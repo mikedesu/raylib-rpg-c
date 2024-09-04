@@ -1,2 +1,3 @@
-# raylib-rpg-c
-An rpg written in C using raylib, with hot reloading!
+# Raylib RPG in C with Hot Reloading
+
+
