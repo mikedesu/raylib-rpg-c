@@ -9,18 +9,17 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+long last_write_time = 0;
+
 char frame_count_buffer[30] = {0};
 
 const int default_window_width = 1280;
 const int default_window_height = 720;
-
-gamestate* g = NULL;
-
-long last_write_time = 0;
-
 const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
+
+gamestate* g = NULL;
 
 void* handle = NULL;
 
@@ -45,10 +44,7 @@ void openhandle() {
 }
 
 void loadsymbols() {
-    //myupdategamestate = (void (*)())dlsym(handle, "updategamestate");
     myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
-    //MyGameRun = dlsym(handle, "GameRun");
-    //if(MyGame_gamestate_destroy == NULL || MyGameRun == NULL) {
     if(myupdategamestate == NULL) {
         fprintf(stderr, "dlsym failed: %s\n", dlerror());
         exit(1);
@@ -108,42 +104,26 @@ void autoreload() {
             printf("Library is locked\n");
             sleep(1);
         }
-        //mprint("getting old gamestate");
-        //gamestate* old_g = g;
-        // dont need to close window this time
+        // mprint("getting old gamestate");
+        // gamestate* old_g = g;
+        //  dont need to close window this time
         mprint("unloading library");
         dlclose(handle);
         mprint("opening handle");
         openhandle();
         mprint("loading symbols");
         loadsymbols();
-        //mprint("reloading window with old gamestate");
-        //myinitwindowwithgamestate(old_g);
+        // mprint("reloading window with old gamestate");
+        // myinitwindowwithgamestate(old_g);
     }
 }
 
-//        old_gamestate = MyGame_get_gamestate();
-//        mPrint("Closing window and unloading library");
-//        MyCloseWindow();
-//        mPrint("Unloading library");
-//        dlclose(handle);
-//        mPrint("Opening handle");
-//        OpenHandle();
-//        mPrint("Loading symbols");
-//        LoadSymbols();
-//        mPrint("Reloading window with old gamestate");
-//        MyInitWindowWithGamestate(old_gamestate);
-//    }
-//}
-
 void gamerun() {
-    //mprint("gamerun");
-    //mprint("initing window");
+    // mprint("gamerun");
+    // mprint("initing window");
     myinitwindow();
-
     openhandle();
     loadsymbols();
-
     mprint("entering gameloop");
     gameloop();
     mprint("closing window");
