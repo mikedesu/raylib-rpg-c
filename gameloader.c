@@ -6,12 +6,13 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
 long last_write_time = 0;
+//char frame_count_buffer[30] = {0};
 
-char frame_count_buffer[30] = {0};
 
 const int default_window_width = 1280;
 const int default_window_height = 720;
@@ -19,11 +20,13 @@ const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
 
-gamestate* g = NULL;
 
+gamestate* g = NULL;
 void* handle = NULL;
 
+
 void (*myupdategamestate)(gamestate*) = NULL;
+
 
 // get the last write time of a file
 time_t getlastwritetime(const char* filename) {
@@ -35,6 +38,7 @@ time_t getlastwritetime(const char* filename) {
     return retval;
 }
 
+
 void openhandle() {
     handle = dlopen(libname, RTLD_LAZY);
     if(!handle) {
@@ -42,6 +46,7 @@ void openhandle() {
         exit(1);
     }
 }
+
 
 void loadsymbols() {
     myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
@@ -51,31 +56,40 @@ void loadsymbols() {
     }
 }
 
+
 void myinitwindow() {
     InitWindow(default_window_width, default_window_height, "Game");
+    SetWindowPosition(GetMonitorWidth(GetCurrentMonitor()) / 2 - default_window_width / 2 + 200, 0);
+
     SetTargetFPS(60);
-    g = gamestate_init();
-    updateframecountbuffer();
+    g = gamestateinit();
+
+    snprintf(g->debugtxtbfr, 256, "framecount: %d", g->framecount);
+
+    //updateframecountbuffer();
 }
 
-void myinitwindowwithgamestate(gamestate* state) {
-    mprint("myinitwindowwithgamestate");
-    InitWindow(default_window_width, default_window_height, "Game");
-    SetTargetFPS(60);
-    mprint("freeing old gamestate");
-    if(g != NULL) {
-        gamestate_destroy(g);
-    }
-    mprint("setting new gamestate");
-    g = state;
-    mprint("updating frame count buffer");
-    updateframecountbuffer();
-    mprint("done with myinitwindowwithgamestatex");
-}
 
-void updateframecountbuffer() {
-    sprintf(frame_count_buffer, "666: %d", g->framecount);
-}
+//void myinitwindowwithgamestate(gamestate* state) {
+//    mprint("myinitwindowwithgamestate");
+//    InitWindow(default_window_width, default_window_height, "Game");
+//    SetTargetFPS(60);
+//    mprint("freeing old gamestate");
+//    if(g != NULL) {
+//        gamestatefree(g);
+//    }
+//    mprint("setting new gamestate");
+//    g = state;
+//    mprint("updating frame count buffer");
+//    updateframecountbuffer();
+//    mprint("done with myinitwindowwithgamestatex");
+//}
+
+
+//void updateframecountbuffer() {
+//    sprintf(frame_count_buffer, "666: %d", g->framecount);
+//}
+
 
 void drawframe() {
     BeginDrawing();
@@ -83,19 +97,25 @@ void drawframe() {
     Color fgc = WHITE;
     ClearBackground(bgc);
     const int fontsize = 60;
-    DrawText(frame_count_buffer, GetScreenWidth() / 4, GetScreenHeight() / 4, fontsize, fgc);
+    //DrawText(frame_count_buffer, GetScreenWidth() / 4, GetScreenHeight() / 4, fontsize, fgc);
+    DrawText(g->debugtxtbfr, g->debugx, g->debugy, fontsize, fgc);
     DrawFPS(GetScreenWidth() - 100, 10);
     EndDrawing();
 }
+
 
 void gameloop() {
     while(!WindowShouldClose()) {
         myupdategamestate(g);
         drawframe();
-        updateframecountbuffer();
+        //updateframecountbuffer();
+        //snprintf(g->debugtxtbfr, 256, "framecount: %d", g->framecount);
+        snprintf(g->debugtxtbfr + 12, 256, "%d", g->framecount);
+
         autoreload();
     }
 }
+
 
 void autoreload() {
     if(getlastwritetime(libname) > last_write_time) {
@@ -118,6 +138,7 @@ void autoreload() {
     }
 }
 
+
 void gamerun() {
     // mprint("gamerun");
     // mprint("initing window");
@@ -130,21 +151,26 @@ void gamerun() {
     CloseWindow();
 }
 
+
 bool mywindowshouldclose() {
     return WindowShouldClose();
 }
+
 
 bool myiskeypressed(int key) {
     return IsKeyPressed(key);
 }
 
+
 unsigned int getframecount() {
     return g->framecount;
 }
 
+
 gamestate* game_get_gamestate() {
     return g;
 }
+
 
 void game_gamestate_destroy(gamestate* gamestate) {
     if(gamestate)

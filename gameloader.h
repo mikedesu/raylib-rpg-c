@@ -5,8 +5,9 @@
 #include <stdbool.h>
 #include <time.h>
 
+
 void myinitwindow();
-void myinitwindowwithgamestate(gamestate* state);
+//void myinitwindowwithgamestate(gamestate* state);
 void drawframe();
 bool mywindowshouldclose();
 bool myiskeypressed(int key);
