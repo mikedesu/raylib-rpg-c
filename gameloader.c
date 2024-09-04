@@ -14,8 +14,8 @@ long last_write_time = 0;
 //char frame_count_buffer[30] = {0};
 
 
-const int default_window_width = 1280;
-const int default_window_height = 720;
+const int default_window_width = 800;
+const int default_window_height = 480;
 const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
@@ -59,7 +59,7 @@ void loadsymbols() {
 
 void myinitwindow() {
     InitWindow(default_window_width, default_window_height, "Game");
-    SetWindowPosition(GetMonitorWidth(GetCurrentMonitor()) / 2 - default_window_width / 2 + 200, 0);
+    SetWindowPosition(GetMonitorWidth(GetCurrentMonitor()) / 2 - default_window_width / 2 + 500, 0);
 
     SetTargetFPS(60);
     g = gamestateinit();
@@ -70,27 +70,6 @@ void myinitwindow() {
 }
 
 
-//void myinitwindowwithgamestate(gamestate* state) {
-//    mprint("myinitwindowwithgamestate");
-//    InitWindow(default_window_width, default_window_height, "Game");
-//    SetTargetFPS(60);
-//    mprint("freeing old gamestate");
-//    if(g != NULL) {
-//        gamestatefree(g);
-//    }
-//    mprint("setting new gamestate");
-//    g = state;
-//    mprint("updating frame count buffer");
-//    updateframecountbuffer();
-//    mprint("done with myinitwindowwithgamestatex");
-//}
-
-
-//void updateframecountbuffer() {
-//    sprintf(frame_count_buffer, "666: %d", g->framecount);
-//}
-
-
 void drawframe() {
     BeginDrawing();
     Color bgc = BLACK;
@@ -98,7 +77,7 @@ void drawframe() {
     ClearBackground(bgc);
     const int fontsize = 60;
     //DrawText(frame_count_buffer, GetScreenWidth() / 4, GetScreenHeight() / 4, fontsize, fgc);
-    DrawText(g->debugtxtbfr, g->debugx, g->debugy, fontsize, fgc);
+    DrawText(g->debugtxtbfr, g->debugx, g->debugy, g->fontsize, fgc);
     DrawFPS(GetScreenWidth() - 100, 10);
     EndDrawing();
 }

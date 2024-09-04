@@ -15,6 +15,7 @@ gamestate* gamestateinit() {
     g->framecount = 0;
     g->debugx = 0;
     g->debugy = 0;
+    g->fontsize = 20;
     bzero(g->debugtxtbfr, 256);
     return g;
 }

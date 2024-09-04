@@ -16,5 +16,6 @@ void updategamestate(gamestate* state) {
         // we can update these while the game is running to re-position the debug text
         state->debugx = 0;
         state->debugy = 0;
+        state->fontsize = 20;
     }
 }
