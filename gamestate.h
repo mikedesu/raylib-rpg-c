@@ -4,6 +4,8 @@
 
 typedef struct gamestate {
     unsigned int framecount;
+    int winwidth;
+    int winheight;
     //unsigned int fontsize;
     //unsigned int debugx;
     //unsigned int debugy;
@@ -13,7 +15,8 @@ typedef struct gamestate {
 
 } gamestate;
 
-#define GAMESTATESIZE (sizeof(unsigned int) * 1 + DEBUGPANELSIZE)
+#define GAMESTATESIZE (sizeof(unsigned int) * 3 + DEBUGPANELSIZE)
 
 gamestate* gamestateinit();
 void gamestatefree(gamestate* gamestate);
+void gamestateinitdebugpanel(gamestate* g);

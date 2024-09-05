@@ -23,3 +23,4 @@ void openhandle();
 void loadsymbols();
 void autoreload();
 void drawdebugpanel();
+void initrendertexture();

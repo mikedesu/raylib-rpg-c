@@ -14,20 +14,19 @@ long last_write_time = 0;
 //char frame_count_buffer[30] = {0};
 
 
-Font font;
-
 const int default_window_width = 960;
 const int default_window_height = 540;
 const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
 
-
 gamestate* g = NULL;
 void* handle = NULL;
 
-
 void (*myupdategamestate)(gamestate*) = NULL;
+
+Font font;
+RenderTexture2D target;
 
 
 // get the last write time of a file
@@ -59,8 +58,16 @@ void loadsymbols() {
 }
 
 
+void initrendertexture() {
+    target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+}
+
+
 void myinitwindow() {
     g = gamestateinit();
+    g->winwidth = default_window_width;
+    g->winheight = default_window_height;
 
     InitWindow(default_window_width, default_window_height, "Game");
     //const int pad = 50;
@@ -71,8 +78,8 @@ void myinitwindow() {
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
 
-    //font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
-    font = LoadFontEx("fonts/liberationmono.ttf", 40, 0, 250);
+    font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
+    //font = LoadFontEx("fonts/liberationmono.ttf", 40, 0, 250);
 
     //snprintf(g->debugtxtbfr, 256, "framecount: %d", g->framecount);
     //snprintf(g->dp.bfr, 256, "framecount: %d", g->framecount);
@@ -91,13 +98,13 @@ void myinitwindow() {
 void drawdebugpanel() {
     const int fontsize = 20;
 
-    Color bgc = DARKGRAY;
-    Color fgc = WHITE;
-    Color borderc = WHITE;
+    Color bgc = (Color){g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, 200};
+    Color fgc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
+    Color borderc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
 
     const int pad = 10;
-    const int w = g->dp.w;
-    const int h = g->dp.h;
+    int w = g->dp.w;
+    int h = g->dp.h;
     int x = g->dp.x + pad;
     int y = g->dp.y + pad;
     DrawRectangle(x, y, w, h, bgc);
@@ -105,20 +112,32 @@ void drawdebugpanel() {
 
     x = g->dp.x + pad * 2;
     y = g->dp.y + pad * 2;
-    DrawTextEx(font, g->dp.bfr, (Vector2){x, y}, fontsize, 0, fgc);
+    DrawTextEx(font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
 }
 
 
 void drawframe() {
     BeginDrawing();
-    Color bgc = BLACK;
-    ClearBackground(bgc);
+    BeginTextureMode(target);
+    ClearBackground(WHITE);
 
     drawdebugpanel();
 
     DrawFPS(GetScreenWidth() - 100, 10);
+    EndTextureMode();
+
+    DrawTexturePro(
+        target.texture,
+        (Rectangle){0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height},
+        (Rectangle){0.0f, 0.0f, (float)GetScreenWidth(), (float)GetScreenHeight()},
+        (Vector2){0.0f, 0.0f},
+        0.0f,
+        WHITE);
 
     EndDrawing();
+
+
+    g->framecount++;
 }
 
 
@@ -162,6 +181,7 @@ void gamerun() {
     openhandle();
     loadsymbols();
     myinitwindow();
+    initrendertexture();
     mprint("entering gameloop");
     gameloop();
     mprint("closing window");
