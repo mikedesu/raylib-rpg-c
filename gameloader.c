@@ -59,26 +59,54 @@ void loadsymbols() {
 
 void myinitwindow() {
     InitWindow(default_window_width, default_window_height, "Game");
-    SetWindowPosition(GetMonitorWidth(GetCurrentMonitor()) / 2 - default_window_width / 2 + 500, 0);
-
+    //const int pad = 50;
+    //const int x = GetMonitorWidth(GetCurrentMonitor()) / 2 - default_window_width / 2 + 500;
+    //const int y = GetMonitorHeight(GetCurrentMonitor()) / 2 - default_window_height / 2;
+    //const int y = pad;
+    //SetWindowPosition(x, y);
     SetTargetFPS(60);
+    SetExitKey(KEY_Q);
+
     g = gamestateinit();
 
-    snprintf(g->debugtxtbfr, 256, "framecount: %d", g->framecount);
+    //snprintf(g->debugtxtbfr, 256, "framecount: %d", g->framecount);
+    snprintf(g->dp.bfr, 256, "framecount: %d", g->framecount);
 
     //updateframecountbuffer();
+}
+
+
+void drawdebugpanel() {
+    const int fontsize = 20;
+
+    Color bgc = DARKGRAY;
+    Color fgc = WHITE;
+
+    const int pad = 10;
+    int x = g->dp.x + pad;
+    int y = g->dp.y + pad;
+    const int w = g->dp.w;
+    const int h = g->dp.h;
+
+    DrawRectangle(x, y, w, h, bgc);
+    //DrawText(g->dp.bfr, g->dp.x, g->dp.y, fontsize, fgc);
+
+    x = g->dp.x + pad * 2;
+    y = g->dp.y + pad * 2;
+
+    DrawText(g->dp.bfr, x, y, fontsize, fgc);
 }
 
 
 void drawframe() {
     BeginDrawing();
     Color bgc = BLACK;
-    Color fgc = WHITE;
     ClearBackground(bgc);
-    const int fontsize = 60;
-    //DrawText(frame_count_buffer, GetScreenWidth() / 4, GetScreenHeight() / 4, fontsize, fgc);
-    DrawText(g->debugtxtbfr, g->debugx, g->debugy, g->fontsize, fgc);
+
+    drawdebugpanel();
+
     DrawFPS(GetScreenWidth() - 100, 10);
+
     EndDrawing();
 }
 
@@ -89,7 +117,6 @@ void gameloop() {
         drawframe();
         //updateframecountbuffer();
         //snprintf(g->debugtxtbfr, 256, "framecount: %d", g->framecount);
-        snprintf(g->debugtxtbfr + 12, 256, "%d", g->framecount);
 
         autoreload();
     }
@@ -152,6 +179,7 @@ gamestate* game_get_gamestate() {
 
 
 void game_gamestate_destroy(gamestate* gamestate) {
-    if(gamestate)
+    if(gamestate) {
         free(gamestate);
+    }
 }

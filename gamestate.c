@@ -12,11 +12,19 @@ gamestate* gamestateinit() {
         fprintf(stderr, "Failed to allocate memory for gamestate: %s\n", strerror(errno));
         return NULL;
     }
+
     g->framecount = 0;
-    g->debugx = 0;
-    g->debugy = 0;
-    g->fontsize = 20;
-    bzero(g->debugtxtbfr, 256);
+    //g->debugx = 0;
+    //g->debugy = 0;
+    //g->fontsize = 20;
+    //bzero(g->debugtxtbfr, 256);
+
+    g->dp.x = 0;
+    g->dp.y = 0;
+    g->dp.w = 200;
+    g->dp.h = 100;
+    bzero(g->dp.bfr, 256);
+
     return g;
 }
 
