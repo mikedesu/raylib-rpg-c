@@ -2,6 +2,7 @@
 #include "mprint.h"
 
 #include <string.h>
+#include <time.h>
 
 void updategamestate(gamestate* state);
 
@@ -15,7 +16,12 @@ void updategamestate(gamestate* g) {
         //snprintf(g->debugtxtbfr, 256, "evildojo %d", g->framecount);
 
         memset(g->dp.bfr, 0, 256);
-        snprintf(g->dp.bfr, 256, "evildojo %d", g->framecount);
+        snprintf(g->dp.bfr,
+                 256,
+                 "framecount %d\ntime: %ld\nfuck god\nhail satan\n",
+                 //"hail satan\n666\npraise the devil");
+                 g->framecount,
+                 time(NULL));
 
         g->dp.x = 10;
         g->dp.y = 10;

@@ -14,8 +14,10 @@ long last_write_time = 0;
 //char frame_count_buffer[30] = {0};
 
 
-const int default_window_width = 800;
-const int default_window_height = 480;
+Font font;
+
+const int default_window_width = 960;
+const int default_window_height = 540;
 const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
@@ -58,6 +60,8 @@ void loadsymbols() {
 
 
 void myinitwindow() {
+    g = gamestateinit();
+
     InitWindow(default_window_width, default_window_height, "Game");
     //const int pad = 50;
     //const int x = GetMonitorWidth(GetCurrentMonitor()) / 2 - default_window_width / 2 + 500;
@@ -67,10 +71,18 @@ void myinitwindow() {
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
 
-    g = gamestateinit();
+    //font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
+    font = LoadFontEx("fonts/liberationmono.ttf", 40, 0, 250);
 
     //snprintf(g->debugtxtbfr, 256, "framecount: %d", g->framecount);
-    snprintf(g->dp.bfr, 256, "framecount: %d", g->framecount);
+    //snprintf(g->dp.bfr, 256, "framecount: %d", g->framecount);
+
+    if(myupdategamestate == NULL) {
+        fprintf(stderr, "dlsym failed or has not been loaded yet: %s\n", dlerror());
+        loadsymbols();
+    }
+
+    myupdategamestate(g);
 
     //updateframecountbuffer();
 }
@@ -81,20 +93,19 @@ void drawdebugpanel() {
 
     Color bgc = DARKGRAY;
     Color fgc = WHITE;
+    Color borderc = WHITE;
 
     const int pad = 10;
-    int x = g->dp.x + pad;
-    int y = g->dp.y + pad;
     const int w = g->dp.w;
     const int h = g->dp.h;
-
+    int x = g->dp.x + pad;
+    int y = g->dp.y + pad;
     DrawRectangle(x, y, w, h, bgc);
-    //DrawText(g->dp.bfr, g->dp.x, g->dp.y, fontsize, fgc);
+    DrawRectangleLines(x, y, w, h, borderc);
 
     x = g->dp.x + pad * 2;
     y = g->dp.y + pad * 2;
-
-    DrawText(g->dp.bfr, x, y, fontsize, fgc);
+    DrawTextEx(font, g->dp.bfr, (Vector2){x, y}, fontsize, 0, fgc);
 }
 
 
@@ -148,9 +159,9 @@ void autoreload() {
 void gamerun() {
     // mprint("gamerun");
     // mprint("initing window");
-    myinitwindow();
     openhandle();
     loadsymbols();
+    myinitwindow();
     mprint("entering gameloop");
     gameloop();
     mprint("closing window");
