@@ -2,22 +2,31 @@ CC=gcc
 OBJ=-c
 SHARED=-shared
 DATA_STRUCTS=vectorentityid.o 
-LIBGAME_OBJECTS=gamestate.o $(DATA_STRUCTS)
+SCENES=titlescene.o 
+LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o gamestate.o
 STATIC_LINK_RAYLIB=-l:libraylib.a
 LINK_MATH=-lm
 POSITION_INDEPENDENT_CODE=-fPIC
 MAIN_C=main.c
 
-all: game 
+all: game  
 
-game: main.c gameloader.o gamestate.o libgame.so $(DATA_STRUCTS)
-	$(CC) -o $@ $(MAIN_C) gameloader.o gamestate.o $(POSITION_INDEPENDENT_CODE)  $(STATIC_LINK_RAYLIB) $(LINK_MATH)
+game: main.c gameloader.o $(LIBGAME_OBJECTS) libgame.so 
+	$(CC) -o $@ $(MAIN_C) gameloader.o $(LIBGAME_OBJECTS) $(POSITION_INDEPENDENT_CODE)  $(STATIC_LINK_RAYLIB) $(LINK_MATH)
 
 # Bridge between Raylib and game
 gameloader.o: gameloader.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+
 gamestate.o: gamestate.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE)  $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	#$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(STATIC_LINK_RAYLIB) $^ -o $@
+
+# Scenes
+
+titlescene.o: titlescene.c 
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	#$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(STATIC_LINK_RAYLIB) $^ -o $@
 
 # Data structures
 vectorentityid.o: vectorentityid.c
@@ -27,8 +36,8 @@ vectorentityid.o: vectorentityid.c
 libgame.o: libgame.c
 	touch libgame.so.lockfile
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
-libgame.so: libgame.o gamestate.o $(DATA_STRUCTS)
-	$(CC) $(SHARED) -o libgame.so libgame.o $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB)
+libgame.so: $(LIBGAME_OBJECTS)
+	$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB)
 	rm -rfv libgame.so.lockfile
 
 clean:

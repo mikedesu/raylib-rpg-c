@@ -9,6 +9,7 @@
 
 // have to update this function when we introduce new fields to Gamestate
 gamestate* gamestateinit() {
+    mprint("gamestateinit\n");
     gamestate* g = (gamestate*)malloc(GAMESTATESIZE);
     if(g == NULL) {
         fprintf(stderr, "Failed to allocate memory for gamestate: %s\n", strerror(errno));
@@ -19,7 +20,11 @@ gamestate* gamestateinit() {
     g->winwidth = 0;
     g->winheight = 0;
     g->clearcolor = (mycolor){0, 0, 0, 255};
+
     gamestateinitdebugpanel(g);
+
+    g->ts = NULL;
+    //g->ts = titlesceneinit();
 
     return g;
 }
@@ -50,10 +55,10 @@ void gamestateinitdebugpanel(gamestate* g) {
 
 
 // have to update this function when we introduce new fields to Gamestate
-void gamestatefree(gamestate* state) {
-    if(state == NULL) {
-        mprint("gamestatefree: gamestate is NULL");
-        return;
+void gamestatefree(gamestate* s) {
+    if(s != NULL) {
+        titlescenefree(s->ts);
+        //titlescenefree(&(s->ts));
+        free(s);
     }
-    free(state);
 }

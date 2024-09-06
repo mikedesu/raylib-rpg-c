@@ -73,10 +73,15 @@ void initrendertexture() {
 
 
 void myinitwindow() {
+    // have to do inittitlescene after initwindow
     g = gamestateinit();
     g->winwidth = default_window_width;
     g->winheight = default_window_height;
+    // cant load textures before initwindow
     InitWindow(default_window_width, default_window_height, "Game");
+
+    g->ts = titlesceneinitptr();
+
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
     font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
@@ -85,6 +90,8 @@ void myinitwindow() {
         loadsymbols();
     }
     myupdategamestate(g);
+
+    mprint("end of myinitwindow");
 }
 
 
@@ -102,19 +109,27 @@ void drawdebugpanel() {
 }
 
 
+void drawtitlescene() {
+    titlescene* ts = g->ts;
+    float w = ts->presents.width, h = ts->presents.height;
+    float z = 0.0f;
+    Rectangle src = {z, z, w, h};
+    w = w * 4, h = h * 4;
+    Rectangle dst = {z, z, w, h};
+    DrawTexturePro(g->ts->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+}
+
+
 void drawframe() {
     BeginDrawing();
     BeginTextureMode(target);
-
     //ClearBackground(WHITE);
     Color clearcolor = (Color){g->clearcolor.r, g->clearcolor.g, g->clearcolor.b, g->clearcolor.a};
     ClearBackground(clearcolor);
-
+    drawtitlescene();
     drawdebugpanel();
-
     DrawFPS(GetScreenWidth() - 100, 10);
     EndTextureMode();
-
     DrawTexturePro(
         target.texture,
         (Rectangle){0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height},
@@ -122,9 +137,7 @@ void drawframe() {
         (Vector2){0.0f, 0.0f},
         0.0f,
         WHITE);
-
     EndDrawing();
-
     g->framecount++;
 }
 
@@ -159,15 +172,19 @@ void autoreload() {
 
 
 void gamerun() {
-    // mprint("gamerun");
-    // mprint("initing window");
+    mprint("gamerun");
+    mprint("opening handle");
     openhandle();
+    mprint("loading symbols");
     loadsymbols();
+    mprint("initing window");
     myinitwindow();
+    mprint("initing rendertexture");
     initrendertexture();
     mprint("entering gameloop");
     gameloop();
     mprint("closing window");
+    gamestatefree(g);
     CloseWindow();
 }
 
