@@ -16,10 +16,13 @@ gamestate* gamestateinit() {
         return NULL;
     }
 
+    g->dodebugpanel = true;
     g->framecount = 0;
     g->winwidth = 0;
     g->winheight = 0;
     g->clearcolor = (mycolor){0, 0, 0, 255};
+    g->fadealpha = 255;
+    g->fadealphadir = -1;
 
     gamestateinitdebugpanel(g);
 
@@ -57,8 +60,8 @@ void gamestateinitdebugpanel(gamestate* g) {
 // have to update this function when we introduce new fields to Gamestate
 void gamestatefree(gamestate* s) {
     if(s != NULL) {
-        titlescenefree(s->ts);
-        //titlescenefree(&(s->ts));
+        companyscenefree(s->ts);
+        //companyscenefree(&(s->ts));
         free(s);
     }
 }

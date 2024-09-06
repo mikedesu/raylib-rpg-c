@@ -19,4 +19,6 @@ void loadsymbols();
 void autoreload();
 void drawdebugpanel();
 void initrendertexture();
-void drawtitlescene();
+void drawcompanyscene();
+void handleinput();
+void drawfade();

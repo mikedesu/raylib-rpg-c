@@ -80,7 +80,7 @@ void myinitwindow() {
     // cant load textures before initwindow
     InitWindow(default_window_width, default_window_height, "Game");
 
-    g->ts = titlesceneinitptr();
+    g->ts = companysceneinitptr();
 
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
@@ -109,8 +109,8 @@ void drawdebugpanel() {
 }
 
 
-void drawtitlescene() {
-    titlescene* ts = g->ts;
+void drawcompanyscene() {
+    companyscene* ts = g->ts;
     float w = ts->presents.width, h = ts->presents.height;
     float x = ts->x;
     float y = ts->y;
@@ -121,15 +121,36 @@ void drawtitlescene() {
 }
 
 
+void drawfade() {
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, g->fadealpha});
+    g->fadealpha += g->fadealphadir;
+    if(g->fadealpha >= 255) {
+        g->fadealphadir = -1;
+    } else if(g->fadealpha <= 0) {
+        g->fadealphadir = 1;
+    }
+}
+
+
 void drawframe() {
     BeginDrawing();
     BeginTextureMode(target);
     //ClearBackground(WHITE);
     Color clearcolor = (Color){g->clearcolor.r, g->clearcolor.g, g->clearcolor.b, g->clearcolor.a};
     ClearBackground(clearcolor);
-    drawtitlescene();
-    drawdebugpanel();
-    DrawFPS(GetScreenWidth() - 100, 10);
+    drawcompanyscene();
+
+    drawfade();
+
+    // draw a box on top of the screen
+    // this box will serve as our 'fade'
+
+
+    if(g->dodebugpanel) {
+        drawdebugpanel();
+        DrawFPS(GetScreenWidth() - 100, 10);
+    }
+
     EndTextureMode();
     DrawTexturePro(
         target.texture,
@@ -143,11 +164,19 @@ void drawframe() {
 }
 
 
+void handleinput() {
+    if(IsKeyPressed(KEY_D)) {
+        g->dodebugpanel = !g->dodebugpanel;
+    }
+}
+
+
 void gameloop() {
     while(!WindowShouldClose()) {
         //myupdategamestate(g);
-        myupdategamestateunsafe(g);
         drawframe();
+        myupdategamestateunsafe(g);
+        handleinput();
         autoreload();
     }
 }

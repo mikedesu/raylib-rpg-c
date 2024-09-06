@@ -1,12 +1,12 @@
+#include "companyscene.h"
 #include "mprint.h"
-#include "titlescene.h"
 
 #include <stdlib.h>
 
 
-titlescene titlesceneinit() {
-    mprint("titlesceneinit");
-    titlescene ts;
+companyscene companysceneinit() {
+    mprint("companysceneinit");
+    companyscene ts;
     mprint("Loading textures");
     mprint("Loading presents texture");
     ts.presents = LoadTexture("img/evildojo666-presents.png");
@@ -19,12 +19,12 @@ titlescene titlesceneinit() {
     return ts;
 }
 
-titlescene* titlesceneinitptr() {
-    mprint("titlesceneinitptr");
-    //titlescene* ts = (titlescene*)malloc(sizeof(titlescene));
-    titlescene* ts = (titlescene*)malloc(TITLESCENESIZE);
+companyscene* companysceneinitptr() {
+    mprint("companysceneinitptr");
+    //companyscene* ts = (companyscene*)malloc(sizeof(companyscene));
+    companyscene* ts = (companyscene*)malloc(COMPANYSCENESIZE);
     if(ts != NULL) {
-        mprint("titlesceneinit: malloc success");
+        mprint("companysceneinit: malloc success");
         mprint("Loading textures");
         mprint("Loading presents texture");
         ts->presents = LoadTexture("img/evildojo666-presents.png");
@@ -35,20 +35,20 @@ titlescene* titlesceneinitptr() {
         ts->y = 0;
         ts->scale = 1;
 
-        //mprint("Loading title texture");
-        //ts->title = LoadTexture("img/title2.png");
-        //if(ts->title.id == 0) {
-        //    mprint("Error loading title texture");
+        //mprint("Loading company texture");
+        //ts->company = LoadTexture("img/company2.png");
+        //if(ts->company.id == 0) {
+        //    mprint("Error loading company texture");
         //}
     }
     return ts;
 }
 
 
-void titlescenefree(titlescene* ts) {
+void companyscenefree(companyscene* ts) {
     if(ts != NULL) {
         UnloadTexture(ts->presents);
-        //UnloadTexture(ts->title);
+        //UnloadTexture(ts->company);
         free(ts);
     }
 }

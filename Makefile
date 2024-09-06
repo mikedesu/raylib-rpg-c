@@ -2,7 +2,7 @@ CC=gcc
 OBJ=-c
 SHARED=-shared
 DATA_STRUCTS=vectorentityid.o 
-SCENES=titlescene.o 
+SCENES=companyscene.o 
 LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o gamestate.o
 STATIC_LINK_RAYLIB=-l:libraylib.a
 LINK_MATH=-lm
@@ -24,7 +24,7 @@ gamestate.o: gamestate.c
 
 # Scenes
 
-titlescene.o: titlescene.c 
+companyscene.o: companyscene.c 
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 	#$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(STATIC_LINK_RAYLIB) $^ -o $@
 

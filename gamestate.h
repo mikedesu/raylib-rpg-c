@@ -1,24 +1,31 @@
 #pragma once
 
+#include "companyscene.h"
 #include "debugpanel.h"
-#include "titlescene.h"
+#include <stdbool.h>
 
 typedef struct gamestate {
+    bool dodebugpanel;
+
     int framecount;
     int winwidth;
     int winheight;
 
     mycolor clearcolor;
 
+    int fadealpha;
+    int fadealphadir;
+
     debugpanel dp;
 
-    titlescene* ts;
-    //titlescene ts;
+    companyscene* ts;
+    //companyscene ts;
 
 } gamestate;
 
-#define GAMESTATESIZE (sizeof(int) * 3 + MYCOLORSIZE + DEBUGPANELSIZE + sizeof(titlescene*))
-//#define GAMESTATESIZE (sizeof(int) * 3 + MYCOLORSIZE + DEBUGPANELSIZE + sizeof(titlescene))
+#define GAMESTATESIZE                                                                              \
+    (sizeof(bool) + sizeof(int) * 5 + MYCOLORSIZE + DEBUGPANELSIZE + sizeof(companyscene*))
+//#define GAMESTATESIZE (sizeof(int) * 3 + MYCOLORSIZE + DEBUGPANELSIZE + sizeof(companyscene))
 //#define GAMESTATESIZE (sizeof(int) * 3 + MYCOLORSIZE + DEBUGPANELSIZE)
 
 gamestate* gamestateinit();
