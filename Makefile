@@ -41,4 +41,4 @@ libgame.so: $(LIBGAME_OBJECTS)
 	rm -rfv libgame.so.lockfile
 
 clean:
-	rm -rfv game *.o *.so *.lockfile
+	rm -rfv game *.o *.so *.lockfile time.txt

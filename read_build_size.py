@@ -10,7 +10,7 @@ import numpy as np
 
 
 def main():
-    filename = "build_size.csv"
+    filename = "build-stats.csv"
     df = pd.read_csv(filename)
 
     for index, row in df.iterrows():
@@ -25,12 +25,22 @@ def main():
             bytes_ = row["bytes"] - df.at[index - 1, "bytes"]
             df.at[index, "loc/s"] = loc / time
             df.at[index, "bytes/s"] = bytes_ / time
+            # how fast the build time is increasing or decreasing per second
+            buildtime = row["buildtime"] - df.at[index - 1, "buildtime"]
+            df.at[index, "buildtime ms/s"] = buildtime / time
         else:
             df.at[index, "loc/s"] = 0
             df.at[index, "bytes/s"] = 0
+            df.at[index, "buildtime ms/s"] = 0
 
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
+    # convert "buildtime" from fractional seconds to milliseconds
+    df["buildtime"] = df["buildtime"] * 1000
     print(df)
+
+    print(f"Average Build Time: {df['buildtime'].mean():10}")
+    print(f"Average LOC:      : {df['loc'].mean():10}")
+    print(f"Average KB:       : {df['kb'].mean():10}")
 
 
 if __name__ == "__main__":
