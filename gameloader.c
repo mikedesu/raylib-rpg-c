@@ -112,10 +112,11 @@ void drawdebugpanel() {
 void drawtitlescene() {
     titlescene* ts = g->ts;
     float w = ts->presents.width, h = ts->presents.height;
-    float z = 0.0f;
-    Rectangle src = {z, z, w, h};
-    w = w * 4, h = h * 4;
-    Rectangle dst = {z, z, w, h};
+    float x = ts->x;
+    float y = ts->y;
+    float s = ts->scale;
+    Rectangle src = {0, 0, w, h};
+    Rectangle dst = {x, y, w * s, h * s};
     DrawTexturePro(g->ts->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
 }
 

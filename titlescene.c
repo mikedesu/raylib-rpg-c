@@ -13,6 +13,9 @@ titlescene titlesceneinit() {
     if(ts.presents.id == 0) {
         mprint("Error loading presents texture");
     }
+    ts.x = 0;
+    ts.y = 0;
+    ts.scale = 1;
     return ts;
 }
 
@@ -28,6 +31,9 @@ titlescene* titlesceneinitptr() {
         if(ts->presents.id == 0) {
             mprint("Error loading presents texture");
         }
+        ts->x = 0;
+        ts->y = 0;
+        ts->scale = 1;
 
         //mprint("Loading title texture");
         //ts->title = LoadTexture("img/title2.png");

@@ -38,5 +38,11 @@ void updategamestateunsafe(gamestate* g) {
     g->dp.bgcolor.a = 128;
 
     //g->clearcolor.r = g->clearcolor.g = g->clearcolor.b = 255;
-    g->clearcolor.r = g->clearcolor.g = g->clearcolor.b = 0x33;
+    //g->clearcolor.r = g->clearcolor.g = g->clearcolor.b = 0x33;
+    g->clearcolor.r = g->clearcolor.g = g->clearcolor.b = 0;
+
+    g->ts->scale = 4;
+    int scale = g->ts->scale;
+    g->ts->x = g->winwidth / 2 - g->ts->presents.width * scale / 2;
+    g->ts->y = g->winheight / 2 - g->ts->presents.height * scale / 2;
 }
