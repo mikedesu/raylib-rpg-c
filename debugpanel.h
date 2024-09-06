@@ -1,13 +1,8 @@
 #pragma once
 
+#include "mycolor.h"
 
-typedef struct MyColor {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-    unsigned char a;
-} MyColor;
-
+#define DEBUGPANELBUFSIZE 256
 
 typedef struct debugpanel {
     int x;
@@ -15,12 +10,9 @@ typedef struct debugpanel {
     int w;
     int h;
     int fontsize;
-    MyColor fgcolor;
-    MyColor bgcolor;
-    char bfr[256];
-
+    mycolor fgcolor;
+    mycolor bgcolor;
+    char bfr[DEBUGPANELBUFSIZE];
 } debugpanel;
 
-
-//#define DEBUGPANELSIZE (sizeof(int) * 5 + sizeof(char) * 256)
 #define DEBUGPANELSIZE (sizeof(debugpanel))

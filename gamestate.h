@@ -6,6 +6,9 @@ typedef struct gamestate {
     unsigned int framecount;
     int winwidth;
     int winheight;
+
+    mycolor clearcolor;
+
     //unsigned int fontsize;
     //unsigned int debugx;
     //unsigned int debugy;
@@ -15,7 +18,7 @@ typedef struct gamestate {
 
 } gamestate;
 
-#define GAMESTATESIZE (sizeof(unsigned int) * 3 + DEBUGPANELSIZE)
+#define GAMESTATESIZE (sizeof(unsigned int) * 1 + sizeof(int) * 2 + MYCOLORSIZE + DEBUGPANELSIZE)
 
 gamestate* gamestateinit();
 void gamestatefree(gamestate* gamestate);

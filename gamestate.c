@@ -1,4 +1,6 @@
+#include "debugpanel.h"
 #include "gamestate.h"
+#include "mprint.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -16,6 +18,7 @@ gamestate* gamestateinit() {
     g->framecount = 0;
     g->winwidth = 0;
     g->winheight = 0;
+    g->clearcolor = (mycolor){0, 0, 0, 255};
     gamestateinitdebugpanel(g);
 
     return g;
@@ -42,14 +45,14 @@ void gamestateinitdebugpanel(gamestate* g) {
     g->dp.bgcolor.g = 0x66;
     g->dp.bgcolor.b = 0x66;
 
-    bzero(g->dp.bfr, 256);
+    bzero(g->dp.bfr, DEBUGPANELBUFSIZE);
 }
 
 
 // have to update this function when we introduce new fields to Gamestate
 void gamestatefree(gamestate* state) {
     if(state == NULL) {
-        fprintf(stderr, "Gamestate_destroy: gamestate is NULL\n");
+        mprint("gamestatefree: gamestate is NULL");
         return;
     }
     free(state);

@@ -24,6 +24,7 @@ gamestate* g = NULL;
 void* handle = NULL;
 
 void (*myupdategamestate)(gamestate*) = NULL;
+void (*myupdategamestateunsafe)(gamestate*) = NULL;
 
 Font font;
 RenderTexture2D target;
@@ -49,12 +50,19 @@ void openhandle() {
 }
 
 
-void loadsymbols() {
-    myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
-    if(myupdategamestate == NULL) {
+void checksymbol(void* symbol, const char* name) {
+    if(symbol == NULL) {
         fprintf(stderr, "dlsym failed: %s\n", dlerror());
         exit(1);
     }
+}
+
+
+void loadsymbols() {
+    myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
+    myupdategamestateunsafe = (void (*)(gamestate*))dlsym(handle, "updategamestateunsafe");
+    checksymbol(myupdategamestate, "updategamestate");
+    checksymbol(myupdategamestateunsafe, "updategamestateunsafe");
 }
 
 
@@ -68,50 +76,28 @@ void myinitwindow() {
     g = gamestateinit();
     g->winwidth = default_window_width;
     g->winheight = default_window_height;
-
     InitWindow(default_window_width, default_window_height, "Game");
-    //const int pad = 50;
-    //const int x = GetMonitorWidth(GetCurrentMonitor()) / 2 - default_window_width / 2 + 500;
-    //const int y = GetMonitorHeight(GetCurrentMonitor()) / 2 - default_window_height / 2;
-    //const int y = pad;
-    //SetWindowPosition(x, y);
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
-
     font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
-    //font = LoadFontEx("fonts/liberationmono.ttf", 40, 0, 250);
-
-    //snprintf(g->debugtxtbfr, 256, "framecount: %d", g->framecount);
-    //snprintf(g->dp.bfr, 256, "framecount: %d", g->framecount);
-
     if(myupdategamestate == NULL) {
         fprintf(stderr, "dlsym failed or has not been loaded yet: %s\n", dlerror());
         loadsymbols();
     }
-
     myupdategamestate(g);
-
-    //updateframecountbuffer();
 }
 
 
 void drawdebugpanel() {
-    const int fontsize = 20;
-
-    Color bgc = (Color){g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, 200};
-    Color fgc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
-    Color borderc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
-
-    const int pad = 10;
-    int w = g->dp.w;
-    int h = g->dp.h;
-    int x = g->dp.x + pad;
-    int y = g->dp.y + pad;
+    const int fontsize = 20, pad = 10;
+    Color bgc = (Color){g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, g->dp.bgcolor.a},
+          fgc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255},
+          borderc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
+    int w = g->dp.w, h = g->dp.h, x = g->dp.x + pad, y = g->dp.y + pad;
     DrawRectangle(x, y, w, h, bgc);
     DrawRectangleLines(x, y, w, h, borderc);
 
-    x = g->dp.x + pad * 2;
-    y = g->dp.y + pad * 2;
+    x = g->dp.x + pad * 2, y = g->dp.y + pad * 2;
     DrawTextEx(font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
 }
 
@@ -119,7 +105,10 @@ void drawdebugpanel() {
 void drawframe() {
     BeginDrawing();
     BeginTextureMode(target);
-    ClearBackground(WHITE);
+
+    //ClearBackground(WHITE);
+    Color clearcolor = (Color){g->clearcolor.r, g->clearcolor.g, g->clearcolor.b, g->clearcolor.a};
+    ClearBackground(clearcolor);
 
     drawdebugpanel();
 
@@ -136,18 +125,15 @@ void drawframe() {
 
     EndDrawing();
 
-
     g->framecount++;
 }
 
 
 void gameloop() {
     while(!WindowShouldClose()) {
-        myupdategamestate(g);
+        //myupdategamestate(g);
+        myupdategamestateunsafe(g);
         drawframe();
-        //updateframecountbuffer();
-        //snprintf(g->debugtxtbfr, 256, "framecount: %d", g->framecount);
-
         autoreload();
     }
 }
@@ -162,15 +148,12 @@ void autoreload() {
         }
         // mprint("getting old gamestate");
         // gamestate* old_g = g;
-        //  dont need to close window this time
         mprint("unloading library");
         dlclose(handle);
         mprint("opening handle");
         openhandle();
         mprint("loading symbols");
         loadsymbols();
-        // mprint("reloading window with old gamestate");
-        // myinitwindowwithgamestate(old_g);
     }
 }
 
@@ -204,13 +187,8 @@ unsigned int getframecount() {
 }
 
 
-gamestate* game_get_gamestate() {
-    return g;
-}
-
-
-void game_gamestate_destroy(gamestate* gamestate) {
-    if(gamestate) {
-        free(gamestate);
-    }
-}
+//void game_gamestate_destroy(gamestate* gamestate) {
+//    if(gamestate) {
+//        free(gamestate);
+//    }
+//}

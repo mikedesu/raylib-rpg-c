@@ -1,7 +1,7 @@
 CC=gcc
 OBJ=-c
 SHARED=-shared
-DATA_STRUCTS=vectorentityid.o mapinttxinfo.o
+DATA_STRUCTS=vectorentityid.o 
 LIBGAME_OBJECTS=gamestate.o $(DATA_STRUCTS)
 STATIC_LINK_RAYLIB=-l:libraylib.a
 LINK_MATH=-lm
@@ -10,7 +10,7 @@ MAIN_C=main.c
 
 all: game 
 
-game: main.c gameloader.o gamestate.o libgame.so vectorentityid.o mapinttxinfo.o
+game: main.c gameloader.o gamestate.o libgame.so $(DATA_STRUCTS)
 	$(CC) -o $@ $(MAIN_C) gameloader.o gamestate.o $(POSITION_INDEPENDENT_CODE)  $(STATIC_LINK_RAYLIB) $(LINK_MATH)
 
 # Bridge between Raylib and game
@@ -21,8 +21,6 @@ gamestate.o: gamestate.c
 
 # Data structures
 vectorentityid.o: vectorentityid.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
-mapinttxinfo.o: mapinttxinfo.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 
 # Main reloadable game base
