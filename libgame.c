@@ -16,7 +16,7 @@ void updategamestateunsafe(gamestate* g);
 
 void updategamestate(gamestate* g) {
     // for right now, we will just update the frame count
-    if(g) {
+    if (g) {
         // we can update these while the game is running to re-position the debug text
         updategamestateunsafe(g);
     }
@@ -41,8 +41,8 @@ void updategamestateunsafe(gamestate* g) {
     //g->clearcolor.r = g->clearcolor.g = g->clearcolor.b = 0x33;
     g->clearcolor.r = g->clearcolor.g = g->clearcolor.b = 0;
 
-    g->ts->scale = 4;
-    int scale = g->ts->scale;
-    g->ts->x = g->winwidth / 2 - g->ts->presents.width * scale / 2;
-    g->ts->y = g->winheight / 2 - g->ts->presents.height * scale / 2;
+    g->cs->scale = 4;
+    int scale = g->cs->scale;
+    g->cs->x = g->winwidth / 2 - g->cs->presents.width * scale / 2;
+    g->cs->y = g->winheight / 2 - g->cs->presents.height * scale / 2;
 }

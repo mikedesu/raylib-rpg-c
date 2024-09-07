@@ -11,7 +11,7 @@
 gamestate* gamestateinit() {
     mprint("gamestateinit\n");
     gamestate* g = (gamestate*)malloc(GAMESTATESIZE);
-    if(g == NULL) {
+    if (g == NULL) {
         fprintf(stderr, "Failed to allocate memory for gamestate: %s\n", strerror(errno));
         return NULL;
     }
@@ -26,7 +26,7 @@ gamestate* gamestateinit() {
 
     gamestateinitdebugpanel(g);
 
-    g->ts = NULL;
+    g->cs = NULL;
     //g->ts = titlesceneinit();
 
     return g;
@@ -34,7 +34,7 @@ gamestate* gamestateinit() {
 
 
 void gamestateinitdebugpanel(gamestate* g) {
-    if(g == NULL) {
+    if (g == NULL) {
         fprintf(stderr, "gamestateinitdebugpanel: gamestate is NULL\n");
         return;
     }
@@ -59,8 +59,8 @@ void gamestateinitdebugpanel(gamestate* g) {
 
 // have to update this function when we introduce new fields to Gamestate
 void gamestatefree(gamestate* s) {
-    if(s != NULL) {
-        companyscenefree(s->ts);
+    if (s != NULL) {
+        companyscenefree(s->cs);
         //companyscenefree(&(s->ts));
         free(s);
     }

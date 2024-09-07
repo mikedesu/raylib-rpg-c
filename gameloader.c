@@ -1,3 +1,4 @@
+#include "display.h"
 #include "gameloader.h"
 #include "gamestate.h"
 #include "mprint.h"
@@ -18,8 +19,7 @@ const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
 
-Font font;
-RenderTexture2D target;
+display mydisplay;
 
 gamestate* g = NULL;
 void* handle = NULL;
@@ -64,8 +64,8 @@ void loadsymbols() {
 
 
 void initrendertexture() {
-    target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
-    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    mydisplay.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+    SetTextureFilter(mydisplay.target.texture, TEXTURE_FILTER_BILINEAR);
 }
 
 
@@ -77,11 +77,11 @@ void myinitwindow() {
     // cant load textures before initwindow
     InitWindow(default_window_width, default_window_height, "Game");
 
-    g->ts = companysceneinitptr();
+    g->cs = companysceneinitptr();
 
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
-    font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
+    mydisplay.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
     if (myupdategamestate == NULL) {
         fprintf(stderr, "dlsym failed or has not been loaded yet: %s\n", dlerror());
         loadsymbols();
@@ -101,19 +101,19 @@ void drawdebugpanel() {
     DrawRectangle(x, y, w, h, bgc);
     DrawRectangleLines(x, y, w, h, borderc);
     x = g->dp.x + pad * 2, y = g->dp.y + pad * 2;
-    DrawTextEx(font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
+    DrawTextEx(mydisplay.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
 }
 
 
 void drawcompanyscene() {
-    companyscene* ts = g->ts;
-    float w = ts->presents.width, h = ts->presents.height;
-    float x = ts->x;
-    float y = ts->y;
-    float s = ts->scale;
+    companyscene* cs = g->cs;
+    float w = cs->presents.width, h = cs->presents.height;
+    float x = cs->x;
+    float y = cs->y;
+    float s = cs->scale;
     Rectangle src = {0, 0, w, h};
     Rectangle dst = {x, y, w * s, h * s};
-    DrawTexturePro(g->ts->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+    DrawTexturePro(g->cs->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
 }
 
 
@@ -145,27 +145,29 @@ void drawframe(gamestate* s) {
 void drawframeunsafe(gamestate* s) {
     if (s) {
         BeginDrawing();
-        BeginTextureMode(target);
+        BeginTextureMode(mydisplay.target);
         //ClearBackground(WHITE);
         Color clearcolor =
             (Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a};
         ClearBackground(clearcolor);
         drawcompanyscene();
         drawfade(s);
+
+        const int dw = GetScreenWidth(), dh = GetScreenHeight(), w = mydisplay.target.texture.width,
+                  h = mydisplay.target.texture.height;
+
         // draw a box on top of the screen
         // this box will serve as our 'fade'
         if (s->dodebugpanel) {
             drawdebugpanel();
-            DrawFPS(GetScreenWidth() - 100, 10);
+            DrawFPS(dw - 100, 10);
         }
         EndTextureMode();
-        DrawTexturePro(
-            target.texture,
-            (Rectangle){0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height},
-            (Rectangle){0.0f, 0.0f, (float)GetScreenWidth(), (float)GetScreenHeight()},
-            (Vector2){0.0f, 0.0f},
-            0.0f,
-            WHITE);
+
+        Rectangle src = {0.0f, 0.0f, (float)w, (float)-h};
+        Rectangle dst = {0.0f, 0.0f, (float)dw, (float)dh};
+
+        DrawTexturePro(mydisplay.target.texture, src, dst, mydisplay.origin, 0.0f, WHITE);
         EndDrawing();
         g->framecount++;
     }
@@ -213,6 +215,12 @@ void autoreload() {
 }
 
 
+void unloaddisplay() {
+    UnloadRenderTexture(mydisplay.target);
+    UnloadFont(mydisplay.font);
+}
+
+
 void gamerun() {
     mprint("gamerun");
     mprint("opening handle");
@@ -227,5 +235,6 @@ void gamerun() {
     gameloop(g);
     mprint("closing window");
     gamestatefree(g);
+    unloaddisplay();
     CloseWindow();
 }

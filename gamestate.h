@@ -18,7 +18,7 @@ typedef struct gamestate {
 
     debugpanel dp;
 
-    companyscene* ts;
+    companyscene* cs;
     //companyscene ts;
 
 } gamestate;
