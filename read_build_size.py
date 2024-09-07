@@ -37,10 +37,21 @@ def main():
     # convert "buildtime" from fractional seconds to milliseconds
     df["buildtime"] = df["buildtime"] * 1000
     print(df)
+    print()
 
-    print(f"Average Build Time: {df['buildtime'].mean():10}")
-    print(f"Average LOC:      : {df['loc'].mean():10}")
-    print(f"Average KB:       : {df['kb'].mean():10}")
+    buildtimestr = f"{df['buildtime'].mean():.4f}"
+    locstr = f"{df['loc'].mean():.4f}"
+    kbstr = f"{df['kb'].mean():.4f}"
+    # bpsstr = f"{df['bytes/s'].mean():.2f}"
+    # locsstr = f"{df['loc/s'].mean():.2f}"
+    # buildtimestr = f"{df['buildtime ms/s'].mean():.2f}"
+
+    print(f"Avg build Time (ms):      {buildtimestr}")
+    print(f"Avg line count (loc):     {locstr}")
+    print(f"Avg build size (kb):      {kbstr}")
+    # print(f"Avg build size (bytes/s): {bpsstr}")
+    # print(f"Avg line count (loc/s):   {locsstr}")
+    # print(f"Avg build Time (ms/s):    {buildtimestr}")
 
 
 if __name__ == "__main__":

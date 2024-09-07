@@ -31,7 +31,7 @@ void (*myupdategamestateunsafe)(gamestate*) = NULL;
 time_t getlastwritetime(const char* filename) {
     struct stat file_stat;
     time_t retval = 0;
-    if(stat(filename, &file_stat) == 0) {
+    if (stat(filename, &file_stat) == 0) {
         retval = file_stat.st_mtime;
     }
     return retval;
@@ -40,7 +40,7 @@ time_t getlastwritetime(const char* filename) {
 
 void openhandle() {
     handle = dlopen(libname, RTLD_LAZY);
-    if(!handle) {
+    if (!handle) {
         fprintf(stderr, "dlopen failed: %s\n", dlerror());
         exit(1);
     }
@@ -48,7 +48,7 @@ void openhandle() {
 
 
 void checksymbol(void* symbol, const char* name) {
-    if(symbol == NULL) {
+    if (symbol == NULL) {
         fprintf(stderr, "dlsym failed: %s\n", dlerror());
         exit(1);
     }
@@ -82,7 +82,7 @@ void myinitwindow() {
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
     font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
-    if(myupdategamestate == NULL) {
+    if (myupdategamestate == NULL) {
         fprintf(stderr, "dlsym failed or has not been loaded yet: %s\n", dlerror());
         loadsymbols();
     }
@@ -118,7 +118,7 @@ void drawcompanyscene() {
 
 
 void drawfade(gamestate* s) {
-    if(s) {
+    if (s) {
         drawfadeunsafe(s);
     }
 }
@@ -127,23 +127,23 @@ void drawfade(gamestate* s) {
 void drawfadeunsafe(gamestate* g) {
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, g->fadealpha});
     g->fadealpha += g->fadealphadir;
-    if(g->fadealpha >= 255) {
+    if (g->fadealpha >= 255) {
         g->fadealphadir = -1;
-    } else if(g->fadealpha <= 0) {
+    } else if (g->fadealpha <= 0) {
         g->fadealphadir = 1;
     }
 }
 
 
 void drawframe(gamestate* s) {
-    if(s) {
+    if (s) {
         drawframeunsafe(s);
     }
 }
 
 
 void drawframeunsafe(gamestate* s) {
-    if(s) {
+    if (s) {
         BeginDrawing();
         BeginTextureMode(target);
         //ClearBackground(WHITE);
@@ -154,7 +154,7 @@ void drawframeunsafe(gamestate* s) {
         drawfade(s);
         // draw a box on top of the screen
         // this box will serve as our 'fade'
-        if(s->dodebugpanel) {
+        if (s->dodebugpanel) {
             drawdebugpanel();
             DrawFPS(GetScreenWidth() - 100, 10);
         }
@@ -172,28 +172,32 @@ void drawframeunsafe(gamestate* s) {
 }
 
 
-void handleinput() {
-    if(IsKeyPressed(KEY_D)) {
-        g->dodebugpanel = !g->dodebugpanel;
+void handleinput(gamestate* g) {
+    if (g) {
+        if (IsKeyPressed(KEY_D)) {
+            g->dodebugpanel = !g->dodebugpanel;
+        }
     }
 }
 
 
-void gameloop() {
-    while(!WindowShouldClose()) {
-        //myupdategamestate(g);
-        drawframe(g);
-        myupdategamestateunsafe(g);
-        handleinput();
-        autoreload();
+void gameloop(gamestate* g) {
+    if (g) {
+        while (!WindowShouldClose()) {
+            //myupdategamestate(g);
+            drawframe(g);
+            myupdategamestateunsafe(g);
+            handleinput(g);
+            autoreload();
+        }
     }
 }
 
 
 void autoreload() {
-    if(getlastwritetime(libname) > last_write_time) {
+    if (getlastwritetime(libname) > last_write_time) {
         last_write_time = getlastwritetime(libname);
-        while(FileExists(lockfile)) {
+        while (FileExists(lockfile)) {
             printf("Library is locked\n");
             sleep(1);
         }
@@ -220,23 +224,8 @@ void gamerun() {
     mprint("initing rendertexture");
     initrendertexture();
     mprint("entering gameloop");
-    gameloop();
+    gameloop(g);
     mprint("closing window");
     gamestatefree(g);
     CloseWindow();
 }
-
-
-//bool mywindowshouldclose() {
-//    return WindowShouldClose();
-//}
-
-
-//bool myiskeypressed(int key) {
-//    return IsKeyPressed(key);
-//}
-
-
-//unsigned int getframecount() {
-//    return g->framecount;
-//}
