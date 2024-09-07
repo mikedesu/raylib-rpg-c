@@ -11,8 +11,6 @@
 #include <unistd.h>
 
 long last_write_time = 0;
-//char frame_count_buffer[30] = {0};
-
 
 const int default_window_width = 960;
 const int default_window_height = 540;
@@ -20,15 +18,14 @@ const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
 
+Font font;
+RenderTexture2D target;
+
 gamestate* g = NULL;
 void* handle = NULL;
 
 void (*myupdategamestate)(gamestate*) = NULL;
 void (*myupdategamestateunsafe)(gamestate*) = NULL;
-
-Font font;
-RenderTexture2D target;
-
 
 // get the last write time of a file
 time_t getlastwritetime(const char* filename) {
@@ -103,7 +100,6 @@ void drawdebugpanel() {
     int w = g->dp.w, h = g->dp.h, x = g->dp.x + pad, y = g->dp.y + pad;
     DrawRectangle(x, y, w, h, bgc);
     DrawRectangleLines(x, y, w, h, borderc);
-
     x = g->dp.x + pad * 2, y = g->dp.y + pad * 2;
     DrawTextEx(font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
 }
@@ -132,21 +128,20 @@ void drawfade() {
 }
 
 
-void drawframe() {
+//void drawframe() {
+void drawframe(gamestate* s) {
     BeginDrawing();
     BeginTextureMode(target);
     //ClearBackground(WHITE);
-    Color clearcolor = (Color){g->clearcolor.r, g->clearcolor.g, g->clearcolor.b, g->clearcolor.a};
+    Color clearcolor = (Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a};
     ClearBackground(clearcolor);
     drawcompanyscene();
 
     drawfade();
-
     // draw a box on top of the screen
     // this box will serve as our 'fade'
 
-
-    if(g->dodebugpanel) {
+    if(s->dodebugpanel) {
         drawdebugpanel();
         DrawFPS(GetScreenWidth() - 100, 10);
     }
@@ -174,7 +169,7 @@ void handleinput() {
 void gameloop() {
     while(!WindowShouldClose()) {
         //myupdategamestate(g);
-        drawframe();
+        drawframe(g);
         myupdategamestateunsafe(g);
         handleinput();
         autoreload();
@@ -219,23 +214,16 @@ void gamerun() {
 }
 
 
-bool mywindowshouldclose() {
-    return WindowShouldClose();
-}
+//bool mywindowshouldclose() {
+//    return WindowShouldClose();
+//}
 
 
-bool myiskeypressed(int key) {
-    return IsKeyPressed(key);
-}
+//bool myiskeypressed(int key) {
+//    return IsKeyPressed(key);
+//}
 
 
-unsigned int getframecount() {
-    return g->framecount;
-}
-
-
-//void game_gamestate_destroy(gamestate* gamestate) {
-//    if(gamestate) {
-//        free(gamestate);
-//    }
+//unsigned int getframecount() {
+//    return g->framecount;
 //}

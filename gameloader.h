@@ -5,15 +5,15 @@
 #include <stdbool.h>
 #include <time.h>
 
+//bool mywindowshouldclose();
+//bool myiskeypressed(int key);
+//unsigned int getframecount();
+time_t getlastwritetime(const char* filename);
 void myinitwindow();
-void drawframe();
-bool mywindowshouldclose();
-bool myiskeypressed(int key);
-void updateframecountbuffer();
-unsigned int getframecount();
+void drawframe(gamestate* g);
 void gameloop();
 void gamerun();
-time_t getlastwritetime(const char* filename);
+void updateframecountbuffer();
 void openhandle();
 void loadsymbols();
 void autoreload();
