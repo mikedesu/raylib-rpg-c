@@ -25,3 +25,4 @@ void handleinput(gamestate* g);
 void drawfade(gamestate* g);
 void drawfadeunsafe(gamestate* g);
 void unloaddisplay();
+void mygamestateinit();

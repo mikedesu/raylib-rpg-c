@@ -69,19 +69,28 @@ void initrendertexture() {
 }
 
 
-void myinitwindow() {
-    // have to do inittitlescene after initwindow
+void mygamestateinit() {
     g = gamestateinit();
     g->winwidth = default_window_width;
     g->winheight = default_window_height;
+    g->cs = companysceneinitptr();
+    mydisplay.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
+}
+
+
+void myinitwindow() {
+    // have to do inittitlescene after initwindow
     // cant load textures before initwindow
     InitWindow(default_window_width, default_window_height, "Game");
-
-    g->cs = companysceneinitptr();
-
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
-    mydisplay.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
+
+    mygamestateinit();
+    //g = gamestateinit();
+    //g->winwidth = default_window_width;
+    //g->winheight = default_window_height;
+    //g->cs = companysceneinitptr();
+
     if (myupdategamestate == NULL) {
         fprintf(stderr, "dlsym failed or has not been loaded yet: %s\n", dlerror());
         loadsymbols();
