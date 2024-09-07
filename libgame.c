@@ -1,6 +1,7 @@
 #include "gamestate.h"
 #include "mprint.h"
 
+#include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,8 +39,6 @@ void updategamestateunsafe(gamestate* g) {
     g->dp.bgcolor.r = g->dp.bgcolor.g = g->dp.bgcolor.b = 0;
     g->dp.bgcolor.a = 128;
 
-    //g->clearcolor.r = g->clearcolor.g = g->clearcolor.b = 255;
-    //g->clearcolor.r = g->clearcolor.g = g->clearcolor.b = 0x33;
     g->clearcolor.r = g->clearcolor.g = g->clearcolor.b = 0;
 
     g->cs->scale = 4;

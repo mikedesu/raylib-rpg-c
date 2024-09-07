@@ -37,6 +37,7 @@ libgame.o: libgame.c
 	touch libgame.so.lockfile
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 libgame.so: $(LIBGAME_OBJECTS)
+	#$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) 
 	$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB)
 	rm -rfv libgame.so.lockfile
 

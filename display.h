@@ -12,4 +12,4 @@ typedef struct display {
 
 } display;
 
-#define DISPLAYSIZE (sizeof(display))
+#define DISPLAYSIZE (sizeof(int) * 2 + sizeof(Font) + sizeof(RenderTexture2D) + sizeof(Vector2))

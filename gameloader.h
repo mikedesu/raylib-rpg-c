@@ -5,9 +5,6 @@
 #include <stdbool.h>
 #include <time.h>
 
-//bool mywindowshouldclose();
-//bool myiskeypressed(int key);
-//unsigned int getframecount();
 time_t getlastwritetime(const char* filename);
 void myinitwindow();
 void drawframe(gamestate* g);
@@ -19,10 +16,10 @@ void openhandle();
 void loadsymbols();
 void autoreload();
 void drawdebugpanel(gamestate* g);
-//void initrendertexture();
 void initrendertexture(gamestate* g);
 void drawcompanyscene(gamestate* g);
 void handleinput(gamestate* g);
+void handleinputunsafe(gamestate* g);
 void drawfade(gamestate* g);
 void drawfadeunsafe(gamestate* g);
 void unloaddisplay();

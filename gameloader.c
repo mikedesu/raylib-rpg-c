@@ -19,8 +19,6 @@ const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
 
-display mydisplay;
-
 gamestate* g = NULL;
 void* handle = NULL;
 
@@ -61,22 +59,26 @@ void loadsymbols() {
     mprint("begin loadsymbols");
     mprint("updategamestate");
     myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
+
     mprint("updategamestateunsafe");
     myupdategamestateunsafe = (void (*)(gamestate*))dlsym(handle, "updategamestateunsafe");
+
+
     mprint("check updategamestate");
     checksymbol(myupdategamestate, "updategamestate");
+
     mprint("check updategamestateunsafe");
     checksymbol(myupdategamestateunsafe, "updategamestateunsafe");
+
+
     mprint("end loadsymbols");
 }
 
 
 void initrendertexture(gamestate* g) {
     if (g) {
-        mydisplay.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
-        //g->d.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
-        SetTextureFilter(mydisplay.target.texture, TEXTURE_FILTER_BILINEAR);
-        //SetTextureFilter(g->d.target.texture, TEXTURE_FILTER_BILINEAR);
+        g->d.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+        SetTextureFilter(g->d.target.texture, TEXTURE_FILTER_BILINEAR);
     }
 }
 
@@ -87,8 +89,7 @@ void mygamestateinit() {
     g->winheight = default_window_height;
     g->cs = companysceneinitptr();
 
-    mydisplay.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
-    //g->d.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
+    g->d.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
 }
 
 
@@ -101,10 +102,6 @@ void myinitwindow() {
     SetExitKey(KEY_Q);
 
     mygamestateinit();
-    //g = gamestateinit();
-    //g->winwidth = default_window_width;
-    //g->winheight = default_window_height;
-    //g->cs = companysceneinitptr();
 
     if (myupdategamestate == NULL) {
         fprintf(stderr, "dlsym failed or has not been loaded yet: %s\n", dlerror());
@@ -126,8 +123,8 @@ void drawdebugpanel(gamestate* g) {
         DrawRectangle(x, y, w, h, bgc);
         DrawRectangleLines(x, y, w, h, borderc);
         x = g->dp.x + pad * 2, y = g->dp.y + pad * 2;
-        DrawTextEx(mydisplay.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
-        //DrawTextEx(g->d.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
+        //DrawTextEx(mydisplay.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
+        DrawTextEx(g->d.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
     }
 }
 
@@ -174,8 +171,7 @@ void drawframe(gamestate* s) {
 void drawframeunsafe(gamestate* s) {
     if (s) {
         BeginDrawing();
-        BeginTextureMode(mydisplay.target);
-        //BeginTextureMode(g->d.target);
+        BeginTextureMode(g->d.target);
         //ClearBackground(WHITE);
         Color clearcolor =
             (Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a};
@@ -183,15 +179,16 @@ void drawframeunsafe(gamestate* s) {
         drawcompanyscene(s);
         drawfade(s);
 
-        const int dw = GetScreenWidth(), dh = GetScreenHeight(), w = mydisplay.target.texture.width,
-                  h = mydisplay.target.texture.height;
-        //const int dw = GetScreenWidth(), dh = GetScreenHeight(), w = g->d.target.texture.width,
-        //          h = g->d.target.texture.height;
+        //const int dw = GetScreenWidth(), dh = GetScreenHeight(), w = mydisplay.target.texture.width,
+        //          h = mydisplay.target.texture.height;
+        const int dw = GetScreenWidth(), dh = GetScreenHeight(), w = g->d.target.texture.width,
+                  h = g->d.target.texture.height;
 
         // draw a box on top of the screen
         // this box will serve as our 'fade'
         if (s->dodebugpanel) {
             drawdebugpanel(s);
+            //mydrawdebugpanel(s);
             DrawFPS(dw - 100, 10);
         }
         EndTextureMode();
@@ -199,8 +196,8 @@ void drawframeunsafe(gamestate* s) {
         Rectangle src = {0.0f, 0.0f, (float)w, (float)-h};
         Rectangle dst = {0.0f, 0.0f, (float)dw, (float)dh};
 
-        DrawTexturePro(mydisplay.target.texture, src, dst, mydisplay.origin, 0.0f, WHITE);
-        //DrawTexturePro(g->d.target.texture, src, dst, g->d.origin, 0.0f, WHITE);
+        //DrawTexturePro(mydisplay.target.texture, src, dst, mydisplay.origin, 0.0f, WHITE);
+        DrawTexturePro(g->d.target.texture, src, dst, g->d.origin, 0.0f, WHITE);
         EndDrawing();
         g->framecount++;
     }
@@ -209,9 +206,14 @@ void drawframeunsafe(gamestate* s) {
 
 void handleinput(gamestate* g) {
     if (g) {
-        if (IsKeyPressed(KEY_D)) {
-            g->dodebugpanel = !g->dodebugpanel;
-        }
+        handleinputunsafe(g);
+    }
+}
+
+
+void handleinputunsafe(gamestate* g) {
+    if (IsKeyPressed(KEY_D)) {
+        g->dodebugpanel = !g->dodebugpanel;
     }
 }
 
@@ -219,10 +221,9 @@ void handleinput(gamestate* g) {
 void gameloop(gamestate* g) {
     if (g) {
         while (!WindowShouldClose()) {
-            //myupdategamestate(g);
-            drawframe(g);
+            drawframeunsafe(g);
             myupdategamestateunsafe(g);
-            handleinput(g);
+            handleinputunsafe(g);
             autoreload();
         }
     }
@@ -249,10 +250,8 @@ void autoreload() {
 
 
 void unloaddisplay() {
-    UnloadRenderTexture(mydisplay.target);
-    //UnloadRenderTexture(g->d.target);
-    UnloadFont(mydisplay.font);
-    //UnloadFont(g->d.font);
+    UnloadRenderTexture(g->d.target);
+    UnloadFont(g->d.font);
 }
 
 
