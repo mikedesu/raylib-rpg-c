@@ -11,6 +11,7 @@
 time_t getlastwritetime(const char* filename);
 void myinitwindow();
 void drawframe(gamestate* g);
+void drawframeunsafe(gamestate* g);
 void gameloop();
 void gamerun();
 void updateframecountbuffer();
@@ -21,4 +22,5 @@ void drawdebugpanel();
 void initrendertexture();
 void drawcompanyscene();
 void handleinput();
-void drawfade();
+void drawfade(gamestate* g);
+void drawfadeunsafe(gamestate* g);

@@ -117,7 +117,14 @@ void drawcompanyscene() {
 }
 
 
-void drawfade() {
+void drawfade(gamestate* s) {
+    if(s) {
+        drawfadeunsafe(s);
+    }
+}
+
+
+void drawfadeunsafe(gamestate* g) {
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, g->fadealpha});
     g->fadealpha += g->fadealphadir;
     if(g->fadealpha >= 255) {
@@ -128,34 +135,40 @@ void drawfade() {
 }
 
 
-//void drawframe() {
 void drawframe(gamestate* s) {
-    BeginDrawing();
-    BeginTextureMode(target);
-    //ClearBackground(WHITE);
-    Color clearcolor = (Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a};
-    ClearBackground(clearcolor);
-    drawcompanyscene();
-
-    drawfade();
-    // draw a box on top of the screen
-    // this box will serve as our 'fade'
-
-    if(s->dodebugpanel) {
-        drawdebugpanel();
-        DrawFPS(GetScreenWidth() - 100, 10);
+    if(s) {
+        drawframeunsafe(s);
     }
+}
 
-    EndTextureMode();
-    DrawTexturePro(
-        target.texture,
-        (Rectangle){0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height},
-        (Rectangle){0.0f, 0.0f, (float)GetScreenWidth(), (float)GetScreenHeight()},
-        (Vector2){0.0f, 0.0f},
-        0.0f,
-        WHITE);
-    EndDrawing();
-    g->framecount++;
+
+void drawframeunsafe(gamestate* s) {
+    if(s) {
+        BeginDrawing();
+        BeginTextureMode(target);
+        //ClearBackground(WHITE);
+        Color clearcolor =
+            (Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a};
+        ClearBackground(clearcolor);
+        drawcompanyscene();
+        drawfade(s);
+        // draw a box on top of the screen
+        // this box will serve as our 'fade'
+        if(s->dodebugpanel) {
+            drawdebugpanel();
+            DrawFPS(GetScreenWidth() - 100, 10);
+        }
+        EndTextureMode();
+        DrawTexturePro(
+            target.texture,
+            (Rectangle){0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height},
+            (Rectangle){0.0f, 0.0f, (float)GetScreenWidth(), (float)GetScreenHeight()},
+            (Vector2){0.0f, 0.0f},
+            0.0f,
+            WHITE);
+        EndDrawing();
+        g->framecount++;
+    }
 }
 
 
