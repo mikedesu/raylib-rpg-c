@@ -71,11 +71,13 @@ void loadsymbols() {
 }
 
 
-void initrendertexture() {
-    mydisplay.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
-    //g->d.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
-    SetTextureFilter(mydisplay.target.texture, TEXTURE_FILTER_BILINEAR);
-    //SetTextureFilter(g->d.target.texture, TEXTURE_FILTER_BILINEAR);
+void initrendertexture(gamestate* g) {
+    if (g) {
+        mydisplay.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+        //g->d.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+        SetTextureFilter(mydisplay.target.texture, TEXTURE_FILTER_BILINEAR);
+        //SetTextureFilter(g->d.target.texture, TEXTURE_FILTER_BILINEAR);
+    }
 }
 
 
@@ -263,7 +265,7 @@ void gamerun() {
     mprint("initing window");
     myinitwindow();
     mprint("initing rendertexture");
-    initrendertexture();
+    initrendertexture(g);
     mprint("entering gameloop");
     gameloop(g);
     mprint("closing window");
