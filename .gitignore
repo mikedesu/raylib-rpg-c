@@ -2,4 +2,6 @@ fonts
 fonts/*.ttf
 img
 img/*.png
-
+*.o
+game
+*.so
