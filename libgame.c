@@ -23,6 +23,7 @@ void updategamestate(gamestate* g) {
 }
 
 void updategamestateunsafe(gamestate* g) {
+    //    mprint("updategamestateunsafe");
     now = time(NULL);
     tm = localtime(&now);
     memset(timebuf, 0, 64);

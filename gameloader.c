@@ -48,24 +48,34 @@ void openhandle() {
 
 
 void checksymbol(void* symbol, const char* name) {
+    //mprint("begin check symbol");
     if (symbol == NULL) {
         fprintf(stderr, "dlsym failed: %s\n", dlerror());
         exit(1);
     }
+    //mprint("end check symbol");
 }
 
 
 void loadsymbols() {
+    mprint("begin loadsymbols");
+    mprint("updategamestate");
     myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
+    mprint("updategamestateunsafe");
     myupdategamestateunsafe = (void (*)(gamestate*))dlsym(handle, "updategamestateunsafe");
+    mprint("check updategamestate");
     checksymbol(myupdategamestate, "updategamestate");
+    mprint("check updategamestateunsafe");
     checksymbol(myupdategamestateunsafe, "updategamestateunsafe");
+    mprint("end loadsymbols");
 }
 
 
 void initrendertexture() {
     mydisplay.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+    //g->d.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
     SetTextureFilter(mydisplay.target.texture, TEXTURE_FILTER_BILINEAR);
+    //SetTextureFilter(g->d.target.texture, TEXTURE_FILTER_BILINEAR);
 }
 
 
@@ -74,11 +84,14 @@ void mygamestateinit() {
     g->winwidth = default_window_width;
     g->winheight = default_window_height;
     g->cs = companysceneinitptr();
+
     mydisplay.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
+    //g->d.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
 }
 
 
 void myinitwindow() {
+    mprint("begin myinitwindow");
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
     InitWindow(default_window_width, default_window_height, "Game");
@@ -112,6 +125,7 @@ void drawdebugpanel(gamestate* g) {
         DrawRectangleLines(x, y, w, h, borderc);
         x = g->dp.x + pad * 2, y = g->dp.y + pad * 2;
         DrawTextEx(mydisplay.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
+        //DrawTextEx(g->d.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
     }
 }
 
@@ -159,6 +173,7 @@ void drawframeunsafe(gamestate* s) {
     if (s) {
         BeginDrawing();
         BeginTextureMode(mydisplay.target);
+        //BeginTextureMode(g->d.target);
         //ClearBackground(WHITE);
         Color clearcolor =
             (Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a};
@@ -168,6 +183,8 @@ void drawframeunsafe(gamestate* s) {
 
         const int dw = GetScreenWidth(), dh = GetScreenHeight(), w = mydisplay.target.texture.width,
                   h = mydisplay.target.texture.height;
+        //const int dw = GetScreenWidth(), dh = GetScreenHeight(), w = g->d.target.texture.width,
+        //          h = g->d.target.texture.height;
 
         // draw a box on top of the screen
         // this box will serve as our 'fade'
@@ -181,6 +198,7 @@ void drawframeunsafe(gamestate* s) {
         Rectangle dst = {0.0f, 0.0f, (float)dw, (float)dh};
 
         DrawTexturePro(mydisplay.target.texture, src, dst, mydisplay.origin, 0.0f, WHITE);
+        //DrawTexturePro(g->d.target.texture, src, dst, g->d.origin, 0.0f, WHITE);
         EndDrawing();
         g->framecount++;
     }
@@ -230,7 +248,9 @@ void autoreload() {
 
 void unloaddisplay() {
     UnloadRenderTexture(mydisplay.target);
+    //UnloadRenderTexture(g->d.target);
     UnloadFont(mydisplay.font);
+    //UnloadFont(g->d.font);
 }
 
 
