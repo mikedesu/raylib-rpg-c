@@ -92,28 +92,32 @@ void myinitwindow() {
 }
 
 
-void drawdebugpanel() {
-    const int fontsize = 20, pad = 10;
-    Color bgc = (Color){g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, g->dp.bgcolor.a},
-          fgc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255},
-          borderc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
-    int w = g->dp.w, h = g->dp.h, x = g->dp.x + pad, y = g->dp.y + pad;
-    DrawRectangle(x, y, w, h, bgc);
-    DrawRectangleLines(x, y, w, h, borderc);
-    x = g->dp.x + pad * 2, y = g->dp.y + pad * 2;
-    DrawTextEx(mydisplay.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
+void drawdebugpanel(gamestate* g) {
+    if (g) {
+        const int fontsize = 20, pad = 10;
+        Color bgc = (Color){g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, g->dp.bgcolor.a},
+              fgc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255},
+              borderc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
+        int w = g->dp.w, h = g->dp.h, x = g->dp.x + pad, y = g->dp.y + pad;
+        DrawRectangle(x, y, w, h, bgc);
+        DrawRectangleLines(x, y, w, h, borderc);
+        x = g->dp.x + pad * 2, y = g->dp.y + pad * 2;
+        DrawTextEx(mydisplay.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
+    }
 }
 
 
-void drawcompanyscene() {
-    companyscene* cs = g->cs;
-    float w = cs->presents.width, h = cs->presents.height;
-    float x = cs->x;
-    float y = cs->y;
-    float s = cs->scale;
-    Rectangle src = {0, 0, w, h};
-    Rectangle dst = {x, y, w * s, h * s};
-    DrawTexturePro(g->cs->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+void drawcompanyscene(gamestate* g) {
+    if (g) {
+        companyscene* cs = g->cs;
+        float w = cs->presents.width, h = cs->presents.height;
+        float x = cs->x;
+        float y = cs->y;
+        float s = cs->scale;
+        Rectangle src = {0, 0, w, h};
+        Rectangle dst = {x, y, w * s, h * s};
+        DrawTexturePro(g->cs->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+    }
 }
 
 
@@ -150,7 +154,7 @@ void drawframeunsafe(gamestate* s) {
         Color clearcolor =
             (Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a};
         ClearBackground(clearcolor);
-        drawcompanyscene();
+        drawcompanyscene(s);
         drawfade(s);
 
         const int dw = GetScreenWidth(), dh = GetScreenHeight(), w = mydisplay.target.texture.width,
@@ -159,7 +163,7 @@ void drawframeunsafe(gamestate* s) {
         // draw a box on top of the screen
         // this box will serve as our 'fade'
         if (s->dodebugpanel) {
-            drawdebugpanel();
+            drawdebugpanel(s);
             DrawFPS(dw - 100, 10);
         }
         EndTextureMode();
