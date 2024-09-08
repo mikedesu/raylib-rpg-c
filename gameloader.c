@@ -144,6 +144,16 @@ void drawcompanyscene(gamestate* g) {
         float s = cs->scale;
         Rectangle src = {0, 0, w, h};
         Rectangle dst = {x, y, w * s, h * s};
+
+
+        BeginMode3D(g->cs->cam3d);
+        DrawGrid(10, 1.0f);
+        DrawCube((Vector3){0.0f, 0.5f, 1.0f}, 1.0f, 1.0f, 1.0f, g->cs->cubecolor);
+        EndMode3D();
+
+        BeginMode2D(g->cs->cam2d);
+
+
         DrawTexturePro(g->cs->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
     }
 }
@@ -157,7 +167,12 @@ void drawfade(gamestate* s) {
 
 
 void drawfadeunsafe(gamestate* g) {
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, g->fadealpha});
+    Color c = (Color){0, 0, 0, g->fadealpha};
+    const int x = 0;
+    const int y = 0;
+    const int w = GetScreenWidth();
+    const int h = GetScreenHeight();
+    DrawRectangle(x, y, w, h, c);
     g->fadealpha += g->fadealphadir;
     if (g->fadealpha >= 255) {
         g->fadealphadir = -1;
@@ -189,14 +204,8 @@ void drawframeunsafe(gamestate* s) {
     BeginTextureMode(g->d.target);
     ClearBackground((Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a});
 
-    BeginMode3D(g->cs->cam3d);
-    DrawGrid(10, 1.0f);
-    DrawCube((Vector3){0, 0, 0}, 2.0f, 2.0f, 2.0f, RED);
-    EndMode3D();
-
-    BeginMode2D(g->cs->cam2d);
     drawcompanyscene(s);
-    drawfade(s);
+
     EndMode2D();
 
     if (s->dodebugpanel) {

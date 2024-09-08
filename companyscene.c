@@ -1,6 +1,7 @@
 #include "companyscene.h"
 #include "mprint.h"
 
+#include <raylib.h>
 #include <stdlib.h>
 
 
@@ -13,11 +14,17 @@ void companysceneptrinitcameras(companyscene* c) {
         c->cam2d.offset = (Vector2){0};
 
         c->cam3d = (Camera3D){0};
-        c->cam3d.position = (Vector3){0, 10, 10};
+        c->cam3d.position = (Vector3){0, 5, 5};
         c->cam3d.target = (Vector3){0, 0, 0};
+        //c->cam3d.target = (Vector3){0, 0, 0};
         c->cam3d.up = (Vector3){0, 1, 0};
         c->cam3d.fovy = 45;
+
         c->cam3d.projection = CAMERA_PERSPECTIVE;
+        //c->cam3d.projection = CAMERA_ORTHOGRAPHIC;
+        //c->cam3d.projection = CAMERA_FREE;
+        //c->cam3d.projection = CAMERA_CUSTOM;
+        //c->cam3d.projection = CAMERA_ORBITAL;
     }
 }
 

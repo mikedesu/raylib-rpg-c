@@ -43,15 +43,18 @@ void updategamestateunsafe(gamestate* g) {
 
     snprintf(g->dp.bfr,
              DEBUGPANELBUFSIZE,
-             "framecount:   %d\nstart date:   %s\ncurrent date: %s\n",
+             "framecount:   %d\nstart date:   %s\ncurrent date: %s\ncamera3d:    %f %f %f\n",
              g->framecount,
              timebuf2,
-             timebuf);
-    g->dp.w = 250;
-    g->dp.h = 70;
+             timebuf,
+             g->cs->cam3d.position.x,
+             g->cs->cam3d.position.y,
+             g->cs->cam3d.position.z);
+    g->dp.w = 350;
+    g->dp.h = 80;
     g->dp.x = 5;
     g->dp.y = 5;
-    g->dp.fontsize = 14;
+    g->dp.fontsize = 16;
 
     g->dp.fgcolor.r = 255;
     g->dp.fgcolor.g = 255;
@@ -66,8 +69,19 @@ void updategamestateunsafe(gamestate* g) {
     g->clearcolor.g = 0;
     g->clearcolor.b = 0;
 
-    g->cs->scale = 3;
-    int scale = g->cs->scale;
+    g->cs->cubecolor = (Color){0x33, 0x33, 0x33, 255};
+
+
+    g->cs->cam3d.position.z += 0.05f;
+    g->cs->cam3d.target.z += 0.05f;
+    if (g->cs->cam3d.position.z > 25.0f) {
+        g->cs->cam3d.position.z = 0.0f;
+        g->cs->cam3d.target.z = 0.0f;
+    }
+
+
+    g->cs->scale = 4;
+    const int scale = g->cs->scale;
     g->cs->x = g->winwidth / 2 - g->cs->presents.width * scale / 2;
     g->cs->y = g->winheight / 2 - g->cs->presents.height * scale / 2;
 }
