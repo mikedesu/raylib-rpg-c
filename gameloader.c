@@ -176,18 +176,6 @@ void drawframe(gamestate* s) {
 
 void drawframeunsafe(gamestate* s) {
     //if (s) {
-    BeginDrawing();
-    BeginTextureMode(g->d.target);
-    ClearBackground((Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a});
-
-
-    BeginMode3D(g->cs->cam3d);
-    DrawGrid(10, 1.0f);
-    DrawCube((Vector3){0, 0, 0}, 2.0f, 2.0f, 2.0f, RED);
-    EndMode3D();
-
-
-    BeginMode2D(g->cs->cam2d);
     const float dw = GetScreenWidth();
     const float dh = GetScreenHeight();
     const float rectw = 170;
@@ -196,10 +184,20 @@ void drawframeunsafe(gamestate* s) {
     const float y = dh / 2 - recth / 2;
     float w = 200;
     float h = 200;
+
+    BeginDrawing();
+    BeginTextureMode(g->d.target);
+    ClearBackground((Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a});
+
+    BeginMode3D(g->cs->cam3d);
+    DrawGrid(10, 1.0f);
+    DrawCube((Vector3){0, 0, 0}, 2.0f, 2.0f, 2.0f, RED);
+    EndMode3D();
+
+    BeginMode2D(g->cs->cam2d);
     drawcompanyscene(s);
     drawfade(s);
     EndMode2D();
-
 
     if (s->dodebugpanel) {
         drawdebugpanel(s);
