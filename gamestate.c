@@ -48,10 +48,17 @@ void gamestateinitdebugpanel(gamestate* g) {
     g->dp.fgcolor.r = 255;
     g->dp.fgcolor.g = 255;
     g->dp.fgcolor.b = 255;
+    g->dp.fgcolor.a = 255;
 
     g->dp.bgcolor.r = 0x66;
     g->dp.bgcolor.g = 0x66;
     g->dp.bgcolor.b = 0x66;
+    g->dp.bgcolor.a = 255;
+
+    //g->dp.bordercolor.r = 0x;
+    //g->dp.bordercolor.g = 0;
+    //g->dp.bordercolor.b = 0;
+    //g->dp.bordercolor.a = 255;
 
     bzero(g->dp.bfr, DEBUGPANELBUFSIZE);
 }

@@ -90,6 +90,7 @@ void mygamestateinit() {
     g->cs = companysceneinitptr();
 
     g->d.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
+    SetTextureFilter(g->d.font.texture, TEXTURE_FILTER_BILINEAR);
 }
 
 
@@ -115,14 +116,19 @@ void myinitwindow() {
 
 void drawdebugpanel(gamestate* g) {
     if (g) {
-        const int fontsize = 20, pad = 10;
+        //const int fontsize = 20;
+        const int pad = 5;
         Color bgc = (Color){g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, g->dp.bgcolor.a},
               fgc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255},
               borderc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
-        int w = g->dp.w, h = g->dp.h, x = g->dp.x + pad, y = g->dp.y + pad;
+        int w = g->dp.w;
+        int h = g->dp.h;
+        int x = g->dp.x + pad;
+        int y = g->dp.y + pad;
         DrawRectangle(x, y, w, h, bgc);
         DrawRectangleLines(x, y, w, h, borderc);
-        x = g->dp.x + pad * 2, y = g->dp.y + pad * 2;
+        x = g->dp.x + pad * 2;
+        y = g->dp.y + pad * 2;
         //DrawTextEx(mydisplay.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
         DrawTextEx(g->d.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
     }
@@ -169,38 +175,47 @@ void drawframe(gamestate* s) {
 
 
 void drawframeunsafe(gamestate* s) {
-    if (s) {
-        BeginDrawing();
-        BeginTextureMode(g->d.target);
-        //ClearBackground(WHITE);
-        Color clearcolor =
-            (Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a};
-        ClearBackground(clearcolor);
-        drawcompanyscene(s);
-        drawfade(s);
+    //if (s) {
+    BeginDrawing();
+    BeginTextureMode(g->d.target);
+    ClearBackground((Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a});
 
-        //const int dw = GetScreenWidth(), dh = GetScreenHeight(), w = mydisplay.target.texture.width,
-        //          h = mydisplay.target.texture.height;
-        const int dw = GetScreenWidth(), dh = GetScreenHeight(), w = g->d.target.texture.width,
-                  h = g->d.target.texture.height;
 
-        // draw a box on top of the screen
-        // this box will serve as our 'fade'
-        if (s->dodebugpanel) {
-            drawdebugpanel(s);
-            //mydrawdebugpanel(s);
-            DrawFPS(dw - 100, 10);
-        }
-        EndTextureMode();
+    BeginMode3D(g->cs->cam3d);
+    DrawGrid(10, 1.0f);
+    DrawCube((Vector3){0, 0, 0}, 2.0f, 2.0f, 2.0f, RED);
+    EndMode3D();
 
-        Rectangle src = {0.0f, 0.0f, (float)w, (float)-h};
-        Rectangle dst = {0.0f, 0.0f, (float)dw, (float)dh};
 
-        //DrawTexturePro(mydisplay.target.texture, src, dst, mydisplay.origin, 0.0f, WHITE);
-        DrawTexturePro(g->d.target.texture, src, dst, g->d.origin, 0.0f, WHITE);
-        EndDrawing();
-        g->framecount++;
+    BeginMode2D(g->cs->cam2d);
+    const float dw = GetScreenWidth();
+    const float dh = GetScreenHeight();
+    const float rectw = 170;
+    const float recth = 170;
+    const float x = dw / 2 - rectw / 2;
+    const float y = dh / 2 - recth / 2;
+    float w = 200;
+    float h = 200;
+    drawcompanyscene(s);
+    drawfade(s);
+    EndMode2D();
+
+
+    if (s->dodebugpanel) {
+        drawdebugpanel(s);
+        DrawFPS(dw - 100, 10);
     }
+
+    EndTextureMode();
+
+    w = g->d.target.texture.width;
+    h = g->d.target.texture.height;
+    Rectangle src = {0.0f, 0.0f, w, -h};
+    Rectangle dst = {0.0f, 0.0f, dw, dh};
+
+    DrawTexturePro(g->d.target.texture, src, dst, g->d.origin, 0.0f, WHITE);
+    EndDrawing();
+    g->framecount++;
 }
 
 

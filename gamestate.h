@@ -3,6 +3,7 @@
 #include "companyscene.h"
 #include "debugpanel.h"
 #include "display.h"
+#include "scenes.h"
 #include <stdbool.h>
 
 typedef struct gamestate {
@@ -19,24 +20,18 @@ typedef struct gamestate {
 
     debugpanel dp;
 
+
+    scene currentscene;
+
     companyscene* cs;
-    //companyscene ts;
-    //
 
     display d;
 
 } gamestate;
 
-//#define GAMESTATESIZE                                                                              \
-//    (sizeof(bool) + sizeof(int) * 5 + MYCOLORSIZE + DEBUGPANELSIZE + sizeof(companyscene*))
-
 #define GAMESTATESIZE                                                                              \
     (sizeof(bool) + sizeof(int) * 5 + MYCOLORSIZE + DEBUGPANELSIZE + sizeof(companyscene*) +       \
-     DISPLAYSIZE)
-
-
-//#define GAMESTATESIZE (sizeof(int) * 3 + MYCOLORSIZE + DEBUGPANELSIZE + sizeof(companyscene))
-//#define GAMESTATESIZE (sizeof(int) * 3 + MYCOLORSIZE + DEBUGPANELSIZE)
+     DISPLAYSIZE + sizeof(scene))
 
 gamestate* gamestateinit();
 void gamestatefree(gamestate* g);
