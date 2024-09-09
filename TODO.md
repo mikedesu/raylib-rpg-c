@@ -1,5 +1,4 @@
 # TODO
 
-
-1. create a data structure and functions to manage it
-	- an unordered map (hash table) to store key ints to value Textures
+1. fix all of the "sizeof" macros to just use "sizeof(struct)"
+	- turns out this works and i was wrong to be suspicious!

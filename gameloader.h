@@ -24,3 +24,11 @@ void drawfade(gamestate* g);
 void drawfadeunsafe(gamestate* g);
 void unloaddisplay();
 void mygamestateinit();
+
+void DrawCubeTextureRec(Texture2D texture,
+                        Rectangle source,
+                        Vector3 position,
+                        float width,
+                        float height,
+                        float length,
+                        Color color);

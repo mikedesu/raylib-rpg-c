@@ -10,24 +10,27 @@
 // have to update this function when we introduce new fields to Gamestate
 gamestate* gamestateinit() {
     mprint("gamestateinit\n");
-    gamestate* g = (gamestate*)malloc(GAMESTATESIZE);
+    gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     if (g == NULL) {
         fprintf(stderr, "Failed to allocate memory for gamestate: %s\n", strerror(errno));
         return NULL;
     }
 
     g->dodebugpanel = true;
+    g->dofps = false;
     g->framecount = 0;
     g->winwidth = 0;
     g->winheight = 0;
     g->clearcolor = (mycolor){0, 0, 0, 255};
     g->fadealpha = 255;
     g->fadealphadir = -1;
+    g->currentscene = SCENE_COMPANY;
+    g->starttime = time(NULL);
+    g->starttm = localtime(&(g->starttime));
 
     gamestateinitdebugpanel(g);
 
     g->cs = NULL;
-    //g->ts = titlesceneinit();
 
     return g;
 }
@@ -55,11 +58,6 @@ void gamestateinitdebugpanel(gamestate* g) {
     g->dp.bgcolor.b = 0x66;
     g->dp.bgcolor.a = 255;
 
-    //g->dp.bordercolor.r = 0x;
-    //g->dp.bordercolor.g = 0;
-    //g->dp.bordercolor.b = 0;
-    //g->dp.bordercolor.a = 255;
-
     bzero(g->dp.bfr, DEBUGPANELBUFSIZE);
 }
 
@@ -68,7 +66,6 @@ void gamestateinitdebugpanel(gamestate* g) {
 void gamestatefree(gamestate* s) {
     if (s != NULL) {
         companyscenefree(s->cs);
-        //companyscenefree(&(s->ts));
         free(s);
     }
 }

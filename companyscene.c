@@ -29,41 +29,85 @@ void companysceneptrinitcameras(companyscene* c) {
 }
 
 
+void companyscenesetcubecolor(companyscene* c, Color color) {
+    if (c != NULL) {
+        c->cubecolor = color;
+    }
+}
+
+
+void companyscenesetcubewirecolor(companyscene* c, Color color) {
+    if (c != NULL) {
+        c->cubewirecolor = color;
+    }
+}
+
+
+void companysceneinitcubecolors(companyscene* c) {
+    if (c) {
+        c->cubecolor = (Color){0x33, 0x33, 0x33, 255};
+        c->cubewirecolor = (Color){0, 0, 0, 255};
+    }
+}
+
+
+void companysceneloadtextures(companyscene* c) {
+    if (c) {
+        mprint("Loading textures");
+        mprint("Loading presents texture");
+        c->presents = LoadTexture("img/evildojo666-presents.png");
+        if (c->presents.id == 0) {
+            mprint("Error loading presents texture");
+        }
+
+        mprint("Loading test texture");
+        c->test = LoadTexture("img/darkknight2-sheet.png");
+        if (c->test.id == 0) {
+            mprint("Error loading test texture");
+        }
+    }
+}
+
+
+void companysceneinitvars(companyscene* c) {
+    if (c) {
+        c->x = 0;
+        c->y = 0;
+        c->scale = 1;
+        c->cubepos = (Vector3){0.0f, 0.5f, 1.0f};
+        c->dodrawpresents = false;
+        c->dodrawtest = true;
+    }
+}
+
+
 companyscene companysceneinit() {
     mprint("companysceneinit");
     companyscene ts;
     mprint("Loading textures");
     mprint("Loading presents texture");
-    ts.presents = LoadTexture("img/evildojo666-presents.png");
-    if (ts.presents.id == 0) {
-        mprint("Error loading presents texture");
-    }
-    ts.x = 0;
-    ts.y = 0;
-    ts.scale = 1;
-
+    companysceneloadtextures(&ts);
+    companysceneinitvars(&ts);
     companysceneptrinitcameras(&ts);
+    companysceneinitcubecolors(&ts);
 
     return ts;
 }
 
 companyscene* companysceneinitptr() {
     mprint("companysceneinitptr");
-    //companyscene* ts = (companyscene*)malloc(sizeof(companyscene));
-    companyscene* ts = (companyscene*)malloc(COMPANYSCENESIZE);
+    companyscene* ts = (companyscene*)malloc(sizeof(companyscene));
+    //companyscene* ts = (companyscene*)malloc(COMPANYSCENESIZE);
     if (ts != NULL) {
         mprint("companysceneinit: malloc success");
         mprint("Loading textures");
         mprint("Loading presents texture");
-        ts->presents = LoadTexture("img/evildojo666-presents.png");
-        if (ts->presents.id == 0) {
-            mprint("Error loading presents texture");
-        }
-        ts->x = 0;
-        ts->y = 0;
-        ts->scale = 1;
-
+        companysceneloadtextures(ts);
+        companysceneinitvars(ts);
         companysceneptrinitcameras(ts);
+        companysceneinitcubecolors(ts);
+    } else {
+        mprint("companysceneinit: malloc failed");
     }
     return ts;
 }
@@ -72,6 +116,7 @@ companyscene* companysceneinitptr() {
 void companyscenefree(companyscene* ts) {
     if (ts != NULL) {
         UnloadTexture(ts->presents);
+        UnloadTexture(ts->test);
         //UnloadTexture(ts->company);
         free(ts);
     }

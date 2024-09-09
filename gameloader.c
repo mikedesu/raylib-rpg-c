@@ -4,6 +4,7 @@
 #include "mprint.h"
 #include <dlfcn.h>
 #include <raylib.h>
+#include <rlgl.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,8 +14,8 @@
 
 long last_write_time = 0;
 
-const int default_window_width = 960;
-const int default_window_height = 540;
+const int default_window_width = 1280;
+const int default_window_height = 720;
 const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
@@ -102,6 +103,8 @@ void myinitwindow() {
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
 
+    rlglInit(default_window_width, default_window_height);
+
     mygamestateinit();
 
     if (myupdategamestate == NULL) {
@@ -145,17 +148,149 @@ void drawcompanyscene(gamestate* g) {
         Rectangle src = {0, 0, w, h};
         Rectangle dst = {x, y, w * s, h * s};
 
+        Vector3 cube = cs->cubepos;
+        Color c = cs->cubecolor;
+        Color c2 = cs->cubewirecolor;
 
         BeginMode3D(g->cs->cam3d);
         DrawGrid(10, 1.0f);
-        DrawCube((Vector3){0.0f, 0.5f, 1.0f}, 1.0f, 1.0f, 1.0f, g->cs->cubecolor);
+
+        DrawCube(cube, 1.0f, 1.0f, 1.0f, c);
+
+        DrawCubeWires(cube, 1.0f, 1.0f, 1.0f, c2);
+
+
+        //DrawCube(cube2, 1.0f, 1.0f, 1.0f, RED);
+        src = (Rectangle){0, 0, g->cs->test.width / 4.0f, g->cs->test.height / 3.0f};
+
+        //float ratio = src.height / src.width;
+        float ratio = src.width / src.height;
+
+        //Vector3 cube2 = {0.0f, 1.5f, 0.5f};
+        //Vector3 cube2 = {0.0f, 1.51f, 0.5f};
+        Vector3 cube2 = {cube.x, 1.51f, cube.z - 0.5f};
+
+        DrawCubeTextureRec(cs->test, src, cube2, ratio, 1.0f, 1.0f, WHITE);
+
+        // DrawCubeWires(cube2, ratio, 1.0f, 1.0f, WHITE);
+
+
         EndMode3D();
 
         BeginMode2D(g->cs->cam2d);
 
 
-        DrawTexturePro(g->cs->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+        // draw the "evildojo666 presents" texture
+        // if (g->cs->dodrawpresents) {
+        //     DrawTexturePro(g->cs->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+        // }
+
+        //const float scale = 2.0f;
+
+        //dst = (Rectangle){GetScreenWidth() / 2.0f - 20,
+        //                  GetScreenHeight() / 2.0f - 90,
+        //                  g->cs->test.width / 4.0f * scale,
+        //                  g->cs->test.height / 3.0f * scale};
+
+        // draw the test texture
+        //if (g->cs->dodrawtest) {
+        //    DrawTexturePro(g->cs->test, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+        //}
     }
+}
+
+
+// Draw cube with texture piece applied to all faces
+void DrawCubeTextureRec(Texture2D texture,
+                        Rectangle source,
+                        Vector3 position,
+                        float width,
+                        float height,
+                        float length,
+                        Color color) {
+    float x = position.x;
+    float y = position.y;
+    float z = position.z;
+    float texWidth = (float)texture.width;
+    float texHeight = (float)texture.height;
+
+    // Set desired texture to be enabled while drawing following vertex data
+    rlSetTexture(texture.id);
+
+    // We calculate the normalized texture coordinates for the desired texture-source-rectangle
+    // It means converting from (tex.width, tex.height) coordinates to [0.0f, 1.0f] equivalent
+    rlBegin(RL_QUADS);
+    rlColor4ub(color.r, color.g, color.b, color.a);
+
+    // Front face
+    rlNormal3f(0.0f, 0.0f, 1.0f);
+    rlTexCoord2f(source.x / texWidth, (source.y + source.height) / texHeight);
+    rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
+    rlTexCoord2f((source.x + source.width) / texWidth, (source.y + source.height) / texHeight);
+    rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
+    rlTexCoord2f((source.x + source.width) / texWidth, source.y / texHeight);
+    rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(source.x / texWidth, source.y / texHeight);
+    rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
+
+    // Back face
+    //rlNormal3f(0.0f, 0.0f, -1.0f);
+    //rlTexCoord2f((source.x + source.width) / texWidth, (source.y + source.height) / texHeight);
+    //rlVertex3f(x - width / 2, y - height / 2, z - length / 2);
+    //rlTexCoord2f((source.x + source.width) / texWidth, source.y / texHeight);
+    //rlVertex3f(x - width / 2, y + height / 2, z - length / 2);
+    //rlTexCoord2f(source.x / texWidth, source.y / texHeight);
+    //rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
+    //rlTexCoord2f(source.x / texWidth, (source.y + source.height) / texHeight);
+    //rlVertex3f(x + width / 2, y - height / 2, z - length / 2);
+
+    // Top face
+    //rlNormal3f(0.0f, 1.0f, 0.0f);
+    //rlTexCoord2f(source.x / texWidth, source.y / texHeight);
+    //rlVertex3f(x - width / 2, y + height / 2, z - length / 2);
+    //rlTexCoord2f(source.x / texWidth, (source.y + source.height) / texHeight);
+    //rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
+    //rlTexCoord2f((source.x + source.width) / texWidth, (source.y + source.height) / texHeight);
+    //rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
+    //rlTexCoord2f((source.x + source.width) / texWidth, source.y / texHeight);
+    //rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
+
+    // Bottom face
+    //rlNormal3f(0.0f, -1.0f, 0.0f);
+    //rlTexCoord2f((source.x + source.width) / texWidth, source.y / texHeight);
+    //rlVertex3f(x - width / 2, y - height / 2, z - length / 2);
+    //rlTexCoord2f(source.x / texWidth, source.y / texHeight);
+    //rlVertex3f(x + width / 2, y - height / 2, z - length / 2);
+    //rlTexCoord2f(source.x / texWidth, (source.y + source.height) / texHeight);
+    //rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
+    //rlTexCoord2f((source.x + source.width) / texWidth, (source.y + source.height) / texHeight);
+    //rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
+
+    // Right face
+    //rlNormal3f(1.0f, 0.0f, 0.0f);
+    //rlTexCoord2f((source.x + source.width) / texWidth, (source.y + source.height) / texHeight);
+    //rlVertex3f(x + width / 2, y - height / 2, z - length / 2);
+    //rlTexCoord2f((source.x + source.width) / texWidth, source.y / texHeight);
+    //rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
+    //rlTexCoord2f(source.x / texWidth, source.y / texHeight);
+    //rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
+    //rlTexCoord2f(source.x / texWidth, (source.y + source.height) / texHeight);
+    //rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
+
+    // Left face
+    //rlNormal3f(-1.0f, 0.0f, 0.0f);
+    //rlTexCoord2f(source.x / texWidth, (source.y + source.height) / texHeight);
+    //rlVertex3f(x - width / 2, y - height / 2, z - length / 2);
+    //rlTexCoord2f((source.x + source.width) / texWidth, (source.y + source.height) / texHeight);
+    //rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
+    //rlTexCoord2f((source.x + source.width) / texWidth, source.y / texHeight);
+    //rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
+    //rlTexCoord2f(source.x / texWidth, source.y / texHeight);
+    //rlVertex3f(x - width / 2, y + height / 2, z - length / 2);
+
+    rlEnd();
+
+    rlSetTexture(0);
 }
 
 
@@ -210,6 +345,10 @@ void drawframeunsafe(gamestate* s) {
 
     if (s->dodebugpanel) {
         drawdebugpanel(s);
+    }
+
+
+    if (s->dofps) {
         DrawFPS(dw - 100, 10);
     }
 
@@ -292,5 +431,7 @@ void gamerun() {
     mprint("closing window");
     gamestatefree(g);
     unloaddisplay();
+
+    //rlglClose();
     CloseWindow();
 }
