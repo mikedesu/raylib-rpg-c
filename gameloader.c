@@ -170,28 +170,24 @@ void drawcompanyscene(gamestate* g) {
         //Vector3 cube2 = {0.0f, 1.51f, 0.5f};
         Vector3 cube2 = {cube.x, 1.51f, cube.z - 0.5f};
 
-        DrawCubeTextureRec(cs->test, src, cube2, ratio, 1.0f, 1.0f, WHITE);
-
+        //DrawCubeTextureRec(cs->test, src, cube2, ratio, 1.0f, 1.0f, WHITE);
+        drawcubetexturerec(cs->test, src, cube2, ratio, 1.0f, 1.0f);
         // DrawCubeWires(cube2, ratio, 1.0f, 1.0f, WHITE);
 
-
         EndMode3D();
-
         BeginMode2D(g->cs->cam2d);
 
-
         // draw the "evildojo666 presents" texture
-        // if (g->cs->dodrawpresents) {
-        //     DrawTexturePro(g->cs->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
-        // }
+        if (g->cs->dodrawpresents) {
+            src = (Rectangle){0, 0, w, h};
+            DrawTexturePro(g->cs->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+        }
 
         //const float scale = 2.0f;
-
         //dst = (Rectangle){GetScreenWidth() / 2.0f - 20,
         //                  GetScreenHeight() / 2.0f - 90,
         //                  g->cs->test.width / 4.0f * scale,
         //                  g->cs->test.height / 3.0f * scale};
-
         // draw the test texture
         //if (g->cs->dodrawtest) {
         //    DrawTexturePro(g->cs->test, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
@@ -201,37 +197,35 @@ void drawcompanyscene(gamestate* g) {
 
 
 // Draw cube with texture piece applied to all faces
-void DrawCubeTextureRec(Texture2D texture,
-                        Rectangle source,
-                        Vector3 position,
-                        float width,
-                        float height,
-                        float length,
-                        Color color) {
-    float x = position.x;
-    float y = position.y;
-    float z = position.z;
-    float texWidth = (float)texture.width;
-    float texHeight = (float)texture.height;
-
+//void DrawCubeTextureRec(
+void drawcubetexturerec(
+    const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l) {
+    const float x = pos.x, y = pos.y, z = pos.z, txw = tex.width, txh = tex.height,
+                srcw = src.width, srch = src.height, srcx = src.x, srcy = src.y;
+    const float rx = srcx + srcw, ry = srcy + srch, w2 = w / 2, h2 = h / 2, l2 = l / 2;
+    const float xw0 = x - w2, xw1 = x + w2, yh0 = y - h2, yh1 = y + h2, z0 = z + l2;
+    // precompute
+    // vertices
+    const Vector3 v[4] = {{xw0, yh0, z0}, {xw1, yh0, z0}, {xw1, yh1, z0}, {xw0, yh1, z0}};
+    // texture coordinates
+    const Vector2 t[4] = {{srcx / txw, ry / txh},
+                          {rx / txw, ry / txh},
+                          {rx / txw, srcy / txh},
+                          {srcx / txw, srcy / txh}};
     // Set desired texture to be enabled while drawing following vertex data
-    rlSetTexture(texture.id);
+    rlSetTexture(tex.id);
 
     // We calculate the normalized texture coordinates for the desired texture-source-rectangle
     // It means converting from (tex.width, tex.height) coordinates to [0.0f, 1.0f] equivalent
     rlBegin(RL_QUADS);
-    rlColor4ub(color.r, color.g, color.b, color.a);
-
-    // Front face
+    //rlColor4ub(color.r, color.g, color.b, color.a);
+    rlColor4ub(255, 255, 255, 255);
+    // draw front face
     rlNormal3f(0.0f, 0.0f, 1.0f);
-    rlTexCoord2f(source.x / texWidth, (source.y + source.height) / texHeight);
-    rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
-    rlTexCoord2f((source.x + source.width) / texWidth, (source.y + source.height) / texHeight);
-    rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
-    rlTexCoord2f((source.x + source.width) / texWidth, source.y / texHeight);
-    rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
-    rlTexCoord2f(source.x / texWidth, source.y / texHeight);
-    rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
+    for (int i = 0; i < 4; i++) {
+        rlTexCoord2f(t[i].x, t[i].y);
+        rlVertex3f(v[i].x, v[i].y, v[i].z);
+    }
 
     // Back face
     //rlNormal3f(0.0f, 0.0f, -1.0f);
@@ -376,6 +370,49 @@ void handleinputunsafe(gamestate* g) {
     if (IsKeyPressed(KEY_D)) {
         g->dodebugpanel = !g->dodebugpanel;
     }
+
+    if (IsKeyPressed(KEY_SPACE)) {
+
+        g->cs->cam3d.projection++;
+        if (g->cs->cam3d.projection > CAMERA_ORTHOGRAPHIC) {
+            g->cs->cam3d.projection = CAMERA_PERSPECTIVE;
+        }
+
+        //switch (g->cs->cam3d.projection) {
+        //case CAMERA_PERSPECTIVE:
+        //    g->cs->cam3d.projection = CAMERA_ORTHOGRAPHIC;
+        //    break;
+        //case CAMERA_ORTHOGRAPHIC:
+        //    //g->cs->cam3d.projection = CAMERA_FREE;
+        //    g->cs->cam3d.projection = CAMERA_ORBITAL;
+        //    break;
+        //case CAMERA_ORBITAL:
+        //    g->cs->cam3d.projection = CAMERA_PERSPECTIVE;
+        //    break;
+        //default:
+        //    g->cs->cam3d.projection = CAMERA_PERSPECTIVE;
+        //    break;
+        //}
+    }
+
+    if (IsKeyPressed(KEY_Z)) {
+        // change camera mode
+        g->cs->cameramode++;
+
+        if (g->cs->cameramode > CAMERA_THIRD_PERSON) {
+            g->cs->cameramode = CAMERA_CUSTOM;
+        }
+    }
+
+    UpdateCamera(&g->cs->cam3d, g->cs->cameramode);
+
+    // zoom in
+    //if (IsKeyPressed(KEY_Z)) {
+    //    g->cs->cam3d.fovy += 5;
+    //    if (g->cs->cam3d.fovy > 90) {
+    //        g->cs->cam3d.fovy = 90;
+    //    }
+    //}
 }
 
 

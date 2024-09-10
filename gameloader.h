@@ -25,10 +25,17 @@ void drawfadeunsafe(gamestate* g);
 void unloaddisplay();
 void mygamestateinit();
 
-void DrawCubeTextureRec(Texture2D texture,
-                        Rectangle source,
-                        Vector3 position,
-                        float width,
-                        float height,
-                        float length,
-                        Color color);
+//void DrawCubeTextureRec(const Texture2D texture,
+//                        const Rectangle source,
+//                        const Vector3 position,
+//                        const float width,
+//                        const float height,
+//                        const float length,
+//                        const Color color);
+//
+void drawcubetexturerec(const Texture2D texture,
+                        const Rectangle source,
+                        const Vector3 position,
+                        const float width,
+                        const float height,
+                        const float length);

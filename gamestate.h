@@ -33,15 +33,6 @@ typedef struct gamestate {
 
 } gamestate;
 
-//#define GAMESTATESIZE                                                                              \
-//    (sizeof(bool) + sizeof(int) * 5 + MYCOLORSIZE + DEBUGPANELSIZE + sizeof(companyscene*) +       \
-     DISPLAYSIZE + sizeof(scene))
-
-
-//#define GAMESTATESIZE                                                                              \
-//    (SIZEOFBOOL(2) + SIZEOFINT(5) + MYCOLORSIZE + DEBUGPANELSIZE + sizeof(companyscene*) +         \
-//     DISPLAYSIZE + sizeof(sceneint) + sizeof(time_t) + sizeof(struct tm*))
-
 
 gamestate* gamestateinit();
 void gamestatefree(gamestate* g);

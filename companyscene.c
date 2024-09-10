@@ -77,6 +77,7 @@ void companysceneinitvars(companyscene* c) {
         c->cubepos = (Vector3){0.0f, 0.5f, 1.0f};
         c->dodrawpresents = false;
         c->dodrawtest = true;
+        c->cameramode = CAMERA_FREE;
     }
 }
 

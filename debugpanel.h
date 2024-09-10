@@ -2,7 +2,10 @@
 
 #include "mycolor.h"
 
-#define DEBUGPANELBUFSIZE 256
+//#define DEBUGPANELBUFSIZE 256
+#define DEBUGPANELBUFSIZE 496
+// game begins black-screening at 497, not sure why
+//#define DEBUGPANELBUFSIZE 497
 
 typedef struct debugpanel {
     int x;
@@ -12,8 +15,5 @@ typedef struct debugpanel {
     int fontsize;
     mycolor fgcolor;
     mycolor bgcolor;
-    //mycolor bordercolor;
     char bfr[DEBUGPANELBUFSIZE];
 } debugpanel;
-
-#define DEBUGPANELSIZE (sizeof(debugpanel))

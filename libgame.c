@@ -77,8 +77,9 @@ void updategamestateunsafe(gamestate* g) {
              "framecount:   %d\n"
              "start date:   %s\n"
              "current date: %s\n"
-             "camera3d.position: %.2f %.2f %.2f\n"
-             "camera3d.target:   %.2f %.2f %.2f\n",
+             "camera3d.pos: %.2f %.2f %.2f\n"
+             "camera3d.target:   %.2f %.2f %.2f\n"
+             "camera3d.proj: %d\ncameramode: %d\n",
              g->framecount,
              timebuf2,
              timebuf,
@@ -87,9 +88,11 @@ void updategamestateunsafe(gamestate* g) {
              g->cs->cam3d.position.z,
              g->cs->cam3d.target.x,
              g->cs->cam3d.target.y,
-             g->cs->cam3d.target.z);
+             g->cs->cam3d.target.z,
+             g->cs->cam3d.projection,
+             g->cs->cameramode);
     g->dp.w = 350;
-    g->dp.h = 120;
+    g->dp.h = 200;
 
     // top left
     //setdebugpaneltopleft(g);

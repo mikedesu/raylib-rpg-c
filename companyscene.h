@@ -15,7 +15,10 @@ typedef struct companyscene {
     Texture2D test;
 
     Camera2D cam2d;
+
     Camera3D cam3d;
+    CameraMode cameramode;
+
 
     // cube color
     Color cubecolor;
