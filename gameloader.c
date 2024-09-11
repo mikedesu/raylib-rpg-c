@@ -106,17 +106,7 @@ void myinitwindow() {
     InitWindow(default_window_width, default_window_height, "Game");
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
-
     rlglInit(default_window_width, default_window_height);
-
-    mygamestateinit();
-
-    if (myupdategamestate == NULL) {
-        fprintf(stderr, "dlsym failed or has not been loaded yet: %s\n", dlerror());
-        loadsymbols();
-    }
-    myupdategamestate(g);
-
     mprint("end of myinitwindow");
 }
 
@@ -451,6 +441,15 @@ void gamerun() {
     loadsymbols();
     mprint("initing window");
     myinitwindow();
+
+    mygamestateinit();
+    if (myupdategamestate == NULL) {
+        fprintf(stderr, "dlsym failed or has not been loaded yet: %s\n", dlerror());
+        loadsymbols();
+    }
+    myupdategamestate(g);
+
+
     mprint("initing rendertexture");
     initrendertexture(g);
     mprint("entering gameloop");
