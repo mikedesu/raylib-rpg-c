@@ -33,8 +33,9 @@ bool (*mywindowshouldclose)(void) = NULL;
 
 void (*myinitwindow)() = NULL;
 void (*myclosewindow)() = NULL;
-//void (*mygameloop)(gamestate*) = NULL;
 void (*mydrawframe)() = NULL;
+void (*mylibgameinit)() = NULL;
+void (*mylibgameclose)() = NULL;
 
 // get the last write time of a file
 time_t getlastwritetime(const char* filename) {
@@ -57,46 +58,42 @@ void openhandle() {
 
 
 void checksymbol(void* symbol, const char* name) {
-    //mprint("begin check symbol");
     if (symbol == NULL) {
         fprintf(stderr, "dlsym failed: %s\n", dlerror());
         exit(1);
     }
-    //mprint("end check symbol");
 }
 
 
 void loadsymbols() {
     mprint("begin loadsymbols");
 
-
     //mprint("updategamestate");
     //myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
-
 
     //mprint("updategamestateunsafe");
     //myupdategamestateunsafe = (void (*)(gamestate*))dlsym(handle, "updategamestateunsafe");
 
-
     mprint("mywindowshouldclose");
     mywindowshouldclose = (bool (*)(void))dlsym(handle, "gamewindowshouldclose");
-
 
     mprint("myinitwindow");
     myinitwindow = (void (*)())dlsym(handle, "gameinitwindow");
 
-
     mprint("myclosewindow");
     myclosewindow = (void (*)())dlsym(handle, "gameclosewindow");
-
 
     //mprint("mygameloop");
     //mygameloop = (void (*)(gamestate*))dlsym(handle, "gameloop");
 
-
     mprint("mydrawframe");
     mydrawframe = (void (*)())dlsym(handle, "drawframe");
 
+    mprint("libgameinit");
+    mylibgameinit = (void (*)())dlsym(handle, "libgameinit");
+
+    mprint("libgameclose");
+    mylibgameclose = (void (*)())dlsym(handle, "libgameclose");
 
     //mprint("check updategamestate");
     //checksymbol(myupdategamestate, "updategamestate");
@@ -295,13 +292,11 @@ void loadsymbols() {
 //rlSetTexture(0);
 //}
 
-
 //void drawfade(gamestate* s) {
 //    if (s) {
 //        drawfadeunsafe(s);
 //    }
 //}
-
 
 //void drawfadeunsafe(gamestate* g) {
 //const Color c = (Color){0, 0, 0, g->fadealpha};
@@ -318,13 +313,11 @@ void loadsymbols() {
 //}
 //}
 
-
 //void drawframe(gamestate* s) {
 //    if (s) {
 //        drawframeunsafe(s);
 //    }
 //}
-
 
 //void drawframeunsafe(gamestate* s) {
 //if (s) {
@@ -428,20 +421,6 @@ void loadsymbols() {
 //}
 
 
-//void gameloop(gamestate* g) {
-//if (g) {
-//while (!WindowShouldClose()) {
-//    while (!mywindowshouldclose()) {
-//drawframeunsafe(g);
-//myupdategamestateunsafe(g);
-//handleinputunsafe(g);
-
-//autoreload();
-//    }
-//}
-//}
-
-
 void autoreload() {
     if (getlastwritetime(libname) > last_write_time) {
         last_write_time = getlastwritetime(libname);
@@ -455,6 +434,7 @@ void autoreload() {
 
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
+        mylibgameclose();
         myclosewindow();
 
         // mprint("getting old gamestate");
@@ -468,6 +448,7 @@ void autoreload() {
 
 
         myinitwindow();
+        mylibgameinit();
     }
 }
 
@@ -510,12 +491,8 @@ void gamerun() {
     while (!mywindowshouldclose()) {
         mydrawframe();
         //mprint("gameloop");
-        //BeginDrawing();
-        //ClearBackground(WHITE);
-        //drawframeunsafe(g);
         //myupdategamestateunsafe(g);
         //handleinputunsafe(g);
-        //EndDrawing();
         autoreload();
     }
 

@@ -17,8 +17,10 @@ struct tm* tm;
 struct tm* tm2;
 
 
+gamestate* g = NULL;
+
+
 bool gamewindowshouldclose();
-void gameloop(gamestate* g);
 void gameinitwindow();
 void gameclosewindow();
 void updategamestate(gamestate* g);
@@ -28,6 +30,8 @@ void setdebugpanelbottomleft(gamestate* g);
 void setdebugpanelbottomright(gamestate* g);
 void setdebugpaneltopright(gamestate* g);
 void drawframe();
+void libgameinit();
+void libgameclose();
 
 
 bool gamewindowshouldclose() {
@@ -257,7 +261,17 @@ void drawframe() {
     //mprint("drawframe");
     BeginDrawing();
     ClearBackground(RAYWHITE);
-    DrawRectangle(0, 0, 100, 100, BLACK);
+    //DrawRectangle(0, 0, 100, 100, BLACK);
     //DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
     EndDrawing();
+}
+
+
+void libgameinit() {
+    mprint("libgameinit");
+}
+
+
+void libgameclose() {
+    mprint("libgameclose");
 }

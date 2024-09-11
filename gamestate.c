@@ -8,7 +8,7 @@
 #include <string.h>
 
 // have to update this function when we introduce new fields to Gamestate
-gamestate* gamestateinit() {
+gamestate* gamestateinitptr() {
     mprint("gamestateinit\n");
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     if (g == NULL) {

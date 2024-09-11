@@ -34,6 +34,6 @@ typedef struct gamestate {
 } gamestate;
 
 
-gamestate* gamestateinit();
+gamestate* gamestateinitptr();
 void gamestatefree(gamestate* g);
 void gamestateinitdebugpanel(gamestate* g);
