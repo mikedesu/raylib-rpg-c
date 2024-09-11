@@ -38,7 +38,6 @@ void companyscenefree(companyscene* ts) {
     if (ts != NULL) {
         UnloadTexture(ts->presents);
         UnloadTexture(ts->test);
-        //UnloadTexture(ts->company);
         free(ts);
     }
 }

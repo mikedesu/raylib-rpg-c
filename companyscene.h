@@ -25,7 +25,6 @@ typedef struct companyscene {
 
     Vector3 cubepos;
 
-
 } companyscene;
 
 

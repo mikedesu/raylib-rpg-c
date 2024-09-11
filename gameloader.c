@@ -14,9 +14,9 @@
 #include <unistd.h>
 
 long last_write_time = 0;
+
 const int default_window_width = 960;
 const int default_window_height = 540;
-
 //const int default_window_width = 1280;
 //const int default_window_height = 720;
 
@@ -124,12 +124,12 @@ void myinitwindow() {
 void drawdebugpanel(gamestate* g) {
     if (g) {
         const int pad = 5;
-        Color bgc = {g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, g->dp.bgcolor.a};
-        Color fgc = {g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
-        Color borderc = {g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
+        const Color bgc = {g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, g->dp.bgcolor.a};
+        const Color fgc = {g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
+        const Color borderc = {g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
         const int x = g->dp.x + pad * 2;
         const int y = g->dp.y + pad * 2;
-        Vector2 v = {x, y};
+        const Vector2 v = {x, y};
         DrawRectangle(g->dp.x + pad, g->dp.y + pad, g->dp.w, g->dp.h, bgc);
         DrawRectangleLines(g->dp.x, g->dp.y, g->dp.w, g->dp.h, borderc);
         DrawTextEx(g->d.font, g->dp.bfr, v, g->dp.fontsize, 0, fgc);
@@ -140,15 +140,15 @@ void drawdebugpanel(gamestate* g) {
 void drawcompanyscene(gamestate* g) {
     if (g) {
         companyscene* cs = g->cs;
-        float w = cs->presents.width, h = cs->presents.height;
-        float x = cs->x;
-        float y = cs->y;
-        float s = cs->scale;
+        const float w = cs->presents.width, h = cs->presents.height;
+        const float x = cs->x;
+        const float y = cs->y;
+        const float s = cs->scale;
         Rectangle src = {0, 0, w, h};
         Rectangle dst = {x, y, w * s, h * s};
-        Vector3 cube = cs->cubepos;
-        Color c = cs->cubecolor;
-        Color c2 = cs->cubewirecolor;
+        const Vector3 cube = cs->cubepos;
+        const Color c = cs->cubecolor;
+        const Color c2 = cs->cubewirecolor;
 
         BeginMode3D(g->cs->cam3d);
         DrawGrid(10, 1.0f);
@@ -157,10 +157,8 @@ void drawcompanyscene(gamestate* g) {
 
         src = (Rectangle){0, 0, g->cs->test.width / 4.0f, g->cs->test.height / 3.0f};
 
-        float ratio = src.width / src.height;
-
-        Vector3 cube2 = {cube.x, 1.51f, cube.z - 0.5f};
-
+        const float ratio = src.width / src.height;
+        const Vector3 cube2 = {cube.x, 1.51f, cube.z - 0.5f};
 
         drawcubetexturerec(cs->test, src, cube2, ratio, 1.0f, 1.0f);
 
@@ -177,13 +175,8 @@ void drawcompanyscene(gamestate* g) {
 
 
 // Draw cube with texture piece applied to all faces
-//void DrawCubeTextureRec(
 void drawcubetexturerec(
     const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l) {
-    //const float x = pos.x;
-    //const float y = pos.y;
-    //const float z = pos.z;
-
     const float rx = src.x + src.width;
     const float ry = src.y + src.height;
 
@@ -192,15 +185,11 @@ void drawcubetexturerec(
     const float c = pos.y - h / 2;
     const float d = pos.y + h / 2;
 
-    //const float e = pos.z + l / 2;
-
     const float e = pos.z + l / 2;
     const float f = pos.z - l / 2;
 
     // precompute
     // vertices
-
-    // const Vector3 v[4] = {{a, c, e}, {b, c, e}, {b, d, e}, {a, d, e}};
     const Vector3 v[4] = {{a, c, e}, {b, c, e}, {b, d, e}, {a, d, e}};
 
     // texture coordinates
@@ -292,7 +281,7 @@ void drawfade(gamestate* s) {
 
 
 void drawfadeunsafe(gamestate* g) {
-    Color c = (Color){0, 0, 0, g->fadealpha};
+    const Color c = (Color){0, 0, 0, g->fadealpha};
     const int x = 0;
     const int y = 0;
     const int w = GetScreenWidth();
@@ -322,8 +311,8 @@ void drawframeunsafe(gamestate* s) {
     const float recth = 170;
     const float x = dw / 2 - rectw / 2;
     const float y = dh / 2 - recth / 2;
-    float w = 200;
-    float h = 200;
+    const float w = 200;
+    const float h = 200;
 
     BeginDrawing();
     BeginTextureMode(g->d.target);
@@ -346,10 +335,10 @@ void drawframeunsafe(gamestate* s) {
 
     // we've finished drawing to the target texture
     // now we can draw the target texture to the window
-    w = g->d.target.texture.width;
-    h = g->d.target.texture.height;
-    Rectangle src = {0.0f, 0.0f, w, -h};
-    Rectangle dst = {0.0f, 0.0f, dw, dh};
+    const float w2 = g->d.target.texture.width;
+    const float h2 = g->d.target.texture.height;
+    const Rectangle src = {0.0f, 0.0f, w2, -h2};
+    const Rectangle dst = {0.0f, 0.0f, dw, dh};
 
     DrawTexturePro(g->d.target.texture, src, dst, g->d.origin, 0.0f, WHITE);
     EndDrawing();
@@ -413,14 +402,7 @@ void handleinputunsafe(gamestate* g) {
         }
     }
 
-
-    // zoom in
-    //if (IsKeyPressed(KEY_Z)) {
-    //    g->cs->cam3d.fovy += 5;
-    //    if (g->cs->cam3d.fovy > 90) {
-    //        g->cs->cam3d.fovy = 90;
-    //    }
-    //}
+    UpdateCamera(&g->cs->cam3d, g->cs->cameramode);
 }
 
 
