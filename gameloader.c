@@ -2,6 +2,7 @@
 #include "gameloader.h"
 #include "gamestate.h"
 #include "mprint.h"
+#include "rcamera.h"
 #include <dlfcn.h>
 #include <raylib.h>
 #include <rlgl.h>
@@ -13,9 +14,12 @@
 #include <unistd.h>
 
 long last_write_time = 0;
+const int default_window_width = 960;
+const int default_window_height = 540;
 
-const int default_window_width = 1280;
-const int default_window_height = 720;
+//const int default_window_width = 1280;
+//const int default_window_height = 720;
+
 const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
@@ -119,21 +123,16 @@ void myinitwindow() {
 
 void drawdebugpanel(gamestate* g) {
     if (g) {
-        //const int fontsize = 20;
         const int pad = 5;
-        Color bgc = (Color){g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, g->dp.bgcolor.a},
-              fgc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255},
-              borderc = (Color){g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
-        int w = g->dp.w;
-        int h = g->dp.h;
-        int x = g->dp.x + pad;
-        int y = g->dp.y + pad;
-        DrawRectangle(x, y, w, h, bgc);
-        DrawRectangleLines(x, y, w, h, borderc);
-        x = g->dp.x + pad * 2;
-        y = g->dp.y + pad * 2;
-        //DrawTextEx(mydisplay.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
-        DrawTextEx(g->d.font, g->dp.bfr, (Vector2){x, y}, g->dp.fontsize, 0, fgc);
+        Color bgc = {g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, g->dp.bgcolor.a};
+        Color fgc = {g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
+        Color borderc = {g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
+        const int x = g->dp.x + pad * 2;
+        const int y = g->dp.y + pad * 2;
+        Vector2 v = {x, y};
+        DrawRectangle(g->dp.x + pad, g->dp.y + pad, g->dp.w, g->dp.h, bgc);
+        DrawRectangleLines(g->dp.x, g->dp.y, g->dp.w, g->dp.h, borderc);
+        DrawTextEx(g->d.font, g->dp.bfr, v, g->dp.fontsize, 0, fgc);
     }
 }
 
@@ -147,32 +146,23 @@ void drawcompanyscene(gamestate* g) {
         float s = cs->scale;
         Rectangle src = {0, 0, w, h};
         Rectangle dst = {x, y, w * s, h * s};
-
         Vector3 cube = cs->cubepos;
         Color c = cs->cubecolor;
         Color c2 = cs->cubewirecolor;
 
         BeginMode3D(g->cs->cam3d);
         DrawGrid(10, 1.0f);
-
         DrawCube(cube, 1.0f, 1.0f, 1.0f, c);
-
         DrawCubeWires(cube, 1.0f, 1.0f, 1.0f, c2);
 
-
-        //DrawCube(cube2, 1.0f, 1.0f, 1.0f, RED);
         src = (Rectangle){0, 0, g->cs->test.width / 4.0f, g->cs->test.height / 3.0f};
 
-        //float ratio = src.height / src.width;
         float ratio = src.width / src.height;
 
-        //Vector3 cube2 = {0.0f, 1.5f, 0.5f};
-        //Vector3 cube2 = {0.0f, 1.51f, 0.5f};
         Vector3 cube2 = {cube.x, 1.51f, cube.z - 0.5f};
 
-        //DrawCubeTextureRec(cs->test, src, cube2, ratio, 1.0f, 1.0f, WHITE);
+
         drawcubetexturerec(cs->test, src, cube2, ratio, 1.0f, 1.0f);
-        // DrawCubeWires(cube2, ratio, 1.0f, 1.0f, WHITE);
 
         EndMode3D();
         BeginMode2D(g->cs->cam2d);
@@ -182,16 +172,6 @@ void drawcompanyscene(gamestate* g) {
             src = (Rectangle){0, 0, w, h};
             DrawTexturePro(g->cs->presents, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
         }
-
-        //const float scale = 2.0f;
-        //dst = (Rectangle){GetScreenWidth() / 2.0f - 20,
-        //                  GetScreenHeight() / 2.0f - 90,
-        //                  g->cs->test.width / 4.0f * scale,
-        //                  g->cs->test.height / 3.0f * scale};
-        // draw the test texture
-        //if (g->cs->dodrawtest) {
-        //    DrawTexturePro(g->cs->test, src, dst, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
-        //}
     }
 }
 
@@ -200,19 +180,35 @@ void drawcompanyscene(gamestate* g) {
 //void DrawCubeTextureRec(
 void drawcubetexturerec(
     const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l) {
-    const float x = pos.x, y = pos.y, z = pos.z, txw = tex.width, txh = tex.height,
-                srcw = src.width, srch = src.height, srcx = src.x, srcy = src.y;
-    const float rx = srcx + srcw, ry = srcy + srch, w2 = w / 2, h2 = h / 2, l2 = l / 2;
-    const float xw0 = x - w2, xw1 = x + w2, yh0 = y - h2, yh1 = y + h2, z0 = z + l2;
+    //const float x = pos.x;
+    //const float y = pos.y;
+    //const float z = pos.z;
+
+    const float rx = src.x + src.width;
+    const float ry = src.y + src.height;
+
+    const float a = pos.x - w / 2;
+    const float b = pos.x + w / 2;
+    const float c = pos.y - h / 2;
+    const float d = pos.y + h / 2;
+
+    //const float e = pos.z + l / 2;
+
+    const float e = pos.z + l / 2;
+    const float f = pos.z - l / 2;
+
     // precompute
     // vertices
-    const Vector3 v[4] = {{xw0, yh0, z0}, {xw1, yh0, z0}, {xw1, yh1, z0}, {xw0, yh1, z0}};
+
+    // const Vector3 v[4] = {{a, c, e}, {b, c, e}, {b, d, e}, {a, d, e}};
+    const Vector3 v[4] = {{a, c, e}, {b, c, e}, {b, d, e}, {a, d, e}};
+
     // texture coordinates
-    const Vector2 t[4] = {{srcx / txw, ry / txh},
-                          {rx / txw, ry / txh},
-                          {rx / txw, srcy / txh},
-                          {srcx / txw, srcy / txh}};
-    // Set desired texture to be enabled while drawing following vertex data
+    const Vector2 t[4] = {{src.x / tex.width, ry / tex.height},
+                          {rx / tex.width, ry / tex.height},
+                          {rx / tex.width, src.y / tex.height},
+                          {src.x / tex.width, src.y / tex.height}};
+    // Set desired texture to be enabled while drawintex.height tex.widthollowintex.height vertex data
     rlSetTexture(tex.id);
 
     // We calculate the normalized texture coordinates for the desired texture-source-rectangle
@@ -348,6 +344,8 @@ void drawframeunsafe(gamestate* s) {
 
     EndTextureMode();
 
+    // we've finished drawing to the target texture
+    // now we can draw the target texture to the window
     w = g->d.target.texture.width;
     h = g->d.target.texture.height;
     Rectangle src = {0.0f, 0.0f, w, -h};
@@ -371,40 +369,50 @@ void handleinputunsafe(gamestate* g) {
         g->dodebugpanel = !g->dodebugpanel;
     }
 
-    if (IsKeyPressed(KEY_SPACE)) {
+    if (IsKeyPressed(KEY_ONE)) {
+        g->cs->cameramode = CAMERA_FREE;
+        g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f}; // Reset roll
+    }
 
-        g->cs->cam3d.projection++;
-        if (g->cs->cam3d.projection > CAMERA_ORTHOGRAPHIC) {
+    if (IsKeyPressed(KEY_TWO)) {
+        g->cs->cameramode = CAMERA_FIRST_PERSON;
+        g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f}; // Reset roll
+    }
+
+    if (IsKeyPressed(KEY_THREE)) {
+        g->cs->cameramode = CAMERA_THIRD_PERSON;
+        g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f}; // Reset roll
+    }
+
+    if (IsKeyPressed(KEY_FOUR)) {
+        g->cs->cameramode = CAMERA_ORBITAL;
+        g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f}; // Reset roll
+    }
+
+    // Switch camera projection
+    if (IsKeyPressed(KEY_P)) {
+        if (g->cs->cam3d.projection == CAMERA_PERSPECTIVE) {
+            // Create isometric view
+            g->cs->cameramode = CAMERA_THIRD_PERSON;
+            // Note: The target distance is related to the render distance in the orthographic projection
+            g->cs->cam3d.position = (Vector3){0.0f, 2.0f, -100.0f};
+            g->cs->cam3d.target = (Vector3){0.0f, 2.0f, 0.0f};
+            g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
+            g->cs->cam3d.projection = CAMERA_ORTHOGRAPHIC;
+            g->cs->cam3d.fovy = 20.0f; // near plane width in CAMERA_ORTHOGRAPHIC
+            CameraYaw(&g->cs->cam3d, -135 * DEG2RAD, true);
+            CameraPitch(&g->cs->cam3d, -45 * DEG2RAD, true, true, false);
+        } else if (g->cs->cam3d.projection == CAMERA_ORTHOGRAPHIC) {
+            // Reset to default view
+            g->cs->cameramode = CAMERA_THIRD_PERSON;
+            g->cs->cam3d.position = (Vector3){0.0f, 2.0f, 10.0f};
+            g->cs->cam3d.target = (Vector3){0.0f, 2.0f, 0.0f};
+            g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
             g->cs->cam3d.projection = CAMERA_PERSPECTIVE;
-        }
-
-        //switch (g->cs->cam3d.projection) {
-        //case CAMERA_PERSPECTIVE:
-        //    g->cs->cam3d.projection = CAMERA_ORTHOGRAPHIC;
-        //    break;
-        //case CAMERA_ORTHOGRAPHIC:
-        //    //g->cs->cam3d.projection = CAMERA_FREE;
-        //    g->cs->cam3d.projection = CAMERA_ORBITAL;
-        //    break;
-        //case CAMERA_ORBITAL:
-        //    g->cs->cam3d.projection = CAMERA_PERSPECTIVE;
-        //    break;
-        //default:
-        //    g->cs->cam3d.projection = CAMERA_PERSPECTIVE;
-        //    break;
-        //}
-    }
-
-    if (IsKeyPressed(KEY_Z)) {
-        // change camera mode
-        g->cs->cameramode++;
-
-        if (g->cs->cameramode > CAMERA_THIRD_PERSON) {
-            g->cs->cameramode = CAMERA_CUSTOM;
+            g->cs->cam3d.fovy = 60.0f;
         }
     }
 
-    UpdateCamera(&g->cs->cam3d, g->cs->cameramode);
 
     // zoom in
     //if (IsKeyPressed(KEY_Z)) {

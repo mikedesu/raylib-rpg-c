@@ -4,6 +4,45 @@
 #include <raylib.h>
 #include <stdlib.h>
 
+companyscene companysceneinit() {
+    mprint("companysceneinit");
+    companyscene ts;
+    mprint("Loading textures");
+    mprint("Loading presents texture");
+    companysceneloadtextures(&ts);
+    companysceneinitvars(&ts);
+    companysceneptrinitcameras(&ts);
+    companysceneinitcubecolors(&ts);
+    return ts;
+}
+
+companyscene* companysceneinitptr() {
+    mprint("companysceneinitptr");
+    companyscene* ts = (companyscene*)malloc(sizeof(companyscene));
+    if (ts != NULL) {
+        mprint("companysceneinit: malloc success");
+        mprint("Loading textures");
+        mprint("Loading presents texture");
+        companysceneloadtextures(ts);
+        companysceneinitvars(ts);
+        companysceneptrinitcameras(ts);
+        companysceneinitcubecolors(ts);
+    } else {
+        mprint("companysceneinit: malloc failed");
+    }
+    return ts;
+}
+
+
+void companyscenefree(companyscene* ts) {
+    if (ts != NULL) {
+        UnloadTexture(ts->presents);
+        UnloadTexture(ts->test);
+        //UnloadTexture(ts->company);
+        free(ts);
+    }
+}
+
 
 void companysceneptrinitcameras(companyscene* c) {
     if (c != NULL) {
@@ -16,15 +55,9 @@ void companysceneptrinitcameras(companyscene* c) {
         c->cam3d = (Camera3D){0};
         c->cam3d.position = (Vector3){0, 5, 5};
         c->cam3d.target = (Vector3){0, 0, 0};
-        //c->cam3d.target = (Vector3){0, 0, 0};
         c->cam3d.up = (Vector3){0, 1, 0};
         c->cam3d.fovy = 45;
-
         c->cam3d.projection = CAMERA_PERSPECTIVE;
-        //c->cam3d.projection = CAMERA_ORTHOGRAPHIC;
-        //c->cam3d.projection = CAMERA_FREE;
-        //c->cam3d.projection = CAMERA_CUSTOM;
-        //c->cam3d.projection = CAMERA_ORBITAL;
     }
 }
 
@@ -78,47 +111,5 @@ void companysceneinitvars(companyscene* c) {
         c->dodrawpresents = false;
         c->dodrawtest = true;
         c->cameramode = CAMERA_FREE;
-    }
-}
-
-
-companyscene companysceneinit() {
-    mprint("companysceneinit");
-    companyscene ts;
-    mprint("Loading textures");
-    mprint("Loading presents texture");
-    companysceneloadtextures(&ts);
-    companysceneinitvars(&ts);
-    companysceneptrinitcameras(&ts);
-    companysceneinitcubecolors(&ts);
-
-    return ts;
-}
-
-companyscene* companysceneinitptr() {
-    mprint("companysceneinitptr");
-    companyscene* ts = (companyscene*)malloc(sizeof(companyscene));
-    //companyscene* ts = (companyscene*)malloc(COMPANYSCENESIZE);
-    if (ts != NULL) {
-        mprint("companysceneinit: malloc success");
-        mprint("Loading textures");
-        mprint("Loading presents texture");
-        companysceneloadtextures(ts);
-        companysceneinitvars(ts);
-        companysceneptrinitcameras(ts);
-        companysceneinitcubecolors(ts);
-    } else {
-        mprint("companysceneinit: malloc failed");
-    }
-    return ts;
-}
-
-
-void companyscenefree(companyscene* ts) {
-    if (ts != NULL) {
-        UnloadTexture(ts->presents);
-        UnloadTexture(ts->test);
-        //UnloadTexture(ts->company);
-        free(ts);
     }
 }

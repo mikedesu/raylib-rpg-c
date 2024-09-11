@@ -19,7 +19,6 @@ typedef struct companyscene {
     Camera3D cam3d;
     CameraMode cameramode;
 
-
     // cube color
     Color cubecolor;
     Color cubewirecolor;
@@ -28,12 +27,6 @@ typedef struct companyscene {
 
 
 } companyscene;
-
-
-//#define COMPANYSCENESIZE                                                                           \
-//    (SIZEOFINT(3) + SIZEOFT2D(2) + SIZEOFCAMERAS + SIZEOFCOLOR(2) + SIZEOFVEC3(1) + SIZEOFBOOL(1))
-//(SIZEOFINT(3) + sizeof(Texture2D) + sizeof(Camera2D) + sizeof(Camera3D) + sizeof(Color))
-//(sizeof(int) * 3 + sizeof(Texture2D) + sizeof(Camera2D) + sizeof(Camera3D) + sizeof(Color))
 
 
 companyscene companysceneinit();

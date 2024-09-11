@@ -134,10 +134,15 @@ void updategamestateunsafe(gamestate* g) {
     //g->cs->cubepos = (Vector3){0.0f, 0.5f, 1.0f};
     //static float cubedirx = 0.01f;
     static Vector3 cubev = {0.05f, 0.00f, 0.01f};
+    //g->cs->cubepos.x = 0.05f;
+    //g->cs->cubepos.y = 0.0f;
+    //g->cs->cubepos.z = 0.01f;
 
-    g->cs->cubepos.x += cubev.x;
-    g->cs->cubepos.y += cubev.y;
-    g->cs->cubepos.z += cubev.z;
+    g->cs->cubepos = (Vector3){0.0f, 0.5f, 1.0f};
+
+    //g->cs->cubepos.x += cubev.x;
+    //g->cs->cubepos.y += cubev.y;
+    //g->cs->cubepos.z += cubev.z;
 
     if (g->cs->cubepos.x > 4.5f) {
         cubev.x = -cubev.x;
@@ -173,9 +178,15 @@ void updategamestateunsafe(gamestate* g) {
     //        dty = 0.005f;
     //    }
     //}
-    g->cs->cam3d.position = (Vector3){0.0f, 4.0f, 10.0f};
-    g->cs->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
-    g->cs->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
+
+    // g->cs->cam3d.position = (Vector3){10.0f, 10.0f, -10.0f};
+    //g->cs->cam3d.position = (Vector3){-10.0f, 5.0f, 9.0f};
+    g->cs->cam3d.position = (Vector3){-3.0f, 5.0f, 5.0f};
+
+    //g->cs->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
+    g->cs->cam3d.target = g->cs->cubepos;
+
+    //g->cs->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
     //g->cs->cam3d.position.x = 0.0f;
     //g->cs->cam3d.target.x = 0.0f;
     //g->cs->cam3d.position.y = 10.0f;
@@ -204,6 +215,6 @@ void updategamestateunsafe(gamestate* g) {
     g->cs->y = g->winheight / 2 - g->cs->presents.height * scale / 2;
 
 
-    //g->cs->dodrawpresents = false;
-    g->cs->dodrawpresents = true;
+    g->cs->dodrawpresents = false;
+    //g->cs->dodrawpresents = true;
 }
