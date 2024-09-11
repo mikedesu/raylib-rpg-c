@@ -2,6 +2,7 @@
 #include "mprint.h"
 
 #include <raylib.h>
+#include <rlgl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,12 +16,38 @@ time_t start = 0;
 struct tm* tm;
 struct tm* tm2;
 
+
+bool gamewindowshouldclose();
+void gameloop(gamestate* g);
+void gameinitwindow();
+void gameclosewindow();
 void updategamestate(gamestate* g);
 void updategamestateunsafe(gamestate* g);
 void setdebugpaneltopleft(gamestate* g);
 void setdebugpanelbottomleft(gamestate* g);
 void setdebugpanelbottomright(gamestate* g);
 void setdebugpaneltopright(gamestate* g);
+
+
+bool gamewindowshouldclose() {
+    return WindowShouldClose();
+    //return false;
+}
+
+void gameinitwindow() {
+    mprint("begin gameinitwindow");
+    // have to do inittitlescene after initwindow
+    // cant load textures before initwindow
+    InitWindow(960, 540, "raylib template");
+    SetTargetFPS(60);
+    SetExitKey(KEY_Q);
+    //rlglInit(960, 540);
+    mprint("end of gameinitwindow");
+}
+
+void gameclosewindow() {
+    CloseWindow();
+}
 
 
 void updategamestate(gamestate* g) {
@@ -217,4 +244,24 @@ void updategamestateunsafe(gamestate* g) {
 
     g->cs->dodrawpresents = false;
     //g->cs->dodrawpresents = true;
+}
+
+
+void gameloop(gamestate* g) {
+    //if (g) {
+    //while (!WindowShouldClose()) {
+
+    gameinitwindow();
+
+    while (!WindowShouldClose()) {
+        //mprint("gameloop");
+        BeginDrawing();
+        ClearBackground(WHITE);
+        //drawframeunsafe(g);
+        //myupdategamestateunsafe(g);
+        //handleinputunsafe(g);
+        //autoreload();
+        EndDrawing();
+    }
+    //}
 }

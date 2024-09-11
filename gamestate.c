@@ -65,7 +65,7 @@ void gamestateinitdebugpanel(gamestate* g) {
 // have to update this function when we introduce new fields to Gamestate
 void gamestatefree(gamestate* s) {
     if (s != NULL) {
-        companyscenefree(s->cs);
+        //companyscenefree(s->cs);
         free(s);
     }
 }

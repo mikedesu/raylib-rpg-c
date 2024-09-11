@@ -12,7 +12,8 @@ MAIN_C=main.c
 all: game  
 
 game: main.c gameloader.o $(LIBGAME_OBJECTS) libgame.so 
-	$(CC) -o $@ $(MAIN_C) gameloader.o $(LIBGAME_OBJECTS) $(POSITION_INDEPENDENT_CODE)  $(STATIC_LINK_RAYLIB) $(LINK_MATH)
+	$(CC) -o $@ $(MAIN_C) gameloader.o gamestate.o $(POSITION_INDEPENDENT_CODE) 
+	#$(CC) -o $@ $(MAIN_C) gameloader.o $(LIBGAME_OBJECTS) $(POSITION_INDEPENDENT_CODE)  $(STATIC_LINK_RAYLIB) $(LINK_MATH)
 
 # Bridge between Raylib and game
 gameloader.o: gameloader.c
