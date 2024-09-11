@@ -27,6 +27,7 @@ void setdebugpaneltopleft(gamestate* g);
 void setdebugpanelbottomleft(gamestate* g);
 void setdebugpanelbottomright(gamestate* g);
 void setdebugpaneltopright(gamestate* g);
+void drawframe();
 
 
 bool gamewindowshouldclose() {
@@ -34,18 +35,23 @@ bool gamewindowshouldclose() {
     //return false;
 }
 
+
 void gameinitwindow() {
     mprint("begin gameinitwindow");
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
-    InitWindow(960, 540, "raylib template");
+    InitWindow(1280, 720, "raylib template");
+    //InitWindow(960, 540, "raylib template");
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
     //rlglInit(960, 540);
+    //rlglInit(1280, 720);
     mprint("end of gameinitwindow");
 }
 
+
 void gameclosewindow() {
+    //rlglClose();
     CloseWindow();
 }
 
@@ -247,21 +253,11 @@ void updategamestateunsafe(gamestate* g) {
 }
 
 
-void gameloop(gamestate* g) {
-    //if (g) {
-    //while (!WindowShouldClose()) {
-
-    gameinitwindow();
-
-    while (!WindowShouldClose()) {
-        //mprint("gameloop");
-        BeginDrawing();
-        ClearBackground(WHITE);
-        //drawframeunsafe(g);
-        //myupdategamestateunsafe(g);
-        //handleinputunsafe(g);
-        //autoreload();
-        EndDrawing();
-    }
-    //}
+void drawframe() {
+    //mprint("drawframe");
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+    DrawRectangle(0, 0, 100, 100, BLACK);
+    //DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+    EndDrawing();
 }

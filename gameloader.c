@@ -28,12 +28,13 @@ const char* templib = "./templibgame.so";
 void* handle = NULL;
 
 bool (*mywindowshouldclose)(void) = NULL;
-void (*myupdategamestate)(gamestate*) = NULL;
-void (*myupdategamestateunsafe)(gamestate*) = NULL;
+//void (*myupdategamestate)(gamestate*) = NULL;
+//void (*myupdategamestateunsafe)(gamestate*) = NULL;
 
 void (*myinitwindow)() = NULL;
 void (*myclosewindow)() = NULL;
-void (*mygameloop)(gamestate*) = NULL;
+//void (*mygameloop)(gamestate*) = NULL;
+void (*mydrawframe)() = NULL;
 
 // get the last write time of a file
 time_t getlastwritetime(const char* filename) {
@@ -69,12 +70,12 @@ void loadsymbols() {
     mprint("begin loadsymbols");
 
 
-    mprint("updategamestate");
-    myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
+    //mprint("updategamestate");
+    //myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
 
 
-    mprint("updategamestateunsafe");
-    myupdategamestateunsafe = (void (*)(gamestate*))dlsym(handle, "updategamestateunsafe");
+    //mprint("updategamestateunsafe");
+    //myupdategamestateunsafe = (void (*)(gamestate*))dlsym(handle, "updategamestateunsafe");
 
 
     mprint("mywindowshouldclose");
@@ -89,15 +90,19 @@ void loadsymbols() {
     myclosewindow = (void (*)())dlsym(handle, "gameclosewindow");
 
 
-    mprint("mygameloop");
-    mygameloop = (void (*)(gamestate*))dlsym(handle, "gameloop");
+    //mprint("mygameloop");
+    //mygameloop = (void (*)(gamestate*))dlsym(handle, "gameloop");
 
 
-    mprint("check updategamestate");
-    checksymbol(myupdategamestate, "updategamestate");
+    mprint("mydrawframe");
+    mydrawframe = (void (*)())dlsym(handle, "drawframe");
 
-    mprint("check updategamestateunsafe");
-    checksymbol(myupdategamestateunsafe, "updategamestateunsafe");
+
+    //mprint("check updategamestate");
+    //checksymbol(myupdategamestate, "updategamestate");
+
+    //mprint("check updategamestateunsafe");
+    //checksymbol(myupdategamestateunsafe, "updategamestateunsafe");
 
     mprint("check mywindowshouldclose");
     checksymbol(mywindowshouldclose, "gamewindowshouldclose");
@@ -108,9 +113,11 @@ void loadsymbols() {
     mprint("check myclosewindow");
     checksymbol(myclosewindow, "gameclosewindow");
 
+    //mprint("check mygameloop");
+    //checksymbol(mygameloop, "gameloop");
 
-    mprint("check mygameloop");
-    checksymbol(mygameloop, "gameloop");
+    mprint("check mydrawframe");
+    checksymbol(mydrawframe, "drawframe");
 
 
     mprint("end loadsymbols");
@@ -435,23 +442,34 @@ void loadsymbols() {
 //}
 
 
-//void autoreload() {
-//    if (getlastwritetime(libname) > last_write_time) {
-//        last_write_time = getlastwritetime(libname);
-//        while (FileExists(lockfile)) {
-//            printf("Library is locked\n");
-//            sleep(1);
-//        }
-//        // mprint("getting old gamestate");
-//        // gamestate* old_g = g;
-//        mprint("unloading library");
-//        dlclose(handle);
-//        mprint("opening handle");
-//        openhandle();
-//        mprint("loading symbols");
-//        loadsymbols();
-//    }
-//}
+void autoreload() {
+    if (getlastwritetime(libname) > last_write_time) {
+        last_write_time = getlastwritetime(libname);
+
+
+        //while (FileExists(lockfile)) {
+        while (access(lockfile, F_OK) == 0) {
+            printf("Library is locked\n");
+            sleep(1);
+        }
+
+        // this time, we have to shut down the game and close the window
+        // before we can reload and restart everything
+        myclosewindow();
+
+        // mprint("getting old gamestate");
+        // gamestate* old_g = g;
+        mprint("unloading library");
+        dlclose(handle);
+        mprint("opening handle");
+        openhandle();
+        mprint("loading symbols");
+        loadsymbols();
+
+
+        myinitwindow();
+    }
+}
 
 
 //void unloaddisplay() {
@@ -468,7 +486,9 @@ void gamerun() {
     loadsymbols();
     mprint("initing window");
 
-    //myinitwindow();
+    last_write_time = getlastwritetime(libname);
+
+    myinitwindow();
 
     //g = gamestateinit();
     //g->winwidth = default_window_width;
@@ -486,9 +506,18 @@ void gamerun() {
     //initrendertexture(g);
 
     mprint("entering gameloop");
-
     //gameloop(NULL);
-    mygameloop(NULL);
+    while (!mywindowshouldclose()) {
+        mydrawframe();
+        //mprint("gameloop");
+        //BeginDrawing();
+        //ClearBackground(WHITE);
+        //drawframeunsafe(g);
+        //myupdategamestateunsafe(g);
+        //handleinputunsafe(g);
+        //EndDrawing();
+        autoreload();
+    }
 
     mprint("closing window");
     myclosewindow();
