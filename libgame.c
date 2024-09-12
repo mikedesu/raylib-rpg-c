@@ -19,6 +19,10 @@ struct tm* tm2;
 
 gamestate* g = NULL;
 
+Font gfont;
+
+unsigned int framecount = 0;
+
 
 bool gamewindowshouldclose();
 void gameinitwindow();
@@ -31,6 +35,8 @@ void setdebugpaneltopright(gamestate* g);
 void drawframe();
 void libgameinit();
 void libgameclose();
+unsigned int saveframecount();
+void gameinitframecount(unsigned int fc);
 
 
 bool gamewindowshouldclose() {
@@ -40,39 +46,29 @@ bool gamewindowshouldclose() {
 
 
 void gameinitwindow() {
+    const char* title = "project rpg v0.000001";
+    const int w = 960;
+    const int h = 540;
     mprint("begin gameinitwindow");
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
-    const char* title = "project rpg v0.000001";
     //InitWindow(1280, 720, title);
-    InitWindow(960, 540, title);
-
+    InitWindow(w, h, title);
     while (!IsWindowReady()) {
     }
 
-    // this is hard-coded for now
+    // this is hard-coded for now so we can auto-position the window
+    // for easier config during streaming
     SetWindowMonitor(0);
     SetWindowPosition(1920, 0);
-
-    mprint("window is ready");
-
-    printf("window width: %d\n", GetScreenWidth());
-    printf("window height: %d\n", GetScreenHeight());
-    printf("monitor count: %d\n", GetMonitorCount());
-    printf("current monitor number: %d\n", GetCurrentMonitor());
-    printf(
-        "current monitor position: %.2f %.2f\n", GetMonitorPosition(0).x, GetMonitorPosition(0).y);
-    printf(
-        "current monitor position: %.2f %.2f\n", GetMonitorPosition(1).x, GetMonitorPosition(1).y);
-
-
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
-
-
-    //rlglInit(960, 540);
-    //rlglInit(1280, 720);
     mprint("end of gameinitwindow");
+}
+
+
+void gameinitframecount(unsigned int fc) {
+    framecount = fc;
 }
 
 
@@ -120,8 +116,6 @@ void updategamestate() {
     memset(timebuf, 0, 64);
     memset(g->dp.bfr, 0, DEBUGPANELBUFSIZE);
     strftime(timebuf, 64, "%Y-%m-%d %H:%M:%S", tm);
-
-
     snprintf(g->dp.bfr,
              DEBUGPANELBUFSIZE,
              "framecount:   %d\n"
@@ -143,7 +137,6 @@ void updategamestate() {
              g->cs->cameramode);
     g->dp.w = 350;
     g->dp.h = 200;
-
     // top left
     //setdebugpaneltopleft(g);
     // top right
@@ -152,29 +145,22 @@ void updategamestate() {
     //setdebugpanelbottomleft(g);
     // bottom right
     //setdebugpanelbottomright(g);
-
     g->dp.fontsize = 20;
-
     g->dp.fgcolor.r = 255;
     g->dp.fgcolor.g = 255;
     g->dp.fgcolor.b = 255;
-
     g->dp.bgcolor.r = 0x33;
     g->dp.bgcolor.g = 0x33;
     g->dp.bgcolor.b = 0x33;
     g->dp.bgcolor.a = 255;
-
     g->clearcolor.r = 0;
     g->clearcolor.g = 0;
     g->clearcolor.b = 0;
-
     //g->cs->cubecolor = (Color){0x33, 0x33, 0x33, 255};
     g->cs->cubecolor = (Color){0x66, 0x66, 0x66, 255};
     g->cs->cubewirecolor = (Color){0x33, 0x33, 0x33, 255};
     //g->cs->cubecolor = (Color){255, 255, 255, 255};
-
     //g->cs->cubepos = (Vector3){-1.5f, 0.5f, 4.5f};
-
     //if (g->framecount % 120 == 0) {
     //    g->cs->cubepos =
     //        (Vector3){GetRandomValue(-4, 4) + 0.5f, 0.5f, GetRandomValue(-4, 4) + 0.5f};
@@ -187,32 +173,25 @@ void updategamestate() {
     //g->cs->cubepos.x = 0.05f;
     //g->cs->cubepos.y = 0.0f;
     //g->cs->cubepos.z = 0.01f;
-
     g->cs->cubepos = (Vector3){0.0f, 0.5f, 1.0f};
-
     //g->cs->cubepos.x += cubev.x;
     //g->cs->cubepos.y += cubev.y;
     //g->cs->cubepos.z += cubev.z;
-
     if (g->cs->cubepos.x > 4.5f) {
         cubev.x = -cubev.x;
     } else if (g->cs->cubepos.x < -4.5f) {
         cubev.x = -cubev.x;
     }
-
     //if (g->cs->cubepos.y > 5.0f) {
     //    cubev.y = -cubev.y;
     //} else if (g->cs->cubepos.y < -5.0f) {
     //    cubev.y = -cubev.y;
     //}
-
     if (g->cs->cubepos.z > 4.5f) {
         cubev.z = -cubev.z;
     } else if (g->cs->cubepos.z < -4.5f) {
         cubev.z = -cubev.z;
     }
-
-
     //static float dpx = 0.00f;
     //static float dtx = 0.00f;
     //static float dpy = 0.01f;
@@ -228,14 +207,11 @@ void updategamestate() {
     //        dty = 0.005f;
     //    }
     //}
-
     // g->cs->cam3d.position = (Vector3){10.0f, 10.0f, -10.0f};
     //g->cs->cam3d.position = (Vector3){-10.0f, 5.0f, 9.0f};
     g->cs->cam3d.position = (Vector3){-3.0f, 5.0f, 5.0f};
-
     //g->cs->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
     g->cs->cam3d.target = g->cs->cubepos;
-
     //g->cs->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
     //g->cs->cam3d.position.x = 0.0f;
     //g->cs->cam3d.target.x = 0.0f;
@@ -243,7 +219,6 @@ void updategamestate() {
     //g->cs->cam3d.target.y = 0.0f;
     //g->cs->cam3d.position.z = 5.0f;
     //g->cs->cam3d.target.z = 0.0f;
-
     //g->cs->cam3d.position.y += dpy;
     //g->cs->cam3d.target.y += dty;
     //g->cs->cam3d.position.z += dz;
@@ -252,19 +227,13 @@ void updategamestate() {
     //    dpy = -dpy;
     //    dty = -dty;
     //}
-
     //if (g->cs->cam3d.target.y > ymax || g->cs->cam3d.target.y < ymin) {
     //    dty = -dty;
     //}
-
     g->cs->scale = 4;
-
     const int scale = g->cs->scale;
-
     g->cs->x = g->winwidth / 2 - g->cs->presents.width * scale / 2;
     g->cs->y = g->winheight / 2 - g->cs->presents.height * scale / 2;
-
-
     g->cs->dodrawpresents = false;
     //g->cs->dodrawpresents = true;
 }
@@ -273,18 +242,40 @@ void updategamestate() {
 void drawframe() {
     //mprint("drawframe");
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+    ClearBackground(BLACK);
     //DrawRectangle(0, 0, 100, 100, BLACK);
-    //DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+    //DrawText("Congrats! You created your first window!", 190, 200, 20, BLACK);
+    //DrawTextEx(gfont, "@evildojo666", (Vector2){10, 10}, 20, 2, WHITE);
+    char buffer[1024];
+    Vector2 pos = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+
+    bzero(buffer, 1024);
+    snprintf(buffer, 1024, "framecount: %d", framecount);
+
+    DrawTextEx(gfont, buffer, (Vector2){10, 10}, 20, 2, WHITE);
+    DrawTextEx(gfont, "@evildojo666", pos, 20, 2, WHITE);
+
     EndDrawing();
+
+    framecount++;
 }
 
 
 void libgameinit() {
     mprint("libgameinit");
+
+    gfont = LoadFont("fonts/hack-bold.ttf");
+    SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
 }
 
 
 void libgameclose() {
     mprint("libgameclose");
+
+    UnloadFont(gfont);
+}
+
+
+unsigned int saveframecount() {
+    return framecount;
 }

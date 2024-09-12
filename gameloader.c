@@ -15,6 +15,8 @@
 
 long last_write_time = 0;
 
+unsigned int old_framecount = 0;
+
 const int default_window_width = 960;
 const int default_window_height = 540;
 //const int default_window_width = 1280;
@@ -36,6 +38,9 @@ void (*myclosewindow)() = NULL;
 void (*mydrawframe)() = NULL;
 void (*mylibgameinit)() = NULL;
 void (*mylibgameclose)() = NULL;
+void (*mylibgameinitframecount)(unsigned int) = NULL;
+
+unsigned int (*mysaveframecount)() = NULL;
 
 // get the last write time of a file
 time_t getlastwritetime(const char* filename) {
@@ -74,48 +79,30 @@ void loadsymbols() {
     //mprint("updategamestateunsafe");
     //myupdategamestateunsafe = (void (*)(gamestate*))dlsym(handle, "updategamestateunsafe");
 
-    mprint("mywindowshouldclose");
+    // casting these to indicate return types and possible args
     mywindowshouldclose = (bool (*)(void))dlsym(handle, "gamewindowshouldclose");
+    mysaveframecount = (unsigned int (*)())dlsym(handle, "saveframecount");
 
-    mprint("myinitwindow");
-    myinitwindow = (void (*)())dlsym(handle, "gameinitwindow");
+    mylibgameinitframecount = dlsym(handle, "gameinitframecount");
 
-    mprint("myclosewindow");
-    myclosewindow = (void (*)())dlsym(handle, "gameclosewindow");
+    myinitwindow = dlsym(handle, "gameinitwindow");
+    myclosewindow = dlsym(handle, "gameclosewindow");
+    mydrawframe = dlsym(handle, "drawframe");
+    mylibgameinit = dlsym(handle, "libgameinit");
+    mylibgameclose = dlsym(handle, "libgameclose");
 
-    //mprint("mygameloop");
-    //mygameloop = (void (*)(gamestate*))dlsym(handle, "gameloop");
 
-    mprint("mydrawframe");
-    mydrawframe = (void (*)())dlsym(handle, "drawframe");
+    //////////////////////////////////////
 
-    mprint("libgameinit");
-    mylibgameinit = (void (*)())dlsym(handle, "libgameinit");
-
-    mprint("libgameclose");
-    mylibgameclose = (void (*)())dlsym(handle, "libgameclose");
-
-    //mprint("check updategamestate");
-    //checksymbol(myupdategamestate, "updategamestate");
-
-    //mprint("check updategamestateunsafe");
-    //checksymbol(myupdategamestateunsafe, "updategamestateunsafe");
-
-    mprint("check mywindowshouldclose");
     checksymbol(mywindowshouldclose, "gamewindowshouldclose");
-
-    mprint("check myinitwindow");
     checksymbol(myinitwindow, "gameinitwindow");
-
-    mprint("check myclosewindow");
     checksymbol(myclosewindow, "gameclosewindow");
-
-    //mprint("check mygameloop");
-    //checksymbol(mygameloop, "gameloop");
-
-    mprint("check mydrawframe");
     checksymbol(mydrawframe, "drawframe");
+    checksymbol(mylibgameinit, "libgameinit");
+    checksymbol(mylibgameclose, "libgameclose");
+    checksymbol(mysaveframecount, "saveframecount");
 
+    checksymbol(mylibgameinitframecount, "gameinitframecount");
 
     mprint("end loadsymbols");
 }
@@ -432,6 +419,10 @@ void autoreload() {
             sleep(1);
         }
 
+
+        old_framecount = mysaveframecount();
+
+
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
         mprint("closing libgame");
@@ -448,8 +439,10 @@ void autoreload() {
         mprint("loading symbols");
         loadsymbols();
 
-
         myinitwindow();
+
+        mylibgameinitframecount(old_framecount);
+
         mylibgameinit();
     }
 }

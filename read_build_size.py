@@ -15,40 +15,44 @@ def main():
 
     for index, row in df.iterrows():
         # df.at[index, "timestamp"] = pd.to_datetime(row["timestamp"], unit="s")
-        df.at[index, "kb"] = row["bytes"] // 1024
+        df.at[index, "binkb"] = row["binbytes"] // 1024
+        df.at[index, "libkb"] = row["libbytes"] // 1024
         # if we are at the first index, we cant calculate an LOC/s
         # however, every index past 0, we can subtract the timestamps to get how long between logs
         # then we can divide the loc by the time to get the loc/s
         if index > 0:
-            time = row["timestamp"] - df.at[index - 1, "timestamp"]
-            loc = row["loc"] - df.at[index - 1, "loc"]
-            bytes_ = row["bytes"] - df.at[index - 1, "bytes"]
-            df.at[index, "loc/s"] = loc / time
-            df.at[index, "bytes/s"] = bytes_ / time
+            pass
+            # time = row["timestamp"] - df.at[index - 1, "timestamp"]
+            # loc = row["loc"] - df.at[index - 1, "loc"]
+            # bytes_ = row["binbytes"] - df.at[index - 1, "bytes"]
+            # df.at[index, "loc/s"] = loc / time
+            # df.at[index, "bytes/s"] = bytes_ / time
             # how fast the build time is increasing or decreasing per second
-            buildtime = row["buildtime"] - df.at[index - 1, "buildtime"]
-            df.at[index, "buildtime ms/s"] = buildtime / time
+            # buildtime = row["buildtime"] - df.at[index - 1, "buildtime"]
+            # df.at[index, "buildtime ms/s"] = buildtime / time
         else:
             df.at[index, "loc/s"] = 0
-            df.at[index, "bytes/s"] = 0
-            df.at[index, "buildtime ms/s"] = 0
+            # df.at[index, "bytes/s"] = 0
+            # df.at[index, "buildtime ms/s"] = 0
 
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
     # convert "buildtime" from fractional seconds to milliseconds
-    df["buildtime"] = df["buildtime"] * 1000
+    # df["buildtime"] = df["buildtime"] * 1000
     print(df)
     print()
 
-    buildtimestr = f"{df['buildtime'].mean():.4f}"
-    locstr = f"{df['loc'].mean():.4f}"
-    kbstr = f"{df['kb'].mean():.4f}"
+    # buildtimestr = f"{df['buildtime'].mean():.4f}"
+    locstr = f"{df['loc'].mean():.1f}"
+    kbstr = f"{df['binkb'].mean():.1f}"
+    kbstr2 = f"{df['libkb'].mean():.1f}"
     # bpsstr = f"{df['bytes/s'].mean():.2f}"
     # locsstr = f"{df['loc/s'].mean():.2f}"
     # buildtimestr = f"{df['buildtime ms/s'].mean():.2f}"
 
-    print(f"Avg build Time (ms):      {buildtimestr}")
-    print(f"Avg line count (loc):     {locstr}")
-    print(f"Avg build size (kb):      {kbstr}")
+    # print(f"Avg build Time (ms):      {buildtimestr}")
+    print(f"Avg line count (loc):  {locstr}")
+    print(f"Avg binary size (kb):  {kbstr}")
+    print(f"Avg library size (kb): {kbstr2}")
     # print(f"Avg build size (bytes/s): {bpsstr}")
     # print(f"Avg line count (loc/s):   {locsstr}")
     # print(f"Avg build Time (ms/s):    {buildtimestr}")
