@@ -434,7 +434,9 @@ void autoreload() {
 
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
+        mprint("closing libgame");
         mylibgameclose();
+        mprint("closing window");
         myclosewindow();
 
         // mprint("getting old gamestate");
@@ -470,6 +472,7 @@ void gamerun() {
     last_write_time = getlastwritetime(libname);
 
     myinitwindow();
+    mylibgameinit();
 
     //g = gamestateinit();
     //g->winwidth = default_window_width;
@@ -496,6 +499,8 @@ void gamerun() {
         autoreload();
     }
 
+    mprint("closing libgame");
+    mylibgameclose();
     mprint("closing window");
     myclosewindow();
     //gamestatefree(g);

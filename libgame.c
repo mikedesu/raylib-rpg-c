@@ -23,8 +23,7 @@ gamestate* g = NULL;
 bool gamewindowshouldclose();
 void gameinitwindow();
 void gameclosewindow();
-void updategamestate(gamestate* g);
-void updategamestateunsafe(gamestate* g);
+void updategamestate();
 void setdebugpaneltopleft(gamestate* g);
 void setdebugpanelbottomleft(gamestate* g);
 void setdebugpanelbottomright(gamestate* g);
@@ -44,10 +43,33 @@ void gameinitwindow() {
     mprint("begin gameinitwindow");
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
-    InitWindow(1280, 720, "raylib template");
-    //InitWindow(960, 540, "raylib template");
+    const char* title = "project rpg v0.000001";
+    //InitWindow(1280, 720, title);
+    InitWindow(960, 540, title);
+
+    while (!IsWindowReady()) {
+    }
+
+    // this is hard-coded for now
+    SetWindowMonitor(0);
+    SetWindowPosition(1920, 0);
+
+    mprint("window is ready");
+
+    printf("window width: %d\n", GetScreenWidth());
+    printf("window height: %d\n", GetScreenHeight());
+    printf("monitor count: %d\n", GetMonitorCount());
+    printf("current monitor number: %d\n", GetCurrentMonitor());
+    printf(
+        "current monitor position: %.2f %.2f\n", GetMonitorPosition(0).x, GetMonitorPosition(0).y);
+    printf(
+        "current monitor position: %.2f %.2f\n", GetMonitorPosition(1).x, GetMonitorPosition(1).y);
+
+
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
+
+
     //rlglInit(960, 540);
     //rlglInit(1280, 720);
     mprint("end of gameinitwindow");
@@ -57,15 +79,6 @@ void gameinitwindow() {
 void gameclosewindow() {
     //rlglClose();
     CloseWindow();
-}
-
-
-void updategamestate(gamestate* g) {
-    // for right now, we will just update the frame count
-    if (g) {
-        // we can update these while the game is running to re-position the debug text
-        updategamestateunsafe(g);
-    }
 }
 
 
@@ -93,7 +106,7 @@ void setdebugpaneltopright(gamestate* g) {
 }
 
 
-void updategamestateunsafe(gamestate* g) {
+void updategamestate() {
     //    mprint("updategamestateunsafe");
     now = time(NULL);
     if (start == 0) {
