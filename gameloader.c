@@ -1,8 +1,9 @@
-#include "display.h"
 #include "gameloader.h"
-#include "gamestate.h"
 #include "mprint.h"
-#include "rcamera.h"
+//#include "display.h"
+//#include "gamestate.h"
+//#include "rcamera.h"
+
 #include <dlfcn.h>
 #include <raylib.h>
 #include <rlgl.h>
@@ -19,27 +20,21 @@ unsigned int old_framecount = 0;
 
 const int default_window_width = 960;
 const int default_window_height = 540;
-//const int default_window_width = 1280;
-//const int default_window_height = 720;
 
 const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
 
-//gamestate* g = NULL;
 void* handle = NULL;
 
 bool (*mywindowshouldclose)(void) = NULL;
-//void (*myupdategamestate)(gamestate*) = NULL;
-//void (*myupdategamestateunsafe)(gamestate*) = NULL;
-
 void (*myinitwindow)() = NULL;
 void (*myclosewindow)() = NULL;
 void (*mydrawframe)() = NULL;
 void (*mylibgameinit)() = NULL;
 void (*mylibgameclose)() = NULL;
+void (*mylibgamehandleinput)() = NULL;
 void (*mylibgameinitframecount)(unsigned int) = NULL;
-
 unsigned int (*mysaveframecount)() = NULL;
 
 // get the last write time of a file
@@ -72,7 +67,6 @@ void checksymbol(void* symbol, const char* name) {
 
 void loadsymbols() {
     mprint("begin loadsymbols");
-
     //mprint("updategamestate");
     //myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
 
@@ -82,15 +76,13 @@ void loadsymbols() {
     // casting these to indicate return types and possible args
     mywindowshouldclose = (bool (*)(void))dlsym(handle, "gamewindowshouldclose");
     mysaveframecount = (unsigned int (*)())dlsym(handle, "saveframecount");
-
     mylibgameinitframecount = dlsym(handle, "gameinitframecount");
-
     myinitwindow = dlsym(handle, "gameinitwindow");
     myclosewindow = dlsym(handle, "gameclosewindow");
     mydrawframe = dlsym(handle, "drawframe");
     mylibgameinit = dlsym(handle, "libgameinit");
     mylibgameclose = dlsym(handle, "libgameclose");
-
+    mylibgamehandleinput = dlsym(handle, "libgamehandleinput");
 
     //////////////////////////////////////
 
@@ -101,8 +93,8 @@ void loadsymbols() {
     checksymbol(mylibgameinit, "libgameinit");
     checksymbol(mylibgameclose, "libgameclose");
     checksymbol(mysaveframecount, "saveframecount");
-
     checksymbol(mylibgameinitframecount, "gameinitframecount");
+    checksymbol(mylibgamehandleinput, "libgamehandleinput");
 
     mprint("end loadsymbols");
 }
@@ -412,23 +404,18 @@ void autoreload() {
     if (getlastwritetime(libname) > last_write_time) {
         last_write_time = getlastwritetime(libname);
 
-
         //while (FileExists(lockfile)) {
         while (access(lockfile, F_OK) == 0) {
             printf("Library is locked\n");
             sleep(1);
         }
 
-
         old_framecount = mysaveframecount();
-
 
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
         mprint("closing libgame");
-        mylibgameclose();
-        mprint("closing window");
-        myclosewindow();
+        mylibgameclose(); // closes window
 
         // mprint("getting old gamestate");
         // gamestate* old_g = g;
@@ -439,19 +426,10 @@ void autoreload() {
         mprint("loading symbols");
         loadsymbols();
 
-        myinitwindow();
-
         mylibgameinitframecount(old_framecount);
-
-        mylibgameinit();
+        mylibgameinit(); // calls initwindow
     }
 }
-
-
-//void unloaddisplay() {
-//UnloadRenderTexture(g->d.target);
-//UnloadFont(g->d.font);
-//}
 
 
 void gamerun() {
@@ -461,12 +439,9 @@ void gamerun() {
     mprint("loading symbols");
     loadsymbols();
     mprint("initing window");
-
     last_write_time = getlastwritetime(libname);
-
-    myinitwindow();
+    //myinitwindow();
     mylibgameinit();
-
     //g = gamestateinit();
     //g->winwidth = default_window_width;
     //g->winheight = default_window_height;
@@ -478,28 +453,18 @@ void gamerun() {
     //    loadsymbols();
     //}
     //myupdategamestate(g);
-
     //mprint("initing rendertexture");
     //initrendertexture(g);
-
     mprint("entering gameloop");
     //gameloop(NULL);
     while (!mywindowshouldclose()) {
         mydrawframe();
+        mylibgamehandleinput();
         //mprint("gameloop");
         //myupdategamestateunsafe(g);
-        //handleinputunsafe(g);
         autoreload();
     }
-
     mprint("closing libgame");
     mylibgameclose();
-    mprint("closing window");
-    myclosewindow();
     //gamestatefree(g);
-
-    //unloaddisplay();
-
-    //rlglClose();
-    //CloseWindow();
 }

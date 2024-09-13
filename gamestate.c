@@ -1,3 +1,4 @@
+#include "companyscene.h"
 #include "debugpanel.h"
 #include "gamestate.h"
 #include "mprint.h"
@@ -30,7 +31,9 @@ gamestate* gamestateinitptr() {
 
     gamestateinitdebugpanel(g);
 
-    g->cs = NULL;
+    //g->cs = NULL;
+
+    gamestateinitcompanyscene(g);
 
     return g;
 }
@@ -59,6 +62,20 @@ void gamestateinitdebugpanel(gamestate* g) {
     g->dp.bgcolor.a = 255;
 
     bzero(g->dp.bfr, DEBUGPANELBUFSIZE);
+}
+
+
+void gamestateinitcompanyscene(gamestate* g) {
+    if (g == NULL) {
+        fprintf(stderr, "gamestateinitcompanyscene: gamestate is NULL\n");
+        return;
+    }
+
+    g->cs = companysceneinitptr();
+    if (g->cs == NULL) {
+        fprintf(stderr, "gamestateinitcompanyscene: companyscene is NULL\n");
+        return;
+    }
 }
 
 

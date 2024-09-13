@@ -37,3 +37,6 @@ typedef struct gamestate {
 gamestate* gamestateinitptr();
 void gamestatefree(gamestate* g);
 void gamestateinitdebugpanel(gamestate* g);
+
+
+void gamestateinitcompanyscene(gamestate* g);
