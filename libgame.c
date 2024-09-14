@@ -14,12 +14,12 @@
 //--------------------------------------------------------------------
 
 // debug panel time string
-char timebuf[64] = {0};
-char timebuf2[64] = {0};
-time_t now = 0;
-time_t start = 0;
-struct tm* tm;
-struct tm* tm2;
+char timebeganbuf[64] = {0};
+time_t timebegan = 0;
+struct tm* timebegantm;
+//char timebuf2[64] = {0};
+//time_t now = 0;
+//struct tm* tm2;
 
 char debugpanelbuffer[1024] = {0};
 
@@ -78,8 +78,8 @@ bool gamewindowshouldclose() {
 
 void gameinitwindow() {
     const char* title = "project rpg v0.000001";
-    const int w = 640;
-    const int h = 360;
+    const int w = 1920 / 2;
+    const int h = 1080 / 2;
     mprint("begin gameinitwindow");
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
@@ -91,9 +91,9 @@ void gameinitwindow() {
 
     // this is hard-coded for now so we can auto-position the window
     // for easier config during streaming
-    SetWindowMonitor(1);
-    //SetWindowPosition(1920, 0);
-    SetWindowPosition(0, 0);
+    SetWindowMonitor(0);
+    SetWindowPosition(1920, 0);
+    //SetWindowPosition(0, 0);
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
     mprint("end of gameinitwindow");
@@ -292,7 +292,7 @@ void drawdebugpanel() {
     Color fgc = WHITE;
     Color bgc = {0, 0, 0, 128};
     Vector2 pos = (Vector2){10, 10};
-    const int fontsize = 16;
+    const int fontsize = 20;
     const int spacing = 1;
 
     bzero(debugpanelbuffer, 1024);
