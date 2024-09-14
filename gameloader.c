@@ -1,7 +1,7 @@
 #include "gameloader.h"
+#include "gamestate.h"
 #include "mprint.h"
 //#include "display.h"
-//#include "gamestate.h"
 //#include "rcamera.h"
 
 #include <dlfcn.h>
@@ -27,15 +27,20 @@ const char* templib = "./templibgame.so";
 
 void* handle = NULL;
 
+gamestate* g = NULL;
+
 bool (*mywindowshouldclose)(void) = NULL;
 void (*myinitwindow)() = NULL;
 void (*myclosewindow)() = NULL;
 void (*mydrawframe)() = NULL;
 void (*mylibgameinit)() = NULL;
+void (*mylibgameinitwithstate)(void*) = NULL;
 void (*mylibgameclose)() = NULL;
+void (*mylibgameclosesavegamestate)() = NULL;
 void (*mylibgamehandleinput)() = NULL;
 void (*mylibgameinitframecount)(unsigned int) = NULL;
-unsigned int (*mysaveframecount)() = NULL;
+gamestate* (*mylibgamegetgamestate)() = NULL;
+
 
 // get the last write time of a file
 time_t getlastwritetime(const char* filename) {
@@ -69,81 +74,54 @@ void loadsymbols() {
     mprint("begin loadsymbols");
     //mprint("updategamestate");
     //myupdategamestate = (void (*)(gamestate*))dlsym(handle, "updategamestate");
-
     //mprint("updategamestateunsafe");
     //myupdategamestateunsafe = (void (*)(gamestate*))dlsym(handle, "updategamestateunsafe");
-
     // casting these to indicate return types and possible args
+
+    mprint("windowshouldclose");
     mywindowshouldclose = (bool (*)(void))dlsym(handle, "gamewindowshouldclose");
-    mysaveframecount = (unsigned int (*)())dlsym(handle, "saveframecount");
-    mylibgameinitframecount = dlsym(handle, "gameinitframecount");
+    checksymbol(mywindowshouldclose, "gamewindowshouldclose");
+
+    mprint("initwindow");
     myinitwindow = dlsym(handle, "gameinitwindow");
+    checksymbol(myinitwindow, "gameinitwindow");
+
+    mprint("closewindow");
     myclosewindow = dlsym(handle, "gameclosewindow");
+    checksymbol(myclosewindow, "gameclosewindow");
+
+    mprint("drawframe");
     mydrawframe = dlsym(handle, "drawframe");
+    checksymbol(mydrawframe, "drawframe");
+
+    mprint("libgameinit");
     mylibgameinit = dlsym(handle, "libgameinit");
+    checksymbol(mylibgameinit, "libgameinit");
+
+    mprint("libgameclose");
     mylibgameclose = dlsym(handle, "libgameclose");
+    checksymbol(mylibgameclose, "libgameclose");
+
+    mprint("libgamehandleinput");
     mylibgamehandleinput = dlsym(handle, "libgamehandleinput");
+    checksymbol(mylibgamehandleinput, "libgamehandleinput");
+
+    mprint("libgamegetgamestate");
+    mylibgamegetgamestate = dlsym(handle, "libgamegetgamestate");
+    checksymbol(mylibgamegetgamestate, "libgamegetgamestate");
+
+    mprint("libgameclosesavegamestate");
+    mylibgameclosesavegamestate = dlsym(handle, "libgameclosesavegamestate");
+    checksymbol(mylibgameclosesavegamestate, "libgameclosesavegamestate");
+
+    mprint("libgameinitwithstate");
+    mylibgameinitwithstate = (void (*)(void*))dlsym(handle, "libgameinitwithstate");
+    checksymbol(mylibgameinitwithstate, "libgameinitwithstate");
 
     //////////////////////////////////////
 
-    checksymbol(mywindowshouldclose, "gamewindowshouldclose");
-    checksymbol(myinitwindow, "gameinitwindow");
-    checksymbol(myclosewindow, "gameclosewindow");
-    checksymbol(mydrawframe, "drawframe");
-    checksymbol(mylibgameinit, "libgameinit");
-    checksymbol(mylibgameclose, "libgameclose");
-    checksymbol(mysaveframecount, "saveframecount");
-    checksymbol(mylibgameinitframecount, "gameinitframecount");
-    checksymbol(mylibgamehandleinput, "libgamehandleinput");
-
     mprint("end loadsymbols");
 }
-
-
-//void initrendertexture(gamestate* g) {
-//    if (g) {
-//        g->d.target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
-//        SetTextureFilter(g->d.target.texture, TEXTURE_FILTER_BILINEAR);
-//    }
-//}
-
-
-//void mygamestateinit() {
-//    g = gamestateinit();
-//    g->winwidth = default_window_width;
-//    g->winheight = default_window_height;
-//    g->cs = companysceneinitptr();
-//    g->d.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
-//    SetTextureFilter(g->d.font.texture, TEXTURE_FILTER_BILINEAR);
-//}
-
-
-//void myinitwindow() {
-//    mprint("begin myinitwindow");
-//    // have to do inittitlescene after initwindow
-//    // cant load textures before initwindow
-//    InitWindow(default_window_width, default_window_height, "Game");
-//    SetTargetFPS(60);
-//    SetExitKey(KEY_Q);
-//    rlglInit(default_window_width, default_window_height);
-//    mprint("end of myinitwindow");
-//}
-
-
-//void drawdebugpanel(gamestate* g) {
-//    if (g) {
-//        const int pad = 5;
-//        const Color bgc = {g->dp.bgcolor.r, g->dp.bgcolor.g, g->dp.bgcolor.b, g->dp.bgcolor.a};
-//        const Color fgc = {g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
-//        const Color borderc = {g->dp.fgcolor.r, g->dp.fgcolor.g, g->dp.fgcolor.b, 255};
-//        const int x = g->dp.x + pad * 2;
-//        const int y = g->dp.y + pad * 2;
-//        const Vector2 v = {x, y};
-//        DrawRectangle(g->dp.x + pad, g->dp.y + pad, g->dp.w, g->dp.h, bgc);
-//        DrawRectangleLines(g->dp.x, g->dp.y, g->dp.w, g->dp.h, borderc);
-//        DrawTextEx(g->d.font, g->dp.bfr, v, g->dp.fontsize, 0, fgc);
-//    }
-//}
 
 
 //void drawcompanyscene(gamestate* g) {
@@ -208,9 +186,7 @@ void loadsymbols() {
 //    rlTexCoord2f(t[i].x, t[i].y);
 //    rlVertex3f(v[i].x, v[i].y, v[i].z);
 //}
-
 /////////////////////////////////////////////////////////
-
 // Back face
 //rlNormal3f(0.0f, 0.0f, -1.0f);
 //rlTexCoord2f((source.x + source.width) / texWidth, (source.y + source.height) / texHeight);
@@ -221,7 +197,6 @@ void loadsymbols() {
 //rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
 //rlTexCoord2f(source.x / texWidth, (source.y + source.height) / texHeight);
 //rlVertex3f(x + width / 2, y - height / 2, z - length / 2);
-
 // Top face
 //rlNormal3f(0.0f, 1.0f, 0.0f);
 //rlTexCoord2f(source.x / texWidth, source.y / texHeight);
@@ -232,7 +207,6 @@ void loadsymbols() {
 //rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
 //rlTexCoord2f((source.x + source.width) / texWidth, source.y / texHeight);
 //rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
-
 // Bottom face
 //rlNormal3f(0.0f, -1.0f, 0.0f);
 //rlTexCoord2f((source.x + source.width) / texWidth, source.y / texHeight);
@@ -243,7 +217,6 @@ void loadsymbols() {
 //rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
 //rlTexCoord2f((source.x + source.width) / texWidth, (source.y + source.height) / texHeight);
 //rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
-
 // Right face
 //rlNormal3f(1.0f, 0.0f, 0.0f);
 //rlTexCoord2f((source.x + source.width) / texWidth, (source.y + source.height) / texHeight);
@@ -254,7 +227,6 @@ void loadsymbols() {
 //rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
 //rlTexCoord2f(source.x / texWidth, (source.y + source.height) / texHeight);
 //rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
-
 // Left face
 //rlNormal3f(-1.0f, 0.0f, 0.0f);
 //rlTexCoord2f(source.x / texWidth, (source.y + source.height) / texHeight);
@@ -265,169 +237,31 @@ void loadsymbols() {
 //rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
 //rlTexCoord2f(source.x / texWidth, source.y / texHeight);
 //rlVertex3f(x - width / 2, y + height / 2, z - length / 2);
-
 //rlEnd();
-
 //rlSetTexture(0);
 //}
-
-//void drawfade(gamestate* s) {
-//    if (s) {
-//        drawfadeunsafe(s);
-//    }
-//}
-
-//void drawfadeunsafe(gamestate* g) {
-//const Color c = (Color){0, 0, 0, g->fadealpha};
-//const int x = 0;
-//const int y = 0;
-//const int w = GetScreenWidth();
-//const int h = GetScreenHeight();
-//DrawRectangle(x, y, w, h, c);
-//g->fadealpha += g->fadealphadir;
-//if (g->fadealpha >= 255) {
-//    g->fadealphadir = -1;
-//} else if (g->fadealpha <= 0) {
-//    g->fadealphadir = 1;
-//}
-//}
-
-//void drawframe(gamestate* s) {
-//    if (s) {
-//        drawframeunsafe(s);
-//    }
-//}
-
-//void drawframeunsafe(gamestate* s) {
-//if (s) {
-//const float dw = GetScreenWidth();
-//const float dh = GetScreenHeight();
-//const float rectw = 170;
-//const float recth = 170;
-//const float x = dw / 2 - rectw / 2;
-//const float y = dh / 2 - recth / 2;
-//const float w = 200;
-//const float h = 200;
-
-//BeginDrawing();
-//BeginTextureMode(g->d.target);
-//ClearBackground((Color){s->clearcolor.r, s->clearcolor.g, s->clearcolor.b, s->clearcolor.a});
-
-//drawcompanyscene(s);
-
-//EndMode2D();
-
-//if (s->dodebugpanel) {
-//    drawdebugpanel(s);
-//}
-
-//if (s->dofps) {
-//    DrawFPS(dw - 100, 10);
-//}
-
-//EndTextureMode();
-
-// we've finished drawing to the target texture
-// now we can draw the target texture to the window
-//const float w2 = g->d.target.texture.width;
-//const float h2 = g->d.target.texture.height;
-//const Rectangle src = {0.0f, 0.0f, w2, -h2};
-//const Rectangle dst = {0.0f, 0.0f, dw, dh};
-
-//DrawTexturePro(g->d.target.texture, src, dst, g->d.origin, 0.0f, WHITE);
-//EndDrawing();
-//g->framecount++;
-//}
-
-
-//void handleinput(gamestate* g) {
-//    if (g) {
-//        handleinputunsafe(g);
-//    }
-//}
-
-
-//void handleinputunsafe(gamestate* g) {
-//if (IsKeyPressed(KEY_D)) {
-//    g->dodebugpanel = !g->dodebugpanel;
-//}
-//
-//if (IsKeyPressed(KEY_ONE)) {
-//    g->cs->cameramode = CAMERA_FREE;
-//    g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f}; // Reset roll
-//}
-
-//if (IsKeyPressed(KEY_TWO)) {
-//    g->cs->cameramode = CAMERA_FIRST_PERSON;
-//    g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f}; // Reset roll
-//}
-
-//if (IsKeyPressed(KEY_THREE)) {
-//    g->cs->cameramode = CAMERA_THIRD_PERSON;
-//    g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f}; // Reset roll
-//}
-
-//if (IsKeyPressed(KEY_FOUR)) {
-//    g->cs->cameramode = CAMERA_ORBITAL;
-//    g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f}; // Reset roll
-//}
-
-// Switch camera projection
-//if (IsKeyPressed(KEY_P)) {
-//    if (g->cs->cam3d.projection == CAMERA_PERSPECTIVE) {
-//        // Create isometric view
-//        g->cs->cameramode = CAMERA_THIRD_PERSON;
-//        // Note: The target distance is related to the render distance in the orthographic projection
-//        g->cs->cam3d.position = (Vector3){0.0f, 2.0f, -100.0f};
-//        g->cs->cam3d.target = (Vector3){0.0f, 2.0f, 0.0f};
-//        g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
-//        g->cs->cam3d.projection = CAMERA_ORTHOGRAPHIC;
-//        g->cs->cam3d.fovy = 20.0f; // near plane width in CAMERA_ORTHOGRAPHIC
-//        CameraYaw(&g->cs->cam3d, -135 * DEG2RAD, true);
-//        CameraPitch(&g->cs->cam3d, -45 * DEG2RAD, true, true, false);
-//    } else if (g->cs->cam3d.projection == CAMERA_ORTHOGRAPHIC) {
-//        // Reset to default view
-//        g->cs->cameramode = CAMERA_THIRD_PERSON;
-//        g->cs->cam3d.position = (Vector3){0.0f, 2.0f, 10.0f};
-//        g->cs->cam3d.target = (Vector3){0.0f, 2.0f, 0.0f};
-//        g->cs->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
-//        g->cs->cam3d.projection = CAMERA_PERSPECTIVE;
-//        g->cs->cam3d.fovy = 60.0f;
-//    }
-//}
-
-//UpdateCamera(&g->cs->cam3d, g->cs->cameramode);
-//}
-
 
 void autoreload() {
     if (getlastwritetime(libname) > last_write_time) {
         last_write_time = getlastwritetime(libname);
-
         //while (FileExists(lockfile)) {
         while (access(lockfile, F_OK) == 0) {
             printf("Library is locked\n");
             sleep(1);
         }
-
-        old_framecount = mysaveframecount();
-
+        mprint("getting old gamestate");
+        g = mylibgamegetgamestate();
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
         mprint("closing libgame");
-        mylibgameclose(); // closes window
-
-        // mprint("getting old gamestate");
-        // gamestate* old_g = g;
+        mylibgameclosesavegamestate(); // closes window
         mprint("unloading library");
         dlclose(handle);
         mprint("opening handle");
         openhandle();
         mprint("loading symbols");
         loadsymbols();
-
-        mylibgameinitframecount(old_framecount);
-        mylibgameinit(); // calls initwindow
+        mylibgameinitwithstate(g);
     }
 }
 
@@ -440,31 +274,13 @@ void gamerun() {
     loadsymbols();
     mprint("initing window");
     last_write_time = getlastwritetime(libname);
-    //myinitwindow();
     mylibgameinit();
-    //g = gamestateinit();
-    //g->winwidth = default_window_width;
-    //g->winheight = default_window_height;
-    //g->cs = companysceneinitptr();
-    //g->d.font = LoadFontEx("fonts/hack.ttf", 20, 0, 250);
-    //SetTextureFilter(g->d.font.texture, TEXTURE_FILTER_BILINEAR);
-    //if (myupdategamestate == NULL) {
-    //    fprintf(stderr, "dlsym failed or has not been loaded yet: %s\n", dlerror());
-    //    loadsymbols();
-    //}
-    //myupdategamestate(g);
-    //mprint("initing rendertexture");
-    //initrendertexture(g);
     mprint("entering gameloop");
-    //gameloop(NULL);
     while (!mywindowshouldclose()) {
         mydrawframe();
         mylibgamehandleinput();
-        //mprint("gameloop");
-        //myupdategamestateunsafe(g);
         autoreload();
     }
     mprint("closing libgame");
     mylibgameclose();
-    //gamestatefree(g);
 }

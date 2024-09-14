@@ -1,3 +1,4 @@
+#include "fadestate.h"
 #include "gamestate.h"
 #include "mprint.h"
 //#include "utils.h"
@@ -10,74 +11,53 @@
 #include <time.h>
 
 
-typedef enum {
-    FADESTATENONE = 0,
-    FADESTATEIN,
-    FADESTATEOUT,
-} fadestate;
-
-
 //--------------------------------------------------------------------
 // libgame global variables
 //--------------------------------------------------------------------
-
-// debug panel time string
-char timebeganbuf[64] = {0};
-time_t timebegan = 0;
-struct tm* timebegantm;
-//char timebuf2[64] = {0};
-//time_t now = 0;
-//struct tm* tm2;
-
-
 char debugpanelbuffer[1024] = {0};
-
-gamestate* g = NULL;
-
-Font gfont;
-
-unsigned int framecount = 0;
 
 int activescene = 0;
 
 fadestate fade = FADESTATENONE;
 
-unsigned char fadealpha = 0;
+int fadealpha = 0;
 
+gamestate* g = NULL;
+
+Font gfont;
+
+bool debugpanelon = true;
 
 //--------------------------------------------------------------------
 // function declarations
 //--------------------------------------------------------------------
-
 bool gamewindowshouldclose();
-
 void gameinitwindow();
 void gameclosewindow();
 void updategamestate();
 void drawframe();
 void libgameinit();
+void libgameinitwithstate(void* state);
 void libgameclose();
+
 void drawdebugpanel();
+
 void libgamehandleinput();
 void drawcompanysceneframe();
 void drawtitlesceneframe();
-
 void setdebugpaneltopleft(gamestate* g);
 void setdebugpanelbottomleft(gamestate* g);
 void setdebugpanelbottomright(gamestate* g);
 void setdebugpaneltopright(gamestate* g);
 void gameinitframecount(unsigned int fc);
-
 unsigned int saveframecount();
-
+gamestate* libgamegetgamestate();
 void handlefade();
 void drawfade();
 
 //--------------------------------------------------------------------
 // definitions
 //--------------------------------------------------------------------
-
-
 void drawfade() {
     if (fadealpha > 0) {
         Color c = {0, 0, 0, fadealpha};
@@ -87,46 +67,47 @@ void drawfade() {
 
 
 void handlefade() {
+    const int fadespeed = 2;
+
     if (fade == FADESTATEOUT) {
         if (fadealpha < 255) {
-            fadealpha++;
+            fadealpha += fadespeed;
         }
-
-        if (fadealpha == 255) {
+        if (fadealpha >= 255) {
+            fadealpha = 255;
             fade = FADESTATEIN;
             activescene++;
             if (activescene > 1) {
                 activescene = 0;
             }
         }
-
     } else if (fade == FADESTATEIN) {
         if (fadealpha > 0) {
-            fadealpha--;
+            fadealpha -= fadespeed;
         }
-
-        if (fadealpha == 0) {
+        if (fadealpha <= 0) {
+            fadealpha = 0;
             fade = FADESTATENONE;
         }
     }
-
-
     drawfade();
 }
+
 
 void libgamehandleinput() {
     if (IsKeyPressed(KEY_SPACE)) {
         mprint("key space pressed");
-
         if (fade == FADESTATENONE) {
             fade = FADESTATEOUT;
         }
-
-
         //activescene++;
         //if (activescene > 1) {
         //    activescene = 0;
         //}
+    }
+
+    if (IsKeyPressed(KEY_D)) {
+        debugpanelon = !debugpanelon;
     }
 }
 
@@ -144,11 +125,8 @@ void gameinitwindow() {
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
     InitWindow(w, h, title);
-
     while (!IsWindowReady())
         ;
-
-
     // this is hard-coded for now so we can auto-position the window
     // for easier config during streaming
     SetWindowMonitor(0);
@@ -160,9 +138,9 @@ void gameinitwindow() {
 }
 
 
-void gameinitframecount(unsigned int fc) {
-    framecount = fc;
-}
+//void gameinitframecount(unsigned int fc) {
+//    framecount = fc;
+//}
 
 
 void gameclosewindow() {
@@ -171,28 +149,28 @@ void gameclosewindow() {
 }
 
 
-void setdebugpaneltopleft(gamestate* g) {
-    g->dp.x = 5;
-    g->dp.y = 5;
-}
+//void setdebugpaneltopleft(gamestate* g) {
+//g->dp.x = 5;
+//g->dp.y = 5;
+//}
 
 
-void setdebugpanelbottomleft(gamestate* g) {
-    g->dp.x = 5;
-    g->dp.y = g->winheight - g->dp.h - 20;
-}
+//void setdebugpanelbottomleft(gamestate* g) {
+//g->dp.x = 5;
+//g->dp.y = g->winheight - g->dp.h - 20;
+//}
 
 
-void setdebugpanelbottomright(gamestate* g) {
-    g->dp.x = g->winwidth - g->dp.w - 20;
-    g->dp.y = g->winheight - g->dp.h - 20;
-}
+//void setdebugpanelbottomright(gamestate* g) {
+//g->dp.x = g->winwidth - g->dp.w - 20;
+//g->dp.y = g->winheight - g->dp.h - 20;
+//}
 
 
-void setdebugpaneltopright(gamestate* g) {
-    g->dp.x = g->winwidth - g->dp.w - 20;
-    g->dp.y = 5;
-}
+//void setdebugpaneltopright(gamestate* g) {
+//g->dp.x = g->winwidth - g->dp.w - 20;
+//g->dp.y = 5;
+//}
 
 
 void updategamestate() {
@@ -228,8 +206,8 @@ void updategamestate() {
     //         g->cs->cam3d.target.z,
     //         g->cs->cam3d.projection,
     //         g->cs->cameramode);
-    g->dp.w = 350;
-    g->dp.h = 200;
+    //g->dp.w = 350;
+    //g->dp.h = 200;
     // top left
     //setdebugpaneltopleft(g);
     // top right
@@ -238,17 +216,17 @@ void updategamestate() {
     //setdebugpanelbottomleft(g);
     // bottom right
     //setdebugpanelbottomright(g);
-    g->dp.fontsize = 20;
-    g->dp.fgcolor.r = 255;
-    g->dp.fgcolor.g = 255;
-    g->dp.fgcolor.b = 255;
-    g->dp.bgcolor.r = 0x33;
-    g->dp.bgcolor.g = 0x33;
-    g->dp.bgcolor.b = 0x33;
-    g->dp.bgcolor.a = 255;
-    g->clearcolor.r = 0;
-    g->clearcolor.g = 0;
-    g->clearcolor.b = 0;
+    //g->dp.fontsize = 20;
+    //g->dp.fgcolor.r = 255;
+    //g->dp.fgcolor.g = 255;
+    //g->dp.fgcolor.b = 255;
+    //g->dp.bgcolor.r = 0x33;
+    //g->dp.bgcolor.g = 0x33;
+    //g->dp.bgcolor.b = 0x33;
+    //g->dp.bgcolor.a = 255;
+    //g->clearcolor.r = 0;
+    //g->clearcolor.g = 0;
+    //g->clearcolor.b = 0;
     //g->cs->cubecolor = (Color){0x33, 0x33, 0x33, 255};
     //g->cs->cubecolor = (Color){0x66, 0x66, 0x66, 255};
     //g->cs->cubewirecolor = (Color){0x33, 0x33, 0x33, 255};
@@ -323,41 +301,54 @@ void updategamestate() {
     //if (g->cs->cam3d.target.y > ymax || g->cs->cam3d.target.y < ymin) {
     //    dty = -dty;
     //}
-    g->cs->scale = 4;
-    const int scale = g->cs->scale;
+    //g->cs->scale = 4;
+    //const int scale = g->cs->scale;
     //g->cs->x = g->winwidth / 2 - g->cs->presents.width * scale / 2;
     //g->cs->y = g->winheight / 2 - g->cs->presents.height * scale / 2;
-    g->cs->dodrawpresents = false;
+    //g->cs->dodrawpresents = false;
     //g->cs->dodrawpresents = true;
 }
 
 
 void drawframe() {
-
     if (activescene == 0) {
         drawcompanysceneframe();
     } else if (activescene == 1) {
         drawtitlesceneframe();
     }
 
-    //drawtitlesceneframe();
-    //drawcompanysceneframe();
 
-    //framecount = 0;
-    framecount++;
+    g->framecount++;
+    gamestateupdatecurrenttime(g);
+
+    g->dp.x = 10;
+    g->dp.y = 10;
 }
 
 
-void drawdebugpanel() {
-    Color fgc = WHITE;
-    Color bgc = {0, 0, 0, 128};
-    Vector2 pos = (Vector2){10, 10};
-    const int fontsize = 20;
-    const int spacing = 1;
+inline void drawdebugpanel() {
+    if (debugpanelon) {
+        const int fontsize = 14, spacing = 1;
 
-    bzero(debugpanelbuffer, 1024);
-    snprintf(debugpanelbuffer, 1024, "framecount: %d", framecount);
-    DrawTextEx(gfont, debugpanelbuffer, (Vector2){10, 10}, fontsize, spacing, fgc);
+        //Vector2 p = (Vector2){10, 10};
+        Vector2 p = {g->dp.x, g->dp.y};
+
+        bzero(debugpanelbuffer, 1024);
+        snprintf(debugpanelbuffer,
+                 1024,
+                 "Framecount:   %d\n%s\n%s\nfadealpha:    %d\nactivescene:  %d\n",
+                 g->framecount,
+                 g->timebeganbuf,
+                 g->currenttimebuf,
+                 fadealpha,
+                 activescene);
+        Vector2 m = MeasureTextEx(gfont, debugpanelbuffer, fontsize, spacing);
+
+        DrawRectangleLines(p.x - 5, p.y - 5, m.x + 12, m.y + 12, WHITE);
+        DrawRectangle(p.x - 3, p.y - 3, m.x + 8, m.y + 8, (Color){0, 0, 0, 128});
+
+        DrawTextEx(gfont, debugpanelbuffer, p, fontsize, spacing, WHITE);
+    }
 }
 
 
@@ -367,14 +358,18 @@ void drawtitlesceneframe() {
     ClearBackground(bgc);
     const Color fgc = WHITE;
     const Color fgc2 = BLACK;
-    char buffer[1024];
-    char buffer2[1024];
-    char buffer3[1024];
+    char buffer[128];
+    char buffer2[128];
+    char buffer3[128];
+    //char buffer4[128];
     //snprintf("project.rpg", 1024, buffer); // lol copilot generated something very wrong lmfao
     //
-    snprintf(buffer, 1024, "project");
-    snprintf(buffer2, 1024, "rpg");
-    snprintf(buffer3, 1024, "press any key to continue");
+    snprintf(buffer, 128, "project");
+    snprintf(buffer2, 128, "rpg");
+    snprintf(buffer3, 128, "press any key to continue");
+    //snprintf(buffer4, 128, "666");
+
+
     Vector2 measurement = MeasureTextEx(gfont, buffer, 40, 2);
     Vector2 measurement2 = MeasureTextEx(gfont, buffer2, 40, 2);
     Vector2 measurement3 = MeasureTextEx(gfont, buffer3, 20, 1);
@@ -392,9 +387,14 @@ void drawtitlesceneframe() {
                     GetScreenHeight() / 2.0f + measurement3.y * 2.0f};
     DrawTextEx(gfont, "press space to continue", pos3, 20, 1, fgc);
 
+    //Vector2 m = MeasureTextEx(gfont, buffer4, 40, 2);
+    //Vector2 p = {GetScreenWidth() / 2.0f - m.x / 2.0f, GetScreenHeight() / 2.0f - m.y / 2.0f + 100};
+    //DrawTextEx(gfont, buffer4, p, 40, 1, fgc);
+
 
     handlefade();
     drawdebugpanel();
+
     EndDrawing();
 }
 
@@ -420,9 +420,32 @@ void libgameinit() {
     mprint("libgameinit");
     gameinitwindow();
     gfont = LoadFont("fonts/hack.ttf");
-    framecount = 0;
     SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
     g = gamestateinitptr();
+    activescene = 0;
+}
+
+
+void libgameinitwithstate(void* state) {
+    if (state == NULL) {
+        mprint("libgameinitwithstate: state is NULL");
+        return;
+    }
+    mprint("libgameinitwithstate");
+    gameinitwindow();
+    gfont = LoadFont("fonts/hack.ttf");
+    SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
+    g = (gamestate*)state;
+
+    activescene = 1;
+}
+
+
+void libgameclosesavegamestate() {
+    mprint("libgameclosesavegamestate");
+    UnloadFont(gfont);
+    mprint("closing window");
+    CloseWindow();
 }
 
 
@@ -435,6 +458,6 @@ void libgameclose() {
 }
 
 
-unsigned int saveframecount() {
-    return framecount;
+gamestate* libgamegetgamestate() {
+    return g;
 }
