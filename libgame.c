@@ -9,6 +9,14 @@
 #include <string.h>
 #include <time.h>
 
+
+typedef enum {
+    FADESTATENONE = 0,
+    FADESTATEIN,
+    FADESTATEOUT,
+} fadestate;
+
+
 //--------------------------------------------------------------------
 // libgame global variables
 //--------------------------------------------------------------------
@@ -21,6 +29,7 @@ struct tm* timebegantm;
 //time_t now = 0;
 //struct tm* tm2;
 
+
 char debugpanelbuffer[1024] = {0};
 
 gamestate* g = NULL;
@@ -30,6 +39,11 @@ Font gfont;
 unsigned int framecount = 0;
 
 int activescene = 0;
+
+fadestate fade = FADESTATENONE;
+
+unsigned char fadealpha = 0;
+
 
 //--------------------------------------------------------------------
 // function declarations
@@ -56,17 +70,63 @@ void gameinitframecount(unsigned int fc);
 
 unsigned int saveframecount();
 
+void handlefade();
+void drawfade();
+
 //--------------------------------------------------------------------
 // definitions
 //--------------------------------------------------------------------
 
+
+void drawfade() {
+    if (fadealpha > 0) {
+        Color c = {0, 0, 0, fadealpha};
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), c);
+    }
+}
+
+
+void handlefade() {
+    if (fade == FADESTATEOUT) {
+        if (fadealpha < 255) {
+            fadealpha++;
+        }
+
+        if (fadealpha == 255) {
+            fade = FADESTATEIN;
+            activescene++;
+            if (activescene > 1) {
+                activescene = 0;
+            }
+        }
+
+    } else if (fade == FADESTATEIN) {
+        if (fadealpha > 0) {
+            fadealpha--;
+        }
+
+        if (fadealpha == 0) {
+            fade = FADESTATENONE;
+        }
+    }
+
+
+    drawfade();
+}
+
 void libgamehandleinput() {
     if (IsKeyPressed(KEY_SPACE)) {
         mprint("key space pressed");
-        activescene++;
-        if (activescene > 1) {
-            activescene = 0;
+
+        if (fade == FADESTATENONE) {
+            fade = FADESTATEOUT;
         }
+
+
+        //activescene++;
+        //if (activescene > 1) {
+        //    activescene = 0;
+        //}
     }
 }
 
@@ -309,12 +369,15 @@ void drawtitlesceneframe() {
     const Color fgc2 = BLACK;
     char buffer[1024];
     char buffer2[1024];
+    char buffer3[1024];
     //snprintf("project.rpg", 1024, buffer); // lol copilot generated something very wrong lmfao
     //
     snprintf(buffer, 1024, "project");
     snprintf(buffer2, 1024, "rpg");
+    snprintf(buffer3, 1024, "press any key to continue");
     Vector2 measurement = MeasureTextEx(gfont, buffer, 40, 2);
     Vector2 measurement2 = MeasureTextEx(gfont, buffer2, 40, 2);
+    Vector2 measurement3 = MeasureTextEx(gfont, buffer3, 20, 1);
     int x = GetScreenWidth() / 2.0f - measurement.x / 2.0f - 100;
     int y = GetScreenHeight() / 2.0f - measurement.y / 2.0f;
     Vector2 pos = (Vector2){x, y};
@@ -323,6 +386,14 @@ void drawtitlesceneframe() {
     Vector2 pos2 = (Vector2){x, y};
     DrawTextEx(gfont, buffer, pos, 40, 4, fgc);
     DrawTextEx(gfont, buffer2, pos2, 40, 1, fgc2);
+
+    // just below the 'project rpg' text
+    Vector2 pos3 = {GetScreenWidth() / 2.0f - measurement3.x / 2.0f,
+                    GetScreenHeight() / 2.0f + measurement3.y * 2.0f};
+    DrawTextEx(gfont, "press space to continue", pos3, 20, 1, fgc);
+
+
+    handlefade();
     drawdebugpanel();
     EndDrawing();
 }
@@ -335,11 +406,12 @@ void drawcompanysceneframe() {
     const int fontsize = 24;
     const int spacing = 1;
     ClearBackground(bgc);
-    drawdebugpanel();
 #define COMPANYNAME "@evildojo666"
     Vector2 m = MeasureTextEx(gfont, COMPANYNAME, fontsize, spacing);
     Vector2 p = {GetScreenWidth() / 2.0f - m.x / 2.0f, GetScreenHeight() / 2.0f - m.y / 2.0f};
     DrawTextEx(gfont, COMPANYNAME, p, fontsize, 1, fgc);
+    handlefade();
+    drawdebugpanel();
     EndDrawing();
 }
 
