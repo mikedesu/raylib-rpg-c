@@ -1,7 +1,7 @@
 #include "fadestate.h"
 #include "gamestate.h"
 #include "mprint.h"
-//#include "utils.h"
+#include "utils.h"
 
 #include <raylib.h>
 #include <rlgl.h>
@@ -16,7 +16,7 @@
 //--------------------------------------------------------------------
 char debugpanelbuffer[1024] = {0};
 
-int activescene = 0;
+int activescene = 1;
 
 fadestate fade = FADESTATENONE;
 
@@ -27,6 +27,19 @@ gamestate* g = NULL;
 Font gfont;
 
 bool debugpanelon = true;
+
+RenderTexture target;
+
+//int windowwidth = 640;
+//int windowheight = 360;
+int windowwidth = 1280;
+int windowheight = 720;
+//int windowwidth = 1920;
+//int windowheight = 1080;
+
+int targetwidth = 640;
+int targetheight = 360;
+
 
 //--------------------------------------------------------------------
 // function declarations
@@ -119,8 +132,12 @@ bool gamewindowshouldclose() {
 
 void gameinitwindow() {
     const char* title = "project rpg v0.000001";
-    const int w = 1920 / 2;
-    const int h = 1080 / 2;
+    //const int w = 1920;
+    //const int h = 1080;
+    //const int w = 1920 / 2;
+    //const int h = 1080 / 2;
+    const int w = windowwidth;
+    const int h = windowheight;
     mprint("begin gameinitwindow");
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
@@ -311,12 +328,31 @@ void updategamestate() {
 
 
 void drawframe() {
+
+    BeginDrawing();
+    BeginTextureMode(target);
+
     if (activescene == 0) {
         drawcompanysceneframe();
     } else if (activescene == 1) {
         drawtitlesceneframe();
     }
 
+    EndTextureMode();
+
+    float w = target.texture.width;
+    float h = target.texture.height;
+
+    Rectangle source = {0, 0, w, -h};
+    Rectangle dest = {0, 0, GetScreenWidth(), GetScreenHeight()};
+    Vector2 origin = {0, 0};
+
+    //DrawTextureRec(target.texture, source, dest, WHITE);
+    DrawTexturePro(target.texture, source, dest, origin, 0.0f, WHITE);
+
+    drawdebugpanel();
+
+    EndDrawing();
 
     g->framecount++;
     gamestateupdatecurrenttime(g);
@@ -336,7 +372,8 @@ inline void drawdebugpanel() {
         bzero(debugpanelbuffer, 1024);
         snprintf(debugpanelbuffer,
                  1024,
-                 "Framecount:   %d\n%s\n%s\nfadealpha:    %d\nactivescene:  %d\n",
+                 "Framecount:   %d\n%s\n%s\nfadealpha:    %d\nscene:  %d\n",
+
                  g->framecount,
                  g->timebeganbuf,
                  g->currenttimebuf,
@@ -353,66 +390,96 @@ inline void drawdebugpanel() {
 
 
 void drawtitlesceneframe() {
-    BeginDrawing();
+    //BeginDrawing();
     const Color bgc = {0x66, 0x66, 0x66, 255};
-    ClearBackground(bgc);
     const Color fgc = WHITE;
     const Color fgc2 = BLACK;
-    char buffer[128];
-    char buffer2[128];
-    char buffer3[128];
-    //char buffer4[128];
-    //snprintf("project.rpg", 1024, buffer); // lol copilot generated something very wrong lmfao
-    //
-    snprintf(buffer, 128, "project");
-    snprintf(buffer2, 128, "rpg");
-    snprintf(buffer3, 128, "press any key to continue");
-    //snprintf(buffer4, 128, "666");
+    char b[128];
+    char b2[128];
+    char b3[128];
+    snprintf(b, 128, "project");
+    snprintf(b2, 128, "rpg");
+    snprintf(b3, 128, "press space to continue");
 
+    Vector2 m = MeasureTextEx(gfont, b, 40, 2);
+    Vector2 m2 = MeasureTextEx(gfont, b2, 40, 2);
+    Vector2 m3 = MeasureTextEx(gfont, b3, 16, 1);
 
-    Vector2 measurement = MeasureTextEx(gfont, buffer, 40, 2);
-    Vector2 measurement2 = MeasureTextEx(gfont, buffer2, 40, 2);
-    Vector2 measurement3 = MeasureTextEx(gfont, buffer3, 20, 1);
-    int x = GetScreenWidth() / 2.0f - measurement.x / 2.0f - 100;
-    int y = GetScreenHeight() / 2.0f - measurement.y / 2.0f;
-    Vector2 pos = (Vector2){x, y};
-    x = GetScreenWidth() / 2.0f - measurement2.x / 2.0f + 100;
-    y = GetScreenHeight() / 2.0f - measurement2.y / 2.0f;
-    Vector2 pos2 = (Vector2){x, y};
-    DrawTextEx(gfont, buffer, pos, 40, 4, fgc);
-    DrawTextEx(gfont, buffer2, pos2, 40, 1, fgc2);
+    float tw2 = targetwidth / 2.0f;
+    float th2 = targetheight / 2.0f;
+    int offset = 100;
+
+    int x = tw2 - m.x / 2.0f - offset;
+    int y = th2 - m.y / 2.0f;
+    int x2 = tw2 - m2.x / 2.0f + offset;
+    //int y2 = th2 / 2.0f - m2.y / 2.0f;
+    int x3 = tw2 - m3.x / 2.0f;
+    int y3 = th2 + m3.y / 2.0f + 20;
+
+    Vector2 pos = {x, y};
+    Vector2 pos2 = {x2, y};
+    Vector2 pos3 = {x3, y3};
+
+    ClearBackground(bgc);
+
+    //DrawRectangleLines(x - 5, y - 5, m.x + 20, m.y + 20, fgc);
+    DrawTextEx(gfont, b, pos, 40, 4, fgc);
+
+    //DrawRectangleLines(x2 - 5, y - 5, m2.x + 20, m2.y + 20, fgc2);
+    DrawTextEx(gfont, b2, pos2, 40, 1, fgc2);
 
     // just below the 'project rpg' text
-    Vector2 pos3 = {GetScreenWidth() / 2.0f - measurement3.x / 2.0f,
-                    GetScreenHeight() / 2.0f + measurement3.y * 2.0f};
-    DrawTextEx(gfont, "press space to continue", pos3, 20, 1, fgc);
-
-    //Vector2 m = MeasureTextEx(gfont, buffer4, 40, 2);
-    //Vector2 p = {GetScreenWidth() / 2.0f - m.x / 2.0f, GetScreenHeight() / 2.0f - m.y / 2.0f + 100};
-    //DrawTextEx(gfont, buffer4, p, 40, 1, fgc);
-
-
+    DrawTextEx(gfont, b3, pos3, 16, 1, fgc);
     handlefade();
-    drawdebugpanel();
-
-    EndDrawing();
 }
 
 
+#define COMPANYNAME "@evildojo666"
+#define COMPANYFILL "   x  x x   "
 void drawcompanysceneframe() {
-    BeginDrawing();
     const Color bgc = BLACK;
     const Color fgc = {0x66, 0x66, 0x66, 255};
-    const int fontsize = 24;
+    const int fontsize = 32;
     const int spacing = 1;
+    const int interval = 120;
+    const int dur = 60;
+    char b[128];
+    char b2[128];
+    char b3[128];
+    bzero(b, 128);
+    bzero(b2, 128);
+    bzero(b3, 128);
+    snprintf(b, 128, COMPANYNAME);
+    snprintf(b2, 128, COMPANYFILL);
+    snprintf(b3, 128, "presents");
+    const Vector2 m = MeasureTextEx(gfont, b, fontsize, spacing);
+    const Vector2 m2 = MeasureTextEx(gfont, b2, fontsize, spacing);
+
+    if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
+        for (int i = 0; i < 10; i++) {
+            shufflestrinplace(b);
+            shufflestrinplace(b3);
+        }
+    }
+    for (int i = 0; i < 10; i++) {
+        shufflestrinplace(b2);
+    }
+
+    //Vector2 p = {GetScreenWidth() / 2.0f - m.x / 2.0f, GetScreenHeight() / 2.0f - m.y / 2.0f};
+    Vector2 p = {targetwidth / 2.0f - m.x / 2.0f, targetheight / 2.0f - m.y / 2.0f};
     ClearBackground(bgc);
-#define COMPANYNAME "@evildojo666"
-    Vector2 m = MeasureTextEx(gfont, COMPANYNAME, fontsize, spacing);
-    Vector2 p = {GetScreenWidth() / 2.0f - m.x / 2.0f, GetScreenHeight() / 2.0f - m.y / 2.0f};
-    DrawTextEx(gfont, COMPANYNAME, p, fontsize, 1, fgc);
+    DrawTextEx(gfont, b, p, fontsize, 1, fgc);
+    DrawTextEx(gfont, b2, p, fontsize, 1, fgc);
+
+    const Vector2 mp = MeasureTextEx(gfont, b3, 20, 1);
+    //const Vector2 pp = {GetScreenWidth() / 2.0f - mp.x / 2.0f,
+    //                    GetScreenHeight() / 2.0f + m.y / 2.0f + 20};
+    const Vector2 pp = {targetwidth / 2.0f - mp.x / 2.0f, targetheight / 2.0f + m.y / 2.0f + 20};
+
+
+    DrawTextEx(gfont, b3, pp, 20, 1, fgc);
+
     handlefade();
-    drawdebugpanel();
-    EndDrawing();
 }
 
 
@@ -422,7 +489,8 @@ void libgameinit() {
     gfont = LoadFont("fonts/hack.ttf");
     SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
     g = gamestateinitptr();
-    activescene = 0;
+    target = LoadRenderTexture(targetwidth, targetheight);
+    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 }
 
 
@@ -436,14 +504,17 @@ void libgameinitwithstate(void* state) {
     gfont = LoadFont("fonts/hack.ttf");
     SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
     g = (gamestate*)state;
-
-    activescene = 1;
+    target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
 }
 
 
 void libgameclosesavegamestate() {
     mprint("libgameclosesavegamestate");
     UnloadFont(gfont);
+
+    mprint("unloading render texture");
+    UnloadRenderTexture(target);
+
     mprint("closing window");
     CloseWindow();
 }
@@ -453,6 +524,10 @@ void libgameclose() {
     mprint("libgameclose");
     UnloadFont(gfont);
     gamestatefree(g);
+
+    mprint("unloading render texture");
+    UnloadRenderTexture(target);
+
     mprint("closing window");
     CloseWindow();
 }

@@ -22,10 +22,10 @@ def main():
         # then we can divide the loc by the time to get the loc/s
         if index > 0:
             pass
-            # time = row["timestamp"] - df.at[index - 1, "timestamp"]
-            # loc = row["loc"] - df.at[index - 1, "loc"]
+            time = row["timestamp"] - df.at[index - 1, "timestamp"]
+            loc = row["loc"] - df.at[index - 1, "loc"]
             # bytes_ = row["binbytes"] - df.at[index - 1, "bytes"]
-            # df.at[index, "loc/s"] = loc / time
+            df.at[index, "loc/s"] = loc / time
             # df.at[index, "bytes/s"] = bytes_ / time
             # how fast the build time is increasing or decreasing per second
             # buildtime = row["buildtime"] - df.at[index - 1, "buildtime"]
@@ -50,9 +50,9 @@ def main():
     # buildtimestr = f"{df['buildtime ms/s'].mean():.2f}"
 
     # print(f"Avg build Time (ms):      {buildtimestr}")
-    print(f"Avg line count (loc):  {locstr}")
-    print(f"Avg binary size (kb):  {kbstr}")
-    print(f"Avg library size (kb): {kbstr2}")
+    print(f"Avg line count:   {locstr:>10} loc")
+    print(f"Avg binary size:  {kbstr:>10} kb")
+    print(f"Avg library size: {kbstr2:>10} kb")
     # print(f"Avg build size (bytes/s): {bpsstr}")
     # print(f"Avg line count (loc/s):   {locsstr}")
     # print(f"Avg build Time (ms/s):    {buildtimestr}")
