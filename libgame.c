@@ -1,6 +1,7 @@
 #include "fadestate.h"
 #include "gamestate.h"
 #include "mprint.h"
+#include "sprite.h"
 #include "utils.h"
 
 #include <raylib.h>
@@ -21,7 +22,8 @@
 
 char debugpanelbuffer[1024] = {0};
 
-int activescene = 1;
+const int maxscenes = 3;
+int activescene = 0;
 
 fadestate fade = FADESTATENONE;
 
@@ -37,16 +39,18 @@ RenderTexture target;
 
 //int windowwidth = 640;
 //int windowheight = 360;
-//int windowwidth = 1280;
-//int windowheight = 720;
-int windowwidth = 1920;
-int windowheight = 1080;
+int windowwidth = 1280;
+int windowheight = 720;
+//int windowwidth = 1920;
+//int windowheight = 1080;
 
 int targetwidth = 640;
 int targetheight = 360;
 
 
 Texture textures[10];
+
+sprite* hero = NULL;
 
 
 //--------------------------------------------------------------------
@@ -60,26 +64,25 @@ void drawframe();
 void libgameinit();
 void libgameinitwithstate(void* state);
 void libgameclose();
-
 void drawdebugpanel();
-
 void libgamehandleinput();
-
 void drawcompanysceneframe();
 void drawtitlesceneframe();
 void drawgameplaysceneframe();
-
 void setdebugpaneltopleft(gamestate* g);
 void setdebugpanelbottomleft(gamestate* g);
 void setdebugpanelbottomright(gamestate* g);
 void setdebugpaneltopright(gamestate* g);
 void gameinitframecount(unsigned int fc);
-unsigned int saveframecount();
-gamestate* libgamegetgamestate();
 void handlefade();
 void drawfade();
 void libgameloadtextures();
 void libgameunloadtextures();
+void libgameinitsharedsetup();
+void libgamecloseshared();
+
+unsigned int saveframecount();
+gamestate* libgamegetgamestate();
 
 //--------------------------------------------------------------------
 // definitions
@@ -126,19 +129,19 @@ void libgamehandleinput() {
         if (fade == FADESTATENONE) {
             fade = FADESTATEOUT;
         }
-        //activescene++;
-        //if (activescene > 1) {
-        //    activescene = 0;
-        //}
     }
 
     if (IsKeyPressed(KEY_D)) {
         debugpanelon = !debugpanelon;
     }
 
+    //if (IsKeyPressed(KEY_F)) {
+    //    ToggleFullscreen();
+    //}
 
-    if (IsKeyPressed(KEY_F)) {
-        ToggleFullscreen();
+    if (IsKeyPressed(KEY_C)) {
+        // increment the hero sprite context
+        sprite_incrcontext(hero);
     }
 }
 
@@ -150,16 +153,10 @@ bool gamewindowshouldclose() {
 
 void gameinitwindow() {
     const char* title = "project rpg v0.000001";
-    //const int w = 1920;
-    //const int h = 1080;
-    //const int w = 1920 / 2;
-    //const int h = 1080 / 2;
-    const int w = windowwidth;
-    const int h = windowheight;
     mprint("begin gameinitwindow");
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
-    InitWindow(w, h, title);
+    InitWindow(windowwidth, windowheight, title);
     while (!IsWindowReady())
         ;
     // this is hard-coded for now so we can auto-position the window
@@ -171,11 +168,6 @@ void gameinitwindow() {
     SetExitKey(KEY_Q);
     mprint("end of gameinitwindow");
 }
-
-
-//void gameinitframecount(unsigned int fc) {
-//    framecount = fc;
-//}
 
 
 void gameclosewindow() {
@@ -368,7 +360,6 @@ void drawframe() {
     Rectangle dest = {0, 0, GetScreenWidth(), GetScreenHeight()};
     Vector2 origin = {0, 0};
 
-    //DrawTextureRec(target.texture, source, dest, WHITE);
     DrawTexturePro(target.texture, source, dest, origin, 0.0f, WHITE);
 
     drawdebugpanel();
@@ -387,14 +378,12 @@ inline void drawdebugpanel() {
     if (debugpanelon) {
         const int fontsize = 14, spacing = 1;
 
-        //Vector2 p = (Vector2){10, 10};
         Vector2 p = {g->dp.x, g->dp.y};
 
         bzero(debugpanelbuffer, 1024);
         snprintf(debugpanelbuffer,
                  1024,
                  "Framecount:   %d\n%s\n%s\nfade:    %d\nfadealpha:    %d\nscene:  %d\n",
-
                  g->framecount,
                  g->timebeganbuf,
                  g->currenttimebuf,
@@ -405,7 +394,6 @@ inline void drawdebugpanel() {
 
         DrawRectangleLines(p.x - 5, p.y - 5, m.x + 12, m.y + 12, WHITE);
         DrawRectangle(p.x - 3, p.y - 3, m.x + 8, m.y + 8, (Color){0, 0, 0, 128});
-
         DrawTextEx(gfont, debugpanelbuffer, p, fontsize, spacing, WHITE);
     }
 }
@@ -414,15 +402,30 @@ inline void drawdebugpanel() {
 void drawgameplaysceneframe() {
     ClearBackground(BLACK);
 
-
     // lets text drawing the hero sprite
-    DrawTexture(textures[TXHERO], targetwidth / 2, targetheight / 2, WHITE);
 
+    // now lets draw the sprite
+    // dont pull from textures
+    // instead, use the hero sprite
+    Vector2 origin = {0, 0};
 
-    DrawText("gameplay scene", targetwidth / 2, targetheight / 2, 20, WHITE);
+    // this was working a moment ago, ish,,,,,just before i tried updating the...
+    DrawTexturePro(*(hero->texture), hero->src, hero->dest, origin, 0.0f, WHITE);
 
+    //DrawText("gameplay scene", targetwidth / 2, targetheight / 2, 20, WHITE);
 
     handlefade();
+
+    // we will want to find a way to wrap animation management
+    // this will get cumbersome as the # of sprites on-screen grows.
+    // will also need a way to manage the existing sprites on screen
+    // previously i used an unordered map in C++ to do this
+    // i will need to find a way to do this in C
+    //
+    // we could rawdog an array of sprite pointers or something but we will deal with it
+    // when we get there
+    if (g->framecount % 10 == 0)
+        sprite_incrframe(hero);
 }
 
 
@@ -533,12 +536,9 @@ void libgameunloadtextures() {
 }
 
 
-void libgameinitsharedsetup();
-
 void libgameinit() {
     mprint("libgameinit");
     libgameinitsharedsetup();
-    libgameloadtextures();
     g = gamestateinitptr();
 }
 
@@ -553,6 +553,25 @@ void libgameinitsharedsetup() {
     target = LoadRenderTexture(targetwidth, targetheight);
     //SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
     //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    libgameloadtextures();
+    // lets try initializing a sprite
+    const int numcontexts = 3;
+    const int numframes = 4;
+
+    hero = sprite_create(&textures[TXHERO], numcontexts, numframes);
+
+    // we need to set the destination
+    // this is a function of how much we have scaled the target texture
+    // we need to write code to manage this but we will hack something
+    // together for right now
+    hero->dest =
+        (Rectangle){targetwidth / 2.0f, targetheight / 2.0f, hero->width * 4, hero->height * 4};
+
+    printf("hero->dest: %.2f %.2f %.2f %.2f\n",
+           hero->dest.x,
+           hero->dest.y,
+           hero->dest.width,
+           hero->dest.height);
 }
 
 
@@ -563,37 +582,31 @@ void libgameinitwithstate(void* state) {
     }
     mprint("libgameinitwithstate");
     libgameinitsharedsetup();
-    libgameloadtextures();
     g = (gamestate*)state;
 }
 
 
 void libgameclosesavegamestate() {
     mprint("libgameclosesavegamestate");
-    UnloadFont(gfont);
-
-    mprint("unloading textures");
-    libgameunloadtextures();
-
-    mprint("unloading render texture");
-    UnloadRenderTexture(target);
-
-    mprint("closing window");
-    CloseWindow();
+    libgamecloseshared();
 }
 
 
 void libgameclose() {
     mprint("libgameclose");
-    UnloadFont(gfont);
     gamestatefree(g);
+    libgamecloseshared();
+}
 
+
+void libgamecloseshared() {
+    sprite_destroy(hero);
+
+    UnloadFont(gfont);
     mprint("unloading textures");
     libgameunloadtextures();
-
     mprint("unloading render texture");
     UnloadRenderTexture(target);
-
     mprint("closing window");
     CloseWindow();
 }

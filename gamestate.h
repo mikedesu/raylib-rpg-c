@@ -3,7 +3,7 @@
 #include "companyscene.h"
 #include "debugpanel.h"
 #include "display.h"
-#include "sceneint.h"
+//#include "sceneint.h"
 #include "sizemacros.h"
 #include <stdbool.h>
 #include <time.h>
