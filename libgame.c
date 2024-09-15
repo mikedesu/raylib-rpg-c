@@ -15,9 +15,14 @@
 //--------------------------------------------------------------------
 // libgame global variables
 //--------------------------------------------------------------------
-
+#define DEFAULT_TARGET_WIDTH 640
+#define DEFAULT_TARGET_HEIGHT 360
+#define DEFAULT_SCALE 3
+#define DEFAULT_WINDOW_WIDTH (DEFAULT_TARGET_WIDTH * DEFAULT_SCALE)
+#define DEFAULT_WINDOW_HEIGHT (DEFAULT_TARGET_HEIGHT * DEFAULT_SCALE)
 
 #define TXHERO 0
+#define TXDIRT 1
 
 
 char debugpanelbuffer[1024] = {0};
@@ -33,20 +38,15 @@ gamestate* g = NULL;
 
 Font gfont;
 
-bool debugpanelon = true;
-
 RenderTexture target;
 
-//int windowwidth = 640;
-//int windowheight = 360;
-int windowwidth = 1280;
-int windowheight = 720;
-//int windowwidth = 1920;
-//int windowheight = 1080;
+int targetwidth = DEFAULT_TARGET_WIDTH;
+int targetheight = DEFAULT_TARGET_HEIGHT;
 
-int targetwidth = 640;
-int targetheight = 360;
+int scale = DEFAULT_SCALE;
 
+int windowwidth = DEFAULT_WINDOW_WIDTH;
+int windowheight = DEFAULT_WINDOW_HEIGHT;
 
 Texture textures[10];
 
@@ -59,31 +59,31 @@ sprite* hero = NULL;
 bool gamewindowshouldclose();
 void gameinitwindow();
 void gameclosewindow();
-void updategamestate();
-void drawframe();
+void libgameupdategamestate();
+void libgamedrawframe();
 void libgameinit();
 void libgameinitwithstate(void* state);
 void libgameclose();
 void drawdebugpanel();
 void libgamehandleinput();
-void drawcompanysceneframe();
-void drawtitlesceneframe();
-void drawgameplaysceneframe();
+void drawcompanyscene();
+void drawtitlescene();
+void drawgameplayscene();
+void handlefade();
+void drawfade();
+void libgameloadtexture(int index, const char* path, bool dodither);
+void libgameloadtextures();
+void libgameunloadtexture(int index);
+void libgameunloadtextures();
+void libgameinitsharedsetup();
+void libgamecloseshared();
+gamestate* libgamegetgamestate();
+
 void setdebugpaneltopleft(gamestate* g);
 void setdebugpanelbottomleft(gamestate* g);
 void setdebugpanelbottomright(gamestate* g);
 void setdebugpaneltopright(gamestate* g);
-void gameinitframecount(unsigned int fc);
-void handlefade();
-void drawfade();
-void libgameloadtextures();
-void libgameunloadtextures();
-void libgameinitsharedsetup();
-void libgamecloseshared();
-
-unsigned int saveframecount();
-gamestate* libgamegetgamestate();
-
+void setdebugpanelcenter(gamestate* g);
 //--------------------------------------------------------------------
 // definitions
 //--------------------------------------------------------------------
@@ -97,28 +97,26 @@ void drawfade() {
 
 void handlefade() {
     const int fadespeed = 4;
+    if (fade == FADESTATEOUT && fadealpha < 255) {
+        fadealpha += fadespeed;
+    } else if (fade == FADESTATEIN && fadealpha > 0) {
+        fadealpha -= fadespeed;
+    }
 
-    if (fade == FADESTATEOUT) {
-        if (fadealpha < 255) {
-            fadealpha += fadespeed;
-        }
-        if (fadealpha >= 255) {
-            fadealpha = 255;
-            fade = FADESTATEIN;
-            activescene++;
-            if (activescene > 2) {
-                activescene = 0;
-            }
-        }
-    } else if (fade == FADESTATEIN) {
-        if (fadealpha > 0) {
-            fadealpha -= fadespeed;
-        }
-        if (fadealpha <= 0) {
-            fadealpha = 0;
-            fade = FADESTATENONE;
+    if (fadealpha >= 255) {
+        fadealpha = 255;
+        fade = FADESTATEIN;
+        activescene++;
+        if (activescene > 2) {
+            activescene = 0;
         }
     }
+
+    if (fadealpha <= 0) {
+        fadealpha = 0;
+        fade = FADESTATENONE;
+    }
+
     drawfade();
 }
 
@@ -132,7 +130,7 @@ void libgamehandleinput() {
     }
 
     if (IsKeyPressed(KEY_D)) {
-        debugpanelon = !debugpanelon;
+        g->debugpanelon = !g->debugpanelon;
     }
 
     //if (IsKeyPressed(KEY_F)) {
@@ -176,31 +174,45 @@ void gameclosewindow() {
 }
 
 
-//void setdebugpaneltopleft(gamestate* g) {
-//g->dp.x = 5;
-//g->dp.y = 5;
-//}
+void setdebugpaneltopleft(gamestate* g) {
+    g->dp.x = 20;
+    g->dp.y = 20;
+}
 
 
-//void setdebugpanelbottomleft(gamestate* g) {
-//g->dp.x = 5;
-//g->dp.y = g->winheight - g->dp.h - 20;
-//}
+void setdebugpanelbottomleft(gamestate* g) {
+    g->dp.x = 20;
+    //g->dp.y = g->winheight - g->dp.h - 20;
+    g->dp.y = GetScreenHeight() - g->dp.h - 40;
+}
 
 
-//void setdebugpanelbottomright(gamestate* g) {
-//g->dp.x = g->winwidth - g->dp.w - 20;
-//g->dp.y = g->winheight - g->dp.h - 20;
-//}
+void setdebugpanelbottomright(gamestate* g) {
+    g->dp.x = GetScreenWidth() - g->dp.w - 20;
+    g->dp.y = GetScreenHeight() - g->dp.h - 40;
+}
 
 
-//void setdebugpaneltopright(gamestate* g) {
-//g->dp.x = g->winwidth - g->dp.w - 20;
-//g->dp.y = 5;
-//}
+void setdebugpaneltopright(gamestate* g) {
+    g->dp.x = GetScreenWidth() - g->dp.w - 20;
+    g->dp.y = 20;
+}
 
 
-void updategamestate() {
+void setdebugpanelcenter(gamestate* g) {
+    g->dp.x = GetScreenWidth() / 2 - g->dp.w / 2;
+    g->dp.y = GetScreenHeight() / 2 - g->dp.h / 2;
+}
+
+
+void libgameupdategamestate() {
+
+    //setdebugpaneltopleft(g);
+    //setdebugpaneltopright(g);
+    //setdebugpanelbottomleft(g);
+    //setdebugpanelbottomright(g);
+    setdebugpanelcenter(g);
+
     //    mprint("updategamestateunsafe");
     //now = time(NULL);
     //if (start == 0) {
@@ -238,7 +250,7 @@ void updategamestate() {
     // top left
     //setdebugpaneltopleft(g);
     // top right
-    setdebugpaneltopright(g);
+    //setdebugpaneltopright(g);
     // bottom left
     //setdebugpanelbottomleft(g);
     // bottom right
@@ -337,17 +349,17 @@ void updategamestate() {
 }
 
 
-void drawframe() {
+void libgamedrawframe() {
 
     BeginDrawing();
     BeginTextureMode(target);
 
     if (activescene == 0) {
-        drawcompanysceneframe();
+        drawcompanyscene();
     } else if (activescene == 1) {
-        drawtitlesceneframe();
+        drawtitlescene();
     } else if (activescene == 2) {
-        drawgameplaysceneframe();
+        drawgameplayscene();
     }
 
 
@@ -375,15 +387,16 @@ void drawframe() {
 
 
 inline void drawdebugpanel() {
-    if (debugpanelon) {
-        const int fontsize = 14, spacing = 1;
+    if (g->debugpanelon) {
+        const int fontsize = 20;
+        const int spacing = 1;
 
         Vector2 p = {g->dp.x, g->dp.y};
 
         bzero(debugpanelbuffer, 1024);
         snprintf(debugpanelbuffer,
                  1024,
-                 "Framecount:   %d\n%s\n%s\nfade:    %d\nfadealpha:    %d\nscene:  %d\n",
+                 "Framecount:   %d\n%s\n%s\nfade:         %d\nfadealpha:    %d\nscene:        %d\n",
                  g->framecount,
                  g->timebeganbuf,
                  g->currenttimebuf,
@@ -391,15 +404,38 @@ inline void drawdebugpanel() {
                  fadealpha,
                  activescene);
         Vector2 m = MeasureTextEx(gfont, debugpanelbuffer, fontsize, spacing);
+        // update the debug panel width and height
+        // this code will go elsewhere like an 'update debug panel' method
+        // to separate the debug panel update from the draw
+        // we store the root measurement because
+        // the box is drawn relative to
+        // the size of the text
+        g->dp.w = m.x;
+        g->dp.h = m.y;
 
-        DrawRectangleLines(p.x - 5, p.y - 5, m.x + 12, m.y + 12, WHITE);
-        DrawRectangle(p.x - 3, p.y - 3, m.x + 8, m.y + 8, (Color){0, 0, 0, 128});
+        int boxoffsetxy = 10;
+        int boxoffsetwh = 20;
+
+        int bx = p.x - boxoffsetxy;
+        int by = p.y - boxoffsetxy;
+        int bw = m.x + boxoffsetwh;
+        int bh = m.y + boxoffsetwh;
+        DrawRectangleLines(bx, by, bw, bh, WHITE);
+
+        int txoffsetxy = 3;
+        int txoffsetwh = 8;
+        int tx = p.x - txoffsetxy;
+        int ty = p.y - txoffsetxy;
+        int tw = m.x + txoffsetwh;
+        int th = m.y + txoffsetwh;
+
+        DrawRectangle(tx, ty, tw, th, (Color){0, 0, 0, 128});
         DrawTextEx(gfont, debugpanelbuffer, p, fontsize, spacing, WHITE);
     }
 }
 
 
-void drawgameplaysceneframe() {
+void drawgameplayscene() {
     ClearBackground(BLACK);
 
     // lets text drawing the hero sprite
@@ -429,7 +465,7 @@ void drawgameplaysceneframe() {
 }
 
 
-void drawtitlesceneframe() {
+void drawtitlescene() {
     //BeginDrawing();
     const Color bgc = {0x66, 0x66, 0x66, 255};
     const Color fgc = WHITE;
@@ -478,7 +514,7 @@ void drawtitlesceneframe() {
 
 #define COMPANYNAME "@evildojo666"
 #define COMPANYFILL "   x  x x   "
-void drawcompanysceneframe() {
+void drawcompanyscene() {
     const Color bgc = BLACK;
     const Color fgc = {0x66, 0x66, 0x66, 255};
     const int fontsize = 32;
@@ -494,8 +530,8 @@ void drawcompanysceneframe() {
     snprintf(b, 128, COMPANYNAME);
     snprintf(b2, 128, COMPANYFILL);
     snprintf(b3, 128, "presents");
-    const Vector2 m = MeasureTextEx(gfont, b, fontsize, spacing);
-    const Vector2 m2 = MeasureTextEx(gfont, b2, fontsize, spacing);
+    const Vector2 measure = MeasureTextEx(gfont, b, fontsize, spacing);
+    const Vector2 measure2 = MeasureTextEx(gfont, b2, fontsize, spacing);
 
     if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
         for (int i = 0; i < 10; i++) {
@@ -507,17 +543,15 @@ void drawcompanysceneframe() {
         shufflestrinplace(b2);
     }
 
-    //Vector2 p = {GetScreenWidth() / 2.0f - m.x / 2.0f, GetScreenHeight() / 2.0f - m.y / 2.0f};
-    Vector2 p = {targetwidth / 2.0f - m.x / 2.0f, targetheight / 2.0f - m.y / 2.0f};
+    const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f,
+                         targetheight / 2.0f - measure.y / 2.0f};
     ClearBackground(bgc);
-    DrawTextEx(gfont, b, p, fontsize, 1, fgc);
-    DrawTextEx(gfont, b2, p, fontsize, 1, fgc);
+    DrawTextEx(gfont, b, pos, fontsize, 1, fgc);
+    DrawTextEx(gfont, b2, pos, fontsize, 1, fgc);
 
-    const Vector2 mp = MeasureTextEx(gfont, b3, 20, 1);
-    //const Vector2 pp = {GetScreenWidth() / 2.0f - mp.x / 2.0f,
-    //                    GetScreenHeight() / 2.0f + m.y / 2.0f + 20};
-    const Vector2 pp = {targetwidth / 2.0f - mp.x / 2.0f, targetheight / 2.0f + m.y / 2.0f + 20};
-
+    const Vector2 measure3 = MeasureTextEx(gfont, b3, 20, 1);
+    const Vector2 pp = {targetwidth / 2.0f - measure3.x / 2.0f,
+                        targetheight / 2.0f + measure.y / 2.0f + 20};
 
     DrawTextEx(gfont, b3, pp, 20, 1, fgc);
 
@@ -525,14 +559,46 @@ void drawcompanysceneframe() {
 }
 
 
-void libgameloadtextures() {
-    textures[TXHERO] = LoadTexture("img/darkknight2-sheet.png");
-    SetTextureFilter(textures[TXHERO], TEXTURE_FILTER_POINT);
+//void libgameloadtexture(const char* path, int index, bool dodither) {
+void libgameloadtexture(int index, const char* path, bool dodither) {
+    if (dodither) {
+        Image img = LoadImage(path);
+        ImageDither(&img, 16, 16, 16, 16);
+        textures[index] = LoadTextureFromImage(img);
+        UnloadImage(img);
+    } else {
+        textures[index] = LoadTexture(path);
+    }
+    SetTextureFilter(textures[index], TEXTURE_FILTER_POINT);
 }
 
+
+void libgameloadtextures() {
+    //textures[TXHERO] = LoadTexture("img/darkknight2-sheet.png");
+    //SetTextureFilter(textures[TXHERO], TEXTURE_FILTER_POINT);
+
+    libgameloadtexture(TXHERO, "img/darkknight2-sheet.png", false);
+
+    libgameloadtexture(TXDIRT, "img/tile-dirt0.png", true);
+}
+
+
+void libgameunloadtexture(int index) {
+    if (textures[index].id > 0)
+        UnloadTexture(textures[index]);
+}
+
+
 void libgameunloadtextures() {
-    if (textures[TXHERO].id > 0)
-        UnloadTexture(textures[TXHERO]);
+
+    libgameunloadtexture(TXHERO);
+    libgameunloadtexture(TXDIRT);
+
+    //if (textures[TXHERO].id > 0)
+    //    UnloadTexture(textures[TXHERO]);
+
+    //if (textures[TXDIRT].id > 0)
+    //    UnloadTexture(textures[TXDIRT]);
 }
 
 
@@ -601,6 +667,7 @@ void libgameclose() {
 
 void libgamecloseshared() {
     sprite_destroy(hero);
+
 
     UnloadFont(gfont);
     mprint("unloading textures");

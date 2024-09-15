@@ -32,13 +32,16 @@ gamestate* g = NULL;
 bool (*mywindowshouldclose)(void) = NULL;
 void (*myinitwindow)() = NULL;
 void (*myclosewindow)() = NULL;
-void (*mydrawframe)() = NULL;
+void (*mylibgamedrawframe)() = NULL;
 void (*mylibgameinit)() = NULL;
 void (*mylibgameinitwithstate)(void*) = NULL;
 void (*mylibgameclose)() = NULL;
 void (*mylibgameclosesavegamestate)() = NULL;
 void (*mylibgamehandleinput)() = NULL;
 void (*mylibgameinitframecount)(unsigned int) = NULL;
+
+void (*mylibgameupdategamestate)(gamestate*) = NULL;
+
 gamestate* (*mylibgamegetgamestate)() = NULL;
 
 
@@ -90,9 +93,9 @@ void loadsymbols() {
     myclosewindow = dlsym(handle, "gameclosewindow");
     checksymbol(myclosewindow, "gameclosewindow");
 
-    mprint("drawframe");
-    mydrawframe = dlsym(handle, "drawframe");
-    checksymbol(mydrawframe, "drawframe");
+    mprint("libgamedrawframe");
+    mylibgamedrawframe = dlsym(handle, "libgamedrawframe");
+    checksymbol(mylibgamedrawframe, "libgamedrawframe");
 
     mprint("libgameinit");
     mylibgameinit = dlsym(handle, "libgameinit");
@@ -117,6 +120,11 @@ void loadsymbols() {
     mprint("libgameinitwithstate");
     mylibgameinitwithstate = (void (*)(void*))dlsym(handle, "libgameinitwithstate");
     checksymbol(mylibgameinitwithstate, "libgameinitwithstate");
+
+
+    mprint("libgameupdategamestate");
+    mylibgameupdategamestate = (void (*)(gamestate*))dlsym(handle, "libgameupdategamestate");
+    checksymbol(mylibgameupdategamestate, "libgameupdategamestate");
 
     //////////////////////////////////////
 
@@ -277,8 +285,13 @@ void gamerun() {
     mylibgameinit();
     mprint("entering gameloop");
     while (!mywindowshouldclose()) {
-        mydrawframe();
+
+        mylibgamedrawframe();
+
         mylibgamehandleinput();
+
+        mylibgameupdategamestate(g);
+
         autoreload();
     }
     mprint("closing libgame");

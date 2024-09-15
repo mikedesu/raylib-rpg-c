@@ -21,7 +21,7 @@ typedef struct gamestate {
     char currenttimebuf[64];
     struct tm* currenttimetm;
 
-
+    bool debugpanelon;
     //mycolor clearcolor;
     debugpanel dp;
     //display d;

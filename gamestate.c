@@ -27,6 +27,7 @@ gamestate* gamestateinitptr() {
 
     gamestateupdatecurrenttime(g);
 
+    g->debugpanelon = true;
     g->dp.x = 0;
     g->dp.y = 0;
 

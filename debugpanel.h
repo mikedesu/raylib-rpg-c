@@ -10,8 +10,8 @@
 typedef struct debugpanel {
     int x;
     int y;
-    //int w;
-    //int h;
+    int w;
+    int h;
     //int fontsize;
     //mycolor fgcolor;
     //mycolor bgcolor;
