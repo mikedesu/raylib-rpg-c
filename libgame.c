@@ -14,6 +14,11 @@
 //--------------------------------------------------------------------
 // libgame global variables
 //--------------------------------------------------------------------
+
+
+#define TXHERO 0
+
+
 char debugpanelbuffer[1024] = {0};
 
 int activescene = 1;
@@ -32,13 +37,16 @@ RenderTexture target;
 
 //int windowwidth = 640;
 //int windowheight = 360;
-int windowwidth = 1280;
-int windowheight = 720;
-//int windowwidth = 1920;
-//int windowheight = 1080;
+//int windowwidth = 1280;
+//int windowheight = 720;
+int windowwidth = 1920;
+int windowheight = 1080;
 
 int targetwidth = 640;
 int targetheight = 360;
+
+
+Texture textures[10];
 
 
 //--------------------------------------------------------------------
@@ -56,8 +64,11 @@ void libgameclose();
 void drawdebugpanel();
 
 void libgamehandleinput();
+
 void drawcompanysceneframe();
 void drawtitlesceneframe();
+void drawgameplaysceneframe();
+
 void setdebugpaneltopleft(gamestate* g);
 void setdebugpanelbottomleft(gamestate* g);
 void setdebugpanelbottomright(gamestate* g);
@@ -67,6 +78,8 @@ unsigned int saveframecount();
 gamestate* libgamegetgamestate();
 void handlefade();
 void drawfade();
+void libgameloadtextures();
+void libgameunloadtextures();
 
 //--------------------------------------------------------------------
 // definitions
@@ -80,7 +93,7 @@ void drawfade() {
 
 
 void handlefade() {
-    const int fadespeed = 2;
+    const int fadespeed = 4;
 
     if (fade == FADESTATEOUT) {
         if (fadealpha < 255) {
@@ -90,7 +103,7 @@ void handlefade() {
             fadealpha = 255;
             fade = FADESTATEIN;
             activescene++;
-            if (activescene > 1) {
+            if (activescene > 2) {
                 activescene = 0;
             }
         }
@@ -121,6 +134,11 @@ void libgamehandleinput() {
 
     if (IsKeyPressed(KEY_D)) {
         debugpanelon = !debugpanelon;
+    }
+
+
+    if (IsKeyPressed(KEY_F)) {
+        ToggleFullscreen();
     }
 }
 
@@ -336,7 +354,10 @@ void drawframe() {
         drawcompanysceneframe();
     } else if (activescene == 1) {
         drawtitlesceneframe();
+    } else if (activescene == 2) {
+        drawgameplaysceneframe();
     }
+
 
     EndTextureMode();
 
@@ -372,11 +393,12 @@ inline void drawdebugpanel() {
         bzero(debugpanelbuffer, 1024);
         snprintf(debugpanelbuffer,
                  1024,
-                 "Framecount:   %d\n%s\n%s\nfadealpha:    %d\nscene:  %d\n",
+                 "Framecount:   %d\n%s\n%s\nfade:    %d\nfadealpha:    %d\nscene:  %d\n",
 
                  g->framecount,
                  g->timebeganbuf,
                  g->currenttimebuf,
+                 fade,
                  fadealpha,
                  activescene);
         Vector2 m = MeasureTextEx(gfont, debugpanelbuffer, fontsize, spacing);
@@ -386,6 +408,21 @@ inline void drawdebugpanel() {
 
         DrawTextEx(gfont, debugpanelbuffer, p, fontsize, spacing, WHITE);
     }
+}
+
+
+void drawgameplaysceneframe() {
+    ClearBackground(BLACK);
+
+
+    // lets text drawing the hero sprite
+    DrawTexture(textures[TXHERO], targetwidth / 2, targetheight / 2, WHITE);
+
+
+    DrawText("gameplay scene", targetwidth / 2, targetheight / 2, 20, WHITE);
+
+
+    handlefade();
 }
 
 
@@ -430,6 +467,8 @@ void drawtitlesceneframe() {
 
     // just below the 'project rpg' text
     DrawTextEx(gfont, b3, pos3, 16, 1, fgc);
+
+
     handlefade();
 }
 
@@ -483,14 +522,37 @@ void drawcompanysceneframe() {
 }
 
 
+void libgameloadtextures() {
+    textures[TXHERO] = LoadTexture("img/darkknight2-sheet.png");
+    SetTextureFilter(textures[TXHERO], TEXTURE_FILTER_POINT);
+}
+
+void libgameunloadtextures() {
+    if (textures[TXHERO].id > 0)
+        UnloadTexture(textures[TXHERO]);
+}
+
+
+void libgameinitsharedsetup();
+
 void libgameinit() {
     mprint("libgameinit");
-    gameinitwindow();
-    gfont = LoadFont("fonts/hack.ttf");
-    SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
+    libgameinitsharedsetup();
+    libgameloadtextures();
     g = gamestateinitptr();
+}
+
+
+void libgameinitsharedsetup() {
+    gameinitwindow();
+
+    //gfont = LoadFont("fonts/hack.ttf");
+    gfont = LoadFontEx("fonts/hack.ttf", 60, 0, 250);
+    SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
+
     target = LoadRenderTexture(targetwidth, targetheight);
-    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    //SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
+    //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 }
 
 
@@ -500,17 +562,18 @@ void libgameinitwithstate(void* state) {
         return;
     }
     mprint("libgameinitwithstate");
-    gameinitwindow();
-    gfont = LoadFont("fonts/hack.ttf");
-    SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
+    libgameinitsharedsetup();
+    libgameloadtextures();
     g = (gamestate*)state;
-    target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
 }
 
 
 void libgameclosesavegamestate() {
     mprint("libgameclosesavegamestate");
     UnloadFont(gfont);
+
+    mprint("unloading textures");
+    libgameunloadtextures();
 
     mprint("unloading render texture");
     UnloadRenderTexture(target);
@@ -524,6 +587,9 @@ void libgameclose() {
     mprint("libgameclose");
     UnloadFont(gfont);
     gamestatefree(g);
+
+    mprint("unloading textures");
+    libgameunloadtextures();
 
     mprint("unloading render texture");
     UnloadRenderTexture(target);
