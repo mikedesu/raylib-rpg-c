@@ -11,24 +11,31 @@
 #include <string.h>
 #include <time.h>
 
-
 //--------------------------------------------------------------------
 // libgame global variables
 //--------------------------------------------------------------------
 #define DEFAULT_TARGET_WIDTH 640
 #define DEFAULT_TARGET_HEIGHT 360
-#define DEFAULT_SCALE 3
+#define DEFAULT_SCALE 1.5
 #define DEFAULT_WINDOW_WIDTH (DEFAULT_TARGET_WIDTH * DEFAULT_SCALE)
 #define DEFAULT_WINDOW_HEIGHT (DEFAULT_TARGET_HEIGHT * DEFAULT_SCALE)
 
 #define TXHERO 0
 #define TXDIRT 1
 
+#define COMPANYSCENE 0
+#define TITLESCENE 1
+#define GAMEPLAYSCENE 2
+
+#define COMPANYNAME "@evildojo666"
+#define COMPANYFILL "   x  x x   "
+
 
 char debugpanelbuffer[1024] = {0};
 
-const int maxscenes = 3;
-int activescene = 0;
+//int activescene = COMPANYSCENE;
+//int activescene = TITLESCENE;
+int activescene = GAMEPLAYSCENE;
 
 fadestate fade = FADESTATENONE;
 
@@ -43,7 +50,7 @@ RenderTexture target;
 int targetwidth = DEFAULT_TARGET_WIDTH;
 int targetheight = DEFAULT_TARGET_HEIGHT;
 
-int scale = DEFAULT_SCALE;
+float scale = DEFAULT_SCALE;
 
 int windowwidth = DEFAULT_WINDOW_WIDTH;
 int windowheight = DEFAULT_WINDOW_HEIGHT;
@@ -79,11 +86,14 @@ void libgameinitsharedsetup();
 void libgamecloseshared();
 gamestate* libgamegetgamestate();
 
+void setdebugpanelxy(gamestate* g, int x, int y);
 void setdebugpaneltopleft(gamestate* g);
 void setdebugpanelbottomleft(gamestate* g);
 void setdebugpanelbottomright(gamestate* g);
 void setdebugpaneltopright(gamestate* g);
 void setdebugpanelcenter(gamestate* g);
+
+
 //--------------------------------------------------------------------
 // definitions
 //--------------------------------------------------------------------
@@ -160,8 +170,12 @@ void gameinitwindow() {
     // this is hard-coded for now so we can auto-position the window
     // for easier config during streaming
     SetWindowMonitor(0);
-    SetWindowPosition(1920, 0);
-    //SetWindowPosition(0, 0);
+    //SetWindowPosition(1920, 0);
+    const int pad = 900;
+    const int x = 1920 + pad;
+    const int y = 50;
+    SetWindowPosition(x, y);
+
     SetTargetFPS(60);
     SetExitKey(KEY_Q);
     mprint("end of gameinitwindow");
@@ -174,44 +188,45 @@ void gameclosewindow() {
 }
 
 
+void setdebugpanelxy(gamestate* g, int x, int y) {
+    if (g != NULL) {
+        g->dp.x = x;
+        g->dp.y = y;
+    }
+}
+
+
 void setdebugpaneltopleft(gamestate* g) {
-    g->dp.x = 20;
-    g->dp.y = 20;
+    setdebugpanelxy(g, 20, 20);
 }
 
 
 void setdebugpanelbottomleft(gamestate* g) {
-    g->dp.x = 20;
-    //g->dp.y = g->winheight - g->dp.h - 20;
-    g->dp.y = GetScreenHeight() - g->dp.h - 40;
+    setdebugpanelxy(g, 20, GetScreenHeight() - g->dp.h - 40);
 }
 
 
 void setdebugpanelbottomright(gamestate* g) {
-    g->dp.x = GetScreenWidth() - g->dp.w - 20;
-    g->dp.y = GetScreenHeight() - g->dp.h - 40;
+    setdebugpanelxy(g, GetScreenWidth() - g->dp.w - 20, GetScreenHeight() - g->dp.h - 40);
 }
 
 
 void setdebugpaneltopright(gamestate* g) {
-    g->dp.x = GetScreenWidth() - g->dp.w - 20;
-    g->dp.y = 20;
+    setdebugpanelxy(g, GetScreenWidth() - g->dp.w - 20, 20);
 }
 
 
 void setdebugpanelcenter(gamestate* g) {
-    g->dp.x = GetScreenWidth() / 2 - g->dp.w / 2;
-    g->dp.y = GetScreenHeight() / 2 - g->dp.h / 2;
+    setdebugpanelxy(g, GetScreenWidth() / 2 - g->dp.w / 2, GetScreenHeight() / 2 - g->dp.h / 2);
 }
 
 
 void libgameupdategamestate() {
-
-    //setdebugpaneltopleft(g);
+    setdebugpaneltopleft(g);
     //setdebugpaneltopright(g);
     //setdebugpanelbottomleft(g);
     //setdebugpanelbottomright(g);
-    setdebugpanelcenter(g);
+    //setdebugpanelcenter(g);
 
     //    mprint("updategamestateunsafe");
     //now = time(NULL);
@@ -436,19 +451,20 @@ inline void drawdebugpanel() {
 
 
 void drawgameplayscene() {
+    //BeginMode2D(g->cam2d);
+    // lets text drawing the hero sprite
+    // now lets draw the sprite
+    //Vector2 origin = {0, 0};
+    //DrawTexturePro(*(hero->texture), hero->src, hero->dest, origin, 0.0f, WHITE);
+    //EndMode2D();
+
+    BeginMode3D(g->cam3d);
     ClearBackground(BLACK);
 
-    // lets text drawing the hero sprite
+    DrawCube((Vector3){0, 0, 0}, 2.0f, 2.0f, 2.0f, RED);
 
-    // now lets draw the sprite
-    // dont pull from textures
-    // instead, use the hero sprite
-    Vector2 origin = {0, 0};
+    EndMode3D();
 
-    // this was working a moment ago, ish,,,,,just before i tried updating the...
-    DrawTexturePro(*(hero->texture), hero->src, hero->dest, origin, 0.0f, WHITE);
-
-    //DrawText("gameplay scene", targetwidth / 2, targetheight / 2, 20, WHITE);
 
     handlefade();
 
@@ -460,8 +476,9 @@ void drawgameplayscene() {
     //
     // we could rawdog an array of sprite pointers or something but we will deal with it
     // when we get there
-    if (g->framecount % 10 == 0)
+    if (g->framecount % 10 == 0) {
         sprite_incrframe(hero);
+    }
 }
 
 
@@ -512,8 +529,6 @@ void drawtitlescene() {
 }
 
 
-#define COMPANYNAME "@evildojo666"
-#define COMPANYFILL "   x  x x   "
 void drawcompanyscene() {
     const Color bgc = BLACK;
     const Color fgc = {0x66, 0x66, 0x66, 255};
@@ -559,7 +574,6 @@ void drawcompanyscene() {
 }
 
 
-//void libgameloadtexture(const char* path, int index, bool dodither) {
 void libgameloadtexture(int index, const char* path, bool dodither) {
     if (dodither) {
         Image img = LoadImage(path);
@@ -578,14 +592,14 @@ void libgameloadtextures() {
     //SetTextureFilter(textures[TXHERO], TEXTURE_FILTER_POINT);
 
     libgameloadtexture(TXHERO, "img/darkknight2-sheet.png", false);
-
     libgameloadtexture(TXDIRT, "img/tile-dirt0.png", true);
 }
 
 
 void libgameunloadtexture(int index) {
-    if (textures[index].id > 0)
+    if (textures[index].id > 0) {
         UnloadTexture(textures[index]);
+    }
 }
 
 
@@ -630,14 +644,20 @@ void libgameinitsharedsetup() {
     // this is a function of how much we have scaled the target texture
     // we need to write code to manage this but we will hack something
     // together for right now
-    hero->dest =
-        (Rectangle){targetwidth / 2.0f, targetheight / 2.0f, hero->width * 4, hero->height * 4};
 
-    printf("hero->dest: %.2f %.2f %.2f %.2f\n",
-           hero->dest.x,
-           hero->dest.y,
-           hero->dest.width,
-           hero->dest.height);
+    const int scale = 2;
+
+    hero->dest = (Rectangle){
+        targetwidth / 2.0f, targetheight / 2.0f, hero->width * scale, hero->height * scale};
+
+    //mprint("before updating camera");
+    //mprint("after updating camera");
+
+    //printf("hero->dest: %.2f %.2f %.2f %.2f\n",
+    //       hero->dest.x,
+    //       hero->dest.y,
+    //       hero->dest.width,
+    //       hero->dest.height);
 }
 
 

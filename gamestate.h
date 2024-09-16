@@ -30,6 +30,10 @@ typedef struct gamestate {
     //time_t starttime;
     //struct tm* starttm;
 
+    Camera2D cam2d;
+    Camera3D cam3d;
+    CameraMode cameramode;
+
 } gamestate;
 
 
