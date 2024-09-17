@@ -37,13 +37,15 @@ gamestate* gamestateinitptr() {
     g->cam2d.zoom = 1.0;
     g->cam2d.rotation = 0.0;
 
-    g->cam3d.position = (Vector3){0, 0, 10};
+    g->cam3d.position = (Vector3){0, 0, 4};
     g->cam3d.target = (Vector3){0, 0, 0};
     g->cam3d.up = (Vector3){0, 1, 0};
     g->cam3d.fovy = 45.0;
     g->cam3d.projection = CAMERA_PERSPECTIVE;
 
-    g->cameramode = CAMERA_FREE;
+    g->cameramode = CAMERA_FIRST_PERSON;
+
+    g->cubepos = (Vector3){0, -1, 0};
 
     //g->currenttime = time(NULL);
     //g->currenttimetm = localtime(&(g->currenttime));

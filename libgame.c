@@ -16,7 +16,11 @@
 //--------------------------------------------------------------------
 #define DEFAULT_TARGET_WIDTH 640
 #define DEFAULT_TARGET_HEIGHT 360
-#define DEFAULT_SCALE 1.5
+#define DEFAULT_SCALE 2
+
+#define DEFAULT_WINDOW_POS_X (1920 + 635)
+#define DEFAULT_WINDOW_POS_Y 25
+
 #define DEFAULT_WINDOW_WIDTH (DEFAULT_TARGET_WIDTH * DEFAULT_SCALE)
 #define DEFAULT_WINDOW_HEIGHT (DEFAULT_TARGET_HEIGHT * DEFAULT_SCALE)
 
@@ -66,6 +70,7 @@ sprite* hero = NULL;
 bool gamewindowshouldclose();
 void gameinitwindow();
 void gameclosewindow();
+void libgameupdatedebugpanelbuffer();
 void libgameupdategamestate();
 void libgamedrawframe();
 void libgameinit();
@@ -93,7 +98,11 @@ void setdebugpanelbottomright(gamestate* g);
 void setdebugpaneltopright(gamestate* g);
 void setdebugpanelcenter(gamestate* g);
 
+void drawcubetexturerecfrontface(
+    const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l);
 
+void drawcubetexturerecallfaces(
+    const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l);
 //--------------------------------------------------------------------
 // definitions
 //--------------------------------------------------------------------
@@ -149,7 +158,20 @@ void libgamehandleinput() {
 
     if (IsKeyPressed(KEY_C)) {
         // increment the hero sprite context
-        sprite_incrcontext(hero);
+        //sprite_incrcontext(hero);
+
+
+        //g->cam3d.projection = CAMERA_ORTHOGRAPHIC;
+        //g->cam3d.fovy = 45.0f;
+        //g->cam3d.target = (Vector3){0.0f, -1.0f, 0.0f};
+        //g->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
+        //g->cam3d.position = (Vector3){0.0f, 0.0f, 10.0f};
+
+        //g->cameramode = CAMERA_FREE;
+        //UpdateCamera(&g->cam3d, g->cameramode);
+        // change the camera perspective
+        //g->cameramode = CAMERA_FIRST_PERSON;
+        //UpdateCamera(&g->cam3d, g->cameramode);
     }
 }
 
@@ -171,9 +193,10 @@ void gameinitwindow() {
     // for easier config during streaming
     SetWindowMonitor(0);
     //SetWindowPosition(1920, 0);
-    const int pad = 900;
-    const int x = 1920 + pad;
-    const int y = 50;
+    //const int pad = 900;
+    //const int x = 1920 + pad;
+    const int x = DEFAULT_WINDOW_POS_X;
+    const int y = DEFAULT_WINDOW_POS_Y;
     SetWindowPosition(x, y);
 
     SetTargetFPS(60);
@@ -221,45 +244,107 @@ void setdebugpanelcenter(gamestate* g) {
 }
 
 
+void libgameupdatedebugpanelbuffer() {
+    bzero(debugpanelbuffer, 1024);
+    snprintf(debugpanelbuffer,
+             1024,
+             "Framecount:    %d\n"
+             "%s\n"
+             "%s\n"
+             "Cam.position:  %.2f,%.2f,%.2f\n"
+             "Cam.target:    %.2f,%.2f,%.2f\n"
+             "Cam Mode:      %d\n"
+             "Cube position: %.2f,%.2f,%.2f\n"
+             "Active scene:  %d\n",
+             g->framecount,
+
+
+             g->timebeganbuf,
+             g->currenttimebuf,
+
+
+             g->cam3d.position.x,
+             g->cam3d.position.y,
+             g->cam3d.position.z,
+
+
+             g->cam3d.target.x,
+             g->cam3d.target.y,
+             g->cam3d.target.z,
+
+             g->cameramode,
+
+             g->cubepos.x,
+             g->cubepos.y,
+             g->cubepos.z,
+
+             activescene);
+}
+
+
 void libgameupdategamestate() {
-    setdebugpaneltopleft(g);
+
+
+    libgameupdatedebugpanelbuffer();
+    //g->cam3d.target.x = 0;
+    //g->cam3d.target.y = -1;
+    //g->cam3d.target.z = 0;
+
+
+    //g->cubepos.x += 0.001f;
+
+    // trying to get the camera to properly follow...
+    //g->cameramode = CAMERA_FREE;
+
+    g->cubepos = (Vector3){0.0f, -1.0f, 0.0f};
+
+    //g->cam3d.position.x = 0.000f;
+    //g->cam3d.position.y = 0.000f;
+    //g->cam3d.position.z = 2.000f;
+
+    g->cam3d.target.x = 0.000f;
+    g->cam3d.target.y = 0.000f;
+    g->cam3d.target.z = -0.500f;
+
+    //g->cam3d.position.x -= 0.001f;
+    //g->cam3d.position.y -= 0.004f;
+
+    static float xdir = -0.01f;
+    static float ydir = -0.01f;
+    static float zdir = -0.01f;
+
+    g->cam3d.position.x += xdir;
+    //g->cam3d.position.y += ydir;
+    g->cam3d.position.z += zdir;
+
+    if (g->cam3d.position.x <= -1.0f) {
+        xdir = -xdir;
+    } else if (g->cam3d.position.x >= 1.0f) {
+        xdir = -xdir;
+    }
+
+    //if (g->cam3d.position.y <= 1.0f) {
+    //    ydir = -ydir;
+    //} else if (g->cam3d.position.y >= 8.0f) {
+    //    ydir = -ydir;
+    //}
+
+    if (g->cam3d.position.z <= -1.0f) {
+        zdir = -zdir;
+    } else if (g->cam3d.position.z >= 1.0f) {
+        zdir = -zdir;
+    }
+
+    //g->cam3d.target = g->cubepos;
+
+    UpdateCamera(&g->cam3d, g->cameramode);
+
+
+    //setdebugpaneltopleft(g);
     //setdebugpaneltopright(g);
     //setdebugpanelbottomleft(g);
     //setdebugpanelbottomright(g);
     //setdebugpanelcenter(g);
-
-    //    mprint("updategamestateunsafe");
-    //now = time(NULL);
-    //if (start == 0) {
-    //    //start = now;
-    //    start = g->starttime;
-    //    tm2 = localtime(&start);
-    //    memset(timebuf2, 0, 64);
-    //    strftime(timebuf2, 64, "%Y-%m-%d %H:%M:%S", tm2);
-    //}
-    //tm = localtime(&now);
-    //memset(timebuf, 0, 64);
-    //memset(g->dp.bfr, 0, DEBUGPANELBUFSIZE);
-    //strftime(timebuf, 64, "%Y-%m-%d %H:%M:%S", tm);
-    //snprintf(g->dp.bfr,
-    //         DEBUGPANELBUFSIZE,
-    //         "framecount:   %d\n"
-    //         "start date:   %s\n"
-    //         "current date: %s\n"
-    //         "camera3d.pos: %.2f %.2f %.2f\n"
-    //         "camera3d.target:   %.2f %.2f %.2f\n"
-    //         "camera3d.proj: %d\ncameramode: %d\n",
-    //         g->framecount,
-    //         timebuf2,
-    //         timebuf,
-    //         g->cs->cam3d.position.x,
-    //         g->cs->cam3d.position.y,
-    //         g->cs->cam3d.position.z,
-    //         g->cs->cam3d.target.x,
-    //         g->cs->cam3d.target.y,
-    //         g->cs->cam3d.target.z,
-    //         g->cs->cam3d.projection,
-    //         g->cs->cameramode);
     //g->dp.w = 350;
     //g->dp.h = 200;
     // top left
@@ -336,7 +421,7 @@ void libgameupdategamestate() {
     //g->cs->cam3d.position = (Vector3){-10.0f, 5.0f, 9.0f};
     //g->cs->cam3d.position = (Vector3){-3.0f, 5.0f, 5.0f};
     //g->cs->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
-    //g->cs->cam3d.target = g->cs->cubepos;
+    //g->cam3d.target = g->cubepos;
     //g->cs->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
     //g->cs->cam3d.position.x = 0.0f;
     //g->cs->cam3d.target.x = 0.0f;
@@ -403,21 +488,24 @@ void libgamedrawframe() {
 
 inline void drawdebugpanel() {
     if (g->debugpanelon) {
-        const int fontsize = 20;
+        const int fontsize = 18;
         const int spacing = 1;
 
         Vector2 p = {g->dp.x, g->dp.y};
 
-        bzero(debugpanelbuffer, 1024);
-        snprintf(debugpanelbuffer,
-                 1024,
-                 "Framecount:   %d\n%s\n%s\nfade:         %d\nfadealpha:    %d\nscene:        %d\n",
-                 g->framecount,
-                 g->timebeganbuf,
-                 g->currenttimebuf,
-                 fade,
-                 fadealpha,
-                 activescene);
+        // this content update needs to be separated from the draw
+        //bzero(debugpanelbuffer, 1024);
+        //snprintf(debugpanelbuffer,
+        //         1024,
+        //         "Framecount:   %d\n%s\n%s\nfade:         %d\nfadealpha:    %d\nscene:        %d\n",
+        //         g->framecount,
+        //         g->timebeganbuf,
+        //         g->currenttimebuf,
+        //         fade,
+        //         fadealpha,
+        //         activescene);
+
+
         Vector2 m = MeasureTextEx(gfont, debugpanelbuffer, fontsize, spacing);
         // update the debug panel width and height
         // this code will go elsewhere like an 'update debug panel' method
@@ -451,19 +539,75 @@ inline void drawdebugpanel() {
 
 
 void drawgameplayscene() {
-    //BeginMode2D(g->cam2d);
-    // lets text drawing the hero sprite
-    // now lets draw the sprite
-    //Vector2 origin = {0, 0};
-    //DrawTexturePro(*(hero->texture), hero->src, hero->dest, origin, 0.0f, WHITE);
-    //EndMode2D();
-
     BeginMode3D(g->cam3d);
     ClearBackground(BLACK);
 
-    DrawCube((Vector3){0, 0, 0}, 2.0f, 2.0f, 2.0f, RED);
+
+    //DrawCube((Vector3){0, 0, 0}, 2.0f, 2.0f, 2.0f, RED);
+
+
+    Rectangle dirtsrc = {0, 0, 10, 10};
+    //drawcubetexturerecallfaces(textures[TXDIRT], dirtsrc, (Vector3){0, -1, 0}, 2.0f, 2.0f, 2.0f);
+
+    Vector3 cubesize = {1, 1, 1};
+    Vector3 cube0 = {0, -1, 0};
+    Vector3 cube1 = {0, 0, -0.5f};
+
+    //DrawCubeWires((Vector3){0, -2, 0}, 2.0f, 2.0f, 2.0f, WHITE);
+    //DrawCubeWiresV(cube0, cubesize, WHITE);
+    drawcubetexturerecallfaces(textures[TXDIRT], dirtsrc, cube0, 1.0f, 1.0f, 1.0f);
+
+    drawcubetexturerecfrontface(textures[TXHERO], hero->src, cube1, 1.0f, 1.0f, 1.0f);
 
     EndMode3D();
+
+
+    // this is just for demo/show
+    const Color bgc = BLACK;
+    const Color fgc = {0x66, 0x66, 0x66, 255};
+    const int fontsize = 32;
+    const int spacing = 1;
+    const int interval = 120;
+    const int dur = 60;
+    char b[128];
+    char b2[128];
+    char b3[128];
+    bzero(b, 128);
+    bzero(b2, 128);
+    bzero(b3, 128);
+    snprintf(b, 128, COMPANYNAME);
+    snprintf(b2, 128, COMPANYFILL);
+    snprintf(b3, 128, "presents");
+    const Vector2 measure = MeasureTextEx(gfont, b, fontsize, spacing);
+    const Vector2 measure2 = MeasureTextEx(gfont, b2, fontsize, spacing);
+
+    if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
+        for (int i = 0; i < 10; i++) {
+            shufflestrinplace(b);
+            shufflestrinplace(b3);
+        }
+    }
+    for (int i = 0; i < 10; i++) {
+        shufflestrinplace(b2);
+    }
+
+    const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f,
+                         targetheight / 2.0f - measure.y / 2.0f};
+    //ClearBackground(bgc);
+    DrawTextEx(gfont, b, pos, fontsize, 1, fgc);
+    DrawTextEx(gfont, b2, pos, fontsize, 1, fgc);
+
+    const Vector2 measure3 = MeasureTextEx(gfont, b3, 20, 1);
+    const Vector2 pp = {targetwidth / 2.0f - measure3.x / 2.0f,
+                        targetheight / 2.0f + measure.y / 2.0f + 20};
+
+    DrawTextEx(gfont, b3, pp, 20, 1, fgc);
+
+
+    //BeginMode2D(g->cam2d);
+    //Vector2 origin = {0, 0};
+    //DrawTexturePro(*(hero->texture), hero->src, hero->dest, origin, 0.0f, WHITE);
+    //EndMode2D();
 
 
     handlefade();
@@ -592,7 +736,15 @@ void libgameloadtextures() {
     //SetTextureFilter(textures[TXHERO], TEXTURE_FILTER_POINT);
 
     libgameloadtexture(TXHERO, "img/darkknight2-sheet.png", false);
-    libgameloadtexture(TXDIRT, "img/tile-dirt0.png", true);
+
+    //libgameloadtexture(TXDIRT, "img/tile-dirt0.png", true);
+
+    // do dithering on the dirt texture
+    Image img = LoadImage("img/tile-dirt0.png");
+    ImageDither(&img, 32, 32, 32, 32);
+    //ImageDither(&img, 16, 16, 16, 16);
+    textures[TXDIRT] = LoadTextureFromImage(img);
+    UnloadImage(img);
 }
 
 
@@ -604,15 +756,8 @@ void libgameunloadtexture(int index) {
 
 
 void libgameunloadtextures() {
-
     libgameunloadtexture(TXHERO);
     libgameunloadtexture(TXDIRT);
-
-    //if (textures[TXHERO].id > 0)
-    //    UnloadTexture(textures[TXHERO]);
-
-    //if (textures[TXDIRT].id > 0)
-    //    UnloadTexture(textures[TXDIRT]);
 }
 
 
@@ -631,33 +776,28 @@ void libgameinitsharedsetup() {
     SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
 
     target = LoadRenderTexture(targetwidth, targetheight);
-    //SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
-    //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
-    libgameloadtextures();
-    // lets try initializing a sprite
-    const int numcontexts = 3;
-    const int numframes = 4;
+    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
+    libgameloadtextures();
+
+    // lets try initializing a sprite
+    int numcontexts = 3;
+    int numframes = 4;
     hero = sprite_create(&textures[TXHERO], numcontexts, numframes);
 
     // we need to set the destination
     // this is a function of how much we have scaled the target texture
     // we need to write code to manage this but we will hack something
     // together for right now
-
     const int scale = 2;
+    float x = targetwidth / 2.0f;
+    float y = targetheight / 2.0f;
+    float w = hero->width * scale;
+    float h = hero->height * scale;
 
-    hero->dest = (Rectangle){
-        targetwidth / 2.0f, targetheight / 2.0f, hero->width * scale, hero->height * scale};
+    hero->dest = (Rectangle){x, y, w, h};
 
-    //mprint("before updating camera");
-    //mprint("after updating camera");
-
-    //printf("hero->dest: %.2f %.2f %.2f %.2f\n",
-    //       hero->dest.x,
-    //       hero->dest.y,
-    //       hero->dest.width,
-    //       hero->dest.height);
+    setdebugpaneltopleft(g);
 }
 
 
@@ -688,7 +828,6 @@ void libgameclose() {
 void libgamecloseshared() {
     sprite_destroy(hero);
 
-
     UnloadFont(gfont);
     mprint("unloading textures");
     libgameunloadtextures();
@@ -701,4 +840,125 @@ void libgamecloseshared() {
 
 gamestate* libgamegetgamestate() {
     return g;
+}
+
+
+void drawcubetexturerecfrontface(
+    const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l) {
+    const float rx = src.x + src.width;
+    const float ry = src.y + src.height;
+    const float a = pos.x - w / 2;
+    const float b = pos.x + w / 2;
+    const float c = pos.y - h / 2;
+    const float d = pos.y + h / 2;
+    const float e = pos.z + l / 2;
+    const float f = pos.z - l / 2;
+    // precompute
+    // vertices
+    const Vector3 v[4] = {{a, c, e}, {b, c, e}, {b, d, e}, {a, d, e}};
+    // texture coordinates
+    const Vector2 t[4] = {{src.x / tex.width, ry / tex.height},
+                          {rx / tex.width, ry / tex.height},
+                          {rx / tex.width, src.y / tex.height},
+                          {src.x / tex.width, src.y / tex.height}};
+    // Set desired texture to be enabled while drawintex.height tex.widthollowintex.height vertex data
+    rlSetTexture(tex.id);
+    // We calculate the normalized texture coordinates for the desired texture-source-rectangle
+    // It means converting from (tex.width, tex.height) coordinates to [0.0f, 1.0f] equivalent
+    rlBegin(RL_QUADS);
+    rlColor4ub(255, 255, 255, 255);
+    // draw front face
+    rlNormal3f(0.0f, 0.0f, 1.0f);
+    for (int i = 0; i < 4; i++) {
+        rlTexCoord2f(t[i].x, t[i].y);
+        rlVertex3f(v[i].x, v[i].y, v[i].z);
+    }
+    rlEnd();
+    rlSetTexture(0);
+}
+
+
+void drawcubetexturerecallfaces(
+    const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l) {
+    const float rx = src.x + src.width;
+    const float ry = src.y + src.height;
+    const float a = pos.x - w / 2;
+    const float b = pos.x + w / 2;
+    const float c = pos.y - h / 2;
+    const float d = pos.y + h / 2;
+    const float e = pos.z + l / 2;
+    const float f = pos.z - l / 2;
+    // precompute
+    // vertices
+    const Vector3 v[4] = {{a, c, e}, {b, c, e}, {b, d, e}, {a, d, e}};
+    // texture coordinates
+    const Vector2 t[4] = {{src.x / tex.width, ry / tex.height},
+                          {rx / tex.width, ry / tex.height},
+                          {rx / tex.width, src.y / tex.height},
+                          {src.x / tex.width, src.y / tex.height}};
+    // Set desired texture to be enabled while drawintex.height tex.widthollowintex.height vertex data
+    rlSetTexture(tex.id);
+    // We calculate the normalized texture coordinates for the desired texture-source-rectangle
+    // It means converting from (tex.width, tex.height) coordinates to [0.0f, 1.0f] equivalent
+    rlBegin(RL_QUADS);
+    rlColor4ub(255, 255, 255, 255);
+    // draw front face
+    rlNormal3f(0.0f, 0.0f, 1.0f);
+    for (int i = 0; i < 4; i++) {
+        rlTexCoord2f(t[i].x, t[i].y);
+        rlVertex3f(v[i].x, v[i].y, v[i].z);
+    }
+    /////////////////////////////////////////////////////////
+    // Back face
+    rlNormal3f(0.0f, 0.0f, -1.0f);
+    rlTexCoord2f((src.x + src.width) / tex.width, (src.y + src.height) / tex.height);
+    rlVertex3f(pos.x - w / 2, pos.y - h / 2, pos.z - l / 2);
+    rlTexCoord2f((src.x + src.width) / tex.width, src.y / tex.height);
+    rlVertex3f(pos.x - w / 2, pos.y + h / 2, pos.z - l / 2);
+    rlTexCoord2f(src.x / tex.width, src.y / tex.height);
+    rlVertex3f(pos.x + w / 2, pos.y + h / 2, pos.z - l / 2);
+    rlTexCoord2f(src.x / tex.width, (src.y + src.height) / tex.height);
+    rlVertex3f(pos.x + w / 2, pos.y - h / 2, pos.z - l / 2);
+    // Top face
+    rlNormal3f(0.0f, 1.0f, 0.0f);
+    rlTexCoord2f(src.x / tex.width, src.y / tex.height);
+    rlVertex3f(pos.x - w / 2, pos.y + h / 2, pos.z - l / 2);
+    rlTexCoord2f(src.x / tex.width, (src.y + src.height) / tex.height);
+    rlVertex3f(pos.x - w / 2, pos.y + h / 2, pos.z + l / 2);
+    rlTexCoord2f((src.x + src.width) / tex.width, (src.y + src.height) / tex.height);
+    rlVertex3f(pos.x + w / 2, pos.y + h / 2, pos.z + l / 2);
+    rlTexCoord2f((src.x + src.width) / tex.width, src.y / tex.height);
+    rlVertex3f(pos.x + w / 2, pos.y + h / 2, pos.z - l / 2);
+    // Bottom face
+    rlNormal3f(0.0f, -1.0f, 0.0f);
+    rlTexCoord2f((src.x + src.width) / tex.width, src.y / tex.height);
+    rlVertex3f(pos.x - w / 2, pos.y - h / 2, pos.z - l / 2);
+    rlTexCoord2f(src.x / tex.width, src.y / tex.height);
+    rlVertex3f(pos.x + w / 2, pos.y - h / 2, pos.z - l / 2);
+    rlTexCoord2f(src.x / tex.width, (src.y + src.height) / tex.height);
+    rlVertex3f(pos.x + w / 2, pos.y - h / 2, pos.z + l / 2);
+    rlTexCoord2f((src.x + src.width) / tex.width, (src.y + src.height) / tex.height);
+    rlVertex3f(pos.x - w / 2, pos.y - h / 2, pos.z + l / 2);
+    // Right face
+    rlNormal3f(1.0f, 0.0f, 0.0f);
+    rlTexCoord2f((src.x + src.width) / tex.width, (src.y + src.height) / tex.height);
+    rlVertex3f(pos.x + w / 2, pos.y - h / 2, pos.z - l / 2);
+    rlTexCoord2f((src.x + src.width) / tex.width, src.y / tex.height);
+    rlVertex3f(pos.x + w / 2, pos.y + h / 2, pos.z - l / 2);
+    rlTexCoord2f(src.x / tex.width, src.y / tex.height);
+    rlVertex3f(pos.x + w / 2, pos.y + h / 2, pos.z + l / 2);
+    rlTexCoord2f(src.x / tex.width, (src.y + src.height) / tex.height);
+    rlVertex3f(pos.x + w / 2, pos.y - h / 2, pos.z + l / 2);
+    // Left face
+    rlNormal3f(-1.0f, 0.0f, 0.0f);
+    rlTexCoord2f(src.x / tex.width, (src.y + src.height) / tex.height);
+    rlVertex3f(pos.x - w / 2, pos.y - h / 2, pos.z - l / 2);
+    rlTexCoord2f((src.x + src.width) / tex.width, (src.y + src.height) / tex.height);
+    rlVertex3f(pos.x - w / 2, pos.y - h / 2, pos.z + l / 2);
+    rlTexCoord2f((src.x + src.width) / tex.width, src.y / tex.height);
+    rlVertex3f(pos.x - w / 2, pos.y + h / 2, pos.z + l / 2);
+    rlTexCoord2f(src.x / tex.width, src.y / tex.height);
+    rlVertex3f(pos.x - w / 2, pos.y + h / 2, pos.z - l / 2);
+    rlEnd();
+    rlSetTexture(0);
 }

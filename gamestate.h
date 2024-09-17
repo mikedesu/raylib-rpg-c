@@ -5,6 +5,7 @@
 #include "display.h"
 //#include "sceneint.h"
 #include "sizemacros.h"
+#include <raylib.h>
 #include <stdbool.h>
 #include <time.h>
 
@@ -33,6 +34,8 @@ typedef struct gamestate {
     Camera2D cam2d;
     Camera3D cam3d;
     CameraMode cameramode;
+
+    Vector3 cubepos;
 
 } gamestate;
 
