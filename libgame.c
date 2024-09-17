@@ -4,6 +4,8 @@
 #include "sprite.h"
 #include "utils.h"
 
+#include "setdebugpanel.h"
+
 #include <raylib.h>
 #include <rlgl.h>
 #include <stdio.h>
@@ -91,12 +93,12 @@ void libgameinitsharedsetup();
 void libgamecloseshared();
 gamestate* libgamegetgamestate();
 
-void setdebugpanelxy(gamestate* g, int x, int y);
-void setdebugpaneltopleft(gamestate* g);
-void setdebugpanelbottomleft(gamestate* g);
-void setdebugpanelbottomright(gamestate* g);
-void setdebugpaneltopright(gamestate* g);
-void setdebugpanelcenter(gamestate* g);
+//void setdebugpanelxy(gamestate* g, int x, int y);
+//void setdebugpaneltopleft(gamestate* g);
+//void setdebugpanelbottomleft(gamestate* g);
+//void setdebugpanelbottomright(gamestate* g);
+//void setdebugpaneltopright(gamestate* g);
+//void setdebugpanelcenter(gamestate* g);
 
 void drawcubetexturerecfrontface(
     const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l);
@@ -152,26 +154,8 @@ void libgamehandleinput() {
         g->debugpanelon = !g->debugpanelon;
     }
 
-    //if (IsKeyPressed(KEY_F)) {
-    //    ToggleFullscreen();
-    //}
-
-    if (IsKeyPressed(KEY_C)) {
-        // increment the hero sprite context
-        //sprite_incrcontext(hero);
-
-
-        //g->cam3d.projection = CAMERA_ORTHOGRAPHIC;
-        //g->cam3d.fovy = 45.0f;
-        //g->cam3d.target = (Vector3){0.0f, -1.0f, 0.0f};
-        //g->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
-        //g->cam3d.position = (Vector3){0.0f, 0.0f, 10.0f};
-
-        //g->cameramode = CAMERA_FREE;
-        //UpdateCamera(&g->cam3d, g->cameramode);
-        // change the camera perspective
-        //g->cameramode = CAMERA_FIRST_PERSON;
-        //UpdateCamera(&g->cam3d, g->cameramode);
+    if (IsKeyPressed(KEY_Z)) {
+        g->cam2d.zoom += 0.1f;
     }
 }
 
@@ -211,39 +195,6 @@ void gameclosewindow() {
 }
 
 
-void setdebugpanelxy(gamestate* g, int x, int y) {
-    if (g != NULL) {
-        g->dp.x = x;
-        g->dp.y = y;
-    }
-}
-
-
-void setdebugpaneltopleft(gamestate* g) {
-    setdebugpanelxy(g, 20, 20);
-}
-
-
-void setdebugpanelbottomleft(gamestate* g) {
-    setdebugpanelxy(g, 20, GetScreenHeight() - g->dp.h - 40);
-}
-
-
-void setdebugpanelbottomright(gamestate* g) {
-    setdebugpanelxy(g, GetScreenWidth() - g->dp.w - 20, GetScreenHeight() - g->dp.h - 40);
-}
-
-
-void setdebugpaneltopright(gamestate* g) {
-    setdebugpanelxy(g, GetScreenWidth() - g->dp.w - 20, 20);
-}
-
-
-void setdebugpanelcenter(gamestate* g) {
-    setdebugpanelxy(g, GetScreenWidth() / 2 - g->dp.w / 2, GetScreenHeight() / 2 - g->dp.h / 2);
-}
-
-
 void libgameupdatedebugpanelbuffer() {
     bzero(debugpanelbuffer, 1024);
     snprintf(debugpanelbuffer,
@@ -251,32 +202,18 @@ void libgameupdatedebugpanelbuffer() {
              "Framecount:    %d\n"
              "%s\n"
              "%s\n"
-             "Cam.position:  %.2f,%.2f,%.2f\n"
-             "Cam.target:    %.2f,%.2f,%.2f\n"
-             "Cam Mode:      %d\n"
-             "Cube position: %.2f,%.2f,%.2f\n"
+             "Cam.target:  %.2f,%.2f\n"
+             "Cam.offset:    %.2f,%.2f\n"
              "Active scene:  %d\n",
              g->framecount,
-
 
              g->timebeganbuf,
              g->currenttimebuf,
 
-
-             g->cam3d.position.x,
-             g->cam3d.position.y,
-             g->cam3d.position.z,
-
-
-             g->cam3d.target.x,
-             g->cam3d.target.y,
-             g->cam3d.target.z,
-
-             g->cameramode,
-
-             g->cubepos.x,
-             g->cubepos.y,
-             g->cubepos.z,
+             g->cam2d.target.x,
+             g->cam2d.target.y,
+             g->cam2d.offset.x,
+             g->cam2d.offset.y,
 
              activescene);
 }
@@ -284,44 +221,40 @@ void libgameupdatedebugpanelbuffer() {
 
 void libgameupdategamestate() {
 
-
     libgameupdatedebugpanelbuffer();
     //g->cam3d.target.x = 0;
     //g->cam3d.target.y = -1;
     //g->cam3d.target.z = 0;
-
-
     //g->cubepos.x += 0.001f;
-
     // trying to get the camera to properly follow...
     //g->cameramode = CAMERA_FREE;
 
-    g->cubepos = (Vector3){0.0f, -1.0f, 0.0f};
+    //g->cubepos = (Vector3){0.0f, -1.0f, 0.0f};
 
     //g->cam3d.position.x = 0.000f;
     //g->cam3d.position.y = 0.000f;
     //g->cam3d.position.z = 2.000f;
 
-    g->cam3d.target.x = 0.000f;
-    g->cam3d.target.y = 0.000f;
-    g->cam3d.target.z = -0.500f;
+    //g->cam3d.target.x = 0.000f;
+    //g->cam3d.target.y = 0.000f;
+    //g->cam3d.target.z = -0.500f;
 
     //g->cam3d.position.x -= 0.001f;
     //g->cam3d.position.y -= 0.004f;
 
-    static float xdir = -0.01f;
-    static float ydir = -0.01f;
-    static float zdir = -0.01f;
+    //static float xdir = -0.01f;
+    //static float ydir = -0.01f;
+    //static float zdir = -0.01f;
 
-    g->cam3d.position.x += xdir;
+    //g->cam3d.position.x += xdir;
     //g->cam3d.position.y += ydir;
-    g->cam3d.position.z += zdir;
+    //g->cam3d.position.z += zdir;
 
-    if (g->cam3d.position.x <= -1.0f) {
-        xdir = -xdir;
-    } else if (g->cam3d.position.x >= 1.0f) {
-        xdir = -xdir;
-    }
+    //if (g->cam3d.position.x <= -1.0f) {
+    //    xdir = -xdir;
+    //} else if (g->cam3d.position.x >= 1.0f) {
+    //    xdir = -xdir;
+    //}
 
     //if (g->cam3d.position.y <= 1.0f) {
     //    ydir = -ydir;
@@ -329,15 +262,15 @@ void libgameupdategamestate() {
     //    ydir = -ydir;
     //}
 
-    if (g->cam3d.position.z <= -1.0f) {
-        zdir = -zdir;
-    } else if (g->cam3d.position.z >= 1.0f) {
-        zdir = -zdir;
-    }
+    //if (g->cam3d.position.z <= -1.0f) {
+    //    zdir = -zdir;
+    //} else if (g->cam3d.position.z >= 1.0f) {
+    //    zdir = -zdir;
+    //}
 
     //g->cam3d.target = g->cubepos;
 
-    UpdateCamera(&g->cam3d, g->cameramode);
+    //UpdateCamera(&g->cam3d, g->cameramode);
 
 
     //setdebugpaneltopleft(g);
@@ -539,75 +472,30 @@ inline void drawdebugpanel() {
 
 
 void drawgameplayscene() {
-    BeginMode3D(g->cam3d);
+    BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
 
 
     //DrawCube((Vector3){0, 0, 0}, 2.0f, 2.0f, 2.0f, RED);
-
-
-    Rectangle dirtsrc = {0, 0, 10, 10};
+    //Rectangle dirtsrc = {0, 0, 10, 10};
     //drawcubetexturerecallfaces(textures[TXDIRT], dirtsrc, (Vector3){0, -1, 0}, 2.0f, 2.0f, 2.0f);
-
-    Vector3 cubesize = {1, 1, 1};
-    Vector3 cube0 = {0, -1, 0};
-    Vector3 cube1 = {0, 0, -0.5f};
-
+    //Vector3 cubesize = {1, 1, 1};
+    //Vector3 cube0 = {0, -1, 0};
+    //Vector3 cube1 = {0, 0, -0.5f};
     //DrawCubeWires((Vector3){0, -2, 0}, 2.0f, 2.0f, 2.0f, WHITE);
     //DrawCubeWiresV(cube0, cubesize, WHITE);
-    drawcubetexturerecallfaces(textures[TXDIRT], dirtsrc, cube0, 1.0f, 1.0f, 1.0f);
+    //drawcubetexturerecallfaces(textures[TXDIRT], dirtsrc, cube0, 1.0f, 1.0f, 1.0f);
+    //drawcubetexturerecfrontface(textures[TXHERO], hero->src, cube1, 1.0f, 1.0f, 1.0f);
 
-    drawcubetexturerecfrontface(textures[TXHERO], hero->src, cube1, 1.0f, 1.0f, 1.0f);
 
-    EndMode3D();
+    // letts draw the sprite
+    DrawTextureRec(textures[TXHERO], hero->src, (Vector2){0, 0}, WHITE);
+
+
+    EndMode2D();
 
 
     // this is just for demo/show
-    const Color bgc = BLACK;
-    const Color fgc = {0x66, 0x66, 0x66, 255};
-    const int fontsize = 32;
-    const int spacing = 1;
-    const int interval = 120;
-    const int dur = 60;
-    char b[128];
-    char b2[128];
-    char b3[128];
-    bzero(b, 128);
-    bzero(b2, 128);
-    bzero(b3, 128);
-    snprintf(b, 128, COMPANYNAME);
-    snprintf(b2, 128, COMPANYFILL);
-    snprintf(b3, 128, "presents");
-    const Vector2 measure = MeasureTextEx(gfont, b, fontsize, spacing);
-    const Vector2 measure2 = MeasureTextEx(gfont, b2, fontsize, spacing);
-
-    if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
-        for (int i = 0; i < 10; i++) {
-            shufflestrinplace(b);
-            shufflestrinplace(b3);
-        }
-    }
-    for (int i = 0; i < 10; i++) {
-        shufflestrinplace(b2);
-    }
-
-    const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f,
-                         targetheight / 2.0f - measure.y / 2.0f};
-    //ClearBackground(bgc);
-    DrawTextEx(gfont, b, pos, fontsize, 1, fgc);
-    DrawTextEx(gfont, b2, pos, fontsize, 1, fgc);
-
-    const Vector2 measure3 = MeasureTextEx(gfont, b3, 20, 1);
-    const Vector2 pp = {targetwidth / 2.0f - measure3.x / 2.0f,
-                        targetheight / 2.0f + measure.y / 2.0f + 20};
-
-    DrawTextEx(gfont, b3, pp, 20, 1, fgc);
-
-
-    //BeginMode2D(g->cam2d);
-    //Vector2 origin = {0, 0};
-    //DrawTexturePro(*(hero->texture), hero->src, hero->dest, origin, 0.0f, WHITE);
-    //EndMode2D();
 
 
     handlefade();
@@ -763,8 +651,9 @@ void libgameunloadtextures() {
 
 void libgameinit() {
     mprint("libgameinit");
-    libgameinitsharedsetup();
+
     g = gamestateinitptr();
+    libgameinitsharedsetup();
 }
 
 
@@ -773,10 +662,10 @@ void libgameinitsharedsetup() {
 
     //gfont = LoadFont("fonts/hack.ttf");
     gfont = LoadFontEx("fonts/hack.ttf", 60, 0, 250);
-    SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
+    //SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
 
     target = LoadRenderTexture(targetwidth, targetheight);
-    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
     libgameloadtextures();
 
@@ -798,6 +687,9 @@ void libgameinitsharedsetup() {
     hero->dest = (Rectangle){x, y, w, h};
 
     setdebugpaneltopleft(g);
+
+
+    g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
 }
 
 
@@ -807,8 +699,8 @@ void libgameinitwithstate(void* state) {
         return;
     }
     mprint("libgameinitwithstate");
-    libgameinitsharedsetup();
     g = (gamestate*)state;
+    libgameinitsharedsetup();
 }
 
 

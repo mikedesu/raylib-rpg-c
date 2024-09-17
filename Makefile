@@ -3,7 +3,7 @@ OBJ=-c
 SHARED=-shared
 DATA_STRUCTS=vectorentityid.o 
 SCENES=companyscene.o 
-LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o gamestate.o utils.o sprite.o
+LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o gamestate.o utils.o sprite.o setdebugpanel.o
 STATIC_LINK_RAYLIB=-l:libraylib.a
 LINK_MATH=-lm
 POSITION_INDEPENDENT_CODE=-fPIC
@@ -42,6 +42,12 @@ vectorentityid.o: vectorentityid.c
 
 utils.o: utils.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+
+
+
+setdebugpanel.o: setdebugpanel.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+
 
 
 # Main reloadable game base

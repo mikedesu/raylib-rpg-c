@@ -3,15 +3,12 @@
 #include "companyscene.h"
 #include "debugpanel.h"
 #include "display.h"
-//#include "sceneint.h"
 #include "sizemacros.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <time.h>
 
 typedef struct gamestate {
-    //bool dodebugpanel;
-    //bool dofps;
     int framecount;
 
     time_t timebegan;
@@ -23,19 +20,12 @@ typedef struct gamestate {
     struct tm* currenttimetm;
 
     bool debugpanelon;
-    //mycolor clearcolor;
     debugpanel dp;
     //display d;
-    //sceneint currentscene;
-    //companyscene* cs;
     //time_t starttime;
     //struct tm* starttm;
 
     Camera2D cam2d;
-    Camera3D cam3d;
-    CameraMode cameramode;
-
-    Vector3 cubepos;
 
 } gamestate;
 
