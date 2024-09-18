@@ -52,6 +52,11 @@ gamestate* gamestateinitptr() {
     g->cam2d.zoom = 1.0;
     g->cam2d.rotation = 0.0;
 
+    g->controlmode = CONTROLMODE_CAMERA;
+
+    g->fadealpha = 0.0f;
+    g->fadestate = FADESTATENONE;
+
     return g;
 }
 

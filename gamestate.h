@@ -1,8 +1,10 @@
 #pragma once
 
 #include "companyscene.h"
+#include "controlmode.h"
 #include "debugpanel.h"
 #include "display.h"
+#include "fadestate.h"
 #include "sizemacros.h"
 #include <raylib.h>
 #include <stdbool.h>
@@ -28,6 +30,11 @@ typedef struct gamestate {
     Camera2D cam2d;
 
     companyscene cs;
+
+    controlmode_t controlmode;
+
+    int fadealpha;
+    fadestate_t fadestate;
 
     //display d;
     //time_t starttime;

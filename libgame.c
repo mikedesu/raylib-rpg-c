@@ -22,13 +22,8 @@
 //--------------------------------------------------------------------
 char debugpanelbuffer[1024] = {0};
 
-//int activescene = COMPANYSCENE;
-//int activescene = TITLESCENE;
 int activescene = GAMEPLAYSCENE;
 
-fadestate fade = FADESTATENONE;
-
-int fadealpha = 0;
 
 gamestate* g = NULL;
 
@@ -51,8 +46,6 @@ Texture textures[10];
 sprite* hero = NULL;
 
 dungeonfloor_t* dungeonfloor = NULL;
-
-controlmode_t controlmode = CONTROLMODE_CAMERA;
 
 //--------------------------------------------------------------------
 // function declarations
@@ -91,16 +84,18 @@ gamestate* libgame_getgamestate();
 void libgame_drawframeend(gamestate* g);
 
 
+void libgame_handleplayerinput(gamestate* g);
 void libgame_handlecaminput(gamestate* g);
 void libgame_handledebugpanelswitch(gamestate* g);
+void libgame_handlemodeswitch(gamestate* g);
 
 
 //--------------------------------------------------------------------
 // definitions
 //--------------------------------------------------------------------
 void drawfade() {
-    if (fadealpha > 0) {
-        Color c = {0, 0, 0, fadealpha};
+    if (g->fadealpha > 0) {
+        Color c = {0, 0, 0, g->fadealpha};
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), c);
     }
 }
@@ -108,24 +103,24 @@ void drawfade() {
 
 void handlefade() {
     const int fadespeed = 4;
-    if (fade == FADESTATEOUT && fadealpha < 255) {
-        fadealpha += fadespeed;
-    } else if (fade == FADESTATEIN && fadealpha > 0) {
-        fadealpha -= fadespeed;
+    if (g->fadestate == FADESTATEOUT && g->fadealpha < 255) {
+        g->fadealpha += fadespeed;
+    } else if (g->fadestate == FADESTATEIN && g->fadealpha > 0) {
+        g->fadealpha -= fadespeed;
     }
 
-    if (fadealpha >= 255) {
-        fadealpha = 255;
-        fade = FADESTATEIN;
+    if (g->fadealpha >= 255) {
+        g->fadealpha = 255;
+        g->fadestate = FADESTATEIN;
         activescene++;
         if (activescene > 2) {
             activescene = 0;
         }
     }
 
-    if (fadealpha <= 0) {
-        fadealpha = 0;
-        fade = FADESTATENONE;
+    if (g->fadealpha <= 0) {
+        g->fadealpha = 0;
+        g->fadestate = FADESTATENONE;
     }
 
     drawfade();
@@ -135,23 +130,26 @@ void handlefade() {
 void libgamehandleinput() {
     if (IsKeyPressed(KEY_SPACE)) {
         mprint("key space pressed");
-        if (fade == FADESTATENONE) {
-            fade = FADESTATEOUT;
+        if (g->fadestate == FADESTATENONE) {
+            g->fadestate = FADESTATEOUT;
         }
     }
 
-
-    if (IsKeyPressed(KEY_C)) {
-        if (controlmode == CONTROLMODE_CAMERA) {
-            controlmode = CONTROLMODE_PLAYER;
-        } else {
-            controlmode = CONTROLMODE_CAMERA;
-        }
-    }
-
-
+    libgame_handlemodeswitch(g);
     libgame_handledebugpanelswitch(g);
+    libgame_handleplayerinput(g);
     libgame_handlecaminput(g);
+}
+
+
+void libgame_handlemodeswitch(gamestate* g) {
+    if (IsKeyPressed(KEY_C)) {
+        if (g->controlmode == CONTROLMODE_CAMERA) {
+            g->controlmode = CONTROLMODE_PLAYER;
+        } else {
+            g->controlmode = CONTROLMODE_CAMERA;
+        }
+    }
 }
 
 
@@ -162,28 +160,57 @@ void libgame_handledebugpanelswitch(gamestate* g) {
 }
 
 
+void libgame_handleplayerinput(gamestate* g) {
+
+    if (g->controlmode == CONTROLMODE_PLAYER) {
+
+        const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+
+
+        // this is just a test
+        // the real setup will involve managing the player's dungeon position
+        // and then translating that into a destination on screen
+        if (IsKeyPressed(KEY_RIGHT)) {
+            hero->dest.x += 20;
+        } else if (IsKeyPressed(KEY_LEFT)) {
+            hero->dest.x -= 20;
+        }
+
+        if (IsKeyPressed(KEY_DOWN)) {
+            hero->dest.y += 20;
+        } else if (IsKeyPressed(KEY_UP)) {
+            hero->dest.y -= 20;
+        }
+    }
+}
+
+
 void libgame_handlecaminput(gamestate* g) {
-    const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
-    const float zoom_incr = 0.01f;
-    const float cam_move_incr = 1;
 
-    if (IsKeyDown(KEY_Z) && shift) {
-        g->cam2d.zoom -= zoom_incr;
-        //} else if (IsKeyPressed(KEY_Z)) {
-    } else if (IsKeyDown(KEY_Z)) {
-        g->cam2d.zoom += zoom_incr;
-    }
+    if (g->controlmode == CONTROLMODE_CAMERA) {
 
-    if (IsKeyDown(KEY_UP)) {
-        g->cam2d.target.y -= cam_move_incr;
-    } else if (IsKeyDown(KEY_DOWN)) {
-        g->cam2d.target.y += cam_move_incr;
-    }
+        const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+        const float zoom_incr = 0.01f;
+        const float cam_move_incr = 1;
 
-    if (IsKeyDown(KEY_LEFT)) {
-        g->cam2d.target.x -= cam_move_incr;
-    } else if (IsKeyDown(KEY_RIGHT)) {
-        g->cam2d.target.x += cam_move_incr;
+        if (IsKeyDown(KEY_Z) && shift) {
+            g->cam2d.zoom -= zoom_incr;
+            //} else if (IsKeyPressed(KEY_Z)) {
+        } else if (IsKeyDown(KEY_Z)) {
+            g->cam2d.zoom += zoom_incr;
+        }
+
+        if (IsKeyDown(KEY_UP)) {
+            g->cam2d.target.y -= cam_move_incr;
+        } else if (IsKeyDown(KEY_DOWN)) {
+            g->cam2d.target.y += cam_move_incr;
+        }
+
+        if (IsKeyDown(KEY_LEFT)) {
+            g->cam2d.target.x -= cam_move_incr;
+        } else if (IsKeyDown(KEY_RIGHT)) {
+            g->cam2d.target.x += cam_move_incr;
+        }
     }
 }
 
@@ -254,7 +281,7 @@ void libgameupdatedebugpanelbuffer() {
 
              activescene,
 
-             controlmode);
+             g->controlmode);
 }
 
 
@@ -290,8 +317,8 @@ void libgamedrawframe() {
     EndTextureMode();
 
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-
     drawdebugpanel();
+
 
     libgame_drawframeend(g);
 }
@@ -303,20 +330,6 @@ inline void drawdebugpanel() {
         const int spacing = 1;
 
         Vector2 p = {g->dp.x, g->dp.y};
-
-        // this content update needs to be separated from the draw
-        //bzero(debugpanelbuffer, 1024);
-        //snprintf(debugpanelbuffer,
-        //         1024,
-        //         "Framecount:   %d\n%s\n%s\nfade:         %d\nfadealpha:    %d\nscene:        %d\n",
-        //         g->framecount,
-        //         g->timebeganbuf,
-        //         g->currenttimebuf,
-        //         fade,
-        //         fadealpha,
-        //         activescene);
-
-
         Vector2 m = MeasureTextEx(gfont, debugpanelbuffer, fontsize, spacing);
         // update the debug panel width and height
         // this code will go elsewhere like an 'update debug panel' method
