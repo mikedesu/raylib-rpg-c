@@ -81,13 +81,18 @@ void loadsymbols() {
     //myupdategamestateunsafe = (void (*)(gamestate*))dlsym(handle, "updategamestateunsafe");
     // casting these to indicate return types and possible args
 
-    mprint("windowshouldclose");
-    mywindowshouldclose = (bool (*)(void))dlsym(handle, "gamewindowshouldclose");
-    checksymbol(mywindowshouldclose, "gamewindowshouldclose");
+    char* sym = "libgame_windowshouldclose";
+    mprint(sym);
+    mywindowshouldclose = (bool (*)(void))dlsym(handle, sym);
+    checksymbol(mywindowshouldclose, sym);
 
-    mprint("initwindow");
-    myinitwindow = dlsym(handle, "gameinitwindow");
-    checksymbol(myinitwindow, "gameinitwindow");
+    sym = "gameinitwindow";
+    mprint(sym);
+    myinitwindow = dlsym(handle, sym);
+    checksymbol(myinitwindow, sym);
+    //mprint("initwindow");
+    //myinitwindow = dlsym(handle, "gameinitwindow");
+    //checksymbol(myinitwindow, "gameinitwindow");
 
     mprint("closewindow");
     myclosewindow = dlsym(handle, "gameclosewindow");

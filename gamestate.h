@@ -8,24 +8,31 @@
 #include <stdbool.h>
 #include <time.h>
 
+#define GAMESTATE_SIZEOFTIMEBUF 64
+#define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
+
 typedef struct gamestate {
     int framecount;
 
     time_t timebegan;
-    char timebeganbuf[64];
+    char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF];
     struct tm* timebegantm;
 
     time_t currenttime;
-    char currenttimebuf[64];
+    char currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
     struct tm* currenttimetm;
 
     bool debugpanelon;
     debugpanel dp;
+
+    Camera2D cam2d;
+
+    companyscene cs;
+
     //display d;
     //time_t starttime;
     //struct tm* starttm;
 
-    Camera2D cam2d;
 
 } gamestate;
 

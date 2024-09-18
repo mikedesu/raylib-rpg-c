@@ -36,7 +36,6 @@
 #define COMPANYNAME "@evildojo666"
 #define COMPANYFILL "   x  x x   "
 
-
 char debugpanelbuffer[1024] = {0};
 
 //int activescene = COMPANYSCENE;
@@ -69,7 +68,8 @@ sprite* hero = NULL;
 //--------------------------------------------------------------------
 // function declarations
 //--------------------------------------------------------------------
-bool gamewindowshouldclose();
+bool libgame_windowshouldclose();
+
 void gameinitwindow();
 void gameclosewindow();
 void libgameupdatedebugpanelbuffer();
@@ -93,18 +93,8 @@ void libgameinitsharedsetup();
 void libgamecloseshared();
 gamestate* libgamegetgamestate();
 
-//void setdebugpanelxy(gamestate* g, int x, int y);
-//void setdebugpaneltopleft(gamestate* g);
-//void setdebugpanelbottomleft(gamestate* g);
-//void setdebugpanelbottomright(gamestate* g);
-//void setdebugpaneltopright(gamestate* g);
-//void setdebugpanelcenter(gamestate* g);
+void libgame_drawframeend(gamestate* g);
 
-void drawcubetexturerecfrontface(
-    const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l);
-
-void drawcubetexturerecallfaces(
-    const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l);
 //--------------------------------------------------------------------
 // definitions
 //--------------------------------------------------------------------
@@ -160,7 +150,7 @@ void libgamehandleinput() {
 }
 
 
-bool gamewindowshouldclose() {
+bool libgame_windowshouldclose() {
     return WindowShouldClose();
 }
 
@@ -381,6 +371,11 @@ void libgameupdategamestate() {
     //g->cs->dodrawpresents = true;
 }
 
+void libgame_drawframeend(gamestate* g) {
+    EndDrawing();
+    g->framecount++;
+    gamestateupdatecurrenttime(g);
+}
 
 void libgamedrawframe() {
 
@@ -409,13 +404,14 @@ void libgamedrawframe() {
 
     drawdebugpanel();
 
-    EndDrawing();
+    libgame_drawframeend(g);
 
-    g->framecount++;
-    gamestateupdatecurrenttime(g);
+    //EndDrawing();
+    //g->framecount++;
+    //gamestateupdatecurrenttime(g);
 
-    g->dp.x = 10;
-    g->dp.y = 10;
+    //g->dp.x = 10;
+    //g->dp.y = 10;
 }
 
 
@@ -475,28 +471,10 @@ void drawgameplayscene() {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
 
-
-    //DrawCube((Vector3){0, 0, 0}, 2.0f, 2.0f, 2.0f, RED);
-    //Rectangle dirtsrc = {0, 0, 10, 10};
-    //drawcubetexturerecallfaces(textures[TXDIRT], dirtsrc, (Vector3){0, -1, 0}, 2.0f, 2.0f, 2.0f);
-    //Vector3 cubesize = {1, 1, 1};
-    //Vector3 cube0 = {0, -1, 0};
-    //Vector3 cube1 = {0, 0, -0.5f};
-    //DrawCubeWires((Vector3){0, -2, 0}, 2.0f, 2.0f, 2.0f, WHITE);
-    //DrawCubeWiresV(cube0, cubesize, WHITE);
-    //drawcubetexturerecallfaces(textures[TXDIRT], dirtsrc, cube0, 1.0f, 1.0f, 1.0f);
-    //drawcubetexturerecfrontface(textures[TXHERO], hero->src, cube1, 1.0f, 1.0f, 1.0f);
-
-
-    // letts draw the sprite
+    // lets draw the sprite
     DrawTextureRec(textures[TXHERO], hero->src, (Vector2){0, 0}, WHITE);
 
-
     EndMode2D();
-
-
-    // this is just for demo/show
-
 
     handlefade();
 

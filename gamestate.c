@@ -19,8 +19,27 @@ gamestate* gamestateinitptr() {
     g->framecount = 0;
     g->timebegan = time(NULL);
     g->timebegantm = localtime(&(g->timebegan));
-    bzero(g->timebeganbuf, 64);
-    strftime(g->timebeganbuf, 64, "Start Time:   %Y-%m-%d %H:%M:%S", g->timebegantm);
+    g->currenttime = time(NULL);
+    g->currenttimetm = localtime(&(g->currenttime));
+
+
+    bzero(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
+    strftime(g->timebeganbuf,
+             GAMESTATE_SIZEOFTIMEBUF,
+             "Start Time:   %Y-%m-%d %H:%M:%S",
+             g->timebegantm);
+    bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
+    strftime(g->currenttimebuf,
+             GAMESTATE_SIZEOFTIMEBUF,
+             "Current Time: %Y-%m-%d %H:%M:%S",
+             g->currenttimetm);
+
+    //bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
+    //strftime(g->currenttimebuf,
+    //         GAMESTATE_SIZEOFTIMEBUF,
+    //         "Current Time: %Y-%m-%d %H:%M:%S",
+    //         g->currenttimetm);
+
 
     gamestateupdatecurrenttime(g);
 
