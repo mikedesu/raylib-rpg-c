@@ -8,6 +8,8 @@
 #include "libgame_defines.h"
 #include "setdebugpanel.h"
 
+#include "controlmode.h"
+
 #include <raylib.h>
 #include <rlgl.h>
 #include <stdio.h>
@@ -50,6 +52,7 @@ sprite* hero = NULL;
 
 dungeonfloor_t* dungeonfloor = NULL;
 
+controlmode_t controlmode = CONTROLMODE_CAMERA;
 
 //--------------------------------------------------------------------
 // function declarations
@@ -86,6 +89,11 @@ void drawfade();
 
 gamestate* libgame_getgamestate();
 void libgame_drawframeend(gamestate* g);
+
+
+void libgame_handlecaminput(gamestate* g);
+void libgame_handledebugpanelswitch(gamestate* g);
+
 
 //--------------------------------------------------------------------
 // definitions
@@ -125,9 +133,6 @@ void handlefade() {
 
 
 void libgamehandleinput() {
-
-    bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
-
     if (IsKeyPressed(KEY_SPACE)) {
         mprint("key space pressed");
         if (fade == FADESTATENONE) {
@@ -135,18 +140,50 @@ void libgamehandleinput() {
         }
     }
 
+
+    if (IsKeyPressed(KEY_C)) {
+        if (controlmode == CONTROLMODE_CAMERA) {
+            controlmode = CONTROLMODE_PLAYER;
+        } else {
+            controlmode = CONTROLMODE_CAMERA;
+        }
+    }
+
+
+    libgame_handledebugpanelswitch(g);
+    libgame_handlecaminput(g);
+}
+
+
+void libgame_handledebugpanelswitch(gamestate* g) {
     if (IsKeyPressed(KEY_D)) {
         g->debugpanelon = !g->debugpanelon;
     }
+}
 
-    //if (IsKeyPressed(KEY_Z) && shift) {
 
-    const float zoom_incr = 0.1f;
+void libgame_handlecaminput(gamestate* g) {
+    const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+    const float zoom_incr = 0.01f;
+    const float cam_move_incr = 1;
+
     if (IsKeyDown(KEY_Z) && shift) {
         g->cam2d.zoom -= zoom_incr;
         //} else if (IsKeyPressed(KEY_Z)) {
     } else if (IsKeyDown(KEY_Z)) {
         g->cam2d.zoom += zoom_incr;
+    }
+
+    if (IsKeyDown(KEY_UP)) {
+        g->cam2d.target.y -= cam_move_incr;
+    } else if (IsKeyDown(KEY_DOWN)) {
+        g->cam2d.target.y += cam_move_incr;
+    }
+
+    if (IsKeyDown(KEY_LEFT)) {
+        g->cam2d.target.x -= cam_move_incr;
+    } else if (IsKeyDown(KEY_RIGHT)) {
+        g->cam2d.target.x += cam_move_incr;
     }
 }
 
@@ -157,7 +194,7 @@ bool libgame_windowshouldclose() {
 
 
 void gameinitwindow() {
-    const char* title = "project rpg v0.000001";
+    const char* title = DEFAULT_WINDOW_TITLE;
     mprint("begin gameinitwindow");
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
@@ -167,14 +204,11 @@ void gameinitwindow() {
     // this is hard-coded for now so we can auto-position the window
     // for easier config during streaming
     SetWindowMonitor(0);
-    //SetWindowPosition(1920, 0);
-    //const int pad = 900;
-    //const int x = 1920 + pad;
     const int x = DEFAULT_WINDOW_POS_X;
     const int y = DEFAULT_WINDOW_POS_Y;
     SetWindowPosition(x, y);
 
-    SetTargetFPS(60);
+    SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_Q);
     mprint("end of gameinitwindow");
 }
@@ -187,20 +221,29 @@ void gameclosewindow() {
 
 
 void libgameupdatedebugpanelbuffer() {
-    bzero(debugpanelbuffer, 1024);
+    //bzero(debugpanelbuffer, 1024);
     snprintf(debugpanelbuffer,
              1024,
-             "Framecount:    %d\n"
+             "Framecount:   %d\n"
              "%s\n"
              "%s\n"
-             "Cam.target:    %.2f,%.2f\n"
-             "Cam.offset:    %.2f,%.2f\n"
-             "Cam.zoom:      %.2f\n"
-             "Active scene:  %d\n",
+             "Target size:  %d,%d\n"
+             "Window size:  %d,%d\n"
+             "Cam.target:   %.2f,%.2f\n"
+             "Cam.offset:   %.2f,%.2f\n"
+             "Cam.zoom:     %.2f\n"
+             "Active scene: %d\n"
+             "Control mode: %d\n",
              g->framecount,
 
              g->timebeganbuf,
              g->currenttimebuf,
+
+             targetwidth,
+             targetheight,
+
+             windowwidth,
+             windowheight,
 
              g->cam2d.target.x,
              g->cam2d.target.y,
@@ -209,7 +252,9 @@ void libgameupdatedebugpanelbuffer() {
 
              g->cam2d.zoom,
 
-             activescene);
+             activescene,
+
+             controlmode);
 }
 
 
@@ -311,10 +356,15 @@ void drawgameplayscene() {
     // lets draw the sprite
     //DrawTextureEx(textures[TXHERO], (Vector2){hero->dest.x, hero->dest.y}, 0.0f, 1.0f, WHITE);
 
-    Rectangle tile_src = {0, 0, 32, 32};
-    Rectangle tile_dest = {0, 0, 32, 32};
+    const int w = textures[TXDIRT].width;
+    const int h = textures[TXDIRT].height;
+
+    Rectangle tile_src = {0, 0, w, h};
+    Rectangle tile_dest = {0, 0, w, h};
     Vector2 origin = {0, 0};
     Color c = WHITE;
+    Color border0 = RED;
+    Color border1 = GREEN;
     float rotation = 0;
 
     //DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
@@ -323,13 +373,21 @@ void drawgameplayscene() {
 
     for (int i = 0; i < dungeonfloor->len; i++) {
         for (int j = 0; j < dungeonfloor->wid; j++) {
-            tile_dest.x = i * 32;
-            tile_dest.y = j * 32;
+            tile_dest.x = i * w;
+            tile_dest.y = j * h;
             DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
+            // lets also draw a border around the tiles
+
+            if (g->debugpanelon) {
+                DrawRectangleLinesEx(tile_dest, 1, border0);
+            }
         }
     }
 
     DrawTexturePro(textures[TXHERO], hero->src, hero->dest, origin, rotation, c);
+    if (g->debugpanelon) {
+        DrawRectangleLinesEx(hero->dest, 1, border1);
+    }
 
     EndMode2D();
 
@@ -463,8 +521,8 @@ void libgame_loadtextures() {
 
     // do dithering on the dirt texture
     Image img = LoadImage("img/tile-dirt0.png");
-    ImageDither(&img, 32, 32, 32, 32);
-    //ImageDither(&img, 16, 16, 16, 16);
+    //ImageDither(&img, 32, 32, 32, 32);
+    ImageDither(&img, 4, 4, 4, 4);
     textures[TXDIRT] = LoadTextureFromImage(img);
     UnloadImage(img);
 }
@@ -510,14 +568,21 @@ void libgame_initsharedsetup() {
     // this is a function of how much we have scaled the target texture
     // we need to write code to manage this but we will hack something
     // together for right now
-    const int scale = 1;
     float x = 0;
     float y = 0;
-    //float x = targetwidth / 2.0f;
-    //float y = targetheight / 2.0f;
-    float w = hero->width * scale;
-    float h = hero->height * scale;
-    hero->dest = (Rectangle){x, y, w, h};
+    float w = hero->width;
+    float h = hero->height;
+
+    // notice that the hero is a bit larger than the tile
+    // we can solve this a number of ways
+    //
+    // 1. we could force all things to be the size of the tile, which would involve drawing a new hero
+    //
+    // 2. we could adjust the hero's destination by modifying the y position
+
+    const float offset_y = -8;
+
+    hero->dest = (Rectangle){x, y + offset_y, w, h};
 
     setdebugpaneltopleft(g);
 

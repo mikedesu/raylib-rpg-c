@@ -20,9 +20,10 @@ typedef struct tile_t {
 typedef struct dungeonfloor_t {
     int len;
     int wid;
-    tile_t** grid;
+    tile_t* grid;
 
 } dungeonfloor_t;
 
 dungeonfloor_t* create_dungeonfloor(int len, int wid, tiletype_t basetype);
 void dungeonfloor_free(dungeonfloor_t* d);
+void dungeonfloor_setalltiles(dungeonfloor_t* d, tiletype_t type);
