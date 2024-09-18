@@ -4,6 +4,7 @@
 #include "sprite.h"
 #include "utils.h"
 
+#include "dungeonfloor.h"
 #include "libgame_defines.h"
 #include "setdebugpanel.h"
 
@@ -32,6 +33,9 @@ gamestate* g = NULL;
 Font gfont;
 
 RenderTexture target;
+Rectangle target_src;
+Rectangle target_dest;
+Vector2 target_origin = (Vector2){0, 0};
 
 int targetwidth = DEFAULT_TARGET_WIDTH;
 int targetheight = DEFAULT_TARGET_HEIGHT;
@@ -43,6 +47,8 @@ float scale = DEFAULT_SCALE;
 Texture textures[10];
 
 sprite* hero = NULL;
+
+dungeonfloor_t* df = NULL;
 
 
 //--------------------------------------------------------------------
@@ -199,166 +205,15 @@ void libgameupdatedebugpanelbuffer() {
 
 
 void libgameupdategamestate() {
-
     libgameupdatedebugpanelbuffer();
-    //g->cam3d.target.x = 0;
-    //g->cam3d.target.y = -1;
-    //g->cam3d.target.z = 0;
-    //g->cubepos.x += 0.001f;
-    // trying to get the camera to properly follow...
-    //g->cameramode = CAMERA_FREE;
-
-    //g->cubepos = (Vector3){0.0f, -1.0f, 0.0f};
-
-    //g->cam3d.position.x = 0.000f;
-    //g->cam3d.position.y = 0.000f;
-    //g->cam3d.position.z = 2.000f;
-
-    //g->cam3d.target.x = 0.000f;
-    //g->cam3d.target.y = 0.000f;
-    //g->cam3d.target.z = -0.500f;
-
-    //g->cam3d.position.x -= 0.001f;
-    //g->cam3d.position.y -= 0.004f;
-
-    //static float xdir = -0.01f;
-    //static float ydir = -0.01f;
-    //static float zdir = -0.01f;
-
-    //g->cam3d.position.x += xdir;
-    //g->cam3d.position.y += ydir;
-    //g->cam3d.position.z += zdir;
-
-    //if (g->cam3d.position.x <= -1.0f) {
-    //    xdir = -xdir;
-    //} else if (g->cam3d.position.x >= 1.0f) {
-    //    xdir = -xdir;
-    //}
-
-    //if (g->cam3d.position.y <= 1.0f) {
-    //    ydir = -ydir;
-    //} else if (g->cam3d.position.y >= 8.0f) {
-    //    ydir = -ydir;
-    //}
-
-    //if (g->cam3d.position.z <= -1.0f) {
-    //    zdir = -zdir;
-    //} else if (g->cam3d.position.z >= 1.0f) {
-    //    zdir = -zdir;
-    //}
-
-    //g->cam3d.target = g->cubepos;
-
-    //UpdateCamera(&g->cam3d, g->cameramode);
-
 
     //setdebugpaneltopleft(g);
     //setdebugpaneltopright(g);
     //setdebugpanelbottomleft(g);
     //setdebugpanelbottomright(g);
     //setdebugpanelcenter(g);
-    //g->dp.w = 350;
-    //g->dp.h = 200;
-    // top left
-    //setdebugpaneltopleft(g);
-    // top right
-    //setdebugpaneltopright(g);
-    // bottom left
-    //setdebugpanelbottomleft(g);
-    // bottom right
-    //setdebugpanelbottomright(g);
-    //g->dp.fontsize = 20;
-    //g->dp.fgcolor.r = 255;
-    //g->dp.fgcolor.g = 255;
-    //g->dp.fgcolor.b = 255;
-    //g->dp.bgcolor.r = 0x33;
-    //g->dp.bgcolor.g = 0x33;
-    //g->dp.bgcolor.b = 0x33;
-    //g->dp.bgcolor.a = 255;
-    //g->clearcolor.r = 0;
-    //g->clearcolor.g = 0;
-    //g->clearcolor.b = 0;
-    //g->cs->cubecolor = (Color){0x33, 0x33, 0x33, 255};
-    //g->cs->cubecolor = (Color){0x66, 0x66, 0x66, 255};
-    //g->cs->cubewirecolor = (Color){0x33, 0x33, 0x33, 255};
-    //g->cs->cubecolor = (Color){255, 255, 255, 255};
-    //g->cs->cubepos = (Vector3){-1.5f, 0.5f, 4.5f};
-    //if (g->framecount % 120 == 0) {
-    //    g->cs->cubepos =
-    //        (Vector3){GetRandomValue(-4, 4) + 0.5f, 0.5f, GetRandomValue(-4, 4) + 0.5f};
-    //    g->cs->cubecolor =
-    //        (Color){GetRandomValue(0, 255), GetRandomValue(0, 255), GetRandomValue(0, 255), 255};
-    //}
-    //g->cs->cubepos = (Vector3){0.0f, 0.5f, 1.0f};
-    //static float cubedirx = 0.01f;
-    //static Vector3 cubev = {0.05f, 0.00f, 0.01f};
-    //g->cs->cubepos.x = 0.05f;
-    //g->cs->cubepos.y = 0.0f;
-    //g->cs->cubepos.z = 0.01f;
-    //g->cs->cubepos = (Vector3){0.0f, 0.5f, 1.0f};
-    //g->cs->cubepos.x += cubev.x;
-    //g->cs->cubepos.y += cubev.y;
-    //g->cs->cubepos.z += cubev.z;
-    //if (g->cs->cubepos.x > 4.5f) {
-    //    cubev.x = -cubev.x;
-    //} else if (g->cs->cubepos.x < -4.5f) {
-    //    cubev.x = -cubev.x;
-    //}
-    //if (g->cs->cubepos.y > 5.0f) {
-    //    cubev.y = -cubev.y;
-    //} else if (g->cs->cubepos.y < -5.0f) {
-    //    cubev.y = -cubev.y;
-    //}
-    //if (g->cs->cubepos.z > 4.5f) {
-    //    cubev.z = -cubev.z;
-    //} else if (g->cs->cubepos.z < -4.5f) {
-    //    cubev.z = -cubev.z;
-    //}
-    //static float dpx = 0.00f;
-    //static float dtx = 0.00f;
-    //static float dpy = 0.01f;
-    //static float dty = 0.01f;
-    //static float dpz = 0.00f;
-    //static float dtz = 0.00f;
-    //const float ymax = 10.0f;
-    //const float ymin = 0.0f;
-    //if (g->cs->cam3d.position.y >= 0.0f || g->cs->cam3d.position.y < 2.0f) {
-    //    if (dty < 0) {
-    //        dty = -0.005f;
-    //    } else if (dty > 0) {
-    //        dty = 0.005f;
-    //    }
-    //}
-    // g->cs->cam3d.position = (Vector3){10.0f, 10.0f, -10.0f};
-    //g->cs->cam3d.position = (Vector3){-10.0f, 5.0f, 9.0f};
-    //g->cs->cam3d.position = (Vector3){-3.0f, 5.0f, 5.0f};
-    //g->cs->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
-    //g->cam3d.target = g->cubepos;
-    //g->cs->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
-    //g->cs->cam3d.position.x = 0.0f;
-    //g->cs->cam3d.target.x = 0.0f;
-    //g->cs->cam3d.position.y = 10.0f;
-    //g->cs->cam3d.target.y = 0.0f;
-    //g->cs->cam3d.position.z = 5.0f;
-    //g->cs->cam3d.target.z = 0.0f;
-    //g->cs->cam3d.position.y += dpy;
-    //g->cs->cam3d.target.y += dty;
-    //g->cs->cam3d.position.z += dz;
-    //g->cs->cam3d.target.z += dz;
-    //if (g->cs->cam3d.position.y > ymax || g->cs->cam3d.position.y < ymin) {
-    //    dpy = -dpy;
-    //    dty = -dty;
-    //}
-    //if (g->cs->cam3d.target.y > ymax || g->cs->cam3d.target.y < ymin) {
-    //    dty = -dty;
-    //}
-    //g->cs->scale = 4;
-    //const int scale = g->cs->scale;
-    //g->cs->x = g->winwidth / 2 - g->cs->presents.width * scale / 2;
-    //g->cs->y = g->winheight / 2 - g->cs->presents.height * scale / 2;
-    //g->cs->dodrawpresents = false;
-    //g->cs->dodrawpresents = true;
 }
+
 
 void libgame_drawframeend(gamestate* g) {
     EndDrawing();
@@ -367,7 +222,6 @@ void libgame_drawframeend(gamestate* g) {
 }
 
 void libgamedrawframe() {
-
     BeginDrawing();
     BeginTextureMode(target);
 
@@ -379,28 +233,13 @@ void libgamedrawframe() {
         drawgameplayscene();
     }
 
-
     EndTextureMode();
 
-    float w = target.texture.width;
-    float h = target.texture.height;
-
-    Rectangle source = {0, 0, w, -h};
-    Rectangle dest = {0, 0, GetScreenWidth(), GetScreenHeight()};
-    Vector2 origin = {0, 0};
-
-    DrawTexturePro(target.texture, source, dest, origin, 0.0f, WHITE);
+    DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
 
     drawdebugpanel();
 
     libgame_drawframeend(g);
-
-    //EndDrawing();
-    //g->framecount++;
-    //gamestateupdatecurrenttime(g);
-
-    //g->dp.x = 10;
-    //g->dp.y = 10;
 }
 
 
@@ -640,6 +479,11 @@ void libgame_initsharedsetup() {
     //SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
 
     target = LoadRenderTexture(targetwidth, targetheight);
+
+
+    target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
+    target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
+
     //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
     libgame_loadtextures();
