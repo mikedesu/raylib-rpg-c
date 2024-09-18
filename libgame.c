@@ -91,7 +91,8 @@ void libgameunloadtexture(int index);
 void libgameunloadtextures();
 void libgameinitsharedsetup();
 void libgamecloseshared();
-gamestate* libgamegetgamestate();
+
+gamestate* libgame_getgamestate();
 
 void libgame_drawframeend(gamestate* g);
 
@@ -708,7 +709,7 @@ void libgamecloseshared() {
 }
 
 
-gamestate* libgamegetgamestate() {
+gamestate* libgame_getgamestate() {
     return g;
 }
 

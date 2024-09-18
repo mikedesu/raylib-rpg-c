@@ -42,7 +42,7 @@ void (*mylibgameinitframecount)(unsigned int) = NULL;
 
 void (*mylibgameupdategamestate)(gamestate*) = NULL;
 
-gamestate* (*mylibgamegetgamestate)() = NULL;
+gamestate* (*mylibgame_getgamestate)() = NULL;
 
 
 // get the last write time of a file
@@ -114,9 +114,9 @@ void loadsymbols() {
     mylibgamehandleinput = dlsym(handle, "libgamehandleinput");
     checksymbol(mylibgamehandleinput, "libgamehandleinput");
 
-    mprint("libgamegetgamestate");
-    mylibgamegetgamestate = dlsym(handle, "libgamegetgamestate");
-    checksymbol(mylibgamegetgamestate, "libgamegetgamestate");
+    mprint("libgame_getgamestate");
+    mylibgame_getgamestate = dlsym(handle, "libgame_getgamestate");
+    checksymbol(mylibgame_getgamestate, "libgame_getgamestate");
 
     mprint("libgameclosesavegamestate");
     mylibgameclosesavegamestate = dlsym(handle, "libgameclosesavegamestate");
@@ -263,7 +263,7 @@ void autoreload() {
             sleep(1);
         }
         mprint("getting old gamestate");
-        g = mylibgamegetgamestate();
+        g = mylibgame_getgamestate();
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
         mprint("closing libgame");
