@@ -60,8 +60,9 @@ void libgameinit();
 void libgameinitwithstate(void* state);
 void libgameclose();
 void libgamehandleinput();
-void libgameloadtexture(int index, const char* path, bool dodither);
-void libgameloadtextures();
+
+void libgame_loadtexture(int index, const char* path, bool dodither);
+void libgame_loadtextures();
 
 void libgame_unloadtexture(int index);
 void libgame_unloadtextures();
@@ -461,6 +462,12 @@ void drawgameplayscene() {
 
     // lets draw the sprite
     //DrawTextureEx(textures[TXHERO], (Vector2){hero->dest.x, hero->dest.y}, 0.0f, 1.0f, WHITE);
+    DrawTexturePro(textures[TXDIRT],
+                   (Rectangle){0, 0, 32, 32},
+                   (Rectangle){0, 0, 32, 32},
+                   (Vector2){0, 0},
+                   0,
+                   WHITE);
     DrawTexturePro(textures[TXHERO], hero->src, hero->dest, (Vector2){0, 0}, 0, WHITE);
 
     EndMode2D();
@@ -573,7 +580,7 @@ void drawcompanyscene() {
 }
 
 
-void libgameloadtexture(int index, const char* path, bool dodither) {
+void libgame_loadtexture(int index, const char* path, bool dodither) {
     if (dodither) {
         Image img = LoadImage(path);
         ImageDither(&img, 16, 16, 16, 16);
@@ -586,13 +593,12 @@ void libgameloadtexture(int index, const char* path, bool dodither) {
 }
 
 
-void libgameloadtextures() {
+void libgame_loadtextures() {
     //textures[TXHERO] = LoadTexture("img/darkknight2-sheet.png");
     //SetTextureFilter(textures[TXHERO], TEXTURE_FILTER_POINT);
 
-    libgameloadtexture(TXHERO, "img/darkknight2-sheet.png", false);
+    libgame_loadtexture(TXHERO, "img/darkknight2-sheet.png", false);
 
-    //libgameloadtexture(TXDIRT, "img/tile-dirt0.png", true);
 
     // do dithering on the dirt texture
     Image img = LoadImage("img/tile-dirt0.png");
@@ -634,7 +640,7 @@ void libgame_initsharedsetup() {
     target = LoadRenderTexture(targetwidth, targetheight);
     //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
-    libgameloadtextures();
+    libgame_loadtextures();
 
     // lets try initializing a sprite
     int numcontexts = 3;
