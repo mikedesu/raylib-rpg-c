@@ -72,19 +72,14 @@ bool libgame_windowshouldclose();
 
 void gameinitwindow();
 void gameclosewindow();
+
 void libgameupdatedebugpanelbuffer();
 void libgameupdategamestate();
 void libgamedrawframe();
 void libgameinit();
 void libgameinitwithstate(void* state);
 void libgameclose();
-void drawdebugpanel();
 void libgamehandleinput();
-void drawcompanyscene();
-void drawtitlescene();
-void drawgameplayscene();
-void handlefade();
-void drawfade();
 void libgameloadtexture(int index, const char* path, bool dodither);
 void libgameloadtextures();
 void libgameunloadtexture(int index);
@@ -92,8 +87,14 @@ void libgameunloadtextures();
 void libgameinitsharedsetup();
 void libgamecloseshared();
 
-gamestate* libgame_getgamestate();
+void drawdebugpanel();
+void drawcompanyscene();
+void drawtitlescene();
+void drawgameplayscene();
+void handlefade();
+void drawfade();
 
+gamestate* libgame_getgamestate();
 void libgame_drawframeend(gamestate* g);
 
 //--------------------------------------------------------------------
