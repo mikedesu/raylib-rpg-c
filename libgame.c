@@ -4,6 +4,7 @@
 #include "sprite.h"
 #include "utils.h"
 
+#include "libgame_defines.h"
 #include "setdebugpanel.h"
 
 #include <raylib.h>
@@ -16,26 +17,6 @@
 //--------------------------------------------------------------------
 // libgame global variables
 //--------------------------------------------------------------------
-#define DEFAULT_TARGET_WIDTH 640
-#define DEFAULT_TARGET_HEIGHT 360
-#define DEFAULT_SCALE 1.5
-
-#define DEFAULT_WINDOW_POS_X (1920 + 950)
-#define DEFAULT_WINDOW_POS_Y 25
-
-#define DEFAULT_WINDOW_WIDTH (DEFAULT_TARGET_WIDTH * DEFAULT_SCALE)
-#define DEFAULT_WINDOW_HEIGHT (DEFAULT_TARGET_HEIGHT * DEFAULT_SCALE)
-
-#define TXHERO 0
-#define TXDIRT 1
-
-#define COMPANYSCENE 0
-#define TITLESCENE 1
-#define GAMEPLAYSCENE 2
-
-#define COMPANYNAME "@evildojo666"
-#define COMPANYFILL "   x  x x   "
-
 char debugpanelbuffer[1024] = {0};
 
 //int activescene = COMPANYSCENE;
@@ -81,9 +62,11 @@ void libgameclose();
 void libgamehandleinput();
 void libgameloadtexture(int index, const char* path, bool dodither);
 void libgameloadtextures();
-void libgameunloadtexture(int index);
-void libgameunloadtextures();
-void libgameinitsharedsetup();
+
+void libgame_unloadtexture(int index);
+void libgame_unloadtextures();
+
+void libgame_initsharedsetup();
 
 void libgame_closeshared();
 
@@ -620,16 +603,16 @@ void libgameloadtextures() {
 }
 
 
-void libgameunloadtexture(int index) {
+void libgame_unloadtexture(int index) {
     if (textures[index].id > 0) {
         UnloadTexture(textures[index]);
     }
 }
 
 
-void libgameunloadtextures() {
-    libgameunloadtexture(TXHERO);
-    libgameunloadtexture(TXDIRT);
+void libgame_unloadtextures() {
+    libgame_unloadtexture(TXHERO);
+    libgame_unloadtexture(TXDIRT);
 }
 
 
@@ -637,11 +620,11 @@ void libgameinit() {
     mprint("libgameinit");
 
     g = gamestateinitptr();
-    libgameinitsharedsetup();
+    libgame_initsharedsetup();
 }
 
 
-void libgameinitsharedsetup() {
+void libgame_initsharedsetup() {
     gameinitwindow();
 
     //gfont = LoadFont("fonts/hack.ttf");
@@ -686,7 +669,7 @@ void libgameinitwithstate(void* state) {
     }
     mprint("libgameinitwithstate");
     g = (gamestate*)state;
-    libgameinitsharedsetup();
+    libgame_initsharedsetup();
 }
 
 
@@ -708,7 +691,7 @@ void libgame_closeshared() {
 
     UnloadFont(gfont);
     mprint("unloading textures");
-    libgameunloadtextures();
+    libgame_unloadtextures();
     mprint("unloading render texture");
     UnloadRenderTexture(target);
     mprint("closing window");
