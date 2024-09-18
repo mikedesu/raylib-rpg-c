@@ -462,13 +462,15 @@ void drawgameplayscene() {
 
     // lets draw the sprite
     //DrawTextureEx(textures[TXHERO], (Vector2){hero->dest.x, hero->dest.y}, 0.0f, 1.0f, WHITE);
-    DrawTexturePro(textures[TXDIRT],
-                   (Rectangle){0, 0, 32, 32},
-                   (Rectangle){0, 0, 32, 32},
-                   (Vector2){0, 0},
-                   0,
-                   WHITE);
-    DrawTexturePro(textures[TXHERO], hero->src, hero->dest, (Vector2){0, 0}, 0, WHITE);
+
+    Rectangle tile_src = {0, 0, 32, 32};
+    Rectangle tile_dest = {0, 0, 32, 32};
+    Vector2 origin = {0, 0};
+    Color c = WHITE;
+    float rotation = 0;
+
+    DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
+    DrawTexturePro(textures[TXHERO], hero->src, hero->dest, origin, rotation, c);
 
     EndMode2D();
 
