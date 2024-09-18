@@ -25,3 +25,4 @@ typedef struct dungeonfloor_t {
 } dungeonfloor_t;
 
 dungeonfloor_t* create_dungeonfloor(int len, int wid, tiletype_t basetype);
+void dungeonfloor_free(dungeonfloor_t* d);

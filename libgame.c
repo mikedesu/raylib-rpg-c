@@ -48,7 +48,7 @@ Texture textures[10];
 
 sprite* hero = NULL;
 
-dungeonfloor_t* df = NULL;
+dungeonfloor_t* dungeonfloor = NULL;
 
 
 //--------------------------------------------------------------------
@@ -125,6 +125,9 @@ void handlefade() {
 
 
 void libgamehandleinput() {
+
+    bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+
     if (IsKeyPressed(KEY_SPACE)) {
         mprint("key space pressed");
         if (fade == FADESTATENONE) {
@@ -136,8 +139,14 @@ void libgamehandleinput() {
         g->debugpanelon = !g->debugpanelon;
     }
 
-    if (IsKeyPressed(KEY_Z)) {
-        g->cam2d.zoom += 0.5f;
+    //if (IsKeyPressed(KEY_Z) && shift) {
+
+    const float zoom_incr = 0.1f;
+    if (IsKeyDown(KEY_Z) && shift) {
+        g->cam2d.zoom -= zoom_incr;
+        //} else if (IsKeyPressed(KEY_Z)) {
+    } else if (IsKeyDown(KEY_Z)) {
+        g->cam2d.zoom += zoom_incr;
     }
 }
 
@@ -308,7 +317,18 @@ void drawgameplayscene() {
     Color c = WHITE;
     float rotation = 0;
 
-    DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
+    //DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
+
+    // draw the dungeon floor
+
+    for (int i = 0; i < dungeonfloor->len; i++) {
+        for (int j = 0; j < dungeonfloor->wid; j++) {
+            tile_dest.x = i * 32;
+            tile_dest.y = j * 32;
+            DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
+        }
+    }
+
     DrawTexturePro(textures[TXHERO], hero->src, hero->dest, origin, rotation, c);
 
     EndMode2D();
@@ -477,22 +497,15 @@ void libgame_initsharedsetup() {
     //gfont = LoadFont("fonts/hack.ttf");
     gfont = LoadFontEx("fonts/hack.ttf", 60, 0, 250);
     //SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
-
     target = LoadRenderTexture(targetwidth, targetheight);
-
-
     target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
     target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
-
     //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
-
     libgame_loadtextures();
-
     // lets try initializing a sprite
     int numcontexts = 3;
     int numframes = 4;
     hero = sprite_create(&textures[TXHERO], numcontexts, numframes);
-
     // we need to set the destination
     // this is a function of how much we have scaled the target texture
     // we need to write code to manage this but we will hack something
@@ -504,13 +517,19 @@ void libgame_initsharedsetup() {
     //float y = targetheight / 2.0f;
     float w = hero->width * scale;
     float h = hero->height * scale;
-
     hero->dest = (Rectangle){x, y, w, h};
 
     setdebugpaneltopleft(g);
 
-
     g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
+
+    // init dungeonfloor
+    dungeonfloor = create_dungeonfloor(4, 4, TILETYPE_DIRT);
+    if (!dungeonfloor) {
+        mprint("could not create dungeonfloor");
+        // we could use an 'emergency shutdown' in case an error causes us
+        // to need to 'panic' and force game close properly
+    }
 }
 
 
@@ -541,6 +560,11 @@ void libgameclose() {
 void libgame_closeshared() {
     sprite_destroy(hero);
 
+    // not right now, but when we add dungeonfloor to
+    // the gamestate, we will be able to avoid freeing
+    // it on every reload
+    dungeonfloor_free(dungeonfloor);
+
     UnloadFont(gfont);
     mprint("unloading textures");
     libgame_unloadtextures();
@@ -553,125 +577,4 @@ void libgame_closeshared() {
 
 gamestate* libgame_getgamestate() {
     return g;
-}
-
-
-void drawcubetexturerecfrontface(
-    const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l) {
-    const float rx = src.x + src.width;
-    const float ry = src.y + src.height;
-    const float a = pos.x - w / 2;
-    const float b = pos.x + w / 2;
-    const float c = pos.y - h / 2;
-    const float d = pos.y + h / 2;
-    const float e = pos.z + l / 2;
-    const float f = pos.z - l / 2;
-    // precompute
-    // vertices
-    const Vector3 v[4] = {{a, c, e}, {b, c, e}, {b, d, e}, {a, d, e}};
-    // texture coordinates
-    const Vector2 t[4] = {{src.x / tex.width, ry / tex.height},
-                          {rx / tex.width, ry / tex.height},
-                          {rx / tex.width, src.y / tex.height},
-                          {src.x / tex.width, src.y / tex.height}};
-    // Set desired texture to be enabled while drawintex.height tex.widthollowintex.height vertex data
-    rlSetTexture(tex.id);
-    // We calculate the normalized texture coordinates for the desired texture-source-rectangle
-    // It means converting from (tex.width, tex.height) coordinates to [0.0f, 1.0f] equivalent
-    rlBegin(RL_QUADS);
-    rlColor4ub(255, 255, 255, 255);
-    // draw front face
-    rlNormal3f(0.0f, 0.0f, 1.0f);
-    for (int i = 0; i < 4; i++) {
-        rlTexCoord2f(t[i].x, t[i].y);
-        rlVertex3f(v[i].x, v[i].y, v[i].z);
-    }
-    rlEnd();
-    rlSetTexture(0);
-}
-
-
-void drawcubetexturerecallfaces(
-    const Texture2D tex, const Rectangle src, Vector3 pos, float w, float h, float l) {
-    const float rx = src.x + src.width;
-    const float ry = src.y + src.height;
-    const float a = pos.x - w / 2;
-    const float b = pos.x + w / 2;
-    const float c = pos.y - h / 2;
-    const float d = pos.y + h / 2;
-    const float e = pos.z + l / 2;
-    const float f = pos.z - l / 2;
-    // precompute
-    // vertices
-    const Vector3 v[4] = {{a, c, e}, {b, c, e}, {b, d, e}, {a, d, e}};
-    // texture coordinates
-    const Vector2 t[4] = {{src.x / tex.width, ry / tex.height},
-                          {rx / tex.width, ry / tex.height},
-                          {rx / tex.width, src.y / tex.height},
-                          {src.x / tex.width, src.y / tex.height}};
-    // Set desired texture to be enabled while drawintex.height tex.widthollowintex.height vertex data
-    rlSetTexture(tex.id);
-    // We calculate the normalized texture coordinates for the desired texture-source-rectangle
-    // It means converting from (tex.width, tex.height) coordinates to [0.0f, 1.0f] equivalent
-    rlBegin(RL_QUADS);
-    rlColor4ub(255, 255, 255, 255);
-    // draw front face
-    rlNormal3f(0.0f, 0.0f, 1.0f);
-    for (int i = 0; i < 4; i++) {
-        rlTexCoord2f(t[i].x, t[i].y);
-        rlVertex3f(v[i].x, v[i].y, v[i].z);
-    }
-    /////////////////////////////////////////////////////////
-    // Back face
-    rlNormal3f(0.0f, 0.0f, -1.0f);
-    rlTexCoord2f((src.x + src.width) / tex.width, (src.y + src.height) / tex.height);
-    rlVertex3f(pos.x - w / 2, pos.y - h / 2, pos.z - l / 2);
-    rlTexCoord2f((src.x + src.width) / tex.width, src.y / tex.height);
-    rlVertex3f(pos.x - w / 2, pos.y + h / 2, pos.z - l / 2);
-    rlTexCoord2f(src.x / tex.width, src.y / tex.height);
-    rlVertex3f(pos.x + w / 2, pos.y + h / 2, pos.z - l / 2);
-    rlTexCoord2f(src.x / tex.width, (src.y + src.height) / tex.height);
-    rlVertex3f(pos.x + w / 2, pos.y - h / 2, pos.z - l / 2);
-    // Top face
-    rlNormal3f(0.0f, 1.0f, 0.0f);
-    rlTexCoord2f(src.x / tex.width, src.y / tex.height);
-    rlVertex3f(pos.x - w / 2, pos.y + h / 2, pos.z - l / 2);
-    rlTexCoord2f(src.x / tex.width, (src.y + src.height) / tex.height);
-    rlVertex3f(pos.x - w / 2, pos.y + h / 2, pos.z + l / 2);
-    rlTexCoord2f((src.x + src.width) / tex.width, (src.y + src.height) / tex.height);
-    rlVertex3f(pos.x + w / 2, pos.y + h / 2, pos.z + l / 2);
-    rlTexCoord2f((src.x + src.width) / tex.width, src.y / tex.height);
-    rlVertex3f(pos.x + w / 2, pos.y + h / 2, pos.z - l / 2);
-    // Bottom face
-    rlNormal3f(0.0f, -1.0f, 0.0f);
-    rlTexCoord2f((src.x + src.width) / tex.width, src.y / tex.height);
-    rlVertex3f(pos.x - w / 2, pos.y - h / 2, pos.z - l / 2);
-    rlTexCoord2f(src.x / tex.width, src.y / tex.height);
-    rlVertex3f(pos.x + w / 2, pos.y - h / 2, pos.z - l / 2);
-    rlTexCoord2f(src.x / tex.width, (src.y + src.height) / tex.height);
-    rlVertex3f(pos.x + w / 2, pos.y - h / 2, pos.z + l / 2);
-    rlTexCoord2f((src.x + src.width) / tex.width, (src.y + src.height) / tex.height);
-    rlVertex3f(pos.x - w / 2, pos.y - h / 2, pos.z + l / 2);
-    // Right face
-    rlNormal3f(1.0f, 0.0f, 0.0f);
-    rlTexCoord2f((src.x + src.width) / tex.width, (src.y + src.height) / tex.height);
-    rlVertex3f(pos.x + w / 2, pos.y - h / 2, pos.z - l / 2);
-    rlTexCoord2f((src.x + src.width) / tex.width, src.y / tex.height);
-    rlVertex3f(pos.x + w / 2, pos.y + h / 2, pos.z - l / 2);
-    rlTexCoord2f(src.x / tex.width, src.y / tex.height);
-    rlVertex3f(pos.x + w / 2, pos.y + h / 2, pos.z + l / 2);
-    rlTexCoord2f(src.x / tex.width, (src.y + src.height) / tex.height);
-    rlVertex3f(pos.x + w / 2, pos.y - h / 2, pos.z + l / 2);
-    // Left face
-    rlNormal3f(-1.0f, 0.0f, 0.0f);
-    rlTexCoord2f(src.x / tex.width, (src.y + src.height) / tex.height);
-    rlVertex3f(pos.x - w / 2, pos.y - h / 2, pos.z - l / 2);
-    rlTexCoord2f((src.x + src.width) / tex.width, (src.y + src.height) / tex.height);
-    rlVertex3f(pos.x - w / 2, pos.y - h / 2, pos.z + l / 2);
-    rlTexCoord2f((src.x + src.width) / tex.width, src.y / tex.height);
-    rlVertex3f(pos.x - w / 2, pos.y + h / 2, pos.z + l / 2);
-    rlTexCoord2f(src.x / tex.width, src.y / tex.height);
-    rlVertex3f(pos.x - w / 2, pos.y + h / 2, pos.z - l / 2);
-    rlEnd();
-    rlSetTexture(0);
 }
