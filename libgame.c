@@ -18,9 +18,9 @@
 //--------------------------------------------------------------------
 #define DEFAULT_TARGET_WIDTH 640
 #define DEFAULT_TARGET_HEIGHT 360
-#define DEFAULT_SCALE 2
+#define DEFAULT_SCALE 1.5
 
-#define DEFAULT_WINDOW_POS_X (1920 + 635)
+#define DEFAULT_WINDOW_POS_X (1920 + 950)
 #define DEFAULT_WINDOW_POS_Y 25
 
 #define DEFAULT_WINDOW_WIDTH (DEFAULT_TARGET_WIDTH * DEFAULT_SCALE)
@@ -54,11 +54,10 @@ RenderTexture target;
 
 int targetwidth = DEFAULT_TARGET_WIDTH;
 int targetheight = DEFAULT_TARGET_HEIGHT;
-
-float scale = DEFAULT_SCALE;
-
 int windowwidth = DEFAULT_WINDOW_WIDTH;
 int windowheight = DEFAULT_WINDOW_HEIGHT;
+
+float scale = DEFAULT_SCALE;
 
 Texture textures[10];
 
@@ -85,7 +84,8 @@ void libgameloadtextures();
 void libgameunloadtexture(int index);
 void libgameunloadtextures();
 void libgameinitsharedsetup();
-void libgamecloseshared();
+
+void libgame_closeshared();
 
 void drawdebugpanel();
 void drawcompanyscene();
@@ -147,7 +147,7 @@ void libgamehandleinput() {
     }
 
     if (IsKeyPressed(KEY_Z)) {
-        g->cam2d.zoom += 0.1f;
+        g->cam2d.zoom += 0.5f;
     }
 }
 
@@ -194,8 +194,9 @@ void libgameupdatedebugpanelbuffer() {
              "Framecount:    %d\n"
              "%s\n"
              "%s\n"
-             "Cam.target:  %.2f,%.2f\n"
+             "Cam.target:    %.2f,%.2f\n"
              "Cam.offset:    %.2f,%.2f\n"
+             "Cam.zoom:      %.2f\n"
              "Active scene:  %d\n",
              g->framecount,
 
@@ -206,6 +207,8 @@ void libgameupdatedebugpanelbuffer() {
              g->cam2d.target.y,
              g->cam2d.offset.x,
              g->cam2d.offset.y,
+
+             g->cam2d.zoom,
 
              activescene);
 }
@@ -419,7 +422,7 @@ void libgamedrawframe() {
 
 inline void drawdebugpanel() {
     if (g->debugpanelon) {
-        const int fontsize = 18;
+        const int fontsize = 14;
         const int spacing = 1;
 
         Vector2 p = {g->dp.x, g->dp.y};
@@ -454,7 +457,7 @@ inline void drawdebugpanel() {
         int by = p.y - boxoffsetxy;
         int bw = m.x + boxoffsetwh;
         int bh = m.y + boxoffsetwh;
-        DrawRectangleLines(bx, by, bw, bh, WHITE);
+        DrawRectangle(bx, by, bw, bh, (Color){0x33, 0x33, 0x33, 128});
 
         int txoffsetxy = 3;
         int txoffsetwh = 8;
@@ -463,7 +466,7 @@ inline void drawdebugpanel() {
         int tw = m.x + txoffsetwh;
         int th = m.y + txoffsetwh;
 
-        DrawRectangle(tx, ty, tw, th, (Color){0, 0, 0, 128});
+        //DrawRectangle(tx, ty, tw, th, (Color){0x33, 0x33, 0x33, 128});
         DrawTextEx(gfont, debugpanelbuffer, p, fontsize, spacing, WHITE);
     }
 }
@@ -474,7 +477,8 @@ void drawgameplayscene() {
     ClearBackground(BLACK);
 
     // lets draw the sprite
-    DrawTextureRec(textures[TXHERO], hero->src, (Vector2){0, 0}, WHITE);
+    //DrawTextureEx(textures[TXHERO], (Vector2){hero->dest.x, hero->dest.y}, 0.0f, 1.0f, WHITE);
+    DrawTexturePro(textures[TXHERO], hero->src, hero->dest, (Vector2){0, 0}, 0, WHITE);
 
     EndMode2D();
 
@@ -658,9 +662,11 @@ void libgameinitsharedsetup() {
     // this is a function of how much we have scaled the target texture
     // we need to write code to manage this but we will hack something
     // together for right now
-    const int scale = 2;
-    float x = targetwidth / 2.0f;
-    float y = targetheight / 2.0f;
+    const int scale = 1;
+    float x = 0;
+    float y = 0;
+    //float x = targetwidth / 2.0f;
+    //float y = targetheight / 2.0f;
     float w = hero->width * scale;
     float h = hero->height * scale;
 
@@ -686,18 +692,18 @@ void libgameinitwithstate(void* state) {
 
 void libgameclosesavegamestate() {
     mprint("libgameclosesavegamestate");
-    libgamecloseshared();
+    libgame_closeshared();
 }
 
 
 void libgameclose() {
     mprint("libgameclose");
     gamestatefree(g);
-    libgamecloseshared();
+    libgame_closeshared();
 }
 
 
-void libgamecloseshared() {
+void libgame_closeshared() {
     sprite_destroy(hero);
 
     UnloadFont(gfont);
