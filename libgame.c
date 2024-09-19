@@ -2,6 +2,7 @@
 #include "gamestate.h"
 #include "mprint.h"
 #include "sprite.h"
+#include "textureinfo.h"
 #include "utils.h"
 
 #include "dungeonfloor.h"
@@ -41,7 +42,9 @@ int windowheight = DEFAULT_WINDOW_HEIGHT;
 
 float scale = DEFAULT_SCALE;
 
-Texture textures[10];
+//Texture textures[10];
+
+textureinfo txinfo[10];
 
 sprite* hero = NULL;
 
@@ -61,13 +64,18 @@ void libgamedrawframe();
 void libgameinit();
 void libgameinitwithstate(void* state);
 void libgameclose();
+
 void libgamehandleinput();
+void libgame_handlereloadtextures();
 
-void libgame_loadtexture(int index, const char* path, bool dodither);
+//void libgame_loadtexture(int index, const char* path, bool dodither);
+
+void libgame_loadtexture(int index, int contexts, int frames, bool dodither, const char* path);
 void libgame_loadtextures();
-
 void libgame_unloadtexture(int index);
 void libgame_unloadtextures();
+void libgame_loadtexturesfromfile(const char* path);
+void libgame_reloadtextures();
 
 void libgame_initsharedsetup();
 
@@ -88,7 +96,6 @@ void libgame_handleplayerinput(gamestate* g);
 void libgame_handlecaminput(gamestate* g);
 void libgame_handledebugpanelswitch(gamestate* g);
 void libgame_handlemodeswitch(gamestate* g);
-
 
 //--------------------------------------------------------------------
 // definitions
@@ -127,6 +134,13 @@ void handlefade() {
 }
 
 
+void libgame_handlereloadtextures() {
+    if (IsKeyPressed(KEY_R)) {
+        libgame_reloadtextures();
+    }
+}
+
+
 void libgamehandleinput() {
     if (IsKeyPressed(KEY_SPACE)) {
         mprint("key space pressed");
@@ -135,6 +149,7 @@ void libgamehandleinput() {
         }
     }
 
+    libgame_handlereloadtextures();
     libgame_handlemodeswitch(g);
     libgame_handledebugpanelswitch(g);
     libgame_handleplayerinput(g);
@@ -230,7 +245,7 @@ void gameinitwindow() {
         ;
     // this is hard-coded for now so we can auto-position the window
     // for easier config during streaming
-    
+
     //SetWindowMonitor(0);
     SetWindowMonitor(1);
 
@@ -372,8 +387,10 @@ void drawgameplayscene() {
     // lets draw the sprite
     //DrawTextureEx(textures[TXHERO], (Vector2){hero->dest.x, hero->dest.y}, 0.0f, 1.0f, WHITE);
 
-    const int w = textures[TXDIRT].width;
-    const int h = textures[TXDIRT].height;
+    //const int w = textures[TXDIRT].width;
+    //const int h = textures[TXDIRT].height;
+    const int w = txinfo[TXDIRT].texture.width;
+    const int h = txinfo[TXDIRT].texture.height;
 
     Rectangle tile_src = {0, 0, w, h};
     Rectangle tile_dest = {0, 0, w, h};
@@ -383,15 +400,14 @@ void drawgameplayscene() {
     Color border1 = GREEN;
     float rotation = 0;
 
-    //DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
-
     // draw the dungeon floor
 
     for (int i = 0; i < dungeonfloor->len; i++) {
         for (int j = 0; j < dungeonfloor->wid; j++) {
             tile_dest.x = i * w;
             tile_dest.y = j * h;
-            DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
+            //DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
+            DrawTexturePro(txinfo[TXDIRT].texture, tile_src, tile_dest, origin, rotation, c);
             // lets also draw a border around the tiles
 
             if (g->debugpanelon) {
@@ -400,7 +416,8 @@ void drawgameplayscene() {
         }
     }
 
-    DrawTexturePro(textures[TXHERO], hero->src, hero->dest, origin, rotation, c);
+    //DrawTexturePro(textures[TXHERO], hero->src, hero->dest, origin, rotation, c);
+    DrawTexturePro(txinfo[TXHERO].texture, hero->src, hero->dest, origin, rotation, c);
     if (g->debugpanelon) {
         DrawRectangleLinesEx(hero->dest, 1, border1);
     }
@@ -515,38 +532,81 @@ void drawcompanyscene() {
 }
 
 
-void libgame_loadtexture(int index, const char* path, bool dodither) {
+//void libgame_loadtexture(int index, const char* path, bool dodither) {
+void libgame_loadtexture(int index, int contexts, int frames, bool dodither, const char* path) {
     if (dodither) {
         Image img = LoadImage(path);
-        ImageDither(&img, 16, 16, 16, 16);
-        textures[index] = LoadTextureFromImage(img);
+        ImageDither(&img, 4, 4, 4, 4);
+        //textures[index] = LoadTextureFromImage(img);
+        //txinfo[index] = LoadTextureFromImage(img);
+
+        txinfo[index].num_frames = frames;
+        txinfo[index].contexts = contexts;
+        txinfo[index].texture = LoadTextureFromImage(img);
+
         UnloadImage(img);
     } else {
-        textures[index] = LoadTexture(path);
+        txinfo[index].num_frames = frames;
+        txinfo[index].contexts = contexts;
+        txinfo[index].texture = LoadTexture(path);
     }
-    SetTextureFilter(textures[index], TEXTURE_FILTER_POINT);
+    //SetTextureFilter(textures[index], TEXTURE_FILTER_POINT);
+    SetTextureFilter(txinfo[index].texture, TEXTURE_FILTER_POINT);
 }
 
 
 void libgame_loadtextures() {
-    //textures[TXHERO] = LoadTexture("img/darkknight2-sheet.png");
-    //SetTextureFilter(textures[TXHERO], TEXTURE_FILTER_POINT);
+    //libgame_loadtexture(TXHERO, 3, 4, false, "img/darkknight2-sheet.png");
+    //libgame_loadtexture(TXDIRT, 1, 1, true, "img/tile-dirt0.png");
 
-    libgame_loadtexture(TXHERO, "img/darkknight2-sheet.png", false);
+    libgame_loadtexturesfromfile("textures.txt");
+}
 
 
-    // do dithering on the dirt texture
-    Image img = LoadImage("img/tile-dirt0.png");
-    //ImageDither(&img, 32, 32, 32, 32);
-    ImageDither(&img, 4, 4, 4, 4);
-    textures[TXDIRT] = LoadTextureFromImage(img);
-    UnloadImage(img);
+void libgame_loadtexturesfromfile(const char* path) {
+    FILE* f = fopen(path, "r");
+    if (!f) {
+        mprint("could not open file");
+        return;
+    }
+
+    char line[256];
+    char txpath[256];
+    int index = 0;
+    int contexts = 0;
+    int frames = 0;
+    int dodither = 0;
+
+
+    while (fgets(line, 256, f)) {
+
+        // if the line begins with a #, skip it
+        if (line[0] == '#') {
+            continue;
+        }
+
+        sscanf(line, "%d %d %d %d %s", &index, &contexts, &frames, &dodither, txpath);
+
+        //printf("index: %d\n", index);
+        //printf("contexts: %d\n", contexts);
+        //printf("frames: %d\n", frames);
+        //printf("dodither: %d\n", dodither);
+        //printf("txpath: %s\n", txpath);
+
+        libgame_loadtexture(index, contexts, frames, dodither, txpath);
+
+        bzero(line, 256);
+        bzero(txpath, 256);
+    }
+    fclose(f);
 }
 
 
 void libgame_unloadtexture(int index) {
-    if (textures[index].id > 0) {
-        UnloadTexture(textures[index]);
+    //if (textures[index].id > 0) {
+    if (txinfo[index].texture.id > 0) {
+        //UnloadTexture(textures[index]);
+        UnloadTexture(txinfo[index].texture);
     }
 }
 
@@ -554,6 +614,12 @@ void libgame_unloadtexture(int index) {
 void libgame_unloadtextures() {
     libgame_unloadtexture(TXHERO);
     libgame_unloadtexture(TXDIRT);
+}
+
+
+void libgame_reloadtextures() {
+    libgame_unloadtextures();
+    libgame_loadtextures();
 }
 
 
@@ -568,18 +634,27 @@ void libgameinit() {
 void libgame_initsharedsetup() {
     gameinitwindow();
 
-    //gfont = LoadFont("fonts/hack.ttf");
-    gfont = LoadFontEx("fonts/hack.ttf", 60, 0, 250);
+    const int fontsize = 60;
+    const int codepointct = 256;
+    gfont = LoadFontEx(DEFAULT_FONT_PATH, fontsize, 0, codepointct);
     //SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
+
     target = LoadRenderTexture(targetwidth, targetheight);
     target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
     target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
     //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+
     libgame_loadtextures();
+
     // lets try initializing a sprite
-    int numcontexts = 3;
-    int numframes = 4;
-    hero = sprite_create(&textures[TXHERO], numcontexts, numframes);
+    //int numcontexts = 3;
+    //int numframes = 4;
+    //hero = sprite_create(&textures[TXHERO], numcontexts, numframes);
+
+    hero =
+        sprite_create(&txinfo[TXHERO].texture, txinfo[TXHERO].contexts, txinfo[TXHERO].num_frames);
+
+
     // we need to set the destination
     // this is a function of how much we have scaled the target texture
     // we need to write code to manage this but we will hack something

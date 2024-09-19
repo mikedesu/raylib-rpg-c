@@ -24,3 +24,5 @@
 
 #define COMPANYNAME "@evildojo666"
 #define COMPANYFILL "   x  x x   "
+
+#define DEFAULT_FONT_PATH "fonts/hack.ttf"
