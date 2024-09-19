@@ -230,7 +230,10 @@ void gameinitwindow() {
         ;
     // this is hard-coded for now so we can auto-position the window
     // for easier config during streaming
-    SetWindowMonitor(0);
+    
+    //SetWindowMonitor(0);
+    SetWindowMonitor(1);
+
     const int x = DEFAULT_WINDOW_POS_X;
     const int y = DEFAULT_WINDOW_POS_Y;
     SetWindowPosition(x, y);
