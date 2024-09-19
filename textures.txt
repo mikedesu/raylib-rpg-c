@@ -1,3 +1,4 @@
 # filepath contexts frames dodither
-0 3 4 0 img/darkknight2-sheet.png 
+#0 3 4 0 img/darkknight2-sheet.png 
+0 1 6 0 img/hero-test0-sheet.png 
 1 1 1 0 img/tile-dirt0.png 

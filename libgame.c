@@ -659,7 +659,7 @@ void libgame_initsharedsetup(gamestate* g) {
         const float y = 0;
         const float w = hero->width;
         const float h = hero->height;
-        const float offset_y = -8;
+        const float offset_y = 0;
         hero->dest = (Rectangle){x, y + offset_y, w, h};
 
         setdebugpaneltopleft(g);
