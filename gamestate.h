@@ -1,6 +1,5 @@
 #pragma once
 
-#include "companyscene.h"
 #include "controlmode.h"
 #include "debugpanel.h"
 #include "display.h"
@@ -28,8 +27,6 @@ typedef struct gamestate {
     debugpanel dp;
 
     Camera2D cam2d;
-
-    companyscene cs;
 
     controlmode_t controlmode;
 
