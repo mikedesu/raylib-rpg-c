@@ -3,13 +3,14 @@
 #include <raylib.h>
 
 typedef struct display {
-    int width;
-    int height;
-    Font font;
-    RenderTexture2D target;
+    int targetwidth;
+    int targetheight;
+    int windowwidth;
+    int windowheight;
 
-    Vector2 origin;
-
-} display;
+    //Font font;
+    //RenderTexture2D target;
+    //Vector2 origin;
+} display_t;
 
 //#define DISPLAYSIZE (sizeof(int) * 2 + sizeof(Font) + sizeof(RenderTexture2D) + sizeof(Vector2))

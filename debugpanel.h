@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mycolor.h"
+//#include "mycolor.h"
 
 //#define DEBUGPANELBUFSIZE 256
 #define DEBUGPANELBUFSIZE 496
@@ -16,4 +16,4 @@ typedef struct debugpanel {
     //mycolor fgcolor;
     //mycolor bgcolor;
     //char bfr[DEBUGPANELBUFSIZE];
-} debugpanel;
+} debugpanel_t;

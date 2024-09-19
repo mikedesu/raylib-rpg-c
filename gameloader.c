@@ -1,6 +1,7 @@
 #include "gameloader.h"
 #include "gamestate.h"
 #include "mprint.h"
+#include "symaddrpair.h"
 
 #include <dlfcn.h>
 #include <raylib.h>
@@ -11,6 +12,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
 
 long last_write_time = 0;
 
@@ -27,15 +29,17 @@ void* handle = NULL;
 
 gamestate* g = NULL;
 
-bool (*mywindowshouldclose)(void) = NULL;
+bool (*mywindowshouldclose)() = NULL;
+
 void (*myinitwindow)() = NULL;
 void (*myclosewindow)() = NULL;
 void (*mylibgamedrawframe)() = NULL;
 void (*mylibgameinit)() = NULL;
-void (*mylibgameinitwithstate)(void*) = NULL;
 void (*mylibgameclose)() = NULL;
 void (*mylibgameclosesavegamestate)() = NULL;
 void (*mylibgamehandleinput)() = NULL;
+
+void (*mylibgameinitwithstate)(gamestate*) = NULL;
 void (*mylibgameinitframecount)(unsigned int) = NULL;
 void (*mylibgameupdategamestate)(gamestate*) = NULL;
 
@@ -73,54 +77,37 @@ void checksymbol(void* symbol, const char* name) {
 void loadsymbols() {
     mprint("begin loadsymbols");
 
-    char* sym = "libgame_windowshouldclose";
+#define NUM_VOID_FUNCTIONS 9
+
+    symaddrpair_t pairs[NUM_VOID_FUNCTIONS] = {
+        {"gameinitwindow", &myinitwindow},
+        {"gameclosewindow", &myclosewindow},
+        {"libgamedrawframe", &mylibgamedrawframe},
+        {"libgameinit", &mylibgameinit},
+        {"libgameclose", &mylibgameclose},
+        {"libgamehandleinput", &mylibgamehandleinput},
+        {"libgameclosesavegamestate", &mylibgameclosesavegamestate},
+        {"libgameinitwithstate", &mylibgameinitwithstate},
+        {"libgameupdategamestate", &mylibgameupdategamestate}};
+    for (int i = 0; i < NUM_VOID_FUNCTIONS; i++) {
+        mprint(pairs[i].name);
+        *pairs[i].addr = dlsym(handle, pairs[i].name);
+        checksymbol(*pairs[i].addr, pairs[i].name);
+    }
+
+    char* sym = NULL;
+
+    // gamestate return
+    sym = "libgame_getgamestate";
     mprint(sym);
-    mywindowshouldclose = (bool (*)(void))dlsym(handle, sym);
+    mylibgame_getgamestate = dlsym(handle, sym);
+    checksymbol(mylibgame_getgamestate, sym);
+
+    // boolean return
+    sym = "libgame_windowshouldclose";
+    mprint(sym);
+    mywindowshouldclose = dlsym(handle, sym);
     checksymbol(mywindowshouldclose, sym);
-
-    sym = "gameinitwindow";
-    mprint(sym);
-    myinitwindow = dlsym(handle, sym);
-    checksymbol(myinitwindow, sym);
-
-    sym = "gameclosewindow";
-    mprint(sym);
-    myclosewindow = dlsym(handle, sym);
-    checksymbol(myclosewindow, sym);
-
-    sym = "libgamedrawframe";
-    mprint(sym);
-    mylibgamedrawframe = dlsym(handle, sym);
-    checksymbol(mylibgamedrawframe, sym);
-
-    mprint("libgameinit");
-    mylibgameinit = dlsym(handle, "libgameinit");
-    checksymbol(mylibgameinit, "libgameinit");
-
-    mprint("libgameclose");
-    mylibgameclose = dlsym(handle, "libgameclose");
-    checksymbol(mylibgameclose, "libgameclose");
-
-    mprint("libgamehandleinput");
-    mylibgamehandleinput = dlsym(handle, "libgamehandleinput");
-    checksymbol(mylibgamehandleinput, "libgamehandleinput");
-
-    mprint("libgame_getgamestate");
-    mylibgame_getgamestate = dlsym(handle, "libgame_getgamestate");
-    checksymbol(mylibgame_getgamestate, "libgame_getgamestate");
-
-    mprint("libgameclosesavegamestate");
-    mylibgameclosesavegamestate = dlsym(handle, "libgameclosesavegamestate");
-    checksymbol(mylibgameclosesavegamestate, "libgameclosesavegamestate");
-
-    mprint("libgameinitwithstate");
-    mylibgameinitwithstate = (void (*)(void*))dlsym(handle, "libgameinitwithstate");
-    checksymbol(mylibgameinitwithstate, "libgameinitwithstate");
-
-
-    mprint("libgameupdategamestate");
-    mylibgameupdategamestate = (void (*)(gamestate*))dlsym(handle, "libgameupdategamestate");
-    checksymbol(mylibgameupdategamestate, "libgameupdategamestate");
 
     //////////////////////////////////////
 

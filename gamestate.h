@@ -24,7 +24,7 @@ typedef struct gamestate {
     struct tm* currenttimetm;
 
     bool debugpanelon;
-    debugpanel dp;
+    debugpanel_t debugpanel;
 
     Camera2D cam2d;
 
@@ -33,7 +33,7 @@ typedef struct gamestate {
     int fadealpha;
     fadestate_t fadestate;
 
-    //display d;
+    display_t display;
     //time_t starttime;
     //struct tm* starttm;
 
@@ -41,7 +41,11 @@ typedef struct gamestate {
 } gamestate;
 
 
-gamestate* gamestateinitptr();
+//gamestate* gamestateinitptr();
+gamestate* gamestateinitptr(const int windowwidth,
+                            const int windowheight,
+                            const int targetwidth,
+                            const int targetheight);
 void gamestatefree(gamestate* g);
 //void gamestateinitdebugpanel(gamestate* g);
 //void gamestateinitcompanyscene(gamestate* g);

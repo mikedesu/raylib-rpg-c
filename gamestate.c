@@ -8,7 +8,10 @@
 #include <string.h>
 
 // have to update this function when we introduce new fields to Gamestate
-gamestate* gamestateinitptr() {
+gamestate* gamestateinitptr(const int windowwidth,
+                            const int windowheight,
+                            const int targetwidth,
+                            const int targetheight) {
     mprint("gamestateinit\n");
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     if (g == NULL) {
@@ -22,7 +25,6 @@ gamestate* gamestateinitptr() {
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&(g->currenttime));
 
-
     bzero(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
     strftime(g->timebeganbuf,
              GAMESTATE_SIZEOFTIMEBUF,
@@ -34,25 +36,24 @@ gamestate* gamestateinitptr() {
              "Current Time: %Y-%m-%d %H:%M:%S",
              g->currenttimetm);
 
-    //bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
-    //strftime(g->currenttimebuf,
-    //         GAMESTATE_SIZEOFTIMEBUF,
-    //         "Current Time: %Y-%m-%d %H:%M:%S",
-    //         g->currenttimetm);
-
-
     gamestateupdatecurrenttime(g);
 
     g->debugpanelon = true;
-    g->dp.x = 0;
-    g->dp.y = 0;
+    g->debugpanel.x = 0;
+    g->debugpanel.y = 0;
+
+    g->display.targetwidth = targetwidth;
+    g->display.targetheight = targetheight;
+    g->display.windowwidth = windowwidth;
+    g->display.windowheight = windowheight;
 
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){0, 0};
     g->cam2d.zoom = 1.0;
     g->cam2d.rotation = 0.0;
 
-    g->controlmode = CONTROLMODE_CAMERA;
+    //g->controlmode = CONTROLMODE_CAMERA;
+    g->controlmode = CONTROLMODE_PLAYER;
 
     g->fadealpha = 0.0f;
     g->fadestate = FADESTATENONE;

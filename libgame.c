@@ -62,7 +62,7 @@ void libgameupdatedebugpanelbuffer();
 void libgameupdategamestate();
 void libgamedrawframe();
 void libgameinit();
-void libgameinitwithstate(void* state);
+void libgameinitwithstate(gamestate* state);
 void libgameclose();
 
 void libgamehandleinput();
@@ -77,7 +77,7 @@ void libgame_unloadtextures();
 void libgame_loadtexturesfromfile(const char* path);
 void libgame_reloadtextures();
 
-void libgame_initsharedsetup();
+void libgame_initsharedsetup(gamestate* g);
 
 void libgame_closeshared();
 
@@ -347,7 +347,7 @@ inline void drawdebugpanel() {
         const int fontsize = 14;
         const int spacing = 1;
 
-        Vector2 p = {g->dp.x, g->dp.y};
+        Vector2 p = {g->debugpanel.x, g->debugpanel.y};
         Vector2 m = MeasureTextEx(gfont, debugpanelbuffer, fontsize, spacing);
         // update the debug panel width and height
         // this code will go elsewhere like an 'update debug panel' method
@@ -355,8 +355,8 @@ inline void drawdebugpanel() {
         // we store the root measurement because
         // the box is drawn relative to
         // the size of the text
-        g->dp.w = m.x;
-        g->dp.h = m.y;
+        g->debugpanel.w = m.x;
+        g->debugpanel.h = m.y;
 
         int boxoffsetxy = 10;
         int boxoffsetwh = 20;
@@ -626,77 +626,66 @@ void libgame_reloadtextures() {
 void libgameinit() {
     mprint("libgameinit");
 
-    g = gamestateinitptr();
-    libgame_initsharedsetup();
+    g = gamestateinitptr(windowwidth, windowheight, targetwidth, targetheight);
+
+    libgame_initsharedsetup(g);
 }
 
 
-void libgame_initsharedsetup() {
-    gameinitwindow();
+void libgame_initsharedsetup(gamestate* g) {
+    if (g) {
+        gameinitwindow();
 
-    const int fontsize = 60;
-    const int codepointct = 256;
-    gfont = LoadFontEx(DEFAULT_FONT_PATH, fontsize, 0, codepointct);
-    //SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
+        const int fontsize = 60;
+        const int codepointct = 256;
+        gfont = LoadFontEx(DEFAULT_FONT_PATH, fontsize, 0, codepointct);
+        //SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
 
-    target = LoadRenderTexture(targetwidth, targetheight);
-    target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
-    target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
-    //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+        target = LoadRenderTexture(targetwidth, targetheight);
+        target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
+        target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
+        //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
-    libgame_loadtextures();
+        libgame_loadtextures();
 
-    // lets try initializing a sprite
-    //int numcontexts = 3;
-    //int numframes = 4;
-    //hero = sprite_create(&textures[TXHERO], numcontexts, numframes);
+        hero = sprite_create(
+            &txinfo[TXHERO].texture, txinfo[TXHERO].contexts, txinfo[TXHERO].num_frames);
 
-    hero =
-        sprite_create(&txinfo[TXHERO].texture, txinfo[TXHERO].contexts, txinfo[TXHERO].num_frames);
+        // we need to set the destination
+        // this is a function of how much we have scaled the target texture
+        // we need to write code to manage this but we will hack something
+        // together for right now
+        const float x = 0;
+        const float y = 0;
+        const float w = hero->width;
+        const float h = hero->height;
+        const float offset_y = -8;
+        hero->dest = (Rectangle){x, y + offset_y, w, h};
 
+        setdebugpaneltopleft(g);
+        g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
 
-    // we need to set the destination
-    // this is a function of how much we have scaled the target texture
-    // we need to write code to manage this but we will hack something
-    // together for right now
-    float x = 0;
-    float y = 0;
-    float w = hero->width;
-    float h = hero->height;
-
-    // notice that the hero is a bit larger than the tile
-    // we can solve this a number of ways
-    //
-    // 1. we could force all things to be the size of the tile, which would involve drawing a new hero
-    //
-    // 2. we could adjust the hero's destination by modifying the y position
-
-    const float offset_y = -8;
-
-    hero->dest = (Rectangle){x, y + offset_y, w, h};
-
-    setdebugpaneltopleft(g);
-
-    g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
-
-    // init dungeonfloor
-    dungeonfloor = create_dungeonfloor(4, 4, TILETYPE_DIRT);
-    if (!dungeonfloor) {
-        mprint("could not create dungeonfloor");
-        // we could use an 'emergency shutdown' in case an error causes us
-        // to need to 'panic' and force game close properly
+        // init dungeonfloor
+        dungeonfloor = create_dungeonfloor(4, 4, TILETYPE_DIRT);
+        if (!dungeonfloor) {
+            mprint("could not create dungeonfloor");
+            // we could use an 'emergency shutdown' in case an error causes us
+            // to need to 'panic' and force game close properly
+        }
+    } else {
+        merror("libgame_initsharedsetup: gamestate is NULL");
     }
 }
 
 
-void libgameinitwithstate(void* state) {
+void libgameinitwithstate(gamestate* state) {
     if (state == NULL) {
         mprint("libgameinitwithstate: state is NULL");
         return;
     }
     mprint("libgameinitwithstate");
-    g = (gamestate*)state;
-    libgame_initsharedsetup();
+    g = state;
+    libgame_initsharedsetup(g);
 }
 
 
