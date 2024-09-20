@@ -205,15 +205,23 @@ void libgame_handlecaminput(gamestate* g) {
     if (g->controlmode == CONTROLMODE_CAMERA) {
 
         const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
-        const float zoom_incr = 0.01f;
+        const float zoom_incr = 1.00f;
         const float cam_move_incr = 1;
 
-        if (IsKeyDown(KEY_Z) && shift) {
-            g->cam2d.zoom -= zoom_incr;
-            //} else if (IsKeyPressed(KEY_Z)) {
-        } else if (IsKeyDown(KEY_Z)) {
+        //if (IsKeyDown(KEY_Z) && shift) {
+        //    g->cam2d.zoom -= zoom_incr;
+        //} else if (IsKeyDown(KEY_Z)) {
+        //    g->cam2d.zoom += zoom_incr;
+        //}
+
+        if (IsKeyPressed(KEY_Z) && shift) {
+            if (g->cam2d.zoom >= 2.0f) {
+                g->cam2d.zoom -= zoom_incr;
+            }
+        } else if (IsKeyPressed(KEY_Z)) {
             g->cam2d.zoom += zoom_incr;
         }
+
 
         if (IsKeyDown(KEY_UP)) {
             g->cam2d.target.y -= cam_move_incr;
