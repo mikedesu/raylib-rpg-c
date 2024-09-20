@@ -47,6 +47,7 @@ float scale = DEFAULT_SCALE;
 textureinfo txinfo[10];
 
 sprite* hero = NULL;
+sprite* hero_shadow = NULL;
 
 dungeonfloor_t* dungeonfloor = NULL;
 
@@ -182,19 +183,24 @@ void libgame_handleplayerinput(gamestate* g) {
         const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
 
 
+#define BASE_SIZE 8
         // this is just a test
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
         if (IsKeyPressed(KEY_RIGHT)) {
-            hero->dest.x += 20;
+            hero->dest.x += BASE_SIZE;
+            hero_shadow->dest.x += BASE_SIZE;
         } else if (IsKeyPressed(KEY_LEFT)) {
-            hero->dest.x -= 20;
+            hero->dest.x -= BASE_SIZE;
+            hero_shadow->dest.x -= BASE_SIZE;
         }
 
         if (IsKeyPressed(KEY_DOWN)) {
-            hero->dest.y += 20;
+            hero->dest.y += BASE_SIZE;
+            hero_shadow->dest.y += BASE_SIZE;
         } else if (IsKeyPressed(KEY_UP)) {
-            hero->dest.y -= 20;
+            hero->dest.y -= BASE_SIZE;
+            hero_shadow->dest.y -= BASE_SIZE;
         }
     }
 }
@@ -424,8 +430,9 @@ void drawgameplayscene() {
         }
     }
 
-    //DrawTexturePro(textures[TXHERO], hero->src, hero->dest, origin, rotation, c);
     DrawTexturePro(txinfo[TXHERO].texture, hero->src, hero->dest, origin, rotation, c);
+    DrawTexturePro(
+        txinfo[TXHEROSHADOW].texture, hero_shadow->src, hero_shadow->dest, origin, rotation, c);
     if (g->debugpanelon) {
         DrawRectangleLinesEx(hero->dest, 1, border1);
     }
@@ -540,33 +547,23 @@ void drawcompanyscene() {
 }
 
 
-//void libgame_loadtexture(int index, const char* path, bool dodither) {
 void libgame_loadtexture(int index, int contexts, int frames, bool dodither, const char* path) {
     if (dodither) {
         Image img = LoadImage(path);
         ImageDither(&img, 4, 4, 4, 4);
-        //textures[index] = LoadTextureFromImage(img);
-        //txinfo[index] = LoadTextureFromImage(img);
-
-        txinfo[index].num_frames = frames;
-        txinfo[index].contexts = contexts;
         txinfo[index].texture = LoadTextureFromImage(img);
-
         UnloadImage(img);
     } else {
-        txinfo[index].num_frames = frames;
-        txinfo[index].contexts = contexts;
         txinfo[index].texture = LoadTexture(path);
     }
+    txinfo[index].num_frames = frames;
+    txinfo[index].contexts = contexts;
     //SetTextureFilter(textures[index], TEXTURE_FILTER_POINT);
     //SetTextureFilter(txinfo[index].texture, TEXTURE_FILTER_POINT);
 }
 
 
 void libgame_loadtextures() {
-    //libgame_loadtexture(TXHERO, 3, 4, false, "img/darkknight2-sheet.png");
-    //libgame_loadtexture(TXDIRT, 1, 1, true, "img/tile-dirt0.png");
-
     libgame_loadtexturesfromfile("textures.txt");
 }
 
@@ -584,7 +581,6 @@ void libgame_loadtexturesfromfile(const char* path) {
     int contexts = 0;
     int frames = 0;
     int dodither = 0;
-
 
     while (fgets(line, 256, f)) {
 
@@ -656,8 +652,13 @@ void libgame_initsharedsetup(gamestate* g) {
 
         libgame_loadtextures();
 
-        hero = sprite_create(
-            &txinfo[TXHERO].texture, txinfo[TXHERO].contexts, txinfo[TXHERO].num_frames);
+        int txkey = TXHERO;
+        hero =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+        txkey = TXHEROSHADOW;
+        hero_shadow =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
 
         // we need to set the destination
         // this is a function of how much we have scaled the target texture
@@ -667,8 +668,10 @@ void libgame_initsharedsetup(gamestate* g) {
         const float y = 0;
         const float w = hero->width;
         const float h = hero->height;
-        const float offset_y = 0;
-        hero->dest = (Rectangle){x, y + offset_y, w, h};
+        const float offset_x = -12;
+        const float offset_y = -12;
+        hero->dest = (Rectangle){x + offset_x, y + offset_y, w, h};
+        hero_shadow->dest = (Rectangle){x + offset_x, y + offset_y, w, h};
 
         setdebugpaneltopleft(g);
         g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
