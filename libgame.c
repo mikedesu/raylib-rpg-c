@@ -559,7 +559,7 @@ void libgame_loadtexture(int index, int contexts, int frames, bool dodither, con
         txinfo[index].texture = LoadTexture(path);
     }
     //SetTextureFilter(textures[index], TEXTURE_FILTER_POINT);
-    SetTextureFilter(txinfo[index].texture, TEXTURE_FILTER_POINT);
+    //SetTextureFilter(txinfo[index].texture, TEXTURE_FILTER_POINT);
 }
 
 
@@ -652,7 +652,7 @@ void libgame_initsharedsetup(gamestate* g) {
         target = LoadRenderTexture(targetwidth, targetheight);
         target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
         target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
-        //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+        SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
         libgame_loadtextures();
 
