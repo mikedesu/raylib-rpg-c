@@ -3,7 +3,7 @@ OBJ=-c
 SHARED=-shared
 DATA_STRUCTS=vectorentityid.o 
 SCENES=companyscene.o 
-LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o gamestate.o utils.o sprite.o setdebugpanel.o dungeonfloor.o
+LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o gamestate.o utils.o sprite.o setdebugpanel.o dungeonfloor.o spritegroup.o
 STATIC_LINK_RAYLIB=-l:libraylib.a
 LINK_MATH=-lm
 POSITION_INDEPENDENT_CODE=-fPIC
@@ -28,13 +28,14 @@ gamestate.o: gamestate.c
 sprite.o: sprite.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 
+spritegroup.o: spritegroup.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 
 
 # Scenes
 
 companyscene.o: companyscene.c 
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
-	#$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(STATIC_LINK_RAYLIB) $^ -o $@
 
 # Data structures and extra functionality/helpers/etc
 vectorentityid.o: vectorentityid.c
@@ -57,7 +58,6 @@ libgame.o: libgame.c
 	touch libgame.so.lockfile
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 libgame.so: $(LIBGAME_OBJECTS)
-	#$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) 
 	$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB)
 	rm -rfv libgame.so.lockfile
 

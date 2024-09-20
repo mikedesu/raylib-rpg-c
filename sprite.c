@@ -44,6 +44,22 @@ void sprite_incrframe(sprite* s) {
         s->src.x = s->width * s->currentframe;
     }
 }
+
+
+void sprite_setcontext(sprite* s, int context) {
+    if (s) {
+        if (context < 0) {
+            context = 0;
+        } else if (context >= s->numcontexts) {
+            context = s->numcontexts - 1;
+        }
+
+        s->currentcontext = context % s->numcontexts;
+        s->src.y = s->height * s->currentcontext;
+    }
+}
+
+
 void sprite_incrcontext(sprite* s) {
     if (s) {
         s->currentcontext = (s->currentcontext + 1) % s->numcontexts;

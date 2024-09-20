@@ -2,6 +2,7 @@
 #include "gamestate.h"
 #include "mprint.h"
 #include "sprite.h"
+#include "spritegroup.h"
 #include "textureinfo.h"
 #include "utils.h"
 
@@ -46,8 +47,12 @@ float scale = DEFAULT_SCALE;
 
 textureinfo txinfo[10];
 
-sprite* hero = NULL;
-sprite* hero_shadow = NULL;
+//sprite* hero = NULL;
+//sprite* hero_shadow = NULL;
+
+spritegroup* hero_group = NULL;
+//spritegroup* hero_shadow_group = NULL;
+
 
 dungeonfloor_t* dungeonfloor = NULL;
 
@@ -150,6 +155,18 @@ void libgamehandleinput() {
         }
     }
 
+    if (IsKeyPressed(KEY_C)) {
+        // increment the 'current' of the hero group
+
+        // this is a test
+
+        hero_group->current += 2;
+        if (hero_group->current >= hero_group->size) {
+            hero_group->current = 0;
+        }
+    }
+
+
     libgame_handlereloadtextures();
     libgame_handlemodeswitch(g);
     libgame_handledebugpanelswitch(g);
@@ -159,7 +176,7 @@ void libgamehandleinput() {
 
 
 void libgame_handlemodeswitch(gamestate* g) {
-    if (IsKeyPressed(KEY_C)) {
+    if (IsKeyPressed(KEY_M)) {
         if (g->controlmode == CONTROLMODE_CAMERA) {
             g->controlmode = CONTROLMODE_PLAYER;
         } else {
@@ -184,23 +201,73 @@ void libgame_handleplayerinput(gamestate* g) {
 
 
 #define BASE_SIZE 8
+#define TEST_SIZE 0.2
         // this is just a test
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
-        if (IsKeyPressed(KEY_RIGHT)) {
-            hero->dest.x += BASE_SIZE;
-            hero_shadow->dest.x += BASE_SIZE;
-        } else if (IsKeyPressed(KEY_LEFT)) {
-            hero->dest.x -= BASE_SIZE;
-            hero_shadow->dest.x -= BASE_SIZE;
+        //if (IsKeyPressed(KEY_RIGHT)) {
+        if (IsKeyDown(KEY_RIGHT)) {
+            //hero_group->dest.x += BASE_SIZE;
+            hero_group->dest.x += TEST_SIZE;
+
+            //hero_group->sprites[hero_group->current]->currentcontext = 0;
+            spritegroup_setcontexts(hero_group, 0);
+
+            //} else if (IsKeyPressed(KEY_LEFT)) {
+        } else if (IsKeyDown(KEY_LEFT)) {
+            //hero_group->dest.x -= BASE_SIZE;
+            hero_group->dest.x -= TEST_SIZE;
+
+            //hero_group->sprites[hero_group->current]->currentcontext = 1;
+            spritegroup_setcontexts(hero_group, 1);
         }
 
-        if (IsKeyPressed(KEY_DOWN)) {
-            hero->dest.y += BASE_SIZE;
-            hero_shadow->dest.y += BASE_SIZE;
-        } else if (IsKeyPressed(KEY_UP)) {
-            hero->dest.y -= BASE_SIZE;
-            hero_shadow->dest.y -= BASE_SIZE;
+        //if (IsKeyPressed(KEY_DOWN)) {
+        if (IsKeyDown(KEY_DOWN)) {
+            //hero_group->dest.y += BASE_SIZE;
+            hero_group->dest.y += TEST_SIZE;
+
+            switch (hero_group->sprites[hero_group->current]->currentcontext) {
+
+            case 0:
+                spritegroup_setcontexts(hero_group, 0);
+                break;
+            case 1:
+                spritegroup_setcontexts(hero_group, 1);
+                break;
+            case 2:
+                spritegroup_setcontexts(hero_group, 0);
+                break;
+            case 3:
+                spritegroup_setcontexts(hero_group, 1);
+                break;
+            default:
+                break;
+            }
+
+
+            //} else if (IsKeyPressed(KEY_UP)) {
+        } else if (IsKeyDown(KEY_UP)) {
+            //hero_group->dest.y -= BASE_SIZE;
+            hero_group->dest.y -= TEST_SIZE;
+
+            switch (hero_group->sprites[hero_group->current]->currentcontext) {
+
+            case 0:
+                spritegroup_setcontexts(hero_group, 2);
+                break;
+            case 1:
+                spritegroup_setcontexts(hero_group, 3);
+                break;
+            case 2:
+                spritegroup_setcontexts(hero_group, 2);
+                break;
+            case 3:
+                spritegroup_setcontexts(hero_group, 3);
+                break;
+            default:
+                break;
+            }
         }
     }
 }
@@ -292,7 +359,13 @@ void libgameupdatedebugpanelbuffer() {
              "Cam.offset:   %.2f,%.2f\n"
              "Cam.zoom:     %.2f\n"
              "Active scene: %d\n"
-             "Control mode: %d\n",
+             "Control mode: %d\n"
+             "Herogroup current: %d\n"
+             "Herogroup size: %d\n"
+             "Herogroup capacity: %d\n"
+
+
+             ,
              g->framecount,
 
              g->timebeganbuf,
@@ -313,7 +386,13 @@ void libgameupdatedebugpanelbuffer() {
 
              activescene,
 
-             g->controlmode);
+             g->controlmode,
+
+             hero_group->current,
+             hero_group->size,
+             hero_group->capacity
+
+    );
 }
 
 
@@ -430,11 +509,29 @@ void drawgameplayscene() {
         }
     }
 
-    DrawTexturePro(txinfo[TXHERO].texture, hero->src, hero->dest, origin, rotation, c);
-    DrawTexturePro(
-        txinfo[TXHEROSHADOW].texture, hero_shadow->src, hero_shadow->dest, origin, rotation, c);
+    // draw hero and its shadow
+    //DrawTexturePro(txinfo[TXHERO].texture, hero->src, hero->dest, origin, rotation, c);
+    //DrawTexturePro(*hero->texture, hero->src, hero->dest, origin, rotation, c);
+    DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
+                   hero_group->sprites[hero_group->current]->src,
+                   hero_group->dest,
+                   origin,
+                   rotation,
+                   c);
+
+    //    DrawTexturePro(
+    //        txinfo[TXHEROSHADOW].texture, hero_shadow->src, hero_shadow->dest, origin, rotation, c);
+    //DrawTexturePro(*hero_shadow->texture, hero_shadow->src, hero_shadow->dest, origin, rotation, c);
+    DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
+                   hero_group->sprites[hero_group->current + 1]->src,
+                   hero_group->dest,
+                   origin,
+                   rotation,
+                   c);
+
+
     if (g->debugpanelon) {
-        DrawRectangleLinesEx(hero->dest, 1, border1);
+        DrawRectangleLinesEx(hero_group->dest, 1, border1);
     }
 
     EndMode2D();
@@ -450,7 +547,13 @@ void drawgameplayscene() {
     // we could rawdog an array of sprite pointers or something but we will deal with it
     // when we get there
     if (g->framecount % 10 == 0) {
-        sprite_incrframe(hero);
+
+        for (int i = 0; i < hero_group->size; i++) {
+            sprite_incrframe(hero_group->sprites[i]);
+        }
+
+        //sprite_incrframe(hero_group->sprites[0]);
+        //sprite_incrframe(hero_group->sprites[1]);
     }
 }
 
@@ -653,11 +756,19 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_loadtextures();
 
         int txkey = TXHERO;
-        hero =
+        sprite* hero =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
 
         txkey = TXHEROSHADOW;
-        hero_shadow =
+        sprite* hero_shadow =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+        txkey = TXHEROWALK;
+        sprite* herowalk =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+        txkey = TXHEROWALKSHADOW;
+        sprite* herowalk_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
 
         // we need to set the destination
@@ -670,8 +781,42 @@ void libgame_initsharedsetup(gamestate* g) {
         const float h = hero->height;
         const float offset_x = -12;
         const float offset_y = -12;
-        hero->dest = (Rectangle){x + offset_x, y + offset_y, w, h};
-        hero_shadow->dest = (Rectangle){x + offset_x, y + offset_y, w, h};
+
+        Rectangle dest = {x + offset_x, y + offset_y, w, h};
+
+        //hero->dest = dest;
+        //hero_shadow->dest = dest;
+        //herowalk->dest = dest;
+        //herowalk_shadow->dest = dest;
+
+
+        hero_group = spritegroup_create(5);
+        spritegroup_add(hero_group, hero);
+        spritegroup_add(hero_group, hero_shadow);
+        spritegroup_add(hero_group, herowalk);
+        spritegroup_add(hero_group, herowalk_shadow);
+
+        // testing
+        hero_group->current = 0;
+        hero_group->dest = dest;
+
+
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+
 
         setdebugpaneltopleft(g);
         g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
@@ -714,7 +859,10 @@ void libgameclose() {
 
 
 void libgame_closeshared() {
-    sprite_destroy(hero);
+    //sprite_destroy(hero);
+    //sprite_destroy(hero_shadow);
+
+    spritegroup_destroy(hero_group);
 
     // not right now, but when we add dungeonfloor to
     // the gamestate, we will be able to avoid freeing
