@@ -7,15 +7,13 @@ typedef struct sprite {
     Texture2D* texture;
     Vector2 position;
 
-    int width;
-    int height;
-
     Rectangle src;
     Rectangle dest;
 
+    int width;
+    int height;
     int numcontexts;
     int numframes;
-
     int currentframe;
     int currentcontext;
 
