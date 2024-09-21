@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 spritegroup* spritegroup_create(int capacity) {
-    mprint("creating spritegroup\n");
+    minfo("creating spritegroup");
     spritegroup* sg = malloc(sizeof(spritegroup));
     if (!sg) {
         return NULL;
@@ -24,7 +24,7 @@ spritegroup* spritegroup_create(int capacity) {
 
 
 void spritegroup_destroy(spritegroup* sg) {
-    mprint("destroying spritegroup\n");
+    minfo("destroying spritegroup");
     if (sg) {
         if (sg->sprites) {
             for (int i = 0; i < sg->size; i++) {
@@ -38,39 +38,39 @@ void spritegroup_destroy(spritegroup* sg) {
 
 
 void spritegroup_add(spritegroup* sg, sprite* s) {
-    mprint("adding sprite to spritegroup\n");
+    minfo("adding sprite to spritegroup");
     if (sg && s) {
         if (sg->size < sg->capacity) {
             sg->sprites[sg->size] = s;
             sg->size++;
         } else {
-            merror("spritegroup is full\n");
+            merror("spritegroup is full");
         }
     } else {
         if (!sg) {
-            merror("spritegroup is NULL\n");
+            merror("spritegroup is NULL");
         }
 
         if (!s) {
-            merror("sprite is NULL\n");
+            merror("sprite is NULL");
         }
     }
 }
 
 
 void spritegroup_set(spritegroup* sg, int index, sprite* s) {
-    mprint("setting sprite in spritegroup\n");
+    minfo("setting sprite in spritegroup");
     if (sg && s) {
         if (index < sg->size) {
             sg->sprites[index] = s;
         }
     } else {
         if (!sg) {
-            merror("spritegroup is NULL\n");
+            merror("spritegroup is NULL");
         }
 
         if (!s) {
-            merror("sprite is NULL\n");
+            merror("sprite is NULL");
         }
     }
 }
@@ -83,6 +83,6 @@ void spritegroup_setcontexts(spritegroup* sg, int context) {
             sprite_setcontext(sg->sprites[i], context);
         }
     } else {
-        merror("spritegroup is NULL\n");
+        merror("spritegroup is NULL");
     }
 }

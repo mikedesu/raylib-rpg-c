@@ -133,7 +133,7 @@ void libgame_handlereloadtextures() {
 
 void libgamehandleinput() {
     if (IsKeyPressed(KEY_SPACE)) {
-        mprint("key space pressed");
+        minfo("key space pressed");
         if (g->fadestate == FADESTATENONE) {
             g->fadestate = FADESTATEOUT;
         }
@@ -296,7 +296,7 @@ bool libgame_windowshouldclose() {
 
 void gameinitwindow() {
     const char* title = DEFAULT_WINDOW_TITLE;
-    mprint("begin gameinitwindow");
+    minfo("begin gameinitwindow");
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
     InitWindow(windowwidth, windowheight, title);
@@ -311,7 +311,7 @@ void gameinitwindow() {
     SetWindowPosition(x, y);
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_Q);
-    mprint("end of gameinitwindow");
+    minfo("end of gameinitwindow");
 }
 
 
@@ -652,12 +652,6 @@ void libgame_loadtexturesfromfile(const char* path) {
 
         sscanf(line, "%d %d %d %d %s", &index, &contexts, &frames, &dodither, txpath);
 
-        //printf("index: %d\n", index);
-        //printf("contexts: %d\n", contexts);
-        //printf("frames: %d\n", frames);
-        //printf("dodither: %d\n", dodither);
-        //printf("txpath: %s\n", txpath);
-
         libgame_loadtexture(index, contexts, frames, dodither, txpath);
 
         bzero(line, 256);
@@ -668,9 +662,7 @@ void libgame_loadtexturesfromfile(const char* path) {
 
 
 void libgame_unloadtexture(int index) {
-    //if (textures[index].id > 0) {
     if (txinfo[index].texture.id > 0) {
-        //UnloadTexture(textures[index]);
         UnloadTexture(txinfo[index].texture);
     }
 }
@@ -689,7 +681,7 @@ void libgame_reloadtextures() {
 
 
 void libgameinit() {
-    mprint("libgameinit");
+    minfo("libgameinit");
 
     g = gamestateinitptr(windowwidth, windowheight, targetwidth, targetheight);
 
@@ -800,7 +792,7 @@ void libgame_initsharedsetup(gamestate* g) {
         // init dungeonfloor
         dungeonfloor = create_dungeonfloor(4, 4, TILETYPE_DIRT);
         if (!dungeonfloor) {
-            mprint("could not create dungeonfloor");
+            merror("could not create dungeonfloor");
             // we could use an 'emergency shutdown' in case an error causes us
             // to need to 'panic' and force game close properly
         }
@@ -812,23 +804,23 @@ void libgame_initsharedsetup(gamestate* g) {
 
 void libgameinitwithstate(gamestate* state) {
     if (state == NULL) {
-        mprint("libgameinitwithstate: state is NULL");
+        merror("libgameinitwithstate: state is NULL");
         return;
     }
-    mprint("libgameinitwithstate");
+    minfo("libgameinitwithstate");
     g = state;
     libgame_initsharedsetup(g);
 }
 
 
 void libgameclosesavegamestate() {
-    mprint("libgameclosesavegamestate");
+    minfo("libgameclosesavegamestate");
     libgame_closeshared();
 }
 
 
 void libgameclose() {
-    mprint("libgameclose");
+    minfo("libgameclose");
     gamestatefree(g);
     libgame_closeshared();
 }
@@ -843,11 +835,11 @@ void libgame_closeshared() {
     dungeonfloor_free(dungeonfloor);
 
     UnloadFont(gfont);
-    mprint("unloading textures");
+    minfo("unloading textures");
     libgame_unloadtextures();
-    mprint("unloading render texture");
+    minfo("unloading render texture");
     UnloadRenderTexture(target);
-    mprint("closing window");
+    minfo("closing window");
     CloseWindow();
 }
 
