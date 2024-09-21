@@ -26,7 +26,6 @@ char debugpanelbuffer[1024] = {0};
 
 int activescene = GAMEPLAYSCENE;
 
-
 gamestate* g = NULL;
 
 Font gfont;
@@ -43,16 +42,9 @@ int windowheight = DEFAULT_WINDOW_HEIGHT;
 
 float scale = DEFAULT_SCALE;
 
-//Texture textures[10];
-
-textureinfo txinfo[10];
-
-//sprite* hero = NULL;
-//sprite* hero_shadow = NULL;
+textureinfo txinfo[20];
 
 spritegroup* hero_group = NULL;
-//spritegroup* hero_shadow_group = NULL;
-
 
 dungeonfloor_t* dungeonfloor = NULL;
 
@@ -63,18 +55,14 @@ bool libgame_windowshouldclose();
 
 void gameinitwindow();
 void gameclosewindow();
-
 void libgameupdatedebugpanelbuffer();
 void libgameupdategamestate();
 void libgamedrawframe();
 void libgameinit();
 void libgameinitwithstate(gamestate* state);
 void libgameclose();
-
 void libgamehandleinput();
 void libgame_handlereloadtextures();
-
-//void libgame_loadtexture(int index, const char* path, bool dodither);
 
 void libgame_loadtexture(int index, int contexts, int frames, bool dodither, const char* path);
 void libgame_loadtextures();
@@ -82,10 +70,14 @@ void libgame_unloadtexture(int index);
 void libgame_unloadtextures();
 void libgame_loadtexturesfromfile(const char* path);
 void libgame_reloadtextures();
-
 void libgame_initsharedsetup(gamestate* g);
-
 void libgame_closeshared();
+gamestate* libgame_getgamestate();
+void libgame_drawframeend(gamestate* g);
+void libgame_handleplayerinput(gamestate* g);
+void libgame_handlecaminput(gamestate* g);
+void libgame_handledebugpanelswitch(gamestate* g);
+void libgame_handlemodeswitch(gamestate* g);
 
 void drawdebugpanel();
 void drawcompanyscene();
@@ -94,14 +86,6 @@ void drawgameplayscene();
 void handlefade();
 void drawfade();
 
-gamestate* libgame_getgamestate();
-void libgame_drawframeend(gamestate* g);
-
-
-void libgame_handleplayerinput(gamestate* g);
-void libgame_handlecaminput(gamestate* g);
-void libgame_handledebugpanelswitch(gamestate* g);
-void libgame_handlemodeswitch(gamestate* g);
 
 //--------------------------------------------------------------------
 // definitions
@@ -159,7 +143,6 @@ void libgamehandleinput() {
         // increment the 'current' of the hero group
 
         // this is a test
-
         hero_group->current += 2;
         if (hero_group->current >= hero_group->size) {
             hero_group->current = 0;
@@ -274,19 +257,15 @@ void libgame_handleplayerinput(gamestate* g) {
 
 
 void libgame_handlecaminput(gamestate* g) {
-
     if (g->controlmode == CONTROLMODE_CAMERA) {
-
         const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         const float zoom_incr = 1.00f;
         const float cam_move_incr = 1;
-
         //if (IsKeyDown(KEY_Z) && shift) {
         //    g->cam2d.zoom -= zoom_incr;
         //} else if (IsKeyDown(KEY_Z)) {
         //    g->cam2d.zoom += zoom_incr;
         //}
-
         if (IsKeyPressed(KEY_Z) && shift) {
             if (g->cam2d.zoom >= 2.0f) {
                 g->cam2d.zoom -= zoom_incr;
@@ -294,7 +273,6 @@ void libgame_handlecaminput(gamestate* g) {
         } else if (IsKeyPressed(KEY_Z)) {
             g->cam2d.zoom += zoom_incr;
         }
-
 
         if (IsKeyDown(KEY_UP)) {
             g->cam2d.target.y -= cam_move_incr;
@@ -326,14 +304,11 @@ void gameinitwindow() {
         ;
     // this is hard-coded for now so we can auto-position the window
     // for easier config during streaming
-
     //SetWindowMonitor(0);
     SetWindowMonitor(1);
-
     const int x = DEFAULT_WINDOW_POS_X;
     const int y = DEFAULT_WINDOW_POS_Y;
     SetWindowPosition(x, y);
-
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_Q);
     mprint("end of gameinitwindow");
@@ -362,32 +337,21 @@ void libgameupdatedebugpanelbuffer() {
              "Control mode: %d\n"
              "Herogroup current: %d\n"
              "Herogroup size: %d\n"
-             "Herogroup capacity: %d\n"
-
-
-             ,
+             "Herogroup capacity: %d\n",
              g->framecount,
-
              g->timebeganbuf,
              g->currenttimebuf,
-
              targetwidth,
              targetheight,
-
              windowwidth,
              windowheight,
-
              g->cam2d.target.x,
              g->cam2d.target.y,
              g->cam2d.offset.x,
              g->cam2d.offset.y,
-
              g->cam2d.zoom,
-
              activescene,
-
              g->controlmode,
-
              hero_group->current,
              hero_group->size,
              hero_group->capacity
@@ -398,7 +362,6 @@ void libgameupdatedebugpanelbuffer() {
 
 void libgameupdategamestate() {
     libgameupdatedebugpanelbuffer();
-
     //setdebugpaneltopleft(g);
     //setdebugpaneltopright(g);
     //setdebugpanelbottomleft(g);
@@ -430,7 +393,6 @@ void libgamedrawframe() {
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     drawdebugpanel();
 
-
     libgame_drawframeend(g);
 }
 
@@ -453,7 +415,6 @@ inline void drawdebugpanel() {
 
         int boxoffsetxy = 10;
         int boxoffsetwh = 20;
-
         int bx = p.x - boxoffsetxy;
         int by = p.y - boxoffsetxy;
         int bw = m.x + boxoffsetwh;
@@ -466,7 +427,6 @@ inline void drawdebugpanel() {
         int ty = p.y - txoffsetxy;
         int tw = m.x + txoffsetwh;
         int th = m.y + txoffsetwh;
-
         //DrawRectangle(tx, ty, tw, th, (Color){0x33, 0x33, 0x33, 128});
         DrawTextEx(gfont, debugpanelbuffer, p, fontsize, spacing, WHITE);
     }
@@ -476,10 +436,8 @@ inline void drawdebugpanel() {
 void drawgameplayscene() {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
-
     // lets draw the sprite
     //DrawTextureEx(textures[TXHERO], (Vector2){hero->dest.x, hero->dest.y}, 0.0f, 1.0f, WHITE);
-
     //const int w = textures[TXDIRT].width;
     //const int h = textures[TXDIRT].height;
     const int w = txinfo[TXDIRT].texture.width;
@@ -494,7 +452,6 @@ void drawgameplayscene() {
     float rotation = 0;
 
     // draw the dungeon floor
-
     for (int i = 0; i < dungeonfloor->len; i++) {
         for (int j = 0; j < dungeonfloor->wid; j++) {
             tile_dest.x = i * w;
@@ -502,7 +459,6 @@ void drawgameplayscene() {
             //DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
             DrawTexturePro(txinfo[TXDIRT].texture, tile_src, tile_dest, origin, rotation, c);
             // lets also draw a border around the tiles
-
             if (g->debugpanelon) {
                 DrawRectangleLinesEx(tile_dest, 1, border0);
             }
@@ -510,18 +466,13 @@ void drawgameplayscene() {
     }
 
     // draw hero and its shadow
-    //DrawTexturePro(txinfo[TXHERO].texture, hero->src, hero->dest, origin, rotation, c);
-    //DrawTexturePro(*hero->texture, hero->src, hero->dest, origin, rotation, c);
     DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
                    hero_group->sprites[hero_group->current]->src,
                    hero_group->dest,
                    origin,
                    rotation,
-                   c);
+                   (Color){255, 0, 0, 255});
 
-    //    DrawTexturePro(
-    //        txinfo[TXHEROSHADOW].texture, hero_shadow->src, hero_shadow->dest, origin, rotation, c);
-    //DrawTexturePro(*hero_shadow->texture, hero_shadow->src, hero_shadow->dest, origin, rotation, c);
     DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
                    hero_group->sprites[hero_group->current + 1]->src,
                    hero_group->dest,
@@ -547,10 +498,11 @@ void drawgameplayscene() {
     // we could rawdog an array of sprite pointers or something but we will deal with it
     // when we get there
     if (g->framecount % 10 == 0) {
+        sprite_incrframe(hero_group->sprites[hero_group->current]);
 
-        for (int i = 0; i < hero_group->size; i++) {
-            sprite_incrframe(hero_group->sprites[i]);
-        }
+        //for (int i = 0; i < hero_group->size; i++) {
+        //    sprite_incrframe(hero_group->sprites[i]);
+        //}
 
         //sprite_incrframe(hero_group->sprites[0]);
         //sprite_incrframe(hero_group->sprites[1]);
@@ -654,10 +606,16 @@ void libgame_loadtexture(int index, int contexts, int frames, bool dodither, con
     if (dodither) {
         Image img = LoadImage(path);
         ImageDither(&img, 4, 4, 4, 4);
-        txinfo[index].texture = LoadTextureFromImage(img);
+
+        Texture2D t = LoadTextureFromImage(img);
+
+
+        txinfo[index].texture = t;
         UnloadImage(img);
     } else {
-        txinfo[index].texture = LoadTexture(path);
+        Texture2D t = LoadTexture(path);
+
+        txinfo[index].texture = t;
     }
     txinfo[index].num_frames = frames;
     txinfo[index].contexts = contexts;
@@ -771,6 +729,40 @@ void libgame_initsharedsetup(gamestate* g) {
         sprite* herowalk_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
 
+
+        txkey = TXHEROATTACK;
+        sprite* heroattack =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+        txkey = TXHEROATTACKSHADOW;
+        sprite* heroattack_shadow =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+        txkey = TXHEROJUMP;
+        sprite* herojump =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+        txkey = TXHEROJUMPSHADOW;
+        sprite* herojump_shadow =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+        txkey = TXHEROSPINDIE;
+        sprite* herospindie =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+        txkey = TXHEROSPINDIESHADOW;
+        sprite* herospindie_shadow =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+        txkey = TXHEROSOULDIE;
+        sprite* herosouldie =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+        txkey = TXHEROSOULDIESHADOW;
+        sprite* herosouldie_shadow =
+            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
+
         // we need to set the destination
         // this is a function of how much we have scaled the target texture
         // we need to write code to manage this but we will hack something
@@ -784,39 +776,23 @@ void libgame_initsharedsetup(gamestate* g) {
 
         Rectangle dest = {x + offset_x, y + offset_y, w, h};
 
-        //hero->dest = dest;
-        //hero_shadow->dest = dest;
-        //herowalk->dest = dest;
-        //herowalk_shadow->dest = dest;
-
-
-        hero_group = spritegroup_create(5);
+        hero_group = spritegroup_create(20);
         spritegroup_add(hero_group, hero);
         spritegroup_add(hero_group, hero_shadow);
         spritegroup_add(hero_group, herowalk);
         spritegroup_add(hero_group, herowalk_shadow);
+        spritegroup_add(hero_group, heroattack);
+        spritegroup_add(hero_group, heroattack_shadow);
+        spritegroup_add(hero_group, herojump);
+        spritegroup_add(hero_group, herojump_shadow);
+        spritegroup_add(hero_group, herospindie);
+        spritegroup_add(hero_group, herospindie_shadow);
+        spritegroup_add(hero_group, herosouldie);
+        spritegroup_add(hero_group, herosouldie_shadow);
 
         // testing
         hero_group->current = 0;
         hero_group->dest = dest;
-
-
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-
 
         setdebugpaneltopleft(g);
         g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
@@ -859,9 +835,6 @@ void libgameclose() {
 
 
 void libgame_closeshared() {
-    //sprite_destroy(hero);
-    //sprite_destroy(hero_shadow);
-
     spritegroup_destroy(hero_group);
 
     // not right now, but when we add dungeonfloor to

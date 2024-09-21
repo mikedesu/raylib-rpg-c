@@ -7,3 +7,11 @@
 3 1 1 0 img/tiles/dungeon0.png
 4 4 4 0  img/characters/human-walk.png 
 5 4 4 0  img/characters/human-walk-shadow.png 
+6 4 4 0  img/characters/human-attack.png 
+7 4 4 0  img/characters/human-attack-shadow.png 
+8 4 4 0  img/characters/human-jump.png 
+9 4 4 0  img/characters/human-jump-shadow.png 
+10 1 12 0  img/characters/human-spindie.png 
+11 1 12 0  img/characters/human-spindie-shadow.png 
+12 1 12 0  img/characters/human-souldie.png 
+13 1 12 0  img/characters/human-souldie-shadow.png 

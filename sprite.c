@@ -50,12 +50,15 @@ void sprite_setcontext(sprite* s, int context) {
     if (s) {
         if (context < 0) {
             context = 0;
+            // also set currentframe to 0 to reset animation frame
         } else if (context >= s->numcontexts) {
             context = s->numcontexts - 1;
         }
 
         s->currentcontext = context % s->numcontexts;
         s->src.y = s->height * s->currentcontext;
+        s->currentframe = 0;
+        s->src.x = 0;
     }
 }
 
