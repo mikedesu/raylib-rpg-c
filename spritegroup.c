@@ -19,6 +19,8 @@ spritegroup* spritegroup_create(int capacity) {
 
     sg->dest = (Rectangle){0, 0, 0, 0};
 
+    sg->move = (Vector2){0, 0};
+
     return sg;
 }
 

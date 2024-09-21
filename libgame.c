@@ -160,10 +160,15 @@ void libgamehandleinput() {
 
 void libgame_handlemodeswitch(gamestate* g) {
     if (IsKeyPressed(KEY_M)) {
-        if (g->controlmode == CONTROLMODE_CAMERA) {
+        switch (g->controlmode) {
+        case CONTROLMODE_CAMERA:
+            minfo("control mode: camera");
             g->controlmode = CONTROLMODE_PLAYER;
-        } else {
+            break;
+        default:
+            minfo("control mode: player");
             g->controlmode = CONTROLMODE_CAMERA;
+            break;
         }
     }
 }
@@ -176,81 +181,53 @@ void libgame_handledebugpanelswitch(gamestate* g) {
 }
 
 
-void libgame_handleplayerinput(gamestate* g) {
-
-    if (g->controlmode == CONTROLMODE_PLAYER) {
-
-        const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
-
-
 #define BASE_SIZE 8
 #define TEST_SIZE 0.2
+void libgame_handleplayerinput(gamestate* g) {
+    if (g->controlmode == CONTROLMODE_PLAYER) {
+        const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         // this is just a test
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
-        //if (IsKeyPressed(KEY_RIGHT)) {
-        if (IsKeyDown(KEY_RIGHT)) {
+        if (IsKeyPressed(KEY_RIGHT)) {
             //hero_group->dest.x += BASE_SIZE;
-            hero_group->dest.x += TEST_SIZE;
+            int cc = hero_group->sprites[hero_group->current]->currentcontext;
+            int context = cc == 0 ? 0 : cc == 1 ? 0 : cc == 2 ? 2 : 2;
+            spritegroup_setcontexts(hero_group, context);
+            hero_group->move = (Vector2){8, 0};
 
-            //hero_group->sprites[hero_group->current]->currentcontext = 0;
-            spritegroup_setcontexts(hero_group, 0);
+            hero_group->current = 2;
 
-            //} else if (IsKeyPressed(KEY_LEFT)) {
-        } else if (IsKeyDown(KEY_LEFT)) {
+        } else if (IsKeyPressed(KEY_LEFT)) {
             //hero_group->dest.x -= BASE_SIZE;
-            hero_group->dest.x -= TEST_SIZE;
-
-            //hero_group->sprites[hero_group->current]->currentcontext = 1;
-            spritegroup_setcontexts(hero_group, 1);
+            int cc = hero_group->sprites[hero_group->current]->currentcontext;
+            int context = cc == 0 ? 1 : cc == 1 ? 1 : cc == 2 ? 3 : 3;
+            spritegroup_setcontexts(hero_group, context);
+            hero_group->move = (Vector2){-8, 0};
+            hero_group->current = 2;
         }
 
-        //if (IsKeyPressed(KEY_DOWN)) {
-        if (IsKeyDown(KEY_DOWN)) {
+        if (IsKeyPressed(KEY_DOWN)) {
             //hero_group->dest.y += BASE_SIZE;
-            hero_group->dest.y += TEST_SIZE;
+            int cc = hero_group->sprites[hero_group->current]->currentcontext;
+            int context = cc == 0 ? 0 : cc == 1 ? 1 : cc == 2 ? 0 : 1;
+            spritegroup_setcontexts(hero_group, context);
+            hero_group->move = (Vector2){0, 8};
+            hero_group->current = 2;
 
-            switch (hero_group->sprites[hero_group->current]->currentcontext) {
-
-            case 0:
-                spritegroup_setcontexts(hero_group, 0);
-                break;
-            case 1:
-                spritegroup_setcontexts(hero_group, 1);
-                break;
-            case 2:
-                spritegroup_setcontexts(hero_group, 0);
-                break;
-            case 3:
-                spritegroup_setcontexts(hero_group, 1);
-                break;
-            default:
-                break;
-            }
-
-
-            //} else if (IsKeyPressed(KEY_UP)) {
-        } else if (IsKeyDown(KEY_UP)) {
+        } else if (IsKeyPressed(KEY_UP)) {
             //hero_group->dest.y -= BASE_SIZE;
-            hero_group->dest.y -= TEST_SIZE;
+            hero_group->move = (Vector2){0, -8};
+            int cc = hero_group->sprites[hero_group->current]->currentcontext;
+            int context = cc == 0 ? 2 : cc == 1 ? 3 : cc == 2 ? 2 : 3;
+            spritegroup_setcontexts(hero_group, context);
+            hero_group->current = 2;
+        }
 
-            switch (hero_group->sprites[hero_group->current]->currentcontext) {
 
-            case 0:
-                spritegroup_setcontexts(hero_group, 2);
-                break;
-            case 1:
-                spritegroup_setcontexts(hero_group, 3);
-                break;
-            case 2:
-                spritegroup_setcontexts(hero_group, 2);
-                break;
-            case 3:
-                spritegroup_setcontexts(hero_group, 3);
-                break;
-            default:
-                break;
-            }
+        if (IsKeyPressed(KEY_PERIOD)) {
+
+            hero_group->current = 0;
         }
     }
 }
@@ -258,18 +235,13 @@ void libgame_handleplayerinput(gamestate* g) {
 
 void libgame_handlecaminput(gamestate* g) {
     if (g->controlmode == CONTROLMODE_CAMERA) {
+
         const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         const float zoom_incr = 1.00f;
         const float cam_move_incr = 1;
-        //if (IsKeyDown(KEY_Z) && shift) {
-        //    g->cam2d.zoom -= zoom_incr;
-        //} else if (IsKeyDown(KEY_Z)) {
-        //    g->cam2d.zoom += zoom_incr;
-        //}
-        if (IsKeyPressed(KEY_Z) && shift) {
-            if (g->cam2d.zoom >= 2.0f) {
-                g->cam2d.zoom -= zoom_incr;
-            }
+
+        if (IsKeyPressed(KEY_Z) && shift && g->cam2d.zoom >= 2.0f) {
+            g->cam2d.zoom -= zoom_incr;
         } else if (IsKeyPressed(KEY_Z)) {
             g->cam2d.zoom += zoom_incr;
         }
@@ -295,8 +267,8 @@ bool libgame_windowshouldclose() {
 
 
 void gameinitwindow() {
-    const char* title = DEFAULT_WINDOW_TITLE;
     minfo("begin gameinitwindow");
+    const char* title = DEFAULT_WINDOW_TITLE;
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
     InitWindow(windowwidth, windowheight, title);
@@ -362,12 +334,38 @@ void libgameupdatedebugpanelbuffer() {
 
 void libgameupdategamestate() {
     libgameupdatedebugpanelbuffer();
-    //setdebugpaneltopleft(g);
-    //setdebugpaneltopright(g);
-    //setdebugpanelbottomleft(g);
-    //setdebugpanelbottomright(g);
-    //setdebugpanelcenter(g);
+
+
+    // lets try using the  move vector on our spritegroup
+    // to move the spritegroup dest rectangle
+    // so that we can begin translating
+    // player input
+    // into real moves
+
+    // only do it 1 unit at a time
+    if (hero_group->move.x > 0) {
+        hero_group->dest.x++;
+        hero_group->move.x--;
+    } else if (hero_group->move.x < 0) {
+        hero_group->dest.x--;
+        hero_group->move.x++;
+    }
+
+    if (hero_group->move.y > 0) {
+        hero_group->dest.y++;
+        hero_group->move.y--;
+    } else if (hero_group->move.y < 0) {
+        hero_group->dest.y--;
+        hero_group->move.y++;
+    }
 }
+
+
+//setdebugpaneltopleft(g);
+//setdebugpaneltopright(g);
+//setdebugpanelbottomleft(g);
+//setdebugpanelbottomright(g);
+//setdebugpanelcenter(g);
 
 
 void libgame_drawframeend(gamestate* g) {
@@ -389,10 +387,8 @@ void libgamedrawframe() {
     }
 
     EndTextureMode();
-
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     drawdebugpanel();
-
     libgame_drawframeend(g);
 }
 
@@ -401,7 +397,6 @@ inline void drawdebugpanel() {
     if (g->debugpanelon) {
         const int fontsize = 14;
         const int spacing = 1;
-
         Vector2 p = {g->debugpanel.x, g->debugpanel.y};
         Vector2 m = MeasureTextEx(gfont, debugpanelbuffer, fontsize, spacing);
         // update the debug panel width and height
@@ -413,20 +408,19 @@ inline void drawdebugpanel() {
         g->debugpanel.w = m.x;
         g->debugpanel.h = m.y;
 
-        int boxoffsetxy = 10;
-        int boxoffsetwh = 20;
-        int bx = p.x - boxoffsetxy;
-        int by = p.y - boxoffsetxy;
-        int bw = m.x + boxoffsetwh;
-        int bh = m.y + boxoffsetwh;
-        DrawRectangle(bx, by, bw, bh, (Color){0x33, 0x33, 0x33, 128});
+        int xy = 10;
+        int wh = 20;
+        Rectangle box = {p.x - xy, p.y - xy, m.x + wh, m.y + wh};
 
-        int txoffsetxy = 3;
-        int txoffsetwh = 8;
-        int tx = p.x - txoffsetxy;
-        int ty = p.y - txoffsetxy;
-        int tw = m.x + txoffsetwh;
-        int th = m.y + txoffsetwh;
+        //DrawRectangle(bx, by, bw, bh, (Color){0x33, 0x33, 0x33, 128});
+        DrawRectanglePro(box, (Vector2){0.0f, 0.0f}, 0.0f, (Color){0x33, 0x33, 0x33, 128});
+
+        //int txoffsetxy = 3;
+        //int txoffsetwh = 8;
+        //int tx = p.x - txoffsetxy;
+        //int ty = p.y - txoffsetxy;
+        //int tw = m.x + txoffsetwh;
+        //int th = m.y + txoffsetwh;
         //DrawRectangle(tx, ty, tw, th, (Color){0x33, 0x33, 0x33, 128});
         DrawTextEx(gfont, debugpanelbuffer, p, fontsize, spacing, WHITE);
     }
@@ -458,12 +452,24 @@ void drawgameplayscene() {
             tile_dest.y = j * h;
             //DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
             DrawTexturePro(txinfo[TXDIRT].texture, tile_src, tile_dest, origin, rotation, c);
-            // lets also draw a border around the tiles
-            if (g->debugpanelon) {
-                DrawRectangleLinesEx(tile_dest, 1, border0);
-            }
         }
     }
+
+    // we want to draw a grid of lines on top of the tiles
+    // previously we were drawing rectanglelines around each tile
+    // but this looked ugly
+    // instead
+    // lets go row by row, column by column
+    // and draw lines
+
+    for (int i = 0; i < dungeonfloor->len; i++) {
+        DrawLine(i * w, 0, i * w, dungeonfloor->wid * h, border1);
+    }
+
+    for (int i = 0; i < dungeonfloor->wid; i++) {
+        DrawLine(0, i * h, dungeonfloor->len * w, i * h, border1);
+    }
+
 
     // draw hero and its shadow
     DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
@@ -482,7 +488,11 @@ void drawgameplayscene() {
 
 
     if (g->debugpanelon) {
-        DrawRectangleLinesEx(hero_group->dest, 1, border1);
+        DrawRectangleLines(hero_group->dest.x,
+                           hero_group->dest.y,
+                           hero_group->dest.width,
+                           hero_group->dest.height,
+                           (Color){0x33, 0x33, 0x33, 255});
     }
 
     EndMode2D();

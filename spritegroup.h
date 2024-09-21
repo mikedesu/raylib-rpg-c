@@ -9,6 +9,7 @@ typedef struct spritegroup {
     sprite** sprites;
 
     Rectangle dest;
+    Vector2 move;
 } spritegroup;
 
 
