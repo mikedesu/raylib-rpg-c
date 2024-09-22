@@ -45,6 +45,8 @@ def main():
     locstr = f"{df['loc'].mean():.1f}"
     kbstr = f"{df['binkb'].mean():.1f}"
     kbstr2 = f"{df['libkb'].mean():.1f}"
+    buildtimestr = f"{df['buildtime'].mean():.3f}"
+
     # bpsstr = f"{df['bytes/s'].mean():.2f}"
     # locsstr = f"{df['loc/s'].mean():.2f}"
     # buildtimestr = f"{df['buildtime ms/s'].mean():.2f}"
@@ -53,6 +55,7 @@ def main():
     print(f"Avg line count:   {locstr:>10} loc")
     print(f"Avg binary size:  {kbstr:>10} kb")
     print(f"Avg library size: {kbstr2:>10} kb")
+    print(f"Avg build Time:   {buildtimestr:>10} s")
     # print(f"Avg build size (bytes/s): {bpsstr}")
     # print(f"Avg line count (loc/s):   {locsstr}")
     # print(f"Avg build Time (ms/s):    {buildtimestr}")

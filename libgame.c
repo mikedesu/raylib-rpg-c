@@ -462,12 +462,14 @@ void drawgameplayscene() {
     // lets go row by row, column by column
     // and draw lines
 
-    for (int i = 0; i < dungeonfloor->len; i++) {
-        DrawLine(i * w, 0, i * w, dungeonfloor->wid * h, border1);
-    }
+    if (g->debugpanelon) {
+        for (int i = 0; i <= dungeonfloor->len; i++) {
+            DrawLine(i * w, 0, i * w, dungeonfloor->wid * h, border1);
+        }
 
-    for (int i = 0; i < dungeonfloor->wid; i++) {
-        DrawLine(0, i * h, dungeonfloor->len * w, i * h, border1);
+        for (int i = 0; i <= dungeonfloor->wid; i++) {
+            DrawLine(0, i * h, dungeonfloor->len * w, i * h, border1);
+        }
     }
 
 
@@ -477,7 +479,8 @@ void drawgameplayscene() {
                    hero_group->dest,
                    origin,
                    rotation,
-                   (Color){255, 0, 0, 255});
+                   (Color){255, 255, 255, 255});
+    //(Color){255, 0, 0, 255});
 
     DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
                    hero_group->sprites[hero_group->current + 1]->src,
@@ -492,7 +495,7 @@ void drawgameplayscene() {
                            hero_group->dest.y,
                            hero_group->dest.width,
                            hero_group->dest.height,
-                           (Color){0x33, 0x33, 0x33, 255});
+                           (Color){51, 51, 51, 255});
     }
 
     EndMode2D();
@@ -507,15 +510,11 @@ void drawgameplayscene() {
     //
     // we could rawdog an array of sprite pointers or something but we will deal with it
     // when we get there
-    if (g->framecount % 10 == 0) {
+
+
+#define FRAMEINTERVAL 10
+    if (g->framecount % FRAMEINTERVAL == 0) {
         sprite_incrframe(hero_group->sprites[hero_group->current]);
-
-        //for (int i = 0; i < hero_group->size; i++) {
-        //    sprite_incrframe(hero_group->sprites[i]);
-        //}
-
-        //sprite_incrframe(hero_group->sprites[0]);
-        //sprite_incrframe(hero_group->sprites[1]);
     }
 }
 
@@ -798,6 +797,7 @@ void libgame_initsharedsetup(gamestate* g) {
 
         setdebugpaneltopleft(g);
         g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
+        g->cam2d.zoom = 2.0f;
 
         // init dungeonfloor
         dungeonfloor = create_dungeonfloor(4, 4, TILETYPE_DIRT);
