@@ -44,7 +44,7 @@ float scale = DEFAULT_SCALE;
 
 textureinfo txinfo[20];
 
-spritegroup* hero_group = NULL;
+spritegroup_t* hero_group = NULL;
 
 dungeonfloor_t* dungeonfloor = NULL;
 

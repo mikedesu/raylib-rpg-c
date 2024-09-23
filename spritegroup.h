@@ -2,7 +2,7 @@
 
 #include "sprite.h"
 
-typedef struct spritegroup {
+typedef struct spritegroup_t {
     int size;
     int capacity;
     int current;
@@ -10,13 +10,13 @@ typedef struct spritegroup {
 
     Rectangle dest;
     Vector2 move;
-} spritegroup;
+} spritegroup_t;
 
 
-spritegroup* spritegroup_create(int capacity);
-void spritegroup_destroy(spritegroup* sg);
+spritegroup_t* spritegroup_create(int capacity);
+void spritegroup_destroy(spritegroup_t* sg);
 
-void spritegroup_add(spritegroup* sg, sprite* s);
-void spritegroup_set(spritegroup* sg, int index, sprite* s);
+void spritegroup_add(spritegroup_t* sg, sprite* s);
+void spritegroup_set(spritegroup_t* sg, int index, sprite* s);
 
-void spritegroup_setcontexts(spritegroup* sg, int context);
+void spritegroup_setcontexts(spritegroup_t* sg, int context);

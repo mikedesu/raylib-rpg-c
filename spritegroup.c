@@ -2,9 +2,9 @@
 #include "spritegroup.h"
 #include <stdlib.h>
 
-spritegroup* spritegroup_create(int capacity) {
-    minfo("creating spritegroup");
-    spritegroup* sg = malloc(sizeof(spritegroup));
+spritegroup_t* spritegroup_create(int capacity) {
+    minfo("creating spritegroup_t");
+    spritegroup_t* sg = malloc(sizeof(spritegroup_t));
     if (!sg) {
         return NULL;
     }
@@ -25,8 +25,8 @@ spritegroup* spritegroup_create(int capacity) {
 }
 
 
-void spritegroup_destroy(spritegroup* sg) {
-    minfo("destroying spritegroup");
+void spritegroup_destroy(spritegroup_t* sg) {
+    minfo("destroying spritegroup_t");
     if (sg) {
         if (sg->sprites) {
             for (int i = 0; i < sg->size; i++) {
@@ -39,18 +39,18 @@ void spritegroup_destroy(spritegroup* sg) {
 }
 
 
-void spritegroup_add(spritegroup* sg, sprite* s) {
-    minfo("adding sprite to spritegroup");
+void spritegroup_add(spritegroup_t* sg, sprite* s) {
+    minfo("adding sprite to spritegroup_t");
     if (sg && s) {
         if (sg->size < sg->capacity) {
             sg->sprites[sg->size] = s;
             sg->size++;
         } else {
-            merror("spritegroup is full");
+            merror("spritegroup_t is full");
         }
     } else {
         if (!sg) {
-            merror("spritegroup is NULL");
+            merror("spritegroup_t is NULL");
         }
 
         if (!s) {
@@ -60,15 +60,15 @@ void spritegroup_add(spritegroup* sg, sprite* s) {
 }
 
 
-void spritegroup_set(spritegroup* sg, int index, sprite* s) {
-    minfo("setting sprite in spritegroup");
+void spritegroup_set(spritegroup_t* sg, int index, sprite* s) {
+    minfo("setting sprite in spritegroup_t");
     if (sg && s) {
         if (index < sg->size) {
             sg->sprites[index] = s;
         }
     } else {
         if (!sg) {
-            merror("spritegroup is NULL");
+            merror("spritegroup_t is NULL");
         }
 
         if (!s) {
@@ -78,13 +78,13 @@ void spritegroup_set(spritegroup* sg, int index, sprite* s) {
 }
 
 
-void spritegroup_setcontexts(spritegroup* sg, int context) {
+void spritegroup_setcontexts(spritegroup_t* sg, int context) {
 
     if (sg) {
         for (int i = 0; i < sg->size; i++) {
             sprite_setcontext(sg->sprites[i], context);
         }
     } else {
-        merror("spritegroup is NULL");
+        merror("spritegroup_t is NULL");
     }
 }
