@@ -2,7 +2,7 @@
 #include "mprint.h"
 
 int main() {
-    mprint("main");
+    minfo("main");
     gamerun();
     return 0;
 }
