@@ -53,8 +53,8 @@ dungeonfloor_t* dungeonfloor = NULL;
 //--------------------------------------------------------------------
 bool libgame_windowshouldclose();
 
-void gameinitwindow();
-void gameclosewindow();
+void libgame_initwindow();
+void libgame_closewindow();
 
 void libgame_updatedebugpanelbuffer();
 void libgame_updategamestate();
@@ -269,8 +269,8 @@ bool libgame_windowshouldclose() {
 }
 
 
-void gameinitwindow() {
-    minfo("begin gameinitwindow");
+void libgame_initwindow() {
+    minfo("begin libgame_initwindow");
     const char* title = DEFAULT_WINDOW_TITLE;
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
@@ -286,11 +286,11 @@ void gameinitwindow() {
     SetWindowPosition(x, y);
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_Q);
-    minfo("end of gameinitwindow");
+    minfo("end of libgame_initwindow");
 }
 
 
-void gameclosewindow() {
+void libgame_closewindow() {
     //rlglClose();
     CloseWindow();
 }
@@ -719,7 +719,7 @@ void libgame_init() {
 
 void libgame_initsharedsetup(gamestate* g) {
     if (g) {
-        gameinitwindow();
+        libgame_initwindow();
 
         const int fontsize = 60;
         const int codepointct = 256;

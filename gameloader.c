@@ -81,8 +81,8 @@ void loadsymbols() {
 #define NUM_VOID_FUNCTIONS 9
 
     symaddrpair_t pairs[NUM_VOID_FUNCTIONS] = {
-        {"gameinitwindow", &myinitwindow},
-        {"gameclosewindow", &myclosewindow},
+        {"libgame_initwindow", &myinitwindow},
+        {"libgame_closewindow", &myclosewindow},
         {"libgame_drawframe", &mylibgamedrawframe},
         {"libgame_init", &mylibgameinit},
         {"libgame_close", &mylibgameclose},
