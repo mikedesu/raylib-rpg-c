@@ -3,7 +3,7 @@ OBJ=-c
 SHARED=-shared
 DATA_STRUCTS=vectorentityid.o 
 SCENES=companyscene.o 
-LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o gamestate.o utils.o sprite.o setdebugpanel.o dungeonfloor.o spritegroup.o
+LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o gamestate.o utils.o sprite.o setdebugpanel.o dungeonfloor.o spritegroup.o entity.o
 STATIC_LINK_RAYLIB=-l:libraylib.a
 LINK_MATH=-lm
 POSITION_INDEPENDENT_CODE=-fPIC
@@ -31,9 +31,7 @@ sprite.o: sprite.c
 spritegroup.o: spritegroup.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 
-
 # Scenes
-
 companyscene.o: companyscene.c 
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 
@@ -44,12 +42,13 @@ vectorentityid.o: vectorentityid.c
 utils.o: utils.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 
-
-
 setdebugpanel.o: setdebugpanel.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 
 dungeonfloor.o: dungeonfloor.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+
+entity.o: entity.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
 
 
