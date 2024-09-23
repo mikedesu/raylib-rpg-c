@@ -83,13 +83,14 @@ void loadsymbols() {
     symaddrpair_t pairs[NUM_VOID_FUNCTIONS] = {
         {"gameinitwindow", &myinitwindow},
         {"gameclosewindow", &myclosewindow},
-        {"libgamedrawframe", &mylibgamedrawframe},
-        {"libgameinit", &mylibgameinit},
-        {"libgameclose", &mylibgameclose},
-        {"libgamehandleinput", &mylibgamehandleinput},
-        {"libgameclosesavegamestate", &mylibgameclosesavegamestate},
-        {"libgameinitwithstate", &mylibgameinitwithstate},
-        {"libgameupdategamestate", &mylibgameupdategamestate}};
+        {"libgame_drawframe", &mylibgamedrawframe},
+        {"libgame_init", &mylibgameinit},
+        {"libgame_close", &mylibgameclose},
+        {"libgame_handleinput", &mylibgamehandleinput},
+        {"libgame_closesavegamestate", &mylibgameclosesavegamestate},
+        {"libgame_initwithstate", &mylibgameinitwithstate},
+        {"libgame_updategamestate", &mylibgameupdategamestate}};
+
     for (int i = 0; i < NUM_VOID_FUNCTIONS; i++) {
         minfo(pairs[i].name);
         *pairs[i].addr = dlsym(handle, pairs[i].name);

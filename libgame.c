@@ -56,12 +56,12 @@ bool libgame_windowshouldclose();
 void gameinitwindow();
 void gameclosewindow();
 void libgameupdatedebugpanelbuffer();
-void libgameupdategamestate();
-void libgamedrawframe();
-void libgameinit();
-void libgameinitwithstate(gamestate* state);
-void libgameclose();
-void libgamehandleinput();
+void libgame_updategamestate();
+void libgame_drawframe();
+void libgame_init();
+void libgame_initwithstate(gamestate* state);
+void libgame_close();
+void libgame_handleinput();
 void libgame_handlereloadtextures();
 
 void libgame_loadtexture(int index, int contexts, int frames, bool dodither, const char* path);
@@ -78,6 +78,7 @@ void libgame_handleplayerinput(gamestate* g);
 void libgame_handlecaminput(gamestate* g);
 void libgame_handledebugpanelswitch(gamestate* g);
 void libgame_handlemodeswitch(gamestate* g);
+void libgame_closesavegamestate();
 
 void drawdebugpanel();
 void drawcompanyscene();
@@ -131,7 +132,7 @@ void libgame_handlereloadtextures() {
 }
 
 
-void libgamehandleinput() {
+void libgame_handleinput() {
     if (IsKeyPressed(KEY_SPACE)) {
         minfo("key space pressed");
         if (g->fadestate == FADESTATENONE) {
@@ -332,7 +333,7 @@ void libgameupdatedebugpanelbuffer() {
 }
 
 
-void libgameupdategamestate() {
+void libgame_updategamestate() {
     libgameupdatedebugpanelbuffer();
 
 
@@ -374,7 +375,7 @@ void libgame_drawframeend(gamestate* g) {
     gamestateupdatecurrenttime(g);
 }
 
-void libgamedrawframe() {
+void libgame_drawframe() {
     BeginDrawing();
     BeginTextureMode(target);
 
@@ -689,8 +690,8 @@ void libgame_reloadtextures() {
 }
 
 
-void libgameinit() {
-    minfo("libgameinit");
+void libgame_init() {
+    minfo("libgame_init");
 
     g = gamestateinitptr(windowwidth, windowheight, targetwidth, targetheight);
 
@@ -812,25 +813,25 @@ void libgame_initsharedsetup(gamestate* g) {
 }
 
 
-void libgameinitwithstate(gamestate* state) {
+void libgame_initwithstate(gamestate* state) {
     if (state == NULL) {
-        merror("libgameinitwithstate: state is NULL");
+        merror("libgame_initwithstate: state is NULL");
         return;
     }
-    minfo("libgameinitwithstate");
+    minfo("libgame_initwithstate");
     g = state;
     libgame_initsharedsetup(g);
 }
 
 
-void libgameclosesavegamestate() {
-    minfo("libgameclosesavegamestate");
+void libgame_closesavegamestate() {
+    minfo("libgame_closesavegamestate");
     libgame_closeshared();
 }
 
 
-void libgameclose() {
-    minfo("libgameclose");
+void libgame_close() {
+    minfo("libgame_close");
     gamestatefree(g);
     libgame_closeshared();
 }
