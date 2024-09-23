@@ -6,10 +6,11 @@ typedef struct spritegroup_t {
     int size;
     int capacity;
     int current;
-    sprite** sprites;
-
     Rectangle dest;
     Vector2 move;
+
+    sprite** sprites;
+
 } spritegroup_t;
 
 

@@ -1,10 +1,14 @@
+#include "entity.h"
 #include "fadestate.h"
 #include "gamestate.h"
+#include "hashtable_entityid_entity.h"
+#include "hashtable_entityid_spritegroup.h"
 #include "mprint.h"
 #include "sprite.h"
 #include "spritegroup.h"
 #include "textureinfo.h"
 #include "utils.h"
+#include "vectorentityid.h"
 
 #include "dungeonfloor.h"
 #include "libgame_defines.h"
@@ -42,9 +46,23 @@ int windowheight = DEFAULT_WINDOW_HEIGHT;
 
 float scale = DEFAULT_SCALE;
 
+
+entityid hero_id;
+
+
+vectorentityid_t entityids;
+
+
+hashtable_entityid_entity_t* entities = NULL;
+
+hashtable_entityid_spritegroup_t* spritegroups = NULL;
+
+
 textureinfo txinfo[20];
 
-spritegroup_t* hero_group = NULL;
+
+//spritegroup_t* hero_group = NULL;
+
 
 dungeonfloor_t* dungeonfloor = NULL;
 
@@ -137,18 +155,28 @@ void libgame_handlereloadtextures() {
 void libgame_handleinput() {
     if (IsKeyPressed(KEY_SPACE)) {
         minfo("key space pressed");
-        if (g->fadestate == FADESTATENONE) {
-            g->fadestate = FADESTATEOUT;
-        }
+
+        // get the hero entity
+        entity_t* hero_entity = hashtable_entityid_entity_search(entities, hero_id);
+
+        // print the hero entity name
+        printf("hero entity name: %s\n", hero_entity->name);
+
+        //if (g->fadestate == FADESTATENONE) {
+        //    g->fadestate = FADESTATEOUT;
+        //}
     }
 
     if (IsKeyPressed(KEY_C)) {
         // increment the 'current' of the hero group
 
-        // this is a test
-        hero_group->current += 2;
-        if (hero_group->current >= hero_group->size) {
-            hero_group->current = 0;
+        spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+        if (hero_group) {
+            // this is a test
+            hero_group->current += 2;
+            if (hero_group->current >= hero_group->size) {
+                hero_group->current = 0;
+            }
         }
     }
 
@@ -193,44 +221,68 @@ void libgame_handleplayerinput(gamestate* g) {
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
         if (IsKeyPressed(KEY_RIGHT)) {
-            //hero_group->dest.x += BASE_SIZE;
-            int cc = hero_group->sprites[hero_group->current]->currentcontext;
-            int context = cc == 0 ? 0 : cc == 1 ? 0 : cc == 2 ? 2 : 2;
-            spritegroup_setcontexts(hero_group, context);
-            hero_group->move = (Vector2){8, 0};
 
-            hero_group->current = 2;
+            spritegroup_t* hero_group =
+                hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+            if (hero_group) {
+                int cc = hero_group->sprites[hero_group->current]->currentcontext;
+                int context = cc == 0 ? 0 : cc == 1 ? 0 : cc == 2 ? 2 : 2;
+                spritegroup_setcontexts(hero_group, context);
+                hero_group->move = (Vector2){8, 0};
+
+                hero_group->current = 2;
+            }
 
         } else if (IsKeyPressed(KEY_LEFT)) {
             //hero_group->dest.x -= BASE_SIZE;
-            int cc = hero_group->sprites[hero_group->current]->currentcontext;
-            int context = cc == 0 ? 1 : cc == 1 ? 1 : cc == 2 ? 3 : 3;
-            spritegroup_setcontexts(hero_group, context);
-            hero_group->move = (Vector2){-8, 0};
-            hero_group->current = 2;
+
+            spritegroup_t* hero_group =
+                hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+            if (hero_group) {
+
+                int cc = hero_group->sprites[hero_group->current]->currentcontext;
+                int context = cc == 0 ? 1 : cc == 1 ? 1 : cc == 2 ? 3 : 3;
+                spritegroup_setcontexts(hero_group, context);
+                hero_group->move = (Vector2){-8, 0};
+                hero_group->current = 2;
+            }
         }
 
         if (IsKeyPressed(KEY_DOWN)) {
             //hero_group->dest.y += BASE_SIZE;
-            int cc = hero_group->sprites[hero_group->current]->currentcontext;
-            int context = cc == 0 ? 0 : cc == 1 ? 1 : cc == 2 ? 0 : 1;
-            spritegroup_setcontexts(hero_group, context);
-            hero_group->move = (Vector2){0, 8};
-            hero_group->current = 2;
+            spritegroup_t* hero_group =
+                hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+            if (hero_group) {
+
+                int cc = hero_group->sprites[hero_group->current]->currentcontext;
+                int context = cc == 0 ? 0 : cc == 1 ? 1 : cc == 2 ? 0 : 1;
+                spritegroup_setcontexts(hero_group, context);
+                hero_group->move = (Vector2){0, 8};
+                hero_group->current = 2;
+            }
 
         } else if (IsKeyPressed(KEY_UP)) {
             //hero_group->dest.y -= BASE_SIZE;
-            hero_group->move = (Vector2){0, -8};
-            int cc = hero_group->sprites[hero_group->current]->currentcontext;
-            int context = cc == 0 ? 2 : cc == 1 ? 3 : cc == 2 ? 2 : 3;
-            spritegroup_setcontexts(hero_group, context);
-            hero_group->current = 2;
+            spritegroup_t* hero_group =
+                hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+            if (hero_group) {
+
+                hero_group->move = (Vector2){0, -8};
+                int cc = hero_group->sprites[hero_group->current]->currentcontext;
+                int context = cc == 0 ? 2 : cc == 1 ? 3 : cc == 2 ? 2 : 3;
+                spritegroup_setcontexts(hero_group, context);
+                hero_group->current = 2;
+            }
         }
 
 
         if (IsKeyPressed(KEY_PERIOD)) {
+            spritegroup_t* hero_group =
+                hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+            if (hero_group) {
 
-            hero_group->current = 0;
+                hero_group->current = 0;
+            }
         }
     }
 }
@@ -298,6 +350,11 @@ void libgame_closewindow() {
 
 void libgame_updatedebugpanelbuffer() {
     //bzero(debugpanelbuffer, 1024);
+
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    //            if (hero_group) {
+
+
     snprintf(debugpanelbuffer,
              1024,
              "Framecount:   %d\n"
@@ -344,22 +401,25 @@ void libgame_updategamestate() {
     // so that we can begin translating
     // player input
     // into real moves
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    if (hero_group) {
 
-    // only do it 1 unit at a time
-    if (hero_group->move.x > 0) {
-        hero_group->dest.x++;
-        hero_group->move.x--;
-    } else if (hero_group->move.x < 0) {
-        hero_group->dest.x--;
-        hero_group->move.x++;
-    }
+        // only do it 1 unit at a time
+        if (hero_group->move.x > 0) {
+            hero_group->dest.x++;
+            hero_group->move.x--;
+        } else if (hero_group->move.x < 0) {
+            hero_group->dest.x--;
+            hero_group->move.x++;
+        }
 
-    if (hero_group->move.y > 0) {
-        hero_group->dest.y++;
-        hero_group->move.y--;
-    } else if (hero_group->move.y < 0) {
-        hero_group->dest.y--;
-        hero_group->move.y++;
+        if (hero_group->move.y > 0) {
+            hero_group->dest.y++;
+            hero_group->move.y--;
+        } else if (hero_group->move.y < 0) {
+            hero_group->dest.y--;
+            hero_group->move.y++;
+        }
     }
 }
 
@@ -465,56 +525,66 @@ void libgame_drawgameplayscene() {
             DrawLine(0, i * h, dungeonfloor->len * w, i * h, border1);
         }
     }
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    if (hero_group) {
 
 
-    // draw hero and its shadow
-    DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
-                   hero_group->sprites[hero_group->current]->src,
-                   hero_group->dest,
-                   origin,
-                   rotation,
-                   // (Color){255, 255, 255, 255});
-                   (Color){255, 255, 255, 255});
+        // draw hero and its shadow
+        DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
+                       hero_group->sprites[hero_group->current]->src,
+                       hero_group->dest,
+                       origin,
+                       rotation,
+                       // (Color){255, 255, 255, 255});
+                       (Color){255, 255, 255, 255});
 
-    DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
-                   hero_group->sprites[hero_group->current + 1]->src,
-                   hero_group->dest,
-                   origin,
-                   rotation,
-                   c);
+        DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
+                       hero_group->sprites[hero_group->current + 1]->src,
+                       hero_group->dest,
+                       origin,
+                       rotation,
+                       c);
 
 
-    if (g->debugpanelon) {
-        //DrawRectangleLines(hero_group->dest.x,
-        //                   hero_group->dest.y,
-        //                   hero_group->dest.width,
-        //                   hero_group->dest.height,
-        //                   (Color){51, 51, 51, 255});
+        if (g->debugpanelon) {
+            //DrawRectangleLines(hero_group->dest.x,
+            //                   hero_group->dest.y,
+            //                   hero_group->dest.width,
+            //                   hero_group->dest.height,
+            //                   (Color){51, 51, 51, 255});
 
-        // do the rectangle using lines
-        DrawLine(hero_group->dest.x,
-                 hero_group->dest.y,
-                 hero_group->dest.x + hero_group->dest.width,
-                 hero_group->dest.y,
-                 (Color){51, 51, 51, 255});
+            // do the rectangle using lines
+            DrawLine(hero_group->dest.x,
+                     hero_group->dest.y,
+                     hero_group->dest.x + hero_group->dest.width,
+                     hero_group->dest.y,
+                     (Color){51, 51, 51, 255});
 
-        DrawLine(hero_group->dest.x,
-                 hero_group->dest.y,
-                 hero_group->dest.x,
-                 hero_group->dest.y + hero_group->dest.height,
-                 (Color){51, 51, 51, 255});
+            DrawLine(hero_group->dest.x,
+                     hero_group->dest.y,
+                     hero_group->dest.x,
+                     hero_group->dest.y + hero_group->dest.height,
+                     (Color){51, 51, 51, 255});
 
-        DrawLine(hero_group->dest.x + hero_group->dest.width,
-                 hero_group->dest.y,
-                 hero_group->dest.x + hero_group->dest.width,
-                 hero_group->dest.y + hero_group->dest.height,
-                 (Color){51, 51, 51, 255});
+            DrawLine(hero_group->dest.x + hero_group->dest.width,
+                     hero_group->dest.y,
+                     hero_group->dest.x + hero_group->dest.width,
+                     hero_group->dest.y + hero_group->dest.height,
+                     (Color){51, 51, 51, 255});
 
-        DrawLine(hero_group->dest.x,
-                 hero_group->dest.y + hero_group->dest.height,
-                 hero_group->dest.x + hero_group->dest.width,
-                 hero_group->dest.y + hero_group->dest.height,
-                 (Color){51, 51, 51, 255});
+            DrawLine(hero_group->dest.x,
+                     hero_group->dest.y + hero_group->dest.height,
+                     hero_group->dest.x + hero_group->dest.width,
+                     hero_group->dest.y + hero_group->dest.height,
+                     (Color){51, 51, 51, 255});
+        }
+
+
+#define FRAMEINTERVAL 10
+        if (g->framecount % FRAMEINTERVAL == 0) {
+
+            sprite_incrframe(hero_group->sprites[hero_group->current]);
+        }
     }
 
     EndMode2D();
@@ -529,12 +599,6 @@ void libgame_drawgameplayscene() {
     //
     // we could rawdog an array of sprite pointers or something but we will deal with it
     // when we get there
-
-
-#define FRAMEINTERVAL 10
-    if (g->framecount % FRAMEINTERVAL == 0) {
-        sprite_incrframe(hero_group->sprites[hero_group->current]);
-    }
 }
 
 
@@ -733,51 +797,59 @@ void libgame_initsharedsetup(gamestate* g) {
 
         libgame_loadtextures();
 
+
+        entityids = vectorentityid_create(1000);
+
+        entities = hashtable_entityid_entity_create(1000);
+
+        spritegroups = hashtable_entityid_spritegroup_create(1000);
+
+        // create a hero entity
+
+        entity_t* hero_entity = entity_create("darkmage");
+        if (!hero_entity) {
+            merror("could not create hero entity");
+            // we could use an 'emergency shutdown' in case an error causes us
+            // to need to 'panic' and force game close properly
+        }
+        hero_id = hero_entity->id;
+        vectorentityid_pushback(&entityids, hero_entity->id);
+        // add the entity to the hashtable
+        hashtable_entityid_entity_insert(entities, hero_entity->id, hero_entity);
+
         int txkey = TXHERO;
         sprite* hero =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
         txkey = TXHEROSHADOW;
         sprite* hero_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
         txkey = TXHEROWALK;
         sprite* herowalk =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
         txkey = TXHEROWALKSHADOW;
         sprite* herowalk_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-
         txkey = TXHEROATTACK;
         sprite* heroattack =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
         txkey = TXHEROATTACKSHADOW;
         sprite* heroattack_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
         txkey = TXHEROJUMP;
         sprite* herojump =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
         txkey = TXHEROJUMPSHADOW;
         sprite* herojump_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
         txkey = TXHEROSPINDIE;
         sprite* herospindie =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
         txkey = TXHEROSPINDIESHADOW;
         sprite* herospindie_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
         txkey = TXHEROSOULDIE;
         sprite* herosouldie =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
         txkey = TXHEROSOULDIESHADOW;
         sprite* herosouldie_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
@@ -796,7 +868,7 @@ void libgame_initsharedsetup(gamestate* g) {
 
         Rectangle dest = {x + offset_x, y + offset_y, w, h};
 
-        hero_group = spritegroup_create(20);
+        spritegroup_t* hero_group = spritegroup_create(20);
         spritegroup_add(hero_group, hero);
         spritegroup_add(hero_group, hero_shadow);
         spritegroup_add(hero_group, herowalk);
@@ -814,9 +886,14 @@ void libgame_initsharedsetup(gamestate* g) {
         hero_group->current = 0;
         hero_group->dest = dest;
 
+        // add the spritegroup to the hashtable
+        hashtable_entityid_spritegroup_insert(spritegroups, hero_entity->id, hero_group);
+
+
         setdebugpaneltopleft(g);
         g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
         //g->cam2d.zoom = 2.0f;
+
 
         // init dungeonfloor
         dungeonfloor = create_dungeonfloor(4, 4, TILETYPE_DIRT);
@@ -856,11 +933,18 @@ void libgame_close() {
 
 
 void libgame_closeshared() {
-    spritegroup_destroy(hero_group);
+    //spritegroup_destroy(hero_group);
 
     // not right now, but when we add dungeonfloor to
     // the gamestate, we will be able to avoid freeing
     // it on every reload
+
+
+    hashtable_entityid_entity_destroy(entities);
+    hashtable_entityid_spritegroup_destroy(spritegroups);
+    vectorentityid_destroy(&entityids);
+
+
     dungeonfloor_free(dungeonfloor);
 
     UnloadFont(gfont);

@@ -4,6 +4,7 @@
 #include "debugpanel.h"
 #include "display.h"
 #include "fadestate.h"
+#include "hashtable_entityid_entity.h"
 #include "sizemacros.h"
 #include <raylib.h>
 #include <stdbool.h>
@@ -37,6 +38,7 @@ typedef struct gamestate {
     //time_t starttime;
     //struct tm* starttm;
 
+    hashtable_entityid_entity_t* entities;
 
 } gamestate;
 

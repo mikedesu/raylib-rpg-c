@@ -61,6 +61,8 @@ gamestate* gamestateinitptr(const int windowwidth,
     g->fadealpha = 0.0f;
     g->fadestate = FADESTATENONE;
 
+    g->entities = hashtable_entityid_entity_create(1000);
+
     return g;
 }
 
@@ -83,6 +85,7 @@ void gamestatefree(gamestate* s) {
     if (s != NULL) {
         //companyscenefree(s->cs);
         //free(s->timebegantm);
+        hashtable_entityid_entity_destroy(s->entities);
         free(s);
     }
 }
