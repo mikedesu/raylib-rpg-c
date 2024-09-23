@@ -473,8 +473,8 @@ void libgame_drawgameplayscene() {
                    hero_group->dest,
                    origin,
                    rotation,
+                   // (Color){255, 255, 255, 255});
                    (Color){255, 255, 255, 255});
-    //(Color){255, 0, 0, 255});
 
     DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
                    hero_group->sprites[hero_group->current + 1]->src,

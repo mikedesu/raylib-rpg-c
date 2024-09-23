@@ -4,4 +4,5 @@ img
 img/*.png
 *.o
 game
+unit_test
 *.so
