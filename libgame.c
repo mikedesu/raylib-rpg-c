@@ -785,75 +785,90 @@ void libgame_initsharedsetup(gamestate* g) {
     if (g) {
         libgame_initwindow();
 
+        // load font
         const int fontsize = 60;
         const int codepointct = 256;
         gfont = LoadFontEx(DEFAULT_FONT_PATH, fontsize, 0, codepointct);
         //SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
 
+        // load target texture
         target = LoadRenderTexture(targetwidth, targetheight);
         target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
         target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
         SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
+        // load game textures
         libgame_loadtextures();
 
 
+        // create entityid vector
         entityids = vectorentityid_create(1000);
 
+        // create entityid entity hashtable
         entities = hashtable_entityid_entity_create(1000);
 
+        // create entityid spritegroup hashtable
         spritegroups = hashtable_entityid_spritegroup_create(1000);
 
         // create a hero entity
-
         entity_t* hero_entity = entity_create("darkmage");
         if (!hero_entity) {
             merror("could not create hero entity");
             // we could use an 'emergency shutdown' in case an error causes us
             // to need to 'panic' and force game close properly
         }
+
         hero_id = hero_entity->id;
         vectorentityid_pushback(&entityids, hero_entity->id);
-        // add the entity to the hashtable
         hashtable_entityid_entity_insert(entities, hero_entity->id, hero_entity);
 
         int txkey = TXHERO;
         sprite* hero =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROSHADOW;
         sprite* hero_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROWALK;
         sprite* herowalk =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROWALKSHADOW;
         sprite* herowalk_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROATTACK;
         sprite* heroattack =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROATTACKSHADOW;
         sprite* heroattack_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROJUMP;
         sprite* herojump =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROJUMPSHADOW;
         sprite* herojump_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROSPINDIE;
         sprite* herospindie =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROSPINDIESHADOW;
         sprite* herospindie_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROSOULDIE;
         sprite* herosouldie =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
+
         txkey = TXHEROSOULDIESHADOW;
         sprite* herosouldie_shadow =
             sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
 
         // we need to set the destination
         // this is a function of how much we have scaled the target texture
@@ -863,9 +878,8 @@ void libgame_initsharedsetup(gamestate* g) {
         const float y = 0;
         const float w = hero->width;
         const float h = hero->height;
-        const float offset_x = -12;
-        const float offset_y = -12;
-
+        const float offset_x = -w / 2 + w / 8;
+        const float offset_y = -h / 2 + h / 8;
         Rectangle dest = {x + offset_x, y + offset_y, w, h};
 
         spritegroup_t* hero_group = spritegroup_create(20);
