@@ -55,7 +55,7 @@ bool libgame_windowshouldclose();
 
 void gameinitwindow();
 void gameclosewindow();
-void libgameupdatedebugpanelbuffer();
+void libgame_updatedebugpanelbuffer();
 void libgame_updategamestate();
 void libgame_drawframe();
 void libgame_init();
@@ -294,7 +294,7 @@ void gameclosewindow() {
 }
 
 
-void libgameupdatedebugpanelbuffer() {
+void libgame_updatedebugpanelbuffer() {
     //bzero(debugpanelbuffer, 1024);
     snprintf(debugpanelbuffer,
              1024,
@@ -334,8 +334,8 @@ void libgameupdatedebugpanelbuffer() {
 
 
 void libgame_updategamestate() {
-    libgameupdatedebugpanelbuffer();
-
+    libgame_updatedebugpanelbuffer();
+    //setdebugpanelcenter(g);
 
     // lets try using the  move vector on our spritegroup
     // to move the spritegroup dest rectangle
@@ -360,13 +360,6 @@ void libgame_updategamestate() {
         hero_group->move.y++;
     }
 }
-
-
-//setdebugpaneltopleft(g);
-//setdebugpaneltopright(g);
-//setdebugpanelbottomleft(g);
-//setdebugpanelbottomright(g);
-//setdebugpanelcenter(g);
 
 
 void libgame_drawframeend(gamestate* g) {
@@ -433,8 +426,6 @@ void drawgameplayscene() {
     ClearBackground(BLACK);
     // lets draw the sprite
     //DrawTextureEx(textures[TXHERO], (Vector2){hero->dest.x, hero->dest.y}, 0.0f, 1.0f, WHITE);
-    //const int w = textures[TXDIRT].width;
-    //const int h = textures[TXDIRT].height;
     const int w = txinfo[TXDIRT].texture.width;
     const int h = txinfo[TXDIRT].texture.height;
 
@@ -492,11 +483,36 @@ void drawgameplayscene() {
 
 
     if (g->debugpanelon) {
-        DrawRectangleLines(hero_group->dest.x,
-                           hero_group->dest.y,
-                           hero_group->dest.width,
-                           hero_group->dest.height,
-                           (Color){51, 51, 51, 255});
+        //DrawRectangleLines(hero_group->dest.x,
+        //                   hero_group->dest.y,
+        //                   hero_group->dest.width,
+        //                   hero_group->dest.height,
+        //                   (Color){51, 51, 51, 255});
+
+        // do the rectangle using lines
+        DrawLine(hero_group->dest.x,
+                 hero_group->dest.y,
+                 hero_group->dest.x + hero_group->dest.width,
+                 hero_group->dest.y,
+                 (Color){51, 51, 51, 255});
+
+        DrawLine(hero_group->dest.x,
+                 hero_group->dest.y,
+                 hero_group->dest.x,
+                 hero_group->dest.y + hero_group->dest.height,
+                 (Color){51, 51, 51, 255});
+
+        DrawLine(hero_group->dest.x + hero_group->dest.width,
+                 hero_group->dest.y,
+                 hero_group->dest.x + hero_group->dest.width,
+                 hero_group->dest.y + hero_group->dest.height,
+                 (Color){51, 51, 51, 255});
+
+        DrawLine(hero_group->dest.x,
+                 hero_group->dest.y + hero_group->dest.height,
+                 hero_group->dest.x + hero_group->dest.width,
+                 hero_group->dest.y + hero_group->dest.height,
+                 (Color){51, 51, 51, 255});
     }
 
     EndMode2D();
@@ -798,7 +814,7 @@ void libgame_initsharedsetup(gamestate* g) {
 
         setdebugpaneltopleft(g);
         g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
-        g->cam2d.zoom = 2.0f;
+        //g->cam2d.zoom = 2.0f;
 
         // init dungeonfloor
         dungeonfloor = create_dungeonfloor(4, 4, TILETYPE_DIRT);
