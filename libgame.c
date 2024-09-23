@@ -55,6 +55,7 @@ bool libgame_windowshouldclose();
 
 void gameinitwindow();
 void gameclosewindow();
+
 void libgame_updatedebugpanelbuffer();
 void libgame_updategamestate();
 void libgame_drawframe();
@@ -80,18 +81,19 @@ void libgame_handledebugpanelswitch(gamestate* g);
 void libgame_handlemodeswitch(gamestate* g);
 void libgame_closesavegamestate();
 
-void drawdebugpanel();
-void drawcompanyscene();
-void drawtitlescene();
-void drawgameplayscene();
-void handlefade();
-void drawfade();
+void libgame_drawdebugpanel();
+
+void libgame_drawcompanyscene();
+void libgame_drawtitlescene();
+void libgame_drawgameplayscene();
+void libgame_handlefade();
+void libgame_drawfade();
 
 
 //--------------------------------------------------------------------
 // definitions
 //--------------------------------------------------------------------
-void drawfade() {
+void libgame_drawfade() {
     if (g->fadealpha > 0) {
         Color c = {0, 0, 0, g->fadealpha};
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), c);
@@ -99,7 +101,7 @@ void drawfade() {
 }
 
 
-void handlefade() {
+void libgame_handlefade() {
     const int fadespeed = 4;
     if (g->fadestate == FADESTATEOUT && g->fadealpha < 255) {
         g->fadealpha += fadespeed;
@@ -121,7 +123,7 @@ void handlefade() {
         g->fadestate = FADESTATENONE;
     }
 
-    drawfade();
+    libgame_drawfade();
 }
 
 
@@ -373,21 +375,21 @@ void libgame_drawframe() {
     BeginTextureMode(target);
 
     if (activescene == 0) {
-        drawcompanyscene();
+        libgame_drawcompanyscene();
     } else if (activescene == 1) {
-        drawtitlescene();
+        libgame_drawtitlescene();
     } else if (activescene == 2) {
-        drawgameplayscene();
+        libgame_drawgameplayscene();
     }
 
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    drawdebugpanel();
+    libgame_drawdebugpanel();
     libgame_drawframeend(g);
 }
 
 
-inline void drawdebugpanel() {
+inline void libgame_drawdebugpanel() {
     if (g->debugpanelon) {
         const int fontsize = 14;
         const int spacing = 1;
@@ -421,7 +423,7 @@ inline void drawdebugpanel() {
 }
 
 
-void drawgameplayscene() {
+void libgame_drawgameplayscene() {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     // lets draw the sprite
@@ -517,7 +519,7 @@ void drawgameplayscene() {
 
     EndMode2D();
 
-    handlefade();
+    libgame_handlefade();
 
     // we will want to find a way to wrap animation management
     // this will get cumbersome as the # of sprites on-screen grows.
@@ -536,7 +538,7 @@ void drawgameplayscene() {
 }
 
 
-void drawtitlescene() {
+void libgame_drawtitlescene() {
     //BeginDrawing();
     const Color bgc = {0x66, 0x66, 0x66, 255};
     const Color fgc = WHITE;
@@ -579,11 +581,11 @@ void drawtitlescene() {
     DrawTextEx(gfont, b3, pos3, 16, 1, fgc);
 
 
-    handlefade();
+    libgame_handlefade();
 }
 
 
-void drawcompanyscene() {
+void libgame_drawcompanyscene() {
     const Color bgc = BLACK;
     const Color fgc = {0x66, 0x66, 0x66, 255};
     const int fontsize = 32;
@@ -624,7 +626,7 @@ void drawcompanyscene() {
 
     DrawTextEx(gfont, b3, pp, 20, 1, fgc);
 
-    handlefade();
+    libgame_handlefade();
 }
 
 
