@@ -9,6 +9,7 @@
 #include "hashtable_entityid_entity.h"
 #include "sizemacros.h"
 #include "textureinfo.h"
+#include "vectorentityid.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <time.h>
@@ -50,6 +51,7 @@ typedef struct gamestate {
     textureinfo txinfo[20];
 
     dungeonfloor_t* dungeonfloor;
+    vectorentityid_t entityids;
 
 } gamestate;
 
