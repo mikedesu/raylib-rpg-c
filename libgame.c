@@ -44,8 +44,6 @@ int targetheight = DEFAULT_TARGET_HEIGHT;
 int windowwidth = DEFAULT_WINDOW_WIDTH;
 int windowheight = DEFAULT_WINDOW_HEIGHT;
 
-hashtable_entityid_entity_t* entities = NULL;
-
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 
 
@@ -798,7 +796,7 @@ entityid libgame_createentity(gamestate* g, const char* name) {
     }
 
     vectorentityid_pushback(&g->entityids, e->id);
-    hashtable_entityid_entity_insert(entities, e->id, e);
+    hashtable_entityid_entity_insert(g->entities, e->id, e);
     return e->id;
 }
 
@@ -869,7 +867,7 @@ void libgame_loadfont(gamestate* g) {
 
 void libgame_initdatastructures(gamestate* g) {
     g->entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
-    entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
+    g->entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
     spritegroups =
         hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
     g->dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
@@ -926,7 +924,6 @@ void libgame_closeshared(gamestate* g) {
     // not right now, but when we add dungeonfloor to
     // the gamestate, we will be able to avoid freeing
     // it on every reload
-    hashtable_entityid_entity_destroy(entities);
     hashtable_entityid_spritegroup_destroy(spritegroups);
     vectorentityid_destroy(&g->entityids);
     dungeonfloor_free(g->dungeonfloor);
