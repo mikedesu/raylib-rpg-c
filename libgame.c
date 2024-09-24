@@ -34,7 +34,6 @@ char debugpanelbuffer[1024] = {0};
 
 gamestate* g = NULL;
 
-Font gfont;
 RenderTexture target;
 Rectangle target_src;
 Rectangle target_dest;
@@ -536,7 +535,7 @@ inline void libgame_drawdebugpanel(gamestate* g) {
         const int xy = 10;
         const int wh = 20;
         const Vector2 p = {g->debugpanel.x, g->debugpanel.y};
-        const Vector2 m = MeasureTextEx(gfont, debugpanelbuffer, fontsize, spacing);
+        const Vector2 m = MeasureTextEx(g->font, debugpanelbuffer, fontsize, spacing);
         const Rectangle box = {p.x - xy, p.y - xy, m.x + wh, m.y + wh};
         // update the debug panel width and height
         // we store the root measurement because
@@ -545,7 +544,7 @@ inline void libgame_drawdebugpanel(gamestate* g) {
         g->debugpanel.w = m.x;
         g->debugpanel.h = m.y;
         DrawRectanglePro(box, (Vector2){0.0f, 0.0f}, 0.0f, (Color){0x33, 0x33, 0x33, 128});
-        DrawTextEx(gfont, debugpanelbuffer, p, fontsize, spacing, WHITE);
+        DrawTextEx(g->font, debugpanelbuffer, p, fontsize, spacing, WHITE);
     }
 }
 
@@ -649,9 +648,9 @@ void libgame_drawtitlescene(gamestate* g) {
     snprintf(b2, 128, "rpg");
     snprintf(b3, 128, "press space to continue");
 
-    const Vector2 m = MeasureTextEx(gfont, b, 40, 2);
-    const Vector2 m2 = MeasureTextEx(gfont, b2, 40, 2);
-    const Vector2 m3 = MeasureTextEx(gfont, b3, 16, 1);
+    const Vector2 m = MeasureTextEx(g->font, b, 40, 2);
+    const Vector2 m2 = MeasureTextEx(g->font, b2, 40, 2);
+    const Vector2 m3 = MeasureTextEx(g->font, b3, 16, 1);
 
     const float tw2 = targetwidth / 2.0f;
     const float th2 = targetheight / 2.0f;
@@ -665,10 +664,10 @@ void libgame_drawtitlescene(gamestate* g) {
 
     const Vector2 pos[3] = {{x, y}, {x2, y}, {x3, y3}};
     ClearBackground(bgc);
-    DrawTextEx(gfont, b, pos[0], 40, 4, fgc);
-    DrawTextEx(gfont, b2, pos[1], 40, 1, fgc2);
+    DrawTextEx(g->font, b, pos[0], 40, 4, fgc);
+    DrawTextEx(g->font, b2, pos[1], 40, 1, fgc2);
     // just below the 'project rpg' text
-    DrawTextEx(gfont, b3, pos[2], 16, 1, fgc);
+    DrawTextEx(g->font, b3, pos[2], 16, 1, fgc);
     libgame_handlefade(g);
 }
 
@@ -690,8 +689,8 @@ void libgame_drawcompanyscene(gamestate* g) {
     snprintf(b2, 128, COMPANYFILL);
     snprintf(b3, 128, "presents");
 
-    const Vector2 measure = MeasureTextEx(gfont, b, fontsize, spacing);
-    const Vector2 measure2 = MeasureTextEx(gfont, b2, fontsize, spacing);
+    const Vector2 measure = MeasureTextEx(g->font, b, fontsize, spacing);
+    const Vector2 measure2 = MeasureTextEx(g->font, b2, fontsize, spacing);
 
     if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
         for (int i = 0; i < 10; i++) {
@@ -707,14 +706,14 @@ void libgame_drawcompanyscene(gamestate* g) {
     const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f,
                          targetheight / 2.0f - measure.y / 2.0f};
     ClearBackground(bgc);
-    DrawTextEx(gfont, b, pos, fontsize, 1, fgc);
-    DrawTextEx(gfont, b2, pos, fontsize, 1, fgc);
+    DrawTextEx(g->font, b, pos, fontsize, 1, fgc);
+    DrawTextEx(g->font, b2, pos, fontsize, 1, fgc);
 
-    const Vector2 measure3 = MeasureTextEx(gfont, b3, 20, 1);
+    const Vector2 measure3 = MeasureTextEx(g->font, b3, 20, 1);
     const Vector2 pp = {targetwidth / 2.0f - measure3.x / 2.0f,
                         targetheight / 2.0f + measure.y / 2.0f + 20};
 
-    DrawTextEx(gfont, b3, pp, 20, 1, fgc);
+    DrawTextEx(g->font, b3, pp, 20, 1, fgc);
     libgame_handlefade(g);
 }
 
@@ -871,7 +870,7 @@ void libgame_loadtargettexture(gamestate* g) {
 void libgame_loadfont(gamestate* g) {
     const int fontsize = 60;
     const int codepointct = 256;
-    gfont = LoadFontEx(DEFAULT_FONT_PATH, fontsize, 0, codepointct);
+    g->font = LoadFontEx(DEFAULT_FONT_PATH, fontsize, 0, codepointct);
 }
 
 
@@ -939,7 +938,7 @@ void libgame_closeshared(gamestate* g) {
     vectorentityid_destroy(&entityids);
     dungeonfloor_free(dungeonfloor);
 
-    UnloadFont(gfont);
+    UnloadFont(g->font);
 
     libgame_unloadtextures(g);
 

@@ -38,6 +38,7 @@ typedef struct gamestate {
     display_t display;
     //time_t starttime;
     //struct tm* starttm;
+    Font font;
 
     hashtable_entityid_entity_t* entities;
 

@@ -12,7 +12,7 @@ gamestate* gamestateinitptr(const int windowwidth,
                             const int windowheight,
                             const int targetwidth,
                             const int targetheight) {
-    mprint("gamestateinit\n");
+    mprint("gamestateinitptr begin\n");
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     if (g == NULL) {
         fprintf(stderr, "Failed to allocate memory for gamestate: %s\n", strerror(errno));
@@ -64,6 +64,7 @@ gamestate* gamestateinitptr(const int windowwidth,
 
     g->entities = hashtable_entityid_entity_create(1000);
 
+    mprint("gamestateinitptr end\n");
     return g;
 }
 
