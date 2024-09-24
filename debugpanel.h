@@ -15,5 +15,5 @@ typedef struct debugpanel {
     //int fontsize;
     //mycolor fgcolor;
     //mycolor bgcolor;
-    //char bfr[DEBUGPANELBUFSIZE];
+    char buffer[DEBUGPANELBUFSIZE];
 } debugpanel_t;

@@ -30,7 +30,6 @@
 //--------------------------------------------------------------------
 // libgame global variables
 //--------------------------------------------------------------------
-char debugpanelbuffer[1024] = {0};
 
 gamestate* g = NULL;
 
@@ -64,9 +63,9 @@ bool libgame_windowshouldclose();
 gamestate* libgame_getgamestate();
 void libgame_initwindow();
 void libgame_closewindow();
-void libgame_updatedebugpanelbuffer();
 void libgame_init();
 
+void libgame_updatedebugpanelbuffer(gamestate* g);
 void libgame_updategamestate(gamestate* g);
 void libgame_close(gamestate* g);
 void libgame_drawframe(gamestate* g);
@@ -420,10 +419,10 @@ void libgame_closewindow() {
 }
 
 
-void libgame_updatedebugpanelbuffer() {
+void libgame_updatedebugpanelbuffer(gamestate* g) {
     //spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
 
-    snprintf(debugpanelbuffer,
+    snprintf(g->debugpanel.buffer,
              1024,
              "Framecount:   %d\n"
              "%s\n"
@@ -458,7 +457,7 @@ void libgame_updatedebugpanelbuffer() {
 
 
 void libgame_updategamestate(gamestate* g) {
-    libgame_updatedebugpanelbuffer();
+    libgame_updatedebugpanelbuffer(g);
     //setdebugpanelcenter(g);
 
     // smooth movement:
@@ -535,7 +534,7 @@ inline void libgame_drawdebugpanel(gamestate* g) {
         const int xy = 10;
         const int wh = 20;
         const Vector2 p = {g->debugpanel.x, g->debugpanel.y};
-        const Vector2 m = MeasureTextEx(g->font, debugpanelbuffer, fontsize, spacing);
+        const Vector2 m = MeasureTextEx(g->font, g->debugpanel.buffer, fontsize, spacing);
         const Rectangle box = {p.x - xy, p.y - xy, m.x + wh, m.y + wh};
         // update the debug panel width and height
         // we store the root measurement because
@@ -544,7 +543,7 @@ inline void libgame_drawdebugpanel(gamestate* g) {
         g->debugpanel.w = m.x;
         g->debugpanel.h = m.y;
         DrawRectanglePro(box, (Vector2){0.0f, 0.0f}, 0.0f, (Color){0x33, 0x33, 0x33, 128});
-        DrawTextEx(g->font, debugpanelbuffer, p, fontsize, spacing, WHITE);
+        DrawTextEx(g->font, g->debugpanel.buffer, p, fontsize, spacing, WHITE);
     }
 }
 
