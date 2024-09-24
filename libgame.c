@@ -866,16 +866,20 @@ void libgame_loadfont(gamestate* g) {
 
 
 void libgame_initdatastructures(gamestate* g) {
+    minfo("libgame_initdatastructures begin");
     g->entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
     g->entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
+
     spritegroups =
         hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
+
     g->dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
     if (!g->dungeonfloor) {
         merror("could not create dungeonfloor");
         // we could use an 'emergency shutdown' in case an error causes us
         // to need to 'panic' and force game close properly
     }
+    minfo("libgame_initdatastructures end");
 }
 
 

@@ -7,6 +7,7 @@
 #include "entityid.h"
 #include "fadestate.h"
 #include "hashtable_entityid_entity.h"
+#include "hashtable_entityid_spritegroup.h"
 #include "sizemacros.h"
 #include "textureinfo.h"
 #include "vectorentityid.h"
@@ -45,6 +46,7 @@ typedef struct gamestate {
     Font font;
 
     hashtable_entityid_entity_t* entities;
+    hashtable_entityid_spritegroup_t* spritegroups;
 
     entityid hero_id;
 

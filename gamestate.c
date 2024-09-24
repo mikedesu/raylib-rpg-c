@@ -63,6 +63,7 @@ gamestate* gamestateinitptr(const int windowwidth,
     g->fadestate = FADESTATENONE;
 
     g->entities = hashtable_entityid_entity_create(1000);
+    g->spritegroups = NULL;
 
     g->hero_id = -1;
 

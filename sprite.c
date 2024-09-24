@@ -1,8 +1,10 @@
+#include "mprint.h"
 #include "sprite.h"
 
 #include <stdlib.h>
 
 sprite* sprite_create(Texture2D* t, int numcontexts, int numframes) {
+    minfo("creating sprite");
     sprite* s = malloc(sizeof(sprite));
     if (!s)
         return NULL;
@@ -80,6 +82,7 @@ void sprite_updatesrc(sprite* s) {
 
 
 sprite* sprite_destroy(sprite* s) {
+    minfo("destroying sprite");
     if (s) {
         // we do not unload the texture here because textures are stored and managed globally
         s->texture = NULL;
