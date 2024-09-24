@@ -67,52 +67,53 @@ bool libgame_windowshouldclose();
 
 gamestate* libgame_getgamestate();
 
+void libgame_close();
 void libgame_initwindow();
 void libgame_closewindow();
 void libgame_updatedebugpanelbuffer();
 void libgame_updategamestate();
 void libgame_drawframe();
 void libgame_init();
-void libgame_initwithstate(gamestate* state);
-void libgame_close();
 void libgame_handleinput();
-void libgame_handlereloadtextures();
-void libgame_loadtexture(int index, int contexts, int frames, bool dodither, const char* path);
-void libgame_loadtextures();
-void libgame_unloadtexture(int index);
-void libgame_unloadtextures();
-void libgame_loadtexturesfromfile(const char* path);
-void libgame_reloadtextures();
+void libgame_loadtexture(
+    gamestate* g, int index, int contexts, int frames, bool dodither, const char* path);
+void libgame_unloadtexture(gamestate* g, int index);
+void libgame_unloadtextures(gamestate* g);
+void libgame_loadtextures(gamestate* g);
+void libgame_loadtexturesfromfile(gamestate* g, const char* path);
+void libgame_handlereloadtextures(gamestate* g);
+void libgame_reloadtextures(gamestate* g);
+void libgame_closeshared(gamestate* g);
+void libgame_closesavegamestate();
+void libgame_drawdebugpanel(gamestate* g);
+void libgame_drawcompanyscene(gamestate* g);
+void libgame_drawtitlescene(gamestate* g);
+void libgame_drawgameplayscene(gamestate* g);
+void libgame_drawfade(gamestate* g);
+void libgame_drawgrid(gamestate* g);
+void libgame_drawdungeonfloor(gamestate* g);
+void libgame_initwithstate(gamestate* state);
 void libgame_initsharedsetup(gamestate* g);
-void libgame_closeshared();
 void libgame_drawframeend(gamestate* g);
 void libgame_handleplayerinput(gamestate* g);
 void libgame_handlecaminput(gamestate* g);
 void libgame_handledebugpanelswitch(gamestate* g);
 void libgame_handlemodeswitch(gamestate* g);
-void libgame_closesavegamestate();
-void libgame_drawdebugpanel();
-void libgame_drawcompanyscene();
-void libgame_drawtitlescene();
-void libgame_drawgameplayscene();
-void libgame_handlefade();
-void libgame_drawfade();
+void libgame_handlefade(gamestate* g);
 void libgame_createherospritegroup(gamestate* g);
 void libgame_createheroentity(gamestate* g);
-void libgame_drawgrid();
-void libgame_drawdungeonfloor();
-void libgame_drawherogroup();
+void libgame_drawherogroup(gamestate* g);
 void libgame_drawherogrouphitbox(gamestate* g);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
 void libgame_initdatastructures(gamestate* g);
 
-entityid libgame_createentity(const char* name);
+entityid libgame_createentity(gamestate* g, const char* name);
 
 //--------------------------------------------------------------------
 // definitions
 //--------------------------------------------------------------------
-void libgame_drawfade() {
+void libgame_drawfade(gamestate* g) {
     if (g->fadealpha > 0) {
         Color c = {0, 0, 0, g->fadealpha};
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), c);
@@ -120,14 +121,17 @@ void libgame_drawfade() {
 }
 
 
-void libgame_handlefade() {
+void libgame_handlefade(gamestate* g) {
     const int fadespeed = 4;
+
+    // modify the fadealpha
     if (g->fadestate == FADESTATEOUT && g->fadealpha < 255) {
         g->fadealpha += fadespeed;
     } else if (g->fadestate == FADESTATEIN && g->fadealpha > 0) {
         g->fadealpha -= fadespeed;
     }
 
+    // handle scene rotation based on fadealpha
     if (g->fadealpha >= 255) {
         g->fadealpha = 255;
         g->fadestate = FADESTATEIN;
@@ -137,18 +141,19 @@ void libgame_handlefade() {
         }
     }
 
+    // halt fade if fadealpha is 0
     if (g->fadealpha <= 0) {
         g->fadealpha = 0;
         g->fadestate = FADESTATENONE;
     }
 
-    libgame_drawfade();
+    libgame_drawfade(g);
 }
 
 
-void libgame_handlereloadtextures() {
+void libgame_handlereloadtextures(gamestate* g) {
     if (IsKeyPressed(KEY_R)) {
-        libgame_reloadtextures();
+        libgame_reloadtextures(g);
     }
 }
 
@@ -167,7 +172,7 @@ void libgame_handleinput() {
         spritegroup_incr(hero_group);
     }
 
-    libgame_handlereloadtextures();
+    libgame_handlereloadtextures(g);
     libgame_handlemodeswitch(g);
     libgame_handledebugpanelswitch(g);
     libgame_handleplayerinput(g);
@@ -429,21 +434,21 @@ void libgame_drawframe() {
     BeginTextureMode(target);
 
     if (activescene == 0) {
-        libgame_drawcompanyscene();
+        libgame_drawcompanyscene(g);
     } else if (activescene == 1) {
-        libgame_drawtitlescene();
+        libgame_drawtitlescene(g);
     } else if (activescene == 2) {
-        libgame_drawgameplayscene();
+        libgame_drawgameplayscene(g);
     }
 
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    libgame_drawdebugpanel();
+    libgame_drawdebugpanel(g);
     libgame_drawframeend(g);
 }
 
 
-inline void libgame_drawdebugpanel() {
+inline void libgame_drawdebugpanel(gamestate* g) {
     if (g->debugpanelon) {
         const int fontsize = 14;
         const int spacing = 1;
@@ -470,7 +475,7 @@ inline void libgame_drawdebugpanel() {
 }
 
 
-void libgame_drawgrid() {
+void libgame_drawgrid(gamestate* g) {
     const int w = txinfo[TXDIRT].texture.width;
     const int h = txinfo[TXDIRT].texture.height;
     Color c = GREEN;
@@ -484,7 +489,7 @@ void libgame_drawgrid() {
 }
 
 
-void libgame_drawdungeonfloor() {
+void libgame_drawdungeonfloor(gamestate* g) {
     const int w = txinfo[TXDIRT].texture.width;
     const int h = txinfo[TXDIRT].texture.height;
     Rectangle tile_src = {0, 0, w, h};
@@ -504,51 +509,40 @@ void libgame_drawdungeonfloor() {
 
 
 void libgame_drawherogrouphitbox(gamestate* g) {
-    float rotation = 0;
-    Color c = (Color){51, 51, 51, 255};
-
     spritegroup_t* sg = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
-    if (sg) {
-        Vector2 o0 = {sg->dest.x, sg->dest.y};
-        Vector2 o1 = {sg->dest.x + sg->dest.width, sg->dest.y};
-        Vector2 o2 = {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height};
-        Vector2 o3 = {sg->dest.x, sg->dest.y + sg->dest.height};
-
-        // draw hero and its shadow
-        if (g->debugpanelon) {
-            // do the rectangle using lines
-            DrawLineEx(o0, o1, 1.0f, c);
-            DrawLineEx(o1, o2, 1.0f, c);
-            DrawLineEx(o2, o3, 1.0f, c);
-            DrawLineEx(o3, o0, 1.0f, c);
-        }
+    if (sg && g->debugpanelon) {
+        Color c = (Color){51, 51, 51, 255};
+        Vector2 v[4] = {{sg->dest.x, sg->dest.y},
+                        {sg->dest.x + sg->dest.width, sg->dest.y},
+                        {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height},
+                        {sg->dest.x, sg->dest.y + sg->dest.height}};
+        DrawLineV(v[0], v[1], c);
+        DrawLineV(v[1], v[2], c);
+        DrawLineV(v[2], v[3], c);
+        DrawLineV(v[3], v[0], c);
     }
 }
 
 
-void libgame_drawherogroup() {
-    Vector2 origin = {0, 0};
-    float rotation = 0;
-    Color c = WHITE;
+void libgame_drawherogroup(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
     if (hero_group) {
         // draw hero and its shadow
         DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
                        hero_group->sprites[hero_group->current]->src,
                        hero_group->dest,
-                       origin,
-                       rotation,
+                       (Vector2){0, 0},
+                       0.0f,
                        (Color){255, 255, 255, 255});
 
         DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
                        hero_group->sprites[hero_group->current + 1]->src,
                        hero_group->dest,
-                       origin,
-                       rotation,
-                       c);
+                       (Vector2){0, 0},
+                       0.0f,
+                       WHITE);
     }
 
-    libgame_drawherogrouphitbox(g);
 
     if (g->framecount % FRAMEINTERVAL == 0) {
         sprite_incrframe(hero_group->sprites[hero_group->current]);
@@ -556,7 +550,7 @@ void libgame_drawherogroup() {
 }
 
 
-void libgame_drawgameplayscene() {
+void libgame_drawgameplayscene(gamestate* g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     const int w = txinfo[TXDIRT].texture.width;
@@ -571,7 +565,7 @@ void libgame_drawgameplayscene() {
     float rotation = 0;
 
     // draw the dungeon floor
-    libgame_drawdungeonfloor();
+    libgame_drawdungeonfloor(g);
 
     // we want to draw a grid of lines on top of the tiles
     // previously we were drawing rectanglelines around each tile
@@ -580,64 +574,63 @@ void libgame_drawgameplayscene() {
     // lets go row by row, column by column
     // and draw lines
     if (g->debugpanelon) {
-        libgame_drawgrid();
+        libgame_drawgrid(g);
     }
 
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
-    if (hero_group) {
-        // draw hero and its shadow
-        DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
-                       hero_group->sprites[hero_group->current]->src,
-                       hero_group->dest,
-                       origin,
-                       rotation,
-                       (Color){255, 255, 255, 255});
 
-        DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
-                       hero_group->sprites[hero_group->current + 1]->src,
-                       hero_group->dest,
-                       origin,
-                       rotation,
-                       c);
+    libgame_drawherogroup(g);
 
+    libgame_drawherogrouphitbox(g);
 
-        if (g->debugpanelon) {
-            // do the rectangle using lines
-            DrawLine(hero_group->dest.x,
-                     hero_group->dest.y,
-                     hero_group->dest.x + hero_group->dest.width,
-                     hero_group->dest.y,
-                     (Color){51, 51, 51, 255});
-
-            DrawLine(hero_group->dest.x,
-                     hero_group->dest.y,
-                     hero_group->dest.x,
-                     hero_group->dest.y + hero_group->dest.height,
-                     (Color){51, 51, 51, 255});
-
-            DrawLine(hero_group->dest.x + hero_group->dest.width,
-                     hero_group->dest.y,
-                     hero_group->dest.x + hero_group->dest.width,
-                     hero_group->dest.y + hero_group->dest.height,
-                     (Color){51, 51, 51, 255});
-
-            DrawLine(hero_group->dest.x,
-                     hero_group->dest.y + hero_group->dest.height,
-                     hero_group->dest.x + hero_group->dest.width,
-                     hero_group->dest.y + hero_group->dest.height,
-                     (Color){51, 51, 51, 255});
-        }
-
-
-        if (g->framecount % FRAMEINTERVAL == 0) {
-
-            sprite_incrframe(hero_group->sprites[hero_group->current]);
-        }
-    }
+    //spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    //if (hero_group) {
+    //    // draw hero and its shadow
+    //    DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
+    //                   hero_group->sprites[hero_group->current]->src,
+    //                   hero_group->dest,
+    //                   origin,
+    //                   rotation,
+    //                   (Color){255, 255, 255, 255});
+    //    DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
+    //                   hero_group->sprites[hero_group->current + 1]->src,
+    //                   hero_group->dest,
+    //                   origin,
+    //                   rotation,
+    //                   c);
+    //    if (g->debugpanelon) {
+    //        // do the rectangle using lines
+    //        DrawLine(hero_group->dest.x,
+    //                 hero_group->dest.y,
+    //                 hero_group->dest.x + hero_group->dest.width,
+    //                 hero_group->dest.y,
+    //                 (Color){51, 51, 51, 255});
+    //
+    //            DrawLine(hero_group->dest.x,
+    //                     hero_group->dest.y,
+    //                     hero_group->dest.x,
+    //                     hero_group->dest.y + hero_group->dest.height,
+    //                     (Color){51, 51, 51, 255});
+    //
+    //            DrawLine(hero_group->dest.x + hero_group->dest.width,
+    //                     hero_group->dest.y,
+    //                     hero_group->dest.x + hero_group->dest.width,
+    //                     hero_group->dest.y + hero_group->dest.height,
+    //                     (Color){51, 51, 51, 255});
+    //
+    //            DrawLine(hero_group->dest.x,
+    //                     hero_group->dest.y + hero_group->dest.height,
+    //                     hero_group->dest.x + hero_group->dest.width,
+    //                     hero_group->dest.y + hero_group->dest.height,
+    //                     (Color){51, 51, 51, 255});
+    //        }
+    //if (g->framecount % FRAMEINTERVAL == 0) {
+    //    sprite_incrframe(hero_group->sprites[hero_group->current]);
+    //}
+    //    }
 
     EndMode2D();
 
-    libgame_handlefade();
+    libgame_handlefade(g);
 
     // we will want to find a way to wrap animation management
     // this will get cumbersome as the # of sprites on-screen grows.
@@ -650,7 +643,7 @@ void libgame_drawgameplayscene() {
 }
 
 
-void libgame_drawtitlescene() {
+void libgame_drawtitlescene(gamestate* g) {
     //BeginDrawing();
     const Color bgc = {0x66, 0x66, 0x66, 255};
     const Color fgc = WHITE;
@@ -693,11 +686,11 @@ void libgame_drawtitlescene() {
     DrawTextEx(gfont, b3, pos3, 16, 1, fgc);
 
 
-    libgame_handlefade();
+    libgame_handlefade(g);
 }
 
 
-void libgame_drawcompanyscene() {
+void libgame_drawcompanyscene(gamestate* g) {
     const Color bgc = BLACK;
     const Color fgc = {0x66, 0x66, 0x66, 255};
     const int fontsize = 32;
@@ -738,11 +731,12 @@ void libgame_drawcompanyscene() {
 
     DrawTextEx(gfont, b3, pp, 20, 1, fgc);
 
-    libgame_handlefade();
+    libgame_handlefade(g);
 }
 
 
-void libgame_loadtexture(int index, int contexts, int frames, bool dodither, const char* path) {
+void libgame_loadtexture(
+    gamestate* g, int index, int contexts, int frames, bool dodither, const char* path) {
     if (dodither) {
         Image img = LoadImage(path);
         ImageDither(&img, 4, 4, 4, 4);
@@ -764,12 +758,12 @@ void libgame_loadtexture(int index, int contexts, int frames, bool dodither, con
 }
 
 
-void libgame_loadtextures() {
-    libgame_loadtexturesfromfile("textures.txt");
+void libgame_loadtextures(gamestate* g) {
+    libgame_loadtexturesfromfile(g, "textures.txt");
 }
 
 
-void libgame_loadtexturesfromfile(const char* path) {
+void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
     FILE* f = fopen(path, "r");
     if (!f) {
         mprint("could not open file");
@@ -792,7 +786,7 @@ void libgame_loadtexturesfromfile(const char* path) {
 
         sscanf(line, "%d %d %d %d %s", &index, &contexts, &frames, &dodither, txpath);
 
-        libgame_loadtexture(index, contexts, frames, dodither, txpath);
+        libgame_loadtexture(g, index, contexts, frames, dodither, txpath);
 
         bzero(line, 256);
         bzero(txpath, 256);
@@ -801,7 +795,7 @@ void libgame_loadtexturesfromfile(const char* path) {
 }
 
 
-void libgame_unloadtexture(int index) {
+void libgame_unloadtexture(gamestate* g, int index) {
     minfo("unloading texture");
 
     if (txinfo[index].texture.id > 0) {
@@ -810,19 +804,19 @@ void libgame_unloadtexture(int index) {
 }
 
 
-void libgame_unloadtextures() {
+void libgame_unloadtextures(gamestate* g) {
     minfo("unloading textures");
 
-    libgame_unloadtexture(TXHERO);
-    libgame_unloadtexture(TXDIRT);
+    libgame_unloadtexture(g, TXHERO);
+    libgame_unloadtexture(g, TXDIRT);
 }
 
 
-void libgame_reloadtextures() {
+void libgame_reloadtextures(gamestate* g) {
     minfo("reloading textures");
 
-    libgame_unloadtextures();
-    libgame_loadtextures();
+    libgame_unloadtextures(g);
+    libgame_loadtextures(g);
 }
 
 
@@ -835,7 +829,7 @@ void libgame_init() {
 }
 
 
-entityid libgame_createentity(const char* name) {
+entityid libgame_createentity(gamestate* g, const char* name) {
     entity_t* e = entity_create(name);
     if (!e) {
         merror("could not create entity");
@@ -849,7 +843,7 @@ entityid libgame_createentity(const char* name) {
 
 
 void libgame_createheroentity(gamestate* g) {
-    entityid heroid = libgame_createentity("hero");
+    entityid heroid = libgame_createentity(g, "hero");
     if (heroid != -1) {
         hero_id = heroid;
     }
@@ -930,7 +924,7 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_initwindow();
         libgame_loadfont(g);
         libgame_loadtargettexture(g);
-        libgame_loadtextures();
+        libgame_loadtextures(g);
         libgame_initdatastructures(g);
         libgame_createheroentity(g);
         libgame_createherospritegroup(g);
@@ -955,18 +949,18 @@ void libgame_initwithstate(gamestate* state) {
 
 void libgame_closesavegamestate() {
     minfo("libgame_closesavegamestate");
-    libgame_closeshared();
+    libgame_closeshared(g);
 }
 
 
 void libgame_close() {
     minfo("libgame_close");
+    libgame_closeshared(g);
     gamestatefree(g);
-    libgame_closeshared();
 }
 
 
-void libgame_closeshared() {
+void libgame_closeshared(gamestate* g) {
     // not right now, but when we add dungeonfloor to
     // the gamestate, we will be able to avoid freeing
     // it on every reload
@@ -980,7 +974,7 @@ void libgame_closeshared() {
 
     UnloadFont(gfont);
 
-    libgame_unloadtextures();
+    libgame_unloadtextures(g);
 
     minfo("unloading render texture");
     UnloadRenderTexture(target);
