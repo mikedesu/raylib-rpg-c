@@ -50,9 +50,6 @@ hashtable_entityid_entity_t* entities = NULL;
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 
-//textureinfo txinfo[20];
-
-dungeonfloor_t* dungeonfloor = NULL;
 
 //--------------------------------------------------------------------
 // function declarations
@@ -549,10 +546,10 @@ inline void libgame_drawdebugpanel(gamestate* g) {
 void libgame_drawgrid(gamestate* g) {
     const int w = g->txinfo[TXDIRT].texture.width;
     const int h = g->txinfo[TXDIRT].texture.height;
-    for (int i = 0; i <= dungeonfloor->len; i++)
-        DrawLine(i * w, 0, i * w, dungeonfloor->wid * h, GREEN);
-    for (int i = 0; i <= dungeonfloor->wid; i++)
-        DrawLine(0, i * h, dungeonfloor->len * w, i * h, GREEN);
+    for (int i = 0; i <= g->dungeonfloor->len; i++)
+        DrawLine(i * w, 0, i * w, g->dungeonfloor->wid * h, GREEN);
+    for (int i = 0; i <= g->dungeonfloor->wid; i++)
+        DrawLine(0, i * h, g->dungeonfloor->len * w, i * h, GREEN);
 }
 
 
@@ -564,8 +561,8 @@ void libgame_drawdungeonfloor(gamestate* g) {
     Color c = WHITE;
     float rotation = 0;
     Vector2 origin = {0, 0};
-    for (int i = 0; i < dungeonfloor->len; i++) {
-        for (int j = 0; j < dungeonfloor->wid; j++) {
+    for (int i = 0; i < g->dungeonfloor->len; i++) {
+        for (int j = 0; j < g->dungeonfloor->wid; j++) {
             tile_dest.x = i * w;
             tile_dest.y = j * h;
             DrawTexturePro(g->txinfo[TXDIRT].texture, tile_src, tile_dest, origin, rotation, c);
@@ -877,8 +874,8 @@ void libgame_initdatastructures(gamestate* g) {
     entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
     spritegroups =
         hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
-    dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
-    if (!dungeonfloor) {
+    g->dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
+    if (!g->dungeonfloor) {
         merror("could not create dungeonfloor");
         // we could use an 'emergency shutdown' in case an error causes us
         // to need to 'panic' and force game close properly
@@ -934,7 +931,7 @@ void libgame_closeshared(gamestate* g) {
     hashtable_entityid_entity_destroy(entities);
     hashtable_entityid_spritegroup_destroy(spritegroups);
     vectorentityid_destroy(&entityids);
-    dungeonfloor_free(dungeonfloor);
+    dungeonfloor_free(g->dungeonfloor);
 
     UnloadFont(g->font);
 

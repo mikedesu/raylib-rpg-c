@@ -3,6 +3,7 @@
 #include "controlmode.h"
 #include "debugpanel.h"
 #include "display.h"
+#include "dungeonfloor.h"
 #include "entityid.h"
 #include "fadestate.h"
 #include "hashtable_entityid_entity.h"
@@ -47,6 +48,8 @@ typedef struct gamestate {
     entityid hero_id;
 
     textureinfo txinfo[20];
+
+    dungeonfloor_t* dungeonfloor;
 
 } gamestate;
 

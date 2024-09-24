@@ -66,6 +66,8 @@ gamestate* gamestateinitptr(const int windowwidth,
 
     g->hero_id = -1;
 
+    g->dungeonfloor = NULL;
+
     mprint("gamestateinitptr end\n");
     return g;
 }
