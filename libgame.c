@@ -102,7 +102,7 @@ void libgame_createheroentity(gamestate* g);
 void libgame_drawgrid();
 void libgame_drawdungeonfloor();
 void libgame_drawherogroup();
-void libgame_drawherogrouphitbox();
+void libgame_drawherogrouphitbox(gamestate* g);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
 void libgame_initdatastructures(gamestate* g);
@@ -503,7 +503,7 @@ void libgame_drawdungeonfloor() {
 }
 
 
-void libgame_drawherogrouphitbox() {
+void libgame_drawherogrouphitbox(gamestate* g) {
     float rotation = 0;
     Color c = (Color){51, 51, 51, 255};
 
@@ -548,7 +548,7 @@ void libgame_drawherogroup() {
                        c);
     }
 
-    libgame_drawherogrouphitbox();
+    libgame_drawherogrouphitbox(g);
 
     if (g->framecount % FRAMEINTERVAL == 0) {
         sprite_incrframe(hero_group->sprites[hero_group->current]);
