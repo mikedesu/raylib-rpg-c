@@ -1,3 +1,4 @@
+#include "dungeonfloor.h"
 #include "gamestate.h"
 #include "mprint.h"
 
@@ -88,11 +89,17 @@ void gamestateupdatecurrenttime(gamestate* g) {
 
 
 // have to update this function when we introduce new fields to Gamestate
-void gamestatefree(gamestate* s) {
-    if (s != NULL) {
+void gamestatefree(gamestate* g) {
+    if (g != NULL) {
         //companyscenefree(s->cs);
         //free(s->timebegantm);
-        hashtable_entityid_entity_destroy(s->entities);
-        free(s);
+        hashtable_entityid_entity_destroy(g->entities);
+
+        hashtable_entityid_spritegroup_destroy(g->spritegroups);
+        vectorentityid_destroy(&g->entityids);
+        dungeonfloor_free(g->dungeonfloor);
+
+
+        free(g);
     }
 }

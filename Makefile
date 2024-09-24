@@ -3,12 +3,12 @@ OBJ=-c
 SHARED=-shared
 DATA_STRUCTS=vectorentityid.o 
 SCENES=companyscene.o 
-LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o  utils.o sprite.o setdebugpanel.o dungeonfloor.o spritegroup.o entity.o hashtable_entityid_entity.o gamestate.o hashtable_entityid_spritegroup.o
+LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o  utils.o sprite.o setdebugpanel.o  spritegroup.o entity.o hashtable_entityid_entity.o gamestate.o hashtable_entityid_spritegroup.o dungeonfloor.o
 STATIC_LINK_RAYLIB=-l:libraylib.a
 LINK_MATH=-lm
 POSITION_INDEPENDENT_CODE=-fPIC
 MAIN_C=main.c
-MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_entity.o hashtable_entityid_spritegroup.o
+MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_entity.o hashtable_entityid_spritegroup.o dungeonfloor.o vectorentityid.o
 
 all: game  
 

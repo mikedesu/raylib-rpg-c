@@ -149,6 +149,7 @@ void libgame_handleinput(gamestate* g) {
     }
 
     if (IsKeyPressed(KEY_A)) {
+        minfo("key a pressed");
         // increment the 'current' of the hero group
         spritegroup_t* hero_group =
             hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
@@ -322,21 +323,26 @@ void libgame_handleplayerinput(gamestate* g) {
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
         if (IsKeyPressed(KEY_RIGHT)) {
+            minfo("key right pressed");
             libgame_updateherospritegroup_right(g);
 
         } else if (IsKeyPressed(KEY_LEFT)) {
+            minfo("key left pressed");
             libgame_updateherospritegroup_left(g);
         }
 
         if (IsKeyPressed(KEY_DOWN)) {
+            minfo("key down pressed");
             libgame_updateherospritegroup_down(g);
 
         } else if (IsKeyPressed(KEY_UP)) {
+            minfo("key up pressed");
             libgame_updateherospritegroup_up(g);
         }
 
 
         if (IsKeyPressed(KEY_PERIOD)) {
+            minfo("key period pressed");
             spritegroup_t* hero_group =
                 hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
             if (hero_group) {
@@ -923,17 +929,8 @@ void libgame_close(gamestate* g) {
 
 
 void libgame_closeshared(gamestate* g) {
-    // not right now, but when we add dungeonfloor to
-    // the gamestate, we will be able to avoid freeing
-    // it on every reload
-    hashtable_entityid_spritegroup_destroy(g->spritegroups);
-    //hashtable_entityid_spritegroup_destroy(spritegroups);
-
-    vectorentityid_destroy(&g->entityids);
-    dungeonfloor_free(g->dungeonfloor);
-
+    // dont need to free most of gamestate
     UnloadFont(g->font);
-
     libgame_unloadtextures(g);
 
     minfo("unloading render texture");
