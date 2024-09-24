@@ -11,7 +11,8 @@
 7 4 4 0  img/characters/human-attack-shadow.png 
 8 4 4 0  img/characters/human-jump.png 
 9 4 4 0  img/characters/human-jump-shadow.png 
-10 1 12 0  img/characters/human-spindie.png 
-11 1 12 0  img/characters/human-spindie-shadow.png 
-12 1 12 0  img/characters/human-souldie.png 
-13 1 12 0  img/characters/human-souldie-shadow.png 
+10 1 12 0 img/characters/human-spindie.png 
+11 1 12 0 img/characters/human-spindie-shadow.png 
+12 1 12 0 img/characters/human-souldie.png 
+13 1 12 0 img/characters/human-souldie-shadow.png 
+14 1 8 0 img/items/torch-sheet.png

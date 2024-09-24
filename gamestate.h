@@ -49,6 +49,7 @@ typedef struct gamestate {
     hashtable_entityid_spritegroup_t* spritegroups;
 
     entityid hero_id;
+    entityid torch_id;
 
     textureinfo txinfo[20];
 

@@ -67,6 +67,7 @@ gamestate* gamestateinitptr(const int windowwidth,
     g->spritegroups = NULL;
 
     g->hero_id = -1;
+    g->torch_id = -1;
 
     g->dungeonfloor = NULL;
 

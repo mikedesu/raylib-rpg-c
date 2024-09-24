@@ -96,6 +96,10 @@ void libgame_updateherospritegroup_up(gamestate* g);
 void libgame_updateherospritegroup_down(gamestate* g);
 
 entityid libgame_createentity(gamestate* g, const char* name);
+entityid libgame_createtorchentity(gamestate* g);
+void libgame_createtorchspritegroup(gamestate* g, entityid id);
+void libgame_drawtorchgroup(gamestate* g);
+void libgame_drawtorchgroup_hitbox(gamestate* g);
 
 
 void libgame_drawfade(gamestate* g) {
@@ -606,9 +610,51 @@ void libgame_drawherogroup(gamestate* g) {
                        WHITE);
     }
 
-
     if (g->framecount % FRAMEINTERVAL == 0) {
         sprite_incrframe(hero_group->sprites[hero_group->current]);
+    }
+}
+
+
+// we are going to have to temporarily save the torchid
+// as we are not enumerating thru the map yet
+void libgame_drawtorchgroup(gamestate* g) {
+    spritegroup_t* group = hashtable_entityid_spritegroup_search(g->spritegroups, g->torch_id);
+    if (group) {
+        // draw hero and its shadow
+        DrawTexturePro(*group->sprites[group->current]->texture,
+                       group->sprites[group->current]->src,
+                       group->dest,
+                       (Vector2){0, 0},
+                       0.0f,
+                       WHITE);
+
+        //DrawTexturePro(*group->sprites[group->current + 1]->texture,
+        //               group->sprites[group->current + 1]->src,
+        //               group->dest,
+        //               (Vector2){0, 0},
+        //               0.0f,
+        //               WHITE);
+    }
+
+    if (g->framecount % FRAMEINTERVAL == 0) {
+        sprite_incrframe(group->sprites[group->current]);
+    }
+}
+
+
+void libgame_drawtorchgroup_hitbox(gamestate* g) {
+    spritegroup_t* sg = hashtable_entityid_spritegroup_search(g->spritegroups, g->torch_id);
+    if (sg && g->debugpanelon) {
+        Color c = (Color){51, 51, 51, 255};
+        Vector2 v[4] = {{sg->dest.x, sg->dest.y},
+                        {sg->dest.x + sg->dest.width, sg->dest.y},
+                        {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height},
+                        {sg->dest.x, sg->dest.y + sg->dest.height}};
+        DrawLineV(v[0], v[1], c);
+        DrawLineV(v[1], v[2], c);
+        DrawLineV(v[2], v[3], c);
+        DrawLineV(v[3], v[0], c);
     }
 }
 
@@ -623,8 +669,14 @@ void libgame_drawgameplayscene(gamestate* g) {
         libgame_drawgrid(g);
     }
 
+
+    libgame_drawtorchgroup(g);
+    libgame_drawtorchgroup_hitbox(g);
+
+
     libgame_drawherogroup(g);
     libgame_drawherogrouphitbox(g);
+
     libgame_handlefade(g);
 
     EndMode2D();
@@ -813,6 +865,50 @@ void libgame_createheroentity(gamestate* g) {
 }
 
 
+entityid libgame_createtorchentity(gamestate* g) {
+    entityid torch_id = libgame_createentity(g, "torch");
+    return torch_id;
+}
+
+
+void libgame_createtorchspritegroup(gamestate* g, entityid id) {
+    spritegroup_t* group = spritegroup_create(4);
+
+    int keys[1] = {TXTORCH};
+
+    for (int i = 0; i < 1; i++) {
+        sprite* s = sprite_create(&g->txinfo[keys[i]].texture,
+                                  g->txinfo[keys[i]].contexts,
+                                  g->txinfo[keys[i]].num_frames);
+        if (!s) {
+            merror("could not create sprite");
+        }
+        spritegroup_add(group, s);
+    }
+
+    // the padding will be different for the torch
+    const float x = 0;
+    const float y = 0;
+    const float w = spritegroup_get(group, 0)->width;
+    const float h = spritegroup_get(group, 0)->height;
+    const float offset_x = 0;
+    //const float offset_y = 0;
+    //const float offset_x = -w / 2 + w / 8;
+    const float offset_y = -h / 2;
+    Rectangle dest = {x + offset_x, y + offset_y, w, h};
+    group->current = 0;
+    group->dest = dest;
+
+    // add the spritegroup to the hashtable
+    hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
+}
+
+
+// this code is ugly as fuck
+// but it works
+// the hero has a LOT of spritegroups
+// not every entity will have this many sprites
+// lets try using this as a basis to get a sprite in there
 void libgame_createherospritegroup(gamestate* g) {
     spritegroup_t* hero_group = spritegroup_create(20);
 
@@ -894,8 +990,21 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_loadtargettexture(g);
         libgame_loadtextures(g);
         libgame_initdatastructures(g);
+
+        // this is just a mock-up for now
+        // eventually we will generalize this
+        // to figure out how,
+        // we will introduce a torch
         libgame_createheroentity(g);
         libgame_createherospritegroup(g);
+
+        g->torch_id = libgame_createtorchentity(g);
+        libgame_createtorchspritegroup(g, g->torch_id);
+        // created but now we have to draw it
+
+        //entityid torch_id = libgame_createentity(g, "torch");
+
+
         setdebugpaneltopleft(g);
 
     } else {
