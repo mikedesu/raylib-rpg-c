@@ -48,7 +48,7 @@ int targetheight = DEFAULT_TARGET_HEIGHT;
 int windowwidth = DEFAULT_WINDOW_WIDTH;
 int windowheight = DEFAULT_WINDOW_HEIGHT;
 
-float scale = DEFAULT_SCALE;
+//float scale = DEFAULT_SCALE;
 
 entityid hero_id;
 
