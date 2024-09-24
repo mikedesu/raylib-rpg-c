@@ -64,6 +64,8 @@ gamestate* gamestateinitptr(const int windowwidth,
 
     g->entities = hashtable_entityid_entity_create(1000);
 
+    g->hero_id = -1;
+
     mprint("gamestateinitptr end\n");
     return g;
 }

@@ -3,6 +3,7 @@
 #include "controlmode.h"
 #include "debugpanel.h"
 #include "display.h"
+#include "entityid.h"
 #include "fadestate.h"
 #include "hashtable_entityid_entity.h"
 #include "sizemacros.h"
@@ -41,6 +42,8 @@ typedef struct gamestate {
     Font font;
 
     hashtable_entityid_entity_t* entities;
+
+    entityid hero_id;
 
 } gamestate;
 

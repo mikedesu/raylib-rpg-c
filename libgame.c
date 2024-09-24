@@ -44,8 +44,6 @@ int targetheight = DEFAULT_TARGET_HEIGHT;
 int windowwidth = DEFAULT_WINDOW_WIDTH;
 int windowheight = DEFAULT_WINDOW_HEIGHT;
 
-entityid hero_id;
-
 vectorentityid_t entityids;
 
 hashtable_entityid_entity_t* entities = NULL;
@@ -162,7 +160,7 @@ void libgame_handleinput(gamestate* g) {
 
     if (IsKeyPressed(KEY_A)) {
         // increment the 'current' of the hero group
-        spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+        spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, g->hero_id);
         spritegroup_incr(hero_group);
     }
 
@@ -200,7 +198,7 @@ void libgame_handledebugpanelswitch(gamestate* g) {
 
 
 void libgame_updateherospritegroup_right(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, g->hero_id);
     if (hero_group) {
         int ctx = SG_CTX_R_D;
         switch (hero_group->sprites[hero_group->current]->currentcontext) {
@@ -229,7 +227,7 @@ void libgame_updateherospritegroup_right(gamestate* g) {
 
 
 void libgame_updateherospritegroup_left(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, g->hero_id);
     if (hero_group) {
 
         int ctx = SG_CTX_L_D;
@@ -258,7 +256,7 @@ void libgame_updateherospritegroup_left(gamestate* g) {
 
 
 void libgame_updateherospritegroup_up(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, g->hero_id);
     if (hero_group) {
 
         int ctx = SG_CTX_R_U;
@@ -292,7 +290,7 @@ void libgame_updateherospritegroup_up(gamestate* g) {
 
 
 void libgame_updateherospritegroup_down(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, g->hero_id);
     if (hero_group) {
 
         int ctx = SG_CTX_R_D;
@@ -349,7 +347,7 @@ void libgame_handleplayerinput(gamestate* g) {
 
         if (IsKeyPressed(KEY_PERIOD)) {
             spritegroup_t* hero_group =
-                hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+                hashtable_entityid_spritegroup_search(spritegroups, g->hero_id);
             if (hero_group) {
                 hero_group->current = 0; //standing/idle
             }
@@ -466,7 +464,7 @@ void libgame_updategamestate(gamestate* g) {
     // so that we can begin translating
     // player input
     // into real moves
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, g->hero_id);
     if (hero_group) {
 
         // only do it 1 unit at a time
@@ -577,7 +575,7 @@ void libgame_drawdungeonfloor(gamestate* g) {
 
 
 void libgame_drawherogrouphitbox(gamestate* g) {
-    spritegroup_t* sg = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    spritegroup_t* sg = hashtable_entityid_spritegroup_search(spritegroups, g->hero_id);
     if (sg && g->debugpanelon) {
         Color c = (Color){51, 51, 51, 255};
         Vector2 v[4] = {{sg->dest.x, sg->dest.y},
@@ -593,7 +591,7 @@ void libgame_drawherogrouphitbox(gamestate* g) {
 
 
 void libgame_drawherogroup(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, g->hero_id);
     if (hero_group) {
         // draw hero and its shadow
         DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
@@ -813,7 +811,7 @@ entityid libgame_createentity(gamestate* g, const char* name) {
 void libgame_createheroentity(gamestate* g) {
     entityid heroid = libgame_createentity(g, "hero");
     if (heroid != -1) {
-        hero_id = heroid;
+        g->hero_id = heroid;
     }
 }
 
@@ -854,7 +852,7 @@ void libgame_createherospritegroup(gamestate* g) {
     hero_group->dest = dest;
 
     // add the spritegroup to the hashtable
-    hashtable_entityid_spritegroup_insert(spritegroups, hero_id, hero_group);
+    hashtable_entityid_spritegroup_insert(spritegroups, g->hero_id, hero_group);
 }
 
 
