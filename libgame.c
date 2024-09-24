@@ -1,20 +1,18 @@
+#include "controlmode.h"
+#include "dungeonfloor.h"
 #include "entity.h"
 #include "fadestate.h"
 #include "gamestate.h"
 #include "hashtable_entityid_entity.h"
 #include "hashtable_entityid_spritegroup.h"
+#include "libgame_defines.h"
 #include "mprint.h"
+#include "setdebugpanel.h"
 #include "sprite.h"
 #include "spritegroup.h"
 #include "textureinfo.h"
 #include "utils.h"
 #include "vectorentityid.h"
-
-#include "dungeonfloor.h"
-#include "libgame_defines.h"
-#include "setdebugpanel.h"
-
-#include "controlmode.h"
 
 #include <raylib.h>
 #include <rlgl.h>
@@ -46,23 +44,15 @@ int windowheight = DEFAULT_WINDOW_HEIGHT;
 
 float scale = DEFAULT_SCALE;
 
-
 entityid hero_id;
 
-
 vectorentityid_t entityids;
-
 
 hashtable_entityid_entity_t* entities = NULL;
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 
-
 textureinfo txinfo[20];
-
-
-//spritegroup_t* hero_group = NULL;
-
 
 dungeonfloor_t* dungeonfloor = NULL;
 
@@ -71,9 +61,10 @@ dungeonfloor_t* dungeonfloor = NULL;
 //--------------------------------------------------------------------
 bool libgame_windowshouldclose();
 
+gamestate* libgame_getgamestate();
+
 void libgame_initwindow();
 void libgame_closewindow();
-
 void libgame_updatedebugpanelbuffer();
 void libgame_updategamestate();
 void libgame_drawframe();
@@ -82,7 +73,6 @@ void libgame_initwithstate(gamestate* state);
 void libgame_close();
 void libgame_handleinput();
 void libgame_handlereloadtextures();
-
 void libgame_loadtexture(int index, int contexts, int frames, bool dodither, const char* path);
 void libgame_loadtextures();
 void libgame_unloadtexture(int index);
@@ -91,22 +81,20 @@ void libgame_loadtexturesfromfile(const char* path);
 void libgame_reloadtextures();
 void libgame_initsharedsetup(gamestate* g);
 void libgame_closeshared();
-gamestate* libgame_getgamestate();
 void libgame_drawframeend(gamestate* g);
 void libgame_handleplayerinput(gamestate* g);
 void libgame_handlecaminput(gamestate* g);
 void libgame_handledebugpanelswitch(gamestate* g);
 void libgame_handlemodeswitch(gamestate* g);
 void libgame_closesavegamestate();
-
 void libgame_drawdebugpanel();
-
 void libgame_drawcompanyscene();
 void libgame_drawtitlescene();
 void libgame_drawgameplayscene();
 void libgame_handlefade();
 void libgame_drawfade();
-
+void libgame_createherospritegroup();
+void libgame_createheroentity();
 
 //--------------------------------------------------------------------
 // definitions
@@ -155,31 +143,16 @@ void libgame_handlereloadtextures() {
 void libgame_handleinput() {
     if (IsKeyPressed(KEY_SPACE)) {
         minfo("key space pressed");
-
-        // get the hero entity
-        entity_t* hero_entity = hashtable_entityid_entity_search(entities, hero_id);
-
-        // print the hero entity name
-        printf("hero entity name: %s\n", hero_entity->name);
-
         //if (g->fadestate == FADESTATENONE) {
         //    g->fadestate = FADESTATEOUT;
         //}
     }
 
-    if (IsKeyPressed(KEY_C)) {
+    if (IsKeyPressed(KEY_A)) {
         // increment the 'current' of the hero group
-
         spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
-        if (hero_group) {
-            // this is a test
-            hero_group->current += 2;
-            if (hero_group->current >= hero_group->size) {
-                hero_group->current = 0;
-            }
-        }
+        spritegroup_incr(hero_group);
     }
-
 
     libgame_handlereloadtextures();
     libgame_handlemodeswitch(g);
@@ -190,7 +163,7 @@ void libgame_handleinput() {
 
 
 void libgame_handlemodeswitch(gamestate* g) {
-    if (IsKeyPressed(KEY_M)) {
+    if (IsKeyPressed(KEY_C)) {
         switch (g->controlmode) {
         case CONTROLMODE_CAMERA:
             minfo("control mode: camera");
@@ -221,15 +194,16 @@ void libgame_handleplayerinput(gamestate* g) {
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
         if (IsKeyPressed(KEY_RIGHT)) {
-
             spritegroup_t* hero_group =
                 hashtable_entityid_spritegroup_search(spritegroups, hero_id);
             if (hero_group) {
                 int cc = hero_group->sprites[hero_group->current]->currentcontext;
-                int context = cc == 0 ? 0 : cc == 1 ? 0 : cc == 2 ? 2 : 2;
+                int context = cc == SG_CTX_R_D   ? SG_CTX_R_D
+                              : cc == SG_CTX_L_D ? SG_CTX_R_D
+                              : cc == SG_CTX_R_U ? SG_CTX_R_U
+                                                 : SG_CTX_R_U;
                 spritegroup_setcontexts(hero_group, context);
                 hero_group->move = (Vector2){8, 0};
-
                 hero_group->current = 2;
             }
 
@@ -241,7 +215,10 @@ void libgame_handleplayerinput(gamestate* g) {
             if (hero_group) {
 
                 int cc = hero_group->sprites[hero_group->current]->currentcontext;
-                int context = cc == 0 ? 1 : cc == 1 ? 1 : cc == 2 ? 3 : 3;
+                int context = cc == SG_CTX_R_D   ? SG_CTX_L_D
+                              : cc == SG_CTX_L_D ? SG_CTX_L_D
+                              : cc == SG_CTX_R_U ? SG_CTX_L_U
+                                                 : SG_CTX_L_U;
                 spritegroup_setcontexts(hero_group, context);
                 hero_group->move = (Vector2){-8, 0};
                 hero_group->current = 2;
@@ -255,7 +232,10 @@ void libgame_handleplayerinput(gamestate* g) {
             if (hero_group) {
 
                 int cc = hero_group->sprites[hero_group->current]->currentcontext;
-                int context = cc == 0 ? 0 : cc == 1 ? 1 : cc == 2 ? 0 : 1;
+                int context = cc == SG_CTX_R_D   ? SG_CTX_R_D
+                              : cc == SG_CTX_L_D ? SG_CTX_L_D
+                              : cc == SG_CTX_R_U ? SG_CTX_R_D
+                                                 : SG_CTX_L_D;
                 spritegroup_setcontexts(hero_group, context);
                 hero_group->move = (Vector2){0, 8};
                 hero_group->current = 2;
@@ -267,10 +247,13 @@ void libgame_handleplayerinput(gamestate* g) {
                 hashtable_entityid_spritegroup_search(spritegroups, hero_id);
             if (hero_group) {
 
-                hero_group->move = (Vector2){0, -8};
                 int cc = hero_group->sprites[hero_group->current]->currentcontext;
-                int context = cc == 0 ? 2 : cc == 1 ? 3 : cc == 2 ? 2 : 3;
+                int context = cc == SG_CTX_R_D   ? SG_CTX_R_U
+                              : cc == SG_CTX_L_D ? SG_CTX_L_U
+                              : cc == SG_CTX_R_U ? SG_CTX_R_U
+                                                 : SG_CTX_L_U;
                 spritegroup_setcontexts(hero_group, context);
+                hero_group->move = (Vector2){0, -8};
                 hero_group->current = 2;
             }
         }
@@ -280,7 +263,6 @@ void libgame_handleplayerinput(gamestate* g) {
             spritegroup_t* hero_group =
                 hashtable_entityid_spritegroup_search(spritegroups, hero_id);
             if (hero_group) {
-
                 hero_group->current = 0;
             }
         }
@@ -366,10 +348,10 @@ void libgame_updatedebugpanelbuffer() {
              "Cam.offset:   %.2f,%.2f\n"
              "Cam.zoom:     %.2f\n"
              "Active scene: %d\n"
-             "Control mode: %d\n"
-             "Herogroup current: %d\n"
-             "Herogroup size: %d\n"
-             "Herogroup capacity: %d\n",
+             "Control mode: %d\n",
+             //"Herogroup current: %d\n"
+             //"Herogroup size: %d\n"
+             //"Herogroup capacity: %d\n",
              g->framecount,
              g->timebeganbuf,
              g->currenttimebuf,
@@ -383,10 +365,7 @@ void libgame_updatedebugpanelbuffer() {
              g->cam2d.offset.y,
              g->cam2d.zoom,
              activescene,
-             g->controlmode,
-             hero_group->current,
-             hero_group->size,
-             hero_group->capacity
+             g->controlmode
 
     );
 }
@@ -421,6 +400,9 @@ void libgame_updategamestate() {
             hero_group->move.y++;
         }
     }
+
+
+    //g->cam2d.rotation += 0.5f;
 }
 
 
@@ -781,6 +763,68 @@ void libgame_init() {
 }
 
 
+void libgame_createheroentity() {
+    // create a hero entity
+    entity_t* hero_entity = entity_create("darkmage");
+    if (!hero_entity) {
+        merror("could not create hero entity");
+        // we could use an 'emergency shutdown' in case an error causes us
+        // to need to 'panic' and force game close properly
+    }
+    hero_id = hero_entity->id;
+    vectorentityid_pushback(&entityids, hero_entity->id);
+    hashtable_entityid_entity_insert(entities, hero_entity->id, hero_entity);
+}
+
+
+void libgame_createherospritegroup() {
+    spritegroup_t* hero_group = spritegroup_create(20);
+
+    const float x = 0;
+    const float y = 0;
+    float w = 0;
+    float h = 0;
+    float offset_x = 0;
+    float offset_y = 0;
+    Rectangle dest;
+
+    int keys[12] = {TXHERO,
+                    TXHEROSHADOW,
+                    TXHEROWALK,
+                    TXHEROWALKSHADOW,
+                    TXHEROATTACK,
+                    TXHEROATTACKSHADOW,
+                    TXHEROJUMP,
+                    TXHEROJUMPSHADOW,
+                    TXHEROSPINDIE,
+                    TXHEROSPINDIESHADOW,
+                    TXHEROSOULDIE,
+                    TXHEROSOULDIESHADOW};
+
+    for (int i = 0; i < 12; i++) {
+        sprite* s = sprite_create(
+            &txinfo[keys[i]].texture, txinfo[keys[i]].contexts, txinfo[keys[i]].num_frames);
+        if (!s) {
+            merror("could not create sprite");
+        }
+        spritegroup_add(hero_group, s);
+    }
+
+    w = spritegroup_get(hero_group, 0)->width;
+    h = spritegroup_get(hero_group, 0)->height;
+    offset_x = -w / 2 + w / 8;
+    offset_y = -h / 2 + h / 8;
+    dest = (Rectangle){x + offset_x, y + offset_y, w, h};
+
+    // testing
+    hero_group->current = 0;
+    hero_group->dest = dest;
+
+    // add the spritegroup to the hashtable
+    hashtable_entityid_spritegroup_insert(spritegroups, hero_id, hero_group);
+}
+
+
 void libgame_initsharedsetup(gamestate* g) {
     if (g) {
         libgame_initwindow();
@@ -800,114 +844,19 @@ void libgame_initsharedsetup(gamestate* g) {
         // load game textures
         libgame_loadtextures();
 
-
         // create entityid vector
-        entityids = vectorentityid_create(1000);
-
+        entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
         // create entityid entity hashtable
-        entities = hashtable_entityid_entity_create(1000);
-
+        entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
         // create entityid spritegroup hashtable
-        spritegroups = hashtable_entityid_spritegroup_create(1000);
+        spritegroups =
+            hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
 
-        // create a hero entity
-        entity_t* hero_entity = entity_create("darkmage");
-        if (!hero_entity) {
-            merror("could not create hero entity");
-            // we could use an 'emergency shutdown' in case an error causes us
-            // to need to 'panic' and force game close properly
-        }
+        libgame_createheroentity();
 
-        hero_id = hero_entity->id;
-        vectorentityid_pushback(&entityids, hero_entity->id);
-        hashtable_entityid_entity_insert(entities, hero_entity->id, hero_entity);
-
-        int txkey = TXHERO;
-        sprite* hero =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROSHADOW;
-        sprite* hero_shadow =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROWALK;
-        sprite* herowalk =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROWALKSHADOW;
-        sprite* herowalk_shadow =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROATTACK;
-        sprite* heroattack =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROATTACKSHADOW;
-        sprite* heroattack_shadow =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROJUMP;
-        sprite* herojump =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROJUMPSHADOW;
-        sprite* herojump_shadow =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROSPINDIE;
-        sprite* herospindie =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROSPINDIESHADOW;
-        sprite* herospindie_shadow =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROSOULDIE;
-        sprite* herosouldie =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        txkey = TXHEROSOULDIESHADOW;
-        sprite* herosouldie_shadow =
-            sprite_create(&txinfo[txkey].texture, txinfo[txkey].contexts, txinfo[txkey].num_frames);
-
-        // we need to set the destination
-        // this is a function of how much we have scaled the target texture
-        // we need to write code to manage this but we will hack something
-        // together for right now
-        const float x = 0;
-        const float y = 0;
-        const float w = hero->width;
-        const float h = hero->height;
-        const float offset_x = -w / 2 + w / 8;
-        const float offset_y = -h / 2 + h / 8;
-        Rectangle dest = {x + offset_x, y + offset_y, w, h};
-
-        spritegroup_t* hero_group = spritegroup_create(20);
-        spritegroup_add(hero_group, hero);
-        spritegroup_add(hero_group, hero_shadow);
-        spritegroup_add(hero_group, herowalk);
-        spritegroup_add(hero_group, herowalk_shadow);
-        spritegroup_add(hero_group, heroattack);
-        spritegroup_add(hero_group, heroattack_shadow);
-        spritegroup_add(hero_group, herojump);
-        spritegroup_add(hero_group, herojump_shadow);
-        spritegroup_add(hero_group, herospindie);
-        spritegroup_add(hero_group, herospindie_shadow);
-        spritegroup_add(hero_group, herosouldie);
-        spritegroup_add(hero_group, herosouldie_shadow);
-
-        // testing
-        hero_group->current = 0;
-        hero_group->dest = dest;
-
-        // add the spritegroup to the hashtable
-        hashtable_entityid_spritegroup_insert(spritegroups, hero_entity->id, hero_group);
-
+        libgame_createherospritegroup();
 
         setdebugpaneltopleft(g);
-        g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
-        //g->cam2d.zoom = 2.0f;
-
 
         // init dungeonfloor
         dungeonfloor = create_dungeonfloor(4, 4, TILETYPE_DIRT);

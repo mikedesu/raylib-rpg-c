@@ -78,13 +78,39 @@ void spritegroup_set(spritegroup_t* sg, int index, sprite* s) {
 }
 
 
+// each sprite has a 'context' that corresponds to different directions
 void spritegroup_setcontexts(spritegroup_t* sg, int context) {
-
     if (sg) {
         for (int i = 0; i < sg->size; i++) {
             sprite_setcontext(sg->sprites[i], context);
         }
     } else {
         merror("spritegroup_t is NULL");
+    }
+}
+
+
+sprite* spritegroup_get(spritegroup_t* sg, int index) {
+
+    sprite* s = NULL;
+
+    if (sg) {
+        if (index < sg->size) {
+            s = sg->sprites[index];
+        }
+    } else {
+        merror("spritegroup_t is NULL");
+    }
+
+    return s;
+}
+
+
+void spritegroup_incr(spritegroup_t* sg) {
+    if (sg) {
+        sg->current += 2;
+        if (sg->current >= sg->size) {
+            sg->current = 0;
+        }
     }
 }

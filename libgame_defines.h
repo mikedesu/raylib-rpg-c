@@ -40,3 +40,14 @@
 #define COMPANYFILL "   x  x x   "
 
 #define DEFAULT_FONT_PATH "fonts/hack.ttf"
+
+
+#define DEFAULT_VECTOR_ENTITYID_SIZE 1024
+#define DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE 1024
+#define DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE 1024
+
+// spritegroup context directions
+#define SG_CTX_R_D 0
+#define SG_CTX_L_D 1
+#define SG_CTX_R_U 2
+#define SG_CTX_L_U 3
