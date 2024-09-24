@@ -7,9 +7,11 @@
 #include "hashtable_entityid_spritegroup.h"
 #include "libgame_defines.h"
 #include "mprint.h"
+#include "scene.h"
 #include "setdebugpanel.h"
 #include "sprite.h"
 #include "spritegroup.h"
+#include "spritegroup_anim.h"
 #include "textureinfo.h"
 #include "utils.h"
 #include "vectorentityid.h"
@@ -21,28 +23,24 @@
 #include <string.h>
 #include <time.h>
 
-
 #define BASE_SIZE 8
 #define TEST_SIZE 0.2
 #define FRAMEINTERVAL 10
-
 
 //--------------------------------------------------------------------
 // libgame global variables
 //--------------------------------------------------------------------
 char debugpanelbuffer[1024] = {0};
 
-int activescene = GAMEPLAYSCENE;
-
 gamestate* g = NULL;
 
 Font gfont;
-
 RenderTexture target;
 Rectangle target_src;
 Rectangle target_dest;
 Vector2 target_origin = (Vector2){0, 0};
 
+int activescene = GAMEPLAYSCENE;
 int targetwidth = DEFAULT_TARGET_WIDTH;
 int targetheight = DEFAULT_TARGET_HEIGHT;
 int windowwidth = DEFAULT_WINDOW_WIDTH;
@@ -64,9 +62,7 @@ dungeonfloor_t* dungeonfloor = NULL;
 // function declarations
 //--------------------------------------------------------------------
 bool libgame_windowshouldclose();
-
 gamestate* libgame_getgamestate();
-
 void libgame_initwindow();
 void libgame_closewindow();
 void libgame_updatedebugpanelbuffer();
@@ -108,12 +104,14 @@ void libgame_drawherogrouphitbox(gamestate* g);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
 void libgame_initdatastructures(gamestate* g);
+void libgame_updateherospritegroup_right(gamestate* g);
+void libgame_updateherospritegroup_left(gamestate* g);
+void libgame_updateherospritegroup_up(gamestate* g);
+void libgame_updateherospritegroup_down(gamestate* g);
 
 entityid libgame_createentity(gamestate* g, const char* name);
 
-//--------------------------------------------------------------------
-// definitions
-//--------------------------------------------------------------------
+
 void libgame_drawfade(gamestate* g) {
     if (g->fadealpha > 0) {
         Color c = {0, 0, 0, g->fadealpha};
@@ -124,14 +122,12 @@ void libgame_drawfade(gamestate* g) {
 
 void libgame_handlefade(gamestate* g) {
     const int fadespeed = 4;
-
     // modify the fadealpha
     if (g->fadestate == FADESTATEOUT && g->fadealpha < 255) {
         g->fadealpha += fadespeed;
     } else if (g->fadestate == FADESTATEIN && g->fadealpha > 0) {
         g->fadealpha -= fadespeed;
     }
-
     // handle scene rotation based on fadealpha
     if (g->fadealpha >= 255) {
         g->fadealpha = 255;
@@ -141,13 +137,11 @@ void libgame_handlefade(gamestate* g) {
             activescene = 0;
         }
     }
-
     // halt fade if fadealpha is 0
     if (g->fadealpha <= 0) {
         g->fadealpha = 0;
         g->fadestate = FADESTATENONE;
     }
-
     libgame_drawfade(g);
 }
 
@@ -160,10 +154,7 @@ void libgame_handlereloadtextures(gamestate* g) {
 }
 
 
-//void libgame_handleinput() {
 void libgame_handleinput(gamestate* g) {
-    //minfo("begin libgame_handleinput");
-
     if (IsKeyPressed(KEY_SPACE)) {
         minfo("key space pressed");
         //if (g->fadestate == FADESTATENONE) {
@@ -210,6 +201,132 @@ void libgame_handledebugpanelswitch(gamestate* g) {
 }
 
 
+void libgame_updateherospritegroup_right(gamestate* g) {
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    if (hero_group) {
+        int ctx = SG_CTX_R_D;
+        switch (hero_group->sprites[hero_group->current]->currentcontext) {
+        case SG_CTX_R_D:
+            ctx = SG_CTX_R_D;
+            break;
+        case SG_CTX_L_D:
+            ctx = SG_CTX_R_D;
+            break;
+        case SG_CTX_R_U:
+            ctx = SG_CTX_R_U;
+            break;
+        case SG_CTX_L_U:
+            ctx = SG_CTX_R_U;
+            break;
+        default:
+            ctx = SG_CTX_R_D;
+            break;
+        }
+
+        spritegroup_setcontexts(hero_group, ctx);
+        hero_group->move = (Vector2){8, 0};
+        hero_group->current = SPRITEGROUP_ANIM_WALK;
+    }
+}
+
+
+void libgame_updateherospritegroup_left(gamestate* g) {
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    if (hero_group) {
+
+        int ctx = SG_CTX_L_D;
+        switch (hero_group->sprites[hero_group->current]->currentcontext) {
+        case SG_CTX_R_D:
+            ctx = SG_CTX_L_D;
+            break;
+        case SG_CTX_L_D:
+            ctx = SG_CTX_L_D;
+            break;
+        case SG_CTX_R_U:
+            ctx = SG_CTX_L_U;
+            break;
+        case SG_CTX_L_U:
+            ctx = SG_CTX_L_U;
+            break;
+        default:
+            ctx = SG_CTX_L_D;
+            break;
+        }
+        spritegroup_setcontexts(hero_group, ctx);
+        hero_group->move = (Vector2){-8, 0};
+        hero_group->current = SPRITEGROUP_ANIM_WALK;
+    }
+}
+
+
+void libgame_updateherospritegroup_up(gamestate* g) {
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    if (hero_group) {
+
+        int ctx = SG_CTX_R_U;
+        switch (hero_group->sprites[hero_group->current]->currentcontext) {
+        case SG_CTX_R_D:
+            ctx = SG_CTX_R_U;
+            break;
+        case SG_CTX_L_D:
+            ctx = SG_CTX_L_U;
+            break;
+        case SG_CTX_R_U:
+            ctx = SG_CTX_R_U;
+            break;
+        case SG_CTX_L_U:
+            ctx = SG_CTX_L_U;
+            break;
+        default:
+            ctx = SG_CTX_R_U;
+            break;
+        }
+        //int cc = hero_group->sprites[hero_group->current]->currentcontext;
+        //int context = cc == SG_CTX_R_D   ? SG_CTX_R_U
+        //              : cc == SG_CTX_L_D ? SG_CTX_L_U
+        //              : cc == SG_CTX_R_U ? SG_CTX_R_U
+        //                                 : SG_CTX_L_U;
+        spritegroup_setcontexts(hero_group, ctx);
+        hero_group->move = (Vector2){0, -8};
+        hero_group->current = SPRITEGROUP_ANIM_WALK;
+    }
+}
+
+
+void libgame_updateherospritegroup_down(gamestate* g) {
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    if (hero_group) {
+
+        int ctx = SG_CTX_R_D;
+        switch (hero_group->sprites[hero_group->current]->currentcontext) {
+        case SG_CTX_R_D:
+            ctx = SG_CTX_R_D;
+            break;
+        case SG_CTX_L_D:
+            ctx = SG_CTX_L_D;
+            break;
+        case SG_CTX_R_U:
+            ctx = SG_CTX_R_D;
+            break;
+        case SG_CTX_L_U:
+            ctx = SG_CTX_L_D;
+            break;
+        default:
+            ctx = SG_CTX_R_D;
+            break;
+        }
+
+        //int cc = hero_group->sprites[hero_group->current]->currentcontext;
+        //int context = cc == SG_CTX_R_D   ? SG_CTX_R_D
+        //              : cc == SG_CTX_L_D ? SG_CTX_L_D
+        //              : cc == SG_CTX_R_U ? SG_CTX_R_D
+        //                                 : SG_CTX_L_D;
+        spritegroup_setcontexts(hero_group, ctx);
+        hero_group->move = (Vector2){0, 8};
+        hero_group->current = SPRITEGROUP_ANIM_WALK;
+    }
+}
+
 void libgame_handleplayerinput(gamestate* g) {
     //minfo("begin libgame_handleplayerinput");
     if (g->controlmode == CONTROLMODE_PLAYER) {
@@ -218,68 +335,17 @@ void libgame_handleplayerinput(gamestate* g) {
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
         if (IsKeyPressed(KEY_RIGHT)) {
-            spritegroup_t* hero_group =
-                hashtable_entityid_spritegroup_search(spritegroups, hero_id);
-            if (hero_group) {
-                int cc = hero_group->sprites[hero_group->current]->currentcontext;
-                int context = cc == SG_CTX_R_D   ? SG_CTX_R_D
-                              : cc == SG_CTX_L_D ? SG_CTX_R_D
-                              : cc == SG_CTX_R_U ? SG_CTX_R_U
-                                                 : SG_CTX_R_U;
-                spritegroup_setcontexts(hero_group, context);
-                hero_group->move = (Vector2){8, 0};
-                hero_group->current = 2;
-            }
+            libgame_updateherospritegroup_right(g);
 
         } else if (IsKeyPressed(KEY_LEFT)) {
-            //hero_group->dest.x -= BASE_SIZE;
-
-            spritegroup_t* hero_group =
-                hashtable_entityid_spritegroup_search(spritegroups, hero_id);
-            if (hero_group) {
-
-                int cc = hero_group->sprites[hero_group->current]->currentcontext;
-                int context = cc == SG_CTX_R_D   ? SG_CTX_L_D
-                              : cc == SG_CTX_L_D ? SG_CTX_L_D
-                              : cc == SG_CTX_R_U ? SG_CTX_L_U
-                                                 : SG_CTX_L_U;
-                spritegroup_setcontexts(hero_group, context);
-                hero_group->move = (Vector2){-8, 0};
-                hero_group->current = 2;
-            }
+            libgame_updateherospritegroup_left(g);
         }
 
         if (IsKeyPressed(KEY_DOWN)) {
-            //hero_group->dest.y += BASE_SIZE;
-            spritegroup_t* hero_group =
-                hashtable_entityid_spritegroup_search(spritegroups, hero_id);
-            if (hero_group) {
-
-                int cc = hero_group->sprites[hero_group->current]->currentcontext;
-                int context = cc == SG_CTX_R_D   ? SG_CTX_R_D
-                              : cc == SG_CTX_L_D ? SG_CTX_L_D
-                              : cc == SG_CTX_R_U ? SG_CTX_R_D
-                                                 : SG_CTX_L_D;
-                spritegroup_setcontexts(hero_group, context);
-                hero_group->move = (Vector2){0, 8};
-                hero_group->current = 2;
-            }
+            libgame_updateherospritegroup_down(g);
 
         } else if (IsKeyPressed(KEY_UP)) {
-            //hero_group->dest.y -= BASE_SIZE;
-            spritegroup_t* hero_group =
-                hashtable_entityid_spritegroup_search(spritegroups, hero_id);
-            if (hero_group) {
-
-                int cc = hero_group->sprites[hero_group->current]->currentcontext;
-                int context = cc == SG_CTX_R_D   ? SG_CTX_R_U
-                              : cc == SG_CTX_L_D ? SG_CTX_L_U
-                              : cc == SG_CTX_R_U ? SG_CTX_R_U
-                                                 : SG_CTX_L_U;
-                spritegroup_setcontexts(hero_group, context);
-                hero_group->move = (Vector2){0, -8};
-                hero_group->current = 2;
-            }
+            libgame_updateherospritegroup_up(g);
         }
 
 
@@ -287,7 +353,7 @@ void libgame_handleplayerinput(gamestate* g) {
             spritegroup_t* hero_group =
                 hashtable_entityid_spritegroup_search(spritegroups, hero_id);
             if (hero_group) {
-                hero_group->current = 0;
+                hero_group->current = 0; //standing/idle
             }
         }
     }
@@ -442,12 +508,18 @@ void libgame_drawframe(gamestate* g) {
     BeginDrawing();
     BeginTextureMode(target);
 
-    if (activescene == 0) {
+    switch (activescene) {
+    case SCENE_COMPANY:
         libgame_drawcompanyscene(g);
-    } else if (activescene == 1) {
+        break;
+    case SCENE_TITLE:
         libgame_drawtitlescene(g);
-    } else if (activescene == 2) {
+        break;
+    case SCENE_GAMEPLAY:
         libgame_drawgameplayscene(g);
+        break;
+    default:
+        break;
     }
 
     EndTextureMode();
@@ -461,24 +533,18 @@ inline void libgame_drawdebugpanel(gamestate* g) {
     if (g->debugpanelon) {
         const int fontsize = 14;
         const int spacing = 1;
-        Vector2 p = {g->debugpanel.x, g->debugpanel.y};
-        Vector2 m = MeasureTextEx(gfont, debugpanelbuffer, fontsize, spacing);
+        const int xy = 10;
+        const int wh = 20;
+        const Vector2 p = {g->debugpanel.x, g->debugpanel.y};
+        const Vector2 m = MeasureTextEx(gfont, debugpanelbuffer, fontsize, spacing);
+        const Rectangle box = {p.x - xy, p.y - xy, m.x + wh, m.y + wh};
         // update the debug panel width and height
-        // this code will go elsewhere like an 'update debug panel' method
-        // to separate the debug panel update from the draw
         // we store the root measurement because
         // the box is drawn relative to
         // the size of the text
         g->debugpanel.w = m.x;
         g->debugpanel.h = m.y;
-
-        int xy = 10;
-        int wh = 20;
-        Rectangle box = {p.x - xy, p.y - xy, m.x + wh, m.y + wh};
-
-        //DrawRectangle(bx, by, bw, bh, (Color){0x33, 0x33, 0x33, 128});
         DrawRectanglePro(box, (Vector2){0.0f, 0.0f}, 0.0f, (Color){0x33, 0x33, 0x33, 128});
-
         DrawTextEx(gfont, debugpanelbuffer, p, fontsize, spacing, WHITE);
     }
 }
@@ -487,14 +553,10 @@ inline void libgame_drawdebugpanel(gamestate* g) {
 void libgame_drawgrid(gamestate* g) {
     const int w = txinfo[TXDIRT].texture.width;
     const int h = txinfo[TXDIRT].texture.height;
-    Color c = GREEN;
-    for (int i = 0; i <= dungeonfloor->len; i++) {
-        DrawLine(i * w, 0, i * w, dungeonfloor->wid * h, c);
-    }
-
-    for (int i = 0; i <= dungeonfloor->wid; i++) {
-        DrawLine(0, i * h, dungeonfloor->len * w, i * h, c);
-    }
+    for (int i = 0; i <= dungeonfloor->len; i++)
+        DrawLine(i * w, 0, i * w, dungeonfloor->wid * h, GREEN);
+    for (int i = 0; i <= dungeonfloor->wid; i++)
+        DrawLine(0, i * h, dungeonfloor->len * w, i * h, GREEN);
 }
 
 
@@ -510,7 +572,6 @@ void libgame_drawdungeonfloor(gamestate* g) {
         for (int j = 0; j < dungeonfloor->wid; j++) {
             tile_dest.x = i * w;
             tile_dest.y = j * h;
-            //DrawTexturePro(textures[TXDIRT], tile_src, tile_dest, origin, rotation, c);
             DrawTexturePro(txinfo[TXDIRT].texture, tile_src, tile_dest, origin, rotation, c);
         }
     }
@@ -542,7 +603,7 @@ void libgame_drawherogroup(gamestate* g) {
                        hero_group->dest,
                        (Vector2){0, 0},
                        0.0f,
-                       (Color){255, 255, 255, 255});
+                       WHITE);
 
         DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
                        hero_group->sprites[hero_group->current + 1]->src,
@@ -562,98 +623,22 @@ void libgame_drawherogroup(gamestate* g) {
 void libgame_drawgameplayscene(gamestate* g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
-    const int w = txinfo[TXDIRT].texture.width;
-    const int h = txinfo[TXDIRT].texture.height;
 
-    Rectangle tile_src = {0, 0, w, h};
-    Rectangle tile_dest = {0, 0, w, h};
-    Vector2 origin = {0, 0};
-    Color c = WHITE;
-    Color border0 = RED;
-    Color border1 = GREEN;
-    float rotation = 0;
-
-    // draw the dungeon floor
     libgame_drawdungeonfloor(g);
 
-    // we want to draw a grid of lines on top of the tiles
-    // previously we were drawing rectanglelines around each tile
-    // but this looked ugly
-    // instead
-    // lets go row by row, column by column
-    // and draw lines
     if (g->debugpanelon) {
         libgame_drawgrid(g);
     }
 
-
     libgame_drawherogroup(g);
-
     libgame_drawherogrouphitbox(g);
-
-    //spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
-    //if (hero_group) {
-    //    // draw hero and its shadow
-    //    DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
-    //                   hero_group->sprites[hero_group->current]->src,
-    //                   hero_group->dest,
-    //                   origin,
-    //                   rotation,
-    //                   (Color){255, 255, 255, 255});
-    //    DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
-    //                   hero_group->sprites[hero_group->current + 1]->src,
-    //                   hero_group->dest,
-    //                   origin,
-    //                   rotation,
-    //                   c);
-    //    if (g->debugpanelon) {
-    //        // do the rectangle using lines
-    //        DrawLine(hero_group->dest.x,
-    //                 hero_group->dest.y,
-    //                 hero_group->dest.x + hero_group->dest.width,
-    //                 hero_group->dest.y,
-    //                 (Color){51, 51, 51, 255});
-    //
-    //            DrawLine(hero_group->dest.x,
-    //                     hero_group->dest.y,
-    //                     hero_group->dest.x,
-    //                     hero_group->dest.y + hero_group->dest.height,
-    //                     (Color){51, 51, 51, 255});
-    //
-    //            DrawLine(hero_group->dest.x + hero_group->dest.width,
-    //                     hero_group->dest.y,
-    //                     hero_group->dest.x + hero_group->dest.width,
-    //                     hero_group->dest.y + hero_group->dest.height,
-    //                     (Color){51, 51, 51, 255});
-    //
-    //            DrawLine(hero_group->dest.x,
-    //                     hero_group->dest.y + hero_group->dest.height,
-    //                     hero_group->dest.x + hero_group->dest.width,
-    //                     hero_group->dest.y + hero_group->dest.height,
-    //                     (Color){51, 51, 51, 255});
-    //        }
-    //if (g->framecount % FRAMEINTERVAL == 0) {
-    //    sprite_incrframe(hero_group->sprites[hero_group->current]);
-    //}
-    //    }
-
-    EndMode2D();
-
     libgame_handlefade(g);
 
-    // we will want to find a way to wrap animation management
-    // this will get cumbersome as the # of sprites on-screen grows.
-    // will also need a way to manage the existing sprites on screen
-    // previously i used an unordered map in C++ to do this
-    // i will need to find a way to do this in C
-    //
-    // we could rawdog an array of sprite pointers or something but we will deal with it
-    // when we get there
+    EndMode2D();
 }
 
 
 void libgame_drawtitlescene(gamestate* g) {
-    //BeginDrawing();
     const Color bgc = {0x66, 0x66, 0x66, 255};
     const Color fgc = WHITE;
     const Color fgc2 = BLACK;
@@ -664,37 +649,26 @@ void libgame_drawtitlescene(gamestate* g) {
     snprintf(b2, 128, "rpg");
     snprintf(b3, 128, "press space to continue");
 
-    Vector2 m = MeasureTextEx(gfont, b, 40, 2);
-    Vector2 m2 = MeasureTextEx(gfont, b2, 40, 2);
-    Vector2 m3 = MeasureTextEx(gfont, b3, 16, 1);
+    const Vector2 m = MeasureTextEx(gfont, b, 40, 2);
+    const Vector2 m2 = MeasureTextEx(gfont, b2, 40, 2);
+    const Vector2 m3 = MeasureTextEx(gfont, b3, 16, 1);
 
-    float tw2 = targetwidth / 2.0f;
-    float th2 = targetheight / 2.0f;
-    int offset = 100;
+    const float tw2 = targetwidth / 2.0f;
+    const float th2 = targetheight / 2.0f;
+    const int offset = 100;
 
-    int x = tw2 - m.x / 2.0f - offset;
-    int y = th2 - m.y / 2.0f;
-    int x2 = tw2 - m2.x / 2.0f + offset;
-    //int y2 = th2 / 2.0f - m2.y / 2.0f;
-    int x3 = tw2 - m3.x / 2.0f;
-    int y3 = th2 + m3.y / 2.0f + 20;
+    const int x = tw2 - m.x / 2.0f - offset;
+    const int y = th2 - m.y / 2.0f;
+    const int x2 = tw2 - m2.x / 2.0f + offset;
+    const int x3 = tw2 - m3.x / 2.0f;
+    const int y3 = th2 + m3.y / 2.0f + 20;
 
-    Vector2 pos = {x, y};
-    Vector2 pos2 = {x2, y};
-    Vector2 pos3 = {x3, y3};
-
+    const Vector2 pos[3] = {{x, y}, {x2, y}, {x3, y3}};
     ClearBackground(bgc);
-
-    //DrawRectangleLines(x - 5, y - 5, m.x + 20, m.y + 20, fgc);
-    DrawTextEx(gfont, b, pos, 40, 4, fgc);
-
-    //DrawRectangleLines(x2 - 5, y - 5, m2.x + 20, m2.y + 20, fgc2);
-    DrawTextEx(gfont, b2, pos2, 40, 1, fgc2);
-
+    DrawTextEx(gfont, b, pos[0], 40, 4, fgc);
+    DrawTextEx(gfont, b2, pos[1], 40, 1, fgc2);
     // just below the 'project rpg' text
-    DrawTextEx(gfont, b3, pos3, 16, 1, fgc);
-
-
+    DrawTextEx(gfont, b3, pos[2], 16, 1, fgc);
     libgame_handlefade(g);
 }
 
@@ -715,6 +689,7 @@ void libgame_drawcompanyscene(gamestate* g) {
     snprintf(b, 128, COMPANYNAME);
     snprintf(b2, 128, COMPANYFILL);
     snprintf(b3, 128, "presents");
+
     const Vector2 measure = MeasureTextEx(gfont, b, fontsize, spacing);
     const Vector2 measure2 = MeasureTextEx(gfont, b2, fontsize, spacing);
 
@@ -724,6 +699,7 @@ void libgame_drawcompanyscene(gamestate* g) {
             shufflestrinplace(b3);
         }
     }
+
     for (int i = 0; i < 10; i++) {
         shufflestrinplace(b2);
     }
@@ -739,7 +715,6 @@ void libgame_drawcompanyscene(gamestate* g) {
                         targetheight / 2.0f + measure.y / 2.0f + 20};
 
     DrawTextEx(gfont, b3, pp, 20, 1, fgc);
-
     libgame_handlefade(g);
 }
 
@@ -749,16 +724,11 @@ void libgame_loadtexture(
     if (dodither) {
         Image img = LoadImage(path);
         ImageDither(&img, 4, 4, 4, 4);
-
         Texture2D t = LoadTextureFromImage(img);
-
-
         txinfo[index].texture = t;
         UnloadImage(img);
     } else {
-        Texture2D t = LoadTexture(path);
-
-        txinfo[index].texture = t;
+        txinfo[index].texture = LoadTexture(path);
     }
     txinfo[index].num_frames = frames;
     txinfo[index].contexts = contexts;
@@ -779,24 +749,20 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
         return;
     }
 
-    char line[256];
-    char txpath[256];
     int index = 0;
     int contexts = 0;
     int frames = 0;
     int dodither = 0;
+    char line[256];
+    char txpath[256];
 
     while (fgets(line, 256, f)) {
-
         // if the line begins with a #, skip it
         if (line[0] == '#') {
             continue;
         }
-
         sscanf(line, "%d %d %d %d %s", &index, &contexts, &frames, &dodither, txpath);
-
         libgame_loadtexture(g, index, contexts, frames, dodither, txpath);
-
         bzero(line, 256);
         bzero(txpath, 256);
     }
@@ -806,7 +772,6 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
 
 void libgame_unloadtexture(gamestate* g, int index) {
     minfo("unloading texture");
-
     if (txinfo[index].texture.id > 0) {
         UnloadTexture(txinfo[index].texture);
     }
@@ -815,7 +780,6 @@ void libgame_unloadtexture(gamestate* g, int index) {
 
 void libgame_unloadtextures(gamestate* g) {
     minfo("unloading textures");
-
     libgame_unloadtexture(g, TXHERO);
     libgame_unloadtexture(g, TXDIRT);
 }
@@ -823,7 +787,6 @@ void libgame_unloadtextures(gamestate* g) {
 
 void libgame_reloadtextures(gamestate* g) {
     minfo("reloading textures");
-
     libgame_unloadtextures(g);
     libgame_loadtextures(g);
 }
@@ -831,9 +794,7 @@ void libgame_reloadtextures(gamestate* g) {
 
 void libgame_init() {
     minfo("libgame_init");
-
     g = gamestateinitptr(windowwidth, windowheight, targetwidth, targetheight);
-
     libgame_initsharedsetup(g);
 }
 
@@ -974,11 +935,8 @@ void libgame_closeshared(gamestate* g) {
     // the gamestate, we will be able to avoid freeing
     // it on every reload
     hashtable_entityid_entity_destroy(entities);
-
     hashtable_entityid_spritegroup_destroy(spritegroups);
-
     vectorentityid_destroy(&entityids);
-
     dungeonfloor_free(dungeonfloor);
 
     UnloadFont(gfont);

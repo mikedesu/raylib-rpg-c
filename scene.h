@@ -2,7 +2,7 @@
 
 
 typedef enum {
-    SCENE_COMPANY,
+    SCENE_COMPANY = 0,
     SCENE_TITLE,
     SCENE_GAMEPLAY,
 } scene;
