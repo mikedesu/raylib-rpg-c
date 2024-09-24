@@ -67,17 +67,15 @@ bool libgame_windowshouldclose();
 
 gamestate* libgame_getgamestate();
 
-void libgame_close();
 void libgame_initwindow();
 void libgame_closewindow();
 void libgame_updatedebugpanelbuffer();
 void libgame_updategamestate();
-void libgame_drawframe();
 void libgame_init();
 
+void libgame_close(gamestate* g);
+void libgame_drawframe(gamestate* g);
 void libgame_handleinput(gamestate* g);
-//void libgame_handleinput();
-
 void libgame_loadtexture(
     gamestate* g, int index, int contexts, int frames, bool dodither, const char* path);
 void libgame_unloadtexture(gamestate* g, int index);
@@ -440,8 +438,7 @@ void libgame_drawframeend(gamestate* g) {
 }
 
 
-void libgame_drawframe() {
-    //minfo("begin libgame_drawframe");
+void libgame_drawframe(gamestate* g) {
     BeginDrawing();
     BeginTextureMode(target);
 
@@ -965,7 +962,7 @@ void libgame_closesavegamestate() {
 }
 
 
-void libgame_close() {
+void libgame_close(gamestate* g) {
     minfo("libgame_close");
     libgame_closeshared(g);
     gamestatefree(g);

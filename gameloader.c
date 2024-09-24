@@ -33,14 +33,13 @@ gamestate* (*mylibgame_getgamestate)() = NULL;
 
 void (*myinitwindow)() = NULL;
 void (*myclosewindow)() = NULL;
-void (*mylibgamedrawframe)() = NULL;
 void (*mylibgameinit)() = NULL;
-void (*mylibgameclose)() = NULL;
+
 void (*mylibgameclosesavegamestate)() = NULL;
 
-//void (*mylibgamehandleinput)() = NULL;
+void (*mylibgameclose)(gamestate*) = NULL;
+void (*mylibgamedrawframe)(gamestate*) = NULL;
 void (*mylibgamehandleinput)(gamestate*) = NULL;
-
 void (*mylibgameinitwithstate)(gamestate*) = NULL;
 void (*mylibgameupdategamestate)(gamestate*) = NULL;
 
@@ -158,11 +157,11 @@ void gamerun() {
 
     minfo("entering gameloop");
     while (!mywindowshouldclose()) {
-        mylibgamedrawframe();
+        mylibgamedrawframe(g);
         mylibgamehandleinput(g);
         mylibgameupdategamestate(g);
         autoreload();
     }
     minfo("closing libgame");
-    mylibgameclose();
+    mylibgameclose(g);
 }
