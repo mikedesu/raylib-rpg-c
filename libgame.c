@@ -50,7 +50,7 @@ hashtable_entityid_entity_t* entities = NULL;
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 
-textureinfo txinfo[20];
+//textureinfo txinfo[20];
 
 dungeonfloor_t* dungeonfloor = NULL;
 
@@ -547,8 +547,8 @@ inline void libgame_drawdebugpanel(gamestate* g) {
 
 
 void libgame_drawgrid(gamestate* g) {
-    const int w = txinfo[TXDIRT].texture.width;
-    const int h = txinfo[TXDIRT].texture.height;
+    const int w = g->txinfo[TXDIRT].texture.width;
+    const int h = g->txinfo[TXDIRT].texture.height;
     for (int i = 0; i <= dungeonfloor->len; i++)
         DrawLine(i * w, 0, i * w, dungeonfloor->wid * h, GREEN);
     for (int i = 0; i <= dungeonfloor->wid; i++)
@@ -557,8 +557,8 @@ void libgame_drawgrid(gamestate* g) {
 
 
 void libgame_drawdungeonfloor(gamestate* g) {
-    const int w = txinfo[TXDIRT].texture.width;
-    const int h = txinfo[TXDIRT].texture.height;
+    const int w = g->txinfo[TXDIRT].texture.width;
+    const int h = g->txinfo[TXDIRT].texture.height;
     Rectangle tile_src = {0, 0, w, h};
     Rectangle tile_dest = {0, 0, w, h};
     Color c = WHITE;
@@ -568,7 +568,7 @@ void libgame_drawdungeonfloor(gamestate* g) {
         for (int j = 0; j < dungeonfloor->wid; j++) {
             tile_dest.x = i * w;
             tile_dest.y = j * h;
-            DrawTexturePro(txinfo[TXDIRT].texture, tile_src, tile_dest, origin, rotation, c);
+            DrawTexturePro(g->txinfo[TXDIRT].texture, tile_src, tile_dest, origin, rotation, c);
         }
     }
 }
@@ -721,13 +721,13 @@ void libgame_loadtexture(
         Image img = LoadImage(path);
         ImageDither(&img, 4, 4, 4, 4);
         Texture2D t = LoadTextureFromImage(img);
-        txinfo[index].texture = t;
+        g->txinfo[index].texture = t;
         UnloadImage(img);
     } else {
-        txinfo[index].texture = LoadTexture(path);
+        g->txinfo[index].texture = LoadTexture(path);
     }
-    txinfo[index].num_frames = frames;
-    txinfo[index].contexts = contexts;
+    g->txinfo[index].num_frames = frames;
+    g->txinfo[index].contexts = contexts;
     //SetTextureFilter(textures[index], TEXTURE_FILTER_POINT);
     //SetTextureFilter(txinfo[index].texture, TEXTURE_FILTER_POINT);
 }
@@ -768,8 +768,8 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
 
 void libgame_unloadtexture(gamestate* g, int index) {
     minfo("unloading texture");
-    if (txinfo[index].texture.id > 0) {
-        UnloadTexture(txinfo[index].texture);
+    if (g->txinfo[index].texture.id > 0) {
+        UnloadTexture(g->txinfo[index].texture);
     }
 }
 
@@ -833,8 +833,9 @@ void libgame_createherospritegroup(gamestate* g) {
                     TXHEROSOULDIESHADOW};
 
     for (int i = 0; i < 12; i++) {
-        sprite* s = sprite_create(
-            &txinfo[keys[i]].texture, txinfo[keys[i]].contexts, txinfo[keys[i]].num_frames);
+        sprite* s = sprite_create(&g->txinfo[keys[i]].texture,
+                                  g->txinfo[keys[i]].contexts,
+                                  g->txinfo[keys[i]].num_frames);
         if (!s) {
             merror("could not create sprite");
         }

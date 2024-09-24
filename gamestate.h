@@ -7,6 +7,7 @@
 #include "fadestate.h"
 #include "hashtable_entityid_entity.h"
 #include "sizemacros.h"
+#include "textureinfo.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <time.h>
@@ -44,6 +45,8 @@ typedef struct gamestate {
     hashtable_entityid_entity_t* entities;
 
     entityid hero_id;
+
+    textureinfo txinfo[20];
 
 } gamestate;
 
