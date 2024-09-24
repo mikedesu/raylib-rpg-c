@@ -95,7 +95,7 @@ void libgame_updateherospritegroup_left(gamestate* g);
 void libgame_updateherospritegroup_up(gamestate* g);
 void libgame_updateherospritegroup_down(gamestate* g);
 
-entityid libgame_createentity(gamestate* g, const char* name);
+entityid libgame_createentity(gamestate* g, const char* name, int x, int y);
 entityid libgame_createtorchentity(gamestate* g);
 void libgame_createtorchspritegroup(gamestate* g, entityid id);
 void libgame_drawtorchgroup(gamestate* g);
@@ -844,12 +844,14 @@ void libgame_init() {
 }
 
 
-entityid libgame_createentity(gamestate* g, const char* name) {
+entityid libgame_createentity(gamestate* g, const char* name, int x, int y) {
     entity_t* e = entity_create(name);
     if (!e) {
         merror("could not create entity");
         return -1;
     }
+    e->x = x;
+    e->y = y;
 
     vectorentityid_pushback(&g->entityids, e->id);
     hashtable_entityid_entity_insert(g->entities, e->id, e);
@@ -858,7 +860,7 @@ entityid libgame_createentity(gamestate* g, const char* name) {
 
 
 void libgame_createheroentity(gamestate* g) {
-    entityid heroid = libgame_createentity(g, "hero");
+    entityid heroid = libgame_createentity(g, "hero", 2, 2);
     if (heroid != -1) {
         g->hero_id = heroid;
     }
@@ -866,13 +868,14 @@ void libgame_createheroentity(gamestate* g) {
 
 
 entityid libgame_createtorchentity(gamestate* g) {
-    entityid torch_id = libgame_createentity(g, "torch");
+    entityid torch_id = libgame_createentity(g, "torch", 0, 0);
     return torch_id;
 }
 
 
 void libgame_createtorchspritegroup(gamestate* g, entityid id) {
     spritegroup_t* group = spritegroup_create(4);
+    entity_t* torch_entity = hashtable_entityid_entity_search(g->entities, g->torch_id);
 
     int keys[1] = {TXTORCH};
 
@@ -887,14 +890,12 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id) {
     }
 
     // the padding will be different for the torch
-    const float x = 0;
-    const float y = 0;
     const float w = spritegroup_get(group, 0)->width;
     const float h = spritegroup_get(group, 0)->height;
     const float offset_x = 0;
-    //const float offset_y = 0;
-    //const float offset_x = -w / 2 + w / 8;
     const float offset_y = -h / 2;
+    const float x = torch_entity->x * 8;
+    const float y = torch_entity->y * 8;
     Rectangle dest = {x + offset_x, y + offset_y, w, h};
     group->current = 0;
     group->dest = dest;
@@ -911,6 +912,8 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id) {
 // lets try using this as a basis to get a sprite in there
 void libgame_createherospritegroup(gamestate* g) {
     spritegroup_t* hero_group = spritegroup_create(20);
+    entity_t* hero_entity = hashtable_entityid_entity_search(g->entities, g->hero_id);
+
 
     int keys[12] = {TXHERO,
                     TXHEROSHADOW,
@@ -935,12 +938,23 @@ void libgame_createherospritegroup(gamestate* g) {
         spritegroup_add(hero_group, s);
     }
 
-    const float x = 0;
-    const float y = 0;
+    // this is effectively how we will update the
+    // sprite position in relation to the entity's
+    // dungeon position
     const float w = spritegroup_get(hero_group, 0)->width;
     const float h = spritegroup_get(hero_group, 0)->height;
-    const float offset_x = -w / 2 + w / 8;
-    const float offset_y = -h / 2 + h / 8;
+    //const float offset_x = -w / 2 + w / 8;
+    //const float offset_y = -h / 2 + h / 8;
+    const float offset_x = -12;
+    const float offset_y = -12;
+    // this is gross we can probably do this better
+    //const float x = (hero_entity->x * -offset_x) - offset_x / 2 - offset_x / 16;
+    //const float y = (hero_entity->y * -offset_y) - offset_y / 2 - offset_y / 8;
+    //const float y = (hero_entity->y * offset_y) + offset_y;
+    const float x = hero_entity->x * 8;
+    const float y = hero_entity->y * 8;
+
+    //Rectangle dest = {x, y, w, h};
     Rectangle dest = {x + offset_x, y + offset_y, w, h};
     hero_group->current = 0;
     hero_group->dest = dest;
@@ -1001,9 +1015,6 @@ void libgame_initsharedsetup(gamestate* g) {
         g->torch_id = libgame_createtorchentity(g);
         libgame_createtorchspritegroup(g, g->torch_id);
         // created but now we have to draw it
-
-        //entityid torch_id = libgame_createentity(g, "torch");
-
 
         setdebugpaneltopleft(g);
 
