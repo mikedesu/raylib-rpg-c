@@ -27,6 +27,7 @@ typedef struct gamestate {
     bool debugpanelon;
     debugpanel_t debugpanel;
 
+    bool cam_lockon;
     Camera2D cam2d;
 
     controlmode_t controlmode;

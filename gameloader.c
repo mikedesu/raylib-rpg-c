@@ -13,7 +13,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-
 long last_write_time = 0;
 
 unsigned int old_framecount = 0;
