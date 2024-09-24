@@ -13,13 +13,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#define NUM_VOID_FUNCTIONS 7
+
 long last_write_time = 0;
-
-unsigned int old_framecount = 0;
-
-const int default_window_width = 960;
-const int default_window_height = 540;
-
 const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
@@ -30,20 +26,13 @@ gamestate* g = NULL;
 
 bool (*mywindowshouldclose)() = NULL;
 gamestate* (*mylibgame_getgamestate)() = NULL;
-
-void (*myinitwindow)() = NULL;
-void (*myclosewindow)() = NULL;
 void (*mylibgameinit)() = NULL;
-
 void (*mylibgameclosesavegamestate)() = NULL;
-
 void (*mylibgameclose)(gamestate*) = NULL;
 void (*mylibgamedrawframe)(gamestate*) = NULL;
 void (*mylibgamehandleinput)(gamestate*) = NULL;
 void (*mylibgameinitwithstate)(gamestate*) = NULL;
 void (*mylibgameupdategamestate)(gamestate*) = NULL;
-
-//void (*mylibgameinitframecount)(unsigned int) = NULL;
 
 
 // get the last write time of a file
@@ -58,6 +47,7 @@ time_t getlastwritetime(const char* filename) {
 
 
 void openhandle() {
+    minfo("openhandle");
     handle = dlopen(libname, RTLD_LAZY);
     if (!handle) {
         merror("handle is NULL");
@@ -68,6 +58,7 @@ void openhandle() {
 
 
 void checksymbol(void* symbol, const char* name) {
+    minfo("checksymbol");
     if (symbol == NULL) {
         merror("symbol is NULL");
         fprintf(stderr, "dlsym failed: %s\n", dlerror());
@@ -78,12 +69,7 @@ void checksymbol(void* symbol, const char* name) {
 
 void loadsymbols() {
     minfo("begin loadsymbols");
-
-#define NUM_VOID_FUNCTIONS 9
-
     symaddrpair_t pairs[NUM_VOID_FUNCTIONS] = {
-        {"libgame_initwindow", &myinitwindow},
-        {"libgame_closewindow", &myclosewindow},
         {"libgame_drawframe", &mylibgamedrawframe},
         {"libgame_init", &mylibgameinit},
         {"libgame_close", &mylibgameclose},
@@ -91,7 +77,6 @@ void loadsymbols() {
         {"libgame_closesavegamestate", &mylibgameclosesavegamestate},
         {"libgame_initwithstate", &mylibgameinitwithstate},
         {"libgame_updategamestate", &mylibgameupdategamestate}};
-
     for (int i = 0; i < NUM_VOID_FUNCTIONS; i++) {
         minfo(pairs[i].name);
         *pairs[i].addr = dlsym(handle, pairs[i].name);
@@ -99,7 +84,6 @@ void loadsymbols() {
     }
 
     char* sym = NULL;
-
     // gamestate return
     sym = "libgame_getgamestate";
     minfo(sym);
@@ -112,16 +96,16 @@ void loadsymbols() {
     mywindowshouldclose = dlsym(handle, sym);
     checksymbol(mywindowshouldclose, sym);
 
-    //////////////////////////////////////
-
     minfo("end loadsymbols");
 }
 
 
 void autoreload() {
-    if (getlastwritetime(libname) > last_write_time) {
-        last_write_time = getlastwritetime(libname);
-        //while (FileExists(lockfile)) {
+    time_t result = getlastwritetime(libname);
+
+    if (result > last_write_time) {
+        minfo("doing autoreload");
+        last_write_time = result;
         while (access(lockfile, F_OK) == 0) {
             minfo("Library is locked\n");
             sleep(1);
@@ -139,17 +123,15 @@ void autoreload() {
         minfo("loading symbols");
         loadsymbols();
         mylibgameinitwithstate(g);
+        minfo("re-entering gameloop");
     }
 }
 
 
 void gamerun() {
     minfo("gamerun");
-    minfo("opening handle");
     openhandle();
-    minfo("loading symbols");
     loadsymbols();
-    minfo("initing window");
     last_write_time = getlastwritetime(libname);
 
     mylibgameinit();
