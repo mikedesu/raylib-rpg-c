@@ -48,8 +48,6 @@ int targetheight = DEFAULT_TARGET_HEIGHT;
 int windowwidth = DEFAULT_WINDOW_WIDTH;
 int windowheight = DEFAULT_WINDOW_HEIGHT;
 
-//float scale = DEFAULT_SCALE;
-
 entityid hero_id;
 
 vectorentityid_t entityids;
@@ -99,12 +97,15 @@ void libgame_drawtitlescene();
 void libgame_drawgameplayscene();
 void libgame_handlefade();
 void libgame_drawfade();
-void libgame_createherospritegroup();
-void libgame_createheroentity();
+void libgame_createherospritegroup(gamestate* g);
+void libgame_createheroentity(gamestate* g);
 void libgame_drawgrid();
 void libgame_drawdungeonfloor();
 void libgame_drawherogroup();
 void libgame_drawherogrouphitbox();
+void libgame_loadtargettexture(gamestate* g);
+void libgame_loadfont(gamestate* g);
+void libgame_initdatastructures(gamestate* g);
 
 entityid libgame_createentity(const char* name);
 
@@ -847,7 +848,7 @@ entityid libgame_createentity(const char* name) {
 }
 
 
-void libgame_createheroentity() {
+void libgame_createheroentity(gamestate* g) {
     entityid heroid = libgame_createentity("hero");
     if (heroid != -1) {
         hero_id = heroid;
@@ -855,7 +856,7 @@ void libgame_createheroentity() {
 }
 
 
-void libgame_createherospritegroup() {
+void libgame_createherospritegroup(gamestate* g) {
     spritegroup_t* hero_group = spritegroup_create(20);
 
     int keys[12] = {TXHERO,
@@ -895,43 +896,46 @@ void libgame_createherospritegroup() {
 }
 
 
+void libgame_loadtargettexture(gamestate* g) {
+    target = LoadRenderTexture(targetwidth, targetheight);
+    target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
+    target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
+    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+}
+
+
+void libgame_loadfont(gamestate* g) {
+    const int fontsize = 60;
+    const int codepointct = 256;
+    gfont = LoadFontEx(DEFAULT_FONT_PATH, fontsize, 0, codepointct);
+}
+
+
+void libgame_initdatastructures(gamestate* g) {
+    entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
+    entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
+    spritegroups =
+        hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
+    dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
+    if (!dungeonfloor) {
+        merror("could not create dungeonfloor");
+        // we could use an 'emergency shutdown' in case an error causes us
+        // to need to 'panic' and force game close properly
+    }
+}
+
+
 void libgame_initsharedsetup(gamestate* g) {
     if (g) {
         libgame_initwindow();
-
-        // load font
-        const int fontsize = 60;
-        const int codepointct = 256;
-        gfont = LoadFontEx(DEFAULT_FONT_PATH, fontsize, 0, codepointct);
-        //SetTextureFilter(gfont.texture, TEXTURE_FILTER_BILINEAR);
-
-        // load target texture
-        target = LoadRenderTexture(targetwidth, targetheight);
-        target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
-        target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
-        SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
-
-        // load game textures
+        libgame_loadfont(g);
+        libgame_loadtargettexture(g);
         libgame_loadtextures();
-
-        // initialize data structures
-        entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
-        entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
-        spritegroups =
-            hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
-
-        libgame_createheroentity();
-        libgame_createherospritegroup();
-
+        libgame_initdatastructures(g);
+        libgame_createheroentity(g);
+        libgame_createherospritegroup(g);
         setdebugpaneltopleft(g);
 
-        // init dungeonfloor
-        dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
-        if (!dungeonfloor) {
-            merror("could not create dungeonfloor");
-            // we could use an 'emergency shutdown' in case an error causes us
-            // to need to 'panic' and force game close properly
-        }
     } else {
         merror("libgame_initsharedsetup: gamestate is NULL");
     }

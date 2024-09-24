@@ -51,6 +51,8 @@ def main():
     # locsstr = f"{df['loc/s'].mean():.2f}"
     # buildtimestr = f"{df['buildtime ms/s'].mean():.2f}"
 
+    print("Average Stats:")
+    print("--------------")
     # print(f"Avg build Time (ms):      {buildtimestr}")
     print(f"Avg line count:   {locstr:>10} loc")
     print(f"Avg binary size:  {kbstr:>10} kb")
@@ -59,6 +61,15 @@ def main():
     # print(f"Avg build size (bytes/s): {bpsstr}")
     # print(f"Avg line count (loc/s):   {locsstr}")
     # print(f"Avg build Time (ms/s):    {buildtimestr}")
+
+    # current stats
+    print()
+    print("Current Stats:")
+    print("--------------")
+    print(f"Current line count:   {df.at[df.index[-1], 'loc']} loc")
+    print(f"Current binary size:  {df.at[df.index[-1], 'binkb']} kb")
+    print(f"Current library size: {df.at[df.index[-1], 'libkb']} kb")
+    print(f"Current build Time:   {df.at[df.index[-1], 'buildtime']} s")
 
 
 if __name__ == "__main__":
