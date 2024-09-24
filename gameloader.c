@@ -37,11 +37,14 @@ void (*mylibgamedrawframe)() = NULL;
 void (*mylibgameinit)() = NULL;
 void (*mylibgameclose)() = NULL;
 void (*mylibgameclosesavegamestate)() = NULL;
-void (*mylibgamehandleinput)() = NULL;
+
+//void (*mylibgamehandleinput)() = NULL;
+void (*mylibgamehandleinput)(gamestate*) = NULL;
 
 void (*mylibgameinitwithstate)(gamestate*) = NULL;
-void (*mylibgameinitframecount)(unsigned int) = NULL;
 void (*mylibgameupdategamestate)(gamestate*) = NULL;
+
+//void (*mylibgameinitframecount)(unsigned int) = NULL;
 
 
 // get the last write time of a file
@@ -149,11 +152,14 @@ void gamerun() {
     loadsymbols();
     minfo("initing window");
     last_write_time = getlastwritetime(libname);
+
     mylibgameinit();
+    g = mylibgame_getgamestate();
+
     minfo("entering gameloop");
     while (!mywindowshouldclose()) {
         mylibgamedrawframe();
-        mylibgamehandleinput();
+        mylibgamehandleinput(g);
         mylibgameupdategamestate(g);
         autoreload();
     }

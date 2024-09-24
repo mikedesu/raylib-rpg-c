@@ -74,7 +74,10 @@ void libgame_updatedebugpanelbuffer();
 void libgame_updategamestate();
 void libgame_drawframe();
 void libgame_init();
-void libgame_handleinput();
+
+void libgame_handleinput(gamestate* g);
+//void libgame_handleinput();
+
 void libgame_loadtexture(
     gamestate* g, int index, int contexts, int frames, bool dodither, const char* path);
 void libgame_unloadtexture(gamestate* g, int index);
@@ -152,13 +155,17 @@ void libgame_handlefade(gamestate* g) {
 
 
 void libgame_handlereloadtextures(gamestate* g) {
+    //minfo("begin libgame_handlereloadtextures");
     if (IsKeyPressed(KEY_R)) {
         libgame_reloadtextures(g);
     }
 }
 
 
-void libgame_handleinput() {
+//void libgame_handleinput() {
+void libgame_handleinput(gamestate* g) {
+    //minfo("begin libgame_handleinput");
+
     if (IsKeyPressed(KEY_SPACE)) {
         minfo("key space pressed");
         //if (g->fadestate == FADESTATENONE) {
@@ -181,6 +188,7 @@ void libgame_handleinput() {
 
 
 void libgame_handlemodeswitch(gamestate* g) {
+    //minfo("begin libgame_handlemodeswitch");
     if (IsKeyPressed(KEY_C)) {
         switch (g->controlmode) {
         case CONTROLMODE_CAMERA:
@@ -197,6 +205,7 @@ void libgame_handlemodeswitch(gamestate* g) {
 
 
 void libgame_handledebugpanelswitch(gamestate* g) {
+    //minfo("begin libgame_handledebugpanelswitch");
     if (IsKeyPressed(KEY_D)) {
         g->debugpanelon = !g->debugpanelon;
     }
@@ -204,6 +213,7 @@ void libgame_handledebugpanelswitch(gamestate* g) {
 
 
 void libgame_handleplayerinput(gamestate* g) {
+    //minfo("begin libgame_handleplayerinput");
     if (g->controlmode == CONTROLMODE_PLAYER) {
         const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         // this is just a test
@@ -287,6 +297,7 @@ void libgame_handleplayerinput(gamestate* g) {
 
 
 void libgame_handlecaminput(gamestate* g) {
+    //minfo("begin libgame_handlecaminput");
     if (g->controlmode == CONTROLMODE_CAMERA) {
 
         const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
@@ -320,7 +331,7 @@ bool libgame_windowshouldclose() {
 
 
 void libgame_initwindow() {
-    minfo("begin libgame_initwindow");
+    //minfo("begin libgame_initwindow");
     const char* title = DEFAULT_WINDOW_TITLE;
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
@@ -430,6 +441,7 @@ void libgame_drawframeend(gamestate* g) {
 
 
 void libgame_drawframe() {
+    //minfo("begin libgame_drawframe");
     BeginDrawing();
     BeginTextureMode(target);
 
