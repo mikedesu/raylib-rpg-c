@@ -4,17 +4,17 @@
 #include <raylib.h>
 #include <stdlib.h>
 
-companyscene companysceneinit() {
-    mprint("companysceneinit");
-    companyscene ts;
-    //mprint("Loading textures");
-    //mprint("Loading presents texture");
-    //companysceneloadtextures(&ts);
-    //companysceneinitvars(&ts);
-    //companysceneptrinitcameras(&ts);
-    //companysceneinitcubecolors(&ts);
-    return ts;
-}
+//companyscene companysceneinit() {
+//mprint("companysceneinit");
+//companyscene ts;
+//mprint("Loading textures");
+//mprint("Loading presents texture");
+//companysceneloadtextures(&ts);
+//companysceneinitvars(&ts);
+//companysceneptrinitcameras(&ts);
+//companysceneinitcubecolors(&ts);
+//return ts;
+//}
 
 companyscene* companysceneinitptr() {
     mprint("companysceneinitptr");

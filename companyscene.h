@@ -27,7 +27,7 @@ typedef struct companyscene {
 } companyscene;
 
 
-companyscene companysceneinit();
+//companyscene companysceneinit();
 companyscene* companysceneinitptr();
 void companyscenefree(companyscene* ts);
 //void companysceneptrinitcameras(companyscene* c);

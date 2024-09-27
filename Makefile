@@ -1,5 +1,6 @@
 CC=gcc
 OBJ=-c
+WFLAGS=-Wall -Werror
 SHARED=-shared
 DATA_STRUCTS=vectorentityid.o 
 SCENES=companyscene.o 
@@ -13,58 +14,58 @@ MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_entity.o
 all: game  
 
 game: main.c gameloader.o $(LIBGAME_OBJECTS) libgame.so  
-	$(CC) -o $@ $(MAIN_C) $(MAIN_OBJECTS) $(POSITION_INDEPENDENT_CODE) 
+	$(CC) -o $@ $(MAIN_C) $(MAIN_OBJECTS) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)
 	#$(CC) -o $@ $(MAIN_C) gameloader.o $(LIBGAME_OBJECTS) $(POSITION_INDEPENDENT_CODE)  $(STATIC_LINK_RAYLIB) $(LINK_MATH)
 
 # Bridge between Raylib and game
 gameloader.o: gameloader.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 gamestate.o: gamestate.c 
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 	#$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(STATIC_LINK_RAYLIB) $^ -o $@
 
 # Rendering Objects
 
 sprite.o: sprite.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 spritegroup.o: spritegroup.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 # Scenes
 companyscene.o: companyscene.c 
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 # Data structures and extra functionality/helpers/etc
 vectorentityid.o: vectorentityid.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 utils.o: utils.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 setdebugpanel.o: setdebugpanel.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 dungeonfloor.o: dungeonfloor.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 entity.o: entity.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 hashtable_entityid_entity.o: hashtable_entityid_entity.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 hashtable_entityid_spritegroup.o: hashtable_entityid_spritegroup.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 
 # Main reloadable game base
 libgame.o: libgame.c
 	touch libgame.so.lockfile
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 libgame.so: $(LIBGAME_OBJECTS)
-	$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB)
+	$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB) $(WFLAGS) 
 	rm -rfv libgame.so.lockfile
 
 clean:

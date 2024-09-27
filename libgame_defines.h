@@ -2,6 +2,7 @@
 
 #define DEFAULT_WINDOW_TITLE "evildojo presents - project rpg v0.000000001"
 
+//#define DEFAULT_TARGET_FPS 30
 #define DEFAULT_TARGET_FPS 60
 
 //#define DEFAULT_TARGET_WIDTH 640

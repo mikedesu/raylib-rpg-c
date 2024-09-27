@@ -312,7 +312,7 @@ void libgame_updateherospritegroup_down(gamestate* g) {
 void libgame_handleplayerinput(gamestate* g) {
     //minfo("begin libgame_handleplayerinput");
     if (g->controlmode == CONTROLMODE_PLAYER) {
-        const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+        //const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         // this is just a test
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
@@ -728,7 +728,7 @@ void libgame_drawcompanyscene(gamestate* g) {
     snprintf(b3, 128, "presents");
 
     const Vector2 measure = MeasureTextEx(g->font, b, fontsize, spacing);
-    const Vector2 measure2 = MeasureTextEx(g->font, b2, fontsize, spacing);
+    //const Vector2 measure2 = MeasureTextEx(g->font, b2, fontsize, spacing);
 
     if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
         for (int i = 0; i < 10; i++) {
@@ -867,7 +867,7 @@ entityid libgame_createtorchentity(gamestate* g) {
 
 void libgame_createtorchspritegroup(gamestate* g, entityid id) {
     spritegroup_t* group = spritegroup_create(4);
-    entity_t* torch_entity = hashtable_entityid_entity_search(g->entities, g->torch_id);
+    entity_t* torch_entity = hashtable_entityid_entity_get(g->entities, g->torch_id);
 
     int keys[1] = {TXTORCH};
 
@@ -904,7 +904,7 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id) {
 // lets try using this as a basis to get a sprite in there
 void libgame_createherospritegroup(gamestate* g) {
     spritegroup_t* hero_group = spritegroup_create(20);
-    entity_t* hero_entity = hashtable_entityid_entity_search(g->entities, g->hero_id);
+    entity_t* hero_entity = hashtable_entityid_entity_get(g->entities, g->hero_id);
 
 
     int keys[12] = {TXHERO,

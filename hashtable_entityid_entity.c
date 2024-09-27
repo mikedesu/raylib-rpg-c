@@ -57,7 +57,8 @@ void hashtable_entityid_entity_insert(hashtable_entityid_entity_t* ht,
 }
 
 
-entity_t* hashtable_entityid_entity_search(hashtable_entityid_entity_t* ht, entityid key) {
+entity_t* hashtable_entityid_entity_get(hashtable_entityid_entity_t* ht, entityid key) {
+    //entity_t* hashtable_entityid_entity_search(hashtable_entityid_entity_t* ht, entityid key) {
     int index = hashtable_entityid_entity_hash(ht, key);
 
     hashtable_entityid_entity_node_t* node = ht->table[index];
