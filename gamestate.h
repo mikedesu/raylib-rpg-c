@@ -56,6 +56,8 @@ typedef struct gamestate {
     dungeonfloor_t* dungeonfloor;
     vectorentityid_t entityids;
 
+    bool do_one_rotation;
+
 } gamestate;
 
 

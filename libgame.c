@@ -27,9 +27,9 @@
 #define TEST_SIZE 0.2
 #define FRAMEINTERVAL 10
 
-//--------------------------------------------------------------------
+//------------------------------------------------------------------
 // libgame global variables
-//--------------------------------------------------------------------
+//------------------------------------------------------------------
 
 gamestate* g = NULL;
 
@@ -44,9 +44,9 @@ int targetheight = DEFAULT_TARGET_HEIGHT;
 int windowwidth = DEFAULT_WINDOW_WIDTH;
 int windowheight = DEFAULT_WINDOW_HEIGHT;
 
-//--------------------------------------------------------------------
+//------------------------------------------------------------------
 // function declarations
-//--------------------------------------------------------------------
+//------------------------------------------------------------------
 bool libgame_windowshouldclose();
 gamestate* libgame_getgamestate();
 void libgame_initwindow();
@@ -94,12 +94,12 @@ void libgame_updateherospritegroup_right(gamestate* g);
 void libgame_updateherospritegroup_left(gamestate* g);
 void libgame_updateherospritegroup_up(gamestate* g);
 void libgame_updateherospritegroup_down(gamestate* g);
-
-entityid libgame_createentity(gamestate* g, const char* name, int x, int y);
-entityid libgame_createtorchentity(gamestate* g);
 void libgame_createtorchspritegroup(gamestate* g, entityid id);
 void libgame_drawtorchgroup(gamestate* g);
 void libgame_drawtorchgroup_hitbox(gamestate* g);
+
+entityid libgame_createentity(gamestate* g, const char* name, int x, int y);
+entityid libgame_createtorchentity(gamestate* g);
 
 
 void libgame_drawfade(gamestate* g) {
@@ -150,6 +150,8 @@ void libgame_handleinput(gamestate* g) {
         //if (g->fadestate == FADESTATENONE) {
         //    g->fadestate = FADESTATEOUT;
         //}
+
+        g->do_one_rotation = true;
     }
 
     if (IsKeyPressed(KEY_A)) {
@@ -273,11 +275,6 @@ void libgame_updateherospritegroup_up(gamestate* g) {
             ctx = SG_CTX_R_U;
             break;
         }
-        //int cc = hero_group->sprites[hero_group->current]->currentcontext;
-        //int context = cc == SG_CTX_R_D   ? SG_CTX_R_U
-        //              : cc == SG_CTX_L_D ? SG_CTX_L_U
-        //              : cc == SG_CTX_R_U ? SG_CTX_R_U
-        //                                 : SG_CTX_L_U;
         spritegroup_setcontexts(hero_group, ctx);
         hero_group->move = (Vector2){0, -8};
         hero_group->current = SPRITEGROUP_ANIM_WALK;
@@ -288,7 +285,6 @@ void libgame_updateherospritegroup_up(gamestate* g) {
 void libgame_updateherospritegroup_down(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
     if (hero_group) {
-
         int ctx = SG_CTX_R_D;
         switch (hero_group->sprites[hero_group->current]->currentcontext) {
         case SG_CTX_R_D:
@@ -307,12 +303,6 @@ void libgame_updateherospritegroup_down(gamestate* g) {
             ctx = SG_CTX_R_D;
             break;
         }
-
-        //int cc = hero_group->sprites[hero_group->current]->currentcontext;
-        //int context = cc == SG_CTX_R_D   ? SG_CTX_R_D
-        //              : cc == SG_CTX_L_D ? SG_CTX_L_D
-        //              : cc == SG_CTX_R_U ? SG_CTX_R_D
-        //                                 : SG_CTX_L_D;
         spritegroup_setcontexts(hero_group, ctx);
         hero_group->move = (Vector2){0, 8};
         hero_group->current = SPRITEGROUP_ANIM_WALK;
@@ -343,7 +333,6 @@ void libgame_handleplayerinput(gamestate* g) {
             minfo("key up pressed");
             libgame_updateherospritegroup_up(g);
         }
-
 
         if (IsKeyPressed(KEY_PERIOD)) {
             minfo("key period pressed");
@@ -449,16 +438,13 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
              g->cam2d.offset.y,
              g->cam2d.zoom,
              activescene,
-             g->controlmode
-
-    );
+             g->controlmode);
 }
 
 
 void libgame_updategamestate(gamestate* g) {
     libgame_updatedebugpanelbuffer(g);
     //setdebugpanelcenter(g);
-
     // smooth movement:
     // lets try using the  move vector on our spritegroup
     // to move the spritegroup dest rectangle
@@ -467,7 +453,6 @@ void libgame_updategamestate(gamestate* g) {
     // into real moves
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
     if (hero_group) {
-
         // only do it 1 unit at a time
         if (hero_group->move.x > 0) {
             hero_group->dest.x++;
@@ -490,7 +475,14 @@ void libgame_updategamestate(gamestate* g) {
         g->cam2d.target = (Vector2){hero_group->dest.x, hero_group->dest.y};
     }
 
-    //g->cam2d.rotation += 0.5f;
+    if (g->do_one_rotation) {
+        g->cam2d.rotation += 8.0f;
+
+        if (g->cam2d.rotation >= 360.0f) {
+            g->cam2d.rotation = 0.0f;
+            g->do_one_rotation = false;
+        }
+    }
 }
 
 

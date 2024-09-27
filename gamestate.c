@@ -56,6 +56,7 @@ gamestate* gamestateinitptr(const int windowwidth,
     g->cam2d.rotation = 0.0;
 
     g->cam_lockon = true;
+    g->do_one_rotation = false;
 
     //g->controlmode = CONTROLMODE_CAMERA;
     g->controlmode = CONTROLMODE_PLAYER;
