@@ -157,8 +157,7 @@ void libgame_handleinput(gamestate* g) {
     if (IsKeyPressed(KEY_A)) {
         minfo("key a pressed");
         // increment the 'current' of the hero group
-        spritegroup_t* hero_group =
-            hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
+        spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
         spritegroup_incr(hero_group);
     }
 
@@ -196,7 +195,7 @@ void libgame_handledebugpanelswitch(gamestate* g) {
 
 
 void libgame_updateherospritegroup_right(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
         int ctx = SG_CTX_R_D;
         switch (hero_group->sprites[hero_group->current]->currentcontext) {
@@ -225,7 +224,7 @@ void libgame_updateherospritegroup_right(gamestate* g) {
 
 
 void libgame_updateherospritegroup_left(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
 
         int ctx = SG_CTX_L_D;
@@ -254,7 +253,7 @@ void libgame_updateherospritegroup_left(gamestate* g) {
 
 
 void libgame_updateherospritegroup_up(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
 
         int ctx = SG_CTX_R_U;
@@ -283,7 +282,7 @@ void libgame_updateherospritegroup_up(gamestate* g) {
 
 
 void libgame_updateherospritegroup_down(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
         int ctx = SG_CTX_R_D;
         switch (hero_group->sprites[hero_group->current]->currentcontext) {
@@ -337,7 +336,7 @@ void libgame_handleplayerinput(gamestate* g) {
         if (IsKeyPressed(KEY_PERIOD)) {
             minfo("key period pressed");
             spritegroup_t* hero_group =
-                hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
+                hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
             if (hero_group) {
                 hero_group->current = 0; //standing/idle
             }
@@ -408,7 +407,7 @@ void libgame_closewindow() {
 
 
 void libgame_updatedebugpanelbuffer(gamestate* g) {
-    //spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(spritegroups, hero_id);
+    //spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(spritegroups, hero_id);
 
     snprintf(g->debugpanel.buffer,
              1024,
@@ -451,7 +450,7 @@ void libgame_updategamestate(gamestate* g) {
     // so that we can begin translating
     // player input
     // into real moves
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
         // only do it 1 unit at a time
         if (hero_group->move.x > 0) {
@@ -568,7 +567,7 @@ void libgame_drawdungeonfloor(gamestate* g) {
 
 
 void libgame_drawherogrouphitbox(gamestate* g) {
-    spritegroup_t* sg = hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (sg && g->debugpanelon) {
         Color c = (Color){51, 51, 51, 255};
         Vector2 v[4] = {{sg->dest.x, sg->dest.y},
@@ -584,7 +583,7 @@ void libgame_drawherogrouphitbox(gamestate* g) {
 
 
 void libgame_drawherogroup(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_search(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
         // draw hero and its shadow
         DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
@@ -611,7 +610,7 @@ void libgame_drawherogroup(gamestate* g) {
 // we are going to have to temporarily save the torchid
 // as we are not enumerating thru the map yet
 void libgame_drawtorchgroup(gamestate* g) {
-    spritegroup_t* group = hashtable_entityid_spritegroup_search(g->spritegroups, g->torch_id);
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
     if (group) {
         // draw hero and its shadow
         DrawTexturePro(*group->sprites[group->current]->texture,
@@ -636,7 +635,7 @@ void libgame_drawtorchgroup(gamestate* g) {
 
 
 void libgame_drawtorchgroup_hitbox(gamestate* g) {
-    spritegroup_t* sg = hashtable_entityid_spritegroup_search(g->spritegroups, g->torch_id);
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
     if (sg && g->debugpanelon) {
         Color c = (Color){51, 51, 51, 255};
         Vector2 v[4] = {{sg->dest.x, sg->dest.y},

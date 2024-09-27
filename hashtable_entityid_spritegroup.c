@@ -58,8 +58,8 @@ void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* ht,
 }
 
 
-spritegroup_t* hashtable_entityid_spritegroup_search(hashtable_entityid_spritegroup_t* ht,
-                                                     entityid key) {
+spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup_t* ht,
+                                                  entityid key) {
     int index = hashtable_entityid_spritegroup_hash(ht, key);
 
     hashtable_entityid_spritegroup_node_t* node = ht->table[index];

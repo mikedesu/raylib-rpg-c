@@ -22,7 +22,8 @@ void hashtable_entityid_spritegroup_destroy(hashtable_entityid_spritegroup_t* ht
 void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* ht,
                                            entityid key,
                                            spritegroup_t* value);
-spritegroup_t* hashtable_entityid_spritegroup_search(hashtable_entityid_spritegroup_t* ht,
-                                                     entityid key);
+//spritegroup_t* hashtable_entityid_spritegroup_search(hashtable_entityid_spritegroup_t* ht,
+spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup_t* ht,
+                                                  entityid key);
 void hashtable_entityid_spritegroup_delete(hashtable_entityid_spritegroup_t* ht, entityid key);
 void hashtable_entityid_spritegroup_print(hashtable_entityid_spritegroup_t* ht);
