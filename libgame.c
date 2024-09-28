@@ -97,6 +97,9 @@ void libgame_updateherospritegroup_down(gamestate* g);
 void libgame_createtorchspritegroup(gamestate* g, entityid id);
 void libgame_drawtorchgroup(gamestate* g);
 void libgame_drawtorchgroup_hitbox(gamestate* g);
+void libgame_updatesmoothmove(gamestate* g);
+void libgame_docameralockon(gamestate* g);
+void libgame_do_one_camera_rotation(gamestate* g);
 
 entityid libgame_createentity(gamestate* g, const char* name, int x, int y);
 entityid libgame_createtorchentity(gamestate* g);
@@ -137,7 +140,6 @@ void libgame_handlefade(gamestate* g) {
 
 
 void libgame_handlereloadtextures(gamestate* g) {
-    //minfo("begin libgame_handlereloadtextures");
     if (IsKeyPressed(KEY_R)) {
         libgame_reloadtextures(g);
     }
@@ -215,7 +217,6 @@ void libgame_updateherospritegroup_right(gamestate* g) {
             ctx = SG_CTX_R_D;
             break;
         }
-
         spritegroup_setcontexts(hero_group, ctx);
         hero_group->move = (Vector2){8, 0};
         hero_group->current = SPRITEGROUP_ANIM_WALK;
@@ -226,7 +227,6 @@ void libgame_updateherospritegroup_right(gamestate* g) {
 void libgame_updateherospritegroup_left(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
-
         int ctx = SG_CTX_L_D;
         switch (hero_group->sprites[hero_group->current]->currentcontext) {
         case SG_CTX_R_D:
@@ -255,7 +255,6 @@ void libgame_updateherospritegroup_left(gamestate* g) {
 void libgame_updateherospritegroup_up(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
-
         int ctx = SG_CTX_R_U;
         switch (hero_group->sprites[hero_group->current]->currentcontext) {
         case SG_CTX_R_D:
@@ -308,6 +307,7 @@ void libgame_updateherospritegroup_down(gamestate* g) {
     }
 }
 
+
 void libgame_handleplayerinput(gamestate* g) {
     //minfo("begin libgame_handleplayerinput");
     if (g->controlmode == CONTROLMODE_PLAYER) {
@@ -348,7 +348,6 @@ void libgame_handleplayerinput(gamestate* g) {
 void libgame_handlecaminput(gamestate* g) {
     //minfo("begin libgame_handlecaminput");
     if (g->controlmode == CONTROLMODE_CAMERA) {
-
         const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         const float zoom_incr = 1.00f;
         const float cam_move_incr = 4;
@@ -441,47 +440,55 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
 }
 
 
-void libgame_updategamestate(gamestate* g) {
-    libgame_updatedebugpanelbuffer(g);
-    //setdebugpanelcenter(g);
-    // smooth movement:
-    // lets try using the  move vector on our spritegroup
-    // to move the spritegroup dest rectangle
-    // so that we can begin translating
-    // player input
-    // into real moves
+void libgame_updatesmoothmove(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    float move_unit = 1.0f;
     if (hero_group) {
         // only do it 1 unit at a time
         if (hero_group->move.x > 0) {
-            hero_group->dest.x++;
-            hero_group->move.x--;
+            hero_group->dest.x += move_unit;
+            hero_group->move.x -= move_unit;
         } else if (hero_group->move.x < 0) {
-            hero_group->dest.x--;
-            hero_group->move.x++;
+            hero_group->dest.x -= move_unit;
+            hero_group->move.x += move_unit;
         }
 
         if (hero_group->move.y > 0) {
-            hero_group->dest.y++;
-            hero_group->move.y--;
+            hero_group->dest.y += move_unit;
+            hero_group->move.y -= move_unit;
         } else if (hero_group->move.y < 0) {
-            hero_group->dest.y--;
-            hero_group->move.y++;
+            hero_group->dest.y -= move_unit;
+            hero_group->move.y += move_unit;
         }
     }
+}
 
+
+void libgame_docameralockon(gamestate* g) {
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (g->cam_lockon) {
         g->cam2d.target = (Vector2){hero_group->dest.x, hero_group->dest.y};
     }
+}
 
+
+void libgame_do_one_camera_rotation(gamestate* g) {
     if (g->do_one_rotation) {
         g->cam2d.rotation += 8.0f;
-
         if (g->cam2d.rotation >= 360.0f) {
             g->cam2d.rotation = 0.0f;
             g->do_one_rotation = false;
         }
     }
+}
+
+
+void libgame_updategamestate(gamestate* g) {
+    libgame_updatedebugpanelbuffer(g);
+    //setdebugpanelcenter(g);
+    libgame_updatesmoothmove(g);
+    libgame_docameralockon(g);
+    libgame_do_one_camera_rotation(g);
 }
 
 
@@ -539,12 +546,12 @@ inline void libgame_drawdebugpanel(gamestate* g) {
 
 
 void libgame_drawgrid(gamestate* g) {
-    const int w = g->txinfo[TXDIRT].texture.width;
-    const int h = g->txinfo[TXDIRT].texture.height;
+    Color c = GREEN;
+    const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
     for (int i = 0; i <= g->dungeonfloor->len; i++)
-        DrawLine(i * w, 0, i * w, g->dungeonfloor->wid * h, GREEN);
+        DrawLine(i * w, 0, i * w, g->dungeonfloor->wid * h, c);
     for (int i = 0; i <= g->dungeonfloor->wid; i++)
-        DrawLine(0, i * h, g->dungeonfloor->len * w, i * h, GREEN);
+        DrawLine(0, i * h, g->dungeonfloor->len * w, i * h, c);
 }
 
 
@@ -585,14 +592,14 @@ void libgame_drawherogrouphitbox(gamestate* g) {
 void libgame_drawherogroup(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
-        // draw hero and its shadow
+        // draw hero
         DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
                        hero_group->sprites[hero_group->current]->src,
                        hero_group->dest,
                        (Vector2){0, 0},
                        0.0f,
                        WHITE);
-
+        // draw shadow
         DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
                        hero_group->sprites[hero_group->current + 1]->src,
                        hero_group->dest,
@@ -612,20 +619,12 @@ void libgame_drawherogroup(gamestate* g) {
 void libgame_drawtorchgroup(gamestate* g) {
     spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
     if (group) {
-        // draw hero and its shadow
         DrawTexturePro(*group->sprites[group->current]->texture,
                        group->sprites[group->current]->src,
                        group->dest,
                        (Vector2){0, 0},
                        0.0f,
                        WHITE);
-
-        //DrawTexturePro(*group->sprites[group->current + 1]->texture,
-        //               group->sprites[group->current + 1]->src,
-        //               group->dest,
-        //               (Vector2){0, 0},
-        //               0.0f,
-        //               WHITE);
     }
 
     if (g->framecount % FRAMEINTERVAL == 0) {
@@ -660,10 +659,8 @@ void libgame_drawgameplayscene(gamestate* g) {
         libgame_drawgrid(g);
     }
 
-
     libgame_drawtorchgroup(g);
     libgame_drawtorchgroup_hitbox(g);
-
 
     libgame_drawherogroup(g);
     libgame_drawherogrouphitbox(g);
@@ -785,12 +782,8 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
         return;
     }
 
-    int index = 0;
-    int contexts = 0;
-    int frames = 0;
-    int dodither = 0;
-    char line[256];
-    char txpath[256];
+    int index = 0, contexts = 0, frames = 0, dodither = 0;
+    char line[256], txpath[256];
 
     while (fgets(line, 256, f)) {
         // if the line begins with a #, skip it
@@ -843,7 +836,6 @@ entityid libgame_createentity(gamestate* g, const char* name, int x, int y) {
     }
     e->x = x;
     e->y = y;
-
     vectorentityid_pushback(&g->entityids, e->id);
     hashtable_entityid_entity_insert(g->entities, e->id, e);
     return e->id;
@@ -867,9 +859,7 @@ entityid libgame_createtorchentity(gamestate* g) {
 void libgame_createtorchspritegroup(gamestate* g, entityid id) {
     spritegroup_t* group = spritegroup_create(4);
     entity_t* torch_entity = hashtable_entityid_entity_get(g->entities, g->torch_id);
-
     int keys[1] = {TXTORCH};
-
     for (int i = 0; i < 1; i++) {
         sprite* s = sprite_create(&g->txinfo[keys[i]].texture,
                                   g->txinfo[keys[i]].contexts,
@@ -896,15 +886,13 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id) {
 }
 
 
-// this code is ugly as fuck
-// but it works
+// this code is ugly as fuck but it works
 // the hero has a LOT of spritegroups
 // not every entity will have this many sprites
 // lets try using this as a basis to get a sprite in there
 void libgame_createherospritegroup(gamestate* g) {
     spritegroup_t* hero_group = spritegroup_create(20);
     entity_t* hero_entity = hashtable_entityid_entity_get(g->entities, g->hero_id);
-
 
     int keys[12] = {TXHERO,
                     TXHEROSHADOW,
@@ -928,24 +916,16 @@ void libgame_createherospritegroup(gamestate* g) {
         }
         spritegroup_add(hero_group, s);
     }
-
     // this is effectively how we will update the
     // sprite position in relation to the entity's
     // dungeon position
     const float w = spritegroup_get(hero_group, 0)->width;
     const float h = spritegroup_get(hero_group, 0)->height;
-    //const float offset_x = -w / 2 + w / 8;
-    //const float offset_y = -h / 2 + h / 8;
     const float offset_x = -12;
     const float offset_y = -12;
     // this is gross we can probably do this better
-    //const float x = (hero_entity->x * -offset_x) - offset_x / 2 - offset_x / 16;
-    //const float y = (hero_entity->y * -offset_y) - offset_y / 2 - offset_y / 8;
-    //const float y = (hero_entity->y * offset_y) + offset_y;
     const float x = hero_entity->x * 8;
     const float y = hero_entity->y * 8;
-
-    //Rectangle dest = {x, y, w, h};
     Rectangle dest = {x + offset_x, y + offset_y, w, h};
     hero_group->current = 0;
     hero_group->dest = dest;
