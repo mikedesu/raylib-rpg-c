@@ -16,12 +16,18 @@
 #include "utils.h"
 #include "vectorentityid.h"
 
+
+
+
 #include <raylib.h>
 #include <rlgl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+
+
 
 #define BASE_SIZE 8
 #define TEST_SIZE 0.2
@@ -31,12 +37,21 @@
 // libgame global variables
 //------------------------------------------------------------------
 
+
+
+
 gamestate* g = NULL;
 
+
+
+
 RenderTexture target;
-Rectangle target_src;
-Rectangle target_dest;
+Rectangle target_src = (Rectangle){0, 0, 0, 0};
+Rectangle target_dest = (Rectangle){0, 0, 0, 0};
 Vector2 target_origin = (Vector2){0, 0};
+
+
+
 
 int activescene = GAMEPLAYSCENE;
 int targetwidth = DEFAULT_TARGET_WIDTH;
@@ -44,14 +59,24 @@ int targetheight = DEFAULT_TARGET_HEIGHT;
 int windowwidth = DEFAULT_WINDOW_WIDTH;
 int windowheight = DEFAULT_WINDOW_HEIGHT;
 
+
+
+
 //------------------------------------------------------------------
 // function declarations
 //------------------------------------------------------------------
+
+
+
+
 bool libgame_windowshouldclose();
 gamestate* libgame_getgamestate();
 void libgame_initwindow();
 void libgame_closewindow();
 void libgame_init();
+
+
+
 
 void libgame_updatedebugpanelbuffer(gamestate* g);
 void libgame_updategamestate(gamestate* g);
@@ -101,8 +126,13 @@ void libgame_updatesmoothmove(gamestate* g);
 void libgame_docameralockon(gamestate* g);
 void libgame_do_one_camera_rotation(gamestate* g);
 
+
+
+
 entityid libgame_createentity(gamestate* g, const char* name, int x, int y);
 entityid libgame_createtorchentity(gamestate* g);
+
+
 
 
 void libgame_drawfade(gamestate* g) {
@@ -111,6 +141,8 @@ void libgame_drawfade(gamestate* g) {
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), c);
     }
 }
+
+
 
 
 void libgame_handlefade(gamestate* g) {
@@ -139,11 +171,15 @@ void libgame_handlefade(gamestate* g) {
 }
 
 
+
+
 void libgame_handlereloadtextures(gamestate* g) {
     if (IsKeyPressed(KEY_R)) {
         libgame_reloadtextures(g);
     }
 }
+
+
 
 
 void libgame_handleinput(gamestate* g) {
@@ -171,6 +207,8 @@ void libgame_handleinput(gamestate* g) {
 }
 
 
+
+
 void libgame_handlemodeswitch(gamestate* g) {
     //minfo("begin libgame_handlemodeswitch");
     if (IsKeyPressed(KEY_C)) {
@@ -188,12 +226,16 @@ void libgame_handlemodeswitch(gamestate* g) {
 }
 
 
+
+
 void libgame_handledebugpanelswitch(gamestate* g) {
     //minfo("begin libgame_handledebugpanelswitch");
     if (IsKeyPressed(KEY_D)) {
         g->debugpanelon = !g->debugpanelon;
     }
 }
+
+
 
 
 void libgame_updateherospritegroup_right(gamestate* g) {
@@ -224,6 +266,8 @@ void libgame_updateherospritegroup_right(gamestate* g) {
 }
 
 
+
+
 void libgame_updateherospritegroup_left(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
@@ -250,6 +294,8 @@ void libgame_updateherospritegroup_left(gamestate* g) {
         hero_group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
+
+
 
 
 void libgame_updateherospritegroup_up(gamestate* g) {
@@ -280,6 +326,8 @@ void libgame_updateherospritegroup_up(gamestate* g) {
 }
 
 
+
+
 void libgame_updateherospritegroup_down(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
@@ -306,6 +354,8 @@ void libgame_updateherospritegroup_down(gamestate* g) {
         hero_group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
+
+
 
 
 void libgame_handleplayerinput(gamestate* g) {
@@ -345,6 +395,8 @@ void libgame_handleplayerinput(gamestate* g) {
 }
 
 
+
+
 void libgame_handlecaminput(gamestate* g) {
     //minfo("begin libgame_handlecaminput");
     if (g->controlmode == CONTROLMODE_CAMERA) {
@@ -373,9 +425,13 @@ void libgame_handlecaminput(gamestate* g) {
 }
 
 
+
+
 bool libgame_windowshouldclose() {
     return WindowShouldClose();
 }
+
+
 
 
 void libgame_initwindow() {
@@ -399,10 +455,14 @@ void libgame_initwindow() {
 }
 
 
+
+
 void libgame_closewindow() {
     //rlglClose();
     CloseWindow();
 }
+
+
 
 
 void libgame_updatedebugpanelbuffer(gamestate* g) {
@@ -440,10 +500,12 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
 }
 
 
+
+
 void libgame_updatesmoothmove(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-    float move_unit = 1.0f;
     if (hero_group) {
+        float move_unit = 1.0f;
         // only do it 1 unit at a time
         if (hero_group->move.x > 0) {
             hero_group->dest.x += move_unit;
@@ -460,8 +522,15 @@ void libgame_updatesmoothmove(gamestate* g) {
             hero_group->dest.y -= move_unit;
             hero_group->move.y += move_unit;
         }
+
+        // smooth move is too fast for this
+        //if (hero_group->move.x == 0.0f && hero_group->move.y == 0.0f) {
+        //    hero_group->current = 0; //standing/idle
+        //}
     }
 }
+
+
 
 
 void libgame_docameralockon(gamestate* g) {
@@ -470,6 +539,8 @@ void libgame_docameralockon(gamestate* g) {
         g->cam2d.target = (Vector2){hero_group->dest.x, hero_group->dest.y};
     }
 }
+
+
 
 
 void libgame_do_one_camera_rotation(gamestate* g) {
@@ -483,13 +554,17 @@ void libgame_do_one_camera_rotation(gamestate* g) {
 }
 
 
+
+
 void libgame_updategamestate(gamestate* g) {
     libgame_updatedebugpanelbuffer(g);
     //setdebugpanelcenter(g);
     libgame_updatesmoothmove(g);
     libgame_docameralockon(g);
-    libgame_do_one_camera_rotation(g);
+    //libgame_do_one_camera_rotation(g);
 }
+
+
 
 
 void libgame_drawframeend(gamestate* g) {
@@ -497,6 +572,8 @@ void libgame_drawframeend(gamestate* g) {
     g->framecount++;
     gamestateupdatecurrenttime(g);
 }
+
+
 
 
 void libgame_drawframe(gamestate* g) {
@@ -524,6 +601,8 @@ void libgame_drawframe(gamestate* g) {
 }
 
 
+
+
 inline void libgame_drawdebugpanel(gamestate* g) {
     if (g->debugpanelon) {
         const int fontsize = 14;
@@ -545,6 +624,8 @@ inline void libgame_drawdebugpanel(gamestate* g) {
 }
 
 
+
+
 void libgame_drawgrid(gamestate* g) {
     Color c = GREEN;
     const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
@@ -555,11 +636,12 @@ void libgame_drawgrid(gamestate* g) {
 }
 
 
+
+
 void libgame_drawdungeonfloor(gamestate* g) {
-    const int w = g->txinfo[TXDIRT].texture.width;
-    const int h = g->txinfo[TXDIRT].texture.height;
-    Rectangle tile_src = {0, 0, w, h};
-    Rectangle tile_dest = {0, 0, w, h};
+    //const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
+    const int w = 16, h = 16;
+    Rectangle tile_src = {0, 0, w, h}, tile_dest = {0, 0, w, h};
     Color c = WHITE;
     float rotation = 0;
     Vector2 origin = {0, 0};
@@ -571,6 +653,8 @@ void libgame_drawdungeonfloor(gamestate* g) {
         }
     }
 }
+
+
 
 
 void libgame_drawherogrouphitbox(gamestate* g) {
@@ -587,6 +671,8 @@ void libgame_drawherogrouphitbox(gamestate* g) {
         DrawLineV(v[3], v[0], c);
     }
 }
+
+
 
 
 void libgame_drawherogroup(gamestate* g) {
@@ -614,6 +700,8 @@ void libgame_drawherogroup(gamestate* g) {
 }
 
 
+
+
 // we are going to have to temporarily save the torchid
 // as we are not enumerating thru the map yet
 void libgame_drawtorchgroup(gamestate* g) {
@@ -633,6 +721,8 @@ void libgame_drawtorchgroup(gamestate* g) {
 }
 
 
+
+
 void libgame_drawtorchgroup_hitbox(gamestate* g) {
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
     if (sg && g->debugpanelon) {
@@ -647,6 +737,8 @@ void libgame_drawtorchgroup_hitbox(gamestate* g) {
         DrawLineV(v[3], v[0], c);
     }
 }
+
+
 
 
 void libgame_drawgameplayscene(gamestate* g) {
@@ -669,6 +761,8 @@ void libgame_drawgameplayscene(gamestate* g) {
 
     EndMode2D();
 }
+
+
 
 
 void libgame_drawtitlescene(gamestate* g) {
@@ -704,6 +798,8 @@ void libgame_drawtitlescene(gamestate* g) {
     DrawTextEx(g->font, b3, pos[2], 16, 1, fgc);
     libgame_handlefade(g);
 }
+
+
 
 
 void libgame_drawcompanyscene(gamestate* g) {
@@ -752,6 +848,8 @@ void libgame_drawcompanyscene(gamestate* g) {
 }
 
 
+
+
 void libgame_loadtexture(
     gamestate* g, int index, int contexts, int frames, bool dodither, const char* path) {
     if (dodither) {
@@ -770,9 +868,13 @@ void libgame_loadtexture(
 }
 
 
+
+
 void libgame_loadtextures(gamestate* g) {
     libgame_loadtexturesfromfile(g, "textures.txt");
 }
+
+
 
 
 void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
@@ -799,12 +901,16 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
 }
 
 
+
+
 void libgame_unloadtexture(gamestate* g, int index) {
     minfo("unloading texture");
     if (g->txinfo[index].texture.id > 0) {
         UnloadTexture(g->txinfo[index].texture);
     }
 }
+
+
 
 
 void libgame_unloadtextures(gamestate* g) {
@@ -814,6 +920,8 @@ void libgame_unloadtextures(gamestate* g) {
 }
 
 
+
+
 void libgame_reloadtextures(gamestate* g) {
     minfo("reloading textures");
     libgame_unloadtextures(g);
@@ -821,11 +929,15 @@ void libgame_reloadtextures(gamestate* g) {
 }
 
 
+
+
 void libgame_init() {
     minfo("libgame_init");
     g = gamestateinitptr(windowwidth, windowheight, targetwidth, targetheight);
     libgame_initsharedsetup(g);
 }
+
+
 
 
 entityid libgame_createentity(gamestate* g, const char* name, int x, int y) {
@@ -842,6 +954,8 @@ entityid libgame_createentity(gamestate* g, const char* name, int x, int y) {
 }
 
 
+
+
 void libgame_createheroentity(gamestate* g) {
     entityid heroid = libgame_createentity(g, "hero", 2, 2);
     if (heroid != -1) {
@@ -850,10 +964,14 @@ void libgame_createheroentity(gamestate* g) {
 }
 
 
+
+
 entityid libgame_createtorchentity(gamestate* g) {
     entityid torch_id = libgame_createentity(g, "torch", 0, 0);
     return torch_id;
 }
+
+
 
 
 void libgame_createtorchspritegroup(gamestate* g, entityid id) {
@@ -884,6 +1002,8 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id) {
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
 }
+
+
 
 
 // this code is ugly as fuck but it works
@@ -935,6 +1055,8 @@ void libgame_createherospritegroup(gamestate* g) {
 }
 
 
+
+
 void libgame_loadtargettexture(gamestate* g) {
     target = LoadRenderTexture(targetwidth, targetheight);
     target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
@@ -943,11 +1065,15 @@ void libgame_loadtargettexture(gamestate* g) {
 }
 
 
+
+
 void libgame_loadfont(gamestate* g) {
     const int fontsize = 60;
     const int codepointct = 256;
     g->font = LoadFontEx(DEFAULT_FONT_PATH, fontsize, 0, codepointct);
 }
+
+
 
 
 void libgame_initdatastructures(gamestate* g) {
@@ -966,6 +1092,8 @@ void libgame_initdatastructures(gamestate* g) {
     }
     minfo("libgame_initdatastructures end");
 }
+
+
 
 
 void libgame_initsharedsetup(gamestate* g) {
@@ -995,6 +1123,8 @@ void libgame_initsharedsetup(gamestate* g) {
 }
 
 
+
+
 void libgame_initwithstate(gamestate* state) {
     if (state == NULL) {
         merror("libgame_initwithstate: state is NULL");
@@ -1006,10 +1136,14 @@ void libgame_initwithstate(gamestate* state) {
 }
 
 
+
+
 void libgame_closesavegamestate() {
     minfo("libgame_closesavegamestate");
     libgame_closeshared(g);
 }
+
+
 
 
 void libgame_close(gamestate* g) {
@@ -1017,6 +1151,8 @@ void libgame_close(gamestate* g) {
     libgame_closeshared(g);
     gamestatefree(g);
 }
+
+
 
 
 void libgame_closeshared(gamestate* g) {
@@ -1030,6 +1166,8 @@ void libgame_closeshared(gamestate* g) {
     minfo("closing window");
     CloseWindow();
 }
+
+
 
 
 gamestate* libgame_getgamestate() {

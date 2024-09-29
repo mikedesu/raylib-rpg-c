@@ -92,7 +92,7 @@ KeepEmptyLinesAtTheStartOfBlocks: true
 MacroBlockBegin: ''
 MacroBlockEnd:   ''
 JavaScriptQuotes: Double
-MaxEmptyLinesToKeep: 2
+MaxEmptyLinesToKeep: 4
 NamespaceIndentation: None
 ObjCBlockIndentWidth: 4
 ObjCSpaceAfterProperty: true

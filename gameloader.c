@@ -3,6 +3,9 @@
 #include "mprint.h"
 #include "symaddrpair.h"
 
+
+
+
 #include <dlfcn.h>
 #include <raylib.h>
 #include <rlgl.h>
@@ -13,16 +16,31 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+
+
+
 #define NUM_VOID_FUNCTIONS 7
+
+
+
 
 long last_write_time = 0;
 const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
 const char* templib = "./templibgame.so";
 
+
+
+
 void* handle = NULL;
 
+
+
+
 gamestate* g = NULL;
+
+
+
 
 bool (*mywindowshouldclose)() = NULL;
 gamestate* (*mylibgame_getgamestate)() = NULL;
@@ -33,6 +51,8 @@ void (*mylibgamedrawframe)(gamestate*) = NULL;
 void (*mylibgamehandleinput)(gamestate*) = NULL;
 void (*mylibgameinitwithstate)(gamestate*) = NULL;
 void (*mylibgameupdategamestate)(gamestate*) = NULL;
+
+
 
 
 // get the last write time of a file
@@ -46,6 +66,8 @@ time_t getlastwritetime(const char* filename) {
 }
 
 
+
+
 void openhandle() {
     minfo("openhandle");
     handle = dlopen(libname, RTLD_LAZY);
@@ -57,6 +79,8 @@ void openhandle() {
 }
 
 
+
+
 void checksymbol(void* symbol, const char* name) {
     minfo("checksymbol");
     if (symbol == NULL) {
@@ -65,6 +89,8 @@ void checksymbol(void* symbol, const char* name) {
         exit(1);
     }
 }
+
+
 
 
 void loadsymbols() {
@@ -100,6 +126,8 @@ void loadsymbols() {
 }
 
 
+
+
 void autoreload() {
     time_t result = getlastwritetime(libname);
 
@@ -126,6 +154,8 @@ void autoreload() {
         minfo("re-entering gameloop");
     }
 }
+
+
 
 
 void gamerun() {
