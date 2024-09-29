@@ -99,6 +99,7 @@ void libgame_drawtitlescene(gamestate* g);
 void libgame_drawgameplayscene(gamestate* g);
 void libgame_drawfade(gamestate* g);
 void libgame_drawgrid(gamestate* g);
+//void libgame_drawgrid_thick(gamestate* g, const int thickness);
 void libgame_drawdungeonfloor(gamestate* g);
 void libgame_initwithstate(gamestate* state);
 void libgame_initsharedsetup(gamestate* g);
@@ -125,6 +126,7 @@ void libgame_drawtorchgroup_hitbox(gamestate* g);
 void libgame_updatesmoothmove(gamestate* g);
 void libgame_docameralockon(gamestate* g);
 void libgame_do_one_camera_rotation(gamestate* g);
+void libgame_entity_move(gamestate* g, entityid id, int x, int y);
 
 
 
@@ -365,22 +367,51 @@ void libgame_handleplayerinput(gamestate* g) {
         // this is just a test
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
+        //entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
+
         if (IsKeyPressed(KEY_RIGHT)) {
             minfo("key right pressed");
-            libgame_updateherospritegroup_right(g);
 
+            // now instead of moving the sprite,
+            // we will move the entity within
+            // the context of the dungeon
+            // and later
+            // we will update the sprite dest
+            // based on
+            // the position they moved to
+
+            // first we have to get the hero entity
+            //if (hero) {
+            //    hero->x += 1;
+            //}
+
+
+            libgame_entity_move(g, g->hero_id, 1, 0);
+
+            //    libgame_updateherospritegroup_right(g);
         } else if (IsKeyPressed(KEY_LEFT)) {
             minfo("key left pressed");
-            libgame_updateherospritegroup_left(g);
+            libgame_entity_move(g, g->hero_id, -1, 0);
+            //if (hero) {
+            //    hero->x -= 1;
+            //}
+            //    libgame_updateherospritegroup_left(g);
         }
 
         if (IsKeyPressed(KEY_DOWN)) {
             minfo("key down pressed");
-            libgame_updateherospritegroup_down(g);
-
+            libgame_entity_move(g, g->hero_id, 0, 1);
+            //if (hero) {
+            //    hero->y += 1;
+            //}
+            //    libgame_updateherospritegroup_down(g);
         } else if (IsKeyPressed(KEY_UP)) {
             minfo("key up pressed");
-            libgame_updateherospritegroup_up(g);
+            libgame_entity_move(g, g->hero_id, 0, -1);
+            //if (hero) {
+            //    hero->y -= 1;
+            //}
+            //    libgame_updateherospritegroup_up(g);
         }
 
         if (IsKeyPressed(KEY_PERIOD)) {
@@ -468,6 +499,8 @@ void libgame_closewindow() {
 void libgame_updatedebugpanelbuffer(gamestate* g) {
     //spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(spritegroups, hero_id);
 
+    entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
+
     snprintf(g->debugpanel.buffer,
              1024,
              "Framecount:   %d\n"
@@ -479,7 +512,9 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
              "Cam.offset:   %.2f,%.2f\n"
              "Cam.zoom:     %.2f\n"
              "Active scene: %d\n"
-             "Control mode: %d\n",
+             "Control mode: %d\n"
+             "Hero position: %.0f,%.0f\n",
+
              //"Herogroup current: %d\n"
              //"Herogroup size: %d\n"
              //"Herogroup capacity: %d\n",
@@ -496,7 +531,9 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
              g->cam2d.offset.y,
              g->cam2d.zoom,
              activescene,
-             g->controlmode);
+             g->controlmode,
+             hero->pos.x,
+             hero->pos.y);
 }
 
 
@@ -558,9 +595,11 @@ void libgame_do_one_camera_rotation(gamestate* g) {
 
 void libgame_updategamestate(gamestate* g) {
     libgame_updatedebugpanelbuffer(g);
+
+
     //setdebugpanelcenter(g);
-    libgame_updatesmoothmove(g);
-    libgame_docameralockon(g);
+    //libgame_updatesmoothmove(g);
+    //libgame_docameralockon(g);
     //libgame_do_one_camera_rotation(g);
 }
 
@@ -629,18 +668,44 @@ inline void libgame_drawdebugpanel(gamestate* g) {
 void libgame_drawgrid(gamestate* g) {
     Color c = GREEN;
     const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
-    for (int i = 0; i <= g->dungeonfloor->len; i++)
-        DrawLine(i * w, 0, i * w, g->dungeonfloor->wid * h, c);
-    for (int i = 0; i <= g->dungeonfloor->wid; i++)
-        DrawLine(0, i * h, g->dungeonfloor->len * w, i * h, c);
+    const int len = g->dungeonfloor->len;
+    const int wid = g->dungeonfloor->wid;
+    for (int i = 0; i <= len; i++) {
+        DrawLine(i * w, 0, i * w, wid * h, c);
+    }
+    for (int i = 0; i <= wid; i++) {
+        DrawLine(0, i * h, len * w, i * h, c);
+    }
 }
 
 
 
 
+//void libgame_drawgrid_thick(gamestate* g, const int thickness) {
+//    if (thickness > 0) {
+//        Color c = GREEN;
+//        const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
+//        const int len = g->dungeonfloor->len;
+//        const int wid = g->dungeonfloor->wid;
+//        for (int i = 0; i <= len; i++) {
+//            for (int k = 0; k < thickness; k++) {
+//                DrawLine(i * w + k, 0, i * w + k, wid * h, c);
+//            }
+//        }
+//        for (int i = 0; i <= wid; i++) {
+//            for (int k = 0; k < thickness; k++) {
+//                DrawLine(0, i * h + k, len * w, i * h + k, c);
+//            }
+//        }
+//    }
+//}
+
+
+
+
 void libgame_drawdungeonfloor(gamestate* g) {
-    //const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
-    const int w = 16, h = 16;
+    const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
+    //const int w = 16, h = 16;
     Rectangle tile_src = {0, 0, w, h}, tile_dest = {0, 0, w, h};
     Color c = WHITE;
     float rotation = 0;
@@ -749,6 +814,7 @@ void libgame_drawgameplayscene(gamestate* g) {
 
     if (g->debugpanelon) {
         libgame_drawgrid(g);
+        //libgame_drawgrid_thick(g, 2);
     }
 
     libgame_drawtorchgroup(g);
@@ -946,8 +1012,8 @@ entityid libgame_createentity(gamestate* g, const char* name, int x, int y) {
         merror("could not create entity");
         return -1;
     }
-    e->x = x;
-    e->y = y;
+    e->pos.x = x;
+    e->pos.y = y;
     vectorentityid_pushback(&g->entityids, e->id);
     hashtable_entityid_entity_insert(g->entities, e->id, e);
     return e->id;
@@ -957,7 +1023,7 @@ entityid libgame_createentity(gamestate* g, const char* name, int x, int y) {
 
 
 void libgame_createheroentity(gamestate* g) {
-    entityid heroid = libgame_createentity(g, "hero", 2, 2);
+    entityid heroid = libgame_createentity(g, "hero", 4, 4);
     if (heroid != -1) {
         g->hero_id = heroid;
     }
@@ -993,8 +1059,8 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id) {
     const float h = spritegroup_get(group, 0)->height;
     const float offset_x = 0;
     const float offset_y = -h / 2;
-    const float x = torch_entity->x * 8;
-    const float y = torch_entity->y * 8;
+    const float x = torch_entity->pos.x * 8;
+    const float y = torch_entity->pos.y * 8;
     Rectangle dest = {x + offset_x, y + offset_y, w, h};
     group->current = 0;
     group->dest = dest;
@@ -1044,8 +1110,8 @@ void libgame_createherospritegroup(gamestate* g) {
     const float offset_x = -12;
     const float offset_y = -12;
     // this is gross we can probably do this better
-    const float x = hero_entity->x * 8;
-    const float y = hero_entity->y * 8;
+    const float x = hero_entity->pos.x * 8;
+    const float y = hero_entity->pos.y * 8;
     Rectangle dest = {x + offset_x, y + offset_y, w, h};
     hero_group->current = 0;
     hero_group->dest = dest;
@@ -1172,4 +1238,26 @@ void libgame_closeshared(gamestate* g) {
 
 gamestate* libgame_getgamestate() {
     return g;
+}
+
+
+
+
+void libgame_entity_move(gamestate* g, entityid id, int x, int y) {
+    entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+    if (e) {
+
+        // check bounds
+        if (e->pos.x + x < 0 || e->pos.x + x >= g->dungeonfloor->len) {
+            merror("out of bounds x");
+            return;
+        }
+
+        if (e->pos.y + y < 0 || e->pos.y + y >= g->dungeonfloor->wid) {
+            merror("out of bounds y");
+            return;
+        }
+
+        entity_move(e, (Vector2){x, y});
+    }
 }
