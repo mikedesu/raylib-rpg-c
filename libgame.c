@@ -29,10 +29,6 @@
 
 
 
-#define BASE_SIZE 8
-#define TEST_SIZE 0.2
-#define FRAMEINTERVAL 10
-
 //------------------------------------------------------------------
 // libgame global variables
 //------------------------------------------------------------------
@@ -99,7 +95,6 @@ void libgame_drawtitlescene(gamestate* g);
 void libgame_drawgameplayscene(gamestate* g);
 void libgame_drawfade(gamestate* g);
 void libgame_drawgrid(gamestate* g);
-//void libgame_drawgrid_thick(gamestate* g, const int thickness);
 void libgame_drawdungeonfloor(gamestate* g);
 void libgame_initwithstate(gamestate* state);
 void libgame_initsharedsetup(gamestate* g);
@@ -131,8 +126,9 @@ void libgame_entity_move(gamestate* g, entityid id, int x, int y);
 
 
 
-entityid libgame_createentity(gamestate* g, const char* name, int x, int y);
-entityid libgame_createtorchentity(gamestate* g);
+const entityid libgame_createentity(gamestate* g, const char* name, int x, int y);
+const entityid libgame_createtorchentity(gamestate* g);
+const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 
 
 
@@ -262,7 +258,8 @@ void libgame_updateherospritegroup_right(gamestate* g) {
             break;
         }
         spritegroup_setcontexts(hero_group, ctx);
-        hero_group->move = (Vector2){8, 0};
+        //hero_group->move = (Vector2){8, 0};
+        libgame_entity_move(g, g->hero_id, 1, 0);
         hero_group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
@@ -292,7 +289,8 @@ void libgame_updateherospritegroup_left(gamestate* g) {
             break;
         }
         spritegroup_setcontexts(hero_group, ctx);
-        hero_group->move = (Vector2){-8, 0};
+        //hero_group->move = (Vector2){-8, 0};
+        libgame_entity_move(g, g->hero_id, -1, 0);
         hero_group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
@@ -322,7 +320,8 @@ void libgame_updateherospritegroup_up(gamestate* g) {
             break;
         }
         spritegroup_setcontexts(hero_group, ctx);
-        hero_group->move = (Vector2){0, -8};
+        //hero_group->move = (Vector2){0, -8};
+        libgame_entity_move(g, g->hero_id, 0, -1);
         hero_group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
@@ -352,7 +351,8 @@ void libgame_updateherospritegroup_down(gamestate* g) {
             break;
         }
         spritegroup_setcontexts(hero_group, ctx);
-        hero_group->move = (Vector2){0, 8};
+        //hero_group->move = (Vector2){0, 8};
+        libgame_entity_move(g, g->hero_id, 0, 1);
         hero_group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
@@ -368,6 +368,7 @@ void libgame_handleplayerinput(gamestate* g) {
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
         //entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
+        //spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
 
         if (IsKeyPressed(KEY_RIGHT)) {
             minfo("key right pressed");
@@ -386,32 +387,36 @@ void libgame_handleplayerinput(gamestate* g) {
             //}
 
 
-            libgame_entity_move(g, g->hero_id, 1, 0);
+            //libgame_entity_move(g, g->hero_id, 1, 0);
+            //hero_group->current = SPRITEGROUP_ANIM_WALK;
 
-            //    libgame_updateherospritegroup_right(g);
+            libgame_updateherospritegroup_right(g);
         } else if (IsKeyPressed(KEY_LEFT)) {
             minfo("key left pressed");
-            libgame_entity_move(g, g->hero_id, -1, 0);
+            //libgame_entity_move(g, g->hero_id, -1, 0);
+            //hero_group->current = SPRITEGROUP_ANIM_WALK;
             //if (hero) {
             //    hero->x -= 1;
             //}
-            //    libgame_updateherospritegroup_left(g);
+            libgame_updateherospritegroup_left(g);
         }
 
         if (IsKeyPressed(KEY_DOWN)) {
             minfo("key down pressed");
-            libgame_entity_move(g, g->hero_id, 0, 1);
+            //libgame_entity_move(g, g->hero_id, 0, 1);
+            //hero_group->current = SPRITEGROUP_ANIM_WALK;
             //if (hero) {
             //    hero->y += 1;
             //}
-            //    libgame_updateherospritegroup_down(g);
+            libgame_updateherospritegroup_down(g);
         } else if (IsKeyPressed(KEY_UP)) {
             minfo("key up pressed");
-            libgame_entity_move(g, g->hero_id, 0, -1);
+            //libgame_entity_move(g, g->hero_id, 0, -1);
+            //hero_group->current = SPRITEGROUP_ANIM_WALK;
             //if (hero) {
             //    hero->y -= 1;
             //}
-            //    libgame_updateherospritegroup_up(g);
+            libgame_updateherospritegroup_up(g);
         }
 
         if (IsKeyPressed(KEY_PERIOD)) {
@@ -596,10 +601,17 @@ void libgame_do_one_camera_rotation(gamestate* g) {
 void libgame_updategamestate(gamestate* g) {
     libgame_updatedebugpanelbuffer(g);
 
+    entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+
+    if (hero && hero_group) {
+        hero_group->dest.x = hero->pos.x * 8 - 12;
+        hero_group->dest.y = hero->pos.y * 8 - 12;
+    }
 
     //setdebugpanelcenter(g);
     //libgame_updatesmoothmove(g);
-    //libgame_docameralockon(g);
+    libgame_docameralockon(g);
     //libgame_do_one_camera_rotation(g);
 }
 
@@ -677,28 +689,6 @@ void libgame_drawgrid(gamestate* g) {
         DrawLine(0, i * h, len * w, i * h, c);
     }
 }
-
-
-
-
-//void libgame_drawgrid_thick(gamestate* g, const int thickness) {
-//    if (thickness > 0) {
-//        Color c = GREEN;
-//        const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
-//        const int len = g->dungeonfloor->len;
-//        const int wid = g->dungeonfloor->wid;
-//        for (int i = 0; i <= len; i++) {
-//            for (int k = 0; k < thickness; k++) {
-//                DrawLine(i * w + k, 0, i * w + k, wid * h, c);
-//            }
-//        }
-//        for (int i = 0; i <= wid; i++) {
-//            for (int k = 0; k < thickness; k++) {
-//                DrawLine(0, i * h + k, len * w, i * h + k, c);
-//            }
-//        }
-//    }
-//}
 
 
 
@@ -1006,7 +996,7 @@ void libgame_init() {
 
 
 
-entityid libgame_createentity(gamestate* g, const char* name, int x, int y) {
+const entityid libgame_createentity(gamestate* g, const char* name, int x, int y) {
     entity_t* e = entity_create(name);
     if (!e) {
         merror("could not create entity");
@@ -1023,7 +1013,7 @@ entityid libgame_createentity(gamestate* g, const char* name, int x, int y) {
 
 
 void libgame_createheroentity(gamestate* g) {
-    entityid heroid = libgame_createentity(g, "hero", 4, 4);
+    entityid heroid = libgame_createentity(g, "hero", 0, 1);
     if (heroid != -1) {
         g->hero_id = heroid;
     }
@@ -1032,7 +1022,7 @@ void libgame_createheroentity(gamestate* g) {
 
 
 
-entityid libgame_createtorchentity(gamestate* g) {
+const entityid libgame_createtorchentity(gamestate* g) {
     entityid torch_id = libgame_createentity(g, "torch", 0, 0);
     return torch_id;
 }
@@ -1245,19 +1235,27 @@ gamestate* libgame_getgamestate() {
 
 void libgame_entity_move(gamestate* g, entityid id, int x, int y) {
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
-    if (e) {
+    if (libgame_entity_move_check(g, e, x, y)) {
+        entity_move(e, (Vector2){x, y});
+    }
+}
 
+
+
+const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y) {
+    if (e) {
         // check bounds
         if (e->pos.x + x < 0 || e->pos.x + x >= g->dungeonfloor->len) {
             merror("out of bounds x");
-            return;
+            return false;
         }
 
         if (e->pos.y + y < 0 || e->pos.y + y >= g->dungeonfloor->wid) {
             merror("out of bounds y");
-            return;
+            return false;
         }
 
-        entity_move(e, (Vector2){x, y});
+        return true;
     }
+    return false;
 }
