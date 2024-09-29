@@ -121,11 +121,12 @@ void libgame_drawtorchgroup_hitbox(gamestate* g);
 void libgame_updatesmoothmove(gamestate* g);
 void libgame_docameralockon(gamestate* g);
 void libgame_do_one_camera_rotation(gamestate* g);
-void libgame_entity_move(gamestate* g, entityid id, int x, int y);
+void libgame_update_spritegroup_move(entityid id, int x, int y);
 
 
 
 
+const bool libgame_entity_move(gamestate* g, entityid id, int x, int y);
 const entityid libgame_createentity(gamestate* g, const char* name, int x, int y);
 const entityid libgame_createtorchentity(gamestate* g);
 const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
@@ -259,7 +260,7 @@ void libgame_updateherospritegroup_right(gamestate* g) {
         }
         spritegroup_setcontexts(hero_group, ctx);
         //hero_group->move = (Vector2){8, 0};
-        libgame_entity_move(g, g->hero_id, 1, 0);
+        //libgame_entity_move(g, g->hero_id, 1, 0);
         hero_group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
@@ -290,7 +291,7 @@ void libgame_updateherospritegroup_left(gamestate* g) {
         }
         spritegroup_setcontexts(hero_group, ctx);
         //hero_group->move = (Vector2){-8, 0};
-        libgame_entity_move(g, g->hero_id, -1, 0);
+        //libgame_entity_move(g, g->hero_id, -1, 0);
         hero_group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
@@ -321,7 +322,7 @@ void libgame_updateherospritegroup_up(gamestate* g) {
         }
         spritegroup_setcontexts(hero_group, ctx);
         //hero_group->move = (Vector2){0, -8};
-        libgame_entity_move(g, g->hero_id, 0, -1);
+        //libgame_entity_move(g, g->hero_id, 0, -1);
         hero_group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
@@ -352,11 +353,20 @@ void libgame_updateherospritegroup_down(gamestate* g) {
         }
         spritegroup_setcontexts(hero_group, ctx);
         //hero_group->move = (Vector2){0, 8};
-        libgame_entity_move(g, g->hero_id, 0, 1);
+        //libgame_entity_move(g, g->hero_id, 0, 1);
         hero_group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
 
+
+
+
+void libgame_update_spritegroup_move(entityid id, int x, int y) {
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (sg) {
+        sg->move = (Vector2){x, y};
+    }
+}
 
 
 
@@ -369,6 +379,8 @@ void libgame_handleplayerinput(gamestate* g) {
         // and then translating that into a destination on screen
         //entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
         //spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+
+        bool result = false;
 
         if (IsKeyPressed(KEY_RIGHT)) {
             minfo("key right pressed");
@@ -387,36 +399,48 @@ void libgame_handleplayerinput(gamestate* g) {
             //}
 
 
-            //libgame_entity_move(g, g->hero_id, 1, 0);
             //hero_group->current = SPRITEGROUP_ANIM_WALK;
 
             libgame_updateherospritegroup_right(g);
+            result = libgame_entity_move(g, g->hero_id, 1, 0);
+            if (result) {
+                libgame_update_spritegroup_move(g->hero_id, 8, 0);
+            }
         } else if (IsKeyPressed(KEY_LEFT)) {
             minfo("key left pressed");
-            //libgame_entity_move(g, g->hero_id, -1, 0);
             //hero_group->current = SPRITEGROUP_ANIM_WALK;
             //if (hero) {
             //    hero->x -= 1;
             //}
             libgame_updateherospritegroup_left(g);
+            result = libgame_entity_move(g, g->hero_id, -1, 0);
+            if (result) {
+                libgame_update_spritegroup_move(g->hero_id, -8, 0);
+            }
         }
 
         if (IsKeyPressed(KEY_DOWN)) {
             minfo("key down pressed");
-            //libgame_entity_move(g, g->hero_id, 0, 1);
             //hero_group->current = SPRITEGROUP_ANIM_WALK;
             //if (hero) {
             //    hero->y += 1;
             //}
             libgame_updateherospritegroup_down(g);
+            result = libgame_entity_move(g, g->hero_id, 0, 1);
+            if (result) {
+                libgame_update_spritegroup_move(g->hero_id, 0, 8);
+            }
         } else if (IsKeyPressed(KEY_UP)) {
             minfo("key up pressed");
-            //libgame_entity_move(g, g->hero_id, 0, -1);
             //hero_group->current = SPRITEGROUP_ANIM_WALK;
             //if (hero) {
             //    hero->y -= 1;
             //}
             libgame_updateherospritegroup_up(g);
+            result = libgame_entity_move(g, g->hero_id, 0, -1);
+            if (result) {
+                libgame_update_spritegroup_move(g->hero_id, 0, -8);
+            }
         }
 
         if (IsKeyPressed(KEY_PERIOD)) {
@@ -600,17 +624,8 @@ void libgame_do_one_camera_rotation(gamestate* g) {
 
 void libgame_updategamestate(gamestate* g) {
     libgame_updatedebugpanelbuffer(g);
-
-    entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-
-    if (hero && hero_group) {
-        hero_group->dest.x = hero->pos.x * 8 - 12;
-        hero_group->dest.y = hero->pos.y * 8 - 12;
-    }
-
     //setdebugpanelcenter(g);
-    //libgame_updatesmoothmove(g);
+    libgame_updatesmoothmove(g);
     libgame_docameralockon(g);
     //libgame_do_one_camera_rotation(g);
 }
@@ -1233,11 +1248,15 @@ gamestate* libgame_getgamestate() {
 
 
 
-void libgame_entity_move(gamestate* g, entityid id, int x, int y) {
+const bool libgame_entity_move(gamestate* g, entityid id, int x, int y) {
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
     if (libgame_entity_move_check(g, e, x, y)) {
+        // move successful
         entity_move(e, (Vector2){x, y});
+        return true;
     }
+    // move unsuccessful
+    return false;
 }
 
 
