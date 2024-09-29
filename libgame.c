@@ -124,8 +124,6 @@ void libgame_do_one_camera_rotation(gamestate* g);
 void libgame_update_spritegroup_move(entityid id, int x, int y);
 
 
-
-
 const bool libgame_entity_move(gamestate* g, entityid id, int x, int y);
 const entityid libgame_createentity(gamestate* g, const char* name, int x, int y);
 const entityid libgame_createtorchentity(gamestate* g);
@@ -570,6 +568,8 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
 
 void libgame_updatesmoothmove(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+
+
     if (hero_group) {
         float move_unit = 1.0f;
         // only do it 1 unit at a time
@@ -589,10 +589,13 @@ void libgame_updatesmoothmove(gamestate* g) {
             hero_group->move.y += move_unit;
         }
 
-        // smooth move is too fast for this
-        //if (hero_group->move.x == 0.0f && hero_group->move.y == 0.0f) {
-        //    hero_group->current = 0; //standing/idle
-        //}
+        if (hero_group->move.x == 0.0f && hero_group->move.y == 0.0f) {
+            entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
+            if (hero) {
+                hero_group->dest.x = hero->pos.x * 8 - 12;
+                hero_group->dest.y = hero->pos.y * 8 - 12;
+            }
+        }
     }
 }
 
@@ -626,6 +629,9 @@ void libgame_updategamestate(gamestate* g) {
     libgame_updatedebugpanelbuffer(g);
     //setdebugpanelcenter(g);
     libgame_updatesmoothmove(g);
+
+
+
     libgame_docameralockon(g);
     //libgame_do_one_camera_rotation(g);
 }
