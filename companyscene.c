@@ -17,10 +17,10 @@
 //}
 
 companyscene* companysceneinitptr() {
-    mprint("companysceneinitptr");
+    //mprint("companysceneinitptr");
     companyscene* ts = (companyscene*)malloc(sizeof(companyscene));
     if (ts != NULL) {
-        mprint("companysceneinit: malloc success");
+        //mprint("companysceneinit: malloc success");
         //mprint("Loading textures");
         //mprint("Loading presents texture");
         //        companysceneloadtextures(ts);
@@ -28,7 +28,7 @@ companyscene* companysceneinitptr() {
         //companysceneptrinitcameras(ts);
         //companysceneinitcubecolors(ts);
     } else {
-        mprint("companysceneinit: malloc failed");
+        //mprint("companysceneinit: malloc failed");
     }
     return ts;
 }

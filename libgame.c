@@ -181,7 +181,7 @@ void libgame_handlereloadtextures(gamestate* g) {
 
 void libgame_handleinput(gamestate* g) {
     if (IsKeyPressed(KEY_SPACE)) {
-        minfo("key space pressed");
+        //minfo("key space pressed");
         //if (g->fadestate == FADESTATENONE) {
         //    g->fadestate = FADESTATEOUT;
         //}
@@ -190,7 +190,7 @@ void libgame_handleinput(gamestate* g) {
     }
 
     if (IsKeyPressed(KEY_A)) {
-        minfo("key a pressed");
+        //minfo("key a pressed");
         // increment the 'current' of the hero group
         spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
         spritegroup_incr(hero_group);
@@ -207,15 +207,15 @@ void libgame_handleinput(gamestate* g) {
 
 
 void libgame_handlemodeswitch(gamestate* g) {
-    //minfo("begin libgame_handlemodeswitch");
+    ////minfo("begin libgame_handlemodeswitch");
     if (IsKeyPressed(KEY_C)) {
         switch (g->controlmode) {
         case CONTROLMODE_CAMERA:
-            minfo("control mode: camera");
+            //minfo("control mode: camera");
             g->controlmode = CONTROLMODE_PLAYER;
             break;
         default:
-            minfo("control mode: player");
+            //minfo("control mode: player");
             g->controlmode = CONTROLMODE_CAMERA;
             break;
         }
@@ -226,7 +226,7 @@ void libgame_handlemodeswitch(gamestate* g) {
 
 
 void libgame_handledebugpanelswitch(gamestate* g) {
-    //minfo("begin libgame_handledebugpanelswitch");
+    ////minfo("begin libgame_handledebugpanelswitch");
     if (IsKeyPressed(KEY_D)) {
         g->debugpanelon = !g->debugpanelon;
     }
@@ -369,7 +369,7 @@ void libgame_update_spritegroup_move(entityid id, int x, int y) {
 
 
 void libgame_handleplayerinput(gamestate* g) {
-    //minfo("begin libgame_handleplayerinput");
+    ////minfo("begin libgame_handleplayerinput");
     if (g->controlmode == CONTROLMODE_PLAYER) {
         //const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         // this is just a test
@@ -381,7 +381,7 @@ void libgame_handleplayerinput(gamestate* g) {
         bool result = false;
 
         if (IsKeyPressed(KEY_RIGHT)) {
-            minfo("key right pressed");
+            //minfo("key right pressed");
 
             // now instead of moving the sprite,
             // we will move the entity within
@@ -405,7 +405,7 @@ void libgame_handleplayerinput(gamestate* g) {
                 libgame_update_spritegroup_move(g->hero_id, 8, 0);
             }
         } else if (IsKeyPressed(KEY_LEFT)) {
-            minfo("key left pressed");
+            //minfo("key left pressed");
             //hero_group->current = SPRITEGROUP_ANIM_WALK;
             //if (hero) {
             //    hero->x -= 1;
@@ -418,7 +418,7 @@ void libgame_handleplayerinput(gamestate* g) {
         }
 
         if (IsKeyPressed(KEY_DOWN)) {
-            minfo("key down pressed");
+            //minfo("key down pressed");
             //hero_group->current = SPRITEGROUP_ANIM_WALK;
             //if (hero) {
             //    hero->y += 1;
@@ -429,7 +429,7 @@ void libgame_handleplayerinput(gamestate* g) {
                 libgame_update_spritegroup_move(g->hero_id, 0, 8);
             }
         } else if (IsKeyPressed(KEY_UP)) {
-            minfo("key up pressed");
+            //minfo("key up pressed");
             //hero_group->current = SPRITEGROUP_ANIM_WALK;
             //if (hero) {
             //    hero->y -= 1;
@@ -442,7 +442,7 @@ void libgame_handleplayerinput(gamestate* g) {
         }
 
         if (IsKeyPressed(KEY_PERIOD)) {
-            minfo("key period pressed");
+            //minfo("key period pressed");
             spritegroup_t* hero_group =
                 hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
             if (hero_group) {
@@ -456,7 +456,7 @@ void libgame_handleplayerinput(gamestate* g) {
 
 
 void libgame_handlecaminput(gamestate* g) {
-    //minfo("begin libgame_handlecaminput");
+    ////minfo("begin libgame_handlecaminput");
     if (g->controlmode == CONTROLMODE_CAMERA) {
         const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         const float zoom_incr = 1.00f;
@@ -493,7 +493,7 @@ bool libgame_windowshouldclose() {
 
 
 void libgame_initwindow() {
-    //minfo("begin libgame_initwindow");
+    ////minfo("begin libgame_initwindow");
     const char* title = DEFAULT_WINDOW_TITLE;
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
@@ -509,7 +509,7 @@ void libgame_initwindow() {
     SetWindowPosition(x, y);
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_Q);
-    minfo("end of libgame_initwindow");
+    //minfo("end of libgame_initwindow");
 }
 
 
@@ -957,7 +957,7 @@ void libgame_loadtextures(gamestate* g) {
 void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
     FILE* f = fopen(path, "r");
     if (!f) {
-        mprint("could not open file");
+        //mprint("could not open file");
         return;
     }
 
@@ -981,7 +981,7 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
 
 
 void libgame_unloadtexture(gamestate* g, int index) {
-    minfo("unloading texture");
+    //minfo("unloading texture");
     if (g->txinfo[index].texture.id > 0) {
         UnloadTexture(g->txinfo[index].texture);
     }
@@ -991,7 +991,7 @@ void libgame_unloadtexture(gamestate* g, int index) {
 
 
 void libgame_unloadtextures(gamestate* g) {
-    minfo("unloading textures");
+    //minfo("unloading textures");
     libgame_unloadtexture(g, TXHERO);
     libgame_unloadtexture(g, TXDIRT);
 }
@@ -1000,7 +1000,7 @@ void libgame_unloadtextures(gamestate* g) {
 
 
 void libgame_reloadtextures(gamestate* g) {
-    minfo("reloading textures");
+    //minfo("reloading textures");
     libgame_unloadtextures(g);
     libgame_loadtextures(g);
 }
@@ -1009,7 +1009,7 @@ void libgame_reloadtextures(gamestate* g) {
 
 
 void libgame_init() {
-    minfo("libgame_init");
+    //minfo("libgame_init");
     g = gamestateinitptr(windowwidth, windowheight, targetwidth, targetheight);
     libgame_initsharedsetup(g);
 }
@@ -1020,7 +1020,7 @@ void libgame_init() {
 const entityid libgame_createentity(gamestate* g, const char* name, int x, int y) {
     entity_t* e = entity_create(name);
     if (!e) {
-        merror("could not create entity");
+        //merror("could not create entity");
         return -1;
     }
     e->pos.x = x;
@@ -1060,7 +1060,7 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id) {
                                   g->txinfo[keys[i]].contexts,
                                   g->txinfo[keys[i]].num_frames);
         if (!s) {
-            merror("could not create sprite");
+            //merror("could not create sprite");
         }
         spritegroup_add(group, s);
     }
@@ -1109,7 +1109,7 @@ void libgame_createherospritegroup(gamestate* g) {
                                   g->txinfo[keys[i]].contexts,
                                   g->txinfo[keys[i]].num_frames);
         if (!s) {
-            merror("could not create sprite");
+            //merror("could not create sprite");
         }
         spritegroup_add(hero_group, s);
     }
@@ -1154,7 +1154,7 @@ void libgame_loadfont(gamestate* g) {
 
 
 void libgame_initdatastructures(gamestate* g) {
-    minfo("libgame_initdatastructures begin");
+    //minfo("libgame_initdatastructures begin");
     g->entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
     g->entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
 
@@ -1163,11 +1163,11 @@ void libgame_initdatastructures(gamestate* g) {
 
     g->dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
     if (!g->dungeonfloor) {
-        merror("could not create dungeonfloor");
+        //merror("could not create dungeonfloor");
         // we could use an 'emergency shutdown' in case an error causes us
         // to need to 'panic' and force game close properly
     }
-    minfo("libgame_initdatastructures end");
+    //minfo("libgame_initdatastructures end");
 }
 
 
@@ -1195,7 +1195,7 @@ void libgame_initsharedsetup(gamestate* g) {
         setdebugpaneltopleft(g);
 
     } else {
-        merror("libgame_initsharedsetup: gamestate is NULL");
+        //merror("libgame_initsharedsetup: gamestate is NULL");
     }
 }
 
@@ -1204,10 +1204,10 @@ void libgame_initsharedsetup(gamestate* g) {
 
 void libgame_initwithstate(gamestate* state) {
     if (state == NULL) {
-        merror("libgame_initwithstate: state is NULL");
+        //merror("libgame_initwithstate: state is NULL");
         return;
     }
-    minfo("libgame_initwithstate");
+    //minfo("libgame_initwithstate");
     g = state;
     libgame_initsharedsetup(g);
 }
@@ -1216,7 +1216,7 @@ void libgame_initwithstate(gamestate* state) {
 
 
 void libgame_closesavegamestate() {
-    minfo("libgame_closesavegamestate");
+    //minfo("libgame_closesavegamestate");
     libgame_closeshared(g);
 }
 
@@ -1224,7 +1224,7 @@ void libgame_closesavegamestate() {
 
 
 void libgame_close(gamestate* g) {
-    minfo("libgame_close");
+    //minfo("libgame_close");
     libgame_closeshared(g);
     gamestatefree(g);
 }
@@ -1237,10 +1237,10 @@ void libgame_closeshared(gamestate* g) {
     UnloadFont(g->font);
     libgame_unloadtextures(g);
 
-    minfo("unloading render texture");
+    //minfo("unloading render texture");
     UnloadRenderTexture(target);
 
-    minfo("closing window");
+    //minfo("closing window");
     CloseWindow();
 }
 
@@ -1271,12 +1271,12 @@ const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y) {
     if (e) {
         // check bounds
         if (e->pos.x + x < 0 || e->pos.x + x >= g->dungeonfloor->len) {
-            merror("out of bounds x");
+            //merror("out of bounds x");
             return false;
         }
 
         if (e->pos.y + y < 0 || e->pos.y + y >= g->dungeonfloor->wid) {
-            merror("out of bounds y");
+            //merror("out of bounds y");
             return false;
         }
 

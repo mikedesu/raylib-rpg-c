@@ -3,7 +3,7 @@
 dungeonfloor_t* create_dungeonfloor(int len, int wid, tiletype_t basetype) {
     dungeonfloor_t* d = (dungeonfloor_t*)malloc(sizeof(dungeonfloor_t));
     if (!d) {
-        merror("could not malloc dungeonfloor_t");
+        //merror("could not malloc dungeonfloor_t");
         return NULL;
     }
 
@@ -14,7 +14,7 @@ dungeonfloor_t* create_dungeonfloor(int len, int wid, tiletype_t basetype) {
     // and manage the dungeon by using coordinate address translation
     d->grid = (tile_t*)malloc(sizeof(tile_t) * len * wid);
     if (!d->grid) {
-        merror("could not malloc dungeonfloor grid tile*");
+        //merror("could not malloc dungeonfloor grid tile*");
         return NULL;
     }
 

@@ -13,7 +13,7 @@ gamestate* gamestateinitptr(const int windowwidth,
                             const int windowheight,
                             const int targetwidth,
                             const int targetheight) {
-    mprint("gamestateinitptr begin\n");
+    //mprint("gamestateinitptr begin\n");
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     if (g == NULL) {
         fprintf(stderr, "Failed to allocate memory for gamestate: %s\n", strerror(errno));
@@ -72,7 +72,7 @@ gamestate* gamestateinitptr(const int windowwidth,
 
     g->dungeonfloor = NULL;
 
-    mprint("gamestateinitptr end\n");
+    //mprint("gamestateinitptr end\n");
     return g;
 }
 
