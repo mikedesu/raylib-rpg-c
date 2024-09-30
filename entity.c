@@ -20,6 +20,7 @@ entity_t* entity_create(const char* n) {
         return NULL;
     }
     e->id = next_entity_id++;
+    e->type = ENTITY_NONE;
     entity_set_x(e, -1);
     entity_set_y(e, -1);
     entity_set_name(e, n);

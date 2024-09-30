@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entityid.h"
+#include "entitytype.h"
 #include <raylib.h>
 
 #define ENTITY_NAME_MAX 128
@@ -8,6 +9,7 @@
 typedef struct entity_t {
     char name[ENTITY_NAME_MAX];
     entityid id;
+    entitytype_t type;
     Vector2 pos;
 } entity_t;
 
