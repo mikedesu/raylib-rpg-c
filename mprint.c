@@ -1,13 +1,13 @@
-#include "mprint.h"
+//#include "mprint.h"
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+//#include <stdlib.h>
+//#include <string.h>
+//#include <time.h>
 
 
 
-void mprint(const char* timebuf, const char* format, ...) {
+void mprint(const char* format, ...) {
     va_list args;
     char buffer[1024];
     va_start(args, format);
@@ -17,7 +17,7 @@ void mprint(const char* timebuf, const char* format, ...) {
 }
 
 
-void merror(const char* timebuf, const char* format, ...) {
+void merror(const char* format, ...) {
     va_list args;
     char buffer[1024];
     //char datetimebuf[128];
@@ -28,14 +28,14 @@ void merror(const char* timebuf, const char* format, ...) {
     va_start(args, format);
     vsnprintf(buffer, sizeof(buffer), format, args);
     va_end(args);
-    fprintf(stderr, "☠️ \033[31;1mError\033[0m %s %s:%d: %s\n", timebuf, __FILE__, __LINE__, buffer);
+    fprintf(stderr, "☠️ \033[31;1mError\033[0m %s:%d: %s\n", __FILE__, __LINE__, buffer);
     //}
 }
 
 
 
 
-void minfo(const char* timebuf, const char* format, ...) {
+void minfo(const char* format, ...) {
     va_list args;
 
     char buffer[1024];
@@ -54,6 +54,6 @@ void minfo(const char* timebuf, const char* format, ...) {
 
     va_end(args);
 
-    fprintf(stdout, "📔 \033[34;1mInfo\033[0m %s %s:%d: %s\n", timebuf, __FILE__, __LINE__, buffer);
+    fprintf(stdout, "📔 \033[34;1mInfo\033[0m %s:%d: %s\n", __FILE__, __LINE__, buffer);
     //}
 }
