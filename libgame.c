@@ -212,7 +212,23 @@ void libgame_handleinput(gamestate* g) {
         // lets place a torch where the player is standing
         entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
         if (hero) {
-            libgame_createitembytype(g, ITEM_TORCH, hero->pos);
+
+            // check to see if there are any items at that location
+            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, hero->pos);
+            if (t) {
+                for (int i = 0; i < vectorentityid_capacity(&t->entityids);
+                     i++) {
+                    entityid id = vectorentityid_get(&t->entityids, i);
+                    entity_t* entity =
+                        hashtable_entityid_entity_get(g->entities, id);
+                    if (entity->type == ENTITY_ITEM &&
+                        entity->itemtype == ITEM_TORCH) {
+                        minfo("torch already exists at this location");
+                    } else {
+                        libgame_createitembytype(g, ITEM_TORCH, hero->pos);
+                    }
+                }
+            }
         }
     }
 
