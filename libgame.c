@@ -137,6 +137,7 @@ const entityid libgame_createtorchentity(gamestate* g);
 const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos);
 void libgame_drawentity(gamestate* g, entityid id);
+void libgame_entity_anim_incr(entityid id);
 
 
 
@@ -187,6 +188,17 @@ void libgame_handlereloadtextures(gamestate* g) {
 
 
 
+void libgame_entity_anim_incr(entityid id) {
+    spritegroup_t* group =
+        hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (group) {
+        spritegroup_incr(group);
+    }
+}
+
+
+
+
 void libgame_handleinput(gamestate* g) {
     if (IsKeyPressed(KEY_SPACE)) {
         //minfo("key space pressed");
@@ -200,9 +212,11 @@ void libgame_handleinput(gamestate* g) {
     if (IsKeyPressed(KEY_A)) {
         //minfo("key a pressed");
         // increment the 'current' of the hero group
-        spritegroup_t* hero_group =
-            hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-        spritegroup_incr(hero_group);
+        //spritegroup_t* hero_group =
+        //    hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+        //spritegroup_incr(hero_group);
+
+        libgame_entity_anim_incr(g->hero_id);
     }
 
 
