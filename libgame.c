@@ -62,37 +62,29 @@ int windowheight = DEFAULT_WINDOW_HEIGHT;
 //------------------------------------------------------------------
 // function declarations
 //------------------------------------------------------------------
-
-
-
-
 bool libgame_windowshouldclose();
 gamestate* libgame_getgamestate();
 void libgame_initwindow();
 void libgame_closewindow();
 void libgame_init();
-
 bool libgame_external_check_reload();
 
-
+const bool libgame_entity_move(gamestate* g, entityid id, int x, int y);
+const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
+const entityid libgame_createentity(gamestate* g, const char* name, entitytype_t type, Vector2 pos);
+const entityid libgame_createtorchentity(gamestate* g);
 
 void libgame_updatedebugpanelbuffer(gamestate* g);
 void libgame_updategamestate(gamestate* g);
 void libgame_close(gamestate* g);
 void libgame_drawframe(gamestate* g);
 void libgame_handleinput(gamestate* g);
-void libgame_loadtexture(gamestate* g,
-                         int index,
-                         int contexts,
-                         int frames,
-                         bool dodither,
-                         const char* path);
+void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path);
 void libgame_unloadtexture(gamestate* g, int index);
 void libgame_unloadtextures(gamestate* g);
 void libgame_loadtextures(gamestate* g);
 void libgame_loadtexturesfromfile(gamestate* g, const char* path);
-//void libgame_handlereloadtextures(gamestate* g);
-void libgame_reloadtextures(gamestate* g);
+//void libgame_reloadtextures(gamestate* g);
 void libgame_closeshared(gamestate* g);
 void libgame_closesavegamestate();
 void libgame_drawdebugpanel(gamestate* g);
@@ -110,7 +102,7 @@ void libgame_handlecaminput(gamestate* g);
 void libgame_handledebugpanelswitch(gamestate* g);
 void libgame_handlemodeswitch(gamestate* g);
 void libgame_handlefade(gamestate* g);
-void libgame_createherospritegroup(gamestate* g);
+void libgame_createherospritegroup(gamestate* g, entityid id);
 void libgame_createheroentity(gamestate* g);
 void libgame_drawherogroup(gamestate* g);
 void libgame_drawherogrouphitbox(gamestate* g);
@@ -128,18 +120,11 @@ void libgame_updatesmoothmove(gamestate* g);
 void libgame_docameralockon(gamestate* g);
 void libgame_do_one_camera_rotation(gamestate* g);
 void libgame_update_spritegroup_move(entityid id, int x, int y);
-
-
-const bool libgame_entity_move(gamestate* g, entityid id, int x, int y);
-const entityid
-//libgame_createentity(gamestate* g, const char* name, int x, int y);
-libgame_createentity(gamestate* g, const char* name, Vector2 pos);
-const entityid libgame_createtorchentity(gamestate* g);
-const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos);
 void libgame_drawentity(gamestate* g, entityid id);
 void libgame_entity_anim_incr(entityid id);
 void libgame_calc_debugpanel_size(gamestate* g);
+void libgame_createhero(gamestate* g);
 
 
 
@@ -181,18 +166,8 @@ void libgame_handlefade(gamestate* g) {
 
 
 
-//void libgame_handlereloadtextures(gamestate* g) {
-//    if (IsKeyPressed(KEY_R)) {
-//        libgame_reloadtextures(g);
-//    }
-//}
-
-
-
-
 void libgame_entity_anim_incr(entityid id) {
-    spritegroup_t* group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (group) {
         spritegroup_incr(group);
     }
@@ -232,13 +207,10 @@ void libgame_handleinput(gamestate* g) {
             // check to see if there are any items at that location
             tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, hero->pos);
             if (t) {
-                for (int i = 0; i < vectorentityid_capacity(&t->entityids);
-                     i++) {
+                for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
                     entityid id = vectorentityid_get(&t->entityids, i);
-                    entity_t* entity =
-                        hashtable_entityid_entity_get(g->entities, id);
-                    if (entity->type == ENTITY_ITEM &&
-                        entity->itemtype == ITEM_TORCH) {
+                    entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+                    if (entity->type == ENTITY_ITEM && entity->itemtype == ITEM_TORCH) {
                         minfo("torch already exists at this location");
                     } else {
                         libgame_createitembytype(g, ITEM_TORCH, hero->pos);
@@ -249,7 +221,6 @@ void libgame_handleinput(gamestate* g) {
     }
 
 
-    //libgame_handlereloadtextures(g);
     libgame_handlemodeswitch(g);
     libgame_handledebugpanelswitch(g);
     libgame_handleplayerinput(g);
@@ -289,8 +260,7 @@ void libgame_handledebugpanelswitch(gamestate* g) {
 
 
 void libgame_updateherospritegroup_right(gamestate* g) {
-    spritegroup_t* hero_group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
         int ctx = SG_CTX_R_D;
         switch (hero_group->sprites[hero_group->current]->currentcontext) {
@@ -321,8 +291,7 @@ void libgame_updateherospritegroup_right(gamestate* g) {
 
 
 void libgame_updateherospritegroup_left(gamestate* g) {
-    spritegroup_t* hero_group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
         int ctx = SG_CTX_L_D;
         switch (hero_group->sprites[hero_group->current]->currentcontext) {
@@ -353,8 +322,7 @@ void libgame_updateherospritegroup_left(gamestate* g) {
 
 
 void libgame_updateherospritegroup_up(gamestate* g) {
-    spritegroup_t* hero_group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
         int ctx = SG_CTX_R_U;
         switch (hero_group->sprites[hero_group->current]->currentcontext) {
@@ -385,8 +353,7 @@ void libgame_updateherospritegroup_up(gamestate* g) {
 
 
 void libgame_updateherospritegroup_down(gamestate* g) {
-    spritegroup_t* hero_group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
         int ctx = SG_CTX_R_D;
         switch (hero_group->sprites[hero_group->current]->currentcontext) {
@@ -479,8 +446,7 @@ void libgame_handleplayerinput(gamestate* g) {
 
         if (IsKeyPressed(KEY_PERIOD)) {
             //minfo("key period pressed");
-            spritegroup_t* hero_group =
-                hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+            spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
             if (hero_group) {
                 hero_group->current = 0; //standing/idle
             }
@@ -494,8 +460,7 @@ void libgame_handleplayerinput(gamestate* g) {
 void libgame_handlecaminput(gamestate* g) {
     ////minfo("begin libgame_handlecaminput");
     if (g->controlmode == CONTROLMODE_CAMERA) {
-        const bool shift =
-            IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+        const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         const float zoom_incr = 1.00f;
         const float cam_move_incr = 4;
 
@@ -600,8 +565,7 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
 
 
 void libgame_updatesmoothmove(gamestate* g) {
-    spritegroup_t* hero_group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
 
     if (hero_group) {
         float move_unit = 1.0f;
@@ -623,8 +587,7 @@ void libgame_updatesmoothmove(gamestate* g) {
         }
 
         if (hero_group->move.x == 0.0f && hero_group->move.y == 0.0f) {
-            entity_t* hero =
-                hashtable_entityid_entity_get(g->entities, g->hero_id);
+            entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
             if (hero) {
                 hero_group->dest.x = hero->pos.x * 8 - 12;
                 hero_group->dest.y = hero->pos.y * 8 - 12;
@@ -637,8 +600,7 @@ void libgame_updatesmoothmove(gamestate* g) {
 
 
 void libgame_docameralockon(gamestate* g) {
-    spritegroup_t* hero_group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (g->cam_lockon) {
         g->cam2d.target = (Vector2){hero_group->dest.x, hero_group->dest.y};
     }
@@ -699,8 +661,7 @@ void libgame_drawframe(gamestate* g) {
     }
 
     EndTextureMode();
-    DrawTexturePro(
-        target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+    DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     libgame_drawdebugpanel(g);
     libgame_drawframeend(g);
 }
@@ -721,10 +682,8 @@ inline void libgame_drawdebugpanel(gamestate* g) {
         //const int fontsize = 14, spacing = 1, xy = 10, wh = 20;
         const int fontsize = 14, spacing = 1, xy = 10, wh = 20;
         const Vector2 p = {g->debugpanel.x, g->debugpanel.y}, o = {0, 0};
-        const Rectangle box = {g->debugpanel.x - xy,
-                               g->debugpanel.y - xy,
-                               g->debugpanel.w + wh,
-                               g->debugpanel.h + wh};
+        const Rectangle box = {
+            g->debugpanel.x - xy, g->debugpanel.y - xy, g->debugpanel.w + wh, g->debugpanel.h + wh};
         DrawRectanglePro(box, o, 0.0f, (Color){0x33, 0x33, 0x33, 128});
         DrawTextEx(g->font, g->debugpanel.buffer, p, fontsize, spacing, WHITE);
     }
@@ -735,8 +694,7 @@ inline void libgame_drawdebugpanel(gamestate* g) {
 
 void libgame_drawgrid(gamestate* g) {
     Color c = GREEN;
-    const int w = g->txinfo[TXDIRT].texture.width,
-              h = g->txinfo[TXDIRT].texture.height;
+    const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
     const int len = g->dungeonfloor->len;
     const int wid = g->dungeonfloor->wid;
     for (int i = 0; i <= len; i++) {
@@ -751,8 +709,7 @@ void libgame_drawgrid(gamestate* g) {
 
 
 void libgame_drawdungeonfloor(gamestate* g) {
-    const int w = g->txinfo[TXDIRT].texture.width,
-              h = g->txinfo[TXDIRT].texture.height;
+    const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
     //const int w = 16, h = 16;
     Rectangle tile_src = {0, 0, w, h}, tile_dest = {0, 0, w, h};
     Color c = WHITE;
@@ -762,12 +719,7 @@ void libgame_drawdungeonfloor(gamestate* g) {
         for (int j = 0; j < g->dungeonfloor->wid; j++) {
             tile_dest.x = i * w;
             tile_dest.y = j * h;
-            DrawTexturePro(g->txinfo[TXDIRT].texture,
-                           tile_src,
-                           tile_dest,
-                           origin,
-                           rotation,
-                           c);
+            DrawTexturePro(g->txinfo[TXDIRT].texture, tile_src, tile_dest, origin, rotation, c);
         }
     }
 }
@@ -776,15 +728,13 @@ void libgame_drawdungeonfloor(gamestate* g) {
 
 
 void libgame_drawherogrouphitbox(gamestate* g) {
-    spritegroup_t* sg =
-        hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (sg && g->debugpanelon) {
         Color c = (Color){51, 51, 51, 255};
-        Vector2 v[4] = {
-            {sg->dest.x, sg->dest.y},
-            {sg->dest.x + sg->dest.width, sg->dest.y},
-            {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height},
-            {sg->dest.x, sg->dest.y + sg->dest.height}};
+        Vector2 v[4] = {{sg->dest.x, sg->dest.y},
+                        {sg->dest.x + sg->dest.width, sg->dest.y},
+                        {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height},
+                        {sg->dest.x, sg->dest.y + sg->dest.height}};
         DrawLineV(v[0], v[1], c);
         DrawLineV(v[1], v[2], c);
         DrawLineV(v[2], v[3], c);
@@ -796,8 +746,7 @@ void libgame_drawherogrouphitbox(gamestate* g) {
 
 
 void libgame_drawherogroup(gamestate* g) {
-    spritegroup_t* hero_group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
     if (hero_group) {
         // draw hero
         DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
@@ -826,8 +775,7 @@ void libgame_drawherogroup(gamestate* g) {
 // we are going to have to temporarily save the torchid
 // as we are not enumerating thru the map yet
 void libgame_drawtorchgroup(gamestate* g) {
-    spritegroup_t* group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
     if (group) {
         DrawTexturePro(*group->sprites[group->current]->texture,
                        group->sprites[group->current]->src,
@@ -846,15 +794,13 @@ void libgame_drawtorchgroup(gamestate* g) {
 
 
 void libgame_drawtorchgroup_hitbox(gamestate* g) {
-    spritegroup_t* sg =
-        hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
     if (sg && g->debugpanelon) {
         Color c = (Color){51, 51, 51, 255};
-        Vector2 v[4] = {
-            {sg->dest.x, sg->dest.y},
-            {sg->dest.x + sg->dest.width, sg->dest.y},
-            {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height},
-            {sg->dest.x, sg->dest.y + sg->dest.height}};
+        Vector2 v[4] = {{sg->dest.x, sg->dest.y},
+                        {sg->dest.x + sg->dest.width, sg->dest.y},
+                        {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height},
+                        {sg->dest.x, sg->dest.y + sg->dest.height}};
         DrawLineV(v[0], v[1], c);
         DrawLineV(v[1], v[2], c);
         DrawLineV(v[2], v[3], c);
@@ -867,8 +813,7 @@ void libgame_drawtorchgroup_hitbox(gamestate* g) {
 
 void libgame_drawentity(gamestate* g, entityid id) {
     if (g) {
-        spritegroup_t* group =
-            hashtable_entityid_spritegroup_get(g->spritegroups, id);
+        spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
         if (group) {
             DrawTexturePro(*group->sprites[group->current]->texture,
                            group->sprites[group->current]->src,
@@ -883,12 +828,10 @@ void libgame_drawentity(gamestate* g, entityid id) {
 
             if (g->debugpanelon) {
                 Color c = (Color){51, 51, 51, 255};
-                Vector2 v[4] = {
-                    {group->dest.x, group->dest.y},
-                    {group->dest.x + group->dest.width, group->dest.y},
-                    {group->dest.x + group->dest.width,
-                     group->dest.y + group->dest.height},
-                    {group->dest.x, group->dest.y + group->dest.height}};
+                Vector2 v[4] = {{group->dest.x, group->dest.y},
+                                {group->dest.x + group->dest.width, group->dest.y},
+                                {group->dest.x + group->dest.width, group->dest.y + group->dest.height},
+                                {group->dest.x, group->dest.y + group->dest.height}};
                 DrawLineV(v[0], v[1], c);
                 DrawLineV(v[1], v[2], c);
                 DrawLineV(v[2], v[3], c);
@@ -946,10 +889,8 @@ void libgame_drawgameplayscene(gamestate* g) {
             // draw torches etc first
             for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
                 entityid id = vectorentityid_get(&t->entityids, k);
-                entity_t* entity =
-                    hashtable_entityid_entity_get(g->entities, id);
-                if (entity->type == ENTITY_ITEM &&
-                    entity->itemtype == ITEM_TORCH) {
+                entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+                if (entity->type == ENTITY_ITEM && entity->itemtype == ITEM_TORCH) {
                     libgame_drawentity(g, id);
                 }
             }
@@ -957,8 +898,7 @@ void libgame_drawgameplayscene(gamestate* g) {
             // draw players and other entities
             for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
                 entityid id = vectorentityid_get(&t->entityids, k);
-                entity_t* entity =
-                    hashtable_entityid_entity_get(g->entities, id);
+                entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
                 if (entity->type == ENTITY_PLAYER) {
                     libgame_drawentity(g, id);
                 }
@@ -1050,15 +990,13 @@ void libgame_drawcompanyscene(gamestate* g) {
         shufflestrinplace(b2);
     }
 
-    const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f,
-                         targetheight / 2.0f - measure.y / 2.0f};
+    const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f, targetheight / 2.0f - measure.y / 2.0f};
     ClearBackground(bgc);
     DrawTextEx(g->font, b, pos, fontsize, 1, fgc);
     DrawTextEx(g->font, b2, pos, fontsize, 1, fgc);
 
     const Vector2 measure3 = MeasureTextEx(g->font, b3, 20, 1);
-    const Vector2 pp = {targetwidth / 2.0f - measure3.x / 2.0f,
-                        targetheight / 2.0f + measure.y / 2.0f + 20};
+    const Vector2 pp = {targetwidth / 2.0f - measure3.x / 2.0f, targetheight / 2.0f + measure.y / 2.0f + 20};
 
     DrawTextEx(g->font, b3, pp, 20, 1, fgc);
     libgame_handlefade(g);
@@ -1067,12 +1005,7 @@ void libgame_drawcompanyscene(gamestate* g) {
 
 
 
-void libgame_loadtexture(gamestate* g,
-                         int index,
-                         int contexts,
-                         int frames,
-                         bool dodither,
-                         const char* path) {
+void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path) {
     if (dodither) {
         Image img = LoadImage(path);
         ImageDither(&img, 4, 4, 4, 4);
@@ -1113,13 +1046,7 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
         if (line[0] == '#') {
             continue;
         }
-        sscanf(line,
-               "%d %d %d %d %s",
-               &index,
-               &contexts,
-               &frames,
-               &dodither,
-               txpath);
+        sscanf(line, "%d %d %d %d %s", &index, &contexts, &frames, &dodither, txpath);
         libgame_loadtexture(g, index, contexts, frames, dodither, txpath);
         bzero(line, 256);
         bzero(txpath, 256);
@@ -1149,11 +1076,10 @@ void libgame_unloadtextures(gamestate* g) {
 
 
 
-void libgame_reloadtextures(gamestate* g) {
-    //minfo("reloading textures");
-    libgame_unloadtextures(g);
-    libgame_loadtextures(g);
-}
+//void libgame_reloadtextures(gamestate* g) {
+//    libgame_unloadtextures(g);
+//    libgame_loadtextures(g);
+//}
 
 
 
@@ -1167,8 +1093,7 @@ void libgame_init() {
 
 
 
-const entityid
-libgame_createentity(gamestate* g, const char* name, Vector2 pos) {
+const entityid libgame_createentity(gamestate* g, const char* name, entitytype_t type, Vector2 pos) {
     entity_t* e = entity_create(name);
     if (!e) {
         //merror("could not create entity");
@@ -1176,6 +1101,7 @@ libgame_createentity(gamestate* g, const char* name, Vector2 pos) {
     }
     e->pos.x = pos.x;
     e->pos.y = pos.y;
+    e->type = type;
     vectorentityid_pushback_unique(&g->entityids, e->id);
 
     tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
@@ -1189,11 +1115,9 @@ libgame_createentity(gamestate* g, const char* name, Vector2 pos) {
 
 
 void libgame_createheroentity(gamestate* g) {
-    //entityid heroid = libgame_createentity(g, "hero", 0, 1);
-    entityid heroid = libgame_createentity(g, "hero", (Vector2){0, 1});
+    entityid heroid = libgame_createentity(g, "hero", ENTITY_PLAYER, (Vector2){0, 1});
     if (heroid != -1) {
         g->hero_id = heroid;
-
         entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
         if (hero) {
             minfo("hero entity created");
@@ -1209,8 +1133,7 @@ void libgame_createheroentity(gamestate* g) {
 
 
 const entityid libgame_createtorchentity(gamestate* g) {
-    //entityid torch_id = libgame_createentity(g, "torch", 0, 0);
-    entityid torch_id = libgame_createentity(g, "torch", (Vector2){0, 0});
+    entityid torch_id = libgame_createentity(g, "torch", ENTITY_ITEM, (Vector2){0, 0});
     return torch_id;
 }
 
@@ -1225,9 +1148,8 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id) {
         hashtable_entityid_entity_get(g->entities, id);
     int keys[1] = {TXTORCH};
     for (int i = 0; i < 1; i++) {
-        sprite* s = sprite_create(&g->txinfo[keys[i]].texture,
-                                  g->txinfo[keys[i]].contexts,
-                                  g->txinfo[keys[i]].num_frames);
+        sprite* s = sprite_create(
+            &g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
         if (!s) {
             //merror("could not create sprite");
         }
@@ -1257,10 +1179,9 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id) {
 // the hero has a LOT of spritegroups
 // not every entity will have this many sprites
 // lets try using this as a basis to get a sprite in there
-void libgame_createherospritegroup(gamestate* g) {
+void libgame_createherospritegroup(gamestate* g, entityid id) {
     spritegroup_t* hero_group = spritegroup_create(20);
-    entity_t* hero_entity =
-        hashtable_entityid_entity_get(g->entities, g->hero_id);
+    entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
 
     int keys[12] = {TXHERO,
                     TXHEROSHADOW,
@@ -1276,9 +1197,8 @@ void libgame_createherospritegroup(gamestate* g) {
                     TXHEROSOULDIESHADOW};
 
     for (int i = 0; i < 12; i++) {
-        sprite* s = sprite_create(&g->txinfo[keys[i]].texture,
-                                  g->txinfo[keys[i]].contexts,
-                                  g->txinfo[keys[i]].num_frames);
+        sprite* s = sprite_create(
+            &g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
         if (!s) {
             //merror("could not create sprite");
         }
@@ -1292,15 +1212,14 @@ void libgame_createherospritegroup(gamestate* g) {
     const float offset_x = -12;
     const float offset_y = -12;
     // this is gross we can probably do this better
-    const float x = hero_entity->pos.x * 8;
-    const float y = hero_entity->pos.y * 8;
+    const float x = hero->pos.x * 8;
+    const float y = hero->pos.y * 8;
     Rectangle dest = {x + offset_x, y + offset_y, w, h};
     hero_group->current = 0;
     hero_group->dest = dest;
 
     // add the spritegroup to the hashtable
-    hashtable_entityid_spritegroup_insert(
-        g->spritegroups, g->hero_id, hero_group);
+    hashtable_entityid_spritegroup_insert(g->spritegroups, g->hero_id, hero_group);
 }
 
 
@@ -1308,8 +1227,7 @@ void libgame_createherospritegroup(gamestate* g) {
 
 void libgame_loadtargettexture(gamestate* g) {
     target = LoadRenderTexture(targetwidth, targetheight);
-    target_src =
-        (Rectangle){0, 0, target.texture.width, -target.texture.height};
+    target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
     target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 }
@@ -1329,11 +1247,9 @@ void libgame_loadfont(gamestate* g) {
 void libgame_initdatastructures(gamestate* g) {
     //minfo("libgame_initdatastructures begin");
     g->entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
-    g->entities = hashtable_entityid_entity_create(
-        DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
+    g->entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
 
-    g->spritegroups = hashtable_entityid_spritegroup_create(
-        DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
+    g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
 
     g->dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
     if (!g->dungeonfloor) {
@@ -1352,7 +1268,7 @@ void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos) {
     minfo("libgame_createitembytype begin");
     switch (type) {
     case ITEM_TORCH: {
-        entityid torch_id = libgame_createentity(g, "torch", pos);
+        entityid torch_id = libgame_createentity(g, "torch", ENTITY_ITEM, pos);
         entity_t* torch = hashtable_entityid_entity_get(g->entities, torch_id);
         if (torch) {
             minfo("torch entity created");
@@ -1372,6 +1288,23 @@ void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos) {
 
 
 
+void libgame_createhero(gamestate* g) {
+    entityid id = libgame_createentity(g, "hero", ENTITY_PLAYER, (Vector2){0, 1});
+    if (id != -1) {
+        g->hero_id = id;
+        entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
+        if (hero) {
+            minfo("hero entity created");
+            hero->type = ENTITY_PLAYER;
+
+            libgame_createherospritegroup(g, id);
+        }
+    }
+}
+
+
+
+
 void libgame_initsharedsetup(gamestate* g) {
     if (g) {
         libgame_initwindow();
@@ -1381,19 +1314,17 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_initdatastructures(g);
 
         // this is just a mock-up for now
-        libgame_createheroentity(g);
-        libgame_createherospritegroup(g);
+        libgame_createhero(g);
+
         // eventually we will generalize this
         // to figure out how,
         // we will introduce a torch
-        //g->torch_id = libgame_createtorchentity(g);
-        //libgame_createtorchspritegroup(g, g->torch_id);
 
-        libgame_createitembytype(g, ITEM_TORCH, (Vector2){0, 0});
-        libgame_createitembytype(g, ITEM_TORCH, (Vector2){1, 1});
-        libgame_createitembytype(g, ITEM_TORCH, (Vector2){2, 2});
-        libgame_createitembytype(g, ITEM_TORCH, (Vector2){3, 3});
-        libgame_createitembytype(g, ITEM_TORCH, (Vector2){4, 4});
+        //libgame_createitembytype(g, ITEM_TORCH, (Vector2){0, 0});
+        //libgame_createitembytype(g, ITEM_TORCH, (Vector2){1, 1});
+        //libgame_createitembytype(g, ITEM_TORCH, (Vector2){2, 2});
+        //libgame_createitembytype(g, ITEM_TORCH, (Vector2){3, 3});
+        //libgame_createitembytype(g, ITEM_TORCH, (Vector2){4, 4});
 
 
 
