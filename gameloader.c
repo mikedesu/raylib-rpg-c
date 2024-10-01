@@ -1,6 +1,6 @@
 #include "gameloader.h"
 #include "gamestate.h"
-//#include "mprint.h"
+#include "mprint.h"
 #include "symaddrpair.h"
 
 
@@ -52,6 +52,7 @@ void (*mylibgamehandleinput)(gamestate*) = NULL;
 void (*mylibgameinitwithstate)(gamestate*) = NULL;
 void (*mylibgameupdategamestate)(gamestate*) = NULL;
 
+bool (*mylibgame_external_check_reload)() = NULL;
 
 
 
@@ -110,6 +111,7 @@ void loadsymbols() {
     }
 
     char* sym = NULL;
+
     // gamestate return
     sym = "libgame_getgamestate";
     //minfo(sym);
@@ -122,6 +124,11 @@ void loadsymbols() {
     mywindowshouldclose = dlsym(handle, sym);
     checksymbol(mywindowshouldclose, sym);
 
+    // boolean return
+    sym = "libgame_external_check_reload";
+    mylibgame_external_check_reload = dlsym(handle, sym);
+    checksymbol(mylibgame_external_check_reload, sym);
+
     //minfo("end loadsymbols");
 }
 
@@ -129,10 +136,13 @@ void loadsymbols() {
 
 
 void autoreload() {
+    minfo("autoreload");
+    //if (g->currenttime % 2 == 0) {
+
     time_t result = getlastwritetime(libname);
 
     if (result > last_write_time) {
-        //minfo("doing autoreload");
+        minfo("libgame.so updated, hot reloading...");
         last_write_time = result;
         while (access(lockfile, F_OK) == 0) {
             //minfo("Library is locked\n");
@@ -153,6 +163,7 @@ void autoreload() {
         mylibgameinitwithstate(g);
         //minfo("re-entering gameloop");
     }
+    //}
 }
 
 
@@ -172,7 +183,11 @@ void gamerun() {
         mylibgameupdategamestate(g);
         mylibgamedrawframe(g);
         mylibgamehandleinput(g);
-        autoreload();
+
+        if (mylibgame_external_check_reload()) {
+            autoreload();
+        }
+        //autoreload();
     }
     //minfo("closing libgame");
     mylibgameclose(g);

@@ -72,6 +72,7 @@ void libgame_initwindow();
 void libgame_closewindow();
 void libgame_init();
 
+bool libgame_external_check_reload();
 
 
 
@@ -90,7 +91,7 @@ void libgame_unloadtexture(gamestate* g, int index);
 void libgame_unloadtextures(gamestate* g);
 void libgame_loadtextures(gamestate* g);
 void libgame_loadtexturesfromfile(gamestate* g, const char* path);
-void libgame_handlereloadtextures(gamestate* g);
+//void libgame_handlereloadtextures(gamestate* g);
 void libgame_reloadtextures(gamestate* g);
 void libgame_closeshared(gamestate* g);
 void libgame_closesavegamestate();
@@ -138,6 +139,7 @@ const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos);
 void libgame_drawentity(gamestate* g, entityid id);
 void libgame_entity_anim_incr(entityid id);
+void libgame_calc_debugpanel_size(gamestate* g);
 
 
 
@@ -179,11 +181,11 @@ void libgame_handlefade(gamestate* g) {
 
 
 
-void libgame_handlereloadtextures(gamestate* g) {
-    if (IsKeyPressed(KEY_R)) {
-        libgame_reloadtextures(g);
-    }
-}
+//void libgame_handlereloadtextures(gamestate* g) {
+//    if (IsKeyPressed(KEY_R)) {
+//        libgame_reloadtextures(g);
+//    }
+//}
 
 
 
@@ -247,7 +249,7 @@ void libgame_handleinput(gamestate* g) {
     }
 
 
-    libgame_handlereloadtextures(g);
+    //libgame_handlereloadtextures(g);
     libgame_handlemodeswitch(g);
     libgame_handledebugpanelswitch(g);
     libgame_handleplayerinput(g);
@@ -705,30 +707,25 @@ void libgame_drawframe(gamestate* g) {
 
 
 
+void libgame_calc_debugpanel_size(gamestate* g) {
+    const int sz = 14, sp = 1;
+    const Vector2 m = MeasureTextEx(g->font, g->debugpanel.buffer, sz, sp);
+    g->debugpanel.w = m.x, g->debugpanel.h = m.y;
+}
+
+
+
 
 inline void libgame_drawdebugpanel(gamestate* g) {
-    if (g->debugpanelon) {
+    if (g && g->debugpanelon) {
+        //const int fontsize = 14, spacing = 1, xy = 10, wh = 20;
         const int fontsize = 14, spacing = 1, xy = 10, wh = 20;
-        // we can try to avoid having to compute these values
-        // on every draw
-        // we would just attach a couple Vector2s to the debug panel
-        const Vector2 p = {g->debugpanel.x, g->debugpanel.y},
-                      m = MeasureTextEx(
-                          g->font, g->debugpanel.buffer, fontsize, spacing),
-                      o = {0, 0};
-        const Rectangle box = {p.x - xy, p.y - xy, m.x + wh, m.y + wh};
-        const Color c = {0x33, 0x33, 0x33, 128};
-        // update the debug panel width and height
-        // we store the root measurement because
-        // the box is drawn relative to
-        // the size of the text
-
-        // technically, we dont need to update these values on every frame
-        // we could calculate these after the first text gets copied into
-        // the buffer, so that we dont have to calculate and copy these
-        // values over every time
-        g->debugpanel.w = m.x, g->debugpanel.h = m.y;
-        DrawRectanglePro(box, o, 0.0f, c);
+        const Vector2 p = {g->debugpanel.x, g->debugpanel.y}, o = {0, 0};
+        const Rectangle box = {g->debugpanel.x - xy,
+                               g->debugpanel.y - xy,
+                               g->debugpanel.w + wh,
+                               g->debugpanel.h + wh};
+        DrawRectanglePro(box, o, 0.0f, (Color){0x33, 0x33, 0x33, 128});
         DrawTextEx(g->font, g->debugpanel.buffer, p, fontsize, spacing, WHITE);
     }
 }
@@ -1404,8 +1401,12 @@ void libgame_initsharedsetup(gamestate* g) {
         //setdebugpanelcenter(g);
 
         //setdebugpaneltopleft(g);
+
+        // these dont work right until the text buffer of the debugpanel is filled
         //setdebugpaneltopright(g);
         //setdebugpanelbottomright(g);
+        libgame_updatedebugpanelbuffer(g);
+        libgame_calc_debugpanel_size(g);
         setdebugpanelbottomleft(g);
 
 
@@ -1515,4 +1516,10 @@ const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y) {
         return true;
     }
     return false;
+}
+
+
+
+bool libgame_external_check_reload() {
+    return IsKeyPressed(KEY_R);
 }
