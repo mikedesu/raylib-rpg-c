@@ -16,7 +16,9 @@ gamestate* gamestateinitptr(const int windowwidth,
     //mprint("gamestateinitptr begin\n");
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     if (g == NULL) {
-        fprintf(stderr, "Failed to allocate memory for gamestate: %s\n", strerror(errno));
+        fprintf(stderr,
+                "Failed to allocate memory for gamestate: %s\n",
+                strerror(errno));
         return NULL;
     }
 
@@ -64,6 +66,8 @@ gamestate* gamestateinitptr(const int windowwidth,
     g->fadealpha = 0.0f;
     g->fadestate = FADESTATENONE;
 
+    g->entityids = vectorentityid_new();
+
     g->entities = hashtable_entityid_entity_create(1000);
     g->spritegroups = NULL;
 
@@ -86,7 +90,10 @@ void gamestateupdatecurrenttime(gamestate* g) {
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&(g->currenttime));
     bzero(g->currenttimebuf, 64);
-    strftime(g->currenttimebuf, 64, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+    strftime(g->currenttimebuf,
+             64,
+             "Current Time: %Y-%m-%d %H:%M:%S",
+             g->currenttimetm);
 }
 
 

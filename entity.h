@@ -2,6 +2,7 @@
 
 #include "entityid.h"
 #include "entitytype.h"
+#include "itemtype.h"
 #include <raylib.h>
 
 #define ENTITY_NAME_MAX 128
@@ -10,6 +11,7 @@ typedef struct entity_t {
     char name[ENTITY_NAME_MAX];
     entityid id;
     entitytype_t type;
+    itemtype_t itemtype;
     Vector2 pos;
 } entity_t;
 

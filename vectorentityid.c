@@ -1,10 +1,11 @@
 #include "entityid.h"
+#include "mprint.h"
 #include "vectorentityid.h"
 
 #include <stdlib.h>
 
 vectorentityid_t vectorentityid_new() {
-    return vectorentityid_create(4);
+    return vectorentityid_create(8);
 }
 
 vectorentityid_t vectorentityid_create(size_t size) {
@@ -37,9 +38,15 @@ void vectorentityid_pushback(vectorentityid_t* v, int value) {
 }
 
 int vectorentityid_get(vectorentityid_t* v, size_t index) {
-    if (index < v->size) {
-        return v->data[index];
+    //minfo("vectorentityid_get");
+    if (v) {
+        if (index < v->size) {
+            return v->data[index];
+        }
+        merror("vectorentityid_get: index out of bounds");
+        return 0;
     }
+    merror("vectorentityid_get: v is NULL");
     return 0;
 }
 

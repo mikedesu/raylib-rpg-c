@@ -1,6 +1,6 @@
 #include "gameloader.h"
 #include "gamestate.h"
-#include "mprint.h"
+//#include "mprint.h"
 #include "symaddrpair.h"
 
 
@@ -169,9 +169,9 @@ void gamerun() {
 
     //minfo("entering gameloop");
     while (!mywindowshouldclose()) {
+        mylibgameupdategamestate(g);
         mylibgamedrawframe(g);
         mylibgamehandleinput(g);
-        mylibgameupdategamestate(g);
         autoreload();
     }
     //minfo("closing libgame");

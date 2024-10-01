@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "mycolor.h"
+#include <raylib.h>
 
 //#define DEBUGPANELBUFSIZE 256
 #define DEBUGPANELBUFSIZE 496
@@ -12,8 +12,10 @@ typedef struct debugpanel {
     int y;
     int w;
     int h;
-    //int fontsize;
-    //mycolor fgcolor;
-    //mycolor bgcolor;
+    Vector2 pos;
+    Color fg_color;
+    Color bg_color;
+    //Rectangle textbox;
+    Rectangle box;
     char buffer[DEBUGPANELBUFSIZE];
 } debugpanel_t;
