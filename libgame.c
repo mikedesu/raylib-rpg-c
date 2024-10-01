@@ -1401,8 +1401,16 @@ void libgame_initsharedsetup(gamestate* g) {
 
 
         // created but now we have to draw it
+        //setdebugpanelcenter(g);
 
-        setdebugpaneltopleft(g);
+        //setdebugpaneltopleft(g);
+        //setdebugpaneltopright(g);
+        //setdebugpanelbottomright(g);
+        setdebugpanelbottomleft(g);
+
+
+
+        //setdebugpanelbottomleft(g, g->display.targetheight);
         // if we update the measurements for the debug panel now,
         // we can avoid copying values over on every frame
 
