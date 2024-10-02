@@ -826,7 +826,8 @@ void libgame_drawgrid(gamestate* g) {
 
 
 void libgame_drawdungeonfloor(gamestate* g) {
-    const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
+    //const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
+    const int w = 8, h = 8;
     //const int w = 16, h = 16;
     Rectangle tile_src = {0, 0, w, h}, tile_dest = {0, 0, w, h};
     Color c = WHITE;
@@ -834,9 +835,29 @@ void libgame_drawdungeonfloor(gamestate* g) {
     Vector2 origin = {0, 0};
     for (int i = 0; i < g->dungeonfloor->len; i++) {
         for (int j = 0; j < g->dungeonfloor->wid; j++) {
+            // get the tile
+            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){i, j});
+            // check the tile type
             tile_dest.x = i * w;
             tile_dest.y = j * h;
-            DrawTexturePro(g->txinfo[TXDIRT].texture, tile_src, tile_dest, origin, rotation, c);
+
+            int key = -1;
+
+            switch (t->type) {
+
+            case TILETYPE_DIRT:
+                key = TXDIRT;
+                break;
+            case TILETYPE_STONE_00:
+                key = TX_TILE_STONE_00;
+                break;
+            default:
+                break;
+            }
+
+            if (key != -1) {
+                DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, origin, rotation, c);
+            }
         }
     }
 }
@@ -1356,7 +1377,8 @@ void libgame_initdatastructures(gamestate* g) {
 
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
 
-    g->dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
+    //g->dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
+    g->dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_STONE_00);
     if (!g->dungeonfloor) {
         //merror("could not create dungeonfloor");
         // we could use an 'emergency shutdown' in case an error causes us

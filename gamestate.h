@@ -51,7 +51,7 @@ typedef struct gamestate {
     entityid hero_id;
     entityid torch_id;
 
-    textureinfo txinfo[20];
+    textureinfo txinfo[100];
 
     dungeonfloor_t* dungeonfloor;
     vectorentityid_t entityids;
