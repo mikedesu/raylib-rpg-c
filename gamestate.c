@@ -16,9 +16,7 @@ gamestate* gamestateinitptr(const int windowwidth,
     //mprint("gamestateinitptr begin\n");
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     if (g == NULL) {
-        fprintf(stderr,
-                "Failed to allocate memory for gamestate: %s\n",
-                strerror(errno));
+        fprintf(stderr, "Failed to allocate memory for gamestate: %s\n", strerror(errno));
         return NULL;
     }
 
@@ -29,15 +27,9 @@ gamestate* gamestateinitptr(const int windowwidth,
     g->currenttimetm = localtime(&(g->currenttime));
 
     bzero(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
-    strftime(g->timebeganbuf,
-             GAMESTATE_SIZEOFTIMEBUF,
-             "Start Time:   %Y-%m-%d %H:%M:%S",
-             g->timebegantm);
+    strftime(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time:   %Y-%m-%d %H:%M:%S", g->timebegantm);
     bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
-    strftime(g->currenttimebuf,
-             GAMESTATE_SIZEOFTIMEBUF,
-             "Current Time: %Y-%m-%d %H:%M:%S",
-             g->currenttimetm);
+    strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 
     gamestateupdatecurrenttime(g);
 
@@ -82,33 +74,37 @@ gamestate* gamestateinitptr(const int windowwidth,
 
 
 void gamestateupdatecurrenttime(gamestate* g) {
-    if (g == NULL) {
-        fprintf(stderr, "gamestateupdatecurrenttime: gamestate is NULL\n");
-        return;
-    }
+    if (g) {
 
-    g->currenttime = time(NULL);
-    g->currenttimetm = localtime(&(g->currenttime));
-    bzero(g->currenttimebuf, 64);
-    strftime(g->currenttimebuf,
-             64,
-             "Current Time: %Y-%m-%d %H:%M:%S",
-             g->currenttimetm);
+        g->currenttime = time(NULL);
+        g->currenttimetm = localtime(&(g->currenttime));
+        bzero(g->currenttimebuf, 64);
+        strftime(g->currenttimebuf, 64, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+    }
 }
 
 
 // have to update this function when we introduce new fields to Gamestate
 void gamestatefree(gamestate* g) {
+    minfo("gamestatefree begin");
     if (g != NULL) {
         //companyscenefree(s->cs);
         //free(s->timebegantm);
+
+        minfo("gamestatefree freeing entities");
         hashtable_entityid_entity_destroy(g->entities);
 
+        minfo("gamestatefree freeing spritegroups");
         hashtable_entityid_spritegroup_destroy(g->spritegroups);
+
+        minfo("gamestatefree freeing entityids");
         vectorentityid_destroy(&g->entityids);
+
+        minfo("gamestatefree freeing dungeonfloor");
         dungeonfloor_free(g->dungeonfloor);
 
-
+        minfo("gamestatefree freeing gamestate");
         free(g);
     }
+    minfo("gamestatefree end");
 }
