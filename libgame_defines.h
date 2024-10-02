@@ -1,6 +1,6 @@
 #pragma once
 
-#define DEFAULT_WINDOW_TITLE "evildojo presents - project rpg v0.000000001"
+#define DEFAULT_WINDOW_TITLE "project rpg v0.00000001"
 
 //#define DEFAULT_TARGET_FPS 30
 #define DEFAULT_TARGET_FPS 60
@@ -13,7 +13,8 @@
 #define DEFAULT_SCALE 1
 
 //#define DEFAULT_WINDOW_POS_X 0
-#define DEFAULT_WINDOW_POS_X (1920)
+#define DEFAULT_WINDOW_POS_X 600
+//#define DEFAULT_WINDOW_POS_X (1920)
 //#define DEFAULT_WINDOW_POS_X (1920 / 2)
 //#define DEFAULT_WINDOW_POS_X (0)
 #define DEFAULT_WINDOW_POS_Y 0
