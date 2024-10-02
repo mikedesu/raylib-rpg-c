@@ -110,8 +110,8 @@ void libgame_handlemodeswitch(gamestate* g);
 void libgame_handlefade(gamestate* g);
 void libgame_createherospritegroup(gamestate* g, entityid id);
 //void libgame_createheroentity(gamestate* g);
-void libgame_drawherogroup(gamestate* g);
-void libgame_drawherogrouphitbox(gamestate* g);
+//void libgame_drawherogroup(gamestate* g);
+//void libgame_drawherogrouphitbox(gamestate* g);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
 void libgame_initdatastructures(gamestate* g);
@@ -121,7 +121,7 @@ void libgame_updateherospritegroup_up(gamestate* g);
 void libgame_updateherospritegroup_down(gamestate* g);
 void libgame_createtorchspritegroup(gamestate* g, entityid id);
 void libgame_drawtorchgroup(gamestate* g);
-void libgame_drawtorchgroup_hitbox(gamestate* g);
+//void libgame_drawtorchgroup_hitbox(gamestate* g, const Color c);
 void libgame_updatesmoothmove(gamestate* g);
 void libgame_docameralockon(gamestate* g);
 void libgame_do_one_camera_rotation(gamestate* g);
@@ -135,6 +135,10 @@ void libgame_handleplayerinput_key_right(gamestate* g);
 void libgame_handleplayerinput_key_left(gamestate* g);
 void libgame_handleplayerinput_key_down(gamestate* g);
 void libgame_handleplayerinput_key_up(gamestate* g);
+void libgame_handleplayerinput_key_down_left(gamestate* g);
+void libgame_handleplayerinput_key_up_left(gamestate* g);
+void libgame_handleplayerinput_key_up_right(gamestate* g);
+void libgame_handleplayerinput_key_down_right(gamestate* g);
 
 
 
@@ -196,9 +200,9 @@ void libgame_handleinput(gamestate* g) {
     //g->do_one_rotation = true;
     //}
 
-    if (IsKeyPressed(KEY_A)) {
-        libgame_entity_anim_incr(g->hero_id);
-    }
+    //if (IsKeyPressed(KEY_A)) {
+    //    libgame_entity_anim_incr(g->hero_id);
+    //}
 
     if (IsKeyPressed(KEY_T)) {
         // lets place a torch where the player is standing
@@ -230,15 +234,12 @@ void libgame_handleinput(gamestate* g) {
 
 
 void libgame_handlemodeswitch(gamestate* g) {
-    ////minfo("begin libgame_handlemodeswitch");
-    if (IsKeyPressed(KEY_C)) {
+    if (IsKeyPressed(KEY_O)) {
         switch (g->controlmode) {
         case CONTROLMODE_CAMERA:
-            //minfo("control mode: camera");
             g->controlmode = CONTROLMODE_PLAYER;
             break;
         default:
-            //minfo("control mode: player");
             g->controlmode = CONTROLMODE_CAMERA;
             break;
         }
@@ -249,7 +250,7 @@ void libgame_handlemodeswitch(gamestate* g) {
 
 
 void libgame_handledebugpanelswitch(gamestate* g) {
-    if (IsKeyPressed(KEY_D)) {
+    if (IsKeyPressed(KEY_I)) {
         minfo("debug panel switch");
         g->debugpanelon = !g->debugpanelon;
     }
@@ -427,6 +428,45 @@ void libgame_handleplayerinput_key_up(gamestate* g) {
 
 
 
+
+void libgame_handleplayerinput_key_down_left(gamestate* g) {
+    libgame_updateherospritegroup_left(g);
+    bool result = libgame_entity_move(g, g->hero_id, -1, 1);
+    if (result) {
+        libgame_update_spritegroup_move(g->hero_id, -8, 8);
+    }
+}
+
+
+
+void libgame_handleplayerinput_key_down_right(gamestate* g) {
+    libgame_updateherospritegroup_right(g);
+    bool result = libgame_entity_move(g, g->hero_id, 1, 1);
+    if (result) {
+        libgame_update_spritegroup_move(g->hero_id, 8, 8);
+    }
+}
+
+
+void libgame_handleplayerinput_key_up_left(gamestate* g) {
+    libgame_updateherospritegroup_left(g);
+    bool result = libgame_entity_move(g, g->hero_id, -1, -1);
+    if (result) {
+        libgame_update_spritegroup_move(g->hero_id, -8, -8);
+    }
+}
+
+
+void libgame_handleplayerinput_key_up_right(gamestate* g) {
+    libgame_updateherospritegroup_right(g);
+    bool result = libgame_entity_move(g, g->hero_id, 1, -1);
+    if (result) {
+        libgame_update_spritegroup_move(g->hero_id, 8, -8);
+    }
+}
+
+
+
 void libgame_handleplayerinput(gamestate* g) {
     if (g->controlmode == CONTROLMODE_PLAYER) {
         //const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
@@ -434,14 +474,35 @@ void libgame_handleplayerinput(gamestate* g) {
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
 
-        if (IsKeyPressed(KEY_RIGHT)) {
+        // left-handed controls
+        if (IsKeyPressed(KEY_D)) {
+
             libgame_handleplayerinput_key_right(g);
-        } else if (IsKeyPressed(KEY_LEFT)) {
+
+        } else if (IsKeyPressed(KEY_A)) {
+
             libgame_handleplayerinput_key_left(g);
-        } else if (IsKeyPressed(KEY_DOWN)) {
+
+        } else if (IsKeyPressed(KEY_X)) {
+
             libgame_handleplayerinput_key_down(g);
-        } else if (IsKeyPressed(KEY_UP)) {
+
+        } else if (IsKeyPressed(KEY_W)) {
+
             libgame_handleplayerinput_key_up(g);
+
+        } else if (IsKeyPressed(KEY_Z)) {
+
+            libgame_handleplayerinput_key_down_left(g);
+        } else if (IsKeyPressed(KEY_C)) {
+
+            libgame_handleplayerinput_key_down_right(g);
+        } else if (IsKeyPressed(KEY_Q)) {
+
+            libgame_handleplayerinput_key_up_left(g);
+        } else if (IsKeyPressed(KEY_E)) {
+
+            libgame_handleplayerinput_key_up_right(g);
         }
 
         else if (IsKeyPressed(KEY_P)) {
@@ -536,7 +597,7 @@ void libgame_initwindow() {
     const int y = DEFAULT_WINDOW_POS_Y;
     SetWindowPosition(x, y);
     SetTargetFPS(DEFAULT_TARGET_FPS);
-    SetExitKey(KEY_Q);
+    SetExitKey(KEY_ESCAPE);
     //minfo("end of libgame_initwindow");
 }
 
@@ -719,13 +780,15 @@ inline void libgame_drawgameplayscene_messagelog(gamestate* g) {
         const char* text = "you have entered the dungeon\nmessages will appear here\n";
         const int x = 20;
         const int y = 20;
-        const int pad = 5;
-        const Rectangle box1 = {x, y, 300, 300};
-        const Rectangle box2 = {x + pad, x + pad, box1.width - pad, box1.height - pad};
+        const int w = 300;
+        const int h = 300;
+        //const int pad = 5;
+        const Rectangle box1 = {x, y, w, h};
+        const Rectangle box2 = {x, y, box1.width, box1.height};
         const Vector2 origin = {0, 0};
         const Vector2 text_origin = {30, 30};
 
-        DrawRectanglePro(box1, origin, 0.0f, (Color){0x33, 0x33, 0x33, 128});
+        DrawRectanglePro(box1, origin, 0.0f, (Color){0x33, 0x33, 0x33, 0xFF});
         DrawRectangleLinesEx(box2, 1, WHITE);
         DrawTextEx(g->font, text, text_origin, 14, 1, WHITE);
     }
@@ -784,47 +847,44 @@ void libgame_drawdungeonfloor(gamestate* g) {
 
 
 
-void libgame_drawherogrouphitbox(gamestate* g) {
-    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-    if (sg && g->debugpanelon) {
-        Color c = (Color){51, 51, 51, 255};
-        Vector2 v[4] = {{sg->dest.x, sg->dest.y},
-                        {sg->dest.x + sg->dest.width, sg->dest.y},
-                        {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height},
-                        {sg->dest.x, sg->dest.y + sg->dest.height}};
-        DrawLineV(v[0], v[1], c);
-        DrawLineV(v[1], v[2], c);
-        DrawLineV(v[2], v[3], c);
-        DrawLineV(v[3], v[0], c);
-    }
-}
+//void libgame_drawherogrouphitbox(gamestate* g) {
+//    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+//    if (sg && g->debugpanelon) {
+//        Color c = (Color){51, 51, 51, 255};
+//        Vector2 v[4] = {{sg->dest.x, sg->dest.y},
+//                        {sg->dest.x + sg->dest.width, sg->dest.y},
+//                        {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height},
+//                        {sg->dest.x, sg->dest.y + sg->dest.height}};
+//        DrawLineV(v[0], v[1], c);
+//        DrawLineV(v[1], v[2], c);
+//        DrawLineV(v[2], v[3], c);
+//        DrawLineV(v[3], v[0], c);
+//    }
+//}
 
 
 
 
-void libgame_drawherogroup(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-    if (hero_group) {
-        // draw hero
-        DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
-                       hero_group->sprites[hero_group->current]->src,
-                       hero_group->dest,
-                       (Vector2){0, 0},
-                       0.0f,
-                       WHITE);
-        // draw shadow
-        DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
-                       hero_group->sprites[hero_group->current + 1]->src,
-                       hero_group->dest,
-                       (Vector2){0, 0},
-                       0.0f,
-                       WHITE);
-    }
-
-    if (g->framecount % FRAMEINTERVAL == 0) {
-        sprite_incrframe(hero_group->sprites[hero_group->current]);
-    }
-}
+//void libgame_drawherogroup(gamestate* g) {
+//    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+//    if (hero_group) {
+//        DrawTexturePro(*hero_group->sprites[hero_group->current]->texture,
+//                       hero_group->sprites[hero_group->current]->src,
+//                       hero_group->dest,
+//                       (Vector2){0, 0},
+//                       0.0f,
+//                       WHITE);
+//        DrawTexturePro(*hero_group->sprites[hero_group->current + 1]->texture,
+//                       hero_group->sprites[hero_group->current + 1]->src,
+//                       hero_group->dest,
+//                       (Vector2){0, 0},
+//                       0.0f,
+//                       WHITE);
+//    }
+//    if (g->framecount % FRAMEINTERVAL == 0) {
+//        sprite_incrframe(hero_group->sprites[hero_group->current]);
+//    }
+//}
 
 
 
@@ -850,20 +910,19 @@ void libgame_drawtorchgroup(gamestate* g) {
 
 
 
-void libgame_drawtorchgroup_hitbox(gamestate* g) {
-    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
-    if (sg && g->debugpanelon) {
-        Color c = (Color){51, 51, 51, 255};
-        Vector2 v[4] = {{sg->dest.x, sg->dest.y},
-                        {sg->dest.x + sg->dest.width, sg->dest.y},
-                        {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height},
-                        {sg->dest.x, sg->dest.y + sg->dest.height}};
-        DrawLineV(v[0], v[1], c);
-        DrawLineV(v[1], v[2], c);
-        DrawLineV(v[2], v[3], c);
-        DrawLineV(v[3], v[0], c);
-    }
-}
+//void libgame_drawtorchgroup_hitbox(gamestate* g, const Color c) {
+//    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
+//    if (sg && g->debugpanelon) {
+//        Vector2 v[4] = {{sg->dest.x, sg->dest.y},
+//                        {sg->dest.x + sg->dest.width, sg->dest.y},
+//                        {sg->dest.x + sg->dest.width, sg->dest.y + sg->dest.height},
+//                        {sg->dest.x, sg->dest.y + sg->dest.height}};
+//        DrawLineV(v[0], v[1], c);
+//        DrawLineV(v[1], v[2], c);
+//        DrawLineV(v[2], v[3], c);
+//        DrawLineV(v[3], v[0], c);
+//    }
+//}
 
 
 
