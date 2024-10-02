@@ -109,9 +109,6 @@ void libgame_handledebugpanelswitch(gamestate* g);
 void libgame_handlemodeswitch(gamestate* g);
 void libgame_handlefade(gamestate* g);
 void libgame_createherospritegroup(gamestate* g, entityid id);
-//void libgame_createheroentity(gamestate* g);
-//void libgame_drawherogroup(gamestate* g);
-//void libgame_drawherogrouphitbox(gamestate* g);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
 void libgame_initdatastructures(gamestate* g);
@@ -121,7 +118,6 @@ void libgame_updateherospritegroup_up(gamestate* g);
 void libgame_updateherospritegroup_down(gamestate* g);
 void libgame_createtorchspritegroup(gamestate* g, entityid id);
 void libgame_drawtorchgroup(gamestate* g);
-//void libgame_drawtorchgroup_hitbox(gamestate* g, const Color c);
 void libgame_updatesmoothmove(gamestate* g);
 void libgame_docameralockon(gamestate* g);
 void libgame_do_one_camera_rotation(gamestate* g);
@@ -475,6 +471,7 @@ void libgame_handleplayerinput(gamestate* g) {
         // and then translating that into a destination on screen
 
         // left-handed controls
+        // eventually we will create a mapping for custom controls
         if (IsKeyPressed(KEY_D)) {
 
             libgame_handleplayerinput_key_right(g);
