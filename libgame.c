@@ -89,7 +89,11 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path);
 //void libgame_reloadtextures(gamestate* g);
 void libgame_closeshared(gamestate* g);
 void libgame_closesavegamestate();
+
 void libgame_drawdebugpanel(gamestate* g);
+
+void libgame_drawgameplayscene_messagelog(gamestate* g);
+
 void libgame_drawcompanyscene(gamestate* g);
 void libgame_drawtitlescene(gamestate* g);
 void libgame_drawgameplayscene(gamestate* g);
@@ -690,7 +694,11 @@ void libgame_drawframe(gamestate* g) {
 
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+
+    libgame_drawgameplayscene_messagelog(g);
+
     libgame_drawdebugpanel(g);
+
     libgame_drawframeend(g);
 }
 
@@ -700,6 +708,27 @@ void libgame_calc_debugpanel_size(gamestate* g) {
     const int sz = 14, sp = 1;
     const Vector2 m = MeasureTextEx(g->font, g->debugpanel.buffer, sz, sp);
     g->debugpanel.w = m.x, g->debugpanel.h = m.y;
+}
+
+
+
+
+inline void libgame_drawgameplayscene_messagelog(gamestate* g) {
+    if (g) {
+        //const int fontsize = 14, spacing = 1, xy = 10, wh = 20;
+        const char* text = "you have entered the dungeon\nmessages will appear here\n";
+        const int x = 20;
+        const int y = 20;
+        const int pad = 5;
+        const Rectangle box1 = {x, y, 300, 300};
+        const Rectangle box2 = {x + pad, x + pad, box1.width - pad, box1.height - pad};
+        const Vector2 origin = {0, 0};
+        const Vector2 text_origin = {30, 30};
+
+        DrawRectanglePro(box1, origin, 0.0f, (Color){0x33, 0x33, 0x33, 128});
+        DrawRectangleLinesEx(box2, 1, WHITE);
+        DrawTextEx(g->font, text, text_origin, 14, 1, WHITE);
+    }
 }
 
 
@@ -894,19 +923,6 @@ void libgame_drawgameplayscene(gamestate* g) {
 
     // we want to iterate over every entityid in gamestate->entityids
 
-    //minfo("getting vectorentityid size...");
-    //printf("vectorentityid size: %ld\n", vectorentityid_size(&g->entityids));
-    //minfo("iterating over entityids...");
-    //for (int i = 0; i < vectorentityid_size(&g->entityids); i++) {
-
-    //for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
-    //    entityid id = vectorentityid_get(&g->entityids, i);
-    //    entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
-    //    if (entity->type == ENTITY_ITEM && entity->itemtype == ITEM_TORCH) {
-    //        libgame_drawentity(g, id);
-    //    }
-    //}
-
     // lets iterate thru the dungeonfloor tiles
     // we can utilize that function we just wrote
 
@@ -934,17 +950,20 @@ void libgame_drawgameplayscene(gamestate* g) {
         }
     }
 
-    //libgame_drawentity(g, g->hero_id);
 
 
-    //libgame_drawtorchgroup_hitbox(g);
-    //libgame_drawherogroup(g);
-    //libgame_drawherogrouphitbox(g);
+    // beginning of the message log window
+
+
+
 
     libgame_handlefade(g);
 
     EndMode2D();
-    //minfo("libgame_drawgameplayscene end");
+
+    //DrawRectangle(0, 0, 100, 100, BLACK);
+    //DrawRectangleLines(10, 10, 80, 80, WHITE);
+    //DrawTextEx(g->font, "message log", (Vector2){20, 20}, 12, 1, WHITE);
 }
 
 

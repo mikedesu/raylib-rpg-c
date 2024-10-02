@@ -1,5 +1,5 @@
 #include "entity.h"
-#include "mprint.h"
+//#include "mprint.h"
 #include <raymath.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,12 +32,8 @@ entity_t* entity_create(const char* n) {
 
 
 void entity_destroy_unsafe(entity_t* e) {
-    //minfo("entity_destroy_unsafe");
-
     // empty and destroy the vector
-
     vectorentityid_destroy(&e->inventory);
-
     free(e);
 }
 
