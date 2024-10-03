@@ -100,13 +100,13 @@ size_t vectorentityid_capacity(vectorentityid_t* v) {
 
 
 size_t vectorentityid_contains(vectorentityid_t* v, entityid value) {
-    minfo("vectorentityid_contains begin");
+    //minfo("vectorentityid_contains begin");
     for (size_t i = 0; i < v->current_index; i++) {
         if (v->data[i] == value) {
             return i;
         }
     }
-    minfo("vectorentityid_contains end");
+    //minfo("vectorentityid_contains end");
     return -1;
 }
 
@@ -114,17 +114,17 @@ size_t vectorentityid_contains(vectorentityid_t* v, entityid value) {
 
 
 entityid vectorentityid_remove_index(vectorentityid_t* v, size_t index) {
-    minfo("vectorentityid_remove_index");
+    //minfo("vectorentityid_remove_index");
     if (index >= v->current_index) {
         return -1;
     }
     entityid value = v->data[index];
-    minfo("vectorentityid_remove_index begin copying...");
+    //minfo("vectorentityid_remove_index begin copying...");
     fprintf(stderr, "index: %zu\n", index);
     for (size_t i = index; i < v->current_index - 1; i++) {
         v->data[i] = v->data[i + 1];
     }
-    minfo("vectorentityid_remove_index end copying...");
+    //minfo("vectorentityid_remove_index end copying...");
     v->current_index--;
     return value;
 }
@@ -133,7 +133,7 @@ entityid vectorentityid_remove_index(vectorentityid_t* v, size_t index) {
 
 
 entityid vectorentityid_remove_value(vectorentityid_t* v, entityid value) {
-    minfo("vectorentityid_remove_value");
+    //minfo("vectorentityid_remove_value");
     size_t index = vectorentityid_contains(v, value);
     if (index == (size_t)-1) {
         return -1;

@@ -73,8 +73,8 @@ const bool libgame_entity_move(gamestate* g, entityid id, int x, int y);
 const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 const bool libgame_entityid_move_check(gamestate* g, entityid id, const Vector2 dir);
 
-const entityid libgame_createentity(gamestate* g, const char* name, entitytype_t type, Vector2 pos);
-const entityid libgame_createtorchentity(gamestate* g);
+const entityid libgame_create_entity(gamestate* g, const char* name, entitytype_t type, Vector2 pos);
+const entityid libgame_create_torchentity(gamestate* g);
 
 void libgame_updatedebugpanelbuffer(gamestate* g);
 void libgame_updategamestate(gamestate* g);
@@ -111,7 +111,7 @@ void libgame_handlefade(gamestate* g);
 void libgame_createherospritegroup(gamestate* g, entityid id);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
-void libgame_initdatastructures(gamestate* g);
+void libgame_init_datastructures(gamestate* g);
 void libgame_updateherospritegroup_right(gamestate* g);
 void libgame_updateherospritegroup_left(gamestate* g);
 void libgame_updateherospritegroup_up(gamestate* g);
@@ -135,7 +135,7 @@ void libgame_handleplayerinput_key_down_left(gamestate* g);
 void libgame_handleplayerinput_key_up_left(gamestate* g);
 void libgame_handleplayerinput_key_up_right(gamestate* g);
 void libgame_handleplayerinput_key_down_right(gamestate* g);
-void libgame_initdungeonfloor(gamestate* g);
+void libgame_init_dungeonfloor(gamestate* g);
 
 
 
@@ -473,19 +473,19 @@ void libgame_handleplayerinput(gamestate* g) {
 
         // left-handed controls
         // eventually we will create a mapping for custom controls
-        if (IsKeyPressed(KEY_KP_6)) {
+        if (IsKeyPressed(KEY_KP_6) || IsKeyPressed(KEY_RIGHT)) {
 
             libgame_handleplayerinput_key_right(g);
 
-        } else if (IsKeyPressed(KEY_KP_4)) {
+        } else if (IsKeyPressed(KEY_KP_4) || IsKeyPressed(KEY_LEFT)) {
 
             libgame_handleplayerinput_key_left(g);
 
-        } else if (IsKeyPressed(KEY_KP_2)) {
+        } else if (IsKeyPressed(KEY_KP_2) || IsKeyPressed(KEY_DOWN)) {
 
             libgame_handleplayerinput_key_down(g);
 
-        } else if (IsKeyPressed(KEY_KP_8)) {
+        } else if (IsKeyPressed(KEY_KP_8) || IsKeyPressed(KEY_UP)) {
 
             libgame_handleplayerinput_key_up(g);
 
@@ -777,7 +777,8 @@ void libgame_calc_debugpanel_size(gamestate* g) {
 inline void libgame_drawgameplayscene_messagelog(gamestate* g) {
     if (g) {
         //const int fontsize = 14, spacing = 1, xy = 10, wh = 20;
-        const char* text = "you have entered the dungeon\nmessages will appear here\n";
+        const char* text =
+            "you have entered the dungeon\nmessages will appear here\nevildojo666\n666\n7777\n";
         const int x = 20;
         const int y = 20;
         const int w = 300;
@@ -1280,7 +1281,7 @@ void libgame_init() {
 
 
 
-const entityid libgame_createentity(gamestate* g, const char* name, entitytype_t type, Vector2 pos) {
+const entityid libgame_create_entity(gamestate* g, const char* name, entitytype_t type, Vector2 pos) {
     entity_t* e = entity_create(name);
     if (!e) {
         //merror("could not create entity");
@@ -1302,8 +1303,8 @@ const entityid libgame_createentity(gamestate* g, const char* name, entitytype_t
 
 
 
-const entityid libgame_createtorchentity(gamestate* g) {
-    entityid torch_id = libgame_createentity(g, "torch", ENTITY_ITEM, (Vector2){0, 0});
+const entityid libgame_create_torchentity(gamestate* g) {
+    entityid torch_id = libgame_create_entity(g, "torch", ENTITY_ITEM, (Vector2){0, 0});
     return torch_id;
 }
 
@@ -1461,8 +1462,8 @@ const char* get_str_for_tiletype(tiletype_t type) {
 
 
 
-void libgame_initdungeonfloor(gamestate* g) {
-    minfo("libgame_initdungeonfloor begin");
+void libgame_init_dungeonfloor(gamestate* g) {
+    minfo("libgame_init_dungeonfloor begin");
     if (g->dungeonfloor) {
         minfo("setting random tiles");
         tiletype_t start_type = TILETYPE_STONE_00;
@@ -1482,7 +1483,7 @@ void libgame_initdungeonfloor(gamestate* g) {
 
 
 
-void libgame_initdatastructures(gamestate* g) {
+void libgame_init_datastructures(gamestate* g) {
     //minfo("libgame_initdatastructures begin");
     g->entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
     g->entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
@@ -1501,7 +1502,7 @@ void libgame_initdatastructures(gamestate* g) {
     }
 
     // lets try setting some random tiles to different tile types
-    libgame_initdungeonfloor(g);
+    libgame_init_dungeonfloor(g);
 
     //minfo("libgame_initdatastructures end");
 }
@@ -1514,7 +1515,7 @@ void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos) {
     minfo("libgame_createitembytype begin");
     switch (type) {
     case ITEM_TORCH: {
-        entityid torch_id = libgame_createentity(g, "torch", ENTITY_ITEM, pos);
+        entityid torch_id = libgame_create_entity(g, "torch", ENTITY_ITEM, pos);
         entity_t* torch = hashtable_entityid_entity_get(g->entities, torch_id);
         if (torch) {
             minfo("torch entity created");
@@ -1535,7 +1536,7 @@ void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos) {
 
 
 void libgame_createhero(gamestate* g) {
-    entityid id = libgame_createentity(g, "hero", ENTITY_PLAYER, (Vector2){0, 1});
+    entityid id = libgame_create_entity(g, "hero", ENTITY_PLAYER, (Vector2){0, 1});
     if (id != -1) {
         g->hero_id = id;
         entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
@@ -1558,7 +1559,7 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_loadfont(g);
         libgame_loadtargettexture(g);
         libgame_loadtextures(g);
-        libgame_initdatastructures(g);
+        libgame_init_datastructures(g);
 
         // this is just a mock-up for now
         libgame_createhero(g);
