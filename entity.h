@@ -3,6 +3,7 @@
 #include "entityid.h"
 #include "entitytype.h"
 #include "itemtype.h"
+#include "race.h"
 #include "vectorentityid.h"
 #include <raylib.h>
 
@@ -12,9 +13,10 @@ typedef struct entity_t {
     char name[ENTITY_NAME_MAX];
     entityid id;
     entitytype_t type;
-    itemtype_t itemtype;
+    itemtype_t itemtype; // not be used if not an item
     Vector2 pos;
     vectorentityid_t inventory;
+    race_t race;
 } entity_t;
 
 

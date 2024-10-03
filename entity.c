@@ -25,6 +25,10 @@ entity_t* entity_create(const char* n) {
     entity_set_x(e, -1);
     entity_set_y(e, -1);
     entity_set_name(e, n);
+
+    e->race.primary = RACETYPE_NONE;
+    e->race.secondary = RACETYPE_NONE;
+
     return e;
 }
 

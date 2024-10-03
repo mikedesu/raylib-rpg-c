@@ -8,6 +8,7 @@
 #include "itemtype.h"
 #include "libgame_defines.h"
 #include "mprint.h"
+#include "race.h"
 #include "scene.h"
 #include "setdebugpanel.h"
 #include "sprite.h"
@@ -108,7 +109,7 @@ void libgame_handlecaminput(gamestate* g);
 void libgame_handledebugpanelswitch(gamestate* g);
 void libgame_handlemodeswitch(gamestate* g);
 void libgame_handlefade(gamestate* g);
-void libgame_createherospritegroup(gamestate* g, entityid id);
+void libgame_create_herospritegroup(gamestate* g, entityid id);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
 void libgame_init_datastructures(gamestate* g);
@@ -126,7 +127,7 @@ void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos);
 void libgame_drawentity(gamestate* g, entityid id);
 void libgame_entity_anim_incr(entityid id);
 void libgame_calc_debugpanel_size(gamestate* g);
-void libgame_createhero(gamestate* g);
+void libgame_create_hero(gamestate* g);
 void libgame_handleplayerinput_key_right(gamestate* g);
 void libgame_handleplayerinput_key_left(gamestate* g);
 void libgame_handleplayerinput_key_down(gamestate* g);
@@ -136,6 +137,8 @@ void libgame_handleplayerinput_key_up_left(gamestate* g);
 void libgame_handleplayerinput_key_up_right(gamestate* g);
 void libgame_handleplayerinput_key_down_right(gamestate* g);
 void libgame_init_dungeonfloor(gamestate* g);
+void libgame_create_orc(gamestate* g, const char* name);
+void libgame_create_orcspritegroup(gamestate* g, entityid id);
 
 
 
@@ -776,7 +779,10 @@ void libgame_calc_debugpanel_size(gamestate* g) {
 
 inline void libgame_drawgameplayscene_messagelog(gamestate* g) {
     if (g) {
-        //const int fontsize = 14, spacing = 1, xy = 10, wh = 20;
+        const int fontsize = 14;
+        const int spacing = 1;
+        //const int xy = 10;
+        //const int wh = 20;
         const char* text =
             "you have entered the dungeon\nmessages will appear here\nevildojo666\n666\n7777\n";
         const int x = 20;
@@ -791,7 +797,7 @@ inline void libgame_drawgameplayscene_messagelog(gamestate* g) {
 
         DrawRectanglePro(box1, origin, 0.0f, (Color){0x33, 0x33, 0x33, 0xFF});
         DrawRectangleLinesEx(box2, 1, WHITE);
-        DrawTextEx(g->font, text, text_origin, 14, 1, WHITE);
+        DrawTextEx(g->font, text, text_origin, fontsize, spacing, WHITE);
     }
 }
 
@@ -815,7 +821,7 @@ inline void libgame_drawdebugpanel(gamestate* g) {
 
 void libgame_drawgrid(gamestate* g) {
     Color c = GREEN;
-    //const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
+    // default tile size 8x8
     const int w = 8, h = 8;
     const int len = g->dungeonfloor->len;
     const int wid = g->dungeonfloor->wid;
@@ -1057,7 +1063,19 @@ void libgame_drawgameplayscene(gamestate* g) {
                 }
             }
 
-            // draw players and other entities
+
+            // draw NPCs
+            for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
+                entityid id = vectorentityid_get(&t->entityids, k);
+                entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+                if (entity->type == ENTITY_NPC) {
+                    libgame_drawentity(g, id);
+                }
+            }
+
+
+
+            // draw player
             for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
                 entityid id = vectorentityid_get(&t->entityids, k);
                 entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
@@ -1349,7 +1367,7 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id) {
 // the hero has a LOT of spritegroups
 // not every entity will have this many sprites
 // lets try using this as a basis to get a sprite in there
-void libgame_createherospritegroup(gamestate* g, entityid id) {
+void libgame_create_herospritegroup(gamestate* g, entityid id) {
     spritegroup_t* hero_group = spritegroup_create(20);
     entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
 
@@ -1390,6 +1408,52 @@ void libgame_createherospritegroup(gamestate* g, entityid id) {
 
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, g->hero_id, hero_group);
+}
+
+
+
+
+void libgame_create_orcspritegroup(gamestate* g, entityid id) {
+    spritegroup_t* orc_group = spritegroup_create(20);
+    entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
+
+    int keys[12] = {TXORCIDLE,
+                    TXORCIDLESHADOW,
+                    TXORCWALK,
+                    TXORCWALKSHADOW,
+                    TXORCATTACK,
+                    TXORCATTACKSHADOW,
+                    TXORCJUMP,
+                    TXORCJUMPSHADOW,
+                    TXORCDIE,
+                    TXORCDIESHADOW,
+                    TXORCDMG,
+                    TXORCDMGSHADOW};
+
+    for (int i = 0; i < 12; i++) {
+        sprite* s = sprite_create(
+            &g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
+        if (!s) {
+            //merror("could not create sprite");
+        }
+        spritegroup_add(orc_group, s);
+    }
+    // this is effectively how we will update the
+    // sprite position in relation to the entity's
+    // dungeon position
+    const float w = spritegroup_get(orc_group, 0)->width;
+    const float h = spritegroup_get(orc_group, 0)->height;
+    const float offset_x = -12;
+    const float offset_y = -12;
+    // this is gross we can probably do this better
+    const float x = orc->pos.x * 8;
+    const float y = orc->pos.y * 8;
+    Rectangle dest = {x + offset_x, y + offset_y, w, h};
+    orc_group->current = 0;
+    orc_group->dest = dest;
+
+    // add the spritegroup to the hashtable
+    hashtable_entityid_spritegroup_insert(g->spritegroups, id, orc_group);
 }
 
 
@@ -1535,7 +1599,7 @@ void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos) {
 
 
 
-void libgame_createhero(gamestate* g) {
+void libgame_create_hero(gamestate* g) {
     entityid id = libgame_create_entity(g, "hero", ENTITY_PLAYER, (Vector2){0, 1});
     if (id != -1) {
         g->hero_id = id;
@@ -1544,7 +1608,25 @@ void libgame_createhero(gamestate* g) {
             minfo("hero entity created");
             hero->type = ENTITY_PLAYER;
 
-            libgame_createherospritegroup(g, id);
+            libgame_create_herospritegroup(g, id);
+        }
+    }
+}
+
+
+
+
+void libgame_create_orc(gamestate* g, const char* name) {
+    entityid id = libgame_create_entity(g, name, ENTITY_NPC, (Vector2){0, 1});
+    if (id != -1) {
+        //g->hero_id = id;
+        entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
+        if (orc) {
+            minfo("orc entity created");
+            orc->race.primary = RACETYPE_ORC;
+            orc->race.secondary = RACETYPE_NONE;
+
+            libgame_create_orcspritegroup(g, id);
         }
     }
 }
@@ -1562,7 +1644,8 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_init_datastructures(g);
 
         // this is just a mock-up for now
-        libgame_createhero(g);
+        libgame_create_hero(g);
+        libgame_create_orc(g, "orc1");
 
         // these dont work right until the text buffer of the debugpanel is filled
         libgame_updatedebugpanelbuffer(g);

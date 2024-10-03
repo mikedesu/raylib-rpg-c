@@ -33,3 +33,18 @@
 29 1 1  0 img/tiles/stone-wall00.png
 30 1 1  0 img/tiles/dirt01.png
 31 1 1  0 img/tiles/dirt02.png
+32 4 16 0 img/characters/orc-idle.png
+33 4 16 0 img/characters/orc-idle-shadow.png
+34 4 4  0 img/characters/orc-walk.png
+35 4 4  0 img/characters/orc-walk-shadow.png
+36 4 4  0 img/characters/orc-attack.png
+37 4 4  0 img/characters/orc-attack-shadow.png
+#38 img/characters/orc-chargedattack.png
+#39 img/characters/orc-chargedattack-shadow.png
+40 4 4  0 img/characters/orc-jump.png
+41 4 4  0 img/characters/orc-jump-shadow.png
+42 1 12 0 img/characters/orc-die.png
+43 1 12 0 img/characters/orc-die-shadow.png
+44 4 4  0 img/characters/orc-dmg.png
+45 4 4  0 img/characters/orc-dmg-shadow.png
+
