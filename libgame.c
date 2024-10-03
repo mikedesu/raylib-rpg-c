@@ -119,7 +119,7 @@ void libgame_updateherospritegroup_up(gamestate* g);
 void libgame_updateherospritegroup_down(gamestate* g);
 void libgame_createtorchspritegroup(gamestate* g, entityid id);
 void libgame_drawtorchgroup(gamestate* g);
-void libgame_updatesmoothmove(gamestate* g);
+void libgame_updatesmoothmove(gamestate* g, entityid id);
 void libgame_docameralockon(gamestate* g);
 void libgame_do_one_camera_rotation(gamestate* g);
 void libgame_update_spritegroup_move(entityid id, int x, int y);
@@ -137,8 +137,12 @@ void libgame_handleplayerinput_key_up_left(gamestate* g);
 void libgame_handleplayerinput_key_up_right(gamestate* g);
 void libgame_handleplayerinput_key_down_right(gamestate* g);
 void libgame_init_dungeonfloor(gamestate* g);
-void libgame_create_orc(gamestate* g, const char* name);
+void libgame_create_orc(gamestate* g, const char* name, const Vector2 pos);
 void libgame_create_orcspritegroup(gamestate* g, entityid id);
+void libgame_update_spritegroup_right(gamestate* g, entityid id);
+void libgame_update_spritegroup_left(gamestate* g, entityid id);
+void libgame_update_spritegroup_up(gamestate* g, entityid id);
+void libgame_update_spritegroup_down(gamestate* g, entityid id);
 
 
 
@@ -222,6 +226,7 @@ void libgame_handleinput(gamestate* g) {
                 }
             }
         }
+        g->player_input_received = true;
     }
 
     libgame_handlemodeswitch(g);
@@ -253,6 +258,121 @@ void libgame_handledebugpanelswitch(gamestate* g) {
     if (IsKeyPressed(KEY_D)) {
         minfo("debug panel switch");
         g->debugpanelon = !g->debugpanelon;
+    }
+}
+
+
+
+void libgame_update_spritegroup_right(gamestate* g, entityid id) {
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (group) {
+        int ctx = SG_CTX_R_D;
+        switch (group->sprites[group->current]->currentcontext) {
+        case SG_CTX_R_D:
+            ctx = SG_CTX_R_D;
+            break;
+        case SG_CTX_L_D:
+            ctx = SG_CTX_R_D;
+            break;
+        case SG_CTX_R_U:
+            ctx = SG_CTX_R_U;
+            break;
+        case SG_CTX_L_U:
+            ctx = SG_CTX_R_U;
+            break;
+        default:
+            ctx = SG_CTX_R_D;
+            break;
+        }
+        spritegroup_setcontexts(group, ctx);
+        group->current = SPRITEGROUP_ANIM_WALK;
+    }
+}
+
+
+
+
+void libgame_update_spritegroup_left(gamestate* g, entityid id) {
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (group) {
+        int ctx = SG_CTX_L_D;
+        switch (group->sprites[group->current]->currentcontext) {
+        case SG_CTX_R_D:
+            ctx = SG_CTX_L_D;
+            break;
+        case SG_CTX_L_D:
+            ctx = SG_CTX_L_D;
+            break;
+        case SG_CTX_R_U:
+            ctx = SG_CTX_L_U;
+            break;
+        case SG_CTX_L_U:
+            ctx = SG_CTX_L_U;
+            break;
+        default:
+            ctx = SG_CTX_L_D;
+            break;
+        }
+        spritegroup_setcontexts(group, ctx);
+        group->current = SPRITEGROUP_ANIM_WALK;
+    }
+}
+
+
+
+
+void libgame_update_spritegroup_up(gamestate* g, entityid id) {
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (group) {
+        int ctx = SG_CTX_R_U;
+        switch (group->sprites[group->current]->currentcontext) {
+        case SG_CTX_R_D:
+            ctx = SG_CTX_R_U;
+            break;
+        case SG_CTX_L_D:
+            ctx = SG_CTX_L_U;
+            break;
+        case SG_CTX_R_U:
+            ctx = SG_CTX_R_U;
+            break;
+        case SG_CTX_L_U:
+            ctx = SG_CTX_L_U;
+            break;
+        default:
+            ctx = SG_CTX_R_U;
+            break;
+        }
+        spritegroup_setcontexts(group, ctx);
+        group->current = SPRITEGROUP_ANIM_WALK;
+    }
+}
+
+
+
+
+void libgame_update_spritegroup_down(gamestate* g, entityid id) {
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (group) {
+        int ctx = SG_CTX_R_D;
+        switch (group->sprites[group->current]->currentcontext) {
+        case SG_CTX_R_D:
+            ctx = SG_CTX_R_D;
+            break;
+        case SG_CTX_L_D:
+            ctx = SG_CTX_L_D;
+            break;
+        case SG_CTX_R_U:
+            ctx = SG_CTX_R_D;
+            break;
+        case SG_CTX_L_U:
+            ctx = SG_CTX_L_D;
+            break;
+        default:
+            ctx = SG_CTX_R_D;
+            break;
+        }
+        spritegroup_setcontexts(group, ctx);
+        group->current = SPRITEGROUP_ANIM_WALK;
     }
 }
 
@@ -480,32 +600,41 @@ void libgame_handleplayerinput(gamestate* g) {
 
             libgame_handleplayerinput_key_right(g);
 
+            g->player_input_received = true;
+
         } else if (IsKeyPressed(KEY_KP_4) || IsKeyPressed(KEY_LEFT)) {
 
             libgame_handleplayerinput_key_left(g);
+            g->player_input_received = true;
 
         } else if (IsKeyPressed(KEY_KP_2) || IsKeyPressed(KEY_DOWN)) {
 
             libgame_handleplayerinput_key_down(g);
+            g->player_input_received = true;
 
         } else if (IsKeyPressed(KEY_KP_8) || IsKeyPressed(KEY_UP)) {
 
             libgame_handleplayerinput_key_up(g);
+            g->player_input_received = true;
 
         } else if (IsKeyPressed(KEY_KP_1)) {
 
             libgame_handleplayerinput_key_down_left(g);
+            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_3)) {
 
             minfo("key KP 3 pressed");
             libgame_handleplayerinput_key_down_right(g);
+            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_7)) {
 
             minfo("key KP 7 pressed");
             libgame_handleplayerinput_key_up_left(g);
+            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_9)) {
             minfo("key KP 9 pressed");
             libgame_handleplayerinput_key_up_right(g);
+            g->player_input_received = true;
         }
 
         else if (IsKeyPressed(KEY_P)) {
@@ -532,15 +661,15 @@ void libgame_handleplayerinput(gamestate* g) {
                     }
                 }
             }
+            g->player_input_received = true;
         }
-
-
 
         else if (IsKeyPressed(KEY_PERIOD)) {
             spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
             if (hero_group) {
                 hero_group->current = 0; //standing/idle
             }
+            g->player_input_received = true;
         }
     }
 }
@@ -660,8 +789,9 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
 
 
 
-void libgame_updatesmoothmove(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+void libgame_updatesmoothmove(gamestate* g, entityid id) {
+    //spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
 
     if (hero_group) {
         float move_unit = 1.0f;
@@ -683,7 +813,7 @@ void libgame_updatesmoothmove(gamestate* g) {
         }
 
         if (hero_group->move.x == 0.0f && hero_group->move.y == 0.0f) {
-            entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
+            entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
             if (hero) {
                 hero_group->dest.x = hero->pos.x * 8 - 12;
                 hero_group->dest.y = hero->pos.y * 8 - 12;
@@ -721,9 +851,94 @@ void libgame_do_one_camera_rotation(gamestate* g) {
 void libgame_updategamestate(gamestate* g) {
     libgame_updatedebugpanelbuffer(g);
     //setdebugpanelcenter(g);
-    libgame_updatesmoothmove(g);
+
+    libgame_updatesmoothmove(g, g->hero_id);
 
     libgame_docameralockon(g);
+
+    // at this point, we can take other NPC turns
+    // lets iterate over our entities, find the NPCs, and make them move in a random direction
+    // then, we will update their smooth moves
+    // we will need to eventually disable player input during smooth moving
+
+    if (g->player_input_received) {
+        for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
+            entityid id = vectorentityid_get(&g->entityids, i);
+            entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+            if (e && e->type == ENTITY_NPC) {
+
+                // select a random direction to move in, up/left/down/right/ul/ur/dl/dr
+                int dir = GetRandomValue(0, 7);
+                bool result = false;
+                if (dir == 0) {
+                    libgame_update_spritegroup_right(g, id);
+                    result = libgame_entity_move(g, id, 1, 0);
+                    if (result) {
+                        minfo("NPC turn success");
+                        libgame_update_spritegroup_move(id, 8, 0);
+                    }
+                } else if (dir == 1) {
+                    libgame_update_spritegroup_left(g, id);
+                    result = libgame_entity_move(g, id, -1, 0);
+                    if (result) {
+                        minfo("NPC turn success");
+                        libgame_update_spritegroup_move(id, -8, 0);
+                    }
+                } else if (dir == 2) {
+                    libgame_update_spritegroup_down(g, id);
+                    result = libgame_entity_move(g, id, 0, 1);
+                    if (result) {
+                        minfo("NPC turn success");
+                        libgame_update_spritegroup_move(id, 0, 8);
+                    }
+                } else if (dir == 3) {
+                    libgame_update_spritegroup_up(g, id);
+                    result = libgame_entity_move(g, id, 0, -1);
+                    if (result) {
+                        minfo("NPC turn success");
+                        libgame_update_spritegroup_move(id, 0, -8);
+                    }
+                } else if (dir == 4) {
+                    libgame_update_spritegroup_right(g, id);
+                    result = libgame_entity_move(g, id, 1, -1);
+                    if (result) {
+                        minfo("NPC turn success");
+                        libgame_update_spritegroup_move(id, 8, -8);
+                    }
+                } else if (dir == 5) {
+                    libgame_update_spritegroup_left(g, id);
+                    result = libgame_entity_move(g, id, -1, -1);
+                    if (result) {
+                        minfo("NPC turn success");
+                        libgame_update_spritegroup_move(id, -8, -8);
+                    }
+                } else if (dir == 6) {
+                    libgame_update_spritegroup_right(g, id);
+                    result = libgame_entity_move(g, id, 1, 1);
+                    if (result) {
+                        minfo("NPC turn success");
+                        libgame_update_spritegroup_move(id, 8, 8);
+                    }
+                } else if (dir == 7) {
+                    libgame_update_spritegroup_left(g, id);
+                    result = libgame_entity_move(g, id, -1, 1);
+                    if (result) {
+                        minfo("NPC turn success");
+                        libgame_update_spritegroup_move(id, -8, 8);
+                    }
+                }
+            }
+        }
+        g->player_input_received = false;
+    }
+
+    for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
+        entityid id = vectorentityid_get(&g->entityids, i);
+        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+        if (e && e->type == ENTITY_NPC) {
+            libgame_updatesmoothmove(g, id);
+        }
+    }
 }
 
 
@@ -1616,8 +1831,8 @@ void libgame_create_hero(gamestate* g) {
 
 
 
-void libgame_create_orc(gamestate* g, const char* name) {
-    entityid id = libgame_create_entity(g, name, ENTITY_NPC, (Vector2){0, 1});
+void libgame_create_orc(gamestate* g, const char* name, const Vector2 pos) {
+    entityid id = libgame_create_entity(g, name, ENTITY_NPC, pos);
     if (id != -1) {
         //g->hero_id = id;
         entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
@@ -1645,7 +1860,22 @@ void libgame_initsharedsetup(gamestate* g) {
 
         // this is just a mock-up for now
         libgame_create_hero(g);
-        libgame_create_orc(g, "orc1");
+
+        for (int i = 0; i < g->dungeonfloor->wid; i++) {
+            for (int j = 0; j < g->dungeonfloor->len; j++) {
+                //if (rand() % 10 == 0) {
+                char tmp[32] = {0};
+                snprintf(tmp, 32, "orc%d", i * g->dungeonfloor->wid + j);
+                libgame_create_orc(g, tmp, (Vector2){i, j});
+                //}
+            }
+        }
+
+        //libgame_create_orc(g, "orc1", (Vector2){2, 2});
+        //libgame_create_orc(g, "orc2", (Vector2){2, 3});
+        //libgame_create_orc(g, "orc3", (Vector2){3, 3});
+        //libgame_create_orc(g, "orc4", (Vector2){1, 3});
+        //libgame_create_orc(g, "orc5", (Vector2){1, 2});
 
         // these dont work right until the text buffer of the debugpanel is filled
         libgame_updatedebugpanelbuffer(g);

@@ -58,6 +58,8 @@ typedef struct gamestate {
 
     bool do_one_rotation;
 
+    bool player_input_received;
+
 } gamestate;
 
 

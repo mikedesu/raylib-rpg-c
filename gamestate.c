@@ -68,6 +68,8 @@ gamestate* gamestateinitptr(const int windowwidth,
 
     g->dungeonfloor = NULL;
 
+    g->player_input_received = false;
+
     //mprint("gamestateinitptr end\n");
     return g;
 }
