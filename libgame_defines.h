@@ -62,11 +62,10 @@
 #define TX_TILE_STONE_11 26
 #define TX_TILE_STONE_12 27
 #define TX_TILE_STONE_13 28
-#define TX_TILE_STONE_14 29
-#define TX_TILE_STONE_WALL_00 30
+#define TX_TILE_STONE_WALL_00 29
 
-#define TX_DIRT_01 31
-#define TX_DIRT_02 32
+#define TX_DIRT_01 30
+#define TX_DIRT_02 31
 
 
 
