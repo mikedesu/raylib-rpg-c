@@ -230,7 +230,7 @@ void libgame_handleinput(gamestate* g) {
 
 
 void libgame_handlemodeswitch(gamestate* g) {
-    if (IsKeyPressed(KEY_O)) {
+    if (IsKeyPressed(KEY_C)) {
         switch (g->controlmode) {
         case CONTROLMODE_CAMERA:
             g->controlmode = CONTROLMODE_PLAYER;
@@ -246,7 +246,7 @@ void libgame_handlemodeswitch(gamestate* g) {
 
 
 void libgame_handledebugpanelswitch(gamestate* g) {
-    if (IsKeyPressed(KEY_I)) {
+    if (IsKeyPressed(KEY_D)) {
         minfo("debug panel switch");
         g->debugpanelon = !g->debugpanelon;
     }
@@ -472,33 +472,35 @@ void libgame_handleplayerinput(gamestate* g) {
 
         // left-handed controls
         // eventually we will create a mapping for custom controls
-        if (IsKeyPressed(KEY_D)) {
+        if (IsKeyPressed(KEY_KP_6)) {
 
             libgame_handleplayerinput_key_right(g);
 
-        } else if (IsKeyPressed(KEY_A)) {
+        } else if (IsKeyPressed(KEY_KP_4)) {
 
             libgame_handleplayerinput_key_left(g);
 
-        } else if (IsKeyPressed(KEY_X)) {
+        } else if (IsKeyPressed(KEY_KP_2)) {
 
             libgame_handleplayerinput_key_down(g);
 
-        } else if (IsKeyPressed(KEY_W)) {
+        } else if (IsKeyPressed(KEY_KP_8)) {
 
             libgame_handleplayerinput_key_up(g);
 
-        } else if (IsKeyPressed(KEY_Z)) {
+        } else if (IsKeyPressed(KEY_KP_1)) {
 
             libgame_handleplayerinput_key_down_left(g);
-        } else if (IsKeyPressed(KEY_C)) {
+        } else if (IsKeyPressed(KEY_KP_3)) {
 
+            minfo("key KP 3 pressed");
             libgame_handleplayerinput_key_down_right(g);
-        } else if (IsKeyPressed(KEY_Q)) {
+        } else if (IsKeyPressed(KEY_KP_7)) {
 
+            minfo("key KP 7 pressed");
             libgame_handleplayerinput_key_up_left(g);
-        } else if (IsKeyPressed(KEY_E)) {
-
+        } else if (IsKeyPressed(KEY_KP_9)) {
+            minfo("key KP 9 pressed");
             libgame_handleplayerinput_key_up_right(g);
         }
 
@@ -594,7 +596,8 @@ void libgame_initwindow() {
     const int y = DEFAULT_WINDOW_POS_Y;
     SetWindowPosition(x, y);
     SetTargetFPS(DEFAULT_TARGET_FPS);
-    SetExitKey(KEY_ESCAPE);
+    //SetExitKey(KEY_ESCAPE);
+    SetExitKey(KEY_Q);
     //minfo("end of libgame_initwindow");
 }
 
@@ -811,7 +814,8 @@ inline void libgame_drawdebugpanel(gamestate* g) {
 
 void libgame_drawgrid(gamestate* g) {
     Color c = GREEN;
-    const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
+    //const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
+    const int w = 8, h = 8;
     const int len = g->dungeonfloor->len;
     const int wid = g->dungeonfloor->wid;
     for (int i = 0; i <= len; i++) {
@@ -843,14 +847,104 @@ void libgame_drawdungeonfloor(gamestate* g) {
 
             int key = -1;
 
+            // this is very inefficient
+            // we want a quick way to map
+            // tiletypes to texture keys
+            //
+            // texture keys should prob be an enum
+            // instead of macros
+            //
+            // if we have one texture per tile type
+            // we can have a direct mapping
+            //
+            // we need this so we can draw the same texture
+            // for the tile
+            // on every round
+            //
+            // another possibility
+            // is that we can
+            // attach the texture key
+            // to the tile
+            // and just do a lookup on that
             switch (t->type) {
 
-            case TILETYPE_DIRT:
-                key = TXDIRT;
+            case TILETYPE_DIRT_00:
+                key = TX_DIRT_00;
                 break;
+
+
+            case TILETYPE_DIRT_01:
+                key = TX_DIRT_01;
+                break;
+
+            case TILETYPE_DIRT_02:
+                key = TX_DIRT_02;
+                break;
+
             case TILETYPE_STONE_00:
                 key = TX_TILE_STONE_00;
                 break;
+
+
+            case TILETYPE_STONE_01:
+                key = TX_TILE_STONE_01;
+                break;
+
+            case TILETYPE_STONE_02:
+                key = TX_TILE_STONE_02;
+                break;
+
+            case TILETYPE_STONE_03:
+                key = TX_TILE_STONE_03;
+                break;
+
+            case TILETYPE_STONE_04:
+                key = TX_TILE_STONE_04;
+                break;
+
+            case TILETYPE_STONE_05:
+                key = TX_TILE_STONE_05;
+                break;
+
+            case TILETYPE_STONE_06:
+                key = TX_TILE_STONE_06;
+                break;
+
+            case TILETYPE_STONE_07:
+                key = TX_TILE_STONE_07;
+                break;
+
+            case TILETYPE_STONE_08:
+                key = TX_TILE_STONE_08;
+                break;
+
+            case TILETYPE_STONE_09:
+                key = TX_TILE_STONE_09;
+                break;
+
+            case TILETYPE_STONE_10:
+                key = TX_TILE_STONE_10;
+                break;
+
+            case TILETYPE_STONE_11:
+                key = TX_TILE_STONE_11;
+                break;
+
+            case TILETYPE_STONE_12:
+                key = TX_TILE_STONE_12;
+                break;
+
+            case TILETYPE_STONE_13:
+                key = TX_TILE_STONE_13;
+                break;
+
+            case TILETYPE_STONE_14:
+                key = TX_TILE_STONE_14;
+                break;
+
+
+
+
             default:
                 break;
             }
@@ -1194,7 +1288,37 @@ void libgame_unloadtexture(gamestate* g, int index) {
 void libgame_unloadtextures(gamestate* g) {
     //minfo("unloading textures");
     libgame_unloadtexture(g, TXHERO);
-    libgame_unloadtexture(g, TXDIRT);
+    libgame_unloadtexture(g, TX_DIRT_00);
+    libgame_unloadtexture(g, TX_DIRT_01);
+    libgame_unloadtexture(g, TX_DIRT_02);
+    libgame_unloadtexture(g, TX_TILE_STONE_00);
+    libgame_unloadtexture(g, TX_TILE_STONE_01);
+    libgame_unloadtexture(g, TX_TILE_STONE_02);
+    libgame_unloadtexture(g, TX_TILE_STONE_03);
+    libgame_unloadtexture(g, TX_TILE_STONE_04);
+    libgame_unloadtexture(g, TX_TILE_STONE_05);
+    libgame_unloadtexture(g, TX_TILE_STONE_06);
+    libgame_unloadtexture(g, TX_TILE_STONE_07);
+    libgame_unloadtexture(g, TX_TILE_STONE_08);
+    libgame_unloadtexture(g, TX_TILE_STONE_09);
+    libgame_unloadtexture(g, TX_TILE_STONE_10);
+    libgame_unloadtexture(g, TX_TILE_STONE_11);
+    libgame_unloadtexture(g, TX_TILE_STONE_12);
+    libgame_unloadtexture(g, TX_TILE_STONE_13);
+    libgame_unloadtexture(g, TX_TILE_STONE_14);
+    libgame_unloadtexture(g, TXTORCH);
+    libgame_unloadtexture(g, TXHEROSHADOW);
+    libgame_unloadtexture(g, TXHEROWALK);
+    libgame_unloadtexture(g, TXHEROWALKSHADOW);
+    libgame_unloadtexture(g, TXHEROATTACK);
+    libgame_unloadtexture(g, TXHEROATTACKSHADOW);
+    libgame_unloadtexture(g, TXHEROJUMP);
+    libgame_unloadtexture(g, TXHEROJUMPSHADOW);
+    libgame_unloadtexture(g, TXHEROSPINDIE);
+    libgame_unloadtexture(g, TXHEROSPINDIESHADOW);
+    libgame_unloadtexture(g, TXHEROSOULDIE);
+    libgame_unloadtexture(g, TXHEROSOULDIESHADOW);
+    libgame_unloadtexture(g, TX_TILE_STONE_WALL_00);
 }
 
 
@@ -1377,13 +1501,29 @@ void libgame_initdatastructures(gamestate* g) {
 
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
 
-    //g->dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_DIRT);
-    g->dungeonfloor = create_dungeonfloor(8, 8, TILETYPE_STONE_00);
+    const tiletype_t base_type = TILETYPE_DIRT_00;
+    //const tiletype_t base_type = TILETYPE_STONE_00;
+    const int w = 16;
+    const int h = 16;
+    g->dungeonfloor = create_dungeonfloor(w, h, base_type);
     if (!g->dungeonfloor) {
         //merror("could not create dungeonfloor");
         // we could use an 'emergency shutdown' in case an error causes us
         // to need to 'panic' and force game close properly
     }
+
+    // lets try setting some random tiles to different tile types
+    for (int i = 0; i < (w * h) / 4; i++) {
+        tile_t* t = dungeonfloor_get_tile(g->dungeonfloor,
+                                          (Vector2){GetRandomValue(0, w - 1), GetRandomValue(0, h - 1)});
+
+        const tiletype_t start_type = TILETYPE_STONE_00;
+        const tiletype_t end_type = TILETYPE_STONE_WALL_00;
+        t->type = (tiletype_t)GetRandomValue(start_type, end_type);
+    }
+
+
+
     //minfo("libgame_initdatastructures end");
 }
 

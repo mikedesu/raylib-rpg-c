@@ -32,7 +32,9 @@
 
 #define TXHERO 0
 #define TXHEROSHADOW 1
-#define TXDIRT 2
+
+#define TX_DIRT_00 2
+
 #define TXDUNGEONSHEET 3
 #define TXHEROWALK 4
 #define TXHEROWALKSHADOW 5
@@ -61,7 +63,10 @@
 #define TX_TILE_STONE_12 27
 #define TX_TILE_STONE_13 28
 #define TX_TILE_STONE_14 29
+#define TX_TILE_STONE_WALL_00 30
 
+#define TX_DIRT_01 31
+#define TX_DIRT_02 32
 
 
 
