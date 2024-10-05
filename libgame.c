@@ -1,6 +1,7 @@
 #include "controlmode.h"
 #include "dungeonfloor.h"
 #include "entity.h"
+#include "entitytype.h"
 #include "fadestate.h"
 #include "gamestate.h"
 #include "hashtable_entityid_entity.h"
@@ -143,7 +144,7 @@ void libgame_update_spritegroup_right(gamestate* g, entityid id);
 void libgame_update_spritegroup_left(gamestate* g, entityid id);
 void libgame_update_spritegroup_up(gamestate* g, entityid id);
 void libgame_update_spritegroup_down(gamestate* g, entityid id);
-
+void libgame_handle_npc_turn(gamestate* g, entityid id);
 
 
 
@@ -208,8 +209,15 @@ void libgame_handleinput(gamestate* g) {
     //    libgame_entity_anim_incr(g->hero_id);
     //}
 
+
+    if (IsKeyPressed(KEY_F)) {
+        ToggleFullscreen();
+    }
+
+
+
+    // lets place a torch where the player is standing
     if (IsKeyPressed(KEY_T)) {
-        // lets place a torch where the player is standing
         entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
         if (hero) {
             // check to see if there are any items at that location
@@ -745,6 +753,16 @@ void libgame_closewindow() {
 
 void libgame_updatedebugpanelbuffer(gamestate* g) {
     entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
+    entity_t* orc = NULL;
+
+    for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
+        entity_t* e = hashtable_entityid_entity_get(g->entities, vectorentityid_get(&g->entityids, i));
+        if (e->type == ENTITY_NPC) {
+            orc = e;
+            break;
+        }
+    }
+
 
     snprintf(g->debugpanel.buffer,
              1024,
@@ -760,8 +778,7 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
              "Control mode: %d\n"
              "Hero position: %.0f,%.0f\n"
              "Inventory capacity: %ld\n"
-
-             ,
+             "Orc position: %.0f,%.0f\n",
 
              g->framecount,
              g->timebeganbuf,
@@ -780,7 +797,10 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
              hero->pos.x,
              hero->pos.y,
 
-             vectorentityid_capacity(&hero->inventory)
+             vectorentityid_capacity(&hero->inventory),
+
+             orc->pos.x,
+             orc->pos.y
 
 
     );
@@ -848,10 +868,79 @@ void libgame_do_one_camera_rotation(gamestate* g) {
 
 
 
+void libgame_handle_npc_turn(gamestate* g, entityid id) {
+    if (g) {
+        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+        if (e && e->type == ENTITY_NPC) {
+            // select a random direction to move in, up/left/down/right/ul/ur/dl/dr
+            int dir = GetRandomValue(0, 7);
+            bool result = false;
+            if (dir == 0) {
+                libgame_update_spritegroup_right(g, id);
+                result = libgame_entity_move(g, id, 1, 0);
+                if (result) {
+                    minfo("NPC turn success");
+                    libgame_update_spritegroup_move(id, 8, 0);
+                }
+            } else if (dir == 1) {
+                libgame_update_spritegroup_left(g, id);
+                result = libgame_entity_move(g, id, -1, 0);
+                if (result) {
+                    minfo("NPC turn success");
+                    libgame_update_spritegroup_move(id, -8, 0);
+                }
+            } else if (dir == 2) {
+                libgame_update_spritegroup_down(g, id);
+                result = libgame_entity_move(g, id, 0, 1);
+                if (result) {
+                    minfo("NPC turn success");
+                    libgame_update_spritegroup_move(id, 0, 8);
+                }
+            } else if (dir == 3) {
+                libgame_update_spritegroup_up(g, id);
+                result = libgame_entity_move(g, id, 0, -1);
+                if (result) {
+                    minfo("NPC turn success");
+                    libgame_update_spritegroup_move(id, 0, -8);
+                }
+            } else if (dir == 4) {
+                libgame_update_spritegroup_right(g, id);
+                result = libgame_entity_move(g, id, 1, -1);
+                if (result) {
+                    minfo("NPC turn success");
+                    libgame_update_spritegroup_move(id, 8, -8);
+                }
+            } else if (dir == 5) {
+                libgame_update_spritegroup_left(g, id);
+                result = libgame_entity_move(g, id, -1, -1);
+                if (result) {
+                    minfo("NPC turn success");
+                    libgame_update_spritegroup_move(id, -8, -8);
+                }
+            } else if (dir == 6) {
+                libgame_update_spritegroup_right(g, id);
+                result = libgame_entity_move(g, id, 1, 1);
+                if (result) {
+                    minfo("NPC turn success");
+                    libgame_update_spritegroup_move(id, 8, 8);
+                }
+            } else if (dir == 7) {
+                libgame_update_spritegroup_left(g, id);
+                result = libgame_entity_move(g, id, -1, 1);
+                if (result) {
+                    minfo("NPC turn success");
+                    libgame_update_spritegroup_move(id, -8, 8);
+                }
+            }
+        }
+    }
+}
+
+
+
 void libgame_updategamestate(gamestate* g) {
     libgame_updatedebugpanelbuffer(g);
     //setdebugpanelcenter(g);
-
     libgame_updatesmoothmove(g, g->hero_id);
 
     libgame_docameralockon(g);
@@ -864,74 +953,13 @@ void libgame_updategamestate(gamestate* g) {
     if (g->player_input_received) {
         for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
             entityid id = vectorentityid_get(&g->entityids, i);
-            entity_t* e = hashtable_entityid_entity_get(g->entities, id);
-            if (e && e->type == ENTITY_NPC) {
-
-                // select a random direction to move in, up/left/down/right/ul/ur/dl/dr
-                int dir = GetRandomValue(0, 7);
-                bool result = false;
-                if (dir == 0) {
-                    libgame_update_spritegroup_right(g, id);
-                    result = libgame_entity_move(g, id, 1, 0);
-                    if (result) {
-                        minfo("NPC turn success");
-                        libgame_update_spritegroup_move(id, 8, 0);
-                    }
-                } else if (dir == 1) {
-                    libgame_update_spritegroup_left(g, id);
-                    result = libgame_entity_move(g, id, -1, 0);
-                    if (result) {
-                        minfo("NPC turn success");
-                        libgame_update_spritegroup_move(id, -8, 0);
-                    }
-                } else if (dir == 2) {
-                    libgame_update_spritegroup_down(g, id);
-                    result = libgame_entity_move(g, id, 0, 1);
-                    if (result) {
-                        minfo("NPC turn success");
-                        libgame_update_spritegroup_move(id, 0, 8);
-                    }
-                } else if (dir == 3) {
-                    libgame_update_spritegroup_up(g, id);
-                    result = libgame_entity_move(g, id, 0, -1);
-                    if (result) {
-                        minfo("NPC turn success");
-                        libgame_update_spritegroup_move(id, 0, -8);
-                    }
-                } else if (dir == 4) {
-                    libgame_update_spritegroup_right(g, id);
-                    result = libgame_entity_move(g, id, 1, -1);
-                    if (result) {
-                        minfo("NPC turn success");
-                        libgame_update_spritegroup_move(id, 8, -8);
-                    }
-                } else if (dir == 5) {
-                    libgame_update_spritegroup_left(g, id);
-                    result = libgame_entity_move(g, id, -1, -1);
-                    if (result) {
-                        minfo("NPC turn success");
-                        libgame_update_spritegroup_move(id, -8, -8);
-                    }
-                } else if (dir == 6) {
-                    libgame_update_spritegroup_right(g, id);
-                    result = libgame_entity_move(g, id, 1, 1);
-                    if (result) {
-                        minfo("NPC turn success");
-                        libgame_update_spritegroup_move(id, 8, 8);
-                    }
-                } else if (dir == 7) {
-                    libgame_update_spritegroup_left(g, id);
-                    result = libgame_entity_move(g, id, -1, 1);
-                    if (result) {
-                        minfo("NPC turn success");
-                        libgame_update_spritegroup_move(id, -8, 8);
-                    }
-                }
-            }
+            libgame_handle_npc_turn(g, id);
         }
         g->player_input_received = false;
     }
 
+
+    // update smooth move for NPCs and other entities
     for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
         entityid id = vectorentityid_get(&g->entityids, i);
         entity_t* e = hashtable_entityid_entity_get(g->entities, id);
@@ -1863,11 +1891,9 @@ void libgame_initsharedsetup(gamestate* g) {
 
         for (int i = 0; i < g->dungeonfloor->wid; i++) {
             for (int j = 0; j < g->dungeonfloor->len; j++) {
-                //if (rand() % 10 == 0) {
                 char tmp[32] = {0};
                 snprintf(tmp, 32, "orc%d", i * g->dungeonfloor->wid + j);
                 libgame_create_orc(g, tmp, (Vector2){i, j});
-                //}
             }
         }
 
@@ -1946,7 +1972,7 @@ gamestate* libgame_getgamestate() {
 
 
 const bool libgame_entity_move(gamestate* g, entityid id, int x, int y) {
-    minfo("libgame_entity_move");
+    //minfo("libgame_entity_move");
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
     if (libgame_entity_move_check(g, e, x, y)) {
         // move successful
@@ -1990,8 +2016,29 @@ const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y) {
             merror("move_check: out of bounds y");
             retval = false;
         } else {
-            minfo("move_check: move successful");
+
             retval = true;
+            // we also want to check to see if the tile is occupied by any NPCs or objects we will bump into
+            int x0 = e->pos.x + x;
+            int y0 = e->pos.y + y;
+            int index = x0 * g->dungeonfloor->wid + y0;
+            tile_t* t = &g->dungeonfloor->grid[index];
+            int count = vectorentityid_capacity(&t->entityids);
+            for (int i = 0; i < count; i++) {
+                entityid id = vectorentityid_get(&t->entityids, i);
+                entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+                if (entity->type == ENTITY_NPC || entity->type == ENTITY_PLAYER) {
+                    minfo("move_check: tile occupied");
+                    retval = false;
+                    break;
+                }
+            }
+            //if (!retval) {
+            //    return false;
+            //}
+
+            //minfo("move_check: move successful");
+            //retval = true;
         }
     } else {
         merror("move_check: entity is NULL");
