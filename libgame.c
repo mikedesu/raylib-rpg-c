@@ -1891,9 +1891,11 @@ void libgame_initsharedsetup(gamestate* g) {
 
         for (int i = 0; i < g->dungeonfloor->wid; i++) {
             for (int j = 0; j < g->dungeonfloor->len; j++) {
-                char tmp[32] = {0};
-                snprintf(tmp, 32, "orc%d", i * g->dungeonfloor->wid + j);
-                libgame_create_orc(g, tmp, (Vector2){i, j});
+                if (rand() % 16 == 0) {
+                    char tmp[32] = {0};
+                    snprintf(tmp, 32, "orc%d", i * g->dungeonfloor->wid + j);
+                    libgame_create_orc(g, tmp, (Vector2){i, j});
+                }
             }
         }
 

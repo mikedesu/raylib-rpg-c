@@ -1,10 +1,12 @@
 #pragma once
 
+#include "damagetype.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "itemtype.h"
 #include "race.h"
 #include "vectorentityid.h"
+#include "weapontype.h"
 #include <raylib.h>
 
 #define ENTITY_NAME_MAX 128
@@ -17,6 +19,10 @@ typedef struct entity_t {
     Vector2 pos;
     vectorentityid_t inventory;
     race_t race;
+    weapontype_t weapontype; // not be used if not a weapon
+    damagetype_t damagetype; // not be used if not a weapon
+    int hp;
+    int maxhp;
 } entity_t;
 
 
@@ -49,3 +55,18 @@ void entity_move_unsafe(entity_t* e, const Vector2 dir);
 
 void entity_destroy(entity_t* entity);
 void entity_destroy_unsafe(entity_t* entity);
+
+
+
+void entity_set_weapontype(entity_t* e, const weapontype_t wt);
+void entity_set_weapontype_unsafe(entity_t* e, const weapontype_t wt);
+void entity_set_damagetype(entity_t* e, const damagetype_t dt);
+void entity_set_damagetype_unsafe(entity_t* e, const damagetype_t dt);
+void entity_set_hp(entity_t* e, const int hp);
+void entity_set_hp_unsafe(entity_t* e, const int hp);
+void entity_set_maxhp(entity_t* e, const int maxhp);
+void entity_set_maxhp_unsafe(entity_t* e, const int maxhp);
+void entity_incr_hp(entity_t* e, const int hp);
+void entity_incr_hp_unsafe(entity_t* e, const int hp);
+void entity_decr_hp(entity_t* e, const int hp);
+void entity_decr_hp_unsafe(entity_t* e, const int hp);

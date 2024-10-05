@@ -29,6 +29,12 @@ entity_t* entity_create(const char* n) {
     e->race.primary = RACETYPE_NONE;
     e->race.secondary = RACETYPE_NONE;
 
+    e->weapontype = WEAPON_NONE;
+    e->damagetype = DAMAGE_NONE;
+
+    e->hp = 0;
+    e->maxhp = 0;
+
     return e;
 }
 
@@ -160,4 +166,106 @@ void entity_move(entity_t* e, const Vector2 dir) {
 void entity_move_unsafe(entity_t* e, const Vector2 dir) {
     //minfo("entity_move_unsafe");
     entity_set_pos_unsafe(e, Vector2Add(e->pos, dir));
+}
+
+
+
+
+void entity_set_weapontype(entity_t* e, const weapontype_t wt) {
+    if (e) {
+        entity_set_weapontype_unsafe(e, wt);
+    }
+}
+
+
+
+
+void entity_set_weapontype_unsafe(entity_t* e, const weapontype_t wt) {
+    e->weapontype = wt;
+}
+
+
+
+
+void entity_set_damagetype(entity_t* e, const damagetype_t dt) {
+    if (e) {
+        entity_set_damagetype_unsafe(e, dt);
+    }
+}
+
+
+
+
+void entity_set_damagetype_unsafe(entity_t* e, const damagetype_t dt) {
+    e->damagetype = dt;
+}
+
+
+
+
+void entity_set_hp(entity_t* e, const int hp) {
+    if (e) {
+        entity_set_hp_unsafe(e, hp);
+    }
+}
+
+
+
+
+void entity_set_hp_unsafe(entity_t* e, const int hp) {
+    e->hp = hp;
+}
+
+
+
+
+void entity_set_maxhp(entity_t* e, const int maxhp) {
+    if (e) {
+        entity_set_maxhp_unsafe(e, maxhp);
+    }
+}
+
+
+
+
+void entity_set_maxhp_unsafe(entity_t* e, const int maxhp) {
+    e->maxhp = maxhp;
+}
+
+
+
+
+void entity_incr_hp(entity_t* e, const int hp) {
+    if (e) {
+        entity_incr_hp_unsafe(e, hp);
+    }
+}
+
+
+
+
+void entity_incr_hp_unsafe(entity_t* e, const int hp) {
+    e->hp += hp;
+    if (e->hp > e->maxhp) {
+        e->hp = e->maxhp;
+    }
+}
+
+
+
+
+void entity_decr_hp(entity_t* e, const int hp) {
+    if (e) {
+        entity_decr_hp_unsafe(e, hp);
+    }
+}
+
+
+
+
+void entity_decr_hp_unsafe(entity_t* e, const int hp) {
+    e->hp -= hp;
+    if (e->hp < -10) {
+        e->hp = -10;
+    }
 }

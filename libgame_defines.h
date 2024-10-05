@@ -85,6 +85,8 @@
 #define TXORCDMG 44
 #define TXORCDMGSHADOW 45
 
+#define TXSWORD 46
+
 
 
 
