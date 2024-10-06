@@ -95,11 +95,11 @@ void libgame_closesavegamestate();
 
 void libgame_drawdebugpanel(gamestate* g);
 
-void libgame_drawgameplayscene_messagelog(gamestate* g);
+void libgame_draw_gameplayscene_messagelog(gamestate* g);
 
 void libgame_drawcompanyscene(gamestate* g);
 void libgame_drawtitlescene(gamestate* g);
-void libgame_drawgameplayscene(gamestate* g);
+void libgame_draw_gameplayscene(gamestate* g);
 void libgame_drawfade(gamestate* g);
 void libgame_drawgrid(gamestate* g);
 void libgame_drawdungeonfloor(gamestate* g);
@@ -147,6 +147,8 @@ void libgame_update_spritegroup_down(gamestate* g, entityid id);
 void libgame_handle_npc_turn(gamestate* g, entityid id);
 void libgame_createtorchspritegroup(gamestate* g, entityid id);
 void libgame_create_sword_spritegroup(gamestate* g, entityid id);
+void libgame_create_shield_spritegroup(gamestate* g, entityid id);
+void libgame_create_shield(gamestate* g, const char* name, const Vector2 pos);
 
 
 
@@ -1026,7 +1028,7 @@ void libgame_drawframe(gamestate* g) {
         libgame_drawtitlescene(g);
         break;
     case SCENE_GAMEPLAY:
-        libgame_drawgameplayscene(g);
+        libgame_draw_gameplayscene(g);
         break;
     default:
         break;
@@ -1035,7 +1037,7 @@ void libgame_drawframe(gamestate* g) {
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
 
-    libgame_drawgameplayscene_messagelog(g);
+    libgame_draw_gameplayscene_messagelog(g);
 
     libgame_drawdebugpanel(g);
 
@@ -1053,7 +1055,7 @@ void libgame_calc_debugpanel_size(gamestate* g) {
 
 
 
-inline void libgame_drawgameplayscene_messagelog(gamestate* g) {
+inline void libgame_draw_gameplayscene_messagelog(gamestate* g) {
     if (g) {
         const int fontsize = 14;
         const int spacing = 1;
@@ -1299,8 +1301,7 @@ void libgame_drawentity(gamestate* g, entityid id) {
 
 
 
-void libgame_drawgameplayscene(gamestate* g) {
-    //minfo("libgame_drawgameplayscene begin");
+void libgame_draw_gameplayscene(gamestate* g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
 
@@ -1334,7 +1335,7 @@ void libgame_drawgameplayscene(gamestate* g) {
             for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
                 entityid id = vectorentityid_get(&t->entityids, k);
                 entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
-                if (entity->type == ENTITY_ITEM && entity->itemtype == ITEM_TORCH) {
+                if (entity->type == ENTITY_ITEM) {
                     libgame_drawentity(g, id);
                 }
             }
@@ -1370,8 +1371,6 @@ void libgame_drawgameplayscene(gamestate* g) {
     //DrawRectangle(0, 0, 100, 100, BLACK);
     //DrawRectangleLines(10, 10, 80, 80, WHITE);
     //DrawTextEx(g->font, "message log", (Vector2){20, 20}, 12, 1, WHITE);
-
-    //minfo("libgame_drawgameplayscene end");
 }
 
 
@@ -1758,8 +1757,8 @@ void libgame_create_sword_spritegroup(gamestate* g, entityid id) {
     // initialize the group current and dest
     const int tilesize = 8;
     const sprite* s = spritegroup_get(group, 0);
-    const float ox = 0;
-    const float oy = -s->height / 2.0f;
+    const float ox = -8;
+    const float oy = -8;
     const float x = e->pos.x * tilesize + ox;
     const float y = e->pos.y * tilesize + oy;
     Rectangle dest = {x, y, s->width, s->height};
@@ -1768,7 +1767,41 @@ void libgame_create_sword_spritegroup(gamestate* g, entityid id) {
 
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
-    minfo("libgame_create_sword_spritegroup end");
+    msuccess("libgame_create_sword_spritegroup end");
+}
+
+
+
+
+void libgame_create_shield_spritegroup(gamestate* g, entityid id) {
+    minfo("libgame_create_shield_spritegroup begin");
+    spritegroup_t* group = spritegroup_create(4);
+    entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+    int keys[1] = {TXSHIELD};
+    for (int i = 0; i < 1; i++) {
+        sprite* s = sprite_create(
+            &g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
+        if (!s) {
+            merror("could not create sprite");
+        }
+        spritegroup_add(group, s);
+    }
+
+    // the padding will be different for the torch
+    // initialize the group current and dest
+    const int tilesize = 8;
+    const sprite* s = spritegroup_get(group, 0);
+    const float ox = -8;
+    const float oy = -8;
+    const float x = e->pos.x * tilesize + ox;
+    const float y = e->pos.y * tilesize + oy;
+    Rectangle dest = {x, y, s->width, s->height};
+    group->current = 0;
+    group->dest = dest;
+
+    // add the spritegroup to the hashtable
+    hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
+    msuccess("libgame_create_shield_spritegroup end");
 }
 
 
@@ -1873,8 +1906,8 @@ void libgame_init_datastructures(gamestate* g) {
 
     const tiletype_t base_type = TILETYPE_DIRT_00;
     //const tiletype_t base_type = TILETYPE_STONE_00;
-    const int w = 16;
-    const int h = 16;
+    const int w = 8;
+    const int h = 8;
     g->dungeonfloor = create_dungeonfloor(w, h, base_type);
     if (!g->dungeonfloor) {
         //merror("could not create dungeonfloor");
@@ -1971,6 +2004,25 @@ void libgame_create_sword(gamestate* g, const char* name, const Vector2 pos) {
 
 
 
+void libgame_create_shield(gamestate* g, const char* name, const Vector2 pos) {
+    entityid id = libgame_create_entity(g, name, ENTITY_ITEM, pos);
+    if (id != -1) {
+        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+        if (e) {
+            minfo("orc entity created");
+            e->race.primary = RACETYPE_NONE;
+            e->race.secondary = RACETYPE_NONE;
+            e->itemtype = ITEM_SHIELD;
+            e->weapontype = WEAPON_NONE;
+            e->shieldtype = SHIELD_BASIC;
+            libgame_create_shield_spritegroup(g, id);
+        }
+    }
+}
+
+
+
+
 void libgame_initsharedsetup(gamestate* g) {
     minfo("libgame_initsharedsetup begin");
     if (g) {
@@ -1983,7 +2035,15 @@ void libgame_initsharedsetup(gamestate* g) {
         minfo("creating hero");
         // this is just a mock-up for now
         libgame_create_hero(g);
-        minfo("hero created");
+        msuccess("hero created");
+
+        minfo("creating sword...");
+        libgame_create_sword(g, "sword", (Vector2){2, 2});
+        msuccess("sword created");
+
+        minfo("creating shield...");
+        libgame_create_shield(g, "shield", (Vector2){3, 3});
+        msuccess("shield created");
 
         //for (int i = 0; i < g->dungeonfloor->wid; i++) {
         //    for (int j = 0; j < g->dungeonfloor->len; j++) {
@@ -2015,7 +2075,7 @@ void libgame_initsharedsetup(gamestate* g) {
         merror("libgame_initsharedsetup: gamestate is NULL");
     }
 
-    minfo("libgame_initsharedsetup end");
+    msuccess("libgame_initsharedsetup end");
 }
 
 
@@ -2023,29 +2083,32 @@ void libgame_initsharedsetup(gamestate* g) {
 
 void libgame_initwithstate(gamestate* state) {
     if (state == NULL) {
-        //merror("libgame_initwithstate: state is NULL");
+        merror("libgame_initwithstate: state is NULL");
         return;
     }
     //minfo("libgame_initwithstate");
     g = state;
     libgame_initsharedsetup(g);
+    msuccess("libgame_initwithstate end");
 }
 
 
 
 
 void libgame_closesavegamestate() {
-    //minfo("libgame_closesavegamestate");
+    minfo("libgame_closesavegamestate");
     libgame_closeshared(g);
+    msuccess("libgame_closesavegamestate end");
 }
 
 
 
 
 void libgame_close(gamestate* g) {
-    //minfo("libgame_close");
+    minfo("libgame_close");
     libgame_closeshared(g);
     gamestatefree(g);
+    msuccess("libgame_close end");
 }
 
 
@@ -2053,6 +2116,7 @@ void libgame_close(gamestate* g) {
 
 void libgame_closeshared(gamestate* g) {
     // dont need to free most of gamestate
+    minfo("libgame_closeshared");
     UnloadFont(g->font);
     libgame_unloadtextures(g);
 
@@ -2061,6 +2125,7 @@ void libgame_closeshared(gamestate* g) {
 
     //minfo("closing window");
     CloseWindow();
+    msuccess("libgame_closeshared end");
 }
 
 
@@ -2074,7 +2139,7 @@ gamestate* libgame_getgamestate() {
 
 
 const bool libgame_entity_move(gamestate* g, entityid id, int x, int y) {
-    //minfo("libgame_entity_move");
+    minfo("libgame_entity_move");
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
     if (libgame_entity_move_check(g, e, x, y)) {
         // move successful
@@ -2091,9 +2156,11 @@ const bool libgame_entity_move(gamestate* g, entityid id, int x, int y) {
         // add the entityid to the new tile
         vectorentityid_add(&to_tile->entityids, e->id);
 
+        msuccess("libgame_entity_move: move successful");
         return true;
     }
     // move unsuccessful
+    minfo("libgame_entity_move: move unsuccessful");
     return false;
 }
 
@@ -2118,7 +2185,6 @@ const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y) {
             merror("move_check: out of bounds y");
             retval = false;
         } else {
-
             retval = true;
             // we also want to check to see if the tile is occupied by any NPCs or objects we will bump into
             int x0 = e->pos.x + x;
@@ -2135,12 +2201,6 @@ const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y) {
                     break;
                 }
             }
-            //if (!retval) {
-            //    return false;
-            //}
-
-            //minfo("move_check: move successful");
-            //retval = true;
         }
     } else {
         merror("move_check: entity is NULL");

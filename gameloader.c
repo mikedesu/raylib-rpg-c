@@ -96,7 +96,7 @@ void checksymbol(void* symbol, const char* name) {
 
 
 void loadsymbols() {
-    ////minfo("begin loadsymbols");
+    minfo("begin loadsymbols");
     symaddrpair_t pairs[NUM_VOID_FUNCTIONS] = {{"libgame_drawframe", &mylibgamedrawframe},
                                                {"libgame_init", &mylibgameinit},
                                                {"libgame_close", &mylibgameclose},
@@ -129,7 +129,7 @@ void loadsymbols() {
     mylibgame_external_check_reload = dlsym(handle, sym);
     checksymbol(mylibgame_external_check_reload, sym);
 
-    //minfo("end loadsymbols");
+    msuccess("end loadsymbols");
 }
 
 
@@ -153,7 +153,7 @@ void autoreload() {
         openhandle();
         loadsymbols();
         mylibgameinitwithstate(g);
-        minfo("re-entering gameloop");
+        msuccess("re-entering gameloop");
     }
 }
 
@@ -170,7 +170,7 @@ void autoreload_every_n_sec(const int n) {
 
 
 void gamerun() {
-    //minfo("gamerun");
+    minfo("gamerun");
     openhandle();
     loadsymbols();
     last_write_time = getlastwritetime(libname);
@@ -178,7 +178,7 @@ void gamerun() {
     mylibgameinit();
     g = mylibgame_getgamestate();
 
-    //minfo("entering gameloop");
+    minfo("entering gameloop");
     while (!mywindowshouldclose()) {
         mylibgameupdategamestate(g);
         mylibgamedrawframe(g);
@@ -187,12 +187,10 @@ void gamerun() {
         //if (mylibgame_external_check_reload()) {
         //    autoreload();
         //}
-
         autoreload_every_n_sec(10);
-
-
         //autoreload();
     }
-    //minfo("closing libgame");
+    minfo("closing libgame");
     mylibgameclose(g);
+    msuccess("libgame closed");
 }

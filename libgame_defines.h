@@ -86,6 +86,7 @@
 #define TXORCDMGSHADOW 45
 
 #define TXSWORD 46
+#define TXSHIELD 47
 
 
 

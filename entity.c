@@ -31,6 +31,7 @@ entity_t* entity_create(const char* n) {
 
     e->weapontype = WEAPON_NONE;
     e->damagetype = DAMAGE_NONE;
+    e->shieldtype = SHIELD_NONE;
 
     e->hp = 0;
     e->maxhp = 0;

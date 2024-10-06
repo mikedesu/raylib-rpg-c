@@ -5,6 +5,7 @@
 #include "entitytype.h"
 #include "itemtype.h"
 #include "race.h"
+#include "shieldtype.h"
 #include "vectorentityid.h"
 #include "weapontype.h"
 #include <raylib.h>
@@ -21,6 +22,7 @@ typedef struct entity_t {
     race_t race;
     weapontype_t weapontype; // not be used if not a weapon
     damagetype_t damagetype; // not be used if not a weapon
+    shieldtype_t shieldtype; // not be used if not a shield
     int hp;
     int maxhp;
 } entity_t;

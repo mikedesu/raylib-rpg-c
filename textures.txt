@@ -48,3 +48,4 @@
 44 4 4  0 img/characters/orc-dmg.png
 45 4 4  0 img/characters/orc-dmg-shadow.png
 46 1 4  0 img/items/sword-sheet.png
+47 1 4  0 img/items/shield-sheet.png
