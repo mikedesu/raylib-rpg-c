@@ -23,7 +23,8 @@
 
 
 #include <raylib.h>
-#include <rlgl.h>
+#include <raymath.h>
+//#include <rlgl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -118,7 +119,6 @@ void libgame_updateherospritegroup_right(gamestate* g);
 void libgame_updateherospritegroup_left(gamestate* g);
 void libgame_updateherospritegroup_up(gamestate* g);
 void libgame_updateherospritegroup_down(gamestate* g);
-void libgame_createtorchspritegroup(gamestate* g, entityid id);
 void libgame_drawtorchgroup(gamestate* g);
 void libgame_updatesmoothmove(gamestate* g, entityid id);
 void libgame_docameralockon(gamestate* g);
@@ -145,6 +145,8 @@ void libgame_update_spritegroup_left(gamestate* g, entityid id);
 void libgame_update_spritegroup_up(gamestate* g, entityid id);
 void libgame_update_spritegroup_down(gamestate* g, entityid id);
 void libgame_handle_npc_turn(gamestate* g, entityid id);
+void libgame_createtorchspritegroup(gamestate* g, entityid id);
+void libgame_create_sword_spritegroup(gamestate* g, entityid id);
 
 
 
@@ -212,6 +214,33 @@ void libgame_handleinput(gamestate* g) {
 
     if (IsKeyPressed(KEY_F)) {
         ToggleFullscreen();
+    }
+
+
+    if (IsKeyPressed(KEY_E)) {
+        entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
+        if (hero) {
+            // check to see if there are any items at that location
+
+            //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, hero->pos);
+            tile_t* t0 = dungeonfloor_get_tile(g->dungeonfloor, Vector2Add(hero->pos, (Vector2){1, 0}));
+
+            if (t0) {
+                bool canplace = true;
+                for (int i = 0; i < vectorentityid_capacity(&t0->entityids); i++) {
+                    entityid id = vectorentityid_get(&t0->entityids, i);
+                    entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+                    if (entity->type == ENTITY_NPC) {
+                        minfo("npc already exists at this location");
+                        canplace = false;
+                    }
+                }
+                if (canplace) {
+                    libgame_create_orc(g, "orc", Vector2Add(hero->pos, (Vector2){1, 0}));
+                }
+            }
+        }
+        g->player_input_received = true;
     }
 
 
@@ -753,15 +782,15 @@ void libgame_closewindow() {
 
 void libgame_updatedebugpanelbuffer(gamestate* g) {
     entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
-    entity_t* orc = NULL;
+    //entity_t* orc = NULL;
 
-    for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
-        entity_t* e = hashtable_entityid_entity_get(g->entities, vectorentityid_get(&g->entityids, i));
-        if (e->type == ENTITY_NPC) {
-            orc = e;
-            break;
-        }
-    }
+    //for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
+    //    entity_t* e = hashtable_entityid_entity_get(g->entities, vectorentityid_get(&g->entityids, i));
+    //    if (e->type == ENTITY_NPC) {
+    //        orc = e;
+    //        break;
+    //    }
+    //}
 
 
     snprintf(g->debugpanel.buffer,
@@ -778,7 +807,8 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
              "Control mode: %d\n"
              "Hero position: %.0f,%.0f\n"
              "Inventory capacity: %ld\n"
-             "Orc position: %.0f,%.0f\n",
+
+             ,
 
              g->framecount,
              g->timebeganbuf,
@@ -797,10 +827,10 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
              hero->pos.x,
              hero->pos.y,
 
-             vectorentityid_capacity(&hero->inventory),
+             vectorentityid_capacity(&hero->inventory)
 
-             orc->pos.x,
-             orc->pos.y
+             //orc->pos.x,
+             //orc->pos.y
 
 
     );
@@ -939,6 +969,7 @@ void libgame_handle_npc_turn(gamestate* g, entityid id) {
 
 
 void libgame_updategamestate(gamestate* g) {
+    //minfo("begin libgame_updategamestate");
     libgame_updatedebugpanelbuffer(g);
     //setdebugpanelcenter(g);
     libgame_updatesmoothmove(g, g->hero_id);
@@ -967,6 +998,8 @@ void libgame_updategamestate(gamestate* g) {
             libgame_updatesmoothmove(g, id);
         }
     }
+
+    //minfo("end libgame_updategamestate");
 }
 
 
@@ -1337,6 +1370,8 @@ void libgame_drawgameplayscene(gamestate* g) {
     //DrawRectangle(0, 0, 100, 100, BLACK);
     //DrawRectangleLines(10, 10, 80, 80, WHITE);
     //DrawTextEx(g->font, "message log", (Vector2){20, 20}, 12, 1, WHITE);
+
+    //minfo("libgame_drawgameplayscene end");
 }
 
 
@@ -1520,6 +1555,17 @@ void libgame_unloadtextures(gamestate* g) {
     libgame_unloadtexture(g, TXHEROSOULDIE);
     libgame_unloadtexture(g, TXHEROSOULDIESHADOW);
     libgame_unloadtexture(g, TX_TILE_STONE_WALL_00);
+    libgame_unloadtexture(g, TXSWORD);
+    libgame_unloadtexture(g, TXORCIDLE);
+    libgame_unloadtexture(g, TXORCIDLESHADOW);
+    libgame_unloadtexture(g, TXORCWALK);
+    libgame_unloadtexture(g, TXORCWALKSHADOW);
+    libgame_unloadtexture(g, TXORCATTACK);
+    libgame_unloadtexture(g, TXORCATTACKSHADOW);
+    libgame_unloadtexture(g, TXORCJUMP);
+    libgame_unloadtexture(g, TXORCJUMPSHADOW);
+    libgame_unloadtexture(g, TXORCDIE);
+    libgame_unloadtexture(g, TXORCDIESHADOW);
 }
 
 
@@ -1694,6 +1740,40 @@ void libgame_create_orcspritegroup(gamestate* g, entityid id) {
 
 
 
+void libgame_create_sword_spritegroup(gamestate* g, entityid id) {
+    minfo("libgame_create_sword_spritegroup begin");
+    spritegroup_t* group = spritegroup_create(4);
+    entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+    int keys[1] = {TXSWORD};
+    for (int i = 0; i < 1; i++) {
+        sprite* s = sprite_create(
+            &g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
+        if (!s) {
+            merror("could not create sprite");
+        }
+        spritegroup_add(group, s);
+    }
+
+    // the padding will be different for the torch
+    // initialize the group current and dest
+    const int tilesize = 8;
+    const sprite* s = spritegroup_get(group, 0);
+    const float ox = 0;
+    const float oy = -s->height / 2.0f;
+    const float x = e->pos.x * tilesize + ox;
+    const float y = e->pos.y * tilesize + oy;
+    Rectangle dest = {x, y, s->width, s->height};
+    group->current = 0;
+    group->dest = dest;
+
+    // add the spritegroup to the hashtable
+    hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
+    minfo("libgame_create_sword_spritegroup end");
+}
+
+
+
+
 void libgame_loadtargettexture(gamestate* g) {
     target = LoadRenderTexture(targetwidth, targetheight);
     target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
@@ -1764,19 +1844,22 @@ const char* get_str_for_tiletype(tiletype_t type) {
 void libgame_init_dungeonfloor(gamestate* g) {
     minfo("libgame_init_dungeonfloor begin");
     if (g->dungeonfloor) {
-        minfo("setting random tiles");
-        tiletype_t start_type = TILETYPE_STONE_00;
-        const tiletype_t end_type = TILETYPE_STONE_13;
-        printf("start type: %s\n", get_str_for_tiletype(start_type));
-        printf("end type: %s\n", get_str_for_tiletype(end_type));
-        for (int i = 0; i < g->dungeonfloor->wid; i++) {
-            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){i, 0});
-            t->type = start_type;
-            start_type++;
-            if (start_type > end_type) {
-                start_type = TILETYPE_STONE_00;
-            }
-        }
+        minfo("setting tiles");
+        //tiletype_t start_type = TILETYPE_STONE_00;
+        //const tiletype_t end_type = TILETYPE_STONE_13;
+
+        dungeonfloor_set_all_tiles_to_type(g->dungeonfloor, TILETYPE_STONE_00);
+
+        //printf("start type: %s\n", get_str_for_tiletype(start_type));
+        //printf("end type: %s\n", get_str_for_tiletype(end_type));
+        //for (int i = 0; i < g->dungeonfloor->wid; i++) {
+        //    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){i, 0});
+        //    t->type = start_type;
+        //    start_type++;
+        //    if (start_type > end_type) {
+        //        start_type = TILETYPE_STONE_00;
+        //    }
+        //}
     }
 }
 
@@ -1786,7 +1869,6 @@ void libgame_init_datastructures(gamestate* g) {
     //minfo("libgame_initdatastructures begin");
     g->entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
     g->entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
-
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
 
     const tiletype_t base_type = TILETYPE_DIRT_00;
@@ -1871,6 +1953,24 @@ void libgame_create_orc(gamestate* g, const char* name, const Vector2 pos) {
 
 
 
+void libgame_create_sword(gamestate* g, const char* name, const Vector2 pos) {
+    entityid id = libgame_create_entity(g, name, ENTITY_ITEM, pos);
+    if (id != -1) {
+        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+        if (e) {
+            minfo("orc entity created");
+            e->race.primary = RACETYPE_NONE;
+            e->race.secondary = RACETYPE_NONE;
+            e->itemtype = ITEM_WEAPON;
+            e->weapontype = WEAPON_SWORD;
+            libgame_create_sword_spritegroup(g, id);
+        }
+    }
+}
+
+
+
+
 void libgame_initsharedsetup(gamestate* g) {
     minfo("libgame_initsharedsetup begin");
     if (g) {
@@ -1880,18 +1980,20 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_loadtextures(g);
         libgame_init_datastructures(g);
 
+        minfo("creating hero");
         // this is just a mock-up for now
         libgame_create_hero(g);
+        minfo("hero created");
 
-        for (int i = 0; i < g->dungeonfloor->wid; i++) {
-            for (int j = 0; j < g->dungeonfloor->len; j++) {
-                if (rand() % 16 == 0) {
-                    char tmp[32] = {0};
-                    snprintf(tmp, 32, "orc%d", i * g->dungeonfloor->wid + j);
-                    libgame_create_orc(g, tmp, (Vector2){i, j});
-                }
-            }
-        }
+        //for (int i = 0; i < g->dungeonfloor->wid; i++) {
+        //    for (int j = 0; j < g->dungeonfloor->len; j++) {
+        //        if (rand() % 16 == 0) {
+        //            char tmp[32] = {0};
+        //            snprintf(tmp, 32, "orc%d", i * g->dungeonfloor->wid + j);
+        //            libgame_create_orc(g, tmp, (Vector2){i, j});
+        //        }
+        //    }
+        //}
 
         //libgame_create_orc(g, "orc1", (Vector2){2, 2});
         //libgame_create_orc(g, "orc2", (Vector2){2, 3});
@@ -1900,6 +2002,8 @@ void libgame_initsharedsetup(gamestate* g) {
         //libgame_create_orc(g, "orc5", (Vector2){1, 2});
 
         // these dont work right until the text buffer of the debugpanel is filled
+
+
         libgame_updatedebugpanelbuffer(g);
         libgame_calc_debugpanel_size(g);
         setdebugpanelbottomleft(g);
@@ -1910,6 +2014,8 @@ void libgame_initsharedsetup(gamestate* g) {
     } else {
         merror("libgame_initsharedsetup: gamestate is NULL");
     }
+
+    minfo("libgame_initsharedsetup end");
 }
 
 

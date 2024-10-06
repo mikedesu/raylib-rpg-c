@@ -120,7 +120,7 @@ entityid vectorentityid_remove_index(vectorentityid_t* v, size_t index) {
     }
     entityid value = v->data[index];
     //minfo("vectorentityid_remove_index begin copying...");
-    fprintf(stderr, "index: %zu\n", index);
+    //fprintf(stderr, "index: %zu\n", index);
     for (size_t i = index; i < v->current_index - 1; i++) {
         v->data[i] = v->data[i + 1];
     }
