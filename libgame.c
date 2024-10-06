@@ -106,7 +106,7 @@ void libgame_drawdungeonfloor(gamestate* g);
 void libgame_initwithstate(gamestate* state);
 void libgame_initsharedsetup(gamestate* g);
 void libgame_drawframeend(gamestate* g);
-void libgame_handleplayerinput(gamestate* g);
+void libgame_handle_playerinput(gamestate* g);
 void libgame_handlecaminput(gamestate* g);
 void libgame_handledebugpanelswitch(gamestate* g);
 void libgame_handlemodeswitch(gamestate* g);
@@ -149,6 +149,8 @@ void libgame_createtorchspritegroup(gamestate* g, entityid id);
 void libgame_create_sword_spritegroup(gamestate* g, entityid id);
 void libgame_create_shield_spritegroup(gamestate* g, entityid id);
 void libgame_create_shield(gamestate* g, const char* name, const Vector2 pos);
+void libgame_entity_look(gamestate* g, entityid id);
+entityid libgame_entity_pickup_item(gamestate* g, entityid id);
 
 
 
@@ -270,7 +272,7 @@ void libgame_handleinput(gamestate* g) {
 
     libgame_handlemodeswitch(g);
     libgame_handledebugpanelswitch(g);
-    libgame_handleplayerinput(g);
+    libgame_handle_playerinput(g);
     libgame_handlecaminput(g);
 }
 
@@ -626,7 +628,62 @@ void libgame_handleplayerinput_key_up_right(gamestate* g) {
 
 
 
-void libgame_handleplayerinput(gamestate* g) {
+
+// we will eventually flesh this out to append messages and events
+// to their respective logs, however we choose to handle that
+void libgame_entity_look(gamestate* g, entityid id) {
+    entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+    if (e) {
+        tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->pos);
+        if (t) {
+            for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
+                entityid id = vectorentityid_get(&t->entityids, i);
+                if (id != e->id) {
+                    entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+                    if (entity) {
+                        char tmp[256];
+                        snprintf(tmp, 256, "entity id: %d, name: %s", id, entity->name);
+                        msuccess(tmp);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+entityid libgame_entity_pickup_item(gamestate* g, entityid id) {
+    entityid retval = -1;
+    entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->pos);
+    if (e && t) {
+        minfo("entity and tile pointers acquired, entering loop...");
+        for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
+            entityid id2 = vectorentityid_get(&t->entityids, i);
+            entity_t* entity = hashtable_entityid_entity_get(g->entities, id2);
+            //if (entity && entity->type == ENTITY_ITEM && entity->itemtype == ITEM_TORCH) {
+            if (entity && entity->type == ENTITY_ITEM) {
+                minfo("item found on tile, removing...");
+                // we are going to remove the item from the tile
+                // and add it to the player's inventory
+                vectorentityid_remove_value(&t->entityids, id2);
+                // add the item to the player's inventory
+                vectorentityid_add(&e->inventory, id2);
+                retval = id2;
+                break;
+            } else {
+                merror("no item found on tile");
+            }
+        }
+    }
+    return retval;
+}
+
+
+
+void libgame_handle_playerinput(gamestate* g) {
     if (g->controlmode == CONTROLMODE_PLAYER) {
         //const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         // this is just a test
@@ -635,75 +692,43 @@ void libgame_handleplayerinput(gamestate* g) {
 
         // left-handed controls
         // eventually we will create a mapping for custom controls
+        // that way we can centralize handling of the controls
         if (IsKeyPressed(KEY_KP_6) || IsKeyPressed(KEY_RIGHT)) {
-
             libgame_handleplayerinput_key_right(g);
-
             g->player_input_received = true;
-
         } else if (IsKeyPressed(KEY_KP_4) || IsKeyPressed(KEY_LEFT)) {
-
             libgame_handleplayerinput_key_left(g);
             g->player_input_received = true;
-
         } else if (IsKeyPressed(KEY_KP_2) || IsKeyPressed(KEY_DOWN)) {
-
             libgame_handleplayerinput_key_down(g);
             g->player_input_received = true;
-
         } else if (IsKeyPressed(KEY_KP_8) || IsKeyPressed(KEY_UP)) {
-
             libgame_handleplayerinput_key_up(g);
             g->player_input_received = true;
-
         } else if (IsKeyPressed(KEY_KP_1)) {
-
             libgame_handleplayerinput_key_down_left(g);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_3)) {
-
-            minfo("key KP 3 pressed");
             libgame_handleplayerinput_key_down_right(g);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_7)) {
-
-            minfo("key KP 7 pressed");
             libgame_handleplayerinput_key_up_left(g);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_9)) {
-            minfo("key KP 9 pressed");
             libgame_handleplayerinput_key_up_right(g);
             g->player_input_received = true;
         }
 
-        else if (IsKeyPressed(KEY_P)) {
 
-            minfo("key P pressed");
-            // we are going to attempt to pick up any torch on the tile
-            entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
-            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, hero->pos);
-            if (hero && t) {
-                minfo("hero and tile pointers acquired, entering loop...");
-                for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
-                    entityid id = vectorentityid_get(&t->entityids, i);
-                    entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
-                    if (entity && entity->type == ENTITY_ITEM && entity->itemtype == ITEM_TORCH) {
-                        minfo("torch found on tile, removing...");
-                        // we are going to remove the torch from the tile
-                        // and add it to the player's inventory
-                        vectorentityid_remove_value(&t->entityids, id);
-
-                        // add the torch to the player's inventory
-                        vectorentityid_add(&hero->inventory, id);
-                    } else {
-                        merror("no torch found on tile");
-                    }
-                }
-            }
+        else if (IsKeyPressed(KEY_COMMA)) {
+            //minfo("Comma key pressed");
+            // look at the tile the player is on
+            libgame_entity_pickup_item(g, g->hero_id);
             g->player_input_received = true;
         }
 
         else if (IsKeyPressed(KEY_PERIOD)) {
+            libgame_entity_look(g, g->hero_id);
             spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
             if (hero_group) {
                 hero_group->current = 0; //standing/idle
@@ -1037,7 +1062,7 @@ void libgame_drawframe(gamestate* g) {
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
 
-    libgame_draw_gameplayscene_messagelog(g);
+    //libgame_draw_gameplayscene_messagelog(g);
 
     libgame_drawdebugpanel(g);
 

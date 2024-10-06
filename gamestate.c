@@ -33,7 +33,8 @@ gamestate* gamestateinitptr(const int windowwidth,
 
     gamestateupdatecurrenttime(g);
 
-    g->debugpanelon = true;
+    g->debugpanelon = false;
+    //g->debugpanelon = true;
     g->debugpanel.x = 0;
     g->debugpanel.y = 0;
 
