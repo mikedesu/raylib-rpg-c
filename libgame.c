@@ -76,7 +76,7 @@ const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 const bool libgame_entityid_move_check(gamestate* g, entityid id, const Vector2 dir);
 
 const entityid libgame_create_entity(gamestate* g, const char* name, entitytype_t type, Vector2 pos);
-const entityid libgame_create_torchentity(gamestate* g);
+//const entityid libgame_create_torch(gamestate* g);
 
 void libgame_updatedebugpanelbuffer(gamestate* g);
 void libgame_updategamestate(gamestate* g);
@@ -1564,14 +1564,6 @@ const entityid libgame_create_entity(gamestate* g, const char* name, entitytype_
 
 
 
-const entityid libgame_create_torchentity(gamestate* g) {
-    entityid torch_id = libgame_create_entity(g, "torch", ENTITY_ITEM, (Vector2){0, 0});
-    return torch_id;
-}
-
-
-
-
 void libgame_createtorchspritegroup(gamestate* g, entityid id) {
     minfo("libgame_createtorchspritegroup begin");
     spritegroup_t* group = spritegroup_create(4);
@@ -1830,6 +1822,8 @@ void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos) {
             torch->itemtype = ITEM_TORCH;
             libgame_createtorchspritegroup(g, torch_id);
         }
+
+
 
 
     } break;
