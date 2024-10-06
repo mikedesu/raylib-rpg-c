@@ -30,6 +30,7 @@ typedef struct gamestate {
     struct tm* currenttimetm;
 
     bool debugpanelon;
+    bool gridon;
     debugpanel_t debugpanel;
 
     bool cam_lockon;

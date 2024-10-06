@@ -102,13 +102,13 @@ void libgame_drawtitlescene(gamestate* g);
 void libgame_draw_gameplayscene(gamestate* g);
 void libgame_drawfade(gamestate* g);
 void libgame_drawgrid(gamestate* g);
-void libgame_drawdungeonfloor(gamestate* g);
+void libgame_draw_dungeonfloor(gamestate* g);
 void libgame_initwithstate(gamestate* state);
 void libgame_initsharedsetup(gamestate* g);
 void libgame_drawframeend(gamestate* g);
 void libgame_handle_playerinput(gamestate* g);
 void libgame_handlecaminput(gamestate* g);
-void libgame_handledebugpanelswitch(gamestate* g);
+void libgame_handle_debugpanel_switch(gamestate* g);
 void libgame_handlemodeswitch(gamestate* g);
 void libgame_handlefade(gamestate* g);
 void libgame_create_herospritegroup(gamestate* g, entityid id);
@@ -125,7 +125,7 @@ void libgame_docameralockon(gamestate* g);
 void libgame_do_one_camera_rotation(gamestate* g);
 void libgame_update_spritegroup_move(entityid id, int x, int y);
 void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos);
-void libgame_drawentity(gamestate* g, entityid id);
+void libgame_draw_entity(gamestate* g, entityid id);
 void libgame_entity_anim_incr(entityid id);
 void libgame_calc_debugpanel_size(gamestate* g);
 void libgame_create_hero(gamestate* g);
@@ -151,6 +151,7 @@ void libgame_create_shield_spritegroup(gamestate* g, entityid id);
 void libgame_create_shield(gamestate* g, const char* name, const Vector2 pos);
 void libgame_entity_look(gamestate* g, entityid id);
 entityid libgame_entity_pickup_item(gamestate* g, entityid id);
+void libgame_handle_grid_switch(gamestate* g);
 
 
 
@@ -271,7 +272,10 @@ void libgame_handleinput(gamestate* g) {
     }
 
     libgame_handlemodeswitch(g);
-    libgame_handledebugpanelswitch(g);
+
+    libgame_handle_debugpanel_switch(g);
+    libgame_handle_grid_switch(g);
+
     libgame_handle_playerinput(g);
     libgame_handlecaminput(g);
 }
@@ -295,12 +299,23 @@ void libgame_handlemodeswitch(gamestate* g) {
 
 
 
-void libgame_handledebugpanelswitch(gamestate* g) {
+void libgame_handle_debugpanel_switch(gamestate* g) {
     if (IsKeyPressed(KEY_D)) {
         minfo("debug panel switch");
         g->debugpanelon = !g->debugpanelon;
     }
 }
+
+
+
+
+void libgame_handle_grid_switch(gamestate* g) {
+    if (IsKeyPressed(KEY_G)) {
+        minfo("grid switch");
+        g->gridon = !g->gridon;
+    }
+}
+
 
 
 
@@ -868,32 +883,33 @@ void libgame_updatedebugpanelbuffer(gamestate* g) {
 
 void libgame_updatesmoothmove(gamestate* g, entityid id) {
     //spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    const int tilesize = 8;
 
-    if (hero_group) {
+    if (group) {
         float move_unit = 1.0f;
         // only do it 1 unit at a time
-        if (hero_group->move.x > 0) {
-            hero_group->dest.x += move_unit;
-            hero_group->move.x -= move_unit;
-        } else if (hero_group->move.x < 0) {
-            hero_group->dest.x -= move_unit;
-            hero_group->move.x += move_unit;
+        if (group->move.x > 0) {
+            group->dest.x += move_unit;
+            group->move.x -= move_unit;
+        } else if (group->move.x < 0) {
+            group->dest.x -= move_unit;
+            group->move.x += move_unit;
         }
 
-        if (hero_group->move.y > 0) {
-            hero_group->dest.y += move_unit;
-            hero_group->move.y -= move_unit;
-        } else if (hero_group->move.y < 0) {
-            hero_group->dest.y -= move_unit;
-            hero_group->move.y += move_unit;
+        if (group->move.y > 0) {
+            group->dest.y += move_unit;
+            group->move.y -= move_unit;
+        } else if (group->move.y < 0) {
+            group->dest.y -= move_unit;
+            group->move.y += move_unit;
         }
 
-        if (hero_group->move.x == 0.0f && hero_group->move.y == 0.0f) {
-            entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
-            if (hero) {
-                hero_group->dest.x = hero->pos.x * 8 - 12;
-                hero_group->dest.y = hero->pos.y * 8 - 12;
+        if (group->move.x == 0.0f && group->move.y == 0.0f) {
+            entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+            if (e) {
+                group->dest.x = e->pos.x * tilesize - 12;
+                group->dest.y = e->pos.y * tilesize - 12;
             }
         }
     }
@@ -1139,11 +1155,11 @@ void libgame_drawgrid(gamestate* g) {
 
 
 
-void libgame_drawdungeonfloor(gamestate* g) {
-    //const int w = g->txinfo[TXDIRT].texture.width, h = g->txinfo[TXDIRT].texture.height;
-    const int w = 8, h = 8;
-    //const int w = 16, h = 16;
-    Rectangle tile_src = {0, 0, w, h}, tile_dest = {0, 0, w, h};
+void libgame_draw_dungeonfloor(gamestate* g) {
+    const int w = 8;
+    const int h = 8;
+    Rectangle tile_src = {0, 0, w, h};
+    Rectangle tile_dest = {0, 0, w, h};
     Color c = WHITE;
     float rotation = 0;
     Vector2 origin = {0, 0};
@@ -1154,9 +1170,7 @@ void libgame_drawdungeonfloor(gamestate* g) {
             // check the tile type
             tile_dest.x = i * w;
             tile_dest.y = j * h;
-
             int key = -1;
-
             // this is very inefficient
             // we want a quick way to map
             // tiletypes to texture keys
@@ -1256,14 +1270,18 @@ void libgame_drawdungeonfloor(gamestate* g) {
                 key = TX_TILE_STONE_WALL_00;
                 break;
 
-
-
             default:
                 break;
             }
 
             if (key != -1) {
                 DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, origin, rotation, c);
+
+                // now lets try drawing a dark rectangle over the tile
+                // we will eventually want to do this on top of entities
+                //const int light_incr = 5;
+                //const int light_level = 50; // the lower the number = brighter
+                //DrawRectangle(tile_dest.x, tile_dest.y, w, h, (Color){0, 0, 0, light_incr * light_level});
             }
         }
     }
@@ -1293,16 +1311,28 @@ void libgame_drawtorchgroup(gamestate* g) {
 
 
 
-void libgame_drawentity(gamestate* g, entityid id) {
+void libgame_draw_entity(gamestate* g, entityid id) {
     if (g) {
         spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
         if (group) {
+
+            //const int light_incr = 5;
+            //const int light_level = 25; // the lower the number = brighter
+            const Color c = WHITE;
+            //const Color c2 = (Color){0, 0, 0, light_incr * light_level};
+            const Vector2 origin = {0, 0};
+
             DrawTexturePro(*group->sprites[group->current]->texture,
                            group->sprites[group->current]->src,
                            group->dest,
-                           (Vector2){0, 0},
+                           origin,
                            0.0f,
-                           WHITE);
+                           c);
+
+            // the problem here is we dont have any information on the offset we used at spritegroup creation
+            // if we keep record of the offsets used when loading spritegroups, we could use that here
+            // so we can keep the tile and entity lighting generic
+
 
             if (g->framecount % FRAMEINTERVAL == 0) {
                 sprite_incrframe(group->sprites[group->current]);
@@ -1330,9 +1360,9 @@ void libgame_draw_gameplayscene(gamestate* g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
 
-    libgame_drawdungeonfloor(g);
+    libgame_draw_dungeonfloor(g);
 
-    if (g->debugpanelon) {
+    if (g->gridon) {
         libgame_drawgrid(g);
         //libgame_drawgrid_thick(g, 2);
     }
@@ -1350,6 +1380,7 @@ void libgame_draw_gameplayscene(gamestate* g) {
     // lets iterate thru the dungeonfloor tiles
     // we can utilize that function we just wrote
 
+    // this will eventually go back up into draw_dungeonfloor so we can apply shadow rectangles uniformly
     for (int i = 0; i < g->dungeonfloor->len; i++) {
         for (int j = 0; j < g->dungeonfloor->wid; j++) {
             tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){i, j});
@@ -1361,7 +1392,7 @@ void libgame_draw_gameplayscene(gamestate* g) {
                 entityid id = vectorentityid_get(&t->entityids, k);
                 entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
                 if (entity->type == ENTITY_ITEM) {
-                    libgame_drawentity(g, id);
+                    libgame_draw_entity(g, id);
                 }
             }
 
@@ -1371,7 +1402,7 @@ void libgame_draw_gameplayscene(gamestate* g) {
                 entityid id = vectorentityid_get(&t->entityids, k);
                 entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
                 if (entity->type == ENTITY_NPC) {
-                    libgame_drawentity(g, id);
+                    libgame_draw_entity(g, id);
                 }
             }
 
@@ -1382,7 +1413,7 @@ void libgame_draw_gameplayscene(gamestate* g) {
                 entityid id = vectorentityid_get(&t->entityids, k);
                 entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
                 if (entity->type == ENTITY_PLAYER) {
-                    libgame_drawentity(g, id);
+                    libgame_draw_entity(g, id);
                 }
             }
         }
@@ -1710,6 +1741,8 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
     Rectangle dest = {x + offset_x, y + offset_y, w, h};
     hero_group->current = 0;
     hero_group->dest = dest;
+    hero_group->off_x = offset_x;
+    hero_group->off_y = offset_y;
 
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, g->hero_id, hero_group);
@@ -1756,6 +1789,8 @@ void libgame_create_orcspritegroup(gamestate* g, entityid id) {
     Rectangle dest = {x + offset_x, y + offset_y, w, h};
     orc_group->current = 0;
     orc_group->dest = dest;
+    orc_group->off_x = offset_x;
+    orc_group->off_y = offset_y;
 
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, orc_group);
@@ -1782,13 +1817,15 @@ void libgame_create_sword_spritegroup(gamestate* g, entityid id) {
     // initialize the group current and dest
     const int tilesize = 8;
     const sprite* s = spritegroup_get(group, 0);
-    const float ox = -8;
-    const float oy = -8;
+    const float ox = 0;
+    const float oy = -2;
     const float x = e->pos.x * tilesize + ox;
     const float y = e->pos.y * tilesize + oy;
     Rectangle dest = {x, y, s->width, s->height};
     group->current = 0;
     group->dest = dest;
+    group->off_x = ox;
+    group->off_y = oy;
 
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
@@ -1816,13 +1853,15 @@ void libgame_create_shield_spritegroup(gamestate* g, entityid id) {
     // initialize the group current and dest
     const int tilesize = 8;
     const sprite* s = spritegroup_get(group, 0);
-    const float ox = -8;
-    const float oy = -8;
+    const float ox = 0;
+    const float oy = -2;
     const float x = e->pos.x * tilesize + ox;
     const float y = e->pos.y * tilesize + oy;
     Rectangle dest = {x, y, s->width, s->height};
     group->current = 0;
     group->dest = dest;
+    group->off_x = ox;
+    group->off_y = oy;
 
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);

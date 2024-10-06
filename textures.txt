@@ -2,7 +2,7 @@
 #0 3 4 0 img/darkknight2-sheet.png 
 #0 1 6 0 img/hero-test0-sheet.png 
 0  4 16 0  img/characters/human-idle.png 
-1  4 16 0  img/characters/human-idle-shadow.png 
+1  4 1 0  img/characters/human-idle-shadow.png 
 2  1 1  1 img/tiles/dirt00.png 
 3  1 1  0 img/tiles/dungeon0.png
 4  4 4  0  img/characters/human-walk.png 

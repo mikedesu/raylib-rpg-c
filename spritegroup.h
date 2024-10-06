@@ -11,6 +11,9 @@ typedef struct spritegroup_t {
     Rectangle dest;
     Vector2 move;
 
+    int off_x;
+    int off_y;
+
     sprite** sprites;
 
 } spritegroup_t;

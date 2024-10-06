@@ -15,7 +15,6 @@ all: game
 
 game: main.c gameloader.o $(LIBGAME_OBJECTS) libgame.so  
 	$(CC) -o $@ $(MAIN_C) $(MAIN_OBJECTS) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)
-	#$(CC) -o $@ $(MAIN_C) gameloader.o $(LIBGAME_OBJECTS) $(POSITION_INDEPENDENT_CODE)  $(STATIC_LINK_RAYLIB) $(LINK_MATH)
 
 # Bridge between Raylib and game
 gameloader.o: gameloader.c
@@ -23,7 +22,6 @@ gameloader.o: gameloader.c
 
 gamestate.o: gamestate.c 
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
-	#$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(STATIC_LINK_RAYLIB) $^ -o $@
 
 # Rendering Objects
 
@@ -43,9 +41,6 @@ vectorentityid.o: vectorentityid.c
 
 utils.o: utils.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
-
-#setdebugpanel.o: setdebugpanel.c
-#	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 dungeonfloor.o: dungeonfloor.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
