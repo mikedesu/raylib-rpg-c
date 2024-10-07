@@ -72,6 +72,9 @@ gamestate* gamestateinitptr(const int windowwidth,
 
     g->player_input_received = false;
 
+    //g->is_updating_smooth_move = false;
+    //g->smooth_move_index = 0;
+
     //mprint("gamestateinitptr end\n");
     return g;
 }

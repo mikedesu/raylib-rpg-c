@@ -28,7 +28,7 @@ dungeonfloor_t* create_dungeonfloor(int len, int wid, tiletype_t basetype) {
 
 
 void dungeonfloor_set_all_tiles_to_type(dungeonfloor_t* d, tiletype_t type) {
-    minfo("dungeonfloor_setalltiles");
+    minfo("dungeonfloor_set_all_tiles_to_type");
     for (int i = 0; i < d->len; i++) {
         for (int j = 0; j < d->wid; j++) {
             int index = i * d->wid + j;
@@ -68,6 +68,8 @@ tile_t* dungeonfloor_get_tile(dungeonfloor_t* d, Vector2 pos) {
         }
 
         merror("dungeonfloor_get_tile: pos out of bounds");
+        fprintf(stderr, "pos: (%d, %d)\n", (int)pos.x, (int)pos.y);
+        fprintf(stderr, "d->len: %d, d->wid: %d\n", d->len, d->wid);
         return NULL;
     }
 

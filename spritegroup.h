@@ -6,8 +6,7 @@ typedef struct spritegroup_t {
     int size;
     int capacity;
 
-    // the current sprite row
-    int current;
+    int current; // the current animation sprite in the spritegroup
     Rectangle dest;
     Vector2 move;
 
@@ -31,3 +30,4 @@ void spritegroup_setcontexts(spritegroup_t* sg, int context);
 
 
 void spritegroup_incr(spritegroup_t* sg);
+void spritegroup_set_current(spritegroup_t* sg, int index);

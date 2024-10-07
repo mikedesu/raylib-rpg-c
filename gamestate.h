@@ -61,6 +61,9 @@ typedef struct gamestate {
 
     bool player_input_received;
 
+    //bool is_updating_smooth_move;
+    //int smooth_move_index;
+
 } gamestate;
 
 

@@ -14,15 +14,22 @@
 
 typedef struct entity_t {
     char name[ENTITY_NAME_MAX];
+
     entityid id;
     entitytype_t type;
+
     itemtype_t itemtype; // not be used if not an item
+
     Vector2 pos;
+
     vectorentityid_t inventory;
+
     race_t race;
+
     weapontype_t weapontype; // not be used if not a weapon
     damagetype_t damagetype; // not be used if not a weapon
     shieldtype_t shieldtype; // not be used if not a shield
+
     int hp;
     int maxhp;
 } entity_t;

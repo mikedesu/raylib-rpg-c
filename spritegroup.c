@@ -117,3 +117,17 @@ void spritegroup_incr(spritegroup_t* sg) {
         }
     }
 }
+
+
+
+void spritegroup_set_current(spritegroup_t* sg, const int index) {
+    if (sg) {
+        if (index >= sg->size) {
+            sg->current = sg->size - 1;
+        } else if (index < 0) {
+            sg->current = 0;
+        } else {
+            sg->current = index;
+        }
+    }
+}
