@@ -18,7 +18,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-//#include <emscripten/emscripten.h>
+#include <emscripten/emscripten.h>
 
 
 
@@ -45,7 +45,7 @@ gamestate* g_ = NULL;
 
 
 
-//void gameloop();
+void gameloop();
 
 
 
@@ -176,50 +176,49 @@ void autoreload_every_n_sec(const int n) {
 
 
 
-//void gameloop() {
-//    libgame_handleinput(g_);
-//    libgame_updategamestate(g_);
-//    libgame_drawframe(g_);
-//}
+void gameloop() {
+    libgame_handleinput(g_);
+    libgame_updategamestate(g_);
+    libgame_drawframe(g_);
+}
 
 
 
 void gamerun() {
     minfo("gamerun");
-    openhandle(); // if building for web, turn off
-    loadsymbols(); // if building for web, turn off
-    last_write_time = getlastwritetime(libname); // if building for web, turn off
+    //openhandle();  // if building for web, turn off
+    //loadsymbols(); // if building for web, turn off
+    //last_write_time = getlastwritetime(libname); // if building for web, turn off
 
-    mylibgameinit(); // if building for web, turn off
-    //libgame_init();
+    //mylibgameinit(); // if building for web, turn off
+    libgame_init();
 
 
-    g_ = mylibgame_getgamestate();
     //g = mylibgame_getgamestate();
-    //g_ = libgame_getgamestate();
+    g_ = libgame_getgamestate();
 
     minfo("entering gameloop");
 
-    //emscripten_set_main_loop(gameloop, 0, 1);
+    emscripten_set_main_loop(gameloop, 0, 1);
 
-    while (!mywindowshouldclose()) {
-        //while (!libgame_windowshouldclose()) {
-        //gameloop();
-        mylibgameupdategamestate(g_); // if building for web, turn off
-        mylibgamedrawframe(g_); // if building for web, turn off
-        mylibgamehandleinput(g_); // if building for web, turn off
-        autoreload_every_n_sec(10); // if building for web, turn off
-        //printf("game looping\n");
-        //libgame_updategamestate(g_);
-        //libgame_drawframe(g_);
-        //libgame_handleinput(g_);
-        //if (mylibgame_external_check_reload()) {
-        //    autoreload();
-        //}
-        //autoreload();
-    }
+    //while (!mywindowshouldclose()) {
+    //while (!libgame_windowshouldclose()) {
+    //gameloop();
+    //mylibgameupdategamestate(g); // if building for web, turn off
+    //mylibgamedrawframe(g);       // if building for web, turn off
+    //mylibgamehandleinput(g);     // if building for web, turn off
+    //autoreload_every_n_sec(10);  // if building for web, turn off
+    //printf("game looping\n");
+    //libgame_updategamestate(g_);
+    //libgame_drawframe(g_);
+    //libgame_handleinput(g_);
+    //if (mylibgame_external_check_reload()) {
+    //    autoreload();
+    //}
+    //autoreload();
+    //}
     minfo("closing libgame");
-    mylibgameclose(g_);
-    //libgame_close(g_);
+    //mylibgameclose(g_);
+    libgame_close(g_);
     msuccess("libgame closed");
 }
