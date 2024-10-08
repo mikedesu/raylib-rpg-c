@@ -15,19 +15,18 @@ typedef struct {
 } vectorentityid_t;
 
 vectorentityid_t vectorentityid_new();
-vectorentityid_t vectorentityid_create(size_t size);
+vectorentityid_t vectorentityid_create(const size_t size);
 
 void vectorentityid_destroy(vectorentityid_t* v);
-void vectorentityid_set(vectorentityid_t* v, size_t index, int value);
-void vectorentityid_resize(vectorentityid_t* v, size_t new_size);
+void vectorentityid_set(vectorentityid_t* v, const size_t index, const int value);
+void vectorentityid_resize(vectorentityid_t* v, const size_t new_size);
 
-entityid vectorentityid_get(vectorentityid_t* v, size_t index);
+const entityid vectorentityid_get(const vectorentityid_t* v, const size_t index);
+const size_t vectorentityid_size(const vectorentityid_t* v);
+const size_t vectorentityid_capacity(const vectorentityid_t* v);
+const size_t vectorentityid_contains(const vectorentityid_t* v, const entityid value);
 
-size_t vectorentityid_size(vectorentityid_t* v);
-size_t vectorentityid_capacity(vectorentityid_t* v);
-size_t vectorentityid_contains(vectorentityid_t* v, entityid value);
+bool vectorentityid_add(vectorentityid_t* v, const entityid value);
 
-bool vectorentityid_add(vectorentityid_t* v, entityid value);
-
-entityid vectorentityid_remove_index(vectorentityid_t* v, size_t index);
-entityid vectorentityid_remove_value(vectorentityid_t* v, entityid value);
+const entityid vectorentityid_remove_index(vectorentityid_t* v, const size_t index);
+const entityid vectorentityid_remove_value(vectorentityid_t* v, const entityid value);

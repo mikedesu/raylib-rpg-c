@@ -14,7 +14,7 @@ MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_entity.o
 
 
 
-all: game index.html
+all: game 
 
 
 index.html: main.c $(MAIN_SOURCES)  

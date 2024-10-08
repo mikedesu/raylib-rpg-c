@@ -222,6 +222,9 @@ void libgame_handleinput(gamestate* g) {
                             break;
                         }
                     }
+
+
+
                     libgame_entity_anim_set(g, orc_id, 10);
                 }
                 // in any case, set the attack animation
@@ -641,6 +644,7 @@ void libgame_handleplayerinput_key_down_left(gamestate* g) {
 
 
 
+
 void libgame_handleplayerinput_key_down_right(gamestate* g) {
     libgame_updateherospritegroup_right(g);
     bool result = libgame_entity_move(g, g->hero_id, 1, 1);
@@ -650,6 +654,8 @@ void libgame_handleplayerinput_key_down_right(gamestate* g) {
 }
 
 
+
+
 void libgame_handleplayerinput_key_up_left(gamestate* g) {
     libgame_updateherospritegroup_left(g);
     bool result = libgame_entity_move(g, g->hero_id, -1, -1);
@@ -657,6 +663,8 @@ void libgame_handleplayerinput_key_up_left(gamestate* g) {
         libgame_update_spritegroup_move(g, g->hero_id, -8, -8);
     }
 }
+
+
 
 
 void libgame_handleplayerinput_key_up_right(gamestate* g) {
@@ -827,12 +835,7 @@ void libgame_handle_caminput(gamestate* g) {
             g->cam2d.offset.y -= cam_move_incr;
         } else if (IsKeyDown(KEY_KP_0)) {
             g->cam2d.zoom = 2.0f;
-        }
-
-
-
-
-        else if (IsKeyPressed(KEY_R)) {
+        } else if (IsKeyPressed(KEY_R)) {
             g->cam2d.offset = (Vector2){0, 0};
         } else if (IsKeyPressed(KEY_F)) {
             g->cam_lockon = !g->cam_lockon;
@@ -883,7 +886,6 @@ void libgame_closewindow() {
 void libgame_update_debugpanelbuffer(gamestate* g) {
     entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
     //entity_t* orc = NULL;
-
     //for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
     //    entity_t* e = hashtable_entityid_entity_get(g->entities, vectorentityid_get(&g->entityids, i));
     //    if (e->type == ENTITY_NPC) {
@@ -891,7 +893,6 @@ void libgame_update_debugpanelbuffer(gamestate* g) {
     //        break;
     //    }
     //}
-
 
     snprintf(g->debugpanel.buffer,
              1024,
@@ -1083,48 +1084,28 @@ void libgame_handle_npc_turn(gamestate* g, entityid id) {
 
 
 
+
 void libgame_updategamestate(gamestate* g) {
     //minfo("begin libgame_updategamestate");
     libgame_update_debugpanelbuffer(g);
     //setdebugpanelcenter(g);
     libgame_update_smoothmove(g, g->hero_id);
-    //libgame_do_cameralockon(g);
+    libgame_do_cameralockon(g);
 
     // at this point, we can take other NPC turns
     // lets iterate over our entities, find the NPCs, and make them move in a random direction
     // then, we will update their smooth moves
     // we will need to eventually disable player input during smooth moving
-
-    //if (g->player_input_received) {
-    //    for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
-    //        entityid id = vectorentityid_get(&g->entityids, i);
-    //        libgame_handle_npc_turn(g, id);
-    //    }
-    //    g->player_input_received = false;
-    //}
-
-
-    // update smooth move for NPCs and other entities
-    for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
-        entityid id = vectorentityid_get(&g->entityids, i);
-        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
-        if (e && e->type == ENTITY_NPC) {
-            libgame_update_smoothmove(g, id);
+    if (g->player_input_received) {
+        for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
+            entityid id = vectorentityid_get(&g->entityids, i);
+            libgame_handle_npc_turn(g, id);
         }
+        g->player_input_received = false;
     }
 
-    //entityid id = vectorentityid_get(&g->entityids, g->smooth_move_index);
-    //libgame_update_smoothmove(g, id);
-    //spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, g->smooth_move_index);
-    //if (group) {
-    //    if (group->move.x == 0.0f && group->move.y == 0.0f) {
-    //        g->smooth_move_index++;
-    //        if (g->smooth_move_index >= vectorentityid_capacity(&g->entityids)) {
-    //            g->smooth_move_index = 0;
-    //        }
-    //    }
-    //}
-
+    // update smooth move for NPCs and other entities
+    libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
     //minfo("end libgame_updategamestate");
 }
 
@@ -1156,7 +1137,6 @@ void libgame_drawframeend(gamestate* g) {
 void libgame_drawframe(gamestate* g) {
     BeginDrawing();
     BeginTextureMode(target);
-
     switch (activescene) {
     case SCENE_COMPANY:
         libgame_drawcompanyscene(g);
@@ -1170,16 +1150,12 @@ void libgame_drawframe(gamestate* g) {
     default:
         break;
     }
-
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-
-    //libgame_draw_gameplayscene_messagelog(g);
-
     libgame_draw_debugpanel(g);
-
     libgame_drawframeend(g);
 }
+
 
 
 
@@ -1196,8 +1172,6 @@ inline void libgame_draw_gameplayscene_messagelog(gamestate* g) {
     if (g) {
         const int fontsize = 14;
         const int spacing = 1;
-        //const int xy = 10;
-        //const int wh = 20;
         const char* text =
             "you have entered the dungeon\nmessages will appear here\nevildojo666\n666\n7777\n";
         const int x = 20;
@@ -1209,7 +1183,6 @@ inline void libgame_draw_gameplayscene_messagelog(gamestate* g) {
         const Rectangle box2 = {x, y, box1.width, box1.height};
         const Vector2 origin = {0, 0};
         const Vector2 text_origin = {30, 30};
-
         DrawRectanglePro(box1, origin, 0.0f, (Color){0x33, 0x33, 0x33, 0xFF});
         DrawRectangleLinesEx(box2, 1, WHITE);
         DrawTextEx(g->font, text, text_origin, fontsize, spacing, WHITE);
@@ -1221,13 +1194,20 @@ inline void libgame_draw_gameplayscene_messagelog(gamestate* g) {
 
 inline void libgame_draw_debugpanel(gamestate* g) {
     if (g && g->debugpanelon) {
-        //const int fontsize = 14, spacing = 1, xy = 10, wh = 20;
-        const int fontsize = 14, spacing = 1, xy = 10, wh = 20;
+        const int fontsize = 14;
+        const int spacing = 1;
+        const int xy = 10;
+        const int wh = 20;
+        Color c = {0x33, 0x33, 0x33, 255};
+        Color c2 = WHITE;
         const Vector2 p = {g->debugpanel.x, g->debugpanel.y}, o = {0, 0};
-        const Rectangle box = {
-            g->debugpanel.x - xy, g->debugpanel.y - xy, g->debugpanel.w + wh, g->debugpanel.h + wh};
-        DrawRectanglePro(box, o, 0.0f, (Color){0x33, 0x33, 0x33, 255});
-        DrawTextEx(g->font, g->debugpanel.buffer, p, fontsize, spacing, WHITE);
+        const int x0 = g->debugpanel.x - xy;
+        const int y0 = g->debugpanel.y - xy;
+        const int w0 = g->debugpanel.w + wh;
+        const int h0 = g->debugpanel.h + wh;
+        const Rectangle box = {x0, y0, w0, h0};
+        DrawRectanglePro(box, o, 0.0f, c);
+        DrawTextEx(g->font, g->debugpanel.buffer, p, fontsize, spacing, c2);
     }
 }
 
@@ -1237,7 +1217,8 @@ inline void libgame_draw_debugpanel(gamestate* g) {
 void libgame_drawgrid(gamestate* g) {
     Color c = GREEN;
     // default tile size 8x8
-    const int w = 8, h = 8;
+    const int w = 8;
+    const int h = 8;
     const int len = g->dungeonfloor->len;
     const int wid = g->dungeonfloor->wid;
     for (int i = 0; i <= len; i++) {
@@ -1285,12 +1266,18 @@ void libgame_draw_dungeonfloor(gamestate* g) {
 void libgame_drawtorchgroup(gamestate* g) {
     spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
     if (group) {
-        DrawTexturePro(*group->sprites[group->current]->texture,
-                       group->sprites[group->current]->src,
-                       group->dest,
-                       (Vector2){0, 0},
-                       0.0f,
-                       WHITE);
+        Texture tx = *group->sprites[group->current]->texture;
+        Rectangle src = group->sprites[group->current]->src;
+        Rectangle dest = group->dest;
+        Vector2 origin = {0, 0};
+        Color c = WHITE;
+        DrawTexturePro(tx, src, dest, origin, 0.0f, c);
+        //DrawTexturePro(*group->sprites[group->current]->texture,
+        //               group->sprites[group->current]->src,
+        //               group->dest,
+        //               (Vector2){0, 0},
+        //               0.0f,
+        //               WHITE);
     }
 
     if (g->framecount % FRAMEINTERVAL == 0) {
@@ -1305,20 +1292,14 @@ void libgame_draw_entity(gamestate* g, entityid id) {
     if (g) {
         spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
         if (group) {
-
-            //const int light_incr = 5;
-            //const int light_level = 25; // the lower the number = brighter
             const Color c = WHITE;
-            //const Color c2 = (Color){0, 0, 0, light_incr * light_level};
             const Vector2 origin = {0, 0};
-
             DrawTexturePro(*group->sprites[group->current]->texture,
                            group->sprites[group->current]->src,
                            group->dest,
                            origin,
                            0.0f,
                            c);
-
             // the problem here is we dont have any information on the offset we used at spritegroup creation
             // if we keep record of the offsets used when loading spritegroups, we could use that here
             // so we can keep the tile and entity lighting generic
@@ -1327,11 +1308,12 @@ void libgame_draw_entity(gamestate* g, entityid id) {
             }
 
             if (g->debugpanelon) {
-                Color c = (Color){51, 51, 51, 255};
-                Vector2 v[4] = {{group->dest.x, group->dest.y},
-                                {group->dest.x + group->dest.width, group->dest.y},
-                                {group->dest.x + group->dest.width, group->dest.y + group->dest.height},
-                                {group->dest.x, group->dest.y + group->dest.height}};
+                Color c = {51, 51, 51, 255};
+                const int x = group->dest.x;
+                const int y = group->dest.y;
+                const int w = group->dest.width;
+                const int h = group->dest.height;
+                const Vector2 v[4] = {{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}};
                 DrawLineV(v[0], v[1], c);
                 DrawLineV(v[1], v[2], c);
                 DrawLineV(v[2], v[3], c);
@@ -1345,10 +1327,10 @@ void libgame_draw_entity(gamestate* g, entityid id) {
 
 
 void libgame_draw_items(gamestate* g, const Vector2 pos, const itemtype_t type) {
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    const tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
     for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
-        entityid id = vectorentityid_get(&t->entityids, k);
-        entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+        const entityid id = vectorentityid_get(&t->entityids, k);
+        const entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
         if (entity->type == ENTITY_ITEM && entity->itemtype == type) {
             libgame_draw_entity(g, id);
         }
@@ -1930,78 +1912,22 @@ void libgame_loadfont(gamestate* g) {
 
 
 
-// GROSS!!!
-//const char* get_str_for_tiletype(tiletype_t type) {
-//    switch (type) {
-//    case TILETYPE_DIRT_00:
-//        return "dirt 00";
-//    case TILETYPE_DIRT_01:
-//        return "dirt 01";
-//    case TILETYPE_DIRT_02:
-//        return "dirt 02";
-//    case TILETYPE_STONE_00:
-//        return "stone 00";
-//    case TILETYPE_STONE_01:
-//        return "stone 01";
-//    case TILETYPE_STONE_02:
-//        return "stone 02";
-//    case TILETYPE_STONE_03:
-//        return "stone 03";
-//    case TILETYPE_STONE_04:
-//        return "stone 04";
-//    case TILETYPE_STONE_05:
-//        return "stone 05";
-//    case TILETYPE_STONE_06:
-//        return "stone 06";
-//    case TILETYPE_STONE_07:
-//        return "stone 07";
-//    case TILETYPE_STONE_08:
-//        return "stone 08";
-//    case TILETYPE_STONE_09:
-//        return "stone 09";
-//    case TILETYPE_STONE_10:
-//        return "stone 10";
-//    case TILETYPE_STONE_11:
-//        return "stone 11";
-//    case TILETYPE_STONE_12:
-//        return "stone 12";
-//    case TILETYPE_STONE_13:
-//        return "stone 13";
-//    case TILETYPE_STONE_14:
-//        return "stone 14";
-//    case TILETYPE_STONE_WALL_00:
-//        return "stone wall 00";
-//    default:
-//        return "unknown";
-//    }
-//}
-
-
-
 
 void libgame_init_dungeonfloor(gamestate* g) {
     minfo("libgame_init_dungeonfloor begin");
     if (g->dungeonfloor) {
         minfo("setting tiles");
-        //dungeonfloor_set_all_tiles_to_type(g->dungeonfloor, TILETYPE_STONE_00);
         tiletype_t start_type = TILETYPE_DIRT_00;
         const tiletype_t end_type = TILETYPE_STONE_13;
-
-        //printf("start type: %s\n", get_str_for_tiletype(start_type));
-        //printf("end type: %s\n", get_str_for_tiletype(end_type));
         for (int i = 0; i < g->dungeonfloor->len; i++) {
             for (int j = 0; j < g->dungeonfloor->wid; j++) {
                 tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){i, j});
                 t->type = GetRandomValue(start_type, end_type);
             }
         }
-        //start_type++;
-        //    if (start_type > end_type) {
-        //        start_type = TILETYPE_STONE_00;
-        //    }
-        //}
     }
 }
+
 
 
 
@@ -2011,7 +1937,6 @@ void libgame_init_datastructures(gamestate* g) {
     g->entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
     const tiletype_t base_type = TILETYPE_DIRT_00;
-    //const tiletype_t base_type = TILETYPE_STONE_00;
     const int w = 8;
     const int h = 8;
     g->dungeonfloor = create_dungeonfloor(w, h, base_type);

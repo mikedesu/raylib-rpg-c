@@ -54,6 +54,12 @@
 	- [ ] message logging
 	- [ ] message boxes that pop up when talking with NPCs
 - [ ] new tiles / environments
-
+- [ ] refactor how we update spritegroups for humanoids with 4-spritegroup contexts
+- [ ] optimize how text gets updated
+	- [ ] debugpanel frame is the only thing actually changing per-frame
+	- [ ] most of the text is static until a value changes
+	- [ ] this can be optimized
+- [ ] `handle_npc_turn` can be optimized / updated
+- [ ] enemy stun on attack or somehow "pause" the gameloop so the sprite doesnt skip the damage animation
 
 
