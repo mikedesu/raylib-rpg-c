@@ -1,0 +1,59 @@
+# TODO
+
+- [ ] web controls / gestures / touchscreen
+- [ ] mouse controls / clicking
+- [ ] attack / damage mechanics
+	- [ ] player
+	- [ ] enemies
+- [ ] death animation change
+- [ ] death mechanics
+- [ ] item drops
+- [ ] inventory menu
+- [ ] game menu
+- [ ] saving / loading
+- [ ] blocking animation
+- [ ] blocking mechanics
+- [ ] raylib-based music
+- [ ] item-use 
+- [ ] item-creation
+	- [ ] ex: potion of healing
+	- [ ] ex: potion of poison
+	- [ ] ex: potion of fire
+- [ ] weapon-creation
+- [ ] armor-creation
+- [ ] wands
+- [ ] staves
+- [ ] magic
+	- [ ] scrolls
+	- [ ] books
+	- [ ] wands
+	- [ ] staves
+- [ ] doors/keys
+- [ ] sokoban mechanics
+	- [ ] pushable blocks
+	- [ ] pressure plates
+	- [ ] doors
+	- [ ] attaching doors to pressure plates and other switches
+- [ ] trap tiles
+	- [ ] trap-on-tile
+	- [ ] trap by pressure plate or other switch
+- [ ] wall switches
+- [ ] lighting
+	- [ ] torches
+	- [ ] candles
+	- [ ] rings / equipment
+	- [ ] other light sources
+- [ ] modifiers to equipment
+	- [ ] ex: +1 attack, +2 defense
+	- [ ] ex: sword of light +1: +1 attack, +1 light radius
+	- [ ] ex: poisonous sword of fire: +1 poison damage, +1 fire damage
+- [ ] dungeon details
+	- [ ] props
+- [ ] messaging systems
+	- [ ] popup texts
+	- [ ] message logging
+	- [ ] message boxes that pop up when talking with NPCs
+- [ ] new tiles / environments
+
+
+

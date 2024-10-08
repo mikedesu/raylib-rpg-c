@@ -45,7 +45,9 @@ gamestate* gamestateinitptr(const int windowwidth,
     g->display.windowheight = windowheight;
 
     g->cam2d.target = (Vector2){0, 0};
-    g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
+    //g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
+    g->cam2d.offset = (Vector2){targetwidth / 8.0f, targetheight / 4.0f};
+
 
     g->cam2d.zoom = 4.0;
 
