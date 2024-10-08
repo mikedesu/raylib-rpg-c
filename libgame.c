@@ -8,6 +8,7 @@
 #include "hashtable_entityid_entity.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "itemtype.h"
+#include "libgame.h"
 #include "libgame_defines.h"
 #include "mprint.h"
 #include "race.h"
@@ -65,20 +66,17 @@ int windowheight = DEFAULT_WINDOW_HEIGHT;
 //------------------------------------------------------------------
 // function declarations
 //------------------------------------------------------------------
+/*
 bool libgame_windowshouldclose();
 gamestate* libgame_getgamestate();
 void libgame_initwindow();
 void libgame_closewindow();
 void libgame_init();
 bool libgame_external_check_reload();
-
 const bool libgame_entity_move(gamestate* g, entityid id, int x, int y);
 const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 const bool libgame_entityid_move_check(gamestate* g, entityid id, const Vector2 dir);
-
 const entityid libgame_create_entity(gamestate* g, const char* name, entitytype_t type, Vector2 pos);
-//const entityid libgame_create_torch(gamestate* g);
-
 void libgame_update_debugpanelbuffer(gamestate* g);
 void libgame_updategamestate(gamestate* g);
 void libgame_close(gamestate* g);
@@ -89,14 +87,10 @@ void libgame_unloadtexture(gamestate* g, int index);
 void libgame_unloadtextures(gamestate* g);
 void libgame_loadtextures(gamestate* g);
 void libgame_loadtexturesfromfile(gamestate* g, const char* path);
-//void libgame_reloadtextures(gamestate* g);
 void libgame_closeshared(gamestate* g);
 void libgame_closesavegamestate();
-
 void libgame_draw_debugpanel(gamestate* g);
-
 void libgame_draw_gameplayscene_messagelog(gamestate* g);
-
 void libgame_drawcompanyscene(gamestate* g);
 void libgame_drawtitlescene(gamestate* g);
 void libgame_draw_gameplayscene(gamestate* g);
@@ -150,21 +144,19 @@ void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off
 void libgame_create_shield_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);
 void libgame_create_shield(gamestate* g, const char* name, const Vector2 pos);
 void libgame_entity_look(gamestate* g, entityid id);
-entityid libgame_entity_pickup_item(gamestate* g, entityid id);
 void libgame_handle_grid_switch(gamestate* g);
-const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const Vector2 pos, const entitytype_t type);
 void libgame_draw_items(gamestate* g, const Vector2 pos, const itemtype_t type);
 void libgame_draw_items_that_are_not(gamestate* g, const Vector2 pos, const itemtype_t type);
 void libgame_draw_entities_at(gamestate* g, const Vector2 pos, const entitytype_t type);
-const bool libgame_entity_is_at(gamestate* g, const Vector2 pos, const entityid id);
-const bool libgame_itemtype_is_at(gamestate* g, const Vector2 pos, const itemtype_t type);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
 void libgame_entity_anim_set(gamestate* g, entityid id, int index);
+entityid libgame_entity_pickup_item(gamestate* g, entityid id);
+const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const Vector2 pos, const entitytype_t type);
+const bool libgame_entity_is_at(gamestate* g, const Vector2 pos, const entityid id);
+const bool libgame_itemtype_is_at(gamestate* g, const Vector2 pos, const itemtype_t type);
 const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, itemtype_t type);
-
-
-
 const bool libgame_entity_try_attack_pos(gamestate* g, entityid id, const Vector2 pos);
+*/
 
 
 
@@ -296,6 +288,7 @@ const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, ite
 
 
 void libgame_handleinput(gamestate* g) {
+    //minfo("handleinput: starting...");
     //if (IsKeyPressed(KEY_SPACE)) {
     //minfo("key space pressed");
     //if (g->fadestate == FADESTATENONE) {
@@ -397,6 +390,18 @@ void libgame_handleinput(gamestate* g) {
     libgame_handle_grid_switch(g);
     libgame_handle_playerinput(g);
     libgame_handle_caminput(g);
+
+
+    // test getting an arbitrary key press
+    int keypressed = GetKeyPressed();
+    if (keypressed > 0) {
+        char tmp[256];
+        snprintf(tmp, 256, "key pressed: %d", keypressed);
+        msuccess(tmp);
+    }
+    //else {
+    //    merror("no key pressed");
+    //}
 }
 
 
@@ -818,6 +823,7 @@ entityid libgame_entity_pickup_item(gamestate* g, entityid id) {
 
 
 void libgame_handle_playerinput(gamestate* g) {
+    //minfo("handle_playerinput: starting...");
     if (g->controlmode == CONTROLMODE_PLAYER) {
         //const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         // this is just a test
@@ -1655,6 +1661,7 @@ void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool
 
 
 void libgame_loadtextures(gamestate* g) {
+    minfo("load textures");
     libgame_loadtexturesfromfile(g, "textures.txt");
 }
 
@@ -1668,8 +1675,12 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
         return;
     }
 
-    int index = 0, contexts = 0, frames = 0, dodither = 0;
-    char line[256], txpath[256];
+    int index = 0;
+    int contexts = 0;
+    int frames = 0;
+    int dodither = 0;
+    char line[256];
+    char txpath[256];
 
     while (fgets(line, 256, f)) {
         // if the line begins with a #, skip it
@@ -1825,7 +1836,11 @@ void libgame_create_torch_spritegroup(gamestate* g, entityid id, const float off
 // not every entity will have this many sprites
 // lets try using this as a basis to get a sprite in there
 void libgame_create_herospritegroup(gamestate* g, entityid id) {
+    minfo("libgame_create_herospritegroup begin");
+
+    minfo("creating hero group...");
     spritegroup_t* hero_group = spritegroup_create(20);
+    minfo("getting hero entity...");
     entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
 
     int keys[12] = {TXHERO,
@@ -1841,11 +1856,14 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
                     TXHEROSOULDIE,
                     TXHEROSOULDIESHADOW};
 
+    minfo("looping thru sprite keys...");
     for (int i = 0; i < 12; i++) {
-        sprite* s = sprite_create(
-            &g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
+        printf("i: %d\n", i);
+        int txkey = keys[i];
+        sprite* s =
+            sprite_create(&g->txinfo[txkey].texture, g->txinfo[txkey].contexts, g->txinfo[txkey].num_frames);
         if (!s) {
-            //merror("could not create sprite");
+            merror("could not create sprite");
         }
         spritegroup_add(hero_group, s);
     }
@@ -1866,7 +1884,9 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
     hero_group->off_y = offset_y;
 
     // add the spritegroup to the hashtable
+    minfo("inserting hero spritegroup into table...");
     hashtable_entityid_spritegroup_insert(g->spritegroups, g->hero_id, hero_group);
+    msuccess("libgame_create_herospritegroup end");
 }
 
 

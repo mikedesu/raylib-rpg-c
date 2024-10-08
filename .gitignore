@@ -6,3 +6,7 @@ img/*.png
 game
 unit_test
 *.so
+*.html
+*.js
+*.data
+*.wasm

@@ -3,6 +3,7 @@
 #include "mprint.h"
 #include "symaddrpair.h"
 
+#include "libgame.h"
 
 
 
@@ -17,6 +18,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <emscripten/emscripten.h>
 
 
 
@@ -38,7 +40,12 @@ void* handle = NULL;
 
 
 
-gamestate* g = NULL;
+gamestate* g_ = NULL;
+
+
+
+
+void gameloop();
 
 
 
@@ -71,7 +78,7 @@ time_t getlastwritetime(const char* filename) {
 
 
 void openhandle() {
-    ////minfo("openhandle");
+    minfo("openhandle");
     handle = dlopen(libname, RTLD_LAZY);
     if (!handle) {
         //merror("handle is NULL");
@@ -145,14 +152,14 @@ void autoreload() {
             sleep(1);
         }
         //minfo("getting old gamestate");
-        g = mylibgame_getgamestate();
+        g_ = mylibgame_getgamestate();
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
         mylibgameclosesavegamestate(); // closes window
         dlclose(handle);
         openhandle();
         loadsymbols();
-        mylibgameinitwithstate(g);
+        mylibgameinitwithstate(g_);
         msuccess("re-entering gameloop");
     }
 }
@@ -161,7 +168,7 @@ void autoreload() {
 
 void autoreload_every_n_sec(const int n) {
     assert(n > 0);
-    if (g->currenttime % n == 0) {
+    if (g_->currenttime % n == 0) {
         autoreload();
     }
 }
@@ -169,28 +176,49 @@ void autoreload_every_n_sec(const int n) {
 
 
 
+void gameloop() {
+    libgame_handleinput(g_);
+    libgame_updategamestate(g_);
+    libgame_drawframe(g_);
+}
+
+
+
 void gamerun() {
     minfo("gamerun");
-    openhandle();
-    loadsymbols();
-    last_write_time = getlastwritetime(libname);
+    //openhandle();  // if building for web, turn off
+    //loadsymbols(); // if building for web, turn off
+    //last_write_time = getlastwritetime(libname); // if building for web, turn off
 
-    mylibgameinit();
-    g = mylibgame_getgamestate();
+    //mylibgameinit(); // if building for web, turn off
+    libgame_init();
+
+
+    //g = mylibgame_getgamestate();
+    g_ = libgame_getgamestate();
 
     minfo("entering gameloop");
-    while (!mywindowshouldclose()) {
-        mylibgameupdategamestate(g);
-        mylibgamedrawframe(g);
-        mylibgamehandleinput(g);
 
-        //if (mylibgame_external_check_reload()) {
-        //    autoreload();
-        //}
-        autoreload_every_n_sec(10);
-        //autoreload();
-    }
+    emscripten_set_main_loop(gameloop, 0, 1);
+
+    //while (!mywindowshouldclose()) {
+    //while (!libgame_windowshouldclose()) {
+    //gameloop();
+    //mylibgameupdategamestate(g); // if building for web, turn off
+    //mylibgamedrawframe(g);       // if building for web, turn off
+    //mylibgamehandleinput(g);     // if building for web, turn off
+    //autoreload_every_n_sec(10);  // if building for web, turn off
+    //printf("game looping\n");
+    //libgame_updategamestate(g_);
+    //libgame_drawframe(g_);
+    //libgame_handleinput(g_);
+    //if (mylibgame_external_check_reload()) {
+    //    autoreload();
+    //}
+    //autoreload();
+    //}
     minfo("closing libgame");
-    mylibgameclose(g);
+    //mylibgameclose(g_);
+    libgame_close(g_);
     msuccess("libgame closed");
 }

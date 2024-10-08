@@ -4,10 +4,11 @@
 #include <stdlib.h>
 
 sprite* sprite_create(Texture2D* t, int numcontexts, int numframes) {
-    //minfo("creating sprite");
+    minfo("creating sprite");
     sprite* s = malloc(sizeof(sprite));
-    if (!s)
+    if (!s) {
         return NULL;
+    }
 
     s->numframes = numframes;
     s->numcontexts = numcontexts;
