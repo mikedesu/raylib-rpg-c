@@ -20,38 +20,24 @@
 #include "textureinfo.h"
 #include "utils.h"
 #include "vectorentityid.h"
-
-
-
 #include <raylib.h>
 #include <raymath.h>
-//#include <rlgl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
 
-
-
 //------------------------------------------------------------------
 // libgame global variables
 //------------------------------------------------------------------
-
-
-
-
 gamestate* g = NULL;
-
-
 
 
 RenderTexture target;
 Rectangle target_src = (Rectangle){0, 0, 0, 0};
 Rectangle target_dest = (Rectangle){0, 0, 0, 0};
 Vector2 target_origin = (Vector2){0, 0};
-
-
 
 
 int activescene = GAMEPLAYSCENE;
@@ -67,7 +53,6 @@ const bool libgame_entity_try_attack(gamestate* g, entityid id, const int x, con
     // we dont have full rules or functions for attacking yet
     // however
     // given the entityid and the position they are attack
-
     minfo("try_attack: starting...");
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
     if (e) {
@@ -77,7 +62,6 @@ const bool libgame_entity_try_attack(gamestate* g, entityid id, const int x, con
         if (t) {
             // check to see if tile has anything
             const bool occupied = vectorentityid_capacity(&t->entityids) > 0;
-
             if (occupied) {
                 // get the entityids at that tile
                 for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
@@ -100,7 +84,6 @@ const bool libgame_entity_try_attack(gamestate* g, entityid id, const int x, con
                 merror("try_attack: tile is empty");
                 return false;
             }
-
         } else {
             // attacking out-of-bounds or something else
             merror("try_attack: tile is NULL");
@@ -199,21 +182,15 @@ void libgame_handleinput(gamestate* g) {
     //}
     //g->do_one_rotation = true;
     //}
-
     if (IsKeyPressed(KEY_A)) {
-
         // technically we dont want to be able to attack until we have picked up a weapon...
         if (libgame_entity_inventory_contains_type(g, g->hero_id, ITEM_WEAPON)) {
-
             entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
             if (hero) {
                 // try an attack
-                //if (libgame_entity_try_attack_pos(g, g->hero_id, (Vector2){hero->pos.x + 1, hero->pos.y})) {
                 if (libgame_entity_try_attack(g, g->hero_id, hero->x + 1, hero->y)) {
                     // successfull attack
                     // lets try setting the orc animation sprite on success
-
-                    //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){hero->x + 1, hero->y});
                     tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, hero->x + 1, hero->y);
                     entityid orc_id = -1;
                     for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
@@ -224,35 +201,22 @@ void libgame_handleinput(gamestate* g) {
                             break;
                         }
                     }
-
-
-
                     libgame_entity_anim_set(g, orc_id, 10);
                 }
                 // in any case, set the attack animation
                 libgame_entity_anim_set(g, g->hero_id, SPRITEGROUP_ANIM_ATTACK);
             }
-
-
         } else {
             libgame_entity_anim_set(g, g->hero_id, SPRITEGROUP_ANIM_IDLE);
         }
         g->player_input_received = true;
     }
 
-    //if (IsKeyPressed(KEY_F)) {
-    //    ToggleFullscreen();
-    //}
-
     if (IsKeyPressed(KEY_E)) {
         entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
         if (hero) {
             // check to see if there are any items at that location
-            //Vector2 dest = Vector2Add(hero->pos, (Vector2){1, 0});
-            Vector2 dest = Vector2Add((Vector2){hero->x, hero->y}, (Vector2){1, 0});
-            //tile_t* t0 = dungeonfloor_get_tile(g->dungeonfloor, dest);
-            tile_t* t0 = dungeonfloor_get_tile(g->dungeonfloor, dest.x, dest.y);
-
+            tile_t* t0 = dungeonfloor_get_tile(g->dungeonfloor, hero->x + 1, hero->y);
             if (t0) {
                 bool canplace = true;
                 for (int i = 0; i < vectorentityid_capacity(&t0->entityids); i++) {
@@ -264,8 +228,6 @@ void libgame_handleinput(gamestate* g) {
                     }
                 }
                 if (canplace) {
-                    //libgame_create_orc(g, "orc", Vector2Add(hero->pos, (Vector2){1, 0}));
-                    //libgame_create_orc(g, "orc", Vector2Add((Vector2){hero->x, hero->y}, (Vector2){1, 0}));
                     libgame_create_orc(g, "orc", hero->x + 1, hero->y);
                 }
             }
@@ -273,15 +235,11 @@ void libgame_handleinput(gamestate* g) {
         g->player_input_received = true;
     }
 
-
-
     // lets place a torch where the player is standing
     if (IsKeyPressed(KEY_T)) {
         entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
         if (hero) {
             // check to see if there are any items at that location
-            //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, hero->pos);
-            //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){hero->x, hero->y});
             tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, hero->x, hero->y);
             if (t) {
                 for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
@@ -290,7 +248,6 @@ void libgame_handleinput(gamestate* g) {
                     if (entity->type == ENTITY_ITEM && entity->itemtype == ITEM_TORCH) {
                         minfo("torch already exists at this location");
                     } else {
-                        //libgame_createitembytype(g, ITEM_TORCH, hero->pos);
                         libgame_createitembytype(g, ITEM_TORCH, hero->x, hero->y);
                     }
                 }
@@ -298,14 +255,11 @@ void libgame_handleinput(gamestate* g) {
         }
         g->player_input_received = true;
     }
-
     libgame_handle_modeswitch(g);
     libgame_handle_debugpanel_switch(g);
     libgame_handle_grid_switch(g);
     libgame_handle_playerinput(g);
     libgame_handle_caminput(g);
-
-
     // test getting an arbitrary key press
     int keypressed = GetKeyPressed();
     if (keypressed > 0) {
@@ -692,8 +646,6 @@ void libgame_handleplayerinput_key_up_right(gamestate* g) {
 void libgame_entity_look(gamestate* g, entityid id) {
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
     if (e) {
-        //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->pos);
-        //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){e->x, e->y});
         tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->x, e->y);
         if (t) {
             for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
@@ -717,15 +669,12 @@ void libgame_entity_look(gamestate* g, entityid id) {
 entityid libgame_entity_pickup_item(gamestate* g, entityid id) {
     entityid retval = -1;
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
-    //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->pos);
-    //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){e->x, e->y});
     tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->x, e->y);
     if (e && t) {
         minfo("entity and tile pointers acquired, entering loop...");
         for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
             entityid id2 = vectorentityid_get(&t->entityids, i);
             entity_t* entity = hashtable_entityid_entity_get(g->entities, id2);
-            //if (entity && entity->type == ENTITY_ITEM && entity->itemtype == ITEM_TORCH) {
             if (entity && entity->type == ENTITY_ITEM) {
                 minfo("item found on tile, removing...");
                 // we are going to remove the item from the tile
@@ -753,7 +702,6 @@ void libgame_handle_playerinput(gamestate* g) {
         // the real setup will involve managing the player's dungeon position
         // and then translating that into a destination on screen
 
-        // left-handed controls
         // eventually we will create a mapping for custom controls
         // that way we can centralize handling of the controls
         if (IsKeyPressed(KEY_KP_6) || IsKeyPressed(KEY_RIGHT)) {
@@ -867,7 +815,7 @@ bool libgame_windowshouldclose() {
 
 
 void libgame_initwindow() {
-    ////minfo("begin libgame_initwindow");
+    //minfo("begin libgame_initwindow");
     const char* title = DEFAULT_WINDOW_TITLE;
     // have to do inittitlescene after initwindow
     // cant load textures before initwindow
@@ -898,14 +846,6 @@ void libgame_closewindow() {
 
 void libgame_update_debugpanelbuffer(gamestate* g) {
     entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
-    //entity_t* orc = NULL;
-    //for (int i = 0; i < vectorentityid_capacity(&g->entityids); i++) {
-    //    entity_t* e = hashtable_entityid_entity_get(g->entities, vectorentityid_get(&g->entityids, i));
-    //    if (e->type == ENTITY_NPC) {
-    //        orc = e;
-    //        break;
-    //    }
-    //}
 
     snprintf(g->debugpanel.buffer,
              1024,
@@ -939,19 +879,11 @@ void libgame_update_debugpanelbuffer(gamestate* g) {
              g->cam2d.zoom,
              activescene,
              g->controlmode,
-             //hero->pos.x,
              hero->x,
-             //hero->pos.y,
              hero->y,
-
              vectorentityid_capacity(&hero->inventory),
-
              g->dungeonfloor->len,
-             g->dungeonfloor->wid
-
-
-
-    );
+             g->dungeonfloor->wid);
 }
 
 
@@ -959,13 +891,10 @@ void libgame_update_debugpanelbuffer(gamestate* g) {
 
 void libgame_update_smoothmove(gamestate* g, entityid id) {
     //spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-
     if (g) {
         //g->is_updating_smooth_move = true;
-
         spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
         const int tilesize = 8;
-
         if (group) {
             float move_unit = 1.0f;
             // only do it 1 unit at a time
@@ -984,7 +913,6 @@ void libgame_update_smoothmove(gamestate* g, entityid id) {
                 group->dest.y -= move_unit;
                 group->move.y += move_unit;
             }
-
             // makes sure the entity is at the destination
             if (group->move.x == 0.0f && group->move.y == 0.0f) {
                 //g->is_updating_smooth_move = false;
@@ -1035,7 +963,6 @@ void libgame_handle_npc_turn(gamestate* g, entityid id) {
         entity_t* e = hashtable_entityid_entity_get(g->entities, id);
         if (e && e->type == ENTITY_NPC) {
             // select a random direction to move in, up/left/down/right/ul/ur/dl/dr
-
             int dir = GetRandomValue(0, 7);
             bool result = false;
             if (dir == 0) {
@@ -1108,7 +1035,6 @@ void libgame_updategamestate(gamestate* g) {
     //setdebugpanelcenter(g);
     libgame_update_smoothmove(g, g->hero_id);
     libgame_do_cameralockon(g);
-
     // at this point, we can take other NPC turns
     // lets iterate over our entities, find the NPCs, and make them move in a random direction
     // then, we will update their smooth moves
@@ -1185,29 +1111,6 @@ void libgame_calc_debugpanel_size(gamestate* g) {
 
 
 
-inline void libgame_draw_gameplayscene_messagelog(gamestate* g) {
-    if (g) {
-        const int fontsize = 14;
-        const int spacing = 1;
-        const char* text = "you have entered the dungeon\nmessages will appear here\nevildojo666\n666\n7777\n";
-        const int x = 20;
-        const int y = 20;
-        const int w = 300;
-        const int h = 300;
-        //const int pad = 5;
-        const Rectangle box1 = {x, y, w, h};
-        const Rectangle box2 = {x, y, box1.width, box1.height};
-        const Vector2 origin = {0, 0};
-        const Vector2 text_origin = {30, 30};
-        DrawRectanglePro(box1, origin, 0.0f, (Color){0x33, 0x33, 0x33, 0xFF});
-        DrawRectangleLinesEx(box2, 1, WHITE);
-        DrawTextEx(g->font, text, text_origin, fontsize, spacing, WHITE);
-    }
-}
-
-
-
-
 inline void libgame_draw_debugpanel(gamestate* g) {
     if (g && g->debugpanelon) {
         const int fontsize = 14;
@@ -1255,13 +1158,10 @@ void libgame_draw_dungeonfloor(gamestate* g) {
     Rectangle tile_dest = {0, 0, w, h};
     Color c = WHITE;
     float rotation = 0;
-    Vector2 origin = {0, 0};
     for (int i = 0; i < g->dungeonfloor->len; i++) {
         for (int j = 0; j < g->dungeonfloor->wid; j++) {
             // get the tile
-            const Vector2 pos = {i, j};
-            //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
-            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
+            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, i, j);
             // check the tile type
             tile_dest.x = i * w;
             tile_dest.y = j * h;
@@ -1269,36 +1169,9 @@ void libgame_draw_dungeonfloor(gamestate* g) {
             // this is very inefficient i think?
             key = get_txkey_for_tiletype(t->type);
             if (key != -1) {
-                DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, origin, rotation, c);
+                DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, (Vector2){0, 0}, rotation, c);
             }
         }
-    }
-}
-
-
-
-
-// we are going to have to temporarily save the torchid
-// as we are not enumerating thru the map yet
-void libgame_drawtorchgroup(gamestate* g) {
-    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, g->torch_id);
-    if (group) {
-        Texture tx = *group->sprites[group->current]->texture;
-        Rectangle src = group->sprites[group->current]->src;
-        Rectangle dest = group->dest;
-        Vector2 origin = {0, 0};
-        Color c = WHITE;
-        DrawTexturePro(tx, src, dest, origin, 0.0f, c);
-        //DrawTexturePro(*group->sprites[group->current]->texture,
-        //               group->sprites[group->current]->src,
-        //               group->dest,
-        //               (Vector2){0, 0},
-        //               0.0f,
-        //               WHITE);
-    }
-
-    if (g->framecount % FRAMEINTERVAL == 0) {
-        sprite_incrframe(group->sprites[group->current]);
     }
 }
 
@@ -1310,11 +1183,10 @@ void libgame_draw_entity(gamestate* g, entityid id) {
         spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
         if (group) {
             const Color c = WHITE;
-            const Vector2 origin = {0, 0};
             DrawTexturePro(*group->sprites[group->current]->texture,
                            group->sprites[group->current]->src,
                            group->dest,
-                           origin,
+                           (Vector2){0, 0},
                            0.0f,
                            c);
             // the problem here is we dont have any information on the offset we used at spritegroup creation
@@ -1323,7 +1195,6 @@ void libgame_draw_entity(gamestate* g, entityid id) {
             if (g->framecount % FRAMEINTERVAL == 0) {
                 sprite_incrframe(group->sprites[group->current]);
             }
-
             if (g->debugpanelon) {
                 Color c = {51, 51, 51, 255};
                 const int x = group->dest.x;
@@ -1344,7 +1215,6 @@ void libgame_draw_entity(gamestate* g, entityid id) {
 
 
 void libgame_draw_items(gamestate* g, const itemtype_t type, const int x, const int y) {
-    //const tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
     const tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
     for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
         const entityid id = vectorentityid_get(&t->entityids, k);
@@ -1387,7 +1257,6 @@ void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x
 
 
 
-//const bool libgame_entity_is_at(gamestate* g, const Vector2 pos, const entityid id) {
 //const bool libgame_entity_is_at(gamestate* g, const entityid id, const int x, const int y) {
 //    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
 //    for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
@@ -1401,7 +1270,6 @@ void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x
 
 
 
-//const bool libgame_itemtype_is_at(gamestate* g, const Vector2 pos, const itemtype_t type) {
 const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int x, const int y) {
     tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
     for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
@@ -1419,25 +1287,20 @@ const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int
 void libgame_draw_gameplayscene(gamestate* g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
-
     // draw tiles
     libgame_draw_dungeonfloor(g);
-
     if (g->gridon) {
         libgame_drawgrid(g);
     }
-
     // draw torches, items, npcs, player
     for (int i = 0; i < g->dungeonfloor->len; i++) {
         for (int j = 0; j < g->dungeonfloor->wid; j++) {
-            const Vector2 pos = {i, j};
-            libgame_draw_items(g, ITEM_TORCH, pos.x, pos.y);
-            libgame_draw_items_that_are_not(g, ITEM_TORCH, pos.x, pos.y);
-            libgame_draw_entities_at(g, ENTITY_NPC, pos.x, pos.y);
-            libgame_draw_entities_at(g, ENTITY_PLAYER, pos.x, pos.y);
+            libgame_draw_items(g, ITEM_TORCH, i, j);
+            libgame_draw_items_that_are_not(g, ITEM_TORCH, i, j);
+            libgame_draw_entities_at(g, ENTITY_NPC, i, j);
+            libgame_draw_entities_at(g, ENTITY_PLAYER, i, j);
         }
     }
-
     // lighting basics
     //const int tilesize = 8;
     for (int i = 0; i < g->dungeonfloor->len; i++) {
@@ -1449,11 +1312,8 @@ void libgame_draw_gameplayscene(gamestate* g) {
             //DrawRectangle(i * tilesize, j * tilesize, tilesize, tilesize, (Color){0, 0, 0, lightlvl});
         }
     }
-
-
     libgame_handle_fade(g);
     EndMode2D();
-
     // disabled for now
     //DrawRectangle(0, 0, 100, 100, BLACK);
     //DrawRectangleLines(10, 10, 80, 80, WHITE);
@@ -1473,21 +1333,17 @@ void libgame_drawtitlescene(gamestate* g) {
     snprintf(b, 128, "project");
     snprintf(b2, 128, "rpg");
     snprintf(b3, 128, "press space to continue");
-
     const Vector2 m = MeasureTextEx(g->font, b, 40, 2);
     const Vector2 m2 = MeasureTextEx(g->font, b2, 40, 2);
     const Vector2 m3 = MeasureTextEx(g->font, b3, 16, 1);
-
     const float tw2 = targetwidth / 2.0f;
     const float th2 = targetheight / 2.0f;
     const int offset = 100;
-
     const int x = tw2 - m.x / 2.0f - offset;
     const int y = th2 - m.y / 2.0f;
     const int x2 = tw2 - m2.x / 2.0f + offset;
     const int x3 = tw2 - m3.x / 2.0f;
     const int y3 = th2 + m3.y / 2.0f + 20;
-
     const Vector2 pos[3] = {{x, y}, {x2, y}, {x3, y3}};
     ClearBackground(bgc);
     DrawTextEx(g->font, b, pos[0], 40, 4, fgc);
@@ -1516,28 +1372,22 @@ void libgame_drawcompanyscene(gamestate* g) {
     snprintf(b, 128, COMPANYNAME);
     snprintf(b2, 128, COMPANYFILL);
     snprintf(b3, 128, "presents");
-
     const Vector2 measure = MeasureTextEx(g->font, b, fontsize, spacing);
-
     if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
         for (int i = 0; i < 10; i++) {
             shufflestrinplace(b);
             shufflestrinplace(b3);
         }
     }
-
     for (int i = 0; i < 10; i++) {
         shufflestrinplace(b2);
     }
-
     const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f, targetheight / 2.0f - measure.y / 2.0f};
     ClearBackground(bgc);
     DrawTextEx(g->font, b, pos, fontsize, 1, fgc);
     DrawTextEx(g->font, b2, pos, fontsize, 1, fgc);
-
     const Vector2 measure3 = MeasureTextEx(g->font, b3, 20, 1);
     const Vector2 pp = {targetwidth / 2.0f - measure3.x / 2.0f, targetheight / 2.0f + measure.y / 2.0f + 20};
-
     DrawTextEx(g->font, b3, pp, 20, 1, fgc);
     libgame_handle_fade(g);
 }
@@ -1578,14 +1428,12 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
         //mprint("could not open file");
         return;
     }
-
     int index = 0;
     int contexts = 0;
     int frames = 0;
     int dodither = 0;
     char line[256];
     char txpath[256];
-
     while (fgets(line, 256, f)) {
         // if the line begins with a #, skip it
         if (line[0] == '#') {
@@ -1690,7 +1538,6 @@ libgame_create_entity(gamestate* g, const char* name, const entitytype_t type, c
     e->y = y;
     e->type = type;
     e->inventory = vectorentityid_new();
-
     vectorentityid_add(&g->entityids, e->id);
     tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
     vectorentityid_add(&t->entityids, e->id);
@@ -1714,7 +1561,6 @@ void libgame_create_torch_spritegroup(gamestate* g, entityid id, const float off
         }
         spritegroup_add(group, s);
     }
-
     // the padding will be different for the torch
     // initialize the group current and dest
     const int tilesize = 8;
@@ -1728,7 +1574,6 @@ void libgame_create_torch_spritegroup(gamestate* g, entityid id, const float off
     Rectangle dest = {x, y, s->width, s->height};
     group->current = 0;
     group->dest = dest;
-
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
     minfo("libgame_createtorchspritegroup end");
@@ -1743,12 +1588,10 @@ void libgame_create_torch_spritegroup(gamestate* g, entityid id, const float off
 // lets try using this as a basis to get a sprite in there
 void libgame_create_herospritegroup(gamestate* g, entityid id) {
     minfo("libgame_create_herospritegroup begin");
-
     minfo("creating hero group...");
     spritegroup_t* hero_group = spritegroup_create(20);
     minfo("getting hero entity...");
     entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
-
     int keys[12] = {TXHERO,
                     TXHEROSHADOW,
                     TXHEROWALK,
@@ -1761,7 +1604,6 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
                     TXHEROSPINDIESHADOW,
                     TXHEROSOULDIE,
                     TXHEROSOULDIESHADOW};
-
     minfo("looping thru sprite keys...");
     for (int i = 0; i < 12; i++) {
         printf("i: %d\n", i);
@@ -1789,7 +1631,6 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
     hero_group->dest = dest;
     hero_group->off_x = offset_x;
     hero_group->off_y = offset_y;
-
     // add the spritegroup to the hashtable
     minfo("inserting hero spritegroup into table...");
     hashtable_entityid_spritegroup_insert(g->spritegroups, g->hero_id, hero_group);
@@ -1802,7 +1643,6 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
 void libgame_create_orcspritegroup(gamestate* g, entityid id) {
     spritegroup_t* orc_group = spritegroup_create(20);
     entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
-
     int keys[12] = {TXORCIDLE,
                     TXORCIDLESHADOW,
                     TXORCWALK,
@@ -1815,7 +1655,6 @@ void libgame_create_orcspritegroup(gamestate* g, entityid id) {
                     TXORCDIESHADOW,
                     TXORCDMG,
                     TXORCDMGSHADOW};
-
     for (int i = 0; i < 12; i++) {
         sprite* s =
             sprite_create(&g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
@@ -1841,7 +1680,6 @@ void libgame_create_orcspritegroup(gamestate* g, entityid id) {
     orc_group->dest = dest;
     orc_group->off_x = offset_x;
     orc_group->off_y = offset_y;
-
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, orc_group);
 }
@@ -1862,7 +1700,6 @@ void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off
         }
         spritegroup_add(group, s);
     }
-
     // the padding will be different for the torch
     // initialize the group current and dest
     const int tilesize = 8;
@@ -1878,7 +1715,6 @@ void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off
     group->dest = dest;
     group->off_x = off_x;
     group->off_y = off_y;
-
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
     msuccess("libgame_create_sword_spritegroup end");
@@ -1900,7 +1736,6 @@ void libgame_create_shield_spritegroup(gamestate* g, entityid id, const float of
         }
         spritegroup_add(group, s);
     }
-
     // the padding will be different for the torch
     // initialize the group current and dest
     const int tilesize = 8;
@@ -1912,7 +1747,6 @@ void libgame_create_shield_spritegroup(gamestate* g, entityid id, const float of
     group->dest = dest;
     group->off_x = off_x;
     group->off_y = off_y;
-
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
     msuccess("libgame_create_shield_spritegroup end");
@@ -1981,8 +1815,6 @@ void libgame_init_datastructures(gamestate* g) {
 
 
 void libgame_createitembytype(gamestate* g, const itemtype_t type, const int x, const int y) {
-
-
     minfo("libgame_createitembytype begin");
     switch (type) {
     case ITEM_TORCH: {
@@ -2038,8 +1870,8 @@ void libgame_create_orc(gamestate* g, const char* name, const int x, const int y
 
 
 
-void libgame_create_sword(gamestate* g, const char* name, const Vector2 pos) {
-    const entityid id = libgame_create_entity(g, name, ENTITY_ITEM, pos.x, pos.y);
+void libgame_create_sword(gamestate* g, const char* name, const int x, const int y) {
+    const entityid id = libgame_create_entity(g, name, ENTITY_ITEM, x, y);
     if (id != -1) {
         entity_t* e = hashtable_entityid_entity_get(g->entities, id);
         if (e) {
@@ -2083,20 +1915,16 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_loadtargettexture(g);
         libgame_loadtextures(g);
         libgame_init_datastructures(g);
-
         minfo("creating hero");
         // this is just a mock-up for now
         libgame_create_hero(g, "hero", 1, 0);
         msuccess("hero created");
-
         minfo("creating sword...");
-        libgame_create_sword(g, "sword", (Vector2){2, 0});
+        libgame_create_sword(g, "sword", 2, 0);
         msuccess("sword created");
-
         //minfo("creating shield...");
         //libgame_create_shield(g, "shield", (Vector2){3, 0});
         //msuccess("shield created");
-
         //for (int i = 0; i < g->dungeonfloor->wid; i++) {
         //    for (int j = 0; j < g->dungeonfloor->len; j++) {
         //        if (rand() % 16 == 0) {
@@ -2106,27 +1934,21 @@ void libgame_initsharedsetup(gamestate* g) {
         //        }
         //    }
         //}
-
         //libgame_create_orc(g, "orc1", (Vector2){2, 2});
         //libgame_create_orc(g, "orc2", (Vector2){2, 3});
         //libgame_create_orc(g, "orc3", (Vector2){3, 3});
         //libgame_create_orc(g, "orc4", (Vector2){1, 3});
         //libgame_create_orc(g, "orc5", (Vector2){1, 2});
-
         // these dont work right until the text buffer of the debugpanel is filled
-
-
         libgame_update_debugpanelbuffer(g);
         libgame_calc_debugpanel_size(g);
         setdebugpanelbottomleft(g);
         //setdebugpaneltopright(g);
         //setdebugpanelbottomright(g);
         //setdebugpanelbottomleft(g, g->display.targetheight);
-
     } else {
         merror("libgame_initsharedsetup: gamestate is NULL");
     }
-
     msuccess("libgame_initsharedsetup end");
 }
 
@@ -2171,10 +1993,8 @@ void libgame_closeshared(gamestate* g) {
     minfo("libgame_closeshared");
     UnloadFont(g->font);
     libgame_unloadtextures(g);
-
     //minfo("unloading render texture");
     UnloadRenderTexture(target);
-
     //minfo("closing window");
     CloseWindow();
     msuccess("libgame_closeshared end");
@@ -2196,22 +2016,16 @@ const bool libgame_entity_move(gamestate* g, entityid id, int x, int y) {
     if (libgame_entity_move_check(g, e, x, y)) {
         // move successful
         // create a copy of the old pos
-        //Vector2 old_pos = e->pos;
-        Vector2 old_pos = (Vector2){e->x, e->y};
-
-        //entity_move(e, (Vector2){x, y});
+        const int old_x = e->x;
+        const int old_y = e->y;
         entity_move(e, x, y);
-
         // we want to update the tile entityids
-        tile_t* from_tile = dungeonfloor_get_tile(g->dungeonfloor, old_pos.x, old_pos.y);
+        tile_t* from_tile = dungeonfloor_get_tile(g->dungeonfloor, old_x, old_y);
         // remove the entityid from the old tile
         vectorentityid_remove_value(&from_tile->entityids, e->id);
-
-        //tile_t* to_tile = dungeonfloor_get_tile(g->dungeonfloor, e->pos);
         tile_t* to_tile = dungeonfloor_get_tile(g->dungeonfloor, e->x, e->y);
         // add the entityid to the new tile
         vectorentityid_add(&to_tile->entityids, e->id);
-
         msuccess("libgame_entity_move: move successful");
         return true;
     }
@@ -2231,7 +2045,6 @@ const bool libgame_entity_move(gamestate* g, entityid id, int x, int y) {
 
 
 
-//const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const Vector2 pos, const entitytype_t type) {
 const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y) {
     tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
     if (t) {
@@ -2256,16 +2069,13 @@ const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y) {
     bool retval = false;
     if (e) {
         // check bounds
-        //if (e->pos.x + x < 0 || e->pos.x + x >= g->dungeonfloor->len) {
         if (e->x + x < 0 || e->x + x >= g->dungeonfloor->len) {
             merror("move_check: out of bounds x");
             retval = false;
-            //} else if (e->pos.y + y < 0 || e->pos.y + y >= g->dungeonfloor->wid) {
         } else if (e->y + y < 0 || e->y + y >= g->dungeonfloor->wid) {
             merror("move_check: out of bounds y");
             retval = false;
         } else {
-            //retval = !libgame_is_tile_occupied_with_entitytype(g, (Vector2){e->pos.x + x, e->pos.y + y}, e->type);
             bool r0 = !libgame_is_tile_occupied_with_entitytype(g, ENTITY_PLAYER, e->x + x, e->y + y);
             bool r1 = !libgame_is_tile_occupied_with_entitytype(g, ENTITY_NPC, e->x + x, e->y + y);
             return r0 && r1;

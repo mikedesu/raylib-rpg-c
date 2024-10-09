@@ -26,7 +26,6 @@ void libgame_loadtexturesfromfile(gamestate* g, const char* path);
 void libgame_closeshared(gamestate* g);
 void libgame_closesavegamestate();
 void libgame_draw_debugpanel(gamestate* g);
-void libgame_draw_gameplayscene_messagelog(gamestate* g);
 void libgame_drawcompanyscene(gamestate* g);
 void libgame_drawtitlescene(gamestate* g);
 void libgame_draw_gameplayscene(gamestate* g);
@@ -107,9 +106,10 @@ void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x
 const entityid libgame_create_entity(gamestate* g, const char* name, const entitytype_t type, const int x, const int y);
 const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y);
 const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int x, const int y);
+const bool libgame_entity_try_attack(gamestate* g, entityid id, const int x, const int y);
 
+void libgame_create_sword(gamestate* g, const char* name, const int x, const int y);
 
 
 
 //const bool libgame_entity_try_attack_pos(gamestate* g, entityid id, const Vector2 pos);
-const bool libgame_entity_try_attack(gamestate* g, entityid id, const int x, const int y);
