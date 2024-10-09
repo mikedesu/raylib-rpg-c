@@ -34,6 +34,10 @@
 
 
 
+#define DEFAULT_TILE_SIZE 8
+
+
+
 
 #define TXHERO 0
 #define TXHEROSHADOW 1
@@ -92,6 +96,12 @@
 
 #define TXSWORD 46
 #define TXSHIELD 47
+
+
+#define TX_HUMAN_GUARD 48
+#define TX_HUMAN_GUARD_SHADOW 49
+#define TX_GUARD_WOODEN_SHIELD_FRONT 50
+#define TX_GUARD_WOODEN_SHIELD_BACK 51
 
 
 

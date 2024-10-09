@@ -1,6 +1,4 @@
 # filepath contexts frames dodither
-#0 3 4 0 img/darkknight2-sheet.png 
-#0 1 6 0 img/hero-test0-sheet.png 
 0  4 16 0  img/characters/human-idle.png 
 1  4 1 0  img/characters/human-idle-shadow.png 
 2  1 1  1 img/tiles/dirt00.png 
@@ -49,4 +47,7 @@
 45 4 4  0 img/characters/orc-dmg-shadow.png
 46 1 4  0 img/items/sword-sheet.png
 47 1 4  0 img/items/shield-sheet.png
-
+48 4 4  0 img/characters/human-guard.png
+49 4 4  0 img/characters/human-guard-shadow.png
+50 4 4  0 img/characters/guard-wooden-shield-front.png
+51 4 4  0 img/characters/guard-wooden-shield-back.png
