@@ -265,7 +265,8 @@ void libgame_handleinput(gamestate* g) {
                 }
                 if (canplace) {
                     //libgame_create_orc(g, "orc", Vector2Add(hero->pos, (Vector2){1, 0}));
-                    libgame_create_orc(g, "orc", Vector2Add((Vector2){hero->x, hero->y}, (Vector2){1, 0}));
+                    //libgame_create_orc(g, "orc", Vector2Add((Vector2){hero->x, hero->y}, (Vector2){1, 0}));
+                    libgame_create_orc(g, "orc", hero->x + 1, hero->y);
                 }
             }
         }
@@ -2025,8 +2026,9 @@ void libgame_create_hero(gamestate* g, const char* name, const int x, const int 
 
 
 
-void libgame_create_orc(gamestate* g, const char* name, const Vector2 pos) {
-    entityid id = libgame_create_entity(g, name, ENTITY_NPC, pos);
+//void libgame_create_orc(gamestate* g, const char* name, const Vector2 pos) {
+void libgame_create_orc(gamestate* g, const char* name, const int x, const int y) {
+    entityid id = libgame_create_entity(g, name, ENTITY_NPC, (Vector2){x, y});
     if (id != -1) {
         //g->hero_id = id;
         entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
