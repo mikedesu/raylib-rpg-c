@@ -83,7 +83,9 @@ entityid libgame_entity_pickup_item(gamestate* g, entityid id);
 const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, itemtype_t type);
 
 
-void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos);
+//void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos);
+void libgame_createitembytype(gamestate* g, const itemtype_t type, const int x, const int y);
+
 void libgame_create_hero(gamestate* g, const char* name, const Vector2 pos);
 void libgame_create_orc(gamestate* g, const char* name, const Vector2 pos);
 void libgame_create_shield(gamestate* g, const char* name, const Vector2 pos);

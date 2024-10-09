@@ -290,7 +290,7 @@ void libgame_handleinput(gamestate* g) {
                         minfo("torch already exists at this location");
                     } else {
                         //libgame_createitembytype(g, ITEM_TORCH, hero->pos);
-                        libgame_createitembytype(g, ITEM_TORCH, (Vector2){hero->x, hero->y});
+                        libgame_createitembytype(g, ITEM_TORCH, hero->x, hero->y);
                     }
                 }
             }
@@ -1983,11 +1983,13 @@ void libgame_init_datastructures(gamestate* g) {
 
 
 
-void libgame_createitembytype(gamestate* g, itemtype_t type, Vector2 pos) {
+void libgame_createitembytype(gamestate* g, const itemtype_t type, const int x, const int y) {
+
+
     minfo("libgame_createitembytype begin");
     switch (type) {
     case ITEM_TORCH: {
-        entityid torch_id = libgame_create_entity(g, "torch", ENTITY_ITEM, pos);
+        entityid torch_id = libgame_create_entity(g, "torch", ENTITY_ITEM, (Vector2){x, y});
         entity_t* torch = hashtable_entityid_entity_get(g->entities, torch_id);
         if (torch) {
             minfo("torch entity created");
