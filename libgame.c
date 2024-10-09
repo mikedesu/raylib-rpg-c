@@ -1359,9 +1359,8 @@ void libgame_draw_items(gamestate* g, const itemtype_t type, const int x, const 
 
 
 
-void libgame_draw_items_that_are_not(gamestate* g, const Vector2 pos, const itemtype_t type) {
-    //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
+void libgame_draw_items_that_are_not(gamestate* g, const itemtype_t type, const int x, const int y) {
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
     for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
         entityid id = vectorentityid_get(&t->entityids, k);
         entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
@@ -1433,7 +1432,7 @@ void libgame_draw_gameplayscene(gamestate* g) {
         for (int j = 0; j < g->dungeonfloor->wid; j++) {
             const Vector2 pos = {i, j};
             libgame_draw_items(g, ITEM_TORCH, pos.x, pos.y);
-            libgame_draw_items_that_are_not(g, pos, ITEM_TORCH);
+            libgame_draw_items_that_are_not(g, ITEM_TORCH, pos.x, pos.y);
             libgame_draw_entities_at(g, pos, ENTITY_NPC);
             libgame_draw_entities_at(g, pos, ENTITY_PLAYER);
         }
