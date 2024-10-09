@@ -1387,16 +1387,17 @@ void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x
 
 
 
-const bool libgame_entity_is_at(gamestate* g, const Vector2 pos, const entityid id) {
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
-    for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
-        entityid id2 = vectorentityid_get(&t->entityids, k);
-        if (id == id2) {
-            return true;
-        }
-    }
-    return false;
-}
+//const bool libgame_entity_is_at(gamestate* g, const Vector2 pos, const entityid id) {
+//const bool libgame_entity_is_at(gamestate* g, const entityid id, const int x, const int y) {
+//    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
+//    for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
+//        entityid id2 = vectorentityid_get(&t->entityids, k);
+//        if (id == id2) {
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
 
 
