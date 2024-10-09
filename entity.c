@@ -36,6 +36,10 @@ entity_t* entity_create(const char* n) {
     e->hp = 0;
     e->maxhp = 0;
 
+    e->pos = (Vector2){-1, -1};
+    e->x = -1;
+    e->y = -1;
+
     return e;
 }
 

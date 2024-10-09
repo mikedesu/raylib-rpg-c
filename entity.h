@@ -21,6 +21,8 @@ typedef struct entity_t {
     itemtype_t itemtype; // not be used if not an item
 
     Vector2 pos;
+    int x;
+    int y;
 
     vectorentityid_t inventory;
 
