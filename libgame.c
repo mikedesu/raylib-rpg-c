@@ -1189,8 +1189,7 @@ inline void libgame_draw_gameplayscene_messagelog(gamestate* g) {
     if (g) {
         const int fontsize = 14;
         const int spacing = 1;
-        const char* text =
-            "you have entered the dungeon\nmessages will appear here\nevildojo666\n666\n7777\n";
+        const char* text = "you have entered the dungeon\nmessages will appear here\nevildojo666\n666\n7777\n";
         const int x = 20;
         const int y = 20;
         const int w = 300;
@@ -1707,8 +1706,8 @@ void libgame_create_torch_spritegroup(gamestate* g, entityid id, const float off
     entity_t* torch_entity = hashtable_entityid_entity_get(g->entities, id);
     int keys[1] = {TXTORCH};
     for (int i = 0; i < 1; i++) {
-        sprite* s = sprite_create(
-            &g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
+        sprite* s =
+            sprite_create(&g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
         if (!s) {
             merror("could not create sprite");
         }
@@ -1766,8 +1765,7 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
     for (int i = 0; i < 12; i++) {
         printf("i: %d\n", i);
         int txkey = keys[i];
-        sprite* s =
-            sprite_create(&g->txinfo[txkey].texture, g->txinfo[txkey].contexts, g->txinfo[txkey].num_frames);
+        sprite* s = sprite_create(&g->txinfo[txkey].texture, g->txinfo[txkey].contexts, g->txinfo[txkey].num_frames);
         if (!s) {
             merror("could not create sprite");
         }
@@ -1818,8 +1816,8 @@ void libgame_create_orcspritegroup(gamestate* g, entityid id) {
                     TXORCDMGSHADOW};
 
     for (int i = 0; i < 12; i++) {
-        sprite* s = sprite_create(
-            &g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
+        sprite* s =
+            sprite_create(&g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
         if (!s) {
             //merror("could not create sprite");
         }
@@ -1856,8 +1854,8 @@ void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
     int keys[1] = {TXSWORD};
     for (int i = 0; i < 1; i++) {
-        sprite* s = sprite_create(
-            &g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
+        sprite* s =
+            sprite_create(&g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
         if (!s) {
             merror("could not create sprite");
         }
@@ -1894,8 +1892,8 @@ void libgame_create_shield_spritegroup(gamestate* g, entityid id, const float of
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
     int keys[1] = {TXSHIELD};
     for (int i = 0; i < 1; i++) {
-        sprite* s = sprite_create(
-            &g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
+        sprite* s =
+            sprite_create(&g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
         if (!s) {
             merror("could not create sprite");
         }
@@ -2232,9 +2230,9 @@ const bool libgame_entity_move(gamestate* g, entityid id, int x, int y) {
 
 
 
-const bool
-libgame_is_tile_occupied_with_entitytype(gamestate* g, const Vector2 pos, const entitytype_t type) {
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
+//const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const Vector2 pos, const entitytype_t type) {
+const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y) {
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
     if (t) {
         int count = vectorentityid_capacity(&t->entityids);
         // get is tile occupied
@@ -2243,7 +2241,7 @@ libgame_is_tile_occupied_with_entitytype(gamestate* g, const Vector2 pos, const 
             entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
             if (entity->type == type) {
                 minfo("is_tile_occupied: tile occupied");
-                fprintf(stdout, "entity type: %d at (%d, %d)\n", entity->type, (int)pos.x, (int)pos.y);
+                fprintf(stdout, "entity type: %d at (%d, %d)\n", entity->type, x, y);
                 return true;
             }
         }
@@ -2267,16 +2265,8 @@ const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y) {
             retval = false;
         } else {
             //retval = !libgame_is_tile_occupied_with_entitytype(g, (Vector2){e->pos.x + x, e->pos.y + y}, e->type);
-            bool r0 = !libgame_is_tile_occupied_with_entitytype(
-                //g, (Vector2){e->pos.x + x, e->pos.y + y}, ENTITY_PLAYER);
-                g,
-                (Vector2){e->x + x, e->y + y},
-                ENTITY_PLAYER);
-            bool r1 = !libgame_is_tile_occupied_with_entitytype(
-                //g, (Vector2){e->pos.x + x, e->pos.y + y}, ENTITY_NPC);
-                g,
-                (Vector2){e->x + x, e->y + y},
-                ENTITY_NPC);
+            bool r0 = !libgame_is_tile_occupied_with_entitytype(g, ENTITY_PLAYER, e->x + x, e->y + y);
+            bool r1 = !libgame_is_tile_occupied_with_entitytype(g, ENTITY_NPC, e->x + x, e->y + y);
             return r0 && r1;
         }
     } else {
