@@ -5,7 +5,6 @@
 
 typedef struct sprite {
     Texture2D* texture;
-    Vector2 position;
 
     Rectangle src;
     Rectangle dest;
