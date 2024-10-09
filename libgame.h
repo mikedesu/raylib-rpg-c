@@ -88,17 +88,18 @@ const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, ite
 //void libgame_create_orc(gamestate* g, const char* name, const Vector2 pos);
 //void libgame_create_shield(gamestate* g, const char* name, const Vector2 pos);
 //void libgame_draw_items(gamestate* g, const Vector2 pos, const itemtype_t type);
+//void libgame_draw_items_that_are_not(gamestate* g, const Vector2 pos, const itemtype_t type);
 void libgame_createitembytype(gamestate* g, const itemtype_t type, const int x, const int y);
 void libgame_create_hero(gamestate* g, const char* name, const int x, const int y);
 void libgame_create_orc(gamestate* g, const char* name, const int x, const int y);
 void libgame_create_shield(gamestate* g, const char* name, const int x, const int y);
 void libgame_draw_items(gamestate* g, const itemtype_t type, const int x, const int y);
-
-
-//void libgame_draw_items_that_are_not(gamestate* g, const Vector2 pos, const itemtype_t type);
 void libgame_draw_items_that_are_not(gamestate* g, const itemtype_t type, const int x, const int y);
 
-void libgame_draw_entities_at(gamestate* g, const Vector2 pos, const entitytype_t type);
+
+//void libgame_draw_entities_at(gamestate* g, const Vector2 pos, const entitytype_t type);
+void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x, const int y);
+
 const bool libgame_entityid_move_check(gamestate* g, entityid id, const Vector2 dir);
 const entityid libgame_create_entity(gamestate* g, const char* name, entitytype_t type, Vector2 pos);
 const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const Vector2 pos, const entitytype_t type);
