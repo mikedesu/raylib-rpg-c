@@ -72,7 +72,8 @@ const bool libgame_entity_try_attack_pos(gamestate* g, entityid id, const Vector
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
     if (e) {
         // get the tile at pos
-        tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+        //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+        tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
         if (t) {
             // check to see if tile has anything
             const bool occupied = vectorentityid_capacity(&t->entityids) > 0;
@@ -212,7 +213,8 @@ void libgame_handleinput(gamestate* g) {
                     // successfull attack
                     // lets try setting the orc animation sprite on success
 
-                    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){hero->x + 1, hero->y});
+                    //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){hero->x + 1, hero->y});
+                    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, hero->x + 1, hero->y);
                     entityid orc_id = -1;
                     for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
                         entityid id = vectorentityid_get(&t->entityids, i);
@@ -248,7 +250,8 @@ void libgame_handleinput(gamestate* g) {
             // check to see if there are any items at that location
             //Vector2 dest = Vector2Add(hero->pos, (Vector2){1, 0});
             Vector2 dest = Vector2Add((Vector2){hero->x, hero->y}, (Vector2){1, 0});
-            tile_t* t0 = dungeonfloor_get_tile(g->dungeonfloor, dest);
+            //tile_t* t0 = dungeonfloor_get_tile(g->dungeonfloor, dest);
+            tile_t* t0 = dungeonfloor_get_tile(g->dungeonfloor, dest.x, dest.y);
 
             if (t0) {
                 bool canplace = true;
@@ -277,7 +280,8 @@ void libgame_handleinput(gamestate* g) {
         if (hero) {
             // check to see if there are any items at that location
             //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, hero->pos);
-            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){hero->x, hero->y});
+            //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){hero->x, hero->y});
+            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, hero->x, hero->y);
             if (t) {
                 for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
                     entityid id = vectorentityid_get(&t->entityids, i);
@@ -688,7 +692,8 @@ void libgame_entity_look(gamestate* g, entityid id) {
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
     if (e) {
         //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->pos);
-        tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){e->x, e->y});
+        //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){e->x, e->y});
+        tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->x, e->y);
         if (t) {
             for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
                 entityid id = vectorentityid_get(&t->entityids, i);
@@ -712,7 +717,8 @@ entityid libgame_entity_pickup_item(gamestate* g, entityid id) {
     entityid retval = -1;
     entity_t* e = hashtable_entityid_entity_get(g->entities, id);
     //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->pos);
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){e->x, e->y});
+    //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){e->x, e->y});
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->x, e->y);
     if (e && t) {
         minfo("entity and tile pointers acquired, entering loop...");
         for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
@@ -1254,7 +1260,8 @@ void libgame_draw_dungeonfloor(gamestate* g) {
         for (int j = 0; j < g->dungeonfloor->wid; j++) {
             // get the tile
             const Vector2 pos = {i, j};
-            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+            //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
             // check the tile type
             tile_dest.x = i * w;
             tile_dest.y = j * h;
@@ -1337,7 +1344,8 @@ void libgame_draw_entity(gamestate* g, entityid id) {
 
 
 void libgame_draw_items(gamestate* g, const Vector2 pos, const itemtype_t type) {
-    const tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    //const tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    const tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
     for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
         const entityid id = vectorentityid_get(&t->entityids, k);
         const entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
@@ -1351,7 +1359,8 @@ void libgame_draw_items(gamestate* g, const Vector2 pos, const itemtype_t type) 
 
 
 void libgame_draw_items_that_are_not(gamestate* g, const Vector2 pos, const itemtype_t type) {
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
     for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
         entityid id = vectorentityid_get(&t->entityids, k);
         entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
@@ -1365,7 +1374,8 @@ void libgame_draw_items_that_are_not(gamestate* g, const Vector2 pos, const item
 
 
 void libgame_draw_entities_at(gamestate* g, const Vector2 pos, const entitytype_t type) {
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
     for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
         entityid id = vectorentityid_get(&t->entityids, k);
         entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
@@ -1379,7 +1389,7 @@ void libgame_draw_entities_at(gamestate* g, const Vector2 pos, const entitytype_
 
 
 const bool libgame_entity_is_at(gamestate* g, const Vector2 pos, const entityid id) {
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
     for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
         entityid id2 = vectorentityid_get(&t->entityids, k);
         if (id == id2) {
@@ -1393,7 +1403,7 @@ const bool libgame_entity_is_at(gamestate* g, const Vector2 pos, const entityid 
 
 const bool libgame_itemtype_is_at(gamestate* g, const Vector2 pos, const itemtype_t type) {
 
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
     for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
         entityid id = vectorentityid_get(&t->entityids, k);
         entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
@@ -1683,7 +1693,7 @@ const entityid libgame_create_entity(gamestate* g, const char* name, entitytype_
     e->inventory = vectorentityid_new();
 
     vectorentityid_add(&g->entityids, e->id);
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
     //vectorentityid_pushback_unique(&g->dungeonfloor->grid[(int)pos.x][(int)pos.y]->entityids, e->id);
     vectorentityid_add(&t->entityids, e->id);
     hashtable_entityid_entity_insert(g->entities, e->id, e);
@@ -1941,7 +1951,7 @@ void libgame_init_dungeonfloor(gamestate* g) {
         const tiletype_t end_type = TILETYPE_STONE_13;
         for (int i = 0; i < g->dungeonfloor->len; i++) {
             for (int j = 0; j < g->dungeonfloor->wid; j++) {
-                tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){i, j});
+                tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, i, j);
                 t->type = GetRandomValue(start_type, end_type);
             }
         }
@@ -2195,12 +2205,12 @@ const bool libgame_entity_move(gamestate* g, entityid id, int x, int y) {
         entity_move(e, x, y);
 
         // we want to update the tile entityids
-        tile_t* from_tile = dungeonfloor_get_tile(g->dungeonfloor, old_pos);
+        tile_t* from_tile = dungeonfloor_get_tile(g->dungeonfloor, old_pos.x, old_pos.y);
         // remove the entityid from the old tile
         vectorentityid_remove_value(&from_tile->entityids, e->id);
 
         //tile_t* to_tile = dungeonfloor_get_tile(g->dungeonfloor, e->pos);
-        tile_t* to_tile = dungeonfloor_get_tile(g->dungeonfloor, (Vector2){e->x, e->y});
+        tile_t* to_tile = dungeonfloor_get_tile(g->dungeonfloor, e->x, e->y);
         // add the entityid to the new tile
         vectorentityid_add(&to_tile->entityids, e->id);
 
@@ -2225,7 +2235,7 @@ const bool libgame_entityid_move_check(gamestate* g, entityid id, const Vector2 
 
 const bool
 libgame_is_tile_occupied_with_entitytype(gamestate* g, const Vector2 pos, const entitytype_t type) {
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
     if (t) {
         int count = vectorentityid_capacity(&t->entityids);
         // get is tile occupied

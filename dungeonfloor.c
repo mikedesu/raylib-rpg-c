@@ -59,16 +59,17 @@ void dungeonfloor_free(dungeonfloor_t* d) {
 
 
 
-tile_t* dungeonfloor_get_tile(dungeonfloor_t* d, Vector2 pos) {
+//tile_t* dungeonfloor_get_tile(dungeonfloor_t* d, Vector2 pos) {
+tile_t* dungeonfloor_get_tile(dungeonfloor_t* d, int x, int y) {
     if (d) {
 
-        if (pos.x < d->len && pos.y < d->wid) {
-            int index = pos.x * d->wid + pos.y;
+        if (x < d->len && y < d->wid) {
+            int index = x * d->wid + y;
             return &d->grid[index];
         }
 
         merror("dungeonfloor_get_tile: pos out of bounds");
-        fprintf(stderr, "pos: (%d, %d)\n", (int)pos.x, (int)pos.y);
+        fprintf(stderr, "pos: (%d, %d)\n", x, y);
         fprintf(stderr, "d->len: %d, d->wid: %d\n", d->len, d->wid);
         return NULL;
     }
