@@ -1679,22 +1679,20 @@ void libgame_init() {
 
 
 
-const entityid libgame_create_entity(gamestate* g, const char* name, entitytype_t type, Vector2 pos) {
+const entityid
+libgame_create_entity(gamestate* g, const char* name, const entitytype_t type, const int x, const int y) {
     entity_t* e = entity_create(name);
     if (!e) {
         //merror("could not create entity");
         return -1;
     }
-    //e->pos.x = pos.x;
-    e->x = pos.x;
-    //e->pos.y = pos.y;
-    e->y = pos.y;
+    e->x = x;
+    e->y = y;
     e->type = type;
     e->inventory = vectorentityid_new();
 
     vectorentityid_add(&g->entityids, e->id);
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
-    //vectorentityid_pushback_unique(&g->dungeonfloor->grid[(int)pos.x][(int)pos.y]->entityids, e->id);
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
     vectorentityid_add(&t->entityids, e->id);
     hashtable_entityid_entity_insert(g->entities, e->id, e);
     return e->id;
@@ -1989,7 +1987,7 @@ void libgame_createitembytype(gamestate* g, const itemtype_t type, const int x, 
     minfo("libgame_createitembytype begin");
     switch (type) {
     case ITEM_TORCH: {
-        entityid torch_id = libgame_create_entity(g, "torch", ENTITY_ITEM, (Vector2){x, y});
+        const entityid torch_id = libgame_create_entity(g, "torch", ENTITY_ITEM, x, y);
         entity_t* torch = hashtable_entityid_entity_get(g->entities, torch_id);
         if (torch) {
             minfo("torch entity created");
@@ -2007,9 +2005,8 @@ void libgame_createitembytype(gamestate* g, const itemtype_t type, const int x, 
 
 
 
-//void libgame_create_hero(gamestate* g, const char* name, const Vector2 pos) {
 void libgame_create_hero(gamestate* g, const char* name, const int x, const int y) {
-    const entityid id = libgame_create_entity(g, name, ENTITY_PLAYER, (Vector2){x, y});
+    const entityid id = libgame_create_entity(g, name, ENTITY_PLAYER, x, y);
     if (id != -1) {
         g->hero_id = id;
         entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
@@ -2025,11 +2022,9 @@ void libgame_create_hero(gamestate* g, const char* name, const int x, const int 
 
 
 
-//void libgame_create_orc(gamestate* g, const char* name, const Vector2 pos) {
 void libgame_create_orc(gamestate* g, const char* name, const int x, const int y) {
-    entityid id = libgame_create_entity(g, name, ENTITY_NPC, (Vector2){x, y});
+    const entityid id = libgame_create_entity(g, name, ENTITY_NPC, x, y);
     if (id != -1) {
-        //g->hero_id = id;
         entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
         if (orc) {
             minfo("orc entity created");
@@ -2045,7 +2040,7 @@ void libgame_create_orc(gamestate* g, const char* name, const int x, const int y
 
 
 void libgame_create_sword(gamestate* g, const char* name, const Vector2 pos) {
-    entityid id = libgame_create_entity(g, name, ENTITY_ITEM, pos);
+    const entityid id = libgame_create_entity(g, name, ENTITY_ITEM, pos.x, pos.y);
     if (id != -1) {
         entity_t* e = hashtable_entityid_entity_get(g->entities, id);
         if (e) {
@@ -2062,9 +2057,8 @@ void libgame_create_sword(gamestate* g, const char* name, const Vector2 pos) {
 
 
 
-//void libgame_create_shield(gamestate* g, const char* name, const Vector2 pos) {
 void libgame_create_shield(gamestate* g, const char* name, const int x, const int y) {
-    entityid id = libgame_create_entity(g, name, ENTITY_ITEM, (Vector2){x, y});
+    const entityid id = libgame_create_entity(g, name, ENTITY_ITEM, x, y);
     if (id != -1) {
         entity_t* e = hashtable_entityid_entity_get(g->entities, id);
         if (e) {
@@ -2230,10 +2224,10 @@ const bool libgame_entity_move(gamestate* g, entityid id, int x, int y) {
 
 
 
-const bool libgame_entityid_move_check(gamestate* g, entityid id, const Vector2 dir) {
-    entity_t* e = hashtable_entityid_entity_get(g->entities, id);
-    return libgame_entity_move_check(g, e, dir.x, dir.y);
-}
+//const bool libgame_entityid_move_check(gamestate* g, entityid id, const int x, const int y) {
+//    entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+//    return libgame_entity_move_check(g, e, x, y);
+//}
 
 
 
