@@ -36,7 +36,7 @@ entity_t* entity_create(const char* n) {
     e->hp = 0;
     e->maxhp = 0;
 
-    e->pos = (Vector2){-1, -1};
+    //e->pos = (Vector2){-1, -1};
     e->x = -1;
     e->y = -1;
 
@@ -85,7 +85,8 @@ void entity_set_name(entity_t* e, const char* n) {
 
 void entity_set_x_unsafe(entity_t* e, const int x) {
     //minfo("entity_set_x_unsafe");
-    e->pos.x = x;
+    //e->pos.x = x;
+    e->x = x;
 }
 
 
@@ -103,8 +104,8 @@ void entity_set_x(entity_t* e, const int x) {
 
 void entity_set_y_unsafe(entity_t* e, const int y) {
     //minfo("entity_set_y_unsafe");
-    //e->y = y;
-    e->pos.y = y;
+    e->y = y;
+    //e->pos.y = y;
 }
 
 
@@ -158,20 +159,31 @@ void entity_set_pos_unsafe(entity_t* e, const Vector2 pos) {
 
 
 
-void entity_move(entity_t* e, const Vector2 dir) {
+void entity_move(entity_t* e, int x, int y) {
+    //void entity_move(entity_t* e, const Vector2 dir) {
     //minfo("entity_move");
     if (e) {
-        entity_move_unsafe(e, dir);
+        e->x += x;
+        e->y += y;
+        if (e->x < 0) {
+            e->x = 0;
+        }
+
+        if (e->y < 0) {
+            e->y = 0;
+        }
+
+        //entity_move_unsafe(e, dir);
     }
 }
 
 
 
 
-void entity_move_unsafe(entity_t* e, const Vector2 dir) {
-    //minfo("entity_move_unsafe");
-    entity_set_pos_unsafe(e, Vector2Add(e->pos, dir));
-}
+//void entity_move_unsafe(entity_t* e, const Vector2 dir) {
+//minfo("entity_move_unsafe");
+//entity_set_pos_unsafe(e, Vector2Add(e->pos, dir));
+//}
 
 
 

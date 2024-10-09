@@ -20,7 +20,7 @@ typedef struct entity_t {
 
     itemtype_t itemtype; // not be used if not an item
 
-    Vector2 pos;
+    //Vector2 pos;
     int x;
     int y;
 
@@ -60,8 +60,9 @@ void entity_set_pos(entity_t* e, const Vector2 pos);
 void entity_set_pos_unsafe(entity_t* e, const Vector2 pos);
 
 
-void entity_move(entity_t* e, const Vector2 dir);
-void entity_move_unsafe(entity_t* e, const Vector2 dir);
+void entity_move(entity_t* e, int x, int y);
+//void entity_move(entity_t* e, const Vector2 dir);
+//void entity_move_unsafe(entity_t* e, const Vector2 dir);
 
 
 void entity_destroy(entity_t* entity);
