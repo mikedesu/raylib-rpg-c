@@ -546,7 +546,9 @@ void libgame_updateherospritegroup_down(gamestate* g) {
 void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y) {
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (sg) {
-        sg->move = (Vector2){x, y};
+        //sg->move = (Vector2){x, y};
+        sg->move_x = x;
+        sg->move_y = y;
     }
 }
 
@@ -898,23 +900,23 @@ void libgame_update_smoothmove(gamestate* g, entityid id) {
         if (group) {
             float move_unit = 1.0f;
             // only do it 1 unit at a time
-            if (group->move.x > 0) {
+            if (group->move_x > 0) {
                 group->dest.x += move_unit;
-                group->move.x -= move_unit;
-            } else if (group->move.x < 0) {
+                group->move_x -= move_unit;
+            } else if (group->move_x < 0) {
                 group->dest.x -= move_unit;
-                group->move.x += move_unit;
+                group->move_x += move_unit;
             }
 
-            if (group->move.y > 0) {
+            if (group->move_y > 0) {
                 group->dest.y += move_unit;
-                group->move.y -= move_unit;
-            } else if (group->move.y < 0) {
+                group->move_y -= move_unit;
+            } else if (group->move_y < 0) {
                 group->dest.y -= move_unit;
-                group->move.y += move_unit;
+                group->move_y += move_unit;
             }
             // makes sure the entity is at the destination
-            if (group->move.x == 0.0f && group->move.y == 0.0f) {
+            if (group->move_x == 0.0f && group->move_y == 0.0f) {
                 //g->is_updating_smooth_move = false;
                 entity_t* e = hashtable_entityid_entity_get(g->entities, id);
                 if (e) {

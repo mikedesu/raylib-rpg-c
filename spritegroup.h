@@ -8,7 +8,10 @@ typedef struct spritegroup_t {
 
     int current; // the current animation sprite in the spritegroup
     Rectangle dest;
-    Vector2 move;
+
+    //Vector2 move;
+    int move_x;
+    int move_y;
 
     int off_x;
     int off_y;
