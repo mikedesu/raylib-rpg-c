@@ -4,13 +4,13 @@ WFLAGS=-Wall -Werror
 SHARED=-shared
 DATA_STRUCTS=vectorentityid.o 
 SCENES=companyscene.o 
-LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o  utils.o sprite.o  spritegroup.o entity.o hashtable_entityid_entity.o gamestate.o hashtable_entityid_spritegroup.o dungeonfloor.o get_txkey_for_tiletype.o
+LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o  utils.o sprite.o  spritegroup.o entity.o hashtable_entityid_entity.o gamestate.o hashtable_entityid_spritegroup.o dungeonfloor.o get_txkey_for_tiletype.o dice.o
 STATIC_LINK_RAYLIB=-l:libraylib.a
 LINK_MATH=-lm
 POSITION_INDEPENDENT_CODE=-fPIC
 MAIN_C=main.c
-WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c hashtable_entityid_entity.c dungeonfloor.c vectorentityid.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c companyscene.c sprite.c spritegroup.c entity.c utils.c /home/darkmage/src/raylib/src/libraylib.a 
-MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_entity.o hashtable_entityid_spritegroup.o dungeonfloor.o vectorentityid.o get_txkey_for_tiletype.o
+WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c hashtable_entityid_entity.c dungeonfloor.c vectorentityid.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c companyscene.c sprite.c spritegroup.c entity.c utils.c dice.c /home/darkmage/src/raylib/src/libraylib.a 
+MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_entity.o hashtable_entityid_spritegroup.o dungeonfloor.o vectorentityid.o get_txkey_for_tiletype.o dice.o 
 
 
 
@@ -25,7 +25,7 @@ game: main.c gameloader.o $(LIBGAME_OBJECTS) libgame.so
 	$(CC) -o $@ $(MAIN_C) $(MAIN_OBJECTS) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)
 
 # Bridge between Raylib and game
-gameloader.o: gameloader.c # desktop version with hot reloading
+gameloader.o: gameloader.c 
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 gamestate.o: gamestate.c 
@@ -65,12 +65,13 @@ hashtable_entityid_spritegroup.o: hashtable_entityid_spritegroup.c
 get_txkey_for_tiletype.o: get_txkey_for_tiletype.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
+dice.o: dice.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 # Main reloadable game base
 libgame.o: libgame.c
 	touch libgame.so.lockfile
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@ # hot-reload desktop version
-	#$(CC) $(OBJ) $(WFLAGS) $^ $(LIBGAME_OBJECTS) -lraylib -o $@ # web version
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@ 
 libgame.so: $(LIBGAME_OBJECTS)
 	$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB) $(WFLAGS) 
 	rm -rfv libgame.so.lockfile
