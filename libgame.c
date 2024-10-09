@@ -2007,8 +2007,9 @@ void libgame_createitembytype(gamestate* g, const itemtype_t type, const int x, 
 
 
 
-void libgame_create_hero(gamestate* g, const char* name, const Vector2 pos) {
-    entityid id = libgame_create_entity(g, name, ENTITY_PLAYER, pos);
+//void libgame_create_hero(gamestate* g, const char* name, const Vector2 pos) {
+void libgame_create_hero(gamestate* g, const char* name, const int x, const int y) {
+    const entityid id = libgame_create_entity(g, name, ENTITY_PLAYER, (Vector2){x, y});
     if (id != -1) {
         g->hero_id = id;
         entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
@@ -2090,7 +2091,7 @@ void libgame_initsharedsetup(gamestate* g) {
 
         minfo("creating hero");
         // this is just a mock-up for now
-        libgame_create_hero(g, "hero", (Vector2){1, 0});
+        libgame_create_hero(g, "hero", 1, 0);
         msuccess("hero created");
 
         minfo("creating sword...");
