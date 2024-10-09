@@ -63,7 +63,7 @@ int windowheight = DEFAULT_WINDOW_HEIGHT;
 
 
 
-const bool libgame_entity_try_attack_pos(gamestate* g, entityid id, const Vector2 pos) {
+const bool libgame_entity_try_attack(gamestate* g, entityid id, const int x, const int y) {
     // we dont have full rules or functions for attacking yet
     // however
     // given the entityid and the position they are attack
@@ -73,7 +73,7 @@ const bool libgame_entity_try_attack_pos(gamestate* g, entityid id, const Vector
     if (e) {
         // get the tile at pos
         //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos);
-        tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
+        tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
         if (t) {
             // check to see if tile has anything
             const bool occupied = vectorentityid_capacity(&t->entityids) > 0;
@@ -209,7 +209,7 @@ void libgame_handleinput(gamestate* g) {
             if (hero) {
                 // try an attack
                 //if (libgame_entity_try_attack_pos(g, g->hero_id, (Vector2){hero->pos.x + 1, hero->pos.y})) {
-                if (libgame_entity_try_attack_pos(g, g->hero_id, (Vector2){hero->x + 1, hero->y})) {
+                if (libgame_entity_try_attack(g, g->hero_id, hero->x + 1, hero->y)) {
                     // successfull attack
                     // lets try setting the orc animation sprite on success
 
@@ -1401,9 +1401,9 @@ void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x
 
 
 
-const bool libgame_itemtype_is_at(gamestate* g, const Vector2 pos, const itemtype_t type) {
-
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, pos.x, pos.y);
+//const bool libgame_itemtype_is_at(gamestate* g, const Vector2 pos, const itemtype_t type) {
+const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int x, const int y) {
+    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
     for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
         entityid id = vectorentityid_get(&t->entityids, k);
         entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
