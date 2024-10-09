@@ -50,5 +50,8 @@ void dungeonfloor_free(dungeonfloor_t* d);
 void dungeonfloor_set_all_tiles_to_type(dungeonfloor_t* d, tiletype_t type);
 void dungeonfloor_init_all_tiles_entityids(dungeonfloor_t* d);
 
+void dungeonfloor_set_tiletype_at(dungeonfloor_t* d, tiletype_t type, int x, int y);
+void dungeonfloor_set_tiletype_at_unsafe(dungeonfloor_t* d, tiletype_t type, int x, int y);
+
 //tile_t* dungeonfloor_get_tile(dungeonfloor_t* d, Vector2 pos);
 tile_t* dungeonfloor_get_tile(dungeonfloor_t* d, int x, int y);

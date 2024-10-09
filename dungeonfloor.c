@@ -77,3 +77,28 @@ tile_t* dungeonfloor_get_tile(dungeonfloor_t* d, int x, int y) {
     merror("dungeonfloor_get_tile: d is NULL");
     return NULL;
 }
+
+
+
+
+void dungeonfloor_set_tiletype_at(dungeonfloor_t* d, tiletype_t type, int x, int y) {
+    if (d) {
+        dungeonfloor_set_tiletype_at_unsafe(d, type, x, y);
+    } else {
+        merror("dungeonfloor_set_tiletype_at: d is NULL");
+    }
+}
+
+
+
+
+void dungeonfloor_set_tiletype_at_unsafe(dungeonfloor_t* d, tiletype_t type, int x, int y) {
+    if (x < d->len && y < d->wid) {
+        int index = x * d->wid + y;
+        d->grid[index].type = type;
+    } else {
+        merror("dungeonfloor_set_tiletype_at: pos out of bounds");
+        fprintf(stderr, "pos: (%d, %d)\n", x, y);
+        fprintf(stderr, "d->len: %d, d->wid: %d\n", d->len, d->wid);
+    }
+}

@@ -71,12 +71,11 @@ void libgame_update_spritegroup_down(gamestate* g, entityid id);
 void libgame_handle_npc_turn(gamestate* g, entityid id);
 void libgame_create_torch_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);
 void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);
-void libgame_create_shield_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);
+void libgame_create_shield_spritegroup(gamestate* g, entityid id, const int off_x, const int off_y);
 void libgame_entity_look(gamestate* g, entityid id);
 void libgame_handle_grid_switch(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
 void libgame_entity_anim_set(gamestate* g, entityid id, int index);
-entityid libgame_entity_pickup_item(gamestate* g, entityid id);
 void libgame_createitembytype(gamestate* g, const itemtype_t type, const int x, const int y);
 void libgame_create_hero(gamestate* g, const char* name, const int x, const int y);
 void libgame_create_orc(gamestate* g, const char* name, const int x, const int y);
@@ -86,6 +85,10 @@ void libgame_draw_items_that_are_not(gamestate* g, const itemtype_t type, const 
 void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x, const int y);
 void libgame_create_sword(gamestate* g, const char* name, const int x, const int y);
 void libgame_test_enemy_placement(gamestate* g);
+void libgame_init_dungeonfloor_random_tiles_unsafe(gamestate* g);
+void libgame_init_dungeonfloor_random_tiles(gamestate* g);
+
+const entityid libgame_entity_pickup_item(gamestate* g, const entityid id);
 
 const bool libgame_entity_move(gamestate* g, entityid id, int x, int y);
 const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);

@@ -37,8 +37,8 @@
 35 4 4  0 img/characters/orc-walk-shadow.png
 36 4 4  0 img/characters/orc-attack.png
 37 4 4  0 img/characters/orc-attack-shadow.png
-#38 img/characters/orc-chargedattack.png
-#39 img/characters/orc-chargedattack-shadow.png
+38 img/characters/orc-chargedattack.png
+39 img/characters/orc-chargedattack-shadow.png
 40 4 4  0 img/characters/orc-jump.png
 41 4 4  0 img/characters/orc-jump-shadow.png
 42 1 12 0 img/characters/orc-die.png
