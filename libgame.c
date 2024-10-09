@@ -2063,8 +2063,9 @@ void libgame_create_sword(gamestate* g, const char* name, const Vector2 pos) {
 
 
 
-void libgame_create_shield(gamestate* g, const char* name, const Vector2 pos) {
-    entityid id = libgame_create_entity(g, name, ENTITY_ITEM, pos);
+//void libgame_create_shield(gamestate* g, const char* name, const Vector2 pos) {
+void libgame_create_shield(gamestate* g, const char* name, const int x, const int y) {
+    entityid id = libgame_create_entity(g, name, ENTITY_ITEM, (Vector2){x, y});
     if (id != -1) {
         entity_t* e = hashtable_entityid_entity_get(g->entities, id);
         if (e) {
