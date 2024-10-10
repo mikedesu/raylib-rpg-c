@@ -27,12 +27,19 @@
 #include <string.h>
 #include <time.h>
 
+// Lua support
+#include "mylua.h"
+
+
 
 //------------------------------------------------------------------
 // libgame global variables
 //------------------------------------------------------------------
 gamestate* g = NULL;
 
+//#ifndef WEB
+lua_State* L = NULL;
+//#endif
 
 RenderTexture target;
 Rectangle target_src = (Rectangle){0, 0, 0, 0};
@@ -1960,6 +1967,13 @@ void libgame_initsharedsetup(gamestate* g) {
     minfo("libgame_initsharedsetup begin");
     if (g) {
         libgame_initwindow();
+
+        // init lua
+        //#ifndef WEB
+        L = luaL_newstate();
+        luaL_openlibs(L);
+        //#endif
+
         libgame_loadfont(g);
         libgame_loadtargettexture(g);
         libgame_loadtextures(g);
@@ -2041,10 +2055,17 @@ void libgame_close(gamestate* g) {
 void libgame_closeshared(gamestate* g) {
     // dont need to free most of gamestate
     minfo("libgame_closeshared");
+
     UnloadFont(g->font);
     libgame_unloadtextures(g);
     UnloadRenderTexture(target);
+
+
+    //#ifndef WEB
+    lua_close(L);
+    //#endif
     CloseWindow();
+
     msuccess("libgame_closeshared end");
 }
 

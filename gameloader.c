@@ -65,9 +65,9 @@ bool (*mylibgame_external_check_reload)() = NULL;
 
 
 // get the last write time of a file
-time_t getlastwritetime(const char* filename) {
+int getlastwritetime(const char* filename) {
     struct stat file_stat;
-    time_t retval = 0;
+    int retval = 0;
     if (stat(filename, &file_stat) == 0) {
         retval = file_stat.st_mtime;
     }

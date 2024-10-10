@@ -14,6 +14,9 @@
 - `gcc` or `clang` (but the `Makefile` assumes `gcc` for now)
 - `emsdk`
 - `make`
+- `liblua5.4-dev`
+- A custom-built version of `liblua.a` for the web build
+
 
 ### Instructions
 
@@ -21,15 +24,34 @@
 2. Change directory to the repository
 3. Run the following command:
 
-For Linux executable:
+#### Linux executable:
 
 ```
 make
 ```
 
-For WebAssembly executable, you will have to edit some of the hardcoded paths in the `emcc` instruction. I will make this easier in the future.
+#### WebAssembly executable
+
+You will have to edit some of the hardcoded paths in the `emcc` instruction. 
+I will provide details for this in the near future.
 
 ```
 make index.html
+```
+
+-----
+
+## Running
+
+### Linux 
+
+```
+./game
+```
+
+### WebAssembly
+
+```
+emrun index.html
 ```
 

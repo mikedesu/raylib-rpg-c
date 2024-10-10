@@ -126,5 +126,5 @@ SortIncludes: true
 ReflowComments: false
 
 IncludeBlocks: Preserve
-IndentPPDirectives: AfterHash
+IndentPPDirectives: None
 ---
