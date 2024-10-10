@@ -1966,13 +1966,12 @@ void libgame_create_shield(gamestate* g, const char* name, const int x, const in
 void libgame_initsharedsetup(gamestate* g) {
     minfo("libgame_initsharedsetup begin");
     if (g) {
-        libgame_initwindow();
 
         // init lua
-        //#ifndef WEB
         L = luaL_newstate();
         luaL_openlibs(L);
-        //#endif
+
+        libgame_initwindow();
 
         libgame_loadfont(g);
         libgame_loadtargettexture(g);
@@ -2061,10 +2060,8 @@ void libgame_closeshared(gamestate* g) {
     UnloadRenderTexture(target);
 
 
-    //#ifndef WEB
-    lua_close(L);
-    //#endif
     CloseWindow();
+    lua_close(L);
 
     msuccess("libgame_closeshared end");
 }
