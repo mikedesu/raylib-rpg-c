@@ -24,3 +24,12 @@ const bool libgame_lua_create_dungeonfloor(lua_State* L, const int width, const 
 
 
 const int libgame_lua_get_tiletype(lua_State* L, const int x, const int y);
+
+
+const bool libgame_lua_entity_move(lua_State* L, const int id, const int x, const int y);
+
+
+
+const int libgame_lua_get_num_entities_at(lua_State* L, const int x, const int y);
+
+const int libgame_lua_get_nth_entity_at(lua_State* L, const int n, const int x, const int y);

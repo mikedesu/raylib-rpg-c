@@ -46,15 +46,47 @@ Entities = {}
 function CreateTile(type)
 	local tile = {
 		type = type,
+		entities = {},
 	}
 	return tile
 end
 
+function GetNumEntitiesAt(x, y)
+	if DungeonFloor[y] and DungeonFloor[y][x] then
+		return #DungeonFloor[y][x].entities
+	end
+	return 0
+end
+
+function GetNthEntityAt(n, x, y)
+	if DungeonFloor[y] and DungeonFloor[y][x] then
+		return DungeonFloor[y][x].entities[n]
+	end
+	return nil
+end
+
+function AddEntityToTile(id, x, y)
+	if DungeonFloor[y] and DungeonFloor[y][x] then
+		table.insert(DungeonFloor[y][x].entities, id)
+	end
+end
+
+function RemoveEntityFromTile(id, x, y)
+	if DungeonFloor[y] and DungeonFloor[y][x] then
+		for i, entityId in ipairs(DungeonFloor[y][x].entities) do
+			if entityId == id then
+				table.remove(DungeonFloor[y][x].entities, i)
+				return
+			end
+		end
+	end
+end
+
 function CreateDungeonFloor(width, height, type)
 	local floor = {}
-	for y = 1, height do
+	for y = 0, height do
 		floor[y] = {}
-		for x = 1, width do
+		for x = 0, width do
 			floor[y][x] = CreateTile(type)
 		end
 	end
@@ -79,6 +111,7 @@ function CreateEntity(name, type, x, y)
 	}
 	NextEntityId = NextEntityId + 1
 	table.insert(Entities, entity)
+	AddEntityToTile(entity.id, x, y)
 	return entity
 end
 
@@ -91,10 +124,43 @@ function GetEntityById(id)
 	return nil
 end
 
+function GetEntityAttr(entityId, propertyName)
+	local entity = GetEntityById(entityId)
+	if entity then
+		return entity[propertyName]
+	end
+	return nil
+end
+
 function SetEntityAttr(entityId, propertyName, value)
 	local entity = GetEntityById(entityId)
 	if entity then
 		entity[propertyName] = value
+		return true
+	end
+	return false
+end
+
+function SetEntityAt(entityId, x, y)
+	local entity = GetEntityById(entityId)
+	if entity then
+		entity.x = x
+		entity.y = y
+		return true
+	end
+	return false
+end
+
+function EntityMove(id, xdir, ydir)
+	local entity = GetEntityById(id)
+	if entity then
+		local newx = entity.x + xdir
+		local newy = entity.y + ydir
+		if GetTileType(newx, newy) == TileTypes.None then
+			return false
+		end
+		entity.x = newx
+		entity.y = newy
 		return true
 	end
 	return false

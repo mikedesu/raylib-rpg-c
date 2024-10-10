@@ -1,4 +1,5 @@
 #include "libgame_lua.h"
+#include "mprint.h"
 
 
 
@@ -95,7 +96,12 @@ const int libgame_lua_get_entity_int(lua_State* L, const int id, const char* key
         lua_pushnumber(L, id);
         lua_pushstring(L, key);
         if (lua_pcall(L, 2, 1, 0) == 0) {
-            retval = lua_tonumber(L, -1);
+            if (lua_isnumber(L, -1)) {
+                retval = lua_tonumber(L, -1);
+            } else {
+                merror("libgame_lua_get_entity_int: value is not a number");
+                retval = -1;
+            }
         }
         lua_pop(L, 1);
     }
@@ -145,6 +151,59 @@ const int libgame_lua_get_tiletype(lua_State* L, const int x, const int y) {
         lua_pushnumber(L, x);
         lua_pushnumber(L, y);
         if (lua_pcall(L, 2, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const bool libgame_lua_entity_move(lua_State* L, const int id, const int x, const int y) {
+    bool retval = false;
+    if (L) {
+        lua_getglobal(L, "EntityMove");
+        lua_pushnumber(L, id);
+        lua_pushnumber(L, x);
+        lua_pushnumber(L, y);
+        if (lua_pcall(L, 3, 1, 0) == 0) {
+            retval = lua_toboolean(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const int libgame_lua_get_num_entities_at(lua_State* L, const int x, const int y) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetNumEntitiesAt");
+        lua_pushnumber(L, x);
+        lua_pushnumber(L, y);
+        if (lua_pcall(L, 2, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const int libgame_lua_get_nth_entity_at(lua_State* L, const int n, const int x, const int y) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetNthEntityAt");
+        lua_pushnumber(L, n);
+        lua_pushnumber(L, x);
+        lua_pushnumber(L, y);
+        if (lua_pcall(L, 3, 1, 0) == 0) {
             retval = lua_tonumber(L, -1);
         }
         lua_pop(L, 1);
