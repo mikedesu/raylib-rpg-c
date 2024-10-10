@@ -112,7 +112,7 @@ function CreateEntity(name, type, x, y)
 	NextEntityId = NextEntityId + 1
 	table.insert(Entities, entity)
 	AddEntityToTile(entity.id, x, y)
-	return entity
+	return entity.id
 end
 
 function GetEntityById(id)
@@ -159,9 +159,38 @@ function EntityMove(id, xdir, ydir)
 		if GetTileType(newx, newy) == TileTypes.None then
 			return false
 		end
+		if TileIsOccupiedByPlayer(newx, newy) or TileIsOccupiedByNPC(newx, newy) then
+			return false
+		end
+
+		-- Remove entity from old tile
+		RemoveEntityFromTile(entity.id, entity.x, entity.y)
+		-- Add entity to new tile
+		AddEntityToTile(entity.id, newx, newy)
 		entity.x = newx
 		entity.y = newy
 		return true
 	end
 	return false
+end
+
+function TileIsOccupiedByType(type, x, y)
+	if DungeonFloor[y] and DungeonFloor[y][x] then
+		for i, entityId in ipairs(DungeonFloor[y][x].entities) do
+			local entity = GetEntityById(entityId)
+			if entity and entity.type == type then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+function TileIsOccupiedByPlayer(x, y)
+	return TileIsOccupiedByType(EntityTypes.Player, x, y)
+end
+
+function TileIsOccupiedByNPC(x, y)
+	return TileIsOccupiedByType(EntityTypes.NPC, x, y)
 end

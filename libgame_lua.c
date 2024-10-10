@@ -210,3 +210,35 @@ const int libgame_lua_get_nth_entity_at(lua_State* L, const int n, const int x, 
     }
     return retval;
 }
+
+
+
+const bool libgame_lua_tile_is_occupied_by_player(lua_State* L, const int x, const int y) {
+    bool retval = false;
+    if (L) {
+        lua_getglobal(L, "TileIsOccupiedByPlayer");
+        lua_pushnumber(L, x);
+        lua_pushnumber(L, y);
+        if (lua_pcall(L, 2, 1, 0) == 0) {
+            retval = lua_toboolean(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+const bool libgame_lua_tile_is_occupied_by_npc(lua_State* L, const int x, const int y) {
+    bool retval = false;
+    if (L) {
+        lua_getglobal(L, "TileIsOccupiedByNPC");
+        lua_pushnumber(L, x);
+        lua_pushnumber(L, y);
+        if (lua_pcall(L, 2, 1, 0) == 0) {
+            retval = lua_toboolean(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}

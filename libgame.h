@@ -81,7 +81,9 @@ void libgame_entity_anim_set(gamestate* g, entityid id, int index);
 //void libgame_create_hero(gamestate* g, const char* name, const int x, const int y);
 void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y);
 
-void libgame_create_orc(gamestate* g, const char* name, const int x, const int y);
+//void libgame_create_orc(gamestate* g, const char* name, const int x, const int y);
+void libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
+
 void libgame_create_shield(gamestate* g, const char* name, const int x, const int y);
 void libgame_draw_items(gamestate* g, const itemtype_t type, const int x, const int y);
 void libgame_draw_items_that_are_not(gamestate* g, const itemtype_t type, const int x, const int y);

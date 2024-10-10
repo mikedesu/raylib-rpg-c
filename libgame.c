@@ -185,12 +185,21 @@ const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, ite
 
 
 void libgame_test_enemy_placement(gamestate* g) {
-    entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
-    if (hero) {
-        if (!libgame_entitytype_is_at(g, ENTITY_NPC, hero->x + 1, hero->y)) {
-            libgame_create_orc(g, "orc", hero->x + 1, hero->y);
-        }
+    minfo("test_enemy_placement begin");
+
+    const int x = libgame_lua_get_entity_int(L, g->hero_id, "x");
+    const int y = libgame_lua_get_entity_int(L, g->hero_id, "y");
+
+    //entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
+    //if (hero) {
+    //if (!libgame_entitytype_is_at(g, ENTITY_NPC, hero->x + 1, hero->y)) {
+    //if (!libgame_entitytype_is_at(g, ENTITY_NPC, hero_x + 1, hero_y)) {
+    if (!libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
+        //libgame_create_orc(g, "orc", hero->x + 1, hero->y);
+        //libgame_create_orc_lua(g, "orc", hero->x + 1, hero->y);
+        libgame_create_orc_lua(g, "orc", x + 1, y);
     }
+    //}
 }
 
 
@@ -241,10 +250,10 @@ void libgame_handleinput(gamestate* g) {
     //g->player_input_received = true;
     //}
 
-    //if (IsKeyPressed(KEY_E)) {
-    //    libgame_test_enemy_placement(g);
-    //    g->player_input_received = true;
-    //}
+    if (IsKeyPressed(KEY_E)) {
+        libgame_test_enemy_placement(g);
+        g->player_input_received = true;
+    }
 
     // lets place a torch where the player is standing
     //if (IsKeyPressed(KEY_T)) {
@@ -1097,9 +1106,7 @@ void libgame_drawframe(gamestate* g) {
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     libgame_draw_debugpanel(g);
-
     //DrawRectangleLines(0, 0, windowwidth, windowheight - 2, RED);
-
     libgame_drawframeend(g);
     //msuccess("libgame_drawframe end");
 }
@@ -1210,9 +1217,9 @@ void libgame_draw_entity(gamestate* g, entityid id) {
                 DrawLineV(v[3], v[0], c);
             }
         } else {
-            char buf[256];
-            snprintf(buf, 256, "libgame_draw_entity: spritegroup is NULL for entity id: %d", id);
-            merror(buf);
+            //char buf[256];
+            //snprintf(buf, 256, "libgame_draw_entity: spritegroup is NULL for entity id: %d", id);
+            //merror(buf);
         }
     }
 }
@@ -1268,7 +1275,8 @@ void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const i
     int num_entities = libgame_lua_get_num_entities_at(L, x, y);
 
     for (int k = 0; k < num_entities; k++) {
-        entityid id = libgame_lua_get_nth_entity_at(L, x, y, k + 1);
+        //entityid id = libgame_lua_get_nth_entity_at(L, x, y, k + 1);
+        entityid id = libgame_lua_get_nth_entity_at(L, k + 1, x, y);
         entitytype_t type2 = libgame_lua_get_entity_int(L, id, "type");
         if (type == type2) {
             //printf("type: %d\n", type);
@@ -1324,6 +1332,7 @@ void libgame_draw_gameplayscene_entities(gamestate* g) {
                 //libgame_draw_entities_at(g, ENTITY_NPC, i, j);
 
                 //libgame_draw_entities_at(g, ENTITY_PLAYER, i, j);
+                libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
                 libgame_draw_entities_at_lua(g, ENTITY_PLAYER, i, j);
             }
         }
@@ -1734,7 +1743,12 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
 void libgame_create_orcspritegroup(gamestate* g, entityid id) {
     minfo("libgame_create_orcspritegroup begin");
     spritegroup_t* orc_group = spritegroup_create(20);
-    entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
+
+    //entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
+
+    const int orc_x = libgame_lua_get_entity_int(L, id, "x");
+    const int orc_y = libgame_lua_get_entity_int(L, id, "y");
+
     int keys[14] = {TXORCIDLE,
                     TXORCIDLESHADOW,
                     TXORCWALK,
@@ -1761,8 +1775,10 @@ void libgame_create_orcspritegroup(gamestate* g, entityid id) {
     const float h = spritegroup_get(orc_group, 0)->height;
     const float offset_x = -12;
     const float offset_y = -12;
-    const float x = orc->x * DEFAULT_TILE_SIZE;
-    const float y = orc->y * DEFAULT_TILE_SIZE;
+    //const float x = orc->x * DEFAULT_TILE_SIZE;
+    //const float y = orc->y * DEFAULT_TILE_SIZE;
+    const float x = orc_x * DEFAULT_TILE_SIZE;
+    const float y = orc_y * DEFAULT_TILE_SIZE;
     Rectangle dest = {x + offset_x, y + offset_y, w, h};
     orc_group->current = 0;
     orc_group->dest = dest;
@@ -1810,35 +1826,35 @@ void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off
 
 
 
-void libgame_create_shield_spritegroup(gamestate* g, const entityid id, const int off_x, const int off_y) {
-    minfo("libgame_create_shield_spritegroup begin");
-    if (g) {
-        spritegroup_t* group = spritegroup_create(4);
-        if (!group) {
-            merror("create shield spritegroup: could not create spritegroup");
-            return;
-        }
-        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
-        if (!e) {
-            merror("create shield spritegroup: could not get entity");
-            return;
-        }
-        sprite* s = sprite_create(&g->txinfo[TXSHIELD].texture, g->txinfo[TXSHIELD].contexts, g->txinfo[TXSHIELD].num_frames);
-        if (!s) {
-            merror("could not create sprite");
-        }
-        spritegroup_add(group, s);
-        const int x = e->x * DEFAULT_TILE_SIZE + off_x;
-        const int y = e->y * DEFAULT_TILE_SIZE + off_y;
-        Rectangle dest = {x, y, s->width, s->height};
-        group->current = 0;
-        group->dest = dest;
-        group->off_x = off_x;
-        group->off_y = off_y;
-        hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
-        msuccess("libgame_create_shield_spritegroup end");
-    }
-}
+//void libgame_create_shield_spritegroup(gamestate* g, const entityid id, const int off_x, const int off_y) {
+//    minfo("libgame_create_shield_spritegroup begin");
+//    if (g) {
+//        spritegroup_t* group = spritegroup_create(4);
+//        if (!group) {
+//            merror("create shield spritegroup: could not create spritegroup");
+//            return;
+//        }
+//        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+//        if (!e) {
+//            merror("create shield spritegroup: could not get entity");
+//            return;
+//        }
+//        sprite* s = sprite_create(&g->txinfo[TXSHIELD].texture, g->txinfo[TXSHIELD].contexts, g->txinfo[TXSHIELD].num_frames);
+//        if (!s) {
+//            merror("could not create sprite");
+//        }
+//        spritegroup_add(group, s);
+//        const int x = e->x * DEFAULT_TILE_SIZE + off_x;
+//        const int y = e->y * DEFAULT_TILE_SIZE + off_y;
+//        Rectangle dest = {x, y, s->width, s->height};
+//        group->current = 0;
+//        group->dest = dest;
+//        group->off_x = off_x;
+//        group->off_y = off_y;
+//        hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
+//        msuccess("libgame_create_shield_spritegroup end");
+//    }
+//}
 
 
 
@@ -1941,10 +1957,8 @@ void libgame_init_datastructures(gamestate* g) {
 
     libgame_lua_create_dungeonfloor(L, w, h, base_type);
 
-
-
     // lets try setting some random tiles to different tile types
-    libgame_init_dungeonfloor(g);
+    //libgame_init_dungeonfloor(g);
     //minfo("libgame_initdatastructures end");
 }
 
@@ -1997,15 +2011,7 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
     if (id != -1) {
         g->hero_id = id;
         libgame_create_herospritegroup(g, id);
-
         msuccess("hero entity created in Lua");
-        //libgame_lua_set_entity_int(L, id, "race", RACETYPE_HUMAN);
-        //g->hero_id = id;
-        //entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
-        //if (hero) {
-        //    minfo("hero entity created");
-        //    libgame_create_herospritegroup(g, id);
-        //}
     } else {
         merror("libgame_create_hero_lua: could not create hero entity");
     }
@@ -2014,48 +2020,74 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
 
 
 
-void libgame_create_orc(gamestate* g, const char* name, const int x, const int y) {
-    const entityid id = libgame_create_entity(g, name, ENTITY_NPC, x, y);
+//void libgame_create_orc(gamestate* g, const char* name, const int x, const int y) {
+//    const entityid id = libgame_create_entity(g, name, ENTITY_NPC, x, y);
+//    if (id != -1) {
+//        entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
+//        if (orc) {
+//            libgame_create_orcspritegroup(g, id);
+//            msuccess("orc entity created");
+//        }
+//    }
+//}
+
+
+
+
+void libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y) {
+
+    char buf[128];
+    snprintf(buf, 128, "libgame_create_orc_lua: creating orc entity %s at %d, %d", name, x, y);
+    minfo(buf);
+
+    const entityid id = libgame_lua_create_entity(L, name, ENTITY_NPC, x, y);
     if (id != -1) {
-        entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
-        if (orc) {
-            minfo("orc entity created");
-            libgame_create_orcspritegroup(g, id);
-        }
+        libgame_create_orcspritegroup(g, id);
+
+        bzero(buf, 128);
+        snprintf(buf, 128, "libgame_create_orc_lua: orc entityid %d", id);
+        msuccess(buf);
+
+        //entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
+        //if (orc) {
+        //    minfo("orc entity created");
+        //    libgame_create_orcspritegroup(g, id);
+        //}
+    } else {
+        merror("libgame_create_orc_lua: could not create orc entity");
     }
 }
 
 
 
-
-void libgame_create_sword(gamestate* g, const char* name, const int x, const int y) {
-    const entityid id = libgame_create_entity(g, name, ENTITY_ITEM, x, y);
-    if (id != -1) {
-        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
-        if (e) {
-            minfo("orc entity created");
-            e->itemtype = ITEM_WEAPON;
-            e->weapontype = WEAPON_SWORD;
-            libgame_create_sword_spritegroup(g, id, 0, -2);
-        }
-    }
-}
-
+//void libgame_create_sword(gamestate* g, const char* name, const int x, const int y) {
+//    const entityid id = libgame_create_entity(g, name, ENTITY_ITEM, x, y);
+//    if (id != -1) {
+//        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+//        if (e) {
+//            minfo("orc entity created");
+//            e->itemtype = ITEM_WEAPON;
+//            e->weapontype = WEAPON_SWORD;
+//            libgame_create_sword_spritegroup(g, id, 0, -2);
+//        }
+//    }
+//}
 
 
 
-void libgame_create_shield(gamestate* g, const char* name, const int x, const int y) {
-    const entityid id = libgame_create_entity(g, name, ENTITY_ITEM, x, y);
-    if (id != -1) {
-        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
-        if (e) {
-            minfo("shield entity created");
-            e->itemtype = ITEM_SHIELD;
-            e->shieldtype = SHIELD_BASIC;
-            libgame_create_shield_spritegroup(g, id, 0, -2);
-        }
-    }
-}
+
+//void libgame_create_shield(gamestate* g, const char* name, const int x, const int y) {
+//    const entityid id = libgame_create_entity(g, name, ENTITY_ITEM, x, y);
+//    if (id != -1) {
+//        entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+//        if (e) {
+//            minfo("shield entity created");
+//            e->itemtype = ITEM_SHIELD;
+//            e->shieldtype = SHIELD_BASIC;
+//            libgame_create_shield_spritegroup(g, id, 0, -2);
+//        }
+//    }
+//}
 
 
 
