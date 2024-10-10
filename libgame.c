@@ -558,7 +558,6 @@ void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y) {
 
 void libgame_handleplayerinput_key_right(gamestate* g) {
     libgame_updateherospritegroup_right(g);
-    //bool result = libgame_entity_move(g, g->hero_id, 1, 0);
     bool result = libgame_entity_move_lua(g, g->hero_id, 1, 0);
     if (result) {
         libgame_update_spritegroup_move(g, g->hero_id, DEFAULT_TILE_SIZE, 0);
@@ -570,7 +569,6 @@ void libgame_handleplayerinput_key_right(gamestate* g) {
 
 void libgame_handleplayerinput_key_left(gamestate* g) {
     libgame_updateherospritegroup_left(g);
-    //bool result = libgame_entity_move(g, g->hero_id, -1, 0);
     bool result = libgame_entity_move_lua(g, g->hero_id, -1, 0);
     if (result) {
         libgame_update_spritegroup_move(g, g->hero_id, -DEFAULT_TILE_SIZE, 0);
@@ -582,7 +580,6 @@ void libgame_handleplayerinput_key_left(gamestate* g) {
 
 void libgame_handleplayerinput_key_down(gamestate* g) {
     libgame_updateherospritegroup_down(g);
-    //bool result = libgame_entity_move(g, g->hero_id, 0, 1);
     bool result = libgame_entity_move_lua(g, g->hero_id, 0, 1);
     if (result) {
         libgame_update_spritegroup_move(g, g->hero_id, 0, DEFAULT_TILE_SIZE);
@@ -594,7 +591,6 @@ void libgame_handleplayerinput_key_down(gamestate* g) {
 
 void libgame_handleplayerinput_key_up(gamestate* g) {
     libgame_updateherospritegroup_up(g);
-    //bool result = libgame_entity_move(g, g->hero_id, 0, -1);
     bool result = libgame_entity_move_lua(g, g->hero_id, 0, -1);
     if (result) {
         libgame_update_spritegroup_move(g, g->hero_id, 0, -DEFAULT_TILE_SIZE);
@@ -606,7 +602,6 @@ void libgame_handleplayerinput_key_up(gamestate* g) {
 
 void libgame_handleplayerinput_key_down_left(gamestate* g) {
     libgame_updateherospritegroup_left(g);
-    //bool result = libgame_entity_move(g, g->hero_id, -1, 1);
     bool result = libgame_entity_move_lua(g, g->hero_id, -1, 1);
     if (result) {
         libgame_update_spritegroup_move(g, g->hero_id, -DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE);
@@ -618,7 +613,6 @@ void libgame_handleplayerinput_key_down_left(gamestate* g) {
 
 void libgame_handleplayerinput_key_down_right(gamestate* g) {
     libgame_updateherospritegroup_right(g);
-    //bool result = libgame_entity_move(g, g->hero_id, 1, 1);
     bool result = libgame_entity_move_lua(g, g->hero_id, 1, 1);
     if (result) {
         libgame_update_spritegroup_move(g, g->hero_id, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE);
@@ -630,7 +624,6 @@ void libgame_handleplayerinput_key_down_right(gamestate* g) {
 
 void libgame_handleplayerinput_key_up_left(gamestate* g) {
     libgame_updateherospritegroup_left(g);
-    //bool result = libgame_entity_move(g, g->hero_id, -1, -1);
     bool result = libgame_entity_move_lua(g, g->hero_id, -1, -1);
     if (result) {
         libgame_update_spritegroup_move(g, g->hero_id, -DEFAULT_TILE_SIZE, -DEFAULT_TILE_SIZE);
@@ -642,7 +635,6 @@ void libgame_handleplayerinput_key_up_left(gamestate* g) {
 
 void libgame_handleplayerinput_key_up_right(gamestate* g) {
     libgame_updateherospritegroup_right(g);
-    //bool result = libgame_entity_move(g, g->hero_id, 1, -1);
     bool result = libgame_entity_move_lua(g, g->hero_id, 1, -1);
     if (result) {
         libgame_update_spritegroup_move(g, g->hero_id, DEFAULT_TILE_SIZE, -DEFAULT_TILE_SIZE);
@@ -654,25 +646,25 @@ void libgame_handleplayerinput_key_up_right(gamestate* g) {
 
 // we will eventually flesh this out to append messages and events
 // to their respective logs, however we choose to handle that
-void libgame_entity_look(gamestate* g, entityid id) {
-    entity_t* e = hashtable_entityid_entity_get(g->entities, id);
-    if (e) {
-        tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->x, e->y);
-        if (t) {
-            for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
-                entityid id = vectorentityid_get(&t->entityids, i);
-                if (id != e->id) {
-                    entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
-                    if (entity) {
-                        char tmp[256];
-                        snprintf(tmp, 256, "entity id: %d, name: %s", id, entity->name);
-                        msuccess(tmp);
-                    }
-                }
-            }
-        }
-    }
-}
+//void libgame_entity_look(gamestate* g, entityid id) {
+//    entity_t* e = hashtable_entityid_entity_get(g->entities, id);
+//    if (e) {
+//        tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, e->x, e->y);
+//        if (t) {
+//            for (int i = 0; i < vectorentityid_capacity(&t->entityids); i++) {
+//                entityid id = vectorentityid_get(&t->entityids, i);
+//                if (id != e->id) {
+//                    entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+//                    if (entity) {
+//                        char tmp[256];
+//                        snprintf(tmp, 256, "entity id: %d, name: %s", id, entity->name);
+//                        msuccess(tmp);
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 
@@ -750,7 +742,7 @@ void libgame_handle_input_player(gamestate* g) {
         }
 
         else if (IsKeyPressed(KEY_PERIOD)) {
-            libgame_entity_look(g, g->hero_id);
+            //libgame_entity_look(g, g->hero_id);
             spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
             if (hero_group) {
                 hero_group->current = 0; //standing/idle
@@ -1192,12 +1184,12 @@ void libgame_draw_entity(gamestate* g, entityid id) {
             const Color c = WHITE;
 
             int current = group->current;
-            entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-            if (type == ENTITY_PLAYER) {
-                // draw entity shadow, which should exist at current+1 if loaded correctly
-                DrawTexturePro(
-                    *group->sprites[current + 1]->texture, group->sprites[current + 1]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
-            }
+            //entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+            //if (type == ENTITY_PLAYER) {
+            //    // draw entity shadow, which should exist at current+1 if loaded correctly
+            //    DrawTexturePro(
+            //        *group->sprites[current + 1]->texture, group->sprites[current + 1]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
+            //}
             DrawTexturePro(*group->sprites[current]->texture, group->sprites[current]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
 
             if (g->framecount % FRAMEINTERVAL == 0) {
@@ -1853,19 +1845,17 @@ void libgame_create_shield_spritegroup(gamestate* g, const entityid id, const in
 
 void libgame_loadtargettexture(gamestate* g) {
     if (g) {
-
         targetwidth = libgame_lua_get_int(L, "TargetWidth");
         targetheight = libgame_lua_get_int(L, "TargetHeight");
-
         target = LoadRenderTexture(targetwidth, targetheight);
         target_src = (Rectangle){0, 0, targetwidth, -targetheight};
         target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
         SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
-
         // update the gamestate display values
         g->display.targetwidth = targetwidth;
         g->display.targetheight = targetheight;
-        g->cam2d.offset = (Vector2){targetwidth / 4.0f, targetheight / 4.0f};
+        g->cam2d.offset.x = targetwidth / 2.0f;
+        g->cam2d.offset.y = targetheight / 4.0f;
     } else {
         merror("could not load target texture: gamestate is NULL");
     }
@@ -2091,14 +2081,10 @@ void libgame_initsharedsetup(gamestate* g) {
         SetRandomSeed(time(NULL));
         libgame_init_datastructures(g);
 
-
-
         minfo("creating hero");
         // this is just a mock-up for now
-
-        libgame_create_hero(g, "hero", 1, 0);
+        //libgame_create_hero(g, "hero", 1, 0);
         libgame_create_hero_lua(g, "hero", 1, 0);
-
         msuccess("hero created");
         //minfo("creating sword...");
         //libgame_create_sword(g, "sword", 2, 0);

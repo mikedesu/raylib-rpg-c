@@ -72,7 +72,7 @@ void libgame_handle_npc_turn(gamestate* g, entityid id);
 //void libgame_create_torch_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);
 void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);
 void libgame_create_shield_spritegroup(gamestate* g, entityid id, const int off_x, const int off_y);
-void libgame_entity_look(gamestate* g, entityid id);
+//void libgame_entity_look(gamestate* g, entityid id);
 void libgame_handle_grid_switch(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
 void libgame_entity_anim_set(gamestate* g, entityid id, int index);
