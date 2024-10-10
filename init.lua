@@ -30,7 +30,8 @@ NextEntityId = 0
 
 TileTypes = {
 	None = 0,
-	Dirt0 = 1,
+	Void = 1,
+	Dirt0 = 2,
 }
 
 EntityTypes = {
@@ -58,6 +59,13 @@ function CreateDungeonFloor(width, height, type)
 		end
 	end
 	DungeonFloor = floor
+end
+
+function GetTileType(x, y)
+	if DungeonFloor[y] and DungeonFloor[y][x] then
+		return DungeonFloor[y][x].type
+	end
+	return TileTypes.None
 end
 
 function CreateEntity(name, type, x, y)

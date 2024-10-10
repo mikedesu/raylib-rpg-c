@@ -21,3 +21,6 @@ const char* libgame_lua_get_entity_str(lua_State* L, const int id, const char* k
 
 
 const bool libgame_lua_create_dungeonfloor(lua_State* L, const int width, const int height, const int type);
+
+
+const int libgame_lua_get_tiletype(lua_State* L, const int x, const int y);

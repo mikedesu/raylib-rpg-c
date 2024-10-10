@@ -135,3 +135,19 @@ const bool libgame_lua_create_dungeonfloor(lua_State* L, const int width, const 
     }
     return retval;
 }
+
+
+
+const int libgame_lua_get_tiletype(lua_State* L, const int x, const int y) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetTileType");
+        lua_pushnumber(L, x);
+        lua_pushnumber(L, y);
+        if (lua_pcall(L, 2, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}

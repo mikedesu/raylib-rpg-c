@@ -1167,17 +1167,26 @@ void libgame_draw_dungeonfloor(gamestate* g) {
     for (int i = 0; i < g->dungeonfloor->len; i++) {
         for (int j = 0; j < g->dungeonfloor->wid; j++) {
             // get the tile
-            tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, i, j);
-            if (t) {
-                // check the tile type
+            //tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, i, j);
+            //if (t) {
+            //    // check the tile type
+            //    tile_dest.x = i * DEFAULT_TILE_SIZE;
+            //    tile_dest.y = j * DEFAULT_TILE_SIZE;
+            //    int key = -1;
+            //    // this is very inefficient i think?
+            //    key = get_txkey_for_tiletype(t->type);
+            //    if (key != -1) {
+            //        DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, (Vector2){0, 0}, rotation, c);
+            //    }
+            //}
+
+            // lua version
+            int type = libgame_lua_get_tiletype(L, i, j);
+            int key = get_txkey_for_tiletype(type);
+            if (key != -1) {
                 tile_dest.x = i * DEFAULT_TILE_SIZE;
                 tile_dest.y = j * DEFAULT_TILE_SIZE;
-                int key = -1;
-                // this is very inefficient i think?
-                key = get_txkey_for_tiletype(t->type);
-                if (key != -1) {
-                    DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, (Vector2){0, 0}, rotation, c);
-                }
+                DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, (Vector2){0, 0}, rotation, c);
             }
         }
     }
