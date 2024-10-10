@@ -28,6 +28,7 @@
 #include <time.h>
 
 // Lua support
+#include "libgame_lua.h"
 #include "mylua.h"
 
 
@@ -47,9 +48,12 @@ Rectangle target_dest = (Rectangle){0, 0, 0, 0};
 Vector2 target_origin = (Vector2){0, 0};
 
 
-int activescene = GAMEPLAYSCENE;
-int targetwidth = DEFAULT_TARGET_WIDTH;
-int targetheight = DEFAULT_TARGET_HEIGHT;
+//int activescene = GAMEPLAYSCENE;
+int activescene = COMPANYSCENE;
+int targetwidth = -1;
+int targetheight = -1;
+//int targetwidth = DEFAULT_TARGET_WIDTH;
+//int targetheight = DEFAULT_TARGET_HEIGHT;
 int windowwidth = DEFAULT_WINDOW_WIDTH;
 int windowheight = DEFAULT_WINDOW_HEIGHT;
 
@@ -229,13 +233,13 @@ void libgame_handle_player_attack(gamestate* g) {
 
 void libgame_handleinput(gamestate* g) {
     //minfo("handleinput: starting...");
-    //if (IsKeyPressed(KEY_SPACE)) {
-    //minfo("key space pressed");
-    //if (g->fadestate == FADESTATENONE) {
-    //    g->fadestate = FADESTATEOUT;
-    //}
-    //g->do_one_rotation = true;
-    //}
+    if (IsKeyPressed(KEY_SPACE)) {
+        minfo("key space pressed");
+        if (g->fadestate == FADESTATENONE) {
+            g->fadestate = FADESTATEOUT;
+        }
+        //g->do_one_rotation = true;
+    }
     if (IsKeyPressed(KEY_A)) {
         // technically we dont want to be able to attack until we have picked up a weapon...
         libgame_handle_player_attack(g);
@@ -818,12 +822,42 @@ bool libgame_windowshouldclose() {
 
 
 
-void libgame_initwindow() {
-    //minfo("begin libgame_initwindow");
-    const char* title = DEFAULT_WINDOW_TITLE;
-    // have to do inittitlescene after initwindow
-    // cant load textures before initwindow
+//const char* libgame_lua_get_str(const char* key) {
+//    const char* retval = NULL;
+//    if (L) {
+//        lua_getglobal(L, key);
+//        if (lua_isstring(L, -1)) {
+//            retval = lua_tostring(L, -1);
+//        }
+//        lua_pop(L, 1);
+//    }
+//    return retval;
+//}
+
+
+
+
+//const int libgame_lua_get_int(const char* key) {
+//    int retval = -1;
+//    if (L) {
+//        lua_getglobal(L, key);
+//        if (lua_isnumber(L, -1)) {
+//            retval = lua_tonumber(L, -1);
+//        }
+//        lua_pop(L, 1);
+//    }
+//    return retval;
+//}
+
+
+
+
+void libgame_initwindow(gamestate* g) {
+    const char* title = libgame_lua_get_str(L, "WindowTitle");
+    windowwidth = libgame_lua_get_int(L, "WindowWidth");
+    windowheight = libgame_lua_get_int(L, "WindowHeight");
     InitWindow(windowwidth, windowheight, title);
+    //InitWindow(width, height, title);
     while (!IsWindowReady())
         ;
     // this is hard-coded for now so we can auto-position the window
@@ -835,6 +869,9 @@ void libgame_initwindow() {
     SetWindowPosition(x, y);
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_Q);
+
+    g->display.windowwidth = windowwidth;
+    g->display.windowheight = windowheight;
     //minfo("end of libgame_initwindow");
 }
 
@@ -1100,6 +1137,9 @@ void libgame_drawframe(gamestate* g) {
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     libgame_draw_debugpanel(g);
+
+    DrawRectangleLines(0, 0, windowwidth, windowheight - 2, RED);
+
     libgame_drawframeend(g);
 }
 
@@ -1778,10 +1818,19 @@ void libgame_create_shield_spritegroup(gamestate* g, const entityid id, const in
 
 void libgame_loadtargettexture(gamestate* g) {
     if (g) {
+
+        targetwidth = libgame_lua_get_int(L, "TargetWidth");
+        targetheight = libgame_lua_get_int(L, "TargetHeight");
+
         target = LoadRenderTexture(targetwidth, targetheight);
-        target_src = (Rectangle){0, 0, target.texture.width, -target.texture.height};
+        target_src = (Rectangle){0, 0, targetwidth, -targetheight};
         target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
         SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+
+        // update the gamestate display values
+        g->display.targetwidth = targetwidth;
+        g->display.targetheight = targetheight;
+        g->cam2d.offset = (Vector2){targetwidth / 4.0f, targetheight / 4.0f};
     } else {
         merror("could not load target texture: gamestate is NULL");
     }
@@ -1970,8 +2019,12 @@ void libgame_initsharedsetup(gamestate* g) {
         // init lua
         L = luaL_newstate();
         luaL_openlibs(L);
+        const char* filename = "init.lua";
+        if (luaL_loadfile(L, filename) || lua_pcall(L, 0, 0, 0)) {
+            luaL_error(L, "cannot run %s: %s", filename, lua_tostring(L, -1));
+        }
 
-        libgame_initwindow();
+        libgame_initwindow(g);
 
         libgame_loadfont(g);
         libgame_loadtargettexture(g);

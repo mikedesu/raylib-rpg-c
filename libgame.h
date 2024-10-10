@@ -7,7 +7,7 @@
 
 bool libgame_windowshouldclose();
 gamestate* libgame_getgamestate();
-void libgame_initwindow();
+void libgame_initwindow(gamestate* g);
 void libgame_closewindow();
 void libgame_init();
 bool libgame_external_check_reload();
@@ -98,3 +98,8 @@ const bool libgame_entity_try_attack(gamestate* g, entityid id, const int x, con
 const entityid libgame_create_entity(gamestate* g, const char* name, const entitytype_t type, const int x, const int y);
 const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y);
 const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const int x, const int y);
+
+
+
+//const char* libgame_lua_get_str(const char* key);
+//const int libgame_lua_get_int(const char* key);

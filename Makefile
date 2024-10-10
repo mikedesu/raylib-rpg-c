@@ -4,12 +4,12 @@ WFLAGS=-Wall -Werror
 SHARED=-shared
 DATA_STRUCTS=vectorentityid.o 
 SCENES=companyscene.o 
-LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o  utils.o sprite.o  spritegroup.o entity.o hashtable_entityid_entity.o gamestate.o hashtable_entityid_spritegroup.o dungeonfloor.o get_txkey_for_tiletype.o dice.o
+LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o  utils.o sprite.o  spritegroup.o entity.o hashtable_entityid_entity.o gamestate.o hashtable_entityid_spritegroup.o dungeonfloor.o get_txkey_for_tiletype.o dice.o libgame_lua.o
 STATIC_LINK_RAYLIB=-l:libraylib.a
 #LINK_MATH=-lm
 POSITION_INDEPENDENT_CODE=-fPIC
 MAIN_C=main.c
-WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c hashtable_entityid_entity.c dungeonfloor.c vectorentityid.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c companyscene.c sprite.c spritegroup.c entity.c utils.c dice.c /home/darkmage/src/raylib/src/libraylib.a /home/darkmage/src/lua/liblua.a
+WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c libgame_lua.c hashtable_entityid_entity.c dungeonfloor.c vectorentityid.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c companyscene.c sprite.c spritegroup.c entity.c utils.c dice.c /home/darkmage/src/raylib/src/libraylib.a /home/darkmage/src/lua/liblua.a
 MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_entity.o hashtable_entityid_spritegroup.o dungeonfloor.o vectorentityid.o get_txkey_for_tiletype.o dice.o 
 
 
@@ -19,7 +19,7 @@ WEB_LINKS=-L. -L /home/darkmage/src/raylib/src
 EMCC_OPTIONS=-s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall
 #SHELL_FILE=--shell-file shell.html
 SHELL_FILE=--shell-file /home/darkmage/src/raylib/src/minshell.html
-PRELOAD_FILES=--preload-file ./img --preload-file ./fonts --preload-file ./textures.txt
+PRELOAD_FILES=--preload-file ./img --preload-file ./fonts --preload-file ./textures.txt --preload-file ./init.lua 
 WEB_OPTIONS=-DPLATFORM_WEB -DWEB
 
 all: game 
@@ -74,6 +74,9 @@ get_txkey_for_tiletype.o: get_txkey_for_tiletype.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 dice.o: dice.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+
+libgame_lua.o: libgame_lua.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
 
 # Main reloadable game base

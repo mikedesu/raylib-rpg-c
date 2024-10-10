@@ -9,10 +9,8 @@
 #include <string.h>
 
 // have to update this function when we introduce new fields to Gamestate
-gamestate* gamestateinitptr(const int windowwidth,
-                            const int windowheight,
-                            const int targetwidth,
-                            const int targetheight) {
+gamestate*
+gamestateinitptr(const int windowwidth, const int windowheight, const int targetwidth, const int targetheight) {
     //mprint("gamestateinitptr begin\n");
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     if (g == NULL) {
@@ -46,7 +44,8 @@ gamestate* gamestateinitptr(const int windowwidth,
 
     g->cam2d.target = (Vector2){0, 0};
     //g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
-    g->cam2d.offset = (Vector2){targetwidth / 8.0f, targetheight / 4.0f};
+    //g->cam2d.offset = (Vector2){targetwidth / 8.0f, targetheight / 4.0f};
+    g->cam2d.offset = (Vector2){targetwidth / 2.0f, targetheight / 2.0f};
 
 
     g->cam2d.zoom = 4.0;
