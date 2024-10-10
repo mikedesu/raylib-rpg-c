@@ -1138,7 +1138,7 @@ void libgame_drawframe(gamestate* g) {
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     libgame_draw_debugpanel(g);
 
-    DrawRectangleLines(0, 0, windowwidth, windowheight - 2, RED);
+    //DrawRectangleLines(0, 0, windowwidth, windowheight - 2, RED);
 
     libgame_drawframeend(g);
 }
