@@ -66,3 +66,72 @@ const bool libgame_lua_set_entity_int(lua_State* L, const int id, const char* ke
     }
     return retval;
 }
+
+
+
+
+const bool libgame_lua_set_entity_str(lua_State* L, const int id, const char* key, const char* value) {
+    bool retval = false;
+    if (L) {
+        lua_getglobal(L, "SetEntityAttr");
+        lua_pushnumber(L, id);
+        lua_pushstring(L, key);
+        lua_pushstring(L, value);
+        if (lua_pcall(L, 3, 1, 0) == 0) {
+            retval = lua_toboolean(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const int libgame_lua_get_entity_int(lua_State* L, const int id, const char* key) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetEntityAttr");
+        lua_pushnumber(L, id);
+        lua_pushstring(L, key);
+        if (lua_pcall(L, 2, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const char* libgame_lua_get_entity_str(lua_State* L, const int id, const char* key) {
+    const char* retval = NULL;
+    if (L) {
+        lua_getglobal(L, "GetEntityAttr");
+        lua_pushnumber(L, id);
+        lua_pushstring(L, key);
+        if (lua_pcall(L, 2, 1, 0) == 0) {
+            retval = lua_tostring(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const bool libgame_lua_create_dungeonfloor(lua_State* L, const int width, const int height, const int type) {
+    bool retval = false;
+    if (L) {
+        lua_getglobal(L, "CreateDungeonFloor");
+        lua_pushnumber(L, width);
+        lua_pushnumber(L, height);
+        lua_pushnumber(L, type);
+        if (lua_pcall(L, 3, 0, 0) == 0) {
+            retval = true;
+        }
+    }
+    return retval;
+}

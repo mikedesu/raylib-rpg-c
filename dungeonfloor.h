@@ -1,34 +1,9 @@
 #pragma once
 
+#include "tiletype.h"
 #include "vectorentityid.h"
 #include <raylib.h>
 #include <stdlib.h>
-
-typedef enum {
-    TILETYPE_NONE = 0,
-    TILETYPE_VOID = 1,
-    TILETYPE_DIRT_00 = 2,
-    TILETYPE_DIRT_01 = 3,
-    TILETYPE_DIRT_02 = 4,
-    TILETYPE_STONE_00 = 5,
-    TILETYPE_STONE_01 = 6,
-    TILETYPE_STONE_02 = 7,
-    TILETYPE_STONE_03 = 8,
-    TILETYPE_STONE_04 = 9,
-    TILETYPE_STONE_05 = 10,
-    TILETYPE_STONE_06 = 11,
-    TILETYPE_STONE_07 = 12,
-    TILETYPE_STONE_08 = 13,
-    TILETYPE_STONE_09 = 14,
-    TILETYPE_STONE_10 = 15,
-    TILETYPE_STONE_11 = 16,
-    TILETYPE_STONE_12 = 17,
-    TILETYPE_STONE_13 = 18,
-    TILETYPE_STONE_14 = 19,
-    TILETYPE_STONE_WALL_00 = 20,
-    TILETYPE_COUNT
-
-} tiletype_t;
 
 
 typedef struct tile_t {

@@ -101,6 +101,7 @@ const bool libgame_entity_try_attack(gamestate* g, entityid id, const int x, con
 const entityid libgame_create_entity(gamestate* g, const char* name, const entitytype_t type, const int x, const int y);
 const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y);
 const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const int x, const int y);
+void libgame_handle_player_attack(gamestate* g);
 
 
 

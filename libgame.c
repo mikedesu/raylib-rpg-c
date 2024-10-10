@@ -11,7 +11,7 @@
 #include "libgame.h"
 #include "libgame_defines.h"
 #include "mprint.h"
-#include "race.h"
+//#include "race.h"
 #include "scene.h"
 #include "setdebugpanel.h"
 #include "sprite.h"
@@ -48,8 +48,8 @@ Rectangle target_dest = (Rectangle){0, 0, 0, 0};
 Vector2 target_origin = (Vector2){0, 0};
 
 
-//int activescene = GAMEPLAYSCENE;
-int activescene = COMPANYSCENE;
+int activescene = GAMEPLAYSCENE;
+//int activescene = COMPANYSCENE;
 int targetwidth = -1;
 int targetheight = -1;
 //int targetwidth = DEFAULT_TARGET_WIDTH;
@@ -187,19 +187,14 @@ const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, ite
 void libgame_test_enemy_placement(gamestate* g) {
     entity_t* hero = hashtable_entityid_entity_get(g->entities, g->hero_id);
     if (hero) {
-        // check to see if there are any items at that location
-        //tile_t* t0 = dungeonfloor_get_tile(g->dungeonfloor, hero->x + 1, hero->y);
-        //if (t0) {
         if (!libgame_entitytype_is_at(g, ENTITY_NPC, hero->x + 1, hero->y)) {
             libgame_create_orc(g, "orc", hero->x + 1, hero->y);
         }
-        //}
     }
 }
 
 
 
-void libgame_handle_player_attack(gamestate* g);
 
 void libgame_handle_player_attack(gamestate* g) {
     if (libgame_entity_inventory_contains_type(g, g->hero_id, ITEM_WEAPON)) {
@@ -1874,6 +1869,11 @@ void libgame_init_datastructures(gamestate* g) {
         // we could use an 'emergency shutdown' in case an error causes us
         // to need to 'panic' and force game close properly
     }
+
+    libgame_lua_create_dungeonfloor(L, w, h, base_type);
+
+
+
     // lets try setting some random tiles to different tile types
     libgame_init_dungeonfloor(g);
     //minfo("libgame_initdatastructures end");
@@ -1910,8 +1910,6 @@ void libgame_create_hero(gamestate* g, const char* name, const int x, const int 
         entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
         if (hero) {
             minfo("hero entity created");
-            hero->race.primary = RACETYPE_HUMAN;
-            hero->race.secondary = RACETYPE_NONE;
             libgame_create_herospritegroup(g, id);
         }
     }
@@ -1923,14 +1921,11 @@ void libgame_create_hero(gamestate* g, const char* name, const int x, const int 
 void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y) {
     const entityid id = libgame_lua_create_entity(L, name, ENTITY_PLAYER, x, y);
     if (id != -1) {
-        libgame_lua_set_entity_int(L, id, "race", RACETYPE_HUMAN);
-
+        //libgame_lua_set_entity_int(L, id, "race", RACETYPE_HUMAN);
         //g->hero_id = id;
         //entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
         //if (hero) {
         //    minfo("hero entity created");
-        //    hero->race.primary = RACETYPE_HUMAN;
-        //    hero->race.secondary = RACETYPE_NONE;
         //    libgame_create_herospritegroup(g, id);
         //}
     }
@@ -1945,8 +1940,6 @@ void libgame_create_orc(gamestate* g, const char* name, const int x, const int y
         entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
         if (orc) {
             minfo("orc entity created");
-            orc->race.primary = RACETYPE_ORC;
-            orc->race.secondary = RACETYPE_NONE;
             libgame_create_orcspritegroup(g, id);
         }
     }
@@ -1961,8 +1954,6 @@ void libgame_create_sword(gamestate* g, const char* name, const int x, const int
         entity_t* e = hashtable_entityid_entity_get(g->entities, id);
         if (e) {
             minfo("orc entity created");
-            e->race.primary = RACETYPE_NONE;
-            e->race.secondary = RACETYPE_NONE;
             e->itemtype = ITEM_WEAPON;
             e->weapontype = WEAPON_SWORD;
             libgame_create_sword_spritegroup(g, id, 0, -2);
@@ -1979,10 +1970,7 @@ void libgame_create_shield(gamestate* g, const char* name, const int x, const in
         entity_t* e = hashtable_entityid_entity_get(g->entities, id);
         if (e) {
             minfo("shield entity created");
-            e->race.primary = RACETYPE_NONE;
-            e->race.secondary = RACETYPE_NONE;
             e->itemtype = ITEM_SHIELD;
-            e->weapontype = WEAPON_NONE;
             e->shieldtype = SHIELD_BASIC;
             libgame_create_shield_spritegroup(g, id, 0, -2);
         }
@@ -2017,7 +2005,9 @@ void libgame_initsharedsetup(gamestate* g) {
 
         minfo("creating hero");
         // this is just a mock-up for now
+
         libgame_create_hero(g, "hero", 1, 0);
+
         msuccess("hero created");
         //minfo("creating sword...");
         //libgame_create_sword(g, "sword", 2, 0);

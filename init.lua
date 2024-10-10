@@ -28,22 +28,46 @@ WindowHeight = TargetHeight * Scale
 
 NextEntityId = 0
 
+TileTypes = {
+	None = 0,
+	Dirt0 = 1,
+}
+
 EntityTypes = {
 	None = 0,
 	Player = 1,
 	NPC = 2,
 }
 
+DungeonFloor = {}
 Entities = {}
 
+function CreateTile(type)
+	local tile = {
+		type = type,
+	}
+	return tile
+end
+
+function CreateDungeonFloor(width, height, type)
+	local floor = {}
+	for y = 1, height do
+		floor[y] = {}
+		for x = 1, width do
+			floor[y][x] = CreateTile(type)
+		end
+	end
+	DungeonFloor = floor
+end
+
 function CreateEntity(name, type, x, y)
-	--print("CreateEntity: " .. name)
 	local entity = {
 		name = name,
 		id = NextEntityId,
 		type = type,
 		x = x,
 		y = y,
+		inventory = {},
 	}
 	NextEntityId = NextEntityId + 1
 	table.insert(Entities, entity)
