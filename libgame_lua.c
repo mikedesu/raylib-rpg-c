@@ -1,5 +1,8 @@
 #include "libgame_lua.h"
 
+
+
+
 const char* libgame_lua_get_str(lua_State* L, const char* key) {
     const char* retval = NULL;
     if (L) {
@@ -21,6 +24,43 @@ const int libgame_lua_get_int(lua_State* L, const char* key) {
         lua_getglobal(L, key);
         if (lua_isnumber(L, -1)) {
             retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const int libgame_lua_create_entity(lua_State* L, const char* name, const int type, const int x, const int y) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "CreateEntity");
+        lua_pushstring(L, name);
+        lua_pushnumber(L, type);
+        lua_pushnumber(L, x);
+        lua_pushnumber(L, y);
+        if (lua_pcall(L, 4, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const bool libgame_lua_set_entity_int(lua_State* L, const int id, const char* key, const int value) {
+    bool retval = false;
+    if (L) {
+        lua_getglobal(L, "SetEntityAttr");
+        lua_pushnumber(L, id);
+        lua_pushstring(L, key);
+        lua_pushnumber(L, value);
+        if (lua_pcall(L, 3, 1, 0) == 0) {
+            retval = lua_toboolean(L, -1);
         }
         lua_pop(L, 1);
     }

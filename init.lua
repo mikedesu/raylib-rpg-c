@@ -28,22 +28,26 @@ WindowHeight = TargetHeight * Scale
 
 NextEntityId = 0
 
+EntityTypes = {
+	None = 0,
+	Player = 1,
+	NPC = 2,
+}
+
 Entities = {}
 
-function CreateEntity(name)
+function CreateEntity(name, type, x, y)
 	--print("CreateEntity: " .. name)
 	local entity = {
 		name = name,
 		id = NextEntityId,
+		type = type,
+		x = x,
+		y = y,
 	}
 	NextEntityId = NextEntityId + 1
-	return entity
-end
-
-function CreateEntityAndInsertIntoTable(name)
-	local entity = CreateEntity(name)
 	table.insert(Entities, entity)
-	return entity.id
+	return entity
 end
 
 function GetEntityById(id)
@@ -53,4 +57,13 @@ function GetEntityById(id)
 		end
 	end
 	return nil
+end
+
+function SetEntityAttr(entityId, propertyName, value)
+	local entity = GetEntityById(entityId)
+	if entity then
+		entity[propertyName] = value
+		return true
+	end
+	return false
 end

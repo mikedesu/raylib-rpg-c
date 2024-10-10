@@ -77,7 +77,10 @@ void libgame_handle_grid_switch(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
 void libgame_entity_anim_set(gamestate* g, entityid id, int index);
 void libgame_createitembytype(gamestate* g, const itemtype_t type, const int x, const int y);
+
 void libgame_create_hero(gamestate* g, const char* name, const int x, const int y);
+void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y);
+
 void libgame_create_orc(gamestate* g, const char* name, const int x, const int y);
 void libgame_create_shield(gamestate* g, const char* name, const int x, const int y);
 void libgame_draw_items(gamestate* g, const itemtype_t type, const int x, const int y);
