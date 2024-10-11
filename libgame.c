@@ -746,16 +746,24 @@ void libgame_handle_input_player(gamestate* g) {
         else if (IsKeyPressed(KEY_COMMA)) {
             //minfo("Comma key pressed");
             // look at the tile the player is on
-            libgame_entity_pickup_item(g, g->hero_id);
-            g->player_input_received = true;
+            //libgame_entity_pickup_item(g, g->hero_id);
+            //g->player_input_received = true;
         }
 
         else if (IsKeyPressed(KEY_PERIOD)) {
             //libgame_entity_look(g, g->hero_id);
-            spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-            if (hero_group) {
-                hero_group->current = 0; //standing/idle
+            //spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+            //if (hero_group) {
+            //    hero_group->current = 0; //standing/idle
+            //}
+
+            bool result = libgame_lua_entity_move_random_dir(L, g->hero_id);
+            if (result) {
+                const int xdir = libgame_lua_get_entity_int(L, g->hero_id, "last_move_x");
+                const int ydir = libgame_lua_get_entity_int(L, g->hero_id, "last_move_y");
+                libgame_update_spritegroup_move(g, g->hero_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
             }
+
             g->player_input_received = true;
         }
     }

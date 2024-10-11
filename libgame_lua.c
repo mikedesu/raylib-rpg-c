@@ -179,6 +179,22 @@ const bool libgame_lua_entity_move(lua_State* L, const int id, const int x, cons
 
 
 
+const bool libgame_lua_entity_move_random_dir(lua_State* L, const int id) {
+    bool retval = false;
+    if (L) {
+        lua_getglobal(L, "EntityMoveRandomDir");
+        lua_pushnumber(L, id);
+        if (lua_pcall(L, 1, 1, 0) == 0) {
+            retval = lua_toboolean(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
 const int libgame_lua_get_num_entities_at(lua_State* L, const int x, const int y) {
     int retval = -1;
     if (L) {

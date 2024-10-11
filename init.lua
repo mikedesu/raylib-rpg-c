@@ -107,6 +107,8 @@ function CreateEntity(name, type, x, y)
 		type = type,
 		x = x,
 		y = y,
+		last_move_x = 0,
+		last_move_y = 0,
 		inventory = {},
 	}
 	NextEntityId = NextEntityId + 1
@@ -163,15 +165,25 @@ function EntityMove(id, xdir, ydir)
 			return false
 		end
 
-		-- Remove entity from old tile
 		RemoveEntityFromTile(entity.id, entity.x, entity.y)
-		-- Add entity to new tile
 		AddEntityToTile(entity.id, newx, newy)
 		entity.x = newx
 		entity.y = newy
+		entity.last_move_x = xdir
+		entity.last_move_y = ydir
 		return true
 	end
 	return false
+end
+
+function EntityMoveRandomDir(id)
+	local xdir = math.random(-1, 1)
+	local ydir = math.random(-1, 1)
+	while xdir == 0 and ydir == 0 do
+		xdir = math.random(-1, 1)
+		ydir = math.random(-1, 1)
+	end
+	return EntityMove(id, xdir, ydir)
 end
 
 function TileIsOccupiedByType(type, x, y)
