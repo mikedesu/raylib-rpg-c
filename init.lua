@@ -27,11 +27,30 @@ WindowWidth = TargetWidth * Scale
 WindowHeight = TargetHeight * Scale
 
 NextEntityId = 0
+HeroId = -1
 
 TileTypes = {
 	None = 0,
 	Void = 1,
 	Dirt0 = 2,
+	Dirt1 = 3,
+	Dirt2 = 4,
+	Stone00 = 5,
+	Stone01 = 6,
+	Stone02 = 7,
+	Stone03 = 8,
+	Stone04 = 9,
+	Stone05 = 10,
+	Stone06 = 11,
+	Stone07 = 12,
+	Stone08 = 13,
+	Stone09 = 14,
+	Stone10 = 15,
+	Stone11 = 16,
+	Stone12 = 17,
+	Stone13 = 18,
+	Stone14 = 19,
+	Stonewall00 = 20,
 }
 
 EntityTypes = {
@@ -231,4 +250,26 @@ end
 
 function GetDungeonFloorRowCount()
 	return #DungeonFloor
+end
+
+function SetTileType(type, x, y)
+	if DungeonFloor[y] and DungeonFloor[y][x] then
+		DungeonFloor[y][x].type = type
+	end
+end
+
+function RandomizeAllDungeonTiles()
+	for y = 0, GetDungeonFloorRowCount() do
+		for x = 0, GetDungeonFloorColumnCount() do
+			SetTileType(math.random(TileTypes.Dirt0, TileTypes.Stonewall00), x, y)
+		end
+	end
+end
+
+function RandomizeDungeonTiles(x, y, w, h)
+	for j = y, y + h do
+		for i = x, x + w do
+			SetTileType(math.random(TileTypes.Dirt0, TileTypes.Stonewall00), i, j)
+		end
+	end
 end

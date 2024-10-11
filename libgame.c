@@ -18,6 +18,7 @@
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
+#include "tiletype.h"
 #include "utils.h"
 #include "vectorentityid.h"
 #include <raylib.h>
@@ -233,13 +234,13 @@ void libgame_test_enemy_placement(gamestate* g) {
 
 void libgame_handleinput(gamestate* g) {
     //minfo("handleinput: starting...");
-    if (IsKeyPressed(KEY_SPACE)) {
-        minfo("key space pressed");
-        if (g->fadestate == FADESTATENONE) {
-            g->fadestate = FADESTATEOUT;
-        }
-        //g->do_one_rotation = true;
-    }
+    //if (IsKeyPressed(KEY_SPACE)) {
+    //    minfo("key space pressed");
+    //    if (g->fadestate == FADESTATENONE) {
+    //        g->fadestate = FADESTATEOUT;
+    //    }
+    //}
+
     //if (IsKeyPressed(KEY_A)) {
     // technically we dont want to be able to attack until we have picked up a weapon...
     //libgame_handle_player_attack(g);
@@ -538,19 +539,30 @@ void libgame_handle_input_player(gamestate* g) {
         //g->player_input_received = true;
         //}
 
+
+        else if (IsKeyPressed(KEY_SPACE)) {
+            // randomize the dungeon tiles
+            int w = 4;
+            int h = 4;
+            int hx = libgame_lua_get_entity_int(L, g->hero_id, "x") - w / 2;
+            int hy = libgame_lua_get_entity_int(L, g->hero_id, "y") - h / 2;
+            libgame_lua_randomize_dungeon_tiles(L, hx, hy, w, h);
+
+        }
+
         else if (IsKeyPressed(KEY_PERIOD)) {
             //libgame_entity_look(g, g->hero_id);
-            //spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-            //if (hero_group) {
-            //    hero_group->current = 0; //standing/idle
-            //}
-            bool result = libgame_lua_entity_move_random_dir(L, g->hero_id);
-            if (result) {
-                const int xdir = libgame_lua_get_entity_int(L, g->hero_id, "last_move_x");
-                const int ydir = libgame_lua_get_entity_int(L, g->hero_id, "last_move_y");
-                libgame_handleplayerinput_move(g, xdir, ydir);
-                //libgame_update_spritegroup_move(g, g->hero_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
+            spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+            if (hero_group) {
+                hero_group->current = 0; //standing/idle
             }
+
+            //bool result = libgame_lua_entity_move_random_dir(L, g->hero_id);
+            //if (result) {
+            //    const int xdir = libgame_lua_get_entity_int(L, g->hero_id, "last_move_x");
+            //    const int ydir = libgame_lua_get_entity_int(L, g->hero_id, "last_move_y");
+            //    libgame_handleplayerinput_move(g, xdir, ydir);
+            //}
             g->player_input_received = true;
         }
     }
@@ -1729,8 +1741,8 @@ void libgame_init_datastructures(gamestate* g) {
     g->entities = hashtable_entityid_entity_create(DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE);
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
     const tiletype_t base_type = TILETYPE_DIRT_00;
-    const int w = 8;
-    const int h = 4;
+    const int w = 16;
+    const int h = 16;
     g->dungeonfloor = create_dungeonfloor(w, h, base_type);
     if (!g->dungeonfloor) {
         merror("could not create dungeonfloor");
@@ -1772,6 +1784,7 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
     const entityid id = libgame_lua_create_entity(L, name, ENTITY_PLAYER, x, y);
     if (id != -1) {
         g->hero_id = id;
+        libgame_lua_set_int(L, "HeroId", id);
         libgame_create_herospritegroup(g, id);
         msuccess("hero entity created in Lua");
     } else {

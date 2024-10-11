@@ -287,3 +287,53 @@ const int libgame_lua_get_dungeonfloor_col_count(lua_State* L) {
     }
     return retval;
 }
+
+
+
+
+const bool libgame_lua_set_tiletype(lua_State* L, const int type, const int x, const int y) {
+    bool retval = false;
+    if (L) {
+        lua_getglobal(L, "SetTileType");
+        lua_pushnumber(L, type);
+        lua_pushnumber(L, x);
+        lua_pushnumber(L, y);
+        if (lua_pcall(L, 3, 1, 0) == 0) {
+            retval = lua_toboolean(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+void libgame_lua_randomize_all_dungeon_tiles(lua_State* L) {
+    if (L) {
+        lua_getglobal(L, "RandomizeAllDungeonTiles");
+        lua_pcall(L, 0, 0, 0);
+    }
+}
+
+
+
+void libgame_lua_randomize_dungeon_tiles(lua_State* L, const int x, const int y, const int w, const int h) {
+    if (L) {
+        lua_getglobal(L, "RandomizeDungeonTiles");
+        lua_pushnumber(L, x);
+        lua_pushnumber(L, y);
+        lua_pushnumber(L, w);
+        lua_pushnumber(L, h);
+        lua_pcall(L, 4, 0, 0);
+    }
+}
+
+
+
+void libgame_lua_set_int(lua_State* L, const char* key, const int value) {
+    if (L) {
+        lua_pushnumber(L, value);
+        lua_setglobal(L, key);
+    }
+}

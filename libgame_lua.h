@@ -6,6 +6,8 @@
 
 const char* libgame_lua_get_str(lua_State* L, const char* key);
 
+void libgame_lua_set_int(lua_State* L, const char* key, const int value);
+
 const char* libgame_lua_get_entity_str(lua_State* L, const int id, const char* key);
 
 const bool libgame_lua_set_entity_int(lua_State* L, const int id, const char* key, const int value);
@@ -36,3 +38,9 @@ const bool libgame_lua_tile_is_occupied_by_npc(lua_State* L, const int x, const 
 
 const int libgame_lua_get_dungeonfloor_row_count(lua_State* L);
 const int libgame_lua_get_dungeonfloor_col_count(lua_State* L);
+
+const bool libgame_lua_set_tiletype(lua_State* L, const int type, const int x, const int y);
+
+void libgame_lua_randomize_all_dungeon_tiles(lua_State* L);
+
+void libgame_lua_randomize_dungeon_tiles(lua_State* L, const int x, const int y, const int w, const int h);
