@@ -1,5 +1,24 @@
 # TODO
 
+- [ ] Lua integration
+	- [ ] test changing tiles using lua 
+		- [ ] during dungeon init
+		- [ ] after dungeon init via keypress (random tile random type)
+	- [ ] dungeon random tile init
+	- [ ] take npc turn 
+	- [ ] take all npc turns after pc turn
+	- [ ] spritegroup management
+	- [ ] torch placement
+	- [ ] sword
+	- [ ] shield
+	- [ ] pickup items
+	- [ ] further gamestate management
+		- [ ] camera
+		- [ ] debug panel
+		- [ ] display
+
+- [ ] handle creatures and objects that occupy multiple tiles (bigger than 8x8)
+	- [ ] example: rhino is 22x10, which can occupy 3 tiles with 2 pixels of overlap on top
 - [ ] web controls / gestures / touchscreen
 - [ ] mouse controls / clicking
 - [ ] attack / damage mechanics
@@ -61,5 +80,4 @@
 	- [ ] this can be optimized
 - [ ] `handle_npc_turn` can be optimized / updated
 - [ ] enemy stun on attack or somehow "pause" the gameloop so the sprite doesnt skip the damage animation
-
 
