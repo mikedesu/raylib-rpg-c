@@ -106,9 +106,3 @@
 #define DEFAULT_VECTOR_ENTITYID_SIZE 16
 #define DEFAULT_HASHTABLE_ENTITYID_ENTITY_SIZE 16
 #define DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE 16
-
-// spritegroup context directions
-#define SG_CTX_R_D 0
-#define SG_CTX_L_D 1
-#define SG_CTX_R_U 2
-#define SG_CTX_L_U 3

@@ -317,232 +317,38 @@ void libgame_handle_grid_switch(gamestate* g) {
 
 
 
-void libgame_update_spritegroup_right(gamestate* g, entityid id) {
+void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir) {
     spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (group) {
-        int ctx = SG_CTX_R_D;
-        switch (group->sprites[group->current]->currentcontext) {
-        case SG_CTX_R_D:
-            ctx = SG_CTX_R_D;
+        int ctx = group->sprites[group->current]->currentcontext;
+        switch (dir) {
+        case DIRECTION_RIGHT:
+            ctx = ctx == SPRITEGROUP_CONTEXT_R_D   ? SPRITEGROUP_CONTEXT_R_D
+                  : ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
+                  : ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
+                                                   : SPRITEGROUP_CONTEXT_R_U;
             break;
-        case SG_CTX_L_D:
-            ctx = SG_CTX_R_D;
+        case DIRECTION_LEFT:
+            ctx = ctx == SPRITEGROUP_CONTEXT_R_D   ? SPRITEGROUP_CONTEXT_L_D
+                  : ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_L_D
+                  : ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_L_U
+                                                   : SPRITEGROUP_CONTEXT_L_U;
             break;
-        case SG_CTX_R_U:
-            ctx = SG_CTX_R_U;
+        case DIRECTION_UP:
+            ctx = ctx == SPRITEGROUP_CONTEXT_R_D   ? SPRITEGROUP_CONTEXT_R_U
+                  : ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_L_U
+                  : ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
+                                                   : SPRITEGROUP_CONTEXT_L_U;
             break;
-        case SG_CTX_L_U:
-            ctx = SG_CTX_R_U;
-            break;
-        default:
-            ctx = SG_CTX_R_D;
+        case DIRECTION_DOWN:
+            ctx = ctx == SPRITEGROUP_CONTEXT_R_D   ? SPRITEGROUP_CONTEXT_R_D
+                  : ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_L_D
+                  : ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_D
+                                                   : SPRITEGROUP_CONTEXT_L_D;
             break;
         }
         spritegroup_setcontexts(group, ctx);
         group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
-    }
-}
-
-
-
-
-void libgame_update_spritegroup_left(gamestate* g, entityid id) {
-    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    if (group) {
-        int ctx = SG_CTX_L_D;
-        switch (group->sprites[group->current]->currentcontext) {
-        case SG_CTX_R_D:
-            ctx = SG_CTX_L_D;
-            break;
-        case SG_CTX_L_D:
-            ctx = SG_CTX_L_D;
-            break;
-        case SG_CTX_R_U:
-            ctx = SG_CTX_L_U;
-            break;
-        case SG_CTX_L_U:
-            ctx = SG_CTX_L_U;
-            break;
-        default:
-            ctx = SG_CTX_L_D;
-            break;
-        }
-        spritegroup_setcontexts(group, ctx);
-        group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
-    }
-}
-
-
-
-
-void libgame_update_spritegroup_up(gamestate* g, entityid id) {
-    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    if (group) {
-        int ctx = SG_CTX_R_U;
-        switch (group->sprites[group->current]->currentcontext) {
-        case SG_CTX_R_D:
-            ctx = SG_CTX_R_U;
-            break;
-        case SG_CTX_L_D:
-            ctx = SG_CTX_L_U;
-            break;
-        case SG_CTX_R_U:
-            ctx = SG_CTX_R_U;
-            break;
-        case SG_CTX_L_U:
-            ctx = SG_CTX_L_U;
-            break;
-        default:
-            ctx = SG_CTX_R_U;
-            break;
-        }
-        spritegroup_setcontexts(group, ctx);
-        group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
-    }
-}
-
-
-
-
-void libgame_update_spritegroup_down(gamestate* g, entityid id) {
-    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    if (group) {
-        int ctx = SG_CTX_R_D;
-        switch (group->sprites[group->current]->currentcontext) {
-        case SG_CTX_R_D:
-            ctx = SG_CTX_R_D;
-            break;
-        case SG_CTX_L_D:
-            ctx = SG_CTX_L_D;
-            break;
-        case SG_CTX_R_U:
-            ctx = SG_CTX_R_D;
-            break;
-        case SG_CTX_L_U:
-            ctx = SG_CTX_L_D;
-            break;
-        default:
-            ctx = SG_CTX_R_D;
-            break;
-        }
-        spritegroup_setcontexts(group, ctx);
-        group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
-    }
-}
-
-
-
-
-void libgame_updateherospritegroup_right(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-    if (hero_group) {
-        int ctx = SG_CTX_R_D;
-        switch (hero_group->sprites[hero_group->current]->currentcontext) {
-        case SG_CTX_R_D:
-            ctx = SG_CTX_R_D;
-            break;
-        case SG_CTX_L_D:
-            ctx = SG_CTX_R_D;
-            break;
-        case SG_CTX_R_U:
-            ctx = SG_CTX_R_U;
-            break;
-        case SG_CTX_L_U:
-            ctx = SG_CTX_R_U;
-            break;
-        default:
-            ctx = SG_CTX_R_D;
-            break;
-        }
-        spritegroup_setcontexts(hero_group, ctx);
-        hero_group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
-    }
-}
-
-
-
-
-void libgame_updateherospritegroup_left(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-    if (hero_group) {
-        int ctx = SG_CTX_L_D;
-        switch (hero_group->sprites[hero_group->current]->currentcontext) {
-        case SG_CTX_R_D:
-            ctx = SG_CTX_L_D;
-            break;
-        case SG_CTX_L_D:
-            ctx = SG_CTX_L_D;
-            break;
-        case SG_CTX_R_U:
-            ctx = SG_CTX_L_U;
-            break;
-        case SG_CTX_L_U:
-            ctx = SG_CTX_L_U;
-            break;
-        default:
-            ctx = SG_CTX_L_D;
-            break;
-        }
-        spritegroup_setcontexts(hero_group, ctx);
-        hero_group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
-    }
-}
-
-
-
-
-void libgame_updateherospritegroup_up(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-    if (hero_group) {
-        int ctx = SG_CTX_R_U;
-        switch (hero_group->sprites[hero_group->current]->currentcontext) {
-        case SG_CTX_R_D:
-            ctx = SG_CTX_R_U;
-            break;
-        case SG_CTX_L_D:
-            ctx = SG_CTX_L_U;
-            break;
-        case SG_CTX_R_U:
-            ctx = SG_CTX_R_U;
-            break;
-        case SG_CTX_L_U:
-            ctx = SG_CTX_L_U;
-            break;
-        default:
-            ctx = SG_CTX_R_U;
-            break;
-        }
-        spritegroup_setcontexts(hero_group, ctx);
-        hero_group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
-    }
-}
-
-
-
-
-void libgame_updateherospritegroup_down(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-    if (hero_group) {
-        int ctx = SG_CTX_R_D;
-        switch (hero_group->sprites[hero_group->current]->currentcontext) {
-        case SG_CTX_R_D:
-            ctx = SG_CTX_R_D;
-            break;
-        case SG_CTX_L_D:
-            ctx = SG_CTX_L_D;
-            break;
-        case SG_CTX_R_U:
-            ctx = SG_CTX_R_D;
-            break;
-        case SG_CTX_L_U:
-            ctx = SG_CTX_L_D;
-            break;
-        default:
-            ctx = SG_CTX_R_D;
-            break;
-        }
-        spritegroup_setcontexts(hero_group, ctx);
-        hero_group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
     }
 }
 
@@ -572,7 +378,7 @@ void libgame_handleplayerinput_move(gamestate* g, int xdir, int ydir) {
 
 
 void libgame_handleplayerinput_key_right(gamestate* g) {
-    libgame_updateherospritegroup_right(g);
+    libgame_update_spritegroup(g, g->hero_id, DIRECTION_RIGHT);
     libgame_handleplayerinput_move(g, 1, 0);
 }
 
@@ -580,7 +386,7 @@ void libgame_handleplayerinput_key_right(gamestate* g) {
 
 
 void libgame_handleplayerinput_key_left(gamestate* g) {
-    libgame_updateherospritegroup_left(g);
+    libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
     libgame_handleplayerinput_move(g, -1, 0);
 }
 
@@ -588,7 +394,7 @@ void libgame_handleplayerinput_key_left(gamestate* g) {
 
 
 void libgame_handleplayerinput_key_down(gamestate* g) {
-    libgame_updateherospritegroup_down(g);
+    libgame_update_spritegroup(g, g->hero_id, DIRECTION_DOWN);
     libgame_handleplayerinput_move(g, 0, 1);
 }
 
@@ -596,7 +402,7 @@ void libgame_handleplayerinput_key_down(gamestate* g) {
 
 
 void libgame_handleplayerinput_key_up(gamestate* g) {
-    libgame_updateherospritegroup_up(g);
+    libgame_update_spritegroup(g, g->hero_id, DIRECTION_UP);
     libgame_handleplayerinput_move(g, 0, -1);
 }
 
@@ -604,7 +410,7 @@ void libgame_handleplayerinput_key_up(gamestate* g) {
 
 
 void libgame_handleplayerinput_key_down_left(gamestate* g) {
-    libgame_updateherospritegroup_left(g);
+    libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
     libgame_handleplayerinput_move(g, -1, 1);
 }
 
@@ -612,7 +418,7 @@ void libgame_handleplayerinput_key_down_left(gamestate* g) {
 
 
 void libgame_handleplayerinput_key_down_right(gamestate* g) {
-    libgame_updateherospritegroup_right(g);
+    libgame_update_spritegroup(g, g->hero_id, DIRECTION_RIGHT);
     libgame_handleplayerinput_move(g, 1, 1);
 }
 
@@ -620,7 +426,7 @@ void libgame_handleplayerinput_key_down_right(gamestate* g) {
 
 
 void libgame_handleplayerinput_key_up_left(gamestate* g) {
-    libgame_updateherospritegroup_left(g);
+    libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
     libgame_handleplayerinput_move(g, -1, -1);
 }
 
@@ -628,7 +434,7 @@ void libgame_handleplayerinput_key_up_left(gamestate* g) {
 
 
 void libgame_handleplayerinput_key_up_right(gamestate* g) {
-    libgame_updateherospritegroup_right(g);
+    libgame_update_spritegroup(g, g->hero_id, DIRECTION_RIGHT);
     libgame_handleplayerinput_move(g, 1, -1);
 }
 
@@ -1193,7 +999,7 @@ void libgame_draw_entity(gamestate* g, entityid id) {
             const Color c = WHITE;
             int current = group->current;
             entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-            if (type == ENTITY_PLAYER) {
+            if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
                 // draw entity shadow, which should exist at current+1 if loaded correctly
                 DrawTexturePro(
                     *group->sprites[current + 1]->texture, group->sprites[current + 1]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
@@ -1931,9 +1737,7 @@ void libgame_init_datastructures(gamestate* g) {
         // we could use an 'emergency shutdown' in case an error causes us
         // to need to 'panic' and force game close properly
     }
-
     libgame_lua_create_dungeonfloor(L, w, h, base_type);
-
     // lets try setting some random tiles to different tile types
     //libgame_init_dungeonfloor(g);
     //minfo("libgame_initdatastructures end");
@@ -1963,25 +1767,6 @@ void libgame_init_datastructures(gamestate* g) {
 
 
 
-//void libgame_create_hero(gamestate* g, const char* name, const int x, const int y) {
-//    const entityid id = libgame_create_entity(g, name, ENTITY_PLAYER, x, y);
-//    if (id != -1) {
-//        g->hero_id = id;
-//        entity_t* hero = hashtable_entityid_entity_get(g->entities, id);
-//        if (hero) {
-//            libgame_create_herospritegroup(g, id);
-//            msuccess("hero entity created");
-//        } else {
-//            merror("libgame_create_hero: could not get hero entity");
-//        }
-//    } else {
-//        merror("libgame_create_hero: could not create hero entity");
-//    }
-//}
-
-
-
-
 void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y) {
     minfo("libgame_create_hero_lua begin");
     const entityid id = libgame_lua_create_entity(L, name, ENTITY_PLAYER, x, y);
@@ -1997,22 +1782,7 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
 
 
 
-//void libgame_create_orc(gamestate* g, const char* name, const int x, const int y) {
-//    const entityid id = libgame_create_entity(g, name, ENTITY_NPC, x, y);
-//    if (id != -1) {
-//        entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
-//        if (orc) {
-//            libgame_create_orcspritegroup(g, id);
-//            msuccess("orc entity created");
-//        }
-//    }
-//}
-
-
-
-
 const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y) {
-
     char buf[128];
     snprintf(buf, 128, "libgame_create_orc_lua: creating orc entity %s at %d, %d", name, x, y);
     minfo(buf);
@@ -2199,27 +1969,6 @@ void libgame_closeshared(gamestate* g) {
 gamestate* libgame_getgamestate() {
     return g;
 }
-
-
-
-
-//const bool libgame_entity_move(gamestate* g, entityid id, int x, int y) {
-//    minfo("libgame_entity_move");
-//    entity_t* e = hashtable_entityid_entity_get(g->entities, id);
-//    if (libgame_entity_move_check(g, e, x, y)) {
-//        const int old_x = e->x;
-//        const int old_y = e->y;
-//        entity_move(e, x, y);
-//        tile_t* from_tile = dungeonfloor_get_tile(g->dungeonfloor, old_x, old_y);
-//        vectorentityid_remove_value(&from_tile->entityids, e->id);
-//        tile_t* to_tile = dungeonfloor_get_tile(g->dungeonfloor, e->x, e->y);
-//        vectorentityid_add(&to_tile->entityids, e->id);
-//        msuccess("libgame_entity_move: move successful");
-//        return true;
-//    }
-//    merror("libgame_entity_move: move unsuccessful");
-//    return false;
-//}
 
 
 
