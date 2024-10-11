@@ -72,7 +72,6 @@ void libgame_handle_grid_switch(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
 void libgame_entity_anim_set(gamestate* g, entityid id, int index);
 void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y);
-void libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
 void libgame_create_shield(gamestate* g, const char* name, const int x, const int y);
 void libgame_draw_items(gamestate* g, const itemtype_t type, const int x, const int y);
 void libgame_draw_items_that_are_not(gamestate* g, const itemtype_t type, const int x, const int y);
@@ -87,6 +86,8 @@ const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const
 void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x, const int y);
 void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const int x, const int y);
 void libgame_handleplayerinput_move(gamestate* g, int xdir, int ydir);
+
+const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
 
 //const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y);
 //void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);

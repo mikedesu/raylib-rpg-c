@@ -193,11 +193,22 @@ function EntityMoveRandomDir(id)
 	return EntityMove(id, xdir, ydir)
 end
 
+function PrintDebug(preample, text)
+	print("\27[31;1m🟣 Lua\27[0m   " .. preample .. ": " .. text)
+end
+
 function TileIsOccupiedByType(type, x, y)
 	if DungeonFloor[y] and DungeonFloor[y][x] then
 		for i, entityId in ipairs(DungeonFloor[y][x].entities) do
 			local entity = GetEntityById(entityId)
 			if entity and entity.type == type then
+				PrintDebug("init.lua:205", "Tile is occupied by entity with id " .. entityId .. " and type " .. type)
+				--print(
+				--	"\27[31;1m🟣 Lua\27[0m   init.lua:202: Tile is occupied by entity with id "
+				--		.. entityId
+				--		.. " and type "
+				--		.. type
+				--)
 				return true
 			end
 		end

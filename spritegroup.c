@@ -40,7 +40,7 @@ void spritegroup_destroy(spritegroup_t* sg) {
 
 
 void spritegroup_add(spritegroup_t* sg, sprite* s) {
-    minfo("adding sprite to spritegroup_t");
+    //minfo("adding sprite to spritegroup_t");
     if (sg && s) {
         if (sg->size < sg->capacity) {
             sg->sprites[sg->size] = s;
