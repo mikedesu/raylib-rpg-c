@@ -208,7 +208,7 @@ void gamerun() {
         mylibgameupdategamestate(g_); // if building for web, turn off
         mylibgamedrawframe(g_); // if building for web, turn off
         mylibgamehandleinput(g_); // if building for web, turn off
-        autoreload_every_n_sec(10); // if building for web, turn off
+        autoreload_every_n_sec(2); // if building for web, turn off
         //printf("game looping\n");
         //libgame_updategamestate(g_);
         //libgame_drawframe(g_);

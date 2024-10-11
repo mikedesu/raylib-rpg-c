@@ -258,3 +258,32 @@ const bool libgame_lua_tile_is_occupied_by_npc(lua_State* L, const int x, const 
     }
     return retval;
 }
+
+
+
+const int libgame_lua_get_dungeonfloor_row_count(lua_State* L) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetDungeonFloorRowCount");
+        if (lua_pcall(L, 0, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const int libgame_lua_get_dungeonfloor_col_count(lua_State* L) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetDungeonFloorColumnCount");
+        if (lua_pcall(L, 0, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}

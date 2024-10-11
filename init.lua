@@ -91,6 +91,9 @@ function CreateDungeonFloor(width, height, type)
 		end
 	end
 	DungeonFloor = floor
+	print("Created dungeon floor with width " .. width .. " and height " .. height .. " and type " .. type)
+	print("Length of floor: " .. #DungeonFloor)
+	print("Length of floor[0]: " .. #DungeonFloor[0])
 end
 
 function GetTileType(x, y)
@@ -158,6 +161,10 @@ function EntityMove(id, xdir, ydir)
 	if entity then
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
+		if newx < 0 or newx >= #DungeonFloor[0] or newy < 0 or newy >= #DungeonFloor then
+			return false
+		end
+
 		if GetTileType(newx, newy) == TileTypes.None then
 			return false
 		end
@@ -205,4 +212,12 @@ end
 
 function TileIsOccupiedByNPC(x, y)
 	return TileIsOccupiedByType(EntityTypes.NPC, x, y)
+end
+
+function GetDungeonFloorColumnCount()
+	return #DungeonFloor[0]
+end
+
+function GetDungeonFloorRowCount()
+	return #DungeonFloor
 end

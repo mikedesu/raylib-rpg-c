@@ -33,3 +33,6 @@ const int libgame_lua_get_nth_entity_at(lua_State* L, const int n, const int x, 
 const bool libgame_lua_tile_is_occupied_by_player(lua_State* L, const int x, const int y);
 
 const bool libgame_lua_tile_is_occupied_by_npc(lua_State* L, const int x, const int y);
+
+const int libgame_lua_get_dungeonfloor_row_count(lua_State* L);
+const int libgame_lua_get_dungeonfloor_col_count(lua_State* L);
