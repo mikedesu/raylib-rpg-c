@@ -96,6 +96,9 @@ const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const
 
 const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
 
+void libgame_handle_npc_turn_lua(gamestate* g, entityid id);
+void libgame_handle_npcs_turn_lua(gamestate* g);
+
 //const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y);
 //void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);
 //void libgame_create_sword(gamestate* g, const char* name, const int x, const int y);

@@ -26,8 +26,18 @@ end
 WindowWidth = TargetWidth * Scale
 WindowHeight = TargetHeight * Scale
 
-NextEntityId = 0
+NextEntityId = 1
 HeroId = -1
+
+LastXDir = 0
+LastYDir = 0
+
+ActionTypes = {
+	Wait = 1,
+	Move = 2,
+}
+
+Actions = {}
 
 TileTypes = {
 	None = 0,
@@ -68,6 +78,14 @@ function CreateTile(type)
 		entities = {},
 	}
 	return tile
+end
+
+function GetNumEntities()
+	return #Entities
+end
+
+function GetNthEntity(n)
+	return Entities[n].id
 end
 
 function GetNumEntitiesAt(x, y)
@@ -178,19 +196,19 @@ end
 function EntityMove(id, xdir, ydir)
 	local entity = GetEntityById(id)
 	if entity then
+		PrintDebug("init.lua:199", "Moving entity with id " .. id .. " by " .. xdir .. ", " .. ydir)
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
+		PrintDebug("init.lua:202", "New position: " .. newx .. ", " .. newy)
 		if newx < 0 or newx >= #DungeonFloor[0] or newy < 0 or newy >= #DungeonFloor then
 			return false
 		end
-
 		if GetTileType(newx, newy) == TileTypes.None then
 			return false
 		end
 		if TileIsOccupiedByPlayer(newx, newy) or TileIsOccupiedByNPC(newx, newy) then
 			return false
 		end
-
 		RemoveEntityFromTile(entity.id, entity.x, entity.y)
 		AddEntityToTile(entity.id, newx, newy)
 		entity.x = newx
@@ -221,7 +239,7 @@ function TileIsOccupiedByType(type, x, y)
 		for i, entityId in ipairs(DungeonFloor[y][x].entities) do
 			local entity = GetEntityById(entityId)
 			if entity and entity.type == type then
-				PrintDebug("init.lua:205", "Tile is occupied by entity with id " .. entityId .. " and type " .. type)
+				PrintDebug("init.lua:242", "Tile is occupied by entity with id " .. entityId .. " and type " .. type)
 				--print(
 				--	"\27[31;1m🟣 Lua\27[0m   init.lua:202: Tile is occupied by entity with id "
 				--		.. entityId
@@ -273,3 +291,88 @@ function RandomizeDungeonTiles(x, y, w, h)
 		end
 	end
 end
+
+function CreateAction(id, type, x, y)
+	-- if the type isnt valid, return
+	if type < ActionTypes.Move or type > ActionTypes.Move then
+		PrintDebug("init.lua:298", "Invalid action type " .. type)
+		return false
+	end
+
+	-- if the id is invalid, return
+	if id < 0 then
+		PrintDebug("init.lua:304", "Invalid entity id " .. id)
+		return false
+	end
+
+	-- if the id isnt in the entities list, return
+	local entity = GetEntityById(id)
+	if not entity then
+		PrintDebug("init.lua:311", "Entity with id " .. id .. " not found")
+		return false
+	end
+
+	local action = {
+		type = type,
+		id = id,
+		x = x,
+		y = y,
+	}
+	table.insert(Actions, action)
+	return true
+end
+
+function ProcessAction(index)
+	--if action.type == ActionTypes.Wait then
+	-- do nothing
+	--end
+	if index < 1 or index > #Actions then
+		PrintDebug("init.lua:330", "Invalid action index " .. index)
+		return -1
+	end
+	local action = Actions[index]
+	local result = false
+	PrintDebug("init.lua:335", "Processing action type " .. action.type .. " for entity with id " .. action.id)
+	if action.type == ActionTypes.Move then
+		result = EntityMove(action.id, action.x, action.y)
+	end
+	if result == false then
+		return -1
+	end
+	return action.id
+end
+
+--function ProcessActions()
+--	PrintDebug("init.lua:322", "Processing " .. #Actions .. " actions")
+--	for i, action in ipairs(Actions) do
+--		ProcessAction(action)
+--	end
+--	Actions = {}
+--end
+
+function ClearActions()
+	Actions = {}
+end
+
+function GetActionCount()
+	return #Actions
+end
+
+function ActionsExist()
+	return #Actions > 0
+end
+
+function PrintEntities()
+	for i, entity in ipairs(Entities) do
+		print("i:" .. i .. "Entity " .. entity.id .. ": " .. entity.name .. " at " .. entity.x .. ", " .. entity.y)
+	end
+end
+
+--function ProcessTopAction()
+--	local result = false
+--	if ActionsExist() then
+--		result = ProcessAction(Actions[1])
+--		table.remove(Actions, 1)
+--	end
+--	return result
+--end
