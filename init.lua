@@ -402,7 +402,18 @@ function SerializeEntities()
 			result = result .. ", "
 		end
 	end
-	return "Entities = " .. result .. "}"
+	return result .. "}"
+end
+
+function SerializeEntitiesFromTable(table)
+	local result = "{"
+	for k, v in ipairs(table) do
+		result = result .. SerializeEntity(v)
+		if k < #table then
+			result = result .. ", "
+		end
+	end
+	return result .. "}"
 end
 
 function SerializeDungeonFloor()
@@ -420,19 +431,19 @@ function SerializeDungeonFloor()
 			result = result .. ", "
 		end
 	end
-	return "DungeonFloor = " .. result .. "}"
+	return result .. "}"
 end
 
-function SerializeActions()
-	local result = "{"
-	for k, v in ipairs(Actions) do
-		result = result .. SerializeAction(v)
-		if k < #Actions then
-			result = result .. ", "
-		end
-	end
-	return "Actions = " .. result .. "}"
-end
+--function SerializeActions()
+--	local result = "{"
+--	for k, v in ipairs(Actions) do
+--		result = result .. SerializeAction(v)
+--		if k < #Actions then
+--			result = result .. ", "
+--		end
+--	end
+--	return "Actions = " .. result .. "}"
+--end
 
 function SerializeEntity(entity)
 	PrintDebug("init.lua:409", "Serializing entity with id " .. entity.id)
@@ -470,22 +481,132 @@ function SerializeTile(tile)
 	return result .. "}"
 end
 
-function SerializeAction(action)
-	local result = "{"
-	for k, v in pairs(action) do
-		if type(v) == "table" then
-			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
-		elseif type(v) == "string" then
-			result = result .. tostring(k) .. " = " .. '"' .. v .. '"'
-		elseif type(v) == "boolean" then
-			result = result .. tostring(k) .. " = " .. tostring(v)
+function DeserializeEntityFromString(str)
+	PrintDebug("init.lua:485", "Deserializing entity from string " .. str)
+	local entity = {}
+	local i = 1
+	local key = ""
+	local value = ""
+	local inKey = true
+	local inValue = false
+	local inString = false
+	local inTable = false
+	local tableDepth = 0
+	local tableString = ""
+	while i <= #str do
+		local c = str:sub(i, i)
+		if c == "{" then
+			inTable = true
+			tableDepth = tableDepth + 1
+		elseif c == "}" then
+			tableDepth = tableDepth - 1
+			if tableDepth == 0 then
+				inTable = false
+				--print("Key: " .. key)
+				--print("Value: " .. tableString)
+				--entity[key] = DeserializeEntityFromString(tableString)
+				tableString = ""
+			end
+		elseif c == "=" then
+			inKey = false
+			inValue = true
+		elseif c == "," then
+			if inString then
+				value = value .. c
+			elseif inTable then
+				tableString = tableString .. c
+			else
+				print("Key: " .. key)
+				print("Value: " .. value)
+				entity[key] = value
+				key = ""
+				value = ""
+				inKey = true
+				inValue = false
+			end
+		elseif c == '"' then
+			if inString then
+				inString = false
+			else
+				inString = true
+			end
+		elseif c == " " then
+			-- do nothing
 		else
-			result = result .. tostring(k) .. " = " .. tostring(v)
+			if inKey then
+				key = key .. c
+			elseif inValue then
+				value = value .. c
+			elseif inTable then
+				tableString = tableString .. c
+			end
 		end
-		result = result .. ", "
+		i = i + 1
 	end
-	return result .. "}"
+	return entity
 end
+
+function DeserializeEntitiesFromString(str)
+	PrintDebug("init.lua:543", "Deserializing entities from string: " .. str)
+	local entities = {}
+	local i = 2
+	while i <= #str do
+		print("i: " .. i)
+		-- print the substring
+		print("Substring: " .. str:sub(i))
+		-- get the index of the next entity which begins with a {
+		local start = str:find("{", i)
+		print("Start: " .. start)
+		if not start then
+			break
+		end
+
+		-- get the index of the next entity which ends with a }
+		local stop = str:find("}", start)
+		if not stop then
+			break
+		end
+		-- the stop is currently at the inventory closing brace so we need to move it to the entity closing brace
+		stop = str:find("}", stop + 1)
+		if not stop then
+			break
+		end
+		-- get the entity string
+		local entityString = str:sub(start, stop)
+		-- deserialize the entity string
+		local entity = DeserializeEntityFromString(entityString)
+		-- add the entity to the entities table
+		table.insert(entities, entity)
+		-- move the index to the next entity, which is after the closing brace and a comma
+		i = stop + 1
+	end
+	return entities
+end
+
+function ReserializationTest()
+	local str = SerializeEntities()
+	print("Serialized entities: " .. str)
+	--local entities = DeserializeEntitiesFromString(str)
+	--local str2 = SerializeEntitiesFromTable(entities)
+	--print("Reserialized entities: " .. str2)
+end
+
+--function SerializeAction(action)
+--	local result = "{"
+--	for k, v in pairs(action) do
+--		if type(v) == "table" then
+--			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
+--		elseif type(v) == "string" then
+--			result = result .. tostring(k) .. " = " .. '"' .. v .. '"'
+--		elseif type(v) == "boolean" then
+--			result = result .. tostring(k) .. " = " .. tostring(v)
+--		else
+--			result = result .. tostring(k) .. " = " .. tostring(v)
+--		end
+--		result = result .. ", "
+--	end
+--	return result .. "}"
+--end
 
 --function ProcessTopAction()
 --	local result = false

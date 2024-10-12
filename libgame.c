@@ -575,7 +575,8 @@ void libgame_handle_input_player(gamestate* g) {
             //libgame_lua_print_entities(L);
             minfo("Key pressed: P");
 
-            libgame_lua_serialize_entities_and_print(L);
+            //libgame_lua_serialize_entities_and_print(L);
+            libgame_lua_reserialization_test(L);
         }
 
 

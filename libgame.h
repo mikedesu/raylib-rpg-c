@@ -70,12 +70,16 @@ void libgame_handleplayerinput_key_up_left(gamestate* g);
 void libgame_handleplayerinput_key_up_right(gamestate* g);
 void libgame_handleplayerinput_key_down_right(gamestate* g);
 void libgame_handle_grid_switch(gamestate* g);
+void libgame_handle_npc_turn_lua(gamestate* g, entityid id);
+void libgame_handle_npcs_turn_lua(gamestate* g);
 
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
 void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path);
 void libgame_loadtextures(gamestate* g);
 void libgame_loadtexturesfromfile(gamestate* g, const char* path);
+
+void libgame_process_turn(gamestate* g);
 
 void libgame_test_enemy_placement(gamestate* g);
 
@@ -98,11 +102,7 @@ const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const
 
 const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
 
-void libgame_handle_npc_turn_lua(gamestate* g, entityid id);
-void libgame_handle_npcs_turn_lua(gamestate* g);
-void libgame_process_turn(gamestate* g);
 //lua_State* libgame_getlua();
-
 //const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y);
 //void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);
 //void libgame_create_sword(gamestate* g, const char* name, const int x, const int y);

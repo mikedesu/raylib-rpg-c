@@ -49,6 +49,8 @@ void libgame_lua_print_entities(lua_State* L);
 
 void libgame_lua_serialize_entities_and_print(lua_State* L);
 
+void libgame_lua_reserialization_test(lua_State* L);
+
 //void libgame_lua_process_actions(lua_State* L);
 
 

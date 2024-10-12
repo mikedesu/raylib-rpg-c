@@ -478,6 +478,17 @@ void libgame_lua_serialize_entities_and_print(lua_State* L) {
 }
 
 
+
+
+void libgame_lua_reserialization_test(lua_State* L) {
+    minfo("libgame_lua_reserialization_test");
+    if (L) {
+        lua_getglobal(L, "ReserializationTest");
+        lua_pcall(L, 0, 0, 0);
+    }
+}
+
+
 //const bool libgame_lua_process_next_action(lua_State* L) {
 //    if (L) {
 //        lua_getglobal(L, "ProcessNextAction");
