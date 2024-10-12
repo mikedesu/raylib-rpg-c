@@ -47,6 +47,8 @@ const int libgame_lua_get_nth_entity(lua_State* L, const int n);
 
 void libgame_lua_print_entities(lua_State* L);
 
+void libgame_lua_serialize_entities_and_print(lua_State* L);
+
 //void libgame_lua_process_actions(lua_State* L);
 
 

@@ -430,9 +430,9 @@ const int libgame_lua_get_num_entities(lua_State* L) {
 
 const int libgame_lua_get_nth_entity(lua_State* L, const int n) {
 
-    char buf[128];
-    snprintf(buf, 128, "GetNthEntity(%d)", n);
-    minfo(buf);
+    //char buf[128];
+    //snprintf(buf, 128, "GetNthEntity(%d)", n);
+    //minfo(buf);
 
     int retval = -1;
     if (L) {
@@ -444,8 +444,8 @@ const int libgame_lua_get_nth_entity(lua_State* L, const int n) {
         lua_pop(L, 1);
     }
 
-    snprintf(buf, 128, "GetNthEntity(%d) = %d", n, retval);
-    msuccess(buf);
+    //snprintf(buf, 128, "GetNthEntity(%d) = %d", n, retval);
+    //msuccess(buf);
 
     return retval;
 }
@@ -457,6 +457,23 @@ void libgame_lua_print_entities(lua_State* L) {
     if (L) {
         lua_getglobal(L, "PrintEntities");
         lua_pcall(L, 0, 0, 0);
+    }
+}
+
+
+
+
+void libgame_lua_serialize_entities_and_print(lua_State* L) {
+    char* result = NULL;
+    if (L) {
+        lua_getglobal(L, "SerializeEntities");
+        lua_pcall(L, 0, 1, 0);
+        result = (char*)lua_tostring(L, -1);
+        if (result) {
+            msuccess(result);
+        }
+        lua_pop(L, 1);
+        //printf("%s\n", result);
     }
 }
 

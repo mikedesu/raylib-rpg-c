@@ -4,6 +4,7 @@
 #include "symaddrpair.h"
 
 #include "libgame.h"
+//#include "mylua.h"
 
 
 
@@ -26,7 +27,6 @@
 
 
 
-
 long last_write_time = 0;
 const char* libname = "./libgame.so";
 const char* lockfile = "./libgame.so.lockfile";
@@ -44,6 +44,10 @@ gamestate* g_ = NULL;
 
 
 
+lua_State* L = NULL;
+
+
+
 
 //void gameloop();
 
@@ -51,9 +55,15 @@ gamestate* g_ = NULL;
 
 
 bool (*mywindowshouldclose)() = NULL;
+
 gamestate* (*mylibgame_getgamestate)() = NULL;
+lua_State* (*mylibgame_getlua)() = NULL;
+
 void (*mylibgameinit)() = NULL;
+
 void (*mylibgameclosesavegamestate)() = NULL;
+//void (*mylibgame_close_save_gamestate_minus_lua)() = NULL;
+
 void (*mylibgameclose)(gamestate*) = NULL;
 void (*mylibgamedrawframe)(gamestate*) = NULL;
 void (*mylibgamehandleinput)(gamestate*) = NULL;
@@ -104,13 +114,16 @@ void checksymbol(void* symbol, const char* name) {
 
 void loadsymbols() {
     minfo("begin loadsymbols");
-    symaddrpair_t pairs[NUM_VOID_FUNCTIONS] = {{"libgame_drawframe", &mylibgamedrawframe},
-                                               {"libgame_init", &mylibgameinit},
-                                               {"libgame_close", &mylibgameclose},
-                                               {"libgame_handleinput", &mylibgamehandleinput},
-                                               {"libgame_closesavegamestate", &mylibgameclosesavegamestate},
-                                               {"libgame_initwithstate", &mylibgameinitwithstate},
-                                               {"libgame_updategamestate", &mylibgameupdategamestate}};
+    symaddrpair_t pairs[NUM_VOID_FUNCTIONS] = {
+        {"libgame_drawframe", &mylibgamedrawframe},
+        {"libgame_init", &mylibgameinit},
+        {"libgame_close", &mylibgameclose},
+        {"libgame_handleinput", &mylibgamehandleinput},
+        {"libgame_closesavegamestate", &mylibgameclosesavegamestate},
+        {"libgame_initwithstate", &mylibgameinitwithstate},
+        {"libgame_updategamestate", &mylibgameupdategamestate},
+        //                                            {"libgame_close_save_gamestate_minus_lua", &mylibgame_close_save_gamestate_minus_lua}
+    };
     for (int i = 0; i < NUM_VOID_FUNCTIONS; i++) {
         //minfo(pairs[i].name);
         *pairs[i].addr = dlsym(handle, pairs[i].name);
@@ -136,6 +149,11 @@ void loadsymbols() {
     mylibgame_external_check_reload = dlsym(handle, sym);
     checksymbol(mylibgame_external_check_reload, sym);
 
+    // lua_State return
+    //sym = "libgame_getlua";
+    //mylibgame_getlua = dlsym(handle, sym);
+    //checksymbol(mylibgame_getlua, sym);
+
     msuccess("end loadsymbols");
 }
 
@@ -153,9 +171,12 @@ void autoreload() {
         }
         //minfo("getting old gamestate");
         g_ = mylibgame_getgamestate();
+        //L = mylibgame_getlua();
+
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
         mylibgameclosesavegamestate(); // closes window
+        //mylibgame_close_save_gamestate_minus_lua(); // closes window
         dlclose(handle);
         openhandle();
         loadsymbols();
@@ -197,6 +218,7 @@ void gamerun() {
     g_ = mylibgame_getgamestate();
     //g = mylibgame_getgamestate();
     //g_ = libgame_getgamestate();
+    //L = mylibgame_getlua();
 
     minfo("entering gameloop");
 

@@ -149,6 +149,9 @@ function CreateEntity(name, type, x, y)
 		y = y,
 		last_move_x = 0,
 		last_move_y = 0,
+		level = 1,
+		hp = 0,
+		maxhp = 0,
 		inventory = {},
 	}
 	NextEntityId = NextEntityId + 1
@@ -196,10 +199,10 @@ end
 function EntityMove(id, xdir, ydir)
 	local entity = GetEntityById(id)
 	if entity then
-		PrintDebug("init.lua:199", "Moving entity with id " .. id .. " by " .. xdir .. ", " .. ydir)
+		--PrintDebug("init.lua:199", "Moving entity with id " .. id .. " by " .. xdir .. ", " .. ydir)
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
-		PrintDebug("init.lua:202", "New position: " .. newx .. ", " .. newy)
+		--PrintDebug("init.lua:202", "New position: " .. newx .. ", " .. newy)
 		if newx < 0 or newx >= #DungeonFloor[0] or newy < 0 or newy >= #DungeonFloor then
 			return false
 		end
@@ -239,7 +242,7 @@ function TileIsOccupiedByType(type, x, y)
 		for i, entityId in ipairs(DungeonFloor[y][x].entities) do
 			local entity = GetEntityById(entityId)
 			if entity and entity.type == type then
-				PrintDebug("init.lua:242", "Tile is occupied by entity with id " .. entityId .. " and type " .. type)
+				--PrintDebug("init.lua:242", "Tile is occupied by entity with id " .. entityId .. " and type " .. type)
 				--print(
 				--	"\27[31;1m🟣 Lua\27[0m   init.lua:202: Tile is occupied by entity with id "
 				--		.. entityId
@@ -295,20 +298,20 @@ end
 function CreateAction(id, type, x, y)
 	-- if the type isnt valid, return
 	if type < ActionTypes.Move or type > ActionTypes.Move then
-		PrintDebug("init.lua:298", "Invalid action type " .. type)
+		--PrintDebug("init.lua:298", "Invalid action type " .. type)
 		return false
 	end
 
 	-- if the id is invalid, return
 	if id < 0 then
-		PrintDebug("init.lua:304", "Invalid entity id " .. id)
+		--PrintDebug("init.lua:304", "Invalid entity id " .. id)
 		return false
 	end
 
 	-- if the id isnt in the entities list, return
 	local entity = GetEntityById(id)
 	if not entity then
-		PrintDebug("init.lua:311", "Entity with id " .. id .. " not found")
+		--PrintDebug("init.lua:311", "Entity with id " .. id .. " not found")
 		return false
 	end
 
@@ -327,12 +330,12 @@ function ProcessAction(index)
 	-- do nothing
 	--end
 	if index < 1 or index > #Actions then
-		PrintDebug("init.lua:330", "Invalid action index " .. index)
+		--PrintDebug("init.lua:330", "Invalid action index " .. index)
 		return -1
 	end
 	local action = Actions[index]
 	local result = false
-	PrintDebug("init.lua:335", "Processing action type " .. action.type .. " for entity with id " .. action.id)
+	--PrintDebug("init.lua:335", "Processing action type " .. action.type .. " for entity with id " .. action.id)
 	if action.type == ActionTypes.Move then
 		result = EntityMove(action.id, action.x, action.y)
 	end
@@ -366,6 +369,62 @@ function PrintEntities()
 	for i, entity in ipairs(Entities) do
 		print("i:" .. i .. "Entity " .. entity.id .. ": " .. entity.name .. " at " .. entity.x .. ", " .. entity.y)
 	end
+end
+
+function SerializeTableToString(table)
+	local result = "{"
+	PrintDebug("init.lua:376", "Serializing table with " .. #table .. " elements")
+	for k, v in ipairs(table) do
+		-- check the type of the value
+		PrintDebug("init.lua:379", "Serializing element " .. k .. " with type " .. type(v))
+		if type(v) == "table" then
+			result = result .. SerializeTableToString(v)
+		elseif type(v) == "string" then
+			--result = result .. '"' .. v .. '"'
+			result = result .. k .. " = " .. v
+		elseif type(v) == "boolean" then
+			result = result .. k .. " = " .. tostring(v)
+		else
+			result = result .. k .. " = " .. v
+		end
+		if k < #table then
+			result = result .. ", "
+		end
+	end
+
+	-- remove leading commas and spaces
+	--result = string.gsub(result, "^%s*,", "")
+	return result .. "}"
+end
+
+function SerializeEntities()
+	local result = "{"
+	for k, v in ipairs(Entities) do
+		result = result .. SerializeEntity(v)
+		if k < #Entities then
+			result = result .. ", "
+		end
+	end
+	return result .. "}"
+end
+
+function SerializeEntity(entity)
+	PrintDebug("init.lua:409", "Serializing entity with id " .. entity.id)
+	local result = "{"
+	for k, v in pairs(entity) do
+		PrintDebug("init.lua:412", "Serializing property " .. k .. " with type " .. type(v))
+		if type(v) == "table" then
+			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
+		elseif type(v) == "string" then
+			result = result .. tostring(k) .. " = " .. '"' .. v .. '"'
+		elseif type(v) == "boolean" then
+			result = result .. tostring(k) .. " = " .. tostring(v)
+		else
+			result = result .. tostring(k) .. " = " .. tostring(v)
+		end
+		result = result .. ", "
+	end
+	return result .. "}"
 end
 
 --function ProcessTopAction()

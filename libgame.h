@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "entitytype.h"
 #include "gamestate.h"
+#include "mylua.h"
 #include <raylib.h>
 
 bool libgame_windowshouldclose();
@@ -19,6 +20,7 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
 void libgame_create_shield(gamestate* g, const char* name, const int x, const int y);
 
 void libgame_closeshared(gamestate* g);
+//void libgame_close_shared_minus_lua(gamestate* g);
 void libgame_closesavegamestate();
 void libgame_closewindow();
 void libgame_close(gamestate* g);
@@ -98,6 +100,8 @@ const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int 
 
 void libgame_handle_npc_turn_lua(gamestate* g, entityid id);
 void libgame_handle_npcs_turn_lua(gamestate* g);
+void libgame_process_turn(gamestate* g);
+//lua_State* libgame_getlua();
 
 //const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y);
 //void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);
