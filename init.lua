@@ -26,18 +26,10 @@ end
 WindowWidth = TargetWidth * Scale
 WindowHeight = TargetHeight * Scale
 
-NextEntityId = 1
-HeroId = -1
-
-LastXDir = 0
-LastYDir = 0
-
 ActionTypes = {
 	Wait = 1,
 	Move = 2,
 }
-
-Actions = {}
 
 TileTypes = {
 	None = 0,
@@ -69,6 +61,11 @@ EntityTypes = {
 	NPC = 2,
 }
 
+NextEntityId = 1
+HeroId = -1
+--LastXDir = 0
+--LastYDir = 0
+Actions = {}
 DungeonFloor = {}
 Entities = {}
 
@@ -405,7 +402,36 @@ function SerializeEntities()
 			result = result .. ", "
 		end
 	end
-	return result .. "}"
+	return "Entities = " .. result .. "}"
+end
+
+function SerializeDungeonFloor()
+	local result = "{"
+	for y, row in ipairs(DungeonFloor) do
+		result = result .. "{"
+		for x, tile in ipairs(row) do
+			result = result .. SerializeTile(tile)
+			if x < #row then
+				result = result .. ", "
+			end
+		end
+		result = result .. "}"
+		if y < #DungeonFloor then
+			result = result .. ", "
+		end
+	end
+	return "DungeonFloor = " .. result .. "}"
+end
+
+function SerializeActions()
+	local result = "{"
+	for k, v in ipairs(Actions) do
+		result = result .. SerializeAction(v)
+		if k < #Actions then
+			result = result .. ", "
+		end
+	end
+	return "Actions = " .. result .. "}"
 end
 
 function SerializeEntity(entity)
@@ -413,6 +439,40 @@ function SerializeEntity(entity)
 	local result = "{"
 	for k, v in pairs(entity) do
 		PrintDebug("init.lua:412", "Serializing property " .. k .. " with type " .. type(v))
+		if type(v) == "table" then
+			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
+		elseif type(v) == "string" then
+			result = result .. tostring(k) .. " = " .. '"' .. v .. '"'
+		elseif type(v) == "boolean" then
+			result = result .. tostring(k) .. " = " .. tostring(v)
+		else
+			result = result .. tostring(k) .. " = " .. tostring(v)
+		end
+		result = result .. ", "
+	end
+	return result .. "}"
+end
+
+function SerializeTile(tile)
+	local result = "{"
+	for k, v in pairs(tile) do
+		if type(v) == "table" then
+			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
+		elseif type(v) == "string" then
+			result = result .. tostring(k) .. " = " .. '"' .. v .. '"'
+		elseif type(v) == "boolean" then
+			result = result .. tostring(k) .. " = " .. tostring(v)
+		else
+			result = result .. tostring(k) .. " = " .. tostring(v)
+		end
+		result = result .. ", "
+	end
+	return result .. "}"
+end
+
+function SerializeAction(action)
+	local result = "{"
+	for k, v in pairs(action) do
 		if type(v) == "table" then
 			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
 		elseif type(v) == "string" then

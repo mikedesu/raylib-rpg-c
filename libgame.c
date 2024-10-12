@@ -2150,11 +2150,10 @@ void libgame_closesavegamestate() {
 
 
 
-void libgame_close_save_gamestate_save_lua() {
-    minfo("libgame_close_save_gamestate_save_lua");
-
-    msuccess("libgame_close_save_gamestate_save_lua end");
-}
+//void libgame_close_save_gamestate_save_lua() {
+//    minfo("libgame_close_save_gamestate_save_lua");
+//    msuccess("libgame_close_save_gamestate_save_lua end");
+//}
 
 
 
