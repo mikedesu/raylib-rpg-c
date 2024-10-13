@@ -51,6 +51,9 @@ void libgame_lua_serialize_entities_and_print(lua_State* L);
 
 void libgame_lua_reserialization_test(lua_State* L);
 
+const char* libgame_lua_get_gamestate_str(lua_State* L, const char* key);
+const int libgame_lua_get_gamestate_int(lua_State* L, const char* key);
+
 //void libgame_lua_process_actions(lua_State* L);
 
 

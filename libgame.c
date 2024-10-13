@@ -187,19 +187,26 @@ void libgame_entity_anim_set(gamestate* g, entityid id, int index) {
 
 void libgame_test_enemy_placement(gamestate* g) {
     minfo("test_enemy_placement begin");
-    const int x = libgame_lua_get_entity_int(L, g->hero_id, "x") + 1;
-    const int y = libgame_lua_get_entity_int(L, g->hero_id, "y");
-    if (!libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
-        entityid id = libgame_create_orc_lua(g, "orc", x, y);
-        if (id == -1) {
-            merror("test_enemy_placement: failed to create orc");
+
+    const entityid hero_id = g->hero_id;
+    if (hero_id != -1) {
+        const int x = libgame_lua_get_entity_int(L, g->hero_id, "x") + 1;
+        const int y = libgame_lua_get_entity_int(L, g->hero_id, "y");
+
+        if (!libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
+            entityid id = libgame_create_orc_lua(g, "orc", x, y);
+            if (id == -1) {
+                merror("test_enemy_placement: failed to create orc");
+            } else {
+                char buf[128];
+                snprintf(buf, 128, "test_enemy_placement: orc created, id: %d", id);
+                msuccess(buf);
+            }
         } else {
-            char buf[128];
-            snprintf(buf, 128, "test_enemy_placement: orc created, id: %d", id);
-            msuccess(buf);
+            merror("test_enemy_placement: tile is occupied by npc");
         }
     } else {
-        merror("test_enemy_placement: tile is occupied by npc");
+        merror("test_enemy_placement: hero_id is -1");
     }
 }
 
@@ -754,9 +761,10 @@ bool libgame_windowshouldclose() {
 
 
 void libgame_initwindow(gamestate* g) {
-    const char* title = libgame_lua_get_str(L, "WindowTitle");
-    windowwidth = libgame_lua_get_int(L, "WindowWidth");
-    windowheight = libgame_lua_get_int(L, "WindowHeight");
+
+    const char* title = libgame_lua_get_gamestate_str(L, "WindowTitle");
+    windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth");
+    windowheight = libgame_lua_get_gamestate_int(L, "WindowHeight");
     InitWindow(windowwidth, windowheight, title);
     //InitWindow(width, height, title);
     while (!IsWindowReady())
@@ -787,8 +795,12 @@ void libgame_closewindow() {
 
 
 void libgame_update_debugpanelbuffer(gamestate* g) {
-    int hx = libgame_lua_get_entity_int(L, g->hero_id, "x");
-    int hy = libgame_lua_get_entity_int(L, g->hero_id, "y");
+    int hx = -1;
+    int hy = -1;
+    if (g->hero_id != -1) {
+        hx = libgame_lua_get_entity_int(L, g->hero_id, "x");
+        hy = libgame_lua_get_entity_int(L, g->hero_id, "y");
+    }
     int dw = libgame_lua_get_dungeonfloor_row_count(L);
     int dh = libgame_lua_get_dungeonfloor_col_count(L);
     int action_count = libgame_lua_get_action_count(L);
@@ -881,7 +893,7 @@ void libgame_update_smoothmove(gamestate* g, entityid id) {
 
 void libgame_do_cameralockon(gamestate* g) {
     spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-    if (g->cam_lockon) {
+    if (hero_group && g->cam_lockon) {
         g->cam2d.target = (Vector2){hero_group->dest.x, hero_group->dest.y};
     }
 }
@@ -917,19 +929,19 @@ void libgame_handle_npc_turn_lua(gamestate* g, entityid id) {
 
 
 void libgame_handle_npcs_turn_lua(gamestate* g) {
-    minfo("libgame_handle_npcs_turn_lua begin");
+    //minfo("libgame_handle_npcs_turn_lua begin");
 
-    char buf[128];
-    snprintf(buf, 128, "num entities: %d", libgame_lua_get_num_entities(L));
-    minfo(buf);
+    //char buf[128];
+    //snprintf(buf, 128, "num entities: %d", libgame_lua_get_num_entities(L));
+    //minfo(buf);
 
     for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
         entityid id = libgame_lua_get_nth_entity(L, i + 1);
         entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
 
-        char buf2[128];
-        snprintf(buf2, 128, "i: %d, entity id: %d, type: %d", i, id, type);
-        minfo(buf2);
+        //char buf2[128];
+        //snprintf(buf2, 128, "i: %d, entity id: %d, type: %d", i, id, type);
+        //minfo(buf2);
 
         if (type == ENTITY_NPC) {
             libgame_handle_npc_turn_lua(g, id);
@@ -1013,20 +1025,27 @@ void libgame_handle_npcs_turn_lua(gamestate* g) {
 
 void libgame_updategamestate(gamestate* g) {
     //minfo("begin libgame_updategamestate");
+
+    //minfo("libgame_updategamestate: update debug panel buffer");
     libgame_update_debugpanelbuffer(g);
     //setdebugpanelcenter(g);
+    //minfo("libgame_updategamestate: update smooth move");
     libgame_update_smoothmove(g, g->hero_id);
+
+    //minfo("libgame_updategamestate: do camera lockon");
     libgame_do_cameralockon(g);
     // at this point, we can take other NPC turns
     // lets iterate over our entities, find the NPCs, and make them move in a random direction
     // then, we will update their smooth moves
     // we will need to eventually disable player input during smooth moving
     if (g->player_input_received) {
+        //minfo("libgame_updategamestate: handle npcs turn lua");
         libgame_handle_npcs_turn_lua(g);
         libgame_process_turn(g);
         g->player_input_received = false;
     }
 
+    //minfo("libgame_updategamestate: update smooth moves for NPCs");
     // update smooth move for NPCs and other entities
     libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
     //msuccess("end libgame_updategamestate");
@@ -1065,7 +1084,7 @@ void libgame_drawframeend(gamestate* g) {
 
 
 void libgame_drawframe(gamestate* g) {
-    //minfo("begin libgame_drawframe");
+    //minfo("begin libgamedrawframe");
     BeginDrawing();
     BeginTextureMode(target);
     switch (activescene) {
@@ -1142,14 +1161,14 @@ void libgame_drawgrid(gamestate* g) {
 
 
 void libgame_draw_dungeonfloor(gamestate* g) {
-    Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
+    const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
+    const int rows = libgame_lua_get_dungeonfloor_row_count(L);
+    const int cols = libgame_lua_get_dungeonfloor_col_count(L);
     Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
-    int rows = libgame_lua_get_dungeonfloor_row_count(L);
-    int cols = libgame_lua_get_dungeonfloor_col_count(L);
     //char buf[128];
     //snprintf(buf, 128, "libgame_draw_dungeonfloor: rows: %d, cols: %d", rows, cols);
     //minfo(buf);
-    Color c = WHITE;
+    const Color c = WHITE;
     float rotation = 0;
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
@@ -1160,7 +1179,7 @@ void libgame_draw_dungeonfloor(gamestate* g) {
                 tile_dest.y = i * DEFAULT_TILE_SIZE;
                 DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, (Vector2){0, 0}, rotation, c);
                 //char buf[128];
-                //snprintf(buf, 128, "libgame_draw_dungeonfloor: tiletype: %d, key: %d", type, key);
+                //snprintf(buf, 128, "libgame_draw_dungeonfloor: tiletype: %d, key: %d at x: %d, y: %d", type, key, j, i);
                 //msuccess(buf);
             }
             //else {
@@ -1348,7 +1367,7 @@ void libgame_draw_gameplayscene(gamestate* g) {
             libgame_drawgrid(g);
         }
         // draw torches, items, npcs, player
-        libgame_draw_gameplayscene_entities(g);
+        //libgame_draw_gameplayscene_entities(g);
         // lighting basics
         //const int tilesize = DEFAULT_TILE_SIZE;
         //for (int i = 0; i < g->dungeonfloor->len; i++) {
@@ -1830,8 +1849,11 @@ void libgame_create_orcspritegroup(gamestate* g, entityid id) {
 
 void libgame_loadtargettexture(gamestate* g) {
     if (g) {
-        targetwidth = libgame_lua_get_int(L, "TargetWidth");
-        targetheight = libgame_lua_get_int(L, "TargetHeight");
+        //targetwidth = libgame_lua_get_int(L, "TargetWidth");
+        //targetheight = libgame_lua_get_int(L, "TargetHeight");
+        targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth");
+        targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
+
         target = LoadRenderTexture(targetwidth, targetheight);
         target_src = (Rectangle){0, 0, targetwidth, -targetheight};
         target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
@@ -2072,11 +2094,10 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_loadtargettexture(g);
         libgame_loadtextures(g);
         libgame_init_datastructures(g);
-        minfo("creating hero");
-        // this is just a mock-up for now
-        //libgame_create_hero(g, "hero", 1, 0);
-        libgame_create_hero_lua(g, "hero", 1, 0);
-        msuccess("hero created");
+        //minfo("creating hero");
+        //libgame_create_hero_lua(g, "hero", 1, 0);
+        //msuccess("hero created");
+
         //minfo("creating sword...");
         //libgame_create_sword(g, "sword", 2, 0);
         //msuccess("sword created");

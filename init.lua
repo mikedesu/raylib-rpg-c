@@ -15,16 +15,25 @@ DefaultScale = 1
 ----------------------------------------
 -- DO NOT EDIT BELOW THIS LINE
 ----------------------------------------
-TargetWidth = DefaultTargetWidth
-TargetHeight = DefaultTargetHeight
 Scale = DefaultScale
 
 if Scale < 1 then
 	Scale = 1
 end
 
-WindowWidth = TargetWidth * Scale
-WindowHeight = TargetHeight * Scale
+Gamestate = {
+	TargetWidth = DefaultTargetWidth,
+	TargetHeight = DefaultTargetHeight,
+	NextEntityId = 1,
+	Actions = {},
+	DungeonFloor = {},
+	Entities = {},
+}
+
+Gamestate.WindowWidth = Gamestate.TargetWidth * Scale
+Gamestate.WindowHeight = Gamestate.TargetHeight * Scale
+
+HeroId = -1
 
 ActionTypes = {
 	Wait = 1,
@@ -78,38 +87,38 @@ function CreateTile(type)
 end
 
 function GetNumEntities()
-	return #Entities
+	return #Gamestate.Entities
 end
 
 function GetNthEntity(n)
-	return Entities[n].id
+	return Gamestate.Entities[n].id
 end
 
 function GetNumEntitiesAt(x, y)
-	if DungeonFloor[y] and DungeonFloor[y][x] then
-		return #DungeonFloor[y][x].entities
+	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
+		return #Gamestate.DungeonFloor[y][x].entities
 	end
 	return 0
 end
 
 function GetNthEntityAt(n, x, y)
-	if DungeonFloor[y] and DungeonFloor[y][x] then
-		return DungeonFloor[y][x].entities[n]
+	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
+		return Gamestate.DungeonFloor[y][x].entities[n]
 	end
 	return nil
 end
 
 function AddEntityToTile(id, x, y)
-	if DungeonFloor[y] and DungeonFloor[y][x] then
-		table.insert(DungeonFloor[y][x].entities, id)
+	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
+		table.insert(Gamestate.DungeonFloor[y][x].entities, id)
 	end
 end
 
 function RemoveEntityFromTile(id, x, y)
-	if DungeonFloor[y] and DungeonFloor[y][x] then
-		for i, entityId in ipairs(DungeonFloor[y][x].entities) do
+	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
+		for i, entityId in ipairs(Gamestate.DungeonFloor[y][x].entities) do
 			if entityId == id then
-				table.remove(DungeonFloor[y][x].entities, i)
+				table.remove(Gamestate.DungeonFloor[y][x].entities, i)
 				return
 			end
 		end
@@ -124,15 +133,15 @@ function CreateDungeonFloor(width, height, type)
 			floor[y][x] = CreateTile(type)
 		end
 	end
-	DungeonFloor = floor
+	Gamestate.DungeonFloor = floor
 	print("Created dungeon floor with width " .. width .. " and height " .. height .. " and type " .. type)
-	print("Length of floor: " .. #DungeonFloor)
-	print("Length of floor[0]: " .. #DungeonFloor[0])
+	print("Length of floor: " .. #Gamestate.DungeonFloor)
+	print("Length of floor[0]: " .. #Gamestate.DungeonFloor[0])
 end
 
 function GetTileType(x, y)
-	if DungeonFloor[y] and DungeonFloor[y][x] then
-		return DungeonFloor[y][x].type
+	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
+		return Gamestate.DungeonFloor[y][x].type
 	end
 	return TileTypes.None
 end
@@ -149,21 +158,25 @@ function CreateEntity(name, type, x, y)
 		level = 1,
 		hp = 0,
 		maxhp = 0,
-		inventory = {},
+		--inventory = {},
 	}
-	NextEntityId = NextEntityId + 1
-	table.insert(Entities, entity)
+	Gamestate.NextEntityId = Gamestate.NextEntityId + 1
+	table.insert(Gamestate.Entities, entity)
 	AddEntityToTile(entity.id, x, y)
 	return entity.id
 end
 
 function GetEntityById(id)
-	for i, entity in ipairs(Entities) do
+	for i, entity in ipairs(Gamestate.Entities) do
 		if entity.id == id then
 			return entity
 		end
 	end
 	return nil
+end
+
+function GetGamestateAttr(propertyName)
+	return Gamestate[propertyName]
 end
 
 function GetEntityAttr(entityId, propertyName)
@@ -200,7 +213,7 @@ function EntityMove(id, xdir, ydir)
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
 		--PrintDebug("init.lua:202", "New position: " .. newx .. ", " .. newy)
-		if newx < 0 or newx >= #DungeonFloor[0] or newy < 0 or newy >= #DungeonFloor then
+		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
 			return false
 		end
 		if GetTileType(newx, newy) == TileTypes.None then
@@ -235,8 +248,8 @@ function PrintDebug(preample, text)
 end
 
 function TileIsOccupiedByType(type, x, y)
-	if DungeonFloor[y] and DungeonFloor[y][x] then
-		for i, entityId in ipairs(DungeonFloor[y][x].entities) do
+	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
+		for i, entityId in ipairs(Gamestate.DungeonFloor[y][x].entities) do
 			local entity = GetEntityById(entityId)
 			if entity and entity.type == type then
 				--PrintDebug("init.lua:242", "Tile is occupied by entity with id " .. entityId .. " and type " .. type)
@@ -263,16 +276,16 @@ function TileIsOccupiedByNPC(x, y)
 end
 
 function GetDungeonFloorColumnCount()
-	return #DungeonFloor[0]
+	return #Gamestate.DungeonFloor[0]
 end
 
 function GetDungeonFloorRowCount()
-	return #DungeonFloor
+	return #Gamestate.DungeonFloor
 end
 
 function SetTileType(type, x, y)
-	if DungeonFloor[y] and DungeonFloor[y][x] then
-		DungeonFloor[y][x].type = type
+	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
+		Gamestate.DungeonFloor[y][x].type = type
 	end
 end
 
@@ -318,7 +331,7 @@ function CreateAction(id, type, x, y)
 		x = x,
 		y = y,
 	}
-	table.insert(Actions, action)
+	table.insert(Gamestate.Actions, action)
 	return true
 end
 
@@ -326,11 +339,11 @@ function ProcessAction(index)
 	--if action.type == ActionTypes.Wait then
 	-- do nothing
 	--end
-	if index < 1 or index > #Actions then
+	if index < 1 or index > #Gamestate.Actions then
 		--PrintDebug("init.lua:330", "Invalid action index " .. index)
 		return -1
 	end
-	local action = Actions[index]
+	local action = Gamestate.Actions[index]
 	local result = false
 	--PrintDebug("init.lua:335", "Processing action type " .. action.type .. " for entity with id " .. action.id)
 	if action.type == ActionTypes.Move then
@@ -351,15 +364,15 @@ end
 --end
 
 function ClearActions()
-	Actions = {}
+	Gamestate.Actions = {}
 end
 
 function GetActionCount()
-	return #Actions
+	return #Gamestate.Actions
 end
 
 function ActionsExist()
-	return #Actions > 0
+	return #Gamestate.Actions > 0
 end
 
 function PrintEntities()
@@ -395,12 +408,12 @@ function SerializeTableToString(table)
 end
 
 function SerializeEntities()
-	local result = "{"
-	for k, v in ipairs(Entities) do
-		result = result .. SerializeEntity(v)
-		if k < #Entities then
-			result = result .. ", "
-		end
+	local result = "{\n"
+	for k, v in ipairs(Gamestate.Entities) do
+		result = result .. SerializeEntity(v) .. ",\n"
+		--if k < #Entities then
+		--	result = result .. ","
+		--end
 	end
 	return result .. "}"
 end
@@ -418,7 +431,7 @@ end
 
 function SerializeDungeonFloor()
 	local result = "{"
-	for y, row in ipairs(DungeonFloor) do
+	for y, row in ipairs(Gamestate.DungeonFloor) do
 		result = result .. "{"
 		for x, tile in ipairs(row) do
 			result = result .. SerializeTile(tile)
@@ -427,7 +440,7 @@ function SerializeDungeonFloor()
 			end
 		end
 		result = result .. "}"
-		if y < #DungeonFloor then
+		if y < #Gamestate.DungeonFloor then
 			result = result .. ", "
 		end
 	end
@@ -447,7 +460,7 @@ end
 
 function SerializeEntity(entity)
 	PrintDebug("init.lua:409", "Serializing entity with id " .. entity.id)
-	local result = "{"
+	local result = entity.id .. " = { "
 	for k, v in pairs(entity) do
 		PrintDebug("init.lua:412", "Serializing property " .. k .. " with type " .. type(v))
 		if type(v) == "table" then
@@ -465,7 +478,7 @@ function SerializeEntity(entity)
 end
 
 function SerializeTile(tile)
-	local result = "{"
+	local result = "{ "
 	for k, v in pairs(tile) do
 		if type(v) == "table" then
 			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
@@ -478,7 +491,7 @@ function SerializeTile(tile)
 		end
 		result = result .. ", "
 	end
-	return result .. "}"
+	return result .. " }"
 end
 
 function DeserializeEntityFromString(str)
@@ -491,22 +504,26 @@ function DeserializeEntityFromString(str)
 	local inValue = false
 	local inString = false
 	local inTable = false
-	local tableDepth = 0
+	--local tableDepth = 0
 	local tableString = ""
 	while i <= #str do
 		local c = str:sub(i, i)
 		if c == "{" then
-			inTable = true
-			tableDepth = tableDepth + 1
+		-- do nothing
 		elseif c == "}" then
-			tableDepth = tableDepth - 1
-			if tableDepth == 0 then
-				inTable = false
-				--print("Key: " .. key)
-				--print("Value: " .. tableString)
-				--entity[key] = DeserializeEntityFromString(tableString)
-				tableString = ""
-			end
+		-- do nothing
+		--
+		--	inTable = true
+		--	tableDepth = tableDepth + 1
+		--elseif c == "}" then
+		--	tableDepth = tableDepth - 1
+		--	if tableDepth == 0 then
+		--		inTable = false
+		--		--print("Key: " .. key)
+		--		--print("Value: " .. tableString)
+		--		--entity[key] = DeserializeEntityFromString(tableString)
+		--		tableString = ""
+		--	end
 		elseif c == "=" then
 			inKey = false
 			inValue = true
@@ -518,7 +535,14 @@ function DeserializeEntityFromString(str)
 			else
 				print("Key: " .. key)
 				print("Value: " .. value)
-				entity[key] = value
+				-- check to see if value can be parsed as a number
+				local num = tonumber(value)
+				if num then
+					entity[key] = num
+				else
+					entity[key] = value
+				end
+				--entity[key] = value
 				key = ""
 				value = ""
 				inKey = true
@@ -543,50 +567,76 @@ function DeserializeEntityFromString(str)
 		end
 		i = i + 1
 	end
+	PrintDebug("Deserialization of Entity " .. entity.id, " successful")
 	return entity
 end
 
 function DeserializeEntitiesFromString(str)
 	PrintDebug("init.lua:543", "Deserializing entities from string: " .. str)
+	-- {
+	-- 1 = { id = 1, name = "Player", type = 1, x = 0, y = 0, last_move_x = 0, last_move_y = 0, level = 1, hp = 0, maxhp = 0 },
+	-- 2 = { id = 2, name = "NPC", type = 2, x = 1, y = 1, last_move_x = 0, last_move_y = 0, level = 1, hp = 0, maxhp = 0 },
+	-- }
 	local entities = {}
-	local i = 2
-	while i <= #str do
-		print("i: " .. i)
-		-- print the substring
-		print("Substring: " .. str:sub(i))
-		-- get the index of the next entity which begins with a {
-		local start = str:find("{", i)
-		print("Start: " .. start)
-		if not start then
-			break
-		end
-
-		-- get the index of the next entity which ends with a }
-		local stop = str:find("}", start)
-		if not stop then
-			break
-		end
-		-- the stop is currently at the inventory closing brace so we need to move it to the entity closing brace
-		stop = str:find("}", stop + 1)
-		if not stop then
-			break
-		end
-		-- get the entity string
-		local entityString = str:sub(start, stop)
-		-- deserialize the entity string
-		local entity = DeserializeEntityFromString(entityString)
-		-- add the entity to the entities table
+	-- assume the string begins with {
+	-- find the first newline
+	local i = str:find("\n") + 1
+	-- find the next newline
+	local j = str:find("\n", i + 1)
+	while j do
+		local str2 = str:sub(i, j)
+		PrintDebug("init.lua:556", "Stripped string: " .. str2)
+		-- rip out the part before =
+		local k = str2:find("=") - 1
+		local id = str2:sub(0, k - 1)
+		PrintDebug("init.lua:560", "id: [" .. id .. "]")
+		-- print the table
+		local l = str2:find("},")
+		local entity_str = str2:sub(k + 2, l)
+		PrintDebug("init.lua:562", "Table: " .. entity_str)
+		local entity = DeserializeEntityFromString(entity_str)
 		table.insert(entities, entity)
-		-- move the index to the next entity, which is after the closing brace and a comma
-		i = stop + 1
+		-- find the next newline
+		i = j + 1
+		j = str:find("\n", i)
+		PrintDebug("init.lua:568", "Rest of string: " .. str:sub(i))
+		if j then
+			PrintDebug("init.lua:570", "Substring: " .. str:sub(i, j - 1))
+		end
 	end
+	-- print the rest of the string
+	-- rip out the space between the first and next curly
+	--local j = str:find("{", i + 1)
+	--while j do
+	--	local str2 = str:sub(i + 1, j)
+	--	PrintDebug("init.lua:556", "Stripped string: " .. str2)
+	--	-- rip out the part before =
+	--	local k = str2:find("=")
+	--	local id = str2:sub(0, k - 1)
+	--	PrintDebug("init.lua:560", "id: [" .. id .. "]")
+	--	-- print the table
+	--	local l = str:find("},")
+	--	local entity_str = str:sub(j, l)
+	--	PrintDebug("init.lua:562", "Table: " .. entity_str)
+	--	local entity = DeserializeEntityFromString(entity_str)
+	--	table.insert(entities, entity)
+	--	-- find the next curly
+	--	i = str:find("{", l + 2)
+	--end
+	--
+	-- get the rest of the string by cutting out the first entity
+	--local str4 = str:sub(f + 1)
+	--PrintDebug("init.lua:567", "Rest of string: " .. str4)
+	-- if there are more entities, repeat the process
+	PrintDebug("init.lua:572", "Deserialize entities successful")
 	return entities
 end
 
 function ReserializationTest()
 	local str = SerializeEntities()
 	print("Serialized entities: " .. str)
-	--local entities = DeserializeEntitiesFromString(str)
+	local entities = DeserializeEntitiesFromString(str)
+	PrintDebug("init.lua:582", "Deserialized entities: " .. SerializeEntitiesFromTable(entities))
 	--local str2 = SerializeEntitiesFromTable(entities)
 	--print("Reserialized entities: " .. str2)
 end

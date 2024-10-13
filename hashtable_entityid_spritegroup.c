@@ -3,11 +3,9 @@
 
 
 hashtable_entityid_spritegroup_t* hashtable_entityid_spritegroup_create(int size) {
-    hashtable_entityid_spritegroup_t* ht =
-        (hashtable_entityid_spritegroup_t*)malloc(sizeof(hashtable_entityid_spritegroup_t));
+    hashtable_entityid_spritegroup_t* ht = (hashtable_entityid_spritegroup_t*)malloc(sizeof(hashtable_entityid_spritegroup_t));
     ht->size = size;
-    ht->table = (hashtable_entityid_spritegroup_node_t**)malloc(
-        sizeof(hashtable_entityid_spritegroup_node_t*) * size);
+    ht->table = (hashtable_entityid_spritegroup_node_t**)malloc(sizeof(hashtable_entityid_spritegroup_node_t*) * size);
     for (int i = 0; i < size; i++) {
         ht->table[i] = NULL;
     }
@@ -35,9 +33,7 @@ int hashtable_entityid_spritegroup_hash(hashtable_entityid_spritegroup_t* ht, en
 }
 
 
-void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* ht,
-                                           entityid key,
-                                           spritegroup_t* value) {
+void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* ht, entityid key, spritegroup_t* value) {
 
     int index = hashtable_entityid_spritegroup_hash(ht, key);
     hashtable_entityid_spritegroup_node_t* node = ht->table[index];
@@ -49,8 +45,7 @@ void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* ht,
         node = node->next;
     }
     hashtable_entityid_spritegroup_node_t* new_node =
-        (hashtable_entityid_spritegroup_node_t*)malloc(
-            sizeof(hashtable_entityid_spritegroup_node_t));
+        (hashtable_entityid_spritegroup_node_t*)malloc(sizeof(hashtable_entityid_spritegroup_node_t));
     new_node->key = key;
     new_node->value = value;
     new_node->next = ht->table[index]; // insert at head
@@ -58,8 +53,17 @@ void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* ht,
 }
 
 
-spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup_t* ht,
-                                                  entityid key) {
+spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup_t* ht, entityid key) {
+
+    if (ht == NULL) {
+        return NULL;
+    }
+
+    if (key < 0) {
+        return NULL;
+    }
+
+
     int index = hashtable_entityid_spritegroup_hash(ht, key);
 
     hashtable_entityid_spritegroup_node_t* node = ht->table[index];

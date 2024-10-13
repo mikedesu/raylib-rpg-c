@@ -93,6 +93,54 @@ const bool libgame_lua_set_entity_str(lua_State* L, const int id, const char* ke
 
 
 
+const int libgame_lua_get_gamestate_int(lua_State* L, const char* key) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetGamestateAttr");
+        lua_pushstring(L, key);
+        if (lua_pcall(L, 1, 1, 0) == 0) {
+            if (lua_isnumber(L, -1)) {
+                retval = lua_tonumber(L, -1);
+            } else {
+                merror("libgame_lua_get_gamestate_int: value is not a number");
+                char buf[128];
+                snprintf(buf, 128, "GetGamestateAttr(%s)", key);
+                merror(buf);
+                retval = -1;
+            }
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const char* libgame_lua_get_gamestate_str(lua_State* L, const char* key) {
+    const char* retval = NULL;
+    if (L) {
+        lua_getglobal(L, "GetGamestateAttr");
+        lua_pushstring(L, key);
+        if (lua_pcall(L, 1, 1, 0) == 0) {
+            if (lua_isstring(L, -1)) {
+                retval = lua_tostring(L, -1);
+            } else {
+                merror("libgame_lua_get_gamestate_str: value is not a string");
+                char buf[128];
+                snprintf(buf, 128, "GetGamestateAttr(%s)", key);
+                merror(buf);
+                retval = NULL;
+            }
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
 const int libgame_lua_get_entity_int(lua_State* L, const int id, const char* key) {
     int retval = -1;
     if (L) {
