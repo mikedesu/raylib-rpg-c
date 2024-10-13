@@ -22,6 +22,7 @@ if Scale < 1 then
 end
 
 Gamestate = {
+	WindowTitle = "@evildojo666 presents: Project.RPG",
 	TargetWidth = DefaultTargetWidth,
 	TargetHeight = DefaultTargetHeight,
 	NextEntityId = 1,
@@ -167,7 +168,7 @@ function CreateEntity(name, type, x, y)
 end
 
 function GetEntityById(id)
-	for i, entity in ipairs(Gamestate.Entities) do
+	for _, entity in ipairs(Gamestate.Entities) do
 		if entity.id == id then
 			return entity
 		end
@@ -209,10 +210,8 @@ end
 function EntityMove(id, xdir, ydir)
 	local entity = GetEntityById(id)
 	if entity then
-		--PrintDebug("init.lua:199", "Moving entity with id " .. id .. " by " .. xdir .. ", " .. ydir)
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
-		--PrintDebug("init.lua:202", "New position: " .. newx .. ", " .. newy)
 		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
 			return false
 		end
@@ -249,7 +248,7 @@ end
 
 function TileIsOccupiedByType(type, x, y)
 	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
-		for i, entityId in ipairs(Gamestate.DungeonFloor[y][x].entities) do
+		for _, entityId in ipairs(Gamestate.DungeonFloor[y][x].entities) do
 			local entity = GetEntityById(entityId)
 			if entity and entity.type == type then
 				--PrintDebug("init.lua:242", "Tile is occupied by entity with id " .. entityId .. " and type " .. type)
@@ -311,20 +310,17 @@ function CreateAction(id, type, x, y)
 		--PrintDebug("init.lua:298", "Invalid action type " .. type)
 		return false
 	end
-
 	-- if the id is invalid, return
 	if id < 0 then
 		--PrintDebug("init.lua:304", "Invalid entity id " .. id)
 		return false
 	end
-
 	-- if the id isnt in the entities list, return
 	local entity = GetEntityById(id)
 	if not entity then
 		--PrintDebug("init.lua:311", "Entity with id " .. id .. " not found")
 		return false
 	end
-
 	local action = {
 		type = type,
 		id = id,
@@ -375,20 +371,20 @@ function ActionsExist()
 	return #Gamestate.Actions > 0
 end
 
-function PrintEntities()
-	for i, entity in ipairs(Entities) do
-		print("i:" .. i .. "Entity " .. entity.id .. ": " .. entity.name .. " at " .. entity.x .. ", " .. entity.y)
-	end
-end
+--function PrintEntities()
+--	for i, entity in ipairs(Entities) do
+--		print("i:" .. i .. "Entity " .. entity.id .. ": " .. entity.name .. " at " .. entity.x .. ", " .. entity.y)
+--	end
+--end
 
-function SerializeTableToString(table)
+function SerializeTable(table)
 	local result = "{"
 	PrintDebug("init.lua:376", "Serializing table with " .. #table .. " elements")
 	for k, v in ipairs(table) do
 		-- check the type of the value
 		PrintDebug("init.lua:379", "Serializing element " .. k .. " with type " .. type(v))
 		if type(v) == "table" then
-			result = result .. SerializeTableToString(v)
+			result = result .. SerializeTable(v)
 		elseif type(v) == "string" then
 			--result = result .. '"' .. v .. '"'
 			result = result .. k .. " = " .. v
@@ -401,51 +397,48 @@ function SerializeTableToString(table)
 			result = result .. ", "
 		end
 	end
-
-	-- remove leading commas and spaces
-	--result = string.gsub(result, "^%s*,", "")
 	return result .. "}"
 end
 
-function SerializeEntities()
-	local result = "{\n"
-	for k, v in ipairs(Gamestate.Entities) do
-		result = result .. SerializeEntity(v) .. ",\n"
-		--if k < #Entities then
-		--	result = result .. ","
-		--end
-	end
-	return result .. "}"
-end
+--function SerializeEntities()
+--	local result = "{\n"
+--	for k, v in ipairs(Gamestate.Entities) do
+--		result = result .. SerializeEntity(v) .. ",\n"
+--if k < #Entities then
+--	result = result .. ","
+--end
+--	end
+--	return result .. "}"
+--end
 
-function SerializeEntitiesFromTable(table)
-	local result = "{"
-	for k, v in ipairs(table) do
-		result = result .. SerializeEntity(v)
-		if k < #table then
-			result = result .. ", "
-		end
-	end
-	return result .. "}"
-end
+--function SerializeTable(table)
+--	local result = "{"
+--	for k, v in ipairs(table) do
+--		result = result .. SerializeEntity(v)
+--		if k < #table then
+--			result = result .. ", "
+--		end
+--	end
+--	return result .. "}"
+--end
 
-function SerializeDungeonFloor()
-	local result = "{"
-	for y, row in ipairs(Gamestate.DungeonFloor) do
-		result = result .. "{"
-		for x, tile in ipairs(row) do
-			result = result .. SerializeTile(tile)
-			if x < #row then
-				result = result .. ", "
-			end
-		end
-		result = result .. "}"
-		if y < #Gamestate.DungeonFloor then
-			result = result .. ", "
-		end
-	end
-	return result .. "}"
-end
+--function SerializeDungeonFloor()
+--	local result = "{"
+--	for y, row in ipairs(Gamestate.DungeonFloor) do
+--		result = result .. "{"
+--		for x, tile in ipairs(row) do
+--			result = result .. SerializeTile(tile)
+--			if x < #row then
+--				result = result .. ", "
+--			end
+--		end
+--		result = result .. "}"
+--		if y < #Gamestate.DungeonFloor then
+--			result = result .. ", "
+--		end
+--	end
+--	return result .. "}"
+--end
 
 --function SerializeActions()
 --	local result = "{"
@@ -458,45 +451,45 @@ end
 --	return "Actions = " .. result .. "}"
 --end
 
-function SerializeEntity(entity)
-	PrintDebug("init.lua:409", "Serializing entity with id " .. entity.id)
-	local result = entity.id .. " = { "
-	for k, v in pairs(entity) do
-		PrintDebug("init.lua:412", "Serializing property " .. k .. " with type " .. type(v))
-		if type(v) == "table" then
-			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
-		elseif type(v) == "string" then
-			result = result .. tostring(k) .. " = " .. '"' .. v .. '"'
-		elseif type(v) == "boolean" then
-			result = result .. tostring(k) .. " = " .. tostring(v)
-		else
-			result = result .. tostring(k) .. " = " .. tostring(v)
-		end
-		result = result .. ", "
-	end
-	return result .. "}"
-end
+--function SerializeTable(table)
+--	PrintDebug("init.lua:409", "Serializing entity with id " .. entity.id)
+--	local result = entity.id .. " = { "
+--	for k, v in pairs(entity) do
+--		PrintDebug("init.lua:412", "Serializing property " .. k .. " with type " .. type(v))
+--		if type(v) == "table" then
+--			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
+--		elseif type(v) == "string" then
+--			result = result .. tostring(k) .. " = " .. '"' .. v .. '"'
+--		elseif type(v) == "boolean" then
+--			result = result .. tostring(k) .. " = " .. tostring(v)
+--		else
+--			result = result .. tostring(k) .. " = " .. tostring(v)
+--		end
+--		result = result .. ", "
+--	end
+--	return result .. "}"
+--end
 
-function SerializeTile(tile)
-	local result = "{ "
-	for k, v in pairs(tile) do
-		if type(v) == "table" then
-			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
-		elseif type(v) == "string" then
-			result = result .. tostring(k) .. " = " .. '"' .. v .. '"'
-		elseif type(v) == "boolean" then
-			result = result .. tostring(k) .. " = " .. tostring(v)
-		else
-			result = result .. tostring(k) .. " = " .. tostring(v)
-		end
-		result = result .. ", "
-	end
-	return result .. " }"
-end
+--function SerializeTile(tile)
+--	local result = "{ "
+--	for k, v in pairs(tile) do
+--		if type(v) == "table" then
+--			result = result .. tostring(k) .. " = " .. SerializeTableToString(v)
+--		elseif type(v) == "string" then
+--			result = result .. tostring(k) .. " = " .. '"' .. v .. '"'
+--		elseif type(v) == "boolean" then
+--			result = result .. tostring(k) .. " = " .. tostring(v)
+--		else
+--			result = result .. tostring(k) .. " = " .. tostring(v)
+--		end
+--		result = result .. ", "
+--	end
+--	return result .. " }"
+--end
 
-function DeserializeEntityFromString(str)
-	PrintDebug("init.lua:485", "Deserializing entity from string " .. str)
-	local entity = {}
+function DeserializeTable(str)
+	PrintDebug("init.lua:485", "Deserializing table from string " .. str)
+	local tbl = {}
 	local i = 1
 	local key = ""
 	local value = ""
@@ -504,26 +497,22 @@ function DeserializeEntityFromString(str)
 	local inValue = false
 	local inString = false
 	local inTable = false
-	--local tableDepth = 0
+	local tableDepth = 0
 	local tableString = ""
 	while i <= #str do
 		local c = str:sub(i, i)
 		if c == "{" then
-		-- do nothing
+			inTable = true
+			tableDepth = tableDepth + 1
 		elseif c == "}" then
-		-- do nothing
-		--
-		--	inTable = true
-		--	tableDepth = tableDepth + 1
-		--elseif c == "}" then
-		--	tableDepth = tableDepth - 1
-		--	if tableDepth == 0 then
-		--		inTable = false
-		--		--print("Key: " .. key)
-		--		--print("Value: " .. tableString)
-		--		--entity[key] = DeserializeEntityFromString(tableString)
-		--		tableString = ""
-		--	end
+			tableDepth = tableDepth - 1
+			if tableDepth == 0 then
+				inTable = false
+				--print("Key: " .. key)
+				--print("Value: " .. tableString)
+				tbl[key] = DeserializeTable(tableString)
+				tableString = ""
+			end
 		elseif c == "=" then
 			inKey = false
 			inValue = true
@@ -533,16 +522,15 @@ function DeserializeEntityFromString(str)
 			elseif inTable then
 				tableString = tableString .. c
 			else
-				print("Key: " .. key)
-				print("Value: " .. value)
+				--print("Key: " .. key)
+				--print("Value: " .. value)
 				-- check to see if value can be parsed as a number
 				local num = tonumber(value)
 				if num then
-					entity[key] = num
+					tbl[key] = num
 				else
-					entity[key] = value
+					tbl[key] = value
 				end
-				--entity[key] = value
 				key = ""
 				value = ""
 				inKey = true
@@ -554,9 +542,7 @@ function DeserializeEntityFromString(str)
 			else
 				inString = true
 			end
-		elseif c == " " then
-			-- do nothing
-		else
+		elseif c == " " and c == "\t" and c == "\n" then
 			if inKey then
 				key = key .. c
 			elseif inValue then
@@ -567,79 +553,55 @@ function DeserializeEntityFromString(str)
 		end
 		i = i + 1
 	end
-	PrintDebug("Deserialization of Entity " .. entity.id, " successful")
-	return entity
+	PrintDebug("Deserialization of table successful")
+	return tbl
 end
 
-function DeserializeEntitiesFromString(str)
-	PrintDebug("init.lua:543", "Deserializing entities from string: " .. str)
-	-- {
-	-- 1 = { id = 1, name = "Player", type = 1, x = 0, y = 0, last_move_x = 0, last_move_y = 0, level = 1, hp = 0, maxhp = 0 },
-	-- 2 = { id = 2, name = "NPC", type = 2, x = 1, y = 1, last_move_x = 0, last_move_y = 0, level = 1, hp = 0, maxhp = 0 },
-	-- }
-	local entities = {}
-	-- assume the string begins with {
-	-- find the first newline
-	local i = str:find("\n") + 1
-	-- find the next newline
-	local j = str:find("\n", i + 1)
-	while j do
-		local str2 = str:sub(i, j)
-		PrintDebug("init.lua:556", "Stripped string: " .. str2)
-		-- rip out the part before =
-		local k = str2:find("=") - 1
-		local id = str2:sub(0, k - 1)
-		PrintDebug("init.lua:560", "id: [" .. id .. "]")
-		-- print the table
-		local l = str2:find("},")
-		local entity_str = str2:sub(k + 2, l)
-		PrintDebug("init.lua:562", "Table: " .. entity_str)
-		local entity = DeserializeEntityFromString(entity_str)
-		table.insert(entities, entity)
-		-- find the next newline
-		i = j + 1
-		j = str:find("\n", i)
-		PrintDebug("init.lua:568", "Rest of string: " .. str:sub(i))
-		if j then
-			PrintDebug("init.lua:570", "Substring: " .. str:sub(i, j - 1))
-		end
-	end
-	-- print the rest of the string
-	-- rip out the space between the first and next curly
-	--local j = str:find("{", i + 1)
-	--while j do
-	--	local str2 = str:sub(i + 1, j)
-	--	PrintDebug("init.lua:556", "Stripped string: " .. str2)
-	--	-- rip out the part before =
-	--	local k = str2:find("=")
-	--	local id = str2:sub(0, k - 1)
-	--	PrintDebug("init.lua:560", "id: [" .. id .. "]")
-	--	-- print the table
-	--	local l = str:find("},")
-	--	local entity_str = str:sub(j, l)
-	--	PrintDebug("init.lua:562", "Table: " .. entity_str)
-	--	local entity = DeserializeEntityFromString(entity_str)
-	--	table.insert(entities, entity)
-	--	-- find the next curly
-	--	i = str:find("{", l + 2)
-	--end
-	--
-	-- get the rest of the string by cutting out the first entity
-	--local str4 = str:sub(f + 1)
-	--PrintDebug("init.lua:567", "Rest of string: " .. str4)
-	-- if there are more entities, repeat the process
-	PrintDebug("init.lua:572", "Deserialize entities successful")
-	return entities
-end
+--function DeserializeEntitiesFromString(str)
+--	PrintDebug("init.lua:543", "Deserializing entities from string: " .. str)
+-- {
+-- 1 = { id = 1, name = "Player", type = 1, x = 0, y = 0, last_move_x = 0, last_move_y = 0, level = 1, hp = 0, maxhp = 0 },
+-- 2 = { id = 2, name = "NPC", type = 2, x = 1, y = 1, last_move_x = 0, last_move_y = 0, level = 1, hp = 0, maxhp = 0 },
+-- }
+-- assume the string begins with {
+-- find the first newline
+-- find the next newline
+-- rip out the part before =
+-- print the table
+-- find the next newline
+--	local entities = {}
+--	local i = str:find("\n") + 1
+--	local j = str:find("\n", i + 1)
+--	while j do
+--		local str2 = str:sub(i, j)
+--		PrintDebug("init.lua:556", "Stripped string: " .. str2)
+--		local k = str2:find("=") - 1
+--		local id = str2:sub(0, k - 1)
+--		PrintDebug("init.lua:560", "id: [" .. id .. "]")
+--		local l = str2:find("},")
+--		local entity_str = str2:sub(k + 2, l)
+--		PrintDebug("init.lua:562", "Table: " .. entity_str)
+--		local entity = DeserializeEntityFromString(entity_str)
+--		table.insert(entities, entity)
+--		i = j + 1
+--		j = str:find("\n", i)
+--		PrintDebug("init.lua:568", "Rest of string: " .. str:sub(i))
+--		if j then
+--			PrintDebug("init.lua:570", "Substring: " .. str:sub(i, j - 1))
+--		end
+--	end
+--	PrintDebug("init.lua:572", "Deserialize entities successful")
+--	return entities
+--end
 
-function ReserializationTest()
-	local str = SerializeEntities()
-	print("Serialized entities: " .. str)
-	local entities = DeserializeEntitiesFromString(str)
-	PrintDebug("init.lua:582", "Deserialized entities: " .. SerializeEntitiesFromTable(entities))
-	--local str2 = SerializeEntitiesFromTable(entities)
-	--print("Reserialized entities: " .. str2)
-end
+--function ReserializationTest()
+--	local str = SerializeEntities()
+--	print("Serialized entities: " .. str)
+--	local entities = DeserializeEntitiesFromString(str)
+--	PrintDebug("init.lua:582", "Deserialized entities: " .. SerializeEntitiesFromTable(entities))
+--local str2 = SerializeEntitiesFromTable(entities)
+--print("Reserialized entities: " .. str2)
+--end
 
 --function SerializeAction(action)
 --	local result = "{"
