@@ -1540,7 +1540,7 @@ void libgame_unloadtexture(gamestate* g, int index) {
     if (g) {
         if (g->txinfo[index].texture.id > 0) {
             UnloadTexture(g->txinfo[index].texture);
-            msuccess("unloading texture");
+            //msuccess("unloading texture");
         }
     } else {
         merror("libgame_unloadtexture: gamestate is NULL");
@@ -1552,6 +1552,7 @@ void libgame_unloadtexture(gamestate* g, int index) {
 
 void libgame_unloadtextures(gamestate* g) {
     minfo("unloading textures");
+    // this can be done smarter, surely...
     libgame_unloadtexture(g, TXHERO);
     libgame_unloadtexture(g, TX_DIRT_00);
     libgame_unloadtexture(g, TX_DIRT_01);
