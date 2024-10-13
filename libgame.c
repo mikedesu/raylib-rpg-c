@@ -569,7 +569,6 @@ void libgame_handle_input_player(gamestate* g) {
             }
         }
 
-
         //else if (IsKeyPressed(KEY_COMMA)) {
         //minfo("Comma key pressed");
         // look at the tile the player is on
@@ -577,15 +576,10 @@ void libgame_handle_input_player(gamestate* g) {
         //g->player_input_received = true;
         //}
 
-
-        if (IsKeyPressed(KEY_P)) {
-            //libgame_lua_print_entities(L);
-            minfo("Key pressed: P");
-
-            //libgame_lua_serialize_entities_and_print(L);
-            libgame_lua_reserialization_test(L);
-        }
-
+        //if (IsKeyPressed(KEY_P)) {
+        //    minfo("Key pressed: P");
+        //    libgame_lua_reserialization_test(L);
+        //}
 
         else if (IsKeyPressed(KEY_SPACE)) {
             // randomize the dungeon tiles
