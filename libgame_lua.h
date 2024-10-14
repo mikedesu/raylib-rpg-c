@@ -36,6 +36,8 @@ void libgame_lua_randomize_all_dungeon_tiles(lua_State* L);
 void libgame_lua_randomize_dungeon_tiles(lua_State* L, const int x, const int y, const int w, const int h);
 void libgame_lua_set_gamestate_int(lua_State* L, const char* key, const int value);
 
+void libgame_lua_mytest(lua_State* L);
+
 //void libgame_lua_print_entities(lua_State* L);
 //void libgame_lua_serialize_entities_and_print(lua_State* L);
 //void libgame_lua_reserialization_test(lua_State* L);

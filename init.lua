@@ -4,6 +4,8 @@
 -- Version: 0.1
 -- Description: This is the main file for the project.rpg game. It contains the global variables and functions that are used throughout the game.
 
+require("test")
+
 -- You can edit these
 WindowTitle = "@evildojo666 presents: Project.RPG"
 -- DefaultTargetWidth = 640

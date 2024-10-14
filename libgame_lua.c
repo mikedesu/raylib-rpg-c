@@ -560,3 +560,11 @@ void libgame_lua_set_gamestate_int(lua_State* L, const char* key, const int valu
 //    }
 //    return retval;
 //}
+
+
+void libgame_lua_mytest(lua_State* L) {
+    if (L) {
+        lua_getglobal(L, "MyTest");
+        lua_pcall(L, 0, 0, 0);
+    }
+}

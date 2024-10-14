@@ -577,10 +577,11 @@ void libgame_handle_input_player(gamestate* g) {
         //g->player_input_received = true;
         //}
 
-        //if (IsKeyPressed(KEY_P)) {
-        //    minfo("Key pressed: P");
-        //    libgame_lua_reserialization_test(L);
-        //}
+        if (IsKeyPressed(KEY_P)) {
+            minfo("Key pressed: P");
+            libgame_lua_mytest(L);
+            //    libgame_lua_reserialization_test(L);
+        }
 
         else if (IsKeyPressed(KEY_SPACE)) {
             // randomize the dungeon tiles
