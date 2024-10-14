@@ -188,10 +188,10 @@ void libgame_entity_anim_set(gamestate* g, entityid id, int index) {
 
 void libgame_test_enemy_placement(gamestate* g) {
     minfo("test_enemy_placement begin");
-    const entityid hero_id = g->hero_id;
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
-        const int x = libgame_lua_get_entity_int(L, g->hero_id, "x") + 1;
-        const int y = libgame_lua_get_entity_int(L, g->hero_id, "y");
+        const int x = libgame_lua_get_entity_int(L, hero_id, "x") + 1;
+        const int y = libgame_lua_get_entity_int(L, hero_id, "y");
         if (!libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
             entityid id = libgame_create_orc_lua(g, "orc", x, y);
             if (id == -1) {
@@ -407,8 +407,6 @@ void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y) {
 
 
 void libgame_handleplayerinput_move(gamestate* g, int xdir, int ydir) {
-    //bool result = libgame_entity_move_lua(g, g->hero_id, xdir, ydir);
-    //libgame_entity_move_lua(g, g->hero_id, xdir, ydir);
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
         libgame_lua_create_action(L, hero_id, 2, xdir, ydir);
@@ -436,7 +434,7 @@ void libgame_handleplayerinput_key_right(gamestate* g) {
 void libgame_handleplayerinput_key_left(gamestate* g) {
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
-        libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
+        libgame_update_spritegroup(g, hero_id, DIRECTION_LEFT);
         libgame_handleplayerinput_move(g, -1, 0);
     } else {
         merror("handleplayerinput_key_left: hero_id is -1");
@@ -450,7 +448,7 @@ void libgame_handleplayerinput_key_down(gamestate* g) {
 
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
-        libgame_update_spritegroup(g, g->hero_id, DIRECTION_DOWN);
+        libgame_update_spritegroup(g, hero_id, DIRECTION_DOWN);
         libgame_handleplayerinput_move(g, 0, 1);
     } else {
         merror("handleplayerinput_key_down: hero_id is -1");
@@ -464,7 +462,7 @@ void libgame_handleplayerinput_key_up(gamestate* g) {
 
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
-        libgame_update_spritegroup(g, g->hero_id, DIRECTION_UP);
+        libgame_update_spritegroup(g, hero_id, DIRECTION_UP);
         libgame_handleplayerinput_move(g, 0, -1);
     } else {
         merror("handleplayerinput_key_up: hero_id is -1");
@@ -478,7 +476,7 @@ void libgame_handleplayerinput_key_down_left(gamestate* g) {
 
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
-        libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
+        libgame_update_spritegroup(g, hero_id, DIRECTION_LEFT);
         libgame_handleplayerinput_move(g, -1, 1);
     } else {
         merror("handleplayerinput_key_down_left: hero_id is -1");
@@ -492,7 +490,7 @@ void libgame_handleplayerinput_key_down_right(gamestate* g) {
 
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
-        libgame_update_spritegroup(g, g->hero_id, DIRECTION_RIGHT);
+        libgame_update_spritegroup(g, hero_id, DIRECTION_RIGHT);
         libgame_handleplayerinput_move(g, 1, 1);
     } else {
         merror("handleplayerinput_key_down_right: hero_id is -1");
@@ -506,7 +504,7 @@ void libgame_handleplayerinput_key_up_left(gamestate* g) {
 
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
-        libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
+        libgame_update_spritegroup(g, hero_id, DIRECTION_LEFT);
         libgame_handleplayerinput_move(g, -1, -1);
     } else {
         merror("handleplayerinput_key_up_left: hero_id is -1");
@@ -520,7 +518,7 @@ void libgame_handleplayerinput_key_up_right(gamestate* g) {
 
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
-        libgame_update_spritegroup(g, g->hero_id, DIRECTION_RIGHT);
+        libgame_update_spritegroup(g, hero_id, DIRECTION_RIGHT);
         libgame_handleplayerinput_move(g, 1, -1);
     } else {
         merror("handleplayerinput_key_up_right: hero_id is -1");
@@ -701,14 +699,14 @@ void libgame_handle_input_player(gamestate* g) {
 
 
 void libgame_process_turn(gamestate* g) {
-    int action_count = libgame_lua_get_action_count(L);
+    const int action_count = libgame_lua_get_action_count(L);
     if (action_count > 0) {
         //char buf[128];
         //snprintf(buf, 128, "action count: %d", action_count);
         //minfo("processing actions...");
         //minfo(buf);
         for (int i = 0; i < action_count; i++) {
-            int entity_id = libgame_lua_process_action(L, i + 1);
+            const int entity_id = libgame_lua_process_action(L, i + 1);
             //bool result = libgame_lua_process_action(L, 1);
             if (entity_id != -1) {
                 //bzero(buf, 128);
@@ -848,9 +846,10 @@ void libgame_closewindow() {
 void libgame_update_debugpanelbuffer(gamestate* g) {
     int hx = -1;
     int hy = -1;
-    if (g->hero_id != -1) {
-        hx = libgame_lua_get_entity_int(L, g->hero_id, "x");
-        hy = libgame_lua_get_entity_int(L, g->hero_id, "y");
+    const entityid id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (id != -1) {
+        hx = libgame_lua_get_entity_int(L, id, "x");
+        hy = libgame_lua_get_entity_int(L, id, "y");
     }
     int dw = libgame_lua_get_dungeonfloor_row_count(L);
     int dh = libgame_lua_get_dungeonfloor_col_count(L);
@@ -906,7 +905,7 @@ void libgame_update_debugpanelbuffer(gamestate* g) {
 
 
 
-void libgame_update_smoothmove(gamestate* g, entityid id) {
+void libgame_update_smoothmove(gamestate* g, const entityid id) {
     if (g) {
         spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
         //const int tilesize = DEFAULT_TILE_SIZE;
@@ -943,7 +942,9 @@ void libgame_update_smoothmove(gamestate* g, entityid id) {
 
 
 void libgame_do_cameralockon(gamestate* g) {
-    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    //spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    spritegroup_t* hero_group = hashtable_entityid_spritegroup_get(g->spritegroups, hero_id);
     if (hero_group && g->cam_lockon) {
         g->cam2d.target = (Vector2){hero_group->dest.x, hero_group->dest.y};
     }
@@ -964,9 +965,8 @@ void libgame_do_cameralockon(gamestate* g) {
 
 
 
-void libgame_handle_npc_turn_lua(gamestate* g, entityid id) {
+void libgame_handle_npc_turn_lua(gamestate* g, const entityid id) {
     minfo("libgame_handle_npc_turn_lua begin");
-
     const int xdir = rand() % 3 - 1;
     const int ydir = rand() % 3 - 1;
     const bool result = libgame_lua_create_action(L, id, 2, xdir, ydir);
@@ -981,19 +981,15 @@ void libgame_handle_npc_turn_lua(gamestate* g, entityid id) {
 
 void libgame_handle_npcs_turn_lua(gamestate* g) {
     //minfo("libgame_handle_npcs_turn_lua begin");
-
     //char buf[128];
     //snprintf(buf, 128, "num entities: %d", libgame_lua_get_num_entities(L));
     //minfo(buf);
-
     for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
-        entityid id = libgame_lua_get_nth_entity(L, i + 1);
-        entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-
+        const entityid id = libgame_lua_get_nth_entity(L, i + 1);
+        const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
         //char buf2[128];
         //snprintf(buf2, 128, "i: %d, entity id: %d, type: %d", i, id, type);
         //minfo(buf2);
-
         if (type == ENTITY_NPC) {
             libgame_handle_npc_turn_lua(g, id);
         }
@@ -1076,13 +1072,12 @@ void libgame_handle_npcs_turn_lua(gamestate* g) {
 
 void libgame_updategamestate(gamestate* g) {
     //minfo("begin libgame_updategamestate");
-
     //minfo("libgame_updategamestate: update debug panel buffer");
     libgame_update_debugpanelbuffer(g);
     //setdebugpanelcenter(g);
     //minfo("libgame_updategamestate: update smooth move");
-    libgame_update_smoothmove(g, g->hero_id);
-
+    //libgame_update_smoothmove(g, g->hero_id);
+    libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
     //minfo("libgame_updategamestate: do camera lockon");
     libgame_do_cameralockon(g);
     // at this point, we can take other NPC turns
@@ -1095,7 +1090,6 @@ void libgame_updategamestate(gamestate* g) {
         libgame_process_turn(g);
         g->player_input_received = false;
     }
-
     //minfo("libgame_updategamestate: update smooth moves for NPCs");
     // update smooth move for NPCs and other entities
     libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
@@ -1105,13 +1099,12 @@ void libgame_updategamestate(gamestate* g) {
 
 
 
-void libgame_update_smoothmoves_for_entitytype(gamestate* g, entitytype_t type) {
+void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type) {
     const int count = libgame_lua_get_num_entities(L);
-
     for (int i = 0; i < count; i++) {
         //entityid id = vectorentityid_get(&g->entityids, i);
-        entityid id = libgame_lua_get_nth_entity(L, i + 1);
-        entitytype_t type2 = libgame_lua_get_entity_int(L, id, "type");
+        const entityid id = libgame_lua_get_nth_entity(L, i + 1);
+        const entitytype_t type2 = libgame_lua_get_entity_int(L, id, "type");
         if (type == type2) {
             libgame_update_smoothmove(g, id);
         }
@@ -1163,9 +1156,11 @@ void libgame_drawframe(gamestate* g) {
 
 
 void libgame_calc_debugpanel_size(gamestate* g) {
-    const int sz = 14, sp = 1;
+    const int sz = 14;
+    const int sp = 1;
     const Vector2 m = MeasureTextEx(g->font, g->debugpanel.buffer, sz, sp);
-    g->debugpanel.w = m.x, g->debugpanel.h = m.y;
+    g->debugpanel.w = m.x;
+    g->debugpanel.h = m.y;
 }
 
 
@@ -1177,8 +1172,8 @@ inline void libgame_draw_debugpanel(gamestate* g) {
         const int spacing = 1;
         const int xy = 10;
         const int wh = 20;
-        Color c = {0x33, 0x33, 0x33, 255};
-        Color c2 = WHITE;
+        const Color c = {0x33, 0x33, 0x33, 255};
+        const Color c2 = WHITE;
         const Vector2 p = {g->debugpanel.x, g->debugpanel.y};
         const Vector2 o = {0, 0};
         const int x0 = g->debugpanel.x - xy;
@@ -1195,7 +1190,7 @@ inline void libgame_draw_debugpanel(gamestate* g) {
 
 
 void libgame_drawgrid(gamestate* g) {
-    Color c = GREEN;
+    const Color c = GREEN;
     const int w = DEFAULT_TILE_SIZE;
     const int h = DEFAULT_TILE_SIZE;
     const int len = g->dungeonfloor->len;
@@ -1220,7 +1215,7 @@ void libgame_draw_dungeonfloor(gamestate* g) {
     //snprintf(buf, 128, "libgame_draw_dungeonfloor: rows: %d, cols: %d", rows, cols);
     //minfo(buf);
     const Color c = WHITE;
-    float rotation = 0;
+    const float rotation = 0;
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             int type = libgame_lua_get_tiletype(L, j, i);
@@ -1249,21 +1244,19 @@ void libgame_draw_entity(gamestate* g, entityid id) {
         spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
         if (group) {
             const Color c = WHITE;
-            int current = group->current;
-            entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+            const int current = group->current;
+            const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
             if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
                 // draw entity shadow, which should exist at current+1 if loaded correctly
                 DrawTexturePro(*group->sprites[current + 1]->texture, group->sprites[current + 1]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
             }
             DrawTexturePro(*group->sprites[current]->texture, group->sprites[current]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
-
             if (g->framecount % FRAMEINTERVAL == 0) {
                 sprite_incrframe(group->sprites[group->current]);
                 sprite_incrframe(group->sprites[group->current + 1]);
             }
-
             if (g->debugpanelon) {
-                Color c = {255, 0, 0, 255};
+                const Color c = {255, 0, 0, 255};
                 const int x = group->dest.x;
                 const int y = group->dest.y;
                 const int w = group->dest.width;
@@ -1289,30 +1282,30 @@ void libgame_draw_entity(gamestate* g, entityid id) {
 
 
 
-void libgame_draw_items(gamestate* g, const itemtype_t type, const int x, const int y) {
-    const tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
-    for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
-        const entityid id = vectorentityid_get(&t->entityids, k);
-        const entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
-        if (entity->type == ENTITY_ITEM && entity->itemtype == type) {
-            libgame_draw_entity(g, id);
-        }
-    }
-}
+//void libgame_draw_items(gamestate* g, const itemtype_t type, const int x, const int y) {
+//    const tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
+//    for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
+//        const entityid id = vectorentityid_get(&t->entityids, k);
+//        const entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+//        if (entity->type == ENTITY_ITEM && entity->itemtype == type) {
+//            libgame_draw_entity(g, id);
+//        }
+//    }
+//}
 
 
 
 
-void libgame_draw_items_that_are_not(gamestate* g, const itemtype_t type, const int x, const int y) {
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
-    for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
-        entityid id = vectorentityid_get(&t->entityids, k);
-        entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
-        if (entity->type == ENTITY_ITEM && entity->itemtype != type) {
-            libgame_draw_entity(g, id);
-        }
-    }
-}
+//void libgame_draw_items_that_are_not(gamestate* g, const itemtype_t type, const int x, const int y) {
+//    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
+//    for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
+//        const entityid id = vectorentityid_get(&t->entityids, k);
+//        entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+//        if (entity->type == ENTITY_ITEM && entity->itemtype != type) {
+//            libgame_draw_entity(g, id);
+//        }
+//    }
+//}
 
 
 
@@ -1334,18 +1327,16 @@ void libgame_draw_items_that_are_not(gamestate* g, const itemtype_t type, const 
 
 void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const int x, const int y) {
     //minfo("libgame_draw_entities_at_lua");
-    int num_entities = libgame_lua_get_num_entities_at(L, x, y);
-
+    const int num_entities = libgame_lua_get_num_entities_at(L, x, y);
     //if (num_entities > 0) {
     //    char buf[128];
     //    snprintf(buf, 128, "libgame_draw_entities_at_lua: num entities: %d", num_entities);
     //    minfo(buf);
     //}
-
     for (int k = 0; k < num_entities; k++) {
         //entityid id = libgame_lua_get_nth_entity_at(L, x, y, k + 1);
-        entityid id = libgame_lua_get_nth_entity_at(L, k + 1, x, y);
-        entitytype_t type2 = libgame_lua_get_entity_int(L, id, "type");
+        const entityid id = libgame_lua_get_nth_entity_at(L, k + 1, x, y);
+        const entitytype_t type2 = libgame_lua_get_entity_int(L, id, "type");
         if (type == type2) {
             //printf("type: %d\n", type);
             libgame_draw_entity(g, id);
@@ -1408,10 +1399,8 @@ void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const i
 void libgame_draw_gameplayscene_entities(gamestate* g) {
     if (g) {
         //minfo("libgame_draw_gameplayscene_entities begin");
-
         const int dw = libgame_lua_get_dungeonfloor_col_count(L);
         const int dh = libgame_lua_get_dungeonfloor_row_count(L);
-
         for (int i = 0; i < dh; i++) {
             for (int j = 0; j < dw; j++) {
                 //libgame_draw_items(g, ITEM_TORCH, i, j);
@@ -1629,7 +1618,6 @@ void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool
 void libgame_load_textures(gamestate* g) {
     if (g) {
         libgame_load_textures_from_data(g);
-
         msuccess("libgame_loadtextures");
     } else {
         merror("libgame_loadtextures: gamestate is NULL");
@@ -1643,7 +1631,6 @@ void libgame_load_textures_from_data(gamestate* g) {
     if (g) {
 #define NUM_PACKS 13
         img_data_pack_t packs[NUM_PACKS] = {
-            //{TILE_DIRT_00_WIDTH, TILE_DIRT_00_HEIGHT, TILE_DIRT_00_FORMAT, TX_DIRT_00, 1, 1, TILE_DIRT_00_DATA},
             PK_TILE_DIRT_00,
             PK_HUMAN_IDLE,
             PK_HUMAN_IDLE_SHADOW,
@@ -1658,35 +1645,9 @@ void libgame_load_textures_from_data(gamestate* g) {
             PK_HUMAN_SOULDIE,
             PK_HUMAN_SOULDIE_SHADOW,
         };
-
-        //{HUMAN_IDLE_WIDTH, HUMAN_IDLE_HEIGHT, HUMAN_IDLE_FORMAT, TX_HERO, 4, 16, HUMAN_IDLE_DATA},
-        //{HUMAN_IDLE_SHADOW_WIDTH, HUMAN_IDLE_SHADOW_HEIGHT, HUMAN_IDLE_SHADOW_FORMAT, TX_HERO_SHADOW, 4, 16, HUMAN_IDLE_SHADOW_DATA},
-
-        //{HUMAN_WALK_WIDTH, HUMAN_WALK_HEIGHT, HUMAN_WALK_FORMAT, TX_HERO_WALK, 4, 4, HUMAN_WALK_DATA},
-        //{HUMAN_WALK_SHADOW_WIDTH, HUMAN_WALK_SHADOW_HEIGHT, HUMAN_WALK_SHADOW_FORMAT, TX_HERO_WALK_SHADOW, 4, 4, HUMAN_WALK_SHADOW_DATA},
-
-        //{HUMAN_ATTACK_WIDTH, HUMAN_ATTACK_HEIGHT, HUMAN_ATTACK_FORMAT, TX_HERO_ATTACK, 4, 4, HUMAN_ATTACK_DATA},
-        //{HUMAN_ATTACK_SHADOW_WIDTH, HUMAN_ATTACK_SHADOW_HEIGHT, HUMAN_ATTACK_SHADOW_FORMAT, TX_HERO_ATTACK_SHADOW, 4, 4, HUMAN_ATTACK_SHADOW_DATA},
-
-
-        //{HUMAN_JUMP_WIDTH, HUMAN_JUMP_HEIGHT, HUMAN_JUMP_FORMAT, TX_HERO_JUMP, 4, 4, HUMAN_JUMP_DATA},
-        //{HUMAN_JUMP_SHADOW_WIDTH, HUMAN_JUMP_SHADOW_HEIGHT, HUMAN_JUMP_SHADOW_FORMAT, TX_HERO_JUMP_SHADOW, 4, 4, HUMAN_JUMP_SHADOW_DATA},
-
-        //{HUMAN_SPINDIE_WIDTH, HUMAN_SPINDIE_HEIGHT, HUMAN_SPINDIE_FORMAT, TX_HERO_SPIN_DIE, 1, 12, HUMAN_SPINDIE_DATA},
-        //{HUMAN_SPINDIE_SHADOW_WIDTH, HUMAN_SPINDIE_SHADOW_HEIGHT, HUMAN_SPINDIE_SHADOW_FORMAT, TX_HERO_SPIN_DIE_SHADOW, 1, 12, HUMAN_SPINDIE_SHADOW_DATA},
-
-        //{HUMAN_SOULDIE_WIDTH, HUMAN_SOULDIE_HEIGHT, HUMAN_SOULDIE_FORMAT, TX_HERO_SOUL_DIE, 1, 12, HUMAN_SOULDIE_DATA},
-        //{HUMAN_SOULDIE_SHADOW_WIDTH, HUMAN_SOULDIE_SHADOW_HEIGHT, HUMAN_SOULDIE_SHADOW_FORMAT, TX_HERO_SOUL_DIE_SHADOW, 1, 12, HUMAN_SOULDIE_SHADOW_DATA},
-
-        //};
-        //libgame_load_texture_from_datapack(g, &packs[0]);
-        //libgame_load_texture_from_datapack(g, &packs[1]);
-        //libgame_load_texture_from_datapack(g, &packs[2]);
-
         for (int i = 0; i < NUM_PACKS; i++) {
             libgame_load_texture_from_datapack(g, &packs[i]);
         }
-
         msuccess("libgame_loadtextures_from_data");
     } else {
         merror("libgame_loadtextures_from_data: gamestate is NULL");
@@ -1713,51 +1674,9 @@ void libgame_unloadtexture(gamestate* g, int index) {
 void libgame_unloadtextures(gamestate* g) {
     minfo("unloading textures");
     // this can be done smarter, surely...
-    libgame_unloadtexture(g, TX_DIRT_00);
-    libgame_unloadtexture(g, TX_HERO_IDLE);
-    libgame_unloadtexture(g, TX_HERO_IDLE_SHADOW);
-    //libgame_unloadtexture(g, TX_DIRT_01);
-    //libgame_unloadtexture(g, TX_DIRT_02);
-    //libgame_unloadtexture(g, TX_TILE_STONE_00);
-    //libgame_unloadtexture(g, TX_TILE_STONE_01);
-    //libgame_unloadtexture(g, TX_TILE_STONE_02);
-    //libgame_unloadtexture(g, TX_TILE_STONE_03);
-    //libgame_unloadtexture(g, TX_TILE_STONE_04);
-    //libgame_unloadtexture(g, TX_TILE_STONE_05);
-    //libgame_unloadtexture(g, TX_TILE_STONE_06);
-    //libgame_unloadtexture(g, TX_TILE_STONE_07);
-    //libgame_unloadtexture(g, TX_TILE_STONE_08);
-    //libgame_unloadtexture(g, TX_TILE_STONE_09);
-    //libgame_unloadtexture(g, TX_TILE_STONE_10);
-    //libgame_unloadtexture(g, TX_TILE_STONE_11);
-    //libgame_unloadtexture(g, TX_TILE_STONE_12);
-    //libgame_unloadtexture(g, TX_TILE_STONE_13);
-    //libgame_unloadtexture(g, TX_TILE_STONE_14);
-    //libgame_unloadtexture(g, TXTORCH);
-    //libgame_unloadtexture(g, TX_HERO_WALK);
-    //libgame_unloadtexture(g, TX_HERO_WALK_SHADOW);
-    //libgame_unloadtexture(g, TX_HERO_ATTACK);
-    //libgame_unloadtexture(g, TX_HERO_ATTACK_SHADOW);
-    //libgame_unloadtexture(g, TX_HERO_JUMP);
-    //libgame_unloadtexture(g, TX_HERO_JUMP_SHADOW);
-    //libgame_unloadtexture(g, TX_HERO_SPIN_DIE);
-    //libgame_unloadtexture(g, TX_HERO_SPIN_DIE_SHADOW);
-    //libgame_unloadtexture(g, TX_HERO_SOUL_DIE);
-    //libgame_unloadtexture(g, TX_HERO_SOUL_DIE_SHADOW);
-    //libgame_unloadtexture(g, TX_TILE_STONE_WALL_00);
-    //libgame_unloadtexture(g, TXSWORD);
-    //libgame_unloadtexture(g, TXORCIDLE);
-    //libgame_unloadtexture(g, TXORCIDLESHADOW);
-    //libgame_unloadtexture(g, TXORCWALK);
-    //libgame_unloadtexture(g, TXORCWALKSHADOW);
-    //libgame_unloadtexture(g, TXORCATTACK);
-    //libgame_unloadtexture(g, TXORCATTACKSHADOW);
-    //libgame_unloadtexture(g, TXORCCHARGEDATTACK);
-    //libgame_unloadtexture(g, TXORCCHARGEDATTACKSHADOW);
-    //libgame_unloadtexture(g, TXORCJUMP);
-    //libgame_unloadtexture(g, TXORCJUMPSHADOW);
-    //libgame_unloadtexture(g, TXORCDIE);
-    //libgame_unloadtexture(g, TXORCDIESHADOW);
+    for (int i = TX_DIRT_00; i <= TX_HERO_SOUL_DIE_SHADOW; i++) {
+        libgame_unloadtexture(g, i);
+    }
 }
 
 
@@ -1853,31 +1772,26 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
 #define NUM_HERO_KEYS 12
 
     minfo("Preparing to enum hero keys...");
-    int keys[NUM_HERO_KEYS] = {TX_HERO_IDLE,
-                               TX_HERO_IDLE_SHADOW,
-                               TX_HERO_WALK,
-                               TX_HERO_WALK_SHADOW,
-                               TX_HERO_ATTACK,
-                               TX_HERO_ATTACK_SHADOW,
-                               TX_HERO_JUMP,
-                               TX_HERO_JUMP_SHADOW,
-                               TX_HERO_SPIN_DIE,
-                               TX_HERO_SPIN_DIE_SHADOW,
-                               TX_HERO_SOUL_DIE,
-                               TX_HERO_SOUL_DIE_SHADOW};
+    const int keys[NUM_HERO_KEYS] = {TX_HERO_IDLE,
+                                     TX_HERO_IDLE_SHADOW,
+                                     TX_HERO_WALK,
+                                     TX_HERO_WALK_SHADOW,
+                                     TX_HERO_ATTACK,
+                                     TX_HERO_ATTACK_SHADOW,
+                                     TX_HERO_JUMP,
+                                     TX_HERO_JUMP_SHADOW,
+                                     TX_HERO_SPIN_DIE,
+                                     TX_HERO_SPIN_DIE_SHADOW,
+                                     TX_HERO_SOUL_DIE,
+                                     TX_HERO_SOUL_DIE_SHADOW};
     minfo("looping thru sprite keys...");
     for (int i = 0; i < NUM_HERO_KEYS; i++) {
-        int txkey = keys[i];
-
+        const int txkey = keys[i];
         const int ctxs = g->txinfo[txkey].contexts;
         const int frames = g->txinfo[txkey].num_frames;
-
         //char buf[128];
         //snprintf(buf, 128, "i: %d, txkey: %d, ctxs: %d, frames: %d", i, txkey, ctxs, frames);
         //minfo(buf);
-
-
-
         sprite* s = sprite_create(&g->txinfo[txkey].texture, ctxs, frames);
         if (!s) {
             merror("could not create sprite");
@@ -1890,21 +1804,18 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
     // dungeon position
     const float w = spritegroup_get(hero_group, 0)->width;
     const float h = spritegroup_get(hero_group, 0)->height;
-    const float offset_x = -12; // this is hard-coded
-    const float offset_y = -12; // this is hard-coded
+    const float offset_x = -12; // this is hard-coded for now...
+    const float offset_y = -12; // this is hard-coded for now...
     const float x = hx * DEFAULT_TILE_SIZE;
     const float y = hy * DEFAULT_TILE_SIZE;
-    Rectangle dest = {x + offset_x, y + offset_y, w, h};
     hero_group->current = 0;
-    hero_group->dest = dest;
+    hero_group->dest = (Rectangle){x + offset_x, y + offset_y, w, h};
     hero_group->off_x = offset_x;
     hero_group->off_y = offset_y;
     // add the spritegroup to the hashtable
     minfo("inserting hero spritegroup into table...");
     //hashtable_entityid_spritegroup_insert(g->spritegroups, g->hero_id, hero_group);
-
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, hero_group);
-
     msuccess("libgame_create_herospritegroup end");
 }
 
@@ -2024,7 +1935,6 @@ void libgame_loadtargettexture(gamestate* g) {
         //targetheight = libgame_lua_get_int(L, "TargetHeight");
         targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth");
         targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
-
         target = LoadRenderTexture(targetwidth, targetheight);
         target_src = (Rectangle){0, 0, targetwidth, -targetheight};
         target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
@@ -2032,6 +1942,7 @@ void libgame_loadtargettexture(gamestate* g) {
         // update the gamestate display values
         g->display.targetwidth = targetwidth;
         g->display.targetheight = targetheight;
+        // can get this from init.lua....
         g->cam2d.offset.x = targetwidth / 2.0f;
         g->cam2d.offset.y = targetheight / 4.0f;
     } else {
@@ -2055,50 +1966,49 @@ void libgame_loadfont(gamestate* g) {
 
 
 
-void libgame_init_dungeonfloor_random_tiles(gamestate* g) {
-    minfo("libgame_init_dungeonfloor_random_tiles begin");
-    if (g) {
-        if (g->dungeonfloor) {
-            libgame_init_dungeonfloor_random_tiles_unsafe(g);
-            msuccess("libgame_init_dungeonfloor_random_tiles end");
-        } else {
-            merror("could not initialize dungeonfloor: dungeonfloor is NULL");
-        }
-    } else {
-        merror("could not initialize dungeonfloor: gamestate is NULL");
-    }
-}
+//void libgame_init_dungeonfloor_random_tiles(gamestate* g) {
+//    minfo("libgame_init_dungeonfloor_random_tiles begin");
+//    if (g) {
+//        if (g->dungeonfloor) {
+//            libgame_init_dungeonfloor_random_tiles_unsafe(g);
+//            msuccess("libgame_init_dungeonfloor_random_tiles end");
+//        } else {
+//            merror("could not initialize dungeonfloor: dungeonfloor is NULL");
+//        }
+//    } else {
+//        merror("could not initialize dungeonfloor: gamestate is NULL");
+//    }
+//}
 
 
 
 
-void libgame_init_dungeonfloor_random_tiles_unsafe(gamestate* g) {
-    //tiletype_t start_type = TILETYPE_DIRT_00;
-    tiletype_t start_type = TILETYPE_STONE_00;
-    const tiletype_t end_type = TILETYPE_STONE_13;
-    for (int i = 0; i < g->dungeonfloor->len; i++) {
-        for (int j = 0; j < g->dungeonfloor->wid; j++) {
-            dungeonfloor_set_tiletype_at_unsafe(g->dungeonfloor, GetRandomValue(start_type, end_type), i, j);
-        }
-    }
-}
+//void libgame_init_dungeonfloor_random_tiles_unsafe(gamestate* g) {
+//    const tiletype_t start_type = TILETYPE_STONE_00;
+//    const tiletype_t end_type = TILETYPE_STONE_13;
+//    for (int i = 0; i < g->dungeonfloor->len; i++) {
+//        for (int j = 0; j < g->dungeonfloor->wid; j++) {
+//            dungeonfloor_set_tiletype_at_unsafe(g->dungeonfloor, GetRandomValue(start_type, end_type), i, j);
+//        }
+//    }
+//}
 
 
 
 
-void libgame_init_dungeonfloor(gamestate* g) {
-    minfo("libgame_init_dungeonfloor begin");
-    if (g) {
-        if (g->dungeonfloor) {
-            minfo("setting tiles");
-            libgame_init_dungeonfloor_random_tiles_unsafe(g);
-        } else {
-            merror("could not initialize dungeonfloor: dungeonfloor is NULL");
-        }
-    } else {
-        merror("could not initialize dungeonfloor: gamestate is NULL");
-    }
-}
+//void libgame_init_dungeonfloor(gamestate* g) {
+//    minfo("libgame_init_dungeonfloor begin");
+//    if (g) {
+//        if (g->dungeonfloor) {
+//            minfo("setting tiles");
+//            libgame_init_dungeonfloor_random_tiles_unsafe(g);
+//        } else {
+//            merror("could not initialize dungeonfloor: dungeonfloor is NULL");
+//        }
+//    } else {
+//        merror("could not initialize dungeonfloor: gamestate is NULL");
+//    }
+//}
 
 
 
@@ -2150,16 +2060,15 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
     minfo("libgame_create_hero_lua begin");
     const entityid id = libgame_lua_create_entity(L, name, ENTITY_PLAYER, x, y);
     if (id != -1) {
-        g->hero_id = id;
+        //g->hero_id = id;
         libgame_lua_set_gamestate_int(L, "HeroId", id);
         libgame_create_herospritegroup(g, id);
-
         char buf[128];
         snprintf(buf, 128, "libgame_create_hero_lua: hero entityid %d", id);
         msuccess(buf);
     } else {
         merror("libgame_create_hero_lua: could not create hero entity, expect crashes");
-        g->hero_id = -1;
+        //g->hero_id = -1;
         libgame_lua_set_gamestate_int(L, "HeroId", -1);
     }
 }
@@ -2253,13 +2162,11 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_load_textures(g);
         libgame_init_datastructures(g);
         //minfo("creating hero");
-
         //libgame_create_hero_lua(g, "hero", 1, 0);
-        if (g->hero_id == -1) {
-            libgame_create_hero_lua(g, "hero", 1, 1);
-        }
+        //if (g->hero_id == -1) {
+        libgame_create_hero_lua(g, "hero", 1, 1);
+        //}
         //msuccess("hero created");
-
         //minfo("creating sword...");
         //libgame_create_sword(g, "sword", 2, 0);
         //msuccess("sword created");
@@ -2306,22 +2213,20 @@ void libgame_initwithstate(gamestate* state) {
 
 
 
-void libgame_init_with_state_and_lua(gamestate* state, lua_State* L2) {
-    if (state == NULL) {
-        merror("libgame_initwithstate: state is NULL");
-        return;
-    }
-    if (L == NULL) {
-        merror("libgame_initwithstate: lua state is NULL");
-        return;
-    }
-
-    g = state;
-    L = L2;
-
-    libgame_initsharedsetup(g);
-    msuccess("libgame_initwithstate end");
-}
+//void libgame_init_with_state_and_lua(gamestate* state, lua_State* L2) {
+//    if (state == NULL) {
+//        merror("libgame_initwithstate: state is NULL");
+//        return;
+//    }
+//    if (L == NULL) {
+//        merror("libgame_initwithstate: lua state is NULL");
+//        return;
+//    }
+//    g = state;
+//    L = L2;
+//    libgame_initsharedsetup(g);
+//    msuccess("libgame_initwithstate end");
+//}
 
 
 

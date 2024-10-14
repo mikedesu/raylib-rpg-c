@@ -49,8 +49,8 @@ typedef struct gamestate {
     hashtable_entityid_entity_t* entities;
     hashtable_entityid_spritegroup_t* spritegroups;
 
-    entityid hero_id;
-    entityid torch_id;
+    //entityid hero_id;
+    //entityid torch_id;
 
     textureinfo txinfo[100];
 
@@ -68,10 +68,7 @@ typedef struct gamestate {
 
 
 //gamestate* gamestateinitptr();
-gamestate* gamestateinitptr(const int windowwidth,
-                            const int windowheight,
-                            const int targetwidth,
-                            const int targetheight);
+gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const int targetwidth, const int targetheight);
 void gamestatefree(gamestate* g);
 //void gamestateinitdebugpanel(gamestate* g);
 //void gamestateinitcompanyscene(gamestate* g);
