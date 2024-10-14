@@ -5,6 +5,9 @@
 #include "entitytype.h"
 #include "gamestate.h"
 #include "mylua.h"
+// Asset packing
+#include "img_data.h"
+#include "img_data_pack.h"
 #include <raylib.h>
 
 bool libgame_windowshouldclose();
@@ -68,9 +71,9 @@ void libgame_handle_npc_turn_lua(gamestate* g, entityid id);
 void libgame_handle_npcs_turn_lua(gamestate* g);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
-void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path);
+//void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path);
 void libgame_load_textures(gamestate* g);
-void libgame_load_textures_from_file(gamestate* g, const char* path);
+//void libgame_load_textures_from_file(gamestate* g, const char* path);
 void libgame_process_turn(gamestate* g);
 void libgame_unloadtexture(gamestate* g, int index);
 void libgame_unloadtextures(gamestate* g);
@@ -82,7 +85,10 @@ void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t 
 void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir);
 void libgame_test_enemy_placement(gamestate* g);
 void libgame_load_textures_from_data(gamestate* g);
-void libgame_load_texture_from_data_test(gamestate* g, int index, int contexts, int frames);
+//void libgame_load_texture_from_data_test(gamestate* g, int index, int contexts, int frames);
+//void libgame_load_texture_from_data(
+//    gamestate* g, unsigned char* d, const int w, const int h, const int format, const int idx, const int ctxs, const int frames);
+void libgame_load_texture_from_datapack(gamestate* g, img_data_pack_t* pack);
 
 const bool libgame_entity_move_lua(gamestate* g, entityid id, int x, int y);
 const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);

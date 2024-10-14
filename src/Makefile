@@ -1,6 +1,7 @@
 CC=gcc
 OBJ=-c
-WFLAGS=-Wall -Werror
+WFLAGS=-Wall 
+#WFLAGS=-Wall -Werror
 SHARED=-shared
 DATA_STRUCTS=vectorentityid.o 
 SCENES=companyscene.o 
@@ -22,7 +23,7 @@ SHELL_FILE=--shell-file /home/darkmage/src/raylib/src/minshell.html
 PRELOAD_FILES=--preload-file ./img --preload-file ./fonts --preload-file ./textures.txt --preload-file ./init.lua 
 WEB_OPTIONS=-DPLATFORM_WEB -DWEB
 
-all: game 
+all: game export_to_code
 
 
 index.html: main.c $(MAIN_SOURCES)  

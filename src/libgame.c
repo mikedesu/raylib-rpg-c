@@ -31,9 +31,6 @@
 // Lua support
 #include "libgame_lua.h"
 
-// Asset packing
-#include "img_data.h"
-
 //------------------------------------------------------------------
 // libgame global variables
 //------------------------------------------------------------------
@@ -1501,26 +1498,52 @@ void libgame_drawcompanyscene(gamestate* g) {
 
 
 
-void libgame_load_texture_from_data_test(gamestate* g, int index, int contexts, int frames) {
-    if (g) {
+//void libgame_load_texture_from_data_test(gamestate* g,
+//                                         unsigned char* data,
+//                                         const int width,
+//                                         const int height,
+//                                         const int format,
+//                                         const int index,
+//                                         const int contexts,
+//                                         const int frames) {
+//    if (g) {
+//        unsigned char* data = TILE_DIRT_00_DATA;
+//        // have to do dithering BEFORE loading as data
+//        Image img = {
+//            .data = data,
+//            .width = width,
+//            .height = height,
+//            .format = format,
+//            .mipmaps = 1,
+//        };
+//        Texture2D t = LoadTextureFromImage(img);
+//        g->txinfo[index].texture = t;
+//        g->txinfo[index].num_frames = frames;
+//        g->txinfo[index].contexts = contexts;
+//        msuccess("libgame_load_texture_from_data_test");
+//    } else {
+//        merror("libgame_loadtexture: gamestate is NULL");
+//    }
+//}
 
+
+
+
+void libgame_load_texture_from_datapack(gamestate* g, img_data_pack_t* pack) {
+    if (g) {
+        // have to do dithering BEFORE loading as data
         Image img = {
-            .data = TILE_DIRT_00_DATA,
-            .width = TILE_DIRT_00_WIDTH,
-            .height = TILE_DIRT_00_HEIGHT,
-            .format = TILE_DIRT_00_FORMAT,
+            .data = pack->data,
+            .width = pack->width,
+            .height = pack->height,
+            .format = pack->format,
             .mipmaps = 1,
         };
-
-        // have to do dithering BEFORE loading as data
-        //if (dodither) {
-        //    ImageDither(&img, 4, 4, 4, 4);
-        //}
         Texture2D t = LoadTextureFromImage(img);
-        g->txinfo[index].texture = t;
-        g->txinfo[index].num_frames = frames;
-        g->txinfo[index].contexts = contexts;
-        msuccess("libgame_load_texture_from_data_test");
+        g->txinfo[pack->index].texture = t;
+        g->txinfo[pack->index].num_frames = pack->frames;
+        g->txinfo[pack->index].contexts = pack->contexts;
+        msuccess("libgame_load_texture_from_data");
     } else {
         merror("libgame_loadtexture: gamestate is NULL");
     }
@@ -1555,8 +1578,6 @@ void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool
 
 void libgame_load_textures(gamestate* g) {
     if (g) {
-        //libgame_loadtexturesfromfile(g, "textures.txt");
-
         libgame_load_textures_from_data(g);
 
         msuccess("libgame_loadtextures");
@@ -1570,46 +1591,13 @@ void libgame_load_textures(gamestate* g) {
 
 void libgame_load_textures_from_data(gamestate* g) {
     if (g) {
-        libgame_load_texture_from_data_test(g, TX_DIRT_00, 1, 1);
-        //libgame_load_texture_from_data_test(g, TILETYPE_DIRT_00, 1, 1, false);
-
-
+        //img_data_pack_t pack0 = {TILE_DIRT_00_WIDTH, TILE_DIRT_00_HEIGHT, TILE_DIRT_00_FORMAT, TX_DIRT_00, 1, 1, TILE_DIRT_00_DATA};
+        img_data_pack_t packs[2] = {{TILE_DIRT_00_WIDTH, TILE_DIRT_00_HEIGHT, TILE_DIRT_00_FORMAT, TX_DIRT_00, 1, 1, TILE_DIRT_00_DATA},
+                                    {0}};
+        libgame_load_texture_from_datapack(g, &packs[0]);
         msuccess("libgame_loadtextures_from_data");
     } else {
         merror("libgame_loadtextures_from_data: gamestate is NULL");
-    }
-}
-
-
-
-
-void libgame_loadtexturesfromfile(gamestate* g, const char* path) {
-    if (g) {
-        FILE* f = fopen(path, "r");
-        if (!f) {
-            //mprint("could not open file");
-            return;
-        }
-        int index = 0;
-        int contexts = 0;
-        int frames = 0;
-        int dodither = 0;
-        char line[256];
-        char txpath[256];
-        while (fgets(line, 256, f)) {
-            // if the line begins with a #, skip it
-            if (line[0] == '#') {
-                continue;
-            }
-            sscanf(line, "%d %d %d %d %s", &index, &contexts, &frames, &dodither, txpath);
-            libgame_loadtexture(g, index, contexts, frames, dodither, txpath);
-            bzero(line, 256);
-            bzero(txpath, 256);
-        }
-        fclose(f);
-        msuccess("libgame_loadtexturesfromfile");
-    } else {
-        merror("libgame_loadtexturesfromfile: gamestate is NULL");
     }
 }
 
