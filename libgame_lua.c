@@ -286,19 +286,19 @@ const int libgame_lua_get_nth_entity_at(lua_State* L, const int n, const int x, 
 
 
 
-const bool libgame_lua_tile_is_occupied_by_player(lua_State* L, const int x, const int y) {
-    bool retval = false;
-    if (L) {
-        lua_getglobal(L, "TileIsOccupiedByPlayer");
-        lua_pushnumber(L, x);
-        lua_pushnumber(L, y);
-        if (lua_pcall(L, 2, 1, 0) == 0) {
-            retval = lua_toboolean(L, -1);
-        }
-        lua_pop(L, 1);
-    }
-    return retval;
-}
+//const bool libgame_lua_tile_is_occupied_by_player(lua_State* L, const int x, const int y) {
+//    bool retval = false;
+//    if (L) {
+//        lua_getglobal(L, "TileIsOccupiedByPlayer");
+//        lua_pushnumber(L, x);
+//        lua_pushnumber(L, y);
+//        if (lua_pcall(L, 2, 1, 0) == 0) {
+//            retval = lua_toboolean(L, -1);
+//        }
+//        lua_pop(L, 1);
+//    }
+//    return retval;
+//}
 
 
 
@@ -528,13 +528,13 @@ void libgame_lua_serialize_entities_and_print(lua_State* L) {
 
 
 
-void libgame_lua_reserialization_test(lua_State* L) {
-    minfo("libgame_lua_reserialization_test");
-    if (L) {
-        lua_getglobal(L, "ReserializationTest");
-        lua_pcall(L, 0, 0, 0);
-    }
-}
+//void libgame_lua_reserialization_test(lua_State* L) {
+//    minfo("libgame_lua_reserialization_test");
+//    if (L) {
+//        lua_getglobal(L, "ReserializationTest");
+//        lua_pcall(L, 0, 0, 0);
+//    }
+//}
 
 
 
