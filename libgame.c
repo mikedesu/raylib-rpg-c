@@ -180,28 +180,28 @@ void libgame_entity_anim_set(gamestate* g, entityid id, int index) {
 
 
 
-//void libgame_test_enemy_placement(gamestate* g) {
-//    minfo("test_enemy_placement begin");
-//    const entityid hero_id = g->hero_id;
-//    if (hero_id != -1) {
-//        const int x = libgame_lua_get_entity_int(L, g->hero_id, "x") + 1;
-//        const int y = libgame_lua_get_entity_int(L, g->hero_id, "y");
-//        if (!libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
-//            entityid id = libgame_create_orc_lua(g, "orc", x, y);
-//            if (id == -1) {
-//                merror("test_enemy_placement: failed to create orc");
-//            } else {
-//                char buf[128];
-//                snprintf(buf, 128, "test_enemy_placement: orc created, id: %d", id);
-//                msuccess(buf);
-//            }
-//        } else {
-//            merror("test_enemy_placement: tile is occupied by npc");
-//        }
-//    } else {
-//        merror("test_enemy_placement: hero_id is -1");
-//    }
-//}
+void libgame_test_enemy_placement(gamestate* g) {
+    minfo("test_enemy_placement begin");
+    const entityid hero_id = g->hero_id;
+    if (hero_id != -1) {
+        const int x = libgame_lua_get_entity_int(L, g->hero_id, "x") + 1;
+        const int y = libgame_lua_get_entity_int(L, g->hero_id, "y");
+        if (!libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
+            entityid id = libgame_create_orc_lua(g, "orc", x, y);
+            if (id == -1) {
+                merror("test_enemy_placement: failed to create orc");
+            } else {
+                char buf[128];
+                snprintf(buf, 128, "test_enemy_placement: orc created, id: %d", id);
+                msuccess(buf);
+            }
+        } else {
+            merror("test_enemy_placement: tile is occupied by npc");
+        }
+    } else {
+        merror("test_enemy_placement: hero_id is -1");
+    }
+}
 
 
 
@@ -252,10 +252,7 @@ void libgame_handleinput(gamestate* g) {
     //}
 
     if (IsKeyPressed(KEY_E)) {
-        //if (g->hero_id == -1) {
-        //    libgame_create_hero_lua(g, "hero", 1, 1);
-        //}
-        //    libgame_test_enemy_placement(g);
+        libgame_test_enemy_placement(g);
         //    g->player_input_received = true;
     }
 
@@ -545,33 +542,33 @@ void libgame_handle_input_player(gamestate* g) {
         // eventually we will create a mapping for custom controls
         // that way we can centralize handling of the controls
 
-        if (g->player_input_received == false) {
-            if (IsKeyPressed(KEY_KP_6) || IsKeyPressed(KEY_RIGHT)) {
-                libgame_handleplayerinput_key_right(g);
-                g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_KP_4) || IsKeyPressed(KEY_LEFT)) {
-                libgame_handleplayerinput_key_left(g);
-                g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_KP_2) || IsKeyPressed(KEY_DOWN)) {
-                libgame_handleplayerinput_key_down(g);
-                g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_KP_8) || IsKeyPressed(KEY_UP)) {
-                libgame_handleplayerinput_key_up(g);
-                g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_KP_1)) {
-                libgame_handleplayerinput_key_down_left(g);
-                g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_KP_3)) {
-                libgame_handleplayerinput_key_down_right(g);
-                g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_KP_7)) {
-                libgame_handleplayerinput_key_up_left(g);
-                g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_KP_9)) {
-                libgame_handleplayerinput_key_up_right(g);
-                g->player_input_received = true;
-            }
+        //if (g->player_input_received == false) {
+        if (IsKeyPressed(KEY_KP_6) || IsKeyPressed(KEY_RIGHT)) {
+            libgame_handleplayerinput_key_right(g);
+            g->player_input_received = true;
+        } else if (IsKeyPressed(KEY_KP_4) || IsKeyPressed(KEY_LEFT)) {
+            libgame_handleplayerinput_key_left(g);
+            g->player_input_received = true;
+        } else if (IsKeyPressed(KEY_KP_2) || IsKeyPressed(KEY_DOWN)) {
+            libgame_handleplayerinput_key_down(g);
+            g->player_input_received = true;
+        } else if (IsKeyPressed(KEY_KP_8) || IsKeyPressed(KEY_UP)) {
+            libgame_handleplayerinput_key_up(g);
+            g->player_input_received = true;
+        } else if (IsKeyPressed(KEY_KP_1)) {
+            libgame_handleplayerinput_key_down_left(g);
+            g->player_input_received = true;
+        } else if (IsKeyPressed(KEY_KP_3)) {
+            libgame_handleplayerinput_key_down_right(g);
+            g->player_input_received = true;
+        } else if (IsKeyPressed(KEY_KP_7)) {
+            libgame_handleplayerinput_key_up_left(g);
+            g->player_input_received = true;
+        } else if (IsKeyPressed(KEY_KP_9)) {
+            libgame_handleplayerinput_key_up_right(g);
+            g->player_input_received = true;
         }
+        //}
 
         //else if (IsKeyPressed(KEY_COMMA)) {
         //minfo("Comma key pressed");
@@ -1371,7 +1368,7 @@ void libgame_draw_gameplayscene_entities(gamestate* g) {
                 //libgame_draw_items_that_are_not(g, ITEM_TORCH, i, j);
                 //libgame_draw_entities_at(g, ENTITY_NPC, i, j);
                 //libgame_draw_entities_at(g, ENTITY_PLAYER, i, j);
-                //libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
+                libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
                 libgame_draw_entities_at_lua(g, ENTITY_PLAYER, i, j);
             }
         }
@@ -2028,39 +2025,39 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
 
 
 
-//const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y) {
-//    char buf[128];
-//    snprintf(buf, 128, "libgame_create_orc_lua: creating orc entity %s at %d, %d", name, x, y);
-//    minfo(buf);
-//    if (!g) {
-//        merror("libgame_create_orc_lua: gamestate is NULL");
-//        return -1;
-//    }
-//    if (!name) {
-//        merror("libgame_create_orc_lua: name is NULL");
-//        return -1;
-//    }
-//    if (x < 0 || y < 0) {
-//        merror("libgame_create_orc_lua: x or y is less than 0");
-//        return -1;
-//    }
-//    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
-//    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
-//    if (x >= dw || y >= dh) {
-//        merror("libgame_create_orc_lua: x or y is greater than dungeonfloor dimensions");
-//        return -1;
-//    }
-//    const entityid id = libgame_lua_create_entity(L, name, ENTITY_NPC, x, y);
-//    if (id != -1) {
-//        libgame_create_orcspritegroup(g, id);
-//        bzero(buf, 128);
-//        snprintf(buf, 128, "libgame_create_orc_lua: orc entityid %d", id);
-//        msuccess(buf);
-//    } else {
-//        merror("libgame_create_orc_lua: could not create orc entity");
-//    }
-//    return id;
-//}
+const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y) {
+    char buf[128];
+    snprintf(buf, 128, "libgame_create_orc_lua: creating orc entity %s at %d, %d", name, x, y);
+    minfo(buf);
+    if (!g) {
+        merror("libgame_create_orc_lua: gamestate is NULL");
+        return -1;
+    }
+    if (!name) {
+        merror("libgame_create_orc_lua: name is NULL");
+        return -1;
+    }
+    if (x < 0 || y < 0) {
+        merror("libgame_create_orc_lua: x or y is less than 0");
+        return -1;
+    }
+    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
+    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
+    if (x >= dw || y >= dh) {
+        merror("libgame_create_orc_lua: x or y is greater than dungeonfloor dimensions");
+        return -1;
+    }
+    const entityid id = libgame_lua_create_entity(L, name, ENTITY_NPC, x, y);
+    if (id != -1) {
+        libgame_create_orcspritegroup(g, id);
+        bzero(buf, 128);
+        snprintf(buf, 128, "libgame_create_orc_lua: orc entityid %d", id);
+        msuccess(buf);
+    } else {
+        merror("libgame_create_orc_lua: could not create orc entity");
+    }
+    return id;
+}
 
 
 

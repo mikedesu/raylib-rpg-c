@@ -86,9 +86,9 @@ const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, itemtype_t type);
 const bool libgame_external_check_reload();
 
-//const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
+const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
 //const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int x, const int y);
-//void libgame_test_enemy_placement(gamestate* g);
+void libgame_test_enemy_placement(gamestate* g);
 //const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const int x, const int y);
 //lua_State* libgame_getlua();
 //const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y);

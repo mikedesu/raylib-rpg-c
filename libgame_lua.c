@@ -376,6 +376,10 @@ void libgame_lua_randomize_all_dungeon_tiles(lua_State* L) {
 
 void libgame_lua_randomize_dungeon_tiles(lua_State* L, const int x, const int y, const int w, const int h) {
     if (L) {
+        char buf[128];
+        snprintf(buf, 128, "RandomizeDungeonTiles(%d, %d, %d, %d)", x, y, w, h);
+        minfo(buf);
+
         lua_getglobal(L, "RandomizeDungeonTiles");
         lua_pushnumber(L, x);
         lua_pushnumber(L, y);
