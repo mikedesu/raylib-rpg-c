@@ -50,8 +50,8 @@ Rectangle target_dest = (Rectangle){0, 0, 0, 0};
 Vector2 target_origin = (Vector2){0, 0};
 
 
-int activescene = GAMEPLAYSCENE;
-//int activescene = COMPANYSCENE;
+//int activescene = GAMEPLAYSCENE;
+int activescene = COMPANYSCENE;
 int targetwidth = -1;
 int targetheight = -1;
 //int targetwidth = DEFAULT_TARGET_WIDTH;
@@ -242,12 +242,12 @@ void libgame_test_enemy_placement(gamestate* g) {
 
 void libgame_handleinput(gamestate* g) {
     //minfo("handleinput: starting...");
-    //if (IsKeyPressed(KEY_SPACE)) {
-    //    minfo("key space pressed");
-    //    if (g->fadestate == FADESTATENONE) {
-    //        g->fadestate = FADESTATEOUT;
-    //    }
-    //}
+    if (IsKeyPressed(KEY_SPACE) || GetTouchPointCount() > 0) {
+        //    minfo("key space pressed");
+        if (g->fadestate == FADESTATENONE) {
+            g->fadestate = FADESTATEOUT;
+        }
+    }
 
     //if (IsKeyPressed(KEY_A)) {
     // technically we dont want to be able to attack until we have picked up a weapon...
