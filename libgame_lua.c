@@ -38,7 +38,6 @@ const int libgame_lua_create_entity(lua_State* L, const char* name, const int ty
     char buf[128];
     snprintf(buf, 128, "CreateEntity(%s, %d, %d, %d)", name, type, x, y);
     minfo(buf);
-
     int retval = -1;
     if (L) {
         lua_getglobal(L, "CreateEntity");
@@ -152,11 +151,9 @@ const int libgame_lua_get_entity_int(lua_State* L, const int id, const char* key
                 retval = lua_tonumber(L, -1);
             } else {
                 //merror("libgame_lua_get_entity_int: value is not a number");
-
                 //char buf[128];
                 //snprintf(buf, 128, "GetEntityAttr(%d, %s)", id, key);
                 //merror(buf);
-
                 retval = -1;
             }
         }
@@ -318,6 +315,7 @@ const bool libgame_lua_tile_is_occupied_by_npc(lua_State* L, const int x, const 
 
 
 
+
 const int libgame_lua_get_dungeonfloor_row_count(lua_State* L) {
     int retval = -1;
     if (L) {
@@ -375,6 +373,7 @@ void libgame_lua_randomize_all_dungeon_tiles(lua_State* L) {
 
 
 
+
 void libgame_lua_randomize_dungeon_tiles(lua_State* L, const int x, const int y, const int w, const int h) {
     if (L) {
         lua_getglobal(L, "RandomizeDungeonTiles");
@@ -404,7 +403,6 @@ const bool libgame_lua_create_action(lua_State* L, const int entity_id, const in
         char buf[256];
         snprintf(buf, 256, "CreateAction(%d, %d, %d, %d)", entity_id, type, x, y);
         minfo(buf);
-
         lua_getglobal(L, "CreateAction");
         lua_pushnumber(L, entity_id);
         lua_pushnumber(L, type);
@@ -418,12 +416,18 @@ const bool libgame_lua_create_action(lua_State* L, const int entity_id, const in
     return retval;
 }
 
+
+
+
 //void libgame_lua_process_actions(lua_State* L) {
 //    if (L) {
 //        lua_getglobal(L, "ProcessActions");
 //        lua_pcall(L, 0, 0, 0);
 //    }
 //}
+
+
+
 
 const int libgame_lua_get_action_count(lua_State* L) {
     int retval = -1;
@@ -436,6 +440,7 @@ const int libgame_lua_get_action_count(lua_State* L) {
     }
     return retval;
 }
+
 
 
 
@@ -462,6 +467,9 @@ void libgame_lua_clear_actions(lua_State* L) {
     }
 }
 
+
+
+
 const int libgame_lua_get_num_entities(lua_State* L) {
     int retval = -1;
     if (L) {
@@ -476,12 +484,11 @@ const int libgame_lua_get_num_entities(lua_State* L) {
 
 
 
-const int libgame_lua_get_nth_entity(lua_State* L, const int n) {
 
+const int libgame_lua_get_nth_entity(lua_State* L, const int n) {
     //char buf[128];
     //snprintf(buf, 128, "GetNthEntity(%d)", n);
     //minfo(buf);
-
     int retval = -1;
     if (L) {
         lua_getglobal(L, "GetNthEntity");
@@ -491,10 +498,8 @@ const int libgame_lua_get_nth_entity(lua_State* L, const int n) {
         }
         lua_pop(L, 1);
     }
-
     //snprintf(buf, 128, "GetNthEntity(%d) = %d", n, retval);
     //msuccess(buf);
-
     return retval;
 }
 

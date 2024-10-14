@@ -252,26 +252,19 @@ void libgame_handleinput(gamestate* g) {
     //}
 
     if (IsKeyPressed(KEY_E)) {
-
-        if (g->hero_id == -1) {
-            libgame_create_hero_lua(g, "hero", 1, 1);
-        }
-
-
-
-
+        //if (g->hero_id == -1) {
+        //    libgame_create_hero_lua(g, "hero", 1, 1);
+        //}
         //    libgame_test_enemy_placement(g);
         //    g->player_input_received = true;
     }
 
 
-    if (IsKeyPressed(KEY_P)) {
-
-
-        char buf[128];
-        snprintf(buf, 128, "hero_id: %d", g->hero_id);
-        msuccess(buf);
-    }
+    //if (IsKeyPressed(KEY_P)) {
+    //    char buf[128];
+    //    snprintf(buf, 128, "hero_id: %d", g->hero_id);
+    //    msuccess(buf);
+    //}
 
 
     // lets place a torch where the player is standing
@@ -2123,7 +2116,9 @@ void libgame_initsharedsetup(gamestate* g) {
         //minfo("creating hero");
 
         //libgame_create_hero_lua(g, "hero", 1, 0);
-
+        //if (g->hero_id == -1) {
+        libgame_create_hero_lua(g, "hero", 1, 1);
+        //}
         //msuccess("hero created");
 
         //minfo("creating sword...");
