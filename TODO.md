@@ -1,12 +1,17 @@
 # TODO
 
+- [ ] asset packing
+	- [ ] compression / decompression
+	- [ ] encryption 
+	- [ ] distribution
+
 - [ ] Lua integration
-	- [ ] test changing tiles using lua 
-		- [ ] during dungeon init
-		- [ ] after dungeon init via keypress (random tile random type)
+	- [x] test changing tiles using lua 
+		- [x] during dungeon init
+		- [x] after dungeon init via keypress (random tile random type)
 	- [ ] dungeon random tile init
-	- [ ] take npc turn 
-	- [ ] take all npc turns after pc turn
+	- [x] take npc turn 
+	- [x] take all npc turns after pc turn
 	- [ ] spritegroup management
 	- [ ] torch placement
 	- [ ] sword
@@ -15,7 +20,7 @@
 	- [ ] further gamestate management
 		- [ ] camera
 		- [ ] debug panel
-		- [ ] display
+		- [x] display
 
 - [ ] handle creatures and objects that occupy multiple tiles (bigger than 8x8)
 	- [ ] example: rhino is 22x10, which can occupy 3 tiles with 2 pixels of overlap on top
@@ -30,6 +35,7 @@
 - [ ] inventory menu
 - [ ] game menu
 - [ ] saving / loading
+	- [ ] lua serialization / deserialization of tables
 - [ ] blocking animation
 - [ ] blocking mechanics
 - [ ] raylib-based music
