@@ -386,7 +386,9 @@ void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir) {
             break;
         }
         spritegroup_setcontexts(group, ctx);
-        group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
+        spritegroup_set_current(group, SPRITEGROUP_ANIM_HUMAN_WALK);
+        //group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
+        //libgame_entity_anim_set(g, id, SPRITEGROUP_ANIM_HUMAN_WALK);
     }
 }
 
@@ -396,7 +398,6 @@ void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir) {
 void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y) {
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (sg) {
-        //sg->move = (Vector2){x, y};
         sg->move_x += x;
         sg->move_y += y;
     }
@@ -407,78 +408,123 @@ void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y) {
 
 void libgame_handleplayerinput_move(gamestate* g, int xdir, int ydir) {
     //bool result = libgame_entity_move_lua(g, g->hero_id, xdir, ydir);
-
     //libgame_entity_move_lua(g, g->hero_id, xdir, ydir);
-
-    libgame_lua_create_action(L, g->hero_id, 2, xdir, ydir);
-
-    //if (result) {
-    //    libgame_update_spritegroup_move(g, g->hero_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
-    //}
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (hero_id != -1) {
+        libgame_lua_create_action(L, hero_id, 2, xdir, ydir);
+    } else {
+        merror("handleplayerinput_move: hero_id is -1");
+    }
 }
 
 
 
 
 void libgame_handleplayerinput_key_right(gamestate* g) {
-    libgame_update_spritegroup(g, g->hero_id, DIRECTION_RIGHT);
-    libgame_handleplayerinput_move(g, 1, 0);
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (hero_id != -1) {
+        libgame_update_spritegroup(g, hero_id, DIRECTION_RIGHT);
+        libgame_handleplayerinput_move(g, 1, 0);
+    } else {
+        merror("handleplayerinput_key_right: hero_id is -1");
+    }
 }
 
 
 
 
 void libgame_handleplayerinput_key_left(gamestate* g) {
-    libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
-    libgame_handleplayerinput_move(g, -1, 0);
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (hero_id != -1) {
+        libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
+        libgame_handleplayerinput_move(g, -1, 0);
+    } else {
+        merror("handleplayerinput_key_left: hero_id is -1");
+    }
 }
 
 
 
 
 void libgame_handleplayerinput_key_down(gamestate* g) {
-    libgame_update_spritegroup(g, g->hero_id, DIRECTION_DOWN);
-    libgame_handleplayerinput_move(g, 0, 1);
+
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (hero_id != -1) {
+        libgame_update_spritegroup(g, g->hero_id, DIRECTION_DOWN);
+        libgame_handleplayerinput_move(g, 0, 1);
+    } else {
+        merror("handleplayerinput_key_down: hero_id is -1");
+    }
 }
 
 
 
 
 void libgame_handleplayerinput_key_up(gamestate* g) {
-    libgame_update_spritegroup(g, g->hero_id, DIRECTION_UP);
-    libgame_handleplayerinput_move(g, 0, -1);
+
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (hero_id != -1) {
+        libgame_update_spritegroup(g, g->hero_id, DIRECTION_UP);
+        libgame_handleplayerinput_move(g, 0, -1);
+    } else {
+        merror("handleplayerinput_key_up: hero_id is -1");
+    }
 }
 
 
 
 
 void libgame_handleplayerinput_key_down_left(gamestate* g) {
-    libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
-    libgame_handleplayerinput_move(g, -1, 1);
+
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (hero_id != -1) {
+        libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
+        libgame_handleplayerinput_move(g, -1, 1);
+    } else {
+        merror("handleplayerinput_key_down_left: hero_id is -1");
+    }
 }
 
 
 
 
 void libgame_handleplayerinput_key_down_right(gamestate* g) {
-    libgame_update_spritegroup(g, g->hero_id, DIRECTION_RIGHT);
-    libgame_handleplayerinput_move(g, 1, 1);
+
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (hero_id != -1) {
+        libgame_update_spritegroup(g, g->hero_id, DIRECTION_RIGHT);
+        libgame_handleplayerinput_move(g, 1, 1);
+    } else {
+        merror("handleplayerinput_key_down_right: hero_id is -1");
+    }
 }
 
 
 
 
 void libgame_handleplayerinput_key_up_left(gamestate* g) {
-    libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
-    libgame_handleplayerinput_move(g, -1, -1);
+
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (hero_id != -1) {
+        libgame_update_spritegroup(g, g->hero_id, DIRECTION_LEFT);
+        libgame_handleplayerinput_move(g, -1, -1);
+    } else {
+        merror("handleplayerinput_key_up_left: hero_id is -1");
+    }
 }
 
 
 
 
 void libgame_handleplayerinput_key_up_right(gamestate* g) {
-    libgame_update_spritegroup(g, g->hero_id, DIRECTION_RIGHT);
-    libgame_handleplayerinput_move(g, 1, -1);
+
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (hero_id != -1) {
+        libgame_update_spritegroup(g, g->hero_id, DIRECTION_RIGHT);
+        libgame_handleplayerinput_move(g, 1, -1);
+    } else {
+        merror("handleplayerinput_key_up_right: hero_id is -1");
+    }
 }
 
 
@@ -763,12 +809,10 @@ bool libgame_windowshouldclose() {
 
 
 void libgame_initwindow(gamestate* g) {
-
     const char* title = libgame_lua_get_gamestate_str(L, "WindowTitle");
     if (!title) {
         title = "Gamestate.WindowTitle not set in init.lua";
     }
-
     windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth");
     windowheight = libgame_lua_get_gamestate_int(L, "WindowHeight");
     InitWindow(windowwidth, windowheight, title);
@@ -779,12 +823,13 @@ void libgame_initwindow(gamestate* g) {
     // for easier config during streaming
     //SetWindowMonitor(0);
     SetWindowMonitor(1);
-    const int x = DEFAULT_WINDOW_POS_X;
-    const int y = DEFAULT_WINDOW_POS_Y;
+    const int x = libgame_lua_get_gamestate_int(L, "WindowPosX");
+    const int y = libgame_lua_get_gamestate_int(L, "WindowPosY");
+    //const int x = DEFAULT_WINDOW_POS_X;
+    //const int y = DEFAULT_WINDOW_POS_Y;
     SetWindowPosition(x, y);
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_Q);
-
     g->display.windowwidth = windowwidth;
     g->display.windowheight = windowheight;
     //minfo("end of libgame_initwindow");

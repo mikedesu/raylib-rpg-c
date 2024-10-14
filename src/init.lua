@@ -13,6 +13,8 @@ WindowTitle = "@evildojo666 presents: Project.RPG"
 DefaultTargetWidth = 1920
 DefaultTargetHeight = 960
 DefaultScale = 1
+DefaultWindowPosX = 0
+DefaultWindowPosY = 0
 
 ----------------------------------------
 -- DO NOT EDIT BELOW THIS LINE
@@ -27,6 +29,8 @@ Gamestate = {
 	WindowTitle = "@evildojo666 presents: Project.RPG",
 	TargetWidth = DefaultTargetWidth,
 	TargetHeight = DefaultTargetHeight,
+	WindowPosX = DefaultWindowPosX,
+	WindowPosY = DefaultWindowPosY,
 	NextEntityId = 1,
 	Actions = {},
 	DungeonFloor = {},
