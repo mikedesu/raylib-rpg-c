@@ -4,6 +4,8 @@
 
 ![projectrpg](https://github.com/user-attachments/assets/2b86ab6b-b9c8-4887-8505-d5c9b669cd61)
 
+*with art assets by Krishna Palacio* [https://www.minifantasy.net](https://www.minifantasy.net)
+
 -----
 
 ## Building 
