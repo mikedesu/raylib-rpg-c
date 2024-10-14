@@ -259,9 +259,27 @@ void libgame_handleinput(gamestate* g) {
     //}
 
     if (IsKeyPressed(KEY_E)) {
-        libgame_test_enemy_placement(g);
-        g->player_input_received = true;
+
+        if (g->hero_id == -1) {
+            libgame_create_hero_lua(g, "hero", 1, 1);
+        }
+
+
+
+
+        //    libgame_test_enemy_placement(g);
+        //    g->player_input_received = true;
     }
+
+
+    if (IsKeyPressed(KEY_P)) {
+
+
+        char buf[128];
+        snprintf(buf, 128, "hero_id: %d", g->hero_id);
+        msuccess(buf);
+    }
+
 
     // lets place a torch where the player is standing
     //if (IsKeyPressed(KEY_T)) {
@@ -757,6 +775,10 @@ bool libgame_windowshouldclose() {
 void libgame_initwindow(gamestate* g) {
 
     const char* title = libgame_lua_get_gamestate_str(L, "WindowTitle");
+    if (!title) {
+        title = "Gamestate.WindowTitle not set in init.lua";
+    }
+
     windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth");
     windowheight = libgame_lua_get_gamestate_int(L, "WindowHeight");
     InitWindow(windowwidth, windowheight, title);
@@ -1280,14 +1302,36 @@ void libgame_draw_items_that_are_not(gamestate* g, const itemtype_t type, const 
 void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const int x, const int y) {
     //minfo("libgame_draw_entities_at_lua");
     int num_entities = libgame_lua_get_num_entities_at(L, x, y);
+
+    //if (num_entities > 0) {
+    //    char buf[128];
+    //    snprintf(buf, 128, "libgame_draw_entities_at_lua: num entities: %d", num_entities);
+    //    minfo(buf);
+    //}
+
     for (int k = 0; k < num_entities; k++) {
         //entityid id = libgame_lua_get_nth_entity_at(L, x, y, k + 1);
         entityid id = libgame_lua_get_nth_entity_at(L, k + 1, x, y);
         entitytype_t type2 = libgame_lua_get_entity_int(L, id, "type");
         if (type == type2) {
-            //printf("type: %d\n", type);
+            printf("type: %d\n", type);
             libgame_draw_entity(g, id);
         }
+        /*
+        else {
+            char buf[128];
+            snprintf(buf,
+                     128,
+                     "libgame_draw_entities_at_lua: type mismatch: k: %d, id: %d, x: %d, y: %d, type: %d, type2: %d",
+                     k,
+                     id,
+                     x,
+                     y,
+                     type,
+                     type2);
+            merror(buf);
+        }
+            */
     }
     //msuccess("libgame_draw_entities_at_lua end");
 }
@@ -1295,18 +1339,18 @@ void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const i
 
 
 
-const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const int x, const int y) {
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
-    if (t) {
-        for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
-            entity_t* entity = hashtable_entityid_entity_get(g->entities, vectorentityid_get(&t->entityids, k));
-            if (entity->type == type) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
+//const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const int x, const int y) {
+//    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
+//    if (t) {
+//        for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
+//            entity_t* entity = hashtable_entityid_entity_get(g->entities, vectorentityid_get(&t->entityids, k));
+//            if (entity->type == type) {
+//                return true;
+//            }
+//        }
+//    }
+//    return false;
+//}
 
 
 
@@ -1331,13 +1375,17 @@ const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int
 void libgame_draw_gameplayscene_entities(gamestate* g) {
     if (g) {
         //minfo("libgame_draw_gameplayscene_entities begin");
-        for (int i = 0; i < g->dungeonfloor->len; i++) {
-            for (int j = 0; j < g->dungeonfloor->wid; j++) {
+
+        const int dw = libgame_lua_get_dungeonfloor_col_count(L);
+        const int dh = libgame_lua_get_dungeonfloor_row_count(L);
+
+        for (int i = 0; i < dh; i++) {
+            for (int j = 0; j < dw; j++) {
                 //libgame_draw_items(g, ITEM_TORCH, i, j);
                 //libgame_draw_items_that_are_not(g, ITEM_TORCH, i, j);
                 //libgame_draw_entities_at(g, ENTITY_NPC, i, j);
                 //libgame_draw_entities_at(g, ENTITY_PLAYER, i, j);
-                libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
+                //libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
                 libgame_draw_entities_at_lua(g, ENTITY_PLAYER, i, j);
             }
         }
@@ -1361,7 +1409,7 @@ void libgame_draw_gameplayscene(gamestate* g) {
             libgame_drawgrid(g);
         }
         // draw torches, items, npcs, player
-        //libgame_draw_gameplayscene_entities(g);
+        libgame_draw_gameplayscene_entities(g);
         // lighting basics
         //const int tilesize = DEFAULT_TILE_SIZE;
         //for (int i = 0; i < g->dungeonfloor->len; i++) {
@@ -1727,7 +1775,10 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
     hero_group->off_y = offset_y;
     // add the spritegroup to the hashtable
     minfo("inserting hero spritegroup into table...");
-    hashtable_entityid_spritegroup_insert(g->spritegroups, g->hero_id, hero_group);
+    //hashtable_entityid_spritegroup_insert(g->spritegroups, g->hero_id, hero_group);
+
+    hashtable_entityid_spritegroup_insert(g->spritegroups, id, hero_group);
+
     msuccess("libgame_create_herospritegroup end");
 }
 
@@ -1975,14 +2026,16 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
     const entityid id = libgame_lua_create_entity(L, name, ENTITY_PLAYER, x, y);
     if (id != -1) {
         g->hero_id = id;
-        libgame_lua_set_int(L, "HeroId", id);
+        libgame_lua_set_gamestate_int(L, "HeroId", id);
         libgame_create_herospritegroup(g, id);
 
         char buf[128];
         snprintf(buf, 128, "libgame_create_hero_lua: hero entityid %d", id);
         msuccess(buf);
     } else {
-        merror("libgame_create_hero_lua: could not create hero entity");
+        merror("libgame_create_hero_lua: could not create hero entity, expect crashes");
+        g->hero_id = -1;
+        libgame_lua_set_gamestate_int(L, "HeroId", -1);
     }
 }
 
@@ -2090,7 +2143,9 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_loadtextures(g);
         libgame_init_datastructures(g);
         //minfo("creating hero");
+
         //libgame_create_hero_lua(g, "hero", 1, 0);
+
         //msuccess("hero created");
 
         //minfo("creating sword...");
@@ -2284,6 +2339,6 @@ gamestate* libgame_getgamestate() {
 
 
 
-bool libgame_external_check_reload() {
+const bool libgame_external_check_reload() {
     return IsKeyPressed(KEY_R);
 }

@@ -53,6 +53,7 @@ void libgame_lua_reserialization_test(lua_State* L);
 
 const char* libgame_lua_get_gamestate_str(lua_State* L, const char* key);
 const int libgame_lua_get_gamestate_int(lua_State* L, const char* key);
+void libgame_lua_set_gamestate_int(lua_State* L, const char* key, const int value);
 
 //void libgame_lua_process_actions(lua_State* L);
 

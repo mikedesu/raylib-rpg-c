@@ -151,11 +151,11 @@ const int libgame_lua_get_entity_int(lua_State* L, const int id, const char* key
             if (lua_isnumber(L, -1)) {
                 retval = lua_tonumber(L, -1);
             } else {
-                merror("libgame_lua_get_entity_int: value is not a number");
+                //merror("libgame_lua_get_entity_int: value is not a number");
 
-                char buf[128];
-                snprintf(buf, 128, "GetEntityAttr(%d, %s)", id, key);
-                merror(buf);
+                //char buf[128];
+                //snprintf(buf, 128, "GetEntityAttr(%d, %s)", id, key);
+                //merror(buf);
 
                 retval = -1;
             }
@@ -533,6 +533,17 @@ void libgame_lua_reserialization_test(lua_State* L) {
     if (L) {
         lua_getglobal(L, "ReserializationTest");
         lua_pcall(L, 0, 0, 0);
+    }
+}
+
+
+
+void libgame_lua_set_gamestate_int(lua_State* L, const char* key, const int value) {
+    if (L) {
+        lua_getglobal(L, "SetGamestateAttr");
+        lua_pushstring(L, key);
+        lua_pushnumber(L, value);
+        lua_pcall(L, 2, 0, 0);
     }
 }
 

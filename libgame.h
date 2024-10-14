@@ -91,17 +91,14 @@ void libgame_update_debugpanelbuffer(gamestate* g);
 void libgame_updategamestate(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
 void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir);
-
-bool libgame_external_check_reload();
-
 const bool libgame_entity_move_lua(gamestate* g, entityid id, int x, int y);
 const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, itemtype_t type);
 const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int x, const int y);
-const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const int x, const int y);
-
+const bool libgame_external_check_reload();
 const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
 
+//const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const int x, const int y);
 //lua_State* libgame_getlua();
 //const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y);
 //void libgame_create_sword_spritegroup(gamestate* g, entityid id, const float off_x, const float off_y);
