@@ -30,9 +30,6 @@
 
 // Lua support
 #include "libgame_lua.h"
-//#include "mylua.h"
-
-
 
 //------------------------------------------------------------------
 // libgame global variables
@@ -57,8 +54,6 @@ int targetheight = -1;
 //int targetheight = DEFAULT_TARGET_HEIGHT;
 int windowwidth = DEFAULT_WINDOW_WIDTH;
 int windowheight = DEFAULT_WINDOW_HEIGHT;
-
-
 
 
 //const bool libgame_entity_try_attack(gamestate* g, entityid id, const int x, const int y) {
@@ -185,30 +180,28 @@ void libgame_entity_anim_set(gamestate* g, entityid id, int index) {
 
 
 
-void libgame_test_enemy_placement(gamestate* g) {
-    minfo("test_enemy_placement begin");
-
-    const entityid hero_id = g->hero_id;
-    if (hero_id != -1) {
-        const int x = libgame_lua_get_entity_int(L, g->hero_id, "x") + 1;
-        const int y = libgame_lua_get_entity_int(L, g->hero_id, "y");
-
-        if (!libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
-            entityid id = libgame_create_orc_lua(g, "orc", x, y);
-            if (id == -1) {
-                merror("test_enemy_placement: failed to create orc");
-            } else {
-                char buf[128];
-                snprintf(buf, 128, "test_enemy_placement: orc created, id: %d", id);
-                msuccess(buf);
-            }
-        } else {
-            merror("test_enemy_placement: tile is occupied by npc");
-        }
-    } else {
-        merror("test_enemy_placement: hero_id is -1");
-    }
-}
+//void libgame_test_enemy_placement(gamestate* g) {
+//    minfo("test_enemy_placement begin");
+//    const entityid hero_id = g->hero_id;
+//    if (hero_id != -1) {
+//        const int x = libgame_lua_get_entity_int(L, g->hero_id, "x") + 1;
+//        const int y = libgame_lua_get_entity_int(L, g->hero_id, "y");
+//        if (!libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
+//            entityid id = libgame_create_orc_lua(g, "orc", x, y);
+//            if (id == -1) {
+//                merror("test_enemy_placement: failed to create orc");
+//            } else {
+//                char buf[128];
+//                snprintf(buf, 128, "test_enemy_placement: orc created, id: %d", id);
+//                msuccess(buf);
+//            }
+//        } else {
+//            merror("test_enemy_placement: tile is occupied by npc");
+//        }
+//    } else {
+//        merror("test_enemy_placement: hero_id is -1");
+//    }
+//}
 
 
 
@@ -1314,7 +1307,7 @@ void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const i
         entityid id = libgame_lua_get_nth_entity_at(L, k + 1, x, y);
         entitytype_t type2 = libgame_lua_get_entity_int(L, id, "type");
         if (type == type2) {
-            printf("type: %d\n", type);
+            //printf("type: %d\n", type);
             libgame_draw_entity(g, id);
         }
         /*
@@ -1355,19 +1348,19 @@ void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const i
 
 
 
-const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int x, const int y) {
-    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
-    if (t) {
-        for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
-            entityid id = vectorentityid_get(&t->entityids, k);
-            entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
-            if (entity->type == ENTITY_ITEM && entity->itemtype == type) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
+//const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int x, const int y) {
+//    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
+//    if (t) {
+//        for (int k = 0; k < vectorentityid_capacity(&t->entityids); k++) {
+//            entityid id = vectorentityid_get(&t->entityids, k);
+//            entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
+//            if (entity->type == ENTITY_ITEM && entity->itemtype == type) {
+//                return true;
+//            }
+//        }
+//    }
+//    return false;
+//}
 
 
 
@@ -2042,54 +2035,39 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
 
 
 
-const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y) {
-    char buf[128];
-    snprintf(buf, 128, "libgame_create_orc_lua: creating orc entity %s at %d, %d", name, x, y);
-    minfo(buf);
-
-    if (!g) {
-        merror("libgame_create_orc_lua: gamestate is NULL");
-        return -1;
-    }
-
-    if (!name) {
-        merror("libgame_create_orc_lua: name is NULL");
-        return -1;
-    }
-
-    if (x < 0 || y < 0) {
-        merror("libgame_create_orc_lua: x or y is less than 0");
-        return -1;
-    }
-
-    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
-    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
-
-    if (x >= dw || y >= dh) {
-        merror("libgame_create_orc_lua: x or y is greater than dungeonfloor dimensions");
-        return -1;
-    }
-
-
-    const entityid id = libgame_lua_create_entity(L, name, ENTITY_NPC, x, y);
-    if (id != -1) {
-        libgame_create_orcspritegroup(g, id);
-
-        bzero(buf, 128);
-        snprintf(buf, 128, "libgame_create_orc_lua: orc entityid %d", id);
-        msuccess(buf);
-
-        //entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
-        //if (orc) {
-        //    minfo("orc entity created");
-        //    libgame_create_orcspritegroup(g, id);
-        //}
-    } else {
-        merror("libgame_create_orc_lua: could not create orc entity");
-    }
-
-    return id;
-}
+//const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y) {
+//    char buf[128];
+//    snprintf(buf, 128, "libgame_create_orc_lua: creating orc entity %s at %d, %d", name, x, y);
+//    minfo(buf);
+//    if (!g) {
+//        merror("libgame_create_orc_lua: gamestate is NULL");
+//        return -1;
+//    }
+//    if (!name) {
+//        merror("libgame_create_orc_lua: name is NULL");
+//        return -1;
+//    }
+//    if (x < 0 || y < 0) {
+//        merror("libgame_create_orc_lua: x or y is less than 0");
+//        return -1;
+//    }
+//    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
+//    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
+//    if (x >= dw || y >= dh) {
+//        merror("libgame_create_orc_lua: x or y is greater than dungeonfloor dimensions");
+//        return -1;
+//    }
+//    const entityid id = libgame_lua_create_entity(L, name, ENTITY_NPC, x, y);
+//    if (id != -1) {
+//        libgame_create_orcspritegroup(g, id);
+//        bzero(buf, 128);
+//        snprintf(buf, 128, "libgame_create_orc_lua: orc entityid %d", id);
+//        msuccess(buf);
+//    } else {
+//        merror("libgame_create_orc_lua: could not create orc entity");
+//    }
+//    return id;
+//}
 
 
 

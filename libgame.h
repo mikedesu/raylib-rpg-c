@@ -12,19 +12,16 @@ bool libgame_windowshouldclose();
 gamestate* libgame_getgamestate();
 
 void libgame_calc_debugpanel_size(gamestate* g);
-
 void libgame_create_herospritegroup(gamestate* g, entityid id);
 void libgame_create_orcspritegroup(gamestate* g, entityid id);
 void libgame_create_shield_spritegroup(gamestate* g, entityid id, const int off_x, const int off_y);
 void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y);
 void libgame_create_shield(gamestate* g, const char* name, const int x, const int y);
-
 void libgame_closeshared(gamestate* g);
 //void libgame_close_shared_minus_lua(gamestate* g);
 void libgame_closesavegamestate();
 void libgame_closewindow();
 void libgame_close(gamestate* g);
-
 void libgame_draw_debugpanel(gamestate* g);
 void libgame_drawcompanyscene(gamestate* g);
 void libgame_drawtitlescene(gamestate* g);
@@ -41,7 +38,6 @@ void libgame_draw_items(gamestate* g, const itemtype_t type, const int x, const 
 void libgame_draw_items_that_are_not(gamestate* g, const itemtype_t type, const int x, const int y);
 void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x, const int y);
 void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const int x, const int y);
-
 void libgame_initwindow(gamestate* g);
 void libgame_initwithstate(gamestate* state);
 void libgame_initsharedsetup(gamestate* g);
@@ -50,10 +46,8 @@ void libgame_init_dungeonfloor(gamestate* g);
 void libgame_init();
 void libgame_init_dungeonfloor_random_tiles_unsafe(gamestate* g);
 void libgame_init_dungeonfloor_random_tiles(gamestate* g);
-
 void libgame_entity_anim_incr(gamestate* g, entityid id);
 void libgame_entity_anim_set(gamestate* g, entityid id, int index);
-
 void libgame_handleinput(gamestate* g);
 void libgame_handle_input_player(gamestate* g);
 void libgame_handle_caminput(gamestate* g);
@@ -72,17 +66,12 @@ void libgame_handleplayerinput_key_down_right(gamestate* g);
 void libgame_handle_grid_switch(gamestate* g);
 void libgame_handle_npc_turn_lua(gamestate* g, entityid id);
 void libgame_handle_npcs_turn_lua(gamestate* g);
-
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
 void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path);
 void libgame_loadtextures(gamestate* g);
 void libgame_loadtexturesfromfile(gamestate* g, const char* path);
-
 void libgame_process_turn(gamestate* g);
-
-void libgame_test_enemy_placement(gamestate* g);
-
 void libgame_unloadtexture(gamestate* g, int index);
 void libgame_unloadtextures(gamestate* g);
 void libgame_update_smoothmove(gamestate* g, entityid id);
@@ -91,13 +80,15 @@ void libgame_update_debugpanelbuffer(gamestate* g);
 void libgame_updategamestate(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
 void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir);
+
 const bool libgame_entity_move_lua(gamestate* g, entityid id, int x, int y);
 const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, itemtype_t type);
-const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int x, const int y);
 const bool libgame_external_check_reload();
-const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
 
+//const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
+//const bool libgame_itemtype_is_at(gamestate* g, const itemtype_t type, const int x, const int y);
+//void libgame_test_enemy_placement(gamestate* g);
 //const bool libgame_entitytype_is_at(gamestate* g, const entitytype_t type, const int x, const int y);
 //lua_State* libgame_getlua();
 //const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y);
