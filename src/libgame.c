@@ -31,6 +31,10 @@
 // Lua support
 #include "libgame_lua.h"
 
+// Data packing
+#include "img_data.h"
+#include "img_data_packs.h"
+
 //------------------------------------------------------------------
 // libgame global variables
 //------------------------------------------------------------------
@@ -251,10 +255,10 @@ void libgame_handleinput(gamestate* g) {
     //g->player_input_received = true;
     //}
 
-    if (IsKeyPressed(KEY_E)) {
-        libgame_test_enemy_placement(g);
-        //    g->player_input_received = true;
-    }
+    //if (IsKeyPressed(KEY_E)) {
+    //    libgame_test_enemy_placement(g);
+    //    g->player_input_received = true;
+    //}
 
 
     //if (IsKeyPressed(KEY_P)) {
@@ -1202,8 +1206,7 @@ void libgame_draw_entity(gamestate* g, entityid id) {
             entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
             if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
                 // draw entity shadow, which should exist at current+1 if loaded correctly
-                DrawTexturePro(
-                    *group->sprites[current + 1]->texture, group->sprites[current + 1]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
+                DrawTexturePro(*group->sprites[current + 1]->texture, group->sprites[current + 1]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
             }
             DrawTexturePro(*group->sprites[current]->texture, group->sprites[current]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
 
@@ -1368,7 +1371,7 @@ void libgame_draw_gameplayscene_entities(gamestate* g) {
                 //libgame_draw_items_that_are_not(g, ITEM_TORCH, i, j);
                 //libgame_draw_entities_at(g, ENTITY_NPC, i, j);
                 //libgame_draw_entities_at(g, ENTITY_PLAYER, i, j);
-                libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
+                //libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
                 libgame_draw_entities_at_lua(g, ENTITY_PLAYER, i, j);
             }
         }
@@ -1591,10 +1594,52 @@ void libgame_load_textures(gamestate* g) {
 
 void libgame_load_textures_from_data(gamestate* g) {
     if (g) {
-        //img_data_pack_t pack0 = {TILE_DIRT_00_WIDTH, TILE_DIRT_00_HEIGHT, TILE_DIRT_00_FORMAT, TX_DIRT_00, 1, 1, TILE_DIRT_00_DATA};
-        img_data_pack_t packs[2] = {{TILE_DIRT_00_WIDTH, TILE_DIRT_00_HEIGHT, TILE_DIRT_00_FORMAT, TX_DIRT_00, 1, 1, TILE_DIRT_00_DATA},
-                                    {0}};
-        libgame_load_texture_from_datapack(g, &packs[0]);
+#define NUM_PACKS 13
+        img_data_pack_t packs[NUM_PACKS] = {
+            //{TILE_DIRT_00_WIDTH, TILE_DIRT_00_HEIGHT, TILE_DIRT_00_FORMAT, TX_DIRT_00, 1, 1, TILE_DIRT_00_DATA},
+            PK_TILE_DIRT_00,
+            PK_HUMAN_IDLE,
+            PK_HUMAN_IDLE_SHADOW,
+            PK_HUMAN_WALK,
+            PK_HUMAN_WALK_SHADOW,
+            PK_HUMAN_ATTACK,
+            PK_HUMAN_ATTACK_SHADOW,
+            PK_HUMAN_JUMP,
+            PK_HUMAN_JUMP_SHADOW,
+            PK_HUMAN_SPINDIE,
+            PK_HUMAN_SPINDIE_SHADOW,
+            PK_HUMAN_SOULDIE,
+            PK_HUMAN_SOULDIE_SHADOW,
+        };
+
+        //{HUMAN_IDLE_WIDTH, HUMAN_IDLE_HEIGHT, HUMAN_IDLE_FORMAT, TX_HERO, 4, 16, HUMAN_IDLE_DATA},
+        //{HUMAN_IDLE_SHADOW_WIDTH, HUMAN_IDLE_SHADOW_HEIGHT, HUMAN_IDLE_SHADOW_FORMAT, TX_HERO_SHADOW, 4, 16, HUMAN_IDLE_SHADOW_DATA},
+
+        //{HUMAN_WALK_WIDTH, HUMAN_WALK_HEIGHT, HUMAN_WALK_FORMAT, TX_HERO_WALK, 4, 4, HUMAN_WALK_DATA},
+        //{HUMAN_WALK_SHADOW_WIDTH, HUMAN_WALK_SHADOW_HEIGHT, HUMAN_WALK_SHADOW_FORMAT, TX_HERO_WALK_SHADOW, 4, 4, HUMAN_WALK_SHADOW_DATA},
+
+        //{HUMAN_ATTACK_WIDTH, HUMAN_ATTACK_HEIGHT, HUMAN_ATTACK_FORMAT, TX_HERO_ATTACK, 4, 4, HUMAN_ATTACK_DATA},
+        //{HUMAN_ATTACK_SHADOW_WIDTH, HUMAN_ATTACK_SHADOW_HEIGHT, HUMAN_ATTACK_SHADOW_FORMAT, TX_HERO_ATTACK_SHADOW, 4, 4, HUMAN_ATTACK_SHADOW_DATA},
+
+
+        //{HUMAN_JUMP_WIDTH, HUMAN_JUMP_HEIGHT, HUMAN_JUMP_FORMAT, TX_HERO_JUMP, 4, 4, HUMAN_JUMP_DATA},
+        //{HUMAN_JUMP_SHADOW_WIDTH, HUMAN_JUMP_SHADOW_HEIGHT, HUMAN_JUMP_SHADOW_FORMAT, TX_HERO_JUMP_SHADOW, 4, 4, HUMAN_JUMP_SHADOW_DATA},
+
+        //{HUMAN_SPINDIE_WIDTH, HUMAN_SPINDIE_HEIGHT, HUMAN_SPINDIE_FORMAT, TX_HERO_SPIN_DIE, 1, 12, HUMAN_SPINDIE_DATA},
+        //{HUMAN_SPINDIE_SHADOW_WIDTH, HUMAN_SPINDIE_SHADOW_HEIGHT, HUMAN_SPINDIE_SHADOW_FORMAT, TX_HERO_SPIN_DIE_SHADOW, 1, 12, HUMAN_SPINDIE_SHADOW_DATA},
+
+        //{HUMAN_SOULDIE_WIDTH, HUMAN_SOULDIE_HEIGHT, HUMAN_SOULDIE_FORMAT, TX_HERO_SOUL_DIE, 1, 12, HUMAN_SOULDIE_DATA},
+        //{HUMAN_SOULDIE_SHADOW_WIDTH, HUMAN_SOULDIE_SHADOW_HEIGHT, HUMAN_SOULDIE_SHADOW_FORMAT, TX_HERO_SOUL_DIE_SHADOW, 1, 12, HUMAN_SOULDIE_SHADOW_DATA},
+
+        //};
+        //libgame_load_texture_from_datapack(g, &packs[0]);
+        //libgame_load_texture_from_datapack(g, &packs[1]);
+        //libgame_load_texture_from_datapack(g, &packs[2]);
+
+        for (int i = 0; i < NUM_PACKS; i++) {
+            libgame_load_texture_from_datapack(g, &packs[i]);
+        }
+
         msuccess("libgame_loadtextures_from_data");
     } else {
         merror("libgame_loadtextures_from_data: gamestate is NULL");
@@ -1750,29 +1795,43 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
     const int hy = libgame_lua_get_entity_int(L, id, "y");
     const int dw = libgame_lua_get_dungeonfloor_col_count(L);
     const int dh = libgame_lua_get_dungeonfloor_row_count(L);
+    msuccess("got x and y");
     if (hx < 0 || hx > dw || hy < 0 || hy > dh) {
         char buf[128];
         snprintf(buf, 128, "Could not create spritegroup, x: %d, y: %d, dw: %d, dh: %d", hx, hy, dw, dh);
         merror(buf);
         return;
     }
-    int keys[12] = {TX_HERO,
-                    TX_HERO_SHADOW,
-                    TX_HERO_WALK,
-                    TX_HERO_WALK_SHADOW,
-                    TX_HERO_ATTACK,
-                    TX_HERO_ATTACK_SHADOW,
-                    TX_HERO_JUMP,
-                    TX_HERO_JUMP_SHADOW,
-                    TX_HERO_SPIN_DIE,
-                    TX_HERO_SPIN_DIE_SHADOW,
-                    TX_HERO_SOUL_DIE,
-                    TX_HERO_SOUL_DIE_SHADOW};
-    //minfo("looping thru sprite keys...");
-    for (int i = 0; i < 12; i++) {
-        //printf("i: %d\n", i);
+
+#define NUM_HERO_KEYS 12
+
+    minfo("Preparing to enum hero keys...");
+    int keys[NUM_HERO_KEYS] = {TX_HERO,
+                               TX_HERO_SHADOW,
+                               TX_HERO_WALK,
+                               TX_HERO_WALK_SHADOW,
+                               TX_HERO_ATTACK,
+                               TX_HERO_ATTACK_SHADOW,
+                               TX_HERO_JUMP,
+                               TX_HERO_JUMP_SHADOW,
+                               TX_HERO_SPIN_DIE,
+                               TX_HERO_SPIN_DIE_SHADOW,
+                               TX_HERO_SOUL_DIE,
+                               TX_HERO_SOUL_DIE_SHADOW};
+    minfo("looping thru sprite keys...");
+    for (int i = 0; i < NUM_HERO_KEYS; i++) {
         int txkey = keys[i];
-        sprite* s = sprite_create(&g->txinfo[txkey].texture, g->txinfo[txkey].contexts, g->txinfo[txkey].num_frames);
+
+        const int ctxs = g->txinfo[txkey].contexts;
+        const int frames = g->txinfo[txkey].num_frames;
+
+        char buf[128];
+        snprintf(buf, 128, "i: %d, txkey: %d, ctxs: %d, frames: %d", i, txkey, ctxs, frames);
+        minfo(buf);
+
+
+
+        sprite* s = sprite_create(&g->txinfo[txkey].texture, ctxs, frames);
         if (!s) {
             merror("could not create sprite");
         }
@@ -1805,47 +1864,46 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
 
 
 
-void libgame_create_orcspritegroup(gamestate* g, entityid id) {
-    minfo("libgame_create_orcspritegroup begin");
-    spritegroup_t* orc_group = spritegroup_create(20);
-    //entity_t* orc = hashtable_entityid_entity_get(g->entities, id);
-    const int orc_x = libgame_lua_get_entity_int(L, id, "x");
-    const int orc_y = libgame_lua_get_entity_int(L, id, "y");
-    int keys[14] = {TXORCIDLE,
-                    TXORCIDLESHADOW,
-                    TXORCWALK,
-                    TXORCWALKSHADOW,
-                    TXORCATTACK,
-                    TXORCATTACKSHADOW,
-                    TXORCCHARGEDATTACK,
-                    TXORCCHARGEDATTACKSHADOW,
-                    TXORCJUMP,
-                    TXORCJUMPSHADOW,
-                    TXORCDIE,
-                    TXORCDIESHADOW,
-                    TXORCDMG,
-                    TXORCDMGSHADOW};
-    for (int i = 0; i < 14; i++) {
-        sprite* s = sprite_create(&g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
-        if (!s) {
-            merror("could not create sprite");
-        }
-        spritegroup_add(orc_group, s);
-    }
-    const float w = spritegroup_get(orc_group, 0)->width;
-    const float h = spritegroup_get(orc_group, 0)->height;
-    const float offset_x = -12; // this is hard-coded
-    const float offset_y = -12; // this is hard-coded
-    const float x = orc_x * DEFAULT_TILE_SIZE;
-    const float y = orc_y * DEFAULT_TILE_SIZE;
-    Rectangle dest = {x + offset_x, y + offset_y, w, h};
-    orc_group->current = 0;
-    orc_group->dest = dest;
-    orc_group->off_x = offset_x;
-    orc_group->off_y = offset_y;
-    hashtable_entityid_spritegroup_insert(g->spritegroups, id, orc_group);
-    msuccess("libgame_create_orcspritegroup end");
-}
+//void libgame_create_orcspritegroup(gamestate* g, entityid id) {
+//    minfo("libgame_create_orcspritegroup begin");
+//    spritegroup_t* orc_group = spritegroup_create(20);
+//    const int orc_x = libgame_lua_get_entity_int(L, id, "x");
+//    const int orc_y = libgame_lua_get_entity_int(L, id, "y");
+//    int keys[14] = {TXORCIDLE,
+//                    TXORCIDLESHADOW,
+//                    TXORCWALK,
+//                    TXORCWALKSHADOW,
+//                    TXORCATTACK,
+//                    TXORCATTACKSHADOW,
+//                    TXORCCHARGEDATTACK,
+//                    TXORCCHARGEDATTACKSHADOW,
+//                    TXORCJUMP,
+//                    TXORCJUMPSHADOW,
+//                    TXORCDIE,
+//                    TXORCDIESHADOW,
+//                    TXORCDMG,
+//                    TXORCDMGSHADOW};
+//    for (int i = 0; i < 14; i++) {
+//        sprite* s = sprite_create(&g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames);
+//        if (!s) {
+//            merror("could not create sprite");
+//        }
+//        spritegroup_add(orc_group, s);
+//    }
+//    const float w = spritegroup_get(orc_group, 0)->width;
+//    const float h = spritegroup_get(orc_group, 0)->height;
+//    const float offset_x = -12; // this is hard-coded
+//    const float offset_y = -12; // this is hard-coded
+//    const float x = orc_x * DEFAULT_TILE_SIZE;
+//    const float y = orc_y * DEFAULT_TILE_SIZE;
+//    Rectangle dest = {x + offset_x, y + offset_y, w, h};
+//    orc_group->current = 0;
+//    orc_group->dest = dest;
+//    orc_group->off_x = offset_x;
+//    orc_group->off_y = offset_y;
+//    hashtable_entityid_spritegroup_insert(g->spritegroups, id, orc_group);
+//    msuccess("libgame_create_orcspritegroup end");
+//}
 
 
 
@@ -2150,9 +2208,9 @@ void libgame_initsharedsetup(gamestate* g) {
         //minfo("creating hero");
 
         //libgame_create_hero_lua(g, "hero", 1, 0);
-        //if (g->hero_id == -1) {
-        //libgame_create_hero_lua(g, "hero", 1, 1);
-        //}
+        if (g->hero_id == -1) {
+            libgame_create_hero_lua(g, "hero", 1, 1);
+        }
         //msuccess("hero created");
 
         //minfo("creating sword...");

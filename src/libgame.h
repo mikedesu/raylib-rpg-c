@@ -6,7 +6,6 @@
 #include "gamestate.h"
 #include "mylua.h"
 // Asset packing
-#include "img_data.h"
 #include "img_data_pack.h"
 #include <raylib.h>
 

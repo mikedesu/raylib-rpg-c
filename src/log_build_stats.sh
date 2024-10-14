@@ -1,6 +1,6 @@
 make clean;
 
-{ time make  } 2>time.txt;
+{ time make } 2>time.txt;
 
 cat time.txt;
 
