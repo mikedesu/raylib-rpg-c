@@ -87,5 +87,11 @@ libgame.so: $(LIBGAME_OBJECTS)
 	$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB) -llua5.4 $(WFLAGS) 
 	rm -rfv libgame.so.lockfile
 
+# Tool to help build out the asset packing
+export_to_code: export_to_code.c
+	$(CC) -o $@ $^ $(WFLAGS) -lraylib
+
+
+
 clean:
-	rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.data 
+	rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.data export_to_code

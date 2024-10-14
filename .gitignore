@@ -22,3 +22,7 @@ src/*.js
 src/*.data
 *.wasm
 src/*.wasm
+a.out
+src/a.out
+src/img_data
+src/img_data/*

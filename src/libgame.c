@@ -31,6 +31,9 @@
 // Lua support
 #include "libgame_lua.h"
 
+// Asset packing
+#include "img_data.h"
+
 //------------------------------------------------------------------
 // libgame global variables
 //------------------------------------------------------------------
@@ -583,14 +586,14 @@ void libgame_handle_input_player(gamestate* g) {
             //    libgame_lua_reserialization_test(L);
         }
 
-        else if (IsKeyPressed(KEY_SPACE)) {
-            // randomize the dungeon tiles
-            int w = 4;
-            int h = 4;
-            int hx = libgame_lua_get_entity_int(L, g->hero_id, "x") - w / 2;
-            int hy = libgame_lua_get_entity_int(L, g->hero_id, "y") - h / 2;
-            libgame_lua_randomize_dungeon_tiles(L, hx, hy, w, h);
-        }
+        //else if (IsKeyPressed(KEY_SPACE)) {
+        // randomize the dungeon tiles
+        //    int w = 4;
+        //    int h = 4;
+        //    int hx = libgame_lua_get_entity_int(L, g->hero_id, "x") - w / 2;
+        //    int hy = libgame_lua_get_entity_int(L, g->hero_id, "y") - h / 2;
+        //    libgame_lua_randomize_dungeon_tiles(L, hx, hy, w, h);
+        //}
 
         //else if (IsKeyPressed(KEY_PERIOD)) {
         //libgame_handle_npcs_turn_lua(g);
@@ -1181,12 +1184,11 @@ void libgame_draw_dungeonfloor(gamestate* g) {
                 //char buf[128];
                 //snprintf(buf, 128, "libgame_draw_dungeonfloor: tiletype: %d, key: %d at x: %d, y: %d", type, key, j, i);
                 //msuccess(buf);
+            } else {
+                char buf[128];
+                snprintf(buf, 128, "libgame_draw_dungeonfloor: key not found for tile type: %d at x: %d, y: %d", type, 0, 0);
+                merror(buf);
             }
-            //else {
-            //    char buf[128];
-            //    snprintf(buf, 128, "libgame_draw_dungeonfloor: key not found for tile type: %d at x: %d, y: %d", type, 0, 0);
-            //    merror(buf);
-            //}
         }
     }
 }
@@ -1499,6 +1501,34 @@ void libgame_drawcompanyscene(gamestate* g) {
 
 
 
+void libgame_load_texture_from_data_test(gamestate* g, int index, int contexts, int frames) {
+    if (g) {
+
+        Image img = {
+            .data = TILE_DIRT_00_DATA,
+            .width = TILE_DIRT_00_WIDTH,
+            .height = TILE_DIRT_00_HEIGHT,
+            .format = TILE_DIRT_00_FORMAT,
+            .mipmaps = 1,
+        };
+
+        // have to do dithering BEFORE loading as data
+        //if (dodither) {
+        //    ImageDither(&img, 4, 4, 4, 4);
+        //}
+        Texture2D t = LoadTextureFromImage(img);
+        g->txinfo[index].texture = t;
+        g->txinfo[index].num_frames = frames;
+        g->txinfo[index].contexts = contexts;
+        msuccess("libgame_load_texture_from_data_test");
+    } else {
+        merror("libgame_loadtexture: gamestate is NULL");
+    }
+}
+
+
+
+
 void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path) {
     if (g) {
         if (dodither) {
@@ -1523,12 +1553,30 @@ void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool
 
 
 
-void libgame_loadtextures(gamestate* g) {
+void libgame_load_textures(gamestate* g) {
     if (g) {
-        libgame_loadtexturesfromfile(g, "textures.txt");
+        //libgame_loadtexturesfromfile(g, "textures.txt");
+
+        libgame_load_textures_from_data(g);
+
         msuccess("libgame_loadtextures");
     } else {
         merror("libgame_loadtextures: gamestate is NULL");
+    }
+}
+
+
+
+
+void libgame_load_textures_from_data(gamestate* g) {
+    if (g) {
+        libgame_load_texture_from_data_test(g, TX_DIRT_00, 1, 1);
+        //libgame_load_texture_from_data_test(g, TILETYPE_DIRT_00, 1, 1, false);
+
+
+        msuccess("libgame_loadtextures_from_data");
+    } else {
+        merror("libgame_loadtextures_from_data: gamestate is NULL");
     }
 }
 
@@ -1585,51 +1633,51 @@ void libgame_unloadtexture(gamestate* g, int index) {
 void libgame_unloadtextures(gamestate* g) {
     minfo("unloading textures");
     // this can be done smarter, surely...
-    libgame_unloadtexture(g, TXHERO);
     libgame_unloadtexture(g, TX_DIRT_00);
-    libgame_unloadtexture(g, TX_DIRT_01);
-    libgame_unloadtexture(g, TX_DIRT_02);
-    libgame_unloadtexture(g, TX_TILE_STONE_00);
-    libgame_unloadtexture(g, TX_TILE_STONE_01);
-    libgame_unloadtexture(g, TX_TILE_STONE_02);
-    libgame_unloadtexture(g, TX_TILE_STONE_03);
-    libgame_unloadtexture(g, TX_TILE_STONE_04);
-    libgame_unloadtexture(g, TX_TILE_STONE_05);
-    libgame_unloadtexture(g, TX_TILE_STONE_06);
-    libgame_unloadtexture(g, TX_TILE_STONE_07);
-    libgame_unloadtexture(g, TX_TILE_STONE_08);
-    libgame_unloadtexture(g, TX_TILE_STONE_09);
-    libgame_unloadtexture(g, TX_TILE_STONE_10);
-    libgame_unloadtexture(g, TX_TILE_STONE_11);
-    libgame_unloadtexture(g, TX_TILE_STONE_12);
-    libgame_unloadtexture(g, TX_TILE_STONE_13);
+    libgame_unloadtexture(g, TX_HERO);
+    libgame_unloadtexture(g, TX_HERO_SHADOW);
+    //libgame_unloadtexture(g, TX_DIRT_01);
+    //libgame_unloadtexture(g, TX_DIRT_02);
+    //libgame_unloadtexture(g, TX_TILE_STONE_00);
+    //libgame_unloadtexture(g, TX_TILE_STONE_01);
+    //libgame_unloadtexture(g, TX_TILE_STONE_02);
+    //libgame_unloadtexture(g, TX_TILE_STONE_03);
+    //libgame_unloadtexture(g, TX_TILE_STONE_04);
+    //libgame_unloadtexture(g, TX_TILE_STONE_05);
+    //libgame_unloadtexture(g, TX_TILE_STONE_06);
+    //libgame_unloadtexture(g, TX_TILE_STONE_07);
+    //libgame_unloadtexture(g, TX_TILE_STONE_08);
+    //libgame_unloadtexture(g, TX_TILE_STONE_09);
+    //libgame_unloadtexture(g, TX_TILE_STONE_10);
+    //libgame_unloadtexture(g, TX_TILE_STONE_11);
+    //libgame_unloadtexture(g, TX_TILE_STONE_12);
+    //libgame_unloadtexture(g, TX_TILE_STONE_13);
     //libgame_unloadtexture(g, TX_TILE_STONE_14);
-    libgame_unloadtexture(g, TXTORCH);
-    libgame_unloadtexture(g, TXHEROSHADOW);
-    libgame_unloadtexture(g, TXHEROWALK);
-    libgame_unloadtexture(g, TXHEROWALKSHADOW);
-    libgame_unloadtexture(g, TXHEROATTACK);
-    libgame_unloadtexture(g, TXHEROATTACKSHADOW);
-    libgame_unloadtexture(g, TXHEROJUMP);
-    libgame_unloadtexture(g, TXHEROJUMPSHADOW);
-    libgame_unloadtexture(g, TXHEROSPINDIE);
-    libgame_unloadtexture(g, TXHEROSPINDIESHADOW);
-    libgame_unloadtexture(g, TXHEROSOULDIE);
-    libgame_unloadtexture(g, TXHEROSOULDIESHADOW);
-    libgame_unloadtexture(g, TX_TILE_STONE_WALL_00);
-    libgame_unloadtexture(g, TXSWORD);
-    libgame_unloadtexture(g, TXORCIDLE);
-    libgame_unloadtexture(g, TXORCIDLESHADOW);
-    libgame_unloadtexture(g, TXORCWALK);
-    libgame_unloadtexture(g, TXORCWALKSHADOW);
-    libgame_unloadtexture(g, TXORCATTACK);
-    libgame_unloadtexture(g, TXORCATTACKSHADOW);
-    libgame_unloadtexture(g, TXORCCHARGEDATTACK);
-    libgame_unloadtexture(g, TXORCCHARGEDATTACKSHADOW);
-    libgame_unloadtexture(g, TXORCJUMP);
-    libgame_unloadtexture(g, TXORCJUMPSHADOW);
-    libgame_unloadtexture(g, TXORCDIE);
-    libgame_unloadtexture(g, TXORCDIESHADOW);
+    //libgame_unloadtexture(g, TXTORCH);
+    //libgame_unloadtexture(g, TX_HERO_WALK);
+    //libgame_unloadtexture(g, TX_HERO_WALK_SHADOW);
+    //libgame_unloadtexture(g, TX_HERO_ATTACK);
+    //libgame_unloadtexture(g, TX_HERO_ATTACK_SHADOW);
+    //libgame_unloadtexture(g, TX_HERO_JUMP);
+    //libgame_unloadtexture(g, TX_HERO_JUMP_SHADOW);
+    //libgame_unloadtexture(g, TX_HERO_SPIN_DIE);
+    //libgame_unloadtexture(g, TX_HERO_SPIN_DIE_SHADOW);
+    //libgame_unloadtexture(g, TX_HERO_SOUL_DIE);
+    //libgame_unloadtexture(g, TX_HERO_SOUL_DIE_SHADOW);
+    //libgame_unloadtexture(g, TX_TILE_STONE_WALL_00);
+    //libgame_unloadtexture(g, TXSWORD);
+    //libgame_unloadtexture(g, TXORCIDLE);
+    //libgame_unloadtexture(g, TXORCIDLESHADOW);
+    //libgame_unloadtexture(g, TXORCWALK);
+    //libgame_unloadtexture(g, TXORCWALKSHADOW);
+    //libgame_unloadtexture(g, TXORCATTACK);
+    //libgame_unloadtexture(g, TXORCATTACKSHADOW);
+    //libgame_unloadtexture(g, TXORCCHARGEDATTACK);
+    //libgame_unloadtexture(g, TXORCCHARGEDATTACKSHADOW);
+    //libgame_unloadtexture(g, TXORCJUMP);
+    //libgame_unloadtexture(g, TXORCJUMPSHADOW);
+    //libgame_unloadtexture(g, TXORCDIE);
+    //libgame_unloadtexture(g, TXORCDIESHADOW);
 }
 
 
@@ -1720,18 +1768,18 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
         merror(buf);
         return;
     }
-    int keys[12] = {TXHERO,
-                    TXHEROSHADOW,
-                    TXHEROWALK,
-                    TXHEROWALKSHADOW,
-                    TXHEROATTACK,
-                    TXHEROATTACKSHADOW,
-                    TXHEROJUMP,
-                    TXHEROJUMPSHADOW,
-                    TXHEROSPINDIE,
-                    TXHEROSPINDIESHADOW,
-                    TXHEROSOULDIE,
-                    TXHEROSOULDIESHADOW};
+    int keys[12] = {TX_HERO,
+                    TX_HERO_SHADOW,
+                    TX_HERO_WALK,
+                    TX_HERO_WALK_SHADOW,
+                    TX_HERO_ATTACK,
+                    TX_HERO_ATTACK_SHADOW,
+                    TX_HERO_JUMP,
+                    TX_HERO_JUMP_SHADOW,
+                    TX_HERO_SPIN_DIE,
+                    TX_HERO_SPIN_DIE_SHADOW,
+                    TX_HERO_SOUL_DIE,
+                    TX_HERO_SOUL_DIE_SHADOW};
     //minfo("looping thru sprite keys...");
     for (int i = 0; i < 12; i++) {
         //printf("i: %d\n", i);
@@ -2109,13 +2157,13 @@ void libgame_initsharedsetup(gamestate* g) {
         SetRandomSeed(time(NULL));
         libgame_loadfont(g);
         libgame_loadtargettexture(g);
-        libgame_loadtextures(g);
+        libgame_load_textures(g);
         libgame_init_datastructures(g);
         //minfo("creating hero");
 
         //libgame_create_hero_lua(g, "hero", 1, 0);
         //if (g->hero_id == -1) {
-        libgame_create_hero_lua(g, "hero", 1, 1);
+        //libgame_create_hero_lua(g, "hero", 1, 1);
         //}
         //msuccess("hero created");
 
