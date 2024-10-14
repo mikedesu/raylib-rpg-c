@@ -1,6 +1,6 @@
 #pragma once
 
-#define DEFAULT_WINDOW_TITLE "project rpg v0.00000001"
+//#define DEFAULT_WINDOW_TITLE "project rpg v0.00000001"
 
 //#define DEFAULT_TARGET_FPS 30
 #define DEFAULT_TARGET_FPS 60
@@ -22,8 +22,8 @@
 //#define TXDUNGEONSHEET 3
 
 #define TX_DIRT_00 0
-#define TX_HERO 1
-#define TX_HERO_SHADOW 2
+#define TX_HERO_IDLE 1
+#define TX_HERO_IDLE_SHADOW 2
 #define TX_HERO_WALK 3
 #define TX_HERO_WALK_SHADOW 4
 #define TX_HERO_ATTACK 5

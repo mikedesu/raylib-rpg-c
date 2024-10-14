@@ -50,14 +50,16 @@ Rectangle target_dest = (Rectangle){0, 0, 0, 0};
 Vector2 target_origin = (Vector2){0, 0};
 
 
-//int activescene = GAMEPLAYSCENE;
-int activescene = COMPANYSCENE;
+int activescene = GAMEPLAYSCENE;
+//int activescene = COMPANYSCENE;
 int targetwidth = -1;
 int targetheight = -1;
 //int targetwidth = DEFAULT_TARGET_WIDTH;
 //int targetheight = DEFAULT_TARGET_HEIGHT;
-int windowwidth = DEFAULT_WINDOW_WIDTH;
-int windowheight = DEFAULT_WINDOW_HEIGHT;
+//int windowwidth = DEFAULT_WINDOW_WIDTH;
+//int windowheight = DEFAULT_WINDOW_HEIGHT;
+int windowwidth = -1;
+int windowheight = -1;
 
 
 //const bool libgame_entity_try_attack(gamestate* g, entityid id, const int x, const int y) {
@@ -1667,8 +1669,8 @@ void libgame_unloadtextures(gamestate* g) {
     minfo("unloading textures");
     // this can be done smarter, surely...
     libgame_unloadtexture(g, TX_DIRT_00);
-    libgame_unloadtexture(g, TX_HERO);
-    libgame_unloadtexture(g, TX_HERO_SHADOW);
+    libgame_unloadtexture(g, TX_HERO_IDLE);
+    libgame_unloadtexture(g, TX_HERO_IDLE_SHADOW);
     //libgame_unloadtexture(g, TX_DIRT_01);
     //libgame_unloadtexture(g, TX_DIRT_02);
     //libgame_unloadtexture(g, TX_TILE_STONE_00);
@@ -1806,8 +1808,8 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
 #define NUM_HERO_KEYS 12
 
     minfo("Preparing to enum hero keys...");
-    int keys[NUM_HERO_KEYS] = {TX_HERO,
-                               TX_HERO_SHADOW,
+    int keys[NUM_HERO_KEYS] = {TX_HERO_IDLE,
+                               TX_HERO_IDLE_SHADOW,
                                TX_HERO_WALK,
                                TX_HERO_WALK_SHADOW,
                                TX_HERO_ATTACK,
@@ -1825,9 +1827,9 @@ void libgame_create_herospritegroup(gamestate* g, entityid id) {
         const int ctxs = g->txinfo[txkey].contexts;
         const int frames = g->txinfo[txkey].num_frames;
 
-        char buf[128];
-        snprintf(buf, 128, "i: %d, txkey: %d, ctxs: %d, frames: %d", i, txkey, ctxs, frames);
-        minfo(buf);
+        //char buf[128];
+        //snprintf(buf, 128, "i: %d, txkey: %d, ctxs: %d, frames: %d", i, txkey, ctxs, frames);
+        //minfo(buf);
 
 
 
