@@ -1,13 +1,13 @@
 #include "controlmode.h"
 #include "dungeonfloor.h"
-#include "entity.h"
+//#include "entity.h"
 #include "entitytype.h"
 #include "fadestate.h"
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_entity.h"
 #include "hashtable_entityid_spritegroup.h"
-#include "itemtype.h"
+//#include "itemtype.h"
 #include "libgame.h"
 #include "libgame_defines.h"
 #include "mprint.h"
@@ -32,7 +32,7 @@
 #include "libgame_lua.h"
 
 // Data packing
-#include "img_data.h"
+//#include "img_data.h"
 #include "img_data_packs.h"
 
 //------------------------------------------------------------------
@@ -418,112 +418,159 @@ void libgame_handleplayerinput_move(gamestate* g, int xdir, int ydir) {
 
 
 
-void libgame_handleplayerinput_key_right(gamestate* g) {
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id != -1) {
-        libgame_update_spritegroup(g, hero_id, DIRECTION_RIGHT);
-        libgame_handleplayerinput_move(g, 1, 0);
-    } else {
-        merror("handleplayerinput_key_right: hero_id is -1");
+void libgame_handle_player_input_movement_key(gamestate* g, direction_t dir) {
+    if (g) {
+        const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+        if (hero_id != -1) {
+            libgame_update_spritegroup(g, hero_id, dir);
+
+            int xdir = 0;
+            int ydir = 0;
+            switch (dir) {
+            case DIRECTION_RIGHT:
+                xdir = 1;
+                break;
+            case DIRECTION_LEFT:
+                xdir = -1;
+                break;
+            case DIRECTION_DOWN:
+                ydir = 1;
+                break;
+            case DIRECTION_UP:
+                ydir = -1;
+                break;
+            case DIRECTION_UP_LEFT:
+                xdir = -1;
+                ydir = -1;
+                break;
+            case DIRECTION_UP_RIGHT:
+                xdir = 1;
+                ydir = -1;
+                break;
+            case DIRECTION_DOWN_LEFT:
+                xdir = -1;
+                ydir = 1;
+                break;
+            case DIRECTION_DOWN_RIGHT:
+                xdir = 1;
+                ydir = 1;
+                break;
+            default:
+                break;
+            }
+
+            libgame_handleplayerinput_move(g, xdir, ydir);
+
+        } else {
+            merror("handleplayerinput_key_right: hero_id is -1");
+        }
     }
 }
 
 
 
 
-void libgame_handleplayerinput_key_left(gamestate* g) {
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id != -1) {
-        libgame_update_spritegroup(g, hero_id, DIRECTION_LEFT);
-        libgame_handleplayerinput_move(g, -1, 0);
-    } else {
-        merror("handleplayerinput_key_left: hero_id is -1");
-    }
-}
+//void libgame_handleplayerinput_key_right(gamestate* g) {
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id != -1) {
+//        libgame_update_spritegroup(g, hero_id, DIRECTION_RIGHT);
+//        libgame_handleplayerinput_move(g, 1, 0);
+//    } else {
+//        merror("handleplayerinput_key_right: hero_id is -1");
+//    }
+//}
 
 
 
 
-void libgame_handleplayerinput_key_down(gamestate* g) {
-
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id != -1) {
-        libgame_update_spritegroup(g, hero_id, DIRECTION_DOWN);
-        libgame_handleplayerinput_move(g, 0, 1);
-    } else {
-        merror("handleplayerinput_key_down: hero_id is -1");
-    }
-}
-
-
-
-
-void libgame_handleplayerinput_key_up(gamestate* g) {
-
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id != -1) {
-        libgame_update_spritegroup(g, hero_id, DIRECTION_UP);
-        libgame_handleplayerinput_move(g, 0, -1);
-    } else {
-        merror("handleplayerinput_key_up: hero_id is -1");
-    }
-}
+//void libgame_handleplayerinput_key_left(gamestate* g) {
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id != -1) {
+//        libgame_update_spritegroup(g, hero_id, DIRECTION_LEFT);
+//        libgame_handleplayerinput_move(g, -1, 0);
+//    } else {
+//        merror("handleplayerinput_key_left: hero_id is -1");
+//    }
+//}
 
 
 
 
-void libgame_handleplayerinput_key_down_left(gamestate* g) {
-
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id != -1) {
-        libgame_update_spritegroup(g, hero_id, DIRECTION_LEFT);
-        libgame_handleplayerinput_move(g, -1, 1);
-    } else {
-        merror("handleplayerinput_key_down_left: hero_id is -1");
-    }
-}
-
-
-
-
-void libgame_handleplayerinput_key_down_right(gamestate* g) {
-
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id != -1) {
-        libgame_update_spritegroup(g, hero_id, DIRECTION_RIGHT);
-        libgame_handleplayerinput_move(g, 1, 1);
-    } else {
-        merror("handleplayerinput_key_down_right: hero_id is -1");
-    }
-}
+//void libgame_handleplayerinput_key_down(gamestate* g) {
+//
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id != -1) {
+//        libgame_update_spritegroup(g, hero_id, DIRECTION_DOWN);
+//        libgame_handleplayerinput_move(g, 0, 1);
+//    } else {
+//        merror("handleplayerinput_key_down: hero_id is -1");
+//    }
+//}
 
 
 
 
-void libgame_handleplayerinput_key_up_left(gamestate* g) {
-
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id != -1) {
-        libgame_update_spritegroup(g, hero_id, DIRECTION_LEFT);
-        libgame_handleplayerinput_move(g, -1, -1);
-    } else {
-        merror("handleplayerinput_key_up_left: hero_id is -1");
-    }
-}
-
+//void libgame_handleplayerinput_key_up(gamestate* g) {
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id != -1) {
+//        libgame_update_spritegroup(g, hero_id, DIRECTION_UP);
+//        libgame_handleplayerinput_move(g, 0, -1);
+//    } else {
+//        merror("handleplayerinput_key_up: hero_id is -1");
+//    }
+//}
 
 
 
-void libgame_handleplayerinput_key_up_right(gamestate* g) {
 
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id != -1) {
-        libgame_update_spritegroup(g, hero_id, DIRECTION_RIGHT);
-        libgame_handleplayerinput_move(g, 1, -1);
-    } else {
-        merror("handleplayerinput_key_up_right: hero_id is -1");
-    }
-}
+//void libgame_handleplayerinput_key_down_left(gamestate* g) {
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id != -1) {
+//        libgame_update_spritegroup(g, hero_id, DIRECTION_LEFT);
+//        libgame_handleplayerinput_move(g, -1, 1);
+//    } else {
+//        merror("handleplayerinput_key_down_left: hero_id is -1");
+//    }
+//}
+
+
+
+
+//void libgame_handleplayerinput_key_down_right(gamestate* g) {
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id != -1) {
+//        libgame_update_spritegroup(g, hero_id, DIRECTION_RIGHT);
+//        libgame_handleplayerinput_move(g, 1, 1);
+//    } else {
+//        merror("handleplayerinput_key_down_right: hero_id is -1");
+//    }
+//}
+
+
+
+
+//void libgame_handleplayerinput_key_up_left(gamestate* g) {
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id != -1) {
+//        libgame_update_spritegroup(g, hero_id, DIRECTION_LEFT);
+//        libgame_handleplayerinput_move(g, -1, -1);
+//    } else {
+//        merror("handleplayerinput_key_up_left: hero_id is -1");
+//    }
+//}
+
+
+
+
+//void libgame_handleplayerinput_key_up_right(gamestate* g) {
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id != -1) {
+//        libgame_update_spritegroup(g, hero_id, DIRECTION_RIGHT);
+//        libgame_handleplayerinput_move(g, 1, -1);
+//    } else {
+//        merror("handleplayerinput_key_up_right: hero_id is -1");
+//    }
+//}
 
 
 
@@ -594,28 +641,36 @@ void libgame_handle_input_player(gamestate* g) {
 
         //if (g->player_input_received == false) {
         if (IsKeyPressed(KEY_KP_6) || IsKeyPressed(KEY_RIGHT)) {
-            libgame_handleplayerinput_key_right(g);
+            //libgame_handleplayerinput_key_right(g);
+            libgame_handle_player_input_movement_key(g, DIRECTION_RIGHT);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_4) || IsKeyPressed(KEY_LEFT)) {
-            libgame_handleplayerinput_key_left(g);
+            //libgame_handleplayerinput_key_left(g);
+            libgame_handle_player_input_movement_key(g, DIRECTION_LEFT);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_2) || IsKeyPressed(KEY_DOWN)) {
-            libgame_handleplayerinput_key_down(g);
+            //libgame_handleplayerinput_key_down(g);
+            libgame_handle_player_input_movement_key(g, DIRECTION_DOWN);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_8) || IsKeyPressed(KEY_UP)) {
-            libgame_handleplayerinput_key_up(g);
+            //libgame_handleplayerinput_key_up(g);
+            libgame_handle_player_input_movement_key(g, DIRECTION_UP);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_1)) {
-            libgame_handleplayerinput_key_down_left(g);
+            //libgame_handleplayerinput_key_down_left(g);
+            libgame_handle_player_input_movement_key(g, DIRECTION_DOWN_LEFT);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_3)) {
-            libgame_handleplayerinput_key_down_right(g);
+            //libgame_handleplayerinput_key_down_right(g);
+            libgame_handle_player_input_movement_key(g, DIRECTION_DOWN_RIGHT);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_7)) {
-            libgame_handleplayerinput_key_up_left(g);
+            //libgame_handleplayerinput_key_up_left(g);
+            libgame_handle_player_input_movement_key(g, DIRECTION_UP_LEFT);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_9)) {
-            libgame_handleplayerinput_key_up_right(g);
+            //libgame_handleplayerinput_key_up_right(g);
+            libgame_handle_player_input_movement_key(g, DIRECTION_UP_RIGHT);
             g->player_input_received = true;
         }
         //}
