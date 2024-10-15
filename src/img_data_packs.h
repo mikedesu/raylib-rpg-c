@@ -21,5 +21,6 @@
 #define PK_HUMAN_SPIN_DIE_SHADOW                                                                                                                                                                       \
     ((img_data_pack_t){HUMAN_SPIN_DIE_SHADOW_WIDTH, HUMAN_SPIN_DIE_SHADOW_HEIGHT, HUMAN_SPIN_DIE_SHADOW_FORMAT, TX_HERO_SPIN_DIE_SHADOW, 1, 12, HUMAN_SPIN_DIE_SHADOW_DATA})
 
-#define PK_HUMAN_SOULDIE ((img_data_pack_t){HUMAN_SOULDIE_WIDTH, HUMAN_SOULDIE_HEIGHT, HUMAN_SOULDIE_FORMAT, TX_HERO_SOUL_DIE, 1, 12, HUMAN_SOULDIE_DATA})
-#define PK_HUMAN_SOULDIE_SHADOW ((img_data_pack_t){HUMAN_SOULDIE_SHADOW_WIDTH, HUMAN_SOULDIE_SHADOW_HEIGHT, HUMAN_SOULDIE_SHADOW_FORMAT, TX_HERO_SOUL_DIE_SHADOW, 1, 12, HUMAN_SOULDIE_SHADOW_DATA})
+#define PK_HUMAN_SOUL_DIE ((img_data_pack_t){HUMAN_SOUL_DIE_WIDTH, HUMAN_SOUL_DIE_HEIGHT, HUMAN_SOUL_DIE_FORMAT, TX_HERO_SOUL_DIE, 1, 12, HUMAN_SOUL_DIE_DATA})
+#define PK_HUMAN_SOUL_DIE_SHADOW                                                                                                                                                                       \
+    ((img_data_pack_t){HUMAN_SOUL_DIE_SHADOW_WIDTH, HUMAN_SOUL_DIE_SHADOW_HEIGHT, HUMAN_SOUL_DIE_SHADOW_FORMAT, TX_HERO_SOUL_DIE_SHADOW, 1, 12, HUMAN_SOUL_DIE_SHADOW_DATA})

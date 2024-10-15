@@ -1642,8 +1642,8 @@ void libgame_load_textures_from_data(gamestate* g) {
             PK_HUMAN_JUMP_SHADOW,
             PK_HUMAN_SPIN_DIE,
             PK_HUMAN_SPIN_DIE_SHADOW,
-            PK_HUMAN_SOULDIE,
-            PK_HUMAN_SOULDIE_SHADOW,
+            PK_HUMAN_SOUL_DIE,
+            PK_HUMAN_SOUL_DIE_SHADOW,
         };
         for (int i = 0; i < NUM_PACKS; i++) {
             libgame_load_texture_from_datapack(g, &packs[i]);
