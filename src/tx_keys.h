@@ -1,0 +1,20 @@
+#pragma once
+
+#include "libgame_defines.h"
+
+#define TX_HERO_KEY_COUNT 12
+
+static int TX_HERO_KEYS[TX_HERO_KEY_COUNT] = {
+    TX_HERO_IDLE,
+    TX_HERO_IDLE_SHADOW,
+    TX_HERO_WALK,
+    TX_HERO_WALK_SHADOW,
+    TX_HERO_ATTACK,
+    TX_HERO_ATTACK_SHADOW,
+    TX_HERO_JUMP,
+    TX_HERO_JUMP_SHADOW,
+    TX_HERO_SPIN_DIE,
+    TX_HERO_SPIN_DIE_SHADOW,
+    TX_HERO_SOUL_DIE,
+    TX_HERO_SOUL_DIE_SHADOW,
+};

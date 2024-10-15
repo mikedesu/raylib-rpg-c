@@ -49,7 +49,7 @@ gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const
     g->fadealpha = 0.0f;
     g->fadestate = FADESTATENONE;
     g->entityids = vectorentityid_new();
-    g->entities = hashtable_entityid_entity_create(1000);
+    //g->entities = hashtable_entityid_entity_create(1000);
     g->spritegroups = NULL;
     //g->hero_id = -1;
     //g->torch_id = -1;
@@ -78,8 +78,8 @@ void gamestatefree(gamestate* g) {
     if (g != NULL) {
         //companyscenefree(s->cs);
         //free(s->timebegantm);
-        minfo("gamestatefree freeing entities");
-        hashtable_entityid_entity_destroy(g->entities);
+        //minfo("gamestatefree freeing entities");
+        //hashtable_entityid_entity_destroy(g->entities);
         minfo("gamestatefree freeing spritegroups");
         hashtable_entityid_spritegroup_destroy(g->spritegroups);
         minfo("gamestatefree freeing entityids");

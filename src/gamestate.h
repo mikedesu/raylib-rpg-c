@@ -46,7 +46,7 @@ typedef struct gamestate {
     //struct tm* starttm;
     Font font;
 
-    hashtable_entityid_entity_t* entities;
+    //hashtable_entityid_entity_t* entities;
     hashtable_entityid_spritegroup_t* spritegroups;
 
     //entityid hero_id;

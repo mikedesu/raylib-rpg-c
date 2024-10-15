@@ -77,6 +77,12 @@ EntityTypes = {
 	NPC = 2,
 }
 
+RaceTypes = {
+	None = 1,
+	Human = 2,
+	Orc = 3,
+}
+
 NextEntityId = 1
 HeroId = -1
 --LastXDir = 0
@@ -166,6 +172,7 @@ function CreateEntity(name, type, x, y)
 		level = 1,
 		hp = 0,
 		maxhp = 0,
+		race = RaceTypes.None,
 		--inventory = {},
 	}
 	Gamestate.NextEntityId = Gamestate.NextEntityId + 1
