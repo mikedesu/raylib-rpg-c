@@ -1640,8 +1640,8 @@ void libgame_load_textures_from_data(gamestate* g) {
             PK_HUMAN_ATTACK_SHADOW,
             PK_HUMAN_JUMP,
             PK_HUMAN_JUMP_SHADOW,
-            PK_HUMAN_SPINDIE,
-            PK_HUMAN_SPINDIE_SHADOW,
+            PK_HUMAN_SPIN_DIE,
+            PK_HUMAN_SPIN_DIE_SHADOW,
             PK_HUMAN_SOULDIE,
             PK_HUMAN_SOULDIE_SHADOW,
         };
