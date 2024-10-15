@@ -4,7 +4,7 @@
 #include "fadestate.h"
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
-#include "hashtable_entityid_entity.h"
+//#include "hashtable_entityid_entity.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "libgame.h"
 #include "libgame_defines.h"
@@ -248,12 +248,12 @@ void libgame_test_enemy_placement(gamestate* g) {
 
 void libgame_handleinput(gamestate* g) {
     //minfo("handleinput: starting...");
-    if (IsKeyPressed(KEY_SPACE) || GetTouchPointCount() > 0) {
-        //    minfo("key space pressed");
-        if (g->fadestate == FADESTATENONE) {
-            g->fadestate = FADESTATEOUT;
-        }
-    }
+    //if (IsKeyPressed(KEY_SPACE) || GetTouchPointCount() > 0) {
+    //    //    minfo("key space pressed");
+    //    if (g->fadestate == FADESTATENONE) {
+    //        g->fadestate = FADESTATEOUT;
+    //    }
+    //}
 
     if (IsKeyPressed(KEY_A)) {
 
@@ -278,10 +278,10 @@ void libgame_handleinput(gamestate* g) {
         //g->player_input_received = true;
     }
 
-    //if (IsKeyPressed(KEY_E)) {
-    //    libgame_test_enemy_placement(g);
-    //    g->player_input_received = true;
-    //}
+    if (IsKeyPressed(KEY_E)) {
+        libgame_test_enemy_placement(g);
+        //    g->player_input_received = true;
+    }
 
 
     //if (IsKeyPressed(KEY_P)) {
@@ -709,14 +709,17 @@ void libgame_handle_input_player(gamestate* g) {
             //    libgame_lua_reserialization_test(L);
         }
 
-        //else if (IsKeyPressed(KEY_SPACE)) {
-        // randomize the dungeon tiles
-        //    int w = 4;
-        //    int h = 4;
-        //    int hx = libgame_lua_get_entity_int(L, g->hero_id, "x") - w / 2;
-        //    int hy = libgame_lua_get_entity_int(L, g->hero_id, "y") - h / 2;
-        //    libgame_lua_randomize_dungeon_tiles(L, hx, hy, w, h);
-        //}
+        else if (IsKeyPressed(KEY_SPACE)) {
+            // randomize the dungeon tiles
+            int w = 4;
+            int h = 4;
+            const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+            //int hx = libgame_lua_get_entity_int(L, g->hero_id, "x") - w / 2;
+            //int hy = libgame_lua_get_entity_int(L, g->hero_id, "y") - h / 2;
+            int hx = libgame_lua_get_entity_int(L, hero_id, "x") - w / 2;
+            int hy = libgame_lua_get_entity_int(L, hero_id, "y") - h / 2;
+            libgame_lua_randomize_dungeon_tiles(L, hx, hy, w, h);
+        }
 
         //else if (IsKeyPressed(KEY_PERIOD)) {
         //libgame_handle_npcs_turn_lua(g);
@@ -1495,7 +1498,7 @@ void libgame_draw_gameplayscene_entities(gamestate* g) {
                 //libgame_draw_items_that_are_not(g, ITEM_TORCH, i, j);
                 //libgame_draw_entities_at(g, ENTITY_NPC, i, j);
                 //libgame_draw_entities_at(g, ENTITY_PLAYER, i, j);
-                //libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
+                libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
                 libgame_draw_entities_at_lua(g, ENTITY_PLAYER, i, j);
             }
         }
@@ -1686,9 +1689,32 @@ void libgame_load_textures(gamestate* g) {
 
 void libgame_load_textures_from_data(gamestate* g) {
     if (g) {
-#define NUM_PACKS 13
+#define NUM_PACKS (44)
         img_data_pack_t packs[NUM_PACKS] = {
+            // 3+14+1 for tile
             PK_TILE_DIRT_00,
+            PK_TILE_DIRT_01,
+            PK_TILE_DIRT_02,
+
+            PK_TILE_STONE_00,
+            PK_TILE_STONE_01,
+            PK_TILE_STONE_02,
+            PK_TILE_STONE_03,
+            PK_TILE_STONE_04,
+            PK_TILE_STONE_05,
+            PK_TILE_STONE_06,
+            PK_TILE_STONE_07,
+            PK_TILE_STONE_08,
+            PK_TILE_STONE_09,
+            PK_TILE_STONE_10,
+            PK_TILE_STONE_11,
+            PK_TILE_STONE_12,
+            PK_TILE_STONE_13,
+
+            PK_TILE_STONEWALL_00,
+
+
+            // 12 for human
             PK_HUMAN_IDLE,
             PK_HUMAN_IDLE_SHADOW,
             PK_HUMAN_WALK,
@@ -1701,6 +1727,22 @@ void libgame_load_textures_from_data(gamestate* g) {
             PK_HUMAN_SPIN_DIE_SHADOW,
             PK_HUMAN_SOUL_DIE,
             PK_HUMAN_SOUL_DIE_SHADOW,
+
+            // 14 for orc
+            PK_ORC_IDLE,
+            PK_ORC_IDLE_SHADOW,
+            PK_ORC_WALK,
+            PK_ORC_WALK_SHADOW,
+            PK_ORC_ATTACK,
+            PK_ORC_ATTACK_SHADOW,
+            PK_ORC_CHARGED_ATTACK,
+            PK_ORC_CHARGED_ATTACK_SHADOW,
+            PK_ORC_JUMP,
+            PK_ORC_JUMP_SHADOW,
+            PK_ORC_DIE,
+            PK_ORC_DIE_SHADOW,
+            PK_ORC_DMG,
+            PK_ORC_DMG_SHADOW,
         };
         for (int i = 0; i < NUM_PACKS; i++) {
             libgame_load_texture_from_data_pack(g, &packs[i]);
@@ -1898,10 +1940,12 @@ void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
                 num_keys = TX_HERO_KEY_COUNT;
                 offset_x = -12;
                 offset_y = -12;
+            } else if (race == RACE_ORC) {
+                keys = TX_ORC_KEYS;
+                num_keys = TX_ORC_KEY_COUNT;
+                offset_x = -12;
+                offset_y = -12;
             }
-            //else if (race== RACE_ORC) {
-            //    keys = TX_ORC_KEYS;
-            //}
         }
         //else if (entity_type == ENTITY_ITEM) {
         //
@@ -2233,39 +2277,45 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
 
 
 
-//const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y) {
-//    char buf[128];
-//    snprintf(buf, 128, "libgame_create_orc_lua: creating orc entity %s at %d, %d", name, x, y);
-//    minfo(buf);
-//    if (!g) {
-//        merror("libgame_create_orc_lua: gamestate is NULL");
-//        return -1;
-//    }
-//    if (!name) {
-//        merror("libgame_create_orc_lua: name is NULL");
-//        return -1;
-//    }
-//    if (x < 0 || y < 0) {
-//        merror("libgame_create_orc_lua: x or y is less than 0");
-//        return -1;
-//    }
-//    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
-//    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
-//    if (x >= dw || y >= dh) {
-//        merror("libgame_create_orc_lua: x or y is greater than dungeonfloor dimensions");
-//        return -1;
-//    }
-//    const entityid id = libgame_lua_create_entity(L, name, ENTITY_NPC, x, y);
-//    if (id != -1) {
-//        libgame_create_orcspritegroup(g, id);
-//        bzero(buf, 128);
-//        snprintf(buf, 128, "libgame_create_orc_lua: orc entityid %d", id);
-//        msuccess(buf);
-//    } else {
-//        merror("libgame_create_orc_lua: could not create orc entity");
-//    }
-//    return id;
-//}
+const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y) {
+    char buf[128];
+    snprintf(buf, 128, "libgame_create_orc_lua: creating orc entity %s at %d, %d", name, x, y);
+    minfo(buf);
+    if (!g) {
+        merror("libgame_create_orc_lua: gamestate is NULL");
+        return -1;
+    }
+    if (!name) {
+        merror("libgame_create_orc_lua: name is NULL");
+        return -1;
+    }
+    if (x < 0 || y < 0) {
+        merror("libgame_create_orc_lua: x or y is less than 0");
+        return -1;
+    }
+    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
+    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
+    if (x >= dw || y >= dh) {
+        merror("libgame_create_orc_lua: x or y is greater than dungeonfloor dimensions");
+        return -1;
+    }
+    const entityid id = libgame_lua_create_entity(L, name, ENTITY_NPC, x, y);
+    if (id != -1) {
+
+        // set orc race
+        libgame_lua_set_entity_int(L, id, "race", RACE_ORC);
+
+        //libgame_create_orcspritegroup(g, id);
+        libgame_create_spritegroup_by_id(g, id);
+
+        bzero(buf, 128);
+        snprintf(buf, 128, "libgame_create_orc_lua: orc entityid %d", id);
+        msuccess(buf);
+    } else {
+        merror("libgame_create_orc_lua: could not create orc entity");
+    }
+    return id;
+}
 
 
 

@@ -12,7 +12,7 @@ STATIC_LINK_RAYLIB=-l:libraylib.a
 #LINK_MATH=-lm
 POSITION_INDEPENDENT_CODE=-fPIC
 MAIN_C=main.c
-WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c libgame_lua.c hashtable_entityid_entity.c dungeonfloor.c vectorentityid.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c companyscene.c sprite.c spritegroup.c entity.c utils.c dice.c /home/darkmage/src/raylib/src/libraylib.a /home/darkmage/src/lua/liblua.a
+WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c libgame_lua.c dungeonfloor.c vectorentityid.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c companyscene.c sprite.c spritegroup.c utils.c dice.c /home/darkmage/src/raylib/src/libraylib.a /home/darkmage/src/lua/liblua.a
 MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_spritegroup.o dungeonfloor.o vectorentityid.o get_txkey_for_tiletype.o dice.o 
 #MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_entity.o hashtable_entityid_spritegroup.o dungeonfloor.o vectorentityid.o get_txkey_for_tiletype.o dice.o 
 

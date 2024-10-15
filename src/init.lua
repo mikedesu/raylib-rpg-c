@@ -67,8 +67,7 @@ TileTypes = {
 	Stone11 = 16,
 	Stone12 = 17,
 	Stone13 = 18,
-	Stone14 = 19,
-	Stonewall00 = 20,
+	Stonewall00 = 19,
 }
 
 EntityTypes = {
@@ -236,6 +235,9 @@ function EntityMove(id, xdir, ydir)
 			return false
 		end
 		if GetTileType(newx, newy) == TileTypes.None then
+			return false
+		end
+		if GetTileType(newx, newy) == TileTypes.Stonewall00 then
 			return false
 		end
 		if TileIsOccupiedByPlayer(newx, newy) or TileIsOccupiedByNPC(newx, newy) then
