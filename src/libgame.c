@@ -649,6 +649,59 @@ void libgame_handle_player_input_movement_key(gamestate* g, direction_t dir) {
 
 
 
+#ifdef MOBILE
+void libgame_handle_input_player_mobile(gamestate* g) {
+    if (g->controlmode == CONTROLMODE_PLAYER) {
+
+        int current_gesture = GetGestureDetected();
+
+        switch (current_gesture) {
+        case GESTURE_TAP:
+            spritegroup_t* grp = hashtable_entityid_spritegroup_get(g->spritegroups, libgame_lua_get_gamestate_int(L, "HeroId"));
+            if (grp) {
+                spritegroup_incr(grp);
+                g->player_input_received = true;
+            }
+            break;
+        case GESTURE_HOLD:
+            libgame_test_enemy_placement(g);
+            g->player_input_received = true;
+            break;
+        case GESTURE_PINCH_OUT:
+            g->cam2d.zoom += 1.0f;
+            break;
+        case GESTURE_PINCH_IN:
+            g->cam2d.zoom -= 1.0f;
+            if (g->cam2d.zoom < 1.0f) {
+                g->cam2d.zoom = 1.0f;
+            }
+            break;
+        case GESTURE_SWIPE_UP:
+            libgame_handle_player_input_movement_key(g, DIRECTION_UP);
+            g->player_input_received = true;
+
+            break;
+        case GESTURE_SWIPE_DOWN:
+            libgame_handle_player_input_movement_key(g, DIRECTION_DOWN);
+            g->player_input_received = true;
+            break;
+        case GESTURE_SWIPE_LEFT:
+            libgame_handle_player_input_movement_key(g, DIRECTION_LEFT);
+            g->player_input_received = true;
+            break;
+        case GESTURE_SWIPE_RIGHT:
+            libgame_handle_player_input_movement_key(g, DIRECTION_RIGHT);
+            g->player_input_received = true;
+            break;
+        default:
+            break;
+        }
+    }
+}
+#endif
+
+
+
 void libgame_handle_input_player(gamestate* g) {
     //minfo("handle_playerinput: starting...");
     if (g->controlmode == CONTROLMODE_PLAYER) {
@@ -771,6 +824,11 @@ void libgame_handle_input_player(gamestate* g) {
         //}
         //    g->player_input_received = true;
         //}
+
+
+#ifdef MOBILE
+        libgame_handle_input_player_mobile(g);
+#endif
     }
 }
 
@@ -1226,7 +1284,12 @@ void libgame_drawframe(gamestate* g) {
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     libgame_draw_debugpanel(g);
-    //DrawRectangleLines(0, 0, windowwidth, windowheight - 2, RED);
+
+    const int pad_w = 2;
+    const int pad_h = 10;
+    //const int pad_w = 0;
+    //const int pad_h = 0;
+    DrawRectangleLines(0, 0, windowwidth - pad_w, windowheight - pad_h, RED);
     libgame_drawframeend(g);
     //msuccess("libgame_drawframe end");
 }
@@ -2361,6 +2424,18 @@ void libgame_initsharedsetup(gamestate* g) {
         if (luaL_loadfile(L, filename) || lua_pcall(L, 0, 0, 0)) {
             luaL_error(L, "cannot run %s: %s", filename, lua_tostring(L, -1));
         }
+#ifdef MOBILE
+        // just testing on my own phone for now, pixel 6a
+        const int tw = 720;
+        const int th = 1400;
+        const int scale = libgame_lua_get_int(L, "Scale");
+        const int dw = tw * scale;
+        const int dh = th * scale;
+        libgame_lua_set_gamestate_int(L, "TargetWidth", tw);
+        libgame_lua_set_gamestate_int(L, "TargetHeight", th);
+        libgame_lua_set_gamestate_int(L, "WindowWidth", dw);
+        libgame_lua_set_gamestate_int(L, "WindowHeight", dh);
+#endif
         libgame_initwindow(g);
         SetRandomSeed(time(NULL));
         libgame_loadfont(g);

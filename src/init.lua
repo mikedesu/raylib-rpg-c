@@ -29,6 +29,8 @@ Gamestate = {
 	WindowTitle = "@evildojo666 presents: Project.RPG",
 	TargetWidth = DefaultTargetWidth,
 	TargetHeight = DefaultTargetHeight,
+	WindowWidth = DefaultTargetWidth * Scale,
+	WindowHeight = DefaultTargetHeight * Scale,
 	WindowPosX = DefaultWindowPosX,
 	WindowPosY = DefaultWindowPosY,
 	NextEntityId = 1,
@@ -37,8 +39,8 @@ Gamestate = {
 	Entities = {},
 }
 
-Gamestate.WindowWidth = Gamestate.TargetWidth * Scale
-Gamestate.WindowHeight = Gamestate.TargetHeight * Scale
+--Gamestate.WindowWidth = Gamestate.TargetWidth * Scale
+--Gamestate.WindowHeight = Gamestate.TargetHeight * Scale
 
 HeroId = -1
 

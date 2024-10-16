@@ -70,6 +70,10 @@ void libgame_load_texture_from_data_pack(gamestate* g, img_data_pack_t* pack);
 void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
 void libgame_create_spritegroup_by_id(gamestate* g, entityid id);
 
+#ifdef MOBILE
+void libgame_handle_input_player_mobile(gamestate* g);
+#endif
+
 const bool libgame_entity_move_lua(gamestate* g, entityid id, int x, int y);
 const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
 const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, itemtype_t type);

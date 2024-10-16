@@ -31,65 +31,66 @@ all: game export_to_code
 
 
 index.html: main.c $(MAIN_SOURCES)  
-	$(WEB_CC) -o $@ $(WEB_SOURCES) $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS)
+	#$(WEB_CC) -o $@ $(WEB_SOURCES) $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS)
+	$(WEB_CC) -o $@ $(WEB_SOURCES) $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS) $(CFLAGS)
 
 
 game: main.c gameloader.o $(LIBGAME_OBJECTS) libgame.so  
-	$(CC) -o $@ $(MAIN_C) $(MAIN_OBJECTS) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)
+	$(CC) -o $@ $(MAIN_C) $(MAIN_OBJECTS) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)
 
 # Bridge between Raylib and game
 gameloader.o: gameloader.c 
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) $^ -o $@
 
 gamestate.o: gamestate.c 
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) $^ -o $@
 
 # Rendering Objects
 
 sprite.o: sprite.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
 
 spritegroup.o: spritegroup.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
 
 # Scenes
 companyscene.o: companyscene.c 
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 # Data structures and extra functionality/helpers/etc
 vectorentityid.o: vectorentityid.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 utils.o: utils.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 dungeonfloor.o: dungeonfloor.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 entity.o: entity.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 hashtable_entityid_entity.o: hashtable_entityid_entity.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 hashtable_entityid_spritegroup.o: hashtable_entityid_spritegroup.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 get_txkey_for_tiletype.o: get_txkey_for_tiletype.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 dice.o: dice.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 libgame_lua.o: libgame_lua.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 # Main reloadable game base
 libgame.o: libgame.c
 	touch libgame.so.lockfile
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $^ -o $@ 
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@ 
 libgame.so: $(LIBGAME_OBJECTS)
-	$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB) -llua5.4 $(WFLAGS) 
+	$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB) -llua5.4 $(WFLAGS)  $(CFLAGS) 
 	rm -rfv libgame.so.lockfile
 
 # Tool to help build out the asset packing
