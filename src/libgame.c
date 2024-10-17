@@ -1,5 +1,6 @@
 #include "actions.h"
 #include "controlmode.h"
+#include "direction.h"
 #include "dungeonfloor.h"
 #include "entitytype.h"
 #include "fadestate.h"
@@ -167,12 +168,9 @@ void libgame_entity_anim_incr(gamestate* g, entityid id) {
 void libgame_entity_anim_set(gamestate* g, entityid id, int index) {
     spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (group) {
-
-        char buf[128];
-        snprintf(buf, 128, "entity_anim_set: id: %d, index: %d", id, index);
-        msuccess(buf);
-
-
+        //char buf[128];
+        //snprintf(buf, 128, "entity_anim_set: id: %d, index: %d", id, index);
+        //msuccess(buf);
 
         spritegroup_set_current(group, index);
     }
@@ -338,11 +336,44 @@ void libgame_handleinput(gamestate* g) {
     }
 
 
-    //if (IsKeyPressed(KEY_P)) {
-    //    char buf[128];
-    //    snprintf(buf, 128, "hero_id: %d", g->hero_id);
-    //    msuccess(buf);
-    //}
+    if (IsKeyPressed(KEY_P)) {
+        //    char buf[128];
+        //    snprintf(buf, 128, "hero_id: %d", g->hero_id);
+
+        //minfo("printing entity info...");
+        //libgame_lua_print_entity_info(L);
+
+        //const int count = libgame_lua_get_num_entities(L);
+        //for (int i = 0; i < count; i++) {
+        //    const entityid id = libgame_lua_get_nth_entity(L, i + 1);
+        //    const race_t race = libgame_lua_get_entity_int(L, id, "race");
+        //    char buf[128];
+        //    snprintf(buf, 128, "id: %d  race: %d\n", id, race);
+        //    minfo(buf);
+        //}
+
+
+        minfo("clearing was damaged...");
+        libgame_lua_clear_was_damaged(L);
+
+        minfo("updating anim indexes...");
+        // update the animation index for all NPCs and player
+        const int count = libgame_lua_get_num_entities(L);
+        for (int i = 0; i < count; i++) {
+            const entityid id = libgame_lua_get_nth_entity(L, i + 1);
+            const race_t race = libgame_lua_get_entity_int(L, id, "race");
+            char buf[128];
+            snprintf(buf, 128, "updating anim index: id: %d  race: %d\n", id, race);
+            minfo(buf);
+            if (id != -1) {
+                spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+                if (group) {
+                    const int index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK : -1;
+                    spritegroup_set_current(group, index);
+                }
+            }
+        }
+    }
 
 
     // lets place a torch where the player is standing
@@ -414,7 +445,8 @@ void libgame_handle_grid_switch(gamestate* g) {
 void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir) {
     spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (group) {
-        int ctx = group->sprites[group->current]->currentcontext;
+        int old_ctx = group->sprites[group->current]->currentcontext;
+        int ctx = old_ctx;
         switch (dir) {
         case DIRECTION_RIGHT:
             ctx = ctx == SPRITEGROUP_CONTEXT_R_D   ? SPRITEGROUP_CONTEXT_R_D
@@ -457,11 +489,20 @@ void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir) {
             ctx = SPRITEGROUP_CONTEXT_R_D;
             break;
 
+        case DIRECTION_NONE:
+            ctx = old_ctx;
+            break;
+
         default:
             break;
         }
+
+        const race_t race = libgame_lua_get_entity_int(L, id, "race");
+        const int index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK : -1;
+
         spritegroup_setcontexts(group, ctx);
-        spritegroup_set_current(group, SPRITEGROUP_ANIM_HUMAN_WALK);
+        spritegroup_set_current(group, index);
+
         //group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
         //libgame_entity_anim_set(g, id, SPRITEGROUP_ANIM_HUMAN_WALK);
     }
@@ -499,41 +540,11 @@ void libgame_handle_player_input_movement_key(gamestate* g, direction_t dir) {
         if (hero_id != -1) {
             libgame_update_spritegroup(g, hero_id, dir);
 
-            int xdir = 0;
-            int ydir = 0;
-            switch (dir) {
-            case DIRECTION_RIGHT:
-                xdir = 1;
-                break;
-            case DIRECTION_LEFT:
-                xdir = -1;
-                break;
-            case DIRECTION_DOWN:
-                ydir = 1;
-                break;
-            case DIRECTION_UP:
-                ydir = -1;
-                break;
-            case DIRECTION_UP_LEFT:
-                xdir = -1;
-                ydir = -1;
-                break;
-            case DIRECTION_UP_RIGHT:
-                xdir = 1;
-                ydir = -1;
-                break;
-            case DIRECTION_DOWN_LEFT:
-                xdir = -1;
-                ydir = 1;
-                break;
-            case DIRECTION_DOWN_RIGHT:
-                xdir = 1;
-                ydir = 1;
-                break;
-            default:
-                break;
-            }
+            int xdir = libgame_get_x_from_dir(dir);
+            int ydir = libgame_get_y_from_dir(dir);
 
+            // update player direction
+            libgame_lua_set_entity_int(L, hero_id, "direction", dir);
             libgame_handleplayerinput_move(g, xdir, ydir);
 
         } else {
@@ -810,11 +821,11 @@ void libgame_handle_input_player(gamestate* g) {
         //g->player_input_received = true;
         //}
 
-        if (IsKeyPressed(KEY_P)) {
-            minfo("Key pressed: P");
-            libgame_lua_mytest(L);
-            //    libgame_lua_reserialization_test(L);
-        }
+        //if (IsKeyPressed(KEY_P)) {
+        //    minfo("Key pressed: P");
+        //    libgame_lua_mytest(L);
+        //    libgame_lua_reserialization_test(L);
+        //}
 
         else if (IsKeyPressed(KEY_SPACE)) {
             // randomize the dungeon tiles
@@ -891,24 +902,7 @@ void libgame_handle_input_player(gamestate* g) {
 void libgame_update_spritegroup_by_lastmove(gamestate* g, entityid entity_id) {
     const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x");
     const int ydir = libgame_lua_get_entity_int(L, entity_id, "last_move_y");
-    direction_t dir = DIRECTION_RIGHT;
-    if (xdir == -1 && ydir == -1) {
-        dir = DIRECTION_UP_LEFT;
-    } else if (xdir == 0 && ydir == -1) {
-        dir = DIRECTION_UP;
-    } else if (xdir == 1 && ydir == -1) {
-        dir = DIRECTION_UP_RIGHT;
-    } else if (xdir == -1 && ydir == 0) {
-        dir = DIRECTION_LEFT;
-    } else if (xdir == 1 && ydir == 0) {
-        dir = DIRECTION_RIGHT;
-    } else if (xdir == -1 && ydir == 1) {
-        dir = DIRECTION_DOWN_LEFT;
-    } else if (xdir == 0 && ydir == 1) {
-        dir = DIRECTION_DOWN;
-    } else if (xdir == 1 && ydir == 1) {
-        dir = DIRECTION_DOWN_RIGHT;
-    }
+    direction_t dir = libgame_get_dir_from_xy(xdir, ydir);
     libgame_update_spritegroup(g, entity_id, dir);
     libgame_update_spritegroup_move(g, entity_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
 }
@@ -924,7 +918,10 @@ void libgame_process_turn_actions(gamestate* g) {
             const entityid entity_id = libgame_lua_get_nth_action_id(L, i + 1);
             const int result_id = libgame_lua_process_action(L, i + 1);
             if (result_id != -1) {
-                if (action_type == ACTION_MOVE) {
+                if (action_type == ACTION_NONE) {
+                    libgame_update_spritegroup(g, entity_id, DIRECTION_NONE);
+
+                } else if (action_type == ACTION_MOVE) {
                     // get entity last move
                     libgame_update_spritegroup_by_lastmove(g, result_id);
                 }
@@ -1054,12 +1051,14 @@ void libgame_update_debug_panel_buffer(gamestate* g) {
     int hy = -1;
     int last_mv_x = -1;
     int last_mv_y = -1;
+    int hero_was_damaged = -1;
     const entityid id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (id != -1) {
         hx = libgame_lua_get_entity_int(L, id, "x");
         hy = libgame_lua_get_entity_int(L, id, "y");
         last_mv_x = libgame_lua_get_entity_int(L, id, "last_move_x");
         last_mv_x = libgame_lua_get_entity_int(L, id, "last_move_y");
+        hero_was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
     }
     int dw = libgame_lua_get_dungeonfloor_row_count(L);
     int dh = libgame_lua_get_dungeonfloor_col_count(L);
@@ -1083,7 +1082,8 @@ void libgame_update_debug_panel_buffer(gamestate* g) {
              "Dungeon size: %dx%d\n"
              "Action count: %d\n"
              "Entity count: %d\n"
-             "Last move: %d,%d\n",
+             "Last move: %d,%d\n"
+             "Was damaged: %d\n",
 
              g->framecount,
              g->timebeganbuf,
@@ -1108,7 +1108,8 @@ void libgame_update_debug_panel_buffer(gamestate* g) {
              action_count,
              entity_count,
              last_mv_x,
-             last_mv_y
+             last_mv_y,
+             hero_was_damaged
 
     );
 }
@@ -1287,10 +1288,16 @@ void libgame_handle_npcs_turn_lua(gamestate* g) {
 void libgame_update_entity_damaged(gamestate* g, const int i) {
     const entityid id = libgame_lua_get_nth_entity(L, i + 1);
     const int was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
+    const race_t race = libgame_lua_get_entity_int(L, id, "race");
     if (was_damaged) {
-        msuccess("entity was damaged");
-        // change the sprite animation
-        libgame_entity_anim_set(g, id, SPRITEGROUP_ANIM_ORC_DMG);
+        //minfo("entity was damaged");
+
+        const int index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_SPINDIE : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_DMG : -1;
+        if (index != -1) {
+            libgame_entity_anim_set(g, id, index);
+        } else {
+            merror("Invalid animation index selection for anim set entity damage, it may not be implemented");
+        }
     }
 }
 

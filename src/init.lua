@@ -332,9 +332,9 @@ function EntityAttack(id, xdir, ydir)
 		-- eventually i will return here to write code to process 'damage'
 		-- we can have a flag on the player and NPCs to indicate when they received damage in the previous turn
 		-- this way we can inform the C-layer about a change to the entity that would need a sprite change
-		--local target_id = GetFirstEntityTypeAt(EntityTypes.NPC, newx, newy)
+		local target_id = GetFirstEntityTypeAt(EntityTypes.NPC, newx, newy)
 		-- mark it as having been damaged
-		local target_entity = GetEntityById(id)
+		local target_entity = GetEntityById(target_id)
 		if target_entity then
 			target_entity.was_damaged = 1
 		end
@@ -342,6 +342,14 @@ function EntityAttack(id, xdir, ydir)
 		return true
 	end
 	return false
+end
+
+function PrintEntityInfo()
+	for _, entity in ipairs(Gamestate.Entities) do
+		if entity then
+			print("id: " .. entity.id .. "  name: " .. entity.name .. "  x: " .. entity.x .. "  y: " .. entity.y)
+		end
+	end
 end
 
 function ResetTurn()
@@ -495,6 +503,12 @@ end
 --	end
 --	Actions = {}
 --end
+
+function ClearWasDamaged()
+	for _, entity in ipairs(Gamestate.Entities) do
+		entity.was_damaged = 0
+	end
+end
 
 function ClearActions()
 	Gamestate.Actions = {}

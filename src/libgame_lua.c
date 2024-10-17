@@ -588,6 +588,25 @@ const int libgame_lua_get_nth_action_type(lua_State* L, const int n) {
 
 
 
+void libgame_lua_clear_was_damaged(lua_State* L) {
+    if (L) {
+        lua_getglobal(L, "ClearWasDamaged");
+        lua_pcall(L, 0, 0, 0);
+    }
+}
+
+
+
+void libgame_lua_print_entity_info(lua_State* L) {
+    if (L) {
+        lua_getglobal(L, "PrintEntityInfo");
+        lua_pcall(L, 0, 0, 0);
+    }
+}
+
+
+
+
 const int libgame_lua_get_nth_action_id(lua_State* L, const int n) {
     int retval = -1;
     if (L) {
