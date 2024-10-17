@@ -71,6 +71,8 @@ void libgame_updategamestate(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
 void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir);
 void libgame_update_spritegroup_by_lastmove(gamestate* g, entityid entity_id);
+const int libgame_get_x_from_dir(direction_t dir);
+const int libgame_get_y_from_dir(direction_t dir);
 
 
 #ifdef MOBILE

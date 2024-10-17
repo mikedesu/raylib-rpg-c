@@ -247,6 +247,22 @@ void libgame_test_enemy_placement(gamestate* g) {
 
 
 
+const int libgame_get_x_from_dir(direction_t dir) {
+    const int xdir = dir == DIRECTION_RIGHT || dir == DIRECTION_DOWN_RIGHT || dir == DIRECTION_UP_RIGHT ? 1 : dir == DIRECTION_LEFT || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_UP_LEFT ? -1 : 0;
+    return xdir;
+}
+
+
+
+
+const int libgame_get_y_from_dir(direction_t dir) {
+    const int ydir = dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1 : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT || dir == DIRECTION_UP_RIGHT ? -1 : 0;
+    return ydir;
+}
+
+
+
+
 void libgame_handleinput(gamestate* g) {
     //minfo("handleinput: starting...");
     //if (IsKeyPressed(KEY_SPACE) || GetTouchPointCount() > 0) {
@@ -257,27 +273,42 @@ void libgame_handleinput(gamestate* g) {
     //}
 
     if (IsKeyPressed(KEY_A)) {
-
-        entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+        const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
         if (hero_id != -1) {
-            spritegroup_t* grp = hashtable_entityid_spritegroup_get(g->spritegroups, hero_id);
-            if (grp) {
-                spritegroup_incr(grp);
+
+            //
+
+            // create an attack action
+            //bool res = libgame_lua_create_action(L, hero_id, ACTION_ATTACK, 0, 0);
+            const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
+            const int xdir = libgame_get_x_from_dir(dir);
+            const int ydir = libgame_get_y_from_dir(dir);
+            bool res = libgame_lua_create_action(L, hero_id, ACTION_ATTACK, xdir, ydir);
+            if (res) {
+                msuccess("attack action created");
+                spritegroup_t* grp = hashtable_entityid_spritegroup_get(g->spritegroups, hero_id);
+                if (grp) {
+                    //spritegroup_incr(grp);
+                    spritegroup_set_current(grp, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+                }
+            } else {
+                merror("attack action failed to create");
             }
+            g->player_input_received = true;
         }
-
-
-
-        // lets cycle the animation for the hero
-        //libgame_entity_anim_incr(g, g->hero_id);
-
-        // technically we dont want to be able to attack until we have picked up a weapon...
-
-
-
-        //libgame_handle_player_attack(g);
-        //g->player_input_received = true;
     }
+
+
+
+    // lets cycle the animation for the hero
+    //libgame_entity_anim_incr(g, g->hero_id);
+
+    // technically we dont want to be able to attack until we have picked up a weapon...
+
+
+
+    //libgame_handle_player_attack(g);
+    //g->player_input_received = true;
 
     if (IsKeyPressed(KEY_E)) {
         libgame_test_enemy_placement(g);
@@ -1111,9 +1142,12 @@ void libgame_do_camera_lock_on(gamestate* g) {
 
 void libgame_handle_npc_turn_lua(gamestate* g, const entityid id) {
     minfo("libgame_handle_npc_turn_lua begin");
-    const int xdir = rand() % 3 - 1;
-    const int ydir = rand() % 3 - 1;
-    const bool result = libgame_lua_create_action(L, id, 2, xdir, ydir);
+    //const int xdir = rand() % 3 - 1;
+    //const int ydir = rand() % 3 - 1;
+    const int xdir = 0;
+    const int ydir = 0;
+    //const bool result = libgame_lua_create_action(L, id, 2, xdir, ydir);
+    const bool result = libgame_lua_create_action(L, id, 1, xdir, ydir);
     if (result) {
         msuccess("libgame_handle_npc_turn_lua end");
     } else {
@@ -2327,12 +2361,15 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
         libgame_lua_set_gamestate_int(L, "HeroId", id);
         // set race type
         race_t race = RACE_HUMAN;
+        direction_t dir = DIRECTION_DOWN_LEFT;
+        //direction_t dir = DIRECTION_DOWN_RIGHT;
         libgame_lua_set_entity_int(L, id, "race", race);
+        libgame_lua_set_entity_int(L, id, "direction", dir);
 
         //libgame_create_herospritegroup(g, id);
         //libgame_create_spritegroup(g, id, TX_HERO_KEYS, TX_HERO_KEY_COUNT, -12, -12);
         libgame_create_spritegroup_by_id(g, id);
-
+        libgame_update_spritegroup(g, id, dir);
 
         char buf[128];
         snprintf(buf, 128, "libgame_create_hero_lua: hero entityid %d", id);

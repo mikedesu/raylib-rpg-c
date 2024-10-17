@@ -51,6 +51,18 @@ ActionTypes = {
 	Count = 4,
 }
 
+DirectionTypes = {
+	None = 0,
+	North = 1,
+	South = 2,
+	West = 3,
+	East = 4,
+	NorthWest = 5,
+	NorthEast = 6,
+	SouthWest = 7,
+	SouthEast = 8,
+}
+
 TileTypes = {
 	None = 0,
 	Void = 1,
@@ -177,6 +189,7 @@ function CreateEntity(name, type, x, y)
 		maxhp = 0,
 		race = RaceTypes.None,
 		was_damaged = 0,
+		direction = DirectionTypes.SouthEast,
 		--inventory = {},
 	}
 	Gamestate.NextEntityId = Gamestate.NextEntityId + 1
@@ -231,6 +244,37 @@ function SetEntityAt(entityId, x, y)
 	return false
 end
 
+function GetDirectionFromXY(xdir, ydir)
+	if xdir == 0 and ydir == 0 then
+		return DirectionTypes.None
+	end
+	if xdir == 0 and ydir == -1 then
+		return DirectionTypes.North
+	end
+	if xdir == 0 and ydir == 1 then
+		return DirectionTypes.South
+	end
+	if xdir == -1 and ydir == 0 then
+		return DirectionTypes.West
+	end
+	if xdir == 1 and ydir == 0 then
+		return DirectionTypes.East
+	end
+	if xdir == -1 and ydir == -1 then
+		return DirectionTypes.NorthWest
+	end
+	if xdir == 1 and ydir == -1 then
+		return DirectionTypes.NorthEast
+	end
+	if xdir == -1 and ydir == 1 then
+		return DirectionTypes.SouthWest
+	end
+	if xdir == 1 and ydir == 1 then
+		return DirectionTypes.SouthEast
+	end
+	return DirectionTypes.None
+end
+
 function EntityMove(id, xdir, ydir)
 	local entity = GetEntityById(id)
 	if entity then
@@ -254,6 +298,7 @@ function EntityMove(id, xdir, ydir)
 		entity.y = newy
 		entity.last_move_x = xdir
 		entity.last_move_y = ydir
+		entity.direction = GetDirectionFromXY(xdir, ydir)
 		return true
 	end
 	return false
