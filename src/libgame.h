@@ -76,6 +76,7 @@ const int libgame_get_y_from_dir(direction_t dir);
 const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
 void libgame_update_entities_damaged(gamestate* g);
 void libgame_update_entity_damaged(gamestate* g, const int i);
+void libgame_update_anim_indices(gamestate* g);
 
 
 #ifdef MOBILE
