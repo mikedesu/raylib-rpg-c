@@ -518,6 +518,14 @@ function GetActionCount()
 	return #Gamestate.Actions
 end
 
+function GetNthActionX(n)
+	return Gamestate.Actions[n].xdir
+end
+
+function GetNthActionY(n)
+	return Gamestate.Actions[n].ydir
+end
+
 function GetNthActionType(n)
 	return Gamestate.Actions[n].type
 end

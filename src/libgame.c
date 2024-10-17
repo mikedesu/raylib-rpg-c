@@ -787,6 +787,8 @@ void libgame_process_turn_actions(gamestate* g) {
         for (int i = 0; i < action_count; i++) {
             const action_t action_type = libgame_lua_get_nth_action_type(L, i + 1);
             const entityid entity_id = libgame_lua_get_nth_action_id(L, i + 1);
+            const int x = libgame_lua_get_nth_action_x(L, i + 1);
+            const int y = libgame_lua_get_nth_action_y(L, i + 1);
             const int result_id = libgame_lua_process_action(L, i + 1);
             if (result_id != -1) {
                 if (action_type == ACTION_NONE) {
@@ -797,8 +799,10 @@ void libgame_process_turn_actions(gamestate* g) {
                     libgame_update_spritegroup_by_lastmove(g, result_id);
                 }
             } else {
-                const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x");
-                const int ydir = libgame_lua_get_entity_int(L, entity_id, "last_move_y");
+                //const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x");
+                //const int ydir = libgame_lua_get_entity_int(L, entity_id, "last_move_y");
+                const int xdir = x;
+                const int ydir = y;
                 const direction_t dir = libgame_get_dir_from_xy(xdir, ydir);
                 libgame_update_spritegroup(g, entity_id, dir);
             }

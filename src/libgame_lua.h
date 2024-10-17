@@ -40,6 +40,8 @@ void libgame_lua_set_gamestate_int(lua_State* L, const char* key, const int valu
 void libgame_lua_mytest(lua_State* L);
 void libgame_lua_clear_was_damaged(lua_State* L);
 void libgame_lua_print_entity_info(lua_State* L);
+const int libgame_lua_get_nth_action_x(lua_State* L, const int n);
+const int libgame_lua_get_nth_action_y(lua_State* L, const int n);
 
 //void libgame_lua_print_entities(lua_State* L);
 //void libgame_lua_serialize_entities_and_print(lua_State* L);

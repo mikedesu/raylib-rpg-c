@@ -588,6 +588,38 @@ const int libgame_lua_get_nth_action_type(lua_State* L, const int n) {
 
 
 
+const int libgame_lua_get_nth_action_x(lua_State* L, const int n) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetNthActionX");
+        lua_pushnumber(L, n);
+        if (lua_pcall(L, 1, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const int libgame_lua_get_nth_action_y(lua_State* L, const int n) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetNthActionY");
+        lua_pushnumber(L, n);
+        if (lua_pcall(L, 1, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
 void libgame_lua_clear_was_damaged(lua_State* L) {
     if (L) {
         lua_getglobal(L, "ClearWasDamaged");
