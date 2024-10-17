@@ -298,7 +298,13 @@ function EntityMove(id, xdir, ydir)
 		entity.y = newy
 		entity.last_move_x = xdir
 		entity.last_move_y = ydir
-		entity.direction = GetDirectionFromXY(xdir, ydir)
+
+		local old_direction = entity.direction
+		local new_direction = GetDirectionFromXY(xdir, ydir)
+		if new_direction ~= DirectionTypes.None then
+			new_direction = old_direction
+		end
+		entity.direction = new_direction
 		return true
 	end
 	return false
@@ -311,17 +317,17 @@ function EntityAttack(id, xdir, ydir)
 		local newy = entity.y + ydir
 		local tiletype = GetTileType(newx, newy)
 		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
-			return false
+			return true
 		end
 		if tiletype == TileTypes.None then
-			return false
+			return true
 		end
 		if tiletype == TileTypes.Stonewall00 then
-			return false
+			return true
 		end
-		-- if the tile is empty of entities, return false
+		-- if the tile is empty of entities, return true
 		if GetNumEntitiesAt(newx, newy) == 0 then
-			return false
+			return true
 		end
 		-- eventually i will return here to write code to process 'damage'
 		-- we can have a flag on the player and NPCs to indicate when they received damage in the previous turn
@@ -433,8 +439,8 @@ end
 
 function CreateAction(id, type, x, y)
 	-- if the type isnt valid, return
-	if type < ActionTypes.Move or type >= ActionTypes.Count then
-		--PrintDebug("init.lua:298", "Invalid action type " .. type)
+	if type < ActionTypes.None or type >= ActionTypes.Count then
+		PrintDebug("init.lua:298", "Invalid action type " .. type)
 		return false
 	end
 	-- if the id is invalid, return
@@ -469,10 +475,11 @@ function ProcessAction(index)
 	local action = Gamestate.Actions[index]
 	local result = false
 	--PrintDebug("init.lua:335", "Processing action type " .. action.type .. " for entity with id " .. action.id)
-	if action.type == ActionTypes.Move then
+	if action.type == ActionTypes.None then
+		result = true
+	elseif action.type == ActionTypes.Move then
 		result = EntityMove(action.id, action.x, action.y)
-	end
-	if action.type == ActionTypes.Attack then
+	elseif action.type == ActionTypes.Attack then
 		result = EntityAttack(action.id, action.x, action.y)
 	end
 	if result == false then
@@ -495,6 +502,14 @@ end
 
 function GetActionCount()
 	return #Gamestate.Actions
+end
+
+function GetNthActionType(n)
+	return Gamestate.Actions[n].type
+end
+
+function GetNthActionId(n)
+	return Gamestate.Actions[n].id
 end
 
 function ActionsExist()

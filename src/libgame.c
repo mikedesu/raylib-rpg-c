@@ -154,12 +154,12 @@ void libgame_handle_fade(gamestate* g) {
 
 
 
-//void libgame_entity_anim_incr(gamestate* g, entityid id) {
-//    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-//    if (group) {
-//        spritegroup_incr(group);
-//    }
-//}
+void libgame_entity_anim_incr(gamestate* g, entityid id) {
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (group) {
+        spritegroup_incr(group);
+    }
+}
 
 
 
@@ -167,6 +167,13 @@ void libgame_handle_fade(gamestate* g) {
 void libgame_entity_anim_set(gamestate* g, entityid id, int index) {
     spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (group) {
+
+        char buf[128];
+        snprintf(buf, 128, "entity_anim_set: id: %d, index: %d", id, index);
+        msuccess(buf);
+
+
+
         spritegroup_set_current(group, index);
     }
 }
@@ -258,6 +265,21 @@ const int libgame_get_x_from_dir(direction_t dir) {
 const int libgame_get_y_from_dir(direction_t dir) {
     const int ydir = dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1 : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT || dir == DIRECTION_UP_RIGHT ? -1 : 0;
     return ydir;
+}
+
+
+
+
+const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir) {
+    return xdir == 1 && ydir == 0     ? DIRECTION_RIGHT
+           : xdir == -1 && ydir == 0  ? DIRECTION_LEFT
+           : xdir == 0 && ydir == 1   ? DIRECTION_DOWN
+           : xdir == 0 && ydir == -1  ? DIRECTION_UP
+           : xdir == 1 && ydir == 1   ? DIRECTION_DOWN_RIGHT
+           : xdir == -1 && ydir == 1  ? DIRECTION_DOWN_LEFT
+           : xdir == 1 && ydir == -1  ? DIRECTION_UP_RIGHT
+           : xdir == -1 && ydir == -1 ? DIRECTION_UP_LEFT
+                                      : DIRECTION_NONE;
 }
 
 
@@ -898,10 +920,19 @@ void libgame_process_turn_actions(gamestate* g) {
     const int action_count = libgame_lua_get_action_count(L);
     if (action_count > 0) {
         for (int i = 0; i < action_count; i++) {
-            const int entity_id = libgame_lua_process_action(L, i + 1);
-            if (entity_id != -1) {
-                // get entity last move
-                libgame_update_spritegroup_by_lastmove(g, entity_id);
+            const action_t action_type = libgame_lua_get_nth_action_type(L, i + 1);
+            const entityid entity_id = libgame_lua_get_nth_action_id(L, i + 1);
+            const int result_id = libgame_lua_process_action(L, i + 1);
+            if (result_id != -1) {
+                if (action_type == ACTION_MOVE) {
+                    // get entity last move
+                    libgame_update_spritegroup_by_lastmove(g, result_id);
+                }
+            } else {
+                const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x");
+                const int ydir = libgame_lua_get_entity_int(L, entity_id, "last_move_y");
+                const direction_t dir = libgame_get_dir_from_xy(xdir, ydir);
+                libgame_update_spritegroup(g, entity_id, dir);
             }
         }
     }
@@ -1018,13 +1049,17 @@ void libgame_closewindow() {
 
 
 
-void libgame_update_debugpanelbuffer(gamestate* g) {
+void libgame_update_debug_panel_buffer(gamestate* g) {
     int hx = -1;
     int hy = -1;
+    int last_mv_x = -1;
+    int last_mv_y = -1;
     const entityid id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (id != -1) {
         hx = libgame_lua_get_entity_int(L, id, "x");
         hy = libgame_lua_get_entity_int(L, id, "y");
+        last_mv_x = libgame_lua_get_entity_int(L, id, "last_move_x");
+        last_mv_x = libgame_lua_get_entity_int(L, id, "last_move_y");
     }
     int dw = libgame_lua_get_dungeonfloor_row_count(L);
     int dh = libgame_lua_get_dungeonfloor_col_count(L);
@@ -1048,8 +1083,7 @@ void libgame_update_debugpanelbuffer(gamestate* g) {
              "Dungeon size: %dx%d\n"
              "Action count: %d\n"
              "Entity count: %d\n"
-
-             ,
+             "Last move: %d,%d\n",
 
              g->framecount,
              g->timebeganbuf,
@@ -1072,7 +1106,9 @@ void libgame_update_debugpanelbuffer(gamestate* g) {
              dh,
              dw,
              action_count,
-             entity_count
+             entity_count,
+             last_mv_x,
+             last_mv_y
 
     );
 }
@@ -1248,13 +1284,38 @@ void libgame_handle_npcs_turn_lua(gamestate* g) {
 
 
 
+void libgame_update_entity_damaged(gamestate* g, const int i) {
+    const entityid id = libgame_lua_get_nth_entity(L, i + 1);
+    const int was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
+    if (was_damaged) {
+        msuccess("entity was damaged");
+        // change the sprite animation
+        libgame_entity_anim_set(g, id, SPRITEGROUP_ANIM_ORC_DMG);
+    }
+}
+
+
+
+void libgame_update_entities_damaged(gamestate* g) {
+    const int count = libgame_lua_get_num_entities(L);
+    for (int i = 0; i < count; i++) {
+        libgame_update_entity_damaged(g, i);
+    }
+}
+
+
+
+
 void libgame_updategamestate(gamestate* g) {
     //minfo("begin libgame_updategamestate");
     //minfo("libgame_updategamestate: update debug panel buffer");
-    libgame_update_debugpanelbuffer(g);
+    libgame_update_debug_panel_buffer(g);
     //setdebugpanelcenter(g);
     //minfo("libgame_updategamestate: update smooth move");
     //libgame_update_smoothmove(g, g->hero_id);
+
+    libgame_update_entities_damaged(g);
+
     libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
     //minfo("libgame_updategamestate: do camera lockon");
     //libgame_do_camera_lock_on(g);
@@ -2513,7 +2574,7 @@ void libgame_initsharedsetup(gamestate* g) {
         //libgame_create_orc(g, "orc4", (Vector2){1, 3});
         //libgame_create_orc(g, "orc5", (Vector2){1, 2});
         // these dont work right until the text buffer of the debugpanel is filled
-        libgame_update_debugpanelbuffer(g);
+        libgame_update_debug_panel_buffer(g);
         libgame_calc_debugpanel_size(g);
         setdebugpanelbottomleft(g);
     } else {

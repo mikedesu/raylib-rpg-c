@@ -66,13 +66,16 @@ void libgame_unloadtexture(gamestate* g, int index);
 void libgame_unloadtextures(gamestate* g);
 void libgame_update_smoothmove(gamestate* g, const entityid id);
 void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y);
-void libgame_update_debugpanelbuffer(gamestate* g);
+void libgame_update_debug_panel_buffer(gamestate* g);
 void libgame_updategamestate(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
 void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir);
 void libgame_update_spritegroup_by_lastmove(gamestate* g, entityid entity_id);
 const int libgame_get_x_from_dir(direction_t dir);
 const int libgame_get_y_from_dir(direction_t dir);
+const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
+void libgame_update_entities_damaged(gamestate* g);
+void libgame_update_entity_damaged(gamestate* g, const int i);
 
 
 #ifdef MOBILE

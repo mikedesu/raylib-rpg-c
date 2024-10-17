@@ -568,3 +568,35 @@ void libgame_lua_mytest(lua_State* L) {
         lua_pcall(L, 0, 0, 0);
     }
 }
+
+
+
+
+const int libgame_lua_get_nth_action_type(lua_State* L, const int n) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetNthActionType");
+        lua_pushnumber(L, n);
+        if (lua_pcall(L, 1, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
+
+
+
+
+const int libgame_lua_get_nth_action_id(lua_State* L, const int n) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetNthActionId");
+        lua_pushnumber(L, n);
+        if (lua_pcall(L, 1, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}

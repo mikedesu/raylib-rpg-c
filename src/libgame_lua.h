@@ -25,6 +25,8 @@ const int libgame_lua_process_action(lua_State* L, const int index);
 const int libgame_lua_get_num_entities(lua_State* L);
 const int libgame_lua_get_nth_entity(lua_State* L, const int n);
 const int libgame_lua_get_gamestate_int(lua_State* L, const char* key);
+const int libgame_lua_get_nth_action_type(lua_State* L, const int n);
+const int libgame_lua_get_nth_action_id(lua_State* L, const int n);
 
 const char* libgame_lua_get_gamestate_str(lua_State* L, const char* key);
 const char* libgame_lua_get_entity_str(lua_State* L, const int id, const char* key);
