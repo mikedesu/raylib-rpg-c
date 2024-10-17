@@ -45,8 +45,10 @@ Gamestate = {
 HeroId = -1
 
 ActionTypes = {
-	Wait = 1,
+	None = 1,
 	Move = 2,
+	Attack = 3,
+	Count = 4,
 }
 
 TileTypes = {
@@ -174,6 +176,7 @@ function CreateEntity(name, type, x, y)
 		hp = 0,
 		maxhp = 0,
 		race = RaceTypes.None,
+		was_damaged = 0,
 		--inventory = {},
 	}
 	Gamestate.NextEntityId = Gamestate.NextEntityId + 1
@@ -256,6 +259,61 @@ function EntityMove(id, xdir, ydir)
 	return false
 end
 
+function EntityAttack(id, xdir, ydir)
+	local entity = GetEntityById(id)
+	if entity then
+		local newx = entity.x + xdir
+		local newy = entity.y + ydir
+		local tiletype = GetTileType(newx, newy)
+		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
+			return false
+		end
+		if tiletype == TileTypes.None then
+			return false
+		end
+		if tiletype == TileTypes.Stonewall00 then
+			return false
+		end
+		-- if the tile is empty of entities, return false
+		if GetNumEntitiesAt(newx, newy) == 0 then
+			return false
+		end
+		-- eventually i will return here to write code to process 'damage'
+		-- we can have a flag on the player and NPCs to indicate when they received damage in the previous turn
+		-- this way we can inform the C-layer about a change to the entity that would need a sprite change
+		--local target_id = GetFirstEntityTypeAt(EntityTypes.NPC, newx, newy)
+		-- mark it as having been damaged
+		local target_entity = GetEntityById(id)
+		if target_entity then
+			target_entity.was_damaged = 1
+		end
+		-- for now, returning true if the tile is occupied by an entity
+		return true
+	end
+	return false
+end
+
+function ResetTurn()
+	for _, entityid in ipairs(Gamestate.Entities) do
+		local entity = GetEntityById(entityid)
+		if entity then
+			entity.was_damaged = 0
+		end
+	end
+end
+
+function GetFirstEntityTypeAt(type, x, y)
+	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
+		for _, entityId in ipairs(Gamestate.DungeonFloor[y][x].entities) do
+			local entity = GetEntityById(entityId)
+			if entity and entity.type == type then
+				return entityId
+			end
+		end
+	end
+	return -1
+end
+
 function EntityMoveRandomDir(id)
 	local xdir = math.random(-1, 1)
 	local ydir = math.random(-1, 1)
@@ -330,7 +388,7 @@ end
 
 function CreateAction(id, type, x, y)
 	-- if the type isnt valid, return
-	if type < ActionTypes.Move or type > ActionTypes.Move then
+	if type < ActionTypes.Move or type >= ActionTypes.Count then
 		--PrintDebug("init.lua:298", "Invalid action type " .. type)
 		return false
 	end
@@ -368,6 +426,9 @@ function ProcessAction(index)
 	--PrintDebug("init.lua:335", "Processing action type " .. action.type .. " for entity with id " .. action.id)
 	if action.type == ActionTypes.Move then
 		result = EntityMove(action.id, action.x, action.y)
+	end
+	if action.type == ActionTypes.Attack then
+		result = EntityAttack(action.id, action.x, action.y)
 	end
 	if result == false then
 		return -1

@@ -1,3 +1,4 @@
+#include "actions.h"
 #include "controlmode.h"
 #include "dungeonfloor.h"
 #include "entitytype.h"
@@ -430,7 +431,7 @@ void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y) {
 void libgame_handleplayerinput_move(gamestate* g, int xdir, int ydir) {
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
-        libgame_lua_create_action(L, hero_id, 2, xdir, ydir);
+        libgame_lua_create_action(L, hero_id, ACTION_MOVE, xdir, ydir);
     } else {
         merror("handleplayerinput_move: hero_id is -1");
     }
@@ -834,48 +835,54 @@ void libgame_handle_input_player(gamestate* g) {
 
 
 
+void libgame_update_spritegroup_by_lastmove(gamestate* g, entityid entity_id) {
+    const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x");
+    const int ydir = libgame_lua_get_entity_int(L, entity_id, "last_move_y");
+    direction_t dir = DIRECTION_RIGHT;
+    if (xdir == -1 && ydir == -1) {
+        dir = DIRECTION_UP_LEFT;
+    } else if (xdir == 0 && ydir == -1) {
+        dir = DIRECTION_UP;
+    } else if (xdir == 1 && ydir == -1) {
+        dir = DIRECTION_UP_RIGHT;
+    } else if (xdir == -1 && ydir == 0) {
+        dir = DIRECTION_LEFT;
+    } else if (xdir == 1 && ydir == 0) {
+        dir = DIRECTION_RIGHT;
+    } else if (xdir == -1 && ydir == 1) {
+        dir = DIRECTION_DOWN_LEFT;
+    } else if (xdir == 0 && ydir == 1) {
+        dir = DIRECTION_DOWN;
+    } else if (xdir == 1 && ydir == 1) {
+        dir = DIRECTION_DOWN_RIGHT;
+    }
+    libgame_update_spritegroup(g, entity_id, dir);
+    libgame_update_spritegroup_move(g, entity_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
+}
 
-void libgame_process_turn(gamestate* g) {
+
+
+
+void libgame_process_turn_actions(gamestate* g) {
     const int action_count = libgame_lua_get_action_count(L);
     if (action_count > 0) {
-        //char buf[128];
-        //snprintf(buf, 128, "action count: %d", action_count);
-        //minfo("processing actions...");
-        //minfo(buf);
         for (int i = 0; i < action_count; i++) {
             const int entity_id = libgame_lua_process_action(L, i + 1);
-            //bool result = libgame_lua_process_action(L, 1);
             if (entity_id != -1) {
-                //bzero(buf, 128);
-                //snprintf(buf, 128, "action processed successfully, entity id: %d", entity_id);
-                //msuccess(buf);
                 // get entity last move
-                const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x");
-                const int ydir = libgame_lua_get_entity_int(L, entity_id, "last_move_y");
-                direction_t dir = DIRECTION_RIGHT;
-                if (xdir == -1 && ydir == -1) {
-                    dir = DIRECTION_UP_LEFT;
-                } else if (xdir == 0 && ydir == -1) {
-                    dir = DIRECTION_UP;
-                } else if (xdir == 1 && ydir == -1) {
-                    dir = DIRECTION_UP_RIGHT;
-                } else if (xdir == -1 && ydir == 0) {
-                    dir = DIRECTION_LEFT;
-                } else if (xdir == 1 && ydir == 0) {
-                    dir = DIRECTION_RIGHT;
-                } else if (xdir == -1 && ydir == 1) {
-                    dir = DIRECTION_DOWN_LEFT;
-                } else if (xdir == 0 && ydir == 1) {
-                    dir = DIRECTION_DOWN;
-                } else if (xdir == 1 && ydir == 1) {
-                    dir = DIRECTION_DOWN_RIGHT;
-                }
-                libgame_update_spritegroup(g, entity_id, dir);
-                libgame_update_spritegroup_move(g, entity_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
+                libgame_update_spritegroup_by_lastmove(g, entity_id);
             }
         }
-        libgame_lua_clear_actions(L);
     }
+}
+
+
+
+void libgame_process_turn(gamestate* g) {
+
+    libgame_process_turn_actions(g);
+
+    libgame_lua_clear_actions(L);
 }
 
 
@@ -2587,51 +2594,6 @@ gamestate* libgame_getgamestate() {
 //    merror("libgame_entity_move: move unsuccessful");
 //}
 //return retval;
-//}
-
-
-
-
-//const bool libgame_is_tile_occupied_with_entitytype(gamestate* g, const entitytype_t type, const int x, const int y) {
-//    tile_t* t = dungeonfloor_get_tile(g->dungeonfloor, x, y);
-//    if (t) {
-//        int count = vectorentityid_capacity(&t->entityids);
-//        // get is tile occupied
-//        for (int i = 0; i < count; i++) {
-//            entityid id = vectorentityid_get(&t->entityids, i);
-//            entity_t* entity = hashtable_entityid_entity_get(g->entities, id);
-//            if (entity->type == type) {
-//                minfo("is_tile_occupied: tile occupied");
-//                fprintf(stdout, "entity type: %d at (%d, %d)\n", entity->type, x, y);
-//                return true;
-//            }
-//        }
-//    }
-//    return false;
-//}
-
-
-
-//const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y) {
-//    bool retval = false;
-//    if (e) {
-//        // check bounds
-//        if (e->x + x < 0 || e->x + x >= g->dungeonfloor->len) {
-//            merror("move_check: out of bounds x");
-//            retval = false;
-//        } else if (e->y + y < 0 || e->y + y >= g->dungeonfloor->wid) {
-//            merror("move_check: out of bounds y");
-//            retval = false;
-//        } else {
-//            bool r0 = !libgame_is_tile_occupied_with_entitytype(g, ENTITY_PLAYER, e->x + x, e->y + y);
-//            bool r1 = !libgame_is_tile_occupied_with_entitytype(g, ENTITY_NPC, e->x + x, e->y + y);
-//            return r0 && r1;
-//        }
-//    } else {
-//        merror("move_check: entity is NULL");
-//        retval = false;
-//    }
-//    return retval;
 //}
 
 
