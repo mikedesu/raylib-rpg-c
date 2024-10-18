@@ -314,31 +314,7 @@ void libgame_handleinput(gamestate* g) {
     //    }
     //}
 
-    if (IsKeyPressed(KEY_A)) {
-        const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-        if (hero_id != -1) {
 
-            //
-
-            // create an attack action
-            //bool res = libgame_lua_create_action(L, hero_id, ACTION_ATTACK, 0, 0);
-            const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
-            const int xdir = libgame_get_x_from_dir(dir);
-            const int ydir = libgame_get_y_from_dir(dir);
-            bool res = libgame_lua_create_action(L, hero_id, ACTION_ATTACK, xdir, ydir);
-            if (res) {
-                msuccess("attack action created");
-                spritegroup_t* grp = hashtable_entityid_spritegroup_get(g->spritegroups, hero_id);
-                if (grp) {
-                    //spritegroup_incr(grp);
-                    spritegroup_set_current(grp, SPRITEGROUP_ANIM_HUMAN_ATTACK);
-                }
-            } else {
-                merror("attack action failed to create");
-            }
-            g->player_input_received = true;
-        }
-    }
 
     // lets cycle the animation for the hero
     //libgame_entity_anim_incr(g, g->hero_id);
@@ -351,11 +327,11 @@ void libgame_handleinput(gamestate* g) {
         //    g->player_input_received = true;
     }
 
-    if (IsKeyPressed(KEY_P)) {
-        minfo("clearing was damaged...");
-        libgame_lua_clear_was_damaged(L);
-        libgame_update_anim_indices(g);
-    }
+    //if (IsKeyPressed(KEY_P)) {
+    //    minfo("clearing was damaged...");
+    //    libgame_lua_clear_was_damaged(L);
+    //    libgame_update_anim_indices(g);
+    //}
 
     // lets place a torch where the player is standing
     //if (IsKeyPressed(KEY_T)) {
@@ -528,6 +504,10 @@ void libgame_handle_player_input_movement_key(gamestate* g, direction_t dir) {
             libgame_lua_set_entity_int(L, hero_id, "direction", dir);
             libgame_handleplayerinput_move(g, xdir, ydir);
 
+            g->player_input_received = true;
+            g->is_locked = true;
+            g->lock_timer = 60;
+
         } else {
             merror("handleplayerinput_key_right: hero_id is -1");
         }
@@ -643,7 +623,7 @@ void libgame_handle_input_player_mobile(gamestate* g) {
 
 void libgame_handle_input_player(gamestate* g) {
     //minfo("handle_playerinput: starting...");
-    if (g->controlmode == CONTROLMODE_PLAYER) {
+    if (g->controlmode == CONTROLMODE_PLAYER && g->player_input_received == false) {
         //const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         // this is just a test
         // the real setup will involve managing the player's dungeon position
@@ -654,35 +634,52 @@ void libgame_handle_input_player(gamestate* g) {
         if (IsKeyPressed(KEY_KP_6) || IsKeyPressed(KEY_RIGHT)) {
             //libgame_handleplayerinput_key_right(g);
             libgame_handle_player_input_movement_key(g, DIRECTION_RIGHT);
-            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_4) || IsKeyPressed(KEY_LEFT)) {
             //libgame_handleplayerinput_key_left(g);
             libgame_handle_player_input_movement_key(g, DIRECTION_LEFT);
-            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_2) || IsKeyPressed(KEY_DOWN)) {
             //libgame_handleplayerinput_key_down(g);
             libgame_handle_player_input_movement_key(g, DIRECTION_DOWN);
-            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_8) || IsKeyPressed(KEY_UP)) {
             //libgame_handleplayerinput_key_up(g);
             libgame_handle_player_input_movement_key(g, DIRECTION_UP);
-            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_1)) {
             //libgame_handleplayerinput_key_down_left(g);
             libgame_handle_player_input_movement_key(g, DIRECTION_DOWN_LEFT);
-            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_3)) {
             //libgame_handleplayerinput_key_down_right(g);
             libgame_handle_player_input_movement_key(g, DIRECTION_DOWN_RIGHT);
-            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_7)) {
             //libgame_handleplayerinput_key_up_left(g);
             libgame_handle_player_input_movement_key(g, DIRECTION_UP_LEFT);
-            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_KP_9)) {
             //libgame_handleplayerinput_key_up_right(g);
             libgame_handle_player_input_movement_key(g, DIRECTION_UP_RIGHT);
-            g->player_input_received = true;
+        }
+
+
+
+        else if (IsKeyPressed(KEY_A)) {
+            const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+            if (hero_id != -1) {
+                // create an attack action
+                const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
+                const int xdir = libgame_get_x_from_dir(dir);
+                const int ydir = libgame_get_y_from_dir(dir);
+                bool res = libgame_lua_create_action(L, hero_id, ACTION_ATTACK, xdir, ydir);
+                if (res) {
+                    msuccess("attack action created");
+                    spritegroup_t* grp = hashtable_entityid_spritegroup_get(g->spritegroups, hero_id);
+                    if (grp) {
+                        spritegroup_set_current(grp, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+                    }
+                } else {
+                    merror("attack action failed to create");
+                }
+                g->player_input_received = true;
+                g->is_locked = true;
+                g->lock_timer = 60;
+            }
         }
 
         //else if (IsKeyPressed(KEY_COMMA)) {
@@ -812,6 +809,22 @@ void libgame_process_turn_actions(gamestate* g) {
 
 
 
+
+const char* libgame_get_str_from_dir(const direction_t dir) {
+    return dir == DIRECTION_RIGHT        ? "RIGHT"
+           : dir == DIRECTION_LEFT       ? "LEFT"
+           : dir == DIRECTION_UP         ? "UP"
+           : dir == DIRECTION_DOWN       ? "DOWN"
+           : dir == DIRECTION_UP_LEFT    ? "UP_LEFT"
+           : dir == DIRECTION_UP_RIGHT   ? "UP_RIGHT"
+           : dir == DIRECTION_DOWN_LEFT  ? "DOWN_LEFT"
+           : dir == DIRECTION_DOWN_RIGHT ? "DOWN_RIGHT"
+                                         : "NONE";
+}
+
+
+
+
 void libgame_process_turn(gamestate* g) {
 
     libgame_process_turn_actions(g);
@@ -935,16 +948,20 @@ void libgame_update_debug_panel_buffer(gamestate* g) {
         last_mv_x = libgame_lua_get_entity_int(L, id, "last_move_y");
         hero_was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
     }
-    int dw = libgame_lua_get_dungeonfloor_row_count(L);
-    int dh = libgame_lua_get_dungeonfloor_col_count(L);
-    int action_count = libgame_lua_get_action_count(L);
-    int entity_count = libgame_lua_get_num_entities(L);
+    const int dw = libgame_lua_get_dungeonfloor_row_count(L);
+    const int dh = libgame_lua_get_dungeonfloor_col_count(L);
+    const int action_count = libgame_lua_get_action_count(L);
+    const int entity_count = libgame_lua_get_num_entities(L);
+    const int dir = libgame_lua_get_entity_int(L, id, "direction");
+    const char* dir_str = libgame_get_str_from_dir(dir);
 
     snprintf(g->debugpanel.buffer,
              1024,
              "Framecount:   %d\n"
              "%s\n"
              "%s\n"
+             "%d\n"
+             "%d\n"
              "Target size:  %d,%d\n"
              "Window size:  %d,%d\n"
              "Cam.target:   %.2f,%.2f\n"
@@ -958,11 +975,16 @@ void libgame_update_debug_panel_buffer(gamestate* g) {
              "Action count: %d\n"
              "Entity count: %d\n"
              "Last move: %d,%d\n"
-             "Was damaged: %d\n",
+             "Was damaged: %d\n"
+             "Dir: %s\n",
 
              g->framecount,
              g->timebeganbuf,
              g->currenttimebuf,
+             g->is_locked,
+             g->lock_timer,
+
+
              targetwidth,
              targetheight,
              windowwidth,
@@ -984,7 +1006,8 @@ void libgame_update_debug_panel_buffer(gamestate* g) {
              entity_count,
              last_mv_x,
              last_mv_y,
-             hero_was_damaged
+             hero_was_damaged,
+             dir_str
 
     );
 }
@@ -1160,7 +1183,7 @@ void libgame_handle_npcs_turn_lua(gamestate* g) {
 
 
 
-void libgame_update_entity_damaged(gamestate* g, const int i) {
+void libgame_update_entity_damaged_anim(gamestate* g, const int i) {
     const entityid id = libgame_lua_get_nth_entity(L, i + 1);
     const int was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
     const race_t race = libgame_lua_get_entity_int(L, id, "race");
@@ -1178,10 +1201,10 @@ void libgame_update_entity_damaged(gamestate* g, const int i) {
 
 
 
-void libgame_update_entities_damaged(gamestate* g) {
+void libgame_update_entities_damaged_anim(gamestate* g) {
     const int count = libgame_lua_get_num_entities(L);
     for (int i = 0; i < count; i++) {
-        libgame_update_entity_damaged(g, i);
+        libgame_update_entity_damaged_anim(g, i);
     }
 }
 
@@ -1194,10 +1217,7 @@ void libgame_updategamestate(gamestate* g) {
     libgame_update_debug_panel_buffer(g);
     //setdebugpanelcenter(g);
     //minfo("libgame_updategamestate: update smooth move");
-    //libgame_update_smoothmove(g, g->hero_id);
-
-    libgame_update_entities_damaged(g);
-
+    libgame_update_entities_damaged_anim(g);
     libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
     //minfo("libgame_updategamestate: do camera lockon");
     //libgame_do_camera_lock_on(g);
@@ -1205,16 +1225,36 @@ void libgame_updategamestate(gamestate* g) {
     // lets iterate over our entities, find the NPCs, and make them move in a random direction
     // then, we will update their smooth moves
     // we will need to eventually disable player input during smooth moving
-    if (g->player_input_received) {
-        //minfo("libgame_updategamestate: handle npcs turn lua");
-        libgame_handle_npcs_turn_lua(g);
-        libgame_process_turn(g);
-        g->player_input_received = false;
-    }
+    //if (g->player_input_received) {
+    //    libgame_handle_npcs_turn_lua(g);
+    //    libgame_process_turn(g);
+    //    g->player_input_received = false;
+    //}
     //minfo("libgame_updategamestate: update smooth moves for NPCs");
     // update smooth move for NPCs and other entities
     libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
     //msuccess("end libgame_updategamestate");
+
+
+    // i plan on using the lock and lock timer to control an ebb-and-flow
+    // so that it doesnt appear like enemies move immediately as the player
+    // does
+    if (g->is_locked && g->lock_timer > 0) {
+        g->lock_timer--;
+    } else if (g->is_locked && g->lock_timer <= 0) {
+        g->is_locked = false;
+        g->lock_timer = 0;
+
+        if (g->player_input_received) {
+            libgame_process_turn(g);
+            g->player_input_received = false;
+            g->is_locked = true;
+            g->lock_timer = 60;
+        } else {
+            libgame_handle_npcs_turn_lua(g);
+            libgame_process_turn(g);
+        }
+    }
 }
 
 
@@ -1242,6 +1282,9 @@ void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t 
 void libgame_drawframeend(gamestate* g) {
     EndDrawing();
     g->framecount++;
+
+
+
     gamestateupdatecurrenttime(g);
 }
 
@@ -1267,13 +1310,13 @@ void libgame_drawframe(gamestate* g) {
     }
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    libgame_draw_debugpanel(g);
+    libgame_draw_debug_panel(g);
 
-    const int pad_w = 2;
-    const int pad_h = 10;
+    //const int pad_w = 2;
+    //const int pad_h = 10;
     //const int pad_w = 0;
     //const int pad_h = 0;
-    DrawRectangleLines(0, 0, windowwidth - pad_w, windowheight - pad_h, RED);
+    //DrawRectangleLines(0, 0, windowwidth - pad_w, windowheight - pad_h, RED);
     libgame_drawframeend(g);
     //msuccess("libgame_drawframe end");
 }
@@ -1292,7 +1335,7 @@ void libgame_calc_debugpanel_size(gamestate* g) {
 
 
 
-inline void libgame_draw_debugpanel(gamestate* g) {
+inline void libgame_draw_debug_panel(gamestate* g) {
     if (g && g->debugpanelon) {
         const int fontsize = 14;
         const int spacing = 1;
@@ -1391,10 +1434,10 @@ void libgame_draw_entity(gamestate* g, entityid id) {
                 int ox = 0;
                 int oy = 0;
                 Vector2 v[4] = {{x - ox, y - oy}, {x + ox + w, y - oy}, {x + w + ox, y + h + oy}, {x - ox, y + h + oy}};
-                DrawLineV(v[0], v[1], c);
-                DrawLineV(v[1], v[2], c);
-                DrawLineV(v[2], v[3], c);
-                DrawLineV(v[3], v[0], c);
+                //DrawLineV(v[0], v[1], c);
+                //DrawLineV(v[1], v[2], c);
+                //DrawLineV(v[2], v[3], c);
+                //DrawLineV(v[3], v[0], c);
                 // now lets draw it with the offset
                 ox = group->off_x;
                 oy = group->off_y;

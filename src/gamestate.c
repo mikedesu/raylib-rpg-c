@@ -58,6 +58,8 @@ gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const
     //g->is_updating_smooth_move = false;
     //g->smooth_move_index = 0;
     //mprint("gamestateinitptr end\n");
+    g->is_locked = false;
+    g->lock_timer = 0;
     return g;
 }
 
