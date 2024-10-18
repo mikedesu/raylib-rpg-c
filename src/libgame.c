@@ -506,7 +506,7 @@ void libgame_handle_player_input_movement_key(gamestate* g, direction_t dir) {
 
             g->player_input_received = true;
             g->is_locked = true;
-            g->lock_timer = 60;
+            //g->lock_timer = 60;
 
         } else {
             merror("handleplayerinput_key_right: hero_id is -1");
@@ -678,7 +678,7 @@ void libgame_handle_input_player(gamestate* g) {
                 }
                 g->player_input_received = true;
                 g->is_locked = true;
-                g->lock_timer = 60;
+                g->lock_timer = 0;
             }
         }
 
@@ -1251,7 +1251,23 @@ void libgame_updategamestate(gamestate* g) {
             g->is_locked = true;
             g->lock_timer = 60;
         } else {
-            libgame_handle_npcs_turn_lua(g);
+            //libgame_handle_npcs_turn_lua(g);
+            //libgame_process_turn(g);
+
+
+            // while this works, we would prefer to "step" thru each entity's turn
+            // presently, this makes it look like all NPCs move at once
+            // but, in combination with the lock_timer, i believe we can introduce
+            // an index into the gamestate to keep track of which entity acted last,
+            // and once we've finished iterating asyncronously, we can assign then
+            // receive player input again and repeat the cycle
+            for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
+                const entityid id = libgame_lua_get_nth_entity(L, i + 1);
+                const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+                if (type == ENTITY_NPC) {
+                    libgame_handle_npc_turn_lua(g, id);
+                }
+            }
             libgame_process_turn(g);
         }
     }
