@@ -1,6 +1,14 @@
 # TODO
 
-- [ ] asset packing
+- [ ] NPC turn time-step
+	- [ ] currently steps hero then ALL NPCs
+		- [ ] want to step hero, then individually step each NPC and any effects that occur
+
+- [ ] loading textures via files
+	- [ ] be able to switch between loading textures via file and .h files
+
+- [x] asset packing
+	- [x] attaching textures via .h files
 	- [ ] compression / decompression
 	- [ ] encryption 
 	- [ ] distribution
