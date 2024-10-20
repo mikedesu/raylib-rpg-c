@@ -24,7 +24,7 @@ gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const
     strftime(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time:   %Y-%m-%d %H:%M:%S", g->timebegantm);
     bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
-    gamestateupdatecurrenttime(g);
+    gamestate_update_current_time(g);
     g->debugpanelon = false;
     g->gridon = false;
     //g->debugpanelon = true;
@@ -64,7 +64,7 @@ gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const
 }
 
 
-void gamestateupdatecurrenttime(gamestate* g) {
+void gamestate_update_current_time(gamestate* g) {
     if (g) {
         g->currenttime = time(NULL);
         g->currenttimetm = localtime(&(g->currenttime));
