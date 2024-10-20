@@ -53,6 +53,7 @@ int targetheight = -1;
 int windowwidth = -1;
 int windowheight = -1;
 
+Music test_music = {0};
 
 
 
@@ -993,6 +994,7 @@ void libgame_update_entities_damaged_anim(gamestate* g) {
 
 
 void libgame_updategamestate(gamestate* g) {
+    UpdateMusicStream(test_music);
     //minfo("begin libgame_updategamestate");
     //minfo("libgame_updategamestate: update debug panel buffer");
     libgame_update_debug_panel_buffer(g);
@@ -2159,7 +2161,15 @@ void libgame_initsharedsetup(gamestate* g) {
         libgame_lua_set_gamestate_int(L, "WindowHeight", dh);
 #endif
         libgame_initwindow(g);
+
+        InitAudioDevice();
+        SetAudioStreamBufferSizeDefault(2048);
+        test_music = LoadMusicStream("./evildojo.mp3");
+        PlayMusicStream(test_music);
+
+
         SetRandomSeed(time(NULL));
+
         libgame_loadfont(g);
         libgame_loadtargettexture(g);
         libgame_load_textures(g);
@@ -2238,11 +2248,20 @@ void libgame_close(gamestate* g) {
 void libgame_closeshared(gamestate* g) {
     // dont need to free most of gamestate
     minfo("libgame_closeshared");
+
+    UnloadMusicStream(test_music);
+    CloseAudioDevice();
+
     UnloadFont(g->font);
+
     libgame_unloadtextures(g);
+
     UnloadRenderTexture(target);
+
     CloseWindow();
+
     lua_close(L);
+
     msuccess("libgame_closeshared end");
 }
 

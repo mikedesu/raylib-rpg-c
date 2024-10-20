@@ -27,3 +27,9 @@ src/a.out
 src/img_data
 src/img_data/*
 src/export_to_code
+*.mp3
+*/*.mp3
+*/*/*.mp3
+*.wav
+*/*.wav
+*/*/*.wav
