@@ -53,7 +53,7 @@ int targetheight = -1;
 int windowwidth = -1;
 int windowheight = -1;
 
-Music test_music = {0};
+//Music test_music = {0};
 
 
 
@@ -994,7 +994,7 @@ void libgame_update_entities_damaged_anim(gamestate* g) {
 
 
 void libgame_updategamestate(gamestate* g) {
-    UpdateMusicStream(test_music);
+    //UpdateMusicStream(test_music);
     //minfo("begin libgame_updategamestate");
     //minfo("libgame_updategamestate: update debug panel buffer");
     libgame_update_debug_panel_buffer(g);
@@ -2162,10 +2162,10 @@ void libgame_initsharedsetup(gamestate* g) {
 #endif
         libgame_initwindow(g);
 
-        InitAudioDevice();
-        SetAudioStreamBufferSizeDefault(2048);
-        test_music = LoadMusicStream("./evildojo.mp3");
-        PlayMusicStream(test_music);
+        //InitAudioDevice();
+        //SetAudioStreamBufferSizeDefault(2048);
+        //test_music = LoadMusicStream("./evildojo.mp3");
+        //PlayMusicStream(test_music);
 
 
         SetRandomSeed(time(NULL));
@@ -2249,8 +2249,8 @@ void libgame_closeshared(gamestate* g) {
     // dont need to free most of gamestate
     minfo("libgame_closeshared");
 
-    UnloadMusicStream(test_music);
-    CloseAudioDevice();
+    //UnloadMusicStream(test_music);
+    //CloseAudioDevice();
 
     UnloadFont(g->font);
 
