@@ -1017,6 +1017,32 @@ void libgame_handle_npcs_turn_lua(gamestate* g) {
 
 
 
+void libgame_reset_entity_anim(gamestate* g, entityid id) {
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (sg) {
+        int old_index = sg->current;
+        sprite* s = spritegroup_get(sg, old_index);
+        const int loop_count = 1;
+        if (s && s->num_loops >= loop_count) {
+            sg->prev_anim = sg->current;
+            sg->current = sg->default_anim;
+            s->num_loops = 0;
+        }
+    }
+}
+
+
+
+void libgame_reset_entities_anim(gamestate* g) {
+
+    const int count = libgame_lua_get_num_entities(L);
+    for (int i = 0; i < count; i++) {
+        libgame_reset_entity_anim(g, i);
+    }
+}
+
+
+
 
 void libgame_update_entity_damaged_anim(gamestate* g, const int i) {
     const entityid id = libgame_lua_get_nth_entity(L, i + 1);
@@ -1025,46 +1051,33 @@ void libgame_update_entity_damaged_anim(gamestate* g, const int i) {
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     int index = -1;
     if (was_damaged && sg) {
-
         int old_index = sg->current;
-
-
-        //index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_SPINDIE : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_DMG : sg->prev_anim;
-
         if (race == RACE_HUMAN) {
             index = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
-
-            //if (s->num_loops > 0) {
-            //    index = sg->prev_anim;
-            //    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
-            //s->num_loops = 0;
-            //}
-            libgame_entity_anim_set(g, id, index);
-        }
-
-        else if (race == RACE_ORC) {
-            index = SPRITEGROUP_ANIM_ORC_DMG;
-
             if (index == old_index) {
-
                 sprite* s = spritegroup_get(sg, old_index);
-                if (s->num_loops > 0) {
-                    index = sg->prev_anim;
+                const int loop_count = 1;
+                if (s && s->num_loops >= loop_count) {
+                    index = SPRITEGROUP_ANIM_HUMAN_IDLE;
+                    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
+                    s->num_loops = 0;
                 }
             }
-
-            //if (s->num_loops > 0) {
-            //    index = sg->prev_anim;
-            //    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
-            //s->num_loops = 0;
-            //}
+            libgame_entity_anim_set(g, id, index);
+        } else if (race == RACE_ORC) {
+            index = SPRITEGROUP_ANIM_ORC_DMG;
+            if (index == old_index) {
+                sprite* s = spritegroup_get(sg, old_index);
+                const int loop_count = 1;
+                if (s && s->num_loops >= loop_count) {
+                    index = SPRITEGROUP_ANIM_ORC_IDLE;
+                    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
+                    s->num_loops = 0;
+                }
+            }
             libgame_entity_anim_set(g, id, index);
         }
     }
-    //else {
-    //index = -1;
-    //merror("Invalid animation index selection for anim set entity damage, it may not be implemented");
-    //}
 }
 
 
@@ -1087,7 +1100,15 @@ void libgame_update_gamestate(gamestate* g) {
     libgame_update_debug_panel_buffer(g);
     //setdebugpanelcenter(g);
     //minfo("libgame_updategamestate: update smooth move");
+
+
+    // need to clean this up a bit but works in general right now for what we want
+    // needs extensibility to handle all animation types
+    // in essence some animations we only want to loop once, then reset to a default or previous
     libgame_update_entities_damaged_anim(g);
+    libgame_reset_entities_anim(g);
+
+
     libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
     //minfo("libgame_updategamestate: do camera lockon");
     libgame_do_camera_lock_on(g);

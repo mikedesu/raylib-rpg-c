@@ -81,6 +81,7 @@ void libgame_set_default_anim_for_id(gamestate* g, entityid id, int anim);
 const char* libgame_get_str_from_dir(const direction_t dir);
 //void libgame_update_spritegroup_current(gamestate* g, entityid id);
 void libgame_update_spritegroup_current(gamestate* g, entityid id, int index);
+void libgame_reset_entities_anim(gamestate* g);
 //void libgame_reset_spritegroup_on_loop(gamestate* g, const entityid id);
 
 
