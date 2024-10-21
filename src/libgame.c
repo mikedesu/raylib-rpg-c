@@ -1029,12 +1029,11 @@ void libgame_update_gamestate(gamestate* g) {
     if (g->player_input_received) {
         libgame_process_turn(g);
         g->player_input_received = false;
+        libgame_handle_npcs_turn_lua(g);
+        libgame_process_turn(g);
         //g->is_locked = true;
         //g->lock_timer = 60;
     } else {
-        //libgame_handle_npcs_turn_lua(g);
-        //libgame_process_turn(g);
-
 
         // while this works, we would prefer to "step" thru each entity's turn
         // presently, this makes it look like all NPCs move at once
@@ -1042,14 +1041,14 @@ void libgame_update_gamestate(gamestate* g) {
         // an index into the gamestate to keep track of which entity acted last,
         // and once we've finished iterating asyncronously, we can assign then
         // receive player input again and repeat the cycle
-        for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
-            const entityid id = libgame_lua_get_nth_entity(L, i + 1);
-            const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-            if (type == ENTITY_NPC) {
-                libgame_handle_npc_turn_lua(g, id);
-            }
-        }
-        libgame_process_turn(g);
+        //for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
+        //    const entityid id = libgame_lua_get_nth_entity(L, i + 1);
+        //    const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+        //    if (type == ENTITY_NPC) {
+        //        libgame_handle_npc_turn_lua(g, id);
+        //    }
+        //}
+        //libgame_process_turn(g);
         //}
     }
 }
