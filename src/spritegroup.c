@@ -20,8 +20,28 @@ spritegroup_t* spritegroup_create(int capacity) {
     sg->move_y = 0;
     sg->off_x = 0;
     sg->off_y = 0;
+    sg->default_anim = 0;
+    sg->prev_anim = 0;
     return sg;
 }
+
+
+
+
+void spritegroup_set_prev_anim(spritegroup_t* sg) {
+    if (sg) {
+        //if (sg->current < 0) {
+        //    sg->current = 0;
+        //    sg->prev_anim = 0;
+        //} else if (sg->current >= sg->size) {
+        //    sg->current = sg->size - 1;
+        //    sg->prev_anim = sg->size - 1;
+        //} else {
+        sg->prev_anim = sg->current;
+        //}
+    }
+}
+
 
 
 void spritegroup_destroy(spritegroup_t* sg) {
@@ -105,6 +125,8 @@ sprite* spritegroup_get(spritegroup_t* sg, int index) {
 }
 
 
+
+
 void spritegroup_incr(spritegroup_t* sg) {
     if (sg) {
         sg->current += 2;
@@ -119,11 +141,23 @@ void spritegroup_incr(spritegroup_t* sg) {
 void spritegroup_set_current(spritegroup_t* sg, const int index) {
     if (sg) {
         if (index >= sg->size) {
+
             sg->current = sg->size - 1;
         } else if (index < 0) {
             sg->current = 0;
         } else {
+            //spritegroup_set_prev_anim(sg);
+            sg->prev_anim = sg->current;
             sg->current = index;
+
+            // update the num_loop count on the previous sprite to 0
+            // this is so that the animation will start from the beginning
+            // when the sprite is switched
+            // also reset the current frame
+
+            //sprite* s = sg->sprites[sg->prev_anim];
+            //s->currentframe = 0;
+            //s->num_loops = 0;
         }
     }
 }

@@ -16,6 +16,8 @@ typedef struct sprite {
     int currentframe;
     int currentcontext;
 
+    int num_loops;
+
 } sprite;
 
 

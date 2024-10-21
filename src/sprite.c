@@ -17,6 +17,7 @@ sprite* sprite_create(Texture2D* t, int numcontexts, int numframes) {
     s->numcontexts = numcontexts;
     s->currentframe = 0;
     s->currentcontext = 0;
+    s->num_loops = 0;
     s->texture = t;
     s->width = t->width / numframes;
     s->height = t->height / numcontexts;
@@ -37,6 +38,9 @@ void sprite_incrframe(sprite* s) {
     if (s) {
         s->currentframe = (s->currentframe + 1) % s->numframes;
         s->src.x = s->width * s->currentframe;
+        if (s->currentframe == 0) {
+            s->num_loops++;
+        }
     }
 }
 

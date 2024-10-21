@@ -7,6 +7,7 @@
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
 //#include "hashtable_entityid_entity.h"
+#include "anim_type.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "libgame.h"
 #include "libgame_defines.h"
@@ -111,6 +112,7 @@ void libgame_entity_anim_set(gamestate* g, entityid id, int index) {
         //char buf[128];
         //snprintf(buf, 128, "entity_anim_set: id: %d, index: %d", id, index);
         //msuccess(buf);
+        //s->num_loops = 0;
         spritegroup_set_current(group, index);
     }
 }
@@ -338,16 +340,21 @@ void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir) {
         default:
             break;
         }
-
-        const race_t race = libgame_lua_get_entity_int(L, id, "race");
-        const int index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK : -1;
-
         spritegroup_setcontexts(group, ctx);
-        spritegroup_set_current(group, index);
-        //group->current = SPRITEGROUP_ANIM_HUMAN_WALK;
-        //libgame_entity_anim_set(g, id, SPRITEGROUP_ANIM_HUMAN_WALK);
     }
 }
+
+
+
+
+//void libgame_update_spritegroup_current(gamestate* g, entityid id, int index) {
+//const race_t race = libgame_lua_get_entity_int(L, id, "race");
+//    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+//    if (group) {
+//const int index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK : -1;
+//        spritegroup_set_current(group, index);
+//    }
+//}
 
 
 
@@ -379,12 +386,15 @@ void libgame_handle_player_input_movement_key(gamestate* g, direction_t dir) {
     if (g) {
         const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
         if (hero_id != -1) {
-            libgame_update_spritegroup(g, hero_id, dir);
             const int xdir = libgame_get_x_from_dir(dir);
             const int ydir = libgame_get_y_from_dir(dir);
             // update player direction
             libgame_lua_set_entity_int(L, hero_id, "direction", dir);
             libgame_handleplayerinput_move(g, xdir, ydir);
+
+            libgame_update_spritegroup(g, hero_id, dir); // updates sg context
+            libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+
             g->player_input_received = true;
             //g->is_locked = true;
             //g->lock_timer = 60;
@@ -477,6 +487,7 @@ void libgame_handle_input_player_mobile(gamestate* g) {
 
 
 void libgame_handle_input_player(gamestate* g) {
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     //minfo("handle_playerinput: starting...");
     if (g->controlmode == CONTROLMODE_PLAYER && g->player_input_received == false) {
         //const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
@@ -524,10 +535,13 @@ void libgame_handle_input_player(gamestate* g) {
                 bool res = libgame_lua_create_action(L, hero_id, ACTION_ATTACK, xdir, ydir);
                 if (res) {
                     msuccess("attack action created");
-                    spritegroup_t* grp = hashtable_entityid_spritegroup_get(g->spritegroups, hero_id);
-                    if (grp) {
-                        spritegroup_set_current(grp, SPRITEGROUP_ANIM_HUMAN_ATTACK);
-                    }
+                    libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+
+
+                    //spritegroup_t* grp = hashtable_entityid_spritegroup_get(g->spritegroups, hero_id);
+                    //if (grp) {
+                    //    spritegroup_set_current(grp, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+                    //}
                 } else {
                     merror("attack action failed to create");
                 }
@@ -554,7 +568,7 @@ void libgame_handle_input_player(gamestate* g) {
             // randomize the dungeon tiles
             const int w = 4;
             const int h = 4;
-            const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+            //const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
             //int hx = libgame_lua_get_entity_int(L, g->hero_id, "x") - w / 2;
             //int hy = libgame_lua_get_entity_int(L, g->hero_id, "y") - h / 2;
             const int hx = libgame_lua_get_entity_int(L, hero_id, "x") - w / 2;
@@ -562,7 +576,25 @@ void libgame_handle_input_player(gamestate* g) {
             libgame_lua_randomize_dungeon_tiles(L, hx, hy, w, h);
         }
 
-        //else if (IsKeyPressed(KEY_PERIOD)) {
+        else if (IsKeyPressed(KEY_PERIOD)) {
+
+            const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
+            const int xdir = libgame_get_x_from_dir(dir);
+            const int ydir = libgame_get_y_from_dir(dir);
+            bool res = libgame_lua_create_action(L, hero_id, ACTION_NONE, xdir, ydir);
+            if (res) {
+                msuccess("attack action created");
+                libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_IDLE);
+
+                //spritegroup_t* grp = hashtable_entityid_spritegroup_get(g->spritegroups, hero_id);
+                //if (grp) {
+                //    spritegroup_set_current(grp, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+                //}
+            } else {
+                merror("attack action failed to create");
+            }
+            g->player_input_received = true;
+        }
         //libgame_handle_npcs_turn_lua(g);
         //libgame_process_turn(g);
         //int action_count = libgame_lua_get_action_count(L);
@@ -963,21 +995,65 @@ void libgame_handle_npcs_turn_lua(gamestate* g) {
 
 
 
+//void libgame_reset_spritegroup_on_loop(gamestate* g, const entityid id) {
+//    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+//    if (group) {
+//        const int current = group->current;
+//        if (current == SPRITEGROUP_ANIM_ORC_DMG) {
+//            // get the current sprite from the group and check its loop count
+//            sprite* sprite = spritegroup_get(group, current);
+//            if (sprite) {
+//                if (sprite->num_loops > 0) {
+//                    // reset the spritegroup to the default animation
+//                    spritegroup_set_current(group, group->default_anim);
+//                }
+//            } else {
+//                merror("could not get sprite");
+//            }
+//        }
+//        spritegroup_set_current(group, group->default_anim);
+//    }
+//}
+
+
+
+
 void libgame_update_entity_damaged_anim(gamestate* g, const int i) {
     const entityid id = libgame_lua_get_nth_entity(L, i + 1);
     const int was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
     const race_t race = libgame_lua_get_entity_int(L, id, "race");
-    if (was_damaged) {
-        //minfo("entity was damaged");
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    int index = -1;
+    if (was_damaged && sg) {
+        sprite* s = spritegroup_get(sg, sg->current);
+        //index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_SPINDIE : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_DMG : sg->prev_anim;
 
-        const int index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_SPINDIE : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_DMG : -1;
-        if (index != -1) {
+        if (race == RACE_HUMAN) {
+            index = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
+            if (s->num_loops > 0) {
+                index = sg->prev_anim;
+                libgame_lua_set_entity_int(L, id, "was_damaged", 0);
+                //s->num_loops = 0;
+            }
             libgame_entity_anim_set(g, id, index);
-        } else {
-            merror("Invalid animation index selection for anim set entity damage, it may not be implemented");
+        }
+
+        else if (race == RACE_ORC) {
+            index = SPRITEGROUP_ANIM_ORC_DMG;
+            //if (s->num_loops > 0) {
+            //    index = sg->prev_anim;
+            //    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
+            //s->num_loops = 0;
+            //}
+            libgame_entity_anim_set(g, id, index);
         }
     }
+    //else {
+    //index = -1;
+    //merror("Invalid animation index selection for anim set entity damage, it may not be implemented");
+    //}
 }
+
 
 
 
@@ -1029,8 +1105,10 @@ void libgame_update_gamestate(gamestate* g) {
     if (g->player_input_received) {
         libgame_process_turn(g);
         g->player_input_received = false;
-        libgame_handle_npcs_turn_lua(g);
-        libgame_process_turn(g);
+
+        //libgame_handle_npcs_turn_lua(g);
+        //libgame_process_turn(g);
+
         //g->is_locked = true;
         //g->lock_timer = 60;
     } else {
@@ -1810,6 +1888,7 @@ void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
         int num_keys = 0;
         int offset_x = 0;
         int offset_y = 0;
+        int default_anim = 0;
 
         if (entity_type == ENTITY_PLAYER || entity_type == ENTITY_NPC) {
             race_t race = libgame_lua_get_entity_int(L, id, "race");
@@ -1818,11 +1897,13 @@ void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
                 num_keys = TX_HERO_KEY_COUNT;
                 offset_x = -12;
                 offset_y = -12;
+                default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
             } else if (race == RACE_ORC) {
                 keys = TX_ORC_KEYS;
                 num_keys = TX_ORC_KEY_COUNT;
                 offset_x = -12;
                 offset_y = -12;
+                default_anim = SPRITEGROUP_ANIM_ORC_IDLE;
             }
         }
         //else if (entity_type == ENTITY_ITEM) {
@@ -1830,11 +1911,23 @@ void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
         //}
         if (keys != NULL) {
             libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y);
+            libgame_set_default_anim_for_id(g, id, default_anim);
+
         } else {
             char buf[128];
             snprintf(buf, 128, "Could not select keys for create_spritegroup_by_id, id: %d, entity_type: %d", id, entity_type);
             merror(buf);
         }
+    }
+}
+
+
+
+
+void libgame_set_default_anim_for_id(gamestate* g, entityid id, int anim) {
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (group) {
+        group->default_anim = anim;
     }
 }
 

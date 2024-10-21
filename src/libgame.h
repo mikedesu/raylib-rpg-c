@@ -77,7 +77,11 @@ const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
 void libgame_update_entities_damaged_anim(gamestate* g);
 void libgame_update_entity_damaged_anim(gamestate* g, const int i);
 void libgame_update_anim_indices(gamestate* g);
+void libgame_set_default_anim_for_id(gamestate* g, entityid id, int anim);
 const char* libgame_get_str_from_dir(const direction_t dir);
+//void libgame_update_spritegroup_current(gamestate* g, entityid id);
+void libgame_update_spritegroup_current(gamestate* g, entityid id, int index);
+//void libgame_reset_spritegroup_on_loop(gamestate* g, const entityid id);
 
 
 #ifdef MOBILE
