@@ -1,4 +1,4 @@
-# filepath contexts frames dodither
+# txkey contexts frames dodither path
 #0  1 1  1 img/tiles/dirt00.png 
 #1  4 16 0  img/characters/human-idle.png 
 #2  4 16 0  img/characters/human-idle-shadow.png 

@@ -2,6 +2,7 @@
 
 //#define DEFAULT_WINDOW_TITLE "project rpg v0.00000001"
 //#define DEFAULT_TARGET_FPS 30
+
 #define DEFAULT_TARGET_FPS 60
 #define FRAMEINTERVAL 10
 
@@ -76,8 +77,6 @@
 //#define TX_GUARD_WOODEN_SHIELD_FRONT 50
 //#define TX_GUARD_WOODEN_SHIELD_BACK 51
 
-
-
 //#define TXTORCH 14
 //#define TX_TILE_STONE_00 15
 //#define TX_TILE_STONE_01 16
@@ -97,7 +96,6 @@
 
 //#define TX_DIRT_01 30
 //#define TX_DIRT_02 31
-
 
 #define COMPANYSCENE 0
 #define TITLESCENE 1

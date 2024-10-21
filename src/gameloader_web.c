@@ -19,7 +19,7 @@ void gameloop();
 
 void gameloop() {
     libgame_handleinput(g_);
-    libgame_updategamestate(g_);
+    libgame_update_gamestate(g_);
     libgame_drawframe(g_);
 }
 

@@ -67,7 +67,7 @@ void libgame_unloadtextures(gamestate* g);
 void libgame_update_smoothmove(gamestate* g, const entityid id);
 void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y);
 void libgame_update_debug_panel_buffer(gamestate* g);
-void libgame_updategamestate(gamestate* g);
+void libgame_update_gamestate(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
 void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir);
 void libgame_update_spritegroup_by_lastmove(gamestate* g, entityid entity_id);

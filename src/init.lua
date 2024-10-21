@@ -8,13 +8,15 @@ require("test")
 
 -- You can edit these
 WindowTitle = "@evildojo666 presents: Project.RPG"
--- DefaultTargetWidth = 640
--- DefaultTargetHeight = 360
-DefaultTargetWidth = 1920
-DefaultTargetHeight = 960
+DefaultTargetWidth = 1280
+DefaultTargetHeight = 720
+--DefaultTargetWidth = 1920
+--DefaultTargetHeight = 960
 DefaultScale = 1
-DefaultWindowPosX = 0
-DefaultWindowPosY = 0
+DefaultWindowPosOffsetX = 100
+DefaultWindowPosOffsetY = 100
+DefaultWindowPosX = 1920 + DefaultWindowPosOffsetX
+DefaultWindowPosY = 0 + DefaultWindowPosOffsetY
 
 ----------------------------------------
 -- DO NOT EDIT BELOW THIS LINE
@@ -69,21 +71,38 @@ TileTypes = {
 	Dirt0 = 2,
 	Dirt1 = 3,
 	Dirt2 = 4,
-	Stone00 = 5,
-	Stone01 = 6,
-	Stone02 = 7,
-	Stone03 = 8,
-	Stone04 = 9,
-	Stone05 = 10,
-	Stone06 = 11,
-	Stone07 = 12,
-	Stone08 = 13,
-	Stone09 = 14,
-	Stone10 = 15,
-	Stone11 = 16,
-	Stone12 = 17,
-	Stone13 = 18,
-	Stonewall00 = 19,
+	Dirt3 = 5,
+	Dirt4 = 6,
+	Dirt5 = 7,
+	Stone00 = 8,
+	Stone01 = 9,
+	Stone02 = 10,
+	Stone03 = 11,
+	Stone04 = 12,
+	Stone05 = 13,
+	Stone06 = 14,
+	Stone07 = 15,
+	Stone08 = 16,
+	Stone09 = 17,
+	Stone10 = 18,
+	Stone11 = 19,
+	Stone12 = 20,
+	Stone13 = 21,
+	Stonewall00 = 22,
+	Stonewall01 = 23,
+	Stonewall02 = 24,
+	Stonewall03 = 25,
+	Stonewall04 = 26,
+	Stonewall05 = 27,
+	Stonewall06 = 28,
+	Stonewall07 = 29,
+	Stonewall08 = 30,
+	Stonewall09 = 31,
+	Stonewall10 = 32,
+	Stonewall11 = 33,
+	Stonewall12 = 34,
+	Stonewall13 = 35,
+	Stonewall14 = 36,
 }
 
 EntityTypes = {

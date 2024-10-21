@@ -121,7 +121,7 @@ void loadsymbols() {
         {"libgame_handleinput", &mylibgamehandleinput},
         {"libgame_closesavegamestate", &mylibgameclosesavegamestate},
         {"libgame_initwithstate", &mylibgameinitwithstate},
-        {"libgame_updategamestate", &mylibgameupdategamestate},
+        {"libgame_update_gamestate", &mylibgameupdategamestate},
         //                                            {"libgame_close_save_gamestate_minus_lua", &mylibgame_close_save_gamestate_minus_lua}
     };
     for (int i = 0; i < NUM_VOID_FUNCTIONS; i++) {
@@ -230,7 +230,7 @@ void gamerun() {
         mylibgameupdategamestate(g_); // if building for web, turn off
         mylibgamedrawframe(g_); // if building for web, turn off
         mylibgamehandleinput(g_); // if building for web, turn off
-        autoreload_every_n_sec(2); // if building for web, turn off
+        autoreload_every_n_sec(4); // if building for web, turn off
         //printf("game looping\n");
         //libgame_updategamestate(g_);
         //libgame_drawframe(g_);
