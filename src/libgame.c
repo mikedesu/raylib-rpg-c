@@ -1025,21 +1025,34 @@ void libgame_update_entity_damaged_anim(gamestate* g, const int i) {
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     int index = -1;
     if (was_damaged && sg) {
-        sprite* s = spritegroup_get(sg, sg->current);
+
+        int old_index = sg->current;
+
+
         //index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_SPINDIE : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_DMG : sg->prev_anim;
 
         if (race == RACE_HUMAN) {
             index = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
-            if (s->num_loops > 0) {
-                index = sg->prev_anim;
-                libgame_lua_set_entity_int(L, id, "was_damaged", 0);
-                //s->num_loops = 0;
-            }
+
+            //if (s->num_loops > 0) {
+            //    index = sg->prev_anim;
+            //    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
+            //s->num_loops = 0;
+            //}
             libgame_entity_anim_set(g, id, index);
         }
 
         else if (race == RACE_ORC) {
             index = SPRITEGROUP_ANIM_ORC_DMG;
+
+            if (index == old_index) {
+
+                sprite* s = spritegroup_get(sg, old_index);
+                if (s->num_loops > 0) {
+                    index = sg->prev_anim;
+                }
+            }
+
             //if (s->num_loops > 0) {
             //    index = sg->prev_anim;
             //    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
