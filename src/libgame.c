@@ -1620,25 +1620,25 @@ void libgame_draw_company_scene(gamestate* g) {
 
 
 
-void libgame_load_texture_from_data_pack(gamestate* g, img_data_pack_t* pack) {
-    if (g) {
-        // have to do dithering BEFORE loading as data
-        Image img = {
-            .data = pack->data,
-            .width = pack->width,
-            .height = pack->height,
-            .format = pack->format,
-            .mipmaps = 1,
-        };
-        Texture2D t = LoadTextureFromImage(img);
-        g->txinfo[pack->index].texture = t;
-        g->txinfo[pack->index].num_frames = pack->frames;
-        g->txinfo[pack->index].contexts = pack->contexts;
-        msuccess("libgame_load_texture_from_data");
-    } else {
-        merror("libgame_loadtexture: gamestate is NULL");
-    }
-}
+//void libgame_load_texture_from_data_pack(gamestate* g, img_data_pack_t* pack) {
+//    if (g) {
+//        // have to do dithering BEFORE loading as data
+//        Image img = {
+//            .data = pack->data,
+//            .width = pack->width,
+//            .height = pack->height,
+//            .format = pack->format,
+//            .mipmaps = 1,
+//        };
+//        Texture2D t = LoadTextureFromImage(img);
+//        g->txinfo[pack->index].texture = t;
+//        g->txinfo[pack->index].num_frames = pack->frames;
+//        g->txinfo[pack->index].contexts = pack->contexts;
+//        msuccess("libgame_load_texture_from_data");
+//    } else {
+//        merror("libgame_loadtexture: gamestate is NULL");
+//    }
+//}
 
 
 

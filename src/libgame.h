@@ -6,7 +6,7 @@
 #include "gamestate.h"
 #include "mylua.h"
 // Asset packing
-#include "img_data_pack.h"
+//#include "img_data_pack.h"
 #include <raylib.h>
 
 bool libgame_windowshouldclose();
@@ -54,9 +54,9 @@ void libgame_initwithstate(gamestate* state);
 void libgame_initsharedsetup(gamestate* g);
 void libgame_init_datastructures(gamestate* g);
 void libgame_init();
-void libgame_load_textures_from_data(gamestate* g);
+//void libgame_load_textures_from_data(gamestate* g);
 void libgame_load_texture_from_disk(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path);
-void libgame_load_texture_from_data_pack(gamestate* g, img_data_pack_t* pack);
+//void libgame_load_texture_from_data_pack(gamestate* g, img_data_pack_t* pack);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
 void libgame_load_textures(gamestate* g);
