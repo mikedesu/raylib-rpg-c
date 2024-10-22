@@ -564,17 +564,17 @@ void libgame_handle_input_player(gamestate* g) {
         //    libgame_lua_reserialization_test(L);
         //}
 
-        //else if (IsKeyPressed(KEY_SPACE)) {
-        //    // randomize the dungeon tiles
-        //    const int w = 4;
-        //    const int h = 4;
-        //    //const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-        //    //int hx = libgame_lua_get_entity_int(L, g->hero_id, "x") - w / 2;
-        //    //int hy = libgame_lua_get_entity_int(L, g->hero_id, "y") - h / 2;
-        //    const int hx = libgame_lua_get_entity_int(L, hero_id, "x") - w / 2;
-        //    const int hy = libgame_lua_get_entity_int(L, hero_id, "y") - h / 2;
-        //    libgame_lua_randomize_dungeon_tiles(L, hx, hy, w, h);
-        //}
+        else if (IsKeyPressed(KEY_SPACE)) {
+            //    // randomize the dungeon tiles
+            const int w = 4;
+            const int h = 4;
+            //const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+            //int hx = libgame_lua_get_entity_int(L, g->hero_id, "x") - w / 2;
+            //int hy = libgame_lua_get_entity_int(L, g->hero_id, "y") - h / 2;
+            const int hx = libgame_lua_get_entity_int(L, hero_id, "x") - w / 2;
+            const int hy = libgame_lua_get_entity_int(L, hero_id, "y") - h / 2;
+            libgame_lua_randomize_dungeon_tiles(L, hx, hy, w, h);
+        }
 
         else if (IsKeyPressed(KEY_PERIOD)) {
 

@@ -21,6 +21,7 @@
 //#define TXDUNGEONSHEET 3
 
 #define TX_DIRT_00 0
+
 #define TX_HUMAN_IDLE 1
 #define TX_HUMAN_IDLE_SHADOW 2
 #define TX_HUMAN_WALK 3
@@ -49,23 +50,53 @@
 #define TX_ORC_DMG 25
 #define TX_ORC_DMG_SHADOW 26
 
+#define TX_STONE_00 27
+#define TX_STONE_01 28
+#define TX_STONE_02 29
+#define TX_STONE_03 30
+#define TX_STONE_04 31
+#define TX_STONE_05 32
+#define TX_STONE_06 33
+#define TX_STONE_07 34
+#define TX_STONE_08 35
+#define TX_STONE_09 36
+#define TX_STONE_10 37
+#define TX_STONE_11 38
+#define TX_STONE_12 39
+#define TX_STONE_13 40
+
+#define TX_STONEWALL_00 41
+#define TX_STONEWALL_01 42
+#define TX_STONEWALL_02 43
+#define TX_STONEWALL_03 44
+#define TX_STONEWALL_04 45
+#define TX_STONEWALL_05 46
+#define TX_STONEWALL_06 47
+#define TX_STONEWALL_07 48
+#define TX_STONEWALL_08 49
+#define TX_STONEWALL_09 50
+
+#define TX_STONEWALL_10 51
+#define TX_STONEWALL_11 52
+#define TX_STONEWALL_12 53
+#define TX_STONEWALL_13 54
+#define TX_STONEWALL_14 55
+
+#define TX_GRASS_00 56
+#define TX_GRASS_01 57
+#define TX_GRASS_02 58
+#define TX_GRASS_03 59
+#define TX_GRASS_04 60
+
+#define TX_DIRT_01 61
+#define TX_DIRT_02 62
+#define TX_DIRT_03 63
+#define TX_DIRT_04 64
+#define TX_DIRT_05 65
+
 //#define TX_DIRT_01 27
 //#define TX_DIRT_02 28
 
-//#define TX_STONE_00 29
-//#define TX_STONE_01 30
-//#define TX_STONE_02 31
-//#define TX_STONE_03 32
-//#define TX_STONE_04 33
-//#define TX_STONE_05 34
-//#define TX_STONE_06 35
-//#define TX_STONE_07 36
-//#define TX_STONE_08 37
-//#define TX_STONE_09 38
-//#define TX_STONE_10 39
-//#define TX_STONE_11 40
-//#define TX_STONE_12 41
-//#define TX_STONE_13 42
 //
 //#define TX_STONEWALL_00 43
 
@@ -77,20 +108,6 @@
 //#define TX_GUARD_WOODEN_SHIELD_BACK 51
 
 //#define TXTORCH 14
-//#define TX_TILE_STONE_00 15
-//#define TX_TILE_STONE_01 16
-//#define TX_TILE_STONE_02 17
-//#define TX_TILE_STONE_03 18
-//#define TX_TILE_STONE_04 19
-//#define TX_TILE_STONE_05 20
-//#define TX_TILE_STONE_06 21
-//#define TX_TILE_STONE_07 22
-//#define TX_TILE_STONE_08 23
-//#define TX_TILE_STONE_09 24
-//#define TX_TILE_STONE_10 25
-//#define TX_TILE_STONE_11 26
-//#define TX_TILE_STONE_12 27
-//#define TX_TILE_STONE_13 28
 //#define TX_TILE_STONE_WALL_00 29
 
 //#define TX_DIRT_01 30
