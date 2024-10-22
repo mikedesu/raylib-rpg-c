@@ -215,7 +215,7 @@ void libgame_handleinput(gamestate* g) {
     //g->player_input_received = true;
 
     if (IsKeyPressed(KEY_E)) {
-        //libgame_test_enemy_placement(g);
+        libgame_test_enemy_placement(g);
         //    g->player_input_received = true;
     }
 

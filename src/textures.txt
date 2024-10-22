@@ -1,5 +1,6 @@
 # txkey contexts frames dodither path
 0  1 1  1 img/tiles/dirt_00.png
+# atm there are 12 total human sprite animations
 1  4 16 0  img/characters/human_idle.png
 2  4 16 0  img/characters/human_idle_shadow.png
 3  4 4  0  img/characters/human_walk.png 
@@ -12,6 +13,21 @@
 10 1 12 0 img/characters/human_spindie_shadow.png 
 11 1 12 0 img/characters/human_souldie.png 
 12 1 12 0 img/characters/human_souldie_shadow.png 
+# atm there are 14 total orc sprite animations
+13 4 16 0 img/characters/orc_idle.png
+14 4 16 0 img/characters/orc_idle_shadow.png
+15 4 4  0 img/characters/orc_walk.png
+16 4 4  0 img/characters/orc_walk_shadow.png
+17 4 4  0 img/characters/orc_attack.png
+18 4 4  0 img/characters/orc_attack_shadow.png
+19 img/characters/orc_chargedattack.png
+20 img/characters/orc_chargedattack_shadow.png
+21 4 4  0 img/characters/orc_jump.png
+22 4 4  0 img/characters/orc_jump_shadow.png
+23 1 12 0 img/characters/orc_die.png
+24 1 12 0 img/characters/orc_die_shadow.png
+25 4 4  0 img/characters/orc_dmg.png
+26 4 4  0 img/characters/orc_dmg_shadow.png
 #3  1 1  0 img/tiles/dungeon0.png
 #14 1 8  0 img/items/torch-sheet.png
 #15 1 1  0 img/tiles/stone_00.png
@@ -31,20 +47,6 @@
 #29 1 1  0 img/tiles/stonewall_00.png
 #30 1 1  0 img/tiles/dirt_01.png
 #31 1 1  0 img/tiles/dirt_02.png
-#32 4 16 0 img/characters/orc-idle.png
-#33 4 16 0 img/characters/orc-idle-shadow.png
-#34 4 4  0 img/characters/orc-walk.png
-#35 4 4  0 img/characters/orc-walk-shadow.png
-#36 4 4  0 img/characters/orc-attack.png
-#37 4 4  0 img/characters/orc-attack-shadow.png
-#38 img/characters/orc-chargedattack.png
-#39 img/characters/orc-chargedattack-shadow.png
-#40 4 4  0 img/characters/orc-jump.png
-#41 4 4  0 img/characters/orc-jump-shadow.png
-#42 1 12 0 img/characters/orc-die.png
-#43 1 12 0 img/characters/orc-die-shadow.png
-#44 4 4  0 img/characters/orc-dmg.png
-#45 4 4  0 img/characters/orc-dmg-shadow.png
 #46 1 4  0 img/items/sword-sheet.png
 #47 1 4  0 img/items/shield-sheet.png
 #48 4 4  0 img/characters/human-guard.png

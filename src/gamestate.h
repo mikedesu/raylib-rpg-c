@@ -52,7 +52,8 @@ typedef struct gamestate {
     //entityid hero_id;
     //entityid torch_id;
 
-    textureinfo txinfo[100];
+#define GAMESTATE_SIZEOFTEXINFOARRAY 255
+    textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
     dungeonfloor_t* dungeonfloor;
     vectorentityid_t entityids;
