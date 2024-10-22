@@ -55,6 +55,7 @@ void libgame_initsharedsetup(gamestate* g);
 void libgame_init_datastructures(gamestate* g);
 void libgame_init();
 void libgame_load_textures_from_data(gamestate* g);
+void libgame_load_texture_from_disk(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path);
 void libgame_load_texture_from_data_pack(gamestate* g, img_data_pack_t* pack);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
@@ -83,6 +84,7 @@ const char* libgame_get_str_from_dir(const direction_t dir);
 void libgame_update_spritegroup_current(gamestate* g, entityid id, int index);
 void libgame_reset_entities_anim(gamestate* g);
 //void libgame_reset_spritegroup_on_loop(gamestate* g, const entityid id);
+void libgame_load_textures_from_data(gamestate* g);
 
 
 #ifdef MOBILE

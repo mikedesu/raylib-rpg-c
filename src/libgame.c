@@ -7,7 +7,7 @@
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
 //#include "hashtable_entityid_entity.h"
-#include "anim_type.h"
+//#include "anim_type.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "libgame.h"
 #include "libgame_defines.h"
@@ -33,7 +33,7 @@
 #include "libgame_lua.h"
 
 // Data packing
-#include "img_data_packs.h"
+//#include "img_data_packs.h"
 #include "tx_keys.h"
 
 //------------------------------------------------------------------
@@ -215,7 +215,7 @@ void libgame_handleinput(gamestate* g) {
     //g->player_input_received = true;
 
     if (IsKeyPressed(KEY_E)) {
-        libgame_test_enemy_placement(g);
+        //libgame_test_enemy_placement(g);
         //    g->player_input_received = true;
     }
 
@@ -564,17 +564,17 @@ void libgame_handle_input_player(gamestate* g) {
         //    libgame_lua_reserialization_test(L);
         //}
 
-        else if (IsKeyPressed(KEY_SPACE)) {
-            // randomize the dungeon tiles
-            const int w = 4;
-            const int h = 4;
-            //const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-            //int hx = libgame_lua_get_entity_int(L, g->hero_id, "x") - w / 2;
-            //int hy = libgame_lua_get_entity_int(L, g->hero_id, "y") - h / 2;
-            const int hx = libgame_lua_get_entity_int(L, hero_id, "x") - w / 2;
-            const int hy = libgame_lua_get_entity_int(L, hero_id, "y") - h / 2;
-            libgame_lua_randomize_dungeon_tiles(L, hx, hy, w, h);
-        }
+        //else if (IsKeyPressed(KEY_SPACE)) {
+        //    // randomize the dungeon tiles
+        //    const int w = 4;
+        //    const int h = 4;
+        //    //const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+        //    //int hx = libgame_lua_get_entity_int(L, g->hero_id, "x") - w / 2;
+        //    //int hy = libgame_lua_get_entity_int(L, g->hero_id, "y") - h / 2;
+        //    const int hx = libgame_lua_get_entity_int(L, hero_id, "x") - w / 2;
+        //    const int hy = libgame_lua_get_entity_int(L, hero_id, "y") - h / 2;
+        //    libgame_lua_randomize_dungeon_tiles(L, hx, hy, w, h);
+        //}
 
         else if (IsKeyPressed(KEY_PERIOD)) {
 
@@ -1643,7 +1643,7 @@ void libgame_load_texture_from_data_pack(gamestate* g, img_data_pack_t* pack) {
 
 
 
-void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path) {
+void libgame_load_texture_from_disk(gamestate* g, int index, int contexts, int frames, bool dodither, const char* path) {
     if (g) {
         if (dodither) {
             Image img = LoadImage(path);
@@ -1667,9 +1667,50 @@ void libgame_loadtexture(gamestate* g, int index, int contexts, int frames, bool
 
 
 
+void libgame_load_textures_from_disk(gamestate* g) {
+    const char* texture_file_path = "textures.txt";
+    FILE* fp = fopen(texture_file_path, "r");
+    if (fp) {
+        char line[512];
+        char path[256];
+        bzero(line, 512);
+        bzero(path, 256);
+        while (fgets(line, 512, fp)) {
+            // if line begins with #, skip it
+            if (line[0] == '#') {
+                continue;
+            }
+            // if line is empty, skip it
+            if (strlen(line) == 0) {
+                continue;
+            }
+            // parse the line
+            int index = -1;
+            int contexts = -1;
+            int frames = -1;
+            int dodither = false;
+            sscanf(line, "%d %d %d %d %s", &index, &contexts, &frames, &dodither, path);
+            libgame_load_texture_from_disk(g, index, contexts, frames, dodither, path);
+            bzero(line, 512);
+            bzero(path, 256);
+        }
+
+        fclose(fp);
+        msuccess("libgame_loadtextures_from_disk");
+    } else {
+        merror("libgame_loadtextures_from_disk: could not open file");
+    }
+}
+
+
+
+
 void libgame_load_textures(gamestate* g) {
     if (g) {
-        libgame_load_textures_from_data(g);
+        //libgame_load_textures_from_data(g);
+        libgame_load_textures_from_disk(g);
+
+
         msuccess("libgame_loadtextures");
     } else {
         merror("libgame_loadtextures: gamestate is NULL");
@@ -1679,70 +1720,66 @@ void libgame_load_textures(gamestate* g) {
 
 
 
-void libgame_load_textures_from_data(gamestate* g) {
-    if (g) {
-#define NUM_PACKS (44)
-        img_data_pack_t packs[NUM_PACKS] = {
-            // 3+14+1 for tile
-            PK_TILE_DIRT_00,
-            PK_TILE_DIRT_01,
-            PK_TILE_DIRT_02,
-
-            PK_TILE_STONE_00,
-            PK_TILE_STONE_01,
-            PK_TILE_STONE_02,
-            PK_TILE_STONE_03,
-            PK_TILE_STONE_04,
-            PK_TILE_STONE_05,
-            PK_TILE_STONE_06,
-            PK_TILE_STONE_07,
-            PK_TILE_STONE_08,
-            PK_TILE_STONE_09,
-            PK_TILE_STONE_10,
-            PK_TILE_STONE_11,
-            PK_TILE_STONE_12,
-            PK_TILE_STONE_13,
-
-            PK_TILE_STONEWALL_00,
-
-            // 12 for human
-            PK_HUMAN_IDLE,
-            PK_HUMAN_IDLE_SHADOW,
-            PK_HUMAN_WALK,
-            PK_HUMAN_WALK_SHADOW,
-            PK_HUMAN_ATTACK,
-            PK_HUMAN_ATTACK_SHADOW,
-            PK_HUMAN_JUMP,
-            PK_HUMAN_JUMP_SHADOW,
-            PK_HUMAN_SPIN_DIE,
-            PK_HUMAN_SPIN_DIE_SHADOW,
-            PK_HUMAN_SOUL_DIE,
-            PK_HUMAN_SOUL_DIE_SHADOW,
-
-            // 14 for orc
-            PK_ORC_IDLE,
-            PK_ORC_IDLE_SHADOW,
-            PK_ORC_WALK,
-            PK_ORC_WALK_SHADOW,
-            PK_ORC_ATTACK,
-            PK_ORC_ATTACK_SHADOW,
-            PK_ORC_CHARGED_ATTACK,
-            PK_ORC_CHARGED_ATTACK_SHADOW,
-            PK_ORC_JUMP,
-            PK_ORC_JUMP_SHADOW,
-            PK_ORC_DIE,
-            PK_ORC_DIE_SHADOW,
-            PK_ORC_DMG,
-            PK_ORC_DMG_SHADOW,
-        };
-        for (int i = 0; i < NUM_PACKS; i++) {
-            libgame_load_texture_from_data_pack(g, &packs[i]);
-        }
-        msuccess("libgame_loadtextures_from_data");
-    } else {
-        merror("libgame_loadtextures_from_data: gamestate is NULL");
-    }
-}
+//void libgame_load_textures_from_data(gamestate* g) {
+//    if (g) {
+//#define NUM_PACKS (44)
+//        img_data_pack_t packs[NUM_PACKS] = {
+//            // 3+14+1 for tile
+//            PK_TILE_DIRT_00,
+//            PK_TILE_DIRT_01,
+//            PK_TILE_DIRT_02,
+//            PK_TILE_STONE_00,
+//            PK_TILE_STONE_01,
+//            PK_TILE_STONE_02,
+//            PK_TILE_STONE_03,
+//            PK_TILE_STONE_04,
+//            PK_TILE_STONE_05,
+//            PK_TILE_STONE_06,
+//            PK_TILE_STONE_07,
+//            PK_TILE_STONE_08,
+//            PK_TILE_STONE_09,
+//            PK_TILE_STONE_10,
+//            PK_TILE_STONE_11,
+//            PK_TILE_STONE_12,
+//            PK_TILE_STONE_13,
+//            PK_TILE_STONEWALL_00,
+//            // 12 for human
+//            PK_HUMAN_IDLE,
+//            PK_HUMAN_IDLE_SHADOW,
+//            PK_HUMAN_WALK,
+//            PK_HUMAN_WALK_SHADOW,
+//            PK_HUMAN_ATTACK,
+//            PK_HUMAN_ATTACK_SHADOW,
+//            PK_HUMAN_JUMP,
+//            PK_HUMAN_JUMP_SHADOW,
+//            PK_HUMAN_SPIN_DIE,
+//            PK_HUMAN_SPIN_DIE_SHADOW,
+//            PK_HUMAN_SOUL_DIE,
+//            PK_HUMAN_SOUL_DIE_SHADOW,
+//            // 14 for orc
+//            PK_ORC_IDLE,
+//            PK_ORC_IDLE_SHADOW,
+//            PK_ORC_WALK,
+//            PK_ORC_WALK_SHADOW,
+//            PK_ORC_ATTACK,
+//            PK_ORC_ATTACK_SHADOW,
+//            PK_ORC_CHARGED_ATTACK,
+//            PK_ORC_CHARGED_ATTACK_SHADOW,
+//            PK_ORC_JUMP,
+//            PK_ORC_JUMP_SHADOW,
+//            PK_ORC_DIE,
+//            PK_ORC_DIE_SHADOW,
+//            PK_ORC_DMG,
+//            PK_ORC_DMG_SHADOW,
+//        };
+//        for (int i = 0; i < NUM_PACKS; i++) {
+//            libgame_load_texture_from_data_pack(g, &packs[i]);
+//        }
+//        msuccess("libgame_loadtextures_from_data");
+//    } else {
+//        merror("libgame_loadtextures_from_data: gamestate is NULL");
+//    }
+//}
 
 
 
@@ -1927,8 +1964,8 @@ void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
         if (entity_type == ENTITY_PLAYER || entity_type == ENTITY_NPC) {
             race_t race = libgame_lua_get_entity_int(L, id, "race");
             if (race == RACE_HUMAN) {
-                keys = TX_HERO_KEYS;
-                num_keys = TX_HERO_KEY_COUNT;
+                keys = TX_HUMAN_KEYS;
+                num_keys = TX_HUMAN_KEY_COUNT;
                 offset_x = -12;
                 offset_y = -12;
                 default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
@@ -1995,6 +2032,8 @@ void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_ke
         sprite* s = sprite_create(&g->txinfo[txkey].texture, ctxs, frames);
         if (!s) {
             merror("could not create sprite");
+        } else {
+            msuccess("sprite created successfully!");
         }
         spritegroup_add(group, s);
     }

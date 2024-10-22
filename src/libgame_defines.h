@@ -21,19 +21,18 @@
 //#define TXDUNGEONSHEET 3
 
 #define TX_DIRT_00 0
-
-#define TX_HERO_IDLE 1
-#define TX_HERO_IDLE_SHADOW 2
-#define TX_HERO_WALK 3
-#define TX_HERO_WALK_SHADOW 4
-#define TX_HERO_ATTACK 5
-#define TX_HERO_ATTACK_SHADOW 6
-#define TX_HERO_JUMP 7
-#define TX_HERO_JUMP_SHADOW 8
-#define TX_HERO_SPIN_DIE 9
-#define TX_HERO_SPIN_DIE_SHADOW 10
-#define TX_HERO_SOUL_DIE 11
-#define TX_HERO_SOUL_DIE_SHADOW 12
+#define TX_HUMAN_IDLE 1
+#define TX_HUMAN_IDLE_SHADOW 2
+#define TX_HUMAN_WALK 3
+#define TX_HUMAN_WALK_SHADOW 4
+#define TX_HUMAN_ATTACK 5
+#define TX_HUMAN_ATTACK_SHADOW 6
+#define TX_HUMAN_JUMP 7
+#define TX_HUMAN_JUMP_SHADOW 8
+#define TX_HUMAN_SPIN_DIE 9
+#define TX_HUMAN_SPIN_DIE_SHADOW 10
+#define TX_HUMAN_SOUL_DIE 11
+#define TX_HUMAN_SOUL_DIE_SHADOW 12
 
 #define TX_ORC_IDLE 13
 #define TX_ORC_IDLE_SHADOW 14
@@ -50,25 +49,25 @@
 #define TX_ORC_DMG 25
 #define TX_ORC_DMG_SHADOW 26
 
-#define TX_DIRT_01 27
-#define TX_DIRT_02 28
+//#define TX_DIRT_01 27
+//#define TX_DIRT_02 28
 
-#define TX_STONE_00 29
-#define TX_STONE_01 30
-#define TX_STONE_02 31
-#define TX_STONE_03 32
-#define TX_STONE_04 33
-#define TX_STONE_05 34
-#define TX_STONE_06 35
-#define TX_STONE_07 36
-#define TX_STONE_08 37
-#define TX_STONE_09 38
-#define TX_STONE_10 39
-#define TX_STONE_11 40
-#define TX_STONE_12 41
-#define TX_STONE_13 42
-
-#define TX_STONEWALL_00 43
+//#define TX_STONE_00 29
+//#define TX_STONE_01 30
+//#define TX_STONE_02 31
+//#define TX_STONE_03 32
+//#define TX_STONE_04 33
+//#define TX_STONE_05 34
+//#define TX_STONE_06 35
+//#define TX_STONE_07 36
+//#define TX_STONE_08 37
+//#define TX_STONE_09 38
+//#define TX_STONE_10 39
+//#define TX_STONE_11 40
+//#define TX_STONE_12 41
+//#define TX_STONE_13 42
+//
+//#define TX_STONEWALL_00 43
 
 //#define TXSWORD 46
 //#define TXSHIELD 47
