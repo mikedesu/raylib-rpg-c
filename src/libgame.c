@@ -526,7 +526,6 @@ void libgame_handle_input_player(gamestate* g) {
 
 
         else if (IsKeyPressed(KEY_A)) {
-            const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
             if (hero_id != -1) {
                 // create an attack action
                 const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
@@ -550,6 +549,17 @@ void libgame_handle_input_player(gamestate* g) {
                 //g->lock_timer = 0;
             }
         }
+
+
+        else if (IsKeyPressed(KEY_B)) {
+
+            if (hero_id != -1) {
+                libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_GUARD);
+                g->player_input_received = true;
+            }
+        }
+
+
 
         //else if (IsKeyPressed(KEY_COMMA)) {
         //minfo("Comma key pressed");
@@ -1037,6 +1047,7 @@ void libgame_reset_entities_anim(gamestate* g) {
 
     const int count = libgame_lua_get_num_entities(L);
     for (int i = 0; i < count; i++) {
+        //minfo("resetting animation...");
         libgame_reset_entity_anim(g, i);
     }
 }
@@ -1106,6 +1117,7 @@ void libgame_update_gamestate(gamestate* g) {
     // needs extensibility to handle all animation types
     // in essence some animations we only want to loop once, then reset to a default or previous
     libgame_update_entities_damaged_anim(g);
+
     libgame_reset_entities_anim(g);
 
 
@@ -1320,11 +1332,27 @@ void libgame_draw_entity(gamestate* g, entityid id) {
             if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
                 // draw entity shadow, which should exist at current+1 if loaded correctly
                 DrawTexturePro(*group->sprites[current + 1]->texture, group->sprites[current + 1]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
+
+                // when time comes to handle blocking with a shield, we will also need to draw
+                // the 'back' component of the shield first before drawing the entity
             }
+
+            // draw the main entity sprite
             DrawTexturePro(*group->sprites[current]->texture, group->sprites[current]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
+
+            // if player or NPC and is blocking, also draw the front component of the shield
+            if (type == ENTITY_PLAYER) {
+                if (current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
+                    //const int key2 = SPRITEGROUP_
+                }
+            }
+
+
             if (g->framecount % FRAMEINTERVAL == 0) {
                 sprite_incrframe(group->sprites[group->current]);
-                sprite_incrframe(group->sprites[group->current + 1]);
+                if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
+                    sprite_incrframe(group->sprites[group->current + 1]);
+                }
             }
             if (g->debugpanelon) {
                 Color c = {255, 0, 0, 255};
