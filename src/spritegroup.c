@@ -22,7 +22,20 @@ spritegroup_t* spritegroup_create(int capacity) {
     sg->off_y = 0;
     sg->default_anim = 0;
     sg->prev_anim = 0;
+    sg->specifier = SPECIFIER_NONE;
     return sg;
+}
+
+
+
+
+void spritegroup_set_specifier(spritegroup_t* sg, specifier_t spec) {
+    if (sg) {
+        // make sure it is a valid specifier
+        if (spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT) {
+            sg->specifier = spec;
+        }
+    }
 }
 
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "specifier.h"
 #include "sprite.h"
 
 typedef struct spritegroup_t {
@@ -14,6 +15,9 @@ typedef struct spritegroup_t {
     //int anim_timer; // the timer for the animation
     int default_anim; // the default animation to return to after the timer expires
     int prev_anim;
+
+    specifier_t specifier;
+
 
     Rectangle dest;
 
@@ -31,3 +35,4 @@ void spritegroup_setcontexts(spritegroup_t* sg, int context);
 void spritegroup_set_current(spritegroup_t* sg, int index);
 void spritegroup_destroy(spritegroup_t* sg);
 void spritegroup_set_prev_anim(spritegroup_t* sg);
+void spritegroup_set_specifier(spritegroup_t* sg, specifier_t spec);
