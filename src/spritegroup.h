@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entityid.h"
 #include "specifier.h"
 #include "sprite.h"
 
@@ -18,6 +19,8 @@ typedef struct spritegroup_t {
 
     specifier_t specifier;
 
+    entityid id; // the id of the entity that this spritegroup belongs to
+    // note this allows for one entity to have multiple spritegroups
 
     Rectangle dest;
 
