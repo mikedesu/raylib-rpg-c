@@ -1,3 +1,3 @@
-timestamp,binary_bytes,libgame_bytes,loc,lualoc,buildtime
-1729743397,32280,1409264,3715,545,0.671
-1729743418,32280,1409264,3715,545,0.638
+timestamp,gcc_size,clang_size,gcc_libsize,clang_libsize,loc,lua_loc,gcc_build_time,clang_build_time
+1729748914,32344,32632,1409328,1392504,3742,545,0.620,0.711
+1729749277,32344,32632,1409328,1392504,3742,545,0.624,0.714
