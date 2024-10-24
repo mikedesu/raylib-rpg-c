@@ -5,7 +5,7 @@
 
 
 
-hashtable_entityid_spritegroup_t* hashtable_entityid_spritegroup_create(int size) {
+hashtable_entityid_spritegroup_t* hashtable_entityid_spritegroup_create(const int size) {
     hashtable_entityid_spritegroup_t* ht = (hashtable_entityid_spritegroup_t*)malloc(sizeof(hashtable_entityid_spritegroup_t));
     ht->size = size;
     ht->table = (hashtable_entityid_spritegroup_node_t**)malloc(sizeof(hashtable_entityid_spritegroup_node_t*) * size);
@@ -34,13 +34,13 @@ void hashtable_entityid_spritegroup_destroy(hashtable_entityid_spritegroup_t* ht
 
 
 
-int hashtable_entityid_spritegroup_hash(hashtable_entityid_spritegroup_t* ht, entityid key) {
+const int hashtable_entityid_spritegroup_hash(hashtable_entityid_spritegroup_t* ht, const entityid key) {
     return key % ht->size;
 }
 
 
 
-bool hashtable_entityid_spritegroup_has_specifier(hashtable_entityid_spritegroup_t* ht, entityid key, specifier_t spec) {
+const bool hashtable_entityid_spritegroup_has_specifier(hashtable_entityid_spritegroup_t* ht, const entityid key, const specifier_t spec) {
     if (ht == NULL) {
         return false;
     }
@@ -67,7 +67,7 @@ bool hashtable_entityid_spritegroup_has_specifier(hashtable_entityid_spritegroup
 
 
 
-void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* ht, entityid key, spritegroup_t* value) {
+void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* ht, const entityid key, spritegroup_t* value) {
     if (ht == NULL) {
         merror("hashtable_entityid_spritegroup_insert: ht is NULL");
         return;
@@ -112,7 +112,7 @@ void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* ht,
 
 
 
-spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup_t* ht, entityid key) {
+spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup_t* ht, const entityid key) {
     if (ht == NULL) {
         return NULL;
     }
@@ -136,7 +136,7 @@ spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup
 
 
 
-spritegroup_t* hashtable_entityid_spritegroup_get_by_specifier(hashtable_entityid_spritegroup_t* ht, entityid key, specifier_t spec) {
+spritegroup_t* hashtable_entityid_spritegroup_get_by_specifier(hashtable_entityid_spritegroup_t* ht, const entityid key, const specifier_t spec) {
     if (ht == NULL) {
         return NULL;
     }
@@ -165,8 +165,8 @@ spritegroup_t* hashtable_entityid_spritegroup_get_by_specifier(hashtable_entityi
 
 
 
-
-void hashtable_entityid_spritegroup_delete(hashtable_entityid_spritegroup_t* ht, entityid key) {
+// this only deletes the first instance of the key
+void hashtable_entityid_spritegroup_delete(hashtable_entityid_spritegroup_t* ht, const entityid key) {
     int index = hashtable_entityid_spritegroup_hash(ht, key);
     hashtable_entityid_spritegroup_node_t* node = ht->table[index];
     if (node != NULL) {
@@ -182,6 +182,34 @@ void hashtable_entityid_spritegroup_delete(hashtable_entityid_spritegroup_t* ht,
                     break;
                 }
                 node = node->next;
+            }
+        }
+    }
+}
+
+
+
+
+// this deletes all instances of the key
+void hashtable_entityid_spritegroup_delete_all(hashtable_entityid_spritegroup_t* ht, const entityid key) {
+    int index = hashtable_entityid_spritegroup_hash(ht, key);
+    hashtable_entityid_spritegroup_node_t* node = ht->table[index];
+    if (node != NULL) {
+        while (node != NULL) {
+            if (node->key == key) {
+                ht->table[index] = node->next;
+                free(node);
+                node = ht->table[index];
+            } else {
+                while (node->next != NULL) {
+                    if (node->next->key == key) {
+                        hashtable_entityid_spritegroup_node_t* temp = node->next;
+                        node->next = node->next->next;
+                        free(temp);
+                    } else {
+                        node = node->next;
+                    }
+                }
             }
         }
     }

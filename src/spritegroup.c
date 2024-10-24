@@ -23,6 +23,7 @@ spritegroup_t* spritegroup_create(int capacity) {
     sg->default_anim = 0;
     sg->prev_anim = 0;
     sg->specifier = SPECIFIER_NONE;
+    sg->id = 0;
     return sg;
 }
 
