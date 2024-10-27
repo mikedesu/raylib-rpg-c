@@ -1518,6 +1518,7 @@ void libgame_draw_gameplayscene_entities(gamestate* g) {
                 //libgame_draw_items_that_are_not(g, ITEM_TORCH, i, j);
                 //libgame_draw_entities_at(g, ENTITY_NPC, i, j);
                 //libgame_draw_entities_at(g, ENTITY_PLAYER, i, j);
+                libgame_draw_entities_at_lua(g, ENTITY_SHIELD, i, j);
                 libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
                 libgame_draw_entities_at_lua(g, ENTITY_PLAYER, i, j);
             }
@@ -2413,18 +2414,18 @@ void libgame_initsharedsetup(gamestate* g) {
         if (luaL_loadfile(L, filename) || lua_pcall(L, 0, 0, 0)) {
             luaL_error(L, "cannot run %s: %s", filename, lua_tostring(L, -1));
         }
-#ifdef MOBILE
+        //#ifdef MOBILE
         // just testing on my own phone for now, pixel 6a
-        const int tw = 720;
-        const int th = 1400;
-        const int scale = libgame_lua_get_int(L, "Scale");
-        const int dw = tw * scale;
-        const int dh = th * scale;
-        libgame_lua_set_gamestate_int(L, "TargetWidth", tw);
-        libgame_lua_set_gamestate_int(L, "TargetHeight", th);
-        libgame_lua_set_gamestate_int(L, "WindowWidth", dw);
-        libgame_lua_set_gamestate_int(L, "WindowHeight", dh);
-#endif
+        //        const int tw = 720;
+        //        const int th = 1400;
+        //        const int scale = libgame_lua_get_int(L, "Scale");
+        //        const int dw = tw * scale;
+        //        const int dh = th * scale;
+        //        libgame_lua_set_gamestate_int(L, "TargetWidth", tw);
+        //        libgame_lua_set_gamestate_int(L, "TargetHeight", th);
+        //        libgame_lua_set_gamestate_int(L, "WindowWidth", dw);
+        //        libgame_lua_set_gamestate_int(L, "WindowHeight", dh);
+        //#endif
         libgame_initwindow(g);
 
         //InitAudioDevice();
@@ -2443,6 +2444,7 @@ void libgame_initsharedsetup(gamestate* g) {
         //libgame_create_hero_lua(g, "hero", 1, 0);
         //if (g->hero_id == -1) {
         libgame_create_hero_lua(g, "hero", 1, 1);
+        libgame_create_buckler_lua(g, "buckler", 2, 1);
         //}
         //msuccess("hero created");
         //minfo("creating sword...");
