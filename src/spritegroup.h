@@ -39,3 +39,4 @@ void spritegroup_set_current(spritegroup_t* sg, int index);
 void spritegroup_destroy(spritegroup_t* sg);
 void spritegroup_set_prev_anim(spritegroup_t* sg);
 void spritegroup_set_specifier(spritegroup_t* sg, specifier_t spec);
+specifier_t spritegroup_get_specifier(spritegroup_t* sg);

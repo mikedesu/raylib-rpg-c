@@ -16,7 +16,7 @@ gamestate* libgame_getgamestate();
 void libgame_calc_debugpanel_size(gamestate* g);
 void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y);
 void libgame_create_shield(gamestate* g, const char* name, const int x, const int y);
-void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
+void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
 void libgame_create_spritegroup_by_id(gamestate* g, entityid id);
 void libgame_closeshared(gamestate* g);
 void libgame_closesavegamestate();
@@ -97,6 +97,7 @@ const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, ite
 const bool libgame_external_check_reload();
 
 const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
+const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const int x, const int y);
 
 
 

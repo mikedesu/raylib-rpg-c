@@ -114,6 +114,9 @@ EntityTypes = {
 	None = 0,
 	Player = 1,
 	NPC = 2,
+	Weapon = 3,
+	Shield = 4,
+	Item = 5,
 }
 
 RaceTypes = {

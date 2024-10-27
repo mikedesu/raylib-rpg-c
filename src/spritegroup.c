@@ -175,3 +175,12 @@ void spritegroup_set_current(spritegroup_t* sg, const int index) {
         }
     }
 }
+
+
+
+specifier_t spritegroup_get_specifier(spritegroup_t* sg) {
+    if (sg) {
+        return sg->specifier;
+    }
+    return SPECIFIER_NONE;
+}

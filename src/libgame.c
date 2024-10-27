@@ -1988,6 +1988,7 @@ void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
         int offset_x = 0;
         int offset_y = 0;
         int default_anim = 0;
+        specifier_t specifier = SPECIFIER_NONE;
 
         if (entity_type == ENTITY_PLAYER || entity_type == ENTITY_NPC) {
             race_t race = libgame_lua_get_entity_int(L, id, "race");
@@ -1997,22 +1998,56 @@ void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
                 offset_x = -12;
                 offset_y = -12;
                 default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
+                specifier = SPECIFIER_NONE;
+                libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);
+                libgame_set_default_anim_for_id(g, id, default_anim);
             } else if (race == RACE_ORC) {
                 keys = TX_ORC_KEYS;
                 num_keys = TX_ORC_KEY_COUNT;
                 offset_x = -12;
                 offset_y = -12;
                 default_anim = SPRITEGROUP_ANIM_ORC_IDLE;
+                specifier = SPECIFIER_NONE;
+                libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);
+                libgame_set_default_anim_for_id(g, id, default_anim);
             }
-        }
-        //else if (entity_type == ENTITY_ITEM) {
-        //
-        //}
-        if (keys != NULL) {
-            libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y);
+            //else if (race == RACE_NONE) {
+            //}
+        } else if (entity_type == ENTITY_SHIELD) {
+            // first we will create the spritegroup for the dungeon-item representation
+            // then we will create the spritegroups for being equipped on the player
+            // they will get attached in the hashtable at the same location via chaining
+            // we will select the proper sprite during rendering by attaching filters to the spritegroups
+
+            keys = TX_BUCKLER_KEYS;
+            num_keys = TX_BUCKLER_KEY_COUNT;
+            offset_x = 0;
+            offset_y = -2;
+            specifier = SPECIFIER_SHIELD_ON_TILE;
+            //default_anim = SPRITEGROUP_ANIM_ORC_IDLE;
+            libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);
+            //libgame_set_default_anim_for_id(g, id, default_anim);
+
+            keys = TX_GUARD_BUCKLER_KEYS;
+            num_keys = TX_GUARD_BUCKLER_KEY_COUNT;
+            offset_x = -12;
+            offset_y = -12;
+            default_anim = SPRITEGROUP_ANIM_GUARD_BUCKLER;
+            specifier = SPECIFIER_SHIELD_BLOCK;
+            libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);
             libgame_set_default_anim_for_id(g, id, default_anim);
 
-        } else {
+            keys = TX_GUARD_BUCKLER_SUCCESS_KEYS;
+            num_keys = TX_GUARD_BUCKLER_SUCCESS_KEY_COUNT;
+            offset_x = -12;
+            offset_y = -12;
+            default_anim = SPRITEGROUP_ANIM_GUARD_BUCKLER;
+            specifier = SPECIFIER_SHIELD_BLOCK_SUCCESS;
+            libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);
+            libgame_set_default_anim_for_id(g, id, default_anim);
+        }
+
+        if (keys == NULL) {
             char buf[128];
             snprintf(buf, 128, "Could not select keys for create_spritegroup_by_id, id: %d, entity_type: %d", id, entity_type);
             merror(buf);
@@ -2033,7 +2068,7 @@ void libgame_set_default_anim_for_id(gamestate* g, entityid id, int anim) {
 
 
 
-void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
+void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
     minfo("libgame_create_spritegroup begin");
     minfo("creating sprite group...");
     spritegroup_t* group = spritegroup_create(20);
@@ -2079,6 +2114,8 @@ void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_ke
     group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
     group->off_x = offset_x;
     group->off_y = offset_y;
+    spritegroup_set_specifier(group, spec);
+
     // add the spritegroup to the hashtable
     minfo("inserting spritegroup into table...");
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
@@ -2243,17 +2280,54 @@ void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const 
         direction_t dir = DIRECTION_DOWN_RIGHT;
         libgame_lua_set_entity_int(L, id, "race", race);
         libgame_lua_set_entity_int(L, id, "direction", dir);
-
         libgame_create_spritegroup_by_id(g, id);
         libgame_update_spritegroup(g, id, dir);
-
-        char buf[128];
-        snprintf(buf, 128, "libgame_create_hero_lua: hero entityid %d", id);
-        msuccess(buf);
+        //char buf[128];
+        //snprintf(buf, 128, "libgame_create_hero_lua: hero entityid %d", id);
+        //msuccess(buf);
     } else {
         merror("libgame_create_hero_lua: could not create hero entity, expect crashes");
         libgame_lua_set_gamestate_int(L, "HeroId", -1);
     }
+}
+
+
+
+
+const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const int x, const int y) {
+    char buf[128];
+    snprintf(buf, 128, "libgame_create_buckler_lua: creating buckler entity %s at %d, %d", name, x, y);
+    minfo(buf);
+    if (!g) {
+        merror("libgame_create_buckler_lua: gamestate is NULL");
+        return -1;
+    }
+    if (!name) {
+        merror("libgame_create_buckler_lua: name is NULL");
+        return -1;
+    }
+    if (x < 0 || y < 0) {
+        merror("libgame_create_buckler_lua: x or y is less than 0");
+        return -1;
+    }
+    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
+    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
+    if (x >= dw || y >= dh) {
+        merror("libgame_create_buckler_lua: x or y is greater than dungeonfloor dimensions");
+        return -1;
+    }
+    const entityid id = libgame_lua_create_entity(L, name, ENTITY_SHIELD, x, y);
+    if (id != -1) {
+        // set buckler race
+        libgame_lua_set_entity_int(L, id, "race", RACE_NONE);
+        libgame_create_spritegroup_by_id(g, id);
+        bzero(buf, 128);
+        snprintf(buf, 128, "libgame_create_buckler_lua: buckler entityid %d", id);
+        msuccess(buf);
+    } else {
+        merror("libgame_create_buckler_lua: could not create buckler entity");
+    }
+    return id;
 }
 
 
