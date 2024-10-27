@@ -554,6 +554,24 @@ void libgame_handle_input_player(gamestate* g) {
         }
 
 
+        else if (IsKeyPressed(KEY_W)) {
+            // test item pickup
+            const int x = libgame_lua_get_entity_int(L, hero_id, "x");
+            const int y = libgame_lua_get_entity_int(L, hero_id, "y");
+            bool res = libgame_lua_create_action(L, hero_id, ACTION_PICKUP, x, y);
+
+            if (res) {
+                msuccess("pickup action created");
+                //libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_PICKUP);
+            } else {
+                merror("pickup action failed to create");
+            }
+
+            g->player_input_received = true;
+        }
+
+
+
         else if (IsKeyPressed(KEY_B)) {
 
             if (hero_id != -1) {
@@ -866,7 +884,7 @@ void libgame_update_debug_panel_buffer(gamestate* g) {
              "Active scene: %d\n"
              "Control mode: %d\n"
              "Hero position: %d,%d\n"
-             "Inventory capacity: %ld\n"
+             "Inventory count: %d\n"
              "Dungeon size: %dx%d\n"
              "Action count: %d\n"
              "Entity count: %d\n"
@@ -893,7 +911,7 @@ void libgame_update_debug_panel_buffer(gamestate* g) {
              g->controlmode,
              hx,
              hy,
-             0L,
+             libgame_lua_get_inventory_count(L, id),
              //vectorentityid_capacity(&hero->inventory),
              dh,
              dw,
@@ -2045,7 +2063,7 @@ void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
             keys = TX_BUCKLER_KEYS;
             num_keys = TX_BUCKLER_KEY_COUNT;
             offset_x = 0;
-            offset_y = -2;
+            offset_y = 0;
             specifier = SPECIFIER_SHIELD_ON_TILE;
             //default_anim = SPRITEGROUP_ANIM_ORC_IDLE;
             libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);

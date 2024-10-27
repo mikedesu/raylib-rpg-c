@@ -50,7 +50,8 @@ ActionTypes = {
 	None = 1,
 	Move = 2,
 	Attack = 3,
-	Count = 4,
+	Pickup = 4,
+	Count = 5,
 }
 
 DirectionTypes = {
@@ -217,7 +218,7 @@ function CreateEntity(name, type, x, y)
 		race = RaceTypes.None,
 		was_damaged = 0,
 		direction = DirectionTypes.SouthEast,
-		--inventory = {},
+		inventory = {},
 	}
 	Gamestate.NextEntityId = Gamestate.NextEntityId + 1
 	table.insert(Gamestate.Entities, entity)
@@ -371,6 +372,36 @@ function EntityAttack(id, xdir, ydir)
 	return false
 end
 
+function EntityPickup(id)
+	local entity = GetEntityById(id)
+	if entity then
+		local tiletype = GetTileType(entity.x, entity.y)
+		if tiletype == TileTypes.None then
+			return false
+		end
+		if tiletype == TileTypes.Stonewall00 then
+			return false
+		end
+		-- if the tile is empty of entities, return false
+		if GetNumEntitiesAt(entity.x, entity.y) == 0 then
+			return false
+		end
+
+		-- lets handle shields first
+		if TileIsOccupiedByType(EntityTypes.Shield, entity.x, entity.y) then
+			local target_id = GetFirstEntityTypeAt(EntityTypes.Shield, entity.x, entity.y)
+
+			-- remove the shield from the tile
+			RemoveEntityFromTile(target_id, entity.x, entity.y)
+
+			-- add the shield to the player's inventory
+			table.insert(entity.inventory, target_id)
+			return true
+		end
+	end
+	return false
+end
+
 function PrintEntityInfo()
 	for _, entity in ipairs(Gamestate.Entities) do
 		if entity then
@@ -519,6 +550,8 @@ function ProcessAction(index)
 		result = EntityMove(action.id, action.x, action.y)
 	elseif action.type == ActionTypes.Attack then
 		result = EntityAttack(action.id, action.x, action.y)
+	elseif action.type == ActionTypes.Pickup then
+		result = EntityPickup(action.id)
 	end
 	if result == false then
 		return -1
@@ -752,6 +785,14 @@ function DeserializeTable(str)
 	end
 	PrintDebug("Deserialization of table successful")
 	return tbl
+end
+
+function GetInventoryCount(id)
+	local entity = GetEntityById(id)
+	if entity then
+		return #entity.inventory
+	end
+	return 0
 end
 
 --function DeserializeEntitiesFromString(str)

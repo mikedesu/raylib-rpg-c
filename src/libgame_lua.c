@@ -651,3 +651,18 @@ const int libgame_lua_get_nth_action_id(lua_State* L, const int n) {
     }
     return retval;
 }
+
+
+
+const int libgame_lua_get_inventory_count(lua_State* L, const int id) {
+    int retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetInventoryCount");
+        lua_pushnumber(L, id);
+        if (lua_pcall(L, 1, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}
