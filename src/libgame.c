@@ -1383,7 +1383,17 @@ void libgame_draw_entity(gamestate* g, entityid id) {
                     // normally we would query the hero to see which shield is equipped
                     // but for now we will introduce a global buckler_id as a test
 
-                    //spritegroup_t* buckler_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, id, SPECIFIER_SHIELD_BLOCK);
+                    specifier_t spec = SPECIFIER_SHIELD_BLOCK;
+                    spritegroup_t* buckler_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, buckler_id, spec);
+                    if (!buckler_group) {
+                        merror("Failed to get buckler group");
+                    } else {
+
+                        buckler_group->dest.x = group->dest.x;
+                        buckler_group->dest.y = group->dest.y;
+
+                        DrawTexturePro(*buckler_group->sprites[buckler_group->current]->texture, buckler_group->sprites[buckler_group->current]->src, buckler_group->dest, (Vector2){0, 0}, 0.0f, c);
+                    }
                 }
             }
 
@@ -1392,6 +1402,16 @@ void libgame_draw_entity(gamestate* g, entityid id) {
                 sprite_incrframe(group->sprites[group->current]);
                 if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
                     sprite_incrframe(group->sprites[group->current + 1]);
+
+                    if (type == ENTITY_PLAYER && current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
+                        specifier_t spec = SPECIFIER_SHIELD_BLOCK;
+                        spritegroup_t* buckler_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, buckler_id, spec);
+                        if (!buckler_group) {
+                            merror("Failed to get buckler group");
+                        } else {
+                            sprite_incrframe(buckler_group->sprites[buckler_group->current]);
+                        }
+                    }
                 }
             }
             if (g->debugpanelon) {
@@ -2071,8 +2091,8 @@ void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
 
             keys = TX_GUARD_BUCKLER_KEYS;
             num_keys = TX_GUARD_BUCKLER_KEY_COUNT;
-            offset_x = -12;
-            offset_y = -12;
+            offset_x = -10;
+            offset_y = -14;
             default_anim = SPRITEGROUP_ANIM_GUARD_BUCKLER;
             specifier = SPECIFIER_SHIELD_BLOCK;
             libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);

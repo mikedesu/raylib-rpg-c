@@ -72,8 +72,8 @@
 67 4 4 0 img/characters/human_guard_shadow.png 
 68 4 3 0 img/characters/human_guard_success.png 
 69 4 3 0 img/characters/human_guard_success_shadow.png 
-70 4 3 0 img/actions/guard_buckler_front.png
-71 4 3 0 img/actions/guard_buckler_back.png
+70 4 4 0 img/actions/guard_buckler_front.png
+71 4 4 0 img/actions/guard_buckler_back.png
 72 4 3 0 img/actions/guard_buckler_success_front.png
 73 4 3 0 img/actions/guard_buckler_success_back.png
 74 1 4 0 img/shields/buckler.png
