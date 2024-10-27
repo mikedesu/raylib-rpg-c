@@ -33,3 +33,10 @@ src/export_to_code
 *.wav
 */*.wav
 */*/*.wav
+src/graphs
+src/graphs/*
+*.png
+*/*.png
+*/*/*.png
+*/*/*/*.png
+*/*/*/*/*.png
