@@ -15,6 +15,7 @@
 #include "race.h"
 #include "scene.h"
 #include "setdebugpanel.h"
+#include "specifier.h"
 #include "sprite.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -53,6 +54,8 @@ int targetwidth = -1;
 int targetheight = -1;
 int windowwidth = -1;
 int windowheight = -1;
+
+entityid buckler_id = -1;
 
 //Music test_music = {0};
 
@@ -1325,10 +1328,25 @@ void libgame_draw_dungeonfloor(gamestate* g) {
 void libgame_draw_entity(gamestate* g, entityid id) {
     if (g) {
         spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+        const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
         if (group) {
             const Color c = WHITE;
             const int current = group->current;
-            const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+
+            if (type == ENTITY_SHIELD) {
+                // select the proper spritegroup
+                specifier_t spec = SPECIFIER_SHIELD_ON_TILE;
+                spritegroup_t* group2 = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, buckler_id, spec);
+                // this could be NULL so check if
+                if (!group2) {
+                    //char buf[128];
+                    //snprintf(buf, 128, "Failed to select spritegroup by specifier: %s", specifier_get_str(spec));
+                    //merror(buf);
+                } else {
+                    group = group2;
+                }
+            }
+
             if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
                 // draw entity shadow, which should exist at current+1 if loaded correctly
                 DrawTexturePro(*group->sprites[current + 1]->texture, group->sprites[current + 1]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
@@ -1343,7 +1361,11 @@ void libgame_draw_entity(gamestate* g, entityid id) {
             // if player or NPC and is blocking, also draw the front component of the shield
             if (type == ENTITY_PLAYER) {
                 if (current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
-                    //const int key2 = SPRITEGROUP_
+                    // to demo the buckler animating on the hero, we will need to pass in the shield id
+                    // normally we would query the hero to see which shield is equipped
+                    // but for now we will introduce a global buckler_id as a test
+
+                    //spritegroup_t* buckler_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, id, SPECIFIER_SHIELD_BLOCK);
                 }
             }
 
@@ -2118,7 +2140,10 @@ void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_ke
     spritegroup_set_specifier(group, spec);
 
     // add the spritegroup to the hashtable
-    minfo("inserting spritegroup into table...");
+    char buf[128];
+    snprintf(buf, 128, "inserting spritegroup into table with id: %d and spec: %s", id, specifier_get_str(spec));
+    minfo(buf);
+
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
     msuccess("libgame_create_spritegroup end");
 }
@@ -2444,7 +2469,8 @@ void libgame_initsharedsetup(gamestate* g) {
         //libgame_create_hero_lua(g, "hero", 1, 0);
         //if (g->hero_id == -1) {
         libgame_create_hero_lua(g, "hero", 1, 1);
-        libgame_create_buckler_lua(g, "buckler", 2, 1);
+        // keeping track of buckler_id to test buckler drawing on the entity
+        buckler_id = libgame_create_buckler_lua(g, "buckler", 2, 1);
         //}
         //msuccess("hero created");
         //minfo("creating sword...");

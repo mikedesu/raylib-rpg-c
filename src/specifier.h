@@ -15,4 +15,10 @@
 // without having to do any weird fix like using multiple entityIDs for
 // the same entity etc
 
+#pragma once
+
+#include <string.h>
+
 typedef enum specifier_t { SPECIFIER_NONE, SPECIFIER_SHIELD_ON_TILE, SPECIFIER_SHIELD_BLOCK, SPECIFIER_SHIELD_BLOCK_SUCCESS, SPECIFIER_COUNT } specifier_t;
+
+const char* specifier_get_str(specifier_t spec);

@@ -85,21 +85,22 @@ void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* ht,
     // but we are not cool if there are multiple of the same specifier in a bucket
     if (value->specifier != SPECIFIER_NONE && hashtable_entityid_spritegroup_has_specifier(ht, key, value->specifier)) {
         char buf[255];
-        snprintf(buf, 255, "hashtable_entityid_spritegroup_insert: key %d already has a spritegroup with specifier %d", key, value->specifier);
+        snprintf(buf, 255, "hashtable_entityid_spritegroup_insert: id %d already has a spritegroup with specifier: %s", key, specifier_get_str(value->specifier));
         merror(buf);
         return;
     }
 
     int index = hashtable_entityid_spritegroup_hash(ht, key);
-    hashtable_entityid_spritegroup_node_t* node = ht->table[index];
+    //hashtable_entityid_spritegroup_node_t* node = ht->table[index];
 
-    while (node != NULL) {
-        if (node->key == key) {
-            node->value = value;
-            return;
-        }
-        node = node->next;
-    }
+    //while (node != NULL) {
+    //    if (node->key == key) {
+    //        minfo("hashtable_entityid_spritegroup key already exists, updating value");
+    //        node->value = value;
+    //        return;
+    //    }
+    //    node = node->next;
+    //}
 
     hashtable_entityid_spritegroup_node_t* new_node = (hashtable_entityid_spritegroup_node_t*)malloc(sizeof(hashtable_entityid_spritegroup_node_t));
     new_node->key = key;
@@ -138,15 +139,19 @@ spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup
 
 spritegroup_t* hashtable_entityid_spritegroup_get_by_specifier(hashtable_entityid_spritegroup_t* ht, const entityid key, const specifier_t spec) {
     if (ht == NULL) {
+        merror("hashtable_entityid_spritegroup_get_by_specifier: ht is NULL");
         return NULL;
     }
     if (key < 0) {
+        merror("hashtable_entityid_spritegroup_get_by_specifier: key is negative");
         return NULL;
     }
     if (spec < SPECIFIER_NONE) {
+        merror("hashtable_entityid_spritegroup_get_by_specifier: spec is less than SPECIFIER_NONE");
         return NULL;
     }
     if (spec >= SPECIFIER_COUNT) {
+        merror("hashtable_entityid_spritegroup_get_by_specifier: spec is greater than or equal to SPECIFIER_COUNT");
         return NULL;
     }
     int index = hashtable_entityid_spritegroup_hash(ht, key);
@@ -158,8 +163,19 @@ spritegroup_t* hashtable_entityid_spritegroup_get_by_specifier(hashtable_entityi
             result = node->value;
             break;
         }
+
+        // print the node specifier
+        //char buf[255];
+        //snprintf(buf, 255, "hashtable_entityid_spritegroup node specifier: %s", specifier_get_str(node->value->specifier));
+        //minfo(buf);
+
         node = node->next;
     }
+
+    if (!result) {
+        //merror("hashtable_entityid_spritegroup_get_by_specifier: no spritegroup found");
+    }
+
     return result;
 }
 
