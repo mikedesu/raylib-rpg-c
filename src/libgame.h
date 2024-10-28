@@ -45,8 +45,8 @@ void libgame_handleinput(gamestate* g);
 void libgame_handle_debugpanel_switch(gamestate* g);
 void libgame_handle_modeswitch(gamestate* g);
 void libgame_handle_fade(gamestate* g);
-void libgame_handleplayerinput_move(gamestate* g, int xdir, int ydir);
-void libgame_handle_player_input_movement_key(gamestate* g, direction_t dir);
+void libgame_handleplayerinput_move(gamestate* g, const int xdir, const int ydir);
+void libgame_handle_player_input_movement_key(gamestate* g, const direction_t dir);
 void libgame_handle_grid_switch(gamestate* g);
 void libgame_handle_npc_turn_lua(gamestate* g, const entityid id);
 void libgame_handle_npcs_turn_lua(gamestate* g);
@@ -67,7 +67,8 @@ void libgame_test_enemy_placement(gamestate* g);
 void libgame_unloadtexture(gamestate* g, int index);
 void libgame_unloadtextures(gamestate* g);
 void libgame_update_smoothmove(gamestate* g, const entityid id);
-void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y);
+void libgame_update_spritegroup_move(gamestate* g, const entityid id, const int x, const int y);
+
 void libgame_update_debug_panel_buffer(gamestate* g);
 void libgame_update_gamestate(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
@@ -78,7 +79,7 @@ const int libgame_get_y_from_dir(direction_t dir);
 const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
 void libgame_update_entities_damaged_anim(gamestate* g);
 void libgame_update_entity_damaged_anim(gamestate* g, const int i);
-void libgame_update_anim_indices(gamestate* g);
+//void libgame_update_anim_indices(gamestate* g);
 void libgame_set_default_anim_for_id(gamestate* g, entityid id, int anim);
 const char* libgame_get_str_from_dir(const direction_t dir);
 //void libgame_update_spritegroup_current(gamestate* g, entityid id);
@@ -88,9 +89,9 @@ void libgame_reset_entities_anim(gamestate* g);
 void libgame_load_textures_from_data(gamestate* g);
 
 
-#ifdef MOBILE
-void libgame_handle_input_player_mobile(gamestate* g);
-#endif
+//#ifdef MOBILE
+//void libgame_handle_input_player_mobile(gamestate* g);
+//#endif
 
 const bool libgame_entity_move_lua(gamestate* g, entityid id, int x, int y);
 const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);

@@ -6,8 +6,6 @@
 #include "fadestate.h"
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
-//#include "hashtable_entityid_entity.h"
-//#include "anim_type.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "libgame.h"
 #include "libgame_defines.h"
@@ -21,6 +19,7 @@
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
 #include "tiletype.h"
+#include "tx_keys.h"
 #include "utils.h"
 #include "vectorentityid.h"
 #include <raylib.h>
@@ -33,9 +32,6 @@
 // Lua support
 #include "libgame_lua.h"
 
-// Data packing
-//#include "img_data_packs.h"
-#include "tx_keys.h"
 
 //------------------------------------------------------------------
 // libgame global variables
@@ -56,7 +52,6 @@ int windowwidth = -1;
 int windowheight = -1;
 
 entityid buckler_id = -1;
-
 //Music test_music = {0};
 
 
@@ -177,25 +172,25 @@ const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir) {
 
 
 
-void libgame_update_anim_indices(gamestate* g) {
-    minfo("updating anim indices...");
-    // update the animation index for all NPCs and player
-    const int count = libgame_lua_get_num_entities(L);
-    for (int i = 0; i < count; i++) {
-        const entityid id = libgame_lua_get_nth_entity(L, i + 1);
-        const race_t race = libgame_lua_get_entity_int(L, id, "race");
-        char buf[128];
-        snprintf(buf, 128, "updating anim index: id: %d  race: %d\n", id, race);
-        minfo(buf);
-        if (id != -1) {
-            spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-            if (group) {
-                const int index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK : -1;
-                spritegroup_set_current(group, index);
-            }
-        }
-    }
-}
+//void libgame_update_anim_indices(gamestate* g) {
+//    minfo("updating anim indices...");
+//    // update the animation index for all NPCs and player
+//    const int count = libgame_lua_get_num_entities(L);
+//    for (int i = 0; i < count; i++) {
+//        const entityid id = libgame_lua_get_nth_entity(L, i + 1);
+//        const race_t race = libgame_lua_get_entity_int(L, id, "race");
+//        char buf[128];
+//        snprintf(buf, 128, "updating anim index: id: %d  race: %d\n", id, race);
+//        minfo(buf);
+//        if (id != -1) {
+//            spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+//            if (group) {
+//                const int index = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK : -1;
+//                spritegroup_set_current(group, index);
+//            }
+//        }
+//    }
+//}
 
 
 
@@ -208,8 +203,6 @@ void libgame_handleinput(gamestate* g) {
     //        g->fadestate = FADESTATEOUT;
     //    }
     //}
-
-
 
     // lets cycle the animation for the hero
     //libgame_entity_anim_incr(g, g->hero_id);
@@ -260,14 +253,7 @@ void libgame_handleinput(gamestate* g) {
 
 void libgame_handle_modeswitch(gamestate* g) {
     if (IsKeyPressed(KEY_C)) {
-        switch (g->controlmode) {
-        case CONTROLMODE_CAMERA:
-            g->controlmode = CONTROLMODE_PLAYER;
-            break;
-        default:
-            g->controlmode = CONTROLMODE_CAMERA;
-            break;
-        }
+        g->controlmode = g->controlmode == CONTROLMODE_CAMERA ? CONTROLMODE_PLAYER : CONTROLMODE_CAMERA;
     }
 }
 
@@ -362,7 +348,7 @@ void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir) {
 
 
 
-void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y) {
+void libgame_update_spritegroup_move(gamestate* g, const entityid id, const int x, const int y) {
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (sg) {
         sg->move_x += x;
@@ -373,7 +359,7 @@ void libgame_update_spritegroup_move(gamestate* g, entityid id, int x, int y) {
 
 
 
-void libgame_handleplayerinput_move(gamestate* g, int xdir, int ydir) {
+void libgame_handleplayerinput_move(gamestate* g, const int xdir, const int ydir) {
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
         libgame_lua_create_action(L, hero_id, ACTION_MOVE, xdir, ydir);
@@ -385,7 +371,7 @@ void libgame_handleplayerinput_move(gamestate* g, int xdir, int ydir) {
 
 
 
-void libgame_handle_player_input_movement_key(gamestate* g, direction_t dir) {
+void libgame_handle_player_input_movement_key(gamestate* g, const direction_t dir) {
     if (g) {
         const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
         if (hero_id != -1) {
@@ -394,13 +380,9 @@ void libgame_handle_player_input_movement_key(gamestate* g, direction_t dir) {
             // update player direction
             libgame_lua_set_entity_int(L, hero_id, "direction", dir);
             libgame_handleplayerinput_move(g, xdir, ydir);
-
             libgame_update_spritegroup(g, hero_id, dir); // updates sg context
             libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
-
             g->player_input_received = true;
-            //g->is_locked = true;
-            //g->lock_timer = 60;
         } else {
             merror("handleplayerinput_key_right: hero_id is -1");
         }
@@ -438,54 +420,54 @@ void libgame_handle_player_input_movement_key(gamestate* g, direction_t dir) {
 
 
 
-#ifdef MOBILE
-void libgame_handle_input_player_mobile(gamestate* g) {
-    if (g->controlmode == CONTROLMODE_PLAYER) {
-        int current_gesture = GetGestureDetected();
-        switch (current_gesture) {
-        case GESTURE_TAP:
-            spritegroup_t* grp = hashtable_entityid_spritegroup_get(g->spritegroups, libgame_lua_get_gamestate_int(L, "HeroId"));
-            if (grp) {
-                spritegroup_incr(grp);
-                g->player_input_received = true;
-            }
-            break;
-        case GESTURE_HOLD:
-            libgame_test_enemy_placement(g);
-            g->player_input_received = true;
-            break;
-        case GESTURE_PINCH_OUT:
-            g->cam2d.zoom += 1.0f;
-            break;
-        case GESTURE_PINCH_IN:
-            g->cam2d.zoom -= 1.0f;
-            if (g->cam2d.zoom < 1.0f) {
-                g->cam2d.zoom = 1.0f;
-            }
-            break;
-        case GESTURE_SWIPE_UP:
-            libgame_handle_player_input_movement_key(g, DIRECTION_UP);
-            g->player_input_received = true;
-
-            break;
-        case GESTURE_SWIPE_DOWN:
-            libgame_handle_player_input_movement_key(g, DIRECTION_DOWN);
-            g->player_input_received = true;
-            break;
-        case GESTURE_SWIPE_LEFT:
-            libgame_handle_player_input_movement_key(g, DIRECTION_LEFT);
-            g->player_input_received = true;
-            break;
-        case GESTURE_SWIPE_RIGHT:
-            libgame_handle_player_input_movement_key(g, DIRECTION_RIGHT);
-            g->player_input_received = true;
-            break;
-        default:
-            break;
-        }
-    }
-}
-#endif
+//#ifdef MOBILE
+//void libgame_handle_input_player_mobile(gamestate* g) {
+//    if (g->controlmode == CONTROLMODE_PLAYER) {
+//        int current_gesture = GetGestureDetected();
+//        switch (current_gesture) {
+//        case GESTURE_TAP:
+//            spritegroup_t* grp = hashtable_entityid_spritegroup_get(g->spritegroups, libgame_lua_get_gamestate_int(L, "HeroId"));
+//            if (grp) {
+//                spritegroup_incr(grp);
+//                g->player_input_received = true;
+//            }
+//            break;
+//        case GESTURE_HOLD:
+//            libgame_test_enemy_placement(g);
+//            g->player_input_received = true;
+//            break;
+//        case GESTURE_PINCH_OUT:
+//            g->cam2d.zoom += 1.0f;
+//            break;
+//        case GESTURE_PINCH_IN:
+//            g->cam2d.zoom -= 1.0f;
+//            if (g->cam2d.zoom < 1.0f) {
+//                g->cam2d.zoom = 1.0f;
+//            }
+//            break;
+//        case GESTURE_SWIPE_UP:
+//            libgame_handle_player_input_movement_key(g, DIRECTION_UP);
+//            g->player_input_received = true;
+//
+//            break;
+//        case GESTURE_SWIPE_DOWN:
+//            libgame_handle_player_input_movement_key(g, DIRECTION_DOWN);
+//            g->player_input_received = true;
+//            break;
+//        case GESTURE_SWIPE_LEFT:
+//            libgame_handle_player_input_movement_key(g, DIRECTION_LEFT);
+//            g->player_input_received = true;
+//            break;
+//        case GESTURE_SWIPE_RIGHT:
+//            libgame_handle_player_input_movement_key(g, DIRECTION_RIGHT);
+//            g->player_input_received = true;
+//            break;
+//        default:
+//            break;
+//        }
+//    }
+//}
+//#endif
 
 
 
@@ -575,6 +557,8 @@ void libgame_handle_input_player(gamestate* g) {
         else if (IsKeyPressed(KEY_B)) {
 
             if (hero_id != -1) {
+                // this only does the block animation
+                // we need this to trigger a "block" action
                 libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_GUARD);
                 g->player_input_received = true;
             }

@@ -499,8 +499,9 @@ function RandomizeDungeonTiles(x, y, w, h)
 	for j = y, y + h do
 		for i = x, x + w do
 			--SetTileType(math.random(TileTypes.Dirt0, TileTypes.Stonewall00), i, j)
+			SetTileType(math.random(TileTypes.Stone00, TileTypes.Stone13), i, j)
 			--SetTileType(math.random(TileTypes.Dirt0, TileTypes.Grass04), i, j)
-			SetTileType(math.random(TileTypes.Dirt1, TileTypes.Dirt5), i, j)
+			--SetTileType(math.random(TileTypes.Dirt1, TileTypes.Dirt5), i, j)
 			--SetTileType(math.random(TileTypes.Grass00, TileTypes.Grass04), i, j)
 		end
 	end
