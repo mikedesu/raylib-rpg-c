@@ -96,3 +96,15 @@ sprite* sprite_destroy(sprite* s) {
     }
     return NULL;
 }
+
+
+
+const int sprite_get_context(sprite* s) {
+
+    if (s) {
+        return s->currentcontext;
+    } else {
+        merror("sprite_get_context failed: sprite is null");
+    }
+    return -1;
+}

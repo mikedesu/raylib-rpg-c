@@ -390,6 +390,7 @@ function EntityEquipShield(entity_id, shield_id)
 		shield = might_be_shield
 	else
 		PrintDebug("init.lua:392", "Entity with id " .. shield_id .. " is not a shield")
+		return false
 	end
 
 	if entity and shield then

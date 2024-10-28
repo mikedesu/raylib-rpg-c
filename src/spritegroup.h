@@ -34,7 +34,10 @@ sprite* spritegroup_get(spritegroup_t* sg, int index);
 void spritegroup_add(spritegroup_t* sg, sprite* s);
 void spritegroup_incr(spritegroup_t* sg);
 void spritegroup_set(spritegroup_t* sg, int index, sprite* s);
+
 void spritegroup_setcontexts(spritegroup_t* sg, int context);
+const int spritegroup_get_first_context(spritegroup_t* sg);
+
 void spritegroup_set_current(spritegroup_t* sg, int index);
 void spritegroup_destroy(spritegroup_t* sg);
 void spritegroup_set_prev_anim(spritegroup_t* sg);

@@ -14,7 +14,8 @@ bool libgame_windowshouldclose();
 gamestate* libgame_getgamestate();
 
 void libgame_calc_debugpanel_size(gamestate* g);
-void libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y);
+
+const entityid libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y);
 //void libgame_create_shield(gamestate* g, const char* name, const int x, const int y);
 const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const int x, const int y);
 void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
@@ -37,8 +38,8 @@ void libgame_draw_entity(gamestate* g, entityid id);
 void libgame_drawframe(gamestate* g);
 void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x, const int y);
 void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const int x, const int y);
-void libgame_entity_anim_incr(gamestate* g, entityid id);
-void libgame_entity_anim_set(gamestate* g, entityid id, int index);
+void libgame_entity_anim_incr(gamestate* g, const entityid id);
+void libgame_entity_anim_set(gamestate* g, const entityid id, const int index);
 void libgame_handle_input_player(gamestate* g);
 void libgame_handle_caminput(gamestate* g);
 void libgame_handleinput(gamestate* g);
@@ -72,21 +73,28 @@ void libgame_update_spritegroup_move(gamestate* g, const entityid id, const int 
 void libgame_update_debug_panel_buffer(gamestate* g);
 void libgame_update_gamestate(gamestate* g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t type);
-void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir);
-void libgame_update_spritegroup_by_lastmove(gamestate* g, entityid entity_id);
+
+//void libgame_update_spritegroup(gamestate* g, entityid id, direction_t dir);
+void libgame_update_spritegroup(gamestate* g, const entityid id, const specifier_t spec, const direction_t dir);
+
+void libgame_update_spritegroup_by_lastmove(gamestate* g, const entityid entity_id);
 const int libgame_get_x_from_dir(direction_t dir);
 const int libgame_get_y_from_dir(direction_t dir);
 const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
 void libgame_update_entities_damaged_anim(gamestate* g);
 void libgame_update_entity_damaged_anim(gamestate* g, const int i);
 //void libgame_update_anim_indices(gamestate* g);
-void libgame_set_default_anim_for_id(gamestate* g, entityid id, int anim);
+void libgame_set_default_anim_for_id(gamestate* g, const entityid id, const int anim);
+//void libgame_set_default_anim_for_id(gamestate* g, entityid id, int anim);
 const char* libgame_get_str_from_dir(const direction_t dir);
 //void libgame_update_spritegroup_current(gamestate* g, entityid id);
 void libgame_update_spritegroup_current(gamestate* g, entityid id, int index);
 void libgame_reset_entities_anim(gamestate* g);
 //void libgame_reset_spritegroup_on_loop(gamestate* g, const entityid id);
 void libgame_load_textures_from_data(gamestate* g);
+void libgame_handle_player_input_attack_key(gamestate* g);
+void libgame_handle_player_input_pickup_key(gamestate* g);
+void libgame_handle_player_input_block_key(gamestate* g);
 
 
 //#ifdef MOBILE

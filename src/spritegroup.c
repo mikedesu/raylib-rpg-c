@@ -184,3 +184,16 @@ specifier_t spritegroup_get_specifier(spritegroup_t* sg) {
     }
     return SPECIFIER_NONE;
 }
+
+
+
+
+const int spritegroup_get_first_context(spritegroup_t* sg) {
+
+    if (sg) {
+        if (sg->size > 0) {
+            return sprite_get_context(sg->sprites[0]);
+        }
+    }
+    return 0;
+}

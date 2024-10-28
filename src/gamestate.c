@@ -83,12 +83,21 @@ void gamestatefree(gamestate* g) {
         //minfo("gamestatefree freeing entities");
         //hashtable_entityid_entity_destroy(g->entities);
         minfo("gamestatefree freeing spritegroups");
+
         hashtable_entityid_spritegroup_destroy(g->spritegroups);
+
         minfo("gamestatefree freeing entityids");
+
         vectorentityid_destroy(&g->entityids);
+
         minfo("gamestatefree freeing dungeonfloor");
-        dungeonfloor_free(g->dungeonfloor);
+
+        if (g->dungeonfloor) {
+            dungeonfloor_free(g->dungeonfloor);
+        }
+
         minfo("gamestatefree freeing gamestate");
+
         free(g);
     }
     minfo("gamestatefree end");

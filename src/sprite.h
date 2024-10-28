@@ -27,3 +27,4 @@ void sprite_updatesrc(sprite* s);
 void sprite_incrframe(sprite* s);
 void sprite_incrcontext(sprite* s);
 void sprite_setcontext(sprite* s, int context);
+const int sprite_get_context(sprite* s);
