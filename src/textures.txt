@@ -83,7 +83,3 @@
 #31 1 1  0 img/tiles/dirt_02.png
 #46 1 4  0 img/items/sword-sheet.png
 #47 1 4  0 img/items/shield-sheet.png
-#48 4 4  0 img/characters/human-guard.png
-#49 4 4  0 img/characters/human-guard-shadow.png
-#50 4 4  0 img/characters/guard-wooden-shield-front.png
-#51 4 4  0 img/characters/guard-wooden-shield-back.png

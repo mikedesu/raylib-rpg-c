@@ -1431,10 +1431,8 @@ void libgame_draw_entity(gamestate* g, entityid id) {
                 // the 'back' component of the shield first before drawing the entity
             }
 
-            // draw the main entity sprite
-            DrawTexturePro(*group->sprites[current]->texture, group->sprites[current]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
 
-            // if player or NPC and is blocking, also draw the front component of the shield
+            // need to draw the back part of the shield
             if (type == ENTITY_PLAYER) {
                 if (current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
                     // to demo the buckler animating on the hero, we will need to pass in the shield id
@@ -1448,16 +1446,36 @@ void libgame_draw_entity(gamestate* g, entityid id) {
                     } else {
                         buckler_group->dest.x = group->dest.x;
                         buckler_group->dest.y = group->dest.y;
-
-                        //const direction_t dir = libgame_lua_get_entity_int(L, id, "direction");
-
-                        //libgame_update_spritegroup(g, buckler_id, SPECIFIER_SHIELD_BLOCK, dir);
-
                         minfo("updating buckler spritegroup...");
+                        DrawTexturePro(
+                            *buckler_group->sprites[buckler_group->current + 1]->texture, buckler_group->sprites[buckler_group->current + 1]->src, buckler_group->dest, (Vector2){0, 0}, 0.0f, c);
+                    }
+                }
+            }
 
+
+
+
+            // draw the main entity sprite
+            DrawTexturePro(*group->sprites[current]->texture, group->sprites[current]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
+
+            // if player or NPC and is blocking, also draw the front component of the shield
+            if (type == ENTITY_PLAYER) {
+                if (current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
+                    // to demo the buckler animating on the hero, we will need to pass in the shield id
+                    // normally we would query the hero to see which shield is equipped
+                    // but for now we will introduce a global buckler_id as a test
+                    specifier_t spec = SPECIFIER_SHIELD_BLOCK;
+                    spritegroup_t* buckler_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, buckler_id, spec);
+                    if (!buckler_group) {
+                        merror("Failed to get buckler group");
+                    } else {
+                        buckler_group->dest.x = group->dest.x;
+                        buckler_group->dest.y = group->dest.y;
+                        //const direction_t dir = libgame_lua_get_entity_int(L, id, "direction");
+                        //libgame_update_spritegroup(g, buckler_id, SPECIFIER_SHIELD_BLOCK, dir);
+                        minfo("updating buckler spritegroup...");
                         //libgame_update_spritegroup(g, buckler_id, SPECIFIER_SHIELD_BLOCK, DIRECTION_DOWN_RIGHT);
-
-
                         DrawTexturePro(*buckler_group->sprites[buckler_group->current]->texture, buckler_group->sprites[buckler_group->current]->src, buckler_group->dest, (Vector2){0, 0}, 0.0f, c);
                     }
                 }
@@ -1476,6 +1494,7 @@ void libgame_draw_entity(gamestate* g, entityid id) {
                             merror("Failed to get buckler group");
                         } else {
                             sprite_incrframe(buckler_group->sprites[buckler_group->current]);
+                            sprite_incrframe(buckler_group->sprites[buckler_group->current + 1]);
                         }
                     }
                 }
