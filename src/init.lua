@@ -216,12 +216,17 @@ function CreateEntity(name, type, x, y)
 		level = 1,
 		hp = 0,
 		maxhp = 0,
+		ac = 0,
 		race = RaceTypes.None,
 		was_damaged = 0,
 		is_blocking = 0,
-		block_dir_x = 0,
-		block_dir_y = 0,
+		--block_dir_x = 0,
+		--block_dir_y = 0,
 		direction = DirectionTypes.SouthEast,
+		equipment = {
+			weapon = -1,
+			shield = -1,
+		},
 		inventory = {},
 	}
 	Gamestate.NextEntityId = Gamestate.NextEntityId + 1
@@ -377,6 +382,28 @@ function EntityAttack(id, xdir, ydir)
 	return false
 end
 
+function EntityEquipShield(entity_id, shield_id)
+	local entity = GetEntityById(entity_id)
+	local might_be_shield = GetEntityById(shield_id)
+	local shield = nil
+	if might_be_shield and might_be_shield.type == EntityTypes.Shield then
+		shield = might_be_shield
+	else
+		PrintDebug("init.lua:392", "Entity with id " .. shield_id .. " is not a shield")
+	end
+
+	if entity and shield then
+		-- if the entity already has a shield equipped, return false
+		if entity.equipment.shield ~= -1 then
+			PrintDebug("init.lua:398", "Entity with id " .. entity_id .. " already has a shield equipped")
+			return false
+		end
+		entity.equipment.shield = shield_id
+		return true
+	end
+	return false
+end
+
 function EntityPickup(id)
 	local entity = GetEntityById(id)
 	if entity then
@@ -401,6 +428,14 @@ function EntityPickup(id)
 
 			-- add the shield to the player's inventory
 			table.insert(entity.inventory, target_id)
+
+			-- mark the shield as being in the player's inventory
+			SetEntityAttr(target_id, "x", -1)
+			SetEntityAttr(target_id, "y", -1)
+
+			-- equip the shield
+			EntityEquipShield(entity.id, target_id)
+
 			return true
 		end
 	end
@@ -539,16 +574,13 @@ function CreateAction(id, type, x, y)
 	return true
 end
 
-function EntityBlock(id, xdir, ydir)
+function EntityBlock(id)
 	-- get the entity
 	local entity = GetEntityById(id)
 	-- if the entity doesnt exist, return
 	if not entity then
 		return false
 	end
-	-- set the entity's block direction
-	entity.block_dir_x = xdir
-	entity.block_dir_y = ydir
 	-- set the entity's blocking flag
 	entity.is_blocking = 1
 	return true
@@ -574,7 +606,7 @@ function ProcessAction(index)
 	elseif action.type == ActionTypes.Pickup then
 		result = EntityPickup(action.id)
 	elseif action.type == ActionTypes.Block then
-		result = EntityBlock(action.id, action.x, action.y)
+		result = EntityBlock(action.id)
 	end
 	if result == false then
 		return -1
