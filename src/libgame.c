@@ -559,8 +559,25 @@ void libgame_handle_input_player(gamestate* g) {
             if (hero_id != -1) {
                 // this only does the block animation
                 // we need this to trigger a "block" action
-                libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_GUARD);
+
+                const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
+                const int xdir = libgame_get_x_from_dir(dir);
+                const int ydir = libgame_get_y_from_dir(dir);
+
+                bool res = libgame_lua_create_action(L, hero_id, ACTION_BLOCK, xdir, ydir);
+
+                if (res) {
+                    msuccess("block action created");
+                    //libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_PICKUP);
+                } else {
+                    merror("block action failed to create");
+                }
+
                 g->player_input_received = true;
+
+
+                //libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_GUARD);
+                //g->player_input_received = true;
             }
         }
 

@@ -51,7 +51,8 @@ ActionTypes = {
 	Move = 2,
 	Attack = 3,
 	Pickup = 4,
-	Count = 5,
+	Block = 5,
+	Count = 6,
 }
 
 DirectionTypes = {
@@ -217,6 +218,9 @@ function CreateEntity(name, type, x, y)
 		maxhp = 0,
 		race = RaceTypes.None,
 		was_damaged = 0,
+		is_blocking = 0,
+		block_dir_x = 0,
+		block_dir_y = 0,
 		direction = DirectionTypes.SouthEast,
 		inventory = {},
 	}
@@ -314,7 +318,8 @@ function EntityMove(id, xdir, ydir)
 		if GetTileType(newx, newy) == TileTypes.None then
 			return false
 		end
-		if GetTileType(newx, newy) == TileTypes.Stonewall00 then
+		-- can't move into stone walls
+		if GetTileType(newx, newy) >= TileTypes.Stonewall00 and GetTileType(newx, newy) <= TileTypes.Stonewall14 then
 			return false
 		end
 		if TileIsOccupiedByPlayer(newx, newy) or TileIsOccupiedByNPC(newx, newy) then
@@ -534,6 +539,21 @@ function CreateAction(id, type, x, y)
 	return true
 end
 
+function EntityBlock(id, xdir, ydir)
+	-- get the entity
+	local entity = GetEntityById(id)
+	-- if the entity doesnt exist, return
+	if not entity then
+		return false
+	end
+	-- set the entity's block direction
+	entity.block_dir_x = xdir
+	entity.block_dir_y = ydir
+	-- set the entity's blocking flag
+	entity.is_blocking = 1
+	return true
+end
+
 function ProcessAction(index)
 	--if action.type == ActionTypes.Wait then
 	-- do nothing
@@ -553,6 +573,8 @@ function ProcessAction(index)
 		result = EntityAttack(action.id, action.x, action.y)
 	elseif action.type == ActionTypes.Pickup then
 		result = EntityPickup(action.id)
+	elseif action.type == ActionTypes.Block then
+		result = EntityBlock(action.id, action.x, action.y)
 	end
 	if result == false then
 		return -1
@@ -571,6 +593,12 @@ end
 function ClearWasDamaged()
 	for _, entity in ipairs(Gamestate.Entities) do
 		entity.was_damaged = 0
+	end
+end
+
+function ClearIsBlocking()
+	for _, entity in ipairs(Gamestate.Entities) do
+		entity.is_blocking = 0
 	end
 end
 
