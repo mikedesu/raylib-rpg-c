@@ -98,6 +98,8 @@ void libgame_handle_player_input_block_key(gamestate* g);
 void libgame_draw_entity_shadow(gamestate* g, const entityid id);
 void libgame_draw_entity_shield_back(gamestate* g, const entityid id);
 void libgame_draw_entity_shield_front(gamestate* g, const entityid id);
+void libgame_init_sound();
+void libgame_draw_entity_incr_frame(gamestate* g, const entityid id);
 
 
 //#ifdef MOBILE
