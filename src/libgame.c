@@ -1496,8 +1496,6 @@ void libgame_draw_entity(gamestate* g, const entityid id) {
         }
 
         if (group) {
-            const Color c = WHITE;
-            const int current = group->current;
             // draw entity shadow
             libgame_draw_entity_shadow(g, id);
 
@@ -1509,35 +1507,11 @@ void libgame_draw_entity(gamestate* g, const entityid id) {
             // but for now we will introduce a global buckler_id as a test
             // instead of hard-coding in buckler_id, lets get the id of the shield equipped on the player
             libgame_draw_entity_shield_back(g, id);
-            //    }
-            //}
 
             // draw the main entity sprite
-            DrawTexturePro(*group->sprites[current]->texture, group->sprites[current]->src, group->dest, (Vector2){0, 0}, 0.0f, c);
+            DrawTexturePro(*group->sprites[group->current]->texture, group->sprites[group->current]->src, group->dest, (Vector2){0, 0}, 0.0f, WHITE);
 
             libgame_draw_entity_shield_front(g, id);
-
-            // if player or NPC and is blocking, also draw the front component of the shield
-            //if (type == ENTITY_PLAYER) {
-            //    if (current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
-            //        // to demo the buckler animating on the hero, we will need to pass in the shield id
-            //        // normally we would query the hero to see which shield is equipped
-            //        // but for now we will introduce a global buckler_id as a test
-            //        specifier_t spec = SPECIFIER_SHIELD_BLOCK;
-            //        spritegroup_t* buckler_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, buckler_id, spec);
-            //        if (!buckler_group) {
-            //            merror("Failed to get buckler group");
-            //        } else {
-            //            buckler_group->dest.x = group->dest.x;
-            //            buckler_group->dest.y = group->dest.y;
-            //            //const direction_t dir = libgame_lua_get_entity_int(L, id, "direction");
-            //            //libgame_update_spritegroup(g, buckler_id, SPECIFIER_SHIELD_BLOCK, dir);
-            //            minfo("updating buckler spritegroup...");
-            //            //libgame_update_spritegroup(g, buckler_id, SPECIFIER_SHIELD_BLOCK, DIRECTION_DOWN_RIGHT);
-            //            DrawTexturePro(*buckler_group->sprites[buckler_group->current]->texture, buckler_group->sprites[buckler_group->current]->src, buckler_group->dest, (Vector2){0, 0}, 0.0f, c);
-            //        }
-            //    }
-            //}
 
             //libgame_draw_entity_incr_frame(g, id);
 
@@ -1546,8 +1520,8 @@ void libgame_draw_entity(gamestate* g, const entityid id) {
                 sprite_incrframe(group->sprites[group->current]);
                 if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
                     sprite_incrframe(group->sprites[group->current + 1]);
-                    if (type == ENTITY_PLAYER && current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
-                        specifier_t spec = SPECIFIER_SHIELD_BLOCK;
+                    if (type == ENTITY_PLAYER && group->current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
+                        const specifier_t spec = SPECIFIER_SHIELD_BLOCK;
                         const entityid shield_id = libgame_lua_get_entity_shield(L, id);
                         spritegroup_t* shield_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, shield_id, spec);
                         if (!shield_group) {
@@ -1562,31 +1536,25 @@ void libgame_draw_entity(gamestate* g, const entityid id) {
 
 
             if (g->debugpanelon) {
-                Color c = {255, 0, 0, 255};
-                const int x = group->dest.x;
-                const int y = group->dest.y;
-                const int w = group->dest.width;
-                const int h = group->dest.height;
+                //Color c = {255, 0, 0, 255};
+                const int x = group->dest.x, y = group->dest.y, w = group->dest.width, h = group->dest.height;
                 // first draw the outer rectangle without the offset
-                int ox = 0;
-                int oy = 0;
-                Vector2 v[4] = {{x - ox, y - oy}, {x + ox + w, y - oy}, {x + w + ox, y + h + oy}, {x - ox, y + h + oy}};
+                //Vector2 v[4] = {{x, y}, {x + w, y }, {x + w , y + h }, {x , y + h }};
+                const Vector2 v[4] = {
+                    {x - group->off_x, y - group->off_y}, {x + group->off_x + w, y - group->off_y}, {x + w + group->off_x, y + h + group->off_y}, {x - group->off_x, y + h + group->off_y}};
                 //DrawLineV(v[0], v[1], c);
                 //DrawLineV(v[1], v[2], c);
                 //DrawLineV(v[2], v[3], c);
                 //DrawLineV(v[3], v[0], c);
                 // now lets draw it with the offset
-                ox = group->off_x;
-                oy = group->off_y;
-                v[0] = (Vector2){x - ox, y - oy};
-                v[1] = (Vector2){x + ox + w, y - oy};
-                v[2] = (Vector2){x + w + ox, y + h + oy};
-                v[3] = (Vector2){x - ox, y + h + oy};
-                c = (Color){0, 0, 255, 255};
-                DrawLineV(v[0], v[1], c);
-                DrawLineV(v[1], v[2], c);
-                DrawLineV(v[2], v[3], c);
-                DrawLineV(v[3], v[0], c);
+                //v[0] = (Vector2){x - group->off_x, y - group->off_y};
+                //v[1] = (Vector2){x + group->off_x + w, y - group->off_y};
+                //v[2] = (Vector2){x + w + group->off_x, y + h + group->off_y};
+                //v[3] = (Vector2){x - group->off_x, y + h + group->off_y};
+                DrawLineV(v[0], v[1], (Color){0, 0, 255, 255});
+                DrawLineV(v[1], v[2], (Color){0, 0, 255, 255});
+                DrawLineV(v[2], v[3], (Color){0, 0, 255, 255});
+                DrawLineV(v[3], v[0], (Color){0, 0, 255, 255});
             }
         }
         //else {
