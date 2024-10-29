@@ -78,8 +78,8 @@ void libgame_update_smoothmoves_for_entitytype(gamestate* g, const entitytype_t 
 void libgame_update_spritegroup(gamestate* g, const entityid id, const specifier_t spec, const direction_t dir);
 
 void libgame_update_spritegroup_by_lastmove(gamestate* g, const entityid entity_id);
-const int libgame_get_x_from_dir(direction_t dir);
-const int libgame_get_y_from_dir(direction_t dir);
+const int libgame_get_x_from_dir(const direction_t dir);
+const int libgame_get_y_from_dir(const direction_t dir);
 const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
 void libgame_update_entities_damaged_anim(gamestate* g);
 void libgame_update_entity_damaged_anim(gamestate* g, const int i);

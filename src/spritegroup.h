@@ -29,13 +29,13 @@ typedef struct spritegroup_t {
 
 
 spritegroup_t* spritegroup_create(int capacity);
-sprite* spritegroup_get(spritegroup_t* sg, int index);
+sprite* spritegroup_get(spritegroup_t* sg, const int index);
 //sprite* spritegroup_get_current(spritegroup_t* sg);
 void spritegroup_add(spritegroup_t* sg, sprite* s);
 void spritegroup_incr(spritegroup_t* sg);
 void spritegroup_set(spritegroup_t* sg, int index, sprite* s);
 
-void spritegroup_setcontexts(spritegroup_t* sg, int context);
+void spritegroup_setcontexts(spritegroup_t* sg, const int context);
 const int spritegroup_get_first_context(spritegroup_t* sg);
 
 void spritegroup_set_current(spritegroup_t* sg, int index);
