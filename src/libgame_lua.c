@@ -666,3 +666,18 @@ const int libgame_lua_get_inventory_count(lua_State* L, const int id) {
     }
     return retval;
 }
+
+
+
+const entityid libgame_lua_get_entity_shield(lua_State* L, const int id) {
+    entityid retval = -1;
+    if (L) {
+        lua_getglobal(L, "GetEntityShield");
+        lua_pushnumber(L, id);
+        if (lua_pcall(L, 1, 1, 0) == 0) {
+            retval = lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return retval;
+}

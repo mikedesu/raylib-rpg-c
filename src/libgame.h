@@ -34,7 +34,7 @@ void libgame_draw_dungeonfloor(gamestate* g);
 void libgame_drawframeend(gamestate* g);
 void libgame_drawtorchgroup(gamestate* g);
 void libgame_do_camera_lock_on(gamestate* g);
-void libgame_draw_entity(gamestate* g, entityid id);
+void libgame_draw_entity(gamestate* g, const entityid id);
 void libgame_drawframe(gamestate* g);
 void libgame_draw_entities_at(gamestate* g, const entitytype_t type, const int x, const int y);
 void libgame_draw_entities_at_lua(gamestate* g, const entitytype_t type, const int x, const int y);
@@ -95,6 +95,8 @@ void libgame_load_textures_from_data(gamestate* g);
 void libgame_handle_player_input_attack_key(gamestate* g);
 void libgame_handle_player_input_pickup_key(gamestate* g);
 void libgame_handle_player_input_block_key(gamestate* g);
+void libgame_draw_entity_shadow(gamestate* g, const entityid id);
+void libgame_draw_entity_shield_back(gamestate* g, const entityid id);
 
 
 //#ifdef MOBILE

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entityid.h"
 #include "mylua.h"
 #include <stdbool.h>
 
@@ -45,6 +46,8 @@ const int libgame_lua_get_nth_action_y(lua_State* L, const int n);
 
 
 const int libgame_lua_get_inventory_count(lua_State* L, const int id);
+
+const entityid libgame_lua_get_entity_shield(lua_State* L, const int id);
 
 //void libgame_lua_print_entities(lua_State* L);
 //void libgame_lua_serialize_entities_and_print(lua_State* L);

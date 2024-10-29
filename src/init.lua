@@ -443,6 +443,14 @@ function EntityPickup(id)
 	return false
 end
 
+function GetEntityShield(entity_id)
+	local entity = GetEntityById(entity_id)
+	if entity then
+		return entity.equipment.shield
+	end
+	return -1
+end
+
 function PrintEntityInfo()
 	for _, entity in ipairs(Gamestate.Entities) do
 		if entity then
