@@ -21,10 +21,10 @@ typedef struct sprite {
 } sprite;
 
 
-sprite* sprite_create(Texture2D* t, int numcontexts, int numframes);
-sprite* sprite_destroy(sprite* s);
+sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes);
+void sprite_destroy(sprite* s);
 void sprite_updatesrc(sprite* s);
 void sprite_incrframe(sprite* s);
 void sprite_incrcontext(sprite* s);
-void sprite_setcontext(sprite* s, int context);
+void sprite_setcontext(sprite* s, const int context);
 const int sprite_get_context(sprite* s);

@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-sprite* sprite_create(Texture2D* t, int numcontexts, int numframes) {
+sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) {
     if (!t) {
         merror("sprite_create failed: texture is null");
         return NULL;
@@ -35,76 +35,54 @@ sprite* sprite_create(Texture2D* t, int numcontexts, int numframes) {
 
 
 void sprite_incrframe(sprite* s) {
-    if (s) {
-        s->currentframe = (s->currentframe + 1) % s->numframes;
-        s->src.x = s->width * s->currentframe;
-        if (s->currentframe == 0) {
-            s->num_loops++;
-        }
-    }
+    if (!s)
+        return;
+    s->currentframe = (s->currentframe + 1) % s->numframes;
+    s->src.x = s->width * s->currentframe;
+    s->num_loops = s->num_loops + (s->currentframe == 0 ? 1 : 0);
 }
 
 
-void sprite_setcontext(sprite* s, int context) {
-    if (s) {
-        if (context < 0) {
-            context = 0;
-            // also set currentframe to 0 to reset animation frame
-        } else if (context >= s->numcontexts) {
-            context = s->numcontexts - 1;
-        }
-        s->currentcontext = context % s->numcontexts;
-        s->src.y = s->height * s->currentcontext;
-        s->currentframe = 0;
-        s->src.x = 0;
-        //msuccess("sprite_setcontext success");
-    } else {
-        merror("sprite_setcontext failed: sprite is null");
-    }
+void sprite_setcontext(sprite* s, const int context) {
+    if (!s)
+        return;
+    if (context < 0 || context >= s->numcontexts)
+        return;
+    // also set currentframe to 0 to reset animation frame
+    s->currentcontext = context % s->numcontexts;
+    s->src.y = s->height * s->currentcontext;
+    s->currentframe = 0;
+    s->src.x = 0;
 }
 
 
 void sprite_incrcontext(sprite* s) {
-    if (s) {
-        s->currentcontext = (s->currentcontext + 1) % s->numcontexts;
-        s->src.y = s->height * s->currentcontext;
-    } else {
-        merror("sprite_incrcontext failed: sprite is null");
-    }
+    if (!s)
+        return;
+    s->currentcontext = (s->currentcontext + 1) % s->numcontexts;
+    s->src.y = s->height * s->currentcontext;
 }
 
 
 void sprite_updatesrc(sprite* s) {
-    if (s) {
-        s->src.x = s->width * s->currentframe;
-        s->src.y = s->height * s->currentcontext;
-    } else {
-        merror("sprite_updatesrc failed: sprite is null");
-    }
+    if (!s)
+        return;
+    s->src.x = s->width * s->currentframe;
+    s->src.y = s->height * s->currentcontext;
 }
 
 
-sprite* sprite_destroy(sprite* s) {
-    if (s) {
-        // we do not unload the texture here because textures are stored and managed globally
-        s->texture = NULL;
-        free(s);
-        s = NULL;
-        msuccess("sprite_destroy success");
-    } else {
-        merror("sprite_destroy failed: sprite is null");
-    }
-    return NULL;
+void sprite_destroy(sprite* s) {
+    if (!s)
+        return;
+    s->texture = NULL;
+    free(s);
+    s = NULL;
+    msuccess("sprite_destroy success");
 }
 
 
 
 const int sprite_get_context(sprite* s) {
-
-    if (s) {
-        return s->currentcontext;
-    } else {
-        merror("sprite_get_context failed: sprite is null");
-    }
-    return -1;
+    return !s ? -1 : s->currentcontext;
 }
