@@ -51,7 +51,7 @@ int targetheight = -1;
 int windowwidth = -1;
 int windowheight = -1;
 
-entityid buckler_id = -1;
+//entityid buckler_id = -1;
 //Music test_music = {0};
 
 
@@ -69,11 +69,12 @@ void libgame_draw_fade(gamestate* g) {
 void libgame_handle_fade(gamestate* g) {
     const int fadespeed = 4;
     // modify the fadealpha
-    if (g->fadestate == FADESTATEOUT && g->fadealpha < 255) {
-        g->fadealpha += fadespeed;
-    } else if (g->fadestate == FADESTATEIN && g->fadealpha > 0) {
-        g->fadealpha -= fadespeed;
-    }
+    g->fadealpha += g->fadestate == FADESTATEOUT && g->fadealpha < 255 ? fadespeed : g->fadestate == FADESTATEIN && g->fadealpha > 0 ? -fadespeed : 0;
+    //if (g->fadestate == FADESTATEOUT && g->fadealpha < 255) {
+    //    g->fadealpha += fadespeed;
+    //} else if (g->fadestate == FADESTATEIN && g->fadealpha > 0) {
+    //    g->fadealpha -= fadespeed;
+    //}
     // handle scene rotation based on fadealpha
     if (g->fadealpha >= 255) {
         g->fadealpha = 255;
@@ -95,10 +96,7 @@ void libgame_handle_fade(gamestate* g) {
 
 
 void libgame_entity_anim_incr(gamestate* g, const entityid id) {
-    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    if (group) {
-        spritegroup_incr(group);
-    }
+    spritegroup_incr(hashtable_entityid_spritegroup_get(g->spritegroups, id));
 }
 
 
@@ -291,7 +289,10 @@ void libgame_handle_player_input_movement_key(gamestate* g, const direction_t di
             //libgame_update_spritegroup(g, hero_id, dir); // updates sg context
             libgame_update_spritegroup(g, hero_id, SPECIFIER_NONE, dir); // updates sg context
             // hack to make the buckler correctly update...this probably doesnt belong here lol
-            libgame_update_spritegroup(g, buckler_id, SPECIFIER_SHIELD_BLOCK, dir);
+
+            const entityid shieldid = libgame_lua_get_entity_shield(L, hero_id);
+            libgame_update_spritegroup(g, shieldid, SPECIFIER_SHIELD_BLOCK, dir);
+
             libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
             g->player_input_received = true;
         } else {
@@ -1065,7 +1066,8 @@ void libgame_draw_entity_incr_frame(gamestate* g, const entityid id) {
             sprite_incrframe(group->sprites[group->current + 1]);
             if (type == ENTITY_PLAYER && group->current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
                 specifier_t spec = SPECIFIER_SHIELD_BLOCK;
-                spritegroup_t* buckler_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, buckler_id, spec);
+                const entityid shieldid = libgame_lua_get_entity_shield(L, id);
+                spritegroup_t* buckler_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, shieldid, spec);
                 if (!buckler_group) {
                     merror("Failed to get buckler group");
                 } else {
@@ -1750,7 +1752,7 @@ void libgame_initsharedsetup(gamestate* g) {
         }
 
         // keeping track of buckler_id to test buckler drawing on the entity
-        buckler_id = libgame_create_buckler_lua(g, "buckler", 2, 1);
+        const entityid buckler_id = libgame_create_buckler_lua(g, "buckler", 2, 1);
         if (buckler_id == -1) {
             merror("libgame_initsharedsetup: could not create buckler entity");
         }
