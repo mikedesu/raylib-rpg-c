@@ -31,7 +31,8 @@ make clean;
 echo $TIMESTAMP,$GCC_SIZE,$CLANG_SIZE,$GCC_LIBSIZE,$CLANG_LIBSIZE,$LOC,$LUA_LOC,$BUILD_TIME,$CLANG_BUILD_TIME >> build-stats.csv
 
 python3 graph_loc.py build-stats.csv loc ;
-python3 graph_loc.py build-stats.csv lua_loc ;
+python3 graph_loc.py build-stats.csv lua_loc;
+python3 graph_loc.py build-stats.csv loc lua_loc;
 python3 graph_loc.py build-stats.csv gcc_build_time clang_build_time;
 python3 graph_loc.py build-stats.csv gcc_size clang_size;
 python3 graph_loc.py build-stats.csv gcc_libsize clang_libsize;
