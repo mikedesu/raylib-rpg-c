@@ -1462,47 +1462,26 @@ void libgame_draw_entity_shield_front(gamestate* g, const entityid id) {
 
 
 
-void libgame_draw_entity_incr_frame(gamestate* g, const entityid id) {
-
-    if (!g) {
-        merror("libgame_draw_entity_incr_frame: gamestate is NULL");
-        return;
-    }
-
-    if (id < 0) {
-        merror("libgame_draw_entity_incr_frame: id is less than 0");
-        return;
-    }
-
-    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-
-    if (!group) {
-        merror("libgame_draw_entity_incr_frame: group is NULL");
-        return;
-    }
-
-    if (g->framecount % FRAMEINTERVAL) {
-        return;
-    }
-
-    const int current = group->current;
-    sprite_incrframe(group->sprites[current]);
-    // handle special animations such as the shield-on-character or the character shadow
-    if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-        sprite_incrframe(group->sprites[current + 1]); // character shadow
-        if (type == ENTITY_PLAYER && current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
-            const specifier_t spec = SPECIFIER_SHIELD_BLOCK;
-            spritegroup_t* buckler = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, buckler_id, spec);
-            if (!buckler) {
-                merror("Failed to get buckler group");
-                return;
-            }
-            sprite_incrframe(buckler->sprites[buckler->current]); // shield front of entity
-            sprite_incrframe(buckler->sprites[buckler->current + 1]); // shield back of entity
-        }
-    }
-}
+//void libgame_draw_entity_incr_frame(gamestate* g, const entityid id) {
+//    spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+//    const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+//    if (g->framecount % FRAMEINTERVAL == 0) {
+//        sprite_incrframe(group->sprites[group->current]);
+//        if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
+//            sprite_incrframe(group->sprites[group->current + 1]);
+//            if (type == ENTITY_PLAYER && group->current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
+//                specifier_t spec = SPECIFIER_SHIELD_BLOCK;
+//                spritegroup_t* buckler_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, buckler_id, spec);
+//                if (!buckler_group) {
+//                    merror("Failed to get buckler group");
+//                } else {
+//                    sprite_incrframe(buckler_group->sprites[buckler_group->current]);
+//                    sprite_incrframe(buckler_group->sprites[buckler_group->current + 1]);
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 
@@ -1562,19 +1541,20 @@ void libgame_draw_entity(gamestate* g, const entityid id) {
 
             //libgame_draw_entity_incr_frame(g, id);
 
+            // for some reason, pulling this block out into its own function isnt working as expected...
             if (g->framecount % FRAMEINTERVAL == 0) {
                 sprite_incrframe(group->sprites[group->current]);
                 if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
                     sprite_incrframe(group->sprites[group->current + 1]);
-
                     if (type == ENTITY_PLAYER && current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
                         specifier_t spec = SPECIFIER_SHIELD_BLOCK;
-                        spritegroup_t* buckler_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, buckler_id, spec);
-                        if (!buckler_group) {
-                            merror("Failed to get buckler group");
+                        const entityid shield_id = libgame_lua_get_entity_shield(L, id);
+                        spritegroup_t* shield_group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, shield_id, spec);
+                        if (!shield_group) {
+                            merror("Failed to get shield group");
                         } else {
-                            sprite_incrframe(buckler_group->sprites[buckler_group->current]);
-                            sprite_incrframe(buckler_group->sprites[buckler_group->current + 1]);
+                            sprite_incrframe(shield_group->sprites[shield_group->current]);
+                            sprite_incrframe(shield_group->sprites[shield_group->current + 1]);
                         }
                     }
                 }
