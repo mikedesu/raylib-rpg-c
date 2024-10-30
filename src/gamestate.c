@@ -46,7 +46,6 @@ gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const
     g->fadealpha = 0.0f;
     g->fadestate = FADESTATENONE;
     g->spritegroups = NULL;
-    //g->dungeonfloor = NULL;
     g->player_input_received = false;
     g->is_locked = false;
     g->lock_timer = 0;
@@ -56,7 +55,7 @@ gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const
 
 
 
-void gamestate_update_current_time(gamestate* g) {
+void gamestate_update_current_time(gamestate* const g) {
     if (!g)
         return;
     g->currenttime = time(NULL);

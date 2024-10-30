@@ -19,7 +19,6 @@
 #include "textureinfo.h"
 #include "tiletype.h"
 #include "tx_keys.h"
-#include "utils.h"
 #include <raylib.h>
 #include <raymath.h>
 #include <stdio.h>
@@ -867,7 +866,7 @@ void libgame_drawframe(gamestate* g) {
     BeginTextureMode(target);
     switch (activescene) {
     case SCENE_COMPANY:
-        libgame_draw_company_scene(g);
+        //libgame_draw_company_scene(g);
         break;
     case SCENE_TITLE:
         libgame_draw_title_scene(g);
@@ -1218,39 +1217,39 @@ void libgame_draw_title_scene(gamestate* g) {
 
 
 
-void libgame_draw_company_scene(gamestate* g) {
-    const Color bgc = BLACK;
-    const Color fgc = {0x66, 0x66, 0x66, 255};
-    const int fontsize = 32;
-    const int spacing = 1;
-    const int interval = 120;
-    const int dur = 60;
-    char b[128 * 3];
-    bzero(b, 128 * 3);
-    char* b2 = b + 128;
-    char* b3 = b + 128 * 2;
-    snprintf(b, 128, COMPANYNAME);
-    snprintf(b2, 128, COMPANYFILL);
-    snprintf(b3, 128, "presents");
-    const Vector2 measure = MeasureTextEx(g->font, b, fontsize, spacing);
-    if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
-        for (int i = 0; i < 10; i++) {
-            shufflestrinplace(b);
-            shufflestrinplace(b3);
-        }
-    }
-    for (int i = 0; i < 10; i++) {
-        shufflestrinplace(b2);
-    }
-    const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f, targetheight / 2.0f - measure.y / 2.0f};
-    ClearBackground(bgc);
-    DrawTextEx(g->font, b, pos, fontsize, 1, fgc);
-    DrawTextEx(g->font, b2, pos, fontsize, 1, fgc);
-    const Vector2 measure3 = MeasureTextEx(g->font, b3, 20, 1);
-    const Vector2 pp = {targetwidth / 2.0f - measure3.x / 2.0f, targetheight / 2.0f + measure.y / 2.0f + 20};
-    DrawTextEx(g->font, b3, pp, 20, 1, fgc);
-    libgame_handle_fade(g);
-}
+//void libgame_draw_company_scene(gamestate* g) {
+//    const Color bgc = BLACK;
+//    const Color fgc = {0x66, 0x66, 0x66, 255};
+//    const int fontsize = 32;
+//    const int spacing = 1;
+//    const int interval = 120;
+//    const int dur = 60;
+//    char b[128 * 3];
+//    bzero(b, 128 * 3);
+//    char* b2 = b + 128;
+//    char* b3 = b + 128 * 2;
+//    snprintf(b, 128, COMPANYNAME);
+//    snprintf(b2, 128, COMPANYFILL);
+//    snprintf(b3, 128, "presents");
+//    const Vector2 measure = MeasureTextEx(g->font, b, fontsize, spacing);
+//    if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
+//        for (int i = 0; i < 10; i++) {
+//            shufflestrinplace(b);
+//            shufflestrinplace(b3);
+//        }
+//    }
+//    for (int i = 0; i < 10; i++) {
+//        shufflestrinplace(b2);
+//    }
+//    const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f, targetheight / 2.0f - measure.y / 2.0f};
+//    ClearBackground(bgc);
+//    DrawTextEx(g->font, b, pos, fontsize, 1, fgc);
+//    DrawTextEx(g->font, b2, pos, fontsize, 1, fgc);
+//    const Vector2 measure3 = MeasureTextEx(g->font, b3, 20, 1);
+//    const Vector2 pp = {targetwidth / 2.0f - measure3.x / 2.0f, targetheight / 2.0f + measure.y / 2.0f + 20};
+//    DrawTextEx(g->font, b3, pp, 20, 1, fgc);
+//    libgame_handle_fade(g);
+//}
 
 
 

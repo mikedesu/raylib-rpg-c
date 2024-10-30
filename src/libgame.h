@@ -25,7 +25,7 @@ void libgame_closesavegamestate();
 void libgame_closewindow();
 void libgame_close(gamestate* g);
 void libgame_draw_debug_panel(gamestate* g);
-void libgame_draw_company_scene(gamestate* g);
+//void libgame_draw_company_scene(gamestate* g);
 void libgame_draw_title_scene(gamestate* g);
 void libgame_draw_gameplayscene(gamestate* g);
 void libgame_draw_fade(gamestate* g);
