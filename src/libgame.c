@@ -250,10 +250,8 @@ void libgame_update_spritegroup_move(gamestate* g, const entityid id, const int 
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (!sg)
         return;
-    //if (sg) {
     sg->move_x += x;
     sg->move_y += y;
-    //}
 }
 
 
@@ -263,9 +261,6 @@ void libgame_handleplayerinput_move(gamestate* g, const int xdir, const int ydir
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id == -1)
         return;
-    //if (hero_id < 0) {
-    //    merror("handleplayerinput_move: hero_id is -1");
-    //}
     libgame_lua_create_action(L, hero_id, ACTION_MOVE, xdir, ydir);
 }
 
@@ -281,8 +276,6 @@ void libgame_handle_player_input_movement_key(gamestate* g, const direction_t di
     // update player direction
     libgame_lua_set_entity_int(L, hero_id, "direction", dir);
     libgame_handleplayerinput_move(g, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir));
-    //libgame_handleplayerinput_move(g, xdir, ydir);
-    //libgame_update_spritegroup(g, hero_id, dir); // updates sg context
     libgame_update_spritegroup(g, hero_id, SPECIFIER_NONE, dir); // updates sg context
     // hack to make the buckler correctly update...this probably doesnt belong here lol
     const entityid shieldid = libgame_lua_get_entity_shield(L, hero_id);
@@ -1604,9 +1597,6 @@ const entityid libgame_create_hero_lua(gamestate* g, const char* name, const int
 
 
 const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const int x, const int y) {
-    //char buf[128];
-    //snprintf(buf, 128, "libgame_create_buckler_lua: creating buckler entity %s at %d, %d", name, x, y);
-    //minfo(buf);
     if (!g) {
         merror("libgame_create_buckler_lua: gamestate is NULL");
         return -1;
@@ -1632,12 +1622,6 @@ const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const 
         libgame_create_spritegroup_by_id(g, id);
         libgame_update_spritegroup(g, id, SPECIFIER_SHIELD_ON_TILE, DIRECTION_NONE);
         libgame_update_spritegroup(g, id, SPECIFIER_SHIELD_BLOCK, DIRECTION_DOWN_RIGHT);
-        //libgame_update_spritegroup(g, id, SPECIFIER_SHIELD_BLOCK, DIRECTION_DOWN_LEFT);
-        //libgame_update_spritegroup(g, id, SPECIFIER_SHIELD_BLOCK, DIRECTION_UP_LEFT);
-        //libgame_update_spritegroup(g, id, SPECIFIER_SHIELD_BLOCK, DIRECTION_UP_RIGHT);
-        //bzero(buf, 128);
-        //snprintf(buf, 128, "libgame_create_buckler_lua: buckler entityid %d", id);
-        //msuccess(buf);
     } else {
         merror("libgame_create_buckler_lua: could not create buckler entity");
     }
@@ -1648,38 +1632,15 @@ const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const 
 
 
 const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y) {
-    //char buf[128];
-    //snprintf(buf, 128, "libgame_create_orc_lua: creating orc entity %s at %d, %d", name, x, y);
-    //minfo(buf);
-    if (!g) {
-        merror("libgame_create_orc_lua: gamestate is NULL");
-        return -1;
-    }
-    if (!name) {
-        merror("libgame_create_orc_lua: name is NULL");
-        return -1;
-    }
-    if (x < 0 || y < 0) {
-        merror("libgame_create_orc_lua: x or y is less than 0");
-        return -1;
-    }
     const int dw = libgame_lua_get_dungeonfloor_col_count(L);
     const int dh = libgame_lua_get_dungeonfloor_row_count(L);
-    if (x >= dw || y >= dh) {
-        merror("libgame_create_orc_lua: x or y is greater than dungeonfloor dimensions");
+    if (!g || !name || x < 0 || y < 0 || x >= dw || y >= dh)
         return -1;
-    }
     const entityid id = libgame_lua_create_entity(L, name, ENTITY_NPC, x, y);
-    if (id != -1) {
-        // set orc race
-        libgame_lua_set_entity_int(L, id, "race", RACE_ORC);
-        libgame_create_spritegroup_by_id(g, id);
-        //bzero(buf, 128);
-        //snprintf(buf, 128, "libgame_create_orc_lua: orc entityid %d", id);
-        //msuccess(buf);
-    } else {
-        merror("libgame_create_orc_lua: could not create orc entity");
-    }
+    if (id == -1)
+        return -1;
+    libgame_lua_set_entity_int(L, id, "race", RACE_ORC);
+    libgame_create_spritegroup_by_id(g, id);
     return id;
 }
 
