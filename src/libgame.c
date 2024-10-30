@@ -276,18 +276,17 @@ void libgame_handle_player_input_movement_key(gamestate* g, const direction_t di
     if (g) {
         const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
         if (hero_id != -1) {
-            const int xdir = libgame_get_x_from_dir(dir);
-            const int ydir = libgame_get_y_from_dir(dir);
+            //const int xdir = libgame_get_x_from_dir(dir);
+            //const int ydir = libgame_get_y_from_dir(dir);
             // update player direction
             libgame_lua_set_entity_int(L, hero_id, "direction", dir);
-            libgame_handleplayerinput_move(g, xdir, ydir);
+            libgame_handleplayerinput_move(g, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir));
+            //libgame_handleplayerinput_move(g, xdir, ydir);
             //libgame_update_spritegroup(g, hero_id, dir); // updates sg context
             libgame_update_spritegroup(g, hero_id, SPECIFIER_NONE, dir); // updates sg context
             // hack to make the buckler correctly update...this probably doesnt belong here lol
-
             const entityid shieldid = libgame_lua_get_entity_shield(L, hero_id);
             libgame_update_spritegroup(g, shieldid, SPECIFIER_SHIELD_BLOCK, dir);
-
             libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
             g->player_input_received = true;
         } else {
@@ -301,17 +300,17 @@ void libgame_handle_player_input_movement_key(gamestate* g, const direction_t di
 
 void libgame_handle_player_input_attack_key(gamestate* g) {
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id != -1) {
-        const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
-        const bool res = libgame_lua_create_action(L, hero_id, ACTION_ATTACK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir));
-        if (res) {
-            msuccess("attack action created");
-            libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
-        } else {
-            merror("attack action failed to create");
-        }
-        g->player_input_received = true;
+    if (hero_id == -1) {
+        merror("handle_playerinput_attack: hero_id is -1");
+        return;
     }
+    const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
+    if (!libgame_lua_create_action(L, hero_id, ACTION_ATTACK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir))) {
+        merror("attack action failed to create");
+    } else {
+        libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+    }
+    g->player_input_received = true;
 }
 
 
