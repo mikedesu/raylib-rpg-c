@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
 // Lua support
 #include "libgame_lua.h"
 
@@ -36,12 +35,10 @@
 //------------------------------------------------------------------
 gamestate* g = NULL;
 lua_State* L = NULL;
-
 RenderTexture target;
 Rectangle target_src = (Rectangle){0, 0, 0, 0};
 Rectangle target_dest = (Rectangle){0, 0, 0, 0};
 Vector2 target_origin = (Vector2){0, 0};
-
 int activescene = GAMEPLAYSCENE;
 //int activescene = COMPANYSCENE;
 int targetwidth = -1;
@@ -49,8 +46,6 @@ int targetheight = -1;
 int windowwidth = -1;
 int windowheight = -1;
 
-//entityid buckler_id = -1;
-//Music test_music = {0};
 
 
 
@@ -553,24 +548,13 @@ void libgame_closewindow() {
 
 
 void libgame_update_debug_panel_buffer(gamestate* g) {
-    int hx = -1;
-    int hy = -1;
-    int last_mv_x = -1;
-    int last_mv_y = -1;
-    int hero_was_damaged = -1;
     const entityid id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (id != -1) {
-        hx = libgame_lua_get_entity_int(L, id, "x");
-        hy = libgame_lua_get_entity_int(L, id, "y");
-        last_mv_x = libgame_lua_get_entity_int(L, id, "last_move_x");
-        last_mv_x = libgame_lua_get_entity_int(L, id, "last_move_y");
-        hero_was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
-    }
-    const int dw = libgame_lua_get_dungeonfloor_row_count(L);
-    const int dh = libgame_lua_get_dungeonfloor_col_count(L);
-    const int action_count = libgame_lua_get_action_count(L);
-    const int entity_count = libgame_lua_get_num_entities(L);
-    const int dir = libgame_lua_get_entity_int(L, id, "direction");
+    if (id == -1)
+        return;
+    const int hx = libgame_lua_get_entity_int(L, id, "x"), hy = libgame_lua_get_entity_int(L, id, "y"), last_mv_x = libgame_lua_get_entity_int(L, id, "last_move_x"),
+              last_mv_y = libgame_lua_get_entity_int(L, id, "last_move_y"), hero_was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged"), dw = libgame_lua_get_dungeonfloor_row_count(L),
+              dh = libgame_lua_get_dungeonfloor_col_count(L), action_count = libgame_lua_get_action_count(L), entity_count = libgame_lua_get_num_entities(L),
+              dir = libgame_lua_get_entity_int(L, id, "direction");
     const char* dir_str = libgame_get_str_from_dir(dir);
     snprintf(g->debugpanel.buffer,
              1024,

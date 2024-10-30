@@ -28,13 +28,14 @@ sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) 
     // given the current frame and current context,
     // the width is the current frame times the width of the sprite
     s->src = (Rectangle){s->currentframe * s->width, s->currentcontext * s->height, s->width, s->height};
-    // this will force us to set the destination rectangle after instancing
     s->dest = (Rectangle){0, 0, 0, 0};
     return s;
 }
 
 
-void sprite_incrframe(sprite* s) {
+
+
+void sprite_incrframe(sprite* const s) {
     if (!s)
         return;
     s->currentframe = (s->currentframe + 1) % s->numframes;
@@ -43,7 +44,9 @@ void sprite_incrframe(sprite* s) {
 }
 
 
-void sprite_setcontext(sprite* s, const int context) {
+
+
+void sprite_setcontext(sprite* const s, const int context) {
     if (!s)
         return;
     if (context < 0 || context >= s->numcontexts)
@@ -56,7 +59,9 @@ void sprite_setcontext(sprite* s, const int context) {
 }
 
 
-void sprite_incrcontext(sprite* s) {
+
+
+void sprite_incrcontext(sprite* const s) {
     if (!s)
         return;
     s->currentcontext = (s->currentcontext + 1) % s->numcontexts;
@@ -64,12 +69,16 @@ void sprite_incrcontext(sprite* s) {
 }
 
 
-void sprite_updatesrc(sprite* s) {
+
+
+void sprite_updatesrc(sprite* const s) {
     if (!s)
         return;
     s->src.x = s->width * s->currentframe;
     s->src.y = s->height * s->currentcontext;
 }
+
+
 
 
 void sprite_destroy(sprite* s) {
@@ -83,6 +92,6 @@ void sprite_destroy(sprite* s) {
 
 
 
-const int sprite_get_context(sprite* s) {
+const int sprite_get_context(const sprite* const s) {
     return !s ? -1 : s->currentcontext;
 }
