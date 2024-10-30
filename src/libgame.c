@@ -160,7 +160,7 @@ const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir) {
 void libgame_handleinput(gamestate* g) {
     //minfo("handleinput: starting...");
     //if (IsKeyPressed(KEY_SPACE) || GetTouchPointCount() > 0) {
-    //    //    minfo("key space pressed");
+    //    minfo("key space pressed");
     //    if (g->fadestate == FADESTATENONE) {
     //        g->fadestate = FADESTATEOUT;
     //    }
@@ -1582,7 +1582,7 @@ void libgame_loadfont(gamestate* g) {
 
 
 void libgame_init_datastructures(gamestate* g) {
-    g->entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
+    //g->entityids = vectorentityid_create(DEFAULT_VECTOR_ENTITYID_SIZE);
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
     const tiletype_t base_type = TILETYPE_DIRT_00;
     const int w = 16;
