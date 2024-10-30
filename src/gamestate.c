@@ -1,4 +1,4 @@
-#include "dungeonfloor.h"
+//#include "dungeonfloor.h"
 #include "gamestate.h"
 #include "mprint.h"
 #include <errno.h>
@@ -46,7 +46,7 @@ gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const
     g->fadealpha = 0.0f;
     g->fadestate = FADESTATENONE;
     g->spritegroups = NULL;
-    g->dungeonfloor = NULL;
+    //g->dungeonfloor = NULL;
     g->player_input_received = false;
     g->is_locked = false;
     g->lock_timer = 0;
@@ -76,9 +76,9 @@ void gamestatefree(gamestate* g) {
     minfo("gamestatefree freeing spritegroups");
     hashtable_entityid_spritegroup_destroy(g->spritegroups);
     minfo("gamestatefree freeing dungeonfloor");
-    if (g->dungeonfloor) {
-        dungeonfloor_free(g->dungeonfloor);
-    }
+    //if (g->dungeonfloor) {
+    //    dungeonfloor_free(g->dungeonfloor);
+    //}
     minfo("gamestatefree freeing gamestate");
     free(g);
     minfo("gamestatefree end");

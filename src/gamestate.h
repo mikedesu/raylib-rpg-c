@@ -3,14 +3,14 @@
 #include "controlmode.h"
 #include "debugpanel.h"
 #include "display.h"
-#include "dungeonfloor.h"
+//#include "dungeonfloor.h"
 #include "entityid.h"
 #include "fadestate.h"
-#include "hashtable_entityid_entity.h"
+//#include "hashtable_entityid_entity.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "sizemacros.h"
 #include "textureinfo.h"
-#include "vectorentityid.h"
+//#include "vectorentityid.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <time.h>
@@ -56,7 +56,7 @@ typedef struct gamestate {
 
     textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
-    dungeonfloor_t* dungeonfloor;
+    //dungeonfloor_t* dungeonfloor;
 
 } gamestate;
 

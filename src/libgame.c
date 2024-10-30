@@ -1,7 +1,7 @@
 #include "actions.h"
 #include "controlmode.h"
 #include "direction.h"
-#include "dungeonfloor.h"
+//#include "dungeonfloor.h"
 #include "entitytype.h"
 #include "fadestate.h"
 #include "gamestate.h"
@@ -21,7 +21,7 @@
 #include "tiletype.h"
 #include "tx_keys.h"
 #include "utils.h"
-#include "vectorentityid.h"
+//#include "vectorentityid.h"
 #include <raylib.h>
 #include <raymath.h>
 #include <stdio.h>
@@ -70,11 +70,6 @@ void libgame_handle_fade(gamestate* g) {
     const int fadespeed = 4;
     // modify the fadealpha
     g->fadealpha += g->fadestate == FADESTATEOUT && g->fadealpha < 255 ? fadespeed : g->fadestate == FADESTATEIN && g->fadealpha > 0 ? -fadespeed : 0;
-    //if (g->fadestate == FADESTATEOUT && g->fadealpha < 255) {
-    //    g->fadealpha += fadespeed;
-    //} else if (g->fadestate == FADESTATEIN && g->fadealpha > 0) {
-    //    g->fadealpha -= fadespeed;
-    //}
     // handle scene rotation based on fadealpha
     if (g->fadealpha >= 255) {
         g->fadealpha = 255;
@@ -955,11 +950,16 @@ void libgame_drawgrid(gamestate* g) {
     const Color c = GREEN;
     const int w = DEFAULT_TILE_SIZE;
     const int h = DEFAULT_TILE_SIZE;
-    const int len = g->dungeonfloor->len;
-    const int wid = g->dungeonfloor->wid;
+
+    //const int len = g->dungeonfloor->len;
+    //const int wid = g->dungeonfloor->wid;
+    const int len = libgame_lua_get_dungeonfloor_row_count(L);
+    const int wid = libgame_lua_get_dungeonfloor_col_count(L);
+
     for (int i = 0; i <= len; i++) {
         DrawLine(i * w, 0, i * w, wid * h, c);
     }
+
     for (int i = 0; i <= wid; i++) {
         DrawLine(0, i * h, len * w, i * h, c);
     }

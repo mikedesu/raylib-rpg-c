@@ -1,7 +1,7 @@
 #pragma once
 
 #include "direction.h"
-#include "entity.h"
+//#include "entity.h"
 #include "entitytype.h"
 #include "gamestate.h"
 #include "mylua.h"
@@ -107,8 +107,8 @@ void libgame_init_sound();
 //#endif
 
 const bool libgame_entity_move_lua(gamestate* g, entityid id, int x, int y);
-const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
-const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, itemtype_t type);
+//const bool libgame_entity_move_check(gamestate* g, entity_t* e, int x, int y);
+//const bool libgame_entity_inventory_contains_type(gamestate* g, entityid id, itemtype_t type);
 const bool libgame_external_check_reload();
 
 const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);

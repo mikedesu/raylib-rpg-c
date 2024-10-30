@@ -4,16 +4,21 @@ OBJ=-c
 #-Wall 
 WFLAGS=-Wall -Werror
 SHARED=-shared
-DATA_STRUCTS=vectorentityid.o 
+#DATA_STRUCTS=vectorentityid.o 
 SCENES=companyscene.o 
-LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o  utils.o sprite.o  spritegroup.o gamestate.o hashtable_entityid_spritegroup.o dungeonfloor.o get_txkey_for_tiletype.o dice.o libgame_lua.o specifier.o 
+LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o  utils.o sprite.o  spritegroup.o gamestate.o hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o dice.o libgame_lua.o specifier.o 
+#LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o  utils.o sprite.o  spritegroup.o gamestate.o hashtable_entityid_spritegroup.o dungeonfloor.o get_txkey_for_tiletype.o dice.o libgame_lua.o specifier.o 
 #LIBGAME_OBJECTS=$(DATA_STRUCTS) $(SCENES) libgame.o  utils.o sprite.o  spritegroup.o entity.o hashtable_entityid_entity.o gamestate.o hashtable_entityid_spritegroup.o dungeonfloor.o get_txkey_for_tiletype.o dice.o libgame_lua.o
 STATIC_LINK_RAYLIB=-l:libraylib.a
 #LINK_MATH=-lm
 POSITION_INDEPENDENT_CODE=-fPIC
 MAIN_C=main.c
-WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c libgame_lua.c dungeonfloor.c vectorentityid.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c companyscene.c sprite.c spritegroup.c utils.c dice.c specifier.o /home/darkmage/src/raylib/src/libraylib.a /home/darkmage/src/lua/liblua.a
-MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_spritegroup.o dungeonfloor.o vectorentityid.o get_txkey_for_tiletype.o dice.o specifier.o
+WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c libgame_lua.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c companyscene.c sprite.c spritegroup.c utils.c dice.c specifier.o /home/darkmage/src/raylib/src/libraylib.a /home/darkmage/src/lua/liblua.a
+#WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c libgame_lua.c dungeonfloor.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c companyscene.c sprite.c spritegroup.c utils.c dice.c specifier.o /home/darkmage/src/raylib/src/libraylib.a /home/darkmage/src/lua/liblua.a
+#WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c libgame_lua.c dungeonfloor.c vectorentityid.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c companyscene.c sprite.c spritegroup.c utils.c dice.c specifier.o /home/darkmage/src/raylib/src/libraylib.a /home/darkmage/src/lua/liblua.a
+MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o dice.o specifier.o
+#MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_spritegroup.o dungeonfloor.o get_txkey_for_tiletype.o dice.o specifier.o
+#MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_spritegroup.o dungeonfloor.o vectorentityid.o get_txkey_for_tiletype.o dice.o specifier.o
 #MAIN_OBJECTS=gameloader.o gamestate.o companyscene.o hashtable_entityid_entity.o hashtable_entityid_spritegroup.o dungeonfloor.o vectorentityid.o get_txkey_for_tiletype.o dice.o 
 
 
@@ -59,20 +64,20 @@ companyscene.o: companyscene.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 # Data structures and extra functionality/helpers/etc
-vectorentityid.o: vectorentityid.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
+#vectorentityid.o: vectorentityid.c
+#	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 utils.o: utils.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
-dungeonfloor.o: dungeonfloor.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
+#dungeonfloor.o: dungeonfloor.c
+#	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
-entity.o: entity.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
+#entity.o: entity.c
+#	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
-hashtable_entityid_entity.o: hashtable_entityid_entity.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
+#hashtable_entityid_entity.o: hashtable_entityid_entity.c
+#	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 hashtable_entityid_spritegroup.o: hashtable_entityid_spritegroup.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
