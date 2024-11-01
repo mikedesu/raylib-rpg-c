@@ -1,13 +1,7 @@
 #pragma once
 
-
-
 #include <stdbool.h>
-//#include <time.h>
 
-
-
-//time_t getlastwritetime(const char* filename);
 int getlastwritetime(const char* filename);
 void gamerun();
 void openhandle();

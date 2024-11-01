@@ -55,7 +55,7 @@ gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const
 
 
 
-void gamestate_update_current_time(gamestate* const g) {
+inline void gamestate_update_current_time(gamestate* const g) {
     if (!g)
         return;
     g->currenttime = time(NULL);

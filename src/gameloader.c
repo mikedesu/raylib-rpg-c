@@ -4,9 +4,6 @@
 #include "symaddrpair.h"
 
 #include "libgame.h"
-//#include "mylua.h"
-
-
 
 #include <assert.h>
 #include <dlfcn.h>
@@ -18,8 +15,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-//#include <emscripten/emscripten.h>
 
 
 
@@ -36,40 +31,20 @@ const char* templib = "./templibgame.so";
 
 
 void* handle = NULL;
-
-
-
-
 gamestate* g_ = NULL;
-
-
-
 lua_State* L = NULL;
 
 
-
-
-//void gameloop();
-
-
-
-
 bool (*mywindowshouldclose)() = NULL;
-
 gamestate* (*mylibgame_getgamestate)() = NULL;
 lua_State* (*mylibgame_getlua)() = NULL;
-
 void (*mylibgameinit)() = NULL;
-
 void (*mylibgameclosesavegamestate)() = NULL;
-//void (*mylibgame_close_save_gamestate_minus_lua)() = NULL;
-
 void (*mylibgameclose)(gamestate*) = NULL;
 void (*mylibgamedrawframe)(gamestate*) = NULL;
 void (*mylibgamehandleinput)(gamestate*) = NULL;
 void (*mylibgameinitwithstate)(gamestate*) = NULL;
 void (*mylibgameupdategamestate)(gamestate*) = NULL;
-
 bool (*mylibgame_external_check_reload)() = NULL;
 
 
@@ -149,11 +124,6 @@ void loadsymbols() {
     mylibgame_external_check_reload = dlsym(handle, sym);
     checksymbol(mylibgame_external_check_reload, sym);
 
-    // lua_State return
-    //sym = "libgame_getlua";
-    //mylibgame_getlua = dlsym(handle, sym);
-    //checksymbol(mylibgame_getlua, sym);
-
     msuccess("end loadsymbols");
 }
 
@@ -169,10 +139,7 @@ void autoreload() {
             minfo("Library is locked\n");
             sleep(1);
         }
-        //minfo("getting old gamestate");
         g_ = mylibgame_getgamestate();
-        //L = mylibgame_getlua();
-
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
         mylibgameclosesavegamestate(); // closes window
@@ -197,33 +164,19 @@ void autoreload_every_n_sec(const int n) {
 
 
 
-//void gameloop() {
-//    libgame_handleinput(g_);
-//    libgame_updategamestate(g_);
-//    libgame_drawframe(g_);
-//}
-
-
-
 void gamerun() {
     minfo("gamerun");
     openhandle(); // if building for web, turn off
     loadsymbols(); // if building for web, turn off
     last_write_time = getlastwritetime(libname); // if building for web, turn off
-
     mylibgameinit(); // if building for web, turn off
     //libgame_init();
-
-
     g_ = mylibgame_getgamestate();
     //g = mylibgame_getgamestate();
     //g_ = libgame_getgamestate();
     //L = mylibgame_getlua();
-
     minfo("entering gameloop");
-
     //emscripten_set_main_loop(gameloop, 0, 1);
-
     while (!mywindowshouldclose()) {
         //while (!libgame_windowshouldclose()) {
         //gameloop();

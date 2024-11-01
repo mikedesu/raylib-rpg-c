@@ -143,7 +143,7 @@ spritegroup_t* hashtable_entityid_spritegroup_get_by_specifier(hashtable_entityi
         return NULL;
     }
     if (key < 0) {
-        merror("hashtable_entityid_spritegroup_get_by_specifier: key is negative");
+        //merror("hashtable_entityid_spritegroup_get_by_specifier: key is negative");
         return NULL;
     }
     if (spec < SPECIFIER_NONE) {
