@@ -48,19 +48,17 @@ int windowheight = -1;
 
 
 
-void libgame_draw_fade(gamestate* g) {
+void libgame_draw_fade(const gamestate* const g) {
     if (!g)
         return;
-    if (g->fadealpha > 0) {
-        Color c = {0, 0, 0, g->fadealpha};
-        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), c);
-    }
+    if (g->fadealpha > 0)
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, g->fadealpha});
 }
 
 
 
 
-void libgame_handle_fade(gamestate* g) {
+void libgame_handle_fade(gamestate* const g) {
     if (!g)
         return;
     const int fadespeed = 4;
@@ -86,7 +84,7 @@ void libgame_handle_fade(gamestate* g) {
 
 
 
-void libgame_entity_anim_incr(gamestate* g, const entityid id) {
+void libgame_entity_anim_incr(gamestate* const g, const entityid id) {
     if (!g)
         return;
     spritegroup_incr(hashtable_entityid_spritegroup_get(g->spritegroups, id));
