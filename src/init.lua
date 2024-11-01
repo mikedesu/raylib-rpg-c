@@ -220,6 +220,7 @@ function CreateEntity(name, type, x, y)
 		race = RaceTypes.None,
 		was_damaged = 0,
 		is_blocking = 0,
+		block_successful = 0,
 		--block_dir_x = 0,
 		--block_dir_y = 0,
 		direction = DirectionTypes.SouthEast,
@@ -374,7 +375,17 @@ function EntityAttack(id, xdir, ydir)
 		-- mark it as having been damaged
 		local target_entity = GetEntityById(target_id)
 		if target_entity then
-			target_entity.was_damaged = 1
+			-- if the target entity is blocking, set the target block to be successful
+			if target_entity.is_blocking == 1 then
+				target_entity.was_damaged = 0
+				target_entity.block_successful = 1
+				target_entity.is_blocking = 0
+				return true
+			else
+				target_entity.was_damaged = 1
+				target_entity.block_successful = 0
+				target_entity.is_blocking = 0
+			end
 		end
 		-- for now, returning true if the tile is occupied by an entity
 		return true

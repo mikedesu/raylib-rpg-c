@@ -658,7 +658,7 @@ void libgame_update_smoothmove(gamestate* g, const entityid id) {
 
 
 
-void libgame_do_camera_lock_on(gamestate* g) {
+void libgame_do_camera_lock_on(gamestate* const g) {
     if (!g)
         return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
@@ -684,19 +684,12 @@ void libgame_do_camera_lock_on(gamestate* g) {
 
 
 
-void libgame_handle_npc_turn_lua(gamestate* g, const entityid id) {
+void libgame_handle_npc_turn_lua(gamestate* const g, const entityid id) {
     if (!g)
         return;
     minfo("libgame_handle_npc_turn_lua begin");
-    const int xdir = rand() % 3 - 1;
-    const int ydir = rand() % 3 - 1;
-    //const bool result = libgame_lua_create_action(L, id, 2, xdir, ydir);
-    const bool result = libgame_lua_create_action(L, id, ACTION_MOVE, xdir, ydir);
-    if (result) {
-        msuccess("libgame_handle_npc_turn_lua end");
-    } else {
-        merror("libgame_handle_npc_turn_lua end");
-    }
+    if (!libgame_lua_create_action(L, id, ACTION_MOVE, rand() % 3 - 1, rand() % 3 - 1))
+        merror("could not create npc action: move");
 }
 
 
