@@ -93,7 +93,7 @@ void libgame_entity_anim_incr(gamestate* const g, const entityid id) {
 
 
 
-void libgame_entity_anim_set(gamestate* g, const entityid id, const int index) {
+void libgame_entity_anim_set(gamestate* const g, const entityid id, const int index) {
     if (!g)
         return;
     spritegroup_set_current(hashtable_entityid_spritegroup_get(g->spritegroups, id), index);
@@ -102,22 +102,19 @@ void libgame_entity_anim_set(gamestate* g, const entityid id, const int index) {
 
 
 
-void libgame_test_enemy_placement(gamestate* g) {
+void libgame_test_enemy_placement(gamestate* const g) {
     minfo("test_enemy_placement begin");
     if (!g)
         return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id == -1) //{
+    if (hero_id == -1)
         return;
-    //merror("test_enemy_placement: hero_id is -1");
-    //}
     const int x = libgame_lua_get_entity_int(L, hero_id, "x") + 1;
     const int y = libgame_lua_get_entity_int(L, hero_id, "y");
-    if (libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
+    if (libgame_lua_tile_is_occupied_by_npc(L, x, y))
         merror("test_enemy_placement: tile is occupied by npc");
-    } else if (libgame_create_orc_lua(g, "orc", x, y) == -1) {
+    else if (libgame_create_orc_lua(g, "orc", x, y) == -1)
         merror("test_enemy_placement: failed to create orc");
-    }
 }
 
 
@@ -152,7 +149,7 @@ const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir) {
 
 
 
-void libgame_handleinput(gamestate* g) {
+void libgame_handleinput(gamestate* const g) {
     if (!g)
         return;
     //if (IsKeyPressed(KEY_SPACE) || GetTouchPointCount() > 0) {
@@ -173,7 +170,7 @@ void libgame_handleinput(gamestate* g) {
 
 
 
-void libgame_handle_modeswitch(gamestate* g) {
+void libgame_handle_modeswitch(gamestate* const g) {
     if (!g)
         return;
     if (IsKeyPressed(KEY_C))
@@ -183,7 +180,7 @@ void libgame_handle_modeswitch(gamestate* g) {
 
 
 
-void libgame_handle_debugpanel_switch(gamestate* g) {
+void libgame_handle_debugpanel_switch(gamestate* const g) {
     if (!g)
         return;
     if (IsKeyPressed(KEY_D))
@@ -193,7 +190,7 @@ void libgame_handle_debugpanel_switch(gamestate* g) {
 
 
 
-void libgame_handle_grid_switch(gamestate* g) {
+void libgame_handle_grid_switch(gamestate* const g) {
     if (!g)
         return;
     if (IsKeyPressed(KEY_G)) {
@@ -204,7 +201,7 @@ void libgame_handle_grid_switch(gamestate* g) {
 
 
 
-void libgame_update_spritegroup(gamestate* g, const entityid id, const specifier_t spec, const direction_t dir) {
+void libgame_update_spritegroup(gamestate* const g, const entityid id, const specifier_t spec, const direction_t dir) {
     if (!g)
         return;
     spritegroup_t* group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, id, spec);
@@ -240,7 +237,7 @@ void libgame_update_spritegroup(gamestate* g, const entityid id, const specifier
 
 
 
-void libgame_update_spritegroup_move(gamestate* g, const entityid id, const int x, const int y) {
+void libgame_update_spritegroup_move(gamestate* const g, const entityid id, const int x, const int y) {
     if (!g)
         return;
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
@@ -253,7 +250,7 @@ void libgame_update_spritegroup_move(gamestate* g, const entityid id, const int 
 
 
 
-void libgame_handleplayerinput_move(gamestate* g, const int xdir, const int ydir) {
+void libgame_handleplayerinput_move(gamestate* const g, const int xdir, const int ydir) {
     if (!g)
         return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
@@ -265,7 +262,7 @@ void libgame_handleplayerinput_move(gamestate* g, const int xdir, const int ydir
 
 
 
-void libgame_handle_player_input_movement_key(gamestate* g, const direction_t dir) {
+void libgame_handle_player_input_movement_key(gamestate* const g, const direction_t dir) {
     if (!g)
         return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
@@ -285,7 +282,7 @@ void libgame_handle_player_input_movement_key(gamestate* g, const direction_t di
 
 
 
-void libgame_handle_player_input_attack_key(gamestate* g) {
+void libgame_handle_player_input_attack_key(gamestate* const g) {
     if (!g)
         return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
@@ -305,22 +302,17 @@ void libgame_handle_player_input_attack_key(gamestate* g) {
 
 
 
-void libgame_handle_player_input_block_key(gamestate* g) {
+void libgame_handle_player_input_block_key(gamestate* const g) {
     if (!g)
         return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id != -1) {
         // trigger a "block" action
         const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
-        const int xdir = libgame_get_x_from_dir(dir);
-        const int ydir = libgame_get_y_from_dir(dir);
-        bool res = libgame_lua_create_action(L, hero_id, ACTION_BLOCK, xdir, ydir);
-        if (res) {
-            msuccess("block action created");
+        if (libgame_lua_create_action(L, hero_id, ACTION_BLOCK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir)))
             libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_GUARD);
-        } else {
+        else
             merror("block action failed to create");
-        }
         g->player_input_received = true;
     }
 }
@@ -328,27 +320,23 @@ void libgame_handle_player_input_block_key(gamestate* g) {
 
 
 
-void libgame_handle_player_input_pickup_key(gamestate* g) {
+void libgame_handle_player_input_pickup_key(gamestate* const g) {
     if (!g)
         return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id < 0) {
-        merror("handle_playerinput_pickup: hero_id is -1");
+    if (hero_id < 0)
         return;
-    }
-    const bool res = libgame_lua_create_action(L, hero_id, ACTION_PICKUP, libgame_lua_get_entity_int(L, hero_id, "x"), libgame_lua_get_entity_int(L, hero_id, "y"));
-    if (res) {
+    if (libgame_lua_create_action(L, hero_id, ACTION_PICKUP, libgame_lua_get_entity_int(L, hero_id, "x"), libgame_lua_get_entity_int(L, hero_id, "y")))
         msuccess("pickup action created");
-    } else {
+    else
         merror("pickup action failed to create");
-    }
     g->player_input_received = true;
 }
 
 
 
 
-void libgame_handle_input_player(gamestate* g) {
+void libgame_handle_input_player(gamestate* const g) {
     if (!g)
         return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
@@ -407,7 +395,7 @@ void libgame_handle_input_player(gamestate* g) {
 
 
 
-void libgame_update_spritegroup_by_lastmove(gamestate* g, const entityid entity_id) {
+void libgame_update_spritegroup_by_lastmove(gamestate* const g, const entityid entity_id) {
     if (!g)
         return;
     const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x");
@@ -420,7 +408,7 @@ void libgame_update_spritegroup_by_lastmove(gamestate* g, const entityid entity_
 
 
 
-void libgame_process_turn_actions(gamestate* g) {
+void libgame_process_turn_actions(gamestate* const g) {
     if (!g)
         return;
     const int action_count = libgame_lua_get_action_count(L);
@@ -463,7 +451,7 @@ const char* libgame_get_str_from_dir(const direction_t dir) {
 
 
 
-void libgame_process_turn(gamestate* g) {
+void libgame_process_turn(gamestate* const g) {
     if (!g)
         return;
     libgame_process_turn_actions(g);
@@ -473,7 +461,7 @@ void libgame_process_turn(gamestate* g) {
 
 
 
-void libgame_handle_caminput(gamestate* g) {
+void libgame_handle_caminput(gamestate* const g) {
     if (!g)
         return;
     if (g->controlmode == CONTROLMODE_CAMERA) {
