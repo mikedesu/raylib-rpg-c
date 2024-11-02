@@ -33,12 +33,12 @@ void libgame_initsharedsetup(gamestate* g);
 void libgame_init_datastructures(gamestate* g);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
-void libgame_load_textures(gamestate* g);
-void libgame_unloadtextures(gamestate* g);
 void libgame_update_gamestate(gamestate* g);
 
 
 
+void libgame_load_textures(gamestate* const g);
+void libgame_unloadtextures(gamestate* const g);
 void libgame_set_default_anim_for_id(gamestate* const g, const entityid id, const int anim);
 void libgame_reset_entities_anim(gamestate* const g);
 const entityid libgame_create_orc_lua(gamestate* const g, const char* name, const int x, const int y);

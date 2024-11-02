@@ -1316,7 +1316,7 @@ void libgame_load_textures_from_disk(gamestate* const g) {
 
 
 
-void libgame_load_textures(gamestate* g) {
+void libgame_load_textures(gamestate* const g) {
     if (!g)
         return;
     libgame_load_textures_from_disk(g);
@@ -1335,7 +1335,7 @@ void libgame_unloadtexture(gamestate* const g, const int index) {
 
 
 
-void libgame_unloadtextures(gamestate* g) {
+void libgame_unloadtextures(gamestate* const g) {
     if (!g)
         return;
     //minfo("unloading textures");
