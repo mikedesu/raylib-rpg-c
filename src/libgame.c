@@ -1371,29 +1371,27 @@ void libgame_create_spritegroup_by_id(gamestate* const g, const entityid id) {
         // then we will create the spritegroups for being equipped on the player
         // they will get attached in the hashtable at the same location via chaining
         // we will select the proper sprite during rendering by attaching filters to the spritegroups
-        int* keys = TX_BUCKLER_KEYS;
-        int num_keys = TX_BUCKLER_KEY_COUNT;
+        //int* keys = TX_BUCKLER_KEYS;
+        //int num_keys = TX_BUCKLER_KEY_COUNT;
         //int offset_x = 0;
         //int offset_y = 0;
         //specifier_t specifier = SPECIFIER_SHIELD_ON_TILE;
-        libgame_create_spritegroup(g, id, keys, num_keys, 0, 0, SPECIFIER_SHIELD_ON_TILE);
-
-        keys = TX_GUARD_BUCKLER_KEYS;
-        num_keys = TX_GUARD_BUCKLER_KEY_COUNT;
+        libgame_create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_KEY_COUNT, 0, 0, SPECIFIER_SHIELD_ON_TILE);
+        //int* keys = TX_GUARD_BUCKLER_KEYS;
+        //int num_keys = TX_GUARD_BUCKLER_KEY_COUNT;
         //int offset_x = -10;
         //int offset_y = -14;
         //int default_anim = SPRITEGROUP_ANIM_GUARD_BUCKLER;
         //specifier_t specifier = SPECIFIER_SHIELD_BLOCK;
-        libgame_create_spritegroup(g, id, keys, num_keys, -10, -14, SPECIFIER_SHIELD_BLOCK);
+        libgame_create_spritegroup(g, id, TX_GUARD_BUCKLER_KEYS, TX_GUARD_BUCKLER_KEY_COUNT, -10, -14, SPECIFIER_SHIELD_BLOCK);
         libgame_set_default_anim_for_id(g, id, SPRITEGROUP_ANIM_GUARD_BUCKLER);
-
-        keys = TX_GUARD_BUCKLER_SUCCESS_KEYS;
-        num_keys = TX_GUARD_BUCKLER_SUCCESS_KEY_COUNT;
+        //keys = TX_GUARD_BUCKLER_SUCCESS_KEYS;
+        //num_keys = TX_GUARD_BUCKLER_SUCCESS_KEY_COUNT;
         //int offset_x = -12;
         //int offset_y = -12;
         //default_anim = SPRITEGROUP_ANIM_GUARD_BUCKLER;
         //specifier_t specifier = SPECIFIER_SHIELD_BLOCK_SUCCESS;
-        libgame_create_spritegroup(g, id, keys, num_keys, -12, -12, SPECIFIER_SHIELD_BLOCK_SUCCESS);
+        libgame_create_spritegroup(g, id, TX_GUARD_BUCKLER_SUCCESS_KEYS, TX_GUARD_BUCKLER_SUCCESS_KEY_COUNT, -12, -12, SPECIFIER_SHIELD_BLOCK_SUCCESS);
         libgame_set_default_anim_for_id(g, id, SPRITEGROUP_ANIM_GUARD_BUCKLER);
     }
 }
