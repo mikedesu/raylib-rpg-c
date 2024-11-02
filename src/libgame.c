@@ -883,10 +883,6 @@ inline void libgame_draw_debug_panel(gamestate* const g) {
 void libgame_drawgrid(gamestate* const g) {
     if (!g)
         return;
-    //const Color c = GREEN;
-    //const int w = DEFAULT_TILE_SIZE, h = DEFAULT_TILE_SIZE;
-    //const int len = g->dungeonfloor->len;
-    //const int wid = g->dungeonfloor->wid;
     const int len = libgame_lua_get_dungeonfloor_row_count(L), wid = libgame_lua_get_dungeonfloor_col_count(L);
     for (int i = 0; i <= len; i++)
         DrawLine(i * DEFAULT_TILE_SIZE, 0, i * DEFAULT_TILE_SIZE, wid * DEFAULT_TILE_SIZE, GREEN);
@@ -901,26 +897,17 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
     if (!g)
         return;
     const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
-    const int rows = libgame_lua_get_dungeonfloor_row_count(L);
-    const int cols = libgame_lua_get_dungeonfloor_col_count(L);
     Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
-    const Color c = WHITE;
-    const float rotation = 0;
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            int type = libgame_lua_get_tiletype(L, j, i);
-            int key = get_txkey_for_tiletype(type);
-            if (key != -1) {
-                tile_dest.x = j * DEFAULT_TILE_SIZE;
-                tile_dest.y = i * DEFAULT_TILE_SIZE;
-                DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, (Vector2){0, 0}, rotation, c);
-            } else {
-                char buf[128];
-                snprintf(buf, 128, "libgame_draw_dungeonfloor: key not found for tile type: %d at x: %d, y: %d", type, 0, 0);
-                merror(buf);
-            }
+    //const int rows = libgame_lua_get_dungeonfloor_row_count(L), cols = libgame_lua_get_dungeonfloor_col_count(L);
+    for (int i = 0; i < libgame_lua_get_dungeonfloor_row_count(L); i++)
+        for (int j = 0; j < libgame_lua_get_dungeonfloor_col_count(L); j++) {
+            const int type = libgame_lua_get_tiletype(L, j, i);
+            const int key = get_txkey_for_tiletype(type);
+            if (key == -1)
+                continue;
+            tile_dest.x = j * DEFAULT_TILE_SIZE, tile_dest.y = i * DEFAULT_TILE_SIZE;
+            DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, (Vector2){0, 0}, 0, WHITE);
         }
-    }
 }
 
 
@@ -974,9 +961,7 @@ void libgame_draw_entity_shield_front(gamestate* const g, const entityid id) {
             // to demo the buckler animating on the hero, we will need to pass in the shield id
             // normally we would query the hero to see which shield is equipped
             // but for now we will introduce a global buckler_id as a test
-            shield_group->dest.x = group->dest.x;
-            shield_group->dest.y = group->dest.y;
-            //minfo("updating buckler spritegroup...");
+            shield_group->dest.x = group->dest.x, shield_group->dest.y = group->dest.y;
             DrawTexturePro(*shield_group->sprites[shield_group->current]->texture, shield_group->sprites[shield_group->current]->src, shield_group->dest, (Vector2){0, 0}, 0.0f, WHITE);
         }
     }
@@ -1055,13 +1040,13 @@ void libgame_draw_entities_at_lua(gamestate* const g, const entitytype_t type, c
     if (!g)
         return;
     //minfo("libgame_draw_entities_at_lua");
-    const int num_entities = libgame_lua_get_num_entities_at(L, x, y);
-    for (int k = 0; k < num_entities; k++) {
+    //const int num_entities = libgame_lua_get_num_entities_at(L, x, y);
+    for (int k = 0; k < libgame_lua_get_num_entities_at(L, x, y); k++) {
         const entityid id = libgame_lua_get_nth_entity_at(L, k + 1, x, y);
         const entitytype_t type2 = libgame_lua_get_entity_int(L, id, "type");
-        if (type == type2) {
-            libgame_draw_entity(g, id);
-        }
+        //if (type == type2)
+        //    libgame_draw_entity(g, id);
+        (type == type2) ? libgame_draw_entity(g, id) : 0;
     }
 }
 
@@ -1071,10 +1056,10 @@ void libgame_draw_entities_at_lua(gamestate* const g, const entitytype_t type, c
 void libgame_draw_gameplayscene_entities(gamestate* const g) {
     if (!g)
         return;
-    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
-    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
-    for (int i = 0; i < dh; i++) {
-        for (int j = 0; j < dw; j++) {
+    //const int dw = libgame_lua_get_dungeonfloor_col_count(L);
+    //const int dh = libgame_lua_get_dungeonfloor_row_count(L);
+    for (int i = 0; i < libgame_lua_get_dungeonfloor_row_count(L); i++)
+        for (int j = 0; j < libgame_lua_get_dungeonfloor_col_count(L); j++) {
             //libgame_draw_items(g, ITEM_TORCH, i, j);
             //libgame_draw_items_that_are_not(g, ITEM_TORCH, i, j);
             //libgame_draw_entities_at(g, ENTITY_NPC, i, j);
@@ -1083,7 +1068,6 @@ void libgame_draw_gameplayscene_entities(gamestate* const g) {
             libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
             libgame_draw_entities_at_lua(g, ENTITY_PLAYER, i, j);
         }
-    }
 }
 
 
@@ -1097,9 +1081,8 @@ void libgame_draw_gameplayscene(gamestate* const g) {
     ClearBackground(BLACK);
     // draw tiles
     libgame_draw_dungeonfloor(g);
-    if (g->gridon) {
+    if (g->gridon)
         libgame_drawgrid(g);
-    }
     // draw torches, items, npcs, player
     libgame_draw_gameplayscene_entities(g);
     // lighting basics
@@ -1133,8 +1116,7 @@ void libgame_draw_title_scene(gamestate* const g) {
         return;
     const Color bgc = {0x66, 0x66, 0x66, 255}, fgc = WHITE, fgc2 = BLACK;
     char b[128 * 3];
-    char* b2 = b + 128;
-    char* b3 = b + 128 * 2;
+    char *b2 = b + 128, *b3 = b + 128 * 2;
     snprintf(b, 128, "project");
     snprintf(b2, 128, "rpg");
     snprintf(b3, 128, "press space to continue");
@@ -1220,26 +1202,19 @@ void libgame_load_textures_from_disk(gamestate* const g) {
         merror("libgame_loadtextures_from_disk: could not open file");
         return;
     }
-
     //if (fp) {
-    char line[512];
-    char path[256];
+    char line[512], path[256];
     bzero(line, 512);
     bzero(path, 256);
     while (fgets(line, 512, fp)) {
         // if line begins with #, skip it
-        if (line[0] == '#') {
+        if (line[0] == '#')
             continue;
-        }
         // if line is empty, skip it
-        if (strlen(line) == 0) {
+        if (strlen(line) == 0)
             continue;
-        }
         // parse the line
-        int index = -1;
-        int contexts = -1;
-        int frames = -1;
-        int dodither = false;
+        int index = -1, contexts = -1, frames = -1, dodither = false;
         sscanf(line, "%d %d %d %d %s", &index, &contexts, &frames, &dodither, path);
         libgame_load_texture_from_disk(g, index, contexts, frames, dodither, path);
         bzero(line, 512);
@@ -1247,7 +1222,7 @@ void libgame_load_textures_from_disk(gamestate* const g) {
     }
 
     fclose(fp);
-    msuccess("libgame_loadtextures_from_disk");
+    //msuccess("libgame_loadtextures_from_disk");
     //} else {
     //    merror("libgame_loadtextures_from_disk: could not open file");
     //}
@@ -1260,7 +1235,7 @@ void libgame_load_textures(gamestate* const g) {
     if (!g)
         return;
     libgame_load_textures_from_disk(g);
-    msuccess("libgame_loadtextures");
+    //msuccess("libgame_loadtextures");
 }
 
 
@@ -1396,12 +1371,11 @@ void libgame_create_spritegroup(gamestate* const g, const entityid id, int* keys
     const float w = spritegroup_get(group, 0)->width, h = spritegroup_get(group, 0)->height, dst_x = x * DEFAULT_TILE_SIZE, dst_y = y * DEFAULT_TILE_SIZE;
     group->current = 0;
     group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
-    group->off_x = offset_x;
-    group->off_y = offset_y;
+    group->off_x = offset_x, group->off_y = offset_y;
     spritegroup_set_specifier(group, spec);
     // add the spritegroup to the hashtable
     hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
-    msuccess("libgame_create_spritegroup end");
+    //msuccess("libgame_create_spritegroup end");
 }
 
 
@@ -1410,8 +1384,7 @@ void libgame_create_spritegroup(gamestate* const g, const entityid id, int* keys
 void libgame_loadtargettexture(gamestate* const g) {
     if (!g)
         return;
-    g->targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth");
-    g->targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
+    g->targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth"), g->targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
     target = LoadRenderTexture(g->targetwidth, g->targetheight);
     target_src = (Rectangle){0, 0, g->targetwidth, -g->targetheight}, target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
@@ -1537,8 +1510,7 @@ void libgame_initsharedsetup(gamestate* const g) {
     //PlayMusicStream(test_music);
     SetRandomSeed(time(NULL));
     g->font = LoadFontEx(DEFAULT_FONT_PATH, 60, 0, 255);
-    g->targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth");
-    g->targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
+    g->targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth"), g->targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
     target = LoadRenderTexture(g->targetwidth, g->targetheight);
     target_src = (Rectangle){0, 0, g->targetwidth, -g->targetheight};
     target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
@@ -1547,8 +1519,7 @@ void libgame_initsharedsetup(gamestate* const g) {
     //g->targetwidth = targetwidth;
     //g->targetheight = targetheight;
     // can get this from init.lua....
-    g->cam2d.offset.x = g->targetwidth / 2.0f;
-    g->cam2d.offset.y = g->targetheight / 4.0f;
+    g->cam2d.offset.x = g->targetwidth / 2.0f, g->cam2d.offset.y = g->targetheight / 4.0f;
     libgame_load_textures(g);
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
     libgame_lua_create_dungeonfloor(L, 16, 16, TILETYPE_DIRT_00);
