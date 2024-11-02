@@ -2,7 +2,7 @@
 
 #include "controlmode.h"
 #include "debugpanel.h"
-#include "display.h"
+//#include "display.h"
 #include "entityid.h"
 #include "fadestate.h"
 #include "hashtable_entityid_spritegroup.h"
@@ -45,7 +45,12 @@ typedef struct gamestate {
 
     fadestate_t fadestate;
 
-    display_t display;
+    //display_t display;
+    int targetwidth;
+    int targetheight;
+    int windowwidth;
+    int windowheight;
+
 
     Font font;
 

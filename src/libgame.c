@@ -518,8 +518,8 @@ void libgame_initwindow(gamestate* const g) {
     SetWindowPosition(libgame_lua_get_gamestate_int(L, "WindowPosX"), libgame_lua_get_gamestate_int(L, "WindowPosY"));
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_Q);
-    g->display.windowwidth = windowwidth;
-    g->display.windowheight = windowheight;
+    g->windowwidth = windowwidth;
+    g->windowheight = windowheight;
     //minfo("end of libgame_initwindow");
 }
 
@@ -1456,15 +1456,11 @@ void libgame_loadtargettexture(gamestate* const g) {
     targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth");
     targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
     target = LoadRenderTexture(targetwidth, targetheight);
-    target_src = (Rectangle){0, 0, targetwidth, -targetheight};
-    target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
+    target_src = (Rectangle){0, 0, targetwidth, -targetheight}, target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     // update the gamestate display values
-    g->display.targetwidth = targetwidth;
-    g->display.targetheight = targetheight;
-    // can get this from init.lua....
-    g->cam2d.offset.x = targetwidth / 2.0f;
-    g->cam2d.offset.y = targetheight / 4.0f;
+    g->targetwidth = targetwidth, g->targetheight = targetheight;
+    g->cam2d.offset.x = targetwidth / 2.0f, g->cam2d.offset.y = targetheight / 4.0f;
 }
 
 
@@ -1592,8 +1588,8 @@ void libgame_initsharedsetup(gamestate* const g) {
     target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     // update the gamestate display values
-    g->display.targetwidth = targetwidth;
-    g->display.targetheight = targetheight;
+    g->targetwidth = targetwidth;
+    g->targetheight = targetheight;
     // can get this from init.lua....
     g->cam2d.offset.x = targetwidth / 2.0f;
     g->cam2d.offset.y = targetheight / 4.0f;
@@ -1614,22 +1610,22 @@ void libgame_initsharedsetup(gamestate* const g) {
 
 
 void libgame_initwithstate(gamestate* const state) {
-    if (state == NULL) {
-        merror("libgame_initwithstate: state is NULL");
-        return;
+    if (state != NULL) {
+        //merror("libgame_initwithstate: state is NULL");
+        g = state;
+        libgame_initsharedsetup(g);
+        //return;
     }
-    g = state;
-    libgame_initsharedsetup(g);
-    msuccess("libgame_initwithstate end");
+    //msuccess("libgame_initwithstate end");
 }
 
 
 
 
 void libgame_closesavegamestate() {
-    minfo("libgame_closesavegamestate");
+    //minfo("libgame_closesavegamestate");
     libgame_closeshared(g);
-    msuccess("libgame_closesavegamestate end");
+    //msuccess("libgame_closesavegamestate end");
 }
 
 
@@ -1638,10 +1634,10 @@ void libgame_closesavegamestate() {
 void libgame_close(gamestate* g) {
     if (!g)
         return;
-    minfo("libgame_close");
+    //minfo("libgame_close");
     libgame_closeshared(g);
     gamestatefree(g);
-    msuccess("libgame_close end");
+    //msuccess("libgame_close end");
 }
 
 
@@ -1651,7 +1647,7 @@ void libgame_closeshared(gamestate* const g) {
     if (!g)
         return;
     // dont need to free most of gamestate
-    minfo("libgame_closeshared");
+    //minfo("libgame_closeshared");
     //UnloadMusicStream(test_music);
     //CloseAudioDevice();
     UnloadFont(g->font);
