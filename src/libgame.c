@@ -395,15 +395,17 @@ void libgame_process_turn_actions(gamestate* const g) {
         return;
     for (int i = 0; i < action_count; i++) {
         const action_t action_type = libgame_lua_get_nth_action_type(L, i + 1);
-        const entityid entity_id = libgame_lua_get_nth_action_id(L, i + 1);
+        const entityid id = libgame_lua_get_nth_action_id(L, i + 1);
         const int x = libgame_lua_get_nth_action_x(L, i + 1), y = libgame_lua_get_nth_action_y(L, i + 1), result_id = libgame_lua_process_action(L, i + 1);
         if (result_id != -1) {
             if (action_type == ACTION_NONE)
-                libgame_update_spritegroup(g, entity_id, SPECIFIER_NONE, DIRECTION_NONE);
+                libgame_update_spritegroup(g, id, SPECIFIER_NONE, DIRECTION_NONE);
             else if (action_type == ACTION_MOVE)
                 libgame_update_spritegroup_by_lastmove(g, result_id);
+            else if (action_type == ACTION_ATTACK)
+                libgame_entity_anim_set(g, id, SPRITEGROUP_ANIM_ORC_ATTACK);
         } else
-            libgame_update_spritegroup(g, entity_id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
+            libgame_update_spritegroup(g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
     }
 }
 
@@ -507,8 +509,7 @@ void libgame_initwindow(gamestate* const g) {
     SetWindowPosition(libgame_lua_get_gamestate_int(L, "WindowPosX"), libgame_lua_get_gamestate_int(L, "WindowPosY"));
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_Q);
-    g->windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth");
-    g->windowheight = libgame_lua_get_gamestate_int(L, "WindowHeight");
+    g->windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth"), g->windowheight = libgame_lua_get_gamestate_int(L, "WindowHeight");
     //minfo("end of libgame_initwindow");
 }
 
@@ -644,8 +645,15 @@ void libgame_handle_npc_turn_lua(gamestate* const g, const entityid id) {
     if (!g)
         return;
     minfo("libgame_handle_npc_turn_lua begin");
-    if (!libgame_lua_create_action(L, id, ACTION_MOVE, rand() % 3 - 1, rand() % 3 - 1))
-        merror("could not create npc action: move");
+    //if (!libgame_lua_create_action(L, id, ACTION_MOVE, rand() % 3 - 1, rand() % 3 - 1))
+    //    merror("could not create npc action: move");
+
+    const direction_t dir = libgame_lua_get_entity_int(L, id, "direction");
+    if (!libgame_lua_create_action(L, id, ACTION_ATTACK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir)))
+        merror("attack action failed to create");
+    //else
+    //libgame_entity_anim_set(g, id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+    //    libgame_entity_anim_set(g, id, SPRITEGROUP_ANIM_ORC_ATTACK);
 }
 
 
@@ -676,16 +684,18 @@ void libgame_reset_entity_anim(gamestate* const g, entityid id) {
     if (!g)
         return;
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    if (sg) {
-        int old_index = sg->current;
-        sprite* s = spritegroup_get(sg, old_index);
-        const int loop_count = 1;
-        if (s && s->num_loops >= loop_count) {
-            sg->prev_anim = sg->current;
-            sg->current = sg->default_anim;
-            s->num_loops = 0;
-        }
+    if (!sg)
+        return;
+    //if (sg) {
+    //const int old_index = sg->current;
+    //const int loop_count = 1;
+    sprite* s = spritegroup_get(sg, sg->current);
+    if (s && s->num_loops >= 1) {
+        sg->prev_anim = sg->current;
+        sg->current = sg->default_anim;
+        s->num_loops = 0;
     }
+    //}
 }
 
 
@@ -694,10 +704,10 @@ void libgame_reset_entity_anim(gamestate* const g, entityid id) {
 void libgame_reset_entities_anim(gamestate* const g) {
     if (!g)
         return;
-    const int count = libgame_lua_get_num_entities(L);
-    for (int i = 0; i < count; i++) {
+    //const int count = libgame_lua_get_num_entities(L);
+    for (int i = 0; i < libgame_lua_get_num_entities(L); i++) //{
         libgame_reset_entity_anim(g, i);
-    }
+    //}
 }
 
 
@@ -717,8 +727,7 @@ void libgame_update_entity_damaged_anim(gamestate* const g, const int i) {
             index = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
             if (index == old_index) {
                 sprite* s = spritegroup_get(sg, old_index);
-                const int loop_count = 1;
-                if (s && s->num_loops >= loop_count) {
+                if (s && s->num_loops >= 1) {
                     index = SPRITEGROUP_ANIM_HUMAN_IDLE;
                     libgame_lua_set_entity_int(L, id, "was_damaged", 0);
                     s->num_loops = 0;
@@ -729,8 +738,7 @@ void libgame_update_entity_damaged_anim(gamestate* const g, const int i) {
             index = SPRITEGROUP_ANIM_ORC_DMG;
             if (index == old_index) {
                 sprite* s = spritegroup_get(sg, old_index);
-                const int loop_count = 1;
-                if (s && s->num_loops >= loop_count) {
+                if (s && s->num_loops >= 1) {
                     index = SPRITEGROUP_ANIM_ORC_IDLE;
                     libgame_lua_set_entity_int(L, id, "was_damaged", 0);
                     s->num_loops = 0;
@@ -796,8 +804,9 @@ void libgame_update_gamestate(gamestate* g) {
     if (g->player_input_received) {
         libgame_process_turn(g);
         g->player_input_received = false;
-        //libgame_handle_npcs_turn_lua(g);
-        //libgame_process_turn(g);
+
+        libgame_handle_npcs_turn_lua(g);
+        libgame_process_turn(g);
         //g->is_locked = true;
         //g->lock_timer = 60;
     }
