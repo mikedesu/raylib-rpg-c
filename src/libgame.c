@@ -1325,13 +1325,11 @@ void libgame_load_textures(gamestate* g) {
 
 
 
-void libgame_unloadtexture(gamestate* g, int index) {
+void libgame_unloadtexture(gamestate* const g, const int index) {
     if (!g)
         return;
-    if (g->txinfo[index].texture.id > 0) {
+    if (g->txinfo[index].texture.id > 0)
         UnloadTexture(g->txinfo[index].texture);
-        //msuccess("unloading texture");
-    }
 }
 
 
@@ -1340,7 +1338,7 @@ void libgame_unloadtexture(gamestate* g, int index) {
 void libgame_unloadtextures(gamestate* g) {
     if (!g)
         return;
-    minfo("unloading textures");
+    //minfo("unloading textures");
     // this can be done smarter, surely...
     for (int i = TX_DIRT_00; i <= TX_BUCKLER; i++)
         libgame_unloadtexture(g, i);
@@ -1553,7 +1551,7 @@ void libgame_init_datastructures(gamestate* g) {
 
 
 
-const entityid libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y) {
+const entityid libgame_create_hero_lua(gamestate* const g, const char* name, const int x, const int y) {
     //minfo("libgame_create_hero_lua begin");
     if (!g)
         return -1;

@@ -9,6 +9,7 @@
 
 
 //void libgame_drawtorchgroup(gamestate* g);
+//const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const int x, const int y);
 
 bool libgame_windowshouldclose();
 gamestate* libgame_getgamestate();
@@ -20,7 +21,6 @@ const bool libgame_external_check_reload();
 
 
 
-const entityid libgame_create_hero_lua(gamestate* g, const char* name, const int x, const int y);
 const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const int x, const int y);
 void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
 void libgame_create_spritegroup_by_id(gamestate* g, entityid id);
@@ -32,7 +32,7 @@ void libgame_init_datastructures(gamestate* g);
 void libgame_loadtargettexture(gamestate* g);
 void libgame_loadfont(gamestate* g);
 void libgame_load_textures(gamestate* g);
-void libgame_unloadtexture(gamestate* g, int index);
+void libgame_unloadtexture(gamestate* const g, const int index);
 void libgame_unloadtextures(gamestate* g);
 void libgame_update_gamestate(gamestate* g);
 void libgame_set_default_anim_for_id(gamestate* g, const entityid id, const int anim);
@@ -40,10 +40,10 @@ void libgame_reset_entities_anim(gamestate* g);
 void libgame_load_textures_from_data(gamestate* g);
 const bool libgame_entity_move_lua(gamestate* g, entityid id, int x, int y);
 const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y);
-const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const int x, const int y);
 
 
 
+const entityid libgame_create_hero_lua(gamestate* const g, const char* name, const int x, const int y);
 void libgame_do_camera_lock_on(gamestate* const g);
 void libgame_draw_entity(gamestate* const g, const entityid id);
 void libgame_draw_entities_at_lua(gamestate* const g, const entitytype_t type, const int x, const int y);
