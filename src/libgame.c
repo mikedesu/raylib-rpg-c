@@ -1437,7 +1437,7 @@ void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
 
 
 
-void libgame_set_default_anim_for_id(gamestate* g, const entityid id, const int anim) {
+void libgame_set_default_anim_for_id(gamestate* const g, const entityid id, const int anim) {
     if (!g)
         return;
     spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
@@ -1609,7 +1609,7 @@ const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const 
 
 
 
-const entityid libgame_create_orc_lua(gamestate* g, const char* name, const int x, const int y) {
+const entityid libgame_create_orc_lua(gamestate* const g, const char* name, const int x, const int y) {
     if (!g)
         return -1;
     const int dw = libgame_lua_get_dungeonfloor_col_count(L);
