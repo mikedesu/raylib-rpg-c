@@ -1700,7 +1700,7 @@ void libgame_initsharedsetup(gamestate* g) {
 
 
 
-void libgame_initwithstate(gamestate* state) {
+void libgame_initwithstate(gamestate* const state) {
     if (state == NULL) {
         merror("libgame_initwithstate: state is NULL");
         return;
@@ -1734,25 +1734,18 @@ void libgame_close(gamestate* g) {
 
 
 
-void libgame_closeshared(gamestate* g) {
+void libgame_closeshared(gamestate* const g) {
     if (!g)
         return;
     // dont need to free most of gamestate
     minfo("libgame_closeshared");
-
     //UnloadMusicStream(test_music);
     //CloseAudioDevice();
-
     UnloadFont(g->font);
-
     libgame_unloadtextures(g);
-
     UnloadRenderTexture(target);
-
     CloseWindow();
-
     lua_close(L);
-
     msuccess("libgame_closeshared end");
 }
 
