@@ -61,6 +61,7 @@ typedef struct gamestate {
 } gamestate;
 
 
-gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const int targetwidth, const int targetheight);
+gamestate* gamestateinitptr();
+//gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const int targetwidth, const int targetheight);
 void gamestatefree(gamestate* g);
 void gamestate_update_current_time(gamestate* const g);

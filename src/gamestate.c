@@ -10,7 +10,8 @@
 
 
 // have to update this function when we introduce new fields to Gamestate
-gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const int targetwidth, const int targetheight) {
+//gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const int targetwidth, const int targetheight) {
+gamestate* gamestateinitptr() {
     //mprint("gamestateinitptr begin\n");
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     if (g == NULL)
@@ -24,19 +25,14 @@ gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const
     bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
     strftime(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time:   %Y-%m-%d %H:%M:%S", g->timebegantm);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
-
     gamestate_update_current_time(g);
-
     g->debugpanelon = true, g->gridon = false;
-    g->debugpanel.x = 0, g->debugpanel.y = 0;
-    g->targetwidth = targetwidth, g->targetheight = targetheight;
-    g->windowwidth = windowwidth, g->windowheight = windowheight;
-
-    printf("\033[31;1mtargetwidth: %d\033[0m\n", targetwidth);
-    printf("\033[31;1mtargetheight: %d\033[0m\n", targetheight);
-    printf("\033[31;1mwindowwidth: %d\033[0m\n", windowwidth);
-    printf("\033[31;1mwindowheight: %d\033[0m\n", windowheight);
-
+    g->debugpanel.x = g->debugpanel.y = 0;
+    g->targetwidth = g->targetheight = g->windowwidth = g->windowheight = -1;
+    //printf("\033[31;1mtargetwidth: %d\033[0m\n", targetwidth);
+    //printf("\033[31;1mtargetheight: %d\033[0m\n", targetheight);
+    //printf("\033[31;1mwindowwidth: %d\033[0m\n", windowwidth);
+    //printf("\033[31;1mwindowheight: %d\033[0m\n", windowheight);
     g->cam2d.target = (Vector2){0, 0}, g->cam2d.offset = (Vector2){0, 0}, g->cam2d.zoom = 4.0, g->cam2d.rotation = 0.0, g->lock_timer = 0, g->fadealpha = 0.0f;
     g->cam_lockon = true, g->do_one_rotation = false, g->controlmode = CONTROLMODE_PLAYER, g->fadestate = FADESTATENONE, g->spritegroups = NULL, g->player_input_received = false, g->is_locked = false;
     return g;

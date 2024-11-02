@@ -39,7 +39,7 @@ Rectangle target_src = {0, 0, 0, 0}, target_dest = {0, 0, 0, 0};
 Vector2 target_origin = {0, 0};
 int activescene = GAMEPLAYSCENE;
 //int activescene = COMPANYSCENE;
-int targetwidth = -1, targetheight = -1, windowwidth = -1, windowheight = -1;
+//int targetwidth = -1, targetheight = -1, windowwidth = -1, windowheight = -1;
 
 
 
@@ -165,9 +165,7 @@ void libgame_handleinput(gamestate* const g) {
 
 
 void libgame_handle_modeswitch(gamestate* const g) {
-    if (!g)
-        return;
-    if (IsKeyPressed(KEY_C))
+    if (g && IsKeyPressed(KEY_C))
         g->controlmode = g->controlmode == CONTROLMODE_CAMERA ? CONTROLMODE_PLAYER : CONTROLMODE_CAMERA;
 }
 
@@ -175,9 +173,7 @@ void libgame_handle_modeswitch(gamestate* const g) {
 
 
 void libgame_handle_debugpanel_switch(gamestate* const g) {
-    if (!g)
-        return;
-    if (IsKeyPressed(KEY_D))
+    if (g && IsKeyPressed(KEY_D))
         g->debugpanelon = !g->debugpanelon;
 }
 
@@ -185,9 +181,7 @@ void libgame_handle_debugpanel_switch(gamestate* const g) {
 
 
 void libgame_handle_grid_switch(gamestate* const g) {
-    if (!g)
-        return;
-    if (IsKeyPressed(KEY_G))
+    if (g && IsKeyPressed(KEY_G))
         g->gridon = !g->gridon;
 }
 
@@ -243,14 +237,14 @@ void libgame_update_spritegroup_move(gamestate* const g, const entityid id, cons
 
 
 
-void libgame_handleplayerinput_move(gamestate* const g, const int xdir, const int ydir) {
-    if (!g)
-        return;
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id == -1)
-        return;
-    libgame_lua_create_action(L, hero_id, ACTION_MOVE, xdir, ydir);
-}
+//void libgame_handleplayerinput_move(gamestate* const g, const int xdir, const int ydir) {
+//    if (!g)
+//        return;
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id == -1)
+//        return;
+//    libgame_lua_create_action(L, hero_id, ACTION_MOVE, xdir, ydir);
+//}
 
 
 
@@ -263,7 +257,10 @@ void libgame_handle_player_input_movement_key(gamestate* const g, const directio
         return;
     // update player direction
     libgame_lua_set_entity_int(L, hero_id, "direction", dir);
-    libgame_handleplayerinput_move(g, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir));
+
+    //libgame_handleplayerinput_move(g, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir));
+    libgame_lua_create_action(L, hero_id, ACTION_MOVE, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir));
+
     libgame_update_spritegroup(g, hero_id, SPECIFIER_NONE, dir); // updates sg context
     // hack to make the buckler correctly update...this probably doesnt belong here lol
     const entityid shieldid = libgame_lua_get_entity_shield(L, hero_id);
@@ -296,15 +293,17 @@ void libgame_handle_player_input_block_key(gamestate* const g) {
     if (!g)
         return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id != -1) {
-        // trigger a "block" action
-        const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
-        if (libgame_lua_create_action(L, hero_id, ACTION_BLOCK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir)))
-            libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_GUARD);
-        else
-            merror("block action failed to create");
-        g->player_input_received = true;
-    }
+    if (hero_id == -1)
+        return;
+    //if (hero_id != -1) {
+    // trigger a "block" action
+    const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
+    if (libgame_lua_create_action(L, hero_id, ACTION_BLOCK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir)))
+        libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_GUARD);
+    else
+        merror("block action failed to create");
+    g->player_input_received = true;
+    //}
 }
 
 
@@ -314,7 +313,7 @@ void libgame_handle_player_input_pickup_key(gamestate* const g) {
     if (!g)
         return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id < 0)
+    if (hero_id == -1)
         return;
     if (libgame_lua_create_action(L, hero_id, ACTION_PICKUP, libgame_lua_get_entity_int(L, hero_id, "x"), libgame_lua_get_entity_int(L, hero_id, "y")))
         msuccess("pickup action created");
@@ -360,17 +359,10 @@ void libgame_handle_input_player(gamestate* const g) {
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_SPACE)) {
             // randomize the dungeon tiles
-            //const int w = 4;
-            //const int h = 4;
-            //const int hx = libgame_lua_get_entity_int(L, hero_id, "x") - 2;
-            //const int hy = libgame_lua_get_entity_int(L, hero_id, "y") - 2;
             libgame_lua_randomize_dungeon_tiles(L, libgame_lua_get_entity_int(L, hero_id, "x") - 2, libgame_lua_get_entity_int(L, hero_id, "y") - 2, 4, 4);
         } else if (IsKeyPressed(KEY_PERIOD)) {
             // Wait action
             const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
-            //const int xdir = libgame_get_x_from_dir(dir);
-            //const int ydir = libgame_get_y_from_dir(dir);
-            //bool res = libgame_lua_create_action(L, hero_id, action_none, xdir, ydir);
             if (libgame_lua_create_action(L, hero_id, ACTION_NONE, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir)))
                 libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_IDLE);
             else
@@ -386,8 +378,7 @@ void libgame_handle_input_player(gamestate* const g) {
 void libgame_update_spritegroup_by_lastmove(gamestate* const g, const entityid entity_id) {
     if (!g)
         return;
-    const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x");
-    const int ydir = libgame_lua_get_entity_int(L, entity_id, "last_move_y");
+    const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x"), ydir = libgame_lua_get_entity_int(L, entity_id, "last_move_y");
     //const direction_t dir = libgame_get_dir_from_xy(xdir, ydir);
     libgame_update_spritegroup(g, entity_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
     libgame_update_spritegroup_move(g, entity_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
@@ -411,10 +402,8 @@ void libgame_process_turn_actions(gamestate* const g) {
                 libgame_update_spritegroup(g, entity_id, SPECIFIER_NONE, DIRECTION_NONE);
             else if (action_type == ACTION_MOVE)
                 libgame_update_spritegroup_by_lastmove(g, result_id);
-        } else {
-            const direction_t dir = libgame_get_dir_from_xy(x, y);
-            libgame_update_spritegroup(g, entity_id, SPECIFIER_NONE, dir);
-        }
+        } else
+            libgame_update_spritegroup(g, entity_id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
     }
 }
 
@@ -508,18 +497,18 @@ void libgame_initwindow(gamestate* const g) {
     if (!g)
         return;
     const char* title = libgame_lua_get_gamestate_str(L, "WindowTitle");
-    if (!title) {
+    if (!title)
         title = "Gamestate.WindowTitle not set in init.lua";
-    }
-    windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth");
-    windowheight = libgame_lua_get_gamestate_int(L, "WindowHeight");
-    InitWindow(windowwidth, windowheight, title);
+    //windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth");
+    //windowheight = libgame_lua_get_gamestate_int(L, "WindowHeight");
+    InitWindow(libgame_lua_get_gamestate_int(L, "WindowWidth"), libgame_lua_get_gamestate_int(L, "WindowHeight"), title);
+    //InitWindow(windowwidth, windowheight, title);
     SetWindowMonitor(1);
     SetWindowPosition(libgame_lua_get_gamestate_int(L, "WindowPosX"), libgame_lua_get_gamestate_int(L, "WindowPosY"));
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_Q);
-    g->windowwidth = windowwidth;
-    g->windowheight = windowheight;
+    g->windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth");
+    g->windowheight = libgame_lua_get_gamestate_int(L, "WindowHeight");
     //minfo("end of libgame_initwindow");
 }
 
@@ -567,10 +556,10 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              g->framecount,
              g->timebeganbuf,
              g->currenttimebuf,
-             targetwidth,
-             targetheight,
-             windowwidth,
-             windowheight,
+             g->targetwidth,
+             g->targetheight,
+             g->windowwidth,
+             g->windowheight,
              g->cam2d.target.x,
              g->cam2d.target.y,
              g->cam2d.offset.x,
@@ -1180,7 +1169,7 @@ void libgame_draw_title_scene(gamestate* const g) {
     snprintf(b2, 128, "rpg");
     snprintf(b3, 128, "press space to continue");
     const Vector2 m = MeasureTextEx(g->font, b, 40, 2), m2 = MeasureTextEx(g->font, b2, 40, 2), m3 = MeasureTextEx(g->font, b3, 16, 1);
-    const float tw2 = targetwidth / 2.0f, th2 = targetheight / 2.0f;
+    const float tw2 = g->targetwidth / 2.0f, th2 = g->targetheight / 2.0f;
     const int offset = 100, x = tw2 - m.x / 2.0f - offset, y = th2 - m.y / 2.0f, x2 = tw2 - m2.x / 2.0f + offset, x3 = tw2 - m3.x / 2.0f, y3 = th2 + m3.y / 2.0f + 20;
     const Vector2 pos[3] = {{x, y}, {x2, y}, {x3, y3}};
     ClearBackground(bgc);
@@ -1338,7 +1327,8 @@ void libgame_unloadtextures(gamestate* const g) {
 
 void libgame_init() {
     //minfo("libgame_init");
-    g = gamestateinitptr(windowwidth, windowheight, targetwidth, targetheight);
+    //g = gamestateinitptr(windowwidth, windowheight, targetwidth, targetheight);
+    g = gamestateinitptr();
     libgame_initsharedsetup(g);
     msuccess("libgame_init");
 }
@@ -1453,23 +1443,22 @@ void libgame_create_spritegroup(gamestate* const g, const entityid id, int* keys
 void libgame_loadtargettexture(gamestate* const g) {
     if (!g)
         return;
-    targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth");
-    targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
-    target = LoadRenderTexture(targetwidth, targetheight);
-    target_src = (Rectangle){0, 0, targetwidth, -targetheight}, target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
+    g->targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth");
+    g->targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
+    target = LoadRenderTexture(g->targetwidth, g->targetheight);
+    target_src = (Rectangle){0, 0, g->targetwidth, -g->targetheight}, target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     // update the gamestate display values
-    g->targetwidth = targetwidth, g->targetheight = targetheight;
-    g->cam2d.offset.x = targetwidth / 2.0f, g->cam2d.offset.y = targetheight / 4.0f;
+    //g->targetwidth = targetwidth, g->targetheight = targetheight;
+    g->cam2d.offset.x = g->targetwidth / 2.0f, g->cam2d.offset.y = g->targetheight / 4.0f;
 }
 
 
 
 
 void libgame_loadfont(gamestate* const g) {
-    if (!g)
-        return;
-    g->font = LoadFontEx(DEFAULT_FONT_PATH, 60, 0, 255);
+    if (g)
+        g->font = LoadFontEx(DEFAULT_FONT_PATH, 60, 0, 255);
 }
 
 
@@ -1527,8 +1516,8 @@ const entityid libgame_create_buckler_lua(gamestate* const g, const char* name, 
 
 
 const entityid libgame_create_orc_lua(gamestate* const g, const char* name, const int x, const int y) {
-    if (!g)
-        return -1;
+    //if (!g)
+    //    return -1;
     const int dw = libgame_lua_get_dungeonfloor_col_count(L), dh = libgame_lua_get_dungeonfloor_row_count(L);
     if (!g || !name || x < 0 || y < 0 || x >= dw || y >= dh)
         return -1;
@@ -1581,18 +1570,18 @@ void libgame_initsharedsetup(gamestate* const g) {
     //PlayMusicStream(test_music);
     SetRandomSeed(time(NULL));
     g->font = LoadFontEx(DEFAULT_FONT_PATH, 60, 0, 255);
-    targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth");
-    targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
-    target = LoadRenderTexture(targetwidth, targetheight);
-    target_src = (Rectangle){0, 0, targetwidth, -targetheight};
+    g->targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth");
+    g->targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
+    target = LoadRenderTexture(g->targetwidth, g->targetheight);
+    target_src = (Rectangle){0, 0, g->targetwidth, -g->targetheight};
     target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     // update the gamestate display values
-    g->targetwidth = targetwidth;
-    g->targetheight = targetheight;
+    //g->targetwidth = targetwidth;
+    //g->targetheight = targetheight;
     // can get this from init.lua....
-    g->cam2d.offset.x = targetwidth / 2.0f;
-    g->cam2d.offset.y = targetheight / 4.0f;
+    g->cam2d.offset.x = g->targetwidth / 2.0f;
+    g->cam2d.offset.y = g->targetheight / 4.0f;
     libgame_load_textures(g);
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
     libgame_lua_create_dungeonfloor(L, 16, 16, TILETYPE_DIRT_00);

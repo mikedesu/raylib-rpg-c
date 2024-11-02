@@ -16,6 +16,7 @@
 //void libgame_loadtargettexture(gamestate* g);
 //void libgame_loadfont(gamestate* const g);
 //void libgame_init_datastructures(gamestate* g);
+//void libgame_handleplayerinput_move(gamestate* const g, const int xdir, const int ydir);
 
 bool libgame_windowshouldclose();
 gamestate* libgame_getgamestate();
@@ -50,7 +51,6 @@ void libgame_handleinput(gamestate* const g);
 void libgame_handle_debugpanel_switch(gamestate* const g);
 void libgame_handle_modeswitch(gamestate* const g);
 void libgame_handle_fade(gamestate* const g);
-void libgame_handleplayerinput_move(gamestate* const g, const int xdir, const int ydir);
 void libgame_handle_player_input_movement_key(gamestate* const g, const direction_t dir);
 void libgame_handle_grid_switch(gamestate* const g);
 void libgame_handle_npc_turn_lua(gamestate* const g, const entityid id);
