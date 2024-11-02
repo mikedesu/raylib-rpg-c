@@ -704,10 +704,8 @@ void libgame_reset_entity_anim(gamestate* const g, entityid id) {
 void libgame_reset_entities_anim(gamestate* const g) {
     if (!g)
         return;
-    //const int count = libgame_lua_get_num_entities(L);
-    for (int i = 0; i < libgame_lua_get_num_entities(L); i++) //{
-        libgame_reset_entity_anim(g, i);
-    //}
+    for (int i = 0; i < libgame_lua_get_num_entities(L); i++)
+        libgame_reset_entity_anim(g, i + 1);
 }
 
 
@@ -716,7 +714,7 @@ void libgame_reset_entities_anim(gamestate* const g) {
 void libgame_update_entity_damaged_anim(gamestate* const g, const int i) {
     if (!g)
         return;
-    const entityid id = libgame_lua_get_nth_entity(L, i + 1);
+    const entityid id = libgame_lua_get_nth_entity(L, i);
     const int was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
     const race_t race = libgame_lua_get_entity_int(L, id, "race");
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
@@ -755,9 +753,8 @@ void libgame_update_entity_damaged_anim(gamestate* const g, const int i) {
 void libgame_update_entities_damaged_anim(gamestate* const g) {
     if (!g)
         return;
-    for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
-        libgame_update_entity_damaged_anim(g, i);
-    }
+    for (int i = 0; i < libgame_lua_get_num_entities(L); i++)
+        libgame_update_entity_damaged_anim(g, i + 1);
 }
 
 
@@ -778,55 +775,24 @@ void libgame_update_gamestate(gamestate* g) {
     libgame_update_entities_damaged_anim(g);
     libgame_reset_entities_anim(g);
     libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
-    //minfo("libgame_updategamestate: do camera lockon");
     libgame_do_camera_lock_on(g);
     // at this point, we can take other NPC turns
     // lets iterate over our entities, find the NPCs, and make them move in a random direction
     // then, we will update their smooth moves
     // we will need to eventually disable player input during smooth moving
-    //if (g->player_input_received) {
-    //    libgame_handle_npcs_turn_lua(g);
-    //    libgame_process_turn(g);
-    //    g->player_input_received = false;
-    //}
-    //minfo("libgame_updategamestate: update smooth moves for NPCs");
     // update smooth move for NPCs and other entities
     libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
-    //msuccess("end libgame_updategamestate");
     // i plan on using the lock and lock timer to control an ebb-and-flow
     // so that it doesnt appear like enemies move immediately as the player
     // does
-    //if (g->is_locked && g->lock_timer > 0) {
-    //    g->lock_timer--;
-    //} else if (g->is_locked && g->lock_timer <= 0) {
-    //    g->is_locked = false;
-    //    g->lock_timer = 0;
     if (g->player_input_received) {
         libgame_process_turn(g);
         g->player_input_received = false;
-
         libgame_handle_npcs_turn_lua(g);
         libgame_process_turn(g);
         //g->is_locked = true;
         //g->lock_timer = 60;
     }
-    //else {
-    // while this works, we would prefer to "step" thru each entity's turn
-    // presently, this makes it look like all NPCs move at once
-    // but, in combination with the lock_timer, i believe we can introduce
-    // an index into the gamestate to keep track of which entity acted last,
-    // and once we've finished iterating asyncronously, we can assign then
-    // receive player input again and repeat the cycle
-    //for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
-    //    const entityid id = libgame_lua_get_nth_entity(L, i + 1);
-    //    const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-    //    if (type == ENTITY_NPC) {
-    //        libgame_handle_npc_turn_lua(g, id);
-    //    }
-    //}
-    //libgame_process_turn(g);
-    //}
-    //}
 }
 
 
@@ -835,13 +801,13 @@ void libgame_update_gamestate(gamestate* g) {
 void libgame_update_smoothmoves_for_entitytype(gamestate* const g, const entitytype_t type) {
     if (!g)
         return;
-    const int count = libgame_lua_get_num_entities(L);
-    for (int i = 0; i < count; i++) {
+    //const int count = libgame_lua_get_num_entities(L);
+    for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
         const entityid id = libgame_lua_get_nth_entity(L, i + 1);
         const entitytype_t type2 = libgame_lua_get_entity_int(L, id, "type");
-        if (type == type2) {
-            libgame_update_smoothmove(g, id);
-        }
+        //if (type == type2)
+        //    libgame_update_smoothmove(g, id);
+        (type == type2) ? libgame_update_smoothmove(g, id) : 0;
     }
 }
 
@@ -862,13 +828,12 @@ void libgame_drawframeend(gamestate* const g) {
 void libgame_drawframe(gamestate* g) {
     if (!g)
         return;
-    //minfo("begin libgamedrawframe");
     BeginDrawing();
     BeginTextureMode(target);
     switch (activescene) {
-    case SCENE_COMPANY:
-        //libgame_draw_company_scene(g);
-        break;
+    //case SCENE_COMPANY:
+    //libgame_draw_company_scene(g);
+    //    break;
     case SCENE_TITLE:
         libgame_draw_title_scene(g);
         break;
@@ -882,7 +847,6 @@ void libgame_drawframe(gamestate* g) {
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     libgame_draw_debug_panel(g);
     libgame_drawframeend(g);
-    //msuccess("libgame_drawframe end");
 }
 
 
@@ -893,8 +857,7 @@ void libgame_calc_debugpanel_size(gamestate* const g) {
         return;
     const int sz = 14, sp = 1;
     const Vector2 m = MeasureTextEx(g->font, g->debugpanel.buffer, sz, sp);
-    g->debugpanel.w = m.x;
-    g->debugpanel.h = m.y;
+    g->debugpanel.w = m.x, g->debugpanel.h = m.y;
 }
 
 
@@ -920,17 +883,15 @@ inline void libgame_draw_debug_panel(gamestate* const g) {
 void libgame_drawgrid(gamestate* const g) {
     if (!g)
         return;
-    const Color c = GREEN;
-    const int w = DEFAULT_TILE_SIZE;
-    const int h = DEFAULT_TILE_SIZE;
+    //const Color c = GREEN;
+    //const int w = DEFAULT_TILE_SIZE, h = DEFAULT_TILE_SIZE;
     //const int len = g->dungeonfloor->len;
     //const int wid = g->dungeonfloor->wid;
-    const int len = libgame_lua_get_dungeonfloor_row_count(L);
-    const int wid = libgame_lua_get_dungeonfloor_col_count(L);
+    const int len = libgame_lua_get_dungeonfloor_row_count(L), wid = libgame_lua_get_dungeonfloor_col_count(L);
     for (int i = 0; i <= len; i++)
-        DrawLine(i * w, 0, i * w, wid * h, c);
+        DrawLine(i * DEFAULT_TILE_SIZE, 0, i * DEFAULT_TILE_SIZE, wid * DEFAULT_TILE_SIZE, GREEN);
     for (int i = 0; i <= wid; i++)
-        DrawLine(0, i * h, len * w, i * h, c);
+        DrawLine(0, i * DEFAULT_TILE_SIZE, len * DEFAULT_TILE_SIZE, i * DEFAULT_TILE_SIZE, GREEN);
 }
 
 
