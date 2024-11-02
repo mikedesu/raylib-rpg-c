@@ -1349,23 +1349,22 @@ void libgame_create_spritegroup_by_id(gamestate* const g, const entityid id) {
     if (entity_type == ENTITY_PLAYER || entity_type == ENTITY_NPC) {
         race_t race = libgame_lua_get_entity_int(L, id, "race");
         if (race == RACE_HUMAN) {
-            int* keys = TX_HUMAN_KEYS;
-            const int num_keys = TX_HUMAN_KEY_COUNT;
-            const int offset_x = -12;
-            const int offset_y = -12;
-            const int default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
-            const specifier_t specifier = SPECIFIER_NONE;
-            libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);
-            libgame_set_default_anim_for_id(g, id, default_anim);
+            //int* keys = TX_HUMAN_KEYS;
+            //const int num_keys = TX_HUMAN_KEY_COUNT;
+            //const int offset_x = -12, offset_y = -12;
+            //const int default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
+            //const specifier_t specifier = SPECIFIER_NONE;
+            libgame_create_spritegroup(g, id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
+            libgame_set_default_anim_for_id(g, id, SPRITEGROUP_ANIM_HUMAN_IDLE);
         } else if (race == RACE_ORC) {
-            int* keys = TX_ORC_KEYS;
-            const int num_keys = TX_ORC_KEY_COUNT;
-            const int offset_x = -12;
-            const int offset_y = -12;
-            const int default_anim = SPRITEGROUP_ANIM_ORC_IDLE;
-            const specifier_t specifier = SPECIFIER_NONE;
-            libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);
-            libgame_set_default_anim_for_id(g, id, default_anim);
+            //int* keys = TX_ORC_KEYS;
+            //const int num_keys = TX_ORC_KEY_COUNT;
+            //const int offset_x = -12;
+            //const int offset_y = -12;
+            //const int default_anim = SPRITEGROUP_ANIM_ORC_IDLE;
+            //const specifier_t specifier = SPECIFIER_NONE;
+            libgame_create_spritegroup(g, id, TX_ORC_KEYS, TX_ORC_KEY_COUNT, -12, -12, SPECIFIER_NONE);
+            libgame_set_default_anim_for_id(g, id, SPRITEGROUP_ANIM_ORC_IDLE);
         }
     } else if (entity_type == ENTITY_SHIELD) {
         // first we will create the spritegroup for the dungeon-item representation
@@ -1374,28 +1373,28 @@ void libgame_create_spritegroup_by_id(gamestate* const g, const entityid id) {
         // we will select the proper sprite during rendering by attaching filters to the spritegroups
         int* keys = TX_BUCKLER_KEYS;
         int num_keys = TX_BUCKLER_KEY_COUNT;
-        int offset_x = 0;
-        int offset_y = 0;
-        specifier_t specifier = SPECIFIER_SHIELD_ON_TILE;
-        libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);
+        //int offset_x = 0;
+        //int offset_y = 0;
+        //specifier_t specifier = SPECIFIER_SHIELD_ON_TILE;
+        libgame_create_spritegroup(g, id, keys, num_keys, 0, 0, SPECIFIER_SHIELD_ON_TILE);
 
         keys = TX_GUARD_BUCKLER_KEYS;
         num_keys = TX_GUARD_BUCKLER_KEY_COUNT;
-        offset_x = -10;
-        offset_y = -14;
-        int default_anim = SPRITEGROUP_ANIM_GUARD_BUCKLER;
-        specifier = SPECIFIER_SHIELD_BLOCK;
-        libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);
-        libgame_set_default_anim_for_id(g, id, default_anim);
+        //int offset_x = -10;
+        //int offset_y = -14;
+        //int default_anim = SPRITEGROUP_ANIM_GUARD_BUCKLER;
+        //specifier_t specifier = SPECIFIER_SHIELD_BLOCK;
+        libgame_create_spritegroup(g, id, keys, num_keys, -10, -14, SPECIFIER_SHIELD_BLOCK);
+        libgame_set_default_anim_for_id(g, id, SPRITEGROUP_ANIM_GUARD_BUCKLER);
 
         keys = TX_GUARD_BUCKLER_SUCCESS_KEYS;
         num_keys = TX_GUARD_BUCKLER_SUCCESS_KEY_COUNT;
-        offset_x = -12;
-        offset_y = -12;
-        default_anim = SPRITEGROUP_ANIM_GUARD_BUCKLER;
-        specifier = SPECIFIER_SHIELD_BLOCK_SUCCESS;
-        libgame_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, specifier);
-        libgame_set_default_anim_for_id(g, id, default_anim);
+        //int offset_x = -12;
+        //int offset_y = -12;
+        //default_anim = SPRITEGROUP_ANIM_GUARD_BUCKLER;
+        //specifier_t specifier = SPECIFIER_SHIELD_BLOCK_SUCCESS;
+        libgame_create_spritegroup(g, id, keys, num_keys, -12, -12, SPECIFIER_SHIELD_BLOCK_SUCCESS);
+        libgame_set_default_anim_for_id(g, id, SPRITEGROUP_ANIM_GUARD_BUCKLER);
     }
 }
 
