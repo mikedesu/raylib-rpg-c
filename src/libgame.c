@@ -1365,7 +1365,7 @@ void libgame_init() {
 
 
 
-void libgame_create_spritegroup_by_id(gamestate* g, entityid id) {
+void libgame_create_spritegroup_by_id(gamestate* const g, const entityid id) {
     if (!g)
         return;
     if (id < 0)
@@ -1504,7 +1504,7 @@ void libgame_create_spritegroup(gamestate* const g, const entityid id, int* keys
 
 
 
-void libgame_loadtargettexture(gamestate* g) {
+void libgame_loadtargettexture(gamestate* const g) {
     if (!g)
         return;
     //if (g) {
@@ -1528,7 +1528,7 @@ void libgame_loadtargettexture(gamestate* g) {
 
 
 
-void libgame_loadfont(gamestate* g) {
+void libgame_loadfont(gamestate* const g) {
     if (!g)
         return;
     //if (g) {
@@ -1637,8 +1637,7 @@ const entityid libgame_create_orc_lua(gamestate* const g, const char* name, cons
 
 
 
-void libgame_initsharedsetup(gamestate* g) {
-    minfo("libgame_initsharedsetup begin");
+void libgame_initsharedsetup(gamestate* const g) {
     if (!g)
         return;
 
@@ -1669,30 +1668,40 @@ void libgame_initsharedsetup(gamestate* g) {
     //PlayMusicStream(test_music);
     SetRandomSeed(time(NULL));
 
-    libgame_loadfont(g);
-    libgame_loadtargettexture(g);
+    //libgame_loadfont(g);
+    g->font = LoadFontEx(DEFAULT_FONT_PATH, 60, 0, 255);
+
+    //libgame_loadtargettexture(g);
+    targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth");
+    targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
+    target = LoadRenderTexture(targetwidth, targetheight);
+    target_src = (Rectangle){0, 0, targetwidth, -targetheight};
+    target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
+    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    // update the gamestate display values
+    g->display.targetwidth = targetwidth;
+    g->display.targetheight = targetheight;
+    // can get this from init.lua....
+    g->cam2d.offset.x = targetwidth / 2.0f;
+    g->cam2d.offset.y = targetheight / 4.0f;
+
     libgame_load_textures(g);
-    libgame_init_datastructures(g);
-    const entityid hero_id = libgame_create_hero_lua(g, "hero", 1, 1);
-    if (hero_id == -1)
+    //libgame_init_datastructures(g);
+
+    g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
+    libgame_lua_create_dungeonfloor(L, 16, 16, TILETYPE_DIRT_00);
+
+    //const entityid hero_id = libgame_create_hero_lua(g, "hero", 1, 1);
+    if (libgame_create_hero_lua(g, "hero", 1, 1) == -1)
         merror("libgame_initsharedsetup: could not create hero entity");
-
-
     // keeping track of buckler_id to test buckler drawing on the entity
-    const entityid buckler_id = libgame_create_buckler_lua(g, "buckler", 2, 1);
-    if (buckler_id == -1)
+    //const entityid buckler_id = libgame_create_buckler_lua(g, "buckler", 2, 1);
+    if (libgame_create_buckler_lua(g, "buckler", 2, 1) == -1)
         merror("libgame_initsharedsetup: could not create buckler entity");
-
-
     // these dont work right until the text buffer of the debugpanel is filled
     libgame_update_debug_panel_buffer(g);
     libgame_calc_debugpanel_size(g);
     setdebugpanelbottomleft(g);
-    //}
-    //else {
-    //    merror("libgame_initsharedsetup: gamestate is NULL");
-    //}
-    msuccess("libgame_initsharedsetup end");
 }
 
 
