@@ -35,15 +35,11 @@
 gamestate* g = NULL;
 lua_State* L = NULL;
 RenderTexture target;
-Rectangle target_src = (Rectangle){0, 0, 0, 0};
-Rectangle target_dest = (Rectangle){0, 0, 0, 0};
-Vector2 target_origin = (Vector2){0, 0};
+Rectangle target_src = {0, 0, 0, 0}, target_dest = {0, 0, 0, 0};
+Vector2 target_origin = {0, 0};
 int activescene = GAMEPLAYSCENE;
 //int activescene = COMPANYSCENE;
-int targetwidth = -1;
-int targetheight = -1;
-int windowwidth = -1;
-int windowheight = -1;
+int targetwidth = -1, targetheight = -1, windowwidth = -1, windowheight = -1;
 
 
 
