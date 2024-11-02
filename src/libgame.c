@@ -1574,35 +1574,20 @@ const entityid libgame_create_hero_lua(gamestate* const g, const char* name, con
 
 
 const entityid libgame_create_buckler_lua(gamestate* const g, const char* name, const int x, const int y) {
-    if (!g) //{
-        //merror("libgame_create_buckler_lua: gamestate is NULL");
+    if (!g || !name || x < 0 || y < 0)
         return -1;
-    //}
-    if (!name) //{
-        //merror("libgame_create_buckler_lua: name is NULL");
-        return -1;
-    //}
-    if (x < 0 || y < 0) //{
-        //merror("libgame_create_buckler_lua: x or y is less than 0");
-        return -1;
-    //}
     const int dw = libgame_lua_get_dungeonfloor_col_count(L);
     const int dh = libgame_lua_get_dungeonfloor_row_count(L);
-    if (x >= dw || y >= dh) //{
-        //merror("libgame_create_buckler_lua: x or y is greater than dungeonfloor dimensions");
+    if (x >= dw || y >= dh)
         return -1;
-    //}
     const entityid id = libgame_lua_create_entity(L, name, ENTITY_SHIELD, x, y);
-    if (id != -1) {
-        // set buckler race
-        libgame_lua_set_entity_int(L, id, "race", RACE_NONE);
-        libgame_create_spritegroup_by_id(g, id);
-        libgame_update_spritegroup(g, id, SPECIFIER_SHIELD_ON_TILE, DIRECTION_NONE);
-        libgame_update_spritegroup(g, id, SPECIFIER_SHIELD_BLOCK, DIRECTION_DOWN_RIGHT);
-    }
-    //else //{
-    //    merror("libgame_create_buckler_lua: could not create buckler entity");
-    //}
+    if (id == -1)
+        return -1;
+    // set buckler race
+    libgame_lua_set_entity_int(L, id, "race", RACE_NONE);
+    libgame_create_spritegroup_by_id(g, id);
+    libgame_update_spritegroup(g, id, SPECIFIER_SHIELD_ON_TILE, DIRECTION_NONE);
+    libgame_update_spritegroup(g, id, SPECIFIER_SHIELD_BLOCK, DIRECTION_DOWN_RIGHT);
     return id;
 }
 
