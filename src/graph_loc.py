@@ -8,7 +8,7 @@ if len(sys.argv) < 3:
     print("Usage: python graph_loc.py <filename> <column_names> ")
     sys.exit(1)
 
-# plt.xkcd()
+plt.xkcd()
 
 filename = sys.argv[1]
 # column names
