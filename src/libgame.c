@@ -1449,7 +1449,7 @@ void libgame_set_default_anim_for_id(gamestate* const g, const entityid id, cons
 
 
 
-void libgame_create_spritegroup(gamestate* g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
+void libgame_create_spritegroup(gamestate* const g, const entityid id, int* keys, const int num_keys, const int offset_x, const int offset_y, const specifier_t spec) {
     if (!g)
         return;
     //minfo("libgame_create_spritegroup begin");
@@ -1573,7 +1573,7 @@ const entityid libgame_create_hero_lua(gamestate* const g, const char* name, con
 
 
 
-const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const int x, const int y) {
+const entityid libgame_create_buckler_lua(gamestate* const g, const char* name, const int x, const int y) {
     if (!g) //{
         //merror("libgame_create_buckler_lua: gamestate is NULL");
         return -1;
