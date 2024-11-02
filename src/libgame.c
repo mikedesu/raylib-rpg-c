@@ -1456,34 +1456,12 @@ void libgame_create_spritegroup(gamestate* const g, const entityid id, int* keys
     //minfo("creating sprite group...");
     spritegroup_t* group = spritegroup_create(20);
     //minfo("getting entity x and y...");
-    const int x = libgame_lua_get_entity_int(L, id, "x");
-    const int y = libgame_lua_get_entity_int(L, id, "y");
-    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
-    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
+    const int x = libgame_lua_get_entity_int(L, id, "x"), y = libgame_lua_get_entity_int(L, id, "y"), dw = libgame_lua_get_dungeonfloor_col_count(L), dh = libgame_lua_get_dungeonfloor_row_count(L);
     //msuccess("got x and y");
-    if (x < 0 || x > dw || y < 0 || y > dh) {
-        //char buf[128];
-        //snprintf(buf, 128, "Could not create spritegroup, x: %d, y: %d, dw: %d, dh: %d", x, y, dw, dh);
-        //merror(buf);
+    if (x < 0 || x > dw || y < 0 || y > dh)
         return;
-    }
-    //minfo("looping thru sprite keys...");
-    for (int i = 0; i < num_keys; i++) {
-        //const int txkey = keys[i];
-        //const int ctxs = g->txinfo[txkey].contexts;
-        //const int frames = g->txinfo[txkey].num_frames;
-        //char buf[128];
-        //snprintf(buf, 128, "i: %d, txkey: %d, ctxs: %d, frames: %d", i, txkey, ctxs, frames);
-        //minfo(buf);
-        //sprite* s = sprite_create(&g->txinfo[txkey].texture, ctxs, frames);
-        //if (!s)
-        //    continue;
-        //msuccess("sprite created successfully!");
-        //spritegroup_add(group, s);
-        //spritegroup_add(group,  sprite_create(&g->txinfo[txkey].texture, ctxs, frames));
+    for (int i = 0; i < num_keys; i++)
         spritegroup_add(group, sprite_create(&g->txinfo[keys[i]].texture, g->txinfo[keys[i]].contexts, g->txinfo[keys[i]].num_frames));
-    }
-    //msuccess("sprites added to sprite group");
     // this is effectively how we will update the
     // sprite position in relation to the entity's
     // dungeon position
@@ -1576,8 +1554,7 @@ const entityid libgame_create_hero_lua(gamestate* const g, const char* name, con
 const entityid libgame_create_buckler_lua(gamestate* const g, const char* name, const int x, const int y) {
     if (!g || !name || x < 0 || y < 0)
         return -1;
-    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
-    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
+    const int dw = libgame_lua_get_dungeonfloor_col_count(L), dh = libgame_lua_get_dungeonfloor_row_count(L);
     if (x >= dw || y >= dh)
         return -1;
     const entityid id = libgame_lua_create_entity(L, name, ENTITY_SHIELD, x, y);
@@ -1597,8 +1574,7 @@ const entityid libgame_create_buckler_lua(gamestate* const g, const char* name, 
 const entityid libgame_create_orc_lua(gamestate* const g, const char* name, const int x, const int y) {
     if (!g)
         return -1;
-    const int dw = libgame_lua_get_dungeonfloor_col_count(L);
-    const int dh = libgame_lua_get_dungeonfloor_row_count(L);
+    const int dw = libgame_lua_get_dungeonfloor_col_count(L), dh = libgame_lua_get_dungeonfloor_row_count(L);
     if (!g || !name || x < 0 || y < 0 || x >= dw || y >= dh)
         return -1;
     const entityid id = libgame_lua_create_entity(L, name, ENTITY_NPC, x, y);
