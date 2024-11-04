@@ -77,9 +77,5 @@
 72 4 3 0 img/actions/guard_buckler_success_front.png
 73 4 3 0 img/actions/guard_buckler_success_back.png
 74 1 4 0 img/shields/buckler.png
-#3  1 1  0 img/tiles/dungeon0.png
-#14 1 8  0 img/items/torch-sheet.png
-#30 1 1  0 img/tiles/dirt_01.png
-#31 1 1  0 img/tiles/dirt_02.png
-#46 1 4  0 img/items/sword-sheet.png
-#47 1 4  0 img/items/shield-sheet.png
+75 4 4 0 img/characters/human_dmg.png
+75 4 4 0 img/characters/human_dmg_shadow.png

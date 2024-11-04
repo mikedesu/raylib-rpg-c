@@ -708,11 +708,8 @@ void libgame_update_gamestate(gamestate* g) {
     if (!g)
         return;
     //UpdateMusicStream(test_music);
-    //minfo("begin libgame_updategamestate");
-    //minfo("libgame_updategamestate: update debug panel buffer");
     libgame_update_debug_panel_buffer(g);
     //setdebugpanelcenter(g);
-    //minfo("libgame_updategamestate: update smooth move");
     // need to clean this up a bit but works in general right now for what we want
     // needs extensibility to handle all animation types
     // in essence some animations we only want to loop once, then reset to a default or previous
@@ -1283,7 +1280,8 @@ void libgame_loadtargettexture(gamestate* const g) {
     g->targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth"), g->targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
     target = LoadRenderTexture(g->targetwidth, g->targetheight);
     target_src = (Rectangle){0, 0, g->targetwidth, -g->targetheight}, target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
-    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
     // update the gamestate display values
     g->cam2d.offset.x = g->targetwidth / 2.0f, g->cam2d.offset.y = g->targetheight / 4.0f;
 }
