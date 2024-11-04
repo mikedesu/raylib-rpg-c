@@ -15,7 +15,8 @@ DefaultTargetHeight = 720
 DefaultScale = 1
 DefaultWindowPosOffsetX = 100
 DefaultWindowPosOffsetY = 100
-DefaultWindowPosX = 1920 + DefaultWindowPosOffsetX
+--DefaultWindowPosX = 1920 + DefaultWindowPosOffsetX
+DefaultWindowPosX = 0 + DefaultWindowPosOffsetX
 DefaultWindowPosY = 0 + DefaultWindowPosOffsetY
 
 ----------------------------------------

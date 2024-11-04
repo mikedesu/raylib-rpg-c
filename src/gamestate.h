@@ -6,7 +6,7 @@
 #include "entityid.h"
 #include "fadestate.h"
 #include "hashtable_entityid_spritegroup.h"
-#include "sizemacros.h"
+//#include "sizemacros.h"
 #include "textureinfo.h"
 #include <raylib.h>
 #include <stdbool.h>
