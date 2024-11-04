@@ -9,7 +9,11 @@ src/img/*.png
 *.o
 src/*.o
 game
+game_gcc
+game_clang
 src/game
+src/game_gcc
+src/game_clang
 unit_test
 src/unit_test
 *.so
