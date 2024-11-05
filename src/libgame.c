@@ -665,7 +665,8 @@ void libgame_update_entity_damaged_anim(gamestate* const g, const int i) {
     if (was_damaged && sg) {
         //int old_index = sg->current;
         if (race == RACE_HUMAN) {
-            index = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
+            msuccess("human was damaged");
+            index = SPRITEGROUP_ANIM_HUMAN_DMG;
             //if (index == old_index) {
             if (index == sg->current) {
                 sprite* s = spritegroup_get(sg, sg->current);

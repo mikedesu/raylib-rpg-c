@@ -359,16 +359,17 @@ function EntityAttack(id, xdir, ydir)
 		local newy = entity.y + ydir
 		local tiletype = GetTileType(newx, newy)
 		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
-			return true
+			return false
 		end
 		if tiletype == TileTypes.None then
-			return true
+			return false
 		end
 		if tiletype == TileTypes.Stonewall00 then
-			return true
+			return false
 		end
 		-- if the tile is empty of entities, return true
 		if GetNumEntitiesAt(newx, newy) == 0 then
+			print("No entities at " .. newx .. ", " .. newy)
 			return true
 		end
 		-- eventually i will return here to write code to process 'damage'
@@ -380,6 +381,26 @@ function EntityAttack(id, xdir, ydir)
 		if target_entity then
 			-- if the target entity is blocking, set the target block to be successful
 			if target_entity.is_blocking == 1 then
+				print("Target entity is blocking")
+				target_entity.was_damaged = 0
+				target_entity.block_successful = 1
+				target_entity.is_blocking = 0
+				return true
+			else
+				print("Target entity is not blocking")
+				print("Target entity is at " .. target_entity.x .. ", " .. target_entity.y)
+				target_entity.was_damaged = 1
+				target_entity.block_successful = 0
+				target_entity.is_blocking = 0
+				return true
+			end
+		end
+
+		-- if it wasnt an NPC, it was probably the hero
+		target_id = GetFirstEntityTypeAt(EntityTypes.Player, newx, newy)
+		target_entity = GetEntityById(target_id)
+		if target_entity then
+			if target_entity.is_blocking == 1 then
 				target_entity.was_damaged = 0
 				target_entity.block_successful = 1
 				target_entity.is_blocking = 0
@@ -388,10 +409,9 @@ function EntityAttack(id, xdir, ydir)
 				target_entity.was_damaged = 1
 				target_entity.block_successful = 0
 				target_entity.is_blocking = 0
+				return true
 			end
 		end
-		-- for now, returning true if the tile is occupied by an entity
-		return true
 	end
 	return false
 end

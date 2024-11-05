@@ -78,4 +78,4 @@
 73 4 3 0 img/actions/guard_buckler_success_back.png
 74 1 4 0 img/shields/buckler.png
 75 4 4 0 img/characters/human_dmg.png
-75 4 4 0 img/characters/human_dmg_shadow.png
+76 4 4 0 img/characters/human_dmg_shadow.png
