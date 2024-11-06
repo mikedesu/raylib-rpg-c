@@ -44,7 +44,7 @@ const entityid libgame_create_hero_lua(gamestate* const g, const char* name, con
 void libgame_do_camera_lock_on(gamestate* const g);
 void libgame_draw_entity(gamestate* const g, const entityid id);
 void libgame_draw_entities_at_lua(gamestate* const g, const entitytype_t type, const int x, const int y);
-void libgame_entity_anim_incr(gamestate* const g, const entityid id);
+//void libgame_entity_anim_incr(gamestate* const g, const entityid id);
 void libgame_entity_anim_set(gamestate* const g, const entityid id, const int index);
 void libgame_handle_input_player(gamestate* const g);
 void libgame_handle_caminput(gamestate* const g);

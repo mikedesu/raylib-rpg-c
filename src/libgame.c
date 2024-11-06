@@ -70,9 +70,9 @@ void libgame_handle_fade(gamestate* const g) {
 
 
 
-void libgame_entity_anim_incr(gamestate* const g, const entityid id) {
-    if (g) spritegroup_incr(hashtable_entityid_spritegroup_get(g->spritegroups, id));
-}
+//void libgame_entity_anim_incr(gamestate* const g, const entityid id) {
+//    if (g) spritegroup_incr(hashtable_entityid_spritegroup_get(g->spritegroups, id));
+//}
 
 
 
