@@ -77,4 +77,4 @@ export_to_code: export_to_code.c
 
 
 clean:
-	rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.data export_to_code
+	rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.data export_to_code game_gcc game_clang
