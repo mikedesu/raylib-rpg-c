@@ -689,8 +689,10 @@ void libgame_update_gamestate(gamestate* g) {
     if (g->player_input_received) {
         libgame_process_turn(g);
         g->player_input_received = false;
-        libgame_handle_npcs_turn_lua(g);
-        libgame_process_turn(g);
+
+        //libgame_handle_npcs_turn_lua(g);
+        //libgame_process_turn(g);
+
         //g->is_locked = true;
         //g->lock_timer = 60;
     }
