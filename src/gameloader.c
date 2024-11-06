@@ -3,7 +3,9 @@
 #include "mprint.h"
 #include "symaddrpair.h"
 
-#include "libgame.h"
+//#include "libgame.h"
+
+#include "mylua.h"
 
 #include <assert.h>
 #include <dlfcn.h>
@@ -23,11 +25,7 @@
 
 
 long last_write_time = 0;
-const char* libname = "./libgame.so";
-const char* lockfile = "./libgame.so.lockfile";
-const char* templib = "./templibgame.so";
-
-
+const char *libname = "./libgame.so", *lockfile = "./libgame.so.lockfile", *templib = "./templibgame.so";
 
 
 void* handle = NULL;
@@ -53,9 +51,7 @@ bool (*mylibgame_external_check_reload)() = NULL;
 int getlastwritetime(const char* filename) {
     struct stat file_stat;
     int retval = 0;
-    if (stat(filename, &file_stat) == 0) {
-        retval = file_stat.st_mtime;
-    }
+    if (stat(filename, &file_stat) == 0) { retval = file_stat.st_mtime; }
     return retval;
 }
 
@@ -63,7 +59,7 @@ int getlastwritetime(const char* filename) {
 
 
 void openhandle() {
-    minfo("openhandle");
+    //minfo("openhandle");
     handle = dlopen(libname, RTLD_LAZY);
     if (!handle) {
         //merror("handle is NULL");
@@ -156,16 +152,14 @@ void autoreload() {
 
 void autoreload_every_n_sec(const int n) {
     assert(n > 0);
-    if (g_->currenttime % n == 0) {
-        autoreload();
-    }
+    if (g_->currenttime % n == 0) autoreload();
 }
 
 
 
 
 void gamerun() {
-    minfo("gamerun");
+    //minfo("gamerun");
     openhandle(); // if building for web, turn off
     loadsymbols(); // if building for web, turn off
     last_write_time = getlastwritetime(libname); // if building for web, turn off
@@ -175,7 +169,7 @@ void gamerun() {
     //g = mylibgame_getgamestate();
     //g_ = libgame_getgamestate();
     //L = mylibgame_getlua();
-    minfo("entering gameloop");
+    //minfo("entering gameloop");
     //emscripten_set_main_loop(gameloop, 0, 1);
     while (!mywindowshouldclose()) {
         //while (!libgame_windowshouldclose()) {
@@ -193,8 +187,8 @@ void gamerun() {
         //}
         //autoreload();
     }
-    minfo("closing libgame");
+    //minfo("closing libgame");
     mylibgameclose(g_);
     //libgame_close(g_);
-    msuccess("libgame closed");
+    //msuccess("libgame closed");
 }
