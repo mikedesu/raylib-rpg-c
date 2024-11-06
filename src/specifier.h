@@ -21,4 +21,4 @@
 
 typedef enum specifier_t { SPECIFIER_NONE, SPECIFIER_SHIELD_ON_TILE, SPECIFIER_SHIELD_BLOCK, SPECIFIER_SHIELD_BLOCK_SUCCESS, SPECIFIER_COUNT } specifier_t;
 
-const char* specifier_get_str(specifier_t spec);
+const char* specifier_get_str(const specifier_t spec);
