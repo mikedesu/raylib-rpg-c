@@ -276,50 +276,63 @@ void libgame_handle_player_input_pickup_key(gamestate* const g) {
 
 
 
-
-void libgame_handle_input_player(gamestate* const g) {
+void libgame_handle_player_wait_key(gamestate* const g) {
     if (!g) return;
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (g->controlmode == CONTROLMODE_PLAYER && g->player_input_received == false) {
+    if (hero_id == -1) return;
+    const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
+    if (libgame_lua_create_action(L, hero_id, ACTION_NONE, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir)))
+        libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_IDLE);
+    else
+        merror("attack action failed to create");
+    g->player_input_received = true;
+
+    //const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
+    //        if (libgame_lua_create_action(L, hero_id, ACTION_NONE, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir)))
+    //            libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_IDLE);
+    //        else
+    //            merror("attack action failed to create");
+    //        g->player_input_received = true;
+}
+
+
+
+void libgame_handle_input_player(gamestate* const g) {
+    if (g && g->controlmode == CONTROLMODE_PLAYER && g->player_input_received == false) {
+        const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
         //const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
         // the real setup will involve managing the player's dungeon position
-        if (IsKeyPressed(KEY_KP_6) || IsKeyPressed(KEY_RIGHT)) {
+        if (IsKeyPressed(KEY_KP_6) || IsKeyPressed(KEY_RIGHT))
             libgame_handle_player_input_movement_key(g, DIRECTION_RIGHT);
-        } else if (IsKeyPressed(KEY_KP_4) || IsKeyPressed(KEY_LEFT)) {
+        else if (IsKeyPressed(KEY_KP_4) || IsKeyPressed(KEY_LEFT))
             libgame_handle_player_input_movement_key(g, DIRECTION_LEFT);
-        } else if (IsKeyPressed(KEY_KP_2) || IsKeyPressed(KEY_DOWN)) {
+        else if (IsKeyPressed(KEY_KP_2) || IsKeyPressed(KEY_DOWN))
             libgame_handle_player_input_movement_key(g, DIRECTION_DOWN);
-        } else if (IsKeyPressed(KEY_KP_8) || IsKeyPressed(KEY_UP)) {
+        else if (IsKeyPressed(KEY_KP_8) || IsKeyPressed(KEY_UP))
             libgame_handle_player_input_movement_key(g, DIRECTION_UP);
-        } else if (IsKeyPressed(KEY_KP_1)) {
+        else if (IsKeyPressed(KEY_KP_1))
             libgame_handle_player_input_movement_key(g, DIRECTION_DOWN_LEFT);
-        } else if (IsKeyPressed(KEY_KP_3)) {
+        else if (IsKeyPressed(KEY_KP_3))
             libgame_handle_player_input_movement_key(g, DIRECTION_DOWN_RIGHT);
-        } else if (IsKeyPressed(KEY_KP_7)) {
+        else if (IsKeyPressed(KEY_KP_7))
             libgame_handle_player_input_movement_key(g, DIRECTION_UP_LEFT);
-        } else if (IsKeyPressed(KEY_KP_9)) {
+        else if (IsKeyPressed(KEY_KP_9))
             libgame_handle_player_input_movement_key(g, DIRECTION_UP_RIGHT);
-        } else if (IsKeyPressed(KEY_A)) {
+        else if (IsKeyPressed(KEY_A))
             libgame_handle_player_input_attack_key(g);
-            g->player_input_received = true;
-        } else if (IsKeyPressed(KEY_W)) {
+        //g->player_input_received = true;
+        else if (IsKeyPressed(KEY_W))
             libgame_handle_player_input_pickup_key(g);
-            g->player_input_received = true;
-        } else if (IsKeyPressed(KEY_B)) {
+        //g->player_input_received = true;
+        else if (IsKeyPressed(KEY_B))
             libgame_handle_player_input_block_key(g);
-            g->player_input_received = true;
-        } else if (IsKeyPressed(KEY_SPACE)) {
+        //g->player_input_received = true;
+        else if (IsKeyPressed(KEY_SPACE))
             // randomize the dungeon tiles
             libgame_lua_randomize_dungeon_tiles(L, libgame_lua_get_entity_int(L, hero_id, "x") - 2, libgame_lua_get_entity_int(L, hero_id, "y") - 2, 4, 4);
-        } else if (IsKeyPressed(KEY_PERIOD)) {
+        else if (IsKeyPressed(KEY_PERIOD))
             // Wait action
-            const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
-            if (libgame_lua_create_action(L, hero_id, ACTION_NONE, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir)))
-                libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_IDLE);
-            else
-                merror("attack action failed to create");
-            g->player_input_received = true;
-        }
+            libgame_handle_player_wait_key(g);
     }
 }
 
@@ -355,6 +368,7 @@ void libgame_process_turn_actions(gamestate* const g) {
         } else
             libgame_update_spritegroup(g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
     }
+    libgame_lua_clear_actions(L);
 }
 
 
@@ -376,9 +390,8 @@ const char* libgame_get_str_from_dir(const direction_t dir) {
 
 
 void libgame_process_turn(gamestate* const g) {
-    if (!g) return;
-    libgame_process_turn_actions(g);
-    libgame_lua_clear_actions(L);
+    if (g) libgame_process_turn_actions(g);
+    //libgame_lua_clear_actions(L);
 }
 
 
@@ -614,7 +627,7 @@ void libgame_update_entity_damaged_anim(gamestate* const g, const int i) {
     if (was_damaged && sg) {
         //int old_index = sg->current;
         if (race == RACE_HUMAN) {
-            msuccess("human was damaged");
+            //msuccess("human was damaged");
             index = SPRITEGROUP_ANIM_HUMAN_DMG;
             //if (index == old_index) {
             if (index == sg->current) {

@@ -29,6 +29,7 @@ void libgame_update_gamestate(gamestate* g);
 void libgame_drawframe(gamestate* g);
 void libgame_close(gamestate* g);
 
+void libgame_handle_player_wait_key(gamestate* const g);
 void libgame_initsharedsetup(gamestate* const g);
 void libgame_create_spritegroup_by_id(gamestate* const g, const entityid id);
 void libgame_create_spritegroup(gamestate* const g, const entityid id, int* keys, const int num_keys, const int offset_x, const int offset_y, const specifier_t spec);
