@@ -28,6 +28,9 @@ const int libgame_lua_get_nth_entity(lua_State* L, const int n);
 const int libgame_lua_get_gamestate_int(lua_State* L, const char* key);
 const int libgame_lua_get_nth_action_type(lua_State* L, const int n);
 const int libgame_lua_get_nth_action_id(lua_State* L, const int n);
+const int libgame_lua_get_nth_action_x(lua_State* L, const int n);
+const int libgame_lua_get_nth_action_y(lua_State* L, const int n);
+const int libgame_lua_get_inventory_count(lua_State* L, const int id);
 
 const char* libgame_lua_get_gamestate_str(lua_State* L, const char* key);
 const char* libgame_lua_get_entity_str(lua_State* L, const int id, const char* key);
@@ -41,11 +44,6 @@ void libgame_lua_set_gamestate_int(lua_State* L, const char* key, const int valu
 void libgame_lua_mytest(lua_State* L);
 void libgame_lua_clear_was_damaged(lua_State* L);
 void libgame_lua_print_entity_info(lua_State* L);
-const int libgame_lua_get_nth_action_x(lua_State* L, const int n);
-const int libgame_lua_get_nth_action_y(lua_State* L, const int n);
-
-
-const int libgame_lua_get_inventory_count(lua_State* L, const int id);
 
 const entityid libgame_lua_get_entity_shield(lua_State* L, const int id);
 
