@@ -24,7 +24,7 @@ spritegroup_t* spritegroup_create(const int capacity) {
 
 
 
-void spritegroup_set_specifier(spritegroup_t* sg, specifier_t spec) {
+void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec) {
     if (!sg) return;
     // make sure it is a valid specifier
     sg->specifier = spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT ? spec : SPECIFIER_NONE;
@@ -33,7 +33,7 @@ void spritegroup_set_specifier(spritegroup_t* sg, specifier_t spec) {
 
 
 
-void spritegroup_set_prev_anim(spritegroup_t* sg) {
+void spritegroup_set_prev_anim(spritegroup_t* const sg) {
     if (!sg) return;
     sg->prev_anim = sg->current;
 }
@@ -53,7 +53,7 @@ void spritegroup_destroy(spritegroup_t* sg) {
 
 
 
-void spritegroup_add(spritegroup_t* sg, sprite* s) {
+void spritegroup_add(spritegroup_t* const sg, sprite* s) {
     if (!sg || !s) return;
     if (sg->size < sg->capacity) {
         sg->sprites[sg->size] = s;
@@ -62,7 +62,7 @@ void spritegroup_add(spritegroup_t* sg, sprite* s) {
 }
 
 
-void spritegroup_set(spritegroup_t* sg, int index, sprite* s) {
+void spritegroup_set(spritegroup_t* const sg, const int index, sprite* s) {
     if (!sg || !s) return;
     if (index >= 0 && index < sg->size) sg->sprites[index] = s;
 }
@@ -71,7 +71,7 @@ void spritegroup_set(spritegroup_t* sg, int index, sprite* s) {
 
 
 // each sprite has a 'context' that corresponds to different directions
-void spritegroup_setcontexts(spritegroup_t* sg, const int context) {
+void spritegroup_setcontexts(spritegroup_t* const sg, const int context) {
     if (!sg) return;
     for (int i = 0; i < sg->size; i++) sprite_setcontext(sg->sprites[i], context);
 }
@@ -79,7 +79,7 @@ void spritegroup_setcontexts(spritegroup_t* sg, const int context) {
 
 
 
-sprite* spritegroup_get(spritegroup_t* sg, const int index) {
+sprite* spritegroup_get(spritegroup_t* const sg, const int index) {
     if (!sg) return NULL;
     return index < sg->size ? sg->sprites[index] : NULL;
 }
@@ -95,7 +95,7 @@ sprite* spritegroup_get(spritegroup_t* sg, const int index) {
 
 
 
-void spritegroup_set_current(spritegroup_t* sg, const int index) {
+void spritegroup_set_current(spritegroup_t* const sg, const int index) {
     if (!sg) return;
     if (index >= sg->size) {
         sg->current = sg->size - 1;
@@ -109,12 +109,12 @@ void spritegroup_set_current(spritegroup_t* sg, const int index) {
 
 
 
-specifier_t spritegroup_get_specifier(spritegroup_t* sg) { return sg ? sg->specifier : SPECIFIER_NONE; }
+const specifier_t spritegroup_get_specifier(spritegroup_t* const sg) { return sg ? sg->specifier : SPECIFIER_NONE; }
 
 
 
 
-const int spritegroup_get_first_context(spritegroup_t* sg) {
+const int spritegroup_get_first_context(spritegroup_t* const sg) {
     if (!sg || sg->size <= 0) return 0;
     return sprite_get_context(sg->sprites[0]);
 }
