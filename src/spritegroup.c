@@ -97,20 +97,14 @@ sprite* spritegroup_get(spritegroup_t* sg, const int index) {
 
 void spritegroup_set_current(spritegroup_t* sg, const int index) {
     if (!sg) return;
-    if (index < 0 || index >= sg->size) {
-        spritegroup_set_current(sg, 0);
-        return;
+    if (index >= sg->size) {
+        sg->current = sg->size - 1;
+    } else if (index < 0) {
+        sg->current = 0;
+    } else {
+        sg->prev_anim = sg->current;
+        sg->current = index;
     }
-    sg->prev_anim = sg->current;
-    sg->current = index;
-    //if (index >= sg->size) {
-    //    sg->current = sg->size - 1;
-    //} else if (index < 0) {
-    //    sg->current = 0;
-    //} else {
-    //    sg->prev_anim = sg->current;
-    //    sg->current = index;
-    //}
 }
 
 
