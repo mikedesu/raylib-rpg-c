@@ -27,6 +27,7 @@ spritegroup_t* spritegroup_create(const int capacity) {
 void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec) {
     if (!sg) return;
     // make sure it is a valid specifier
+    //sg->specifier = spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT ? spec : SPECIFIER_NONE;
     sg->specifier = spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT ? spec : SPECIFIER_NONE;
 }
 
@@ -41,7 +42,7 @@ void spritegroup_set_prev_anim(spritegroup_t* const sg) {
 
 
 void spritegroup_destroy(spritegroup_t* sg) {
-    minfo("destroying spritegroup_t");
+    //minfo("destroying spritegroup_t");
     if (!sg) return;
     if (sg->sprites) {
         for (int i = 0; i < sg->size; i++) { sprite_destroy(sg->sprites[i]); }
@@ -95,16 +96,20 @@ sprite* spritegroup_get(spritegroup_t* const sg, const int index) {
 
 
 
-void spritegroup_set_current(spritegroup_t* const sg, const int index) {
-    if (!sg) return;
+const bool spritegroup_set_current(spritegroup_t* const sg, const int index) {
+    if (!sg) return false;
     if (index >= sg->size) {
-        sg->current = sg->size - 1;
+        merror("spritegroup_set_current: index is out of bounds");
+        return false;
+        //sg->current = sg->size - 1;
     } else if (index < 0) {
-        sg->current = 0;
-    } else {
-        sg->prev_anim = sg->current;
-        sg->current = index;
+        merror("spritegroup_set_current: index is negative");
+        return false;
+        //sg->current = 0;
     }
+    sg->prev_anim = sg->current;
+    sg->current = index;
+    return true;
 }
 
 

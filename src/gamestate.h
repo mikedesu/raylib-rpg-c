@@ -33,7 +33,7 @@ typedef struct gamestate {
     bool debugpanelon;
     bool gridon;
     bool cam_lockon;
-    bool do_one_rotation;
+    //bool do_one_rotation;
     bool player_input_received;
     bool is_locked;
 
@@ -64,4 +64,4 @@ typedef struct gamestate {
 gamestate* gamestateinitptr();
 //gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const int targetwidth, const int targetheight);
 void gamestatefree(gamestate* g);
-void gamestate_update_current_time(gamestate* const g);
+//void gamestate_update_current_time(gamestate* const g);
