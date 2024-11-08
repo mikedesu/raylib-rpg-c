@@ -42,6 +42,7 @@ Gamestate = {
 	Actions = {},
 	DungeonFloor = {},
 	Entities = {},
+	CurrentAction = -1,
 }
 
 --Gamestate.WindowWidth = Gamestate.TargetWidth * Scale
