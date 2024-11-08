@@ -19,7 +19,7 @@
 typedef struct gamestate {
     int framecount;
     int fadealpha;
-    int lock_timer;
+    //int lock_timer;
 
     time_t timebegan;
     time_t currenttime;
@@ -36,6 +36,7 @@ typedef struct gamestate {
     //bool do_one_rotation;
     bool player_input_received;
     bool is_locked;
+    bool processing_actions;
 
     debugpanel_t debugpanel;
 
@@ -50,7 +51,7 @@ typedef struct gamestate {
     int targetheight;
     int windowwidth;
     int windowheight;
-
+    int lock;
 
     Font font;
 

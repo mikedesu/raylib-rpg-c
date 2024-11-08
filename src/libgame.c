@@ -131,6 +131,28 @@ const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir) {
 
 
 
+void libgame_process_turn_alt(gamestate* const g) {
+    const int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
+    const int action_count = libgame_lua_get_action_count(L);
+    if (action_count <= 0) {
+        merror("action count is 0");
+        return;
+    } else if (current_action == -1) {
+        merror("current action is -1");
+        libgame_incr_current_action(g);
+        return;
+    } else if (current_action > action_count) {
+        merror("current action is greater than action count");
+        libgame_lua_clear_actions(L);
+        libgame_incr_current_action(g);
+        return;
+    }
+    libgame_process_turn_action(g, current_action);
+    libgame_incr_current_action(g);
+}
+
+
+
 void libgame_handleinput(gamestate* const g) {
     if (!g) return;
     //if (IsKeyPressed(KEY_SPACE) || GetTouchPointCount() > 0) {
@@ -145,40 +167,25 @@ void libgame_handleinput(gamestate* const g) {
     //if (IsKeyPressed(KEY_O)) { libgame_incr_current_action_key(g); }
     if (IsKeyPressed(KEY_P)) {
 
-        //libgame_incr_current_action(g);
-        const int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
-        const int action_count = libgame_lua_get_action_count(L);
+        libgame_process_turn_alt(g);
 
-        if (action_count <= 0) {
-            merror("action count is 0");
-            return;
-        } else if (current_action == -1) {
-            merror("current action is -1");
-            libgame_incr_current_action(g);
-        }
-
-        else if (current_action > action_count) {
-            merror("current action is greater than action count");
-            libgame_lua_clear_actions(L);
-            libgame_incr_current_action(g);
-            //libgame_incr_current_action(g);
-        } else {
-            libgame_process_turn_action(g, current_action);
-            libgame_incr_current_action(g);
-        }
-
-
-        //if (current_action > action_count) {
+        //const int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
+        //const int action_count = libgame_lua_get_action_count(L);
+        //if (action_count <= 0) {
+        //    merror("action count is 0");
+        //    return;
+        //} else if (current_action == -1) {
+        //    merror("current action is -1");
+        //    libgame_incr_current_action(g);
+        //    return;
+        //} else if (current_action > action_count) {
         //    merror("current action is greater than action count");
         //    libgame_lua_clear_actions(L);
         //    libgame_incr_current_action(g);
-        //} else {
-        //libgame_process_turn_action(g, current_action);
+        //    return;
         //}
-
-
-
-        //libgame_incr_current_action_key(g);
+        //libgame_process_turn_action(g, current_action);
+        //libgame_incr_current_action(g);
     }
 
 
@@ -852,12 +859,52 @@ void libgame_update_gamestate(gamestate* g) {
 
         libgame_handle_npcs_turn_lua(g);
 
+        // this is where we want to process the turn
+        // we want to do this in a lock-step fashion so that it is only called once every N frames or so
+        g->processing_actions = true;
+
+
         //libgame_process_turn(g);
         g->player_input_received = false;
 
         //g->is_locked = true;
         //g->lock_timer = 60;
     }
+
+    if (g->processing_actions && g->lock == 0) {
+        libgame_process_turn_alt(g);
+        g->lock = 15;
+    } else if (g->processing_actions && g->lock > 0) {
+        g->lock--;
+    }
+
+
+    const int action_count = libgame_lua_get_action_count(L);
+    if (action_count == 0) {
+        g->processing_actions = false;
+        g->player_input_received = false;
+    }
+
+    /*
+
+// imagine some like this:
+
+
+if (g->start_processing_actions && g->lock_timer == 0) {
+    libgame_process_turn_alt(g);
+    g->lock_timer = 60;
+}
+
+if (g->lock_timer) {
+    g->lock_timer--;
+}
+
+if (action_count == 0) {
+    g->start_processing_actions = false;
+    g->player_input_received = false;
+}
+
+*/
 }
 
 
