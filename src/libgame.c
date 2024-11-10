@@ -137,16 +137,21 @@ void libgame_process_turn_alt(gamestate* const g) {
     if (action_count <= 0) {
         merror("action count is 0");
         return;
-    } else if (current_action == -1) {
-        merror("current action is -1");
-        libgame_incr_current_action(g);
-        return;
-    } else if (current_action > action_count) {
-        merror("current action is greater than action count");
-        libgame_lua_clear_actions(L);
-        libgame_incr_current_action(g);
-        return;
     }
+    //else if (current_action == -1) {
+    //    merror("current action is -1");
+    //    libgame_incr_current_action(g);
+    //    return;
+    //}
+
+
+    //if (current_action >= action_count) {
+    //    merror("current action is greater than action count");
+    //    libgame_lua_clear_actions(L);
+    //    libgame_incr_current_action(g);
+    //    return;
+    //}
+
     libgame_process_turn_action(g, current_action);
     libgame_incr_current_action(g);
 }
@@ -474,14 +479,14 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
 
 
 
-void libgame_process_next_action(gamestate* const g) {
-    if (!g) return;
-    const int action_count = libgame_lua_get_action_count(L);
-    if (action_count <= 0) return;
-    int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
-    libgame_process_turn_action(g, current_action);
-    libgame_incr_current_action(g);
-}
+//void libgame_process_next_action(gamestate* const g) {
+//    if (!g) return;
+//    const int action_count = libgame_lua_get_action_count(L);
+//    if (action_count <= 0) return;
+//    int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
+//    libgame_process_turn_action(g, current_action);
+//    libgame_incr_current_action(g);
+//}
 
 
 
@@ -857,20 +862,11 @@ void libgame_update_gamestate(gamestate* g) {
     // so that it doesnt appear like enemies move immediately as the player
     // does
     if (g->player_input_received) {
-        //libgame_process_turn(g);
-
         libgame_handle_npcs_turn_lua(g);
-
         // this is where we want to process the turn
         // we want to do this in a lock-step fashion so that it is only called once every N frames or so
         g->processing_actions = true;
-
-
-        //libgame_process_turn(g);
         g->player_input_received = false;
-
-        //g->is_locked = true;
-        //g->lock_timer = 60;
     }
 
     if (g->processing_actions && g->lock == 0) {
@@ -885,6 +881,7 @@ void libgame_update_gamestate(gamestate* g) {
     if (action_count == 0) {
         g->processing_actions = false;
         g->player_input_received = false;
+        g->lock = 0;
     }
 
     /*
@@ -1607,12 +1604,16 @@ const bool libgame_external_check_reload() { return IsKeyPressed(KEY_R); }
 
 void libgame_incr_current_action(gamestate* const g) {
     if (!g) return;
+
     int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
     const int action_count = libgame_lua_get_action_count(L);
+
     if (current_action == -1) {
         current_action = 1;
-    } else if (current_action > action_count) {
-        current_action = -1;
+    } else if (current_action >= action_count) {
+        //current_action = -1;
+        current_action = 1;
+        libgame_lua_clear_actions(L);
     } else {
         current_action++;
     }
