@@ -667,7 +667,8 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              "Last move: %d,%d\n"
              "Was damaged: %d\n"
              "Dir: %s\n"
-             "CurrentAction: %d\n",
+             "CurrentAction: %d\n"
+             "Lock: %d\n",
              g->framecount,
              g->timebeganbuf,
              g->currenttimebuf,
@@ -693,7 +694,8 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              last_mv_y,
              hero_was_damaged,
              dir_str,
-             current_action);
+             current_action,
+             g->lock);
 }
 
 
@@ -873,7 +875,7 @@ void libgame_update_gamestate(gamestate* g) {
 
     if (g->processing_actions && g->lock == 0) {
         libgame_process_turn_alt(g);
-        g->lock = 15;
+        g->lock = 60;
     } else if (g->processing_actions && g->lock > 0) {
         g->lock--;
     }
