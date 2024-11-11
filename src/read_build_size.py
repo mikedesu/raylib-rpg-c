@@ -56,7 +56,7 @@ def main():
     # kbstr2 = f"{df['libkb'].mean():.1f}"
     gccbuildtimestr = f"{df['gcc_build_time'].mean():.3f}"
     clangbuildtimestr = f"{df['clang_build_time'].mean():.3f}"
-
+    emccbuildtimestr = f"{df['emcc_build_time'].mean():.3f}"
     # bpsstr = f"{df['bytes/s'].mean():.2f}"
     # locsstr = f"{df['loc/s'].mean():.2f}"
     # buildtimestr = f"{df['buildtime ms/s'].mean():.2f}"
@@ -72,6 +72,9 @@ def main():
 
     print(f"Clang Avg build Time:     {clangbuildtimestr:>10} s")
     print(f"Clang Current build Time: {df.at[df.index[-1], 'clang_build_time']:>10} s")
+
+    print(f"EMCC Avg build Time:      {emccbuildtimestr:>10} s")
+    print(f"EMCC Current build Time:  {df.at[df.index[-1], 'emcc_build_time']:>10} s")
 
     # print(f"Avg build size (bytes/s): {bpsstr}")
     # print(f"Avg line count (loc/s):   {locsstr}")
