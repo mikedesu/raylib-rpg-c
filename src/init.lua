@@ -8,15 +8,15 @@ require("test")
 
 -- You can edit these
 WindowTitle = "@evildojo666 presents: Project.RPG"
-DefaultTargetWidth = 800
-DefaultTargetHeight = 480
+DefaultTargetWidth = 1280
+DefaultTargetHeight = 720
 --DefaultTargetWidth = 1280
 --DefaultTargetHeight = 720
 --DefaultTargetWidth = 1920
 --DefaultTargetHeight = 960
 DefaultScale = 1
-DefaultWindowPosOffsetX = 1920 / 4
-DefaultWindowPosOffsetY = 1080 / 4
+DefaultWindowPosOffsetX = 100
+DefaultWindowPosOffsetY = 100
 DefaultWindowPosX = 1920 + DefaultWindowPosOffsetX
 --DefaultWindowPosX = 0 + DefaultWindowPosOffsetX
 DefaultWindowPosY = 0 + DefaultWindowPosOffsetY

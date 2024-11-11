@@ -281,7 +281,9 @@ void libgame_handle_player_input_movement_key(gamestate* const g, const directio
     // hack to make the buckler correctly update...this probably doesnt belong here lol
     const entityid shieldid = libgame_lua_get_entity_shield(L, hero_id);
     libgame_update_spritegroup(g, shieldid, SPECIFIER_SHIELD_BLOCK, dir);
+
     libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+
     g->player_input_received = true;
 }
 
@@ -435,8 +437,6 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
         return;
     }
 
-
-
     // process the action
     const int result_id = libgame_lua_process_action(L, i);
     // depending on the action result depends on how we update sprite animations
@@ -446,19 +446,14 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
         return;
     }
 
-    //if (result_id != -1) {
-    if (action_type == ACTION_NONE)
+    if (action_type == ACTION_NONE) {
         libgame_update_spritegroup(g, id, SPECIFIER_NONE, DIRECTION_NONE);
-    else if (action_type == ACTION_MOVE)
+    } else if (action_type == ACTION_MOVE) {
         libgame_update_spritegroup_by_lastmove(g, result_id);
-    else if (action_type == ACTION_ATTACK) {
+    } else if (action_type == ACTION_ATTACK) {
         // get race of entity
         race_t race = libgame_lua_get_entity_int(L, id, "race");
-        //printf("Race: %d\n", race);
-
         int spritegroup_anim_id = SPRITEGROUP_ANIM_HUMAN_ATTACK;
-        //int spritegroup_anim_id = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_ATTACK : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_ATTACK : SPRITEGROUP_ANIM_HUMAN_ATTACK;
-
         if (race == RACE_HUMAN) {
             msuccess("set human attack animation");
             spritegroup_anim_id = SPRITEGROUP_ANIM_HUMAN_ATTACK;
@@ -466,14 +461,8 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
             msuccess("set orc attack animation");
             spritegroup_anim_id = SPRITEGROUP_ANIM_ORC_ATTACK;
         }
-
-        //const bool result = libgame_entity_anim_set(g, id, spritegroup_anim_id);
         if (!libgame_entity_anim_set(g, id, spritegroup_anim_id)) merror("failed to set attack animation");
-        //else
-        //    msuccess("set orc attack animation");
     }
-    //} else
-    //    libgame_update_spritegroup(g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
 }
 
 
@@ -490,52 +479,15 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
 
 
 
-void libgame_process_turn_actions(gamestate* const g) {
-    if (!g) return;
-    //const int action_count = libgame_lua_get_action_count(L);
-    //if (action_count <= 0) return;
-    for (int i = 1; i <= libgame_lua_get_action_count(L); i++) {
-        libgame_lua_set_gamestate_int(L, "CurrentAction", i);
-        libgame_process_turn_action(g, i);
-        // parse out the action values
-        //const action_t action_type = libgame_lua_get_nth_action_type(L, i + 1);
-        //const entityid id = libgame_lua_get_nth_action_id(L, i + 1);
-        //const int x = libgame_lua_get_nth_action_x(L, i + 1), y = libgame_lua_get_nth_action_y(L, i + 1);
-        //// process the action
-        //const int result_id = libgame_lua_process_action(L, i + 1);
-        //// depending on the action result depends on how we update sprite animations
-        //if (result_id != -1) {
-        //    if (action_type == ACTION_NONE)
-        //        libgame_update_spritegroup(g, id, SPECIFIER_NONE, DIRECTION_NONE);
-        //    else if (action_type == ACTION_MOVE)
-        //        libgame_update_spritegroup_by_lastmove(g, result_id);
-        //    else if (action_type == ACTION_ATTACK) {
-        //        // get race of entity
-        //        race_t race = libgame_lua_get_entity_int(L, id, "race");
-        //        //printf("Race: %d\n", race);
-        //
-        //                int spritegroup_anim_id = SPRITEGROUP_ANIM_HUMAN_ATTACK;
-        //                //int spritegroup_anim_id = race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_ATTACK : race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_ATTACK : SPRITEGROUP_ANIM_HUMAN_ATTACK;
-        //
-        //                if (race == RACE_HUMAN) {
-        //                    msuccess("set human attack animation");
-        //                    spritegroup_anim_id = SPRITEGROUP_ANIM_HUMAN_ATTACK;
-        //                } else if (race == RACE_ORC) {
-        //                    msuccess("set orc attack animation");
-        //                    spritegroup_anim_id = SPRITEGROUP_ANIM_ORC_ATTACK;
-        //                }
-        //
-        //                const bool result = libgame_entity_anim_set(g, id, spritegroup_anim_id);
-        //                if (!result) merror("failed to set attack animation");
-        //                //else
-        //                //    msuccess("set orc attack animation");
-        //            }
-        //        } else
-        //            libgame_update_spritegroup(g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
-    }
-    libgame_lua_set_gamestate_int(L, "CurrentAction", -1);
-    libgame_lua_clear_actions(L);
-}
+//void libgame_process_turn_actions(gamestate* const g) {
+//    if (!g) return;
+//    for (int i = 1; i <= libgame_lua_get_action_count(L); i++) {
+//        libgame_lua_set_gamestate_int(L, "CurrentAction", i);
+//        libgame_process_turn_action(g, i);
+//    }
+//    libgame_lua_set_gamestate_int(L, "CurrentAction", -1);
+//    libgame_lua_clear_actions(L);
+//}
 
 
 
@@ -555,10 +507,10 @@ const char* libgame_get_str_from_dir(const direction_t dir) {
 
 
 
-void libgame_process_turn(gamestate* const g) {
-    if (g) libgame_process_turn_actions(g);
-    //libgame_lua_clear_actions(L);
-}
+//void libgame_process_turn(gamestate* const g) {
+//    if (g) libgame_process_turn_actions(g);
+//libgame_lua_clear_actions(L);
+//}
 
 
 
@@ -871,7 +823,7 @@ void libgame_update_gamestate(gamestate* g) {
 
     if (g->processing_actions && g->lock == 0) {
         libgame_process_turn_alt(g);
-        g->lock = 60;
+        g->lock = DEFAULT_LOCK;
     } else if (g->processing_actions && g->lock > 0) {
         g->lock--;
     }
@@ -883,27 +835,6 @@ void libgame_update_gamestate(gamestate* g) {
         g->player_input_received = false;
         g->lock = 0;
     }
-
-    /*
-
-// imagine some like this:
-
-
-if (g->start_processing_actions && g->lock_timer == 0) {
-    libgame_process_turn_alt(g);
-    g->lock_timer = 60;
-}
-
-if (g->lock_timer) {
-    g->lock_timer--;
-}
-
-if (action_count == 0) {
-    g->start_processing_actions = false;
-    g->player_input_received = false;
-}
-
-*/
 }
 
 
@@ -914,10 +845,6 @@ void libgame_update_smoothmoves_for_entitytype(gamestate* const g, const entityt
     //const int count = libgame_lua_get_num_entities(L);
     for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
         const entityid id = libgame_lua_get_nth_entity(L, i + 1);
-        //const entitytype_t type2 = libgame_lua_get_entity_int(L, id, "type");
-        //if (type == type2)
-        //    libgame_update_smoothmove(g, id);
-        //(type == type2) ? libgame_update_smoothmove(g, id) : 0;
         if (type == libgame_lua_get_entity_int(L, id, "type")) libgame_update_smoothmove(g, id);
     }
 }
@@ -928,12 +855,11 @@ void libgame_update_smoothmoves_for_entitytype(gamestate* const g, const entityt
 void libgame_drawframeend(gamestate* const g) {
     if (!g) return;
     EndDrawing();
+    // update gamestate values at end of draw frame:
+    // framecount, currenttime, currenttimetm, currenttimebuf
     g->framecount++;
-    //gamestate_update_current_time(g);
-
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&(g->currenttime));
-    //bzero(g->currenttimebuf, 64);
     strftime(g->currenttimebuf, 64, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 }
 
