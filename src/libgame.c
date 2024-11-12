@@ -619,12 +619,12 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              "Hero position: %d,%d\n"
              "Inventory count: %d\n"
              "Dungeon size: %dx%d\n"
-             "Action count: %d\n"
              "Entity count: %d\n"
              "Last move: %d,%d\n"
              "Was damaged: %d\n"
              "Dir: %s\n"
              "CurrentAction: %d\n"
+             "Action count: %d\n"
              "Lock: %d\n",
              g->framecount,
              g->timebeganbuf,
@@ -645,13 +645,13 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              libgame_lua_get_inventory_count(L, id),
              dh,
              dw,
-             action_count,
              entity_count,
              last_mv_x,
              last_mv_y,
              hero_was_damaged,
              dir_str,
              current_action,
+             action_count,
              g->lock);
 }
 
@@ -664,10 +664,11 @@ void libgame_update_smoothmove(gamestate* const g, const entityid id) {
     if (!group) return;
     //const float move_unit = 1.0f;
     // only do it 1 unit at a time
-    group->dest.x += group->move_x > 0 ? 1.0f : group->move_x < 0 ? -1.0f : 0;
-    group->dest.y += group->move_y > 0 ? 1.0f : group->move_y < 0 ? -1.0f : 0;
-    group->move_x += group->move_x > 0 ? -1.0f : group->move_x < 0 ? 1.0f : 0;
-    group->move_y += group->move_y > 0 ? -1.0f : group->move_y < 0 ? 1.0f : 0;
+    const float move = 2.0f;
+    group->dest.x += group->move_x > 0 ? move : group->move_x < 0 ? -move : 0;
+    group->dest.y += group->move_y > 0 ? move : group->move_y < 0 ? -move : 0;
+    group->move_x += group->move_x > 0 ? -move : group->move_x < 0 ? move : 0;
+    group->move_y += group->move_y > 0 ? -move : group->move_y < 0 ? move : 0;
 }
 
 
@@ -699,10 +700,14 @@ void libgame_do_camera_lock_on(gamestate* const g) {
 void libgame_handle_npc_turn_lua(gamestate* const g, const entityid id) {
     if (!g) return;
     //minfo("libgame_handle_npc_turn_lua begin");
-    //if (!libgame_lua_create_action(L, id, ACTION_MOVE, rand() % 3 - 1, rand() % 3 - 1))
-    //    merror("could not create npc action: move");
-    const direction_t dir = libgame_lua_get_entity_int(L, id, "direction");
-    if (!libgame_lua_create_action(L, id, ACTION_ATTACK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir))) merror("attack action failed to create");
+
+    int diceroll = rand() % 8;
+    const int xdir = diceroll == 0 || diceroll == 6 || diceroll == 7 ? -1 : diceroll == 2 || diceroll == 3 || diceroll == 4 ? 1 : 0;
+    const int ydir = diceroll == 0 || diceroll == 1 || diceroll == 2 ? -1 : diceroll == 4 || diceroll == 5 || diceroll == 6 ? 1 : 0;
+
+    if (!libgame_lua_create_action(L, id, ACTION_MOVE, xdir, ydir)) merror("could not create npc action: move");
+    //const direction_t dir = libgame_lua_get_entity_int(L, id, "direction");
+    //if (!libgame_lua_create_action(L, id, ACTION_ATTACK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir))) merror("attack action failed to create");
 }
 
 
