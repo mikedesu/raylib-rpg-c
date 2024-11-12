@@ -47,6 +47,9 @@ void libgame_lua_print_entity_info(lua_State* L);
 
 const entityid libgame_lua_get_entity_shield(lua_State* L, const int id);
 
+
+void libgame_lua_incr_current_turn(lua_State* L);
+
 //void libgame_lua_print_entities(lua_State* L);
 //void libgame_lua_serialize_entities_and_print(lua_State* L);
 //void libgame_lua_reserialization_test(lua_State* L);

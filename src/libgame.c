@@ -282,7 +282,7 @@ void libgame_handle_player_input_movement_key(gamestate* const g, const directio
     const entityid shieldid = libgame_lua_get_entity_shield(L, hero_id);
     libgame_update_spritegroup(g, shieldid, SPECIFIER_SHIELD_BLOCK, dir);
 
-    libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+    //libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
 
     g->player_input_received = true;
 }
@@ -602,6 +602,7 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
 
     const int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
 
+    const int current_turn = libgame_lua_get_gamestate_int(L, "CurrentTurn");
 
     const char* dir_str = libgame_get_str_from_dir(dir);
     snprintf(g->debugpanel.buffer,
@@ -625,6 +626,7 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              "Dir: %s\n"
              "CurrentAction: %d\n"
              "Action count: %d\n"
+             "Current Turn: %d\n"
              "Lock: %d\n",
              g->framecount,
              g->timebeganbuf,
@@ -652,6 +654,7 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              dir_str,
              current_action,
              action_count,
+             current_turn,
              g->lock);
 }
 
@@ -720,6 +723,7 @@ void libgame_handle_npcs_turn_lua(gamestate* const g) {
         const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
         if (type == ENTITY_NPC) libgame_handle_npc_turn_lua(g, id);
     }
+    libgame_lua_incr_current_turn(L);
     //msuccess("libgame_handle_npcs_turn_lua end");
 }
 

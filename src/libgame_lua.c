@@ -663,3 +663,12 @@ const entityid libgame_lua_get_entity_shield(lua_State* L, const int id) {
     //}
     return retval;
 }
+
+
+
+
+void libgame_lua_incr_current_turn(lua_State* L) {
+    if (!L) return;
+    lua_getglobal(L, "IncrementCurrentTurn");
+    lua_pcall(L, 0, 0, 0);
+}

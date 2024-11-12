@@ -43,6 +43,7 @@ Gamestate = {
 	DungeonFloor = {},
 	Entities = {},
 	CurrentAction = 1,
+	CurrentTurn = 1,
 }
 
 --Gamestate.WindowWidth = Gamestate.TargetWidth * Scale
@@ -898,6 +899,10 @@ function GetInventoryCount(id)
 		return #entity.inventory
 	end
 	return 0
+end
+
+function IncrementCurrentTurn()
+	Gamestate.CurrentTurn = Gamestate.CurrentTurn + 1
 end
 
 --function DeserializeEntitiesFromString(str)
