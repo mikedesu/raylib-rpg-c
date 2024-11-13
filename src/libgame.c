@@ -136,21 +136,9 @@ void libgame_process_turn_alt(gamestate* const g) {
     const int action_count = libgame_lua_get_action_count(L);
     if (action_count <= 0) {
         merror("action count is 0");
+        g->player_input_received = false;
         return;
     }
-    //else if (current_action == -1) {
-    //    merror("current action is -1");
-    //    libgame_incr_current_action(g);
-    //    return;
-    //}
-
-
-    //if (current_action >= action_count) {
-    //    merror("current action is greater than action count");
-    //    libgame_lua_clear_actions(L);
-    //    libgame_incr_current_action(g);
-    //    return;
-    //}
 
     libgame_process_turn_action(g, current_action);
     libgame_incr_current_action(g);
@@ -170,34 +158,32 @@ void libgame_handleinput(gamestate* const g) {
 
 
     //if (IsKeyPressed(KEY_O)) { libgame_incr_current_action_key(g); }
-    if (IsKeyPressed(KEY_P)) {
-
-        libgame_process_turn_alt(g);
-
-        //const int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
-        //const int action_count = libgame_lua_get_action_count(L);
-        //if (action_count <= 0) {
-        //    merror("action count is 0");
-        //    return;
-        //} else if (current_action == -1) {
-        //    merror("current action is -1");
-        //    libgame_incr_current_action(g);
-        //    return;
-        //} else if (current_action > action_count) {
-        //    merror("current action is greater than action count");
-        //    libgame_lua_clear_actions(L);
-        //    libgame_incr_current_action(g);
-        //    return;
-        //}
-        //libgame_process_turn_action(g, current_action);
-        //libgame_incr_current_action(g);
-    }
+    //if (IsKeyPressed(KEY_P)) {
+    //    libgame_process_turn_alt(g);
+    //const int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
+    //const int action_count = libgame_lua_get_action_count(L);
+    //if (action_count <= 0) {
+    //    merror("action count is 0");
+    //    return;
+    //} else if (current_action == -1) {
+    //    merror("current action is -1");
+    //    libgame_incr_current_action(g);
+    //    return;
+    //} else if (current_action > action_count) {
+    //    merror("current action is greater than action count");
+    //    libgame_lua_clear_actions(L);
+    //    libgame_incr_current_action(g);
+    //    return;
+    //}
+    //libgame_process_turn_action(g, current_action);
+    //libgame_incr_current_action(g);
+    //}
 
 
     libgame_handle_modeswitch(g);
     libgame_handle_debugpanel_switch(g);
     libgame_handle_grid_switch(g);
-    libgame_handle_input_player(g);
+    if (g && g->controlmode == CONTROLMODE_PLAYER && g->player_input_received == false && g->processing_actions == false) { libgame_handle_input_player(g); }
     libgame_handle_caminput(g);
 }
 
@@ -822,12 +808,12 @@ void libgame_update_gamestate(gamestate* g) {
     // i plan on using the lock and lock timer to control an ebb-and-flow
     // so that it doesnt appear like enemies move immediately as the player
     // does
-    if (g->player_input_received) {
+    if (g->player_input_received && !g->processing_actions) {
         libgame_handle_npcs_turn_lua(g);
         // this is where we want to process the turn
         // we want to do this in a lock-step fashion so that it is only called once every N frames or so
         g->processing_actions = true;
-        g->player_input_received = false;
+        //g->player_input_received = false;
     }
 
     if (g->processing_actions && g->lock == 0) {
@@ -840,6 +826,7 @@ void libgame_update_gamestate(gamestate* g) {
 
     const int action_count = libgame_lua_get_action_count(L);
     if (action_count == 0) {
+        //minfo("action count is 0");
         g->processing_actions = false;
         g->player_input_received = false;
         g->lock = 0;
@@ -1549,6 +1536,7 @@ void libgame_incr_current_action(gamestate* const g) {
         //current_action = -1;
         current_action = 1;
         libgame_lua_clear_actions(L);
+        //g->player_input_received = false;
     } else {
         current_action++;
     }
@@ -1556,19 +1544,17 @@ void libgame_incr_current_action(gamestate* const g) {
 }
 
 
-void libgame_incr_current_action_key(gamestate* const g) {
-    if (!g) return;
-
-    libgame_incr_current_action(g);
-
-    //int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
-    //const int action_count = libgame_lua_get_action_count(L);
-    //if (current_action == -1) {
-    //    current_action = 1;
-    //} else if (current_action > action_count) {
-    //    current_action = -1;
-    //} else {
-    //    current_action++;
-    //}
-    //libgame_lua_set_gamestate_int(L, "CurrentAction", current_action);
-}
+//void libgame_incr_current_action_key(gamestate* const g) {
+//    if (!g) return;
+//    libgame_incr_current_action(g);
+//int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
+//const int action_count = libgame_lua_get_action_count(L);
+//if (current_action == -1) {
+//    current_action = 1;
+//} else if (current_action > action_count) {
+//    current_action = -1;
+//} else {
+//    current_action++;
+//}
+//libgame_lua_set_gamestate_int(L, "CurrentAction", current_action);
+//}

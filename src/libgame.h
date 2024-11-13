@@ -97,5 +97,5 @@ void libgame_draw_fade(const gamestate* const g);
 void libgame_drawgrid(gamestate* const g);
 void libgame_draw_dungeonfloor(gamestate* const g);
 void libgame_drawframeend(gamestate* const g);
-void libgame_incr_current_action_key(gamestate* const g);
 void libgame_incr_current_action(gamestate* const g);
+//void libgame_incr_current_action_key(gamestate* const g);
