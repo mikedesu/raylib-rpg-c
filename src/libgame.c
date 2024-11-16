@@ -465,15 +465,16 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
 
 
 
-//void libgame_process_turn_actions(gamestate* const g) {
-//    if (!g) return;
-//    for (int i = 1; i <= libgame_lua_get_action_count(L); i++) {
-//        libgame_lua_set_gamestate_int(L, "CurrentAction", i);
-//        libgame_process_turn_action(g, i);
-//    }
-//    libgame_lua_set_gamestate_int(L, "CurrentAction", -1);
-//    libgame_lua_clear_actions(L);
-//}
+void libgame_process_turn_actions(gamestate* const g) {
+    if (!g) return;
+    for (int i = 1; i <= libgame_lua_get_action_count(L); i++) {
+        //libgame_lua_set_gamestate_int(L, "CurrentAction", i);
+        
+        libgame_process_turn_action(g, i);
+    }
+    //libgame_lua_set_gamestate_int(L, "CurrentAction", -1);
+    libgame_lua_clear_actions(L);
+}
 
 
 
@@ -493,10 +494,10 @@ const char* libgame_get_str_from_dir(const direction_t dir) {
 
 
 
-//void libgame_process_turn(gamestate* const g) {
-//    if (g) libgame_process_turn_actions(g);
-//libgame_lua_clear_actions(L);
-//}
+void libgame_process_turn(gamestate* const g) {
+    if (g) libgame_process_turn_actions(g);
+    libgame_lua_clear_actions(L);
+}
 
 
 
