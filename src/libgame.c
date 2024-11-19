@@ -469,7 +469,7 @@ void libgame_process_turn_actions(gamestate* const g) {
     if (!g) return;
     for (int i = 1; i <= libgame_lua_get_action_count(L); i++) {
         //libgame_lua_set_gamestate_int(L, "CurrentAction", i);
-        
+
         libgame_process_turn_action(g, i);
     }
     //libgame_lua_set_gamestate_int(L, "CurrentAction", -1);
@@ -809,6 +809,10 @@ void libgame_update_gamestate(gamestate* g) {
     // i plan on using the lock and lock timer to control an ebb-and-flow
     // so that it doesnt appear like enemies move immediately as the player
     // does
+
+
+
+
     if (g->player_input_received && !g->processing_actions) {
         libgame_handle_npcs_turn_lua(g);
         // this is where we want to process the turn
@@ -817,21 +821,32 @@ void libgame_update_gamestate(gamestate* g) {
         //g->player_input_received = false;
     }
 
-    if (g->processing_actions && g->lock == 0) {
-        libgame_process_turn_alt(g);
-        g->lock = DEFAULT_LOCK;
-    } else if (g->processing_actions && g->lock > 0) {
-        g->lock--;
-    }
 
-
-    const int action_count = libgame_lua_get_action_count(L);
-    if (action_count == 0) {
-        //minfo("action count is 0");
+    // this is the og method with everyone moving simultaneously per turn
+    if (g->processing_actions) {
+        libgame_process_turn(g);
         g->processing_actions = false;
         g->player_input_received = false;
-        g->lock = 0;
     }
+
+
+    // this method steps each entity action in sequence, which may be useful when resolving actions and effects, but for basic movement feels "excessive"
+    // shiren, for example, appears to perform all move actions simultaneously, and then incrementing remaining actions
+    // if the player does a non-move action first, it increments that action, simul-does any sequence of moves, and then resolves actions
+    // for experiment purposes, we are temporarily disabling this
+    //if (g->processing_actions && g->lock == 0) {
+    //    libgame_process_turn_alt(g);
+    //    g->lock = DEFAULT_LOCK;
+    //} else if (g->processing_actions && g->lock > 0) {
+    //    g->lock--;
+    //}
+    //const int action_count = libgame_lua_get_action_count(L);
+    //if (action_count == 0) {
+    //    //minfo("action count is 0");
+    //    g->processing_actions = false;
+    //    g->player_input_received = false;
+    //    g->lock = 0;
+    //}
 }
 
 
