@@ -34,21 +34,37 @@ EMCC_HTML_SIZE=$(ls -al index.html | awk '{print $5}');
 EMCC_JS_SIZE=$(ls -al index.js | awk '{print $5}');
 EMCC_WASM_SIZE=$(ls -al index.wasm | awk '{print $5}');
 
+echo build time: $BUILD_TIME;
+echo timestamp: $TIMESTAMP;
+echo loc: $LOC;
+echo lua_loc: $LUA_LOC;
+echo gcc_size: $GCC_SIZE;
+echo gcc_libsize: $GCC_LIBSIZE;
+
+echo clang build time: $CLANG_BUILD_TIME;
+echo clang size: $CLANG_SIZE;
+echo clang libsize: $CLANG_LIBSIZE;
+
+echo emcc build time: $EMCC_BUILD_TIME;
+echo emcc data size: $EMCC_DATA_SIZE;
+echo emcc html size: $EMCC_HTML_SIZE;
+echo emcc js size: $EMCC_JS_SIZE;
+echo emcc wasm size: $EMCC_WASM_SIZE;
+
 make clean;
 
-#echo "timestamp,gcc_size,clang_size,gcc_libsize,clang_libsize,loc,lua_loc,gcc_build_time,clang_build_time" > build-stats.csv
 echo $TIMESTAMP,$GCC_SIZE,$CLANG_SIZE,$GCC_LIBSIZE,$CLANG_LIBSIZE,$EMCC_DATA_SIZE,$EMCC_HTML_SIZE,$EMCC_JS_SIZE,$EMCC_WASM_SIZE,$LOC,$LUA_LOC,$BUILD_TIME,$CLANG_BUILD_TIME,$EMCC_BUILD_TIME >> build-stats.csv
 
-#python3 graph_loc.py build-stats.csv loc 2>/dev/null;
-#python3 graph_loc.py build-stats.csv lua_loc 2>/dev/null;
+python3 graph_loc.py build-stats.csv LOC loc 2>/dev/null;
+python3 graph_loc.py build-stats.csv LOC lua_loc 2>/dev/null;
 #python3 graph_loc.py build-stats.csv loc lua_loc 2>/dev/null;
-#python3 graph_loc.py build-stats.csv gcc_build_time clang_build_time 2>/dev/null;
-#python3 graph_loc.py build-stats.csv gcc_size clang_size 2>/dev/null;
-#python3 graph_loc.py build-stats.csv gcc_libsize clang_libsize 2>/dev/null;
+python3 graph_loc.py build-stats.csv seconds gcc_build_time clang_build_time emcc_build_time 2>/dev/null;
+python3 graph_loc.py build-stats.csv bytes gcc_size clang_size 2>/dev/null;
+python3 graph_loc.py build-stats.csv bytes gcc_libsize clang_libsize 2>/dev/null;
 #python3 graph_loc.py build-stats.csv emcc_build_time 2>/dev/null;
-#python3 graph_loc.py build-stats.csv emcc_data_size 2>/dev/null;
-#python3 graph_loc.py build-stats.csv emcc_html_size 2>/dev/null;
-#python3 graph_loc.py build-stats.csv emcc_js_size 2>/dev/null;
-#python3 graph_loc.py build-stats.csv emcc_wasm_size 2>/dev/null;
+python3 graph_loc.py build-stats.csv bytes emcc_data_size 2>/dev/null;
+python3 graph_loc.py build-stats.csv bytes emcc_html_size 2>/dev/null;
+python3 graph_loc.py build-stats.csv bytes emcc_js_size 2>/dev/null;
+python3 graph_loc.py build-stats.csv bytes emcc_wasm_size 2>/dev/null;
 
 rm -rf time.txt time_clang.txt time_emcc.txt;
