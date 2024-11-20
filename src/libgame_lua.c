@@ -672,3 +672,28 @@ void libgame_lua_incr_current_turn(lua_State* L) {
     lua_getglobal(L, "IncrementCurrentTurn");
     lua_pcall(L, 0, 0, 0);
 }
+
+
+
+const int libgame_lua_get_move_seq_begin(lua_State* L, const int begin) {
+    if (!L) return -1;
+    int retval = -1;
+    lua_getglobal(L, "GetMoveSeqBegin");
+    lua_pushnumber(L, begin);
+    if (lua_pcall(L, 1, 1, 0) == 0) { retval = lua_tonumber(L, -1); }
+    lua_pop(L, 1);
+    return retval;
+}
+
+
+
+
+const int libgame_lua_get_move_seq_end(lua_State* L, const int begin) {
+    if (!L) return -1;
+    int retval = -1;
+    lua_getglobal(L, "GetMoveSeqEnd");
+    lua_pushnumber(L, begin);
+    if (lua_pcall(L, 1, 1, 0) == 0) { retval = lua_tonumber(L, -1); }
+    lua_pop(L, 1);
+    return retval;
+}

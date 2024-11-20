@@ -467,12 +467,7 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
 
 void libgame_process_turn_actions(gamestate* const g) {
     if (!g) return;
-    for (int i = 1; i <= libgame_lua_get_action_count(L); i++) {
-        //libgame_lua_set_gamestate_int(L, "CurrentAction", i);
-
-        libgame_process_turn_action(g, i);
-    }
-    //libgame_lua_set_gamestate_int(L, "CurrentAction", -1);
+    for (int i = 1; i <= libgame_lua_get_action_count(L); i++) { libgame_process_turn_action(g, i); }
     libgame_lua_clear_actions(L);
 }
 
@@ -828,6 +823,10 @@ void libgame_update_gamestate(gamestate* g) {
         g->processing_actions = false;
         g->player_input_received = false;
     }
+
+    // we are going to need to tie these methods together in a way where we can:
+    // 1. simul-process moves in sequence if they exist from N to M
+    // 2. incr-process actions in sequence if they exist from M to K
 
 
     // this method steps each entity action in sequence, which may be useful when resolving actions and effects, but for basic movement feels "excessive"

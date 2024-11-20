@@ -905,6 +905,22 @@ function IncrementCurrentTurn()
 	Gamestate.CurrentTurn = Gamestate.CurrentTurn + 1
 end
 
+function GetMoveSeqBegin(begin)
+	for i = begin, #Gamestate.Actions do
+		if Gamestate.Actions[i].type == ActionTypes.Move then
+			return i
+		end
+	end
+end
+
+function GetMoveSeqEnd(begin)
+	for i = begin, #Gamestate.Actions do
+		if Gamestate.Actions[i].type ~= ActionTypes.Move then
+			return i
+		end
+	end
+end
+
 --function DeserializeEntitiesFromString(str)
 --	PrintDebug("init.lua:543", "Deserializing entities from string: " .. str)
 -- {
