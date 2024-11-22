@@ -456,6 +456,7 @@ void libgame_process_turn_actions(gamestate* const g, const int begin, const int
         return;
     } else if (begin > end) {
         merror("libgame_process_turn_actions: begin is greater than end");
+        fprintf(stderr, "begin: %d, end: %d\n", begin, end);
         return;
     } else if (end > libgame_lua_get_action_count(L)) {
         merror("libgame_process_turn_actions: end is greater than action count");
@@ -463,7 +464,7 @@ void libgame_process_turn_actions(gamestate* const g, const int begin, const int
     }
 
     for (int i = begin; i <= end; i++) { libgame_process_turn_action(g, i); }
-    libgame_lua_clear_actions(L);
+    //libgame_lua_clear_actions(L);
 }
 
 
@@ -817,6 +818,9 @@ void libgame_update_gamestate(gamestate* g) {
 
         // so, the logic for handling whether or not we are dealing with a chunk of MOVES vs NONMOVES actions:
 
+        // 0. get the first action's type
+        // 1. if the first action is a MOVE, we are going to process all sequential MOVE actions
+        // ------
         // 1. get the beginning index of the first sequence of MOVES
         // 2. get the ending index of the first sequence of MOVES
         // 3. process the moves via libgame_process_turn(g, begin, end)
@@ -826,11 +830,42 @@ void libgame_update_gamestate(gamestate* g) {
 
         //libgame_process_turn(g);
 
-        libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
-        libgame_lua_clear_actions(L);
+        action_t first_action_type = libgame_lua_get_nth_action_type(L, 1);
+        if (first_action_type == ACTION_MOVE) {
+            int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
+            int begin = libgame_lua_get_move_seq_begin(L, current_action);
+            int end = libgame_lua_get_move_seq_end(L, current_action);
 
-        g->processing_actions = false;
-        g->player_input_received = false;
+            fprintf(stderr, "###current_action: %d\nbegin: %d\n###end: %d\n", current_action, begin, end);
+
+            //for (int i = 1; i <= libgame_lua_get_action_count(L); i++) {
+            //    if (libgame_lua_get_nth_action_type(L, i) == ACTION_MOVE) {
+            //        end = i;
+            //    } else {
+            //        break;
+            //    }
+            //}
+            libgame_process_turn_actions(g, begin, end);
+            libgame_lua_set_gamestate_int(L, "CurrentAction", end + 1);
+            if (libgame_lua_get_gamestate_int(L, "CurrentAction") > libgame_lua_get_action_count(L)) {
+                libgame_lua_clear_actions(L);
+                g->processing_actions = false;
+                g->player_input_received = false;
+            }
+        }
+        //else {
+        //    libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
+        //    libgame_lua_clear_actions(L);
+        //    g->processing_actions = false;
+        //    g->player_input_received = false;
+        //}
+
+
+        //libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
+        //libgame_lua_clear_actions(L);
+
+        //g->processing_actions = false;
+        //g->player_input_received = false;
     }
 
     // we are going to need to tie these methods together in a way where we can:

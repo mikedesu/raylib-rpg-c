@@ -915,10 +915,16 @@ end
 
 function GetMoveSeqEnd(begin)
 	for i = begin, #Gamestate.Actions do
+		print("Checking action " .. i .. " with type " .. Gamestate.Actions[i].type)
 		if Gamestate.Actions[i].type ~= ActionTypes.Move then
 			return i
 		end
 	end
+
+	-- if we get here, we are at the end of the sequence and should return the last index
+	-- print an error message
+	-- print("Error: GetMoveSeqEnd reached the end of the sequence")
+	return #Gamestate.Actions
 end
 
 --function DeserializeEntitiesFromString(str)
