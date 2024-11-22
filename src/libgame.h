@@ -63,8 +63,12 @@ void libgame_reset_entity_anim(gamestate* const g, entityid id);
 void libgame_initwindow(gamestate* const g);
 void libgame_initwithstate(gamestate* const state);
 void libgame_load_texture_from_disk(gamestate* const g, const int index, const int contexts, const int frames, const bool dodither, const char* path);
+
 void libgame_process_turn(gamestate* const g);
-void libgame_process_turn_actions(gamestate* const g);
+void libgame_process_turn_begin_end(gamestate* const g, const int begin, const int end);
+
+void libgame_process_turn_actions(gamestate* const g, const int begin, const int end);
+
 void libgame_test_enemy_placement(gamestate* const g);
 void libgame_update_smoothmove(gamestate* const g, const entityid id);
 void libgame_update_spritegroup_move(gamestate* const g, const entityid id, const int x, const int y);

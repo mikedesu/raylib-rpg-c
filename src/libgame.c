@@ -157,27 +157,6 @@ void libgame_handleinput(gamestate* const g) {
     if (IsKeyPressed(KEY_E)) libgame_test_enemy_placement(g);
 
 
-    //if (IsKeyPressed(KEY_O)) { libgame_incr_current_action_key(g); }
-    //if (IsKeyPressed(KEY_P)) {
-    //    libgame_process_turn_alt(g);
-    //const int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
-    //const int action_count = libgame_lua_get_action_count(L);
-    //if (action_count <= 0) {
-    //    merror("action count is 0");
-    //    return;
-    //} else if (current_action == -1) {
-    //    merror("current action is -1");
-    //    libgame_incr_current_action(g);
-    //    return;
-    //} else if (current_action > action_count) {
-    //    merror("current action is greater than action count");
-    //    libgame_lua_clear_actions(L);
-    //    libgame_incr_current_action(g);
-    //    return;
-    //}
-    //libgame_process_turn_action(g, current_action);
-    //libgame_incr_current_action(g);
-    //}
 
 
     libgame_handle_modeswitch(g);
@@ -465,9 +444,25 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
 
 
 
-void libgame_process_turn_actions(gamestate* const g) {
+void libgame_process_turn_actions(gamestate* const g, const int begin, const int end) {
+    //void libgame_process_turn_actions(gamestate* const g) {
     if (!g) return;
-    for (int i = 1; i <= libgame_lua_get_action_count(L); i++) { libgame_process_turn_action(g, i); }
+
+    if (begin < 0) {
+        merror("libgame_process_turn_actions: begin is negative");
+        return;
+    } else if (end < 0) {
+        merror("libgame_process_turn_actions: end is negative");
+        return;
+    } else if (begin > end) {
+        merror("libgame_process_turn_actions: begin is greater than end");
+        return;
+    } else if (end > libgame_lua_get_action_count(L)) {
+        merror("libgame_process_turn_actions: end is greater than action count");
+        return;
+    }
+
+    for (int i = begin; i <= end; i++) { libgame_process_turn_action(g, i); }
     libgame_lua_clear_actions(L);
 }
 
@@ -490,7 +485,7 @@ const char* libgame_get_str_from_dir(const direction_t dir) {
 
 
 void libgame_process_turn(gamestate* const g) {
-    if (g) libgame_process_turn_actions(g);
+    if (g) libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
     libgame_lua_clear_actions(L);
 }
 
@@ -819,7 +814,21 @@ void libgame_update_gamestate(gamestate* g) {
 
     // this is the og method with everyone moving simultaneously per turn
     if (g->processing_actions) {
-        libgame_process_turn(g);
+
+        // so, the logic for handling whether or not we are dealing with a chunk of MOVES vs NONMOVES actions:
+
+        // 1. get the beginning index of the first sequence of MOVES
+        // 2. get the ending index of the first sequence of MOVES
+        // 3. process the moves via libgame_process_turn(g, begin, end)
+        // 4. update the current action index to end+1
+        // 5. if current action is greater than the length of actions, we are at the end of the turn
+        // 6. otherwise, there might be NONMOVES and other MOVES to process
+
+        //libgame_process_turn(g);
+
+        libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
+        libgame_lua_clear_actions(L);
+
         g->processing_actions = false;
         g->player_input_received = false;
     }
