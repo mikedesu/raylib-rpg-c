@@ -636,7 +636,7 @@ function ProcessAction(index)
 	-- do nothing
 	--end
 	if index < 1 or index > #Gamestate.Actions then
-		--PrintDebug("init.lua:330", "Invalid action index " .. index)
+		PrintDebug("init.lua:~639", "Invalid action index " .. index)
 		return -1
 	end
 	local action = Gamestate.Actions[index]

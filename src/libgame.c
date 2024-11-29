@@ -861,6 +861,7 @@ void libgame_update_gamestate(gamestate* g) {
                 libgame_lua_clear_actions(L);
                 g->processing_actions = false;
                 g->player_input_received = false;
+                libgame_lua_set_gamestate_int(L, "CurrentAction", 1);
             }
         }
         //else {
