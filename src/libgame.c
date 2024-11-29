@@ -230,6 +230,16 @@ void libgame_update_spritegroup_move(gamestate* const g, const entityid id, cons
     if (!sg) return;
     sg->move_x += x;
     sg->move_y += y;
+
+    // set the spritegroup context based on the direction
+    const direction_t dir = libgame_get_dir_from_xy(x, y);
+    libgame_update_spritegroup(g, id, SPECIFIER_NONE, dir);
+
+    // set the sprite animation based on entity race
+    const race_t race = libgame_lua_get_entity_int(L, id, "Race");
+    int spritegroup_anim_id = SPRITEGROUP_ANIM_HUMAN_WALK;
+    if (race == RACE_ORC) { spritegroup_anim_id = SPRITEGROUP_ANIM_ORC_WALK; }
+    libgame_entity_anim_set(g, id, spritegroup_anim_id);
 }
 
 
