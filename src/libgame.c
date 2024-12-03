@@ -741,50 +741,50 @@ void libgame_reset_entities_anim(gamestate* const g) {
 
 
 
-void libgame_update_entity_damaged_anim(gamestate* const g, const int i) {
-    if (!g) return;
-    const entityid id = libgame_lua_get_nth_entity(L, i);
-    const int was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
-    const race_t race = libgame_lua_get_entity_int(L, id, "race");
-    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    int index = -1;
-    if (was_damaged && sg) {
-        //int old_index = sg->current;
-        if (race == RACE_HUMAN) {
-            //msuccess("human was damaged");
-            index = SPRITEGROUP_ANIM_HUMAN_DMG;
-            //if (index == old_index) {
-            if (index == sg->current) {
-                sprite* s = spritegroup_get(sg, sg->current);
-                if (s && s->num_loops >= 1) {
-                    index = SPRITEGROUP_ANIM_HUMAN_IDLE;
-                    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
-                    s->num_loops = 0;
-                }
-            }
-            libgame_entity_anim_set(g, id, index);
-        } else if (race == RACE_ORC) {
-            index = SPRITEGROUP_ANIM_ORC_DMG;
-            if (index == sg->current) {
-                sprite* s = spritegroup_get(sg, sg->current);
-                if (s && s->num_loops >= 1) {
-                    index = SPRITEGROUP_ANIM_ORC_IDLE;
-                    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
-                    s->num_loops = 0;
-                }
-            }
-            libgame_entity_anim_set(g, id, index);
-        }
-    }
-}
+//void libgame_update_entity_damaged_anim(gamestate* const g, const int i) {
+//    if (!g) return;
+//    const entityid id = libgame_lua_get_nth_entity(L, i);
+//    const int was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
+//    const race_t race = libgame_lua_get_entity_int(L, id, "race");
+//    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+//    int index = -1;
+//    if (was_damaged && sg) {
+//        //int old_index = sg->current;
+//        if (race == RACE_HUMAN) {
+//            //msuccess("human was damaged");
+//            index = SPRITEGROUP_ANIM_HUMAN_DMG;
+//            //if (index == old_index) {
+//            if (index == sg->current) {
+//                sprite* s = spritegroup_get(sg, sg->current);
+//                if (s && s->num_loops >= 1) {
+//                    index = SPRITEGROUP_ANIM_HUMAN_IDLE;
+//                    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
+//                    s->num_loops = 0;
+//                }
+//            }
+//            libgame_entity_anim_set(g, id, index);
+//        } else if (race == RACE_ORC) {
+//            index = SPRITEGROUP_ANIM_ORC_DMG;
+//            if (index == sg->current) {
+//                sprite* s = spritegroup_get(sg, sg->current);
+//                if (s && s->num_loops >= 1) {
+//                    index = SPRITEGROUP_ANIM_ORC_IDLE;
+//                    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
+//                    s->num_loops = 0;
+//                }
+//            }
+//            libgame_entity_anim_set(g, id, index);
+//        }
+//    }
+//}
 
 
 
 
-void libgame_update_entities_damaged_anim(gamestate* const g) {
-    if (!g) return;
-    for (int i = 0; i < libgame_lua_get_num_entities(L); i++) libgame_update_entity_damaged_anim(g, i + 1);
-}
+//void libgame_update_entities_damaged_anim(gamestate* const g) {
+//    if (!g) return;
+//    for (int i = 0; i < libgame_lua_get_num_entities(L); i++) libgame_update_entity_damaged_anim(g, i + 1);
+//}
 
 
 
@@ -797,7 +797,7 @@ void libgame_update_gamestate(gamestate* g) {
     // need to clean this up a bit but works in general right now for what we want
     // needs extensibility to handle all animation types
     // in essence some animations we only want to loop once, then reset to a default or previous
-    libgame_update_entities_damaged_anim(g);
+    //libgame_update_entities_damaged_anim(g);
     libgame_reset_entities_anim(g);
     libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
     libgame_do_camera_lock_on(g);
@@ -810,10 +810,6 @@ void libgame_update_gamestate(gamestate* g) {
     // i plan on using the lock and lock timer to control an ebb-and-flow
     // so that it doesnt appear like enemies move immediately as the player
     // does
-
-
-
-
     if (g->player_input_received && !g->processing_actions) {
         libgame_handle_npcs_turn_lua(g);
         // this is where we want to process the turn
@@ -821,13 +817,9 @@ void libgame_update_gamestate(gamestate* g) {
         g->processing_actions = true;
         //g->player_input_received = false;
     }
-
-
     // this is the og method with everyone moving simultaneously per turn
     if (g->processing_actions) {
-
         // so, the logic for handling whether or not we are dealing with a chunk of MOVES vs NONMOVES actions:
-
         // 0. get the first action's type
         // 1. if the first action is a MOVE, we are going to process all sequential MOVE actions
         // ------
@@ -837,53 +829,35 @@ void libgame_update_gamestate(gamestate* g) {
         // 4. update the current action index to end+1
         // 5. if current action is greater than the length of actions, we are at the end of the turn
         // 6. otherwise, there might be NONMOVES and other MOVES to process
-
-        //libgame_process_turn(g);
-
-        action_t first_action_type = libgame_lua_get_nth_action_type(L, 1);
-        if (first_action_type == ACTION_MOVE) {
-            int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
-            int begin = libgame_lua_get_move_seq_begin(L, current_action);
-            int end = libgame_lua_get_move_seq_end(L, current_action);
-
-            fprintf(stderr, "###current_action: %d\nbegin: %d\n###end: %d\n", current_action, begin, end);
-
-            //for (int i = 1; i <= libgame_lua_get_action_count(L); i++) {
-            //    if (libgame_lua_get_nth_action_type(L, i) == ACTION_MOVE) {
-            //        end = i;
-            //    } else {
-            //        break;
-            //    }
-            //}
-            libgame_process_turn_actions(g, begin, end);
-            libgame_lua_set_gamestate_int(L, "CurrentAction", end + 1);
-            if (libgame_lua_get_gamestate_int(L, "CurrentAction") > libgame_lua_get_action_count(L)) {
-                libgame_lua_clear_actions(L);
-                g->processing_actions = false;
-                g->player_input_received = false;
-                libgame_lua_set_gamestate_int(L, "CurrentAction", 1);
-            }
-        }
+        libgame_process_turn(g);
+        //action_t first_action_type = libgame_lua_get_nth_action_type(L, 1);
+        //if (first_action_type == ACTION_MOVE) {
+        //    int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
+        //    int begin = libgame_lua_get_move_seq_begin(L, current_action);
+        //    int end = libgame_lua_get_move_seq_end(L, current_action);
+        //    libgame_process_turn_actions(g, begin, end);
+        //    libgame_lua_set_gamestate_int(L, "CurrentAction", end + 1);
+        //    if (libgame_lua_get_gamestate_int(L, "CurrentAction") > libgame_lua_get_action_count(L)) {
+        //        libgame_lua_clear_actions(L);
+        //        g->processing_actions = false;
+        //        g->player_input_received = false;
+        //        libgame_lua_set_gamestate_int(L, "CurrentAction", 1);
+        //    }
+        //}
         //else {
         //    libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
         //    libgame_lua_clear_actions(L);
         //    g->processing_actions = false;
         //    g->player_input_received = false;
         //}
-
-
         //libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
         //libgame_lua_clear_actions(L);
-
-        //g->processing_actions = false;
-        //g->player_input_received = false;
+        g->processing_actions = false;
+        g->player_input_received = false;
     }
-
     // we are going to need to tie these methods together in a way where we can:
     // 1. simul-process moves in sequence if they exist from N to M
     // 2. incr-process actions in sequence if they exist from M to K
-
-
     // this method steps each entity action in sequence, which may be useful when resolving actions and effects, but for basic movement feels "excessive"
     // shiren, for example, appears to perform all move actions simultaneously, and then incrementing remaining actions
     // if the player does a non-move action first, it increments that action, simul-does any sequence of moves, and then resolves actions

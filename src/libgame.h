@@ -9,6 +9,8 @@
 
 
 //void libgame_drawtorchgroup(gamestate* g);
+//void libgame_update_entities_damaged_anim(gamestate* const g);
+//void libgame_update_entity_damaged_anim(gamestate* const g, const int i);
 //const entityid libgame_create_buckler_lua(gamestate* g, const char* name, const int x, const int y);
 //const bool libgame_entity_move_lua(gamestate* g, entityid id, int x, int y);
 //void libgame_load_textures_from_data(gamestate* g);
@@ -79,8 +81,6 @@ void libgame_update_spritegroup_by_lastmove(gamestate* const g, const entityid e
 const int libgame_get_x_from_dir(const direction_t dir);
 const int libgame_get_y_from_dir(const direction_t dir);
 const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
-void libgame_update_entities_damaged_anim(gamestate* const g);
-void libgame_update_entity_damaged_anim(gamestate* const g, const int i);
 const char* libgame_get_str_from_dir(const direction_t dir);
 void libgame_update_spritegroup_current(gamestate* const g, entityid id, int index);
 void libgame_handle_player_input_attack_key(gamestate* const g);
