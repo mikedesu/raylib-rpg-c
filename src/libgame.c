@@ -567,7 +567,7 @@ void libgame_initwindow(gamestate* const g) {
     SetWindowMonitor(1);
     SetWindowPosition(libgame_lua_get_gamestate_int(L, "WindowPosX"), libgame_lua_get_gamestate_int(L, "WindowPosY"));
     SetTargetFPS(DEFAULT_TARGET_FPS);
-    SetExitKey(KEY_Q);
+    SetExitKey(KEY_ESCAPE);
     g->windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth"), g->windowheight = libgame_lua_get_gamestate_int(L, "WindowHeight");
 }
 
