@@ -60,6 +60,26 @@ ActionTypes = {
 	Count = 6,
 }
 
+ActionResultType = {
+	MoveSuccess = 1,
+	MoveFailBlockedByEntity = 2,
+	MoveFailBlockedByWall = 3,
+	MoveFailOutOfBounds = 4,
+	MoveFailNoTile = 5,
+	MoveFailUnknownEntity = 6,
+	AttackSuccess = 7,
+	AttackFailOutOfBounds = 8,
+	AttackFailNoTile = 9,
+	PickupSuccess = 10,
+	PickupFailNoTile = 11,
+	PickupFailNoEntities = 12,
+	BlockSuccess = 13,
+	BlockFailUnknownEntity = 14,
+	NoneSuccess = 15,
+	NoneFail = 16,
+	--BlockFailNoTile = 14,
+}
+
 DirectionTypes = {
 	None = 0,
 	North = 1,
@@ -137,6 +157,7 @@ HeroId = -1
 --LastXDir = 0
 --LastYDir = 0
 Actions = {}
+ActionResults = {}
 DungeonFloor = {}
 Entities = {}
 
@@ -318,26 +339,68 @@ function GetDirectionFromXY(xdir, ydir)
 	return DirectionTypes.None
 end
 
+function ActionResult()
+	-- returns a new table with keys informing about the action result
+	return {
+		success = false,
+		actor_id = -1,
+		target_id = -1,
+		xdir = -1,
+		ydir = -1,
+		action_type = ActionTypes.None,
+		action_result = ActionResultType.Success,
+		--target_was_damaged = 0,
+		--target_block_successful = 0,
+		--target_is_blocking = 0,
+		--target_direction = DirectionTypes.None,
+	}
+end
+
 function EntityMove(id, xdir, ydir)
 	local entity = GetEntityById(id)
+	local result = ActionResult()
 	if entity then
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
 		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
-			return false
+			result.success = false
+			result.actor_id = id
+			result.xdir = xdir
+			result.ydir = ydir
+			result.action_type = ActionTypes.Move
+			result.action_result = ActionResultType.MoveFailOutOfBounds
+			return result
 		end
 		if GetTileType(newx, newy) == TileTypes.None then
 			PrintDebug("init.lua:330", "Tile is None")
-			return false
+			result.success = false
+			result.actor_id = id
+			result.xdir = xdir
+			result.ydir = ydir
+			result.action_type = ActionTypes.Move
+			result.action_result = ActionResultType.MoveFailNoTile
+			return result
 		end
 		-- can't move into stone walls
 		if GetTileType(newx, newy) >= TileTypes.Stonewall00 and GetTileType(newx, newy) <= TileTypes.Stonewall14 then
 			PrintDebug("init.lua:335", "Tile is Stonewall")
-			return false
+			result.success = false
+			result.actor_id = id
+			result.xdir = xdir
+			result.ydir = ydir
+			result.action_type = ActionTypes.Move
+			result.action_result = ActionResultType.MoveFailBlockedByWall
+			return result
 		end
 		if TileIsOccupiedByPlayer(newx, newy) or TileIsOccupiedByNPC(newx, newy) then
 			PrintDebug("init.lua:340", "Tile is occupied by player or NPC")
-			return false
+			result.success = false
+			result.actor_id = id
+			result.xdir = xdir
+			result.ydir = ydir
+			result.action_type = ActionTypes.Move
+			result.action_result = ActionResultType.MoveFailBlockedByEntity
+			return result
 		end
 		RemoveEntityFromTile(entity.id, entity.x, entity.y)
 		AddEntityToTile(entity.id, newx, newy)
@@ -352,32 +415,68 @@ function EntityMove(id, xdir, ydir)
 			new_direction = old_direction
 		end
 		entity.direction = new_direction
-		return true
+
+		result.success = true
+		result.actor_id = id
+		result.xdir = xdir
+		result.ydir = ydir
+		result.action_type = ActionTypes.Move
+		result.action_result = ActionResultType.Success
+		return result
 	end
 
 	PrintDebug("init.lua:358", "Entity with id " .. id .. " not found")
-	return false
+
+	result.success = false
+	result.actor_id = id
+	result.xdir = xdir
+	result.ydir = ydir
+	result.action_type = ActionTypes.Move
+	result.action_result = ActionResultType.MoveFailUnknownEntity
+	return result
 end
 
 function EntityAttack(id, xdir, ydir)
 	local entity = GetEntityById(id)
+	local result = ActionResult()
 	if entity then
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
 		local tiletype = GetTileType(newx, newy)
+		-- attack fail out of bounds
 		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
-			return false
+			result.success = false
+			result.actor_id = id
+			result.xdir = xdir
+			result.ydir = ydir
+			result.action_type = ActionTypes.Attack
+			result.action_result = ActionResultType.AttackFailOutOfBounds
+			return result
 		end
+		-- attack fail no tile
 		if tiletype == TileTypes.None then
-			return false
+			result.success = false
+			result.actor_id = id
+			result.xdir = xdir
+			result.ydir = ydir
+			result.action_type = ActionTypes.Attack
+			result.action_result = ActionResultType.AttackFailNoTile
+			return result
 		end
-		if tiletype == TileTypes.Stonewall00 then
-			return false
-		end
-		-- if the tile is empty of entities, return true
+		-- attack fail blocked by wall
+		--if tiletype == TileTypes.Stonewall00 then
+		--	return false
+		--end
+		-- attack success but no entities at target
 		if GetNumEntitiesAt(newx, newy) == 0 then
 			print("No entities at " .. newx .. ", " .. newy)
-			return true
+			result.success = true
+			result.actor_id = id
+			result.xdir = xdir
+			result.ydir = ydir
+			result.action_type = ActionTypes.Attack
+			result.action_result = ActionResultType.AttackSuccess
+			return result
 		end
 		-- eventually i will return here to write code to process 'damage'
 		-- we can have a flag on the player and NPCs to indicate when they received damage in the previous turn
@@ -389,17 +488,31 @@ function EntityAttack(id, xdir, ydir)
 			-- if the target entity is blocking, set the target block to be successful
 			if target_entity.is_blocking == 1 then
 				print("Target entity is blocking")
-				target_entity.was_damaged = 0
-				target_entity.block_successful = 1
-				target_entity.is_blocking = 0
-				return true
+				--target_entity.was_damaged = 0
+				--target_entity.block_successful = 1
+				--target_entity.is_blocking = 0
+				result.success = true
+				result.actor_id = id
+				result.target_id = target_id
+				result.xdir = xdir
+				result.ydir = ydir
+				result.action_type = ActionTypes.Attack
+				result.action_result = ActionResultType.AttackSuccess
+				return result
 			else
 				print("Target entity is not blocking")
 				print("Target entity is at " .. target_entity.x .. ", " .. target_entity.y)
-				target_entity.was_damaged = 1
-				target_entity.block_successful = 0
-				target_entity.is_blocking = 0
-				return true
+				--target_entity.was_damaged = 1
+				--target_entity.block_successful = 0
+				--target_entity.is_blocking = 0
+				result.success = true
+				result.actor_id = id
+				result.target_id = target_id
+				result.xdir = xdir
+				result.ydir = ydir
+				result.action_type = ActionTypes.Attack
+				result.action_result = ActionResultType.AttackSuccess
+				return result
 			end
 		end
 
@@ -408,19 +521,39 @@ function EntityAttack(id, xdir, ydir)
 		target_entity = GetEntityById(target_id)
 		if target_entity then
 			if target_entity.is_blocking == 1 then
-				target_entity.was_damaged = 0
-				target_entity.block_successful = 1
-				target_entity.is_blocking = 0
-				return true
+				--target_entity.was_damaged = 0
+				--target_entity.block_successful = 1
+				--target_entity.is_blocking = 0
+				result.success = true
+				result.actor_id = id
+				result.target_id = target_id
+				result.xdir = xdir
+				result.ydir = ydir
+				result.action_type = ActionTypes.Attack
+				result.action_result = ActionResultType.AttackSuccess
+				return result
 			else
-				target_entity.was_damaged = 1
-				target_entity.block_successful = 0
-				target_entity.is_blocking = 0
-				return true
+				--target_entity.was_damaged = 1
+				--target_entity.block_successful = 0
+				--target_entity.is_blocking = 0
+				result.success = true
+				result.actor_id = id
+				result.target_id = target_id
+				result.xdir = xdir
+				result.ydir = ydir
+				result.action_type = ActionTypes.Attack
+				result.action_result = ActionResultType.AttackSuccess
+				return result
 			end
 		end
 	end
-	return false
+	result.success = false
+	result.actor_id = id
+	result.xdir = xdir
+	result.ydir = ydir
+	result.action_type = ActionTypes.Attack
+	result.action_result = ActionResultType.AttackFailUnknownEntity
+	return result
 end
 
 function EntityEquipShield(entity_id, shield_id)
@@ -448,40 +581,57 @@ end
 
 function EntityPickup(id)
 	local entity = GetEntityById(id)
+	local result = ActionResult()
 	if entity then
 		local tiletype = GetTileType(entity.x, entity.y)
 		if tiletype == TileTypes.None then
-			return false
+			result.success = false
+			result.actor_id = id
+			result.action_type = ActionTypes.Pickup
+			result.action_result = ActionResultType.PickupFailNoTile
+			return result
 		end
 		if tiletype == TileTypes.Stonewall00 then
-			return false
+			result.success = false
+			result.actor_id = id
+			result.action_type = ActionTypes.Pickup
+			result.action_result = ActionResultType.PickupFailNoTile
+			return result
 		end
 		-- if the tile is empty of entities, return false
 		if GetNumEntitiesAt(entity.x, entity.y) == 0 then
-			return false
+			result.success = false
+			result.actor_id = id
+			result.action_type = ActionTypes.Pickup
+			result.action_result = ActionResultType.PickupFailNoEntities
+			return result
 		end
 
 		-- lets handle shields first
 		if TileIsOccupiedByType(EntityTypes.Shield, entity.x, entity.y) then
 			local target_id = GetFirstEntityTypeAt(EntityTypes.Shield, entity.x, entity.y)
-
 			-- remove the shield from the tile
 			RemoveEntityFromTile(target_id, entity.x, entity.y)
-
 			-- add the shield to the player's inventory
 			table.insert(entity.inventory, target_id)
-
 			-- mark the shield as being in the player's inventory
 			SetEntityAttr(target_id, "x", -1)
 			SetEntityAttr(target_id, "y", -1)
-
 			-- equip the shield
-			EntityEquipShield(entity.id, target_id)
-
-			return true
+			--EntityEquipShield(entity.id, target_id)
+			result.success = true
+			result.actor_id = id
+			result.target_id = target_id
+			result.action_type = ActionTypes.Pickup
+			result.action_result = ActionResultType.PickupSuccess
+			return result
 		end
 	end
-	return false
+	result.success = false
+	result.actor_id = id
+	result.action_type = ActionTypes.Pickup
+	result.action_result = ActionResultType.PickupFailNoEntities
+	return result
 end
 
 function GetEntityShield(entity_id)
@@ -627,13 +777,22 @@ end
 function EntityBlock(id)
 	-- get the entity
 	local entity = GetEntityById(id)
+	local result = ActionResult()
 	-- if the entity doesnt exist, return
 	if not entity then
-		return false
+		result.success = false
+		result.actor_id = id
+		result.action_type = ActionTypes.Block
+		result.action_result = ActionResultType.BlockFailUnknownEntity
+		return result
 	end
 	-- set the entity's blocking flag
 	entity.is_blocking = 1
-	return true
+	result.success = true
+	result.actor_id = id
+	result.action_type = ActionTypes.Block
+	result.action_result = ActionResultType.BlockSuccess
+	return result
 end
 
 function ProcessAction(index)
@@ -645,10 +804,14 @@ function ProcessAction(index)
 		return -1
 	end
 	local action = Gamestate.Actions[index]
-	local result = false
+	local result = ActionResult()
 	--PrintDebug("init.lua:335", "Processing action type " .. action.type .. " for entity with id " .. action.id)
 	if action.type == ActionTypes.None then
-		result = true
+		result.success = true
+		result.actor_id = action.id
+		result.action_type = ActionTypes.None
+		result.action_result = ActionResultType.NoneSuccess
+		return result
 	elseif action.type == ActionTypes.Move then
 		result = EntityMove(action.id, action.x, action.y)
 	elseif action.type == ActionTypes.Attack then
@@ -658,7 +821,21 @@ function ProcessAction(index)
 	elseif action.type == ActionTypes.Block then
 		result = EntityBlock(action.id)
 	end
-	if result == false then
+
+	ActionResults[index] = result
+
+	if
+		result.action_result == ActionResultType.MoveFailBlockedByEntity
+		or result.action_result == ActionResultType.MoveFailBlockedByWall
+		or result.action_result == ActionResultType.MoveFailOutOfBounds
+		or result.action_result == ActionResultType.MoveFailNoTile
+		or result.action_result == ActionResultType.MoveFailUnknownEntity
+		or result.action_result == ActionResultType.AttackFailOutOfBounds
+		or result.action_result == ActionResultType.AttackFailNoTile
+		or result.action_result == ActionResultType.PickupFailNoTile
+		or result.action_result == ActionResultType.PickupFailNoEntities
+		or result.action_result == ActionResultType.BlockFailUnknownEntity
+	then
 		return -1
 	end
 	return action.id

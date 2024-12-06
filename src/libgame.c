@@ -138,18 +138,17 @@ const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir) {
 
 
 
-void libgame_process_turn_alt(gamestate* const g) {
-    const int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
-    const int action_count = libgame_lua_get_action_count(L);
-    if (action_count <= 0) {
-        merror("action count is 0");
-        g->player_input_received = false;
-        return;
-    }
-
-    libgame_process_turn_action(g, current_action);
-    libgame_incr_current_action(g);
-}
+//void libgame_process_turn_alt(gamestate* const g) {
+//    const int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
+//    const int action_count = libgame_lua_get_action_count(L);
+//    if (action_count <= 0) {
+//        merror("action count is 0");
+//        g->player_input_received = false;
+//        return;
+//    }
+//    libgame_process_turn_action(g, current_action);
+//    libgame_incr_current_action(g);
+//}
 
 
 
@@ -530,15 +529,23 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
         return;
     }
 
-    const int x = libgame_lua_get_nth_action_x(L, i), y = libgame_lua_get_nth_action_y(L, i);
+    const int x = libgame_lua_get_nth_action_x(L, i);
+    const int y = libgame_lua_get_nth_action_y(L, i);
 
-    if (x < 0 || y < 0) {
-        merror("libgame_process_turn_action: x or y is negative");
+    if (x < 0) {
+        merror("libgame_process_turn_action: x is negative");
+
+        return;
+    }
+
+    if (y < 0) {
+        merror("libgame_process_turn_action: y is negative");
         return;
     }
 
     // process the action
     const int result_id = libgame_lua_process_action(L, i);
+
     // depending on the action result depends on how we update sprite animations
     if (result_id == -1) {
         mwarning("libgame_process_turn_action: result_id is -1");
