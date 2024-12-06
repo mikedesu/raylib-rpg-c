@@ -810,51 +810,59 @@ void libgame_update_gamestate(gamestate* g) {
     // i plan on using the lock and lock timer to control an ebb-and-flow
     // so that it doesnt appear like enemies move immediately as the player
     // does
-    if (g->player_input_received && !g->processing_actions) {
+    //if (g->player_input_received && !g->processing_actions) {
+    if (g->player_input_received) { //&& !g->processing_actions) {
         libgame_handle_npcs_turn_lua(g);
         // this is where we want to process the turn
         // we want to do this in a lock-step fashion so that it is only called once every N frames or so
-        g->processing_actions = true;
+        //g->processing_actions = true;
         //g->player_input_received = false;
-    }
-    // this is the og method with everyone moving simultaneously per turn
-    if (g->processing_actions) {
-        // so, the logic for handling whether or not we are dealing with a chunk of MOVES vs NONMOVES actions:
-        // 0. get the first action's type
-        // 1. if the first action is a MOVE, we are going to process all sequential MOVE actions
-        // ------
-        // 1. get the beginning index of the first sequence of MOVES
-        // 2. get the ending index of the first sequence of MOVES
-        // 3. process the moves via libgame_process_turn(g, begin, end)
-        // 4. update the current action index to end+1
-        // 5. if current action is greater than the length of actions, we are at the end of the turn
-        // 6. otherwise, there might be NONMOVES and other MOVES to process
         libgame_process_turn(g);
-        //action_t first_action_type = libgame_lua_get_nth_action_type(L, 1);
-        //if (first_action_type == ACTION_MOVE) {
-        //    int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
-        //    int begin = libgame_lua_get_move_seq_begin(L, current_action);
-        //    int end = libgame_lua_get_move_seq_end(L, current_action);
-        //    libgame_process_turn_actions(g, begin, end);
-        //    libgame_lua_set_gamestate_int(L, "CurrentAction", end + 1);
-        //    if (libgame_lua_get_gamestate_int(L, "CurrentAction") > libgame_lua_get_action_count(L)) {
-        //        libgame_lua_clear_actions(L);
-        //        g->processing_actions = false;
-        //        g->player_input_received = false;
-        //        libgame_lua_set_gamestate_int(L, "CurrentAction", 1);
-        //    }
-        //}
-        //else {
-        //    libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
-        //    libgame_lua_clear_actions(L);
-        //    g->processing_actions = false;
-        //    g->player_input_received = false;
-        //}
-        //libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
-        //libgame_lua_clear_actions(L);
-        g->processing_actions = false;
+        //g->processing_actions = false;
         g->player_input_received = false;
     }
+    // this is the og method with everyone moving simultaneously per turn
+    //if (g->processing_actions) {
+    // so, the logic for handling whether or not we are dealing with a chunk of MOVES vs NONMOVES actions:
+    // 0. get the first action's type
+    // 1. if the first action is a MOVE, we are going to process all sequential MOVE actions
+    // ------
+    // 1. get the beginning index of the first sequence of MOVES
+    // 2. get the ending index of the first sequence of MOVES
+    // 3. process the moves via libgame_process_turn(g, begin, end)
+    // 4. update the current action index to end+1
+    // 5. if current action is greater than the length of actions, we are at the end of the turn
+    // 6. otherwise, there might be NONMOVES and other MOVES to process
+    //libgame_process_turn(g);
+
+
+
+
+    //action_t first_action_type = libgame_lua_get_nth_action_type(L, 1);
+    //if (first_action_type == ACTION_MOVE) {
+    //    int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
+    //    int begin = libgame_lua_get_move_seq_begin(L, current_action);
+    //    int end = libgame_lua_get_move_seq_end(L, current_action);
+    //    libgame_process_turn_actions(g, begin, end);
+    //    libgame_lua_set_gamestate_int(L, "CurrentAction", end + 1);
+    //    if (libgame_lua_get_gamestate_int(L, "CurrentAction") > libgame_lua_get_action_count(L)) {
+    //        libgame_lua_clear_actions(L);
+    //        g->processing_actions = false;
+    //        g->player_input_received = false;
+    //        libgame_lua_set_gamestate_int(L, "CurrentAction", 1);
+    //    }
+    //}
+    //else {
+    //    libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
+    //    libgame_lua_clear_actions(L);
+    //    g->processing_actions = false;
+    //    g->player_input_received = false;
+    //}
+    //libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
+    //libgame_lua_clear_actions(L);
+    //g->processing_actions = false;
+    //g->player_input_received = false;
+    //}
     // we are going to need to tie these methods together in a way where we can:
     // 1. simul-process moves in sequence if they exist from N to M
     // 2. incr-process actions in sequence if they exist from M to K
