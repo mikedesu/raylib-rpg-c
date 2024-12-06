@@ -95,8 +95,11 @@ void libgame_load_textures_from_disk(gamestate* const g);
 void libgame_calc_debugpanel_size(gamestate* const g);
 void libgame_closeshared(gamestate* const g);
 void libgame_draw_debug_panel(gamestate* const g);
+
+void libgame_draw_company_scene(gamestate* const g);
 void libgame_draw_title_scene(gamestate* const g);
 void libgame_draw_gameplayscene(gamestate* const g);
+
 void libgame_draw_fade(const gamestate* const g);
 void libgame_drawgrid(gamestate* const g);
 void libgame_draw_dungeonfloor(gamestate* const g);

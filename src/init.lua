@@ -327,13 +327,16 @@ function EntityMove(id, xdir, ydir)
 			return false
 		end
 		if GetTileType(newx, newy) == TileTypes.None then
+			PrintDebug("init.lua:330", "Tile is None")
 			return false
 		end
 		-- can't move into stone walls
 		if GetTileType(newx, newy) >= TileTypes.Stonewall00 and GetTileType(newx, newy) <= TileTypes.Stonewall14 then
+			PrintDebug("init.lua:335", "Tile is Stonewall")
 			return false
 		end
 		if TileIsOccupiedByPlayer(newx, newy) or TileIsOccupiedByNPC(newx, newy) then
+			PrintDebug("init.lua:340", "Tile is occupied by player or NPC")
 			return false
 		end
 		RemoveEntityFromTile(entity.id, entity.x, entity.y)
@@ -351,6 +354,8 @@ function EntityMove(id, xdir, ydir)
 		entity.direction = new_direction
 		return true
 	end
+
+	PrintDebug("init.lua:358", "Entity with id " .. id .. " not found")
 	return false
 end
 

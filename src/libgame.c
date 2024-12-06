@@ -94,9 +94,9 @@ void libgame_test_enemy_placement(gamestate* const g) {
     if (hero_id == -1) return;
     const int x = libgame_lua_get_entity_int(L, hero_id, "x") + 1, y = libgame_lua_get_entity_int(L, hero_id, "y");
     if (libgame_lua_tile_is_occupied_by_npc(L, x, y))
-        merror("test_enemy_placement: tile is occupied by npc");
+        mwarning("test_enemy_placement: tile is occupied by npc");
     else if (libgame_create_orc_lua(g, "orc", x, y) == -1)
-        merror("test_enemy_placement: failed to create orc");
+        mwarning("test_enemy_placement: failed to create orc");
 }
 
 
@@ -416,7 +416,7 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
     const int result_id = libgame_lua_process_action(L, i);
     // depending on the action result depends on how we update sprite animations
     if (result_id == -1) {
-        merror("libgame_process_turn_action: result_id is -1");
+        mwarning("libgame_process_turn_action: result_id is -1");
         libgame_update_spritegroup(g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
         return;
     }
@@ -741,63 +741,11 @@ void libgame_reset_entities_anim(gamestate* const g) {
 
 
 
-//void libgame_update_entity_damaged_anim(gamestate* const g, const int i) {
-//    if (!g) return;
-//    const entityid id = libgame_lua_get_nth_entity(L, i);
-//    const int was_damaged = libgame_lua_get_entity_int(L, id, "was_damaged");
-//    const race_t race = libgame_lua_get_entity_int(L, id, "race");
-//    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-//    int index = -1;
-//    if (was_damaged && sg) {
-//        //int old_index = sg->current;
-//        if (race == RACE_HUMAN) {
-//            //msuccess("human was damaged");
-//            index = SPRITEGROUP_ANIM_HUMAN_DMG;
-//            //if (index == old_index) {
-//            if (index == sg->current) {
-//                sprite* s = spritegroup_get(sg, sg->current);
-//                if (s && s->num_loops >= 1) {
-//                    index = SPRITEGROUP_ANIM_HUMAN_IDLE;
-//                    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
-//                    s->num_loops = 0;
-//                }
-//            }
-//            libgame_entity_anim_set(g, id, index);
-//        } else if (race == RACE_ORC) {
-//            index = SPRITEGROUP_ANIM_ORC_DMG;
-//            if (index == sg->current) {
-//                sprite* s = spritegroup_get(sg, sg->current);
-//                if (s && s->num_loops >= 1) {
-//                    index = SPRITEGROUP_ANIM_ORC_IDLE;
-//                    libgame_lua_set_entity_int(L, id, "was_damaged", 0);
-//                    s->num_loops = 0;
-//                }
-//            }
-//            libgame_entity_anim_set(g, id, index);
-//        }
-//    }
-//}
-
-
-
-
-//void libgame_update_entities_damaged_anim(gamestate* const g) {
-//    if (!g) return;
-//    for (int i = 0; i < libgame_lua_get_num_entities(L); i++) libgame_update_entity_damaged_anim(g, i + 1);
-//}
-
-
-
-
 void libgame_update_gamestate(gamestate* g) {
     if (!g) return;
     //UpdateMusicStream(test_music);
     libgame_update_debug_panel_buffer(g);
     //setdebugpanelcenter(g);
-    // need to clean this up a bit but works in general right now for what we want
-    // needs extensibility to handle all animation types
-    // in essence some animations we only want to loop once, then reset to a default or previous
-    //libgame_update_entities_damaged_anim(g);
     libgame_reset_entities_anim(g);
     libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
     libgame_do_camera_lock_on(g);
@@ -807,82 +755,13 @@ void libgame_update_gamestate(gamestate* g) {
     // we will need to eventually disable player input during smooth moving
     // update smooth move for NPCs and other entities
     libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
-    // i plan on using the lock and lock timer to control an ebb-and-flow
-    // so that it doesnt appear like enemies move immediately as the player
-    // does
-    //if (g->player_input_received && !g->processing_actions) {
     if (g->player_input_received) { //&& !g->processing_actions) {
         libgame_handle_npcs_turn_lua(g);
         // this is where we want to process the turn
         // we want to do this in a lock-step fashion so that it is only called once every N frames or so
-        //g->processing_actions = true;
-        //g->player_input_received = false;
         libgame_process_turn(g);
-        //g->processing_actions = false;
         g->player_input_received = false;
     }
-    // this is the og method with everyone moving simultaneously per turn
-    //if (g->processing_actions) {
-    // so, the logic for handling whether or not we are dealing with a chunk of MOVES vs NONMOVES actions:
-    // 0. get the first action's type
-    // 1. if the first action is a MOVE, we are going to process all sequential MOVE actions
-    // ------
-    // 1. get the beginning index of the first sequence of MOVES
-    // 2. get the ending index of the first sequence of MOVES
-    // 3. process the moves via libgame_process_turn(g, begin, end)
-    // 4. update the current action index to end+1
-    // 5. if current action is greater than the length of actions, we are at the end of the turn
-    // 6. otherwise, there might be NONMOVES and other MOVES to process
-    //libgame_process_turn(g);
-
-
-
-
-    //action_t first_action_type = libgame_lua_get_nth_action_type(L, 1);
-    //if (first_action_type == ACTION_MOVE) {
-    //    int current_action = libgame_lua_get_gamestate_int(L, "CurrentAction");
-    //    int begin = libgame_lua_get_move_seq_begin(L, current_action);
-    //    int end = libgame_lua_get_move_seq_end(L, current_action);
-    //    libgame_process_turn_actions(g, begin, end);
-    //    libgame_lua_set_gamestate_int(L, "CurrentAction", end + 1);
-    //    if (libgame_lua_get_gamestate_int(L, "CurrentAction") > libgame_lua_get_action_count(L)) {
-    //        libgame_lua_clear_actions(L);
-    //        g->processing_actions = false;
-    //        g->player_input_received = false;
-    //        libgame_lua_set_gamestate_int(L, "CurrentAction", 1);
-    //    }
-    //}
-    //else {
-    //    libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
-    //    libgame_lua_clear_actions(L);
-    //    g->processing_actions = false;
-    //    g->player_input_received = false;
-    //}
-    //libgame_process_turn_actions(g, 1, libgame_lua_get_action_count(L));
-    //libgame_lua_clear_actions(L);
-    //g->processing_actions = false;
-    //g->player_input_received = false;
-    //}
-    // we are going to need to tie these methods together in a way where we can:
-    // 1. simul-process moves in sequence if they exist from N to M
-    // 2. incr-process actions in sequence if they exist from M to K
-    // this method steps each entity action in sequence, which may be useful when resolving actions and effects, but for basic movement feels "excessive"
-    // shiren, for example, appears to perform all move actions simultaneously, and then incrementing remaining actions
-    // if the player does a non-move action first, it increments that action, simul-does any sequence of moves, and then resolves actions
-    // for experiment purposes, we are temporarily disabling this
-    //if (g->processing_actions && g->lock == 0) {
-    //    libgame_process_turn_alt(g);
-    //    g->lock = DEFAULT_LOCK;
-    //} else if (g->processing_actions && g->lock > 0) {
-    //    g->lock--;
-    //}
-    //const int action_count = libgame_lua_get_action_count(L);
-    //if (action_count == 0) {
-    //    //minfo("action count is 0");
-    //    g->processing_actions = false;
-    //    g->player_input_received = false;
-    //    g->lock = 0;
-    //}
 }
 
 
@@ -919,9 +798,9 @@ void libgame_drawframe(gamestate* g) {
     BeginDrawing();
     BeginTextureMode(target);
     switch (activescene) {
-    //case SCENE_COMPANY:
-    //libgame_draw_company_scene(g);
-    //    break;
+    case SCENE_COMPANY:
+        libgame_draw_company_scene(g);
+        break;
     case SCENE_TITLE:
         libgame_draw_title_scene(g);
         break;
@@ -1194,39 +1073,40 @@ void libgame_draw_title_scene(gamestate* const g) {
 
 
 
-//void libgame_draw_company_scene(gamestate* g) {
-//    const Color bgc = BLACK;
-//    const Color fgc = {0x66, 0x66, 0x66, 255};
-//    const int fontsize = 32;
-//    const int spacing = 1;
-//    const int interval = 120;
-//    const int dur = 60;
-//    char b[128 * 3];
-//    bzero(b, 128 * 3);
-//    char* b2 = b + 128;
-//    char* b3 = b + 128 * 2;
-//    snprintf(b, 128, COMPANYNAME);
-//    snprintf(b2, 128, COMPANYFILL);
-//    snprintf(b3, 128, "presents");
-//    const Vector2 measure = MeasureTextEx(g->font, b, fontsize, spacing);
-//    if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
-//        for (int i = 0; i < 10; i++) {
-//            shufflestrinplace(b);
-//            shufflestrinplace(b3);
-//        }
-//    }
-//    for (int i = 0; i < 10; i++) {
-//        shufflestrinplace(b2);
-//    }
-//    const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f, targetheight / 2.0f - measure.y / 2.0f};
-//    ClearBackground(bgc);
-//    DrawTextEx(g->font, b, pos, fontsize, 1, fgc);
-//    DrawTextEx(g->font, b2, pos, fontsize, 1, fgc);
-//    const Vector2 measure3 = MeasureTextEx(g->font, b3, 20, 1);
-//    const Vector2 pp = {targetwidth / 2.0f - measure3.x / 2.0f, targetheight / 2.0f + measure.y / 2.0f + 20};
-//    DrawTextEx(g->font, b3, pp, 20, 1, fgc);
-//    libgame_handle_fade(g);
-//}
+void libgame_draw_company_scene(gamestate* g) {
+    const Color bgc = BLACK;
+    const Color fgc = {0x66, 0x66, 0x66, 255};
+    const int fontsize = 32;
+    const int spacing = 1;
+    //const int interval = 120;
+    //const int dur = 60;
+    char b[128 * 3];
+    bzero(b, 128 * 3);
+    char* b2 = b + 128;
+    char* b3 = b + 128 * 2;
+    snprintf(b, 128, COMPANYNAME);
+    snprintf(b2, 128, COMPANYFILL);
+    snprintf(b3, 128, "presents");
+    const Vector2 measure = MeasureTextEx(g->font, b, fontsize, spacing);
+    //if (g->framecount % interval >= 0 && g->framecount % interval < dur) {
+    //    for (int i = 0; i < 10; i++) {
+    //        shufflestrinplace(b);
+    //        shufflestrinplace(b3);
+    //    }
+    //}
+    //for (int i = 0; i < 10; i++) {
+    //    shufflestrinplace(b2);
+    //}
+    //const Vector2 pos = {targetwidth / 2.0f - measure.x / 2.0f, targetheight / 2.0f - measure.y / 2.0f};
+    const Vector2 pos = {g->targetwidth / 2.0f - measure.x / 2.0f, g->targetheight / 2.0f - measure.y / 2.0f};
+    ClearBackground(bgc);
+    DrawTextEx(g->font, b, pos, fontsize, 1, fgc);
+    DrawTextEx(g->font, b2, pos, fontsize, 1, fgc);
+    const Vector2 measure3 = MeasureTextEx(g->font, b3, 20, 1);
+    const Vector2 pp = {g->targetwidth / 2.0f - measure3.x / 2.0f, g->targetheight / 2.0f + measure.y / 2.0f + 20};
+    DrawTextEx(g->font, b3, pp, 20, 1, fgc);
+    libgame_handle_fade(g);
+}
 
 
 
@@ -1281,14 +1161,21 @@ void libgame_load_textures_from_disk(gamestate* const g) {
 
 
 void libgame_load_textures(gamestate* const g) {
-    if (!g) return;
+    if (!g) {
+        merror("libgame_loadtextures: gamestate is null");
+        return;
+    }
     libgame_load_textures_from_disk(g);
 }
 
 
 
 void libgame_unloadtexture(gamestate* const g, const int index) {
-    if (!g) return;
+    if (!g) {
+
+        merror("libgame_unloadtexture: gamestate is null");
+        return;
+    }
     if (g->txinfo[index].texture.id > 0) UnloadTexture(g->txinfo[index].texture);
 }
 

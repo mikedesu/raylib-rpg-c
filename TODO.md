@@ -1,35 +1,9 @@
 # TODO
 
-- [ ] NPC turn time-step
-	- [ ] currently steps hero then ALL NPCs
-		- [ ] want to step hero, then individually step each NPC and any effects that occur
-
-- [ ] loading textures via files
-	- [ ] be able to switch between loading textures via file and .h files
-
-- [x] asset packing
-	- [x] attaching textures via .h files
-	- [ ] compression / decompression
-	- [ ] encryption 
-	- [ ] distribution
-
-- [ ] Lua integration
-	- [x] test changing tiles using lua 
-		- [x] during dungeon init
-		- [x] after dungeon init via keypress (random tile random type)
-	- [ ] dungeon random tile init
-	- [x] take npc turn 
-	- [x] take all npc turns after pc turn
-	- [ ] spritegroup management
-	- [ ] torch placement
-	- [ ] sword
-	- [ ] shield
-	- [ ] pickup items
-	- [ ] further gamestate management
-		- [ ] camera
-		- [ ] debug panel
-		- [x] display
-
+- [ ] change the speed of smooth movement
+- [ ] change the speed of animation
+- [ ] lock the gamestate to reject inputs until previous turn completes
+- [ ] change the default camera zoom
 - [ ] handle creatures and objects that occupy multiple tiles (bigger than 8x8)
 	- [ ] example: rhino is 22x10, which can occupy 3 tiles with 2 pixels of overlap on top
 - [ ] web controls / gestures / touchscreen
@@ -95,3 +69,9 @@
 - [ ] `handle_npc_turn` can be optimized / updated
 - [ ] enemy stun on attack or somehow "pause" the gameloop so the sprite doesnt skip the damage animation
 
+# DONE
+
+- [x] NPC turn time-step
+	- [x] steps all entities
+- [x] loading textures via files
+- [x] Lua integration
