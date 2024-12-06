@@ -109,3 +109,8 @@ void libgame_draw_dungeonfloor(gamestate* const g);
 void libgame_drawframeend(gamestate* const g);
 void libgame_incr_current_action(gamestate* const g);
 //void libgame_incr_current_action_key(gamestate* const g);
+
+
+
+
+void libgame_update_hero_shield_spritegroup(gamestate* const g);

@@ -1,5 +1,6 @@
 # TODO
 
+- [ ] do we want auto-equip? should picking up an item and equipping it be 2 seperate actions/turns?
 - [ ] handle creatures and objects that occupy multiple tiles (bigger than 8x8)
 	- [ ] example: rhino is 22x10, which can occupy 3 tiles with 2 pixels of overlap on top
 - [ ] web controls / gestures / touchscreen

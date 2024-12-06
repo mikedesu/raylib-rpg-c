@@ -272,6 +272,32 @@ void libgame_update_spritegroup_move(gamestate* const g, const entityid id, cons
 
 
 
+void libgame_update_hero_shield_spritegroup(gamestate* const g) {
+
+    if (!g) {
+        merror("libgame_update_hero_shield_spritegroup: gamestate is NULL");
+        return;
+    }
+
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    if (hero_id == -1) {
+        merror("libgame_update_hero_shield_spritegroup: hero_id is -1");
+        return;
+    }
+
+    const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
+
+    const entityid shieldid = libgame_lua_get_entity_shield(L, hero_id);
+    if (shieldid != -1) {
+        const int update_result2 = libgame_update_spritegroup(g, shieldid, SPECIFIER_SHIELD_BLOCK, dir);
+        if (update_result2 == -1) { merror("libgame_handle_player_input_movement_key: failed to update shield spritegroup"); }
+    } else {
+        mwarning("libgame_handle_player_input_movement_key: shieldid is -1");
+    }
+}
+
+
+
 void libgame_handle_player_input_movement_key(gamestate* const g, const direction_t dir) {
     if (!g) {
         merror("libgame_handle_player_input_movement_key: gamestate is NULL");
@@ -289,10 +315,17 @@ void libgame_handle_player_input_movement_key(gamestate* const g, const directio
     if (update_result == -1) { merror("libgame_handle_player_input_movement_key: failed to update spritegroup"); }
     //
     // hack to make the buckler correctly update...this probably doesnt belong here lol
-    const entityid shieldid = libgame_lua_get_entity_shield(L, hero_id);
-    const int update_result2 = libgame_update_spritegroup(g, shieldid, SPECIFIER_SHIELD_BLOCK, dir);
-    if (update_result2 == -1) { merror("libgame_handle_player_input_movement_key: failed to update shield spritegroup"); }
 
+    libgame_update_hero_shield_spritegroup(g);
+
+
+    //const entityid shieldid = libgame_lua_get_entity_shield(L, hero_id);
+    //if (shieldid != -1) {
+    //    const int update_result2 = libgame_update_spritegroup(g, shieldid, SPECIFIER_SHIELD_BLOCK, dir);
+    //    if (update_result2 == -1) { merror("libgame_handle_player_input_movement_key: failed to update shield spritegroup"); }
+    //} else {
+    //    mwarning("libgame_handle_player_input_movement_key: shieldid is -1");
+    //}
     //libgame_entity_anim_set(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
 
     g->player_input_received = true;
@@ -355,10 +388,11 @@ void libgame_handle_player_input_pickup_key(gamestate* const g) {
         merror("libgame_handle_player_input_pickup_key: hero_id is -1");
         return;
     }
-    if (libgame_lua_create_action(L, hero_id, ACTION_PICKUP, libgame_lua_get_entity_int(L, hero_id, "x"), libgame_lua_get_entity_int(L, hero_id, "y")))
+    if (libgame_lua_create_action(L, hero_id, ACTION_PICKUP, libgame_lua_get_entity_int(L, hero_id, "x"), libgame_lua_get_entity_int(L, hero_id, "y"))) {
         msuccess("pickup action created");
-    else
+    } else {
         merror("pickup action failed to create");
+    }
     g->player_input_received = true;
 }
 
@@ -530,6 +564,11 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
             spritegroup_anim_id = SPRITEGROUP_ANIM_ORC_ATTACK;
         }
         if (!libgame_entity_anim_set(g, id, spritegroup_anim_id)) { merror("failed to set attack animation"); }
+    } else if (action_type == ACTION_PICKUP) {
+
+        // this is a hack and needs to be genericized
+
+        libgame_update_hero_shield_spritegroup(g);
     }
 }
 
