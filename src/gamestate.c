@@ -36,7 +36,7 @@ gamestate* gamestateinitptr() {
     //printf("\033[31;1mwindowwidth: %d\033[0m\n", windowwidth);
     //printf("\033[31;1mwindowheight: %d\033[0m\n", windowheight);
     //g->cam2d.target = (Vector2){0, 0}, g->cam2d.offset = (Vector2){0, 0}, g->cam2d.zoom = 4.0, g->cam2d.rotation = 0.0, g->lock_timer = 0, g->fadealpha = 0.0f;
-    g->cam2d.target = (Vector2){0, 0}, g->cam2d.offset = (Vector2){0, 0}, g->cam2d.zoom = 4.0, g->cam2d.rotation = 0.0, g->fadealpha = 0.0f;
+    g->cam2d.target = (Vector2){0, 0}, g->cam2d.offset = (Vector2){0, 0}, g->cam2d.zoom = 7.0, g->cam2d.rotation = 0.0, g->fadealpha = 0.0f;
     //g->cam_lockon = true, g->do_one_rotation = false, g->controlmode = CONTROLMODE_PLAYER, g->fadestate = FADESTATENONE, g->spritegroups = NULL, g->player_input_received = false, g->is_locked = false;
     g->controlmode = CONTROLMODE_PLAYER, g->fadestate = FADESTATENONE, g->spritegroups = NULL;
     return g;
