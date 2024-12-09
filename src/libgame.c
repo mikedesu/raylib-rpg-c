@@ -675,6 +675,7 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
         return;
     }
 
+    // set animation based on action type
     if (action_type == ACTION_NONE) {
         const int update_result =
             libgame_update_spritegroup(g, id, SPECIFIER_NONE, DIRECTION_NONE);
@@ -703,6 +704,9 @@ void libgame_process_turn_action(gamestate* const g, const int i) {
 
         libgame_update_hero_shield_spritegroup(g);
     }
+
+
+    // set animation type based on action result
 }
 
 
