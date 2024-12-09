@@ -1,3 +1,10 @@
+screenshots
+screenshots/*
+src/screenshots
+src/screenshots/*
+*.png
+*.jpg
+*.jpeg
 fonts
 fonts/*.ttf
 src/fonts

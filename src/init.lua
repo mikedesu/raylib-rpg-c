@@ -8,15 +8,15 @@ require("test")
 
 -- You can edit these
 WindowTitle = "@evildojo666 presents: Project.RPG"
-DefaultTargetWidth = 1280
-DefaultTargetHeight = 720
+DefaultTargetWidth = 800
+DefaultTargetHeight = 480
 --DefaultTargetWidth = 1280
 --DefaultTargetHeight = 720
 --DefaultTargetWidth = 1920
 --DefaultTargetHeight = 960
 DefaultScale = 1
-DefaultWindowPosOffsetX = 100
-DefaultWindowPosOffsetY = 100
+DefaultWindowPosOffsetX = 1920 - DefaultTargetWidth
+DefaultWindowPosOffsetY = 0
 DefaultWindowPosX = 1920 + DefaultWindowPosOffsetX
 --DefaultWindowPosX = 0 + DefaultWindowPosOffsetX
 DefaultWindowPosY = 0 + DefaultWindowPosOffsetY
@@ -57,7 +57,8 @@ ActionTypes = {
 	Attack = 3,
 	Pickup = 4,
 	Block = 5,
-	Count = 6,
+	Wait = 6,
+	Count = 7,
 }
 
 ActionResultType = {
@@ -349,6 +350,9 @@ function ActionResult()
 		ydir = -1,
 		action_type = ActionTypes.None,
 		action_result = ActionResultType.Success,
+		damage_cutting = 0, -- for attack actions
+		damage_piercing = 0, -- for attack actions
+		damage_blunt = 0, -- for attack actions
 		--target_was_damaged = 0,
 		--target_block_successful = 0,
 		--target_is_blocking = 0,
@@ -502,6 +506,7 @@ function EntityAttack(id, xdir, ydir)
 			else
 				print("Target entity is not blocking")
 				print("Target entity is at " .. target_entity.x .. ", " .. target_entity.y)
+				print("Attack was successful")
 				--target_entity.was_damaged = 1
 				--target_entity.block_successful = 0
 				--target_entity.is_blocking = 0
@@ -512,6 +517,8 @@ function EntityAttack(id, xdir, ydir)
 				result.ydir = ydir
 				result.action_type = ActionTypes.Attack
 				result.action_result = ActionResultType.AttackSuccess
+				-- random damage from 1 to 6
+				result.damage_cutting = math.random(1, 6)
 				return result
 			end
 		end
@@ -521,9 +528,6 @@ function EntityAttack(id, xdir, ydir)
 		target_entity = GetEntityById(target_id)
 		if target_entity then
 			if target_entity.is_blocking == 1 then
-				--target_entity.was_damaged = 0
-				--target_entity.block_successful = 1
-				--target_entity.is_blocking = 0
 				result.success = true
 				result.actor_id = id
 				result.target_id = target_id
@@ -533,9 +537,6 @@ function EntityAttack(id, xdir, ydir)
 				result.action_result = ActionResultType.AttackSuccess
 				return result
 			else
-				--target_entity.was_damaged = 1
-				--target_entity.block_successful = 0
-				--target_entity.is_blocking = 0
 				result.success = true
 				result.actor_id = id
 				result.target_id = target_id
@@ -547,6 +548,8 @@ function EntityAttack(id, xdir, ydir)
 			end
 		end
 	end
+
+	-- if we got here, the entity was not found
 	result.success = false
 	result.actor_id = id
 	result.xdir = xdir
@@ -811,7 +814,7 @@ function ProcessAction(index)
 		result.actor_id = action.id
 		result.action_type = ActionTypes.None
 		result.action_result = ActionResultType.NoneSuccess
-		return result
+		--return result
 	elseif action.type == ActionTypes.Move then
 		result = EntityMove(action.id, action.x, action.y)
 	elseif action.type == ActionTypes.Attack then
@@ -838,7 +841,8 @@ function ProcessAction(index)
 	then
 		return -1
 	end
-	return action.id
+	--return action.id
+	return index
 end
 
 --function ProcessActions()
@@ -1107,6 +1111,14 @@ function GetMoveSeqEnd(begin)
 	-- print an error message
 	-- print("Error: GetMoveSeqEnd reached the end of the sequence")
 	return #Gamestate.Actions
+end
+
+function GetActionResultsCount()
+	return #ActionResults
+end
+
+function GetActionResult(index, key)
+	return ActionResults[index][key]
 end
 
 --function DeserializeEntitiesFromString(str)

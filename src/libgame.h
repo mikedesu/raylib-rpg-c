@@ -110,6 +110,7 @@ void libgame_drawframeend(gamestate* const g);
 void libgame_incr_current_action(gamestate* const g);
 //void libgame_incr_current_action_key(gamestate* const g);
 
+void libgame_handle_screen_shot(gamestate* const g);
 
 
 
