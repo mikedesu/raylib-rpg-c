@@ -1026,9 +1026,6 @@ void libgame_handle_npc_turn_lua(gamestate* const g, const entityid id) {
         merror("could not create npc action: none");
     }
 
-
-
-
     //const direction_t dir = libgame_lua_get_entity_int(L, id, "direction");
     //if (!libgame_lua_create_action(L, id, ACTION_ATTACK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir))) merror("attack action failed to create");
 }

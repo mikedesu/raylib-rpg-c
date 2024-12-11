@@ -107,8 +107,8 @@
 
 #define TX_BUCKLER 74
 
-//#define TX_HUMAN_DMG 75
-//#define TX_HUMAN_DMG_SHADOW 76
+#define TX_HUMAN_DMG 75
+#define TX_HUMAN_DMG_SHADOW 76
 
 
 
