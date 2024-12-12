@@ -2164,8 +2164,12 @@ void libgame_loadtargettexture(gamestate* const g) {
     //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
     // update the gamestate display values
-    g->cam2d.offset.x = g->targetwidth / 2.0f,
-    g->cam2d.offset.y = g->targetheight / 4.0f;
+
+    //const int c_offset_x = 0;
+    //const int c_offset_y = 0;
+
+    g->cam2d.offset.x = g->targetwidth / 2.0f; //+ c_offset_x;
+    g->cam2d.offset.y = g->targetheight / 4.0f; //+ c_offset_y;
 }
 
 
@@ -2556,8 +2560,12 @@ void libgame_initsharedsetup(gamestate* const g) {
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     // update the gamestate display values
     // can get this from init.lua....
-    g->cam2d.offset.x = g->targetwidth / 2.0f,
+
+    const int c_offset_x = -100;
+    g->cam2d.offset.x = g->targetwidth / 2.0f + c_offset_x;
+
     g->cam2d.offset.y = g->targetheight / 4.0f;
+
     libgame_load_textures(g);
     g->spritegroups = hashtable_entityid_spritegroup_create(
         DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);

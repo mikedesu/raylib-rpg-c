@@ -8,8 +8,8 @@ require("test")
 
 -- You can edit these
 WindowTitle = "@evildojo666 presents: Project.RPG"
-DefaultTargetWidth = 960
-DefaultTargetHeight = 576
+DefaultTargetWidth = 1920 / 2
+DefaultTargetHeight = 1080 / 2
 --DefaultTargetWidth = 1280
 --DefaultTargetHeight = 720
 --DefaultTargetWidth = 1920
