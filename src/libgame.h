@@ -64,10 +64,10 @@ const entityid libgame_create_orc(gamestate* const g,
 
 void libgame_unloadtexture(gamestate* const g, const int index);
 
-const entityid libgame_create_hero(gamestate* const g,
-                                   const char* name,
-                                   const int x,
-                                   const int y);
+//const entityid libgame_create_hero(gamestate* const g,
+//                                   const char* name,
+//                                   const int x,
+//                                   const int y);
 
 void libgame_do_camera_lock_on(gamestate* const g);
 

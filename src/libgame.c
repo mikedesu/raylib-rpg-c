@@ -2009,48 +2009,41 @@ const entityid libgame_create_entity(gamestate* const g,
 
 
 
-const entityid libgame_create_hero(gamestate* const g,
-                                   const char* name,
-                                   const int x,
-                                   const int y) {
-    if (!g) {
-        merror("libgame_create_hero: gamestate is NULL");
-        return -1;
-    }
-
-    const entitytype_t entity_type = ENTITY_PLAYER;
-
-    const entityid id = libgame_lua_create_entity(L, name, entity_type, x, y);
-    if (id == -1) {
-        merror("libgame_create_hero: could not create hero entity, expect "
-               "crashes");
-        libgame_lua_set_gamestate_int(L, "HeroId", -1);
-        return -1;
-    }
-
-    libgame_lua_set_gamestate_int(L, "HeroId", id);
-    libgame_lua_set_entity_int(L, id, "race", RACE_HUMAN);
-    libgame_lua_set_entity_int(L, id, "direction", DIRECTION_DOWN_RIGHT);
-
-    const int create_sg_result =
-        libgame_create_spritegroup_by_id(g, id, DIRECTION_DOWN_RIGHT);
-
-    if (create_sg_result == -1) {
-        merror("libgame_create_hero: could not create spritegroup, expect "
-               "crashes");
-        return -1;
-    }
-
-    const int update_result =
-        libgame_update_spritegroup(g, id, SPECIFIER_NONE, DIRECTION_DOWN_RIGHT);
-    if (update_result == -1) {
-        merror("libgame_create_hero: could not update spritegroup, expect "
-               "crashes");
-        return -1;
-    }
-
-    return id;
-}
+//const entityid libgame_create_hero(gamestate* const g,
+//                                   const char* name,
+//                                   const int x,
+//                                   const int y) {
+//    if (!g) {
+//        merror("libgame_create_hero: gamestate is NULL");
+//        return -1;
+//    }
+//    const entitytype_t entity_type = ENTITY_PLAYER;
+//    const entityid id = libgame_lua_create_entity(L, name, entity_type, x, y);
+//    if (id == -1) {
+//        merror("libgame_create_hero: could not create hero entity, expect "
+//               "crashes");
+//        libgame_lua_set_gamestate_int(L, "HeroId", -1);
+//        return -1;
+//    }
+//    libgame_lua_set_gamestate_int(L, "HeroId", id);
+//    libgame_lua_set_entity_int(L, id, "race", RACE_HUMAN);
+//    libgame_lua_set_entity_int(L, id, "direction", DIRECTION_DOWN_RIGHT);
+//    const int create_sg_result =
+//        libgame_create_spritegroup_by_id(g, id, DIRECTION_DOWN_RIGHT);
+//    if (create_sg_result == -1) {
+//        merror("libgame_create_hero: could not create spritegroup, expect "
+//               "crashes");
+//        return -1;
+//    }
+//    const int update_result =
+//        libgame_update_spritegroup(g, id, SPECIFIER_NONE, DIRECTION_DOWN_RIGHT);
+//    if (update_result == -1) {
+//        merror("libgame_create_hero: could not update spritegroup, expect "
+//               "crashes");
+//        return -1;
+//    }
+//    return id;
+//}
 
 
 
@@ -2251,14 +2244,7 @@ void libgame_initsharedsetup(gamestate* const g) {
 
 
     const entityid heroid = libgame_create_entity(
-        //g, "hero", ENTITY_PLAYER, RACE_HUMAN, 1, 1, DIRECTION_DOWN_RIGHT);
-        g,
-        "hero",
-        ENTITY_PLAYER,
-        RACE_HUMAN,
-        1,
-        1,
-        DIRECTION_UP_LEFT);
+        g, "hero", ENTITY_PLAYER, RACE_HUMAN, 3, 3, DIRECTION_DOWN);
     if (heroid == -1) {
         merror(
             "libgame_initsharedsetup: could not create hero entity, crashing");
