@@ -2,11 +2,8 @@
 #include "gamestate.h"
 #include "mprint.h"
 #include "symaddrpair.h"
-
 //#include "libgame.h"
-
 #include "mylua.h"
-
 #include <assert.h>
 #include <dlfcn.h>
 #include <raylib.h>
@@ -25,7 +22,9 @@
 
 
 long last_write_time = 0;
-const char *libname = "./libgame.so", *lockfile = "./libgame.so.lockfile", *templib = "./templibgame.so";
+const char* libname = "./libgame.so";
+const char* lockfile = "./libgame.so.lockfile";
+const char* templib = "./templibgame.so";
 
 
 void* handle = NULL;
@@ -51,7 +50,9 @@ bool (*mylibgame_external_check_reload)() = NULL;
 int getlastwritetime(const char* filename) {
     struct stat file_stat;
     int retval = 0;
-    if (stat(filename, &file_stat) == 0) { retval = file_stat.st_mtime; }
+    if (stat(filename, &file_stat) == 0) {
+        retval = file_stat.st_mtime;
+    }
     return retval;
 }
 
@@ -72,7 +73,6 @@ void openhandle() {
 
 
 void checksymbol(void* symbol, const char* name) {
-    ////minfo("checksymbol");
     if (symbol == NULL) {
         //merror("symbol is NULL");
         fprintf(stderr, "dlsym failed: %s\n", dlerror());
@@ -84,7 +84,9 @@ void checksymbol(void* symbol, const char* name) {
 
 
 void loadsymbols() {
+#ifdef DEBUG
     minfo("begin loadsymbols");
+#endif
     symaddrpair_t pairs[NUM_VOID_FUNCTIONS] = {
         {"libgame_drawframe", &mylibgamedrawframe},
         {"libgame_init", &mylibgameinit},
@@ -120,7 +122,9 @@ void loadsymbols() {
     mylibgame_external_check_reload = dlsym(handle, sym);
     checksymbol(mylibgame_external_check_reload, sym);
 
+#ifdef DEBUG
     msuccess("end loadsymbols");
+#endif
 }
 
 
@@ -139,7 +143,6 @@ void autoreload() {
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
         mylibgameclosesavegamestate(); // closes window
-        //mylibgame_close_save_gamestate_minus_lua(); // closes window
         dlclose(handle);
         openhandle();
         loadsymbols();
@@ -152,43 +155,26 @@ void autoreload() {
 
 void autoreload_every_n_sec(const int n) {
     assert(n > 0);
-    if (g_->currenttime % n == 0) autoreload();
+    if (g_->currenttime % n == 0) {
+        autoreload();
+    }
 }
 
 
 
 
 void gamerun() {
-    //minfo("gamerun");
     openhandle(); // if building for web, turn off
     loadsymbols(); // if building for web, turn off
-    last_write_time = getlastwritetime(libname); // if building for web, turn off
+    last_write_time =
+        getlastwritetime(libname); // if building for web, turn off
     mylibgameinit(); // if building for web, turn off
-    //libgame_init();
     g_ = mylibgame_getgamestate();
-    //g = mylibgame_getgamestate();
-    //g_ = libgame_getgamestate();
-    //L = mylibgame_getlua();
-    //minfo("entering gameloop");
-    //emscripten_set_main_loop(gameloop, 0, 1);
     while (!mywindowshouldclose()) {
-        //while (!libgame_windowshouldclose()) {
-        //gameloop();
         mylibgameupdategamestate(g_); // if building for web, turn off
         mylibgamedrawframe(g_); // if building for web, turn off
         mylibgamehandleinput(g_); // if building for web, turn off
         autoreload_every_n_sec(4); // if building for web, turn off
-        //printf("game looping\n");
-        //libgame_updategamestate(g_);
-        //libgame_drawframe(g_);
-        //libgame_handleinput(g_);
-        //if (mylibgame_external_check_reload()) {
-        //    autoreload();
-        //}
-        //autoreload();
     }
-    //minfo("closing libgame");
     mylibgameclose(g_);
-    //libgame_close(g_);
-    //msuccess("libgame closed");
 }
