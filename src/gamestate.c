@@ -10,7 +10,9 @@
 gamestate* gamestateinitptr() {
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     if (g == NULL) {
+#ifdef DEBUG
         merror("gamestateinitptr malloc failed");
+#endif
         return NULL;
     }
     g->framecount = 0;
@@ -58,7 +60,9 @@ gamestate* gamestateinitptr() {
 // have to update this function when we introduce new fields to Gamestate
 void gamestatefree(gamestate* g) {
     if (!g) {
+#ifdef DEBUG
         merror("gamestatefree g is NULL");
+#endif
         return;
     }
     hashtable_entityid_spritegroup_destroy(g->spritegroups);
