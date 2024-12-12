@@ -4,6 +4,7 @@
 #include "entitytype.h"
 #include "gamestate.h"
 #include "mylua.h"
+#include "race.h"
 #include <raylib.h>
 
 
@@ -29,7 +30,9 @@ void libgame_handle_player_wait_key(gamestate* const g);
 
 void libgame_initsharedsetup(gamestate* const g);
 
-void libgame_create_spritegroup_by_id(gamestate* const g, const entityid id);
+const int libgame_create_spritegroup_by_id(gamestate* const g,
+                                           const entityid id,
+                                           const direction_t dir);
 
 void libgame_create_spritegroup(gamestate* const g,
                                 const entityid id,
@@ -204,3 +207,11 @@ void libgame_incr_current_action(gamestate* const g);
 void libgame_handle_screen_shot(gamestate* const g);
 
 void libgame_update_hero_shield_spritegroup(gamestate* const g);
+
+const entityid libgame_create_entity(gamestate* const g,
+                                     const char* name,
+                                     const entitytype_t type,
+                                     const race_t race,
+                                     const int x,
+                                     const int y,
+                                     const direction_t direction);
