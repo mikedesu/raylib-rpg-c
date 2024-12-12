@@ -4,6 +4,8 @@
 #include "specifier.h"
 #include "sprite.h"
 
+#define SPRITEGROUP_ANIM_QUEUE_MAX 32
+
 typedef struct spritegroup_t {
     int size;
     int capacity;
@@ -25,6 +27,12 @@ typedef struct spritegroup_t {
     Rectangle dest;
 
     sprite** sprites;
+
+    // animation queue
+    int anim_queue[SPRITEGROUP_ANIM_QUEUE_MAX];
+    int anim_queue_current;
+    int anim_queue_count;
+
 } spritegroup_t;
 
 
@@ -44,3 +52,9 @@ const bool spritegroup_set_current(spritegroup_t* const sg, const int index);
 void spritegroup_destroy(spritegroup_t* sg);
 void spritegroup_set_prev_anim(spritegroup_t* const sg);
 void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec);
+
+
+void spritegroup_enqueue_anim(spritegroup_t* const sg, const int anim);
+const int spritegroup_get_anim_in_queue(spritegroup_t* const sg,
+                                        const int index);
+void spritegroup_clear_anim_queue(spritegroup_t* const sg);
