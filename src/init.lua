@@ -157,7 +157,7 @@ NextEntityId = 1
 HeroId = -1
 --LastXDir = 0
 --LastYDir = 0
-Actions = {}
+--Actions = {}
 ActionResults = {}
 DungeonFloor = {}
 Entities = {}
@@ -343,7 +343,7 @@ end
 function ActionResult()
 	-- returns a new table with keys informing about the action result
 	return {
-		success = false,
+		success = 0,
 		actor_id = -1,
 		target_id = -1,
 		xdir = -1,
@@ -367,7 +367,7 @@ function EntityMove(id, xdir, ydir)
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
 		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
-			result.success = false
+			result.success = 0
 			result.actor_id = id
 			result.xdir = xdir
 			result.ydir = ydir
@@ -377,7 +377,7 @@ function EntityMove(id, xdir, ydir)
 		end
 		if GetTileType(newx, newy) == TileTypes.None then
 			PrintDebug("init.lua:330", "Tile is None")
-			result.success = false
+			result.success = 0
 			result.actor_id = id
 			result.xdir = xdir
 			result.ydir = ydir
@@ -388,7 +388,7 @@ function EntityMove(id, xdir, ydir)
 		-- can't move into stone walls
 		if GetTileType(newx, newy) >= TileTypes.Stonewall00 and GetTileType(newx, newy) <= TileTypes.Stonewall14 then
 			PrintDebug("init.lua:335", "Tile is Stonewall")
-			result.success = false
+			result.success = 0
 			result.actor_id = id
 			result.xdir = xdir
 			result.ydir = ydir
@@ -398,7 +398,7 @@ function EntityMove(id, xdir, ydir)
 		end
 		if TileIsOccupiedByPlayer(newx, newy) or TileIsOccupiedByNPC(newx, newy) then
 			PrintDebug("init.lua:340", "Tile is occupied by player or NPC")
-			result.success = false
+			result.success = 0
 			result.actor_id = id
 			result.xdir = xdir
 			result.ydir = ydir
@@ -420,7 +420,7 @@ function EntityMove(id, xdir, ydir)
 		end
 		entity.direction = new_direction
 
-		result.success = true
+		result.success = 1
 		result.actor_id = id
 		result.xdir = xdir
 		result.ydir = ydir
@@ -751,20 +751,24 @@ function RandomizeDungeonTiles(x, y, w, h)
 end
 
 function CreateAction(id, type, x, y)
+	PrintDebug(
+		"CreateAction",
+		"Creating action for entity with id " .. id .. "  type: " .. type .. "  x: " .. x .. "  y: " .. y
+	)
 	-- if the type isnt valid, return
 	if type < ActionTypes.None or type >= ActionTypes.Count then
-		PrintDebug("init.lua:298", "Invalid action type " .. type)
+		PrintDebug("CreateAction", "Invalid action type " .. type)
 		return false
 	end
 	-- if the id is invalid, return
 	if id < 0 then
-		--PrintDebug("init.lua:304", "Invalid entity id " .. id)
+		PrintDebug("CreateAction", "Invalid entity id " .. id)
 		return false
 	end
 	-- if the id isnt in the entities list, return
 	local entity = GetEntityById(id)
 	if not entity then
-		--PrintDebug("init.lua:311", "Entity with id " .. id .. " not found")
+		PrintDebug("CreateAction", "Entity with id " .. id .. " not found")
 		return false
 	end
 	local action = {
@@ -799,16 +803,23 @@ function EntityBlock(id)
 end
 
 function ProcessAction(index)
+	PrintDebug("ProcessAction", "Begin: " .. index)
+	--if action.type == ActionTypes.Wait then
 	--if action.type == ActionTypes.Wait then
 	-- do nothing
 	--end
 	if index < 1 or index > #Gamestate.Actions then
-		PrintDebug("ProcessAction", "Invalid action index " .. index)
+		PrintDebug("ProcessAction", "Invalid action index")
 		return -1
 	end
+
+	--PrintDebug("ProcessAction", "1")
 	local action = Gamestate.Actions[index]
+	--PrintDebug("ProcessAction", "2")
 	local result = ActionResult()
-	--PrintDebug("init.lua:335", "Processing action type " .. action.type .. " for entity with id " .. action.id)
+	PrintDebug("ProcessAction", "3")
+
+	PrintDebug("ProcessAction", "Processing action type")
 	if action.type == ActionTypes.None then
 		result.success = true
 		result.actor_id = action.id
@@ -824,33 +835,37 @@ function ProcessAction(index)
 	elseif action.type == ActionTypes.Block then
 		result = EntityBlock(action.id)
 	end
-
-	ActionResults[index] = result
-
-	if
-		result.action_result == ActionResultType.MoveFailBlockedByEntity
-		or result.action_result == ActionResultType.MoveFailBlockedByWall
-		or result.action_result == ActionResultType.MoveFailOutOfBounds
-		or result.action_result == ActionResultType.MoveFailNoTile
-		or result.action_result == ActionResultType.MoveFailUnknownEntity
-		or result.action_result == ActionResultType.AttackFailOutOfBounds
-		or result.action_result == ActionResultType.AttackFailNoTile
-		or result.action_result == ActionResultType.PickupFailNoTile
-		or result.action_result == ActionResultType.PickupFailNoEntities
-		or result.action_result == ActionResultType.BlockFailUnknownEntity
-	then
-		return -1
-	end
-	--return action.id
-	return index
+	PrintDebug("ProcessAction", "4")
+	-- add the action result to the results table
+	--ActionResults[index] = result
+	-- is this not-doing what i think it should be doing?
+	table.insert(ActionResults, result)
+	print("ProcessAction", "Size of ActionResults: " .. #ActionResults)
+	--if
+	--	result.action_result == ActionResultType.MoveFailBlockedByEntity
+	--	or result.action_result == ActionResultType.MoveFailBlockedByWall
+	--	or result.action_result == ActionResultType.MoveFailOutOfBounds
+	--	or result.action_result == ActionResultType.MoveFailNoTile
+	--	or result.action_result == ActionResultType.MoveFailUnknownEntity
+	--	or result.action_result == ActionResultType.AttackFailOutOfBounds
+	--	or result.action_result == ActionResultType.AttackFailNoTile
+	--	or result.action_result == ActionResultType.PickupFailNoTile
+	--	or result.action_result == ActionResultType.PickupFailNoEntities
+	--	or result.action_result == ActionResultType.BlockFailUnknownEntity
+	--then
+	--	PrintDebug("ProcessAction", "Error -- " .. result.action_result)
+	--	return -1
+	--end
+	--PrintDebug("ProcessAction", "5")
+	-- return the index for the result in the table
+	return #ActionResults
 end
 
 function ProcessActions()
-	PrintDebug("ProcessActions", "Processing " .. #Actions .. " actions")
-	for i, action in ipairs(Actions) do
-		ProcessAction(action)
+	PrintDebug("ProcessActions", "Processing " .. #Gamestate.Actions .. " actions")
+	for i, action in ipairs(Gamestate.Actions) do
+		ProcessAction(i)
 	end
-	Actions = {}
 end
 
 function ClearWasDamaged()

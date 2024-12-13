@@ -98,6 +98,12 @@ const bool libgame_entity_anim_set(gamestate* const g,
 #endif
         return false;
     }
+
+#ifdef DEBUG
+    minfo("libgame_entity_anim_set");
+#endif
+
+
     return spritegroup_set_current(
         hashtable_entityid_spritegroup_get(g->spritegroups, id), index);
 }
@@ -201,9 +207,9 @@ void libgame_handleinput(gamestate* const g) {
         libgame_handle_input_player(g);
     }
 
-    //else if (g->controlmode == CONTROLMODE_CAMERA) {
-    libgame_handle_caminput(g);
-    //}
+    else if (g->controlmode == CONTROLMODE_CAMERA) {
+        libgame_handle_caminput(g);
+    }
 }
 
 
@@ -422,19 +428,21 @@ void libgame_handle_player_input_movement_key(gamestate* const g,
     }
     // update player direction
     libgame_lua_set_entity_int(L, hero_id, "direction", dir);
+
     libgame_lua_create_action(L,
                               hero_id,
                               ACTION_MOVE,
                               libgame_get_x_from_dir(dir),
                               libgame_get_y_from_dir(dir));
-    const int update_result = libgame_update_spritegroup(
-        g, hero_id, SPECIFIER_NONE, dir); // updates sg context
-    if (update_result == -1) {
-#ifdef DEBUG
-        merror("libgame_handle_player_input_movement_key: failed to update "
-               "spritegroup");
-#endif
-    }
+
+    //const int update_result = libgame_update_spritegroup(
+    //    g, hero_id, SPECIFIER_NONE, dir); // updates sg context
+    //if (update_result == -1) {
+    //#ifdef DEBUG
+    //       merror("libgame_handle_player_input_movement_key: failed to update "
+    //              "spritegroup");
+    //#endif
+    //    }
     //
     // hack to make the buckler correctly update...this probably doesnt belong here lol
 
@@ -1101,6 +1109,7 @@ void libgame_update_gamestate(gamestate* g) {
     // update smooth move for NPCs and other entities
     libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
     if (g->player_input_received) {
+        minfo("libgame_update_gamestate: player input received");
         libgame_handle_npcs_turn_lua(g);
         // this is where we want to process the turn
         // we want to do this in a lock-step fashion so that it is only called once every N frames or so
@@ -1122,6 +1131,9 @@ void libgame_update_gamestate(gamestate* g) {
 
 
 void libgame_process_action_results(gamestate* const g) {
+
+    minfo("libgame_process_action_results begin");
+
     if (!g) {
 #ifdef DEBUG
         merror("libgame_process_action_results: gamestate is NULL");
@@ -1130,7 +1142,22 @@ void libgame_process_action_results(gamestate* const g) {
     }
 
     const int action_result_count = libgame_lua_get_action_results_count(L);
-    for (int i = 1; i < action_result_count; i++) {
+
+
+    fprintf(stderr,
+            "libgame_process_action_results: action_result_count is %d\n",
+            action_result_count);
+
+
+
+    for (int i = 1; i <= action_result_count; i++) {
+
+#ifdef DEBUG
+        minfo("libgame_process_action_results");
+#endif
+
+
+
         // fill in the blank
         // depending on the actionresult's actor and target, we will update the spritegroups by enqueuing an animation state
         const bool success = libgame_lua_get_action_result(L, i, "success");
@@ -1167,6 +1194,13 @@ const bool libgame_handle_sprite_update(gamestate* const g,
 
     // given the actor_id, grab the spritegroup and set the animation
 
+
+    minfo("libgame_handle_sprite_update begin");
+    printf("actor_id: %d\n", actor_id);
+    printf("action_type: %d\n", action_type);
+    printf("xdir = %d\n", xdir);
+    printf("ydir = %d\n", ydir);
+
     spritegroup_t* sg =
         hashtable_entityid_spritegroup_get(g->spritegroups, actor_id);
     if (!sg) {
@@ -1174,7 +1208,7 @@ const bool libgame_handle_sprite_update(gamestate* const g,
         return false;
     }
 
-    race_t actor_race = libgame_lua_get_entity_int(L, actor_id, "Race");
+    race_t actor_race = libgame_lua_get_entity_int(L, actor_id, "race");
     int anim = -1;
 
     if (action_type == ACTION_MOVE) {
@@ -1183,6 +1217,11 @@ const bool libgame_handle_sprite_update(gamestate* const g,
             anim = SPRITEGROUP_ANIM_HUMAN_WALK;
         } else if (actor_race == RACE_ORC) {
             anim = SPRITEGROUP_ANIM_ORC_WALK;
+        } else {
+#ifdef DEBUG
+            merror("Race not set properly");
+            fprintf(stderr, "Race: %d\n", actor_race);
+#endif
         }
 
         libgame_entity_anim_set(g, actor_id, anim);
