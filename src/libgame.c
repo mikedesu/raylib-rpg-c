@@ -201,9 +201,9 @@ void libgame_handleinput(gamestate* const g) {
         libgame_handle_input_player(g);
     }
 
-    else if (g->controlmode == CONTROLMODE_CAMERA) {
-        libgame_handle_caminput(g);
-    }
+    //else if (g->controlmode == CONTROLMODE_CAMERA) {
+    libgame_handle_caminput(g);
+    //}
 }
 
 
@@ -731,7 +731,7 @@ void libgame_handle_caminput(gamestate* const g) {
     //        merror(
     //            "libgame_handle_caminput: controlmode is not CONTROLMODE_CAMERA");
     //#endif
-    return;
+    //return;
     //}
     //if (g->controlmode == CONTROLMODE_CAMERA) {
 
