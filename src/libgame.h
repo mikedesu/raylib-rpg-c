@@ -1,5 +1,7 @@
 #pragma once
 
+#include "actionresults.h"
+#include "actions.h"
 #include "direction.h"
 #include "entitytype.h"
 #include "gamestate.h"
@@ -209,8 +211,13 @@ void libgame_process_action_results(gamestate* const g);
 
 void libgame_handle_test_enemy_placement(gamestate* const g);
 
-const bool libgame_handle_sprite_update(gamestate* const g,
-                                        const entityid actor_id,
-                                        const action_t action_type,
-                                        const int xdir,
-                                        const int ydir);
+const bool
+libgame_handle_sprite_update(gamestate* const g,
+                             const entityid actor_id,
+                             const actionresults_t actionresults_type,
+                             const int xdir,
+                             const int ydir);
+
+const bool libgame_entity_anim_enqueue(gamestate* const g,
+                                       const entityid id,
+                                       const int index);

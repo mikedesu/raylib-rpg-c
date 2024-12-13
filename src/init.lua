@@ -78,6 +78,9 @@ ActionResultType = {
 	BlockFailUnknownEntity = 14,
 	NoneSuccess = 15,
 	NoneFail = 16,
+	WaitSuccess = 17,
+	WaitFail = 18,
+	WasDamaged = 19,
 	--BlockFailNoTile = 14,
 }
 
@@ -426,7 +429,7 @@ function EntityMove(id, xdir, ydir)
 		result.xdir = xdir
 		result.ydir = ydir
 		result.action_type = ActionTypes.Move
-		result.action_result = ActionResultType.Success
+		result.action_result = ActionResultType.MoveSuccess
 		return result
 	end
 

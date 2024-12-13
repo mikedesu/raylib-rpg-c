@@ -1,3 +1,4 @@
+#include "actionresults.h"
 #include "actions.h"
 #include "controlmode.h"
 #include "direction.h"
@@ -84,6 +85,52 @@ void libgame_handle_fade(gamestate* const g) {
         g->fadealpha = 0, g->fadestate = FADESTATENONE;
     }
     libgame_draw_fade(g);
+}
+
+
+
+
+const bool libgame_entity_anim_enqueue(gamestate* const g,
+                                       const entityid id,
+                                       const int index) {
+    if (!g) {
+#ifdef DEBUG
+        merror("libgame_entity_anim_set: gamestate is NULL");
+#endif
+        return false;
+    }
+
+#ifdef DEBUG
+    minfo("libgame_entity_anim_enqueue");
+#endif
+
+
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (!sg) {
+#ifdef DEBUG
+        merror("libgame_entity_anim_enqueue: spritegroup is NULL");
+#endif
+        return false;
+    }
+
+    //if (sg->anim_queue_current >= SPRITEGROUP_ANIM_QUEUE_MAX) {
+    //#ifdef DEBUG
+    //        merror("libgame_entity_anim_enqueue: animation queue is full");
+    //#endif
+    //        return false;
+    //    }
+
+    //sg->anim_queue[sg->anim_queue_current] = index;
+    //sg->anim_queue_current += 1;
+    //sg->anim_queue_count += 1;
+
+
+    spritegroup_enqueue_anim(sg, index);
+
+    return true;
+
+    //return spritegroup_set_current(
+    //    hashtable_entityid_spritegroup_get(g->spritegroups, id), index);
 }
 
 
@@ -1125,6 +1172,7 @@ void libgame_update_gamestate(gamestate* g) {
         libgame_process_action_results(g);
 
         libgame_lua_clear_actions(L);
+
         g->player_input_received = false;
     }
 }
@@ -1162,26 +1210,41 @@ void libgame_process_action_results(gamestate* const g) {
 
         // fill in the blank
         // depending on the actionresult's actor and target, we will update the spritegroups by enqueuing an animation state
-        const int success = libgame_lua_get_action_result(L, i, "success");
+        //const int success = libgame_lua_get_action_result(L, i, "success");
+        const int action_result =
+            libgame_lua_get_action_result(L, i, "action_result");
+
         const entityid actor_id =
             libgame_lua_get_action_result(L, i, "actor_id");
 
 
-        if (success) {
+        if (action_result == AR_MOVE_SUCCESS ||
+            action_result == AR_ATTACK_SUCCESS) {
             //const entityid target_id =
             //    libgame_lua_get_action_result(L, i, "target_id");
-            const action_t action_type =
-                libgame_lua_get_action_result(L, i, "action_type");
+            //const action_t action_type =
+            //    libgame_lua_get_action_result(L, i, "action_type");
             const int xdir = libgame_lua_get_action_result(L, i, "xdir");
             const int ydir = libgame_lua_get_action_result(L, i, "ydir");
+            const entityid target_id =
+                libgame_lua_get_action_result(L, i, "target_id");
 
-            const bool sprite_update_result = libgame_handle_sprite_update(
-                g, actor_id, action_type, xdir, ydir);
-            if (!sprite_update_result) {
+            const bool actor_update_result = libgame_handle_sprite_update(
+                g, actor_id, action_result, xdir, ydir);
+            if (!actor_update_result) {
 #ifdef DEBUG
                 merror("libgame_handle_sprite_update: failed to update "
                        "spritegroup");
 #endif
+            } else {
+                const bool target_update_result = libgame_handle_sprite_update(
+                    g, target_id, AR_WAS_DAMAGED, xdir, ydir);
+                if (!target_update_result) {
+#ifdef DEBUG
+                    merror("libgame_handle_sprite_update: failed to update "
+                           "spritegroup");
+#endif
+                }
             }
         } else {
 #ifdef DEBUG
@@ -1200,18 +1263,19 @@ void libgame_process_action_results(gamestate* const g) {
 
 
 
-const bool libgame_handle_sprite_update(gamestate* const g,
-                                        const entityid actor_id,
-                                        const action_t action_type,
-                                        const int xdir,
-                                        const int ydir) {
+const bool
+libgame_handle_sprite_update(gamestate* const g,
+                             const entityid actor_id,
+                             const actionresults_t actionresults_type,
+                             const int xdir,
+                             const int ydir) {
 
     // given the actor_id, grab the spritegroup and set the animation
 
 
     minfo("libgame_handle_sprite_update begin");
     printf("actor_id: %d\n", actor_id);
-    printf("action_type: %d\n", action_type);
+    printf("actionresults_type: %d\n", actionresults_type);
     printf("xdir = %d\n", xdir);
     printf("ydir = %d\n", ydir);
 
@@ -1225,9 +1289,7 @@ const bool libgame_handle_sprite_update(gamestate* const g,
     race_t actor_race = libgame_lua_get_entity_int(L, actor_id, "race");
     int anim = -1;
 
-    if (action_type == ACTION_MOVE) {
-
-
+    if (actionresults_type == AR_MOVE_SUCCESS) {
         anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK
                : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK
                                         : -1;
@@ -1240,21 +1302,54 @@ const bool libgame_handle_sprite_update(gamestate* const g,
         }
 
         libgame_entity_anim_set(g, actor_id, anim);
-        //const int update_result = libgame_update_spritegroup(
-        //    g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
-
-        //libgame_update_spritegroup_move(g, actor_id, xdir, ydir);
-
-
+        libgame_entity_anim_enqueue(g, actor_id, anim);
         libgame_update_spritegroup_move(
             g, actor_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
+        libgame_update_spritegroup(
+            g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
 
+        return true;
+    }
+
+    else if (actionresults_type == AR_ATTACK_SUCCESS) {
+        anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_ATTACK
+               : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_ATTACK
+                                        : -1;
+        if (anim == -1) {
+#ifdef DEBUG
+            merror("Race not set properly");
+            fprintf(stderr, "Race: %d\n", actor_race);
+#endif
+        }
+        libgame_entity_anim_set(g, actor_id, anim);
+        libgame_entity_anim_enqueue(g, actor_id, anim);
 
         libgame_update_spritegroup(
             g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
 
         return true;
     }
+
+
+    else if (actionresults_type == AR_WAS_DAMAGED) {
+        anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_DMG
+               : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_DMG
+                                        : -1;
+        if (anim == -1) {
+#ifdef DEBUG
+            merror("Race not set properly");
+            fprintf(stderr, "Race: %d\n", actor_race);
+#endif
+        }
+        libgame_entity_anim_set(g, actor_id, anim);
+        libgame_entity_anim_enqueue(g, actor_id, anim);
+
+        libgame_update_spritegroup(
+            g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
+
+        return true;
+    }
+
 
     return false;
 }
