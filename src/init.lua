@@ -367,6 +367,7 @@ function EntityMove(id, xdir, ydir)
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
 		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
+			PrintDebug("EntityMove", "Entity is out of bounds")
 			result.success = 0
 			result.actor_id = id
 			result.xdir = xdir
@@ -376,7 +377,7 @@ function EntityMove(id, xdir, ydir)
 			return result
 		end
 		if GetTileType(newx, newy) == TileTypes.None then
-			PrintDebug("init.lua:330", "Tile is None")
+			PrintDebug("EntityMove", "Tile is None")
 			result.success = 0
 			result.actor_id = id
 			result.xdir = xdir
@@ -387,7 +388,7 @@ function EntityMove(id, xdir, ydir)
 		end
 		-- can't move into stone walls
 		if GetTileType(newx, newy) >= TileTypes.Stonewall00 and GetTileType(newx, newy) <= TileTypes.Stonewall14 then
-			PrintDebug("init.lua:335", "Tile is Stonewall")
+			PrintDebug("EntityMove", "Tile is Stonewall")
 			result.success = 0
 			result.actor_id = id
 			result.xdir = xdir
@@ -397,7 +398,7 @@ function EntityMove(id, xdir, ydir)
 			return result
 		end
 		if TileIsOccupiedByPlayer(newx, newy) or TileIsOccupiedByNPC(newx, newy) then
-			PrintDebug("init.lua:340", "Tile is occupied by player or NPC")
+			PrintDebug("EntityMove", "Tile is occupied by player or NPC")
 			result.success = 0
 			result.actor_id = id
 			result.xdir = xdir
@@ -882,6 +883,10 @@ end
 
 function ClearActions()
 	Gamestate.Actions = {}
+end
+
+function ClearActionResults()
+	ActionResults = {}
 end
 
 function GetActionCount()

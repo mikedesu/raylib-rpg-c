@@ -92,6 +92,7 @@ const int
 libgame_lua_get_action_result(lua_State* L, const int index, const char* key);
 
 
+void libgame_lua_clear_action_results(lua_State* L);
 
 
 //void libgame_lua_print_entities(lua_State* L);

@@ -1162,10 +1162,12 @@ void libgame_process_action_results(gamestate* const g) {
 
         // fill in the blank
         // depending on the actionresult's actor and target, we will update the spritegroups by enqueuing an animation state
-        const bool success = libgame_lua_get_action_result(L, i, "success");
+        const int success = libgame_lua_get_action_result(L, i, "success");
+        const entityid actor_id =
+            libgame_lua_get_action_result(L, i, "actor_id");
+
+
         if (success) {
-            const entityid actor_id =
-                libgame_lua_get_action_result(L, i, "actor_id");
             //const entityid target_id =
             //    libgame_lua_get_action_result(L, i, "target_id");
             const action_t action_type =
@@ -1181,8 +1183,18 @@ void libgame_process_action_results(gamestate* const g) {
                        "spritegroup");
 #endif
             }
+        } else {
+#ifdef DEBUG
+            merror("libgame_process_action_results: failed to process action "
+                   "result for actor");
+            fprintf(stderr, "actor_id: %d\n", actor_id);
+
+#endif
         }
     }
+
+    // clear the action results table
+    libgame_lua_clear_action_results(L);
 }
 
 

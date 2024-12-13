@@ -879,3 +879,15 @@ void libgame_lua_process_actions(lua_State* L) {
     lua_getglobal(L, "ProcessActions");
     lua_pcall(L, 0, 0, 0);
 }
+
+
+void libgame_lua_clear_action_results(lua_State* L) {
+    if (!L) {
+#ifdef DEBUG
+        merror("libgame_lua_clear_action_results: L is NULL");
+#endif
+        return;
+    }
+    lua_getglobal(L, "ClearActionResults");
+    lua_pcall(L, 0, 0, 0);
+}
