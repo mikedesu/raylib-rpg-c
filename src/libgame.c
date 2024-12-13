@@ -349,26 +349,28 @@ void libgame_update_spritegroup_move(gamestate* const g,
 #endif
         return;
     }
-    sg->move_x += x;
-    sg->move_y += y;
+    //sg->move_x += x;
+    //sg->move_y += y;
+    sg->move_x = x;
+    sg->move_y = y;
 
     // set the spritegroup context based on the direction
-    const direction_t dir = libgame_get_dir_from_xy(x, y);
-    const int update_result =
-        libgame_update_spritegroup(g, id, SPECIFIER_NONE, dir);
-    if (update_result == -1) {
-#ifdef DEBUG
-        merror("libgame_update_spritegroup_move: failed to update spritegroup");
-#endif
-    }
+    //const direction_t dir = libgame_get_dir_from_xy(x, y);
+    //const int update_result =
+    //    libgame_update_spritegroup(g, id, SPECIFIER_NONE, dir);
+    //if (update_result == -1) {
+    //#ifdef DEBUG
+    //        merror("libgame_update_spritegroup_move: failed to update spritegroup");
+    //#endif
+    //    }
 
     // set the sprite animation based on entity race
-    const race_t race = libgame_lua_get_entity_int(L, id, "Race");
-    int spritegroup_anim_id = SPRITEGROUP_ANIM_HUMAN_WALK;
-    if (race == RACE_ORC) {
-        spritegroup_anim_id = SPRITEGROUP_ANIM_ORC_WALK;
-    }
-    libgame_entity_anim_set(g, id, spritegroup_anim_id);
+    //const race_t race = libgame_lua_get_entity_int(L, id, "Race");
+    //int spritegroup_anim_id = SPRITEGROUP_ANIM_HUMAN_WALK;
+    //if (race == RACE_ORC) {
+    //    spritegroup_anim_id = SPRITEGROUP_ANIM_ORC_WALK;
+    //}
+    //libgame_entity_anim_set(g, id, spritegroup_anim_id);
 }
 
 
@@ -1213,11 +1215,12 @@ const bool libgame_handle_sprite_update(gamestate* const g,
 
     if (action_type == ACTION_MOVE) {
 
-        if (actor_race == RACE_HUMAN) {
-            anim = SPRITEGROUP_ANIM_HUMAN_WALK;
-        } else if (actor_race == RACE_ORC) {
-            anim = SPRITEGROUP_ANIM_ORC_WALK;
-        } else {
+
+        anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK
+               : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK
+                                        : -1;
+
+        if (anim == -1) {
 #ifdef DEBUG
             merror("Race not set properly");
             fprintf(stderr, "Race: %d\n", actor_race);
@@ -1227,6 +1230,14 @@ const bool libgame_handle_sprite_update(gamestate* const g,
         libgame_entity_anim_set(g, actor_id, anim);
         //const int update_result = libgame_update_spritegroup(
         //    g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
+
+        //libgame_update_spritegroup_move(g, actor_id, xdir, ydir);
+
+
+        libgame_update_spritegroup_move(
+            g, actor_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
+
+
         libgame_update_spritegroup(
             g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
 
