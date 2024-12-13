@@ -64,10 +64,6 @@ const entityid libgame_create_orc(gamestate* const g,
 
 void libgame_unloadtexture(gamestate* const g, const int index);
 
-//const entityid libgame_create_hero(gamestate* const g,
-//                                   const char* name,
-//                                   const int x,
-//                                   const int y);
 
 void libgame_do_camera_lock_on(gamestate* const g);
 
@@ -77,12 +73,9 @@ void libgame_draw_entities_at_lua(gamestate* const g,
                                   const entitytype_t type,
                                   const int x,
                                   const int y);
-//void libgame_entity_anim_incr(gamestate* const g, const entityid id);
 
 const bool
 libgame_entity_anim_set(gamestate* const g, const entityid id, const int index);
-
-void libgame_process_turn_action(gamestate* const g, const int i);
 
 void libgame_handle_input_player(gamestate* const g);
 
@@ -118,15 +111,13 @@ void libgame_load_texture_from_disk(gamestate* const g,
                                     const bool dodither,
                                     const char* path);
 
-void libgame_process_turn(gamestate* const g);
+//void libgame_process_turn(gamestate* const g);
 
 void libgame_process_turn_begin_end(gamestate* const g,
                                     const int begin,
                                     const int end);
 
-void libgame_process_turn_actions(gamestate* const g,
-                                  const int begin,
-                                  const int end);
+//void libgame_process_turn_actions(gamestate* const g);
 
 void libgame_test_enemy_placement(gamestate* const g);
 
@@ -142,7 +133,6 @@ void libgame_update_debug_panel_buffer(gamestate* const g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* const g,
                                                const entitytype_t type);
 
-//void libgame_update_spritegroup(gamestate* const g, const entityid id, const specifier_t spec, const direction_t dir);
 const int libgame_update_spritegroup(gamestate* const g,
                                      const entityid id,
                                      const specifier_t spec,
@@ -202,9 +192,6 @@ void libgame_draw_dungeonfloor(gamestate* const g);
 void libgame_drawframeend(gamestate* const g);
 
 void libgame_incr_current_action(gamestate* const g);
-//void libgame_incr_current_action_key(gamestate* const g);
-
-void libgame_handle_screen_shot(gamestate* const g);
 
 void libgame_update_hero_shield_spritegroup(gamestate* const g);
 
@@ -215,3 +202,15 @@ const entityid libgame_create_entity(gamestate* const g,
                                      const int x,
                                      const int y,
                                      const direction_t direction);
+
+
+void libgame_process_action_results(gamestate* const g);
+
+
+void libgame_handle_test_enemy_placement(gamestate* const g);
+
+const bool libgame_handle_sprite_update(gamestate* const g,
+                                        const entityid actor_id,
+                                        const action_t action_type,
+                                        const int xdir,
+                                        const int ydir);

@@ -46,7 +46,10 @@ const int libgame_lua_get_nth_entity_at(lua_State* L,
                                         const int x,
                                         const int y);
 const int libgame_lua_get_action_count(lua_State* L);
-const int libgame_lua_process_action(lua_State* L, const int index);
+
+//const int libgame_lua_process_action(lua_State* L, const int index);
+void libgame_lua_process_actions(lua_State* L);
+
 const int libgame_lua_get_num_entities(lua_State* L);
 const int libgame_lua_get_nth_entity(lua_State* L, const int n);
 const int libgame_lua_get_gamestate_int(lua_State* L, const char* key);

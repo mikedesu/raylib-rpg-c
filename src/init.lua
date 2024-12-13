@@ -803,7 +803,7 @@ function ProcessAction(index)
 	-- do nothing
 	--end
 	if index < 1 or index > #Gamestate.Actions then
-		PrintDebug("init.lua:~639", "Invalid action index " .. index)
+		PrintDebug("ProcessAction", "Invalid action index " .. index)
 		return -1
 	end
 	local action = Gamestate.Actions[index]
@@ -845,13 +845,13 @@ function ProcessAction(index)
 	return index
 end
 
---function ProcessActions()
---	PrintDebug("init.lua:322", "Processing " .. #Actions .. " actions")
---	for i, action in ipairs(Actions) do
---		ProcessAction(action)
---	end
---	Actions = {}
---end
+function ProcessActions()
+	PrintDebug("ProcessActions", "Processing " .. #Actions .. " actions")
+	for i, action in ipairs(Actions) do
+		ProcessAction(action)
+	end
+	Actions = {}
+end
 
 function ClearWasDamaged()
 	for _, entity in ipairs(Gamestate.Entities) do
