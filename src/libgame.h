@@ -135,10 +135,10 @@ void libgame_update_debug_panel_buffer(gamestate* const g);
 void libgame_update_smoothmoves_for_entitytype(gamestate* const g,
                                                const entitytype_t type);
 
-const int libgame_update_spritegroup(gamestate* const g,
-                                     const entityid id,
-                                     const specifier_t spec,
-                                     const direction_t dir);
+const int libgame_update_spritegroup_context(gamestate* const g,
+                                             const entityid id,
+                                             const specifier_t spec,
+                                             const direction_t dir);
 
 void libgame_update_spritegroup_by_lastmove(gamestate* const g,
                                             const entityid entity_id);
@@ -221,3 +221,7 @@ libgame_handle_sprite_update(gamestate* const g,
 const bool libgame_entity_anim_enqueue(gamestate* const g,
                                        const entityid id,
                                        const int index);
+
+
+const bool libgame_entity_anim_enqueue_by_actionresult(
+    gamestate* const g, const entityid id, const actionresults_t ar);

@@ -54,7 +54,8 @@ void spritegroup_set_prev_anim(spritegroup_t* const sg);
 void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec);
 
 
-void spritegroup_enqueue_anim(spritegroup_t* const sg, const int anim);
+const bool spritegroup_enqueue_anim(spritegroup_t* const sg, const int anim);
+
 const int spritegroup_get_anim_in_queue(spritegroup_t* const sg,
                                         const int index);
 void spritegroup_clear_anim_queue(spritegroup_t* const sg);

@@ -68,7 +68,9 @@ void spritegroup_destroy(spritegroup_t* sg) {
         return;
     }
     if (sg->sprites) {
-        for (int i = 0; i < sg->size; i++) { sprite_destroy(sg->sprites[i]); }
+        for (int i = 0; i < sg->size; i++) {
+            sprite_destroy(sg->sprites[i]);
+        }
         free(sg->sprites);
     }
     free(sg);
@@ -191,17 +193,22 @@ const int spritegroup_get_first_context(spritegroup_t* const sg) {
 
 
 
-void spritegroup_enqueue_anim(spritegroup_t* const sg, const int anim) {
+const bool spritegroup_enqueue_anim(spritegroup_t* const sg, const int anim) {
     if (!sg) {
+#ifdef DEBUG
         merror("spritegroup_enqueue_anim: spritegroup is NULL");
-        return;
+#endif
+        return false;
     }
     if (sg->anim_queue_count < SPRITEGROUP_ANIM_QUEUE_MAX) {
         sg->anim_queue[sg->anim_queue_count] = anim;
         sg->anim_queue_count++;
-    } else {
-        mwarning("spritegroup_enqueue_anim: animation queue is full");
+        return true;
     }
+#ifdef DEBUG
+    mwarning("spritegroup_enqueue_anim: animation queue is full");
+#endif
+    return false;
 }
 
 
@@ -231,6 +238,7 @@ void spritegroup_clear_anim_queue(spritegroup_t* const sg) {
         return;
     }
 
-    for (int i = 0; i < SPRITEGROUP_ANIM_QUEUE_MAX; i++) sg->anim_queue[i] = -1;
+    for (int i = 0; i < SPRITEGROUP_ANIM_QUEUE_MAX; i++)
+        sg->anim_queue[i] = -1;
     sg->anim_queue_count = 0;
 }
