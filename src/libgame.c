@@ -1148,33 +1148,31 @@ void libgame_update_gamestate(gamestate* g) {
     //UpdateMusicStream(test_music);
     libgame_update_debug_panel_buffer(g);
     //setdebugpanelcenter(g);
-    libgame_reset_entities_anim(g);
-    libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
+    //libgame_reset_entities_anim(g);
+    //libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
     libgame_do_camera_lock_on(g);
     // at this point, we can take other NPC turns
     // lets iterate over our entities, find the NPCs, and make them move in a random direction
     // then, we will update their smooth moves
     // we will need to eventually disable player input during smooth moving
     // update smooth move for NPCs and other entities
-    libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
-    if (g->player_input_received) {
-        minfo("libgame_update_gamestate: player input received");
-        libgame_handle_npcs_turn_lua(g);
-        // this is where we want to process the turn
-        // we want to do this in a lock-step fashion so that it is only called once every N frames or so
-        //libgame_process_turn(g);
-        //libgame_process_turn_actions(g);
-        libgame_lua_process_actions(L);
-        // here, we need to step thru the ActionResults array in the lua gamestate
-        // and update the sprites based on the results
-        // this is a major step towards handling the animation stacking which is the whole point
+    //libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
 
-        libgame_process_action_results(g);
-
-        libgame_lua_clear_actions(L);
-
-        g->player_input_received = false;
-    }
+    //if (g->player_input_received) {
+    //    minfo("libgame_update_gamestate: player input received");
+    //    libgame_handle_npcs_turn_lua(g);
+    // this is where we want to process the turn
+    // we want to do this in a lock-step fashion so that it is only called once every N frames or so
+    //libgame_process_turn(g);
+    //libgame_process_turn_actions(g);
+    //    libgame_lua_process_actions(L);
+    // here, we need to step thru the ActionResults array in the lua gamestate
+    // and update the sprites based on the results
+    // this is a major step towards handling the animation stacking which is the whole point
+    //    libgame_process_action_results(g);
+    //    libgame_lua_clear_actions(L);
+    //    g->player_input_received = false;
+    //}
 }
 
 
@@ -1772,17 +1770,17 @@ void libgame_draw_gameplayscene_entities(gamestate* const g) {
 #endif
         return;
     }
-    for (int i = 0; i < libgame_lua_get_dungeonfloor_row_count(L); i++) {
-        for (int j = 0; j < libgame_lua_get_dungeonfloor_col_count(L); j++) {
-            //libgame_draw_items(g, ITEM_TORCH, i, j);
-            //libgame_draw_items_that_are_not(g, ITEM_TORCH, i, j);
-            //libgame_draw_entities_at(g, ENTITY_NPC, i, j);
-            //libgame_draw_entities_at(g, ENTITY_PLAYER, i, j);
-            libgame_draw_entities_at_lua(g, ENTITY_SHIELD, i, j);
-            libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
-            libgame_draw_entities_at_lua(g, ENTITY_PLAYER, i, j);
-        }
-    }
+    //for (int i = 0; i < libgame_lua_get_dungeonfloor_row_count(L); i++) {
+    //    for (int j = 0; j < libgame_lua_get_dungeonfloor_col_count(L); j++) {
+    //libgame_draw_items(g, ITEM_TORCH, i, j);
+    //libgame_draw_items_that_are_not(g, ITEM_TORCH, i, j);
+    //libgame_draw_entities_at(g, ENTITY_NPC, i, j);
+    //libgame_draw_entities_at(g, ENTITY_PLAYER, i, j);
+    //        libgame_draw_entities_at_lua(g, ENTITY_SHIELD, i, j);
+    //        libgame_draw_entities_at_lua(g, ENTITY_NPC, i, j);
+    //        libgame_draw_entities_at_lua(g, ENTITY_PLAYER, i, j);
+    //    }
+    //}
 }
 
 
@@ -1802,7 +1800,8 @@ void libgame_draw_gameplayscene(gamestate* const g) {
         libgame_drawgrid(g);
     }
     // draw torches, items, npcs, player
-    libgame_draw_gameplayscene_entities(g);
+    //libgame_draw_gameplayscene_entities(g);
+
     // lighting basics
     //const int tilesize = DEFAULT_TILE_SIZE;
     //for (int i = 0; i < g->dungeonfloor->len; i++) {
