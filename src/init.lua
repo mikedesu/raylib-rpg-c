@@ -168,7 +168,7 @@ Entities = {}
 function CreateTile(type)
 	local tile = {
 		type = type,
-		entities = {},
+		--entities = {},
 	}
 	return tile
 end
@@ -262,7 +262,7 @@ function CreateEntity(name, type, x, y)
 	}
 	Gamestate.NextEntityId = Gamestate.NextEntityId + 1
 	table.insert(Gamestate.Entities, entity)
-	AddEntityToTile(entity.id, x, y)
+	--AddEntityToTile(entity.id, x, y)
 	PrintDebug("init.lua:167", "Created entity with id " .. entity.id)
 	return entity.id
 end
