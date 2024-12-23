@@ -44,12 +44,13 @@ Gamestate = {
 	Entities = {},
 	CurrentAction = 1,
 	CurrentTurn = 1,
+	HeroId = -1,
 }
 
 --Gamestate.WindowWidth = Gamestate.TargetWidth * Scale
 --Gamestate.WindowHeight = Gamestate.TargetHeight * Scale
 
-HeroId = -1
+--HeroId = -1
 
 ActionTypes = {
 	None = 1,
@@ -157,7 +158,7 @@ RaceTypes = {
 }
 
 NextEntityId = 1
-HeroId = -1
+--HeroId = -1
 --LastXDir = 0
 --LastYDir = 0
 --Actions = {}
