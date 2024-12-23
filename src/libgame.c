@@ -1764,6 +1764,25 @@ void libgame_draw_gameplayscene_entities(gamestate* const g) {
 
         return;
     }
+
+    const int entity_count = libgame_lua_get_num_entities(L);
+    if (entity_count == -1) {
+        merror("libgame_draw_gameplayscene_entities: entity_count is -1");
+        return;
+    } else if (entity_count == 0) {
+        merror("libgame_draw_gameplayscene_entities: entity_count is 0");
+        return;
+    }
+
+    for (int i = 1; i <= entity_count; i++) {
+        const entityid id = libgame_lua_get_nth_entity(L, i);
+        //const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+        //if (type == ENTITY_PLAYER) {
+        libgame_draw_entity(g, id);
+        //}
+    }
+
+
     //for (int i = 0; i < libgame_lua_get_dungeonfloor_row_count(L); i++) {
     //    for (int j = 0; j < libgame_lua_get_dungeonfloor_col_count(L); j++) {
     //libgame_draw_items(g, ITEM_TORCH, i, j);
@@ -1796,7 +1815,7 @@ void libgame_draw_gameplayscene(gamestate* const g) {
     //    libgame_drawgrid(g);
     //}
     // draw torches, items, npcs, player
-    //libgame_draw_gameplayscene_entities(g);
+    libgame_draw_gameplayscene_entities(g);
 
     // lighting basics
     //const int tilesize = DEFAULT_TILE_SIZE;
