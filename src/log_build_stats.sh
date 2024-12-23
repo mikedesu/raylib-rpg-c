@@ -55,16 +55,26 @@ make clean;
 
 echo $TIMESTAMP,$GCC_SIZE,$CLANG_SIZE,$GCC_LIBSIZE,$CLANG_LIBSIZE,$EMCC_DATA_SIZE,$EMCC_HTML_SIZE,$EMCC_JS_SIZE,$EMCC_WASM_SIZE,$LOC,$LUA_LOC,$BUILD_TIME,$CLANG_BUILD_TIME,$EMCC_BUILD_TIME >> build-stats.csv
 
+echo "Building graphs...";
 python3 graph_loc.py build-stats.csv LOC loc 2>/dev/null;
+echo "Built loc graph";
 python3 graph_loc.py build-stats.csv LOC lua_loc 2>/dev/null;
+echo "Built lua_loc graph";
 #python3 graph_loc.py build-stats.csv loc lua_loc 2>/dev/null;
 python3 graph_loc.py build-stats.csv seconds gcc_build_time clang_build_time emcc_build_time 2>/dev/null;
+echo "Built build time graph";
 python3 graph_loc.py build-stats.csv bytes gcc_size clang_size 2>/dev/null;
+echo "Built size graph";
 python3 graph_loc.py build-stats.csv bytes gcc_libsize clang_libsize 2>/dev/null;
+echo "Built libsize graph";
 #python3 graph_loc.py build-stats.csv emcc_build_time 2>/dev/null;
 python3 graph_loc.py build-stats.csv bytes emcc_data_size 2>/dev/null;
+echo "Built emcc data size graph";
 python3 graph_loc.py build-stats.csv bytes emcc_html_size 2>/dev/null;
+echo "Built emcc html size graph";
 python3 graph_loc.py build-stats.csv bytes emcc_js_size 2>/dev/null;
+echo "Built emcc js size graph";
 python3 graph_loc.py build-stats.csv bytes emcc_wasm_size 2>/dev/null;
+echo "Built emcc wasm size graph";
 
 rm -rf time.txt time_clang.txt time_emcc.txt;

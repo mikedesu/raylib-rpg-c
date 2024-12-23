@@ -1676,25 +1676,21 @@ void libgame_draw_entity_incr_frame(gamestate* const g, const entityid id) {
 
 void libgame_draw_entity(gamestate* const g, const entityid id) {
     if (!g) {
-
         merror("libgame_draw_entity: gamestate is NULL");
-
         return;
     }
-    const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-    const specifier_t spec =
-        type == ENTITY_SHIELD ? SPECIFIER_SHIELD_ON_TILE : SPECIFIER_NONE;
+    //const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+    const specifier_t spec = SPECIFIER_NONE;
+    //type == ENTITY_SHIELD ? SPECIFIER_SHIELD_ON_TILE : SPECIFIER_NONE;
     spritegroup_t* group = hashtable_entityid_spritegroup_get_by_specifier(
         g->spritegroups, id, spec);
     if (!group) {
-
         merror("libgame_draw_entity: group is NULL");
-
         return;
     }
     // draw entity shadow
     libgame_draw_entity_shadow(g, id);
-    libgame_draw_entity_shield_back(g, id);
+    //libgame_draw_entity_shield_back(g, id);
     // draw the main entity sprite
     DrawTexturePro(*group->sprites[group->current]->texture,
                    group->sprites[group->current]->src,
@@ -1702,11 +1698,13 @@ void libgame_draw_entity(gamestate* const g, const entityid id) {
                    (Vector2){0, 0},
                    0.0f,
                    WHITE);
-    libgame_draw_entity_shield_front(g, id);
+    //libgame_draw_entity_shield_front(g, id);
     libgame_draw_entity_incr_frame(g, id);
     if (g->debugpanelon) {
-        const int x = group->dest.x, y = group->dest.y, w = group->dest.width,
-                  h = group->dest.height;
+        const int x = group->dest.x;
+        const int y = group->dest.y;
+        const int w = group->dest.width;
+        const int h = group->dest.height;
         // first draw the outer rectangle without the offset
         //Vector2 v[4] = {{x, y}, {x + w, y }, {x + w , y + h }, {x , y + h }};
         const Vector2 v[4] = {{x - group->off_x, y - group->off_y},
@@ -2181,37 +2179,29 @@ void libgame_create_spritegroup(gamestate* const g,
         return;
     }
     spritegroup_t* group = spritegroup_create(20);
-    const int x = libgame_lua_get_entity_int(L, id, "x"),
-              y = libgame_lua_get_entity_int(L, id, "y"),
-              dw = libgame_lua_get_dungeonfloor_col_count(L),
-              dh = libgame_lua_get_dungeonfloor_row_count(L);
+    const int x = libgame_lua_get_entity_int(L, id, "x");
+    const int y = libgame_lua_get_entity_int(L, id, "y");
+    //const int dw = libgame_lua_get_dungeonfloor_col_count(L);
+    //const int dh = libgame_lua_get_dungeonfloor_row_count(L);
     if (x < 0) {
-
         merror("libgame_create_spritegroup: x is less than 0");
-
         return;
     }
 
-    if (x >= dw) {
-
-        merror("libgame_create_spritegroup: x is greater than or equal to dw");
-
-        return;
-    }
+    //if (x >= dw) {
+    //    merror("libgame_create_spritegroup: x is greater than or equal to dw");
+    //    return;
+    //}
 
     if (y < 0) {
-
         merror("libgame_create_spritegroup: y is less than 0");
-
         return;
     }
 
-    if (y >= dh) {
-
-        merror("libgame_create_spritegroup: y is greater than or equal to dh");
-
-        return;
-    }
+    //if (y >= dh) {
+    //    merror("libgame_create_spritegroup: y is greater than or equal to dh");
+    //    return;
+    //}
 
     for (int i = 0; i < num_keys; i++) {
         spritegroup_add(group,
@@ -2222,9 +2212,12 @@ void libgame_create_spritegroup(gamestate* const g,
     // this is effectively how we will update the
     // sprite position in relation to the entity's
     // dungeon position
-    const float w = spritegroup_get(group, 0)->width,
-                h = spritegroup_get(group, 0)->height,
-                dst_x = x * DEFAULT_TILE_SIZE, dst_y = y * DEFAULT_TILE_SIZE;
+    const float w = spritegroup_get(group, 0)->width;
+    const float h = spritegroup_get(group, 0)->height;
+    const float dst_x = x;
+    //const float dst_x = x * DEFAULT_TILE_SIZE;
+    //const float dst_y = y * DEFAULT_TILE_SIZE;
+    const float dst_y = y;
     group->current = 0;
     group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
     group->off_x = offset_x;
@@ -2352,7 +2345,13 @@ const entityid libgame_create_entity(gamestate* const g,
         return -1;
     }
 
-    const entityid id = libgame_lua_create_entity(L, name, type, x, y);
+
+    const int onscreen_x = x * DEFAULT_TILE_SIZE;
+    const int onscreen_y = y * DEFAULT_TILE_SIZE;
+
+    const entityid id =
+        libgame_lua_create_entity(L, name, type, onscreen_x, onscreen_y);
+    //const entityid id = libgame_lua_create_entity(L, name, type, x, y);
     if (id == -1) {
 
         merror("libgame_create_entity: could not create entity, expect "
