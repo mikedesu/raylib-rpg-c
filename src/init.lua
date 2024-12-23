@@ -391,83 +391,18 @@ end
 
 function EntityMove(id, xdir, ydir)
 	local entity = GetEntityById(id)
-	local result = ActionResult()
+	--local result = ActionResult()
 	if entity then
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
 		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
 			PrintDebug("EntityMove", "Entity is out of bounds")
-			result.success = 0
-			result.actor_id = id
-			result.xdir = xdir
-			result.ydir = ydir
-			result.action_type = ActionTypes.Move
-			result.action_result = ActionResultType.MoveFailOutOfBounds
-			return result
-		end
-		if GetTileType(newx, newy) == TileTypes.None then
-			PrintDebug("EntityMove", "Tile is None")
-			result.success = 0
-			result.actor_id = id
-			result.xdir = xdir
-			result.ydir = ydir
-			result.action_type = ActionTypes.Move
-			result.action_result = ActionResultType.MoveFailNoTile
-			return result
 		end
 		-- can't move into stone walls
-		if GetTileType(newx, newy) >= TileTypes.Stonewall00 and GetTileType(newx, newy) <= TileTypes.Stonewall14 then
-			PrintDebug("EntityMove", "Tile is Stonewall")
-			result.success = 0
-			result.actor_id = id
-			result.xdir = xdir
-			result.ydir = ydir
-			result.action_type = ActionTypes.Move
-			result.action_result = ActionResultType.MoveFailBlockedByWall
-			return result
-		end
-		if TileIsOccupiedByPlayer(newx, newy) or TileIsOccupiedByNPC(newx, newy) then
-			PrintDebug("EntityMove", "Tile is occupied by player or NPC")
-			result.success = 0
-			result.actor_id = id
-			result.xdir = xdir
-			result.ydir = ydir
-			result.action_type = ActionTypes.Move
-			result.action_result = ActionResultType.MoveFailBlockedByEntity
-			return result
-		end
-		RemoveEntityFromTile(entity.id, entity.x, entity.y)
-		AddEntityToTile(entity.id, newx, newy)
 		entity.x = newx
 		entity.y = newy
-		entity.last_move_x = xdir
-		entity.last_move_y = ydir
-
-		local old_direction = entity.direction
-		local new_direction = GetDirectionFromXY(xdir, ydir)
-		if new_direction ~= DirectionTypes.None then
-			new_direction = old_direction
-		end
-		entity.direction = new_direction
-
-		result.success = 1
-		result.actor_id = id
-		result.xdir = xdir
-		result.ydir = ydir
-		result.action_type = ActionTypes.Move
-		result.action_result = ActionResultType.MoveSuccess
-		return result
 	end
-
 	PrintDebug("init.lua:358", "Entity with id " .. id .. " not found")
-
-	result.success = false
-	result.actor_id = id
-	result.xdir = xdir
-	result.ydir = ydir
-	result.action_type = ActionTypes.Move
-	result.action_result = ActionResultType.MoveFailUnknownEntity
-	return result
 end
 
 function EntityAttack(id, xdir, ydir)
