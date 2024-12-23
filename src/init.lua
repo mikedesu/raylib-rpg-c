@@ -183,7 +183,7 @@ function UpdateTilePosition(dungeon_x, dungeon_y, x, y)
 end
 
 function GetTileX(dungeon_x, dungeon_y)
-	PrintDebug("GetTileX", "Getting tile x for dungeon_x: " .. dungeon_x .. " and dungeon_y: " .. dungeon_y)
+	--PrintDebug("GetTileX", "Getting tile x for dungeon_x: " .. dungeon_x .. " and dungeon_y: " .. dungeon_y)
 	if Gamestate.DungeonFloor[dungeon_y] and Gamestate.DungeonFloor[dungeon_y][dungeon_x] then
 		return Gamestate.DungeonFloor[dungeon_y][dungeon_x].x
 	end
@@ -191,7 +191,7 @@ function GetTileX(dungeon_x, dungeon_y)
 end
 
 function GetTileY(dungeon_x, dungeon_y)
-	PrintDebug("GetTileY", "Getting tile x for dungeon_x: " .. dungeon_x .. " and dungeon_y: " .. dungeon_y)
+	--PrintDebug("GetTileY", "Getting tile x for dungeon_x: " .. dungeon_x .. " and dungeon_y: " .. dungeon_y)
 	if Gamestate.DungeonFloor[dungeon_y] and Gamestate.DungeonFloor[dungeon_y][dungeon_x] then
 		return Gamestate.DungeonFloor[dungeon_y][dungeon_x].y
 	end

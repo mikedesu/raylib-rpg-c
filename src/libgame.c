@@ -674,7 +674,7 @@ void libgame_handle_input_player(gamestate* const g) {
 
 
     //if (g->player_input_received == false) {
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    //const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     //const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
     // the real setup will involve managing the player's dungeon position
     if (IsKeyPressed(KEY_KP_6) || IsKeyPressed(KEY_RIGHT)) {
@@ -705,15 +705,16 @@ void libgame_handle_input_player(gamestate* const g) {
         libgame_handle_player_input_block_key(g);
     }
     //g->player_input_received = true;
-    else if (IsKeyPressed(KEY_SPACE)) {
-        // randomize the dungeon tiles
-        libgame_lua_randomize_dungeon_tiles(
-            L,
-            libgame_lua_get_entity_int(L, hero_id, "x") - 2,
-            libgame_lua_get_entity_int(L, hero_id, "y") - 2,
-            4,
-            4);
-    } else if (IsKeyPressed(KEY_PERIOD)) {
+    //else if (IsKeyPressed(KEY_SPACE)) {
+    // randomize the dungeon tiles
+    //    libgame_lua_randomize_dungeon_tiles(
+    //        L,
+    //        libgame_lua_get_entity_int(L, hero_id, "x") - 2,
+    //        libgame_lua_get_entity_int(L, hero_id, "y") - 2,
+    //        4,
+    //        4);
+    //}
+    else if (IsKeyPressed(KEY_PERIOD)) {
         // Wait action
         libgame_handle_player_wait_key(g);
     }
@@ -1141,7 +1142,7 @@ void libgame_reset_entities_anim(gamestate* const g) {
 
 
 void libgame_update_gamestate(gamestate* g) {
-    minfo("libgame_update_gamestate begin");
+    //minfo("libgame_update_gamestate begin");
     if (!g) {
 #ifdef DEBUG
         merror("libgame_update_gamestate: gamestate is NULL");
@@ -1176,7 +1177,7 @@ void libgame_update_gamestate(gamestate* g) {
     //    libgame_lua_clear_actions(L);
     //    g->player_input_received = false;
     //}
-    minfo("libgame_update_gamestate end");
+    //minfo("libgame_update_gamestate end");
 }
 
 
@@ -1526,15 +1527,15 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
 #endif
         return;
     }
-    minfo("libgame_draw_dungeonfloor begin");
+    //minfo("libgame_draw_dungeonfloor begin");
 
     const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
     Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
     //const int rows = libgame_lua_get_dungeonfloor_row_count(L), cols = libgame_lua_get_dungeonfloor_col_count(L);
 
-    minfo("libgame_draw_dungeonfloor: getting row  count");
+    //minfo("libgame_draw_dungeonfloor: getting row  count");
     const int row_count = libgame_lua_get_dungeonfloor_row_count(L);
-    minfo("libgame_draw_dungeonfloor: getting col  count");
+    //minfo("libgame_draw_dungeonfloor: getting col  count");
     const int col_count = libgame_lua_get_dungeonfloor_col_count(L);
 
 
@@ -1550,10 +1551,10 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
     for (int i = 0; i < row_count; i++) {
         for (int j = 0; j < col_count; j++) {
 
-            fprintf(stderr, "i: %d\n", i);
-            fprintf(stderr, "j: %d\n", j);
+            //fprintf(stderr, "i: %d\n", i);
+            //fprintf(stderr, "j: %d\n", j);
 
-            minfo("libgame_draw_dungeonfloor: getting tiletype");
+            //minfo("libgame_draw_dungeonfloor: getting tiletype");
             const int type = libgame_lua_get_tiletype(L, j, i);
             const int key = get_txkey_for_tiletype(type);
             if (key == -1) {
@@ -1561,12 +1562,12 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
             }
 
             //tile_dest.x = j * DEFAULT_TILE_SIZE,
-            minfo("libgame_draw_dungeonfloor: getting tile x");
+            //minfo("libgame_draw_dungeonfloor: getting tile x");
             tile_dest.x = libgame_lua_get_tile_x(L, j, i);
 
 
             //tile_dest.y = i * DEFAULT_TILE_SIZE;
-            minfo("libgame_draw_dungeonfloor: getting tile y");
+            //minfo("libgame_draw_dungeonfloor: getting tile y");
             tile_dest.y = libgame_lua_get_tile_y(L, j, i);
 
 
