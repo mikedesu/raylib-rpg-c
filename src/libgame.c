@@ -125,7 +125,7 @@ const bool libgame_entity_anim_enqueue(gamestate* const g,
     //sg->anim_queue_count += 1;
 
 
-    spritegroup_enqueue_anim(sg, index);
+    //spritegroup_enqueue_anim(sg, index);
 
     return true;
 
@@ -378,47 +378,46 @@ const int libgame_update_spritegroup(gamestate* const g,
 
 
 
-void libgame_update_spritegroup_move(gamestate* const g,
-                                     const entityid id,
-                                     const int x,
-                                     const int y) {
-    if (!g) {
-#ifdef DEBUG
-        merror("libgame_update_spritegroup_move: gamestate is NULL");
-#endif
-        return;
-    }
+//void libgame_update_spritegroup_move(gamestate* const g,
+//                                     const entityid id,
+//                                     const int x,
+//                                     const int y) {
+//    if (!g) {
+//#ifdef DEBUG
+//        merror("libgame_update_spritegroup_move: gamestate is NULL");
+//#endif
+//        return;
+//    }
+//    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+//    if (!sg) {
+//#ifdef DEBUG
+//        merror("libgame_update_spritegroup_move: spritegroup is NULL");
+//#endif
+//        return;
+//    }
+//sg->move_x += x;
+//sg->move_y += y;
+//sg->move_x = x;
+//sg->move_y = y;
 
-    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    if (!sg) {
-#ifdef DEBUG
-        merror("libgame_update_spritegroup_move: spritegroup is NULL");
-#endif
-        return;
-    }
-    //sg->move_x += x;
-    //sg->move_y += y;
-    sg->move_x = x;
-    sg->move_y = y;
+// set the spritegroup context based on the direction
+//const direction_t dir = libgame_get_dir_from_xy(x, y);
+//const int update_result =
+//    libgame_update_spritegroup(g, id, SPECIFIER_NONE, dir);
+//if (update_result == -1) {
+//#ifdef DEBUG
+//        merror("libgame_update_spritegroup_move: failed to update spritegroup");
+//#endif
+//    }
 
-    // set the spritegroup context based on the direction
-    //const direction_t dir = libgame_get_dir_from_xy(x, y);
-    //const int update_result =
-    //    libgame_update_spritegroup(g, id, SPECIFIER_NONE, dir);
-    //if (update_result == -1) {
-    //#ifdef DEBUG
-    //        merror("libgame_update_spritegroup_move: failed to update spritegroup");
-    //#endif
-    //    }
-
-    // set the sprite animation based on entity race
-    //const race_t race = libgame_lua_get_entity_int(L, id, "Race");
-    //int spritegroup_anim_id = SPRITEGROUP_ANIM_HUMAN_WALK;
-    //if (race == RACE_ORC) {
-    //    spritegroup_anim_id = SPRITEGROUP_ANIM_ORC_WALK;
-    //}
-    //libgame_entity_anim_set(g, id, spritegroup_anim_id);
-}
+// set the sprite animation based on entity race
+//const race_t race = libgame_lua_get_entity_int(L, id, "Race");
+//int spritegroup_anim_id = SPRITEGROUP_ANIM_HUMAN_WALK;
+//if (race == RACE_ORC) {
+//    spritegroup_anim_id = SPRITEGROUP_ANIM_ORC_WALK;
+//}
+//libgame_entity_anim_set(g, id, spritegroup_anim_id);
+//}
 
 
 
@@ -724,27 +723,27 @@ void libgame_handle_input_player(gamestate* const g) {
 
 
 
-void libgame_update_spritegroup_by_lastmove(gamestate* const g,
-                                            const entityid entity_id) {
-    if (!g) {
-#ifdef DEBUG
-        merror("libgame_update_spritegroup_by_lastmove: gamestate is NULL");
-#endif
-        return;
-    }
-    const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x");
-    const int ydir = libgame_lua_get_entity_int(L, entity_id, "last_move_y");
-    const int update_result = libgame_update_spritegroup(
-        g, entity_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
-    if (update_result == -1) {
-#ifdef DEBUG
-        merror("libgame_update_spritegroup_by_lastmove: failed to update "
-               "spritegroup");
-#endif
-    }
-    libgame_update_spritegroup_move(
-        g, entity_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
-}
+//void libgame_update_spritegroup_by_lastmove(gamestate* const g,
+//                                            const entityid entity_id) {
+//    if (!g) {
+//#ifdef DEBUG
+//        merror("libgame_update_spritegroup_by_lastmove: gamestate is NULL");
+//#endif
+//        return;
+//    }
+//    const int xdir = libgame_lua_get_entity_int(L, entity_id, "last_move_x");
+//    const int ydir = libgame_lua_get_entity_int(L, entity_id, "last_move_y");
+//    const int update_result = libgame_update_spritegroup(
+//        g, entity_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
+//    if (update_result == -1) {
+//#ifdef DEBUG
+//        merror("libgame_update_spritegroup_by_lastmove: failed to update "
+//               "spritegroup");
+//#endif
+//    }
+//libgame_update_spritegroup_move(
+//    g, entity_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
+//}
 
 
 
@@ -990,29 +989,29 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
 
 
 
-void libgame_update_smoothmove(gamestate* const g, const entityid id) {
-    if (!g) {
-#ifdef DEBUG
-        merror("libgame_update_smoothmove: gamestate is NULL");
-#endif
-        return;
-    }
-    spritegroup_t* group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    if (!group) {
-#ifdef DEBUG
-        merror("libgame_update_smoothmove: group is NULL");
-#endif
-        return;
-    }
-    //const float move_unit = 1.0f;
-    // only do it 1 unit at a time
-    const float move = 1.0f;
-    group->dest.x += group->move_x > 0 ? move : group->move_x < 0 ? -move : 0;
-    group->dest.y += group->move_y > 0 ? move : group->move_y < 0 ? -move : 0;
-    group->move_x += group->move_x > 0 ? -move : group->move_x < 0 ? move : 0;
-    group->move_y += group->move_y > 0 ? -move : group->move_y < 0 ? move : 0;
-}
+//void libgame_update_smoothmove(gamestate* const g, const entityid id) {
+//    if (!g) {
+//#ifdef DEBUG
+//        merror("libgame_update_smoothmove: gamestate is NULL");
+//#endif
+//        return;
+//    }
+//    spritegroup_t* group =
+//        hashtable_entityid_spritegroup_get(g->spritegroups, id);
+//    if (!group) {
+//#ifdef DEBUG
+//        merror("libgame_update_smoothmove: group is NULL");
+//#endif
+//        return;
+//    }
+//const float move_unit = 1.0f;
+// only do it 1 unit at a time
+//const float move = 1.0f;
+//group->dest.x += group->move_x > 0 ? move : group->move_x < 0 ? -move : 0;
+//group->dest.y += group->move_y > 0 ? move : group->move_y < 0 ? -move : 0;
+//group->move_x += group->move_x > 0 ? -move : group->move_x < 0 ? move : 0;
+//group->move_y += group->move_y > 0 ? -move : group->move_y < 0 ? move : 0;
+//}
 
 
 
@@ -1116,7 +1115,7 @@ void libgame_reset_entity_anim(gamestate* const g, entityid id) {
     }
     sprite* s = spritegroup_get(sg, sg->current);
     if (s && s->num_loops >= 1) {
-        sg->prev_anim = sg->current;
+        //sg->prev_anim = sg->current;
         sg->current = sg->default_anim;
         s->num_loops = 0;
     }
@@ -1305,9 +1304,9 @@ libgame_handle_sprite_update(gamestate* const g,
         }
 
         libgame_entity_anim_set(g, actor_id, anim);
-        libgame_entity_anim_enqueue(g, actor_id, anim);
-        libgame_update_spritegroup_move(
-            g, actor_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
+        //libgame_entity_anim_enqueue(g, actor_id, anim);
+        //libgame_update_spritegroup_move(
+        //    g, actor_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
         libgame_update_spritegroup(
             g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
 
@@ -1325,7 +1324,7 @@ libgame_handle_sprite_update(gamestate* const g,
 #endif
         }
         libgame_entity_anim_set(g, actor_id, anim);
-        libgame_entity_anim_enqueue(g, actor_id, anim);
+        //libgame_entity_anim_enqueue(g, actor_id, anim);
 
         libgame_update_spritegroup(
             g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
@@ -1360,22 +1359,21 @@ libgame_handle_sprite_update(gamestate* const g,
 
 
 
-void libgame_update_smoothmoves_for_entitytype(gamestate* const g,
-                                               const entitytype_t type) {
-    if (!g) {
-#ifdef DEBUG
-        merror("libgame_update_smoothmoves_for_entitytype: gamestate is NULL");
-#endif
-        return;
-    }
-    //const int count = libgame_lua_get_num_entities(L);
-    for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
-        const entityid id = libgame_lua_get_nth_entity(L, i + 1);
-        if (type == libgame_lua_get_entity_int(L, id, "type")) {
-            libgame_update_smoothmove(g, id);
-        }
-    }
-}
+// void libgame_update_smoothmoves_for_entitytype(gamestate* const g,
+//                                               const entitytype_t type) {
+//    if (!g) {
+// #ifdef DEBUG
+// #endif
+//        return;
+//    }
+//const int count = libgame_lua_get_num_entities(L);
+//  for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
+//      const entityid id = libgame_lua_get_nth_entity(L, i + 1);
+//      if (type == libgame_lua_get_entity_int(L, id, "type")) {
+//          libgame_update_smoothmove(g, id);
+//      }
+//  }
+//}
 
 
 
