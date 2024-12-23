@@ -2653,6 +2653,29 @@ const entityid libgame_create_orc(gamestate* const g,
 
 
 
+void libgame_create_hero(gamestate* const g) {
+    if (!g) {
+#ifdef DEBUG
+        merror("libgame_create_hero: gamestate is NULL");
+#endif
+        return;
+    }
+
+
+    const entityid heroid = libgame_create_entity(
+        g, "hero", ENTITY_PLAYER, RACE_HUMAN, 3, 3, DIRECTION_DOWN);
+    if (heroid == -1) {
+#ifdef DEBUG
+        merror("libgame_initsharedsetup: could not create hero entity, "
+               "crashing");
+#endif
+    } else {
+        libgame_lua_set_gamestate_int(L, "HeroId", heroid);
+    }
+}
+
+
+
 
 void libgame_initsharedsetup(gamestate* const g) {
     if (!g) {
