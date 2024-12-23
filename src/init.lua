@@ -168,9 +168,34 @@ Entities = {}
 function CreateTile(type)
 	local tile = {
 		type = type,
+		x = -1,
+		y = -1,
 		--entities = {},
 	}
 	return tile
+end
+
+function UpdateTilePosition(dungeon_x, dungeon_y, x, y)
+	if Gamestate.DungeonFloor[dungeon_y] and Gamestate.DungeonFloor[dungeon_y][dungeon_x] then
+		Gamestate.DungeonFloor[dungeon_y][dungeon_x].x = x
+		Gamestate.DungeonFloor[dungeon_y][dungeon_x].y = y
+	end
+end
+
+function GetTileX(dungeon_x, dungeon_y)
+	PrintDebug("GetTileX", "Getting tile x for dungeon_x: " .. dungeon_x .. " and dungeon_y: " .. dungeon_y)
+	if Gamestate.DungeonFloor[dungeon_y] and Gamestate.DungeonFloor[dungeon_y][dungeon_x] then
+		return Gamestate.DungeonFloor[dungeon_y][dungeon_x].x
+	end
+	return -1
+end
+
+function GetTileY(dungeon_x, dungeon_y)
+	PrintDebug("GetTileY", "Getting tile x for dungeon_x: " .. dungeon_x .. " and dungeon_y: " .. dungeon_y)
+	if Gamestate.DungeonFloor[dungeon_y] and Gamestate.DungeonFloor[dungeon_y][dungeon_x] then
+		return Gamestate.DungeonFloor[dungeon_y][dungeon_x].y
+	end
+	return -1
 end
 
 function GetNumEntities()

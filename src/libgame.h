@@ -221,3 +221,8 @@ libgame_handle_sprite_update(gamestate* const g,
 const bool libgame_entity_anim_enqueue(gamestate* const g,
                                        const entityid id,
                                        const int index);
+
+
+
+
+void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g);

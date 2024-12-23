@@ -900,88 +900,90 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
 #endif
         return;
     }
-    const entityid id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (id == -1) {
-#ifdef DEBUG
-        merror("libgame_update_debug_panel_buffer: hero_id is -1");
-#endif
-        return;
-    }
-    const int hx = libgame_lua_get_entity_int(L, id, "x");
-    const int hy = libgame_lua_get_entity_int(L, id, "y");
-    const int last_mv_x = libgame_lua_get_entity_int(L, id, "last_move_x");
-    const int last_mv_y = libgame_lua_get_entity_int(L, id, "last_move_y");
-    const int hero_was_damaged =
-        libgame_lua_get_entity_int(L, id, "was_damaged");
-    const int dw = libgame_lua_get_dungeonfloor_row_count(L);
-    const int dh = libgame_lua_get_dungeonfloor_col_count(L);
-    const int action_count = libgame_lua_get_action_count(L);
-    const int entity_count = libgame_lua_get_num_entities(L);
-    const int dir = libgame_lua_get_entity_int(L, id, "direction");
-    const int current_action =
-        libgame_lua_get_gamestate_int(L, "CurrentAction");
-    const int current_turn = libgame_lua_get_gamestate_int(L, "CurrentTurn");
-    const char* dir_str = libgame_get_str_from_dir(dir);
-    const int action_results_count = libgame_lua_get_action_results_count(L);
+    //const entityid id = libgame_lua_get_gamestate_int(L, "HeroId");
+    //const entityid id = libgame_lua_get_gamestate_int(L, "HeroId");
+    //if (id == -1) {
+    //#ifdef DEBUG
+    //        merror("libgame_update_debug_panel_buffer: hero_id is -1");
+    //#endif
+    //        return;
+    //    }
+    //const int hx = libgame_lua_get_entity_int(L, id, "x");
+    //const int hy = libgame_lua_get_entity_int(L, id, "y");
+    //const int last_mv_x = libgame_lua_get_entity_int(L, id, "last_move_x");
+    //const int last_mv_y = libgame_lua_get_entity_int(L, id, "last_move_y");
+    //const int hero_was_damaged =
+    //    libgame_lua_get_entity_int(L, id, "was_damaged");
+    //const int dw = libgame_lua_get_dungeonfloor_row_count(L);
+    //const int dh = libgame_lua_get_dungeonfloor_col_count(L);
+    //const int action_count = libgame_lua_get_action_count(L);
+    //const int entity_count = libgame_lua_get_num_entities(L);
+    //const int dir = libgame_lua_get_entity_int(L, id, "direction");
+    //const int current_action =
+    //    libgame_lua_get_gamestate_int(L, "CurrentAction");
+    //const int current_turn = libgame_lua_get_gamestate_int(L, "CurrentTurn");
+    //const char* dir_str = libgame_get_str_from_dir(dir);
+    //const int action_results_count = libgame_lua_get_action_results_count(L);
 
-    const int last_attack_damage =
-        libgame_lua_get_action_result(L, 1, "damage_cutting");
+    //const int last_attack_damage =
+    //    libgame_lua_get_action_result(L, 1, "damage_cutting");
+    snprintf(g->debugpanel.buffer, 1024, "evildojo");
 
-    snprintf(g->debugpanel.buffer,
-             1024,
-             "Framecount:   %d\n"
-             "%s\n"
-             "%s\n"
-             "Target size:  %d,%d\n"
-             "Window size:  %d,%d\n"
-             "Cam.target:   %.2f,%.2f\n"
-             "Cam.offset:   %.2f,%.2f\n"
-             "Cam.zoom:     %.2f\n"
-             "Active scene: %d\n"
-             "Control mode: %d\n"
-             "Hero position: %d,%d\n"
-             "Inventory count: %d\n"
-             "Dungeon size: %dx%d\n"
-             "Entity count: %d\n"
-             "Last move: %d,%d\n"
-             "Was damaged: %d\n"
-             "Dir: %s\n"
-             "CurrentAction: %d\n"
-             "Action count: %d\n"
-             "Action results count: %d\n"
-             "Current Turn: %d\n"
-             "Last Attack Damage: %d\n"
-             "Lock: %d\n",
-             g->framecount,
-             g->timebeganbuf,
-             g->currenttimebuf,
-             g->targetwidth,
-             g->targetheight,
-             g->windowwidth,
-             g->windowheight,
-             g->cam2d.target.x,
-             g->cam2d.target.y,
-             g->cam2d.offset.x,
-             g->cam2d.offset.y,
-             g->cam2d.zoom,
-             activescene,
-             g->controlmode,
-             hx,
-             hy,
-             libgame_lua_get_inventory_count(L, id),
-             dh,
-             dw,
-             entity_count,
-             last_mv_x,
-             last_mv_y,
-             hero_was_damaged,
-             dir_str,
-             current_action,
-             action_count,
-             action_results_count,
-             current_turn,
-             last_attack_damage,
-             g->lock);
+    //snprintf(g->debugpanel.buffer,
+    //         1024,
+    //         "Framecount:   %d\n"
+    //         "%s\n"
+    //         "%s\n"
+    //         "Target size:  %d,%d\n"
+    //         "Window size:  %d,%d\n"
+    //         "Cam.target:   %.2f,%.2f\n"
+    //         "Cam.offset:   %.2f,%.2f\n"
+    //         "Cam.zoom:     %.2f\n"
+    //         "Active scene: %d\n"
+    //         "Control mode: %d\n"
+    //         "Hero position: %d,%d\n"
+    //         "Inventory count: %d\n"
+    //         "Dungeon size: %dx%d\n"
+    //         "Entity count: %d\n"
+    //         "Last move: %d,%d\n"
+    //         "Was damaged: %d\n"
+    //         "Dir: %s\n"
+    //         "CurrentAction: %d\n"
+    //         "Action count: %d\n"
+    //         "Action results count: %d\n"
+    //         "Current Turn: %d\n"
+    //         "Last Attack Damage: %d\n"
+    //         "Lock: %d\n",
+    //         g->framecount,
+    //         g->timebeganbuf,
+    //         g->currenttimebuf,
+    //         g->targetwidth,
+    //         g->targetheight,
+    //         g->windowwidth,
+    //         g->windowheight,
+    //         g->cam2d.target.x,
+    //         g->cam2d.target.y,
+    //         g->cam2d.offset.x,
+    //         g->cam2d.offset.y,
+    //         g->cam2d.zoom,
+    //         activescene,
+    //         g->controlmode,
+    //         hx,
+    //         hy,
+    //         libgame_lua_get_inventory_count(L, id),
+    //         dh,
+    //         dw,
+    //         entity_count,
+    //         last_mv_x,
+    //         last_mv_y,
+    //         hero_was_damaged,
+    //         dir_str,
+    //         current_action,
+    //         action_count,
+    //         action_results_count,
+    //         current_turn,
+    //         last_attack_damage,
+    //         g->lock);
 }
 
 
@@ -1139,6 +1141,7 @@ void libgame_reset_entities_anim(gamestate* const g) {
 
 
 void libgame_update_gamestate(gamestate* g) {
+    minfo("libgame_update_gamestate begin");
     if (!g) {
 #ifdef DEBUG
         merror("libgame_update_gamestate: gamestate is NULL");
@@ -1150,7 +1153,7 @@ void libgame_update_gamestate(gamestate* g) {
     //setdebugpanelcenter(g);
     //libgame_reset_entities_anim(g);
     //libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
-    libgame_do_camera_lock_on(g);
+    //libgame_do_camera_lock_on(g);
     // at this point, we can take other NPC turns
     // lets iterate over our entities, find the NPCs, and make them move in a random direction
     // then, we will update their smooth moves
@@ -1173,6 +1176,7 @@ void libgame_update_gamestate(gamestate* g) {
     //    libgame_lua_clear_actions(L);
     //    g->player_input_received = false;
     //}
+    minfo("libgame_update_gamestate end");
 }
 
 
@@ -1522,8 +1526,74 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
 #endif
         return;
     }
+    minfo("libgame_draw_dungeonfloor begin");
+
     const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
     Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
+    //const int rows = libgame_lua_get_dungeonfloor_row_count(L), cols = libgame_lua_get_dungeonfloor_col_count(L);
+
+    minfo("libgame_draw_dungeonfloor: getting row  count");
+    const int row_count = libgame_lua_get_dungeonfloor_row_count(L);
+    minfo("libgame_draw_dungeonfloor: getting col  count");
+    const int col_count = libgame_lua_get_dungeonfloor_col_count(L);
+
+
+    if (row_count == -1 || col_count == -1) {
+#ifdef DEBUG
+        merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
+#endif
+        return;
+    }
+
+
+
+    for (int i = 0; i < row_count; i++) {
+        for (int j = 0; j < col_count; j++) {
+
+            fprintf(stderr, "i: %d\n", i);
+            fprintf(stderr, "j: %d\n", j);
+
+            minfo("libgame_draw_dungeonfloor: getting tiletype");
+            const int type = libgame_lua_get_tiletype(L, j, i);
+            const int key = get_txkey_for_tiletype(type);
+            if (key == -1) {
+                continue;
+            }
+
+            //tile_dest.x = j * DEFAULT_TILE_SIZE,
+            minfo("libgame_draw_dungeonfloor: getting tile x");
+            tile_dest.x = libgame_lua_get_tile_x(L, j, i);
+
+
+            //tile_dest.y = i * DEFAULT_TILE_SIZE;
+            minfo("libgame_draw_dungeonfloor: getting tile y");
+            tile_dest.y = libgame_lua_get_tile_y(L, j, i);
+
+
+
+
+            DrawTexturePro(g->txinfo[key].texture,
+                           tile_src,
+                           tile_dest,
+                           (Vector2){0, 0},
+                           0,
+                           WHITE);
+        }
+    }
+}
+
+
+
+
+void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g) {
+    if (!g) {
+#ifdef DEBUG
+        merror("libgame_precompute_df: gamestate is NULL");
+#endif
+        return;
+    }
+    //const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
+    //Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
     //const int rows = libgame_lua_get_dungeonfloor_row_count(L), cols = libgame_lua_get_dungeonfloor_col_count(L);
     for (int i = 0; i < libgame_lua_get_dungeonfloor_row_count(L); i++) {
         for (int j = 0; j < libgame_lua_get_dungeonfloor_col_count(L); j++) {
@@ -1532,14 +1602,18 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
             if (key == -1) {
                 continue;
             }
-            tile_dest.x = j * DEFAULT_TILE_SIZE,
-            tile_dest.y = i * DEFAULT_TILE_SIZE;
-            DrawTexturePro(g->txinfo[key].texture,
-                           tile_src,
-                           tile_dest,
-                           (Vector2){0, 0},
-                           0,
-                           WHITE);
+
+            const int x = j * DEFAULT_TILE_SIZE;
+            const int y = i * DEFAULT_TILE_SIZE;
+
+            libgame_lua_update_tile_position(L, j, i, x, y);
+
+            //DrawTexturePro(g->txinfo[key].texture,
+            //               tile_src,
+            //               tile_dest,
+            //               (Vector2){0, 0},
+            //               0,
+            //               WHITE);
         }
     }
 }
@@ -1795,10 +1869,12 @@ void libgame_draw_gameplayscene(gamestate* const g) {
     }
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
+
     libgame_draw_dungeonfloor(g);
-    if (g->gridon) {
-        libgame_drawgrid(g);
-    }
+
+    //if (g->gridon) {
+    //    libgame_drawgrid(g);
+    //}
     // draw torches, items, npcs, player
     //libgame_draw_gameplayscene_entities(g);
 
@@ -2650,17 +2726,19 @@ void libgame_initsharedsetup(gamestate* const g) {
                                     DEFAULT_DUNGEONFLOOR_HEIGHT,
                                     TILETYPE_DIRT_00);
 
+    libgame_precompute_dungeonfloor_tile_positions(g);
 
-    const entityid heroid = libgame_create_entity(
-        g, "hero", ENTITY_PLAYER, RACE_HUMAN, 3, 3, DIRECTION_DOWN);
-    if (heroid == -1) {
-#ifdef DEBUG
-        merror("libgame_initsharedsetup: could not create hero entity, "
-               "crashing");
-#endif
-        exit(1);
-    }
-    libgame_lua_set_gamestate_int(L, "HeroId", heroid);
+
+    //const entityid heroid = libgame_create_entity(
+    //    g, "hero", ENTITY_PLAYER, RACE_HUMAN, 3, 3, DIRECTION_DOWN);
+    //if (heroid == -1) {
+    //#ifdef DEBUG
+    //        merror("libgame_initsharedsetup: could not create hero entity, "
+    //               "crashing");
+    //#endif
+    //exit(1);
+    //}
+    //libgame_lua_set_gamestate_int(L, "HeroId", heroid);
 
     //if (libgame_create_hero(g, "hero", 1, 1) == -1) {
     //    merror("libgame_initsharedsetup: could not create hero entity");

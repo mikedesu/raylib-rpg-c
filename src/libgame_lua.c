@@ -891,3 +891,50 @@ void libgame_lua_clear_action_results(lua_State* L) {
     lua_getglobal(L, "ClearActionResults");
     lua_pcall(L, 0, 0, 0);
 }
+
+
+
+void libgame_lua_update_tile_position(lua_State* L,
+                                      const int dungeon_x,
+                                      const int dungeon_y,
+                                      const int x,
+                                      const int y) {
+    if (!L) {
+        return;
+    }
+    lua_getglobal(L, "UpdateTilePosition");
+    lua_pushnumber(L, dungeon_x);
+    lua_pushnumber(L, dungeon_y);
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    lua_pcall(L, 4, 0, 0);
+}
+
+
+
+const int libgame_lua_get_tile_x(lua_State* L, const int x, const int y) {
+    if (!L) {
+        return -1;
+    }
+    lua_getglobal(L, "GetTileX");
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    lua_pcall(L, 2, 1, 0);
+    const int retval = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+    return retval;
+}
+
+
+const int libgame_lua_get_tile_y(lua_State* L, const int x, const int y) {
+    if (!L) {
+        return -1;
+    }
+    lua_getglobal(L, "GetTileY");
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    lua_pcall(L, 2, 1, 0);
+    const int retval = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+    return retval;
+}
