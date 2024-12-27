@@ -223,7 +223,8 @@ libgame_handle_sprite_update(gamestate* const g,
 //                                       const int index);
 
 
-void libgame_create_hero(gamestate* const g);
+void libgame_create_hero(gamestate* const g, const int x, const int y);
 
 
 void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g);
+void libgame_handle_mouse_player(gamestate* const g);

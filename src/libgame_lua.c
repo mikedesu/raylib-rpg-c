@@ -641,6 +641,10 @@ void libgame_lua_set_gamestate_int(lua_State* L,
     lua_pushnumber(L, value);
     if (lua_pcall(L, 2, 0, 0) != 0) {
         merror("libgame_lua_set_gamestate_int: failed to set gamestate int");
+    } else {
+        char buf[256];
+        snprintf(buf, 256, "SetGamestateAttr(%s, %d)", key, value);
+        msuccess(buf);
     }
 }
 
@@ -1020,4 +1024,24 @@ libgame_lua_get_entity_float(lua_State* L, const int id, const char* key) {
     }
     lua_pop(L, 1);
     return retval;
+}
+
+
+
+
+void libgame_lua_set_entity_float(lua_State* L,
+                                  const int id,
+                                  const char* key,
+                                  const float value) {
+    if (!L) {
+        merror("L is NULL");
+        return;
+    }
+    lua_getglobal(L, "SetEntityAttr");
+    lua_pushnumber(L, id);
+    lua_pushstring(L, key);
+    lua_pushnumber(L, value);
+    if (lua_pcall(L, 3, 0, 0) != 0) {
+        merror("libgame_lua_set_entity_float: failed to set entity float");
+    }
 }

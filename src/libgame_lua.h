@@ -120,6 +120,13 @@ const int libgame_lua_get_tile_x(lua_State* L, const int x, const int y);
 const int libgame_lua_get_tile_y(lua_State* L, const int x, const int y);
 
 
+void libgame_lua_set_entity_float(lua_State* L,
+                                  const int id,
+                                  const char* key,
+                                  const float value);
+
+
+
 //void libgame_lua_print_entities(lua_State* L);
 //void libgame_lua_serialize_entities_and_print(lua_State* L);
 //void libgame_lua_reserialization_test(lua_State* L);

@@ -295,7 +295,9 @@ end
 
 function GetEntityById(id)
 	for _, entity in ipairs(Gamestate.Entities) do
+		--PrintDebug("GetEntityById", "Checking entity with id " .. entity.id .. " against id " .. id)
 		if entity.id == id then
+			--PrintSuccess("GetEntityById", "Checking entity with id " .. entity.id .. " against id " .. id)
 			return entity
 		end
 	end
@@ -307,7 +309,7 @@ function GetGamestateAttr(propertyName)
 end
 
 function SetGamestateAttr(propertyName, value)
-	PrintDebug("init.lua:184", "Setting Gamestate property " .. propertyName .. " to " .. value)
+	PrintDebug("SetGamestateAttr", "Setting Gamestate property " .. propertyName .. " to " .. value)
 	Gamestate[propertyName] = value
 end
 
@@ -393,14 +395,14 @@ function EntityMove(id, xdir, ydir)
 	local entity = GetEntityById(id)
 	--local result = ActionResult()
 	if entity then
-		local newx = entity.x + xdir
-		local newy = entity.y + ydir
-		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
-			PrintDebug("EntityMove", "Entity is out of bounds")
-		end
+		--local newx = entity.x + xdir
+		--local newy = entity.y + ydir
+		--if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
+		--	PrintDebug("EntityMove", "Entity is out of bounds")
+		--end
 		-- can't move into stone walls
-		entity.x = newx
-		entity.y = newy
+		entity.x = entity.x + xdir
+		entity.y = entity.y + ydir
 	end
 	PrintDebug("init.lua:358", "Entity with id " .. id .. " not found")
 end
@@ -651,6 +653,10 @@ end
 
 function PrintDebug(preample, text)
 	print("\27[31;1m🟣 Lua\27[0m   " .. preample .. ": " .. text)
+end
+
+function PrintSuccess(preample, text)
+	print("\27[32;1m🟢 Lua\27[0m   " .. preample .. ": " .. text)
 end
 
 function TileIsOccupiedByType(type, x, y)
