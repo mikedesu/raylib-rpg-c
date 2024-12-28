@@ -274,12 +274,6 @@ void libgame_handle_mouse_player(gamestate* const g) {
         clickPositionWorld = GetScreenToWorld2D(clickPosition, g->cam2d);
         char buf[128];
         bzero(buf, sizeof(buf));
-        //snprintf(buf,
-        //         sizeof(buf),
-        //         "clickPositionWorld: %0.2f, %0.2f",
-        //         clickPositionWorld.x,
-        //         clickPositionWorld.y);
-        //minfo(buf);
 
         // get the player's position
         const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
@@ -288,77 +282,46 @@ void libgame_handle_mouse_player(gamestate* const g) {
             return;
         }
 
-        float hero_x = libgame_lua_get_entity_float(L, hero_id, "x");
-        float hero_y = libgame_lua_get_entity_float(L, hero_id, "y");
-        //Vector2 hero_pos = (Vector2){hero_x, hero_y};
-
-        bzero(buf, sizeof(buf));
-        //snprintf(
-        //    buf, sizeof(buf), "hero_x: %0.2f, hero_y: %0.2f", hero_x, hero_y);
-        //minfo(buf);
-
-        Vector2 hero_pos = {hero_x, hero_y};
-
-        // get the direction from the player to the click position
-        Vector2 dir = Vector2Subtract(clickPositionWorld, hero_pos);
-
-        // if the player is already at the click position, return
-        //if (dir.x == 0 && dir.y == 0) {
-        //    return;
-        //}
-
-        // normalize the direction
-        dir = Vector2Normalize(dir);
-
-
-        snprintf(buf,
-                 sizeof(buf),
-                 "clickPosition: %0.2f, %0.2f --- clickWorld: %0.2f, %0.2f --- "
-                 "hero: %0.2f, %0.2f --- dir: %0.2f, %0.2f",
-                 clickPosition.x,
-                 clickPosition.y,
-                 clickPositionWorld.x,
-                 clickPositionWorld.y,
-                 hero_x,
-                 hero_y,
-                 dir.x,
-                 dir.y);
-        minfo(buf);
-
-
-
-        //snprintf(buf, sizeof(buf), "dir: %0.2f, %0.2f", dir.x, dir.y);
-        //minfo(buf);
-
-
-
-        // move the player in the direction of the click
-        hero_x += dir.x;
-        hero_y += dir.y;
+        //float hero_x = libgame_lua_get_entity_float(L, hero_id, "x");
+        //float hero_y = libgame_lua_get_entity_float(L, hero_id, "y");
 
         // set the player's new position
         //libgame_lua_entity_move(L, hero_id, hero_x, hero_y);
-        libgame_lua_set_entity_float(L, hero_id, "x", hero_x);
-        libgame_lua_set_entity_float(L, hero_id, "y", hero_y);
 
-        // get the spritegroup
-        spritegroup_t* sg = hashtable_entityid_spritegroup_get_by_specifier(
-            g->spritegroups, hero_id, SPECIFIER_NONE);
-        if (!sg) {
-            merror("libgame_handle_mouse_player: spritegroup is NULL");
-            return;
-        }
-
-
-        Vector2 hero_pos_new = {hero_x, hero_y};
-
-        // convert hero_pos_new from world to screen
-        Vector2 hero_pos_screen = GetWorldToScreen2D(hero_pos_new, g->cam2d);
-
-
-        sg->dest.x = hero_pos_screen.x;
-        sg->dest.y = hero_pos_screen.y;
+        libgame_update_spritegroup_dest(
+            g, hero_id, clickPositionWorld.x, clickPositionWorld.y);
     }
+}
+
+
+
+
+void libgame_update_spritegroup_dest(gamestate* const g,
+                                     const entityid id,
+                                     const int x,
+                                     const int y) {
+    if (!g) {
+        merror("libgame_update_spritegroup_dest: gamestate is NULL");
+        return;
+    }
+
+    libgame_lua_set_entity_float(L, id, "x", x);
+    libgame_lua_set_entity_float(L, id, "y", y);
+
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (!sg) {
+        merror("libgame_update_spritegroup_dest: spritegroup is NULL");
+        return;
+    }
+
+    const int w = sg->dest.width;
+    const int h = sg->dest.height;
+
+    const int realx = x - w / 2;
+    const int realy = y - h / 2;
+
+    sg->dest.x = realx;
+    sg->dest.y = realy;
 }
 
 
@@ -1802,11 +1765,11 @@ void libgame_draw_entity(gamestate* const g, const entityid id) {
         const int w = group->dest.width;
         const int h = group->dest.height;
         // first draw the outer rectangle without the offset
-        //Vector2 v[4] = {{x, y}, {x + w, y }, {x + w , y + h }, {x , y + h }};
-        const Vector2 v[4] = {{x - group->off_x, y - group->off_y},
-                              {x + group->off_x + w, y - group->off_y},
-                              {x + w + group->off_x, y + h + group->off_y},
-                              {x - group->off_x, y + h + group->off_y}};
+        Vector2 v[4] = {{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}};
+        //const Vector2 v[4] = {{x - group->off_x, y - group->off_y},
+        //                      {x + group->off_x + w, y - group->off_y},
+        //                      {x + w + group->off_x, y + h + group->off_y},
+        //                      {x - group->off_x, y + h + group->off_y}};
         DrawLineV(v[0], v[1], (Color){0, 0, 255, 255});
         DrawLineV(v[1], v[2], (Color){0, 0, 255, 255});
         DrawLineV(v[2], v[3], (Color){0, 0, 255, 255});
@@ -1816,10 +1779,14 @@ void libgame_draw_entity(gamestate* const g, const entityid id) {
         //DrawLineV(v[2], v[3], c);
         //DrawLineV(v[3], v[0], c);
         // now lets draw it with the offset
-        //v[0] = (Vector2){x - group->off_x, y - group->off_y};
-        //v[1] = (Vector2){x + group->off_x + w, y - group->off_y};
-        //v[2] = (Vector2){x + w + group->off_x, y + h + group->off_y};
-        //v[3] = (Vector2){x - group->off_x, y + h + group->off_y};
+        v[0] = (Vector2){x - group->off_x, y - group->off_y};
+        v[1] = (Vector2){x + group->off_x + w, y - group->off_y};
+        v[2] = (Vector2){x + w + group->off_x, y + h + group->off_y};
+        v[3] = (Vector2){x - group->off_x, y + h + group->off_y};
+        DrawLineV(v[0], v[1], (Color){0, 255, 0, 255});
+        DrawLineV(v[1], v[2], (Color){0, 255, 0, 255});
+        DrawLineV(v[2], v[3], (Color){0, 255, 0, 255});
+        DrawLineV(v[3], v[0], (Color){0, 255, 0, 255});
     }
 }
 
