@@ -39,9 +39,10 @@ Gamestate = {
 	WindowPosX = DefaultWindowPosX,
 	WindowPosY = DefaultWindowPosY,
 	NextEntityId = 1,
-	Actions = {},
+	--Actions = {},
 	DungeonFloor = {},
 	Entities = {},
+	--EntityDirections = {},
 	CurrentAction = 1,
 	CurrentTurn = 1,
 	HeroId = -1,
@@ -174,6 +175,21 @@ function CreateTile(type)
 		--entities = {},
 	}
 	return tile
+end
+
+function SetEntityDirection(id, dirx, diry)
+	local entity = GetEntityById(id)
+	if entity then
+		entity.direction = { x = dirx, y = diry }
+	end
+end
+
+function GetEntityDirectionX(id)
+	local e = GetEntityById(id)
+	if e then
+		return e.x
+	end
+	return -1
 end
 
 function UpdateTilePosition(dungeon_x, dungeon_y, x, y)
@@ -327,6 +343,7 @@ function SetEntityAttr(entityId, propertyName, value)
 		entity[propertyName] = value
 		return true
 	end
+	PrintDebug("SetEntityAttr", "Entity with id " .. entityId .. " not found")
 	return false
 end
 

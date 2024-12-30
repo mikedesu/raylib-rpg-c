@@ -41,6 +41,7 @@ Vector2 target_origin = {0, 0};
 int activescene = GAMEPLAYSCENE;
 
 
+bool is_clicked = false;
 Vector2 clickPosition = {-1, -1};
 Vector2 clickPositionWorld = {-1, -1};
 
@@ -248,7 +249,7 @@ void libgame_handleinput(gamestate* const g) {
     //if (g->controlmode == CONTROLMODE_PLAYER) { //&&
     //g->player_input_received == false && g->processing_actions == false) {
     libgame_handle_input_player(g);
-    libgame_handle_mouse_player(g);
+    //libgame_handle_mouse_player(g);
     //}
 
     //else if (g->controlmode == CONTROLMODE_CAMERA) {
@@ -259,39 +260,84 @@ void libgame_handleinput(gamestate* const g) {
 
 
 
-void libgame_handle_mouse_player(gamestate* const g) {
+//void libgame_handle_mouse_player(gamestate* const g) {
+//if (!g) {
+//    merror("libgame_handle_mouse_player: gamestate is NULL");
+//    return;
+//}
+//minfo("libgame_handle_mouse_player");
+//if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+//if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+//    is_clicked = true;
+//    clickPosition = GetMousePosition();
+//    clickPositionWorld = GetScreenToWorld2D(clickPosition, g->cam2d);
+//    char buf[128];
+//    bzero(buf, sizeof(buf));
+//
+//        // get the player's position
+//        const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//        if (hero_id == -1) {
+//            merror("libgame_handle_mouse_player: hero_id is -1");
+//            return;
+//        }
 
-    if (!g) {
-        merror("libgame_handle_mouse_player: gamestate is NULL");
-        return;
-    }
+//        float hero_x = libgame_lua_get_entity_float(L, hero_id, "x");
+//        float hero_y = libgame_lua_get_entity_float(L, hero_id, "y");
 
-    //minfo("libgame_handle_mouse_player");
+//        Vector2 hero_pos = (Vector2){hero_x, hero_y};
 
-    //if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-        clickPosition = GetMousePosition();
-        clickPositionWorld = GetScreenToWorld2D(clickPosition, g->cam2d);
-        char buf[128];
-        bzero(buf, sizeof(buf));
+// calculate the direction vector
+//Vector2 direction = Vector2Subtract(clickPositionWorld, hero_pos);
 
-        // get the player's position
-        const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-        if (hero_id == -1) {
-            merror("libgame_handle_mouse_player: hero_id is -1");
-            return;
-        }
+// normalize the direction vector
+//direction = Vector2Normalize(direction);
 
-        //float hero_x = libgame_lua_get_entity_float(L, hero_id, "x");
-        //float hero_y = libgame_lua_get_entity_float(L, hero_id, "y");
+//bzero(buf, sizeof(buf));
+//snprintf(buf,
+//         sizeof(buf),
+//         "direction: %0.2f, %0.2f",
+//         direction.x,
+//         direction.y);
+//minfo(buf);
 
-        // set the player's new position
-        //libgame_lua_entity_move(L, hero_id, hero_x, hero_y);
+//direction = Vector2Scale(direction, 1.5);
 
-        libgame_update_spritegroup_dest(
-            g, hero_id, clickPositionWorld.x, clickPositionWorld.y);
-    }
-}
+
+//snprintf(buf,
+//         sizeof(buf),
+//         "direction scaled: %0.2f, %0.2f",
+//         direction.x,
+//         direction.y);
+//minfo(buf);
+
+//        Vector2 new_pos = Vector2MoveTowards(hero_pos, clickPositionWorld, 1.4);
+
+//        bzero(buf, sizeof(buf));
+//        snprintf(
+//            buf, sizeof(buf), "new_pos: %0.2f, %0.2f", new_pos.x, new_pos.y);
+//        minfo(buf);
+
+// set the player's new position
+//        libgame_lua_set_entity_float(L, hero_id, "x", new_pos.x);
+//        libgame_lua_set_entity_float(L, hero_id, "y", new_pos.y);
+
+// set the player's new position
+//libgame_lua_entity_move(L, hero_id, hero_x, hero_y);
+
+// instead of updating the spritegroup destination right away,
+// lets set a variable inside the lua to keep track of a normalized directional vector
+// for the entity
+//        libgame_update_spritegroup_dest(g, hero_id, new_pos.x, new_pos.y);
+//g, hero_id, clickPositionWorld.x, clickPositionWorld.y);
+
+
+
+//    } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+//        is_clicked = false;
+//        clickPosition = (Vector2){-1, -1};
+//        clickPositionWorld = (Vector2){-1, -1};
+//    }
+//}
 
 
 
@@ -948,6 +994,8 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
         return;
     }
     entityid id = libgame_lua_get_gamestate_int(L, "HeroId");
+    const float x = libgame_lua_get_entity_float(L, id, "x");
+    const float y = libgame_lua_get_entity_float(L, id, "y");
 
     //if (id == -1) {
     //    merror("libgame_update_debug_panel_buffer: hero_id is -1");
@@ -959,8 +1007,12 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              1024,
              "@evildojo666\n"
              "HeroId: %d\n"
+             "Hero.pos: %0.2f, %0.2f\n"
              "EntityCount: %d\n",
              id,
+             x,
+             y,
+
              entity_count);
 }
 
@@ -1126,7 +1178,7 @@ void libgame_update_gamestate(gamestate* g) {
     //setdebugpanelcenter(g);
     libgame_reset_entities_anim(g);
     //libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
-    //libgame_do_camera_lock_on(g);
+    libgame_do_camera_lock_on(g);
     // at this point, we can take other NPC turns
     // lets iterate over our entities, find the NPCs, and make them move in a random direction
     // then, we will update their smooth moves
@@ -1411,7 +1463,20 @@ void libgame_drawframe(gamestate* g) {
 
     //if (g->debugpanelon) {
     libgame_draw_debug_panel(g);
+
+
+
+    //if (is_clicked) {
+    //    float x = libgame_lua_get_entity_float(L, 1, "x");
+    //    float y = libgame_lua_get_entity_float(L, 1, "y");
+    //    Vector2 hero_vec = {x, y};
+    //    Vector2 hero_screen = GetWorldToScreen2D(hero_vec, g->cam2d);
+    //    DrawLineV(hero_screen, clickPosition, RED);
     //}
+    //}
+
+
+
 
     libgame_drawframeend(g);
 }
@@ -1438,16 +1503,12 @@ void libgame_calc_debugpanel_size(gamestate* const g) {
 
 inline void libgame_draw_debug_panel(gamestate* const g) {
     if (!g) {
-
         merror("libgame_draw_debug_panel: gamestate is NULL");
-
         return;
     }
 
     if (!g->debugpanelon) {
-        //
-        //        merror("libgame_draw_debug_panel: debugpanelon is false");
-        //
+        //merror("libgame_draw_debug_panel: debugpanelon is false");
         return;
     }
 
@@ -2687,7 +2748,8 @@ void libgame_initsharedsetup(gamestate* const g) {
     // these dont work right until the text buffer of the debugpanel is filled
     libgame_update_debug_panel_buffer(g);
     libgame_calc_debugpanel_size(g);
-    setdebugpanelbottomleft(g);
+    //setdebugpanelbottomleft(g);
+    setdebugpaneltopleft(g);
 }
 
 
