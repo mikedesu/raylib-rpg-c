@@ -231,7 +231,6 @@ void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g);
 
 
 
-void libgame_update_spritegroup_dest(gamestate* const g,
-                                     const entityid id,
-                                     const int x,
-                                     const int y);
+
+void libgame_update_spritegroup_dest(gamestate* const g, const entityid id);
+void libgame_update_all_entity_sg_dests(gamestate* const g);

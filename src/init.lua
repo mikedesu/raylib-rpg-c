@@ -420,6 +420,7 @@ function EntityMove(id, xdir, ydir)
 		-- can't move into stone walls
 		entity.x = entity.x + xdir
 		entity.y = entity.y + ydir
+		return
 	end
 	PrintDebug("init.lua:358", "Entity with id " .. id .. " not found")
 end
