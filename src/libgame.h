@@ -93,8 +93,9 @@ void libgame_handle_fade(gamestate* const g);
 
 //void libgame_handle_player_input_movement_key(gamestate* const g,
 //                                              const direction_t dir);
-const int libgame_get_hero_x(gamestate* const g);
-const int libgame_get_hero_y(gamestate* const g);
+//const int libgame_get_hero_x(gamestate* const g);
+//const int libgame_get_hero_y(gamestate* const g);
+void libgame_get_hero_xy(gamestate* const g, int* x, int* y);
 
 void libgame_handle_grid_switch(gamestate* const g);
 
@@ -144,24 +145,23 @@ const int libgame_entity_update_context(gamestate* const g,
 
 //void libgame_update_spritegroup_by_lastmove(gamestate* const g,
 //                                            const entityid entity_id);
+//const int libgame_get_x_from_dir(const direction_t dir);
+//const int libgame_get_y_from_dir(const direction_t dir);
 
-const int libgame_get_x_from_dir(const direction_t dir);
-
-const int libgame_get_y_from_dir(const direction_t dir);
-
+void libgame_get_entity_xy(gamestate* const g,
+                           const entityid id,
+                           int* x,
+                           int* y);
 const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
-
 const char* libgame_get_str_from_dir(const direction_t dir);
 
-void libgame_update_spritegroup_current(gamestate* const g,
-                                        entityid id,
-                                        int index);
-
+//void libgame_update_spritegroup_current(gamestate* const g,
+//                                        entityid id,
+//                                        const int index);
 //void libgame_handle_player_input_attack_key(gamestate* const g);
+//void libgame_handle_player_input_pickup_key(gamestate* const g);
 
-void libgame_handle_player_input_pickup_key(gamestate* const g);
-
-void libgame_handle_player_input_block_key(gamestate* const g);
+//void libgame_handle_player_input_block_key(gamestate* const g);
 
 void libgame_draw_entity_shadow(gamestate* const g, const entityid id);
 
@@ -208,7 +208,7 @@ const entityid libgame_create_entity(gamestate* const g,
                                      const direction_t direction);
 
 
-void libgame_process_action_results(gamestate* const g);
+//void libgame_process_action_results(gamestate* const g);
 
 
 void libgame_handle_test_enemy_placement(gamestate* const g);

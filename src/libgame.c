@@ -125,8 +125,13 @@ void libgame_test_enemy_placement(gamestate* const g) {
     //    return;
     //}
 
-    const int x = libgame_get_hero_x(g);
-    const int y = libgame_get_hero_y(g);
+    //const int x = libgame_get_hero_x(g);
+    //const int y = libgame_get_hero_y(g);
+
+    int x, y;
+    libgame_get_hero_xy(g, &x, &y);
+
+
     if (libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
         mwarning("test_enemy_placement: tile is occupied by npc");
     } else if (libgame_create_orc(g, "orc", x, y) == -1) {
@@ -137,50 +142,125 @@ void libgame_test_enemy_placement(gamestate* const g) {
 
 
 
-const int libgame_get_hero_x(gamestate* const g) {
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id == -1) {
-        merror("test_enemy_placement: hero_id is -1");
-        return -1;
+//const int libgame_get_hero_x(gamestate* const g) {
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id == -1) {
+//        merror("test_enemy_placement: hero_id is -1");
+//        return -1;
+//    }
+//    return libgame_lua_get_entity_int(L, hero_id, "x");
+//}
+
+
+
+//const int libgame_get_hero_y(gamestate* const g) {
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id == -1) {
+//        merror("test_enemy_placement: hero_id is -1");
+//        return -1;
+//    }
+//    return libgame_lua_get_entity_int(L, hero_id, "y");
+//}
+
+
+
+
+void libgame_get_entity_xy(gamestate* const g,
+                           const entityid id,
+                           int* x,
+                           int* y) {
+    if (!g) {
+        merror("libgame_get_entity_xy: gamestate is NULL");
+        return;
     }
-    return libgame_lua_get_entity_int(L, hero_id, "x");
-}
 
+    if (!x) {
 
-
-const int libgame_get_hero_y(gamestate* const g) {
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id == -1) {
-        merror("test_enemy_placement: hero_id is -1");
-        return -1;
+        merror("libgame_get_entity_xy: x is NULL");
+        return;
     }
-    return libgame_lua_get_entity_int(L, hero_id, "y");
+
+    if (!y) {
+        merror("libgame_get_entity_xy: y is NULL");
+        return;
+    }
+
+    *x = libgame_lua_get_entity_int(L, id, "x");
+    *y = libgame_lua_get_entity_int(L, id, "y");
+}
+
+
+
+void libgame_get_hero_xy(gamestate* const g, int* x, int* y) {
+    if (!g) {
+        merror("libgame_get_hero_xy: gamestate is NULL");
+        return;
+    }
+    //if (!x) {
+    //    merror("libgame_get_hero_xy: x is NULL");
+    //    return;
+    //}
+    //if (!y) {
+    //    merror("libgame_get_hero_xy: y is NULL");
+    //    return;
+    //}
+    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    //*x = libgame_lua_get_entity_int(L, hero_id, "x");
+    //*y = libgame_lua_get_entity_int(L, hero_id, "y");
+    libgame_get_entity_xy(g, hero_id, x, y);
 }
 
 
 
 
-const int libgame_get_x_from_dir(const direction_t dir) {
-    return dir == DIRECTION_RIGHT || dir == DIRECTION_DOWN_RIGHT ||
-                   dir == DIRECTION_UP_RIGHT
-               ? 1
-           : dir == DIRECTION_LEFT || dir == DIRECTION_DOWN_LEFT ||
-                   dir == DIRECTION_UP_LEFT
-               ? -1
-               : 0;
-}
+//const int libgame_get_x_from_dir(const direction_t dir) {
+//    return dir == DIRECTION_RIGHT || dir == DIRECTION_DOWN_RIGHT ||
+//                   dir == DIRECTION_UP_RIGHT
+//               ? 1
+//           : dir == DIRECTION_LEFT || dir == DIRECTION_DOWN_LEFT ||
+//                   dir == DIRECTION_UP_LEFT
+//               ? -1
+//               : 0;
+//}
+
+
+
+//const int libgame_get_y_from_dir(const direction_t dir) {
+//    return dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT ||
+//                   dir == DIRECTION_DOWN_RIGHT
+//               ? 1
+//           : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT ||
+//                   dir == DIRECTION_UP_RIGHT
+//               ? -1
+//               : 0;
+//}
 
 
 
 
-const int libgame_get_y_from_dir(const direction_t dir) {
-    return dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT ||
-                   dir == DIRECTION_DOWN_RIGHT
-               ? 1
-           : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT ||
-                   dir == DIRECTION_UP_RIGHT
-               ? -1
-               : 0;
+void libgame_get_xy_from_dir(int* x, int* y, const direction_t dir) {
+    if (!x) {
+        merror("libgame_get_xy_from_dir: x is NULL");
+        return;
+    }
+    if (!y) {
+        merror("libgame_get_xy_from_dir: y is NULL");
+        return;
+    }
+    *x = dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT ||
+                 dir == DIRECTION_DOWN_RIGHT
+             ? 1
+         : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT ||
+                 dir == DIRECTION_UP_RIGHT
+             ? -1
+             : 0;
+    *y = dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT ||
+                 dir == DIRECTION_DOWN_RIGHT
+             ? 1
+         : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT ||
+                 dir == DIRECTION_UP_RIGHT
+             ? -1
+             : 0;
 }
 
 
@@ -217,21 +297,17 @@ void libgame_handle_input(gamestate* const g) {
     //    libgame_create_hero(g, 3, 3);
     //}
     //libgame_handle_modeswitch(g);
-
     if (IsKeyPressed(KEY_C)) {
         g->controlmode = g->controlmode == CONTROLMODE_CAMERA
                              ? CONTROLMODE_PLAYER
                              : CONTROLMODE_CAMERA;
     }
-
     if (IsKeyPressed(KEY_D)) {
         g->debugpanelon = !g->debugpanelon;
     }
-
     if (IsKeyPressed(KEY_G)) {
         g->gridon = !g->gridon;
     }
-
     if (g->controlmode == CONTROLMODE_PLAYER) { //&&
         //libgame_handle_input_player(g);
         const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
@@ -262,7 +338,6 @@ void libgame_handle_input(gamestate* const g) {
             libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
         } else if (IsKeyPressed(KEY_A)) {
             minfo("KEY_A");
-
             libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
         }
     } else if (g->controlmode == CONTROLMODE_CAMERA) {
@@ -475,67 +550,53 @@ void libgame_update_hero_shield_spritegroup(gamestate* const g) {
 
 
 
-void libgame_handle_player_input_block_key(gamestate* const g) {
-    if (!g) {
-
-        merror("libgame_handle_player_input_block_key: gamestate is NULL");
-
-        return;
-    }
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id == -1) {
-
-        merror("libgame_handle_player_input_block_key: hero_id is -1");
-
-        return;
-    }
-    // trigger a "block" action
-    const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
-    if (libgame_lua_create_action(L,
-                                  hero_id,
-                                  ACTION_BLOCK,
-                                  libgame_get_x_from_dir(dir),
-                                  libgame_get_y_from_dir(dir))) {
-        libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_GUARD);
-    } else {
-
-        mwarning("block action failed to create");
-    }
-    g->player_input_received = true;
-}
+//void libgame_handle_player_input_block_key(gamestate* const g) {
+//    if (!g) {
+//        merror("libgame_handle_player_input_block_key: gamestate is NULL");
+//        return;
+//    }
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id == -1) {
+//        merror("libgame_handle_player_input_block_key: hero_id is -1");
+//        return;
+//    }
+// trigger a "block" action
+//    const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
+//    if (libgame_lua_create_action(L,
+//                                  hero_id,
+//                                  ACTION_BLOCK,
+//                                  libgame_get_x_from_dir(dir),
+//                                  libgame_get_y_from_dir(dir))) {
+//        libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_GUARD);
+//    } else {
+//
+//        mwarning("block action failed to create");
+//    }
+//    g->player_input_received = true;
+//}
 
 
 
 
-void libgame_handle_player_input_pickup_key(gamestate* const g) {
-    if (!g) {
-
-        merror("libgame_handle_player_input_pickup_key: gamestate is NULL");
-
-        return;
-    }
-
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-    if (hero_id == -1) {
-
-        merror("libgame_handle_player_input_pickup_key: hero_id is -1");
-
-        return;
-    }
-    if (libgame_lua_create_action(L,
-                                  hero_id,
-                                  ACTION_PICKUP,
-                                  libgame_get_hero_x(g),
-                                  libgame_get_hero_y(g))) {
-
-        msuccess("pickup action created");
-
-    } else {
-
-        merror("pickup action failed to create");
-    }
-    g->player_input_received = true;
-}
+//void libgame_handle_player_input_pickup_key(gamestate* const g) {
+//    if (!g) {
+//        merror("libgame_handle_player_input_pickup_key: gamestate is NULL");
+//        return;
+//    }
+//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+//    if (hero_id == -1) {
+//        merror("libgame_handle_player_input_pickup_key: hero_id is -1");
+//        return;
+//    }
+//    int x, y;
+//    libgame_get_hero_xy(g, &x, &y);
+//    if (libgame_lua_create_action(L, hero_id, ACTION_PICKUP, x, y)) {
+//        msuccess("pickup action created");
+//    } else {
+//        merror("pickup action failed to create");
+//    }
+//    g->player_input_received = true;
+//}
 
 
 
@@ -554,14 +615,11 @@ void libgame_handle_player_wait_key(gamestate* const g) {
         return;
     }
     const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
-    if (libgame_lua_create_action(L,
-                                  hero_id,
-                                  ACTION_NONE,
-                                  libgame_get_x_from_dir(dir),
-                                  libgame_get_y_from_dir(dir))) {
+    int x, y;
+    libgame_get_xy_from_dir(&x, &y, dir);
+    if (libgame_lua_create_action(L, hero_id, ACTION_NONE, x, y)) {
         libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_IDLE);
     } else {
-
         mwarning("attack action failed to create");
     }
     g->player_input_received = true;
@@ -581,31 +639,21 @@ void libgame_handle_player_wait_key(gamestate* const g) {
 //        merror("libgame_handle_input_player: gamestate is NULL");
 //        return;
 //    }
-
 //minfo("libgame_handle_input_player");
-
 //    if (IsKeyPressed(KEY_LEFT)) {
-
 //    } else if (IsKeyPressed(KEY_RIGHT)) {
-
 //    } else if (IsKeyPressed(KEY_UP)) {
-
 //    } else if (IsKeyPressed(KEY_DOWN)) {
 //    }
-
-
 //if (g->controlmode != CONTROLMODE_PLAYER) {
 //    merror("libgame_handle_input_player: controlmode is not "
 //           "CONTROLMODE_PLAYER");
 //    return;
 //}
-
 //if (g->player_input_received) {
 //    merror("libgame_handle_input_player: player_input already received");
 //    return;
 //}
-
-
 //if (g->player_input_received == false) {
 //const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
 //const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
@@ -726,17 +774,14 @@ void libgame_handle_caminput(gamestate* const g) {
     //return;
     //}
     //if (g->controlmode == CONTROLMODE_CAMERA) {
-
     const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
     const float zoom_incr = 1.00f;
     const float cam_move_incr = 4.00f;
-
     if (IsKeyPressed(KEY_Z) && shift && g->cam2d.zoom >= 2.0f) {
         g->cam2d.zoom -= zoom_incr;
     } else if (IsKeyPressed(KEY_Z)) {
         g->cam2d.zoom += zoom_incr;
     }
-
     if (IsKeyDown(KEY_UP)) {
         g->cam2d.offset.y += cam_move_incr;
     } else if (IsKeyDown(KEY_DOWN)) {
@@ -778,46 +823,32 @@ void libgame_handle_caminput(gamestate* const g) {
 
 
 
-
 bool libgame_windowshouldclose() {
     return WindowShouldClose();
 }
 
 
 
-
 void libgame_initwindow(gamestate* const g) {
     if (!g) {
-
         merror("libgame_initwindow: gamestate is NULL");
-
         return;
     }
-
     const char* title = libgame_lua_get_gamestate_str(L, "WindowTitle");
-
     if (!title) {
         title = "Gamestate.WindowTitle not set in init.lua";
     }
-
     InitWindow(libgame_lua_get_gamestate_int(L, "WindowWidth"),
                libgame_lua_get_gamestate_int(L, "WindowHeight"),
                title);
-
     SetWindowMonitor(1);
-
     SetWindowPosition(libgame_lua_get_gamestate_int(L, "WindowPosX"),
                       libgame_lua_get_gamestate_int(L, "WindowPosY"));
-
     SetTargetFPS(DEFAULT_TARGET_FPS);
-
     SetExitKey(KEY_ESCAPE);
-
     g->windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth"),
-
     g->windowheight = libgame_lua_get_gamestate_int(L, "WindowHeight");
 }
-
 
 
 
@@ -830,21 +861,16 @@ void libgame_closewindow() {
 
 void libgame_update_debug_panel_buffer(gamestate* const g) {
     if (!g) {
-
         merror("libgame_update_debug_panel_buffer: gamestate is NULL");
-
         return;
     }
     entityid id = libgame_lua_get_gamestate_int(L, "HeroId");
     const float x = libgame_lua_get_entity_float(L, id, "x");
     const float y = libgame_lua_get_entity_float(L, id, "y");
-
     //if (id == -1) {
     //    merror("libgame_update_debug_panel_buffer: hero_id is -1");
     //}
-
     const int entity_count = libgame_lua_get_num_entities(L);
-
     snprintf(g->debugpanel.buffer,
              1024,
              "@evildojo666\n"
@@ -854,7 +880,6 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              id,
              x,
              y,
-
              entity_count);
 }
 
@@ -890,17 +915,12 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
 
 void libgame_do_camera_lock_on(gamestate* const g) {
     if (!g) {
-
         merror("libgame_do_camera_lock_on: gamestate is NULL");
-
         return;
     }
-
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-
     spritegroup_t* hero_group =
         hashtable_entityid_spritegroup_get(g->spritegroups, hero_id);
-
     if (hero_group && g->cam_lockon) {
         g->cam2d.target = (Vector2){hero_group->dest.x, hero_group->dest.y};
     }
@@ -924,9 +944,7 @@ void libgame_do_camera_lock_on(gamestate* const g) {
 
 void libgame_handle_npc_turn_lua(gamestate* const g, const entityid id) {
     if (!g) {
-
         merror("libgame_handle_npc_turn_lua: gamestate is NULL");
-
         return;
     }
     //minfo("libgame_handle_npc_turn_lua begin");
@@ -936,12 +954,9 @@ void libgame_handle_npc_turn_lua(gamestate* const g, const entityid id) {
     //if (!libgame_lua_create_action(L, id, ACTION_MOVE, xdir, ydir)) {
     //    merror("could not create npc action: move");
     //}
-
     if (!libgame_lua_create_action(L, id, ACTION_NONE, 0, 0)) {
-
         merror("could not create npc action: none");
     }
-
     //const direction_t dir = libgame_lua_get_entity_int(L, id, "direction");
     //if (!libgame_lua_create_action(L, id, ACTION_ATTACK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir))) merror("attack action failed to create");
 }
@@ -950,12 +965,10 @@ void libgame_handle_npc_turn_lua(gamestate* const g, const entityid id) {
 
 void libgame_handle_npcs_turn_lua(gamestate* const g) {
     if (!g) {
-
         merror("libgame_handle_npcs_turn_lua: gamestate is NULL");
-
         return;
     }
-    //for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
+    // have to start at 1 for lua
     for (int i = 1; i <= libgame_lua_get_num_entities(L); i++) {
         const entityid id = libgame_lua_get_nth_entity(L, i);
         const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
@@ -993,12 +1006,9 @@ void libgame_reset_entity_anim(gamestate* const g, entityid id) {
 
 void libgame_reset_entities_anim(gamestate* const g) {
     if (!g) {
-
         merror("libgame_reset_entities_anim: gamestate is NULL");
-
         return;
     }
-
     for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
         libgame_reset_entity_anim(g, i + 1);
     }
@@ -1010,21 +1020,16 @@ void libgame_reset_entities_anim(gamestate* const g) {
 void libgame_update_gamestate(gamestate* g) {
     //minfo("libgame_update_gamestate begin");
     if (!g) {
-
         merror("libgame_update_gamestate: gamestate is NULL");
-
         return;
     }
     //UpdateMusicStream(test_music);
     libgame_update_debug_panel_buffer(g);
     //setdebugpanelcenter(g);
     libgame_reset_entities_anim(g);
-
     libgame_update_all_entity_sg_dests(g);
     //libgame_update_spritegroup_dest(g,
     //                                libgame_lua_get_gamestate_int(L, "HeroId"));
-
-
     //libgame_update_smoothmove(g, libgame_lua_get_gamestate_int(L, "HeroId"));
     libgame_do_camera_lock_on(g);
     // at this point, we can take other NPC turns
@@ -1033,7 +1038,6 @@ void libgame_update_gamestate(gamestate* g) {
     // we will need to eventually disable player input during smooth moving
     // update smooth move for NPCs and other entities
     //libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
-
     //if (g->player_input_received) {
     //    minfo("libgame_update_gamestate: player input received");
     //    libgame_handle_npcs_turn_lua(g);
@@ -1055,82 +1059,52 @@ void libgame_update_gamestate(gamestate* g) {
 
 
 
-void libgame_process_action_results(gamestate* const g) {
-
-    minfo("libgame_process_action_results begin");
-
-    if (!g) {
-
-        merror("libgame_process_action_results: gamestate is NULL");
-
-        return;
-    }
-
-    const int action_result_count = libgame_lua_get_action_results_count(L);
-
-
-    fprintf(stderr,
-            "libgame_process_action_results: action_result_count is %d\n",
-            action_result_count);
-
-
-
-    for (int i = 1; i <= action_result_count; i++) {
-
-
-        minfo("libgame_process_action_results");
-
-
-
-
-        // fill in the blank
-        // depending on the actionresult's actor and target, we will update the spritegroups by enqueuing an animation state
-        //const int success = libgame_lua_get_action_result(L, i, "success");
-        const int action_result =
-            libgame_lua_get_action_result(L, i, "action_result");
-
-        const entityid actor_id =
-            libgame_lua_get_action_result(L, i, "actor_id");
-
-
-        if (action_result == AR_MOVE_SUCCESS ||
-            action_result == AR_ATTACK_SUCCESS) {
-            //const entityid target_id =
-            //    libgame_lua_get_action_result(L, i, "target_id");
-            //const action_t action_type =
-            //    libgame_lua_get_action_result(L, i, "action_type");
-            const int xdir = libgame_lua_get_action_result(L, i, "xdir");
-            const int ydir = libgame_lua_get_action_result(L, i, "ydir");
-            const entityid target_id =
-                libgame_lua_get_action_result(L, i, "target_id");
-
-            const bool actor_update_result = libgame_handle_sprite_update(
-                g, actor_id, action_result, xdir, ydir);
-            if (!actor_update_result) {
-
-                merror("libgame_handle_sprite_update: failed to update "
-                       "spritegroup");
-
-            } else {
-                const bool target_update_result = libgame_handle_sprite_update(
-                    g, target_id, AR_WAS_DAMAGED, xdir, ydir);
-                if (!target_update_result) {
-
-                    merror("libgame_handle_sprite_update: failed to update "
-                           "spritegroup");
-                }
-            }
-        } else {
-
-            merror("libgame_process_action_results: failed to process action "
-                   "result for actor");
-            fprintf(stderr, "actor_id: %d\n", actor_id);
-        }
-    }
-
-    // clear the action results table
-    libgame_lua_clear_action_results(L);
-}
+//void libgame_process_action_results(gamestate* const g) {
+//    minfo("libgame_process_action_results begin");
+//    if (!g) {
+//        merror("libgame_process_action_results: gamestate is NULL");
+//        return;
+//    }
+//    const int action_result_count = libgame_lua_get_action_results_count(L);
+//    fprintf(stderr,
+//            "libgame_process_action_results: action_result_count is %d\n",
+//            action_result_count);
+//    for (int i = 1; i <= action_result_count; i++) {
+//        minfo("libgame_process_action_results");
+//        // fill in the blank
+//        // depending on the actionresult's actor and target, we will update the spritegroups by enqueuing an animation state
+//        //const int success = libgame_lua_get_action_result(L, i, "success");
+//        const int action_result =
+//            libgame_lua_get_action_result(L, i, "action_result");
+//        const entityid actor_id =
+//            libgame_lua_get_action_result(L, i, "actor_id");
+//        if (action_result == AR_MOVE_SUCCESS ||
+//            action_result == AR_ATTACK_SUCCESS) {
+//            const int xdir = libgame_lua_get_action_result(L, i, "xdir");
+//            const int ydir = libgame_lua_get_action_result(L, i, "ydir");
+//            const entityid target_id =
+//                libgame_lua_get_action_result(L, i, "target_id");
+//            const bool actor_update_result = libgame_handle_sprite_update(
+//                g, actor_id, action_result, xdir, ydir);
+//            if (!actor_update_result) {
+//                merror("libgame_handle_sprite_update: failed to update "
+//                       "spritegroup");
+//            } else {
+//                const bool target_update_result = libgame_handle_sprite_update(
+//                    g, target_id, AR_WAS_DAMAGED, xdir, ydir);
+//                if (!target_update_result) {
+//                    merror("libgame_handle_sprite_update: failed to update "
+//                           "spritegroup");
+//                }
+//            }
+//        } else {
+//            merror("libgame_process_action_results: failed to process action "
+//                   "result for actor");
+//            fprintf(stderr, "actor_id: %d\n", actor_id);
+//        }
+//    }
+//    libgame_lua_clear_action_results(L);
+//}
 
 
 
