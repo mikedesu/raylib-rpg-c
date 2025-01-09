@@ -670,11 +670,11 @@ function EntityMoveRandomDir(id)
 end
 
 function PrintDebug(preample, text)
-	print("\27[31;1m🟣 Lua\27[0m   " .. preample .. ": " .. text)
+	print("\27- [31;1mLua\27[0m   " .. preample .. ": " .. text)
 end
 
 function PrintSuccess(preample, text)
-	print("\27[32;1m🟢 Lua\27[0m   " .. preample .. ": " .. text)
+	print("\27- [32;1mLua\27[0m   " .. preample .. ": " .. text)
 end
 
 function TileIsOccupiedByType(type, x, y)
@@ -684,7 +684,7 @@ function TileIsOccupiedByType(type, x, y)
 			if entity and entity.type == type then
 				--PrintDebug("init.lua:242", "Tile is occupied by entity with id " .. entityId .. " and type " .. type)
 				--print(
-				--	"\27[31;1m🟣 Lua\27[0m   init.lua:202: Tile is occupied by entity with id "
+				--	"\27[31;1m- Lua\27[0m   init.lua:202: Tile is occupied by entity with id "
 				--		.. entityId
 				--		.. " and type "
 				--		.. type
