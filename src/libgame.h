@@ -91,8 +91,10 @@ void libgame_handle_modeswitch(gamestate* const g);
 
 void libgame_handle_fade(gamestate* const g);
 
-void libgame_handle_player_input_movement_key(gamestate* const g,
-                                              const direction_t dir);
+//void libgame_handle_player_input_movement_key(gamestate* const g,
+//                                              const direction_t dir);
+const int libgame_get_hero_x(gamestate* const g);
+const int libgame_get_hero_y(gamestate* const g);
 
 void libgame_handle_grid_switch(gamestate* const g);
 
@@ -155,7 +157,7 @@ void libgame_update_spritegroup_current(gamestate* const g,
                                         entityid id,
                                         int index);
 
-void libgame_handle_player_input_attack_key(gamestate* const g);
+//void libgame_handle_player_input_attack_key(gamestate* const g);
 
 void libgame_handle_player_input_pickup_key(gamestate* const g);
 
