@@ -28,7 +28,7 @@ const char* templib = "./templibgame.so";
 
 
 void* handle = NULL;
-gamestate* g_ = NULL;
+gamestate* g = NULL;
 lua_State* L = NULL;
 
 
@@ -39,7 +39,7 @@ void (*mylibgameinit)() = NULL;
 void (*mylibgameclosesavegamestate)() = NULL;
 void (*mylibgameclose)(gamestate*) = NULL;
 void (*mylibgamedrawframe)(gamestate*) = NULL;
-void (*mylibgamehandleinput)(gamestate*) = NULL;
+void (*mylibgamehandle_input)(gamestate*) = NULL;
 void (*mylibgameinitwithstate)(gamestate*) = NULL;
 void (*mylibgameupdategamestate)(gamestate*) = NULL;
 bool (*mylibgame_external_check_reload)() = NULL;
@@ -91,7 +91,7 @@ void loadsymbols() {
         {"libgame_drawframe", &mylibgamedrawframe},
         {"libgame_init", &mylibgameinit},
         {"libgame_close", &mylibgameclose},
-        {"libgame_handleinput", &mylibgamehandleinput},
+        {"libgame_handle_input", &mylibgamehandle_input},
         {"libgame_closesavegamestate", &mylibgameclosesavegamestate},
         {"libgame_initwithstate", &mylibgameinitwithstate},
         {"libgame_update_gamestate", &mylibgameupdategamestate},
@@ -139,14 +139,14 @@ void autoreload() {
             minfo("Library is locked\n");
             sleep(1);
         }
-        g_ = mylibgame_getgamestate();
+        g = mylibgame_getgamestate();
         // this time, we have to shut down the game and close the window
         // before we can reload and restart everything
         mylibgameclosesavegamestate(); // closes window
         dlclose(handle);
         openhandle();
         loadsymbols();
-        mylibgameinitwithstate(g_);
+        mylibgameinitwithstate(g);
         msuccess("re-entering gameloop");
     }
 }
@@ -155,7 +155,7 @@ void autoreload() {
 
 void autoreload_every_n_sec(const int n) {
     assert(n > 0);
-    if (g_->currenttime % n == 0) {
+    if (g->currenttime % n == 0) {
         autoreload();
     }
 }
@@ -169,12 +169,12 @@ void gamerun() {
     last_write_time =
         getlastwritetime(libname); // if building for web, turn off
     mylibgameinit(); // if building for web, turn off
-    g_ = mylibgame_getgamestate();
+    g = mylibgame_getgamestate();
     while (!mywindowshouldclose()) {
-        mylibgameupdategamestate(g_); // if building for web, turn off
-        mylibgamedrawframe(g_); // if building for web, turn off
-        mylibgamehandleinput(g_); // if building for web, turn off
+        mylibgameupdategamestate(g); // if building for web, turn off
+        mylibgamedrawframe(g); // if building for web, turn off
+        mylibgamehandle_input(g); // if building for web, turn off
         autoreload_every_n_sec(4); // if building for web, turn off
     }
-    mylibgameclose(g_);
+    mylibgameclose(g);
 }

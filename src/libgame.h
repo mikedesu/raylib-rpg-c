@@ -83,7 +83,7 @@ void libgame_handle_input_player(gamestate* const g);
 
 void libgame_handle_caminput(gamestate* const g);
 
-void libgame_handleinput(gamestate* const g);
+void libgame_handle_input(gamestate* const g);
 
 void libgame_handle_debugpanel_switch(gamestate* const g);
 

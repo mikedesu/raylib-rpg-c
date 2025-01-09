@@ -1,3 +1,4 @@
+#include "libgame.h"
 #include "actionresults.h"
 #include "actions.h"
 #include "controlmode.h"
@@ -7,7 +8,6 @@
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
-#include "libgame.h"
 #include "libgame_defines.h"
 #include "mprint.h"
 #include "race.h"
@@ -17,8 +17,6 @@
 #include "sprite.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
-//#include "textureinfo.h"
-//#include "tiletype.h"
 #include "tx_keys.h"
 #include <raylib.h>
 #include <raymath.h>
@@ -28,6 +26,8 @@
 #include <time.h>
 // Lua support
 #include "libgame_lua.h"
+//#include "textureinfo.h"
+//#include "tiletype.h"
 
 
 //------------------------------------------------------------------
@@ -226,7 +226,7 @@ const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir) {
 
 
 
-void libgame_handleinput(gamestate* const g) {
+void libgame_handle_input(gamestate* const g) {
     if (!g) {
         merror("libgame_handleinput: gamestate is NULL");
         return;
