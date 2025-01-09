@@ -77,7 +77,7 @@ void libgame_draw_entities_at_lua(gamestate* const g,
                                   const int y);
 
 const bool
-libgame_entity_anim_set(gamestate* const g, const entityid id, const int index);
+libgame_entity_set_anim(gamestate* const g, const entityid id, const int index);
 
 void libgame_handle_input_player(gamestate* const g);
 
@@ -135,10 +135,10 @@ void libgame_update_debug_panel_buffer(gamestate* const g);
 //void libgame_update_smoothmoves_for_entitytype(gamestate* const g,
 //                                               const entitytype_t type);
 
-const int libgame_update_spritegroup(gamestate* const g,
-                                     const entityid id,
-                                     const specifier_t spec,
-                                     const direction_t dir);
+const int libgame_entity_update_context(gamestate* const g,
+                                        const entityid id,
+                                        const specifier_t spec,
+                                        const direction_t dir);
 
 //void libgame_update_spritegroup_by_lastmove(gamestate* const g,
 //                                            const entityid entity_id);
@@ -218,9 +218,6 @@ libgame_handle_sprite_update(gamestate* const g,
                              const int xdir,
                              const int ydir);
 
-//const bool libgame_entity_anim_enqueue(gamestate* const g,
-//                                       const entityid id,
-//                                       const int index);
 
 
 void libgame_create_hero(gamestate* const g, const int x, const int y);
