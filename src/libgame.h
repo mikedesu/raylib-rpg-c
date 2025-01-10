@@ -187,6 +187,7 @@ const entityid libgame_create_entity(gamestate* const g,
 
 
 void libgame_handle_test_enemy_placement(gamestate* const g);
+void libgame_test_enemy_placement(gamestate* const g);
 
 const bool libgame_handle_sprite_update(gamestate* const g,
                                         const entityid actor_id,

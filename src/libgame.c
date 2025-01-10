@@ -122,7 +122,7 @@ void libgame_test_enemy_placement(gamestate* const g) {
 
     int x, y;
     libgame_get_hero_xy(g, &x, &y);
-
+    x++;
 
     if (libgame_lua_tile_is_occupied_by_npc(L, x, y)) {
         mwarning("test_enemy_placement: tile is occupied by npc");
@@ -273,10 +273,10 @@ void libgame_handle_input(gamestate* const g) {
     //        g->fadestate = FADESTATEOUT;
     //    }
     //}
-    //libgame_handle_test_enemy_placement(g);
-    //if (IsKeyPressed(KEY_E)) {
-    //    libgame_create_hero(g, 3, 3);
-    //}
+    if (IsKeyPressed(KEY_E)) {
+        //    libgame_create_hero(g, 3, 3);
+        libgame_test_enemy_placement(g);
+    }
     //libgame_handle_modeswitch(g);
     if (IsKeyPressed(KEY_C)) {
         g->controlmode = g->controlmode == CONTROLMODE_CAMERA ? CONTROLMODE_PLAYER : CONTROLMODE_CAMERA;
@@ -354,17 +354,6 @@ void libgame_update_all_entity_sg_dests(gamestate* const g) {
     }
 }
 
-
-
-//void libgame_handle_test_enemy_placement(gamestate* const g) {
-//    if (!g) {
-//        merror("libgame_handle_test_enemy_placement: gamestate is NULL");
-//        return;
-//    }
-//    if (IsKeyPressed(KEY_E)) {
-//        libgame_test_enemy_placement(g);
-//    }
-//}
 
 
 
