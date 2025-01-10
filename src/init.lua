@@ -39,10 +39,8 @@ Gamestate = {
 	WindowPosX = DefaultWindowPosX,
 	WindowPosY = DefaultWindowPosY,
 	NextEntityId = 1,
-	--Actions = {},
 	DungeonFloor = {},
 	Entities = {},
-	--EntityDirections = {},
 	CurrentAction = 1,
 	CurrentTurn = 1,
 	HeroId = -1,
@@ -163,16 +161,16 @@ NextEntityId = 1
 --LastXDir = 0
 --LastYDir = 0
 --Actions = {}
-ActionResults = {}
-DungeonFloor = {}
-Entities = {}
+--ActionResults = {}
+--DungeonFloor = {}
+--Entities = {}
 
 function CreateTile(type)
 	local tile = {
 		type = type,
 		x = -1,
 		y = -1,
-		--entities = {},
+		entities = {},
 	}
 	return tile
 end
@@ -239,9 +237,15 @@ function GetNthEntityAt(n, x, y)
 end
 
 function AddEntityToTile(id, x, y)
+	PrintDebug("AddEntityToTile", "Adding entity with id " .. id .. " to tile " .. x .. ", " .. y)
 	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
-		table.insert(Gamestate.DungeonFloor[y][x].entities, id)
+		local success = table.insert(Gamestate.DungeonFloor[y][x].entities, id)
+		print(success)
+		PrintDebug("AddEntityToTile", "Added entity with id " .. id .. " to tile " .. x .. ", " .. y)
+		--else
+		--PrintDebug("AddEntityToTile", "Tile " .. x .. ", " .. y .. " not found")
 	end
+	--PrintDebug("AddEntityToTile", "Length of entities: " .. #Gamestate.DungeonFloor[y][x].entities)
 end
 
 function RemoveEntityFromTile(id, x, y)
@@ -304,7 +308,7 @@ function CreateEntity(name, type, x, y)
 	}
 	Gamestate.NextEntityId = Gamestate.NextEntityId + 1
 	table.insert(Gamestate.Entities, entity)
-	--AddEntityToTile(entity.id, x, y)
+	AddEntityToTile(entity.id, x, y)
 	PrintDebug("init.lua:167", "Created entity with id " .. entity.id)
 	return entity.id
 end
@@ -412,14 +416,38 @@ function EntityMove(id, xdir, ydir)
 	local entity = GetEntityById(id)
 	--local result = ActionResult()
 	if entity then
-		--local newx = entity.x + xdir
-		--local newy = entity.y + ydir
-		--if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
-		--	PrintDebug("EntityMove", "Entity is out of bounds")
-		--end
+		local newx = entity.x + xdir
+		local newy = entity.y + ydir
+		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
+			PrintDebug("EntityMove", "Entity is out of bounds")
+		end
 		-- can't move into stone walls
-		entity.x = entity.x + xdir
-		entity.y = entity.y + ydir
+		-- have to move the entity from old tile to new tile
+		-- local old_tile = GetTileType(entity.x, entity.y)
+		local new_tile = GetTileType(newx, newy)
+		if new_tile == TileTypes.Stonewall00 then
+			PrintDebug("EntityMove", "Entity is blocked by a wall")
+			return false
+		end
+		-- if the tile is occupied by an entity, return false
+		if GetNumEntitiesAt(newx, newy) > 0 then
+			PrintDebug("EntityMove", "Entity is blocked by another entity")
+			return false
+		end
+		-- if the entity is blocked by another entity, return false
+		--if TileIsOccupiedByEntity(newx, newy) then
+		--    PrintDebug("EntityMove", "Entity is blocked by another entity")
+		--    return false
+		--    end
+
+		-- move the entity from the old tile to the new tile
+		RemoveEntityFromTile(id, entity.x, entity.y)
+		AddEntityToTile(id, newx, newy)
+
+		-- set the entity's position to the new position
+		entity.x = newx
+		entity.y = newy
+
 		return
 	end
 	PrintDebug("init.lua:358", "Entity with id " .. id .. " not found")
@@ -670,11 +698,11 @@ function EntityMoveRandomDir(id)
 end
 
 function PrintDebug(preample, text)
-	print("\27- [31;1mLua\27[0m   " .. preample .. ": " .. text)
+	print("-\27[31;1mLua\27[0m   " .. preample .. ": " .. text)
 end
 
 function PrintSuccess(preample, text)
-	print("\27- [32;1mLua\27[0m   " .. preample .. ": " .. text)
+	print("-\27[32;1mLua\27[0m   " .. preample .. ": " .. text)
 end
 
 function TileIsOccupiedByType(type, x, y)
