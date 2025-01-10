@@ -1340,7 +1340,50 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
             //minfo("libgame_draw_dungeonfloor: getting tile y");
             tile_dest.y = libgame_lua_get_tile_y(L, j, i);
 
+            // draw tile
             DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
+
+            // next, we want to draw the entities on the tile
+            // at first we will do it generically then we will guarantee ordering
+
+            int num_entities_on_tile = libgame_lua_get_num_entities_at(L, j, i);
+            int entity_index = 1;
+            entityid id = -1;
+
+            for (int k = 0; k < num_entities_on_tile; k++) {
+                //id = libgame_lua_get_entity_at(L, j, i, entity_index);
+                id = libgame_lua_get_nth_entity_at(L, entity_index, j, i);
+                if (id == -1) {
+                    merror("libgame_draw_dungeonfloor: entity id is -1");
+                    continue;
+                }
+
+                const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+                if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
+                    libgame_draw_entity_shadow(g, id);
+                }
+
+                libgame_draw_entity(g, id);
+
+
+
+                //minfo("libgame_draw_dungeonfloor: getting entity type");
+                //minfo("libgame_draw_dungeonfloor: getting spritegroup");
+                //spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+                //if (!group) {
+                //    merror("libgame_draw_dungeonfloor: spritegroup is NULL");
+                //    continue;
+                //}
+                ////minfo("libgame_draw_dungeonfloor: drawing entity");
+                //DrawTexturePro(*group->sprites[group->current]->texture,
+                //               group->sprites[group->current]->src,
+                //               group->dest,
+                //               (Vector2){0, 0},
+                //               0.0f,
+                //               WHITE);
+                //}
+                entity_index++;
+            }
         }
     }
 }
@@ -1638,7 +1681,7 @@ void libgame_draw_gameplayscene(gamestate* const g) {
     //    libgame_drawgrid(g);
     //}
     // draw torches, items, npcs, player
-    libgame_draw_gameplayscene_entities(g);
+    //libgame_draw_gameplayscene_entities(g);
 
     // lighting basics
     //const int tilesize = DEFAULT_TILE_SIZE;
