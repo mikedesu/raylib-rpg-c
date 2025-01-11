@@ -1310,13 +1310,9 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
         merror("libgame_draw_dungeonfloor: gamestate is NULL");
         return;
     }
-    //minfo("libgame_draw_dungeonfloor begin");
     const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
     Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
-    //const int rows = libgame_lua_get_dungeonfloor_row_count(L), cols = libgame_lua_get_dungeonfloor_col_count(L);
-    //minfo("libgame_draw_dungeonfloor: getting row  count");
     const int row_count = libgame_lua_get_dungeonfloor_row_count(L);
-    //minfo("libgame_draw_dungeonfloor: getting col  count");
     const int col_count = libgame_lua_get_dungeonfloor_col_count(L);
     if (row_count == -1 || col_count == -1) {
         merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
@@ -1325,63 +1321,40 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
 
     for (int i = 0; i < row_count; i++) {
         for (int j = 0; j < col_count; j++) {
-            //fprintf(stderr, "i: %d\n", i);
-            //fprintf(stderr, "j: %d\n", j);
-            //minfo("libgame_draw_dungeonfloor: getting tiletype");
             const int type = libgame_lua_get_tiletype(L, j, i);
             const int key = get_txkey_for_tiletype(type);
             if (key == -1) {
                 continue;
             }
-            //tile_dest.x = j * DEFAULT_TILE_SIZE,
-            //minfo("libgame_draw_dungeonfloor: getting tile x");
             tile_dest.x = libgame_lua_get_tile_x(L, j, i);
-            //tile_dest.y = i * DEFAULT_TILE_SIZE;
-            //minfo("libgame_draw_dungeonfloor: getting tile y");
             tile_dest.y = libgame_lua_get_tile_y(L, j, i);
-
-            // draw tile
             DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
+        }
+    }
 
-            // next, we want to draw the entities on the tile
-            // at first we will do it generically then we will guarantee ordering
-
+    // next, we want to draw the entities on the tiles
+    // at first we will do it generically then we will guarantee ordering
+    for (int i = 0; i < row_count; i++) {
+        for (int j = 0; j < col_count; j++) {
             int num_entities_on_tile = libgame_lua_get_num_entities_at(L, j, i);
             int entity_index = 1;
             entityid id = -1;
-
             for (int k = 0; k < num_entities_on_tile; k++) {
-                //id = libgame_lua_get_entity_at(L, j, i, entity_index);
                 id = libgame_lua_get_nth_entity_at(L, entity_index, j, i);
                 if (id == -1) {
                     merror("libgame_draw_dungeonfloor: entity id is -1");
                     continue;
                 }
-
                 const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-                if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
+                switch (type) {
+                case ENTITY_PLAYER:
+                case ENTITY_NPC:
                     libgame_draw_entity_shadow(g, id);
+                    break;
+                default:
+                    break;
                 }
-
                 libgame_draw_entity(g, id);
-
-
-
-                //minfo("libgame_draw_dungeonfloor: getting entity type");
-                //minfo("libgame_draw_dungeonfloor: getting spritegroup");
-                //spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-                //if (!group) {
-                //    merror("libgame_draw_dungeonfloor: spritegroup is NULL");
-                //    continue;
-                //}
-                ////minfo("libgame_draw_dungeonfloor: drawing entity");
-                //DrawTexturePro(*group->sprites[group->current]->texture,
-                //               group->sprites[group->current]->src,
-                //               group->dest,
-                //               (Vector2){0, 0},
-                //               0.0f,
-                //               WHITE);
-                //}
                 entity_index++;
             }
         }
