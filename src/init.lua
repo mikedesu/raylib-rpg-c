@@ -237,15 +237,10 @@ function GetNthEntityAt(n, x, y)
 end
 
 function AddEntityToTile(id, x, y)
-	PrintDebug("AddEntityToTile", "Adding entity with id " .. id .. " to tile " .. x .. ", " .. y)
+	--PrintDebug("AddEntityToTile", "Adding entity with id " .. id .. " to tile " .. x .. ", " .. y)
 	if Gamestate.DungeonFloor[y] and Gamestate.DungeonFloor[y][x] then
-		local success = table.insert(Gamestate.DungeonFloor[y][x].entities, id)
-		print(success)
-		PrintDebug("AddEntityToTile", "Added entity with id " .. id .. " to tile " .. x .. ", " .. y)
-		--else
-		--PrintDebug("AddEntityToTile", "Tile " .. x .. ", " .. y .. " not found")
+		table.insert(Gamestate.DungeonFloor[y][x].entities, id)
 	end
-	--PrintDebug("AddEntityToTile", "Length of entities: " .. #Gamestate.DungeonFloor[y][x].entities)
 end
 
 function RemoveEntityFromTile(id, x, y)

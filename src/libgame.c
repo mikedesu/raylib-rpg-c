@@ -295,25 +295,30 @@ void libgame_handle_input(gamestate* const g) {
             libgame_lua_entity_move(L, hero_id, -1, 0);
             libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_LEFT);
             libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+            g->player_input_received = true;
 
         } else if (IsKeyPressed(KEY_RIGHT)) {
             minfo("KEY_RIGHT");
             libgame_lua_entity_move(L, hero_id, 1, 0);
             libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_RIGHT);
             libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_UP)) {
             minfo("KEY_UP");
             libgame_lua_entity_move(L, hero_id, 0, -1);
             libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_UP);
             libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_DOWN)) {
             minfo("KEY_DOWN");
             libgame_lua_entity_move(L, hero_id, 0, 1);
             libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_DOWN);
             libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+            g->player_input_received = true;
         } else if (IsKeyPressed(KEY_A)) {
             minfo("KEY_A");
             libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+            g->player_input_received = true;
         }
     } else if (g->controlmode == CONTROLMODE_CAMERA) {
         libgame_handle_caminput(g);
@@ -979,8 +984,28 @@ void libgame_update_gamestate(gamestate* g) {
     // we will need to eventually disable player input during smooth moving
     // update smooth move for NPCs and other entities
     //libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
-    //if (g->player_input_received) {
-    //    minfo("libgame_update_gamestate: player input received");
+
+    //minfo("test");
+    if (g->player_input_received) {
+        minfo("libgame_update_gamestate: player input received");
+
+
+        const int num_entities = libgame_lua_get_num_entities(L);
+        for (int i = 1; i <= num_entities; i++) {
+            const entityid id = libgame_lua_get_nth_entity(L, i);
+            const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+            if (type == ENTITY_NPC) {
+                //libgame_handle_npc_turn_lua(g, id);
+                libgame_lua_entity_move(L, id, 1, 0);
+                libgame_entity_set_anim(g, id, SPRITEGROUP_ANIM_ORC_WALK);
+                libgame_entity_update_context(g, id, SPECIFIER_NONE, DIRECTION_RIGHT);
+            }
+        }
+
+
+        g->player_input_received = false;
+    }
+
     //    libgame_handle_npcs_turn_lua(g);
     // this is where we want to process the turn
     // we want to do this in a lock-step fashion so that it is only called once every N frames or so
@@ -1366,14 +1391,9 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
 
 void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g) {
     if (!g) {
-
         merror("libgame_precompute_df: gamestate is NULL");
-
         return;
     }
-    //const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
-    //Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
-    //const int rows = libgame_lua_get_dungeonfloor_row_count(L), cols = libgame_lua_get_dungeonfloor_col_count(L);
     for (int i = 0; i < libgame_lua_get_dungeonfloor_row_count(L); i++) {
         for (int j = 0; j < libgame_lua_get_dungeonfloor_col_count(L); j++) {
             const int type = libgame_lua_get_tiletype(L, j, i);
@@ -1381,18 +1401,9 @@ void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g) {
             if (key == -1) {
                 continue;
             }
-
             const int x = j * DEFAULT_TILE_SIZE;
             const int y = i * DEFAULT_TILE_SIZE;
-
             libgame_lua_update_tile_position(L, j, i, x, y);
-
-            //DrawTexturePro(g->txinfo[key].texture,
-            //               tile_src,
-            //               tile_dest,
-            //               (Vector2){0, 0},
-            //               0,
-            //               WHITE);
         }
     }
 }
@@ -1419,63 +1430,6 @@ void libgame_draw_entity_shadow(gamestate* const g, const entityid id) {
         // the 'back' component of the shield first before drawing the entity
     }
 }
-
-
-
-
-//void libgame_draw_entity_shield_back(gamestate* const g, const entityid id) {
-//    if (!g) {
-//        merror("libgame_draw_entity_shield_back: gamestate is NULL");
-//        return;
-//    }
-//    const entityid shield_id = libgame_lua_get_entity_shield(L, id);
-//    const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-//    if (shield_id != -1 && type == ENTITY_PLAYER) {
-//        spritegroup_t* group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, id, SPECIFIER_NONE);
-//        spritegroup_t* shield_group =
-//            hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, shield_id, SPECIFIER_SHIELD_BLOCK);
-//        if (group && shield_group && group->current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
-//            shield_group->dest.x = group->dest.x;
-//            shield_group->dest.y = group->dest.y;
-//            DrawTexturePro(*shield_group->sprites[shield_group->current + 1]->texture,
-//                           shield_group->sprites[shield_group->current + 1]->src,
-//                           shield_group->dest,
-//                           (Vector2){0, 0},
-//                           0.0f,
-//                           WHITE);
-//        }
-//    }
-//}
-
-
-
-
-//void libgame_draw_entity_shield_front(gamestate* const g, const entityid id) {
-//    if (!g) {
-//        merror("libgame_draw_entity_shield_front: gamestate is NULL");
-//        return;
-//    }
-//    const entityid shield_id = libgame_lua_get_entity_shield(L, id);
-//    const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-//    if (shield_id != -1 && type == ENTITY_PLAYER) {
-//        spritegroup_t* group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, id, SPECIFIER_NONE);
-//        spritegroup_t* s_g =
-//            hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, shield_id, SPECIFIER_SHIELD_BLOCK);
-//        if (group && s_g && group->current == SPRITEGROUP_ANIM_HUMAN_GUARD) {
-//            // to demo the buckler animating on the hero, we will need to pass in the shield id
-//            // normally we would query the hero to see which shield is equipped
-//            // but for now we will introduce a global buckler_id as a test
-//            s_g->dest.x = group->dest.x;
-//            s_g->dest.y = group->dest.y;
-//            DrawTexturePro(*s_g->sprites[s_g->current]->texture,
-//                           s_g->sprites[s_g->current]->src,
-//                           s_g->dest,
-//                           zero_vec,
-//                           0.0f,
-//                           WHITE);
-//        }
-//    }
-//}
 
 
 
@@ -1516,9 +1470,7 @@ void libgame_draw_entity(gamestate* const g, const entityid id) {
         merror("libgame_draw_entity: gamestate is NULL");
         return;
     }
-    //const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
     const specifier_t spec = SPECIFIER_NONE;
-    //type == ENTITY_SHIELD ? SPECIFIER_SHIELD_ON_TILE : SPECIFIER_NONE;
     spritegroup_t* group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, id, spec);
     if (!group) {
         merror("libgame_draw_entity: group is NULL");
@@ -1526,7 +1478,6 @@ void libgame_draw_entity(gamestate* const g, const entityid id) {
     }
     // draw entity shadow
     libgame_draw_entity_shadow(g, id);
-    //libgame_draw_entity_shield_back(g, id);
     // draw the main entity sprite
     DrawTexturePro(*group->sprites[group->current]->texture,
                    group->sprites[group->current]->src,
@@ -1534,7 +1485,6 @@ void libgame_draw_entity(gamestate* const g, const entityid id) {
                    (Vector2){0, 0},
                    0.0f,
                    WHITE);
-    //libgame_draw_entity_shield_front(g, id);
     libgame_draw_entity_incr_frame(g, id);
     if (g->debugpanelon) {
         const int x = group->dest.x;
@@ -1543,23 +1493,24 @@ void libgame_draw_entity(gamestate* const g, const entityid id) {
         const int h = group->dest.height;
         // first draw the outer rectangle without the offset
         Vector2 v[4] = {{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}};
-        //const Vector2 v[4] = {{x - group->off_x, y - group->off_y},
-        //                      {x + group->off_x + w, y - group->off_y},
-        //                      {x + w + group->off_x, y + h + group->off_y},
-        //                      {x - group->off_x, y + h + group->off_y}};
         DrawLineV(v[0], v[1], (Color){0, 0, 255, 255});
         DrawLineV(v[1], v[2], (Color){0, 0, 255, 255});
         DrawLineV(v[2], v[3], (Color){0, 0, 255, 255});
         DrawLineV(v[3], v[0], (Color){0, 0, 255, 255});
-        //DrawLineV(v[0], v[1], c);
-        //DrawLineV(v[1], v[2], c);
-        //DrawLineV(v[2], v[3], c);
-        //DrawLineV(v[3], v[0], c);
         // now lets draw it with the offset
-        v[0] = (Vector2){x - group->off_x, y - group->off_y};
-        v[1] = (Vector2){x + group->off_x + w, y - group->off_y};
-        v[2] = (Vector2){x + w + group->off_x, y + h + group->off_y};
-        v[3] = (Vector2){x - group->off_x, y + h + group->off_y};
+        v[0].x = x - group->off_x;
+        v[0].y = y - group->off_y;
+        v[1].x = x + group->off_x + w;
+        v[1].y = y - group->off_y;
+        v[2].x = x + w + group->off_x;
+        v[2].y = y + h + group->off_y;
+        v[3].x = x - group->off_x;
+        v[3].y = y + h + group->off_y;
+
+        //v[0] = (Vector2){x - group->off_x, y - group->off_y};
+        //v[1] = (Vector2){x + group->off_x + w, y - group->off_y};
+        //v[2] = (Vector2){x + w + group->off_x, y + h + group->off_y};
+        //v[3] = (Vector2){x - group->off_x, y + h + group->off_y};
         DrawLineV(v[0], v[1], (Color){0, 255, 0, 255});
         DrawLineV(v[1], v[2], (Color){0, 255, 0, 255});
         DrawLineV(v[2], v[3], (Color){0, 255, 0, 255});
