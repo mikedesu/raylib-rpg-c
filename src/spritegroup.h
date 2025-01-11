@@ -25,6 +25,7 @@ typedef struct spritegroup_t {
     // note this allows for one entity to have multiple spritegroups
 
     Rectangle dest;
+    Rectangle move;
 
     sprite** sprites;
 

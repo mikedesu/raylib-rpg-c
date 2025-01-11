@@ -1,5 +1,5 @@
-#include "mprint.h"
 #include "spritegroup.h"
+#include "mprint.h"
 #include <stdlib.h>
 
 
@@ -9,8 +9,7 @@ spritegroup_t* spritegroup_create(const int capacity) {
     if (capacity <= 0) return NULL;
     spritegroup_t* sg = malloc(sizeof(spritegroup_t));
     if (!sg) {
-        merror(
-            "spritegroup_create: failed to allocate memory for spritegroup_t");
+        merror("spritegroup_create: failed to allocate memory for spritegroup_t");
         return NULL;
     }
     sg->current = 0;
@@ -30,6 +29,7 @@ spritegroup_t* spritegroup_create(const int capacity) {
         return NULL;
     }
     sg->dest = (Rectangle){0, 0, 0, 0};
+    sg->move = (Rectangle){0, 0, 0, 0};
     sg->specifier = SPECIFIER_NONE;
     // zero out the animation queue
     //spritegroup_clear_anim_queue(sg);
@@ -39,17 +39,14 @@ spritegroup_t* spritegroup_create(const int capacity) {
 
 
 
-void spritegroup_set_specifier(spritegroup_t* const sg,
-                               const specifier_t spec) {
+void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec) {
     if (!sg) {
         merror("spritegroup_set_specifier: spritegroup is NULL");
         return;
     }
     // make sure it is a valid specifier
     //sg->specifier = spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT ? spec : SPECIFIER_NONE;
-    sg->specifier = spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT
-                        ? spec
-                        : SPECIFIER_NONE;
+    sg->specifier = spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT ? spec : SPECIFIER_NONE;
 }
 
 
