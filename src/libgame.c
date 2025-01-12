@@ -273,9 +273,9 @@ void libgame_handle_input(gamestate* const g) {
     //        g->fadestate = FADESTATEOUT;
     //    }
     //}
-    //if (IsKeyPressed(KEY_E)) {
-    //    libgame_test_enemy_placement(g);
-    //}
+    if (IsKeyPressed(KEY_E)) {
+        libgame_test_enemy_placement(g);
+    }
     //libgame_handle_modeswitch(g);
     if (IsKeyPressed(KEY_C)) {
         g->controlmode = g->controlmode == CONTROLMODE_CAMERA ? CONTROLMODE_PLAYER : CONTROLMODE_CAMERA;
@@ -341,6 +341,17 @@ void libgame_handle_input(gamestate* const g) {
         } else if (IsKeyPressed(KEY_A)) {
             minfo("KEY_A");
             libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+            g->player_input_received = true;
+        } else if (IsKeyPressed(KEY_PERIOD)) {
+            minfo("KEY_PERIOD");
+            const bool r = libgame_lua_entity_move(L, hero_id, 0, 0);
+            if (r) {
+
+                libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_IDLE);
+            }
+
+
+
             g->player_input_received = true;
         }
     } else if (g->controlmode == CONTROLMODE_CAMERA) {
@@ -574,16 +585,12 @@ void libgame_update_hero_shield_spritegroup(gamestate* const g) {
 
 void libgame_handle_player_wait_key(gamestate* const g) {
     if (!g) {
-
         merror("libgame_handle_player_wait_key: gamestate is NULL");
-
         return;
     }
     const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     if (hero_id == -1) {
-
         merror("libgame_handle_player_wait_key: hero_id is -1");
-
         return;
     }
     const direction_t dir = libgame_lua_get_entity_int(L, hero_id, "direction");
@@ -909,16 +916,40 @@ void libgame_handle_npc_turn_lua(gamestate* const g, const entityid id) {
         merror("libgame_handle_npc_turn_lua: gamestate is NULL");
         return;
     }
+
+
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+    if (!sg) {
+        merror("libgame_handle_npc_turn_lua: spritegroup is NULL");
+        return;
+    }
+
     //minfo("libgame_handle_npc_turn_lua begin");
-    //const int diceroll = rand() % 8;
-    //const int xdir = diceroll == 0 || diceroll == 6 || diceroll == 7 ? -1 : diceroll == 2 || diceroll == 3 || diceroll == 4 ? 1 : 0;
-    //const int ydir = diceroll == 0 || diceroll == 1 || diceroll == 2 ? -1 : diceroll == 4 || diceroll == 5 || diceroll == 6 ? 1 : 0;
+    const int diceroll = rand() % 8;
+    const int xdir = diceroll == 0 || diceroll == 6 || diceroll == 7   ? -1
+                     : diceroll == 2 || diceroll == 3 || diceroll == 4 ? 1
+                                                                       : 0;
+    const int ydir = diceroll == 0 || diceroll == 1 || diceroll == 2   ? -1
+                     : diceroll == 4 || diceroll == 5 || diceroll == 6 ? 1
+                                                                       : 0;
+
+    const bool r = libgame_lua_entity_move(L, id, xdir, ydir);
+    if (r) {
+        libgame_entity_set_anim(g, id, SPRITEGROUP_ANIM_ORC_WALK);
+        libgame_entity_update_context(g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
+
+        sg->move.x = xdir * DEFAULT_TILE_SIZE;
+        sg->move.y = ydir * DEFAULT_TILE_SIZE;
+    }
+
+
+
     //if (!libgame_lua_create_action(L, id, ACTION_MOVE, xdir, ydir)) {
     //    merror("could not create npc action: move");
     //}
-    if (!libgame_lua_create_action(L, id, ACTION_NONE, 0, 0)) {
-        merror("could not create npc action: none");
-    }
+    //if (!libgame_lua_create_action(L, id, ACTION_NONE, 0, 0)) {
+    //    merror("could not create npc action: none");
+    //}
     //const direction_t dir = libgame_lua_get_entity_int(L, id, "direction");
     //if (!libgame_lua_create_action(L, id, ACTION_ATTACK, libgame_get_x_from_dir(dir), libgame_get_y_from_dir(dir))) merror("attack action failed to create");
 }
@@ -985,14 +1016,23 @@ void libgame_update_gamestate(gamestate* g) {
         merror("libgame_update_gamestate: gamestate is NULL");
         return;
     }
-    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
+    //const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
 
     //UpdateMusicStream(test_music);
     libgame_update_debug_panel_buffer(g);
     //setdebugpanelcenter(g);
     libgame_reset_entities_anim(g);
     libgame_do_camera_lock_on(g);
-    libgame_update_smoothmove(g, hero_id);
+
+
+    for (int i = 1; i <= libgame_lua_get_num_entities(L); i++) {
+        const entityid id = libgame_lua_get_nth_entity(L, i);
+        //libgame_update_spritegroup_dest(g, id);
+        libgame_update_smoothmove(g, id);
+    }
+
+
+
     // at this point, we can take other NPC turns
     // lets iterate over our entities, find the NPCs, and make them move in a random direction
     // then, we will update their smooth moves
@@ -1000,21 +1040,21 @@ void libgame_update_gamestate(gamestate* g) {
     // update smooth move for NPCs and other entities
     //libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
     //minfo("test");
-    //if (g->player_input_received) {
-    //    minfo("libgame_update_gamestate: player input received");
-    //    const int num_entities = libgame_lua_get_num_entities(L);
-    //    for (int i = 1; i <= num_entities; i++) {
-    //        const entityid id = libgame_lua_get_nth_entity(L, i);
-    //        const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-    //        if (type == ENTITY_NPC) {
-    //            //libgame_handle_npc_turn_lua(g, id);
-    //            libgame_lua_entity_move(L, id, 1, 0);
-    //            libgame_entity_set_anim(g, id, SPRITEGROUP_ANIM_ORC_WALK);
-    //            libgame_entity_update_context(g, id, SPECIFIER_NONE, DIRECTION_RIGHT);
-    //        }
-    //    }
-    //    g->player_input_received = false;
-    //}
+    if (g->player_input_received) {
+        //    minfo("libgame_update_gamestate: player input received");
+        const int num_entities = libgame_lua_get_num_entities(L);
+        for (int i = 1; i <= num_entities; i++) {
+            const entityid id = libgame_lua_get_nth_entity(L, i);
+            const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
+            if (type == ENTITY_NPC) {
+                libgame_handle_npc_turn_lua(g, id);
+                //            libgame_lua_entity_move(L, id, 1, 0);
+                //            libgame_entity_set_anim(g, id, SPRITEGROUP_ANIM_ORC_WALK);
+                //            libgame_entity_update_context(g, id, SPECIFIER_NONE, DIRECTION_RIGHT);
+            }
+        }
+        g->player_input_received = false;
+    }
     //    libgame_handle_npcs_turn_lua(g);
     // this is where we want to process the turn
     // we want to do this in a lock-step fashion so that it is only called once every N frames or so
