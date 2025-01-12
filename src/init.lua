@@ -414,16 +414,19 @@ function EntityMove(id, xdir, ydir)
 		local newx = entity.x + xdir
 		local newy = entity.y + ydir
 		if newx < 0 or newx >= #Gamestate.DungeonFloor[0] or newy < 0 or newy >= #Gamestate.DungeonFloor then
-			PrintDebug("EntityMove", "Entity is out of bounds")
+			PrintDebug("EntityMove", "Entity is out of bounds, new move would be: " .. newx .. ", " .. newy)
+			PrintDebug("EntityMove", "entity.x: " .. entity.x .. "  entity.y: " .. entity.y)
+			PrintDebug("EntityMove", "xdir: " .. xdir .. "  ydir: " .. ydir)
+			return false
 		end
 		-- can't move into stone walls
 		-- have to move the entity from old tile to new tile
 		-- local old_tile = GetTileType(entity.x, entity.y)
-		local new_tile = GetTileType(newx, newy)
-		if new_tile == TileTypes.Stonewall00 then
-			PrintDebug("EntityMove", "Entity is blocked by a wall")
-			return false
-		end
+		--local new_tile = GetTileType(newx, newy)
+		--if new_tile == TileTypes.Stonewall00 then
+		--	PrintDebug("EntityMove", "Entity is blocked by a wall")
+		--	return false
+		--end
 		-- if the tile is occupied by an entity, return false
 		if GetNumEntitiesAt(newx, newy) > 0 then
 			PrintDebug("EntityMove", "Entity is blocked by another entity")
@@ -443,9 +446,10 @@ function EntityMove(id, xdir, ydir)
 		entity.x = newx
 		entity.y = newy
 
-		return
+		return true
 	end
 	PrintDebug("init.lua:358", "Entity with id " .. id .. " not found")
+	return false
 end
 
 function EntityAttack(id, xdir, ydir)

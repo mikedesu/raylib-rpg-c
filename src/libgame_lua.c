@@ -44,8 +44,7 @@ const int libgame_lua_get_int(lua_State* L, const char* key) {
 
 
 
-const int libgame_lua_create_entity(
-    lua_State* L, const char* name, const int type, const int x, const int y) {
+const int libgame_lua_create_entity(lua_State* L, const char* name, const int type, const int x, const int y) {
     if (!L) {
         merror("L is NULL");
         return -1;
@@ -68,10 +67,7 @@ const int libgame_lua_create_entity(
 
 
 
-const bool libgame_lua_set_entity_int(lua_State* L,
-                                      const int id,
-                                      const char* key,
-                                      const int value) {
+const bool libgame_lua_set_entity_int(lua_State* L, const int id, const char* key, const int value) {
     if (!L) {
         merror("L is NULL");
         return false;
@@ -93,10 +89,7 @@ const bool libgame_lua_set_entity_int(lua_State* L,
 
 
 
-const bool libgame_lua_set_entity_str(lua_State* L,
-                                      const int id,
-                                      const char* key,
-                                      const char* value) {
+const bool libgame_lua_set_entity_str(lua_State* L, const int id, const char* key, const char* value) {
     if (!L) {
         merror("L is NULL");
         return false;
@@ -174,8 +167,7 @@ const char* libgame_lua_get_gamestate_str(lua_State* L, const char* key) {
 
 
 
-const int
-libgame_lua_get_entity_int(lua_State* L, const int id, const char* key) {
+const int libgame_lua_get_entity_int(lua_State* L, const int id, const char* key) {
     if (!L) {
         merror("L is NULL");
         return -1;
@@ -204,8 +196,7 @@ libgame_lua_get_entity_int(lua_State* L, const int id, const char* key) {
 
 
 
-const char*
-libgame_lua_get_entity_str(lua_State* L, const int id, const char* key) {
+const char* libgame_lua_get_entity_str(lua_State* L, const int id, const char* key) {
     if (!L) {
         merror("L is NULL");
         return NULL;
@@ -226,10 +217,7 @@ libgame_lua_get_entity_str(lua_State* L, const int id, const char* key) {
 
 
 
-const bool libgame_lua_create_dungeonfloor(lua_State* L,
-                                           const int width,
-                                           const int height,
-                                           const int type) {
+const bool libgame_lua_create_dungeonfloor(lua_State* L, const int width, const int height, const int type) {
     if (!L) {
         merror("L is NULL");
         return false;
@@ -242,8 +230,7 @@ const bool libgame_lua_create_dungeonfloor(lua_State* L,
     if (lua_pcall(L, 3, 0, 0) == 0) {
         retval = true;
     } else {
-        merror(
-            "libgame_lua_create_dungeonfloor: failed to create dungeon floor");
+        merror("libgame_lua_create_dungeonfloor: failed to create dungeon floor");
     }
     return retval;
 }
@@ -271,10 +258,7 @@ const int libgame_lua_get_tiletype(lua_State* L, const int x, const int y) {
 
 
 
-const bool libgame_lua_entity_move(lua_State* L,
-                                   const int id,
-                                   const float x,
-                                   const float y) {
+const bool libgame_lua_entity_move(lua_State* L, const int id, const float x, const float y) {
     if (!L) {
         merror("L is NULL");
         return false;
@@ -284,8 +268,8 @@ const bool libgame_lua_entity_move(lua_State* L,
     lua_pushnumber(L, id);
     lua_pushnumber(L, x);
     lua_pushnumber(L, y);
-    if (lua_pcall(L, 3, 0, 0) == 0) {
-        retval = true;
+    if (lua_pcall(L, 3, 1, 0) == 0) {
+        retval = lua_toboolean(L, -1);
     } else {
         merror("libgame_lua_entity_move: failed to move entity");
     }
@@ -315,8 +299,7 @@ const bool libgame_lua_entity_move_random_dir(lua_State* L, const int id) {
 
 
 
-const int
-libgame_lua_get_num_entities_at(lua_State* L, const int x, const int y) {
+const int libgame_lua_get_num_entities_at(lua_State* L, const int x, const int y) {
     if (!L) {
         merror("L is NULL");
         return -1;
@@ -328,8 +311,7 @@ libgame_lua_get_num_entities_at(lua_State* L, const int x, const int y) {
     if (lua_pcall(L, 2, 1, 0) == 0) {
         retval = lua_tonumber(L, -1);
     } else {
-        merror(
-            "libgame_lua_get_num_entities_at: failed to get num entities at");
+        merror("libgame_lua_get_num_entities_at: failed to get num entities at");
     }
     lua_pop(L, 1);
     return retval;
@@ -338,10 +320,7 @@ libgame_lua_get_num_entities_at(lua_State* L, const int x, const int y) {
 
 
 
-const int libgame_lua_get_nth_entity_at(lua_State* L,
-                                        const int n,
-                                        const int x,
-                                        const int y) {
+const int libgame_lua_get_nth_entity_at(lua_State* L, const int n, const int x, const int y) {
     if (!L) {
         merror("L is NULL");
         return -1;
@@ -362,8 +341,7 @@ const int libgame_lua_get_nth_entity_at(lua_State* L,
 
 
 
-const bool
-libgame_lua_tile_is_occupied_by_npc(lua_State* L, const int x, const int y) {
+const bool libgame_lua_tile_is_occupied_by_npc(lua_State* L, const int x, const int y) {
     if (!L) {
         merror("L is NULL");
         return false;
@@ -394,8 +372,7 @@ const int libgame_lua_get_dungeonfloor_row_count(lua_State* L) {
     if (lua_pcall(L, 0, 1, 0) == 0) {
         retval = lua_tonumber(L, -1);
     } else {
-        merror(
-            "libgame_lua_get_dungeonfloor_row_count: failed to get row count");
+        merror("libgame_lua_get_dungeonfloor_row_count: failed to get row count");
     }
     lua_pop(L, 1);
     return retval;
@@ -426,10 +403,7 @@ const int libgame_lua_get_dungeonfloor_col_count(lua_State* L) {
 
 
 
-const bool libgame_lua_set_tiletype(lua_State* L,
-                                    const int type,
-                                    const int x,
-                                    const int y) {
+const bool libgame_lua_set_tiletype(lua_State* L, const int type, const int x, const int y) {
 
     if (!L) {
         merror("L is NULL");
@@ -471,8 +445,7 @@ void libgame_lua_randomize_all_dungeon_tiles(lua_State* L) {
 
 
 
-void libgame_lua_randomize_dungeon_tiles(
-    lua_State* L, const int x, const int y, const int w, const int h) {
+void libgame_lua_randomize_dungeon_tiles(lua_State* L, const int x, const int y, const int w, const int h) {
     //if (!L) return;
     if (!L) {
         merror("L is NULL");
@@ -510,11 +483,7 @@ void libgame_lua_set_int(lua_State* L, const char* key, const int value) {
 
 
 
-const bool libgame_lua_create_action(lua_State* L,
-                                     const int entity_id,
-                                     const int type,
-                                     const int x,
-                                     const int y) {
+const bool libgame_lua_create_action(lua_State* L, const int entity_id, const int type, const int x, const int y) {
     if (!L) {
         merror("L is NULL");
         return false;
@@ -629,9 +598,7 @@ const int libgame_lua_get_nth_entity(lua_State* L, const int n) {
 
 
 
-void libgame_lua_set_gamestate_int(lua_State* L,
-                                   const char* key,
-                                   const int value) {
+void libgame_lua_set_gamestate_int(lua_State* L, const char* key, const int value) {
     if (!L) {
         merror("L is NULL");
         return;
@@ -676,8 +643,7 @@ const int libgame_lua_get_nth_action_type(lua_State* L, const int n) {
     if (lua_pcall(L, 1, 1, 0) == 0) {
         retval = lua_tonumber(L, -1);
     } else {
-        merror(
-            "libgame_lua_get_nth_action_type: failed to get nth action type");
+        merror("libgame_lua_get_nth_action_type: failed to get nth action type");
     }
     lua_pop(L, 1);
     return retval;
@@ -783,8 +749,7 @@ const int libgame_lua_get_inventory_count(lua_State* L, const int id) {
     if (lua_pcall(L, 1, 1, 0) == 0) {
         retval = lua_tonumber(L, -1);
     } else {
-        merror(
-            "libgame_lua_get_inventory_count: failed to get inventory count");
+        merror("libgame_lua_get_inventory_count: failed to get inventory count");
     }
     lua_pop(L, 1);
     return retval;
@@ -819,8 +784,7 @@ void libgame_lua_incr_current_turn(lua_State* L) {
     }
     lua_getglobal(L, "IncrementCurrentTurn");
     if (lua_pcall(L, 0, 0, 0) != 0) {
-        merror(
-            "libgame_lua_incr_current_turn: failed to increment current turn");
+        merror("libgame_lua_incr_current_turn: failed to increment current turn");
     }
 }
 
@@ -884,8 +848,7 @@ const int libgame_lua_get_action_results_count(lua_State* L) {
 }
 
 
-const int
-libgame_lua_get_action_result(lua_State* L, const int index, const char* key) {
+const int libgame_lua_get_action_result(lua_State* L, const int index, const char* key) {
     if (!L) {
         merror("L is NULL");
         return -1;
@@ -932,18 +895,14 @@ void libgame_lua_clear_action_results(lua_State* L) {
     }
     lua_getglobal(L, "ClearActionResults");
     if (lua_pcall(L, 0, 0, 0) != 0) {
-        merror(
-            "libgame_lua_clear_action_results: failed to clear action results");
+        merror("libgame_lua_clear_action_results: failed to clear action results");
     }
 }
 
 
 
-void libgame_lua_update_tile_position(lua_State* L,
-                                      const int dungeon_x,
-                                      const int dungeon_y,
-                                      const int x,
-                                      const int y) {
+void libgame_lua_update_tile_position(
+    lua_State* L, const int dungeon_x, const int dungeon_y, const int x, const int y) {
     if (!L) {
         merror("L is NULL");
         return;
@@ -954,8 +913,7 @@ void libgame_lua_update_tile_position(lua_State* L,
     lua_pushnumber(L, x);
     lua_pushnumber(L, y);
     if (lua_pcall(L, 4, 0, 0) != 0) {
-        merror(
-            "libgame_lua_update_tile_position: failed to update tile position");
+        merror("libgame_lua_update_tile_position: failed to update tile position");
     }
 }
 
@@ -1002,8 +960,7 @@ const int libgame_lua_get_tile_y(lua_State* L, const int x, const int y) {
 
 
 
-const float
-libgame_lua_get_entity_float(lua_State* L, const int id, const char* key) {
+const float libgame_lua_get_entity_float(lua_State* L, const int id, const char* key) {
     if (!L) {
         merror("L is NULL");
         return -1;
@@ -1029,10 +986,7 @@ libgame_lua_get_entity_float(lua_State* L, const int id, const char* key) {
 
 
 
-void libgame_lua_set_entity_float(lua_State* L,
-                                  const int id,
-                                  const char* key,
-                                  const float value) {
+void libgame_lua_set_entity_float(lua_State* L, const int id, const char* key, const float value) {
     if (!L) {
         merror("L is NULL");
         return;

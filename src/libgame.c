@@ -298,37 +298,45 @@ void libgame_handle_input(gamestate* const g) {
 
         if (IsKeyPressed(KEY_LEFT)) {
             minfo("KEY_LEFT");
-            libgame_lua_entity_move(L, hero_id, -1, 0);
-            libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_LEFT);
-            libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+            const bool r = libgame_lua_entity_move(L, hero_id, -1, 0);
+            if (r) {
+                libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_LEFT);
+                libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+                sg->move.x = -DEFAULT_TILE_SIZE;
+                sg->move.y = 0;
+            }
 
-            sg->move.x = -DEFAULT_TILE_SIZE;
-            sg->move.y = 0;
             g->player_input_received = true;
 
         } else if (IsKeyPressed(KEY_RIGHT)) {
             minfo("KEY_RIGHT");
-            libgame_lua_entity_move(L, hero_id, 1, 0);
-            libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_RIGHT);
-            libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
-            sg->move.x = DEFAULT_TILE_SIZE;
-            sg->move.y = 0;
+            const bool r = libgame_lua_entity_move(L, hero_id, 1, 0);
+            if (r) {
+                libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_RIGHT);
+                libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+                sg->move.x = DEFAULT_TILE_SIZE;
+                sg->move.y = 0;
+            }
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_UP)) {
             minfo("KEY_UP");
-            libgame_lua_entity_move(L, hero_id, 0, -1);
-            libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_UP);
-            libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
-            sg->move.x = 0;
-            sg->move.y = -DEFAULT_TILE_SIZE;
+            const bool r = libgame_lua_entity_move(L, hero_id, 0, -1);
+            if (r) {
+                libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_UP);
+                libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+                sg->move.x = 0;
+                sg->move.y = -DEFAULT_TILE_SIZE;
+            }
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_DOWN)) {
             minfo("KEY_DOWN");
-            libgame_lua_entity_move(L, hero_id, 0, 1);
-            libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_DOWN);
-            libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
-            sg->move.x = 0;
-            sg->move.y = DEFAULT_TILE_SIZE;
+            const bool r = libgame_lua_entity_move(L, hero_id, 0, 1);
+            if (r) {
+                libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_DOWN);
+                libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+                sg->move.x = 0;
+                sg->move.y = DEFAULT_TILE_SIZE;
+            }
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_A)) {
             minfo("KEY_A");
