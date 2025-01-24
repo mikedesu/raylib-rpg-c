@@ -34,18 +34,22 @@
 // libgame global variables
 //------------------------------------------------------------------
 gamestate* g = NULL;
+
 lua_State* L = NULL;
+
 RenderTexture target;
+
 Rectangle target_src = {0, 0, 0, 0};
 Rectangle target_dest = {0, 0, 0, 0};
-Vector2 target_origin = {0, 0};
+
+const Vector2 zero_vec = {0, 0};
+const Vector2 target_origin = {0, 0};
+
 int activescene = GAMEPLAYSCENE;
 
 bool is_clicked = false;
-Vector2 clickPosition = {-1, -1};
-Vector2 clickPositionWorld = {-1, -1};
 
-const Vector2 zero_vec = {0, 0};
+
 
 
 void libgame_draw_fade(const gamestate* const g) {
@@ -1203,14 +1207,6 @@ void libgame_drawframe(gamestate* g) {
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     //if (g->debugpanelon) {
     libgame_draw_debug_panel(g);
-    //if (is_clicked) {
-    //    float x = libgame_lua_get_entity_float(L, 1, "x");
-    //    float y = libgame_lua_get_entity_float(L, 1, "y");
-    //    Vector2 hero_vec = {x, y};
-    //    Vector2 hero_screen = GetWorldToScreen2D(hero_vec, g->cam2d);
-    //    DrawLineV(hero_screen, clickPosition, RED);
-    //}
-    //}
     libgame_drawframeend(g);
 }
 

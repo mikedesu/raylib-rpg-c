@@ -127,7 +127,9 @@ libgame_entity_update_context(gamestate* const g, const entityid id, const speci
 //const int libgame_get_y_from_dir(const direction_t dir);
 
 void libgame_get_entity_xy(gamestate* const g, const entityid id, int* x, int* y);
+
 const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
+
 const char* libgame_get_str_from_dir(const direction_t dir);
 
 //void libgame_update_spritegroup_current(gamestate* const g,
@@ -187,6 +189,7 @@ const entityid libgame_create_entity(gamestate* const g,
 
 
 void libgame_handle_test_enemy_placement(gamestate* const g);
+
 void libgame_test_enemy_placement(gamestate* const g);
 
 const bool libgame_handle_sprite_update(gamestate* const g,
@@ -207,4 +210,5 @@ void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g);
 
 
 void libgame_update_spritegroup_dest(gamestate* const g, const entityid id);
+
 void libgame_update_all_entity_sg_dests(gamestate* const g);
