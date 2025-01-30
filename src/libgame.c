@@ -4,10 +4,11 @@
 #include "controlmode.h"
 #include "direction.h"
 #include "dungeon_floor.h"
+#include "dungeon_tile_type.h"
 #include "entitytype.h"
 #include "fadestate.h"
 #include "gamestate.h"
-//#include "get_txkey_for_tiletype.h"
+#include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "libgame_defines.h"
 #include "mprint.h"
@@ -1275,33 +1276,52 @@ void libgame_drawgrid(gamestate* const g) {
 
 
 
-void libgame_draw_dungeonfloor(gamestate* const g) {
+void libgame_draw_dungeon_floor(gamestate* const g) {
     if (!g) {
-        merror("libgame_draw_dungeonfloor: gamestate is NULL");
+        merror("libgame_draw_dungeon_floor: gamestate is NULL");
         return;
     }
-    //const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
-    //Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
 
-    //const int row_count = libgame_lua_get_dungeonfloor_row_count(L);
+    //minfo("libgame_draw_dungeon_floor begin");
+
+    const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
+    Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
+
+    const int row_count = dungeon_floor.height;
+    const int col_count = dungeon_floor.width;
 
     //const int col_count = libgame_lua_get_dungeonfloor_col_count(L);
-    //if (row_count == -1 || col_count == -1) {
-    //    merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
-    //    return;
-    //}
-    //for (int i = 0; i < row_count; i++) {
-    //    for (int j = 0; j < col_count; j++) {
-    //        const int type = libgame_lua_get_tiletype(L, j, i);
-    //        const int key = get_txkey_for_tiletype(type);
-    //        if (key == -1) {
-    //            continue;
-    //        }
-    //        tile_dest.x = libgame_lua_get_tile_x(L, j, i);
-    //        tile_dest.y = libgame_lua_get_tile_y(L, j, i);
-    //        DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
-    //    }
-    //}
+    if (row_count == -1 || col_count == -1) {
+        merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
+        return;
+    }
+    for (int i = 0; i < row_count; i++) {
+        for (int j = 0; j < col_count; j++) {
+            const dungeon_tile_type_t type = dungeon_floor.tiles[i][j].type;
+            const int key = get_txkey_for_tiletype(type);
+            if (key == -1) {
+                continue;
+            }
+
+            char error_buf[512];
+            bzero(error_buf, 512);
+
+
+            //tile_dest.x = libgame_lua_get_tile_x(L, j, i);
+            tile_dest.x = j * DEFAULT_TILE_SIZE;
+            //tile_dest.y = libgame_lua_get_tile_y(L, j, i);
+            tile_dest.y = i * DEFAULT_TILE_SIZE;
+
+
+            snprintf(error_buf, 512, "%d %f, %f", key, tile_dest.x, tile_dest.y);
+            minfo(error_buf);
+
+            DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
+
+            // test by drawing a box
+            //DrawRectangle(tile_dest.x, tile_dest.y, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE, WHITE);
+        }
+    }
     // next, we want to draw the entities on the tiles
     // at first we will do it generically then we will guarantee ordering
     //for (int i = 0; i < row_count; i++) {
@@ -1513,7 +1533,11 @@ void libgame_draw_gameplayscene(gamestate* const g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     // draw tiles and entities
-    libgame_draw_dungeonfloor(g);
+    libgame_draw_dungeon_floor(g);
+
+    // test draw
+    //DrawRectangle(0, 0, 100, 100, WHITE);
+
     libgame_handle_fade(g);
     EndMode2D();
     // disabled for now
@@ -1711,6 +1735,7 @@ const int libgame_create_spritegroup_by_id(gamestate* const g, const entityid id
         merror("libgame_create_spritegroup_by_id: id");
         return -1;
     }
+    //
     //if (!g || id < 0) return;
     // want to pre-select values to feed into create_spritegroup by
     // entity-type
@@ -2109,10 +2134,14 @@ void libgame_initsharedsetup(gamestate* const g) {
     g->font = LoadFontEx(DEFAULT_FONT_PATH, 60, 0, 255);
     //g->targetwidth = libgame_lua_get_gamestate_int(L, "TargetWidth"),
     //g->targetheight = libgame_lua_get_gamestate_int(L, "TargetHeight");
+
+    g->targetwidth = 1280;
+    g->targetheight = 720;
     target = LoadRenderTexture(g->targetwidth, g->targetheight);
     target_src = (Rectangle){0, 0, g->targetwidth, -g->targetheight};
     target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+
     // update the gamestate display values
     // can get this from init.lua....
     const int c_offset_x = -100;
@@ -2125,8 +2154,8 @@ void libgame_initsharedsetup(gamestate* const g) {
     //libgame_lua_create_dungeonfloor(L, 16, 16, TILETYPE_DIRT_00);
     //libgame_lua_create_dungeonfloor(L, DEFAULT_DUNGEONFLOOR_WIDTH, DEFAULT_DUNGEONFLOOR_HEIGHT, TILETYPE_DIRT_00);
 
-    libgame_precompute_dungeonfloor_tile_positions(g);
-    libgame_create_hero(g, 1, 1);
+    //libgame_precompute_dungeonfloor_tile_positions(g);
+    //libgame_create_hero(g, 1, 1);
     //const entityid heroid = libgame_create_entity(
     //    g, "hero", ENTITY_PLAYER, RACE_HUMAN, 3, 3, DIRECTION_DOWN);
     //if (heroid == -1) {

@@ -168,7 +168,7 @@ void libgame_draw_fade(const gamestate* const g);
 
 void libgame_drawgrid(gamestate* const g);
 
-void libgame_draw_dungeonfloor(gamestate* const g);
+void libgame_draw_dungeon_floor(gamestate* const g);
 
 void libgame_drawframeend(gamestate* const g);
 
