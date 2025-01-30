@@ -3,6 +3,7 @@
 //#include "actions.h"
 #include "controlmode.h"
 #include "direction.h"
+#include "dungeon_floor.h"
 #include "entitytype.h"
 #include "fadestate.h"
 #include "gamestate.h"
@@ -40,16 +41,18 @@ lua_State* L = NULL;
 RenderTexture target;
 
 Rectangle target_src = {0, 0, 0, 0};
+
 Rectangle target_dest = {0, 0, 0, 0};
 
 const Vector2 zero_vec = {0, 0};
+
 const Vector2 target_origin = {0, 0};
 
 int activescene = GAMEPLAYSCENE;
 
 bool is_clicked = false;
 
-
+dungeon_floor_t dungeon_floor;
 
 
 void libgame_draw_fade(const gamestate* const g) {
@@ -1279,7 +1282,9 @@ void libgame_draw_dungeonfloor(gamestate* const g) {
     }
     //const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
     //Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
+
     //const int row_count = libgame_lua_get_dungeonfloor_row_count(L);
+
     //const int col_count = libgame_lua_get_dungeonfloor_col_count(L);
     //if (row_count == -1 || col_count == -1) {
     //    merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
@@ -2072,14 +2077,14 @@ void libgame_initsharedsetup(gamestate* const g) {
         return;
     }
     // init lua
-    L = luaL_newstate();
-    luaL_openlibs(L);
-    const char* filename = "init.lua";
-    if (luaL_loadfile(L, filename)) {
-        luaL_error(L, "cannot run %s: %s", filename, lua_tostring(L, -1));
-    } else if (lua_pcall(L, 0, 0, 0)) {
-        luaL_error(L, "cannot run %s: %s", filename, lua_tostring(L, -1));
-    }
+    //L = luaL_newstate();
+    //luaL_openlibs(L);
+    //const char* filename = "init.lua";
+    //if (luaL_loadfile(L, filename)) {
+    //    luaL_error(L, "cannot run %s: %s", filename, lua_tostring(L, -1));
+    //} else if (lua_pcall(L, 0, 0, 0)) {
+    //    luaL_error(L, "cannot run %s: %s", filename, lua_tostring(L, -1));
+    //}
     //if (luaL_loadfile(L, filename) || lua_pcall(L, 0, 0, 0)) {
     //    luaL_error(L, "cannot run %s: %s", filename, lua_tostring(L, -1));
     //}
@@ -2115,8 +2120,11 @@ void libgame_initsharedsetup(gamestate* const g) {
     g->cam2d.offset.y = g->targetheight / 4.0f;
     libgame_load_textures(g);
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
+
+    dungeon_floor_init(&dungeon_floor);
     //libgame_lua_create_dungeonfloor(L, 16, 16, TILETYPE_DIRT_00);
     //libgame_lua_create_dungeonfloor(L, DEFAULT_DUNGEONFLOOR_WIDTH, DEFAULT_DUNGEONFLOOR_HEIGHT, TILETYPE_DIRT_00);
+
     libgame_precompute_dungeonfloor_tile_positions(g);
     libgame_create_hero(g, 1, 1);
     //const entityid heroid = libgame_create_entity(
@@ -2189,7 +2197,7 @@ void libgame_closeshared(gamestate* const g) {
     libgame_unloadtextures(g);
     UnloadRenderTexture(target);
     CloseWindow();
-    lua_close(L);
+    //lua_close(L);
     msuccess("libgame_closeshared end");
 }
 
