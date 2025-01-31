@@ -817,8 +817,8 @@ void libgame_initwindow(gamestate* const g) {
     //    title = "Gamestate.WindowTitle not set in init.lua";
     //}
     const char* title = "evildojo666";
-    const int window_width = 1280;
-    const int window_height = 720;
+    const int window_width = 800;
+    const int window_height = 480;
     InitWindow(window_width, window_height, title);
     //libgame_lua_get_gamestate_int(L, "WindowWidth"), libgame_lua_get_gamestate_int(L, "WindowHeight"), title);
     SetWindowMonitor(1);
@@ -827,8 +827,8 @@ void libgame_initwindow(gamestate* const g) {
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_ESCAPE);
     //g->windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth"),
-    g->windowwidth = 1280;
-    g->windowheight = 720;
+    g->windowwidth = window_width;
+    g->windowheight = window_height;
 }
 
 
