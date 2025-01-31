@@ -26,10 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-// Lua support
-//#include "libgame_lua.h"
-//#include "textureinfo.h"
-//#include "tiletype.h"
 
 
 //------------------------------------------------------------------
@@ -54,6 +50,32 @@ int activescene = GAMEPLAYSCENE;
 bool is_clicked = false;
 
 dungeon_floor_t dungeon_floor;
+
+
+entityid next_entityid = 0;
+
+#define DEFAULT_ENTITY_LIST_SIZE 1024
+//entityid entity_list[DEFAULT_ENTITY_LIST_SIZE];
+entityid* entity_list = NULL;
+
+size_t entity_list_size = 0;
+
+//#define DEFAULT_ENTITY_NAME_SIZE 128
+//char entity_names[DEFAULT_ENTITY_LIST_SIZE][DEFAULT_ENTITY_NAME_SIZE];
+
+
+
+typedef struct {
+    entityid id;
+    char name[128];
+} entity_name_t;
+
+#define DEFAULT_ENTITY_NAME_CHAIN_SIZE 3
+//entity_name_t*** entity_names = NULL;
+//entity_name_t** entity_names = NULL;
+
+entity_name_t entity_names[DEFAULT_ENTITY_LIST_SIZE][DEFAULT_ENTITY_NAME_CHAIN_SIZE];
+
 
 
 void libgame_draw_fade(const gamestate* const g) {
@@ -1907,13 +1929,16 @@ void libgame_loadfont(gamestate* const g) {
 
 
 
-const entityid libgame_create_entity(gamestate* const g,
-                                     const char* name,
-                                     const entitytype_t type,
-                                     const race_t race,
-                                     const int x,
-                                     const int y,
-                                     const direction_t direction) {
+const entityid libgame_create_entity(gamestate* const g, const char* name) {
+
+    //const entitytype_t type,
+    //const race_t race,
+    //const int x,
+    //const int y,
+    //const direction_t direction) {
+    // const int dw = dungeon_floor.width;
+    // const int dh = dungeon_floor.height;
+
     if (!g) {
         merror("libgame_create_entity: gamestate is NULL");
         return -1;
@@ -1923,24 +1948,90 @@ const entityid libgame_create_entity(gamestate* const g,
     } else if (strlen(name) == 0) {
         merror("libgame_create_entity: name is empty");
         return -1;
-    } else if (x < 0) {
-        merror("libgame_create_entity: x is less than 0");
-        return -1;
-    } else if (y < 0) {
-        merror("libgame_create_entity: y is less than 0");
+    }
+    // else if (x < 0) {
+    //     merror("libgame_create_entity: x is less than 0");
+    //     return -1;
+    // } else if (y < 0) {
+    //     merror("libgame_create_entity: y is less than 0");
+    //     return -1;
+    // } else if (x >= dw) {
+    //     merror("libgame_create_entity: x is greater than or equal to dw");
+    //     return -1;
+    // } else if (y >= dh) {
+    //     merror("libgame_create_entity: y is greater than or equal to dh");
+    //     return -1;
+    // }
+
+
+    if (entity_list_size >= DEFAULT_ENTITY_LIST_SIZE) {
+        merror("libgame_create_entity: entity list is full");
         return -1;
     }
 
-    const int dw = dungeon_floor.width;
-    const int dh = dungeon_floor.height;
+    const entityid id = next_entityid++;
+    entity_list[entity_list_size] = id;
+    entity_list_size++;
 
-    if (x >= dw) {
-        merror("libgame_create_entity: x is greater than or equal to dw");
-        return -1;
-    } else if (y >= dh) {
-        merror("libgame_create_entity: y is greater than or equal to dh");
+
+    // create a new name node and insert it
+    //entity_name_t* name_node = (entity_name_t*)malloc(sizeof(entity_name_t));
+    //if (!name_node) {
+    //    merror("libgame_create_entity: could not allocate memory for name node");
+    //    return -1;
+    //}
+
+    //name_node->id = id;
+    //strncpy(name_node->name, name, 128);
+
+    // insert the name node into the name list
+    const int hash_index = id % DEFAULT_ENTITY_LIST_SIZE;
+    bool did_name = false;
+
+    for (int i = 0; i < 3; i++) {
+        if (entity_names[hash_index][i].id == -1) {
+            entity_names[hash_index][i].id = id;
+            strncpy(entity_names[hash_index][i].name, name, 128);
+            did_name = true;
+            break;
+        }
+        //        entity_names[hash_index][i] = name_node;
+        //        did_name = true;
+        //        break;
+        //    }
+    }
+
+    if (!did_name) {
+        merror("libgame_create_entity: could not insert name node into name list");
         return -1;
     }
+
+
+    //entity_name_t *current = entity_names[hash_index][0];
+    //if (!current) {
+    //    entity_names[hash_index][0] = name_node;
+    //} else {
+    //    current = entity_names[hash_index][1];
+    //    if (!current) {
+    //        entity_names[hash_index][1] = name_node;
+    //    } else {
+    //        current = entity_names[hash_index][2];
+    //        if (!current) {
+    //            current = entity_names[hash_index][2];
+    //        } else {
+    //            merror("libgame_create_entity: could not insert name node into name list");
+    //            return -1;
+    //        }
+    //    }
+    //}
+    //    while (current->next) {
+    //        current = current->next;
+    //    }
+    //    current->next = name_node;
+    //}
+
+
+
 
     //const entityid id = libgame_lua_create_entity(L, name, type, x, y);
     //const entityid id = libgame_lua_create_entity(L, name, type, x, y);
@@ -2093,9 +2184,13 @@ void libgame_create_hero(gamestate* const g, const int x, const int y) {
         return;
     }
     //const entityid heroid = libgame_create_entity(g, "hero", ENTITY_PLAYER, RACE_HUMAN, x, y, DIRECTION_DOWN);
-    //if (heroid == -1) {
-    //    merror("libgame_initsharedsetup: could not create hero entity, "
-    //           "crashing");
+    const entityid heroid = libgame_create_entity(g, "darkmage");
+    if (heroid == -1) {
+        merror("libgame_initsharedsetup: could not create hero entity, "
+               "crashing");
+        exit(-1);
+    }
+    g->hero_id = heroid;
     //} else {
     //    libgame_lua_set_gamestate_int(L, "HeroId", heroid);
     //}
@@ -2162,8 +2257,10 @@ void libgame_initsharedsetup(gamestate* const g) {
     //libgame_lua_create_dungeonfloor(L, 16, 16, TILETYPE_DIRT_00);
     //libgame_lua_create_dungeonfloor(L, DEFAULT_DUNGEONFLOOR_WIDTH, DEFAULT_DUNGEONFLOOR_HEIGHT, TILETYPE_DIRT_00);
 
+    libgame_init_entity_list(g);
+    libgame_create_hero(g, 1, 1);
+
     //libgame_precompute_dungeonfloor_tile_positions(g);
-    //libgame_create_hero(g, 1, 1);
     //const entityid heroid = libgame_create_entity(
     //    g, "hero", ENTITY_PLAYER, RACE_HUMAN, 3, 3, DIRECTION_DOWN);
     //if (heroid == -1) {
@@ -2185,6 +2282,46 @@ void libgame_initsharedsetup(gamestate* const g) {
     libgame_calc_debugpanel_size(g);
     //setdebugpanelbottomleft(g);
     setdebugpaneltopleft(g);
+}
+
+
+
+
+void libgame_init_entity_list(gamestate* const state) {
+    if (!state) {
+        merror("libgame_init_entity_list: gamestate is NULL");
+        return;
+    }
+    // use the global entity_list array
+    entity_list = (entityid*)malloc(sizeof(entityid) * DEFAULT_ENTITY_LIST_SIZE);
+    if (!entity_list) {
+        merror("libgame_init_entity_list: could not allocate entity_list");
+        return;
+    }
+
+    memset(entity_list, -1, sizeof(entityid) * DEFAULT_ENTITY_LIST_SIZE);
+    entity_list_size = 0;
+
+    for (int i = 0; i < DEFAULT_ENTITY_LIST_SIZE; i++) {
+        for (int j = 0; j < DEFAULT_ENTITY_NAME_CHAIN_SIZE; j++) {
+            entity_names[i][j].id = -1;
+            bzero(entity_names[i][j].name, 128);
+        }
+    }
+
+
+    //entity_names =
+    //    (entity_name_t***)malloc(sizeof(entity_name_t**) * DEFAULT_ENTITY_LIST_SIZE * DEFAULT_ENTITY_NAME_CHAIN_SIZE);
+    //if (!entity_names) {
+    //    merror("libgame_init_entity_list: could not allocate entity_names");
+    //    return;
+    //}
+    //memset(entity_names, 0, sizeof(entity_name_t**) * DEFAULT_ENTITY_LIST_SIZE * DEFAULT_ENTITY_NAME_CHAIN_SIZE);
+
+    // init the entity_names
+    //for (int i = 0; i < DEFAULT_ENTITY_LIST_SIZE; i++) {
+    //    bzero(entity_names[i], 128);
+    //}
 }
 
 

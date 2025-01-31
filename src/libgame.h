@@ -176,13 +176,14 @@ void libgame_incr_current_action(gamestate* const g);
 
 void libgame_update_hero_shield_spritegroup(gamestate* const g);
 
-const entityid libgame_create_entity(gamestate* const g,
-                                     const char* name,
-                                     const entitytype_t type,
-                                     const race_t race,
-                                     const int x,
-                                     const int y,
-                                     const direction_t direction);
+//const entityid libgame_create_entity(gamestate* const g,
+//                                     const char* name,
+//                                     const entitytype_t type,
+//                                     const race_t race,
+//                                     const int x,
+//                                     const int y,
+//                                     const direction_t direction);
+const entityid libgame_create_entity(gamestate* const g, const char* name);
 
 
 //void libgame_process_action_results(gamestate* const g);
@@ -212,3 +213,6 @@ void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g);
 void libgame_update_spritegroup_dest(gamestate* const g, const entityid id);
 
 void libgame_update_all_entity_sg_dests(gamestate* const g);
+
+
+void libgame_init_entity_list(gamestate* const state);
