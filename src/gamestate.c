@@ -29,14 +29,8 @@ gamestate* gamestateinitptr() {
     g->currenttimetm = localtime(&(g->currenttime));
     bzero(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
     bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
-    strftime(g->timebeganbuf,
-             GAMESTATE_SIZEOFTIMEBUF,
-             "Start Time:   %Y-%m-%d %H:%M:%S",
-             g->timebegantm);
-    strftime(g->currenttimebuf,
-             GAMESTATE_SIZEOFTIMEBUF,
-             "Current Time: %Y-%m-%d %H:%M:%S",
-             g->currenttimetm);
+    strftime(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time:   %Y-%m-%d %H:%M:%S", g->timebegantm);
+    strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
     g->debugpanelon = false;
     g->cam_lockon = true;
     g->player_input_received = false;
@@ -51,6 +45,7 @@ gamestate* gamestateinitptr() {
     g->controlmode = CONTROLMODE_PLAYER;
     g->fadestate = FADESTATENONE;
     g->spritegroups = NULL;
+    g->hero_id = -1;
     return g;
 }
 

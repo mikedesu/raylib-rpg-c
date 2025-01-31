@@ -59,6 +59,7 @@ typedef struct gamestate {
 
     textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
+    entityid hero_id;
 } gamestate;
 
 

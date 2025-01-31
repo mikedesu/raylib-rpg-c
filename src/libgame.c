@@ -1930,15 +1930,18 @@ const entityid libgame_create_entity(gamestate* const g,
         merror("libgame_create_entity: y is less than 0");
         return -1;
     }
-    //const int dw = libgame_lua_get_dungeonfloor_col_count(L);
-    //const int dh = libgame_lua_get_dungeonfloor_row_count(L);
-    //if (x >= dw) {
-    //    merror("libgame_create_entity: x is greater than or equal to dw");
-    //    return -1;
-    //} else if (y >= dh) {
-    //    merror("libgame_create_entity: y is greater than or equal to dh");
-    //    return -1;
-    //}
+
+    const int dw = dungeon_floor.width;
+    const int dh = dungeon_floor.height;
+
+    if (x >= dw) {
+        merror("libgame_create_entity: x is greater than or equal to dw");
+        return -1;
+    } else if (y >= dh) {
+        merror("libgame_create_entity: y is greater than or equal to dh");
+        return -1;
+    }
+
     //const entityid id = libgame_lua_create_entity(L, name, type, x, y);
     //const entityid id = libgame_lua_create_entity(L, name, type, x, y);
     //if (id == -1) {
@@ -2080,10 +2083,15 @@ void libgame_create_hero(gamestate* const g, const int x, const int y) {
         return;
     }
     //const entityid heroid_check = libgame_lua_get_gamestate_int(L, "HeroId");
-    //if (heroid_check != -1) {
-    //    merror("libgame_create_hero: hero entity already exists");
-    //    return;
-    //}
+    const entityid heroid_check = g->hero_id;
+    if (heroid_check != -1) {
+        minfo("libgame_create_hero: hero id has not been assigned");
+        //const entityid heroid = libgame_create_entity(g, "hero", ENTITY_PLAYER, RACE_HUMAN, x, y, DIRECTION_DOWN);
+        return;
+    } else {
+        minfo("libgame_create_hero: hero id has been assigned");
+        return;
+    }
     //const entityid heroid = libgame_create_entity(g, "hero", ENTITY_PLAYER, RACE_HUMAN, x, y, DIRECTION_DOWN);
     //if (heroid == -1) {
     //    merror("libgame_initsharedsetup: could not create hero entity, "
