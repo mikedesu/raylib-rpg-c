@@ -1,5 +1,5 @@
-#include "mprint.h"
 #include "sprite.h"
+#include "mprint.h"
 
 #include <stdlib.h>
 
@@ -36,21 +36,19 @@ sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) 
 
 
 void sprite_incrframe(sprite* const s) {
-    if (!s)
-        return;
+    if (!s) return;
     s->currentframe = (s->currentframe + 1) % s->numframes;
     s->src.x = s->width * s->currentframe;
-    s->num_loops = s->num_loops + (s->currentframe == 0 ? 1 : 0);
+    if (s->currentframe == 0) s->num_loops++;
+    //s->num_loops = s->num_loops + (s->currentframe == 0 ? 1 : 0);
 }
 
 
 
 
 void sprite_setcontext(sprite* const s, const int context) {
-    if (!s)
-        return;
-    if (context < 0 || context >= s->numcontexts)
-        return;
+    if (!s) return;
+    if (context < 0 || context >= s->numcontexts) return;
     // also set currentframe to 0 to reset animation frame
     s->currentcontext = context % s->numcontexts;
     s->src.y = s->height * s->currentcontext;
@@ -62,8 +60,7 @@ void sprite_setcontext(sprite* const s, const int context) {
 
 
 void sprite_incrcontext(sprite* const s) {
-    if (!s)
-        return;
+    if (!s) return;
     s->currentcontext = (s->currentcontext + 1) % s->numcontexts;
     s->src.y = s->height * s->currentcontext;
 }
@@ -72,8 +69,7 @@ void sprite_incrcontext(sprite* const s) {
 
 
 void sprite_updatesrc(sprite* const s) {
-    if (!s)
-        return;
+    if (!s) return;
     s->src.x = s->width * s->currentframe;
     s->src.y = s->height * s->currentcontext;
 }
@@ -82,8 +78,7 @@ void sprite_updatesrc(sprite* const s) {
 
 
 void sprite_destroy(sprite* s) {
-    if (!s)
-        return;
+    if (!s) return;
     s->texture = NULL;
     free(s);
     s = NULL;

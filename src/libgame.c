@@ -1447,9 +1447,9 @@ void libgame_draw_entity(gamestate* const g, const entityid id) {
         return;
     }
 
-    char debug[256];
-    snprintf(debug, 256, "libgame_draw_entity: id = %d", id);
-    minfo(debug);
+    //char debug[256];
+    //snprintf(debug, 256, "libgame_draw_entity: id = %d", id);
+    //minfo(debug);
 
     const specifier_t spec = SPECIFIER_NONE;
     spritegroup_t* group = hashtable_entityid_spritegroup_get_by_specifier(g->spritegroups, id, spec);
@@ -1472,7 +1472,17 @@ void libgame_draw_entity(gamestate* const g, const entityid id) {
                    (Vector2){0, 0},
                    0.0f,
                    WHITE);
-    libgame_draw_entity_incr_frame(g, id);
+
+    if (g->framecount % FRAMEINTERVAL == 0) {
+        sprite_incrframe(group->sprites[group->current]);
+        sprite_incrframe(group->sprites[group->current + 1]);
+    }
+
+
+
+
+    //libgame_draw_entity_incr_frame(g, id);
+
     if (g->debugpanelon) {
         const int x = group->dest.x;
         const int y = group->dest.y;
