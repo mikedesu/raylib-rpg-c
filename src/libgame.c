@@ -2095,7 +2095,7 @@ const entityid libgame_create_entity(gamestate* const g, const char* name) {
     //    return -1;
     //}
     //return id;
-    return -1;
+    return id;
 }
 
 
@@ -2217,13 +2217,21 @@ void libgame_create_hero(gamestate* const g, const int x, const int y) {
     //const entityid heroid_check = libgame_lua_get_gamestate_int(L, "HeroId");
     const entityid heroid_check = g->hero_id;
     if (heroid_check != -1) {
-        minfo("libgame_create_hero: hero id has not been assigned");
+        minfo("libgame_create_hero: hero id has been assigned");
         //const entityid heroid = libgame_create_entity(g, "hero", ENTITY_PLAYER, RACE_HUMAN, x, y, DIRECTION_DOWN);
         return;
-    } else {
-        minfo("libgame_create_hero: hero id has been assigned");
-        return;
     }
+    //else {
+    //    minfo("libgame_create_hero: hero id has not been assigned");
+
+    //    char buffer[1024];
+    //    bzero(buffer, 1024);
+
+    //    snprintf(buffer, 1024, "hero id: %d", heroid_check);
+    //    minfo(buffer);
+
+    //    return;
+    //}
     //const entityid heroid = libgame_create_entity(g, "hero", ENTITY_PLAYER, RACE_HUMAN, x, y, DIRECTION_DOWN);
     const entityid heroid = libgame_create_entity(g, "darkmage");
     if (heroid == -1) {
@@ -2236,6 +2244,18 @@ void libgame_create_hero(gamestate* const g, const int x, const int y) {
     libgame_assign_entity_position(g, heroid, x, y);
 
 
+    //fprintf(stderr, "---libgame_create_hero: hero id: %d\n", heroid);
+    //fprintf(stderr, "---libgame_create_hero: g->hero id: %d\n", g->hero_id);
+
+
+    char buffer[1024];
+    bzero(buffer, 1024);
+
+    snprintf(buffer, 1024, "hero id: %d", heroid);
+    minfo(buffer);
+
+    snprintf(buffer, 1024, "g->hero id: %d", g->hero_id);
+    minfo(buffer);
 
 
     //} else {
@@ -2346,6 +2366,8 @@ void libgame_initsharedsetup(gamestate* const g) {
 
     libgame_init_entity_list(g);
     libgame_create_hero(g, 1, 1);
+
+    fprintf(stderr, "---libgame_initsharedsetup: g->hero_id: %d\n", g->hero_id);
 
     //libgame_precompute_dungeonfloor_tile_positions(g);
     //const entityid heroid = libgame_create_entity(
