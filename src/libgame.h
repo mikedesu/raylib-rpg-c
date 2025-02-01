@@ -216,3 +216,6 @@ void libgame_update_all_entity_sg_dests(gamestate* const g);
 
 
 void libgame_init_entity_list(gamestate* const state);
+bool libgame_assign_entity_position(gamestate* const g, const entityid id, const int x, const int y);
+const int libgame_get_entity_pos_x(gamestate const* g, const entityid id);
+const int libgame_get_entity_pos_y(gamestate const* g, const entityid id);

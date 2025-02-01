@@ -63,8 +63,6 @@ size_t entity_list_size = 0;
 //#define DEFAULT_ENTITY_NAME_SIZE 128
 //char entity_names[DEFAULT_ENTITY_LIST_SIZE][DEFAULT_ENTITY_NAME_SIZE];
 
-
-
 typedef struct {
     entityid id;
     char name[128];
@@ -75,6 +73,15 @@ typedef struct {
 //entity_name_t** entity_names = NULL;
 
 entity_name_t entity_names[DEFAULT_ENTITY_LIST_SIZE][DEFAULT_ENTITY_NAME_CHAIN_SIZE];
+
+typedef struct {
+    entityid id;
+    int x;
+    int y;
+} entity_pos_t;
+
+entity_pos_t entity_positions[DEFAULT_ENTITY_LIST_SIZE][DEFAULT_ENTITY_NAME_CHAIN_SIZE];
+
 
 
 
@@ -867,8 +874,9 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
         merror("libgame_update_debug_panel_buffer: gamestate is NULL");
         return;
     }
-    //entityid id = libgame_lua_get_gamestate_int(L, "HeroId");
-    //const float x = libgame_lua_get_entity_float(L, id, "x");
+    entityid id = g->hero_id;
+    const int x = libgame_get_entity_pos_x(g, id);
+    const int y = libgame_get_entity_pos_y(g, id);
     //const float y = libgame_lua_get_entity_float(L, id, "y");
     //if (id == -1) {
     //    merror("libgame_update_debug_panel_buffer: hero_id is -1");
@@ -878,12 +886,12 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              1024,
              "@evildojo666\n"
              "HeroId: %d\n"
-             "Hero.pos: %0.2f, %0.2f\n"
-             "EntityCount: %d\n",
-             -1,
-             -1.0f,
-             -1.0f,
-             0);
+             "Hero.pos: %d, %d\n"
+             "EntityCount: %lu\n",
+             id,
+             x,
+             y,
+             entity_list_size);
 }
 
 
@@ -1325,8 +1333,8 @@ void libgame_draw_dungeon_floor(gamestate* const g) {
                 continue;
             }
 
-            char error_buf[512];
-            bzero(error_buf, 512);
+            //char error_buf[512];
+            //bzero(error_buf, 512);
 
 
             //tile_dest.x = libgame_lua_get_tile_x(L, j, i);
@@ -1335,8 +1343,8 @@ void libgame_draw_dungeon_floor(gamestate* const g) {
             tile_dest.y = i * DEFAULT_TILE_SIZE;
 
 
-            snprintf(error_buf, 512, "%d %f, %f", key, tile_dest.x, tile_dest.y);
-            minfo(error_buf);
+            //snprintf(error_buf, 512, "%d %f, %f", key, tile_dest.x, tile_dest.y);
+            //minfo(error_buf);
 
             DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
 
@@ -1929,6 +1937,36 @@ void libgame_loadfont(gamestate* const g) {
 
 
 
+bool libgame_assign_entity_position(gamestate* const g, const entityid id, const int x, const int y) {
+    if (!g) {
+        merror("libgame_assign_entity_position: gamestate is NULL");
+        return false;
+    }
+
+    const int hash_index = id % DEFAULT_ENTITY_LIST_SIZE;
+    bool did_assign = false;
+
+    for (int i = 0; i < 3; i++) {
+        if (entity_positions[hash_index][i].id == -1) {
+            entity_positions[hash_index][i].id = id;
+            entity_positions[hash_index][i].x = x;
+            entity_positions[hash_index][i].y = y;
+            did_assign = true;
+            break;
+        }
+    }
+
+    if (!did_assign) {
+        merror("libgame_assign_entity_position: could not assign entity position");
+        return false;
+    }
+
+    return true;
+}
+
+
+
+
 const entityid libgame_create_entity(gamestate* const g, const char* name) {
 
     //const entitytype_t type,
@@ -2005,6 +2043,8 @@ const entityid libgame_create_entity(gamestate* const g, const char* name) {
         merror("libgame_create_entity: could not insert name node into name list");
         return -1;
     }
+
+    //
 
 
     //entity_name_t *current = entity_names[hash_index][0];
@@ -2169,6 +2209,7 @@ const entityid libgame_create_orc(gamestate* const g, const char* name, const in
 
 
 void libgame_create_hero(gamestate* const g, const int x, const int y) {
+    minfo("libgame_create_hero");
     if (!g) {
         merror("libgame_create_hero: gamestate is NULL");
         return;
@@ -2191,9 +2232,55 @@ void libgame_create_hero(gamestate* const g, const int x, const int y) {
         exit(-1);
     }
     g->hero_id = heroid;
+
+    libgame_assign_entity_position(g, heroid, x, y);
+
+
+
+
     //} else {
     //    libgame_lua_set_gamestate_int(L, "HeroId", heroid);
     //}
+}
+
+
+const int libgame_get_entity_pos_x(gamestate const* g, const entityid id) {
+    if (!g) {
+        //merror("libgame_get_entity_pos_x: gamestate is NULL");
+        return -1;
+    }
+    if (id < 0) {
+        //merror("libgame_get_entity_pos_x: id is less than 0");
+        return -1;
+    }
+    const int hash_index = id % DEFAULT_ENTITY_LIST_SIZE;
+    for (int i = 0; i < 3; i++) {
+        if (entity_positions[hash_index][i].id == id) {
+            return entity_positions[hash_index][i].x;
+        }
+    }
+    merror("libgame_get_entity_pos_x: could not find entity position");
+    return -1;
+}
+
+
+const int libgame_get_entity_pos_y(gamestate const* g, const entityid id) {
+    if (!g) {
+        //merror("libgame_get_entity_pos_y: gamestate is NULL");
+        return -1;
+    }
+    if (id < 0) {
+        //merror("libgame_get_entity_pos_y: id is less than 0");
+        return -1;
+    }
+    const int hash_index = id % DEFAULT_ENTITY_LIST_SIZE;
+    for (int i = 0; i < 3; i++) {
+        if (entity_positions[hash_index][i].id == id) {
+            return entity_positions[hash_index][i].y;
+        }
+    }
+    merror("libgame_get_entity_pos_y: could not find entity position");
+    return -1;
 }
 
 
@@ -2288,6 +2375,7 @@ void libgame_initsharedsetup(gamestate* const g) {
 
 
 void libgame_init_entity_list(gamestate* const state) {
+    minfo("libgame_init_entity_list");
     if (!state) {
         merror("libgame_init_entity_list: gamestate is NULL");
         return;
@@ -2306,6 +2394,9 @@ void libgame_init_entity_list(gamestate* const state) {
         for (int j = 0; j < DEFAULT_ENTITY_NAME_CHAIN_SIZE; j++) {
             entity_names[i][j].id = -1;
             bzero(entity_names[i][j].name, 128);
+            entity_positions[i][j].id = -1;
+            entity_positions[i][j].x = -1;
+            entity_positions[i][j].y = -1;
         }
     }
 
