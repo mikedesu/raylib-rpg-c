@@ -4,11 +4,11 @@ OBJ=-c
 #-Wall 
 WFLAGS=-Wall -Werror
 SHARED=-shared
-LIBGAME_OBJECTS=$(DATA_STRUCTS) libgame.o  sprite.o  spritegroup.o gamestate.o hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o libgame_lua.o specifier.o dungeon_floor.o
+LIBGAME_OBJECTS=$(DATA_STRUCTS) libgame.o  sprite.o  spritegroup.o gamestate.o hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o libgame_lua.o specifier.o dungeon_floor.o entity.o em.o dungeon_tile.o
 STATIC_LINK_RAYLIB=-l:libraylib.a
 POSITION_INDEPENDENT_CODE=-fPIC
 MAIN_C=main.c
-WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c libgame_lua.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c sprite.c spritegroup.c specifier.c dungeon_floor.o /home/darkmage/src/raylib/src/libraylib.a /home/darkmage/src/lua/liblua.a
+WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c libgame_lua.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c sprite.c spritegroup.c specifier.c dungeon_floor.o entity.o em.o dungeon_tile.o /home/darkmage/src/raylib/src/libraylib.a /home/darkmage/src/lua/liblua.a
 MAIN_OBJECTS=gameloader.o gamestate.o hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o specifier.o
 WEB_CC=emcc
 WEB_INCLUDES=-I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include -I /home/darkmage/src/lua
@@ -46,8 +46,14 @@ spritegroup.o: spritegroup.c
 dungeon_floor.o: dungeon_floor.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
 
+entity.o: entity.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
 
+em.o: em.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
 
+dungeon_tile.o: dungeon_tile.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
 
 
 
