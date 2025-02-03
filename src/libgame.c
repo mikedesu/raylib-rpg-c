@@ -134,112 +134,39 @@ const bool libgame_entity_set_anim(gamestate* const g, const entityid id, const 
 //}
 
 
-
-
-//const int libgame_get_hero_x(gamestate* const g) {
-//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-//    if (hero_id == -1) {
-//        merror("test_enemy_placement: hero_id is -1");
-//        return -1;
-//    }
-//    return libgame_lua_get_entity_int(L, hero_id, "x");
-//}
+const int libgame_get_x_from_dir(const direction_t dir) {
+    return dir == DIRECTION_RIGHT || dir == DIRECTION_DOWN_RIGHT || dir == DIRECTION_UP_RIGHT ? 1
+           : dir == DIRECTION_LEFT || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_UP_LEFT  ? -1
+                                                                                              : 0;
+}
 
 
 
-//const int libgame_get_hero_y(gamestate* const g) {
-//    const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-//    if (hero_id == -1) {
-//        merror("test_enemy_placement: hero_id is -1");
-//        return -1;
-//    }
-//    return libgame_lua_get_entity_int(L, hero_id, "y");
-//}
+const int libgame_get_y_from_dir(const direction_t dir) {
+    return dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1
+           : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT || dir == DIRECTION_UP_RIGHT     ? -1
+                                                                                              : 0;
+}
 
 
 
 
-//void libgame_get_entity_xy(gamestate* const g, const entityid id, int* x, int* y) {
-//    if (!g) {
-//        merror("libgame_get_entity_xy: gamestate is NULL");
-//        return;
-//    }
+//void libgame_get_xy_from_dir(int* x, int* y, const direction_t dir) {
 //    if (!x) {
-//        merror("libgame_get_entity_xy: x is NULL");
+//        merror("libgame_get_xy_from_dir: x is NULL");
 //        return;
 //    }
 //    if (!y) {
-//        merror("libgame_get_entity_xy: y is NULL");
+//        merror("libgame_get_xy_from_dir: y is NULL");
 //        return;
 //    }
-//    *x = libgame_lua_get_entity_int(L, id, "x");
-//    *y = libgame_lua_get_entity_int(L, id, "y");
+//    *x = dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1
+//         : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT || dir == DIRECTION_UP_RIGHT     ? -1
+//                                                                                            : 0;
+//    *y = dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1
+//         : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT || dir == DIRECTION_UP_RIGHT     ? -1
+//                                                                                            : 0;
 //}
-
-
-
-//void libgame_get_hero_xy(gamestate* const g, int* x, int* y) {
-//    if (!g) {
-//        merror("libgame_get_hero_xy: gamestate is NULL");
-//        return;
-//    }
-//if (!x) {
-//    merror("libgame_get_hero_xy: x is NULL");
-//    return;
-//}
-//if (!y) {
-//    merror("libgame_get_hero_xy: y is NULL");
-//    return;
-//}
-//const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-//*x = libgame_lua_get_entity_int(L, hero_id, "x");
-//*y = libgame_lua_get_entity_int(L, hero_id, "y");
-//libgame_get_entity_xy(g, hero_id, x, y);
-//}
-
-
-
-//const int libgame_get_x_from_dir(const direction_t dir) {
-//    return dir == DIRECTION_RIGHT || dir == DIRECTION_DOWN_RIGHT ||
-//                   dir == DIRECTION_UP_RIGHT
-//               ? 1
-//           : dir == DIRECTION_LEFT || dir == DIRECTION_DOWN_LEFT ||
-//                   dir == DIRECTION_UP_LEFT
-//               ? -1
-//               : 0;
-//}
-
-
-
-//const int libgame_get_y_from_dir(const direction_t dir) {
-//    return dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT ||
-//                   dir == DIRECTION_DOWN_RIGHT
-//               ? 1
-//           : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT ||
-//                   dir == DIRECTION_UP_RIGHT
-//               ? -1
-//               : 0;
-//}
-
-
-
-
-void libgame_get_xy_from_dir(int* x, int* y, const direction_t dir) {
-    if (!x) {
-        merror("libgame_get_xy_from_dir: x is NULL");
-        return;
-    }
-    if (!y) {
-        merror("libgame_get_xy_from_dir: y is NULL");
-        return;
-    }
-    *x = dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1
-         : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT || dir == DIRECTION_UP_RIGHT     ? -1
-                                                                                            : 0;
-    *y = dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1
-         : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT || dir == DIRECTION_UP_RIGHT     ? -1
-                                                                                            : 0;
-}
 
 
 
