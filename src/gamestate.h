@@ -7,6 +7,7 @@
 #include "fadestate.h"
 #include "hashtable_entityid_spritegroup.h"
 //#include "sizemacros.h"
+#include "dungeon_floor.h"
 #include "textureinfo.h"
 #include <raylib.h>
 #include <stdbool.h>
@@ -60,6 +61,8 @@ typedef struct gamestate {
     textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
     entityid hero_id;
+
+    dungeon_floor_t* dungeon_floor;
 } gamestate;
 
 

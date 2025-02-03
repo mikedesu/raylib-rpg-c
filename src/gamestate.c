@@ -1,4 +1,5 @@
 #include "gamestate.h"
+#include "dungeon_floor.h"
 #include "mprint.h"
 #include <raylib.h>
 #include <stdio.h>
@@ -46,6 +47,7 @@ gamestate* gamestateinitptr() {
     g->fadestate = FADESTATENONE;
     g->spritegroups = NULL;
     g->hero_id = -1;
+    g->dungeon_floor = NULL;
     return g;
 }
 
@@ -61,6 +63,7 @@ void gamestatefree(gamestate* g) {
         return;
     }
     hashtable_entityid_spritegroup_destroy(g->spritegroups);
+    dungeon_floor_free(g->dungeon_floor);
     //free(g->timebegantm);
     //free(g->currenttimetm);
     free(g);
