@@ -16,6 +16,7 @@ em_t* em_new() {
     for (int i = 0; i < EM_MAX_SLOTS; i++) {
         em->entities[i] = NULL;
     }
+    em->count = 0;
     return em;
 }
 
@@ -80,6 +81,7 @@ entity_t* em_add(em_t* em, entity_t* e) {
     } else {
         em->entities[hash] = e;
     }
+    em->count++;
     return e;
 }
 
@@ -101,22 +103,27 @@ entity_t* em_remove_last(em_t* em, const entityid id) {
     }
     entity_t* last = current->next;
     current->next = NULL;
+    em->count--;
     return last;
 }
 
 
 
 
-size_t em_count(em_t* em) {
-    size_t count = 0;
-    for (int i = 0; i < EM_MAX_SLOTS; i++) {
-        entity_t* current = em->entities[i];
-        while (current != NULL) {
-            count++;
-            current = current->next;
-        }
+int em_count(em_t* em) {
+    //size_t count = 0;
+    //for (int i = 0; i < EM_MAX_SLOTS; i++) {
+    //    entity_t* current = em->entities[i];
+    //    while (current != NULL) {
+    //        count++;
+    //        current = current->next;
+    //    }
+    //}
+    if (!em) {
+        merror("em_count: em is NULL");
+        return -1;
     }
-    return count;
+    return em->count;
 }
 
 

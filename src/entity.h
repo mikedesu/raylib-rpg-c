@@ -23,4 +23,7 @@ typedef struct entity_t {
 
 
 entity_t* entity_new(const entityid id, const entitytype_t type, const char* name);
+entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x, const int y, const char* name);
+
+
 void entity_free(entity_t* e);

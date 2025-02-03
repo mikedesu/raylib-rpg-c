@@ -214,6 +214,7 @@ void libgame_update_spritegroup_dest(gamestate* const g, const entityid id);
 
 void libgame_update_all_entity_sg_dests(gamestate* const g);
 
+void libgame_init_entityids(gamestate* const g);
 
 //void libgame_init_entity_list(gamestate* const state);
 //bool libgame_assign_entity_position(gamestate* const g, const entityid id, const int x, const int y);

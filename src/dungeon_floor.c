@@ -7,6 +7,7 @@
 dungeon_floor_t* dungeon_floor_create(int width, int height) {
     dungeon_floor_t* floor = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
     if (floor == NULL) {
+        merror("dungeon_floor_create: floor malloc failed");
         return NULL;
     }
 
@@ -48,15 +49,32 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
 
 
 void dungeon_floor_free(dungeon_floor_t* floor) {
-    if (!floor) {
-        return;
+    if (floor) {
+        for (int i = 0; i < floor->width; i++) {
+            dungeon_tile_t* current = floor->tiles[i];
+            free(current);
+        }
+        free(floor);
     }
+}
 
-    for (int i = 0; i < floor->width; i++) {
-        dungeon_tile_t* current = floor->tiles[i];
-        free(current);
+
+
+
+const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, const int x, const int y) {
+    if (df) {
+        if (id != -1) {
+            if (x >= 0 && x < df->width && y >= 0 && y < df->height) {
+                dungeon_tile_add(&df->tiles[x][y], id);
+                return true;
+            } else {
+                merror("dungeon_floor_add_at: x or y out of bounds");
+            }
+        } else {
+            merror("dungeon_floor_add_at: id is -1");
+        }
+    } else {
+        merror("dungeon_floor_add_at: df is NULL");
     }
-
-    free(floor);
-    floor = NULL;
+    return false;
 }

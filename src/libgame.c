@@ -45,14 +45,13 @@ Rectangle tile_dest = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
 const Vector2 zero_vec = {0, 0};
 const Vector2 target_origin = {0, 0};
 
-dungeon_floor_t dungeon_floor;
-
 int activescene = GAMEPLAYSCENE;
+
 entityid next_entity_id = 0;
 
 em_t* entitymap = NULL;
 
-
+entityid* entityids = NULL;
 
 void libgame_draw_fade(const gamestate* const g) {
     if (!g) {
@@ -220,7 +219,7 @@ void libgame_handle_input(gamestate* const g) {
             //const bool r = libgame_lua_entity_move(L, hero_id, -1, 0);
             //if (r) {
             //    libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_LEFT);
-            //    libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+            libgame_entity_set_anim(g, g->hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
             //    sg->move.x = -DEFAULT_TILE_SIZE;
             //    sg->move.y = 0;
             //}
@@ -539,6 +538,8 @@ void libgame_reset_entities_anim(gamestate* const g) {
         merror("libgame_reset_entities_anim: gamestate is NULL");
         return;
     }
+
+
     //for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
     //    libgame_reset_entity_anim(g, i + 1);
     //}
@@ -795,15 +796,15 @@ void libgame_draw_dungeon_floor(gamestate* const g) {
         merror("libgame_draw_dungeon_floor: gamestate is NULL");
         return;
     }
-    if (dungeon_floor.height == -1 || dungeon_floor.width == -1) {
+    if (g->dungeon_floor->height == -1 || g->dungeon_floor->width == -1) {
         merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
         return;
     }
 
     // draw dungeon floor tiles
-    for (int i = 0; i < dungeon_floor.height; i++) {
-        for (int j = 0; j < dungeon_floor.width; j++) {
-            const dungeon_tile_type_t type = dungeon_floor.tiles[i][j].type;
+    for (int i = 0; i < g->dungeon_floor->height; i++) {
+        for (int j = 0; j < g->dungeon_floor->width; j++) {
+            const dungeon_tile_type_t type = g->dungeon_floor->tiles[i][j].type;
             const int key = get_txkey_for_tiletype(type);
             if (key == -1) {
                 continue;
@@ -817,12 +818,12 @@ void libgame_draw_dungeon_floor(gamestate* const g) {
     // draw entities per tile
     // next, we want to draw the entities on the tiles
     // at first we will do it generically then we will guarantee ordering
-    for (int i = 0; i < dungeon_floor.height; i++) {
-        for (int j = 0; j < dungeon_floor.width; j++) {
-            dungeon_tile_t* tile = &dungeon_floor.tiles[i][j];
-            if (tile->entity_count > 0) {
+    for (int i = 0; i < g->dungeon_floor->height; i++) {
+        for (int j = 0; j < g->dungeon_floor->width; j++) {
+            dungeon_tile_t* tile = &g->dungeon_floor->tiles[i][j];
+            if (tile && tile->entity_count > 0) {
                 //minfo("tile entity loop");
-                for (size_t k = 0; k < tile->entity_count; k++) {
+                for (int k = 0; k < tile->entity_count; k++) {
                     libgame_draw_entity_shadow(g, tile->entities[k]);
                     libgame_draw_entity(g, tile->entities[k]);
                 }
@@ -1163,8 +1164,8 @@ void libgame_create_spritegroup(gamestate* const g,
         merror("libgame_create_spritegroup: entity is NULL");
         return;
     }
-    const int dw = dungeon_floor.width;
-    const int dh = dungeon_floor.height;
+    const int dw = g->dungeon_floor->width;
+    const int dh = g->dungeon_floor->height;
     if (e->x < 0) {
         merror("libgame_create_spritegroup: x is less than 0");
         return;
@@ -1275,6 +1276,16 @@ const entityid libgame_create_orc(gamestate* const g, const char* name, const in
 
 
 
+void libgame_init_entityids(gamestate* const g) {
+    entityids = (entityid*)malloc(sizeof(entityid) * EM_MAX_SLOTS);
+    if (!entityids) {
+        merror("libgame_initsharedsetup: could not allocate entityids");
+        return;
+    }
+    memset(entityids, -1, sizeof(entityid) * EM_MAX_SLOTS);
+}
+
+
 void libgame_initsharedsetup(gamestate* const g) {
     if (!g) {
         merror("libgame_initsharedsetup: gamestate is NULL");
@@ -1302,26 +1313,31 @@ void libgame_initsharedsetup(gamestate* const g) {
     libgame_load_textures(g);
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
 
-    dungeon_floor_init(&dungeon_floor);
 
     // init the entitymap
     entitymap = em_new();
 
-    entity* hero = entity_new(next_entity_id++, ENTITY_PLAYER, "hero");
-    hero->x = 2;
-    hero->y = 2;
+    // init the entities array
+    libgame_init_entityids(g);
+
+    g->dungeon_floor = dungeon_floor_create(20, 20);
+    dungeon_floor_init(g->dungeon_floor);
+
+    //entity* hero = entity_new(next_entity_id++, ENTITY_PLAYER, "hero");
+    entity* hero = entity_new_at(next_entity_id++, ENTITY_PLAYER, 2, 2, "hero");
     em_add(entitymap, hero);
     g->hero_id = hero->id;
     // whenever we create a new entity and want it on the visible dungeon floor
     // we have to add it to the tile at its x,y position
-    dungeon_tile_t* start_tile = &dungeon_floor.tiles[hero->y][hero->x];
-    dungeon_tile_add(start_tile, hero->id);
-    // we ALSO have to create the spritegroup for the entity
+    //dungeon_tile_t* start_tile = &g->dungeon_floor->tiles[hero->y][hero->x];
+    //dungeon_tile_add(start_tile, hero->id);
+    dungeon_tile_add(&g->dungeon_floor->tiles[hero->y][hero->x], hero->id);
 
-    //libgame_create_spritegroup_by_id(g, hero->id, DIRECTION_DOWN_RIGHT);
+
+
+    // we ALSO have to create the spritegroup for the entity
     libgame_create_spritegroup(g, hero->id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
     libgame_set_default_anim_for_id(g, hero->id, SPRITEGROUP_ANIM_HUMAN_IDLE);
-
     // these dont work right until the text buffer of the debugpanel is filled
     libgame_update_debug_panel_buffer(g);
     libgame_calc_debugpanel_size(g);
@@ -1357,7 +1373,15 @@ void libgame_close(gamestate* g) {
         return;
     }
     libgame_closeshared(g);
+
     gamestatefree(g);
+
+    // free the entityids array
+    free(entityids);
+    // free the entitymap
+    em_free(entitymap);
+    // free the dungeon floor
+    //dungeon_floor_free(&dungeon_floor);
 }
 
 
