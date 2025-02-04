@@ -190,72 +190,47 @@ void libgame_handle_move(gamestate* const g, const entityid id, const int x, con
         return;
     }
 
-    // need to establish x/y directions
-    // y x = row col
-    const int src_y = e->y;
-    const int src_x = e->x;
-    const int dest_y = e->y + y;
-    const int dest_x = e->x + x;
-
-    if (dest_x < 0) {
-        merror("libgame_handle_player_input_movement_key: dest_x < 0");
-        return;
-    }
-    if (dest_x >= g->dungeon_floor->width) {
-        merror("libgame_handle_player_input_movement_key: dest_x > g->dungeon_floor->width");
-        return;
-    }
-    if (dest_y < 0) {
-        merror("libgame_handle_player_input_movement_key: dest_y < 0");
-        return;
-    }
-    if (dest_y >= g->dungeon_floor->height) {
-        merror("libgame_handle_player_input_movement_key: dest_y > g->dungeon_floor->height");
+    if (e->x < 0 || e->x >= g->dungeon_floor->width) {
+        merror("libgame_handle_player_input_movement_key: e->x is out of bounds");
         return;
     }
 
+    if (e->y < 0 || e->y >= g->dungeon_floor->height) {
+        merror("libgame_handle_player_input_movement_key: e->y is out of bounds");
+        return;
+    }
+
+    if (e->x + x < 0 || e->x + x >= g->dungeon_floor->width) {
+        merror("libgame_handle_player_input_movement_key: e->x+x is out of bounds");
+        return;
+    }
+
+    if (e->y + y < 0 || e->y + y >= g->dungeon_floor->height) {
+        merror("libgame_handle_player_input_movement_key: e->y+y is out of bounds");
+        return;
+    }
+
+    // whether or not the move is successful, we will do these
     libgame_entity_set_anim(g, id, SPRITEGROUP_ANIM_HUMAN_WALK);
-
-    // update the entity context
     libgame_entity_update_context(g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
+    dungeon_floor_remove_at(g->dungeon_floor, id, e->x, e->y);
+    dungeon_floor_add_at(g->dungeon_floor, id, e->x + x, e->y + y);
 
-    dungeon_tile_t* tile_row = g->dungeon_floor->tiles[src_y];
-    // mostly a sanity-check
-    if (tile_row == NULL) {
-        merror("libgame_handle_player_input_movement_key: tile_row is NULL");
-        return;
-    }
-    // it technically wont ever be null because of how we are accessing stuff
-    // so we have to hard-check values before we go grabbing stuff
-    dungeon_tile_t* src_tile = &tile_row[src_x];
-    if (dungeon_tile_remove(src_tile, id) == -1) {
-        merror("libgame_handle_player_input_movement_key: dungeon_tile_remove failed");
-        return;
-    } else {
-        msuccess("libgame_handle_player_input_movement_key: dungeon_tile_remove succeeded");
-    }
+    //if (!dungeon_floor_remove_at(g->dungeon_floor, id, e->x, e->y)) {
+    //    merror("libgame_handle_player_input_movement_key: dungeon_floor_remove_at failed");
+    //    return;
+    //}
 
-    dungeon_tile_t* dest_tile_row = g->dungeon_floor->tiles[dest_y];
-    if (dest_tile_row == NULL) {
-        merror("libgame_handle_player_input_movement_key: dest_tile_row is NULL");
-        return;
-    }
-
-    dungeon_tile_t* dest_tile = &dest_tile_row[dest_x];
-    if (dungeon_tile_add(dest_tile, id) == -1) {
-        merror("libgame_handle_player_input_movement_key: dungeon_tile_add failed");
-        return;
-    } else {
-        msuccess("libgame_handle_player_input_movement_key: dungeon_tile_add succeeded");
-    }
+    //if (!dungeon_floor_add_at(g->dungeon_floor, id, e->x + x, e->y + y)) {
+    //    merror("libgame_handle_player_input_movement_key: dungeon_floor_add_at failed");
+    //    return;
+    //}
 
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-
     sg->move.x = x * DEFAULT_TILE_SIZE;
     sg->move.y = y * DEFAULT_TILE_SIZE;
-
-    e->x = dest_x;
-    e->y = dest_y;
+    e->x = e->x + x;
+    e->y = e->y + y;
 }
 
 
@@ -274,7 +249,6 @@ void libgame_handle_input(gamestate* const g) {
     if (IsKeyPressed(KEY_E)) {
         libgame_test_enemy_placement(g);
     }
-    //libgame_handle_modeswitch(g);
     if (IsKeyPressed(KEY_C)) {
         g->controlmode = g->controlmode == CONTROLMODE_CAMERA ? CONTROLMODE_PLAYER : CONTROLMODE_CAMERA;
     }
@@ -284,14 +258,7 @@ void libgame_handle_input(gamestate* const g) {
     if (IsKeyPressed(KEY_G)) {
         g->gridon = !g->gridon;
     }
-    if (g->controlmode == CONTROLMODE_PLAYER) { //&&
-        //libgame_handle_input_player(g);
-        //const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
-        //spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, hero_id);
-        //if (!sg) {
-        //    merror("libgame_handle_player_input_movement_key: spritegroup is NULL");
-        //    return;
-        //}
+    if (g->controlmode == CONTROLMODE_PLAYER) {
         if (IsKeyPressed(KEY_LEFT)) {
             minfo("KEY_LEFT");
             libgame_handle_move(g, g->hero_id, -1, 0);
@@ -1381,11 +1348,6 @@ void libgame_initsharedsetup(gamestate* const g) {
     if (!res) {
         merror("libgame_initsharedsetup: could not add hero to dungeon floor");
     }
-
-    //const entityid res = dungeon_tile_add(&g->dungeon_floor->tiles[hero->y][hero->x], hero->id);
-    //if (res == -1) {
-    //    merror("libgame_initsharedsetup: could not add hero to tile");
-    //}
 
     // we ALSO have to create the spritegroup for the entity
     libgame_create_spritegroup(g, hero->id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
