@@ -52,6 +52,11 @@ const bool dungeon_tile_resize(dungeon_tile_t* tile) {
 
 
 const entityid dungeon_tile_add(dungeon_tile_t* tile, const entityid id) {
+
+    char buffer[1024];
+    snprintf(buffer, 1024, "dungeon_tile_add: adding entity %d to tile", id);
+    minfo(buffer);
+
     int index = -1;
     for (int i = 0; i < DUNGEON_TILE_MAX_ENTITIES_DEFAULT; i++) {
         if (tile->entities[i] == -1) {
@@ -67,6 +72,9 @@ const entityid dungeon_tile_add(dungeon_tile_t* tile, const entityid id) {
         merror("dungeon_tile_add: no space for entity");
         minfo("resizing...");
         dungeon_tile_resize(tile);
+
+        // call add again
+        return dungeon_tile_add(tile, id);
     }
 
     return index;

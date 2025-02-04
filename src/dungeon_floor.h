@@ -9,11 +9,9 @@
 
 
 typedef struct {
-
-    //dungeon_tile_t tiles[DEFAULT_DUNGEON_FLOOR_WIDTH][DEFAULT_DUNGEON_FLOOR_HEIGHT];
     dungeon_tile_t** tiles;
-    size_t width;
-    size_t height;
+    int width;
+    int height;
 
 } dungeon_floor_t;
 

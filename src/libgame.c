@@ -182,6 +182,106 @@ const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir) {
 
 
 
+void libgame_handle_move(gamestate* const g, const entityid id, const int x, const int y) {
+    //void libgame_handle_move_left(gamestate* const g, const entityid id) {
+    entity_t* e = em_get(entitymap, id);
+    if (e == NULL) {
+        merror("libgame_handle_player_input_movement_key: e is NULL");
+        return;
+    }
+
+
+    char buffer[1024];
+
+    snprintf(buffer,
+             1024,
+             "libgame_handle_player_input_movement_key: dungeon width: %d, height: %d",
+             g->dungeon_floor->width,
+             g->dungeon_floor->height);
+
+    minfo(buffer);
+    //snprintf(buffer,
+    //         g->dungeon_floor->width,
+    //         g->dungeon_floor->height);
+
+    // need to establish x/y directions
+    // y x = row col
+    const int src_y = e->y;
+    const int src_x = e->x;
+    const int dest_y = e->y + y;
+    const int dest_x = e->x + x;
+
+    if (dest_x < 0) {
+        merror("libgame_handle_player_input_movement_key: dest_x < 0");
+        return;
+    }
+    if (dest_x >= g->dungeon_floor->width) {
+        merror("libgame_handle_player_input_movement_key: dest_x > g->dungeon_floor->width");
+        return;
+    }
+    if (dest_y < 0) {
+        merror("libgame_handle_player_input_movement_key: dest_y < 0");
+        return;
+    }
+    if (dest_y >= g->dungeon_floor->height) {
+        merror("libgame_handle_player_input_movement_key: dest_y > g->dungeon_floor->height");
+        return;
+    }
+
+    snprintf(buffer,
+             1024,
+             "libgame_handle_player_input_movement_key: src_x: %d, src_y: %d, dest_x: %d, dest_y: %d",
+             src_x,
+             src_y,
+             dest_x,
+             dest_y);
+    minfo(buffer);
+
+
+    libgame_entity_set_anim(g, id, SPRITEGROUP_ANIM_HUMAN_WALK);
+    dungeon_tile_t* tile_row = g->dungeon_floor->tiles[src_y];
+    // mostly a sanity-check
+    if (tile_row == NULL) {
+        merror("libgame_handle_player_input_movement_key: tile_row is NULL");
+        return;
+    }
+    // it technically wont ever be null because of how we are accessing stuff
+    // so we have to hard-check values before we go grabbing stuff
+    dungeon_tile_t* src_tile = &tile_row[src_x];
+    if (dungeon_tile_remove(src_tile, id) == -1) {
+        merror("libgame_handle_player_input_movement_key: dungeon_tile_remove failed");
+        return;
+    } else {
+        msuccess("libgame_handle_player_input_movement_key: dungeon_tile_remove succeeded");
+    }
+
+    dungeon_tile_t* dest_tile_row = g->dungeon_floor->tiles[dest_y];
+    if (dest_tile_row == NULL) {
+        merror("libgame_handle_player_input_movement_key: dest_tile_row is NULL");
+        return;
+    }
+    dungeon_tile_t* dest_tile = &dest_tile_row[dest_x];
+    if (dungeon_tile_add(dest_tile, id) == -1) {
+        merror("libgame_handle_player_input_movement_key: dungeon_tile_add failed");
+        return;
+    } else {
+        msuccess("libgame_handle_player_input_movement_key: dungeon_tile_add succeeded");
+    }
+
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
+
+    //sg->move.x = -DEFAULT_TILE_SIZE;
+    //sg->move.y = 0;
+
+    sg->move.x = x * DEFAULT_TILE_SIZE;
+    sg->move.y = y * DEFAULT_TILE_SIZE;
+
+    e->x = dest_x;
+    e->y = dest_y;
+}
+
+
+
 void libgame_handle_input(gamestate* const g) {
     if (!g) {
         merror("libgame_handleinput: gamestate is NULL");
@@ -216,78 +316,19 @@ void libgame_handle_input(gamestate* const g) {
         //}
         if (IsKeyPressed(KEY_LEFT)) {
             minfo("KEY_LEFT");
-            entity_t* hero = em_get(entitymap, g->hero_id);
-            if (hero == NULL) {
-                merror("libgame_handle_player_input_movement_key: hero is NULL");
-                return;
-            }
-
-            if (hero->x - 1 < 0) {
-                merror("libgame_handle_player_input_movement_key: hero->x - 1 < 0");
-                return;
-            }
-
-            dungeon_tile_t* tile_row = g->dungeon_floor->tiles[hero->x - 1];
-            //if (tile_row == NULL) {
-            //    merror("libgame_handle_player_input_movement_key: tile_row is NULL");
-            //    return;
-            //}
-
-            // it technically wont ever be null because of how we are accessing stuff
-            // so we have to hard-check values before we go grabbing stuff
-            dungeon_tile_t* tile = &tile_row[hero->y];
-            if (dungeon_tile_remove(tile, g->hero_id) == -1) {
-                merror("libgame_handle_player_input_movement_key: dungeon_tile_remove failed");
-            }
-
-            hero->x -= 1;
-            // lol it crashed
-            if (dungeon_tile_add(tile, g->hero_id) == -1) {
-                merror("libgame_handle_player_input_movement_key: dungeon_tile_add failed");
-            }
-
-            //hero->x -= 1;
-            spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-            sg->move.x = -DEFAULT_TILE_SIZE;
-            sg->move.y = 0;
-            //libgame_entity_set_anim(g, g->hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
-
-            // have to move the hero from one tile to another
-
-
-
-            //    sg->move.x = -DEFAULT_TILE_SIZE;
-            //    sg->move.y = 0;
-            //}
+            libgame_handle_move(g, g->hero_id, -1, 0);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_RIGHT)) {
             minfo("KEY_RIGHT");
-            //const bool r = libgame_lua_entity_move(L, hero_id, 1, 0);
-            //if (r) {
-            //    libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_RIGHT);
-            //    libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
-            //    sg->move.x = DEFAULT_TILE_SIZE;
-            //    sg->move.y = 0;
-            //}
+            libgame_handle_move(g, g->hero_id, 1, 0);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_UP)) {
             minfo("KEY_UP");
-            //const bool r = libgame_lua_entity_move(L, hero_id, 0, -1);
-            //if (r) {
-            //    libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_UP);
-            //    libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
-            //    sg->move.x = 0;
-            //    sg->move.y = -DEFAULT_TILE_SIZE;
-            //}
+            libgame_handle_move(g, g->hero_id, 0, -1);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_DOWN)) {
             minfo("KEY_DOWN");
-            //if (r) {
-            //    libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_DOWN);
-            //    libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
-            //    sg->move.x = 0;
-            //    sg->move.y = DEFAULT_TILE_SIZE;
-            //}
+            libgame_handle_move(g, g->hero_id, 0, 1);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_A)) {
             minfo("KEY_A");
@@ -575,10 +616,9 @@ void libgame_reset_entities_anim(gamestate* const g) {
         return;
     }
 
-
-    //for (int i = 0; i < libgame_lua_get_num_entities(L); i++) {
-    //    libgame_reset_entity_anim(g, i + 1);
-    //}
+    for (int i = 0; i < em_count(entitymap); i++) {
+        libgame_reset_entity_anim(g, i);
+    }
 }
 
 
@@ -603,8 +643,6 @@ void libgame_update_gamestate(gamestate* g) {
             merror("libgame_update_gamestate: entity is NULL");
             continue;
         }
-        //    const entityid id = libgame_lua_get_nth_entity(L, i);
-        //libgame_update_spritegroup_dest(g, e->id);
         libgame_update_smoothmove(g, e->id);
     }
 
@@ -1363,8 +1401,8 @@ void libgame_initsharedsetup(gamestate* const g) {
     //dungeon_tile_t* start_tile = &g->dungeon_floor->tiles[hero->y][hero->x];
     //dungeon_tile_add(start_tile, hero->id);
 
-    const bool res = dungeon_tile_add(&g->dungeon_floor->tiles[hero->y][hero->x], hero->id);
-    if (!res) {
+    const entityid res = dungeon_tile_add(&g->dungeon_floor->tiles[hero->y][hero->x], hero->id);
+    if (res == -1) {
         merror("libgame_initsharedsetup: could not add hero to tile");
     }
 
