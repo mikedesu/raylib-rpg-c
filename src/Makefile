@@ -2,7 +2,8 @@ CC=gcc
 OBJ=-c
 #WFLAGS=
 #-Wall 
-WFLAGS=-Wall -Werror
+WFLAGS=-Wall 
+#WFLAGS=-Wall -Werror
 SHARED=-shared
 LIBGAME_OBJECTS=$(DATA_STRUCTS) libgame.o  sprite.o  spritegroup.o  hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o specifier.o dungeon_floor.o entity.o em.o dungeon_tile.o gamestate.o
 

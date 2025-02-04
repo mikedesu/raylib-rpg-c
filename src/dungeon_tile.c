@@ -26,19 +26,19 @@ void dungeon_tile_init(dungeon_tile_t* tile, const dungeon_tile_type_t type) {
 
 
 
-void dungeon_tile_resize(dungeon_tile_t* tile) {
+const bool dungeon_tile_resize(dungeon_tile_t* tile) {
     size_t new_max = tile->entity_max * 2;
     size_t malloc_sz = sizeof(entityid) * new_max;
     if (malloc_sz > DUNGEON_TILE_MAX_ENTITIES_MAX) {
         merror("dungeon_tile_resize: malloc_sz > DUNGEON_TILE_MAX_ENTITIES_MAX");
-        return;
+        return false;
     }
     if (tile) {
         // instead of reallocing, do a malloc instead, a memset, and then copy
         entityid* new_entities = (entityid*)malloc(malloc_sz);
         if (new_entities == NULL) {
             merror("dungeon_tile_resize: new_entities malloc failed");
-            return;
+            return false;
         }
         memset(new_entities, -1, malloc_sz);
         memcpy(new_entities, tile->entities, sizeof(entityid) * tile->entity_max);
@@ -46,11 +46,12 @@ void dungeon_tile_resize(dungeon_tile_t* tile) {
         tile->entities = new_entities;
         tile->entity_max = new_max;
     }
+    return true;
 }
 
 
 
-void dungeon_tile_add(dungeon_tile_t* tile, const entityid id) {
+const entityid dungeon_tile_add(dungeon_tile_t* tile, const entityid id) {
     int index = -1;
     for (int i = 0; i < DUNGEON_TILE_MAX_ENTITIES_DEFAULT; i++) {
         if (tile->entities[i] == -1) {
@@ -67,12 +68,17 @@ void dungeon_tile_add(dungeon_tile_t* tile, const entityid id) {
         minfo("resizing...");
         dungeon_tile_resize(tile);
     }
+
+    return index;
 }
 
 
 
 
-void dungeon_tile_remove(dungeon_tile_t* tile, const entityid id) {
+const entityid dungeon_tile_remove(dungeon_tile_t* tile, const entityid id) {
+    //void dungeon_tile_remove(dungeon_tile_t* tile, const entityid id) {
+
+    bool did_remove = false;
     for (int i = 0; i < tile->entity_max; i++) {
         if (tile->entities[i] == id) {
             tile->entities[i] = -1;
@@ -85,8 +91,16 @@ void dungeon_tile_remove(dungeon_tile_t* tile, const entityid id) {
 
             tile->entities[tile->entity_max - 1] = -1;
             tile->entity_count--;
+            did_remove = true;
         }
     }
+
+    if (!did_remove) {
+        merror("dungeon_tile_remove: entity not found");
+        return -1;
+    }
+
+    return id;
 }
 
 

@@ -216,10 +216,46 @@ void libgame_handle_input(gamestate* const g) {
         //}
         if (IsKeyPressed(KEY_LEFT)) {
             minfo("KEY_LEFT");
-            //const bool r = libgame_lua_entity_move(L, hero_id, -1, 0);
-            //if (r) {
-            //    libgame_entity_update_context(g, hero_id, SPECIFIER_NONE, DIRECTION_LEFT);
-            libgame_entity_set_anim(g, g->hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+            entity_t* hero = em_get(entitymap, g->hero_id);
+            if (hero == NULL) {
+                merror("libgame_handle_player_input_movement_key: hero is NULL");
+                return;
+            }
+
+            if (hero->x - 1 < 0) {
+                merror("libgame_handle_player_input_movement_key: hero->x - 1 < 0");
+                return;
+            }
+
+            dungeon_tile_t* tile_row = g->dungeon_floor->tiles[hero->x - 1];
+            //if (tile_row == NULL) {
+            //    merror("libgame_handle_player_input_movement_key: tile_row is NULL");
+            //    return;
+            //}
+
+            // it technically wont ever be null because of how we are accessing stuff
+            // so we have to hard-check values before we go grabbing stuff
+            dungeon_tile_t* tile = &tile_row[hero->y];
+            if (dungeon_tile_remove(tile, g->hero_id) == -1) {
+                merror("libgame_handle_player_input_movement_key: dungeon_tile_remove failed");
+            }
+
+            hero->x -= 1;
+            // lol it crashed
+            if (dungeon_tile_add(tile, g->hero_id) == -1) {
+                merror("libgame_handle_player_input_movement_key: dungeon_tile_add failed");
+            }
+
+            //hero->x -= 1;
+            spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
+            sg->move.x = -DEFAULT_TILE_SIZE;
+            sg->move.y = 0;
+            //libgame_entity_set_anim(g, g->hero_id, SPRITEGROUP_ANIM_HUMAN_WALK);
+
+            // have to move the hero from one tile to another
+
+
+
             //    sg->move.x = -DEFAULT_TILE_SIZE;
             //    sg->move.y = 0;
             //}
@@ -568,8 +604,8 @@ void libgame_update_gamestate(gamestate* g) {
             continue;
         }
         //    const entityid id = libgame_lua_get_nth_entity(L, i);
-        libgame_update_spritegroup_dest(g, e->id);
-        //    libgame_update_smoothmove(g, id);
+        //libgame_update_spritegroup_dest(g, e->id);
+        libgame_update_smoothmove(g, e->id);
     }
 
     // at this point, we can take other NPC turns
@@ -1313,17 +1349,12 @@ void libgame_initsharedsetup(gamestate* const g) {
     libgame_load_textures(g);
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
 
-
     // init the entitymap
     entitymap = em_new();
-
     // init the entities array
     libgame_init_entityids(g);
-
     g->dungeon_floor = dungeon_floor_create(20, 20);
     dungeon_floor_init(g->dungeon_floor);
-
-    //entity* hero = entity_new(next_entity_id++, ENTITY_PLAYER, "hero");
     entity* hero = entity_new_at(next_entity_id++, ENTITY_PLAYER, 2, 2, "hero");
     em_add(entitymap, hero);
     g->hero_id = hero->id;
@@ -1331,9 +1362,11 @@ void libgame_initsharedsetup(gamestate* const g) {
     // we have to add it to the tile at its x,y position
     //dungeon_tile_t* start_tile = &g->dungeon_floor->tiles[hero->y][hero->x];
     //dungeon_tile_add(start_tile, hero->id);
-    dungeon_tile_add(&g->dungeon_floor->tiles[hero->y][hero->x], hero->id);
 
-
+    const bool res = dungeon_tile_add(&g->dungeon_floor->tiles[hero->y][hero->x], hero->id);
+    if (!res) {
+        merror("libgame_initsharedsetup: could not add hero to tile");
+    }
 
     // we ALSO have to create the spritegroup for the entity
     libgame_create_spritegroup(g, hero->id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);

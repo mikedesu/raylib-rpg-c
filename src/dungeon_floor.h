@@ -25,3 +25,5 @@ void dungeon_floor_init(dungeon_floor_t* floor);
 void dungeon_floor_free(dungeon_floor_t* floor);
 
 const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, const int x, const int y);
+
+const entityid dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id, const int x, const int y);
