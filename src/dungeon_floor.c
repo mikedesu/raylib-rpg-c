@@ -83,12 +83,12 @@ const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, co
 }
 
 
-const entityid dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id, const int x, const int y) {
+const bool dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id, const int x, const int y) {
     if (df) {
         if (id != -1) {
             if (x >= 0 && x < df->width && y >= 0 && y < df->height) {
                 dungeon_tile_remove(&df->tiles[y][x], id);
-                return id;
+                return true;
             } else {
                 merror("dungeon_floor_remove_at: x or y out of bounds");
             }
@@ -98,5 +98,5 @@ const entityid dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid
     } else {
         merror("dungeon_floor_remove_at: df is NULL");
     }
-    return -1;
+    return false;
 }

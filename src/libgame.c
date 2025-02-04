@@ -190,20 +190,6 @@ void libgame_handle_move(gamestate* const g, const entityid id, const int x, con
         return;
     }
 
-
-    char buffer[1024];
-
-    snprintf(buffer,
-             1024,
-             "libgame_handle_player_input_movement_key: dungeon width: %d, height: %d",
-             g->dungeon_floor->width,
-             g->dungeon_floor->height);
-
-    minfo(buffer);
-    //snprintf(buffer,
-    //         g->dungeon_floor->width,
-    //         g->dungeon_floor->height);
-
     // need to establish x/y directions
     // y x = row col
     const int src_y = e->y;
@@ -228,17 +214,11 @@ void libgame_handle_move(gamestate* const g, const entityid id, const int x, con
         return;
     }
 
-    snprintf(buffer,
-             1024,
-             "libgame_handle_player_input_movement_key: src_x: %d, src_y: %d, dest_x: %d, dest_y: %d",
-             src_x,
-             src_y,
-             dest_x,
-             dest_y);
-    minfo(buffer);
-
-
     libgame_entity_set_anim(g, id, SPRITEGROUP_ANIM_HUMAN_WALK);
+
+    // update the entity context
+    libgame_entity_update_context(g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
+
     dungeon_tile_t* tile_row = g->dungeon_floor->tiles[src_y];
     // mostly a sanity-check
     if (tile_row == NULL) {
@@ -260,6 +240,7 @@ void libgame_handle_move(gamestate* const g, const entityid id, const int x, con
         merror("libgame_handle_player_input_movement_key: dest_tile_row is NULL");
         return;
     }
+
     dungeon_tile_t* dest_tile = &dest_tile_row[dest_x];
     if (dungeon_tile_add(dest_tile, id) == -1) {
         merror("libgame_handle_player_input_movement_key: dungeon_tile_add failed");
@@ -269,9 +250,6 @@ void libgame_handle_move(gamestate* const g, const entityid id, const int x, con
     }
 
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-
-    //sg->move.x = -DEFAULT_TILE_SIZE;
-    //sg->move.y = 0;
 
     sg->move.x = x * DEFAULT_TILE_SIZE;
     sg->move.y = y * DEFAULT_TILE_SIZE;
@@ -853,12 +831,11 @@ void libgame_draw_dungeon_floor_tiles(gamestate* const g) {
         for (int j = 0; j < g->dungeon_floor->width; j++) {
             const dungeon_tile_type_t type = g->dungeon_floor->tiles[i][j].type;
             const int key = get_txkey_for_tiletype(type);
-            if (key == -1) {
-                continue;
+            if (key != -1) {
+                tile_dest.x = j * DEFAULT_TILE_SIZE;
+                tile_dest.y = i * DEFAULT_TILE_SIZE;
+                DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
             }
-            tile_dest.x = j * DEFAULT_TILE_SIZE;
-            tile_dest.y = i * DEFAULT_TILE_SIZE;
-            DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
         }
     }
 }
@@ -1397,13 +1374,18 @@ void libgame_initsharedsetup(gamestate* const g) {
     g->hero_id = hero->id;
     // whenever we create a new entity and want it on the visible dungeon floor
     // we have to add it to the tile at its x,y position
-    //dungeon_tile_t* start_tile = &g->dungeon_floor->tiles[hero->y][hero->x];
-    //dungeon_tile_add(start_tile, hero->id);
 
-    const entityid res = dungeon_tile_add(&g->dungeon_floor->tiles[hero->y][hero->x], hero->id);
-    if (res == -1) {
-        merror("libgame_initsharedsetup: could not add hero to tile");
+
+
+    const bool res = dungeon_floor_add_at(g->dungeon_floor, hero->id, hero->x, hero->y);
+    if (!res) {
+        merror("libgame_initsharedsetup: could not add hero to dungeon floor");
     }
+
+    //const entityid res = dungeon_tile_add(&g->dungeon_floor->tiles[hero->y][hero->x], hero->id);
+    //if (res == -1) {
+    //    merror("libgame_initsharedsetup: could not add hero to tile");
+    //}
 
     // we ALSO have to create the spritegroup for the entity
     libgame_create_spritegroup(g, hero->id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
