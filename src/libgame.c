@@ -541,15 +541,21 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
 
     const int camera_zoom = (int)g->cam2d.zoom;
 
+    const int dw = g->dungeon_floor->width;
+    const int dh = g->dungeon_floor->height;
+
     snprintf(g->debugpanel.buffer,
              1024,
              "@evildojo666\n"
              "Frame Count: %d\n"
              "Camera Zoom: %d\n"
+             "Dungeon Size: %dx%d\n"
              "Hero.pos: %d, %d\n"
              "EntityCount: %d\n",
              g->framecount,
              camera_zoom,
+             dw,
+             dh,
              hero->x,
              hero->y,
              entity_count);
