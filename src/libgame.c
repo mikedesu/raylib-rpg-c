@@ -538,13 +538,18 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
     entityid id = g->hero_id;
     entity* hero = em_get(entitymap, id);
     const int entity_count = em_count(entitymap);
+
+    const int camera_zoom = (int)g->cam2d.zoom;
+
     snprintf(g->debugpanel.buffer,
              1024,
              "@evildojo666\n"
              "Frame Count: %d\n"
+             "Camera Zoom: %d\n"
              "Hero.pos: %d, %d\n"
              "EntityCount: %d\n",
              g->framecount,
+             camera_zoom,
              hero->x,
              hero->y,
              entity_count);
@@ -630,13 +635,11 @@ void libgame_update_gamestate(gamestate* g) {
         merror("libgame_update_gamestate: gamestate is NULL");
         return;
     }
-    //const entityid hero_id = libgame_lua_get_gamestate_int(L, "HeroId");
     //UpdateMusicStream(test_music);
     libgame_update_debug_panel_buffer(g);
     //setdebugpanelcenter(g);
     libgame_reset_entities_anim(g);
     libgame_do_camera_lock_on(g);
-
     for (int i = 0; i < em_count(entitymap); i++) {
         entity* e = em_get(entitymap, i);
         if (!e) {
@@ -645,7 +648,6 @@ void libgame_update_gamestate(gamestate* g) {
         }
         libgame_update_smoothmove(g, e->id);
     }
-
     // at this point, we can take other NPC turns
     // lets iterate over our entities, find the NPCs, and make them move in a random direction
     // then, we will update their smooth moves
@@ -654,33 +656,8 @@ void libgame_update_gamestate(gamestate* g) {
     //libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
     //minfo("test");
     if (g->player_input_received) {
-        //    minfo("libgame_update_gamestate: player input received");
-        //const int num_entities = libgame_lua_get_num_entities(L);
-        //for (int i = 1; i <= num_entities; i++) {
-        //    const entityid id = libgame_lua_get_nth_entity(L, i);
-        //    const entitytype_t type = libgame_lua_get_entity_int(L, id, "type");
-        //    if (type == ENTITY_NPC) {
-        //        libgame_handle_npc_turn_lua(g, id);
-        //            libgame_lua_entity_move(L, id, 1, 0);
-        //            libgame_entity_set_anim(g, id, SPRITEGROUP_ANIM_ORC_WALK);
-        //            libgame_entity_update_context(g, id, SPECIFIER_NONE, DIRECTION_RIGHT);
-        //    }
-        //}
         g->player_input_received = false;
     }
-    //    libgame_handle_npcs_turn_lua(g);
-    // this is where we want to process the turn
-    // we want to do this in a lock-step fashion so that it is only called once every N frames or so
-    //libgame_process_turn(g);
-    //libgame_process_turn_actions(g);
-    //    libgame_lua_process_actions(L);
-    // here, we need to step thru the ActionResults array in the lua gamestate
-    // and update the sprites based on the results
-    // this is a major step towards handling the animation stacking which is the whole point
-    //    libgame_process_action_results(g);
-    //    libgame_lua_clear_actions(L);
-    //    g->player_input_received = false;
-    //}
     //minfo("libgame_update_gamestate end");
 }
 
