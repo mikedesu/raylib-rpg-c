@@ -848,17 +848,7 @@ void libgame_drawgrid(gamestate* const g) {
 
 
 
-void libgame_draw_dungeon_floor(gamestate* const g) {
-    if (!g) {
-        merror("libgame_draw_dungeon_floor: gamestate is NULL");
-        return;
-    }
-    if (g->dungeon_floor->height == -1 || g->dungeon_floor->width == -1) {
-        merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
-        return;
-    }
-
-    // draw dungeon floor tiles
+void libgame_draw_dungeon_floor_tiles(gamestate* const g) {
     for (int i = 0; i < g->dungeon_floor->height; i++) {
         for (int j = 0; j < g->dungeon_floor->width; j++) {
             const dungeon_tile_type_t type = g->dungeon_floor->tiles[i][j].type;
@@ -871,10 +861,12 @@ void libgame_draw_dungeon_floor(gamestate* const g) {
             DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
         }
     }
+}
 
-    // draw entities per tile
-    // next, we want to draw the entities on the tiles
-    // at first we will do it generically then we will guarantee ordering
+
+
+
+void libgame_draw_dungeon_floor_entities(gamestate* const g) {
     for (int i = 0; i < g->dungeon_floor->height; i++) {
         for (int j = 0; j < g->dungeon_floor->width; j++) {
             dungeon_tile_t* tile = &g->dungeon_floor->tiles[i][j];
@@ -887,6 +879,28 @@ void libgame_draw_dungeon_floor(gamestate* const g) {
             }
         }
     }
+}
+
+
+
+
+void libgame_draw_dungeon_floor(gamestate* const g) {
+    if (!g) {
+        merror("libgame_draw_dungeon_floor: gamestate is NULL");
+        return;
+    }
+    if (g->dungeon_floor->height == -1 || g->dungeon_floor->width == -1) {
+        merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
+        return;
+    }
+
+    // draw dungeon floor tiles
+    libgame_draw_dungeon_floor_tiles(g);
+
+    // draw entities per tile
+    // next, we want to draw the entities on the tiles
+    // at first we will do it generically then we will guarantee ordering
+    libgame_draw_dungeon_floor_entities(g);
 }
 
 
@@ -1341,6 +1355,8 @@ void libgame_init_entityids(gamestate* const g) {
     }
     memset(entityids, -1, sizeof(entityid) * EM_MAX_SLOTS);
 }
+
+
 
 
 void libgame_initsharedsetup(gamestate* const g) {
