@@ -1336,22 +1336,27 @@ void libgame_initsharedsetup(gamestate* const g) {
     libgame_init_entityids(g);
     g->dungeon_floor = dungeon_floor_create(20, 20);
     dungeon_floor_init(g->dungeon_floor);
+
+
+    // ----------
+    // begin create hero
+    // ----------
     entity* hero = entity_new_at(next_entity_id++, ENTITY_PLAYER, 2, 2, "hero");
     em_add(entitymap, hero);
     g->hero_id = hero->id;
     // whenever we create a new entity and want it on the visible dungeon floor
     // we have to add it to the tile at its x,y position
-
-
-
     const bool res = dungeon_floor_add_at(g->dungeon_floor, hero->id, hero->x, hero->y);
     if (!res) {
         merror("libgame_initsharedsetup: could not add hero to dungeon floor");
     }
-
     // we ALSO have to create the spritegroup for the entity
     libgame_create_spritegroup(g, hero->id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
     libgame_set_default_anim_for_id(g, hero->id, SPRITEGROUP_ANIM_HUMAN_IDLE);
+    // ----------
+    // end create hero
+    // ----------
+
     // these dont work right until the text buffer of the debugpanel is filled
     libgame_update_debug_panel_buffer(g);
     libgame_calc_debugpanel_size(g);
