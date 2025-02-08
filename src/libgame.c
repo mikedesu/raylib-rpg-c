@@ -511,12 +511,12 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
 
 void libgame_update_smoothmove(gamestate* const g, const entityid id) {
     if (!g) {
-        merror("libgame_update_smoothmove: gamestate is NULL");
+        //merror("libgame_update_smoothmove: gamestate is NULL");
         return;
     }
     spritegroup_t* group = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (!group) {
-        merror("libgame_update_smoothmove: group is NULL");
+        //merror("libgame_update_smoothmove: group is NULL");
         return;
     }
     const float move = 1.0f;
@@ -547,12 +547,12 @@ void libgame_do_camera_lock_on(gamestate* const g) {
 
 void libgame_reset_entity_anim(gamestate* const g, entityid id) {
     if (!g) {
-        merror("libgame_reset_entity_anim: gamestate is NULL");
+        //merror("libgame_reset_entity_anim: gamestate is NULL");
         return;
     }
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
     if (!sg) {
-        merror("libgame_reset_entity_anim: spritegroup is NULL");
+        //merror("libgame_reset_entity_anim: spritegroup is NULL");
         return;
     }
     sprite* s = spritegroup_get(sg, sg->current);
@@ -1331,17 +1331,44 @@ void libgame_initsharedsetup(gamestate* const g) {
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
 
     // init the entitymap
+    //entitymap = em_new();
+    // init the entities array
+    //libgame_init_entityids(g);
+    //g->dungeon_floor = dungeon_floor_create(20, 20);
+    //dungeon_floor_init(g->dungeon_floor);
+
+    libgame_init_datastructures(g);
+
+    libgame_create_hero(g, 0, 0);
+
+    // these dont work right until the text buffer of the debugpanel is filled
+    libgame_update_debug_panel_buffer(g);
+    libgame_calc_debugpanel_size(g);
+    //setdebugpanelbottomleft(g);
+    setdebugpaneltopleft(g);
+}
+
+
+
+void libgame_init_datastructures(gamestate* const g) {
+    if (!g) {
+        merror("libgame_init_datastructures: gamestate is NULL");
+        return;
+    }
+
+    // init the entitymap
     entitymap = em_new();
     // init the entities array
     libgame_init_entityids(g);
     g->dungeon_floor = dungeon_floor_create(20, 20);
     dungeon_floor_init(g->dungeon_floor);
+}
 
 
-    // ----------
-    // begin create hero
-    // ----------
-    entity* hero = entity_new_at(next_entity_id++, ENTITY_PLAYER, 2, 2, "hero");
+
+
+void libgame_create_hero(gamestate* const g, const int x, const int y) {
+    entity* hero = entity_new_at(next_entity_id++, ENTITY_PLAYER, x, y, "hero");
     em_add(entitymap, hero);
     g->hero_id = hero->id;
     // whenever we create a new entity and want it on the visible dungeon floor
@@ -1353,15 +1380,6 @@ void libgame_initsharedsetup(gamestate* const g) {
     // we ALSO have to create the spritegroup for the entity
     libgame_create_spritegroup(g, hero->id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
     libgame_set_default_anim_for_id(g, hero->id, SPRITEGROUP_ANIM_HUMAN_IDLE);
-    // ----------
-    // end create hero
-    // ----------
-
-    // these dont work right until the text buffer of the debugpanel is filled
-    libgame_update_debug_panel_buffer(g);
-    libgame_calc_debugpanel_size(g);
-    //setdebugpanelbottomleft(g);
-    setdebugpaneltopleft(g);
 }
 
 
