@@ -1372,67 +1372,87 @@ void libgame_init_datastructures(gamestate* const g) {
 
 
 
-void libgame_create_hero(gamestate* const g, const int x, const int y) {
-
+const bool libgame_create_entity_checks(gamestate* const g, const int x, const int y) {
     if (!g) {
         merror("libgame_create_hero: gamestate is NULL");
-        return;
+        return false;
     }
-
 
     if (x < 0 || x >= g->dungeon_floor->width) {
         merror("libgame_create_hero: x is out of bounds");
-        return;
+        return false;
     }
 
     if (y < 0 || y >= g->dungeon_floor->height) {
         merror("libgame_create_hero: y is out of bounds");
-        return;
+        return false;
     }
 
     if (g->entitymap == NULL) {
         merror("libgame_create_hero: entitymap is NULL");
-        return;
+        return false;
     }
 
     if (g->dungeon_floor == NULL) {
         merror("libgame_create_hero: dungeon_floor is NULL");
-        return;
+        return false;
     }
 
     if (g->spritegroups == NULL) {
         merror("libgame_create_hero: spritegroups is NULL");
-        return;
+        return false;
     }
 
     if (g->index_entityids >= g->max_entityids) {
         merror("libgame_create_hero: index_entityids is greater than or equal to max_entityids");
+        return false;
+    }
+
+    return true;
+}
+
+
+
+void libgame_create_hero(gamestate* const g, const int x, const int y) {
+    if (!libgame_create_entity_checks(g, x, y)) {
+        merror("One or more checks failed in libgame_create_hero");
         return;
     }
 
     // general process for adding a new entity:
     // 1. create the entity with an x y
-    entity* e = entity_new_at(next_entity_id++, ENTITY_PLAYER, x, y, "hero");
+    entitytype_t type = ENTITY_PLAYER;
+    const char* name = "hero";
+    entity* e = entity_new_at(next_entity_id++, type, x, y, name);
     if (!e) {
         merror("libgame_create_hero: could not create hero entity");
         return;
     }
-    entityid id = e->id;
+
     // 2. add the entity to the entitymap
     em_add(g->entitymap, e);
-    g->hero_id = id;
+    g->hero_id = e->id;
     // 3. add the entity id to the entityids array
-    g->entityids[g->index_entityids++] = id;
+    g->entityids[g->index_entityids++] = e->id;
 
-    // whenever we create a new entity and want it on the visible dungeon floor
-    // we have to add it to the tile at its x,y position
-    const bool res = dungeon_floor_add_at(g->dungeon_floor, id, x, y);
+    // 4. add it to the tile at its x,y position
+    const bool res = dungeon_floor_add_at(g->dungeon_floor, e->id, x, y);
     if (!res) {
         merror("libgame_initsharedsetup: could not add hero to dungeon floor");
     }
-    // we ALSO have to create the spritegroup for the entity
-    libgame_create_spritegroup(g, e->id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
-    libgame_set_default_anim_for_id(g, e->id, SPRITEGROUP_ANIM_HUMAN_IDLE);
+
+    // 5. create the spritegroup for the entity
+    // we will come back here and implement texture and anim selection
+    // based on the NPC's race
+    int* keys = TX_HUMAN_KEYS;
+    const int num_keys = TX_HUMAN_KEY_COUNT;
+    const int off_x = -12;
+    const int off_y = -12;
+    libgame_create_spritegroup(g, e->id, keys, num_keys, off_x, off_y, SPECIFIER_NONE);
+
+    // 6. set the default animation
+    const int default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
+    libgame_set_default_anim_for_id(g, e->id, default_anim);
 }
 
 

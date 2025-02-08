@@ -177,6 +177,8 @@ void libgame_draw_dungeon_floor_entities(gamestate* const g);
 
 void libgame_draw_dungeon_floor_tiles(gamestate* const g);
 
+const bool libgame_create_entity_checks(gamestate* const g, const int x, const int y);
+
 //void libgame_init_entity_list(gamestate* const state);
 //bool libgame_assign_entity_position(gamestate* const g, const entityid id, const int x, const int y);
 //const int libgame_get_entity_pos_x(gamestate const* g, const entityid id);
