@@ -8,6 +8,7 @@
 #include "hashtable_entityid_spritegroup.h"
 //#include "sizemacros.h"
 #include "dungeon_floor.h"
+#include "em.h"
 #include "textureinfo.h"
 #include <raylib.h>
 #include <stdbool.h>
@@ -63,6 +64,14 @@ typedef struct gamestate {
     entityid hero_id;
 
     dungeon_floor_t* dungeon_floor;
+
+    em_t* entitymap;
+
+    int index_entityids;
+    int max_entityids;
+    entityid* entityids;
+
+
 } gamestate;
 
 

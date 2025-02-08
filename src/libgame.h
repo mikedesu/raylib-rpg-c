@@ -162,6 +162,7 @@ void libgame_create_hero(gamestate* const g, const int x, const int y);
 
 void libgame_init_datastructures(gamestate* const g);
 
+void libgame_init_spritegroups(gamestate* const g);
 void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g);
 
 void libgame_update_spritegroup_dest(gamestate* const g, const entityid id);

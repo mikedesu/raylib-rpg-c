@@ -40,7 +40,10 @@ void (*mylibgameclosesavegamestate)() = NULL;
 void (*mylibgameclose)(gamestate*) = NULL;
 void (*mylibgamedrawframe)(gamestate*) = NULL;
 void (*mylibgamehandle_input)(gamestate*) = NULL;
-void (*mylibgameinitwithstate)(gamestate*) = NULL;
+
+//void (*mylibgameinitwithstate)(gamestate*) = NULL;
+void (*mylibgameinitwithstate)(gamestate* const) = NULL;
+
 void (*mylibgameupdategamestate)(gamestate*) = NULL;
 bool (*mylibgame_external_check_reload)() = NULL;
 
@@ -166,8 +169,7 @@ void autoreload_every_n_sec(const int n) {
 void gamerun() {
     openhandle(); // if building for web, turn off
     loadsymbols(); // if building for web, turn off
-    last_write_time =
-        getlastwritetime(libname); // if building for web, turn off
+    last_write_time = getlastwritetime(libname); // if building for web, turn off
     mylibgameinit(); // if building for web, turn off
     g = mylibgame_getgamestate();
     while (!mywindowshouldclose()) {

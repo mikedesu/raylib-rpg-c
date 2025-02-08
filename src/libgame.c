@@ -49,9 +49,9 @@ int activescene = GAMEPLAYSCENE;
 
 entityid next_entity_id = 0;
 
-em_t* entitymap = NULL;
+//em_t* entitymap = NULL;
 
-entityid* entityids = NULL;
+//entityid* entityids = NULL;
 
 void libgame_draw_fade(const gamestate* const g) {
     if (!g) {
@@ -184,7 +184,7 @@ const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir) {
 
 void libgame_handle_move(gamestate* const g, const entityid id, const int x, const int y) {
     //void libgame_handle_move_left(gamestate* const g, const entityid id) {
-    entity_t* e = em_get(entitymap, id);
+    entity_t* e = em_get(g->entitymap, id);
     if (e == NULL) {
         merror("libgame_handle_player_input_movement_key: e is NULL");
         return;
@@ -296,7 +296,7 @@ void libgame_update_spritegroup_dest(gamestate* const g, const entityid id) {
     entity_t* e = NULL;
     if (g) {
         sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-        e = em_get(entitymap, id);
+        e = em_get(g->entitymap, id);
         if (sg && e) {
             sg->dest.x = e->x * DEFAULT_TILE_SIZE + sg->off_x;
             sg->dest.y = e->y * DEFAULT_TILE_SIZE + sg->off_y;
@@ -481,8 +481,8 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
         return;
     }
     entityid id = g->hero_id;
-    entity* hero = em_get(entitymap, id);
-    const int entity_count = em_count(entitymap);
+    entity* hero = em_get(g->entitymap, id);
+    const int entity_count = em_count(g->entitymap);
 
     const int camera_zoom = (int)g->cam2d.zoom;
 
@@ -572,7 +572,7 @@ void libgame_reset_entities_anim(gamestate* const g) {
         return;
     }
 
-    for (int i = 0; i < em_count(entitymap); i++) {
+    for (int i = 0; i < em_count(g->entitymap); i++) {
         libgame_reset_entity_anim(g, i);
     }
 }
@@ -591,8 +591,8 @@ void libgame_update_gamestate(gamestate* g) {
     //setdebugpanelcenter(g);
     libgame_reset_entities_anim(g);
     libgame_do_camera_lock_on(g);
-    for (int i = 0; i < em_count(entitymap); i++) {
-        entity* e = em_get(entitymap, i);
+    for (int i = 0; i < em_count(g->entitymap); i++) {
+        entity* e = em_get(g->entitymap, i);
         if (!e) {
             merror("libgame_update_gamestate: entity is NULL");
             continue;
@@ -1126,7 +1126,7 @@ const int libgame_create_spritegroup_by_id(gamestate* const g, const entityid id
         merror("libgame_create_spritegroup_by_id: id");
         return -1;
     }
-    entity* e = em_get(entitymap, id);
+    entity* e = em_get(g->entitymap, id);
     if (!e) {
         merror("libgame_create_spritegroup_by_id: entity is NULL");
         return -1;
@@ -1174,7 +1174,7 @@ void libgame_create_spritegroup(gamestate* const g,
         merror("libgame_create_spritegroup: could not create group");
         return;
     }
-    entity* e = em_get(entitymap, id);
+    entity* e = em_get(g->entitymap, id);
     if (!e) {
         merror("libgame_create_spritegroup: entity is NULL");
         return;
@@ -1292,12 +1292,14 @@ const entityid libgame_create_orc(gamestate* const g, const char* name, const in
 
 
 void libgame_init_entityids(gamestate* const g) {
-    entityids = (entityid*)malloc(sizeof(entityid) * EM_MAX_SLOTS);
-    if (!entityids) {
+    g->entityids = (entityid*)malloc(sizeof(entityid) * EM_MAX_SLOTS);
+    if (!g->entityids) {
         merror("libgame_initsharedsetup: could not allocate entityids");
         return;
     }
-    memset(entityids, -1, sizeof(entityid) * EM_MAX_SLOTS);
+    memset(g->entityids, -1, sizeof(entityid) * EM_MAX_SLOTS);
+    g->index_entityids = 0;
+    g->max_entityids = EM_MAX_SLOTS;
 }
 
 
@@ -1328,14 +1330,6 @@ void libgame_initsharedsetup(gamestate* const g) {
     g->cam2d.offset.x = g->targetwidth / 2.0f + c_offset_x;
     g->cam2d.offset.y = g->targetheight / 4.0f;
     libgame_load_textures(g);
-    g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
-
-    // init the entitymap
-    //entitymap = em_new();
-    // init the entities array
-    //libgame_init_entityids(g);
-    //g->dungeon_floor = dungeon_floor_create(20, 20);
-    //dungeon_floor_init(g->dungeon_floor);
 
     libgame_init_datastructures(g);
 
@@ -1350,14 +1344,25 @@ void libgame_initsharedsetup(gamestate* const g) {
 
 
 
+void libgame_init_spritegroups(gamestate* const g) {
+    if (!g) {
+        merror("libgame_init_datastructures: gamestate is NULL");
+        return;
+    }
+    g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
+}
+
+
+
 void libgame_init_datastructures(gamestate* const g) {
     if (!g) {
         merror("libgame_init_datastructures: gamestate is NULL");
         return;
     }
+    libgame_init_spritegroups(g);
 
     // init the entitymap
-    entitymap = em_new();
+    g->entitymap = em_new();
     // init the entities array
     libgame_init_entityids(g);
     g->dungeon_floor = dungeon_floor_create(20, 20);
@@ -1368,18 +1373,66 @@ void libgame_init_datastructures(gamestate* const g) {
 
 
 void libgame_create_hero(gamestate* const g, const int x, const int y) {
-    entity* hero = entity_new_at(next_entity_id++, ENTITY_PLAYER, x, y, "hero");
-    em_add(entitymap, hero);
-    g->hero_id = hero->id;
+
+    if (!g) {
+        merror("libgame_create_hero: gamestate is NULL");
+        return;
+    }
+
+
+    if (x < 0 || x >= g->dungeon_floor->width) {
+        merror("libgame_create_hero: x is out of bounds");
+        return;
+    }
+
+    if (y < 0 || y >= g->dungeon_floor->height) {
+        merror("libgame_create_hero: y is out of bounds");
+        return;
+    }
+
+    if (g->entitymap == NULL) {
+        merror("libgame_create_hero: entitymap is NULL");
+        return;
+    }
+
+    if (g->dungeon_floor == NULL) {
+        merror("libgame_create_hero: dungeon_floor is NULL");
+        return;
+    }
+
+    if (g->spritegroups == NULL) {
+        merror("libgame_create_hero: spritegroups is NULL");
+        return;
+    }
+
+    if (g->index_entityids >= g->max_entityids) {
+        merror("libgame_create_hero: index_entityids is greater than or equal to max_entityids");
+        return;
+    }
+
+    // general process for adding a new entity:
+    // 1. create the entity with an x y
+    entity* e = entity_new_at(next_entity_id++, ENTITY_PLAYER, x, y, "hero");
+    if (!e) {
+        merror("libgame_create_hero: could not create hero entity");
+        return;
+    }
+    entityid id = e->id;
+    // 2. add the entity to the entitymap
+    em_add(g->entitymap, e);
+    g->hero_id = id;
+    // 3. add the entity id to the entityids array
+    g->entityids[g->index_entityids++] = id;
+
     // whenever we create a new entity and want it on the visible dungeon floor
     // we have to add it to the tile at its x,y position
-    const bool res = dungeon_floor_add_at(g->dungeon_floor, hero->id, hero->x, hero->y);
+    const bool res = dungeon_floor_add_at(g->dungeon_floor, id, x, y);
     if (!res) {
         merror("libgame_initsharedsetup: could not add hero to dungeon floor");
     }
     // we ALSO have to create the spritegroup for the entity
-    libgame_create_spritegroup(g, hero->id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
-    libgame_set_default_anim_for_id(g, hero->id, SPRITEGROUP_ANIM_HUMAN_IDLE);
+    libgame_create_spritegroup(g, e->id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
+    libgame_set_default_anim_for_id(g, e->id, SPRITEGROUP_ANIM_HUMAN_IDLE);
 }
 
 
@@ -1410,15 +1463,7 @@ void libgame_close(gamestate* g) {
         return;
     }
     libgame_closeshared(g);
-
     gamestatefree(g);
-
-    // free the entityids array
-    free(entityids);
-    // free the entitymap
-    em_free(entitymap);
-    // free the dungeon floor
-    //dungeon_floor_free(&dungeon_floor);
 }
 
 

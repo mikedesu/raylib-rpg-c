@@ -1,5 +1,6 @@
 #include "gamestate.h"
 #include "dungeon_floor.h"
+#include "libgame_defines.h"
 #include "mprint.h"
 #include <raylib.h>
 #include <stdio.h>
@@ -40,14 +41,24 @@ gamestate* gamestateinitptr() {
     g->processing_actions = false;
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){0, 0};
-    g->cam2d.zoom = 7.0;
+
+    //g->cam2d.zoom = DEFAULT_CAMERA_ZOOM;
+    g->cam2d.zoom = 20.0f;
+
     g->cam2d.rotation = 0.0;
+
     g->fadealpha = 0.0f;
     g->controlmode = CONTROLMODE_PLAYER;
     g->fadestate = FADESTATENONE;
     g->spritegroups = NULL;
     g->hero_id = -1;
     g->dungeon_floor = NULL;
+    g->entitymap = NULL;
+
+    g->entityids = NULL;
+    g->index_entityids = -1;
+    g->max_entityids = -1;
+
     return g;
 }
 
@@ -64,6 +75,8 @@ void gamestatefree(gamestate* g) {
     }
     hashtable_entityid_spritegroup_destroy(g->spritegroups);
     dungeon_floor_free(g->dungeon_floor);
+    em_free(g->entitymap);
+    free(g->entityids);
     //free(g->timebegantm);
     //free(g->currenttimetm);
     free(g);
