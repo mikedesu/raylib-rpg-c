@@ -56,7 +56,7 @@ gamestate* gamestateinitptr() {
     g->entitymap = NULL;
 
     g->entityids = NULL;
-    g->index_entityids = -1;
+    g->index_entityids = 0;
     g->max_entityids = -1;
 
     return g;
@@ -80,4 +80,27 @@ void gamestatefree(gamestate* g) {
     //free(g->timebegantm);
     //free(g->currenttimetm);
     free(g);
+}
+
+
+
+void gamestate_add_entityid(gamestate* const g, const entityid id) {
+
+    if (g == NULL) {
+        merror("gamestate_add_entityid g is NULL");
+        return;
+    }
+
+    if (g->entityids == NULL) {
+        merror("gamestate_add_entityid g->entityids is NULL");
+        return;
+    }
+
+    if (g->index_entityids >= g->max_entityids) {
+        merror("gamestate_add_entityid g->index_entityids >= g->max_entityids");
+        return;
+    }
+
+    g->entityids[g->index_entityids] = id;
+    g->index_entityids++;
 }

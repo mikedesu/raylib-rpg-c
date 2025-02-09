@@ -1,8 +1,4 @@
 #pragma once
 
 
-typedef enum {
-    RACE_NONE = 1,
-    RACE_HUMAN,
-    RACE_ORC,
-} race_t;
+typedef enum { RACE_NONE = 0, RACE_HUMAN, RACE_ORC, RACE_COUNT } race_t;

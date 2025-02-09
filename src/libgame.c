@@ -489,18 +489,22 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
     const int dw = g->dungeon_floor->width;
     const int dh = g->dungeon_floor->height;
 
+    const char* hero_name = hero->name;
+
     snprintf(g->debugpanel.buffer,
              1024,
              "@evildojo666\n"
              "Frame Count: %d\n"
              "Camera Zoom: %d\n"
              "Dungeon Size: %dx%d\n"
+             "Hero.name: %s\n"
              "Hero.pos: %d, %d\n"
              "EntityCount: %d\n",
              g->framecount,
              camera_zoom,
              dw,
              dh,
+             hero_name,
              hero->x,
              hero->y,
              entity_count);
@@ -1423,35 +1427,41 @@ void libgame_create_hero(gamestate* const g, const int x, const int y) {
     // 1. create the entity with an x y
     entitytype_t type = ENTITY_PLAYER;
     const char* name = "hero";
-    entity* e = entity_new_at(next_entity_id++, type, x, y, name);
+    entity* e = entity_new_at(next_entity_id++, type, x, y);
     if (!e) {
         merror("libgame_create_hero: could not create hero entity");
         return;
     }
-
+    entity_set_name(e, name);
+    entity_set_race(e, RACE_HUMAN);
+    //entity_set_race(e, RACE_HUMAN);
     // 2. add the entity to the entitymap
     em_add(g->entitymap, e);
     g->hero_id = e->id;
-    // 3. add the entity id to the entityids array
-    g->entityids[g->index_entityids++] = e->id;
-
+    gamestate_add_entityid(g, e->id);
     // 4. add it to the tile at its x,y position
-    const bool res = dungeon_floor_add_at(g->dungeon_floor, e->id, x, y);
-    if (!res) {
-        merror("libgame_initsharedsetup: could not add hero to dungeon floor");
+    dungeon_floor_add_at(g->dungeon_floor, e->id, x, y);
+
+    // based on the NPC's race
+    //int* keys = TX_HUMAN_KEYS;
+    int* keys = NULL;
+    int num_keys = TX_HUMAN_KEY_COUNT;
+    int default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
+    if (e->race == RACE_HUMAN) {
+        keys = TX_HUMAN_KEYS;
+        num_keys = TX_HUMAN_KEY_COUNT;
+        default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
+    } else if (e->race == RACE_ORC) {
+        keys = TX_ORC_KEYS;
+        num_keys = TX_ORC_KEY_COUNT;
+        default_anim = SPRITEGROUP_ANIM_ORC_IDLE;
     }
 
-    // 5. create the spritegroup for the entity
-    // we will come back here and implement texture and anim selection
-    // based on the NPC's race
-    int* keys = TX_HUMAN_KEYS;
-    const int num_keys = TX_HUMAN_KEY_COUNT;
     const int off_x = -12;
     const int off_y = -12;
+    // 5. create the spritegroup for the entity
     libgame_create_spritegroup(g, e->id, keys, num_keys, off_x, off_y, SPECIFIER_NONE);
-
     // 6. set the default animation
-    const int default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
     libgame_set_default_anim_for_id(g, e->id, default_anim);
 }
 

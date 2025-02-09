@@ -5,14 +5,14 @@ OBJ=-c
 WFLAGS=-Wall 
 #WFLAGS=-Wall -Werror
 SHARED=-shared
-LIBGAME_OBJECTS=$(DATA_STRUCTS) libgame.o  sprite.o  spritegroup.o  hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o specifier.o dungeon_floor.o entity.o em.o dungeon_tile.o gamestate.o
+LIBGAME_OBJECTS=$(DATA_STRUCTS) libgame.o  sprite.o  spritegroup.o  hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o specifier.o dungeon_floor.o entity.o em.o dungeon_tile.o race.o gamestate.o
 
 STATIC_LINK_RAYLIB=-l:libraylib.a
 
 POSITION_INDEPENDENT_CODE=-fPIC
 MAIN_C=main.c
-WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c sprite.c spritegroup.c specifier.c dungeon_floor.o entity.o em.o dungeon_tile.o /home/darkmage/src/raylib/src/libraylib.a 
-MAIN_OBJECTS=gameloader.o gamestate.o hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o specifier.o dungeon_floor.o dungeon_tile.o entity.o em.o sprite.o spritegroup.o 
+WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c sprite.c spritegroup.c specifier.c dungeon_floor.o entity.o em.o dungeon_tile.o race.o /home/darkmage/src/raylib/src/libraylib.a 
+MAIN_OBJECTS=gameloader.o gamestate.o hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o specifier.o dungeon_floor.o dungeon_tile.o entity.o em.o sprite.o spritegroup.o race.o
 WEB_CC=emcc
 
 WEB_INCLUDES=-I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include 
@@ -40,7 +40,8 @@ game: main.c gameloader.o $(LIBGAME_OBJECTS) libgame.so
 gameloader.o: gameloader.c 
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) $^ -o $@
 
-gamestate.o: dungeon_floor.o gamestate.c
+#gamestate.o: dungeon_floor.o gamestate.c
+gamestate.o: gamestate.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) $^ -o $@
 
 # Rendering Objects
@@ -73,6 +74,9 @@ get_txkey_for_tiletype.o: get_txkey_for_tiletype.c
 
 
 specifier.o: specifier.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
+
+race.o: race.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
 
 

@@ -64,12 +64,12 @@ void dungeon_floor_free(dungeon_floor_t* floor) {
 
 
 
-const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, const int x, const int y) {
+void dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, const int x, const int y) {
     if (df) {
         if (id != -1) {
             if (x >= 0 && x < df->width && y >= 0 && y < df->height) {
                 dungeon_tile_add(&df->tiles[y][x], id);
-                return true;
+                return;
             } else {
                 merror("dungeon_floor_add_at: x or y out of bounds");
             }
@@ -79,7 +79,6 @@ const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, co
     } else {
         merror("dungeon_floor_add_at: df is NULL");
     }
-    return false;
 }
 
 
