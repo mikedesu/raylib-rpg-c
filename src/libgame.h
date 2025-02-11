@@ -178,6 +178,7 @@ void libgame_draw_dungeon_floor_entities_unsafe(gamestate* const g);
 
 void libgame_draw_dungeon_floor_tiles(gamestate* const g);
 void libgame_draw_dungeon_floor_tiles_unsafe(gamestate* const g);
+void libgame_draw_dungeon_floor_tiles_3d_unsafe(gamestate* const g);
 
 const bool libgame_create_entity_checks(gamestate* const g, const int x, const int y);
 

@@ -45,7 +45,17 @@ gamestate* gamestateinitptr() {
     g->cam2d.rotation = 0.0;
 
     g->cam3d = (Camera3D){0};
+    g->cam3d.position = (Vector3){0.0f, 20.0f, 20.0f};
+    g->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
+    g->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
+    g->cam3d.fovy = 45.0f;
+    g->cam3d.projection = CAMERA_PERSPECTIVE;
+
+
+
     g->camera_mode = CAMERA_FREE;
+
+
 
     g->is3d = false;
 

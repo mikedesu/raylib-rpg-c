@@ -488,19 +488,44 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
 
     const bool is3d = g->is3d;
 
+    const int cam2dx = (int)g->cam2d.target.x;
+    const int cam2dy = (int)g->cam2d.target.y;
+    const int cam2dox = (int)g->cam2d.offset.x;
+    const int cam2doy = (int)g->cam2d.offset.y;
+
+    const float cam3dx = g->cam3d.position.x;
+    const float cam3dy = g->cam3d.position.y;
+    const float cam3dz = g->cam3d.position.z;
+
+    const float cam3dtx = g->cam3d.target.x;
+    const float cam3dty = g->cam3d.target.y;
+    const float cam3dtz = g->cam3d.target.z;
+
     snprintf(g->debugpanel.buffer,
              1024,
              "@evildojo666\n"
              "is3d: %d\n"
              "Frame Count: %d\n"
-             "Camera Zoom: %d\n"
+             "Camera2D Position Offset & Zoom: %03d,%03d %03d,%03d %03d\n"
+             "Camera3D Position: %03.2f,%03.2f,%03.2f\n"
+             "Camera3D Target:   %03.2f,%03.2f,%03.2f\n"
              "Dungeon Size: %dx%d\n"
              "Hero.name: %s\n"
              "Hero.pos: %d, %d\n"
              "EntityCount: %d\n",
              is3d,
              g->framecount,
+             cam2dx,
+             cam2dy,
+             cam2dox,
+             cam2doy,
              camera_zoom,
+             cam3dx,
+             cam3dy,
+             cam3dz,
+             cam3dtx,
+             cam3dty,
+             cam3dtz,
              dw,
              dh,
              hero_name,
@@ -813,6 +838,37 @@ void libgame_draw_dungeon_floor_tiles_unsafe(gamestate* const g) {
 
 
 
+void libgame_draw_dungeon_floor_tiles_3d_unsafe(gamestate* const g) {
+    const float w = 1.0f;
+    const float h = 1.0f;
+    const float d = 1.0f;
+
+    const float x = -10.0f;
+    const float y = 0.0f;
+    const float z = 10.0f;
+
+    //DrawCube((Vector3){10, 0, 0}, w, h, d, RED);
+
+    for (int i = 0; i < g->dungeon_floor->height; i++) {
+        for (int j = 0; j < g->dungeon_floor->width; j++) {
+            DrawPlane((Vector3){j, 0, i}, (Vector2){w, d}, GREEN);
+        }
+    }
+
+    //const dungeon_tile_type_t type = g->dungeon_floor->tiles[i][j].type;
+    //const int key = get_txkey_for_tiletype(type);
+    //if (key != -1) {
+    //    tile_dest.x = j * DEFAULT_TILE_SIZE;
+    //    tile_dest.y = i * DEFAULT_TILE_SIZE;
+    //    DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
+    //}
+    //    }
+    //}
+}
+
+
+
+
 void libgame_draw_dungeon_floor_entities(gamestate* const g) {
     if (g) {
         for (int i = 0; i < g->dungeon_floor->height; i++) {
@@ -973,7 +1029,10 @@ void libgame_draw_gameplayscene(gamestate* const g) {
         EndMode2D();
     } else {
         BeginMode3D(g->cam3d);
-        ClearBackground(WHITE);
+        ClearBackground(BLACK);
+
+        libgame_draw_dungeon_floor_tiles_3d_unsafe(g);
+
         //libgame_draw_dungeon_floor(g);
         EndMode3D();
     }
@@ -1269,12 +1328,12 @@ void libgame_loadtargettexture(gamestate* const g) {
     g->cam2d.offset.y = g->targetheight / 4.0f; //+ c_offset_y;
     //
 
+    UpdateCamera(&(g->cam3d), CAMERA_FREE);
     g->cam3d.position = (Vector3){0.0f, 10.0f, 10.0f};
     g->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
     g->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
     g->cam3d.fovy = 45.0f;
     g->cam3d.projection = CAMERA_PERSPECTIVE;
-    //SetCameraMode(g->cam3d, CAMERA_FREE);
 }
 
 
