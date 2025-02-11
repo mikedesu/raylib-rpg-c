@@ -238,9 +238,9 @@ void libgame_handle_input(gamestate* const g) {
     //        g->fadestate = FADESTATEOUT;
     //    }
     //}
-    if (IsKeyPressed(KEY_E)) {
-        libgame_test_enemy_placement(g);
-    }
+    //if (IsKeyPressed(KEY_E)) {
+    //    libgame_test_enemy_placement(g);
+    //}
     if (IsKeyPressed(KEY_C)) {
         g->controlmode = g->controlmode == CONTROLMODE_CAMERA ? CONTROLMODE_PLAYER : CONTROLMODE_CAMERA;
     }
@@ -249,6 +249,9 @@ void libgame_handle_input(gamestate* const g) {
     }
     if (IsKeyPressed(KEY_G)) {
         g->gridon = !g->gridon;
+    }
+    if (IsKeyPressed(KEY_W)) {
+        g->is3d = !g->is3d;
     }
     if (g->controlmode == CONTROLMODE_PLAYER) {
         if (IsKeyPressed(KEY_LEFT)) {
@@ -483,15 +486,19 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
 
     const char* hero_name = hero->name;
 
+    const bool is3d = g->is3d;
+
     snprintf(g->debugpanel.buffer,
              1024,
              "@evildojo666\n"
+             "is3d: %d\n"
              "Frame Count: %d\n"
              "Camera Zoom: %d\n"
              "Dungeon Size: %dx%d\n"
              "Hero.name: %s\n"
              "Hero.pos: %d, %d\n"
              "EntityCount: %d\n",
+             is3d,
              g->framecount,
              camera_zoom,
              dw,
@@ -957,11 +964,19 @@ void libgame_draw_gameplayscene(gamestate* const g) {
         merror("libgame_draw_gameplayscene: gamestate is NULL");
         return;
     }
-    BeginMode2D(g->cam2d);
-    ClearBackground(BLACK);
-    libgame_draw_dungeon_floor(g);
-    libgame_handle_fade(g);
-    EndMode2D();
+
+    if (!g->is3d) {
+        BeginMode2D(g->cam2d);
+        ClearBackground(BLACK);
+        libgame_draw_dungeon_floor(g);
+        libgame_handle_fade(g);
+        EndMode2D();
+    } else {
+        BeginMode3D(g->cam3d);
+        ClearBackground(WHITE);
+        //libgame_draw_dungeon_floor(g);
+        EndMode3D();
+    }
 }
 
 
@@ -1252,6 +1267,14 @@ void libgame_loadtargettexture(gamestate* const g) {
     // update the gamestate display values
     g->cam2d.offset.x = g->targetwidth / 2.0f; //+ c_offset_x;
     g->cam2d.offset.y = g->targetheight / 4.0f; //+ c_offset_y;
+    //
+
+    g->cam3d.position = (Vector3){0.0f, 10.0f, 10.0f};
+    g->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
+    g->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
+    g->cam3d.fovy = 45.0f;
+    g->cam3d.projection = CAMERA_PERSPECTIVE;
+    //SetCameraMode(g->cam3d, CAMERA_FREE);
 }
 
 

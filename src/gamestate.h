@@ -43,6 +43,10 @@ typedef struct gamestate {
     debugpanel_t debugpanel;
 
     Camera2D cam2d;
+    Camera3D cam3d;
+    int camera_mode;
+
+    bool is3d;
 
     controlmode_t controlmode;
 
