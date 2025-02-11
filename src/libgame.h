@@ -139,6 +139,7 @@ void libgame_draw_fade(const gamestate* const g);
 void libgame_drawgrid(gamestate* const g);
 
 void libgame_draw_dungeon_floor(gamestate* const g);
+void libgame_draw_dungeon_floor_3d(gamestate* const g);
 
 void libgame_drawframeend(gamestate* const g);
 
@@ -175,6 +176,7 @@ void libgame_handle_move(gamestate* const g, const entityid id, const int x, con
 
 void libgame_draw_dungeon_floor_entities(gamestate* const g);
 void libgame_draw_dungeon_floor_entities_unsafe(gamestate* const g);
+void libgame_draw_dungeon_floor_entities_3d_unsafe(gamestate* const g);
 
 void libgame_draw_dungeon_floor_tiles(gamestate* const g);
 void libgame_draw_dungeon_floor_tiles_unsafe(gamestate* const g);

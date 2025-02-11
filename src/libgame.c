@@ -907,6 +907,29 @@ void libgame_draw_dungeon_floor_entities_unsafe(gamestate* const g) {
 
 
 
+void libgame_draw_dungeon_floor_entities_3d_unsafe(gamestate* const g) {
+    for (int i = 0; i < g->dungeon_floor->height; i++) {
+        for (int j = 0; j < g->dungeon_floor->width; j++) {
+            dungeon_tile_t* tile = &g->dungeon_floor->tiles[i][j];
+            //if (tile && tile->entity_count > 0) {
+            //if (tile && tile->entity_count > 0) {
+            //minfo("tile entity loop");
+            for (int k = 0; k < tile->entity_count; k++) {
+
+                DrawCube((Vector3){j, 0.5, i}, 1.0f, 1.0f, 1.0f, RED);
+
+
+                //libgame_draw_entity_shadow(g, tile->entities[k]);
+                //libgame_draw_entity(g, tile->entities[k]);
+            }
+            //}
+        }
+    }
+}
+
+
+
+
 void libgame_draw_dungeon_floor(gamestate* const g) {
     if (!g) {
         merror("libgame_draw_dungeon_floor: gamestate is NULL");
@@ -926,6 +949,29 @@ void libgame_draw_dungeon_floor(gamestate* const g) {
     // at first we will do it generically then we will guarantee ordering
     //libgame_draw_dungeon_floor_entities(g);
     libgame_draw_dungeon_floor_entities_unsafe(g);
+}
+
+
+
+void libgame_draw_dungeon_floor_3d(gamestate* const g) {
+    if (!g) {
+        merror("libgame_draw_dungeon_floor: gamestate is NULL");
+        return;
+    }
+    if (g->dungeon_floor->height == -1 || g->dungeon_floor->width == -1) {
+        merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
+        return;
+    }
+
+    // draw dungeon floor tiles
+    //libgame_draw_dungeon_floor_tiles(g);
+    libgame_draw_dungeon_floor_tiles_3d_unsafe(g);
+
+    // draw entities per tile
+    // next, we want to draw the entities on the tiles
+    // at first we will do it generically then we will guarantee ordering
+    //libgame_draw_dungeon_floor_entities(g);
+    libgame_draw_dungeon_floor_entities_3d_unsafe(g);
 }
 
 
@@ -1030,8 +1076,8 @@ void libgame_draw_gameplayscene(gamestate* const g) {
     } else {
         BeginMode3D(g->cam3d);
         ClearBackground(BLACK);
-
-        libgame_draw_dungeon_floor_tiles_3d_unsafe(g);
+        libgame_draw_dungeon_floor_3d(g);
+        libgame_handle_fade(g);
 
         //libgame_draw_dungeon_floor(g);
         EndMode3D();
