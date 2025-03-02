@@ -525,11 +525,20 @@ void libgame_initwindow(gamestate* const g) {
         return;
     }
     const char* title = "evildojo666";
-    const int window_width = 800;
-    const int window_height = 480;
+
+    //const int window_width = 800;
+    //const int window_height = 480;
+    const int window_width = 1080;
+    const int window_height = 1920 / 2;
+
+
+    const int x = 1080;
+    const int y = 0;
+
     InitWindow(window_width, window_height, title);
     SetWindowMonitor(1);
-    SetWindowPosition(1920 * 2 - 800, 0);
+    //const int x = 1920 * 2 - 800;
+    SetWindowPosition(x, y);
     SetTargetFPS(DEFAULT_TARGET_FPS);
     SetExitKey(KEY_ESCAPE);
     //g->windowwidth = libgame_lua_get_gamestate_int(L, "WindowWidth"),
