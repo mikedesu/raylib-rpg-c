@@ -160,53 +160,86 @@ void libgame_handle_move(gamestate* const g,
                          const int x,
                          const int y) {
     //void libgame_handle_move_left(gamestate* const g, const entityid id) {
-    if (!g) {
+
+    if (g) {
+        entity_t* e = em_get(g->entitymap, id);
+
+        if (e) {
+
+            if (e->x < 0 || e->x >= g->dungeon_floor->width) {
+                merror(
+                    "libgame_handle_player_input_movement_key: e->x is out of "
+                    "bounds");
+            } else if (e->y < 0 || e->y >= g->dungeon_floor->height) {
+                merror(
+                    "libgame_handle_player_input_movement_key: e->y is out of "
+                    "bounds");
+            } else if (e->x + x < 0 || e->x + x >= g->dungeon_floor->width) {
+                merror("libgame_handle_player_input_movement_key: e->x+x is "
+                       "out of "
+                       "bounds");
+            } else if (e->y + y < 0 || e->y + y >= g->dungeon_floor->height) {
+                merror("libgame_handle_player_input_movement_key: e->y+y is "
+                       "out of "
+                       "bounds");
+            } else {
+                // whether or not the move is successful, we will do these
+                libgame_entity_set_anim(g, id, SPRITEGROUP_ANIM_HUMAN_WALK);
+                libgame_entity_update_context(
+                    g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
+
+                // this is only if the move is successful
+                // we will need to examine if there is an entity at the
+                // destination
+
+                bool entity_at_location = false;
+
+                // instead of iterating the entities,
+                // we should be able to grab the dungeon tile
+                // at the destination and check its entity list
+
+                dungeon_tile_t* dest_tile =
+                    dungeon_floor_tile_at(g->dungeon_floor, e->x + x, e->y + y);
+
+                if (dest_tile) {
+                    const size_t current_count =
+                        dungeon_tile_entity_count(dest_tile);
+
+                    // this is very basic to start with
+                    // eventually we will decide to move based on
+                    // the type of entities at the destination
+                    if (current_count == 0) {
+                        dungeon_floor_remove_at(
+                            g->dungeon_floor, id, e->x, e->y);
+                        dungeon_floor_add_at(
+                            g->dungeon_floor, id, e->x + x, e->y + y);
+
+                        spritegroup_t* sg = hashtable_entityid_spritegroup_get(
+                            g->spritegroups, id);
+                        sg->move.x = x * DEFAULT_TILE_SIZE;
+                        sg->move.y = y * DEFAULT_TILE_SIZE;
+
+                        // actually update the real entity
+                        e->x = e->x + x;
+                        e->y = e->y + y;
+                    } else {
+                        minfo("entity at location");
+                    }
+
+                } else {
+                    merror(
+                        "libgame_handle_player_input_movement_key: dest_tile "
+                        "is NULL");
+                }
+            }
+
+        } else {
+            merror("libgame_handle_player_input_movement_key: e is NULL");
+        }
+
+    } else {
         merror("libgame_handle_move: gamestate is NULL");
-        return;
     }
-
-    entity_t* e = em_get(g->entitymap, id);
-    if (e == NULL) {
-        merror("libgame_handle_player_input_movement_key: e is NULL");
-        return;
-    }
-
-    if (e->x < 0 || e->x >= g->dungeon_floor->width) {
-        merror(
-            "libgame_handle_player_input_movement_key: e->x is out of bounds");
-        return;
-    }
-
-    if (e->y < 0 || e->y >= g->dungeon_floor->height) {
-        merror(
-            "libgame_handle_player_input_movement_key: e->y is out of bounds");
-        return;
-    }
-
-    if (e->x + x < 0 || e->x + x >= g->dungeon_floor->width) {
-        merror("libgame_handle_player_input_movement_key: e->x+x is out of "
-               "bounds");
-        return;
-    }
-
-    if (e->y + y < 0 || e->y + y >= g->dungeon_floor->height) {
-        merror("libgame_handle_player_input_movement_key: e->y+y is out of "
-               "bounds");
-        return;
-    }
-
-    // whether or not the move is successful, we will do these
-    libgame_entity_set_anim(g, id, SPRITEGROUP_ANIM_HUMAN_WALK);
-    libgame_entity_update_context(
-        g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
-    dungeon_floor_remove_at(g->dungeon_floor, id, e->x, e->y);
-    dungeon_floor_add_at(g->dungeon_floor, id, e->x + x, e->y + y);
-
-    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    sg->move.x = x * DEFAULT_TILE_SIZE;
-    sg->move.y = y * DEFAULT_TILE_SIZE;
-    e->x = e->x + x;
-    e->y = e->y + y;
 }
 
 
@@ -293,19 +326,6 @@ void libgame_update_spritegroup_dest(gamestate* const g, const entityid id) {
         merror("libgame_update_spritegroup_dest: gamestate is NULL");
     }
 }
-
-
-//void libgame_update_all_entity_sg_dests(gamestate* const g) {
-//    if (!g) {
-//        merror("libgame_update_all_entity_sg_dests: gamestate is NULL");
-//        return;
-//    }
-//const int entity_count = libgame_lua_get_num_entities(L);
-//for (int i = 1; i <= entity_count; i++) {
-//    const entityid id = libgame_lua_get_nth_entity(L, i);
-//    libgame_update_spritegroup_dest(g, id);
-//}
-//}
 
 
 const int libgame_entity_update_context(gamestate* const g,

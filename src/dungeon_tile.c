@@ -25,12 +25,12 @@ void dungeon_tile_init(dungeon_tile_t* tile, const dungeon_tile_type_t type) {
 }
 
 
-
 const bool dungeon_tile_resize(dungeon_tile_t* tile) {
     size_t new_max = tile->entity_max * 2;
     size_t malloc_sz = sizeof(entityid) * new_max;
     if (malloc_sz > DUNGEON_TILE_MAX_ENTITIES_MAX) {
-        merror("dungeon_tile_resize: malloc_sz > DUNGEON_TILE_MAX_ENTITIES_MAX");
+        merror(
+            "dungeon_tile_resize: malloc_sz > DUNGEON_TILE_MAX_ENTITIES_MAX");
         return false;
     }
     if (tile) {
@@ -41,14 +41,14 @@ const bool dungeon_tile_resize(dungeon_tile_t* tile) {
             return false;
         }
         memset(new_entities, -1, malloc_sz);
-        memcpy(new_entities, tile->entities, sizeof(entityid) * tile->entity_max);
+        memcpy(
+            new_entities, tile->entities, sizeof(entityid) * tile->entity_max);
         free(tile->entities);
         tile->entities = new_entities;
         tile->entity_max = new_max;
     }
     return true;
 }
-
 
 
 const entityid dungeon_tile_add(dungeon_tile_t* tile, const entityid id) {
@@ -81,8 +81,6 @@ const entityid dungeon_tile_add(dungeon_tile_t* tile, const entityid id) {
 }
 
 
-
-
 const entityid dungeon_tile_remove(dungeon_tile_t* tile, const entityid id) {
     //void dungeon_tile_remove(dungeon_tile_t* tile, const entityid id) {
 
@@ -91,7 +89,9 @@ const entityid dungeon_tile_remove(dungeon_tile_t* tile, const entityid id) {
         if (tile->entities[i] == id) {
             tile->entities[i] = -1;
             // shift all elements to the left with memcpy
-            memcpy(&tile->entities[i], &tile->entities[i + 1], sizeof(entityid) * (tile->entity_max - i - 1));
+            memcpy(&tile->entities[i],
+                   &tile->entities[i + 1],
+                   sizeof(entityid) * (tile->entity_max - i - 1));
 
             //for (int j = i; j < tile->entity_max - 1; j++) {
             //    tile->entities[j] = tile->entities[j + 1];
@@ -112,7 +112,6 @@ const entityid dungeon_tile_remove(dungeon_tile_t* tile, const entityid id) {
 }
 
 
-
 dungeon_tile_t* dungeon_tile_create(const dungeon_tile_type_t type) {
     dungeon_tile_t* tile = (dungeon_tile_t*)malloc(sizeof(dungeon_tile_t));
     if (tile == NULL) {
@@ -123,11 +122,19 @@ dungeon_tile_t* dungeon_tile_create(const dungeon_tile_type_t type) {
 }
 
 
-
 void dungeon_tile_free(dungeon_tile_t* tile) {
     if (tile) {
         free(tile->entities);
         tile->entities = NULL;
         free(tile);
     }
+}
+
+
+const size_t dungeon_tile_entity_count(const dungeon_tile_t* tile) {
+    size_t count = 0;
+    if (tile) {
+        count = tile->entity_count;
+    }
+    return count;
 }
