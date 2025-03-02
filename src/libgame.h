@@ -40,7 +40,7 @@ const int libgame_entity_update_context(gamestate* const g,
                                         const entityid id,
                                         const specifier_t spec,
                                         const direction_t dir);
-const entityid libgame_create_entity(gamestate* const g, const char* name);
+//const entityid libgame_create_entity(gamestate* const g, const char* name);
 const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
 
 void libgame_create_spritegroup(gamestate* const g,
@@ -113,12 +113,12 @@ void libgame_update_hero_shield_spritegroup(gamestate* const g);
 void libgame_handle_test_enemy_placement(gamestate* const g);
 void libgame_test_enemy_placement(gamestate* const g);
 
-void libgame_create_entity_full(gamestate* const g,
-                                const int x,
-                                const int y,
-                                entitytype_t type,
-                                race_t race,
-                                const char* name);
+void libgame_create_entity(gamestate* const g,
+                           const int x,
+                           const int y,
+                           entitytype_t type,
+                           race_t race,
+                           const char* name);
 void libgame_init_datastructures(gamestate* const g);
 void libgame_init_spritegroups(gamestate* const g);
 void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g);

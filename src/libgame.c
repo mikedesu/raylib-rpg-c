@@ -1353,20 +1353,20 @@ void libgame_loadfont(gamestate* const g) {
 }
 
 
-const entityid libgame_create_entity(gamestate* const g, const char* name) {
-    entityid id = -1;
-    if (!g) {
-        merror("libgame_create_entity: gamestate is NULL");
-        return -1;
-    } else if (!name) {
-        merror("libgame_create_entity: name is NULL");
-        return -1;
-    } else if (strlen(name) == 0) {
-        merror("libgame_create_entity: name is empty");
-        return -1;
-    }
-    return id;
-}
+//const entityid libgame_create_entity(gamestate* const g, const char* name) {
+//    entityid id = -1;
+//    if (!g) {
+//        merror("libgame_create_entity: gamestate is NULL");
+//        return -1;
+//    } else if (!name) {
+//        merror("libgame_create_entity: name is NULL");
+//        return -1;
+//    } else if (strlen(name) == 0) {
+//        merror("libgame_create_entity: name is empty");
+//        return -1;
+//    }
+//    return id;
+//}
 
 
 //const entityid libgame_create_orc(gamestate* const g,
@@ -1407,8 +1407,10 @@ void libgame_init_entityids(gamestate* const g) {
 
 void libgame_initsharedsetup(gamestate* const g) {
     if (g) {
-        const int x = 5;
-        const int y = 5;
+        const int hero_x = 5;
+        const int hero_y = 5;
+        const int orc_x = 7;
+        const int orc_y = 7;
         const int c_offset_x = -100;
         libgame_initwindow(g);
         //InitAudioDevice();
@@ -1429,8 +1431,10 @@ void libgame_initsharedsetup(gamestate* const g) {
         g->cam2d.offset.y = g->targetheight / 4.0f;
         libgame_load_textures(g);
         libgame_init_datastructures(g);
-        libgame_create_entity_full(g, x, y, ENTITY_PLAYER, RACE_HUMAN, "hero");
-        //void libgame_create_hero(gamestate* const g, const int x, const int y, race_t race, const char* name) {
+        libgame_create_entity(
+            g, hero_x, hero_y, ENTITY_PLAYER, RACE_HUMAN, "hero");
+        // testing
+        libgame_create_entity(g, orc_x, orc_y, ENTITY_NPC, RACE_ORC, "orc-0");
         // these dont work right until the text buffer of the debugpanel is filled
         libgame_update_debug_panel_buffer(g);
         libgame_calc_debugpanel_size(g);
@@ -1503,13 +1507,13 @@ libgame_create_entity_checks(gamestate* const g, const int x, const int y) {
 
 
 // written by gpt-3.5-turbo on 3/1/2025
-void libgame_create_entity_full(gamestate* const g,
-                                const int x,
-                                const int y,
-                                entitytype_t type,
-                                race_t race,
-                                const char* name) {
-    minfo("libgame_create_entity_full");
+void libgame_create_entity(gamestate* const g,
+                           const int x,
+                           const int y,
+                           entitytype_t type,
+                           race_t race,
+                           const char* name) {
+    minfo("libgame_create_entity");
     if (g) {
         if (!libgame_create_entity_checks(g, x, y)) {
             merror("One or more checks failed in libgame_create_hero");
