@@ -630,67 +630,6 @@ void libgame_update_gamestate(gamestate* g) {
 }
 
 
-//const bool libgame_handle_sprite_update(gamestate* const g,
-//                                        const entityid actor_id,
-//                                        const actionresults_t actionresults_type,
-//                                        const int xdir,
-//                                        const int ydir) {
-//    // given the actor_id, grab the spritegroup and set the animation
-//    minfo("libgame_handle_sprite_update begin");
-//    printf("actor_id: %d\n", actor_id);
-//    printf("actionresults_type: %d\n", actionresults_type);
-//    printf("xdir = %d\n", xdir);
-//    printf("ydir = %d\n", ydir);
-//    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, actor_id);
-//    if (!sg) {
-//        merror("libgame_handle_sprite_update: spritegroup is NULL");
-//        return false;
-//    }
-//race_t actor_race = libgame_lua_get_entity_int(L, actor_id, "race");
-//int anim = -1;
-//if (actionresults_type == AR_MOVE_SUCCESS) {
-//    anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK
-//           : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK
-//                                    : -1;
-//    if (anim == -1) {
-//        merror("Race not set properly");
-//        fprintf(stderr, "Race: %d\n", actor_race);
-//    }
-//    libgame_entity_set_anim(g, actor_id, anim);
-//libgame_entity_anim_enqueue(g, actor_id, anim);
-//libgame_update_spritegroup_move(
-//    g, actor_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
-//    libgame_entity_update_context(g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
-//    return true;
-//} else if (actionresults_type == AR_ATTACK_SUCCESS) {
-//    anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_ATTACK
-//           : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_ATTACK
-//                                    : -1;
-//    if (anim == -1) {
-//        merror("Race not set properly");
-//        fprintf(stderr, "Race: %d\n", actor_race);
-//    }
-//    libgame_entity_set_anim(g, actor_id, anim);
-//libgame_entity_anim_enqueue(g, actor_id, anim);
-//    libgame_entity_update_context(g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
-//    return true;
-//} else if (actionresults_type == AR_WAS_DAMAGED) {
-//    anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_DMG
-//           : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_DMG
-//                                    : -1;
-//    if (anim == -1) {
-//        merror("Race not set properly");
-//        fprintf(stderr, "Race: %d\n", actor_race);
-//    }
-//    libgame_entity_set_anim(g, actor_id, anim);
-//libgame_entity_anim_enqueue(g, actor_id, anim);
-//    libgame_entity_update_context(g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
-//    return true;
-//}
-//    return false;
-//}
-
-
 void libgame_drawframeend(gamestate* const g) {
     if (!g) {
         merror("libgame_drawframeend: gamestate is NULL");
@@ -778,20 +717,20 @@ inline void libgame_draw_debug_panel(gamestate* const g) {
 }
 
 
-void libgame_drawgrid(gamestate* const g) {
-    if (!g) {
-        merror("libgame_drawgrid: gamestate is NULL");
-        return;
-    }
-    //const int len = libgame_lua_get_dungeonfloor_row_count(L);
-    //const int wid = libgame_lua_get_dungeonfloor_col_count(L);
-    //for (int i = 0; i <= len; i++) {
-    //    DrawLine(i * DEFAULT_TILE_SIZE, 0, i * DEFAULT_TILE_SIZE, wid * DEFAULT_TILE_SIZE, GREEN);
-    //}
-    //for (int i = 0; i <= wid; i++) {
-    //    DrawLine(0, i * DEFAULT_TILE_SIZE, len * DEFAULT_TILE_SIZE, i * DEFAULT_TILE_SIZE, GREEN);
-    //}
-}
+//void libgame_drawgrid(gamestate* const g) {
+//    if (!g) {
+//        merror("libgame_drawgrid: gamestate is NULL");
+//        return;
+//    }
+//const int len = libgame_lua_get_dungeonfloor_row_count(L);
+//const int wid = libgame_lua_get_dungeonfloor_col_count(L);
+//for (int i = 0; i <= len; i++) {
+//    DrawLine(i * DEFAULT_TILE_SIZE, 0, i * DEFAULT_TILE_SIZE, wid * DEFAULT_TILE_SIZE, GREEN);
+//}
+//for (int i = 0; i <= wid; i++) {
+//    DrawLine(0, i * DEFAULT_TILE_SIZE, len * DEFAULT_TILE_SIZE, i * DEFAULT_TILE_SIZE, GREEN);
+//}
+//}
 
 
 void libgame_draw_dungeon_floor_tiles(gamestate* const g) {
@@ -841,21 +780,16 @@ void libgame_draw_dungeon_floor_tiles_3d_unsafe(gamestate* const g) {
     const float w = 1.0f;
     const float h = 1.0f;
     const float d = 1.0f;
-
     const float x = -10.0f;
     const float y = 0.0f;
     const float z = 10.0f;
-
     //DrawCube((Vector3){10, 0, 0}, w, h, d, RED);
-
     Color floor_color = BROWN;
-
     for (int i = 0; i < g->dungeon_floor->height; i++) {
         for (int j = 0; j < g->dungeon_floor->width; j++) {
             DrawPlane((Vector3){j, 0, i}, (Vector2){w, d}, floor_color);
         }
     }
-
     //const dungeon_tile_type_t type = g->dungeon_floor->tiles[i][j].type;
     //const int key = get_txkey_for_tiletype(type);
     //if (key != -1) {
@@ -911,10 +845,7 @@ void libgame_draw_dungeon_floor_entities_3d_unsafe(gamestate* const g) {
             //if (tile && tile->entity_count > 0) {
             //minfo("tile entity loop");
             for (int k = 0; k < tile->entity_count; k++) {
-
                 DrawCube((Vector3){j, 0.5, i}, 1.0f, 1.0f, 1.0f, GREEN);
-
-
                 //libgame_draw_entity_shadow(g, tile->entities[k]);
                 //libgame_draw_entity(g, tile->entities[k]);
             }
@@ -1051,25 +982,24 @@ void libgame_draw_entity(gamestate* const g, const entityid id) {
 
 
 void libgame_draw_gameplayscene(gamestate* const g) {
-    if (!g) {
-        merror("libgame_draw_gameplayscene: gamestate is NULL");
-        return;
-    }
+    if (g) {
+        if (!g->is3d) {
+            BeginMode2D(g->cam2d);
+            ClearBackground(BLACK);
+            libgame_draw_dungeon_floor(g);
+            libgame_handle_fade(g);
+            EndMode2D();
+        } else {
+            BeginMode3D(g->cam3d);
+            ClearBackground(BLACK);
+            libgame_draw_dungeon_floor_3d(g);
+            libgame_handle_fade(g);
 
-    if (!g->is3d) {
-        BeginMode2D(g->cam2d);
-        ClearBackground(BLACK);
-        libgame_draw_dungeon_floor(g);
-        libgame_handle_fade(g);
-        EndMode2D();
+            //libgame_draw_dungeon_floor(g);
+            EndMode3D();
+        }
     } else {
-        BeginMode3D(g->cam3d);
-        ClearBackground(BLACK);
-        libgame_draw_dungeon_floor_3d(g);
-        libgame_handle_fade(g);
-
-        //libgame_draw_dungeon_floor(g);
-        EndMode3D();
+        merror("libgame_draw_gameplayscene: gamestate is NULL");
     }
 }
 
