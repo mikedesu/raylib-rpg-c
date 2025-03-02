@@ -45,11 +45,7 @@ entityid next_entity_id = 0;
 
 
 void libgame_draw_fade(const gamestate* const g) {
-    if (!g) {
-        merror("libgame_draw_fade: gamestate is NULL");
-        return;
-    }
-    if (g->fadealpha > 0) {
+    if (g && g->fadealpha > 0) {
         DrawRectangle(0,
                       0,
                       GetScreenWidth(),
@@ -58,69 +54,96 @@ void libgame_draw_fade(const gamestate* const g) {
     }
 }
 
+//void libgame_draw_fade(const gamestate* const g) {
+//    if (!g) {
+//        merror("libgame_draw_fade: gamestate is NULL");
+//        return;
+//    }
+//    if (g->fadealpha > 0) {
+//        DrawRectangle(0,
+//                      0,
+//                      GetScreenWidth(),
+//                      GetScreenHeight(),
+//                      (Color){0, 0, 0, g->fadealpha});
+//    }
+//}
+
 
 void libgame_handle_fade(gamestate* const g) {
-    if (!g) {
+    if (g) {
+        const int speed = 4;
+        // modify the fadealpha
+        int a = g->fadealpha;
+        fadestate_t fs = g->fadestate;
+        g->fadealpha += fs == FADESTATEOUT && a < 255 ? speed
+                        : fs == FADESTATEIN && a > 0  ? -speed
+                                                      : 0;
+        // have to update a
+        a = g->fadealpha;
+        // handle scene rotation based on fadealpha
+        bool fmax = a >= 255;
+        bool fmin = a <= 0;
+        g->fadealpha = fmax ? 255 : fmin ? 0 : a;
+        g->fadestate = fmax ? FADESTATEIN : fmin ? FADESTATENONE : fs;
+        if (a >= 255) {
+            activescene = activescene + 1 > 2 ? 0 : activescene + 1;
+        }
+        libgame_draw_fade(g);
+    } else {
         merror("libgame_handle_fade: gamestate is NULL");
-        return;
     }
-    const int fadespeed = 4;
-    // modify the fadealpha
-    g->fadealpha +=
-        g->fadestate == FADESTATEOUT && g->fadealpha < 255 ? fadespeed
-        : g->fadestate == FADESTATEIN && g->fadealpha > 0  ? -fadespeed
-                                                           : 0;
-    // handle scene rotation based on fadealpha
-    if (g->fadealpha >= 255) {
-        g->fadealpha = 255, g->fadestate = FADESTATEIN;
-        activescene = activescene + 1 > 2 ? 0 : activescene + 1;
-    }
-    // halt fade if fadealpha is 0
-    if (g->fadealpha <= 0) {
-        g->fadealpha = 0, g->fadestate = FADESTATENONE;
-    }
-    libgame_draw_fade(g);
 }
 
 
 const bool libgame_entity_set_anim(gamestate* const g,
                                    const entityid id,
                                    const int index) {
-    if (!g) {
+
+    bool retval = false;
+    if (g) {
+        retval = spritegroup_set_current(
+            hashtable_entityid_spritegroup_get(g->spritegroups, id), index);
+    } else {
         merror("libgame_entity_set_anim: gamestate is NULL");
-        return false;
     }
-#ifdef DEBUG
-    char buf[1024];
-    bzero(buf, 1024);
-    snprintf(
-        buf, 1024, "libgame_entity_anim_set: id: %d, index: %d", id, index);
-    minfo(buf);
-#endif
-    return spritegroup_set_current(
-        hashtable_entityid_spritegroup_get(g->spritegroups, id), index);
+    return retval;
 }
 
 
 const int libgame_get_x_from_dir(const direction_t dir) {
-    return dir == DIRECTION_RIGHT || dir == DIRECTION_DOWN_RIGHT ||
-                   dir == DIRECTION_UP_RIGHT
-               ? 1
-           : dir == DIRECTION_LEFT || dir == DIRECTION_DOWN_LEFT ||
-                   dir == DIRECTION_UP_LEFT
-               ? -1
-               : 0;
+    const bool right = dir == DIRECTION_RIGHT;
+    const bool down_right = dir == DIRECTION_DOWN_RIGHT;
+    const bool up_right = dir == DIRECTION_UP_RIGHT;
+    const bool left = dir == DIRECTION_LEFT;
+    const bool down_left = dir == DIRECTION_DOWN_LEFT;
+    const bool up_left = dir == DIRECTION_UP_LEFT;
+
+    return right || down_right || up_right ? 1
+           : left || down_left || up_left  ? -1
+                                           : 0;
 }
 
 
 const int libgame_get_y_from_dir(const direction_t dir) {
-    return dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT ||
-                   dir == DIRECTION_DOWN_RIGHT
-               ? 1
-           : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT ||
-                   dir == DIRECTION_UP_RIGHT
-               ? -1
-               : 0;
+    const bool down = dir == DIRECTION_DOWN;
+    const bool down_right = dir == DIRECTION_DOWN_RIGHT;
+    const bool down_left = dir == DIRECTION_DOWN_LEFT;
+    const bool up = dir == DIRECTION_UP;
+    const bool up_right = dir == DIRECTION_UP_RIGHT;
+    const bool up_left = dir == DIRECTION_UP_LEFT;
+
+    return down || down_right || down_left ? 1
+           : up || up_right || up_left     ? -1
+                                           : 0;
+
+
+    //return dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT ||
+    //               dir == DIRECTION_DOWN_RIGHT
+    //           ? 1
+    //       : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT ||
+    //               dir == DIRECTION_UP_RIGHT
+    //           ? -1
+    //           : 0;
 }
 
 
@@ -159,13 +182,9 @@ void libgame_handle_move(gamestate* const g,
                          const entityid id,
                          const int x,
                          const int y) {
-    //void libgame_handle_move_left(gamestate* const g, const entityid id) {
-
     if (g) {
         entity_t* e = em_get(g->entitymap, id);
-
         if (e) {
-
             if (e->x < 0 || e->x >= g->dungeon_floor->width) {
                 merror(
                     "libgame_handle_player_input_movement_key: e->x is out of "
@@ -188,16 +207,11 @@ void libgame_handle_move(gamestate* const g,
                 libgame_entity_update_context(
                     g, id, SPECIFIER_NONE, libgame_get_dir_from_xy(x, y));
 
-                // this is only if the move is successful
                 // we will need to examine if there is an entity at the
                 // destination
 
-                bool entity_at_location = false;
-
-                // instead of iterating the entities,
-                // we should be able to grab the dungeon tile
-                // at the destination and check its entity list
-
+                // first we have to check if the tile exists
+                // if it is outside the dungeon bounds it will return NULL
                 dungeon_tile_t* dest_tile =
                     dungeon_floor_tile_at(g->dungeon_floor, e->x + x, e->y + y);
 
@@ -209,19 +223,32 @@ void libgame_handle_move(gamestate* const g,
                     // eventually we will decide to move based on
                     // the type of entities at the destination
                     if (current_count == 0) {
+                        // at this point, we've confirmed the move and are
+                        // ready to move the entity
+
+                        // first, we have to remove the entity from the tile
+                        // temporarily
                         dungeon_floor_remove_at(
                             g->dungeon_floor, id, e->x, e->y);
-                        dungeon_floor_add_at(
-                            g->dungeon_floor, id, e->x + x, e->y + y);
+
+                        // next, we
+                        // actually update the real entity's x/y
+                        e->x = e->x + x;
+                        e->y = e->y + y;
+
+                        // we re-add the entity at its new location
+                        dungeon_floor_add_at(g->dungeon_floor, id, e->x, e->y);
 
                         spritegroup_t* sg = hashtable_entityid_spritegroup_get(
                             g->spritegroups, id);
-                        sg->move.x = x * DEFAULT_TILE_SIZE;
-                        sg->move.y = y * DEFAULT_TILE_SIZE;
-
-                        // actually update the real entity
-                        e->x = e->x + x;
-                        e->y = e->y + y;
+                        // we SHOULD have a spritegroup but still need to check
+                        if (sg) {
+                            sg->move.x = x * DEFAULT_TILE_SIZE;
+                            sg->move.y = y * DEFAULT_TILE_SIZE;
+                        } else {
+                            merror("libgame_handle_player_input_movement_key: "
+                                   "spritegroup is NULL");
+                        }
                     } else {
                         minfo("entity at location");
                     }
@@ -244,79 +271,93 @@ void libgame_handle_move(gamestate* const g,
 
 
 void libgame_handle_input(gamestate* const g) {
-    if (!g) {
-        merror("libgame_handleinput: gamestate is NULL");
-        return;
-    }
-    //if (IsKeyPressed(KEY_SPACE) || GetTouchPointCount() > 0) {
-    //    minfo("key space pressed");
-    //    if (g->fadestate == FADESTATENONE) {
-    //        g->fadestate = FADESTATEOUT;
-    //    }
-    //}
-    //if (IsKeyPressed(KEY_E)) {
-    //    libgame_test_enemy_placement(g);
-    //}
-    if (IsKeyPressed(KEY_C)) {
-        //    minfo("KEY_C");
-        if (g->controlmode == CONTROLMODE_PLAYER) {
-            g->controlmode = CONTROLMODE_CAMERA;
-        } else if (g->controlmode == CONTROLMODE_CAMERA) {
-            g->controlmode = CONTROLMODE_PLAYER;
-        }
-        //g->controlmode = CONTROLMODE_CAMERA;
-    }
-    if (IsKeyPressed(KEY_D)) {
-        g->debugpanelon = !g->debugpanelon;
-    }
-    if (IsKeyPressed(KEY_G)) {
-        g->gridon = !g->gridon;
-    }
-    if (IsKeyPressed(KEY_W)) {
-        g->is3d = !g->is3d;
-    }
-
-    if (g->controlmode == CONTROLMODE_PLAYER) {
-        if (IsKeyPressed(KEY_LEFT)) {
-            minfo("KEY_LEFT");
-            libgame_handle_move(g, g->hero_id, -1, 0);
-            g->player_input_received = true;
-        } else if (IsKeyPressed(KEY_RIGHT)) {
-            minfo("KEY_RIGHT");
-            libgame_handle_move(g, g->hero_id, 1, 0);
-            g->player_input_received = true;
-        } else if (IsKeyPressed(KEY_UP)) {
-            minfo("KEY_UP");
-            libgame_handle_move(g, g->hero_id, 0, -1);
-            g->player_input_received = true;
-        } else if (IsKeyPressed(KEY_DOWN)) {
-            minfo("KEY_DOWN");
-            libgame_handle_move(g, g->hero_id, 0, 1);
-            g->player_input_received = true;
-        } else if (IsKeyPressed(KEY_A)) {
-            minfo("KEY_A");
-            const entityid hero_id = g->hero_id;
-            libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
-            g->player_input_received = true;
-        } else if (IsKeyPressed(KEY_PERIOD)) {
-            minfo("KEY_PERIOD");
-            g->player_input_received = true;
-        } else if (IsKeyPressed(KEY_E)) {
-            minfo("KEY_E");
-            // get the hero's x and y
-            entity_t* hero = em_get(g->entitymap, g->hero_id);
-            if (hero) {
-                const int hero_x = hero->x;
-                const int hero_y = hero->y;
-                const int orc_x = hero_x + 1;
-                const int orc_y = hero_y;
-                libgame_create_npc_orc(g, orc_x, orc_y);
-            } else {
-                merror("hero is NULL");
+    if (g) {
+        //if (IsKeyPressed(KEY_SPACE) || GetTouchPointCount() > 0) {
+        //    minfo("key space pressed");
+        //    if (g->fadestate == FADESTATENONE) {
+        //        g->fadestate = FADESTATEOUT;
+        //    }
+        //}
+        //if (IsKeyPressed(KEY_E)) {
+        //    libgame_test_enemy_placement(g);
+        //}
+        // flip between player and camera control
+        if (IsKeyPressed(KEY_C)) {
+            if (g->controlmode == CONTROLMODE_PLAYER) {
+                g->controlmode = CONTROLMODE_CAMERA;
+            } else if (g->controlmode == CONTROLMODE_CAMERA) {
+                g->controlmode = CONTROLMODE_PLAYER;
             }
         }
-    } else if (g->controlmode == CONTROLMODE_CAMERA) {
-        libgame_handle_caminput(g);
+        if (IsKeyPressed(KEY_D)) {
+            g->debugpanelon = !g->debugpanelon;
+        }
+        if (IsKeyPressed(KEY_G)) {
+            g->gridon = !g->gridon;
+        }
+        if (IsKeyPressed(KEY_W)) {
+            g->is3d = !g->is3d;
+        }
+        if (g->controlmode == CONTROLMODE_PLAYER) {
+            if (IsKeyPressed(KEY_LEFT)) {
+                minfo("KEY_LEFT");
+                libgame_handle_move(g, g->hero_id, -1, 0);
+                g->player_input_received = true;
+            } else if (IsKeyPressed(KEY_RIGHT)) {
+                minfo("KEY_RIGHT");
+                libgame_handle_move(g, g->hero_id, 1, 0);
+                g->player_input_received = true;
+            } else if (IsKeyPressed(KEY_UP)) {
+                minfo("KEY_UP");
+                libgame_handle_move(g, g->hero_id, 0, -1);
+                g->player_input_received = true;
+            } else if (IsKeyPressed(KEY_DOWN)) {
+                minfo("KEY_DOWN");
+                libgame_handle_move(g, g->hero_id, 0, 1);
+                g->player_input_received = true;
+            } else if (IsKeyPressed(KEY_A)) {
+                minfo("KEY_A");
+                const entityid hero_id = g->hero_id;
+                libgame_entity_set_anim(
+                    g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+                g->player_input_received = true;
+            } else if (IsKeyPressed(KEY_PERIOD)) {
+                minfo("KEY_PERIOD");
+                g->player_input_received = true;
+            } else if (IsKeyPressed(KEY_E)) {
+                minfo("KEY_E");
+                libgame_create_npc_orc_test(g);
+                // get the hero's x and y
+                //entity_t* hero = em_get(g->entitymap, g->hero_id);
+                //if (hero) {
+                //    const int hero_x = hero->x;
+                //    const int hero_y = hero->y;
+                //    const int orc_x = hero_x + 1;
+                //    const int orc_y = hero_y;
+                //    libgame_create_npc_orc(g, orc_x, orc_y);
+                //} else {
+                //    merror("hero is NULL");
+                //}
+            }
+        } else if (g->controlmode == CONTROLMODE_CAMERA) {
+            libgame_handle_caminput(g);
+        }
+    } else {
+        merror("libgame_handleinput: gamestate is NULL");
+    }
+}
+
+
+void libgame_create_npc_orc_test(gamestate* const g) {
+    if (g) {
+        const entity_t* const h = em_get(g->entitymap, g->hero_id);
+        if (h) {
+            libgame_create_npc_orc(g, h->x + 1, h->y);
+        } else {
+            merror("h is NULL");
+        }
+    } else {
+        merror("libgame_create_npc_orc_test: g is NULL");
     }
 }
 
@@ -414,59 +455,62 @@ const char* libgame_get_str_from_dir(const direction_t dir) {
 }
 
 
-void libgame_handle_caminput(gamestate* const g) {
-    if (!g) {
-        return;
-    }
-
+void libgame_handle_caminput_zoom(gamestate* const g) {
     const bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
     const float zoom_incr = 1.00f;
-    const float cam_move_incr = 4.00f;
     if (IsKeyPressed(KEY_Z) && shift && g->cam2d.zoom >= 2.0f) {
         g->cam2d.zoom -= zoom_incr;
     } else if (IsKeyPressed(KEY_Z)) {
         g->cam2d.zoom += zoom_incr;
     }
-    if (IsKeyDown(KEY_UP)) {
-        g->cam2d.offset.y += cam_move_incr;
-    } else if (IsKeyDown(KEY_DOWN)) {
-        g->cam2d.offset.y -= cam_move_incr;
-    } else if (IsKeyDown(KEY_LEFT)) {
-        g->cam2d.offset.x += cam_move_incr;
-    } else if (IsKeyDown(KEY_RIGHT)) {
-        g->cam2d.offset.x -= cam_move_incr;
-    } else if (IsKeyDown(KEY_KP_5)) {
-        g->cam2d.offset = (Vector2){0, 0};
-    } else if (IsKeyDown(KEY_KP_2)) {
-        g->cam2d.offset.y += cam_move_incr;
-    } else if (IsKeyDown(KEY_KP_4)) {
-        g->cam2d.offset.x -= cam_move_incr;
-    } else if (IsKeyDown(KEY_KP_6)) {
-        g->cam2d.offset.x += cam_move_incr;
-    } else if (IsKeyDown(KEY_KP_8)) {
-        g->cam2d.offset.y -= cam_move_incr;
-    } else if (IsKeyDown(KEY_KP_0)) {
-        g->cam2d.zoom = 2.0f;
-    } else if (IsKeyPressed(KEY_R)) {
-        g->cam2d.offset = (Vector2){0, 0};
-    } else if (IsKeyPressed(KEY_F)) {
-        g->cam_lockon = !g->cam_lockon;
-    } else if (IsKeyDown(KEY_KP_1)) {
-        g->cam2d.offset.x -= cam_move_incr;
-        g->cam2d.offset.y += cam_move_incr;
-    } else if (IsKeyDown(KEY_KP_3)) {
-        g->cam2d.offset.x += cam_move_incr;
-        g->cam2d.offset.y += cam_move_incr;
-    } else if (IsKeyDown(KEY_KP_7)) {
-        g->cam2d.offset.x -= cam_move_incr;
-        g->cam2d.offset.y -= cam_move_incr;
-    } else if (IsKeyDown(KEY_KP_9)) {
-        g->cam2d.offset.x += cam_move_incr;
-        g->cam2d.offset.y -= cam_move_incr;
+}
+
+
+void libgame_handle_caminput(gamestate* const g) {
+    if (g) {
+        const float move = 4.00f;
+
+        libgame_handle_caminput_zoom(g);
+
+        if (IsKeyDown(KEY_UP)) {
+            g->cam2d.offset.y += move;
+        } else if (IsKeyDown(KEY_DOWN)) {
+            g->cam2d.offset.y -= move;
+        } else if (IsKeyDown(KEY_LEFT)) {
+            g->cam2d.offset.x += move;
+        } else if (IsKeyDown(KEY_RIGHT)) {
+            g->cam2d.offset.x -= move;
+        } else if (IsKeyDown(KEY_KP_5)) {
+            g->cam2d.offset = zero_vec;
+        } else if (IsKeyDown(KEY_KP_2)) {
+            g->cam2d.offset.y += move;
+        } else if (IsKeyDown(KEY_KP_4)) {
+            g->cam2d.offset.x -= move;
+        } else if (IsKeyDown(KEY_KP_6)) {
+            g->cam2d.offset.x += move;
+        } else if (IsKeyDown(KEY_KP_8)) {
+            g->cam2d.offset.y -= move;
+        } else if (IsKeyDown(KEY_KP_0)) {
+            // reset zoom
+            g->cam2d.zoom = 2.0f;
+        } else if (IsKeyPressed(KEY_R)) {
+            g->cam2d.offset = zero_vec;
+        } else if (IsKeyPressed(KEY_F)) {
+            g->cam_lockon = !g->cam_lockon;
+        } else if (IsKeyDown(KEY_KP_1)) {
+            g->cam2d.offset.x -= move;
+            g->cam2d.offset.y += move;
+        } else if (IsKeyDown(KEY_KP_3)) {
+            g->cam2d.offset.x += move;
+            g->cam2d.offset.y += move;
+        } else if (IsKeyDown(KEY_KP_7)) {
+            g->cam2d.offset.x -= move;
+            g->cam2d.offset.y -= move;
+        } else if (IsKeyDown(KEY_KP_9)) {
+            g->cam2d.offset.x += move;
+            g->cam2d.offset.y -= move;
+        }
     }
-    //else if (IsKeyDown(KEY_C)) {
-    //    g->controlmode = CONTROLMODE_PLAYER;
-    //}
 }
 
 
