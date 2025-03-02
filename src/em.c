@@ -40,6 +40,7 @@ void em_free(em_t* em) {
 
 // returns the first item in the set which will be the oldest
 entity_t* em_get(em_t* em, const entityid id) {
+    if (id == -1) return NULL;
     const int hash = id % EM_MAX_SLOTS;
     return em->entities[hash];
 }

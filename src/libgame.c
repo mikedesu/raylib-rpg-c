@@ -477,26 +477,27 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
     }
     entityid id = g->hero_id;
     entity* hero = em_get(g->entitymap, id);
-    const int entity_count = em_count(g->entitymap);
-
+    int entity_count = 0;
+    char* hero_name = "none";
+    int hx = -1;
+    int hy = -1;
+    if (hero) {
+        entity_count = em_count(g->entitymap);
+        hero_name = hero->name;
+        hx = hero->x;
+        hy = hero->y;
+    }
     const int camera_zoom = (int)g->cam2d.zoom;
-
     const int dw = g->dungeon_floor->width;
     const int dh = g->dungeon_floor->height;
-
-    const char* hero_name = hero->name;
-
     const bool is3d = g->is3d;
-
     const int cam2dx = (int)g->cam2d.target.x;
     const int cam2dy = (int)g->cam2d.target.y;
     const int cam2dox = (int)g->cam2d.offset.x;
     const int cam2doy = (int)g->cam2d.offset.y;
-
     const float cam3dx = g->cam3d.position.x;
     const float cam3dy = g->cam3d.position.y;
     const float cam3dz = g->cam3d.position.z;
-
     const float cam3dtx = g->cam3d.target.x;
     const float cam3dty = g->cam3d.target.y;
     const float cam3dtz = g->cam3d.target.z;
@@ -529,8 +530,8 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              dw,
              dh,
              hero_name,
-             hero->x,
-             hero->y,
+             hx,
+             hy,
              entity_count);
 }
 
@@ -583,13 +584,12 @@ void libgame_reset_entity_anim(gamestate* const g, entityid id) {
 
 
 void libgame_reset_entities_anim(gamestate* const g) {
-    if (!g) {
+    if (g) {
+        for (int i = 0; i < em_count(g->entitymap); i++) {
+            libgame_reset_entity_anim(g, i);
+        }
+    } else if (!g) {
         merror("libgame_reset_entities_anim: gamestate is NULL");
-        return;
-    }
-
-    for (int i = 0; i < em_count(g->entitymap); i++) {
-        libgame_reset_entity_anim(g, i);
     }
 }
 
@@ -598,98 +598,99 @@ void libgame_reset_entities_anim(gamestate* const g) {
 
 void libgame_update_gamestate(gamestate* g) {
     //minfo("libgame_update_gamestate begin");
-    if (!g) {
-        merror("libgame_update_gamestate: gamestate is NULL");
-        return;
-    }
-    //UpdateMusicStream(test_music);
-    libgame_update_debug_panel_buffer(g);
-    //setdebugpanelcenter(g);
-    libgame_reset_entities_anim(g);
-    libgame_do_camera_lock_on(g);
-    for (int i = 0; i < em_count(g->entitymap); i++) {
-        entity* e = em_get(g->entitymap, i);
-        if (!e) {
-            merror("libgame_update_gamestate: entity is NULL");
-            continue;
+    if (g) {
+        //UpdateMusicStream(test_music);
+        libgame_update_debug_panel_buffer(g);
+        //setdebugpanelcenter(g);
+        libgame_reset_entities_anim(g);
+        libgame_do_camera_lock_on(g);
+        for (int i = 0; i < em_count(g->entitymap); i++) {
+            entity* e = em_get(g->entitymap, i);
+            if (!e) {
+                merror("libgame_update_gamestate: entity is NULL");
+                continue;
+            }
+            libgame_update_smoothmove(g, e->id);
         }
-        libgame_update_smoothmove(g, e->id);
+        // at this point, we can take other NPC turns
+        // lets iterate over our entities, find the NPCs, and make them move in a random direction
+        // then, we will update their smooth moves
+        // we will need to eventually disable player input during smooth moving
+        // update smooth move for NPCs and other entities
+        //libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
+        //minfo("test");
+        if (g->player_input_received) {
+            g->player_input_received = false;
+        }
+    } else if (!g) {
+        merror("libgame_update_gamestate: gamestate is NULL");
     }
-    // at this point, we can take other NPC turns
-    // lets iterate over our entities, find the NPCs, and make them move in a random direction
-    // then, we will update their smooth moves
-    // we will need to eventually disable player input during smooth moving
-    // update smooth move for NPCs and other entities
-    //libgame_update_smoothmoves_for_entitytype(g, ENTITY_NPC);
-    //minfo("test");
-    if (g->player_input_received) {
-        g->player_input_received = false;
-    }
+
     //minfo("libgame_update_gamestate end");
 }
 
 
 
 
-const bool libgame_handle_sprite_update(gamestate* const g,
-                                        const entityid actor_id,
-                                        const actionresults_t actionresults_type,
-                                        const int xdir,
-                                        const int ydir) {
-    // given the actor_id, grab the spritegroup and set the animation
-    minfo("libgame_handle_sprite_update begin");
-    printf("actor_id: %d\n", actor_id);
-    printf("actionresults_type: %d\n", actionresults_type);
-    printf("xdir = %d\n", xdir);
-    printf("ydir = %d\n", ydir);
-    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, actor_id);
-    if (!sg) {
-        merror("libgame_handle_sprite_update: spritegroup is NULL");
-        return false;
-    }
-    //race_t actor_race = libgame_lua_get_entity_int(L, actor_id, "race");
-    //int anim = -1;
-    //if (actionresults_type == AR_MOVE_SUCCESS) {
-    //    anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK
-    //           : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK
-    //                                    : -1;
-    //    if (anim == -1) {
-    //        merror("Race not set properly");
-    //        fprintf(stderr, "Race: %d\n", actor_race);
-    //    }
-    //    libgame_entity_set_anim(g, actor_id, anim);
-    //libgame_entity_anim_enqueue(g, actor_id, anim);
-    //libgame_update_spritegroup_move(
-    //    g, actor_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
-    //    libgame_entity_update_context(g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
-    //    return true;
-    //} else if (actionresults_type == AR_ATTACK_SUCCESS) {
-    //    anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_ATTACK
-    //           : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_ATTACK
-    //                                    : -1;
-    //    if (anim == -1) {
-    //        merror("Race not set properly");
-    //        fprintf(stderr, "Race: %d\n", actor_race);
-    //    }
-    //    libgame_entity_set_anim(g, actor_id, anim);
-    //libgame_entity_anim_enqueue(g, actor_id, anim);
-    //    libgame_entity_update_context(g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
-    //    return true;
-    //} else if (actionresults_type == AR_WAS_DAMAGED) {
-    //    anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_DMG
-    //           : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_DMG
-    //                                    : -1;
-    //    if (anim == -1) {
-    //        merror("Race not set properly");
-    //        fprintf(stderr, "Race: %d\n", actor_race);
-    //    }
-    //    libgame_entity_set_anim(g, actor_id, anim);
-    //libgame_entity_anim_enqueue(g, actor_id, anim);
-    //    libgame_entity_update_context(g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
-    //    return true;
-    //}
-    return false;
-}
+//const bool libgame_handle_sprite_update(gamestate* const g,
+//                                        const entityid actor_id,
+//                                        const actionresults_t actionresults_type,
+//                                        const int xdir,
+//                                        const int ydir) {
+//    // given the actor_id, grab the spritegroup and set the animation
+//    minfo("libgame_handle_sprite_update begin");
+//    printf("actor_id: %d\n", actor_id);
+//    printf("actionresults_type: %d\n", actionresults_type);
+//    printf("xdir = %d\n", xdir);
+//    printf("ydir = %d\n", ydir);
+//    spritegroup_t* sg = hashtable_entityid_spritegroup_get(g->spritegroups, actor_id);
+//    if (!sg) {
+//        merror("libgame_handle_sprite_update: spritegroup is NULL");
+//        return false;
+//    }
+//race_t actor_race = libgame_lua_get_entity_int(L, actor_id, "race");
+//int anim = -1;
+//if (actionresults_type == AR_MOVE_SUCCESS) {
+//    anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_WALK
+//           : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_WALK
+//                                    : -1;
+//    if (anim == -1) {
+//        merror("Race not set properly");
+//        fprintf(stderr, "Race: %d\n", actor_race);
+//    }
+//    libgame_entity_set_anim(g, actor_id, anim);
+//libgame_entity_anim_enqueue(g, actor_id, anim);
+//libgame_update_spritegroup_move(
+//    g, actor_id, xdir * DEFAULT_TILE_SIZE, ydir * DEFAULT_TILE_SIZE);
+//    libgame_entity_update_context(g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
+//    return true;
+//} else if (actionresults_type == AR_ATTACK_SUCCESS) {
+//    anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_ATTACK
+//           : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_ATTACK
+//                                    : -1;
+//    if (anim == -1) {
+//        merror("Race not set properly");
+//        fprintf(stderr, "Race: %d\n", actor_race);
+//    }
+//    libgame_entity_set_anim(g, actor_id, anim);
+//libgame_entity_anim_enqueue(g, actor_id, anim);
+//    libgame_entity_update_context(g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
+//    return true;
+//} else if (actionresults_type == AR_WAS_DAMAGED) {
+//    anim = actor_race == RACE_HUMAN ? SPRITEGROUP_ANIM_HUMAN_DMG
+//           : actor_race == RACE_ORC ? SPRITEGROUP_ANIM_ORC_DMG
+//                                    : -1;
+//    if (anim == -1) {
+//        merror("Race not set properly");
+//        fprintf(stderr, "Race: %d\n", actor_race);
+//    }
+//    libgame_entity_set_anim(g, actor_id, anim);
+//libgame_entity_anim_enqueue(g, actor_id, anim);
+//    libgame_entity_update_context(g, actor_id, SPECIFIER_NONE, libgame_get_dir_from_xy(xdir, ydir));
+//    return true;
+//}
+//    return false;
+//}
 
 
 
@@ -1452,115 +1453,102 @@ void libgame_init_entityids(gamestate* const g) {
 
 
 void libgame_initsharedsetup(gamestate* const g) {
-    if (!g) {
+    if (g) {
+        const int x = 5;
+        const int y = 5;
+        const int c_offset_x = -100;
+        libgame_initwindow(g);
+        //InitAudioDevice();
+        //SetAudioStreamBufferSizeDefault(2048);
+        //test_music = LoadMusicStream("./evildojo.mp3");
+        //PlayMusicStream(test_music);
+        SetRandomSeed(time(NULL));
+        g->font = LoadFontEx(DEFAULT_FONT_PATH, 60, 0, 255);
+        g->targetwidth = 1280;
+        g->targetheight = 720;
+        target = LoadRenderTexture(g->targetwidth, g->targetheight);
+        target_src = (Rectangle){0, 0, g->targetwidth, -g->targetheight};
+        target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
+        SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+        // update the gamestate display values
+        // can get this from init.lua....
+        g->cam2d.offset.x = g->targetwidth / 2.0f + c_offset_x;
+        g->cam2d.offset.y = g->targetheight / 4.0f;
+        libgame_load_textures(g);
+        libgame_init_datastructures(g);
+        libgame_create_entity_full(g, x, y, ENTITY_PLAYER, RACE_HUMAN, "hero");
+        //void libgame_create_hero(gamestate* const g, const int x, const int y, race_t race, const char* name) {
+        // these dont work right until the text buffer of the debugpanel is filled
+        libgame_update_debug_panel_buffer(g);
+        libgame_calc_debugpanel_size(g);
+        //setdebugpanelbottomleft(g);
+        setdebugpaneltopleft(g);
+    } else {
         merror("libgame_initsharedsetup: gamestate is NULL");
-        return;
     }
-    libgame_initwindow(g);
-    //InitAudioDevice();
-    //SetAudioStreamBufferSizeDefault(2048);
-    //test_music = LoadMusicStream("./evildojo.mp3");
-    //PlayMusicStream(test_music);
-    SetRandomSeed(time(NULL));
-    g->font = LoadFontEx(DEFAULT_FONT_PATH, 60, 0, 255);
-    g->targetwidth = 1280;
-    g->targetheight = 720;
-    target = LoadRenderTexture(g->targetwidth, g->targetheight);
-    target_src = (Rectangle){0, 0, g->targetwidth, -g->targetheight};
-    target_dest = (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()};
-    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
-
-    // update the gamestate display values
-    // can get this from init.lua....
-    const int c_offset_x = -100;
-    g->cam2d.offset.x = g->targetwidth / 2.0f + c_offset_x;
-    g->cam2d.offset.y = g->targetheight / 4.0f;
-    libgame_load_textures(g);
-
-    libgame_init_datastructures(g);
-
-    //libgame_create_hero(g, 0, 0);
-    libgame_create_entity_full(g, 0, 0, ENTITY_PLAYER, RACE_HUMAN, "hero");
-    //void libgame_create_hero(gamestate* const g, const int x, const int y, race_t race, const char* name) {
-
-    // these dont work right until the text buffer of the debugpanel is filled
-    libgame_update_debug_panel_buffer(g);
-    libgame_calc_debugpanel_size(g);
-    //setdebugpanelbottomleft(g);
-    setdebugpaneltopleft(g);
 }
 
 
 
 
 void libgame_init_spritegroups(gamestate* const g) {
-    if (!g) {
+    if (g) {
+        g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
+        msuccess("libgame_init_spritegroups");
+    } else {
         merror("libgame_init_datastructures: gamestate NULL");
-        return;
     }
-
-    g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
-    msuccess("libgame_init_spritegroups");
 }
 
 
 
 
 void libgame_init_datastructures(gamestate* const g) {
-    if (!g) {
+    if (g) {
+        libgame_init_spritegroups(g);
+        // init the entitymap
+        g->entitymap = em_new();
+        // init the entities array
+        libgame_init_entityids(g);
+        g->dungeon_floor = dungeon_floor_create(20, 20);
+        dungeon_floor_init(g->dungeon_floor);
+    } else {
         merror("libgame_init_datastructures: gamestate is NULL");
-        return;
     }
-    libgame_init_spritegroups(g);
-
-    // init the entitymap
-    g->entitymap = em_new();
-    // init the entities array
-    libgame_init_entityids(g);
-    g->dungeon_floor = dungeon_floor_create(20, 20);
-    dungeon_floor_init(g->dungeon_floor);
 }
 
 
 
 
 const bool libgame_create_entity_checks(gamestate* const g, const int x, const int y) {
-    if (!g) {
+    bool retval = false;
+    if (g) {
+        if (x < 0 || x >= g->dungeon_floor->width) {
+            merror("libgame_create_hero: x is out of bounds");
+            retval = false;
+        } else if (y < 0 || y >= g->dungeon_floor->height) {
+            merror("libgame_create_hero: y is out of bounds");
+            retval = false;
+        } else if (g->entitymap == NULL) {
+            merror("libgame_create_hero: entitymap is NULL");
+            retval = false;
+        } else if (g->dungeon_floor == NULL) {
+            merror("libgame_create_hero: dungeon_floor is NULL");
+            retval = false;
+        } else if (g->spritegroups == NULL) {
+            merror("libgame_create_hero: spritegroups is NULL");
+            retval = false;
+        } else if (g->index_entityids >= g->max_entityids) {
+            merror("libgame_create_hero: index_entityids is greater than or equal to max_entityids");
+            retval = false;
+        } else {
+            retval = true;
+        }
+    } else {
         merror("libgame_create_hero: gamestate is NULL");
-        return false;
+        retval = false;
     }
-
-    if (x < 0 || x >= g->dungeon_floor->width) {
-        merror("libgame_create_hero: x is out of bounds");
-        return false;
-    }
-
-    if (y < 0 || y >= g->dungeon_floor->height) {
-        merror("libgame_create_hero: y is out of bounds");
-        return false;
-    }
-
-    if (g->entitymap == NULL) {
-        merror("libgame_create_hero: entitymap is NULL");
-        return false;
-    }
-
-    if (g->dungeon_floor == NULL) {
-        merror("libgame_create_hero: dungeon_floor is NULL");
-        return false;
-    }
-
-    if (g->spritegroups == NULL) {
-        merror("libgame_create_hero: spritegroups is NULL");
-        return false;
-    }
-
-    if (g->index_entityids >= g->max_entityids) {
-        merror("libgame_create_hero: index_entityids is greater than or equal to max_entityids");
-        return false;
-    }
-
-    return true;
+    return retval;
 }
 
 
@@ -1569,6 +1557,7 @@ const bool libgame_create_entity_checks(gamestate* const g, const int x, const i
 // written by gpt-3.5-turbo on 3/1/2025
 void libgame_create_entity_full(
     gamestate* const g, const int x, const int y, entitytype_t type, race_t race, const char* name) {
+    minfo("libgame_create_entity_full");
     if (!libgame_create_entity_checks(g, x, y)) {
         merror("One or more checks failed in libgame_create_hero");
         return;
@@ -1590,44 +1579,49 @@ void libgame_create_entity_full(
     dungeon_floor_add_at(g->dungeon_floor, e->id, x, y);
 
     // based on the NPC's race
-    set_race_specific_parameters(e);
+    libgame_set_race_specific_parameters(e);
 }
 
 
 
 
 // written by gpt-3.5-turbo on 3/1/2025
-void set_race_specific_parameters(entity* e) {
+void libgame_set_race_specific_parameters(entity* e) {
     // set race-specific parameters
-    int* keys = NULL;
-    int num_keys = 0;
-    int default_anim = 0;
+    if (e) {
 
-    switch (e->race) {
-    case RACE_HUMAN:
-        keys = TX_HUMAN_KEYS;
-        num_keys = TX_HUMAN_KEY_COUNT;
-        default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
-        break;
-    case RACE_ORC:
-        keys = TX_ORC_KEYS;
-        num_keys = TX_ORC_KEY_COUNT;
-        default_anim = SPRITEGROUP_ANIM_ORC_IDLE;
-        break;
-    // add more cases for additional races as needed
-    default:
-        merror("Unknown race encountered!");
-        return;
+        int* keys = NULL;
+        int num_keys = 0;
+        int default_anim = 0;
+
+        switch (e->race) {
+        case RACE_HUMAN:
+            keys = TX_HUMAN_KEYS;
+            num_keys = TX_HUMAN_KEY_COUNT;
+            default_anim = SPRITEGROUP_ANIM_HUMAN_IDLE;
+            break;
+        case RACE_ORC:
+            keys = TX_ORC_KEYS;
+            num_keys = TX_ORC_KEY_COUNT;
+            default_anim = SPRITEGROUP_ANIM_ORC_IDLE;
+            break;
+        // add more cases for additional races as needed
+        default:
+            merror("Unknown race encountered!");
+            return;
+        }
+
+        const int off_x = -12;
+        const int off_y = -12;
+
+        // create the spritegroup for the entity
+        libgame_create_spritegroup(g, e->id, keys, num_keys, off_x, off_y, SPECIFIER_NONE);
+
+        // set the default animation
+        libgame_set_default_anim_for_id(g, e->id, default_anim);
+    } else {
+        merror("libgame_set_race_specific_parameters: entity is NULL");
     }
-
-    const int off_x = -12;
-    const int off_y = -12;
-
-    // create the spritegroup for the entity
-    libgame_create_spritegroup(g, e->id, keys, num_keys, off_x, off_y, SPECIFIER_NONE);
-
-    // set the default animation
-    libgame_set_default_anim_for_id(g, e->id, default_anim);
 }
 
 
