@@ -42,7 +42,7 @@
 #38 1 1  0  img/tiles/stone_11.png
 #39 1 1  0  img/tiles/stone_12.png
 #40 1 1  0  img/tiles/stone_13.png
-#41 1 1  0  img/tiles/stonewall_00.png
+41 1 1  0  img/tiles/stonewall_00.png
 #42 1 1  0  img/tiles/stonewall_01.png
 #43 1 1  0  img/tiles/stonewall_02.png
 #44 1 1  0  img/tiles/stonewall_03.png

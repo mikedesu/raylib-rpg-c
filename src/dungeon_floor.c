@@ -43,7 +43,13 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
     for (int i = 0; i < floor->height; i++) {
         for (int j = 0; j < floor->width; j++) {
             dungeon_tile_t* current = &floor->tiles[i][j];
-            dungeon_tile_init(current, DUNGEON_TILE_TYPE_FLOOR_DIRT);
+            // set the perimeter to stone walls
+            if (i == 0 || i == floor->height - 1 || j == 0 ||
+                j == floor->width - 1) {
+                dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL);
+            } else {
+                dungeon_tile_init(current, DUNGEON_TILE_TYPE_FLOOR_DIRT);
+            }
         }
     }
 }

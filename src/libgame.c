@@ -31,7 +31,7 @@
 //------------------------------------------------------------------
 // libgame global variables
 //------------------------------------------------------------------
-const Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
+Rectangle tile_src = {0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
 const Vector2 zero_vec = {0, 0};
 const Vector2 target_origin = {0, 0};
 
@@ -216,41 +216,58 @@ void libgame_handle_move(gamestate* const g,
                     dungeon_floor_tile_at(g->dungeon_floor, e->x + x, e->y + y);
 
                 if (dest_tile) {
-                    const size_t current_count =
-                        dungeon_tile_entity_count(dest_tile);
 
-                    // this is very basic to start with
-                    // eventually we will decide to move based on
-                    // the type of entities at the destination
-                    if (current_count == 0) {
-                        // at this point, we've confirmed the move and are
-                        // ready to move the entity
+                    // we have to check the tile type
+                    // we cannot move into things like walls etc
 
-                        // first, we have to remove the entity from the tile
-                        // temporarily
-                        dungeon_floor_remove_at(
-                            g->dungeon_floor, id, e->x, e->y);
+                    dungeon_tile_type_t dest_type = dest_tile->type;
 
-                        // next, we
-                        // actually update the real entity's x/y
-                        e->x = e->x + x;
-                        e->y = e->y + y;
+                    bool can_move_to_tile = false;
 
-                        // we re-add the entity at its new location
-                        dungeon_floor_add_at(g->dungeon_floor, id, e->x, e->y);
+                    can_move_to_tile =
+                        dest_type != DUNGEON_TILE_TYPE_STONE_WALL;
 
-                        spritegroup_t* sg = hashtable_entityid_spritegroup_get(
-                            g->spritegroups, id);
-                        // we SHOULD have a spritegroup but still need to check
-                        if (sg) {
-                            sg->move.x = x * DEFAULT_TILE_SIZE;
-                            sg->move.y = y * DEFAULT_TILE_SIZE;
+                    if (can_move_to_tile) {
+
+                        const size_t current_count =
+                            dungeon_tile_entity_count(dest_tile);
+
+                        // this is very basic to start with
+                        // eventually we will decide to move based on
+                        // the type of entities at the destination
+                        if (current_count == 0) {
+                            // at this point, we've confirmed the move and are
+                            // ready to move the entity
+
+                            // first, we have to remove the entity from the tile
+                            // temporarily
+                            dungeon_floor_remove_at(
+                                g->dungeon_floor, id, e->x, e->y);
+
+                            // next, we
+                            // actually update the real entity's x/y
+                            e->x = e->x + x;
+                            e->y = e->y + y;
+
+                            // we re-add the entity at its new location
+                            dungeon_floor_add_at(
+                                g->dungeon_floor, id, e->x, e->y);
+
+                            spritegroup_t* sg =
+                                hashtable_entityid_spritegroup_get(
+                                    g->spritegroups, id);
+                            // we SHOULD have a spritegroup but still need to check
+                            if (sg) {
+                                sg->move.x = x * DEFAULT_TILE_SIZE;
+                                sg->move.y = y * DEFAULT_TILE_SIZE;
+                            } else {
+                                merror(
+                                    "libgame_handle_player_input_movement_key: "
+                                    "spritegroup is NULL");
+                            }
                         } else {
-                            merror("libgame_handle_player_input_movement_key: "
-                                   "spritegroup is NULL");
+                            minfo("entity at location");
                         }
-                    } else {
-                        minfo("entity at location");
                     }
 
                 } else {
@@ -829,12 +846,37 @@ void libgame_draw_dungeon_floor_tiles(gamestate* const g) {
                 if (key != -1) {
                     tile_dest.x = j * DEFAULT_TILE_SIZE;
                     tile_dest.y = i * DEFAULT_TILE_SIZE;
+
+                    // we need to adjust the size of the dest tile
+                    // if the tile type requires it
+                    // for example: dirt tiles are 8x8
+                    // while stone wall tiles are 8x16
+
+                    if (type == DUNGEON_TILE_TYPE_STONE_WALL) {
+                        //tile_src.width = DEFAULT_TILE_SIZE;
+                        tile_src.height = DEFAULT_TILE_SIZE * 2;
+
+                        //tile_dest.width = DEFAULT_TILE_SIZE;
+                        tile_dest.height = DEFAULT_TILE_SIZE * 2;
+                        //tile_dest.y -= DEFAULT_TILE_SIZE;
+                    } else {
+
+                        //tile_src.width = DEFAULT_TILE_SIZE;
+                        tile_src.height = DEFAULT_TILE_SIZE;
+
+                        //tile_dest.width = DEFAULT_TILE_SIZE;
+                        tile_dest.height = DEFAULT_TILE_SIZE;
+                    }
+
                     DrawTexturePro(g->txinfo[key].texture,
                                    tile_src,
                                    tile_dest,
                                    zero_vec,
                                    0,
                                    WHITE);
+
+                    // draw a red rect around the tile
+                    DrawRectangleLinesEx(tile_dest, DEFAULT_TILE_SIZE, RED);
                 }
             }
         }
@@ -850,12 +892,47 @@ void libgame_draw_dungeon_floor_tiles_unsafe(gamestate* const g) {
             if (key != -1) {
                 tile_dest.x = j * DEFAULT_TILE_SIZE;
                 tile_dest.y = i * DEFAULT_TILE_SIZE;
+
+                if (type == DUNGEON_TILE_TYPE_STONE_WALL) {
+                    //tile_src.width = DEFAULT_TILE_SIZE;
+                    tile_src.height = DEFAULT_TILE_SIZE * 2;
+
+                    //tile_dest.width = DEFAULT_TILE_SIZE;
+                    tile_dest.height = DEFAULT_TILE_SIZE * 2;
+                    tile_dest.y -= DEFAULT_TILE_SIZE;
+                } else {
+
+                    //tile_src.width = DEFAULT_TILE_SIZE;
+                    tile_src.height = DEFAULT_TILE_SIZE;
+
+                    //tile_dest.width = DEFAULT_TILE_SIZE;
+                    tile_dest.height = DEFAULT_TILE_SIZE;
+                }
+
                 DrawTexturePro(g->txinfo[key].texture,
                                tile_src,
                                tile_dest,
                                zero_vec,
                                0,
                                WHITE);
+
+                if (g->debugpanelon) {
+
+                    Vector2 tile_pos[4] = {
+                        (Vector2){tile_dest.x, tile_dest.y},
+                        (Vector2){tile_dest.x + DEFAULT_TILE_SIZE, tile_dest.y},
+                        (Vector2){tile_dest.x + DEFAULT_TILE_SIZE,
+                                  tile_dest.y + DEFAULT_TILE_SIZE},
+                        (Vector2){tile_dest.x,
+                                  tile_dest.y + DEFAULT_TILE_SIZE}};
+
+                    DrawLineEx(tile_pos[0], tile_pos[1], 1.0f, RED);
+                    DrawLineEx(tile_pos[1], tile_pos[2], 1.0f, RED);
+                    DrawLineEx(tile_pos[2], tile_pos[3], 1.0f, RED);
+                    DrawLineEx(tile_pos[3], tile_pos[0], 1.0f, RED);
+
+                    //DrawRectangleLinesEx(tile_dest, DEFAULT_TILE_SIZE, RED);
+                }
             }
         }
     }
@@ -1373,10 +1450,10 @@ void libgame_init_entityids(gamestate* const g) {
 
 void libgame_initsharedsetup(gamestate* const g) {
     if (g) {
-        const int hero_x = 5;
-        const int hero_y = 5;
-        const int orc_x = 7;
-        const int orc_y = 7;
+        const int hero_x = 4;
+        const int hero_y = 4;
+        const int orc_x = 5;
+        const int orc_y = 5;
         const int c_offset_x = -100;
         libgame_initwindow(g);
         //InitAudioDevice();
@@ -1475,7 +1552,18 @@ libgame_create_entity_checks(gamestate* const g, const int x, const int y) {
                    "equal to max_entityids");
             retval = false;
         } else {
-            retval = true;
+
+            // we have to check the tile type of the tile at x y
+            // in order to see if an entity can exist on that tile
+            // ex: we cant create entities on top of walls etc
+            dungeon_tile_t* tile = &g->dungeon_floor->tiles[y][x];
+            if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL) {
+                merror(
+                    "libgame_create_hero: entity cannot be created on a wall");
+                retval = false;
+            } else {
+                retval = true;
+            }
         }
     } else {
         merror("libgame_create_hero: gamestate is NULL");
