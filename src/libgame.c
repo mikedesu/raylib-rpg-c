@@ -301,6 +301,19 @@ void libgame_handle_input(gamestate* const g) {
         } else if (IsKeyPressed(KEY_PERIOD)) {
             minfo("KEY_PERIOD");
             g->player_input_received = true;
+        } else if (IsKeyPressed(KEY_E)) {
+            minfo("KEY_E");
+            // get the hero's x and y
+            entity_t* hero = em_get(g->entitymap, g->hero_id);
+            if (hero) {
+                const int hero_x = hero->x;
+                const int hero_y = hero->y;
+                const int orc_x = hero_x + 1;
+                const int orc_y = hero_y;
+                libgame_create_npc_orc(g, orc_x, orc_y);
+            } else {
+                merror("hero is NULL");
+            }
         }
     } else if (g->controlmode == CONTROLMODE_CAMERA) {
         libgame_handle_caminput(g);
@@ -861,86 +874,76 @@ void libgame_draw_dungeon_floor_entities_3d_unsafe(gamestate* const g) {
     for (int i = 0; i < g->dungeon_floor->height; i++) {
         for (int j = 0; j < g->dungeon_floor->width; j++) {
             dungeon_tile_t* tile = &g->dungeon_floor->tiles[i][j];
-            //if (tile && tile->entity_count > 0) {
-            //if (tile && tile->entity_count > 0) {
-            //minfo("tile entity loop");
             for (int k = 0; k < tile->entity_count; k++) {
-                DrawCube((Vector3){j, 0.5, i}, 1.0f, 1.0f, 1.0f, GREEN);
-                //libgame_draw_entity_shadow(g, tile->entities[k]);
-                //libgame_draw_entity(g, tile->entities[k]);
+                const entity_t* e = em_get(g->entitymap, tile->entities[k]);
+                if (e) {
+                    Color c = GREEN;
+                    if (e->type == ENTITY_NPC) {
+                        c = RED;
+                    } else if (e->type == ENTITY_PLAYER) {
+                        c = GREEN;
+                    }
+                    DrawCube((Vector3){j, 0.5, i}, 1.0f, 1.0f, 1.0f, c);
+                }
             }
-            //}
         }
     }
 }
 
 
 void libgame_draw_dungeon_floor(gamestate* const g) {
-    if (!g) {
+    if (g) {
+        if (g->dungeon_floor->height == -1 || g->dungeon_floor->width == -1) {
+            merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
+        } else {
+            libgame_draw_dungeon_floor_tiles_unsafe(g);
+            libgame_draw_dungeon_floor_entities_unsafe(g);
+        }
+    } else {
         merror("libgame_draw_dungeon_floor: gamestate is NULL");
-        return;
     }
-    if (g->dungeon_floor->height == -1 || g->dungeon_floor->width == -1) {
-        merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
-        return;
-    }
-
-    // draw dungeon floor tiles
-    //libgame_draw_dungeon_floor_tiles(g);
-    libgame_draw_dungeon_floor_tiles_unsafe(g);
-
-    // draw entities per tile
-    // next, we want to draw the entities on the tiles
-    // at first we will do it generically then we will guarantee ordering
-    //libgame_draw_dungeon_floor_entities(g);
-    libgame_draw_dungeon_floor_entities_unsafe(g);
 }
 
 
 void libgame_draw_dungeon_floor_3d(gamestate* const g) {
-    if (!g) {
+    if (g) {
+        if (g->dungeon_floor->height == -1 || g->dungeon_floor->width == -1) {
+            merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
+        } else {
+            libgame_draw_dungeon_floor_tiles_3d_unsafe(g);
+            libgame_draw_dungeon_floor_entities_3d_unsafe(g);
+        }
+    } else {
         merror("libgame_draw_dungeon_floor: gamestate is NULL");
-        return;
     }
-    if (g->dungeon_floor->height == -1 || g->dungeon_floor->width == -1) {
-        merror("libgame_draw_dungeonfloor: row_count or col_count is -1");
-        return;
-    }
-
-    // draw dungeon floor tiles
-    //libgame_draw_dungeon_floor_tiles(g);
-    libgame_draw_dungeon_floor_tiles_3d_unsafe(g);
-
-    // draw entities per tile
-    // next, we want to draw the entities on the tiles
-    // at first we will do it generically then we will guarantee ordering
-    //libgame_draw_dungeon_floor_entities(g);
-    libgame_draw_dungeon_floor_entities_3d_unsafe(g);
 }
 
 
 void libgame_draw_entity_shadow(gamestate* const g, const entityid id) {
-    if (!g) {
+    if (g) {
+        if (id == -1) {
+            merror("libgame_draw_entity_shadow: id is -1");
+        } else {
+            spritegroup_t* grp =
+                hashtable_entityid_spritegroup_get(g->spritegroups, id);
+            if (grp) {
+                // draw entity shadow, which should exist at current+1
+                // if loaded correctly
+                // we need to check for the pointer at current+1 to be non-NULL
+                const sprite* const s = grp->sprites[grp->current + 1];
+                if (s) {
+                    DrawTexturePro(
+                        *s->texture, s->src, grp->dest, zero_vec, 0.0f, WHITE);
+                } else {
+                    merror("libgame_draw_entity_shadow: s is NULL");
+                }
+            } else {
+                merror("libgame_draw_entity_shadow: grp is NULL");
+            }
+        }
+    } else {
         merror("libgame_draw_entity_shadow: gamestate is NULL");
-        return;
     }
-    if (id == -1) {
-        merror("libgame_draw_entity_shadow: id is -1");
-        return;
-    }
-    spritegroup_t* group =
-        hashtable_entityid_spritegroup_get(g->spritegroups, id);
-    if (!group) {
-        merror("libgame_draw_entity_shadow: group is NULL");
-        return;
-    }
-    // draw entity shadow, which should exist at current+1 if loaded correctly
-    DrawTexturePro(*group->sprites[group->current + 1]->texture,
-                   group->sprites[group->current + 1]->src,
-                   group->dest,
-                   (Vector2){0, 0},
-                   0.0f,
-                   WHITE);
 }
 
 
@@ -1303,46 +1306,6 @@ void libgame_loadfont(gamestate* const g) {
 }
 
 
-//const entityid libgame_create_entity(gamestate* const g, const char* name) {
-//    entityid id = -1;
-//    if (!g) {
-//        merror("libgame_create_entity: gamestate is NULL");
-//        return -1;
-//    } else if (!name) {
-//        merror("libgame_create_entity: name is NULL");
-//        return -1;
-//    } else if (strlen(name) == 0) {
-//        merror("libgame_create_entity: name is empty");
-//        return -1;
-//    }
-//    return id;
-//}
-
-
-//const entityid libgame_create_orc(gamestate* const g,
-//                                  const char* name,
-//                                  const int x,
-//                                  const int y) {
-//    if (!g) {
-//        merror("libgame_create_orc: gamestate is NULL");
-//        return -1;
-//    }
-//    if (!name) {
-//        merror("libgame_create_orc: name is NULL");
-//        return -1;
-//    }
-//    if (x < 0) {
-//        merror("libgame_create_orc: x is less than 0");
-//        return -1;
-//    }
-//    if (y < 0) {
-//        merror("libgame_create_orc: y is less than 0");
-//        return -1;
-//    }
-//    return -1;
-//}
-
-
 void libgame_init_entityids(gamestate* const g) {
     g->entityids = (entityid*)malloc(sizeof(entityid) * EM_MAX_SLOTS);
     if (!g->entityids) {
@@ -1384,7 +1347,11 @@ void libgame_initsharedsetup(gamestate* const g) {
         libgame_create_entity(
             g, hero_x, hero_y, ENTITY_PLAYER, RACE_HUMAN, "hero");
         // testing
-        libgame_create_entity(g, orc_x, orc_y, ENTITY_NPC, RACE_ORC, "orc-0");
+
+        libgame_create_npc_orc(g, orc_x, orc_y);
+
+
+        //libgame_create_entity(g, orc_x, orc_y, ENTITY_NPC, RACE_ORC, "orc-0");
         // these dont work right until the text buffer of the debugpanel is filled
         libgame_update_debug_panel_buffer(g);
         libgame_calc_debugpanel_size(g);
@@ -1392,6 +1359,15 @@ void libgame_initsharedsetup(gamestate* const g) {
         setdebugpaneltopleft(g);
     } else {
         merror("libgame_initsharedsetup: gamestate is NULL");
+    }
+}
+
+
+void libgame_create_npc_orc(gamestate* const g, const int x, const int y) {
+    if (g) {
+        libgame_create_entity(g, x, y, ENTITY_NPC, RACE_ORC, "orc-0");
+    } else {
+        merror("libgame_create_npc_orc: gamestate is NULL");
     }
 }
 
