@@ -947,21 +947,19 @@ void libgame_draw_dungeon_floor_tiles_3d_unsafe(gamestate* const g) {
     const float y = 0.0f;
     const float z = 10.0f;
     //DrawCube((Vector3){10, 0, 0}, w, h, d, RED);
-    Color floor_color = BROWN;
+    Color color = BROWN;
     for (int i = 0; i < g->dungeon_floor->height; i++) {
         for (int j = 0; j < g->dungeon_floor->width; j++) {
-            DrawPlane((Vector3){j, 0, i}, (Vector2){w, d}, floor_color);
+            dungeon_tile_type_t tiletype = g->dungeon_floor->tiles[i][j].type;
+            if (tiletype == DUNGEON_TILE_TYPE_STONE_WALL) {
+                color = DARKGRAY;
+                DrawCube((Vector3){j, 0.5, i}, w, h * 2, d, color);
+            } else {
+                color = BROWN;
+                DrawPlane((Vector3){j, 0, i}, (Vector2){w, d}, color);
+            }
         }
     }
-    //const dungeon_tile_type_t type = g->dungeon_floor->tiles[i][j].type;
-    //const int key = get_txkey_for_tiletype(type);
-    //if (key != -1) {
-    //    tile_dest.x = j * DEFAULT_TILE_SIZE;
-    //    tile_dest.y = i * DEFAULT_TILE_SIZE;
-    //    DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
-    //}
-    //    }
-    //}
 }
 
 
