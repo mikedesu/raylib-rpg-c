@@ -159,7 +159,10 @@ const bool libgame_handle_sprite_update(gamestate* const g,
                                         const int xdir,
                                         const int ydir);
 
-void libgame_create_hero(gamestate* const g, const int x, const int y);
+//void libgame_create_hero(gamestate* const g, const int x, const int y);
+//void libgame_create_hero(gamestate* const g, const int x, const int y, race_t race, const char* name);
+void libgame_create_entity_full(
+    gamestate* const g, const int x, const int y, entitytype_t type, race_t race, const char* name);
 
 void libgame_init_datastructures(gamestate* const g);
 
@@ -188,3 +191,4 @@ const bool libgame_create_entity_checks(gamestate* const g, const int x, const i
 //bool libgame_assign_entity_position(gamestate* const g, const entityid id, const int x, const int y);
 //const int libgame_get_entity_pos_x(gamestate const* g, const entityid id);
 //const int libgame_get_entity_pos_y(gamestate const* g, const entityid id);
+void set_race_specific_parameters(entity* e);
