@@ -1,4 +1,5 @@
 #include "gamestate.h"
+#include "controlmode.h"
 #include "dungeon_floor.h"
 #include "libgame_defines.h"
 #include "mprint.h"
@@ -51,16 +52,14 @@ gamestate* gamestateinitptr() {
     g->cam3d.fovy = 45.0f;
     g->cam3d.projection = CAMERA_PERSPECTIVE;
 
-
-
     g->camera_mode = CAMERA_FREE;
-
-
 
     g->is3d = false;
 
     g->fadealpha = 0.0f;
+
     g->controlmode = CONTROLMODE_PLAYER;
+
     g->fadestate = FADESTATENONE;
     g->spritegroups = NULL;
     g->hero_id = -1;

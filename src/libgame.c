@@ -242,7 +242,13 @@ void libgame_handle_input(gamestate* const g) {
     //    libgame_test_enemy_placement(g);
     //}
     if (IsKeyPressed(KEY_C)) {
-        g->controlmode = g->controlmode == CONTROLMODE_CAMERA ? CONTROLMODE_PLAYER : CONTROLMODE_CAMERA;
+        //    minfo("KEY_C");
+        if (g->controlmode == CONTROLMODE_PLAYER) {
+            g->controlmode = CONTROLMODE_CAMERA;
+        } else if (g->controlmode == CONTROLMODE_CAMERA) {
+            g->controlmode = CONTROLMODE_PLAYER;
+        }
+        //g->controlmode = CONTROLMODE_CAMERA;
     }
     if (IsKeyPressed(KEY_D)) {
         g->debugpanelon = !g->debugpanelon;
@@ -253,6 +259,7 @@ void libgame_handle_input(gamestate* const g) {
     if (IsKeyPressed(KEY_W)) {
         g->is3d = !g->is3d;
     }
+
     if (g->controlmode == CONTROLMODE_PLAYER) {
         if (IsKeyPressed(KEY_LEFT)) {
             minfo("KEY_LEFT");
@@ -272,7 +279,8 @@ void libgame_handle_input(gamestate* const g) {
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_A)) {
             minfo("KEY_A");
-            //libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+            const entityid hero_id = g->hero_id;
+            libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
             g->player_input_received = true;
         } else if (IsKeyPressed(KEY_PERIOD)) {
             minfo("KEY_PERIOD");
@@ -431,6 +439,9 @@ void libgame_handle_caminput(gamestate* const g) {
         g->cam2d.offset.x += cam_move_incr;
         g->cam2d.offset.y -= cam_move_incr;
     }
+    //else if (IsKeyDown(KEY_C)) {
+    //    g->controlmode = CONTROLMODE_PLAYER;
+    //}
 }
 
 
@@ -501,6 +512,7 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
     const float cam3dtx = g->cam3d.target.x;
     const float cam3dty = g->cam3d.target.y;
     const float cam3dtz = g->cam3d.target.z;
+    const controlmode_t controlmode = g->controlmode;
 
     snprintf(g->debugpanel.buffer,
              1024,
@@ -513,7 +525,8 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              "Dungeon Size: %dx%d\n"
              "Hero.name: %s\n"
              "Hero.pos: %d, %d\n"
-             "EntityCount: %d\n",
+             "EntityCount: %d\n"
+             "ControlMode: %d\n",
              is3d,
              g->framecount,
              cam2dx,
@@ -532,7 +545,8 @@ void libgame_update_debug_panel_buffer(gamestate* const g) {
              hero_name,
              hx,
              hy,
-             entity_count);
+             entity_count,
+             controlmode);
 }
 
 
@@ -1590,11 +1604,9 @@ void libgame_create_entity_full(
 void libgame_set_race_specific_parameters(entity* e) {
     // set race-specific parameters
     if (e) {
-
         int* keys = NULL;
         int num_keys = 0;
         int default_anim = 0;
-
         switch (e->race) {
         case RACE_HUMAN:
             keys = TX_HUMAN_KEYS;
@@ -1611,14 +1623,9 @@ void libgame_set_race_specific_parameters(entity* e) {
             merror("Unknown race encountered!");
             return;
         }
-
         const int off_x = -12;
         const int off_y = -12;
-
-        // create the spritegroup for the entity
         libgame_create_spritegroup(g, e->id, keys, num_keys, off_x, off_y, SPECIFIER_NONE);
-
-        // set the default animation
         libgame_set_default_anim_for_id(g, e->id, default_anim);
     } else {
         merror("libgame_set_race_specific_parameters: entity is NULL");
@@ -1647,31 +1654,32 @@ void libgame_closesavegamestate() {
 
 
 void libgame_close(gamestate* g) {
-    if (!g) {
+    if (g) {
+        libgame_closeshared(g);
+        gamestatefree(g);
+    } else {
         merror("libgame_close: gamestate is NULL");
-        return;
     }
-    libgame_closeshared(g);
-    gamestatefree(g);
 }
 
 
 
 
 void libgame_closeshared(gamestate* const g) {
-    if (!g) {
+
+    if (g) {
+        // dont need to free most of gamestate
+        minfo("libgame_closeshared");
+        //UnloadMusicStream(test_music);
+        //CloseAudioDevice();
+        UnloadFont(g->font);
+        libgame_unloadtextures(g);
+        UnloadRenderTexture(target);
+        CloseWindow();
+        msuccess("libgame_closeshared end");
+    } else {
         merror("libgame_closeshared: gamestate is NULL");
-        return;
     }
-    // dont need to free most of gamestate
-    minfo("libgame_closeshared");
-    //UnloadMusicStream(test_music);
-    //CloseAudioDevice();
-    UnloadFont(g->font);
-    libgame_unloadtextures(g);
-    UnloadRenderTexture(target);
-    CloseWindow();
-    msuccess("libgame_closeshared end");
 }
 
 
