@@ -1490,13 +1490,17 @@ void libgame_initsharedsetup(gamestate* const g) {
 
 
 
+
 void libgame_init_spritegroups(gamestate* const g) {
     if (!g) {
-        merror("libgame_init_datastructures: gamestate is NULL");
+        merror("libgame_init_datastructures: gamestate NULL");
         return;
     }
+
     g->spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE);
+    msuccess("libgame_init_spritegroups");
 }
+
 
 
 
