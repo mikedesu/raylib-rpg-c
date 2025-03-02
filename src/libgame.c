@@ -1558,28 +1558,29 @@ const bool libgame_create_entity_checks(gamestate* const g, const int x, const i
 void libgame_create_entity_full(
     gamestate* const g, const int x, const int y, entitytype_t type, race_t race, const char* name) {
     minfo("libgame_create_entity_full");
-    if (!libgame_create_entity_checks(g, x, y)) {
-        merror("One or more checks failed in libgame_create_hero");
-        return;
+    if (g) {
+        if (!libgame_create_entity_checks(g, x, y)) {
+            merror("One or more checks failed in libgame_create_hero");
+        } else {
+            entity* e = entity_new_at(next_entity_id++, type, x, y);
+            if (!e) {
+                merror("libgame_create_hero: could not create hero entity");
+            } else {
+                entity_set_name(e, name);
+                entity_set_race(e, race);
+                em_add(g->entitymap, e);
+                if (type == ENTITY_PLAYER) {
+                    g->hero_id = e->id;
+                }
+                gamestate_add_entityid(g, e->id);
+                dungeon_floor_add_at(g->dungeon_floor, e->id, x, y);
+                // based on the NPC's race
+                libgame_set_race_specific_parameters(e);
+            }
+        }
+    } else {
+        merror("libgame_create_hero: gamestate is NULL");
     }
-
-    entity* e = entity_new_at(next_entity_id++, type, x, y);
-    if (!e) {
-        merror("libgame_create_hero: could not create hero entity");
-        return;
-    }
-
-    entity_set_name(e, name);
-    entity_set_race(e, race);
-
-    em_add(g->entitymap, e);
-    g->hero_id = e->id;
-    gamestate_add_entityid(g, e->id);
-
-    dungeon_floor_add_at(g->dungeon_floor, e->id, x, y);
-
-    // based on the NPC's race
-    libgame_set_race_specific_parameters(e);
 }
 
 
