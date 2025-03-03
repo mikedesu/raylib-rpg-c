@@ -6,54 +6,58 @@
 
 dungeon_floor_t* dungeon_floor_create(int width, int height) {
     dungeon_floor_t* floor = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
-    if (floor == NULL) {
+    if (floor) {
+        dungeon_floor_init(floor);
+    } else {
         merror("dungeon_floor_create: floor malloc failed");
-        return NULL;
+        floor = NULL;
     }
-
-    dungeon_floor_init(floor);
-
     return floor;
 }
 
 
 void dungeon_floor_init(dungeon_floor_t* floor) {
-    floor->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
-    floor->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
+    if (floor) {
+        floor->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
+        floor->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
+        floor->tiles = (dungeon_tile_t**)malloc(sizeof(dungeon_tile_t*) * floor->height);
 
-    //floor->tiles = (dungeon_tile_t**)malloc(sizeof(dungeon_tile_t*) * floor->width);
-    floor->tiles = (dungeon_tile_t**)malloc(sizeof(dungeon_tile_t*) * floor->height);
-    if (floor->tiles == NULL) {
-        merror("dungeon_floor_init: floor->tiles malloc failed");
-        return;
-    }
+        if (floor->tiles) {
+            bool success = true;
+            for (int i = 0; i < floor->width; i++) {
+                floor->tiles[i] = (dungeon_tile_t*)malloc(sizeof(dungeon_tile_t) * floor->width);
+                if (floor->tiles[i] == NULL) {
+                    success = false;
+                    break;
+                }
+            }
 
-    for (int i = 0; i < floor->width; i++) {
-        //floor->tiles[i] = (dungeon_tile_t*)malloc(sizeof(dungeon_tile_t) * floor->height);
-        floor->tiles[i] = (dungeon_tile_t*)malloc(sizeof(dungeon_tile_t) * floor->width);
-        if (floor->tiles[i] == NULL) {
-            merror("dungeon_floor_init: floor->tiles[i] malloc failed");
-            return;
-        }
-    }
-
-    //for (int i = 0; i < floor->width; i++) {
-    for (int i = 0; i < floor->height; i++) {
-        for (int j = 0; j < floor->width; j++) {
-            dungeon_tile_t* current = &floor->tiles[i][j];
-            // set the perimeter to stone walls
-            if (i == 0 || i == floor->height - 1 || j == 0 || j == floor->width - 1) {
-
-                if (j % 2 == 0) {
-                    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_00);
-
-                } else {
-                    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_01);
+            if (success) {
+                for (int i = 0; i < floor->height; i++) {
+                    for (int j = 0; j < floor->width; j++) {
+                        dungeon_tile_t* current = &floor->tiles[i][j];
+                        // set the perimeter to stone walls
+                        if (i == 0 || i == floor->height - 1 || j == 0 || j == floor->width - 1) {
+                            if (j % 2 == 0) {
+                                dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_00);
+                            } else if (j % 3 == 0) {
+                                dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_02);
+                            } else {
+                                dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_01);
+                            }
+                        } else {
+                            dungeon_tile_init(current, DUNGEON_TILE_TYPE_FLOOR_DIRT);
+                        }
+                    }
                 }
             } else {
-                dungeon_tile_init(current, DUNGEON_TILE_TYPE_FLOOR_DIRT);
+                merror("dungeon_floor_init: floor->tiles[i] malloc failed");
             }
+        } else {
+            merror("dungeon_floor_init: floor->tiles malloc failed");
         }
+    } else {
+        merror("dungeon_floor_init: floor is NULL");
     }
 }
 
@@ -88,11 +92,12 @@ void dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, const in
 
 
 const bool dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id, const int x, const int y) {
+    bool retval = false;
     if (df) {
         if (id != -1) {
             if (x >= 0 && x < df->width && y >= 0 && y < df->height) {
                 dungeon_tile_remove(&df->tiles[y][x], id);
-                return true;
+                retval = true;
             } else {
                 merror("dungeon_floor_remove_at: x or y out of bounds");
             }
@@ -102,7 +107,7 @@ const bool dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id,
     } else {
         merror("dungeon_floor_remove_at: df is NULL");
     }
-    return false;
+    return retval;
 }
 
 

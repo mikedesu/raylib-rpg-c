@@ -15,9 +15,9 @@ int get_txkey_for_tiletype(dungeon_tile_type_t type) {
     case DUNGEON_TILE_TYPE_STONE_WALL_01:
         key = TX_STONEWALL_01;
         break;
-    //case DUNGEON_TILE_TYPE_STONE_WALL_02:
-    //    key = TX_STONEWALL_02;
-    //    break;
+    case DUNGEON_TILE_TYPE_STONE_WALL_02:
+        key = TX_STONEWALL_02;
+        break;
 
 
     //case TILETYPE_DIRT_01:

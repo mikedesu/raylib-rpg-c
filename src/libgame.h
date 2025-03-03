@@ -12,7 +12,7 @@
 bool libgame_windowshouldclose();
 const bool libgame_external_check_reload();
 const bool libgame_entity_set_anim(gamestate* const g, const entityid id, const int index);
-const bool libgame_create_entity_checks(gamestate* const g, const int x, const int y);
+const bool libgame_create_entity_checks_unsafe(gamestate* const g, const int x, const int y);
 
 gamestate* libgame_getgamestate();
 void libgame_closesavegamestate();
@@ -64,7 +64,7 @@ void libgame_unloadtexture(gamestate* const g, const int index);
 void libgame_do_camera_lock_on(gamestate* const g);
 void libgame_draw_entity(gamestate* const g, const entityid id);
 void libgame_draw_entities_at_lua(gamestate* const g, const entitytype_t type, const int x, const int y);
-void libgame_handle_input_player(gamestate* const g);
+void libgame_handle_input_player_unsafe(gamestate* const g);
 void libgame_handle_caminput(gamestate* const g);
 void libgame_handle_input(gamestate* const g);
 void libgame_handle_debugpanel_switch(gamestate* const g);
@@ -89,17 +89,18 @@ void libgame_draw_entity_shadow(gamestate* const g, const entityid id);
 void libgame_draw_entity_incr_frame(gamestate* const g, const entityid id);
 void libgame_draw_gameplayscene_entities(gamestate* const g);
 void libgame_load_textures_from_disk(gamestate* const g);
-void libgame_calc_debugpanel_size(gamestate* const g);
+void libgame_calc_debugpanel_size_unsafe(gamestate* const g);
 void libgame_closeshared(gamestate* const g);
-void libgame_draw_debug_panel(gamestate* const g);
+void libgame_draw_debug_panel_unsafe(gamestate* const g);
 void libgame_draw_company_scene(gamestate* const g);
-void libgame_draw_title_scene(gamestate* const g);
+void libgame_draw_title_scene_unsafe(gamestate* const g);
 void libgame_draw_gameplayscene(gamestate* const g);
+void libgame_draw_gameplayscene_unsafe(gamestate* const g);
 void libgame_draw_fade(const gamestate* const g);
 //void libgame_drawgrid(gamestate* const g);
 void libgame_draw_dungeon_floor(gamestate* const g);
 void libgame_draw_dungeon_floor_3d(gamestate* const g);
-void libgame_drawframeend(gamestate* const g);
+void libgame_drawframeend_unsafe(gamestate* const g);
 void libgame_incr_current_action(gamestate* const g);
 void libgame_update_hero_shield_spritegroup(gamestate* const g);
 void libgame_handle_test_enemy_placement(gamestate* const g);
@@ -112,6 +113,9 @@ void libgame_create_entity_unsafe(
 void libgame_create_npc_orc_unsafe(gamestate* const g, const int x, const int y);
 //void libgame_create_npc_orc_test_unsafe(gamestate* const g);
 void libgame_set_tile_params_unsafe(gamestate* const g, dungeon_tile_type_t type, int i, int j);
+void libgame_draw_dungeon_floor_unsafe(gamestate* const g);
+void libgame_draw_dungeon_floor_3d_unsafe(gamestate* const g);
+void libgame_handle_fade_unsafe(gamestate* const g);
 
 
 void libgame_init_datastructures(gamestate* const g);
