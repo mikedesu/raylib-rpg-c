@@ -101,35 +101,29 @@ const bool libgame_entity_set_anim(gamestate* const g, const entityid id, const 
 
 
 const bool libgame_entity_set_anim_unsafe(gamestate* const g, const entityid id, const int index) {
-    //bool retval = false;
-    //if (g) {
     return spritegroup_set_current(hashtable_entityid_spritegroup_get(g->spritegroups, id), index);
-    //} else {
-    //    merror("libgame_entity_set_anim: gamestate is NULL");
-    //}
-    //return retval;
 }
 
 
 const int libgame_get_x_from_dir(const direction_t dir) {
-    const bool right = dir == DIRECTION_RIGHT;
-    const bool down_right = dir == DIRECTION_DOWN_RIGHT;
-    const bool up_right = dir == DIRECTION_UP_RIGHT;
-    const bool left = dir == DIRECTION_LEFT;
-    const bool down_left = dir == DIRECTION_DOWN_LEFT;
-    const bool up_left = dir == DIRECTION_UP_LEFT;
-    return right || down_right || up_right ? 1 : left || down_left || up_left ? -1 : 0;
+    const bool r = dir == DIRECTION_RIGHT;
+    const bool dr = dir == DIRECTION_DOWN_RIGHT;
+    const bool ur = dir == DIRECTION_UP_RIGHT;
+    const bool l = dir == DIRECTION_LEFT;
+    const bool dl = dir == DIRECTION_DOWN_LEFT;
+    const bool ul = dir == DIRECTION_UP_LEFT;
+    return r || dr || ur ? 1 : l || dl || ul ? -1 : 0;
 }
 
 
 const int libgame_get_y_from_dir(const direction_t dir) {
-    const bool down = dir == DIRECTION_DOWN;
-    const bool down_right = dir == DIRECTION_DOWN_RIGHT;
-    const bool down_left = dir == DIRECTION_DOWN_LEFT;
-    const bool up = dir == DIRECTION_UP;
-    const bool up_right = dir == DIRECTION_UP_RIGHT;
-    const bool up_left = dir == DIRECTION_UP_LEFT;
-    return down || down_right || down_left ? 1 : up || up_right || up_left ? -1 : 0;
+    const bool d = dir == DIRECTION_DOWN;
+    const bool dr = dir == DIRECTION_DOWN_RIGHT;
+    const bool dl = dir == DIRECTION_DOWN_LEFT;
+    const bool u = dir == DIRECTION_UP;
+    const bool ur = dir == DIRECTION_UP_RIGHT;
+    const bool ul = dir == DIRECTION_UP_LEFT;
+    return d || dr || dl ? 1 : u || ur || ul ? -1 : 0;
 }
 
 
@@ -151,21 +145,20 @@ const int libgame_get_y_from_dir(const direction_t dir) {
 //}
 
 
-const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir) {
-    return xdir == 1 && ydir == 0     ? DIRECTION_RIGHT
-           : xdir == -1 && ydir == 0  ? DIRECTION_LEFT
-           : xdir == 0 && ydir == 1   ? DIRECTION_DOWN
-           : xdir == 0 && ydir == -1  ? DIRECTION_UP
-           : xdir == 1 && ydir == 1   ? DIRECTION_DOWN_RIGHT
-           : xdir == -1 && ydir == 1  ? DIRECTION_DOWN_LEFT
-           : xdir == 1 && ydir == -1  ? DIRECTION_UP_RIGHT
-           : xdir == -1 && ydir == -1 ? DIRECTION_UP_LEFT
-                                      : DIRECTION_NONE;
+const direction_t libgame_get_dir_from_xy(const int x, const int y) {
+    return x == 1 && y == 0     ? DIRECTION_RIGHT
+           : x == -1 && y == 0  ? DIRECTION_LEFT
+           : x == 0 && y == 1   ? DIRECTION_DOWN
+           : x == 0 && y == -1  ? DIRECTION_UP
+           : x == 1 && y == 1   ? DIRECTION_DOWN_RIGHT
+           : x == -1 && y == 1  ? DIRECTION_DOWN_LEFT
+           : x == 1 && y == -1  ? DIRECTION_UP_RIGHT
+           : x == -1 && y == -1 ? DIRECTION_UP_LEFT
+                                : DIRECTION_NONE;
 }
 
 
 void libgame_handle_move_unsafe(gamestate* const g, const entityid id, const int x, const int y) {
-    //if (g) {
     entity_t* e = em_get(g->entitymap, id);
     if (e) {
         if (e->x < 0 || e->x >= g->dungeon_floor->width) {
@@ -261,14 +254,14 @@ void libgame_handle_input(gamestate* const g) {
         //    libgame_test_enemy_placement(g);
         //}
         // flip between player and camera control
-        if (IsKeyPressed(KEY_C)) {
+        if (IsKeyPressed(KEY_F3)) {
             if (g->controlmode == CONTROLMODE_PLAYER) {
                 g->controlmode = CONTROLMODE_CAMERA;
             } else if (g->controlmode == CONTROLMODE_CAMERA) {
                 g->controlmode = CONTROLMODE_PLAYER;
             }
         }
-        if (IsKeyPressed(KEY_D)) {
+        if (IsKeyPressed(KEY_F2)) {
             g->debugpanelon = !g->debugpanelon;
         }
         if (IsKeyPressed(KEY_G)) {
@@ -278,38 +271,32 @@ void libgame_handle_input(gamestate* const g) {
             g->is3d = !g->is3d;
         }
         if (g->controlmode == CONTROLMODE_PLAYER) {
-            if (IsKeyPressed(KEY_LEFT)) {
-                minfo("KEY_LEFT");
-                //libgame_handle_move(g, g->hero_id, -1, 0);
+            if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_KP_4)) {
                 libgame_handle_move_unsafe(g, g->hero_id, -1, 0);
                 g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_RIGHT)) {
-                minfo("KEY_RIGHT");
-                //libgame_handle_move(g, g->hero_id, 1, 0);
+            } else if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_KP_6)) {
                 libgame_handle_move_unsafe(g, g->hero_id, 1, 0);
                 g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_UP)) {
-                minfo("KEY_UP");
-                //libgame_handle_move(g, g->hero_id, 0, -1);
+            } else if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_KP_8)) {
                 libgame_handle_move_unsafe(g, g->hero_id, 0, -1);
                 g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_DOWN)) {
-                minfo("KEY_DOWN");
-                //libgame_handle_move(g, g->hero_id, 0, 1);
+            } else if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_KP_2)) {
                 libgame_handle_move_unsafe(g, g->hero_id, 0, 1);
                 g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_A)) {
-                minfo("KEY_A");
-                //const entityid hero_id = g->hero_id;
-                libgame_entity_set_anim_unsafe(g, g->hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
-                //libgame_entity_set_anim(g, hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+            } else if (IsKeyPressed(KEY_KP_3)) {
+                libgame_handle_move_unsafe(g, g->hero_id, 1, 1);
+                g->player_input_received = true;
+            } else if (IsKeyPressed(KEY_KP_1)) {
+                libgame_handle_move_unsafe(g, g->hero_id, -1, 1);
+                g->player_input_received = true;
+            } else if (IsKeyPressed(KEY_KP_7)) {
+                libgame_handle_move_unsafe(g, g->hero_id, -1, -1);
+                g->player_input_received = true;
+            } else if (IsKeyPressed(KEY_KP_9)) {
+                libgame_handle_move_unsafe(g, g->hero_id, 1, -1);
                 g->player_input_received = true;
             } else if (IsKeyPressed(KEY_PERIOD)) {
-                minfo("KEY_PERIOD");
                 g->player_input_received = true;
-            } else if (IsKeyPressed(KEY_E)) {
-                minfo("KEY_E");
-                libgame_create_npc_orc_test_unsafe(g);
             }
         } else if (g->controlmode == CONTROLMODE_CAMERA) {
             //libgame_handle_caminput(g);
@@ -330,14 +317,14 @@ void libgame_handle_input(gamestate* const g) {
 //}
 
 
-void libgame_create_npc_orc_test_unsafe(gamestate* const g) {
-    const entity_t* const h = em_get(g->entitymap, g->hero_id);
-    if (h) {
-        libgame_create_npc_orc_unsafe(g, h->x + 1, h->y);
-    } else {
-        merror("h is NULL");
-    }
-}
+//void libgame_create_npc_orc_test_unsafe(gamestate* const g) {
+//    const entity_t* const h = em_get(g->entitymap, g->hero_id);
+//    if (h) {
+//        libgame_create_npc_orc_unsafe(g, h->x + 1, h->y);
+//    } else {
+//        merror("h is NULL");
+//    }
+//}
 
 
 //void libgame_update_spritegroup_dest(gamestate* const g, const entityid id) {
@@ -785,76 +772,30 @@ inline void libgame_draw_debug_panel(gamestate* const g) {
 }
 
 
-//void libgame_drawgrid(gamestate* const g) {
-//    if (!g) {
-//        merror("libgame_drawgrid: gamestate is NULL");
-//        return;
-//    }
-//const int len = libgame_lua_get_dungeonfloor_row_count(L);
-//const int wid = libgame_lua_get_dungeonfloor_col_count(L);
-//for (int i = 0; i <= len; i++) {
-//    DrawLine(i * DEFAULT_TILE_SIZE, 0, i * DEFAULT_TILE_SIZE, wid * DEFAULT_TILE_SIZE, GREEN);
-//}
-//for (int i = 0; i <= wid; i++) {
-//    DrawLine(0, i * DEFAULT_TILE_SIZE, len * DEFAULT_TILE_SIZE, i * DEFAULT_TILE_SIZE, GREEN);
-//}
-//}
-
-
-//void libgame_draw_dungeon_floor_tiles(gamestate* const g) {
-//    if (g) {
-//        for (int i = 0; i < g->dungeon_floor->height; i++) {
-//            for (int j = 0; j < g->dungeon_floor->width; j++) {
-//                const dungeon_tile_type_t type = g->dungeon_floor->tiles[i][j].type;
-//                const int key = get_txkey_for_tiletype(type);
-//                if (key != -1) {
-//                    tile_dest.x = j * DEFAULT_TILE_SIZE;
-//                    tile_dest.y = i * DEFAULT_TILE_SIZE;
-//
-//                    // we need to adjust the size of the dest tile
-//                    // if the tile type requires it
-//                    // for example: dirt tiles are 8x8
-//                    // while stone wall tiles are 8x16
-//
-//                    if (type == DUNGEON_TILE_TYPE_STONE_WALL) {
-//                        tile_src.height = DEFAULT_TILE_SIZE * 2;
-//                        tile_dest.height = DEFAULT_TILE_SIZE * 2;
-//                    } else {
-//                        tile_src.height = DEFAULT_TILE_SIZE;
-//                        tile_dest.height = DEFAULT_TILE_SIZE;
-//                    }
-//
-//                    DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
-//
-//                    // draw a red rect around the tile
-//                    DrawRectangleLinesEx(tile_dest, DEFAULT_TILE_SIZE, RED);
-//                }
-//            }
-//        }
-//    }
-//}
-
-
-void libgame_set_tile_params(gamestate* const g, dungeon_tile_type_t type, int i, int j) {
-    if (g) {
-        const int size = DEFAULT_TILE_SIZE;
-        tile_dest.x = j * DEFAULT_TILE_SIZE;
-        tile_dest.y = i * DEFAULT_TILE_SIZE;
-        if (type == DUNGEON_TILE_TYPE_STONE_WALL_00) {
-            tile_src = (Rectangle){0, 0, size, 16};
-            tile_dest = (Rectangle){tile_dest.x, tile_dest.y - 8, size, 16};
-        } else if (type == DUNGEON_TILE_TYPE_STONE_WALL_01) {
-            tile_src = (Rectangle){0, 0, size, 12};
-            tile_dest = (Rectangle){tile_dest.x, tile_dest.y - 4, size, 12};
-        } else if (type == DUNGEON_TILE_TYPE_FLOOR_DIRT) {
-            tile_src = (Rectangle){0, 0, size, size};
-            tile_dest = (Rectangle){tile_dest.x, tile_dest.y, size, size};
-        }
+void libgame_set_tile_params_unsafe(gamestate* const g, dungeon_tile_type_t type, int i, int j) {
+    const int size = DEFAULT_TILE_SIZE;
+    tile_dest.x = j * DEFAULT_TILE_SIZE;
+    tile_dest.y = i * DEFAULT_TILE_SIZE;
+    if (type == DUNGEON_TILE_TYPE_STONE_WALL_00) {
+        tile_src = (Rectangle){0, 0, size, 16};
+        tile_dest = (Rectangle){tile_dest.x, tile_dest.y - 8, size, 16};
+    } else if (type == DUNGEON_TILE_TYPE_STONE_WALL_01) {
+        tile_src = (Rectangle){0, 0, size, 12};
+        tile_dest = (Rectangle){tile_dest.x, tile_dest.y - 4, size, 12};
+    } else if (type == DUNGEON_TILE_TYPE_FLOOR_DIRT) {
+        tile_src = (Rectangle){0, 0, size, size};
+        tile_dest = (Rectangle){tile_dest.x, tile_dest.y, size, size};
     }
 }
 
 
-//void libgame_draw_dungeon_floor_tiles_unsafe(gamestate* const g) {
+void libgame_set_tile_params(gamestate* const g, dungeon_tile_type_t type, int i, int j) {
+    if (g) {
+        libgame_set_tile_params_unsafe(g, type, i, j);
+    }
+}
+
+
 void libgame_draw_dungeon_floor_tiles_unsafe_floors(gamestate* const g) {
     for (int i = 0; i < g->dungeon_floor->height; i++) {
         for (int j = 0; j < g->dungeon_floor->width; j++) {
@@ -863,7 +804,8 @@ void libgame_draw_dungeon_floor_tiles_unsafe_floors(gamestate* const g) {
             case DUNGEON_TILE_TYPE_FLOOR_DIRT: {
                 const int key = get_txkey_for_tiletype(type);
                 if (key != -1) {
-                    libgame_set_tile_params(g, type, i, j);
+                    libgame_set_tile_params_unsafe(g, type, i, j);
+                    //libgame_set_tile_params(g, type, i, j);
                     DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
                 } else {
                     merror("libgame_draw_dungeon_floor_tiles_unsafe: key is -1");
@@ -887,7 +829,8 @@ void libgame_draw_dungeon_floor_tiles_unsafe_walls(gamestate* const g) {
             case DUNGEON_TILE_TYPE_STONE_WALL_01: {
                 const int key = get_txkey_for_tiletype(type);
                 if (key != -1) {
-                    libgame_set_tile_params(g, type, i, j);
+                    //libgame_set_tile_params(g, type, i, j);
+                    libgame_set_tile_params_unsafe(g, type, i, j);
                     DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
                 } else {
                     merror("libgame_draw_dungeon_floor_tiles_unsafe: key is -1");

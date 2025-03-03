@@ -110,7 +110,8 @@ void libgame_create_entity(
 void libgame_create_entity_unsafe(
     gamestate* const g, const int x, const int y, entitytype_t type, race_t race, const char* name);
 void libgame_create_npc_orc_unsafe(gamestate* const g, const int x, const int y);
-void libgame_create_npc_orc_test_unsafe(gamestate* const g);
+//void libgame_create_npc_orc_test_unsafe(gamestate* const g);
+void libgame_set_tile_params_unsafe(gamestate* const g, dungeon_tile_type_t type, int i, int j);
 
 
 void libgame_init_datastructures(gamestate* const g);
