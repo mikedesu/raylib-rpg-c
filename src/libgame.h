@@ -139,6 +139,10 @@ void libgame_set_race_specific_parameters(entity* e);
 void libgame_create_npc_orc(gamestate* const g, const int x, const int y);
 void libgame_create_npc_orc_test(gamestate* const g);
 void libgame_handle_caminput_zoom(gamestate* const g);
+void libgame_set_tile_params(gamestate* const g,
+                             dungeon_tile_type_t type,
+                             int i,
+                             int j);
 //void libgame_init_entity_list(gamestate* const state);
 //bool libgame_assign_entity_position(gamestate* const g, const entityid id, const int x, const int y);
 //const int libgame_get_entity_pos_x(gamestate const* g, const entityid id);

@@ -645,18 +645,14 @@ void libgame_update_smoothmove(gamestate* const g, const entityid id) {
             hashtable_entityid_spritegroup_get(g->spritegroups, id);
         if (group) {
             const float move = 1.0f;
-            group->dest.x += group->move.x > 0   ? move
-                             : group->move.x < 0 ? -move
-                                                 : 0;
-            group->dest.y += group->move.y > 0   ? move
-                             : group->move.y < 0 ? -move
-                                                 : 0;
-            group->move.x += group->move.x > 0   ? -move
-                             : group->move.x < 0 ? move
-                                                 : 0;
-            group->move.y += group->move.y > 0   ? -move
-                             : group->move.y < 0 ? move
-                                                 : 0;
+            const float x = group->move.x;
+            const float y = group->move.y;
+            group->dest.x += x > 0 ? move : x < 0 ? -move : 0;
+            group->dest.y += y > 0 ? move : y < 0 ? -move : 0;
+            group->move.x += x > 0 ? -move : x < 0 ? move : 0;
+            group->move.y += y > 0 ? -move : y < 0 ? move : 0;
+        } else {
+            merror("libgame_update_smoothmove: group is NULL");
         }
     }
 }
@@ -666,8 +662,12 @@ void libgame_do_camera_lock_on(gamestate* const g) {
     if (g) {
         spritegroup_t* grp =
             hashtable_entityid_spritegroup_get(g->spritegroups, g->hero_id);
-        if (grp && g->cam_lockon) {
-            g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
+        if (grp) {
+            if (g->cam_lockon) {
+                g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
+            }
+        } else {
+            merror("libgame_do_camera_lock_on: grp is NULL");
         }
     }
 }
@@ -683,6 +683,8 @@ void libgame_reset_entity_anim(gamestate* const g, entityid id) {
                 //sg->prev_anim = sg->current;
                 sg->current = sg->default_anim;
                 s->num_loops = 0;
+            } else if (!s) {
+                merror("libgame_reset_entity_anim: s is NULL");
             }
         }
     }
@@ -735,89 +737,104 @@ void libgame_update_gamestate(gamestate* g) {
 
 
 void libgame_drawframeend(gamestate* const g) {
-    if (!g) {
-        merror("libgame_drawframeend: gamestate is NULL");
-        return;
+    //if (!g) {
+    //    merror("libgame_drawframeend: gamestate is NULL");
+    //    return;
+    //}
+
+    if (g) {
+        EndDrawing();
+        // update gamestate values at end of draw frame:
+        // framecount, currenttime, currenttimetm, currenttimebuf
+        g->framecount++;
+        g->currenttime = time(NULL);
+        g->currenttimetm = localtime(&(g->currenttime));
+        strftime(g->currenttimebuf,
+                 64,
+                 "Current Time: %Y-%m-%d %H:%M:%S",
+                 g->currenttimetm);
     }
-    EndDrawing();
-    // update gamestate values at end of draw frame:
-    // framecount, currenttime, currenttimetm, currenttimebuf
-    g->framecount++;
-    g->currenttime = time(NULL);
-    g->currenttimetm = localtime(&(g->currenttime));
-    strftime(g->currenttimebuf,
-             64,
-             "Current Time: %Y-%m-%d %H:%M:%S",
-             g->currenttimetm);
 }
 
 
 void libgame_drawframe(gamestate* g) {
-    if (!g) {
-        merror("libgame_drawframe: gamestate is NULL");
-        return;
+    //if (!g) {
+    //    merror("libgame_drawframe: gamestate is NULL");
+    //    return;
+    //}
+    if (g) {
+        BeginDrawing();
+        BeginTextureMode(target);
+        switch (activescene) {
+        //case SCENE_COMPANY:
+        //    libgame_draw_company_scene(g);
+        //    break;
+        case SCENE_TITLE:
+            libgame_draw_title_scene(g);
+            break;
+        case SCENE_GAMEPLAY:
+            libgame_draw_gameplayscene(g);
+            break;
+        default:
+            break;
+        }
+        EndTextureMode();
+        DrawTexturePro(target.texture,
+                       target_src,
+                       target_dest,
+                       target_origin,
+                       0.0f,
+                       WHITE);
+        libgame_draw_debug_panel(g);
+        libgame_drawframeend(g);
     }
-    BeginDrawing();
-    BeginTextureMode(target);
-    switch (activescene) {
-    //case SCENE_COMPANY:
-    //    libgame_draw_company_scene(g);
-    //    break;
-    case SCENE_TITLE:
-        libgame_draw_title_scene(g);
-        break;
-    case SCENE_GAMEPLAY:
-        libgame_draw_gameplayscene(g);
-        break;
-    default:
-        break;
-    }
-    EndTextureMode();
-    DrawTexturePro(
-        target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    libgame_draw_debug_panel(g);
-    libgame_drawframeend(g);
 }
 
 
 void libgame_calc_debugpanel_size(gamestate* const g) {
-    if (!g) {
-        merror("libgame_calc_debugpanel_size: gamestate is NULL");
-        return;
+    //if (!g) {
+    //    merror("libgame_calc_debugpanel_size: gamestate is NULL");
+    //    return;
+    //}
+    if (g) {
+        const int fontsize = 14;
+        const int spacing = 1;
+        const Vector2 m =
+            MeasureTextEx(g->font, g->debugpanel.buffer, fontsize, spacing);
+        g->debugpanel.w = m.x;
+        g->debugpanel.h = m.y;
     }
-    const int fontsize = 14;
-    const int spacing = 1;
-    const Vector2 m =
-        MeasureTextEx(g->font, g->debugpanel.buffer, fontsize, spacing);
-    g->debugpanel.w = m.x;
-    g->debugpanel.h = m.y;
 }
 
 
 inline void libgame_draw_debug_panel(gamestate* const g) {
-    if (!g) {
-        merror("libgame_draw_debug_panel: gamestate is NULL");
-        return;
+    //if (!g) {
+    //    merror("libgame_draw_debug_panel: gamestate is NULL");
+    //    return;
+    //}
+    //if (!g->debugpanelon) {
+    //    //merror("libgame_draw_debug_panel: debugpanelon is false");
+    //    return;
+    //}
+    if (g) {
+        if (g->debugpanelon) {
+            const int fontsize = 14;
+            const int spacing = 1;
+            const int xy = 10;
+            const int wh = 20;
+            const Color c = {0x33, 0x33, 0x33, 255};
+            const Color c2 = WHITE;
+            const Vector2 p = {g->debugpanel.x, g->debugpanel.y};
+            const Vector2 o = {0, 0};
+            const int x0 = g->debugpanel.x - xy;
+            const int y0 = g->debugpanel.y - xy;
+            const int w0 = g->debugpanel.w + wh;
+            const int h0 = g->debugpanel.h + wh;
+            const Rectangle box = {x0, y0, w0, h0};
+            DrawRectanglePro(box, o, 0.0f, c);
+            DrawTextEx(g->font, g->debugpanel.buffer, p, fontsize, spacing, c2);
+        }
     }
-    if (!g->debugpanelon) {
-        //merror("libgame_draw_debug_panel: debugpanelon is false");
-        return;
-    }
-    const int fontsize = 14;
-    const int spacing = 1;
-    const int xy = 10;
-    const int wh = 20;
-    const Color c = {0x33, 0x33, 0x33, 255};
-    const Color c2 = WHITE;
-    const Vector2 p = {g->debugpanel.x, g->debugpanel.y};
-    const Vector2 o = {0, 0};
-    const int x0 = g->debugpanel.x - xy;
-    const int y0 = g->debugpanel.y - xy;
-    const int w0 = g->debugpanel.w + wh;
-    const int h0 = g->debugpanel.h + wh;
-    const Rectangle box = {x0, y0, w0, h0};
-    DrawRectanglePro(box, o, 0.0f, c);
-    DrawTextEx(g->font, g->debugpanel.buffer, p, fontsize, spacing, c2);
 }
 
 
@@ -854,18 +871,10 @@ void libgame_draw_dungeon_floor_tiles(gamestate* const g) {
                     // while stone wall tiles are 8x16
 
                     if (type == DUNGEON_TILE_TYPE_STONE_WALL) {
-                        //tile_src.width = DEFAULT_TILE_SIZE;
                         tile_src.height = DEFAULT_TILE_SIZE * 2;
-
-                        //tile_dest.width = DEFAULT_TILE_SIZE;
                         tile_dest.height = DEFAULT_TILE_SIZE * 2;
-                        //tile_dest.y -= DEFAULT_TILE_SIZE;
                     } else {
-
-                        //tile_src.width = DEFAULT_TILE_SIZE;
                         tile_src.height = DEFAULT_TILE_SIZE;
-
-                        //tile_dest.width = DEFAULT_TILE_SIZE;
                         tile_dest.height = DEFAULT_TILE_SIZE;
                     }
 
@@ -885,30 +894,32 @@ void libgame_draw_dungeon_floor_tiles(gamestate* const g) {
 }
 
 
+void libgame_set_tile_params(gamestate* const g,
+                             dungeon_tile_type_t type,
+                             int i,
+                             int j) {
+    if (g) {
+        const int size = DEFAULT_TILE_SIZE;
+        tile_dest.x = j * DEFAULT_TILE_SIZE;
+        tile_dest.y = i * DEFAULT_TILE_SIZE;
+        if (type == DUNGEON_TILE_TYPE_STONE_WALL) {
+            tile_src = (Rectangle){0, 0, size, size * 2};
+            tile_dest = (Rectangle){0, 0, size, size * 2};
+        } else {
+            tile_src = (Rectangle){0, 0, size, size};
+            tile_dest = (Rectangle){0, 0, size, size};
+        }
+    }
+}
+
+
 void libgame_draw_dungeon_floor_tiles_unsafe(gamestate* const g) {
     for (int i = 0; i < g->dungeon_floor->height; i++) {
         for (int j = 0; j < g->dungeon_floor->width; j++) {
             const dungeon_tile_type_t type = g->dungeon_floor->tiles[i][j].type;
             const int key = get_txkey_for_tiletype(type);
             if (key != -1) {
-                tile_dest.x = j * DEFAULT_TILE_SIZE;
-                tile_dest.y = i * DEFAULT_TILE_SIZE;
-
-                if (type == DUNGEON_TILE_TYPE_STONE_WALL) {
-                    //tile_src.width = DEFAULT_TILE_SIZE;
-                    tile_src.height = DEFAULT_TILE_SIZE * 2;
-
-                    //tile_dest.width = DEFAULT_TILE_SIZE;
-                    tile_dest.height = DEFAULT_TILE_SIZE * 2;
-                    tile_dest.y -= DEFAULT_TILE_SIZE;
-                } else {
-
-                    //tile_src.width = DEFAULT_TILE_SIZE;
-                    tile_src.height = DEFAULT_TILE_SIZE;
-
-                    //tile_dest.width = DEFAULT_TILE_SIZE;
-                    tile_dest.height = DEFAULT_TILE_SIZE;
-                }
+                libgame_set_tile_params(g, type, i, j);
 
                 DrawTexturePro(g->txinfo[key].texture,
                                tile_src,
