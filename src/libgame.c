@@ -543,13 +543,14 @@ void libgame_initwindow(gamestate* const g) {
     }
     const char* title = "evildojo666";
 
-    //const int window_width = 800;
-    //const int window_height = 480;
-    const int window_width = 1080;
-    const int window_height = 1920 / 2;
+    const int window_width = 800;
+    const int window_height = 480;
+    //const int window_width = 1080;
+    //const int window_height = 1920 / 2;
 
 
-    const int x = 1080;
+    const int x = 1920 * 2 - window_width;
+    //const int x = 1080;
     const int y = 0;
 
     InitWindow(window_width, window_height, title);
