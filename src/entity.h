@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "direction.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "race.h"
@@ -16,12 +17,13 @@ typedef struct entity_t {
     race_t race;
     char name[ENTITY_NAME_LEN_MAX];
 
+    direction_t direction;
+
     int x;
     int y;
 
     entity_t* next;
 } entity;
-
 
 
 entity_t* entity_new(const entityid id, const entitytype_t type);

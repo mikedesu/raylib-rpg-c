@@ -12,14 +12,14 @@ entity_t* entity_new(const entityid id, const entitytype_t type) {
     e->id = id;
     e->type = type;
     e->race = RACE_NONE;
+    //e->direction = DIRECTION_RIGHT;
+    e->direction = DIRECTION_RIGHT;
     e->x = -1;
     e->y = -1;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     e->next = NULL;
     return e;
 }
-
-
 
 
 entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x, const int y) {
@@ -33,8 +33,6 @@ entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x,
 }
 
 
-
-
 // this frees the entity so you lose the next pointer!
 // make sure you wire the map correctly before calling this!
 void entity_free(entity_t* e) {
@@ -44,8 +42,6 @@ void entity_free(entity_t* e) {
     }
     free(e);
 }
-
-
 
 
 void entity_set_name(entity_t* const e, const char* name) {
@@ -67,7 +63,6 @@ void entity_set_name(entity_t* const e, const char* name) {
 
     strncpy(e->name, name, ENTITY_NAME_LEN_MAX);
 }
-
 
 
 void entity_set_race(entity_t* const e, const race_t race) {

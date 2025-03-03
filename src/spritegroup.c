@@ -3,8 +3,6 @@
 #include <stdlib.h>
 
 
-
-
 spritegroup_t* spritegroup_create(const int capacity) {
     if (capacity <= 0) return NULL;
     spritegroup_t* sg = malloc(sizeof(spritegroup_t));
@@ -37,8 +35,6 @@ spritegroup_t* spritegroup_create(const int capacity) {
 }
 
 
-
-
 void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec) {
     if (!sg) {
         merror("spritegroup_set_specifier: spritegroup is NULL");
@@ -50,8 +46,6 @@ void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec) 
 }
 
 
-
-
 //void spritegroup_set_prev_anim(spritegroup_t* const sg) {
 //    if (!sg) {
 //        merror("spritegroup_set_prev_anim: spritegroup is NULL");
@@ -59,7 +53,6 @@ void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec) 
 //    }
 //    sg->prev_anim = sg->current;
 //}
-
 
 
 void spritegroup_destroy(spritegroup_t* sg) {
@@ -76,8 +69,6 @@ void spritegroup_destroy(spritegroup_t* sg) {
     }
     free(sg);
 }
-
-
 
 
 void spritegroup_add(spritegroup_t* const sg, sprite* s) {
@@ -117,8 +108,6 @@ void spritegroup_set(spritegroup_t* const sg, const int index, sprite* s) {
 }
 
 
-
-
 // each sprite has a 'context' that corresponds to different directions
 void spritegroup_setcontexts(spritegroup_t* const sg, const int context) {
     if (!sg) {
@@ -131,8 +120,6 @@ void spritegroup_setcontexts(spritegroup_t* const sg, const int context) {
 }
 
 
-
-
 sprite* spritegroup_get(spritegroup_t* const sg, const int index) {
     if (!sg) {
         merror("spritegroup_get: spritegroup is NULL");
@@ -142,14 +129,11 @@ sprite* spritegroup_get(spritegroup_t* const sg, const int index) {
 }
 
 
-
-
 //void spritegroup_incr(spritegroup_t* sg) {
 //    if (!sg) return;
 //    sg->current += 2;
 //    sg->current = sg->current >= sg->size ? 0 : sg->current;
 //}
-
 
 
 const bool spritegroup_set_current(spritegroup_t* const sg, const int index) {
@@ -158,7 +142,8 @@ const bool spritegroup_set_current(spritegroup_t* const sg, const int index) {
         return false;
     }
     if (index >= sg->size) {
-        merror("spritegroup_set_current: index is out of bounds");
+        //merror("spritegroup_set_current: index is out of bounds");
+        merrorint("spritegroup_set_current: index is out of bounds", index);
         return false;
         //sg->current = sg->size - 1;
     } else if (index < 0) {
@@ -172,12 +157,9 @@ const bool spritegroup_set_current(spritegroup_t* const sg, const int index) {
 }
 
 
-
 const specifier_t spritegroup_get_specifier(spritegroup_t* const sg) {
     return sg ? sg->specifier : SPECIFIER_NONE;
 }
-
-
 
 
 const int spritegroup_get_first_context(spritegroup_t* const sg) {
@@ -191,7 +173,6 @@ const int spritegroup_get_first_context(spritegroup_t* const sg) {
     }
     return sprite_get_context(sg->sprites[0]);
 }
-
 
 
 //void spritegroup_enqueue_anim(spritegroup_t* const sg, const int anim) {
@@ -221,8 +202,6 @@ const int spritegroup_get_first_context(spritegroup_t* const sg) {
 //
 //    return sg->anim_queue[index];
 //}
-
-
 
 
 //void spritegroup_clear_anim_queue(spritegroup_t* const sg) {

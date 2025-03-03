@@ -13,6 +13,7 @@
 #include "hashtable_entityid_spritegroup.h"
 #include "libgame_defines.h"
 #include "mprint.h"
+#include "race.h"
 #include "scene.h"
 #include "setdebugpanel.h"
 #include "specifier.h"
@@ -106,6 +107,7 @@ const bool libgame_entity_set_anim(gamestate* const g, const entityid id, const 
 
 
 const bool libgame_entity_set_anim_unsafe(gamestate* const g, const entityid id, const int index) {
+    minfo("libgame_entity_set_anim_unsafe");
     return spritegroup_set_current(hashtable_entityid_spritegroup_get(g->spritegroups, id), index);
 }
 
@@ -315,8 +317,103 @@ void libgame_handle_input_player_unsafe(gamestate* const g) {
     } else if (IsKeyPressed(KEY_PERIOD)) {
         g->player_input_received = true;
     } else if (IsKeyPressed(KEY_A)) {
-        libgame_entity_set_anim_unsafe(g, g->hero_id, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+        libgame_handle_entity_attack_unsafe(g, g->hero_id);
         g->player_input_received = true;
+    }
+}
+
+
+void libgame_handle_entity_attack_unsafe(gamestate* const g, const entityid id) {
+    if (g) {
+        // ok time to work on the logic of attacking
+        // we need to get the direction of the entity
+        // we need to get the entity
+
+        entity_t* e = em_get(g->entitymap, id);
+
+        if (e) {
+            // here, we need to handle the logic of attacking, and then set the animation appropriately
+            // we need to know the direction the entity is currently facing
+            // this will need to be set when moving etc
+
+            // lets first get e's direction to see which dungeon tile we need to check
+            const direction_t dir = e->direction;
+            const int x = libgame_get_x_from_dir(dir);
+            const int y = libgame_get_y_from_dir(dir);
+            minfoint("libgame_handle_entity_attack: x", x);
+            minfoint("libgame_handle_entity_attack: y", y);
+            // we need to get the tile in front of the entity
+            dungeon_tile_t* dest_tile = dungeon_floor_tile_at(g->dungeon_floor, e->x + x, e->y + y);
+            // we need to check if there is an entity at the destination
+            if (dest_tile) {
+                const size_t current_count = dungeon_tile_entity_count(dest_tile);
+                if (current_count > 0) {
+                    // we need to get the entities at the destination
+                    entityid* ids = dest_tile->entities;
+                    if (ids) {
+                        for (int i = 0; i < current_count; i++) {
+                            entityid current_id = ids[i];
+                            entity_t* current_entity = em_get(g->entitymap, current_id);
+                            if (current_entity) {
+                                // check the entity type
+                                // if it is an NPC, then it can receive an attack
+                                // eventually we will handle attacking items etc
+
+                                minfoint("libgame_handle_entity_attack: current_entity->id", current_entity->id);
+
+                                if (current_entity->type == ENTITY_NPC) {
+                                    // we will need to handle the attack
+                                    // we will need to get
+
+                                    minfo("libgame_handle_entity_attack: attack reaches NPC");
+
+                                    int anim = SPRITEGROUP_ANIM_HUMAN_DMG;
+
+                                    if (current_entity->race == RACE_HUMAN) {
+                                        minfoint("race is", e->race);
+                                        anim = SPRITEGROUP_ANIM_HUMAN_DMG;
+                                    } else if (current_entity->race == RACE_ORC) {
+                                        minfoint("race is", e->race);
+
+                                        anim = SPRITEGROUP_ANIM_ORC_DMG;
+                                    }
+
+                                    minfoint("libgame_handle_entity_attack: setting anim to", anim);
+
+                                    // set the damage animation for the entity that is attacked
+                                    libgame_entity_set_anim_unsafe(g, current_id, anim);
+                                }
+                            }
+                        }
+                    } else {
+                        merror("CRITICAL: libgame_handle_entity_attack: ids is NULL but current_count > 0");
+                    }
+                } else {
+                    minfo("libgame_handle_entity_attack: no entities at destination");
+                }
+            } else {
+                minfo("libgame_handle_entity_attack: dest_tile is NULL");
+            }
+
+
+            // the below code handles the setting of the attack animation
+            // assuming the attack is successful against another entity, we will also want to
+            // set the damage animation for the entity that is attacked
+            // we need to get the spritegroup
+            int anim = SPRITEGROUP_ANIM_HUMAN_ATTACK;
+            race_t race = e->race;
+            if (race == RACE_HUMAN) {
+                anim = SPRITEGROUP_ANIM_HUMAN_ATTACK;
+            } else if (race == RACE_ORC) {
+                anim = SPRITEGROUP_ANIM_ORC_ATTACK;
+            }
+
+            libgame_entity_set_anim_unsafe(g, id, anim);
+        } else {
+            merror("libgame_handle_entity_attack: entity is NULL");
+        }
+    } else {
+        merror("libgame_handle_entity_attack: gamestate is NULL");
     }
 }
 
@@ -769,7 +866,6 @@ void libgame_draw_dungeon_floor_tiles_unsafe_floors(gamestate* const g) {
                 const int key = get_txkey_for_tiletype(type);
                 if (key != -1) {
                     libgame_set_tile_params_unsafe(g, type, i, j);
-                    //libgame_set_tile_params(g, type, i, j);
                     DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
                 } else {
                     merror("libgame_draw_dungeon_floor_tiles_unsafe: key is -1");
@@ -794,7 +890,6 @@ void libgame_draw_dungeon_floor_tiles_unsafe_walls(gamestate* const g) {
             case DUNGEON_TILE_TYPE_STONE_WALL_02: {
                 const int key = get_txkey_for_tiletype(type);
                 if (key != -1) {
-                    //libgame_set_tile_params(g, type, i, j);
                     libgame_set_tile_params_unsafe(g, type, i, j);
                     DrawTexturePro(g->txinfo[key].texture, tile_src, tile_dest, zero_vec, 0, WHITE);
                 } else {
@@ -1247,6 +1342,8 @@ void libgame_create_spritegroup(gamestate* const g,
                                 spritegroup_set_specifier(group, spec);
                                 // add the spritegroup to the hashtable
                                 hashtable_entityid_spritegroup_insert(g->spritegroups, id, group);
+                                // update the entity's spritegroup context
+                                libgame_entity_update_context_unsafe(g, id, spec, e->direction);
                             } else {
                                 merror("libgame_create_spritegroup: y is greater than or equal to dh");
                             }
