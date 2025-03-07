@@ -23,15 +23,6 @@ void libgame_drawframe(gamestate* g);
 void libgame_close(gamestate* g);
 void libgame_handle_player_wait_key(gamestate* const g);
 void libgame_initsharedsetup(gamestate* const g);
-
-//const entityid libgame_create_buckler(gamestate* const g,
-//                                      const char* name,
-//                                      const int x,
-//                                      const int y);
-//const entityid libgame_create_orc(gamestate* const g,
-//                                  const char* name,
-//                                  const int x,
-//                                  const int y);
 const int libgame_get_x_from_dir(const direction_t dir);
 const int libgame_get_y_from_dir(const direction_t dir);
 const int
@@ -46,7 +37,6 @@ void libgame_handle_move_unsafe(gamestate* const g, const entityid id, const int
 void libgame_handle_caminput_unsafe(gamestate* const g);
 
 
-//const entityid libgame_create_entity(gamestate* const g, const char* name);
 const direction_t libgame_get_dir_from_xy(const int xdir, const int ydir);
 
 void libgame_create_spritegroup(gamestate* const g,
@@ -98,7 +88,6 @@ void libgame_draw_title_scene_unsafe(gamestate* const g);
 void libgame_draw_gameplayscene(gamestate* const g);
 void libgame_draw_gameplayscene_unsafe(gamestate* const g);
 void libgame_draw_fade(const gamestate* const g);
-//void libgame_drawgrid(gamestate* const g);
 void libgame_draw_dungeon_floor(gamestate* const g);
 void libgame_draw_dungeon_floor_3d(gamestate* const g);
 void libgame_drawframeend_unsafe(gamestate* const g);
@@ -112,7 +101,6 @@ void libgame_create_entity(
 void libgame_create_entity_unsafe(
     gamestate* const g, const int x, const int y, entitytype_t type, race_t race, const char* name);
 void libgame_create_npc_orc_unsafe(gamestate* const g, const int x, const int y);
-//void libgame_create_npc_orc_test_unsafe(gamestate* const g);
 void libgame_set_tile_params_unsafe(gamestate* const g, dungeon_tile_type_t type, int i, int j);
 void libgame_draw_dungeon_floor_unsafe(gamestate* const g);
 void libgame_draw_dungeon_floor_3d_unsafe(gamestate* const g);
@@ -122,34 +110,16 @@ void libgame_handle_fade_unsafe(gamestate* const g);
 void libgame_init_datastructures(gamestate* const g);
 void libgame_init_spritegroups(gamestate* const g);
 void libgame_precompute_dungeonfloor_tile_positions(gamestate* const g);
-//void libgame_update_spritegroup_dest(gamestate* const g, const entityid id);
 void libgame_update_all_entity_sg_dests(gamestate* const g);
 void libgame_init_entityids(gamestate* const g);
 void libgame_handle_move(gamestate* const g, const entityid id, const int x, const int y);
 void libgame_draw_dungeon_floor_entities(gamestate* const g);
 void libgame_draw_dungeon_floor_entities_unsafe(gamestate* const g);
 void libgame_draw_dungeon_floor_entities_3d_unsafe(gamestate* const g);
-//void libgame_draw_dungeon_floor_tiles(gamestate* const g);
-//void libgame_draw_dungeon_floor_tiles_unsafe(gamestate* const g);
 void libgame_draw_dungeon_floor_tiles_unsafe_floors(gamestate* const g);
 void libgame_draw_dungeon_floor_tiles_unsafe_walls(gamestate* const g);
 void libgame_draw_dungeon_floor_tiles_3d_unsafe(gamestate* const g);
 void libgame_set_race_specific_parameters(entity* e);
 void libgame_create_npc_orc(gamestate* const g, const int x, const int y);
-//void libgame_create_npc_orc_test(gamestate* const g);
 void libgame_handle_caminput_zoom(gamestate* const g);
 void libgame_set_tile_params(gamestate* const g, dungeon_tile_type_t type, int i, int j);
-//void libgame_init_entity_list(gamestate* const state);
-//bool libgame_assign_entity_position(gamestate* const g, const entityid id, const int x, const int y);
-//const int libgame_get_entity_pos_x(gamestate const* g, const entityid id);
-//const int libgame_get_entity_pos_y(gamestate const* g, const entityid id);
-//const int libgame_create_spritegroup_by_id(gamestate* const g, const entityid id, const direction_t dir);
-//void libgame_create_hero(gamestate* const g, const int x, const int y);
-//void libgame_create_hero(gamestate* const g, const int x, const int y, race_t race, const char* name);
-//
-//
-//const bool libgame_handle_sprite_update(gamestate* const g,
-//                                        const entityid actor_id,
-//                                        const actionresults_t actionresults_type,
-//                                        const int xdir,
-//                                        const int ydir);

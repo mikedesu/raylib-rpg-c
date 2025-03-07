@@ -2,11 +2,9 @@
 
 #include "controlmode.h"
 #include "debugpanel.h"
-//#include "display.h"
 #include "entityid.h"
 #include "fadestate.h"
 #include "hashtable_entityid_spritegroup.h"
-//#include "sizemacros.h"
 #include "dungeon_floor.h"
 #include "em.h"
 #include "textureinfo.h"
@@ -21,7 +19,6 @@
 typedef struct gamestate {
     int framecount;
     int fadealpha;
-    //int lock_timer;
 
     time_t timebegan;
     time_t currenttime;
@@ -35,7 +32,6 @@ typedef struct gamestate {
     bool debugpanelon;
     bool gridon;
     bool cam_lockon;
-    //bool do_one_rotation;
     bool player_input_received;
     bool is_locked;
     bool processing_actions;
@@ -52,7 +48,6 @@ typedef struct gamestate {
 
     fadestate_t fadestate;
 
-    //display_t display;
     int targetwidth;
     int targetheight;
     int windowwidth;
@@ -80,11 +75,5 @@ typedef struct gamestate {
 
 
 gamestate* gamestateinitptr();
-//gamestate* gamestateinitptr(const int windowwidth, const int windowheight, const int targetwidth, const int targetheight);
 void gamestatefree(gamestate* g);
-//void gamestate_update_current_time(gamestate* const g);
-//
-//
-//
-
 void gamestate_add_entityid(gamestate* const g, const entityid id);

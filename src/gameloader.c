@@ -3,7 +3,6 @@
 #include "mprint.h"
 #include "symaddrpair.h"
 //#include "libgame.h"
-#include "mylua.h"
 #include <assert.h>
 #include <dlfcn.h>
 #include <raylib.h>
@@ -29,12 +28,10 @@ const char* templib = "./templibgame.so";
 
 void* handle = NULL;
 gamestate* g = NULL;
-lua_State* L = NULL;
 
 
 bool (*mywindowshouldclose)() = NULL;
 gamestate* (*mylibgame_getgamestate)() = NULL;
-lua_State* (*mylibgame_getlua)() = NULL;
 void (*mylibgameinit)() = NULL;
 void (*mylibgameclosesavegamestate)() = NULL;
 void (*mylibgameclose)(gamestate*) = NULL;
@@ -98,7 +95,6 @@ void loadsymbols() {
         {"libgame_closesavegamestate", &mylibgameclosesavegamestate},
         {"libgame_initwithstate", &mylibgameinitwithstate},
         {"libgame_update_gamestate", &mylibgameupdategamestate},
-        //                                            {"libgame_close_save_gamestate_minus_lua", &mylibgame_close_save_gamestate_minus_lua}
     };
     for (int i = 0; i < NUM_VOID_FUNCTIONS; i++) {
         //minfo(pairs[i].name);
