@@ -1,98 +1,82 @@
-CC=gcc
-OBJ=-c
-#WFLAGS=
-#-Wall 
-WFLAGS=-Wall 
-#WFLAGS=-Wall -Werror
-SHARED=-shared
-LIBGAME_OBJECTS=$(DATA_STRUCTS) libgame.o  sprite.o  spritegroup.o  hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o specifier.o dungeon_floor.o entity.o em.o dungeon_tile.o race.o gamestate.o
+CC = gcc
+OBJ = -c
+WFLAGS = -Wall
+SHARED = -shared
+LIBGAME_OBJECTS = gamestate.o hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o specifier.o dungeon_floor.o dungeon_tile.o entity.o em.o sprite.o spritegroup.o race.o libgame.o
+STATIC_LINK_RAYLIB = -l:libraylib.a
+POSITION_INDEPENDENT_CODE = -fPIC
+MAIN_C = main.c
+LINK_MATH = -lm
+RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
-STATIC_LINK_RAYLIB=-l:libraylib.a
+all: game
 
-POSITION_INDEPENDENT_CODE=-fPIC
-MAIN_C=main.c
-WEB_SOURCES=$(MAIN_C) gameloader_web.c libgame.c get_txkey_for_tiletype.c hashtable_entityid_spritegroup.c gamestate.c sprite.c spritegroup.c specifier.c dungeon_floor.o entity.o em.o dungeon_tile.o race.o /home/darkmage/src/raylib/src/libraylib.a 
-MAIN_OBJECTS=gameloader.o gamestate.o hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o specifier.o dungeon_floor.o dungeon_tile.o entity.o em.o sprite.o spritegroup.o race.o
-WEB_CC=emcc
+# Main executable
+game: main.o gameloader.o libdraw.so
+	$(CC) -o $@ main.o gameloader.o -L. -ldraw $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE)
 
-WEB_INCLUDES=-I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include 
+# Core objects
+main.o: main.c gameloader.h
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) main.c -o $@
 
-WEB_LINKS=-L. -L /home/darkmage/src/raylib/src
+gameloader.o: gameloader.c gameloader.h
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) gameloader.c -o $@
 
-LINK_MATH=-lm
+# New reloadable drawing base
+libdraw.o: libdraw.c libdraw.h
+	touch libdraw.so.lockfile
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) libdraw.c -o $@
 
-EMCC_OPTIONS=-s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall
-SHELL_FILE=--shell-file /home/darkmage/src/raylib/src/minshell.html
-PRELOAD_FILES=--preload-file ./fonts --preload-file ./textures.txt --preload-file ./img
-WEB_OPTIONS=-DPLATFORM_WEB -DWEB
+libdraw.so: libdraw.o
+	$(CC) $(SHARED) -o $@ libdraw.o $(RAYLIB_LIBS) $(LINK_MATH) $(WFLAGS)
+	rm -rfv libdraw.so.lockfile
 
-all: game export_to_code
-
-
-index.html: main.c $(MAIN_SOURCES)  
-	$(WEB_CC) -o $@ $(WEB_SOURCES) $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS) $(CFLAGS)
-
-
-game: main.c gameloader.o $(LIBGAME_OBJECTS) libgame.so  
-	$(CC) -o $@ $(MAIN_C) $(MAIN_OBJECTS) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) 
-
-# Bridge between Raylib and game
-gameloader.o: gameloader.c 
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) $^ -o $@
-
-#gamestate.o: dungeon_floor.o gamestate.c
-gamestate.o: gamestate.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) $^ -o $@
-
-# Rendering Objects
-
-sprite.o: sprite.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
-
-spritegroup.o: spritegroup.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
-
-dungeon_floor.o: dungeon_floor.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
-
-entity.o: entity.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
-
-em.o: em.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
-
-dungeon_tile.o: dungeon_tile.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS)  $(CFLAGS) $^ -o $@
-
-
-
-hashtable_entityid_spritegroup.o: hashtable_entityid_spritegroup.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
-
-get_txkey_for_tiletype.o: get_txkey_for_tiletype.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
-
-
-specifier.o: specifier.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
-
-race.o: race.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@
-
-
-# Main reloadable game base
+# Legacy libgame stuff (keep for now, but not used)
 libgame.o: libgame.c
 	touch libgame.so.lockfile
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS)  $^ -o $@ 
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) libgame.c -o $@
+
 libgame.so: $(LIBGAME_OBJECTS)
-	$(CC) $(SHARED) -o libgame.so $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB) $(LINK_MATH) $(WFLAGS)  $(CFLAGS) 
+	$(CC) $(SHARED) -o $@ $(LIBGAME_OBJECTS) $(STATIC_LINK_RAYLIB) $(LINK_MATH) $(WFLAGS)
 	rm -rfv libgame.so.lockfile
 
-# Tool to help build out the asset packing
+# Supporting objects (unchanged)
+gamestate.o: gamestate.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) gamestate.c -o $@
+
+sprite.o: sprite.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) sprite.c -o $@
+
+spritegroup.o: spritegroup.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) spritegroup.c -o $@
+
+dungeon_floor.o: dungeon_floor.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) dungeon_floor.c -o $@
+
+entity.o: entity.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) entity.c -o $@
+
+em.o: em.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) em.c -o $@
+
+dungeon_tile.o: dungeon_tile.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) dungeon_tile.c -o $@
+
+hashtable_entityid_spritegroup.o: hashtable_entityid_spritegroup.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) hashtable_entityid_spritegroup.c -o $@
+
+get_txkey_for_tiletype.o: get_txkey_for_tiletype.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) get_txkey_for_tiletype.c -o $@
+
+specifier.o: specifier.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) specifier.c -o $@
+
+race.o: race.c
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) race.c -o $@
+
+# Tool (unchanged)
 export_to_code: export_to_code.c
-	$(CC) -o $@ $^ $(WFLAGS) -lraylib
-
-
+	$(CC) -o $@ export_to_code.c $(WFLAGS) -lraylib
 
 clean:
 	rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.data export_to_code
