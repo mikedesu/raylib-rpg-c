@@ -1,6 +1,7 @@
 #include "gameloader.h"
+#include "inputstate.h"
 #include <dlfcn.h>
-#include <raylib.h> // Add this for IsKeyPressed
+#include <raylib.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +11,7 @@ void (*mylibdraw_init)() = NULL;
 void (*mylibdraw_close)() = NULL;
 bool (*mylibdraw_windowshouldclose)() = NULL;
 void (*mylibdraw_drawframe)() = NULL;
+void (*mylibdraw_update_input)(inputstate* const) = NULL;
 
 void checksymbol(void* symbol, const char* name) {
     if (symbol == NULL) {
@@ -32,14 +34,18 @@ void load_draw_symbols() {
     checksymbol(mylibdraw_windowshouldclose, "libdraw_windowshouldclose");
     mylibdraw_drawframe = dlsym(draw_handle, "libdraw_drawframe");
     checksymbol(mylibdraw_drawframe, "libdraw_drawframe");
+    mylibdraw_update_input = dlsym(draw_handle, "libdraw_update_input");
+    checksymbol(mylibdraw_update_input, "libdraw_update_input");
 }
 
 void gamerun() {
+    inputstate is = {0};
     load_draw_symbols();
     mylibdraw_init();
     while (!mylibdraw_windowshouldclose()) {
+        mylibdraw_update_input(&is);
         mylibdraw_drawframe();
-        if (IsKeyPressed(KEY_ESCAPE)) break; // Fallback
+        if (inputstate_is_pressed(&is, KEY_ESCAPE)) break;
     }
     mylibdraw_close();
     dlclose(draw_handle);
