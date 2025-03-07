@@ -8,7 +8,7 @@ POSITION_INDEPENDENT_CODE = -fPIC
 MAIN_C = main.c
 LINK_MATH = -lm
 RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
-CFLAGS ?= # Empty by default, override with make CFLAGS=...
+CFLAGS ?= # Allow override
 
 all: game
 
@@ -18,7 +18,7 @@ game: main.o gameloader.o libdraw.so liblogic.so
 main.o: main.c gameloader.h
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) main.c -o $@
 
-gameloader.o: gameloader.c gameloader.h
+gameloader.o: gameloader.c gameloader.h gamestate.h inputstate.h
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) gameloader.c -o $@
 
 libdraw.o: libdraw.c libdraw.h
@@ -33,9 +33,25 @@ liblogic.o: liblogic.c liblogic.h
 	touch liblogic.so.lockfile
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) liblogic.c -o $@
 
-liblogic.so: liblogic.o
-	$(CC) $(SHARED) -o $@ liblogic.o $(LINK_MATH) $(WFLAGS) $(CFLAGS)
+# Bundle gamestate and its deps into liblogic.so
+liblogic.so: liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o
+	$(CC) $(SHARED) -o $@ liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o $(LINK_MATH) $(WFLAGS) $(CFLAGS)
 	rm -rfv liblogic.so.lockfile
+
+gamestate.o: gamestate.c gamestate.h hashtable_entityid_spritegroup.h dungeon_floor.h em.h
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) gamestate.c -o $@
+
+hashtable_entityid_spritegroup.o: hashtable_entityid_spritegroup.c hashtable_entityid_spritegroup.h
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) hashtable_entityid_spritegroup.c -o $@
+
+dungeon_floor.o: dungeon_floor.c dungeon_floor.h dungeon_tile.h
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) dungeon_floor.c -o $@
+
+dungeon_tile.o: dungeon_tile.c dungeon_tile.h
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) dungeon_tile.c -o $@
+
+em.o: em.c em.h
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) em.c -o $@
 
 # Legacy libgame stuff (unchanged)
 libgame.o: libgame.c
@@ -47,29 +63,14 @@ libgame.so: $(LIBGAME_OBJECTS)
 	rm -rfv libgame.so.lockfile
 
 # Supporting objects (unchanged)
-gamestate.o: gamestate.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) gamestate.c -o $@
-
 sprite.o: sprite.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) sprite.c -o $@
 
 spritegroup.o: spritegroup.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) spritegroup.c -o $@
 
-dungeon_floor.o: dungeon_floor.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) dungeon_floor.c -o $@
-
 entity.o: entity.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) entity.c -o $@
-
-em.o: em.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) em.c -o $@
-
-dungeon_tile.o: dungeon_tile.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) dungeon_tile.c -o $@
-
-hashtable_entityid_spritegroup.o: hashtable_entityid_spritegroup.c
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) hashtable_entityid_spritegroup.c -o $@
 
 get_txkey_for_tiletype.o: get_txkey_for_tiletype.c
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) get_txkey_for_tiletype.c -o $@
