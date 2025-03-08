@@ -1,9 +1,6 @@
 #include "liblogic.h"
 #include "mprint.h"
 
-#include "liblogic.h"
-#include "mprint.h"
-
 void liblogic_init(gamestate* const g) {
     msuccess("Logic Init!");
 }

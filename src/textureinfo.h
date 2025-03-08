@@ -2,11 +2,11 @@
 
 #include <raylib.h>
 
+#define TEXTUREINFO_ASSET_PATH_MAX_LENGTH 512
+
 typedef struct {
     int num_frames;
     int contexts;
-    //int width;
-    //int height;
     Texture2D texture;
-    char asset_path[128];
+    char asset_path[TEXTUREINFO_ASSET_PATH_MAX_LENGTH];
 } textureinfo;
