@@ -61,7 +61,7 @@ gamestate* gamestateinitptr() {
     g->controlmode = CONTROLMODE_PLAYER;
 
     g->fadestate = FADESTATENONE;
-    g->spritegroups = NULL;
+    //g->spritegroups = NULL;
     g->hero_id = -1;
     g->dungeon_floor = NULL;
     g->entitymap = NULL;
@@ -78,8 +78,8 @@ gamestate* gamestateinitptr() {
 void gamestatefree(gamestate* g) {
     if (g) {
         minfo("Freeing gamestate");
-        minfo("Freeing hashtable");
-        hashtable_entityid_spritegroup_destroy(g->spritegroups);
+        //minfo("Freeing hashtable");
+        //hashtable_entityid_spritegroup_destroy(g->spritegroups);
         minfo("Freeing dungeon");
         dungeon_floor_free(g->dungeon_floor);
         minfo("Freeing em");

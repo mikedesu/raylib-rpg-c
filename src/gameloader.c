@@ -15,7 +15,7 @@
 #define LIBLOGIC_PATH "./liblogic.so"
 
 void* draw_handle = NULL;
-void (*mylibdraw_init)() = NULL;
+void (*mylibdraw_init)(const gamestate* const) = NULL;
 void (*mylibdraw_close)() = NULL;
 bool (*mylibdraw_windowshouldclose)() = NULL;
 void (*mylibdraw_drawframe)(const gamestate* const) = NULL;
@@ -74,7 +74,7 @@ void load_logic_symbols() {
     checksymbol(myliblogic_tick, "liblogic_tick");
 }
 
-void reload_draw() {
+void reload_draw(const gamestate* const g) {
     long new_time = getlastwritetime(LIBDRAW_PATH);
     if (new_time > draw_last_write_time) {
         if (draw_handle) {
@@ -82,7 +82,7 @@ void reload_draw() {
             dlclose(draw_handle);
         }
         load_draw_symbols();
-        mylibdraw_init();
+        mylibdraw_init(g);
         draw_last_write_time = new_time;
         msuccess("Reloaded libdraw.so");
     }
@@ -98,11 +98,11 @@ void reload_logic() {
     }
 }
 
-void autoreload_every_n_sec(const int n) {
+void autoreload_every_n_sec(const int n, const gamestate* const g) {
     assert(n > 0);
     frame_count++;
     if (frame_count % (n * 60) == 0) {
-        reload_draw();
+        reload_draw(g);
         reload_logic();
     }
 }
@@ -115,14 +115,14 @@ void gamerun() {
 
     load_draw_symbols();
     load_logic_symbols();
-    mylibdraw_init();
+    mylibdraw_init(g);
     myliblogic_init(g);
 
     while (!mylibdraw_windowshouldclose()) {
         mylibdraw_update_input(&is);
         myliblogic_tick(&is, g);
         mylibdraw_drawframe(g);
-        autoreload_every_n_sec(4);
+        autoreload_every_n_sec(4, g);
         if (inputstate_is_pressed(&is, KEY_ESCAPE)) break;
     }
 

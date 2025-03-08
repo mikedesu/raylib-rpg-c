@@ -2,12 +2,12 @@
 
 #include "controlmode.h"
 #include "debugpanel.h"
-#include "entityid.h"
-#include "fadestate.h"
-#include "hashtable_entityid_spritegroup.h"
 #include "dungeon_floor.h"
 #include "em.h"
-#include "textureinfo.h"
+#include "entityid.h"
+#include "fadestate.h"
+//#include "hashtable_entityid_spritegroup.h"
+//#include "textureinfo.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <time.h>
@@ -56,9 +56,9 @@ typedef struct gamestate {
 
     Font font;
 
-    hashtable_entityid_spritegroup_t* spritegroups;
+    //hashtable_entityid_spritegroup_t* spritegroups;
 
-    textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
+    //textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
     entityid hero_id;
 
