@@ -33,10 +33,24 @@ void libdraw_update_input(inputstate* const is) {
 }
 
 
-void libdraw_drawframe(const gamestate* const g) {
+void libdraw_drawframe(gamestate* const g) {
+
+    double start_time = GetTime();
+
     BeginDrawing();
     ClearBackground(RAYWHITE);
+
+    char buffer[1024] = {0};
+    snprintf(buffer, sizeof(buffer), "Frame draw time: %.02f ms", g->last_frame_time * 1000);
+    DrawText(buffer, 10, 10, 20, MAROON);
+
+
     EndDrawing();
+
+    double end_time = GetTime();
+
+    double elapsed_time = end_time - start_time;
+    g->last_frame_time = elapsed_time;
 }
 
 

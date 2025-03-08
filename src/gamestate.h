@@ -70,6 +70,8 @@ typedef struct gamestate {
     int max_entityids;
     entityid* entityids;
 
+    double last_frame_time;
+    char frame_time_str[32];
 
 } gamestate;
 

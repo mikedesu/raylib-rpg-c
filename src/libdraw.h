@@ -7,7 +7,8 @@
 //void libdraw_init(gamestate* const g);
 void libdraw_init(const gamestate* const g);
 void libdraw_update_input(inputstate* const is);
-void libdraw_drawframe(const gamestate* const g);
+//void libdraw_drawframe(const gamestate* const g);
+void libdraw_drawframe(gamestate* const g);
 void libdraw_close();
 bool libdraw_windowshouldclose();
 void libdraw_unload_texture(const int txkey);
