@@ -74,25 +74,25 @@ gamestate* gamestateinitptr() {
 }
 
 
-
-
 // have to update this function when we introduce new fields to Gamestate
 void gamestatefree(gamestate* g) {
-    if (!g) {
-#ifdef DEBUG
-        merror("gamestatefree g is NULL");
-#endif
-        return;
+    if (g) {
+        minfo("Freeing gamestate");
+        minfo("Freeing hashtable");
+        hashtable_entityid_spritegroup_destroy(g->spritegroups);
+        minfo("Freeing dungeon");
+        dungeon_floor_free(g->dungeon_floor);
+        minfo("Freeing em");
+        em_free(g->entitymap);
+        minfo("Freeing entityids");
+        free(g->entityids);
+        //free(g->timebegantm);
+        //free(g->currenttimetm);
+        minfo("Freeing g...");
+        free(g);
+        msuccess("Freed gamestate");
     }
-    hashtable_entityid_spritegroup_destroy(g->spritegroups);
-    dungeon_floor_free(g->dungeon_floor);
-    em_free(g->entitymap);
-    free(g->entityids);
-    //free(g->timebegantm);
-    //free(g->currenttimetm);
-    free(g);
 }
-
 
 
 void gamestate_add_entityid(gamestate* const g, const entityid id) {

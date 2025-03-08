@@ -6,46 +6,53 @@
 #include <string.h>
 
 
-
 em_t* em_new() {
     em_t* em = malloc(sizeof(em_t));
-    if (em == NULL) {
-        merror("em_new: malloc failed");
-        return NULL;
+    if (em) {
+        for (int i = 0; i < EM_MAX_SLOTS; i++) {
+            em->entities[i] = NULL;
+        }
+        em->count = 0;
+    } else {
+        merror("em_new: em is NULL");
+        em = NULL;
     }
-    for (int i = 0; i < EM_MAX_SLOTS; i++) {
-        em->entities[i] = NULL;
-    }
-    em->count = 0;
     return em;
 }
 
 
-
-
 void em_free(em_t* em) {
-    for (int i = 0; i < EM_MAX_SLOTS; i++) {
-        entity_t* current = em->entities[i];
-        while (current != NULL) {
-            entity_t* next = current->next;
-            free(current);
-            current = next;
+    if (em) {
+        minfo("Freeing entity map");
+        for (int i = 0; i < EM_MAX_SLOTS; i++) {
+            entity_t* current = em->entities[i];
+            while (current != NULL) {
+                entity_t* next = current->next;
+                free(current);
+                current = next;
+            }
         }
+        free(em);
+        msuccess("Freed entity map");
+    } else {
+        merror("em_free: em is NULL");
     }
-    free(em);
 }
-
-
 
 
 // returns the first item in the set which will be the oldest
 entity_t* em_get(em_t* em, const entityid id) {
-    if (id == -1) return NULL;
-    const int hash = id % EM_MAX_SLOTS;
-    return em->entities[hash];
+    entity_t* e = NULL;
+    if (em) {
+        if (id != -1) {
+            const int hash = id % EM_MAX_SLOTS;
+            e = em->entities[hash];
+        }
+    } else {
+        merror("em_get: em is NULL");
+    }
+    return e;
 }
-
-
 
 
 entity_t* em_get_last(em_t* em, const entityid id) {
@@ -59,7 +66,6 @@ entity_t* em_get_last(em_t* em, const entityid id) {
     }
     return current;
 }
-
 
 
 entity_t* em_add(em_t* em, entity_t* e) {
@@ -87,8 +93,6 @@ entity_t* em_add(em_t* em, entity_t* e) {
 }
 
 
-
-
 entity_t* em_remove_last(em_t* em, const entityid id) {
     const int hash = id % EM_MAX_SLOTS;
     entity_t* current = em->entities[hash];
@@ -109,8 +113,6 @@ entity_t* em_remove_last(em_t* em, const entityid id) {
 }
 
 
-
-
 int em_count(em_t* em) {
     //size_t count = 0;
     //for (int i = 0; i < EM_MAX_SLOTS; i++) {
@@ -126,7 +128,6 @@ int em_count(em_t* em) {
     }
     return em->count;
 }
-
 
 
 // remember to free the indices when you are done using them
