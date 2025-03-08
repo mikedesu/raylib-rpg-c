@@ -16,7 +16,7 @@ void libdraw_update_input(inputstate* const is) {
 void libdraw_drawframe(const gamestate* const g) {
     BeginDrawing();
     ClearBackground(RAYWHITE);
-    DrawText("Libdraw Works!", 10, 10, 20, BLACK);
+    DrawText("evildojo Works!", 10, 10, 20, BLACK);
     char buffer[32];
     snprintf(buffer, sizeof(buffer), "Hero ID: %d", g->hero_id);
     DrawText(buffer, 10, 40, 20, BLACK);
