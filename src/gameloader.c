@@ -17,6 +17,7 @@
 void* draw_handle = NULL;
 void (*mylibdraw_init)(const gamestate* const) = NULL;
 void (*mylibdraw_close)() = NULL;
+void (*myliblogic_close)(gamestate* const) = NULL;
 bool (*mylibdraw_windowshouldclose)() = NULL;
 void (*mylibdraw_drawframe)(const gamestate* const) = NULL;
 void (*mylibdraw_update_input)(inputstate* const) = NULL;
@@ -72,6 +73,8 @@ void load_logic_symbols() {
     checksymbol(myliblogic_init, "liblogic_init");
     myliblogic_tick = dlsym(logic_handle, "liblogic_tick");
     checksymbol(myliblogic_tick, "liblogic_tick");
+    myliblogic_close = dlsym(logic_handle, "liblogic_close");
+    checksymbol(myliblogic_close, "liblogic_close");
 }
 
 void reload_draw(const gamestate* const g) {
@@ -115,8 +118,11 @@ void gamerun() {
 
     load_draw_symbols();
     load_logic_symbols();
-    mylibdraw_init(g);
+
+    // i think liblogic will need init before libdraw because
+    // we will want to create entries in the entitymap AFTER it is init'd
     myliblogic_init(g);
+    mylibdraw_init(g);
 
     while (!mylibdraw_windowshouldclose()) {
         mylibdraw_update_input(&is);
@@ -127,6 +133,7 @@ void gamerun() {
     }
 
     mylibdraw_close();
+    myliblogic_close(g);
     dlclose(draw_handle);
     dlclose(logic_handle);
     gamestatefree(g);

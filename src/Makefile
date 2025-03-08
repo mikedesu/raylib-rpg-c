@@ -25,8 +25,12 @@ libdraw.o: libdraw.c libdraw.h
 	touch libdraw.so.lockfile
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) libdraw.c -o $@
 
-libdraw.so: libdraw.o
-	$(CC) $(SHARED) -o $@ libdraw.o $(RAYLIB_LIBS) $(LINK_MATH) $(WFLAGS) $(CFLAGS)
+#libdraw.so: libdraw.o
+#	$(CC) $(SHARED) -o $@ libdraw.o $(RAYLIB_LIBS) $(LINK_MATH) $(WFLAGS) $(CFLAGS)
+#	rm -rfv libdraw.so.lockfile
+
+libdraw.so: libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o
+	$(CC) $(SHARED) -o $@ libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o $(RAYLIB_LIBS) $(LINK_MATH) $(WFLAGS) $(CFLAGS)
 	rm -rfv libdraw.so.lockfile
 
 liblogic.o: liblogic.c liblogic.h
@@ -34,8 +38,8 @@ liblogic.o: liblogic.c liblogic.h
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) liblogic.c -o $@
 
 # Bundle gamestate and its deps into liblogic.so
-liblogic.so: liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o
-	$(CC) $(SHARED) -o $@ liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o $(LINK_MATH) $(WFLAGS) $(CFLAGS)
+liblogic.so: liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o
+	$(CC) $(SHARED) -o $@ liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o $(LINK_MATH) $(WFLAGS) $(CFLAGS)
 	rm -rfv liblogic.so.lockfile
 
 gamestate.o: gamestate.c gamestate.h hashtable_entityid_spritegroup.h dungeon_floor.h em.h
