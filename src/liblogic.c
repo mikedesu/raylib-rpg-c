@@ -18,20 +18,38 @@ void liblogic_init(gamestate* const g) {
     if (hero_id != -1) {
         g->hero_id = hero_id;
         msuccessint("Logic Init! Hero ID: ", g->hero_id);
-    } else {
+    } else
         merror("Logic Init: failed to init hero");
-    }
 }
 
 
+//void liblogic_tick(const inputstate* const is, gamestate* const g) {
+//    if (inputstate_is_held(is, KEY_RIGHT)) {
+//        entity* hero = em_get(g->entitymap, g->hero_id);
+//        if (hero) {
+//            entity_incr_x(hero);
+//        } else {
+//            merror("Hero not found!");
+//        }
+//    }
+//}
+
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
-    if (inputstate_is_held(is, KEY_RIGHT)) {
+    if (!is) {
+        merror("Input state is NULL!");
+        return;
+    }
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+    //if (inputstate_is_held(is, KEY_RIGHT)) {
+    if (inputstate_is_pressed(is, KEY_RIGHT)) {
         entity* hero = em_get(g->entitymap, g->hero_id);
-        if (hero) {
+        if (hero)
             entity_incr_x(hero);
-        } else {
+        else
             merror("Hero not found!");
-        }
     }
 }
 

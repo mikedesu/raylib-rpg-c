@@ -15,9 +15,7 @@ sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) 
     }
     s->numframes = numframes;
     s->numcontexts = numcontexts;
-    s->currentframe = 0;
-    s->currentcontext = 0;
-    s->num_loops = 0;
+    s->currentframe = s->currentcontext = s->num_loops = 0;
     s->texture = t;
     s->width = t->width / numframes;
     s->height = t->height / numcontexts;
@@ -33,8 +31,6 @@ sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) 
 }
 
 
-
-
 void sprite_incrframe(sprite* const s) {
     if (!s) return;
     s->currentframe = (s->currentframe + 1) % s->numframes;
@@ -44,19 +40,14 @@ void sprite_incrframe(sprite* const s) {
 }
 
 
-
-
 void sprite_setcontext(sprite* const s, const int context) {
     if (!s) return;
     if (context < 0 || context >= s->numcontexts) return;
     // also set currentframe to 0 to reset animation frame
     s->currentcontext = context % s->numcontexts;
     s->src.y = s->height * s->currentcontext;
-    s->currentframe = 0;
-    s->src.x = 0;
+    s->currentframe = s->src.x = 0;
 }
-
-
 
 
 void sprite_incrcontext(sprite* const s) {
@@ -66,15 +57,11 @@ void sprite_incrcontext(sprite* const s) {
 }
 
 
-
-
 void sprite_updatesrc(sprite* const s) {
     if (!s) return;
     s->src.x = s->width * s->currentframe;
-    s->src.y = s->height * s->currentcontext;
+    //s->src.y = s->height * s->currentcontext;
 }
-
-
 
 
 void sprite_destroy(sprite* s) {
@@ -84,7 +71,6 @@ void sprite_destroy(sprite* s) {
     s = NULL;
     msuccess("sprite_destroy success");
 }
-
 
 
 const int sprite_get_context(const sprite* const s) {

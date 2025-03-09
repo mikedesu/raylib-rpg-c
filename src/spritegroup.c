@@ -10,12 +10,7 @@ spritegroup_t* spritegroup_create(const int capacity) {
         merror("spritegroup_create: failed to allocate memory for spritegroup_t");
         return NULL;
     }
-    sg->current = 0;
-    sg->size = 0;
-    sg->off_x = 0;
-    sg->off_y = 0;
-    sg->default_anim = 0;
-    sg->id = 0;
+    sg->current = sg->size = sg->off_x = sg->off_y = sg->default_anim = sg->id = 0;
     sg->capacity = capacity;
     sg->sprites = malloc(sizeof(sprite*) * capacity);
     if (!sg->sprites) {
@@ -24,8 +19,7 @@ spritegroup_t* spritegroup_create(const int capacity) {
         free(sg);
         return NULL;
     }
-    sg->dest = (Rectangle){0, 0, 0, 0};
-    sg->move = (Rectangle){0, 0, 0, 0};
+    sg->dest = sg->move = (Rectangle){0, 0, 0, 0};
     sg->specifier = SPECIFIER_NONE;
     return sg;
 }
@@ -36,7 +30,7 @@ void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec) 
         merror("spritegroup_set_specifier: spritegroup is NULL");
         return;
     }
-    sg->specifier = spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT ? spec : SPECIFIER_NONE;
+    sg->specifier = (spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT) ? spec : SPECIFIER_NONE;
 }
 
 
@@ -46,12 +40,13 @@ void spritegroup_destroy(spritegroup_t* sg) {
         merror("spritegroup_destroy: spritegroup is NULL");
         return;
     }
-    if (sg->sprites) {
-        for (int i = 0; i < sg->size; i++) {
-            sprite_destroy(sg->sprites[i]);
-        }
-        free(sg->sprites);
+    if (!sg->sprites) {
+        merror("somerrormsg");
+        return;
     }
+    for (int i = 0; i < sg->size; i++)
+        sprite_destroy(sg->sprites[i]);
+    free(sg->sprites);
     free(sg);
 }
 
@@ -61,18 +56,14 @@ void spritegroup_add(spritegroup_t* const sg, sprite* s) {
         merror("spritegroup_add: spritegroup is NULL");
         return;
     }
-
     if (!s) {
         merror("spritegroup_add: sprite is NULL");
         return;
     }
-
-    if (sg->size < sg->capacity) {
-        sg->sprites[sg->size] = s;
-        sg->size++;
-    } else {
+    if (sg->size < sg->capacity)
+        sg->sprites[sg->size++] = s;
+    else
         mwarning("spritegroup_add: spritegroup is full");
-    }
 }
 
 
@@ -85,11 +76,15 @@ void spritegroup_set(spritegroup_t* const sg, const int index, sprite* s) {
         merror("spritegroup_set: sprite is NULL");
         return;
     }
-    if (index >= 0 && index < sg->size) {
-        sg->sprites[index] = s;
-    } else {
-        merror("spritegroup_set: index is out of bounds");
+    if (index < 0) {
+        merror("spritegroup_set: index is negative");
+        return;
     }
+    if (index >= sg->size) {
+        merror("spritegroup_set: index is out of bounds");
+        return;
+    }
+    sg->sprites[index] = s;
 }
 
 
@@ -99,9 +94,8 @@ void spritegroup_setcontexts(spritegroup_t* const sg, const int context) {
         merror("spritegroup_setcontexts: spritegroup is NULL");
         return;
     }
-    for (int i = 0; i < sg->size; i++) {
+    for (int i = 0; i < sg->size; i++)
         sprite_setcontext(sg->sprites[i], context);
-    }
 }
 
 
@@ -110,7 +104,11 @@ sprite* spritegroup_get(spritegroup_t* const sg, const int index) {
         merror("spritegroup_get: spritegroup is NULL");
         return NULL;
     }
-    return index < sg->size ? sg->sprites[index] : NULL;
+    if (index >= sg->size) {
+        merror("spritegroup_get: spritegroup is NULL");
+        return NULL;
+    }
+    return sg->sprites[index];
 }
 
 
@@ -118,8 +116,7 @@ const bool spritegroup_set_current(spritegroup_t* const sg, const int index) {
     if (!sg) {
         merror("spritegroup_set_current: spritegroup is NULL");
         return false;
-    }
-    if (index >= sg->size) {
+    } else if (index >= sg->size) {
         merrorint("spritegroup_set_current: index is out of bounds", index);
         return false;
     } else if (index < 0) {
@@ -147,4 +144,3 @@ const int spritegroup_get_first_context(spritegroup_t* const sg) {
     }
     return sprite_get_context(sg->sprites[0]);
 }
-

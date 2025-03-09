@@ -14,22 +14,24 @@ textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 #define DEFAULT_WINDOW_HEIGHT 480
 #define DEFAULT_TILE_SIZE 8
 #define SPRITEGROUP_DEFAULT_SIZE 32
+#define ANIM_SPEED 10
 
 
 void libdraw_init(gamestate* const g) {
-    if (g) {
-        const char* title = "evildojo666";
-        const int window_width = DEFAULT_WINDOW_WIDTH;
-        const int window_height = DEFAULT_WINDOW_HEIGHT;
-        InitWindow(window_width, window_height, title);
-        SetTargetFPS(60);
-        spritegroups = hashtable_entityid_spritegroup_create(4);
-        libdraw_load_textures();
-        libdraw_create_spritegroup(g, g->hero_id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
-        msuccess("libdraw_init");
-    } else {
+    if (!g) {
         merror("libdraw_init g is NULL");
+        return;
     }
+
+    const char* t = "evildojo666";
+    const int w_width = DEFAULT_WINDOW_WIDTH;
+    const int w_height = DEFAULT_WINDOW_HEIGHT;
+    InitWindow(w_width, w_height, t);
+    SetTargetFPS(60);
+    spritegroups = hashtable_entityid_spritegroup_create(4);
+    libdraw_load_textures();
+    libdraw_create_spritegroup(g, g->hero_id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
+    msuccess("libdraw_init");
 }
 
 
@@ -48,9 +50,9 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
     if (e) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, e->id);
         if (sg) {
-            //const int scale = 4;
-            sg->dest.x = e->x * DEFAULT_TILE_SIZE;
-            sg->dest.y = e->y * DEFAULT_TILE_SIZE;
+            const int scale = 4;
+            sg->dest.x = e->x * DEFAULT_TILE_SIZE * scale;
+            sg->dest.y = e->y * DEFAULT_TILE_SIZE * scale;
         }
     }
 }
@@ -83,7 +85,12 @@ void libdraw_drawframe(gamestate* const g) {
     spritegroup_t* hero_sg = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     if (hero_sg) {
         sprite* s = spritegroup_get(hero_sg, hero_sg->current);
-        if (s) {
+        const int scale = 4;
+        Rectangle new_dest =
+            (Rectangle){hero_sg->dest.x, hero_sg->dest.y, scale * hero_sg->dest.width, scale * hero_sg->dest.height};
+        if (!s) {
+            merror("sprite not found");
+        } else {
             snprintf(buffer2,
                      sizeof(buffer2),
                      "Hero x/y/w/h: %0.2f/%0.2f/%0.2f/%0.2f\n",
@@ -93,20 +100,17 @@ void libdraw_drawframe(gamestate* const g) {
                      hero_sg->dest.height);
             //const int scale = 1;
             DrawText(buffer2, 10, 40, 20, MAROON);
-            DrawTexturePro(*s->texture,
-                           s->src,
-                           (Rectangle){hero_sg->dest.x, hero_sg->dest.y, hero_sg->dest.width, hero_sg->dest.height},
-                           (Vector2){hero_sg->off_x, hero_sg->off_y},
-                           0,
-                           WHITE);
-        } else {
-            merror("sprite not found");
+            //DrawTexturePro(*s->texture, s->src, new_dest, (Vector2){hero_sg->off_x, hero_sg->off_y}, 0, WHITE);
+            DrawTexturePro(*s->texture, s->src, new_dest, (Vector2){0, 0}, 0, WHITE);
+            // increment the sprite's current frame
+            if (g->framecount % ANIM_SPEED == 0) sprite_incrframe(s);
         }
     }
     EndDrawing();
     double end_time = GetTime();
     double elapsed_time = end_time - start_time;
     g->last_frame_time = elapsed_time;
+    g->framecount++;
 }
 
 
