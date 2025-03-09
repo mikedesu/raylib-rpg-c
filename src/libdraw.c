@@ -1,7 +1,6 @@
 #include "libdraw.h"
 #include "gamestate.h"
 #include "hashtable_entityid_spritegroup.h"
-//#include "libgame_defines.h"
 #include "mprint.h"
 #include "spritegroup.h"
 #include "textureinfo.h"
@@ -53,6 +52,8 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
             const int scale = 4;
             sg->dest.x = e->x * DEFAULT_TILE_SIZE * scale;
             sg->dest.y = e->y * DEFAULT_TILE_SIZE * scale;
+            sprite* s = sg->sprites[sg->current];
+            if (g->framecount % ANIM_SPEED == 0) sprite_incrframe(s);
         }
     }
 }
@@ -82,35 +83,32 @@ void libdraw_drawframe(gamestate* const g) {
     char buffer2[1024] = {0};
     snprintf(buffer, sizeof(buffer), "Frame draw time: %.02f ms\n", g->last_frame_time * 1000);
     DrawText(buffer, 10, 10, 20, MAROON);
-    spritegroup_t* hero_sg = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
-    if (hero_sg) {
-        sprite* s = spritegroup_get(hero_sg, hero_sg->current);
-        const int scale = 4;
-        Rectangle new_dest =
-            (Rectangle){hero_sg->dest.x, hero_sg->dest.y, scale * hero_sg->dest.width, scale * hero_sg->dest.height};
-        if (!s) {
-            merror("sprite not found");
-        } else {
-            snprintf(buffer2,
-                     sizeof(buffer2),
-                     "Hero x/y/w/h: %0.2f/%0.2f/%0.2f/%0.2f\n",
-                     hero_sg->dest.x,
-                     hero_sg->dest.y,
-                     hero_sg->dest.width,
-                     hero_sg->dest.height);
-            //const int scale = 1;
-            DrawText(buffer2, 10, 40, 20, MAROON);
-            //DrawTexturePro(*s->texture, s->src, new_dest, (Vector2){hero_sg->off_x, hero_sg->off_y}, 0, WHITE);
-            DrawTexturePro(*s->texture, s->src, new_dest, (Vector2){0, 0}, 0, WHITE);
-            // increment the sprite's current frame
-            if (g->framecount % ANIM_SPEED == 0) sprite_incrframe(s);
-        }
-    }
+
+    libdraw_draw_sprite(g, g->hero_id);
+
     EndDrawing();
-    double end_time = GetTime();
-    double elapsed_time = end_time - start_time;
+    //double end_time = GetTime();
+    double elapsed_time = GetTime() - start_time;
     g->last_frame_time = elapsed_time;
     g->framecount++;
+}
+
+
+void libdraw_draw_sprite(const gamestate* const g, const entityid id) {
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+    if (!sg) {
+        merror("libdraw_draw_sprite: spritegroup is NULL");
+        return;
+    }
+    sprite* s = spritegroup_get(sg, sg->current);
+    if (!s) {
+        merror("sprite not found");
+        return;
+    }
+    const int scale = 4;
+    Rectangle new_dest = (Rectangle){sg->dest.x, sg->dest.y, scale * sg->dest.width, scale * sg->dest.height};
+    DrawTexturePro(*s->texture, s->src, new_dest, (Vector2){0, 0}, 0, WHITE);
+    if (g->framecount % ANIM_SPEED == 0) sprite_incrframe(s);
 }
 
 

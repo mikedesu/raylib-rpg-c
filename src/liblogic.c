@@ -23,16 +23,23 @@ void liblogic_init(gamestate* const g) {
 }
 
 
-//void liblogic_tick(const inputstate* const is, gamestate* const g) {
-//    if (inputstate_is_held(is, KEY_RIGHT)) {
-//        entity* hero = em_get(g->entitymap, g->hero_id);
-//        if (hero) {
-//            entity_incr_x(hero);
-//        } else {
-//            merror("Hero not found!");
-//        }
-//    }
-//}
+void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
+    entity* hero = em_get(g->entitymap, g->hero_id);
+    if (!hero) {
+        merror("Hero not found!");
+        return;
+    }
+
+    if (inputstate_is_pressed(is, KEY_RIGHT)) {
+        entity_incr_x(hero);
+    } else if (inputstate_is_pressed(is, KEY_LEFT)) {
+        entity_decr_x(hero);
+    } else if (inputstate_is_pressed(is, KEY_UP)) {
+        entity_decr_y(hero);
+    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+        entity_incr_y(hero);
+    }
+}
 
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     if (!is) {
@@ -43,14 +50,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
         merror("Game state is NULL!");
         return;
     }
-    //if (inputstate_is_held(is, KEY_RIGHT)) {
-    if (inputstate_is_pressed(is, KEY_RIGHT)) {
-        entity* hero = em_get(g->entitymap, g->hero_id);
-        if (hero)
-            entity_incr_x(hero);
-        else
-            merror("Hero not found!");
-    }
+    liblogic_handle_input(is, g);
 }
 
 
@@ -103,6 +103,7 @@ entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, in
         return -1;
     }
     // Assuming entity struct has a name field—copy it
+    bzero(e->name, ENTITY_NAME_LEN_MAX); // Clear name field
     strncpy(e->name, name, ENTITY_NAME_LEN_MAX - 1); // Adjust ENTITY_NAME_MAXLEN if defined elsewhere
     e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null-terminated
     em_add(g->entitymap, e);
