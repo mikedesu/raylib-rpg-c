@@ -16,6 +16,7 @@ void libdraw_load_texture(
 void libdraw_load_textures();
 void libdraw_unload_textures();
 
+// may or may not deprecate specifier_t
 void libdraw_create_spritegroup(
     gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
 
