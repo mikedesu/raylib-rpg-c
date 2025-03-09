@@ -11,6 +11,7 @@ void liblogic_init(gamestate* const g) {
     entity* e = entity_new_at(0, ENTITY_PLAYER, 0, 0);
     if (e) {
         em_add(g->entitymap, e);
+        // in this case we keep a copy of the id separate from the entityids
         g->hero_id = e->id;
         msuccessint("Logic Init! Hero ID: ", g->hero_id);
     } else {
@@ -20,8 +21,18 @@ void liblogic_init(gamestate* const g) {
 
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     if (inputstate_is_held(is, KEY_RIGHT)) {
-        g->hero_id += 1; // Dummy movement
-        msuccess("Hero moved right!");
+
+        entity* hero = em_get(g->entitymap, g->hero_id);
+        if (hero) {
+            entity_incr_x(hero);
+            msuccessint("Hero moved right! x: ", hero->x);
+        } else {
+            merror("Hero not found!");
+        }
+
+
+        //g->hero_id += 1; // Dummy movement
+        //msuccess("Hero moved right!");
     }
     //msuccess("Logic Tick! v1");
 }

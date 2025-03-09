@@ -1,7 +1,7 @@
 #include "libdraw.h"
 #include "gamestate.h"
 #include "hashtable_entityid_spritegroup.h"
-#include "libgame_defines.h"
+//#include "libgame_defines.h"
 #include "mprint.h"
 #include "spritegroup.h"
 #include "textureinfo.h"
@@ -9,8 +9,6 @@
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
-
-gamestate* g = NULL;
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 480
@@ -25,14 +23,9 @@ void libdraw_init(gamestate* const g) {
         const int window_height = DEFAULT_WINDOW_HEIGHT;
         InitWindow(window_width, window_height, title);
         SetTargetFPS(60);
-
         spritegroups = hashtable_entityid_spritegroup_create(4);
-
         libdraw_load_textures();
-
-
         libdraw_create_spritegroup(g, g->hero_id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
-
         msuccess("libdraw_init");
     } else {
         merror("libdraw_init g is NULL");
@@ -45,51 +38,80 @@ void libdraw_update_input(inputstate* const is) {
 }
 
 
+void libdraw_update_sprite(gamestate* const g, entityid id) {
+    if (!g) {
+        merror("libdraw_update_sprite: gamestate is NULL");
+        return;
+    }
+
+    entity* const e = em_get(g->entitymap, id);
+    if (e) {
+        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, e->id);
+        if (sg) {
+            //const int scale = 4;
+            sg->dest.x = e->x * DEFAULT_TILE_SIZE;
+            sg->dest.y = e->y * DEFAULT_TILE_SIZE;
+        }
+    }
+}
+
+
+void libdraw_update_sprites(gamestate* const g) {
+    if (!g) {
+        merror("libdraw_update_sprites: gamestate is NULL");
+        return;
+    }
+
+    //minfo("libdraw_update_sprites");
+    // for each entityid in our entitymap, update the spritegroup
+    libdraw_update_sprite(g, g->hero_id);
+    for (int i = 0; i < g->index_entityids; i++) {
+        entityid id = g->entityids[i];
+        libdraw_update_sprite(g, id);
+    }
+}
+
+
 void libdraw_drawframe(gamestate* const g) {
-
     double start_time = GetTime();
-
     BeginDrawing();
     ClearBackground(RAYWHITE);
-
     char buffer[1024] = {0};
+    char buffer2[1024] = {0};
     snprintf(buffer, sizeof(buffer), "Frame draw time: %.02f ms\n", g->last_frame_time * 1000);
     DrawText(buffer, 10, 10, 20, MAROON);
-
     spritegroup_t* hero_sg = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     if (hero_sg) {
-        msuccess("spritegroup found");
-        hero_sg->dest.width *= 1.01f;
-        hero_sg->dest.height *= 1.01f;
         sprite* s = spritegroup_get(hero_sg, hero_sg->current);
         if (s) {
-            //snprintf(buffer, sizeof(buffer), "Hero x/y/w/h: %d/%d/%d/%d\n", hero_sg->dest.x, hero_sg->dest.y, hero_sg->dest.width, hero_sg->dest.height);
-            snprintf(buffer,
-                     sizeof(buffer),
+            snprintf(buffer2,
+                     sizeof(buffer2),
                      "Hero x/y/w/h: %0.2f/%0.2f/%0.2f/%0.2f\n",
                      hero_sg->dest.x,
                      hero_sg->dest.y,
                      hero_sg->dest.width,
                      hero_sg->dest.height);
-            DrawText(buffer, 10, 40, 20, MAROON);
-            DrawTexturePro(*s->texture, s->src, hero_sg->dest, (Vector2){hero_sg->off_x, hero_sg->off_y}, 0, WHITE);
-            //DrawTexturePro(*s->texture, s->src, hero_sg->dest, (Vector2){0, 0}, 0, WHITE);
+            //const int scale = 1;
+            DrawText(buffer2, 10, 40, 20, MAROON);
+            DrawTexturePro(*s->texture,
+                           s->src,
+                           (Rectangle){hero_sg->dest.x, hero_sg->dest.y, hero_sg->dest.width, hero_sg->dest.height},
+                           (Vector2){hero_sg->off_x, hero_sg->off_y},
+                           0,
+                           WHITE);
         } else {
             merror("sprite not found");
         }
     }
-
     EndDrawing();
-
     double end_time = GetTime();
-
     double elapsed_time = end_time - start_time;
     g->last_frame_time = elapsed_time;
 }
 
 
 void libdraw_close() {
-    g = NULL;
+    //g = NULL;
     libdraw_unload_textures();
     CloseWindow();
 }
@@ -157,7 +179,6 @@ void libdraw_load_textures() {
                 minfo("libdraw_load_textures: skipping comment line");
                 continue;
             }
-
             sscanf(line, "%d %d %d %d %s", &txkey, &contexts, &frames, &do_dither, path);
             if (txkey < 0 || contexts < 0 || frames < 0) {
                 merror("libdraw_load_textures: invalid line in textures.txt");
@@ -183,6 +204,7 @@ void libdraw_unload_textures() {
         libdraw_unload_texture(i);
 }
 
+
 void libdraw_create_spritegroup(
     gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
     minfo("libdraw_create_spritegroup");
@@ -198,7 +220,6 @@ void libdraw_create_spritegroup(
         return;
     }
     msuccess("group was not NULL");
-
     entity* e = em_get(g->entitymap, id);
     if (!e) {
         merrorint("libdraw_create_spritegroup: entity not found", id);
@@ -206,8 +227,7 @@ void libdraw_create_spritegroup(
         return;
     }
     msuccessint("entity found", id);
-
-
+    //disabling this check until dungeon_floor created
     //if (e->x < 0 || e->x >= g->dungeon_floor->width || e->y < 0 || e->y >= g->dungeon_floor->height) {
     //    merrorint2("libdraw_create_spritegroup: entity pos out of bounds", e->x, e->y);
     //    spritegroup_destroy(group);
@@ -224,29 +244,12 @@ void libdraw_create_spritegroup(
         minfoint("k", k);
         Texture2D* tex = &txinfo[k].texture;
         minfo("got texture");
-        //sprite_width = tex->width / 4; // 4 frames
-        //sprite_height = tex->height / 4; // 4 directions
-        //sprite_width = tex->width; // 4 frames
-        //sprite_height = tex->height; // 4 directions
-        //minfo("got width/height");
-        //minfoint("sprite_width", sprite_width);
-        //minfoint("sprite_height", sprite_height);
-        //minfoint("contexts", txinfo[k].contexts);
-        //minfoint("num_frames", txinfo[k].num_frames);
-
         sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
         minfo("created sprite");
-        //s->src = (Rectangle){k * sprite_width, 0, sprite_width, sprite_height}; // Row 0 (up)
-        //minfo("set src");
         spritegroup_add(group, s);
         minfo("added sprite");
     }
     minfo("loop done");
-    //group->dest = (Rectangle){
-    //    e->x * DEFAULT_TILE_SIZE + offset_x, e->y * DEFAULT_TILE_SIZE + offset_y, sprite_width, sprite_height};
-    //group->off_x = offset_x;
-    //group->off_y = offset_y;
-    //minfo("set dest");
     spritegroup_set_specifier(group, spec);
     group->id = id;
     const float w = spritegroup_get(group, 0)->width;
@@ -257,9 +260,7 @@ void libdraw_create_spritegroup(
     group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
     group->off_x = offset_x;
     group->off_y = offset_y;
-
     msuccessint("inserting spritegroup for entity", id);
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
     msuccessint("Spritegroup created for entity", id);
-    //    spritegroup_destroy(group); // Hashtable copies it
 }

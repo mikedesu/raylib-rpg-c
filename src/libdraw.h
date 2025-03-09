@@ -18,3 +18,6 @@ void libdraw_unload_textures();
 
 void libdraw_create_spritegroup(
     gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
+
+void libdraw_update_sprites(gamestate* const g);
+void libdraw_update_sprite(gamestate* const g, entityid id);

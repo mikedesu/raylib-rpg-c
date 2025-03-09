@@ -12,7 +12,6 @@ entity_t* entity_new(const entityid id, const entitytype_t type) {
     e->id = id;
     e->type = type;
     e->race = RACE_NONE;
-    //e->direction = DIRECTION_RIGHT;
     e->direction = DIRECTION_RIGHT;
     e->x = -1;
     e->y = -1;
@@ -77,4 +76,68 @@ void entity_set_race(entity_t* const e, const race_t race) {
     }
 
     e->race = race;
+}
+
+
+void entity_set_x(entity_t* const e, const int x) {
+    if (e == NULL) {
+        merror("e is NULL");
+        return;
+    }
+
+    e->x = x;
+}
+
+void entity_set_y(entity_t* const e, const int y) {
+    if (e == NULL) {
+        merror("e is NULL");
+        return;
+    }
+
+    e->y = y;
+}
+
+
+void entity_set_xy(entity_t* const e, const int x, const int y) {
+    entity_set_x(e, x);
+    entity_set_y(e, y);
+}
+
+
+void entity_incr_x(entity_t* const e) {
+    if (e == NULL) {
+        merror("e is NULL");
+        return;
+    }
+
+    e->x++;
+}
+
+
+void entity_incr_y(entity_t* const e) {
+    if (e == NULL) {
+        merror("e is NULL");
+        return;
+    }
+
+    e->y++;
+}
+
+
+void entity_decr_x(entity_t* const e) {
+    if (e == NULL) {
+        merror("e is NULL");
+        return;
+    }
+
+    e->x--;
+}
+
+void entity_decr_y(entity_t* const e) {
+    if (e == NULL) {
+        merror("e is NULL");
+        return;
+    }
+
+    e->y--;
 }

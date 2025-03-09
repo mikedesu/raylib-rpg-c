@@ -20,6 +20,7 @@ void (*mylibdraw_close)() = NULL;
 void (*myliblogic_close)(gamestate* const) = NULL;
 bool (*mylibdraw_windowshouldclose)() = NULL;
 void (*mylibdraw_drawframe)(const gamestate* const) = NULL;
+void (*mylibdraw_update_sprites)(gamestate* const) = NULL;
 void (*mylibdraw_update_input)(inputstate* const) = NULL;
 
 void* logic_handle = NULL;
@@ -61,6 +62,8 @@ void load_draw_symbols() {
     checksymbol(mylibdraw_drawframe, "libdraw_drawframe");
     mylibdraw_update_input = dlsym(draw_handle, "libdraw_update_input");
     checksymbol(mylibdraw_update_input, "libdraw_update_input");
+    mylibdraw_update_sprites = dlsym(draw_handle, "libdraw_update_sprites");
+    checksymbol(mylibdraw_update_sprites, "libdraw_update_sprites");
 }
 
 void load_logic_symbols() {
@@ -127,6 +130,7 @@ void gamerun() {
     while (!mylibdraw_windowshouldclose()) {
         mylibdraw_update_input(&is);
         myliblogic_tick(&is, g);
+        mylibdraw_update_sprites(g);
         mylibdraw_drawframe(g);
         autoreload_every_n_sec(4, g);
         if (inputstate_is_pressed(&is, KEY_ESCAPE)) break;
