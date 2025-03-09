@@ -8,20 +8,6 @@
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
 
-//void liblogic_init(gamestate* const g) {
-//    g->entitymap = em_new();
-//    // have to create a new entity for adding to entitymap
-//    entity* e = entity_new_at(0, ENTITY_PLAYER, 0, 0);
-//    if (e) {
-//        em_add(g->entitymap, e);
-//        // in this case we keep a copy of the id separate from the entityids
-//        g->hero_id = e->id;
-//        msuccessint("Logic Init! Hero ID: ", g->hero_id);
-//    } else {
-//        merror("Failed to create entity");
-//    }
-//}
-
 void liblogic_init(gamestate* const g) {
     if (!g) {
         merror("liblogic_init: gamestate is NULL");
@@ -37,26 +23,18 @@ void liblogic_init(gamestate* const g) {
     }
 }
 
+
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     if (inputstate_is_held(is, KEY_RIGHT)) {
         entity* hero = em_get(g->entitymap, g->hero_id);
         if (hero) {
             entity_incr_x(hero);
-            msuccessint("Hero moved right! x: ", hero->x);
         } else {
             merror("Hero not found!");
         }
-        //g->hero_id += 1; // Dummy movement
-        //msuccess("Hero moved right!");
     }
-    //msuccess("Logic Tick! v1");
 }
 
-
-//void liblogic_close(gamestate* const g) {
-//    em_free(g->entitymap);
-//    msuccess("Logic Close!");
-//}
 
 void liblogic_close(gamestate* const g) {
     if (!g) {
@@ -69,6 +47,7 @@ void liblogic_close(gamestate* const g) {
     }
     msuccess("Logic Close!");
 }
+
 
 void liblogic_add_entityid(gamestate* const g, entityid id) {
     if (!g) {
@@ -90,6 +69,7 @@ void liblogic_add_entityid(gamestate* const g, entityid id) {
     msuccessint("Added entity ID: ", id);
 }
 
+
 entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, int y, const char* name) {
     if (!g || !g->entitymap) {
         merror("liblogic_entity_create: gamestate or entitymap is NULL");
@@ -109,6 +89,6 @@ entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, in
     e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null-terminated
     em_add(g->entitymap, e);
     liblogic_add_entityid(g, e->id);
-    //msuccess("Created entity '%s' type %d at (%d, %d), ID: %d", name, type, x, y, e->id);
+    msuccessint2("Created entity at", x, y);
     return e->id;
 }
