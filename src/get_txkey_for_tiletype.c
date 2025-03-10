@@ -1,8 +1,7 @@
 #include "get_txkey_for_tiletype.h"
 #include "libgame_defines.h"
 
-//int get_txkey_for_tiletype(tiletype_t type) {
-int get_txkey_for_tiletype(dungeon_tile_type_t type) {
+int get_txkey_for_tiletype(const dungeon_tile_type_t type) {
     int key = -1;
     switch (type) {
     //case TILETYPE_DIRT_00:
@@ -18,7 +17,6 @@ int get_txkey_for_tiletype(dungeon_tile_type_t type) {
     case DUNGEON_TILE_TYPE_STONE_WALL_02:
         key = TX_STONEWALL_02;
         break;
-
 
     //case TILETYPE_DIRT_01:
     //    key = TX_DIRT_01;

@@ -10,6 +10,9 @@ LINK_MATH = -lm
 RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 CFLAGS ?= # Allow override
 
+LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o get_txkey_for_tiletype.o
+LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o
+
 all: game
 
 game: main.o gameloader.o libdraw.so liblogic.so
@@ -25,12 +28,8 @@ libdraw.o: libdraw.c libdraw.h
 	touch libdraw.so.lockfile
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) libdraw.c -o $@
 
-#libdraw.so: libdraw.o
-#	$(CC) $(SHARED) -o $@ libdraw.o $(RAYLIB_LIBS) $(LINK_MATH) $(WFLAGS) $(CFLAGS)
-#	rm -rfv libdraw.so.lockfile
-
-libdraw.so: libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o
-	$(CC) $(SHARED) -o $@ libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o $(RAYLIB_LIBS) $(LINK_MATH) $(WFLAGS) $(CFLAGS)
+libdraw.so: $(LIBDRAW_OBJECTS)
+	$(CC) $(SHARED) -o $@ $(LIBDRAW_OBJECTS) $(RAYLIB_LIBS) $(LINK_MATH) $(WFLAGS) $(CFLAGS)
 	rm -rfv libdraw.so.lockfile
 
 liblogic.o: liblogic.c liblogic.h
@@ -38,8 +37,8 @@ liblogic.o: liblogic.c liblogic.h
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) liblogic.c -o $@
 
 # Bundle gamestate and its deps into liblogic.so
-liblogic.so: liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o
-	$(CC) $(SHARED) -o $@ liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o $(LINK_MATH) $(WFLAGS) $(CFLAGS)
+liblogic.so: $(LIBLOGIC_OBJECTS)
+	$(CC) $(SHARED) -o $@ $(LIBLOGIC_OBJECTS) $(LINK_MATH) $(WFLAGS) $(CFLAGS)
 	rm -rfv liblogic.so.lockfile
 
 gamestate.o: gamestate.c gamestate.h hashtable_entityid_spritegroup.h dungeon_floor.h em.h

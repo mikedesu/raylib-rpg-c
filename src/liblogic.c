@@ -13,6 +13,17 @@ void liblogic_init(gamestate* const g) {
         merror("liblogic_init: gamestate is NULL");
         return;
     }
+
+    // init the dungeon floor
+
+    g->dungeon_floor = dungeon_floor_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    if (!g->dungeon_floor) {
+        merror("liblogic_init: failed to init dungeon floor");
+        return;
+    }
+    dungeon_floor_init(g->dungeon_floor);
+
+
     g->entitymap = em_new();
     entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, 0, 0, "hero");
     if (hero_id != -1) {

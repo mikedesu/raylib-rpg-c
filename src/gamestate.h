@@ -19,7 +19,14 @@
 typedef struct gamestate {
     int framecount;
     int fadealpha;
-
+    int camera_mode;
+    int targetwidth;
+    int targetheight;
+    int windowwidth;
+    int windowheight;
+    int lock;
+    controlmode_t controlmode;
+    entityid hero_id;
     time_t timebegan;
     time_t currenttime;
 
@@ -35,32 +42,16 @@ typedef struct gamestate {
     bool player_input_received;
     bool is_locked;
     bool processing_actions;
+    bool is3d;
 
     debugpanel_t debugpanel;
 
     Camera2D cam2d;
     Camera3D cam3d;
-    int camera_mode;
-
-    bool is3d;
-
-    controlmode_t controlmode;
 
     fadestate_t fadestate;
 
-    int targetwidth;
-    int targetheight;
-    int windowwidth;
-    int windowheight;
-    int lock;
-
     Font font;
-
-    //hashtable_entityid_spritegroup_t* spritegroups;
-
-    //textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
-
-    entityid hero_id;
 
     dungeon_floor_t* dungeon_floor;
 

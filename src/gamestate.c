@@ -42,7 +42,7 @@ gamestate* gamestateinitptr() {
     g->processing_actions = false;
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){0, 0};
-    g->cam2d.zoom = 20.0f;
+    g->cam2d.zoom = 1.0f;
     g->cam2d.rotation = 0.0;
 
     g->cam3d = (Camera3D){0};
