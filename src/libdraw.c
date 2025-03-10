@@ -108,7 +108,7 @@ void libdraw_draw_sprite(const gamestate* const g, const entityid id) {
     const int scale = 4;
     Rectangle new_dest = (Rectangle){sg->dest.x, sg->dest.y, scale * sg->dest.width, scale * sg->dest.height};
     DrawTexturePro(*s->texture, s->src, new_dest, (Vector2){0, 0}, 0, WHITE);
-    if (g->framecount % ANIM_SPEED == 0) sprite_incrframe(s);
+    //if (g->framecount % ANIM_SPEED == 0) sprite_incrframe(s);
 }
 
 
@@ -128,76 +128,100 @@ void libdraw_load_texture(
     const int txkey, const int contexts, const int frames, const bool do_dither, const char* path) {
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
         merror("libdraw_load_texture: txkey out of bounds");
-    } else if (contexts < 0) {
-        merror("libdraw_load_texture: contexts out of bounds");
-    } else if (frames < 0) {
-        merror("libdraw_load_texture: frames out of bounds");
-    } else if (txinfo[txkey].texture.id > 0) {
-        merror("libdraw_load_texture: texture already loaded");
-    } else if (strlen(path) == 0) {
-        merror("libdraw_load_texture: path is empty");
-    } else if (strcmp(path, "\n") == 0) {
-        merror("libdraw_load_texture: path is newline");
-    } else {
-        Image image = LoadImage(path);
-        if (do_dither) {
-            ImageDither(&image, 8, 8, 8, 8);
-        }
-        Texture2D texture = LoadTextureFromImage(image);
-        UnloadImage(image);
-        txinfo[txkey].texture = texture;
-        txinfo[txkey].contexts = contexts;
-        txinfo[txkey].num_frames = frames;
-        msuccess("libdraw_load_texture: texture loaded successfully");
+        return;
     }
+
+    if (contexts < 0) {
+        merror("libdraw_load_texture: contexts out of bounds");
+        return;
+    }
+
+    if (frames < 0) {
+        merror("libdraw_load_texture: frames out of bounds");
+        return;
+    }
+
+    if (txinfo[txkey].texture.id > 0) {
+        merror("libdraw_load_texture: texture already loaded");
+        return;
+    }
+    if (strlen(path) == 0) {
+        merror("libdraw_load_texture: path is empty");
+        return;
+    }
+    if (strcmp(path, "\n") == 0) {
+        merror("libdraw_load_texture: path is newline");
+        return;
+    }
+    Image image = LoadImage(path);
+    if (do_dither) ImageDither(&image, 8, 8, 8, 8);
+    Texture2D texture = LoadTextureFromImage(image);
+    UnloadImage(image);
+    txinfo[txkey].texture = texture;
+    txinfo[txkey].contexts = contexts;
+    txinfo[txkey].num_frames = frames;
+    msuccess("libdraw_load_texture: texture loaded successfully");
 }
 
 
 void libdraw_unload_texture(const int txkey) {
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
         merror("libdraw_unload_texture: txkey out of bounds");
-    } else {
-        UnloadTexture(txinfo[txkey].texture);
-        txinfo[txkey].texture = (Texture2D){0};
-        txinfo[txkey].contexts = 0;
-        msuccess("libdraw_unload_texture: texture unloaded successfully");
+        return;
     }
+    UnloadTexture(txinfo[txkey].texture);
+    txinfo[txkey].texture = (Texture2D){0};
+    txinfo[txkey].contexts = 0;
+    msuccess("libdraw_unload_texture: texture unloaded successfully");
 }
 
 
 void libdraw_load_textures() {
     const char* textures_file = "textures.txt";
     FILE* file = fopen(textures_file, "r");
-    if (file) {
-        char line[1024] = {0};
-        while (fgets(line, sizeof(line), file)) {
-            int txkey = -1;
-            int contexts = -1;
-            int frames = -1;
-            int do_dither = 0;
-            char path[512] = {0};
-            // check if the line begins with a #
-            if (line[0] == '#') {
-                minfo("libdraw_load_textures: skipping comment line");
-                continue;
-            }
-            sscanf(line, "%d %d %d %d %s", &txkey, &contexts, &frames, &do_dither, path);
-            if (txkey < 0 || contexts < 0 || frames < 0) {
-                merror("libdraw_load_textures: invalid line in textures.txt");
-                continue;
-            }
-            libdraw_load_texture(txkey, contexts, frames, do_dither, path);
-            minfo("libdraw_load_textures: loaded texture");
-            minfoint("txkey", txkey);
-            minfoint("contexts", contexts);
-            minfoint("frames", frames);
-            minfo("path");
-            minfo(path);
-        }
-        fclose(file);
-    } else {
-        merror("libdraw_load_textures: could not open textures.txt");
+    if (!file) {
+        merror("libdraw_load_textures: textures.txt not found");
+        return;
     }
+    char line[1024] = {0};
+    while (fgets(line, sizeof(line), file)) {
+        int txkey = -1;
+        int contexts = -1;
+        int frames = -1;
+        int do_dither = 0;
+        char path[512] = {0};
+        // check if the line begins with a #
+        if (line[0] == '#') continue;
+        sscanf(line, "%d %d %d %d %s", &txkey, &contexts, &frames, &do_dither, path);
+        if (txkey < 0 || contexts < 0 || frames < 0) {
+            merror("libdraw_load_textures: invalid line in textures.txt");
+            continue;
+        }
+        libdraw_load_texture(txkey, contexts, frames, do_dither, path);
+        minfo("libdraw_load_textures: loaded texture");
+        minfoint("txkey", txkey);
+        minfoint("contexts", contexts);
+        minfoint("frames", frames);
+        minfo("path");
+        minfo(path);
+    }
+    fclose(file);
+}
+
+
+bool libdraw_line_begins_with_whitespace_and_char(const char* line) {
+    if (!line) {
+        merror("libdraw_line_begins_with_whitespace_and_char: line is NULL");
+        return false;
+    }
+
+    // Skip leading whitespace
+    //while (*line != '\0' && *line == ' ' || *line == '\t') {
+    while (*line != '\0' && (*line == ' ' || *line == '\t')) {
+        line++;
+    }
+    // Check if the next character is a non-whitespace character
+    return *line != '\0' && *line != ' ' && *line != '\t';
 }
 
 
