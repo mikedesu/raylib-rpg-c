@@ -5,6 +5,7 @@
 #include "spritegroup.h"
 #include "textureinfo.h"
 #include "tx_keys.h"
+#include <ctype.h>
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -84,10 +85,9 @@ void libdraw_drawframe(gamestate* const g) {
     snprintf(buffer, sizeof(buffer), "Frame draw time: %.02f ms\n", g->last_frame_time * 1000);
     DrawText(buffer, 10, 10, 20, MAROON);
 
-    libdraw_draw_sprite(g, g->hero_id);
+    libdraw_draw_sprite_and_shadow(g, g->hero_id);
 
     EndDrawing();
-    //double end_time = GetTime();
     double elapsed_time = GetTime() - start_time;
     g->last_frame_time = elapsed_time;
     g->framecount++;
@@ -108,7 +108,34 @@ void libdraw_draw_sprite(const gamestate* const g, const entityid id) {
     const int scale = 4;
     Rectangle new_dest = (Rectangle){sg->dest.x, sg->dest.y, scale * sg->dest.width, scale * sg->dest.height};
     DrawTexturePro(*s->texture, s->src, new_dest, (Vector2){0, 0}, 0, WHITE);
-    //if (g->framecount % ANIM_SPEED == 0) sprite_incrframe(s);
+}
+
+
+void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
+    if (!g) {
+        merror("libdraw_draw_sprite_and_shadow: gamestate is NULL");
+        return;
+    }
+    spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+    if (!sg) {
+        merrorint("libdraw_draw_sprite_and_shadow: spritegroup not found", id);
+        return;
+    }
+    sprite* s = spritegroup_get(sg, sg->current);
+    if (!s) {
+        merrorint("libdraw_draw_sprite_and_shadow: sprite not found at current", sg->current);
+        return;
+    }
+    const int scale = 4;
+    Rectangle dest = {sg->dest.x, sg->dest.y, scale * sg->dest.width, scale * sg->dest.height};
+    sprite* sh = spritegroup_get(sg, sg->current + 1);
+    if (sh) {
+        DrawTexturePro(*sh->texture, sh->src, dest, (Vector2){0, 0}, 0, WHITE);
+    } else {
+        merrorint("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1", sg->current + 1);
+    }
+    // Draw sprite on top
+    DrawTexturePro(*s->texture, s->src, dest, (Vector2){0, 0}, 0, WHITE);
 }
 
 
@@ -209,19 +236,14 @@ void libdraw_load_textures() {
 }
 
 
-bool libdraw_line_begins_with_whitespace_and_char(const char* line) {
-    if (!line) {
+bool libdraw_line_begins_with_whitespace_and_char(const char* l) {
+    if (!l) {
         merror("libdraw_line_begins_with_whitespace_and_char: line is NULL");
         return false;
     }
-
-    // Skip leading whitespace
-    //while (*line != '\0' && *line == ' ' || *line == '\t') {
-    while (*line != '\0' && (*line == ' ' || *line == '\t')) {
-        line++;
-    }
-    // Check if the next character is a non-whitespace character
-    return *line != '\0' && *line != ' ' && *line != '\t';
+    while (*l != 0 && isspace(*l))
+        l++;
+    return *l != 0 && !isspace(*l);
 }
 
 

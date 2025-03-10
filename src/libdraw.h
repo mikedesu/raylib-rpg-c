@@ -23,3 +23,5 @@ void libdraw_create_spritegroup(
 void libdraw_update_sprites(gamestate* const g);
 void libdraw_update_sprite(gamestate* const g, entityid id);
 void libdraw_draw_sprite(const gamestate* const g, const entityid id);
+void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id);
+//void libdraw_draw_sprite(const gamestate* const g, const entityid id, int anim);
