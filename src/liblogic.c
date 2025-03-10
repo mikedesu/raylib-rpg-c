@@ -1,4 +1,5 @@
 #include "liblogic.h"
+#include "controlmode.h"
 #include "em.h"
 #include "entity.h"
 #include "mprint.h"
@@ -35,6 +36,63 @@ void liblogic_init(gamestate* const g) {
 
 
 void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
+    if (g->controlmode == CONTROLMODE_PLAYER) {
+        liblogic_handle_input_player(is, g);
+    } else if (g->controlmode == CONTROLMODE_CAMERA) {
+        liblogic_handle_input_camera(is, g);
+    } else {
+        merror("Unknown control mode");
+    }
+}
+
+
+void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g) {
+
+    minfo("Handling camera input");
+
+    if (!is) {
+        merror("Input state is NULL!");
+        return;
+    }
+
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+
+    const float move = 1.0f;
+
+    if (inputstate_is_pressed(is, KEY_RIGHT)) {
+        // move camera right
+        msuccess("Moving camera right");
+        g->cam2d.offset.x += move;
+
+    } else if (inputstate_is_pressed(is, KEY_LEFT)) {
+        // move camera left
+        msuccess("Moving camera left");
+        g->cam2d.offset.x -= move;
+    } else if (inputstate_is_pressed(is, KEY_UP)) {
+        // move camera up
+        msuccess("Moving camera up");
+        g->cam2d.offset.y -= move;
+    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+        // move camera down
+        msuccess("Moving camera down");
+        g->cam2d.offset.y += move;
+    }
+}
+
+
+void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {
+    if (!is) {
+        merror("Input state is NULL!");
+        return;
+    }
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+
     entity* hero = em_get(g->entitymap, g->hero_id);
     if (!hero) {
         merror("Hero not found!");

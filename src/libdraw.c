@@ -140,7 +140,7 @@ void libdraw_drawframe(gamestate* const g) {
     ClearBackground(BLACK);
     char buffer[1024] = {0};
     char buffer2[1024] = {0};
-    //libdraw_draw_dungeon_floor(g);
+    libdraw_draw_dungeon_floor(g);
     //libdraw_draw_sprite_and_shadow(g, g->hero_id);
     snprintf(buffer, sizeof(buffer), "Frame draw time: %.02f ms\n", g->last_frame_time * 1000);
     DrawText(buffer, 10, 10, 20, WHITE);

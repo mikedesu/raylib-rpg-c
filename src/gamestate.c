@@ -58,7 +58,8 @@ gamestate* gamestateinitptr() {
 
     g->fadealpha = 0.0f;
 
-    g->controlmode = CONTROLMODE_PLAYER;
+    //g->controlmode = CONTROLMODE_PLAYER;
+    g->controlmode = CONTROLMODE_CAMERA;
 
     g->fadestate = FADESTATENONE;
     //g->spritegroups = NULL;
