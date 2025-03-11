@@ -173,9 +173,16 @@ void libdraw_drawframe(gamestate* const g) {
     libdraw_draw_sprite_and_shadow(g, g->hero_id);
     EndMode2D();
     EndTextureMode();
-    snprintf(buffer, sizeof(buffer), "Frame draw time: %.02f ms\n", g->last_frame_time * 1000);
+    snprintf(buffer,
+             sizeof(buffer),
+             "%s\n"
+             "%s\n"
+             "Frame draw time: %.02f ms\n",
+             g->timebeganbuf,
+             g->currenttimebuf,
+             g->last_frame_time * 1000);
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    DrawText(buffer, 10, 10, 20, WHITE);
+    DrawText(buffer, 5, 5, 10, WHITE);
     EndDrawing();
     double elapsed_time = GetTime() - start_time;
     g->last_frame_time = elapsed_time;

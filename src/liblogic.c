@@ -86,11 +86,11 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
     }
 
 #define DEFAULT_ZOOM_INCR 0.1f
-    if (inputstate_is_pressed(is, KEY_Z)) {
-        msuccess("Z pressed!");
+    if (inputstate_is_held(is, KEY_Z)) {
+        msuccess("Z held!");
         g->cam2d.zoom += DEFAULT_ZOOM_INCR;
-    } else if (inputstate_is_pressed(is, KEY_X)) {
-        msuccess("X pressed!");
+    } else if (inputstate_is_held(is, KEY_X)) {
+        msuccess("X held!");
         g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
     }
 }
@@ -144,6 +144,11 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
         return;
     }
     liblogic_handle_input(is, g);
+
+    g->currenttime = time(NULL);
+    g->currenttimetm = localtime(&g->currenttime);
+    //g->currenttimebuf = strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+    strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 }
 
 
