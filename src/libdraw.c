@@ -57,8 +57,6 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
     if (e) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
         if (sg) {
-
-
             // Copy movement intent from e->sprite_move_x/y if present
             if (e->sprite_move_x != 0 || e->sprite_move_y != 0) {
                 sg->move.x = e->sprite_move_x;
@@ -95,7 +93,14 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
                 merror("libdraw_update_sprite: sprite is NULL");
                 return;
             }
-            if (g->framecount % ANIM_SPEED == 0) sprite_incrframe(s);
+            if (g->framecount % ANIM_SPEED == 0) {
+                sprite_incrframe(s);
+                // Check if the animation has completed one loop
+                if (s->num_loops >= 1) {
+                    sg->current = sg->default_anim;
+                    s->num_loops = 0;
+                }
+            }
         }
     }
 }
