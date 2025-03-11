@@ -11,7 +11,7 @@ RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 CFLAGS ?= # Allow override
 
 LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o get_txkey_for_tiletype.o
-LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o
+LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o event.o
 
 all: game
 
@@ -55,6 +55,9 @@ dungeon_tile.o: dungeon_tile.c dungeon_tile.h
 
 em.o: em.c em.h
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) em.c -o $@
+
+event.o: event.c event.h
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) event.c -o $@
 
 # Legacy libgame stuff (unchanged)
 libgame.o: libgame.c
