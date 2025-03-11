@@ -4,6 +4,7 @@
 #include "hashtable_entityid_spritegroup.h"
 #include "mprint.h"
 #include "spritegroup.h"
+#include "spritegroup_anim.h"
 #include "textureinfo.h"
 #include "tx_keys.h"
 #include <ctype.h>
@@ -57,33 +58,38 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
         if (sg) {
 
-            if (!e->sprite_move_x && !e->sprite_move_y) {
-                sg->dest.x = e->x * DEFAULT_TILE_SIZE + sg->off_x;
-                sg->dest.y = e->y * DEFAULT_TILE_SIZE + sg->off_y;
-            } else {
-                if (e->sprite_move_x) {
-                    if (e->sprite_move_x > 0) {
-                        sg->dest.x++;
-                        e->sprite_move_x--;
-                    } else if (e->sprite_move_x < 0) {
-                        sg->dest.x--;
-                        e->sprite_move_x++;
-                    }
-                }
 
-                if (e->sprite_move_y) {
-                    if (e->sprite_move_y > 0) {
-                        sg->dest.y++;
-                        e->sprite_move_y--;
-                    } else if (e->sprite_move_y < 0) {
-                        sg->dest.y--;
-                        e->sprite_move_y++;
-                    }
-                }
+            // Copy movement intent from e->sprite_move_x/y if present
+            if (e->sprite_move_x != 0 || e->sprite_move_y != 0) {
+                sg->move.x = e->sprite_move_x;
+                sg->move.y = e->sprite_move_y;
+                e->sprite_move_x = 0;
+                e->sprite_move_y = 0;
+                sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
             }
 
-            //sg->dest.x = e->x * DEFAULT_TILE_SIZE;
-            //sg->dest.y = e->y * DEFAULT_TILE_SIZE;
+            // Update movement as long as sg->move.x/y is non-zero
+            if (sg->move.x > 0) {
+                sg->dest.x++;
+                sg->move.x--;
+            } else if (sg->move.x < 0) {
+                sg->dest.x--;
+                sg->move.x++;
+            }
+            if (sg->move.y > 0) {
+                sg->dest.y++;
+                sg->move.y--;
+            } else if (sg->move.y < 0) {
+                sg->dest.y--;
+                sg->move.y++;
+            }
+
+            // Snap to the tile position only when movement is fully complete
+            if (sg->move.x == 0 && sg->move.y == 0) {
+                sg->dest.x = e->x * DEFAULT_TILE_SIZE + sg->off_x;
+                sg->dest.y = e->y * DEFAULT_TILE_SIZE + sg->off_y;
+            }
+
             sprite* s = sg->sprites[sg->current];
             if (!s) {
                 merror("libdraw_update_sprite: sprite is NULL");
@@ -282,7 +288,7 @@ void libdraw_load_texture(
         return;
     }
     Image image = LoadImage(path);
-    if (do_dither) ImageDither(&image, 8, 8, 8, 8);
+    if (do_dither) ImageDither(&image, 4, 4, 4, 4);
     Texture2D texture = LoadTextureFromImage(image);
     UnloadImage(image);
     txinfo[txkey].texture = texture;
