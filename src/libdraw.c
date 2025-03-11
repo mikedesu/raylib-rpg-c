@@ -58,8 +58,8 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         if (sg) {
 
             if (!e->sprite_move_x && !e->sprite_move_y) {
-                sg->dest.x = e->x * DEFAULT_TILE_SIZE;
-                sg->dest.y = e->y * DEFAULT_TILE_SIZE;
+                sg->dest.x = e->x * DEFAULT_TILE_SIZE + sg->off_x;
+                sg->dest.y = e->y * DEFAULT_TILE_SIZE + sg->off_y;
             } else {
                 if (e->sprite_move_x) {
                     if (e->sprite_move_x > 0) {
@@ -177,12 +177,16 @@ void libdraw_drawframe(gamestate* const g) {
              sizeof(buffer),
              "%s\n"
              "%s\n"
+             "Frame count: %d\n"
              "Frame draw time: %.02f ms\n",
              g->timebeganbuf,
              g->currenttimebuf,
+             g->framecount,
              g->last_frame_time * 1000);
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    DrawText(buffer, 5, 5, 10, WHITE);
+    const int fontsize = 20;
+    const Color fontcolor = WHITE;
+    DrawText(buffer, 5, 5, fontsize, fontcolor);
     EndDrawing();
     double elapsed_time = GetTime() - start_time;
     g->last_frame_time = elapsed_time;
