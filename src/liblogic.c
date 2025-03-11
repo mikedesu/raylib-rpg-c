@@ -27,7 +27,10 @@ void liblogic_init(gamestate* const g) {
 
 
     g->entitymap = em_new();
-    entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, 0, 0, "hero");
+
+    const int x = 1;
+    const int y = 1;
+    entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, x, y, "hero");
     if (hero_id != -1) {
         g->hero_id = hero_id;
         msuccessint("Logic Init! Hero ID: ", g->hero_id);
@@ -145,10 +148,35 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     }
     liblogic_handle_input(is, g);
 
+    liblogic_update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     //g->currenttimebuf = strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+}
+
+
+void liblogic_update_debug_panel_buffer(gamestate* const g) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+
+    snprintf(g->debugpanel.buffer,
+             sizeof(g->debugpanel.buffer),
+             "%s\n"
+             "%s\n"
+             "Frame count: %d\n"
+             "Frame draw time: %.02f ms\n"
+             "Cam: (%.02f, %.02f)\n"
+             "Zoom: %.02f",
+             g->timebeganbuf,
+             g->currenttimebuf,
+             g->framecount,
+             g->last_frame_time * 1000,
+             g->cam2d.offset.x,
+             g->cam2d.offset.y,
+             g->cam2d.zoom);
 }
 
 

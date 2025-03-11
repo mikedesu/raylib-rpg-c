@@ -41,8 +41,8 @@ gamestate* gamestateinitptr() {
     g->gridon = false;
     g->processing_actions = false;
     g->cam2d.target = (Vector2){0, 0};
-    g->cam2d.offset = (Vector2){0, 0};
-    g->cam2d.zoom = 1.0f;
+    g->cam2d.offset = (Vector2){100, 100};
+    g->cam2d.zoom = 6.0f;
     g->cam2d.rotation = 0.0;
 
     g->cam3d = (Camera3D){0};
@@ -58,8 +58,8 @@ gamestate* gamestateinitptr() {
 
     g->fadealpha = 0.0f;
 
-    //g->controlmode = CONTROLMODE_PLAYER;
-    g->controlmode = CONTROLMODE_CAMERA;
+    g->controlmode = CONTROLMODE_PLAYER;
+    //g->controlmode = CONTROLMODE_CAMERA;
 
     g->fadestate = FADESTATENONE;
     //g->spritegroups = NULL;

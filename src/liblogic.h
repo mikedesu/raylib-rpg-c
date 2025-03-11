@@ -11,3 +11,4 @@ void liblogic_add_entityid(gamestate* const g, entityid id); // New
 void liblogic_handle_input(const inputstate* const is, gamestate* const g);
 void liblogic_handle_input_player(const inputstate* const is, gamestate* const g);
 void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g);
+void liblogic_update_debug_panel_buffer(gamestate* const g);

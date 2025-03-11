@@ -172,60 +172,16 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
 }
 
 
-/*
-void libdraw_drawframe(gamestate* const g) {
-    double start_time = GetTime();
-    BeginDrawing();
-    BeginTextureMode(target);
-    BeginMode2D(g->cam2d);
-    ClearBackground(BLACK);
-    char buffer[1024] = {0};
-    //char buffer2[1024] = {0};
-    libdraw_draw_dungeon_floor(g);
-    libdraw_draw_sprite_and_shadow(g, g->hero_id);
-    EndMode2D();
-    EndTextureMode();
-    snprintf(buffer,
-             sizeof(buffer),
-             "%s\n"
-             "%s\n"
-             "Frame count: %d\n"
-             "Frame draw time: %.02f ms\n",
-             g->timebeganbuf,
-             g->currenttimebuf,
-             g->framecount,
-             g->last_frame_time * 1000);
-    DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    const int fontsize = 10;
-    const Color fontcolor = WHITE;
-    DrawText(buffer, 5, 5, fontsize, fontcolor);
-    EndDrawing();
-    double elapsed_time = GetTime() - start_time;
-    g->last_frame_time = elapsed_time;
-    g->framecount++;
-}
-*/
-
 void libdraw_draw_debug_panel(gamestate* const g) {
     if (!g) {
         merror("libdraw_draw_debug_panel: gamestate is NULL");
         return;
     }
-    char buffer[1024] = {0};
-    snprintf(buffer,
-             sizeof(buffer),
-             "%s\n"
-             "%s\n"
-             "Frame count: %d\n"
-             "Frame draw time: %.02f ms\n",
-             g->timebeganbuf,
-             g->currenttimebuf,
-             g->framecount,
-             g->last_frame_time * 1000);
     const int fontsize = 10;
     const Color fontcolor = WHITE;
-    DrawText(buffer, 5, 5, fontsize, fontcolor);
+    DrawText(g->debugpanel.buffer, 5, 5, fontsize, fontcolor);
 }
+
 
 void libdraw_drawframe(gamestate* const g) {
     double start_time = GetTime();
@@ -244,10 +200,6 @@ void libdraw_drawframe(gamestate* const g) {
     g->last_frame_time = elapsed_time;
     g->framecount++;
 }
-
-
-//void libdraw_draw_dungeon_tile(const gamestate* const g, const int x, const int y) {
-//}
 
 
 void libdraw_draw_sprite(const gamestate* const g, const entityid id) {
@@ -453,8 +405,14 @@ void libdraw_create_spritegroup(
     minfo("loop done");
     spritegroup_set_specifier(group, spec);
     group->id = id;
-    const float w = spritegroup_get(group, 0)->width;
-    const float h = spritegroup_get(group, 0)->height;
+    sprite* s = spritegroup_get(group, 0);
+    if (!s) {
+        merror("libdraw_create_spritegroup: sprite is NULL");
+        spritegroup_destroy(group);
+        return;
+    }
+    const float w = s->width;
+    const float h = s->height;
     const float dst_x = e->x * DEFAULT_TILE_SIZE;
     const float dst_y = e->y * DEFAULT_TILE_SIZE;
     group->current = 0;
