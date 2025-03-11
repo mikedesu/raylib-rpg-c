@@ -28,8 +28,8 @@ void liblogic_init(gamestate* const g) {
 
     g->entitymap = em_new();
 
-    const int x = 1;
-    const int y = 1;
+    const int x = 0;
+    const int y = 0;
     entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, x, y, "hero");
     if (hero_id != -1) {
         g->hero_id = hero_id;

@@ -381,11 +381,11 @@ void libdraw_create_spritegroup(
     }
     msuccessint("entity found", id);
     //disabling this check until dungeon_floor created
-    //if (e->x < 0 || e->x >= g->dungeon_floor->width || e->y < 0 || e->y >= g->dungeon_floor->height) {
-    //    merrorint2("libdraw_create_spritegroup: entity pos out of bounds", e->x, e->y);
-    //    spritegroup_destroy(group);
-    //    return;
-    //}
+    if (e->x < 0 || e->x >= g->dungeon_floor->width || e->y < 0 || e->y >= g->dungeon_floor->height) {
+        merrorint2("libdraw_create_spritegroup: entity pos out of bounds", e->x, e->y);
+        spritegroup_destroy(group);
+        return;
+    }
     //    // Use TX_HUMAN_WALK (assume index 2—check textures.txt)
     //int tx_key = keys[0]; // First key (e.g., TX_HUMAN_WALK)
     //int sprite_width = -1;
@@ -411,10 +411,8 @@ void libdraw_create_spritegroup(
         spritegroup_destroy(group);
         return;
     }
-    const float w = s->width;
-    const float h = s->height;
-    const float dst_x = e->x * DEFAULT_TILE_SIZE;
-    const float dst_y = e->y * DEFAULT_TILE_SIZE;
+    const float w = s->width, h = s->height;
+    const float dst_x = e->x * DEFAULT_TILE_SIZE, dst_y = e->y * DEFAULT_TILE_SIZE;
     group->current = 0;
     group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
     group->off_x = offset_x;
