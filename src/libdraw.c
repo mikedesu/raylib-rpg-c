@@ -172,6 +172,7 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
 }
 
 
+/*
 void libdraw_drawframe(gamestate* const g) {
     double start_time = GetTime();
     BeginDrawing();
@@ -179,7 +180,7 @@ void libdraw_drawframe(gamestate* const g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     char buffer[1024] = {0};
-    char buffer2[1024] = {0};
+    //char buffer2[1024] = {0};
     libdraw_draw_dungeon_floor(g);
     libdraw_draw_sprite_and_shadow(g, g->hero_id);
     EndMode2D();
@@ -195,9 +196,49 @@ void libdraw_drawframe(gamestate* const g) {
              g->framecount,
              g->last_frame_time * 1000);
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    const int fontsize = 20;
+    const int fontsize = 10;
     const Color fontcolor = WHITE;
     DrawText(buffer, 5, 5, fontsize, fontcolor);
+    EndDrawing();
+    double elapsed_time = GetTime() - start_time;
+    g->last_frame_time = elapsed_time;
+    g->framecount++;
+}
+*/
+
+void libdraw_draw_debug_panel(gamestate* const g) {
+    if (!g) {
+        merror("libdraw_draw_debug_panel: gamestate is NULL");
+        return;
+    }
+    char buffer[1024] = {0};
+    snprintf(buffer,
+             sizeof(buffer),
+             "%s\n"
+             "%s\n"
+             "Frame count: %d\n"
+             "Frame draw time: %.02f ms\n",
+             g->timebeganbuf,
+             g->currenttimebuf,
+             g->framecount,
+             g->last_frame_time * 1000);
+    const int fontsize = 10;
+    const Color fontcolor = WHITE;
+    DrawText(buffer, 5, 5, fontsize, fontcolor);
+}
+
+void libdraw_drawframe(gamestate* const g) {
+    double start_time = GetTime();
+    BeginDrawing();
+    BeginTextureMode(target);
+    BeginMode2D(g->cam2d);
+    ClearBackground(BLACK);
+    libdraw_draw_dungeon_floor(g);
+    libdraw_draw_sprite_and_shadow(g, g->hero_id);
+    EndMode2D();
+    EndTextureMode();
+    DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+    libdraw_draw_debug_panel(g); // Call the new function here
     EndDrawing();
     double elapsed_time = GetTime() - start_time;
     g->last_frame_time = elapsed_time;
@@ -395,8 +436,8 @@ void libdraw_create_spritegroup(
     //}
     //    // Use TX_HUMAN_WALK (assume index 2—check textures.txt)
     //int tx_key = keys[0]; // First key (e.g., TX_HUMAN_WALK)
-    int sprite_width = -1;
-    int sprite_height = -1;
+    //int sprite_width = -1;
+    //int sprite_height = -1;
     minfo("libdraw_create_spritegroup: creating spritegroup");
     for (int i = 0; i < TX_HUMAN_KEY_COUNT; i++) {
         int k = keys[i];

@@ -26,4 +26,5 @@ void libdraw_draw_sprite(const gamestate* const g, const entityid id);
 void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id);
 void libdraw_draw_dungeon_floor(const gamestate* const g);
 void libdraw_draw_dungeon_floor_tile(const gamestate* const g, const int x, const int y);
+void libdraw_draw_debug_panel(gamestate* const g);
 //void libdraw_draw_sprite(const gamestate* const g, const entityid id, int anim);
