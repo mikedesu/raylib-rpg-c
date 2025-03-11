@@ -22,6 +22,9 @@ typedef struct entity_t {
     int x;
     int y;
 
+    int sprite_move_x;
+    int sprite_move_y;
+
     entity_t* next;
 } entity;
 

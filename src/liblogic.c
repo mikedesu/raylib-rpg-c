@@ -2,6 +2,7 @@
 #include "controlmode.h"
 #include "em.h"
 #include "entity.h"
+#include "libgame_defines.h"
 #include "mprint.h"
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +49,7 @@ void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
 
 void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g) {
 
-    minfo("Handling camera input");
+    //minfo("Handling camera input");
 
     if (!is) {
         merror("Input state is NULL!");
@@ -60,25 +61,37 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
         return;
     }
 
-    const float move = 1.0f;
+    const float move = 2.0f;
 
-    if (inputstate_is_pressed(is, KEY_RIGHT)) {
+    if (inputstate_is_held(is, KEY_RIGHT)) {
         // move camera right
-        msuccess("Moving camera right");
         g->cam2d.offset.x += move;
-
-    } else if (inputstate_is_pressed(is, KEY_LEFT)) {
+    }
+    if (inputstate_is_held(is, KEY_LEFT)) {
         // move camera left
-        msuccess("Moving camera left");
         g->cam2d.offset.x -= move;
-    } else if (inputstate_is_pressed(is, KEY_UP)) {
+    }
+    if (inputstate_is_held(is, KEY_UP)) {
         // move camera up
-        msuccess("Moving camera up");
         g->cam2d.offset.y -= move;
-    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+    }
+    if (inputstate_is_held(is, KEY_DOWN)) {
         // move camera down
-        msuccess("Moving camera down");
         g->cam2d.offset.y += move;
+    }
+
+    if (inputstate_is_pressed(is, KEY_C)) {
+        msuccess("C pressed!");
+        g->controlmode = CONTROLMODE_PLAYER;
+    }
+
+#define DEFAULT_ZOOM_INCR 0.1f
+    if (inputstate_is_pressed(is, KEY_Z)) {
+        msuccess("Z pressed!");
+        g->cam2d.zoom += DEFAULT_ZOOM_INCR;
+    } else if (inputstate_is_pressed(is, KEY_X)) {
+        msuccess("X pressed!");
+        g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
     }
 }
 
@@ -93,20 +106,31 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         return;
     }
 
-    entity* hero = em_get(g->entitymap, g->hero_id);
-    if (!hero) {
+    entity* e = em_get(g->entitymap, g->hero_id);
+    if (!e) {
         merror("Hero not found!");
         return;
     }
 
     if (inputstate_is_pressed(is, KEY_RIGHT)) {
-        entity_incr_x(hero);
+        e->sprite_move_x = DEFAULT_TILE_SIZE;
+        entity_incr_x(e);
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
-        entity_decr_x(hero);
+        e->sprite_move_x = -DEFAULT_TILE_SIZE;
+        entity_decr_x(e);
     } else if (inputstate_is_pressed(is, KEY_UP)) {
-        entity_decr_y(hero);
+        e->sprite_move_y = -DEFAULT_TILE_SIZE;
+        entity_decr_y(e);
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
-        entity_incr_y(hero);
+        e->sprite_move_y = DEFAULT_TILE_SIZE;
+        entity_incr_y(e);
+    } else if (inputstate_is_pressed(is, KEY_SPACE)) {
+        msuccess("Space pressed!");
+    } else if (inputstate_is_pressed(is, KEY_ENTER)) {
+        msuccess("Enter pressed!");
+    } else if (inputstate_is_pressed(is, KEY_C)) {
+        msuccess("C pressed!");
+        g->controlmode = CONTROLMODE_CAMERA;
     }
 }
 

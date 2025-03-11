@@ -13,8 +13,8 @@ entity_t* entity_new(const entityid id, const entitytype_t type) {
     e->type = type;
     e->race = RACE_NONE;
     e->direction = DIRECTION_RIGHT;
-    e->x = -1;
-    e->y = -1;
+    e->x = e->y = -1;
+    e->sprite_move_x = e->sprite_move_y = 0;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     e->next = NULL;
     return e;

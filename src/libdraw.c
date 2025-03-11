@@ -56,10 +56,39 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
     if (e) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
         if (sg) {
-            const int scale = 4;
-            sg->dest.x = e->x * DEFAULT_TILE_SIZE * scale;
-            sg->dest.y = e->y * DEFAULT_TILE_SIZE * scale;
+
+            if (!e->sprite_move_x && !e->sprite_move_y) {
+                sg->dest.x = e->x * DEFAULT_TILE_SIZE;
+                sg->dest.y = e->y * DEFAULT_TILE_SIZE;
+            } else {
+                if (e->sprite_move_x) {
+                    if (e->sprite_move_x > 0) {
+                        sg->dest.x++;
+                        e->sprite_move_x--;
+                    } else if (e->sprite_move_x < 0) {
+                        sg->dest.x--;
+                        e->sprite_move_x++;
+                    }
+                }
+
+                if (e->sprite_move_y) {
+                    if (e->sprite_move_y > 0) {
+                        sg->dest.y++;
+                        e->sprite_move_y--;
+                    } else if (e->sprite_move_y < 0) {
+                        sg->dest.y--;
+                        e->sprite_move_y++;
+                    }
+                }
+            }
+
+            //sg->dest.x = e->x * DEFAULT_TILE_SIZE;
+            //sg->dest.y = e->y * DEFAULT_TILE_SIZE;
             sprite* s = sg->sprites[sg->current];
+            if (!s) {
+                merror("libdraw_update_sprite: sprite is NULL");
+                return;
+            }
             if (g->framecount % ANIM_SPEED == 0) sprite_incrframe(s);
         }
     }
@@ -141,12 +170,12 @@ void libdraw_drawframe(gamestate* const g) {
     char buffer[1024] = {0};
     char buffer2[1024] = {0};
     libdraw_draw_dungeon_floor(g);
-    //libdraw_draw_sprite_and_shadow(g, g->hero_id);
-    snprintf(buffer, sizeof(buffer), "Frame draw time: %.02f ms\n", g->last_frame_time * 1000);
-    DrawText(buffer, 10, 10, 20, WHITE);
+    libdraw_draw_sprite_and_shadow(g, g->hero_id);
     EndMode2D();
     EndTextureMode();
+    snprintf(buffer, sizeof(buffer), "Frame draw time: %.02f ms\n", g->last_frame_time * 1000);
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+    DrawText(buffer, 10, 10, 20, WHITE);
     EndDrawing();
     double elapsed_time = GetTime() - start_time;
     g->last_frame_time = elapsed_time;
@@ -190,8 +219,8 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
         merrorint("libdraw_draw_sprite_and_shadow: sprite not found at current", sg->current);
         return;
     }
-    const int scale = 4;
-    Rectangle dest = {sg->dest.x, sg->dest.y, scale * sg->dest.width, scale * sg->dest.height};
+    //const int scale = 4;
+    Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     sprite* sh = spritegroup_get(sg, sg->current + 1);
     if (sh) {
         DrawTexturePro(*sh->texture, sh->src, dest, (Vector2){0, 0}, 0, WHITE);
