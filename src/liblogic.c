@@ -1,5 +1,6 @@
 #include "liblogic.h"
 #include "controlmode.h"
+#include "dungeon_floor.h"
 #include "em.h"
 #include "entity.h"
 #include "libgame_defines.h"
@@ -245,6 +246,8 @@ entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, in
     e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null-terminated
     em_add(g->entitymap, e);
     liblogic_add_entityid(g, e->id);
+    dungeon_floor_add_at(g->dungeon_floor, e->id, x, y);
+
     msuccessint2("Created entity at", x, y);
     return e->id;
 }
