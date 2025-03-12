@@ -2,6 +2,7 @@
 
 #include "controlmode.h"
 #include "debugpanel.h"
+#include "dungeon.h"
 #include "dungeon_floor.h"
 #include "em.h"
 #include "entityid.h"
@@ -53,7 +54,9 @@ typedef struct gamestate {
 
     Font font;
 
-    dungeon_floor_t* dungeon_floor;
+    //dungeon_floor_t* dungeon_floor;
+
+    dungeon_t* dungeon;
 
     em_t* entitymap;
 

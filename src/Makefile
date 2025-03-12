@@ -10,8 +10,8 @@ LINK_MATH = -lm
 RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 CFLAGS ?= # Allow override
 
-LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o get_txkey_for_tiletype.o
-LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o event.o
+LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o get_txkey_for_tiletype.o 
+LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o event.o dungeon.o
 
 all: game
 
@@ -46,6 +46,9 @@ gamestate.o: gamestate.c gamestate.h hashtable_entityid_spritegroup.h dungeon_fl
 
 hashtable_entityid_spritegroup.o: hashtable_entityid_spritegroup.c hashtable_entityid_spritegroup.h
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) hashtable_entityid_spritegroup.c -o $@
+
+dungeon.o: dungeon.c dungeon_floor.h dungeon_tile.h
+	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) dungeon.c -o $@
 
 dungeon_floor.o: dungeon_floor.c dungeon_floor.h dungeon_tile.h
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) dungeon_floor.c -o $@

@@ -1,9 +1,10 @@
 #include "liblogic.h"
 #include "controlmode.h"
+#include "dungeon.h"
 #include "dungeon_floor.h"
 #include "em.h"
 #include "entity.h"
-#include "libgame_defines.h"
+//#include "libgame_defines.h"
 #include "mprint.h"
 #include <math.h>
 #include <stdlib.h>
@@ -18,21 +19,28 @@ void liblogic_init(gamestate* const g) {
         return;
     }
 
-    // init the dungeon floor
 
-    g->dungeon_floor = dungeon_floor_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    if (!g->dungeon_floor) {
-        merror("liblogic_init: failed to init dungeon floor");
+    g->dungeon = dungeon_create();
+    if (!g->dungeon) {
+        merror("liblogic_init: failed to init dungeon");
         return;
     }
-    dungeon_floor_init(g->dungeon_floor);
 
+    dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+
+    // init the dungeon floor
+    //g->dungeon_floor = dungeon_floor_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    //if (!g->dungeon_floor) {
+    //    merror("liblogic_init: failed to init dungeon floor");
+    //    return;
+    //}
+
+    //dungeon_floor_init(g->dungeon_floor);
 
     g->entitymap = em_new();
 
-    const int x = 0;
-    const int y = 0;
-    entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, x, y, "hero");
+    const int x = 0, y = 0;
+    const entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, x, y, "hero");
     if (hero_id != -1) {
         g->hero_id = hero_id;
         msuccessint("Logic Init! Hero ID: ", g->hero_id);
@@ -123,17 +131,17 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     }
 
     if (inputstate_is_pressed(is, KEY_RIGHT)) {
-        e->sprite_move_x = DEFAULT_TILE_SIZE;
-        entity_incr_x(e);
+        //e->sprite_move_x = DEFAULT_TILE_SIZE;
+        //entity_incr_x(e);
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
-        e->sprite_move_x = -DEFAULT_TILE_SIZE;
-        entity_decr_x(e);
+        //e->sprite_move_x = -DEFAULT_TILE_SIZE;
+        //entity_decr_x(e);
     } else if (inputstate_is_pressed(is, KEY_UP)) {
-        e->sprite_move_y = -DEFAULT_TILE_SIZE;
-        entity_decr_y(e);
+        //e->sprite_move_y = -DEFAULT_TILE_SIZE;
+        //entity_decr_y(e);
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
-        e->sprite_move_y = DEFAULT_TILE_SIZE;
-        entity_incr_y(e);
+        //e->sprite_move_y = DEFAULT_TILE_SIZE;
+        //entity_incr_y(e);
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {
         msuccess("Space pressed!");
     } else if (inputstate_is_pressed(is, KEY_ENTER)) {
@@ -177,8 +185,9 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Frame draw time: %.02f ms\n"
              "Cam: (%.02f, %.02f)\n"
              "Zoom: %.02f\n"
-             "Control mode: %s\n",
-
+             "Control mode: %s\n"
+             "Current floor: %d\n"
+             "Dungeon num floors: %d\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -188,7 +197,9 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              g->cam2d.zoom,
              g->controlmode == CONTROLMODE_PLAYER   ? "Player"
              : g->controlmode == CONTROLMODE_CAMERA ? "Camera"
-                                                    : "Unknown");
+                                                    : "Unknown",
+             g->dungeon->current_floor,
+             g->dungeon->num_floors);
 }
 
 
@@ -246,7 +257,13 @@ entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, in
     e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null-terminated
     em_add(g->entitymap, e);
     liblogic_add_entityid(g, e->id);
-    dungeon_floor_add_at(g->dungeon_floor, e->id, x, y);
+
+    dungeon_floor_t* df = dungeon_get_current_floor(g->dungeon);
+    if (!df) {
+        merror("liblogic_entity_create: failed to get current dungeon floor");
+        return -1;
+    }
+    dungeon_floor_add_at(df, e->id, x, y);
 
     msuccessint2("Created entity at", x, y);
     return e->id;

@@ -124,16 +124,23 @@ void libdraw_update_sprites(gamestate* const g) {
 }
 
 
-void libdraw_draw_dungeon_floor_tile(const gamestate* const g, const int x, const int y) {
+void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, const int x, const int y) {
     if (!g) {
         merror("libdraw_draw_dungeon_floor_tile: gamestate is NULL");
         return;
     }
-    if (x < 0 || x >= g->dungeon_floor->width || y < 0 || y >= g->dungeon_floor->height) {
+    //dungeon_floor_t* df = dungeon_get_current_floor(g->dungeon);
+    if (!df) {
+        merror("libdraw_draw_dungeon_floor_tile: dungeon_floor is NULL");
+        return;
+    }
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
         merrorint2("libdraw_draw_dungeon_floor_tile: x or y out of bounds", x, y);
         return;
     }
-    dungeon_tile_t* tile = dungeon_floor_tile_at(g->dungeon_floor, x, y);
+
+
+    dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merrorint2("libdraw_draw_dungeon_floor_tile: tile is NULL", x, y);
         return;
@@ -161,15 +168,15 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
         merror("libdraw_draw_dungeon_floor: gamestate is NULL");
         return;
     }
-    if (!g->dungeon_floor) {
+
+    dungeon_floor_t* const df = dungeon_get_current_floor(g->dungeon);
+    if (!df) {
         merror("libdraw_draw_dungeon_floor: dungeon_floor is NULL");
         return;
     }
-    for (int y = 0; y < g->dungeon_floor->height; y++) {
-        for (int x = 0; x < g->dungeon_floor->width; x++) {
-            libdraw_draw_dungeon_floor_tile(g, x, y);
-        }
-    }
+    for (int y = 0; y < df->height; y++)
+        for (int x = 0; x < df->width; x++)
+            libdraw_draw_dungeon_floor_tile(g, df, x, y);
 }
 
 
@@ -330,10 +337,7 @@ void libdraw_load_textures() {
     }
     char line[1024] = {0};
     while (fgets(line, sizeof(line), file)) {
-        int txkey = -1;
-        int contexts = -1;
-        int frames = -1;
-        int do_dither = 0;
+        int txkey = -1, contexts = -1, frames = -1, do_dither = 0;
         char path[512] = {0};
         // check if the line begins with a #
         if (line[0] == '#') continue;
@@ -394,7 +398,14 @@ void libdraw_create_spritegroup(
     }
     msuccessint("entity found", id);
     //disabling this check until dungeon_floor created
-    if (e->x < 0 || e->x >= g->dungeon_floor->width || e->y < 0 || e->y >= g->dungeon_floor->height) {
+    dungeon_floor_t* df = dungeon_get_current_floor(g->dungeon);
+    if (!df) {
+        merror("libdraw_create_spritegroup: dungeon_floor is NULL");
+        spritegroup_destroy(group);
+        return;
+    }
+    const int df_w = df->width, df_h = df->height;
+    if (e->x < 0 || e->x >= df_w || e->y < 0 || e->y >= df_h) {
         merrorint2("libdraw_create_spritegroup: entity pos out of bounds", e->x, e->y);
         spritegroup_destroy(group);
         return;
