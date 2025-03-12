@@ -2,6 +2,7 @@
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
+#include "libgame_defines.h"
 #include "mprint.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -16,6 +17,7 @@ RenderTexture2D target = {0};
 Rectangle target_src = {0, 0, 800, 480};
 Rectangle target_dest = {0, 0, 800, 480};
 Vector2 target_origin = {0, 0};
+Vector2 zero_vector = {0, 0};
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 480
@@ -148,10 +150,8 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, const int x, cons
         merrorint("libdraw_draw_dungeon_floor_tile: texture id is invalid", texture->id);
         return;
     }
-    Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
-    const int dest_x = x * DEFAULT_TILE_SIZE;
-    const int dest_y = y * DEFAULT_TILE_SIZE;
-    Rectangle dest = (Rectangle){dest_x, dest_y, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
+    Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE},
+              dest = (Rectangle){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
 }
 
@@ -256,7 +256,7 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
         merrorint("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1", sg->current + 1);
     }
     // Draw sprite on top
-    DrawTexturePro(*s->texture, s->src, dest, (Vector2){0, 0}, 0, WHITE);
+    DrawTexturePro(*s->texture, s->src, dest, zero_vector, 0, WHITE);
 }
 
 
