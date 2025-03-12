@@ -12,10 +12,17 @@ typedef struct debugpanel {
     int y;
     int w;
     int h;
-    Vector2 pos;
+
+    int pad_left;
+    int pad_right;
+    int pad_top;
+    int pad_bottom;
+
+    int font_size;
+    //Vector2 pos;
     Color fg_color;
     Color bg_color;
     //Rectangle textbox;
-    Rectangle box;
+    //Rectangle box;
     char buffer[DEBUGPANELBUFSIZE];
 } debugpanel_t;

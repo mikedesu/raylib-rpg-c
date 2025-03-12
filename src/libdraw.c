@@ -33,6 +33,7 @@ void libdraw_init(gamestate* const g) {
     const int w = DEFAULT_WINDOW_WIDTH, h = DEFAULT_WINDOW_HEIGHT;
     InitWindow(w, h, t);
     SetTargetFPS(60);
+    //SetExitKey(KEY_Q);
     target = LoadRenderTexture(w, h);
     target_src = (Rectangle){0, 0, w, -h};
     target_dest = (Rectangle){0, 0, w, h};
@@ -177,9 +178,21 @@ void libdraw_draw_debug_panel(gamestate* const g) {
         merror("libdraw_draw_debug_panel: gamestate is NULL");
         return;
     }
-    const int fontsize = 10;
-    const Color fontcolor = WHITE;
-    DrawText(g->debugpanel.buffer, 5, 5, fontsize, fontcolor);
+    libdraw_calc_debugpanel_size(g); // Calculate size
+    // Draw background
+    const int x = g->debugpanel.x, y = g->debugpanel.y, w = g->debugpanel.w, h = g->debugpanel.h,
+              fontsize = g->debugpanel.font_size;
+    const Color c = Fade(RED, 0.8f), c2 = WHITE;
+    // calculate the size of the bg box of the debug panel
+    // use g->debugpanel.pad_left, top, bottom, right to do this
+    const int pad_left = g->debugpanel.pad_left, pad_top = g->debugpanel.pad_top, pad_right = g->debugpanel.pad_right,
+              pad_bottom = g->debugpanel.pad_bottom;
+    // the root of the box should be at x,y
+    const int x0 = x, y0 = y, w0 = w + pad_left + pad_right, h0 = h + pad_top + pad_bottom;
+    DrawRectangle(x0, y0, w0, h0, c);
+    // Draw text
+    const int x1 = x + pad_left, y1 = y + pad_top;
+    DrawText(g->debugpanel.buffer, x1, y1, fontsize, c2);
 }
 
 
@@ -373,7 +386,7 @@ void libdraw_create_spritegroup(
         return;
     }
     msuccess("group was not NULL");
-    entity* e = em_get(g->entitymap, id);
+    const entity* const e = em_get(g->entitymap, id);
     if (!e) {
         merrorint("libdraw_create_spritegroup: entity not found", id);
         spritegroup_destroy(group);
@@ -411,8 +424,7 @@ void libdraw_create_spritegroup(
         spritegroup_destroy(group);
         return;
     }
-    const float w = s->width, h = s->height;
-    const float dst_x = e->x * DEFAULT_TILE_SIZE, dst_y = e->y * DEFAULT_TILE_SIZE;
+    const float w = s->width, h = s->height, dst_x = e->x * DEFAULT_TILE_SIZE, dst_y = e->y * DEFAULT_TILE_SIZE;
     group->current = 0;
     group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
     group->off_x = offset_x;
@@ -420,4 +432,15 @@ void libdraw_create_spritegroup(
     msuccessint("inserting spritegroup for entity", id);
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
     msuccessint("Spritegroup created for entity", id);
+}
+
+
+void libdraw_calc_debugpanel_size(gamestate* const g) {
+    if (!g) {
+        merror("libdraw_calc_debugpanel_size: gamestate is NULL");
+        return;
+    }
+    const Vector2 size = MeasureTextEx(GetFontDefault(), g->debugpanel.buffer, g->debugpanel.font_size, 1);
+    g->debugpanel.w = size.x;
+    g->debugpanel.h = size.y;
 }

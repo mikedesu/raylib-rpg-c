@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "libgame_defines.h"
 #include "mprint.h"
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -95,6 +96,11 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
     } else if (inputstate_is_held(is, KEY_X)) {
         msuccess("X held!");
         g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
+    } else if (inputstate_is_pressed(is, KEY_V)) {
+        msuccess("V pressed!");
+        // we want to round up to the next nearest integer value
+        // we can use math.h roundf() function
+        g->cam2d.zoom = roundf(g->cam2d.zoom);
     }
 }
 
@@ -169,14 +175,19 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Frame count: %d\n"
              "Frame draw time: %.02f ms\n"
              "Cam: (%.02f, %.02f)\n"
-             "Zoom: %.02f",
+             "Zoom: %.02f\n"
+             "Control mode: %s\n",
+
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
              g->last_frame_time * 1000,
              g->cam2d.offset.x,
              g->cam2d.offset.y,
-             g->cam2d.zoom);
+             g->cam2d.zoom,
+             g->controlmode == CONTROLMODE_PLAYER   ? "Player"
+             : g->controlmode == CONTROLMODE_CAMERA ? "Camera"
+                                                    : "Unknown");
 }
 
 

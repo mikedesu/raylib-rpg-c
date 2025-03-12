@@ -9,6 +9,9 @@
 #include <string.h>
 
 
+#define GAMESTATE_DEBUGPANEL_DEFAULT_X 5
+#define GAMESTATE_DEBUGPANEL_DEFAULT_Y 5
+
 // have to update this function when we introduce new fields to Gamestate
 gamestate* gamestateinitptr() {
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
@@ -19,8 +22,20 @@ gamestate* gamestateinitptr() {
         return NULL;
     }
     g->framecount = 0;
-    g->debugpanel.x = 0;
-    g->debugpanel.y = 0;
+
+    g->debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
+    g->debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
+    g->debugpanel.w = 200;
+    g->debugpanel.h = 200;
+    g->debugpanel.fg_color = RAYWHITE;
+    g->debugpanel.bg_color = Fade(RED, 0.8f);
+    g->debugpanel.pad_top = 10;
+    g->debugpanel.pad_left = 10;
+    g->debugpanel.pad_right = 10;
+    g->debugpanel.pad_bottom = 10;
+    g->debugpanel.font_size = 10;
+
+
     g->lock = 0;
     g->targetwidth = -1;
     g->targetheight = -1;
