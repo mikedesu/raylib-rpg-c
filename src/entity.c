@@ -17,6 +17,7 @@ entity_t* entity_new(const entityid id, const entitytype_t type) {
     e->sprite_move_x = e->sprite_move_y = 0;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     e->next = NULL;
+    e->current_dungeon_floor = -1;
     return e;
 }
 

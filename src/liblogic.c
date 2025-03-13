@@ -30,7 +30,7 @@ void liblogic_init(gamestate* const g) {
 
     g->entitymap = em_new();
 
-    const int x = 0, y = 0;
+    const int x = 1, y = 1;
     const entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, x, y, "hero");
     if (hero_id != -1) {
         g->hero_id = hero_id;
@@ -122,19 +122,23 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     }
     if (inputstate_is_pressed(is, KEY_RIGHT)) {
         minfo("Right pressed!");
+        liblogic_try_entity_move_right(g, e);
         //e->sprite_move_x = DEFAULT_TILE_SIZE;
         //entity_incr_x(e);
         //entity_incr_x(e);
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
         minfo("left  pressed!");
+        liblogic_try_entity_move_left(g, e);
         //e->sprite_move_x = -DEFAULT_TILE_SIZE;
         //entity_decr_x(e);
     } else if (inputstate_is_pressed(is, KEY_UP)) {
         minfo("up pressed!");
+        liblogic_try_entity_move_up(g, e);
         //e->sprite_move_y = -DEFAULT_TILE_SIZE;
         //entity_decr_y(e);
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
         minfo("down pressed!");
+        liblogic_try_entity_move_down(g, e);
         //e->sprite_move_y = DEFAULT_TILE_SIZE;
         //entity_incr_y(e);
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {
@@ -146,6 +150,207 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         g->controlmode = CONTROLMODE_CAMERA;
     }
 }
+
+
+void liblogic_try_entity_move_left(gamestate* const g, entity* const e) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+    if (!e) {
+        merror("Entity is NULL!");
+        return;
+    }
+    // check if the entity can move left
+    const int ex = e->x, ey = e->y, floor = e->current_dungeon_floor;
+    // get the current dungeon floor for the entity
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
+    if (!df) {
+        merror("Failed to get dungeon floor");
+        return;
+    }
+    // check if the entity can move left
+    dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex - 1, ey);
+    if (!tile) {
+        merror("Failed to get tile");
+        return;
+    }
+    // check the tiletype
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_00) {
+        merror("Cannot move left, stone wall 00");
+        return;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_01) {
+        merror("Cannot move left, stone wall 01");
+        return;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_02) {
+        merror("Cannot move left, stone wall 02");
+        return;
+    }
+    if (ex - 1 < 0) {
+        merror("Cannot move left, out of bounds");
+        return;
+    }
+
+    // move the entity left
+    // this consists of updating the entity's x value
+    // as well as removing the entity from its previous tile
+    // and adding it to the new tile
+    dungeon_floor_remove_at(df, e->id, ex, ey);
+    dungeon_floor_add_at(df, e->id, ex - 1, ey);
+    e->x -= 1;
+}
+
+
+void liblogic_try_entity_move_right(gamestate* const g, entity* const e) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+    if (!e) {
+        merror("Entity is NULL!");
+        return;
+    }
+    // check if the entity can move right
+    const int ex = e->x, ey = e->y, floor = e->current_dungeon_floor;
+    // get the current dungeon floor for the entity
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
+    if (!df) {
+        merror("Failed to get dungeon floor");
+        return;
+    }
+    // check if the entity can move right
+    dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex + 1, ey);
+    if (!tile) {
+        merror("Failed to get tile");
+        return;
+    }
+    // check the tiletype
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_00) {
+        merror("Cannot move right, stone wall 00");
+        return;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_01) {
+        merror("Cannot move right, stone wall 01");
+        return;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_02) {
+        merror("Cannot move right, stone wall 02");
+        return;
+    }
+    if (ex + 1 >= df->width) {
+        merror("Cannot move right, out of bounds");
+        return;
+    }
+
+    // move the entity right
+    // this consists of updating the entity's x value
+    // as well as removing the entity from its previous tile
+    // and adding it to the new tile
+    dungeon_floor_remove_at(df, e->id, ex, ey);
+    dungeon_floor_add_at(df, e->id, ex + 1, ey);
+    e->x += 1;
+}
+
+
+void liblogic_try_entity_move_up(gamestate* const g, entity* const e) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+    if (!e) {
+        merror("Entity is NULL!");
+        return;
+    }
+    // check if the entity can move right
+    const int ex = e->x, ey = e->y, floor = e->current_dungeon_floor;
+    // get the current dungeon floor for the entity
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
+    if (!df) {
+        merror("Failed to get dungeon floor");
+        return;
+    }
+    // check if the entity can move up
+    dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex, ey - 1);
+    if (!tile) {
+        merror("Failed to get tile");
+        return;
+    }
+    // check the tiletype
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_00) {
+        merror("Cannot move up, stone wall 00");
+        return;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_01) {
+        merror("Cannot move up, stone wall 01");
+        return;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_02) {
+        merror("Cannot move up, stone wall 02");
+        return;
+    }
+    if (ey - 1 < 0) {
+        merror("Cannot move up, out of bounds");
+        return;
+    }
+
+    // move the entity right
+    // this consists of updating the entity's x value
+    // as well as removing the entity from its previous tile
+    // and adding it to the new tile
+    dungeon_floor_remove_at(df, e->id, ex, ey);
+    dungeon_floor_add_at(df, e->id, ex, ey - 1);
+    e->y -= 1;
+}
+
+
+void liblogic_try_entity_move_down(gamestate* const g, entity* const e) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+    if (!e) {
+        merror("Entity is NULL!");
+        return;
+    }
+    // check if the entity can move down
+    const int ex = e->x, ey = e->y, floor = e->current_dungeon_floor;
+    // get the current dungeon floor for the entity
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
+    if (!df) {
+        merror("Failed to get dungeon floor");
+        return;
+    }
+    // check if the entity can move down
+    dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex, ey + 1);
+    if (!tile) {
+        merror("Failed to get tile");
+        return;
+    }
+    // check the tiletype
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_00) {
+        merror("Cannot move down, stone wall 00");
+        return;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_01) {
+        merror("Cannot move down, stone wall 01");
+        return;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_02) {
+        merror("Cannot move down, stone wall 02");
+        return;
+    }
+    if (ey + 1 >= df->height) {
+        merror("Cannot move down, out of bounds");
+        return;
+    }
+
+    dungeon_floor_remove_at(df, e->id, ex, ey);
+    dungeon_floor_add_at(df, e->id, ex, ey + 1);
+    e->y += 1;
+}
+
 
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     if (!is) {
@@ -241,6 +446,31 @@ entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, in
         merror("liblogic_entity_create: name is NULL or empty");
         return -1;
     }
+    // can we create an entity at this location? no entities can be made on wall-types etc
+    dungeon_floor_t* df = dungeon_get_current_floor(g->dungeon);
+    if (!df) {
+        merror("liblogic_entity_create: failed to get current dungeon floor");
+        return -1;
+    }
+    dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+    if (!tile) {
+        merror("liblogic_entity_create: failed to get tile");
+        return -1;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_00) {
+        merror("liblogic_entity_create: cannot create entity on stone wall 00");
+        return -1;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_01) {
+        merror("liblogic_entity_create: cannot create entity on stone wall 01");
+        return -1;
+    }
+    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_02) {
+        merror("liblogic_entity_create: cannot create entity on stone wall 02");
+        return -1;
+    }
+
+
     entity* e = entity_new_at(next_entityid++, type, x, y); // Assuming entity_new_at takes name next
     if (!e) {
         merror("liblogic_entity_create: failed to create entity");
@@ -253,11 +483,7 @@ entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, in
     em_add(g->entitymap, e);
     liblogic_add_entityid(g, e->id);
 
-    dungeon_floor_t* df = dungeon_get_current_floor(g->dungeon);
-    if (!df) {
-        merror("liblogic_entity_create: failed to get current dungeon floor");
-        return -1;
-    }
+
     dungeon_floor_add_at(df, e->id, x, y);
 
     msuccessint2("Created entity at", x, y);

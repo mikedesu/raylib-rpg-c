@@ -21,6 +21,7 @@ typedef struct entity_t {
 
     int x;
     int y;
+    int current_dungeon_floor;
 
     int sprite_move_x;
     int sprite_move_y;

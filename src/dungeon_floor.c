@@ -91,6 +91,7 @@ const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, co
     } else {
         merror("dungeon_floor_add_at: df is NULL");
     }
+    msuccessint3("dungeon_floor_add_at: added entity", id, x, y);
     return retval;
 }
 
@@ -111,6 +112,7 @@ const bool dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id,
     } else {
         merror("dungeon_floor_remove_at: df is NULL");
     }
+    msuccessint3("dungeon_floor_remove_at: added entity", id, x, y);
     return retval;
 }
 
