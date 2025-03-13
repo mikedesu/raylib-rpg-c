@@ -369,12 +369,15 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
         return;
     }
 
+    //g->debugpanel.font_size = 20;
+
     snprintf(g->debugpanel.buffer,
              sizeof(g->debugpanel.buffer),
              "%s\n"
              "%s\n"
              "Frame count: %d\n"
              "Frame draw time: %.02f ms\n"
+             "debug font size: %d\n"
              "Cam: (%.02f, %.02f)\n"
              "Zoom: %.02f\n"
              "Control mode: %s\n"
@@ -384,6 +387,7 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              g->currenttimebuf,
              g->framecount,
              g->last_frame_time * 1000,
+             g->debugpanel.font_size,
              g->cam2d.offset.x,
              g->cam2d.offset.y,
              g->cam2d.zoom,

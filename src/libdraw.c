@@ -19,8 +19,10 @@ Rectangle target_dest = {0, 0, 800, 480};
 Vector2 target_origin = {0, 0};
 Vector2 zero_vector = {0, 0};
 
-#define DEFAULT_WINDOW_WIDTH 800
-#define DEFAULT_WINDOW_HEIGHT 480
+//#define DEFAULT_WINDOW_WIDTH 800
+//#define DEFAULT_WINDOW_HEIGHT 480
+#define DEFAULT_WINDOW_WIDTH 1280
+#define DEFAULT_WINDOW_HEIGHT 720
 #define DEFAULT_TILE_SIZE 8
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define ANIM_SPEED 10
@@ -195,8 +197,8 @@ void libdraw_draw_debug_panel(gamestate* const g) {
     const int pad_left = g->debugpanel.pad_left, pad_top = g->debugpanel.pad_top, pad_right = g->debugpanel.pad_right,
               pad_bottom = g->debugpanel.pad_bottom;
     // the root of the box should be at x,y
-    const int x0 = x, y0 = y, w0 = w + pad_left + pad_right, h0 = h + pad_top + pad_bottom;
-    DrawRectangle(x0, y0, w0, h0, c);
+    const int w0 = w + pad_left + pad_right + pad_right, h0 = h + pad_top + pad_bottom;
+    DrawRectangle(x, y, w0, h0, c);
     // Draw text
     const int x1 = x + pad_left, y1 = y + pad_top;
     DrawText(g->debugpanel.buffer, x1, y1, fontsize, c2);
