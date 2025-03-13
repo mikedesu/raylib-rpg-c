@@ -20,22 +20,13 @@ void liblogic_init(gamestate* const g) {
     }
 
 
+    // init the dungeon and dungeon floor
     g->dungeon = dungeon_create();
     if (!g->dungeon) {
         merror("liblogic_init: failed to init dungeon");
         return;
     }
-
     dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-
-    // init the dungeon floor
-    //g->dungeon_floor = dungeon_floor_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    //if (!g->dungeon_floor) {
-    //    merror("liblogic_init: failed to init dungeon floor");
-    //    return;
-    //}
-
-    //dungeon_floor_init(g->dungeon_floor);
 
     g->entitymap = em_new();
 
@@ -50,6 +41,12 @@ void liblogic_init(gamestate* const g) {
 
 
 void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
+
+    if (inputstate_is_pressed(is, KEY_D)) {
+        msuccess("D pressed!");
+        g->debugpanelon = !g->debugpanelon;
+    }
+
     if (g->controlmode == CONTROLMODE_PLAYER) {
         liblogic_handle_input_player(is, g);
     } else if (g->controlmode == CONTROLMODE_CAMERA) {
@@ -60,22 +57,18 @@ void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
 }
 
 
+#define DEFAULT_ZOOM_INCR 0.1f
 void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g) {
-
     //minfo("Handling camera input");
-
+    const float move = 2.0f;
     if (!is) {
         merror("Input state is NULL!");
         return;
     }
-
     if (!g) {
         merror("Game state is NULL!");
         return;
     }
-
-    const float move = 2.0f;
-
     if (inputstate_is_held(is, KEY_RIGHT)) {
         // move camera right
         g->cam2d.offset.x += move;
@@ -92,13 +85,12 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
         // move camera down
         g->cam2d.offset.y += move;
     }
-
     if (inputstate_is_pressed(is, KEY_C)) {
         msuccess("C pressed!");
         g->controlmode = CONTROLMODE_PLAYER;
     }
 
-#define DEFAULT_ZOOM_INCR 0.1f
+
     if (inputstate_is_held(is, KEY_Z)) {
         msuccess("Z held!");
         g->cam2d.zoom += DEFAULT_ZOOM_INCR;
@@ -123,23 +115,26 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         merror("Game state is NULL!");
         return;
     }
-
     entity* e = em_get(g->entitymap, g->hero_id);
     if (!e) {
         merror("Hero not found!");
         return;
     }
-
     if (inputstate_is_pressed(is, KEY_RIGHT)) {
+        minfo("Right pressed!");
         //e->sprite_move_x = DEFAULT_TILE_SIZE;
         //entity_incr_x(e);
+        //entity_incr_x(e);
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
+        minfo("left  pressed!");
         //e->sprite_move_x = -DEFAULT_TILE_SIZE;
         //entity_decr_x(e);
     } else if (inputstate_is_pressed(is, KEY_UP)) {
+        minfo("up pressed!");
         //e->sprite_move_y = -DEFAULT_TILE_SIZE;
         //entity_decr_y(e);
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+        minfo("down pressed!");
         //e->sprite_move_y = DEFAULT_TILE_SIZE;
         //entity_incr_y(e);
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {

@@ -214,7 +214,10 @@ void libdraw_drawframe(gamestate* const g) {
     EndMode2D();
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    libdraw_draw_debug_panel(g); // Call the new function here
+
+    if (g->debugpanelon) {
+        libdraw_draw_debug_panel(g);
+    }
     EndDrawing();
     double elapsed_time = GetTime() - start_time;
     g->last_frame_time = elapsed_time;
