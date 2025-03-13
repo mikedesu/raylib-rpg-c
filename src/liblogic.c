@@ -4,7 +4,7 @@
 #include "dungeon_floor.h"
 #include "em.h"
 #include "entity.h"
-//#include "libgame_defines.h"
+#include "libgame_defines.h"
 #include "mprint.h"
 #include <math.h>
 #include <stdlib.h>
@@ -18,8 +18,6 @@ void liblogic_init(gamestate* const g) {
         merror("liblogic_init: gamestate is NULL");
         return;
     }
-
-
     // init the dungeon and dungeon floor
     g->dungeon = dungeon_create();
     if (!g->dungeon) {
@@ -27,26 +25,23 @@ void liblogic_init(gamestate* const g) {
         return;
     }
     dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-
     g->entitymap = em_new();
-
-    const int x = 1, y = 1;
-    const entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, x, y, "hero");
+    const int x = 1, y = 1, floor = 0;
+    const entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, x, y, floor, "hero");
     if (hero_id != -1) {
         g->hero_id = hero_id;
         msuccessint("Logic Init! Hero ID: ", g->hero_id);
-    } else
+    } else {
         merror("Logic Init: failed to init hero");
+    }
 }
 
 
 void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
-
     if (inputstate_is_pressed(is, KEY_D)) {
         msuccess("D pressed!");
         g->debugpanelon = !g->debugpanelon;
     }
-
     if (g->controlmode == CONTROLMODE_PLAYER) {
         liblogic_handle_input_player(is, g);
     } else if (g->controlmode == CONTROLMODE_CAMERA) {
@@ -70,38 +65,40 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
         return;
     }
     if (inputstate_is_held(is, KEY_RIGHT)) {
-        // move camera right
         g->cam2d.offset.x += move;
+        return;
     }
     if (inputstate_is_held(is, KEY_LEFT)) {
-        // move camera left
         g->cam2d.offset.x -= move;
+        return;
     }
     if (inputstate_is_held(is, KEY_UP)) {
-        // move camera up
         g->cam2d.offset.y -= move;
+        return;
     }
     if (inputstate_is_held(is, KEY_DOWN)) {
-        // move camera down
         g->cam2d.offset.y += move;
+        return;
     }
     if (inputstate_is_pressed(is, KEY_C)) {
         msuccess("C pressed!");
         g->controlmode = CONTROLMODE_PLAYER;
+        return;
     }
-
-
     if (inputstate_is_held(is, KEY_Z)) {
         msuccess("Z held!");
         g->cam2d.zoom += DEFAULT_ZOOM_INCR;
+        return;
     } else if (inputstate_is_held(is, KEY_X)) {
         msuccess("X held!");
         g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
+        return;
     } else if (inputstate_is_pressed(is, KEY_V)) {
         msuccess("V pressed!");
         // we want to round up to the next nearest integer value
         // we can use math.h roundf() function
         g->cam2d.zoom = roundf(g->cam2d.zoom);
+        return;
     }
 }
 
@@ -123,24 +120,15 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     if (inputstate_is_pressed(is, KEY_RIGHT)) {
         minfo("Right pressed!");
         liblogic_try_entity_move_right(g, e);
-        //e->sprite_move_x = DEFAULT_TILE_SIZE;
-        //entity_incr_x(e);
-        //entity_incr_x(e);
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
         minfo("left  pressed!");
         liblogic_try_entity_move_left(g, e);
-        //e->sprite_move_x = -DEFAULT_TILE_SIZE;
-        //entity_decr_x(e);
     } else if (inputstate_is_pressed(is, KEY_UP)) {
         minfo("up pressed!");
         liblogic_try_entity_move_up(g, e);
-        //e->sprite_move_y = -DEFAULT_TILE_SIZE;
-        //entity_decr_y(e);
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
         minfo("down pressed!");
         liblogic_try_entity_move_down(g, e);
-        //e->sprite_move_y = DEFAULT_TILE_SIZE;
-        //entity_incr_y(e);
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {
         msuccess("Space pressed!");
     } else if (inputstate_is_pressed(is, KEY_ENTER)) {
@@ -162,7 +150,7 @@ void liblogic_try_entity_move_left(gamestate* const g, entity* const e) {
         return;
     }
     // check if the entity can move left
-    const int ex = e->x, ey = e->y, floor = e->current_dungeon_floor;
+    const int ex = e->x, ey = e->y, floor = e->floor;
     // get the current dungeon floor for the entity
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
@@ -200,6 +188,7 @@ void liblogic_try_entity_move_left(gamestate* const g, entity* const e) {
     dungeon_floor_remove_at(df, e->id, ex, ey);
     dungeon_floor_add_at(df, e->id, ex - 1, ey);
     e->x -= 1;
+    e->sprite_move_x = -DEFAULT_TILE_SIZE;
 }
 
 
@@ -213,11 +202,11 @@ void liblogic_try_entity_move_right(gamestate* const g, entity* const e) {
         return;
     }
     // check if the entity can move right
-    const int ex = e->x, ey = e->y, floor = e->current_dungeon_floor;
+    const int ex = e->x, ey = e->y, floor = e->floor;
     // get the current dungeon floor for the entity
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
-        merror("Failed to get dungeon floor");
+        merrorint("Failed to get dungeon floor", floor);
         return;
     }
     // check if the entity can move right
@@ -251,6 +240,7 @@ void liblogic_try_entity_move_right(gamestate* const g, entity* const e) {
     dungeon_floor_remove_at(df, e->id, ex, ey);
     dungeon_floor_add_at(df, e->id, ex + 1, ey);
     e->x += 1;
+    e->sprite_move_x = DEFAULT_TILE_SIZE;
 }
 
 
@@ -264,7 +254,7 @@ void liblogic_try_entity_move_up(gamestate* const g, entity* const e) {
         return;
     }
     // check if the entity can move right
-    const int ex = e->x, ey = e->y, floor = e->current_dungeon_floor;
+    const int ex = e->x, ey = e->y, floor = e->floor;
     // get the current dungeon floor for the entity
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
@@ -302,6 +292,7 @@ void liblogic_try_entity_move_up(gamestate* const g, entity* const e) {
     dungeon_floor_remove_at(df, e->id, ex, ey);
     dungeon_floor_add_at(df, e->id, ex, ey - 1);
     e->y -= 1;
+    e->sprite_move_y = -DEFAULT_TILE_SIZE;
 }
 
 
@@ -315,7 +306,7 @@ void liblogic_try_entity_move_down(gamestate* const g, entity* const e) {
         return;
     }
     // check if the entity can move down
-    const int ex = e->x, ey = e->y, floor = e->current_dungeon_floor;
+    const int ex = e->x, ey = e->y, floor = e->floor;
     // get the current dungeon floor for the entity
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
@@ -349,6 +340,7 @@ void liblogic_try_entity_move_down(gamestate* const g, entity* const e) {
     dungeon_floor_remove_at(df, e->id, ex, ey);
     dungeon_floor_add_at(df, e->id, ex, ey + 1);
     e->y += 1;
+    e->sprite_move_y = DEFAULT_TILE_SIZE;
 }
 
 
@@ -437,7 +429,9 @@ void liblogic_add_entityid(gamestate* const g, entityid id) {
 }
 
 
-entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, int y, const char* name) {
+//entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, int y, const char* name) {
+const entityid liblogic_entity_create(
+    gamestate* const g, const entitytype_t type, const int x, const int y, const int floor, const char* name) {
     if (!g || !g->entitymap) {
         merror("liblogic_entity_create: gamestate or entitymap is NULL");
         return -1;
@@ -446,12 +440,25 @@ entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, in
         merror("liblogic_entity_create: name is NULL or empty");
         return -1;
     }
-    // can we create an entity at this location? no entities can be made on wall-types etc
-    dungeon_floor_t* df = dungeon_get_current_floor(g->dungeon);
+    // check type
+    if (type < 0 || type >= ENTITY_COUNT) {
+        merror("liblogic_entity_create: type is out of bounds");
+        return -1;
+    }
+    // check x and y
+    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
         merror("liblogic_entity_create: failed to get current dungeon floor");
         return -1;
     }
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
+        merror("liblogic_entity_create: x or y is out of bounds");
+        return -1;
+    }
+
+
+    // can we create an entity at this location? no entities can be made on wall-types etc
+
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merror("liblogic_entity_create: failed to get tile");
@@ -471,7 +478,7 @@ entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, in
     }
 
 
-    entity* e = entity_new_at(next_entityid++, type, x, y); // Assuming entity_new_at takes name next
+    entity* e = entity_new_at(next_entityid++, type, x, y, floor); // Assuming entity_new_at takes name next
     if (!e) {
         merror("liblogic_entity_create: failed to create entity");
         return -1;

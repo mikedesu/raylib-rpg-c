@@ -17,18 +17,19 @@ entity_t* entity_new(const entityid id, const entitytype_t type) {
     e->sprite_move_x = e->sprite_move_y = 0;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     e->next = NULL;
-    e->current_dungeon_floor = -1;
+    e->floor = -1;
     return e;
 }
 
 
-entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x, const int y) {
+entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x, const int y, const int floor) {
     entity_t* e = entity_new(id, type);
     if (e == NULL) {
         return NULL;
     }
     e->x = x;
     e->y = y;
+    e->floor = floor;
     return e;
 }
 

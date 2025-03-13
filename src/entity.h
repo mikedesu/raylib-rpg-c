@@ -21,7 +21,7 @@ typedef struct entity_t {
 
     int x;
     int y;
-    int current_dungeon_floor;
+    int floor;
 
     int sprite_move_x;
     int sprite_move_y;
@@ -31,7 +31,9 @@ typedef struct entity_t {
 
 
 entity_t* entity_new(const entityid id, const entitytype_t type);
-entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x, const int y);
+//entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x, const int y);
+entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x, const int y, const int floor);
+
 
 void entity_set_name(entity_t* const e, const char* name);
 void entity_set_race(entity_t* const e, const race_t race);
