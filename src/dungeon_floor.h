@@ -16,7 +16,8 @@ typedef struct {
 } dungeon_floor_t;
 
 
-dungeon_floor_t* dungeon_floor_create(int width, int height);
+//dungeon_floor_t* dungeon_floor_create(int width, int height);
+dungeon_floor_t* dungeon_floor_create(const int width, const int height);
 
 void dungeon_floor_init(dungeon_floor_t* floor);
 

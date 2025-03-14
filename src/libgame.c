@@ -796,8 +796,7 @@ void libgame_drawframe(gamestate* g) {
 
 
 void libgame_calc_debugpanel_size_unsafe(gamestate* const g) {
-    const int fontsize = 14;
-    const int spacing = 1;
+    const int fontsize = 14, spacing = 1;
     const Vector2 m = MeasureTextEx(g->font, g->debugpanel.buffer, fontsize, spacing);
     g->debugpanel.w = m.x;
     g->debugpanel.h = m.y;
@@ -806,10 +805,7 @@ void libgame_calc_debugpanel_size_unsafe(gamestate* const g) {
 
 inline void libgame_draw_debug_panel_unsafe(gamestate* const g) {
     if (g->debugpanelon) {
-        const int fontsize = 14;
-        const int spacing = 1;
-        const int xy = 10;
-        const int wh = 20;
+        const int fontsize = 14, spacing = 1, xy = 10, wh = 20;
         //const Color c = {0x33, 0x33, 0x33, 255};
         const Color c = {0, 0, 0, 0};
         const Color c2 = WHITE;

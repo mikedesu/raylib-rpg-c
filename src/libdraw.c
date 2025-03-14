@@ -79,6 +79,7 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
                 sg->dest.x--;
                 sg->move.x++;
             }
+
             if (sg->move.y > 0) {
                 sg->dest.y++;
                 sg->move.y--;
@@ -131,7 +132,6 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         merror("libdraw_draw_dungeon_floor_tile: gamestate is NULL");
         return;
     }
-    //dungeon_floor_t* df = dungeon_get_current_floor(g->dungeon);
     if (!df) {
         merror("libdraw_draw_dungeon_floor_tile: dungeon_floor is NULL");
         return;
@@ -140,7 +140,6 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         merrorint2("libdraw_draw_dungeon_floor_tile: x or y out of bounds", x, y);
         return;
     }
-
 
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
@@ -159,8 +158,17 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         merrorint("libdraw_draw_dungeon_floor_tile: texture id is invalid", texture->id);
         return;
     }
-    Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE},
-              dest = (Rectangle){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE};
+    // atm hard-coding the size of the new tiles and their destinations
+
+    const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
+    const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
+    const int tile_size_dest_w = DEFAULT_TILE_SIZE * 4;
+    const int tile_size_dest_h = DEFAULT_TILE_SIZE * 4;
+    const int tile_size_dest_x = x * DEFAULT_TILE_SIZE - 12;
+    const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
+
+    Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
+    Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
 }
 
@@ -286,30 +294,27 @@ bool libdraw_windowshouldclose() {
 
 void libdraw_load_texture(
     const int txkey, const int contexts, const int frames, const bool do_dither, const char* path) {
+
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
         merror("libdraw_load_texture: txkey out of bounds");
         return;
-    }
-    if (contexts < 0) {
+    } else if (contexts < 0) {
         merror("libdraw_load_texture: contexts out of bounds");
         return;
-    }
-    if (frames < 0) {
+    } else if (frames < 0) {
         merror("libdraw_load_texture: frames out of bounds");
         return;
-    }
-    if (txinfo[txkey].texture.id > 0) {
+    } else if (txinfo[txkey].texture.id > 0) {
         merror("libdraw_load_texture: texture already loaded");
         return;
-    }
-    if (strlen(path) == 0) {
+    } else if (strlen(path) == 0) {
         merror("libdraw_load_texture: path is empty");
         return;
-    }
-    if (strcmp(path, "\n") == 0) {
+    } else if (strcmp(path, "\n") == 0) {
         merror("libdraw_load_texture: path is newline");
         return;
     }
+
     Image image = LoadImage(path);
     if (do_dither) ImageDither(&image, 4, 4, 4, 4);
     Texture2D texture = LoadTextureFromImage(image);

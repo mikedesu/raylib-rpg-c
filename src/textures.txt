@@ -1,5 +1,5 @@
 # txkey contexts frames dodither path
-0  1 1  1  img/tiles/dirt_00.png
+0  1 1  1  img/tiles/dirt_00a.png
 # atm there are 12 total human sprite animations
 1  4 16 0  img/characters/human_idle.png
 2  4 16 0  img/characters/human_idle_shadow.png
@@ -28,7 +28,7 @@
 24 1 12 0  img/characters/orc_die_shadow.png
 25 4 4  0  img/characters/orc_dmg.png
 26 4 4  0  img/characters/orc_dmg_shadow.png
-27 1 1  0  img/tiles/stone_00.png
+27 1 1  0  img/tiles/stone_00a.png
 #28 1 1  0  img/tiles/stone_01.png
 #29 1 1  0  img/tiles/stone_02.png
 #30 1 1  0  img/tiles/stone_03.png
@@ -42,9 +42,9 @@
 #38 1 1  0  img/tiles/stone_11.png
 #39 1 1  0  img/tiles/stone_12.png
 #40 1 1  0  img/tiles/stone_13.png
-41 1 1  0  img/tiles/stonewall_00.png
-42 1 1  0  img/tiles/stonewall_01.png
-43 1 1  0  img/tiles/stonewall_02.png
+41 1 1  0  img/tiles/stonewall_00a.png
+42 1 1  0  img/tiles/stonewall_01a.png
+43 1 1  0  img/tiles/stonewall_02a.png
 #44 1 1  0  img/tiles/stonewall_03.png
 #45 1 1  0  img/tiles/stonewall_04.png
 #46 1 1  0  img/tiles/stonewall_05.png

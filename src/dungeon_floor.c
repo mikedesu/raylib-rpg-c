@@ -4,19 +4,31 @@
 #include <stdlib.h>
 
 
-dungeon_floor_t* dungeon_floor_create(int width, int height) {
-    dungeon_floor_t* floor = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
-    if (floor) {
-        dungeon_floor_init(floor);
-    } else {
+//dungeon_floor_t* dungeon_floor_create(int width, int height) {
+//    dungeon_floor_t* floor = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
+//    if (floor) {
+//        dungeon_floor_init(floor);
+//    } else {
+//        merror("dungeon_floor_create: floor malloc failed");
+//        floor = NULL;
+//    }
+//    return floor;
+//}
+
+
+dungeon_floor_t* dungeon_floor_create(const int width, const int height) {
+    dungeon_floor_t* floor = malloc(sizeof(dungeon_floor_t));
+    if (!floor) {
         merror("dungeon_floor_create: floor malloc failed");
-        floor = NULL;
+        return NULL;
     }
+    dungeon_floor_init(floor);
     return floor;
 }
 
 
 void dungeon_floor_init(dungeon_floor_t* floor) {
+    /*
     if (floor) {
         floor->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
         floor->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
@@ -58,6 +70,55 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
         }
     } else {
         merror("dungeon_floor_init: floor is NULL");
+    }
+
+    */
+
+
+    if (!floor) {
+        merror("dungeon_floor_init: floor is NULL");
+        return;
+    }
+
+    floor->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
+    floor->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
+    floor->tiles = (dungeon_tile_t**)malloc(sizeof(dungeon_tile_t*) * floor->height);
+
+    if (!floor->tiles) {
+        merror("dungeon_floor_init: floor->tiles malloc failed");
+        return;
+    }
+
+    bool success = true;
+    for (int i = 0; i < floor->width; i++) {
+        floor->tiles[i] = (dungeon_tile_t*)malloc(sizeof(dungeon_tile_t) * floor->width);
+        if (floor->tiles[i] == NULL) {
+            success = false;
+            break;
+        }
+    }
+
+    if (!success) {
+        merror("dungeon_floor_init: floor->tiles[i] malloc failed");
+        return;
+    }
+
+    for (int i = 0; i < floor->height; i++) {
+        for (int j = 0; j < floor->width; j++) {
+            dungeon_tile_t* current = &floor->tiles[i][j];
+            // set the perimeter to stone walls
+            if (i == 0 || i == floor->height - 1 || j == 0 || j == floor->width - 1) {
+                if (j % 2 == 0) {
+                    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_00);
+                } else if (j % 3 == 0) {
+                    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_02);
+                } else {
+                    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_01);
+                }
+            } else {
+                dungeon_tile_init(current, DUNGEON_TILE_TYPE_FLOOR_DIRT);
+            }
+        }
     }
 }
 
