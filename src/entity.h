@@ -5,6 +5,7 @@
 #include "entityid.h"
 #include "entitytype.h"
 #include "race.h"
+#include <stdbool.h>
 
 #define ENTITY_NAME_LEN_MAX 64
 
@@ -27,6 +28,8 @@ typedef struct entity_t {
     int sprite_move_y;
 
     entity_t* next;
+
+    bool do_update;
 } entity;
 
 
@@ -47,3 +50,6 @@ void entity_incr_x(entity_t* const e);
 void entity_incr_y(entity_t* const e);
 void entity_decr_x(entity_t* const e);
 void entity_decr_y(entity_t* const e);
+
+void entity_set_dir(entity_t* const e, const direction_t dir);
+const direction_t entity_get_dir(entity_t* const e);

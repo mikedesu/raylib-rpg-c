@@ -59,56 +59,71 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         return;
     }
     entity* const e = em_get(g->entitymap, id);
-    if (e) {
-        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-        if (sg) {
-            // Copy movement intent from e->sprite_move_x/y if present
-            if (e->sprite_move_x != 0 || e->sprite_move_y != 0) {
-                sg->move.x = e->sprite_move_x;
-                sg->move.y = e->sprite_move_y;
-                e->sprite_move_x = 0;
-                e->sprite_move_y = 0;
-                sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
-            }
+    if (!e) {
+        merrorint("libdraw_update_sprite: entity not found", id);
+        return;
+    }
 
-            // Update movement as long as sg->move.x/y is non-zero
-            if (sg->move.x > 0) {
-                sg->dest.x++;
-                sg->move.x--;
-            } else if (sg->move.x < 0) {
-                sg->dest.x--;
-                sg->move.x++;
-            }
 
-            if (sg->move.y > 0) {
-                sg->dest.y++;
-                sg->move.y--;
-            } else if (sg->move.y < 0) {
-                sg->dest.y--;
-                sg->move.y++;
-            }
+    //if (e) {
+    spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+    if (!sg) {
+        merrorint("libdraw_update_sprite: spritegroup not found", id);
+        return;
+    }
 
-            // Snap to the tile position only when movement is fully complete
-            if (sg->move.x == 0 && sg->move.y == 0) {
-                sg->dest.x = e->x * DEFAULT_TILE_SIZE + sg->off_x;
-                sg->dest.y = e->y * DEFAULT_TILE_SIZE + sg->off_y;
-            }
+    if (e->do_update) {
+        libdraw_update_sprite_context(g, id, e->direction);
+        e->do_update = false;
+    }
 
-            sprite* s = sg->sprites[sg->current];
-            if (!s) {
-                merror("libdraw_update_sprite: sprite is NULL");
-                return;
-            }
-            if (g->framecount % ANIM_SPEED == 0) {
-                sprite_incrframe(s);
-                // Check if the animation has completed one loop
-                if (s->num_loops >= 1) {
-                    sg->current = sg->default_anim;
-                    s->num_loops = 0;
-                }
-            }
+    // Copy movement intent from e->sprite_move_x/y if present
+    if (e->sprite_move_x != 0 || e->sprite_move_y != 0) {
+        sg->move.x = e->sprite_move_x;
+        sg->move.y = e->sprite_move_y;
+        e->sprite_move_x = 0;
+        e->sprite_move_y = 0;
+        sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
+    }
+
+    // Update movement as long as sg->move.x/y is non-zero
+    if (sg->move.x > 0) {
+        sg->dest.x++;
+        sg->move.x--;
+    } else if (sg->move.x < 0) {
+        sg->dest.x--;
+        sg->move.x++;
+    }
+
+    if (sg->move.y > 0) {
+        sg->dest.y++;
+        sg->move.y--;
+    } else if (sg->move.y < 0) {
+        sg->dest.y--;
+        sg->move.y++;
+    }
+
+    // Snap to the tile position only when movement is fully complete
+    if (sg->move.x == 0 && sg->move.y == 0) {
+        sg->dest.x = e->x * DEFAULT_TILE_SIZE + sg->off_x;
+        sg->dest.y = e->y * DEFAULT_TILE_SIZE + sg->off_y;
+    }
+
+    sprite* s = sg->sprites[sg->current];
+    if (!s) {
+        merror("libdraw_update_sprite: sprite is NULL");
+        return;
+    }
+    if (g->framecount % ANIM_SPEED == 0) {
+        sprite_incrframe(s);
+        // Check if the animation has completed one loop
+        if (s->num_loops >= 1) {
+            sg->current = sg->default_anim;
+            s->num_loops = 0;
         }
     }
+    //}
+    //}
 }
 
 
@@ -464,4 +479,43 @@ void libdraw_calc_debugpanel_size(gamestate* const g) {
     const Vector2 size = MeasureTextEx(GetFontDefault(), g->debugpanel.buffer, g->debugpanel.font_size, 1);
     g->debugpanel.w = size.x;
     g->debugpanel.h = size.y;
+}
+
+
+void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t dir) {
+    //int retval = 0;
+    spritegroup_t* group = hashtable_entityid_spritegroup_get(spritegroups, id); // Adjusted for no specifier
+    if (group) {
+        const int old_ctx = group->sprites[group->current]->currentcontext;
+        int ctx = old_ctx;
+        ctx = dir == DIRECTION_NONE                                      ? old_ctx
+              : dir == DIRECTION_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
+              : dir == DIRECTION_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
+              : dir == DIRECTION_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
+              : dir == DIRECTION_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
+              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
+              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
+              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
+              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
+              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
+              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
+              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
+              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
+              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
+              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
+              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
+              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
+              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
+              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
+                                                                         : old_ctx;
+        spritegroup_setcontexts(group, ctx);
+        //retval = 0;
+    } else {
+        merror("libdraw_update_sprite_context: group is NULL");
+        //retval = -1;
+    }
+    //return retval;
+    // Return value omitted since it’s not needed in libdraw context, but kept in logic for fidelity
 }

@@ -119,15 +119,19 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     }
     if (inputstate_is_pressed(is, KEY_RIGHT)) {
         minfo("Right pressed!");
+        e->do_update = true;
         liblogic_try_entity_move_right(g, e);
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
         minfo("left  pressed!");
+        e->do_update = true;
         liblogic_try_entity_move_left(g, e);
     } else if (inputstate_is_pressed(is, KEY_UP)) {
         minfo("up pressed!");
+        e->do_update = true;
         liblogic_try_entity_move_up(g, e);
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
         minfo("down pressed!");
+        e->do_update = true;
         liblogic_try_entity_move_down(g, e);
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {
         msuccess("Space pressed!");
@@ -158,6 +162,7 @@ void liblogic_try_entity_move_left(gamestate* const g, entity* const e) {
         return;
     }
     // check if the entity can move left
+    entity_set_dir(e, DIRECTION_LEFT);
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex - 1, ey);
     if (!tile) {
         merror("Failed to get tile");
@@ -210,6 +215,7 @@ void liblogic_try_entity_move_right(gamestate* const g, entity* const e) {
         return;
     }
     // check if the entity can move right
+    entity_set_dir(e, DIRECTION_RIGHT);
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex + 1, ey);
     if (!tile) {
         merror("Failed to get tile");
@@ -262,6 +268,7 @@ void liblogic_try_entity_move_up(gamestate* const g, entity* const e) {
         return;
     }
     // check if the entity can move up
+    entity_set_dir(e, DIRECTION_UP);
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex, ey - 1);
     if (!tile) {
         merror("Failed to get tile");
@@ -314,6 +321,7 @@ void liblogic_try_entity_move_down(gamestate* const g, entity* const e) {
         return;
     }
     // check if the entity can move down
+    entity_set_dir(e, DIRECTION_DOWN);
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex, ey + 1);
     if (!tile) {
         merror("Failed to get tile");

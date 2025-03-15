@@ -29,3 +29,4 @@ void libdraw_draw_dungeon_floor(const gamestate* const g);
 void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, const int x, const int y);
 void libdraw_draw_debug_panel(gamestate* const g);
 void libdraw_calc_debugpanel_size(gamestate* const g);
+void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t dir);

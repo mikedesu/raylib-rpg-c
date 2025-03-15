@@ -143,3 +143,28 @@ void entity_decr_y(entity_t* const e) {
 
     e->y--;
 }
+
+
+void entity_set_dir(entity_t* const e, const direction_t dir) {
+    if (e == NULL) {
+        merror("e is NULL");
+        return;
+    }
+    // check that dir is valid
+    if (dir < 0 || dir >= DIRECTION_COUNT) {
+        merror("dir is out of bounds");
+        return;
+    }
+
+    e->direction = dir;
+}
+
+
+const direction_t entity_get_dir(entity_t* const e) {
+    if (e == NULL) {
+        merror("e is NULL");
+        return DIRECTION_NONE;
+    }
+
+    return e->direction;
+}
