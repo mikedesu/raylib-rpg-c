@@ -199,9 +199,30 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
         merror("libdraw_draw_dungeon_floor: dungeon_floor is NULL");
         return;
     }
-    for (int y = 0; y < df->height; y++)
-        for (int x = 0; x < df->width; x++)
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            // draw the entities on the tile
+            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+            if (!tile) {
+                merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
+                return;
+            }
+
             libdraw_draw_dungeon_floor_tile(g, df, x, y);
+
+            const int num_entities = dungeon_tile_entity_count(tile);
+
+            for (int i = 0; i < num_entities; i++) {
+                entityid id = dungeon_tile_get_entity(tile, i);
+                if (id == -1) {
+                    merrorint2("libdraw_draw_dungeon_floor: entity id is -1", x, y);
+                    return;
+                }
+
+                libdraw_draw_sprite_and_shadow(g, id);
+            }
+        }
+    }
 }
 
 
@@ -235,7 +256,7 @@ void libdraw_drawframe(gamestate* const g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     libdraw_draw_dungeon_floor(g);
-    libdraw_draw_sprite_and_shadow(g, g->hero_id);
+    //libdraw_draw_sprite_and_shadow(g, g->hero_id);
     EndMode2D();
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
@@ -261,7 +282,7 @@ void libdraw_draw_sprite(const gamestate* const g, const entityid id) {
         merror("sprite not found");
         return;
     }
-    const int scale = 4;
+    const int scale = 1;
     Rectangle new_dest = (Rectangle){sg->dest.x, sg->dest.y, scale * sg->dest.width, scale * sg->dest.height};
     DrawTexturePro(*s->texture, s->src, new_dest, (Vector2){0, 0}, 0, WHITE);
 }

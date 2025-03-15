@@ -9,6 +9,7 @@
 
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 5
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 5
+#define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
 
 // have to update this function when we introduce new fields to Gamestate
 gamestate* gamestateinitptr() {
@@ -27,7 +28,7 @@ gamestate* gamestateinitptr() {
     g->debugpanel.fg_color = RAYWHITE;
     g->debugpanel.bg_color = Fade(RED, 0.8f);
     g->debugpanel.pad_top = g->debugpanel.pad_left = g->debugpanel.pad_right = g->debugpanel.pad_bottom = 10;
-    g->debugpanel.font_size = 10;
+    g->debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
     g->lock = 0;
     g->targetwidth = g->targetheight = g->windowwidth = g->windowheight = -1;
     g->timebegan = g->currenttime = time(NULL);
