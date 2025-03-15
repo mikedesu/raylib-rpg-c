@@ -209,22 +209,8 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
                 merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
                 return;
             }
-
-            if (dungeon_tile_is_wall(tile->type)) {
-                continue;
-            }
-
+            if (dungeon_tile_is_wall(tile->type)) continue;
             libdraw_draw_dungeon_floor_tile(g, df, x, y);
-
-            //const int num_entities = dungeon_tile_entity_count(tile);
-            //for (int i = 0; i < num_entities; i++) {
-            //    entityid id = dungeon_tile_get_entity(tile, i);
-            //    if (id == -1) {
-            //        merrorint2("libdraw_draw_dungeon_floor: entity id is -1", x, y);
-            //        return;
-            //    }
-            //    libdraw_draw_sprite_and_shadow(g, id);
-            //}
         }
     }
 
@@ -238,16 +224,10 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
                 merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
                 return;
             }
-
-            if (dungeon_tile_is_wall(tile->type)) {
-                continue;
-            }
-
-            //libdraw_draw_dungeon_floor_tile(g, df, x, y);
-
+            if (dungeon_tile_is_wall(tile->type)) continue;
             const int num_entities = dungeon_tile_entity_count(tile);
             for (int i = 0; i < num_entities; i++) {
-                entityid id = dungeon_tile_get_entity(tile, i);
+                const entityid id = dungeon_tile_get_entity(tile, i);
                 if (id == -1) {
                     merrorint2("libdraw_draw_dungeon_floor: entity id is -1", x, y);
                     return;
@@ -258,30 +238,16 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
     }
 
 
+    // walls etc
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            // draw the entities on the tile
             dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
             if (!tile) {
                 merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
                 return;
             }
-
-            if (!dungeon_tile_is_wall(tile->type)) {
-                continue;
-            }
-
+            if (!dungeon_tile_is_wall(tile->type)) continue;
             libdraw_draw_dungeon_floor_tile(g, df, x, y);
-
-            //const int num_entities = dungeon_tile_entity_count(tile);
-            //for (int i = 0; i < num_entities; i++) {
-            //    entityid id = dungeon_tile_get_entity(tile, i);
-            //    if (id == -1) {
-            //        merrorint2("libdraw_draw_dungeon_floor: entity id is -1", x, y);
-            //        return;
-            //    }
-            //    libdraw_draw_sprite_and_shadow(g, id);
-            //}
         }
     }
 }
