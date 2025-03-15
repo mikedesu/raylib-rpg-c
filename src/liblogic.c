@@ -12,7 +12,6 @@
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
-
 void liblogic_init(gamestate* const g) {
     if (!g) {
         merror("liblogic_init: gamestate is NULL");
@@ -24,8 +23,11 @@ void liblogic_init(gamestate* const g) {
         merror("liblogic_init: failed to init dungeon");
         return;
     }
+
     dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+
     g->entitymap = em_new();
+
     const int x = 1, y = 1, floor = 0;
     const entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, x, y, floor, "hero");
     if (hero_id != -1) {
@@ -34,6 +36,16 @@ void liblogic_init(gamestate* const g) {
     } else {
         merror("Logic Init: failed to init hero");
     }
+
+    // create orc
+    const int orc_x = 5, orc_y = 5;
+    const entityid orc_id = liblogic_entity_create(g, ENTITY_NPC, orc_x, orc_y, floor, "orc");
+    if (orc_id != -1) {
+        msuccessint("Logic Init! Orc ID: ", orc_id);
+    } else {
+        merror("Logic Init: failed to init orc");
+    }
+    // set orc properties
 }
 
 

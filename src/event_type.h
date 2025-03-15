@@ -1,6 +1,7 @@
 #pragma once
 
 typedef enum {
+    EVENT_NONE, // No event
     EVENT_MOVE, // Walking to a new tile
     EVENT_ATTACK, // Attacking a target
     EVENT_BLOCK, // Blocking an attack
@@ -12,6 +13,6 @@ typedef enum {
     EVENT_UNEQUIP_SWORD, // Unequipping a sword
     EVENT_USE_ITEM, // Using an item
     EVENT_PICKUP_ITEM, // Picking up a sword (or other item)
-    EVENT_DAMAGE // Receiving damage from an attack or spell
-    // More event types can be added later, e.g., EVENT_DROP_ITEM
+    EVENT_DAMAGE, // Receiving damage from an attack or spell
+    EVENT_COUNT // More event types can be added later, e.g., EVENT_DROP_ITEM
 } event_type_t;
