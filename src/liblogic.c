@@ -31,14 +31,29 @@ void liblogic_init(gamestate* const g) {
 
     g->entitymap = em_new();
 
-    const int x = 1, y = 1, floor = 0;
-    const entityid hero_id = liblogic_player_create(g, RACE_HUMAN, x, y, floor, "hero");
-    if (hero_id == -1) {
+    int x = 1;
+    int y = 1;
+    int floor = 0;
+    entityid id = liblogic_player_create(g, RACE_HUMAN, x, y, floor, "hero");
+    if (id == -1) {
         merror("liblogic_init: failed to init hero");
         return;
     }
-    gamestate_set_hero_id(g, hero_id);
-    msuccessint("Logic Init! Hero ID: ", hero_id);
+    gamestate_set_hero_id(g, id);
+    msuccessint("Logic Init! Hero ID: ", id);
+
+
+    x = 2;
+    y = 2;
+    // floor = 0;
+    id = liblogic_npc_create(g, RACE_ORC, x, y, floor, "orc");
+    if (id == -1) {
+        merror("liblogic_init: failed to create orc");
+        return;
+    }
+    msuccessint("Logic Init! Orc ID: ", id);
+
+
     //entity_set_type(em_get(g->entitymap, gamestate_get_hero_id(g)), ENTITY_PLAYER);
     //entity_set_type(em_get(gamestate_get_entitymap(g), gamestate_get_hero_id(g)), ENTITY_PLAYER);
     liblogic_update_debug_panel_buffer(g);
