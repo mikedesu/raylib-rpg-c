@@ -131,19 +131,19 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     }
     if (inputstate_is_pressed(is, KEY_RIGHT)) {
         minfo("Right pressed!");
-        e->do_update = true;
+        //e->do_update = true;
         liblogic_try_entity_move(g, e, 1, 0);
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
         minfo("left  pressed!");
-        e->do_update = true;
+        //e->do_update = true;
         liblogic_try_entity_move(g, e, -1, 0);
     } else if (inputstate_is_pressed(is, KEY_UP)) {
         minfo("up pressed!");
-        e->do_update = true;
+        //e->do_update = true;
         liblogic_try_entity_move(g, e, 0, -1);
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
         minfo("down pressed!");
-        e->do_update = true;
+        //e->do_update = true;
         liblogic_try_entity_move(g, e, 0, 1);
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {
         msuccess("Space pressed!");
@@ -156,14 +156,29 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
 }
 
 
+static inline const direction_t liblogic_get_dir_from_xy(const int x, const int y) {
+    if (x == 0 && y == 0) return DIRECTION_NONE;
+    if (x == 0 && y == -1) return DIRECTION_UP;
+    if (x == 0 && y == 1) return DIRECTION_DOWN;
+    if (x == -1 && y == 0) return DIRECTION_LEFT;
+    if (x == 1 && y == 0) return DIRECTION_RIGHT;
+    return DIRECTION_NONE;
+}
+
+
 void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y) {
     if (!g || !e) {
         merror(!g ? "Game state is NULL!" : "Entity is NULL!");
         return;
     }
+
+    e->do_update = true;
+    e->direction = liblogic_get_dir_from_xy(x, y);
+
     const int ex = e->x + x;
     const int ey = e->y + y;
     const int floor = e->floor;
+
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
         merror("Failed to get dungeon floor");

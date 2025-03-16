@@ -569,6 +569,14 @@ void libdraw_calc_debugpanel_size(gamestate* const g) {
 
 
 void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t dir) {
+    if (!g) {
+        merror("libdraw_update_sprite_context: gamestate is NULL");
+        return;
+    }
+
+    minfoint2("libdraw_update_sprite_context: updating sprite context for entity", id, dir);
+
+
     spritegroup_t* group = hashtable_entityid_spritegroup_get(spritegroups, id); // Adjusted for no specifier
     if (!group) {
         merrorint("libdraw_update_sprite_context: group not found", id);
