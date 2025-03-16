@@ -22,7 +22,6 @@ static int TX_HUMAN_KEYS[TX_HUMAN_KEY_COUNT] = {TX_HUMAN_IDLE,
                                                 TX_HUMAN_DMG,
                                                 TX_HUMAN_DMG_SHADOW};
 
-/*
 #define TX_ORC_KEY_COUNT 14
 static int TX_ORC_KEYS[TX_ORC_KEY_COUNT] = {
     TX_ORC_IDLE,
@@ -40,6 +39,7 @@ static int TX_ORC_KEYS[TX_ORC_KEY_COUNT] = {
     TX_ORC_DIE,
     TX_ORC_DIE_SHADOW,
 };
+/*
 */
 
 

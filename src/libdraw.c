@@ -2,7 +2,7 @@
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
-#include "libgame_defines.h"
+//#include "libgame_defines.h"
 #include "mprint.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -48,7 +48,7 @@ void libdraw_init(gamestate* const g) {
     //libdraw_create_spritegroup(g, g->hero_id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
 
     // use the new function to create the spritegroup
-    libdraw_create_sg_byid(g, g->hero_id);
+    //libdraw_create_sg_byid(g, g->hero_id);
 
 
     // we will need to write a function that, given an entityid, does a lookup on the entity
@@ -57,9 +57,11 @@ void libdraw_init(gamestate* const g) {
 
 
     // instead, we want to iterate across our entitymap and create spritegroups for each entity
-    //for (int i = 0; i < g->index_entityids; i++) {
-    //    entityid id = g->entityids[i];
-    //}
+    for (int i = 0; i < g->index_entityids; i++) {
+        entityid id = g->entityids[i];
+        // use the new function to create the spritegroup
+        libdraw_create_sg_byid(g, id);
+    }
 
 
     libdraw_calc_debugpanel_size(g); // Calculate size
@@ -626,6 +628,13 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
         offset_y = -12;
         break;
     // Add cases for other races here
+    case RACE_ORC:
+        keys = TX_ORC_KEYS;
+        num_keys = TX_ORC_KEY_COUNT;
+        offset_x = -12;
+        offset_y = -12;
+        break;
+
     default:
         merrorint("libdraw_create_sg_byid: unknown race", e->race);
         return;
