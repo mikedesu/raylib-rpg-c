@@ -34,4 +34,5 @@ const entityid dungeon_tile_remove(dungeon_tile_t* tile, const entityid id);
 
 const size_t dungeon_tile_entity_count(const dungeon_tile_t* tile);
 
+
 const entityid dungeon_tile_get_entity(const dungeon_tile_t* tile, const size_t index);

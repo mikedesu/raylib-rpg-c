@@ -34,9 +34,9 @@ void liblogic_init(gamestate* const g) {
     if (liblogic_player_create(g, RACE_HUMAN, 1, 1, 0, "hero") == -1) {
         merror("liblogic_init: failed to init hero");
     }
-    //if (liblogic_npc_create(g, RACE_ORC, 2, 2, 0, "orc") == -1) {
-    //    merror("liblogic_init: failed to create orc");
-    //}
+    if (liblogic_npc_create(g, RACE_ORC, 2, 2, 0, "orc") == -1) {
+        merror("liblogic_init: failed to create orc");
+    }
     liblogic_update_debug_panel_buffer(g);
 }
 
@@ -178,12 +178,52 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         merror("Cannot move, wall");
         return;
     }
+    if (liblogic_tile_npc_count(g, ex, ey, floor) > 0) {
+        merror("Cannot move, NPC in the way");
+        return;
+    }
+
+
     dungeon_floor_remove_at(df, e->id, e->x, e->y);
     dungeon_floor_add_at(df, e->id, ex, ey);
     e->x = ex;
     e->y = ey;
     e->sprite_move_x = x * DEFAULT_TILE_SIZE;
     e->sprite_move_y = y * DEFAULT_TILE_SIZE;
+}
+
+
+const int liblogic_tile_npc_count(const gamestate* const g, const int x, const int y, const int floor) {
+    if (!g) {
+        merror("liblogic_tile_npc_count: gamestate is NULL");
+        return -1;
+    }
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
+    if (!df) {
+        merror("liblogic_tile_npc_count: failed to get dungeon floor");
+        return -1;
+    }
+    dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+    if (!tile) {
+        merror("liblogic_tile_npc_count: failed to get tile");
+        return -1;
+    }
+    // enumerate entities and check their type
+    int count = 0;
+    for (int i = 0; i < tile->entity_max; i++) {
+        if (tile->entities[i] == -1) {
+            continue;
+        }
+        entity* e = em_get(g->entitymap, tile->entities[i]);
+        if (!e) {
+            merror("liblogic_tile_npc_count: failed to get entity");
+            return -1;
+        }
+        if (e->type == ENTITY_NPC) {
+            count++;
+        }
+    }
+    return count;
 }
 
 
