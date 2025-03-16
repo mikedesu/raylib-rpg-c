@@ -44,6 +44,7 @@ void libdraw_init(gamestate* const g) {
     spritegroups = hashtable_entityid_spritegroup_create(4);
     libdraw_load_textures();
     libdraw_create_spritegroup(g, g->hero_id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
+    libdraw_calc_debugpanel_size(g); // Calculate size
     msuccess("libdraw_init");
 }
 
@@ -258,7 +259,7 @@ void libdraw_draw_debug_panel(gamestate* const g) {
         merror("libdraw_draw_debug_panel: gamestate is NULL");
         return;
     }
-    libdraw_calc_debugpanel_size(g); // Calculate size
+    //libdraw_calc_debugpanel_size(g); // Calculate size
     // Draw background
     const int x = g->debugpanel.x, y = g->debugpanel.y, w = g->debugpanel.w, h = g->debugpanel.h,
               fontsize = g->debugpanel.font_size;
@@ -268,7 +269,7 @@ void libdraw_draw_debug_panel(gamestate* const g) {
     const int pad_left = g->debugpanel.pad_left, pad_top = g->debugpanel.pad_top, pad_right = g->debugpanel.pad_right,
               pad_bottom = g->debugpanel.pad_bottom;
     // the root of the box should be at x,y
-    const int w0 = w + pad_left + pad_right + pad_right, h0 = h + pad_top + pad_bottom;
+    const int w0 = w + pad_left + pad_right * 4, h0 = h + pad_top + pad_bottom;
     DrawRectangle(x, y, w0, h0, c);
     // Draw text
     const int x1 = x + pad_left, y1 = y + pad_top;

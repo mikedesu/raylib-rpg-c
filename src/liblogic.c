@@ -37,14 +37,16 @@ void liblogic_init(gamestate* const g) {
         merror("Logic Init: failed to init hero");
     }
 
+    liblogic_update_debug_panel_buffer(g);
+
     // create orc
-    const int orc_x = 5, orc_y = 5;
-    const entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_x, orc_y, floor, "orc");
-    if (orc_id != -1) {
-        msuccessint("Logic Init! Orc ID: ", orc_id);
-    } else {
-        merror("Logic Init: failed to init orc");
-    }
+    //const int orc_x = 5, orc_y = 5;
+    //const entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_x, orc_y, floor, "orc");
+    //if (orc_id != -1) {
+    //    msuccessint("Logic Init! Orc ID: ", orc_id);
+    //} else {
+    //    merror("Logic Init: failed to init orc");
+    //}
     // set orc properties
 }
 
