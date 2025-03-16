@@ -17,7 +17,6 @@
 void* draw_handle = NULL;
 void (*mylibdraw_init)(const gamestate* const) = NULL;
 void (*mylibdraw_close)() = NULL;
-void (*myliblogic_close)(gamestate* const) = NULL;
 bool (*mylibdraw_windowshouldclose)() = NULL;
 void (*mylibdraw_drawframe)(const gamestate* const) = NULL;
 void (*mylibdraw_update_sprites)(gamestate* const) = NULL;
@@ -26,6 +25,7 @@ void (*mylibdraw_update_input)(inputstate* const) = NULL;
 void* logic_handle = NULL;
 void (*myliblogic_init)(gamestate* const) = NULL;
 void (*myliblogic_tick)(const inputstate* const, gamestate* const) = NULL;
+void (*myliblogic_close)(gamestate* const) = NULL;
 
 long draw_last_write_time = 0;
 long logic_last_write_time = 0;

@@ -24,23 +24,16 @@ void liblogic_init(gamestate* const g) {
         merror("liblogic_init: failed to init dungeon");
         return;
     }
-
     dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-
     gamestate_init_entityids(g);
-
     g->entitymap = em_new();
-
     entityid id = -1;
-
     if (liblogic_player_create(g, RACE_HUMAN, 1, 1, 0, "hero") == -1) {
         merror("liblogic_init: failed to init hero");
     }
-
     if (liblogic_npc_create(g, RACE_ORC, 2, 2, 0, "orc") == -1) {
         merror("liblogic_init: failed to create orc");
     }
-
     liblogic_update_debug_panel_buffer(g);
 }
 
