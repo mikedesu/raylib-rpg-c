@@ -124,7 +124,7 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         merror("Game state is NULL!");
         return;
     }
-    entity* e = em_get(g->entitymap, g->hero_id);
+    entity* const e = em_get(g->entitymap, g->hero_id);
     if (!e) {
         //merror("Hero not found!");
         return;
@@ -175,29 +175,29 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     e->do_update = true;
     e->direction = liblogic_get_dir_from_xy(x, y);
 
-    const int ex = e->x + x;
-    const int ey = e->y + y;
-    const int floor = e->floor;
+    const int ex = e->x + x, ey = e->y + y, floor = e->floor;
 
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
         merror("Failed to get dungeon floor");
         return;
     }
+
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex, ey);
     if (!tile || ex < 0 || ey < 0) {
         merror(!tile ? "Failed to get tile" : "Cannot move, out of bounds");
         return;
     }
+
     if (dungeon_tile_is_wall(tile->type)) {
         merror("Cannot move, wall");
         return;
     }
+
     if (liblogic_tile_npc_count(g, ex, ey, floor) > 0) {
         merror("Cannot move, NPC in the way");
         return;
     }
-
 
     dungeon_floor_remove_at(df, e->id, e->x, e->y);
     dungeon_floor_add_at(df, e->id, ex, ey);
@@ -213,23 +213,26 @@ const int liblogic_tile_npc_count(const gamestate* const g, const int x, const i
         merror("liblogic_tile_npc_count: gamestate is NULL");
         return -1;
     }
-    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
+
+    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
         merror("liblogic_tile_npc_count: failed to get dungeon floor");
         return -1;
     }
-    dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+
+    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merror("liblogic_tile_npc_count: failed to get tile");
         return -1;
     }
+
     // enumerate entities and check their type
     int count = 0;
     for (int i = 0; i < tile->entity_max; i++) {
         if (tile->entities[i] == -1) {
             continue;
         }
-        entity* e = em_get(g->entitymap, tile->entities[i]);
+        const entity* const e = em_get(g->entitymap, tile->entities[i]);
         if (!e) {
             merror("liblogic_tile_npc_count: failed to get entity");
             return -1;

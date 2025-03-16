@@ -178,7 +178,7 @@ const bool dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id,
 }
 
 
-dungeon_tile_t* dungeon_floor_tile_at(dungeon_floor_t* const df, const int x, const int y) {
+dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
     if (df) {
         if (x >= 0 && x < df->width && y >= 0 && y < df->height) {
             return &df->tiles[y][x];

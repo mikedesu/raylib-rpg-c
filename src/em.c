@@ -42,7 +42,7 @@ void em_free(em_t* em) {
 
 
 // returns the first item in the set which will be the oldest
-entity_t* em_get(em_t* em, const entityid id) {
+entity_t* const em_get(em_t* em, const entityid id) {
     if (!em) {
         merror("em_get: em is NULL");
         return NULL;
@@ -142,7 +142,7 @@ entity_t* em_remove_last(em_t* em, const entityid id) {
 }
 
 
-int em_count(em_t* em) {
+const int em_count(const em_t* const em) {
     if (!em) {
         merror("em_count: em is NULL");
         return -1;

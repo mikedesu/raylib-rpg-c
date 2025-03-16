@@ -31,4 +31,4 @@ const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, co
 
 const bool dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id, const int x, const int y);
 
-dungeon_tile_t* dungeon_floor_tile_at(dungeon_floor_t* const df, const int x, const int y);
+dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int x, const int y);
