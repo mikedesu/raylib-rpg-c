@@ -10,6 +10,7 @@
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 5
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 5
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
+#define GAMESTATE_INIT_ENTITYIDS_MAX 1000
 
 // have to update this function when we introduce new fields to Gamestate
 gamestate* gamestateinitptr() {
@@ -24,13 +25,20 @@ gamestate* gamestateinitptr() {
 
     g->debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
     g->debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
-    g->debugpanel.w = g->debugpanel.h = 200;
+    g->debugpanel.w = 200;
+    g->debugpanel.h = 200;
     g->debugpanel.fg_color = RAYWHITE;
     g->debugpanel.bg_color = Fade(RED, 0.8f);
-    g->debugpanel.pad_top = g->debugpanel.pad_left = g->debugpanel.pad_right = g->debugpanel.pad_bottom = 10;
+    g->debugpanel.pad_top = 10;
+    g->debugpanel.pad_left = 10;
+    g->debugpanel.pad_right = 10;
+    g->debugpanel.pad_bottom = 10;
     g->debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
     g->lock = 0;
-    g->targetwidth = g->targetheight = g->windowwidth = g->windowheight = -1;
+    g->targetwidth = -1;
+    g->targetheight = -1;
+    g->windowwidth = -1;
+    g->windowheight = -1;
     g->timebegan = g->currenttime = time(NULL);
     g->timebegantm = g->currenttimetm = localtime(&(g->currenttime));
     bzero(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
@@ -145,7 +153,6 @@ em_t* gamestate_get_entitymap(gamestate* const g) {
     return g->entitymap;
 }
 
-#define GAMESTATE_INIT_ENTITYIDS_MAX 1000
 
 void gamestate_init_entityids(gamestate* const g) {
 
@@ -153,11 +160,6 @@ void gamestate_init_entityids(gamestate* const g) {
         merror("gamestate_init_entityids: g is NULL");
         return;
     }
-
-    //if (g->max_entityids == -1) {
-    //    merror("gamestate_init_entityids: g->max_entityids is -1");
-    //    return;
-    //}
 
     g->entityids = (entityid*)malloc(sizeof(entityid) * GAMESTATE_INIT_ENTITYIDS_MAX);
     if (g->entityids == NULL) {
