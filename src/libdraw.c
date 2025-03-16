@@ -45,7 +45,17 @@ void libdraw_init(gamestate* const g) {
     libdraw_load_textures();
 
     // here we are hard-coding the creation of the hero sprite
-    libdraw_create_spritegroup(g, g->hero_id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
+    //libdraw_create_spritegroup(g, g->hero_id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
+
+    // use the new function to create the spritegroup
+    libdraw_create_sg_byid(g, g->hero_id);
+
+
+    // we will need to write a function that, given an entityid, does a lookup on the entity
+    // for NPCs, we need to look at the entity race to determine which texture keys, texture key count, offset to use
+    // so we might write a `libdraw_create_sg_byid(gamestate* const g, entityid id)` function
+
+
     // instead, we want to iterate across our entitymap and create spritegroups for each entity
     //for (int i = 0; i < g->index_entityids; i++) {
     //    entityid id = g->entityids[i];
@@ -588,4 +598,38 @@ void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t 
           : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
                                                                      : old_ctx;
     spritegroup_setcontexts(group, ctx);
+}
+
+
+void libdraw_create_sg_byid(gamestate* const g, entityid id) {
+    if (!g) {
+        merror("libdraw_create_sg_byid: gamestate is NULL");
+        return;
+    }
+
+    entity* const e = em_get(g->entitymap, id);
+    if (!e) {
+        merrorint("libdraw_create_sg_byid: entity not found", id);
+        return;
+    }
+
+    int* keys = NULL;
+    int num_keys = 0;
+    int offset_x = 0;
+    int offset_y = 0;
+
+    switch (e->race) {
+    case RACE_HUMAN:
+        keys = TX_HUMAN_KEYS;
+        num_keys = TX_HUMAN_KEY_COUNT;
+        offset_x = -12;
+        offset_y = -12;
+        break;
+    // Add cases for other races here
+    default:
+        merrorint("libdraw_create_sg_byid: unknown race", e->race);
+        return;
+    }
+
+    libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
 }
