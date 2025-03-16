@@ -49,7 +49,7 @@ entity_t* em_get(em_t* em, const entityid id) {
     }
 
     if (id == -1) {
-        merror("em_get: id is -1");
+        //merror("em_get: id is -1");
         return NULL;
     }
     const int hash = id % EM_MAX_SLOTS;
