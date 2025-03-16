@@ -31,52 +31,18 @@ void liblogic_init(gamestate* const g) {
 
     g->entitymap = em_new();
 
-    int x = 1;
-    int y = 1;
-    int floor = 0;
-    entityid id = liblogic_player_create(g, RACE_HUMAN, x, y, floor, "hero");
-    if (id == -1) {
+    entityid id = -1;
+
+    if (liblogic_player_create(g, RACE_HUMAN, 1, 1, 0, "hero") == -1) {
         merror("liblogic_init: failed to init hero");
-        return;
     }
-    gamestate_set_hero_id(g, id);
-    msuccessint("Logic Init! Hero ID: ", id);
 
-
-    x = 2;
-    y = 2;
-    // floor = 0;
-    id = liblogic_npc_create(g, RACE_ORC, x, y, floor, "orc");
-    if (id == -1) {
+    if (liblogic_npc_create(g, RACE_ORC, 2, 2, 0, "orc") == -1) {
         merror("liblogic_init: failed to create orc");
-        return;
     }
-    msuccessint("Logic Init! Orc ID: ", id);
 
-
-    //entity_set_type(em_get(g->entitymap, gamestate_get_hero_id(g)), ENTITY_PLAYER);
-    //entity_set_type(em_get(gamestate_get_entitymap(g), gamestate_get_hero_id(g)), ENTITY_PLAYER);
     liblogic_update_debug_panel_buffer(g);
-    // create orc
-    //const int orc_x = 5, orc_y = 5;
-    //const entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_x, orc_y, floor, "orc");
-    //if (orc_id != -1) {
-    //    msuccessint("Logic Init! Orc ID: ", orc_id);
-    //} else {
-    //    merror("Logic Init: failed to init orc");
-    //}
-    // set orc properties
 }
-
-
-//void liblogic_set_entity_type(gamestate* const g, const entityid id, const entitytype_t type) {
-//    if (!g) {
-//        merror("liblogic_set_entity_type: gamestate is NULL");
-//        return;
-//    }
-//    entity_set_type(em_get(g->entitymap, id), type);
-//msuccessint2("Set entity type to", id, type);
-//}
 
 
 void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
@@ -84,6 +50,7 @@ void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
         msuccess("D pressed!");
         g->debugpanelon = !g->debugpanelon;
     }
+
     if (g->controlmode == CONTROLMODE_PLAYER) {
         liblogic_handle_input_player(is, g);
     } else if (g->controlmode == CONTROLMODE_CAMERA) {
@@ -102,31 +69,38 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
         merror("Input state is NULL!");
         return;
     }
+
     if (!g) {
         merror("Game state is NULL!");
         return;
     }
+
     if (inputstate_is_held(is, KEY_RIGHT)) {
         g->cam2d.offset.x += move;
         return;
     }
+
     if (inputstate_is_held(is, KEY_LEFT)) {
         g->cam2d.offset.x -= move;
         return;
     }
+
     if (inputstate_is_held(is, KEY_UP)) {
         g->cam2d.offset.y -= move;
         return;
     }
+
     if (inputstate_is_held(is, KEY_DOWN)) {
         g->cam2d.offset.y += move;
         return;
     }
+
     if (inputstate_is_pressed(is, KEY_C)) {
         msuccess("C pressed!");
         g->controlmode = CONTROLMODE_PLAYER;
         return;
     }
+
     if (inputstate_is_held(is, KEY_Z)) {
         msuccess("Z held!");
         g->cam2d.zoom += DEFAULT_ZOOM_INCR;
@@ -528,7 +502,6 @@ const entityid liblogic_npc_create(gamestate* const g,
         return -1;
     }
 
-
     // can we create an entity at this location? no entities can be made on wall-types etc
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
@@ -558,16 +531,9 @@ const entityid liblogic_npc_create(gamestate* const g,
         merror("liblogic_entity_create: failed to create entity");
         return -1;
     }
-    // Assuming entity struct has a name field—copy it
-    //bzero(e->name, ENTITY_NAME_LEN_MAX); // Clear name field
-    //strncpy(e->name, name, ENTITY_NAME_LEN_MAX - 1); // Adjust ENTITY_NAME_MAXLEN if defined elsewhere
-    //e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null-terminated
     em_add(em, e);
-    //liblogic_add_entityid(g, e->id);
     gamestate_add_entityid(g, e->id);
-
     dungeon_floor_add_at(df, e->id, x, y);
-
     msuccessint2("Created entity at", x, y);
     return e->id;
 }
@@ -588,5 +554,6 @@ const entityid liblogic_player_create(gamestate* const g,
     // use the previously-written liblogic_npc_create function
     entityid id = liblogic_npc_create(g, race_type, x, y, floor, name);
     entity_set_type(em_get(gamestate_get_entitymap(g), id), ENTITY_PLAYER);
+    gamestate_set_hero_id(g, id);
     return id;
 }
