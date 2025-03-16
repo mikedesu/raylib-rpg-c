@@ -36,6 +36,7 @@ void liblogic_init(gamestate* const g) {
     } else {
         merror("Logic Init: failed to init hero");
     }
+    entity_set_type(em_get(g->entitymap, hero_id), ENTITY_PLAYER);
 
     liblogic_update_debug_panel_buffer(g);
 
@@ -49,6 +50,16 @@ void liblogic_init(gamestate* const g) {
     //}
     // set orc properties
 }
+
+
+//void liblogic_set_entity_type(gamestate* const g, const entityid id, const entitytype_t type) {
+//    if (!g) {
+//        merror("liblogic_set_entity_type: gamestate is NULL");
+//        return;
+//    }
+//    entity_set_type(em_get(g->entitymap, id), type);
+//msuccessint2("Set entity type to", id, type);
+//}
 
 
 void liblogic_handle_input(const inputstate* const is, gamestate* const g) {

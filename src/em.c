@@ -8,62 +8,76 @@
 
 em_t* em_new() {
     em_t* em = malloc(sizeof(em_t));
-    if (em) {
-        for (int i = 0; i < EM_MAX_SLOTS; i++) {
-            em->entities[i] = NULL;
-        }
-        em->count = 0;
-    } else {
-        merror("em_new: em is NULL");
-        em = NULL;
+    if (!em) {
+        merror("em_new: em malloc failed");
+        return NULL;
     }
+
+    for (int i = 0; i < EM_MAX_SLOTS; i++) {
+        em->entities[i] = NULL;
+    }
+    em->count = 0;
     return em;
 }
 
 
 void em_free(em_t* em) {
-    if (em) {
-        minfo("Freeing entity map");
-        for (int i = 0; i < EM_MAX_SLOTS; i++) {
-            entity_t* current = em->entities[i];
-            while (current != NULL) {
-                entity_t* next = current->next;
-                free(current);
-                current = next;
-            }
-        }
-        free(em);
-        msuccess("Freed entity map");
-    } else {
+    if (!em) {
         merror("em_free: em is NULL");
+        return;
     }
+
+    minfo("Freeing entity map");
+    for (int i = 0; i < EM_MAX_SLOTS; i++) {
+        entity_t* current = em->entities[i];
+        while (current != NULL) {
+            entity_t* next = current->next;
+            free(current);
+            current = next;
+        }
+    }
+    free(em);
+    msuccess("Freed entity map");
 }
 
 
 // returns the first item in the set which will be the oldest
 entity_t* em_get(em_t* em, const entityid id) {
-    entity_t* e = NULL;
-    if (em) {
-        if (id != -1) {
-            const int hash = id % EM_MAX_SLOTS;
-            e = em->entities[hash];
-        }
-    } else {
+    if (!em) {
         merror("em_get: em is NULL");
+        return NULL;
     }
-    return e;
+
+    if (id == -1) {
+        merror("em_get: id is -1");
+        return NULL;
+    }
+    const int hash = id % EM_MAX_SLOTS;
+    return em->entities[hash];
 }
 
 
 entity_t* em_get_last(em_t* em, const entityid id) {
+    if (!em) {
+        merror("em_get_last: em is NULL");
+        return NULL;
+    }
+
+    if (id == -1) {
+        merror("em_get_last: id is -1");
+        return NULL;
+    }
+
     const int hash = id % EM_MAX_SLOTS;
     entity_t* current = em->entities[hash];
     if (current == NULL) {
         return NULL;
     }
+
     while (current->next != NULL) {
         current = current->next;
     }
+
     return current;
 }
 
@@ -72,7 +86,8 @@ entity_t* em_add(em_t* em, entity_t* e) {
     if (!em) {
         merror("em_add: em is NULL");
         return NULL;
-    } else if (!e) {
+    }
+    if (!e) {
         merror("em_add: entity is NULL");
         return NULL;
     }
@@ -94,46 +109,60 @@ entity_t* em_add(em_t* em, entity_t* e) {
 
 
 entity_t* em_remove_last(em_t* em, const entityid id) {
+    if (!em) {
+        merror("em_remove_last: em is NULL");
+        return NULL;
+    }
+
+    if (id == -1) {
+        merror("em_remove_last: id is -1");
+        return NULL;
+    }
+
     const int hash = id % EM_MAX_SLOTS;
     entity_t* current = em->entities[hash];
     if (current == NULL) {
         return NULL;
     }
+
     if (current->next == NULL) {
         em->entities[hash] = NULL;
         return current;
     }
+
     while (current->next->next != NULL) {
         current = current->next;
     }
+
     entity_t* last = current->next;
     current->next = NULL;
     em->count--;
+
     return last;
 }
 
 
 int em_count(em_t* em) {
-    //size_t count = 0;
-    //for (int i = 0; i < EM_MAX_SLOTS; i++) {
-    //    entity_t* current = em->entities[i];
-    //    while (current != NULL) {
-    //        count++;
-    //        current = current->next;
-    //    }
-    //}
     if (!em) {
         merror("em_count: em is NULL");
         return -1;
     }
+
     return em->count;
 }
 
 
 // remember to free the indices when you are done using them
 int* em_get_indices(em_t* em) {
+    if (!em) {
+        merror("em_get_indices: em is NULL");
+        return NULL;
+    }
+
     int* indices = malloc(sizeof(int) * EM_MAX_SLOTS);
+
     memset(indices, 0, sizeof(int) * EM_MAX_SLOTS);
+
     for (int i = 0; i < EM_MAX_SLOTS; i++) {
         entity_t* current = em->entities[i];
         while (current != NULL) {
@@ -141,5 +170,6 @@ int* em_get_indices(em_t* em) {
             current = current->next;
         }
     }
+
     return indices;
 }

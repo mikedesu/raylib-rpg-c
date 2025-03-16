@@ -43,7 +43,15 @@ void libdraw_init(gamestate* const g) {
     target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(4);
     libdraw_load_textures();
+
+    // here we are hard-coding the creation of the hero sprite
     libdraw_create_spritegroup(g, g->hero_id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
+    // instead, we want to iterate across our entitymap and create spritegroups for each entity
+    //for (int i = 0; i < g->index_entityids; i++) {
+    //    entityid id = g->entityids[i];
+    //}
+
+
     libdraw_calc_debugpanel_size(g); // Calculate size
     msuccess("libdraw_init");
 }
