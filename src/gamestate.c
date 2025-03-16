@@ -173,3 +173,8 @@ void gamestate_init_entityids(gamestate* const g) {
 
     g->max_entityids = GAMESTATE_INIT_ENTITYIDS_MAX;
 }
+
+
+const entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index) {
+    return g->entityids[index];
+}

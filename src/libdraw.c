@@ -67,14 +67,13 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         merror("libdraw_update_sprite: gamestate is NULL");
         return;
     }
+
     entity* const e = em_get(g->entitymap, id);
     if (!e) {
         merrorint("libdraw_update_sprite: entity not found", id);
         return;
     }
 
-
-    //if (e) {
     spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (!sg) {
         merrorint("libdraw_update_sprite: spritegroup not found", id);
@@ -123,6 +122,7 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         merror("libdraw_update_sprite: sprite is NULL");
         return;
     }
+
     if (g->framecount % ANIM_SPEED == 0) {
         sprite_incrframe(s);
         // Check if the animation has completed one loop
@@ -131,8 +131,6 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
             s->num_loops = 0;
         }
     }
-    //}
-    //}
 }
 
 
@@ -141,11 +139,9 @@ void libdraw_update_sprites(gamestate* const g) {
         merror("libdraw_update_sprites: gamestate is NULL");
         return;
     }
-    //minfo("libdraw_update_sprites");
     // for each entityid in our entitymap, update the spritegroup
-    //libdraw_update_sprite(g, g->hero_id);
     for (int i = 0; i < g->index_entityids; i++) {
-        entityid id = g->entityids[i];
+        const entityid id = g->entityids[i];
         libdraw_update_sprite(g, id);
     }
 }
@@ -156,10 +152,12 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         merror("libdraw_draw_dungeon_floor_tile: gamestate is NULL");
         return;
     }
+
     if (!df) {
         merror("libdraw_draw_dungeon_floor_tile: dungeon_floor is NULL");
         return;
     }
+
     if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
         merrorint2("libdraw_draw_dungeon_floor_tile: x or y out of bounds", x, y);
         return;
@@ -170,6 +168,7 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         merrorint2("libdraw_draw_dungeon_floor_tile: tile is NULL", x, y);
         return;
     }
+
     // just draw the tile itself
     // tile values in get_txkey_for_tiletype.h
     int txkey = get_txkey_for_tiletype(tile->type);
@@ -177,6 +176,7 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         merrorint("libdraw_draw_dungeon_floor_tile: txkey is invalid", txkey);
         return;
     }
+
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) {
         merrorint("libdraw_draw_dungeon_floor_tile: texture id is invalid", texture->id);
@@ -267,31 +267,41 @@ void libdraw_draw_debug_panel(gamestate* const g) {
         merror("libdraw_draw_debug_panel: gamestate is NULL");
         return;
     }
+
     //libdraw_calc_debugpanel_size(g); // Calculate size
     // Draw background
     const int x = g->debugpanel.x, y = g->debugpanel.y, w = g->debugpanel.w, h = g->debugpanel.h,
               fontsize = g->debugpanel.font_size;
+
     const Color c = Fade(RED, 0.8f), c2 = WHITE;
     // calculate the size of the bg box of the debug panel
     // use g->debugpanel.pad_left, top, bottom, right to do this
+
     const int pad_left = g->debugpanel.pad_left, pad_top = g->debugpanel.pad_top, pad_right = g->debugpanel.pad_right,
               pad_bottom = g->debugpanel.pad_bottom;
     // the root of the box should be at x,y
+
     const int w0 = w + pad_left + pad_right * 4, h0 = h + pad_top + pad_bottom;
+
     DrawRectangle(x, y, w0, h0, c);
     // Draw text
+
     const int x1 = x + pad_left, y1 = y + pad_top;
+
     DrawText(g->debugpanel.buffer, x1, y1, fontsize, c2);
 }
 
 
 void libdraw_drawframe(gamestate* const g) {
     double start_time = GetTime();
+
     BeginDrawing();
     BeginTextureMode(target);
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
+
     libdraw_draw_dungeon_floor(g);
+
     //libdraw_draw_sprite_and_shadow(g, g->hero_id);
     EndMode2D();
     EndTextureMode();
@@ -300,7 +310,9 @@ void libdraw_drawframe(gamestate* const g) {
     if (g->debugpanelon) {
         libdraw_draw_debug_panel(g);
     }
+
     EndDrawing();
+
     double elapsed_time = GetTime() - start_time;
     g->last_frame_time = elapsed_time;
     g->framecount++;
@@ -501,10 +513,6 @@ void libdraw_create_spritegroup(gamestate* const g,
         spritegroup_destroy(group);
         return;
     }
-    //    // Use TX_HUMAN_WALK (assume index 2—check textures.txt)
-    //int tx_key = keys[0]; // First key (e.g., TX_HUMAN_WALK)
-    //int sprite_width = -1;
-    //int sprite_height = -1;
     minfo("libdraw_create_spritegroup: creating spritegroup");
     for (int i = 0; i < TX_HUMAN_KEY_COUNT; i++) {
         int k = keys[i];
@@ -549,39 +557,35 @@ void libdraw_calc_debugpanel_size(gamestate* const g) {
 
 
 void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t dir) {
-    //int retval = 0;
     spritegroup_t* group = hashtable_entityid_spritegroup_get(spritegroups, id); // Adjusted for no specifier
-    if (group) {
-        const int old_ctx = group->sprites[group->current]->currentcontext;
-        int ctx = old_ctx;
-        ctx = dir == DIRECTION_NONE                                      ? old_ctx
-              : dir == DIRECTION_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
-              : dir == DIRECTION_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
-              : dir == DIRECTION_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
-              : dir == DIRECTION_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
-              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
-              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
-              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
-              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
-              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
-              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
-              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
-              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
-              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
-              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
-              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
-              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
-              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
-              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
-              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
-              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
-                                                                         : old_ctx;
-        spritegroup_setcontexts(group, ctx);
-        //retval = 0;
-    } else {
-        merror("libdraw_update_sprite_context: group is NULL");
-        //retval = -1;
+    if (!group) {
+        merrorint("libdraw_update_sprite_context: group not found", id);
+        return;
     }
-    //return retval;
-    // Return value omitted since it’s not needed in libdraw context, but kept in logic for fidelity
+
+    const int old_ctx = group->sprites[group->current]->currentcontext;
+    int ctx = old_ctx;
+    ctx = dir == DIRECTION_NONE                                      ? old_ctx
+          : dir == DIRECTION_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIRECTION_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIRECTION_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIRECTION_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
+                                                                     : old_ctx;
+    spritegroup_setcontexts(group, ctx);
 }
