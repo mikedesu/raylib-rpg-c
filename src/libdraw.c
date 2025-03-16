@@ -143,7 +143,7 @@ void libdraw_update_sprites(gamestate* const g) {
     }
     //minfo("libdraw_update_sprites");
     // for each entityid in our entitymap, update the spritegroup
-    libdraw_update_sprite(g, g->hero_id);
+    //libdraw_update_sprite(g, g->hero_id);
     for (int i = 0; i < g->index_entityids; i++) {
         entityid id = g->entityids[i];
         libdraw_update_sprite(g, id);

@@ -72,6 +72,8 @@ typedef struct gamestate {
 
 gamestate* gamestateinitptr();
 void gamestatefree(gamestate* g);
+
+void gamestate_init_entityids(gamestate* const g);
 void gamestate_add_entityid(gamestate* const g, const entityid id);
 
 void gamestate_set_hero_id(gamestate* const g, const entityid id);

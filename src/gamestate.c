@@ -144,3 +144,32 @@ em_t* gamestate_get_entitymap(gamestate* const g) {
 
     return g->entitymap;
 }
+
+#define GAMESTATE_INIT_ENTITYIDS_MAX 1000
+
+void gamestate_init_entityids(gamestate* const g) {
+
+    if (!g) {
+        merror("gamestate_init_entityids: g is NULL");
+        return;
+    }
+
+    //if (g->max_entityids == -1) {
+    //    merror("gamestate_init_entityids: g->max_entityids is -1");
+    //    return;
+    //}
+
+    g->entityids = (entityid*)malloc(sizeof(entityid) * GAMESTATE_INIT_ENTITYIDS_MAX);
+    if (g->entityids == NULL) {
+        merror("gamestate_init_entityids: g->entityids is NULL");
+        return;
+    }
+
+    for (int i = 0; i < g->max_entityids; i++) {
+        g->entityids[i] = -1;
+    }
+
+    g->index_entityids = 0;
+
+    g->max_entityids = GAMESTATE_INIT_ENTITYIDS_MAX;
+}

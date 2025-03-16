@@ -27,6 +27,8 @@ void liblogic_init(gamestate* const g) {
 
     dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
+    gamestate_init_entityids(g);
+
     g->entitymap = em_new();
 
     const int x = 1, y = 1, floor = 0;
@@ -415,7 +417,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Zoom: %.02f\n"
              "Control mode: %s\n"
              "Current floor: %d\n"
-             "Dungeon num floors: %d\n",
+             "Dungeon num floors: %d\n"
+             "Num entityids: %d\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -428,7 +431,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              : g->controlmode == CONTROLMODE_CAMERA ? "Camera"
                                                     : "Unknown",
              g->dungeon->current_floor,
-             g->dungeon->num_floors);
+             g->dungeon->num_floors,
+             g->index_entityids);
 }
 
 
@@ -450,18 +454,19 @@ void liblogic_add_entityid(gamestate* const g, entityid id) {
         merror("liblogic_add_entityid: gamestate is NULL");
         return;
     }
-    if (g->index_entityids >= g->max_entityids) {
-        int new_max = g->max_entityids * 2;
-        entityid* new_ids = realloc(g->entityids, new_max * sizeof(entityid));
-        if (!new_ids) {
-            merror("liblogic_add_entityid: realloc failed");
-            return;
-        }
-        g->entityids = new_ids;
-        g->max_entityids = new_max;
-        msuccessint("Expanded entityids to ", new_max);
-    }
-    g->entityids[g->index_entityids++] = id;
+    //if (g->index_entityids >= g->max_entityids) {
+    //    int new_max = g->max_entityids * 2;
+    //    entityid* new_ids = realloc(g->entityids, new_max * sizeof(entityid));
+    //    if (!new_ids) {
+    //        merror("liblogic_add_entityid: realloc failed");
+    //        return;
+    //    }
+    //    g->entityids = new_ids;
+    //    g->max_entityids = new_max;
+    //    msuccessint("Expanded entityids to ", new_max);
+    //}
+    // g->entityids[g->index_entityids++] = id;
+    gamestate_add_entityid(g, id);
     msuccessint("Added entity ID: ", id);
 }
 
@@ -543,7 +548,8 @@ const entityid liblogic_npc_create(gamestate* const g,
     //strncpy(e->name, name, ENTITY_NAME_LEN_MAX - 1); // Adjust ENTITY_NAME_MAXLEN if defined elsewhere
     //e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null-terminated
     em_add(em, e);
-    liblogic_add_entityid(g, e->id);
+    //liblogic_add_entityid(g, e->id);
+    gamestate_add_entityid(g, e->id);
 
     dungeon_floor_add_at(df, e->id, x, y);
 
