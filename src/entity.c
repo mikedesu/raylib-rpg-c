@@ -13,11 +13,11 @@ entity_t* entity_new(const entityid id, const entitytype_t type) {
     e->type = type;
     e->race = RACE_NONE;
     e->direction = DIRECTION_RIGHT;
-    e->x = e->y = -1;
+    e->x = e->y = e->floor = -1;
+    e->do_update = false;
     e->sprite_move_x = e->sprite_move_y = 0;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     e->next = NULL;
-    e->floor = -1;
     return e;
 }
 
@@ -30,6 +30,17 @@ entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x,
     e->x = x;
     e->y = y;
     e->floor = floor;
+    return e;
+}
+
+
+entity_t* entity_new_npc_at(const entityid id, race_t r, const int x, const int y, const int floor, const char* name) {
+    entity_t* e = entity_new_at(id, ENTITY_NPC, x, y, floor);
+    if (e == NULL) {
+        return NULL;
+    }
+    entity_set_race(e, r);
+    entity_set_name(e, name);
     return e;
 }
 
@@ -167,4 +178,30 @@ const direction_t entity_get_dir(entity_t* const e) {
     }
 
     return e->direction;
+}
+
+
+void entity_set_type(entity_t* const e, const entitytype_t type) {
+
+    if (!e) {
+        merror("entity_set_type: e is NULL");
+        return;
+    }
+
+    if (type < 0 || type >= ENTITY_COUNT) {
+        merror("entity_set_type: type is out of bounds");
+        return;
+    }
+
+    e->type = type;
+}
+
+
+const entitytype_t entity_get_type(entity_t* const e) {
+    if (!e) {
+        merror("entity_get_type: e is NULL");
+        return ENTITY_NONE;
+    }
+
+    return e->type;
 }

@@ -29,7 +29,7 @@ void liblogic_init(gamestate* const g) {
     g->entitymap = em_new();
 
     const int x = 1, y = 1, floor = 0;
-    const entityid hero_id = liblogic_entity_create(g, ENTITY_PLAYER, x, y, floor, "hero");
+    const entityid hero_id = liblogic_npc_create(g, RACE_HUMAN, x, y, floor, "hero");
     if (hero_id != -1) {
         g->hero_id = hero_id;
         msuccessint("Logic Init! Hero ID: ", g->hero_id);
@@ -39,7 +39,7 @@ void liblogic_init(gamestate* const g) {
 
     // create orc
     const int orc_x = 5, orc_y = 5;
-    const entityid orc_id = liblogic_entity_create(g, ENTITY_NPC, orc_x, orc_y, floor, "orc");
+    const entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_x, orc_y, floor, "orc");
     if (orc_id != -1) {
         msuccessint("Logic Init! Orc ID: ", orc_id);
     } else {
@@ -454,8 +454,8 @@ void liblogic_add_entityid(gamestate* const g, entityid id) {
 
 
 //entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, int y, const char* name) {
-const entityid liblogic_entity_create(
-    gamestate* const g, const entitytype_t type, const int x, const int y, const int floor, const char* name) {
+const entityid liblogic_npc_create(
+    gamestate* const g, const race_t type, const int x, const int y, const int floor, const char* name) {
     if (!g || !g->entitymap) {
         merror("liblogic_entity_create: gamestate or entitymap is NULL");
         return -1;
@@ -465,7 +465,7 @@ const entityid liblogic_entity_create(
         return -1;
     }
     // check type
-    if (type < 0 || type >= ENTITY_COUNT) {
+    if (type < 0 || type >= RACE_COUNT) {
         merror("liblogic_entity_create: type is out of bounds");
         return -1;
     }
@@ -502,18 +502,17 @@ const entityid liblogic_entity_create(
     }
 
 
-    entity* e = entity_new_at(next_entityid++, type, x, y, floor); // Assuming entity_new_at takes name next
+    entity* e = entity_new_npc_at(next_entityid++, type, x, y, floor, name); // Assuming entity_new_at takes name next
     if (!e) {
         merror("liblogic_entity_create: failed to create entity");
         return -1;
     }
     // Assuming entity struct has a name field—copy it
-    bzero(e->name, ENTITY_NAME_LEN_MAX); // Clear name field
-    strncpy(e->name, name, ENTITY_NAME_LEN_MAX - 1); // Adjust ENTITY_NAME_MAXLEN if defined elsewhere
-    e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null-terminated
+    //bzero(e->name, ENTITY_NAME_LEN_MAX); // Clear name field
+    //strncpy(e->name, name, ENTITY_NAME_LEN_MAX - 1); // Adjust ENTITY_NAME_MAXLEN if defined elsewhere
+    //e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null-terminated
     em_add(g->entitymap, e);
     liblogic_add_entityid(g, e->id);
-
 
     dungeon_floor_add_at(df, e->id, x, y);
 

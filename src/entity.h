@@ -33,9 +33,8 @@ typedef struct entity_t {
 
 
 entity_t* entity_new(const entityid id, const entitytype_t type);
-//entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x, const int y);
 entity_t* entity_new_at(const entityid id, const entitytype_t type, const int x, const int y, const int floor);
-
+entity_t* entity_new_npc_at(const entityid id, race_t r, const int x, const int y, const int floor, const char* name);
 
 void entity_set_name(entity_t* const e, const char* name);
 void entity_set_race(entity_t* const e, const race_t race);
@@ -52,3 +51,6 @@ void entity_decr_y(entity_t* const e);
 
 void entity_set_dir(entity_t* const e, const direction_t dir);
 const direction_t entity_get_dir(entity_t* const e);
+
+void entity_set_type(entity_t* const e, const entitytype_t type);
+const entitytype_t entity_get_type(entity_t* const e);

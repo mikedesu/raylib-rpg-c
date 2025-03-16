@@ -7,8 +7,10 @@ void liblogic_tick(const inputstate* const is, gamestate* const g);
 void liblogic_close(gamestate* const g);
 
 //entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, int y, const char* name);
-const entityid liblogic_entity_create(
-    gamestate* const g, const entitytype_t type, const int x, const int y, const int floor, const char* name);
+//const entityid liblogic_entity_create(
+//    gamestate* const g, const entitytype_t type, const int x, const int y, const int floor, const char* name);
+const entityid
+liblogic_npc_create(gamestate* const g, const race_t type, const int x, const int y, const int floor, const char* name);
 void liblogic_add_entityid(gamestate* const g, entityid id); // New
 void liblogic_handle_input(const inputstate* const is, gamestate* const g);
 void liblogic_handle_input_player(const inputstate* const is, gamestate* const g);
