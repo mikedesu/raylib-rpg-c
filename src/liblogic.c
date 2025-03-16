@@ -30,12 +30,13 @@ void liblogic_init(gamestate* const g) {
 
     const int x = 1, y = 1, floor = 0;
     const entityid hero_id = liblogic_npc_create(g, RACE_HUMAN, x, y, floor, "hero");
-    if (hero_id != -1) {
-        g->hero_id = hero_id;
-        msuccessint("Logic Init! Hero ID: ", g->hero_id);
-    } else {
-        merror("Logic Init: failed to init hero");
+    if (hero_id == -1) {
+        merror("liblogic_init: failed to init hero");
+        return;
     }
+
+    g->hero_id = hero_id;
+    msuccessint("Logic Init! Hero ID: ", g->hero_id);
     entity_set_type(em_get(g->entitymap, hero_id), ENTITY_PLAYER);
 
     liblogic_update_debug_panel_buffer(g);

@@ -68,7 +68,8 @@ gamestate* gamestateinitptr() {
     g->entityids = NULL;
 
     g->index_entityids = 0;
-    g->max_entityids = g->hero_id = -1;
+    g->max_entityids = -1;
+    g->hero_id = -1;
 
     // current displayed dungeon floor
     //g->current_dungeon_floor = 0;
@@ -112,4 +113,14 @@ void gamestate_add_entityid(gamestate* const g, const entityid id) {
     }
     g->entityids[g->index_entityids] = id;
     g->index_entityids++;
+}
+
+
+void gamestate_set_hero_id(gamestate* const g, const entityid id) {
+    if (!g) {
+        merror("gamestate_set_hero_id: g is NULL");
+        return;
+    }
+
+    g->hero_id = id;
 }
