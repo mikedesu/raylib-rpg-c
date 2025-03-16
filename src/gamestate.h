@@ -75,3 +75,6 @@ void gamestatefree(gamestate* g);
 void gamestate_add_entityid(gamestate* const g, const entityid id);
 
 void gamestate_set_hero_id(gamestate* const g, const entityid id);
+const entityid gamestate_get_hero_id(const gamestate* const g);
+
+em_t* gamestate_get_entitymap(gamestate* const g);

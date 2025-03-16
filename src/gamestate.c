@@ -124,3 +124,23 @@ void gamestate_set_hero_id(gamestate* const g, const entityid id) {
 
     g->hero_id = id;
 }
+
+
+const entityid gamestate_get_hero_id(const gamestate* const g) {
+    if (!g) {
+        merror("gamestate_get_hero_id: g is NULL");
+        return -1;
+    }
+
+    return g->hero_id;
+}
+
+
+em_t* gamestate_get_entitymap(gamestate* const g) {
+    if (!g) {
+        merror("gamestate_get_entitymap: g is NULL");
+        return NULL;
+    }
+
+    return g->entitymap;
+}

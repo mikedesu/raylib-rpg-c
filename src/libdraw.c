@@ -365,8 +365,11 @@ bool libdraw_windowshouldclose() {
 }
 
 
-void libdraw_load_texture(
-    const int txkey, const int contexts, const int frames, const bool do_dither, const char* path) {
+void libdraw_load_texture(const int txkey,
+                          const int contexts,
+                          const int frames,
+                          const bool do_dither,
+                          const char* path) {
 
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
         merror("libdraw_load_texture: txkey out of bounds");
@@ -458,8 +461,13 @@ void libdraw_unload_textures() {
 }
 
 
-void libdraw_create_spritegroup(
-    gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
+void libdraw_create_spritegroup(gamestate* const g,
+                                entityid id,
+                                int* keys,
+                                int num_keys,
+                                int offset_x,
+                                int offset_y,
+                                specifier_t spec) {
     minfo("libdraw_create_spritegroup");
     if (!g) {
         merror("libdraw_create_spritegroup: gamestate is NULL");

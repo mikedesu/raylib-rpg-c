@@ -4,6 +4,7 @@
 #include "dungeon_floor.h"
 #include "em.h"
 #include "entity.h"
+#include "gamestate.h"
 #include "libgame_defines.h"
 #include "mprint.h"
 #include <math.h>
@@ -29,18 +30,16 @@ void liblogic_init(gamestate* const g) {
     g->entitymap = em_new();
 
     const int x = 1, y = 1, floor = 0;
-    const entityid hero_id = liblogic_npc_create(g, RACE_HUMAN, x, y, floor, "hero");
+    const entityid hero_id = liblogic_player_create(g, RACE_HUMAN, x, y, floor, "hero");
     if (hero_id == -1) {
         merror("liblogic_init: failed to init hero");
         return;
     }
-
-    g->hero_id = hero_id;
-    msuccessint("Logic Init! Hero ID: ", g->hero_id);
-    entity_set_type(em_get(g->entitymap, hero_id), ENTITY_PLAYER);
-
+    gamestate_set_hero_id(g, hero_id);
+    msuccessint("Logic Init! Hero ID: ", hero_id);
+    //entity_set_type(em_get(g->entitymap, gamestate_get_hero_id(g)), ENTITY_PLAYER);
+    //entity_set_type(em_get(gamestate_get_entitymap(g), gamestate_get_hero_id(g)), ENTITY_PLAYER);
     liblogic_update_debug_panel_buffer(g);
-
     // create orc
     //const int orc_x = 5, orc_y = 5;
     //const entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_x, orc_y, floor, "orc");
@@ -468,27 +467,42 @@ void liblogic_add_entityid(gamestate* const g, entityid id) {
 
 
 //entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, int y, const char* name) {
-const entityid liblogic_npc_create(
-    gamestate* const g, const race_t type, const int x, const int y, const int floor, const char* name) {
-    if (!g || !g->entitymap) {
-        merror("liblogic_entity_create: gamestate or entitymap is NULL");
+const entityid liblogic_npc_create(gamestate* const g,
+                                   const race_t race_type,
+                                   const int x,
+                                   const int y,
+                                   const int floor,
+                                   const char* name) {
+
+    if (!g) {
+        merror("liblogic_entity_create: gamestate is NULL");
         return -1;
     }
+
+    em_t* em = gamestate_get_entitymap(g);
+    if (!em) {
+        merror("liblogic_entity_create: em is NULL");
+        return -1;
+    }
+
     if (!name || !name[0]) {
         merror("liblogic_entity_create: name is NULL or empty");
         return -1;
     }
+
     // check type
-    if (type < 0 || type >= RACE_COUNT) {
-        merror("liblogic_entity_create: type is out of bounds");
+    if (race_type < 0 || race_type >= RACE_COUNT) {
+        merror("liblogic_entity_create: race_type is out of bounds");
         return -1;
     }
+
     // check x and y
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
         merror("liblogic_entity_create: failed to get current dungeon floor");
         return -1;
     }
+
     if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
         merror("liblogic_entity_create: x or y is out of bounds");
         return -1;
@@ -496,7 +510,6 @@ const entityid liblogic_npc_create(
 
 
     // can we create an entity at this location? no entities can be made on wall-types etc
-
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merror("liblogic_entity_create: failed to get tile");
@@ -515,8 +528,12 @@ const entityid liblogic_npc_create(
         return -1;
     }
 
-
-    entity* e = entity_new_npc_at(next_entityid++, type, x, y, floor, name); // Assuming entity_new_at takes name next
+    entity* e = entity_new_npc_at(next_entityid++,
+                                  race_type,
+                                  x,
+                                  y,
+                                  floor,
+                                  name); // Assuming entity_new_at takes name next
     if (!e) {
         merror("liblogic_entity_create: failed to create entity");
         return -1;
@@ -525,11 +542,30 @@ const entityid liblogic_npc_create(
     //bzero(e->name, ENTITY_NAME_LEN_MAX); // Clear name field
     //strncpy(e->name, name, ENTITY_NAME_LEN_MAX - 1); // Adjust ENTITY_NAME_MAXLEN if defined elsewhere
     //e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null-terminated
-    em_add(g->entitymap, e);
+    em_add(em, e);
     liblogic_add_entityid(g, e->id);
 
     dungeon_floor_add_at(df, e->id, x, y);
 
     msuccessint2("Created entity at", x, y);
     return e->id;
+}
+
+
+const entityid liblogic_player_create(gamestate* const g,
+                                      const race_t race_type,
+                                      const int x,
+                                      const int y,
+                                      const int floor,
+                                      const char* name) {
+
+    if (!g) {
+        merror("liblogic_player_create: gamestate is NULL");
+        return -1;
+    }
+
+    // use the previously-written liblogic_npc_create function
+    entityid id = liblogic_npc_create(g, race_type, x, y, floor, name);
+    entity_set_type(em_get(gamestate_get_entitymap(g), id), ENTITY_PLAYER);
+    return id;
 }
