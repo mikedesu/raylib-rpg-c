@@ -46,11 +46,11 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
             // set the perimeter to stone walls
             if (i == 0 || i == floor->height - 1 || j == 0 || j == floor->width - 1) {
                 if (j % 2 == 0) {
-                    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_00);
-                } else if (j % 3 == 0) {
-                    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_02);
-                } else {
                     dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_01);
+                    //} else if (j % 3 == 0) {
+                    //    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_02);
+                } else {
+                    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_02);
                 }
             } else {
                 dungeon_tile_init(current, DUNGEON_TILE_TYPE_FLOOR_DIRT);

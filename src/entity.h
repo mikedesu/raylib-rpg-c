@@ -29,6 +29,9 @@ typedef struct entity_t {
     entity_t* next;
 
     bool do_update;
+
+    bool is_attacking;
+
 } entity;
 
 

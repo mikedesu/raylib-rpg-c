@@ -10,7 +10,12 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define DEFAULT_ZOOM_INCR 0.1f
+
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
+
+
 void liblogic_init(gamestate* const g) {
     if (!g) {
         merror("liblogic_init: gamestate is NULL");
@@ -28,11 +33,13 @@ void liblogic_init(gamestate* const g) {
     if (liblogic_player_create(g, RACE_HUMAN, 1, 1, 0, "hero") == -1) {
         merror("liblogic_init: failed to init hero");
     }
-    if (liblogic_npc_create(g, RACE_ORC, 2, 2, 0, "orc") == -1) {
+    if (liblogic_npc_create(g, RACE_ORC, 3, 1, 0, "orc") == -1) {
         merror("liblogic_init: failed to create orc");
     }
     liblogic_update_debug_panel_buffer(g);
 }
+
+
 void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
     if (inputstate_is_pressed(is, KEY_D)) {
         msuccess("D pressed!");
@@ -46,7 +53,8 @@ void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
         merror("Unknown control mode");
     }
 }
-#define DEFAULT_ZOOM_INCR 0.1f
+
+
 void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g) {
     //minfo("Handling camera input");
     const float move = 2.0f;
@@ -95,6 +103,8 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
         return;
     }
 }
+
+
 void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {
     if (!is) {
         merror("Input state is NULL!");
@@ -125,7 +135,14 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         minfo("down pressed!");
         //e->do_update = true;
         liblogic_try_entity_move(g, e, 0, 1);
-    } else if (inputstate_is_pressed(is, KEY_SPACE)) {
+    } else if (inputstate_is_pressed(is, KEY_A)) {
+        msuccess("A pressed!");
+        // we will try this as a test but eventually
+        // a will attack in the direction the player is facing
+        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y);
+    }
+
+    else if (inputstate_is_pressed(is, KEY_SPACE)) {
         msuccess("Space pressed!");
     } else if (inputstate_is_pressed(is, KEY_ENTER)) {
         msuccess("Enter pressed!");
@@ -134,6 +151,8 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         g->controlmode = CONTROLMODE_CAMERA;
     }
 }
+
+
 static inline const direction_t liblogic_get_dir_from_xy(const int x, const int y) {
     if (x == 0 && y == 0) return DIRECTION_NONE;
     if (x == 0 && y == -1) return DIRECTION_UP;
@@ -142,6 +161,8 @@ static inline const direction_t liblogic_get_dir_from_xy(const int x, const int 
     if (x == 1 && y == 0) return DIRECTION_RIGHT;
     return DIRECTION_NONE;
 }
+
+
 void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y) {
     if (!g || !e) {
         merror(!g ? "Game state is NULL!" : "Entity is NULL!");
@@ -175,6 +196,8 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     e->sprite_move_x = x * DEFAULT_TILE_SIZE;
     e->sprite_move_y = y * DEFAULT_TILE_SIZE;
 }
+
+
 const int liblogic_tile_npc_count(const gamestate* const g, const int x, const int y, const int floor) {
     if (!g) {
         merror("liblogic_tile_npc_count: gamestate is NULL");
@@ -207,6 +230,8 @@ const int liblogic_tile_npc_count(const gamestate* const g, const int x, const i
     }
     return count;
 }
+
+
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     if (!is) {
         merror("Input state is NULL!");
@@ -224,6 +249,8 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     //g->currenttimebuf = strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 }
+
+
 void liblogic_update_debug_panel_buffer(gamestate* const g) {
     if (!g) {
         merror("Game state is NULL!");
@@ -314,6 +341,8 @@ void liblogic_add_entityid(gamestate* const g, entityid id) {
     gamestate_add_entityid(g, id);
     msuccessint("Added entity ID: ", id);
 }
+
+
 //entityid liblogic_entity_create(gamestate* const g, entitytype_t type, int x, int y, const char* name) {
 const entityid liblogic_npc_create(gamestate* const g,
                                    const race_t race_type,
@@ -383,6 +412,8 @@ const entityid liblogic_npc_create(gamestate* const g,
     msuccessint2("Created entity at", x, y);
     return e->id;
 }
+
+
 const entityid liblogic_player_create(gamestate* const g,
                                       const race_t race_type,
                                       const int x,
@@ -399,4 +430,45 @@ const entityid liblogic_player_create(gamestate* const g,
     entity_set_type(em_get(gamestate_get_entitymap(g), id), ENTITY_PLAYER);
     gamestate_set_hero_id(g, id);
     return id;
+}
+
+
+void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y) {
+    if (!g) {
+        merror("liblogic_try_entity_attack: gamestate is NULL");
+        return;
+    }
+
+    entity* attacker = em_get(g->entitymap, attacker_id);
+    if (!attacker) {
+        merror("liblogic_try_entity_attack: attacker entity not found");
+        return;
+    }
+
+    dungeon_floor_t* floor = dungeon_get_floor(g->dungeon, attacker->floor);
+    if (!floor) {
+        merror("liblogic_try_entity_attack: failed to get dungeon floor");
+        return;
+    }
+
+    dungeon_tile_t* tile = dungeon_floor_tile_at(floor, target_x, target_y);
+    if (!tile) {
+        merror("liblogic_try_entity_attack: target tile not found");
+        return;
+    }
+
+    attacker->is_attacking = true;
+
+    for (int i = 0; i < tile->entity_max; i++) {
+        if (tile->entities[i] != -1) {
+            entity* target = em_get(g->entitymap, tile->entities[i]);
+            if (target && target->type == ENTITY_NPC) {
+                // Perform attack logic here
+                minfo("Attack successful!");
+                return;
+            }
+        }
+    }
+
+    merror("liblogic_try_entity_attack: no valid target found at the specified location");
 }

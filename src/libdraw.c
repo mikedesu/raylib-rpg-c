@@ -106,6 +106,11 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
     }
 
+    if (e->is_attacking) {
+        sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
+        e->is_attacking = false;
+    }
+
     // Update movement as long as sg->move.x/y is non-zero
     if (sg->move.x > 0) {
         sg->dest.x++;
