@@ -180,3 +180,14 @@ void gamestate_init_entityids(gamestate* const g) {
 const entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index) {
     return g->entityids[index];
 }
+
+
+void gamestate_dungeon_destroy(gamestate* const g) {
+    if (!g) {
+        merror("gamestate_dungeon_destroy: g is NULL");
+        return;
+    }
+
+    dungeon_destroy(g->dungeon);
+    g->dungeon = NULL;
+}

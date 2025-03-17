@@ -34,6 +34,7 @@ void dungeon_destroy(dungeon_t* dungeon) {
     }
     free(dungeon->floors);
     free(dungeon);
+    msuccess("Freed dungeon");
 }
 
 

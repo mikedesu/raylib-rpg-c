@@ -73,6 +73,8 @@ typedef struct gamestate {
 gamestate* gamestateinitptr();
 void gamestatefree(gamestate* g);
 
+void gamestate_dungeon_destroy(gamestate* const g);
+
 void gamestate_init_entityids(gamestate* const g);
 void gamestate_add_entityid(gamestate* const g, const entityid id);
 const entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index);
