@@ -153,6 +153,11 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         merror("Game state is NULL!");
         return;
     }
+
+    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
+        return;
+    }
+
     entity* const e = em_get(g->entitymap, g->hero_id);
     if (!e) {
         //merror("Hero not found!");
@@ -162,18 +167,22 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         minfo("Right pressed!");
         //e->do_update = true;
         liblogic_try_entity_move(g, e, 1, 0);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
         minfo("left  pressed!");
         //e->do_update = true;
         liblogic_try_entity_move(g, e, -1, 0);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     } else if (inputstate_is_pressed(is, KEY_UP)) {
         minfo("up pressed!");
         //e->do_update = true;
         liblogic_try_entity_move(g, e, 0, -1);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
         minfo("down pressed!");
         //e->do_update = true;
         liblogic_try_entity_move(g, e, 0, 1);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     } else if (inputstate_is_pressed(is, KEY_A)) {
         msuccess("A pressed!");
         // we will try this as a test but eventually
@@ -188,6 +197,7 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         int ty = e->y + dy;
 
         liblogic_try_entity_attack(g, e->id, tx, ty);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 
     }
 
@@ -316,6 +326,7 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Current floor: %d\n"
              "Dungeon num floors: %d\n"
              "Num entityids: %d\n"
+             "g->flag: %s\n"
              "Hero: (%d, %d)\n",
              g->timebeganbuf,
              g->currenttimebuf,
@@ -331,6 +342,11 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              g->dungeon->current_floor,
              g->dungeon->num_floors,
              g->index_entityids,
+             g->flag == GAMESTATE_FLAG_PLAYER_INPUT  ? "GAMESTATE_FLAG_PLAYER_INPUT"
+             : g->flag == GAMESTATE_FLAG_PLAYER_ANIM ? "GAMESTATE_FLAG_PLAYER_ANIM"
+             : g->flag == GAMESTATE_FLAG_NONE        ? "GAMESTATE_FLAG_NONE"
+             : g->flag == GAMESTATE_FLAG_COUNT       ? "GAMESTATE_FLAG_COUNT"
+                                                     : "Unknown",
              x,
              y);
 }
@@ -505,6 +521,14 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
                 // Perform attack logic here
                 minfo("Attack successful!");
                 target->is_damaged = true;
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+
+                // temporary test of the orc "attacking back" at the same time...
+                //if (target->race == RACE_ORC) {
+                //    target->is_attacking = true;
+                //    attacker->is_damaged = true;
+                //}
+
                 return;
             }
         }

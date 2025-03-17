@@ -39,3 +39,4 @@ void libdraw_draw_debug_panel(gamestate* const g);
 void libdraw_calc_debugpanel_size(gamestate* const g);
 void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t dir);
 void libdraw_create_sg_byid(gamestate* const g, entityid id);
+bool libdraw_check_default_animations(gamestate* const g);

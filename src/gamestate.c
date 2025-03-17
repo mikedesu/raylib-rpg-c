@@ -1,5 +1,6 @@
 #include "gamestate.h"
 #include "controlmode.h"
+#include "gamestate_flag.h"
 #include "mprint.h"
 #include <raylib.h>
 #include <stdio.h>
@@ -86,7 +87,7 @@ gamestate* gamestateinitptr() {
     // current displayed dungeon floor
     //g->current_dungeon_floor = 0;
 
-    g->flag = PLAYER_TURN;
+    g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
 
     return g;
 }

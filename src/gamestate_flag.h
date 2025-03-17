@@ -1,7 +1,9 @@
 #pragma once
 
 typedef enum {
-    PLAYER_TURN,
-    UPDATING_ANIM,
-    NPC_TURN,
+    GAMESTATE_FLAG_NONE,
+    GAMESTATE_FLAG_PLAYER_INPUT,
+    GAMESTATE_FLAG_PLAYER_ANIM,
+    GAMESTATE_FLAG_NPC_TURN,
+    GAMESTATE_FLAG_COUNT
 } gamestate_flag_t;

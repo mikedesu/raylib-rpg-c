@@ -1,5 +1,7 @@
 #include "libdraw.h"
+#include "entitytype.h"
 #include "gamestate.h"
+#include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
 //#include "libgame_defines.h"
@@ -23,13 +25,13 @@ Vector2 zero_vector = {0, 0};
 //#define DEFAULT_WINDOW_WIDTH 400
 //#define DEFAULT_WINDOW_HEIGHT 240
 
-//#define DEFAULT_WINDOW_WIDTH 640
-//#define DEFAULT_WINDOW_HEIGHT 360
+#define DEFAULT_WINDOW_WIDTH 640
+#define DEFAULT_WINDOW_HEIGHT 360
 //#define DEFAULT_WINDOW_WIDTH 800
 //#define DEFAULT_WINDOW_HEIGHT 480
 
-#define DEFAULT_WINDOW_WIDTH 1280
-#define DEFAULT_WINDOW_HEIGHT 720
+//#define DEFAULT_WINDOW_WIDTH 1280
+//#define DEFAULT_WINDOW_HEIGHT 720
 
 //#define DEFAULT_WINDOW_WIDTH 960
 //#define DEFAULT_WINDOW_HEIGHT 540
@@ -85,6 +87,23 @@ void libdraw_update_input(inputstate* const is) {
 }
 
 
+bool libdraw_check_default_animations(gamestate* const g) {
+    if (!g) {
+        merror("libdraw_check_default_animations: gamestate is NULL");
+        return false;
+    }
+
+    for (int i = 0; i < g->index_entityids; i++) {
+        const entityid id = g->entityids[i];
+        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+        if (sg && sg->current != sg->default_anim) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
 void libdraw_update_sprite(gamestate* const g, entityid id) {
     if (!g) {
         merror("libdraw_update_sprite: gamestate is NULL");
@@ -119,7 +138,13 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
 
     // simple attack switch
     if (e->is_attacking) {
-        sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
+        if (e->race == RACE_HUMAN) {
+            sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
+
+        } else if (e->race == RACE_ORC) {
+            sg->current = SPRITEGROUP_ANIM_ORC_ATTACK;
+        }
+
         e->is_attacking = false;
     }
 
@@ -177,10 +202,12 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         if (s->num_loops >= 1) {
             sg->current = sg->default_anim;
             s->num_loops = 0;
+            // testing switching g->flag
+            //if (e->type == ENTITY_PLAYER) {
+            //    g->flag = PLAYER_INPUT_FLAG;
+            //}
         }
-
         if (s_shadow) {
-
             sprite_incrframe(s_shadow);
             if (s_shadow->num_loops >= 1) {
                 sg->current = sg->default_anim;
@@ -200,6 +227,16 @@ void libdraw_update_sprites(gamestate* const g) {
     for (int i = 0; i < g->index_entityids; i++) {
         const entityid id = g->entityids[i];
         libdraw_update_sprite(g, id);
+    }
+
+    // do some additional "thing" yet undecided to determine if
+    // we are done processing/animating this turn...
+
+    if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+        bool done = libdraw_check_default_animations(g);
+        if (done) {
+            g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+        }
     }
 }
 
