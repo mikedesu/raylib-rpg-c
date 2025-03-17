@@ -45,7 +45,11 @@ gamestate* gamestateinitptr() {
     bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
     strftime(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", g->timebegantm);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
-    g->debugpanelon = g->player_input_received = g->is_locked = g->gridon = g->processing_actions = false;
+    g->debugpanelon = false;
+    g->player_input_received = false;
+    g->is_locked = false;
+    g->gridon = false;
+    g->processing_actions = false;
     g->cam_lockon = true;
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){100, 100};

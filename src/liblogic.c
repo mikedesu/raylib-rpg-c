@@ -16,6 +16,40 @@
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
 
+static inline const direction_t liblogic_get_dir_from_xy(const int x, const int y) {
+    if (x == 0 && y == 0) return DIRECTION_NONE;
+    if (x == 0 && y == -1) return DIRECTION_UP;
+    if (x == 0 && y == 1) return DIRECTION_DOWN;
+    if (x == -1 && y == 0) return DIRECTION_LEFT;
+    if (x == 1 && y == 0) return DIRECTION_RIGHT;
+    return DIRECTION_NONE;
+}
+
+
+static inline int liblogic_get_x_from_dir(const direction_t dir) {
+    switch (dir) {
+    case DIRECTION_LEFT:
+        return -1;
+    case DIRECTION_RIGHT:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+
+static inline int liblogic_get_y_from_dir(const direction_t dir) {
+    switch (dir) {
+    case DIRECTION_UP:
+        return -1;
+    case DIRECTION_DOWN:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+
 void liblogic_init(gamestate* const g) {
     if (!g) {
         merror("liblogic_init: gamestate is NULL");
@@ -30,10 +64,15 @@ void liblogic_init(gamestate* const g) {
     dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     gamestate_init_entityids(g);
     g->entitymap = em_new();
-    if (liblogic_player_create(g, RACE_HUMAN, 1, 1, 0, "hero") == -1) {
+
+    int herox = 7;
+    int heroy = 2;
+    int orcx = 8;
+    int orcy = 3;
+    if (liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero") == -1) {
         merror("liblogic_init: failed to init hero");
     }
-    if (liblogic_npc_create(g, RACE_ORC, 3, 1, 0, "orc") == -1) {
+    if (liblogic_npc_create(g, RACE_ORC, orcx, orcy, 0, "orc") == -1) {
         merror("liblogic_init: failed to create orc");
     }
     liblogic_update_debug_panel_buffer(g);
@@ -139,7 +178,17 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         msuccess("A pressed!");
         // we will try this as a test but eventually
         // a will attack in the direction the player is facing
-        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y);
+
+        int dx = liblogic_get_x_from_dir(e->direction);
+        int dy = liblogic_get_y_from_dir(e->direction);
+
+        minfoint2("Attacking in direction", dx, dy);
+
+        int tx = e->x + dx;
+        int ty = e->y + dy;
+
+        liblogic_try_entity_attack(g, e->id, tx, ty);
+
     }
 
     else if (inputstate_is_pressed(is, KEY_SPACE)) {
@@ -150,16 +199,6 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         msuccess("C pressed!");
         g->controlmode = CONTROLMODE_CAMERA;
     }
-}
-
-
-static inline const direction_t liblogic_get_dir_from_xy(const int x, const int y) {
-    if (x == 0 && y == 0) return DIRECTION_NONE;
-    if (x == 0 && y == -1) return DIRECTION_UP;
-    if (x == 0 && y == 1) return DIRECTION_DOWN;
-    if (x == -1 && y == 0) return DIRECTION_LEFT;
-    if (x == 1 && y == 0) return DIRECTION_RIGHT;
-    return DIRECTION_NONE;
 }
 
 
