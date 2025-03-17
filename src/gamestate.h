@@ -9,6 +9,7 @@
 #include "fadestate.h"
 //#include "hashtable_entityid_spritegroup.h"
 //#include "textureinfo.h"
+#include "gamestate_flag.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <time.h>
@@ -66,6 +67,12 @@ typedef struct gamestate {
 
     double last_frame_time;
     char frame_time_str[32];
+
+    // flag can be:
+    // PLAYER_TURN,
+    // UPDATING_ANIM,
+    // NPC_TURN,
+    gamestate_flag_t flag;
 
 } gamestate;
 

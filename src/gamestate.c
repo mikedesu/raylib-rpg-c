@@ -82,6 +82,8 @@ gamestate* gamestateinitptr() {
     // current displayed dungeon floor
     //g->current_dungeon_floor = 0;
 
+    g->flag = PLAYER_TURN;
+
     return g;
 }
 
