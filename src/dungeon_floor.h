@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define DEFAULT_DUNGEON_FLOOR_WIDTH 16
-#define DEFAULT_DUNGEON_FLOOR_HEIGHT 3
+#define DEFAULT_DUNGEON_FLOOR_HEIGHT 16
 
 
 typedef struct {

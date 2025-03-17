@@ -4,6 +4,7 @@
 #include "hashtable_entityid_spritegroup.h"
 //#include "libgame_defines.h"
 #include "mprint.h"
+#include "sprite.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
@@ -106,6 +107,7 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
     }
 
+    // simple attack switch
     if (e->is_attacking) {
         sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
         e->is_attacking = false;
@@ -139,6 +141,12 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         merror("libdraw_update_sprite: sprite is NULL");
         return;
     }
+    // attempt to grab the sprite's shadow
+    sprite* s_shadow = sg->sprites[sg->current + 1];
+    if (!s_shadow) {
+        merror("libdraw_update_sprite: shadow sprite is NULL");
+        // don't need to return... we can just continue
+    }
 
     if (g->framecount % ANIM_SPEED == 0) {
         sprite_incrframe(s);
@@ -146,6 +154,15 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         if (s->num_loops >= 1) {
             sg->current = sg->default_anim;
             s->num_loops = 0;
+        }
+
+        if (s_shadow) {
+
+            sprite_incrframe(s_shadow);
+            if (s_shadow->num_loops >= 1) {
+                sg->current = sg->default_anim;
+                s_shadow->num_loops = 0;
+            }
         }
     }
 }
