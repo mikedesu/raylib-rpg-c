@@ -20,6 +20,7 @@ entity_t* entity_new(const entityid id, const entitytype_t type) {
     e->sprite_move_x = 0;
     e->sprite_move_y = 0;
     e->is_attacking = false;
+    e->is_damaged = false;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     e->next = NULL;
     return e;

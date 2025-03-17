@@ -23,20 +23,20 @@ Vector2 zero_vector = {0, 0};
 //#define DEFAULT_WINDOW_WIDTH 400
 //#define DEFAULT_WINDOW_HEIGHT 240
 
-#define DEFAULT_WINDOW_WIDTH 640
-#define DEFAULT_WINDOW_HEIGHT 360
+//#define DEFAULT_WINDOW_WIDTH 640
+//#define DEFAULT_WINDOW_HEIGHT 360
 //#define DEFAULT_WINDOW_WIDTH 800
 //#define DEFAULT_WINDOW_HEIGHT 480
 
-//#define DEFAULT_WINDOW_WIDTH 1280
-//#define DEFAULT_WINDOW_HEIGHT 720
+#define DEFAULT_WINDOW_WIDTH 1280
+#define DEFAULT_WINDOW_HEIGHT 720
 
 //#define DEFAULT_WINDOW_WIDTH 960
 //#define DEFAULT_WINDOW_HEIGHT 540
 
 #define DEFAULT_TILE_SIZE 8
 #define SPRITEGROUP_DEFAULT_SIZE 32
-#define ANIM_SPEED 10
+#define ANIM_SPEED 40
 
 
 void libdraw_init(gamestate* const g) {
@@ -122,6 +122,19 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
         e->is_attacking = false;
     }
+
+    // simple damage switch
+    if (e->is_damaged) {
+        // check the race of the entity to determine which animation index to use
+        if (e->race == RACE_HUMAN) {
+            sg->current = SPRITEGROUP_ANIM_HUMAN_DMG;
+
+        } else if (e->race == RACE_ORC) {
+            sg->current = SPRITEGROUP_ANIM_ORC_DMG;
+        }
+        e->is_damaged = false;
+    }
+
 
     // Update movement as long as sg->move.x/y is non-zero
     if (sg->move.x > 0) {

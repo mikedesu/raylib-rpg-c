@@ -504,6 +504,7 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
             if (target && target->type == ENTITY_NPC) {
                 // Perform attack logic here
                 minfo("Attack successful!");
+                target->is_damaged = true;
                 return;
             }
         }
