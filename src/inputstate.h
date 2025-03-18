@@ -12,6 +12,7 @@ typedef struct inputstate {
     uint64_t held[NUM_LONGS]; // Bits for keys held down
 } inputstate;
 
+
 // Reset all bits to 0
 static inline void inputstate_reset(inputstate* is) {
     for (int i = 0; i < NUM_LONGS; i++) {
@@ -19,6 +20,7 @@ static inline void inputstate_reset(inputstate* is) {
         is->held[i] = 0;
     }
 }
+
 
 // Update all key states from Raylib
 static inline void inputstate_update(inputstate* is) {
@@ -37,6 +39,7 @@ static inline void inputstate_update(inputstate* is) {
     }
 }
 
+
 // Check if a key was pressed this frame
 static inline bool inputstate_is_pressed(const inputstate* is, int key) {
     if (key < 0 || key >= MAX_KEYS) return false;
@@ -44,6 +47,7 @@ static inline bool inputstate_is_pressed(const inputstate* is, int key) {
     int bit = key % BITS_PER_LONG;
     return (is->pressed[idx] & (1ULL << bit)) != 0;
 }
+
 
 // Check if a key is held down
 static inline bool inputstate_is_held(const inputstate* is, int key) {
@@ -54,9 +58,9 @@ static inline bool inputstate_is_held(const inputstate* is, int key) {
 }
 
 
+// Get the first key pressed this frame
 static inline int inputstate_get_pressed_key(const inputstate* is) {
     if (!is) return -1; // Invalid inputstate
-
     for (int idx = 0; idx < NUM_LONGS; idx++) {
         uint64_t bits = is->pressed[idx];
         if (bits != 0) { // At least one key pressed in this block
@@ -72,13 +76,16 @@ static inline int inputstate_get_pressed_key(const inputstate* is) {
     return -1; // No key pressed
 }
 
+
 static inline bool inputstate_is_left_shift_held(const inputstate* is) {
     return inputstate_is_held(is, KEY_LEFT_SHIFT);
 }
 
+
 static inline bool inputstate_is_right_shift_held(const inputstate* is) {
     return inputstate_is_held(is, KEY_RIGHT_SHIFT);
 }
+
 
 static inline bool inputstate_is_shift_held(const inputstate* is) {
     return inputstate_is_left_shift_held(is) || inputstate_is_right_shift_held(is);
