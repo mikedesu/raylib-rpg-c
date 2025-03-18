@@ -71,3 +71,15 @@ static inline int inputstate_get_pressed_key(const inputstate* is) {
     }
     return -1; // No key pressed
 }
+
+static inline bool inputstate_is_left_shift_held(const inputstate* is) {
+    return inputstate_is_held(is, KEY_LEFT_SHIFT);
+}
+
+static inline bool inputstate_is_right_shift_held(const inputstate* is) {
+    return inputstate_is_held(is, KEY_RIGHT_SHIFT);
+}
+
+static inline bool inputstate_is_shift_held(const inputstate* is) {
+    return inputstate_is_left_shift_held(is) || inputstate_is_right_shift_held(is);
+}

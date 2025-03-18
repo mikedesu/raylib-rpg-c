@@ -86,21 +86,6 @@ void liblogic_init(gamestate* const g) {
         count++;
     }
 
-
-    //int orcx = 8;
-    //int orcy = 3;
-
-
-    //const int rows = 10;
-    //const int cols = 10;
-    //for (int i = 0; i < rows; i += 2) {
-    //    for (int j = 0; j < cols; j += 2) {
-    //        if (liblogic_npc_create(g, RACE_ORC, orcx + i, orcy + j, 0, "orc") == -1) {
-    //            merror("liblogic_init: failed to create orc");
-    //        }
-    //    }
-    //}
-
     liblogic_update_debug_panel_buffer(g);
 }
 
@@ -135,6 +120,8 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
         merror("Game state is NULL!");
         return;
     }
+
+
     if (inputstate_is_held(is, KEY_RIGHT)) {
         g->cam2d.offset.x += move;
         return;
@@ -158,11 +145,12 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
     }
     if (inputstate_is_held(is, KEY_Z)) {
         msuccess("Z held!");
-        g->cam2d.zoom += DEFAULT_ZOOM_INCR;
-        return;
-    } else if (inputstate_is_held(is, KEY_X)) {
-        msuccess("X held!");
-        g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
+
+        if (inputstate_is_shift_held(is)) {
+            g->cam2d.zoom += DEFAULT_ZOOM_INCR;
+        } else {
+            g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
+        }
         return;
     } else if (inputstate_is_pressed(is, KEY_V)) {
         msuccess("V pressed!");
@@ -196,22 +184,45 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
 
     int key = inputstate_get_pressed_key(is);
     switch (key) {
+    case KEY_KP_6:
     case KEY_RIGHT:
         minfo("Right pressed!");
         liblogic_try_entity_move(g, e, 1, 0);
         break;
+    case KEY_KP_4:
     case KEY_LEFT:
         minfo("left  pressed!");
         liblogic_try_entity_move(g, e, -1, 0);
         break;
+    case KEY_KP_8:
     case KEY_UP:
         minfo("up pressed!");
         liblogic_try_entity_move(g, e, 0, -1);
         break;
+    case KEY_KP_2:
     case KEY_DOWN:
         minfo("down pressed!");
         liblogic_try_entity_move(g, e, 0, 1);
         break;
+    // diagonals on the numpad
+    case KEY_KP_7:
+        minfo("Numpad 7 pressed!");
+        liblogic_try_entity_move(g, e, -1, -1);
+        break;
+    case KEY_KP_9:
+        minfo("Numpad 9 pressed!");
+        liblogic_try_entity_move(g, e, 1, -1);
+        break;
+    case KEY_KP_1:
+        minfo("Numpad 1 pressed!");
+        liblogic_try_entity_move(g, e, -1, 1);
+        break;
+    case KEY_KP_3:
+        minfo("Numpad 3 pressed!");
+        liblogic_try_entity_move(g, e, 1, 1);
+        break;
+
+
     case KEY_A:
         msuccess("A pressed!");
         int dx = liblogic_get_x_from_dir(e->direction);
