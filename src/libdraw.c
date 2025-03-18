@@ -39,7 +39,9 @@ Vector2 zero_vector = {0, 0};
 
 #define DEFAULT_TILE_SIZE 8
 #define SPRITEGROUP_DEFAULT_SIZE 32
-#define ANIM_SPEED 40
+
+//#define ANIM_SPEED 10
+int ANIM_SPEED = 10;
 
 
 void libdraw_init(gamestate* const g) {
@@ -211,6 +213,18 @@ void libdraw_update_sprites(gamestate* const g) {
         merror("libdraw_update_sprites: gamestate is NULL");
         return;
     }
+
+    // lets tweak the ANIM_SPEED based on what state we are in
+    // if we are in player_anim, then it will be 10
+    // if we are in npc_anim, then it will be 5
+
+    if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM || g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+        ANIM_SPEED = 10;
+    } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM || g->flag == GAMESTATE_FLAG_NPC_TURN) {
+        ANIM_SPEED = 1;
+    }
+
+
     // for each entityid in our entitymap, update the spritegroup
     for (int i = 0; i < g->index_entityids; i++) {
         const entityid id = g->entityids[i];

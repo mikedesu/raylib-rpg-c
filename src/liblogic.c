@@ -76,14 +76,14 @@ void liblogic_init(gamestate* const g) {
 
     int orcx = 8;
     int orcy = 3;
-    if (liblogic_npc_create(g, RACE_ORC, orcx, orcy, 0, "orc") == -1) {
-        merror("liblogic_init: failed to create orc");
-    }
 
-    orcx = 9;
-    orcy = 4;
-    if (liblogic_npc_create(g, RACE_ORC, orcx, orcy, 0, "orc") == -1) {
-        merror("liblogic_init: failed to create orc");
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (liblogic_npc_create(g, RACE_ORC, orcx + i, orcy + j, 0, "orc") == -1) {
+                merror("liblogic_init: failed to create orc");
+            }
+        }
     }
 
     liblogic_update_debug_panel_buffer(g);
@@ -254,6 +254,12 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         merror("Cannot move, NPC in the way");
         return;
     }
+    if (liblogic_player_on_tile(g, ex, ey, floor)) {
+        merror("Cannot move, player on tile");
+        return;
+    }
+
+
     dungeon_floor_remove_at(df, e->id, e->x, e->y);
     dungeon_floor_add_at(df, e->id, ex, ey);
     e->x = ex;
@@ -268,6 +274,40 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     } else {
         g->flag = GAMESTATE_FLAG_NONE;
     }
+}
+
+
+const bool liblogic_player_on_tile(const gamestate* const g, const int x, const int y, const int floor) {
+    if (!g) {
+        merror("liblogic_player_on_tile: gamestate is NULL");
+        return false;
+    }
+    // get the tile at x y
+    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, 0);
+    if (!df) {
+        merror("liblogic_player_on_tile: failed to get dungeon floor");
+        return false;
+    }
+    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    if (!tile) {
+        merror("liblogic_player_on_tile: failed to get tile");
+        return false;
+    }
+    // enumerate entities and check their type
+    for (int i = 0; i < tile->entity_max; i++) {
+        if (tile->entities[i] == -1) {
+            continue;
+        }
+        const entity* const e = em_get(g->entitymap, tile->entities[i]);
+        if (!e) {
+            merror("liblogic_player_on_tile: failed to get entity");
+            return false;
+        }
+        if (e->type == ENTITY_PLAYER) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
