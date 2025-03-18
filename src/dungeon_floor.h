@@ -18,12 +18,10 @@ typedef struct {
 
 dungeon_floor_t* dungeon_floor_create(const int width, const int height);
 
-void dungeon_floor_init(dungeon_floor_t* floor);
-
-void dungeon_floor_free(dungeon_floor_t* floor);
+dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int x, const int y);
 
 const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, const int x, const int y);
-
 const bool dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id, const int x, const int y);
 
-dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int x, const int y);
+void dungeon_floor_init(dungeon_floor_t* floor);
+void dungeon_floor_free(dungeon_floor_t* floor);
