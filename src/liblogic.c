@@ -23,6 +23,11 @@ static inline const direction_t liblogic_get_dir_from_xy(const int x, const int 
     if (x == 0 && y == 1) return DIRECTION_DOWN;
     if (x == -1 && y == 0) return DIRECTION_LEFT;
     if (x == 1 && y == 0) return DIRECTION_RIGHT;
+    // also handle diagonals
+    if (x == -1 && y == -1) return DIRECTION_UP_LEFT;
+    if (x == 1 && y == -1) return DIRECTION_UP_RIGHT;
+    if (x == -1 && y == 1) return DIRECTION_DOWN_LEFT;
+    if (x == 1 && y == 1) return DIRECTION_DOWN_RIGHT;
     return DIRECTION_NONE;
 }
 
@@ -76,7 +81,8 @@ void liblogic_init(gamestate* const g) {
     g->entity_turn = g->hero_id;
 
     // create a bunch of orcs in a grid. we'll come back here and place them randomly
-    int num_orcs_to_make = 10;
+    //int num_orcs_to_make = 10;
+    int num_orcs_to_make = 0;
     int count = 0;
     while (count < num_orcs_to_make) {
         int orcx = rand() % DEFAULT_DUNGEON_FLOOR_WIDTH;
