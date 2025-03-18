@@ -78,18 +78,18 @@ typedef struct gamestate {
 
 
 gamestate* gamestateinitptr();
-void gamestatefree(gamestate* g);
 
-void gamestate_dungeon_destroy(gamestate* const g);
-
-void gamestate_init_entityids(gamestate* const g);
-void gamestate_add_entityid(gamestate* const g, const entityid id);
 const entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index);
-
-void gamestate_set_hero_id(gamestate* const g, const entityid id);
 const entityid gamestate_get_hero_id(const gamestate* const g);
 
 em_t* gamestate_get_entitymap(gamestate* const g);
+
 const int gamestate_get_entityid_index(const gamestate* const g, const entityid id);
 const int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, const int index);
+
+void gamestatefree(gamestate* g);
+void gamestate_dungeon_destroy(gamestate* const g);
+void gamestate_init_entityids(gamestate* const g);
+void gamestate_add_entityid(gamestate* const g, const entityid id);
+void gamestate_set_hero_id(gamestate* const g, const entityid id);
 void gamestate_incr_entity_turn(gamestate* const g);
