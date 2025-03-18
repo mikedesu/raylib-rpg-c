@@ -34,8 +34,12 @@ static inline const direction_t liblogic_get_dir_from_xy(const int x, const int 
 
 static inline int liblogic_get_x_from_dir(const direction_t dir) {
     switch (dir) {
+    case DIRECTION_UP_LEFT:
+    case DIRECTION_DOWN_LEFT:
     case DIRECTION_LEFT:
         return -1;
+    case DIRECTION_UP_RIGHT:
+    case DIRECTION_DOWN_RIGHT:
     case DIRECTION_RIGHT:
         return 1;
     default:
@@ -47,8 +51,12 @@ static inline int liblogic_get_x_from_dir(const direction_t dir) {
 static inline int liblogic_get_y_from_dir(const direction_t dir) {
     switch (dir) {
     case DIRECTION_UP:
+    case DIRECTION_UP_LEFT:
+    case DIRECTION_UP_RIGHT:
         return -1;
     case DIRECTION_DOWN:
+    case DIRECTION_DOWN_LEFT:
+    case DIRECTION_DOWN_RIGHT:
         return 1;
     default:
         return 0;
@@ -81,8 +89,8 @@ void liblogic_init(gamestate* const g) {
     g->entity_turn = g->hero_id;
 
     // create a bunch of orcs in a grid. we'll come back here and place them randomly
-    //int num_orcs_to_make = 10;
-    int num_orcs_to_make = 0;
+    int num_orcs_to_make = 10;
+    //int num_orcs_to_make = 0;
     int count = 0;
     while (count < num_orcs_to_make) {
         int orcx = rand() % DEFAULT_DUNGEON_FLOOR_WIDTH;
@@ -666,7 +674,7 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
         }
     }
 
-    merror("liblogic_try_entity_attack: no valid target found at the specified location");
+    merrorint2("liblogic_try_entity_attack: no valid target found at the specified location", target_x, target_y);
 
     if (attacker->type == ENTITY_PLAYER)
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
