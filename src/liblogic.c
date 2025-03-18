@@ -74,18 +74,18 @@ void liblogic_init(gamestate* const g) {
     }
     g->entity_turn = g->hero_id;
 
-    int orcx = 8;
-    int orcy = 3;
-
-    const int rows = 10;
-    const int cols = 10;
-    for (int i = 0; i < rows; i += 2) {
-        for (int j = 0; j < cols; j += 2) {
-            if (liblogic_npc_create(g, RACE_ORC, orcx + i, orcy + j, 0, "orc") == -1) {
-                merror("liblogic_init: failed to create orc");
-            }
-        }
-    }
+    // create a bunch of orcs in a grid. we'll come back here and place them randomly
+    //int orcx = 8;
+    //int orcy = 3;
+    //const int rows = 10;
+    //const int cols = 10;
+    //for (int i = 0; i < rows; i += 2) {
+    //    for (int j = 0; j < cols; j += 2) {
+    //        if (liblogic_npc_create(g, RACE_ORC, orcx + i, orcy + j, 0, "orc") == -1) {
+    //            merror("liblogic_init: failed to create orc");
+    //        }
+    //    }
+    //}
 
     liblogic_update_debug_panel_buffer(g);
 }
@@ -108,7 +108,11 @@ void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
 
 void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g) {
     //minfo("Handling camera input");
-    const float move = 2.0f;
+
+    //const float zoom = g->cam2d.zoom;
+    //const float move = 1.0f * zoom;
+    const float move = g->cam2d.zoom;
+
     if (!is) {
         merror("Input state is NULL!");
         return;

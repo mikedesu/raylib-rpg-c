@@ -384,24 +384,26 @@ void libdraw_draw_debug_panel(gamestate* const g) {
 
     //libdraw_calc_debugpanel_size(g); // Calculate size
     // Draw background
-    const int x = g->debugpanel.x, y = g->debugpanel.y, w = g->debugpanel.w, h = g->debugpanel.h,
-              fontsize = g->debugpanel.font_size;
-
-    const Color c = Fade(RED, 0.8f), c2 = WHITE;
+    const int x = g->debugpanel.x;
+    const int y = g->debugpanel.y;
+    const int w = g->debugpanel.w;
+    const int h = g->debugpanel.h;
+    const int fontsize = g->debugpanel.font_size;
+    const Color fg = Fade(BLUE, 0.8f);
+    const Color c2 = WHITE;
     // calculate the size of the bg box of the debug panel
     // use g->debugpanel.pad_left, top, bottom, right to do this
-
-    const int pad_left = g->debugpanel.pad_left, pad_top = g->debugpanel.pad_top, pad_right = g->debugpanel.pad_right,
-              pad_bottom = g->debugpanel.pad_bottom;
+    const int pad_left = g->debugpanel.pad_left;
+    const int pad_top = g->debugpanel.pad_top;
+    const int pad_right = g->debugpanel.pad_right;
+    const int pad_bottom = g->debugpanel.pad_bottom;
     // the root of the box should be at x,y
-
-    const int w0 = w + pad_left + pad_right * 4, h0 = h + pad_top + pad_bottom;
-
-    DrawRectangle(x, y, w0, h0, c);
+    const int w0 = w + pad_left + pad_right * 4;
+    const int h0 = h + pad_top + pad_bottom;
+    DrawRectangle(x, y, w0, h0, fg);
     // Draw text
-
-    const int x1 = x + pad_left, y1 = y + pad_top;
-
+    const int x1 = x + pad_left;
+    const int y1 = y + pad_top;
     DrawText(g->debugpanel.buffer, x1, y1, fontsize, c2);
 }
 

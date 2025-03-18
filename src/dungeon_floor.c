@@ -43,18 +43,25 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
     for (int i = 0; i < floor->height; i++) {
         for (int j = 0; j < floor->width; j++) {
             dungeon_tile_t* current = &floor->tiles[i][j];
-            // set the perimeter to stone walls
+            dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
             if (i == 0 || i == floor->height - 1 || j == 0 || j == floor->width - 1) {
+
                 if (j % 2 == 0) {
-                    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_01);
-                    //} else if (j % 3 == 0) {
-                    //    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_02);
+                    type = DUNGEON_TILE_TYPE_STONE_WALL_00;
+                    //dungeon_tile_init(current, type);
+                } else if (j % 3 == 0) {
+                    type = DUNGEON_TILE_TYPE_STONE_WALL_01;
+                    //dungeon_tile_init(current, type);
                 } else {
-                    dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_02);
+                    type = DUNGEON_TILE_TYPE_STONE_WALL_02;
+                    //dungeon_tile_init(current, type);
                 }
             } else {
-                dungeon_tile_init(current, DUNGEON_TILE_TYPE_FLOOR_DIRT);
+                //type = DUNGEON_TILE_TYPE_FLOOR_DIRT;
+                type = DUNGEON_TILE_TYPE_FLOOR_STONE_00;
+                //dungeon_tile_init(current, DUNGEON_TILE_TYPE_FLOOR_DIRT);
             }
+            dungeon_tile_init(current, type);
         }
     }
     // lets set the corners to NONE
