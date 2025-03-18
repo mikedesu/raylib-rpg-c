@@ -57,6 +57,11 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
             }
         }
     }
+    // lets set the corners to NONE
+    dungeon_tile_init(&floor->tiles[0][0], DUNGEON_TILE_TYPE_NONE);
+    dungeon_tile_init(&floor->tiles[0][floor->width - 1], DUNGEON_TILE_TYPE_NONE);
+    dungeon_tile_init(&floor->tiles[floor->height - 1][0], DUNGEON_TILE_TYPE_NONE);
+    dungeon_tile_init(&floor->tiles[floor->height - 1][floor->width - 1], DUNGEON_TILE_TYPE_NONE);
 }
 
 

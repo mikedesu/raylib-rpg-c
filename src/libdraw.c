@@ -287,7 +287,7 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
     // tile values in get_txkey_for_tiletype.h
     int txkey = get_txkey_for_tiletype(tile->type);
     if (txkey < 0) {
-        merrorint("libdraw_draw_dungeon_floor_tile: txkey is invalid", txkey);
+        //merrorint("libdraw_draw_dungeon_floor_tile: txkey is invalid", txkey);
         return;
     }
 

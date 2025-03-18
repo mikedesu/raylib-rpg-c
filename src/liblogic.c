@@ -77,9 +77,10 @@ void liblogic_init(gamestate* const g) {
     int orcx = 8;
     int orcy = 3;
 
-
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
+    const int rows = 10;
+    const int cols = 10;
+    for (int i = 0; i < rows; i += 2) {
+        for (int j = 0; j < cols; j += 2) {
             if (liblogic_npc_create(g, RACE_ORC, orcx + i, orcy + j, 0, "orc") == -1) {
                 merror("liblogic_init: failed to create orc");
             }
@@ -241,19 +242,31 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         merror("Failed to get dungeon floor");
         return;
     }
+
+    if (e->type == ENTITY_PLAYER) {
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    } else if (e->type == ENTITY_NPC) {
+        g->flag = GAMESTATE_FLAG_NPC_ANIM;
+    } else {
+        g->flag = GAMESTATE_FLAG_NONE;
+    }
+
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex, ey);
     if (!tile || ex < 0 || ey < 0) {
         merror(!tile ? "Failed to get tile" : "Cannot move, out of bounds");
         return;
     }
+
     if (dungeon_tile_is_wall(tile->type)) {
         merror("Cannot move, wall");
         return;
     }
+
     if (liblogic_tile_npc_count(g, ex, ey, floor) > 0) {
         merror("Cannot move, NPC in the way");
         return;
     }
+
     if (liblogic_player_on_tile(g, ex, ey, floor)) {
         merror("Cannot move, player on tile");
         return;
@@ -266,14 +279,6 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     e->y = ey;
     e->sprite_move_x = x * DEFAULT_TILE_SIZE;
     e->sprite_move_y = y * DEFAULT_TILE_SIZE;
-
-    if (e->type == ENTITY_PLAYER) {
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    } else if (e->type == ENTITY_NPC) {
-        g->flag = GAMESTATE_FLAG_NPC_ANIM;
-    } else {
-        g->flag = GAMESTATE_FLAG_NONE;
-    }
 }
 
 
