@@ -52,8 +52,6 @@ typedef enum {
 
 
 static inline bool dungeon_tile_is_wall(const dungeon_tile_type_t type) {
-    //return type == DUNGEON_TILE_TYPE_STONE_WALL_00 || type == DUNGEON_TILE_TYPE_STONE_WALL_01 ||
-    //       type == DUNGEON_TILE_TYPE_STONE_WALL_02 || type == DUNGEON_TILE_TYPE_STONE_WALL_03;
-
     return type >= DUNGEON_TILE_TYPE_STONE_WALL_00 && type <= DUNGEON_TILE_TYPE_STONE_WALL_02;
 }
+

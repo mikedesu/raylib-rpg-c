@@ -75,7 +75,7 @@ void liblogic_init(gamestate* const g) {
     g->entity_turn = g->hero_id;
 
     // create a bunch of orcs in a grid. we'll come back here and place them randomly
-    int num_orcs_to_make = 100;
+    int num_orcs_to_make = 10;
     int count = 0;
     while (count < num_orcs_to_make) {
         int orcx = rand() % DEFAULT_DUNGEON_FLOOR_WIDTH;
@@ -193,52 +193,79 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         //merror("Hero not found!");
         return;
     }
-    if (inputstate_is_pressed(is, KEY_RIGHT)) {
-        minfo("Right pressed!");
-        //e->do_update = true;
-        liblogic_try_entity_move(g, e, 1, 0);
-        //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    } else if (inputstate_is_pressed(is, KEY_LEFT)) {
-        minfo("left  pressed!");
-        //e->do_update = true;
-        liblogic_try_entity_move(g, e, -1, 0);
-        //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    } else if (inputstate_is_pressed(is, KEY_UP)) {
-        minfo("up pressed!");
-        //e->do_update = true;
-        liblogic_try_entity_move(g, e, 0, -1);
-        //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
-        minfo("down pressed!");
-        //e->do_update = true;
-        liblogic_try_entity_move(g, e, 0, 1);
-        //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    } else if (inputstate_is_pressed(is, KEY_A)) {
-        msuccess("A pressed!");
-        // we will try this as a test but eventually
-        // a will attack in the direction the player is facing
 
+    int key = inputstate_get_pressed_key(is);
+    switch (key) {
+    case KEY_RIGHT:
+        minfo("Right pressed!");
+        liblogic_try_entity_move(g, e, 1, 0);
+        break;
+    case KEY_LEFT:
+        minfo("left  pressed!");
+        liblogic_try_entity_move(g, e, -1, 0);
+        break;
+    case KEY_UP:
+        minfo("up pressed!");
+        liblogic_try_entity_move(g, e, 0, -1);
+        break;
+    case KEY_DOWN:
+        minfo("down pressed!");
+        liblogic_try_entity_move(g, e, 0, 1);
+        break;
+    case KEY_A:
+        msuccess("A pressed!");
         int dx = liblogic_get_x_from_dir(e->direction);
         int dy = liblogic_get_y_from_dir(e->direction);
-
-        minfoint2("Attacking in direction", dx, dy);
-
         int tx = e->x + dx;
         int ty = e->y + dy;
-
         liblogic_try_entity_attack(g, e->id, tx, ty);
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-
-    }
-
-    else if (inputstate_is_pressed(is, KEY_SPACE)) {
+        break;
+    case KEY_SPACE:
         msuccess("Space pressed!");
-    } else if (inputstate_is_pressed(is, KEY_ENTER)) {
+        break;
+    case KEY_ENTER:
         msuccess("Enter pressed!");
-    } else if (inputstate_is_pressed(is, KEY_C)) {
+        break;
+    case KEY_C:
         msuccess("C pressed!");
         g->controlmode = CONTROLMODE_CAMERA;
+        break;
+    default:
+        break; // Ignore unhandled keys
     }
+
+    //if (inputstate_is_pressed(is, KEY_RIGHT)) {
+    //    minfo("Right pressed!");
+    //    liblogic_try_entity_move(g, e, 1, 0);
+    //} else if (inputstate_is_pressed(is, KEY_LEFT)) {
+    //    minfo("left  pressed!");
+    //    liblogic_try_entity_move(g, e, -1, 0);
+    //} else if (inputstate_is_pressed(is, KEY_UP)) {
+    //    minfo("up pressed!");
+    //    liblogic_try_entity_move(g, e, 0, -1);
+    //} else if (inputstate_is_pressed(is, KEY_DOWN)) {
+    //    minfo("down pressed!");
+    //    liblogic_try_entity_move(g, e, 0, 1);
+    //} else if (inputstate_is_pressed(is, KEY_A)) {
+    //    msuccess("A pressed!");
+    //    // we will try this as a test but eventually
+    //    // a will attack in the direction the player is facing
+    //    int dx = liblogic_get_x_from_dir(e->direction);
+    //    int dy = liblogic_get_y_from_dir(e->direction);
+    //    minfoint2("Attacking in direction", dx, dy);
+    //    int tx = e->x + dx;
+    //    int ty = e->y + dy;
+    //    liblogic_try_entity_attack(g, e->id, tx, ty);
+    //    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //}
+    //else if (inputstate_is_pressed(is, KEY_SPACE)) {
+    //    msuccess("Space pressed!");
+    //} else if (inputstate_is_pressed(is, KEY_ENTER)) {
+    //    msuccess("Enter pressed!");
+    //} else if (inputstate_is_pressed(is, KEY_C)) {
+    //    msuccess("C pressed!");
+    //    g->controlmode = CONTROLMODE_CAMERA;
+    //}
 }
 
 
@@ -562,18 +589,29 @@ const entityid liblogic_npc_create(gamestate* const g,
         merror("liblogic_entity_create: failed to get tile");
         return -1;
     }
-    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_00) {
-        merror("liblogic_entity_create: cannot create entity on stone wall 00");
+
+    if (dungeon_tile_is_wall(tile->type)) {
+        merror("liblogic_entity_create: cannot create entity on wall");
         return -1;
     }
-    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_01) {
-        merror("liblogic_entity_create: cannot create entity on stone wall 01");
+
+    if (liblogic_tile_npc_count(g, x, y, floor) > 0) {
+        merror("liblogic_entity_create: cannot create entity on tile with NPC");
         return -1;
     }
-    if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_02) {
-        merror("liblogic_entity_create: cannot create entity on stone wall 02");
-        return -1;
-    }
+
+    //if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_00) {
+    //    merror("liblogic_entity_create: cannot create entity on stone wall 00");
+    //    return -1;
+    //}
+    //if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_01) {
+    //    merror("liblogic_entity_create: cannot create entity on stone wall 01");
+    //    return -1;
+    //}
+    //if (tile->type == DUNGEON_TILE_TYPE_STONE_WALL_02) {
+    //    merror("liblogic_entity_create: cannot create entity on stone wall 02");
+    //    return -1;
+    //}
     entity* e = entity_new_npc_at(next_entityid++,
                                   race_type,
                                   x,
@@ -584,9 +622,11 @@ const entityid liblogic_npc_create(gamestate* const g,
         merror("liblogic_entity_create: failed to create entity");
         return -1;
     }
+
     em_add(em, e);
     gamestate_add_entityid(g, e->id);
     dungeon_floor_add_at(df, e->id, x, y);
+
     msuccessint2("Created entity at", x, y);
     return e->id;
 }

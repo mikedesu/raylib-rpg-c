@@ -4,8 +4,8 @@
 #include "entityid.h"
 #include <stdbool.h>
 
-#define DEFAULT_DUNGEON_FLOOR_WIDTH 16 * 8
-#define DEFAULT_DUNGEON_FLOOR_HEIGHT 8 * 8
+#define DEFAULT_DUNGEON_FLOOR_WIDTH 16 * 2
+#define DEFAULT_DUNGEON_FLOOR_HEIGHT 8 * 2
 
 
 typedef struct {

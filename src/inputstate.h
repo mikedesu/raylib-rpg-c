@@ -52,3 +52,22 @@ static inline bool inputstate_is_held(const inputstate* is, int key) {
     int bit = key % BITS_PER_LONG;
     return (is->held[idx] & (1ULL << bit)) != 0;
 }
+
+
+static inline int inputstate_get_pressed_key(const inputstate* is) {
+    if (!is) return -1; // Invalid inputstate
+
+    for (int idx = 0; idx < NUM_LONGS; idx++) {
+        uint64_t bits = is->pressed[idx];
+        if (bits != 0) { // At least one key pressed in this block
+            for (int bit = 0; bit < BITS_PER_LONG; bit++) {
+                if (bits & (1ULL << bit)) {
+                    int key = idx * BITS_PER_LONG + bit;
+                    if (key < MAX_KEYS) return key; // Return first pressed key
+                    break; // Invalid key, stop searching this block
+                }
+            }
+        }
+    }
+    return -1; // No key pressed
+}
