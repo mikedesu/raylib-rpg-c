@@ -80,6 +80,12 @@ void liblogic_init(gamestate* const g) {
         merror("liblogic_init: failed to create orc");
     }
 
+    orcx = 9;
+    orcy = 4;
+    if (liblogic_npc_create(g, RACE_ORC, orcx, orcy, 0, "orc") == -1) {
+        merror("liblogic_init: failed to create orc");
+    }
+
     liblogic_update_debug_panel_buffer(g);
 }
 
@@ -332,27 +338,30 @@ void liblogic_handle_npcs(gamestate* const g) {
     if (g->flag != GAMESTATE_FLAG_NPC_TURN) {
         return;
     }
-    //minfo("Handling NPCs");
 
-    // get the next entityid to take a turn
-    gamestate_incr_entity_turn(g);
-    entityid id = g->entity_turn;
+    const entityid id = g->entity_turn;
+    entity* const e = em_get(g->entitymap, id);
+    const int rx = rand() % 3 - 1;
+    const int ry = rand() % 3 - 1;
 
-    entity* e = em_get(g->entitymap, id);
     if (!e) {
         merror("Failed to get entity");
         return;
     }
 
     if (e->type != ENTITY_NPC) {
-        merror("Entity is not an NPC");
+        merrorint("Entity is not an NPC. entityid", e->id);
+        merrorstr("Entity type", e->type == ENTITY_PLAYER ? "PLAYER" : e->type == ENTITY_NPC ? "NPC" : "UNKNOWN");
+
+        //gamestate_increment_entity_turn(g);
+
+        g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+
         return;
     }
 
-    int randomx = rand() % 3 - 1;
-    int randomy = rand() % 3 - 1;
 
-    liblogic_try_entity_move(g, e, randomx, randomy);
+    liblogic_try_entity_move(g, e, rx, ry);
 }
 
 
@@ -362,7 +371,7 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
         return;
     }
     // grab a pointer to the hero
-    entity* e = em_get(g->entitymap, g->hero_id);
+    entity* const e = em_get(g->entitymap, g->hero_id);
     int x = -1;
     int y = -1;
     if (e) {
@@ -413,17 +422,6 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              y);
 }
 
-//void liblogic_close(gamestate* const g) {
-//    if (!g) {
-//        merror("liblogic_close: gamestate is NULL");
-//        return;
-//    }
-//    if (g->entitymap) {
-//        em_free(g->entitymap);
-//        g->entitymap = NULL;
-//    }
-//    msuccess("Logic Close!");
-//}
 
 void liblogic_close(gamestate* const g) {
     if (!g) return;

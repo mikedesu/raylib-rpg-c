@@ -39,7 +39,7 @@ Vector2 zero_vector = {0, 0};
 
 #define DEFAULT_TILE_SIZE 8
 #define SPRITEGROUP_DEFAULT_SIZE 32
-#define ANIM_SPEED 10
+#define ANIM_SPEED 40
 
 
 void libdraw_init(gamestate* const g) {
@@ -223,14 +223,25 @@ void libdraw_update_sprites(gamestate* const g) {
     if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
         bool done = libdraw_check_default_animations(g);
         if (done) {
-            //g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+            gamestate_incr_entity_turn(g);
             g->flag = GAMESTATE_FLAG_NPC_TURN;
         }
     } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
         bool done = libdraw_check_default_animations(g);
         if (done) {
-            g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
-            g->entity_turn = 0;
+
+            gamestate_incr_entity_turn(g);
+
+            if (g->entity_turn == -1) {
+                g->entity_turn = g->hero_id;
+                g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+            } else {
+                g->flag = GAMESTATE_FLAG_NPC_TURN;
+            }
+
+
+            //g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+            //g->entity_turn = 0;
         }
     }
 }

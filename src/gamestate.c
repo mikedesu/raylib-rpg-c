@@ -246,18 +246,19 @@ void gamestate_incr_entity_turn(gamestate* const g) {
             return;
         }
         g->entity_turn = g->hero_id;
+        //g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
     } else {
         // given that entity_turn is an entityid, we need to find the next entity in our
         // entityids array that belongs to an NPC
 
-        int index = gamestate_get_entityid_index(g, g->entity_turn);
+        const int index = gamestate_get_entityid_index(g, g->entity_turn);
 
         if (index == -1) {
             merror("gamestate_incr_entity_turn: index is -1");
             return;
         }
 
-        int next_npc_entityid = gamestate_get_next_npc_entityid_from_index(g, index);
+        const int next_npc_entityid = gamestate_get_next_npc_entityid_from_index(g, index);
 
         //if (next_npc_entityid == -1) {
         //    merror("gamestate_incr_entity_turn: next_npc_entityid is -1");
