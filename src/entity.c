@@ -12,7 +12,7 @@ entity_t* entity_new(const entityid id, const entitytype_t type) {
     e->id = id;
     e->type = type;
     e->race = RACE_NONE;
-    e->direction = DIRECTION_RIGHT;
+    e->direction = DIRECTION_LEFT;
     e->x = -1;
     e->y = -1;
     e->floor = -1;

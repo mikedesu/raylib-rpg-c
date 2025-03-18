@@ -25,20 +25,21 @@ Vector2 zero_vector = {0, 0};
 //#define DEFAULT_WINDOW_WIDTH 400
 //#define DEFAULT_WINDOW_HEIGHT 240
 
-#define DEFAULT_WINDOW_WIDTH 640
-#define DEFAULT_WINDOW_HEIGHT 360
+//#define DEFAULT_WINDOW_WIDTH 640
+//#define DEFAULT_WINDOW_HEIGHT 360
+
 //#define DEFAULT_WINDOW_WIDTH 800
 //#define DEFAULT_WINDOW_HEIGHT 480
 
-//#define DEFAULT_WINDOW_WIDTH 1280
-//#define DEFAULT_WINDOW_HEIGHT 720
+#define DEFAULT_WINDOW_WIDTH 1280
+#define DEFAULT_WINDOW_HEIGHT 720
 
 //#define DEFAULT_WINDOW_WIDTH 960
 //#define DEFAULT_WINDOW_HEIGHT 540
 
 #define DEFAULT_TILE_SIZE 8
 #define SPRITEGROUP_DEFAULT_SIZE 32
-#define ANIM_SPEED 40
+#define ANIM_SPEED 10
 
 
 void libdraw_init(gamestate* const g) {
@@ -47,7 +48,8 @@ void libdraw_init(gamestate* const g) {
         return;
     }
     const char* t = "evildojo666";
-    const int w = DEFAULT_WINDOW_WIDTH, h = DEFAULT_WINDOW_HEIGHT;
+    const int w = DEFAULT_WINDOW_WIDTH;
+    const int h = DEFAULT_WINDOW_HEIGHT;
     InitWindow(w, h, t);
     SetTargetFPS(60);
     //SetExitKey(KEY_Q);
@@ -57,25 +59,11 @@ void libdraw_init(gamestate* const g) {
     spritegroups = hashtable_entityid_spritegroup_create(4);
     libdraw_load_textures();
 
-    // here we are hard-coding the creation of the hero sprite
-    //libdraw_create_spritegroup(g, g->hero_id, TX_HUMAN_KEYS, TX_HUMAN_KEY_COUNT, -12, -12, SPECIFIER_NONE);
-
-    // use the new function to create the spritegroup
-    //libdraw_create_sg_byid(g, g->hero_id);
-
-
-    // we will need to write a function that, given an entityid, does a lookup on the entity
-    // for NPCs, we need to look at the entity race to determine which texture keys, texture key count, offset to use
-    // so we might write a `libdraw_create_sg_byid(gamestate* const g, entityid id)` function
-
-
-    // instead, we want to iterate across our entitymap and create spritegroups for each entity
+    // we want to iterate across our entitymap and create spritegroups for each entity
     for (int i = 0; i < g->index_entityids; i++) {
-        entityid id = g->entityids[i];
-        // use the new function to create the spritegroup
+        const entityid id = g->entityids[i];
         libdraw_create_sg_byid(g, id);
     }
-
 
     libdraw_calc_debugpanel_size(g); // Calculate size
     msuccess("libdraw_init");
@@ -235,7 +223,14 @@ void libdraw_update_sprites(gamestate* const g) {
     if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
         bool done = libdraw_check_default_animations(g);
         if (done) {
+            //g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+            g->flag = GAMESTATE_FLAG_NPC_TURN;
+        }
+    } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
+        bool done = libdraw_check_default_animations(g);
+        if (done) {
             g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+            g->entity_turn = 0;
         }
     }
 }

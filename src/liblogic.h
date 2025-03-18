@@ -36,3 +36,4 @@ void liblogic_update_debug_panel_buffer(gamestate* const g);
 void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y);
 const int liblogic_tile_npc_count(const gamestate* const g, const int x, const int y, const int floor);
 void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
+void liblogic_handle_npcs(gamestate* const g);

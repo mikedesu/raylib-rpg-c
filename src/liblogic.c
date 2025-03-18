@@ -4,6 +4,7 @@
 #include "dungeon_floor.h"
 #include "em.h"
 #include "entity.h"
+#include "entitytype.h"
 #include "gamestate.h"
 #include "libgame_defines.h"
 #include "mprint.h"
@@ -55,6 +56,7 @@ void liblogic_init(gamestate* const g) {
         merror("liblogic_init: gamestate is NULL");
         return;
     }
+
     // init the dungeon and dungeon floor
     g->dungeon = dungeon_create();
     if (!g->dungeon) {
@@ -67,14 +69,17 @@ void liblogic_init(gamestate* const g) {
 
     int herox = 7;
     int heroy = 2;
-    int orcx = 8;
-    int orcy = 3;
     if (liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero") == -1) {
         merror("liblogic_init: failed to init hero");
     }
+    g->entity_turn = g->hero_id;
+
+    int orcx = 8;
+    int orcy = 3;
     if (liblogic_npc_create(g, RACE_ORC, orcx, orcy, 0, "orc") == -1) {
         merror("liblogic_init: failed to create orc");
     }
+
     liblogic_update_debug_panel_buffer(g);
 }
 
@@ -167,22 +172,22 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         minfo("Right pressed!");
         //e->do_update = true;
         liblogic_try_entity_move(g, e, 1, 0);
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
         minfo("left  pressed!");
         //e->do_update = true;
         liblogic_try_entity_move(g, e, -1, 0);
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     } else if (inputstate_is_pressed(is, KEY_UP)) {
         minfo("up pressed!");
         //e->do_update = true;
         liblogic_try_entity_move(g, e, 0, -1);
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
         minfo("down pressed!");
         //e->do_update = true;
         liblogic_try_entity_move(g, e, 0, 1);
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     } else if (inputstate_is_pressed(is, KEY_A)) {
         msuccess("A pressed!");
         // we will try this as a test but eventually
@@ -217,9 +222,14 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         merror(!g ? "Game state is NULL!" : "Entity is NULL!");
         return;
     }
+
     e->do_update = true;
     e->direction = liblogic_get_dir_from_xy(x, y);
-    const int ex = e->x + x, ey = e->y + y, floor = e->floor;
+
+    const int ex = e->x + x;
+    const int ey = e->y + y;
+    const int floor = e->floor;
+
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
         merror("Failed to get dungeon floor");
@@ -244,6 +254,14 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     e->y = ey;
     e->sprite_move_x = x * DEFAULT_TILE_SIZE;
     e->sprite_move_y = y * DEFAULT_TILE_SIZE;
+
+    if (e->type == ENTITY_PLAYER) {
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    } else if (e->type == ENTITY_NPC) {
+        g->flag = GAMESTATE_FLAG_NPC_ANIM;
+    } else {
+        g->flag = GAMESTATE_FLAG_NONE;
+    }
 }
 
 
@@ -290,13 +308,51 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
         merror("Game state is NULL!");
         return;
     }
+
+
     liblogic_handle_input(is, g);
+
+    liblogic_handle_npcs(g);
+
 
     liblogic_update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     //g->currenttimebuf = strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+}
+
+
+void liblogic_handle_npcs(gamestate* const g) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+
+    if (g->flag != GAMESTATE_FLAG_NPC_TURN) {
+        return;
+    }
+    //minfo("Handling NPCs");
+
+    // get the next entityid to take a turn
+    gamestate_incr_entity_turn(g);
+    entityid id = g->entity_turn;
+
+    entity* e = em_get(g->entitymap, id);
+    if (!e) {
+        merror("Failed to get entity");
+        return;
+    }
+
+    if (e->type != ENTITY_NPC) {
+        merror("Entity is not an NPC");
+        return;
+    }
+
+    int randomx = rand() % 3 - 1;
+    int randomy = rand() % 3 - 1;
+
+    liblogic_try_entity_move(g, e, randomx, randomy);
 }
 
 
@@ -326,7 +382,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Current floor: %d\n"
              "Dungeon num floors: %d\n"
              "Num entityids: %d\n"
-             "g->flag: %s\n"
+             "flag: %s\n"
+             "entity_turn: %d\n"
              "Hero: (%d, %d)\n",
              g->timebeganbuf,
              g->currenttimebuf,
@@ -346,7 +403,12 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              : g->flag == GAMESTATE_FLAG_PLAYER_ANIM ? "GAMESTATE_FLAG_PLAYER_ANIM"
              : g->flag == GAMESTATE_FLAG_NONE        ? "GAMESTATE_FLAG_NONE"
              : g->flag == GAMESTATE_FLAG_COUNT       ? "GAMESTATE_FLAG_COUNT"
+             : g->flag == GAMESTATE_FLAG_NPC_TURN    ? "GAMESTATE_FLAG_NPC_TURN"
+             : g->flag == GAMESTATE_FLAG_NPC_ANIM    ? "GAMESTATE_FLAG_NPC_ANIM"
                                                      : "Unknown",
+
+             g->entity_turn,
+
              x,
              y);
 }
@@ -521,13 +583,14 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
                 // Perform attack logic here
                 minfo("Attack successful!");
                 target->is_damaged = true;
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 
-                // temporary test of the orc "attacking back" at the same time...
-                //if (target->race == RACE_ORC) {
-                //    target->is_attacking = true;
-                //    attacker->is_damaged = true;
-                //}
+                if (attacker->type == ENTITY_PLAYER) {
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                } else if (attacker->type == ENTITY_NPC) {
+                    g->flag = GAMESTATE_FLAG_NPC_ANIM;
+                } else {
+                    g->flag = GAMESTATE_FLAG_NONE;
+                }
 
                 return;
             }

@@ -89,6 +89,8 @@ gamestate* gamestateinitptr() {
 
     g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
 
+    g->entity_turn = -1;
+
     return g;
 }
 
@@ -197,4 +199,71 @@ void gamestate_dungeon_destroy(gamestate* const g) {
 
     dungeon_destroy(g->dungeon);
     g->dungeon = NULL;
+}
+
+
+const int gamestate_get_entityid_index(const gamestate* const g, const entityid id) {
+    if (!g) {
+        merror("gamestate_get_entityid_index: g is NULL");
+        return -1;
+    }
+
+    for (int i = 0; i < g->max_entityids; i++) {
+        if (g->entityids[i] == id) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+
+const int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, const int index) {
+    if (!g) {
+        merror("gamestate_get_next_npc_entityid_from_index: g is NULL");
+        return -1;
+    }
+
+    for (int i = index + 1; i < g->max_entityids; i++) {
+        if (g->entityids[i] != -1) {
+            return g->entityids[i];
+        }
+    }
+
+    return -1;
+}
+
+
+void gamestate_incr_entity_turn(gamestate* const g) {
+    if (!g) {
+        merror("gamestate_incr_entity_turn: g is NULL");
+        return;
+    }
+
+    if (g->entity_turn == -1) {
+        if (g->hero_id == -1) {
+            merror("gamestate_incr_entity_turn: both g->entity_turn and g->hero_id are -1");
+            return;
+        }
+        g->entity_turn = g->hero_id;
+    } else {
+        // given that entity_turn is an entityid, we need to find the next entity in our
+        // entityids array that belongs to an NPC
+
+        int index = gamestate_get_entityid_index(g, g->entity_turn);
+
+        if (index == -1) {
+            merror("gamestate_incr_entity_turn: index is -1");
+            return;
+        }
+
+        int next_npc_entityid = gamestate_get_next_npc_entityid_from_index(g, index);
+
+        //if (next_npc_entityid == -1) {
+        //    merror("gamestate_incr_entity_turn: next_npc_entityid is -1");
+        //    return;
+        //}
+
+        g->entity_turn = next_npc_entityid;
+    }
 }
