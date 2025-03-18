@@ -3,6 +3,7 @@
 #include "gamestate.h"
 
 long getlastwritetime(const char* filename);
+
 void gamerun();
 void open_libdraw_handle();
 void checksymbol(void* symbol, const char* name);
