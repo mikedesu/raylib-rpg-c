@@ -58,7 +58,11 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
                 }
             } else {
                 //type = DUNGEON_TILE_TYPE_FLOOR_DIRT;
-                type = DUNGEON_TILE_TYPE_FLOOR_STONE_00;
+
+                type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
+                // randomly generate a value between 0 and 12 inclusive
+
+
                 //dungeon_tile_init(current, DUNGEON_TILE_TYPE_FLOOR_DIRT);
             }
             dungeon_tile_init(current, type);

@@ -49,7 +49,7 @@
 #define TX_STONE_10 37
 #define TX_STONE_11 38
 #define TX_STONE_12 39
-#define TX_STONE_13 40
+//#define TX_STONE_13 40
 
 #define TX_STONEWALL_00 41
 #define TX_STONEWALL_01 42

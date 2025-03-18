@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEFAULT_ZOOM_INCR 0.1f
+#define DEFAULT_ZOOM_INCR 0.01f
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
@@ -75,8 +75,22 @@ void liblogic_init(gamestate* const g) {
     g->entity_turn = g->hero_id;
 
     // create a bunch of orcs in a grid. we'll come back here and place them randomly
+    int num_orcs_to_make = 100;
+    int count = 0;
+    while (count < num_orcs_to_make) {
+        int orcx = rand() % DEFAULT_DUNGEON_FLOOR_WIDTH;
+        int orcy = rand() % DEFAULT_DUNGEON_FLOOR_HEIGHT;
+        if (liblogic_npc_create(g, RACE_ORC, orcx, orcy, 0, "orc") == -1) {
+            merror("liblogic_init: failed to create orc");
+        }
+        count++;
+    }
+
+
     //int orcx = 8;
     //int orcy = 3;
+
+
     //const int rows = 10;
     //const int cols = 10;
     //for (int i = 0; i < rows; i += 2) {
