@@ -41,7 +41,7 @@ Vector2 zero_vector = {0, 0};
 #define SPRITEGROUP_DEFAULT_SIZE 32
 
 //#define ANIM_SPEED 10
-int ANIM_SPEED = 10;
+int ANIM_SPEED = 40;
 
 
 void libdraw_init(gamestate* const g) {
@@ -219,7 +219,7 @@ void libdraw_update_sprites(gamestate* const g) {
     // if we are in npc_anim, then it will be 5
 
     if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM || g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-        ANIM_SPEED = 10;
+        ANIM_SPEED = 40;
     } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM || g->flag == GAMESTATE_FLAG_NPC_TURN) {
         ANIM_SPEED = 1;
     }
