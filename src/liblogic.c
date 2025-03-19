@@ -89,7 +89,7 @@ void liblogic_init(gamestate* const g) {
     g->entity_turn = g->hero_id;
 
     // create a bunch of orcs in a grid. we'll come back here and place them randomly
-    int num_orcs_to_make = 10;
+    int num_orcs_to_make = 100;
     //int num_orcs_to_make = 0;
     int count = 0;
     while (count < num_orcs_to_make) {
@@ -97,8 +97,9 @@ void liblogic_init(gamestate* const g) {
         int orcy = rand() % DEFAULT_DUNGEON_FLOOR_HEIGHT;
         if (liblogic_npc_create(g, RACE_ORC, orcx, orcy, 0, "orc") == -1) {
             merror("liblogic_init: failed to create orc");
+        } else {
+            count++;
         }
-        count++;
     }
 
     liblogic_update_debug_panel_buffer(g);
@@ -272,7 +273,7 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     const int ey = e->y + y;
     const int floor = e->floor;
 
-    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, floor);
+    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
         merror("Failed to get dungeon floor");
         return;
@@ -286,7 +287,7 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         g->flag = GAMESTATE_FLAG_NONE;
     }
 
-    dungeon_tile_t* tile = dungeon_floor_tile_at(df, ex, ey);
+    dungeon_tile_t* const tile = dungeon_floor_tile_at(df, ex, ey);
     if (!tile || ex < 0 || ey < 0) {
         merror(!tile ? "Failed to get tile" : "Cannot move, out of bounds");
         return;
@@ -402,7 +403,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     }
 
     liblogic_handle_input(is, g);
-    liblogic_handle_npcs(g);
+    liblogic_handle_npc(g);
     liblogic_update_debug_panel_buffer(g);
 
     g->currenttime = time(NULL);
@@ -411,7 +412,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
 }
 
 
-void liblogic_handle_npcs(gamestate* const g) {
+void liblogic_handle_npc(gamestate* const g) {
     if (!g) {
         merror("Game state is NULL!");
         return;
@@ -569,7 +570,7 @@ const entityid liblogic_npc_create(gamestate* const g,
         return -1;
     }
     // can we create an entity at this location? no entities can be made on wall-types etc
-    dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+    dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merror("liblogic_entity_create: failed to get tile");
         return -1;
@@ -617,9 +618,9 @@ const entityid liblogic_player_create(gamestate* const g,
         return -1;
     }
     // use the previously-written liblogic_npc_create function
-    entitytype_t type = ENTITY_PLAYER;
+    const entitytype_t type = ENTITY_PLAYER;
     const entityid id = liblogic_npc_create(g, race_type, x, y, floor, name);
-    entity_t* e = em_get(gamestate_get_entitymap(g), id);
+    entity_t* const e = em_get(gamestate_get_entitymap(g), id);
     if (!e) {
         merror("liblogic_player_create: failed to get entity");
         return -1;
@@ -636,19 +637,19 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
         return;
     }
 
-    entity* attacker = em_get(g->entitymap, attacker_id);
+    entity* const attacker = em_get(g->entitymap, attacker_id);
     if (!attacker) {
         merror("liblogic_try_entity_attack: attacker entity not found");
         return;
     }
 
-    dungeon_floor_t* floor = dungeon_get_floor(g->dungeon, attacker->floor);
+    dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, attacker->floor);
     if (!floor) {
         merror("liblogic_try_entity_attack: failed to get dungeon floor");
         return;
     }
 
-    dungeon_tile_t* tile = dungeon_floor_tile_at(floor, target_x, target_y);
+    dungeon_tile_t* const tile = dungeon_floor_tile_at(floor, target_x, target_y);
     if (!tile) {
         merror("liblogic_try_entity_attack: target tile not found");
         return;
@@ -663,12 +664,13 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
                 // Perform attack logic here
                 minfo("Attack successful!");
                 target->is_damaged = true;
-                if (attacker->type == ENTITY_PLAYER)
+                if (attacker->type == ENTITY_PLAYER) {
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-                else if (attacker->type == ENTITY_NPC)
+                } else if (attacker->type == ENTITY_NPC) {
                     g->flag = GAMESTATE_FLAG_NPC_ANIM;
-                else
+                } else {
                     g->flag = GAMESTATE_FLAG_NONE;
+                }
                 return;
             }
         }
@@ -676,10 +678,11 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
 
     merrorint2("liblogic_try_entity_attack: no valid target found at the specified location", target_x, target_y);
 
-    if (attacker->type == ENTITY_PLAYER)
+    if (attacker->type == ENTITY_PLAYER) {
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    else if (attacker->type == ENTITY_NPC)
+    } else if (attacker->type == ENTITY_NPC) {
         g->flag = GAMESTATE_FLAG_NPC_ANIM;
-    else
+    } else {
         g->flag = GAMESTATE_FLAG_NONE;
+    }
 }
