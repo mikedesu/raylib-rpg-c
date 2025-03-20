@@ -88,9 +88,7 @@ void liblogic_init(gamestate* const g) {
     }
     g->entity_turn = g->hero_id;
 
-    // create a bunch of orcs in a grid. we'll come back here and place them randomly
-    int num_orcs_to_make = 3;
-    //int num_orcs_to_make = 0;
+    // create some orcs with names
     liblogic_npc_create(g, RACE_ORC, 8, 2, 0, "orc-mover");
     liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
     liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
@@ -274,10 +272,6 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
 
     if (e->type == ENTITY_PLAYER) {
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        //} else if (e->type == ENTITY_NPC) {
-        //    g->flag = GAMESTATE_FLAG_NPC_ANIM;
-        //} else {
-        //    g->flag = GAMESTATE_FLAG_NONE;
     }
 
     dungeon_tile_t* const tile = dungeon_floor_tile_at(df, ex, ey);
@@ -725,26 +719,23 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
     attacker->is_attacking = true;
     attacker->do_update = true;
 
+    bool attack_successful = false;
+
     for (int i = 0; i < tile->entity_max; i++) {
         if (tile->entities[i] != -1) {
             entity* const target = em_get(g->entitymap, tile->entities[i]);
             if (target && (target->type == ENTITY_NPC || target->type == ENTITY_PLAYER)) {
                 // Perform attack logic here
                 minfo("Attack successful!");
+                attack_successful = true;
                 target->is_damaged = true;
-                if (attacker->type == ENTITY_PLAYER) {
-                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-                } else if (attacker->type == ENTITY_NPC) {
-                    g->flag = GAMESTATE_FLAG_NPC_ANIM;
-                } else {
-                    g->flag = GAMESTATE_FLAG_NONE;
-                }
-                return;
+                break;
             }
         }
     }
 
-    merrorint2("liblogic_try_entity_attack: no valid target found at the specified location", target_x, target_y);
+    if (!attack_successful)
+        merrorint2("liblogic_try_entity_attack: no valid target found at the specified location", target_x, target_y);
 
     if (attacker->type == ENTITY_PLAYER) {
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
