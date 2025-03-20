@@ -91,16 +91,9 @@ void liblogic_init(gamestate* const g) {
     // create a bunch of orcs in a grid. we'll come back here and place them randomly
     int num_orcs_to_make = 3;
     //int num_orcs_to_make = 0;
-    int count = 0;
-    while (count < num_orcs_to_make) {
-        int orcx = rand() % DEFAULT_DUNGEON_FLOOR_WIDTH;
-        int orcy = rand() % DEFAULT_DUNGEON_FLOOR_HEIGHT;
-        if (liblogic_npc_create(g, RACE_ORC, orcx, orcy, 0, "orc") == -1) {
-            merror("liblogic_init: failed to create orc");
-        } else {
-            count++;
-        }
-    }
+    liblogic_npc_create(g, RACE_ORC, 8, 2, 0, "orc-mover");
+    liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
+    liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
 
     liblogic_update_debug_panel_buffer(g);
 }
@@ -465,15 +458,20 @@ void liblogic_handle_npcs(gamestate* const g) {
             continue;
         }
 
-        // Random movement for now (replace with smarter AI later)
-        int rx = rand() % 3 - 1; // -1, 0, or 1
-        int ry = rand() % 3 - 1;
-        if (rx == 0 && ry == 0) {
-            continue; // No movement
-        }
+        // testing attack logic
+        if (strcmp(e->name, "orc-attacker") == 0) {
+            //liblogic_try_entity_move(g, e, 1, 0);
+            liblogic_try_entity_attack(g, e->id, e->x - 1, e->y);
 
-        // Attempt to move the NPC
-        liblogic_try_entity_move(g, e, rx, ry);
+        } else {
+            // Random movement for now (replace with smarter AI later)
+            //int rx = rand() % 3 - 1; // -1, 0, or 1
+            //int ry = rand() % 3 - 1;
+            int rx = -1;
+            int ry = 0;
+            // Attempt to move the NPC
+            liblogic_try_entity_move(g, e, rx, ry);
+        }
     }
 
     // After processing all NPCs, set the flag to animate all movements together
@@ -693,12 +691,20 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
         return;
     }
 
+
+    // Calculate direction based on target position
+    int dx = target_x - attacker->x;
+    int dy = target_y - attacker->y;
+    attacker->direction =
+        liblogic_get_dir_from_xy(dx, dy); // Assumes this function exists to convert dx, dy to a direction
+
     attacker->is_attacking = true;
+    attacker->do_update = true;
 
     for (int i = 0; i < tile->entity_max; i++) {
         if (tile->entities[i] != -1) {
             entity* const target = em_get(g->entitymap, tile->entities[i]);
-            if (target && target->type == ENTITY_NPC) {
+            if (target && (target->type == ENTITY_NPC || target->type == ENTITY_PLAYER)) {
                 // Perform attack logic here
                 minfo("Attack successful!");
                 target->is_damaged = true;
