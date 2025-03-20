@@ -41,7 +41,7 @@ Vector2 zero_vector = {0, 0};
 #define SPRITEGROUP_DEFAULT_SIZE 32
 
 //#define ANIM_SPEED 10
-int ANIM_SPEED = 40;
+int ANIM_SPEED = 10;
 
 
 void libdraw_init(gamestate* const g) {
@@ -218,11 +218,11 @@ void libdraw_update_sprites(gamestate* const g) {
     // if we are in player_anim, then it will be 10
     // if we are in npc_anim, then it will be 5
 
-    if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM || g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-        ANIM_SPEED = 40;
-    } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM || g->flag == GAMESTATE_FLAG_NPC_TURN) {
-        ANIM_SPEED = 1;
-    }
+    //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM || g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+    //    ANIM_SPEED = 10;
+    //} else if (g->flag == GAMESTATE_FLAG_NPC_ANIM || g->flag == GAMESTATE_FLAG_NPC_TURN) {
+    //    ANIM_SPEED = 10;
+    //}
 
 
     // for each entityid in our entitymap, update the spritegroup
@@ -234,28 +234,37 @@ void libdraw_update_sprites(gamestate* const g) {
     // do some additional "thing" yet undecided to determine if
     // we are done processing/animating this turn...
 
+    //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+    //    bool done = libdraw_check_default_animations(g);
+    //    if (done) {
+    //        gamestate_incr_entity_turn(g);
+    //        g->flag = GAMESTATE_FLAG_NPC_TURN;
+    //    }
+    //} else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
+    //    bool done = libdraw_check_default_animations(g);
+    //    if (done) {
+    //        gamestate_incr_entity_turn(g);
+    //        if (g->entity_turn == -1) {
+    //            g->entity_turn = g->hero_id;
+    //            g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+    //        } else {
+    //            g->flag = GAMESTATE_FLAG_NPC_TURN;
+    //        }
+    //    }
+    //}
+
+
+    // Handle state transitions
     if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-        bool done = libdraw_check_default_animations(g);
+        bool done = libdraw_check_default_animations(g); // Or check just the hero
         if (done) {
-            gamestate_incr_entity_turn(g);
             g->flag = GAMESTATE_FLAG_NPC_TURN;
         }
     } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
         bool done = libdraw_check_default_animations(g);
         if (done) {
-
-            gamestate_incr_entity_turn(g);
-
-            if (g->entity_turn == -1) {
-                g->entity_turn = g->hero_id;
-                g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
-            } else {
-                g->flag = GAMESTATE_FLAG_NPC_TURN;
-            }
-
-
-            //g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
-            //g->entity_turn = 0;
+            g->entity_turn = g->hero_id; // Reset directly to hero
+            g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
         }
     }
 }

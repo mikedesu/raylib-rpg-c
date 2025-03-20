@@ -89,7 +89,7 @@ void liblogic_init(gamestate* const g) {
     g->entity_turn = g->hero_id;
 
     // create a bunch of orcs in a grid. we'll come back here and place them randomly
-    int num_orcs_to_make = 100;
+    int num_orcs_to_make = 3;
     //int num_orcs_to_make = 0;
     int count = 0;
     while (count < num_orcs_to_make) {
@@ -281,10 +281,10 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
 
     if (e->type == ENTITY_PLAYER) {
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    } else if (e->type == ENTITY_NPC) {
-        g->flag = GAMESTATE_FLAG_NPC_ANIM;
-    } else {
-        g->flag = GAMESTATE_FLAG_NONE;
+        //} else if (e->type == ENTITY_NPC) {
+        //    g->flag = GAMESTATE_FLAG_NPC_ANIM;
+        //} else {
+        //    g->flag = GAMESTATE_FLAG_NONE;
     }
 
     dungeon_tile_t* const tile = dungeon_floor_tile_at(df, ex, ey);
@@ -403,7 +403,12 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     }
 
     liblogic_handle_input(is, g);
-    liblogic_handle_npc(g);
+
+    if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
+        liblogic_handle_npcs(g);
+    }
+    //liblogic_handle_npc(g);
+
     liblogic_update_debug_panel_buffer(g);
 
     g->currenttime = time(NULL);
@@ -440,6 +445,39 @@ void liblogic_handle_npc(gamestate* const g) {
     }
 
     liblogic_try_entity_move(g, e, rx, ry);
+}
+
+
+void liblogic_handle_npcs(gamestate* const g) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+
+    if (g->flag != GAMESTATE_FLAG_NPC_TURN) {
+        return;
+    }
+
+    // Process all NPCs
+    for (int i = 0; i < g->index_entityids; i++) {
+        entity* e = em_get(g->entitymap, g->entityids[i]);
+        if (!e || e->type != ENTITY_NPC || e->floor != 0) {
+            continue;
+        }
+
+        // Random movement for now (replace with smarter AI later)
+        int rx = rand() % 3 - 1; // -1, 0, or 1
+        int ry = rand() % 3 - 1;
+        if (rx == 0 && ry == 0) {
+            continue; // No movement
+        }
+
+        // Attempt to move the NPC
+        liblogic_try_entity_move(g, e, rx, ry);
+    }
+
+    // After processing all NPCs, set the flag to animate all movements together
+    g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }
 
 
