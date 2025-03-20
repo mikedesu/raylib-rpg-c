@@ -130,11 +130,9 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
     if (e->is_attacking) {
         if (e->race == RACE_HUMAN) {
             sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
-
         } else if (e->race == RACE_ORC) {
             sg->current = SPRITEGROUP_ANIM_ORC_ATTACK;
         }
-
         e->is_attacking = false;
     }
 
@@ -143,13 +141,11 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         // check the race of the entity to determine which animation index to use
         if (e->race == RACE_HUMAN) {
             sg->current = SPRITEGROUP_ANIM_HUMAN_DMG;
-
         } else if (e->race == RACE_ORC) {
             sg->current = SPRITEGROUP_ANIM_ORC_DMG;
         }
         e->is_damaged = false;
     }
-
 
     // Update movement as long as sg->move.x/y is non-zero
     if (sg->move.x > 0) {
@@ -214,16 +210,11 @@ void libdraw_update_sprites(gamestate* const g) {
         return;
     }
 
-    // lets tweak the ANIM_SPEED based on what state we are in
-    // if we are in player_anim, then it will be 10
-    // if we are in npc_anim, then it will be 5
-
     //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM || g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
     //    ANIM_SPEED = 10;
     //} else if (g->flag == GAMESTATE_FLAG_NPC_ANIM || g->flag == GAMESTATE_FLAG_NPC_TURN) {
     //    ANIM_SPEED = 10;
     //}
-
 
     // for each entityid in our entitymap, update the spritegroup
     for (int i = 0; i < g->index_entityids; i++) {
@@ -231,38 +222,25 @@ void libdraw_update_sprites(gamestate* const g) {
         libdraw_update_sprite(g, id);
     }
 
-    // do some additional "thing" yet undecided to determine if
-    // we are done processing/animating this turn...
-
+    // Handle state transitions
     //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-    //    bool done = libdraw_check_default_animations(g);
+    //    bool done = libdraw_check_default_animations(g); // Or check just the hero
     //    if (done) {
-    //        gamestate_incr_entity_turn(g);
     //        g->flag = GAMESTATE_FLAG_NPC_TURN;
     //    }
     //} else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
     //    bool done = libdraw_check_default_animations(g);
     //    if (done) {
-    //        gamestate_incr_entity_turn(g);
-    //        if (g->entity_turn == -1) {
-    //            g->entity_turn = g->hero_id;
-    //            g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
-    //        } else {
-    //            g->flag = GAMESTATE_FLAG_NPC_TURN;
-    //        }
+    //        g->entity_turn = g->hero_id; // Reset directly to hero
+    //        g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
     //    }
     //}
 
-
-    // Handle state transitions
-    if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-        bool done = libdraw_check_default_animations(g); // Or check just the hero
-        if (done) {
+    bool done = libdraw_check_default_animations(g);
+    if (done) {
+        if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
             g->flag = GAMESTATE_FLAG_NPC_TURN;
-        }
-    } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
-        bool done = libdraw_check_default_animations(g);
-        if (done) {
+        } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
             g->entity_turn = g->hero_id; // Reset directly to hero
             g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
         }

@@ -446,37 +446,65 @@ void liblogic_handle_npcs(gamestate* const g) {
         merror("Game state is NULL!");
         return;
     }
-
-    if (g->flag != GAMESTATE_FLAG_NPC_TURN) {
-        return;
-    }
-
+    if (g->flag != GAMESTATE_FLAG_NPC_TURN) return;
     // Process all NPCs
     for (int i = 0; i < g->index_entityids; i++) {
         entity* e = em_get(g->entitymap, g->entityids[i]);
         if (!e || e->type != ENTITY_NPC || e->floor != 0) {
             continue;
         }
-
         // testing attack logic
         if (strcmp(e->name, "orc-attacker") == 0) {
-            //liblogic_try_entity_move(g, e, 1, 0);
             liblogic_try_entity_attack(g, e->id, e->x - 1, e->y);
-
         } else {
-            // Random movement for now (replace with smarter AI later)
-            //int rx = rand() % 3 - 1; // -1, 0, or 1
-            //int ry = rand() % 3 - 1;
-            int rx = -1;
-            int ry = 0;
-            // Attempt to move the NPC
-            liblogic_try_entity_move(g, e, rx, ry);
+            liblogic_try_entity_move(g, e, -1, 0);
         }
     }
-
     // After processing all NPCs, set the flag to animate all movements together
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }
+
+
+/*
+void liblogic_handle_npcs(gamestate* const g) {
+    if (!g || g->flag != GAMESTATE_FLAG_NPC_TURN) return;
+
+    int current_index = gamestate_get_entityid_index(g, g->entity_turn);
+    for (int i = current_index; i < g->index_entityids; i++) {
+        entity* e = em_get(g->entitymap, g->entityids[i]);
+        if (!e || e->type != ENTITY_NPC || e->floor != 0) continue;
+
+        g->entity_turn = e->id; // Track the current NPC
+
+        if (strcmp(e->name, "orc-attacker") == 0) {
+            bool attack_connected = liblogic_try_entity_attack(g, e->id, e->x - 1, e->y);
+            if (attack_connected) {
+                // Set attack animation for this NPC
+                e->is_attacking = true;
+                e->do_update = true;
+
+                // Find the victim (assume it’s the entity at x-1, y for simplicity)
+                entity* victim = liblogic_get_entity_at(g, e->x - 1, e->y);
+                if (victim) {
+                    victim->is_damaged = true;
+                    victim->do_update = true;
+                }
+
+                // Switch to animation state and wait
+                g->flag = GAMESTATE_FLAG_NPC_ANIM;
+                return; // Exit to let animations play
+            }
+        } else {
+            // Non-interactive action (e.g., move left)
+            liblogic_try_entity_move(g, e, -1, 0);
+        }
+    }
+
+    // All NPCs processed, animate remaining actions
+    g->flag = GAMESTATE_FLAG_NPC_ANIM;
+    g->entity_turn = g->hero_id; // Reset for player turn
+}
+*/
 
 
 void liblogic_update_debug_panel_buffer(gamestate* const g) {
@@ -672,25 +700,21 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
         merror("liblogic_try_entity_attack: gamestate is NULL");
         return;
     }
-
     entity* const attacker = em_get(g->entitymap, attacker_id);
     if (!attacker) {
         merror("liblogic_try_entity_attack: attacker entity not found");
         return;
     }
-
     dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, attacker->floor);
     if (!floor) {
         merror("liblogic_try_entity_attack: failed to get dungeon floor");
         return;
     }
-
     dungeon_tile_t* const tile = dungeon_floor_tile_at(floor, target_x, target_y);
     if (!tile) {
         merror("liblogic_try_entity_attack: target tile not found");
         return;
     }
-
 
     // Calculate direction based on target position
     int dx = target_x - attacker->x;
