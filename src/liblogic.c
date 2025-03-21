@@ -397,7 +397,8 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         return;
     }
 
-    if (liblogic_tile_npc_count(g, ex, ey, floor) > 0) {
+    //if (liblogic_tile_npc_count(g, ex, ey, floor) > 0) {
+    if (liblogic_tile_npc_living_count(g, ex, ey, floor) > 0) {
         merror("Cannot move, NPC in the way");
         return;
     }
@@ -870,4 +871,78 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
     } else {
         g->flag = GAMESTATE_FLAG_NONE;
     }
+}
+
+
+const int liblogic_tile_npc_dead_count(const gamestate* const g, const int x, const int y, const int floor) {
+    if (!g) {
+        merror("liblogic_tile_npc_dead_count: gamestate is NULL");
+        return -1;
+    }
+
+    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
+    if (!df) {
+        merror("liblogic_tile_npc_dead_count: failed to get dungeon floor");
+        return -1;
+    }
+
+    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    if (!tile) {
+        merror("liblogic_tile_npc_dead_count: failed to get tile");
+        return -1;
+    }
+
+    // enumerate entities and count dead NPCs
+    int count = 0;
+    for (int i = 0; i < tile->entity_max; i++) {
+        if (tile->entities[i] == -1) {
+            continue;
+        }
+        const entity* const e = em_get(g->entitymap, tile->entities[i]);
+        if (!e) {
+            merror("liblogic_tile_npc_dead_count: failed to get entity");
+            return -1;
+        }
+        if (e->type == ENTITY_NPC && e->is_dead) {
+            count++;
+        }
+    }
+    return count;
+}
+
+
+const int liblogic_tile_npc_living_count(const gamestate* const g, const int x, const int y, const int floor) {
+    if (!g) {
+        merror("liblogic_tile_npc_living_count: gamestate is NULL");
+        return -1;
+    }
+
+    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
+    if (!df) {
+        merror("liblogic_tile_npc_living_count: failed to get dungeon floor");
+        return -1;
+    }
+
+    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    if (!tile) {
+        merror("liblogic_tile_npc_living_count: failed to get tile");
+        return -1;
+    }
+
+    // enumerate entities and count living NPCs
+    int count = 0;
+    for (int i = 0; i < tile->entity_max; i++) {
+        if (tile->entities[i] == -1) {
+            continue;
+        }
+        const entity* const e = em_get(g->entitymap, tile->entities[i]);
+        if (!e) {
+            merror("liblogic_tile_npc_living_count: failed to get entity");
+            return -1;
+        }
+        if (e->type == ENTITY_NPC && !e->is_dead) {
+            count++;
+        }
+    }
+    return count;
 }
