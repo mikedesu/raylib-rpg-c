@@ -188,8 +188,15 @@ void liblogic_init(gamestate* const g) {
 
     int orc_basex = 8;
     int orc_basey = 2;
-    int rows = 10;
-    int cols = 10;
+    //int rows = 10;
+    //int cols = 10;
+    //int rows = 34;
+    //int cols = 30;
+
+    int rows = 34;
+    int cols = 30;
+
+
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_basex + j, orc_basey + i, 0, "orc");

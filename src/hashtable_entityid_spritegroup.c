@@ -99,7 +99,9 @@ void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* con
     const int index = hashtable_entityid_spritegroup_hash(ht, key);
     hashtable_entityid_spritegroup_node_t* new_node =
         (hashtable_entityid_spritegroup_node_t*)malloc(sizeof(hashtable_entityid_spritegroup_node_t));
-    new_node->key = key, new_node->value = value, new_node->next = ht->table[index]; // insert at head
+    new_node->key = key;
+    new_node->value = value;
+    new_node->next = ht->table[index]; // insert at head
     ht->table[index] = new_node;
 }
 

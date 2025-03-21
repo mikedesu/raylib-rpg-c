@@ -59,7 +59,8 @@ void libdraw_init(gamestate* const g) {
     target = LoadRenderTexture(w, h);
     target_src = (Rectangle){0, 0, w, -h};
     target_dest = (Rectangle){0, 0, w, h};
-    spritegroups = hashtable_entityid_spritegroup_create(4);
+    //spritegroups = hashtable_entityid_spritegroup_create(4);
+    spritegroups = hashtable_entityid_spritegroup_create(100000);
     libdraw_load_textures();
 
     // we want to iterate across our entitymap and create spritegroups for each entity
@@ -491,7 +492,7 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (!sg) {
-        merrorint("libdraw_draw_sprite_and_shadow: spritegroup not found", id);
+        //merrorint("libdraw_draw_sprite_and_shadow: spritegroup not found", id);
         return;
     }
     sprite* s = spritegroup_get(sg, sg->current);
@@ -663,16 +664,16 @@ void libdraw_create_spritegroup(gamestate* const g,
     minfo("libdraw_create_spritegroup: creating spritegroup");
     for (int i = 0; i < TX_HUMAN_KEY_COUNT; i++) {
         int k = keys[i];
-        minfo("beginning loop");
-        minfoint("k", k);
+        //minfo("beginning loop");
+        //minfoint("k", k);
         Texture2D* tex = &txinfo[k].texture;
-        minfo("got texture");
+        //minfo("got texture");
         sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
-        minfo("created sprite");
+        //minfo("created sprite");
         spritegroup_add(group, s);
-        minfo("added sprite");
+        //minfo("added sprite");
     }
-    minfo("loop done");
+    //minfo("loop done");
     spritegroup_set_specifier(group, spec);
     group->id = id;
     sprite* s = spritegroup_get(group, 0);

@@ -11,7 +11,7 @@
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 5
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 5
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
-#define GAMESTATE_INIT_ENTITYIDS_MAX 1000
+#define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
 
 // have to update this function when we introduce new fields to Gamestate
 gamestate* gamestateinitptr() {
