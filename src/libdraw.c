@@ -107,9 +107,14 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         return;
     }
 
+
     spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (!sg) {
         merrorint("libdraw_update_sprite: spritegroup not found", id);
+        return;
+    }
+
+    if (e->is_dead && !spritegroup_is_animating(sg)) {
         return;
     }
 

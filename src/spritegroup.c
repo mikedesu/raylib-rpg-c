@@ -180,3 +180,17 @@ void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, const bool do_s
     }
     shadow->stop_on_last_frame = do_stop;
 }
+
+
+const bool spritegroup_is_animating(spritegroup_t* const sg) {
+    if (!sg) {
+        merror("spritegroup_is_animating: spritegroup is NULL");
+        return false;
+    }
+    sprite* s = sg->sprites[sg->current];
+    if (!s) {
+        merror("spritegroup_is_animating: sprite is NULL");
+        return false;
+    }
+    return s->is_animating;
+}
