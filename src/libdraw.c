@@ -340,23 +340,48 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
     // we will come back here and update the order
     // so that dead entities arent drawn over others,
     // player gets drawn on top, etc
+    //for (int y = 0; y < df->height; y++) {
+    //    for (int x = 0; x < df->width; x++) {
+    //        // draw the entities on the tile
+    //        dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+    //        if (!tile) {
+    //            merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
+    //            return;
+    //        }
+    //        if (dungeon_tile_is_wall(tile->type)) continue;
+    //        const int num_entities = dungeon_tile_entity_count(tile);
+    //        for (int i = 0; i < num_entities; i++) {
+    //            const entityid id = dungeon_tile_get_entity(tile, i);
+    //            if (id == -1) {
+    //                merrorint2("libdraw_draw_dungeon_floor: entity id is -1", x, y);
+    //                return;
+    //            }
+    //            libdraw_draw_sprite_and_shadow(g, id);
+    //        }
+    //    }
+    //}
+
+    // First pass: dead entities
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            // draw the entities on the tile
             dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
-            if (!tile) {
-                merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
-                return;
+            if (!tile || dungeon_tile_is_wall(tile->type)) continue;
+            for (int i = 0; i < dungeon_tile_entity_count(tile); i++) {
+                entityid id = dungeon_tile_get_entity(tile, i);
+                entity* e = em_get(g->entitymap, id);
+                if (e && e->is_dead) libdraw_draw_sprite_and_shadow(g, id);
             }
-            if (dungeon_tile_is_wall(tile->type)) continue;
-            const int num_entities = dungeon_tile_entity_count(tile);
-            for (int i = 0; i < num_entities; i++) {
-                const entityid id = dungeon_tile_get_entity(tile, i);
-                if (id == -1) {
-                    merrorint2("libdraw_draw_dungeon_floor: entity id is -1", x, y);
-                    return;
-                }
-                libdraw_draw_sprite_and_shadow(g, id);
+        }
+    }
+    // Second pass: alive entities
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+            if (!tile || dungeon_tile_is_wall(tile->type)) continue;
+            for (int i = 0; i < dungeon_tile_entity_count(tile); i++) {
+                entityid id = dungeon_tile_get_entity(tile, i);
+                entity* e = em_get(g->entitymap, id);
+                if (e && !e->is_dead) libdraw_draw_sprite_and_shadow(g, id);
             }
         }
     }
