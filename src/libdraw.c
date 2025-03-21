@@ -41,8 +41,9 @@ Vector2 zero_vector = {0, 0};
 #define DEFAULT_TILE_SIZE 8
 #define SPRITEGROUP_DEFAULT_SIZE 32
 
-//#define ANIM_SPEED 10
-int ANIM_SPEED = 10;
+//#define DEFAULT_ANIM_SPEED 10
+#define DEFAULT_ANIM_SPEED 5
+int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 
 void libdraw_init(gamestate* const g) {
@@ -59,8 +60,8 @@ void libdraw_init(gamestate* const g) {
     target = LoadRenderTexture(w, h);
     target_src = (Rectangle){0, 0, w, -h};
     target_dest = (Rectangle){0, 0, w, h};
-    //spritegroups = hashtable_entityid_spritegroup_create(4);
-    spritegroups = hashtable_entityid_spritegroup_create(100000);
+    spritegroups = hashtable_entityid_spritegroup_create(4);
+    //spritegroups = hashtable_entityid_spritegroup_create(100000);
     libdraw_load_textures();
 
     // we want to iterate across our entitymap and create spritegroups for each entity

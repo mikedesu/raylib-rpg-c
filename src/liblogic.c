@@ -192,14 +192,19 @@ void liblogic_init(gamestate* const g) {
     //int cols = 10;
     //int rows = 34;
     //int cols = 30;
+    int count = 0;
+    int total_orcs_to_make = 1000;
 
-    int rows = 34;
-    int cols = 30;
+    dungeon_t* d = g->dungeon;
+    dungeon_floor_t* df = d->floors[0];
+    if (!df) {
+        merror("liblogic_init: failed to get dungeon floor");
+        return;
+    }
 
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_basex + j, orc_basey + i, 0, "orc");
+    for (int y = orc_basey; y < df->height; y++) {
+        for (int x = orc_basex; x < df->width; x++) {
+            entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_basex + x, orc_basey + y, 0, "orc");
             if (orc_id == -1) {
                 merror("liblogic_init: failed to init orc");
             }
@@ -208,7 +213,16 @@ void liblogic_init(gamestate* const g) {
                 entity_set_default_action(orc, ENTITY_ACTION_MOVE_RANDOM);
                 entity_set_maxhp(orc, 3);
                 entity_set_hp(orc, 3);
+                count++;
             }
+
+            if (count >= total_orcs_to_make) {
+                break;
+            }
+        }
+
+        if (count >= total_orcs_to_make) {
+            break;
         }
     }
 

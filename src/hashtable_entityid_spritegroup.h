@@ -17,6 +17,7 @@ typedef struct hashtable_entityid_spritegroup_node_t {
 typedef struct hashtable_entityid_spritegroup_t {
     hashtable_entityid_spritegroup_node_t** table;
     int size;
+    int num_entries;
 } hashtable_entityid_spritegroup_t;
 
 hashtable_entityid_spritegroup_t* hashtable_entityid_spritegroup_create(const int size);
