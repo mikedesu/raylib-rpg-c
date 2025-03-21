@@ -42,6 +42,7 @@ Vector2 zero_vector = {0, 0};
 #define SPRITEGROUP_DEFAULT_SIZE 32
 
 //#define DEFAULT_ANIM_SPEED 10
+
 #define DEFAULT_ANIM_SPEED 5
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
@@ -445,6 +446,7 @@ void libdraw_drawframe(gamestate* const g) {
     double start_time = GetTime();
 
     BeginDrawing();
+    ClearBackground(WHITE);
     BeginTextureMode(target);
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
