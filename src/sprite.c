@@ -40,7 +40,13 @@ void sprite_incrframe(sprite* const s) {
         s->is_animating = false;
         return;
     }
-    s->currentframe = (s->currentframe + 1) % s->numframes;
+    //s->currentframe = (s->currentframe + 1) % s->numframes;
+    s->currentframe++;
+    if (s->currentframe >= s->numframes) {
+        s->currentframe = 0;
+    }
+
+
     s->src.x = s->width * s->currentframe;
     if (s->currentframe == 0) s->num_loops++;
     //s->num_loops = s->num_loops + (s->currentframe == 0 ? 1 : 0);
