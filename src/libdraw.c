@@ -61,7 +61,9 @@ void libdraw_init(gamestate* const g) {
     target = LoadRenderTexture(w, h);
     target_src = (Rectangle){0, 0, w, -h};
     target_dest = (Rectangle){0, 0, w, h};
-    spritegroups = hashtable_entityid_spritegroup_create(4);
+
+    const size_t size = 128;
+    spritegroups = hashtable_entityid_spritegroup_create(size);
     //spritegroups = hashtable_entityid_spritegroup_create(100000);
     libdraw_load_textures();
 

@@ -7,7 +7,7 @@
 
 
 //#define EM_MAX_SLOTS 1024
-#define EM_MAX_SLOTS 8192
+#define EM_MAX_SLOTS (1024 * 64)
 
 typedef struct {
     entity_t* entities[EM_MAX_SLOTS];
