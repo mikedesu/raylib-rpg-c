@@ -7,6 +7,8 @@
 #include "race.h"
 #include <stdbool.h>
 
+#include "entity_actions.h" // Include the new enum
+
 #define ENTITY_NAME_LEN_MAX 64
 
 // forward declaration
@@ -26,12 +28,13 @@ typedef struct entity_t {
     int sprite_move_x;
     int sprite_move_y;
 
-    entity_t* next;
-
     bool do_update;
-
     bool is_attacking;
     bool is_damaged;
+
+    entity_action_t default_action; // New field
+
+    entity_t* next;
 
 } entity;
 
@@ -58,3 +61,7 @@ const direction_t entity_get_dir(entity_t* const e);
 
 void entity_set_type(entity_t* const e, const entitytype_t type);
 const entitytype_t entity_get_type(entity_t* const e);
+
+
+void entity_set_default_action(entity_t* const e, const entity_action_t action);
+const entity_action_t entity_get_default_action(entity_t* const e);

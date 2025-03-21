@@ -24,6 +24,7 @@ entity_t* entity_new(const entityid id, const entitytype_t type) {
     e->is_damaged = false;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     e->next = NULL;
+    e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
     return e;
 }
 
@@ -210,4 +211,26 @@ const entitytype_t entity_get_type(entity_t* const e) {
     }
 
     return e->type;
+}
+
+
+void entity_set_default_action(entity_t* const e, const entity_action_t action) {
+    if (!e) {
+        merror("entity_set_default_action: e is NULL");
+        return;
+    }
+    if (action < 0 || action >= ENTITY_ACTION_COUNT) {
+        merror("entity_set_default_action: action is out of bounds");
+        return;
+    }
+    e->default_action = action;
+}
+
+
+const entity_action_t entity_get_default_action(entity_t* const e) {
+    if (!e) {
+        merror("entity_get_default_action: e is NULL");
+        return ENTITY_ACTION_NONE;
+    }
+    return e->default_action;
 }

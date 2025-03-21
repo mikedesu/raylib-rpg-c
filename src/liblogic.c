@@ -64,6 +64,98 @@ static inline int liblogic_get_y_from_dir(const direction_t dir) {
 }
 
 
+// liblogic.c (add this function)
+static void liblogic_execute_action(gamestate* const g, entity* e, entity_action_t action) {
+    switch (action) {
+    case ENTITY_ACTION_MOVE_LEFT:
+        liblogic_try_entity_move(g, e, -1, 0);
+        break;
+    case ENTITY_ACTION_MOVE_RIGHT:
+        liblogic_try_entity_move(g, e, 1, 0);
+        break;
+    case ENTITY_ACTION_MOVE_UP:
+        liblogic_try_entity_move(g, e, 0, -1);
+        break;
+    case ENTITY_ACTION_MOVE_DOWN:
+        liblogic_try_entity_move(g, e, 0, 1);
+        break;
+    case ENTITY_ACTION_MOVE_UP_LEFT:
+        liblogic_try_entity_move(g, e, -1, -1);
+        break;
+    case ENTITY_ACTION_MOVE_UP_RIGHT:
+        liblogic_try_entity_move(g, e, 1, -1);
+        break;
+    case ENTITY_ACTION_MOVE_DOWN_LEFT:
+        liblogic_try_entity_move(g, e, -1, 1);
+        break;
+    case ENTITY_ACTION_MOVE_DOWN_RIGHT:
+        liblogic_try_entity_move(g, e, 1, 1);
+        break;
+    case ENTITY_ACTION_ATTACK_LEFT:
+        liblogic_try_entity_attack(g, e->id, e->x - 1, e->y);
+        break;
+    case ENTITY_ACTION_ATTACK_RIGHT:
+        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y);
+        break;
+    case ENTITY_ACTION_ATTACK_UP:
+        liblogic_try_entity_attack(g, e->id, e->x, e->y - 1);
+        break;
+    case ENTITY_ACTION_ATTACK_DOWN:
+        liblogic_try_entity_attack(g, e->id, e->x, e->y + 1);
+        break;
+    case ENTITY_ACTION_ATTACK_UP_LEFT:
+        liblogic_try_entity_attack(g, e->id, e->x - 1, e->y - 1);
+        break;
+    case ENTITY_ACTION_ATTACK_UP_RIGHT:
+        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y - 1);
+        break;
+    case ENTITY_ACTION_ATTACK_DOWN_LEFT:
+        liblogic_try_entity_attack(g, e->id, e->x - 1, e->y + 1);
+        break;
+    case ENTITY_ACTION_ATTACK_DOWN_RIGHT:
+        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y + 1);
+        break;
+    case ENTITY_ACTION_MOVE_RANDOM: {
+        int rx = rand() % 3 - 1; // -1, 0, 1
+        int ry = rand() % 3 - 1;
+        if (rx != 0 || ry != 0) liblogic_try_entity_move(g, e, rx, ry);
+        break;
+    }
+    case ENTITY_ACTION_ATTACK_RANDOM: {
+        int rx = rand() % 3 - 1;
+        int ry = rand() % 3 - 1;
+        if (rx != 0 || ry != 0) liblogic_try_entity_attack(g, e->id, e->x + rx, e->y + ry);
+        break;
+    }
+    case ENTITY_ACTION_MOVE_PLAYER: {
+        entity* hero = em_get(g->entitymap, g->hero_id);
+        if (hero) {
+            int dx = (hero->x > e->x) ? 1 : (hero->x < e->x) ? -1 : 0;
+            int dy = (hero->y > e->y) ? 1 : (hero->y < e->y) ? -1 : 0;
+            if (dx != 0 || dy != 0) liblogic_try_entity_move(g, e, dx, dy);
+        }
+        break;
+    }
+    case ENTITY_ACTION_ATTACK_PLAYER: {
+        entity* hero = em_get(g->entitymap, g->hero_id);
+        if (hero) {
+            int dx = hero->x - e->x;
+            int dy = hero->y - e->y;
+            if (abs(dx) <= 1 && abs(dy) <= 1) // Adjacent check
+                liblogic_try_entity_attack(g, e->id, hero->x, hero->y);
+        }
+        break;
+    }
+    case ENTITY_ACTION_WAIT:
+        // Do nothing for now (future healing logic can go here)
+        break;
+    default:
+        //merror("Unknown entity action: %d", action);
+        break;
+    }
+}
+
+
 void liblogic_init(gamestate* const g) {
     if (!g) {
         merror("liblogic_init: gamestate is NULL");
@@ -89,9 +181,20 @@ void liblogic_init(gamestate* const g) {
     g->entity_turn = g->hero_id;
 
     // create some orcs with names
-    liblogic_npc_create(g, RACE_ORC, 8, 2, 0, "orc-mover");
-    liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
-    liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
+    entityid orc0 = liblogic_npc_create(g, RACE_ORC, 8, 2, 0, "orc-mover");
+    entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
+    entityid orc2 = liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
+
+    entity* const e0 = em_get(g->entitymap, orc0);
+    entity* const e1 = em_get(g->entitymap, orc1);
+    entity* const e2 = em_get(g->entitymap, orc2);
+
+    entity_action_t action = ENTITY_ACTION_MOVE_PLAYER;
+
+    entity_set_default_action(e0, action);
+    entity_set_default_action(e1, action);
+    entity_set_default_action(e2, action);
+
 
     liblogic_update_debug_panel_buffer(g);
 }
@@ -448,11 +551,12 @@ void liblogic_handle_npcs(gamestate* const g) {
             continue;
         }
         // testing attack logic
-        if (strcmp(e->name, "orc-attacker") == 0) {
-            liblogic_try_entity_attack(g, e->id, e->x - 1, e->y);
-        } else {
-            liblogic_try_entity_move(g, e, -1, 0);
-        }
+        //if (strcmp(e->name, "orc-attacker") == 0) {
+        //    liblogic_try_entity_attack(g, e->id, e->x - 1, e->y);
+        //} else {
+        //    liblogic_try_entity_move(g, e, -1, 0);
+        //}
+        liblogic_execute_action(g, e, e->default_action);
     }
     // After processing all NPCs, set the flag to animate all movements together
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
