@@ -709,7 +709,7 @@ void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t 
         return;
     }
 
-    minfoint2("libdraw_update_sprite_context: updating sprite context for entity", id, dir);
+    //minfoint2("libdraw_update_sprite_context: updating sprite context for entity", id, dir);
 
 
     spritegroup_t* group = hashtable_entityid_spritegroup_get(spritegroups, id); // Adjusted for no specifier

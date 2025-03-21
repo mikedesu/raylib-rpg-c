@@ -8,6 +8,7 @@
 #include "gamestate.h"
 #include "libgame_defines.h"
 #include "mprint.h"
+#include "race.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -181,28 +182,47 @@ void liblogic_init(gamestate* const g) {
     g->entity_turn = g->hero_id;
 
     // create some orcs with names
-    entityid orc0 = liblogic_npc_create(g, RACE_ORC, 8, 2, 0, "orc-mover");
-    entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
-    entityid orc2 = liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
+    //entityid orc0 = liblogic_npc_create(g, RACE_ORC, 8, 2, 0, "orc-mover");
+    //entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
+    //entityid orc2 = liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
 
-    entity* const e0 = em_get(g->entitymap, orc0);
-    entity* const e1 = em_get(g->entitymap, orc1);
-    entity* const e2 = em_get(g->entitymap, orc2);
+    int orc_basex = 8;
+    int orc_basey = 2;
+    int rows = 10;
+    int cols = 10;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_basex + j, orc_basey + i, 0, "orc");
+            if (orc_id == -1) {
+                merror("liblogic_init: failed to init orc");
+            }
+            entity* const orc = em_get(g->entitymap, orc_id);
+            if (orc) {
+                entity_set_default_action(orc, ENTITY_ACTION_MOVE_RANDOM);
+                entity_set_maxhp(orc, 3);
+                entity_set_hp(orc, 3);
+            }
+        }
+    }
 
-    entity_set_maxhp(e0, 3);
-    entity_set_maxhp(e1, 3);
-    entity_set_maxhp(e2, 3);
+    //entity* const e0 = em_get(g->entitymap, orc0);
+    //entity* const e1 = em_get(g->entitymap, orc1);
+    //entity* const e2 = em_get(g->entitymap, orc2);
 
-    entity_set_hp(e0, 3);
-    entity_set_hp(e1, 3);
-    entity_set_hp(e2, 3);
+    //entity_set_maxhp(e0, 3);
+    //entity_set_maxhp(e1, 3);
+    //entity_set_maxhp(e2, 3);
+
+    //entity_set_hp(e0, 3);
+    //entity_set_hp(e1, 3);
+    //entity_set_hp(e2, 3);
 
 
-    entity_action_t action = ENTITY_ACTION_MOVE_PLAYER;
+    //entity_action_t action = ENTITY_ACTION_MOVE_PLAYER;
 
-    entity_set_default_action(e0, action);
-    entity_set_default_action(e1, action);
-    entity_set_default_action(e2, action);
+    //entity_set_default_action(e0, action);
+    //entity_set_default_action(e1, action);
+    //entity_set_default_action(e2, action);
 
 
     liblogic_update_debug_panel_buffer(g);
@@ -371,10 +391,7 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
 
     e->do_update = true;
     e->direction = liblogic_get_dir_from_xy(x, y);
-
-    const int ex = e->x + x;
-    const int ey = e->y + y;
-    const int floor = e->floor;
+    const int ex = e->x + x, ey = e->y + y, floor = e->floor;
 
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
@@ -382,6 +399,7 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         return;
     }
 
+    // i feel like this might be something we can set elsewhere...like after the player input phase?
     if (e->type == ENTITY_PLAYER) {
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     }
@@ -397,7 +415,6 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         return;
     }
 
-    //if (liblogic_tile_npc_count(g, ex, ey, floor) > 0) {
     if (liblogic_tile_npc_living_count(g, ex, ey, floor) > 0) {
         merror("Cannot move, NPC in the way");
         return;
@@ -410,10 +427,8 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
 
     dungeon_floor_remove_at(df, e->id, e->x, e->y);
     dungeon_floor_add_at(df, e->id, ex, ey);
-    e->x = ex;
-    e->y = ey;
-    e->sprite_move_x = x * DEFAULT_TILE_SIZE;
-    e->sprite_move_y = y * DEFAULT_TILE_SIZE;
+    e->x = ex, e->y = ey;
+    e->sprite_move_x = x * DEFAULT_TILE_SIZE, e->sprite_move_y = y * DEFAULT_TILE_SIZE;
 }
 
 
