@@ -27,10 +27,13 @@ typedef struct entity_t {
     int floor;
     int sprite_move_x;
     int sprite_move_y;
+    int hp;
+    int maxhp;
 
     bool do_update;
     bool is_attacking;
     bool is_damaged;
+    bool is_dead;
 
     entity_action_t default_action; // New field
 
@@ -65,3 +68,8 @@ const entitytype_t entity_get_type(entity_t* const e);
 
 void entity_set_default_action(entity_t* const e, const entity_action_t action);
 const entity_action_t entity_get_default_action(entity_t* const e);
+
+void entity_set_hp(entity_t* const e, const int hp);
+const int entity_get_hp(entity_t* const e);
+void entity_set_maxhp(entity_t* const e, const int maxhp);
+const int entity_get_maxhp(entity_t* const e);

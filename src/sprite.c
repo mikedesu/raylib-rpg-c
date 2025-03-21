@@ -19,6 +19,8 @@ sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) 
     s->texture = t;
     s->width = t->width / numframes;
     s->height = t->height / numcontexts;
+    s->stop_on_last_frame = false;
+    s->is_animating = true;
     // setting the source of the texture is about which frame and context we are on
     // context is the y access aka which row of sprites
     // frame is the x access aka which column of sprites
@@ -33,6 +35,11 @@ sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) 
 
 void sprite_incrframe(sprite* const s) {
     if (!s) return;
+    if (!s->is_animating) return;
+    if (s->stop_on_last_frame && s->currentframe == s->numframes - 1) {
+        s->is_animating = false;
+        return;
+    }
     s->currentframe = (s->currentframe + 1) % s->numframes;
     s->src.x = s->width * s->currentframe;
     if (s->currentframe == 0) s->num_loops++;
@@ -75,4 +82,14 @@ void sprite_destroy(sprite* s) {
 
 const int sprite_get_context(const sprite* const s) {
     return !s ? -1 : s->currentcontext;
+}
+
+
+void sprite_set_is_animating(sprite* const s, const bool is_animating) {
+    if (!s) return;
+    s->is_animating = is_animating;
+}
+
+const bool sprite_is_animating(const sprite* const s) {
+    return !s ? false : s->is_animating;
 }

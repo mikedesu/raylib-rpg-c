@@ -24,8 +24,10 @@
 20 4 6  0  img/characters/shadows/orc_chargedattack_shadow.png
 21 4 4  0  img/characters/orc_jump.png
 22 4 4  0  img/characters/shadows/orc_jump_shadow.png
-23 1 12 0  img/characters/orc_die.png
-24 1 12 0  img/characters/shadows/orc_die_shadow.png
+#23 1 12 0  img/characters/orc_die.png
+#24 1 12 0  img/characters/shadows/orc_die_shadow.png
+23 1 7 0  img/characters/orc_die2.png
+24 1 7 0  img/characters/shadows/orc_die2_shadow.png
 25 4 4  0  img/characters/orc_dmg.png
 26 4 4  0  img/characters/shadows/orc_dmg_shadow.png
 27 1 1  0  img/tiles/stone_00.png

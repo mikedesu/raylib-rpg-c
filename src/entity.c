@@ -17,11 +17,14 @@ entity_t* entity_new(const entityid id, const entitytype_t type) {
     e->x = -1;
     e->y = -1;
     e->floor = -1;
+    e->hp = 1;
+    e->maxhp = 1;
     e->do_update = false;
     e->sprite_move_x = 0;
     e->sprite_move_y = 0;
     e->is_attacking = false;
     e->is_damaged = false;
+    e->is_dead = false;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     e->next = NULL;
     e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
@@ -233,4 +236,40 @@ const entity_action_t entity_get_default_action(entity_t* const e) {
         return ENTITY_ACTION_NONE;
     }
     return e->default_action;
+}
+
+
+void entity_set_hp(entity_t* const e, const int hp) {
+    if (!e) {
+        merror("entity_set_hp: e is NULL");
+        return;
+    }
+    e->hp = hp;
+}
+
+
+const int entity_get_hp(entity_t* const e) {
+    if (!e) {
+        merror("entity_get_hp: e is NULL");
+        return -1;
+    }
+    return e->hp;
+}
+
+
+void entity_set_maxhp(entity_t* const e, const int maxhp) {
+    if (!e) {
+        merror("entity_set_maxhp: e is NULL");
+        return;
+    }
+    e->maxhp = maxhp;
+}
+
+
+const int entity_get_maxhp(entity_t* const e) {
+    if (!e) {
+        merror("entity_get_maxhp: e is NULL");
+        return -1;
+    }
+    return e->maxhp;
 }

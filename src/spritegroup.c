@@ -144,3 +144,35 @@ const int spritegroup_get_first_context(spritegroup_t* const sg) {
     }
     return sprite_get_context(sg->sprites[0]);
 }
+
+
+void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, const bool do_stop) {
+    if (!sg) {
+        merror("spritegroup_set_stop_on_last_frame: spritegroup is NULL");
+        return;
+    }
+
+    // get the current sprite
+    sprite* s = sg->sprites[sg->current];
+    if (!s) {
+        merror("spritegroup_set_stop_on_last_frame: sprite is NULL");
+        return;
+    }
+
+    // set the stop_on_last_frame flag
+    s->stop_on_last_frame = do_stop;
+
+    // lets also set stopframe on any possible shadow sprites
+    // first make sure sg->current+1 does not exceed our bounds
+    if (sg->current + 1 >= sg->size) {
+        merrorint("spritegroup_set_stop_on_last_frame: current sprite index is out of bounds", sg->current);
+        return;
+    }
+
+    sprite* shadow = sg->sprites[sg->current + 1];
+    if (!shadow) {
+        merrorint("spritegroup_set_stop_on_last_frame: shadow sprite is NULL", sg->current + 1);
+        return;
+    }
+    shadow->stop_on_last_frame = do_stop;
+}

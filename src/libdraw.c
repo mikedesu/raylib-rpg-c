@@ -6,6 +6,7 @@
 #include "hashtable_entityid_spritegroup.h"
 //#include "libgame_defines.h"
 #include "mprint.h"
+#include "race.h"
 #include "sprite.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -134,10 +135,7 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
             sg->current = SPRITEGROUP_ANIM_ORC_ATTACK;
         }
         e->is_attacking = false;
-    }
-
-    // simple damage switch
-    if (e->is_damaged) {
+    } else if (e->is_damaged) {
         // check the race of the entity to determine which animation index to use
         if (e->race == RACE_HUMAN) {
             sg->current = SPRITEGROUP_ANIM_HUMAN_DMG;
@@ -145,6 +143,19 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
             sg->current = SPRITEGROUP_ANIM_ORC_DMG;
         }
         e->is_damaged = false;
+    } else if (e->is_dead) {
+        if (e->race == RACE_HUMAN) {
+            sg->current = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
+            // unlike the other animations, once a entity is dead, we want to change the
+            // default animation for the spritegroup
+            sg->default_anim = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
+
+            spritegroup_set_stop_on_last_frame(sg, true);
+        } else if (e->race == RACE_ORC) {
+            sg->current = SPRITEGROUP_ANIM_ORC_DIE;
+            sg->default_anim = SPRITEGROUP_ANIM_ORC_DIE;
+            spritegroup_set_stop_on_last_frame(sg, true);
+        }
     }
 
     // Update movement as long as sg->move.x/y is non-zero
@@ -326,6 +337,9 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
 
 
     // draw all non-wall tile entities
+    // we will come back here and update the order
+    // so that dead entities arent drawn over others,
+    // player gets drawn on top, etc
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             // draw the entities on the tile

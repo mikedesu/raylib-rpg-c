@@ -37,3 +37,5 @@ void spritegroup_set(spritegroup_t* const sg, const int index, sprite* s);
 void spritegroup_setcontexts(spritegroup_t* const sg, const int context);
 void spritegroup_destroy(spritegroup_t* sg);
 void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec);
+
+void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, const bool do_stop);

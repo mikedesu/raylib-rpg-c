@@ -189,6 +189,15 @@ void liblogic_init(gamestate* const g) {
     entity* const e1 = em_get(g->entitymap, orc1);
     entity* const e2 = em_get(g->entitymap, orc2);
 
+    entity_set_maxhp(e0, 3);
+    entity_set_maxhp(e1, 3);
+    entity_set_maxhp(e2, 3);
+
+    entity_set_hp(e0, 3);
+    entity_set_hp(e1, 3);
+    entity_set_hp(e2, 3);
+
+
     entity_action_t action = ENTITY_ACTION_MOVE_PLAYER;
 
     entity_set_default_action(e0, action);
@@ -550,6 +559,11 @@ void liblogic_handle_npcs(gamestate* const g) {
         if (!e || e->type != ENTITY_NPC || e->floor != 0) {
             continue;
         }
+
+        if (e->is_dead) {
+            continue;
+        }
+
         // testing attack logic
         //if (strcmp(e->name, "orc-attacker") == 0) {
         //    liblogic_try_entity_attack(g, e->id, e->x - 1, e->y);
@@ -799,7 +813,8 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
         return;
     }
     entity* const attacker = em_get(g->entitymap, attacker_id);
-    if (!attacker) {
+    //if (!attacker) {
+    if (!attacker || attacker->is_dead) {
         merror("liblogic_try_entity_attack: attacker entity not found");
         return;
     }
@@ -828,11 +843,18 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
     for (int i = 0; i < tile->entity_max; i++) {
         if (tile->entities[i] != -1) {
             entity* const target = em_get(g->entitymap, tile->entities[i]);
-            if (target && (target->type == ENTITY_NPC || target->type == ENTITY_PLAYER)) {
+            if (target && (target->type == ENTITY_NPC || target->type == ENTITY_PLAYER) && !target->is_dead) {
                 // Perform attack logic here
                 minfo("Attack successful!");
                 attack_successful = true;
                 target->is_damaged = true;
+                target->do_update = true;
+
+                entity_set_hp(target, entity_get_hp(target) - 1); // Reduce HP by 1
+
+                if (entity_get_hp(target) <= 0) { // Check if target is dead
+                    target->is_dead = true;
+                }
                 break;
             }
         }
