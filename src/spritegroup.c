@@ -41,7 +41,7 @@ void spritegroup_destroy(spritegroup_t* sg) {
         return;
     }
     if (!sg->sprites) {
-        merror("somerrormsg");
+        merror("spritegroup_destroy: spritegroup->sprites is NULL");
         return;
     }
     for (int i = 0; i < sg->size; i++)
@@ -60,10 +60,11 @@ void spritegroup_add(spritegroup_t* const sg, sprite* s) {
         merror("spritegroup_add: sprite is NULL");
         return;
     }
-    if (sg->size < sg->capacity)
+    if (sg->size < sg->capacity) {
         sg->sprites[sg->size++] = s;
-    else
+    } else {
         mwarning("spritegroup_add: spritegroup is full");
+    }
 }
 
 
@@ -84,7 +85,10 @@ void spritegroup_set(spritegroup_t* const sg, const int index, sprite* s) {
         merror("spritegroup_set: index is out of bounds");
         return;
     }
-    sg->sprites[index] = s;
+    // only set if the sprite is not NULL and sg->sprites[index] is NULL
+    if (sg->sprites[index] == NULL) {
+        sg->sprites[index] = s;
+    }
 }
 
 
@@ -105,7 +109,7 @@ sprite* spritegroup_get(spritegroup_t* const sg, const int index) {
         return NULL;
     }
     if (index >= sg->size) {
-        merror("spritegroup_get: spritegroup is NULL");
+        merror("spritegroup_get: index is out of bounds");
         return NULL;
     }
     return sg->sprites[index];
