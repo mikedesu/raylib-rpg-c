@@ -40,3 +40,7 @@ void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t 
 void libdraw_create_sg_byid(gamestate* const g, entityid id);
 bool libdraw_check_default_animations(gamestate* const g);
 void libdraw_draw_hud(gamestate* const g);
+
+extern Shader shader_grayscale; // Global shader
+void libdraw_load_shaders(); // Load shader
+void libdraw_unload_shaders(); // Cleanup

@@ -141,3 +141,43 @@ dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int
     }
     return &df->tiles[y][x];
 }
+
+
+//void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
+//                                      const int x,
+//                                      const int y,
+//                                      const int texture_key,
+//                                      const int event) {
+//    if (!df) {
+//        merror("dungeon_floor_set_pressure_plate: df is NULL");
+//        return;
+//    }
+//    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
+//        merror("dungeon_floor_set_pressure_plate: x or y out of bounds");
+//        return;
+//    }
+//    dungeon_tile_set_pressure_plate(&df->tiles[y][x], true);
+//    dungeon_tile_set_pressure_plate_texture_key(&df->tiles[y][x], texture_key);
+//    dungeon_tile_set_pressure_plate_event(&df->tiles[y][x], event);
+//}
+
+
+void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
+                                      const int x,
+                                      const int y,
+                                      const int up_tx_key,
+                                      const int dn_tx_key,
+                                      const int event) {
+    if (!df) {
+        merror("dungeon_floor_set_pressure_plate: df is NULL");
+        return;
+    }
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
+        merror("dungeon_floor_set_pressure_plate: x or y out of bounds");
+        return;
+    }
+    dungeon_tile_set_pressure_plate(&df->tiles[y][x], true);
+    dungeon_tile_set_pressure_plate_up_tx_key(&df->tiles[y][x], up_tx_key);
+    dungeon_tile_set_pressure_plate_down_tx_key(&df->tiles[y][x], dn_tx_key);
+    dungeon_tile_set_pressure_plate_event(&df->tiles[y][x], event);
+}

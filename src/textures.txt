@@ -113,3 +113,8 @@
 106 1 1  0  img/tiles/dirt_grass_14.png
 107 1 1  0  img/tiles/water_00.png
 108 1 1  0  img/tiles/water_01.png
+109 1 1  0  img/tiles/dirt_06.png
+110 1 1  0  img/tiles/dirt_07.png
+111 1 1  0  img/tiles/dirt_08.png
+112 1 1  0  img/switches/pressure-plate-up-00.png
+113 1 1  0  img/switches/pressure-plate-down-00.png

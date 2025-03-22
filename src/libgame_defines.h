@@ -135,6 +135,9 @@
 #define TX_DIRT_07 110
 #define TX_DIRT_08 111
 
+#define TX_PRESSURE_PLATE_UP_00 112
+#define TX_PRESSURE_PLATE_DOWN_00 113
+
 //--------------------------------
 
 #define COMPANYSCENE 0

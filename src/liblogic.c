@@ -186,14 +186,14 @@ void liblogic_init(gamestate* const g) {
     //entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
     //entityid orc2 = liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
 
-    int orc_basex = 8;
+    int orc_basex = 9;
     int orc_basey = 2;
     //int rows = 10;
     //int cols = 10;
     //int rows = 34;
     //int cols = 30;
     int count = 0;
-    int total_orcs_to_make = 8000;
+    int total_orcs_to_make = 1;
 
     dungeon_t* d = g->dungeon;
     dungeon_floor_t* df = d->floors[0];
@@ -201,6 +201,11 @@ void liblogic_init(gamestate* const g) {
         merror("liblogic_init: failed to get dungeon floor");
         return;
     }
+
+
+    // lets test setting a pressure plate
+    dungeon_floor_set_pressure_plate(df, 8, 2, TX_PRESSURE_PLATE_UP_00, TX_PRESSURE_PLATE_DOWN_00, 666);
+
 
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
@@ -453,6 +458,21 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     dungeon_floor_add_at(df, e->id, ex, ey);
     e->x = ex, e->y = ey;
     e->sprite_move_x = x * DEFAULT_TILE_SIZE, e->sprite_move_y = y * DEFAULT_TILE_SIZE;
+
+    // get the entity's new tile
+    dungeon_tile_t* const new_tile = dungeon_floor_tile_at(df, ex, ey);
+    if (!new_tile) {
+        merror("Failed to get new tile");
+        return;
+    }
+
+    // check if the tile has a pressure plate
+    if (new_tile->has_pressure_plate) {
+        msuccess("Pressure plate activated!");
+        // do something
+        // print the pressure plate event
+        msuccessint("Pressure plate event", new_tile->pressure_plate_event);
+    }
 }
 
 

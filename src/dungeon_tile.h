@@ -18,7 +18,8 @@ typedef struct {
     size_t entity_max;
 
     bool has_pressure_plate;
-    int pressure_plate_texture_key;
+    int pressure_plate_up_tx_key;
+    int pressure_plate_down_tx_key;
     int pressure_plate_event;
 
 } dungeon_tile_t;
@@ -31,3 +32,13 @@ const entityid dungeon_tile_add(dungeon_tile_t* tile, const entityid id);
 const entityid dungeon_tile_remove(dungeon_tile_t* tile, const entityid id);
 const size_t dungeon_tile_entity_count(const dungeon_tile_t* tile);
 const entityid dungeon_tile_get_entity(const dungeon_tile_t* tile, const size_t index);
+
+void dungeon_tile_set_pressure_plate(dungeon_tile_t* tile, const bool has_pressure_plate);
+
+void dungeon_tile_set_pressure_plate_up_tx_key(dungeon_tile_t* tile, const int key);
+void dungeon_tile_set_pressure_plate_down_tx_key(dungeon_tile_t* tile, const int key);
+
+void dungeon_tile_set_pressure_plate_event(dungeon_tile_t* tile, const int event);
+const bool dungeon_tile_has_pressure_plate(const dungeon_tile_t* tile);
+//const int dungeon_tile_get_pressure_plate_texture_key(const dungeon_tile_t* tile);
+const int dungeon_tile_get_pressure_plate_event(const dungeon_tile_t* tile);

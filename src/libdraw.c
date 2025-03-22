@@ -17,6 +17,7 @@
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
+Shader shader_grayscale = {0};
 RenderTexture2D target = {0};
 Rectangle target_src = {0, 0, 800, 480};
 Rectangle target_dest = {0, 0, 800, 480};
@@ -74,6 +75,10 @@ void libdraw_init(gamestate* const g) {
     }
 
     libdraw_calc_debugpanel_size(g); // Calculate size
+
+    libdraw_load_shaders();
+
+
     msuccess("libdraw_init");
 }
 
@@ -316,6 +321,29 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
     Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
     Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
+
+    // draw the pressure plate if it exists
+    if (tile->has_pressure_plate) {
+        const int txkey = tile->pressure_plate_up_tx_key;
+        if (txkey < 0) {
+            merrorint2("libdraw_draw_dungeon_floor_tile: pressure plate up txkey is invalid", x, y);
+            return;
+        }
+        Texture2D* texture = &txinfo[txkey].texture;
+        if (texture->id <= 0) {
+            //merrorint3("libdraw_draw_dungeon_floor_tile: pressure plate texture id is invalid", x, y, txkey);
+            return;
+        }
+        const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
+        const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
+        const int tile_size_dest_w = DEFAULT_TILE_SIZE * 4;
+        const int tile_size_dest_h = DEFAULT_TILE_SIZE * 4;
+        const int tile_size_dest_x = x * DEFAULT_TILE_SIZE - 12;
+        const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
+        Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
+        Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
+        DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
+    }
 }
 
 
@@ -442,7 +470,14 @@ void libdraw_drawframe(gamestate* const g) {
     //libdraw_draw_sprite_and_shadow(g, g->hero_id);
     EndMode2D();
     EndTextureMode();
+
+    BeginShaderMode(shader_grayscale);
+    float time = (float)GetTime(); // Current time in seconds
+    SetShaderValue(shader_grayscale, GetShaderLocation(shader_grayscale, "time"), &time, SHADER_UNIFORM_FLOAT);
+
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+
+    EndShaderMode();
 
     libdraw_draw_hud(g);
 
@@ -507,6 +542,7 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
 void libdraw_close() {
     //g = NULL;
     libdraw_unload_textures();
+    libdraw_unload_shaders();
     CloseWindow();
 }
 
@@ -803,4 +839,12 @@ void libdraw_draw_hud(gamestate* const g) {
     const int x1 = x;
     const int y1 = y;
     DrawText(text, x1 + pad + pad, y1 + pad + pad, fontsize, c2);
+}
+
+void libdraw_load_shaders() {
+    shader_grayscale = LoadShader(0, "glow.frag"); // No vertex shader needed
+}
+
+void libdraw_unload_shaders() {
+    UnloadShader(shader_grayscale);
 }
