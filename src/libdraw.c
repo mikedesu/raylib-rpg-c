@@ -417,30 +417,14 @@ void libdraw_draw_debug_panel(gamestate* const g) {
         merror("libdraw_draw_debug_panel: gamestate is NULL");
         return;
     }
-
-    //libdraw_calc_debugpanel_size(g); // Calculate size
-    // Draw background
-    const int x = g->debugpanel.x;
-    const int y = g->debugpanel.y;
-    const int w = g->debugpanel.w;
-    const int h = g->debugpanel.h;
-    const int fontsize = g->debugpanel.font_size;
-    const Color fg = Fade(BLUE, 0.8f);
-    const Color c2 = WHITE;
-    // calculate the size of the bg box of the debug panel
-    // use g->debugpanel.pad_left, top, bottom, right to do this
-    const int pad_left = g->debugpanel.pad_left;
-    const int pad_top = g->debugpanel.pad_top;
-    const int pad_right = g->debugpanel.pad_right;
-    const int pad_bottom = g->debugpanel.pad_bottom;
-    // the root of the box should be at x,y
-    const int w0 = w + pad_left + pad_right * 4;
-    const int h0 = h + pad_top + pad_bottom;
-    DrawRectangle(x, y, w0, h0, fg);
-    // Draw text
-    const int x1 = x + pad_left;
-    const int y1 = y + pad_top;
-    DrawText(g->debugpanel.buffer, x1, y1, fontsize, c2);
+    const Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f);
+    const Color fg = WHITE;
+    const int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
+    const int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
+    const int x1 = g->debugpanel.x + g->debugpanel.pad_left;
+    const int y1 = g->debugpanel.y + g->debugpanel.pad_top;
+    DrawRectangle(g->debugpanel.x, g->debugpanel.y, w0, h0, bg);
+    DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
 }
 
 
@@ -459,6 +443,8 @@ void libdraw_drawframe(gamestate* const g) {
     EndMode2D();
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+
+    libdraw_draw_hud(g);
 
     if (g->debugpanelon) {
         libdraw_draw_debug_panel(g);
@@ -790,4 +776,31 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
     }
 
     libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+}
+
+
+void libdraw_draw_hud(gamestate* const g) {
+    if (!g) {
+        merror("libdraw_draw_hud: gamestate is NULL");
+        return;
+    }
+    // Draw the HUD
+    const int pad = 10;
+    const int x = 0;
+    const int y = 0;
+
+    const char* text = "HUD";
+    const int fontsize = 20;
+    const Vector2 size = MeasureTextEx(GetFontDefault(), text, fontsize, 1);
+    const int w = size.x + pad * 2;
+    const int h = size.y + pad * 2;
+
+    const Color fg = Fade((Color){0x66, 0x66, 0x66, 255}, 0.8f);
+    const Color c2 = WHITE;
+    DrawRectangle(x + pad, y + pad, w, h, fg);
+    // Draw text
+
+    const int x1 = x;
+    const int y1 = y;
+    DrawText(text, x1 + pad + pad, y1 + pad + pad, fontsize, c2);
 }
