@@ -45,21 +45,20 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
             dungeon_tile_t* current = &floor->tiles[i][j];
             dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
             if (i == 0 || i == floor->height - 1 || j == 0 || j == floor->width - 1) {
+                type = DUNGEON_TILE_TYPE_NONE;
 
-                if (j % 2 == 0) {
-                    type = DUNGEON_TILE_TYPE_STONE_WALL_00;
-                    //dungeon_tile_init(current, type);
-                } else if (j % 3 == 0) {
-                    type = DUNGEON_TILE_TYPE_STONE_WALL_01;
-                    //dungeon_tile_init(current, type);
-                } else {
-                    type = DUNGEON_TILE_TYPE_STONE_WALL_02;
-                    //dungeon_tile_init(current, type);
-                }
+                //if (j % 2 == 0) {
+                //    type = DUNGEON_TILE_TYPE_STONE_WALL_00;
+                //} else if (j % 3 == 0) {
+                //    type = DUNGEON_TILE_TYPE_STONE_WALL_01;
+                //} else {
+                //    type = DUNGEON_TILE_TYPE_STONE_WALL_02;
+                //}
             } else {
                 //type = DUNGEON_TILE_TYPE_FLOOR_DIRT;
 
-                type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
+                //type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
+                type = DUNGEON_TILE_TYPE_FLOOR_STONE_00;
                 // randomly generate a value between 0 and 12 inclusive
 
 
@@ -69,10 +68,10 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
         }
     }
     // lets set the corners to NONE
-    dungeon_tile_init(&floor->tiles[0][0], DUNGEON_TILE_TYPE_NONE);
-    dungeon_tile_init(&floor->tiles[0][floor->width - 1], DUNGEON_TILE_TYPE_NONE);
-    dungeon_tile_init(&floor->tiles[floor->height - 1][0], DUNGEON_TILE_TYPE_NONE);
-    dungeon_tile_init(&floor->tiles[floor->height - 1][floor->width - 1], DUNGEON_TILE_TYPE_NONE);
+    //dungeon_tile_init(&floor->tiles[0][0], DUNGEON_TILE_TYPE_NONE);
+    //dungeon_tile_init(&floor->tiles[0][floor->width - 1], DUNGEON_TILE_TYPE_NONE);
+    //dungeon_tile_init(&floor->tiles[floor->height - 1][0], DUNGEON_TILE_TYPE_NONE);
+    //dungeon_tile_init(&floor->tiles[floor->height - 1][floor->width - 1], DUNGEON_TILE_TYPE_NONE);
 }
 
 

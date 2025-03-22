@@ -8,6 +8,7 @@
 
 em_t* em_new() {
     em_t* em = malloc(sizeof(em_t));
+
     if (!em) {
         merror("em_new: em malloc failed");
         return NULL;
@@ -16,7 +17,10 @@ em_t* em_new() {
     for (int i = 0; i < EM_MAX_SLOTS; i++) {
         em->entities[i] = NULL;
     }
+
     em->count = 0;
+    em->max_slots = EM_MAX_SLOTS;
+
     return em;
 }
 
@@ -52,7 +56,9 @@ entity_t* const em_get(em_t* em, const entityid id) {
         //merror("em_get: id is -1");
         return NULL;
     }
+
     const int hash = id % EM_MAX_SLOTS;
+
     return em->entities[hash];
 }
 
@@ -69,7 +75,9 @@ entity_t* em_get_last(em_t* em, const entityid id) {
     }
 
     const int hash = id % EM_MAX_SLOTS;
+
     entity_t* current = em->entities[hash];
+
     if (current == NULL) {
         return NULL;
     }
@@ -87,22 +95,34 @@ entity_t* em_add(em_t* em, entity_t* e) {
         merror("em_add: em is NULL");
         return NULL;
     }
+
     if (!e) {
         merror("em_add: entity is NULL");
         return NULL;
     }
 
     const int hash = e->id % EM_MAX_SLOTS;
+
+    if (hash < 0) {
+        merrorint("em_add: hash is negative", hash);
+        return NULL;
+    }
+
+    if (hash >= EM_MAX_SLOTS) {
+        merrorint("em_add: hash is too large", hash);
+        return NULL;
+    }
+
     if (em->entities[hash] != NULL) {
         entity_t* current = em->entities[hash];
         // find a new slot
-        while (current->next != NULL) {
+        while (current->next != NULL)
             current = current->next;
-        }
         current->next = e;
     } else {
         em->entities[hash] = e;
     }
+
     em->count++;
     return e;
 }
@@ -120,8 +140,21 @@ entity_t* em_remove_last(em_t* em, const entityid id) {
     }
 
     const int hash = id % EM_MAX_SLOTS;
+
+    if (hash < 0) {
+        merrorint("em_remove_last: hash is negative", hash);
+        return NULL;
+    }
+
+    if (hash >= EM_MAX_SLOTS) {
+        merrorint("em_remove_last: hash is too large", hash);
+        return NULL;
+    }
+
     entity_t* current = em->entities[hash];
+
     if (current == NULL) {
+        merror("em_remove_last: current is NULL");
         return NULL;
     }
 
@@ -130,9 +163,8 @@ entity_t* em_remove_last(em_t* em, const entityid id) {
         return current;
     }
 
-    while (current->next->next != NULL) {
+    while (current->next->next != NULL)
         current = current->next;
-    }
 
     entity_t* last = current->next;
     current->next = NULL;
@@ -149,27 +181,4 @@ const int em_count(const em_t* const em) {
     }
 
     return em->count;
-}
-
-
-// remember to free the indices when you are done using them
-int* em_get_indices(em_t* em) {
-    if (!em) {
-        merror("em_get_indices: em is NULL");
-        return NULL;
-    }
-
-    int* indices = malloc(sizeof(int) * EM_MAX_SLOTS);
-
-    memset(indices, 0, sizeof(int) * EM_MAX_SLOTS);
-
-    for (int i = 0; i < EM_MAX_SLOTS; i++) {
-        entity_t* current = em->entities[i];
-        while (current != NULL) {
-            indices[i]++;
-            current = current->next;
-        }
-    }
-
-    return indices;
 }

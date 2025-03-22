@@ -193,7 +193,7 @@ void liblogic_init(gamestate* const g) {
     //int rows = 34;
     //int cols = 30;
     int count = 0;
-    int total_orcs_to_make = 1024 * 8;
+    int total_orcs_to_make = 3;
 
     dungeon_t* d = g->dungeon;
     dungeon_floor_t* df = d->floors[0];
@@ -202,8 +202,8 @@ void liblogic_init(gamestate* const g) {
         return;
     }
 
-    for (int y = orc_basey; y < df->height; y += 1) {
-        for (int x = orc_basex; x < df->width; x += 1) {
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
             entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_basex + x, orc_basey + y, 0, "orc");
             if (orc_id == -1) {
                 merror("liblogic_init: failed to init orc");
@@ -213,8 +213,8 @@ void liblogic_init(gamestate* const g) {
                 //entity_action_t action = ENTITY_ACTION_MOVE_RANDOM;
                 entity_action_t action = ENTITY_ACTION_MOVE_PLAYER;
                 entity_set_default_action(orc, action);
-                entity_set_maxhp(orc, 3);
-                entity_set_hp(orc, 3);
+                entity_set_maxhp(orc, 1);
+                entity_set_hp(orc, 1);
                 count++;
             }
 
@@ -781,7 +781,7 @@ const entityid liblogic_npc_create(gamestate* const g,
         return -1;
     }
     if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-        merror("liblogic_entity_create: x or y is out of bounds");
+        merrorint2("liblogic_entity_create: x or y is out of bounds", x, y);
         return -1;
     }
     // can we create an entity at this location? no entities can be made on wall-types etc
