@@ -45,20 +45,20 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
             dungeon_tile_t* current = &floor->tiles[i][j];
             dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
             if (i == 0 || i == floor->height - 1 || j == 0 || j == floor->width - 1) {
-                type = DUNGEON_TILE_TYPE_NONE;
+                //type = DUNGEON_TILE_TYPE_NONE;
 
-                //if (j % 2 == 0) {
-                //    type = DUNGEON_TILE_TYPE_STONE_WALL_00;
-                //} else if (j % 3 == 0) {
-                //    type = DUNGEON_TILE_TYPE_STONE_WALL_01;
-                //} else {
-                //    type = DUNGEON_TILE_TYPE_STONE_WALL_02;
-                //}
+                if (j % 2 == 0) {
+                    type = DUNGEON_TILE_TYPE_STONE_WALL_00;
+                } else if (j % 3 == 0) {
+                    type = DUNGEON_TILE_TYPE_STONE_WALL_01;
+                } else {
+                    type = DUNGEON_TILE_TYPE_STONE_WALL_02;
+                }
             } else {
                 //type = DUNGEON_TILE_TYPE_FLOOR_DIRT;
 
-                //type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
-                type = DUNGEON_TILE_TYPE_FLOOR_STONE_00;
+                type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
+                //type = DUNGEON_TILE_TYPE_FLOOR_STONE_00;
                 // randomly generate a value between 0 and 12 inclusive
 
 

@@ -16,6 +16,11 @@ typedef struct {
     entityid* entities;
     size_t entity_count;
     size_t entity_max;
+
+    bool has_pressure_plate;
+    int pressure_plate_texture_key;
+    int pressure_plate_event;
+
 } dungeon_tile_t;
 
 

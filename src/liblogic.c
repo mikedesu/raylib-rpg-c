@@ -193,7 +193,7 @@ void liblogic_init(gamestate* const g) {
     //int rows = 34;
     //int cols = 30;
     int count = 0;
-    int total_orcs_to_make = 3;
+    int total_orcs_to_make = 8000;
 
     dungeon_t* d = g->dungeon;
     dungeon_floor_t* df = d->floors[0];
