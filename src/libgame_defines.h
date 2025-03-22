@@ -95,6 +95,48 @@
 #define TX_HUMAN_DMG 75
 #define TX_HUMAN_DMG_SHADOW 76
 
+
+#define TX_GRASS_05 77
+#define TX_GRASS_06 78
+#define TX_GRASS_07 79
+#define TX_GRASS_08 80
+#define TX_GRASS_09 81
+#define TX_GRASS_10 82
+#define TX_GRASS_11 83
+#define TX_GRASS_12 84
+#define TX_GRASS_13 85
+#define TX_GRASS_14 86
+#define TX_GRASS_15 87
+#define TX_GRASS_16 88
+#define TX_GRASS_17 89
+#define TX_GRASS_18 90
+#define TX_GRASS_19 91
+
+#define TX_DIRT_GRASS_00 92
+#define TX_DIRT_GRASS_01 93
+#define TX_DIRT_GRASS_02 94
+#define TX_DIRT_GRASS_03 95
+#define TX_DIRT_GRASS_04 96
+#define TX_DIRT_GRASS_05 97
+#define TX_DIRT_GRASS_06 98
+#define TX_DIRT_GRASS_07 99
+#define TX_DIRT_GRASS_08 100
+#define TX_DIRT_GRASS_09 101
+#define TX_DIRT_GRASS_10 102
+#define TX_DIRT_GRASS_11 103
+#define TX_DIRT_GRASS_12 104
+#define TX_DIRT_GRASS_13 105
+#define TX_DIRT_GRASS_14 106
+
+#define TX_WATER_00 107
+#define TX_WATER_01 108
+
+#define TX_DIRT_06 109
+#define TX_DIRT_07 110
+#define TX_DIRT_08 111
+
+//--------------------------------
+
 #define COMPANYSCENE 0
 #define TITLESCENE 1
 #define GAMEPLAYSCENE 2

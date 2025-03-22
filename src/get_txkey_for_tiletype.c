@@ -57,6 +57,144 @@ int get_txkey_for_tiletype(const dungeon_tile_type_t type) {
     case DUNGEON_TILE_TYPE_FLOOR_STONE_12:
         key = TX_STONE_12;
         break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_00:
+        key = TX_GRASS_00;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_01:
+        key = TX_GRASS_01;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_02:
+        key = TX_GRASS_02;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_03:
+        key = TX_GRASS_03;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_04:
+        key = TX_GRASS_04;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_05:
+        key = TX_GRASS_05;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_06:
+        key = TX_GRASS_06;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_07:
+        key = TX_GRASS_07;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_08:
+        key = TX_GRASS_08;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_09:
+        key = TX_GRASS_09;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_10:
+        key = TX_GRASS_10;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_11:
+        key = TX_GRASS_11;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_12:
+        key = TX_GRASS_12;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_13:
+        key = TX_GRASS_13;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_14:
+        key = TX_GRASS_14;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_15:
+        key = TX_GRASS_15;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_16:
+        key = TX_GRASS_16;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_17:
+        key = TX_GRASS_17;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_18:
+        key = TX_GRASS_18;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_GRASS_19:
+        key = TX_GRASS_19;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_00:
+        key = TX_DIRT_GRASS_00;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_01:
+        key = TX_DIRT_GRASS_01;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_02:
+        key = TX_DIRT_GRASS_02;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_03:
+        key = TX_DIRT_GRASS_03;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_04:
+        key = TX_DIRT_GRASS_04;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_05:
+        key = TX_DIRT_GRASS_05;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_06:
+        key = TX_DIRT_GRASS_06;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_07:
+        key = TX_DIRT_GRASS_07;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_08:
+        key = TX_DIRT_GRASS_08;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_09:
+        key = TX_DIRT_GRASS_09;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_10:
+        key = TX_DIRT_GRASS_10;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_11:
+        key = TX_DIRT_GRASS_11;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_12:
+        key = TX_DIRT_GRASS_12;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_13:
+        key = TX_DIRT_GRASS_13;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_GRASS_14:
+        key = TX_DIRT_GRASS_14;
+        break;
+    case DUNGEON_TILE_TYPE_WATER_00:
+        key = TX_WATER_00;
+        break;
+    case DUNGEON_TILE_TYPE_WATER_01:
+        key = TX_WATER_01;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_00:
+        key = TX_DIRT_00;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_01:
+        key = TX_DIRT_01;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_02:
+        key = TX_DIRT_02;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_03:
+        key = TX_DIRT_03;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_04:
+        key = TX_DIRT_04;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_05:
+        key = TX_DIRT_05;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_06:
+        key = TX_DIRT_06;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_07:
+        key = TX_DIRT_07;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_DIRT_08:
+        key = TX_DIRT_08;
+        break;
 
 
     //case TILETYPE_DIRT_01:
