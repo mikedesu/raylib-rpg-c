@@ -789,10 +789,10 @@ void libdraw_draw_hud(gamestate* const g) {
     const int x = 0;
     const int y = 0;
 
-    const char* text = "HUD";
+    const char* text = "Name: darkmage\nHP: 1/1";
     const int fontsize = 20;
     const Vector2 size = MeasureTextEx(GetFontDefault(), text, fontsize, 1);
-    const int w = size.x + pad * 2;
+    const int w = size.x + pad * 4;
     const int h = size.y + pad * 2;
 
     const Color fg = Fade((Color){0x66, 0x66, 0x66, 255}, 0.8f);

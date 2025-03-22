@@ -433,8 +433,9 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         return;
     }
 
-    if (dungeon_tile_is_wall(tile->type)) {
-        merror("Cannot move, wall");
+    //if (dungeon_tile_is_wall(tile->type)) {
+    if (!dungeon_tile_is_walkable(tile->type)) {
+        merror("Cannot move, tile is not walkable");
         return;
     }
 
