@@ -163,6 +163,8 @@ void liblogic_init(gamestate* const g) {
         return;
     }
 
+    srand(time(NULL));
+
     // init the dungeon and dungeon floor
     g->dungeon = dungeon_create();
     if (!g->dungeon) {
@@ -174,12 +176,16 @@ void liblogic_init(gamestate* const g) {
     gamestate_init_entityids(g);
     g->entitymap = em_new();
 
-    int herox = 7;
+    int herox = 2;
     int heroy = 2;
     if (liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero") == -1) {
         merror("liblogic_init: failed to init hero");
     }
+
     g->entity_turn = g->hero_id;
+
+    //g->cam2d.offset.x = g->windowwidth / 2;
+    //g->cam2d.offset.y = g->windowheight / 2;
 
     // create some orcs with names
     //entityid orc0 = liblogic_npc_create(g, RACE_ORC, 8, 2, 0, "orc-mover");
@@ -193,7 +199,7 @@ void liblogic_init(gamestate* const g) {
     //int rows = 34;
     //int cols = 30;
     int count = 0;
-    int total_orcs_to_make = 1;
+    int total_orcs_to_make = 0;
 
     dungeon_t* d = g->dungeon;
     dungeon_floor_t* df = d->floors[0];
@@ -209,6 +215,10 @@ void liblogic_init(gamestate* const g) {
 
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
+            if (count >= total_orcs_to_make) {
+                break;
+            }
+
             entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_basex + x, orc_basey + y, 0, "orc");
             if (orc_id == -1) {
                 merror("liblogic_init: failed to init orc");

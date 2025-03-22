@@ -5,6 +5,9 @@
 #include <raylib.h>
 #include <stdbool.h>
 
+extern Shader shader_grayscale; // Global shader
+extern Shader shader_tile_glow; // Global shader
+
 void libdraw_init(gamestate* const g);
 void libdraw_update_input(inputstate* const is);
 void libdraw_drawframe(gamestate* const g);
@@ -41,6 +44,5 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id);
 bool libdraw_check_default_animations(gamestate* const g);
 void libdraw_draw_hud(gamestate* const g);
 
-extern Shader shader_grayscale; // Global shader
 void libdraw_load_shaders(); // Load shader
 void libdraw_unload_shaders(); // Cleanup

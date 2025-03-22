@@ -18,6 +18,8 @@ hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 Shader shader_grayscale = {0};
+Shader shader_tile_glow = {0};
+
 RenderTexture2D target = {0};
 Rectangle target_src = {0, 0, 800, 480};
 Rectangle target_dest = {0, 0, 800, 480};
@@ -33,8 +35,8 @@ Vector2 zero_vector = {0, 0};
 //#define DEFAULT_WINDOW_WIDTH 800
 //#define DEFAULT_WINDOW_HEIGHT 480
 
-#define DEFAULT_WINDOW_WIDTH 1280
-#define DEFAULT_WINDOW_HEIGHT 720
+#define DEFAULT_WINDOW_WIDTH 1920
+#define DEFAULT_WINDOW_HEIGHT 1080
 
 //#define DEFAULT_WINDOW_WIDTH 960
 //#define DEFAULT_WINDOW_HEIGHT 540
@@ -78,6 +80,9 @@ void libdraw_init(gamestate* const g) {
 
     libdraw_load_shaders();
 
+
+    g->cam2d.offset.x = DEFAULT_WINDOW_WIDTH / 4;
+    g->cam2d.offset.y = DEFAULT_WINDOW_HEIGHT / 4;
 
     msuccess("libdraw_init");
 }
@@ -342,7 +347,14 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
         Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
         Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
+
+        BeginShaderMode(shader_tile_glow);
+
+        float time = (float)GetTime(); // Current time in seconds
+        SetShaderValue(shader_tile_glow, GetShaderLocation(shader_tile_glow, "time"), &time, SHADER_UNIFORM_FLOAT);
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
+
+        EndShaderMode();
     }
 }
 
@@ -471,13 +483,13 @@ void libdraw_drawframe(gamestate* const g) {
     EndMode2D();
     EndTextureMode();
 
-    BeginShaderMode(shader_grayscale);
-    float time = (float)GetTime(); // Current time in seconds
-    SetShaderValue(shader_grayscale, GetShaderLocation(shader_grayscale, "time"), &time, SHADER_UNIFORM_FLOAT);
+    //BeginShaderMode(shader_grayscale);
+    //float time = (float)GetTime(); // Current time in seconds
+    //SetShaderValue(shader_grayscale, GetShaderLocation(shader_grayscale, "time"), &time, SHADER_UNIFORM_FLOAT);
 
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
 
-    EndShaderMode();
+    //EndShaderMode();
 
     libdraw_draw_hud(g);
 
@@ -842,9 +854,11 @@ void libdraw_draw_hud(gamestate* const g) {
 }
 
 void libdraw_load_shaders() {
-    shader_grayscale = LoadShader(0, "glow.frag"); // No vertex shader needed
+    shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
+    shader_tile_glow = LoadShader(0, "glow.frag");
 }
 
 void libdraw_unload_shaders() {
     UnloadShader(shader_grayscale);
+    UnloadShader(shader_tile_glow);
 }
