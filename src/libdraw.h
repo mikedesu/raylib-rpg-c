@@ -46,3 +46,4 @@ void libdraw_draw_hud(gamestate* const g);
 
 void libdraw_load_shaders(); // Load shader
 void libdraw_unload_shaders(); // Cleanup
+void libdraw_camera_lock_on(gamestate* const g);

@@ -26,29 +26,19 @@ Rectangle target_dest = {0, 0, 800, 480};
 Vector2 target_origin = {0, 0};
 Vector2 zero_vector = {0, 0};
 
-//#define DEFAULT_WINDOW_WIDTH 400
-//#define DEFAULT_WINDOW_HEIGHT 240
-
-//#define DEFAULT_WINDOW_WIDTH 640
-//#define DEFAULT_WINDOW_HEIGHT 360
-
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 480
-
+//#define DEFAULT_WINDOW_WIDTH 960
+//#define DEFAULT_WINDOW_HEIGHT 540
 //#define DEFAULT_WINDOW_WIDTH 1280
 //#define DEFAULT_WINDOW_HEIGHT 720
 //#define DEFAULT_WINDOW_WIDTH 1920
 //#define DEFAULT_WINDOW_HEIGHT 1080
 
-//#define DEFAULT_WINDOW_WIDTH 960
-//#define DEFAULT_WINDOW_HEIGHT 540
-
 #define DEFAULT_TILE_SIZE 8
 #define SPRITEGROUP_DEFAULT_SIZE 32
 
-//#define DEFAULT_ANIM_SPEED 10
-
-#define DEFAULT_ANIM_SPEED 10
+#define DEFAULT_ANIM_SPEED 4
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 
@@ -504,6 +494,8 @@ void libdraw_drawframe(gamestate* const g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
 
+    libdraw_camera_lock_on(g); // Add here
+
     libdraw_draw_dungeon_floor(g);
 
     //libdraw_draw_sprite_and_shadow(g, g->hero_id);
@@ -904,4 +896,15 @@ void libdraw_load_shaders() {
 void libdraw_unload_shaders() {
     UnloadShader(shader_grayscale);
     UnloadShader(shader_tile_glow);
+}
+
+
+void libdraw_camera_lock_on(gamestate* const g) {
+    if (!g || !g->cam_lockon) return;
+    spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
+    if (!grp) {
+        merrorint("libdraw_camera_lock_on: hero spritegroup NULL", g->hero_id);
+        return;
+    }
+    g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
 }

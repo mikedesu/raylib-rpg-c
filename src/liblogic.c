@@ -66,7 +66,6 @@ static inline int liblogic_get_y_from_dir(const direction_t dir) {
 }
 
 
-// liblogic.c (add this function)
 static void liblogic_execute_action(gamestate* const g, entity* e, entity_action_t action) {
     switch (action) {
     case ENTITY_ACTION_MOVE_LEFT:
@@ -185,8 +184,6 @@ void liblogic_init(gamestate* const g) {
 
     g->entity_turn = g->hero_id;
 
-    //g->cam2d.offset.x = g->windowwidth / 2;
-    //g->cam2d.offset.y = g->windowheight / 2;
 
     // create some orcs with names
     //entityid orc0 = liblogic_npc_create(g, RACE_ORC, 8, 2, 0, "orc-mover");
@@ -413,11 +410,8 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         int ty = e->y + dy;
         liblogic_try_entity_attack(g, e->id, tx, ty);
     } break;
-    case KEY_SPACE:
+    case KEY_SPACE: {
         msuccess("Space pressed!");
-        break;
-    case KEY_ENTER: {
-        msuccess("Enter pressed!");
         int dx = liblogic_get_x_from_dir(e->direction);
         int dy = liblogic_get_y_from_dir(e->direction);
         int tx = e->x + dx;
