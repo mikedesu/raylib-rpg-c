@@ -78,10 +78,10 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
         dungeon_tile_init(current, type);
     }
     // set a tile on the bottom of the perimeter to be floor
-    dungeon_tile_t* current = &floor->tiles[y + h][x + w / 2];
-    dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
-    //type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
-    type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+
+    dungeon_tile_t* current = &floor->tiles[5][2];
+    //dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
+    dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
     dungeon_tile_init(current, type);
 
     //current = &floor->tiles[y + h / 2][x + w / 2];

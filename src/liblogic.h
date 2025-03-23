@@ -42,3 +42,4 @@ void liblogic_handle_npcs(gamestate* const g);
 const int liblogic_tile_npc_dead_count(const gamestate* const g, const int x, const int y, const int floor);
 const int liblogic_tile_npc_living_count(const gamestate* const g, const int x, const int y, const int floor);
 void liblogic_update_player_state(gamestate* const g);
+void liblogic_try_flip_switch(gamestate* const g, const int x, const int y, const int floor);

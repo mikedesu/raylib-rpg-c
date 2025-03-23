@@ -193,14 +193,14 @@ void liblogic_init(gamestate* const g) {
     //entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
     //entityid orc2 = liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
 
-    int orc_basex = 9;
-    int orc_basey = 2;
+    int orc_basex = 14;
+    int orc_basey = 1;
     //int rows = 10;
     //int cols = 10;
     //int rows = 34;
     //int cols = 30;
     int count = 0;
-    int total_orcs_to_make = 0;
+    int total_orcs_to_make = 1;
 
     dungeon_t* d = g->dungeon;
     dungeon_floor_t* df = d->floors[0];
@@ -405,20 +405,27 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         minfo("Numpad 3 pressed!");
         liblogic_try_entity_move(g, e, 1, 1);
         break;
-    case KEY_A:
+    case KEY_A: {
         msuccess("A pressed!");
         int dx = liblogic_get_x_from_dir(e->direction);
         int dy = liblogic_get_y_from_dir(e->direction);
         int tx = e->x + dx;
         int ty = e->y + dy;
         liblogic_try_entity_attack(g, e->id, tx, ty);
-        break;
+    } break;
     case KEY_SPACE:
         msuccess("Space pressed!");
         break;
-    case KEY_ENTER:
+    case KEY_ENTER: {
         msuccess("Enter pressed!");
-        break;
+        int dx = liblogic_get_x_from_dir(e->direction);
+        int dy = liblogic_get_y_from_dir(e->direction);
+        int tx = e->x + dx;
+        int ty = e->y + dy;
+
+        liblogic_try_flip_switch(g, tx, ty, e->floor);
+
+    } break;
     case KEY_C:
         msuccess("C pressed!");
         g->controlmode = CONTROLMODE_CAMERA;
@@ -501,6 +508,53 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
 
         e->is_damaged = true;
         e->do_update = true;
+    }
+}
+
+
+void liblogic_try_flip_switch(gamestate* const g, const int x, const int y, const int floor) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+
+    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
+    if (!df) {
+        merror("Failed to get dungeon floor");
+        return;
+    }
+
+    dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    if (!tile) {
+        merror("Failed to get tile");
+        return;
+    }
+
+    if (tile->has_wall_switch) {
+        tile->wall_switch_on = !tile->wall_switch_on;
+        msuccess("Wall switch flipped!");
+        msuccessint("Wall switch event", tile->wall_switch_event);
+
+        if (tile->wall_switch_event == 777) {
+            msuccess("Wall switch event 777!");
+            // do something
+            // get the tile at 5,2 and change its type to DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00
+
+            dungeon_tile_t* const trap_tile = dungeon_floor_tile_at(df, 2, 5);
+            if (!trap_tile) {
+                merror("Failed to get trap tile");
+                return;
+            }
+
+            dungeon_tile_type_t type = trap_tile->type;
+            if (type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00) {
+                trap_tile->type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+            } else if (type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00) {
+                trap_tile->type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+            }
+
+            //trap_tile->type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+        }
     }
 }
 

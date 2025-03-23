@@ -354,7 +354,16 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
 
     // draw the wall switch
     if (tile->has_wall_switch) {
-        const int txkey = tile->wall_switch_up_tx_key;
+        //const int txkey = tile->wall_switch_up_tx_key;
+
+        int txkey = -1;
+        if (tile->wall_switch_on) {
+            txkey = tile->wall_switch_down_tx_key;
+        } else {
+            txkey = tile->wall_switch_up_tx_key;
+        }
+
+
         if (txkey < 0) {
             merrorint2("libdraw_draw_dungeon_floor_tile: wall switch up txkey is invalid", x, y);
             return;
