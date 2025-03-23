@@ -190,8 +190,8 @@ void liblogic_init(gamestate* const g) {
     //entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
     //entityid orc2 = liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
 
-    int orc_basex = 14;
-    int orc_basey = 1;
+    int orc_basex = 2;
+    int orc_basey = 6;
     //int rows = 10;
     //int cols = 10;
     //int rows = 34;
@@ -632,6 +632,8 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     }
 
     liblogic_update_player_state(g);
+    liblogic_update_npcs_state(g);
+
     liblogic_handle_input(is, g);
 
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
@@ -670,11 +672,44 @@ void liblogic_update_player_state(gamestate* const g) {
         merror("Hero is dead!");
         return;
     }
+}
 
-    //if (e->is_damaged) {
-    //    e->is_damaged = false;
-    //    e->do_update = true;
-    //}
+
+void liblogic_update_npcs_state(gamestate* const g) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+
+    for (int i = 0; i < g->index_entityids; i++) {
+        entityid id = g->entityids[i];
+        liblogic_update_npc_state(g, id);
+    }
+}
+
+
+void liblogic_update_npc_state(gamestate* const g, entityid id) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+
+    entity* const e = em_get(g->entitymap, id);
+    if (!e) {
+        merror("Failed to get entity");
+        return;
+    }
+
+    if (e->is_dead) {
+        return;
+    }
+
+    if (e->hp <= 0) {
+        e->is_dead = true;
+        e->do_update = true;
+        merror("NPC is dead!");
+        return;
+    }
 }
 
 

@@ -55,7 +55,7 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
 
     int x = 0;
     int y = 0;
-    int w = 5;
+    int w = 14;
     int h = 5;
     for (int i = 0; i <= w; i++) {
         dungeon_tile_t* current = &floor->tiles[y][x + i];
