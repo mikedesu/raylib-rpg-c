@@ -517,42 +517,35 @@ void liblogic_try_flip_switch(gamestate* const g, const int x, const int y, cons
         merror("Game state is NULL!");
         return;
     }
-
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
         merror("Failed to get dungeon floor");
         return;
     }
-
     dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merror("Failed to get tile");
         return;
     }
-
     if (tile->has_wall_switch) {
         tile->wall_switch_on = !tile->wall_switch_on;
         msuccess("Wall switch flipped!");
         msuccessint("Wall switch event", tile->wall_switch_event);
-
         if (tile->wall_switch_event == 777) {
             msuccess("Wall switch event 777!");
             // do something
             // get the tile at 5,2 and change its type to DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00
-
             dungeon_tile_t* const trap_tile = dungeon_floor_tile_at(df, 2, 5);
             if (!trap_tile) {
                 merror("Failed to get trap tile");
                 return;
             }
-
             dungeon_tile_type_t type = trap_tile->type;
             if (type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00) {
                 trap_tile->type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
             } else if (type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00) {
                 trap_tile->type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
             }
-
             //trap_tile->type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
         }
     }

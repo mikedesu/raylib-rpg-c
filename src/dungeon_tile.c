@@ -19,12 +19,10 @@ void dungeon_tile_init(dungeon_tile_t* tile, const dungeon_tile_type_t type) {
     memset(tile->entities, -1, malloc_sz);
     tile->entity_count = 0;
     tile->entity_max = DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
-
     tile->has_pressure_plate = false;
     tile->pressure_plate_up_tx_key = -1;
     tile->pressure_plate_down_tx_key = -1;
     tile->pressure_plate_event = -1;
-
     tile->has_wall_switch = false;
     tile->wall_switch_on = false;
     tile->wall_switch_up_tx_key = -1;
@@ -67,14 +65,6 @@ void dungeon_tile_set_pressure_plate_event(dungeon_tile_t* tile, const int event
     tile->pressure_plate_event = event;
 }
 
-//void dungeon_tile_set_pressure_plate_active(dungeon_tile_t* tile, const bool active) {
-//    if (!tile) {
-//        merror("dungeon_tile_set_pressure_plate_active: tile is NULL");
-//        return;
-//    }
-//    tile->pressure_plate_active = active;
-//}
-
 
 const bool dungeon_tile_has_pressure_plate(const dungeon_tile_t* tile) {
     if (!tile) {
@@ -85,15 +75,6 @@ const bool dungeon_tile_has_pressure_plate(const dungeon_tile_t* tile) {
 }
 
 
-//const int dungeon_tile_get_pressure_plate_texture_key(const dungeon_tile_t* tile) {
-//    if (!tile) {
-//        merror("dungeon_tile_get_pressure_plate_texture_key: tile is NULL");
-//        return -1;
-//    }
-//    return tile->pressure_plate_tx_key;
-//}
-
-
 const int dungeon_tile_get_pressure_plate_event(const dungeon_tile_t* tile) {
     if (!tile) {
         merror("dungeon_tile_get_pressure_plate_event: tile is NULL");
@@ -101,14 +82,6 @@ const int dungeon_tile_get_pressure_plate_event(const dungeon_tile_t* tile) {
     }
     return tile->pressure_plate_event;
 }
-
-//const bool dungeon_tile_is_pressure_plate_active(const dungeon_tile_t* tile) {
-//    if (!tile) {
-//        merror("dungeon_tile_is_pressure_plate_active: tile is NULL");
-//        return false;
-//    }
-//    return tile->pressure_plate_active;
-//}
 
 
 const bool dungeon_tile_resize(dungeon_tile_t* tile) {

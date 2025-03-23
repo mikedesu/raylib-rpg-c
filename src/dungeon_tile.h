@@ -12,7 +12,6 @@ typedef struct {
     dungeon_tile_type_t type;
     bool visible;
     bool explored;
-    //entityid entities[DUNGEON_TILE_MAX_ENTITIES];
     entityid* entities;
     size_t entity_count;
     size_t entity_max;
@@ -28,34 +27,33 @@ typedef struct {
     int wall_switch_down_tx_key;
     int wall_switch_event;
 
-
 } dungeon_tile_t;
 
-
 dungeon_tile_t* dungeon_tile_create(const dungeon_tile_type_t type);
+
 void dungeon_tile_free(dungeon_tile_t* tile);
 void dungeon_tile_init(dungeon_tile_t* tile, const dungeon_tile_type_t type);
+
 const entityid dungeon_tile_add(dungeon_tile_t* tile, const entityid id);
 const entityid dungeon_tile_remove(dungeon_tile_t* tile, const entityid id);
-const size_t dungeon_tile_entity_count(const dungeon_tile_t* tile);
 const entityid dungeon_tile_get_entity(const dungeon_tile_t* tile, const size_t index);
 
-void dungeon_tile_set_pressure_plate(dungeon_tile_t* tile, const bool has_pressure_plate);
+const size_t dungeon_tile_entity_count(const dungeon_tile_t* tile);
 
+void dungeon_tile_set_pressure_plate(dungeon_tile_t* tile, const bool has_pressure_plate);
 void dungeon_tile_set_pressure_plate_up_tx_key(dungeon_tile_t* tile, const int key);
 void dungeon_tile_set_pressure_plate_down_tx_key(dungeon_tile_t* tile, const int key);
-
 void dungeon_tile_set_pressure_plate_event(dungeon_tile_t* tile, const int event);
+
 const bool dungeon_tile_has_pressure_plate(const dungeon_tile_t* tile);
-//const int dungeon_tile_get_pressure_plate_texture_key(const dungeon_tile_t* tile);
-const int dungeon_tile_get_pressure_plate_event(const dungeon_tile_t* tile);
-
-
 const bool dungeon_tile_is_wall_switch_on(const dungeon_tile_t* tile);
 const bool dungeon_tile_has_wall_switch(const dungeon_tile_t* tile);
+
+const int dungeon_tile_get_pressure_plate_event(const dungeon_tile_t* tile);
 const int dungeon_tile_get_wall_switch_event(const dungeon_tile_t* tile);
 const int dungeon_tile_get_wall_switch_down_tx_key(const dungeon_tile_t* tile);
 const int dungeon_tile_get_wall_switch_up_tx_key(const dungeon_tile_t* tile);
+
 void dungeon_tile_set_wall_switch_on(dungeon_tile_t* tile, const bool on);
 void dungeon_tile_set_wall_switch_event(dungeon_tile_t* tile, const int event);
 void dungeon_tile_set_wall_switch_down_tx_key(dungeon_tile_t* tile, const int key);
