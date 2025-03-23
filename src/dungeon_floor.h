@@ -35,3 +35,10 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
                                       const int up_tx_key,
                                       const int dn_tx_key,
                                       const int event);
+
+void dungeon_floor_set_wall_switch(dungeon_floor_t* const df,
+                                   const int x,
+                                   const int y,
+                                   const int up_tx_key,
+                                   const int dn_tx_key,
+                                   const int event);

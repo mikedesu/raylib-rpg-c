@@ -1,5 +1,6 @@
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
+#include "dungeon_tile_type.h"
 #include "mprint.h"
 #include <stdlib.h>
 
@@ -44,7 +45,7 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
         for (int j = 0; j < floor->width; j++) {
             dungeon_tile_t* current = &floor->tiles[i][j];
             dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
-            type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
+            type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 11);
             dungeon_tile_init(current, type);
         }
     }
@@ -54,27 +55,39 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
 
     int x = 0;
     int y = 0;
-    int w = floor->width / 2;
-    int h = floor->height / 2;
+    int w = 5;
+    int h = 5;
     for (int i = 0; i <= w; i++) {
         dungeon_tile_t* current = &floor->tiles[y][x + i];
-        dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_00);
+        dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
+        dungeon_tile_init(current, type);
     }
     for (int i = 0; i <= h; i++) {
         dungeon_tile_t* current = &floor->tiles[y + i][x];
-        dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_00);
+        dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
+        dungeon_tile_init(current, type);
     }
     for (int i = 0; i <= w; i++) {
         dungeon_tile_t* current = &floor->tiles[y + h][x + i];
-        dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_00);
+        dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
+        dungeon_tile_init(current, type);
     }
     for (int i = 0; i <= h; i++) {
         dungeon_tile_t* current = &floor->tiles[y + i][x + w];
-        dungeon_tile_init(current, DUNGEON_TILE_TYPE_STONE_WALL_00);
+        dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
+        dungeon_tile_init(current, type);
     }
     // set a tile on the bottom of the perimeter to be floor
     dungeon_tile_t* current = &floor->tiles[y + h][x + w / 2];
-    dungeon_tile_init(current, DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12));
+    dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
+    //type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+    type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+    dungeon_tile_init(current, type);
+
+    //current = &floor->tiles[y + h / 2][x + w / 2];
+    //dungeon_tile_init(current, type);
+    /*
+    */
 }
 
 
@@ -183,4 +196,25 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
     dungeon_tile_set_pressure_plate_up_tx_key(&df->tiles[y][x], up_tx_key);
     dungeon_tile_set_pressure_plate_down_tx_key(&df->tiles[y][x], dn_tx_key);
     dungeon_tile_set_pressure_plate_event(&df->tiles[y][x], event);
+}
+
+
+void dungeon_floor_set_wall_switch(dungeon_floor_t* const df,
+                                   const int x,
+                                   const int y,
+                                   const int up_tx_key,
+                                   const int dn_tx_key,
+                                   const int event) {
+    if (!df) {
+        merror("dungeon_floor_set_wall_switch: df is NULL");
+        return;
+    }
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
+        merror("dungeon_floor_set_wall_switch: x or y out of bounds");
+        return;
+    }
+    dungeon_tile_set_wall_switch(&df->tiles[y][x], true);
+    dungeon_tile_set_wall_switch_up_tx_key(&df->tiles[y][x], up_tx_key);
+    dungeon_tile_set_wall_switch_down_tx_key(&df->tiles[y][x], dn_tx_key);
+    dungeon_tile_set_wall_switch_event(&df->tiles[y][x], event);
 }

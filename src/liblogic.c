@@ -2,6 +2,7 @@
 #include "controlmode.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
+#include "dungeon_tile_type.h"
 #include "em.h"
 #include "entity.h"
 #include "entitytype.h"
@@ -13,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEFAULT_ZOOM_INCR 0.01f
+#define DEFAULT_ZOOM_INCR 0.05f
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
@@ -210,8 +211,9 @@ void liblogic_init(gamestate* const g) {
 
 
     // lets test setting a pressure plate
-    dungeon_floor_set_pressure_plate(df, 8, 2, TX_PRESSURE_PLATE_UP_00, TX_PRESSURE_PLATE_DOWN_00, 666);
+    dungeon_floor_set_pressure_plate(df, 9, 2, TX_PRESSURE_PLATE_UP_00, TX_PRESSURE_PLATE_DOWN_00, 666);
 
+    dungeon_floor_set_wall_switch(df, herox, heroy - 2, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, 777);
 
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
@@ -482,6 +484,17 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         // do something
         // print the pressure plate event
         msuccessint("Pressure plate event", new_tile->pressure_plate_event);
+    }
+
+    // check if the tile is an ON TRAP
+    if (new_tile->type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00) {
+        msuccess("On trap activated!");
+        // do something
+
+        e->hp--;
+
+        e->is_damaged = true;
+        e->do_update = true;
     }
 }
 

@@ -24,6 +24,12 @@ void dungeon_tile_init(dungeon_tile_t* tile, const dungeon_tile_type_t type) {
     tile->pressure_plate_up_tx_key = -1;
     tile->pressure_plate_down_tx_key = -1;
     tile->pressure_plate_event = -1;
+
+    tile->has_wall_switch = false;
+    tile->wall_switch_on = false;
+    tile->wall_switch_up_tx_key = -1;
+    tile->wall_switch_down_tx_key = -1;
+    tile->wall_switch_event = -1;
 }
 
 
@@ -214,4 +220,94 @@ const entityid dungeon_tile_get_entity(const dungeon_tile_t* tile, const size_t 
         return tile->entities[index];
     }
     return -1;
+}
+
+
+void dungeon_tile_set_wall_switch(dungeon_tile_t* tile, const bool has_wall_switch) {
+    if (!tile) {
+        merror("dungeon_tile_set_wall_switch: tile is NULL");
+        return;
+    }
+    tile->has_wall_switch = has_wall_switch;
+}
+
+
+void dungeon_tile_set_wall_switch_up_tx_key(dungeon_tile_t* tile, const int key) {
+    if (!tile) {
+        merror("dungeon_tile_set_wall_switch_up_tx_key: tile is NULL");
+        return;
+    }
+    tile->wall_switch_up_tx_key = key;
+}
+
+
+void dungeon_tile_set_wall_switch_down_tx_key(dungeon_tile_t* tile, const int key) {
+    if (!tile) {
+        merror("dungeon_tile_set_wall_switch_down_tx_key: tile is NULL");
+        return;
+    }
+    tile->wall_switch_down_tx_key = key;
+}
+
+
+void dungeon_tile_set_wall_switch_event(dungeon_tile_t* tile, const int event) {
+    if (!tile) {
+        merror("dungeon_tile_set_wall_switch_event: tile is NULL");
+        return;
+    }
+    tile->wall_switch_event = event;
+}
+
+
+const bool dungeon_tile_has_wall_switch(const dungeon_tile_t* tile) {
+    if (!tile) {
+        merror("dungeon_tile_has_wall_switch: tile is NULL");
+        return false;
+    }
+    return tile->has_wall_switch;
+}
+
+
+const int dungeon_tile_get_wall_switch_up_tx_key(const dungeon_tile_t* tile) {
+    if (!tile) {
+        merror("dungeon_tile_get_wall_switch_up_tx_key: tile is NULL");
+        return -1;
+    }
+    return tile->wall_switch_up_tx_key;
+}
+
+
+const int dungeon_tile_get_wall_switch_down_tx_key(const dungeon_tile_t* tile) {
+    if (!tile) {
+        merror("dungeon_tile_get_wall_switch_down_tx_key: tile is NULL");
+        return -1;
+    }
+    return tile->wall_switch_down_tx_key;
+}
+
+
+const int dungeon_tile_get_wall_switch_event(const dungeon_tile_t* tile) {
+    if (!tile) {
+        merror("dungeon_tile_get_wall_switch_event: tile is NULL");
+        return -1;
+    }
+    return tile->wall_switch_event;
+}
+
+
+void dungeon_tile_set_wall_switch_on(dungeon_tile_t* tile, const bool on) {
+    if (!tile) {
+        merror("dungeon_tile_set_wall_switch_on: tile is NULL");
+        return;
+    }
+    tile->wall_switch_on = on;
+}
+
+
+const bool dungeon_tile_is_wall_switch_on(const dungeon_tile_t* tile) {
+    if (!tile) {
+        merror("dungeon_tile_is_wall_switch_on: tile is NULL");
+        return false;
+    }
+    return tile->wall_switch_on;
 }

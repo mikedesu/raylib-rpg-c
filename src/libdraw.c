@@ -32,11 +32,13 @@ Vector2 zero_vector = {0, 0};
 //#define DEFAULT_WINDOW_WIDTH 640
 //#define DEFAULT_WINDOW_HEIGHT 360
 
-//#define DEFAULT_WINDOW_WIDTH 800
-//#define DEFAULT_WINDOW_HEIGHT 480
+#define DEFAULT_WINDOW_WIDTH 800
+#define DEFAULT_WINDOW_HEIGHT 480
 
-#define DEFAULT_WINDOW_WIDTH 1920
-#define DEFAULT_WINDOW_HEIGHT 1080
+//#define DEFAULT_WINDOW_WIDTH 1280
+//#define DEFAULT_WINDOW_HEIGHT 720
+//#define DEFAULT_WINDOW_WIDTH 1920
+//#define DEFAULT_WINDOW_HEIGHT 1080
 
 //#define DEFAULT_WINDOW_WIDTH 960
 //#define DEFAULT_WINDOW_HEIGHT 540
@@ -46,7 +48,7 @@ Vector2 zero_vector = {0, 0};
 
 //#define DEFAULT_ANIM_SPEED 10
 
-#define DEFAULT_ANIM_SPEED 5
+#define DEFAULT_ANIM_SPEED 10
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 
@@ -311,7 +313,7 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
 
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) {
-        merrorint("libdraw_draw_dungeon_floor_tile: texture id is invalid", texture->id);
+        merrorint4("libdraw_draw_dungeon_floor_tile: texture id is invalid", texture->id, x, y, txkey);
         return;
     }
     // atm hard-coding the size of the new tiles and their destinations
@@ -347,14 +349,30 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
         Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
         Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
-
-        BeginShaderMode(shader_tile_glow);
-
-        float time = (float)GetTime(); // Current time in seconds
-        SetShaderValue(shader_tile_glow, GetShaderLocation(shader_tile_glow, "time"), &time, SHADER_UNIFORM_FLOAT);
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
+    }
 
-        EndShaderMode();
+    // draw the wall switch
+    if (tile->has_wall_switch) {
+        const int txkey = tile->wall_switch_up_tx_key;
+        if (txkey < 0) {
+            merrorint2("libdraw_draw_dungeon_floor_tile: wall switch up txkey is invalid", x, y);
+            return;
+        }
+        Texture2D* texture = &txinfo[txkey].texture;
+        if (texture->id <= 0) {
+            merrorint3("libdraw_draw_dungeon_floor_tile: wall switch texture id is invalid", x, y, txkey);
+            return;
+        }
+        const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
+        const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
+        const int tile_size_dest_w = DEFAULT_TILE_SIZE * 4;
+        const int tile_size_dest_h = DEFAULT_TILE_SIZE * 4;
+        const int tile_size_dest_x = x * DEFAULT_TILE_SIZE - 12;
+        const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
+        Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
+        Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
+        DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
 }
 
@@ -833,14 +851,29 @@ void libdraw_draw_hud(gamestate* const g) {
         return;
     }
     // Draw the HUD
+    const int fontsize = 20;
     const int pad = 10;
     const int x = 0;
     const int y = 0;
 
-    const char* text = "Name: darkmage\nHP: 1/1";
-    const int fontsize = 20;
-    const Vector2 size = MeasureTextEx(GetFontDefault(), text, fontsize, 1);
-    const int w = size.x + pad * 4;
+    //const char* text = "Name: darkmage\nHP: 1/1";
+
+    char buffer[1024] = {0};
+
+    entity* const e = em_get(g->entitymap, g->hero_id);
+    int hp = -1;
+    int maxhp = -1;
+    if (e) {
+        hp = e->hp;
+        maxhp = e->maxhp;
+    }
+
+    snprintf(buffer, sizeof(buffer), "Name: %s\nHP: %d/%d", e->name, hp, maxhp);
+
+
+    //const char* text = "Name: evildojo666\nHP: 1/1";
+    const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
+    const int w = size.x + (pad * 10);
     const int h = size.y + pad * 2;
 
     const Color fg = Fade((Color){0x66, 0x66, 0x66, 255}, 0.8f);
@@ -850,12 +883,13 @@ void libdraw_draw_hud(gamestate* const g) {
 
     const int x1 = x;
     const int y1 = y;
-    DrawText(text, x1 + pad + pad, y1 + pad + pad, fontsize, c2);
+    DrawText(buffer, x1 + pad + pad, y1 + pad + pad, fontsize, c2);
 }
 
 void libdraw_load_shaders() {
     shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
     shader_tile_glow = LoadShader(0, "glow.frag");
+    //shader_tile_glow = LoadShader(0, "psychedelic_ripple.frag");
 }
 
 void libdraw_unload_shaders() {

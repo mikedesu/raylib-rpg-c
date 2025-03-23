@@ -138,6 +138,12 @@
 #define TX_PRESSURE_PLATE_UP_00 112
 #define TX_PRESSURE_PLATE_DOWN_00 113
 
+#define TX_STONE_TRAP_OFF_00 114
+#define TX_STONE_TRAP_ON_00 115
+
+#define TX_WALL_SWITCH_UP_00 116
+#define TX_WALL_SWITCH_DOWN_00 117
+
 //--------------------------------
 
 #define COMPANYSCENE 0

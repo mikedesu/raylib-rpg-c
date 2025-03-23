@@ -54,9 +54,9 @@ int get_txkey_for_tiletype(const dungeon_tile_type_t type) {
     case DUNGEON_TILE_TYPE_FLOOR_STONE_11:
         key = TX_STONE_11;
         break;
-    case DUNGEON_TILE_TYPE_FLOOR_STONE_12:
-        key = TX_STONE_12;
-        break;
+    //case DUNGEON_TILE_TYPE_FLOOR_STONE_12:
+    //    key = TX_STONE_12;
+    //    break;
     case DUNGEON_TILE_TYPE_FLOOR_GRASS_00:
         key = TX_GRASS_00;
         break;
@@ -194,6 +194,12 @@ int get_txkey_for_tiletype(const dungeon_tile_type_t type) {
         break;
     case DUNGEON_TILE_TYPE_FLOOR_DIRT_08:
         key = TX_DIRT_08;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00:
+        key = TX_STONE_TRAP_OFF_00;
+        break;
+    case DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00:
+        key = TX_STONE_TRAP_ON_00;
         break;
 
 
