@@ -3,8 +3,8 @@
 #define DEFAULT_TARGET_FPS 60
 #define FRAMEINTERVAL 10
 #define DEFAULT_LOCK 30
-
 #define DEFAULT_TILE_SIZE 8
+
 
 #define TX_DIRT_00 0
 

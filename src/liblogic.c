@@ -774,48 +774,6 @@ void liblogic_handle_npcs(gamestate* const g) {
 }
 
 
-/*
-void liblogic_handle_npcs(gamestate* const g) {
-    if (!g || g->flag != GAMESTATE_FLAG_NPC_TURN) return;
-
-    int current_index = gamestate_get_entityid_index(g, g->entity_turn);
-    for (int i = current_index; i < g->index_entityids; i++) {
-        entity* e = em_get(g->entitymap, g->entityids[i]);
-        if (!e || e->type != ENTITY_NPC || e->floor != 0) continue;
-
-        g->entity_turn = e->id; // Track the current NPC
-
-        if (strcmp(e->name, "orc-attacker") == 0) {
-            bool attack_connected = liblogic_try_entity_attack(g, e->id, e->x - 1, e->y);
-            if (attack_connected) {
-                // Set attack animation for this NPC
-                e->is_attacking = true;
-                e->do_update = true;
-
-                // Find the victim (assume it’s the entity at x-1, y for simplicity)
-                entity* victim = liblogic_get_entity_at(g, e->x - 1, e->y);
-                if (victim) {
-                    victim->is_damaged = true;
-                    victim->do_update = true;
-                }
-
-                // Switch to animation state and wait
-                g->flag = GAMESTATE_FLAG_NPC_ANIM;
-                return; // Exit to let animations play
-            }
-        } else {
-            // Non-interactive action (e.g., move left)
-            liblogic_try_entity_move(g, e, -1, 0);
-        }
-    }
-
-    // All NPCs processed, animate remaining actions
-    g->flag = GAMESTATE_FLAG_NPC_ANIM;
-    g->entity_turn = g->hero_id; // Reset for player turn
-}
-*/
-
-
 void liblogic_update_debug_panel_buffer(gamestate* const g) {
     if (!g) {
         merror("Game state is NULL!");
@@ -979,6 +937,30 @@ const entityid liblogic_npc_create(gamestate* const g,
 }
 
 
+//const entityid liblogic_player_create(gamestate* const g,
+//                                      const race_t race_type,
+//                                      const int x,
+//                                      const int y,
+//                                      const int floor,
+//                                      const char* name) {
+//
+//    if (!g) {
+//        merror("liblogic_player_create: gamestate is NULL");
+//        return -1;
+//    }
+//    // use the previously-written liblogic_npc_create function
+//    const entitytype_t type = ENTITY_PLAYER;
+//    const entityid id = liblogic_npc_create(g, race_type, x, y, floor, name);
+//    entity_t* const e = em_get(gamestate_get_entitymap(g), id);
+//    if (!e) {
+//        merror("liblogic_player_create: failed to get entity");
+//        return -1;
+//    }
+//    entity_set_type(e, type);
+//    gamestate_set_hero_id(g, id);
+//    return id;
+//}
+
 const entityid liblogic_player_create(gamestate* const g,
                                       const race_t race_type,
                                       const int x,
@@ -988,15 +970,21 @@ const entityid liblogic_player_create(gamestate* const g,
 
     if (!g) {
         merror("liblogic_player_create: gamestate is NULL");
-        return -1;
+        return ENTITYID_INVALID;
     }
+
+    if (!name) {
+        merror("liblogic_player_create: name is NULL");
+        return ENTITYID_INVALID;
+    }
+
     // use the previously-written liblogic_npc_create function
     const entitytype_t type = ENTITY_PLAYER;
     const entityid id = liblogic_npc_create(g, race_type, x, y, floor, name);
     entity_t* const e = em_get(gamestate_get_entitymap(g), id);
     if (!e) {
-        merror("liblogic_player_create: failed to get entity");
-        return -1;
+        merrorint("liblogic_player_create: failed to get entity with id", id);
+        return ENTITYID_INVALID;
     }
     entity_set_type(e, type);
     gamestate_set_hero_id(g, id);
@@ -1070,41 +1058,82 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
 }
 
 
-const int liblogic_tile_npc_dead_count(const gamestate* const g, const int x, const int y, const int floor) {
-    if (!g) {
-        merror("liblogic_tile_npc_dead_count: gamestate is NULL");
-        return -1;
-    }
+//int liblogic_tile_npc_dead_count(const gamestate* const g, int x, int y, int floor) {
+//    if (!g) {
+//        merror("liblogic_tile_npc_dead_count: gamestate is NULL");
+//        return -1;
+//        //return 0;
+//    }
+//
+//    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
+//    if (!df) {
+//        merror("liblogic_tile_npc_dead_count: failed to get dungeon floor");
+//        return -1;
+//        //return 0;
+//    }
+//
+//    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+//    if (!tile) {
+//        merror("liblogic_tile_npc_dead_count: failed to get tile");
+//        return -1;
+//        //return 0;
+//    }
+//
+//    // enumerate entities and count dead NPCs
+//    int count = 0;
+//    for (int i = 0; i < tile->entity_max; i++) {
+//        //if (tile->entities[i] == 0) {
+//        if (tile->entities[i] == -1) continue;
+//        const entity* const e = em_get(g->entitymap, tile->entities[i]);
+//        if (!e) {
+//            merror("liblogic_tile_npc_dead_count: failed to get entity");
+//            return 0;
+//        }
+//        if (e->type == ENTITY_NPC && e->is_dead) count++;
+//    }
+//    return count;
+//}
 
-    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
-    if (!df) {
-        merror("liblogic_tile_npc_dead_count: failed to get dungeon floor");
-        return -1;
-    }
 
-    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-    if (!tile) {
-        merror("liblogic_tile_npc_dead_count: failed to get tile");
-        return -1;
-    }
-
-    // enumerate entities and count dead NPCs
-    int count = 0;
-    for (int i = 0; i < tile->entity_max; i++) {
-        if (tile->entities[i] == -1) {
-            continue;
-        }
-        const entity* const e = em_get(g->entitymap, tile->entities[i]);
-        if (!e) {
-            merror("liblogic_tile_npc_dead_count: failed to get entity");
-            return -1;
-        }
-        if (e->type == ENTITY_NPC && e->is_dead) {
-            count++;
-        }
-    }
-    return count;
-}
+//int liblogic_tile_npc_dead_count(const gamestate* const g, int x, int y, int floor) {
+//    // Input validation
+//    if (!g) {
+//        merror("liblogic_tile_npc_dead_count: gamestate is NULL");
+//        return TILE_COUNT_ERROR; // Define this constant, e.g., -999
+//    }
+//
+//    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
+//    if (!df) {
+//        merrorint("liblogic_tile_npc_dead_count: failed to get dungeon floor", floor);
+//        return TILE_COUNT_ERROR;
+//    }
+//
+//    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+//    if (!tile) {
+//        merrorint2("liblogic_tile_npc_dead_count: failed to get tile at", x, y);
+//        return TILE_COUNT_ERROR;
+//    }
+//
+//    // Count dead NPCs
+//    int count = 0;
+//    for (int i = 0; i < tile->entity_max; i++) {
+//        if (tile->entities[i] == -1) {
+//            continue;
+//        }
+//
+//        const entity* const e = em_get(g->entitymap, tile->entities[i]);
+//        if (!e) {
+//            merrorint("liblogic_tile_npc_dead_count: failed to get entity", tile->entities[i]);
+//            return TILE_COUNT_ERROR;
+//        }
+//
+//        if (e->type == ENTITY_NPC && e->is_dead) {
+//            count++;
+//        }
+//    }
+//
+//    return count;
+//}
 
 
 const int liblogic_tile_npc_living_count(const gamestate* const g, const int x, const int y, const int floor) {
