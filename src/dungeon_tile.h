@@ -34,16 +34,17 @@ dungeon_tile_t* dungeon_tile_create(const dungeon_tile_type_t type);
 void dungeon_tile_free(dungeon_tile_t* tile);
 void dungeon_tile_init(dungeon_tile_t* tile, const dungeon_tile_type_t type);
 
-const entityid dungeon_tile_add(dungeon_tile_t* tile, const entityid id);
+bool dungeon_tile_resize(dungeon_tile_t* t);
+entityid dungeon_tile_add(dungeon_tile_t* tile, const entityid id);
 const entityid dungeon_tile_remove(dungeon_tile_t* tile, const entityid id);
 const entityid dungeon_tile_get_entity(const dungeon_tile_t* tile, const size_t index);
 
 const size_t dungeon_tile_entity_count(const dungeon_tile_t* tile);
 
-void dungeon_tile_set_pressure_plate(dungeon_tile_t* tile, const bool has_pressure_plate);
-void dungeon_tile_set_pressure_plate_up_tx_key(dungeon_tile_t* tile, const int key);
-void dungeon_tile_set_pressure_plate_down_tx_key(dungeon_tile_t* tile, const int key);
-void dungeon_tile_set_pressure_plate_event(dungeon_tile_t* tile, const int event);
+void dungeon_tile_set_pressure_plate(dungeon_tile_t* const t, bool b);
+void dungeon_tile_set_pressure_plate_up_tx_key(dungeon_tile_t* const t, int k);
+void dungeon_tile_set_pressure_plate_down_tx_key(dungeon_tile_t* const t, int k);
+void dungeon_tile_set_pressure_plate_event(dungeon_tile_t* const t, int e);
 
 const bool dungeon_tile_has_pressure_plate(const dungeon_tile_t* tile);
 const bool dungeon_tile_is_wall_switch_on(const dungeon_tile_t* tile);
