@@ -3,26 +3,33 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 void dungeon_tile_init(dungeon_tile_t* tile, const dungeon_tile_type_t type) {
     if (!tile) {
         merror("dungeon_tile_init: tile is NULL");
         return;
     }
-    const size_t malloc_sz = sizeof(entityid) * DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
+
     tile->type = type;
-    tile->visible = tile->explored = false;
-    tile->entities = (entityid*)malloc(malloc_sz);
-    if (tile->entities == NULL) {
-        merror("dungeon_tile_init: tile->entities malloc failed");
+    tile->visible = false;
+    tile->explored = false;
+
+    const size_t malloc_sz = sizeof(entityid) * DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
+    tile->entities = malloc(malloc_sz);
+    if (!tile->entities) {
+        merror("dungeon_tile_init: failed to allocate entities array");
+        tile->type = DUNGEON_TILE_TYPE_NONE; // Reset to safe state
         return;
     }
     memset(tile->entities, -1, malloc_sz);
     tile->entity_count = 0;
     tile->entity_max = DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
+
     tile->has_pressure_plate = false;
     tile->pressure_plate_up_tx_key = -1;
     tile->pressure_plate_down_tx_key = -1;
     tile->pressure_plate_event = -1;
+
     tile->has_wall_switch = false;
     tile->wall_switch_on = false;
     tile->wall_switch_up_tx_key = -1;
