@@ -9,8 +9,8 @@
 6  4 4  0  img/characters/shadows/human_attack_shadow.png 
 7  4 4  0  img/characters/human_jump.png 
 8  4 4  0  img/characters/shadows/human_jump_shadow.png 
-9  1 12 0  img/characters/human_spindie.png 
-10 1 12 0  img/characters/shadows/human_spindie_shadow.png 
+9  1 7 0  img/characters/human_spindie2.png 
+10 1 7 0  img/characters/shadows/human_spindie2_shadow.png 
 11 1 12 0  img/characters/human_souldie.png 
 12 1 12 0  img/characters/shadows/human_souldie_shadow.png 
 # atm there are 14 total orc sprite animations

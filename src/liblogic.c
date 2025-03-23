@@ -359,6 +359,12 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         return;
     }
 
+    // check if the player is dead
+    if (e->is_dead) {
+        //merror("Hero is dead!");
+        return;
+    }
+
     const int key = inputstate_get_pressed_key(is);
 
     switch (key) {
@@ -584,6 +590,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
         return;
     }
 
+    liblogic_update_player_state(g);
     liblogic_handle_input(is, g);
 
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
@@ -596,6 +603,37 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+}
+
+
+void liblogic_update_player_state(gamestate* const g) {
+    if (!g) {
+        merror("Game state is NULL!");
+        return;
+    }
+
+    entity* const e = em_get(g->entitymap, g->hero_id);
+    if (!e) {
+        merror("Failed to get hero entity");
+        return;
+    }
+
+    if (e->is_dead) {
+        //merror("Hero is dead!");
+        return;
+    }
+
+    if (e->hp <= 0) {
+        e->is_dead = true;
+        e->do_update = true;
+        merror("Hero is dead!");
+        return;
+    }
+
+    //if (e->is_damaged) {
+    //    e->is_damaged = false;
+    //    e->do_update = true;
+    //}
 }
 
 
