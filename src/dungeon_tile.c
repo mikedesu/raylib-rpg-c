@@ -4,37 +4,37 @@
 #include <string.h>
 
 
-void dungeon_tile_init(dungeon_tile_t* tile, const dungeon_tile_type_t type) {
-    if (!tile) {
+void dungeon_tile_init(dungeon_tile_t* const t, dungeon_tile_type_t type) {
+    if (!t) {
         merror("dungeon_tile_init: tile is NULL");
         return;
     }
 
-    tile->type = type;
-    tile->visible = false;
-    tile->explored = false;
+    t->type = type;
+    t->visible = false;
+    t->explored = false;
 
     const size_t malloc_sz = sizeof(entityid) * DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
-    tile->entities = malloc(malloc_sz);
-    if (!tile->entities) {
+    t->entities = malloc(malloc_sz);
+    if (!t->entities) {
         merror("dungeon_tile_init: failed to allocate entities array");
-        tile->type = DUNGEON_TILE_TYPE_NONE; // Reset to safe state
+        t->type = DUNGEON_TILE_TYPE_NONE; // Reset to safe state
         return;
     }
-    memset(tile->entities, -1, malloc_sz);
-    tile->entity_count = 0;
-    tile->entity_max = DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
+    memset(t->entities, -1, malloc_sz);
+    t->entity_count = 0;
+    t->entity_max = DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
 
-    tile->has_pressure_plate = false;
-    tile->pressure_plate_up_tx_key = -1;
-    tile->pressure_plate_down_tx_key = -1;
-    tile->pressure_plate_event = -1;
+    t->has_pressure_plate = false;
+    t->pressure_plate_up_tx_key = -1;
+    t->pressure_plate_down_tx_key = -1;
+    t->pressure_plate_event = -1;
 
-    tile->has_wall_switch = false;
-    tile->wall_switch_on = false;
-    tile->wall_switch_up_tx_key = -1;
-    tile->wall_switch_down_tx_key = -1;
-    tile->wall_switch_event = -1;
+    t->has_wall_switch = false;
+    t->wall_switch_on = false;
+    t->wall_switch_up_tx_key = -1;
+    t->wall_switch_down_tx_key = -1;
+    t->wall_switch_event = -1;
 }
 
 
@@ -61,16 +61,16 @@ void dungeon_tile_set_pressure_plate_event(dungeon_tile_t* const t, int e) {
 }
 
 
-const bool dungeon_tile_has_pressure_plate(const dungeon_tile_t* tile) {
-    if (!tile) {
+bool dungeon_tile_has_pressure_plate(const dungeon_tile_t* const t) {
+    if (!t) {
         merror("dungeon_tile_has_pressure_plate: tile is NULL");
         return false;
     }
-    return tile->has_pressure_plate;
+    return t->has_pressure_plate;
 }
 
 
-const int dungeon_tile_get_pressure_plate_event(const dungeon_tile_t* tile) {
+int dungeon_tile_get_pressure_plate_event(const dungeon_tile_t* const tile) {
     if (!tile) {
         merror("dungeon_tile_get_pressure_plate_event: tile is NULL");
         return -1;
@@ -130,70 +130,37 @@ bool dungeon_tile_resize(dungeon_tile_t* t) {
 }
 
 
-//const entityid dungeon_tile_add(dungeon_tile_t* const t, const entityid id) {
-//    minfoint("dungeon_tile_add: adding entity", id);
-//    int index = -1;
-//    for (int i = 0; i < DUNGEON_TILE_MAX_ENTITIES_DEFAULT; i++) {
-//        if (t->entities[i] == -1) {
-//            index = i;
-//            break;
-//        }
-//    }
-//    if (index != -1) {
-//        t->entities[index] = id;
-//        t->entity_count++;
-//    } else {
-//        merror("dungeon_tile_add: no space for entity, resizing...");
-//        dungeon_tile_resize(t);
-//        return dungeon_tile_add(t, id);
-//    }
-//    return index;
-//}
-
-
-//entityid dungeon_tile_add(dungeon_tile_t* const t, entityid id) {
-//    if (!t || !t->entities) {
-//        merror("dungeon_tile_add: tile or entities is NULL");
-//        return -1;
-//    }
-//    minfoint("Adding entity", id);
-//
-//    for (size_t i = 0; i < t->entity_max; i++) {
-//        if (t->entities[i] == -1) {
-//            t->entities[i] = id;
-//            t->entity_count++;
-//            return id; // Return ID, not index
-//        }
-//    }
-//
-//    mwarning("No space for entity, resizing...");
-//    if (!dungeon_tile_resize(t)) { // Assume resize returns success
-//        merror("Resize failed");
-//        return -1;
-//    }
-//    return dungeon_tile_add(t, id); // Recurse
-//}
-
-
 entityid dungeon_tile_add(dungeon_tile_t* const t, entityid id) {
-    if (!t || !t->entities) return -1;
-    minfoint("Adding entity", id);
+    if (!t || !t->entities) {
+        merror("dungeon_tile_add: Invalid tile or entity array");
+        return ENTITYID_INVALID;
+    }
 
-    for (size_t i = 0; i < t->entity_max; i++) { // Use entity_max
-        if (t->entities[i] == -1) {
+    // Early exit if tile is full and resize fails
+    if (t->entity_count >= t->entity_max) {
+        mwarning("dungeon_tile_add: Tile full, attempting resize");
+        if (!dungeon_tile_resize(t)) {
+            merror("dungeon_tile_add: Resize failed");
+            return ENTITYID_INVALID;
+        }
+    }
+
+    // Find first empty slot
+    for (size_t i = 0; i < t->entity_max; i++) {
+        if (t->entities[i] == ENTITYID_INVALID) {
             t->entities[i] = id;
             t->entity_count++;
             return id;
         }
     }
 
-    mwarning("No space, resizing...");
-    if (!dungeon_tile_resize(t)) return -1;
-    return dungeon_tile_add(t, id);
+    // This should never happen due to earlier check
+    merror("dungeon_tile_add: No empty slot found after resize");
+    return ENTITYID_INVALID;
 }
 
 
-const entityid dungeon_tile_remove(dungeon_tile_t* tile, const entityid id) {
+entityid dungeon_tile_remove(dungeon_tile_t* tile, entityid id) {
     bool did_remove = false;
     for (int i = 0; i < tile->entity_max; i++) {
         if (tile->entities[i] == id) {
@@ -214,7 +181,7 @@ const entityid dungeon_tile_remove(dungeon_tile_t* tile, const entityid id) {
 }
 
 
-dungeon_tile_t* dungeon_tile_create(const dungeon_tile_type_t type) {
+dungeon_tile_t* dungeon_tile_create(dungeon_tile_type_t type) {
     dungeon_tile_t* t = malloc(sizeof(dungeon_tile_t));
     if (!t) {
         merror("dungeon_tile_create: failed to allocate memory for dungeon_tile_t");
@@ -232,34 +199,32 @@ void dungeon_tile_free(dungeon_tile_t* t) {
 }
 
 
-const size_t dungeon_tile_entity_count(const dungeon_tile_t* t) {
-    if (!t) return 0;
-    return t->entity_count;
+size_t dungeon_tile_entity_count(const dungeon_tile_t* const t) {
+    //if (!t) return 0;
+    //return t->entity_count;
+    return !t ? 0 : t->entity_count;
 }
 
 
-const entityid dungeon_tile_get_entity(const dungeon_tile_t* tile, const size_t index) {
-    if (!tile) {
-        merror("dungeon_tile_get_entity: tile is NULL");
-        return -1;
-    }
-    if (index < tile->entity_max) {
-        return tile->entities[index];
-    }
-    return -1;
+entityid dungeon_tile_get_entity(const dungeon_tile_t* const t, size_t i) {
+    //if (!t) {
+    //    merror("dungeon_tile_get_entity: tile is NULL");
+    //    return -1;
+    //}
+    return !t ? -1 : i < t->entity_max ? t->entities[i] : -1;
 }
 
 
-void dungeon_tile_set_wall_switch(dungeon_tile_t* tile, const bool has_wall_switch) {
-    if (!tile) {
+void dungeon_tile_set_wall_switch(dungeon_tile_t* const t, bool b) {
+    if (!t) {
         merror("dungeon_tile_set_wall_switch: tile is NULL");
         return;
     }
-    tile->has_wall_switch = has_wall_switch;
+    t->has_wall_switch = b;
 }
 
 
-void dungeon_tile_set_wall_switch_up_tx_key(dungeon_tile_t* tile, const int key) {
+void dungeon_tile_set_wall_switch_up_tx_key(dungeon_tile_t* tile, int key) {
     if (!tile) {
         merror("dungeon_tile_set_wall_switch_up_tx_key: tile is NULL");
         return;
@@ -268,7 +233,7 @@ void dungeon_tile_set_wall_switch_up_tx_key(dungeon_tile_t* tile, const int key)
 }
 
 
-void dungeon_tile_set_wall_switch_down_tx_key(dungeon_tile_t* tile, const int key) {
+void dungeon_tile_set_wall_switch_down_tx_key(dungeon_tile_t* tile, int key) {
     if (!tile) {
         merror("dungeon_tile_set_wall_switch_down_tx_key: tile is NULL");
         return;
@@ -277,7 +242,7 @@ void dungeon_tile_set_wall_switch_down_tx_key(dungeon_tile_t* tile, const int ke
 }
 
 
-void dungeon_tile_set_wall_switch_event(dungeon_tile_t* tile, const int event) {
+void dungeon_tile_set_wall_switch_event(dungeon_tile_t* tile, int event) {
     if (!tile) {
         merror("dungeon_tile_set_wall_switch_event: tile is NULL");
         return;
@@ -286,7 +251,7 @@ void dungeon_tile_set_wall_switch_event(dungeon_tile_t* tile, const int event) {
 }
 
 
-const bool dungeon_tile_has_wall_switch(const dungeon_tile_t* tile) {
+bool dungeon_tile_has_wall_switch(const dungeon_tile_t* tile) {
     if (!tile) {
         merror("dungeon_tile_has_wall_switch: tile is NULL");
         return false;
@@ -295,7 +260,7 @@ const bool dungeon_tile_has_wall_switch(const dungeon_tile_t* tile) {
 }
 
 
-const int dungeon_tile_get_wall_switch_up_tx_key(const dungeon_tile_t* tile) {
+int dungeon_tile_get_wall_switch_up_tx_key(const dungeon_tile_t* const tile) {
     if (!tile) {
         merror("dungeon_tile_get_wall_switch_up_tx_key: tile is NULL");
         return -1;
@@ -304,7 +269,7 @@ const int dungeon_tile_get_wall_switch_up_tx_key(const dungeon_tile_t* tile) {
 }
 
 
-const int dungeon_tile_get_wall_switch_down_tx_key(const dungeon_tile_t* tile) {
+int dungeon_tile_get_wall_switch_down_tx_key(const dungeon_tile_t* const tile) {
     if (!tile) {
         merror("dungeon_tile_get_wall_switch_down_tx_key: tile is NULL");
         return -1;
@@ -313,7 +278,7 @@ const int dungeon_tile_get_wall_switch_down_tx_key(const dungeon_tile_t* tile) {
 }
 
 
-const int dungeon_tile_get_wall_switch_event(const dungeon_tile_t* tile) {
+int dungeon_tile_get_wall_switch_event(const dungeon_tile_t* const tile) {
     if (!tile) {
         merror("dungeon_tile_get_wall_switch_event: tile is NULL");
         return -1;
@@ -322,7 +287,7 @@ const int dungeon_tile_get_wall_switch_event(const dungeon_tile_t* tile) {
 }
 
 
-void dungeon_tile_set_wall_switch_on(dungeon_tile_t* tile, const bool on) {
+void dungeon_tile_set_wall_switch_on(dungeon_tile_t* const tile, bool on) {
     if (!tile) {
         merror("dungeon_tile_set_wall_switch_on: tile is NULL");
         return;
@@ -331,10 +296,10 @@ void dungeon_tile_set_wall_switch_on(dungeon_tile_t* tile, const bool on) {
 }
 
 
-const bool dungeon_tile_is_wall_switch_on(const dungeon_tile_t* tile) {
-    if (!tile) {
+bool dungeon_tile_is_wall_switch_on(const dungeon_tile_t* const t) {
+    if (!t) {
         merror("dungeon_tile_is_wall_switch_on: tile is NULL");
         return false;
     }
-    return tile->wall_switch_on;
+    return t->wall_switch_on;
 }

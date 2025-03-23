@@ -326,9 +326,9 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
     if (inputstate_is_held(is, KEY_Z)) {
         //msuccess("Z held!");
         if (inputstate_is_shift_held(is)) {
-            g->cam2d.zoom += DEFAULT_ZOOM_INCR;
-        } else {
             g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
+        } else {
+            g->cam2d.zoom += DEFAULT_ZOOM_INCR;
         }
         return;
     }
