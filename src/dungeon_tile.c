@@ -8,10 +8,8 @@ void dungeon_tile_init(dungeon_tile_t* const t, dungeon_tile_type_t type) {
         merror("dungeon_tile_init: tile is NULL");
         return;
     }
-
     t->type = type;
-    t->visible = false;
-    t->explored = false;
+    t->visible = t->explored = false;
     const size_t malloc_sz = sizeof(entityid) * DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
     t->entities = malloc(malloc_sz);
     if (!t->entities) {
@@ -23,16 +21,9 @@ void dungeon_tile_init(dungeon_tile_t* const t, dungeon_tile_type_t type) {
     t->entity_count = 0;
     t->entity_max = DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
 
-    t->has_pressure_plate = false;
-    t->pressure_plate_up_tx_key = -1;
-    t->pressure_plate_down_tx_key = -1;
-    t->pressure_plate_event = -1;
-
-    t->has_wall_switch = false;
-    t->wall_switch_on = false;
-    t->wall_switch_up_tx_key = -1;
-    t->wall_switch_down_tx_key = -1;
-    t->wall_switch_event = -1;
+    t->has_pressure_plate = t->has_wall_switch = t->wall_switch_on = false;
+    t->pressure_plate_up_tx_key = t->pressure_plate_down_tx_key = t->pressure_plate_event = -1;
+    t->wall_switch_up_tx_key = t->wall_switch_down_tx_key = t->wall_switch_event = -1;
 }
 
 void dungeon_tile_set_pressure_plate(dungeon_tile_t* const t, bool b) {
