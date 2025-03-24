@@ -39,5 +39,8 @@ void liblogic_try_entity_attack_player(gamestate* const g, entity* const e);
 void liblogic_try_entity_move_attack_player(gamestate* const g, entity* const e);
 bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1);
 
+entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
+
+
 //void liblogic_camera_lock_on(gamestate* const g);
 //int liblogic_tile_npc_dead_count(const gamestate* const g, int x, int y, int floor);

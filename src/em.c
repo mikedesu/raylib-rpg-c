@@ -52,12 +52,23 @@ entity_t* const em_get(em_t* em, const entityid id) {
         return NULL;
     }
 
-    if (id == -1) {
+    if (id < 0) {
         //merror("em_get: id is -1");
         return NULL;
     }
 
     const int hash = id % EM_MAX_SLOTS;
+
+    if (hash < 0) {
+        merrorint("em_get: hash is negative", hash);
+        return NULL;
+    }
+
+    // this code is not needed because the hash is already checked
+    //if (hash >= EM_MAX_SLOTS) {
+    //    merrorint("em_get: hash is too large", hash);
+    //    return NULL;
+    //}
 
     return em->entities[hash];
 }

@@ -299,8 +299,6 @@ void liblogic_init(gamestate* const g) {
         entity_set_maxhp(hero, 3);
         entity_set_hp(hero, 3);
     }
-
-
     g->entity_turn = g->hero_id;
 
 
@@ -309,8 +307,8 @@ void liblogic_init(gamestate* const g) {
     //entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
     //entityid orc2 = liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
 
-    int orc_basex = 4;
-    int orc_basey = 6;
+    int orc_x = 4;
+    int orc_y = 6;
     //int rows = 10;
     //int cols = 10;
     //int rows = 34;
@@ -325,7 +323,6 @@ void liblogic_init(gamestate* const g) {
         return;
     }
 
-
     // lets test setting a pressure plate
     dungeon_floor_set_pressure_plate(df, 9, 2, TX_PRESSURE_PLATE_UP_00, TX_PRESSURE_PLATE_DOWN_00, 666);
 
@@ -337,20 +334,18 @@ void liblogic_init(gamestate* const g) {
                 break;
             }
 
-            entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_basex + x, orc_basey + y, 0, "orc");
-            if (orc_id == -1) {
-                merror("liblogic_init: failed to init orc");
-            }
-            entity* const orc = em_get(g->entitymap, orc_id);
-            if (orc) {
-                //entity_action_t action = ENTITY_ACTION_MOVE_RANDOM;
-                //entity_action_t action = ENTITY_ACTION_MOVE_PLAYER;
-                entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
-                entity_set_default_action(orc, action);
-                entity_set_maxhp(orc, 1);
-                entity_set_hp(orc, 1);
-                count++;
-            }
+            //entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_x + x, orc_y + y, 0, "orc");
+            //if (orc_id == -1) {
+            //    merror("liblogic_init: failed to init orc");
+            //    continue;
+            //}
+            //entity* const orc = em_get(g->entitymap, orc_id);
+            entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, orc_x + x, orc_y + y, 0, "orc");
+            entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
+            entity_set_default_action(orc, action);
+            entity_set_maxhp(orc, 1);
+            entity_set_hp(orc, 1);
+            count++;
 
             if (count >= total_orcs_to_make) {
                 break;
@@ -982,6 +977,23 @@ void liblogic_add_entityid(gamestate* const g, entityid id) {
     }
     gamestate_add_entityid(g, id);
     msuccessint("Added entity ID: ", id);
+}
+
+
+entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
+
+    if (!g) {
+        merror("liblogic_npc_create_ptr: gamestate is NULL");
+        return NULL;
+    }
+
+    entityid id = liblogic_npc_create(g, rt, x, y, fl, name);
+    if (id == -1) {
+        merror("liblogic_npc_create_ptr: failed to create NPC");
+        return NULL;
+    }
+
+    return em_get(g->entitymap, id);
 }
 
 
