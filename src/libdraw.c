@@ -1,5 +1,6 @@
 #include "libdraw.h"
 //#include "entitytype.h"
+#include "direction.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
@@ -465,6 +466,10 @@ void libdraw_drawframe(gamestate* const g) {
         merror("libdraw_drawframe: failed to draw dungeon floor");
     }
 
+    if (!libdraw_draw_player_target_box(g)) {
+        merror("libdraw_drawframe: failed to draw player target box");
+    }
+
     //libdraw_draw_sprite_and_shadow(g, g->hero_id);
     EndMode2D();
     EndTextureMode();
@@ -474,6 +479,7 @@ void libdraw_drawframe(gamestate* const g) {
     //SetShaderValue(shader_grayscale, GetShaderLocation(shader_grayscale, "time"), &time, SHADER_UNIFORM_FLOAT);
 
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+
 
     //EndShaderMode();
 
@@ -488,6 +494,59 @@ void libdraw_drawframe(gamestate* const g) {
     double elapsed_time = GetTime() - start_time;
     g->last_frame_time = elapsed_time;
     g->framecount++;
+}
+
+
+bool libdraw_draw_player_target_box(const gamestate* const g) {
+    if (!g) {
+        merror("libdraw_draw_player_target_box: gamestate is NULL");
+        return false;
+    }
+    const entityid id = g->hero_id;
+    if (id == -1) {
+        merror("libdraw_draw_player_target_box: id is -1");
+        return false;
+    }
+    entity* e = em_get(g->entitymap, id);
+    if (!e) {
+        merrorint("libdraw_draw_player_target_box: entity not found", id);
+        return false;
+    }
+    direction_t dir = e->direction;
+    int x = e->x, y = e->y;
+    if (dir == DIRECTION_LEFT) {
+        x--;
+    } else if (dir == DIRECTION_RIGHT) {
+        x++;
+    } else if (dir == DIRECTION_UP) {
+        y--;
+    } else if (dir == DIRECTION_DOWN) {
+        y++;
+    } else if (dir == DIRECTION_DOWN_LEFT) {
+        x--;
+        y++;
+    } else if (dir == DIRECTION_DOWN_RIGHT) {
+        x++;
+        y++;
+    } else if (dir == DIRECTION_UP_LEFT) {
+        x--;
+        y--;
+    } else if (dir == DIRECTION_UP_RIGHT) {
+        x++;
+        y--;
+    }
+
+    //const int tile_size_src_w = DEFAULT_TILE_SIZE;
+    //const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
+    const int tile_size_dest_w = DEFAULT_TILE_SIZE;
+    const int tile_size_dest_h = DEFAULT_TILE_SIZE;
+    const int tile_size_dest_x = x * DEFAULT_TILE_SIZE;
+    const int tile_size_dest_y = y * DEFAULT_TILE_SIZE;
+
+    //Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
+    Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
+    DrawRectangleLinesEx(dest, 1, Fade(RED, 0.5f));
+    return true;
 }
 
 

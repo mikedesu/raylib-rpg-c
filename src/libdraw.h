@@ -53,3 +53,4 @@ bool libdraw_camera_lock_on(gamestate* const g);
 void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
 void libdraw_update_sprite_position(spritegroup_t* sg, entity_t* e);
 void libdraw_update_sprite_attack(entity_t* e, spritegroup_t* sg);
+bool libdraw_draw_player_target_box(const gamestate* const g);
