@@ -282,15 +282,22 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
     }
     // atm hard-coding the size of the new tiles and their destinations
 
-    const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
-    const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
-    const int tile_size_dest_w = DEFAULT_TILE_SIZE * 4;
-    const int tile_size_dest_h = DEFAULT_TILE_SIZE * 4;
-    const int tile_size_dest_x = x * DEFAULT_TILE_SIZE - 12;
-    const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
+    //const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
+    //const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
+    //const int tile_size_dest_w = DEFAULT_TILE_SIZE * 4;
+    //const int tile_size_dest_h = DEFAULT_TILE_SIZE * 4;
+    //const int tile_size_dest_x = x * DEFAULT_TILE_SIZE - 12;
+    //const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
 
-    Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
-    Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
+    const int sw = DEFAULT_TILE_SIZE * 4;
+    const int sh = DEFAULT_TILE_SIZE * 4;
+    const int dw = DEFAULT_TILE_SIZE * 4;
+    const int dh = DEFAULT_TILE_SIZE * 4;
+    const int dx = x * DEFAULT_TILE_SIZE - 12;
+    const int dy = y * DEFAULT_TILE_SIZE - 12;
+
+    Rectangle src = (Rectangle){0, 0, sw, sh};
+    Rectangle dest = (Rectangle){dx, dy, dw, dh};
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
 
     // draw the pressure plate if it exists
@@ -305,14 +312,15 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
             //merrorint3("libdraw_draw_dungeon_floor_tile: pressure plate texture id is invalid", x, y, txkey);
             return false;
         }
-        const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
-        const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
-        const int tile_size_dest_w = DEFAULT_TILE_SIZE * 4;
-        const int tile_size_dest_h = DEFAULT_TILE_SIZE * 4;
-        const int tile_size_dest_x = x * DEFAULT_TILE_SIZE - 12;
-        const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
-        Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
-        Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
+        //const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
+        //const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
+        //const int tile_size_dest_w = DEFAULT_TILE_SIZE * 4;
+        //const int tile_size_dest_h = DEFAULT_TILE_SIZE * 4;
+        //const int tile_size_dest_x = x * DEFAULT_TILE_SIZE - 12;
+        //const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
+        //Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
+        //Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
+
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
 
@@ -336,14 +344,14 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
             merrorint3("libdraw_draw_dungeon_floor_tile: wall switch texture id is invalid", x, y, txkey);
             return false;
         }
-        const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
-        const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
-        const int tile_size_dest_w = DEFAULT_TILE_SIZE * 4;
-        const int tile_size_dest_h = DEFAULT_TILE_SIZE * 4;
-        const int tile_size_dest_x = x * DEFAULT_TILE_SIZE - 12;
-        const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
-        Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
-        Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
+        //const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
+        //const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
+        //const int tile_size_dest_w = DEFAULT_TILE_SIZE * 4;
+        //const int tile_size_dest_h = DEFAULT_TILE_SIZE * 4;
+        //const int tile_size_dest_x = x * DEFAULT_TILE_SIZE - 12;
+        //const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
+        //Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
+        //Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
     return true;
