@@ -367,28 +367,21 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
 }
 
 
-void libdraw_draw_dungeon_floor(const gamestate* const g) {
+bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     if (!g) {
         merror("libdraw_draw_dungeon_floor: gamestate is NULL");
-        return;
+        return false;
     }
 
     dungeon_floor_t* const df = dungeon_get_current_floor(g->dungeon);
     if (!df) {
         merror("libdraw_draw_dungeon_floor: dungeon_floor is NULL");
-        return;
+        return false;
     }
 
     // draw all non-wall tiles
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            // draw the entities on the tile
-            //dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
-            //if (!tile) {
-            //    merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
-            //    return;
-            //}
-            //if (dungeon_tile_is_wall(tile->type)) continue;
             if (df_tile_is_wall(df, x, y)) continue;
 
             if (!libdraw_draw_dungeon_floor_tile(g, df, x, y)) {
@@ -396,32 +389,6 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
             }
         }
     }
-
-
-    // draw all non-wall tile entities
-    // we will come back here and update the order
-    // so that dead entities arent drawn over others,
-    // player gets drawn on top, etc
-    //for (int y = 0; y < df->height; y++) {
-    //    for (int x = 0; x < df->width; x++) {
-    //        // draw the entities on the tile
-    //        dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
-    //        if (!tile) {
-    //            merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
-    //            return;
-    //        }
-    //        if (dungeon_tile_is_wall(tile->type)) continue;
-    //        const int num_entities = dungeon_tile_entity_count(tile);
-    //        for (int i = 0; i < num_entities; i++) {
-    //            const entityid id = dungeon_tile_get_entity(tile, i);
-    //            if (id == -1) {
-    //                merrorint2("libdraw_draw_dungeon_floor: entity id is -1", x, y);
-    //                return;
-    //            }
-    //            libdraw_draw_sprite_and_shadow(g, id);
-    //        }
-    //    }
-    //}
 
     // First pass: dead entities
     for (int y = 0; y < df->height; y++) {
@@ -448,19 +415,20 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
         }
     }
 
-
     // walls etc
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
             if (!tile) {
                 merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
-                return;
+                return false;
             }
             if (!dungeon_tile_is_wall(tile->type)) continue;
             libdraw_draw_dungeon_floor_tile(g, df, x, y);
         }
     }
+
+    return true;
 }
 
 
@@ -489,9 +457,13 @@ void libdraw_drawframe(gamestate* const g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
 
-    libdraw_camera_lock_on(g); // Add here
+    if (!libdraw_camera_lock_on(g)) {
+        merror("libdraw_drawframe: failed to lock camera on hero");
+    }
 
-    libdraw_draw_dungeon_floor(g);
+    if (!libdraw_draw_dungeon_floor(g)) {
+        merror("libdraw_drawframe: failed to draw dungeon floor");
+    }
 
     //libdraw_draw_sprite_and_shadow(g, g->hero_id);
     EndMode2D();
@@ -530,8 +502,6 @@ void libdraw_draw_sprite(const gamestate* const g, const entityid id) {
         merror("sprite not found");
         return;
     }
-    //const int scale = 1;
-    //Rectangle new_dest = (Rectangle){sg->dest.x, sg->dest.y, scale * sg->dest.width, scale * sg->dest.height};
     Rectangle new_dest = (Rectangle){sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     DrawTexturePro(*s->texture, s->src, new_dest, (Vector2){0, 0}, 0, WHITE);
 }
@@ -552,7 +522,6 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
         merrorint("libdraw_draw_sprite_and_shadow: sprite not found at current", sg->current);
         return;
     }
-    //const int scale = 4;
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     sprite* sh = spritegroup_get(sg, sg->current + 1);
     if (sh) {
@@ -900,12 +869,13 @@ void libdraw_unload_shaders() {
 }
 
 
-void libdraw_camera_lock_on(gamestate* const g) {
-    if (!g || !g->cam_lockon) return;
+bool libdraw_camera_lock_on(gamestate* const g) {
+    if (!g || !g->cam_lockon) return false;
     spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     if (!grp) {
         merrorint("libdraw_camera_lock_on: hero spritegroup NULL", g->hero_id);
-        return;
+        return false;
     }
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
+    return true;
 }

@@ -34,8 +34,8 @@ void libdraw_update_sprites(gamestate* const g);
 void libdraw_update_sprite(gamestate* const g, entityid id);
 void libdraw_draw_sprite(const gamestate* const g, const entityid id);
 void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id);
-void libdraw_draw_dungeon_floor(const gamestate* const g);
 
+bool libdraw_draw_dungeon_floor(const gamestate* const g);
 bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
 
 void libdraw_draw_debug_panel(gamestate* const g);
@@ -47,7 +47,9 @@ void libdraw_draw_hud(gamestate* const g);
 
 void libdraw_load_shaders(); // Load shader
 void libdraw_unload_shaders(); // Cleanup
-void libdraw_camera_lock_on(gamestate* const g);
+
+bool libdraw_camera_lock_on(gamestate* const g);
+
 void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
 void libdraw_update_sprite_position(spritegroup_t* sg, entity_t* e);
 void libdraw_update_sprite_attack(entity_t* e, spritegroup_t* sg);
