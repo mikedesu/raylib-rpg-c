@@ -16,6 +16,19 @@ dungeon_floor_t* dungeon_floor_create(const int width, const int height) {
 }
 
 
+void df_set_tile_area(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y, int w, int h) {
+    if (!df) return;
+    for (int i = x; i < df->height; i++) {
+        for (int j = y; j < df->width; j++) {
+            //dungeon_tile_t* current = &df->tiles[i][j];
+            dungeon_tile_t* current = dungeon_floor_tile_at(df, j, i);
+            //dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
+            dungeon_tile_init(current, type);
+        }
+    }
+}
+
+
 void dungeon_floor_init(dungeon_floor_t* floor) {
     if (!floor) {
         merror("dungeon_floor_init: floor is NULL");
@@ -78,7 +91,6 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
         dungeon_tile_init(current, type);
     }
     // set a tile on the bottom of the perimeter to be floor
-
     dungeon_tile_t* current = &floor->tiles[5][2];
     //dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
     dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
