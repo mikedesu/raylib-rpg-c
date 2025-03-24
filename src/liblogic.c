@@ -334,12 +334,6 @@ void liblogic_init(gamestate* const g) {
                 break;
             }
 
-            //entityid orc_id = liblogic_npc_create(g, RACE_ORC, orc_x + x, orc_y + y, 0, "orc");
-            //if (orc_id == -1) {
-            //    merror("liblogic_init: failed to init orc");
-            //    continue;
-            //}
-            //entity* const orc = em_get(g->entitymap, orc_id);
             entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, orc_x + x, orc_y + y, 0, "orc");
             entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
             entity_set_default_action(orc, action);
