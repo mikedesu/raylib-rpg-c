@@ -14,6 +14,8 @@
 #include "tx_keys.h"
 #include <ctype.h>
 
+#define DEFAULT_SPRITEGROUPS_SIZE 128
+
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
@@ -24,10 +26,10 @@ RenderTexture2D target = {0};
 Rectangle target_src = {0, 0, 800, 480};
 Rectangle target_dest = {0, 0, 800, 480};
 Vector2 target_origin = {0, 0};
-Vector2 zero_vector = {0, 0};
+Vector2 zero_vec = {0, 0};
 
-#define DEFAULT_WINDOW_WIDTH 800
-#define DEFAULT_WINDOW_HEIGHT 480
+#define DEFAULT_WIN_WIDTH 800
+#define DEFAULT_WIN_HEIGHT 480
 //#define DEFAULT_WINDOW_WIDTH 960
 //#define DEFAULT_WINDOW_HEIGHT 540
 //#define DEFAULT_WINDOW_WIDTH 1280
@@ -47,35 +49,20 @@ void libdraw_init(gamestate* const g) {
         merror("libdraw_init g is NULL");
         return;
     }
-    const char* t = "evildojo666";
-    const int w = DEFAULT_WINDOW_WIDTH;
-    const int h = DEFAULT_WINDOW_HEIGHT;
-    InitWindow(w, h, t);
+    const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT, x = w / 4, y = h / 4;
+    InitWindow(w, h, "evildojo666");
     SetTargetFPS(60);
-    //SetExitKey(KEY_Q);
     target = LoadRenderTexture(w, h);
     target_src = (Rectangle){0, 0, w, -h};
     target_dest = (Rectangle){0, 0, w, h};
-
-    const size_t size = 128;
-    spritegroups = hashtable_entityid_spritegroup_create(size);
-    //spritegroups = hashtable_entityid_spritegroup_create(100000);
+    spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
     libdraw_load_textures();
-
-    // we want to iterate across our entitymap and create spritegroups for each entity
     for (int i = 0; i < g->index_entityids; i++) {
-        const entityid id = g->entityids[i];
-        libdraw_create_sg_byid(g, id);
+        libdraw_create_sg_byid(g, g->entityids[i]);
     }
-
-    libdraw_calc_debugpanel_size(g); // Calculate size
-
+    libdraw_calc_debugpanel_size(g);
     libdraw_load_shaders();
-
-
-    g->cam2d.offset.x = DEFAULT_WINDOW_WIDTH / 4;
-    g->cam2d.offset.y = DEFAULT_WINDOW_HEIGHT / 4;
-
+    g->cam2d.offset = (Vector2){x, y};
     msuccess("libdraw_init");
 }
 
@@ -113,7 +100,6 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         merrorint("libdraw_update_sprite: entity not found", id);
         return;
     }
-
 
     spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (!sg) {
@@ -566,7 +552,7 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
         merrorint("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1", sg->current + 1);
     }
     // Draw sprite on top
-    DrawTexturePro(*s->texture, s->src, dest, zero_vector, 0, WHITE);
+    DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
 }
 
 
