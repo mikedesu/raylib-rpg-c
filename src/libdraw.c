@@ -1,5 +1,5 @@
 #include "libdraw.h"
-#include "entitytype.h"
+//#include "entitytype.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
@@ -37,7 +37,7 @@ Vector2 zero_vec = {0, 0};
 //#define DEFAULT_WINDOW_WIDTH 1920
 //#define DEFAULT_WINDOW_HEIGHT 1080
 
-#define DEFAULT_TILE_SIZE 8
+//#define DEFAULT_TILE_SIZE 8
 #define SPRITEGROUP_DEFAULT_SIZE 32
 
 #define DEFAULT_ANIM_SPEED 4
@@ -94,38 +94,36 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         merror("libdraw_update_sprite: gamestate is NULL");
         return;
     }
-
     entity* const e = em_get(g->entitymap, id);
     if (!e) {
         merrorint("libdraw_update_sprite: entity not found", id);
         return;
     }
-
     spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (!sg) {
         merrorint("libdraw_update_sprite: spritegroup not found", id);
         return;
     }
-
     if (e->is_dead && !spritegroup_is_animating(sg)) {
         return;
     }
-
     if (e->do_update) {
         libdraw_update_sprite_context(g, id, e->direction);
         e->do_update = false;
     }
-
     // Copy movement intent from e->sprite_move_x/y if present
-    if (e->sprite_move_x != 0 || e->sprite_move_y != 0) {
-        sg->move.x = e->sprite_move_x;
-        sg->move.y = e->sprite_move_y;
-        e->sprite_move_x = 0;
-        e->sprite_move_y = 0;
-        sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
-    }
+    libdraw_update_sprite_position(sg, e);
+    libdraw_update_sprite_attack(e, sg);
+    // Update movement as long as sg->move.x/y is non-zero
+    spritegroup_update_dest(sg);
+    // Snap to the tile position only when movement is fully complete
+    spritegroup_snap_dest(sg, e->x, e->y);
+    // Update the sprite's frame
+    libdraw_handle_frame_incr(g, sg);
+}
 
-    // simple attack switch
+
+void libdraw_update_sprite_attack(entity_t* e, spritegroup_t* sg) {
     if (e->is_attacking) {
         if (e->race == RACE_HUMAN) {
             sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
@@ -134,7 +132,6 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         }
         e->is_attacking = false;
     } else if (e->is_damaged) {
-        // check the race of the entity to determine which animation index to use
         if (e->race == RACE_HUMAN) {
             sg->current = SPRITEGROUP_ANIM_HUMAN_DMG;
         } else if (e->race == RACE_ORC) {
@@ -144,10 +141,7 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
     } else if (e->is_dead) {
         if (e->race == RACE_HUMAN) {
             sg->current = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
-            // unlike the other animations, once a entity is dead, we want to change the
-            // default animation for the spritegroup
             sg->default_anim = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
-
             spritegroup_set_stop_on_last_frame(sg, true);
         } else if (e->race == RACE_ORC) {
             sg->current = SPRITEGROUP_ANIM_ORC_DIE;
@@ -155,37 +149,43 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
             spritegroup_set_stop_on_last_frame(sg, true);
         }
     }
+}
 
-    // Update movement as long as sg->move.x/y is non-zero
-    if (sg->move.x > 0) {
-        sg->dest.x++;
-        sg->move.x--;
-    } else if (sg->move.x < 0) {
-        sg->dest.x--;
-        sg->move.x++;
+
+void libdraw_update_sprite_position(spritegroup_t* sg, entity_t* e) {
+    if (!sg) {
+        merror("libdraw_update_sprite_position: spritegroup is NULL");
+        return;
     }
 
-    if (sg->move.y > 0) {
-        sg->dest.y++;
-        sg->move.y--;
-    } else if (sg->move.y < 0) {
-        sg->dest.y--;
-        sg->move.y++;
+    if (!e) {
+        merror("libdraw_update_sprite_position: entity is NULL");
+        return;
     }
 
-    // Snap to the tile position only when movement is fully complete
-    if (sg->move.x == 0 && sg->move.y == 0) {
-        sg->dest.x = e->x * DEFAULT_TILE_SIZE + sg->off_x;
-        sg->dest.y = e->y * DEFAULT_TILE_SIZE + sg->off_y;
+    if (e->sprite_move_x != 0 || e->sprite_move_y != 0) {
+        sg->move.x = e->sprite_move_x;
+        sg->move.y = e->sprite_move_y;
+        e->sprite_move_x = 0;
+        e->sprite_move_y = 0;
+        sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
+    }
+}
+
+
+void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
+    if (!g) {
+        merror("libdraw_handle_frame_incr: gamestate is NULL");
+        return;
     }
 
-    sprite* s = sg->sprites[sg->current];
+    sprite* const s = sg->sprites[sg->current];
     if (!s) {
         merror("libdraw_update_sprite: sprite is NULL");
         return;
     }
     // attempt to grab the sprite's shadow
-    sprite* s_shadow = sg->sprites[sg->current + 1];
+    sprite* const s_shadow = sg->sprites[sg->current + 1];
     if (!s_shadow) {
         merror("libdraw_update_sprite: shadow sprite is NULL");
         // don't need to return... we can just continue
@@ -874,8 +874,8 @@ void libdraw_draw_hud(gamestate* const g) {
 }
 
 void libdraw_load_shaders() {
-    shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
-    shader_tile_glow = LoadShader(0, "glow.frag");
+    //shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
+    //shader_tile_glow = LoadShader(0, "glow.frag");
     //shader_tile_glow = LoadShader(0, "psychedelic_ripple.frag");
 }
 

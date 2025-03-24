@@ -2,6 +2,7 @@
 #include "gamestate.h"
 #include "inputstate.h"
 #include "specifier.h"
+#include "spritegroup.h"
 #include <raylib.h>
 #include <stdbool.h>
 
@@ -47,3 +48,6 @@ void libdraw_draw_hud(gamestate* const g);
 void libdraw_load_shaders(); // Load shader
 void libdraw_unload_shaders(); // Cleanup
 void libdraw_camera_lock_on(gamestate* const g);
+void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
+void libdraw_update_sprite_position(spritegroup_t* sg, entity_t* e);
+void libdraw_update_sprite_attack(entity_t* e, spritegroup_t* sg);

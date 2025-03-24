@@ -1,4 +1,5 @@
 #include "spritegroup.h"
+#include "libgame_defines.h"
 #include "mprint.h"
 #include <stdlib.h>
 
@@ -193,4 +194,38 @@ const bool spritegroup_is_animating(spritegroup_t* const sg) {
         return false;
     }
     return s->is_animating;
+}
+
+
+void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y) {
+    if (!sg) {
+        merror("spritegroup_snap_dest: spritegroup is NULL");
+        return;
+    }
+    if (sg->move.x == 0 && sg->move.y == 0) {
+        sg->dest.x = x * DEFAULT_TILE_SIZE + sg->off_x;
+        sg->dest.y = y * DEFAULT_TILE_SIZE + sg->off_y;
+    }
+}
+
+
+void spritegroup_update_dest(spritegroup_t* const sg) {
+    if (!sg) {
+        //merror("spritegroup_update_dest: spritegroup is NULL");
+        return;
+    }
+    if (sg->move.x > 0) {
+        sg->dest.x++;
+        sg->move.x--;
+    } else if (sg->move.x < 0) {
+        sg->dest.x--;
+        sg->move.x++;
+    }
+    if (sg->move.y > 0) {
+        sg->dest.y++;
+        sg->move.y--;
+    } else if (sg->move.y < 0) {
+        sg->dest.y--;
+        sg->move.y++;
+    }
 }

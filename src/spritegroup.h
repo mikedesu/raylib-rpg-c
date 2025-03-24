@@ -40,3 +40,5 @@ void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec);
 
 void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, const bool do_stop);
 const bool spritegroup_is_animating(spritegroup_t* const sg);
+void spritegroup_update_dest(spritegroup_t* const sg);
+void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y);
