@@ -24,11 +24,12 @@ PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-f
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 
 # Targets
-all: game index.html
+all: game #index.html
 
 # Desktop build
 game: main.o gameloader.o libdraw.so liblogic.so
 	$(CC) -o $@ main.o gameloader.o -L. -ldraw -llogic $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
+	./log_build_stats.sh
 
 # Web build
 index.html: $(WEB_SOURCES)
