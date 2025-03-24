@@ -229,3 +229,10 @@ void df_set_all_tiles(dungeon_floor_t* const df, dungeon_tile_type_t type) {
         }
     }
 }
+
+
+bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {
+    if (!df) return false;
+    dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+    return dungeon_tile_is_wall(tile->type);
+}

@@ -34,3 +34,6 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df, int x, int y, i
 void dungeon_floor_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_tx_key, int dn_tx_key, int event);
 
 void df_set_all_tiles(dungeon_floor_t* const df, dungeon_tile_type_t type);
+
+
+bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y);

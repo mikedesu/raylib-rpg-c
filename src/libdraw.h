@@ -14,12 +14,10 @@ void libdraw_update_input(inputstate* const is);
 void libdraw_drawframe(gamestate* const g);
 void libdraw_close();
 bool libdraw_windowshouldclose();
-void libdraw_unload_texture(const int txkey);
-void libdraw_load_texture(const int txkey,
-                          const int contexts,
-                          const int frames,
-                          const bool do_dither,
-                          const char* path);
+
+bool libdraw_load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
+bool libdraw_unload_texture(int txkey);
+
 void libdraw_load_textures();
 void libdraw_unload_textures();
 
@@ -37,7 +35,9 @@ void libdraw_update_sprite(gamestate* const g, entityid id);
 void libdraw_draw_sprite(const gamestate* const g, const entityid id);
 void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id);
 void libdraw_draw_dungeon_floor(const gamestate* const g);
-void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, const int x, const int y);
+
+bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
+
 void libdraw_draw_debug_panel(gamestate* const g);
 void libdraw_calc_debugpanel_size(gamestate* const g);
 void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t dir);

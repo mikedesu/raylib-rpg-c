@@ -71,9 +71,9 @@
 65  1 1  0 img/tiles/dirt_05.png
 # new human sprites for guarding
 66 4 4 0 img/characters/human_guard.png 
-67 4 4 0 img/characters/human_guard_shadow.png 
+67 4 4 0 img/characters/shadows/human_guard_shadow.png 
 68 4 3 0 img/characters/human_guard_success.png 
-69 4 3 0 img/characters/human_guard_success_shadow.png 
+69 4 3 0 img/characters/shadows/human_guard_success_shadow.png 
 70 4 4 0 img/actions/guard_buckler_front.png
 71 4 4 0 img/actions/guard_buckler_back.png
 72 4 3 0 img/actions/guard_buckler_success_front.png

@@ -15,6 +15,10 @@
 #include <ctype.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
+//#define DEFAULT_WIN_WIDTH 800
+//#define DEFAULT_WIN_HEIGHT 480
+#define DEFAULT_WIN_WIDTH 1920
+#define DEFAULT_WIN_HEIGHT 1080
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -23,13 +27,12 @@ Shader shader_grayscale = {0};
 Shader shader_tile_glow = {0};
 
 RenderTexture2D target = {0};
-Rectangle target_src = {0, 0, 800, 480};
-Rectangle target_dest = {0, 0, 800, 480};
+//Rectangle target_src = {0, 0, 800, 480};
+Rectangle target_src = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
+Rectangle target_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 Vector2 target_origin = {0, 0};
 Vector2 zero_vec = {0, 0};
 
-#define DEFAULT_WIN_WIDTH 800
-#define DEFAULT_WIN_HEIGHT 480
 //#define DEFAULT_WINDOW_WIDTH 960
 //#define DEFAULT_WINDOW_HEIGHT 540
 //#define DEFAULT_WINDOW_WIDTH 1280
@@ -57,6 +60,7 @@ void libdraw_init(gamestate* const g) {
     target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
     libdraw_load_textures();
+    printf("libdraw_init: loaded textures\n");
     for (int i = 0; i < g->index_entityids; i++) {
         libdraw_create_sg_byid(g, g->entityids[i]);
     }
@@ -257,26 +261,26 @@ void libdraw_update_sprites(gamestate* const g) {
 }
 
 
-void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, const int x, const int y) {
+bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
     if (!g) {
         merror("libdraw_draw_dungeon_floor_tile: gamestate is NULL");
-        return;
+        return false;
     }
 
     if (!df) {
         merror("libdraw_draw_dungeon_floor_tile: dungeon_floor is NULL");
-        return;
+        return false;
     }
 
     if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
         merrorint2("libdraw_draw_dungeon_floor_tile: x or y out of bounds", x, y);
-        return;
+        return false;
     }
 
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merrorint2("libdraw_draw_dungeon_floor_tile: tile is NULL", x, y);
-        return;
+        return false;
     }
 
     // just draw the tile itself
@@ -284,13 +288,13 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
     int txkey = get_txkey_for_tiletype(tile->type);
     if (txkey < 0) {
         //merrorint("libdraw_draw_dungeon_floor_tile: txkey is invalid", txkey);
-        return;
+        return false;
     }
 
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) {
         merrorint4("libdraw_draw_dungeon_floor_tile: texture id is invalid", texture->id, x, y, txkey);
-        return;
+        return false;
     }
     // atm hard-coding the size of the new tiles and their destinations
 
@@ -310,12 +314,12 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         const int txkey = tile->pressure_plate_up_tx_key;
         if (txkey < 0) {
             merrorint2("libdraw_draw_dungeon_floor_tile: pressure plate up txkey is invalid", x, y);
-            return;
+            return false;
         }
         Texture2D* texture = &txinfo[txkey].texture;
         if (texture->id <= 0) {
             //merrorint3("libdraw_draw_dungeon_floor_tile: pressure plate texture id is invalid", x, y, txkey);
-            return;
+            return false;
         }
         const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
         const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
@@ -342,12 +346,12 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
 
         if (txkey < 0) {
             merrorint2("libdraw_draw_dungeon_floor_tile: wall switch up txkey is invalid", x, y);
-            return;
+            return false;
         }
         Texture2D* texture = &txinfo[txkey].texture;
         if (texture->id <= 0) {
             merrorint3("libdraw_draw_dungeon_floor_tile: wall switch texture id is invalid", x, y, txkey);
-            return;
+            return false;
         }
         const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
         const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
@@ -359,6 +363,7 @@ void libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
+    return true;
 }
 
 
@@ -378,13 +383,17 @@ void libdraw_draw_dungeon_floor(const gamestate* const g) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             // draw the entities on the tile
-            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
-            if (!tile) {
-                merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
-                return;
+            //dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+            //if (!tile) {
+            //    merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
+            //    return;
+            //}
+            //if (dungeon_tile_is_wall(tile->type)) continue;
+            if (df_tile_is_wall(df, x, y)) continue;
+
+            if (!libdraw_draw_dungeon_floor_tile(g, df, x, y)) {
+                merrorint2("libdraw_draw_dungeon_floor: failed to draw tile", x, y);
             }
-            if (dungeon_tile_is_wall(tile->type)) continue;
-            libdraw_draw_dungeon_floor_tile(g, df, x, y);
         }
     }
 
@@ -569,52 +578,52 @@ bool libdraw_windowshouldclose() {
 }
 
 
-void libdraw_load_texture(const int txkey,
-                          const int contexts,
-                          const int frames,
-                          const bool do_dither,
-                          const char* path) {
+bool libdraw_load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path) {
 
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
         merror("libdraw_load_texture: txkey out of bounds");
-        return;
-    } else if (contexts < 0) {
+        return false;
+    } else if (ctxs < 0) {
         merror("libdraw_load_texture: contexts out of bounds");
-        return;
+        return false;
     } else if (frames < 0) {
         merror("libdraw_load_texture: frames out of bounds");
-        return;
+        return false;
     } else if (txinfo[txkey].texture.id > 0) {
         merror("libdraw_load_texture: texture already loaded");
-        return;
+        return false;
     } else if (strlen(path) == 0) {
         merror("libdraw_load_texture: path is empty");
-        return;
+        return false;
     } else if (strcmp(path, "\n") == 0) {
         merror("libdraw_load_texture: path is newline");
-        return;
+        return false;
     }
 
     Image image = LoadImage(path);
-    if (do_dither) ImageDither(&image, 4, 4, 4, 4);
+    if (do_dither) {
+        ImageDither(&image, 4, 4, 4, 4);
+    }
     Texture2D texture = LoadTextureFromImage(image);
     UnloadImage(image);
     txinfo[txkey].texture = texture;
-    txinfo[txkey].contexts = contexts;
+    txinfo[txkey].contexts = ctxs;
     txinfo[txkey].num_frames = frames;
     msuccess("libdraw_load_texture: texture loaded successfully");
+    return true;
 }
 
 
-void libdraw_unload_texture(const int txkey) {
+bool libdraw_unload_texture(int txkey) {
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
         merror("libdraw_unload_texture: txkey out of bounds");
-        return;
+        return false;
     }
     UnloadTexture(txinfo[txkey].texture);
     txinfo[txkey].texture = (Texture2D){0};
     txinfo[txkey].contexts = 0;
     msuccess("libdraw_unload_texture: texture unloaded successfully");
+    return true;
 }
 
 
@@ -636,32 +645,37 @@ void libdraw_load_textures() {
             merror("libdraw_load_textures: invalid line in textures.txt");
             continue;
         }
-        libdraw_load_texture(txkey, contexts, frames, do_dither, path);
-        minfo("libdraw_load_textures: loaded texture");
-        minfoint("txkey", txkey);
-        minfoint("contexts", contexts);
-        minfoint("frames", frames);
-        minfo("path");
-        minfo(path);
+        if (!libdraw_load_texture(txkey, contexts, frames, do_dither, path)) {
+            merrorstr("libdraw_load_textures: failed to load texture", path);
+        }
+        //minfo("libdraw_load_textures: loaded texture");
+        //minfoint("txkey", txkey);
+        //minfoint("contexts", contexts);
+        //minfoint("frames", frames);
+        //minfo("path");
+        //minfo(path);
     }
     fclose(file);
 }
 
 
-bool libdraw_line_begins_with_whitespace_and_char(const char* l) {
-    if (!l) {
-        merror("libdraw_line_begins_with_whitespace_and_char: line is NULL");
-        return false;
-    }
-    while (*l != 0 && isspace(*l))
-        l++;
-    return *l != 0 && !isspace(*l);
-}
+//bool libdraw_line_begins_with_whitespace_and_char(const char* l) {
+//    if (!l) {
+//        merror("libdraw_line_begins_with_whitespace_and_char: line is NULL");
+//        return false;
+//    }
+//    while (*l != 0 && isspace(*l))
+//        l++;
+//    return *l != 0 && !isspace(*l);
+//}
 
 
 void libdraw_unload_textures() {
-    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++)
-        libdraw_unload_texture(i);
+    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) {
+        if (!libdraw_unload_texture(i)) {
+            merrorint("libdraw_unload_textures: failed to unload texture", i);
+        }
+    }
 }
 
 
@@ -705,19 +719,20 @@ void libdraw_create_spritegroup(gamestate* const g,
         spritegroup_destroy(group);
         return;
     }
-    minfo("libdraw_create_spritegroup: creating spritegroup");
-    for (int i = 0; i < TX_HUMAN_KEY_COUNT; i++) {
+    minfoint("libdraw_create_spritegroup: creating spritegroup for entityid", id);
+    //for (int i = 0; i < TX_HUMAN_KEY_COUNT; i++) {
+    for (int i = 0; i < num_keys; i++) {
         int k = keys[i];
         //minfo("beginning loop");
-        //minfoint("k", k);
+        minfoint("k", k);
         Texture2D* tex = &txinfo[k].texture;
-        //minfo("got texture");
+        minfo("got texture");
         sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
-        //minfo("created sprite");
+        minfo("created sprite");
         spritegroup_add(group, s);
-        //minfo("added sprite");
+        minfo("added sprite");
     }
-    //minfo("loop done");
+    minfo("loop done");
     spritegroup_set_specifier(group, spec);
     group->id = id;
     sprite* s = spritegroup_get(group, 0);
@@ -742,9 +757,9 @@ void libdraw_calc_debugpanel_size(gamestate* const g) {
         merror("libdraw_calc_debugpanel_size: gamestate is NULL");
         return;
     }
-    const Vector2 size = MeasureTextEx(GetFontDefault(), g->debugpanel.buffer, g->debugpanel.font_size, 1);
-    g->debugpanel.w = size.x;
-    g->debugpanel.h = size.y;
+    Vector2 s = MeasureTextEx(GetFontDefault(), g->debugpanel.buffer, g->debugpanel.font_size, 1);
+    g->debugpanel.w = s.x;
+    g->debugpanel.h = s.y;
 }
 
 
