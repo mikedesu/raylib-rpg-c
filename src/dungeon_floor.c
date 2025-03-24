@@ -4,7 +4,6 @@
 #include "mprint.h"
 #include <stdlib.h>
 
-
 dungeon_floor_t* dungeon_floor_create(const int width, const int height) {
     dungeon_floor_t* floor = malloc(sizeof(dungeon_floor_t));
     if (!floor) {
@@ -14,7 +13,6 @@ dungeon_floor_t* dungeon_floor_create(const int width, const int height) {
     dungeon_floor_init(floor);
     return floor;
 }
-
 
 void df_set_tile_area(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y, int w, int h) {
     if (!df) return;
@@ -27,7 +25,6 @@ void df_set_tile_area(dungeon_floor_t* const df, dungeon_tile_type_t type, int x
         }
     }
 }
-
 
 void dungeon_floor_init(dungeon_floor_t* floor) {
     if (!floor) {
@@ -102,7 +99,6 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
     */
 }
 
-
 void dungeon_floor_free(dungeon_floor_t* floor) {
     minfo("Freeing dungeon floor");
     if (!floor) {
@@ -117,8 +113,7 @@ void dungeon_floor_free(dungeon_floor_t* floor) {
     msuccess("Freed dungeon floor");
 }
 
-
-const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, const int x, const int y) {
+bool dungeon_floor_add_at(dungeon_floor_t* const df, entityid id, int x, int y) {
     bool retval = false;
     if (!df) {
         merror("dungeon_floor_add_at: df is NULL");
@@ -137,9 +132,7 @@ const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, co
     return retval;
 }
 
-
-const bool dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id, const int x, const int y) {
-    //bool retval = false;
+bool dungeon_floor_remove_at(dungeon_floor_t* const df, entityid id, int x, int y) {
     if (!df) {
         merror("dungeon_floor_remove_at: df is NULL");
         return false;
@@ -157,7 +150,6 @@ const bool dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id,
     return r != -1 && r == id;
 }
 
-
 dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
     if (!df) {
         merror("dungeon_floor_tile_at: df is NULL");
@@ -169,26 +161,6 @@ dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int
     }
     return &df->tiles[y][x];
 }
-
-
-//void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
-//                                      const int x,
-//                                      const int y,
-//                                      const int texture_key,
-//                                      const int event) {
-//    if (!df) {
-//        merror("dungeon_floor_set_pressure_plate: df is NULL");
-//        return;
-//    }
-//    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-//        merror("dungeon_floor_set_pressure_plate: x or y out of bounds");
-//        return;
-//    }
-//    dungeon_tile_set_pressure_plate(&df->tiles[y][x], true);
-//    dungeon_tile_set_pressure_plate_texture_key(&df->tiles[y][x], texture_key);
-//    dungeon_tile_set_pressure_plate_event(&df->tiles[y][x], event);
-//}
-
 
 void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
                                       const int x,
@@ -210,7 +182,6 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
     dungeon_tile_set_pressure_plate_event(&df->tiles[y][x], event);
 }
 
-
 void dungeon_floor_set_wall_switch(dungeon_floor_t* const df,
                                    const int x,
                                    const int y,
@@ -231,17 +202,18 @@ void dungeon_floor_set_wall_switch(dungeon_floor_t* const df,
     dungeon_tile_set_wall_switch_event(&df->tiles[y][x], event);
 }
 
-
 void df_set_all_tiles(dungeon_floor_t* const df, dungeon_tile_type_t type) {
     if (!df) return;
-    for (int i = 0; i < df->height; i++) {
-        for (int j = 0; j < df->width; j++) {
-            dungeon_tile_t* current = &df->tiles[i][j];
-            dungeon_tile_init(current, type);
-        }
-    }
-}
+    //for (int i = 0; i < df->height; i++) {
+    //    for (int j = 0; j < df->width; j++) {
+    //        dungeon_tile_t* current = &df->tiles[i][j];
+    //        dungeon_tile_init(current, type);
+    //    }
+    //}
 
+    // rewrite this function using df_set_tile_area
+    df_set_tile_area(df, type, 0, 0, df->width, df->height);
+}
 
 bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {
     if (!df) return false;
