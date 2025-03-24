@@ -15,9 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
-
 
 static inline const direction_t liblogic_get_dir_from_xy(int x, int y) {
     if (x == 0 && y == 0) return DIRECTION_NONE;
@@ -33,89 +31,48 @@ static inline const direction_t liblogic_get_dir_from_xy(int x, int y) {
     return DIRECTION_NONE;
 }
 
-
 static inline int liblogic_get_x_from_dir(direction_t dir) {
     switch (dir) {
     case DIRECTION_UP_LEFT:
     case DIRECTION_DOWN_LEFT:
-    case DIRECTION_LEFT:
-        return -1;
+    case DIRECTION_LEFT: return -1;
     case DIRECTION_UP_RIGHT:
     case DIRECTION_DOWN_RIGHT:
-    case DIRECTION_RIGHT:
-        return 1;
-    default:
-        return 0;
+    case DIRECTION_RIGHT: return 1;
+    default: return 0;
     }
 }
-
 
 static inline int liblogic_get_y_from_dir(direction_t dir) {
     switch (dir) {
     case DIRECTION_UP:
     case DIRECTION_UP_LEFT:
-    case DIRECTION_UP_RIGHT:
-        return -1;
+    case DIRECTION_UP_RIGHT: return -1;
     case DIRECTION_DOWN:
     case DIRECTION_DOWN_LEFT:
-    case DIRECTION_DOWN_RIGHT:
-        return 1;
-    default:
-        return 0;
+    case DIRECTION_DOWN_RIGHT: return 1;
+    default: return 0;
     }
 }
 
-
 void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_t action) {
     switch (action) {
-    case ENTITY_ACTION_MOVE_LEFT:
-        liblogic_try_entity_move(g, e, -1, 0);
-        break;
-    case ENTITY_ACTION_MOVE_RIGHT:
-        liblogic_try_entity_move(g, e, 1, 0);
-        break;
-    case ENTITY_ACTION_MOVE_UP:
-        liblogic_try_entity_move(g, e, 0, -1);
-        break;
-    case ENTITY_ACTION_MOVE_DOWN:
-        liblogic_try_entity_move(g, e, 0, 1);
-        break;
-    case ENTITY_ACTION_MOVE_UP_LEFT:
-        liblogic_try_entity_move(g, e, -1, -1);
-        break;
-    case ENTITY_ACTION_MOVE_UP_RIGHT:
-        liblogic_try_entity_move(g, e, 1, -1);
-        break;
-    case ENTITY_ACTION_MOVE_DOWN_LEFT:
-        liblogic_try_entity_move(g, e, -1, 1);
-        break;
-    case ENTITY_ACTION_MOVE_DOWN_RIGHT:
-        liblogic_try_entity_move(g, e, 1, 1);
-        break;
-    case ENTITY_ACTION_ATTACK_LEFT:
-        liblogic_try_entity_attack(g, e->id, e->x - 1, e->y);
-        break;
-    case ENTITY_ACTION_ATTACK_RIGHT:
-        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y);
-        break;
-    case ENTITY_ACTION_ATTACK_UP:
-        liblogic_try_entity_attack(g, e->id, e->x, e->y - 1);
-        break;
-    case ENTITY_ACTION_ATTACK_DOWN:
-        liblogic_try_entity_attack(g, e->id, e->x, e->y + 1);
-        break;
-    case ENTITY_ACTION_ATTACK_UP_LEFT:
-        liblogic_try_entity_attack(g, e->id, e->x - 1, e->y - 1);
-        break;
-    case ENTITY_ACTION_ATTACK_UP_RIGHT:
-        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y - 1);
-        break;
-    case ENTITY_ACTION_ATTACK_DOWN_LEFT:
-        liblogic_try_entity_attack(g, e->id, e->x - 1, e->y + 1);
-        break;
-    case ENTITY_ACTION_ATTACK_DOWN_RIGHT:
-        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y + 1);
-        break;
+    case ENTITY_ACTION_MOVE_LEFT: liblogic_try_entity_move(g, e, -1, 0); break;
+    case ENTITY_ACTION_MOVE_RIGHT: liblogic_try_entity_move(g, e, 1, 0); break;
+    case ENTITY_ACTION_MOVE_UP: liblogic_try_entity_move(g, e, 0, -1); break;
+    case ENTITY_ACTION_MOVE_DOWN: liblogic_try_entity_move(g, e, 0, 1); break;
+    case ENTITY_ACTION_MOVE_UP_LEFT: liblogic_try_entity_move(g, e, -1, -1); break;
+    case ENTITY_ACTION_MOVE_UP_RIGHT: liblogic_try_entity_move(g, e, 1, -1); break;
+    case ENTITY_ACTION_MOVE_DOWN_LEFT: liblogic_try_entity_move(g, e, -1, 1); break;
+    case ENTITY_ACTION_MOVE_DOWN_RIGHT: liblogic_try_entity_move(g, e, 1, 1); break;
+    case ENTITY_ACTION_ATTACK_LEFT: liblogic_try_entity_attack(g, e->id, e->x - 1, e->y); break;
+    case ENTITY_ACTION_ATTACK_RIGHT: liblogic_try_entity_attack(g, e->id, e->x + 1, e->y); break;
+    case ENTITY_ACTION_ATTACK_UP: liblogic_try_entity_attack(g, e->id, e->x, e->y - 1); break;
+    case ENTITY_ACTION_ATTACK_DOWN: liblogic_try_entity_attack(g, e->id, e->x, e->y + 1); break;
+    case ENTITY_ACTION_ATTACK_UP_LEFT: liblogic_try_entity_attack(g, e->id, e->x - 1, e->y - 1); break;
+    case ENTITY_ACTION_ATTACK_UP_RIGHT: liblogic_try_entity_attack(g, e->id, e->x + 1, e->y - 1); break;
+    case ENTITY_ACTION_ATTACK_DOWN_LEFT: liblogic_try_entity_attack(g, e->id, e->x - 1, e->y + 1); break;
+    case ENTITY_ACTION_ATTACK_DOWN_RIGHT: liblogic_try_entity_attack(g, e->id, e->x + 1, e->y + 1); break;
     case ENTITY_ACTION_MOVE_RANDOM: {
         //int x = rand() % 3;
         //x = x == 0 ? -1 : x == 1 ? 0 : 1;
@@ -172,7 +129,6 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
     }
 }
 
-
 void liblogic_try_entity_move_random(gamestate* const g, entity* const e) {
     int x = rand() % 3;
     x = x == 0 ? -1 : x == 1 ? 0 : 1;
@@ -188,30 +144,23 @@ void liblogic_try_entity_move_random(gamestate* const g, entity* const e) {
     liblogic_try_entity_move(g, e, x, y);
 }
 
-
 void liblogic_try_entity_move_player(gamestate* const g, entity* const e) {
     entity* h = em_get(g->entitymap, g->hero_id);
     if (h) {
         int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
         int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
-        if (dx != 0 || dy != 0) {
-            liblogic_try_entity_move(g, e, dx, dy);
-        }
+        if (dx != 0 || dy != 0) { liblogic_try_entity_move(g, e, dx, dy); }
     }
 }
-
 
 void liblogic_try_entity_attack_player(gamestate* const g, entity* const e) {
     entity* h = em_get(g->entitymap, g->hero_id);
     if (h) {
         int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
         int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
-        if (dx != 0 || dy != 0) {
-            liblogic_try_entity_attack(g, e->id, h->x, h->y);
-        }
+        if (dx != 0 || dy != 0) { liblogic_try_entity_attack(g, e->id, h->x, h->y); }
     }
 }
-
 
 void liblogic_try_entity_move_attack_player(gamestate* const g, entity* const e) {
     entity* h = em_get(g->entitymap, g->hero_id);
@@ -224,7 +173,6 @@ void liblogic_try_entity_move_attack_player(gamestate* const g, entity* const e)
         }
     }
 }
-
 
 bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1) {
     if (!g) {
@@ -255,19 +203,14 @@ bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1
     // use e0 and check the surrounding 8 tiles
     for (int y = -1; y <= 1; y++) {
         for (int x = -1; x <= 1; x++) {
-            if (x == 0 && y == 0) {
-                continue;
-            }
+            if (x == 0 && y == 0) { continue; }
 
-            if (e0->x + x == e1->x && e0->y + y == e1->y) {
-                return true;
-            }
+            if (e0->x + x == e1->x && e0->y + y == e1->y) { return true; }
         }
     }
 
     return false;
 }
-
 
 void liblogic_init(gamestate* const g) {
     if (!g) {
@@ -301,7 +244,6 @@ void liblogic_init(gamestate* const g) {
     }
     g->entity_turn = g->hero_id;
 
-
     // create some orcs with names
     //entityid orc0 = liblogic_npc_create(g, RACE_ORC, 8, 2, 0, "orc-mover");
     //entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
@@ -330,9 +272,7 @@ void liblogic_init(gamestate* const g) {
 
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            if (count >= total_orcs_to_make) {
-                break;
-            }
+            if (count >= total_orcs_to_make) { break; }
 
             entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, orc_x + x, orc_y + y, 0, "orc");
             entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
@@ -341,14 +281,10 @@ void liblogic_init(gamestate* const g) {
             entity_set_hp(orc, 1);
             count++;
 
-            if (count >= total_orcs_to_make) {
-                break;
-            }
+            if (count >= total_orcs_to_make) { break; }
         }
 
-        if (count >= total_orcs_to_make) {
-            break;
-        }
+        if (count >= total_orcs_to_make) { break; }
     }
 
     //entity* const e0 = em_get(g->entitymap, orc0);
@@ -363,17 +299,14 @@ void liblogic_init(gamestate* const g) {
     //entity_set_hp(e1, 3);
     //entity_set_hp(e2, 3);
 
-
     //entity_action_t action = ENTITY_ACTION_MOVE_PLAYER;
 
     //entity_set_default_action(e0, action);
     //entity_set_default_action(e1, action);
     //entity_set_default_action(e2, action);
 
-
     liblogic_update_debug_panel_buffer(g);
 }
-
 
 void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
     if (inputstate_is_pressed(is, KEY_D)) {
@@ -389,7 +322,6 @@ void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
         merror("Unknown control mode");
     }
 }
-
 
 void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g) {
     //minfo("Handling camera input");
@@ -443,7 +375,6 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
     }
 }
 
-
 void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {
     if (!is) {
         merror("Input state is NULL!");
@@ -455,9 +386,7 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         return;
     }
 
-    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
-        return;
-    }
+    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
 
     entity* const e = em_get(g->entitymap, g->hero_id);
     if (!e) {
@@ -533,11 +462,9 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         msuccess("C pressed!");
         g->controlmode = CONTROLMODE_CAMERA;
         break;
-    default:
-        break; // Ignore unhandled keys
+    default: break; // Ignore unhandled keys
     }
 }
-
 
 void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y) {
     if (!g || !e) {
@@ -556,9 +483,7 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     }
 
     // i feel like this might be something we can set elsewhere...like after the player input phase?
-    if (e->type == ENTITY_PLAYER) {
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    }
+    if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
 
     dungeon_tile_t* const tile = dungeon_floor_tile_at(df, ex, ey);
     if (!tile || ex < 0 || ey < 0) {
@@ -614,7 +539,6 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     }
 }
 
-
 void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
     if (!g) {
         merror("Game state is NULL!");
@@ -653,7 +577,6 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
     }
 }
 
-
 const bool liblogic_player_on_tile(const gamestate* const g, const int x, const int y, const int floor) {
     if (!g) {
         merror("liblogic_player_on_tile: gamestate is NULL");
@@ -675,21 +598,16 @@ const bool liblogic_player_on_tile(const gamestate* const g, const int x, const 
 
     // enumerate entities and check their type
     for (int i = 0; i < tile->entity_max; i++) {
-        if (tile->entities[i] == -1) {
-            continue;
-        }
+        if (tile->entities[i] == -1) { continue; }
         const entity* const e = em_get(g->entitymap, tile->entities[i]);
         if (!e) {
             merror("liblogic_player_on_tile: failed to get entity");
             return false;
         }
-        if (e->type == ENTITY_PLAYER) {
-            return true;
-        }
+        if (e->type == ENTITY_PLAYER) { return true; }
     }
     return false;
 }
-
 
 const int liblogic_tile_npc_count(const gamestate* const g, const int x, const int y, const int floor) {
     if (!g) {
@@ -712,21 +630,16 @@ const int liblogic_tile_npc_count(const gamestate* const g, const int x, const i
     // enumerate entities and check their type
     int count = 0;
     for (int i = 0; i < tile->entity_max; i++) {
-        if (tile->entities[i] == -1) {
-            continue;
-        }
+        if (tile->entities[i] == -1) { continue; }
         const entity* const e = em_get(g->entitymap, tile->entities[i]);
         if (!e) {
             merror("liblogic_tile_npc_count: failed to get entity");
             return -1;
         }
-        if (e->type == ENTITY_NPC) {
-            count++;
-        }
+        if (e->type == ENTITY_NPC) { count++; }
     }
     return count;
 }
-
 
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     if (!is) {
@@ -744,9 +657,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
 
     liblogic_handle_input(is, g);
 
-    if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
-        liblogic_handle_npcs(g);
-    }
+    if (g->flag == GAMESTATE_FLAG_NPC_TURN) { liblogic_handle_npcs(g); }
     //liblogic_handle_npc(g);
 
     liblogic_update_debug_panel_buffer(g);
@@ -755,7 +666,6 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 }
-
 
 void liblogic_update_player_state(gamestate* const g) {
     if (!g) {
@@ -782,7 +692,6 @@ void liblogic_update_player_state(gamestate* const g) {
     }
 }
 
-
 void liblogic_update_npcs_state(gamestate* const g) {
     if (!g) {
         merror("Game state is NULL!");
@@ -794,7 +703,6 @@ void liblogic_update_npcs_state(gamestate* const g) {
         liblogic_update_npc_state(g, id);
     }
 }
-
 
 void liblogic_update_npc_state(gamestate* const g, entityid id) {
     if (!g) {
@@ -808,9 +716,7 @@ void liblogic_update_npc_state(gamestate* const g, entityid id) {
         return;
     }
 
-    if (e->is_dead) {
-        return;
-    }
+    if (e->is_dead) { return; }
 
     if (e->hp <= 0) {
         e->is_dead = true;
@@ -820,16 +726,13 @@ void liblogic_update_npc_state(gamestate* const g, entityid id) {
     }
 }
 
-
 void liblogic_handle_npc(gamestate* const g) {
     if (!g) {
         merror("Game state is NULL!");
         return;
     }
 
-    if (g->flag != GAMESTATE_FLAG_NPC_TURN) {
-        return;
-    }
+    if (g->flag != GAMESTATE_FLAG_NPC_TURN) { return; }
 
     const entityid id = g->entity_turn;
     entity* const e = em_get(g->entitymap, id);
@@ -851,7 +754,6 @@ void liblogic_handle_npc(gamestate* const g) {
     liblogic_try_entity_move(g, e, rx, ry);
 }
 
-
 void liblogic_handle_npcs(gamestate* const g) {
     if (!g) {
         merror("Game state is NULL!");
@@ -861,13 +763,9 @@ void liblogic_handle_npcs(gamestate* const g) {
     // Process all NPCs
     for (int i = 0; i < g->index_entityids; i++) {
         entity* e = em_get(g->entitymap, g->entityids[i]);
-        if (!e || e->type != ENTITY_NPC || e->floor != 0) {
-            continue;
-        }
+        if (!e || e->type != ENTITY_NPC || e->floor != 0) { continue; }
 
-        if (e->is_dead) {
-            continue;
-        }
+        if (e->is_dead) { continue; }
 
         // testing attack logic
         //if (strcmp(e->name, "orc-attacker") == 0) {
@@ -880,7 +778,6 @@ void liblogic_handle_npcs(gamestate* const g) {
     // After processing all NPCs, set the flag to animate all movements together
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }
-
 
 void liblogic_update_debug_panel_buffer(gamestate* const g) {
     if (!g) {
@@ -939,7 +836,6 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              y);
 }
 
-
 void liblogic_close(gamestate* const g) {
     if (!g) {
         merror("Game state is NULL!");
@@ -963,7 +859,6 @@ void liblogic_close(gamestate* const g) {
     g->dungeon = NULL;
 }
 
-
 void liblogic_add_entityid(gamestate* const g, entityid id) {
     if (!g) {
         merror("liblogic_add_entityid: gamestate is NULL");
@@ -972,7 +867,6 @@ void liblogic_add_entityid(gamestate* const g, entityid id) {
     gamestate_add_entityid(g, id);
     msuccessint("Added entity ID: ", id);
 }
-
 
 entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
 
@@ -989,7 +883,6 @@ entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, in
 
     return em_get(g->entitymap, id);
 }
-
 
 entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
     if (!g) {
@@ -1052,7 +945,6 @@ entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl
     return e->id;
 }
 
-
 //const entityid liblogic_player_create(gamestate* const g,
 //                                      const race_t race_type,
 //                                      const int x,
@@ -1101,7 +993,6 @@ entityid liblogic_player_create(gamestate* const g, race_t rt, int x, int y, int
     gamestate_set_hero_id(g, id);
     return id;
 }
-
 
 void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y) {
     if (!g) {
@@ -1168,7 +1059,6 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
     }
 }
 
-
 int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int fl) {
     if (!g) {
         merror("liblogic_tile_npc_living_count: gamestate is NULL");
@@ -1190,17 +1080,13 @@ int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int f
     // enumerate entities and count living NPCs
     int count = 0;
     for (int i = 0; i < tile->entity_max; i++) {
-        if (tile->entities[i] == -1) {
-            continue;
-        }
+        if (tile->entities[i] == -1) { continue; }
         const entity* const e = em_get(g->entitymap, tile->entities[i]);
         if (!e) {
             merror("liblogic_tile_npc_living_count: failed to get entity");
             return -1;
         }
-        if (e->type == ENTITY_NPC && !e->is_dead) {
-            count++;
-        }
+        if (e->type == ENTITY_NPC && !e->is_dead) { count++; }
     }
     return count;
 }

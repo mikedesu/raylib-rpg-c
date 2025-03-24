@@ -182,12 +182,7 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
     dungeon_tile_set_pressure_plate_event(&df->tiles[y][x], event);
 }
 
-void dungeon_floor_set_wall_switch(dungeon_floor_t* const df,
-                                   const int x,
-                                   const int y,
-                                   const int up_tx_key,
-                                   const int dn_tx_key,
-                                   const int event) {
+void dungeon_floor_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_key, int dn_key, int event) {
     if (!df) {
         merror("dungeon_floor_set_wall_switch: df is NULL");
         return;
@@ -197,8 +192,8 @@ void dungeon_floor_set_wall_switch(dungeon_floor_t* const df,
         return;
     }
     dungeon_tile_set_wall_switch(&df->tiles[y][x], true);
-    dungeon_tile_set_wall_switch_up_tx_key(&df->tiles[y][x], up_tx_key);
-    dungeon_tile_set_wall_switch_down_tx_key(&df->tiles[y][x], dn_tx_key);
+    dungeon_tile_set_wall_switch_up_tx_key(&df->tiles[y][x], up_key);
+    dungeon_tile_set_wall_switch_down_tx_key(&df->tiles[y][x], dn_key);
     dungeon_tile_set_wall_switch_event(&df->tiles[y][x], event);
 }
 
