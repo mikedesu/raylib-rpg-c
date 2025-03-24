@@ -218,3 +218,14 @@ void dungeon_floor_set_wall_switch(dungeon_floor_t* const df,
     dungeon_tile_set_wall_switch_down_tx_key(&df->tiles[y][x], dn_tx_key);
     dungeon_tile_set_wall_switch_event(&df->tiles[y][x], event);
 }
+
+
+void df_set_all_tiles(dungeon_floor_t* const df, dungeon_tile_type_t type) {
+    if (!df) return;
+    for (int i = 0; i < df->height; i++) {
+        for (int j = 0; j < df->width; j++) {
+            dungeon_tile_t* current = &df->tiles[i][j];
+            dungeon_tile_init(current, type);
+        }
+    }
+}

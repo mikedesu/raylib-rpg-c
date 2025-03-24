@@ -18,27 +18,19 @@ typedef struct {
 } dungeon_floor_t;
 
 
-dungeon_floor_t* dungeon_floor_create(const int width, const int height);
+dungeon_floor_t* dungeon_floor_create(int width, int height);
 
-dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int x, const int y);
+dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, int x, int y);
 
-const bool dungeon_floor_add_at(dungeon_floor_t* const df, const entityid id, const int x, const int y);
-const bool dungeon_floor_remove_at(dungeon_floor_t* const df, const entityid id, const int x, const int y);
+const bool dungeon_floor_add_at(dungeon_floor_t* const df, entityid id, int x, int y);
+const bool dungeon_floor_remove_at(dungeon_floor_t* const df, entityid id, int x, int y);
 
 void dungeon_floor_init(dungeon_floor_t* floor);
 void dungeon_floor_free(dungeon_floor_t* floor);
 
 
-void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
-                                      const int x,
-                                      const int y,
-                                      const int up_tx_key,
-                                      const int dn_tx_key,
-                                      const int event);
+void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df, int x, int y, int up_tx_key, int dn_tx_key, int event);
 
-void dungeon_floor_set_wall_switch(dungeon_floor_t* const df,
-                                   const int x,
-                                   const int y,
-                                   const int up_tx_key,
-                                   const int dn_tx_key,
-                                   const int event);
+void dungeon_floor_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_tx_key, int dn_tx_key, int event);
+
+void df_set_all_tiles(dungeon_floor_t* const df, dungeon_tile_type_t type);
