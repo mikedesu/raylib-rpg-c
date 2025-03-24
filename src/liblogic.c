@@ -5,6 +5,7 @@
 #include "dungeon_tile_type.h"
 #include "em.h"
 #include "entity.h"
+#include "entity_actions.h"
 #include "entitytype.h"
 #include "gamestate.h"
 #include "libgame_defines.h"
@@ -14,7 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEFAULT_ZOOM_INCR 0.05f
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
@@ -117,34 +117,50 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
         liblogic_try_entity_attack(g, e->id, e->x + 1, e->y + 1);
         break;
     case ENTITY_ACTION_MOVE_RANDOM: {
-        int rx = rand() % 3 - 1; // -1, 0, 1
-        int ry = rand() % 3 - 1;
-        if (rx != 0 || ry != 0) liblogic_try_entity_move(g, e, rx, ry);
+        //int x = rand() % 3;
+        //x = x == 0 ? -1 : x == 1 ? 0 : 1;
+        //// if x is 0, y cannot also be 0
+        //int y;
+        //if (x == 0) {
+        //    y = rand() % 2;
+        //    y = y == 0 ? -1 : 1;
+        //} else {
+        //    y = rand() % 3;
+        //    y = y == 0 ? -1 : y == 1 ? 0 : 1;
+        //}
+        //liblogic_try_entity_move(g, e, x, y);
+
+        liblogic_try_entity_move_random(g, e);
+
         break;
     }
     case ENTITY_ACTION_ATTACK_RANDOM: {
-        int rx = rand() % 3 - 1;
-        int ry = rand() % 3 - 1;
-        if (rx != 0 || ry != 0) liblogic_try_entity_attack(g, e->id, e->x + rx, e->y + ry);
+
+        int x = rand() % 3;
+        x = x == 0 ? -1 : x == 1 ? 0 : 1;
+        // if x is 0, y cannot also be 0
+        // if x is 0, y cannot also be 0
+        int y;
+        if (x == 0) {
+            y = rand() % 2;
+            y = y == 0 ? -1 : 1;
+        } else {
+            y = rand() % 3;
+            y = y == 0 ? -1 : y == 1 ? 0 : 1;
+        }
+        liblogic_try_entity_attack(g, e->id, e->x + x, e->y + y);
         break;
     }
     case ENTITY_ACTION_MOVE_PLAYER: {
-        entity* hero = em_get(g->entitymap, g->hero_id);
-        if (hero) {
-            int dx = (hero->x > e->x) ? 1 : (hero->x < e->x) ? -1 : 0;
-            int dy = (hero->y > e->y) ? 1 : (hero->y < e->y) ? -1 : 0;
-            if (dx != 0 || dy != 0) liblogic_try_entity_move(g, e, dx, dy);
-        }
+        liblogic_try_entity_move_player(g, e);
         break;
     }
     case ENTITY_ACTION_ATTACK_PLAYER: {
-        entity* hero = em_get(g->entitymap, g->hero_id);
-        if (hero) {
-            int dx = hero->x - e->x;
-            int dy = hero->y - e->y;
-            if (abs(dx) <= 1 && abs(dy) <= 1) // Adjacent check
-                liblogic_try_entity_attack(g, e->id, hero->x, hero->y);
-        }
+        liblogic_try_entity_attack_player(g, e);
+        break;
+    }
+    case ENTITY_ACTION_MOVE_ATTACK_PLAYER: {
+        liblogic_try_entity_move_attack_player(g, e);
         break;
     }
     case ENTITY_ACTION_WAIT:
@@ -154,6 +170,102 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
         //merror("Unknown entity action: %d", action);
         break;
     }
+}
+
+
+void liblogic_try_entity_move_random(gamestate* const g, entity* const e) {
+    int x = rand() % 3;
+    x = x == 0 ? -1 : x == 1 ? 0 : 1;
+    // if x is 0, y cannot also be 0
+    int y;
+    if (x == 0) {
+        y = rand() % 2;
+        y = y == 0 ? -1 : 1;
+    } else {
+        y = rand() % 3;
+        y = y == 0 ? -1 : y == 1 ? 0 : 1;
+    }
+    liblogic_try_entity_move(g, e, x, y);
+}
+
+
+void liblogic_try_entity_move_player(gamestate* const g, entity* const e) {
+    entity* h = em_get(g->entitymap, g->hero_id);
+    if (h) {
+        int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
+        int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
+        if (dx != 0 || dy != 0) {
+            liblogic_try_entity_move(g, e, dx, dy);
+        }
+    }
+}
+
+
+void liblogic_try_entity_attack_player(gamestate* const g, entity* const e) {
+    entity* h = em_get(g->entitymap, g->hero_id);
+    if (h) {
+        int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
+        int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
+        if (dx != 0 || dy != 0) {
+            liblogic_try_entity_attack(g, e->id, h->x, h->y);
+        }
+    }
+}
+
+
+void liblogic_try_entity_move_attack_player(gamestate* const g, entity* const e) {
+    entity* h = em_get(g->entitymap, g->hero_id);
+    if (h) {
+        // check if we are adjacent to the player
+        if (liblogic_entities_adjacent(g, e->id, h->id)) {
+            liblogic_try_entity_attack(g, e->id, h->x, h->y);
+        } else {
+            liblogic_try_entity_move_player(g, e);
+        }
+    }
+}
+
+
+bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1) {
+    if (!g) {
+        merror("liblogic_entities_adjacent: gamestate is NULL");
+        return false;
+    }
+
+    entity* const e0 = em_get(g->entitymap, eid0);
+    if (!e0) {
+        merrorint("liblogic_entities_adjacent: entity not found", eid0);
+        return false;
+    }
+
+    entity* const e1 = em_get(g->entitymap, eid1);
+    if (!e1) {
+        merrorint("liblogic_entities_adjacent: entity not found", eid1);
+        return false;
+    }
+
+    //if (e0->x == e1->x && abs(e0->y - e1->y) == 1) {
+    //    return true;
+    //}
+
+    //if (e0->y == e1->y && abs(e0->x - e1->x) == 1) {
+    //    return true;
+    //}
+
+    // use e0 and check the surrounding 8 tiles
+    for (int y = -1; y <= 1; y++) {
+        for (int x = -1; x <= 1; x++) {
+            if (x == 0 && y == 0) {
+                continue;
+            }
+
+            if (e0->x + x == e1->x && e0->y + y == e1->y) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 
@@ -181,6 +293,13 @@ void liblogic_init(gamestate* const g) {
     if (liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero") == -1) {
         merror("liblogic_init: failed to init hero");
     }
+    entity* const hero = em_get(g->entitymap, g->hero_id);
+    if (hero) {
+        //entity_set_default_action(hero, ENTITY_ACTION_MOVE_PLAYER);
+        entity_set_maxhp(hero, 3);
+        entity_set_hp(hero, 3);
+    }
+
 
     g->entity_turn = g->hero_id;
 
@@ -190,7 +309,7 @@ void liblogic_init(gamestate* const g) {
     //entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
     //entityid orc2 = liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
 
-    int orc_basex = 2;
+    int orc_basex = 4;
     int orc_basey = 6;
     //int rows = 10;
     //int cols = 10;
@@ -225,7 +344,8 @@ void liblogic_init(gamestate* const g) {
             entity* const orc = em_get(g->entitymap, orc_id);
             if (orc) {
                 //entity_action_t action = ENTITY_ACTION_MOVE_RANDOM;
-                entity_action_t action = ENTITY_ACTION_MOVE_PLAYER;
+                //entity_action_t action = ENTITY_ACTION_MOVE_PLAYER;
+                entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
                 entity_set_default_action(orc, action);
                 entity_set_maxhp(orc, 1);
                 entity_set_hp(orc, 1);

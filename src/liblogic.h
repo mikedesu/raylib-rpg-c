@@ -33,6 +33,11 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl);
 void liblogic_update_npc_state(gamestate* const g, entityid id);
 void liblogic_update_npcs_state(gamestate* const g);
 void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_t action);
+void liblogic_try_entity_move_random(gamestate* const g, entity* const e);
+void liblogic_try_entity_move_player(gamestate* const g, entity* const e);
+void liblogic_try_entity_attack_player(gamestate* const g, entity* const e);
+void liblogic_try_entity_move_attack_player(gamestate* const g, entity* const e);
+bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1);
 
 //void liblogic_camera_lock_on(gamestate* const g);
 //int liblogic_tile_npc_dead_count(const gamestate* const g, int x, int y, int floor);

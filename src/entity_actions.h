@@ -24,6 +24,7 @@ typedef enum {
     ENTITY_ACTION_ATTACK_RANDOM,
     ENTITY_ACTION_MOVE_PLAYER, // Move towards the player
     ENTITY_ACTION_ATTACK_PLAYER, // Attack player if nearby
+    ENTITY_ACTION_MOVE_ATTACK_PLAYER, // Move towards player and attack if nearby
     ENTITY_ACTION_WAIT, // Added for future healing
     ENTITY_ACTION_COUNT // Useful for bounds checking
 } entity_action_t;

@@ -4,6 +4,7 @@
 #define FRAMEINTERVAL 10
 #define DEFAULT_LOCK 30
 #define DEFAULT_TILE_SIZE 8
+#define DEFAULT_ZOOM_INCR 0.05f
 
 
 #define TX_DIRT_00 0
