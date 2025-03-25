@@ -2,11 +2,8 @@
 
 #include "entity.h"
 #include "entityid.h"
-//#include "entitytype.h"
 #include <stddef.h>
 
-
-//#define EM_MAX_SLOTS 1024
 #define EM_MAX_SLOTS (1024 * 64)
 
 typedef struct {

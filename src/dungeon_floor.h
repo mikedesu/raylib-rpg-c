@@ -6,14 +6,11 @@
 
 #define DEFAULT_DUNGEON_FLOOR_WIDTH 32
 #define DEFAULT_DUNGEON_FLOOR_HEIGHT 8
-//#define DEFAULT_DUNGEON_FLOOR_WIDTH 256
-//#define DEFAULT_DUNGEON_FLOOR_HEIGHT 128
 
 typedef struct {
     dungeon_tile_t** tiles;
     int width;
     int height;
-
 } dungeon_floor_t;
 
 dungeon_floor_t* dungeon_floor_create(int width, int height);
