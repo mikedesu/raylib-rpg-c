@@ -3,6 +3,7 @@
 #include "dungeon_tile_type.h"
 #include "mprint.h"
 #include <stdlib.h>
+#include <string.h>
 
 dungeon_floor_t* dungeon_floor_create(const int width, const int height) {
     dungeon_floor_t* floor = malloc(sizeof(dungeon_floor_t));
@@ -30,19 +31,20 @@ void dungeon_floor_init(dungeon_floor_t* df) {
     if (!df) return;
     df->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
     df->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
-    //df->tiles = (dungeon_tile_t**)malloc(sizeof(dungeon_tile_t*) * df->height);
     df->tiles = malloc(sizeof(dungeon_tile_t*) * df->height);
     if (!df->tiles) return;
-    bool success = true;
+
+    // memset the tiles
+    memset(df->tiles, 0, sizeof(dungeon_tile_t*) * df->height);
+
     for (int i = 0; i < df->height; i++) {
-        //df->tiles[i] = (dungeon_tile_t*)malloc(sizeof(dungeon_tile_t) * df->width);
         df->tiles[i] = malloc(sizeof(dungeon_tile_t) * df->width);
         if (df->tiles[i] == NULL) {
-            success = false;
-            break;
+            // malloc failed and we need to free everything up to this point
+            for (int j = 0; j < i; j++) { free(df->tiles[j]); }
+            return;
         }
     }
-    if (!success) return;
     for (int i = 0; i < df->height; i++) {
         for (int j = 0; j < df->width; j++) {
             dungeon_tile_t* current = &df->tiles[i][j];
