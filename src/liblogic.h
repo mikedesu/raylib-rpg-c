@@ -4,16 +4,13 @@
 
 #define TILE_COUNT_ERROR -999
 
-
 entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
-
 entityid liblogic_player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 
+bool liblogic_player_on_tile(const gamestate* const g, int x, int y, int floor);
+bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1);
 
-const bool liblogic_player_on_tile(const gamestate* const g, const int x, const int y, const int floor);
-
-const int liblogic_tile_npc_count(const gamestate* const g, const int x, const int y, const int floor);
-//const int liblogic_tile_npc_living_count(const gamestate* const g, const int x, const int y, const int floor);
+int liblogic_tile_npc_count(const gamestate* const g, int x, int y, int floor);
 int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int fl);
 
 void liblogic_init(gamestate* const g);
@@ -37,10 +34,8 @@ void liblogic_try_entity_move_random(gamestate* const g, entity* const e);
 void liblogic_try_entity_move_player(gamestate* const g, entity* const e);
 void liblogic_try_entity_attack_player(gamestate* const g, entity* const e);
 void liblogic_try_entity_move_attack_player(gamestate* const g, entity* const e);
-bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1);
 
 entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
-
 
 //void liblogic_camera_lock_on(gamestate* const g);
 //int liblogic_tile_npc_dead_count(const gamestate* const g, int x, int y, int floor);

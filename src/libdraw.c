@@ -503,13 +503,13 @@ bool libdraw_draw_player_target_box(const gamestate* const g) {
     int x = e->x, y = e->y;
     x += dir == DIR_LEFT || dir == DIR_DOWN_LEFT || dir == DIR_UP_LEFT      ? -1
          : dir == DIR_RIGHT || dir == DIR_DOWN_RIGHT || dir == DIR_UP_RIGHT ? 1
-                                                                                              : 0;
+                                                                            : 0;
     y += dir == DIR_UP || dir == DIR_UP_LEFT || dir == DIR_UP_RIGHT         ? -1
          : dir == DIR_DOWN || dir == DIR_DOWN_LEFT || dir == DIR_DOWN_RIGHT ? 1
-                                                                                              : 0;
+                                                                            : 0;
     const int ds = DEFAULT_TILE_SIZE;
     const Color base_c = GREEN;
-    const float a = 1.0f;
+    const float a = 0.5f;
     const Color c = Fade(base_c, a);
     DrawRectangleLinesEx((Rectangle){x * ds, y * ds, ds, ds}, 1, c);
     return true;
@@ -771,7 +771,7 @@ void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t 
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
-                                                                     : old_ctx;
+                                                               : old_ctx;
     spritegroup_setcontexts(group, ctx);
 }
 

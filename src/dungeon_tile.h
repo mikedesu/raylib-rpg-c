@@ -2,6 +2,7 @@
 
 #include "dungeon_tile_type.h"
 #include "entityid.h"
+#include "entitytype.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -47,9 +48,8 @@ int dungeon_tile_get_wall_switch_event(const dungeon_tile_t* t);
 int dungeon_tile_get_wall_switch_down_tx_key(const dungeon_tile_t* t);
 int dungeon_tile_get_wall_switch_up_tx_key(const dungeon_tile_t* t);
 
-void dungeon_tile_free(dungeon_tile_t* t);
-
 void dungeon_tile_init(dungeon_tile_t* const t, dungeon_tile_type_t type);
+void dungeon_tile_free(dungeon_tile_t* t);
 
 void dungeon_tile_set_pressure_plate_down_tx_key(dungeon_tile_t* const t, int k);
 void dungeon_tile_set_pressure_plate_event(dungeon_tile_t* const t, int e);

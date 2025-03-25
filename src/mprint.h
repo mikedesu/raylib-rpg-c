@@ -11,9 +11,8 @@
     (printf("☠️  \033[31;1mError  \033[0m %s:%d: %s: %d %d %d %d\n", __FILE__, __LINE__, s, x, y, z, a))
 #define merrorstr(s, x) (printf("☠️  \033[31;1mError  \033[0m %s:%d: %s: %s\n", __FILE__, __LINE__, s, x))
 
-
 #define mwarning(s) (printf("⚠️  \033[31;1mWarning\033[0m %s:%d: %s\n", __FILE__, __LINE__, s))
-#define mwaringint(s, x) (printf("⚠️  \033[31;1mWarning\033[0m %s:%d: %s: %d\n", __FILE__, __LINE__, s, x))
+#define mwarningint(s, x) (printf("⚠️  \033[31;1mWarning\033[0m %s:%d: %s: %d\n", __FILE__, __LINE__, s, x))
 #define mwarningint2(s, x, y) (printf("⚠️  \033[31;1mWarning\033[0m %s:%d: %s: %d %d\n", __FILE__, __LINE__, s, x, y))
 #define mwarningint3(s, x, y, z)                                                                                       \
     (printf("⚠️  \033[31;1mWarning\033[0m %s:%d: %s: %d %d %d\n", __FILE__, __LINE__, s, x, y, z))

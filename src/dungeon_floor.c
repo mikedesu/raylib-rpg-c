@@ -58,22 +58,95 @@ void df_init(dungeon_floor_t* df) {
     df_init_test(df);
 }
 
+void df_set_event(dungeon_floor_t* const df,
+                  int x,
+                  int y,
+                  int event_id,
+                  dungeon_tile_type_t on_type,
+                  dungeon_tile_type_t off_type) {
+    if (!df) return;
+    if (event_id < 0 || event_id >= DEFAULT_DF_EVENTS) {
+        merrorint("df_set_event: event_id is out of bounds", event_id);
+        return;
+    }
+    df->events[event_id].x = x;
+    df->events[event_id].y = y;
+    df->events[event_id].on_type = on_type;
+    df->events[event_id].off_type = off_type;
+    df->events[event_id].listen_event = event_id;
+}
+
 void df_init_test(dungeon_floor_t* const df) {
     df_set_tile_area_range(df, 0, 0, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
-    df_set_tile_area_range(df, 3, 5, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
+    df_set_tile_area_range(df, 0, 5, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
 
-    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, 0, 0);
-    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, 3, 4);
-
-    // have to specify an event id within range
     df_event_id event_id = 1;
-    dungeon_floor_set_wall_switch(df, 0, 0, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
-
+    int x = 0;
+    int y = 4;
+    // define the event that is triggered by the wall switch
+    // have to specify an event id within range
     df->events[event_id].listen_event = event_id;
-    df->events[event_id].x = 3;
-    df->events[event_id].y = 4;
+    df->events[event_id].x = x;
+    df->events[event_id].y = y;
     df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
     df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
+
+    x = 0;
+    y = 0;
+    // create a wall tile and place a switch on it with an event id
+    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
+    dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
+
+    event_id = 2;
+    x = 1;
+    y = 4;
+    df->events[event_id].listen_event = event_id;
+    df->events[event_id].x = x;
+    df->events[event_id].y = y;
+    df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+    df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
+
+    x = 1;
+    y = 0;
+    // create a wall tile and place a switch on it with an event id
+    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
+    dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
+
+    event_id = 3;
+    x = 2;
+    y = 4;
+    df->events[event_id].listen_event = event_id;
+    df->events[event_id].x = x;
+    df->events[event_id].y = y;
+    df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+    df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
+
+    x = 2;
+    y = 0;
+    // create a wall tile and place a switch on it with an event id
+    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
+    dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
+
+    event_id = 4;
+    x = 3;
+    y = 4;
+    df->events[event_id].listen_event = event_id;
+    df->events[event_id].x = x;
+    df->events[event_id].y = y;
+    df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+    df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
+
+    x = 3;
+    y = 0;
+    // create a wall tile and place a switch on it with an event id
+    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
+    dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
+
+    // create the corresponding tile that gets flipped by the switch
 
     //int num_rooms = 10;
     //for (int i = 0; i < num_rooms; i++) {

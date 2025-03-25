@@ -73,26 +73,8 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
     case ENTITY_ACTION_ATTACK_UP_RIGHT: liblogic_try_entity_attack(g, e->id, e->x + 1, e->y - 1); break;
     case ENTITY_ACTION_ATTACK_DOWN_LEFT: liblogic_try_entity_attack(g, e->id, e->x - 1, e->y + 1); break;
     case ENTITY_ACTION_ATTACK_DOWN_RIGHT: liblogic_try_entity_attack(g, e->id, e->x + 1, e->y + 1); break;
-    case ENTITY_ACTION_MOVE_RANDOM: {
-        //int x = rand() % 3;
-        //x = x == 0 ? -1 : x == 1 ? 0 : 1;
-        //// if x is 0, y cannot also be 0
-        //int y;
-        //if (x == 0) {
-        //    y = rand() % 2;
-        //    y = y == 0 ? -1 : 1;
-        //} else {
-        //    y = rand() % 3;
-        //    y = y == 0 ? -1 : y == 1 ? 0 : 1;
-        //}
-        //liblogic_try_entity_move(g, e, x, y);
-
-        liblogic_try_entity_move_random(g, e);
-
-        break;
-    }
+    case ENTITY_ACTION_MOVE_RANDOM: liblogic_try_entity_move_random(g, e); break;
     case ENTITY_ACTION_ATTACK_RANDOM: {
-
         int x = rand() % 3;
         x = x == 0 ? -1 : x == 1 ? 0 : 1;
         // if x is 0, y cannot also be 0
@@ -179,36 +161,29 @@ bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1
         merror("liblogic_entities_adjacent: gamestate is NULL");
         return false;
     }
-
     entity* const e0 = em_get(g->entitymap, eid0);
     if (!e0) {
         merrorint("liblogic_entities_adjacent: entity not found", eid0);
         return false;
     }
-
     entity* const e1 = em_get(g->entitymap, eid1);
     if (!e1) {
         merrorint("liblogic_entities_adjacent: entity not found", eid1);
         return false;
     }
-
     //if (e0->x == e1->x && abs(e0->y - e1->y) == 1) {
     //    return true;
     //}
-
     //if (e0->y == e1->y && abs(e0->x - e1->x) == 1) {
     //    return true;
     //}
-
     // use e0 and check the surrounding 8 tiles
     for (int y = -1; y <= 1; y++) {
         for (int x = -1; x <= 1; x++) {
             if (x == 0 && y == 0) { continue; }
-
             if (e0->x + x == e1->x && e0->y + y == e1->y) { return true; }
         }
     }
-
     return false;
 }
 
@@ -249,14 +224,14 @@ void liblogic_init(gamestate* const g) {
     //entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
     //entityid orc2 = liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
 
-    int orc_x = 4;
+    int orc_x = 0;
     int orc_y = 6;
     //int rows = 10;
     //int cols = 10;
     //int rows = 34;
     //int cols = 30;
     int count = 0;
-    int total_orcs_to_make = 1;
+    int total_orcs_to_make = 4;
 
     dungeon_t* d = g->dungeon;
     dungeon_floor_t* df = d->floors[0];
@@ -599,7 +574,7 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
     }
 }
 
-const bool liblogic_player_on_tile(const gamestate* const g, const int x, const int y, const int floor) {
+bool liblogic_player_on_tile(const gamestate* const g, int x, int y, int floor) {
     if (!g) {
         merror("liblogic_player_on_tile: gamestate is NULL");
         return false;
@@ -631,7 +606,7 @@ const bool liblogic_player_on_tile(const gamestate* const g, const int x, const 
     return false;
 }
 
-const int liblogic_tile_npc_count(const gamestate* const g, const int x, const int y, const int floor) {
+int liblogic_tile_npc_count(const gamestate* const g, int x, int y, int floor) {
     if (!g) {
         merror("liblogic_tile_npc_count: gamestate is NULL");
         return -1;
@@ -1022,7 +997,6 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
         return;
     }
     entity* const attacker = em_get(g->entitymap, attacker_id);
-    //if (!attacker) {
     if (!attacker || attacker->is_dead) {
         merror("liblogic_try_entity_attack: attacker entity not found");
         return;
@@ -1037,76 +1011,61 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
         merror("liblogic_try_entity_attack: target tile not found");
         return;
     }
-
     // Calculate direction based on target position
-    int dx = target_x - attacker->x;
-    int dy = target_y - attacker->y;
-    attacker->direction =
-        liblogic_get_dir_from_xy(dx, dy); // Assumes this function exists to convert dx, dy to a direction
-
-    attacker->is_attacking = true;
-    attacker->do_update = true;
-
     bool attack_successful = false;
-
+    int dx = target_x - attacker->x, dy = target_y - attacker->y;
+    attacker->direction = liblogic_get_dir_from_xy(dx, dy);
+    attacker->is_attacking = attacker->do_update = true;
     for (int i = 0; i < tile->entity_max; i++) {
-        if (tile->entities[i] != -1) {
-            entity* const target = em_get(g->entitymap, tile->entities[i]);
+        entityid id = tile->entities[i];
+        if (id != -1) {
+            entity* const target = em_get(g->entitymap, id);
             if (target && (target->type == ENTITY_NPC || target->type == ENTITY_PLAYER) && !target->is_dead) {
                 // Perform attack logic here
                 minfo("Attack successful!");
-                attack_successful = true;
-                target->is_damaged = true;
-                target->do_update = true;
-
+                attack_successful = target->is_damaged = target->do_update = true;
                 entity_set_hp(target, entity_get_hp(target) - 1); // Reduce HP by 1
-
-                if (entity_get_hp(target) <= 0) { // Check if target is dead
-                    target->is_dead = true;
-                }
+                if (entity_get_hp(target) <= 0) target->is_dead = true;
                 break;
             }
         }
     }
-
     if (!attack_successful)
         merrorint2("liblogic_try_entity_attack: no valid target found at the specified location", target_x, target_y);
-
-    if (attacker->type == ENTITY_PLAYER) {
+    if (attacker->type == ENTITY_PLAYER)
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    } else if (attacker->type == ENTITY_NPC) {
+    else if (attacker->type == ENTITY_NPC)
         g->flag = GAMESTATE_FLAG_NPC_ANIM;
-    } else {
+    else
         g->flag = GAMESTATE_FLAG_NONE;
-    }
 }
 
 int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int fl) {
+    // Validate inputs
     if (!g) {
-        merror("liblogic_tile_npc_living_count: gamestate is NULL");
-        return -1;
+        merror("Null gamestate");
+        return TILE_COUNT_ERROR;
     }
-
     const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
     if (!df) {
-        merror("liblogic_tile_npc_living_count: failed to get dungeon floor");
-        return -1;
+        merrorint("Invalid floor", fl);
+        return TILE_COUNT_ERROR;
     }
-
     const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
-        merror("liblogic_tile_npc_living_count: failed to get tile");
-        return -1;
+        merrorint2("Invalid tile at", x, y);
+        return TILE_COUNT_ERROR;
     }
-
-    // enumerate entities and count living NPCs
+    // Count living NPCs
     int count = 0;
-    for (int i = 0; i < tile->entity_max; i++) {
-        if (tile->entities[i] == -1) { continue; }
-        const entity* const e = em_get(g->entitymap, tile->entities[i]);
+    const int max_entities = tile->entity_max;
+    for (int i = 0; i < max_entities; i++) {
+        const entityid eid = tile->entities[i];
+        if (eid == -1) continue;
+        const entity* const e = em_get(g->entitymap, eid);
         if (!e) {
-            merror("liblogic_tile_npc_living_count: failed to get entity");
-            return -1;
+            mwarningint("Missing entity", eid); // Warning not error
+            continue;
         }
         if (e->type == ENTITY_NPC && !e->is_dead) { count++; }
     }
