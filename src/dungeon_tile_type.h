@@ -2,6 +2,9 @@
 
 #include <stdbool.h>
 
+//typedef enum {
+//} dungeon_tile_type_cat_t;
+
 typedef enum {
     DUNGEON_TILE_TYPE_NONE,
     DUNGEON_TILE_TYPE_FLOOR_DIRT,
@@ -72,18 +75,15 @@ typedef enum {
     DUNGEON_TILE_TYPE_COUNT
 } dungeon_tile_type_t;
 
-
 static inline bool dungeon_tile_is_wall(const dungeon_tile_type_t type) {
     return type >= DUNGEON_TILE_TYPE_STONE_WALL_00 && type <= DUNGEON_TILE_TYPE_STONE_WALL_02;
 }
-
 
 static inline bool dungeon_tile_is_walkable(const dungeon_tile_type_t type) {
     return type != DUNGEON_TILE_TYPE_STONE_WALL_00 && type != DUNGEON_TILE_TYPE_STONE_WALL_01 &&
            type != DUNGEON_TILE_TYPE_STONE_WALL_02 && type != DUNGEON_TILE_TYPE_UNKNOWN &&
            type != DUNGEON_TILE_TYPE_NONE;
 }
-
 
 static inline bool dungeon_tile_is_trap(const dungeon_tile_type_t type) {
     return type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00 || type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
