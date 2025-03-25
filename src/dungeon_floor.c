@@ -11,7 +11,7 @@ dungeon_floor_t* dungeon_floor_create(const int width, const int height) {
         merror("dungeon_floor_create: floor malloc failed");
         return NULL;
     }
-    dungeon_floor_init(floor);
+    df_init(floor);
     return floor;
 }
 
@@ -27,7 +27,7 @@ void df_set_tile_area(dungeon_floor_t* const df, dungeon_tile_type_t type, int x
     }
 }
 
-void dungeon_floor_init(dungeon_floor_t* df) {
+void df_init(dungeon_floor_t* df) {
     if (!df) return;
     df->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
     df->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;

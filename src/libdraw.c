@@ -241,6 +241,8 @@ void libdraw_update_sprites(gamestate* const g) {
         } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
             g->entity_turn = g->hero_id; // Reset directly to hero
             g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+
+            g->turn_count++;
         }
     }
 }
@@ -496,10 +498,10 @@ bool libdraw_draw_player_target_box(const gamestate* const g) {
          : dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1
                                                                                               : 0;
     const int ds = DEFAULT_TILE_SIZE;
-    //const int dh = DEFAULT_TILE_SIZE;
-    //const int dx = x * DEFAULT_TILE_SIZE;
-    //const int dy = y * DEFAULT_TILE_SIZE;
-    DrawRectangleLinesEx((Rectangle){x * ds, y * ds, ds, ds}, 1, Fade(RED, 0.5f));
+    const Color base_c = GREEN;
+    const float a = 1.0f;
+    const Color c = Fade(base_c, a);
+    DrawRectangleLinesEx((Rectangle){x * ds, y * ds, ds, ds}, 1, c);
     return true;
 }
 
@@ -829,7 +831,7 @@ void libdraw_draw_hud(gamestate* const g) {
         maxhp = e->maxhp;
     }
 
-    snprintf(buffer, sizeof(buffer), "Name: %s\nHP: %d/%d", e->name, hp, maxhp);
+    snprintf(buffer, sizeof(buffer), "Name: %s\nHP: %d/%d\nTurn: %d\n", e->name, hp, maxhp, g->turn_count);
 
     //const char* text = "Name: evildojo666\nHP: 1/1";
     const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);

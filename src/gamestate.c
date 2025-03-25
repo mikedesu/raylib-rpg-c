@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 5
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 5
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
@@ -23,6 +22,7 @@ gamestate* gamestateinitptr() {
         return NULL;
     }
     g->framecount = 0;
+    g->turn_count = 0;
 
     g->debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
     g->debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
@@ -94,7 +94,6 @@ gamestate* gamestateinitptr() {
     return g;
 }
 
-
 void gamestatefree(gamestate* g) {
     if (!g) {
         merror("gamestatefree: g is NULL");
@@ -114,7 +113,6 @@ void gamestatefree(gamestate* g) {
     msuccess("Freed gamestate");
 }
 
-
 void gamestate_add_entityid(gamestate* const g, const entityid id) {
     if (g == NULL) {
         merror("gamestate_add_entityid g is NULL");
@@ -132,7 +130,6 @@ void gamestate_add_entityid(gamestate* const g, const entityid id) {
     g->index_entityids++;
 }
 
-
 void gamestate_set_hero_id(gamestate* const g, const entityid id) {
     if (!g) {
         merror("gamestate_set_hero_id: g is NULL");
@@ -141,7 +138,6 @@ void gamestate_set_hero_id(gamestate* const g, const entityid id) {
 
     g->hero_id = id;
 }
-
 
 const entityid gamestate_get_hero_id(const gamestate* const g) {
     if (!g) {
@@ -152,7 +148,6 @@ const entityid gamestate_get_hero_id(const gamestate* const g) {
     return g->hero_id;
 }
 
-
 em_t* gamestate_get_entitymap(gamestate* const g) {
     if (!g) {
         merror("gamestate_get_entitymap: g is NULL");
@@ -161,7 +156,6 @@ em_t* gamestate_get_entitymap(gamestate* const g) {
 
     return g->entitymap;
 }
-
 
 void gamestate_init_entityids(gamestate* const g) {
 
@@ -176,20 +170,14 @@ void gamestate_init_entityids(gamestate* const g) {
         return;
     }
 
-    for (int i = 0; i < g->max_entityids; i++) {
-        g->entityids[i] = -1;
-    }
+    for (int i = 0; i < g->max_entityids; i++) { g->entityids[i] = -1; }
 
     g->index_entityids = 0;
 
     g->max_entityids = GAMESTATE_INIT_ENTITYIDS_MAX;
 }
 
-
-const entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index) {
-    return g->entityids[index];
-}
-
+const entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index) { return g->entityids[index]; }
 
 void gamestate_dungeon_destroy(gamestate* const g) {
     if (!g) {
@@ -201,7 +189,6 @@ void gamestate_dungeon_destroy(gamestate* const g) {
     g->dungeon = NULL;
 }
 
-
 const int gamestate_get_entityid_index(const gamestate* const g, const entityid id) {
     if (!g) {
         merror("gamestate_get_entityid_index: g is NULL");
@@ -209,14 +196,11 @@ const int gamestate_get_entityid_index(const gamestate* const g, const entityid 
     }
 
     for (int i = 0; i < g->max_entityids; i++) {
-        if (g->entityids[i] == id) {
-            return i;
-        }
+        if (g->entityids[i] == id) { return i; }
     }
 
     return -1;
 }
-
 
 const int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, const int index) {
     if (!g) {
@@ -225,14 +209,11 @@ const int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, c
     }
 
     for (int i = index + 1; i < g->max_entityids; i++) {
-        if (g->entityids[i] != -1) {
-            return g->entityids[i];
-        }
+        if (g->entityids[i] != -1) { return g->entityids[i]; }
     }
 
     return -1;
 }
-
 
 void gamestate_incr_entity_turn(gamestate* const g) {
     if (!g) {

@@ -25,6 +25,7 @@ typedef struct gamestate {
     int windowwidth;
     int windowheight;
     int lock;
+    int turn_count;
     controlmode_t controlmode;
     entityid hero_id;
     time_t timebegan;
@@ -75,7 +76,6 @@ typedef struct gamestate {
     entityid entity_turn;
 
 } gamestate;
-
 
 gamestate* gamestateinitptr();
 
