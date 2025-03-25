@@ -32,26 +32,27 @@ void df_init(dungeon_floor_t* df) {
     if (!df) return;
     df->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
     df->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
-    for (int i = 0; i < DEFAULT_DF_EVENTS; i++) {
-        df->events[i].listen_event = -1;
-        df->events[i].x = -1;
-        df->events[i].y = -1;
-        df->events[i].on_type = DUNGEON_TILE_TYPE_NONE;
-        df->events[i].off_type = DUNGEON_TILE_TYPE_NONE;
+
+    df_reset_plates(df);
+    df_reset_events(df);
+
+    if (!df_malloc_tiles(df)) {
+        merror("df_init: failed to malloc tiles");
+        return;
     }
 
-    df->tiles = malloc(sizeof(dungeon_tile_t*) * df->height);
-    if (!df->tiles) return;
-    // memset the tiles
-    memset(df->tiles, 0, sizeof(dungeon_tile_t*) * df->height);
-    for (int i = 0; i < df->height; i++) {
-        df->tiles[i] = malloc(sizeof(dungeon_tile_t) * df->width);
-        if (df->tiles[i] == NULL) {
-            // malloc failed and we need to free everything up to this point
-            for (int j = 0; j < i; j++) { free(df->tiles[j]); }
-            return;
-        }
-    }
+    //df->tiles = malloc(sizeof(dungeon_tile_t*) * df->height);
+    //if (!df->tiles) return;
+    //// memset the tiles
+    //memset(df->tiles, 0, sizeof(dungeon_tile_t*) * df->height);
+    //for (int i = 0; i < df->height; i++) {
+    //    df->tiles[i] = malloc(sizeof(dungeon_tile_t) * df->width);
+    //    if (df->tiles[i] == NULL) {
+    //        // malloc failed and we need to free everything up to this point
+    //        for (int j = 0; j < i; j++) { free(df->tiles[j]); }
+    //        return;
+    //    }
+    //}
     df_set_all_tiles(df, DUNGEON_TILE_TYPE_NONE);
 
     // at this point, we are free to customize the dungeon floor to our liking
@@ -95,56 +96,56 @@ void df_init_test(dungeon_floor_t* const df) {
     x = 0;
     y = 0;
     // create a wall tile and place a switch on it with an event id
-    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
+    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_02, x, y);
     dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
 
-    event_id = 2;
-    x = 1;
-    y = 4;
-    df->events[event_id].listen_event = event_id;
-    df->events[event_id].x = x;
-    df->events[event_id].y = y;
-    df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
-    df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
-    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
+    //event_id = 2;
+    //x = 1;
+    //y = 4;
+    //df->events[event_id].listen_event = event_id;
+    //df->events[event_id].x = x;
+    //df->events[event_id].y = y;
+    //df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+    //df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+    //df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
 
-    x = 1;
-    y = 0;
-    // create a wall tile and place a switch on it with an event id
-    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
-    dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
+    //x = 1;
+    //y = 0;
+    //// create a wall tile and place a switch on it with an event id
+    //df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
+    //dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
 
-    event_id = 3;
-    x = 2;
-    y = 4;
-    df->events[event_id].listen_event = event_id;
-    df->events[event_id].x = x;
-    df->events[event_id].y = y;
-    df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
-    df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
-    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
+    //event_id = 3;
+    //x = 2;
+    //y = 4;
+    //df->events[event_id].listen_event = event_id;
+    //df->events[event_id].x = x;
+    //df->events[event_id].y = y;
+    //df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+    //df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+    //df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
 
-    x = 2;
-    y = 0;
-    // create a wall tile and place a switch on it with an event id
-    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
-    dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
+    //x = 2;
+    //y = 0;
+    //// create a wall tile and place a switch on it with an event id
+    //df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
+    //dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
 
-    event_id = 4;
-    x = 3;
-    y = 4;
-    df->events[event_id].listen_event = event_id;
-    df->events[event_id].x = x;
-    df->events[event_id].y = y;
-    df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
-    df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
-    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
+    //event_id = 4;
+    //x = 3;
+    //y = 4;
+    //df->events[event_id].listen_event = event_id;
+    //df->events[event_id].x = x;
+    //df->events[event_id].y = y;
+    //df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+    //df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+    //df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
 
-    x = 3;
-    y = 0;
-    // create a wall tile and place a switch on it with an event id
-    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
-    dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
+    //x = 3;
+    //y = 0;
+    //// create a wall tile and place a switch on it with an event id
+    //df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_00, x, y);
+    //dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
 
     // create the corresponding tile that gets flipped by the switch
 
@@ -390,4 +391,37 @@ void df_set_tile_area_range(dungeon_floor_t* const df,
             dungeon_tile_init(current, type);
         }
     }
+}
+
+void df_reset_plates(dungeon_floor_t* const df) {
+    if (!df) return;
+    for (int i = 0; i < DEFAULT_DF_PLATES; i++) df->plates[i] = false;
+}
+
+void df_reset_events(dungeon_floor_t* const df) {
+    if (!df) return;
+    for (int i = 0; i < DEFAULT_DF_EVENTS; i++) {
+        df->events[i].listen_event = -1;
+        df->events[i].x = -1;
+        df->events[i].y = -1;
+        df->events[i].on_type = DUNGEON_TILE_TYPE_NONE;
+        df->events[i].off_type = DUNGEON_TILE_TYPE_NONE;
+    }
+}
+
+bool df_malloc_tiles(dungeon_floor_t* const df) {
+    if (!df) return false;
+    df->tiles = malloc(sizeof(dungeon_tile_t*) * df->height);
+    if (!df->tiles) return false;
+    // memset the tiles
+    memset(df->tiles, 0, sizeof(dungeon_tile_t*) * df->height);
+    for (int i = 0; i < df->height; i++) {
+        df->tiles[i] = malloc(sizeof(dungeon_tile_t) * df->width);
+        if (df->tiles[i] == NULL) {
+            // malloc failed and we need to free everything up to this point
+            for (int j = 0; j < i; j++) { free(df->tiles[j]); }
+            return false;
+        }
+    }
+    return true;
 }

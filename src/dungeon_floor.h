@@ -7,6 +7,7 @@
 #define DEFAULT_DUNGEON_FLOOR_WIDTH 128
 #define DEFAULT_DUNGEON_FLOOR_HEIGHT 128
 #define DEFAULT_DF_EVENTS 16
+#define DEFAULT_DF_PLATES 16
 
 typedef int df_event_id;
 
@@ -22,7 +23,10 @@ typedef struct {
     dungeon_tile_t** tiles;
     int width;
     int height;
+
     df_event_t events[DEFAULT_DF_EVENTS];
+    bool plates[DEFAULT_DF_PLATES];
+
 } dungeon_floor_t;
 
 dungeon_floor_t* dungeon_floor_create(int width, int height);
@@ -65,3 +69,7 @@ void df_set_event(dungeon_floor_t* const df,
                   int event_id,
                   dungeon_tile_type_t on_type,
                   dungeon_tile_type_t off_type);
+
+void df_reset_plates(dungeon_floor_t* const df);
+void df_reset_events(dungeon_floor_t* const df);
+bool df_malloc_tiles(dungeon_floor_t* const df);
