@@ -1,6 +1,7 @@
 #include "libdraw.h"
 //#include "entitytype.h"
 #include "direction.h"
+#include "dungeon_tile_type.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
@@ -267,6 +268,12 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
     if (!tile) {
         merrorint2("libdraw_draw_dungeon_floor_tile: tile is NULL", x, y);
         return false;
+    }
+
+    // check if the tile type is none
+    if (tile->type == DUNGEON_TILE_TYPE_NONE) {
+        //merrorint2("libdraw_draw_dungeon_floor_tile: tile type is none", x, y);
+        return true;
     }
 
     // just draw the tile itself
