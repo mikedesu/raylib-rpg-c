@@ -26,3 +26,6 @@ void df_set_tile_area(dungeon_floor_t* const df, dungeon_tile_type_t type, int x
 bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y);
 bool dungeon_floor_add_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool dungeon_floor_remove_at(dungeon_floor_t* const df, entityid id, int x, int y);
+
+void df_set_tile_perimeter(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y, int w, int h);
+void df_set_tile(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y);

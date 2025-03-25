@@ -27,17 +27,11 @@ void df_set_tile_area(dungeon_floor_t* const df, dungeon_tile_type_t type, int x
 }
 
 void dungeon_floor_init(dungeon_floor_t* floor) {
-    if (!floor) {
-        merror("dungeon_floor_init: floor is NULL");
-        return;
-    }
+    if (!floor) return;
     floor->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
     floor->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
     floor->tiles = (dungeon_tile_t**)malloc(sizeof(dungeon_tile_t*) * floor->height);
-    if (!floor->tiles) {
-        merror("dungeon_floor_init: floor->tiles malloc failed");
-        return;
-    }
+    if (!floor->tiles) return;
     bool success = true;
     //for (int i = 0; i < floor->width; i++) {
     for (int i = 0; i < floor->height; i++) {
@@ -47,10 +41,7 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
             break;
         }
     }
-    if (!success) {
-        merror("dungeon_floor_init: floor->tiles[i] malloc failed");
-        return;
-    }
+    if (!success) return;
     for (int i = 0; i < floor->height; i++) {
         for (int j = 0; j < floor->width; j++) {
             dungeon_tile_t* current = &floor->tiles[i][j];
@@ -62,41 +53,39 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
     // lets do an experiment
     // i want to set a perimeter given an x,y and a width and height
     // i want to set the perimeter to be a wall
-
-    int x = 0;
-    int y = 0;
-    int w = 14;
-    int h = 5;
-    for (int i = 0; i <= w; i++) {
-        dungeon_tile_t* current = &floor->tiles[y][x + i];
-        dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
-        dungeon_tile_init(current, type);
-    }
-    for (int i = 0; i <= h; i++) {
-        dungeon_tile_t* current = &floor->tiles[y + i][x];
-        dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
-        dungeon_tile_init(current, type);
-    }
-    for (int i = 0; i <= w; i++) {
-        dungeon_tile_t* current = &floor->tiles[y + h][x + i];
-        dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
-        dungeon_tile_init(current, type);
-    }
-    for (int i = 0; i <= h; i++) {
-        dungeon_tile_t* current = &floor->tiles[y + i][x + w];
-        dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
-        dungeon_tile_init(current, type);
-    }
+    df_set_tile_perimeter(floor, DUNGEON_TILE_TYPE_STONE_WALL_00, 0, 0, 14, 5);
     // set a tile on the bottom of the perimeter to be floor
-    dungeon_tile_t* current = &floor->tiles[5][2];
-    //dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 12);
-    dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
-    dungeon_tile_init(current, type);
-
-    //current = &floor->tiles[y + h / 2][x + w / 2];
+    //dungeon_tile_t* current = &floor->tiles[5][2];
+    //dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
     //dungeon_tile_init(current, type);
-    /*
-    */
+
+    df_set_tile(floor, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, 2, 5);
+}
+
+void df_set_tile(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y) {
+    if (!df) return;
+    dungeon_tile_t* current = &df->tiles[y][x];
+    dungeon_tile_init(current, type);
+}
+
+void df_set_tile_perimeter(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y, int w, int h) {
+    if (!df) return;
+    for (int i = 0; i <= w; i++) {
+        dungeon_tile_t* current = &df->tiles[y][x + i];
+        dungeon_tile_init(current, type);
+    }
+    for (int i = 0; i <= h; i++) {
+        dungeon_tile_t* current = &df->tiles[y + i][x];
+        dungeon_tile_init(current, type);
+    }
+    for (int i = 0; i <= w; i++) {
+        dungeon_tile_t* current = &df->tiles[y + h][x + i];
+        dungeon_tile_init(current, type);
+    }
+    for (int i = 0; i <= h; i++) {
+        dungeon_tile_t* current = &df->tiles[y + i][x + w];
+        dungeon_tile_init(current, type);
+    }
 }
 
 void dungeon_floor_free(dungeon_floor_t* floor) {
@@ -168,14 +157,7 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
                                       const int up_tx_key,
                                       const int dn_tx_key,
                                       const int event) {
-    if (!df) {
-        merror("dungeon_floor_set_pressure_plate: df is NULL");
-        return;
-    }
-    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-        merror("dungeon_floor_set_pressure_plate: x or y out of bounds");
-        return;
-    }
+    if (!df || x < 0 || x >= df->width || y < 0 || y >= df->height) return;
     dungeon_tile_set_pressure_plate(&df->tiles[y][x], true);
     dungeon_tile_set_pressure_plate_up_tx_key(&df->tiles[y][x], up_tx_key);
     dungeon_tile_set_pressure_plate_down_tx_key(&df->tiles[y][x], dn_tx_key);
@@ -183,14 +165,7 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
 }
 
 void dungeon_floor_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_key, int dn_key, int event) {
-    if (!df) {
-        merror("dungeon_floor_set_wall_switch: df is NULL");
-        return;
-    }
-    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-        merror("dungeon_floor_set_wall_switch: x or y out of bounds");
-        return;
-    }
+    if (!df || x < 0 || x >= df->width || y < 0 || y >= df->height) return;
     dungeon_tile_set_wall_switch(&df->tiles[y][x], true);
     dungeon_tile_set_wall_switch_up_tx_key(&df->tiles[y][x], up_key);
     dungeon_tile_set_wall_switch_down_tx_key(&df->tiles[y][x], dn_key);
@@ -199,13 +174,6 @@ void dungeon_floor_set_wall_switch(dungeon_floor_t* const df, int x, int y, int 
 
 void df_set_all_tiles(dungeon_floor_t* const df, dungeon_tile_type_t type) {
     if (!df) return;
-    //for (int i = 0; i < df->height; i++) {
-    //    for (int j = 0; j < df->width; j++) {
-    //        dungeon_tile_t* current = &df->tiles[i][j];
-    //        dungeon_tile_init(current, type);
-    //    }
-    //}
-
     // rewrite this function using df_set_tile_area
     df_set_tile_area(df, type, 0, 0, df->width, df->height);
 }
