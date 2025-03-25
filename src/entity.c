@@ -12,7 +12,7 @@ entity_t* entity_new(entityid id, entitytype_t type) {
     e->id = id;
     e->type = type;
     e->race = RACE_NONE;
-    e->direction = DIRECTION_RIGHT;
+    e->direction = DIR_RIGHT;
     e->x = e->y = e->floor = -1;
     e->hp = e->maxhp = 1;
     e->do_update = false;
@@ -107,7 +107,7 @@ void entity_decr_y(entity_t* const e) {
 
 
 void entity_set_dir(entity_t* const e, direction_t dir) {
-    if (!e || dir < 0 || dir >= DIRECTION_COUNT) return;
+    if (!e || dir < 0 || dir >= DIR_COUNT) return;
     e->direction = dir;
 }
 
@@ -115,7 +115,7 @@ void entity_set_dir(entity_t* const e, direction_t dir) {
 direction_t entity_get_dir(entity_t* const e) {
     if (e == NULL) {
         merror("e is NULL");
-        return DIRECTION_NONE;
+        return DIR_NONE;
     }
     return e->direction;
 }

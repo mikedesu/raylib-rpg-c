@@ -18,39 +18,39 @@
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
 static inline const direction_t liblogic_get_dir_from_xy(int x, int y) {
-    if (x == 0 && y == 0) return DIRECTION_NONE;
-    if (x == 0 && y == -1) return DIRECTION_UP;
-    if (x == 0 && y == 1) return DIRECTION_DOWN;
-    if (x == -1 && y == 0) return DIRECTION_LEFT;
-    if (x == 1 && y == 0) return DIRECTION_RIGHT;
+    if (x == 0 && y == 0) return DIR_NONE;
+    if (x == 0 && y == -1) return DIR_UP;
+    if (x == 0 && y == 1) return DIR_DOWN;
+    if (x == -1 && y == 0) return DIR_LEFT;
+    if (x == 1 && y == 0) return DIR_RIGHT;
     // also handle diagonals
-    if (x == -1 && y == -1) return DIRECTION_UP_LEFT;
-    if (x == 1 && y == -1) return DIRECTION_UP_RIGHT;
-    if (x == -1 && y == 1) return DIRECTION_DOWN_LEFT;
-    if (x == 1 && y == 1) return DIRECTION_DOWN_RIGHT;
-    return DIRECTION_NONE;
+    if (x == -1 && y == -1) return DIR_UP_LEFT;
+    if (x == 1 && y == -1) return DIR_UP_RIGHT;
+    if (x == -1 && y == 1) return DIR_DOWN_LEFT;
+    if (x == 1 && y == 1) return DIR_DOWN_RIGHT;
+    return DIR_NONE;
 }
 
 static inline int liblogic_get_x_from_dir(direction_t dir) {
     switch (dir) {
-    case DIRECTION_UP_LEFT:
-    case DIRECTION_DOWN_LEFT:
-    case DIRECTION_LEFT: return -1;
-    case DIRECTION_UP_RIGHT:
-    case DIRECTION_DOWN_RIGHT:
-    case DIRECTION_RIGHT: return 1;
+    case DIR_UP_LEFT:
+    case DIR_DOWN_LEFT:
+    case DIR_LEFT: return -1;
+    case DIR_UP_RIGHT:
+    case DIR_DOWN_RIGHT:
+    case DIR_RIGHT: return 1;
     default: return 0;
     }
 }
 
 static inline int liblogic_get_y_from_dir(direction_t dir) {
     switch (dir) {
-    case DIRECTION_UP:
-    case DIRECTION_UP_LEFT:
-    case DIRECTION_UP_RIGHT: return -1;
-    case DIRECTION_DOWN:
-    case DIRECTION_DOWN_LEFT:
-    case DIRECTION_DOWN_RIGHT: return 1;
+    case DIR_UP:
+    case DIR_UP_LEFT:
+    case DIR_UP_RIGHT: return -1;
+    case DIR_DOWN:
+    case DIR_DOWN_LEFT:
+    case DIR_DOWN_RIGHT: return 1;
     default: return 0;
     }
 }

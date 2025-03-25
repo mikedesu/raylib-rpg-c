@@ -1,14 +1,14 @@
 #pragma once
 
 typedef enum direction_t {
-    DIRECTION_NONE,
-    DIRECTION_UP,
-    DIRECTION_DOWN,
-    DIRECTION_LEFT,
-    DIRECTION_RIGHT,
-    DIRECTION_UP_LEFT,
-    DIRECTION_UP_RIGHT,
-    DIRECTION_DOWN_LEFT,
-    DIRECTION_DOWN_RIGHT,
-    DIRECTION_COUNT
+    DIR_NONE,
+    DIR_UP,
+    DIR_DOWN,
+    DIR_LEFT,
+    DIR_RIGHT,
+    DIR_UP_LEFT,
+    DIR_UP_RIGHT,
+    DIR_DOWN_LEFT,
+    DIR_DOWN_RIGHT,
+    DIR_COUNT
 } direction_t;

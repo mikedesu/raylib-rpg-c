@@ -113,23 +113,23 @@ const bool libgame_entity_set_anim_unsafe(gamestate* const g, const entityid id,
 
 
 const int libgame_get_x_from_dir(const direction_t dir) {
-    const bool r = dir == DIRECTION_RIGHT;
-    const bool dr = dir == DIRECTION_DOWN_RIGHT;
-    const bool ur = dir == DIRECTION_UP_RIGHT;
-    const bool l = dir == DIRECTION_LEFT;
-    const bool dl = dir == DIRECTION_DOWN_LEFT;
-    const bool ul = dir == DIRECTION_UP_LEFT;
+    const bool r = dir == DIR_RIGHT;
+    const bool dr = dir == DIR_DOWN_RIGHT;
+    const bool ur = dir == DIR_UP_RIGHT;
+    const bool l = dir == DIR_LEFT;
+    const bool dl = dir == DIR_DOWN_LEFT;
+    const bool ul = dir == DIR_UP_LEFT;
     return r || dr || ur ? 1 : l || dl || ul ? -1 : 0;
 }
 
 
 const int libgame_get_y_from_dir(const direction_t dir) {
-    const bool d = dir == DIRECTION_DOWN;
-    const bool dr = dir == DIRECTION_DOWN_RIGHT;
-    const bool dl = dir == DIRECTION_DOWN_LEFT;
-    const bool u = dir == DIRECTION_UP;
-    const bool ur = dir == DIRECTION_UP_RIGHT;
-    const bool ul = dir == DIRECTION_UP_LEFT;
+    const bool d = dir == DIR_DOWN;
+    const bool dr = dir == DIR_DOWN_RIGHT;
+    const bool dl = dir == DIR_DOWN_LEFT;
+    const bool u = dir == DIR_UP;
+    const bool ur = dir == DIR_UP_RIGHT;
+    const bool ul = dir == DIR_UP_LEFT;
     return d || dr || dl ? 1 : u || ur || ul ? -1 : 0;
 }
 
@@ -143,25 +143,25 @@ const int libgame_get_y_from_dir(const direction_t dir) {
 //        merror("libgame_get_xy_from_dir: y is NULL");
 //        return;
 //    }
-//    *x = dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1
-//         : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT || dir == DIRECTION_UP_RIGHT     ? -1
+//    *x = dir == DIR_DOWN || dir == DIR_DOWN_LEFT || dir == DIR_DOWN_RIGHT ? 1
+//         : dir == DIR_UP || dir == DIR_UP_LEFT || dir == DIR_UP_RIGHT     ? -1
 //                                                                                            : 0;
-//    *y = dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1
-//         : dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT || dir == DIRECTION_UP_RIGHT     ? -1
+//    *y = dir == DIR_DOWN || dir == DIR_DOWN_LEFT || dir == DIR_DOWN_RIGHT ? 1
+//         : dir == DIR_UP || dir == DIR_UP_LEFT || dir == DIR_UP_RIGHT     ? -1
 //                                                                                            : 0;
 //}
 
 
 const direction_t libgame_get_dir_from_xy(const int x, const int y) {
-    return x == 1 && y == 0     ? DIRECTION_RIGHT
-           : x == -1 && y == 0  ? DIRECTION_LEFT
-           : x == 0 && y == 1   ? DIRECTION_DOWN
-           : x == 0 && y == -1  ? DIRECTION_UP
-           : x == 1 && y == 1   ? DIRECTION_DOWN_RIGHT
-           : x == -1 && y == 1  ? DIRECTION_DOWN_LEFT
-           : x == 1 && y == -1  ? DIRECTION_UP_RIGHT
-           : x == -1 && y == -1 ? DIRECTION_UP_LEFT
-                                : DIRECTION_NONE;
+    return x == 1 && y == 0     ? DIR_RIGHT
+           : x == -1 && y == 0  ? DIR_LEFT
+           : x == 0 && y == 1   ? DIR_DOWN
+           : x == 0 && y == -1  ? DIR_UP
+           : x == 1 && y == 1   ? DIR_DOWN_RIGHT
+           : x == -1 && y == 1  ? DIR_DOWN_LEFT
+           : x == 1 && y == -1  ? DIR_UP_RIGHT
+           : x == -1 && y == -1 ? DIR_UP_LEFT
+                                : DIR_NONE;
 }
 
 
@@ -427,27 +427,27 @@ const int libgame_entity_update_context_unsafe(gamestate* const g,
     if (group) {
         const int old_ctx = group->sprites[group->current]->currentcontext;
         int ctx = old_ctx;
-        ctx = dir == DIRECTION_NONE                                      ? old_ctx
-              : dir == DIRECTION_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
-              : dir == DIRECTION_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
-              : dir == DIRECTION_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
-              : dir == DIRECTION_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
-              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
-              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
-              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
-              : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
-              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
-              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
-              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
-              : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
-              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
-              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
-              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
-              : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
-              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
-              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
-              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
-              : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
+        ctx = dir == DIR_NONE                                      ? old_ctx
+              : dir == DIR_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
+              : dir == DIR_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
+              : dir == DIR_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
+              : dir == DIR_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
+              : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
+              : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+              : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
+              : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
+              : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
+              : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
+              : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
+              : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
+              : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
+              : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
+              : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
+              : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
+              : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
+              : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+              : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
+              : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
                                                                          : old_ctx;
         spritegroup_setcontexts(group, ctx);
         retval = 0;
@@ -473,14 +473,14 @@ libgame_entity_update_context(gamestate* const g, const entityid id, const speci
 
 
 const char* libgame_get_str_from_dir(const direction_t dir) {
-    return dir == DIRECTION_RIGHT        ? "RIGHT"
-           : dir == DIRECTION_LEFT       ? "LEFT"
-           : dir == DIRECTION_UP         ? "UP"
-           : dir == DIRECTION_DOWN       ? "DOWN"
-           : dir == DIRECTION_UP_LEFT    ? "UP_LEFT"
-           : dir == DIRECTION_UP_RIGHT   ? "UP_RIGHT"
-           : dir == DIRECTION_DOWN_LEFT  ? "DOWN_LEFT"
-           : dir == DIRECTION_DOWN_RIGHT ? "DOWN_RIGHT"
+    return dir == DIR_RIGHT        ? "RIGHT"
+           : dir == DIR_LEFT       ? "LEFT"
+           : dir == DIR_UP         ? "UP"
+           : dir == DIR_DOWN       ? "DOWN"
+           : dir == DIR_UP_LEFT    ? "UP_LEFT"
+           : dir == DIR_UP_RIGHT   ? "UP_RIGHT"
+           : dir == DIR_DOWN_LEFT  ? "DOWN_LEFT"
+           : dir == DIR_DOWN_RIGHT ? "DOWN_RIGHT"
                                          : "NONE";
 }
 

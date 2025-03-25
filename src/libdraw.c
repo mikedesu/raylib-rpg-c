@@ -14,7 +14,7 @@
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
 #include "tx_keys.h"
-#include <ctype.h>
+//#include <ctype.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
@@ -48,28 +48,31 @@ Vector2 zero_vec = {0, 0};
 #define DEFAULT_ANIM_SPEED 4
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
-void libdraw_init(gamestate* const g) {
-    if (!g) {
-        merror("libdraw_init g is NULL");
-        return;
-    }
-    const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT, x = w / 4, y = h / 4;
-    InitWindow(w, h, "evildojo666");
-    SetTargetFPS(60);
-    target = LoadRenderTexture(w, h);
-    target_src = (Rectangle){0, 0, w, -h};
-    target_dest = (Rectangle){0, 0, w, h};
-    spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
-    libdraw_load_textures();
-    printf("libdraw_init: loaded textures\n");
-    for (int i = 0; i < g->index_entityids; i++) { libdraw_create_sg_byid(g, g->entityids[i]); }
-    libdraw_calc_debugpanel_size(g);
-    libdraw_load_shaders();
-    g->cam2d.offset = (Vector2){x, y};
-    msuccess("libdraw_init");
+void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
+
+bool libdraw_windowshouldclose() { return WindowShouldClose(); }
+
+void libdraw_load_shaders() {
+    //shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
+    //shader_tile_glow = LoadShader(0, "glow.frag");
+    //shader_tile_glow = LoadShader(0, "psychedelic_ripple.frag");
 }
 
-void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
+void libdraw_unload_shaders() {
+    UnloadShader(shader_grayscale);
+    UnloadShader(shader_tile_glow);
+}
+
+bool libdraw_camera_lock_on(gamestate* const g) {
+    if (!g || !g->cam_lockon) return false;
+    spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
+    if (!grp) {
+        merrorint("libdraw_camera_lock_on: hero spritegroup NULL", g->hero_id);
+        return false;
+    }
+    g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
+    return true;
+}
 
 bool libdraw_check_default_animations(gamestate* const g) {
     if (!g) {
@@ -498,11 +501,11 @@ bool libdraw_draw_player_target_box(const gamestate* const g) {
     }
     direction_t dir = e->direction;
     int x = e->x, y = e->y;
-    x += dir == DIRECTION_LEFT || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_UP_LEFT      ? -1
-         : dir == DIRECTION_RIGHT || dir == DIRECTION_DOWN_RIGHT || dir == DIRECTION_UP_RIGHT ? 1
+    x += dir == DIR_LEFT || dir == DIR_DOWN_LEFT || dir == DIR_UP_LEFT      ? -1
+         : dir == DIR_RIGHT || dir == DIR_DOWN_RIGHT || dir == DIR_UP_RIGHT ? 1
                                                                                               : 0;
-    y += dir == DIRECTION_UP || dir == DIRECTION_UP_LEFT || dir == DIRECTION_UP_RIGHT         ? -1
-         : dir == DIRECTION_DOWN || dir == DIRECTION_DOWN_LEFT || dir == DIRECTION_DOWN_RIGHT ? 1
+    y += dir == DIR_UP || dir == DIR_UP_LEFT || dir == DIR_UP_RIGHT         ? -1
+         : dir == DIR_DOWN || dir == DIR_DOWN_LEFT || dir == DIR_DOWN_RIGHT ? 1
                                                                                               : 0;
     const int ds = DEFAULT_TILE_SIZE;
     const Color base_c = GREEN;
@@ -559,8 +562,6 @@ void libdraw_close() {
     libdraw_unload_shaders();
     CloseWindow();
 }
-
-bool libdraw_windowshouldclose() { return WindowShouldClose(); }
 
 bool libdraw_load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path) {
 
@@ -741,38 +742,35 @@ void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t 
         merror("libdraw_update_sprite_context: gamestate is NULL");
         return;
     }
-
     //minfoint2("libdraw_update_sprite_context: updating sprite context for entity", id, dir);
-
     spritegroup_t* group = hashtable_entityid_spritegroup_get(spritegroups, id); // Adjusted for no specifier
     if (!group) {
         merrorint("libdraw_update_sprite_context: group not found", id);
         return;
     }
-
     const int old_ctx = group->sprites[group->current]->currentcontext;
     int ctx = old_ctx;
-    ctx = dir == DIRECTION_NONE                                      ? old_ctx
-          : dir == DIRECTION_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIRECTION_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIRECTION_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIRECTION_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIRECTION_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIRECTION_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIRECTION_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIRECTION_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
+    ctx = dir == DIR_NONE                                      ? old_ctx
+          : dir == DIR_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIR_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIR_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIR_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
                                                                      : old_ctx;
     spritegroup_setcontexts(group, ctx);
 }
@@ -855,24 +853,23 @@ void libdraw_draw_hud(gamestate* const g) {
     DrawText(buffer, x1 + pad + pad, y1 + pad + pad, fontsize, c2);
 }
 
-void libdraw_load_shaders() {
-    //shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
-    //shader_tile_glow = LoadShader(0, "glow.frag");
-    //shader_tile_glow = LoadShader(0, "psychedelic_ripple.frag");
-}
-
-void libdraw_unload_shaders() {
-    UnloadShader(shader_grayscale);
-    UnloadShader(shader_tile_glow);
-}
-
-bool libdraw_camera_lock_on(gamestate* const g) {
-    if (!g || !g->cam_lockon) return false;
-    spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
-    if (!grp) {
-        merrorint("libdraw_camera_lock_on: hero spritegroup NULL", g->hero_id);
-        return false;
+void libdraw_init(gamestate* const g) {
+    if (!g) {
+        merror("libdraw_init g is NULL");
+        return;
     }
-    g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
-    return true;
+    const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT, x = w / 4, y = h / 4;
+    InitWindow(w, h, "evildojo666");
+    SetTargetFPS(60);
+    target = LoadRenderTexture(w, h);
+    target_src = (Rectangle){0, 0, w, -h};
+    target_dest = (Rectangle){0, 0, w, h};
+    spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
+    libdraw_load_textures();
+    printf("libdraw_init: loaded textures\n");
+    for (int i = 0; i < g->index_entityids; i++) { libdraw_create_sg_byid(g, g->entityids[i]); }
+    libdraw_calc_debugpanel_size(g);
+    libdraw_load_shaders();
+    g->cam2d.offset = (Vector2){x, y};
+    msuccess("libdraw_init");
 }
