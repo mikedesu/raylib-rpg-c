@@ -26,25 +26,26 @@ void df_set_tile_area(dungeon_floor_t* const df, dungeon_tile_type_t type, int x
     }
 }
 
-void dungeon_floor_init(dungeon_floor_t* floor) {
-    if (!floor) return;
-    floor->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
-    floor->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
-    floor->tiles = (dungeon_tile_t**)malloc(sizeof(dungeon_tile_t*) * floor->height);
-    if (!floor->tiles) return;
+void dungeon_floor_init(dungeon_floor_t* df) {
+    if (!df) return;
+    df->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
+    df->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
+    //df->tiles = (dungeon_tile_t**)malloc(sizeof(dungeon_tile_t*) * df->height);
+    df->tiles = malloc(sizeof(dungeon_tile_t*) * df->height);
+    if (!df->tiles) return;
     bool success = true;
-    //for (int i = 0; i < floor->width; i++) {
-    for (int i = 0; i < floor->height; i++) {
-        floor->tiles[i] = (dungeon_tile_t*)malloc(sizeof(dungeon_tile_t) * floor->width);
-        if (floor->tiles[i] == NULL) {
+    for (int i = 0; i < df->height; i++) {
+        //df->tiles[i] = (dungeon_tile_t*)malloc(sizeof(dungeon_tile_t) * df->width);
+        df->tiles[i] = malloc(sizeof(dungeon_tile_t) * df->width);
+        if (df->tiles[i] == NULL) {
             success = false;
             break;
         }
     }
     if (!success) return;
-    for (int i = 0; i < floor->height; i++) {
-        for (int j = 0; j < floor->width; j++) {
-            dungeon_tile_t* current = &floor->tiles[i][j];
+    for (int i = 0; i < df->height; i++) {
+        for (int j = 0; j < df->width; j++) {
+            dungeon_tile_t* current = &df->tiles[i][j];
             dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
             type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 11);
             dungeon_tile_init(current, type);
@@ -53,13 +54,8 @@ void dungeon_floor_init(dungeon_floor_t* floor) {
     // lets do an experiment
     // i want to set a perimeter given an x,y and a width and height
     // i want to set the perimeter to be a wall
-    df_set_tile_perimeter(floor, DUNGEON_TILE_TYPE_STONE_WALL_00, 0, 0, 14, 5);
-    // set a tile on the bottom of the perimeter to be floor
-    //dungeon_tile_t* current = &floor->tiles[5][2];
-    //dungeon_tile_type_t type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
-    //dungeon_tile_init(current, type);
-
-    df_set_tile(floor, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, 2, 5);
+    df_set_tile_perimeter(df, DUNGEON_TILE_TYPE_STONE_WALL_00, 0, 0, 14, 5);
+    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, 2, 5);
 }
 
 void df_set_tile(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y) {
