@@ -45,19 +45,25 @@ void df_init(dungeon_floor_t* df) {
             return;
         }
     }
-    for (int i = 0; i < df->height; i++) {
-        for (int j = 0; j < df->width; j++) {
-            dungeon_tile_t* current = &df->tiles[i][j];
-            dungeon_tile_type_t type = DUNGEON_TILE_TYPE_STONE_WALL_00;
-            type = DUNGEON_TILE_TYPE_FLOOR_STONE_00 + (rand() % 11);
-            dungeon_tile_init(current, type);
-        }
-    }
-    // lets do an experiment
-    // i want to set a perimeter given an x,y and a width and height
-    // i want to set the perimeter to be a wall
-    df_set_tile_perimeter(df, DUNGEON_TILE_TYPE_STONE_WALL_00, 0, 0, 14, 5);
-    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, 2, 5);
+
+    df_set_all_tiles(df, DUNGEON_TILE_TYPE_FLOOR_STONE_00);
+    df_set_all_tiles_range(df, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
+
+    //df_set_tile_perimeter(df, DUNGEON_TILE_TYPE_STONE_WALL_00, 0, 0, 14, 5);
+    //df_set_tile_perimeter_range(df, DUNGEON_TILE_TYPE_STONE_WALL_00, DUNGEON_TILE_TYPE_STONE_WALL_02, 0, 0, 14, 5);
+
+    int x = 0;
+    int y = 0;
+    int min_w = 4;
+    int min_h = 4;
+    int max_w = 16;
+    int max_h = 8;
+    int w = min_w + (rand() % (max_w - min_w + 1));
+    int h = min_h + (rand() % (max_h - min_h + 1));
+
+    df_set_tile_perimeter_range(df, DUNGEON_TILE_TYPE_STONE_WALL_00, DUNGEON_TILE_TYPE_STONE_WALL_02, x, y, w, h);
+
+    //df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, 2, 5);
 }
 
 void df_set_tile(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y) {
@@ -84,6 +90,56 @@ void df_set_tile_perimeter(dungeon_floor_t* const df, dungeon_tile_type_t type, 
         dungeon_tile_t* current = &df->tiles[y + i][x + w];
         dungeon_tile_init(current, type);
     }
+}
+
+void df_set_tile_perimeter_range(dungeon_floor_t* const df,
+                                 dungeon_tile_type_t begin,
+                                 dungeon_tile_type_t end,
+                                 int x,
+                                 int y,
+                                 int w,
+                                 int h) {
+    if (!df) return;
+    dungeon_tile_type_t begin_type = begin;
+    dungeon_tile_type_t end_type = end;
+    if (end_type < begin_type) {
+        dungeon_tile_type_t temp = begin_type;
+        begin_type = end_type;
+        end_type = temp;
+    }
+    int num_types = end_type - begin_type + 1;
+
+    dungeon_tile_t* t = NULL;
+    dungeon_tile_type_t type = DUNGEON_TILE_TYPE_NONE;
+
+    for (int i = 0; i <= w; i++) {
+        t = dungeon_floor_tile_at(df, x + i, y);
+        type = begin_type + (rand() % num_types);
+        dungeon_tile_init(t, type);
+
+        t = dungeon_floor_tile_at(df, x + i, y + h);
+        type = begin_type + (rand() % num_types);
+        dungeon_tile_init(t, type);
+    }
+    for (int i = 0; i <= h; i++) {
+        t = dungeon_floor_tile_at(df, x, y + i);
+        type = begin_type + (rand() % num_types);
+        dungeon_tile_init(t, type);
+
+        t = dungeon_floor_tile_at(df, x + w, y + i);
+        type = begin_type + (rand() % num_types);
+        dungeon_tile_init(t, type);
+    }
+    //for (int i = 0; i <= w; i++) {
+    //    t = dungeon_floor_tile_at(df, x + i, y + h);
+    //    type = begin_type + (rand() % num_types);
+    //    dungeon_tile_init(t, type);
+    //}
+    //for (int i = 0; i <= h; i++) {
+    //    t = dungeon_floor_tile_at(df, x + w, y + i);
+    //    type = begin_type + (rand() % num_types);
+    //    dungeon_tile_init(t, type);
+    //}
 }
 
 void dungeon_floor_free(dungeon_floor_t* floor) {
@@ -164,16 +220,38 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
 
 void dungeon_floor_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_key, int dn_key, int event) {
     if (!df || x < 0 || x >= df->width || y < 0 || y >= df->height) return;
-    dungeon_tile_set_wall_switch(&df->tiles[y][x], true);
-    dungeon_tile_set_wall_switch_up_tx_key(&df->tiles[y][x], up_key);
-    dungeon_tile_set_wall_switch_down_tx_key(&df->tiles[y][x], dn_key);
-    dungeon_tile_set_wall_switch_event(&df->tiles[y][x], event);
+    dungeon_tile_t* const t = dungeon_floor_tile_at(df, x, y);
+    if (!t) return;
+    if (!dungeon_tile_is_wall(t->type)) return;
+    dungeon_tile_set_wall_switch(t, true);
+    dungeon_tile_set_wall_switch_up_tx_key(t, up_key);
+    dungeon_tile_set_wall_switch_down_tx_key(t, dn_key);
+    dungeon_tile_set_wall_switch_event(t, event);
 }
 
 void df_set_all_tiles(dungeon_floor_t* const df, dungeon_tile_type_t type) {
     if (!df) return;
     // rewrite this function using df_set_tile_area
     df_set_tile_area(df, type, 0, 0, df->width, df->height);
+}
+
+void df_set_all_tiles_range(dungeon_floor_t* const df, dungeon_tile_type_t begin, dungeon_tile_type_t end) {
+    if (!df) return;
+    dungeon_tile_type_t begin_type = begin;
+    dungeon_tile_type_t end_type = end;
+    if (end_type < begin_type) {
+        dungeon_tile_type_t temp = begin_type;
+        begin_type = end_type;
+        end_type = temp;
+    }
+    int num_types = end_type - begin_type + 1;
+    for (int i = 0; i < df->height; i++) {
+        for (int j = 0; j < df->width; j++) {
+            dungeon_tile_t* current = dungeon_floor_tile_at(df, j, i);
+            dungeon_tile_type_t type = begin_type + (rand() % num_types);
+            dungeon_tile_init(current, type);
+        }
+    }
 }
 
 bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {

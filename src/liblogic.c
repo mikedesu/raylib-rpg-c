@@ -266,9 +266,8 @@ void liblogic_init(gamestate* const g) {
     }
 
     // lets test setting a pressure plate
-    dungeon_floor_set_pressure_plate(df, 9, 2, TX_PRESSURE_PLATE_UP_00, TX_PRESSURE_PLATE_DOWN_00, 666);
-
-    dungeon_floor_set_wall_switch(df, herox, heroy - 2, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, 777);
+    //dungeon_floor_set_pressure_plate(df, 9, 2, TX_PRESSURE_PLATE_UP_00, TX_PRESSURE_PLATE_DOWN_00, 666);
+    //dungeon_floor_set_wall_switch(df, herox, heroy - 2, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, 777);
 
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {

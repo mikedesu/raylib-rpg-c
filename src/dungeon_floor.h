@@ -4,8 +4,8 @@
 #include "entityid.h"
 #include <stdbool.h>
 
-#define DEFAULT_DUNGEON_FLOOR_WIDTH 32
-#define DEFAULT_DUNGEON_FLOOR_HEIGHT 8
+#define DEFAULT_DUNGEON_FLOOR_WIDTH 64
+#define DEFAULT_DUNGEON_FLOOR_HEIGHT 64
 
 typedef struct {
     dungeon_tile_t** tiles;
@@ -22,6 +22,7 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df, int x, int y, i
 void dungeon_floor_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_tx_key, int dn_tx_key, int event);
 void df_set_all_tiles(dungeon_floor_t* const df, dungeon_tile_type_t type);
 void df_set_tile_area(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y, int w, int h);
+void df_set_all_tiles_range(dungeon_floor_t* const df, dungeon_tile_type_t begin, dungeon_tile_type_t end);
 
 bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y);
 bool dungeon_floor_add_at(dungeon_floor_t* const df, entityid id, int x, int y);
@@ -29,3 +30,11 @@ bool dungeon_floor_remove_at(dungeon_floor_t* const df, entityid id, int x, int 
 
 void df_set_tile_perimeter(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y, int w, int h);
 void df_set_tile(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y);
+
+void df_set_tile_perimeter_range(dungeon_floor_t* const df,
+                                 dungeon_tile_type_t begin,
+                                 dungeon_tile_type_t end,
+                                 int x,
+                                 int y,
+                                 int w,
+                                 int h);
