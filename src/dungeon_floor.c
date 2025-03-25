@@ -32,7 +32,13 @@ void df_init(dungeon_floor_t* df) {
     if (!df) return;
     df->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
     df->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
-    for (int i = 0; i < DEFAULT_DF_EVENTS; i++) { df->events[i] = (df_event_t){0}; }
+    for (int i = 0; i < DEFAULT_DF_EVENTS; i++) {
+        df->events[i].listen_event = -1;
+        df->events[i].x = -1;
+        df->events[i].y = -1;
+        df->events[i].on_type = DUNGEON_TILE_TYPE_NONE;
+        df->events[i].off_type = DUNGEON_TILE_TYPE_NONE;
+    }
 
     df->tiles = malloc(sizeof(dungeon_tile_t*) * df->height);
     if (!df->tiles) return;

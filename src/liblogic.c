@@ -556,7 +556,30 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
     if (tile->has_wall_switch) {
         tile->wall_switch_on = !tile->wall_switch_on;
         msuccess("Wall switch flipped!");
-        msuccessint("Wall switch event", tile->wall_switch_event);
+        int ws_event = tile->wall_switch_event;
+        msuccessint("Wall switch event", ws_event);
+
+        if (ws_event <= -1) {
+            merror("Wall switch event is invalid");
+            return;
+        }
+
+        // grab the event in df
+        df_event_t event = df->events[ws_event];
+        // grab the tile marked at by the event
+        dungeon_tile_t* const event_tile = dungeon_floor_tile_at(df, event.x, event.y);
+        if (!event_tile) {
+            merror("Failed to get event tile");
+            return;
+        }
+
+        dungeon_tile_type_t type = event_tile->type;
+        if (type == event.off_type) {
+            event_tile->type = event.on_type;
+        } else if (type == event.on_type) {
+            event_tile->type = event.off_type;
+        }
+
         //if (tile->wall_switch_event == 777) {
         //    msuccess("Wall switch event 777!");
         //    // do something
