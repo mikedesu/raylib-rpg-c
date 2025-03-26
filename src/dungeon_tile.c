@@ -14,7 +14,7 @@ void dungeon_tile_init(dungeon_tile_t* const t, dungeon_tile_type_t type) {
     t->entities = malloc(malloc_sz);
     if (!t->entities) {
         merror("dungeon_tile_init: failed to allocate entities array");
-        t->type = DUNGEON_TILE_TYPE_NONE; // Reset to safe state
+        t->type = TILE_NONE; // Reset to safe state
         return;
     }
     memset(t->entities, -1, malloc_sz);

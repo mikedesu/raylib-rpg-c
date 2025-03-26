@@ -502,7 +502,7 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     }
 
     // check if the tile is an ON TRAP
-    if (new_tile->type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00) {
+    if (new_tile->type == TILE_FLOOR_STONE_TRAP_ON_00) {
         msuccess("On trap activated!");
         // do something
 

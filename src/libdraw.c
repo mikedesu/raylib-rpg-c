@@ -274,7 +274,7 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
     }
 
     // check if the tile type is none
-    if (tile->type == DUNGEON_TILE_TYPE_NONE) {
+    if (tile->type == TILE_NONE) {
         //merrorint2("libdraw_draw_dungeon_floor_tile: tile type is none", x, y);
         return true;
     }
