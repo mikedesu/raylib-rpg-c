@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void dungeon_tile_init(dungeon_tile_t* const t, dungeon_tile_type_t type) {
+void dungeon_tile_init(dungeon_tile_t* const t, tiletype_t type) {
     if (!t) {
         merror("dungeon_tile_init: tile is NULL");
         return;
@@ -123,7 +123,7 @@ entityid dungeon_tile_remove(dungeon_tile_t* tile, entityid id) {
     return id;
 }
 
-dungeon_tile_t* dungeon_tile_create(dungeon_tile_type_t type) {
+dungeon_tile_t* dungeon_tile_create(tiletype_t type) {
     dungeon_tile_t* t = malloc(sizeof(dungeon_tile_t));
     if (!t) return NULL;
     dungeon_tile_init(t, type);

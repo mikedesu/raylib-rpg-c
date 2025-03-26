@@ -70,17 +70,17 @@ typedef enum {
     TILE_FLOOR_STONE_TRAP_ON_00,
     TILE_UNKNOWN,
     TILE_COUNT
-} dungeon_tile_type_t;
+} tiletype_t;
 
-static inline bool dungeon_tile_is_wall(const dungeon_tile_type_t type) {
+static inline bool dungeon_tile_is_wall(const tiletype_t type) {
     return type >= TILE_STONE_WALL_00 && type <= TILE_STONE_WALL_02;
 }
 
-static inline bool dungeon_tile_is_walkable(const dungeon_tile_type_t type) {
+static inline bool dungeon_tile_is_walkable(const tiletype_t type) {
     return type != TILE_STONE_WALL_00 && type != TILE_STONE_WALL_01 && type != TILE_STONE_WALL_02 &&
            type != TILE_UNKNOWN && type != TILE_NONE;
 }
 
-static inline bool dungeon_tile_is_trap(const dungeon_tile_type_t type) {
+static inline bool dungeon_tile_is_trap(const tiletype_t type) {
     return type == TILE_FLOOR_STONE_TRAP_OFF_00 || type == TILE_FLOOR_STONE_TRAP_ON_00;
 }

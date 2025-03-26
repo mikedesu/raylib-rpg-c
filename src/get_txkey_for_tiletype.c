@@ -2,7 +2,7 @@
 #include "dungeon_tile_type.h"
 #include "libgame_defines.h"
 
-int get_txkey_for_tiletype(const dungeon_tile_type_t type) {
+int get_txkey_for_tiletype(const tiletype_t type) {
     int key = -1;
     switch (type) {
     //case TILETYPE_DIRT_00:

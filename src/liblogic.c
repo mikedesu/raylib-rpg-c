@@ -548,7 +548,7 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
             return;
         }
 
-        dungeon_tile_type_t type = event_tile->type;
+        tiletype_t type = event_tile->type;
         if (type == event.off_type) {
             event_tile->type = event.on_type;
         } else if (type == event.on_type) {
@@ -564,7 +564,7 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
         //        merror("Failed to get trap tile");
         //        return;
         //    }
-        //    dungeon_tile_type_t type = trap_tile->type;
+        //    tiletype_t type = trap_tile->type;
         //    if (type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00) {
         //        trap_tile->type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
         //    } else if (type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00) {

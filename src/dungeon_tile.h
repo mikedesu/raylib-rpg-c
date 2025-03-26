@@ -10,7 +10,7 @@
 #define DUNGEON_TILE_MAX_ENTITIES_MAX 256
 
 typedef struct {
-    dungeon_tile_type_t type;
+    tiletype_t type;
     bool visible;
     bool explored;
     entityid* entities;
@@ -30,7 +30,7 @@ typedef struct {
 
 } dungeon_tile_t;
 
-dungeon_tile_t* dungeon_tile_create(dungeon_tile_type_t type);
+dungeon_tile_t* dungeon_tile_create(tiletype_t type);
 
 entityid dungeon_tile_add(dungeon_tile_t* const tile, entityid id);
 entityid dungeon_tile_remove(dungeon_tile_t* const tile, entityid id);
@@ -48,7 +48,7 @@ int dungeon_tile_get_wall_switch_event(const dungeon_tile_t* t);
 int dungeon_tile_get_wall_switch_down_tx_key(const dungeon_tile_t* t);
 int dungeon_tile_get_wall_switch_up_tx_key(const dungeon_tile_t* t);
 
-void dungeon_tile_init(dungeon_tile_t* const t, dungeon_tile_type_t type);
+void dungeon_tile_init(dungeon_tile_t* const t, tiletype_t type);
 void dungeon_tile_free(dungeon_tile_t* t);
 void dungeon_tile_set_pressure_plate_down_tx_key(dungeon_tile_t* const t, int k);
 void dungeon_tile_set_pressure_plate_event(dungeon_tile_t* const t, int e);
