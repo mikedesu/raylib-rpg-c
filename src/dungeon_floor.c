@@ -65,11 +65,13 @@ void df_init_test(dungeon_floor_t* df) {
     // Rooms
     df_init_rect(df, 0, 0, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
     df_init_rect(df, 0, 5, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
-
+    df_init_rect(df, 5, 0, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
+    df_init_rect(df, 5, 5, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
     // Trap + Switch
-    df_create_trap_event(
-        df, 0, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00, 1);
-    df_place_wall_switch(df, 0, 0, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, 1);
+    //df_create_trap_event(
+    //    df, 1, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00, 1);
+    //df_create_trap_event(df, 1, 4, DUNGEON_TILE_TYPE_STONE_WALL_00, DUNGEON_TILE_TYPE_FLOOR_STONE_00, 1);
+    //df_place_wall_switch(df, 0, 0, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, 1);
 }
 
 void df_set_tile(dungeon_floor_t* const df, dungeon_tile_type_t type, int x, int y) {
