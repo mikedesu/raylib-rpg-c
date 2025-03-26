@@ -777,61 +777,110 @@ void liblogic_handle_npcs(gamestate* const g) {
 }
 
 void liblogic_update_debug_panel_buffer(gamestate* const g) {
-    if (!g) {
-        merror("Game state is NULL!");
-        return;
-    }
-    // grab a pointer to the hero
-    entity* const e = em_get(g->entitymap, g->hero_id);
-    int x = -1;
-    int y = -1;
-    if (e) {
-        x = e->x;
-        y = e->y;
-    }
+    if (!g) return;
 
+    // Static buffers to avoid reallocating every frame
+    static const char* control_modes[] = {"Player", "Camera", "Unknown"};
+    static const char* flag_names[] = {"GAMESTATE_FLAG_PLAYER_INPUT",
+                                       "GAMESTATE_FLAG_PLAYER_ANIM",
+                                       "GAMESTATE_FLAG_NONE",
+                                       "GAMESTATE_FLAG_COUNT",
+                                       "GAMESTATE_FLAG_NPC_TURN",
+                                       "GAMESTATE_FLAG_NPC_ANIM",
+                                       "Unknown"};
+
+    // Get hero position once
+    const entity* const e = em_get(g->entitymap, g->hero_id);
+    const int hero_x = e ? e->x : -1;
+    const int hero_y = e ? e->y : -1;
+
+    // Determine control mode and flag strings
+    const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
+    const char* flag_name = flag_names[(g->flag >= 0 && g->flag <= 5) ? g->flag : 6];
+
+    // Format the string in one pass
     snprintf(g->debugpanel.buffer,
              sizeof(g->debugpanel.buffer),
-             "%s\n"
-             "%s\n"
-             "Frame count: %d\n"
-             "Frame draw time: %.02f ms\n"
-             "debug font size: %d\n"
-             "Cam: (%.02f, %.02f)\n"
-             "Zoom: %.02f\n"
-             "Control mode: %s\n"
-             "Current floor: %d\n"
-             "Dungeon num floors: %d\n"
-             "Num entityids: %d\n"
-             "flag: %s\n"
-             "entity_turn: %d\n"
-             "Hero: (%d, %d)\n",
+             "%s\n" // timebeganbuf
+             "%s\n" // currenttimebuf
+             "Frame: %d (%.1fms)\n"
+             "Cam: (%.0f,%.0f) Zoom: %.1f\n"
+             "Mode: %s | Floor: %d/%d\n"
+             "Entities: %d | Flag: %s\n"
+             "Turn: %d | Hero: (%d,%d)",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
              g->last_frame_time * 1000,
-             g->debugpanel.font_size,
              g->cam2d.offset.x,
              g->cam2d.offset.y,
              g->cam2d.zoom,
-             g->controlmode == CONTROLMODE_PLAYER   ? "Player"
-             : g->controlmode == CONTROLMODE_CAMERA ? "Camera"
-                                                    : "Unknown",
-             g->dungeon->current_floor,
+             control_mode,
+             g->dungeon->current_floor + 1, // More user-friendly 1-based
              g->dungeon->num_floors,
              g->index_entityids,
-             g->flag == GAMESTATE_FLAG_PLAYER_INPUT  ? "GAMESTATE_FLAG_PLAYER_INPUT"
-             : g->flag == GAMESTATE_FLAG_PLAYER_ANIM ? "GAMESTATE_FLAG_PLAYER_ANIM"
-             : g->flag == GAMESTATE_FLAG_NONE        ? "GAMESTATE_FLAG_NONE"
-             : g->flag == GAMESTATE_FLAG_COUNT       ? "GAMESTATE_FLAG_COUNT"
-             : g->flag == GAMESTATE_FLAG_NPC_TURN    ? "GAMESTATE_FLAG_NPC_TURN"
-             : g->flag == GAMESTATE_FLAG_NPC_ANIM    ? "GAMESTATE_FLAG_NPC_ANIM"
-                                                     : "Unknown",
-
+             flag_name,
              g->entity_turn,
-             x,
-             y);
+             hero_x,
+             hero_y);
 }
+
+//void liblogic_update_debug_panel_buffer(gamestate* const g) {
+//    if (!g) {
+//        merror("Game state is NULL!");
+//        return;
+//    }
+//    // grab a pointer to the hero
+//    entity* const e = em_get(g->entitymap, g->hero_id);
+//    int x = -1;
+//    int y = -1;
+//    if (e) {
+//        x = e->x;
+//        y = e->y;
+//    }
+//
+//    snprintf(g->debugpanel.buffer,
+//             sizeof(g->debugpanel.buffer),
+//             "%s\n"
+//             "%s\n"
+//             "Frame count: %d\n"
+//             "Frame draw time: %.02f ms\n"
+//             "debug font size: %d\n"
+//             "Cam: (%.02f, %.02f)\n"
+//             "Zoom: %.02f\n"
+//             "Control mode: %s\n"
+//             "Current floor: %d\n"
+//             "Dungeon num floors: %d\n"
+//             "Num entityids: %d\n"
+//             "flag: %s\n"
+//             "entity_turn: %d\n"
+//             "Hero: (%d, %d)\n",
+//             g->timebeganbuf,
+//             g->currenttimebuf,
+//             g->framecount,
+//             g->last_frame_time * 1000,
+//             g->debugpanel.font_size,
+//             g->cam2d.offset.x,
+//             g->cam2d.offset.y,
+//             g->cam2d.zoom,
+//             g->controlmode == CONTROLMODE_PLAYER   ? "Player"
+//             : g->controlmode == CONTROLMODE_CAMERA ? "Camera"
+//                                                    : "Unknown",
+//             g->dungeon->current_floor,
+//             g->dungeon->num_floors,
+//             g->index_entityids,
+//             g->flag == GAMESTATE_FLAG_PLAYER_INPUT  ? "GAMESTATE_FLAG_PLAYER_INPUT"
+//             : g->flag == GAMESTATE_FLAG_PLAYER_ANIM ? "GAMESTATE_FLAG_PLAYER_ANIM"
+//             : g->flag == GAMESTATE_FLAG_NONE        ? "GAMESTATE_FLAG_NONE"
+//             : g->flag == GAMESTATE_FLAG_COUNT       ? "GAMESTATE_FLAG_COUNT"
+//             : g->flag == GAMESTATE_FLAG_NPC_TURN    ? "GAMESTATE_FLAG_NPC_TURN"
+//             : g->flag == GAMESTATE_FLAG_NPC_ANIM    ? "GAMESTATE_FLAG_NPC_ANIM"
+//                                                     : "Unknown",
+//
+//             g->entity_turn,
+//             x,
+//             y);
+//}
 
 void liblogic_close(gamestate* const g) {
     if (!g) {

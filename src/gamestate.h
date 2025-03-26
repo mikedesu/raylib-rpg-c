@@ -54,8 +54,6 @@ typedef struct gamestate {
 
     Font font;
 
-    //dungeon_floor_t* dungeon_floor;
-
     dungeon_t* dungeon;
 
     em_t* entitymap;
@@ -81,11 +79,10 @@ gamestate* gamestateinitptr();
 
 const entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index);
 const entityid gamestate_get_hero_id(const gamestate* const g);
-
-em_t* gamestate_get_entitymap(gamestate* const g);
-
 const int gamestate_get_entityid_index(const gamestate* const g, const entityid id);
 const int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, const int index);
+
+em_t* gamestate_get_entitymap(gamestate* const g);
 
 void gamestatefree(gamestate* g);
 void gamestate_dungeon_destroy(gamestate* const g);

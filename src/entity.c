@@ -24,7 +24,6 @@ entity_t* entity_new(entityid id, entitytype_t type) {
     return e;
 }
 
-
 entity_t* entity_new_at(entityid id, entitytype_t type, int x, int y, int floor) {
     entity_t* e = entity_new(id, type);
     if (!e) {
@@ -37,7 +36,6 @@ entity_t* entity_new_at(entityid id, entitytype_t type, int x, int y, int floor)
     return e;
 }
 
-
 entity_t* entity_new_npc_at(entityid id, race_t r, int x, int y, int floor, const char* name) {
     entity_t* e = entity_new_at(id, ENTITY_NPC, x, y, floor);
     if (!e) {
@@ -49,7 +47,6 @@ entity_t* entity_new_npc_at(entityid id, race_t r, int x, int y, int floor, cons
     return e;
 }
 
-
 // this frees the entity so you lose the next pointer!
 // make sure you wire the map correctly before calling this!
 void entity_free(entity_t* e) {
@@ -57,18 +54,15 @@ void entity_free(entity_t* e) {
     free(e);
 }
 
-
 void entity_set_name(entity_t* const e, const char* name) {
     if (!e || !name || strlen(name) >= ENTITY_NAME_LEN_MAX) return;
     strncpy(e->name, name, ENTITY_NAME_LEN_MAX);
 }
 
-
 void entity_set_race(entity_t* const e, race_t race) {
     if (!e || race < 0 || race >= RACE_COUNT) return;
     e->race = race;
 }
-
 
 void entity_set_x(entity_t* const e, int x) {
     if (!e || x < 0) return;
@@ -80,37 +74,23 @@ void entity_set_y(entity_t* const e, int y) {
     e->y = y;
 }
 
-
 void entity_set_xy(entity_t* const e, int x, int y) {
     entity_set_x(e, x);
     entity_set_y(e, y);
 }
 
+void entity_incr_x(entity_t* const e) { entity_set_x(e, e->x + 1); }
 
-void entity_incr_x(entity_t* const e) {
-    entity_set_x(e, e->x + 1);
-}
+void entity_incr_y(entity_t* const e) { entity_set_y(e, e->y + 1); }
 
+void entity_decr_x(entity_t* const e) { entity_set_x(e, e->x - 1); }
 
-void entity_incr_y(entity_t* const e) {
-    entity_set_y(e, e->y + 1);
-}
-
-
-void entity_decr_x(entity_t* const e) {
-    entity_set_x(e, e->x - 1);
-}
-
-void entity_decr_y(entity_t* const e) {
-    entity_set_y(e, e->y - 1);
-}
-
+void entity_decr_y(entity_t* const e) { entity_set_y(e, e->y - 1); }
 
 void entity_set_dir(entity_t* const e, direction_t dir) {
     if (!e || dir < 0 || dir >= DIR_COUNT) return;
     e->direction = dir;
 }
-
 
 direction_t entity_get_dir(entity_t* const e) {
     if (e == NULL) {
@@ -120,12 +100,10 @@ direction_t entity_get_dir(entity_t* const e) {
     return e->direction;
 }
 
-
 void entity_set_type(entity_t* const e, entitytype_t type) {
     if (!e || type < 0 || type >= ENTITY_COUNT) return;
     e->type = type;
 }
-
 
 entitytype_t entity_get_type(entity_t* const e) {
     if (!e) {
@@ -135,12 +113,10 @@ entitytype_t entity_get_type(entity_t* const e) {
     return e->type;
 }
 
-
 void entity_set_default_action(entity_t* const e, entity_action_t action) {
     if (!e || action < 0 || action >= ENTITY_ACTION_COUNT) return;
     e->default_action = action;
 }
-
 
 entity_action_t entity_get_default_action(entity_t* const e) {
     if (!e) {
@@ -150,12 +126,10 @@ entity_action_t entity_get_default_action(entity_t* const e) {
     return e->default_action;
 }
 
-
 void entity_set_hp(entity_t* const e, int hp) {
     if (!e) return;
     e->hp = hp;
 }
-
 
 int entity_get_hp(entity_t* const e) {
     if (!e) {
@@ -166,12 +140,10 @@ int entity_get_hp(entity_t* const e) {
     return e->hp;
 }
 
-
 void entity_set_maxhp(entity_t* const e, int maxhp) {
     if (!e) return;
     e->maxhp = maxhp;
 }
-
 
 int entity_get_maxhp(entity_t* const e) {
     if (!e) {
@@ -181,7 +153,6 @@ int entity_get_maxhp(entity_t* const e) {
 
     return e->maxhp;
 }
-
 
 void entity_set_hpmaxhp(entity_t* const e, int hp, int maxhp) {
     if (!e) return;

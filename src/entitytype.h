@@ -1,6 +1,5 @@
 #pragma once
 
-
 typedef enum {
     ENTITY_NONE,
     ENTITY_PLAYER,

@@ -2,9 +2,6 @@
 
 #include <stdbool.h>
 
-//typedef enum {
-//} dungeon_tile_type_cat_t;
-
 typedef enum {
     DUNGEON_TILE_TYPE_NONE,
     DUNGEON_TILE_TYPE_FLOOR_DIRT,

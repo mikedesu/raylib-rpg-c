@@ -23,20 +23,16 @@ dungeon_t* dungeon_create() {
     return dungeon;
 }
 
-
 void dungeon_destroy(dungeon_t* dungeon) {
     if (!dungeon) {
         merror("dungeon_destroy: dungeon is NULL");
         return;
     }
-    for (int i = 0; i < dungeon->num_floors; i++) {
-        dungeon_floor_free(dungeon->floors[i]);
-    }
+    for (int i = 0; i < dungeon->num_floors; i++) { dungeon_floor_free(dungeon->floors[i]); }
     free(dungeon->floors);
     free(dungeon);
     msuccess("Freed dungeon");
 }
-
 
 const bool dungeon_add_floor(dungeon_t* const dungeon, const int width, const int height) {
     if (!dungeon || dungeon->is_locked) {
@@ -59,7 +55,6 @@ const bool dungeon_add_floor(dungeon_t* const dungeon, const int width, const in
     return true;
 }
 
-
 void dungeon_lock(dungeon_t* dungeon) {
     if (!dungeon) {
         merror("dungeon_lock: dungeon is NULL");
@@ -67,7 +62,6 @@ void dungeon_lock(dungeon_t* dungeon) {
     }
     dungeon->is_locked = true;
 }
-
 
 void dungeon_unlock(dungeon_t* dungeon) {
     if (!dungeon) {
@@ -77,7 +71,6 @@ void dungeon_unlock(dungeon_t* dungeon) {
     dungeon->is_locked = false;
 }
 
-
 const int dungeon_num_floors(const dungeon_t* const dungeon) {
     if (!dungeon) {
         merror("dungeon_num_floors: dungeon is NULL");
@@ -85,7 +78,6 @@ const int dungeon_num_floors(const dungeon_t* const dungeon) {
     }
     return dungeon->num_floors;
 }
-
 
 dungeon_floor_t* dungeon_get_floor(dungeon_t* const dungeon, const int index) {
     // break this up into multiple if-elses with merror calls
@@ -103,7 +95,6 @@ dungeon_floor_t* dungeon_get_floor(dungeon_t* const dungeon, const int index) {
     }
     return dungeon->floors[index];
 }
-
 
 dungeon_floor_t* dungeon_get_current_floor(dungeon_t* const dungeon) {
     return dungeon_get_floor(dungeon, dungeon->current_floor);
