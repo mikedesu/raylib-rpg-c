@@ -61,28 +61,39 @@ void df_set_event(dungeon_floor_t* const df,
     df->events[event_id].listen_event = event_id;
 }
 
-void df_init_test(dungeon_floor_t* const df) {
-    df_set_tile_area_range(df, 0, 0, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
-    df_set_tile_area_range(df, 0, 5, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
+void df_init_test(dungeon_floor_t* df) {
+    // Rooms
+    df_init_rect(df, 0, 0, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
+    df_init_rect(df, 0, 5, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
 
-    df_event_id event_id = 1;
-    int x = 0;
-    int y = 4;
-    // define the event that is triggered by the wall switch
-    // have to specify an event id within range
-    df->events[event_id].listen_event = event_id;
-    df->events[event_id].x = x;
-    df->events[event_id].y = y;
-    df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
-    df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
-    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
-
-    x = 0;
-    y = 0;
-    // create a wall tile and place a switch on it with an event id
-    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_02, x, y);
-    dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
+    // Trap + Switch
+    df_create_trap_event(
+        df, 0, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00, 1);
+    df_place_wall_switch(df, 0, 0, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, 1);
 }
+
+//void df_init_test(dungeon_floor_t* const df) {
+//    df_set_tile_area_range(df, 0, 0, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
+//    df_set_tile_area_range(df, 0, 5, 4, 4, DUNGEON_TILE_TYPE_FLOOR_STONE_00, DUNGEON_TILE_TYPE_FLOOR_STONE_11);
+//
+//    df_event_id event_id = 1;
+//    int x = 0;
+//    int y = 4;
+//    // define the event that is triggered by the wall switch
+//    // have to specify an event id within range
+//    df->events[event_id].listen_event = event_id;
+//    df->events[event_id].x = x;
+//    df->events[event_id].y = y;
+//    df->events[event_id].on_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+//    df->events[event_id].off_type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
+//    df_set_tile(df, DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00, x, y);
+//
+//    x = 0;
+//    y = 0;
+//    // create a wall tile and place a switch on it with an event id
+//    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_02, x, y);
+//    dungeon_floor_set_wall_switch(df, x, y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, event_id);
+//}
 //event_id = 2;
 //x = 1;
 //y = 4;
@@ -408,4 +419,23 @@ bool df_malloc_tiles(dungeon_floor_t* const df) {
         }
     }
     return true;
+}
+
+void df_init_rect(dungeon_floor_t* df, int x, int y, int w, int h, dungeon_tile_type_t t1, dungeon_tile_type_t t2) {
+    df_set_tile_area_range(df, x, y, w, h, t1, t2);
+}
+
+void df_create_trap_event(dungeon_floor_t* df,
+                          int x,
+                          int y,
+                          dungeon_tile_type_t on,
+                          dungeon_tile_type_t off,
+                          df_event_id id) {
+    df->events[id] = (df_event_t){.listen_event = id, .x = x, .y = y, .on_type = on, .off_type = off};
+    df_set_tile(df, on, x, y);
+}
+
+void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id) {
+    df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_02, x, y);
+    dungeon_floor_set_wall_switch(df, x, y, up, down, trigger_id);
 }
