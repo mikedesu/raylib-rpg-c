@@ -13,7 +13,6 @@ void libdraw_init(gamestate* const g);
 void libdraw_update_input(inputstate* const is);
 void libdraw_drawframe(gamestate* const g);
 void libdraw_close();
-
 void libdraw_load_textures();
 void libdraw_unload_textures();
 
@@ -49,3 +48,4 @@ bool libdraw_draw_player_target_box(const gamestate* const g);
 bool libdraw_windowshouldclose();
 bool libdraw_load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 bool libdraw_unload_texture(int txkey);
+void libdraw_draw_msgbox_test(gamestate* const g, const char* text);

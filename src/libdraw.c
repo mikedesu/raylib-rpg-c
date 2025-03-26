@@ -475,12 +475,14 @@ void libdraw_drawframe(gamestate* const g) {
 
     libdraw_draw_hud(g);
 
+    //libdraw_draw_msgbox_test(g, "Hello, world!\nLets fucking go!");
+
     if (g->debugpanelon) { libdraw_draw_debug_panel(g); }
 
     EndDrawing();
 
-    double elapsed_time = GetTime() - start_time;
-    g->last_frame_time = elapsed_time;
+    //double elapsed_time = GetTime() - start_time;
+    g->last_frame_time = GetTime() - start_time;
     g->framecount++;
 }
 
@@ -819,38 +821,49 @@ void libdraw_draw_hud(gamestate* const g) {
         return;
     }
     // Draw the HUD
-    const int fontsize = 20;
-    const int pad = 10;
-    const int x = 0;
-    const int y = 0;
-
-    //const char* text = "Name: darkmage\nHP: 1/1";
-
+    const int fontsize = 20, pad = 4, pad2 = pad * 2, x = pad, y = pad;
     char buffer[1024] = {0};
-
+    int hp = -1, maxhp = -1;
+    //const char* text = "Name: darkmage\nHP: 1/1";
     entity* const e = em_get(g->entitymap, g->hero_id);
-    int hp = -1;
-    int maxhp = -1;
     if (e) {
         hp = e->hp;
         maxhp = e->maxhp;
     }
-
-    snprintf(buffer, sizeof(buffer), "Name: %s\nHP: %d/%d\nTurn: %d\n", e->name, hp, maxhp, g->turn_count);
-
+    //snprintf(buffer, sizeof(buffer), "Name: %s", e->name);
+    snprintf(buffer, sizeof(buffer), "Name: %s\nHP: %d/%d\nTurn: %d", e->name, hp, maxhp, g->turn_count);
     //const char* text = "Name: evildojo666\nHP: 1/1";
     const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
-    const int w = size.x + (pad * 10);
-    const int h = size.y + pad * 2;
+    const int w = size.x + pad2 * 4, h = size.y + pad2;
+    const Color fg = (Color){0x33, 0x33, 0x33, 0xff}, fg2 = (Color){0x66, 0x66, 0x66, 0xff}, fg3 = WHITE;
+    DrawRectangle(x, y, w, h, fg);
+    // draw rectangle lines around the box
+    DrawRectangleLines(x, y, w, h, fg2);
 
-    const Color fg = Fade((Color){0x66, 0x66, 0x66, 255}, 0.8f);
-    const Color c2 = WHITE;
-    DrawRectangle(x + pad, y + pad, w, h, fg);
+    const int x2 = x + pad, y2 = y + pad;
     // Draw text
+    DrawText(buffer, x2, y2, fontsize, fg3);
+}
 
-    const int x1 = x;
-    const int y1 = y;
-    DrawText(buffer, x1 + pad + pad, y1 + pad + pad, fontsize, c2);
+void libdraw_draw_msgbox_test(gamestate* const g, const char* text) {
+    if (!g) {
+        merror("libdraw_draw_msgbox_test: gamestate is NULL");
+        return;
+    }
+    const int fontsize = 20;
+    const Vector2 size = MeasureTextEx(GetFontDefault(), text, fontsize + 30, 1);
+    //const Vector2 size2 = MeasureTextEx(GetFontDefault(), text, fontsize, 1);
+    const int w = size.x, h = size.y;
+    const int pad = 10;
+    const int pad2 = 20;
+    const int x = g->windowwidth / 4 - w / 2, y = 0 + pad;
+    const Color fg = (Color){0x33, 0x33, 0x33, 0xff}, c2 = WHITE;
+    // we need to calculate x and y based on the w and h
+    //const int x = g->windowwidth / 2 - w / 2, y = g->windowheight / 2 - h / 2;
+    DrawRectangle(x + pad, y + pad, w, h, fg);
+    // we need to calculate an x and y for the text based on size2 and a padding
+    const int x2 = x + pad2, y2 = y + pad2;
+    DrawText(text, x2, y2, fontsize, c2);
 }
 
 void libdraw_init(gamestate* const g) {
@@ -860,6 +873,8 @@ void libdraw_init(gamestate* const g) {
     }
     const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT, x = w / 4, y = h / 4;
     InitWindow(w, h, "evildojo666");
+    g->windowwidth = w;
+    g->windowheight = h;
     SetTargetFPS(60);
     target = LoadRenderTexture(w, h);
     target_src = (Rectangle){0, 0, w, -h};
