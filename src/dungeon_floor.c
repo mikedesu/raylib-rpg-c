@@ -422,6 +422,7 @@ bool df_malloc_tiles(dungeon_floor_t* const df) {
 }
 
 void df_init_rect(dungeon_floor_t* df, int x, int y, int w, int h, dungeon_tile_type_t t1, dungeon_tile_type_t t2) {
+    if (!df || w <= 0 || h <= 0) return;
     df_set_tile_area_range(df, x, y, w, h, t1, t2);
 }
 
@@ -431,11 +432,13 @@ void df_create_trap_event(dungeon_floor_t* df,
                           dungeon_tile_type_t on,
                           dungeon_tile_type_t off,
                           df_event_id id) {
+    if (!df || id >= DEFAULT_DF_EVENTS) return;
     df->events[id] = (df_event_t){.listen_event = id, .x = x, .y = y, .on_type = on, .off_type = off};
     df_set_tile(df, on, x, y);
 }
 
 void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id) {
+    if (!df) return;
     df_set_tile(df, DUNGEON_TILE_TYPE_STONE_WALL_02, x, y);
     dungeon_floor_set_wall_switch(df, x, y, up, down, trigger_id);
 }
