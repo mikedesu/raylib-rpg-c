@@ -12,6 +12,8 @@
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
 #include "tx_keys.h"
+//#include "raylib.h"
+#include "rlgl.h"
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
@@ -36,21 +38,160 @@ Vector2 zero_vec = {0, 0};
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
-static void draw_dungeon_tiles_3d(const gamestate* g, const dungeon_floor_t* floor) {
+void DrawTexturedCubeTopOnly(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
+    if (!tex || tex->id == 0) return;
+
+    float x = pos.x, y = pos.y, z = pos.z;
+    float w = size.x * 0.5f;
+    float h = size.y * 0.5f;
+    float d = size.z * 0.5f;
+
+    float u0 = src.x / tex->width;
+    float v0 = src.y / tex->height;
+    float u1 = (src.x + src.width) / tex->width;
+    float v1 = (src.y + src.height) / tex->height;
+
+    //rlEnableTexture(tex->id);
+    rlSetTexture(tex->id);
+    rlBegin(RL_QUADS);
+
+    // Top face using correct source region
+    rlTexCoord2f(u0, v0);
+    rlVertex3f(x - w, y + h, z + d); // top-left
+    rlTexCoord2f(u1, v0);
+    rlVertex3f(x + w, y + h, z + d); // top-right
+    rlTexCoord2f(u1, v1);
+    rlVertex3f(x + w, y + h, z - d); // bottom-right
+    rlTexCoord2f(u0, v1);
+    rlVertex3f(x - w, y + h, z - d); // bottom-left
+
+    rlEnd();
+    //rlDisableTexture();
+    rlSetTexture(0);
+}
+
+void DrawTexturedCube(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
+    if (!tex || tex->id == 0) return;
+
+    float x = pos.x, y = pos.y, z = pos.z;
+    float w = size.x * 0.5f;
+    float h = size.y * 0.5f;
+    float d = size.z * 0.5f;
+
+    float u0 = src.x / tex->width;
+    float v0 = src.y / tex->height;
+    float u1 = (src.x + src.width) / tex->width;
+    float v1 = (src.y + src.height) / tex->height;
+
+    rlDisableBackfaceCulling();
+    rlSetTexture(tex->id);
+    rlBegin(RL_QUADS);
+
+    // FRONT
+    rlTexCoord2f(u0, v0);
+    rlVertex3f(x - w, y + h, z - d);
+    rlTexCoord2f(u1, v0);
+    rlVertex3f(x + w, y + h, z - d);
+    rlTexCoord2f(u1, v1);
+    rlVertex3f(x + w, y - h, z - d);
+    rlTexCoord2f(u0, v1);
+    rlVertex3f(x - w, y - h, z - d);
+
+    // BACK
+    rlTexCoord2f(u0, v0);
+    rlVertex3f(x + w, y + h, z + d);
+    rlTexCoord2f(u1, v0);
+    rlVertex3f(x - w, y + h, z + d);
+    rlTexCoord2f(u1, v1);
+    rlVertex3f(x - w, y - h, z + d);
+    rlTexCoord2f(u0, v1);
+    rlVertex3f(x + w, y - h, z + d);
+
+    // TOP
+    rlTexCoord2f(u0, v0);
+    rlVertex3f(x - w, y + h, z + d);
+    rlTexCoord2f(u1, v0);
+    rlVertex3f(x + w, y + h, z + d);
+    rlTexCoord2f(u1, v1);
+    rlVertex3f(x + w, y + h, z - d);
+    rlTexCoord2f(u0, v1);
+    rlVertex3f(x - w, y + h, z - d);
+
+    // BOTTOM
+    rlTexCoord2f(u0, v0);
+    rlVertex3f(x - w, y - h, z - d);
+    rlTexCoord2f(u1, v0);
+    rlVertex3f(x + w, y - h, z - d);
+    rlTexCoord2f(u1, v1);
+    rlVertex3f(x + w, y - h, z + d);
+    rlTexCoord2f(u0, v1);
+    rlVertex3f(x - w, y - h, z + d);
+
+    // LEFT
+    rlTexCoord2f(u0, v0);
+    rlVertex3f(x - w, y + h, z + d);
+    rlTexCoord2f(u1, v0);
+    rlVertex3f(x - w, y + h, z - d);
+    rlTexCoord2f(u1, v1);
+    rlVertex3f(x - w, y - h, z - d);
+    rlTexCoord2f(u0, v1);
+    rlVertex3f(x - w, y - h, z + d);
+
+    // RIGHT
+    rlTexCoord2f(u0, v0);
+    rlVertex3f(x + w, y + h, z - d);
+    rlTexCoord2f(u1, v0);
+    rlVertex3f(x + w, y + h, z + d);
+    rlTexCoord2f(u1, v1);
+    rlVertex3f(x + w, y - h, z + d);
+    rlTexCoord2f(u0, v1);
+    rlVertex3f(x + w, y - h, z - d);
+
+    rlEnd();
+    rlSetTexture(0);
+    rlEnableBackfaceCulling();
+}
+
+//static void draw_dungeon_tiles_3d(const gamestate* g, const dungeon_floor_t* floor) {
+//    const float TILE_SIZE = 1.0f;
+//    const float TILE_HEIGHT = 1.0f;
+//    for (int y = 0; y < floor->height; y++) {
+//        for (int x = 0; x < floor->width; x++) {
+//            dungeon_tile_t* t = &floor->tiles[y][x];
+//            if (dungeon_tile_is_wall(t->type)) continue;
+//            Color c = GRAY;
+//            if (t->type == TILE_NONE)
+//                c = BLACK;
+//            else if (t->type >= TILE_FLOOR_STONE_00 && t->type <= TILE_FLOOR_STONE_11)
+//                c = DARKGRAY;
+//            else if (t->type >= TILE_FLOOR_GRASS_00)
+//                c = GREEN;
+//            DrawCube((Vector3){x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, c);
+//        }
+//    }
+//}
+
+static void draw_dungeon_tiles_3d(const gamestate* const g, const dungeon_floor_t* const floor) {
     const float TILE_SIZE = 1.0f;
     const float TILE_HEIGHT = 1.0f;
+    //DrawGrid(10, 1.0f);
     for (int y = 0; y < floor->height; y++) {
         for (int x = 0; x < floor->width; x++) {
             dungeon_tile_t* t = &floor->tiles[y][x];
             if (dungeon_tile_is_wall(t->type)) continue;
-            Color c = GRAY;
-            if (t->type == TILE_NONE)
-                c = BLACK;
-            else if (t->type >= TILE_FLOOR_STONE_00 && t->type <= TILE_FLOOR_STONE_11)
-                c = DARKGRAY;
-            else if (t->type >= TILE_FLOOR_GRASS_00)
-                c = GREEN;
-            DrawCube((Vector3){x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, c);
+            const int txkey = get_txkey_for_tiletype(t->type);
+            Texture2D* tex = &txinfo[txkey].texture;
+            if (!tex) continue;
+            // check if the texture is loaded
+            if (tex->id == 0) {
+                merrorint("draw_dungeon_tiles_3d: texture not loaded", txkey);
+                continue;
+            }
+            const Vector3 pos = {x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE};
+            const Vector3 size = {TILE_SIZE, TILE_HEIGHT, TILE_SIZE};
+            //DrawTexturedCube(tex, pos, size);
+            //DrawTexturedCube(tex, pos, size, (Rectangle){12, 12, 8, 8});
+            DrawTexturedCubeTopOnly(tex, pos, size, (Rectangle){12, 12, 8, 8});
         }
     }
 }
