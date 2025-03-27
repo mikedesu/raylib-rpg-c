@@ -49,3 +49,8 @@ bool libdraw_windowshouldclose();
 bool libdraw_load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 bool libdraw_unload_texture(int txkey);
 void libdraw_draw_msgbox_test(gamestate* const g, const char* text);
+void libdraw_drawframe_3d(gamestate* const g);
+void libdraw_drawframe_2d(gamestate* const g);
+bool libdraw_camera_lock_on_3d(gamestate* const g);
+bool libdraw_draw_dungeon_floor_3d(gamestate* const g);
+bool libdraw_draw_player_target_box_3d(gamestate* const g);

@@ -13,6 +13,7 @@
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
+//#include "tiletype.h"
 #include "tx_keys.h"
 //#include <ctype.h>
 
@@ -448,39 +449,116 @@ void libdraw_draw_debug_panel(gamestate* const g) {
     DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
 }
 
-void libdraw_drawframe(gamestate* const g) {
-    double start_time = GetTime();
+//void libdraw_drawframe_3d(gamestate* const g) {
+//    ClearBackground(BLACK);
+//    BeginMode3D(g->cam3d);
+//    dungeon_floor_t* floor = dungeon_get_current_floor(g->dungeon);
+//    if (!floor) return;
+//    const float TILE_SIZE = 1.0f;
+//    const float TILE_HEIGHT = 1.0f;
+//    for (int y = 0; y < floor->height; y++) {
+//        for (int x = 0; x < floor->width; x++) {
+//            dungeon_tile_t* t = &floor->tiles[y][x];
+//            Color c = GRAY;
+//            if (t->type == TILE_NONE) c = BLACK;
+//            //else if (t->type >= TILE_DIRT_00 && t->type <= TILE_DIRT_05)
+//            //    c = BROWN;
+//            else if (t->type >= TILE_FLOOR_STONE_00 && t->type <= TILE_FLOOR_STONE_11)
+//                c = DARKGRAY;
+//            else if (t->type >= TILE_FLOOR_GRASS_00)
+//                c = GREEN;
+//            DrawCube((Vector3){x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, c);
+//        }
+//    }
+//    entity_t* p = em_get(g->entitymap, g->hero_id);
+//    if (p) {
+//        DrawCube((Vector3){p->x * TILE_SIZE, TILE_HEIGHT, p->y * TILE_SIZE}, TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
+//    }
+//    EndMode3D();
+//}
 
-    BeginDrawing();
-    ClearBackground(WHITE);
-    BeginTextureMode(target);
+bool libdraw_camera_lock_on_3d(gamestate* const g) {
+    if (!g) return false;
+    const float TILE_SIZE = 1.0f;
+    const float TILE_HEIGHT = 1.0f;
+    entity_t* p = em_get(g->entitymap, g->hero_id);
+    if (!p) return false;
+    g->cam3d.target = (Vector3){p->x * TILE_SIZE, TILE_HEIGHT, p->y * TILE_SIZE};
+    return true;
+}
+
+bool libdraw_draw_dungeon_floor_3d(gamestate* const g) {
+    dungeon_floor_t* floor = dungeon_get_current_floor(g->dungeon);
+    if (!floor) return false;
+
+    const float TILE_SIZE = 1.0f;
+    const float TILE_HEIGHT = 1.0f;
+    for (int y = 0; y < floor->height; y++) {
+        for (int x = 0; x < floor->width; x++) {
+            dungeon_tile_t* t = &floor->tiles[y][x];
+            Color c = GRAY;
+            if (t->type == TILE_NONE)
+                c = BLACK;
+            else if (t->type >= TILE_FLOOR_STONE_00 && t->type <= TILE_FLOOR_STONE_11)
+                c = DARKGRAY;
+            else if (t->type >= TILE_FLOOR_GRASS_00)
+                c = GREEN;
+
+            DrawCube((Vector3){x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, c);
+        }
+    }
+    return true;
+}
+
+bool libdraw_draw_player_target_box_3d(gamestate* const g) {
+    if (!g) return false;
+    const float TILE_SIZE = 1.0f;
+    const float TILE_HEIGHT = 1.0f;
+    entity_t* p = em_get(g->entitymap, g->hero_id);
+    if (!p) return false;
+    // Placeholder: draw a wireframe cube at player's position
+    DrawCubeWires((Vector3){p->x * TILE_SIZE, TILE_HEIGHT, p->y * TILE_SIZE}, TILE_SIZE, TILE_SIZE, TILE_SIZE, RED);
+    return true;
+}
+
+void libdraw_drawframe_3d(gamestate* const g) {
+    if (!g) return;
+    ClearBackground(BLACK);
+    BeginMode3D(g->cam3d);
+
+    if (!libdraw_camera_lock_on_3d(g)) { merror("camera lock 3D failed"); }
+    if (!libdraw_draw_dungeon_floor_3d(g)) { merror("draw dungeon floor 3D failed"); }
+    if (!libdraw_draw_player_target_box_3d(g)) { merror("draw target box 3D failed"); }
+
+    EndMode3D();
+}
+
+void libdraw_drawframe_2d(gamestate* const g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
-
     if (!libdraw_camera_lock_on(g)) { merror("libdraw_drawframe: failed to lock camera on hero"); }
     if (!libdraw_draw_dungeon_floor(g)) { merror("libdraw_drawframe: failed to draw dungeon floor"); }
     if (!libdraw_draw_player_target_box(g)) { merror("libdraw_drawframe: failed to draw player target box"); }
-
-    //libdraw_draw_sprite_and_shadow(g, g->hero_id);
     EndMode2D();
-    EndTextureMode();
+}
 
+void libdraw_drawframe(gamestate* const g) {
+    double start_time = GetTime();
+    BeginDrawing();
+    ClearBackground(WHITE);
+    BeginTextureMode(target);
+    //libdraw_drawframe_2d(g);
+    libdraw_drawframe_3d(g);
+    EndTextureMode();
     //BeginShaderMode(shader_grayscale);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_grayscale, GetShaderLocation(shader_grayscale, "time"), &time, SHADER_UNIFORM_FLOAT);
-
-    DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-
     //EndShaderMode();
-
+    DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     libdraw_draw_hud(g);
-
     //libdraw_draw_msgbox_test(g, "Hello, world!\nLets fucking go!");
-
     if (g->debugpanelon) { libdraw_draw_debug_panel(g); }
-
     EndDrawing();
-
     //double elapsed_time = GetTime() - start_time;
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
