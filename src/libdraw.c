@@ -18,6 +18,8 @@
 //#define DEFAULT_WIN_HEIGHT 480
 #define DEFAULT_WIN_WIDTH 1920
 #define DEFAULT_WIN_HEIGHT 1080
+#define SPRITEGROUP_DEFAULT_SIZE 32
+#define DEFAULT_ANIM_SPEED 4
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -32,18 +34,15 @@ Rectangle target_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 Vector2 target_origin = {0, 0};
 Vector2 zero_vec = {0, 0};
 
+int ANIM_SPEED = DEFAULT_ANIM_SPEED;
+
 //#define DEFAULT_WINDOW_WIDTH 960
 //#define DEFAULT_WINDOW_HEIGHT 540
 //#define DEFAULT_WINDOW_WIDTH 1280
 //#define DEFAULT_WINDOW_HEIGHT 720
 //#define DEFAULT_WINDOW_WIDTH 1920
 //#define DEFAULT_WINDOW_HEIGHT 1080
-
 //#define DEFAULT_TILE_SIZE 8
-#define SPRITEGROUP_DEFAULT_SIZE 32
-
-#define DEFAULT_ANIM_SPEED 4
-int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
 
@@ -76,7 +75,6 @@ bool libdraw_check_default_animations(gamestate* const g) {
         merror("libdraw_check_default_animations: gamestate is NULL");
         return false;
     }
-
     for (int i = 0; i < g->index_entityids; i++) {
         const entityid id = g->entityids[i];
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
@@ -100,9 +98,18 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         merrorint("libdraw_update_sprite: spritegroup not found", id);
         return;
     }
+    libdraw_update_sprite_ptr(g, e, sg);
+    libdraw_handle_frame_incr(g, sg);
+}
+
+void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg) {
+    if (!e || !sg) {
+        merror("libdraw_update_sprite_ptr: entity or spritegroup is NULL");
+        return;
+    }
     if (e->is_dead && !spritegroup_is_animating(sg)) { return; }
     if (e->do_update) {
-        libdraw_update_sprite_context(g, id, e->direction);
+        libdraw_update_sprite_context_ptr(g, sg, e->direction);
         e->do_update = false;
     }
     // Copy movement intent from e->sprite_move_x/y if present
@@ -112,55 +119,78 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
     spritegroup_update_dest(sg);
     // Snap to the tile position only when movement is fully complete
     spritegroup_snap_dest(sg, e->x, e->y);
-    // Update the sprite's frame
-    libdraw_handle_frame_incr(g, sg);
 }
 
 void libdraw_update_sprite_attack(entity_t* e, spritegroup_t* sg) {
     if (e->is_attacking) {
-        if (e->race == RACE_HUMAN) {
-            sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
-        } else if (e->race == RACE_ORC) {
-            sg->current = SPRITEGROUP_ANIM_ORC_ATTACK;
-        }
-        e->is_attacking = false;
+        libdraw_set_sg_is_attacking(e, sg);
     } else if (e->is_damaged) {
-        if (e->race == RACE_HUMAN) {
-            sg->current = SPRITEGROUP_ANIM_HUMAN_DMG;
-        } else if (e->race == RACE_ORC) {
-            sg->current = SPRITEGROUP_ANIM_ORC_DMG;
-        }
-        e->is_damaged = false;
+        libdraw_set_sg_is_damaged(e, sg);
     } else if (e->is_dead) {
-        if (e->race == RACE_HUMAN) {
-            sg->current = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
-            sg->default_anim = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
-            spritegroup_set_stop_on_last_frame(sg, true);
-        } else if (e->race == RACE_ORC) {
-            sg->current = SPRITEGROUP_ANIM_ORC_DIE;
-            sg->default_anim = SPRITEGROUP_ANIM_ORC_DIE;
-            spritegroup_set_stop_on_last_frame(sg, true);
-        }
+        libdraw_set_sg_is_dead(e, sg);
+    }
+}
+
+void libdraw_set_sg_is_attacking(entity_t* const e, spritegroup_t* const sg) {
+    if (!e || !sg) {
+        merror("libdraw_set_sg_is_attacking: entity or spritegroup is NULL");
+        return;
+    }
+    if (e->race == RACE_HUMAN) {
+        sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
+    } else if (e->race == RACE_ORC) {
+        sg->current = SPRITEGROUP_ANIM_ORC_ATTACK;
+    }
+    e->is_attacking = false;
+}
+
+void libdraw_set_sg_is_damaged(entity_t* const e, spritegroup_t* const sg) {
+    if (!e || !sg) {
+        merror("libdraw_set_sg_is_damaged: entity or spritegroup is NULL");
+        return;
+    }
+
+    if (e->race == RACE_HUMAN) {
+        sg->current = SPRITEGROUP_ANIM_HUMAN_DMG;
+    } else if (e->race == RACE_ORC) {
+        sg->current = SPRITEGROUP_ANIM_ORC_DMG;
+    }
+    e->is_damaged = false;
+}
+
+void libdraw_set_sg_is_dead(entity_t* const e, spritegroup_t* const sg) {
+    if (!e || !sg) {
+        merror("libdraw_set_sg_is_dead: entity or spritegroup is NULL");
+        return;
+    }
+
+    if (e->race == RACE_HUMAN) {
+        sg->current = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
+        sg->default_anim = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
+        spritegroup_set_stop_on_last_frame(sg, true);
+    } else if (e->race == RACE_ORC) {
+        sg->current = SPRITEGROUP_ANIM_ORC_DIE;
+        sg->default_anim = SPRITEGROUP_ANIM_ORC_DIE;
+        spritegroup_set_stop_on_last_frame(sg, true);
     }
 }
 
 void libdraw_update_sprite_position(spritegroup_t* sg, entity_t* e) {
-    if (!sg) {
-        merror("libdraw_update_sprite_position: spritegroup is NULL");
+    if (!sg || !e) {
+        merror("libdraw_update_sprite_position: spritegroup or entity is NULL");
         return;
     }
-
-    if (!e) {
-        merror("libdraw_update_sprite_position: entity is NULL");
-        return;
-    }
-
     if (e->sprite_move_x != 0 || e->sprite_move_y != 0) {
         sg->move.x = e->sprite_move_x;
         sg->move.y = e->sprite_move_y;
         e->sprite_move_x = 0;
         e->sprite_move_y = 0;
-        sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
+        // set the current based on e->race
+        if (e->race == RACE_HUMAN) {
+            sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
+        } else if (e->race == RACE_ORC) {
+            sg->current = SPRITEGROUP_ANIM_ORC_WALK; // Set animation
+        } // else no sprite animation update
     }
 }
 
@@ -169,7 +199,6 @@ void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
         merror("libdraw_handle_frame_incr: gamestate is NULL");
         return;
     }
-
     sprite* const s = sg->sprites[sg->current];
     if (!s) {
         merror("libdraw_update_sprite: sprite is NULL");
@@ -181,7 +210,6 @@ void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
         merror("libdraw_update_sprite: shadow sprite is NULL");
         // don't need to return... we can just continue
     }
-
     if (g->framecount % ANIM_SPEED == 0) {
         sprite_incrframe(s);
         // Check if the animation has completed one loop
@@ -208,34 +236,22 @@ void libdraw_update_sprites(gamestate* const g) {
         merror("libdraw_update_sprites: gamestate is NULL");
         return;
     }
-
     //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM || g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
     //    ANIM_SPEED = 10;
     //} else if (g->flag == GAMESTATE_FLAG_NPC_ANIM || g->flag == GAMESTATE_FLAG_NPC_TURN) {
     //    ANIM_SPEED = 10;
     //}
-
     // for each entityid in our entitymap, update the spritegroup
     for (int i = 0; i < g->index_entityids; i++) {
         const entityid id = g->entityids[i];
         libdraw_update_sprite(g, id);
     }
 
-    // Handle state transitions
-    //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-    //    bool done = libdraw_check_default_animations(g); // Or check just the hero
-    //    if (done) {
-    //        g->flag = GAMESTATE_FLAG_NPC_TURN;
-    //    }
-    //} else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
-    //    bool done = libdraw_check_default_animations(g);
-    //    if (done) {
-    //        g->entity_turn = g->hero_id; // Reset directly to hero
-    //        g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
-    //    }
-    //}
+    libdraw_handle_gamestate_flag(g);
+}
 
-    bool done = libdraw_check_default_animations(g);
+void libdraw_handle_gamestate_flag(gamestate* const g) {
+    const bool done = libdraw_check_default_animations(g);
     if (done) {
         if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
             g->flag = GAMESTATE_FLAG_NPC_TURN;
@@ -249,33 +265,24 @@ void libdraw_update_sprites(gamestate* const g) {
 }
 
 bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
-    if (!g) {
-        merror("libdraw_draw_dungeon_floor_tile: gamestate is NULL");
+    if (!g || !df) {
+        merror("libdraw_draw_dungeon_floor_tile: gamestate or dungeon_floor is NULL");
         return false;
     }
-
-    if (!df) {
-        merror("libdraw_draw_dungeon_floor_tile: dungeon_floor is NULL");
-        return false;
-    }
-
     if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
         merrorint2("libdraw_draw_dungeon_floor_tile: x or y out of bounds", x, y);
         return false;
     }
-
     dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merrorint2("libdraw_draw_dungeon_floor_tile: tile is NULL", x, y);
         return false;
     }
-
     // check if the tile type is none
     if (tile->type == TILE_NONE) {
         //merrorint2("libdraw_draw_dungeon_floor_tile: tile type is none", x, y);
         return true;
     }
-
     // just draw the tile itself
     // tile values in get_txkey_for_tiletype.h
     int txkey = get_txkey_for_tiletype(tile->type);
@@ -283,40 +290,26 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         //merrorint("libdraw_draw_dungeon_floor_tile: txkey is invalid", txkey);
         return false;
     }
-
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) {
         merrorint4("libdraw_draw_dungeon_floor_tile: texture id is invalid", texture->id, x, y, txkey);
         return false;
     }
     // atm hard-coding the size of the new tiles and their destinations
-
-    //const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
-    //const int tile_size_src_h = DEFAULT_TILE_SIZE * 4;
-    //const int tile_size_dest_w = DEFAULT_TILE_SIZE * 4;
-    //const int tile_size_dest_h = DEFAULT_TILE_SIZE * 4;
-    //const int tile_size_dest_x = x * DEFAULT_TILE_SIZE - 12;
-    //const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
-
-    const int sw = DEFAULT_TILE_SIZE * 4;
-    const int sh = DEFAULT_TILE_SIZE * 4;
-    const int dw = DEFAULT_TILE_SIZE * 4;
-    const int dh = DEFAULT_TILE_SIZE * 4;
+    const int sw = DEFAULT_TILE_SIZE * 4, sh = sw, dw = sw, dh = sw;
     const int dx = x * DEFAULT_TILE_SIZE - 12;
     const int dy = y * DEFAULT_TILE_SIZE - 12;
-
     Rectangle src = (Rectangle){0, 0, sw, sh};
     Rectangle dest = (Rectangle){dx, dy, dw, dh};
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
-
     // draw the pressure plate if it exists
     if (tile->has_pressure_plate) {
-        const int txkey = tile->pressure_plate_up_tx_key;
-        if (txkey < 0) {
+        const int txkey2 = tile->pressure_plate_up_tx_key;
+        if (txkey2 < 0) {
             merrorint2("libdraw_draw_dungeon_floor_tile: pressure plate up txkey is invalid", x, y);
             return false;
         }
-        Texture2D* texture = &txinfo[txkey].texture;
+        Texture2D* texture = &txinfo[txkey2].texture;
         if (texture->id <= 0) {
             //merrorint3("libdraw_draw_dungeon_floor_tile: pressure plate texture id is invalid", x, y, txkey);
             return false;
@@ -329,14 +322,12 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         //const int tile_size_dest_y = y * DEFAULT_TILE_SIZE - 12;
         //Rectangle src = (Rectangle){0, 0, tile_size_src_w, tile_size_src_h};
         //Rectangle dest = (Rectangle){tile_size_dest_x, tile_size_dest_y, tile_size_dest_w, tile_size_dest_h};
-
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
 
     // draw the wall switch
     if (tile->has_wall_switch) {
         //const int txkey = tile->wall_switch_up_tx_key;
-
         int txkey = -1;
         if (tile->wall_switch_on) {
             txkey = tile->wall_switch_down_tx_key;
@@ -411,18 +402,15 @@ bool libdraw_draw_dungeon_floor(const gamestate* const g) {
         merror("libdraw_draw_dungeon_floor: gamestate is NULL");
         return false;
     }
-
     dungeon_floor_t* const df = dungeon_get_current_floor(g->dungeon);
     if (!df) {
         merror("libdraw_draw_dungeon_floor: dungeon_floor is NULL");
         return false;
     }
-
     draw_dungeon_tiles_2d(g, df);
     draw_entities_2d(g, df, true); // dead entities
     draw_entities_2d(g, df, false); // alive entities
     draw_wall_tiles_2d(g, df);
-
     return true;
 }
 
@@ -454,7 +442,6 @@ bool libdraw_camera_lock_on_3d(gamestate* const g) {
 bool libdraw_draw_dungeon_floor_3d(gamestate* const g) {
     dungeon_floor_t* floor = dungeon_get_current_floor(g->dungeon);
     if (!floor) return false;
-
     const float TILE_SIZE = 1.0f;
     const float TILE_HEIGHT = 1.0f;
     for (int y = 0; y < floor->height; y++) {
@@ -467,7 +454,6 @@ bool libdraw_draw_dungeon_floor_3d(gamestate* const g) {
                 c = DARKGRAY;
             else if (t->type >= TILE_FLOOR_GRASS_00)
                 c = GREEN;
-
             DrawCube((Vector3){x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, c);
         }
     }
@@ -489,11 +475,9 @@ void libdraw_drawframe_3d(gamestate* const g) {
     if (!g) return;
     ClearBackground(BLACK);
     BeginMode3D(g->cam3d);
-
     if (!libdraw_camera_lock_on_3d(g)) { merror("camera lock 3D failed"); }
     if (!libdraw_draw_dungeon_floor_3d(g)) { merror("draw dungeon floor 3D failed"); }
     if (!libdraw_draw_player_target_box_3d(g)) { merror("draw target box 3D failed"); }
-
     EndMode3D();
 }
 
@@ -511,8 +495,8 @@ void libdraw_drawframe(gamestate* const g) {
     BeginDrawing();
     ClearBackground(WHITE);
     BeginTextureMode(target);
-    libdraw_drawframe_2d(g);
-    //libdraw_drawframe_3d(g);
+    //libdraw_drawframe_2d(g);
+    libdraw_drawframe_3d(g);
     EndTextureMode();
     //BeginShaderMode(shader_grayscale);
     //float time = (float)GetTime(); // Current time in seconds
@@ -601,14 +585,12 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
 }
 
 void libdraw_close() {
-    //g = NULL;
     libdraw_unload_textures();
     libdraw_unload_shaders();
     CloseWindow();
 }
 
 bool libdraw_load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path) {
-
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
         merror("libdraw_load_texture: txkey out of bounds");
         return false;
@@ -628,7 +610,6 @@ bool libdraw_load_texture(int txkey, int ctxs, int frames, bool do_dither, char*
         merror("libdraw_load_texture: path is newline");
         return false;
     }
-
     Image image = LoadImage(path);
     if (do_dither) { ImageDither(&image, 4, 4, 4, 4); }
     Texture2D texture = LoadTextureFromImage(image);
@@ -673,25 +654,9 @@ void libdraw_load_textures() {
         if (!libdraw_load_texture(txkey, contexts, frames, do_dither, path)) {
             merrorstr("libdraw_load_textures: failed to load texture", path);
         }
-        //minfo("libdraw_load_textures: loaded texture");
-        //minfoint("txkey", txkey);
-        //minfoint("contexts", contexts);
-        //minfoint("frames", frames);
-        //minfo("path");
-        //minfo(path);
     }
     fclose(file);
 }
-
-//bool libdraw_line_begins_with_whitespace_and_char(const char* l) {
-//    if (!l) {
-//        merror("libdraw_line_begins_with_whitespace_and_char: line is NULL");
-//        return false;
-//    }
-//    while (*l != 0 && isspace(*l))
-//        l++;
-//    return *l != 0 && !isspace(*l);
-//}
 
 void libdraw_unload_textures() {
     for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) {
@@ -744,15 +709,15 @@ void libdraw_create_spritegroup(gamestate* const g,
     for (int i = 0; i < num_keys; i++) {
         int k = keys[i];
         //minfo("beginning loop");
-        minfoint("k", k);
+        //minfoint("k", k);
         Texture2D* tex = &txinfo[k].texture;
-        minfo("got texture");
+        //minfo("got texture");
         sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
-        minfo("created sprite");
+        //minfo("created sprite");
         spritegroup_add(group, s);
-        minfo("added sprite");
+        //minfo("added sprite");
     }
-    minfo("loop done");
+    //minfo("loop done");
     spritegroup_set_specifier(group, spec);
     group->id = id;
     sprite* s = spritegroup_get(group, 0);
@@ -764,8 +729,7 @@ void libdraw_create_spritegroup(gamestate* const g,
     const float w = s->width, h = s->height, dst_x = e->x * DEFAULT_TILE_SIZE, dst_y = e->y * DEFAULT_TILE_SIZE;
     group->current = 0;
     group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
-    group->off_x = offset_x;
-    group->off_y = offset_y;
+    group->off_x = offset_x, group->off_y = offset_y;
     msuccessint("inserting spritegroup for entity", id);
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
     msuccessint("Spritegroup created for entity", id);
@@ -790,6 +754,46 @@ void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t 
     spritegroup_t* group = hashtable_entityid_spritegroup_get(spritegroups, id); // Adjusted for no specifier
     if (!group) {
         merrorint("libdraw_update_sprite_context: group not found", id);
+        return;
+    }
+    libdraw_update_sprite_context_ptr(g, group, dir);
+
+    //const int old_ctx = group->sprites[group->current]->currentcontext;
+    //int ctx = old_ctx;
+    //ctx = dir == DIR_NONE                                      ? old_ctx
+    //      : dir == DIR_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
+    //      : dir == DIR_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
+    //      : dir == DIR_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
+    //      : dir == DIR_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
+    //      : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
+    //      : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+    //      : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
+    //      : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
+    //      : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
+    //      : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
+    //      : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
+    //      : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
+    //      : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
+    //      : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
+    //      : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
+    //      : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
+    //      : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
+    //      : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+    //      : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
+    //      : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
+    //                                                           : old_ctx;
+    //spritegroup_setcontexts(group, ctx);
+}
+
+void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir) {
+    if (!g) {
+        merror("libdraw_update_sprite_context: gamestate is NULL");
+        return;
+    }
+    //minfoint2("libdraw_update_sprite_context: updating sprite context for entity", id, dir);
+    //spritegroup_t* group = hashtable_entityid_spritegroup_get(spritegroups, id); // Adjusted for no specifier
+    if (!group) {
+        merrorint("libdraw_update_sprite_context: group is NULL", id);
         return;
     }
     const int old_ctx = group->sprites[group->current]->currentcontext;
@@ -824,18 +828,15 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
         merror("libdraw_create_sg_byid: gamestate is NULL");
         return;
     }
-
     entity* const e = em_get(g->entitymap, id);
     if (!e) {
         merrorint("libdraw_create_sg_byid: entity not found", id);
         return;
     }
-
     int* keys = NULL;
     int num_keys = 0;
     int offset_x = 0;
     int offset_y = 0;
-
     switch (e->race) {
     case RACE_HUMAN:
         keys = TX_HUMAN_KEYS;
@@ -850,7 +851,6 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
         offset_x = -12;
         offset_y = -12;
         break;
-
     default: merrorint("libdraw_create_sg_byid: unknown race", e->race); return;
     }
 
@@ -881,31 +881,27 @@ void libdraw_draw_hud(gamestate* const g) {
     DrawRectangle(x, y, w, h, fg);
     // draw rectangle lines around the box
     DrawRectangleLines(x, y, w, h, fg2);
-
     const int x2 = x + pad, y2 = y + pad;
     // Draw text
     DrawText(buffer, x2, y2, fontsize, fg3);
 }
 
-void libdraw_draw_msgbox_test(gamestate* const g, const char* text) {
+void libdraw_draw_msgbox_test(gamestate* const g, const char* s) {
     if (!g) {
         merror("libdraw_draw_msgbox_test: gamestate is NULL");
         return;
     }
-    const int fontsize = 20;
-    const Vector2 size = MeasureTextEx(GetFontDefault(), text, fontsize + 30, 1);
+    const int fontsize = 20, f_offset = 30;
+    const Vector2 size = MeasureTextEx(GetFontDefault(), s, fontsize + f_offset, 1);
     //const Vector2 size2 = MeasureTextEx(GetFontDefault(), text, fontsize, 1);
-    const int w = size.x, h = size.y;
-    const int pad = 10;
-    const int pad2 = 20;
-    const int x = g->windowwidth / 4 - w / 2, y = 0 + pad;
-    const Color fg = (Color){0x33, 0x33, 0x33, 0xff}, c2 = WHITE;
+    const int w = size.x, h = size.y, pad = 10, pad2 = 20;
+    const int x = g->windowwidth / 4 - w / 2, y = 0 + pad, x2 = x + pad2, y2 = y + pad2;
+    const Color bg = (Color){0x33, 0x33, 0x33, 0xff}, fg = WHITE;
     // we need to calculate x and y based on the w and h
     //const int x = g->windowwidth / 2 - w / 2, y = g->windowheight / 2 - h / 2;
-    DrawRectangle(x + pad, y + pad, w, h, fg);
+    DrawRectangle(x + pad, y + pad, w, h, bg);
     // we need to calculate an x and y for the text based on size2 and a padding
-    const int x2 = x + pad2, y2 = y + pad2;
-    DrawText(text, x2, y2, fontsize, c2);
+    DrawText(s, x2, y2, fontsize, fg);
 }
 
 void libdraw_init(gamestate* const g) {
