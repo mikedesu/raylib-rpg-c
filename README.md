@@ -23,10 +23,8 @@
 ### Instructions
 
 1. Clone the repository
-2. Change directory to the repository
+2. Change directory: `cd raylib-rpg-c/src`
 3. Run the following command:
-
-#### Linux executable:
 
 ```
 make
