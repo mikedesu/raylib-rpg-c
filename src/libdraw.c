@@ -1,21 +1,17 @@
 #include "libdraw.h"
-//#include "entitytype.h"
 #include "direction.h"
 #include "dungeon_tile_type.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
-//#include "libgame_defines.h"
 #include "mprint.h"
 #include "race.h"
 #include "sprite.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
-//#include "tiletype.h"
 #include "tx_keys.h"
-//#include <ctype.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
@@ -448,34 +444,6 @@ void libdraw_draw_debug_panel(gamestate* const g) {
     DrawRectangle(g->debugpanel.x, g->debugpanel.y, w0, h0, bg);
     DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
 }
-
-//void libdraw_drawframe_3d(gamestate* const g) {
-//    ClearBackground(BLACK);
-//    BeginMode3D(g->cam3d);
-//    dungeon_floor_t* floor = dungeon_get_current_floor(g->dungeon);
-//    if (!floor) return;
-//    const float TILE_SIZE = 1.0f;
-//    const float TILE_HEIGHT = 1.0f;
-//    for (int y = 0; y < floor->height; y++) {
-//        for (int x = 0; x < floor->width; x++) {
-//            dungeon_tile_t* t = &floor->tiles[y][x];
-//            Color c = GRAY;
-//            if (t->type == TILE_NONE) c = BLACK;
-//            //else if (t->type >= TILE_DIRT_00 && t->type <= TILE_DIRT_05)
-//            //    c = BROWN;
-//            else if (t->type >= TILE_FLOOR_STONE_00 && t->type <= TILE_FLOOR_STONE_11)
-//                c = DARKGRAY;
-//            else if (t->type >= TILE_FLOOR_GRASS_00)
-//                c = GREEN;
-//            DrawCube((Vector3){x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, c);
-//        }
-//    }
-//    entity_t* p = em_get(g->entitymap, g->hero_id);
-//    if (p) {
-//        DrawCube((Vector3){p->x * TILE_SIZE, TILE_HEIGHT, p->y * TILE_SIZE}, TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
-//    }
-//    EndMode3D();
-//}
 
 bool libdraw_camera_lock_on_3d(gamestate* const g) {
     if (!g) return false;
