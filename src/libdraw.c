@@ -366,6 +366,46 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
     return true;
 }
 
+static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            if (df_tile_is_wall(df, x, y)) continue;
+            if (!libdraw_draw_dungeon_floor_tile(g, df, x, y)) { merrorint2("draw_dungeon_tiles_2d failed", x, y); }
+        }
+    }
+    return true;
+}
+
+static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead) {
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+            if (!tile || dungeon_tile_is_wall(tile->type)) continue;
+            for (int i = 0; i < dungeon_tile_entity_count(tile); i++) {
+                entityid id = dungeon_tile_get_entity(tile, i);
+                entity* e = em_get(g->entitymap, id);
+                if (e && e->is_dead == dead) libdraw_draw_sprite_and_shadow(g, id);
+            }
+        }
+    }
+    return true;
+}
+
+static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+            if (!tile) {
+                merrorint2("draw_wall_tiles_2d: tile NULL", x, y);
+                return false;
+            }
+            if (!dungeon_tile_is_wall(tile->type)) continue;
+            libdraw_draw_dungeon_floor_tile(g, df, x, y);
+        }
+    }
+    return true;
+}
+
 bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     if (!g) {
         merror("libdraw_draw_dungeon_floor: gamestate is NULL");
@@ -378,54 +418,10 @@ bool libdraw_draw_dungeon_floor(const gamestate* const g) {
         return false;
     }
 
-    // draw all non-wall tiles
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            if (df_tile_is_wall(df, x, y)) continue;
-
-            if (!libdraw_draw_dungeon_floor_tile(g, df, x, y)) {
-                merrorint2("libdraw_draw_dungeon_floor: failed to draw tile", x, y);
-            }
-        }
-    }
-
-    // First pass: dead entities
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
-            if (!tile || dungeon_tile_is_wall(tile->type)) continue;
-            for (int i = 0; i < dungeon_tile_entity_count(tile); i++) {
-                entityid id = dungeon_tile_get_entity(tile, i);
-                entity* e = em_get(g->entitymap, id);
-                if (e && e->is_dead) libdraw_draw_sprite_and_shadow(g, id);
-            }
-        }
-    }
-    // Second pass: alive entities
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
-            if (!tile || dungeon_tile_is_wall(tile->type)) continue;
-            for (int i = 0; i < dungeon_tile_entity_count(tile); i++) {
-                entityid id = dungeon_tile_get_entity(tile, i);
-                entity* e = em_get(g->entitymap, id);
-                if (e && !e->is_dead) libdraw_draw_sprite_and_shadow(g, id);
-            }
-        }
-    }
-
-    // walls etc
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
-            if (!tile) {
-                merrorint2("libdraw_draw_dungeon_floor: tile is NULL", x, y);
-                return false;
-            }
-            if (!dungeon_tile_is_wall(tile->type)) continue;
-            libdraw_draw_dungeon_floor_tile(g, df, x, y);
-        }
-    }
+    draw_dungeon_tiles_2d(g, df);
+    draw_entities_2d(g, df, true); // dead entities
+    draw_entities_2d(g, df, false); // alive entities
+    draw_wall_tiles_2d(g, df);
 
     return true;
 }
@@ -515,8 +511,8 @@ void libdraw_drawframe(gamestate* const g) {
     BeginDrawing();
     ClearBackground(WHITE);
     BeginTextureMode(target);
-    //libdraw_drawframe_2d(g);
-    libdraw_drawframe_3d(g);
+    libdraw_drawframe_2d(g);
+    //libdraw_drawframe_3d(g);
     EndTextureMode();
     //BeginShaderMode(shader_grayscale);
     //float time = (float)GetTime(); // Current time in seconds
