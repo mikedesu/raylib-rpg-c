@@ -12,6 +12,7 @@
 #include "mprint.h"
 #include "race.h"
 #include <math.h>
+#include <raylib.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -287,6 +288,8 @@ void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
         msuccess("D pressed!");
         g->debugpanelon = !g->debugpanelon;
     }
+
+    if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) { g->is3d = !g->is3d; }
 
     if (g->controlmode == CONTROLMODE_PLAYER) {
         liblogic_handle_input_player(is, g);
@@ -804,6 +807,7 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "%s\n" // timebeganbuf
              "%s\n" // currenttimebuf
              "Frame: %d (%.1fms)\n"
+             "Is3D: %d\n"
              "Cam: (%.0f,%.0f) Zoom: %.1f\n"
              "Mode: %s | Floor: %d/%d\n"
              "Entities: %d | Flag: %s\n"
@@ -812,6 +816,7 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              g->currenttimebuf,
              g->framecount,
              g->last_frame_time * 1000,
+             g->is3d,
              g->cam2d.offset.x,
              g->cam2d.offset.y,
              g->cam2d.zoom,

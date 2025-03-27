@@ -980,8 +980,13 @@ void libdraw_drawframe(gamestate* const g) {
     BeginDrawing();
     ClearBackground(WHITE);
     BeginTextureMode(target);
-    //libdraw_drawframe_2d(g);
-    libdraw_drawframe_3d(g);
+
+    if (g->is3d) {
+        libdraw_drawframe_3d(g);
+
+    } else {
+        libdraw_drawframe_2d(g);
+    }
     EndTextureMode();
     //BeginShaderMode(shader_grayscale);
     //float time = (float)GetTime(); // Current time in seconds
