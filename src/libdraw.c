@@ -36,16 +36,100 @@ Vector2 zero_vec = {0, 0};
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
-//#define DEFAULT_WINDOW_WIDTH 960
-//#define DEFAULT_WINDOW_HEIGHT 540
-//#define DEFAULT_WINDOW_WIDTH 1280
-//#define DEFAULT_WINDOW_HEIGHT 720
-//#define DEFAULT_WINDOW_WIDTH 1920
-//#define DEFAULT_WINDOW_HEIGHT 1080
-//#define DEFAULT_TILE_SIZE 8
+static void draw_dungeon_tiles_3d(const gamestate* g, const dungeon_floor_t* floor) {
+    const float TILE_SIZE = 1.0f;
+    const float TILE_HEIGHT = 1.0f;
+    for (int y = 0; y < floor->height; y++) {
+        for (int x = 0; x < floor->width; x++) {
+            dungeon_tile_t* t = &floor->tiles[y][x];
+            if (dungeon_tile_is_wall(t->type)) continue;
+            Color c = GRAY;
+            if (t->type == TILE_NONE)
+                c = BLACK;
+            else if (t->type >= TILE_FLOOR_STONE_00 && t->type <= TILE_FLOOR_STONE_11)
+                c = DARKGRAY;
+            else if (t->type >= TILE_FLOOR_GRASS_00)
+                c = GREEN;
+            DrawCube((Vector3){x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, c);
+        }
+    }
+}
+
+static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, bool dead_only) {
+    const float TILE_SIZE = 1.0f;
+    for (int y = 0; y < floor->height; y++) {
+        for (int x = 0; x < floor->width; x++) {
+            dungeon_tile_t* t = &floor->tiles[y][x];
+            if (dungeon_tile_is_wall(t->type)) continue;
+            for (int i = 0; i < dungeon_tile_entity_count(t); i++) {
+                entityid id = dungeon_tile_get_entity(t, i);
+                entity_t* e = em_get(g->entitymap, id);
+                if (!e || e->is_dead != dead_only) continue;
+                Color color = (e->type == ENTITY_PLAYER) ? BLUE : RED;
+                DrawCube(
+                    (Vector3){e->x * TILE_SIZE, TILE_SIZE, e->y * TILE_SIZE}, TILE_SIZE, TILE_SIZE, TILE_SIZE, color);
+            }
+        }
+    }
+}
+
+static void draw_wall_tiles_3d(const gamestate* g, const dungeon_floor_t* floor) {
+    const float TILE_SIZE = 1.0f;
+    const float TILE_HEIGHT = 2.0f;
+    for (int y = 0; y < floor->height; y++) {
+        for (int x = 0; x < floor->width; x++) {
+            dungeon_tile_t* t = &floor->tiles[y][x];
+            if (!dungeon_tile_is_wall(t->type)) continue;
+            DrawCube((Vector3){x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE},
+                     TILE_SIZE,
+                     TILE_HEIGHT,
+                     TILE_SIZE,
+                     DARKBROWN);
+        }
+    }
+}
+
+static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            if (df_tile_is_wall(df, x, y)) continue;
+            if (!libdraw_draw_dungeon_floor_tile(g, df, x, y)) { merrorint2("draw_dungeon_tiles_2d failed", x, y); }
+        }
+    }
+    return true;
+}
+
+static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead) {
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+            if (!tile || dungeon_tile_is_wall(tile->type)) continue;
+            for (int i = 0; i < dungeon_tile_entity_count(tile); i++) {
+                entityid id = dungeon_tile_get_entity(tile, i);
+                entity* e = em_get(g->entitymap, id);
+                if (e && e->is_dead == dead) libdraw_draw_sprite_and_shadow(g, id);
+            }
+        }
+    }
+    return true;
+}
+
+static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+            if (!tile) {
+                merrorint2("draw_wall_tiles_2d: tile NULL", x, y);
+                return false;
+            }
+            if (!dungeon_tile_is_wall(tile->type)) continue;
+            libdraw_draw_dungeon_floor_tile(g, df, x, y);
+        }
+    }
+    return true;
+}
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
-
 bool libdraw_windowshouldclose() { return WindowShouldClose(); }
 
 void libdraw_load_shaders() {
@@ -357,46 +441,6 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
     return true;
 }
 
-static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            if (df_tile_is_wall(df, x, y)) continue;
-            if (!libdraw_draw_dungeon_floor_tile(g, df, x, y)) { merrorint2("draw_dungeon_tiles_2d failed", x, y); }
-        }
-    }
-    return true;
-}
-
-static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead) {
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
-            if (!tile || dungeon_tile_is_wall(tile->type)) continue;
-            for (int i = 0; i < dungeon_tile_entity_count(tile); i++) {
-                entityid id = dungeon_tile_get_entity(tile, i);
-                entity* e = em_get(g->entitymap, id);
-                if (e && e->is_dead == dead) libdraw_draw_sprite_and_shadow(g, id);
-            }
-        }
-    }
-    return true;
-}
-
-static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
-            if (!tile) {
-                merrorint2("draw_wall_tiles_2d: tile NULL", x, y);
-                return false;
-            }
-            if (!dungeon_tile_is_wall(tile->type)) continue;
-            libdraw_draw_dungeon_floor_tile(g, df, x, y);
-        }
-    }
-    return true;
-}
-
 bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     if (!g) {
         merror("libdraw_draw_dungeon_floor: gamestate is NULL");
@@ -440,34 +484,24 @@ bool libdraw_camera_lock_on_3d(gamestate* const g) {
 }
 
 bool libdraw_draw_dungeon_floor_3d(gamestate* const g) {
+    if (!g) return false;
     dungeon_floor_t* floor = dungeon_get_current_floor(g->dungeon);
     if (!floor) return false;
-    const float TILE_SIZE = 1.0f;
-    const float TILE_HEIGHT = 1.0f;
-    for (int y = 0; y < floor->height; y++) {
-        for (int x = 0; x < floor->width; x++) {
-            dungeon_tile_t* t = &floor->tiles[y][x];
-            Color c = GRAY;
-            if (t->type == TILE_NONE)
-                c = BLACK;
-            else if (t->type >= TILE_FLOOR_STONE_00 && t->type <= TILE_FLOOR_STONE_11)
-                c = DARKGRAY;
-            else if (t->type >= TILE_FLOOR_GRASS_00)
-                c = GREEN;
-            DrawCube((Vector3){x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, c);
-        }
-    }
+    draw_dungeon_tiles_3d(g, floor);
+    draw_entities_3d(g, floor, true); // dead
+    draw_entities_3d(g, floor, false); // alive
+    draw_wall_tiles_3d(g, floor);
     return true;
 }
 
 bool libdraw_draw_player_target_box_3d(gamestate* const g) {
     if (!g) return false;
-    const float TILE_SIZE = 1.0f;
-    const float TILE_HEIGHT = 1.0f;
+    const float w = 1.0f;
+    const float h = 1.0f;
     entity_t* p = em_get(g->entitymap, g->hero_id);
     if (!p) return false;
     // Placeholder: draw a wireframe cube at player's position
-    DrawCubeWires((Vector3){p->x * TILE_SIZE, TILE_HEIGHT, p->y * TILE_SIZE}, TILE_SIZE, TILE_SIZE, TILE_SIZE, RED);
+    DrawCubeWires((Vector3){p->x * w, h, p->y * w}, w, w, w, RED);
     return true;
 }
 
@@ -475,18 +509,18 @@ void libdraw_drawframe_3d(gamestate* const g) {
     if (!g) return;
     ClearBackground(BLACK);
     BeginMode3D(g->cam3d);
-    if (!libdraw_camera_lock_on_3d(g)) { merror("camera lock 3D failed"); }
-    if (!libdraw_draw_dungeon_floor_3d(g)) { merror("draw dungeon floor 3D failed"); }
-    if (!libdraw_draw_player_target_box_3d(g)) { merror("draw target box 3D failed"); }
+    if (!libdraw_camera_lock_on_3d(g)) merror("camera lock 3D failed");
+    if (!libdraw_draw_dungeon_floor_3d(g)) merror("draw dungeon floor 3D failed");
+    if (!libdraw_draw_player_target_box_3d(g)) merror("draw target box 3D failed");
     EndMode3D();
 }
 
 void libdraw_drawframe_2d(gamestate* const g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
-    if (!libdraw_camera_lock_on(g)) { merror("libdraw_drawframe: failed to lock camera on hero"); }
-    if (!libdraw_draw_dungeon_floor(g)) { merror("libdraw_drawframe: failed to draw dungeon floor"); }
-    if (!libdraw_draw_player_target_box(g)) { merror("libdraw_drawframe: failed to draw player target box"); }
+    if (!libdraw_camera_lock_on(g)) merror("libdraw_drawframe: failed to lock camera on hero");
+    if (!libdraw_draw_dungeon_floor(g)) merror("libdraw_drawframe: failed to draw dungeon floor");
+    if (!libdraw_draw_player_target_box(g)) merror("libdraw_drawframe: failed to draw player target box");
     EndMode2D();
 }
 
@@ -659,9 +693,7 @@ void libdraw_load_textures() {
 }
 
 void libdraw_unload_textures() {
-    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) {
-        if (!libdraw_unload_texture(i)) { merrorint("libdraw_unload_textures: failed to unload texture", i); }
-    }
+    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) libdraw_unload_texture(i);
 }
 
 void libdraw_create_spritegroup(gamestate* const g,
@@ -705,19 +737,12 @@ void libdraw_create_spritegroup(gamestate* const g,
         return;
     }
     minfoint("libdraw_create_spritegroup: creating spritegroup for entityid", id);
-    //for (int i = 0; i < TX_HUMAN_KEY_COUNT; i++) {
     for (int i = 0; i < num_keys; i++) {
-        int k = keys[i];
-        //minfo("beginning loop");
-        //minfoint("k", k);
+        const int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
-        //minfo("got texture");
         sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
-        //minfo("created sprite");
         spritegroup_add(group, s);
-        //minfo("added sprite");
     }
-    //minfo("loop done");
     spritegroup_set_specifier(group, spec);
     group->id = id;
     sprite* s = spritegroup_get(group, 0);
@@ -757,32 +782,6 @@ void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t 
         return;
     }
     libdraw_update_sprite_context_ptr(g, group, dir);
-
-    //const int old_ctx = group->sprites[group->current]->currentcontext;
-    //int ctx = old_ctx;
-    //ctx = dir == DIR_NONE                                      ? old_ctx
-    //      : dir == DIR_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
-    //      : dir == DIR_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
-    //      : dir == DIR_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
-    //      : dir == DIR_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
-    //      : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
-    //      : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
-    //      : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
-    //      : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
-    //      : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
-    //      : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
-    //      : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
-    //      : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
-    //      : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
-    //      : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
-    //      : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
-    //      : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
-    //      : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
-    //      : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
-    //      : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
-    //      : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
-    //                                                           : old_ctx;
-    //spritegroup_setcontexts(group, ctx);
 }
 
 void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir) {
