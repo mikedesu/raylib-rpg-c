@@ -14,6 +14,7 @@
 #include "tx_keys.h"
 //#include "raylib.h"
 #include "libdraw_cube.h"
+#include "libdraw_plane.h"
 #include "rlgl.h"
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
@@ -40,9 +41,7 @@ Vector2 zero_vec = {0, 0};
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 static void draw_dungeon_tiles_3d(const gamestate* const g, const dungeon_floor_t* const floor) {
-    const float TW = 1.0f;
-    const float TH = 1.0f;
-    const float TD = 1.0f;
+    const float TW = 1.0f, TH = 1.0f, TD = 1.0f;
     //DrawGrid(10, 1.0f);
     for (int y = 0; y < floor->height; y++) {
         for (int x = 0; x < floor->width; x++) {
@@ -56,8 +55,13 @@ static void draw_dungeon_tiles_3d(const gamestate* const g, const dungeon_floor_
                 merrorint("draw_dungeon_tiles_3d: texture not loaded", txkey);
                 continue;
             }
-            const Vector3 pos = {x * TW, 0, y * TD}, size = {TW, TH, TD};
-            DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
+            const Vector3 pos = {x * TW, -0.5f, y * TD};
+            const Vector3 size = {TW, TH, TD};
+            //const Vector2 size = {TW, TH};
+            //DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
+            DrawTexturedPlane(tex, pos, size, (Rectangle){12, 12, 8, 8});
+            //DrawPlane(pos, size, WHITE);
+            //DrawDebugPlane(tex);
         }
     }
 }
