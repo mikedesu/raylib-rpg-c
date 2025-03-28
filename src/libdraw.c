@@ -39,392 +39,10 @@ Vector2 zero_vec = {0, 0};
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
-/*
-void DrawTexturedCubeFront(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
-    if (!tex || tex->id == 0) return;
-
-    float x = pos.x, y = pos.y, z = pos.z;
-    float w = size.x * 0.5f;
-    float h = size.y * 0.5f;
-    float d = size.z * 0.5f;
-
-    float u0 = src.x / tex->width;
-    float v0 = src.y / tex->height;
-    float u1 = (src.x + src.width) / tex->width;
-    float v1 = (src.y + src.height) / tex->height;
-
-    rlEnableTexture(tex->id);
-    rlBegin(RL_QUADS);
-
-    // Front face
-    rlTexCoord2f(u0, v0);
-    rlVertex3f(x - w, y + h, z + d); // top-left
-    rlTexCoord2f(u1, v0);
-    rlVertex3f(x + w, y + h, z + d); // top-right
-    rlTexCoord2f(u1, v1);
-    rlVertex3f(x + w, y - h, z + d); // bottom-right
-    rlTexCoord2f(u0, v1);
-    rlVertex3f(x - w, y - h, z + d); // bottom-left
-
-    rlEnd();
-    rlDisableTexture();
-}
-
-void DrawTexturedCubeTopOnly(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
-    if (!tex || tex->id == 0) return;
-
-    float x = pos.x, y = pos.y, z = pos.z;
-    float w = size.x * 0.5f;
-    float h = size.y * 0.5f;
-    float d = size.z * 0.5f;
-
-    float u0 = src.x / tex->width;
-    float v0 = src.y / tex->height;
-    float u1 = (src.x + src.width) / tex->width;
-    float v1 = (src.y + src.height) / tex->height;
-
-    //rlEnableTexture(tex->id);
-    rlSetTexture(tex->id);
-    rlBegin(RL_QUADS);
-
-    // Top face using correct source region
-    rlTexCoord2f(u0, v0);
-    rlVertex3f(x - w, y + h, z + d); // top-left
-    rlTexCoord2f(u1, v0);
-    rlVertex3f(x + w, y + h, z + d); // top-right
-    rlTexCoord2f(u1, v1);
-    rlVertex3f(x + w, y + h, z - d); // bottom-right
-    rlTexCoord2f(u0, v1);
-    rlVertex3f(x - w, y + h, z - d); // bottom-left
-
-    rlEnd();
-    //rlDisableTexture();
-    rlSetTexture(0);
-}
-
-//void DrawTexturedCubeFrontOnly(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
-//}
-
-void DrawTexturedCubeBack(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
-    if (!tex || tex->id == 0) return;
-
-    float x = pos.x, y = pos.y, z = pos.z;
-    float w = size.x * 0.5f;
-    float h = size.y * 0.5f;
-    float d = size.z * 0.5f;
-
-    float u0 = src.x / tex->width;
-    float v0 = src.y / tex->height;
-    float u1 = (src.x + src.width) / tex->width;
-    float v1 = (src.y + src.height) / tex->height;
-
-    rlSetTexture(tex->id);
-    rlBegin(RL_QUADS);
-
-    // FRONT (-Z)
-    //rlTexCoord2f(u0, v0);
-    //rlVertex3f(x - w, y + h, z - d);
-    //rlTexCoord2f(u1, v0);
-    //rlVertex3f(x + w, y + h, z - d);
-    //rlTexCoord2f(u1, v1);
-    //rlVertex3f(x + w, y - h, z - d);
-    //rlTexCoord2f(u0, v1);
-    //rlVertex3f(x - w, y - h, z - d);
-
-    // BACK (+Z)
-    rlTexCoord2f(u0, v0);
-    rlVertex3f(x + w, y + h, z + d);
-    rlTexCoord2f(u1, v0);
-    rlVertex3f(x - w, y + h, z + d);
-    rlTexCoord2f(u1, v1);
-    rlVertex3f(x - w, y - h, z + d);
-    rlTexCoord2f(u0, v1);
-    rlVertex3f(x + w, y - h, z + d);
-
-    // TOP (+Y)
-    //rlTexCoord2f(u0, v0);
-    //rlVertex3f(x - w, y + h, z + d);
-    //rlTexCoord2f(u1, v0);
-    //rlVertex3f(x + w, y + h, z + d);
-    //rlTexCoord2f(u1, v1);
-    //rlVertex3f(x + w, y + h, z - d);
-    //rlTexCoord2f(u0, v1);
-    //rlVertex3f(x - w, y + h, z - d);
-
-    // BOTTOM (-Y)
-    //rlTexCoord2f(u0, v0);
-    //rlVertex3f(x - w, y - h, z - d);
-    //rlTexCoord2f(u1, v0);
-    //rlVertex3f(x + w, y - h, z - d);
-    //rlTexCoord2f(u1, v1);
-    //rlVertex3f(x + w, y - h, z + d);
-    //rlTexCoord2f(u0, v1);
-    //rlVertex3f(x - w, y - h, z + d);
-
-    // LEFT (-X)
-    //rlTexCoord2f(u0, v0);
-    //rlVertex3f(x - w, y + h, z + d);
-    //rlTexCoord2f(u1, v0);
-    //rlVertex3f(x - w, y + h, z - d);
-    //rlTexCoord2f(u1, v1);
-    //rlVertex3f(x - w, y - h, z - d);
-    //rlTexCoord2f(u0, v1);
-    //rlVertex3f(x - w, y - h, z + d);
-
-    // RIGHT (+X)
-    //rlTexCoord2f(u0, v0);
-    //rlVertex3f(x + w, y + h, z - d);
-    //rlTexCoord2f(u1, v0);
-    //rlVertex3f(x + w, y + h, z + d);
-    //rlTexCoord2f(u1, v1);
-    //rlVertex3f(x + w, y - h, z + d);
-    //rlTexCoord2f(u0, v1);
-    //rlVertex3f(x + w, y - h, z - d);
-
-    rlEnd();
-    rlSetTexture(0);
-}
-
-void DrawTexturedCubeTopOnlyInverted(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
-    if (!tex || tex->id == 0) return;
-
-    float x = pos.x, y = pos.y, z = pos.z;
-    float w = size.x * 0.5f;
-    float h = size.y * 0.5f;
-    float d = size.z * 0.5f;
-
-    float u0 = src.x / tex->width;
-    float v0 = src.y / tex->height;
-    float u1 = (src.x + src.width) / tex->width;
-    float v1 = (src.y + src.height) / tex->height;
-
-    // Flip vertically: just swap v0 <-> v1
-    float vt0 = v1;
-    float vt1 = v0;
-
-    rlSetTexture(tex->id);
-    rlBegin(RL_QUADS);
-
-    // Top face with flipped UVs
-    rlTexCoord2f(u0, vt0);
-    rlVertex3f(x - w, y + h, z + d);
-    rlTexCoord2f(u1, vt0);
-    rlVertex3f(x + w, y + h, z + d);
-    rlTexCoord2f(u1, vt1);
-    rlVertex3f(x + w, y + h, z - d);
-    rlTexCoord2f(u0, vt1);
-    rlVertex3f(x - w, y + h, z - d);
-
-    rlEnd();
-    rlSetTexture(0);
-}
-
-void DrawTexturedCubeTopOnlyPlayer(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
-    if (!tex || tex->id == 0) return;
-
-    float x = pos.x, y = pos.y, z = pos.z;
-    float w = size.x * 0.5f;
-    float h = size.y * 0.5f;
-    float d = size.z * 0.5f;
-
-    // Assume sprite frames are laid out horizontally across the texture
-    //float u0 = src.x / (tex->width);
-    //float v0 = src.y / tex->height;
-    //float u1 = (src.x + src.width) / tex->width;
-    //float v1 = (src.y + src.height) / tex->height;
-
-    float u0 = src.x / (tex->width);
-    float v0 = src.y / tex->height;
-    float u1 = (src.x + src.width) / tex->width;
-    float v1 = (src.y + src.height) / tex->height;
-
-    //float u1 = (src.x + src.width);
-    //float v1 = (src.y + src.height);
-
-    rlSetTexture(tex->id);
-    rlBegin(RL_QUADS);
-
-    // Top face only
-    rlTexCoord2f(u0, v0);
-    rlVertex3f(x - w, y + h, z + d);
-    rlTexCoord2f(u1, v0);
-    rlVertex3f(x + w, y + h, z + d);
-    rlTexCoord2f(u1, v1);
-    rlVertex3f(x + w, y + h, z - d);
-    rlTexCoord2f(u0, v1);
-    rlVertex3f(x - w, y + h, z - d);
-
-    rlEnd();
-    rlSetTexture(0);
-}
-
-void DrawTexturedCube(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
-    if (!tex || tex->id == 0) return;
-
-    float x = pos.x, y = pos.y, z = pos.z;
-    float w = size.x * 0.5f;
-    float h = size.y * 0.5f;
-    float d = size.z * 0.5f;
-
-    float u0 = src.x / tex->width;
-    float v0 = src.y / tex->height;
-    float u1 = (src.x + src.width) / tex->width;
-    float v1 = (src.y + src.height) / tex->height;
-
-    rlSetTexture(tex->id);
-    rlBegin(RL_QUADS);
-
-    // FRONT (-Z)
-    rlTexCoord2f(u0, v0);
-    rlVertex3f(x - w, y + h, z - d);
-    rlTexCoord2f(u1, v0);
-    rlVertex3f(x + w, y + h, z - d);
-    rlTexCoord2f(u1, v1);
-    rlVertex3f(x + w, y - h, z - d);
-    rlTexCoord2f(u0, v1);
-    rlVertex3f(x - w, y - h, z - d);
-
-    // BACK (+Z)
-    rlTexCoord2f(u0, v0);
-    rlVertex3f(x + w, y + h, z + d);
-    rlTexCoord2f(u1, v0);
-    rlVertex3f(x - w, y + h, z + d);
-    rlTexCoord2f(u1, v1);
-    rlVertex3f(x - w, y - h, z + d);
-    rlTexCoord2f(u0, v1);
-    rlVertex3f(x + w, y - h, z + d);
-
-    // TOP (+Y)
-    rlTexCoord2f(u0, v0);
-    rlVertex3f(x - w, y + h, z + d);
-    rlTexCoord2f(u1, v0);
-    rlVertex3f(x + w, y + h, z + d);
-    rlTexCoord2f(u1, v1);
-    rlVertex3f(x + w, y + h, z - d);
-    rlTexCoord2f(u0, v1);
-    rlVertex3f(x - w, y + h, z - d);
-
-    // BOTTOM (-Y)
-    rlTexCoord2f(u0, v0);
-    rlVertex3f(x - w, y - h, z - d);
-    rlTexCoord2f(u1, v0);
-    rlVertex3f(x + w, y - h, z - d);
-    rlTexCoord2f(u1, v1);
-    rlVertex3f(x + w, y - h, z + d);
-    rlTexCoord2f(u0, v1);
-    rlVertex3f(x - w, y - h, z + d);
-
-    // LEFT (-X)
-    rlTexCoord2f(u0, v0);
-    rlVertex3f(x - w, y + h, z + d);
-    rlTexCoord2f(u1, v0);
-    rlVertex3f(x - w, y + h, z - d);
-    rlTexCoord2f(u1, v1);
-    rlVertex3f(x - w, y - h, z - d);
-    rlTexCoord2f(u0, v1);
-    rlVertex3f(x - w, y - h, z + d);
-
-    // RIGHT (+X)
-    rlTexCoord2f(u0, v0);
-    rlVertex3f(x + w, y + h, z - d);
-    rlTexCoord2f(u1, v0);
-    rlVertex3f(x + w, y + h, z + d);
-    rlTexCoord2f(u1, v1);
-    rlVertex3f(x + w, y - h, z + d);
-    rlTexCoord2f(u0, v1);
-    rlVertex3f(x + w, y - h, z - d);
-
-    rlEnd();
-    rlSetTexture(0);
-}
-*/
-
-//void DrawTexturedCube(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
-//    if (!tex || tex->id == 0) return;
-//
-//    float x = pos.x, y = pos.y, z = pos.z;
-//    float w = size.x * 0.5f;
-//    float h = size.y * 0.5f;
-//    float d = size.z * 0.5f;
-//
-//    float u0 = src.x / tex->width;
-//    float v0 = src.y / tex->height;
-//    float u1 = (src.x + src.width) / tex->width;
-//    float v1 = (src.y + src.height) / tex->height;
-//
-//    //rlDisableBackfaceCulling();
-//    rlSetTexture(tex->id);
-//    rlBegin(RL_QUADS);
-//
-//    // FRONT
-//    rlTexCoord2f(u0, v0);
-//    rlVertex3f(x - w, y + h, z - d);
-//    rlTexCoord2f(u1, v0);
-//    rlVertex3f(x + w, y + h, z - d);
-//    rlTexCoord2f(u1, v1);
-//    rlVertex3f(x + w, y - h, z - d);
-//    rlTexCoord2f(u0, v1);
-//    rlVertex3f(x - w, y - h, z - d);
-//
-//    // BACK
-//    rlTexCoord2f(u0, v0);
-//    rlVertex3f(x + w, y + h, z + d);
-//    rlTexCoord2f(u1, v0);
-//    rlVertex3f(x - w, y + h, z + d);
-//    rlTexCoord2f(u1, v1);
-//    rlVertex3f(x - w, y - h, z + d);
-//    rlTexCoord2f(u0, v1);
-//    rlVertex3f(x + w, y - h, z + d);
-//
-//    // TOP
-//    rlTexCoord2f(u0, v0);
-//    rlVertex3f(x - w, y + h, z + d);
-//    rlTexCoord2f(u1, v0);
-//    rlVertex3f(x + w, y + h, z + d);
-//    rlTexCoord2f(u1, v1);
-//    rlVertex3f(x + w, y + h, z - d);
-//    rlTexCoord2f(u0, v1);
-//    rlVertex3f(x - w, y + h, z - d);
-//
-//    // BOTTOM
-//    rlTexCoord2f(u0, v0);
-//    rlVertex3f(x - w, y - h, z - d);
-//    rlTexCoord2f(u1, v0);
-//    rlVertex3f(x + w, y - h, z - d);
-//    rlTexCoord2f(u1, v1);
-//    rlVertex3f(x + w, y - h, z + d);
-//    rlTexCoord2f(u0, v1);
-//    rlVertex3f(x - w, y - h, z + d);
-//
-//    // LEFT
-//    rlTexCoord2f(u0, v0);
-//    rlVertex3f(x - w, y + h, z + d);
-//    rlTexCoord2f(u1, v0);
-//    rlVertex3f(x - w, y + h, z - d);
-//    rlTexCoord2f(u1, v1);
-//    rlVertex3f(x - w, y - h, z - d);
-//    rlTexCoord2f(u0, v1);
-//    rlVertex3f(x - w, y - h, z + d);
-//
-//    // RIGHT
-//    rlTexCoord2f(u0, v0);
-//    rlVertex3f(x + w, y + h, z - d);
-//    rlTexCoord2f(u1, v0);
-//    rlVertex3f(x + w, y + h, z + d);
-//    rlTexCoord2f(u1, v1);
-//    rlVertex3f(x + w, y - h, z + d);
-//    rlTexCoord2f(u0, v1);
-//    rlVertex3f(x + w, y - h, z - d);
-//
-//    rlEnd();
-//    rlSetTexture(0);
-//    //rlEnableBackfaceCulling();
-//}
-
 static void draw_dungeon_tiles_3d(const gamestate* const g, const dungeon_floor_t* const floor) {
-    const float TILE_WIDTH = 1.0f;
-    const float TILE_HEIGHT = 1.0f;
-    const float TILE_DEPTH = 1.0f;
+    const float TW = 1.0f;
+    const float TH = 1.0f;
+    const float TD = 1.0f;
     //DrawGrid(10, 1.0f);
     for (int y = 0; y < floor->height; y++) {
         for (int x = 0; x < floor->width; x++) {
@@ -438,20 +56,14 @@ static void draw_dungeon_tiles_3d(const gamestate* const g, const dungeon_floor_
                 merrorint("draw_dungeon_tiles_3d: texture not loaded", txkey);
                 continue;
             }
-            //const Vector3 pos = {x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE};
-            const Vector3 pos = {x * TILE_WIDTH, 0, y * TILE_DEPTH};
-            const Vector3 size = {TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH};
-            //DrawTexturedCube(tex, pos, size);
-            //DrawTexturedCube(tex, pos, size, (Rectangle){12, 12, 8, 8});
-            //DrawTexturedCube(tex, pos, size, (Rectangle){12, 12, 8, 8});
+            const Vector3 pos = {x * TW, 0, y * TD}, size = {TW, TH, TD};
             DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
-            //DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
         }
     }
 }
 
 static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, bool dead_only) {
-    const float TILE_SIZE = 1.0f;
+    const float TSIZE = 1.0f;
     for (int y = 0; y < floor->height; y++) {
         for (int x = 0; x < floor->width; x++) {
             dungeon_tile_t* t = &floor->tiles[y][x];
@@ -477,49 +89,25 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                         merrorint("draw_entities_3d: player texture NULL", sg->tx_keys[sg->current]);
                         continue;
                     }
-                    const int xpos = e->x * TILE_SIZE;
-                    const int ypos = 1;
-                    const int zpos = e->y * TILE_SIZE;
-                    const Vector3 pos = {xpos, ypos, zpos};
-                    const Vector3 size = {TILE_SIZE, TILE_SIZE, TILE_SIZE};
-                    //Rectangle src = sg->sprites[sg->current]->src;
-                    //src.width = 8;
-                    //src.height = 8;
-                    //src.x = 12;
-                    //src.y = 12;
+                    const int xpos = e->x * TSIZE, ypos = 1, zpos = e->y * TSIZE;
+                    const Vector3 pos = {xpos, ypos, zpos}, size = {TSIZE, TSIZE, TSIZE};
                     DrawTexturedCubeBack(tex, pos, size, (Rectangle){12, 12, 8, 8});
-                    //DrawCubeWires(
-                    //    (Vector3){e->x * TILE_SIZE, 1, e->y * TILE_SIZE}, TILE_SIZE, TILE_SIZE, TILE_SIZE, color);
                 } else {
-                    //DrawCube((Vector3){e->x * TILE_SIZE, 1, e->y * TILE_SIZE}, TILE_SIZE, TILE_SIZE, TILE_SIZE, color);
-
                     // get the entity's spritegroup
-
                     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
                     if (!sg) {
                         merrorint("draw_entities_3d: spritegroup NULL", id);
                         continue;
                     }
-
                     // get the entity's current sprite's texture
-
                     Texture2D* tex = sg->sprites[sg->current]->texture;
                     if (!tex) {
                         merrorint("draw_entities_3d: texture NULL", sg->tx_keys[sg->current]);
                         continue;
                     }
-
                     // get the entity's current sprite's source rectangle
-                    const int xpos = e->x * TILE_SIZE;
-                    const int ypos = 1;
-                    const int zpos = e->y * TILE_SIZE;
-                    const Vector3 pos = {xpos, ypos, zpos};
-                    const Vector3 size = {TILE_SIZE, TILE_SIZE, TILE_SIZE};
-                    //Rectangle src = sg->sprites[sg->current]->src;
-                    //src.width = 8;
-                    //src.height = 8;
-                    //src.x = 12;
-                    //src.y = 12;
+                    const int xpos = e->x * TSIZE, ypos = 1, zpos = e->y * TSIZE;
+                    const Vector3 pos = {xpos, ypos, zpos}, size = {TSIZE, TSIZE, TSIZE};
                     DrawTexturedCubeBack(tex, pos, size, (Rectangle){12, 12, 8, 8});
                 }
             }
@@ -1347,12 +935,10 @@ void libdraw_draw_msgbox_test(gamestate* const g, const char* s) {
     }
     const int fontsize = 20, f_offset = 30;
     const Vector2 size = MeasureTextEx(GetFontDefault(), s, fontsize + f_offset, 1);
-    //const Vector2 size2 = MeasureTextEx(GetFontDefault(), text, fontsize, 1);
     const int w = size.x, h = size.y, pad = 10, pad2 = 20;
     const int x = g->windowwidth / 4 - w / 2, y = 0 + pad, x2 = x + pad2, y2 = y + pad2;
     const Color bg = (Color){0x33, 0x33, 0x33, 0xff}, fg = WHITE;
     // we need to calculate x and y based on the w and h
-    //const int x = g->windowwidth / 2 - w / 2, y = g->windowheight / 2 - h / 2;
     DrawRectangle(x + pad, y + pad, w, h, bg);
     // we need to calculate an x and y for the text based on size2 and a padding
     DrawText(s, x2, y2, fontsize, fg);
