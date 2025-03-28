@@ -1,6 +1,7 @@
 CC = gcc
 OBJ = -c
-WFLAGS = -Wall -Werror
+WFLAGS = -Wall 
+#WFLAGS = -Wall -Werror
 SHARED = -shared
 LIBGAME_OBJECTS = gamestate.o hashtable_entityid_spritegroup.o get_txkey_for_tiletype.o specifier.o dungeon_floor.o dungeon_tile.o entity.o em.o sprite.o spritegroup.o race.o libgame.o
 STATIC_LINK_RAYLIB = -l:libraylib.a  # Desktop Raylib

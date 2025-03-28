@@ -13,6 +13,7 @@
 #include "textureinfo.h"
 #include "tx_keys.h"
 //#include "raylib.h"
+#include "libdraw_billboard.h"
 #include "libdraw_cube.h"
 #include "libdraw_plane.h"
 #include "rlgl.h"
@@ -93,9 +94,15 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                         merrorint("draw_entities_3d: player texture NULL", sg->tx_keys[sg->current]);
                         continue;
                     }
-                    const int xpos = e->x * TSIZE, ypos = 1, zpos = e->y * TSIZE;
-                    const Vector3 pos = {xpos, ypos, zpos}, size = {TSIZE, TSIZE, TSIZE};
-                    DrawTexturedCubeBack(tex, pos, size, (Rectangle){12, 12, 8, 8});
+                    const float xpos = e->x * TSIZE, ypos = 1, zpos = e->y * TSIZE;
+                    //const int xpos = 4, ypos = 1, zpos = 4;
+                    const Vector3 pos = {xpos, ypos, zpos};
+                    //const Vector2 size = {TSIZE, TSIZE};
+                    const Vector3 size = {TSIZE, TSIZE, TSIZE};
+                    //DrawTexturedCubeBack(tex, pos, size, (Rectangle){12, 12, 8, 8});
+                    DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
+                    //DrawBillboardFromRect(g->cam3d, tex, pos, size, (Rectangle){12, 12, 8, 8}, WHITE);
+                    //DrawBillboardRec(g->cam3d, *tex, (Rectangle){12, 12, 8, 8}, pos, size, WHITE);
                 } else {
                     // get the entity's spritegroup
                     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
@@ -111,8 +118,15 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                     }
                     // get the entity's current sprite's source rectangle
                     const int xpos = e->x * TSIZE, ypos = 1, zpos = e->y * TSIZE;
-                    const Vector3 pos = {xpos, ypos, zpos}, size = {TSIZE, TSIZE, TSIZE};
-                    DrawTexturedCubeBack(tex, pos, size, (Rectangle){12, 12, 8, 8});
+                    const Vector3 pos = {xpos, ypos, zpos};
+                    const Vector3 size = {TSIZE, TSIZE, TSIZE};
+                    //const Vector2 size = {TSIZE, TSIZE};
+                    //DrawTexturedCubeBack(tex, pos, size, (Rectangle){12, 12, 8, 8});
+                    DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
+                    //DrawBillboard(g->cam3d, *tex, (Vector3){e->x, 0.5f, e->y}, 1.0f, WHITE);
+                    //DrawBillboard(g->cam3d, *tex, pos, 1.0f, WHITE);
+                    //DrawBillboardFromRect(g->cam3d, tex, pos, size, sg->sprites[sg->current]->src, WHITE);
+                    //DrawBillboardFromRect(g->cam3d, tex, pos, size, (Rectangle){12, 12, 8, 8}, WHITE);
                 }
             }
         }
@@ -533,6 +547,20 @@ bool libdraw_draw_dungeon_floor_3d(gamestate* const g) {
     draw_entities_3d(g, floor, true); // dead
     draw_entities_3d(g, floor, false); // alive
     draw_wall_tiles_3d(g, floor);
+
+    //Texture2D* tex = &txinfo[get_txkey_for_tiletype(TILE_FLOOR_STONE_00)].texture;
+    //Rectangle src = {0, 0, 32, 32};
+    //Vector3 pos = {4, 1, 4};
+    //Vector3 size = {4, 1, 4};
+    //DrawBillboardFromRect(g->cam3d, tex, (Vector3){4, 1, 4}, (Vector2){1.0f, 1.0f}, src, WHITE);
+    //DrawTexturedCubeTopOnlyInverted(tex, pos, size, src);
+    //DrawBillboardFromRect(
+    //    g->cam3d, tex, (Vector3){4, 1.0f, 4}, (Vector2){1.0f, 1.0f}, (Rectangle){0, 0, 32, 32}, WHITE);
+    //DrawBillboardPro(g->cam3d, tex, (Vector3){4, 1.0f, 4}, (Vector2){1.0f, 1.0f}, (Rectangle){0, 0, 32, 32}, WHITE);
+    //DrawBillboardRec(g->cam3d, *tex, (Rectangle){12, 12, 8, 8}, (Vector3){4, 1.0f, 4}, (Vector2){4.0f, 4.0f}, WHITE);
+    // Draw cube wireframe around billboard
+    //DrawCubeWires((Vector3){4, 1.0f, 4}, 4.0f, 1.0f, 4.0f, RED);
+
     return true;
 }
 
