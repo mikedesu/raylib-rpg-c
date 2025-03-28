@@ -13,6 +13,7 @@
 #include "textureinfo.h"
 #include "tx_keys.h"
 //#include "raylib.h"
+#include "libdraw_cube.h"
 #include "rlgl.h"
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
@@ -38,6 +39,7 @@ Vector2 zero_vec = {0, 0};
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
+/*
 void DrawTexturedCubeFront(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
     if (!tex || tex->id == 0) return;
 
@@ -335,6 +337,7 @@ void DrawTexturedCube(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) 
     rlEnd();
     rlSetTexture(0);
 }
+*/
 
 //void DrawTexturedCube(Texture2D* tex, Vector3 pos, Vector3 size, Rectangle src) {
 //    if (!tex || tex->id == 0) return;
@@ -436,16 +439,12 @@ static void draw_dungeon_tiles_3d(const gamestate* const g, const dungeon_floor_
                 continue;
             }
             //const Vector3 pos = {x * TILE_SIZE, TILE_HEIGHT / 2.0f, y * TILE_SIZE};
-            const int xpos = x * TILE_WIDTH;
-            const int ypos = 0;
-            const int zpos = y * TILE_DEPTH;
-
-            const Vector3 pos = {xpos, ypos, zpos};
+            const Vector3 pos = {x * TILE_WIDTH, 0, y * TILE_DEPTH};
             const Vector3 size = {TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH};
             //DrawTexturedCube(tex, pos, size);
             //DrawTexturedCube(tex, pos, size, (Rectangle){12, 12, 8, 8});
             //DrawTexturedCube(tex, pos, size, (Rectangle){12, 12, 8, 8});
-            DrawTexturedCubeTopOnly(tex, pos, size, (Rectangle){12, 12, 8, 8});
+            DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
             //DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
         }
     }
@@ -462,7 +461,7 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                 entity_t* e = em_get(g->entitymap, id);
                 if (!e || e->is_dead != dead_only) continue;
                 //Color color = (e->type == ENTITY_PLAYER) ? Fade((Color){0, 0, 255}, 0.8f) : RED;
-                Color color = (e->type == ENTITY_PLAYER) ? Fade(BLUE, 0.5f) : RED;
+                //Color color = (e->type == ENTITY_PLAYER) ? Fade(BLUE, 0.5f) : RED;
                 if (e->type == ENTITY_PLAYER) {
                     //DrawCubeWires(
                     //    (Vector3){e->x * TILE_SIZE, 1, e->y * TILE_SIZE}, TILE_SIZE, TILE_SIZE, TILE_SIZE, WHITE);
@@ -483,11 +482,11 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                     const int zpos = e->y * TILE_SIZE;
                     const Vector3 pos = {xpos, ypos, zpos};
                     const Vector3 size = {TILE_SIZE, TILE_SIZE, TILE_SIZE};
-                    Rectangle src = sg->sprites[sg->current]->src;
-                    src.width = 8;
-                    src.height = 8;
-                    src.x = 12;
-                    src.y = 12;
+                    //Rectangle src = sg->sprites[sg->current]->src;
+                    //src.width = 8;
+                    //src.height = 8;
+                    //src.x = 12;
+                    //src.y = 12;
                     DrawTexturedCubeBack(tex, pos, size, (Rectangle){12, 12, 8, 8});
                     //DrawCubeWires(
                     //    (Vector3){e->x * TILE_SIZE, 1, e->y * TILE_SIZE}, TILE_SIZE, TILE_SIZE, TILE_SIZE, color);
@@ -516,11 +515,11 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                     const int zpos = e->y * TILE_SIZE;
                     const Vector3 pos = {xpos, ypos, zpos};
                     const Vector3 size = {TILE_SIZE, TILE_SIZE, TILE_SIZE};
-                    Rectangle src = sg->sprites[sg->current]->src;
-                    src.width = 8;
-                    src.height = 8;
-                    src.x = 12;
-                    src.y = 12;
+                    //Rectangle src = sg->sprites[sg->current]->src;
+                    //src.width = 8;
+                    //src.height = 8;
+                    //src.x = 12;
+                    //src.y = 12;
                     DrawTexturedCubeBack(tex, pos, size, (Rectangle){12, 12, 8, 8});
                 }
             }
