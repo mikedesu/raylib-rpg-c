@@ -234,67 +234,70 @@ static inline void DrawTexturedCube(Texture2D* tex, Vector3 pos, Vector3 size, R
     float u1 = (src.x + src.width) / tex->width;
     float v1 = (src.y + src.height) / tex->height;
 
+    float vt0 = v1;
+    float vt1 = v0;
+
     rlSetTexture(tex->id);
     rlBegin(RL_QUADS);
 
     // FRONT (-Z)
-    rlTexCoord2f(u0, v0);
+    rlTexCoord2f(u0, vt0);
     rlVertex3f(x - w, y + h, z - d);
-    rlTexCoord2f(u1, v0);
+    rlTexCoord2f(u1, vt0);
     rlVertex3f(x + w, y + h, z - d);
-    rlTexCoord2f(u1, v1);
+    rlTexCoord2f(u1, vt1);
     rlVertex3f(x + w, y - h, z - d);
-    rlTexCoord2f(u0, v1);
+    rlTexCoord2f(u0, vt1);
     rlVertex3f(x - w, y - h, z - d);
 
     // BACK (+Z)
-    rlTexCoord2f(u0, v0);
+    rlTexCoord2f(u0, vt0);
     rlVertex3f(x + w, y + h, z + d);
-    rlTexCoord2f(u1, v0);
+    rlTexCoord2f(u1, vt0);
     rlVertex3f(x - w, y + h, z + d);
-    rlTexCoord2f(u1, v1);
+    rlTexCoord2f(u1, vt1);
     rlVertex3f(x - w, y - h, z + d);
-    rlTexCoord2f(u0, v1);
+    rlTexCoord2f(u0, vt1);
     rlVertex3f(x + w, y - h, z + d);
 
     // TOP (+Y)
-    rlTexCoord2f(u0, v0);
+    rlTexCoord2f(u0, vt0);
     rlVertex3f(x - w, y + h, z + d);
-    rlTexCoord2f(u1, v0);
+    rlTexCoord2f(u1, vt0);
     rlVertex3f(x + w, y + h, z + d);
-    rlTexCoord2f(u1, v1);
+    rlTexCoord2f(u1, vt1);
     rlVertex3f(x + w, y + h, z - d);
-    rlTexCoord2f(u0, v1);
+    rlTexCoord2f(u0, vt1);
     rlVertex3f(x - w, y + h, z - d);
 
     // BOTTOM (-Y)
-    rlTexCoord2f(u0, v0);
+    rlTexCoord2f(u0, vt0);
     rlVertex3f(x - w, y - h, z - d);
-    rlTexCoord2f(u1, v0);
+    rlTexCoord2f(u1, vt0);
     rlVertex3f(x + w, y - h, z - d);
-    rlTexCoord2f(u1, v1);
+    rlTexCoord2f(u1, vt1);
     rlVertex3f(x + w, y - h, z + d);
-    rlTexCoord2f(u0, v1);
+    rlTexCoord2f(u0, vt1);
     rlVertex3f(x - w, y - h, z + d);
 
     // LEFT (-X)
-    rlTexCoord2f(u0, v0);
+    rlTexCoord2f(u0, vt0);
     rlVertex3f(x - w, y + h, z + d);
-    rlTexCoord2f(u1, v0);
+    rlTexCoord2f(u1, vt0);
     rlVertex3f(x - w, y + h, z - d);
-    rlTexCoord2f(u1, v1);
+    rlTexCoord2f(u1, vt1);
     rlVertex3f(x - w, y - h, z - d);
-    rlTexCoord2f(u0, v1);
+    rlTexCoord2f(u0, vt1);
     rlVertex3f(x - w, y - h, z + d);
 
     // RIGHT (+X)
-    rlTexCoord2f(u0, v0);
+    rlTexCoord2f(u0, vt0);
     rlVertex3f(x + w, y + h, z - d);
-    rlTexCoord2f(u1, v0);
+    rlTexCoord2f(u1, vt0);
     rlVertex3f(x + w, y + h, z + d);
-    rlTexCoord2f(u1, v1);
+    rlTexCoord2f(u1, vt1);
     rlVertex3f(x + w, y - h, z + d);
-    rlTexCoord2f(u0, v1);
+    rlTexCoord2f(u0, vt1);
     rlVertex3f(x + w, y - h, z - d);
 
     rlEnd();

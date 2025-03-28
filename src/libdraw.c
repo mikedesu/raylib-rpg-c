@@ -135,12 +135,22 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
 
 static void draw_wall_tiles_3d(const gamestate* g, const dungeon_floor_t* floor) {
     const float TILE_SIZE = 1.0f;
-    const float TILE_HEIGHT = 2.0f;
+    const float TILE_HEIGHT = 1.0f;
     for (int y = 0; y < floor->height; y++) {
         for (int x = 0; x < floor->width; x++) {
             dungeon_tile_t* t = &floor->tiles[y][x];
             if (!dungeon_tile_is_wall(t->type)) continue;
-            DrawCube((Vector3){x * TILE_SIZE, 0.5f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, DARKBROWN);
+            //DrawCube((Vector3){x * TILE_SIZE, 0.5f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, DARKBROWN);
+            int txkey = get_txkey_for_tiletype(t->type);
+            Texture2D* tex = &txinfo[txkey].texture;
+            if (!tex) {
+                merrorint("draw_wall_tiles_3d: texture not loaded", txkey);
+                continue;
+            }
+            const Vector3 pos = {x * TILE_SIZE, 0.5f, y * TILE_SIZE};
+            const Vector3 size = {TILE_SIZE, TILE_HEIGHT, TILE_SIZE};
+            DrawTexturedCube(tex, pos, size, (Rectangle){12, 12, 8, 8});
+            //DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
         }
     }
 }

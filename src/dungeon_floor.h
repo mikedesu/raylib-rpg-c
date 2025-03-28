@@ -2,6 +2,7 @@
 
 #include "dungeon_tile.h"
 #include "entityid.h"
+#include "raylib.h"
 #include <stdbool.h>
 
 #define DEFAULT_DUNGEON_FLOOR_WIDTH 128
@@ -47,13 +48,7 @@ void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y);
 void df_set_tile_perimeter(dungeon_floor_t* const df, tiletype_t type, int x, int y, int w, int h);
 void df_init_test(dungeon_floor_t* const df);
 
-void df_set_tile_area_range(dungeon_floor_t* const df,
-                            int x,
-                            int y,
-                            int w,
-                            int h,
-                            tiletype_t begin,
-                            tiletype_t end);
+void df_set_tile_area_range(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end);
 
 void df_set_tile_perimeter_range(dungeon_floor_t* const df,
                                  tiletype_t begin,
@@ -63,23 +58,17 @@ void df_set_tile_perimeter_range(dungeon_floor_t* const df,
                                  int w,
                                  int h);
 
-void df_set_event(dungeon_floor_t* const df,
-                  int x,
-                  int y,
-                  int event_id,
-                  tiletype_t on_type,
-                  tiletype_t off_type);
+void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type);
 
 void df_reset_plates(dungeon_floor_t* const df);
 void df_reset_events(dungeon_floor_t* const df);
 bool df_malloc_tiles(dungeon_floor_t* const df);
 void df_init_rect(dungeon_floor_t* df, int x, int y, int w, int h, tiletype_t t1, tiletype_t t2);
 
-void df_create_trap_event(dungeon_floor_t* df,
-                          int x,
-                          int y,
-                          tiletype_t on,
-                          tiletype_t off,
-                          df_event_id id);
+void df_create_trap_event(dungeon_floor_t* df, int x, int y, tiletype_t on, tiletype_t off, df_event_id id);
 
 void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id);
+
+void df_set_tile_area_range2(dungeon_floor_t* const df, Rectangle r, tiletype_t begin, tiletype_t end);
+
+void df_init_rect2(dungeon_floor_t* df, Rectangle r, tiletype_t t1, tiletype_t t2);

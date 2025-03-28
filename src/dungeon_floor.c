@@ -4,6 +4,7 @@
 //#include "libgame_defines.h"
 #include "libgame_defines.h"
 #include "mprint.h"
+#include "raylib.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -59,10 +60,16 @@ void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletyp
 
 void df_init_test(dungeon_floor_t* df) {
     // Rooms
-    df_init_rect(df, 0, 0, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-    df_init_rect(df, 0, 5, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-    df_init_rect(df, 5, 0, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-    df_init_rect(df, 5, 5, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    //df_init_rect(df, 0, 0, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    //df_init_rect(df, 0, 5, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    //df_init_rect(df, 5, 0, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    //df_init_rect(df, 5, 5, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+
+    df_init_rect2(df, (Rectangle){0, 0, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    df_init_rect2(df, (Rectangle){0, 5, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    df_init_rect2(df, (Rectangle){5, 0, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    df_init_rect2(df, (Rectangle){5, 5, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+
     // Trap + Switch
     df_create_trap_event(df, 1, 4, TILE_FLOOR_STONE_TRAP_ON_00, TILE_FLOOR_STONE_TRAP_OFF_00, 1);
     //df_create_trap_event(df, 1, 4, TILE_STONE_WALL_00, TILE_FLOOR_STONE_00, 1);
@@ -263,6 +270,25 @@ bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {
     return dungeon_tile_is_wall(tile->type);
 }
 
+void df_set_tile_area_range2(dungeon_floor_t* const df, Rectangle r, tiletype_t begin, tiletype_t end) {
+    if (!df) return;
+    tiletype_t begin_type = begin;
+    tiletype_t end_type = end;
+    if (end_type < begin_type) {
+        tiletype_t temp = begin_type;
+        begin_type = end_type;
+        end_type = temp;
+    }
+    int num_types = end_type - begin_type + 1;
+    for (int i = r.y; i < r.y + r.height; i++) {
+        for (int j = r.x; j < r.x + r.width; j++) {
+            dungeon_tile_t* current = dungeon_floor_tile_at(df, j, i);
+            tiletype_t type = begin_type + (rand() % num_types);
+            dungeon_tile_init(current, type);
+        }
+    }
+}
+
 void df_set_tile_area_range(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end) {
     if (!df) return;
     tiletype_t begin_type = begin;
@@ -320,6 +346,12 @@ void df_init_rect(dungeon_floor_t* df, int x, int y, int w, int h, tiletype_t t1
     df_set_tile_area_range(df, x, y, w, h, t1, t2);
 }
 
+void df_init_rect2(dungeon_floor_t* df, Rectangle r, tiletype_t t1, tiletype_t t2) {
+    if (!df || r.width <= 0 || r.height <= 0) return;
+    //df_set_tile_area_range(df, r.x, r.y, r.width, r.height, t1, t2);
+    df_set_tile_area_range2(df, r, t1, t2);
+}
+
 void df_create_trap_event(dungeon_floor_t* df, int x, int y, tiletype_t on, tiletype_t off, df_event_id id) {
     if (!df || id >= DEFAULT_DF_EVENTS) return;
     df->events[id] = (df_event_t){.listen_event = id, .x = x, .y = y, .on_type = on, .off_type = off};
@@ -328,6 +360,7 @@ void df_create_trap_event(dungeon_floor_t* df, int x, int y, tiletype_t on, tile
 
 void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id) {
     if (!df) return;
-    df_set_tile(df, TILE_STONE_WALL_02, x, y);
+    tiletype_t type = TILE_STONE_WALL_02;
+    df_set_tile(df, type, x, y);
     dungeon_floor_set_wall_switch(df, x, y, up, down, trigger_id);
 }
