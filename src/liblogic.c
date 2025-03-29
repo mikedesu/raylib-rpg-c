@@ -9,8 +9,10 @@
 #include "entitytype.h"
 #include "gamestate.h"
 #include "libgame_defines.h"
+#include "massert.h"
 #include "mprint.h"
 #include "race.h"
+#include <assert.h>
 #include <math.h>
 #include <raylib.h>
 #include <stdlib.h>
@@ -609,37 +611,37 @@ bool liblogic_player_on_tile(const gamestate* const g, int x, int y, int floor) 
     return false;
 }
 
-int liblogic_tile_npc_count(const gamestate* const g, int x, int y, int floor) {
-    if (!g) {
-        merror("liblogic_tile_npc_count: gamestate is NULL");
-        return -1;
-    }
-
-    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
-    if (!df) {
-        merror("liblogic_tile_npc_count: failed to get dungeon floor");
-        return -1;
-    }
-
-    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-    if (!tile) {
-        merror("liblogic_tile_npc_count: failed to get tile");
-        return -1;
-    }
-
-    // enumerate entities and check their type
-    int count = 0;
-    for (int i = 0; i < tile->entity_max; i++) {
-        if (tile->entities[i] == -1) { continue; }
-        const entity* const e = em_get(g->entitymap, tile->entities[i]);
-        if (!e) {
-            merror("liblogic_tile_npc_count: failed to get entity");
-            return -1;
-        }
-        if (e->type == ENTITY_NPC) { count++; }
-    }
-    return count;
-}
+//int liblogic_tile_npc_count(const gamestate* const g, int x, int y, int floor) {
+//    if (!g) {
+//        merror("liblogic_tile_npc_count: gamestate is NULL");
+//        return -1;
+//    }
+//
+//    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
+//    if (!df) {
+//        merror("liblogic_tile_npc_count: failed to get dungeon floor");
+//        return -1;
+//    }
+//
+//    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+//    if (!tile) {
+//        merror("liblogic_tile_npc_count: failed to get tile");
+//        return -1;
+//    }
+//
+//    // enumerate entities and check their type
+//    int count = 0;
+//    for (int i = 0; i < tile->entity_max; i++) {
+//        if (tile->entities[i] == -1) { continue; }
+//        const entity* const e = em_get(g->entitymap, tile->entities[i]);
+//        if (!e) {
+//            merror("liblogic_tile_npc_count: failed to get entity");
+//            return -1;
+//        }
+//        if (e->type == ENTITY_NPC) { count++; }
+//    }
+//    return count;
+//}
 
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     if (!is) {
@@ -936,47 +938,31 @@ entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, in
 }
 
 entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
-    if (!g) {
-        merror("liblogic_entity_create: gamestate is NULL");
-        return -1;
-    }
+    massert(g, "liblogic_npc_create: gamestate is NULL");
+
     em_t* em = gamestate_get_entitymap(g);
-    if (!em) {
-        merror("liblogic_entity_create: em is NULL");
-        return -1;
-    }
-    if (!name || !name[0]) {
-        merror("liblogic_entity_create: name is NULL or empty");
-        return -1;
-    }
-    // check type
-    if (rt < 0 || rt >= RACE_COUNT) {
-        merror("liblogic_entity_create: race_type is out of bounds");
-        return -1;
-    }
-    // check x and y
+    massert(em, "liblogic_npc_create: entitymap is NULL");
+    massert(name && name[0], "liblogic_npc_create: name is NULL or empty");
+    massert(rt >= 0, "liblogic_entity_create: race_type is out of bounds");
+    massert(rt < RACE_COUNT, "liblogic_entity_create: race_type is out of bounds");
+
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
-    if (!df) {
-        merror("liblogic_entity_create: failed to get current dungeon floor");
-        return -1;
-    }
-    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-        merrorint2("liblogic_entity_create: x or y is out of bounds", x, y);
-        return -1;
-    }
+    massert(df, "liblogic_entity_create: failed to get current dungeon floor");
+    massert(x >= 0, "liblogic_entity_create: x is out of bounds");
+    massert(x < df->width, "liblogic_entity_create: x is out of bounds");
+    massert(y >= 0, "liblogic_entity_create: y is out of bounds");
+    massert(y < df->height, "liblogic_entity_create: y is out of bounds");
+
     // can we create an entity at this location? no entities can be made on wall-types etc
     dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-    if (!tile) {
-        merror("liblogic_entity_create: failed to get tile");
-        return -1;
-    }
+    massert(tile, "liblogic_entity_create: failed to get tile");
 
-    if (dungeon_tile_is_wall(tile->type)) {
+    if (!dungeon_tile_is_walkable(tile->type)) {
         merror("liblogic_entity_create: cannot create entity on wall");
         return -1;
     }
 
-    if (liblogic_tile_npc_count(g, x, y, fl) > 0) {
+    if (dungeon_tile_has_live_npcs(tile, em)) {
         merror("liblogic_entity_create: cannot create entity on tile with NPC");
         return -1;
     }
@@ -991,8 +977,7 @@ entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl
     em_add(em, e);
     gamestate_add_entityid(g, e->id);
     dungeon_floor_add_at(df, e->id, x, y);
-
-    msuccessint2("Created entity at", x, y);
+    //msuccessint2("Created entity at", x, y);
     return e->id;
 }
 

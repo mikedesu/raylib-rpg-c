@@ -91,7 +91,7 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                     }
                     Texture2D* tex = sg->sprites[sg->current]->texture;
                     if (!tex) {
-                        merrorint("draw_entities_3d: player texture NULL", sg->tx_keys[sg->current]);
+                        merror("draw_entities_3d: player texture NULL");
                         continue;
                     }
                     const float xpos = e->x * TSIZE, ypos = 1, zpos = e->y * TSIZE;
@@ -113,7 +113,8 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                     // get the entity's current sprite's texture
                     Texture2D* tex = sg->sprites[sg->current]->texture;
                     if (!tex) {
-                        merrorint("draw_entities_3d: texture NULL", sg->tx_keys[sg->current]);
+                        //merrorint("draw_entities_3d: texture NULL", sg->tx_keys[sg->current]);
+                        merror("draw_entities_3d: texture NULL");
                         continue;
                     }
                     // get the entity's current sprite's source rectangle
@@ -877,7 +878,8 @@ void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group,
     //minfoint2("libdraw_update_sprite_context: updating sprite context for entity", id, dir);
     //spritegroup_t* group = hashtable_entityid_spritegroup_get(spritegroups, id); // Adjusted for no specifier
     if (!group) {
-        merrorint("libdraw_update_sprite_context: group is NULL", id);
+        merror("libdraw_update_sprite_context: group is NULL");
+        //merrorint("libdraw_update_sprite_context: group is NULL", id);
         return;
     }
     const int old_ctx = group->sprites[group->current]->currentcontext;
