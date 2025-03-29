@@ -200,8 +200,7 @@ void liblogic_init(gamestate* const g) {
     dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     gamestate_init_entityids(g);
     g->entitymap = em_new();
-    int herox = 2;
-    int heroy = 2;
+    const int herox = 2, heroy = 2;
     if (liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero") == -1) {
         merror("liblogic_init: failed to init hero");
     }
@@ -213,26 +212,17 @@ void liblogic_init(gamestate* const g) {
     }
     g->entity_turn = g->hero_id;
     // create some orcs with names
-    //entityid orc0 = liblogic_npc_create(g, RACE_ORC, 8, 2, 0, "orc-mover");
-    //entityid orc1 = liblogic_npc_create(g, RACE_ORC, 8, 3, 0, "orc-attacker");
-    //entityid orc2 = liblogic_npc_create(g, RACE_ORC, 8, 4, 0, "orc-mover");
-    int orc_x = 0;
-    int orc_y = 6;
-    //int rows = 10;
-    //int cols = 10;
-    //int rows = 34;
-    //int cols = 30;
+    const int orc_x = 0, orc_y = 6, total_orcs_to_make = 4;
     int count = 0;
-    int total_orcs_to_make = 4;
-    dungeon_t* d = g->dungeon;
-    dungeon_floor_t* df = d->floors[0];
-    if (!df) {
-        merror("liblogic_init: failed to get dungeon floor");
-        return;
-    }
-    // lets test setting a pressure plate
-    //dungeon_floor_set_pressure_plate(df, 9, 2, TX_PRESSURE_PLATE_UP_00, TX_PRESSURE_PLATE_DOWN_00, 666);
-    //dungeon_floor_set_wall_switch(df, herox, heroy - 2, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, 777);
+    dungeon_t* const d = g->dungeon;
+    massert(d, "liblogic_init: dungeon is NULL");
+    //dungeon_floor_t* const df = d->floors[0];
+    dungeon_floor_t* const df = dungeon_get_floor(d, 0);
+    massert(df, "liblogic_init: dungeon floor is NULL");
+    //if (!df) {
+    //    merror("liblogic_init: failed to get dungeon floor");
+    //    return;
+    //}
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             if (count >= total_orcs_to_make) { break; }
@@ -246,19 +236,6 @@ void liblogic_init(gamestate* const g) {
         }
         if (count >= total_orcs_to_make) { break; }
     }
-    //entity* const e0 = em_get(g->entitymap, orc0);
-    //entity* const e1 = em_get(g->entitymap, orc1);
-    //entity* const e2 = em_get(g->entitymap, orc2);
-    //entity_set_maxhp(e0, 3);
-    //entity_set_maxhp(e1, 3);
-    //entity_set_maxhp(e2, 3);
-    //entity_set_hp(e0, 3);
-    //entity_set_hp(e1, 3);
-    //entity_set_hp(e2, 3);
-    //entity_action_t action = ENTITY_ACTION_MOVE_PLAYER;
-    //entity_set_default_action(e0, action);
-    //entity_set_default_action(e1, action);
-    //entity_set_default_action(e2, action);
     liblogic_update_debug_panel_buffer(g);
 }
 
@@ -282,15 +259,12 @@ void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
 void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
+    liblogic_handle_camera_move(g, is);
+    liblogic_handle_camera_zoom(g, is);
+}
+
+void liblogic_handle_camera_move(gamestate* const g, const inputstate* const is) {
     const float move = g->cam2d.zoom;
-    //if (!is) {
-    //    merror("Input state is NULL!");
-    //    return;
-    //}
-    //if (!g) {
-    //    merror("Game state is NULL!");
-    //    return;
-    //}
     if (inputstate_is_held(is, KEY_RIGHT)) {
         g->cam2d.offset.x += move;
         return;
@@ -313,17 +287,6 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
         g->controlmode = CONTROLMODE_PLAYER;
         return;
     }
-
-    liblogic_handle_camera_zoom(g, is);
-    //if (inputstate_is_held(is, KEY_Z)) {
-    //    //msuccess("Z held!");
-    //    if (inputstate_is_shift_held(is)) {
-    //        g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
-    //    } else {
-    //        g->cam2d.zoom += DEFAULT_ZOOM_INCR;
-    //    }
-    //    return;
-    //}
 }
 
 void liblogic_handle_camera_zoom(gamestate* const g, const inputstate* const is) {

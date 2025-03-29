@@ -36,5 +36,6 @@ void liblogic_try_entity_attack_player(gamestate* const g, entity* const e);
 void liblogic_try_entity_move_attack_player(gamestate* const g, entity* const e);
 //void liblogic_handle_camera_zoom(gamestate* const g, inputstate* const is);
 void liblogic_handle_camera_zoom(gamestate* const g, const inputstate* const is);
+void liblogic_handle_camera_move(gamestate* const g, const inputstate* const is);
 
 entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
