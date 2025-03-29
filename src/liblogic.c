@@ -928,8 +928,8 @@ entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, in
         return NULL;
     }
 
-    //entityid id = liblogic_npc_create(g, rt, x, y, fl, name);
-    entityid id = liblogic_npc_create(NULL, rt, x, y, fl, name);
+    entityid id = liblogic_npc_create(g, rt, x, y, fl, name);
+    //entityid id = liblogic_npc_create(NULL, rt, x, y, fl, name);
     if (id == -1) {
         merror("liblogic_npc_create_ptr: failed to create NPC");
         return NULL;

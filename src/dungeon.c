@@ -1,5 +1,6 @@
 // dungeon.c
 #include "dungeon.h"
+#include "massert.h"
 #include "mprint.h"
 #include <stdlib.h>
 
@@ -7,10 +8,11 @@
 
 dungeon_t* dungeon_create() {
     dungeon_t* dungeon = malloc(sizeof(dungeon_t));
-    if (!dungeon) {
-        merror("dungeon_create: dungeon malloc failed");
-        return NULL;
-    }
+    massert(dungeon, "dungeon_create: dungeon malloc failed");
+    //if (!dungeon) {
+    //    merror("dungeon_create: dungeon malloc failed");
+    //    return NULL;
+    //}
     dungeon->floors = malloc(sizeof(dungeon_floor_t*) * INITIAL_DUNGEON_CAPACITY);
     if (!dungeon->floors) {
         merror("dungeon_create: dungeon->floors malloc failed");
@@ -24,10 +26,11 @@ dungeon_t* dungeon_create() {
 }
 
 void dungeon_destroy(dungeon_t* dungeon) {
-    if (!dungeon) {
-        merror("dungeon_destroy: dungeon is NULL");
-        return;
-    }
+    massert(dungeon, "dungeon_destroy: dungeon is NULL");
+    //if (!dungeon) {
+    //    merror("dungeon_destroy: dungeon is NULL");
+    //    return;
+    //}
     for (int i = 0; i < dungeon->num_floors; i++) { dungeon_floor_free(dungeon->floors[i]); }
     free(dungeon->floors);
     free(dungeon);
@@ -35,10 +38,12 @@ void dungeon_destroy(dungeon_t* dungeon) {
 }
 
 const bool dungeon_add_floor(dungeon_t* const dungeon, const int width, const int height) {
-    if (!dungeon || dungeon->is_locked) {
-        merror("dungeon_add_floor: dungeon is NULL or locked");
-        return false;
-    }
+    massert(dungeon, "dungeon_add_floor: dungeon is NULL");
+    massert(!dungeon->is_locked, "dungeon_add_floor: dungeon is locked");
+    //if (!dungeon || dungeon->is_locked) {
+    //    merror("dungeon_add_floor: dungeon is NULL or locked");
+    //    return false;
+    //}
     if (dungeon->num_floors >= dungeon->capacity_floors) {
         int new_capacity = dungeon->capacity_floors * 2;
         dungeon_floor_t** new_floors = realloc(dungeon->floors, sizeof(dungeon_floor_t*) * new_capacity);
@@ -56,18 +61,20 @@ const bool dungeon_add_floor(dungeon_t* const dungeon, const int width, const in
 }
 
 void dungeon_lock(dungeon_t* dungeon) {
-    if (!dungeon) {
-        merror("dungeon_lock: dungeon is NULL");
-        return;
-    }
+    massert(dungeon, "dungeon_lock: dungeon is NULL");
+    //if (!dungeon) {
+    //    merror("dungeon_lock: dungeon is NULL");
+    //    return;
+    //}
     dungeon->is_locked = true;
 }
 
 void dungeon_unlock(dungeon_t* dungeon) {
-    if (!dungeon) {
-        merror("dungeon_unlock: dungeon is NULL");
-        return;
-    }
+    massert(dungeon, "dungeon_unlock: dungeon is NULL");
+    //if (!dungeon) {
+    //    merror("dungeon_unlock: dungeon is NULL");
+    //    return;
+    //}
     dungeon->is_locked = false;
 }
 
@@ -81,18 +88,21 @@ const int dungeon_num_floors(const dungeon_t* const dungeon) {
 
 dungeon_floor_t* dungeon_get_floor(dungeon_t* const dungeon, const int index) {
     // break this up into multiple if-elses with merror calls
-    if (!dungeon) {
-        merror("dungeon_get_floor: dungeon is NULL");
-        return NULL;
-    }
-    if (index < 0) {
-        merror("dungeon_get_floor: index is negative");
-        return NULL;
-    }
-    if (index >= dungeon->num_floors) {
-        merror("dungeon_get_floor: index is out of bounds");
-        return NULL;
-    }
+    massert(dungeon, "dungeon_get_floor: dungeon is NULL");
+    //if (!dungeon) {
+    //    merror("dungeon_get_floor: dungeon is NULL");
+    //    return NULL;
+    //}
+    massert(index >= 0, "dungeon_get_floor: index is negative");
+    //if (index < 0) {
+    //    merror("dungeon_get_floor: index is negative");
+    //    return NULL;
+    //}
+    massert(index < dungeon->num_floors, "dungeon_get_floor: index is out of bounds");
+    //if (index >= dungeon->num_floors) {
+    //    merror("dungeon_get_floor: index is out of bounds");
+    //    return NULL;
+    //}
     return dungeon->floors[index];
 }
 
