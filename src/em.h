@@ -14,10 +14,10 @@ typedef struct {
 
 em_t* em_new();
 
-entity_t* const em_get(em_t* em, const entityid id);
-entity_t* em_get_last(em_t* em, const entityid id);
-entity_t* em_add(em_t* em, entity_t* e);
-entity_t* em_remove_last(em_t* em, const entityid id);
+entity_t* const em_get(const em_t* const em, entityid id);
+entity_t* em_get_last(const em_t* const em, entityid id);
+entity_t* em_add(em_t* const em, entity_t* const e);
+entity_t* em_remove_last(em_t* const em, entityid id);
 
 const int em_count(const em_t* const em);
 

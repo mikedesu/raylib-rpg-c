@@ -7,7 +7,7 @@
 em_t* em_new() {
     em_t* em = malloc(sizeof(em_t));
     massert(em, "em_new: em malloc failed");
-    for (int i = 0; i < EM_MAX_SLOTS; i++) { em->entities[i] = NULL; }
+    for (int i = 0; i < EM_MAX_SLOTS; i++) em->entities[i] = NULL;
     em->count = 0;
     em->max_slots = EM_MAX_SLOTS;
     return em;
@@ -32,7 +32,7 @@ void em_free(em_t* em) {
 }
 
 // returns the first item in the set which will be the oldest
-entity_t* const em_get(em_t* em, const entityid id) {
+entity_t* const em_get(const em_t* const em, entityid id) {
     massert(em, "em_get: em is NULL");
     if (id < 0) { return NULL; }
     const int hash = id % EM_MAX_SLOTS;
@@ -40,7 +40,7 @@ entity_t* const em_get(em_t* em, const entityid id) {
     return em->entities[hash];
 }
 
-entity_t* em_get_last(em_t* em, const entityid id) {
+entity_t* em_get_last(const em_t* const em, entityid id) {
     massert(em, "em_get_last: em is NULL");
     massert(id >= 0, "em_get_last: id is less than 0");
     const int hash = id % EM_MAX_SLOTS;
@@ -51,7 +51,7 @@ entity_t* em_get_last(em_t* em, const entityid id) {
     return current;
 }
 
-entity_t* em_add(em_t* em, entity_t* e) {
+entity_t* em_add(em_t* const em, entity_t* const e) {
     massert(em, "em_add: em is NULL");
     massert(e, "em_add: entity is NULL");
     const int hash = e->id % EM_MAX_SLOTS;
@@ -69,7 +69,7 @@ entity_t* em_add(em_t* em, entity_t* e) {
     return e;
 }
 
-entity_t* em_remove_last(em_t* em, const entityid id) {
+entity_t* em_remove_last(em_t* const em, entityid id) {
     massert(em, "em_remove_last: em is NULL");
     massert(id >= 0, "em_remove_last: id is less than 0");
     const int hash = id % EM_MAX_SLOTS;
