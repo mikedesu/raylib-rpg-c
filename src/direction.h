@@ -10,5 +10,6 @@ typedef enum direction_t {
     DIR_UP_RIGHT,
     DIR_DOWN_LEFT,
     DIR_DOWN_RIGHT,
+    DIR_UNKNOWN,
     DIR_COUNT
 } direction_t;
