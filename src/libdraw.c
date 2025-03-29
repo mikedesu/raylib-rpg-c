@@ -5,18 +5,16 @@
 #include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
+#include "libdraw_cube.h"
+#include "libdraw_plane.h"
 #include "mprint.h"
 #include "race.h"
+#include "rlgl.h"
 #include "sprite.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
 #include "tx_keys.h"
-//#include "raylib.h"
-//#include "libdraw_billboard.h"
-#include "libdraw_cube.h"
-#include "libdraw_plane.h"
-#include "rlgl.h"
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
@@ -33,7 +31,6 @@ Shader shader_grayscale = {0};
 Shader shader_tile_glow = {0};
 
 RenderTexture2D target = {0};
-//Rectangle target_src = {0, 0, 800, 480};
 Rectangle target_src = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 Rectangle target_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 Vector2 target_origin = {0, 0};
@@ -58,11 +55,7 @@ static void draw_dungeon_tiles_3d(const gamestate* const g, const dungeon_floor_
             }
             const Vector3 pos = {x * TW, -0.5f, y * TD};
             const Vector3 size = {TW, TH, TD};
-            //const Vector2 size = {TW, TH};
-            //DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
             DrawTexturedPlane(tex, pos, size, (Rectangle){12, 12, 8, 8});
-            //DrawPlane(pos, size, WHITE);
-            //DrawDebugPlane(tex);
         }
     }
 }
@@ -77,11 +70,7 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                 entityid id = tile_get_entity(t, i);
                 entity_t* e = em_get(g->entitymap, id);
                 if (!e || e->is_dead != dead_only) continue;
-                //Color color = (e->type == ENTITY_PLAYER) ? Fade((Color){0, 0, 255}, 0.8f) : RED;
-                //Color color = (e->type == ENTITY_PLAYER) ? Fade(BLUE, 0.5f) : RED;
                 if (e->type == ENTITY_PLAYER) {
-                    //DrawCubeWires(
-                    //    (Vector3){e->x * TILE_SIZE, 1, e->y * TILE_SIZE}, TILE_SIZE, TILE_SIZE, TILE_SIZE, WHITE);
                     // get the player's texture
                     // it can be gotten off the player's spritegroup
                     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
@@ -121,13 +110,7 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                     const int xpos = e->x * TSIZE, ypos = 1, zpos = e->y * TSIZE;
                     const Vector3 pos = {xpos, ypos, zpos};
                     const Vector3 size = {TSIZE, TSIZE, TSIZE};
-                    //const Vector2 size = {TSIZE, TSIZE};
-                    //DrawTexturedCubeBack(tex, pos, size, (Rectangle){12, 12, 8, 8});
                     DrawTexturedCubeTopOnlyInverted(tex, pos, size, (Rectangle){12, 12, 8, 8});
-                    //DrawBillboard(g->cam3d, *tex, (Vector3){e->x, 0.5f, e->y}, 1.0f, WHITE);
-                    //DrawBillboard(g->cam3d, *tex, pos, 1.0f, WHITE);
-                    //DrawBillboardFromRect(g->cam3d, tex, pos, size, sg->sprites[sg->current]->src, WHITE);
-                    //DrawBillboardFromRect(g->cam3d, tex, pos, size, (Rectangle){12, 12, 8, 8}, WHITE);
                 }
             }
         }

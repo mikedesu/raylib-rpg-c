@@ -166,16 +166,16 @@ void liblogic_try_entity_move_attack_player(gamestate* const g, entity* const e)
     }
 }
 
-bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1) {
+bool liblogic_entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
     massert(g, "liblogic_entities_adjacent: gamestate is NULL");
-    entity* const e0 = em_get(g->entitymap, eid0);
+    entity* const e0 = em_get(g->entitymap, id0);
     if (!e0) {
-        merrorint("liblogic_entities_adjacent: entity not found", eid0);
+        merrorint("liblogic_entities_adjacent: entity not found", id0);
         return false;
     }
-    entity* const e1 = em_get(g->entitymap, eid1);
+    entity* const e1 = em_get(g->entitymap, id1);
     if (!e1) {
-        merrorint("liblogic_entities_adjacent: entity not found", eid1);
+        merrorint("liblogic_entities_adjacent: entity not found", id1);
         return false;
     }
     // use e0 and check the surrounding 8 tiles
@@ -191,15 +191,28 @@ bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1
 void liblogic_init(gamestate* const g) {
     massert(g, "liblogic_init: gamestate is NULL");
     srand(time(NULL));
-    // init the dungeon and dungeon floor
-    g->dungeon = dungeon_create();
-    if (!g->dungeon) {
-        merror("liblogic_init: failed to init dungeon");
-        return;
-    }
-    dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    liblogic_init_dungeon(g);
     gamestate_init_entityids(g);
+    liblogic_init_em(g);
+    liblogic_init_player(g);
+    liblogic_init_orcs_test(g);
+    liblogic_update_debug_panel_buffer(g);
+}
+
+void liblogic_init_dungeon(gamestate* const g) {
+    massert(g, "liblogic_init_dungeon: gamestate is NULL");
+    g->dungeon = dungeon_create();
+    massert(g->dungeon, "liblogic_init_dungeon: failed to init dungeon");
+    dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+}
+
+void liblogic_init_em(gamestate* const g) {
+    massert(g, "liblogic_init: gamestate is NULL");
     g->entitymap = em_new();
+}
+
+void liblogic_init_player(gamestate* const g) {
+    massert(g, "liblogic_init: gamestate is NULL");
     const int herox = 2, heroy = 2;
     if (liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero") == -1) {
         merror("liblogic_init: failed to init hero");
@@ -211,7 +224,9 @@ void liblogic_init(gamestate* const g) {
         entity_set_hp(hero, 3);
     }
     g->entity_turn = g->hero_id;
-    // create some orcs with names
+}
+
+void liblogic_init_orcs_test(gamestate* const g) {
     const int orc_x = 0, orc_y = 6, total_orcs_to_make = 4;
     int count = 0;
     dungeon_t* const d = g->dungeon;
@@ -219,10 +234,6 @@ void liblogic_init(gamestate* const g) {
     //dungeon_floor_t* const df = d->floors[0];
     dungeon_floor_t* const df = dungeon_get_floor(d, 0);
     massert(df, "liblogic_init: dungeon floor is NULL");
-    //if (!df) {
-    //    merror("liblogic_init: failed to get dungeon floor");
-    //    return;
-    //}
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             if (count >= total_orcs_to_make) { break; }
@@ -232,11 +243,10 @@ void liblogic_init(gamestate* const g) {
             entity_set_maxhp(orc, 1);
             entity_set_hp(orc, 1);
             count++;
-            if (count >= total_orcs_to_make) { break; }
+            if (count >= total_orcs_to_make) break;
         }
-        if (count >= total_orcs_to_make) { break; }
+        if (count >= total_orcs_to_make) break;
     }
-    liblogic_update_debug_panel_buffer(g);
 }
 
 void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
