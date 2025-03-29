@@ -108,7 +108,7 @@ void gamestatefree(gamestate* g) {
     //free(g->timebegantm);
     //free(g->currenttimetm);
     minfo("Freeing dungeon");
-    dungeon_destroy(g->dungeon);
+    if (g->dungeon) dungeon_destroy(g->dungeon);
     minfo("Freeing g...");
     free(g);
     msuccess("Freed gamestate");
