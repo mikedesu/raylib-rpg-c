@@ -7,6 +7,5 @@ typedef enum {
     ENTITY_WEAPON,
     ENTITY_SHIELD,
     ENTITY_ITEM,
-    ENTITY_COUNT
-
+    ENTITY_TYPE_COUNT
 } entitytype_t;
