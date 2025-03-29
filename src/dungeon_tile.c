@@ -1,4 +1,5 @@
 #include "dungeon_tile.h"
+#include "em.h"
 #include "mprint.h"
 #include <stdlib.h>
 #include <string.h>
@@ -24,6 +25,11 @@ void dungeon_tile_init(dungeon_tile_t* const t, tiletype_t type) {
     t->has_pressure_plate = t->has_wall_switch = t->wall_switch_on = false;
     t->pressure_plate_up_tx_key = t->pressure_plate_down_tx_key = t->pressure_plate_event = -1;
     t->wall_switch_up_tx_key = t->wall_switch_down_tx_key = t->wall_switch_event = -1;
+
+    t->cached_live_npcs = 0;
+    t->cached_player_present = false;
+    t->dirty_entities = true; // Start dirty
+    t->dirty_visibility = true;
 }
 
 void dungeon_tile_set_pressure_plate(dungeon_tile_t* const t, bool b) {
@@ -94,9 +100,12 @@ entityid dungeon_tile_add(dungeon_tile_t* const t, entityid id) {
         if (t->entities[i] == ENTITYID_INVALID) {
             t->entities[i] = id;
             t->entity_count++;
+            t->dirty_entities = true;
             return id;
         }
     }
+
+    //return id;
 
     // This should never happen due to earlier check
     merror("dungeon_tile_add: No empty slot found after resize");
@@ -112,6 +121,7 @@ entityid dungeon_tile_remove(dungeon_tile_t* tile, entityid id) {
             memcpy(&tile->entities[i], &tile->entities[i + 1], sizeof(entityid) * (tile->entity_max - i - 1));
             tile->entities[tile->entity_max - 1] = -1;
             tile->entity_count--;
+            tile->dirty_entities = true;
             did_remove = true;
             break;
         }
@@ -178,3 +188,32 @@ void dungeon_tile_set_wall_switch_on(dungeon_tile_t* const t, bool on) {
 }
 
 bool dungeon_tile_is_wall_switch_on(const dungeon_tile_t* const t) { return !t ? false : t->wall_switch_on; }
+
+static void recompute_entity_cache(dungeon_tile_t* t, em_t* em) {
+    if (!t->dirty_entities) return;
+
+    t->cached_live_npcs = 0;
+    t->cached_player_present = false;
+
+    for (size_t i = 0; i < t->entity_max; i++) {
+        entity* e = em_get(em, t->entities[i]);
+        if (!e || e->is_dead) continue;
+
+        if (e->type == ENTITY_NPC) t->cached_live_npcs++;
+        if (e->type == ENTITY_PLAYER) t->cached_player_present = true;
+    }
+
+    t->dirty_entities = false;
+}
+
+bool dungeon_tile_has_live_npcs(dungeon_tile_t* t, em_t* em) {
+    if (!t) return false;
+    recompute_entity_cache(t, em);
+    return t->cached_live_npcs > 0;
+}
+
+bool dungeon_tile_has_player(dungeon_tile_t* t, em_t* em) {
+    if (!t) return false;
+    recompute_entity_cache(t, em);
+    return t->cached_player_present;
+}

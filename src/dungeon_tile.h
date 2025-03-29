@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dungeon_tile_type.h"
+#include "em.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include <stdbool.h>
@@ -27,6 +28,11 @@ typedef struct {
     int wall_switch_up_tx_key;
     int wall_switch_down_tx_key;
     int wall_switch_event;
+
+    int cached_live_npcs;
+    bool cached_player_present;
+    bool dirty_entities;
+    bool dirty_visibility;
 
 } dungeon_tile_t;
 
@@ -59,3 +65,7 @@ void dungeon_tile_set_wall_switch_event(dungeon_tile_t* const t, int e);
 void dungeon_tile_set_wall_switch_down_tx_key(dungeon_tile_t* const t, int k);
 void dungeon_tile_set_wall_switch_up_tx_key(dungeon_tile_t* const t, int k);
 void dungeon_tile_set_wall_switch(dungeon_tile_t* const t, bool b);
+
+bool dungeon_tile_has_live_npcs(dungeon_tile_t* t, em_t* em);
+
+bool dungeon_tile_has_player(dungeon_tile_t* t, em_t* em);
