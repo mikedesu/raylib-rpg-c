@@ -13,7 +13,7 @@
 #include "textureinfo.h"
 #include "tx_keys.h"
 //#include "raylib.h"
-#include "libdraw_billboard.h"
+//#include "libdraw_billboard.h"
 #include "libdraw_cube.h"
 #include "libdraw_plane.h"
 #include "rlgl.h"
@@ -73,8 +73,8 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
         for (int x = 0; x < floor->width; x++) {
             dungeon_tile_t* t = &floor->tiles[y][x];
             if (dungeon_tile_is_wall(t->type)) continue;
-            for (int i = 0; i < dungeon_tile_entity_count(t); i++) {
-                entityid id = dungeon_tile_get_entity(t, i);
+            for (int i = 0; i < tile_entity_count(t); i++) {
+                entityid id = tile_get_entity(t, i);
                 entity_t* e = em_get(g->entitymap, id);
                 if (!e || e->is_dead != dead_only) continue;
                 //Color color = (e->type == ENTITY_PLAYER) ? Fade((Color){0, 0, 255}, 0.8f) : RED;
@@ -171,8 +171,8 @@ static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead)
         for (int x = 0; x < df->width; x++) {
             dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
             if (!tile || dungeon_tile_is_wall(tile->type)) continue;
-            for (int i = 0; i < dungeon_tile_entity_count(tile); i++) {
-                entityid id = dungeon_tile_get_entity(tile, i);
+            for (int i = 0; i < tile_entity_count(tile); i++) {
+                entityid id = tile_get_entity(tile, i);
                 entity* e = em_get(g->entitymap, id);
                 if (e && e->is_dead == dead) libdraw_draw_sprite_and_shadow(g, id);
             }

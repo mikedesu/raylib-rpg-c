@@ -725,7 +725,7 @@ entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl
         merror("liblogic_entity_create: cannot create entity on wall");
         return -1;
     }
-    if (dungeon_tile_has_live_npcs(tile, em)) {
+    if (tile_has_live_npcs(tile, em)) {
         merror("liblogic_entity_create: cannot create entity on tile with NPC");
         return -1;
     }
