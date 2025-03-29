@@ -2,6 +2,7 @@
 #include "controlmode.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
+#include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
 #include "em.h"
 #include "entity.h"
@@ -282,14 +283,14 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     const float move = g->cam2d.zoom;
-    if (!is) {
-        merror("Input state is NULL!");
-        return;
-    }
-    if (!g) {
-        merror("Game state is NULL!");
-        return;
-    }
+    //if (!is) {
+    //    merror("Input state is NULL!");
+    //    return;
+    //}
+    //if (!g) {
+    //    merror("Game state is NULL!");
+    //    return;
+    //}
     if (inputstate_is_held(is, KEY_RIGHT)) {
         g->cam2d.offset.x += move;
         return;
@@ -312,14 +313,28 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
         g->controlmode = CONTROLMODE_PLAYER;
         return;
     }
+
+    liblogic_handle_camera_zoom(g, is);
+    //if (inputstate_is_held(is, KEY_Z)) {
+    //    //msuccess("Z held!");
+    //    if (inputstate_is_shift_held(is)) {
+    //        g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
+    //    } else {
+    //        g->cam2d.zoom += DEFAULT_ZOOM_INCR;
+    //    }
+    //    return;
+    //}
+}
+
+void liblogic_handle_camera_zoom(gamestate* const g, const inputstate* const is) {
+    massert(g, "Game state is NULL!");
+    massert(is, "Input state is NULL!");
     if (inputstate_is_held(is, KEY_Z)) {
-        //msuccess("Z held!");
         if (inputstate_is_shift_held(is)) {
             g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
         } else {
             g->cam2d.zoom += DEFAULT_ZOOM_INCR;
         }
-        return;
     }
 }
 
@@ -806,28 +821,29 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
 int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int fl) {
     // Validate inputs
     massert(g, "liblogic_tile_npc_living_count: gamestate is NULL");
+    massert(fl >= 0, "liblogic_tile_npc_living_count: floor is out of bounds");
+    massert(fl < g->dungeon->num_floors, "liblogic_tile_npc_living_count: floor is out of bounds");
+    massert(x >= 0, "liblogic_tile_npc_living_count: x is out of bounds");
+    massert(x < g->dungeon->floors[fl]->width, "liblogic_tile_npc_living_count: x is out of bounds");
+    massert(y >= 0, "liblogic_tile_npc_living_count: y is out of bounds");
+    massert(y < g->dungeon->floors[fl]->height, "liblogic_tile_npc_living_count: y is out of bounds");
     const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
-    if (!df) {
-        merrorint("Invalid floor", fl);
-        return TILE_COUNT_ERROR;
-    }
+    massert(df, "liblogic_tile_npc_living_count: failed to get dungeon floor");
     const tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-    if (!tile) {
-        merrorint2("Invalid tile at", x, y);
-        return TILE_COUNT_ERROR;
-    }
+    massert(tile, "liblogic_tile_npc_living_count: failed to get tile");
     // Count living NPCs
     int count = 0;
     const int max_entities = tile->entity_max;
     for (int i = 0; i < max_entities; i++) {
-        const entityid eid = tile->entities[i];
+        //const entityid eid = tile->entities[i];
+        const entityid eid = tile_get_entity(tile, i);
         if (eid == -1) continue;
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) {
             mwarningint("Missing entity", eid); // Warning not error
             continue;
         }
-        if (e->type == ENTITY_NPC && !e->is_dead) { count++; }
+        if (e->type == ENTITY_NPC && !e->is_dead) count++;
     }
     return count;
 }
