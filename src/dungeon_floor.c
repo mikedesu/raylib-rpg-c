@@ -137,29 +137,15 @@ void df_set_tile_perimeter_range(dungeon_floor_t* const df,
         type = begin_type + (rand() % num_types);
         tile_init(t, type);
     }
-    //for (int i = 0; i <= w; i++) {
-    //    t = dungeon_floor_tile_at(df, x + i, y + h);
-    //    type = begin_type + (rand() % num_types);
-    //    dungeon_tile_init(t, type);
-    //}
-    //for (int i = 0; i <= h; i++) {
-    //    t = dungeon_floor_tile_at(df, x + w, y + i);
-    //    type = begin_type + (rand() % num_types);
-    //    dungeon_tile_init(t, type);
-    //}
 }
 
-void dungeon_floor_free(dungeon_floor_t* floor) {
-    minfo("Freeing dungeon floor");
-    if (!floor) {
-        merror("dungeon_floor_free: floor is NULL");
-        return;
+void df_free(dungeon_floor_t* f) {
+    if (!f) return;
+    for (int i = 0; i < f->height; i++) {
+        tile_t* t = f->tiles[i];
+        if (t) free(t);
     }
-    for (int i = 0; i < floor->height; i++) {
-        tile_t* current = floor->tiles[i];
-        free(current);
-    }
-    free(floor);
+    free(f);
     msuccess("Freed dungeon floor");
 }
 

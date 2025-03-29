@@ -21,12 +21,14 @@ dungeon_t* dungeon_create() {
     return dungeon;
 }
 
-void dungeon_destroy(dungeon_t* dungeon) {
-    massert(dungeon, "dungeon_destroy: dungeon is NULL");
-    for (int i = 0; i < dungeon->num_floors; i++) { dungeon_floor_free(dungeon->floors[i]); }
-    free(dungeon->floors);
-    free(dungeon);
-    msuccess("Freed dungeon");
+void dungeon_destroy(dungeon_t* d) {
+    massert(d, "dungeon_destroy: dungeon is NULL");
+    //for (int i = 0; i < dungeon->num_floors; i++) { dungeon_floor_free(dungeon->floors[i]); }
+    if (d->floors) {
+        for (int i = 0; i < d->num_floors; i++) df_free(d->floors[i]);
+        free(d->floors);
+    }
+    free(d);
 }
 
 bool dungeon_add_floor(dungeon_t* const dungeon, int width, int height) {
