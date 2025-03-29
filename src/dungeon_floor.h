@@ -21,7 +21,7 @@ typedef struct {
 } df_event_t;
 
 typedef struct {
-    dungeon_tile_t** tiles;
+    tile_t** tiles;
     int width;
     int height;
 
@@ -31,7 +31,7 @@ typedef struct {
 } dungeon_floor_t;
 
 dungeon_floor_t* dungeon_floor_create(int width, int height);
-dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, int x, int y);
+tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, int x, int y);
 
 bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y);
 bool dungeon_floor_add_at(dungeon_floor_t* const df, entityid id, int x, int y);

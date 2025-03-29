@@ -46,7 +46,7 @@ static void draw_dungeon_tiles_3d(const gamestate* const g, const dungeon_floor_
     //DrawGrid(10, 1.0f);
     for (int y = 0; y < floor->height; y++) {
         for (int x = 0; x < floor->width; x++) {
-            dungeon_tile_t* t = &floor->tiles[y][x];
+            tile_t* t = &floor->tiles[y][x];
             if (dungeon_tile_is_wall(t->type)) continue;
             const int txkey = get_txkey_for_tiletype(t->type);
             Texture2D* tex = &txinfo[txkey].texture;
@@ -71,7 +71,7 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
     const float TSIZE = 1.0f;
     for (int y = 0; y < floor->height; y++) {
         for (int x = 0; x < floor->width; x++) {
-            dungeon_tile_t* t = &floor->tiles[y][x];
+            tile_t* t = &floor->tiles[y][x];
             if (dungeon_tile_is_wall(t->type)) continue;
             for (int i = 0; i < tile_entity_count(t); i++) {
                 entityid id = tile_get_entity(t, i);
@@ -139,7 +139,7 @@ static void draw_wall_tiles_3d(const gamestate* g, const dungeon_floor_t* floor)
     const float TILE_HEIGHT = 1.0f;
     for (int y = 0; y < floor->height; y++) {
         for (int x = 0; x < floor->width; x++) {
-            dungeon_tile_t* t = &floor->tiles[y][x];
+            tile_t* t = &floor->tiles[y][x];
             if (!dungeon_tile_is_wall(t->type)) continue;
             //DrawCube((Vector3){x * TILE_SIZE, 0.5f, y * TILE_SIZE}, TILE_SIZE, TILE_HEIGHT, TILE_SIZE, DARKBROWN);
             int txkey = get_txkey_for_tiletype(t->type);
@@ -169,7 +169,7 @@ static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
 static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+            tile_t* tile = dungeon_floor_tile_at(df, x, y);
             if (!tile || dungeon_tile_is_wall(tile->type)) continue;
             for (int i = 0; i < tile_entity_count(tile); i++) {
                 entityid id = tile_get_entity(tile, i);
@@ -184,7 +184,7 @@ static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead)
 static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+            tile_t* tile = dungeon_floor_tile_at(df, x, y);
             if (!tile) {
                 merrorint2("draw_wall_tiles_2d: tile NULL", x, y);
                 return false;
@@ -424,7 +424,7 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         merrorint2("libdraw_draw_dungeon_floor_tile: x or y out of bounds", x, y);
         return false;
     }
-    dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+    tile_t* tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merrorint2("libdraw_draw_dungeon_floor_tile: tile is NULL", x, y);
         return false;

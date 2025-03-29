@@ -413,7 +413,7 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     }
     // i feel like this might be something we can set elsewhere...like after the player input phase?
     if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
-    dungeon_tile_t* const tile = dungeon_floor_tile_at(df, ex, ey);
+    tile_t* const tile = dungeon_floor_tile_at(df, ex, ey);
     if (!tile || ex < 0 || ey < 0) {
         merror(!tile ? "Failed to get tile" : "Cannot move, out of bounds");
         return;
@@ -435,7 +435,7 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     e->x = ex, e->y = ey;
     e->sprite_move_x = x * DEFAULT_TILE_SIZE, e->sprite_move_y = y * DEFAULT_TILE_SIZE;
     // get the entity's new tile
-    dungeon_tile_t* const new_tile = dungeon_floor_tile_at(df, ex, ey);
+    tile_t* const new_tile = dungeon_floor_tile_at(df, ex, ey);
     if (!new_tile) {
         merror("Failed to get new tile");
         return;
@@ -464,7 +464,7 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
         merror("Failed to get dungeon floor");
         return;
     }
-    dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    tile_t* const tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merror("Failed to get tile");
         return;
@@ -481,7 +481,7 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
         // grab the event in df
         df_event_t event = df->events[ws_event];
         // grab the tile marked at by the event
-        dungeon_tile_t* const event_tile = dungeon_floor_tile_at(df, event.x, event.y);
+        tile_t* const event_tile = dungeon_floor_tile_at(df, event.x, event.y);
         if (!event_tile) {
             merror("Failed to get event tile");
             return;
@@ -495,17 +495,17 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
         //if (tile->wall_switch_event == 777) {
         //    msuccess("Wall switch event 777!");
         //    // do something
-        //    // get the tile at 5,2 and change its type to DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00
-        //    dungeon_tile_t* const trap_tile = dungeon_floor_tile_at(df, 2, 5);
+        //    // get the tile at 5,2 and change its type to tile_tYPE_FLOOR_STONE_TRAP_OFF_00
+        //    tile_t* const trap_tile = dungeon_floor_tile_at(df, 2, 5);
         //    if (!trap_tile) {
         //        merror("Failed to get trap tile");
         //        return;
         //    }
         //    tiletype_t type = trap_tile->type;
-        //    if (type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00) {
-        //        trap_tile->type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00;
-        //    } else if (type == DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_OFF_00) {
-        //        trap_tile->type = DUNGEON_TILE_TYPE_FLOOR_STONE_TRAP_ON_00;
+        //    if (type == tile_tYPE_FLOOR_STONE_TRAP_ON_00) {
+        //        trap_tile->type = tile_tYPE_FLOOR_STONE_TRAP_OFF_00;
+        //    } else if (type == tile_tYPE_FLOOR_STONE_TRAP_OFF_00) {
+        //        trap_tile->type = tile_tYPE_FLOOR_STONE_TRAP_ON_00;
         //    }
         //}
     }
@@ -519,7 +519,7 @@ bool liblogic_player_on_tile(const gamestate* const g, int x, int y, int floor) 
         merror("liblogic_player_on_tile: failed to get dungeon floor");
         return false;
     }
-    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    const tile_t* const tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merror("liblogic_player_on_tile: failed to get tile");
         return false;
@@ -719,7 +719,7 @@ entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl
     massert(y >= 0, "liblogic_entity_create: y is out of bounds");
     massert(y < df->height, "liblogic_entity_create: y is out of bounds");
     // can we create an entity at this location? no entities can be made on wall-types etc
-    dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    tile_t* const tile = dungeon_floor_tile_at(df, x, y);
     massert(tile, "liblogic_entity_create: failed to get tile");
     if (!dungeon_tile_is_walkable(tile->type)) {
         merror("liblogic_entity_create: cannot create entity on wall");
@@ -769,7 +769,7 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
         merror("liblogic_try_entity_attack: failed to get dungeon floor");
         return;
     }
-    dungeon_tile_t* const tile = dungeon_floor_tile_at(floor, target_x, target_y);
+    tile_t* const tile = dungeon_floor_tile_at(floor, target_x, target_y);
     if (!tile) {
         merror("liblogic_try_entity_attack: target tile not found");
         return;
@@ -811,7 +811,7 @@ int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int f
         merrorint("Invalid floor", fl);
         return TILE_COUNT_ERROR;
     }
-    const dungeon_tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    const tile_t* const tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
         merrorint2("Invalid tile at", x, y);
         return TILE_COUNT_ERROR;

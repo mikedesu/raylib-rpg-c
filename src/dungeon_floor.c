@@ -21,7 +21,7 @@ void df_set_tile_area(dungeon_floor_t* const df, tiletype_t type, int x, int y, 
     if (!df) return;
     for (int i = y; i < y + h; i++) {
         for (int j = x; j < x + w; j++) {
-            dungeon_tile_t* current = dungeon_floor_tile_at(df, j, i);
+            tile_t* current = dungeon_floor_tile_at(df, j, i);
             tile_init(current, type);
         }
     }
@@ -75,26 +75,26 @@ void df_init_test(dungeon_floor_t* df) {
 
 void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y) {
     if (!df) return;
-    dungeon_tile_t* current = &df->tiles[y][x];
+    tile_t* current = &df->tiles[y][x];
     tile_init(current, type);
 }
 
 void df_set_tile_perimeter(dungeon_floor_t* const df, tiletype_t type, int x, int y, int w, int h) {
     if (!df) return;
     for (int i = 0; i <= w; i++) {
-        dungeon_tile_t* current = &df->tiles[y][x + i];
+        tile_t* current = &df->tiles[y][x + i];
         tile_init(current, type);
     }
     for (int i = 0; i <= h; i++) {
-        dungeon_tile_t* current = &df->tiles[y + i][x];
+        tile_t* current = &df->tiles[y + i][x];
         tile_init(current, type);
     }
     for (int i = 0; i <= w; i++) {
-        dungeon_tile_t* current = &df->tiles[y + h][x + i];
+        tile_t* current = &df->tiles[y + h][x + i];
         tile_init(current, type);
     }
     for (int i = 0; i <= h; i++) {
-        dungeon_tile_t* current = &df->tiles[y + i][x + w];
+        tile_t* current = &df->tiles[y + i][x + w];
         tile_init(current, type);
     }
 }
@@ -116,7 +116,7 @@ void df_set_tile_perimeter_range(dungeon_floor_t* const df,
     }
     int num_types = end_type - begin_type + 1;
 
-    dungeon_tile_t* t = NULL;
+    tile_t* t = NULL;
     tiletype_t type = TILE_NONE;
 
     for (int i = 0; i <= w; i++) {
@@ -156,7 +156,7 @@ void dungeon_floor_free(dungeon_floor_t* floor) {
         return;
     }
     for (int i = 0; i < floor->height; i++) {
-        dungeon_tile_t* current = floor->tiles[i];
+        tile_t* current = floor->tiles[i];
         free(current);
     }
     free(floor);
@@ -200,7 +200,7 @@ bool dungeon_floor_remove_at(dungeon_floor_t* const df, entityid id, int x, int 
     return r != -1 && r == id;
 }
 
-dungeon_tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
+tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
     if (!df) {
         merror("dungeon_floor_tile_at: df is NULL");
         return NULL;
@@ -227,7 +227,7 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
 
 void dungeon_floor_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_key, int dn_key, int event) {
     if (!df || x < 0 || x >= df->width || y < 0 || y >= df->height) return;
-    dungeon_tile_t* const t = dungeon_floor_tile_at(df, x, y);
+    tile_t* const t = dungeon_floor_tile_at(df, x, y);
     if (!t) return;
     if (!dungeon_tile_is_wall(t->type)) return;
     tile_set_wall_switch(t, true);
@@ -254,7 +254,7 @@ void df_set_all_tiles_range(dungeon_floor_t* const df, tiletype_t begin, tiletyp
     int num_types = end_type - begin_type + 1;
     for (int i = 0; i < df->height; i++) {
         for (int j = 0; j < df->width; j++) {
-            dungeon_tile_t* current = dungeon_floor_tile_at(df, j, i);
+            tile_t* current = dungeon_floor_tile_at(df, j, i);
             tiletype_t type = begin_type + (rand() % num_types);
             tile_init(current, type);
         }
@@ -263,7 +263,7 @@ void df_set_all_tiles_range(dungeon_floor_t* const df, tiletype_t begin, tiletyp
 
 bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {
     if (!df) return false;
-    dungeon_tile_t* tile = dungeon_floor_tile_at(df, x, y);
+    tile_t* tile = dungeon_floor_tile_at(df, x, y);
     return dungeon_tile_is_wall(tile->type);
 }
 
@@ -279,7 +279,7 @@ void df_set_tile_area_range2(dungeon_floor_t* const df, Rectangle r, tiletype_t 
     int num_types = end_type - begin_type + 1;
     for (int i = r.y; i < r.y + r.height; i++) {
         for (int j = r.x; j < r.x + r.width; j++) {
-            dungeon_tile_t* current = dungeon_floor_tile_at(df, j, i);
+            tile_t* current = dungeon_floor_tile_at(df, j, i);
             tiletype_t type = begin_type + (rand() % num_types);
             tile_init(current, type);
         }
@@ -298,7 +298,7 @@ void df_set_tile_area_range(dungeon_floor_t* const df, int x, int y, int w, int 
     int num_types = end_type - begin_type + 1;
     for (int i = y; i < y + h; i++) {
         for (int j = x; j < x + w; j++) {
-            dungeon_tile_t* current = dungeon_floor_tile_at(df, j, i);
+            tile_t* current = dungeon_floor_tile_at(df, j, i);
             tiletype_t type = begin_type + (rand() % num_types);
             tile_init(current, type);
         }
@@ -323,12 +323,12 @@ void df_reset_events(dungeon_floor_t* const df) {
 
 bool df_malloc_tiles(dungeon_floor_t* const df) {
     if (!df) return false;
-    df->tiles = malloc(sizeof(dungeon_tile_t*) * df->height);
+    df->tiles = malloc(sizeof(tile_t*) * df->height);
     if (!df->tiles) return false;
     // memset the tiles
-    memset(df->tiles, 0, sizeof(dungeon_tile_t*) * df->height);
+    memset(df->tiles, 0, sizeof(tile_t*) * df->height);
     for (int i = 0; i < df->height; i++) {
-        df->tiles[i] = malloc(sizeof(dungeon_tile_t) * df->width);
+        df->tiles[i] = malloc(sizeof(tile_t) * df->width);
         if (df->tiles[i] == NULL) {
             // malloc failed and we need to free everything up to this point
             for (int j = 0; j < i; j++) { free(df->tiles[j]); }
