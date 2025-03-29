@@ -1,6 +1,7 @@
 #include "gameloader.h"
 #include "gamestate.h"
 #include "inputstate.h"
+#include "massert.h"
 #include "mprint.h"
 #include <assert.h>
 #include <dlfcn.h>
@@ -32,17 +33,19 @@ long logic_last_write_time = 0;
 int frame_count = 0;
 
 void checksymbol(void* symbol, const char* name) {
-    if (symbol == NULL) {
-        fprintf(stderr, "dlsym failed: %s\n", dlerror());
-        exit(1);
-    }
+    massert(symbol, "dlsym failed: %s", name);
+    massert(name, "dlsym failed: %s", name);
+    massert(strlen(name) > 0, "dlsym failed: %s", name);
+
+    //if (symbol == NULL) {
+    //    fprintf(stderr, "dlsym failed: %s\n", dlerror());
+    //    exit(1);
+    //}
 }
 
 long getlastwritetime(const char* filename) {
     struct stat file_stat;
-    if (stat(filename, &file_stat) == 0) {
-        return file_stat.st_mtime;
-    }
+    if (stat(filename, &file_stat) == 0) { return file_stat.st_mtime; }
     return 0;
 }
 
@@ -68,10 +71,11 @@ void load_draw_symbols() {
 
 void load_logic_symbols() {
     logic_handle = dlopen(LIBLOGIC_PATH, RTLD_LAZY);
-    if (!logic_handle) {
-        fprintf(stderr, "dlopen failed for %s: %s\n", LIBLOGIC_PATH, dlerror());
-        exit(1);
-    }
+    massert(logic_handle, "dlopen failed for %s: %s", LIBLOGIC_PATH, dlerror());
+    //if (!logic_handle) {
+    //    fprintf(stderr, "dlopen failed for %s: %s\n", LIBLOGIC_PATH, dlerror());
+    //    exit(1);
+    //}
     myliblogic_init = dlsym(logic_handle, "liblogic_init");
     checksymbol(myliblogic_init, "liblogic_init");
     myliblogic_tick = dlsym(logic_handle, "liblogic_tick");
@@ -105,7 +109,7 @@ void reload_logic() {
 }
 
 void autoreload_every_n_sec(const int n, const gamestate* const g) {
-    assert(n > 0);
+    massert(n > 0, "autoreload_every_n_sec: n must be greater than 0");
     frame_count++;
     if (frame_count % (n * 60) == 0) {
         reload_draw(g);
