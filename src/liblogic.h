@@ -41,5 +41,6 @@ void liblogic_init_orcs_test(gamestate* const g);
 void liblogic_init_player(gamestate* const g);
 void liblogic_init_em(gamestate* const g);
 void liblogic_init_dungeon(gamestate* const g);
+void liblogic_add_message(gamestate* g, const char* text);
 
 entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);

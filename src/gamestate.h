@@ -15,6 +15,15 @@
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
 #define GAMESTATE_SIZEOFTEXINFOARRAY 255
+#define MAX_MESSAGES 32
+#define MAX_MSG_LENGTH 256
+
+typedef struct {
+    char messages[MAX_MESSAGES][MAX_MSG_LENGTH];
+    int count; // Total messages in queue
+    int index; // Current message being shown
+    bool is_active; // Blocks input when true
+} message_system;
 
 typedef struct gamestate {
     int framecount;
@@ -72,6 +81,8 @@ typedef struct gamestate {
     gamestate_flag_t flag;
 
     entityid entity_turn;
+
+    message_system msg_system;
 
 } gamestate;
 

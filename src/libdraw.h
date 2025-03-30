@@ -60,3 +60,4 @@ void libdraw_set_sg_is_damaged(entity_t* const e, spritegroup_t* const sg);
 void libdraw_set_sg_is_attacking(entity_t* const e, spritegroup_t* const sg);
 void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
 void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg);
+void libdraw_draw_message_box(gamestate* g);

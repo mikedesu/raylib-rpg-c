@@ -606,6 +606,7 @@ void libdraw_drawframe(gamestate* const g) {
     //SetShaderValue(shader_grayscale, GetShaderLocation(shader_grayscale, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+    libdraw_draw_message_box(g);
     libdraw_draw_hud(g);
     //libdraw_draw_msgbox_test(g, "Hello, world!\nLets fucking go!");
     if (g->debugpanelon) { libdraw_draw_debug_panel(g); }
@@ -992,4 +993,41 @@ void libdraw_init(gamestate* const g) {
     libdraw_load_shaders();
     g->cam2d.offset = (Vector2){x, y};
     msuccess("libdraw_init");
+}
+
+void libdraw_draw_message_box(gamestate* g) {
+    if (!g->msg_system.is_active || g->msg_system.count == 0) return;
+
+    const char* msg = g->msg_system.messages[g->msg_system.index];
+    int font_size = 20;
+    int pad = 20; // Inner padding (text <-> box edges)
+    int margin = 50; // Outer margin (box <-> screen edges)
+    float line_spacing = 1.0f;
+
+    // Measure text (split into lines if needed)
+    Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, font_size, line_spacing);
+
+    // Calculate centered box position
+    Rectangle box = {.x = (g->windowwidth - text_size.x) / 2 - pad, // Center X
+                     .y = (g->windowheight - text_size.y) / 2 - pad, // Center Y
+                     .width = text_size.x + pad * 2,
+                     .height = text_size.y + pad * 2};
+
+    // Draw box (semi-transparent black with white border)
+    DrawRectangleRec(box, Fade(BLACK, 0.8f));
+    DrawRectangleLinesEx(box, 2, WHITE);
+
+    // Draw text (centered in box)
+    DrawTextEx(GetFontDefault(), msg, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
+
+    // Show "Next" prompt if more messages exist
+    if (g->msg_system.count > 1) {
+        const char* prompt = "[A] Next";
+        int prompt_width = MeasureText(prompt, 15);
+        DrawText(prompt,
+                 box.x + box.width - prompt_width - 10, // Right-align in box
+                 box.y + box.height - 25, // Bottom of box
+                 15,
+                 YELLOW);
+    }
 }

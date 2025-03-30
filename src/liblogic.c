@@ -192,11 +192,27 @@ void liblogic_init(gamestate* const g) {
     massert(g, "liblogic_init: gamestate is NULL");
     srand(time(NULL));
     liblogic_init_dungeon(g);
+
     gamestate_init_entityids(g);
+    g->msg_system.count = 0;
+    g->msg_system.index = 0;
+    g->msg_system.is_active = false;
+
     liblogic_init_em(g);
     liblogic_init_player(g);
     liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
+}
+
+void liblogic_add_message(gamestate* g, const char* text) {
+    if (g->msg_system.count >= MAX_MESSAGES) {
+        mwarning("Message queue full!");
+        return;
+    }
+    strncpy(g->msg_system.messages[g->msg_system.count], text, MAX_MSG_LENGTH - 1);
+    g->msg_system.messages[g->msg_system.count][MAX_MSG_LENGTH - 1] = '\0'; // Ensure null-termination
+    g->msg_system.count++;
+    g->msg_system.is_active = true;
 }
 
 void liblogic_init_dungeon(gamestate* const g) {
@@ -315,6 +331,20 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
+
+    if (g->msg_system.is_active) {
+        if (inputstate_is_pressed(is, KEY_A)) {
+            g->msg_system.index++;
+            if (g->msg_system.index >= g->msg_system.count) {
+                // Reset when all messages read
+                g->msg_system.index = 0;
+                g->msg_system.count = 0;
+                g->msg_system.is_active = false;
+            }
+        }
+        return;
+    }
+
     entity* const e = em_get(g->entitymap, g->hero_id);
     if (!e) {
         //merror("Hero not found!");
@@ -480,6 +510,9 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
         } else if (type == event.on_type) {
             event_tile->type = event.off_type;
         }
+
+        liblogic_add_message(g, "Wall switch flipped!");
+
         //if (tile->wall_switch_event == 777) {
         //    msuccess("Wall switch event 777!");
         //    // do something
