@@ -254,26 +254,54 @@ void liblogic_init_player(gamestate* const g) {
 }
 
 void liblogic_init_orcs_test(gamestate* const g) {
-    const int orc_x = 0, orc_y = 6, total_orcs_to_make = 4;
+    const int orc_x = 0;
+    const int orc_y = 6;
+    const int total_orcs_to_make = 100;
     int count = 0;
     dungeon_t* const d = g->dungeon;
     massert(d, "liblogic_init: dungeon is NULL");
     //dungeon_floor_t* const df = d->floors[0];
     dungeon_floor_t* const df = dungeon_get_floor(d, 0);
     massert(df, "liblogic_init: dungeon floor is NULL");
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            if (count >= total_orcs_to_make) { break; }
-            entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, orc_x + x, orc_y + y, 0, "orc");
-            entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
-            entity_set_default_action(orc, action);
-            entity_set_maxhp(orc, 1);
-            entity_set_hp(orc, 1);
-            count++;
-            if (count >= total_orcs_to_make) break;
+
+    while (count < total_orcs_to_make) {
+
+        int x = rand() % df->width;
+        int y = rand() % df->height;
+
+        tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+
+        if (dungeon_tile_is_wall(tile->type)) { continue; }
+
+        // check if there is already an entity at this location
+        if (tile_entity_count(tile) > 0) { continue; }
+
+        entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, x, y, 0, "orc");
+        if (!orc) {
+            merror("liblogic_init: failed to init orc");
+            continue;
         }
-        if (count >= total_orcs_to_make) break;
+
+        entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
+        entity_set_default_action(orc, action);
+        entity_set_maxhp(orc, 1);
+        entity_set_hp(orc, 1);
+        count++;
     }
+
+    //for (int y = 0; y < df->height; y++) {
+    //    for (int x = 0; x < df->width; x++) {
+    //        if (count >= total_orcs_to_make) { break; }
+    //        entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, orc_x + x, orc_y + y, 0, "orc");
+    //        entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
+    //        entity_set_default_action(orc, action);
+    //        entity_set_maxhp(orc, 1);
+    //        entity_set_hp(orc, 1);
+    //        count++;
+    //        if (count >= total_orcs_to_make) break;
+    //    }
+    //    if (count >= total_orcs_to_make) break;
+    //}
 }
 
 void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
@@ -528,7 +556,7 @@ void liblogic_try_flip_switch(gamestate* const g, entity* const e, int x, int y,
             event_tile->type = event.off_type;
         }
 
-        liblogic_add_message(g, "Wall switch flipped!");
+        //liblogic_add_message(g, "Wall switch flipped!");
 
         // this is the basis for what we need to do next
         // currently we have no entity passed into this function
