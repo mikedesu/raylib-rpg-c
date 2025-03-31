@@ -26,7 +26,10 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
 void liblogic_handle_npc(gamestate* const g);
 void liblogic_handle_npcs(gamestate* const g);
 void liblogic_update_player_state(gamestate* const g);
-void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl);
+
+//void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl);
+void liblogic_try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
+
 void liblogic_update_npc_state(gamestate* const g, entityid id);
 void liblogic_update_npcs_state(gamestate* const g);
 void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_t action);

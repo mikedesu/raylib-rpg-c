@@ -408,7 +408,8 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         int dy = liblogic_get_y_from_dir(e->direction);
         int tx = e->x + dx;
         int ty = e->y + dy;
-        liblogic_try_flip_switch(g, tx, ty, e->floor);
+        //liblogic_try_flip_switch(g, tx, ty, e->floor);
+        liblogic_try_flip_switch(g, e, tx, ty, e->floor);
     } break;
     case KEY_C:
         msuccess("C pressed!");
@@ -475,18 +476,24 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     }
 }
 
-void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
+//void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
+void liblogic_try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl) {
     massert(g, "Game state is NULL!");
+    massert(e, "Entity is NULL!");
+
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
-    if (!df) {
-        merror("Failed to get dungeon floor");
-        return;
-    }
+    massert(df, "Failed to get dungeon floor");
+    //if (!df) {
+    //    merror("Failed to get dungeon floor");
+    //    return;
+    //}
+
     tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-    if (!tile) {
-        merror("Failed to get tile");
-        return;
-    }
+    massert(tile, "Failed to get tile");
+    //if (!tile) {
+    //    merror("Failed to get tile");
+    //    return;
+    //}
     if (tile->has_wall_switch) {
         tile->wall_switch_on = !tile->wall_switch_on;
         msuccess("Wall switch flipped!");
@@ -512,6 +519,16 @@ void liblogic_try_flip_switch(gamestate* const g, int x, int y, int fl) {
         }
 
         liblogic_add_message(g, "Wall switch flipped!");
+
+        // this is the basis for what we need to do next
+        // currently we have no entity passed into this function
+        // we need to fix that
+        if (e->type == ENTITY_PLAYER)
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        else if (e->type == ENTITY_NPC)
+            g->flag = GAMESTATE_FLAG_NPC_ANIM;
+        else
+            g->flag = GAMESTATE_FLAG_NONE;
 
         //if (tile->wall_switch_event == 777) {
         //    msuccess("Wall switch event 777!");
@@ -580,6 +597,13 @@ void liblogic_update_player_state(gamestate* const g) {
         return;
     }
     if (e->is_dead) {
+
+        if (!g->gameover) {
+
+            liblogic_add_message(g, "You died!");
+            g->gameover = true;
+        }
+
         //merror("Hero is dead!");
         return;
     }
@@ -809,6 +833,11 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
                 minfo("Attack successful!");
                 attack_successful = target->is_damaged = target->do_update = true;
                 entity_set_hp(target, entity_get_hp(target) - 1); // Reduce HP by 1
+                //
+                //
+
+                if (target->type == ENTITY_PLAYER) { liblogic_add_message(g, "Player attacked!"); }
+
                 if (entity_get_hp(target) <= 0) target->is_dead = true;
                 break;
             }

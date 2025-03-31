@@ -84,6 +84,7 @@ typedef struct gamestate {
 
     message_system msg_system;
 
+    bool gameover;
 } gamestate;
 
 gamestate* gamestateinitptr();

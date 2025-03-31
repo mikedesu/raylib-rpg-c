@@ -15,6 +15,7 @@
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
 #include "tx_keys.h"
+#include <raylib.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
@@ -933,9 +934,14 @@ void libdraw_draw_hud(gamestate* const g) {
         return;
     }
     // Draw the HUD
-    const int fontsize = 20, pad = 4, pad2 = pad * 2, x = pad, y = pad;
+    int fontsize = 30;
+    int pad = 4;
+    int pad2 = pad * 2;
+    //int x = pad;
+    //int y = pad;
     char buffer[1024] = {0};
-    int hp = -1, maxhp = -1;
+    int hp = -1;
+    int maxhp = -1;
     //const char* text = "Name: darkmage\nHP: 1/1";
     entity* const e = em_get(g->entitymap, g->hero_id);
     if (e) {
@@ -946,12 +952,22 @@ void libdraw_draw_hud(gamestate* const g) {
     snprintf(buffer, sizeof(buffer), "Name: %s\nHP: %d/%d\nTurn: %d", e->name, hp, maxhp, g->turn_count);
     //const char* text = "Name: evildojo666\nHP: 1/1";
     const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
-    const int w = size.x + pad2 * 4, h = size.y + pad2;
-    const Color fg = (Color){0x33, 0x33, 0x33, 0xff}, fg2 = (Color){0x66, 0x66, 0x66, 0xff}, fg3 = WHITE;
+    const int w = size.x + pad2 * 4;
+    const int h = size.y + pad2;
+    // set the x and y based on the window width and height to be the center of the bottom of the screen
+    const int x = g->windowwidth / 2 - w / 2;
+    const int y = g->windowheight - (h * 2) - pad;
+    const Color fg = (Color){0x33, 0x33, 0x33, 0xff};
+    const Color fg2 = (Color){0x66, 0x66, 0x66, 0xff}, fg3 = WHITE;
     DrawRectangle(x, y, w, h, fg);
     // draw rectangle lines around the box
-    DrawRectangleLines(x, y, w, h, fg2);
-    const int x2 = x + pad, y2 = y + pad;
+    //DrawRectangleLines(x, y, w, h, fg2);
+
+    Rectangle box = (Rectangle){x, y, w, h};
+
+    DrawRectangleLinesEx(box, 2, WHITE);
+    const int x2 = x + pad;
+    const int y2 = y + pad;
     // Draw text
     DrawText(buffer, x2, y2, fontsize, fg3);
 }
@@ -999,7 +1015,7 @@ void libdraw_draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) return;
 
     const char* msg = g->msg_system.messages[g->msg_system.index];
-    int font_size = 20;
+    int font_size = 30;
     int pad = 20; // Inner padding (text <-> box edges)
     int margin = 50; // Outer margin (box <-> screen edges)
     float line_spacing = 1.0f;
@@ -1014,7 +1030,12 @@ void libdraw_draw_message_box(gamestate* g) {
                      .height = text_size.y + pad * 2};
 
     // Draw box (semi-transparent black with white border)
-    DrawRectangleRec(box, Fade(BLACK, 0.8f));
+    //DrawRectangleRec(box, Fade(BLACK, 0.8f));
+
+    Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
+
+    //DrawRectangleRec(box, Fade((Color){0x66, 0x66, 0x66}, 0.6f));
+    DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
 
     // Draw text (centered in box)
@@ -1023,11 +1044,12 @@ void libdraw_draw_message_box(gamestate* g) {
     // Show "Next" prompt if more messages exist
     if (g->msg_system.count > 1) {
         const char* prompt = "[A] Next";
-        int prompt_width = MeasureText(prompt, 15);
+        //int prompt_width = MeasureText(prompt, 10);
+        Vector2 prompt_size = MeasureTextEx(GetFontDefault(), prompt, 10, 1.0f);
         DrawText(prompt,
-                 box.x + box.width - prompt_width - 10, // Right-align in box
-                 box.y + box.height - 25, // Bottom of box
-                 15,
-                 YELLOW);
+                 box.x + box.width - prompt_size.x - 10, // Right-align in box
+                 box.y + box.height - prompt_size.y - 10, // Bottom of box
+                 10,
+                 WHITE);
     }
 }

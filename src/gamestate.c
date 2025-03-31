@@ -54,7 +54,7 @@ gamestate* gamestateinitptr() {
     g->cam_lockon = true;
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){100, 100};
-    g->cam2d.zoom = 4.0f;
+    g->cam2d.zoom = 9.0f;
     g->cam2d.rotation = 0.0;
 
     g->cam3d = (Camera3D){0};
@@ -91,6 +91,8 @@ gamestate* gamestateinitptr() {
     g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
 
     g->entity_turn = -1;
+
+    g->gameover = false;
 
     return g;
 }
