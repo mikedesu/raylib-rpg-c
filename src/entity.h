@@ -54,9 +54,13 @@ void entity_decr_x(entity_t* const e);
 void entity_decr_y(entity_t* const e);
 void entity_set_dir(entity_t* const e, direction_t dir);
 void entity_set_type(entity_t* const e, entitytype_t type);
+
 void entity_set_hp(entity_t* const e, int hp);
 void entity_set_maxhp(entity_t* const e, int maxhp);
 void entity_set_hpmaxhp(entity_t* const e, int hp, int maxhp);
+void entity_incr_hp(entity_t* const e, int hp);
+void entity_decr_hp(entity_t* const e, int hp);
+
 void entity_set_default_action(entity_t* const e, entity_action_t action);
 
 direction_t entity_get_dir(entity_t* const e);

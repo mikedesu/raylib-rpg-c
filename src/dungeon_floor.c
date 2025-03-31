@@ -61,16 +61,31 @@ void df_init_test(dungeon_floor_t* df) {
     //df_init_rect(df, 0, 5, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     //df_init_rect(df, 5, 0, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     //df_init_rect(df, 5, 5, 4, 4, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    int txwallup = TX_WALL_SWITCH_UP_00;
+    int txwalldown = TX_WALL_SWITCH_DOWN_00;
+    tiletype_t trap_on = TILE_FLOOR_STONE_TRAP_ON_00;
+    tiletype_t trap_off = TILE_FLOOR_STONE_TRAP_OFF_00;
 
+    // First Room
     df_init_rect2(df, (Rectangle){0, 0, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-    df_init_rect2(df, (Rectangle){0, 5, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-    df_init_rect2(df, (Rectangle){5, 0, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-    df_init_rect2(df, (Rectangle){5, 5, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-
     // Trap + Switch
-    df_create_trap_event(df, 1, 4, TILE_FLOOR_STONE_TRAP_ON_00, TILE_FLOOR_STONE_TRAP_OFF_00, 1);
-    //df_create_trap_event(df, 1, 4, TILE_STONE_WALL_00, TILE_FLOOR_STONE_00, 1);
-    df_place_wall_switch(df, 0, 0, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, 1);
+    df_place_wall_switch(df, 0, 0, txwallup, txwalldown, 1);
+    df_create_trap_event(df, 1, 4, trap_on, trap_off, 1);
+
+    // Second Room and Trap
+    df_init_rect2(df, (Rectangle){0, 5, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    df_place_wall_switch(df, 0, 5, txwallup, txwalldown, 2);
+    df_create_trap_event(df, 4, 7, trap_on, trap_off, 2);
+
+    // Third Room and Trap
+    df_init_rect2(df, (Rectangle){5, 0, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    df_place_wall_switch(df, 5, 0, txwallup, txwalldown, 3);
+    df_create_trap_event(df, 7, 4, trap_on, trap_off, 3);
+
+    // Fourth Room and Trap
+    df_init_rect2(df, (Rectangle){5, 5, 4, 4}, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    df_place_wall_switch(df, 5, 5, txwallup, txwalldown, 4);
+    df_create_trap_event(df, 4, 1, trap_on, trap_off, 4);
 }
 
 void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y) {

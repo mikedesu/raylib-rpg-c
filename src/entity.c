@@ -127,7 +127,7 @@ entity_action_t entity_get_default_action(entity_t* const e) {
 
 void entity_set_hp(entity_t* const e, int hp) {
     massert(e, "entity_set_hp: e is NULL");
-    e->hp = hp;
+    e->hp = hp < 0 ? 0 : hp > e->maxhp ? e->maxhp : hp;
 }
 
 int entity_get_hp(entity_t* const e) {
@@ -149,4 +149,14 @@ int entity_get_maxhp(entity_t* const e) {
 void entity_set_hpmaxhp(entity_t* const e, int hp, int maxhp) {
     entity_set_hp(e, hp);
     entity_set_maxhp(e, maxhp);
+}
+
+void entity_incr_hp(entity_t* const e, int hp) {
+    massert(e, "entity_incr_hp: e is NULL");
+    entity_set_hp(e, e->hp + hp);
+}
+
+void entity_decr_hp(entity_t* const e, int hp) {
+    massert(e, "entity_decr_hp: e is NULL");
+    entity_set_hp(e, e->hp - hp);
 }

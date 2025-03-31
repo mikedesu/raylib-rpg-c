@@ -81,19 +81,7 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
     case ENTITY_ACTION_ATTACK_DOWN_RIGHT: liblogic_try_entity_attack(g, e->id, e->x + 1, e->y + 1); break;
     case ENTITY_ACTION_MOVE_RANDOM: liblogic_try_entity_move_random(g, e); break;
     case ENTITY_ACTION_ATTACK_RANDOM: {
-        int x = rand() % 3;
-        x = x == 0 ? -1 : x == 1 ? 0 : 1;
-        // if x is 0, y cannot also be 0
-        // if x is 0, y cannot also be 0
-        int y;
-        if (x == 0) {
-            y = rand() % 2;
-            y = y == 0 ? -1 : 1;
-        } else {
-            y = rand() % 3;
-            y = y == 0 ? -1 : y == 1 ? 0 : 1;
-        }
-        liblogic_try_entity_attack(g, e->id, e->x + x, e->y + y);
+        liblogic_try_entity_attack_random(g, e);
         break;
     }
     case ENTITY_ACTION_MOVE_PLAYER: {
@@ -117,8 +105,27 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
     }
 }
 
+void liblogic_try_entity_attack_random(gamestate* const g, entity* const e) {
+    massert(g, "liblogic_try_entity_attack_random: gamestate is NULL");
+    massert(e, "liblogic_try_entity_attack_random: entity is NULL");
+    int x = rand() % 3;
+    x = x == 0 ? -1 : x == 1 ? 0 : 1;
+    // if x is 0, y cannot also be 0
+    // if x is 0, y cannot also be 0
+    int y;
+    if (x == 0) {
+        y = rand() % 2;
+        y = y == 0 ? -1 : 1;
+    } else {
+        y = rand() % 3;
+        y = y == 0 ? -1 : y == 1 ? 0 : 1;
+    }
+    liblogic_try_entity_attack(g, e->id, e->x + x, e->y + y);
+}
+
 void liblogic_try_entity_move_random(gamestate* const g, entity* const e) {
     massert(g, "liblogic_try_entity_move_random: gamestate is NULL");
+    massert(e, "liblogic_try_entity_move_random: entity is NULL");
     int x = rand() % 3;
     x = x == 0 ? -1 : x == 1 ? 0 : 1;
     // if x is 0, y cannot also be 0
@@ -205,6 +212,10 @@ void liblogic_init(gamestate* const g) {
 }
 
 void liblogic_add_message(gamestate* g, const char* text) {
+    massert(g, "liblogic_add_message: gamestate is NULL");
+    massert(text, "liblogic_add_message: text is NULL");
+    massert(strlen(text) > 0, "liblogic_add_message: text is empty");
+
     if (g->msg_system.count >= MAX_MESSAGES) {
         mwarning("Message queue full!");
         return;
@@ -408,7 +419,6 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         int dy = liblogic_get_y_from_dir(e->direction);
         int tx = e->x + dx;
         int ty = e->y + dy;
-        //liblogic_try_flip_switch(g, tx, ty, e->floor);
         liblogic_try_flip_switch(g, e, tx, ty, e->floor);
     } break;
     case KEY_C:
@@ -833,8 +843,6 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
                 minfo("Attack successful!");
                 attack_successful = target->is_damaged = target->do_update = true;
                 entity_set_hp(target, entity_get_hp(target) - 1); // Reduce HP by 1
-                //
-                //
 
                 if (target->type == ENTITY_PLAYER) { liblogic_add_message(g, "Player attacked!"); }
 
@@ -864,21 +872,19 @@ int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int f
     massert(y < g->dungeon->floors[fl]->height, "liblogic_tile_npc_living_count: y is out of bounds");
     const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
     massert(df, "liblogic_tile_npc_living_count: failed to get dungeon floor");
-    const tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-    massert(tile, "liblogic_tile_npc_living_count: failed to get tile");
+    const tile_t* const t = dungeon_floor_tile_at(df, x, y);
+    massert(t, "liblogic_tile_npc_living_count: failed to get tile");
     // Count living NPCs
     int count = 0;
-    const int max_entities = tile->entity_max;
-    for (int i = 0; i < max_entities; i++) {
-        //const entityid eid = tile->entities[i];
-        const entityid eid = tile_get_entity(tile, i);
+    for (int i = 0; i < t->entity_max; i++) {
+        const entityid eid = tile_get_entity(t, i);
         if (eid == -1) continue;
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) {
-            mwarningint("Missing entity", eid); // Warning not error
+            //mwarningint("Missing entity", eid); // Warning not error
             continue;
         }
-        if (e->type == ENTITY_NPC && !e->is_dead) count++;
+        if (e->type == ENTITY_NPC && !e->is_dead) { count++; }
     }
     return count;
 }
