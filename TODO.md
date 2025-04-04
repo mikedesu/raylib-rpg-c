@@ -5,16 +5,15 @@
 	- [ ] example: rhino is 22x10, which can occupy 3 tiles with 2 pixels of overlap on top
 - [ ] web controls / gestures / touchscreen
 - [ ] mouse controls / clicking
-- [ ] attack / damage mechanics
-	- [ ] player
-	- [ ] enemies
-- [ ] death animation change
-- [ ] death mechanics
+- [x] attack / damage mechanics
+	- [x] player
+	- [x] enemies
+- [x] death animation change
+- [x] death mechanics
 - [ ] item drops
 - [ ] inventory menu
 - [ ] game menu
 - [ ] saving / loading
-	- [ ] lua serialization / deserialization of tables
 - [ ] blocking animation
 - [ ] blocking mechanics
 - [ ] item-use 
@@ -37,10 +36,10 @@
 	- [ ] pressure plates
 	- [ ] doors
 	- [ ] attaching doors to pressure plates and other switches
-- [ ] trap tiles
-	- [ ] trap-on-tile
+- [x] trap tiles
+	- [x] trap-on-tile
 	- [ ] trap by pressure plate or other switch
-- [ ] wall switches
+- [x] wall switches
 - [ ] lighting
 	- [ ] torches
 	- [ ] candles
@@ -52,8 +51,8 @@
 	- [ ] ex: poisonous sword of fire: +1 poison damage, +1 fire damage
 - [ ] dungeon details
 	- [ ] props
-- [ ] messaging systems
-	- [ ] popup texts
+- [x] messaging systems
+	- [x] popup texts
 	- [ ] message logging
 	- [ ] message boxes that pop up when talking with NPCs
 - [ ] new tiles / environments
@@ -65,9 +64,4 @@
 - [ ] `handle_npc_turn` can be optimized / updated
 - [ ] enemy stun on attack or somehow "pause" the gameloop so the sprite doesnt skip the damage animation
 
-# DONE
 
-- [x] NPC turn time-step
-	- [x] steps all entities
-- [x] loading textures via files
-- [x] Lua integration
