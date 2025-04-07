@@ -209,6 +209,11 @@ bool dungeon_floor_add_at(dungeon_floor_t* const df, entityid id, int x, int y) 
         return false;
     }
     retval = tile_add(&df->tiles[y][x], id) != -1;
+    if (!retval) {
+        merror("dungeon_floor_add_at: failed to add entity, tile_add failure");
+        return false;
+    }
+
     //msuccessint3("dungeon_floor_add_at: added entity", id, x, y);
     return retval;
 }

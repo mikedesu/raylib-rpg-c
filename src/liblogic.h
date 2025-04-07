@@ -44,3 +44,5 @@ void liblogic_add_message(gamestate* g, const char* text);
 void liblogic_try_entity_attack_random(gamestate* const g, entity* const e);
 
 entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
+void liblogic_init_orcs_test_naive_loop(gamestate* const g);
+void liblogic_init_orcs_test_intermediate(gamestate* const g);

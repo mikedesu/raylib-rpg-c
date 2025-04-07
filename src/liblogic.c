@@ -11,6 +11,7 @@
 #include "keybinding.h"
 #include "libgame_defines.h"
 #include "liblogic.h"
+#include "location.h"
 #include "massert.h"
 #include "mprint.h"
 #include "race.h"
@@ -268,56 +269,111 @@ void liblogic_init_player(gamestate* const g) {
     msuccess("liblogic_init: hero id %d", g->hero_id);
 }
 
-void liblogic_init_orcs_test(gamestate* const g) {
-    //const int orc_x = 0;
-    //const int orc_y = 6;
-    const int total_orcs_to_make = 100;
-    int count = 0;
+void liblogic_init_orcs_test_naive_loop(gamestate* const g) {
+    massert(g, "liblogic_init: gamestate is NULL");
     dungeon_t* const d = g->dungeon;
     massert(d, "liblogic_init: dungeon is NULL");
     //dungeon_floor_t* const df = d->floors[0];
     dungeon_floor_t* const df = dungeon_get_floor(d, 0);
     massert(df, "liblogic_init: dungeon floor is NULL");
 
+    // this works, but is naive and slow
+    int count = 0;
+    const int total_orcs_to_make = 100;
     while (count < total_orcs_to_make) {
-
         int x = rand() % df->width;
         int y = rand() % df->height;
-
         tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-
         if (dungeon_tile_is_wall(tile->type)) { continue; }
-
         // check if there is already an entity at this location
         if (tile_entity_count(tile) > 0) { continue; }
-
         entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, x, y, 0, "orc");
         //massert(orc, "liblogic_init: failed to create orc");
         if (!orc) {
             merror("liblogic_init: failed to init orc");
             continue;
         }
-
         entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
         entity_set_default_action(orc, action);
         entity_set_maxhp(orc, 1);
         entity_set_hp(orc, 1);
         count++;
     }
+}
 
-    //for (int y = 0; y < df->height; y++) {
-    //    for (int x = 0; x < df->width; x++) {
-    //        if (count >= total_orcs_to_make) { break; }
-    //        entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, orc_x + x, orc_y + y, 0, "orc");
-    //        entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
-    //        entity_set_default_action(orc, action);
-    //        entity_set_maxhp(orc, 1);
-    //        entity_set_hp(orc, 1);
-    //        count++;
-    //        if (count >= total_orcs_to_make) break;
-    //    }
-    //    if (count >= total_orcs_to_make) break;
-    //}
+void liblogic_init_orcs_test_intermediate(gamestate* const g) {
+    massert(g, "liblogic_init: gamestate is NULL");
+    dungeon_t* const d = g->dungeon;
+    massert(d, "liblogic_init: dungeon is NULL");
+    //dungeon_floor_t* const df = d->floors[0];
+    dungeon_floor_t* const df = dungeon_get_floor(d, 0);
+    massert(df, "liblogic_init: dungeon floor is NULL");
+
+    // first, we need to count all of the possible tiles we could place an orc on
+    // we can loop thru each tile on the dungeon floor and check if it is walkable
+    // in the beginning there wont be any entities at all so we are just counting total possible locations right now
+    // in order to prepare a list of them
+
+    int count = 0;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            if (dungeon_tile_is_walkable(tile->type)) {
+                // there wont be any entities yet so do not check for them
+                // do not write an if statement
+                count++;
+            }
+        }
+    }
+
+    // now we have the total number of possible locations
+    // we can create an array of size count
+
+    loc_t* locations = malloc(sizeof(loc_t) * count);
+    massert(locations, "liblogic_init: failed to malloc locations");
+
+    int count2 = 0;
+    // now we can loop thru the dungeon floor again and fill the array with the locations
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            if (dungeon_tile_is_walkable(tile->type)) {
+                // there wont be any entities yet so do not check for them
+                // do not write an if statement
+                locations[count2].x = x;
+                locations[count2].y = y;
+                count2++;
+                massert(count2 <= count, "liblogic_init: count2 is greater than count");
+            }
+        }
+    }
+    massert(count2 == count, "liblogic_init: count2 is greater than count");
+
+    // now we can loop thru the array and create an orc at each location
+    //for (int i = 0; i < count2; i++) {
+    //for (int i = 0; i < count2; i++) {
+    for (int i = 0; i < 1; i++) {
+
+        tile_t* const tile = dungeon_floor_tile_at(df, locations[i].x, locations[i].y);
+        if (dungeon_tile_is_wall(tile->type)) { continue; }
+        // check if there is already an entity at this location
+        if (tile_entity_count(tile) > 0) { continue; }
+        entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, locations[i].x, locations[i].y, 0, "orc");
+        massert(orc, "liblogic_init: failed to create orc");
+        //if (!orc) {
+        //    merror("liblogic_init: failed to init orc");
+        //    continue;
+        //}
+        entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
+        entity_set_default_action(orc, action);
+        entity_set_maxhp(orc, 1);
+        entity_set_hp(orc, 1);
+    }
+}
+
+void liblogic_init_orcs_test(gamestate* const g) {
+    //liblogic_init_orcs_test_naive_loop(g);
+    liblogic_init_orcs_test_intermediate(g);
 }
 
 void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
@@ -440,6 +496,20 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
             liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_DOWN_LEFT);
         } else if (strcmp(action, "move_se") == 0) {
             liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_DOWN_RIGHT);
+        } else if (strcmp(action, "attack") == 0) {
+            msuccess("attack pressed!");
+            int dx = liblogic_get_x_from_dir(e->direction);
+            int dy = liblogic_get_y_from_dir(e->direction);
+            int tx = e->x + dx;
+            int ty = e->y + dy;
+            liblogic_try_entity_attack(g, e->id, tx, ty);
+        } else if (strcmp(action, "interact") == 0) {
+            msuccess("Space pressed!");
+            int dx = liblogic_get_x_from_dir(e->direction);
+            int dy = liblogic_get_y_from_dir(e->direction);
+            int tx = e->x + dx;
+            int ty = e->y + dy;
+            liblogic_try_flip_switch(g, e, tx, ty, e->floor);
         }
     } else {
         merror("No action found for key");
@@ -820,7 +890,7 @@ entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, in
     massert(g, "liblogic_npc_create_ptr: gamestate is NULL");
     entityid id = liblogic_npc_create(g, rt, x, y, fl, name);
     if (id == -1) {
-        //merror("liblogic_npc_create_ptr: failed to create NPC");
+        merror("liblogic_npc_create_ptr: failed to create NPC");
         return NULL;
     }
     return em_get(g->entitymap, id);
@@ -843,23 +913,24 @@ entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl
     tile_t* const tile = dungeon_floor_tile_at(df, x, y);
     massert(tile, "liblogic_entity_create: failed to get tile");
     if (!dungeon_tile_is_walkable(tile->type)) {
-        //merror("liblogic_entity_create: cannot create entity on wall");
+        merror("liblogic_entity_create: cannot create entity on wall");
         return -1;
     }
     if (tile_has_live_npcs(tile, em)) {
-        //merror("liblogic_entity_create: cannot create entity on tile with NPC");
+        merror("liblogic_entity_create: cannot create entity on tile with NPC");
         return -1;
     }
     entity* const e = entity_new_npc_at(next_entityid++, rt, x, y, fl,
                                         name); // Assuming entity_new_at takes name next
     if (!e) {
-        //merror("liblogic_entity_create: failed to create entity");
+        merror("liblogic_entity_create: failed to create entity");
         return -1;
     }
     em_add(em, e);
     gamestate_add_entityid(g, e->id);
     //dungeon_floor_add_at(df, e->id, x, y);
     if (!dungeon_floor_add_at(df, e->id, x, y)) {
+        merror("liblogic_entity_create: failed to add entity to dungeon floor");
         entity_free(e);
         return -1;
     }
