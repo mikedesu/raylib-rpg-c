@@ -2,7 +2,6 @@
 #include "mprint.h"
 #include <stdlib.h>
 
-
 hashtable_entityid_spritegroup_t* hashtable_entityid_spritegroup_create(const int size) {
     if (size <= 0) {
         merror("hashtable_entityid_spritegroup_create: size must be greater than 0");
@@ -24,14 +23,10 @@ hashtable_entityid_spritegroup_t* hashtable_entityid_spritegroup_create(const in
         free(ht);
         return NULL;
     }
-    for (int i = 0; i < size; i++) {
-        ht->table[i] = NULL;
-    }
-
+    for (int i = 0; i < size; i++) { ht->table[i] = NULL; }
 
     return ht;
 }
-
 
 void hashtable_entityid_spritegroup_destroy(hashtable_entityid_spritegroup_t* ht) {
     if (ht) {
@@ -49,11 +44,9 @@ void hashtable_entityid_spritegroup_destroy(hashtable_entityid_spritegroup_t* ht
     }
 }
 
-
 const int hashtable_entityid_spritegroup_hash(hashtable_entityid_spritegroup_t* const ht, const entityid key) {
     return key % ht->size;
 }
-
 
 const bool hashtable_entityid_spritegroup_has_specifier(hashtable_entityid_spritegroup_t* const ht,
                                                         const entityid key,
@@ -67,7 +60,6 @@ const bool hashtable_entityid_spritegroup_has_specifier(hashtable_entityid_sprit
     }
     return false;
 }
-
 
 void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* const ht,
                                            const entityid key,
@@ -87,11 +79,8 @@ void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* con
     ht->num_entries++;
 }
 
-
 spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup_t* const ht, const entityid key) {
-    if (ht == NULL || key < 0) {
-        return NULL;
-    }
+    if (ht == NULL || key < 0) { return NULL; }
     const int index = hashtable_entityid_spritegroup_hash(ht, key);
     hashtable_entityid_spritegroup_node_t* node = ht->table[index];
     spritegroup_t* result = NULL;
@@ -104,7 +93,6 @@ spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup
     }
     return result;
 }
-
 
 spritegroup_t* hashtable_entityid_spritegroup_get_by_specifier(hashtable_entityid_spritegroup_t* const ht,
                                                                const entityid key,
@@ -123,7 +111,6 @@ spritegroup_t* hashtable_entityid_spritegroup_get_by_specifier(hashtable_entityi
     }
     return result;
 }
-
 
 // this only deletes the first instance of the key
 void hashtable_entityid_spritegroup_delete(hashtable_entityid_spritegroup_t* const ht, const entityid key) {
@@ -149,7 +136,6 @@ void hashtable_entityid_spritegroup_delete(hashtable_entityid_spritegroup_t* con
         node = node->next;
     }
 }
-
 
 // this deletes all instances of the key
 void hashtable_entityid_spritegroup_delete_all(hashtable_entityid_spritegroup_t* const ht, const entityid key) {

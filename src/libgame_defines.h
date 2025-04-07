@@ -6,7 +6,6 @@
 #define DEFAULT_TILE_SIZE 8
 #define DEFAULT_ZOOM_INCR 0.05f
 
-
 #define TX_DIRT_00 0
 
 #define TX_HUMAN_IDLE 1
@@ -95,7 +94,6 @@
 
 #define TX_HUMAN_DMG 75
 #define TX_HUMAN_DMG_SHADOW 76
-
 
 #define TX_GRASS_05 77
 #define TX_GRASS_06 78

@@ -13,11 +13,12 @@ em_t* em_new() {
     return em;
 }
 
-void em_free(em_t* em) {
-    if (!em) {
-        merror("em_free: em is NULL");
-        return;
-    }
+bool em_free(em_t* em) {
+    massert(em, "em_free: em is NULL");
+    //if (!em) {
+    //    merror("em_free: em is NULL");
+    //    return false;
+    //}
     minfo("Freeing entity map");
     for (int i = 0; i < EM_MAX_SLOTS; i++) {
         entity_t* current = em->entities[i];
@@ -29,11 +30,13 @@ void em_free(em_t* em) {
     }
     free(em);
     msuccess("Freed entity map");
+    return true;
 }
 
 // returns the first item in the set which will be the oldest
 entity_t* const em_get(const em_t* const em, entityid id) {
     massert(em, "em_get: em is NULL");
+    //massert(id >= 0, "em_get: id is less than 0");
     if (id < 0) { return NULL; }
     const int hash = id % EM_MAX_SLOTS;
     massert(hash >= 0, "em_get: hash is negative");
@@ -91,7 +94,7 @@ entity_t* em_remove_last(em_t* const em, entityid id) {
     return last;
 }
 
-const int em_count(const em_t* const em) {
+int em_count(const em_t* const em) {
     massert(em, "em_count: em is NULL");
     return em->count;
 }

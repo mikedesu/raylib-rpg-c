@@ -45,7 +45,7 @@ void df_init(dungeon_floor_t* df) {
 void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
     if (!df) return;
     if (event_id < 0 || event_id >= DEFAULT_DF_EVENTS) {
-        merrorint("df_set_event: event_id is out of bounds", event_id);
+        //merrorint("df_set_event: event_id is out of bounds", event_id);
         return;
     }
     df->events[event_id].x = x;
@@ -209,7 +209,7 @@ bool dungeon_floor_add_at(dungeon_floor_t* const df, entityid id, int x, int y) 
         return false;
     }
     retval = tile_add(&df->tiles[y][x], id) != -1;
-    msuccessint3("dungeon_floor_add_at: added entity", id, x, y);
+    //msuccessint3("dungeon_floor_add_at: added entity", id, x, y);
     return retval;
 }
 
@@ -227,7 +227,7 @@ bool dungeon_floor_remove_at(dungeon_floor_t* const df, entityid id, int x, int 
         return false;
     }
     const entityid r = tile_remove(&df->tiles[y][x], id);
-    msuccessint3("dungeon_floor_remove_at: added entity", id, x, y);
+    //msuccessint3("dungeon_floor_remove_at: added entity", id, x, y);
     return r != -1 && r == id;
 }
 

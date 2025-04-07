@@ -8,6 +8,7 @@
 #include "entityid.h"
 #include "fadestate.h"
 #include "gamestate_flag.h"
+#include "keybinding.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <time.h>
@@ -85,20 +86,24 @@ typedef struct gamestate {
     message_system msg_system;
 
     bool gameover;
+
+    keybinding_list_t keybinding_list;
 } gamestate;
 
 gamestate* gamestateinitptr();
 
-const entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index);
-const entityid gamestate_get_hero_id(const gamestate* const g);
-const int gamestate_get_entityid_index(const gamestate* const g, const entityid id);
-const int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, const int index);
+entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index);
+entityid gamestate_get_hero_id(const gamestate* const g);
+int gamestate_get_entityid_index(const gamestate* const g, const entityid id);
+int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, const int index);
 
 em_t* gamestate_get_entitymap(gamestate* const g);
+
+bool gamestate_add_entityid(gamestate* const g, entityid id);
 
 void gamestatefree(gamestate* g);
 void gamestate_dungeon_destroy(gamestate* const g);
 void gamestate_init_entityids(gamestate* const g);
-void gamestate_add_entityid(gamestate* const g, const entityid id);
 void gamestate_set_hero_id(gamestate* const g, const entityid id);
 void gamestate_incr_entity_turn(gamestate* const g);
+void gamestate_load_keybindings(gamestate* const g);

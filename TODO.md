@@ -1,5 +1,15 @@
 # TODO
 
+- [ ] alternate control scheme for when im using keyboard-mouse on the numpad
+  - [ ] control configurability
+- [ ] add a "pause" button to the game
+- [ ] player starting position
+- [ ] more intelligent enemy placement system
+- [ ] need to display the game window before everything is loaded, perhaps?
+  - [ ] opportunity to make a loading screen
+- [ ] allow the player to 'turn' in place without consuming a turn
+- [ ] 2d "z" axis / sprite "layers" like in emulators
+- [ ] improve enemy movement
 - [ ] do we want auto-equip? should picking up an item and equipping it be 2 seperate actions/turns?
 - [ ] handle creatures and objects that occupy multiple tiles (bigger than 8x8)
 	- [ ] example: rhino is 22x10, which can occupy 3 tiles with 2 pixels of overlap on top

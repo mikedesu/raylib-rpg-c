@@ -1,5 +1,5 @@
-#include "gamestate.h"
 #include "controlmode.h"
+#include "gamestate.h"
 #include "gamestate_flag.h"
 #include "mprint.h"
 #include <raylib.h>
@@ -116,21 +116,22 @@ void gamestatefree(gamestate* g) {
     msuccess("Freed gamestate");
 }
 
-void gamestate_add_entityid(gamestate* const g, const entityid id) {
+bool gamestate_add_entityid(gamestate* const g, entityid id) {
     if (g == NULL) {
         merror("gamestate_add_entityid g is NULL");
-        return;
+        return false;
     }
     if (g->entityids == NULL) {
         merror("gamestate_add_entityid g->entityids is NULL");
-        return;
+        return false;
     }
     if (g->index_entityids >= g->max_entityids) {
         merror("gamestate_add_entityid g->index_entityids >= g->max_entityids");
-        return;
+        return false;
     }
     g->entityids[g->index_entityids] = id;
     g->index_entityids++;
+    return true;
 }
 
 void gamestate_set_hero_id(gamestate* const g, const entityid id) {
@@ -142,7 +143,7 @@ void gamestate_set_hero_id(gamestate* const g, const entityid id) {
     g->hero_id = id;
 }
 
-const entityid gamestate_get_hero_id(const gamestate* const g) {
+entityid gamestate_get_hero_id(const gamestate* const g) {
     if (!g) {
         merror("gamestate_get_hero_id: g is NULL");
         return -1;
@@ -180,7 +181,7 @@ void gamestate_init_entityids(gamestate* const g) {
     g->max_entityids = GAMESTATE_INIT_ENTITYIDS_MAX;
 }
 
-const entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index) { return g->entityids[index]; }
+entityid gamestate_get_entityid_unsafe(const gamestate* const g, const int index) { return g->entityids[index]; }
 
 void gamestate_dungeon_destroy(gamestate* const g) {
     if (!g) {
@@ -192,7 +193,7 @@ void gamestate_dungeon_destroy(gamestate* const g) {
     g->dungeon = NULL;
 }
 
-const int gamestate_get_entityid_index(const gamestate* const g, const entityid id) {
+int gamestate_get_entityid_index(const gamestate* const g, const entityid id) {
     if (!g) {
         merror("gamestate_get_entityid_index: g is NULL");
         return -1;
@@ -205,7 +206,7 @@ const int gamestate_get_entityid_index(const gamestate* const g, const entityid 
     return -1;
 }
 
-const int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, const int index) {
+int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, const int index) {
     if (!g) {
         merror("gamestate_get_next_npc_entityid_from_index: g is NULL");
         return -1;
@@ -242,13 +243,16 @@ void gamestate_incr_entity_turn(gamestate* const g) {
             return;
         }
 
-        const int next_npc_entityid = gamestate_get_next_npc_entityid_from_index(g, index);
-
-        //if (next_npc_entityid == -1) {
-        //    merror("gamestate_incr_entity_turn: next_npc_entityid is -1");
-        //    return;
-        //}
-
-        g->entity_turn = next_npc_entityid;
+        g->entity_turn = gamestate_get_next_npc_entityid_from_index(g, index);
     }
+}
+
+void gamestate_load_keybindings(gamestate* const g) {
+    if (!g) {
+        merror("gamestate_load_keybindings: g is NULL");
+        return;
+    }
+    const char* filename = "keybindings.ini";
+
+    load_keybindings(filename, &g->keybinding_list);
 }

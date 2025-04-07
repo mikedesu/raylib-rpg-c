@@ -1,10 +1,10 @@
-#include "libdraw.h"
 #include "direction.h"
 #include "dungeon_tile_type.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
+#include "libdraw.h"
 #include "libdraw_cube.h"
 #include "libdraw_plane.h"
 #include "mprint.h"
@@ -51,7 +51,7 @@ static void draw_dungeon_tiles_3d(const gamestate* const g, const dungeon_floor_
             if (!tex) continue;
             // check if the texture is loaded
             if (tex->id == 0) {
-                merrorint("draw_dungeon_tiles_3d: texture not loaded", txkey);
+                merror("draw_dungeon_tiles_3d: texture not loaded %d", txkey);
                 continue;
             }
             const Vector3 pos = {x * TW, -0.5f, y * TD};
@@ -76,7 +76,7 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                     // it can be gotten off the player's spritegroup
                     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
                     if (!sg) {
-                        merrorint("draw_entities_3d: player spritegroup NULL", id);
+                        merror("draw_entities_3d: player spritegroup NULL %d", id);
                         continue;
                     }
                     Texture2D* tex = sg->sprites[sg->current]->texture;
@@ -97,7 +97,7 @@ static void draw_entities_3d(const gamestate* g, const dungeon_floor_t* floor, b
                     // get the entity's spritegroup
                     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
                     if (!sg) {
-                        merrorint("draw_entities_3d: spritegroup NULL", id);
+                        merror("draw_entities_3d: spritegroup NULL: %d", id);
                         continue;
                     }
                     // get the entity's current sprite's texture
@@ -129,7 +129,7 @@ static void draw_wall_tiles_3d(const gamestate* g, const dungeon_floor_t* floor)
             int txkey = get_txkey_for_tiletype(t->type);
             Texture2D* tex = &txinfo[txkey].texture;
             if (!tex) {
-                merrorint("draw_wall_tiles_3d: texture not loaded", txkey);
+                //merrorint("draw_wall_tiles_3d: texture not loaded", txkey);
                 continue;
             }
             const Vector3 pos = {x * TILE_SIZE, 0.5f, y * TILE_SIZE};
@@ -144,7 +144,9 @@ static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             if (df_tile_is_wall(df, x, y)) continue;
-            if (!libdraw_draw_dungeon_floor_tile(g, df, x, y)) { merrorint2("draw_dungeon_tiles_2d failed", x, y); }
+            if (!libdraw_draw_dungeon_floor_tile(g, df, x, y)) {
+                //merrorint2("draw_dungeon_tiles_2d failed", x, y);
+            }
         }
     }
     return true;
@@ -170,7 +172,7 @@ static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
         for (int x = 0; x < df->width; x++) {
             tile_t* tile = dungeon_floor_tile_at(df, x, y);
             if (!tile) {
-                merrorint2("draw_wall_tiles_2d: tile NULL", x, y);
+                //merrorint2("draw_wall_tiles_2d: tile NULL", x, y);
                 return false;
             }
             if (!dungeon_tile_is_wall(tile->type)) continue;
@@ -198,7 +200,7 @@ bool libdraw_camera_lock_on(gamestate* const g) {
     if (!g || !g->cam_lockon) return false;
     spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     if (!grp) {
-        merrorint("libdraw_camera_lock_on: hero spritegroup NULL", g->hero_id);
+        //merrorint("libdraw_camera_lock_on: hero spritegroup NULL", g->hero_id);
         return false;
     }
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
@@ -225,12 +227,12 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
     }
     entity* const e = em_get(g->entitymap, id);
     if (!e) {
-        merrorint("libdraw_update_sprite: entity not found", id);
+        //merrorint("libdraw_update_sprite: entity not found", id);
         return;
     }
     spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (!sg) {
-        merrorint("libdraw_update_sprite: spritegroup not found", id);
+        //merrorint("libdraw_update_sprite: spritegroup not found", id);
         return;
     }
     libdraw_update_sprite_ptr(g, e, sg);
@@ -405,12 +407,12 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         return false;
     }
     if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-        merrorint2("libdraw_draw_dungeon_floor_tile: x or y out of bounds", x, y);
+        //merrorint2("libdraw_draw_dungeon_floor_tile: x or y out of bounds", x, y);
         return false;
     }
     tile_t* tile = dungeon_floor_tile_at(df, x, y);
     if (!tile) {
-        merrorint2("libdraw_draw_dungeon_floor_tile: tile is NULL", x, y);
+        //merrorint2("libdraw_draw_dungeon_floor_tile: tile is NULL", x, y);
         return false;
     }
     // check if the tile type is none
@@ -427,7 +429,7 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
     }
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) {
-        merrorint4("libdraw_draw_dungeon_floor_tile: texture id is invalid", texture->id, x, y, txkey);
+        //merrorint4("libdraw_draw_dungeon_floor_tile: texture id is invalid", texture->id, x, y, txkey);
         return false;
     }
     // atm hard-coding the size of the new tiles and their destinations
@@ -441,7 +443,7 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
     if (tile->has_pressure_plate) {
         const int txkey2 = tile->pressure_plate_up_tx_key;
         if (txkey2 < 0) {
-            merrorint2("libdraw_draw_dungeon_floor_tile: pressure plate up txkey is invalid", x, y);
+            //merrorint2("libdraw_draw_dungeon_floor_tile: pressure plate up txkey is invalid", x, y);
             return false;
         }
         Texture2D* texture = &txinfo[txkey2].texture;
@@ -471,12 +473,12 @@ bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* 
         }
 
         if (txkey < 0) {
-            merrorint2("libdraw_draw_dungeon_floor_tile: wall switch up txkey is invalid", x, y);
+            //merrorint2("libdraw_draw_dungeon_floor_tile: wall switch up txkey is invalid", x, y);
             return false;
         }
         Texture2D* texture = &txinfo[txkey].texture;
         if (texture->id <= 0) {
-            merrorint3("libdraw_draw_dungeon_floor_tile: wall switch texture id is invalid", x, y, txkey);
+            //merrorint3("libdraw_draw_dungeon_floor_tile: wall switch texture id is invalid", x, y, txkey);
             return false;
         }
         //const int tile_size_src_w = DEFAULT_TILE_SIZE * 4;
@@ -629,7 +631,7 @@ bool libdraw_draw_player_target_box(const gamestate* const g) {
     }
     entity* const e = em_get(g->entitymap, id);
     if (!e) {
-        merrorint("libdraw_draw_player_target_box: entity not found", id);
+        //merrorint("libdraw_draw_player_target_box: entity not found", id);
         return false;
     }
     direction_t dir = e->direction;
@@ -675,7 +677,7 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
     sprite* s = spritegroup_get(sg, sg->current);
     if (!s) {
-        merrorint("libdraw_draw_sprite_and_shadow: sprite not found at current", sg->current);
+        //merrorint("libdraw_draw_sprite_and_shadow: sprite not found at current", sg->current);
         return;
     }
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
@@ -683,7 +685,7 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     if (sh) {
         DrawTexturePro(*sh->texture, sh->src, dest, (Vector2){0, 0}, 0, WHITE);
     } else {
-        merrorint("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1", sg->current + 1);
+        //merrorint("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1", sg->current + 1);
     }
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
@@ -757,7 +759,7 @@ void libdraw_load_textures() {
             continue;
         }
         if (!libdraw_load_texture(txkey, contexts, frames, do_dither, path)) {
-            merrorstr("libdraw_load_textures: failed to load texture", path);
+            //merrorstr("libdraw_load_textures: failed to load texture", path);
         }
     }
     fclose(file);
@@ -789,11 +791,11 @@ void libdraw_create_spritegroup(gamestate* const g,
     msuccess("group was not NULL");
     const entity* const e = em_get(g->entitymap, id);
     if (!e) {
-        merrorint("libdraw_create_spritegroup: entity not found", id);
+        merror("libdraw_create_spritegroup: entity not found %d", id);
         spritegroup_destroy(group);
         return;
     }
-    msuccessint("entity found", id);
+    msuccess("entity found %d", id);
     //disabling this check until dungeon_floor created
     dungeon_floor_t* df = dungeon_get_current_floor(g->dungeon);
     if (!df) {
@@ -803,11 +805,11 @@ void libdraw_create_spritegroup(gamestate* const g,
     }
     const int df_w = df->width, df_h = df->height;
     if (e->x < 0 || e->x >= df_w || e->y < 0 || e->y >= df_h) {
-        merrorint2("libdraw_create_spritegroup: entity pos out of bounds", e->x, e->y);
+        merror("libdraw_create_spritegroup: entity pos out of bounds %d %d", e->x, e->y);
         spritegroup_destroy(group);
         return;
     }
-    minfoint("libdraw_create_spritegroup: creating spritegroup for entityid", id);
+    minfo("libdraw_create_spritegroup: creating spritegroup for entityid %d", id);
     for (int i = 0; i < num_keys; i++) {
         const int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
@@ -826,9 +828,9 @@ void libdraw_create_spritegroup(gamestate* const g,
     group->current = 0;
     group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
     group->off_x = offset_x, group->off_y = offset_y;
-    msuccessint("inserting spritegroup for entity", id);
+    //msuccessint("inserting spritegroup for entity", id);
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
-    msuccessint("Spritegroup created for entity", id);
+    //msuccessint("Spritegroup created for entity", id);
 }
 
 void libdraw_calc_debugpanel_size(gamestate* const g) {
@@ -849,7 +851,7 @@ void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t 
     //minfoint2("libdraw_update_sprite_context: updating sprite context for entity", id, dir);
     spritegroup_t* group = hashtable_entityid_spritegroup_get(spritegroups, id); // Adjusted for no specifier
     if (!group) {
-        merrorint("libdraw_update_sprite_context: group not found", id);
+        //merrorint("libdraw_update_sprite_context: group not found", id);
         return;
     }
     libdraw_update_sprite_context_ptr(g, group, dir);
@@ -901,7 +903,7 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
     }
     entity* const e = em_get(g->entitymap, id);
     if (!e) {
-        merrorint("libdraw_create_sg_byid: entity not found", id);
+        //merrorint("libdraw_create_sg_byid: entity not found", id);
         return;
     }
     int* keys = NULL;
@@ -922,7 +924,7 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
         offset_x = -12;
         offset_y = -12;
         break;
-    default: merrorint("libdraw_create_sg_byid: unknown race", e->race); return;
+    default: merror("libdraw_create_sg_byid: unknown race %d", e->race); return;
     }
 
     libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
@@ -958,7 +960,8 @@ void libdraw_draw_hud(gamestate* const g) {
     const int x = g->windowwidth / 2 - w / 2;
     const int y = g->windowheight - (h * 2) - pad;
     const Color fg = (Color){0x33, 0x33, 0x33, 0xff};
-    const Color fg2 = (Color){0x66, 0x66, 0x66, 0xff}, fg3 = WHITE;
+    //const Color fg2 = (Color){0x66, 0x66, 0x66, 0xff};
+    const Color fg3 = WHITE;
     DrawRectangle(x, y, w, h, fg);
     // draw rectangle lines around the box
     //DrawRectangleLines(x, y, w, h, fg2);
@@ -1017,7 +1020,7 @@ void libdraw_draw_message_box(gamestate* g) {
     const char* msg = g->msg_system.messages[g->msg_system.index];
     int font_size = 30;
     int pad = 20; // Inner padding (text <-> box edges)
-    int margin = 50; // Outer margin (box <-> screen edges)
+    //int margin = 50; // Outer margin (box <-> screen edges)
     float line_spacing = 1.0f;
 
     // Measure text (split into lines if needed)

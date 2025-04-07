@@ -1,5 +1,5 @@
-#include "sprite.h"
 #include "mprint.h"
+#include "sprite.h"
 
 #include <stdlib.h>
 
@@ -32,7 +32,6 @@ sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) 
     return s;
 }
 
-
 void sprite_incrframe(sprite* const s) {
     if (!s) return;
     if (!s->is_animating) return;
@@ -42,16 +41,12 @@ void sprite_incrframe(sprite* const s) {
     }
     //s->currentframe = (s->currentframe + 1) % s->numframes;
     s->currentframe++;
-    if (s->currentframe >= s->numframes) {
-        s->currentframe = 0;
-    }
-
+    if (s->currentframe >= s->numframes) { s->currentframe = 0; }
 
     s->src.x = s->width * s->currentframe;
     if (s->currentframe == 0) s->num_loops++;
     //s->num_loops = s->num_loops + (s->currentframe == 0 ? 1 : 0);
 }
-
 
 void sprite_setcontext(sprite* const s, const int context) {
     if (!s) return;
@@ -62,20 +57,17 @@ void sprite_setcontext(sprite* const s, const int context) {
     s->currentframe = s->src.x = 0;
 }
 
-
 void sprite_incrcontext(sprite* const s) {
     if (!s) return;
     s->currentcontext = (s->currentcontext + 1) % s->numcontexts;
     s->src.y = s->height * s->currentcontext;
 }
 
-
 void sprite_updatesrc(sprite* const s) {
     if (!s) return;
     s->src.x = s->width * s->currentframe;
     //s->src.y = s->height * s->currentcontext;
 }
-
 
 void sprite_destroy(sprite* s) {
     if (!s) return;
@@ -85,17 +77,11 @@ void sprite_destroy(sprite* s) {
     msuccess("sprite_destroy success");
 }
 
-
-const int sprite_get_context(const sprite* const s) {
-    return !s ? -1 : s->currentcontext;
-}
-
+const int sprite_get_context(const sprite* const s) { return !s ? -1 : s->currentcontext; }
 
 void sprite_set_is_animating(sprite* const s, const bool is_animating) {
     if (!s) return;
     s->is_animating = is_animating;
 }
 
-const bool sprite_is_animating(const sprite* const s) {
-    return !s ? false : s->is_animating;
-}
+const bool sprite_is_animating(const sprite* const s) { return !s ? false : s->is_animating; }

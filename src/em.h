@@ -19,6 +19,6 @@ entity_t* em_get_last(const em_t* const em, entityid id);
 entity_t* em_add(em_t* const em, entity_t* const e);
 entity_t* em_remove_last(em_t* const em, entityid id);
 
-const int em_count(const em_t* const em);
+int em_count(const em_t* const em);
 
-void em_free(em_t* em);
+bool em_free(em_t* em);
