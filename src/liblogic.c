@@ -504,6 +504,10 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
             int ty = e->y + dy;
             liblogic_try_entity_attack(g, e->id, tx, ty);
         } else if (strcmp(action, "interact") == 0) {
+            // we are hardcoding the flip switch interaction for now
+            // but eventually this will be generalized
+            // for instance u can talk to an NPC merchant using "interact"
+            // or open a door, etc
             msuccess("Space pressed!");
             int dx = liblogic_get_x_from_dir(e->direction);
             int dy = liblogic_get_y_from_dir(e->direction);
