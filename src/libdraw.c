@@ -937,7 +937,7 @@ void libdraw_draw_hud(gamestate* const g) {
     }
     // Draw the HUD
     int fontsize = 30;
-    int pad = 4;
+    int pad = 10;
     int pad2 = pad * 2;
     //int x = pad;
     //int y = pad;
@@ -954,11 +954,11 @@ void libdraw_draw_hud(gamestate* const g) {
     snprintf(buffer, sizeof(buffer), "Name: %s\nHP: %d/%d\nTurn: %d", e->name, hp, maxhp, g->turn_count);
     //const char* text = "Name: evildojo666\nHP: 1/1";
     const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
-    const int w = size.x + pad2 * 4;
-    const int h = size.y + pad2;
     // set the x and y based on the window width and height to be the center of the bottom of the screen
-    const int x = g->windowwidth / 2 - w / 2;
+    const int h = size.y + pad2;
     const int y = g->windowheight - (h * 2) - pad;
+    int w = size.x + pad2 * 2;
+    const int x = g->windowwidth / 2 - w / 2;
     const Color fg = (Color){0x33, 0x33, 0x33, 0xff};
     //const Color fg2 = (Color){0x66, 0x66, 0x66, 0xff};
     const Color fg3 = WHITE;
@@ -1019,7 +1019,7 @@ void libdraw_draw_message_box(gamestate* g) {
 
     const char* msg = g->msg_system.messages[g->msg_system.index];
     int font_size = 30;
-    int pad = 20; // Inner padding (text <-> box edges)
+    int pad = 40; // Inner padding (text <-> box edges)
     //int margin = 50; // Outer margin (box <-> screen edges)
     float line_spacing = 1.0f;
 
@@ -1047,12 +1047,14 @@ void libdraw_draw_message_box(gamestate* g) {
     // Show "Next" prompt if more messages exist
     if (g->msg_system.count > 1) {
         const char* prompt = "[A] Next";
+        int prompt_font_size = 10;
+        int prompt_offset = 10; // Offset from box edges
         //int prompt_width = MeasureText(prompt, 10);
-        Vector2 prompt_size = MeasureTextEx(GetFontDefault(), prompt, 10, 1.0f);
+        Vector2 prompt_size = MeasureTextEx(GetFontDefault(), prompt, prompt_font_size, 1.0f);
         DrawText(prompt,
-                 box.x + box.width - prompt_size.x - 10, // Right-align in box
-                 box.y + box.height - prompt_size.y - 10, // Bottom of box
-                 10,
+                 box.x + box.width - prompt_size.x - prompt_offset, // Right-align in box
+                 box.y + box.height - prompt_size.y - prompt_offset, // Bottom of box
+                 prompt_font_size,
                  WHITE);
     }
 }

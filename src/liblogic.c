@@ -963,6 +963,17 @@ entityid liblogic_player_create(gamestate* const g, race_t rt, int x, int y, int
     return id;
 }
 
+void liblogic_try_entity_attack_in_facing_dir(gamestate* const g, entityid attacker_id) {
+    massert(g, "liblogic_try_entity_attack_in_facing_dir: gamestate is NULL");
+    massert(attacker_id != ENTITYID_INVALID, "liblogic_try_entity_attack_in_facing_dir: attacker_id is invalid");
+    entity* const e = em_get(g->entitymap, attacker_id);
+    massert(e, "liblogic_try_entity_attack_in_facing_dir: entity is NULL");
+    int tx = e->x + liblogic_get_x_from_dir(e->direction);
+    int ty = e->y + liblogic_get_y_from_dir(e->direction);
+    // if tx = 0 and ty = 0, then we attack ourselves
+    liblogic_try_entity_attack(g, e->id, tx, ty);
+}
+
 void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y) {
     massert(g, "liblogic_try_entity_attack: gamestate is NULL");
     entity* const attacker = em_get(g->entitymap, attacker_id);
