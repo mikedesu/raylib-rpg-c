@@ -955,7 +955,7 @@ entityid liblogic_player_create(gamestate* const g, race_t rt, int x, int y, int
     massert(em, "liblogic_player_create: entitymap is NULL");
     entity_t* const e = em_get(em, id);
     if (!e) {
-        merror("liblogic_player_create: failed to get entity with id", id);
+        merror("liblogic_player_create: failed to get entity with id %d", id);
         return ENTITYID_INVALID;
     }
     entity_set_type(e, type);
