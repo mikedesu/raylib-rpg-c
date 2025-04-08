@@ -459,3 +459,35 @@ void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, d
     df_set_tile(df, type, x, y);
     dungeon_floor_set_wall_switch(df, x, y, up, down, trigger_id);
 }
+
+loc_t df_get_upstairs(const dungeon_floor_t* const df) {
+    loc_t loc = {-1, -1};
+    if (!df) return loc;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            if (tile->type == TILE_UPSTAIRS) {
+                loc.x = x;
+                loc.y = y;
+                return loc;
+            }
+        }
+    }
+    return loc;
+}
+
+loc_t df_get_downstairs(const dungeon_floor_t* const df) {
+    loc_t loc = {-1, -1};
+    if (!df) return loc;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            if (tile->type == TILE_DOWNSTAIRS) {
+                loc.x = x;
+                loc.y = y;
+                return loc;
+            }
+        }
+    }
+    return loc;
+}

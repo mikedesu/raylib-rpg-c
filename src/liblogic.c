@@ -261,22 +261,21 @@ void liblogic_init_player(gamestate* const g) {
 
     // setting it up so we can return a loc_t from a function
     // that can scan for an appropriate starting location
-    loc_t loc;
-    loc.x = 2;
-    loc.y = 2;
-
-    const int herox = loc.x;
-    const int heroy = loc.y;
+    //loc_t loc;
+    //loc.x = 2;
+    //loc.y = 2;
+    loc_t loc = df_get_upstairs(g->dungeon->floors[g->dungeon->current_floor]);
+    //const int herox = loc.x;
+    //const int heroy = loc.y;
     //const int id = liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero");
     minfo("liblogic_init: creating player...");
-    const int id = liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero");
-    minfo("liblogic_init: player id: %d", id);
+    const int id = liblogic_player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
+    msuccess("liblogic_init: player id: %d", id);
     massert(id != -1, "liblogic_init: failed to init hero");
     entity* const hero = em_get(g->entitymap, g->hero_id);
-    if (hero) {
-        entity_set_maxhp(hero, 3);
-        entity_set_hp(hero, 3);
-    }
+    massert(hero, "liblogic_init: hero is NULL");
+    entity_set_maxhp(hero, 3);
+    entity_set_hp(hero, 3);
     g->entity_turn = g->hero_id;
     msuccess("liblogic_init: hero id %d", g->hero_id);
 }

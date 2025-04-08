@@ -2,6 +2,7 @@
 
 #include "dungeon_tile.h"
 #include "entityid.h"
+#include "location.h"
 #include "raylib.h"
 #include <stdbool.h>
 
@@ -72,3 +73,7 @@ void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, d
 void df_set_tile_area_range2(dungeon_floor_t* const df, Rectangle r, tiletype_t begin, tiletype_t end);
 
 void df_init_rect2(dungeon_floor_t* df, Rectangle r, tiletype_t t1, tiletype_t t2);
+
+loc_t df_get_upstairs(const dungeon_floor_t* const df);
+
+loc_t df_get_downstairs(const dungeon_floor_t* const df);
