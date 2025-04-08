@@ -258,8 +258,15 @@ void liblogic_init_player(gamestate* const g) {
     // we cant simply hardcode in player start position anymore
     // without potential assert failure
     // so...
-    const int herox = 2;
-    const int heroy = 2;
+
+    // setting it up so we can return a loc_t from a function
+    // that can scan for an appropriate starting location
+    loc_t loc;
+    loc.x = 2;
+    loc.y = 2;
+
+    const int herox = loc.x;
+    const int heroy = loc.y;
     //const int id = liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero");
     minfo("liblogic_init: creating player...");
     const int id = liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero");
