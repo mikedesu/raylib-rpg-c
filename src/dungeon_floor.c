@@ -64,14 +64,12 @@ void df_init_test(dungeon_floor_t* df) {
     tiletype_t begin_type = TILE_FLOOR_STONE_00;
     tiletype_t end_type = TILE_FLOOR_STONE_11;
     df_event_id id = 1;
-
     // First Room and Trap and Switch
     int x = 0;
     int y = 0;
     int w = 4;
     int h = 4;
     int r = 0;
-
     x = 0;
     y = 0;
     w = 3;
@@ -79,14 +77,11 @@ void df_init_test(dungeon_floor_t* df) {
     //df_init_rect2(df, (Rectangle){x, y, w, h}, begin_type, end_type);
     //df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
     //df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
-
     int count = 0;
     int total_rooms = 100;
-
     while (count < total_rooms) {
         df_init_rect2(df, (Rectangle){x, y, w, h}, begin_type, end_type);
         df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
-
         r = rand() % 2;
         if (r == 0) {
             df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
@@ -97,15 +92,11 @@ void df_init_test(dungeon_floor_t* df) {
             //x = 0;
             y = y + h + 1;
         }
-
         //df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
-
         id++;
-
         //if (r == 0) {
         //} else {
         //}
-
         //x = x + w + 1;
         //y = 0;
         count++;

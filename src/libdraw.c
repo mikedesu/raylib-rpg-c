@@ -936,43 +936,58 @@ void libdraw_draw_hud(gamestate* const g) {
         return;
     }
     // Draw the HUD
-    int fontsize = 30;
+    int fontsize = 20;
     int pad = 10;
-    int pad2 = pad * 2;
-    //int x = pad;
-    //int y = pad;
+    int pad2 = 20;
     char buffer[1024] = {0};
     int hp = -1;
     int maxhp = -1;
+    int mp = -1;
+    int maxmp = -1;
+    int level = 1;
+    char* name = NULL;
+    int turn = g->turn_count;
     //const char* text = "Name: darkmage\nHP: 1/1";
     entity* const e = em_get(g->entitymap, g->hero_id);
     if (e) {
         hp = e->hp;
         maxhp = e->maxhp;
+        mp = e->mp;
+        maxmp = e->maxmp;
+        level = e->level;
+        name = e->name;
     }
     //snprintf(buffer, sizeof(buffer), "Name: %s", e->name);
-    snprintf(buffer, sizeof(buffer), "Name: %s\nHP: %d/%d\nTurn: %d", e->name, hp, maxhp, g->turn_count);
+    snprintf(buffer,
+             sizeof(buffer),
+             //"Name: %s\nLevel: %d\nHP: %d/%d MP: %d/%d\nTurn: %d",
+             "%s Lvl %d HP %d/%d MP %d/%d Turn %d",
+             name,
+             level,
+             hp,
+             maxhp,
+             mp,
+             maxmp,
+             g->turn_count);
     //const char* text = "Name: evildojo666\nHP: 1/1";
     const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
     // set the x and y based on the window width and height to be the center of the bottom of the screen
-    const int h = size.y + pad2;
-    const int y = g->windowheight - (h * 2) - pad;
-    int w = size.x + pad2 * 2;
-    const int x = g->windowwidth / 2 - w / 2;
-    const Color fg = (Color){0x33, 0x33, 0x33, 0xff};
+    const int y_offset = 100;
+    const Color bg = (Color){0x33, 0x33, 0x33, 0xff};
+    const Color fg = WHITE;
+    const int h = size.y + pad * 2;
+    const int y = g->windowheight - h - y_offset - pad;
+    const int w = size.x + pad * 5;
+    const int x = g->windowwidth / 2 - w / 2 - pad;
     //const Color fg2 = (Color){0x66, 0x66, 0x66, 0xff};
-    const Color fg3 = WHITE;
-    DrawRectangle(x, y, w, h, fg);
+    DrawRectangle(x, y, w, h, bg);
     // draw rectangle lines around the box
-    //DrawRectangleLines(x, y, w, h, fg2);
-
     Rectangle box = (Rectangle){x, y, w, h};
-
-    DrawRectangleLinesEx(box, 2, WHITE);
+    DrawRectangleLinesEx(box, 2, fg);
     const int x2 = x + pad;
     const int y2 = y + pad;
     // Draw text
-    DrawText(buffer, x2, y2, fontsize, fg3);
+    DrawText(buffer, x2, y2, fontsize, fg);
 }
 
 void libdraw_draw_msgbox_test(gamestate* const g, const char* s) {

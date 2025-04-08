@@ -26,8 +26,12 @@ typedef struct entity_t {
     int floor;
     int sprite_move_x;
     int sprite_move_y;
+
+    int level;
     int hp;
     int maxhp;
+    int mp;
+    int maxmp;
 
     bool do_update;
     bool is_attacking;
