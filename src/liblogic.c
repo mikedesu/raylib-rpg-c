@@ -381,6 +381,9 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
         entity_set_maxhp(orc, 1);
         entity_set_hp(orc, 1);
     }
+
+    // we need to free the locations array
+    free(locations);
 }
 
 void liblogic_init_orcs_test(gamestate* const g) {

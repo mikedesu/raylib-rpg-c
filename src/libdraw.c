@@ -936,7 +936,7 @@ void libdraw_draw_hud(gamestate* const g) {
         return;
     }
     // Draw the HUD
-    int fontsize = 20;
+    int fontsize = 30;
     int pad = 10;
     int pad2 = 20;
     char buffer[1024] = {0};

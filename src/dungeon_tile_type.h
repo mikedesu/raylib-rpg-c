@@ -87,3 +87,11 @@ static inline bool dungeon_tile_is_walkable(const tiletype_t type) {
 static inline bool dungeon_tile_is_trap(const tiletype_t type) {
     return type == TILE_FLOOR_STONE_TRAP_OFF_00 || type == TILE_FLOOR_STONE_TRAP_ON_00;
 }
+
+static inline bool dungeon_tile_is_possible_upstairs(const tiletype_t type) {
+    return dungeon_tile_is_walkable(type) && !dungeon_tile_is_trap(type) && type != TILE_DOWNSTAIRS;
+}
+
+static inline bool dungeon_tile_is_possible_downstairs(const tiletype_t type) {
+    return dungeon_tile_is_walkable(type) && !dungeon_tile_is_trap(type) && type != TILE_UPSTAIRS;
+}

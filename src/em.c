@@ -14,11 +14,11 @@ em_t* em_new() {
 }
 
 bool em_free(em_t* em) {
-    massert(em, "em_free: em is NULL");
-    //if (!em) {
-    //    merror("em_free: em is NULL");
-    //    return false;
-    //}
+    //massert(em, "em_free: em is NULL");
+    if (!em) {
+        merror("em_free: em is NULL");
+        return false;
+    }
     minfo("Freeing entity map");
     for (int i = 0; i < EM_MAX_SLOTS; i++) {
         entity_t* current = em->entities[i];

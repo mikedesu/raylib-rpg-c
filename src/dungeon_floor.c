@@ -2,6 +2,8 @@
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
 #include "libgame_defines.h"
+#include "location.h"
+#include "massert.h"
 #include "mprint.h"
 #include "raylib.h"
 #include <stdlib.h>
@@ -78,7 +80,7 @@ void df_init_test(dungeon_floor_t* df) {
     //df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
     //df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
     int count = 0;
-    int total_rooms = 100;
+    int total_rooms = 10;
     while (count < total_rooms) {
         df_init_rect2(df, (Rectangle){x, y, w, h}, begin_type, end_type);
         df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
@@ -101,6 +103,75 @@ void df_init_test(dungeon_floor_t* df) {
         //y = 0;
         count++;
     }
+
+    // after our rooms have been constructed and we're happy with the layout
+    // we need to assign an upstairs and downstairs tile
+
+    // we will do this similar to the intermediate orc spawn test in liblogic
+    // basically we will count the total possible tiles first
+    // then we will create a list and add each possible tile location to the list
+    // then we will be able to randomly select an upstairs and a downstairs from there
+
+    int count2 = 0;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            if (dungeon_tile_is_possible_upstairs(tile->type)) { count2++; }
+        }
+    }
+
+    loc_t* locations = malloc(sizeof(loc_t) * count2);
+    massert(locations, "df_init_test: failed to malloc locations");
+
+    int count3 = 0;
+    // now we can loop thru the dungeon floor again and fill the array with the locations
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            if (dungeon_tile_is_possible_upstairs(tile->type)) {
+                // there wont be any entities yet so do not check for them
+                // do not write an if statement
+                locations[count3].x = x;
+                locations[count3].y = y;
+                count3++;
+                massert(count3 <= count2, "liblogic_init: count2 is greater than count");
+            }
+        }
+    }
+    massert(count3 == count2, "liblogic_init: count2 is greater than count");
+
+    // now that we have a list of possible locations for the upstairs to appear
+    // we can randomly select one of them
+    //
+
+    int upstairs_index = rand() % count3;
+    // lazily set the downstairs
+    int downstairs_index = rand() % count3;
+    while (downstairs_index == upstairs_index) { downstairs_index = rand() % count3; }
+
+    loc_t up_loc = locations[upstairs_index];
+    loc_t down_loc = locations[downstairs_index];
+
+    // now we can set the upstairs tile
+    tile_t* const tile = dungeon_floor_tile_at(df, up_loc.x, up_loc.y);
+    if (!tile) {
+        merror("df_init_test: failed to get tile");
+        return;
+    }
+    tile_init(tile, TILE_UPSTAIRS);
+
+    // now we can set the downstairs tile
+    tile_t* const tile2 = dungeon_floor_tile_at(df, down_loc.x, down_loc.y);
+    if (!tile2) {
+        merror("df_init_test: failed to get tile");
+        return;
+    }
+    tile_init(tile2, TILE_DOWNSTAIRS);
+    /*
+     */
+
+    free(locations);
+
     //id++;
     //x = x + w + 1;
     //y = 1;
