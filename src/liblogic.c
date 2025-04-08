@@ -219,7 +219,8 @@ void liblogic_init(gamestate* const g) {
 
     liblogic_init_em(g);
     liblogic_init_player(g);
-    liblogic_init_orcs_test(g);
+    // temporarily disabling
+    //liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
 }
 
