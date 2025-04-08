@@ -4,6 +4,8 @@
 
 typedef enum {
     TILE_NONE,
+    TILE_UPSTAIRS,
+    TILE_DOWNSTAIRS,
     TILE_FLOOR_DIRT,
     TILE_FLOOR_STONE_00,
     TILE_FLOOR_STONE_01,
@@ -77,8 +79,9 @@ static inline bool dungeon_tile_is_wall(const tiletype_t type) {
 }
 
 static inline bool dungeon_tile_is_walkable(const tiletype_t type) {
-    return type != TILE_STONE_WALL_00 && type != TILE_STONE_WALL_01 && type != TILE_STONE_WALL_02 &&
-           type != TILE_UNKNOWN && type != TILE_NONE;
+    return !dungeon_tile_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE;
+    //return type != TILE_STONE_WALL_00 && type != TILE_STONE_WALL_01 && type != TILE_STONE_WALL_02 &&
+    //       type != TILE_UNKNOWN && type != TILE_NONE;
 }
 
 static inline bool dungeon_tile_is_trap(const tiletype_t type) {

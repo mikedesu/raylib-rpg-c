@@ -253,6 +253,10 @@ void liblogic_init_em(gamestate* const g) {
 void liblogic_init_player(gamestate* const g) {
     minfo("liblogic_init: initializing player");
     massert(g, "liblogic_init: gamestate is NULL");
+    // this is primitive and requires work
+    // we cant simply hardcode in player start position anymore
+    // without potential assert failure
+    // so...
     const int herox = 2;
     const int heroy = 2;
     //const int id = liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero");

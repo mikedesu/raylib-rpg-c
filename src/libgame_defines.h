@@ -143,6 +143,9 @@
 #define TX_WALL_SWITCH_UP_00 116
 #define TX_WALL_SWITCH_DOWN_00 117
 
+#define TX_UPSTAIRS_00 118
+#define TX_DOWNSTAIRS_00 119
+
 //--------------------------------
 
 #define COMPANYSCENE 0

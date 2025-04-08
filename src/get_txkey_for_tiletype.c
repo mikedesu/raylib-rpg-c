@@ -1,10 +1,12 @@
-#include "get_txkey_for_tiletype.h"
 #include "dungeon_tile_type.h"
+#include "get_txkey_for_tiletype.h"
 #include "libgame_defines.h"
 
 int get_txkey_for_tiletype(tiletype_t type) {
     int key = -1;
     switch (type) {
+    case TILE_UPSTAIRS: key = TX_UPSTAIRS_00; break;
+    case TILE_DOWNSTAIRS: key = TX_DOWNSTAIRS_00; break;
     case TILE_FLOOR_DIRT: key = TX_DIRT_00; break;
     case TILE_STONE_WALL_00: key = TX_STONEWALL_00; break;
     case TILE_STONE_WALL_01: key = TX_STONEWALL_01; break;
