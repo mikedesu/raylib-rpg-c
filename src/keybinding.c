@@ -4,9 +4,17 @@
 #include "raylib.h"
 
 const char* get_action_for_key(keybinding_list_t* kb, int key) {
+    minfo("Getting action for key %d", key);
+    massert(kb, "Keybinding list is NULL");
+    massert(kb->count > 0, "Keybinding list is empty");
+    massert(key >= 0, "Key is less than 0");
     for (int i = 0; i < kb->count; i++) {
-        if (kb->bindings[i].key == key) { return kb->bindings[i].action; }
+        if (kb->bindings[i].key == key) {
+            minfo("Key %d found in keybinding list", key);
+            return kb->bindings[i].action;
+        }
     }
+    minfo("Key %d not found in keybinding list", key);
     return NULL;
 }
 

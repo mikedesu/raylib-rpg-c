@@ -220,7 +220,7 @@ void liblogic_init(gamestate* const g) {
     liblogic_init_em(g);
     liblogic_init_player(g);
     // temporarily disabling
-    //liblogic_init_orcs_test(g);
+    liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
 }
 
@@ -287,7 +287,6 @@ void liblogic_init_orcs_test_naive_loop(gamestate* const g) {
         // check if there is already an entity at this location
         if (tile_entity_count(tile) > 0) { continue; }
         entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, x, y, 0, "orc");
-        //massert(orc, "liblogic_init: failed to create orc");
         if (!orc) {
             merror("liblogic_init: failed to init orc");
             continue;
@@ -314,18 +313,6 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     // in order to prepare a list of them
 
     int count = df_count_walkable(df);
-    //int count = 0;
-    //for (int y = 0; y < df->height; y++) {
-    //    for (int x = 0; x < df->width; x++) {
-    //        tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-    //        if (dungeon_tile_is_walkable(tile->type)) {
-    //            // there wont be any entities yet so do not check for them
-    //            // do not write an if statement
-    //            count++;
-    //        }
-    //    }
-    //}
-
     // now we have the total number of possible locations
     // we can create an array of size count
 
@@ -352,8 +339,8 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     // now we can loop thru the array and create an orc at each location
     //for (int i = 0; i < count2; i++) {
     //for (int i = 0; i < count2; i++) {
-    for (int i = 0; i < 1; i++) {
 
+    for (int i = 0; i < count2; i++) {
         tile_t* const tile = dungeon_floor_tile_at(df, locations[i].x, locations[i].y);
         if (dungeon_tile_is_wall(tile->type)) { continue; }
         // check if there is already an entity at this location
@@ -405,6 +392,13 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
 
 void liblogic_handle_camera_move(gamestate* const g, const inputstate* const is) {
     const float move = g->cam2d.zoom;
+
+    const char* action = liblogic_get_action_key(is, g);
+    if (!action) {
+        merror("No action found for key");
+        return;
+    }
+
     if (inputstate_is_held(is, KEY_RIGHT)) {
         g->cam2d.offset.x += move;
         return;
@@ -421,7 +415,9 @@ void liblogic_handle_camera_move(gamestate* const g, const inputstate* const is)
         g->cam2d.offset.y += move;
         return;
     }
-    if (inputstate_is_pressed(is, KEY_C)) {
+
+    if (strcmp(action, "toggle_camera") == 0) {
+        //if (inputstate_is_pressed(is, KEY_C)) {
         //msuccess("C pressed!");
         g->cam2d.zoom = roundf(g->cam2d.zoom);
         g->controlmode = CONTROLMODE_PLAYER;
@@ -441,13 +437,31 @@ void liblogic_handle_camera_zoom(gamestate* const g, const inputstate* const is)
     }
 }
 
+const char* liblogic_get_action_key(const inputstate* const is, gamestate* const g) {
+    const int key = inputstate_get_pressed_key(is);
+    if (key != -1) { minfo("Key pressed: %d", key); }
+    // can return early if key == -1
+    if (key == -1) { return "none"; }
+    return get_action_for_key(&g->keybinding_list, key);
+}
+
 void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
 
+    minfo("1");
+    const char* action = liblogic_get_action_key(is, g);
+    minfo("2");
+    minfo("Checking...%s", action);
+    if (!action) {
+        merror("No action found for key");
+        return;
+    }
+
     if (g->msg_system.is_active) {
-        if (inputstate_is_pressed(is, KEY_A)) {
+        if (strcmp(action, "attack") == 0) {
+            //if (inputstate_is_pressed(is, KEY_A)) {
             g->msg_system.index++;
             if (g->msg_system.index >= g->msg_system.count) {
                 // Reset when all messages read
@@ -469,17 +483,15 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         //merror("Hero is dead!");
         return;
     }
-    const int key = inputstate_get_pressed_key(is);
 
-    if (key != -1) { minfo("Key pressed: %d", key); }
-
-    // can return early if key == -1
-    if (key == -1) {
-        //merror("Key not found!");
-        return;
-    }
-
-    const char* action = get_action_for_key(&g->keybinding_list, key);
+    //const int key = inputstate_get_pressed_key(is);
+    //if (key != -1) { minfo("Key pressed: %d", key); }
+    //// can return early if key == -1
+    //if (key == -1) {
+    //    //merror("Key not found!");
+    //    return;
+    //}
+    //const char* action = get_action_for_key(&g->keybinding_list, key);
 
     if (action) {
         //msuccessstr("Action: --", action);
@@ -517,6 +529,8 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
             int tx = e->x + dx;
             int ty = e->y + dy;
             liblogic_try_flip_switch(g, e, tx, ty, e->floor);
+        } else if (strcmp(action, "toggle_camera") == 0) {
+            g->controlmode = CONTROLMODE_CAMERA;
         }
     } else {
         merror("No action found for key");
