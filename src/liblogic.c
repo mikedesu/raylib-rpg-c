@@ -254,20 +254,9 @@ void liblogic_init_em(gamestate* const g) {
 void liblogic_init_player(gamestate* const g) {
     minfo("liblogic_init: initializing player");
     massert(g, "liblogic_init: gamestate is NULL");
-    // this is primitive and requires work
-    // we cant simply hardcode in player start position anymore
-    // without potential assert failure
-    // so...
-
     // setting it up so we can return a loc_t from a function
     // that can scan for an appropriate starting location
-    //loc_t loc;
-    //loc.x = 2;
-    //loc.y = 2;
     loc_t loc = df_get_upstairs(g->dungeon->floors[g->dungeon->current_floor]);
-    //const int herox = loc.x;
-    //const int heroy = loc.y;
-    //const int id = liblogic_player_create(g, RACE_HUMAN, herox, heroy, 0, "hero");
     minfo("liblogic_init: creating player...");
     const int id = liblogic_player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
     msuccess("liblogic_init: player id: %d", id);
@@ -287,7 +276,6 @@ void liblogic_init_orcs_test_naive_loop(gamestate* const g) {
     //dungeon_floor_t* const df = d->floors[0];
     dungeon_floor_t* const df = dungeon_get_floor(d, 0);
     massert(df, "liblogic_init: dungeon floor is NULL");
-
     // this works, but is naive and slow
     int count = 0;
     const int total_orcs_to_make = 100;
@@ -325,17 +313,18 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     // in the beginning there wont be any entities at all so we are just counting total possible locations right now
     // in order to prepare a list of them
 
-    int count = 0;
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-            if (dungeon_tile_is_walkable(tile->type)) {
-                // there wont be any entities yet so do not check for them
-                // do not write an if statement
-                count++;
-            }
-        }
-    }
+    int count = df_count_walkable(df);
+    //int count = 0;
+    //for (int y = 0; y < df->height; y++) {
+    //    for (int x = 0; x < df->width; x++) {
+    //        tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    //        if (dungeon_tile_is_walkable(tile->type)) {
+    //            // there wont be any entities yet so do not check for them
+    //            // do not write an if statement
+    //            count++;
+    //        }
+    //    }
+    //}
 
     // now we have the total number of possible locations
     // we can create an array of size count

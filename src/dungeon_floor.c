@@ -310,6 +310,18 @@ tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int x, cons
     return &df->tiles[y][x];
 }
 
+tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y) {
+    if (!df) {
+        merror("df_type_at: df is NULL");
+        return TILE_NONE;
+    }
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
+        merror("df_type_at: x or y out of bounds");
+        return TILE_NONE;
+    }
+    return df->tiles[y][x].type;
+}
+
 void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
                                       const int x,
                                       const int y,
@@ -490,4 +502,16 @@ loc_t df_get_downstairs(const dungeon_floor_t* const df) {
         }
     }
     return loc;
+}
+
+int df_count_walkable(const dungeon_floor_t* const df) {
+    if (!df) return 0;
+    int count = 0;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tiletype_t type = df_type_at(df, x, y);
+            if (dungeon_tile_is_walkable(type)) { count++; }
+        }
+    }
+    return count;
 }

@@ -79,7 +79,7 @@ static inline bool dungeon_tile_is_wall(const tiletype_t type) {
 }
 
 static inline bool dungeon_tile_is_walkable(const tiletype_t type) {
-    return !dungeon_tile_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE;
+    return !dungeon_tile_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE && type != TILE_COUNT;
     //return type != TILE_STONE_WALL_00 && type != TILE_STONE_WALL_01 && type != TILE_STONE_WALL_02 &&
     //       type != TILE_UNKNOWN && type != TILE_NONE;
 }
@@ -89,9 +89,10 @@ static inline bool dungeon_tile_is_trap(const tiletype_t type) {
 }
 
 static inline bool dungeon_tile_is_possible_upstairs(const tiletype_t type) {
-    return dungeon_tile_is_walkable(type) && !dungeon_tile_is_trap(type) && type != TILE_DOWNSTAIRS;
+    return dungeon_tile_is_walkable(type) && !dungeon_tile_is_trap(type) && type != TILE_DOWNSTAIRS &&
+           type != TILE_COUNT;
 }
 
 static inline bool dungeon_tile_is_possible_downstairs(const tiletype_t type) {
-    return dungeon_tile_is_walkable(type) && !dungeon_tile_is_trap(type) && type != TILE_UPSTAIRS;
+    return dungeon_tile_is_walkable(type) && !dungeon_tile_is_trap(type) && type != TILE_UPSTAIRS && type != TILE_COUNT;
 }

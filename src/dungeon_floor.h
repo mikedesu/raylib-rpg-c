@@ -77,3 +77,5 @@ void df_init_rect2(dungeon_floor_t* df, Rectangle r, tiletype_t t1, tiletype_t t
 loc_t df_get_upstairs(const dungeon_floor_t* const df);
 
 loc_t df_get_downstairs(const dungeon_floor_t* const df);
+tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y);
+int df_count_walkable(const dungeon_floor_t* const df);
