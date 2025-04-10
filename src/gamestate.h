@@ -26,6 +26,12 @@ typedef struct {
     bool is_active; // Blocks input when true
 } message_system;
 
+typedef struct {
+    char** messages;
+    int count;
+    int max_count;
+} message_history;
+
 typedef struct gamestate {
     int framecount;
     int fadealpha;
@@ -86,6 +92,8 @@ typedef struct gamestate {
     entityid entity_turn;
 
     message_system msg_system;
+
+    message_history msg_history;
 
     keybinding_list_t keybinding_list;
 } gamestate;

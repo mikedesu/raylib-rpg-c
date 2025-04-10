@@ -94,6 +94,25 @@ gamestate* gamestateinitptr() {
 
     g->gameover = false;
 
+    g->msg_history.count = 0;
+    g->msg_history.max_count = 1024;
+    g->msg_history.messages = (char**)malloc(sizeof(char*) * g->msg_history.max_count);
+    if (g->msg_history.messages == NULL) {
+        merror("gamestateinitptr: g->msg_history.messages is NULL");
+        free(g);
+        return NULL;
+    }
+    for (int i = 0; i < g->msg_history.max_count; i++) {
+        g->msg_history.messages[i] = (char*)malloc(sizeof(char) * MAX_MSG_LENGTH);
+        if (g->msg_history.messages[i] == NULL) {
+            merror("gamestateinitptr: g->msg_history.messages[%d] is NULL", i);
+            for (int j = 0; j < i; j++) { free(g->msg_history.messages[j]); }
+            free(g->msg_history.messages);
+            free(g);
+            return NULL;
+        }
+    }
+
     return g;
 }
 
@@ -111,6 +130,16 @@ void gamestatefree(gamestate* g) {
     //free(g->currenttimetm);
     minfo("Freeing dungeon");
     if (g->dungeon) dungeon_destroy(g->dungeon);
+
+    // free message history
+    for (int i = 0; i < g->msg_history.max_count; i++) {
+        if (g->msg_history.messages[i]) {
+            free(g->msg_history.messages[i]);
+            g->msg_history.messages[i] = NULL;
+        }
+    }
+    free(g->msg_history.messages);
+
     minfo("Freeing g...");
     free(g);
     msuccess("Freed gamestate");
