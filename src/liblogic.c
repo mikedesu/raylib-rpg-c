@@ -307,7 +307,7 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     // in the beginning there wont be any entities at all so we are just counting total possible locations right now
     // in order to prepare a list of them
 
-    int count = df_count_walkable(df);
+    const int count = df_count_walkable(df);
     // now we have the total number of possible locations
     // we can create an array of size count
 
@@ -332,10 +332,8 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     massert(count2 == count, "liblogic_init: count2 is greater than count");
 
     // now we can loop thru the array and create an orc at each location
-    //for (int i = 0; i < count2; i++) {
-    //for (int i = 0; i < count2; i++) {
 
-    int max_orcs = 3;
+    int max_orcs = 10;
     //int max_orcs = count2;
     for (int i = 0; i < max_orcs && i < count2; i++) {
         tile_t* const tile = dungeon_floor_tile_at(df, locations[i].x, locations[i].y);
@@ -344,10 +342,6 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
         if (tile_entity_count(tile) > 0) { continue; }
         entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, locations[i].x, locations[i].y, 0, "orc");
         massert(orc, "liblogic_init: failed to create orc");
-        //if (!orc) {
-        //    merror("liblogic_init: failed to init orc");
-        //    continue;
-        //}
         entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
         entity_set_default_action(orc, action);
         entity_set_maxhp(orc, 1);
@@ -442,6 +436,35 @@ const char* liblogic_get_action_key(const inputstate* const is, gamestate* const
     return get_action_for_key(&g->keybinding_list, key);
 }
 
+void liblogic_change_player_dir(gamestate* const g, direction_t dir) {
+    massert(g, "Game state is NULL!");
+    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
+
+    // get the player entity
+    entity* const e = em_get(g->entitymap, g->hero_id);
+    if (!e) {
+        //merror("Hero not found!");
+        return;
+    }
+
+    // check if the player is dead
+    if (e->is_dead) {
+        //merror("Hero is dead!");
+        return;
+    }
+
+    // set the direction
+    e->direction = dir;
+
+    e->do_update = true;
+
+    // check if the player is moving
+    //if (e->do_update) {
+    //    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //    e->do_update = false;
+    //}
+}
+
 void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
@@ -491,9 +514,45 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     //const char* action = get_action_for_key(&g->keybinding_list, key);
 
     if (action) {
+
+        if (g->player_changing_direction) {
+            if (strcmp(action, "wait") == 0) {
+                liblogic_execute_action(g, e, ENTITY_ACTION_WAIT);
+                g->player_changing_direction = false;
+            } else if (strcmp(action, "move_w") == 0) {
+                liblogic_change_player_dir(g, DIR_LEFT);
+                g->player_changing_direction = false;
+            } else if (strcmp(action, "move_e") == 0) {
+                liblogic_change_player_dir(g, DIR_RIGHT);
+                g->player_changing_direction = false;
+            } else if (strcmp(action, "move_s") == 0) {
+                liblogic_change_player_dir(g, DIR_DOWN);
+                g->player_changing_direction = false;
+            } else if (strcmp(action, "move_n") == 0) {
+                liblogic_change_player_dir(g, DIR_UP);
+                g->player_changing_direction = false;
+            } else if (strcmp(action, "move_nw") == 0) {
+                liblogic_change_player_dir(g, DIR_UP_LEFT);
+                g->player_changing_direction = false;
+            } else if (strcmp(action, "move_ne") == 0) {
+                liblogic_change_player_dir(g, DIR_UP_RIGHT);
+                g->player_changing_direction = false;
+            } else if (strcmp(action, "move_sw") == 0) {
+                liblogic_change_player_dir(g, DIR_DOWN_LEFT);
+                g->player_changing_direction = false;
+            } else if (strcmp(action, "move_se") == 0) {
+                liblogic_change_player_dir(g, DIR_DOWN_RIGHT);
+                g->player_changing_direction = false;
+            }
+            return;
+        }
+
         //msuccessstr("Action: --", action);
         if (strcmp(action, "wait") == 0) {
-            liblogic_execute_action(g, e, ENTITY_ACTION_WAIT);
+            //liblogic_execute_action(g, e, ENTITY_ACTION_WAIT);
+
+            g->player_changing_direction = true;
+
         } else if (strcmp(action, "move_w") == 0) {
             liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_LEFT);
         } else if (strcmp(action, "move_e") == 0) {

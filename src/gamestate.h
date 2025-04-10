@@ -54,6 +54,8 @@ typedef struct gamestate {
     bool is_locked;
     bool processing_actions;
     bool is3d;
+    bool gameover;
+    bool player_changing_direction;
 
     debugpanel_t debugpanel;
 
@@ -84,8 +86,6 @@ typedef struct gamestate {
     entityid entity_turn;
 
     message_system msg_system;
-
-    bool gameover;
 
     keybinding_list_t keybinding_list;
 } gamestate;

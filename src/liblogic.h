@@ -43,6 +43,7 @@ void liblogic_init_dungeon(gamestate* const g);
 void liblogic_add_message(gamestate* g, const char* text);
 void liblogic_try_entity_attack_random(gamestate* const g, entity* const e);
 void liblogic_try_entity_wait(gamestate* const g, entity* const e);
+void liblogic_change_player_dir(gamestate* const g, direction_t dir);
 
 entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 void liblogic_init_orcs_test_naive_loop(gamestate* const g);
