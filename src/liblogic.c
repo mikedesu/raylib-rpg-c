@@ -335,7 +335,8 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     //for (int i = 0; i < count2; i++) {
     //for (int i = 0; i < count2; i++) {
 
-    int max_orcs = 4;
+    int max_orcs = 3;
+    //int max_orcs = count2;
     for (int i = 0; i < max_orcs && i < count2; i++) {
         tile_t* const tile = dungeon_floor_tile_at(df, locations[i].x, locations[i].y);
         if (dungeon_tile_is_wall(tile->type)) { continue; }
@@ -446,10 +447,10 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     massert(g, "Game state is NULL!");
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
 
-    minfo("1");
+    //minfo("1");
     const char* action = liblogic_get_action_key(is, g);
-    minfo("2");
-    minfo("Checking...%s", action);
+    //minfo("2");
+    //minfo("Checking...%s", action);
     if (!action) {
         merror("No action found for key");
         return;
@@ -1043,9 +1044,18 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
                 // Perform attack logic here
                 minfo("Attack successful!");
                 attack_successful = target->is_damaged = target->do_update = true;
-                entity_set_hp(target, entity_get_hp(target) - 1); // Reduce HP by 1
 
-                if (target->type == ENTITY_PLAYER) { liblogic_add_message(g, "Player attacked!"); }
+                int dmg = 1;
+                entity_set_hp(target, entity_get_hp(target) - dmg); // Reduce HP by 1
+
+                if (target->type == ENTITY_PLAYER) {
+
+                    char tmp_msg[128];
+                    //snprintf(tmp_msg, sizeof(tmp_msg), "You were attacked for %d damage!", dmg);
+                    snprintf(tmp_msg, sizeof(tmp_msg), "You took %d damage!", dmg);
+                    //liblogic_add_message(g, "Player attacked!");
+                    liblogic_add_message(g, tmp_msg);
+                }
 
                 if (entity_get_hp(target) <= 0) target->is_dead = true;
                 break;
