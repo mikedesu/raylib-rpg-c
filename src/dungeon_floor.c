@@ -69,44 +69,86 @@ void df_init_test(dungeon_floor_t* df) {
     // First Room and Trap and Switch
     int x = 0;
     int y = 0;
-    int w = 4;
-    int h = 4;
     int r = 0;
-    x = 0;
-    y = 0;
+    int w = 0;
+    int h = 0;
+    //x = 0;
+    //y = 0;
+    x = df->width / 2;
+    y = df->height / 2;
     w = 3;
     h = 3;
     //df_init_rect2(df, (Rectangle){x, y, w, h}, begin_type, end_type);
     //df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
     //df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
     int count = 0;
-    int total_rooms = 10;
-    while (count < total_rooms) {
-        df_init_rect2(df, (Rectangle){x, y, w, h}, begin_type, end_type);
-        df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
-        r = rand() % 2;
-        if (r == 0) {
-            df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
-            x = x + w + 1;
-            //y = 0;
-        } else {
-            df_create_trap_event(df, x + rand() % w, y + h, trap_on, trap_off, id);
-            //x = 0;
-            y = y + h + 1;
-        }
-        //df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
-        id++;
-        //if (r == 0) {
-        //} else {
-        //}
-        //x = x + w + 1;
-        //y = 0;
-        count++;
+    int total_rooms = 1;
+    //int prev_r = -1;
+
+    // create space for a list of Rectangles
+    // we will generate each rectangle one at a time
+    // after the first rectangle, we will make sure each new rectangle does not intersect or overlap
+    // with any of the previously generated rectangles
+
+    Rectangle rectangles[total_rooms];
+    // initialize the rectangles to zero
+    for (int i = 0; i < total_rooms; i++) { rectangles[i] = (Rectangle){0, 0, 0, 0}; }
+
+    int min_room_width = 2;
+    int min_room_height = 2;
+    int max_room_width = 10;
+    int max_room_height = 10;
+
+    // generate the first rectangle
+
+    int rand_w = rand() % (max_room_width - min_room_width + 1) + min_room_width;
+    int rand_h = rand() % (max_room_height - min_room_height + 1) + min_room_height;
+    Rectangle rect = {x, y, rand_w, rand_h};
+    rectangles[count] = rect;
+
+    // now that we have our list of non-intersecting rectangles,
+    // we can loop thru them and create the rooms
+
+    for (int j = 0; j < total_rooms; j++) {
+        Rectangle r = rectangles[j];
+        df_init_rect2(df, r, begin_type, end_type);
+        //df_place_wall_switch(df, r.x + rand() % (int)r.width, r.y + rand() % (int)r.height, txwallup, txwalldown, id);
+        //df_create_trap_event(df, r.x + r.width, r.y + rand() % (int)r.height, trap_on, trap_off, id);
+        //id++;
     }
 
-    // after our rooms have been constructed and we're happy with the layout
-    // we need to assign an upstairs and downstairs tile
-
+    //while (count < total_rooms) {
+    //    df_init_rect2(df, (Rectangle){x, y, w, h}, begin_type, end_type);
+    //    //df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
+    //    r = rand() % 2;
+    //    //while (r == prev_r) { r = rand() % 4; }
+    //    if (r == 0) {
+    //        df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
+    //        x = x + w + 1;
+    //    } else if (r == 1) {
+    //        df_create_trap_event(df, x + rand() % w, y + h, trap_on, trap_off, id);
+    //        y = y + h + 1;
+    //    }
+    //    //else if (r == 2) {
+    //    //    df_create_trap_event(df, x - 1, y + rand() % h, trap_on, trap_off, id);
+    //    //    x = x - 2;
+    //    //} else if (r == 3) {
+    //    //    df_create_trap_event(df, x + rand() % w, y - 1, trap_on, trap_off, id);
+    //    //    y = y - 2;
+    //    //} else {
+    //    //    merror("df_init_test: invalid random number");
+    //    //    continue;
+    //    //}
+    //    //prev_r = r;
+    //    id++;
+    //    count++;
+    //    //w++;
+    //    //h++;
+    //}
+    //
+    //    // after our rooms have been constructed and we're happy with the layout
+    //    // we need to assign an upstairs and downstairs tile
+    //
     // we will do this similar to the intermediate orc spawn test in liblogic
     // basically we will count the total possible tiles first
     // then we will create a list and add each possible tile location to the list
@@ -462,7 +504,8 @@ void df_init_rect2(dungeon_floor_t* df, Rectangle r, tiletype_t t1, tiletype_t t
 void df_create_trap_event(dungeon_floor_t* df, int x, int y, tiletype_t on, tiletype_t off, df_event_id id) {
     if (!df || id >= DEFAULT_DF_EVENTS) return;
     df->events[id] = (df_event_t){.listen_event = id, .x = x, .y = y, .on_type = on, .off_type = off};
-    df_set_tile(df, on, x, y);
+    //df_set_tile(df, on, x, y);
+    df_set_tile(df, off, x, y);
 }
 
 void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id) {
