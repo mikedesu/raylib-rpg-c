@@ -609,6 +609,10 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
             int tx = e->x + dx;
             int ty = e->y + dy;
             liblogic_try_flip_switch(g, e, tx, ty, e->floor);
+        } else if (strcmp(action, "pickup") == 0) {
+            mwarning("Pickup action currently unimplemented");
+            // add a message to the message system
+            liblogic_add_message(g, "Pickup action currently unimplemented");
         } else if (strcmp(action, "toggle_camera") == 0) {
             g->controlmode = CONTROLMODE_CAMERA;
         }
