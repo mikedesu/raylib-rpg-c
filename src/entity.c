@@ -38,6 +38,9 @@ entity_t* entity_new(entityid id, entitytype_t type) {
 }
 
 entity_t* entity_new_at(entityid id, entitytype_t type, int x, int y, int floor) {
+    massert(x >= 0, "entity_new_at: x is less than 0");
+    massert(y >= 0, "entity_new_at: y is less than 0");
+    massert(floor >= 0, "entity_new_at: floor is less than 0");
     entity_t* e = entity_new(id, type);
     massert(e, "Failed to create entity");
     entity_set_xy(e, x, y);
@@ -108,6 +111,14 @@ entity_t* entity_new_npc_at(entityid id, race_t r, int x, int y, int floor, cons
 
 entity_t* entity_new_weapon_at(entityid id, int x, int y, int floor, const char* name) {
     entity_t* e = entity_new_at(id, ENTITY_WEAPON, x, y, floor);
+    massert(e, "Failed to create entity");
+    //entity_set_race(e, r);
+    entity_set_name(e, name);
+    return e;
+}
+
+entity_t* entity_new_shield_at(entityid id, int x, int y, int floor, const char* name) {
+    entity_t* e = entity_new_at(id, ENTITY_SHIELD, x, y, floor);
     massert(e, "Failed to create entity");
     //entity_set_race(e, r);
     entity_set_name(e, name);

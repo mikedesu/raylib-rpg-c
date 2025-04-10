@@ -945,6 +945,12 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
         offset_x = -12;
         offset_y = -12;
         libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    } else if (e->type == ENTITY_SHIELD) {
+        keys = TX_BUCKLER_KEYS;
+        num_keys = TX_BUCKLER_KEY_COUNT;
+        offset_x = -12;
+        offset_y = -12;
+        libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     }
 }
 

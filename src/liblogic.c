@@ -237,24 +237,46 @@ void liblogic_init_weapon_test(gamestate* const g) {
     int y = player->y;
 
     // place the sword somewhere around the player
-    entityid id = liblogic_weapon_create(g, x + 1, y, 0, "sword");
-    massert(id != -1, "liblogic_init_weapon_test: failed to create weapon");
+    entityid sword_id = liblogic_weapon_create(g, x + 1, y, 0, "sword");
+    massert(sword_id != -1, "liblogic_init_weapon_test: failed to create weapon");
+
+    // place the shield somewhere around the player
+    entityid shield_id = liblogic_shield_create(g, x - 1, y, 0, "shield");
+    massert(shield_id != -1, "liblogic_init_weapon_test: failed to create shield");
 }
 
-void liblogic_add_message(gamestate* g, const char* text) {
+void liblogic_add_message(gamestate* g, const char* fmt, ...) {
     massert(g, "liblogic_add_message: gamestate is NULL");
-    massert(text, "liblogic_add_message: text is NULL");
-    massert(strlen(text) > 0, "liblogic_add_message: text is empty");
+    massert(fmt, "liblogic_add_message: format string is NULL");
 
     if (g->msg_system.count >= MAX_MESSAGES) {
         mwarning("Message queue full!");
         return;
     }
-    strncpy(g->msg_system.messages[g->msg_system.count], text, MAX_MSG_LENGTH - 1);
-    g->msg_system.messages[g->msg_system.count][MAX_MSG_LENGTH - 1] = '\0'; // Ensure null-termination
+
+    va_list args;
+    va_start(args, fmt);
+    //vsnprintf(g->msg_system.messages,
+    vsnprintf(g->msg_system.messages[g->msg_system.count], MAX_MSG_LENGTH - 1, fmt, args);
+    va_end(args);
+
     g->msg_system.count++;
     g->msg_system.is_active = true;
 }
+
+//void liblogic_add_message(gamestate* g, const char* text) {
+//    massert(g, "liblogic_add_message: gamestate is NULL");
+//    massert(text, "liblogic_add_message: text is NULL");
+//    massert(strlen(text) > 0, "liblogic_add_message: text is empty");
+//    if (g->msg_system.count >= MAX_MESSAGES) {
+//        mwarning("Message queue full!");
+//        return;
+//    }
+//    strncpy(g->msg_system.messages[g->msg_system.count], text, MAX_MSG_LENGTH - 1);
+//    g->msg_system.messages[g->msg_system.count][MAX_MSG_LENGTH - 1] = '\0'; // Ensure null-termination
+//    g->msg_system.count++;
+//    g->msg_system.is_active = true;
+//}
 
 void liblogic_init_dungeon(gamestate* const g) {
     massert(g, "liblogic_init_dungeon: gamestate is NULL");
@@ -747,7 +769,21 @@ void liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             // 1. removing its id from the tile
             // 2. adding its id to the entity inventory
             // remove the item from the tile
-            liblogic_add_message(g, "Picked up weapon");
+            //liblogic_add_message(g, "Picked up weapon");
+            liblogic_add_message(g, "Picked up %s", it->name);
+            tile_remove(tile, id);
+            // add the item to the entity inventory
+            entity_add_item_to_inventory(e, id);
+            msuccess("Picked up item: %s", it->name);
+            if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+            return;
+        } else if (it->type == ENTITY_SHIELD) {
+            // pick up the item
+            // picking up an item requires:
+            // 1. removing its id from the tile
+            // 2. adding its id to the entity inventory
+            // remove the item from the tile
+            liblogic_add_message(g, "Picked up shield");
             tile_remove(tile, id);
             // add the item to the entity inventory
             entity_add_item_to_inventory(e, id);
@@ -1193,6 +1229,46 @@ entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl, const 
     //dungeon_floor_add_at(df, e->id, x, y);
     if (!dungeon_floor_add_at(df, e->id, x, y)) {
         merror("liblogic_weapon_create: failed to add entity to dungeon floor");
+        entity_free(e);
+        return -1;
+    }
+    return e->id;
+}
+
+entityid liblogic_shield_create(gamestate* const g, int x, int y, int fl, const char* name) {
+    massert(g, "liblogic_shield_create: gamestate is NULL");
+    em_t* em = gamestate_get_entitymap(g);
+    massert(em, "liblogic_shield_create: entitymap is NULL");
+    massert(name && name[0], "liblogic_shield_create: name is NULL or empty");
+    //massert(rt >= 0, "liblogic_shield_create: race_type is out of bounds");
+    //massert(rt < RACE_COUNT, "liblogic_shield_create: race_type is out of bounds");
+    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    massert(df, "liblogic_shield_create: failed to get current dungeon floor");
+    massert(x >= 0, "liblogic_shield_create: x is out of bounds");
+    massert(x < df->width, "liblogic_shield_create: x is out of bounds");
+    massert(y >= 0, "liblogic_shield_create: y is out of bounds");
+    massert(y < df->height, "liblogic_shield_create: y is out of bounds");
+    // can we create an entity at this location? no entities can be made on wall-types etc
+    tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    massert(tile, "liblogic_shield_create: failed to get tile");
+    if (!dungeon_tile_is_walkable(tile->type)) {
+        merror("liblogic_shield_create: cannot create entity on wall");
+        return -1;
+    }
+    if (tile_has_live_npcs(tile, em)) {
+        merror("liblogic_shield_create: cannot create entity on tile with NPC");
+        return -1;
+    }
+    entity* const e = entity_new_shield_at(next_entityid++, x, y, fl, name);
+    if (!e) {
+        merror("liblogic_shield_create: failed to create entity");
+        return -1;
+    }
+    em_add(em, e);
+    gamestate_add_entityid(g, e->id);
+    //dungeon_floor_add_at(df, e->id, x, y);
+    if (!dungeon_floor_add_at(df, e->id, x, y)) {
+        merror("liblogic_shield_create: failed to add entity to dungeon floor");
         entity_free(e);
         return -1;
     }

@@ -40,7 +40,8 @@ void liblogic_init_orcs_test(gamestate* const g);
 void liblogic_init_player(gamestate* const g);
 void liblogic_init_em(gamestate* const g);
 void liblogic_init_dungeon(gamestate* const g);
-void liblogic_add_message(gamestate* g, const char* text);
+//void liblogic_add_message(gamestate* g, const char* text);
+void liblogic_add_message(gamestate* g, const char* fmt, ...);
 void liblogic_try_entity_attack_random(gamestate* const g, entity* const e);
 void liblogic_try_entity_wait(gamestate* const g, entity* const e);
 void liblogic_change_player_dir(gamestate* const g, direction_t dir);
@@ -53,6 +54,7 @@ void liblogic_try_entity_block(gamestate* const g, entity* const e);
 entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 
 entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl, const char* name);
+entityid liblogic_shield_create(gamestate* const g, int x, int y, int fl, const char* name);
 
 const char* liblogic_get_action_key(const inputstate* const is, gamestate* const g);
 
