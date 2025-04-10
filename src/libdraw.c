@@ -635,13 +635,10 @@ bool libdraw_draw_player_target_box(const gamestate* const g) {
         return false;
     }
     direction_t dir = e->direction;
-    int x = e->x, y = e->y;
-    x += dir == DIR_LEFT || dir == DIR_DOWN_LEFT || dir == DIR_UP_LEFT      ? -1
-         : dir == DIR_RIGHT || dir == DIR_DOWN_RIGHT || dir == DIR_UP_RIGHT ? 1
-                                                                            : 0;
-    y += dir == DIR_UP || dir == DIR_UP_LEFT || dir == DIR_UP_RIGHT         ? -1
-         : dir == DIR_DOWN || dir == DIR_DOWN_LEFT || dir == DIR_DOWN_RIGHT ? 1
-                                                                            : 0;
+    int x = e->x;
+    int y = e->y;
+    x += get_x_from_dir(dir);
+    y += get_y_from_dir(dir);
     const int ds = DEFAULT_TILE_SIZE;
     const Color base_c = GREEN;
     const float a = 0.5f;
@@ -672,12 +669,12 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (!sg) {
-        //merrorint("libdraw_draw_sprite_and_shadow: spritegroup not found", id);
+        merror("libdraw_draw_sprite_and_shadow: spritegroup not found: id %d", id);
         return;
     }
     sprite* s = spritegroup_get(sg, sg->current);
     if (!s) {
-        //merrorint("libdraw_draw_sprite_and_shadow: sprite not found at current", sg->current);
+        merror("libdraw_draw_sprite_and_shadow: sprite not found at current %d", sg->current);
         return;
     }
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
@@ -685,7 +682,7 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     if (sh) {
         DrawTexturePro(*sh->texture, sh->src, dest, (Vector2){0, 0}, 0, WHITE);
     } else {
-        //merrorint("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1", sg->current + 1);
+        merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1: %d", sg->current + 1);
     }
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
