@@ -44,15 +44,16 @@ void liblogic_add_message(gamestate* g, const char* text);
 void liblogic_try_entity_attack_random(gamestate* const g, entity* const e);
 void liblogic_try_entity_wait(gamestate* const g, entity* const e);
 void liblogic_change_player_dir(gamestate* const g, direction_t dir);
-entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl, const char* name);
 void liblogic_init_weapon_test(gamestate* const g);
-
-entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 void liblogic_init_orcs_test_naive_loop(gamestate* const g);
 void liblogic_init_orcs_test_intermediate(gamestate* const g);
+void liblogic_try_entity_pickup(gamestate* const g, entity* const e);
+void liblogic_try_entity_block(gamestate* const g, entity* const e);
+
+entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
+
+entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl, const char* name);
 
 const char* liblogic_get_action_key(const inputstate* const is, gamestate* const g);
-
-void liblogic_try_entity_pickup(gamestate* const g, entity* const e);
 
 bool liblogic_entity_has_weapon(gamestate* const g, entityid id);

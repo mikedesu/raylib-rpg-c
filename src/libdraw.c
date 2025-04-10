@@ -7,6 +7,7 @@
 #include "libdraw.h"
 #include "libdraw_cube.h"
 #include "libdraw_plane.h"
+#include "massert.h"
 #include "mprint.h"
 #include "race.h"
 #include "rlgl.h"
@@ -260,8 +261,12 @@ void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg)
 }
 
 void libdraw_update_sprite_attack(entity_t* e, spritegroup_t* sg) {
+    massert(e, "libdraw_update_sprite_attack: entity is NULL");
+    massert(sg, "libdraw_update_sprite_attack: spritegroup is NULL");
     if (e->is_attacking) {
         libdraw_set_sg_is_attacking(e, sg);
+    } else if (e->is_blocking) {
+        libdraw_set_sg_is_blocking(e, sg);
     } else if (e->is_damaged) {
         libdraw_set_sg_is_damaged(e, sg);
     } else if (e->is_dead) {
@@ -270,16 +275,21 @@ void libdraw_update_sprite_attack(entity_t* e, spritegroup_t* sg) {
 }
 
 void libdraw_set_sg_is_attacking(entity_t* const e, spritegroup_t* const sg) {
-    if (!e || !sg) {
-        merror("libdraw_set_sg_is_attacking: entity or spritegroup is NULL");
-        return;
-    }
+    massert(e, "libdraw_set_sg_is_attacking: entity is NULL");
+    massert(sg, "libdraw_set_sg_is_attacking: spritegroup is NULL");
     if (e->race == RACE_HUMAN) {
         sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
     } else if (e->race == RACE_ORC) {
         sg->current = SPRITEGROUP_ANIM_ORC_ATTACK;
     }
     e->is_attacking = false;
+}
+
+void libdraw_set_sg_is_blocking(entity_t* const e, spritegroup_t* const sg) {
+    massert(e, "libdraw_set_sg_is_blocking: entity is NULL");
+    massert(sg, "libdraw_set_sg_is_blocking: spritegroup is NULL");
+    if (e->race == RACE_HUMAN) { sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD; }
+    e->is_blocking = false;
 }
 
 void libdraw_set_sg_is_damaged(entity_t* const e, spritegroup_t* const sg) {

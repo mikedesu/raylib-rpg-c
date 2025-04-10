@@ -607,7 +607,14 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
                 // add a message to the message system
                 //liblogic_add_message(g, "You have no weapon to attack with!");
             }
-        } else if (strcmp(action, "interact") == 0) {
+        }
+
+        else if (strcmp(action, "block") == 0) {
+            msuccess("Block pressed!");
+            liblogic_try_entity_block(g, e);
+        }
+
+        else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
             // but eventually this will be generalized
             // for instance u can talk to an NPC merchant using "interact"
@@ -694,6 +701,15 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     default: break; // Ignore unhandled keys
     }
     */
+}
+
+void liblogic_try_entity_block(gamestate* const g, entity* const e) {
+    liblogic_add_message(g, "Blocking!");
+    massert(g, "Game state is NULL!");
+    massert(e, "Entity is NULL!");
+    e->do_update = true;
+    e->is_blocking = true;
+    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
 
 void liblogic_try_entity_pickup(gamestate* const g, entity* const e) {

@@ -21,6 +21,7 @@ entity_t* entity_new(entityid id, entitytype_t type) {
     e->maxhp = 1;
     e->do_update = false;
     e->is_attacking = false;
+    e->is_blocking = false;
     e->is_damaged = false;
     e->is_dead = false;
     e->sprite_move_x = 0;

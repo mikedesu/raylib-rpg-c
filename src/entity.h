@@ -43,6 +43,7 @@ typedef struct entity_t {
 
     bool do_update;
     bool is_attacking;
+    bool is_blocking;
     bool is_damaged;
     bool is_dead;
 
