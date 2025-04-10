@@ -24,8 +24,8 @@
 #define DEFAULT_WIN_WIDTH 1920
 #define DEFAULT_WIN_HEIGHT 1080
 #define SPRITEGROUP_DEFAULT_SIZE 32
-//#define DEFAULT_ANIM_SPEED 4
-#define DEFAULT_ANIM_SPEED 8
+#define DEFAULT_ANIM_SPEED 4
+//#define DEFAULT_ANIM_SPEED 8
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
