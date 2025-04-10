@@ -836,7 +836,8 @@ void libdraw_calc_debugpanel_size(gamestate* const g) {
         return;
     }
     Vector2 s = MeasureTextEx(GetFontDefault(), g->debugpanel.buffer, g->debugpanel.font_size, 1);
-    g->debugpanel.w = s.x;
+    const float width_factor = 1.1f;
+    g->debugpanel.w = s.x * width_factor;
     g->debugpanel.h = s.y;
 }
 
@@ -944,6 +945,8 @@ void libdraw_draw_hud(gamestate* const g) {
     int level = 1;
     char* name = NULL;
     int turn = g->turn_count;
+    const Color bg = (Color){0x33, 0x33, 0x33, 0xff};
+    const Color fg = WHITE;
     //const char* text = "Name: darkmage\nHP: 1/1";
     entity* const e = em_get(g->entitymap, g->hero_id);
     if (e) {
@@ -966,7 +969,50 @@ void libdraw_draw_hud(gamestate* const g) {
              mp,
              maxmp,
              g->turn_count);
+
+    const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
+    const int padding = 20;
+
+    // Add slight extra width factor to account for text measurement inconsistency
+    const float width_factor = 1.1f; // 10% extra width
+    const int box_width = (size.x * width_factor) + (padding * 2);
+    const int box_height = size.y + (padding * 2);
+
+    // Position box
+    const int box_x = (g->windowwidth - box_width) / 2;
+    const int box_y = g->windowheight - box_height - 100;
+
+    // Draw everything
+    DrawRectangle(box_x, box_y, box_width, box_height, bg);
+    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, fg);
+    DrawText(buffer, box_x + padding, box_y + padding, fontsize, fg);
+
     //const char* text = "Name: evildojo666\nHP: 1/1";
+    /*
+     const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
+    const int padding = 20; // Single padding value for clarity
+    
+    // Box dimensions
+    const int box_width = size.x + (padding * 2);  // Text width + left/right padding
+    const int box_height = size.y + (padding * 2); // Text height + top/bottom padding
+    
+    // Position box at bottom center
+    const int y_offset = 100;
+    const int box_x = (g->windowwidth - box_width) / 2;  // Center horizontally
+    const int box_y = g->windowheight - box_height - y_offset;
+    
+    // Draw background
+    DrawRectangle(box_x, box_y, box_width, box_height, bg);
+    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, fg);
+    
+    // Draw text (centered within box)
+    const int text_x = box_x + padding;
+    const int text_y = box_y + padding;
+    DrawText(buffer, text_x, text_y, fontsize, fg);
+
+    */
+
+    /*
     const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
     // create a 2nd vector2 that is the size of the text with padding
     const Vector2 box_size = (Vector2){size.x + pad * 2, size.y + pad * 2};
@@ -993,6 +1039,7 @@ void libdraw_draw_hud(gamestate* const g) {
 
     // draw rectangle lines around the text
     DrawRectangleLinesEx((Rectangle){x2, y2, size.x, size.y}, 1, fg);
+    */
 }
 
 void libdraw_draw_msgbox_test(gamestate* const g, const char* s) {
