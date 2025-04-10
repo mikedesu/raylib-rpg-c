@@ -8,6 +8,7 @@
 #include "entity_actions.h"
 #include "entitytype.h"
 #include "gamestate.h"
+#include "gamestate_flag.h"
 #include "keybinding.h"
 #include "libgame_defines.h"
 #include "liblogic.h"
@@ -22,44 +23,6 @@
 #include <string.h>
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
-
-static inline const direction_t liblogic_get_dir_from_xy(int x, int y) {
-    if (x == 0 && y == 0) return DIR_NONE;
-    if (x == 0 && y == -1) return DIR_UP;
-    if (x == 0 && y == 1) return DIR_DOWN;
-    if (x == -1 && y == 0) return DIR_LEFT;
-    if (x == 1 && y == 0) return DIR_RIGHT;
-    // also handle diagonals
-    if (x == -1 && y == -1) return DIR_UP_LEFT;
-    if (x == 1 && y == -1) return DIR_UP_RIGHT;
-    if (x == -1 && y == 1) return DIR_DOWN_LEFT;
-    if (x == 1 && y == 1) return DIR_DOWN_RIGHT;
-    return DIR_UNKNOWN;
-}
-
-static inline int liblogic_get_x_from_dir(direction_t dir) {
-    switch (dir) {
-    case DIR_UP_LEFT:
-    case DIR_DOWN_LEFT:
-    case DIR_LEFT: return -1;
-    case DIR_UP_RIGHT:
-    case DIR_DOWN_RIGHT:
-    case DIR_RIGHT: return 1;
-    default: return 0;
-    }
-}
-
-static inline int liblogic_get_y_from_dir(direction_t dir) {
-    switch (dir) {
-    case DIR_UP:
-    case DIR_UP_LEFT:
-    case DIR_UP_RIGHT: return -1;
-    case DIR_DOWN:
-    case DIR_DOWN_LEFT:
-    case DIR_DOWN_RIGHT: return 1;
-    default: return 0;
-    }
-}
 
 void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_t action) {
     massert(g, "liblogic_execute_action: gamestate is NULL");
@@ -119,16 +82,35 @@ void liblogic_try_entity_attack_random(gamestate* const g, entity* const e) {
     massert(g, "liblogic_try_entity_attack_random: gamestate is NULL");
     massert(e, "liblogic_try_entity_attack_random: entity is NULL");
     int x = rand() % 3;
-    x = x == 0 ? -1 : x == 1 ? 0 : 1;
+    if (x == 0) {
+        x = -1;
+    } else if (x == 1) {
+        x = 0;
+    } else {
+        x = 1;
+    }
+    //x = x == 0 ? -1 : x == 1 ? 0 : 1;
     // if x is 0, y cannot also be 0
     // if x is 0, y cannot also be 0
-    int y;
+    int y = 0;
     if (x == 0) {
         y = rand() % 2;
-        y = y == 0 ? -1 : 1;
+        if (y == 0) {
+            y = -1;
+        } else {
+            y = 1;
+        }
+        //y = y == 0 ? -1 : 1;
     } else {
         y = rand() % 3;
-        y = y == 0 ? -1 : y == 1 ? 0 : 1;
+        if (y == 0) {
+            y = -1;
+        } else if (y == 1) {
+            y = 0;
+        } else {
+            y = 1;
+        }
+        //y = y == 0 ? -1 : y == 1 ? 0 : 1;
     }
     liblogic_try_entity_attack(g, e->id, e->x + x, e->y + y);
 }
@@ -137,15 +119,29 @@ void liblogic_try_entity_move_random(gamestate* const g, entity* const e) {
     massert(g, "liblogic_try_entity_move_random: gamestate is NULL");
     massert(e, "liblogic_try_entity_move_random: entity is NULL");
     int x = rand() % 3;
-    x = x == 0 ? -1 : x == 1 ? 0 : 1;
+    if (x == 0) {
+        x = -1;
+    } else if (x == 1) {
+        x = 0;
+    } else {
+        x = 1;
+    }
+    //x = x == 0 ? -1 : x == 1 ? 0 : 1;
     // if x is 0, y cannot also be 0
-    int y;
+    int y = 0;
     if (x == 0) {
         y = rand() % 2;
         y = y == 0 ? -1 : 1;
     } else {
         y = rand() % 3;
-        y = y == 0 ? -1 : y == 1 ? 0 : 1;
+        if (y == 0) {
+            y = -1;
+        } else if (y == 1) {
+            y = 0;
+        } else {
+            y = 1;
+        }
+        //y = y == 0 ? -1 : y == 1 ? 0 : 1;
     }
     liblogic_try_entity_move(g, e, x, y);
 }
@@ -513,8 +509,8 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
             liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_DOWN_RIGHT);
         } else if (strcmp(action, "attack") == 0) {
             msuccess("attack pressed!");
-            int dx = liblogic_get_x_from_dir(e->direction);
-            int dy = liblogic_get_y_from_dir(e->direction);
+            int dx = get_x_from_dir(e->direction);
+            int dy = get_y_from_dir(e->direction);
             int tx = e->x + dx;
             int ty = e->y + dy;
             liblogic_try_entity_attack(g, e->id, tx, ty);
@@ -524,8 +520,8 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
             // for instance u can talk to an NPC merchant using "interact"
             // or open a door, etc
             msuccess("Space pressed!");
-            int dx = liblogic_get_x_from_dir(e->direction);
-            int dy = liblogic_get_y_from_dir(e->direction);
+            int dx = get_x_from_dir(e->direction);
+            int dy = get_y_from_dir(e->direction);
             int tx = e->x + dx;
             int ty = e->y + dy;
             liblogic_try_flip_switch(g, e, tx, ty, e->floor);
@@ -605,7 +601,7 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
     e->do_update = true;
-    e->direction = liblogic_get_dir_from_xy(x, y);
+    e->direction = get_dir_from_xy(x, y);
     const int ex = e->x + x, ey = e->y + y, floor = e->floor;
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
@@ -813,12 +809,12 @@ void liblogic_handle_npc(gamestate* const g) {
     if (g->flag != GAMESTATE_FLAG_NPC_TURN) { return; }
     const entityid id = g->entity_turn;
     entity* const e = em_get(g->entitymap, id);
-    const int rx = rand() % 3 - 1;
-    const int ry = rand() % 3 - 1;
     if (!e) {
         merror("Failed to get entity");
         return;
     }
+    const int rx = rand() % 3 - 1;
+    const int ry = rand() % 3 - 1;
     if (e->type != ENTITY_NPC) {
         g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
         return;
@@ -832,7 +828,8 @@ void liblogic_handle_npcs(gamestate* const g) {
     // Process all NPCs
     for (int i = 0; i < g->index_entityids; i++) {
         entity* e = em_get(g->entitymap, g->entityids[i]);
-        if (!e || e->type != ENTITY_NPC || e->floor != 0) continue;
+        if (!e) { continue; }
+        if (e->type != ENTITY_NPC || e->floor != 0) continue;
         if (e->is_dead) continue;
         // testing attack logic
         liblogic_execute_action(g, e, e->default_action);
@@ -858,7 +855,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
     const int hero_y = e ? e->y : -1;
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
-    const char* flag_name = flag_names[(g->flag >= 0 && g->flag <= 5) ? g->flag : 6];
+    const char* flag_name =
+        flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
     // Format the string in one pass
     snprintf(g->debugpanel.buffer,
              sizeof(g->debugpanel.buffer),
@@ -985,8 +983,8 @@ void liblogic_try_entity_attack_in_facing_dir(gamestate* const g, entityid attac
     massert(attacker_id != ENTITYID_INVALID, "liblogic_try_entity_attack_in_facing_dir: attacker_id is invalid");
     entity* const e = em_get(g->entitymap, attacker_id);
     massert(e, "liblogic_try_entity_attack_in_facing_dir: entity is NULL");
-    int tx = e->x + liblogic_get_x_from_dir(e->direction);
-    int ty = e->y + liblogic_get_y_from_dir(e->direction);
+    int tx = e->x + get_x_from_dir(e->direction);
+    int ty = e->y + get_y_from_dir(e->direction);
     // if tx = 0 and ty = 0, then we attack ourselves
     liblogic_try_entity_attack(g, e->id, tx, ty);
 }
@@ -1011,7 +1009,7 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
     // Calculate direction based on target position
     bool attack_successful = false;
     int dx = target_x - attacker->x, dy = target_y - attacker->y;
-    attacker->direction = liblogic_get_dir_from_xy(dx, dy);
+    attacker->direction = get_dir_from_xy(dx, dy);
     attacker->is_attacking = attacker->do_update = true;
     for (int i = 0; i < tile->entity_max; i++) {
         entityid id = tile->entities[i];
