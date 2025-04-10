@@ -23,7 +23,8 @@
 #define DEFAULT_WIN_WIDTH 1920
 #define DEFAULT_WIN_HEIGHT 1080
 #define SPRITEGROUP_DEFAULT_SIZE 32
-#define DEFAULT_ANIM_SPEED 4
+//#define DEFAULT_ANIM_SPEED 4
+#define DEFAULT_ANIM_SPEED 8
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -343,10 +344,10 @@ void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
     }
     // attempt to grab the sprite's shadow
     sprite* const s_shadow = sg->sprites[sg->current + 1];
-    if (!s_shadow) {
-        merror("libdraw_update_sprite: shadow sprite is NULL");
-        // don't need to return... we can just continue
-    }
+    //if (!s_shadow) {
+    //merror("libdraw_update_sprite: shadow sprite is NULL");
+    // don't need to return... we can just continue
+    //}
     if (g->framecount % ANIM_SPEED == 0) {
         sprite_incrframe(s);
         // Check if the animation has completed one loop
@@ -679,11 +680,10 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     sprite* sh = spritegroup_get(sg, sg->current + 1);
-    if (sh) {
-        DrawTexturePro(*sh->texture, sh->src, dest, (Vector2){0, 0}, 0, WHITE);
-    } else {
-        merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1: %d", sg->current + 1);
-    }
+    if (sh) { DrawTexturePro(*sh->texture, sh->src, dest, (Vector2){0, 0}, 0, WHITE); }
+    //else {
+    //    merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1: %d", sg->current + 1);
+    //}
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
 }
@@ -800,7 +800,8 @@ void libdraw_create_spritegroup(gamestate* const g,
         spritegroup_destroy(group);
         return;
     }
-    const int df_w = df->width, df_h = df->height;
+    const int df_w = df->width;
+    const int df_h = df->height;
     if (e->x < 0 || e->x >= df_w || e->y < 0 || e->y >= df_h) {
         merror("libdraw_create_spritegroup: entity pos out of bounds %d %d", e->x, e->y);
         spritegroup_destroy(group);
@@ -908,24 +909,33 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
     int num_keys = 0;
     int offset_x = 0;
     int offset_y = 0;
-    switch (e->race) {
-    case RACE_HUMAN:
-        keys = TX_HUMAN_KEYS;
-        num_keys = TX_HUMAN_KEY_COUNT;
-        offset_x = -12;
-        offset_y = -12;
-        break;
-    // Add cases for other races here
-    case RACE_ORC:
-        keys = TX_ORC_KEYS;
-        num_keys = TX_ORC_KEY_COUNT;
-        offset_x = -12;
-        offset_y = -12;
-        break;
-    default: merror("libdraw_create_sg_byid: unknown race %d", e->race); return;
-    }
 
-    libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
+        switch (e->race) {
+        case RACE_HUMAN:
+            keys = TX_HUMAN_KEYS;
+            num_keys = TX_HUMAN_KEY_COUNT;
+            offset_x = -12;
+            offset_y = -12;
+            break;
+        // Add cases for other races here
+        case RACE_ORC:
+            keys = TX_ORC_KEYS;
+            num_keys = TX_ORC_KEY_COUNT;
+            offset_x = -12;
+            offset_y = -12;
+            break;
+        default: merror("libdraw_create_sg_byid: unknown race %d", e->race); return;
+        }
+        libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    } else if (e->type == ENTITY_WEAPON) {
+        // for now we only have 1 sprite for weapons
+        keys = TX_LONG_SWORD_KEYS;
+        num_keys = TX_LONG_SWORD_KEY_COUNT;
+        offset_x = -12;
+        offset_y = -12;
+        libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    }
 }
 
 void libdraw_draw_hud(gamestate* const g) {

@@ -78,7 +78,7 @@
 71 4 4 0 img/actions/guard_buckler_back.png
 72 4 3 0 img/actions/guard_buckler_success_front.png
 73 4 3 0 img/actions/guard_buckler_success_back.png
-74 1 4 0 img/shields/buckler.png
+74 1 4 0 img/shields/buckler-sheet.png
 75 4 4 0 img/characters/human_dmg.png
 76 4 4 0 img/characters/shadows/human_dmg_shadow.png
 77 1 1  0  img/tiles/grass_05.png
@@ -124,3 +124,4 @@
 117 1 1  0  img/switches/wall-switch-down-00.png
 118 1 1  0  img/tiles/upstairs_00.png
 119 1 1  0  img/tiles/downstairs_00.png
+120 1 4  0  img/weapons/long-sword-sheet.png

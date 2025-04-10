@@ -44,6 +44,7 @@ typedef struct entity_t {
 entity_t* entity_new(entityid id, entitytype_t type);
 entity_t* entity_new_at(entityid id, entitytype_t type, int x, int y, int floor);
 entity_t* entity_new_npc_at(entityid id, race_t r, int x, int y, int floor, const char* name);
+entity_t* entity_new_weapon_at(entityid id, int x, int y, int floor, const char* name);
 
 void entity_set_floor(entity_t* const e, int floor);
 void entity_set_name(entity_t* const e, const char* name);

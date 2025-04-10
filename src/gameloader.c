@@ -112,8 +112,8 @@ void autoreload_every_n_sec(const int n, const gamestate* const g) {
     massert(n > 0, "autoreload_every_n_sec: n must be greater than 0");
     frame_count++;
     if (frame_count % (n * 60) == 0) {
-        reload_draw(g);
         reload_logic();
+        reload_draw(g);
     }
 }
 

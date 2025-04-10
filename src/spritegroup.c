@@ -99,7 +99,7 @@ sprite* spritegroup_get(spritegroup_t* const sg, const int index) {
         return NULL;
     }
     if (index >= sg->size) {
-        merror("spritegroup_get: index is out of bounds");
+        //merror("spritegroup_get: index is out of bounds");
         return NULL;
     }
     return sg->sprites[index];

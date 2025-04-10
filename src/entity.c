@@ -46,6 +46,14 @@ entity_t* entity_new_npc_at(entityid id, race_t r, int x, int y, int floor, cons
     return e;
 }
 
+entity_t* entity_new_weapon_at(entityid id, int x, int y, int floor, const char* name) {
+    entity_t* e = entity_new_at(id, ENTITY_WEAPON, x, y, floor);
+    massert(e, "Failed to create entity");
+    //entity_set_race(e, r);
+    entity_set_name(e, name);
+    return e;
+}
+
 // this frees the entity so you lose the next pointer!
 // make sure you wire the map correctly before calling this!
 void entity_free(entity_t* e) {

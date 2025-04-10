@@ -214,9 +214,31 @@ void liblogic_init(gamestate* const g) {
 
     liblogic_init_em(g);
     liblogic_init_player(g);
+
+    // test to create a weapon
+    liblogic_init_weapon_test(g);
+
     // temporarily disabling
-    liblogic_init_orcs_test(g);
+    //liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
+}
+
+void liblogic_init_weapon_test(gamestate* const g) {
+    massert(g, "liblogic_init_weapon_test: gamestate is NULL");
+    dungeon_t* const d = g->dungeon;
+    massert(d, "liblogic_init_weapon_test: dungeon is NULL");
+    dungeon_floor_t* const df = dungeon_get_floor(d, 0);
+    massert(df, "liblogic_init_weapon_test: dungeon floor is NULL");
+
+    // get player position
+    entity* const player = em_get(g->entitymap, g->hero_id);
+    massert(player, "liblogic_init_weapon_test: player is NULL");
+    int x = player->x;
+    int y = player->y;
+
+    // place the sword somewhere around the player
+    entityid id = liblogic_weapon_create(g, x + 1, y, 0, "sword");
+    massert(id != -1, "liblogic_init_weapon_test: failed to create weapon");
 }
 
 void liblogic_add_message(gamestate* g, const char* text) {
@@ -1034,6 +1056,46 @@ entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl
     //dungeon_floor_add_at(df, e->id, x, y);
     if (!dungeon_floor_add_at(df, e->id, x, y)) {
         merror("liblogic_entity_create: failed to add entity to dungeon floor");
+        entity_free(e);
+        return -1;
+    }
+    return e->id;
+}
+
+entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl, const char* name) {
+    massert(g, "liblogic_weapon_create: gamestate is NULL");
+    em_t* em = gamestate_get_entitymap(g);
+    massert(em, "liblogic_weapon_create: entitymap is NULL");
+    massert(name && name[0], "liblogic_weapon_create: name is NULL or empty");
+    //massert(rt >= 0, "liblogic_weapon_create: race_type is out of bounds");
+    //massert(rt < RACE_COUNT, "liblogic_weapon_create: race_type is out of bounds");
+    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    massert(df, "liblogic_weapon_create: failed to get current dungeon floor");
+    massert(x >= 0, "liblogic_weapon_create: x is out of bounds");
+    massert(x < df->width, "liblogic_weapon_create: x is out of bounds");
+    massert(y >= 0, "liblogic_weapon_create: y is out of bounds");
+    massert(y < df->height, "liblogic_weapon_create: y is out of bounds");
+    // can we create an entity at this location? no entities can be made on wall-types etc
+    tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    massert(tile, "liblogic_weapon_create: failed to get tile");
+    if (!dungeon_tile_is_walkable(tile->type)) {
+        merror("liblogic_weapon_create: cannot create entity on wall");
+        return -1;
+    }
+    if (tile_has_live_npcs(tile, em)) {
+        merror("liblogic_weapon_create: cannot create entity on tile with NPC");
+        return -1;
+    }
+    entity* const e = entity_new_weapon_at(next_entityid++, x, y, fl, name);
+    if (!e) {
+        merror("liblogic_weapon_create: failed to create entity");
+        return -1;
+    }
+    em_add(em, e);
+    gamestate_add_entityid(g, e->id);
+    //dungeon_floor_add_at(df, e->id, x, y);
+    if (!dungeon_floor_add_at(df, e->id, x, y)) {
+        merror("liblogic_weapon_create: failed to add entity to dungeon floor");
         entity_free(e);
         return -1;
     }

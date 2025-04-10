@@ -146,6 +146,8 @@
 #define TX_UPSTAIRS_00 118
 #define TX_DOWNSTAIRS_00 119
 
+#define TX_LONG_SWORD_00 120
+
 //--------------------------------
 
 #define COMPANYSCENE 0
