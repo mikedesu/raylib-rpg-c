@@ -45,6 +45,10 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
     case ENTITY_ACTION_ATTACK_DOWN_LEFT: liblogic_try_entity_attack(g, e->id, e->x - 1, e->y + 1); break;
     case ENTITY_ACTION_ATTACK_DOWN_RIGHT: liblogic_try_entity_attack(g, e->id, e->x + 1, e->y + 1); break;
     case ENTITY_ACTION_MOVE_RANDOM: liblogic_try_entity_move_random(g, e); break;
+    case ENTITY_ACTION_WAIT: {
+        liblogic_try_entity_wait(g, e);
+        break;
+    }
     case ENTITY_ACTION_ATTACK_RANDOM: {
         liblogic_try_entity_attack_random(g, e);
         break;
@@ -61,9 +65,6 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
         liblogic_try_entity_move_attack_player(g, e);
         break;
     }
-    case ENTITY_ACTION_WAIT:
-        // Do nothing for now (future healing logic can go here)
-        break;
     case ENTITY_ACTION_INTERACT_DOWN_LEFT:
     case ENTITY_ACTION_INTERACT_DOWN_RIGHT:
     case ENTITY_ACTION_INTERACT_UP_LEFT:
@@ -72,9 +73,7 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
     case ENTITY_ACTION_INTERACT_RIGHT:
     case ENTITY_ACTION_INTERACT_UP:
     case ENTITY_ACTION_INTERACT_DOWN:
-    default:
-        //merror("Unknown entity action: %d", action);
-        break;
+    default: merror("Unknown entity action: %d", action); break;
     }
 }
 
@@ -216,7 +215,7 @@ void liblogic_init(gamestate* const g) {
     liblogic_init_em(g);
     liblogic_init_player(g);
     // temporarily disabling
-    //liblogic_init_orcs_test(g);
+    liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
 }
 
@@ -336,7 +335,8 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     //for (int i = 0; i < count2; i++) {
     //for (int i = 0; i < count2; i++) {
 
-    for (int i = 0; i < count2; i++) {
+    int max_orcs = 4;
+    for (int i = 0; i < max_orcs && i < count2; i++) {
         tile_t* const tile = dungeon_floor_tile_at(df, locations[i].x, locations[i].y);
         if (dungeon_tile_is_wall(tile->type)) { continue; }
         // check if there is already an entity at this location
@@ -491,7 +491,9 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
 
     if (action) {
         //msuccessstr("Action: --", action);
-        if (strcmp(action, "move_w") == 0) {
+        if (strcmp(action, "wait") == 0) {
+            liblogic_execute_action(g, e, ENTITY_ACTION_WAIT);
+        } else if (strcmp(action, "move_w") == 0) {
             liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_LEFT);
         } else if (strcmp(action, "move_e") == 0) {
             liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_RIGHT);
@@ -595,6 +597,24 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     default: break; // Ignore unhandled keys
     }
     */
+}
+
+void liblogic_try_entity_wait(gamestate* const g, entity* const e) {
+    massert(g, "Game state is NULL!");
+    massert(e, "Entity is NULL!");
+    e->do_update = true;
+
+    // waiting increments hp for player and NPCs
+    if (e->type == ENTITY_PLAYER) {
+        entity_incr_hp(e, 1);
+        msuccess("Player HP: %d", e->hp);
+    } else if (e->type == ENTITY_NPC) {
+        entity_incr_hp(e, 1);
+        msuccess("NPC HP: %d", e->hp);
+    }
+
+    // handle flag update
+    if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
 }
 
 void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y) {
@@ -851,8 +871,12 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
                                        "Unknown"};
     // Get hero position once
     const entity* const e = em_get(g->entitymap, g->hero_id);
-    const int hero_x = e ? e->x : -1;
-    const int hero_y = e ? e->y : -1;
+    int hero_x = -1;
+    int hero_y = -1;
+    if (e) {
+        hero_x = e->x;
+        hero_y = e->y;
+    }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
     const char* flag_name =
@@ -1037,6 +1061,8 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
         } else {
             g->flag = GAMESTATE_FLAG_NONE;
         }
+    } else {
+        if (attacker->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
     }
 }
 
