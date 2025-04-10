@@ -333,7 +333,7 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
 
     // now we can loop thru the array and create an orc at each location
 
-    int max_orcs = 10;
+    int max_orcs = 0;
     //int max_orcs = count2;
     for (int i = 0; i < max_orcs && i < count2; i++) {
         tile_t* const tile = dungeon_floor_tile_at(df, locations[i].x, locations[i].y);
