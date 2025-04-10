@@ -54,3 +54,5 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g);
 const char* liblogic_get_action_key(const inputstate* const is, gamestate* const g);
 
 void liblogic_try_entity_pickup(gamestate* const g, entity* const e);
+
+bool liblogic_entity_has_weapon(gamestate* const g, entityid id);

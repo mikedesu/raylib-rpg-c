@@ -502,7 +502,7 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     }
 
     if (g->msg_system.is_active) {
-        if (strcmp(action, "attack") == 0) {
+        if (strcmp(action, "attack") == 0 || strcmp(action, "pickup") == 0) {
             //if (inputstate_is_pressed(is, KEY_A)) {
             g->msg_system.index++;
             if (g->msg_system.index >= g->msg_system.count) {
@@ -593,11 +593,20 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
             liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_DOWN_RIGHT);
         } else if (strcmp(action, "attack") == 0) {
             msuccess("attack pressed!");
-            int dx = get_x_from_dir(e->direction);
-            int dy = get_y_from_dir(e->direction);
-            int tx = e->x + dx;
-            int ty = e->y + dy;
-            liblogic_try_entity_attack(g, e->id, tx, ty);
+
+            if (liblogic_entity_has_weapon(g, e->id)) {
+                msuccess("Entity has weapon");
+                int dx = get_x_from_dir(e->direction);
+                int dy = get_y_from_dir(e->direction);
+                int tx = e->x + dx;
+                int ty = e->y + dy;
+                liblogic_try_entity_attack(g, e->id, tx, ty);
+            } else {
+                merror("Entity has no weapon");
+                liblogic_add_message(g, "You have no weapon to attack with!");
+                // add a message to the message system
+                //liblogic_add_message(g, "You have no weapon to attack with!");
+            }
         } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
             // but eventually this will be generalized
@@ -1295,4 +1304,20 @@ int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int f
         if (e->type == ENTITY_NPC && !e->is_dead) { count++; }
     }
     return count;
+}
+
+bool liblogic_entity_has_weapon(gamestate* const g, entityid id) {
+    massert(g, "liblogic_entity_has_weapon: gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "liblogic_entity_has_weapon: entity ID is invalid");
+    entity* const e = em_get(g->entitymap, id);
+    if (!e) {
+        merror("liblogic_entity_has_weapon: entity not found");
+        return false;
+    }
+    for (int i = 0; i < e->inventory_count; i++) {
+        entityid item_id = e->inventory[i];
+        entity* item = em_get(g->entitymap, item_id);
+        if (item && item->type == ENTITY_WEAPON) { return true; }
+    }
+    return false;
 }
