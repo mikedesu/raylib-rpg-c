@@ -936,7 +936,7 @@ void libdraw_draw_hud(gamestate* const g) {
         return;
     }
     // Draw the HUD
-    int fontsize = 30;
+    int fontsize = 20;
     int pad = 10;
     int pad2 = 20;
     char buffer[1024] = {0};
@@ -971,16 +971,21 @@ void libdraw_draw_hud(gamestate* const g) {
              g->turn_count);
     //const char* text = "Name: evildojo666\nHP: 1/1";
     const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
+    // create a 2nd vector2 that is the size of the text with padding
+    const Vector2 box_size = (Vector2){size.x + pad * 2, size.y + pad * 2};
     // set the x and y based on the window width and height to be the center of the bottom of the screen
     const int y_offset = 100;
     const Color bg = (Color){0x33, 0x33, 0x33, 0xff};
     const Color fg = WHITE;
-    const int h = size.y + pad * 2;
-    const int y = g->windowheight - h - y_offset - pad;
-    const int w = size.x + pad * 5;
-    const int x = g->windowwidth / 2 - w / 2 - pad;
-    //const Color fg2 = (Color){0x66, 0x66, 0x66, 0xff};
+
+    int h = box_size.y;
+    const int y = g->windowheight - h - y_offset;
+
+    int w = size.x;
+    const int x = g->windowwidth / 2 - w / 2;
+
     DrawRectangle(x, y, w, h, bg);
+
     // draw rectangle lines around the box
     Rectangle box = (Rectangle){x, y, w, h};
     DrawRectangleLinesEx(box, 2, fg);
@@ -988,6 +993,9 @@ void libdraw_draw_hud(gamestate* const g) {
     const int y2 = y + pad;
     // Draw text
     DrawText(buffer, x2, y2, fontsize, fg);
+
+    // draw rectangle lines around the text
+    DrawRectangleLinesEx((Rectangle){x2, y2, size.x, size.y}, 1, fg);
 }
 
 void libdraw_draw_msgbox_test(gamestate* const g, const char* s) {
