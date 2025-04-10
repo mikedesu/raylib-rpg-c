@@ -9,6 +9,8 @@
 
 #define ENTITY_NAME_LEN_MAX 64
 
+#define ENTITY_INVENTORY_MAX_SIZE 32
+
 // forward declaration
 typedef struct entity_t entity_t;
 
@@ -20,6 +22,12 @@ typedef struct entity_t {
     race_t race;
 
     char name[ENTITY_NAME_LEN_MAX];
+
+    entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
+    int inventory_count;
+
+    //entityid* inventory;
+    //int inventory_max_size;
 
     int x;
     int y;
@@ -59,13 +67,11 @@ void entity_decr_x(entity_t* const e);
 void entity_decr_y(entity_t* const e);
 void entity_set_dir(entity_t* const e, direction_t dir);
 void entity_set_type(entity_t* const e, entitytype_t type);
-
 void entity_set_hp(entity_t* const e, int hp);
 void entity_set_maxhp(entity_t* const e, int maxhp);
 void entity_set_hpmaxhp(entity_t* const e, int hp, int maxhp);
 void entity_incr_hp(entity_t* const e, int hp);
 void entity_decr_hp(entity_t* const e, int hp);
-
 void entity_set_default_action(entity_t* const e, entity_action_t action);
 
 direction_t entity_get_dir(entity_t* const e);
@@ -76,3 +82,8 @@ entity_action_t entity_get_default_action(entity_t* const e);
 
 int entity_get_hp(entity_t* const e);
 int entity_get_maxhp(entity_t* const e);
+int entity_get_inventory_count(entity_t* const e);
+
+bool entity_item_is_already_in_inventory(entity_t* const e, entityid item_id);
+bool entity_add_item_to_inventory(entity_t* const e, entityid item_id);
+bool entity_remove_item_from_inventory(entity_t* const e, entityid item_id);

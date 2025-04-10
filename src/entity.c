@@ -1,6 +1,6 @@
 #include "entity.h"
 #include "massert.h"
-//#include "mprint.h"
+#include "mprint.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,10 +14,22 @@ entity_t* entity_new(entityid id, entitytype_t type) {
     e->type = type;
     e->race = RACE_NONE;
     e->direction = DIR_RIGHT;
-    e->x = e->y = e->floor = -1;
-    e->hp = e->maxhp = 1;
-    e->do_update = e->is_attacking = e->is_damaged = e->is_dead = false;
-    e->sprite_move_x = e->sprite_move_y = 0;
+    e->x = -1;
+    e->y = -1;
+    e->floor = -1;
+    e->hp = 1;
+    e->maxhp = 1;
+    e->do_update = false;
+    e->is_attacking = false;
+    e->is_damaged = false;
+    e->is_dead = false;
+    e->sprite_move_x = 0;
+    e->sprite_move_y = 0;
+
+    //e->inventory = NULL;
+    //e->inventory_max_size = 0;
+    e->inventory_count = 0;
+
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     //e->next = NULL;
     e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
@@ -30,6 +42,53 @@ entity_t* entity_new_at(entityid id, entitytype_t type, int x, int y, int floor)
     entity_set_xy(e, x, y);
     entity_set_floor(e, floor);
     return e;
+}
+
+bool entity_item_is_already_in_inventory(entity_t* const e, entityid item_id) {
+    massert(e, "entity_item_is_already_in_inventory: e is NULL");
+    massert(item_id >= 0, "entity_item_is_already_in_inventory: item_id is less than 0");
+    for (int i = 0; i < e->inventory_count; i++) {
+        if (e->inventory[i] == item_id) return true;
+    }
+    return false;
+}
+
+bool entity_add_item_to_inventory(entity_t* const e, entityid item_id) {
+    massert(e, "entity_add_item_to_inventory: e is NULL");
+    massert(item_id >= 0, "entity_add_item_to_inventory: item_id is less than 0");
+    if (e->inventory_count >= ENTITY_INVENTORY_MAX_SIZE) {
+        merror("entity_add_item_to_inventory: inventory is full");
+        return false;
+    }
+    if (entity_item_is_already_in_inventory(e, item_id)) {
+        merror("entity_add_item_to_inventory: item is already in inventory");
+        return false;
+    }
+    e->inventory[e->inventory_count++] = item_id;
+    return true;
+}
+
+bool entity_remove_item_from_inventory(entity_t* const e, entityid item_id) {
+    massert(e, "entity_remove_item_from_inventory: e is NULL");
+    massert(item_id >= 0, "entity_remove_item_from_inventory: item_id is less than 0");
+
+    if (e->inventory_count <= 0) {
+        merror("entity_remove_item_from_inventory: inventory is empty");
+        return false;
+    }
+
+    if (!entity_item_is_already_in_inventory(e, item_id)) {
+        merror("entity_remove_item_from_inventory: item is not in inventory");
+        return false;
+    }
+
+    for (int i = 0; i < e->inventory_count; i++) {
+        if (e->inventory[i] == item_id) {
+            e->inventory[i] = e->inventory[--e->inventory_count];
+            return true;
+        }
+    }
+    return false;
 }
 
 void entity_set_floor(entity_t* const e, int floor) {
@@ -167,4 +226,9 @@ void entity_incr_hp(entity_t* const e, int hp) {
 void entity_decr_hp(entity_t* const e, int hp) {
     massert(e, "entity_decr_hp: e is NULL");
     entity_set_hp(e, e->hp - hp);
+}
+
+int entity_get_inventory_count(entity_t* const e) {
+    massert(e, "entity_get_inventory_count: e is NULL");
+    return e->inventory_count;
 }

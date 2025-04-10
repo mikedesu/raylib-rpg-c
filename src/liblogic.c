@@ -497,7 +497,7 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     //minfo("2");
     //minfo("Checking...%s", action);
     if (!action) {
-        merror("No action found for key");
+        merror("1 No action found for key");
         return;
     }
 
@@ -610,14 +610,16 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
             int ty = e->y + dy;
             liblogic_try_flip_switch(g, e, tx, ty, e->floor);
         } else if (strcmp(action, "pickup") == 0) {
-            mwarning("Pickup action currently unimplemented");
+            //mwarning("Pickup action currently unimplemented");
             // add a message to the message system
-            liblogic_add_message(g, "Pickup action currently unimplemented");
+            //liblogic_add_message(g, "Pickup action currently unimplemented");
+
+            liblogic_try_entity_pickup(g, e);
         } else if (strcmp(action, "toggle_camera") == 0) {
             g->controlmode = CONTROLMODE_CAMERA;
         }
     } else {
-        merror("No action found for key");
+        merror("2 No action found for key");
     }
 
     // old
@@ -683,6 +685,68 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     default: break; // Ignore unhandled keys
     }
     */
+}
+
+void liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
+    minfo("liblogic_try_entity_pickup: trying to pick up item");
+    massert(g, "Game state is NULL!");
+    massert(e, "Entity is NULL!");
+    e->do_update = true;
+    // check if the player is on a tile with an item
+    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, e->floor);
+    if (!df) {
+        merror("Failed to get dungeon floor");
+        return;
+    }
+    tile_t* const tile = dungeon_floor_tile_at(df, e->x, e->y);
+    if (!tile) {
+        merror("Failed to get tile");
+        return;
+    }
+
+    if (tile->entity_count == 0) {
+        merror("No items on tile");
+        return;
+    }
+
+    for (int i = 0; i < tile->entity_count; i++) {
+        entityid id = tile->entities[i];
+        entity* it = em_get(g->entitymap, id);
+        if (!it) {
+            merror("Failed to get entity");
+            return;
+        }
+        if (it->type == ENTITY_WEAPON) {
+            // pick up the item
+            // picking up an item requires:
+            // 1. removing its id from the tile
+            // 2. adding its id to the entity inventory
+            // remove the item from the tile
+            liblogic_add_message(g, "Picked up weapon");
+            tile_remove(tile, id);
+            // add the item to the entity inventory
+            entity_add_item_to_inventory(e, id);
+            msuccess("Picked up item: %s", it->name);
+            if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+            return;
+        }
+    }
+
+    //if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+
+    //if (tile->item_count > 0) {
+    //    // pick up the item
+    //    itemid id = tile->items[0];
+    //    item* it = im_get(g->itemmap, id);
+    //    if (!it) {
+    //        merror("Failed to get item");
+    //        return;
+    //    }
+    //    liblogic_item_pickup(g, it);
+    //    msuccess("Picked up item: %s", it->name);
+    //} else {
+    //    merror("No items on tile");
+    //}
 }
 
 void liblogic_try_entity_wait(gamestate* const g, entity* const e) {
@@ -959,9 +1023,11 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
     const entity* const e = em_get(g->entitymap, g->hero_id);
     int hero_x = -1;
     int hero_y = -1;
+    int inventory_count = -1;
     if (e) {
         hero_x = e->x;
         hero_y = e->y;
+        inventory_count = e->inventory_count;
     }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
@@ -977,7 +1043,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Cam: (%.0f,%.0f) Zoom: %.1f\n"
              "Mode: %s | Floor: %d/%d\n"
              "Entities: %d | Flag: %s\n"
-             "Turn: %d | Hero: (%d,%d)",
+             "Turn: %d | Hero: (%d,%d)\n"
+             "Inventory: %d\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -993,7 +1060,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              flag_name,
              g->entity_turn,
              hero_x,
-             hero_y);
+             hero_y,
+             inventory_count);
 }
 
 void liblogic_close(gamestate* const g) {
