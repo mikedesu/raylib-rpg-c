@@ -19,6 +19,8 @@
 #define MAX_MESSAGES 32
 #define MAX_MSG_LENGTH 256
 
+#define DEFAULT_MAX_HISTORY_SIZE 1024
+
 typedef struct {
     char messages[MAX_MESSAGES][MAX_MSG_LENGTH];
     int count; // Total messages in queue
@@ -108,6 +110,10 @@ int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, const i
 em_t* gamestate_get_entitymap(gamestate* const g);
 
 bool gamestate_add_entityid(gamestate* const g, entityid id);
+bool gamestate_init_msg_history(gamestate* const g);
+bool gamestate_free_msg_history(gamestate* const g);
+
+bool gamestate_add_msg_history(gamestate* const g, const char* msg);
 
 void gamestatefree(gamestate* g);
 void gamestate_dungeon_destroy(gamestate* const g);

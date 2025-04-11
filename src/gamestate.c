@@ -1,6 +1,7 @@
 #include "controlmode.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
+#include "massert.h"
 #include "mprint.h"
 #include <raylib.h>
 #include <stdio.h>
@@ -94,13 +95,38 @@ gamestate* gamestateinitptr() {
 
     g->gameover = false;
 
+    //g->msg_history.count = 0;
+    //g->msg_history.max_count = DEFAULT_MAX_HISTORY_SIZE;
+    //g->msg_history.messages = (char**)malloc(sizeof(char*) * g->msg_history.max_count);
+    //if (g->msg_history.messages == NULL) {
+    //    merror("gamestateinitptr: g->msg_history.messages is NULL");
+    //    free(g);
+    //    return NULL;
+    //}
+    //for (int i = 0; i < g->msg_history.max_count; i++) {
+    //    g->msg_history.messages[i] = (char*)malloc(sizeof(char) * MAX_MSG_LENGTH);
+    //    if (g->msg_history.messages[i] == NULL) {
+    //        merror("gamestateinitptr: g->msg_history.messages[%d] is NULL", i);
+    //        for (int j = 0; j < i; j++) { free(g->msg_history.messages[j]); }
+    //        free(g->msg_history.messages);
+    //        free(g);
+    //        return NULL;
+    //    }
+    //}
+
+    gamestate_init_msg_history(g);
+    return g;
+}
+
+bool gamestate_init_msg_history(gamestate* const g) {
+    massert(g, "gamestate_init_msg_history: g is NULL");
     g->msg_history.count = 0;
-    g->msg_history.max_count = 1024;
+    g->msg_history.max_count = DEFAULT_MAX_HISTORY_SIZE;
     g->msg_history.messages = (char**)malloc(sizeof(char*) * g->msg_history.max_count);
     if (g->msg_history.messages == NULL) {
         merror("gamestateinitptr: g->msg_history.messages is NULL");
         free(g);
-        return NULL;
+        return false;
     }
     for (int i = 0; i < g->msg_history.max_count; i++) {
         g->msg_history.messages[i] = (char*)malloc(sizeof(char) * MAX_MSG_LENGTH);
@@ -108,12 +134,24 @@ gamestate* gamestateinitptr() {
             merror("gamestateinitptr: g->msg_history.messages[%d] is NULL", i);
             for (int j = 0; j < i; j++) { free(g->msg_history.messages[j]); }
             free(g->msg_history.messages);
-            free(g);
-            return NULL;
+            //free(g);
+            return false;
         }
     }
+    return true;
+}
 
-    return g;
+bool gamestate_free_msg_history(gamestate* const g) {
+    massert(g, "gamestate_free_msg_history: g is NULL");
+    for (int i = 0; i < g->msg_history.max_count; i++) {
+        if (g->msg_history.messages[i]) {
+            free(g->msg_history.messages[i]);
+            g->msg_history.messages[i] = NULL;
+        }
+    }
+    free(g->msg_history.messages);
+    g->msg_history.messages = NULL;
+    return true;
 }
 
 void gamestatefree(gamestate* g) {
@@ -132,13 +170,15 @@ void gamestatefree(gamestate* g) {
     if (g->dungeon) dungeon_destroy(g->dungeon);
 
     // free message history
-    for (int i = 0; i < g->msg_history.max_count; i++) {
-        if (g->msg_history.messages[i]) {
-            free(g->msg_history.messages[i]);
-            g->msg_history.messages[i] = NULL;
-        }
-    }
-    free(g->msg_history.messages);
+    //for (int i = 0; i < g->msg_history.max_count; i++) {
+    //    if (g->msg_history.messages[i]) {
+    //        free(g->msg_history.messages[i]);
+    //        g->msg_history.messages[i] = NULL;
+    //    }
+    //}
+    //free(g->msg_history.messages);
+
+    gamestate_free_msg_history(g);
 
     minfo("Freeing g...");
     free(g);
@@ -284,4 +324,16 @@ void gamestate_load_keybindings(gamestate* const g) {
     const char* filename = "keybindings.ini";
 
     load_keybindings(filename, &g->keybinding_list);
+}
+
+bool gamestate_add_msg_history(gamestate* const g, const char* msg) {
+    massert(g, "gamestate_add_msg_history: g is NULL");
+    massert(msg, "gamestate_add_msg_history: msg is NULL");
+    if (g->msg_history.count >= g->msg_history.max_count) {
+        merror("gamestate_add_msg_history: msg history is full");
+        return false;
+    }
+    strncpy(g->msg_history.messages[g->msg_history.count], msg, MAX_MSG_LENGTH);
+    g->msg_history.count++;
+    return true;
 }
