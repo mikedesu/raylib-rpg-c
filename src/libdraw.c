@@ -354,20 +354,11 @@ void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
     }
     // attempt to grab the sprite's shadow
     sprite* const s_shadow = sg->sprites[sg->current + 1];
-    //if (!s_shadow) {
-    //merror("libdraw_update_sprite: shadow sprite is NULL");
-    // don't need to return... we can just continue
-    //}
     if (g->framecount % ANIM_SPEED == 0) {
         sprite_incrframe(s);
-        // Check if the animation has completed one loop
         if (s->num_loops >= 1) {
             sg->current = sg->default_anim;
             s->num_loops = 0;
-            // testing switching g->flag
-            //if (e->type == ENTITY_PLAYER) {
-            //    g->flag = PLAYER_INPUT_FLAG;
-            //}
         }
         if (s_shadow) {
             sprite_incrframe(s_shadow);

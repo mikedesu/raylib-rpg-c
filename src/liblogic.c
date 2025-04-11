@@ -248,18 +248,14 @@ void liblogic_init_weapon_test(gamestate* const g) {
 void liblogic_add_message(gamestate* g, const char* fmt, ...) {
     massert(g, "liblogic_add_message: gamestate is NULL");
     massert(fmt, "liblogic_add_message: format string is NULL");
-
     if (g->msg_system.count >= MAX_MESSAGES) {
         mwarning("Message queue full!");
         return;
     }
-
     va_list args;
     va_start(args, fmt);
-    //vsnprintf(g->msg_system.messages,
     vsnprintf(g->msg_system.messages[g->msg_system.count], MAX_MSG_LENGTH - 1, fmt, args);
     va_end(args);
-
     g->msg_system.count++;
     g->msg_system.is_active = true;
 }
