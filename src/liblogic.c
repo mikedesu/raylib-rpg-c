@@ -256,8 +256,21 @@ void liblogic_add_message(gamestate* g, const char* fmt, ...) {
     va_start(args, fmt);
     vsnprintf(g->msg_system.messages[g->msg_system.count], MAX_MSG_LENGTH - 1, fmt, args);
     va_end(args);
+    liblogic_add_message_history(g, g->msg_system.messages[g->msg_system.count]);
     g->msg_system.count++;
     g->msg_system.is_active = true;
+}
+
+void liblogic_add_message_history(gamestate* const g, const char* msg) {
+    massert(g, "liblogic_add_message_history: gamestate is NULL");
+    massert(msg, "liblogic_add_message_history: msg is NULL");
+    if (g->msg_history.count >= g->msg_history.max_count) {
+        mwarning("Message history full!");
+        return;
+    }
+    strncpy(g->msg_history.messages[g->msg_history.count], msg, MAX_MSG_LENGTH - 1);
+    g->msg_history.messages[g->msg_history.count][MAX_MSG_LENGTH - 1] = '\0'; // Ensure null-termination
+    g->msg_history.count++;
 }
 
 //void liblogic_add_message(gamestate* g, const char* text) {
@@ -730,7 +743,7 @@ void liblogic_try_entity_block(gamestate* const g, entity* const e) {
     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
 
-void liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
+bool liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
     minfo("liblogic_try_entity_pickup: trying to pick up item");
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
@@ -739,25 +752,23 @@ void liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, e->floor);
     if (!df) {
         merror("Failed to get dungeon floor");
-        return;
+        return false;
     }
     tile_t* const tile = dungeon_floor_tile_at(df, e->x, e->y);
     if (!tile) {
         merror("Failed to get tile");
-        return;
+        return false;
     }
-
     if (tile->entity_count == 0) {
         merror("No items on tile");
-        return;
+        return false;
     }
-
     for (int i = 0; i < tile->entity_count; i++) {
         entityid id = tile->entities[i];
         entity* it = em_get(g->entitymap, id);
         if (!it) {
             merror("Failed to get entity");
-            return;
+            return false;
         }
         if (it->type == ENTITY_WEAPON) {
             // pick up the item
@@ -772,38 +783,24 @@ void liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             entity_add_item_to_inventory(e, id);
             msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
-            return;
+            return true;
         } else if (it->type == ENTITY_SHIELD) {
             // pick up the item
             // picking up an item requires:
             // 1. removing its id from the tile
             // 2. adding its id to the entity inventory
             // remove the item from the tile
-            liblogic_add_message(g, "Picked up shield");
+            liblogic_add_message(g, "Picked up %s", it->name);
             tile_remove(tile, id);
             // add the item to the entity inventory
             entity_add_item_to_inventory(e, id);
             msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
-            return;
+            return true;
         }
     }
-
-    //if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
-
-    //if (tile->item_count > 0) {
-    //    // pick up the item
-    //    itemid id = tile->items[0];
-    //    item* it = im_get(g->itemmap, id);
-    //    if (!it) {
-    //        merror("Failed to get item");
-    //        return;
-    //    }
-    //    liblogic_item_pickup(g, it);
-    //    msuccess("Picked up item: %s", it->name);
-    //} else {
-    //    merror("No items on tile");
-    //}
+    liblogic_add_message(g, "No items to pick up");
+    return false;
 }
 
 void liblogic_try_entity_wait(gamestate* const g, entity* const e) {
@@ -1102,7 +1099,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Mode: %s | Floor: %d/%d\n"
              "Entities: %d | Flag: %s\n"
              "Turn: %d | Hero: (%d,%d)\n"
-             "Inventory: %d\n",
+             "Inventory: %d\n"
+             "msg_history.count: %d\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -1119,7 +1117,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              g->entity_turn,
              hero_x,
              hero_y,
-             inventory_count);
+             inventory_count,
+             g->msg_history.count);
 }
 
 void liblogic_close(gamestate* const g) {

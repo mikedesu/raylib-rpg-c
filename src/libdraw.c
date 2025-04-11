@@ -612,6 +612,7 @@ void libdraw_drawframe(gamestate* const g) {
     //EndShaderMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     libdraw_draw_message_box(g);
+    libdraw_draw_message_history_placeholder(g);
     libdraw_draw_hud(g);
     //libdraw_draw_msgbox_test(g, "Hello, world!\nLets fucking go!");
     if (g->debugpanelon) { libdraw_draw_debug_panel(g); }
@@ -1066,9 +1067,16 @@ void libdraw_draw_msgbox_test(gamestate* const g, const char* s) {
     }
     const int fontsize = 20, f_offset = 30;
     const Vector2 size = MeasureTextEx(GetFontDefault(), s, fontsize + f_offset, 1);
-    const int w = size.x, h = size.y, pad = 10, pad2 = 20;
-    const int x = g->windowwidth / 4 - w / 2, y = 0 + pad, x2 = x + pad2, y2 = y + pad2;
-    const Color bg = (Color){0x33, 0x33, 0x33, 0xff}, fg = WHITE;
+    const int w = size.x;
+    const int h = size.y;
+    const int pad = 10;
+    const int pad2 = 20;
+    const int x = g->windowwidth / 4 - w / 2;
+    const int y = 0 + pad;
+    const int x2 = x + pad2;
+    const int y2 = y + pad2;
+    const Color bg = (Color){0x33, 0x33, 0x33, 0xff};
+    const Color fg = WHITE;
     // we need to calculate x and y based on the w and h
     DrawRectangle(x + pad, y + pad, w, h, bg);
     // we need to calculate an x and y for the text based on size2 and a padding
@@ -1106,28 +1114,21 @@ void libdraw_draw_message_box(gamestate* g) {
     int pad = 40; // Inner padding (text <-> box edges)
     //int margin = 50; // Outer margin (box <-> screen edges)
     float line_spacing = 1.0f;
-
     // Measure text (split into lines if needed)
     Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, font_size, line_spacing);
-
     // Calculate centered box position
     Rectangle box = {.x = (g->windowwidth - text_size.x) / 2 - pad, // Center X
                      .y = (g->windowheight - text_size.y) / 2 - pad, // Center Y
                      .width = text_size.x + pad * 2,
                      .height = text_size.y + pad * 2};
-
     // Draw box (semi-transparent black with white border)
     //DrawRectangleRec(box, Fade(BLACK, 0.8f));
-
     Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
-
     //DrawRectangleRec(box, Fade((Color){0x66, 0x66, 0x66}, 0.6f));
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
-
     // Draw text (centered in box)
     DrawTextEx(GetFontDefault(), msg, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
-
     // Show "Next" prompt if more messages exist
     if (g->msg_system.count > 1) {
         const char* prompt = "[A] Next";
@@ -1141,4 +1142,55 @@ void libdraw_draw_message_box(gamestate* g) {
                  prompt_font_size,
                  WHITE);
     }
+}
+
+void libdraw_draw_message_history_placeholder(gamestate* const g) {
+    if (!g) {
+        merror("libdraw_draw_message_history_placeholder: gamestate is NULL");
+        return;
+    }
+
+    // if there are no messages in the message history, return
+    if (g->msg_history.count == 0) return;
+
+    //const char* msg = "Message history 1\nMessage history 2\nMessage history 3\nMessage history 4\nMessage history 5";
+    int font_size = 20;
+    int pad = 40; // Inner padding (text <-> box edges)
+    //int margin = 50; // Outer margin (box <-> screen edges)
+    float line_spacing = 1.0f;
+
+    // instead of a placeholder message, we now need to actually draw the message history
+    // we might only render the last N messages
+
+    int index = g->msg_history.count;
+    int current_count = 0;
+    int max_messages = 5;
+    char tmp_buffer[2048] = {0};
+    for (int i = index - 1; i >= 0 && current_count < max_messages; i--) {
+        //snprintf(tmp_buffer, sizeof(tmp_buffer), "%s\n%s", tmp_buffer, g->msg_history.messages[i]);
+        strncat(tmp_buffer, g->msg_history.messages[i], sizeof(tmp_buffer) - strlen(tmp_buffer) - 1);
+        strncat(tmp_buffer, "\n", sizeof(tmp_buffer) - strlen(tmp_buffer) - 1);
+        current_count++;
+    }
+    // chop off the last newline
+    if (strlen(tmp_buffer) > 0) { tmp_buffer[strlen(tmp_buffer) - 1] = '\0'; }
+
+    // Measure text (split into lines if needed)
+    //Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, font_size, line_spacing);
+    Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp_buffer, font_size, line_spacing);
+
+    // Calculate box position
+    // we want the box to be in the top left corner of the screen
+
+    int x = 0;
+    int y = 0;
+    Rectangle box = {.x = x, .y = y, .width = text_size.x + pad * 2, .height = text_size.y + pad * 2};
+
+    // Draw box (semi-transparent black with white border)
+    Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
+    DrawRectangleRec(box, message_bg);
+    DrawRectangleLinesEx(box, 2, WHITE);
+
+    // Draw text (centered in box)
+    DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
 }
