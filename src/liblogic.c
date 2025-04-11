@@ -1099,7 +1099,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              sizeof(g->debugpanel.buffer),
              "%s\n" // timebeganbuf
              "%s\n" // currenttimebuf
-             "Frame: %d (%.1fms)\n"
+             "Frame: %d\n"
+             "Draw Time: %.1fms\n"
              "Is3D: %d\n"
              "Cam: (%.0f,%.0f) Zoom: %.1f\n"
              "Mode: %s | Floor: %d/%d\n"
