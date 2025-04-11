@@ -16,6 +16,8 @@ entity_t* entity_new(entityid id, entitytype_t type) {
     e->direction = DIR_RIGHT;
     e->x = -1;
     e->y = -1;
+    e->weapon = -1;
+    e->shield = -1;
     e->floor = -1;
     e->hp = 1;
     e->maxhp = 1;

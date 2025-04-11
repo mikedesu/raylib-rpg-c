@@ -94,6 +94,7 @@ gamestate* gamestateinitptr() {
     g->entity_turn = -1;
 
     g->gameover = false;
+    g->test_guard = false;
 
     //g->msg_history.count = 0;
     //g->msg_history.max_count = DEFAULT_MAX_HISTORY_SIZE;

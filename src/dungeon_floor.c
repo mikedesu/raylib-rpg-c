@@ -82,7 +82,7 @@ void df_init_test(dungeon_floor_t* df) {
     //df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
     //df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
     int count = 0;
-    int total_rooms = 1;
+    int total_rooms = 10;
     //int prev_r = -1;
 
     // create space for a list of Rectangles
@@ -114,37 +114,37 @@ void df_init_test(dungeon_floor_t* df) {
         df_init_rect2(df, r, begin_type, end_type);
         //df_place_wall_switch(df, r.x + rand() % (int)r.width, r.y + rand() % (int)r.height, txwallup, txwalldown, id);
         //df_create_trap_event(df, r.x + r.width, r.y + rand() % (int)r.height, trap_on, trap_off, id);
-        //id++;
+        id++;
     }
 
-    //while (count < total_rooms) {
-    //    df_init_rect2(df, (Rectangle){x, y, w, h}, begin_type, end_type);
-    //    //df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
-    //    r = rand() % 2;
-    //    //while (r == prev_r) { r = rand() % 4; }
-    //    if (r == 0) {
-    //        df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
-    //        x = x + w + 1;
-    //    } else if (r == 1) {
-    //        df_create_trap_event(df, x + rand() % w, y + h, trap_on, trap_off, id);
-    //        y = y + h + 1;
-    //    }
-    //    //else if (r == 2) {
-    //    //    df_create_trap_event(df, x - 1, y + rand() % h, trap_on, trap_off, id);
-    //    //    x = x - 2;
-    //    //} else if (r == 3) {
-    //    //    df_create_trap_event(df, x + rand() % w, y - 1, trap_on, trap_off, id);
-    //    //    y = y - 2;
-    //    //} else {
-    //    //    merror("df_init_test: invalid random number");
-    //    //    continue;
-    //    //}
-    //    //prev_r = r;
-    //    id++;
-    //    count++;
-    //    //w++;
-    //    //h++;
-    //}
+    while (count < total_rooms) {
+        df_init_rect2(df, (Rectangle){x, y, w, h}, begin_type, end_type);
+        //df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
+        r = rand() % 2;
+        //while (r == prev_r) { r = rand() % 4; }
+        if (r == 0) {
+            df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
+            x = x + w + 1;
+        } else if (r == 1) {
+            df_create_trap_event(df, x + rand() % w, y + h, trap_on, trap_off, id);
+            y = y + h + 1;
+        }
+        //else if (r == 2) {
+        //    df_create_trap_event(df, x - 1, y + rand() % h, trap_on, trap_off, id);
+        //    x = x - 2;
+        //} else if (r == 3) {
+        //    df_create_trap_event(df, x + rand() % w, y - 1, trap_on, trap_off, id);
+        //    y = y - 2;
+        //} else {
+        //    merror("df_init_test: invalid random number");
+        //    continue;
+        //}
+        //prev_r = r;
+        id++;
+        count++;
+        //w++;
+        //h++;
+    }
     //
     //    // after our rooms have been constructed and we're happy with the layout
     //    // we need to assign an upstairs and downstairs tile

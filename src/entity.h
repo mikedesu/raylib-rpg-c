@@ -47,6 +47,9 @@ typedef struct entity_t {
     bool is_damaged;
     bool is_dead;
 
+    entityid weapon;
+    entityid shield;
+
     entity_t* next;
 } entity;
 

@@ -11,6 +11,7 @@
 #include "mprint.h"
 #include "race.h"
 #include "rlgl.h"
+#include "specifier.h"
 #include "sprite.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -24,8 +25,8 @@
 #define DEFAULT_WIN_WIDTH 1920
 #define DEFAULT_WIN_HEIGHT 1080
 #define SPRITEGROUP_DEFAULT_SIZE 32
-#define DEFAULT_ANIM_SPEED 4
-//#define DEFAULT_ANIM_SPEED 8
+//#define DEFAULT_ANIM_SPEED 4
+#define DEFAULT_ANIM_SPEED 8
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -232,13 +233,22 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         //merrorint("libdraw_update_sprite: entity not found", id);
         return;
     }
-    spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-    if (!sg) {
-        //merrorint("libdraw_update_sprite: spritegroup not found", id);
-        return;
+
+    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+
+    for (int i = 0; i < num_spritegroups; i++) {
+        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+        if (!sg) { continue; }
+        libdraw_update_sprite_ptr(g, e, sg);
+        libdraw_handle_frame_incr(g, sg);
     }
-    libdraw_update_sprite_ptr(g, e, sg);
-    libdraw_handle_frame_incr(g, sg);
+
+    //spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+    //if (!sg) {
+    //    return;
+    //}
+    //libdraw_update_sprite_ptr(g, e, sg);
+    //libdraw_handle_frame_incr(g, sg);
 }
 
 void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg) {
@@ -247,10 +257,21 @@ void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg)
         return;
     }
     if (e->is_dead && !spritegroup_is_animating(sg)) { return; }
+    //if (e->do_update) {
+    //    libdraw_update_sprite_context_ptr(g, sg, e->direction);
+    //    e->do_update = false;
+    //}
+
     if (e->do_update) {
         libdraw_update_sprite_context_ptr(g, sg, e->direction);
+        //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, e->id);
+        //for (int i = 0; i < num_spritegroups; i++) {
+        //    spritegroup_t* const sg2 = hashtable_entityid_spritegroup_get_by_index(spritegroups, e->id, i);
+        //    if (sg2) { libdraw_update_sprite_context_ptr(g, sg2, e->direction); }
+        //}
         e->do_update = false;
     }
+
     // Copy movement intent from e->sprite_move_x/y if present
     libdraw_update_sprite_position(sg, e);
     libdraw_update_sprite_attack(e, sg);
@@ -394,6 +415,9 @@ void libdraw_handle_gamestate_flag(gamestate* const g) {
     if (done) {
         if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
             g->flag = GAMESTATE_FLAG_NPC_TURN;
+
+            g->test_guard = false;
+
         } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
             g->entity_turn = g->hero_id; // Reset directly to hero
             g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
@@ -670,6 +694,17 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
         merror("libdraw_draw_sprite_and_shadow: gamestate is NULL");
         return;
     }
+    if (id == -1) {
+        merror("libdraw_draw_sprite_and_shadow: id is -1");
+        return;
+    }
+
+    entity* e = em_get(g->entitymap, id);
+    if (!e) {
+        merror("libdraw_draw_sprite_and_shadow: entity not found: id %d", id);
+        return;
+    }
+
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (!sg) {
         merror("libdraw_draw_sprite_and_shadow: spritegroup not found: id %d", id);
@@ -681,13 +716,37 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
         return;
     }
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-    sprite* sh = spritegroup_get(sg, sg->current + 1);
-    if (sh) { DrawTexturePro(*sh->texture, sh->src, dest, (Vector2){0, 0}, 0, WHITE); }
+    sprite* shadow = spritegroup_get(sg, sg->current + 1);
+    if (shadow) { DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE); }
     //else {
     //    merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1: %d", sg->current + 1);
     //}
     // Draw sprite on top
+
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
+
+    // check for a shield
+    entityid shield_id = e->shield;
+    //bool is_blocking = e->is_blocking;
+    //if (shield_id != -1 && is_blocking) {
+    if (shield_id != -1 && g->test_guard) {
+        //spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+        spritegroup_t* shield_front_sg =
+            hashtable_entityid_spritegroup_get_by_specifier(spritegroups, shield_id, SPECIFIER_SHIELD_GUARD_FRONT);
+        if (shield_front_sg) {
+            //sprite* shield_s = spritegroup_get(shield_front_sg, shield_front_sg->current);
+            sprite* shield_s = spritegroup_get(shield_front_sg, shield_front_sg->current);
+            //sprite* shield_s = spritegroup_get(shield_front_sg, sg->current);
+            if (shield_s) {
+
+                //sprite_setcontext(shield_s, s->currentcontext);
+
+                Rectangle shield_dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
+                DrawTexturePro(*shield_s->texture, shield_s->src, shield_dest, (Vector2){0, 0}, 0, WHITE);
+            }
+        }
+        //e->is_blocking = false; // Reset blocking state
+    }
 }
 
 void libdraw_close() {
@@ -824,10 +883,14 @@ void libdraw_create_spritegroup(gamestate* const g,
         spritegroup_destroy(group);
         return;
     }
-    const float w = s->width, h = s->height, dst_x = e->x * DEFAULT_TILE_SIZE, dst_y = e->y * DEFAULT_TILE_SIZE;
+    const float w = s->width;
+    const float h = s->height;
+    const float dst_x = e->x * DEFAULT_TILE_SIZE;
+    const float dst_y = e->y * DEFAULT_TILE_SIZE;
     group->current = 0;
     group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
-    group->off_x = offset_x, group->off_y = offset_y;
+    group->off_x = offset_x;
+    group->off_y = offset_y;
     //msuccessint("inserting spritegroup for entity", id);
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
     //msuccessint("Spritegroup created for entity", id);
@@ -938,6 +1001,19 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
         offset_y = -12;
         libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     } else if (e->type == ENTITY_SHIELD) {
+        // also need to create guard front and back
+        keys = TX_GUARD_BUCKLER_FRONT_KEYS;
+        num_keys = TX_GUARD_BUCKLER_FRONT_KEY_COUNT;
+        offset_x = -12;
+        offset_y = -12;
+        libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_SHIELD_GUARD_FRONT);
+
+        //keys = TX_GUARD_BUCKLER_BACK_KEYS;
+        //num_keys = TX_GUARD_BUCKLER_BACK_KEY_COUNT;
+        //offset_x = -12;
+        //offset_y = -12;
+        //libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_SHIELD_GUARD_BACK);
+        //
         keys = TX_BUCKLER_KEYS;
         num_keys = TX_BUCKLER_KEY_COUNT;
         offset_x = -12;

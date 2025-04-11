@@ -735,11 +735,12 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
 }
 
 void liblogic_try_entity_block(gamestate* const g, entity* const e) {
-    liblogic_add_message(g, "Blocking!");
+    //liblogic_add_message(g, "Blocking!");
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
     e->do_update = true;
     e->is_blocking = true;
+    g->test_guard = true;
     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
 
@@ -781,6 +782,7 @@ bool liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             tile_remove(tile, id);
             // add the item to the entity inventory
             entity_add_item_to_inventory(e, id);
+            e->weapon = id;
             msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
             return true;
@@ -794,6 +796,8 @@ bool liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             tile_remove(tile, id);
             // add the item to the entity inventory
             entity_add_item_to_inventory(e, id);
+            e->shield = id;
+
             msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
             return true;
@@ -1406,6 +1410,22 @@ bool liblogic_entity_has_weapon(gamestate* const g, entityid id) {
         entityid item_id = e->inventory[i];
         entity* item = em_get(g->entitymap, item_id);
         if (item && item->type == ENTITY_WEAPON) { return true; }
+    }
+    return false;
+}
+
+bool liblogic_entity_has_shield(gamestate* const g, entityid id) {
+    massert(g, "liblogic_entity_has_shield: gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "liblogic_entity_has_shield: entity ID is invalid");
+    entity* const e = em_get(g->entitymap, id);
+    if (!e) {
+        merror("liblogic_entity_has_shield: entity not found");
+        return false;
+    }
+    for (int i = 0; i < e->inventory_count; i++) {
+        entityid item_id = e->inventory[i];
+        entity* item = em_get(g->entitymap, item_id);
+        if (item && item->type == ENTITY_SHIELD) { return true; }
     }
     return false;
 }

@@ -98,6 +98,9 @@ typedef struct gamestate {
     message_history msg_history;
 
     keybinding_list_t keybinding_list;
+
+    bool test_guard;
+
 } gamestate;
 
 gamestate* gamestateinitptr();
