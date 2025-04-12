@@ -25,8 +25,8 @@
 #define DEFAULT_WIN_WIDTH 1920
 #define DEFAULT_WIN_HEIGHT 1080
 #define SPRITEGROUP_DEFAULT_SIZE 32
-//#define DEFAULT_ANIM_SPEED 4
-#define DEFAULT_ANIM_SPEED 8
+#define DEFAULT_ANIM_SPEED 4
+//#define DEFAULT_ANIM_SPEED 8
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -218,7 +218,9 @@ bool libdraw_check_default_animations(gamestate* const g) {
     for (int i = 0; i < g->index_entityids; i++) {
         const entityid id = g->entityids[i];
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-        if (sg && sg->current != sg->default_anim) { return false; }
+        if (sg && sg->current != sg->default_anim) {
+            return false;
+        }
     }
     return true;
 }
@@ -238,7 +240,9 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
 
     for (int i = 0; i < num_spritegroups; i++) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
-        if (!sg) { continue; }
+        if (!sg) {
+            continue;
+        }
         libdraw_update_sprite_ptr(g, e, sg);
         libdraw_handle_frame_incr(g, sg);
     }
@@ -256,7 +260,9 @@ void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg)
         merror("libdraw_update_sprite_ptr: entity or spritegroup is NULL");
         return;
     }
-    if (e->is_dead && !spritegroup_is_animating(sg)) { return; }
+    if (e->is_dead && !spritegroup_is_animating(sg)) {
+        return;
+    }
     //if (e->do_update) {
     //    libdraw_update_sprite_context_ptr(g, sg, e->direction);
     //    e->do_update = false;
@@ -309,7 +315,9 @@ void libdraw_set_sg_is_attacking(entity_t* const e, spritegroup_t* const sg) {
 void libdraw_set_sg_is_blocking(entity_t* const e, spritegroup_t* const sg) {
     massert(e, "libdraw_set_sg_is_blocking: entity is NULL");
     massert(sg, "libdraw_set_sg_is_blocking: spritegroup is NULL");
-    if (e->race == RACE_HUMAN) { sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD; }
+    if (e->race == RACE_HUMAN) {
+        sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD;
+    }
     e->is_blocking = false;
 }
 
@@ -639,7 +647,9 @@ void libdraw_drawframe(gamestate* const g) {
     libdraw_draw_message_history_placeholder(g);
     libdraw_draw_hud(g);
     //libdraw_draw_msgbox_test(g, "Hello, world!\nLets fucking go!");
-    if (g->debugpanelon) { libdraw_draw_debug_panel(g); }
+    if (g->debugpanelon) {
+        libdraw_draw_debug_panel(g);
+    }
     EndDrawing();
     //double elapsed_time = GetTime() - start_time;
     g->last_frame_time = GetTime() - start_time;
@@ -717,7 +727,9 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     sprite* shadow = spritegroup_get(sg, sg->current + 1);
-    if (shadow) { DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE); }
+    if (shadow) {
+        DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE);
+    }
     //else {
     //    merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1: %d", sg->current + 1);
     //}
@@ -738,7 +750,6 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
             sprite* shield_s = spritegroup_get(shield_front_sg, shield_front_sg->current);
             //sprite* shield_s = spritegroup_get(shield_front_sg, sg->current);
             if (shield_s) {
-
                 //sprite_setcontext(shield_s, s->currentcontext);
 
                 Rectangle shield_dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
@@ -776,7 +787,9 @@ bool libdraw_load_texture(int txkey, int ctxs, int frames, bool do_dither, char*
         return false;
     }
     Image image = LoadImage(path);
-    if (do_dither) { ImageDither(&image, 4, 4, 4, 4); }
+    if (do_dither) {
+        ImageDither(&image, 4, 4, 4, 4);
+    }
     Texture2D texture = LoadTextureFromImage(image);
     UnloadImage(image);
     txinfo[txkey].texture = texture;
@@ -990,7 +1003,9 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
             offset_x = -12;
             offset_y = -12;
             break;
-        default: merror("libdraw_create_sg_byid: unknown race %d", e->race); return;
+        default:
+            merror("libdraw_create_sg_byid: unknown race %d", e->race);
+            return;
         }
         libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     } else if (e->type == ENTITY_WEAPON) {
@@ -1175,7 +1190,9 @@ void libdraw_init(gamestate* const g) {
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
     libdraw_load_textures();
     printf("libdraw_init: loaded textures\n");
-    for (int i = 0; i < g->index_entityids; i++) { libdraw_create_sg_byid(g, g->entityids[i]); }
+    for (int i = 0; i < g->index_entityids; i++) {
+        libdraw_create_sg_byid(g, g->entityids[i]);
+    }
     libdraw_calc_debugpanel_size(g);
     libdraw_load_shaders();
     g->cam2d.offset = (Vector2){x, y};
@@ -1249,7 +1266,9 @@ void libdraw_draw_message_history_placeholder(gamestate* const g) {
         current_count++;
     }
     // chop off the last newline
-    if (strlen(tmp_buffer) > 0) { tmp_buffer[strlen(tmp_buffer) - 1] = '\0'; }
+    if (strlen(tmp_buffer) > 0) {
+        tmp_buffer[strlen(tmp_buffer) - 1] = '\0';
+    }
 
     // Measure text (split into lines if needed)
     //Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, font_size, line_spacing);

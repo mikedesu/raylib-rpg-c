@@ -117,6 +117,7 @@ void liblogic_try_entity_attack_random(gamestate* const g, entity* const e) {
     massert(g, "liblogic_try_entity_attack_random: gamestate is NULL");
     massert(e, "liblogic_try_entity_attack_random: entity is NULL");
     int x = rand() % 3;
+    int y = 0;
     if (x == 0) {
         x = -1;
     } else if (x == 1) {
@@ -124,10 +125,7 @@ void liblogic_try_entity_attack_random(gamestate* const g, entity* const e) {
     } else {
         x = 1;
     }
-    //x = x == 0 ? -1 : x == 1 ? 0 : 1;
     // if x is 0, y cannot also be 0
-    // if x is 0, y cannot also be 0
-    int y = 0;
     if (x == 0) {
         y = rand() % 2;
         if (y == 0) {
@@ -135,7 +133,6 @@ void liblogic_try_entity_attack_random(gamestate* const g, entity* const e) {
         } else {
             y = 1;
         }
-        //y = y == 0 ? -1 : 1;
     } else {
         y = rand() % 3;
         if (y == 0) {
@@ -145,7 +142,6 @@ void liblogic_try_entity_attack_random(gamestate* const g, entity* const e) {
         } else {
             y = 1;
         }
-        //y = y == 0 ? -1 : y == 1 ? 0 : 1;
     }
     liblogic_try_entity_attack(g, e->id, e->x + x, e->y + y);
 }
@@ -154,6 +150,7 @@ void liblogic_try_entity_move_random(gamestate* const g, entity* const e) {
     massert(g, "liblogic_try_entity_move_random: gamestate is NULL");
     massert(e, "liblogic_try_entity_move_random: entity is NULL");
     int x = rand() % 3;
+    int y = 0;
     if (x == 0) {
         x = -1;
     } else if (x == 1) {
@@ -161,9 +158,7 @@ void liblogic_try_entity_move_random(gamestate* const g, entity* const e) {
     } else {
         x = 1;
     }
-    //x = x == 0 ? -1 : x == 1 ? 0 : 1;
     // if x is 0, y cannot also be 0
-    int y = 0;
     if (x == 0) {
         y = rand() % 2;
         y = y == 0 ? -1 : 1;
@@ -176,7 +171,6 @@ void liblogic_try_entity_move_random(gamestate* const g, entity* const e) {
         } else {
             y = 1;
         }
-        //y = y == 0 ? -1 : y == 1 ? 0 : 1;
     }
     liblogic_try_entity_move(g, e, x, y);
 }
@@ -184,38 +178,39 @@ void liblogic_try_entity_move_random(gamestate* const g, entity* const e) {
 void liblogic_try_entity_move_player(gamestate* const g, entity* const e) {
     massert(g, "liblogic_try_entity_move_player: gamestate is NULL");
     entity* h = em_get(g->entitymap, g->hero_id);
-    if (h) {
-        int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
-        int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
-        if (dx != 0 || dy != 0) {
-            liblogic_try_entity_move(g, e, dx, dy);
-        }
+    massert(h, "liblogic_try_entity_move_player: hero is NULL");
+    int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
+    int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
+    if (dx != 0 || dy != 0) {
+        liblogic_try_entity_move(g, e, dx, dy);
     }
 }
 
 void liblogic_try_entity_attack_player(gamestate* const g, entity* const e) {
     massert(g, "liblogic_try_entity_attack_player: gamestate is NULL");
     entity* h = em_get(g->entitymap, g->hero_id);
-    if (h) {
-        int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
-        int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
-        if (dx != 0 || dy != 0) {
-            liblogic_try_entity_attack(g, e->id, h->x, h->y);
-        }
+    massert(h, "liblogic_try_entity_attack_player: hero is NULL");
+    //if (h) {
+    int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
+    int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
+    if (dx != 0 || dy != 0) {
+        liblogic_try_entity_attack(g, e->id, h->x, h->y);
     }
+    //}
 }
 
 void liblogic_try_entity_move_attack_player(gamestate* const g, entity* const e) {
     massert(g, "liblogic_try_entity_move_attack_player: gamestate is NULL");
     entity* h = em_get(g->entitymap, g->hero_id);
-    if (h) {
-        // check if we are adjacent to the player
-        if (liblogic_entities_adjacent(g, e->id, h->id)) {
-            liblogic_try_entity_attack(g, e->id, h->x, h->y);
-        } else {
-            liblogic_try_entity_move_player(g, e);
-        }
+    massert(h, "liblogic_try_entity_move_attack_player: hero is NULL");
+    //if (h) {
+    // check if we are adjacent to the player
+    if (liblogic_entities_adjacent(g, e->id, h->id)) {
+        liblogic_try_entity_attack(g, e->id, h->x, h->y);
+    } else {
+        liblogic_try_entity_move_player(g, e);
     }
+    //}
 }
 
 bool liblogic_entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
@@ -248,20 +243,15 @@ void liblogic_init(gamestate* const g) {
     massert(g, "liblogic_init: gamestate is NULL");
     srand(time(NULL));
     liblogic_init_dungeon(g);
-
     gamestate_init_entityids(g);
     g->msg_system.count = 0;
     g->msg_system.index = 0;
     g->msg_system.is_active = false;
-
     gamestate_load_keybindings(g);
-
     liblogic_init_em(g);
     liblogic_init_player(g);
-
     // test to create a weapon
     liblogic_init_weapon_test(g);
-
     // temporarily disabling
     liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
@@ -273,17 +263,14 @@ void liblogic_init_weapon_test(gamestate* const g) {
     massert(d, "liblogic_init_weapon_test: dungeon is NULL");
     dungeon_floor_t* const df = dungeon_get_floor(d, 0);
     massert(df, "liblogic_init_weapon_test: dungeon floor is NULL");
-
     // get player position
     entity* const player = em_get(g->entitymap, g->hero_id);
     massert(player, "liblogic_init_weapon_test: player is NULL");
     int x = player->x;
     int y = player->y;
-
     // place the sword somewhere around the player
     entityid sword_id = liblogic_weapon_create(g, x + 1, y, 0, "sword");
     massert(sword_id != -1, "liblogic_init_weapon_test: failed to create weapon");
-
     // place the shield somewhere around the player
     entityid shield_id = liblogic_shield_create(g, x - 1, y, 0, "shield");
     massert(shield_id != -1, "liblogic_init_weapon_test: failed to create shield");
@@ -316,20 +303,6 @@ void liblogic_add_message_history(gamestate* const g, const char* msg) {
     g->msg_history.messages[g->msg_history.count][MAX_MSG_LENGTH - 1] = '\0'; // Ensure null-termination
     g->msg_history.count++;
 }
-
-//void liblogic_add_message(gamestate* g, const char* text) {
-//    massert(g, "liblogic_add_message: gamestate is NULL");
-//    massert(text, "liblogic_add_message: text is NULL");
-//    massert(strlen(text) > 0, "liblogic_add_message: text is empty");
-//    if (g->msg_system.count >= MAX_MESSAGES) {
-//        mwarning("Message queue full!");
-//        return;
-//    }
-//    strncpy(g->msg_system.messages[g->msg_system.count], text, MAX_MSG_LENGTH - 1);
-//    g->msg_system.messages[g->msg_system.count][MAX_MSG_LENGTH - 1] = '\0'; // Ensure null-termination
-//    g->msg_system.count++;
-//    g->msg_system.is_active = true;
-//}
 
 void liblogic_init_dungeon(gamestate* const g) {
     massert(g, "liblogic_init_dungeon: gamestate is NULL");
@@ -402,19 +375,15 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     //dungeon_floor_t* const df = d->floors[0];
     dungeon_floor_t* const df = dungeon_get_floor(d, 0);
     massert(df, "liblogic_init: dungeon floor is NULL");
-
     // first, we need to count all of the possible tiles we could place an orc on
     // we can loop thru each tile on the dungeon floor and check if it is walkable
     // in the beginning there wont be any entities at all so we are just counting total possible locations right now
     // in order to prepare a list of them
-
     const int count = df_count_walkable(df);
     // now we have the total number of possible locations
     // we can create an array of size count
-
     loc_t* locations = malloc(sizeof(loc_t) * count);
     massert(locations, "liblogic_init: failed to malloc locations");
-
     int count2 = 0;
     // now we can loop thru the dungeon floor again and fill the array with the locations
     for (int y = 0; y < df->height; y++) {
@@ -431,9 +400,7 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
         }
     }
     massert(count2 == count, "liblogic_init: count2 is greater than count");
-
     // now we can loop thru the array and create an orc at each location
-
     int max_orcs = 4;
     //int max_orcs = count2;
     for (int i = 0; i < max_orcs && i < count2; i++) {
@@ -452,7 +419,6 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
         entity_set_maxhp(orc, 1);
         entity_set_hp(orc, 1);
     }
-
     // we need to free the locations array
     free(locations);
 }
@@ -488,13 +454,11 @@ void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g
 
 void liblogic_handle_camera_move(gamestate* const g, const inputstate* const is) {
     const float move = g->cam2d.zoom;
-
     const char* action = liblogic_get_action_key(is, g);
     if (!action) {
         merror("No action found for key");
         return;
     }
-
     if (inputstate_is_held(is, KEY_RIGHT)) {
         g->cam2d.offset.x += move;
         return;
@@ -511,7 +475,6 @@ void liblogic_handle_camera_move(gamestate* const g, const inputstate* const is)
         g->cam2d.offset.y += move;
         return;
     }
-
     if (strcmp(action, "toggle_camera") == 0) {
         //if (inputstate_is_pressed(is, KEY_C)) {
         //msuccess("C pressed!");
@@ -550,30 +513,16 @@ void liblogic_change_player_dir(gamestate* const g, direction_t dir) {
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
         return;
     }
-
     // get the player entity
-    entity* const e = em_get(g->entitymap, g->hero_id);
-    if (!e) {
-        //merror("Hero not found!");
-        return;
-    }
-
+    entity* const hero = em_get(g->entitymap, g->hero_id);
+    massert(hero, "liblogic_change_player_dir: hero is NULL");
     // check if the player is dead
-    if (e->is_dead) {
-        //merror("Hero is dead!");
+    if (hero->is_dead) {
         return;
     }
-
     // set the direction
-    e->direction = dir;
-
-    e->do_update = true;
-
-    // check if the player is moving
-    //if (e->do_update) {
-    //    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    //    e->do_update = false;
-    //}
+    hero->direction = dir;
+    hero->do_update = true;
 }
 
 void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {
@@ -582,19 +531,13 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
         return;
     }
-
-    //minfo("1");
     const char* action = liblogic_get_action_key(is, g);
-    //minfo("2");
-    //minfo("Checking...%s", action);
     if (!action) {
         merror("1 No action found for key");
         return;
     }
-
     if (g->msg_system.is_active) {
         if (strcmp(action, "attack") == 0 || strcmp(action, "pickup") == 0) {
-            //if (inputstate_is_pressed(is, KEY_A)) {
             g->msg_system.index++;
             if (g->msg_system.index >= g->msg_system.count) {
                 // Reset when all messages read
@@ -605,31 +548,16 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
         }
         return;
     }
-
-    entity* const e = em_get(g->entitymap, g->hero_id);
-    if (!e) {
-        //merror("Hero not found!");
-        return;
-    }
+    entity* const hero = em_get(g->entitymap, g->hero_id);
+    massert(hero, "liblogic_handle_input_player: hero is NULL");
     // check if the player is dead
-    if (e->is_dead) {
-        //merror("Hero is dead!");
+    if (hero->is_dead) {
         return;
     }
-
-    //const int key = inputstate_get_pressed_key(is);
-    //if (key != -1) { minfo("Key pressed: %d", key); }
-    //// can return early if key == -1
-    //if (key == -1) {
-    //    //merror("Key not found!");
-    //    return;
-    //}
-    //const char* action = get_action_for_key(&g->keybinding_list, key);
-
     if (action) {
         if (g->player_changing_direction) {
             if (strcmp(action, "wait") == 0) {
-                liblogic_execute_action(g, e, ENTITY_ACTION_WAIT);
+                liblogic_execute_action(g, hero, ENTITY_ACTION_WAIT);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_w") == 0) {
                 liblogic_change_player_dir(g, DIR_LEFT);
@@ -658,143 +586,60 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
             }
             return;
         }
-
-        //msuccessstr("Action: --", action);
         if (strcmp(action, "wait") == 0) {
-            //liblogic_execute_action(g, e, ENTITY_ACTION_WAIT);
-
             g->player_changing_direction = true;
-
         } else if (strcmp(action, "move_w") == 0) {
-            liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_LEFT);
+            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_LEFT);
         } else if (strcmp(action, "move_e") == 0) {
-            liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_RIGHT);
+            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_RIGHT);
         } else if (strcmp(action, "move_n") == 0) {
-            liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_UP);
+            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_UP);
         } else if (strcmp(action, "move_s") == 0) {
-            liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_DOWN);
+            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN);
         } else if (strcmp(action, "move_nw") == 0) {
-            liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_UP_LEFT);
+            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_UP_LEFT);
         } else if (strcmp(action, "move_ne") == 0) {
-            liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_UP_RIGHT);
+            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_UP_RIGHT);
         } else if (strcmp(action, "move_sw") == 0) {
-            liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_DOWN_LEFT);
+            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_LEFT);
         } else if (strcmp(action, "move_se") == 0) {
-            liblogic_execute_action(g, e, ENTITY_ACTION_MOVE_DOWN_RIGHT);
+            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_RIGHT);
         } else if (strcmp(action, "attack") == 0) {
             msuccess("attack pressed!");
-
-            if (liblogic_entity_has_weapon(g, e->id)) {
+            if (liblogic_entity_has_weapon(g, hero->id)) {
                 msuccess("Entity has weapon");
-                int dx = get_x_from_dir(e->direction);
-                int dy = get_y_from_dir(e->direction);
-                int tx = e->x + dx;
-                int ty = e->y + dy;
-                liblogic_try_entity_attack(g, e->id, tx, ty);
+                int tx = hero->x + get_x_from_dir(hero->direction);
+                int ty = hero->y + get_y_from_dir(hero->direction);
+                liblogic_try_entity_attack(g, hero->id, tx, ty);
             } else {
                 merror("Entity has no weapon");
                 liblogic_add_message(g, "You have no weapon to attack with!");
                 // add a message to the message system
-                //liblogic_add_message(g, "You have no weapon to attack with!");
             }
-        }
-
-        else if (strcmp(action, "block") == 0) {
+        } else if (strcmp(action, "block") == 0) {
             msuccess("Block pressed!");
-            liblogic_try_entity_block(g, e);
-        }
-
-        else if (strcmp(action, "interact") == 0) {
+            liblogic_try_entity_block(g, hero);
+        } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
             // but eventually this will be generalized
             // for instance u can talk to an NPC merchant using "interact"
             // or open a door, etc
             msuccess("Space pressed!");
-            int dx = get_x_from_dir(e->direction);
-            int dy = get_y_from_dir(e->direction);
-            int tx = e->x + dx;
-            int ty = e->y + dy;
-            liblogic_try_flip_switch(g, e, tx, ty, e->floor);
+            int tx = hero->x + get_x_from_dir(hero->direction);
+            int ty = hero->y + get_y_from_dir(hero->direction);
+            liblogic_try_flip_switch(g, hero, tx, ty, hero->floor);
         } else if (strcmp(action, "pickup") == 0) {
-            //mwarning("Pickup action currently unimplemented");
             // add a message to the message system
-            //liblogic_add_message(g, "Pickup action currently unimplemented");
-
-            liblogic_try_entity_pickup(g, e);
+            liblogic_try_entity_pickup(g, hero);
         } else if (strcmp(action, "toggle_camera") == 0) {
             g->controlmode = CONTROLMODE_CAMERA;
         }
     } else {
-        merror("2 No action found for key");
+        merror("No action found for key");
     }
-
-    // old
-    /*
-    switch (key) {
-    case KEY_KP_6:
-    case KEY_RIGHT:
-        minfo("Right pressed!");
-        liblogic_try_entity_move(g, e, 1, 0);
-        break;
-    case KEY_KP_4:
-    case KEY_LEFT:
-        minfo("left  pressed!");
-        liblogic_try_entity_move(g, e, -1, 0);
-        break;
-    case KEY_KP_8:
-    case KEY_UP:
-        minfo("up pressed!");
-        liblogic_try_entity_move(g, e, 0, -1);
-        break;
-    case KEY_KP_2:
-    case KEY_DOWN:
-        minfo("down pressed!");
-        liblogic_try_entity_move(g, e, 0, 1);
-        break;
-    // diagonals on the numpad
-    case KEY_KP_7:
-        minfo("Numpad 7 pressed!");
-        liblogic_try_entity_move(g, e, -1, -1);
-        break;
-    case KEY_KP_9:
-        minfo("Numpad 9 pressed!");
-        liblogic_try_entity_move(g, e, 1, -1);
-        break;
-    case KEY_KP_1:
-        minfo("Numpad 1 pressed!");
-        liblogic_try_entity_move(g, e, -1, 1);
-        break;
-    case KEY_KP_3:
-        minfo("Numpad 3 pressed!");
-        liblogic_try_entity_move(g, e, 1, 1);
-        break;
-    case KEY_A: {
-        msuccess("A pressed!");
-        int dx = liblogic_get_x_from_dir(e->direction);
-        int dy = liblogic_get_y_from_dir(e->direction);
-        int tx = e->x + dx;
-        int ty = e->y + dy;
-        liblogic_try_entity_attack(g, e->id, tx, ty);
-    } break;
-    case KEY_SPACE: {
-        msuccess("Space pressed!");
-        int dx = liblogic_get_x_from_dir(e->direction);
-        int dy = liblogic_get_y_from_dir(e->direction);
-        int tx = e->x + dx;
-        int ty = e->y + dy;
-        liblogic_try_flip_switch(g, e, tx, ty, e->floor);
-    } break;
-    case KEY_C:
-        msuccess("C pressed!");
-        g->controlmode = CONTROLMODE_CAMERA;
-        break;
-    default: break; // Ignore unhandled keys
-    }
-    */
 }
 
 void liblogic_try_entity_block(gamestate* const g, entity* const e) {
-    //liblogic_add_message(g, "Blocking!");
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
     e->do_update = true;
@@ -858,7 +703,6 @@ bool liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             // add the item to the entity inventory
             entity_add_item_to_inventory(e, id);
             e->shield = id;
-
             msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) {
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -874,7 +718,6 @@ void liblogic_try_entity_wait(gamestate* const g, entity* const e) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
     e->do_update = true;
-
     // waiting increments hp for player and NPCs
     if (e->type == ENTITY_PLAYER) {
         entity_incr_hp(e, 1);
@@ -883,7 +726,6 @@ void liblogic_try_entity_wait(gamestate* const g, entity* const e) {
         entity_incr_hp(e, 1);
         msuccess("NPC HP: %d", e->hp);
     }
-
     // handle flag update
     if (e->type == ENTITY_PLAYER) {
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1067,8 +909,6 @@ void liblogic_update_player_state(gamestate* const g) {
             liblogic_add_message(g, "You died!");
             g->gameover = true;
         }
-
-        //merror("Hero is dead!");
         return;
     }
     if (e->hp <= 0) {
