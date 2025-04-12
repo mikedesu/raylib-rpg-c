@@ -253,7 +253,7 @@ void liblogic_init(gamestate* const g) {
     // test to create a weapon
     liblogic_init_weapon_test(g);
     // temporarily disabling
-    liblogic_init_orcs_test(g);
+    //liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
 }
 
@@ -269,8 +269,8 @@ void liblogic_init_weapon_test(gamestate* const g) {
     int x = player->x;
     int y = player->y;
     // place the sword somewhere around the player
-    entityid sword_id = liblogic_weapon_create(g, x + 1, y, 0, "sword");
-    massert(sword_id != -1, "liblogic_init_weapon_test: failed to create weapon");
+    //entityid sword_id = liblogic_weapon_create(g, x + 1, y, 0, "sword");
+    //massert(sword_id != -1, "liblogic_init_weapon_test: failed to create weapon");
     // place the shield somewhere around the player
     entityid shield_id = liblogic_shield_create(g, x - 1, y, 0, "shield");
     massert(shield_id != -1, "liblogic_init_weapon_test: failed to create shield");
@@ -523,6 +523,15 @@ void liblogic_change_player_dir(gamestate* const g, direction_t dir) {
     // set the direction
     hero->direction = dir;
     hero->do_update = true;
+
+    entityid shield_id = hero->shield;
+    if (shield_id != -1) {
+        entity* const shield = em_get(g->entitymap, shield_id);
+        massert(shield, "liblogic_change_player_dir: shield is NULL");
+        // set the direction of the shield
+        shield->direction = dir;
+        shield->do_update = true;
+    }
 }
 
 void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {

@@ -21,6 +21,7 @@ bool em_free(em_t* em) {
     }
     minfo("Freeing entity map");
     for (int i = 0; i < EM_MAX_SLOTS; i++) {
+        minfo("Freeing slot %d", i);
         entity_t* current = em->entities[i];
         while (current != NULL) {
             entity_t* next = current->next;
@@ -37,7 +38,9 @@ bool em_free(em_t* em) {
 entity_t* const em_get(const em_t* const em, entityid id) {
     massert(em, "em_get: em is NULL");
     //massert(id >= 0, "em_get: id is less than 0");
-    if (id < 0) { return NULL; }
+    if (id < 0) {
+        return NULL;
+    }
     const int hash = id % EM_MAX_SLOTS;
     massert(hash >= 0, "em_get: hash is negative");
     return em->entities[hash];
@@ -50,7 +53,9 @@ entity_t* em_get_last(const em_t* const em, entityid id) {
     massert(hash >= 0, "em_get_last: hash is negative");
     entity_t* current = em->entities[hash];
     if (current == NULL) return NULL;
-    while (current->next != NULL) { current = current->next; }
+    while (current->next != NULL) {
+        current = current->next;
+    }
     return current;
 }
 

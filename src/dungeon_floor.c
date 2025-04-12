@@ -82,7 +82,7 @@ void df_init_test(dungeon_floor_t* df) {
     //df_place_wall_switch(df, x + rand() % w, y + rand() % h, txwallup, txwalldown, id);
     //df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
     int count = 0;
-    int total_rooms = 10;
+    int total_rooms = 1;
     //int prev_r = -1;
 
     // create space for a list of Rectangles
@@ -92,7 +92,9 @@ void df_init_test(dungeon_floor_t* df) {
 
     Rectangle rectangles[total_rooms];
     // initialize the rectangles to zero
-    for (int i = 0; i < total_rooms; i++) { rectangles[i] = (Rectangle){0, 0, 0, 0}; }
+    for (int i = 0; i < total_rooms; i++) {
+        rectangles[i] = (Rectangle){0, 0, 0, 0};
+    }
 
     int min_room_width = 2;
     int min_room_height = 2;
@@ -158,7 +160,9 @@ void df_init_test(dungeon_floor_t* df) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-            if (dungeon_tile_is_possible_upstairs(tile->type)) { count2++; }
+            if (dungeon_tile_is_possible_upstairs(tile->type)) {
+                count2++;
+            }
         }
     }
 
@@ -189,7 +193,9 @@ void df_init_test(dungeon_floor_t* df) {
     int upstairs_index = rand() % count3;
     // lazily set the downstairs
     int downstairs_index = rand() % count3;
-    while (downstairs_index == upstairs_index) { downstairs_index = rand() % count3; }
+    while (downstairs_index == upstairs_index) {
+        downstairs_index = rand() % count3;
+    }
 
     loc_t up_loc = locations[upstairs_index];
     loc_t down_loc = locations[downstairs_index];
@@ -483,7 +489,9 @@ bool df_malloc_tiles(dungeon_floor_t* const df) {
         df->tiles[i] = malloc(sizeof(tile_t) * df->width);
         if (df->tiles[i] == NULL) {
             // malloc failed and we need to free everything up to this point
-            for (int j = 0; j < i; j++) { free(df->tiles[j]); }
+            for (int j = 0; j < i; j++) {
+                free(df->tiles[j]);
+            }
             return false;
         }
     }
@@ -553,7 +561,9 @@ int df_count_walkable(const dungeon_floor_t* const df) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tiletype_t type = df_type_at(df, x, y);
-            if (dungeon_tile_is_walkable(type)) { count++; }
+            if (dungeon_tile_is_walkable(type)) {
+                count++;
+            }
         }
     }
     return count;
