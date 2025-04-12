@@ -28,23 +28,57 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
     massert(g, "liblogic_execute_action: gamestate is NULL");
     massert(e, "liblogic_execute_action: entity is NULL");
     switch (action) {
-    case ENTITY_ACTION_MOVE_LEFT: liblogic_try_entity_move(g, e, -1, 0); break;
-    case ENTITY_ACTION_MOVE_RIGHT: liblogic_try_entity_move(g, e, 1, 0); break;
-    case ENTITY_ACTION_MOVE_UP: liblogic_try_entity_move(g, e, 0, -1); break;
-    case ENTITY_ACTION_MOVE_DOWN: liblogic_try_entity_move(g, e, 0, 1); break;
-    case ENTITY_ACTION_MOVE_UP_LEFT: liblogic_try_entity_move(g, e, -1, -1); break;
-    case ENTITY_ACTION_MOVE_UP_RIGHT: liblogic_try_entity_move(g, e, 1, -1); break;
-    case ENTITY_ACTION_MOVE_DOWN_LEFT: liblogic_try_entity_move(g, e, -1, 1); break;
-    case ENTITY_ACTION_MOVE_DOWN_RIGHT: liblogic_try_entity_move(g, e, 1, 1); break;
-    case ENTITY_ACTION_ATTACK_LEFT: liblogic_try_entity_attack(g, e->id, e->x - 1, e->y); break;
-    case ENTITY_ACTION_ATTACK_RIGHT: liblogic_try_entity_attack(g, e->id, e->x + 1, e->y); break;
-    case ENTITY_ACTION_ATTACK_UP: liblogic_try_entity_attack(g, e->id, e->x, e->y - 1); break;
-    case ENTITY_ACTION_ATTACK_DOWN: liblogic_try_entity_attack(g, e->id, e->x, e->y + 1); break;
-    case ENTITY_ACTION_ATTACK_UP_LEFT: liblogic_try_entity_attack(g, e->id, e->x - 1, e->y - 1); break;
-    case ENTITY_ACTION_ATTACK_UP_RIGHT: liblogic_try_entity_attack(g, e->id, e->x + 1, e->y - 1); break;
-    case ENTITY_ACTION_ATTACK_DOWN_LEFT: liblogic_try_entity_attack(g, e->id, e->x - 1, e->y + 1); break;
-    case ENTITY_ACTION_ATTACK_DOWN_RIGHT: liblogic_try_entity_attack(g, e->id, e->x + 1, e->y + 1); break;
-    case ENTITY_ACTION_MOVE_RANDOM: liblogic_try_entity_move_random(g, e); break;
+    case ENTITY_ACTION_MOVE_LEFT:
+        liblogic_try_entity_move(g, e, -1, 0);
+        break;
+    case ENTITY_ACTION_MOVE_RIGHT:
+        liblogic_try_entity_move(g, e, 1, 0);
+        break;
+    case ENTITY_ACTION_MOVE_UP:
+        liblogic_try_entity_move(g, e, 0, -1);
+        break;
+    case ENTITY_ACTION_MOVE_DOWN:
+        liblogic_try_entity_move(g, e, 0, 1);
+        break;
+    case ENTITY_ACTION_MOVE_UP_LEFT:
+        liblogic_try_entity_move(g, e, -1, -1);
+        break;
+    case ENTITY_ACTION_MOVE_UP_RIGHT:
+        liblogic_try_entity_move(g, e, 1, -1);
+        break;
+    case ENTITY_ACTION_MOVE_DOWN_LEFT:
+        liblogic_try_entity_move(g, e, -1, 1);
+        break;
+    case ENTITY_ACTION_MOVE_DOWN_RIGHT:
+        liblogic_try_entity_move(g, e, 1, 1);
+        break;
+    case ENTITY_ACTION_ATTACK_LEFT:
+        liblogic_try_entity_attack(g, e->id, e->x - 1, e->y);
+        break;
+    case ENTITY_ACTION_ATTACK_RIGHT:
+        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y);
+        break;
+    case ENTITY_ACTION_ATTACK_UP:
+        liblogic_try_entity_attack(g, e->id, e->x, e->y - 1);
+        break;
+    case ENTITY_ACTION_ATTACK_DOWN:
+        liblogic_try_entity_attack(g, e->id, e->x, e->y + 1);
+        break;
+    case ENTITY_ACTION_ATTACK_UP_LEFT:
+        liblogic_try_entity_attack(g, e->id, e->x - 1, e->y - 1);
+        break;
+    case ENTITY_ACTION_ATTACK_UP_RIGHT:
+        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y - 1);
+        break;
+    case ENTITY_ACTION_ATTACK_DOWN_LEFT:
+        liblogic_try_entity_attack(g, e->id, e->x - 1, e->y + 1);
+        break;
+    case ENTITY_ACTION_ATTACK_DOWN_RIGHT:
+        liblogic_try_entity_attack(g, e->id, e->x + 1, e->y + 1);
+        break;
+    case ENTITY_ACTION_MOVE_RANDOM:
+        liblogic_try_entity_move_random(g, e);
+        break;
     case ENTITY_ACTION_WAIT: {
         liblogic_try_entity_wait(g, e);
         break;
@@ -73,7 +107,9 @@ void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_
     case ENTITY_ACTION_INTERACT_RIGHT:
     case ENTITY_ACTION_INTERACT_UP:
     case ENTITY_ACTION_INTERACT_DOWN:
-    default: merror("Unknown entity action: %d", action); break;
+    default:
+        merror("Unknown entity action: %d", action);
+        break;
     }
 }
 
