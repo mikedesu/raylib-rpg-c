@@ -151,7 +151,9 @@ void liblogic_try_entity_move_player(gamestate* const g, entity* const e) {
     if (h) {
         int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
         int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
-        if (dx != 0 || dy != 0) { liblogic_try_entity_move(g, e, dx, dy); }
+        if (dx != 0 || dy != 0) {
+            liblogic_try_entity_move(g, e, dx, dy);
+        }
     }
 }
 
@@ -161,7 +163,9 @@ void liblogic_try_entity_attack_player(gamestate* const g, entity* const e) {
     if (h) {
         int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
         int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
-        if (dx != 0 || dy != 0) { liblogic_try_entity_attack(g, e->id, h->x, h->y); }
+        if (dx != 0 || dy != 0) {
+            liblogic_try_entity_attack(g, e->id, h->x, h->y);
+        }
     }
 }
 
@@ -193,8 +197,12 @@ bool liblogic_entities_adjacent(gamestate* const g, entityid id0, entityid id1) 
     // use e0 and check the surrounding 8 tiles
     for (int y = -1; y <= 1; y++) {
         for (int x = -1; x <= 1; x++) {
-            if (x == 0 && y == 0) { continue; }
-            if (e0->x + x == e1->x && e0->y + y == e1->y) { return true; }
+            if (x == 0 && y == 0) {
+                continue;
+            }
+            if (e0->x + x == e1->x && e0->y + y == e1->y) {
+                return true;
+            }
         }
     }
     return false;
@@ -331,9 +339,13 @@ void liblogic_init_orcs_test_naive_loop(gamestate* const g) {
         int x = rand() % df->width;
         int y = rand() % df->height;
         tile_t* const tile = dungeon_floor_tile_at(df, x, y);
-        if (dungeon_tile_is_wall(tile->type)) { continue; }
+        if (dungeon_tile_is_wall(tile->type)) {
+            continue;
+        }
         // check if there is already an entity at this location
-        if (tile_entity_count(tile) > 0) { continue; }
+        if (tile_entity_count(tile) > 0) {
+            continue;
+        }
         entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, x, y, 0, "orc");
         if (!orc) {
             merror("liblogic_init: failed to init orc");
@@ -390,9 +402,13 @@ void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     //int max_orcs = count2;
     for (int i = 0; i < max_orcs && i < count2; i++) {
         tile_t* const tile = dungeon_floor_tile_at(df, locations[i].x, locations[i].y);
-        if (dungeon_tile_is_wall(tile->type)) { continue; }
+        if (dungeon_tile_is_wall(tile->type)) {
+            continue;
+        }
         // check if there is already an entity at this location
-        if (tile_entity_count(tile) > 0) { continue; }
+        if (tile_entity_count(tile) > 0) {
+            continue;
+        }
         entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, locations[i].x, locations[i].y, 0, "orc");
         massert(orc, "liblogic_init: failed to create orc");
         entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
@@ -483,15 +499,21 @@ void liblogic_handle_camera_zoom(gamestate* const g, const inputstate* const is)
 
 const char* liblogic_get_action_key(const inputstate* const is, gamestate* const g) {
     const int key = inputstate_get_pressed_key(is);
-    if (key != -1) { minfo("Key pressed: %d", key); }
+    if (key != -1) {
+        minfo("Key pressed: %d", key);
+    }
     // can return early if key == -1
-    if (key == -1) { return "none"; }
+    if (key == -1) {
+        return "none";
+    }
     return get_action_for_key(&g->keybinding_list, key);
 }
 
 void liblogic_change_player_dir(gamestate* const g, direction_t dir) {
     massert(g, "Game state is NULL!");
-    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
+    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
+        return;
+    }
 
     // get the player entity
     entity* const e = em_get(g->entitymap, g->hero_id);
@@ -521,7 +543,9 @@ void liblogic_change_player_dir(gamestate* const g, direction_t dir) {
 void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
+    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
+        return;
+    }
 
     //minfo("1");
     const char* action = liblogic_get_action_key(is, g);
@@ -567,7 +591,6 @@ void liblogic_handle_input_player(const inputstate* const is, gamestate* const g
     //const char* action = get_action_for_key(&g->keybinding_list, key);
 
     if (action) {
-
         if (g->player_changing_direction) {
             if (strcmp(action, "wait") == 0) {
                 liblogic_execute_action(g, e, ENTITY_ACTION_WAIT);
@@ -784,7 +807,9 @@ bool liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             entity_add_item_to_inventory(e, id);
             e->weapon = id;
             msuccess("Picked up item: %s", it->name);
-            if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+            if (e->type == ENTITY_PLAYER) {
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            }
             return true;
         } else if (it->type == ENTITY_SHIELD) {
             // pick up the item
@@ -799,7 +824,9 @@ bool liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             e->shield = id;
 
             msuccess("Picked up item: %s", it->name);
-            if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+            if (e->type == ENTITY_PLAYER) {
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            }
             return true;
         }
     }
@@ -822,7 +849,9 @@ void liblogic_try_entity_wait(gamestate* const g, entity* const e) {
     }
 
     // handle flag update
-    if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+    if (e->type == ENTITY_PLAYER) {
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    }
 }
 
 void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y) {
@@ -837,7 +866,9 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         return;
     }
     // i feel like this might be something we can set elsewhere...like after the player input phase?
-    if (e->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+    if (e->type == ENTITY_PLAYER) {
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    }
     tile_t* const tile = dungeon_floor_tile_at(df, ex, ey);
     if (!tile || ex < 0 || ey < 0) {
         merror(!tile ? "Failed to get tile" : "Cannot move, out of bounds");
@@ -957,13 +988,17 @@ bool liblogic_player_on_tile(const gamestate* const g, int x, int y, int floor) 
     }
     // enumerate entities and check their type
     for (int i = 0; i < tile->entity_max; i++) {
-        if (tile->entities[i] == -1) { continue; }
+        if (tile->entities[i] == -1) {
+            continue;
+        }
         const entity* const e = em_get(g->entitymap, tile->entities[i]);
         if (!e) {
             merror("liblogic_player_on_tile: failed to get entity");
             return false;
         }
-        if (e->type == ENTITY_PLAYER) { return true; }
+        if (e->type == ENTITY_PLAYER) {
+            return true;
+        }
     }
     return false;
 }
@@ -974,7 +1009,9 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     liblogic_update_player_state(g);
     liblogic_update_npcs_state(g);
     liblogic_handle_input(is, g);
-    if (g->flag == GAMESTATE_FLAG_NPC_TURN) { liblogic_handle_npcs(g); }
+    if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
+        liblogic_handle_npcs(g);
+    }
     //liblogic_handle_npc(g);
     liblogic_update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
@@ -990,9 +1027,7 @@ void liblogic_update_player_state(gamestate* const g) {
         return;
     }
     if (e->is_dead) {
-
         if (!g->gameover) {
-
             liblogic_add_message(g, "You died!");
             g->gameover = true;
         }
@@ -1023,7 +1058,9 @@ void liblogic_update_npc_state(gamestate* const g, entityid id) {
         merror("Failed to get entity");
         return;
     }
-    if (e->is_dead) { return; }
+    if (e->is_dead) {
+        return;
+    }
     if (e->hp <= 0) {
         e->is_dead = true;
         e->do_update = true;
@@ -1034,7 +1071,9 @@ void liblogic_update_npc_state(gamestate* const g, entityid id) {
 
 void liblogic_handle_npc(gamestate* const g) {
     massert(g, "Game state is NULL!");
-    if (g->flag != GAMESTATE_FLAG_NPC_TURN) { return; }
+    if (g->flag != GAMESTATE_FLAG_NPC_TURN) {
+        return;
+    }
     const entityid id = g->entity_turn;
     entity* const e = em_get(g->entitymap, id);
     if (!e) {
@@ -1056,7 +1095,9 @@ void liblogic_handle_npcs(gamestate* const g) {
     // Process all NPCs
     for (int i = 0; i < g->index_entityids; i++) {
         entity* e = em_get(g->entitymap, g->entityids[i]);
-        if (!e) { continue; }
+        if (!e) {
+            continue;
+        }
         if (e->type != ENTITY_NPC || e->floor != 0) continue;
         if (e->is_dead) continue;
         // testing attack logic
@@ -1327,7 +1368,8 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
     }
     // Calculate direction based on target position
     bool attack_successful = false;
-    int dx = target_x - attacker->x, dy = target_y - attacker->y;
+    int dx = target_x - attacker->x;
+    int dy = target_y - attacker->y;
     attacker->direction = get_dir_from_xy(dx, dy);
     attacker->is_attacking = attacker->do_update = true;
     for (int i = 0; i < tile->entity_max; i++) {
@@ -1337,21 +1379,21 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
             if (target && (target->type == ENTITY_NPC || target->type == ENTITY_PLAYER) && !target->is_dead) {
                 // Perform attack logic here
                 minfo("Attack successful!");
-                attack_successful = target->is_damaged = target->do_update = true;
-
+                attack_successful = true;
+                target->is_damaged = true;
+                target->do_update = true;
                 int dmg = 1;
                 entity_set_hp(target, entity_get_hp(target) - dmg); // Reduce HP by 1
-
                 if (target->type == ENTITY_PLAYER) {
-
                     char tmp_msg[128];
                     //snprintf(tmp_msg, sizeof(tmp_msg), "You were attacked for %d damage!", dmg);
                     snprintf(tmp_msg, sizeof(tmp_msg), "You took %d damage!", dmg);
                     //liblogic_add_message(g, "Player attacked!");
                     liblogic_add_message(g, tmp_msg);
                 }
-
-                if (entity_get_hp(target) <= 0) target->is_dead = true;
+                if (entity_get_hp(target) <= 0) {
+                    target->is_dead = true;
+                }
                 break;
             }
         }
@@ -1366,7 +1408,9 @@ void liblogic_try_entity_attack(gamestate* const g, entityid attacker_id, int ta
             g->flag = GAMESTATE_FLAG_NONE;
         }
     } else {
-        if (attacker->type == ENTITY_PLAYER) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+        if (attacker->type == ENTITY_PLAYER) {
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        }
     }
 }
 
@@ -1393,7 +1437,9 @@ int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int f
             //mwarningint("Missing entity", eid); // Warning not error
             continue;
         }
-        if (e->type == ENTITY_NPC && !e->is_dead) { count++; }
+        if (e->type == ENTITY_NPC && !e->is_dead) {
+            count++;
+        }
     }
     return count;
 }
@@ -1409,7 +1455,9 @@ bool liblogic_entity_has_weapon(gamestate* const g, entityid id) {
     for (int i = 0; i < e->inventory_count; i++) {
         entityid item_id = e->inventory[i];
         entity* item = em_get(g->entitymap, item_id);
-        if (item && item->type == ENTITY_WEAPON) { return true; }
+        if (item && item->type == ENTITY_WEAPON) {
+            return true;
+        }
     }
     return false;
 }
@@ -1425,7 +1473,9 @@ bool liblogic_entity_has_shield(gamestate* const g, entityid id) {
     for (int i = 0; i < e->inventory_count; i++) {
         entityid item_id = e->inventory[i];
         entity* item = em_get(g->entitymap, item_id);
-        if (item && item->type == ENTITY_SHIELD) { return true; }
+        if (item && item->type == ENTITY_SHIELD) {
+            return true;
+        }
     }
     return false;
 }
