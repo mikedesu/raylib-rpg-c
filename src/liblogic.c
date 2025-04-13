@@ -24,6 +24,16 @@
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
+static void update_equipped_shield_dir(gamestate* g, entity* e) {
+    if (e->shield != -1) {
+        entity* shield = em_get(g->entitymap, e->shield);
+        if (shield) {
+            shield->direction = e->direction;
+            shield->do_update = true;
+        }
+    }
+}
+
 void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_t action) {
     massert(g, "liblogic_execute_action: gamestate is NULL");
     massert(e, "liblogic_execute_action: entity is NULL");
@@ -524,14 +534,16 @@ void liblogic_change_player_dir(gamestate* const g, direction_t dir) {
     hero->direction = dir;
     hero->do_update = true;
 
-    entityid shield_id = hero->shield;
-    if (shield_id != -1) {
-        entity* const shield = em_get(g->entitymap, shield_id);
-        massert(shield, "liblogic_change_player_dir: shield is NULL");
-        // set the direction of the shield
-        shield->direction = dir;
-        shield->do_update = true;
-    }
+    update_equipped_shield_dir(g, hero);
+
+    //entityid shield_id = hero->shield;
+    //if (shield_id != -1) {
+    //    entity* const shield = em_get(g->entitymap, shield_id);
+    //    massert(shield, "liblogic_change_player_dir: shield is NULL");
+    //    // set the direction of the shield
+    //    shield->direction = dir;
+    //    shield->do_update = true;
+    //}
 }
 
 void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {
@@ -746,7 +758,9 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     massert(e, "Entity is NULL!");
     e->do_update = true;
     e->direction = get_dir_from_xy(x, y);
-    const int ex = e->x + x, ey = e->y + y, floor = e->floor;
+    const int ex = e->x + x;
+    const int ey = e->y + y;
+    const int floor = e->floor;
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
         merror("Failed to get dungeon floor");
@@ -775,8 +789,14 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     }
     dungeon_floor_remove_at(df, e->id, e->x, e->y);
     dungeon_floor_add_at(df, e->id, ex, ey);
-    e->x = ex, e->y = ey;
-    e->sprite_move_x = x * DEFAULT_TILE_SIZE, e->sprite_move_y = y * DEFAULT_TILE_SIZE;
+    e->x = ex;
+    e->y = ey;
+    e->sprite_move_x = x * DEFAULT_TILE_SIZE;
+    e->sprite_move_y = y * DEFAULT_TILE_SIZE;
+    // at this point the move is 'successful'
+
+    update_equipped_shield_dir(g, e);
+
     // get the entity's new tile
     tile_t* const new_tile = dungeon_floor_tile_at(df, ex, ey);
     if (!new_tile) {
@@ -784,12 +804,12 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
         return;
     }
     // check if the tile has a pressure plate
-    if (new_tile->has_pressure_plate) {
-        msuccess("Pressure plate activated!");
-        // do something
-        // print the pressure plate event
-        //msuccessint("Pressure plate event", new_tile->pressure_plate_event);
-    }
+    //if (new_tile->has_pressure_plate) {
+    //    msuccess("Pressure plate activated!");
+    // do something
+    // print the pressure plate event
+    //msuccessint("Pressure plate event", new_tile->pressure_plate_event);
+    //}
     // check if the tile is an ON TRAP
     if (new_tile->type == TILE_FLOOR_STONE_TRAP_ON_00) {
         msuccess("On trap activated!");
