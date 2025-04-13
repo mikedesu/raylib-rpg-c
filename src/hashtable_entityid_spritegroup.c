@@ -7,15 +7,12 @@ hashtable_entityid_spritegroup_t* hashtable_entityid_spritegroup_create(int size
         merror("hashtable_entityid_spritegroup_create: size must be greater than 0");
         return NULL;
     }
-
     hashtable_entityid_spritegroup_t* ht =
         (hashtable_entityid_spritegroup_t*)malloc(sizeof(hashtable_entityid_spritegroup_t));
-
     if (ht == NULL) {
         merror("hashtable_entityid_spritegroup_create: failed to allocate memory for hashtable_entityid_spritegroup");
         return NULL;
     }
-
     ht->size = size;
     ht->num_entries = 0;
     ht->table = (hashtable_entityid_spritegroup_node_t**)malloc(sizeof(hashtable_entityid_spritegroup_node_t*) * size);
@@ -23,8 +20,9 @@ hashtable_entityid_spritegroup_t* hashtable_entityid_spritegroup_create(int size
         free(ht);
         return NULL;
     }
-    for (int i = 0; i < size; i++) { ht->table[i] = NULL; }
-
+    for (int i = 0; i < size; i++) {
+        ht->table[i] = NULL;
+    }
     return ht;
 }
 
@@ -52,7 +50,6 @@ const bool hashtable_entityid_spritegroup_has_specifier(hashtable_entityid_sprit
                                                         entityid key,
                                                         specifier_t spec) {
     if (ht == NULL || key < 0 || spec < SPECIFIER_NONE || spec >= SPECIFIER_COUNT) return false;
-
     hashtable_entityid_spritegroup_node_t* node = ht->table[hashtable_entityid_spritegroup_hash(ht, key)];
     while (node != NULL) {
         if (node->key == key && node->value->specifier == spec) return true;
@@ -67,7 +64,6 @@ void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* con
     if (ht == NULL || key < 0 || value == NULL ||
         (value->specifier != SPECIFIER_NONE && hashtable_entityid_spritegroup_has_specifier(ht, key, value->specifier)))
         return;
-
     const int index = hashtable_entityid_spritegroup_hash(ht, key);
     hashtable_entityid_spritegroup_node_t* new_node =
         (hashtable_entityid_spritegroup_node_t*)malloc(sizeof(hashtable_entityid_spritegroup_node_t));
@@ -75,12 +71,13 @@ void hashtable_entityid_spritegroup_insert(hashtable_entityid_spritegroup_t* con
     new_node->value = value;
     new_node->next = ht->table[index]; // insert at head
     ht->table[index] = new_node;
-
     ht->num_entries++;
 }
 
 spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup_t* const ht, entityid key) {
-    if (ht == NULL || key < 0) { return NULL; }
+    if (ht == NULL || key < 0) {
+        return NULL;
+    }
     const int index = hashtable_entityid_spritegroup_hash(ht, key);
     hashtable_entityid_spritegroup_node_t* node = ht->table[index];
     spritegroup_t* result = NULL;
@@ -96,8 +93,12 @@ spritegroup_t* hashtable_entityid_spritegroup_get(hashtable_entityid_spritegroup
 
 spritegroup_t*
 hashtable_entityid_spritegroup_get_by_index(hashtable_entityid_spritegroup_t* const ht, entityid key, int index) {
-    if (ht == NULL || key < 0) { return NULL; }
-    if (index < 0) { return NULL; }
+    if (ht == NULL || key < 0) {
+        return NULL;
+    }
+    if (index < 0) {
+        return NULL;
+    }
     const int hash = hashtable_entityid_spritegroup_hash(ht, key);
     hashtable_entityid_spritegroup_node_t* node = ht->table[hash];
     spritegroup_t* result = NULL;
@@ -105,13 +106,14 @@ hashtable_entityid_spritegroup_get_by_index(hashtable_entityid_spritegroup_t* co
     while (node != NULL) {
         if (node->key == key) {
             //result = node->value;
-            if (current_index == index) { return node->value; }
+            if (current_index == index) {
+                return node->value;
+            }
             current_index++;
         }
         node = node->next;
     }
     return NULL;
-
     //if (current_index == index) {
     //        break;
     //    }
@@ -124,7 +126,6 @@ spritegroup_t* hashtable_entityid_spritegroup_get_by_specifier(hashtable_entityi
                                                                entityid key,
                                                                specifier_t spec) {
     if (ht == NULL || key < 0 || spec < SPECIFIER_NONE || spec >= SPECIFIER_COUNT) return NULL;
-
     const int index = hashtable_entityid_spritegroup_hash(ht, key);
     hashtable_entityid_spritegroup_node_t* node = ht->table[index];
     spritegroup_t* result = NULL;
@@ -141,17 +142,13 @@ spritegroup_t* hashtable_entityid_spritegroup_get_by_specifier(hashtable_entityi
 // this only deletes the first instance of the key
 void hashtable_entityid_spritegroup_delete(hashtable_entityid_spritegroup_t* const ht, entityid key) {
     const int index = hashtable_entityid_spritegroup_hash(ht, key);
-
     hashtable_entityid_spritegroup_node_t* node = ht->table[index];
-
     if (!node) return;
-
     if (node->key == key) {
         ht->table[hashtable_entityid_spritegroup_hash(ht, key)] = node->next;
         free(node);
         return;
     }
-
     while (node->next != NULL) {
         if (node->next->key == key) {
             hashtable_entityid_spritegroup_node_t* temp = node->next;
@@ -167,9 +164,7 @@ void hashtable_entityid_spritegroup_delete(hashtable_entityid_spritegroup_t* con
 void hashtable_entityid_spritegroup_delete_all(hashtable_entityid_spritegroup_t* const ht, entityid key) {
     const int index = hashtable_entityid_spritegroup_hash(ht, key);
     hashtable_entityid_spritegroup_node_t* node = ht->table[index];
-
     if (node == NULL) return;
-
     while (node != NULL) {
         if (node->key != key) {
             while (node->next != NULL) {
@@ -188,22 +183,35 @@ void hashtable_entityid_spritegroup_delete_all(hashtable_entityid_spritegroup_t*
     }
 }
 
+//int ht_entityid_sg_get_num_entries_for_key(hashtable_entityid_spritegroup_t* const ht, entityid key) {
+//    spritegroup_t* sg = hashtable_entityid_spritegroup_get(ht, key);
+//    if (!sg) {
+//        return 0;
+//    }
+//    int count = 1;
+//    int hash = hashtable_entityid_spritegroup_hash(ht, key);
+//    hashtable_entityid_spritegroup_node_t* node = ht->table[hash];
+//    while (node != NULL) {
+//        if (node->key == key) {
+//            count++;
+//        }
+//        node = node->next;
+//    }
+//    return count;
+//}
+
 int ht_entityid_sg_get_num_entries_for_key(hashtable_entityid_spritegroup_t* const ht, entityid key) {
-    // we can start by getting the first entry using our get function
-    spritegroup_t* sg = hashtable_entityid_spritegroup_get(ht, key);
-
-    // if we don't have an entry, return 0
-    if (!sg) { return 0; }
-
-    // if we do have an entry, we can count the number of entries
-    int count = 1;
-
+    if (!ht || key < 0) {
+        return 0;
+    }
+    int count = 0;
     int hash = hashtable_entityid_spritegroup_hash(ht, key);
     hashtable_entityid_spritegroup_node_t* node = ht->table[hash];
     while (node != NULL) {
-        if (node->key == key) { count++; }
+        if (node->key == key) {
+            count++;
+        }
         node = node->next;
     }
-
     return count;
 }

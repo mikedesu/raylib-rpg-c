@@ -186,6 +186,7 @@ static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
 }
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
+
 bool libdraw_windowshouldclose() { return WindowShouldClose(); }
 
 void libdraw_load_shaders() {
@@ -235,9 +236,10 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         //merrorint("libdraw_update_sprite: entity not found", id);
         return;
     }
-
     int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
-
+    if (id == 1) {
+        minfo("libdraw_update_sprite: id: %d, num_spritegroups: %d", id, num_spritegroups);
+    }
     for (int i = 0; i < num_spritegroups; i++) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
         if (!sg) {
@@ -246,7 +248,6 @@ void libdraw_update_sprite(gamestate* const g, entityid id) {
         libdraw_update_sprite_ptr(g, e, sg);
         libdraw_handle_frame_incr(g, sg);
     }
-
     //spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     //if (!sg) {
     //    return;
@@ -1028,7 +1029,7 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
         //offset_x = -12;
         //offset_y = -12;
         //libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_SHIELD_GUARD_BACK);
-        //
+
         keys = TX_BUCKLER_KEYS;
         num_keys = TX_BUCKLER_KEY_COUNT;
         offset_x = -12;

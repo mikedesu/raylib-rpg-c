@@ -1028,10 +1028,12 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
     int hero_x = -1;
     int hero_y = -1;
     int inventory_count = -1;
+    entityid shield_id = -1;
     if (e) {
         hero_x = e->x;
         hero_y = e->y;
         inventory_count = e->inventory_count;
+        shield_id = e->shield;
     }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
@@ -1050,7 +1052,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Entities: %d | Flag: %s\n"
              "Turn: %d | Hero: (%d,%d)\n"
              "Inventory: %d\n"
-             "msg_history.count: %d\n",
+             "msg_history.count: %d\n"
+             "shield: %d\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -1068,7 +1071,8 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              hero_x,
              hero_y,
              inventory_count,
-             g->msg_history.count);
+             g->msg_history.count,
+             shield_id);
 }
 
 void liblogic_close(gamestate* const g) {
