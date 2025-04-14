@@ -1,9 +1,9 @@
+#include "massert.h"
 #include "mprint.h"
 #include "sprite.h"
-
 #include <stdlib.h>
 
-sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) {
+sprite* sprite_create(Texture2D* t, int numcontexts, int numframes) {
     if (!t) {
         merror("sprite_create failed: texture is null");
         return NULL;
@@ -15,7 +15,9 @@ sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) 
     }
     s->numframes = numframes;
     s->numcontexts = numcontexts;
-    s->currentframe = s->currentcontext = s->num_loops = 0;
+    s->currentframe = 0;
+    s->currentcontext = 0;
+    s->num_loops = 0;
     s->texture = t;
     s->width = t->width / numframes;
     s->height = t->height / numcontexts;
@@ -33,55 +35,76 @@ sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes) 
 }
 
 void sprite_incrframe(sprite* const s) {
-    if (!s) return;
+    massert(s, "sprite_incrframe: sprite is NULL");
     if (!s->is_animating) return;
     if (s->stop_on_last_frame && s->currentframe == s->numframes - 1) {
         s->is_animating = false;
         return;
     }
-    //s->currentframe = (s->currentframe + 1) % s->numframes;
     s->currentframe++;
-    if (s->currentframe >= s->numframes) { s->currentframe = 0; }
-
+    if (s->currentframe >= s->numframes) {
+        s->currentframe = 0;
+    }
     s->src.x = s->width * s->currentframe;
-    if (s->currentframe == 0) s->num_loops++;
-    //s->num_loops = s->num_loops + (s->currentframe == 0 ? 1 : 0);
+    if (s->currentframe == 0) {
+        s->num_loops++;
+    }
 }
 
-void sprite_setcontext(sprite* const s, const int context) {
-    if (!s) return;
-    if (context < 0 || context >= s->numcontexts) return;
-    // also set currentframe to 0 to reset animation frame
+void sprite_setcontext(sprite* const s, int context) {
+    massert(s, "sprite_setcontext: sprite is NULL");
+    //massert(context >= 0, "sprite_setcontext: context is less than 0: %d", context);
+    //massert(context < s->numcontexts,
+    //        "sprite_setcontext: context is greater than numcontexts: %d < %d",
+    //        context,
+    //        s->numcontexts);
+
+    if (context < 0) {
+        merror("sprite_setcontext: context is less than 0");
+        return;
+    }
+
+    if (context >= s->numcontexts) {
+        merror("sprite_setcontext: context is greater than numcontexts: %d < %d", context, s->numcontexts);
+        return;
+    }
+
     s->currentcontext = context % s->numcontexts;
     s->src.y = s->height * s->currentcontext;
-    s->currentframe = s->src.x = 0;
+    s->currentframe = 0;
+    s->src.x = 0;
 }
 
 void sprite_incrcontext(sprite* const s) {
-    if (!s) return;
+    massert(s, "sprite_incrcontext: sprite is NULL");
     s->currentcontext = (s->currentcontext + 1) % s->numcontexts;
     s->src.y = s->height * s->currentcontext;
 }
 
 void sprite_updatesrc(sprite* const s) {
-    if (!s) return;
+    massert(s, "sprite_updatesrc: sprite is NULL");
     s->src.x = s->width * s->currentframe;
-    //s->src.y = s->height * s->currentcontext;
 }
 
 void sprite_destroy(sprite* s) {
-    if (!s) return;
+    massert(s, "sprite_destroy: sprite is NULL");
     s->texture = NULL;
     free(s);
     s = NULL;
     msuccess("sprite_destroy success");
 }
 
-const int sprite_get_context(const sprite* const s) { return !s ? -1 : s->currentcontext; }
+int sprite_get_context(const sprite* const s) {
+    massert(s, "sprite_get_context: sprite is NULL");
+    return s->currentcontext;
+}
 
-void sprite_set_is_animating(sprite* const s, const bool is_animating) {
-    if (!s) return;
+void sprite_set_is_animating(sprite* const s, bool is_animating) {
+    massert(s, "sprite_set_is_animating: sprite is NULL");
     s->is_animating = is_animating;
 }
 
-const bool sprite_is_animating(const sprite* const s) { return !s ? false : s->is_animating; }
+bool sprite_is_animating(const sprite* const s) {
+    massert(s, "sprite_is_animating: sprite is NULL");
+    return s->is_animating;
+}

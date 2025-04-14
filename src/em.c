@@ -21,7 +21,7 @@ bool em_free(em_t* em) {
     }
     minfo("Freeing entity map");
     for (int i = 0; i < EM_MAX_SLOTS; i++) {
-        minfo("Freeing slot %d", i);
+        //minfo("Freeing slot %d", i);
         entity_t* current = em->entities[i];
         while (current != NULL) {
             entity_t* next = current->next;

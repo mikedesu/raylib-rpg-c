@@ -261,7 +261,7 @@ void liblogic_init(gamestate* const g) {
     liblogic_init_em(g);
     liblogic_init_player(g);
     // test to create a weapon
-    liblogic_init_weapon_test(g);
+    //liblogic_init_weapon_test(g);
     // temporarily disabling
     //liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
@@ -794,7 +794,6 @@ void liblogic_try_entity_move(gamestate* const g, entity* const e, int x, int y)
     e->sprite_move_x = x * DEFAULT_TILE_SIZE;
     e->sprite_move_y = y * DEFAULT_TILE_SIZE;
     // at this point the move is 'successful'
-
     update_equipped_shield_dir(g, e);
 
     // get the entity's new tile
@@ -1029,11 +1028,17 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
     int hero_y = -1;
     int inventory_count = -1;
     entityid shield_id = -1;
+    direction_t shield_dir = DIR_NONE;
     if (e) {
         hero_x = e->x;
         hero_y = e->y;
         inventory_count = e->inventory_count;
         shield_id = e->shield;
+        if (shield_id != -1) {
+            entity* const shield = em_get(g->entitymap, shield_id);
+            massert(shield, "liblogic_update_debug_panel_buffer: shield is NULL");
+            shield_dir = shield->direction;
+        }
     }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
@@ -1053,7 +1058,9 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Turn: %d | Hero: (%d,%d)\n"
              "Inventory: %d\n"
              "msg_history.count: %d\n"
-             "shield: %d\n",
+             "shield: %d\n"
+             "shield_dir: %d\n"
+             "shield_dir_str: %s\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -1072,7 +1079,10 @@ void liblogic_update_debug_panel_buffer(gamestate* const g) {
              hero_y,
              inventory_count,
              g->msg_history.count,
-             shield_id);
+             shield_id,
+             shield_dir,
+
+             get_dir_as_string(shield_dir));
 }
 
 void liblogic_close(gamestate* const g) {

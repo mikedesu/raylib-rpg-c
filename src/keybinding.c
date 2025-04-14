@@ -44,6 +44,10 @@ int key_from_string(const char* str) {
     if (!strcmp(str, "KP_7")) return KEY_KP_7;
     if (!strcmp(str, "KP_8")) return KEY_KP_8;
     if (!strcmp(str, "KP_9")) return KEY_KP_9;
+    if (!strcmp(str, "UP")) return KEY_UP;
+    if (!strcmp(str, "DOWN")) return KEY_DOWN;
+    if (!strcmp(str, "LEFT")) return KEY_LEFT;
+    if (!strcmp(str, "RIGHT")) return KEY_RIGHT;
     // Add more as needed
     return -1;
 }

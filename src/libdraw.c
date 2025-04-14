@@ -227,34 +227,49 @@ bool libdraw_check_default_animations(gamestate* const g) {
 }
 
 void libdraw_update_sprite(gamestate* const g, entityid id) {
-    if (!g) {
-        merror("libdraw_update_sprite: gamestate is NULL");
-        return;
-    }
+    if (!g) return;
     entity* const e = em_get(g->entitymap, id);
     if (!e) {
-        //merrorint("libdraw_update_sprite: entity not found", id);
         return;
     }
     int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
-    if (id == 1) {
-        minfo("libdraw_update_sprite: id: %d, num_spritegroups: %d", id, num_spritegroups);
-    }
     for (int i = 0; i < num_spritegroups; i++) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
-        if (!sg) {
-            continue;
+        if (sg) {
+            libdraw_update_sprite_ptr(g, e, sg);
+            libdraw_handle_frame_incr(g, sg);
         }
-        libdraw_update_sprite_ptr(g, e, sg);
-        libdraw_handle_frame_incr(g, sg);
     }
-    //spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-    //if (!sg) {
-    //    return;
-    //}
-    //libdraw_update_sprite_ptr(g, e, sg);
-    //libdraw_handle_frame_incr(g, sg);
 }
+
+//void libdraw_update_sprite(gamestate* const g, entityid id) {
+//    if (!g) {
+//        merror("libdraw_update_sprite: gamestate is NULL");
+//        return;
+//    }
+//    entity* const e = em_get(g->entitymap, id);
+//    if (!e) {
+//        return;
+//    }
+//    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+//    if (id == 1) {
+//        minfo("libdraw_update_sprite: id: %d, num_spritegroups: %d", id, num_spritegroups);
+//    }
+//    for (int i = 0; i < num_spritegroups; i++) {
+//        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+//        if (!sg) {
+//            continue;
+//        }
+//        libdraw_update_sprite_ptr(g, e, sg);
+//        libdraw_handle_frame_incr(g, sg);
+//    }
+//spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+//if (!sg) {
+//    return;
+//}
+//libdraw_update_sprite_ptr(g, e, sg);
+//libdraw_handle_frame_incr(g, sg);
+//}
 
 void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg) {
     if (!e || !sg) {
@@ -264,18 +279,8 @@ void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg)
     if (e->is_dead && !spritegroup_is_animating(sg)) {
         return;
     }
-    //if (e->do_update) {
-    //    libdraw_update_sprite_context_ptr(g, sg, e->direction);
-    //    e->do_update = false;
-    //}
-
     if (e->do_update) {
         libdraw_update_sprite_context_ptr(g, sg, e->direction);
-        //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, e->id);
-        //for (int i = 0; i < num_spritegroups; i++) {
-        //    spritegroup_t* const sg2 = hashtable_entityid_spritegroup_get_by_index(spritegroups, e->id, i);
-        //    if (sg2) { libdraw_update_sprite_context_ptr(g, sg2, e->direction); }
-        //}
         e->do_update = false;
     }
 
@@ -709,13 +714,11 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
         merror("libdraw_draw_sprite_and_shadow: id is -1");
         return;
     }
-
     entity* e = em_get(g->entitymap, id);
     if (!e) {
         merror("libdraw_draw_sprite_and_shadow: entity not found: id %d", id);
         return;
     }
-
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (!sg) {
         merror("libdraw_draw_sprite_and_shadow: spritegroup not found: id %d", id);
@@ -735,9 +738,7 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     //    merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1: %d", sg->current + 1);
     //}
     // Draw sprite on top
-
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
-
     // check for a shield
     entityid shield_id = e->shield;
     //bool is_blocking = e->is_blocking;
@@ -752,7 +753,6 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
             //sprite* shield_s = spritegroup_get(shield_front_sg, sg->current);
             if (shield_s) {
                 //sprite_setcontext(shield_s, s->currentcontext);
-
                 Rectangle shield_dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
                 DrawTexturePro(*shield_s->texture, shield_s->src, shield_dest, (Vector2){0, 0}, 0, WHITE);
             }
@@ -936,17 +936,18 @@ void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t 
 }
 
 void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir) {
-    if (!g) {
-        merror("libdraw_update_sprite_context: gamestate is NULL");
-        return;
-    }
+    massert(g, "libdraw_update_sprite_context: gamestate is NULL");
+    //if (!g) {
+    //    merror("libdraw_update_sprite_context: gamestate is NULL");
+    //    return;
+    //}
     //minfoint2("libdraw_update_sprite_context: updating sprite context for entity", id, dir);
     //spritegroup_t* group = hashtable_entityid_spritegroup_get(spritegroups, id); // Adjusted for no specifier
-    if (!group) {
-        merror("libdraw_update_sprite_context: group is NULL");
-        //merrorint("libdraw_update_sprite_context: group is NULL", id);
-        return;
-    }
+    massert(group != NULL, "libdraw_update_sprite_context: group is NULL");
+    //if (!group) {
+    //    merror("libdraw_update_sprite_context: group is NULL");
+    //    return;
+    //}
     const int old_ctx = group->sprites[group->current]->currentcontext;
     int ctx = old_ctx;
     ctx = dir == DIR_NONE                                      ? old_ctx
@@ -971,6 +972,14 @@ void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group,
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
                                                                : old_ctx;
+
+    if (ctx == old_ctx) {
+        minfo("libdraw_update_sprite_context: ctx is same as old_ctx: %d", ctx);
+        //return;
+    } else {
+        minfo("libdraw_update_sprite_context: ctx changed from %d to %d", old_ctx, ctx);
+    }
+
     spritegroup_setcontexts(group, ctx);
 }
 

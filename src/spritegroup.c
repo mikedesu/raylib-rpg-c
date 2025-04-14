@@ -1,4 +1,5 @@
 #include "libgame_defines.h"
+#include "massert.h"
 #include "mprint.h"
 #include "spritegroup.h"
 #include <stdlib.h>
@@ -81,16 +82,21 @@ void spritegroup_set(spritegroup_t* const sg, const int index, sprite* s) {
         return;
     }
     // only set if the sprite is not NULL and sg->sprites[index] is NULL
-    if (sg->sprites[index] == NULL) { sg->sprites[index] = s; }
+    if (sg->sprites[index] == NULL) {
+        sg->sprites[index] = s;
+    }
 }
 
 // each sprite has a 'context' that corresponds to different directions
-void spritegroup_setcontexts(spritegroup_t* const sg, const int context) {
-    if (!sg) {
-        merror("spritegroup_setcontexts: spritegroup is NULL");
-        return;
+void spritegroup_setcontexts(spritegroup_t* const sg, int context) {
+    massert(sg, "spritegroup_setcontexts: spritegroup is NULL");
+    //if (!sg) {
+    //    merror("spritegroup_setcontexts: spritegroup is NULL");
+    //    return;
+    //}
+    for (int i = 0; i < sg->size; i++) {
+        sprite_setcontext(sg->sprites[i], context);
     }
-    for (int i = 0; i < sg->size; i++) sprite_setcontext(sg->sprites[i], context);
 }
 
 sprite* spritegroup_get(spritegroup_t* const sg, const int index) {

@@ -21,7 +21,6 @@ typedef struct spritegroup_t {
     sprite** sprites;
 } spritegroup_t;
 
-
 spritegroup_t* spritegroup_create(const int capacity);
 
 sprite* spritegroup_get(spritegroup_t* const sg, const int index);
@@ -34,7 +33,7 @@ const bool spritegroup_set_current(spritegroup_t* const sg, const int index);
 
 void spritegroup_add(spritegroup_t* const sg, sprite* s);
 void spritegroup_set(spritegroup_t* const sg, const int index, sprite* s);
-void spritegroup_setcontexts(spritegroup_t* const sg, const int context);
+void spritegroup_setcontexts(spritegroup_t* const sg, int context);
 void spritegroup_destroy(spritegroup_t* sg);
 void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec);
 

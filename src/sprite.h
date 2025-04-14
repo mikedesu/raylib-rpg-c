@@ -18,13 +18,15 @@ typedef struct sprite {
     bool is_animating;
 } sprite;
 
-sprite* sprite_create(Texture2D* t, const int numcontexts, const int numframes);
+sprite* sprite_create(Texture2D* t, int numcontexts, int numframes);
+
 void sprite_destroy(sprite* s);
 void sprite_updatesrc(sprite* const s);
 void sprite_incrframe(sprite* const s);
 void sprite_incrcontext(sprite* const s);
-void sprite_setcontext(sprite* const s, const int context);
-const int sprite_get_context(const sprite* const s);
+void sprite_setcontext(sprite* const s, int context);
+void sprite_set_is_animating(sprite* const s, bool is_animating);
 
-void sprite_set_is_animating(sprite* const s, const bool is_animating);
-const bool sprite_is_animating(const sprite* const s);
+int sprite_get_context(const sprite* const s);
+
+bool sprite_is_animating(const sprite* const s);
