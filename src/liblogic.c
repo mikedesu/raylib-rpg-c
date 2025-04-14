@@ -25,9 +25,12 @@
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
 static inline void update_equipped_shield_dir(gamestate* g, entity* e) {
+    minfo("update_equipped_shield_dir: e->id: %d, e->shield: %d", e->id, e->shield);
     if (e->shield != -1) {
+        msuccess("update_equipped_shield_dir: e->shield is not -1");
         entity* shield = em_get(g->entitymap, e->shield);
         if (shield) {
+            msuccess("update_equipped_shield_dir: shield found");
             shield->direction = e->direction;
             shield->do_update = true;
         }
@@ -271,7 +274,7 @@ void liblogic_init(gamestate* const g) {
     liblogic_init_em(g);
     liblogic_init_player(g);
     // test to create a weapon
-    liblogic_init_weapon_test(g);
+    //liblogic_init_weapon_test(g);
     // temporarily disabling
     //liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
@@ -694,6 +697,9 @@ void liblogic_try_entity_block(gamestate* const g, entity* const e) {
     e->do_update = true;
     e->is_blocking = true;
     g->test_guard = true;
+
+    update_equipped_shield_dir(g, e);
+
     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
 

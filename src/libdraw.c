@@ -410,11 +410,6 @@ void libdraw_update_sprites(gamestate* const g) {
         merror("libdraw_update_sprites: gamestate is NULL");
         return;
     }
-    //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM || g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-    //    ANIM_SPEED = 10;
-    //} else if (g->flag == GAMESTATE_FLAG_NPC_ANIM || g->flag == GAMESTATE_FLAG_NPC_TURN) {
-    //    ANIM_SPEED = 10;
-    //}
     // for each entityid in our entitymap, update the spritegroup
     for (int i = 0; i < g->index_entityids; i++) {
         const entityid id = g->entityids[i];
@@ -698,7 +693,7 @@ void libdraw_draw_sprite(const gamestate* const g, const entityid id) {
     }
     sprite* s = spritegroup_get(sg, sg->current);
     if (!s) {
-        merror("sprite not found");
+        merror("sprite not found for id %d", id);
         return;
     }
     Rectangle new_dest = (Rectangle){sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
@@ -734,6 +729,9 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     if (shadow) {
         DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE);
     }
+    //else {
+    //    merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current %d", sg->current);
+    //}
     //else {
     //    merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1: %d", sg->current + 1);
     //}
@@ -1024,11 +1022,11 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
         libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     } else if (e->type == ENTITY_SHIELD) {
         // also need to create guard front and back
-        keys = TX_GUARD_BUCKLER_FRONT_KEYS;
-        num_keys = TX_GUARD_BUCKLER_FRONT_KEY_COUNT;
-        offset_x = -12;
-        offset_y = -12;
-        libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_SHIELD_GUARD_FRONT);
+        //keys = TX_GUARD_BUCKLER_FRONT_KEYS;
+        //num_keys = TX_GUARD_BUCKLER_FRONT_KEY_COUNT;
+        //offset_x = -12;
+        //offset_y = -12;
+        //libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_SHIELD_GUARD_FRONT);
 
         //keys = TX_GUARD_BUCKLER_BACK_KEYS;
         //num_keys = TX_GUARD_BUCKLER_BACK_KEY_COUNT;
