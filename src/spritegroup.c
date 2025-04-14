@@ -96,7 +96,7 @@ void spritegroup_setcontexts(spritegroup_t* const sg, int context) {
     //}
     minfo("spritegroup_setcontexts: entering loop of sg->size %d", sg->size);
     for (int i = 0; i < sg->size; i++) {
-        minfo("spritegroup_setcontexts: setting sprite %d", i);
+        //minfo("spritegroup_setcontexts: setting sprite %d", i);
         if (!sg->sprites[i]) {
             //merror("spritegroup_setcontexts: sprite is NULL");
             continue;
