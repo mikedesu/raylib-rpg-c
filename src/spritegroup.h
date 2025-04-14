@@ -21,23 +21,23 @@ typedef struct spritegroup_t {
     sprite** sprites;
 } spritegroup_t;
 
-spritegroup_t* spritegroup_create(const int capacity);
+spritegroup_t* spritegroup_create(int capacity);
 
-sprite* spritegroup_get(spritegroup_t* const sg, const int index);
+sprite* spritegroup_get(spritegroup_t* const sg, int index);
 
-const int spritegroup_get_first_context(spritegroup_t* const sg);
+int spritegroup_get_first_context(spritegroup_t* const sg);
 
-const specifier_t spritegroup_get_specifier(spritegroup_t* const sg);
+specifier_t spritegroup_get_specifier(spritegroup_t* const sg);
 
-const bool spritegroup_set_current(spritegroup_t* const sg, const int index);
+bool spritegroup_set_current(spritegroup_t* const sg, int index);
+bool spritegroup_is_animating(spritegroup_t* const sg);
 
 void spritegroup_add(spritegroup_t* const sg, sprite* s);
-void spritegroup_set(spritegroup_t* const sg, const int index, sprite* s);
+void spritegroup_set(spritegroup_t* const sg, int index, sprite* s);
 void spritegroup_setcontexts(spritegroup_t* const sg, int context);
 void spritegroup_destroy(spritegroup_t* sg);
-void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec);
+void spritegroup_set_specifier(spritegroup_t* const sg, specifier_t spec);
 
-void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, const bool do_stop);
-const bool spritegroup_is_animating(spritegroup_t* const sg);
+void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop);
 void spritegroup_update_dest(spritegroup_t* const sg);
 void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y);

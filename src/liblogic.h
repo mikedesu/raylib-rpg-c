@@ -63,4 +63,4 @@ const char* liblogic_get_action_key(const inputstate* const is, gamestate* const
 bool liblogic_entity_has_weapon(gamestate* const g, entityid id);
 bool liblogic_entity_has_shield(gamestate* const g, entityid id);
 
-void liblogic_add_message_history(gamestate* const g, const char* msg);
+//void liblogic_add_message_history(gamestate* const g, const char* msg);

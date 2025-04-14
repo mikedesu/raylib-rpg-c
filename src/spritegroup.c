@@ -4,7 +4,7 @@
 #include "spritegroup.h"
 #include <stdlib.h>
 
-spritegroup_t* spritegroup_create(const int capacity) {
+spritegroup_t* spritegroup_create(int capacity) {
     if (capacity <= 0) return NULL;
     spritegroup_t* sg = malloc(sizeof(spritegroup_t));
     if (!sg) {
@@ -25,7 +25,7 @@ spritegroup_t* spritegroup_create(const int capacity) {
     return sg;
 }
 
-void spritegroup_set_specifier(spritegroup_t* const sg, const specifier_t spec) {
+void spritegroup_set_specifier(spritegroup_t* const sg, specifier_t spec) {
     if (!sg) {
         merror("spritegroup_set_specifier: spritegroup is NULL");
         return;
@@ -64,7 +64,7 @@ void spritegroup_add(spritegroup_t* const sg, sprite* s) {
     }
 }
 
-void spritegroup_set(spritegroup_t* const sg, const int index, sprite* s) {
+void spritegroup_set(spritegroup_t* const sg, int index, sprite* s) {
     if (!sg) {
         merror("spritegroup_set: spritegroup is NULL");
         return;
@@ -94,60 +94,88 @@ void spritegroup_setcontexts(spritegroup_t* const sg, int context) {
     //    merror("spritegroup_setcontexts: spritegroup is NULL");
     //    return;
     //}
+    minfo("spritegroup_setcontexts: entering loop of sg->size %d", sg->size);
     for (int i = 0; i < sg->size; i++) {
+        minfo("spritegroup_setcontexts: setting sprite %d", i);
+        if (!sg->sprites[i]) {
+            //merror("spritegroup_setcontexts: sprite is NULL");
+            continue;
+        }
+        if (sg->sprites[i]->numcontexts <= 0) {
+            //merror("spritegroup_setcontexts: sprite has no contexts");
+            continue;
+        }
+        if (context < 0) {
+            //merror("spritegroup_setcontexts: context is negative");
+            continue;
+        }
+        if (context >= sg->sprites[i]->numcontexts) {
+            //merror("spritegroup_setcontexts: context is out of bounds");
+            continue;
+        }
         sprite_setcontext(sg->sprites[i], context);
     }
 }
 
-sprite* spritegroup_get(spritegroup_t* const sg, const int index) {
-    if (!sg) {
-        merror("spritegroup_get: spritegroup is NULL");
-        return NULL;
-    }
-    if (index >= sg->size) {
-        //merror("spritegroup_get: index is out of bounds");
-        return NULL;
-    }
+sprite* spritegroup_get(spritegroup_t* const sg, int index) {
+    massert(sg, "spritegroup_get: spritegroup is NULL");
+    massert(index >= 0, "spritegroup_get: index is negative");
+    massert(index < sg->size, "spritegroup_get: index is out of bounds");
+    //if (!sg) {
+    //    merror("spritegroup_get: spritegroup is NULL");
+    //    return NULL;
+    //}
+    //if (index >= sg->size) {
+    //    //merror("spritegroup_get: index is out of bounds");
+    //    return NULL;
+    //}
     return sg->sprites[index];
 }
 
-const bool spritegroup_set_current(spritegroup_t* const sg, const int index) {
-    if (!sg) {
-        merror("spritegroup_set_current: spritegroup is NULL");
-        return false;
-    } else if (index >= sg->size) {
-        //merrorint("spritegroup_set_current: index is out of bounds", index);
-        return false;
-    } else if (index < 0) {
-        merror("spritegroup_set_current: index is negative");
-        return false;
-    }
+bool spritegroup_set_current(spritegroup_t* const sg, int index) {
+    massert(sg, "spritegroup_set_current: spritegroup is NULL");
+    massert(index >= 0, "spritegroup_set_current: index is negative");
+    massert(index < sg->size, "spritegroup_set_current: index is out of bounds");
+    //if (!sg) {
+    //    merror("spritegroup_set_current: spritegroup is NULL");
+    //    return false;
+    //} else if (index >= sg->size) {
+    //    //merrorint("spritegroup_set_current: index is out of bounds", index);
+    //    return false;
+    //} else if (index < 0) {
+    //    merror("spritegroup_set_current: index is negative");
+    //    return false;
+    //}
     sg->current = index;
     return true;
 }
 
-const specifier_t spritegroup_get_specifier(spritegroup_t* const sg) { return sg ? sg->specifier : SPECIFIER_NONE; }
+specifier_t spritegroup_get_specifier(spritegroup_t* const sg) { return sg ? sg->specifier : SPECIFIER_NONE; }
 
-const int spritegroup_get_first_context(spritegroup_t* const sg) {
-    if (!sg) {
-        merror("spritegroup_get_first_context: spritegroup is NULL");
-        return -1;
-    }
-    if (sg->size <= 0) {
-        merror("spritegroup_get_first_context: spritegroup is empty");
-        return -1;
-    }
+int spritegroup_get_first_context(spritegroup_t* const sg) {
+    massert(sg, "spritegroup_get_first_context: spritegroup is NULL");
+    massert(sg->size > 0, "spritegroup_get_first_context: spritegroup is empty");
+    //if (!sg) {
+    //    merror("spritegroup_get_first_context: spritegroup is NULL");
+    //    return -1;
+    //}
+    //if (sg->size <= 0) {
+    //    merror("spritegroup_get_first_context: spritegroup is empty");
+    //    return -1;
+    //}
     return sprite_get_context(sg->sprites[0]);
 }
 
-void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, const bool do_stop) {
-    if (!sg) {
-        merror("spritegroup_set_stop_on_last_frame: spritegroup is NULL");
-        return;
-    }
+void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop) {
+    massert(sg, "spritegroup_set_stop_on_last_frame: spritegroup is NULL");
+    //if (!sg) {
+    //    merror("spritegroup_set_stop_on_last_frame: spritegroup is NULL");
+    //    return;
+    //}
 
     // get the current sprite
-    sprite* s = sg->sprites[sg->current];
+    //sprite* s = sg->sprites[sg->current];
+    sprite* s = spritegroup_get(sg, sg->current);
     if (!s) {
         merror("spritegroup_set_stop_on_last_frame: sprite is NULL");
         return;
@@ -163,7 +191,8 @@ void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, const bool do_s
         return;
     }
 
-    sprite* shadow = sg->sprites[sg->current + 1];
+    //sprite* shadow = sg->sprites[sg->current + 1];
+    sprite* shadow = spritegroup_get(sg, sg->current + 1);
     if (!shadow) {
         //merrorint("spritegroup_set_stop_on_last_frame: shadow sprite is NULL", sg->current + 1);
         return;
@@ -171,7 +200,7 @@ void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, const bool do_s
     shadow->stop_on_last_frame = do_stop;
 }
 
-const bool spritegroup_is_animating(spritegroup_t* const sg) {
+bool spritegroup_is_animating(spritegroup_t* const sg) {
     if (!sg) {
         merror("spritegroup_is_animating: spritegroup is NULL");
         return false;

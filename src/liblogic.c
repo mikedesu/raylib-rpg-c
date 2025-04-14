@@ -24,7 +24,7 @@
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
-static void update_equipped_shield_dir(gamestate* g, entity* e) {
+static inline void update_equipped_shield_dir(gamestate* g, entity* e) {
     if (e->shield != -1) {
         entity* shield = em_get(g->entitymap, e->shield);
         if (shield) {
@@ -32,6 +32,18 @@ static void update_equipped_shield_dir(gamestate* g, entity* e) {
             shield->do_update = true;
         }
     }
+}
+
+static inline void liblogic_add_message_history(gamestate* const g, const char* msg) {
+    massert(g, "liblogic_add_message_history: gamestate is NULL");
+    massert(msg, "liblogic_add_message_history: msg is NULL");
+    if (g->msg_history.count >= g->msg_history.max_count) {
+        mwarning("Message history full!");
+        return;
+    }
+    strncpy(g->msg_history.messages[g->msg_history.count], msg, MAX_MSG_LENGTH - 1);
+    g->msg_history.messages[g->msg_history.count][MAX_MSG_LENGTH - 1] = '\0'; // Ensure null-termination
+    g->msg_history.count++;
 }
 
 void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_t action) {
@@ -227,12 +239,10 @@ bool liblogic_entities_adjacent(gamestate* const g, entityid id0, entityid id1) 
     massert(g, "liblogic_entities_adjacent: gamestate is NULL");
     entity* const e0 = em_get(g->entitymap, id0);
     if (!e0) {
-        //merrorint("liblogic_entities_adjacent: entity not found", id0);
         return false;
     }
     entity* const e1 = em_get(g->entitymap, id1);
     if (!e1) {
-        //merrorint("liblogic_entities_adjacent: entity not found", id1);
         return false;
     }
     // use e0 and check the surrounding 8 tiles
@@ -300,18 +310,6 @@ void liblogic_add_message(gamestate* g, const char* fmt, ...) {
     liblogic_add_message_history(g, g->msg_system.messages[g->msg_system.count]);
     g->msg_system.count++;
     g->msg_system.is_active = true;
-}
-
-void liblogic_add_message_history(gamestate* const g, const char* msg) {
-    massert(g, "liblogic_add_message_history: gamestate is NULL");
-    massert(msg, "liblogic_add_message_history: msg is NULL");
-    if (g->msg_history.count >= g->msg_history.max_count) {
-        mwarning("Message history full!");
-        return;
-    }
-    strncpy(g->msg_history.messages[g->msg_history.count], msg, MAX_MSG_LENGTH - 1);
-    g->msg_history.messages[g->msg_history.count][MAX_MSG_LENGTH - 1] = '\0'; // Ensure null-termination
-    g->msg_history.count++;
 }
 
 void liblogic_init_dungeon(gamestate* const g) {

@@ -53,11 +53,11 @@ void sprite_incrframe(sprite* const s) {
 
 void sprite_setcontext(sprite* const s, int context) {
     massert(s, "sprite_setcontext: sprite is NULL");
-    //massert(context >= 0, "sprite_setcontext: context is less than 0: %d", context);
-    //massert(context < s->numcontexts,
-    //        "sprite_setcontext: context is greater than numcontexts: %d < %d",
-    //        context,
-    //        s->numcontexts);
+    massert(context >= 0, "sprite_setcontext: context is less than 0: %d", context);
+    massert(context < s->numcontexts,
+            "sprite_setcontext: context is greater than numcontexts: %d < %d",
+            context,
+            s->numcontexts);
 
     if (context < 0) {
         merror("sprite_setcontext: context is less than 0");
@@ -75,16 +75,16 @@ void sprite_setcontext(sprite* const s, int context) {
     s->src.x = 0;
 }
 
-void sprite_incrcontext(sprite* const s) {
-    massert(s, "sprite_incrcontext: sprite is NULL");
-    s->currentcontext = (s->currentcontext + 1) % s->numcontexts;
-    s->src.y = s->height * s->currentcontext;
-}
+//void sprite_incrcontext(sprite* const s) {
+//    massert(s, "sprite_incrcontext: sprite is NULL");
+//    s->currentcontext = (s->currentcontext + 1) % s->numcontexts;
+//    s->src.y = s->height * s->currentcontext;
+//}
 
-void sprite_updatesrc(sprite* const s) {
-    massert(s, "sprite_updatesrc: sprite is NULL");
-    s->src.x = s->width * s->currentframe;
-}
+//void sprite_updatesrc(sprite* const s) {
+//    massert(s, "sprite_updatesrc: sprite is NULL");
+//    s->src.x = s->width * s->currentframe;
+//}
 
 void sprite_destroy(sprite* s) {
     massert(s, "sprite_destroy: sprite is NULL");

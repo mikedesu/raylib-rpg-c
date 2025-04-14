@@ -20,10 +20,10 @@
 #include <raylib.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
-//#define DEFAULT_WIN_WIDTH 800
-//#define DEFAULT_WIN_HEIGHT 480
-#define DEFAULT_WIN_WIDTH 1920
-#define DEFAULT_WIN_HEIGHT 1080
+#define DEFAULT_WIN_WIDTH 800
+#define DEFAULT_WIN_HEIGHT 480
+//#define DEFAULT_WIN_WIDTH 1920
+//#define DEFAULT_WIN_HEIGHT 1080
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_ANIM_SPEED 4
 //#define DEFAULT_ANIM_SPEED 8
@@ -973,10 +973,7 @@ void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group,
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
                                                                : old_ctx;
 
-    if (ctx == old_ctx) {
-        minfo("libdraw_update_sprite_context: ctx is same as old_ctx: %d", ctx);
-        //return;
-    } else {
+    if (ctx != old_ctx) {
         minfo("libdraw_update_sprite_context: ctx changed from %d to %d", old_ctx, ctx);
     }
 
