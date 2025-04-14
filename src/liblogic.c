@@ -271,7 +271,7 @@ void liblogic_init(gamestate* const g) {
     liblogic_init_em(g);
     liblogic_init_player(g);
     // test to create a weapon
-    //liblogic_init_weapon_test(g);
+    liblogic_init_weapon_test(g);
     // temporarily disabling
     //liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
@@ -292,8 +292,38 @@ void liblogic_init_weapon_test(gamestate* const g) {
     //entityid sword_id = liblogic_weapon_create(g, x + 1, y, 0, "sword");
     //massert(sword_id != -1, "liblogic_init_weapon_test: failed to create weapon");
     // place the shield somewhere around the player
-    entityid shield_id = liblogic_shield_create(g, x - 1, y, 0, "shield");
-    massert(shield_id != -1, "liblogic_init_weapon_test: failed to create shield");
+
+    bool found = false;
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            if (found) {
+                break;
+            }
+            if (i == 0 && j == 0) {
+                continue;
+            }
+            int new_x = x + i;
+            int new_y = y + j;
+            tile_t* const tile = dungeon_floor_tile_at(df, new_x, new_y);
+            if (tile_entity_count(tile) > 0) {
+                continue;
+            }
+            // check if the tile is walkable
+            if (!dungeon_tile_is_walkable(tile->type)) {
+                continue;
+            }
+            // create the shield
+            entityid shield_id = liblogic_shield_create(g, x - 1, y, 0, "shield");
+            massert(shield_id != -1, "liblogic_init_weapon_test: failed to create shield");
+            entity* const shield = em_get(g->entitymap, shield_id);
+            massert(shield, "liblogic_init_weapon_test: shield is NULL");
+            // set the shield direction to the player direction
+            found = true;
+        }
+        if (found) {
+            break;
+        }
+    }
 }
 
 void liblogic_add_message(gamestate* g, const char* fmt, ...) {

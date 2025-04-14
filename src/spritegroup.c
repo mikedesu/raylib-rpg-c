@@ -120,15 +120,15 @@ void spritegroup_setcontexts(spritegroup_t* const sg, int context) {
 sprite* spritegroup_get(spritegroup_t* const sg, int index) {
     massert(sg, "spritegroup_get: spritegroup is NULL");
     massert(index >= 0, "spritegroup_get: index is negative");
-    massert(index < sg->size, "spritegroup_get: index is out of bounds");
+    //massert(index < sg->size, "spritegroup_get: index is out of bounds");
     //if (!sg) {
     //    merror("spritegroup_get: spritegroup is NULL");
     //    return NULL;
     //}
-    //if (index >= sg->size) {
-    //    //merror("spritegroup_get: index is out of bounds");
-    //    return NULL;
-    //}
+    if (index >= sg->size) {
+        merror("spritegroup_get: index is out of bounds: %d >= %d", index, sg->size);
+        return NULL;
+    }
     return sg->sprites[index];
 }
 
