@@ -95,7 +95,7 @@ static bool liblogic_player_on_tile(const gamestate* const g, int x, int y, int 
     return false;
 }
 
-static int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int fl) {
+static inline int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int fl) {
     // Validate inputs
     massert(g, "liblogic_tile_npc_living_count: gamestate is NULL");
     massert(fl >= 0, "liblogic_tile_npc_living_count: floor is out of bounds");
@@ -112,10 +112,11 @@ static int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y
     int count = 0;
     for (int i = 0; i < t->entity_max; i++) {
         const entityid eid = tile_get_entity(t, i);
-        if (eid == -1) continue;
+        if (eid == -1) {
+            continue;
+        }
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) {
-            //mwarningint("Missing entity", eid); // Warning not error
             continue;
         }
         if (e->type == ENTITY_NPC && !e->is_dead) {
@@ -230,9 +231,8 @@ static void liblogic_try_entity_move_random(gamestate* const g, entity* const e)
     liblogic_try_entity_move(g, e, x, y);
 }
 
-static void liblogic_handle_attack_success_gamestate_flag(gamestate* const g, entitytype_t type, bool success) {
+static inline void liblogic_handle_attack_success_gamestate_flag(gamestate* const g, entitytype_t type, bool success) {
     if (!success) {
-        //merrorint2("liblogic_try_entity_attack: no valid target found at the specified location", target_x, target_y);
         if (type == ENTITY_PLAYER) {
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         } else if (type == ENTITY_NPC) {
@@ -267,34 +267,57 @@ liblogic_handle_attack_success(gamestate* const g, entity* attacker, entity* tar
     }
 }
 
-static void liblogic_handle_attack_helper(gamestate* const g, tile_t* tile, entity* attacker, bool* attack_successful) {
-    for (int i = 0; i < tile->entity_max; i++) {
-        entityid id = tile->entities[i];
-        if (id != -1) {
-            entity* const target = em_get(g->entitymap, id);
-            if (target) {
-                entitytype_t type = target->type;
-                if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-                    msuccess("Attacking target: %s", target->name);
-                    if (!target->is_dead) {
-                        liblogic_handle_attack_success(g, attacker, target, attack_successful);
-                        break;
-                    } else {
-                        merror("Target is dead, cannot attack");
-                        return;
-                    }
+static inline bool liblogic_handle_attack_helper_innerloop(gamestate* const g,
+                                                           tile_t* tile,
+                                                           int i,
+                                                           entity* attacker,
+                                                           bool* attack_successful) {
+    massert(g, "liblogic_handle_attack_helper_innerloop: gamestate is NULL");
+    massert(tile, "liblogic_handle_attack_helper_innerloop: tile is NULL");
+    massert(i >= 0, "liblogic_handle_attack_helper_innerloop: i is out of bounds");
+    massert(i < tile->entity_max, "liblogic_handle_attack_helper_innerloop: i is out of bounds");
+    massert(attacker, "liblogic_handle_attack_helper_innerloop: attacker is NULL");
+    massert(attack_successful, "liblogic_handle_attack_helper_innerloop: attack_successful is NULL");
+
+    entityid id = tile->entities[i];
+    if (id != -1) {
+        entity* const target = em_get(g->entitymap, id);
+        if (target) {
+            entitytype_t type = target->type;
+            if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
+                msuccess("Attacking target: %s", target->name);
+                if (!target->is_dead) {
+                    liblogic_handle_attack_success(g, attacker, target, attack_successful);
+                    return true;
                 } else {
-                    merror("Target is not a valid target: %s", entitytype_to_string(type));
-                    return;
+                    merror("Target is dead, cannot attack");
+                    return false;
                 }
             } else {
-                merror("liblogic_handle_attack_helper: target entity is NULL");
-                return;
+                merror("Target is not a valid target: %s", entitytype_to_string(type));
+                return false;
             }
         } else {
-            merror("liblogic_handle_attack_helper: target entity id is -1");
-            return;
+            merror("liblogic_handle_attack_helper: target entity is NULL");
+            return false;
         }
+    } else {
+        merror("liblogic_handle_attack_helper: target entity id is -1");
+        return false;
+    }
+
+    merror("liblogic_handle_attack_helper_innerloop: no valid target found at the specified location");
+    return false;
+}
+
+static void liblogic_handle_attack_helper(gamestate* const g, tile_t* tile, entity* attacker, bool* attack_successful) {
+    massert(g, "liblogic_handle_attack_helper: gamestate is NULL");
+    massert(tile, "liblogic_handle_attack_helper: tile is NULL");
+    massert(attacker, "liblogic_handle_attack_helper: attacker is NULL");
+    massert(attack_successful, "liblogic_handle_attack_helper: attack_successful is NULL");
+
+    for (int i = 0; i < tile->entity_max; i++) {
+        liblogic_handle_attack_helper_innerloop(g, tile, i, attacker, attack_successful);
     }
 }
 
@@ -933,30 +956,19 @@ static void liblogic_handle_input_camera(const inputstate* const is, gamestate* 
     liblogic_handle_camera_zoom(g, is);
 }
 
-static void liblogic_change_player_dir(gamestate* const g, direction_t dir) {
+static inline void liblogic_change_player_dir(gamestate* const g, direction_t dir) {
     massert(g, "Game state is NULL!");
-    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
-        return;
-    }
-    // get the player entity
+    //if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
+    //    return;
+    //}
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "liblogic_change_player_dir: hero is NULL");
-    // check if the player is dead
     if (hero->is_dead) {
         return;
     }
-    // set the direction
     hero->direction = dir;
     hero->do_update = true;
     liblogic_update_equipped_shield_dir(g, hero);
-    //entityid shield_id = hero->shield;
-    //if (shield_id != -1) {
-    //    entity* const shield = em_get(g->entitymap, shield_id);
-    //    massert(shield, "liblogic_change_player_dir: shield is NULL");
-    //    // set the direction of the shield
-    //    shield->direction = dir;
-    //    shield->do_update = true;
-    //}
 }
 
 static void liblogic_try_entity_block(gamestate* const g, entity* const e) {
@@ -1095,7 +1107,7 @@ static void liblogic_try_flip_switch(gamestate* const g, entity* const e, int x,
     }
 }
 
-static bool liblogic_entity_has_weapon(gamestate* const g, entityid id) {
+static inline bool liblogic_entity_has_weapon(gamestate* const g, entityid id) {
     massert(g, "liblogic_entity_has_weapon: gamestate is NULL");
     massert(id != ENTITYID_INVALID, "liblogic_entity_has_weapon: entity ID is invalid");
     entity* const e = em_get(g->entitymap, id);
@@ -1103,14 +1115,28 @@ static bool liblogic_entity_has_weapon(gamestate* const g, entityid id) {
         merror("liblogic_entity_has_weapon: entity not found");
         return false;
     }
-    for (int i = 0; i < e->inventory_count; i++) {
-        entityid item_id = e->inventory[i];
-        entity* item = em_get(g->entitymap, item_id);
-        if (item && item->type == ENTITY_WEAPON) {
-            return true;
-        }
+    entityid id0 = e->weapon;
+    if (id0 == ENTITYID_INVALID) {
+        merror("liblogic_entity_has_weapon: entity has no weapon");
+        return false;
     }
-    return false;
+    return true;
+}
+
+static inline bool liblogic_entity_has_shield(gamestate* const g, entityid id) {
+    massert(g, "liblogic_entity_has_shield: gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "liblogic_entity_has_shield: entity ID is invalid");
+    entity* const e = em_get(g->entitymap, id);
+    if (!e) {
+        merror("liblogic_entity_has_shield: entity not found");
+        return false;
+    }
+    entityid id0 = e->shield;
+    if (id0 == ENTITYID_INVALID) {
+        merror("liblogic_entity_has_shield: entity has no shield");
+        return false;
+    }
+    return true;
 }
 
 static void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {
@@ -1383,19 +1409,34 @@ static void liblogic_update_npcs_state(gamestate* const g) {
     }
 }
 
+static void liblogic_handle_nth_npc(gamestate* const g, int i) {
+    massert(g, "Game state is NULL!");
+    massert(i >= 0, "Index is out of bounds!");
+    massert(i < g->index_entityids, "Index is out of bounds!");
+    entity* e = em_get(g->entitymap, g->entityids[i]);
+    if (e) {
+        if (e->type == ENTITY_NPC) {
+            if (!e->is_dead) {
+                liblogic_execute_action(g, e, e->default_action);
+            }
+        }
+    }
+}
+
 static void liblogic_handle_npcs(gamestate* const g) {
     massert(g, "Game state is NULL!");
     if (g->flag != GAMESTATE_FLAG_NPC_TURN) return;
     // Process all NPCs
     for (int i = 0; i < g->index_entityids; i++) {
-        entity* e = em_get(g->entitymap, g->entityids[i]);
-        if (!e) {
-            continue;
-        }
-        if (e->type != ENTITY_NPC || e->floor != 0) continue;
-        if (e->is_dead) continue;
-        // testing attack logic
-        liblogic_execute_action(g, e, e->default_action);
+        liblogic_handle_nth_npc(g, i);
+        //entity* e = em_get(g->entitymap, g->entityids[i]);
+        //if (e) {
+        //    if (e->type == ENTITY_NPC) {
+        //        if (!e->is_dead) {
+        //            liblogic_execute_action(g, e, e->default_action);
+        //        }
+        //    }
+        //}
     }
     // After processing all NPCs, set the flag to animate all movements together
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
@@ -1410,32 +1451,11 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
         liblogic_handle_npcs(g);
     }
-    //liblogic_handle_npc(g);
     liblogic_update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 }
-
-//static void liblogic_handle_npc(gamestate* const g) {
-//    massert(g, "Game state is NULL!");
-//    if (g->flag != GAMESTATE_FLAG_NPC_TURN) {
-//        return;
-//    }
-//    const entityid id = g->entity_turn;
-//    entity* const e = em_get(g->entitymap, id);
-//    if (!e) {
-//        merror("Failed to get entity");
-//        return;
-//    }
-//    const int rx = rand() % 3 - 1;
-//    const int ry = rand() % 3 - 1;
-//    if (e->type != ENTITY_NPC) {
-//        g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
-//        return;
-//    }
-//    liblogic_try_entity_move(g, e, rx, ry);
-//}
 
 void liblogic_close(gamestate* const g) {
     massert(g, "liblogic_close: gamestate is NULL");
@@ -1453,7 +1473,6 @@ void liblogic_close(gamestate* const g) {
 static void liblogic_add_entityid(gamestate* const g, entityid id) {
     massert(g, "liblogic_add_entityid: gamestate is NULL");
     gamestate_add_entityid(g, id);
-    //msuccessint("Added entity ID: ", id);
 }
 
 static void liblogic_try_entity_attack_in_facing_dir(gamestate* const g, entityid attacker_id) {
@@ -1465,22 +1484,4 @@ static void liblogic_try_entity_attack_in_facing_dir(gamestate* const g, entityi
     int ty = e->y + get_y_from_dir(e->direction);
     // if tx = 0 and ty = 0, then we attack ourselves
     liblogic_try_entity_attack(g, e->id, tx, ty);
-}
-
-static bool liblogic_entity_has_shield(gamestate* const g, entityid id) {
-    massert(g, "liblogic_entity_has_shield: gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "liblogic_entity_has_shield: entity ID is invalid");
-    entity* const e = em_get(g->entitymap, id);
-    if (!e) {
-        merror("liblogic_entity_has_shield: entity not found");
-        return false;
-    }
-    for (int i = 0; i < e->inventory_count; i++) {
-        entityid item_id = e->inventory[i];
-        entity* item = em_get(g->entitymap, item_id);
-        if (item && item->type == ENTITY_SHIELD) {
-            return true;
-        }
-    }
-    return false;
 }
