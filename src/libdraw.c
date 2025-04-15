@@ -415,26 +415,26 @@ void libdraw_draw_debug_panel(gamestate* const g) {
     DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
 }
 
-bool libdraw_camera_lock_on_3d(gamestate* const g) {
-    if (!g) return false;
-    const float TILE_SIZE = 1.0f;
-    const float TILE_HEIGHT = 1.0f;
-    entity_t* p = em_get(g->entitymap, g->hero_id);
-    if (!p) return false;
-    g->cam3d.target = (Vector3){p->x * TILE_SIZE, TILE_HEIGHT, p->y * TILE_SIZE};
-    return true;
-}
+//bool libdraw_camera_lock_on_3d(gamestate* const g) {
+//    if (!g) return false;
+//    const float TILE_SIZE = 1.0f;
+//    const float TILE_HEIGHT = 1.0f;
+//    entity_t* p = em_get(g->entitymap, g->hero_id);
+//    if (!p) return false;
+//    g->cam3d.target = (Vector3){p->x * TILE_SIZE, TILE_HEIGHT, p->y * TILE_SIZE};
+//    return true;
+//}
 
-bool libdraw_draw_player_target_box_3d(gamestate* const g) {
-    if (!g) return false;
-    const float w = 1.0f;
-    const float h = 1.0f;
-    entity_t* p = em_get(g->entitymap, g->hero_id);
-    if (!p) return false;
-    // Placeholder: draw a wireframe cube at player's position
-    DrawCubeWires((Vector3){p->x * w, h, p->y * w}, w, w, w, RED);
-    return true;
-}
+//bool libdraw_draw_player_target_box_3d(gamestate* const g) {
+//    if (!g) return false;
+//    const float w = 1.0f;
+//    const float h = 1.0f;
+//    entity_t* p = em_get(g->entitymap, g->hero_id);
+//    if (!p) return false;
+//    // Placeholder: draw a wireframe cube at player's position
+//    DrawCubeWires((Vector3){p->x * w, h, p->y * w}, w, w, w, RED);
+//    return true;
+//}
 
 void libdraw_drawframe_2d(gamestate* const g) {
     BeginMode2D(g->cam2d);
@@ -462,6 +462,9 @@ void libdraw_drawframe(gamestate* const g) {
     libdraw_draw_hud(g);
     //libdraw_draw_msgbox_test(g, "Hello, world!\nLets fucking go!");
     if (g->debugpanelon) {
+        // concat a string onto the end of the debug panel message
+        strncat(g->debugpanel.buffer, "evildojo666", sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
+
         libdraw_draw_debug_panel(g);
     }
     EndDrawing();
@@ -541,15 +544,13 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     entityid shield_id = e->shield;
     bool is_blocking = e->is_blocking;
     spritegroup_t* shield_sg = NULL;
-    sprite* shield_front_s = NULL;
+    //sprite* shield_front_s = NULL;
     sprite* shield_back_s = NULL;
     if (shield_id != -1 && g->test_guard) {
         shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
         if (shield_sg) {
-            //shield_front_s = spritegroup_get(shield_sg, shield_sg->current);
-            shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
+            //shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
             shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
-            //shield_back_s = spritegroup_get(shield_sg, shield_sg->current + 1);
         }
     }
     if (shield_back_s) {
@@ -557,9 +558,9 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
-    if (shield_front_s) {
-        DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
-    }
+    //if (shield_front_s) {
+    //    DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    //}
 }
 
 static void libdraw_unload_textures() {
