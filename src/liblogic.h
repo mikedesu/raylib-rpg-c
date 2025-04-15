@@ -4,40 +4,37 @@
 
 #define TILE_COUNT_ERROR -999
 
-entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
-entityid liblogic_player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
+//entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
+//entityid liblogic_player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 
-int liblogic_tile_npc_count(const gamestate* const g, int x, int y, int floor);
-int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int fl);
+//int liblogic_tile_npc_count(const gamestate* const g, int x, int y, int floor);
+//int liblogic_tile_npc_living_count(const gamestate* const g, int x, int y, int fl);
 
 void liblogic_init(gamestate* const g);
 void liblogic_close(gamestate* const g);
 void liblogic_tick(const inputstate* const is, gamestate* const g);
-void liblogic_add_entityid(gamestate* const g, entityid id); // New
+//void liblogic_add_entityid(gamestate* const g, entityid id); // New
+//void liblogic_update_debug_panel_buffer(gamestate* const g);
+//void liblogic_handle_npc(gamestate* const g);
+//void liblogic_handle_npcs(gamestate* const g);
+//void liblogic_update_npc_state(gamestate* const g, entityid id);
+//void liblogic_update_npcs_state(gamestate* const g);
+
+//entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
+//entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl, const char* name);
+//entityid liblogic_shield_create(gamestate* const g, int x, int y, int fl, const char* name);
+//bool liblogic_entity_has_weapon(gamestate* const g, entityid id);
+//bool liblogic_entity_has_shield(gamestate* const g, entityid id);
+
 //void liblogic_handle_input_player(const inputstate* const is, gamestate* const g);
-void liblogic_update_debug_panel_buffer(gamestate* const g);
-void liblogic_handle_npc(gamestate* const g);
-void liblogic_handle_npcs(gamestate* const g);
 //void liblogic_update_player_state(gamestate* const g);
-void liblogic_update_npc_state(gamestate* const g, entityid id);
-void liblogic_update_npcs_state(gamestate* const g);
 //void liblogic_change_player_dir(gamestate* const g, direction_t dir);
-void liblogic_try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
-void liblogic_try_entity_wait(gamestate* const g, entity* const e);
+//void liblogic_try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
+//void liblogic_try_entity_wait(gamestate* const g, entity* const e);
 //void liblogic_try_entity_block(gamestate* const g, entity* const e);
-
-entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
-
-entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl, const char* name);
-entityid liblogic_shield_create(gamestate* const g, int x, int y, int fl, const char* name);
-
 //const char* liblogic_get_action_key(const inputstate* const is, gamestate* const g);
-
-bool liblogic_player_on_tile(const gamestate* const g, int x, int y, int floor);
+//bool liblogic_player_on_tile(const gamestate* const g, int x, int y, int floor);
 //bool liblogic_try_entity_pickup(gamestate* const g, entity* const e);
-bool liblogic_entity_has_weapon(gamestate* const g, entityid id);
-bool liblogic_entity_has_shield(gamestate* const g, entityid id);
-
 //bool liblogic_entities_adjacent(gamestate* const g, entityid eid0, entityid eid1);
 //void liblogic_handle_input(const inputstate* const is, gamestate* const g);
 //void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g);
