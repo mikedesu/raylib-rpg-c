@@ -738,25 +738,25 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
     // check for a shield
-    entityid shield_id = e->shield;
+    //entityid shield_id = e->shield;
     //bool is_blocking = e->is_blocking;
     //if (shield_id != -1 && is_blocking) {
-    if (shield_id != -1 && g->test_guard) {
-        //spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
-        spritegroup_t* shield_front_sg =
-            hashtable_entityid_spritegroup_get_by_specifier(spritegroups, shield_id, SPECIFIER_SHIELD_GUARD_FRONT);
-        if (shield_front_sg) {
-            //sprite* shield_s = spritegroup_get(shield_front_sg, shield_front_sg->current);
-            sprite* shield_s = spritegroup_get(shield_front_sg, shield_front_sg->current);
-            //sprite* shield_s = spritegroup_get(shield_front_sg, sg->current);
-            if (shield_s) {
-                //sprite_setcontext(shield_s, s->currentcontext);
-                Rectangle shield_dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-                DrawTexturePro(*shield_s->texture, shield_s->src, shield_dest, (Vector2){0, 0}, 0, WHITE);
-            }
-        }
-        //e->is_blocking = false; // Reset blocking state
-    }
+    //if (shield_id != -1 && g->test_guard) {
+    //spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+    //spritegroup_t* shield_front_sg =
+    //    hashtable_entityid_spritegroup_get_by_specifier(spritegroups, shield_id, SPECIFIER_SHIELD_GUARD_FRONT);
+    //if (shield_front_sg) {
+    //sprite* shield_s = spritegroup_get(shield_front_sg, shield_front_sg->current);
+    //sprite* shield_s = spritegroup_get(shield_front_sg, shield_front_sg->current);
+    //sprite* shield_s = spritegroup_get(shield_front_sg, sg->current);
+    //if (shield_s) {
+    //sprite_setcontext(shield_s, s->currentcontext);
+    //Rectangle shield_dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
+    //DrawTexturePro(*shield_s->texture, shield_s->src, shield_dest, (Vector2){0, 0}, 0, WHITE);
+    //}
+    //}
+    //e->is_blocking = false; // Reset blocking state
+    //}
 }
 
 void libdraw_close() {
@@ -990,23 +990,23 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
     }
     int* keys = NULL;
     int num_keys = 0;
-    int offset_x = 0;
-    int offset_y = 0;
+    int offset_x = -12;
+    int offset_y = -12;
 
     if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
         switch (e->race) {
         case RACE_HUMAN:
             keys = TX_HUMAN_KEYS;
             num_keys = TX_HUMAN_KEY_COUNT;
-            offset_x = -12;
-            offset_y = -12;
+            //offset_x = -12;
+            //offset_y = -12;
             break;
         // Add cases for other races here
         case RACE_ORC:
             keys = TX_ORC_KEYS;
             num_keys = TX_ORC_KEY_COUNT;
-            offset_x = -12;
-            offset_y = -12;
+            //offset_x = -12;
+            //offset_y = -12;
             break;
         default:
             merror("libdraw_create_sg_byid: unknown race %d", e->race);
@@ -1017,8 +1017,8 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
         // for now we only have 1 sprite for weapons
         keys = TX_LONG_SWORD_KEYS;
         num_keys = TX_LONG_SWORD_KEY_COUNT;
-        offset_x = -12;
-        offset_y = -12;
+        //offset_x = -12;
+        //offset_y = -12;
         libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     } else if (e->type == ENTITY_SHIELD) {
         // also need to create guard front and back
@@ -1036,8 +1036,8 @@ void libdraw_create_sg_byid(gamestate* const g, entityid id) {
 
         keys = TX_BUCKLER_KEYS;
         num_keys = TX_BUCKLER_KEY_COUNT;
-        offset_x = -12;
-        offset_y = -12;
+        //offset_x = -12;
+        //offset_y = -12;
         libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     }
 }
@@ -1184,7 +1184,10 @@ void libdraw_init(gamestate* const g) {
         merror("libdraw_init g is NULL");
         return;
     }
-    const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT, x = w / 4, y = h / 4;
+    const int w = DEFAULT_WIN_WIDTH;
+    const int h = DEFAULT_WIN_HEIGHT;
+    const int x = w / 4;
+    const int y = h / 4;
     InitWindow(w, h, "evildojo666");
     g->windowwidth = w;
     g->windowheight = h;
@@ -1194,7 +1197,7 @@ void libdraw_init(gamestate* const g) {
     target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
     libdraw_load_textures();
-    printf("libdraw_init: loaded textures\n");
+    //printf("libdraw_init: loaded textures\n");
     for (int i = 0; i < g->index_entityids; i++) {
         libdraw_create_sg_byid(g, g->entityids[i]);
     }

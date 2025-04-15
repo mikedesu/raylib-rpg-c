@@ -274,7 +274,7 @@ void liblogic_init(gamestate* const g) {
     liblogic_init_em(g);
     liblogic_init_player(g);
     // test to create a weapon
-    //liblogic_init_weapon_test(g);
+    liblogic_init_weapon_test(g);
     // temporarily disabling
     //liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);

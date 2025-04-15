@@ -20,36 +20,26 @@ typedef struct entity_t {
     entity_action_t default_action; // New field
     direction_t direction;
     race_t race;
-
     char name[ENTITY_NAME_LEN_MAX];
-
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
-
-    //entityid* inventory;
-    //int inventory_max_size;
-
     int x;
     int y;
     int floor;
     int sprite_move_x;
     int sprite_move_y;
-
     int level;
     int hp;
     int maxhp;
     int mp;
     int maxmp;
-
     bool do_update;
     bool is_attacking;
     bool is_blocking;
     bool is_damaged;
     bool is_dead;
-
     entityid weapon;
     entityid shield;
-
     entity_t* next;
 } entity;
 
