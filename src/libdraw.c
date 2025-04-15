@@ -165,7 +165,9 @@ static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead)
             for (int i = 0; i < tile_entity_count(tile); i++) {
                 entityid id = tile_get_entity(tile, i);
                 entity* e = em_get(g->entitymap, id);
-                if (e && e->is_dead == dead) libdraw_draw_sprite_and_shadow(g, id);
+                if (e && e->is_dead == dead) {
+                    libdraw_draw_sprite_and_shadow(g, id);
+                }
             }
         }
     }
@@ -703,14 +705,16 @@ void libdraw_draw_sprite(const gamestate* const g, const entityid id) {
 }
 
 void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
-    if (!g) {
-        merror("libdraw_draw_sprite_and_shadow: gamestate is NULL");
-        return;
-    }
-    if (id == -1) {
-        merror("libdraw_draw_sprite_and_shadow: id is -1");
-        return;
-    }
+    massert(g, "libdraw_draw_sprite_and_shadow: gamestate is NULL");
+    //if (!g) {
+    //    merror("libdraw_draw_sprite_and_shadow: gamestate is NULL");
+    //    return;
+    //}
+    massert(id != -1, "libdraw_draw_sprite_and_shadow: id is -1");
+    //if (id == -1) {
+    //    merror("libdraw_draw_sprite_and_shadow: id is -1");
+    //    return;
+    //}
     entity* e = em_get(g->entitymap, id);
     if (!e) {
         merror("libdraw_draw_sprite_and_shadow: entity not found: id %d", id);
@@ -727,10 +731,14 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
         return;
     }
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-    sprite* shadow = spritegroup_get(sg, sg->current + 1);
-    if (shadow) {
-        DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE);
+
+    if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
+        sprite* shadow = spritegroup_get(sg, sg->current + 1);
+        if (shadow) {
+            DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE);
+        }
     }
+
     //else {
     //    merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current %d", sg->current);
     //}
