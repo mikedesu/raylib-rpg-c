@@ -289,29 +289,31 @@ void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg)
     }
 
     // Copy movement intent from e->sprite_move_x/y if present
-    libdraw_update_sprite_position(sg, e);
-    libdraw_update_sprite_attack(e, sg);
+    libdraw_update_sprite_position(g, sg, e);
+    libdraw_update_sprite_attack(g, e, sg);
     // Update movement as long as sg->move.x/y is non-zero
     spritegroup_update_dest(sg);
     // Snap to the tile position only when movement is fully complete
     spritegroup_snap_dest(sg, e->x, e->y);
 }
 
-void libdraw_update_sprite_attack(entity_t* e, spritegroup_t* sg) {
+void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg) {
+    massert(g, "libdraw_update_sprite_attack: gamestate is NULL");
     massert(e, "libdraw_update_sprite_attack: entity is NULL");
     massert(sg, "libdraw_update_sprite_attack: spritegroup is NULL");
     if (e->is_attacking) {
-        libdraw_set_sg_is_attacking(e, sg);
+        libdraw_set_sg_is_attacking(g, e, sg);
     } else if (e->is_blocking) {
-        libdraw_set_sg_is_blocking(e, sg);
+        libdraw_set_sg_is_blocking(g, e, sg);
     } else if (e->is_damaged) {
-        libdraw_set_sg_is_damaged(e, sg);
+        libdraw_set_sg_is_damaged(g, e, sg);
     } else if (e->is_dead) {
-        libdraw_set_sg_is_dead(e, sg);
+        libdraw_set_sg_is_dead(g, e, sg);
     }
 }
 
-void libdraw_set_sg_is_attacking(entity_t* const e, spritegroup_t* const sg) {
+void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
+    massert(g, "libdraw_set_sg_is_attacking: gamestate is NULL");
     massert(e, "libdraw_set_sg_is_attacking: entity is NULL");
     massert(sg, "libdraw_set_sg_is_attacking: spritegroup is NULL");
     if (e->race == RACE_HUMAN) {
@@ -322,16 +324,35 @@ void libdraw_set_sg_is_attacking(entity_t* const e, spritegroup_t* const sg) {
     e->is_attacking = false;
 }
 
-void libdraw_set_sg_is_blocking(entity_t* const e, spritegroup_t* const sg) {
+void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
+    massert(g, "libdraw_set_sg_is_blocking: gamestate is NULL");
     massert(e, "libdraw_set_sg_is_blocking: entity is NULL");
     massert(sg, "libdraw_set_sg_is_blocking: spritegroup is NULL");
     if (e->race == RACE_HUMAN) {
         sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD;
+
+        entityid shield_id = e->shield;
+        if (shield_id != ENTITYID_INVALID) {
+            spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+            if (shield_sg) {
+                shield_sg->current = 1;
+                //shield_sg->do_update = true;
+                //libdraw_update_sprite(g, shield_id);
+            }
+
+            //entity_t* shield = em_get(g->entitymap, shield_id);
+            //if (shield) {
+            //    shield->is_blocking = true;
+            //    shield->do_update = true;
+            //    libdraw_update_sprite(g, shield_id);
+            //}
+        }
     }
     e->is_blocking = false;
 }
 
-void libdraw_set_sg_is_damaged(entity_t* const e, spritegroup_t* const sg) {
+void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
+    massert(g, "libdraw_set_sg_is_damaged: gamestate is NULL");
     if (!e || !sg) {
         merror("libdraw_set_sg_is_damaged: entity or spritegroup is NULL");
         return;
@@ -345,7 +366,7 @@ void libdraw_set_sg_is_damaged(entity_t* const e, spritegroup_t* const sg) {
     e->is_damaged = false;
 }
 
-void libdraw_set_sg_is_dead(entity_t* const e, spritegroup_t* const sg) {
+void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
     if (!e || !sg) {
         merror("libdraw_set_sg_is_dead: entity or spritegroup is NULL");
         return;
@@ -362,7 +383,7 @@ void libdraw_set_sg_is_dead(entity_t* const e, spritegroup_t* const sg) {
     }
 }
 
-void libdraw_update_sprite_position(spritegroup_t* sg, entity_t* e) {
+void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entity_t* e) {
     if (!sg || !e) {
         merror("libdraw_update_sprite_position: spritegroup or entity is NULL");
         return;
@@ -372,12 +393,17 @@ void libdraw_update_sprite_position(spritegroup_t* sg, entity_t* e) {
         sg->move.y = e->sprite_move_y;
         e->sprite_move_x = 0;
         e->sprite_move_y = 0;
-        // set the current based on e->race
-        if (e->race == RACE_HUMAN) {
-            sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
-        } else if (e->race == RACE_ORC) {
-            sg->current = SPRITEGROUP_ANIM_ORC_WALK; // Set animation
-        } // else no sprite animation update
+
+        if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
+            if (e->race == RACE_HUMAN) {
+                sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
+            } else if (e->race == RACE_ORC) {
+                sg->current = SPRITEGROUP_ANIM_ORC_WALK; // Set animation
+            } // else no sprite animation update
+        }
+        //else if (e->type == ENTITY_SHIELD) {
+        //
+        //        }
     }
 }
 
@@ -748,17 +774,24 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
     // check for a shield
-    //entityid shield_id = e->shield;
-    //bool is_blocking = e->is_blocking;
+    entityid shield_id = e->shield;
+    bool is_blocking = e->is_blocking;
     //if (shield_id != -1 && is_blocking) {
-    //if (shield_id != -1 && g->test_guard) {
-    //spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+    if (shield_id != -1 && g->test_guard) {
+        spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+        if (shield_sg) {
+            sprite* shield_s = spritegroup_get(shield_sg, shield_sg->current);
+            if (shield_s) {
+                //Rectangle shield_dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
+                DrawTexturePro(*shield_s->texture, shield_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+            }
+        }
+    }
+    //}
     //spritegroup_t* shield_front_sg =
     //    hashtable_entityid_spritegroup_get_by_specifier(spritegroups, shield_id, SPECIFIER_SHIELD_GUARD_FRONT);
-    //if (shield_front_sg) {
     //sprite* shield_s = spritegroup_get(shield_front_sg, shield_front_sg->current);
     //sprite* shield_s = spritegroup_get(shield_front_sg, shield_front_sg->current);
-    //sprite* shield_s = spritegroup_get(shield_front_sg, sg->current);
     //if (shield_s) {
     //sprite_setcontext(shield_s, s->currentcontext);
     //Rectangle shield_dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};

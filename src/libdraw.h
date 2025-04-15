@@ -38,8 +38,8 @@ void libdraw_draw_hud(gamestate* const g);
 void libdraw_load_shaders(); // Load shader
 void libdraw_unload_shaders(); // Cleanup
 void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
-void libdraw_update_sprite_position(spritegroup_t* sg, entity_t* e);
-void libdraw_update_sprite_attack(entity_t* e, spritegroup_t* sg);
+void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entity_t* e);
+void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg);
 
 bool libdraw_draw_dungeon_floor(const gamestate* const g);
 bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
@@ -55,11 +55,11 @@ bool libdraw_camera_lock_on_3d(gamestate* const g);
 bool libdraw_draw_dungeon_floor_3d(gamestate* const g);
 bool libdraw_draw_player_target_box_3d(gamestate* const g);
 void libdraw_handle_gamestate_flag(gamestate* const g);
-void libdraw_set_sg_is_dead(entity_t* const e, spritegroup_t* const sg);
-void libdraw_set_sg_is_damaged(entity_t* const e, spritegroup_t* const sg);
-void libdraw_set_sg_is_attacking(entity_t* const e, spritegroup_t* const sg);
+void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
 void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg);
 void libdraw_draw_message_box(gamestate* g);
-void libdraw_set_sg_is_blocking(entity_t* const e, spritegroup_t* const sg);
+void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 void libdraw_draw_message_history_placeholder(gamestate* const g);
