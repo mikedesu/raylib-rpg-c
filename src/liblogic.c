@@ -1035,6 +1035,7 @@ static bool liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             tile_remove(tile, id);
             // add the item to the entity inventory
             entity_add_item_to_inventory(e, id);
+            liblogic_update_equipped_shield_dir(g, e);
             e->shield = id;
             msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) {
@@ -1357,7 +1358,7 @@ void liblogic_init(gamestate* const g) {
     // test to create a weapon
     liblogic_init_weapon_test(g);
     // temporarily disabling
-    liblogic_init_orcs_test(g);
+    //liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
 }
 

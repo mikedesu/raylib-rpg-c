@@ -25,8 +25,8 @@
 #define DEFAULT_WIN_WIDTH 1920
 #define DEFAULT_WIN_HEIGHT 1080
 #define SPRITEGROUP_DEFAULT_SIZE 32
-//#define DEFAULT_ANIM_SPEED 4
-#define DEFAULT_ANIM_SPEED 8
+#define DEFAULT_ANIM_SPEED 4
+//#define DEFAULT_ANIM_SPEED 8
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -463,7 +463,26 @@ void libdraw_drawframe(gamestate* const g) {
     //libdraw_draw_msgbox_test(g, "Hello, world!\nLets fucking go!");
     if (g->debugpanelon) {
         // concat a string onto the end of the debug panel message
-        strncat(g->debugpanel.buffer, "evildojo666", sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
+
+        char tmp[1024] = {0};
+
+        entityid hero_id = g->hero_id;
+        entity* e = em_get(g->entitymap, hero_id);
+        massert(e, "libdraw_drawframe: entity is NULL");
+        entityid shield_id = e->shield;
+        if (shield_id != -1) {
+            spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+            if (sg) {
+                sprite* shield_s_front = spritegroup_get(sg, SG_ANIM_BUCKLER_FRONT);
+                sprite* shield_s_back = spritegroup_get(sg, SG_ANIM_BUCKLER_BACK);
+
+                int front_context = sprite_get_context(shield_s_front);
+                int back_context = sprite_get_context(shield_s_back);
+
+                snprintf(tmp, sizeof(tmp), "shield front back: %d %d\n", front_context, back_context);
+                strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
+            }
+        }
 
         libdraw_draw_debug_panel(g);
     }
@@ -544,12 +563,12 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     entityid shield_id = e->shield;
     bool is_blocking = e->is_blocking;
     spritegroup_t* shield_sg = NULL;
-    //sprite* shield_front_s = NULL;
+    sprite* shield_front_s = NULL;
     sprite* shield_back_s = NULL;
     if (shield_id != -1 && g->test_guard) {
         shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
         if (shield_sg) {
-            //shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
+            shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
             shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
         }
     }
@@ -558,9 +577,9 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
-    //if (shield_front_s) {
-    //    DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
-    //}
+    if (shield_front_s) {
+        DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
 }
 
 static void libdraw_unload_textures() {
@@ -905,6 +924,9 @@ void libdraw_init(gamestate* const g) {
     libdraw_calc_debugpanel_size(g);
     libdraw_load_shaders();
     g->cam2d.offset = (Vector2){x, y};
+
+    gamestate_set_debug_panel_pos_top_right(g);
+
     msuccess("libdraw_init");
 }
 
