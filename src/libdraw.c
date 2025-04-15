@@ -185,38 +185,37 @@ void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
 
 bool libdraw_windowshouldclose() { return WindowShouldClose(); }
 
-void libdraw_load_shaders() {
+static void libdraw_load_shaders() {
     //shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
     //shader_tile_glow = LoadShader(0, "glow.frag");
     //shader_tile_glow = LoadShader(0, "psychedelic_ripple.frag");
 }
 
-void libdraw_unload_shaders() {
+static void libdraw_unload_shaders() {
     UnloadShader(shader_grayscale);
     UnloadShader(shader_tile_glow);
 }
 
-bool libdraw_camera_lock_on(gamestate* const g) {
-    if (!g || !g->cam_lockon) return false;
-    spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
-    if (!grp) {
-        //merrorint("libdraw_camera_lock_on: hero spritegroup NULL", g->hero_id);
+static bool libdraw_camera_lock_on(gamestate* const g) {
+    massert(g, "libdraw_camera_lock_on: gamestate is NULL");
+    if (!g->cam_lockon) {
         return false;
     }
+    spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
+    massert(grp, "libdraw_camera_lock_on: spritegroup is NULL");
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
     return true;
 }
 
 bool libdraw_check_default_animations(gamestate* const g) {
-    if (!g) {
-        merror("libdraw_check_default_animations: gamestate is NULL");
-        return false;
-    }
+    massert(g, "libdraw_check_default_animations: gamestate is NULL");
     for (int i = 0; i < g->index_entityids; i++) {
         const entityid id = g->entityids[i];
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-        if (sg && sg->current != sg->default_anim) {
-            return false;
+        if (sg) {
+            if (sg->current != sg->default_anim) {
+                return false;
+            }
         }
     }
     return true;
@@ -694,6 +693,12 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
 }
 
+static void libdraw_unload_textures() {
+    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) {
+        libdraw_unload_texture(i);
+    }
+}
+
 void libdraw_close() {
     libdraw_unload_textures();
     libdraw_unload_shaders();
@@ -745,7 +750,7 @@ bool libdraw_unload_texture(int txkey) {
     return true;
 }
 
-void libdraw_load_textures() {
+static void libdraw_load_textures() {
     const char* textures_file = "textures.txt";
     FILE* file = fopen(textures_file, "r");
     if (!file) {
@@ -769,10 +774,6 @@ void libdraw_load_textures() {
         //}
     }
     fclose(file);
-}
-
-void libdraw_unload_textures() {
-    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) libdraw_unload_texture(i);
 }
 
 void libdraw_create_spritegroup(gamestate* const g,
@@ -844,7 +845,7 @@ void libdraw_create_spritegroup(gamestate* const g,
     //msuccessint("Spritegroup created for entity", id);
 }
 
-void libdraw_calc_debugpanel_size(gamestate* const g) {
+static void libdraw_calc_debugpanel_size(gamestate* const g) {
     if (!g) {
         merror("libdraw_calc_debugpanel_size: gamestate is NULL");
         return;
@@ -900,7 +901,7 @@ void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group,
     spritegroup_setcontexts(group, ctx);
 }
 
-void libdraw_create_sg_byid(gamestate* const g, entityid id) {
+static void libdraw_create_sg_byid(gamestate* const g, entityid id) {
     if (!g) {
         merror("libdraw_create_sg_byid: gamestate is NULL");
         return;
@@ -1029,7 +1030,8 @@ void libdraw_init(gamestate* const g) {
     const int h = DEFAULT_WIN_HEIGHT;
     const int x = w / 4;
     const int y = h / 4;
-    InitWindow(w, h, "evildojo666");
+    const char* title = "evildojo666";
+    InitWindow(w, h, title);
     g->windowwidth = w;
     g->windowheight = h;
     SetTargetFPS(60);
@@ -1049,7 +1051,9 @@ void libdraw_init(gamestate* const g) {
 
 void libdraw_draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) return;
+    const char* prompt = "[A] Next";
     const char* msg = g->msg_system.messages[g->msg_system.index];
+    Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
     int font_size = 30;
     int pad = 40; // Inner padding (text <-> box edges)
     //int margin = 50; // Outer margin (box <-> screen edges)
@@ -1062,16 +1066,12 @@ void libdraw_draw_message_box(gamestate* g) {
                      .width = text_size.x + pad * 2,
                      .height = text_size.y + pad * 2};
     // Draw box (semi-transparent black with white border)
-    //DrawRectangleRec(box, Fade(BLACK, 0.8f));
-    Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
-    //DrawRectangleRec(box, Fade((Color){0x66, 0x66, 0x66}, 0.6f));
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
     // Draw text (centered in box)
     DrawTextEx(GetFontDefault(), msg, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
     // Show "Next" prompt if more messages exist
     if (g->msg_system.count > 1) {
-        const char* prompt = "[A] Next";
         int prompt_font_size = 10;
         int prompt_offset = 10; // Offset from box edges
         //int prompt_width = MeasureText(prompt, 10);
