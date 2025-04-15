@@ -335,7 +335,7 @@ void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegro
         if (shield_id != ENTITYID_INVALID) {
             spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
             if (shield_sg) {
-                shield_sg->current = 1;
+                shield_sg->current = SG_ANIM_BUCKLER_FRONT;
                 //shield_sg->do_update = true;
                 //libdraw_update_sprite(g, shield_id);
             }
@@ -765,28 +765,45 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
         }
     }
 
-    //else {
-    //    merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current %d", sg->current);
-    //}
-    //else {
-    //    merror("libdraw_draw_sprite_and_shadow: shadow sprite not found at current+1: %d", sg->current + 1);
-    //}
-    // Draw sprite on top
-    DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
     // check for a shield
     entityid shield_id = e->shield;
     bool is_blocking = e->is_blocking;
-    //if (shield_id != -1 && is_blocking) {
+    spritegroup_t* shield_sg = NULL;
+    sprite* shield_front_s = NULL;
+    sprite* shield_back_s = NULL;
+
     if (shield_id != -1 && g->test_guard) {
-        spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+        shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
         if (shield_sg) {
-            sprite* shield_s = spritegroup_get(shield_sg, shield_sg->current);
-            if (shield_s) {
-                //Rectangle shield_dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-                DrawTexturePro(*shield_s->texture, shield_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
-            }
+            //shield_front_s = spritegroup_get(shield_sg, shield_sg->current);
+            shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
+            shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
+            //shield_back_s = spritegroup_get(shield_sg, shield_sg->current + 1);
         }
     }
+
+    if (shield_back_s) {
+        DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
+
+    // Draw sprite on top
+    DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
+
+    if (shield_front_s) {
+        DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
+
+    //if (shield_id != -1 && g->test_guard) {
+    //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+    //    if (shield_sg) {
+    //        sprite* shield_front_s = spritegroup_get(shield_sg, shield_sg->current);
+    //        if (shield_front_s) {
+    //Rectangle shield_dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
+    //DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    //        }
+    //    }
+    //}
+
     //}
     //spritegroup_t* shield_front_sg =
     //    hashtable_entityid_spritegroup_get_by_specifier(spritegroups, shield_id, SPECIFIER_SHIELD_GUARD_FRONT);
