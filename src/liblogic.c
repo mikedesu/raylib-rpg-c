@@ -284,10 +284,16 @@ static void liblogic_handle_attack_helper(gamestate* const g, tile_t* tile, enti
                         return;
                     }
                 } else {
-                    merror("Target is not a valid target");
+                    merror("Target is not a valid target: %s", entitytype_to_string(type));
                     return;
                 }
+            } else {
+                merror("liblogic_handle_attack_helper: target entity is NULL");
+                return;
             }
+        } else {
+            merror("liblogic_handle_attack_helper: target entity id is -1");
+            return;
         }
     }
 }
@@ -1255,11 +1261,13 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
     int hero_y = -1;
     int inventory_count = -1;
     entityid shield_id = -1;
+    direction_t player_dir = DIR_NONE;
     direction_t shield_dir = DIR_NONE;
     if (e) {
         hero_x = e->x;
         hero_y = e->y;
         inventory_count = e->inventory_count;
+        player_dir = e->direction;
         shield_id = e->shield;
         if (shield_id != -1) {
             entity* const shield = em_get(g->entitymap, shield_id);
@@ -1285,9 +1293,8 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Turn: %d | Hero: (%d,%d)\n"
              "Inventory: %d\n"
              "msg_history.count: %d\n"
-             "shield: %d\n"
-             "shield_dir: %d\n"
-             "shield_dir_str: %s\n",
+             "shield_dir_str: %s\n"
+             "player_dir_str: %s\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -1306,10 +1313,8 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
              hero_y,
              inventory_count,
              g->msg_history.count,
-             shield_id,
-             shield_dir,
-
-             get_dir_as_string(shield_dir));
+             get_dir_as_string(shield_dir),
+             get_dir_as_string(player_dir));
 }
 
 void liblogic_init(gamestate* const g) {
