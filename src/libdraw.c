@@ -199,9 +199,12 @@ void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegro
     if (e->race == RACE_HUMAN) {
         sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD;
         if (e->shield != ENTITYID_INVALID) {
-            spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
-            if (sg) {
-                sg->current = SG_ANIM_BUCKLER_FRONT;
+            spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
+            if (shield_sg) {
+                int player_ctx = sg->sprites[sg->current]->currentcontext;
+                spritegroup_setcontexts(shield_sg, player_ctx);
+
+                shield_sg->current = SG_ANIM_BUCKLER_FRONT;
             }
         }
     }
@@ -463,9 +466,7 @@ void libdraw_drawframe(gamestate* const g) {
     //libdraw_draw_msgbox_test(g, "Hello, world!\nLets fucking go!");
     if (g->debugpanelon) {
         // concat a string onto the end of the debug panel message
-
         char tmp[1024] = {0};
-
         entityid hero_id = g->hero_id;
         entity* e = em_get(g->entitymap, hero_id);
         massert(e, "libdraw_drawframe: entity is NULL");
@@ -475,15 +476,12 @@ void libdraw_drawframe(gamestate* const g) {
             if (sg) {
                 sprite* shield_s_front = spritegroup_get(sg, SG_ANIM_BUCKLER_FRONT);
                 sprite* shield_s_back = spritegroup_get(sg, SG_ANIM_BUCKLER_BACK);
-
                 int front_context = sprite_get_context(shield_s_front);
                 int back_context = sprite_get_context(shield_s_back);
-
                 snprintf(tmp, sizeof(tmp), "shield front back: %d %d\n", front_context, back_context);
                 strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
             }
         }
-
         libdraw_draw_debug_panel(g);
     }
     EndDrawing();
