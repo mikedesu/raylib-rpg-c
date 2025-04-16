@@ -412,13 +412,11 @@ static void liblogic_try_entity_attack_player(gamestate* const g, entity* const 
     massert(g, "liblogic_try_entity_attack_player: gamestate is NULL");
     entity* h = em_get(g->entitymap, g->hero_id);
     massert(h, "liblogic_try_entity_attack_player: hero is NULL");
-    //if (h) {
     int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
     int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
     if (dx != 0 || dy != 0) {
         liblogic_try_entity_attack(g, e->id, h->x, h->y);
     }
-    //}
 }
 
 static bool liblogic_entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
@@ -1303,9 +1301,9 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
     massert(g, "liblogic_update_debug_panel_buffer: gamestate is NULL");
     // Static buffers to avoid reallocating every frame
     static const char* control_modes[] = {"Player", "Camera", "Unknown"};
-    static const char* flag_names[] = {"GAMESTATE_FLAG_PLAYER_INPUT",
+    static const char* flag_names[] = {"GAMESTATE_FLAG_NONE",
+                                       "GAMESTATE_FLAG_PLAYER_INPUT",
                                        "GAMESTATE_FLAG_PLAYER_ANIM",
-                                       "GAMESTATE_FLAG_NONE",
                                        "GAMESTATE_FLAG_COUNT",
                                        "GAMESTATE_FLAG_NPC_TURN",
                                        "GAMESTATE_FLAG_NPC_ANIM",
@@ -1318,6 +1316,8 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
     entityid shield_id = -1;
     direction_t player_dir = DIR_NONE;
     direction_t shield_dir = DIR_NONE;
+    bool is_blocking = false;
+    bool test_guard = g->test_guard;
     if (e) {
         hero_x = e->x;
         hero_y = e->y;
@@ -1329,6 +1329,7 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
             massert(shield, "liblogic_update_debug_panel_buffer: shield is NULL");
             shield_dir = shield->direction;
         }
+        is_blocking = e->is_blocking;
     }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
@@ -1349,7 +1350,9 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "Inventory: %d\n"
              "msg_history.count: %d\n"
              "shield_dir_str: %s\n"
-             "player_dir_str: %s\n",
+             "player_dir_str: %s\n"
+             "is_blocking: %d\n"
+             "test_guard: %d\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -1369,7 +1372,9 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
              inventory_count,
              g->msg_history.count,
              get_dir_as_string(shield_dir),
-             get_dir_as_string(player_dir));
+             get_dir_as_string(player_dir),
+             is_blocking,
+             test_guard);
 }
 
 void liblogic_init(gamestate* const g) {

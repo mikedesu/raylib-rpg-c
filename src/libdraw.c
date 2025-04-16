@@ -151,16 +151,20 @@ static void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id
     spritegroup_t* shield_sg = NULL;
     sprite* shield_front_s = NULL;
     sprite* shield_back_s = NULL;
-    if (shield_id != -1 && g->test_guard) {
+
+    //if (shield_id != -1 && g->test_guard) {
+    if (shield_id != -1 && e->is_blocking) {
         shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
         if (shield_sg) {
             shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
             shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
         }
     }
+
     if (shield_back_s) {
         DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
+
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
     if (shield_front_s) {
@@ -302,6 +306,7 @@ static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, sp
         }
     }
     //e->is_blocking = false;
+    g->test_guard = false;
 }
 
 static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg) {
@@ -310,7 +315,8 @@ static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, sprite
     massert(sg, "libdraw_update_sprite_attack: spritegroup is NULL");
     if (e->is_attacking) {
         libdraw_set_sg_is_attacking(g, e, sg);
-    } else if (e->is_blocking) {
+        //} else if (e->is_blocking) {
+    } else if (g->test_guard) {
         libdraw_set_sg_is_blocking(g, e, sg);
     } else if (e->is_damaged) {
         libdraw_set_sg_is_damaged(g, e, sg);
