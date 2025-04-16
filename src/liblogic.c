@@ -1514,18 +1514,3 @@ void liblogic_close(gamestate* const g) {
     dungeon_destroy(g->dungeon);
     g->dungeon = NULL;
 }
-
-//static void liblogic_add_entityid(gamestate* const g, entityid id) {
-//    massert(g, "liblogic_add_entityid: gamestate is NULL");
-//    gamestate_add_entityid(g, id);
-//}
-
-//static void liblogic_try_entity_attack_in_facing_dir(gamestate* const g, entityid attacker_id) {
-//    massert(g, "liblogic_try_entity_attack_in_facing_dir: gamestate is NULL");
-//    massert(attacker_id != ENTITYID_INVALID, "liblogic_try_entity_attack_in_facing_dir: attacker_id is invalid");
-//    entity* const e = em_get(g->entitymap, attacker_id);
-//    massert(e, "liblogic_try_entity_attack_in_facing_dir: entity is NULL");
-//    int tx = e->x + get_x_from_dir(e->direction);
-//    int ty = e->y + get_y_from_dir(e->direction);
-//    liblogic_try_entity_attack(g, e->id, tx, ty);
-//}
