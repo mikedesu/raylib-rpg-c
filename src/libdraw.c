@@ -301,7 +301,7 @@ static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, sp
             }
         }
     }
-    e->is_blocking = false;
+    //e->is_blocking = false;
 }
 
 static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg) {
