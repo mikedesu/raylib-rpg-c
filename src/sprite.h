@@ -21,9 +21,7 @@ typedef struct sprite {
 sprite* sprite_create(Texture2D* t, int numcontexts, int numframes);
 
 void sprite_destroy(sprite* s);
-//void sprite_updatesrc(sprite* const s);
 void sprite_incrframe(sprite* const s);
-//void sprite_incrcontext(sprite* const s);
 void sprite_setcontext(sprite* const s, int context);
 void sprite_set_is_animating(sprite* const s, bool is_animating);
 
