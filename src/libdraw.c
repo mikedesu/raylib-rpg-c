@@ -25,8 +25,8 @@
 #define DEFAULT_WIN_WIDTH 1920
 #define DEFAULT_WIN_HEIGHT 1080
 #define SPRITEGROUP_DEFAULT_SIZE 32
-#define DEFAULT_ANIM_SPEED 4
-//#define DEFAULT_ANIM_SPEED 8
+//#define DEFAULT_ANIM_SPEED 4
+#define DEFAULT_ANIM_SPEED 8
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -559,7 +559,7 @@ void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
     // check for a shield
     entityid shield_id = e->shield;
-    bool is_blocking = e->is_blocking;
+    //bool is_blocking = e->is_blocking;
     spritegroup_t* shield_sg = NULL;
     sprite* shield_front_s = NULL;
     sprite* shield_back_s = NULL;
@@ -826,8 +826,8 @@ void libdraw_draw_hud(gamestate* const g) {
     }
     // Draw the HUD
     int fontsize = 20;
-    int pad = 10;
-    int pad2 = 20;
+    //int pad = 10;
+    //int pad2 = 20;
     int hp = -1;
     int maxhp = -1;
     int mp = -1;

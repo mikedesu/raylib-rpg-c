@@ -267,6 +267,27 @@ liblogic_handle_attack_success(gamestate* const g, entity* attacker, entity* tar
     }
 }
 
+static void
+liblogic_handle_attack_blocked(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
+    massert(g, "liblogic_handle_attack_blocked: gamestate is NULL");
+    massert(attacker, "liblogic_handle_attack_blocked: attacker entity is NULL");
+    massert(target, "liblogic_handle_attack_blocked: target entity is NULL");
+    massert(attack_successful, "liblogic_handle_attack_blocked: attack_successful is NULL");
+    msuccess("Successful Block from target: %s", target->name);
+    *attack_successful = false;
+
+    target->is_damaged = false;
+    target->do_update = true;
+    //int dmg = 1;
+    //entity_set_hp(target, entity_get_hp(target) - dmg); // Reduce HP by 1
+    if (target->type == ENTITY_PLAYER) {
+        liblogic_add_message(g, "You blocked the attack!");
+    }
+    //if (entity_get_hp(target) <= 0) {
+    //    target->is_dead = true;
+    //}
+}
+
 static inline bool liblogic_handle_attack_helper_innerloop(gamestate* const g,
                                                            tile_t* tile,
                                                            int i,
@@ -287,6 +308,13 @@ static inline bool liblogic_handle_attack_helper_innerloop(gamestate* const g,
             if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
                 msuccess("Attacking target: %s", target->name);
                 if (!target->is_dead) {
+                    if (target->is_blocking) {
+                        msuccess("Block successful");
+                        liblogic_handle_attack_blocked(g, attacker, target, attack_successful);
+                        return false;
+                    }
+
+                    msuccess("Attack successful");
                     liblogic_handle_attack_success(g, attacker, target, attack_successful);
                     return true;
                 } else {
@@ -1358,7 +1386,7 @@ void liblogic_init(gamestate* const g) {
     // test to create a weapon
     liblogic_init_weapon_test(g);
     // temporarily disabling
-    //liblogic_init_orcs_test(g);
+    liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
 }
 
@@ -1382,6 +1410,10 @@ static void liblogic_update_player_state(gamestate* const g) {
         merror("Hero is dead!");
         return;
     }
+
+    //if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+    //    e->is_blocking = false;
+    //}
 }
 
 static void liblogic_update_npc_state(gamestate* const g, entityid id) {
@@ -1443,6 +1475,17 @@ static void liblogic_handle_npcs(gamestate* const g) {
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }
 
+static void liblogic_reset_player_blocking(gamestate* const g) {
+    massert(g, "Game state is NULL!");
+    entity* const e = em_get(g->entitymap, g->hero_id);
+    if (!e) {
+        merror("Failed to get hero entity");
+        return;
+    }
+    e->is_blocking = false;
+    g->test_guard = false;
+}
+
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
@@ -1451,6 +1494,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     liblogic_handle_input(is, g);
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
         liblogic_handle_npcs(g);
+        liblogic_reset_player_blocking(g);
     }
     liblogic_update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
@@ -1471,18 +1515,17 @@ void liblogic_close(gamestate* const g) {
     g->dungeon = NULL;
 }
 
-static void liblogic_add_entityid(gamestate* const g, entityid id) {
-    massert(g, "liblogic_add_entityid: gamestate is NULL");
-    gamestate_add_entityid(g, id);
-}
+//static void liblogic_add_entityid(gamestate* const g, entityid id) {
+//    massert(g, "liblogic_add_entityid: gamestate is NULL");
+//    gamestate_add_entityid(g, id);
+//}
 
-static void liblogic_try_entity_attack_in_facing_dir(gamestate* const g, entityid attacker_id) {
-    massert(g, "liblogic_try_entity_attack_in_facing_dir: gamestate is NULL");
-    massert(attacker_id != ENTITYID_INVALID, "liblogic_try_entity_attack_in_facing_dir: attacker_id is invalid");
-    entity* const e = em_get(g->entitymap, attacker_id);
-    massert(e, "liblogic_try_entity_attack_in_facing_dir: entity is NULL");
-    int tx = e->x + get_x_from_dir(e->direction);
-    int ty = e->y + get_y_from_dir(e->direction);
-    // if tx = 0 and ty = 0, then we attack ourselves
-    liblogic_try_entity_attack(g, e->id, tx, ty);
-}
+//static void liblogic_try_entity_attack_in_facing_dir(gamestate* const g, entityid attacker_id) {
+//    massert(g, "liblogic_try_entity_attack_in_facing_dir: gamestate is NULL");
+//    massert(attacker_id != ENTITYID_INVALID, "liblogic_try_entity_attack_in_facing_dir: attacker_id is invalid");
+//    entity* const e = em_get(g->entitymap, attacker_id);
+//    massert(e, "liblogic_try_entity_attack_in_facing_dir: entity is NULL");
+//    int tx = e->x + get_x_from_dir(e->direction);
+//    int ty = e->y + get_y_from_dir(e->direction);
+//    liblogic_try_entity_attack(g, e->id, tx, ty);
+//}
