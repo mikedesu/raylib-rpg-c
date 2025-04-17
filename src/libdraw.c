@@ -43,6 +43,8 @@ Vector2 zero_vec = {0, 0};
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
+static inline void draw_hud(gamestate* const g);
+
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
     if (!g || !df) {
         merror("libdraw_draw_dungeon_floor_tile: gamestate or dungeon_floor is NULL");
@@ -227,7 +229,7 @@ void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
 
 bool libdraw_windowshouldclose() { return WindowShouldClose(); }
 
-static void libdraw_load_shaders() {
+static void load_shaders() {
     //shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
     //shader_tile_glow = LoadShader(0, "glow.frag");
     //shader_tile_glow = LoadShader(0, "psychedelic_ripple.frag");
@@ -587,6 +589,42 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     EndMode2D();
 }
 
+static void draw_message_box(gamestate* g) {
+    if (!g->msg_system.is_active || g->msg_system.count == 0) {
+        return;
+    }
+    const char* prompt = "[A] Next";
+    const char* msg = g->msg_system.messages[g->msg_system.index];
+    const Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
+    const int font_size = 30;
+    const int pad = 40; // Inner padding (text <-> box edges)
+    const float line_spacing = 1.0f;
+    // Measure text (split into lines if needed)
+    const Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, font_size, line_spacing);
+    // Calculate centered box position
+    const Rectangle box = {.x = (g->windowwidth - text_size.x) / 2 - pad, // Center X
+                           .y = (g->windowheight - text_size.y) / 2 - pad, // Center Y
+                           .width = text_size.x + pad * 2,
+                           .height = text_size.y + pad * 2};
+    // Draw box (semi-transparent black with white border)
+    DrawRectangleRec(box, message_bg);
+    DrawRectangleLinesEx(box, 2, WHITE);
+    // Draw text (centered in box)
+    DrawTextEx(GetFontDefault(), msg, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
+    // Show "Next" prompt if more messages exist
+    if (g->msg_system.count > 1) {
+        int prompt_font_size = 10;
+        int prompt_offset = 10; // Offset from box edges
+        //int prompt_width = MeasureText(prompt, 10);
+        Vector2 prompt_size = MeasureTextEx(GetFontDefault(), prompt, prompt_font_size, 1.0f);
+        DrawText(prompt,
+                 box.x + box.width - prompt_size.x - prompt_offset, // Right-align in box
+                 box.y + box.height - prompt_size.y - prompt_offset, // Bottom of box
+                 prompt_font_size,
+                 WHITE);
+    }
+}
+
 void libdraw_drawframe(gamestate* const g) {
     double start_time = GetTime();
     BeginDrawing();
@@ -599,10 +637,9 @@ void libdraw_drawframe(gamestate* const g) {
     //SetShaderValue(shader_grayscale, GetShaderLocation(shader_grayscale, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    libdraw_draw_message_box(g);
+    draw_message_box(g);
     libdraw_draw_message_history_placeholder(g);
-    libdraw_draw_hud(g);
-    //libdraw_draw_msgbox_test(g, "Hello, world!\nLets fucking go!");
+    draw_hud(g);
     if (g->debugpanelon) {
         // concat a string onto the end of the debug panel message
         char tmp[1024] = {0};
@@ -668,24 +705,24 @@ void libdraw_close() {
     CloseWindow();
 }
 
-static bool libdraw_load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path) {
+static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path) {
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
-        merror("libdraw_load_texture: txkey out of bounds");
+        merror("load_texture: txkey out of bounds");
         return false;
     } else if (ctxs < 0) {
-        merror("libdraw_load_texture: contexts out of bounds");
+        merror("load_texture: contexts out of bounds");
         return false;
     } else if (frames < 0) {
-        merror("libdraw_load_texture: frames out of bounds");
+        merror("load_texture: frames out of bounds");
         return false;
     } else if (txinfo[txkey].texture.id > 0) {
-        merror("libdraw_load_texture: texture already loaded");
+        merror("load_texture: texture already loaded");
         return false;
     } else if (strlen(path) == 0) {
-        merror("libdraw_load_texture: path is empty");
+        merror("load_texture: path is empty");
         return false;
     } else if (strcmp(path, "\n") == 0) {
-        merror("libdraw_load_texture: path is newline");
+        merror("load_texture: path is newline");
         return false;
     }
     Image image = LoadImage(path);
@@ -697,15 +734,15 @@ static bool libdraw_load_texture(int txkey, int ctxs, int frames, bool do_dither
     txinfo[txkey].texture = texture;
     txinfo[txkey].contexts = ctxs;
     txinfo[txkey].num_frames = frames;
-    msuccess("libdraw_load_texture: texture loaded successfully");
+    msuccess("load_texture: texture loaded successfully");
     return true;
 }
 
-static void libdraw_load_textures() {
+static void load_textures() {
     const char* textures_file = "textures.txt";
     FILE* file = fopen(textures_file, "r");
     if (!file) {
-        merror("libdraw_load_textures: textures.txt not found");
+        merror("load_textures: textures.txt not found");
         return;
     }
     char line[1024] = {0};
@@ -722,34 +759,34 @@ static void libdraw_load_textures() {
             merror("libdraw_load_textures: invalid line in textures.txt");
             continue;
         }
-        libdraw_load_texture(txkey, contexts, frames, do_dither, path);
+        load_texture(txkey, contexts, frames, do_dither, path);
     }
     fclose(file);
 }
 
-static void libdraw_create_spritegroup(gamestate* const g,
-                                       entityid id,
-                                       int* keys,
-                                       int num_keys,
-                                       int offset_x,
-                                       int offset_y,
-                                       specifier_t spec) {
-    minfo("libdraw_create_spritegroup");
+static void create_spritegroup(gamestate* const g,
+                               entityid id,
+                               int* keys,
+                               int num_keys,
+                               int offset_x,
+                               int offset_y,
+                               specifier_t spec) {
+    minfo("create_spritegroup");
     if (!g) {
-        merror("libdraw_create_spritegroup: gamestate is NULL");
+        merror("create_spritegroup: gamestate is NULL");
         return;
     }
     msuccess("g was not NULL");
     // can hold up to 32 sprites
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
     if (!group) {
-        merror("libdraw_create_spritegroup: failed to create spritegroup");
+        merror("create_spritegroup: failed to create spritegroup");
         return;
     }
     msuccess("group was not NULL");
     const entity* const e = em_get(g->entitymap, id);
     if (!e) {
-        merror("libdraw_create_spritegroup: entity not found %d", id);
+        merror("create_spritegroup: entity not found %d", id);
         spritegroup_destroy(group);
         return;
     }
@@ -757,18 +794,18 @@ static void libdraw_create_spritegroup(gamestate* const g,
     //disabling this check until dungeon_floor created
     dungeon_floor_t* df = dungeon_get_current_floor(g->dungeon);
     if (!df) {
-        merror("libdraw_create_spritegroup: dungeon_floor is NULL");
+        merror("create_spritegroup: dungeon_floor is NULL");
         spritegroup_destroy(group);
         return;
     }
     const int df_w = df->width;
     const int df_h = df->height;
     if (e->x < 0 || e->x >= df_w || e->y < 0 || e->y >= df_h) {
-        merror("libdraw_create_spritegroup: entity pos out of bounds %d %d", e->x, e->y);
+        merror("create_spritegroup: entity pos out of bounds %d %d", e->x, e->y);
         spritegroup_destroy(group);
         return;
     }
-    minfo("libdraw_create_spritegroup: creating spritegroup for entityid %d", id);
+    minfo("create_spritegroup: creating spritegroup for entityid %d", id);
     for (int i = 0; i < num_keys; i++) {
         const int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
@@ -779,7 +816,7 @@ static void libdraw_create_spritegroup(gamestate* const g,
     group->id = id;
     sprite* s = spritegroup_get(group, 0);
     if (!s) {
-        merror("libdraw_create_spritegroup: sprite is NULL");
+        merror("create_spritegroup: sprite is NULL");
         spritegroup_destroy(group);
         return;
     }
@@ -794,9 +831,9 @@ static void libdraw_create_spritegroup(gamestate* const g,
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
 }
 
-static void libdraw_calc_debugpanel_size(gamestate* const g) {
+static void calc_debugpanel_size(gamestate* const g) {
     if (!g) {
-        merror("libdraw_calc_debugpanel_size: gamestate is NULL");
+        merror("calc_debugpanel_size: gamestate is NULL");
         return;
     }
     Vector2 s = MeasureTextEx(GetFontDefault(), g->debugpanel.buffer, g->debugpanel.font_size, 1);
@@ -805,9 +842,9 @@ static void libdraw_calc_debugpanel_size(gamestate* const g) {
     g->debugpanel.h = s.y;
 }
 
-static void libdraw_create_sg_byid(gamestate* const g, entityid id) {
+static void create_sg_byid(gamestate* const g, entityid id) {
     if (!g) {
-        merror("libdraw_create_sg_byid: gamestate is NULL");
+        merror("create_sg_byid: gamestate is NULL");
         return;
     }
     entity* const e = em_get(g->entitymap, id);
@@ -833,22 +870,22 @@ static void libdraw_create_sg_byid(gamestate* const g, entityid id) {
             merror("libdraw_create_sg_byid: unknown race %d", e->race);
             return;
         }
-        libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     } else if (e->type == ENTITY_WEAPON) {
         // for now we only have 1 sprite for weapons
         keys = TX_LONG_SWORD_KEYS;
         num_keys = TX_LONG_SWORD_KEY_COUNT;
-        libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     } else if (e->type == ENTITY_SHIELD) {
         keys = TX_BUCKLER_KEYS;
         num_keys = TX_BUCKLER_KEY_COUNT;
-        libdraw_create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     }
 }
 
-void libdraw_draw_hud(gamestate* const g) {
+static inline void draw_hud(gamestate* const g) {
     if (!g) {
-        merror("libdraw_draw_hud: gamestate is NULL");
+        merror("draw_hud: gamestate is NULL");
         return;
     }
     // Draw the HUD
@@ -898,28 +935,28 @@ void libdraw_draw_hud(gamestate* const g) {
     DrawText(buffer, box_x + padding, box_y + padding, fontsize, fg);
 }
 
-void libdraw_draw_msgbox_test(gamestate* const g, const char* s) {
-    if (!g) {
-        merror("libdraw_draw_msgbox_test: gamestate is NULL");
-        return;
-    }
-    const int fontsize = 20, f_offset = 30;
-    const Vector2 size = MeasureTextEx(GetFontDefault(), s, fontsize + f_offset, 1);
-    const int w = size.x;
-    const int h = size.y;
-    const int pad = 10;
-    const int pad2 = 20;
-    const int x = g->windowwidth / 4 - w / 2;
-    const int y = 0 + pad;
-    const int x2 = x + pad2;
-    const int y2 = y + pad2;
-    const Color bg = (Color){0x33, 0x33, 0x33, 0xff};
-    const Color fg = WHITE;
-    // we need to calculate x and y based on the w and h
-    DrawRectangle(x + pad, y + pad, w, h, bg);
-    // we need to calculate an x and y for the text based on size2 and a padding
-    DrawText(s, x2, y2, fontsize, fg);
-}
+//void draw_msgbox_test(gamestate* const g, const char* s) {
+//    if (!g) {
+//        merror("libdraw_draw_msgbox_test: gamestate is NULL");
+//        return;
+//    }
+//    const int fontsize = 20, f_offset = 30;
+//    const Vector2 size = MeasureTextEx(GetFontDefault(), s, fontsize + f_offset, 1);
+//    const int w = size.x;
+//    const int h = size.y;
+//    const int pad = 10;
+//    const int pad2 = 20;
+//    const int x = g->windowwidth / 4 - w / 2;
+//    const int y = 0 + pad;
+//    const int x2 = x + pad2;
+//    const int y2 = y + pad2;
+//    const Color bg = (Color){0x33, 0x33, 0x33, 0xff};
+//    const Color fg = WHITE;
+//    // we need to calculate x and y based on the w and h
+//    DrawRectangle(x + pad, y + pad, w, h, bg);
+//    // we need to calculate an x and y for the text based on size2 and a padding
+//    DrawText(s, x2, y2, fontsize, fg);
+//}
 
 void libdraw_init(gamestate* const g) {
     if (!g) {
@@ -939,53 +976,15 @@ void libdraw_init(gamestate* const g) {
     target_src = (Rectangle){0, 0, w, -h};
     target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
-    libdraw_load_textures();
+    load_textures();
     for (int i = 0; i < g->index_entityids; i++) {
-        libdraw_create_sg_byid(g, g->entityids[i]);
+        create_sg_byid(g, g->entityids[i]);
     }
-    libdraw_calc_debugpanel_size(g);
-    libdraw_load_shaders();
+    calc_debugpanel_size(g);
+    load_shaders();
     g->cam2d.offset = (Vector2){x, y};
-
     gamestate_set_debug_panel_pos_top_right(g);
-
     msuccess("libdraw_init");
-}
-
-void libdraw_draw_message_box(gamestate* g) {
-    if (!g->msg_system.is_active || g->msg_system.count == 0) {
-        return;
-    }
-    const char* prompt = "[A] Next";
-    const char* msg = g->msg_system.messages[g->msg_system.index];
-    const Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
-    const int font_size = 30;
-    const int pad = 40; // Inner padding (text <-> box edges)
-    const float line_spacing = 1.0f;
-    // Measure text (split into lines if needed)
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, font_size, line_spacing);
-    // Calculate centered box position
-    const Rectangle box = {.x = (g->windowwidth - text_size.x) / 2 - pad, // Center X
-                           .y = (g->windowheight - text_size.y) / 2 - pad, // Center Y
-                           .width = text_size.x + pad * 2,
-                           .height = text_size.y + pad * 2};
-    // Draw box (semi-transparent black with white border)
-    DrawRectangleRec(box, message_bg);
-    DrawRectangleLinesEx(box, 2, WHITE);
-    // Draw text (centered in box)
-    DrawTextEx(GetFontDefault(), msg, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
-    // Show "Next" prompt if more messages exist
-    if (g->msg_system.count > 1) {
-        int prompt_font_size = 10;
-        int prompt_offset = 10; // Offset from box edges
-        //int prompt_width = MeasureText(prompt, 10);
-        Vector2 prompt_size = MeasureTextEx(GetFontDefault(), prompt, prompt_font_size, 1.0f);
-        DrawText(prompt,
-                 box.x + box.width - prompt_size.x - prompt_offset, // Right-align in box
-                 box.y + box.height - prompt_size.y - prompt_offset, // Bottom of box
-                 prompt_font_size,
-                 WHITE);
-    }
 }
 
 void libdraw_draw_message_history_placeholder(gamestate* const g) {
