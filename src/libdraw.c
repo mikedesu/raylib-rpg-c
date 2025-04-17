@@ -43,7 +43,7 @@ Vector2 zero_vec = {0, 0};
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
-static bool libdraw_draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
+static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
     if (!g || !df) {
         merror("libdraw_draw_dungeon_floor_tile: gamestate or dungeon_floor is NULL");
         return false;
@@ -115,28 +115,28 @@ static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
             if (df_tile_is_wall(df, x, y)) {
                 continue;
             }
-            libdraw_draw_dungeon_floor_tile(g, df, x, y);
+            draw_dungeon_floor_tile(g, df, x, y);
         }
     }
     return true;
 }
 
-static void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id) {
-    massert(g, "libdraw_draw_sprite_and_shadow: gamestate is NULL");
-    massert(id != -1, "libdraw_draw_sprite_and_shadow: id is -1");
+static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
+    massert(g, "draw_sprite_and_shadow: gamestate is NULL");
+    massert(id != -1, "draw_sprite_and_shadow: id is -1");
     entity* e = em_get(g->entitymap, id);
     if (!e) {
-        merror("libdraw_draw_sprite_and_shadow: entity not found: id %d", id);
+        merror("draw_sprite_and_shadow: entity not found: id %d", id);
         return;
     }
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (!sg) {
-        merror("libdraw_draw_sprite_and_shadow: spritegroup not found: id %d", id);
+        merror("draw_sprite_and_shadow: spritegroup not found: id %d", id);
         return;
     }
     sprite* s = spritegroup_get(sg, sg->current);
     if (!s) {
-        merror("libdraw_draw_sprite_and_shadow: sprite not found at current %d", sg->current);
+        merror("draw_sprite_and_shadow: sprite not found at current %d", sg->current);
         return;
     }
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
@@ -168,11 +168,11 @@ static void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id
 
             //} else {
 
-            //shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
-            //shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
+            shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
+            shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
 
-            shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
-            shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
+            //shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+            //shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
             //}
         }
     }
@@ -199,7 +199,7 @@ static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead)
                 entityid id = tile_get_entity(tile, i);
                 entity* e = em_get(g->entitymap, id);
                 if (e && e->is_dead == dead) {
-                    libdraw_draw_sprite_and_shadow(g, id);
+                    draw_sprite_and_shadow(g, id);
                 }
             }
         }
@@ -217,7 +217,7 @@ static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
             if (!dungeon_tile_is_wall(tile->type)) {
                 continue;
             }
-            libdraw_draw_dungeon_floor_tile(g, df, x, y);
+            draw_dungeon_floor_tile(g, df, x, y);
         }
     }
     return true;

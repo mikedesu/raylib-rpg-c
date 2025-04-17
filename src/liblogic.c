@@ -335,7 +335,7 @@ static inline bool liblogic_handle_attack_helper_innerloop(gamestate* const g,
             return false;
         }
     } else {
-        merror("liblogic_handle_attack_helper: target entity id is -1");
+        //merror("liblogic_handle_attack_helper: target entity id is -1");
         return false;
     }
 
@@ -1582,7 +1582,8 @@ static void liblogic_handle_nth_npc(gamestate* const g, int i) {
 
 static void liblogic_handle_npcs(gamestate* const g) {
     massert(g, "Game state is NULL!");
-    if (g->flag != GAMESTATE_FLAG_NPC_TURN) return;
+    massert(g->flag == GAMESTATE_FLAG_NPC_TURN, "Game state is not in NPC turn!");
+    //if (g->flag != GAMESTATE_FLAG_NPC_TURN) return;
     // Process all NPCs
     for (int i = 0; i < g->index_entityids; i++) {
         liblogic_handle_nth_npc(g, i);
@@ -1622,7 +1623,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
 
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
         //liblogic_handle_input_player(is, g);
-        liblogic_reset_player_blocking(g);
+        liblogic_reset_player_block_success(g);
     }
 
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
