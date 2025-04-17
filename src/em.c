@@ -13,8 +13,32 @@ em_t* em_new() {
     return em;
 }
 
+//bool em_free(em_t* em) {
+//    if (!em) {
+//        merror("em_free: em is NULL");
+//        return false;
+//    }
+//
+//    minfo("Freeing entity map");
+//    for (int i = 0; i < EM_MAX_SLOTS; i++) {
+//        entity_t* current = em->entities[i];
+//        if (!current) continue; // Skip empty slots
+//
+//        minfo("Freeing slot %d", i);
+//        while (current != NULL) {
+//            entity_t* next = current->next; // Save next before freeing
+//            free(current);
+//            current = next;
+//        }
+//        em->entities[i] = NULL; // Clear the slot
+//    }
+//
+//    free(em);
+//    msuccess("Freed entity map");
+//    return true;
+//}
+
 bool em_free(em_t* em) {
-    //massert(em, "em_free: em is NULL");
     if (!em) {
         merror("em_free: em is NULL");
         return false;
@@ -23,9 +47,15 @@ bool em_free(em_t* em) {
     for (int i = 0; i < EM_MAX_SLOTS; i++) {
         //minfo("Freeing slot %d", i);
         entity_t* current = em->entities[i];
+        //minfo("1");
+        //massert(current, "em_free: current is NULL");
         while (current != NULL) {
+            //minfo("2");
             entity_t* next = current->next;
+            current->next = NULL; // Clear the next pointer
+            //minfo("5");
             free(current);
+            //minfo("6");
             current = next;
         }
     }

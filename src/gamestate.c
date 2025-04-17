@@ -153,7 +153,9 @@ void gamestatefree(gamestate* g) {
     //free(g->timebegantm);
     //free(g->currenttimetm);
     minfo("Freeing dungeon");
-    if (g->dungeon) dungeon_destroy(g->dungeon);
+    //if (g->dungeon) dungeon_destroy(g->dungeon);
+    dungeon_destroy(g->dungeon);
+
     // free message history
     //for (int i = 0; i < g->msg_history.max_count; i++) {
     //    if (g->msg_history.messages[i]) {

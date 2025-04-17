@@ -29,6 +29,7 @@ entity_t* entity_new(entityid id, entitytype_t type) {
     e->sprite_move_x = 0;
     e->sprite_move_y = 0;
     e->inventory_count = 0;
+    e->next = NULL;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
     return e;

@@ -560,6 +560,7 @@ static void liblogic_execute_action(gamestate* const g, entity* const e, entity_
 }
 
 static entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl, const char* name) {
+    // ... (existing validation checks) ...
     massert(g, "liblogic_weapon_create: gamestate is NULL");
     em_t* em = gamestate_get_entitymap(g);
     massert(em, "liblogic_weapon_create: entitymap is NULL");
@@ -572,7 +573,6 @@ static entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl,
     massert(x < df->width, "liblogic_weapon_create: x is out of bounds");
     massert(y >= 0, "liblogic_weapon_create: y is out of bounds");
     massert(y < df->height, "liblogic_weapon_create: y is out of bounds");
-    // can we create an entity at this location? no entities can be made on wall-types etc
     tile_t* const tile = dungeon_floor_tile_at(df, x, y);
     massert(tile, "liblogic_weapon_create: failed to get tile");
     if (!dungeon_tile_is_walkable(tile->type)) {
@@ -588,16 +588,57 @@ static entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl,
         merror("liblogic_weapon_create: failed to create entity");
         return -1;
     }
-    em_add(em, e);
-    gamestate_add_entityid(g, e->id);
-    //dungeon_floor_add_at(df, e->id, x, y);
+
+    // FIRST try to add to dungeon floor
     if (!dungeon_floor_add_at(df, e->id, x, y)) {
         merror("liblogic_weapon_create: failed to add entity to dungeon floor");
-        entity_free(e);
+        entity_free(e); // Free immediately since EM doesn't own it yet
         return -1;
     }
+
+    // ONLY add to EM after dungeon placement succeeds
+    em_add(gamestate_get_entitymap(g), e);
+    gamestate_add_entityid(g, e->id);
+
     return e->id;
 }
+
+//static entityid liblogic_weapon_create(gamestate* const g, int x, int y, int fl, const char* name) {
+//    massert(g, "liblogic_weapon_create: gamestate is NULL");
+//    em_t* em = gamestate_get_entitymap(g);
+//    massert(em, "liblogic_weapon_create: entitymap is NULL");
+//    massert(name && name[0], "liblogic_weapon_create: name is NULL or empty");
+//    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+//    massert(df, "liblogic_weapon_create: failed to get current dungeon floor");
+//    massert(x >= 0, "liblogic_weapon_create: x is out of bounds");
+//    massert(x < df->width, "liblogic_weapon_create: x is out of bounds");
+//    massert(y >= 0, "liblogic_weapon_create: y is out of bounds");
+//    massert(y < df->height, "liblogic_weapon_create: y is out of bounds");
+//    tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+//    massert(tile, "liblogic_weapon_create: failed to get tile");
+//    if (!dungeon_tile_is_walkable(tile->type)) {
+//        merror("liblogic_weapon_create: cannot create entity on wall");
+//        return -1;
+//    }
+//    if (tile_has_live_npcs(tile, em)) {
+//        merror("liblogic_weapon_create: cannot create entity on tile with NPC");
+//        return -1;
+//    }
+//    entity* const e = entity_new_weapon_at(next_entityid++, x, y, fl, name);
+//    if (!e) {
+//        merror("liblogic_weapon_create: failed to create entity");
+//        return -1;
+//    }
+//    em_add(em, e);
+//    gamestate_add_entityid(g, e->id);
+//    //dungeon_floor_add_at(df, e->id, x, y);
+//    if (!dungeon_floor_add_at(df, e->id, x, y)) {
+//        merror("liblogic_weapon_create: failed to add entity to dungeon floor");
+//        entity_free(e);
+//        return -1;
+//    }
+//    return e->id;
+//}
 
 static entityid liblogic_shield_create(gamestate* const g, int x, int y, int fl, const char* name) {
     massert(g, "liblogic_shield_create: gamestate is NULL");
@@ -650,9 +691,10 @@ static void liblogic_init_weapon_test(gamestate* const g) {
     massert(player, "liblogic_init_weapon_test: player is NULL");
     int x = player->x;
     int y = player->y;
-    // place the sword somewhere around the player
-    // place the shield somewhere around the player
     bool found = false;
+
+    // place the shield somewhere around the player
+    found = false;
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
             if (found) {
@@ -683,38 +725,40 @@ static void liblogic_init_weapon_test(gamestate* const g) {
             break;
         }
     }
-    found = false;
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
-            if (found) {
-                break;
-            }
-            if (i == 0 && j == 0) {
-                continue;
-            }
-            int new_x = x + i;
-            int new_y = y + j;
-            tile_t* const tile = dungeon_floor_tile_at(df, new_x, new_y);
-            if (tile_entity_count(tile) > 0) {
-                continue;
-            }
-            // check if the tile is walkable
-            if (!dungeon_tile_is_walkable(tile->type)) {
-                continue;
-            }
-            // create the shield
-            //        entityid shield_id = liblogic_shield_create(g, x - 1, y, 0, "shield");
-            entityid sword_id = liblogic_weapon_create(g, new_x, new_y, 0, "sword");
-            massert(sword_id != -1, "liblogic_init_weapon_test: failed to create weapon");
-            //        massert(shield_id != -1, "liblogic_init_weapon_test: failed to create shield");
-            entity* const sword = em_get(g->entitymap, sword_id);
-            massert(sword, "liblogic_init_weapon_test: sword is NULL");
-            found = true;
-        }
-        if (found) {
-            break;
-        }
-    }
+
+    // place the sword somewhere around the player
+    //found = false;
+    //for (int i = -1; i <= 1; i++) {
+    //    for (int j = -1; j <= 1; j++) {
+    //        if (found) {
+    //            break;
+    //        }
+    //        if (i == 0 && j == 0) {
+    //            continue;
+    //        }
+    //        int new_x = x + i;
+    //        int new_y = y + j;
+    //        tile_t* const tile = dungeon_floor_tile_at(df, new_x, new_y);
+    //        if (tile_entity_count(tile) > 0) {
+    //            continue;
+    //        }
+    //        // check if the tile is walkable
+    //        if (!dungeon_tile_is_walkable(tile->type)) {
+    //            continue;
+    //        }
+    //        // create the shield
+    //        //        entityid shield_id = liblogic_shield_create(g, x - 1, y, 0, "shield");
+    //        entityid sword_id = liblogic_weapon_create(g, new_x, new_y, 0, "sword");
+    //        massert(sword_id != -1, "liblogic_init_weapon_test: failed to create weapon");
+    //        //        massert(shield_id != -1, "liblogic_init_weapon_test: failed to create shield");
+    //        entity* const sword = em_get(g->entitymap, sword_id);
+    //        massert(sword, "liblogic_init_weapon_test: sword is NULL");
+    //        found = true;
+    //    }
+    //    if (found) {
+    //        break;
+    //    }
+    //}
 }
 
 static void liblogic_init_dungeon(gamestate* const g) {
@@ -1386,9 +1430,9 @@ void liblogic_init(gamestate* const g) {
     liblogic_init_em(g);
     liblogic_init_player(g);
     // test to create a weapon
-    liblogic_init_weapon_test(g);
+    //liblogic_init_weapon_test(g);
     // temporarily disabling
-    liblogic_init_orcs_test(g);
+    //liblogic_init_orcs_test(g);
     liblogic_update_debug_panel_buffer(g);
 }
 
@@ -1503,13 +1547,18 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
 
 void liblogic_close(gamestate* const g) {
     massert(g, "liblogic_close: gamestate is NULL");
-    massert(g->entitymap, "liblogic_close: entitymap is NULL");
-    em_free(g->entitymap);
-    g->entitymap = NULL;
-    if (!g->dungeon) {
-        merror("Dungeon is NULL!");
-        return;
-    }
-    dungeon_destroy(g->dungeon);
-    g->dungeon = NULL;
+    //massert(g->entitymap, "liblogic_close: entitymap is NULL");
+
+    //minfo("liblogic_close: calling em_free...");
+    //em_free(g->entitymap);
+    //msuccess("liblogic_close: em_free done");
+
+    //g->entitymap = NULL;
+
+    //if (!g->dungeon) {
+    //    merror("Dungeon is NULL!");
+    //    return;
+    //}
+    //dungeon_destroy(g->dungeon);
+    //g->dungeon = NULL;
 }

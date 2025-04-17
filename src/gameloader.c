@@ -45,7 +45,9 @@ void checksymbol(void* symbol, const char* name) {
 
 long getlastwritetime(const char* filename) {
     struct stat file_stat;
-    if (stat(filename, &file_stat) == 0) { return file_stat.st_mtime; }
+    if (stat(filename, &file_stat) == 0) {
+        return file_stat.st_mtime;
+    }
     return 0;
 }
 
@@ -141,8 +143,22 @@ void gamerun() {
     }
 
     mylibdraw_close();
+
+    msuccess("libdraw closed");
+
     myliblogic_close(g);
+
+    msuccess("liblogic closed");
+
     dlclose(draw_handle);
+
+    msuccess("dlclose libdraw");
+
     dlclose(logic_handle);
+
+    msuccess("dlclose liblogic");
+
     gamestatefree(g);
+
+    msuccess("gamestate freed");
 }
