@@ -275,17 +275,12 @@ liblogic_handle_attack_blocked(gamestate* const g, entity* attacker, entity* tar
     massert(attack_successful, "liblogic_handle_attack_blocked: attack_successful is NULL");
     msuccess("Successful Block from target: %s", target->name);
     *attack_successful = false;
-
     target->is_damaged = false;
+    target->block_success = true;
     target->do_update = true;
-    //int dmg = 1;
-    //entity_set_hp(target, entity_get_hp(target) - dmg); // Reduce HP by 1
     if (target->type == ENTITY_PLAYER) {
         liblogic_add_message(g, "You blocked the attack!");
     }
-    //if (entity_get_hp(target) <= 0) {
-    //    target->is_dead = true;
-    //}
 }
 
 static inline bool liblogic_handle_attack_helper_innerloop(gamestate* const g,
@@ -1352,7 +1347,8 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
              "shield_dir_str: %s\n"
              "player_dir_str: %s\n"
              "is_blocking: %d\n"
-             "test_guard: %d\n",
+             "test_guard: %d\n"
+             "block_success: %d\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -1374,7 +1370,8 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
              get_dir_as_string(shield_dir),
              get_dir_as_string(player_dir),
              is_blocking,
-             test_guard);
+             test_guard,
+             e->block_success);
 }
 
 void liblogic_init(gamestate* const g) {
@@ -1415,10 +1412,6 @@ static void liblogic_update_player_state(gamestate* const g) {
         merror("Hero is dead!");
         return;
     }
-
-    //if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-    //    e->is_blocking = false;
-    //}
 }
 
 static void liblogic_update_npc_state(gamestate* const g, entityid id) {
@@ -1488,6 +1481,7 @@ static void liblogic_reset_player_blocking(gamestate* const g) {
         return;
     }
     e->is_blocking = false;
+    e->block_success = false;
     g->test_guard = false;
 }
 

@@ -11,7 +11,12 @@ spritegroup_t* spritegroup_create(int capacity) {
         merror("spritegroup_create: failed to allocate memory for spritegroup_t");
         return NULL;
     }
-    sg->current = sg->size = sg->off_x = sg->off_y = sg->default_anim = sg->id = 0;
+    sg->current = 0;
+    sg->size = 0;
+    sg->off_x = 0;
+    sg->off_y = 0;
+    sg->default_anim = 0;
+    sg->id = 0;
     sg->capacity = capacity;
     sg->sprites = malloc(sizeof(sprite*) * capacity);
     if (!sg->sprites) {
@@ -22,6 +27,7 @@ spritegroup_t* spritegroup_create(int capacity) {
     }
     sg->dest = sg->move = (Rectangle){0, 0, 0, 0};
     sg->specifier = SPECIFIER_NONE;
+    sg->move_rate = 2.0 / DEFAULT_ANIM_SPEED;
     return sg;
 }
 
@@ -230,17 +236,25 @@ void spritegroup_update_dest(spritegroup_t* const sg) {
         return;
     }
     if (sg->move.x > 0) {
-        sg->dest.x++;
-        sg->move.x--;
+        //sg->dest.x++;
+        //sg->move.x--;
+        sg->dest.x += sg->move_rate;
+        sg->move.x -= sg->move_rate;
     } else if (sg->move.x < 0) {
-        sg->dest.x--;
-        sg->move.x++;
+        //sg->dest.x--;
+        //sg->move.x++;
+        sg->dest.x -= sg->move_rate;
+        sg->move.x += sg->move_rate;
     }
     if (sg->move.y > 0) {
-        sg->dest.y++;
-        sg->move.y--;
+        //sg->dest.y++;
+        //sg->move.y--;
+        sg->dest.y += sg->move_rate;
+        sg->move.y -= sg->move_rate;
     } else if (sg->move.y < 0) {
-        sg->dest.y--;
-        sg->move.y++;
+        //sg->dest.y--;
+        //sg->move.y++;
+        sg->dest.y -= sg->move_rate;
+        sg->move.y += sg->move_rate;
     }
 }

@@ -78,9 +78,9 @@ typedef struct gamestate {
 
     em_t* entitymap;
 
+    entityid* entityids;
     int index_entityids;
     int max_entityids;
-    entityid* entityids;
 
     double last_frame_time;
     char frame_time_str[32];

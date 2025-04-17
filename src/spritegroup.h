@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entityid.h"
+#include "libgame_defines.h"
 #include "specifier.h"
 #include "sprite.h"
 
@@ -19,6 +20,8 @@ typedef struct spritegroup_t {
     Rectangle dest;
     Rectangle move;
     sprite** sprites;
+
+    float move_rate;
 } spritegroup_t;
 
 spritegroup_t* spritegroup_create(int capacity);

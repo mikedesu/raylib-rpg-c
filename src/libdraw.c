@@ -5,6 +5,7 @@
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "libdraw.h"
+#include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
 #include "race.h"
@@ -20,14 +21,13 @@
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
-//#define DEFAULT_WIN_WIDTH 960
-//#define DEFAULT_WIN_HEIGHT 540
-#define DEFAULT_WIN_WIDTH 1920
-#define DEFAULT_WIN_HEIGHT 1080
+#define DEFAULT_WIN_WIDTH 960
+#define DEFAULT_WIN_HEIGHT 540
+//#define DEFAULT_WIN_WIDTH 1920
+//#define DEFAULT_WIN_HEIGHT 1080
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
 //#define DEFAULT_ANIM_SPEED 4
-#define DEFAULT_ANIM_SPEED 8
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -153,11 +153,25 @@ static void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id
     sprite* shield_back_s = NULL;
 
     //if (shield_id != -1 && g->test_guard) {
-    if (shield_id != -1 && e->is_blocking) {
+    if (shield_id != -1 && e->block_success) {
         shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
         if (shield_sg) {
+            shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+            shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
+        }
+    } else if (shield_id != -1 && e->is_blocking) {
+        shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+        if (shield_sg) {
+            //if (e->block_success) {
+            //    shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
+            //    shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
+
+            //} else {
             shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
             shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
+            //shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+            //shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
+            //}
         }
     }
 
@@ -309,6 +323,25 @@ static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, sp
     g->test_guard = false;
 }
 
+static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
+    massert(g, "libdraw_set_sg_block_success: gamestate is NULL");
+    massert(e, "libdraw_set_sg_block_success: entity is NULL");
+    massert(sg, "libdraw_set_sg_block_success: spritegroup is NULL");
+    if (e->race == RACE_HUMAN) {
+        sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
+        if (e->shield != ENTITYID_INVALID) {
+            spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
+            if (shield_sg) {
+                int player_ctx = sg->sprites[sg->current]->currentcontext;
+                spritegroup_setcontexts(shield_sg, player_ctx);
+                shield_sg->current = SG_ANIM_BUCKLER_SUCCESS_FRONT;
+            }
+        }
+    }
+    //e->is_blocking = false;
+    //g->test_guard = false;
+}
+
 static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg) {
     massert(g, "libdraw_update_sprite_attack: gamestate is NULL");
     massert(e, "libdraw_update_sprite_attack: entity is NULL");
@@ -316,6 +349,8 @@ static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, sprite
     if (e->is_attacking) {
         libdraw_set_sg_is_attacking(g, e, sg);
         //} else if (e->is_blocking) {
+    } else if (e->block_success) {
+        libdraw_set_sg_block_success(g, e, sg);
     } else if (g->test_guard) {
         libdraw_set_sg_is_blocking(g, e, sg);
     } else if (e->is_damaged) {
