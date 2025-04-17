@@ -167,10 +167,12 @@ static void libdraw_draw_sprite_and_shadow(const gamestate* const g, entityid id
             //    shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
 
             //} else {
-            shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
-            shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
-            //shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
-            //shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
+
+            //shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
+            //shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
+
+            shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+            shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
             //}
         }
     }

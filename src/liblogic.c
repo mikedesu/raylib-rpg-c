@@ -25,6 +25,7 @@
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
 static inline bool liblogic_entity_has_shield(gamestate* const g, entityid id);
+static inline void liblogic_reset_player_block_success(gamestate* const g);
 
 static void liblogic_add_message_history(gamestate* const g, const char* msg) {
     massert(g, "liblogic_add_message_history: gamestate is NULL");
@@ -287,7 +288,8 @@ liblogic_handle_attack_blocked(gamestate* const g, entity* attacker, entity* tar
     target->block_success = true;
     target->do_update = true;
     if (target->type == ENTITY_PLAYER) {
-        liblogic_add_message(g, "You blocked the attack!");
+        //liblogic_add_message(g, "You blocked the attack!");
+        liblogic_add_message_history(g, "You blocked the attack!");
     }
 }
 
@@ -1597,8 +1599,18 @@ static void liblogic_reset_player_blocking(gamestate* const g) {
         return;
     }
     e->is_blocking = false;
-    e->block_success = false;
+    //e->block_success = false;
     g->test_guard = false;
+}
+
+static inline void liblogic_reset_player_block_success(gamestate* const g) {
+    massert(g, "Game state is NULL!");
+    entity* const e = em_get(g->entitymap, g->hero_id);
+    if (!e) {
+        merror("Failed to get hero entity");
+        return;
+    }
+    e->block_success = false;
 }
 
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
@@ -1607,10 +1619,17 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     liblogic_update_player_state(g);
     liblogic_update_npcs_state(g);
     liblogic_handle_input(is, g);
+
+    if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+        //liblogic_handle_input_player(is, g);
+        liblogic_reset_player_blocking(g);
+    }
+
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
         liblogic_handle_npcs(g);
         liblogic_reset_player_blocking(g);
     }
+
     liblogic_update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
