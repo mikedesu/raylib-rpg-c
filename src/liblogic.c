@@ -24,6 +24,8 @@
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
+static inline bool liblogic_entity_has_shield(gamestate* const g, entityid id);
+
 static void liblogic_add_message_history(gamestate* const g, const char* msg) {
     massert(g, "liblogic_add_message_history: gamestate is NULL");
     massert(msg, "liblogic_add_message_history: msg is NULL");
@@ -144,8 +146,8 @@ static void liblogic_try_entity_move(gamestate* const g, entity* const e, int x,
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     }
     tile_t* const tile = dungeon_floor_tile_at(df, ex, ey);
-    if (!tile || ex < 0 || ey < 0) {
-        merror(!tile ? "Failed to get tile" : "Cannot move, out of bounds");
+    if (!tile) {
+        merror("Cannot move, tile is NULL");
         return;
     }
     if (!dungeon_tile_is_walkable(tile->type)) {
@@ -160,8 +162,14 @@ static void liblogic_try_entity_move(gamestate* const g, entity* const e, int x,
         merror("Cannot move, player on tile");
         return;
     }
-    dungeon_floor_remove_at(df, e->id, e->x, e->y);
-    dungeon_floor_add_at(df, e->id, ex, ey);
+    if (!dungeon_floor_remove_at(df, e->id, e->x, e->y)) {
+        merror("Failed to remove entity from old tile");
+        return;
+    }
+    if (!dungeon_floor_add_at(df, e->id, ex, ey)) {
+        merror("Failed to add entity to new tile");
+        return;
+    }
     e->x = ex;
     e->y = ey;
     e->sprite_move_x = x * DEFAULT_TILE_SIZE;
@@ -1013,6 +1021,7 @@ static void liblogic_init_orcs_test_intermediate(gamestate* const g) {
         entity_set_maxhp(orc, 1);
         entity_set_hp(orc, 1);
         i++;
+        created_orcs++;
     }
     // we need to free the locations array
     free(locations);
@@ -1104,6 +1113,12 @@ static inline void liblogic_change_player_dir(gamestate* const g, direction_t di
 static void liblogic_try_entity_block(gamestate* const g, entity* const e) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
+
+    if (!liblogic_entity_has_shield(g, e->id)) {
+        liblogic_add_message(g, "You have no shield to block with!");
+        return;
+    }
+
     e->do_update = true;
     e->is_blocking = true;
     g->test_guard = true;
@@ -1569,14 +1584,6 @@ static void liblogic_handle_npcs(gamestate* const g) {
     // Process all NPCs
     for (int i = 0; i < g->index_entityids; i++) {
         liblogic_handle_nth_npc(g, i);
-        //entity* e = em_get(g->entitymap, g->entityids[i]);
-        //if (e) {
-        //    if (e->type == ENTITY_NPC) {
-        //        if (!e->is_dead) {
-        //            liblogic_execute_action(g, e, e->default_action);
-        //        }
-        //    }
-        //}
     }
     // After processing all NPCs, set the flag to animate all movements together
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
