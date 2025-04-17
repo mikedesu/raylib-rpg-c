@@ -67,8 +67,8 @@ static void df_assign_stairs(dungeon_floor_t* df) {
 static void df_init_test_simple(dungeon_floor_t* df) {
     int x = df->width / 2;
     int y = df->height / 2;
-    int w = 16;
-    int h = 8;
+    int w = 4;
+    int h = 4;
 
     tiletype_t begin_type = TILE_FLOOR_STONE_00;
     tiletype_t end_type = TILE_FLOOR_STONE_11;

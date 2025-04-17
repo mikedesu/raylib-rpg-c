@@ -898,6 +898,45 @@ static entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, in
     return em_get(g->entitymap, id);
 }
 
+static int liblogic_tile_npc_count(gamestate* const g, dungeon_floor_t* const df, tile_t* const tile) {
+    massert(g, "liblogic_tile_npc_count: gamestate is NULL");
+    massert(df, "liblogic_tile_npc_count: dungeon floor is NULL");
+    //massert(x >= 0, "liblogic_tile_npc_count: x is out of bounds");
+    //massert(x < df->width, "liblogic_tile_npc_count: x is out of bounds");
+    //massert(y >= 0, "liblogic_tile_npc_count: y is out of bounds");
+    //massert(y < df->height, "liblogic_tile_npc_count: y is out of bounds");
+    //tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    massert(tile, "liblogic_tile_npc_count: failed to get tile");
+
+    const int t_entity_count = tile_entity_count(tile);
+    int tile_npc_count = 0;
+
+    for (int i = 0; i < t_entity_count; i++) {
+        entityid id = tile_get_entity(tile, i);
+        massert(id != ENTITYID_INVALID, "liblogic_tile_npc_count: entity id is invalid");
+        entity* const e = em_get(g->entitymap, id);
+        massert(e, "liblogic_tile_npc_count: entity is NULL");
+        if (e->type == ENTITY_NPC) {
+            tile_npc_count++;
+        }
+    }
+    return tile_npc_count;
+}
+
+static int liblogic_tile_npc_count_xy(gamestate* const g, dungeon_floor_t* const df, int x, int y) {
+    massert(g, "liblogic_tile_npc_count: gamestate is NULL");
+    massert(df, "liblogic_tile_npc_count: dungeon floor is NULL");
+    massert(x >= 0, "liblogic_tile_npc_count: x is out of bounds");
+    massert(x < df->width, "liblogic_tile_npc_count: x is out of bounds");
+    massert(y >= 0, "liblogic_tile_npc_count: y is out of bounds");
+    massert(y < df->height, "liblogic_tile_npc_count: y is out of bounds");
+
+    tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+    massert(tile, "liblogic_tile_npc_count: failed to get tile");
+
+    return liblogic_tile_npc_count(g, df, tile);
+}
+
 static void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     massert(g, "liblogic_init: gamestate is NULL");
     dungeon_t* const d = g->dungeon;
@@ -933,21 +972,47 @@ static void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     // now we can loop thru the array and create an orc at each location
     int max_orcs = 1;
     //int max_orcs = count2;
-    for (int i = 0; i < max_orcs && i < count2; i++) {
-        tile_t* const tile = dungeon_floor_tile_at(df, locations[i].x, locations[i].y);
-        if (dungeon_tile_is_wall(tile->type)) {
-            continue;
-        }
+
+    int created_orcs = 0;
+    int i = 0;
+    massert(max_orcs < count2, "liblogic_init: max_orcs is greater than count2");
+
+    //for (int i = 0; i < max_orcs && i < count2; i++) {
+    while (created_orcs < max_orcs && i < count2) {
+        //tile_t* const tile = dungeon_floor_tile_at(df, locations[i].x, locations[i].y);
+        //if (dungeon_tile_is_wall(tile->type)) {
+        //    continue;
+        //}
         // check if there is already an entity at this location
-        if (tile_entity_count(tile) > 0) {
+        //if (tile_entity_count(tile) > 0) {
+        //if (liblogic_tile_npc_count(g, df, tile) > 0) {
+        //    continue;
+        //}
+
+        int tile_npc_count = liblogic_tile_npc_count_xy(g, df, locations[i].x, locations[i].y);
+        if (tile_npc_count > 0) {
+            //merror("liblogic_init: tile has %d NPCs", tile_npc_count);
+            i++;
             continue;
         }
+
+        // also cant spawn on top of a player
+        entity* const player = em_get(g->entitymap, g->hero_id);
+        massert(player, "liblogic_init: player is NULL");
+
+        if (locations[i].x == player->x && locations[i].y == player->y) {
+            merror("liblogic_init: cannot spawn on top of player");
+            i++;
+            continue;
+        }
+
         entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, locations[i].x, locations[i].y, 0, "orc");
         massert(orc, "liblogic_init: failed to create orc");
         entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
         entity_set_default_action(orc, action);
         entity_set_maxhp(orc, 1);
         entity_set_hp(orc, 1);
+        i++;
     }
     // we need to free the locations array
     free(locations);
