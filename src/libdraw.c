@@ -638,7 +638,7 @@ void libdraw_drawframe(gamestate* const g) {
     //EndShaderMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     draw_message_box(g);
-    libdraw_draw_message_history_placeholder(g);
+    draw_message_history(g);
     draw_hud(g);
     if (g->debugpanelon) {
         // concat a string onto the end of the debug panel message
@@ -987,9 +987,9 @@ void libdraw_init(gamestate* const g) {
     msuccess("libdraw_init");
 }
 
-void libdraw_draw_message_history_placeholder(gamestate* const g) {
+static void draw_message_history(gamestate* const g) {
     if (!g) {
-        merror("libdraw_draw_message_history_placeholder: gamestate is NULL");
+        merror("libdraw_draw_message_history: gamestate is NULL");
         return;
     }
     // if there are no messages in the message history, return
@@ -1002,12 +1002,12 @@ void libdraw_draw_message_history_placeholder(gamestate* const g) {
     const int max_messages = 5;
     const int x = 0;
     const int y = 0;
-    // instead of a placeholder message, we now need to actually draw the message history
-    // we might only render the last N messages
-    //int index = g->msg_history.count;
     int current_count = 0;
     char tmp_buffer[2048] = {0};
     Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
+    // instead of a placeholder message, we now need to actually draw the message history
+    // we might only render the last N messages
+    //int index = g->msg_history.count;
     for (int i = g->msg_history.count - 1; i >= 0 && current_count < max_messages; i--) {
         strncat(tmp_buffer, g->msg_history.messages[i], sizeof(tmp_buffer) - strlen(tmp_buffer) - 1);
         strncat(tmp_buffer, "\n", sizeof(tmp_buffer) - strlen(tmp_buffer) - 1);
