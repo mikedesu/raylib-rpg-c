@@ -44,6 +44,44 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 static inline void draw_hud(gamestate* const g);
 static void draw_message_history(gamestate* const g);
+static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
+static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df);
+static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
+static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead);
+static void load_shaders();
+static void libdraw_unload_shaders();
+static bool libdraw_camera_lock_on(gamestate* const g);
+static bool libdraw_check_default_animations(gamestate* const g);
+static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg);
+static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entity_t* e);
+static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
+static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg);
+static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
+static void libdraw_update_sprite(gamestate* const g, entityid id);
+static inline void libdraw_handle_gamestate_flag(gamestate* const g);
+static bool libdraw_draw_dungeon_floor(const gamestate* const g);
+static void libdraw_draw_debug_panel(gamestate* const g);
+static bool libdraw_draw_player_target_box(const gamestate* const g);
+static void libdraw_drawframe_2d(gamestate* const g);
+static void draw_message_box(gamestate* g);
+static bool libdraw_unload_texture(int txkey);
+static void libdraw_unload_textures();
+static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
+static void load_textures();
+static void create_spritegroup(gamestate* const g,
+                               entityid id,
+                               int* keys,
+                               int num_keys,
+                               int offset_x,
+                               int offset_y,
+                               specifier_t spec);
+static void calc_debugpanel_size(gamestate* const g);
+static void create_sg_byid(gamestate* const g, entityid id);
 
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
     if (!g || !df) {
@@ -224,10 +262,6 @@ static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
     }
     return true;
 }
-
-void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
-
-bool libdraw_windowshouldclose() { return WindowShouldClose(); }
 
 static void load_shaders() {
     //shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
@@ -990,3 +1024,7 @@ static void draw_message_history(gamestate* const g) {
     // Draw text (centered in box)
     DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
 }
+
+void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
+
+bool libdraw_windowshouldclose() { return WindowShouldClose(); }
