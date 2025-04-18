@@ -124,15 +124,12 @@ void gamerun() {
     gamestate* g = gamestateinitptr();
     draw_last_write_time = getlastwritetime(LIBDRAW_PATH);
     logic_last_write_time = getlastwritetime(LIBLOGIC_PATH);
-
     load_draw_symbols();
     load_logic_symbols();
-
     // i think liblogic will need init before libdraw because
     // we will want to create entries in the entitymap AFTER it is init'd
     myliblogic_init(g);
     mylibdraw_init(g);
-
     while (!mylibdraw_windowshouldclose()) {
         mylibdraw_update_input(&is);
         myliblogic_tick(&is, g);
@@ -141,24 +138,14 @@ void gamerun() {
         autoreload_every_n_sec(4, g);
         if (inputstate_is_pressed(&is, KEY_ESCAPE)) break;
     }
-
     mylibdraw_close();
-
     msuccess("libdraw closed");
-
     myliblogic_close(g);
-
     msuccess("liblogic closed");
-
     dlclose(draw_handle);
-
     msuccess("dlclose libdraw");
-
     dlclose(logic_handle);
-
     msuccess("dlclose liblogic");
-
     gamestatefree(g);
-
     msuccess("gamestate freed");
 }
