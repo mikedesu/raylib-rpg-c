@@ -27,7 +27,6 @@
 //#define DEFAULT_WIN_HEIGHT 1080
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
-//#define DEFAULT_ANIM_SPEED 4
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -44,6 +43,7 @@ Vector2 zero_vec = {0, 0};
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 static inline void draw_hud(gamestate* const g);
+static void draw_message_history(gamestate* const g);
 
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
     if (!g || !df) {
@@ -666,21 +666,6 @@ void libdraw_drawframe(gamestate* const g) {
     g->framecount++;
 }
 
-//static void libdraw_draw_sprite(const gamestate* const g, const entityid id) {
-//    spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-//    if (!sg) {
-//        merror("libdraw_draw_sprite: spritegroup is NULL");
-//        return;
-//    }
-//    sprite* s = spritegroup_get(sg, sg->current);
-//    if (!s) {
-//        merror("sprite not found for id %d", id);
-//        return;
-//    }
-//    Rectangle new_dest = (Rectangle){sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-//    DrawTexturePro(*s->texture, s->src, new_dest, (Vector2){0, 0}, 0, WHITE);
-//}
-
 static bool libdraw_unload_texture(int txkey) {
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
         merror("libdraw_unload_texture: txkey out of bounds");
@@ -934,29 +919,6 @@ static inline void draw_hud(gamestate* const g) {
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, fg);
     DrawText(buffer, box_x + padding, box_y + padding, fontsize, fg);
 }
-
-//void draw_msgbox_test(gamestate* const g, const char* s) {
-//    if (!g) {
-//        merror("libdraw_draw_msgbox_test: gamestate is NULL");
-//        return;
-//    }
-//    const int fontsize = 20, f_offset = 30;
-//    const Vector2 size = MeasureTextEx(GetFontDefault(), s, fontsize + f_offset, 1);
-//    const int w = size.x;
-//    const int h = size.y;
-//    const int pad = 10;
-//    const int pad2 = 20;
-//    const int x = g->windowwidth / 4 - w / 2;
-//    const int y = 0 + pad;
-//    const int x2 = x + pad2;
-//    const int y2 = y + pad2;
-//    const Color bg = (Color){0x33, 0x33, 0x33, 0xff};
-//    const Color fg = WHITE;
-//    // we need to calculate x and y based on the w and h
-//    DrawRectangle(x + pad, y + pad, w, h, bg);
-//    // we need to calculate an x and y for the text based on size2 and a padding
-//    DrawText(s, x2, y2, fontsize, fg);
-//}
 
 void libdraw_init(gamestate* const g) {
     if (!g) {
