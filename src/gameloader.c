@@ -36,11 +36,6 @@ void checksymbol(void* symbol, const char* name) {
     massert(symbol, "dlsym failed: %s", name);
     massert(name, "dlsym failed: %s", name);
     massert(strlen(name) > 0, "dlsym failed: %s", name);
-
-    //if (symbol == NULL) {
-    //    fprintf(stderr, "dlsym failed: %s\n", dlerror());
-    //    exit(1);
-    //}
 }
 
 bool file_changed(const char* path, long* last_time) {
@@ -83,10 +78,6 @@ void load_draw_symbols() {
 void load_logic_symbols() {
     logic_handle = dlopen(LIBLOGIC_PATH, RTLD_LAZY);
     massert(logic_handle, "dlopen failed for %s: %s", LIBLOGIC_PATH, dlerror());
-    //if (!logic_handle) {
-    //    fprintf(stderr, "dlopen failed for %s: %s\n", LIBLOGIC_PATH, dlerror());
-    //    exit(1);
-    //}
     myliblogic_init = dlsym(logic_handle, "liblogic_init");
     checksymbol(myliblogic_init, "liblogic_init");
     myliblogic_tick = dlsym(logic_handle, "liblogic_tick");
@@ -95,39 +86,11 @@ void load_logic_symbols() {
     checksymbol(myliblogic_close, "liblogic_close");
 }
 
-//void reload_draw(const gamestate* const g) {
-//    long new_time = getlastwritetime(LIBDRAW_PATH);
-//    if (new_time > draw_last_write_time) {
-//        if (draw_handle) {
-//            mylibdraw_close();
-//            dlclose(draw_handle);
-//        }
-//        load_draw_symbols();
-//        mylibdraw_init(g);
-//        draw_last_write_time = new_time;
-//        msuccess("Reloaded libdraw.so");
-//    }
-//}
-
-//void reload_draw(const gamestate* const g) {
-//    if (draw_handle) {
-//        void (*temp_close)() = mylibdraw_close; // Save close fn
-//        if (temp_close) {
-//            temp_close();
-//        }
-//        dlclose(draw_handle);
-//    }
-//
-//    load_draw_symbols();
-//    mylibdraw_init(g);
-//}
-
 void reload_draw(const gamestate* const g) {
     if (draw_handle) {
         mylibdraw_close(); // Direct call
         dlclose(draw_handle);
     }
-
     load_draw_symbols(); // Let it crash if fails
     mylibdraw_init(g);
     draw_last_write_time = getlastwritetime(LIBDRAW_PATH);
@@ -142,25 +105,6 @@ void reload_logic() {
         msuccess("Reloaded liblogic.so");
     }
 }
-
-//void reload_logic() {
-//    long new_time = getlastwritetime(LIBLOGIC_PATH);
-//    if (new_time > logic_last_write_time) {
-//        if (logic_handle) dlclose(logic_handle);
-//        load_logic_symbols();
-//        logic_last_write_time = new_time;
-//        msuccess("Reloaded liblogic.so");
-//    }
-//}
-
-//void autoreload_every_n_sec(const int n, const gamestate* const g) {
-//    massert(n > 0, "autoreload_every_n_sec: n must be greater than 0");
-//    frame_count++;
-//    if (frame_count % (n * 60) == 0) {
-//        reload_logic();
-//        reload_draw(g);
-//    }
-//}
 
 void autoreload_every_n_sec(const int n, const gamestate* const g) {
     frame_count++;
