@@ -43,15 +43,22 @@ Vector2 zero_vec = {0, 0};
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 static inline void draw_hud(gamestate* const g);
-static void draw_message_history(gamestate* const g);
+static inline void update_debug_panel(gamestate* const g);
+static inline void handle_debug_panel(gamestate* const g);
+static inline bool libdraw_camera_lock_on(gamestate* const g);
+static inline void libdraw_handle_gamestate_flag(gamestate* const g);
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
 static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df);
-static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
 static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead);
+static bool libdraw_check_default_animations(gamestate* const g);
+static bool libdraw_draw_dungeon_floor(const gamestate* const g);
+static bool libdraw_draw_player_target_box(const gamestate* const g);
+static bool libdraw_unload_texture(int txkey);
+static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
+static void draw_message_history(gamestate* const g);
+static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
 static void load_shaders();
 static void libdraw_unload_shaders();
-static bool libdraw_camera_lock_on(gamestate* const g);
-static bool libdraw_check_default_animations(gamestate* const g);
 static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
@@ -63,15 +70,10 @@ static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t*
 static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg);
 static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
 static void libdraw_update_sprite(gamestate* const g, entityid id);
-static inline void libdraw_handle_gamestate_flag(gamestate* const g);
-static bool libdraw_draw_dungeon_floor(const gamestate* const g);
 static void libdraw_draw_debug_panel(gamestate* const g);
-static bool libdraw_draw_player_target_box(const gamestate* const g);
 static void libdraw_drawframe_2d(gamestate* const g);
 static void draw_message_box(gamestate* g);
-static bool libdraw_unload_texture(int txkey);
 static void libdraw_unload_textures();
-static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 static void load_textures();
 static void create_spritegroup(gamestate* const g,
                                entityid id,
@@ -274,7 +276,7 @@ static void libdraw_unload_shaders() {
     UnloadShader(shader_tile_glow);
 }
 
-static bool libdraw_camera_lock_on(gamestate* const g) {
+static inline bool libdraw_camera_lock_on(gamestate* const g) {
     massert(g, "libdraw_camera_lock_on: gamestate is NULL");
     if (!g->cam_lockon) {
         return false;
@@ -659,6 +661,33 @@ static void draw_message_box(gamestate* g) {
     }
 }
 
+static inline void update_debug_panel(gamestate* const g) {
+    // concat a string onto the end of the debug panel message
+    char tmp[1024] = {0};
+    entityid hero_id = g->hero_id;
+    entity* e = em_get(g->entitymap, hero_id);
+    massert(e, "libdraw_drawframe: entity is NULL");
+    entityid shield_id = e->shield;
+    if (shield_id != -1) {
+        spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+        if (sg) {
+            sprite* shield_s_front = spritegroup_get(sg, SG_ANIM_BUCKLER_FRONT);
+            sprite* shield_s_back = spritegroup_get(sg, SG_ANIM_BUCKLER_BACK);
+            int front_context = sprite_get_context(shield_s_front);
+            int back_context = sprite_get_context(shield_s_back);
+            snprintf(tmp, sizeof(tmp), "shield front back: %d %d\n", front_context, back_context);
+            strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
+        }
+    }
+}
+
+static inline void handle_debug_panel(gamestate* const g) {
+    if (g->debugpanelon) {
+        update_debug_panel(g);
+        libdraw_draw_debug_panel(g);
+    }
+}
+
 void libdraw_drawframe(gamestate* const g) {
     double start_time = GetTime();
     BeginDrawing();
@@ -674,26 +703,8 @@ void libdraw_drawframe(gamestate* const g) {
     draw_message_box(g);
     draw_message_history(g);
     draw_hud(g);
-    if (g->debugpanelon) {
-        // concat a string onto the end of the debug panel message
-        char tmp[1024] = {0};
-        entityid hero_id = g->hero_id;
-        entity* e = em_get(g->entitymap, hero_id);
-        massert(e, "libdraw_drawframe: entity is NULL");
-        entityid shield_id = e->shield;
-        if (shield_id != -1) {
-            spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
-            if (sg) {
-                sprite* shield_s_front = spritegroup_get(sg, SG_ANIM_BUCKLER_FRONT);
-                sprite* shield_s_back = spritegroup_get(sg, SG_ANIM_BUCKLER_BACK);
-                int front_context = sprite_get_context(shield_s_front);
-                int back_context = sprite_get_context(shield_s_back);
-                snprintf(tmp, sizeof(tmp), "shield front back: %d %d\n", front_context, back_context);
-                strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
-            }
-        }
-        libdraw_draw_debug_panel(g);
-    }
+    handle_debug_panel(g);
+
     EndDrawing();
     //double elapsed_time = GetTime() - start_time;
     g->last_frame_time = GetTime() - start_time;
