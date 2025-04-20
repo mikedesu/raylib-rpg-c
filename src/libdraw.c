@@ -42,39 +42,46 @@ Vector2 zero_vec = {0, 0};
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
-static inline void draw_hud(gamestate* const g);
+static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
-static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void libdraw_handle_gamestate_flag(gamestate* const g);
-static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
-static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df);
-static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead);
-static bool libdraw_check_default_animations(gamestate* const g);
-static bool libdraw_draw_dungeon_floor(const gamestate* const g);
-static bool libdraw_draw_player_target_box(const gamestate* const g);
-static bool libdraw_unload_texture(int txkey);
-static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
-static void draw_message_history(gamestate* const g);
-static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
-static void load_shaders();
-static void libdraw_unload_shaders();
+static bool libdraw_check_default_animations(const gamestate* const g);
+
 static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+
+static void load_shaders();
+static void libdraw_unload_shaders();
+
+static void load_textures();
+static void libdraw_unload_textures();
+static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
+static bool libdraw_unload_texture(int txkey);
+
 static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg);
 static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entity_t* e);
 static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
 static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg);
 static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
 static void libdraw_update_sprite(gamestate* const g, entityid id);
+
+static inline void draw_hud(gamestate* const g);
+static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
+static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df);
+static bool draw_entities_2d(const gamestate* const g, dungeon_floor_t* df, bool dead);
+static bool libdraw_draw_dungeon_floor(const gamestate* const g);
+static bool libdraw_draw_player_target_box(const gamestate* const g);
+static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y);
+static void draw_message_history(gamestate* const g);
+static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
 static void libdraw_draw_debug_panel(gamestate* const g);
 static void libdraw_drawframe_2d(gamestate* const g);
 static void draw_message_box(gamestate* g);
-static void libdraw_unload_textures();
-static void load_textures();
+
 static void create_spritegroup(gamestate* const g,
                                entityid id,
                                int* keys,
@@ -82,8 +89,8 @@ static void create_spritegroup(gamestate* const g,
                                int offset_x,
                                int offset_y,
                                specifier_t spec);
-static void calc_debugpanel_size(gamestate* const g);
 static void create_sg_byid(gamestate* const g, entityid id);
+static void calc_debugpanel_size(gamestate* const g);
 
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
     if (!g || !df) {
@@ -151,7 +158,7 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* c
     return true;
 }
 
-static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
+static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             if (df_tile_is_wall(df, x, y)) {
@@ -163,24 +170,19 @@ static bool draw_dungeon_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
     return true;
 }
 
-static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
+static inline void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(g, "draw_sprite_and_shadow: gamestate is NULL");
     massert(id != -1, "draw_sprite_and_shadow: id is -1");
+
     entity* e = em_get(g->entitymap, id);
-    if (!e) {
-        merror("draw_sprite_and_shadow: entity not found: id %d", id);
-        return;
-    }
+    massert(e, "draw_sprite_and_shadow: entity is NULL");
+
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-    if (!sg) {
-        merror("draw_sprite_and_shadow: spritegroup not found: id %d", id);
-        return;
-    }
+    massert(sg, "draw_sprite_and_shadow: spritegroup is NULL");
+
     sprite* s = spritegroup_get(sg, sg->current);
-    if (!s) {
-        merror("draw_sprite_and_shadow: sprite not found at current %d", sg->current);
-        return;
-    }
+    massert(s, "draw_sprite_and_shadow: sprite is NULL");
+
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
         sprite* shadow = spritegroup_get(sg, sg->current + 1);
@@ -188,12 +190,12 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
             DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE);
         }
     }
+
     // check for a shield
     entityid shield_id = e->shield;
     spritegroup_t* shield_sg = NULL;
     sprite* shield_front_s = NULL;
     sprite* shield_back_s = NULL;
-
     //if (shield_id != -1 && g->test_guard) {
     if (shield_id != -1 && e->block_success) {
         shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
@@ -207,12 +209,9 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
             //if (e->block_success) {
             //    shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
             //    shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
-
             //} else {
-
             shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
             shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
-
             //shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
             //shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
             //}
@@ -230,20 +229,49 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
 }
 
-static bool draw_entities_2d(const gamestate* g, dungeon_floor_t* df, bool dead) {
+static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y) {
+    massert(g, "draw_entities_2d: gamestate is NULL");
+    massert(df, "draw_entities_2d: dungeon_floor is NULL");
+    massert(df->width > 0, "draw_entities_2d: dungeon_floor width is 0");
+    massert(df->height > 0, "draw_entities_2d: dungeon_floor height is 0");
+    massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
+    massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
+    massert(x >= 0, "draw_entities_2d: x is out of bounds");
+    massert(x < df->width, "draw_entities_2d: x is out of bounds");
+    massert(y >= 0, "draw_entities_2d: y is out of bounds");
+    massert(y < df->height, "draw_entities_2d: y is out of bounds");
+
+    tile_t* tile = dungeon_floor_tile_at(df, x, y);
+    if (!tile) {
+        return false;
+    }
+
+    if (dungeon_tile_is_wall(tile->type)) {
+        return false;
+    }
+
+    for (int i = 0; i < tile_entity_count(tile); i++) {
+        entityid id = tile_get_entity(tile, i);
+        entity* e = em_get(g->entitymap, id);
+        if (e && e->is_dead == dead) {
+            draw_sprite_and_shadow(g, id);
+        }
+    }
+
+    return true;
+}
+
+static bool draw_entities_2d(const gamestate* const g, dungeon_floor_t* df, bool dead) {
+    massert(g, "draw_entities_2d: gamestate is NULL");
+    massert(df, "draw_entities_2d: dungeon_floor is NULL");
+    massert(df->width > 0, "draw_entities_2d: dungeon_floor width is 0");
+    massert(df->height > 0, "draw_entities_2d: dungeon_floor height is 0");
+    massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
+    massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
+
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            tile_t* tile = dungeon_floor_tile_at(df, x, y);
-            if (!tile || dungeon_tile_is_wall(tile->type)) {
-                continue;
-            }
-            for (int i = 0; i < tile_entity_count(tile); i++) {
-                entityid id = tile_get_entity(tile, i);
-                entity* e = em_get(g->entitymap, id);
-                if (e && e->is_dead == dead) {
-                    draw_sprite_and_shadow(g, id);
-                }
-            }
+            draw_entities_2d_at(g, df, dead, x, y);
         }
     }
     return true;
@@ -287,15 +315,13 @@ static inline bool libdraw_camera_lock_on(gamestate* const g) {
     return true;
 }
 
-static bool libdraw_check_default_animations(gamestate* const g) {
+static bool libdraw_check_default_animations(const gamestate* const g) {
     massert(g, "libdraw_check_default_animations: gamestate is NULL");
     for (int i = 0; i < g->index_entityids; i++) {
         const entityid id = g->entityids[i];
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-        if (sg) {
-            if (sg->current != sg->default_anim) {
-                return false;
-            }
+        if (sg && sg->current != sg->default_anim) {
+            return false;
         }
     }
     return true;
@@ -388,7 +414,6 @@ static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, sprite
     massert(sg, "libdraw_update_sprite_attack: spritegroup is NULL");
     if (e->is_attacking) {
         libdraw_set_sg_is_attacking(g, e, sg);
-        //} else if (e->is_blocking) {
     } else if (e->block_success) {
         libdraw_set_sg_block_success(g, e, sg);
     } else if (g->test_guard) {
@@ -527,10 +552,30 @@ static void libdraw_update_sprite(gamestate* const g, entityid id) {
 static inline void libdraw_handle_gamestate_flag(gamestate* const g) {
     const bool done = libdraw_check_default_animations(g);
     if (done) {
-        if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+        msuccess("animations DONE: %s",
+                 g->flag == GAMESTATE_FLAG_PLAYER_ANIM    ? "PLAYER ANIM"
+                 : g->flag == GAMESTATE_FLAG_NPC_ANIM     ? "NPC ANIM"
+                 : g->flag == GAMESTATE_FLAG_PLAYER_INPUT ? "PLAYER INPUT"
+                 : g->flag == GAMESTATE_FLAG_NPC_TURN     ? "NPC TURN"
+                                                          : "UNKNOWN");
+        if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+            //minfo("PLAYER INPUT");
+            //g->flag = GAMESTATE_FLAG_NPC_TURN;
+            //g->test_guard = false;
+        } else if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+            minfo("PLAYER ANIM");
             g->flag = GAMESTATE_FLAG_NPC_TURN;
             g->test_guard = false;
+        } else if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
+            minfo("NPC TURN");
+            //g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+            //g->turn_count++;
+
+            //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+            //    g->flag = GAMESTATE_FLAG_NPC_TURN;
+            //    g->test_guard = false;
         } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
+            minfo("NPC ANIM");
             g->entity_turn = g->hero_id; // Reset directly to hero
             g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
             g->turn_count++;
