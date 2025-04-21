@@ -321,6 +321,8 @@ static bool libdraw_check_default_animations(const gamestate* const g) {
         const entityid id = g->entityids[i];
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
         if (sg && sg->current != sg->default_anim) {
+            // which sg isnt done?
+            merror("libdraw_check_default_animations: spritegroup %d is not at current animation %d", id, sg->current);
             return false;
         }
     }
@@ -506,23 +508,21 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
 }
 
 static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
-    if (!g) {
-        merror("libdraw_handle_frame_incr: gamestate is NULL");
-        return;
-    }
-    sprite* const s = sg->sprites[sg->current];
-    if (!s) {
-        merror("libdraw_update_sprite: sprite is NULL");
-        return;
-    }
-    // attempt to grab the sprite's shadow
-    sprite* const s_shadow = sg->sprites[sg->current + 1];
+    massert(g, "libdraw_handle_frame_incr: gamestate is NULL");
+    massert(sg, "libdraw_handle_frame_incr: spritegroup is NULL");
+    sprite* const s = sg_get_current(sg);
+    massert(s, "libdraw_handle_frame_incr: sprite is NULL");
+
+    //sprite* const s_shadow = sg->sprites[sg->current + 1];
     if (g->framecount % ANIM_SPEED == 0) {
         sprite_incrframe(s);
         if (s->num_loops >= 1) {
             sg->current = sg->default_anim;
             s->num_loops = 0;
         }
+
+        // attempt to grab the sprite's shadow
+        sprite* const s_shadow = sg_get_current_plus_one(sg);
         if (s_shadow) {
             sprite_incrframe(s_shadow);
             if (s_shadow->num_loops >= 1) {
@@ -570,7 +570,6 @@ static inline void libdraw_handle_gamestate_flag(gamestate* const g) {
             minfo("NPC TURN");
             //g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
             //g->turn_count++;
-
             //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
             //    g->flag = GAMESTATE_FLAG_NPC_TURN;
             //    g->test_guard = false;
@@ -591,6 +590,7 @@ void libdraw_update_sprites(gamestate* const g) {
     // for each entityid in our entitymap, update the spritegroup
     for (int i = 0; i < g->index_entityids; i++) {
         const entityid id = g->entityids[i];
+        //minfo("libdraw_update_sprites: updating spritegroup for id %d", id);
         libdraw_update_sprite(g, id);
     }
     libdraw_handle_gamestate_flag(g);

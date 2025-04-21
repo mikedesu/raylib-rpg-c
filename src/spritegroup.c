@@ -139,6 +139,27 @@ sprite* spritegroup_get(spritegroup_t* const sg, int index) {
     return sg->sprites[index];
 }
 
+sprite* sg_get_current(spritegroup_t* const sg) {
+    massert(sg, "sg_get_current: spritegroup is NULL");
+    massert(sg->current >= 0, "sg_get_current: current is negative");
+    massert(sg->current < sg->size, "sg_get_current: current is out of bounds");
+
+    return sg->sprites[sg->current];
+}
+
+sprite* sg_get_current_plus_one(spritegroup_t* const sg) {
+    massert(sg, "sg_get_current_plus_one: spritegroup is NULL");
+    massert(sg->current >= 0, "sg_get_current_plus_one: current is negative");
+    //massert(sg->current + 1 < sg->size, "sg_get_current_plus_one: current + 1 is out of bounds");
+
+    if (sg->current + 1 >= sg->size) {
+        //merror("sg_get_current_plus_one: current + 1 is out of bounds");
+        return NULL;
+    }
+
+    return sg->sprites[sg->current + 1];
+}
+
 bool spritegroup_set_current(spritegroup_t* const sg, int index) {
     massert(sg, "spritegroup_set_current: spritegroup is NULL");
     massert(index >= 0, "spritegroup_set_current: index is negative");

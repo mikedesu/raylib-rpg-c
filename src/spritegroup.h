@@ -27,6 +27,8 @@ typedef struct spritegroup_t {
 spritegroup_t* spritegroup_create(int capacity);
 
 sprite* spritegroup_get(spritegroup_t* const sg, int index);
+sprite* sg_get_current(spritegroup_t* const sg);
+sprite* sg_get_current_plus_one(spritegroup_t* const sg);
 
 int spritegroup_get_first_context(spritegroup_t* const sg);
 
