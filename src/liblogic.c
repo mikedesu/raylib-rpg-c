@@ -1619,16 +1619,14 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(g, "Game state is NULL!");
     liblogic_update_player_state(g);
     liblogic_update_npcs_state(g);
-    liblogic_handle_input(is, g);
-
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-        //liblogic_handle_input_player(is, g);
+        liblogic_reset_player_blocking(g);
         liblogic_reset_player_block_success(g);
     }
+    liblogic_handle_input(is, g);
 
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
         liblogic_handle_npcs(g);
-        liblogic_reset_player_blocking(g);
     }
 
     liblogic_update_debug_panel_buffer(g);
