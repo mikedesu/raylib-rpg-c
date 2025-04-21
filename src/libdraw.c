@@ -325,7 +325,7 @@ static bool libdraw_check_default_animations(const gamestate* const g) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
         if (sg && sg->current != sg->default_anim) {
             // which sg isnt done?
-            merror("libdraw_check_default_animations: spritegroup %d is not at current animation %d", id, sg->current);
+            //merror("libdraw_check_default_animations: spritegroup %d is not at current animation %d", id, sg->current);
             return false;
         }
     }
@@ -562,12 +562,13 @@ static void libdraw_update_sprite(gamestate* const g, entityid id) {
 static inline void libdraw_handle_gamestate_flag(gamestate* const g) {
     const bool done = libdraw_check_default_animations(g);
     if (done) {
-        msuccess("animations DONE: %s",
-                 g->flag == GAMESTATE_FLAG_PLAYER_ANIM    ? "PLAYER ANIM"
-                 : g->flag == GAMESTATE_FLAG_NPC_ANIM     ? "NPC ANIM"
-                 : g->flag == GAMESTATE_FLAG_PLAYER_INPUT ? "PLAYER INPUT"
-                 : g->flag == GAMESTATE_FLAG_NPC_TURN     ? "NPC TURN"
-                                                          : "UNKNOWN");
+        //msuccess("animations DONE: %s",
+        //         g->flag == GAMESTATE_FLAG_PLAYER_ANIM    ? "PLAYER ANIM"
+        //         : g->flag == GAMESTATE_FLAG_NPC_ANIM     ? "NPC ANIM"
+        //         : g->flag == GAMESTATE_FLAG_PLAYER_INPUT ? "PLAYER INPUT"
+        //         : g->flag == GAMESTATE_FLAG_NPC_TURN     ? "NPC TURN"
+        //                                                  : "UNKNOWN");
+
         if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
             //minfo("PLAYER INPUT");
             //g->flag = GAMESTATE_FLAG_NPC_TURN;

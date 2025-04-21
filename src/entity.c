@@ -242,3 +242,18 @@ int entity_get_inventory_count(entity_t* const e) {
     massert(e, "entity_get_inventory_count: e is NULL");
     return e->inventory_count;
 }
+
+bool entity_is_dead(entity_t* const e) {
+    massert(e, "entity_is_dead: e is NULL");
+    return e->is_dead;
+}
+
+void entity_set_is_dead(entity_t* const e, bool is_dead) {
+    massert(e, "entity_set_is_dead: e is NULL");
+    e->is_dead = is_dead;
+}
+
+void entity_set_do_update(entity_t* const e, bool do_update) {
+    massert(e, "entity_set_do_update: e is NULL");
+    e->do_update = do_update;
+}

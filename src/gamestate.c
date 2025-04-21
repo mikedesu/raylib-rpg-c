@@ -338,3 +338,13 @@ void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
     g->debugpanel.x = g->windowwidth - g->debugpanel.w;
     g->debugpanel.y = g->debugpanel.pad_right;
 }
+
+bool g_get_gameover(const gamestate* const g) {
+    massert(g, "gs_get_gameover: g is NULL");
+    return g->gameover;
+}
+
+void g_set_gameover(gamestate* const g, bool gameover) {
+    massert(g, "g_set_gameover: g is NULL");
+    g->gameover = gameover;
+}

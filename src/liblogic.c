@@ -24,6 +24,7 @@
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
+static void update_player_state(gamestate* const g);
 static inline bool liblogic_entity_has_shield(gamestate* const g, entityid id);
 static inline void liblogic_reset_player_block_success(gamestate* const g);
 
@@ -1518,23 +1519,20 @@ void liblogic_init(gamestate* const g) {
     liblogic_update_debug_panel_buffer(g);
 }
 
-static void liblogic_update_player_state(gamestate* const g) {
+static void update_player_state(gamestate* const g) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, g->hero_id);
-    if (!e) {
-        merror("Failed to get hero entity");
-        return;
-    }
-    if (e->is_dead) {
-        if (!g->gameover) {
+    massert(e, "liblogic_update_player_state: hero is NULL");
+    if (!g_get_gameover(g)) {
+        if (entity_is_dead(e)) {
             liblogic_add_message(g, "You died!");
-            g->gameover = true;
+            g_set_gameover(g, true);
         }
         return;
     }
-    if (e->hp <= 0) {
-        e->is_dead = true;
-        e->do_update = true;
+    if (entity_get_hp(e) <= 0) {
+        entity_set_is_dead(e, true);
+        entity_set_do_update(e, true);
         merror("Hero is dead!");
         return;
     }
@@ -1617,12 +1615,14 @@ static inline void liblogic_reset_player_block_success(gamestate* const g) {
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-    liblogic_update_player_state(g);
+    update_player_state(g);
     liblogic_update_npcs_state(g);
+
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
         liblogic_reset_player_blocking(g);
         liblogic_reset_player_block_success(g);
     }
+
     liblogic_handle_input(is, g);
 
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
