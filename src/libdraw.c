@@ -180,12 +180,14 @@ static inline void draw_sprite_and_shadow(const gamestate* const g, entityid id)
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     massert(sg, "draw_sprite_and_shadow: spritegroup is NULL");
 
-    sprite* s = spritegroup_get(sg, sg->current);
+    //sprite* s = spritegroup_get(sg, sg->current);
+    sprite* s = sg_get_current(sg);
     massert(s, "draw_sprite_and_shadow: sprite is NULL");
 
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
-        sprite* shadow = spritegroup_get(sg, sg->current + 1);
+        //sprite* shadow = spritegroup_get(sg, sg->current + 1);
+        sprite* shadow = sg_get_current_plus_one(sg);
         if (shadow) {
             DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE);
         }
@@ -197,7 +199,8 @@ static inline void draw_sprite_and_shadow(const gamestate* const g, entityid id)
     sprite* shield_front_s = NULL;
     sprite* shield_back_s = NULL;
     //if (shield_id != -1 && g->test_guard) {
-    if (shield_id != -1 && e->block_success) {
+    //if (shield_id != -1 && e->block_success) {
+    if (shield_id != -1 && sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS) {
         shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
         if (shield_sg) {
             shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
@@ -396,16 +399,23 @@ static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, 
     massert(e, "libdraw_set_sg_block_success: entity is NULL");
     massert(sg, "libdraw_set_sg_block_success: spritegroup is NULL");
     if (e->race == RACE_HUMAN) {
-        sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
+        //sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS);
+
         if (e->shield != ENTITYID_INVALID) {
             spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
             if (shield_sg) {
-                int player_ctx = sg->sprites[sg->current]->currentcontext;
+                sprite* player_sprite = sg_get_current(sg);
+                int player_ctx = sprite_get_context(player_sprite);
+                //int player_ctx = player_sprite->currentcontext;
+                //int player_ctx = sg->sprites[sg->current]->currentcontext;
+                spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
                 spritegroup_setcontexts(shield_sg, player_ctx);
-                shield_sg->current = SG_ANIM_BUCKLER_SUCCESS_FRONT;
+                //shield_sg->current = SG_ANIM_BUCKLER_SUCCESS_FRONT;
             }
         }
     }
+    e->block_success = false;
     //e->is_blocking = false;
     //g->test_guard = false;
 }
