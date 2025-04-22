@@ -262,18 +262,15 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     if (e_get_hp(target) <= 0) target->is_dead = true;
 }
 
-static void
-liblogic_handle_attack_blocked(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
-    massert(g, "liblogic_handle_attack_blocked: gamestate is NULL");
-    massert(attacker, "liblogic_handle_attack_blocked: attacker entity is NULL");
-    massert(target, "liblogic_handle_attack_blocked: target entity is NULL");
-    massert(attack_successful, "liblogic_handle_attack_blocked: attack_successful is NULL");
+static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
+    massert(g, "gamestate is NULL");
+    massert(attacker, "attacker entity is NULL");
+    massert(target, "target entity is NULL");
+    massert(attack_successful, "attack_successful is NULL");
     msuccess("Successful Block from target: %s", target->name);
-    *attack_successful = false;
-    target->is_damaged = false;
-    target->block_success = true;
-    target->do_update = true;
-    if (target->type == ENTITY_PLAYER) { add_message_history(g, "You blocked the attack!"); }
+    *attack_successful = target->is_damaged = false;
+    target->block_success = target->do_update = true;
+    if (target->type == ENTITY_PLAYER) add_message_history(g, "You blocked the attack!");
 }
 
 static inline bool liblogic_handle_attack_helper_innerloop(gamestate* const g,
@@ -298,7 +295,7 @@ static inline bool liblogic_handle_attack_helper_innerloop(gamestate* const g,
                 if (!target->is_dead) {
                     if (target->is_blocking) {
                         msuccess("Block successful");
-                        liblogic_handle_attack_blocked(g, attacker, target, attack_successful);
+                        handle_attack_blocked(g, attacker, target, attack_successful);
                         return false;
                     }
 
