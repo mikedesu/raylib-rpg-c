@@ -112,7 +112,7 @@ int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, int ind
 
 em_t* gamestate_get_entitymap(gamestate* const g);
 
-bool gamestate_add_entityid(gamestate* const g, entityid id);
+bool gs_add_entityid(gamestate* const g, entityid id);
 bool gamestate_init_msg_history(gamestate* const g);
 bool gamestate_free_msg_history(gamestate* const g);
 

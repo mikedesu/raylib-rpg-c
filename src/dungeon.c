@@ -43,7 +43,7 @@ bool dungeon_add_floor(dungeon_t* const dungeon, int width, int height) {
         dungeon->floors = new_floors;
         dungeon->capacity_floors = new_capacity;
     }
-    dungeon_floor_t* new_floor = dungeon_floor_create(width, height);
+    dungeon_floor_t* new_floor = df_create(width, height);
     massert(new_floor, "dungeon_add_floor: failed to create new floor");
     if (!new_floor) {
         merror("dungeon_add_floor: new_floor is NULL");

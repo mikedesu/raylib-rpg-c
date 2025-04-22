@@ -13,7 +13,7 @@ static void df_assign_stairs(dungeon_floor_t* df) {
     int count2 = 0;
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            tile_t* const tile = df_tile_at(df, x, y);
             if (dungeon_tile_is_possible_upstairs(tile->type)) {
                 count2++;
             }
@@ -25,7 +25,7 @@ static void df_assign_stairs(dungeon_floor_t* df) {
     // now we can loop thru the dungeon floor again and fill the array with the locations
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            tile_t* const tile = df_tile_at(df, x, y);
             if (dungeon_tile_is_possible_upstairs(tile->type)) {
                 // there wont be any entities yet so do not check for them
                 // do not write an if statement
@@ -48,14 +48,14 @@ static void df_assign_stairs(dungeon_floor_t* df) {
     loc_t up_loc = locations[upstairs_index];
     loc_t down_loc = locations[downstairs_index];
     // now we can set the upstairs tile
-    tile_t* const tile = dungeon_floor_tile_at(df, up_loc.x, up_loc.y);
+    tile_t* const tile = df_tile_at(df, up_loc.x, up_loc.y);
     if (!tile) {
         merror("df_init_test: failed to get tile");
         return;
     }
     tile_init(tile, TILE_UPSTAIRS);
     // now we can set the downstairs tile
-    tile_t* const tile2 = dungeon_floor_tile_at(df, down_loc.x, down_loc.y);
+    tile_t* const tile2 = df_tile_at(df, down_loc.x, down_loc.y);
     if (!tile2) {
         merror("df_init_test: failed to get tile");
         return;
@@ -78,7 +78,7 @@ static void df_init_test_simple(dungeon_floor_t* df) {
     df_assign_stairs(df);
 }
 
-dungeon_floor_t* dungeon_floor_create(const int width, const int height) {
+dungeon_floor_t* df_create(const int width, const int height) {
     dungeon_floor_t* floor = malloc(sizeof(dungeon_floor_t));
     if (!floor) {
         merror("dungeon_floor_create: floor malloc failed");
@@ -92,7 +92,7 @@ void df_set_tile_area(dungeon_floor_t* const df, tiletype_t type, int x, int y, 
     if (!df) return;
     for (int i = y; i < y + h; i++) {
         for (int j = x; j < x + w; j++) {
-            tile_t* current = dungeon_floor_tile_at(df, j, i);
+            tile_t* current = df_tile_at(df, j, i);
             tile_init(current, type);
         }
     }
@@ -228,7 +228,7 @@ void df_init_test(dungeon_floor_t* df) {
     int count2 = 0;
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            tile_t* const tile = df_tile_at(df, x, y);
             if (dungeon_tile_is_possible_upstairs(tile->type)) {
                 count2++;
             }
@@ -240,7 +240,7 @@ void df_init_test(dungeon_floor_t* df) {
     // now we can loop thru the dungeon floor again and fill the array with the locations
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            tile_t* const tile = df_tile_at(df, x, y);
             if (dungeon_tile_is_possible_upstairs(tile->type)) {
                 // there wont be any entities yet so do not check for them
                 // do not write an if statement
@@ -263,14 +263,14 @@ void df_init_test(dungeon_floor_t* df) {
     loc_t up_loc = locations[upstairs_index];
     loc_t down_loc = locations[downstairs_index];
     // now we can set the upstairs tile
-    tile_t* const tile = dungeon_floor_tile_at(df, up_loc.x, up_loc.y);
+    tile_t* const tile = df_tile_at(df, up_loc.x, up_loc.y);
     if (!tile) {
         merror("df_init_test: failed to get tile");
         return;
     }
     tile_init(tile, TILE_UPSTAIRS);
     // now we can set the downstairs tile
-    tile_t* const tile2 = dungeon_floor_tile_at(df, down_loc.x, down_loc.y);
+    tile_t* const tile2 = df_tile_at(df, down_loc.x, down_loc.y);
     if (!tile2) {
         merror("df_init_test: failed to get tile");
         return;
@@ -326,20 +326,20 @@ void df_set_tile_perimeter_range(dungeon_floor_t* const df,
     tiletype_t type = TILE_NONE;
 
     for (int i = 0; i <= w; i++) {
-        t = dungeon_floor_tile_at(df, x + i, y);
+        t = df_tile_at(df, x + i, y);
         type = begin_type + (rand() % num_types);
         tile_init(t, type);
 
-        t = dungeon_floor_tile_at(df, x + i, y + h);
+        t = df_tile_at(df, x + i, y + h);
         type = begin_type + (rand() % num_types);
         tile_init(t, type);
     }
     for (int i = 0; i <= h; i++) {
-        t = dungeon_floor_tile_at(df, x, y + i);
+        t = df_tile_at(df, x, y + i);
         type = begin_type + (rand() % num_types);
         tile_init(t, type);
 
-        t = dungeon_floor_tile_at(df, x + w, y + i);
+        t = df_tile_at(df, x + w, y + i);
         type = begin_type + (rand() % num_types);
         tile_init(t, type);
     }
@@ -355,7 +355,7 @@ void df_free(dungeon_floor_t* f) {
     msuccess("Freed dungeon floor");
 }
 
-bool dungeon_floor_add_at(dungeon_floor_t* const df, entityid id, int x, int y) {
+bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y) {
     bool retval = false;
     if (!df) {
         merror("dungeon_floor_add_at: df is NULL");
@@ -374,12 +374,10 @@ bool dungeon_floor_add_at(dungeon_floor_t* const df, entityid id, int x, int y) 
         merror("dungeon_floor_add_at: failed to add entity, tile_add failure");
         return false;
     }
-
-    //msuccessint3("dungeon_floor_add_at: added entity", id, x, y);
     return retval;
 }
 
-bool dungeon_floor_remove_at(dungeon_floor_t* const df, entityid id, int x, int y) {
+bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y) {
     if (!df) {
         merror("dungeon_floor_remove_at: df is NULL");
         return false;
@@ -397,7 +395,7 @@ bool dungeon_floor_remove_at(dungeon_floor_t* const df, entityid id, int x, int 
     return r != -1 && r == id;
 }
 
-tile_t* dungeon_floor_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
+tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
     if (!df) {
         merror("dungeon_floor_tile_at: df is NULL");
         return NULL;
@@ -421,12 +419,12 @@ tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y)
     return df->tiles[y][x].type;
 }
 
-void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
-                                      const int x,
-                                      const int y,
-                                      const int up_tx_key,
-                                      const int dn_tx_key,
-                                      const int event) {
+void df_set_pressure_plate(dungeon_floor_t* const df,
+                           const int x,
+                           const int y,
+                           const int up_tx_key,
+                           const int dn_tx_key,
+                           const int event) {
     if (!df || x < 0 || x >= df->width || y < 0 || y >= df->height) return;
     tile_set_pressure_plate(&df->tiles[y][x], true);
     tile_set_pressure_plate_up_tx_key(&df->tiles[y][x], up_tx_key);
@@ -434,9 +432,9 @@ void dungeon_floor_set_pressure_plate(dungeon_floor_t* const df,
     tile_set_pressure_plate_event(&df->tiles[y][x], event);
 }
 
-void dungeon_floor_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_key, int dn_key, int event) {
+void df_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_key, int dn_key, int event) {
     if (!df || x < 0 || x >= df->width || y < 0 || y >= df->height) return;
-    tile_t* const t = dungeon_floor_tile_at(df, x, y);
+    tile_t* const t = df_tile_at(df, x, y);
     if (!t) return;
     if (!dungeon_tile_is_wall(t->type)) return;
     tile_set_wall_switch(t, true);
@@ -463,7 +461,7 @@ void df_set_all_tiles_range(dungeon_floor_t* const df, tiletype_t begin, tiletyp
     int num_types = end_type - begin_type + 1;
     for (int i = 0; i < df->height; i++) {
         for (int j = 0; j < df->width; j++) {
-            tile_t* current = dungeon_floor_tile_at(df, j, i);
+            tile_t* current = df_tile_at(df, j, i);
             tiletype_t type = begin_type + (rand() % num_types);
             tile_init(current, type);
         }
@@ -472,7 +470,7 @@ void df_set_all_tiles_range(dungeon_floor_t* const df, tiletype_t begin, tiletyp
 
 bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {
     if (!df) return false;
-    tile_t* tile = dungeon_floor_tile_at(df, x, y);
+    tile_t* tile = df_tile_at(df, x, y);
     return dungeon_tile_is_wall(tile->type);
 }
 
@@ -488,7 +486,7 @@ void df_set_tile_area_range2(dungeon_floor_t* const df, Rectangle r, tiletype_t 
     int num_types = end_type - begin_type + 1;
     for (int i = r.y; i < r.y + r.height; i++) {
         for (int j = r.x; j < r.x + r.width; j++) {
-            tile_t* current = dungeon_floor_tile_at(df, j, i);
+            tile_t* current = df_tile_at(df, j, i);
             tiletype_t type = begin_type + (rand() % num_types);
             tile_init(current, type);
         }
@@ -507,7 +505,7 @@ void df_set_tile_area_range(dungeon_floor_t* const df, int x, int y, int w, int 
     int num_types = end_type - begin_type + 1;
     for (int i = y; i < y + h; i++) {
         for (int j = x; j < x + w; j++) {
-            tile_t* current = dungeon_floor_tile_at(df, j, i);
+            tile_t* current = df_tile_at(df, j, i);
             tiletype_t type = begin_type + (rand() % num_types);
             tile_init(current, type);
         }
@@ -571,7 +569,7 @@ void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, d
     if (!df) return;
     tiletype_t type = TILE_STONE_WALL_02;
     df_set_tile(df, type, x, y);
-    dungeon_floor_set_wall_switch(df, x, y, up, down, trigger_id);
+    df_set_wall_switch(df, x, y, up, down, trigger_id);
 }
 
 loc_t df_get_upstairs(const dungeon_floor_t* const df) {
@@ -579,7 +577,7 @@ loc_t df_get_upstairs(const dungeon_floor_t* const df) {
     if (!df) return loc;
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            tile_t* const tile = df_tile_at(df, x, y);
             if (tile->type == TILE_UPSTAIRS) {
                 loc.x = x;
                 loc.y = y;
@@ -595,7 +593,7 @@ loc_t df_get_downstairs(const dungeon_floor_t* const df) {
     if (!df) return loc;
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            tile_t* const tile = dungeon_floor_tile_at(df, x, y);
+            tile_t* const tile = df_tile_at(df, x, y);
             if (tile->type == TILE_DOWNSTAIRS) {
                 loc.x = x;
                 loc.y = y;
@@ -607,7 +605,10 @@ loc_t df_get_downstairs(const dungeon_floor_t* const df) {
 }
 
 int df_count_walkable(const dungeon_floor_t* const df) {
-    if (!df) return 0;
+    massert(df, "df_count_walkable: df is NULL");
+    //if (!df) {
+    //    return 0;
+    //}
     int count = 0;
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {

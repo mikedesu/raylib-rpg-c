@@ -115,9 +115,7 @@ bool gamestate_init_msg_history(gamestate* const g) {
         g->msg_history.messages[i] = (char*)malloc(sizeof(char) * MAX_MSG_LENGTH);
         if (g->msg_history.messages[i] == NULL) {
             merror("gamestateinitptr: g->msg_history.messages[%d] is NULL", i);
-            for (int j = 0; j < i; j++) {
-                free(g->msg_history.messages[j]);
-            }
+            for (int j = 0; j < i; j++) { free(g->msg_history.messages[j]); }
             free(g->msg_history.messages);
             //free(g);
             return false;
@@ -170,7 +168,7 @@ void gamestatefree(gamestate* g) {
     msuccess("Freed gamestate");
 }
 
-bool gamestate_add_entityid(gamestate* const g, entityid id) {
+bool gs_add_entityid(gamestate* const g, entityid id) {
     massert(g, "gamestate_add_entityid: g is NULL");
     massert(id != -1, "gamestate_add_entityid: id is -1");
     massert(g->index_entityids < g->max_entityids, "gamestate_add_entityid: index_entityids >= max_entityids");
@@ -230,9 +228,7 @@ void gamestate_init_entityids(gamestate* const g) {
         merror("gamestate_init_entityids: g->entityids is NULL");
         return;
     }
-    for (int i = 0; i < g->max_entityids; i++) {
-        g->entityids[i] = -1;
-    }
+    for (int i = 0; i < g->max_entityids; i++) { g->entityids[i] = -1; }
     g->index_entityids = 0;
     g->max_entityids = GAMESTATE_INIT_ENTITYIDS_MAX;
 }
@@ -254,9 +250,7 @@ int gamestate_get_entityid_index(const gamestate* const g, entityid id) {
         return -1;
     }
     for (int i = 0; i < g->max_entityids; i++) {
-        if (g->entityids[i] == id) {
-            return i;
-        }
+        if (g->entityids[i] == id) { return i; }
     }
     return -1;
 }
@@ -267,9 +261,7 @@ int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, int ind
         return -1;
     }
     for (int i = index + 1; i < g->max_entityids; i++) {
-        if (g->entityids[i] != -1) {
-            return g->entityids[i];
-        }
+        if (g->entityids[i] != -1) { return g->entityids[i]; }
     }
     return -1;
 }
