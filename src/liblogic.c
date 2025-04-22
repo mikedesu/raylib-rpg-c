@@ -24,11 +24,15 @@
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
-static inline bool liblogic_entity_has_shield(gamestate* const g, entityid id);
+static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
+static inline loc_t* get_locs_around_entity(gamestate* const g, entityid id);
+static inline bool entity_has_weapon(gamestate* const g, entityid id);
+static inline bool entity_has_shield(gamestate* const g, entityid id);
 static inline void reset_player_block_success(gamestate* const g);
 static inline void update_npc_state(gamestate* const g, entityid id);
 static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
 static inline void add_message_history(gamestate* const g, const char* msg);
+static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 static void update_player_state(gamestate* const g);
 static void handle_input(const inputstate* const is, gamestate* const g);
 static void handle_input_camera(const inputstate* const is, gamestate* const g);
@@ -47,9 +51,9 @@ static inline void add_message_history(gamestate* const g, const char* msg) {
     g->msg_history.count++;
 }
 
-static void liblogic_add_message(gamestate* g, const char* fmt, ...) {
-    massert(g, "liblogic_add_message: gamestate is NULL");
-    massert(fmt, "liblogic_add_message: format string is NULL");
+static void add_message(gamestate* g, const char* fmt, ...) {
+    massert(g, "add_message: gamestate is NULL");
+    massert(fmt, "add_message: format string is NULL");
     if (g->msg_system.count >= MAX_MESSAGES) {
         mwarning("Message queue full!");
         return;
@@ -63,7 +67,7 @@ static void liblogic_add_message(gamestate* g, const char* fmt, ...) {
     g->msg_system.is_active = true;
 }
 
-static void liblogic_update_equipped_shield_dir(gamestate* g, entity* e) {
+static void update_equipped_shield_dir(gamestate* g, entity* e) {
     minfo("liblogic_update_equipped_shield_dir: e->id: %d, e->shield: %d", e->id, e->shield);
     if (e->shield != -1) {
         msuccess("liblogic_update_equipped_shield_dir: e->shield is not -1");
@@ -184,7 +188,7 @@ static void liblogic_try_entity_move(gamestate* const g, entity* const e, int x,
     e->sprite_move_x = x * DEFAULT_TILE_SIZE;
     e->sprite_move_y = y * DEFAULT_TILE_SIZE;
     // at this point the move is 'successful'
-    liblogic_update_equipped_shield_dir(g, e);
+    update_equipped_shield_dir(g, e);
     // get the entity's new tile
     tile_t* const new_tile = dungeon_floor_tile_at(df, ex, ey);
     if (!new_tile) {
@@ -277,7 +281,7 @@ liblogic_handle_attack_success(gamestate* const g, entity* attacker, entity* tar
     int dmg = 1;
     entity_set_hp(target, entity_get_hp(target) - dmg); // Reduce HP by 1
     if (target->type == ENTITY_PLAYER) {
-        liblogic_add_message(g, "You took %d damage!", dmg);
+        add_message(g, "You took %d damage!", dmg);
     }
     if (entity_get_hp(target) <= 0) {
         target->is_dead = true;
@@ -296,7 +300,6 @@ liblogic_handle_attack_blocked(gamestate* const g, entity* attacker, entity* tar
     target->block_success = true;
     target->do_update = true;
     if (target->type == ENTITY_PLAYER) {
-        //liblogic_add_message(g, "You blocked the attack!");
         add_message_history(g, "You blocked the attack!");
     }
 }
@@ -698,7 +701,72 @@ static entityid liblogic_shield_create(gamestate* const g, int x, int y, int fl,
     return e->id;
 }
 
-static void liblogic_init_weapon_test(gamestate* const g) {
+static inline loc_t* get_locs_around_entity(gamestate* const g, entityid id) {
+    massert(g, "get_locs_around_entity: gamestate is NULL");
+    entity* const e = em_get(g->entitymap, id);
+    massert(e, "get_locs_around_entity: entity is NULL");
+    int x = e->x;
+    int y = e->y;
+    loc_t* locs = malloc(sizeof(loc_t) * 8);
+    if (!locs) {
+        merror("get_locs_around_entity: failed to allocate memory for locs");
+        return NULL;
+    }
+    int index = 0;
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            if (i == 0 && j == 0) {
+                continue;
+            }
+            locs[index].x = x + i;
+            locs[index].y = y + j;
+            index++;
+        }
+    }
+    return locs;
+}
+
+static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id) {
+    massert(g, "get_random_tile_around_entity: gamestate is NULL");
+    entity* const e = em_get(g->entitymap, id);
+    massert(e, "get_random_tile_around_entity: entity is NULL");
+
+    loc_t* locs = get_locs_around_entity(g, id);
+    massert(locs, "get_random_tile_around_entity: locs is NULL");
+
+    bool found = false;
+    tile_t* tile = NULL;
+    for (int i = 0; i < 8; i++) {
+        tile = dungeon_floor_tile_at(g->dungeon->floors[e->floor], locs[i].x, locs[i].y);
+        if (!tile) {
+            continue;
+        }
+
+        if (!dungeon_tile_is_walkable(tile->type)) {
+            continue;
+        }
+
+        if (tile_entity_count(tile) > 0) {
+            continue;
+        }
+
+        // found an empty tile
+        found = true;
+
+        break;
+    }
+
+    free(locs);
+
+    if (!found) {
+        merror("get_random_tile_around_entity: no empty tile found");
+        return NULL;
+    }
+
+    return tile;
+}
+
+static void init_weapon_test(gamestate* const g) {
     massert(g, "liblogic_init_weapon_test: gamestate is NULL");
     dungeon_t* const d = g->dungeon;
     massert(d, "liblogic_init_weapon_test: dungeon is NULL");
@@ -854,7 +922,7 @@ static entityid liblogic_player_create(gamestate* const g, race_t rt, int x, int
     return id;
 }
 
-static void liblogic_init_player(gamestate* const g) {
+static void init_player(gamestate* const g) {
     minfo("liblogic_init: initializing player");
     massert(g, "liblogic_init: gamestate is NULL");
     // setting it up so we can return a loc_t from a function
@@ -1037,7 +1105,7 @@ static void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     free(locations);
 }
 
-static void liblogic_init_orcs_test(gamestate* const g) {
+static void init_orcs_test(gamestate* const g) {
     //liblogic_init_orcs_test_naive_loop(g);
     liblogic_init_orcs_test_intermediate(g);
 }
@@ -1117,22 +1185,22 @@ static inline void liblogic_change_player_dir(gamestate* const g, direction_t di
     }
     hero->direction = dir;
     hero->do_update = true;
-    liblogic_update_equipped_shield_dir(g, hero);
+    update_equipped_shield_dir(g, hero);
 }
 
-static void liblogic_try_entity_block(gamestate* const g, entity* const e) {
+static void try_entity_block(gamestate* const g, entity* const e) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
 
-    if (!liblogic_entity_has_shield(g, e->id)) {
-        liblogic_add_message(g, "You have no shield to block with!");
+    if (!entity_has_shield(g, e->id)) {
+        add_message(g, "You have no shield to block with!");
         return;
     }
 
     e->do_update = true;
     e->is_blocking = true;
     g->test_guard = true;
-    liblogic_update_equipped_shield_dir(g, e);
+    update_equipped_shield_dir(g, e);
     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
 
@@ -1169,8 +1237,7 @@ static bool liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             // 1. removing its id from the tile
             // 2. adding its id to the entity inventory
             // remove the item from the tile
-            //liblogic_add_message(g, "Picked up weapon");
-            liblogic_add_message(g, "Picked up %s", it->name);
+            add_message(g, "Picked up %s", it->name);
             tile_remove(tile, id);
             // add the item to the entity inventory
             entity_add_item_to_inventory(e, id);
@@ -1186,11 +1253,11 @@ static bool liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             // 1. removing its id from the tile
             // 2. adding its id to the entity inventory
             // remove the item from the tile
-            liblogic_add_message(g, "Picked up %s", it->name);
+            add_message(g, "Picked up %s", it->name);
             tile_remove(tile, id);
             // add the item to the entity inventory
             entity_add_item_to_inventory(e, id);
-            liblogic_update_equipped_shield_dir(g, e);
+            update_equipped_shield_dir(g, e);
             e->shield = id;
             msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) {
@@ -1199,11 +1266,11 @@ static bool liblogic_try_entity_pickup(gamestate* const g, entity* const e) {
             return true;
         }
     }
-    liblogic_add_message(g, "No items to pick up");
+    add_message(g, "No items to pick up");
     return false;
 }
 
-static void liblogic_try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl) {
+static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
@@ -1263,23 +1330,23 @@ static void liblogic_try_flip_switch(gamestate* const g, entity* const e, int x,
     }
 }
 
-static inline bool liblogic_entity_has_weapon(gamestate* const g, entityid id) {
-    massert(g, "liblogic_entity_has_weapon: gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "liblogic_entity_has_weapon: entity ID is invalid");
+static inline bool entity_has_weapon(gamestate* const g, entityid id) {
+    massert(g, "entity_has_weapon: gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entity_has_weapon: entity ID is invalid");
     entity* const e = em_get(g->entitymap, id);
     if (!e) {
-        merror("liblogic_entity_has_weapon: entity not found");
+        merror("entity_has_weapon: entity not found");
         return false;
     }
     entityid id0 = e->weapon;
     if (id0 == ENTITYID_INVALID) {
-        merror("liblogic_entity_has_weapon: entity has no weapon");
+        merror("entity_has_weapon: entity has no weapon");
         return false;
     }
     return true;
 }
 
-static inline bool liblogic_entity_has_shield(gamestate* const g, entityid id) {
+static inline bool entity_has_shield(gamestate* const g, entityid id) {
     massert(g, "liblogic_entity_has_shield: gamestate is NULL");
     massert(id != ENTITYID_INVALID, "liblogic_entity_has_shield: entity ID is invalid");
     entity* const e = em_get(g->entitymap, id);
@@ -1376,19 +1443,19 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_RIGHT);
         } else if (strcmp(action, "attack") == 0) {
             msuccess("attack pressed!");
-            if (liblogic_entity_has_weapon(g, hero->id)) {
+            if (entity_has_weapon(g, hero->id)) {
                 msuccess("Entity has weapon");
                 int tx = hero->x + get_x_from_dir(hero->direction);
                 int ty = hero->y + get_y_from_dir(hero->direction);
                 liblogic_try_entity_attack(g, hero->id, tx, ty);
             } else {
                 merror("Entity has no weapon");
-                liblogic_add_message(g, "You have no weapon to attack with!");
+                add_message(g, "You have no weapon to attack with!");
                 // add a message to the message system
             }
         } else if (strcmp(action, "block") == 0) {
             msuccess("Block pressed!");
-            liblogic_try_entity_block(g, hero);
+            try_entity_block(g, hero);
         } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
             // but eventually this will be generalized
@@ -1397,7 +1464,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             msuccess("Space pressed!");
             int tx = hero->x + get_x_from_dir(hero->direction);
             int ty = hero->y + get_y_from_dir(hero->direction);
-            liblogic_try_flip_switch(g, hero, tx, ty, hero->floor);
+            try_flip_switch(g, hero, tx, ty, hero->floor);
         } else if (strcmp(action, "pickup") == 0) {
             // add a message to the message system
             liblogic_try_entity_pickup(g, hero);
@@ -1428,8 +1495,8 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
     }
 }
 
-static void liblogic_update_debug_panel_buffer(gamestate* const g) {
-    massert(g, "liblogic_update_debug_panel_buffer: gamestate is NULL");
+static void update_debug_panel_buffer(gamestate* const g) {
+    massert(g, "update_debug_panel_buffer: gamestate is NULL");
     // Static buffers to avoid reallocating every frame
     static const char* control_modes[] = {"Player", "Camera", "Unknown"};
     static const char* flag_names[] = {"GAMESTATE_FLAG_NONE",
@@ -1441,17 +1508,17 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
                                        "Unknown"};
     // Get hero position once
     const entity* const e = em_get(g->entitymap, g->hero_id);
-    int hero_x = -1;
-    int hero_y = -1;
+    int x = -1;
+    int y = -1;
     int inventory_count = -1;
     entityid shield_id = -1;
     direction_t player_dir = DIR_NONE;
     direction_t shield_dir = DIR_NONE;
-    bool is_blocking = false;
+    bool is_b = false;
     bool test_guard = g->test_guard;
     if (e) {
-        hero_x = e->x;
-        hero_y = e->y;
+        x = e->x;
+        y = e->y;
         inventory_count = e->inventory_count;
         player_dir = e->direction;
         shield_id = e->shield;
@@ -1460,7 +1527,7 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
             massert(shield, "liblogic_update_debug_panel_buffer: shield is NULL");
             shield_dir = shield->direction;
         }
-        is_blocking = e->is_blocking;
+        is_b = e->is_blocking;
     }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
@@ -1499,13 +1566,13 @@ static void liblogic_update_debug_panel_buffer(gamestate* const g) {
              g->index_entityids,
              flag_name,
              g->entity_turn,
-             hero_x,
-             hero_y,
+             x,
+             y,
              inventory_count,
              g->msg_history.count,
              get_dir_as_string(shield_dir),
              get_dir_as_string(player_dir),
-             is_blocking,
+             is_b,
              test_guard,
              e->block_success);
 }
@@ -1520,12 +1587,12 @@ void liblogic_init(gamestate* const g) {
     g->msg_system.is_active = false;
     gamestate_load_keybindings(g);
     liblogic_init_em(g);
-    liblogic_init_player(g);
+    init_player(g);
     // test to create a weapon
-    liblogic_init_weapon_test(g);
+    init_weapon_test(g);
     // temporarily disabling
-    liblogic_init_orcs_test(g);
-    liblogic_update_debug_panel_buffer(g);
+    init_orcs_test(g);
+    update_debug_panel_buffer(g);
 }
 
 static void update_player_state(gamestate* const g) {
@@ -1533,14 +1600,14 @@ static void update_player_state(gamestate* const g) {
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "liblogic_update_player_state: hero is NULL");
     if (!g_get_gameover(g)) {
-        if (entity_is_dead(e)) {
-            liblogic_add_message(g, "You died!");
+        if (e_is_dead(e)) {
+            add_message(g, "You died!");
             g_set_gameover(g, true);
         }
         return;
     }
 
-    if (entity_is_dead(e)) {
+    if (e_is_dead(e)) {
         entity_set_do_update(e, true);
         return;
     }
@@ -1592,7 +1659,7 @@ static void liblogic_handle_nth_npc(gamestate* const g, int i) {
     }
 }
 
-static void liblogic_handle_npcs(gamestate* const g) {
+static void handle_npcs(gamestate* const g) {
     massert(g, "Game state is NULL!");
     massert(g->flag == GAMESTATE_FLAG_NPC_TURN, "Game state is not in NPC turn!");
     // Process all NPCs
@@ -1639,10 +1706,10 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     handle_input(is, g);
 
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
-        liblogic_handle_npcs(g);
+        handle_npcs(g);
     }
 
-    liblogic_update_debug_panel_buffer(g);
+    update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);

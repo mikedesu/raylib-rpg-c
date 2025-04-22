@@ -84,8 +84,12 @@ int entity_get_inventory_count(entity_t* const e);
 bool entity_item_is_already_in_inventory(entity_t* const e, entityid item_id);
 bool entity_add_item_to_inventory(entity_t* const e, entityid item_id);
 bool entity_remove_item_from_inventory(entity_t* const e, entityid item_id);
-bool entity_is_dead(entity_t* const e);
 bool entity_is_alive(entity_t* const e);
+
+static inline bool e_is_dead(entity_t* const e) {
+    massert(e, "e_is_dead: e is NULL");
+    return e->is_dead;
+}
 
 static inline entitytype_t e_get_type(entity_t* const e) {
     massert(e, "e_get_type: e is NULL");

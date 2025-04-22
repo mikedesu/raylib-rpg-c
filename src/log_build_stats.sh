@@ -2,8 +2,10 @@
 
 LOC=$(find . -name '*.c' -o -name '*.h' | xargs grep -hv '^\s*//' | grep -v '^\s*$' | grep -v '^$' | wc -l);
 DATE=$(date +%s);
+TOKENS=$(python3 count_tokens.py);
 
-echo $DATE,$LOC >> build-stats.csv;
+#echo $DATE,$LOC >> build-stats.csv;
+echo $DATE,$LOC,$TOKENS >> build-stats.csv;
 
 #make clean;
 #{ time make } 2>time.txt;
