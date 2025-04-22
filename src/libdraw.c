@@ -66,8 +66,8 @@ static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, sprite
 static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entity_t* e);
 static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
 static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg);
-static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
 static void libdraw_update_sprite(gamestate* const g, entityid id);
+static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
 
 static inline void draw_hud(gamestate* const g);
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);

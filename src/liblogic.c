@@ -488,9 +488,9 @@ static void liblogic_try_entity_wait(gamestate* const g, entity* const e) {
     }
 }
 
-static void liblogic_execute_action(gamestate* const g, entity* const e, entity_action_t action) {
-    massert(g, "liblogic_execute_action: gamestate is NULL");
-    massert(e, "liblogic_execute_action: entity is NULL");
+static void execute_action(gamestate* const g, entity* const e, entity_action_t action) {
+    massert(g, "execute_action: gamestate is NULL");
+    massert(e, "execute_action: entity is NULL");
     switch (action) {
     case ENTITY_ACTION_MOVE_LEFT:
         liblogic_try_entity_move(g, e, -1, 0);
@@ -1327,7 +1327,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     if (action) {
         if (g->player_changing_direction) {
             if (strcmp(action, "wait") == 0) {
-                liblogic_execute_action(g, hero, ENTITY_ACTION_WAIT);
+                execute_action(g, hero, ENTITY_ACTION_WAIT);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_w") == 0) {
                 liblogic_change_player_dir(g, DIR_LEFT);
@@ -1359,21 +1359,21 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         if (strcmp(action, "wait") == 0) {
             g->player_changing_direction = true;
         } else if (strcmp(action, "move_w") == 0) {
-            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_LEFT);
+            execute_action(g, hero, ENTITY_ACTION_MOVE_LEFT);
         } else if (strcmp(action, "move_e") == 0) {
-            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_RIGHT);
+            execute_action(g, hero, ENTITY_ACTION_MOVE_RIGHT);
         } else if (strcmp(action, "move_n") == 0) {
-            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_UP);
+            execute_action(g, hero, ENTITY_ACTION_MOVE_UP);
         } else if (strcmp(action, "move_s") == 0) {
-            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN);
+            execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN);
         } else if (strcmp(action, "move_nw") == 0) {
-            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_UP_LEFT);
+            execute_action(g, hero, ENTITY_ACTION_MOVE_UP_LEFT);
         } else if (strcmp(action, "move_ne") == 0) {
-            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_UP_RIGHT);
+            execute_action(g, hero, ENTITY_ACTION_MOVE_UP_RIGHT);
         } else if (strcmp(action, "move_sw") == 0) {
-            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_LEFT);
+            execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_LEFT);
         } else if (strcmp(action, "move_se") == 0) {
-            liblogic_execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_RIGHT);
+            execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_RIGHT);
         } else if (strcmp(action, "attack") == 0) {
             msuccess("attack pressed!");
             if (liblogic_entity_has_weapon(g, hero->id)) {
@@ -1587,8 +1587,8 @@ static void liblogic_handle_nth_npc(gamestate* const g, int i) {
     massert(i < g->index_entityids, "Index is out of bounds!");
     entity* e = em_get(g->entitymap, g->entityids[i]);
     massert(e, "liblogic_handle_nth_npc: entity is NULL");
-    if (entity_get_type(e) == ENTITY_NPC && entity_is_alive(e)) {
-        liblogic_execute_action(g, e, e->default_action);
+    if (e_get_type(e) == ENTITY_NPC && entity_is_alive(e)) {
+        execute_action(g, e, e->default_action);
     }
 }
 

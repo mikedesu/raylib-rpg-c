@@ -185,10 +185,10 @@ void entity_set_type(entity_t* const e, entitytype_t type) {
     e->type = type;
 }
 
-entitytype_t entity_get_type(entity_t* const e) {
-    massert(e, "entity_get_type: e is NULL");
-    return e->type;
-}
+//entitytype_t entity_get_type(entity_t* const e) {
+//    massert(e, "entity_get_type: e is NULL");
+//    return e->type;
+//}
 
 void entity_set_default_action(entity_t* const e, entity_action_t action) {
     massert(e, "entity_set_default_action: e is NULL");
