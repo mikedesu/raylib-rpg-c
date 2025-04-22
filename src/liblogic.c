@@ -24,11 +24,18 @@
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
-static void update_player_state(gamestate* const g);
 static inline bool liblogic_entity_has_shield(gamestate* const g, entityid id);
-static inline void liblogic_reset_player_block_success(gamestate* const g);
+static inline void reset_player_block_success(gamestate* const g);
+static inline void update_npc_state(gamestate* const g, entityid id);
+static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
+static inline void add_message_history(gamestate* const g, const char* msg);
+static void update_player_state(gamestate* const g);
+static void handle_input(const inputstate* const is, gamestate* const g);
+static void handle_input_camera(const inputstate* const is, gamestate* const g);
+static void handle_input_player(const inputstate* const is, gamestate* const g);
+static void handle_camera_move(gamestate* const g, const inputstate* const is);
 
-static void liblogic_add_message_history(gamestate* const g, const char* msg) {
+static inline void add_message_history(gamestate* const g, const char* msg) {
     massert(g, "liblogic_add_message_history: gamestate is NULL");
     massert(msg, "liblogic_add_message_history: msg is NULL");
     if (g->msg_history.count >= g->msg_history.max_count) {
@@ -51,7 +58,7 @@ static void liblogic_add_message(gamestate* g, const char* fmt, ...) {
     va_start(args, fmt);
     vsnprintf(g->msg_system.messages[g->msg_system.count], MAX_MSG_LENGTH - 1, fmt, args);
     va_end(args);
-    liblogic_add_message_history(g, g->msg_system.messages[g->msg_system.count]);
+    add_message_history(g, g->msg_system.messages[g->msg_system.count]);
     g->msg_system.count++;
     g->msg_system.is_active = true;
 }
@@ -290,7 +297,7 @@ liblogic_handle_attack_blocked(gamestate* const g, entity* attacker, entity* tar
     target->do_update = true;
     if (target->type == ENTITY_PLAYER) {
         //liblogic_add_message(g, "You blocked the attack!");
-        liblogic_add_message_history(g, "You blocked the attack!");
+        add_message_history(g, "You blocked the attack!");
     }
 }
 
@@ -1047,7 +1054,7 @@ static const char* liblogic_get_action_key(const inputstate* const is, gamestate
     return get_action_for_key(&g->keybinding_list, key);
 }
 
-static void liblogic_handle_camera_move(gamestate* const g, const inputstate* const is) {
+static void handle_camera_move(gamestate* const g, const inputstate* const is) {
     const float move = g->cam2d.zoom;
     const char* action = liblogic_get_action_key(is, g);
     if (!action) {
@@ -1079,7 +1086,7 @@ static void liblogic_handle_camera_move(gamestate* const g, const inputstate* co
     }
 }
 
-static void liblogic_handle_camera_zoom(gamestate* const g, const inputstate* const is) {
+static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is) {
     massert(g, "Game state is NULL!");
     massert(is, "Input state is NULL!");
     if (inputstate_is_held(is, KEY_Z)) {
@@ -1091,11 +1098,11 @@ static void liblogic_handle_camera_zoom(gamestate* const g, const inputstate* co
     }
 }
 
-static void liblogic_handle_input_camera(const inputstate* const is, gamestate* const g) {
+static void handle_input_camera(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-    liblogic_handle_camera_move(g, is);
-    liblogic_handle_camera_zoom(g, is);
+    handle_camera_move(g, is);
+    handle_camera_zoom(g, is);
 }
 
 static inline void liblogic_change_player_dir(gamestate* const g, direction_t dir) {
@@ -1288,7 +1295,7 @@ static inline bool liblogic_entity_has_shield(gamestate* const g, entityid id) {
     return true;
 }
 
-static void liblogic_handle_input_player(const inputstate* const is, gamestate* const g) {
+static void handle_input_player(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
@@ -1402,18 +1409,20 @@ static void liblogic_handle_input_player(const inputstate* const is, gamestate* 
     }
 }
 
-static void liblogic_handle_input(const inputstate* const is, gamestate* const g) {
-    massert(is, "liblogic_handle_input: inputstate is NULL");
-    massert(g, "liblogic_handle_input: gamestate is NULL");
+static void handle_input(const inputstate* const is, gamestate* const g) {
+    massert(is, "handle_input: inputstate is NULL");
+    massert(g, "handle_input: gamestate is NULL");
+
+    // no matter which mode we are in, we can toggle the debug panel
     if (inputstate_is_pressed(is, KEY_D)) {
         msuccess("D pressed!");
         g->debugpanelon = !g->debugpanelon;
     }
-    //if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) g->is3d = !g->is3d;
+
     if (g->controlmode == CONTROLMODE_PLAYER) {
-        liblogic_handle_input_player(is, g);
+        handle_input_player(is, g);
     } else if (g->controlmode == CONTROLMODE_CAMERA) {
-        liblogic_handle_input_camera(is, g);
+        handle_input_camera(is, g);
     } else {
         merror("Unknown control mode");
     }
@@ -1544,14 +1553,16 @@ static void update_player_state(gamestate* const g) {
     }
 }
 
-static void liblogic_update_npc_state(gamestate* const g, entityid id) {
+static inline void update_npc_state(gamestate* const g, entityid id) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, id);
-    if (!e) {
-        merror("Failed to get entity");
-        return;
-    }
+    massert(e, "update_npc_state: entity is NULL");
+    //if (!e) {
+    //    merror("Failed to get entity");
+    //    return;
+    //}
     if (e->is_dead) {
+        e->do_update = true;
         return;
     }
     if (e->hp <= 0) {
@@ -1562,11 +1573,11 @@ static void liblogic_update_npc_state(gamestate* const g, entityid id) {
     }
 }
 
-static void liblogic_update_npcs_state(gamestate* const g) {
+static void update_npcs_state(gamestate* const g) {
     massert(g, "Game state is NULL!");
     for (int i = 0; i < g->index_entityids; i++) {
         entityid id = g->entityids[i];
-        liblogic_update_npc_state(g, id);
+        update_npc_state(g, id);
     }
 }
 
@@ -1575,19 +1586,15 @@ static void liblogic_handle_nth_npc(gamestate* const g, int i) {
     massert(i >= 0, "Index is out of bounds!");
     massert(i < g->index_entityids, "Index is out of bounds!");
     entity* e = em_get(g->entitymap, g->entityids[i]);
-    if (e) {
-        if (e->type == ENTITY_NPC) {
-            if (!e->is_dead) {
-                liblogic_execute_action(g, e, e->default_action);
-            }
-        }
+    massert(e, "liblogic_handle_nth_npc: entity is NULL");
+    if (entity_get_type(e) == ENTITY_NPC && entity_is_alive(e)) {
+        liblogic_execute_action(g, e, e->default_action);
     }
 }
 
 static void liblogic_handle_npcs(gamestate* const g) {
     massert(g, "Game state is NULL!");
     massert(g->flag == GAMESTATE_FLAG_NPC_TURN, "Game state is not in NPC turn!");
-    //if (g->flag != GAMESTATE_FLAG_NPC_TURN) return;
     // Process all NPCs
     for (int i = 0; i < g->index_entityids; i++) {
         liblogic_handle_nth_npc(g, i);
@@ -1596,7 +1603,7 @@ static void liblogic_handle_npcs(gamestate* const g) {
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }
 
-static void liblogic_reset_player_blocking(gamestate* const g) {
+static void reset_player_blocking(gamestate* const g) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, g->hero_id);
     if (!e) {
@@ -1604,17 +1611,17 @@ static void liblogic_reset_player_blocking(gamestate* const g) {
         return;
     }
     e->is_blocking = false;
-    //e->block_success = false;
     g->test_guard = false;
 }
 
-static inline void liblogic_reset_player_block_success(gamestate* const g) {
+static inline void reset_player_block_success(gamestate* const g) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, g->hero_id);
-    if (!e) {
-        merror("Failed to get hero entity");
-        return;
-    }
+    massert(e, "liblogic_reset_player_block_success: hero is NULL");
+    //if (!e) {
+    //    merror("Failed to get hero entity");
+    //    return;
+    //}
     e->block_success = false;
 }
 
@@ -1622,14 +1629,14 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     update_player_state(g);
-    liblogic_update_npcs_state(g);
+    update_npcs_state(g);
 
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-        liblogic_reset_player_blocking(g);
-        liblogic_reset_player_block_success(g);
+        reset_player_blocking(g);
+        reset_player_block_success(g);
     }
 
-    liblogic_handle_input(is, g);
+    handle_input(is, g);
 
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
         liblogic_handle_npcs(g);

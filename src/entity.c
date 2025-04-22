@@ -257,3 +257,8 @@ void entity_set_do_update(entity_t* const e, bool do_update) {
     massert(e, "entity_set_do_update: e is NULL");
     e->do_update = do_update;
 }
+
+bool entity_is_alive(entity_t* const e) {
+    massert(e, "entity_is_alive: e is NULL");
+    return !e->is_dead;
+}

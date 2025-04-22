@@ -86,3 +86,4 @@ bool entity_item_is_already_in_inventory(entity_t* const e, entityid item_id);
 bool entity_add_item_to_inventory(entity_t* const e, entityid item_id);
 bool entity_remove_item_from_inventory(entity_t* const e, entityid item_id);
 bool entity_is_dead(entity_t* const e);
+bool entity_is_alive(entity_t* const e);
