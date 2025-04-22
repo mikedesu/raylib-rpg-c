@@ -273,17 +273,14 @@ static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* 
     if (target->type == ENTITY_PLAYER) add_message_history(g, "You blocked the attack!");
 }
 
-static inline bool liblogic_handle_attack_helper_innerloop(gamestate* const g,
-                                                           tile_t* tile,
-                                                           int i,
-                                                           entity* attacker,
-                                                           bool* attack_successful) {
-    massert(g, "liblogic_handle_attack_helper_innerloop: gamestate is NULL");
-    massert(tile, "liblogic_handle_attack_helper_innerloop: tile is NULL");
-    massert(i >= 0, "liblogic_handle_attack_helper_innerloop: i is out of bounds");
-    massert(i < tile->entity_max, "liblogic_handle_attack_helper_innerloop: i is out of bounds");
-    massert(attacker, "liblogic_handle_attack_helper_innerloop: attacker is NULL");
-    massert(attack_successful, "liblogic_handle_attack_helper_innerloop: attack_successful is NULL");
+static inline bool
+handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entity* attacker, bool* attack_successful) {
+    massert(g, "gamestate is NULL");
+    massert(tile, "tile is NULL");
+    massert(i >= 0, "i is out of bounds");
+    massert(i < tile->entity_max, "i is out of bounds");
+    massert(attacker, "attacker is NULL");
+    massert(attack_successful, "attack_successful is NULL");
 
     entityid id = tile->entities[i];
     if (id != -1) {
@@ -323,80 +320,74 @@ static inline bool liblogic_handle_attack_helper_innerloop(gamestate* const g,
     return false;
 }
 
-static void liblogic_handle_attack_helper(gamestate* const g, tile_t* tile, entity* attacker, bool* attack_successful) {
-    massert(g, "liblogic_handle_attack_helper: gamestate is NULL");
-    massert(tile, "liblogic_handle_attack_helper: tile is NULL");
-    massert(attacker, "liblogic_handle_attack_helper: attacker is NULL");
-    massert(attack_successful, "liblogic_handle_attack_helper: attack_successful is NULL");
-
-    for (int i = 0; i < tile->entity_max; i++) {
-        liblogic_handle_attack_helper_innerloop(g, tile, i, attacker, attack_successful);
-    }
+static void handle_attack_helper(gamestate* const g, tile_t* tile, entity* attacker, bool* successful) {
+    massert(g, "gamestate is NULL");
+    massert(tile, "tile is NULL");
+    massert(attacker, "attacker is NULL");
+    massert(successful, "attack_successful is NULL");
+    for (int i = 0; i < tile->entity_max; i++) handle_attack_helper_innerloop(g, tile, i, attacker, successful);
 }
 
 static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y) {
-    massert(g, "liblogic_try_entity_attack: gamestate is NULL");
-    entity* const attacker = em_get(g->entitymap, attacker_id);
-    massert(attacker, "liblogic_try_entity_attack: attacker entity is NULL");
-    if (attacker->is_dead) {
-        merror("liblogic_try_entity_attack: attacker entity is dead");
+    massert(g, "gamestate is NULL");
+    entity* e = em_get(g->entitymap, attacker_id);
+    massert(e, "attacker entity is NULL");
+    if (e->is_dead) {
+        merror("attacker entity is dead");
         return;
     }
-    dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, attacker->floor);
-    massert(floor, "liblogic_try_entity_attack: failed to get dungeon floor");
+    dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, e->floor);
+    massert(floor, "failed to get dungeon floor");
     tile_t* const tile = df_tile_at(floor, target_x, target_y);
     if (!tile) {
-        merror("liblogic_try_entity_attack: target tile not found");
+        merror("target tile not found");
         return;
     }
     // Calculate direction based on target position
-    bool attack_successful = false;
-    int dx = target_x - attacker->x;
-    int dy = target_y - attacker->y;
-    attacker->direction = get_dir_from_xy(dx, dy);
-    attacker->is_attacking = true;
-    attacker->do_update = true;
-    liblogic_handle_attack_helper(g, tile, attacker, &attack_successful);
-    handle_attack_success_gamestate_flag(g, attacker->type, attack_successful);
+    bool successful = false;
+    int dx = target_x - e->x;
+    int dy = target_y - e->y;
+    e->direction = get_dir_from_xy(dx, dy);
+    e->is_attacking = e->do_update = true;
+    handle_attack_helper(g, tile, e, &successful);
+    handle_attack_success_gamestate_flag(g, e->type, successful);
 }
 
 static void try_entity_attack_random(gamestate* const g, entity* const e) {
-    massert(g, "liblogic_try_entity_attack_random: gamestate is NULL");
-    massert(e, "liblogic_try_entity_attack_random: entity is NULL");
+    massert(g, "gamestate is NULL");
+    massert(e, "entity is NULL");
     int x = rand() % 3;
     int y = 0;
-    if (x == 0) {
+    if (x == 0)
         x = -1;
-    } else if (x == 1) {
+    else if (x == 1)
         x = 0;
-    } else {
+    else
         x = 1;
-    }
+
     // if x is 0, y cannot also be 0
     if (x == 0) {
         y = rand() % 2;
-        if (y == 0) {
+        if (y == 0)
             y = -1;
-        } else {
+        else
             y = 1;
-        }
     } else {
         y = rand() % 3;
-        if (y == 0) {
+        if (y == 0)
             y = -1;
-        } else if (y == 1) {
+        else if (y == 1)
             y = 0;
-        } else {
+        else
             y = 1;
-        }
     }
     try_entity_attack(g, e->id, e->x + x, e->y + y);
 }
 
 static void try_entity_attack_player(gamestate* const g, entity* const e) {
-    massert(g, "liblogic_try_entity_attack_player: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     entity* h = em_get(g->entitymap, g->hero_id);
-    massert(h, "liblogic_try_entity_attack_player: hero is NULL");
+    massert(h, "hero is NULL");
     int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
     int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
     if (dx != 0 || dy != 0) try_entity_attack(g, e->id, h->x, h->y);
@@ -405,14 +396,14 @@ static void try_entity_attack_player(gamestate* const g, entity* const e) {
 static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
     massert(g, "liblogic_entities_adjacent: gamestate is NULL");
     entity* const e0 = em_get(g->entitymap, id0);
-    if (!e0) { return false; }
+    if (!e0) return false;
     entity* const e1 = em_get(g->entitymap, id1);
-    if (!e1) { return false; }
+    if (!e1) return false;
     // use e0 and check the surrounding 8 tiles
     for (int y = -1; y <= 1; y++) {
         for (int x = -1; x <= 1; x++) {
-            if (x == 0 && y == 0) { continue; }
-            if (e0->x + x == e1->x && e0->y + y == e1->y) { return true; }
+            if (x == 0 && y == 0) continue;
+            if (e0->x + x == e1->x && e0->y + y == e1->y) return true;
         }
     }
     return false;
@@ -513,39 +504,37 @@ static entityid weapon_create(gamestate* const g, int x, int y, int fl, const ch
 }
 
 static entityid liblogic_shield_create(gamestate* const g, int x, int y, int fl, const char* name) {
-    massert(g, "liblogic_shield_create: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     em_t* em = gamestate_get_entitymap(g);
-    massert(em, "liblogic_shield_create: entitymap is NULL");
-    massert(name && name[0], "liblogic_shield_create: name is NULL or empty");
-    //massert(rt >= 0, "liblogic_shield_create: race_type is out of bounds");
-    //massert(rt < RACE_COUNT, "liblogic_shield_create: race_type is out of bounds");
+    massert(em, "entitymap is NULL");
+    massert(name && name[0], "name is NULL or empty");
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
-    massert(df, "liblogic_shield_create: failed to get current dungeon floor");
-    massert(x >= 0, "liblogic_shield_create: x is out of bounds");
-    massert(x < df->width, "liblogic_shield_create: x is out of bounds");
-    massert(y >= 0, "liblogic_shield_create: y is out of bounds");
-    massert(y < df->height, "liblogic_shield_create: y is out of bounds");
+    massert(df, "failed to get current dungeon floor");
+    massert(x >= 0, "x is out of bounds");
+    massert(x < df->width, "x is out of bounds");
+    massert(y >= 0, "y is out of bounds");
+    massert(y < df->height, "y is out of bounds");
     // can we create an entity at this location? no entities can be made on wall-types etc
     tile_t* const tile = df_tile_at(df, x, y);
-    massert(tile, "liblogic_shield_create: failed to get tile");
+    massert(tile, "failed to get tile");
     if (!dungeon_tile_is_walkable(tile->type)) {
-        merror("liblogic_shield_create: cannot create entity on wall");
+        merror("cannot create entity on wall");
         return -1;
     }
     if (tile_has_live_npcs(tile, em)) {
-        merror("liblogic_shield_create: cannot create entity on tile with NPC");
+        merror("cannot create entity on tile with NPC");
         return -1;
     }
     entity* const e = e_new_shield_at(next_entityid++, x, y, fl, name);
     if (!e) {
-        merror("liblogic_shield_create: failed to create entity");
+        merror("failed to create entity");
         return -1;
     }
     em_add(em, e);
     gs_add_entityid(g, e->id);
     //dungeon_floor_add_at(df, e->id, x, y);
     if (!df_add_at(df, e->id, x, y)) {
-        merror("liblogic_shield_create: failed to add entity to dungeon floor");
+        merror("failed to add entity to dungeon floor");
         e_free(e);
         return -1;
     }
@@ -553,14 +542,14 @@ static entityid liblogic_shield_create(gamestate* const g, int x, int y, int fl,
 }
 
 static inline loc_t* get_locs_around_entity(gamestate* const g, entityid id) {
-    massert(g, "get_locs_around_entity: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     entity* const e = em_get(g->entitymap, id);
-    massert(e, "get_locs_around_entity: entity is NULL");
+    massert(e, "entity is NULL");
     int x = e->x;
     int y = e->y;
     loc_t* locs = malloc(sizeof(loc_t) * 8);
     if (!locs) {
-        merror("get_locs_around_entity: failed to allocate memory for locs");
+        merror("failed to allocate memory for locs");
         return NULL;
     }
     int index = 0;
@@ -576,12 +565,12 @@ static inline loc_t* get_locs_around_entity(gamestate* const g, entityid id) {
 }
 
 static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id) {
-    massert(g, "get_random_tile_around_entity: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     entity* const e = em_get(g->entitymap, id);
-    massert(e, "get_random_tile_around_entity: entity is NULL");
+    massert(e, "entity is NULL");
 
     loc_t* locs = get_locs_around_entity(g, id);
-    massert(locs, "get_random_tile_around_entity: locs is NULL");
+    massert(locs, "locs is NULL");
 
     bool found = false;
     tile_t* tile = NULL;
@@ -602,7 +591,7 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
     free(locs);
 
     if (!found) {
-        merror("get_random_tile_around_entity: no empty tile found");
+        merror("no empty tile found");
         return NULL;
     }
 
@@ -610,11 +599,11 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
 }
 
 static void init_weapon_test(gamestate* const g) {
-    massert(g, "liblogic_init_weapon_test: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     dungeon_t* const d = g->dungeon;
-    massert(d, "liblogic_init_weapon_test: dungeon is NULL");
+    massert(d, "dungeon is NULL");
     dungeon_floor_t* const df = dungeon_get_floor(d, 0);
-    massert(df, "liblogic_init_weapon_test: dungeon floor is NULL");
+    massert(df, "dungeon floor is NULL");
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "e is NULL");
     bool found = false;
@@ -675,51 +664,51 @@ static void init_weapon_test(gamestate* const g) {
 }
 
 static void liblogic_init_dungeon(gamestate* const g) {
-    massert(g, "liblogic_init_dungeon: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     g->dungeon = dungeon_create();
-    massert(g->dungeon, "liblogic_init_dungeon: failed to init dungeon");
+    massert(g->dungeon, "failed to init dungeon");
     dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 }
 
 static void liblogic_init_em(gamestate* const g) {
-    massert(g, "liblogic_init: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     g->entitymap = em_new();
 }
 
 static entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
-    massert(g, "liblogic_npc_create: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     em_t* em = gamestate_get_entitymap(g);
-    massert(em, "liblogic_npc_create: entitymap is NULL");
-    massert(name && name[0], "liblogic_npc_create: name is NULL or empty");
-    massert(rt >= 0, "liblogic_entity_create: race_type is out of bounds");
-    massert(rt < RACE_COUNT, "liblogic_entity_create: race_type is out of bounds");
+    massert(em, "entitymap is NULL");
+    massert(name && name[0], "name is NULL or empty");
+    massert(rt >= 0, "race_type is out of bounds");
+    massert(rt < RACE_COUNT, "race_type is out of bounds");
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
-    massert(df, "liblogic_entity_create: failed to get current dungeon floor");
-    massert(x >= 0, "liblogic_entity_create: x is out of bounds");
-    massert(x < df->width, "liblogic_entity_create: x is out of bounds");
-    massert(y >= 0, "liblogic_entity_create: y is out of bounds");
-    massert(y < df->height, "liblogic_entity_create: y is out of bounds");
+    massert(df, "failed to get current dungeon floor");
+    massert(x >= 0, "x is out of bounds");
+    massert(x < df->width, "x is out of bounds");
+    massert(y >= 0, "y is out of bounds");
+    massert(y < df->height, "y is out of bounds");
     // can we create an entity at this location? no entities can be made on wall-types etc
     tile_t* const tile = df_tile_at(df, x, y);
-    massert(tile, "liblogic_entity_create: failed to get tile");
+    massert(tile, "failed to get tile");
     if (!dungeon_tile_is_walkable(tile->type)) {
-        merror("liblogic_entity_create: cannot create entity on wall");
+        merror("cannot create entity on wall");
         return -1;
     }
     if (tile_has_live_npcs(tile, em)) {
-        merror("liblogic_entity_create: cannot create entity on tile with NPC");
+        merror("cannot create entity on tile with NPC");
         return -1;
     }
     entity* const e = e_new_npc_at(next_entityid++, rt, x, y, fl,
                                    name); // Assuming entity_new_at takes name next
     if (!e) {
-        merror("liblogic_entity_create: failed to create entity");
+        merror("failed to create entity");
         return -1;
     }
     em_add(em, e);
     gs_add_entityid(g, e->id);
     if (!df_add_at(df, e->id, x, y)) {
-        merror("liblogic_entity_create: failed to add entity to dungeon floor");
+        merror("failed to add entity to dungeon floor");
         e_free(e);
         return -1;
     }
@@ -727,20 +716,20 @@ static entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y,
 }
 
 static entityid liblogic_player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
-    minfo("liblogic_player_create: creating player");
-    massert(g, "liblogic_player_create: gamestate is NULL");
-    massert(name, "liblogic_player_create: name is NULL");
+    minfo("creating player");
+    massert(g, "gamestate is NULL");
+    massert(name, "name is NULL");
     // use the previously-written liblogic_npc_create function
     const entitytype_t type = ENTITY_PLAYER;
-    minfo("liblogic_player_create: creating player with type %d", type);
+    minfo("creating player with type %d", type);
     const entityid id = liblogic_npc_create(g, rt, x, y, fl, name);
-    minfo("liblogic_player_create: player id: %d", id);
+    minfo("player id: %d", id);
     minfo("getting entitymap");
     em_t* em = gamestate_get_entitymap(g);
-    massert(em, "liblogic_player_create: entitymap is NULL");
+    massert(em, "entitymap is NULL");
     entity_t* const e = em_get(em, id);
     if (!e) {
-        merror("liblogic_player_create: failed to get entity with id %d", id);
+        merror("failed to get entity with id %d", id);
         return ENTITYID_INVALID;
     }
     e_set_type(e, type);
@@ -749,21 +738,21 @@ static entityid liblogic_player_create(gamestate* const g, race_t rt, int x, int
 }
 
 static void init_player(gamestate* const g) {
-    minfo("liblogic_init: initializing player");
-    massert(g, "liblogic_init: gamestate is NULL");
+    minfo("initializing player");
+    massert(g, "gamestate is NULL");
     // setting it up so we can return a loc_t from a function
     // that can scan for an appropriate starting location
     loc_t loc = df_get_upstairs(g->dungeon->floors[g->dungeon->current_floor]);
-    minfo("liblogic_init: creating player...");
+    minfo("creating player...");
     const int id = liblogic_player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
-    msuccess("liblogic_init: player id: %d", id);
-    massert(id != -1, "liblogic_init: failed to init hero");
+    msuccess("player id: %d", id);
+    massert(id != -1, "failed to init hero");
     entity* const hero = em_get(g->entitymap, g->hero_id);
-    massert(hero, "liblogic_init: hero is NULL");
+    massert(hero, "hero is NULL");
     e_set_maxhp(hero, 3);
     e_set_hp(hero, 3);
     g->entity_turn = g->hero_id;
-    msuccess("liblogic_init: hero id %d", g->hero_id);
+    msuccess("hero id %d", g->hero_id);
 }
 
 //static void liblogic_init_orcs_test_naive_loop(gamestate* const g) {
