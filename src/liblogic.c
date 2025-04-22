@@ -1530,10 +1530,16 @@ static void update_player_state(gamestate* const g) {
         }
         return;
     }
+
+    if (entity_is_dead(e)) {
+        entity_set_do_update(e, true);
+        return;
+    }
+
     if (entity_get_hp(e) <= 0) {
         entity_set_is_dead(e, true);
         entity_set_do_update(e, true);
-        merror("Hero is dead!");
+        //merror("Hero is dead!");
         return;
     }
 }
