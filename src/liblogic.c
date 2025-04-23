@@ -29,11 +29,13 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
 static inline loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 static inline bool e_has_weapon(gamestate* const g, entityid id);
 static inline bool e_has_shield(gamestate* const g, entityid id);
+static inline bool player_on_tile(gamestate* g, int x, int y, int floor);
 static inline void reset_player_block_success(gamestate* const g);
 static inline void update_npc_state(gamestate* const g, entityid id);
 static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
 static inline void add_message_history(gamestate* const g, const char* msg);
 static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
+
 static void update_player_state(gamestate* const g);
 static void handle_input(const inputstate* const is, gamestate* const g);
 static void handle_input_camera(const inputstate* const is, gamestate* const g);
@@ -41,10 +43,13 @@ static void handle_input_player(const inputstate* const is, gamestate* const g);
 static void handle_camera_move(gamestate* const g, const inputstate* const is);
 
 static inline void add_message_history(gamestate* const g, const char* msg) {
-    massert(g, "liblogic_add_message_history: gamestate is NULL");
-    massert(msg, "liblogic_add_message_history: msg is NULL");
+    massert(g, "gamestate is NULL");
+    massert(msg, "msg is NULL");
+    massert(strlen(msg) > 0, "msg is empty");
+    massert(g->msg_history.messages, "g->msg_history.messages is NULL");
+    massert(g->msg_history.count >= 0, "g->msg_history.count is negative");
     if (g->msg_history.count >= g->msg_history.max_count) {
-        mwarning("Message history full!");
+        merror("Message history full!");
         return;
     }
     strncpy(g->msg_history.messages[g->msg_history.count], msg, MAX_MSG_LENGTH - 1);
@@ -69,39 +74,41 @@ static void add_message(gamestate* g, const char* fmt, ...) {
 }
 
 static void update_equipped_shield_dir(gamestate* g, entity* e) {
-    minfo("update_equipped_shield_dir: e->id: %d, e->shield: %d", e->id, e->shield);
-    if (e->shield != -1) {
-        msuccess("e->shield is not -1");
+    massert(g, "gamestate is NULL");
+    massert(e, "entity is NULL");
+    if (e->shield != ENTITYID_INVALID) {
         entity* shield = em_get(g->entitymap, e->shield);
-        if (shield) {
-            shield->direction = e->direction;
-            shield->do_update = true;
+        if (!shield) {
+            merror("Failed to get shield entity");
+            return;
         }
+        shield->direction = e->direction;
+        shield->do_update = true;
     }
 }
 
-static bool player_on_tile(const gamestate* const g, int x, int y, int floor) {
+static inline bool player_on_tile(gamestate* g, int x, int y, int floor) {
     massert(g, "gamestate is NULL");
     // get the tile at x y
-    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, 0);
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
     if (!df) {
         merror("failed to get dungeon floor");
         return false;
     }
-    const tile_t* const tile = df_tile_at(df, x, y);
+    tile_t* tile = df_tile_at(df, x, y);
     if (!tile) {
         merror("failed to get tile");
         return false;
     }
     // enumerate entities and check their type
     for (int i = 0; i < tile->entity_max; i++) {
-        if (tile->entities[i] == -1) { continue; }
-        const entity* const e = em_get(g->entitymap, tile->entities[i]);
+        if (tile->entities[i] == -1) continue;
+        entity* e = em_get(g->entitymap, tile->entities[i]);
         if (!e) {
             merror("failed to get entity");
             return false;
         }
-        if (e->type == ENTITY_PLAYER) { return true; }
+        if (e->type == ENTITY_PLAYER) return true;
     }
     return false;
 }

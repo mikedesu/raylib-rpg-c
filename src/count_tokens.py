@@ -12,7 +12,7 @@ def main():
         if filename.endswith(".c") or filename.endswith(".h"):
             with open(filename, "r") as f:
                 content = f.read()
-                encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+                encoding = tiktoken.encoding_for_model("gpt-4o")
                 tokens = len(encoding.encode(content))
                 total_count += tokens
                 # print(f"{filename}: {tokens} tokens")
