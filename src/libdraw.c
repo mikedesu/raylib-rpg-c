@@ -487,13 +487,13 @@ static void libdraw_update_sprite(gamestate* const g, entityid id) {
             //
             //
 
-            if (e->dead) {
-                if (!spritegroup_is_animating(sg)) {
-                    minfo("Death animation COMPLETE - Entity %d frozen on frame %d", id, sg->sprites[sg->current]->currentframe);
-                    return;
-                }
-                //minfo("Death animation in progress - Frame %d/%d", sg->sprites[sg->current]->currentframe, sg->sprites[sg->current]->numframes - 1);
-            }
+            //if (e->dead) {
+            //if (!spritegroup_is_animating(sg)) {
+            //minfo("Death animation COMPLETE - Entity %d frozen on frame %d", id, sg->sprites[sg->current]->currentframe);
+            //    return;
+            //}
+            //minfo("Death animation in progress - Frame %d/%d", sg->sprites[sg->current]->currentframe, sg->sprites[sg->current]->numframes - 1);
+            //}
 
             libdraw_update_sprite_ptr(g, e, sg);
             libdraw_handle_frame_incr(g, sg);
