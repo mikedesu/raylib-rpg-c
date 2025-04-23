@@ -747,8 +747,8 @@ static void init_player(gamestate* const g) {
     massert(id != -1, "failed to init hero");
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "hero is NULL");
-    e_set_maxhp(hero, 3);
-    e_set_hp(hero, 3);
+    e_set_maxhp(hero, 10);
+    e_set_hp(hero, 10);
     g->entity_turn = g->hero_id;
     msuccess("hero id %d", g->hero_id);
 }

@@ -38,7 +38,7 @@ void sprite_incrframe(sprite* const s) {
     massert(s, "sprite_incrframe: sprite is NULL");
     //if (!s->is_animating) return;
     if (!s->is_animating) {
-        minfo("Frame increment blocked - animation stopped");
+        //minfo("Frame increment blocked - animation stopped");
         return;
     }
 
@@ -48,7 +48,7 @@ void sprite_incrframe(sprite* const s) {
     //}
 
     if (s->stop_on_last_frame && s->currentframe == s->numframes - 1) {
-        minfo("Reached last frame of stopped animation (Frame %d)", s->currentframe);
+        //minfo("Reached last frame of stopped animation (Frame %d)", s->currentframe);
         s->is_animating = false;
         return;
     }
