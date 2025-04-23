@@ -270,17 +270,28 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spr
 }
 
 static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
-    if (!e || !sg) {
-        merror("entity or spritegroup is NULL");
-        return;
-    }
+    massert(g, "gamestate is NULL");
+    massert(e, "entity is NULL");
+    massert(sg, "spritegroup is NULL");
+
+    if (!e->dead) return;
+
     if (e->race == RACE_HUMAN) {
-        sg->current = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
+        if (sg->current == SPRITEGROUP_ANIM_HUMAN_SPINDIE) {
+            merror("libdraw_set_sg_is_dead: spritegroup is already dead");
+            return;
+        }
+
         sg->default_anim = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
+        sg->current = sg->default_anim;
         spritegroup_set_stop_on_last_frame(sg, true);
     } else if (e->race == RACE_ORC) {
-        sg->current = SPRITEGROUP_ANIM_ORC_DIE;
+        if (sg->current == SPRITEGROUP_ANIM_ORC_DIE) {
+            merror("libdraw_set_sg_is_dead: spritegroup is already dead");
+            return;
+        }
         sg->default_anim = SPRITEGROUP_ANIM_ORC_DIE;
+        sg->current = sg->default_anim;
         spritegroup_set_stop_on_last_frame(sg, true);
     }
 }

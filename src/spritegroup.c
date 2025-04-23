@@ -89,9 +89,7 @@ void spritegroup_set(spritegroup_t* const sg, int index, sprite* s) {
         return;
     }
     // only set if the sprite is not NULL and sg->sprites[index] is NULL
-    if (sg->sprites[index] == NULL) {
-        sg->sprites[index] = s;
-    }
+    if (sg->sprites[index] == NULL) { sg->sprites[index] = s; }
 }
 
 // each sprite has a 'context' that corresponds to different directions
@@ -195,19 +193,14 @@ int spritegroup_get_first_context(spritegroup_t* const sg) {
 }
 
 void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop) {
-    massert(sg, "spritegroup_set_stop_on_last_frame: spritegroup is NULL");
-    //if (!sg) {
-    //    merror("spritegroup_set_stop_on_last_frame: spritegroup is NULL");
+    massert(sg, "spritegroup is NULL");
+    // get the current sprite
+    sprite* s = spritegroup_get(sg, sg->current);
+    massert(s, "sprite is NULL");
+    //if (!s) {
+    //    merror("spritegroup_set_stop_on_last_frame: sprite is NULL");
     //    return;
     //}
-
-    // get the current sprite
-    //sprite* s = sg->sprites[sg->current];
-    sprite* s = spritegroup_get(sg, sg->current);
-    if (!s) {
-        merror("spritegroup_set_stop_on_last_frame: sprite is NULL");
-        return;
-    }
 
     // set the stop_on_last_frame flag
     s->stop_on_last_frame = do_stop;
