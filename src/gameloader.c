@@ -34,8 +34,8 @@ int frame_count = 0;
 
 void checksymbol(void* symbol, const char* name) {
     massert(symbol, "dlsym failed: %s", name);
-    massert(name, "dlsym failed: %s", name);
-    massert(strlen(name) > 0, "dlsym failed: %s", name);
+    //massert(name, "dlsym failed: %s", name);
+    //massert(strlen(name) > 0, "dlsym failed: %s", name);
 }
 
 bool file_changed(const char* path, long* last_time) {
@@ -49,9 +49,7 @@ bool file_changed(const char* path, long* last_time) {
 
 long getlastwritetime(const char* filename) {
     struct stat file_stat;
-    if (stat(filename, &file_stat) == 0) {
-        return file_stat.st_mtime;
-    }
+    if (stat(filename, &file_stat) == 0) { return file_stat.st_mtime; }
     return 0;
 }
 
@@ -106,15 +104,21 @@ void reload_logic() {
     }
 }
 
-void autoreload_every_n_sec(const int n, const gamestate* const g) {
-    frame_count++;
-    if (frame_count % (n * 60) == 0) {
-        if (file_changed(LIBDRAW_PATH, &draw_last_write_time)) {
-            reload_draw(g);
-        }
-        if (file_changed(LIBLOGIC_PATH, &logic_last_write_time)) {
-            reload_logic();
-        }
+//void autoreload_every_n_sec(const int n, const gamestate* const g) {
+//    frame_count++;
+//    if (frame_count % (n * 60) == 0) {
+//        if (file_changed(LIBDRAW_PATH, &draw_last_write_time)) { reload_draw(g); }
+//        if (file_changed(LIBLOGIC_PATH, &logic_last_write_time)) { reload_logic(); }
+//    }
+//}
+
+void autoreload_every_n_sec(int n, gamestate* g) {
+    static double last = 0;
+    double now = GetTime();
+    if (now - last >= n) {
+        if (file_changed(LIBDRAW_PATH, &draw_last_write_time)) reload_draw(g);
+        if (file_changed(LIBLOGIC_PATH, &logic_last_write_time)) reload_logic();
+        last = now;
     }
 }
 
