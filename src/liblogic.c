@@ -263,7 +263,9 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     massert(target, "target entity is NULL");
     massert(attack_successful, "attack_successful is NULL");
     msuccess("Successful Attack on target: %s", target->name);
-    *attack_successful = target->is_damaged = target->do_update = true;
+    *attack_successful = true;
+    target->is_damaged = true;
+    target->do_update = true;
     int dmg = 1;
     e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
     if (target->type == ENTITY_PLAYER) add_message(g, "You took %d damage!", dmg);
@@ -276,8 +278,10 @@ static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* 
     massert(target, "target entity is NULL");
     massert(attack_successful, "attack_successful is NULL");
     msuccess("Successful Block from target: %s", target->name);
-    *attack_successful = target->is_damaged = false;
-    target->block_success = target->do_update = true;
+    *attack_successful = false;
+    target->is_damaged = false;
+    target->block_success = true;
+    target->do_update = true;
     if (target->type == ENTITY_PLAYER) add_message_history(g, "You blocked the attack!");
 }
 
@@ -290,10 +294,7 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     massert(attack_successful, "attack_successful is NULL");
 
     entityid id = tile->entities[i];
-    if (id == ENTITYID_INVALID) {
-        //merror("entity id is invalid");
-        return false;
-    }
+    if (id == ENTITYID_INVALID) { return false; }
 
     entity* target = em_get(g->entitymap, id);
     if (!target) {
@@ -322,8 +323,8 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     msuccess("Attack successful");
     handle_attack_success(g, attacker, target, attack_successful);
     return true;
-    merror("no valid target found at the specified location");
-    return false;
+    //merror("no valid target found at the specified location");
+    //return false;
 }
 
 static void handle_attack_helper(gamestate* const g, tile_t* tile, entity* attacker, bool* successful) {
@@ -354,7 +355,8 @@ static void try_entity_attack(gamestate* const g, entityid attacker_id, int targ
     int dx = target_x - e->x;
     int dy = target_y - e->y;
     e->direction = get_dir_from_xy(dx, dy);
-    e->is_attacking = e->do_update = true;
+    e->is_attacking = true;
+    e->do_update = true;
     handle_attack_helper(g, tile, e, &successful);
     handle_attack_success_gamestate_flag(g, e->type, successful);
 }
@@ -1387,23 +1389,22 @@ static void update_player_state(gamestate* const g) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "liblogic_update_player_state: hero is NULL");
-    if (!g_get_gameover(g)) {
-        if (e_is_dead(e)) {
+    if (!g->gameover) {
+        if (e->dead) {
             add_message(g, "You died!");
-            g_set_gameover(g, true);
+            g->gameover = true;
         }
         return;
     }
 
-    if (e_is_dead(e)) {
-        e_set_do_update(e, true);
+    if (e->dead) {
+        //e->do_update = true;
         return;
     }
 
     if (e_get_hp(e) <= 0) {
-        e_set_is_dead(e, true);
-        e_set_do_update(e, true);
-        //merror("Hero is dead!");
+        e->dead = true;
+        e->do_update = true;
         return;
     }
 }
@@ -1412,12 +1413,8 @@ static inline void update_npc_state(gamestate* const g, entityid id) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, id);
     massert(e, "update_npc_state: entity is NULL");
-    //if (!e) {
-    //    merror("Failed to get entity");
-    //    return;
-    //}
     if (e->dead) {
-        e->do_update = true;
+        //e->do_update = true;
         return;
     }
     if (e->hp <= 0) {
@@ -1432,24 +1429,28 @@ static void update_npcs_state(gamestate* const g) {
     massert(g, "Game state is NULL!");
     for (int i = 0; i < g->index_entityids; i++) {
         entityid id = g->entityids[i];
+        if (id == g->hero_id) continue;
         update_npc_state(g, id);
     }
 }
 
-static void liblogic_handle_nth_npc(gamestate* const g, int i) {
+static void handle_nth_npc(gamestate* const g, int i) {
     massert(g, "Game state is NULL!");
     massert(i >= 0, "Index is out of bounds!");
     massert(i < g->index_entityids, "Index is out of bounds!");
-    entity* e = em_get(g->entitymap, g->entityids[i]);
+
+    entityid id = g->entityids[i];
+    if (id == g->hero_id) return; // Skip the hero
+    entity* e = em_get(g->entitymap, id);
     massert(e, "liblogic_handle_nth_npc: entity is NULL");
-    if (e_get_type(e) == ENTITY_NPC && e_is_alive(e)) { execute_action(g, e, e->default_action); }
+    if (e->type == ENTITY_NPC && !e->dead) execute_action(g, e, e->default_action);
 }
 
 static void handle_npcs(gamestate* const g) {
     massert(g, "Game state is NULL!");
     massert(g->flag == GAMESTATE_FLAG_NPC_TURN, "Game state is not in NPC turn!");
     // Process all NPCs
-    for (int i = 0; i < g->index_entityids; i++) { liblogic_handle_nth_npc(g, i); }
+    for (int i = 0; i < g->index_entityids; i++) handle_nth_npc(g, i);
     // After processing all NPCs, set the flag to animate all movements together
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }
@@ -1469,10 +1470,6 @@ static inline void reset_player_block_success(gamestate* const g) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "liblogic_reset_player_block_success: hero is NULL");
-    //if (!e) {
-    //    merror("Failed to get hero entity");
-    //    return;
-    //}
     e->block_success = false;
 }
 
@@ -1489,7 +1486,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
 
     handle_input(is, g);
 
-    if (g->flag == GAMESTATE_FLAG_NPC_TURN) { handle_npcs(g); }
+    if (g->flag == GAMESTATE_FLAG_NPC_TURN) handle_npcs(g);
 
     update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
@@ -1497,20 +1494,4 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 }
 
-void liblogic_close(gamestate* const g) {
-    massert(g, "liblogic_close: gamestate is NULL");
-    //massert(g->entitymap, "liblogic_close: entitymap is NULL");
-
-    //minfo("liblogic_close: calling em_free...");
-    //em_free(g->entitymap);
-    //msuccess("liblogic_close: em_free done");
-
-    //g->entitymap = NULL;
-
-    //if (!g->dungeon) {
-    //    merror("Dungeon is NULL!");
-    //    return;
-    //}
-    //dungeon_destroy(g->dungeon);
-    //g->dungeon = NULL;
-}
+void liblogic_close(gamestate* const g) { massert(g, "liblogic_close: gamestate is NULL"); }

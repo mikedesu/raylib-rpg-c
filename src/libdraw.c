@@ -262,9 +262,9 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spr
     }
 
     if (e->race == RACE_HUMAN)
-        sg->current = SPRITEGROUP_ANIM_HUMAN_DMG;
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_DMG);
     else if (e->race == RACE_ORC)
-        sg->current = SPRITEGROUP_ANIM_ORC_DMG;
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_DMG);
 
     e->is_damaged = false;
 }
@@ -278,16 +278,18 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, sprite
 
     if (e->race == RACE_HUMAN) {
         if (sg->current == SPRITEGROUP_ANIM_HUMAN_SPINDIE) {
-            merror("libdraw_set_sg_is_dead: spritegroup is already dead");
+            //merror("libdraw_set_sg_is_dead: spritegroup is already dead");
             return;
         }
 
+        //spritegroup_set_d
         sg->default_anim = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
         sg->current = sg->default_anim;
+
         spritegroup_set_stop_on_last_frame(sg, true);
     } else if (e->race == RACE_ORC) {
         if (sg->current == SPRITEGROUP_ANIM_ORC_DIE) {
-            merror("libdraw_set_sg_is_dead: spritegroup is already dead");
+            //merror("libdraw_set_sg_is_dead: spritegroup is already dead");
             return;
         }
         sg->default_anim = SPRITEGROUP_ANIM_ORC_DIE;
@@ -301,9 +303,12 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, s
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
     if (e->race == RACE_HUMAN) {
-        sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
+        //sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_ATTACK);
+        //spritegroup_setcontexts(shield_sg, player_ctx);
     } else if (e->race == RACE_ORC) {
-        sg->current = SPRITEGROUP_ANIM_ORC_ATTACK;
+        //sg->current = SPRITEGROUP_ANIM_ORC_ATTACK;
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_ATTACK);
     }
     e->is_attacking = false;
 }
@@ -319,8 +324,7 @@ static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, sp
             if (shield_sg) {
                 int player_ctx = sg->sprites[sg->current]->currentcontext;
                 spritegroup_setcontexts(shield_sg, player_ctx);
-
-                shield_sg->current = SG_ANIM_BUCKLER_FRONT;
+                spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_FRONT);
             }
         }
     }
@@ -341,17 +345,12 @@ static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, 
             if (shield_sg) {
                 sprite* player_sprite = sg_get_current(sg);
                 int player_ctx = sprite_get_context(player_sprite);
-                //int player_ctx = player_sprite->currentcontext;
-                //int player_ctx = sg->sprites[sg->current]->currentcontext;
                 spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
                 spritegroup_setcontexts(shield_sg, player_ctx);
-                //shield_sg->current = SG_ANIM_BUCKLER_SUCCESS_FRONT;
             }
         }
     }
     e->block_success = false;
-    //e->is_blocking = false;
-    //g->test_guard = false;
 }
 
 static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg) {
@@ -477,10 +476,25 @@ static void libdraw_update_sprite(gamestate* const g, entityid id) {
     if (!g) return;
     entity* const e = em_get(g->entitymap, id);
     if (!e) { return; }
+    //if (e->dead) { minfo("Dead entity update - ID: %d, Type: %s", id, e->type == ENTITY_PLAYER ? "Player" : "NPC"); }
+
     int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
     for (int i = 0; i < num_spritegroups; i++) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
         if (sg) {
+            //if (e->dead && !spritegroup_is_animating(sg)) { return; }
+            //
+            //
+            //
+
+            if (e->dead) {
+                if (!spritegroup_is_animating(sg)) {
+                    minfo("Death animation COMPLETE - Entity %d frozen on frame %d", id, sg->sprites[sg->current]->currentframe);
+                    return;
+                }
+                //minfo("Death animation in progress - Frame %d/%d", sg->sprites[sg->current]->currentframe, sg->sprites[sg->current]->numframes - 1);
+            }
+
             libdraw_update_sprite_ptr(g, e, sg);
             libdraw_handle_frame_incr(g, sg);
         }

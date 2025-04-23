@@ -36,28 +36,33 @@ sprite* sprite_create(Texture2D* t, int numcontexts, int numframes) {
 
 void sprite_incrframe(sprite* const s) {
     massert(s, "sprite_incrframe: sprite is NULL");
-    if (!s->is_animating) return;
+    //if (!s->is_animating) return;
+    if (!s->is_animating) {
+        minfo("Frame increment blocked - animation stopped");
+        return;
+    }
+
+    //if (s->stop_on_last_frame && s->currentframe == s->numframes - 1) {
+    //    s->is_animating = false;
+    //    return;
+    //}
+
     if (s->stop_on_last_frame && s->currentframe == s->numframes - 1) {
+        minfo("Reached last frame of stopped animation (Frame %d)", s->currentframe);
         s->is_animating = false;
         return;
     }
+
     s->currentframe++;
-    if (s->currentframe >= s->numframes) {
-        s->currentframe = 0;
-    }
+    if (s->currentframe >= s->numframes) s->currentframe = 0;
     s->src.x = s->width * s->currentframe;
-    if (s->currentframe == 0) {
-        s->num_loops++;
-    }
+    if (s->currentframe == 0) s->num_loops++;
 }
 
 void sprite_setcontext(sprite* const s, int context) {
     massert(s, "sprite_setcontext: sprite is NULL");
     massert(context >= 0, "sprite_setcontext: context is less than 0: %d", context);
-    massert(context < s->numcontexts,
-            "sprite_setcontext: context is greater than numcontexts: %d < %d",
-            context,
-            s->numcontexts);
+    massert(context < s->numcontexts, "sprite_setcontext: context is greater than numcontexts: %d < %d", context, s->numcontexts);
 
     if (context < 0) {
         merror("sprite_setcontext: context is less than 0");
