@@ -640,21 +640,8 @@ static void draw_message_box(gamestate* g) {
 static inline void update_debug_panel(gamestate* const g) {
     // concat a string onto the end of the debug panel message
     char tmp[1024] = {0};
-    entityid hero_id = g->hero_id;
-    entity* e = em_get(g->entitymap, hero_id);
-    massert(e, "libdraw_drawframe: entity is NULL");
-    entityid shield_id = e->shield;
-    if (shield_id != -1) {
-        spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
-        if (sg) {
-            sprite* shield_s_front = spritegroup_get(sg, SG_ANIM_BUCKLER_FRONT);
-            sprite* shield_s_back = spritegroup_get(sg, SG_ANIM_BUCKLER_BACK);
-            int f_context = sprite_get_context(shield_s_front);
-            int b_context = sprite_get_context(shield_s_back);
-            snprintf(tmp, sizeof(tmp), "shield front back: %d %d\n", f_context, b_context);
-            strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
-        }
-    }
+    snprintf(tmp, sizeof(tmp), "7777\n");
+    strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
 }
 
 static inline void handle_debug_panel(gamestate* const g) {

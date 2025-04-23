@@ -37,10 +37,11 @@ static inline void add_message_history(gamestate* const g, const char* msg);
 static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
 static void update_player_state(gamestate* const g);
+static void update_debug_panel_buffer(gamestate* const g);
+static void handle_camera_move(gamestate* const g, const inputstate* const is);
 static void handle_input(const inputstate* const is, gamestate* const g);
 static void handle_input_camera(const inputstate* const is, gamestate* const g);
 static void handle_input_player(const inputstate* const is, gamestate* const g);
-static void handle_camera_move(gamestate* const g, const inputstate* const is);
 
 static inline void add_message_history(gamestate* const g, const char* msg) {
     massert(g, "gamestate is NULL");
@@ -1287,7 +1288,7 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
 }
 
 static void update_debug_panel_buffer(gamestate* const g) {
-    massert(g, "update_debug_panel_buffer: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     // Static buffers to avoid reallocating every frame
     static const char* control_modes[] = {"Player", "Camera", "Unknown"};
     static const char* flag_names[] = {"GAMESTATE_FLAG_NONE",
@@ -1315,7 +1316,7 @@ static void update_debug_panel_buffer(gamestate* const g) {
         shield_id = e->shield;
         if (shield_id != -1) {
             entity* const shield = em_get(g->entitymap, shield_id);
-            massert(shield, "liblogic_update_debug_panel_buffer: shield is NULL");
+            massert(shield, "shield is NULL");
             shield_dir = shield->direction;
         }
         is_b = e->is_blocking;
@@ -1323,6 +1324,10 @@ static void update_debug_panel_buffer(gamestate* const g) {
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
     const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
+
+    // zero out the buffer
+    memset(g->debugpanel.buffer, 0, sizeof(g->debugpanel.buffer));
+
     // Format the string in one pass
     snprintf(g->debugpanel.buffer,
              sizeof(g->debugpanel.buffer),
@@ -1341,7 +1346,9 @@ static void update_debug_panel_buffer(gamestate* const g) {
              "player_dir_str: %s\n"
              "is_blocking: %d\n"
              "test_guard: %d\n"
-             "block_success: %d\n",
+             "TEST 12345\n"
+             "block_success: %d\n"
+             "TEST 66666\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,

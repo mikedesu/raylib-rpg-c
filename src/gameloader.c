@@ -30,13 +30,8 @@ void (*myliblogic_close)(gamestate* const) = NULL;
 
 long draw_last_write_time = 0;
 long logic_last_write_time = 0;
-int frame_count = 0;
 
-void checksymbol(void* symbol, const char* name) {
-    massert(symbol, "dlsym failed: %s", name);
-    //massert(name, "dlsym failed: %s", name);
-    //massert(strlen(name) > 0, "dlsym failed: %s", name);
-}
+void checksymbol(void* symbol, const char* name) { massert(symbol, "dlsym failed: %s", name); }
 
 bool file_changed(const char* path, long* last_time) {
     long t = getlastwritetime(path);
@@ -48,17 +43,14 @@ bool file_changed(const char* path, long* last_time) {
 }
 
 long getlastwritetime(const char* filename) {
-    struct stat file_stat;
-    if (stat(filename, &file_stat) == 0) { return file_stat.st_mtime; }
+    struct stat f_stat;
+    if (stat(filename, &f_stat) == 0) return f_stat.st_mtime;
     return 0;
 }
 
 void load_draw_symbols() {
     draw_handle = dlopen(LIBDRAW_PATH, RTLD_LAZY);
-    if (!draw_handle) {
-        fprintf(stderr, "dlopen failed for %s: %s\n", LIBDRAW_PATH, dlerror());
-        exit(1);
-    }
+    massert(draw_handle, "dlopen failed for %s: %s", LIBDRAW_PATH, dlerror());
     mylibdraw_init = dlsym(draw_handle, "libdraw_init");
     checksymbol(mylibdraw_init, "libdraw_init");
     mylibdraw_close = dlsym(draw_handle, "libdraw_close");
@@ -74,6 +66,7 @@ void load_draw_symbols() {
 }
 
 void load_logic_symbols() {
+    minfo("Loading liblogic.so...");
     logic_handle = dlopen(LIBLOGIC_PATH, RTLD_LAZY);
     massert(logic_handle, "dlopen failed for %s: %s", LIBLOGIC_PATH, dlerror());
     myliblogic_init = dlsym(logic_handle, "liblogic_init");
@@ -82,9 +75,11 @@ void load_logic_symbols() {
     checksymbol(myliblogic_tick, "liblogic_tick");
     myliblogic_close = dlsym(logic_handle, "liblogic_close");
     checksymbol(myliblogic_close, "liblogic_close");
+    msuccess("Loaded liblogic.so");
 }
 
 void reload_draw(const gamestate* const g) {
+    massert(g, "reload_draw: gamestate is NULL");
     if (draw_handle) {
         mylibdraw_close(); // Direct call
         dlclose(draw_handle);
@@ -95,22 +90,15 @@ void reload_draw(const gamestate* const g) {
 }
 
 void reload_logic() {
-    long new_time = getlastwritetime(LIBLOGIC_PATH);
-    if (new_time > logic_last_write_time) {
-        if (logic_handle) dlclose(logic_handle);
-        load_logic_symbols();
-        logic_last_write_time = new_time;
-        msuccess("Reloaded liblogic.so");
-    }
+    minfo("Reloading liblogic.so...");
+    minfo("liblogic.so has changed, reloading...");
+    massert(logic_handle, "reload_logic: logic_handle is NULL");
+    minfo("Closing liblogic.so...");
+    dlclose(logic_handle);
+    load_logic_symbols();
+    logic_last_write_time = getlastwritetime(LIBLOGIC_PATH);
+    msuccess("Reloaded liblogic.so");
 }
-
-//void autoreload_every_n_sec(const int n, const gamestate* const g) {
-//    frame_count++;
-//    if (frame_count % (n * 60) == 0) {
-//        if (file_changed(LIBDRAW_PATH, &draw_last_write_time)) { reload_draw(g); }
-//        if (file_changed(LIBLOGIC_PATH, &logic_last_write_time)) { reload_logic(); }
-//    }
-//}
 
 void autoreload_every_n_sec(int n, gamestate* g) {
     static double last = 0;
@@ -129,8 +117,6 @@ void gamerun() {
     logic_last_write_time = getlastwritetime(LIBLOGIC_PATH);
     load_draw_symbols();
     load_logic_symbols();
-    // i think liblogic will need init before libdraw because
-    // we will want to create entries in the entitymap AFTER it is init'd
     myliblogic_init(g);
     mylibdraw_init(g);
     while (!mylibdraw_windowshouldclose()) {
