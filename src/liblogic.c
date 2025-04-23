@@ -6,6 +6,7 @@
 #include "em.h"
 #include "entity.h"
 #include "entity_actions.h"
+#include "entityid.h"
 #include "entitytype.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
@@ -283,40 +284,39 @@ handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entity* 
     massert(attack_successful, "attack_successful is NULL");
 
     entityid id = tile->entities[i];
-    if (id != -1) {
-        entity* const target = em_get(g->entitymap, id);
-        if (target) {
-            entitytype_t type = target->type;
-            if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-                msuccess("Attacking target: %s", target->name);
-                if (!target->dead) {
-                    if (target->is_blocking) {
-                        msuccess("Block successful");
-                        handle_attack_blocked(g, attacker, target, attack_successful);
-                        return false;
-                    }
-
-                    msuccess("Attack successful");
-                    handle_attack_success(g, attacker, target, attack_successful);
-                    return true;
-                } else {
-                    merror("Target is dead, cannot attack");
-                    return false;
-                }
-            } else {
-                merror("Target is not a valid target: %s", entitytype_to_string(type));
-                return false;
-            }
-        } else {
-            merror("liblogic_handle_attack_helper: target entity is NULL");
-            return false;
-        }
-    } else {
-        //merror("liblogic_handle_attack_helper: target entity id is -1");
+    if (id == ENTITYID_INVALID) {
+        //merror("entity id is invalid");
         return false;
     }
 
-    merror("liblogic_handle_attack_helper_innerloop: no valid target found at the specified location");
+    entity* target = em_get(g->entitymap, id);
+    if (!target) {
+        merror("target entity is NULL");
+        return false;
+    }
+
+    entitytype_t type = target->type;
+    if (type != ENTITY_PLAYER && type != ENTITY_NPC) {
+        merror("target entity is not a player or NPC");
+        return false;
+    }
+
+    minfo("Attacking target: %s", target->name);
+    if (target->dead) {
+        merror("Target is dead, cannot attack");
+        return false;
+    }
+
+    if (target->is_blocking) {
+        msuccess("Block successful");
+        handle_attack_blocked(g, attacker, target, attack_successful);
+        return false;
+    }
+
+    msuccess("Attack successful");
+    handle_attack_success(g, attacker, target, attack_successful);
+    return true;
+    merror("no valid target found at the specified location");
     return false;
 }
 

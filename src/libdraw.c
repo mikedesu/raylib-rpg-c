@@ -128,14 +128,14 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* c
 static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            if (df_tile_is_wall(df, x, y)) { continue; }
+            if (df_tile_is_wall(df, x, y)) continue;
             draw_dungeon_floor_tile(g, df, x, y);
         }
     }
     return true;
 }
 
-static inline void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
+static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(g, "draw_sprite_and_shadow: gamestate is NULL");
     massert(id != -1, "draw_sprite_and_shadow: id is -1");
 
