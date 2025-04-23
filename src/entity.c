@@ -25,7 +25,7 @@ entity_t* e_new(entityid id, entitytype_t type) {
     e->is_attacking = false;
     e->is_blocking = false;
     e->is_damaged = false;
-    e->is_dead = false;
+    e->dead = false;
     e->sprite_move_x = 0;
     e->sprite_move_y = 0;
     e->inventory_count = 0;
@@ -238,9 +238,9 @@ int e_get_inventory_count(entity_t* const e) {
     return e->inventory_count;
 }
 
-void e_set_is_dead(entity_t* const e, bool is_dead) {
+void e_set_is_dead(entity_t* const e, bool dead) {
     massert(e, "e_set_is_dead: e is NULL");
-    e->is_dead = is_dead;
+    e->dead = dead;
 }
 
 void e_set_do_update(entity_t* const e, bool do_update) {
@@ -250,5 +250,5 @@ void e_set_do_update(entity_t* const e, bool do_update) {
 
 bool e_is_alive(entity_t* const e) {
     massert(e, "e_is_alive: e is NULL");
-    return !e->is_dead;
+    return !e->dead;
 }

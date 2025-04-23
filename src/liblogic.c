@@ -125,7 +125,7 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
         if (eid == -1) continue;
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) continue;
-        if (e->type == ENTITY_NPC && !e->is_dead) count++;
+        if (e->type == ENTITY_NPC && !e->dead) count++;
     }
     return count;
 }
@@ -259,7 +259,7 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     int dmg = 1;
     e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
     if (target->type == ENTITY_PLAYER) add_message(g, "You took %d damage!", dmg);
-    if (e_get_hp(target) <= 0) target->is_dead = true;
+    if (e_get_hp(target) <= 0) target->dead = true;
 }
 
 static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
@@ -289,7 +289,7 @@ handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entity* 
             entitytype_t type = target->type;
             if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
                 msuccess("Attacking target: %s", target->name);
-                if (!target->is_dead) {
+                if (!target->dead) {
                     if (target->is_blocking) {
                         msuccess("Block successful");
                         handle_attack_blocked(g, attacker, target, attack_successful);
@@ -332,7 +332,7 @@ static void try_entity_attack(gamestate* const g, entityid attacker_id, int targ
     massert(g, "gamestate is NULL");
     entity* e = em_get(g->entitymap, attacker_id);
     massert(e, "attacker entity is NULL");
-    if (e->is_dead) {
+    if (e->dead) {
         merror("attacker entity is dead");
         return;
     }
@@ -989,7 +989,7 @@ static inline void liblogic_change_player_dir(gamestate* const g, direction_t di
     //}
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "liblogic_change_player_dir: hero is NULL");
-    if (hero->is_dead) { return; }
+    if (hero->dead) return;
     hero->direction = dir;
     hero->do_update = true;
     update_equipped_shield_dir(g, hero);
@@ -1184,7 +1184,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "liblogic_handle_input_player: hero is NULL");
     // check if the player is dead
-    if (hero->is_dead) { return; }
+    if (hero->dead) return;
     if (action) {
         if (g->player_changing_direction) {
             if (strcmp(action, "wait") == 0) {
@@ -1421,12 +1421,12 @@ static inline void update_npc_state(gamestate* const g, entityid id) {
     //    merror("Failed to get entity");
     //    return;
     //}
-    if (e->is_dead) {
+    if (e->dead) {
         e->do_update = true;
         return;
     }
     if (e->hp <= 0) {
-        e->is_dead = true;
+        e->dead = true;
         e->do_update = true;
         merror("NPC is dead!");
         return;

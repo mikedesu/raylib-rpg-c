@@ -46,42 +46,40 @@ static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
 static inline void libdraw_handle_gamestate_flag(gamestate* const g);
+static inline void draw_hud(gamestate* const g);
+
 static bool libdraw_check_default_animations(const gamestate* const g);
-
-static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
-static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
-static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
-static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
-static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
-
-static void load_shaders();
-static void libdraw_unload_shaders();
-
-static void load_textures();
-static void libdraw_unload_textures();
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 static bool libdraw_unload_texture(int txkey);
-
-static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg);
-static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entity_t* e);
-static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
-static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg);
-static void libdraw_update_sprite(gamestate* const g, entityid id);
-static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
-
-static inline void draw_hud(gamestate* const g);
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
 static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df);
 static bool draw_entities_2d(const gamestate* const g, dungeon_floor_t* df, bool dead);
 static bool libdraw_draw_dungeon_floor(const gamestate* const g);
 static bool libdraw_draw_player_target_box(const gamestate* const g);
 static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y);
+
+static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
+static void load_shaders();
+static void libdraw_unload_shaders();
+static void load_textures();
+static void libdraw_unload_textures();
+static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg);
+static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entity_t* e);
+static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
+static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg);
+static void libdraw_update_sprite(gamestate* const g, entityid id);
+static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
 static void draw_message_history(gamestate* const g);
 static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
 static void libdraw_draw_debug_panel(gamestate* const g);
 static void libdraw_drawframe_2d(gamestate* const g);
 static void draw_message_box(gamestate* g);
-
+static void create_sg_byid(gamestate* const g, entityid id);
+static void calc_debugpanel_size(gamestate* const g);
 static void create_spritegroup(gamestate* const g,
                                entityid id,
                                int* keys,
@@ -89,52 +87,39 @@ static void create_spritegroup(gamestate* const g,
                                int offset_x,
                                int offset_y,
                                specifier_t spec);
-static void create_sg_byid(gamestate* const g, entityid id);
-static void calc_debugpanel_size(gamestate* const g);
 
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
-    if (!g || !df) {
-        merror("libdraw_draw_dungeon_floor_tile: gamestate or dungeon_floor is NULL");
-        return false;
-    }
-    if (x < 0 || x >= df->width || y < 0 || y >= df->height) { return false; }
+    massert(g, "draw_dungeon_floor_tile: gamestate is NULL");
+    massert(df, "draw_dungeon_floor_tile: dungeon_floor is NULL");
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height) return false;
     tile_t* tile = df_tile_at(df, x, y);
-    if (!tile) { return false; }
+    if (!tile) return false;
     // check if the tile type is none
-    if (tile->type == TILE_NONE) { return true; }
+    if (tile->type == TILE_NONE) return true;
     // just draw the tile itself
     // tile values in get_txkey_for_tiletype.h
     int txkey = get_txkey_for_tiletype(tile->type);
-    if (txkey < 0) { return false; }
+    if (txkey < 0) return false;
     Texture2D* texture = &txinfo[txkey].texture;
-    if (texture->id <= 0) { return false; }
+    if (texture->id <= 0) return false;
     // atm hard-coding the size of the new tiles and their destinations
-    const int offset_x = -12;
-    const int offset_y = -12;
-    const int dx = x * DEFAULT_TILE_SIZE + offset_x;
-    const int dy = y * DEFAULT_TILE_SIZE + offset_y;
-    Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
-    Rectangle dest = (Rectangle){dx, dy, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+    const int offset_x = -12, offset_y = -12;
+    const int dx = x * DEFAULT_TILE_SIZE + offset_x, dy = y * DEFAULT_TILE_SIZE + offset_y;
+    const Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED},
+                    dest = (Rectangle){dx, dy, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
-    // draw the pressure plate if it exists
     if (tile->has_pressure_plate) {
         const int txkey2 = tile->pressure_plate_up_tx_key;
-        if (txkey2 < 0) { return false; }
+        if (txkey2 < 0) return false;
         Texture2D* texture = &txinfo[txkey2].texture;
-        if (texture->id <= 0) { return false; }
+        if (texture->id <= 0) return false;
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
-    // draw the wall switch
     if (tile->has_wall_switch) {
-        int txkey = -1;
-        if (tile->wall_switch_on) {
-            txkey = tile->wall_switch_down_tx_key;
-        } else {
-            txkey = tile->wall_switch_up_tx_key;
-        }
-        if (txkey < 0) { return false; }
+        int txkey = tile->wall_switch_on ? tile->wall_switch_down_tx_key : tile->wall_switch_up_tx_key;
+        if (txkey < 0) return false;
         Texture2D* texture = &txinfo[txkey].texture;
-        if (texture->id <= 0) { return false; }
+        if (texture->id <= 0) return false;
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
     return true;
@@ -230,7 +215,7 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     for (int i = 0; i < tile_entity_count(tile); i++) {
         entityid id = tile_get_entity(tile, i);
         entity* e = em_get(g->entitymap, id);
-        if (e && e->is_dead == dead) { draw_sprite_and_shadow(g, id); }
+        if (e && e->dead == dead) draw_sprite_and_shadow(g, id);
     }
 
     return true;
@@ -394,7 +379,7 @@ static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, sprite
         libdraw_set_sg_is_blocking(g, e, sg);
     } else if (e->is_damaged) {
         libdraw_set_sg_is_damaged(g, e, sg);
-    } else if (e->is_dead) {
+    } else if (e->dead) {
         libdraw_set_sg_is_dead(g, e, sg);
     }
 }
@@ -459,7 +444,7 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
         merror("libdraw_update_sprite_ptr: entity or spritegroup is NULL");
         return;
     }
-    if (e->is_dead && !spritegroup_is_animating(sg)) { return; }
+    if (e->dead && !spritegroup_is_animating(sg)) return;
 
     if (e->do_update) {
         libdraw_update_sprite_context_ptr(g, sg, e->direction);

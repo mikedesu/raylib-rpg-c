@@ -39,7 +39,7 @@ typedef struct entity_t {
     bool is_blocking;
     bool block_success;
     bool is_damaged;
-    bool is_dead;
+    bool dead;
     entityid weapon;
     entityid shield;
     entity_t* next;
@@ -65,7 +65,7 @@ void e_set_hp(entity_t* const e, int hp);
 void e_set_maxhp(entity_t* const e, int maxhp);
 void e_set_hpmaxhp(entity_t* const e, int hp, int maxhp);
 void e_set_default_action(entity_t* const e, entity_action_t action);
-void e_set_is_dead(entity_t* const e, bool is_dead);
+void e_set_is_dead(entity_t* const e, bool dead);
 void e_set_do_update(entity_t* const e, bool do_update);
 void e_incr_hp(entity_t* const e, int hp);
 void e_incr_x(entity_t* const e);
@@ -89,7 +89,7 @@ bool e_is_alive(entity_t* const e);
 
 static inline bool e_is_dead(entity_t* const e) {
     massert(e, "e_is_dead: e is NULL");
-    return e->is_dead;
+    return e->dead;
 }
 
 static inline entitytype_t e_get_type(entity_t* const e) {

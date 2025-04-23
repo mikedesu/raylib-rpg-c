@@ -193,7 +193,7 @@ static void recompute_entity_cache(tile_t* t, em_t* em) {
 
     for (size_t i = 0; i < t->entity_max; i++) {
         entity* e = em_get(em, t->entities[i]);
-        if (!e || e->is_dead) continue;
+        if (!e || e->dead) continue;
 
         if (e->type == ENTITY_NPC) t->cached_live_npcs++;
         if (e->type == ENTITY_PLAYER) t->cached_player_present = true;
