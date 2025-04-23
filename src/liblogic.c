@@ -274,8 +274,7 @@ static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* 
     if (target->type == ENTITY_PLAYER) add_message_history(g, "You blocked the attack!");
 }
 
-static inline bool
-handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entity* attacker, bool* attack_successful) {
+static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entity* attacker, bool* attack_successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(i >= 0, "i is out of bounds");
@@ -629,38 +628,28 @@ static void init_weapon_test(gamestate* const g) {
     }
 
     // place the sword somewhere around the player
-    //found = false;
-    //for (int i = -1; i <= 1; i++) {
-    //    for (int j = -1; j <= 1; j++) {
-    //        if (found) {
-    //            break;
-    //        }
-    //        if (i == 0 && j == 0) {
-    //            continue;
-    //        }
-    //        int new_x = x + i;
-    //        int new_y = y + j;
-    //        tile_t* const tile = dungeon_floor_tile_at(df, new_x, new_y);
-    //        if (tile_entity_count(tile) > 0) {
-    //            continue;
-    //        }
-    //        // check if the tile is walkable
-    //        if (!dungeon_tile_is_walkable(tile->type)) {
-    //            continue;
-    //        }
-    //        // create the shield
-    //        //        entityid shield_id = liblogic_shield_create(g, x - 1, y, 0, "shield");
-    //        entityid sword_id = liblogic_weapon_create(g, new_x, new_y, 0, "sword");
-    //        massert(sword_id != -1, "liblogic_init_weapon_test: failed to create weapon");
-    //        //        massert(shield_id != -1, "liblogic_init_weapon_test: failed to create shield");
-    //        entity* const sword = em_get(g->entitymap, sword_id);
-    //        massert(sword, "liblogic_init_weapon_test: sword is NULL");
-    //        found = true;
-    //    }
-    //    if (found) {
-    //        break;
-    //    }
-    //}
+    found = false;
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            if (found) { break; }
+            if (i == 0 && j == 0) { continue; }
+            int nx = e->x + i;
+            int ny = e->y + j;
+            tile_t* const tile = df_tile_at(df, nx, ny);
+            if (tile_entity_count(tile) > 0) { continue; }
+            // check if the tile is walkable
+            if (!dungeon_tile_is_walkable(tile->type)) { continue; }
+            // create the shield
+            //        entityid shield_id = liblogic_shield_create(g, x - 1, y, 0, "shield");
+            entityid sword_id = weapon_create(g, nx, ny, 0, "sword");
+            massert(sword_id != -1, "liblogic_init_weapon_test: failed to create weapon");
+            //        massert(shield_id != -1, "liblogic_init_weapon_test: failed to create shield");
+            entity* const sword = em_get(g->entitymap, sword_id);
+            massert(sword, "liblogic_init_weapon_test: sword is NULL");
+            found = true;
+        }
+        if (found) { break; }
+    }
 }
 
 static void liblogic_init_dungeon(gamestate* const g) {
@@ -1324,8 +1313,7 @@ static void update_debug_panel_buffer(gamestate* const g) {
     }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
-    const char* flag_name =
-        flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
+    const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
     // Format the string in one pass
     snprintf(g->debugpanel.buffer,
              sizeof(g->debugpanel.buffer),
