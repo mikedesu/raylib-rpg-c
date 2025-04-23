@@ -80,13 +80,7 @@ static void libdraw_drawframe_2d(gamestate* const g);
 static void draw_message_box(gamestate* g);
 static void create_sg_byid(gamestate* const g, entityid id);
 static void calc_debugpanel_size(gamestate* const g);
-static void create_spritegroup(gamestate* const g,
-                               entityid id,
-                               int* keys,
-                               int num_keys,
-                               int offset_x,
-                               int offset_y,
-                               specifier_t spec);
+static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
 
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
     massert(g, "draw_dungeon_floor_tile: gamestate is NULL");
@@ -102,7 +96,6 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* c
     if (txkey < 0) return false;
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) return false;
-    // atm hard-coding the size of the new tiles and their destinations
     const int offset_x = -12, offset_y = -12;
     const int dx = x * DEFAULT_TILE_SIZE + offset_x, dy = y * DEFAULT_TILE_SIZE + offset_y;
     const Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED},
@@ -136,22 +129,20 @@ static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df)
 }
 
 static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
-    massert(g, "draw_sprite_and_shadow: gamestate is NULL");
-    massert(id != -1, "draw_sprite_and_shadow: id is -1");
+    massert(g, "gamestate is NULL");
+    massert(id != -1, "id is -1");
 
     entity* e = em_get(g->entitymap, id);
-    massert(e, "draw_sprite_and_shadow: entity is NULL");
+    massert(e, "entity is NULL");
 
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-    massert(sg, "draw_sprite_and_shadow: spritegroup is NULL");
+    massert(sg, "spritegroup is NULL");
 
-    //sprite* s = spritegroup_get(sg, sg->current);
     sprite* s = sg_get_current(sg);
-    massert(s, "draw_sprite_and_shadow: sprite is NULL");
+    massert(s, "sprite is NULL");
 
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
-        //sprite* shadow = spritegroup_get(sg, sg->current + 1);
         sprite* shadow = sg_get_current_plus_one(sg);
         if (shadow) { DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE); }
     }
@@ -161,8 +152,6 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     spritegroup_t* shield_sg = NULL;
     sprite* shield_front_s = NULL;
     sprite* shield_back_s = NULL;
-    //if (shield_id != -1 && g->test_guard) {
-    //if (shield_id != -1 && e->block_success) {
     if (shield_id != -1 && sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS) {
         shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
         if (shield_sg) {
@@ -172,27 +161,15 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     } else if (shield_id != -1 && e->is_blocking) {
         shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
         if (shield_sg) {
-            //if (e->block_success) {
-            //    shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
-            //    shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
-            //} else {
             shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
             shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
-            //shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
-            //shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
-            //}
         }
     }
 
-    if (shield_back_s) {
-        DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
-    }
-
+    if (shield_back_s) DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
-    if (shield_front_s) {
-        DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
-    }
+    if (shield_front_s) DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
 }
 
 static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y) {
@@ -208,9 +185,9 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     massert(y < df->height, "draw_entities_2d: y is out of bounds");
 
     tile_t* tile = df_tile_at(df, x, y);
-    if (!tile) { return false; }
+    if (!tile) return false;
 
-    if (dungeon_tile_is_wall(tile->type)) { return false; }
+    if (dungeon_tile_is_wall(tile->type)) return false;
 
     for (int i = 0; i < tile_entity_count(tile); i++) {
         entityid id = tile_get_entity(tile, i);
@@ -230,7 +207,6 @@ static bool draw_entities_2d(const gamestate* const g, dungeon_floor_t* df, bool
     massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
     for (int y = 0; y < df->height; y++)
         for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, dead, x, y);
-
     return true;
 }
 
@@ -272,7 +248,6 @@ static bool libdraw_check_default_animations(const gamestate* const g) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
         if (sg && sg->current != sg->default_anim) {
             // which sg isnt done?
-            //merror("libdraw_check_default_animations: spritegroup %d is not at current animation %d", id, sg->current);
             return false;
         }
     }
@@ -285,17 +260,18 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spr
         merror("libdraw_set_sg_is_damaged: entity or spritegroup is NULL");
         return;
     }
-    if (e->race == RACE_HUMAN) {
+
+    if (e->race == RACE_HUMAN)
         sg->current = SPRITEGROUP_ANIM_HUMAN_DMG;
-    } else if (e->race == RACE_ORC) {
+    else if (e->race == RACE_ORC)
         sg->current = SPRITEGROUP_ANIM_ORC_DMG;
-    }
+
     e->is_damaged = false;
 }
 
 static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
     if (!e || !sg) {
-        merror("libdraw_set_sg_is_dead: entity or spritegroup is NULL");
+        merror("entity or spritegroup is NULL");
         return;
     }
     if (e->race == RACE_HUMAN) {
@@ -310,9 +286,9 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, sprite
 }
 
 static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
-    massert(g, "libdraw_set_sg_is_attacking: gamestate is NULL");
-    massert(e, "libdraw_set_sg_is_attacking: entity is NULL");
-    massert(sg, "libdraw_set_sg_is_attacking: spritegroup is NULL");
+    massert(g, "gamestate is NULL");
+    massert(e, "entity is NULL");
+    massert(sg, "spritegroup is NULL");
     if (e->race == RACE_HUMAN) {
         sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
     } else if (e->race == RACE_ORC) {
@@ -322,9 +298,9 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, s
 }
 
 static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
-    massert(g, "libdraw_set_sg_is_blocking: gamestate is NULL");
-    massert(e, "libdraw_set_sg_is_blocking: entity is NULL");
-    massert(sg, "libdraw_set_sg_is_blocking: spritegroup is NULL");
+    massert(g, "gamestate is NULL");
+    massert(e, "entity is NULL");
+    massert(sg, "spritegroup is NULL");
     if (e->race == RACE_HUMAN) {
         sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD;
         if (e->shield != ENTITYID_INVALID) {
@@ -342,9 +318,9 @@ static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, sp
 }
 
 static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
-    massert(g, "libdraw_set_sg_block_success: gamestate is NULL");
-    massert(e, "libdraw_set_sg_block_success: entity is NULL");
-    massert(sg, "libdraw_set_sg_block_success: spritegroup is NULL");
+    massert(g, "gamestate is NULL");
+    massert(e, "entity is NULL");
+    massert(sg, "spritegroup is NULL");
     if (e->race == RACE_HUMAN) {
         //sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS);
@@ -368,9 +344,9 @@ static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, 
 }
 
 static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg) {
-    massert(g, "libdraw_update_sprite_attack: gamestate is NULL");
-    massert(e, "libdraw_update_sprite_attack: entity is NULL");
-    massert(sg, "libdraw_update_sprite_attack: spritegroup is NULL");
+    massert(g, "gamestate is NULL");
+    massert(e, "entity is NULL");
+    massert(sg, "spritegroup is NULL");
     if (e->is_attacking) {
         libdraw_set_sg_is_attacking(g, e, sg);
     } else if (e->block_success) {
@@ -386,7 +362,7 @@ static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, sprite
 
 static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entity_t* e) {
     if (!sg || !e) {
-        merror("libdraw_update_sprite_position: spritegroup or entity is NULL");
+        merror("spritegroup or entity is NULL");
         return;
     }
     if (e->sprite_move_x != 0 || e->sprite_move_y != 0) {
@@ -405,8 +381,8 @@ static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg
 }
 
 static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir) {
-    massert(g, "libdraw_update_sprite_context: gamestate is NULL");
-    massert(group != NULL, "libdraw_update_sprite_context: group is NULL");
+    massert(g, "gamestate is NULL");
+    massert(group != NULL, "group is NULL");
     const int old_ctx = group->sprites[group->current]->currentcontext;
     int ctx = old_ctx;
     ctx = dir == DIR_NONE         ? old_ctx
@@ -435,13 +411,13 @@ static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t*
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_L_U
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_L_U
                                                               : old_ctx;
-    if (ctx != old_ctx) { minfo("libdraw_update_sprite_context: ctx changed from %d to %d", old_ctx, ctx); }
+    if (ctx != old_ctx) minfo("ctx changed from %d to %d", old_ctx, ctx);
     spritegroup_setcontexts(group, ctx);
 }
 
 static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg) {
     if (!e || !sg) {
-        merror("libdraw_update_sprite_ptr: entity or spritegroup is NULL");
+        merror("entity or spritegroup is NULL");
         return;
     }
     if (e->dead && !spritegroup_is_animating(sg)) return;
@@ -461,10 +437,10 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
 }
 
 static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
-    massert(g, "libdraw_handle_frame_incr: gamestate is NULL");
-    massert(sg, "libdraw_handle_frame_incr: spritegroup is NULL");
+    massert(g, "gamestate is NULL");
+    massert(sg, "spritegroup is NULL");
     sprite* const s = sg_get_current(sg);
-    massert(s, "libdraw_handle_frame_incr: sprite is NULL");
+    massert(s, "sprite is NULL");
 
     //sprite* const s_shadow = sg->sprites[sg->current + 1];
     if (g->framecount % ANIM_SPEED == 0) {
@@ -536,13 +512,12 @@ static inline void libdraw_handle_gamestate_flag(gamestate* const g) {
 
 void libdraw_update_sprites(gamestate* const g) {
     if (!g) {
-        merror("libdraw_update_sprites: gamestate is NULL");
+        merror("gamestate is NULL");
         return;
     }
     // for each entityid in our entitymap, update the spritegroup
     for (int i = 0; i < g->index_entityids; i++) {
         const entityid id = g->entityids[i];
-        //minfo("libdraw_update_sprites: updating spritegroup for id %d", id);
         libdraw_update_sprite(g, id);
     }
     libdraw_handle_gamestate_flag(g);
@@ -550,12 +525,12 @@ void libdraw_update_sprites(gamestate* const g) {
 
 static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     if (!g) {
-        merror("libdraw_draw_dungeon_floor: gamestate is NULL");
+        merror("gamestate is NULL");
         return false;
     }
     dungeon_floor_t* const df = dungeon_get_current_floor(g->dungeon);
     if (!df) {
-        merror("libdraw_draw_dungeon_floor: dungeon_floor is NULL");
+        merror("dungeon_floor is NULL");
         return false;
     }
     draw_dungeon_tiles_2d(g, df);
@@ -566,12 +541,8 @@ static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
 }
 
 static void libdraw_draw_debug_panel(gamestate* const g) {
-    if (!g) {
-        merror("libdraw_draw_debug_panel: gamestate is NULL");
-        return;
-    }
-    const Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f);
-    const Color fg = WHITE;
+    massert(g, "gamestate is NULL");
+    const Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f), fg = WHITE;
     const int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
     const int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
     const int x1 = g->debugpanel.x + g->debugpanel.pad_left;
@@ -581,26 +552,19 @@ static void libdraw_draw_debug_panel(gamestate* const g) {
 }
 
 static bool libdraw_draw_player_target_box(const gamestate* const g) {
-    if (!g) {
-        merror("libdraw_draw_player_target_box: gamestate is NULL");
-        return false;
-    }
+    massert(g, "gamestate is NULL");
     const entityid id = g->hero_id;
     if (id == -1) {
         merror("libdraw_draw_player_target_box: id is -1");
         return false;
     }
     entity* const e = em_get(g->entitymap, id);
-    if (!e) { return false; }
+    if (!e) return false;
     direction_t dir = e->direction;
-    int x = e->x;
-    int y = e->y;
-    x += get_x_from_dir(dir);
-    y += get_y_from_dir(dir);
-    const int ds = DEFAULT_TILE_SIZE;
-    const Color base_c = GREEN;
-    const float a = 0.5f;
-    const Color c = Fade(base_c, a);
+    int x = e->x + get_x_from_dir(dir), y = e->y + get_y_from_dir(dir), ds = DEFAULT_TILE_SIZE;
+    Color base_c = GREEN;
+    float a = 0.5f;
+    Color c = Fade(base_c, a);
     DrawRectangleLinesEx((Rectangle){x * ds, y * ds, ds, ds}, 1, c);
     return true;
 }
@@ -608,9 +572,9 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
 static void libdraw_drawframe_2d(gamestate* const g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
-    if (!libdraw_camera_lock_on(g)) { merror("libdraw_drawframe: failed to lock camera on hero"); }
-    if (!libdraw_draw_dungeon_floor(g)) { merror("libdraw_drawframe: failed to draw dungeon floor"); }
-    if (!libdraw_draw_player_target_box(g)) { merror("libdraw_drawframe: failed to draw player target box"); }
+    if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
+    if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
+    if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
     EndMode2D();
 }
 
@@ -618,10 +582,10 @@ static void draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) { return; }
     const char* prompt = "[A] Next";
     const char* msg = g->msg_system.messages[g->msg_system.index];
-    const Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
-    const int font_size = 30;
-    const int pad = 40; // Inner padding (text <-> box edges)
-    const float line_spacing = 1.0f;
+    Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
+    int font_size = 30;
+    int pad = 40; // Inner padding (text <-> box edges)
+    float line_spacing = 1.0f;
     // Measure text (split into lines if needed)
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, font_size, line_spacing);
     // Calculate centered box position
@@ -660,9 +624,9 @@ static inline void update_debug_panel(gamestate* const g) {
         if (sg) {
             sprite* shield_s_front = spritegroup_get(sg, SG_ANIM_BUCKLER_FRONT);
             sprite* shield_s_back = spritegroup_get(sg, SG_ANIM_BUCKLER_BACK);
-            int front_context = sprite_get_context(shield_s_front);
-            int back_context = sprite_get_context(shield_s_back);
-            snprintf(tmp, sizeof(tmp), "shield front back: %d %d\n", front_context, back_context);
+            int f_context = sprite_get_context(shield_s_front);
+            int b_context = sprite_get_context(shield_s_back);
+            snprintf(tmp, sizeof(tmp), "shield front back: %d %d\n", f_context, b_context);
             strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
         }
     }
@@ -777,13 +741,7 @@ static void load_textures() {
     fclose(file);
 }
 
-static void create_spritegroup(gamestate* const g,
-                               entityid id,
-                               int* keys,
-                               int num_keys,
-                               int offset_x,
-                               int offset_y,
-                               specifier_t spec) {
+static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
     minfo("create_spritegroup");
     if (!g) {
         merror("create_spritegroup: gamestate is NULL");
