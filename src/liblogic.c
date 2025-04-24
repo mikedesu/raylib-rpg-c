@@ -1485,7 +1485,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
 
-    minfo("tick");
+    //minfo("tick");
 
     update_player_state(g);
     update_npcs_state(g);

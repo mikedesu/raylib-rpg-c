@@ -118,12 +118,12 @@ bool gamestate_free_msg_history(gamestate* const g) {
 void gamestatefree(gamestate* g) {
     massert(g, "g is NULL");
     minfo("Freeing gamestate");
-    minfo("Freeing em");
-    em_free(g->entitymap);
+    //minfo("Freeing em");
+    //em_free(g->entitymap);
     minfo("Freeing entityids");
     free(g->entityids);
-    minfo("Freeing dungeon");
-    dungeon_destroy(g->dungeon);
+    //minfo("Freeing dungeon");
+    //dungeon_destroy(g->dungeon);
     // free message history
     gamestate_free_msg_history(g);
     minfo("Freeing g...");
@@ -170,14 +170,14 @@ void gamestate_init_entityids(gamestate* const g) {
 
 entityid gamestate_get_entityid_unsafe(const gamestate* const g, int index) { return g->entityids[index]; }
 
-void gamestate_dungeon_destroy(gamestate* const g) {
-    if (!g) {
-        merror("g is NULL");
-        return;
-    }
-    dungeon_destroy(g->dungeon);
-    g->dungeon = NULL;
-}
+//void gamestate_dungeon_destroy(gamestate* const g) {
+//    if (!g) {
+//        merror("g is NULL");
+//        return;
+//    }
+//    dungeon_destroy(g->dungeon);
+//    g->dungeon = NULL;
+//}
 
 int gamestate_get_entityid_index(const gamestate* const g, entityid id) {
     if (!g) {

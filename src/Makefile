@@ -11,7 +11,7 @@ LINK_MATH = -lm
 RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 CFLAGS ?= # Allow override
 
-LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o get_txkey_for_tiletype.o
+LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o get_txkey_for_tiletype.o em.o dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o
 LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o dungeon.o keybinding.o
 
 # Web build setup
@@ -28,8 +28,8 @@ WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 all: game #index.html
 
 # Desktop build
-game: main.o gameloader.o gamestate.o libdraw.so liblogic.so
-	$(CC) -o $@ main.o gameloader.o gamestate.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
+game: main.o gameloader.o gamestate.o keybinding.o libdraw.so liblogic.so
+	$(CC) -o $@ main.o gameloader.o gamestate.o keybinding.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
 	#$(CC) -o $@ main.o gameloader.o -L. -ldraw -llogic $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
 	./log_build_stats.sh
 

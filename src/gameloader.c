@@ -187,6 +187,7 @@ void gamerun() {
     msuccess("dlclose libdraw");
     dlclose(logic_handle);
     msuccess("dlclose liblogic");
+
     gamestatefree(g);
     msuccess("gamestate freed");
 }

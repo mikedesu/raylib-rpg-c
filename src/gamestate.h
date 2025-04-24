@@ -85,10 +85,6 @@ typedef struct gamestate {
     double last_frame_time;
     char frame_time_str[32];
 
-    // flag can be:
-    // PLAYER_TURN,
-    // UPDATING_ANIM,
-    // NPC_TURN,
     gamestate_flag_t flag;
 
     entityid entity_turn;
@@ -119,7 +115,7 @@ bool gamestate_free_msg_history(gamestate* const g);
 bool gamestate_add_msg_history(gamestate* const g, const char* msg);
 
 void gamestatefree(gamestate* g);
-void gamestate_dungeon_destroy(gamestate* const g);
+//void gamestate_dungeon_destroy(gamestate* const g);
 void gamestate_init_entityids(gamestate* const g);
 void gamestate_set_hero_id(gamestate* const g, entityid id);
 void gamestate_set_debug_panel_pos_bottom_left(gamestate* const g);
