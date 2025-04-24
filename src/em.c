@@ -6,56 +6,25 @@
 
 em_t* em_new() {
     em_t* em = malloc(sizeof(em_t));
-    massert(em, "em_new: em malloc failed");
+    massert(em, "em malloc failed");
     for (int i = 0; i < EM_MAX_SLOTS; i++) em->entities[i] = NULL;
     em->count = 0;
     em->max_slots = EM_MAX_SLOTS;
     return em;
 }
 
-//bool em_free(em_t* em) {
-//    if (!em) {
-//        merror("em_free: em is NULL");
-//        return false;
-//    }
-//
-//    minfo("Freeing entity map");
-//    for (int i = 0; i < EM_MAX_SLOTS; i++) {
-//        entity_t* current = em->entities[i];
-//        if (!current) continue; // Skip empty slots
-//
-//        minfo("Freeing slot %d", i);
-//        while (current != NULL) {
-//            entity_t* next = current->next; // Save next before freeing
-//            free(current);
-//            current = next;
-//        }
-//        em->entities[i] = NULL; // Clear the slot
-//    }
-//
-//    free(em);
-//    msuccess("Freed entity map");
-//    return true;
-//}
-
 bool em_free(em_t* em) {
     if (!em) {
-        merror("em_free: em is NULL");
+        merror("em is NULL");
         return false;
     }
     minfo("Freeing entity map");
     for (int i = 0; i < EM_MAX_SLOTS; i++) {
-        //minfo("Freeing slot %d", i);
         entity_t* current = em->entities[i];
-        //minfo("1");
-        //massert(current, "em_free: current is NULL");
         while (current != NULL) {
-            //minfo("2");
             entity_t* next = current->next;
             current->next = NULL; // Clear the next pointer
-            //minfo("5");
             free(current);
-            //minfo("6");
             current = next;
         }
     }
@@ -66,35 +35,30 @@ bool em_free(em_t* em) {
 
 // returns the first item in the set which will be the oldest
 entity_t* const em_get(const em_t* const em, entityid id) {
-    massert(em, "em_get: em is NULL");
-    //massert(id >= 0, "em_get: id is less than 0");
-    if (id < 0) {
-        return NULL;
-    }
+    massert(em, "em is NULL");
+    if (id < 0) { return NULL; }
     const int hash = id % EM_MAX_SLOTS;
-    massert(hash >= 0, "em_get: hash is negative");
+    massert(hash >= 0, "hash is negative");
     return em->entities[hash];
 }
 
 entity_t* em_get_last(const em_t* const em, entityid id) {
-    massert(em, "em_get_last: em is NULL");
-    massert(id >= 0, "em_get_last: id is less than 0");
+    massert(em, "em is NULL");
+    massert(id >= 0, "id is less than 0");
     const int hash = id % EM_MAX_SLOTS;
-    massert(hash >= 0, "em_get_last: hash is negative");
+    massert(hash >= 0, "hash is negative");
     entity_t* current = em->entities[hash];
     if (current == NULL) return NULL;
-    while (current->next != NULL) {
-        current = current->next;
-    }
+    while (current->next != NULL) current = current->next;
     return current;
 }
 
 entity_t* em_add(em_t* const em, entity_t* const e) {
-    massert(em, "em_add: em is NULL");
-    massert(e, "em_add: entity is NULL");
+    massert(em, "em is NULL");
+    massert(e, "entity is NULL");
     const int hash = e->id % EM_MAX_SLOTS;
-    massert(hash >= 0, "em_add: hash is negative");
-    massert(hash < EM_MAX_SLOTS, "em_add: hash is too large");
+    massert(hash >= 0, "hash is negative");
+    massert(hash < EM_MAX_SLOTS, "hash is too large");
     if (em->entities[hash] != NULL) {
         entity_t* current = em->entities[hash];
         // find a new slot
@@ -108,14 +72,14 @@ entity_t* em_add(em_t* const em, entity_t* const e) {
 }
 
 entity_t* em_remove_last(em_t* const em, entityid id) {
-    massert(em, "em_remove_last: em is NULL");
-    massert(id >= 0, "em_remove_last: id is less than 0");
+    massert(em, "em is NULL");
+    massert(id >= 0, "id is less than 0");
     const int hash = id % EM_MAX_SLOTS;
-    massert(hash >= 0, "em_remove_last: hash is negative");
-    massert(hash < EM_MAX_SLOTS, "em_remove_last: hash is too large");
+    massert(hash >= 0, "hash is negative");
+    massert(hash < EM_MAX_SLOTS, "hash is too large");
     entity_t* current = em->entities[hash];
     if (current == NULL) {
-        merror("em_remove_last: current is NULL");
+        merror("current is NULL");
         return NULL;
     }
     if (current->next == NULL) {
@@ -130,6 +94,6 @@ entity_t* em_remove_last(em_t* const em, entityid id) {
 }
 
 int em_count(const em_t* const em) {
-    massert(em, "em_count: em is NULL");
+    massert(em, "em is NULL");
     return em->count;
 }

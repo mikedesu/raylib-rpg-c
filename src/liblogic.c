@@ -1408,4 +1408,10 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 }
 
-void liblogic_close(gamestate* const g) { massert(g, "liblogic_close: gamestate is NULL"); }
+void liblogic_close(gamestate* const g) {
+    massert(g, "liblogic_close: gamestate is NULL");
+
+    // free the entitymap
+
+    // free the dungeon
+}
