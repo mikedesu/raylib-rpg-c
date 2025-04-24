@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+static void df_init_test_simple2(dungeon_floor_t* df);
+static void df_assign_stairs(dungeon_floor_t* df);
+
 static void df_assign_stairs(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
     int count2 = 0;
@@ -73,6 +76,26 @@ static void df_init_test_simple(dungeon_floor_t* df) {
     df_assign_stairs(df);
 }
 
+int df_center_x(const dungeon_floor_t* const df) {
+    massert(df, "dungeon floor is NULL");
+    return df->width / 2;
+}
+
+int df_center_y(const dungeon_floor_t* const df) {
+    massert(df, "dungeon floor is NULL");
+    return df->height / 2;
+}
+
+static void df_init_test_simple2(dungeon_floor_t* df) {
+    massert(df, "dungeon floor is NULL");
+    int x = df_center_x(df), y = df_center_y(df);
+    int w = 4, h = 4;
+    df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    x += w + 1;
+    df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    df_assign_stairs(df);
+}
+
 dungeon_floor_t* df_create(const int width, const int height) {
     dungeon_floor_t* floor = malloc(sizeof(dungeon_floor_t));
     massert(floor, "failed to malloc dungeon floor");
@@ -103,7 +126,8 @@ void df_init(dungeon_floor_t* df) {
     df_set_all_tiles(df, TILE_NONE);
     // at this point, we are free to customize the dungeon floor to our liking
     //df_init_test(df);
-    df_init_test_simple(df);
+    //df_init_test_simple(df);
+    df_init_test_simple2(df);
 }
 
 void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {

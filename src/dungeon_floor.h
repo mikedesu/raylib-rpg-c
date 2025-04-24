@@ -49,13 +49,7 @@ void df_set_all_tiles_range(dungeon_floor_t* const df, tiletype_t begin, tiletyp
 void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y);
 void df_set_tile_perimeter(dungeon_floor_t* const df, tiletype_t type, int x, int y, int w, int h);
 void df_init_test(dungeon_floor_t* const df);
-void df_set_tile_perimeter_range(dungeon_floor_t* const df,
-                                 tiletype_t begin,
-                                 tiletype_t end,
-                                 int x,
-                                 int y,
-                                 int w,
-                                 int h);
+void df_set_tile_perimeter_range(dungeon_floor_t* const df, tiletype_t begin, tiletype_t end, int x, int y, int w, int h);
 void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type);
 void df_reset_plates(dungeon_floor_t* const df);
 void df_reset_events(dungeon_floor_t* const df);
@@ -69,3 +63,6 @@ loc_t df_get_upstairs(const dungeon_floor_t* const df);
 loc_t df_get_downstairs(const dungeon_floor_t* const df);
 tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y);
 int df_count_walkable(const dungeon_floor_t* const df);
+
+int df_center_x(const dungeon_floor_t* const df);
+int df_center_y(const dungeon_floor_t* const df);
