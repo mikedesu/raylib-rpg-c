@@ -814,7 +814,7 @@ static void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     }
     massert(count2 == count, "count2 is greater than count");
     // now we can loop thru the array and create an orc at each location
-    int max_orcs = 8;
+    int max_orcs = 3;
     //int max_orcs = count2;
 
     int created_orcs = 0;
