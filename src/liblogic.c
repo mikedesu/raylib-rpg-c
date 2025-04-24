@@ -1412,6 +1412,8 @@ void liblogic_close(gamestate* const g) {
     massert(g, "liblogic_close: gamestate is NULL");
 
     // free the entitymap
+    em_free(g->entitymap);
 
     // free the dungeon
+    dungeon_free(g->dungeon);
 }
