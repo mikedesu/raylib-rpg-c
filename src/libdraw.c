@@ -23,8 +23,10 @@
 //#define DEFAULT_WIN_HEIGHT 480
 //#define DEFAULT_WIN_WIDTH 960
 //#define DEFAULT_WIN_HEIGHT 540
-#define DEFAULT_WIN_WIDTH 1920
-#define DEFAULT_WIN_HEIGHT 1080
+//#define DEFAULT_WIN_WIDTH 1920
+//#define DEFAULT_WIN_HEIGHT 1080
+#define DEFAULT_WIN_WIDTH 1280
+#define DEFAULT_WIN_HEIGHT 720
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
 
@@ -628,9 +630,12 @@ static void draw_message_box(gamestate* g) {
     if (g->msg_system.count > 1) {
         int prompt_font_size = 10;
         int prompt_offset = 10; // Offset from box edges
-        //int prompt_width = MeasureText(prompt, 10);
-        Vector2 prompt_size = MeasureTextEx(GetFontDefault(), prompt, prompt_font_size, 1.0f);
-        DrawText(prompt,
+
+        char tmp_prompt[1024] = {0};
+        snprintf(tmp_prompt, sizeof(tmp_prompt), "%s %d/%d", prompt, g->msg_system.index + 1, g->msg_system.count);
+
+        Vector2 prompt_size = MeasureTextEx(GetFontDefault(), tmp_prompt, prompt_font_size, 1.0f);
+        DrawText(tmp_prompt,
                  box.x + box.width - prompt_size.x - prompt_offset, // Right-align in box
                  box.y + box.height - prompt_size.y - prompt_offset, // Bottom of box
                  prompt_font_size,
@@ -658,15 +663,18 @@ void libdraw_drawframe(gamestate* const g) {
     ClearBackground(WHITE);
     BeginTextureMode(target);
     libdraw_drawframe_2d(g);
+
     EndTextureMode();
     //BeginShaderMode(shader_grayscale);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_grayscale, GetShaderLocation(shader_grayscale, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+
     draw_message_box(g);
     draw_message_history(g);
     draw_hud(g);
+
     handle_debug_panel(g);
 
     EndDrawing();
@@ -869,7 +877,7 @@ static inline void draw_hud(gamestate* const g) {
         return;
     }
     // Draw the HUD
-    int fontsize = 30;
+    int fontsize = 20;
     int hp = -1;
     int maxhp = -1;
     int mp = -1;
@@ -910,7 +918,8 @@ static inline void draw_hud(gamestate* const g) {
     const int box_height = size.y + (padding * 2);
     // Position box
     const int box_x = (g->windowwidth - box_width) / 2;
-    const int box_y = g->windowheight - box_height - 100;
+    //const int box_y = g->windowheight - box_height - 100;
+    const int box_y = g->windowheight - box_height;
     // Draw everything
     DrawRectangle(box_x, box_y, box_width, box_height, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, fg);
@@ -951,7 +960,7 @@ static void draw_message_history(gamestate* const g) {
     }
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) { return; }
-    const int font_size = 30;
+    const int font_size = 20;
     const int pad = 40; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
     const int max_messages = 10;
