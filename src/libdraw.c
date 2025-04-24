@@ -607,7 +607,8 @@ static void draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) { return; }
     const char* prompt = "[A] Next";
     const char* msg = g->msg_system.messages[g->msg_system.index];
-    Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
+    //Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
+    Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     int font_size = 30;
     int pad = 40; // Inner padding (text <-> box edges)
     float line_spacing = 1.0f;
@@ -958,7 +959,8 @@ static void draw_message_history(gamestate* const g) {
     const int y = 20;
     int current_count = 0;
     char tmp_buffer[2048] = {0};
-    Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
+    //Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
+    Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     // instead of a placeholder message, we now need to actually draw the message history
     // we might only render the last N messages
     //int index = g->msg_history.count;
