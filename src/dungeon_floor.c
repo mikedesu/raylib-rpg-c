@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+static bool df_malloc_tiles(dungeon_floor_t* const df);
 static void df_init_test_simple(dungeon_floor_t* df);
 static void df_init_test_simple2(dungeon_floor_t* df);
 static void df_init_test_simple3(dungeon_floor_t* df);
@@ -556,7 +557,7 @@ void df_reset_events(dungeon_floor_t* const df) {
     }
 }
 
-bool df_malloc_tiles(dungeon_floor_t* const df) {
+static bool df_malloc_tiles(dungeon_floor_t* const df) {
     massert(df, "dungeon floor is NULL");
     df->tiles = malloc(sizeof(tile_t*) * df->height);
     if (!df->tiles) return false;

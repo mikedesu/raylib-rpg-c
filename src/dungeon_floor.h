@@ -53,7 +53,6 @@ void df_set_tile_perimeter_range(dungeon_floor_t* const df, tiletype_t begin, ti
 void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type);
 void df_reset_plates(dungeon_floor_t* const df);
 void df_reset_events(dungeon_floor_t* const df);
-bool df_malloc_tiles(dungeon_floor_t* const df);
 void df_init_rect(dungeon_floor_t* df, int x, int y, int w, int h, tiletype_t t1, tiletype_t t2);
 void df_create_trap_event(dungeon_floor_t* df, int x, int y, tiletype_t on, tiletype_t off, df_event_id id);
 void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id);
