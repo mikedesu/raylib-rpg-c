@@ -21,10 +21,10 @@
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
-#define DEFAULT_WIN_WIDTH 960
-#define DEFAULT_WIN_HEIGHT 540
-//#define DEFAULT_WIN_WIDTH 1920
-//#define DEFAULT_WIN_HEIGHT 1080
+//#define DEFAULT_WIN_WIDTH 960
+//#define DEFAULT_WIN_HEIGHT 540
+#define DEFAULT_WIN_WIDTH 1920
+#define DEFAULT_WIN_HEIGHT 1080
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
 
@@ -868,7 +868,7 @@ static inline void draw_hud(gamestate* const g) {
         return;
     }
     // Draw the HUD
-    int fontsize = 20;
+    int fontsize = 30;
     int hp = -1;
     int maxhp = -1;
     int mp = -1;
@@ -893,17 +893,19 @@ static inline void draw_hud(gamestate* const g) {
     snprintf(buffer,
              sizeof(buffer),
              //"Name: %s\nLevel: %d\nHP: %d/%d MP: %d/%d\nTurn: %d",
-             "%s Lvl %d HP %d/%d MP %d/%d Turn %d",
+             "%s Lvl %d HP %d/%d MP %d/%d XP %d Turn %d",
              name,
              level,
              hp,
              maxhp,
              mp,
              maxmp,
+             0,
              turn);
     const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
     // Add slight extra width factor to account for text measurement inconsistency
-    const int box_width = (size.x * width_factor) + (padding * 2);
+    //const int box_width = (size.x * width_factor) + (padding * 2);
+    const int box_width = (size.x * width_factor) + (padding * 3);
     const int box_height = size.y + (padding * 2);
     // Position box
     const int box_x = (g->windowwidth - box_width) / 2;
@@ -948,12 +950,12 @@ static void draw_message_history(gamestate* const g) {
     }
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) { return; }
-    const int font_size = 20;
+    const int font_size = 30;
     const int pad = 40; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
-    const int max_messages = 5;
-    const int x = 0;
-    const int y = 0;
+    const int max_messages = 10;
+    const int x = 20;
+    const int y = 20;
     int current_count = 0;
     char tmp_buffer[2048] = {0};
     Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
