@@ -8,9 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GAMESTATE_DEBUGPANEL_DEFAULT_X 5
-#define GAMESTATE_DEBUGPANEL_DEFAULT_Y 5
-#define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
+#define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
+#define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
+#define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 10
 #define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
 
 // have to update this function when we introduce new fields to Gamestate
@@ -25,10 +25,10 @@ gamestate* gamestateinitptr() {
     g->debugpanel.h = 200;
     g->debugpanel.fg_color = RAYWHITE;
     g->debugpanel.bg_color = Fade(RED, 0.8f);
-    g->debugpanel.pad_top = 10;
-    g->debugpanel.pad_left = 10;
-    g->debugpanel.pad_right = 10;
-    g->debugpanel.pad_bottom = 10;
+    g->debugpanel.pad_top = 0;
+    g->debugpanel.pad_left = 0;
+    g->debugpanel.pad_right = 0;
+    g->debugpanel.pad_bottom = 0;
     g->debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
     g->lock = 0;
     g->targetwidth = -1;
