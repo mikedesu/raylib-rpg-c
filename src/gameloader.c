@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #define LIBDRAW_PATH "./libdraw.so"
 #define LIBLOGIC_PATH "./liblogic.so"
@@ -109,16 +110,6 @@ void reload_logic() {
     msuccess("Reloaded liblogic.so");
 }
 
-//void autoreload_every_n_sec(int n, gamestate* g) {
-//    static double last = 0;
-//    double now = GetTime();
-//    if (now - last >= n) {
-//        if (file_changed(LIBDRAW_PATH, &draw_last_write_time)) reload_draw(g);
-//        if (file_changed(LIBLOGIC_PATH, &logic_last_write_time)) reload_logic();
-//        last = now;
-//    }
-//}
-
 void autoreload_every_n_sec(int n, gamestate* g) {
     static double last = 0;
     double now = GetTime();
@@ -129,33 +120,22 @@ void autoreload_every_n_sec(int n, gamestate* g) {
         if (file_changed(LIBDRAW_PATH, &draw_last_write_time)) {
             minfo("Checking libdraw.so...");
 
-            if (!file_exists(LIBDRAW_PATH ".lockfile")) {
-                msuccess("Reloading libdraw.so...");
-                reload_draw(g);
-                last = now; // Reset timer immediately
-            }
+            while (file_exists(LIBDRAW_PATH ".lockfile")) usleep(1000);
 
-            else {
-                merror("libdraw.so is locked, skipping reload");
-            }
+            msuccess("Reloading libdraw.so...");
+            reload_draw(g);
+            last = now; // Reset timer immediately
         }
 
         // Check logic lib
         if (file_changed(LIBLOGIC_PATH, &logic_last_write_time)) {
             minfo("Checking liblogic.so...");
 
-            while (file_exists(LIBLOGIC_PATH ".lockfile"))
-                ;
+            while (file_exists(LIBLOGIC_PATH ".lockfile")) usleep(1000);
 
-            //if (!file_exists(LIBLOGIC_PATH ".lockfile")) {
             msuccess("Reloading liblogic.so...");
             reload_logic();
             last = now; // Reset timer immediately
-            //}
-
-            //else {
-            //    merror("liblogic.so is locked, skipping reload");
-            //}
         }
     }
 }
