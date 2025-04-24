@@ -28,8 +28,9 @@ WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 all: game #index.html
 
 # Desktop build
-game: main.o gameloader.o libdraw.so liblogic.so
-	$(CC) -o $@ main.o gameloader.o -L. -ldraw -llogic $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
+game: main.o gameloader.o gamestate.o libdraw.so liblogic.so
+	$(CC) -o $@ main.o gameloader.o gamestate.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
+	#$(CC) -o $@ main.o gameloader.o -L. -ldraw -llogic $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
 	./log_build_stats.sh
 
 # Web build

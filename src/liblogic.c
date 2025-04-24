@@ -1377,6 +1377,7 @@ static void update_debug_panel_buffer(gamestate* const g) {
 void liblogic_init(gamestate* const g) {
     massert(g, "liblogic_init: gamestate is NULL");
     srand(time(NULL));
+
     liblogic_init_dungeon(g);
     gamestate_init_entityids(g);
     g->msg_system.count = 0;
@@ -1483,6 +1484,9 @@ static inline void reset_player_block_success(gamestate* const g) {
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
+
+    minfo("tick");
+
     update_player_state(g);
     update_npcs_state(g);
 

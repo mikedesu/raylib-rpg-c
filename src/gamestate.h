@@ -126,6 +126,3 @@ void gamestate_set_debug_panel_pos_bottom_left(gamestate* const g);
 void gamestate_set_debug_panel_pos_top_right(gamestate* const g);
 void gamestate_incr_entity_turn(gamestate* const g);
 void gamestate_load_keybindings(gamestate* const g);
-
-bool g_get_gameover(const gamestate* const g);
-void g_set_gameover(gamestate* const g, bool gameover);
