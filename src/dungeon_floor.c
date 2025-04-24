@@ -124,37 +124,25 @@ static void df_init_test_simple4(dungeon_floor_t* df) {
     x += w + 1;
     df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     df_assign_stairs(df);
-
     // now we need to attach a single tile to connect the rooms
     // we will use the tile to the right of the first room
     // we will set the tile to the right of the first room to be a stone floor 00
     x = df_center_x(df) + w;
     y = df_center_y(df) + h / 2;
     df_set_tile(df, TILE_FLOOR_STONE_00, x, y);
-
     // now we will create two tiles to do a 'trap'
     // this involves
     // 1. creating a wall tile
     // 2. attaching a switch to the wall
     // 3. creating a trap tile
     // 4. attaching the trap to the switch
-
-    int trap_tile_x = x;
-    int trap_tile_y = y;
-
     int id = 1;
-
-    //x = df_center_x(df);
-    //y = df_center_y(df);
-    x = df_center_x(df) + w;
-    y = df_center_y(df);
-
-    int switch_x = x + rand() % w;
-    int switch_y = y + rand() % h;
-
-    df_place_wall_switch(df, switch_x, switch_y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, id);
-    df_create_trap_event(df, trap_tile_x, trap_tile_y, TILE_FLOOR_STONE_TRAP_ON_00, TILE_FLOOR_STONE_TRAP_OFF_00, id);
-    df_set_tile(df, TILE_FLOOR_STONE_TRAP_ON_00, trap_tile_x, trap_tile_y);
+    int t_x = x, t_y = y;
+    x = df_center_x(df) + w, y = df_center_y(df);
+    int s_x = x + rand() % w, s_y = y + rand() % h;
+    df_place_wall_switch(df, s_x, s_y, TX_WALL_SWITCH_UP_00, TX_WALL_SWITCH_DOWN_00, id);
+    df_create_trap_event(df, t_x, t_y, TILE_FLOOR_STONE_TRAP_ON_00, TILE_FLOOR_STONE_TRAP_OFF_00, id);
+    df_set_tile(df, TILE_FLOOR_STONE_TRAP_ON_00, t_x, t_y);
 }
 
 dungeon_floor_t* df_create(const int width, const int height) {
