@@ -22,5 +22,6 @@ dungeon_floor_t* dungeon_get_floor(dungeon_t* const dungeon, const int index);
 dungeon_floor_t* dungeon_get_current_floor(dungeon_t* const dungeon);
 
 void dungeon_destroy(dungeon_t* dungeon);
+void dungeon_free(dungeon_t* dungeon);
 void dungeon_lock(dungeon_t* dungeon);
 void dungeon_unlock(dungeon_t* dungeon);
