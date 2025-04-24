@@ -36,9 +36,9 @@ entity_t* e_new(entityid id, entitytype_t type) {
 }
 
 entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int floor) {
-    massert(x >= 0, "entity_new_at: x is less than 0");
-    massert(y >= 0, "entity_new_at: y is less than 0");
-    massert(floor >= 0, "entity_new_at: floor is less than 0");
+    massert(x >= 0, "x is less than 0");
+    massert(y >= 0, "y is less than 0");
+    massert(floor >= 0, "floor is less than 0");
     entity_t* e = e_new(id, type);
     massert(e, "Failed to create entity");
     e_set_xy(e, x, y);
@@ -47,8 +47,8 @@ entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int floor) {
 }
 
 bool e_item_is_already_in_inventory(entity_t* const e, entityid item_id) {
-    massert(e, "e_item_is_already_in_inventory: e is NULL");
-    massert(item_id >= 0, "entity_item_is_already_in_inventory: item_id is less than 0");
+    massert(e, "e is NULL");
+    massert(item_id >= 0, "item_id is less than 0");
     for (int i = 0; i < e->inventory_count; i++) {
         if (e->inventory[i] == item_id) return true;
     }
@@ -56,14 +56,14 @@ bool e_item_is_already_in_inventory(entity_t* const e, entityid item_id) {
 }
 
 bool e_add_item_to_inventory(entity_t* const e, entityid item_id) {
-    massert(e, "e_add_item_to_inventory: e is NULL");
-    massert(item_id >= 0, "entity_add_item_to_inventory: item_id is less than 0");
+    massert(e, "e is NULL");
+    massert(item_id >= 0, "item_id is less than 0");
     if (e->inventory_count >= ENTITY_INVENTORY_MAX_SIZE) {
-        merror("e_add_item_to_inventory: inventory is full");
+        merror("inventory is full");
         return false;
     }
     if (e_item_is_already_in_inventory(e, item_id)) {
-        merror("e_add_item_to_inventory: item is already in inventory");
+        merror("item is already in inventory");
         return false;
     }
     e->inventory[e->inventory_count++] = item_id;
@@ -71,16 +71,16 @@ bool e_add_item_to_inventory(entity_t* const e, entityid item_id) {
 }
 
 bool e_remove_item_from_inventory(entity_t* const e, entityid item_id) {
-    massert(e, "e_remove_item_from_inventory: e is NULL");
-    massert(item_id >= 0, "entity_remove_item_from_inventory: item_id is less than 0");
+    massert(e, "e is NULL");
+    massert(item_id >= 0, "item_id is less than 0");
 
     if (e->inventory_count <= 0) {
-        merror("e_remove_item_from_inventory: inventory is empty");
+        merror("inventory is empty");
         return false;
     }
 
     if (!e_item_is_already_in_inventory(e, item_id)) {
-        merror("e_remove_item_from_inventory: item is not in inventory");
+        merror("item is not in inventory");
         return false;
     }
 
@@ -95,7 +95,7 @@ bool e_remove_item_from_inventory(entity_t* const e, entityid item_id) {
 
 void e_set_floor(entity_t* const e, int floor) {
     massert(e, "e is NULL");
-    massert(floor >= 0, "entity_set_floor: floor is less than 0");
+    massert(floor >= 0, "floor is less than 0");
     e->floor = floor;
 }
 
@@ -110,7 +110,6 @@ entity_t* e_new_npc_at(entityid id, race_t r, int x, int y, int floor, const cha
 entity_t* e_new_weapon_at(entityid id, int x, int y, int floor, const char* name) {
     entity_t* e = e_new_at(id, ENTITY_WEAPON, x, y, floor);
     massert(e, "Failed to create entity");
-    //entity_set_race(e, r);
     e_set_name(e, name);
     return e;
 }
@@ -123,17 +122,10 @@ entity_t* e_new_shield_at(entityid id, int x, int y, int floor, const char* name
     return e;
 }
 
-// this frees the entity so you lose the next pointer!
-// make sure you wire the map correctly before calling this!
-void e_free(entity_t* e) {
-    if (!e) return;
-    free(e);
-}
-
 void e_set_name(entity_t* const e, const char* name) {
     massert(e, "e is NULL");
-    massert(name, "entity_set_name: name is NULL");
-    massert(strlen(name) < ENTITY_NAME_LEN_MAX, "entity_set_name: name is too long");
+    massert(name, "name is NULL");
+    massert(strlen(name) < ENTITY_NAME_LEN_MAX, "name is too long");
     strncpy(e->name, name, ENTITY_NAME_LEN_MAX);
 }
 
@@ -167,9 +159,9 @@ void e_decr_x(entity_t* const e) { e_set_x(e, e->x - 1); }
 void e_decr_y(entity_t* const e) { e_set_y(e, e->y - 1); }
 
 void e_set_dir(entity_t* const e, direction_t dir) {
-    massert(e, "e_set_dir: e is NULL");
-    massert(dir >= 0, "e_set_dir: dir is less than 0");
-    massert(dir < DIR_COUNT, "e_set_dir: dir is greater than DIR_COUNT");
+    massert(e, "e is NULL");
+    massert(dir >= 0, "dir is less than 0");
+    massert(dir < DIR_COUNT, "dir is greater than DIR_COUNT");
     e->direction = dir;
 }
 
@@ -179,42 +171,42 @@ direction_t e_get_dir(entity_t* const e) {
 }
 
 void e_set_type(entity_t* const e, entitytype_t type) {
-    massert(e, "e_set_type: e is NULL");
-    massert(type >= 0, "e_set_type: type is less than 0");
-    massert(type < ENTITY_TYPE_COUNT, "e_set_type: type is greater than ENTITY_COUNT");
+    massert(e, "e is NULL");
+    massert(type >= 0, "type is less than 0");
+    massert(type < ENTITY_TYPE_COUNT, "type is greater than ENTITY_COUNT");
     e->type = type;
 }
 
 void e_set_default_action(entity_t* const e, entity_action_t action) {
-    massert(e, "e_set_default_action: e is NULL");
-    massert(action >= 0, "e_set_default_action: action is less than 0");
-    massert(action < ENTITY_ACTION_COUNT, "e_set_default_action: action is greater than ENTITY_ACTION_COUNT");
+    massert(e, "e is NULL");
+    massert(action >= 0, "action is less than 0");
+    massert(action < ENTITY_ACTION_COUNT, "action is greater than ENTITY_ACTION_COUNT");
     e->default_action = action;
 }
 
 entity_action_t e_get_default_action(entity_t* const e) {
-    massert(e, "e_get_default_action: e is NULL");
+    massert(e, "e is NULL");
     return e->default_action;
 }
 
 void e_set_hp(entity_t* const e, int hp) {
-    massert(e, "e_set_hp: e is NULL");
+    massert(e, "e is NULL");
     e->hp = hp < 0 ? 0 : hp > e->maxhp ? e->maxhp : hp;
 }
 
 int e_get_hp(entity_t* const e) {
-    massert(e, "e_get_hp: e is NULL");
+    massert(e, "e is NULL");
     return e->hp;
 }
 
 void e_set_maxhp(entity_t* const e, int maxhp) {
-    massert(e, "e_set_maxhp: e is NULL");
-    massert(maxhp > 0, "e_set_maxhp: maxhp is less than 1");
+    massert(e, "e is NULL");
+    massert(maxhp > 0, "maxhp is less than 1");
     e->maxhp = maxhp;
 }
 
 int e_get_maxhp(entity_t* const e) {
-    massert(e, "e_get_maxhp: e is NULL");
+    massert(e, "e is NULL");
     return e->maxhp;
 }
 
@@ -224,31 +216,31 @@ void e_set_hpmaxhp(entity_t* const e, int hp, int maxhp) {
 }
 
 void e_incr_hp(entity_t* const e, int hp) {
-    massert(e, "e_incr_hp: e is NULL");
+    massert(e, "e is NULL");
     e_set_hp(e, e->hp + hp);
 }
 
 void e_decr_hp(entity_t* const e, int hp) {
-    massert(e, "e_decr_hp: e is NULL");
+    massert(e, "e is NULL");
     e_set_hp(e, e->hp - hp);
 }
 
 int e_get_inventory_count(entity_t* const e) {
-    massert(e, "e_get_inventory_count: e is NULL");
+    massert(e, "e is NULL");
     return e->inventory_count;
 }
 
 void e_set_is_dead(entity_t* const e, bool dead) {
-    massert(e, "e_set_is_dead: e is NULL");
+    massert(e, "e is NULL");
     e->dead = dead;
 }
 
 void e_set_do_update(entity_t* const e, bool do_update) {
-    massert(e, "e_set_do_update: e is NULL");
+    massert(e, "e is NULL");
     e->do_update = do_update;
 }
 
 bool e_is_alive(entity_t* const e) {
-    massert(e, "e_is_alive: e is NULL");
+    massert(e, "e is NULL");
     return !e->dead;
 }

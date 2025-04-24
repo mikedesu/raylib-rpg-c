@@ -52,7 +52,7 @@ entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int floor);
 entity_t* e_new_weapon_at(entityid id, int x, int y, int floor, const char* name);
 entity_t* e_new_shield_at(entityid id, int x, int y, int floor, const char* name);
 
-void e_free(entity_t* e);
+//void e_free(entity_t* e);
 void e_set_floor(entity_t* const e, int floor);
 void e_set_name(entity_t* const e, const char* name);
 void e_set_race(entity_t* const e, race_t race);
