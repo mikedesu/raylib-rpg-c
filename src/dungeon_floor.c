@@ -65,14 +65,11 @@ static void df_init_test_simple(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
     int x = df->width / 2;
     int y = df->height / 2;
-    int w = 4;
-    int h = 4;
-
+    int w = 8;
+    int h = 8;
     tiletype_t begin_type = TILE_FLOOR_STONE_00;
     tiletype_t end_type = TILE_FLOOR_STONE_11;
-    df_set_tile_area(df, begin_type, x, y, w, h);
-    df_set_tile_area(df, end_type, x + 1, y + 1, w - 2, h - 2);
-
+    df_set_tile_area_range(df, x, y, w, h, begin_type, end_type);
     df_assign_stairs(df);
 }
 
