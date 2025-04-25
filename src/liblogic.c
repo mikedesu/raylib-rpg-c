@@ -159,7 +159,7 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
         merror("Cannot move, tile is NULL");
         return;
     }
-    if (!dungeon_tile_is_walkable(tile->type)) {
+    if (!tile_is_walkable(tile->type)) {
         merror("Cannot move, tile is not walkable");
         return;
     }
@@ -485,7 +485,7 @@ static entityid weapon_create(gamestate* const g, int x, int y, int fl, const ch
     massert(y < df->height, "y is out of bounds");
     tile_t* const tile = df_tile_at(df, x, y);
     massert(tile, "failed to get tile");
-    if (!dungeon_tile_is_walkable(tile->type)) {
+    if (!tile_is_walkable(tile->type)) {
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
@@ -524,7 +524,7 @@ static entityid liblogic_shield_create(gamestate* const g, int x, int y, int fl,
     // can we create an entity at this location? no entities can be made on wall-types etc
     tile_t* const tile = df_tile_at(df, x, y);
     massert(tile, "failed to get tile");
-    if (!dungeon_tile_is_walkable(tile->type)) {
+    if (!tile_is_walkable(tile->type)) {
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
@@ -581,7 +581,7 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
     for (int i = 0; i < 8; i++) {
         tile = df_tile_at(g->dungeon->floors[e->floor], locs[i].x, locs[i].y);
         if (!tile) continue;
-        if (!dungeon_tile_is_walkable(tile->type)) continue;
+        if (!tile_is_walkable(tile->type)) continue;
         if (tile_entity_count(tile) > 0) continue;
         // found an empty tile
         found = true;
@@ -613,7 +613,7 @@ static void init_weapon_test(gamestate* const g) {
             int ny = e->y + j;
             tile_t* tile = df_tile_at(df, nx, ny);
             if (tile_entity_count(tile) > 0) continue;
-            if (!dungeon_tile_is_walkable(tile->type)) continue;
+            if (!tile_is_walkable(tile->type)) continue;
             // create the shield
             entityid shield_id = liblogic_shield_create(g, nx, ny, 0, "shield");
             massert(shield_id != ENTITYID_INVALID, "failed to create shield");
@@ -636,7 +636,7 @@ static void init_weapon_test(gamestate* const g) {
             tile_t* const tile = df_tile_at(df, nx, ny);
             if (tile_entity_count(tile) > 0) continue;
             // check if the tile is walkable
-            if (!dungeon_tile_is_walkable(tile->type)) continue;
+            if (!tile_is_walkable(tile->type)) continue;
             // create the sword
             entityid sword_id = weapon_create(g, nx, ny, 0, "sword");
             massert(sword_id != ENTITYID_INVALID, "failed to create weapon");
@@ -669,14 +669,14 @@ static entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y,
     massert(rt < RACE_COUNT, "race_type is out of bounds");
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
     massert(df, "failed to get current dungeon floor");
-    massert(x >= 0, "x is out of bounds");
+    massert(x >= 0, "x is out of bounds: %s", name);
     massert(x < df->width, "x is out of bounds");
     massert(y >= 0, "y is out of bounds");
     massert(y < df->height, "y is out of bounds");
     // can we create an entity at this location? no entities can be made on wall-types etc
     tile_t* const tile = df_tile_at(df, x, y);
     massert(tile, "failed to get tile");
-    if (!dungeon_tile_is_walkable(tile->type)) {
+    if (!tile_is_walkable(tile->type)) {
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
@@ -802,7 +802,7 @@ static void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tile_t* const tile = df_tile_at(df, x, y);
-            if (dungeon_tile_is_walkable(tile->type)) {
+            if (tile_is_walkable(tile->type)) {
                 // there wont be any entities yet so do not check for them
                 // do not write an if statement
                 locations[count2].x = x;

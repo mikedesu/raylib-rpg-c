@@ -189,7 +189,7 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     tile_t* tile = df_tile_at(df, x, y);
     if (!tile) return false;
 
-    if (dungeon_tile_is_wall(tile->type)) return false;
+    if (tile_is_wall(tile->type)) return false;
 
     for (int i = 0; i < tile_entity_count(tile); i++) {
         entityid id = tile_get_entity(tile, i);
@@ -217,7 +217,7 @@ static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
         for (int x = 0; x < df->width; x++) {
             tile_t* t = df_tile_at(df, x, y);
             if (!t) return false;
-            if (!dungeon_tile_is_wall(t->type)) continue;
+            if (!tile_is_wall(t->type)) continue;
             draw_dungeon_floor_tile(g, df, x, y);
         }
     return true;
