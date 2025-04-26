@@ -802,6 +802,14 @@ static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt) {
     return locs;
 }
 
+static void create_orc_at(gamestate* g, int x, int y) {
+    entity* o = npc_create_ptr(g, RACE_ORC, x, y, 0, "orc");
+    massert(o, "orc create fail");
+    e_set_default_action(o, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
+    e_set_maxhp(o, 1);
+    e_set_hp(o, 1);
+}
+
 static void init_orcs_test_intermediate(gamestate* g) {
     massert(g, "gamestate is NULL");
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
@@ -822,11 +830,7 @@ static void init_orcs_test_intermediate(gamestate* g) {
             i++;
             continue;
         }
-        entity* orc = npc_create_ptr(g, RACE_ORC, locs[i].x, locs[i].y, 0, "orc");
-        massert(orc, "orc create fail");
-        e_set_default_action(orc, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
-        e_set_maxhp(orc, 1);
-        e_set_hp(orc, 1);
+        create_orc_at(g, locs[i].x, locs[i].y);
         i++;
         created++;
     }
