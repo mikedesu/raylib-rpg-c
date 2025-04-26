@@ -14,6 +14,11 @@
 typedef int df_event_id;
 
 typedef struct {
+    int x, y, w, h;
+    char room_name[64]; // shorten to reasonable length
+} room_data_t;
+
+typedef struct {
     df_event_id listen_event;
     int x;
     int y;
@@ -29,19 +34,15 @@ typedef struct {
     df_event_t events[DEFAULT_DF_EVENTS];
     bool plates[DEFAULT_DF_PLATES];
 
+    room_data_t* rooms; // dynamic array pointer
+    int room_count; // current room number
+    int room_capacity; // allocated capacity
+
 } dungeon_floor_t;
 
 dungeon_floor_t* df_create(int width, int height);
 void df_init(dungeon_floor_t* df);
 void df_free(dungeon_floor_t* f);
-
-//void df_set_pressure_plate(dungeon_floor_t* const df, int x, int y, int up_tx_key, int dn_tx_key, int event);
-//void df_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_tx_key, int dn_tx_key, int event);
-//void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type);
-//void df_reset_plates(dungeon_floor_t* const df);
-//void df_reset_events(dungeon_floor_t* const df);
-//void df_create_trap_event(dungeon_floor_t* df, int x, int y, tiletype_t on, tiletype_t off, df_event_id id);
-//void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id);
 
 bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y);
 tile_t* df_tile_at(const dungeon_floor_t* const df, int x, int y);
@@ -53,3 +54,4 @@ loc_t df_get_downstairs(const dungeon_floor_t* const df);
 int df_count_walkable(const dungeon_floor_t* const df);
 int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
+bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);

@@ -450,6 +450,9 @@ static void df_set_tile_area(dungeon_floor_t* const df, tiletype_t type, int x, 
 
 void df_init(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
+    df->rooms = NULL;
+    df->room_count = 0;
+    df->room_capacity = 0;
     df->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
     df->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
     df_reset_plates(df);
@@ -694,6 +697,9 @@ void df_free(dungeon_floor_t* df) {
         tile_t* t = df->tiles[i];
         if (t) free(t);
     }
+
+    if (df->tiles) free(df->tiles);
+    if (df->rooms) free(df->rooms);
     free(df);
     msuccess("Freed dungeon floor");
 }
@@ -990,4 +996,30 @@ static void df_init_test_simple9(dungeon_floor_t* df) {
     df_make_diamond_shape_room(df, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     df_assign_downstairs_in_area(df, cx - w / 2, cy - h / 2, w, h);
     df_assign_upstairs_in_area(df, cx - w / 2, cy - h / 2, w, h);
+}
+
+bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name) {
+    if (df->room_count == df->room_capacity) {
+        int new_cap = df->room_capacity ? df->room_capacity * 2 : 8;
+        room_data_t* tmp = realloc(df->rooms, sizeof(room_data_t) * new_cap);
+        if (!tmp) return false;
+        df->rooms = tmp;
+        df->room_capacity = new_cap;
+    }
+    room_data_t* r = &df->rooms[df->room_count++];
+    r->x = x;
+    r->y = y;
+    r->w = w;
+    r->h = h;
+    strncpy(r->room_name, name, sizeof(r->room_name) - 1);
+    r->room_name[sizeof(r->room_name) - 1] = '\0';
+    return true;
+}
+
+const room_data_t* df_get_room_at(const dungeon_floor_t* df, int px, int py) {
+    for (int i = 0; i < df->room_count; i++) {
+        const room_data_t* r = &df->rooms[i];
+        if (px >= r->x && px < r->x + r->w && py >= r->y && py < r->y + r->h) return r;
+    }
+    return NULL;
 }
