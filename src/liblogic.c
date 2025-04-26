@@ -36,12 +36,18 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
 static inline void add_message_history(gamestate* const g, const char* msg);
 static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
+static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
+static void init_orcs_test_intermediate(gamestate* const g);
+static void init_em(gamestate* const g);
+static void init_dungeon(gamestate* const g);
+static const char* get_action_key(const inputstate* const is, gamestate* const g);
 static void update_player_state(gamestate* const g);
 static void update_debug_panel_buffer(gamestate* const g);
 static void handle_camera_move(gamestate* const g, const inputstate* const is);
 static void handle_input(const inputstate* const is, gamestate* const g);
 static void handle_input_camera(const inputstate* const is, gamestate* const g);
 static void handle_input_player(const inputstate* const is, gamestate* const g);
+static int tile_npc_count(gamestate* const g, dungeon_floor_t* const df, tile_t* const tile);
 
 static inline void add_message_history(gamestate* const g, const char* msg) {
     massert(g, "gamestate is NULL");
@@ -510,7 +516,7 @@ static entityid weapon_create(gamestate* const g, int x, int y, int fl, const ch
     return e->id;
 }
 
-static entityid liblogic_shield_create(gamestate* const g, int x, int y, int fl, const char* name) {
+static entityid shield_create(gamestate* const g, int x, int y, int fl, const char* name) {
     massert(g, "gamestate is NULL");
     em_t* em = gamestate_get_entitymap(g);
     massert(em, "entitymap is NULL");
@@ -615,7 +621,7 @@ static void init_weapon_test(gamestate* const g) {
             if (tile_entity_count(tile) > 0) continue;
             if (!tile_is_walkable(tile->type)) continue;
             // create the shield
-            entityid shield_id = liblogic_shield_create(g, nx, ny, 0, "shield");
+            entityid shield_id = shield_create(g, nx, ny, 0, "shield");
             massert(shield_id != ENTITYID_INVALID, "failed to create shield");
             entity* const shield = em_get(g->entitymap, shield_id);
             massert(shield, "shield is NULL");
@@ -648,19 +654,19 @@ static void init_weapon_test(gamestate* const g) {
     }
 }
 
-static void liblogic_init_dungeon(gamestate* const g) {
+static void init_dungeon(gamestate* const g) {
     massert(g, "gamestate is NULL");
     g->dungeon = dungeon_create();
     massert(g->dungeon, "failed to init dungeon");
     dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 }
 
-static void liblogic_init_em(gamestate* const g) {
+static void init_em(gamestate* const g) {
     massert(g, "gamestate is NULL");
     g->entitymap = em_new();
 }
 
-static entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
+static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
     massert(g, "gamestate is NULL");
     em_t* em = gamestate_get_entitymap(g);
     massert(em, "entitymap is NULL");
@@ -700,14 +706,14 @@ static entityid liblogic_npc_create(gamestate* const g, race_t rt, int x, int y,
     return e->id;
 }
 
-static entityid liblogic_player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
+static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
     minfo("creating player");
     massert(g, "gamestate is NULL");
     massert(name, "name is NULL");
     // use the previously-written liblogic_npc_create function
     const entitytype_t type = ENTITY_PLAYER;
     minfo("creating player with type %d", type);
-    const entityid id = liblogic_npc_create(g, rt, x, y, fl, name);
+    const entityid id = npc_create(g, rt, x, y, fl, name);
     minfo("player id: %d", id);
     minfo("getting entitymap");
     em_t* em = gamestate_get_entitymap(g);
@@ -728,9 +734,7 @@ static void init_player(gamestate* const g) {
     // setting it up so we can return a loc_t from a function
     // that can scan for an appropriate starting location
     loc_t loc = df_get_upstairs(g->dungeon->floors[g->dungeon->current_floor]);
-    minfo("creating player...");
-    const int id = liblogic_player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
-    msuccess("player id: %d", id);
+    const int id = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
     massert(id != ENTITYID_INVALID, "failed to init hero");
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "hero is NULL");
@@ -740,9 +744,9 @@ static void init_player(gamestate* const g) {
     msuccess("hero id %d", g->hero_id);
 }
 
-static entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
+static entity_t* const npc_create_ptr(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
     massert(g, "gamestate is NULL");
-    entityid id = liblogic_npc_create(g, rt, x, y, fl, name);
+    entityid id = npc_create(g, rt, x, y, fl, name);
     if (id == ENTITYID_INVALID) {
         merror("failed to create NPC");
         return NULL;
@@ -750,7 +754,7 @@ static entity_t* const liblogic_npc_create_ptr(gamestate* const g, race_t rt, in
     return em_get(g->entitymap, id);
 }
 
-static int liblogic_tile_npc_count(gamestate* const g, dungeon_floor_t* const df, tile_t* const tile) {
+static int tile_npc_count(gamestate* const g, dungeon_floor_t* const df, tile_t* const tile) {
     massert(g, "gamestate is NULL");
     massert(df, "dungeon floor is NULL");
     massert(tile, "failed to get tile");
@@ -768,7 +772,7 @@ static int liblogic_tile_npc_count(gamestate* const g, dungeon_floor_t* const df
     return tile_npc_count;
 }
 
-static int liblogic_tile_npc_count_xy(gamestate* const g, dungeon_floor_t* const df, int x, int y) {
+static int tile_npc_count_xy(gamestate* const g, dungeon_floor_t* const df, int x, int y) {
     massert(g, "gamestate is NULL");
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is out of bounds");
@@ -779,10 +783,10 @@ static int liblogic_tile_npc_count_xy(gamestate* const g, dungeon_floor_t* const
     tile_t* const tile = df_tile_at(df, x, y);
     massert(tile, "failed to get tile");
 
-    return liblogic_tile_npc_count(g, df, tile);
+    return tile_npc_count(g, df, tile);
 }
 
-static void liblogic_init_orcs_test_intermediate(gamestate* const g) {
+static void init_orcs_test_intermediate(gamestate* const g) {
     massert(g, "gamestate is NULL");
     dungeon_t* const d = g->dungeon;
     massert(d, "dungeon is NULL");
@@ -814,7 +818,7 @@ static void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     }
     massert(count2 == count, "count2 is greater than count");
     // now we can loop thru the array and create an orc at each location
-    int max_orcs = 3;
+    int max_orcs = 1;
     //int max_orcs = count2;
 
     int created_orcs = 0;
@@ -822,23 +826,22 @@ static void liblogic_init_orcs_test_intermediate(gamestate* const g) {
     massert(max_orcs < count2, "max_orcs is greater than count2");
 
     while (created_orcs < max_orcs && i < count2) {
-        int tile_npc_count = liblogic_tile_npc_count_xy(g, df, locations[i].x, locations[i].y);
+        int tile_npc_count = tile_npc_count_xy(g, df, locations[i].x, locations[i].y);
         if (tile_npc_count > 0) {
-            //merror("liblogic_init: tile has %d NPCs", tile_npc_count);
             i++;
             continue;
         }
 
         // also cant spawn on top of a player
         entity* const player = em_get(g->entitymap, g->hero_id);
-        massert(player, "liblogic_init: player is NULL");
+        massert(player, "player is NULL");
         if (locations[i].x == player->x && locations[i].y == player->y) {
-            merror("liblogic_init: cannot spawn on top of player");
+            merror("cannot spawn on top of player");
             i++;
             continue;
         }
-        entity* const orc = liblogic_npc_create_ptr(g, RACE_ORC, locations[i].x, locations[i].y, 0, "orc");
-        massert(orc, "liblogic_init: failed to create orc");
+        entity* const orc = npc_create_ptr(g, RACE_ORC, locations[i].x, locations[i].y, 0, "orc");
+        massert(orc, "failed to create orc");
         entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
         e_set_default_action(orc, action);
         e_set_maxhp(orc, 1);
@@ -852,10 +855,10 @@ static void liblogic_init_orcs_test_intermediate(gamestate* const g) {
 
 static void init_orcs_test(gamestate* const g) {
     //liblogic_init_orcs_test_naive_loop(g);
-    liblogic_init_orcs_test_intermediate(g);
+    init_orcs_test_intermediate(g);
 }
 
-static const char* liblogic_get_action_key(const inputstate* const is, gamestate* const g) {
+static const char* get_action_key(const inputstate* const is, gamestate* const g) {
     const int key = inputstate_get_pressed_key(is);
     //if (key != -1) { minfo("Key pressed: %d", key); }
     // can return early if key == -1
@@ -865,7 +868,7 @@ static const char* liblogic_get_action_key(const inputstate* const is, gamestate
 
 static void handle_camera_move(gamestate* const g, const inputstate* const is) {
     const float move = g->cam2d.zoom;
-    const char* action = liblogic_get_action_key(is, g);
+    const char* action = get_action_key(is, g);
     if (!action) {
         merror("No action found for key");
         return;
@@ -912,10 +915,10 @@ static void handle_input_camera(const inputstate* const is, gamestate* const g) 
     handle_camera_zoom(g, is);
 }
 
-static inline void liblogic_change_player_dir(gamestate* const g, direction_t dir) {
+static inline void change_player_dir(gamestate* const g, direction_t dir) {
     massert(g, "Game state is NULL!");
     entity* const hero = em_get(g->entitymap, g->hero_id);
-    massert(hero, "liblogic_change_player_dir: hero is NULL");
+    massert(hero, "hero is NULL");
     if (hero->dead) return;
     hero->direction = dir;
     hero->do_update = true;
@@ -1086,7 +1089,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
-    const char* action = liblogic_get_action_key(is, g);
+    const char* action = get_action_key(is, g);
     if (!action) {
         merror("1 No action found for key");
         return;
@@ -1113,32 +1116,33 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
                 execute_action(g, hero, ENTITY_ACTION_WAIT);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_w") == 0) {
-                liblogic_change_player_dir(g, DIR_LEFT);
+                change_player_dir(g, DIR_LEFT);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_e") == 0) {
-                liblogic_change_player_dir(g, DIR_RIGHT);
+                change_player_dir(g, DIR_RIGHT);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_s") == 0) {
-                liblogic_change_player_dir(g, DIR_DOWN);
+                change_player_dir(g, DIR_DOWN);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_n") == 0) {
-                liblogic_change_player_dir(g, DIR_UP);
+                change_player_dir(g, DIR_UP);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_nw") == 0) {
-                liblogic_change_player_dir(g, DIR_UP_LEFT);
+                change_player_dir(g, DIR_UP_LEFT);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_ne") == 0) {
-                liblogic_change_player_dir(g, DIR_UP_RIGHT);
+                change_player_dir(g, DIR_UP_RIGHT);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_sw") == 0) {
-                liblogic_change_player_dir(g, DIR_DOWN_LEFT);
+                change_player_dir(g, DIR_DOWN_LEFT);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_se") == 0) {
-                liblogic_change_player_dir(g, DIR_DOWN_RIGHT);
+                change_player_dir(g, DIR_DOWN_RIGHT);
                 g->player_changing_direction = false;
             }
             return;
         }
+
         if (strcmp(action, "wait") == 0) {
             g->player_changing_direction = true;
         } else if (strcmp(action, "move_w") == 0) {
@@ -1295,13 +1299,13 @@ static void update_debug_panel_buffer(gamestate* const g) {
 void liblogic_init(gamestate* const g) {
     massert(g, "liblogic_init: gamestate is NULL");
     srand(time(NULL));
-    liblogic_init_dungeon(g);
+    init_dungeon(g);
     gamestate_init_entityids(g);
     g->msg_system.count = 0;
     g->msg_system.index = 0;
     g->msg_system.is_active = false;
     gamestate_load_keybindings(g);
-    liblogic_init_em(g);
+    init_em(g);
     init_player(g);
     // test to create a weapon
     init_weapon_test(g);
@@ -1389,11 +1393,6 @@ static inline void reset_player_block_success(gamestate* const g) {
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-
-    //minfo("TICK");
-
-    //static int newvar = 0;
-    //minfo("newvar: %d", newvar++);
 
     update_player_state(g);
     update_npcs_state(g);
