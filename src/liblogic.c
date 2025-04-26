@@ -786,77 +786,54 @@ static int tile_npc_count_xy(gamestate* const g, dungeon_floor_t* const df, int 
     return tile_npc_count(g, df, tile);
 }
 
-static void init_orcs_test_intermediate(gamestate* const g) {
-    massert(g, "gamestate is NULL");
-    dungeon_t* const d = g->dungeon;
-    massert(d, "dungeon is NULL");
-    dungeon_floor_t* const df = dungeon_get_floor(d, 0);
-    massert(df, "dungeon floor is NULL");
-    // first, we need to count all of the possible tiles we could place an orc on
-    // we can loop thru each tile on the dungeon floor and check if it is walkable
-    // in the beginning there wont be any entities at all so we are just counting total possible locations right now
-    // in order to prepare a list of them
-    const int count = df_count_walkable(df);
-    // now we have the total number of possible locations
-    // we can create an array of size count
-    loc_t* locations = malloc(sizeof(loc_t) * count);
-    massert(locations, "failed to malloc locations");
-    int count2 = 0;
-    // now we can loop thru the dungeon floor again and fill the array with the locations
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            tile_t* const tile = df_tile_at(df, x, y);
-            if (tile_is_walkable(tile->type)) {
-                // there wont be any entities yet so do not check for them
-                // do not write an if statement
-                locations[count2].x = x;
-                locations[count2].y = y;
-                count2++;
-                massert(count2 <= count, "count2 is greater than count");
-            }
-        }
-    }
-    massert(count2 == count, "count2 is greater than count");
-    // now we can loop thru the array and create an orc at each location
-    int max_orcs = 1;
-    //int max_orcs = count2;
-
-    int created_orcs = 0;
+static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt) {
+    massert(cnt, "cnt is NULL");
+    int c = df_count_walkable(df);
+    loc_t* locs = malloc(sizeof(loc_t) * c);
+    massert(locs, "malloc failed");
     int i = 0;
-    massert(max_orcs < count2, "max_orcs is greater than count2");
+    for (int y = 0; y < df->height; y++)
+        for (int x = 0; x < df->width; x++) {
+            tile_t* t = df_tile_at(df, x, y);
+            if (tile_is_walkable(t->type)) locs[i++] = (loc_t){x, y};
+        }
+    massert(i == c, "count mismatch");
+    *cnt = c;
+    return locs;
+}
 
-    while (created_orcs < max_orcs && i < count2) {
-        int tile_npc_count = tile_npc_count_xy(g, df, locations[i].x, locations[i].y);
-        if (tile_npc_count > 0) {
+static void init_orcs_test_intermediate(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
+    massert(df, "floor is NULL");
+    int c;
+    loc_t* locs = get_walkable_locs(df, &c);
+    int max = 10, created = 0, i = 0;
+    entity* player = em_get(g->entitymap, g->hero_id);
+    massert(player, "player NULL");
+    massert(max < c, "max > count");
+    while (created < max && i < c) {
+        if (tile_npc_count_xy(g, df, locs[i].x, locs[i].y) > 0) {
             i++;
             continue;
         }
-
-        // also cant spawn on top of a player
-        entity* const player = em_get(g->entitymap, g->hero_id);
-        massert(player, "player is NULL");
-        if (locations[i].x == player->x && locations[i].y == player->y) {
-            merror("cannot spawn on top of player");
+        if (locs[i].x == player->x && locs[i].y == player->y) {
+            merror("cannot spawn on player");
             i++;
             continue;
         }
-        entity* const orc = npc_create_ptr(g, RACE_ORC, locations[i].x, locations[i].y, 0, "orc");
-        massert(orc, "failed to create orc");
-        entity_action_t action = ENTITY_ACTION_MOVE_ATTACK_PLAYER;
-        e_set_default_action(orc, action);
+        entity* orc = npc_create_ptr(g, RACE_ORC, locs[i].x, locs[i].y, 0, "orc");
+        massert(orc, "orc create fail");
+        e_set_default_action(orc, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
         e_set_maxhp(orc, 1);
         e_set_hp(orc, 1);
         i++;
-        created_orcs++;
+        created++;
     }
-    // we need to free the locations array
-    free(locations);
+    free(locs);
 }
 
-static void init_orcs_test(gamestate* const g) {
-    //liblogic_init_orcs_test_naive_loop(g);
-    init_orcs_test_intermediate(g);
-}
+static void init_orcs_test(gamestate* const g) { init_orcs_test_intermediate(g); }
 
 static const char* get_action_key(const inputstate* const is, gamestate* const g) {
     const int key = inputstate_get_pressed_key(is);
