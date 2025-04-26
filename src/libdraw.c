@@ -892,11 +892,11 @@ static inline void draw_hud(gamestate* const g) {
     const float width_factor = 1.1f; // 10% extra width
     entity* const e = em_get(g->entitymap, g->hero_id);
     if (e) {
-        hp = e->hp;
-        maxhp = e->maxhp;
-        mp = e->mp;
-        maxmp = e->maxmp;
-        level = e->level;
+        hp = e->stats.hp;
+        maxhp = e->stats.maxhp;
+        mp = e->stats.mp;
+        maxmp = e->stats.maxmp;
+        level = e->stats.level;
         name = e->name;
     }
     snprintf(buffer,

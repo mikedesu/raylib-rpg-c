@@ -15,6 +15,14 @@
 // forward declaration
 typedef struct entity_t entity_t;
 
+typedef struct {
+    int level;
+    int hp;
+    int maxhp;
+    int mp;
+    int maxmp;
+} entity_stats_t;
+
 typedef struct entity_t {
     entityid id;
     entitytype_t type;
@@ -29,11 +37,14 @@ typedef struct entity_t {
     int floor;
     int sprite_move_x;
     int sprite_move_y;
-    int level;
-    int hp;
-    int maxhp;
-    int mp;
-    int maxmp;
+
+    entity_stats_t stats;
+    //int level;
+    //int hp;
+    //int maxhp;
+    //int mp;
+    //int maxmp;
+
     bool do_update;
     bool is_attacking;
     bool is_blocking;

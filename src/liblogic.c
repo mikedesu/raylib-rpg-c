@@ -209,7 +209,7 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
     if (new_tile->type == TILE_FLOOR_STONE_TRAP_ON_00) {
         msuccess("On trap activated!");
         // do something
-        e->hp--;
+        e->stats.hp--;
         e->is_damaged = true;
         e->do_update = true;
     }
@@ -1319,7 +1319,7 @@ static inline void update_npc_state(gamestate* const g, entityid id) {
     entity* const e = em_get(g->entitymap, id);
     massert(e, "update_npc_state: entity is NULL");
     if (e->dead) return;
-    if (e->hp <= 0) {
+    if (e->stats.hp <= 0) {
         e->dead = true;
         e->do_update = true;
         merror("NPC is dead!");

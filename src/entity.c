@@ -19,8 +19,8 @@ entity_t* e_new(entityid id, entitytype_t type) {
     e->weapon = -1;
     e->shield = -1;
     e->floor = -1;
-    e->hp = 1;
-    e->maxhp = 1;
+    e->stats.hp = 1;
+    e->stats.maxhp = 1;
     e->do_update = false;
     e->is_attacking = false;
     e->is_blocking = false;
@@ -191,23 +191,23 @@ entity_action_t e_get_default_action(entity_t* const e) {
 
 void e_set_hp(entity_t* const e, int hp) {
     massert(e, "e is NULL");
-    e->hp = hp < 0 ? 0 : hp > e->maxhp ? e->maxhp : hp;
+    e->stats.hp = hp < 0 ? 0 : hp > e->stats.maxhp ? e->stats.maxhp : hp;
 }
 
 int e_get_hp(entity_t* const e) {
     massert(e, "e is NULL");
-    return e->hp;
+    return e->stats.hp;
 }
 
 void e_set_maxhp(entity_t* const e, int maxhp) {
     massert(e, "e is NULL");
     massert(maxhp > 0, "maxhp is less than 1");
-    e->maxhp = maxhp;
+    e->stats.maxhp = maxhp;
 }
 
 int e_get_maxhp(entity_t* const e) {
     massert(e, "e is NULL");
-    return e->maxhp;
+    return e->stats.maxhp;
 }
 
 void e_set_hpmaxhp(entity_t* const e, int hp, int maxhp) {
@@ -217,12 +217,12 @@ void e_set_hpmaxhp(entity_t* const e, int hp, int maxhp) {
 
 void e_incr_hp(entity_t* const e, int hp) {
     massert(e, "e is NULL");
-    e_set_hp(e, e->hp + hp);
+    e_set_hp(e, e->stats.hp + hp);
 }
 
 void e_decr_hp(entity_t* const e, int hp) {
     massert(e, "e is NULL");
-    e_set_hp(e, e->hp - hp);
+    e_set_hp(e, e->stats.hp - hp);
 }
 
 int e_get_inventory_count(entity_t* const e) {
