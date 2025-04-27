@@ -6,8 +6,6 @@
 #define DEFAULT_TILE_SIZE 8
 #define DEFAULT_ZOOM_INCR 0.05f
 
-#define TX_DIRT_00 0
-
 #define TX_HUMAN_IDLE 1
 #define TX_HUMAN_IDLE_SHADOW 2
 #define TX_HUMAN_WALK 3
@@ -42,6 +40,7 @@
 #define TX_ORC_DMG 25
 #define TX_ORC_DMG_SHADOW 26
 
+#define TX_DIRT_00 0
 #define TX_STONE_00 27
 #define TX_STONE_01 28
 #define TX_STONE_02 29
@@ -56,7 +55,6 @@
 #define TX_STONE_11 38
 #define TX_STONE_12 39
 //#define TX_STONE_13 40
-
 #define TX_STONEWALL_00 41
 #define TX_STONEWALL_01 42
 #define TX_STONEWALL_02 43
@@ -67,19 +65,16 @@
 #define TX_STONEWALL_07 48
 #define TX_STONEWALL_08 49
 #define TX_STONEWALL_09 50
-
 #define TX_STONEWALL_10 51
 #define TX_STONEWALL_11 52
 #define TX_STONEWALL_12 53
 #define TX_STONEWALL_13 54
 #define TX_STONEWALL_14 55
-
 #define TX_GRASS_00 56
 #define TX_GRASS_01 57
 #define TX_GRASS_02 58
 #define TX_GRASS_03 59
 #define TX_GRASS_04 60
-
 #define TX_DIRT_01 61
 #define TX_DIRT_02 62
 #define TX_DIRT_03 63
@@ -108,7 +103,6 @@
 #define TX_GRASS_17 89
 #define TX_GRASS_18 90
 #define TX_GRASS_19 91
-
 #define TX_DIRT_GRASS_00 92
 #define TX_DIRT_GRASS_01 93
 #define TX_DIRT_GRASS_02 94
@@ -124,20 +118,16 @@
 #define TX_DIRT_GRASS_12 104
 #define TX_DIRT_GRASS_13 105
 #define TX_DIRT_GRASS_14 106
-
 #define TX_WATER_00 107
 #define TX_WATER_01 108
-
 #define TX_DIRT_06 109
 #define TX_DIRT_07 110
 #define TX_DIRT_08 111
 
 #define TX_PRESSURE_PLATE_UP_00 112
 #define TX_PRESSURE_PLATE_DOWN_00 113
-
 #define TX_STONE_TRAP_OFF_00 114
 #define TX_STONE_TRAP_ON_00 115
-
 #define TX_WALL_SWITCH_UP_00 116
 #define TX_WALL_SWITCH_DOWN_00 117
 
@@ -222,6 +212,28 @@
 //#define TX_GOBLIN_GUARD_SUCCESS 68
 //#define TX_GOBLIN_GUARD_SUCCESS_SHADOW 69
 
+#define TX_BAT_IDLE 177
+#define TX_BAT_IDLE_SHADOW 178
+#define TX_BAT_ATTACK 179
+#define TX_BAT_ATTACK_SHADOW 180
+#define TX_BAT_DMG 181
+#define TX_BAT_DMG_SHADOW 182
+#define TX_BAT_SLEEP 183
+#define TX_BAT_SLEEP_SHADOW 184
+
+#define TX_WOLF_IDLE 185
+#define TX_WOLF_IDLE_SHADOW 186
+#define TX_WOLF_WALK 187
+#define TX_WOLF_WALK_SHADOW 188
+#define TX_WOLF_ATTACK 189
+#define TX_WOLF_ATTACK_SHADOW 190
+#define TX_WOLF_DMG 191
+#define TX_WOLF_DMG_SHADOW 192
+#define TX_WOLF_JUMP 193
+#define TX_WOLF_JUMP_SHADOW 194
+#define TX_WOLF_DIE 195
+#define TX_WOLF_DIE_SHADOW 196
+
 //--------------------------------
 
 #define COMPANYSCENE 0
@@ -242,5 +254,4 @@
 
 #define DEFAULT_CAMERA_ZOOM 10.0f
 
-//#define DEFAULT_ANIM_SPEED 8
 #define DEFAULT_ANIM_SPEED 8
