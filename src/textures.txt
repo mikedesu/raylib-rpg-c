@@ -3,16 +3,16 @@
 # atm there are 12 total human sprite animations
 1  4 16 0  img/characters/human_idle.png
 2  4 16 0  img/characters/shadows/human_idle_shadow.png
-3  4 4  0  img/characters/human_walk.png 
-4  4 4  0  img/characters/shadows/human_walk_shadow.png 
-5  4 4  0  img/characters/human_attack.png 
-6  4 4  0  img/characters/shadows/human_attack_shadow.png 
-7  4 4  0  img/characters/human_jump.png 
-8  4 4  0  img/characters/shadows/human_jump_shadow.png 
-9  1 7 0  img/characters/human_spindie2.png 
-10 1 7 0  img/characters/shadows/human_spindie2_shadow.png 
-11 1 12 0  img/characters/human_souldie.png 
-12 1 12 0  img/characters/shadows/human_souldie_shadow.png 
+3  4 4  0  img/characters/human_walk.png
+4  4 4  0  img/characters/shadows/human_walk_shadow.png
+5  4 4  0  img/characters/human_attack.png
+6  4 4  0  img/characters/shadows/human_attack_shadow.png
+7  4 4  0  img/characters/human_jump.png
+8  4 4  0  img/characters/shadows/human_jump_shadow.png
+9  1 7 0  img/characters/human_spindie2.png
+10 1 7 0  img/characters/shadows/human_spindie2_shadow.png
+11 1 12 0  img/characters/human_souldie.png
+12 1 12 0  img/characters/shadows/human_souldie_shadow.png
 # atm there are 14 total orc sprite animations
 13 4 16 0  img/characters/orc_idle.png
 14 4 16 0  img/characters/shadows/orc_idle_shadow.png
@@ -70,10 +70,10 @@
 64  1 1  0 img/tiles/dirt_04.png
 65  1 1  0 img/tiles/dirt_05.png
 # new human sprites for guarding
-66 4 4 0 img/characters/human_guard.png 
-67 4 4 0 img/characters/shadows/human_guard_shadow.png 
-68 4 3 0 img/characters/human_guard_success.png 
-69 4 3 0 img/characters/shadows/human_guard_success_shadow.png 
+66 4 4 0 img/characters/human_guard.png
+67 4 4 0 img/characters/shadows/human_guard_shadow.png
+68 4 3 0 img/characters/human_guard_success.png
+69 4 3 0 img/characters/shadows/human_guard_success_shadow.png
 70 4 4 0 img/actions/guard_buckler_front.png
 71 4 4 0 img/actions/guard_buckler_back.png
 72 4 3 0 img/actions/guard_buckler_success_front.png
@@ -126,3 +126,64 @@
 118 1 1  0  img/tiles/upstairs_00.png
 119 1 1  0  img/tiles/downstairs_00.png
 120 1 8  0  img/weapons/long-sword-sheet-2.png
+#
+121 4 16 0  img/characters/dwarf_idle.png
+122 4 16 0  img/characters/shadows/dwarf_idle_shadow.png
+123 4 4  0  img/characters/dwarf_walk.png
+124 4 4  0  img/characters/shadows/dwarf_walk_shadow.png
+125 4 4  0  img/characters/dwarf_attack.png
+126 4 4  0  img/characters/shadows/dwarf_attack_shadow.png
+127 4 4  0  img/characters/dwarf_jump.png
+128 4 4  0  img/characters/shadows/dwarf_jump_shadow.png
+129 1 7  0  img/characters/dwarf_spindie.png
+130 1 7  0  img/characters/shadows/dwarf_spindie_shadow.png
+131 1 12 0  img/characters/dwarf_souldie.png
+132 1 12 0  img/characters/shadows/dwarf_souldie_shadow.png
+133 4 4  0  img/characters/dwarf_dmg.png
+134 4 4  0  img/characters/shadows/dwarf_dmg_shadow.png
+#
+135 4 16 0  img/characters/elf_idle.png
+136 4 16 0  img/characters/shadows/elf_idle_shadow.png
+137 4 4  0  img/characters/elf_walk.png
+138 4 4  0  img/characters/shadows/elf_walk_shadow.png
+139 4 4  0  img/characters/elf_attack.png
+140 4 4  0  img/characters/shadows/elf_attack_shadow.png
+141 4 4  0  img/characters/elf_jump.png
+142 4 4  0  img/characters/shadows/elf_jump_shadow.png
+143 1 7  0  img/characters/elf_spindie2.png
+144 1 7  0  img/characters/shadows/elf_spindie2_shadow.png
+145 1 12 0  img/characters/elf_souldie.png
+146 1 12 0  img/characters/shadows/elf_souldie_shadow.png
+147 4 4  0  img/characters/elf_dmg.png
+148 4 4  0  img/characters/shadows/elf_dmg_shadow.png
+#
+149 4 16 0  img/characters/halfling_idle.png
+150 4 16 0  img/characters/shadows/halfling_idle_shadow.png
+151 4 4  0  img/characters/halfling_walk.png
+152 4 4  0  img/characters/shadows/halfling_walk_shadow.png
+153 4 4  0  img/characters/halfling_attack.png
+154 4 4  0  img/characters/shadows/halfling_attack_shadow.png
+155 4 4  0  img/characters/halfling_jump.png
+156 4 4  0  img/characters/shadows/halfling_jump_shadow.png
+157 1 7  0  img/characters/halfling_spindie2.png
+158 1 7  0  img/characters/shadows/halfling_spindie2_shadow.png
+159 1 12 0  img/characters/halfling_souldie.png
+160 1 12 0  img/characters/shadows/halfling_souldie_shadow.png
+161 4 4  0  img/characters/halfling_dmg.png
+162 4 4  0  img/characters/shadows/halfling_dmg_shadow.png
+#
+163 4 16 0  img/characters/goblin_idle.png
+164 4 16 0  img/characters/shadows/goblin_idle_shadow.png
+165 4 4  0  img/characters/goblin_walk.png
+166 4 4  0  img/characters/shadows/goblin_walk_shadow.png
+167 4 4  0  img/characters/goblin_attack.png
+168 4 4  0  img/characters/shadows/goblin_attack_shadow.png
+169 4 4  0  img/characters/goblin_jump.png
+170 4 4  0  img/characters/shadows/goblin_jump_shadow.png
+171 1 7  0  img/characters/goblin_spindie2.png
+172 1 7  0  img/characters/shadows/goblin_spindie2_shadow.png
+173 1 12 0  img/characters/goblin_souldie.png
+174 1 12 0  img/characters/shadows/goblin_souldie_shadow.png
+175 4 4  0  img/characters/goblin_dmg.png
+176 4 4  0  img/characters/shadows/goblin_dmg_shadow.png
+#
