@@ -598,7 +598,9 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
 
 static void libdraw_drawframe_2d(gamestate* const g) {
     BeginMode2D(g->cam2d);
-    ClearBackground(BLACK);
+
+    ClearBackground(BLUE);
+
     if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
     if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
@@ -611,7 +613,7 @@ static void draw_message_box(gamestate* g) {
     const char* msg = g->msg_system.messages[g->msg_system.index];
     //Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    int font_size = 30;
+    int font_size = 20;
     int pad = 40; // Inner padding (text <-> box edges)
     float line_spacing = 1.0f;
     // Measure text (split into lines if needed)
@@ -835,16 +837,13 @@ static void calc_debugpanel_size(gamestate* const g) {
 }
 
 static void create_sg_byid(gamestate* const g, entityid id) {
-    if (!g) {
-        merror("create_sg_byid: gamestate is NULL");
-        return;
-    }
+    massert(g, "gamestate is NULL");
     entity* const e = em_get(g->entitymap, id);
-    if (!e) { return; }
+    massert(e, "entity is NULL");
+    //if (!e) return;
     int* keys = NULL;
     int num_keys = 0;
-    const int offset_x = -12;
-    const int offset_y = -12;
+    const int offset_x = -12, offset_y = -12;
     if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
         switch (e->race) {
         case RACE_HUMAN:
@@ -856,7 +855,12 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             keys = TX_ORC_KEYS;
             num_keys = TX_ORC_KEY_COUNT;
             break;
-        default: merror("libdraw_create_sg_byid: unknown race %d", e->race); return;
+        case RACE_ELF:
+            keys = TX_ELF_KEYS;
+            num_keys = TX_ELF_KEY_COUNT;
+            break;
+
+        default: merror("unknown race %d", e->race); return;
         }
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     } else if (e->type == ENTITY_WEAPON) {
@@ -872,18 +876,10 @@ static void create_sg_byid(gamestate* const g, entityid id) {
 }
 
 static inline void draw_hud(gamestate* const g) {
-    if (!g) {
-        merror("draw_hud: gamestate is NULL");
-        return;
-    }
+    massert(g, "gamestate is NULL");
     // Draw the HUD
     int fontsize = 20;
-    int hp = -1;
-    int maxhp = -1;
-    int mp = -1;
-    int maxmp = -1;
-    int level = 1;
-    int turn = g->turn_count;
+    int hp = -1, maxhp = -1, mp = -1, maxmp = -1, level = 1, turn = g->turn_count;
     char buffer[1024] = {0};
     char* name = NULL;
     const Color bg = (Color){0x33, 0x33, 0x33, 0xff};
@@ -891,14 +887,15 @@ static inline void draw_hud(gamestate* const g) {
     const int padding = 20;
     const float width_factor = 1.1f; // 10% extra width
     entity* const e = em_get(g->entitymap, g->hero_id);
-    if (e) {
-        hp = e->stats.hp;
-        maxhp = e->stats.maxhp;
-        mp = e->stats.mp;
-        maxmp = e->stats.maxmp;
-        level = e->stats.level;
-        name = e->name;
-    }
+    massert(e, "entity is NULL");
+    //if (e) {
+    hp = e->stats.hp;
+    maxhp = e->stats.maxhp;
+    mp = e->stats.mp;
+    maxmp = e->stats.maxmp;
+    level = e->stats.level;
+    name = e->name;
+    //}
     snprintf(buffer,
              sizeof(buffer),
              //"Name: %s\nLevel: %d\nHP: %d/%d MP: %d/%d\nTurn: %d",
@@ -913,13 +910,11 @@ static inline void draw_hud(gamestate* const g) {
              turn);
     const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
     // Add slight extra width factor to account for text measurement inconsistency
-    //const int box_width = (size.x * width_factor) + (padding * 2);
     const int box_width = (size.x * width_factor) + (padding * 3);
     const int box_height = size.y + (padding * 2);
     // Position box
     const int box_x = (g->windowwidth - box_width) / 2;
-    //const int box_y = g->windowheight - box_height - 100;
-    const int box_y = g->windowheight - box_height;
+    const int box_y = (g->windowheight - box_height) * 7 / 8;
     // Draw everything
     DrawRectangle(box_x, box_y, box_width, box_height, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, fg);
