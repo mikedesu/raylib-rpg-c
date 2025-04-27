@@ -234,6 +234,12 @@
 #define TX_WOLF_DIE 195
 #define TX_WOLF_DIE_SHADOW 196
 
+#define TX_DAGGER 197
+#define TX_TWO_HANDED_SWORD 198
+
+#define TX_IRON_SHIELD 199
+#define TX_WOODEN_TOWER_SHIELD 200
+
 //--------------------------------
 
 #define COMPANYSCENE 0
