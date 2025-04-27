@@ -36,6 +36,8 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
 static inline void add_message_history(gamestate* const g, const char* msg);
 static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
+static void create_goblin_at(gamestate* g, int x, int y);
+static void create_halfling_at(gamestate* g, int x, int y);
 static void create_dwarf_at(gamestate* g, int x, int y);
 static void create_elf_at(gamestate* g, int x, int y);
 static void create_orc_at(gamestate* g, int x, int y);
@@ -44,9 +46,13 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
 static void init_humans_test(gamestate* const g);
 static void init_orcs_test(gamestate* const g);
 static void init_elves_test(gamestate* const g);
+static void init_goblins_test(gamestate* const g);
+static void init_halflings_test(gamestate* const g);
 static void init_humans_test_intermediate(gamestate* const g);
 static void init_orcs_test_intermediate(gamestate* const g);
 static void init_elves_test_intermediate(gamestate* const g);
+static void init_goblins_test_intermediate(gamestate* const g);
+static void init_halflings_test_intermediate(gamestate* const g);
 static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
 static const char* get_action_key(const inputstate* const is, gamestate* const g);
@@ -284,7 +290,7 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     target->do_update = true;
     int dmg = 1;
     e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
-    if (target->type == ENTITY_PLAYER) add_message(g, "You took %d damage!", dmg);
+    if (target->type == ENTITY_PLAYER) add_message(g, "%s attacked you for %d damage!", attacker->name, dmg);
     if (e_get_hp(target) <= 0) target->dead = true;
 }
 
@@ -836,8 +842,24 @@ static void create_elf_at(gamestate* g, int x, int y) {
 }
 
 static void create_dwarf_at(gamestate* g, int x, int y) {
-    entity* o = npc_create_ptr(g, RACE_DWARF, x, y, 0, "elf");
+    entity* o = npc_create_ptr(g, RACE_DWARF, x, y, 0, "dwarf");
     massert(o, "dwarf create fail");
+    e_set_default_action(o, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
+    e_set_maxhp(o, 1);
+    e_set_hp(o, 1);
+}
+
+static void create_halfling_at(gamestate* g, int x, int y) {
+    entity* o = npc_create_ptr(g, RACE_HALFLING, x, y, 0, "halfling");
+    massert(o, "halfling create fail");
+    e_set_default_action(o, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
+    e_set_maxhp(o, 1);
+    e_set_hp(o, 1);
+}
+
+static void create_goblin_at(gamestate* g, int x, int y) {
+    entity* o = npc_create_ptr(g, RACE_GOBLIN, x, y, 0, "goblin");
+    massert(o, "goblin create fail");
     e_set_default_action(o, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
     e_set_maxhp(o, 1);
     e_set_hp(o, 1);
@@ -951,10 +973,66 @@ static void init_dwarves_test_intermediate(gamestate* const g) {
     free(locs);
 }
 
+static void init_halflings_test_intermediate(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
+    massert(df, "floor is NULL");
+    int c;
+    loc_t* locs = get_walkable_locs(df, &c);
+    int max = 1, created = 0, i = 0;
+    entity* player = em_get(g->entitymap, g->hero_id);
+    massert(player, "player NULL");
+    massert(max < c, "max > count");
+    while (created < max && i < c) {
+        if (tile_npc_count_xy(g, df, locs[i].x, locs[i].y) > 0) {
+            i++;
+            continue;
+        }
+        if (locs[i].x == player->x && locs[i].y == player->y) {
+            merror("cannot spawn on player");
+            i++;
+            continue;
+        }
+        create_halfling_at(g, locs[i].x, locs[i].y);
+        i++;
+        created++;
+    }
+    free(locs);
+}
+
+static void init_goblins_test_intermediate(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
+    massert(df, "floor is NULL");
+    int c;
+    loc_t* locs = get_walkable_locs(df, &c);
+    int max = 1, created = 0, i = 0;
+    entity* player = em_get(g->entitymap, g->hero_id);
+    massert(player, "player NULL");
+    massert(max < c, "max > count");
+    while (created < max && i < c) {
+        if (tile_npc_count_xy(g, df, locs[i].x, locs[i].y) > 0) {
+            i++;
+            continue;
+        }
+        if (locs[i].x == player->x && locs[i].y == player->y) {
+            merror("cannot spawn on player");
+            i++;
+            continue;
+        }
+        create_goblin_at(g, locs[i].x, locs[i].y);
+        i++;
+        created++;
+    }
+    free(locs);
+}
+
 static void init_orcs_test(gamestate* const g) { init_orcs_test_intermediate(g); }
 static void init_humans_test(gamestate* const g) { init_humans_test_intermediate(g); }
 static void init_elves_test(gamestate* const g) { init_elves_test_intermediate(g); }
 static void init_dwarves_test(gamestate* const g) { init_dwarves_test_intermediate(g); }
+static void init_halflings_test(gamestate* const g) { init_halflings_test_intermediate(g); }
+static void init_goblins_test(gamestate* const g) { init_goblins_test_intermediate(g); }
 
 static const char* get_action_key(const inputstate* const is, gamestate* const g) {
     const int key = inputstate_get_pressed_key(is);
@@ -1411,7 +1489,9 @@ void liblogic_init(gamestate* const g) {
     //init_humans_test(g);
     //init_orcs_test(g);
     //init_elves_test(g);
-    init_dwarves_test(g);
+    //init_dwarves_test(g);
+    //init_halflings_test(g);
+    //init_goblins_test(g);
     update_debug_panel_buffer(g);
 }
 

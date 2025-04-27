@@ -275,6 +275,10 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spr
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_DMG);
     else if (e->race == RACE_DWARF)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_DWARF_DMG);
+    else if (e->race == RACE_HALFLING)
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HALFLING_DMG);
+    else if (e->race == RACE_GOBLIN)
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_GOBLIN_DMG);
 
     e->is_damaged = false;
 }
@@ -306,6 +310,16 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, sprite
         sg_set_default_anim(sg, SPRITEGROUP_ANIM_DWARF_SPINDIE);
         spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
+    } else if (e->race == RACE_HALFLING) {
+        if (sg->current == SPRITEGROUP_ANIM_HALFLING_SPINDIE) return;
+        sg_set_default_anim(sg, SPRITEGROUP_ANIM_HALFLING_SPINDIE);
+        spritegroup_set_current(sg, sg->default_anim);
+        spritegroup_set_stop_on_last_frame(sg, true);
+    } else if (e->race == RACE_GOBLIN) {
+        if (sg->current == SPRITEGROUP_ANIM_GOBLIN_SPINDIE) return;
+        sg_set_default_anim(sg, SPRITEGROUP_ANIM_GOBLIN_SPINDIE);
+        spritegroup_set_current(sg, sg->default_anim);
+        spritegroup_set_stop_on_last_frame(sg, true);
     }
 }
 
@@ -321,6 +335,10 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, s
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_ATTACK);
     else if (e->race == RACE_DWARF)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_DWARF_ATTACK);
+    else if (e->race == RACE_HALFLING)
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HALFLING_ATTACK);
+    else if (e->race == RACE_GOBLIN)
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_GOBLIN_ATTACK);
 
     e->is_attacking = false;
 }
@@ -401,6 +419,10 @@ static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg
                 sg->current = SPRITEGROUP_ANIM_ELF_WALK;
             else if (e->race == RACE_DWARF)
                 sg->current = SPRITEGROUP_ANIM_DWARF_WALK;
+            else if (e->race == RACE_HALFLING)
+                sg->current = SPRITEGROUP_ANIM_HALFLING_WALK;
+            else if (e->race == RACE_GOBLIN)
+                sg->current = SPRITEGROUP_ANIM_GOBLIN_WALK;
         }
     }
 }
@@ -624,8 +646,8 @@ static void draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) { return; }
     const char* prompt = "[A] Next";
     const char* msg = g->msg_system.messages[g->msg_system.index];
-    //Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
-    Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
+    Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.5f);
+    //Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     int font_size = 20;
     int pad = 40; // Inner padding (text <-> box edges)
     float line_spacing = 1.0f;
@@ -876,6 +898,14 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             keys = TX_DWARF_KEYS;
             num_keys = TX_DWARF_KEY_COUNT;
             break;
+        case RACE_HALFLING:
+            keys = TX_HALFLING_KEYS;
+            num_keys = TX_HALFLING_KEY_COUNT;
+            break;
+        case RACE_GOBLIN:
+            keys = TX_GOBLIN_KEYS;
+            num_keys = TX_GOBLIN_KEY_COUNT;
+            break;
 
         default: merror("unknown race %d", e->race); return;
         }
@@ -895,7 +925,7 @@ static void create_sg_byid(gamestate* const g, entityid id) {
 static inline void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // Draw the HUD
-    int fontsize = 20;
+    int fontsize = 10;
     int hp = -1, maxhp = -1, mp = -1, maxmp = -1, level = 1, turn = g->turn_count;
     char buffer[1024] = {0};
     char* name = NULL;
@@ -971,9 +1001,9 @@ static void draw_message_history(gamestate* const g) {
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) { return; }
     const int font_size = 10;
-    const int pad = 40; // Inner padding (text <-> box edges)
+    const int pad = 20; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
-    const int max_messages = 10;
+    const int max_messages = 20;
     const int x = 20;
     const int y = 20;
     int current_count = 0;

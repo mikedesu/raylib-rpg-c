@@ -165,12 +165,12 @@
 154 4 4  0  img/characters/shadows/halfling_attack_shadow.png
 155 4 4  0  img/characters/halfling_jump.png
 156 4 4  0  img/characters/shadows/halfling_jump_shadow.png
-157 1 7  0  img/characters/halfling_spindie2.png
-158 1 7  0  img/characters/shadows/halfling_spindie2_shadow.png
-159 1 12 0  img/characters/halfling_souldie.png
-160 1 12 0  img/characters/shadows/halfling_souldie_shadow.png
-161 4 4  0  img/characters/halfling_dmg.png
-162 4 4  0  img/characters/shadows/halfling_dmg_shadow.png
+157 4 4  0  img/characters/halfling_dmg.png
+158 4 4  0  img/characters/shadows/halfling_dmg_shadow.png
+159 1 7  0  img/characters/halfling_spindie2.png
+160 1 7  0  img/characters/shadows/halfling_spindie2_shadow.png
+#161 1 12 0  img/characters/halfling_souldie.png
+#162 1 12 0  img/characters/shadows/halfling_souldie_shadow.png
 #
 163 4 16 0  img/characters/goblin_idle.png
 164 4 16 0  img/characters/shadows/goblin_idle_shadow.png
@@ -180,12 +180,12 @@
 168 4 4  0  img/characters/shadows/goblin_attack_shadow.png
 169 4 4  0  img/characters/goblin_jump.png
 170 4 4  0  img/characters/shadows/goblin_jump_shadow.png
-171 1 7  0  img/characters/goblin_spindie2.png
-172 1 7  0  img/characters/shadows/goblin_spindie2_shadow.png
-173 1 12 0  img/characters/goblin_souldie.png
-174 1 12 0  img/characters/shadows/goblin_souldie_shadow.png
-175 4 4  0  img/characters/goblin_dmg.png
-176 4 4  0  img/characters/shadows/goblin_dmg_shadow.png
+171 4 4  0  img/characters/goblin_dmg.png
+172 4 4  0  img/characters/shadows/goblin_dmg_shadow.png
+173 1 7  0  img/characters/goblin_spindie2.png
+174 1 7  0  img/characters/shadows/goblin_spindie2_shadow.png
+#173 1 12 0  img/characters/goblin_souldie.png
+#174 1 12 0  img/characters/shadows/goblin_souldie_shadow.png
 #
 177 4 2  0  img/monsters/bat_idle.png
 178 4 2  0  img/monsters/shadows/bat_idle_shadow.png
