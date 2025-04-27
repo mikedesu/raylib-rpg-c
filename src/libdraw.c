@@ -273,6 +273,8 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spr
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_DMG);
     else if (e->race == RACE_ELF)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_DMG);
+    else if (e->race == RACE_DWARF)
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_DWARF_DMG);
 
     e->is_damaged = false;
 }
@@ -285,18 +287,23 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, sprite
     if (!e->dead) return;
 
     if (e->race == RACE_HUMAN) {
-        if (sg->current == SPRITEGROUP_ANIM_HUMAN_SPINDIE) { return; }
-        sg->default_anim = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
+        if (sg->current == SPRITEGROUP_ANIM_HUMAN_SPINDIE) return;
+        sg_set_default_anim(sg, SPRITEGROUP_ANIM_HUMAN_SPINDIE);
         spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
     } else if (e->race == RACE_ORC) {
-        if (sg->current == SPRITEGROUP_ANIM_ORC_DIE) { return; }
-        sg->default_anim = SPRITEGROUP_ANIM_ORC_DIE;
+        if (sg->current == SPRITEGROUP_ANIM_ORC_DIE) return;
+        sg_set_default_anim(sg, SPRITEGROUP_ANIM_ORC_DIE);
         spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
     } else if (e->race == RACE_ELF) {
-        if (sg->current == SPRITEGROUP_ANIM_ELF_SPINDIE) { return; }
-        sg->default_anim = SPRITEGROUP_ANIM_ELF_SPINDIE;
+        if (sg->current == SPRITEGROUP_ANIM_ELF_SPINDIE) return;
+        sg_set_default_anim(sg, SPRITEGROUP_ANIM_ELF_SPINDIE);
+        spritegroup_set_current(sg, sg->default_anim);
+        spritegroup_set_stop_on_last_frame(sg, true);
+    } else if (e->race == RACE_DWARF) {
+        if (sg->current == SPRITEGROUP_ANIM_DWARF_SPINDIE) return;
+        sg_set_default_anim(sg, SPRITEGROUP_ANIM_DWARF_SPINDIE);
         spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
     }
@@ -306,13 +313,15 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, s
     massert(g, "gamestate is NULL");
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
-    if (e->race == RACE_HUMAN) {
+    if (e->race == RACE_HUMAN)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_ATTACK);
-    } else if (e->race == RACE_ORC) {
+    else if (e->race == RACE_ORC)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_ATTACK);
-    } else if (e->race == RACE_ELF) {
+    else if (e->race == RACE_ELF)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_ATTACK);
-    }
+    else if (e->race == RACE_DWARF)
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_DWARF_ATTACK);
+
     e->is_attacking = false;
 }
 
@@ -384,11 +393,14 @@ static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg
         e->sprite_move_x = 0;
         e->sprite_move_y = 0;
         if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
-            if (e->race == RACE_HUMAN) {
-                sg->current = SPRITEGROUP_ANIM_HUMAN_WALK; // Set animation
-            } else if (e->race == RACE_ORC) {
-                sg->current = SPRITEGROUP_ANIM_ORC_WALK; // Set animation
-            } // else no sprite animation update
+            if (e->race == RACE_HUMAN)
+                sg->current = SPRITEGROUP_ANIM_HUMAN_WALK;
+            else if (e->race == RACE_ORC)
+                sg->current = SPRITEGROUP_ANIM_ORC_WALK;
+            else if (e->race == RACE_ELF)
+                sg->current = SPRITEGROUP_ANIM_ELF_WALK;
+            else if (e->race == RACE_DWARF)
+                sg->current = SPRITEGROUP_ANIM_DWARF_WALK;
         }
     }
 }
@@ -859,6 +871,10 @@ static void create_sg_byid(gamestate* const g, entityid id) {
         case RACE_ELF:
             keys = TX_ELF_KEYS;
             num_keys = TX_ELF_KEY_COUNT;
+            break;
+        case RACE_DWARF:
+            keys = TX_DWARF_KEYS;
+            num_keys = TX_DWARF_KEY_COUNT;
             break;
 
         default: merror("unknown race %d", e->race); return;

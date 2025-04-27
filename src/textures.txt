@@ -135,8 +135,8 @@
 126 4 4  0  img/characters/shadows/dwarf_attack_shadow.png
 127 4 4  0  img/characters/dwarf_jump.png
 128 4 4  0  img/characters/shadows/dwarf_jump_shadow.png
-129 1 7  0  img/characters/dwarf_spindie.png
-130 1 7  0  img/characters/shadows/dwarf_spindie_shadow.png
+129 1 7  0  img/characters/dwarf_spindie2.png
+130 1 7  0  img/characters/shadows/dwarf_spindie2_shadow.png
 131 1 12 0  img/characters/dwarf_souldie.png
 132 1 12 0  img/characters/shadows/dwarf_souldie_shadow.png
 133 4 4  0  img/characters/dwarf_dmg.png
