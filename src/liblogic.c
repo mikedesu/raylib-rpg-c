@@ -816,7 +816,7 @@ static void init_orcs_test_intermediate(gamestate* g) {
     massert(df, "floor is NULL");
     int c;
     loc_t* locs = get_walkable_locs(df, &c);
-    int max = 10, created = 0, i = 0;
+    int max = 1, created = 0, i = 0;
     entity* player = em_get(g->entitymap, g->hero_id);
     massert(player, "player NULL");
     massert(max < c, "max > count");
