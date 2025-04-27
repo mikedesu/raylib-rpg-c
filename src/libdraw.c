@@ -271,6 +271,8 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spr
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_DMG);
     else if (e->race == RACE_ORC)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_DMG);
+    else if (e->race == RACE_ELF)
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_DMG);
 
     e->is_damaged = false;
 }
@@ -283,23 +285,19 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, sprite
     if (!e->dead) return;
 
     if (e->race == RACE_HUMAN) {
-        if (sg->current == SPRITEGROUP_ANIM_HUMAN_SPINDIE) {
-            //merror("libdraw_set_sg_is_dead: spritegroup is already dead");
-            return;
-        }
-
-        //spritegroup_set_d
+        if (sg->current == SPRITEGROUP_ANIM_HUMAN_SPINDIE) { return; }
         sg->default_anim = SPRITEGROUP_ANIM_HUMAN_SPINDIE;
-        sg->current = sg->default_anim;
-
+        spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
     } else if (e->race == RACE_ORC) {
-        if (sg->current == SPRITEGROUP_ANIM_ORC_DIE) {
-            //merror("libdraw_set_sg_is_dead: spritegroup is already dead");
-            return;
-        }
+        if (sg->current == SPRITEGROUP_ANIM_ORC_DIE) { return; }
         sg->default_anim = SPRITEGROUP_ANIM_ORC_DIE;
-        sg->current = sg->default_anim;
+        spritegroup_set_current(sg, sg->default_anim);
+        spritegroup_set_stop_on_last_frame(sg, true);
+    } else if (e->race == RACE_ELF) {
+        if (sg->current == SPRITEGROUP_ANIM_ELF_SPINDIE) { return; }
+        sg->default_anim = SPRITEGROUP_ANIM_ELF_SPINDIE;
+        spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
     }
 }
@@ -309,12 +307,11 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, s
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
     if (e->race == RACE_HUMAN) {
-        //sg->current = SPRITEGROUP_ANIM_HUMAN_ATTACK;
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_ATTACK);
-        //spritegroup_setcontexts(shield_sg, player_ctx);
     } else if (e->race == RACE_ORC) {
-        //sg->current = SPRITEGROUP_ANIM_ORC_ATTACK;
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_ATTACK);
+    } else if (e->race == RACE_ELF) {
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_ATTACK);
     }
     e->is_attacking = false;
 }
@@ -652,7 +649,7 @@ static void draw_message_box(gamestate* g) {
 static inline void update_debug_panel(gamestate* const g) {
     // concat a string onto the end of the debug panel message
     char tmp[1024] = {0};
-    snprintf(tmp, sizeof(tmp), "7777\n");
+    //snprintf(tmp, sizeof(tmp), "7777\n");
     strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
 }
 
@@ -927,6 +924,7 @@ void libdraw_init(gamestate* const g) {
         merror("libdraw_init g is NULL");
         return;
     }
+
     const int w = DEFAULT_WIN_WIDTH;
     const int h = DEFAULT_WIN_HEIGHT;
     const int x = w / 4;

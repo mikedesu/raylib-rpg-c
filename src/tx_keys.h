@@ -40,7 +40,7 @@ static int TX_ORC_KEYS[TX_ORC_KEY_COUNT] = {
     TX_ORC_DIE_SHADOW,
 };
 
-#define TX_ELF_KEY_COUNT 12
+#define TX_ELF_KEY_COUNT 14
 static int TX_ELF_KEYS[TX_ELF_KEY_COUNT] = {
     TX_ELF_IDLE,
     TX_ELF_IDLE_SHADOW,
@@ -54,6 +54,8 @@ static int TX_ELF_KEYS[TX_ELF_KEY_COUNT] = {
     TX_ELF_DMG_SHADOW,
     TX_ELF_SPIN_DIE,
     TX_ELF_SPIN_DIE_SHADOW,
+    TX_ELF_SOUL_DIE,
+    TX_ELF_SOUL_DIE_SHADOW,
 };
 
 // Weapons

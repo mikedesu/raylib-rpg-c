@@ -36,8 +36,16 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
 static inline void add_message_history(gamestate* const g, const char* msg);
 static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
+static void create_elf_at(gamestate* g, int x, int y);
+static void create_orc_at(gamestate* g, int x, int y);
+static void create_human_at(gamestate* g, int x, int y);
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
+static void init_humans_test(gamestate* const g);
+static void init_orcs_test(gamestate* const g);
+static void init_elves_test(gamestate* const g);
+static void init_humans_test_intermediate(gamestate* const g);
 static void init_orcs_test_intermediate(gamestate* const g);
+static void init_elves_test_intermediate(gamestate* const g);
 static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
 static const char* get_action_key(const inputstate* const is, gamestate* const g);
@@ -810,6 +818,22 @@ static void create_orc_at(gamestate* g, int x, int y) {
     e_set_hp(o, 1);
 }
 
+static void create_human_at(gamestate* g, int x, int y) {
+    entity* o = npc_create_ptr(g, RACE_HUMAN, x, y, 0, "human");
+    massert(o, "human create fail");
+    e_set_default_action(o, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
+    e_set_maxhp(o, 1);
+    e_set_hp(o, 1);
+}
+
+static void create_elf_at(gamestate* g, int x, int y) {
+    entity* o = npc_create_ptr(g, RACE_ELF, x, y, 0, "elf");
+    massert(o, "elf create fail");
+    e_set_default_action(o, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
+    e_set_maxhp(o, 1);
+    e_set_hp(o, 1);
+}
+
 static void init_orcs_test_intermediate(gamestate* g) {
     massert(g, "gamestate is NULL");
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
@@ -837,7 +861,63 @@ static void init_orcs_test_intermediate(gamestate* g) {
     free(locs);
 }
 
+static void init_humans_test_intermediate(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
+    massert(df, "floor is NULL");
+    int c;
+    loc_t* locs = get_walkable_locs(df, &c);
+    int max = 1, created = 0, i = 0;
+    entity* player = em_get(g->entitymap, g->hero_id);
+    massert(player, "player NULL");
+    massert(max < c, "max > count");
+    while (created < max && i < c) {
+        if (tile_npc_count_xy(g, df, locs[i].x, locs[i].y) > 0) {
+            i++;
+            continue;
+        }
+        if (locs[i].x == player->x && locs[i].y == player->y) {
+            merror("cannot spawn on player");
+            i++;
+            continue;
+        }
+        create_human_at(g, locs[i].x, locs[i].y);
+        i++;
+        created++;
+    }
+    free(locs);
+}
+
+static void init_elves_test_intermediate(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
+    massert(df, "floor is NULL");
+    int c;
+    loc_t* locs = get_walkable_locs(df, &c);
+    int max = 1, created = 0, i = 0;
+    entity* player = em_get(g->entitymap, g->hero_id);
+    massert(player, "player NULL");
+    massert(max < c, "max > count");
+    while (created < max && i < c) {
+        if (tile_npc_count_xy(g, df, locs[i].x, locs[i].y) > 0) {
+            i++;
+            continue;
+        }
+        if (locs[i].x == player->x && locs[i].y == player->y) {
+            merror("cannot spawn on player");
+            i++;
+            continue;
+        }
+        create_elf_at(g, locs[i].x, locs[i].y);
+        i++;
+        created++;
+    }
+    free(locs);
+}
+
 static void init_orcs_test(gamestate* const g) { init_orcs_test_intermediate(g); }
+static void init_humans_test(gamestate* const g) { init_humans_test_intermediate(g); }
+static void init_elves_test(gamestate* const g) { init_elves_test_intermediate(g); }
 
 static const char* get_action_key(const inputstate* const is, gamestate* const g) {
     const int key = inputstate_get_pressed_key(is);
@@ -1291,7 +1371,9 @@ void liblogic_init(gamestate* const g) {
     // test to create a weapon
     init_weapon_test(g);
     // temporarily disabling
-    init_orcs_test(g);
+    //init_humans_test(g);
+    //init_orcs_test(g);
+    init_elves_test(g);
     update_debug_panel_buffer(g);
 }
 
