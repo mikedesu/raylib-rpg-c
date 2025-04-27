@@ -21,12 +21,14 @@
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
-//#define DEFAULT_WIN_WIDTH 960
-//#define DEFAULT_WIN_HEIGHT 540
+#define DEFAULT_WIN_WIDTH 960
+#define DEFAULT_WIN_HEIGHT 540
 //#define DEFAULT_WIN_WIDTH 1920
 //#define DEFAULT_WIN_HEIGHT 1080
-#define DEFAULT_WIN_WIDTH 1280
-#define DEFAULT_WIN_HEIGHT 720
+
+//#define DEFAULT_WIN_WIDTH 1280
+//#define DEFAULT_WIN_HEIGHT 720
+
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
 
@@ -48,17 +50,19 @@ static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
 static inline void libdraw_handle_gamestate_flag(gamestate* const g);
-static inline void draw_hud(gamestate* const g);
+
+static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 
 static bool libdraw_check_default_animations(const gamestate* const g);
-static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
+
+static inline void draw_hud(gamestate* const g);
 static bool libdraw_unload_texture(int txkey);
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
 static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df);
 static bool draw_entities_2d(const gamestate* const g, dungeon_floor_t* df, bool dead);
+static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y);
 static bool libdraw_draw_dungeon_floor(const gamestate* const g);
 static bool libdraw_draw_player_target_box(const gamestate* const g);
-static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y);
 
 static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
@@ -599,7 +603,7 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
 static void libdraw_drawframe_2d(gamestate* const g) {
     BeginMode2D(g->cam2d);
 
-    ClearBackground(BLUE);
+    ClearBackground(BLACK);
 
     if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
@@ -882,20 +886,17 @@ static inline void draw_hud(gamestate* const g) {
     int hp = -1, maxhp = -1, mp = -1, maxmp = -1, level = 1, turn = g->turn_count;
     char buffer[1024] = {0};
     char* name = NULL;
-    const Color bg = (Color){0x33, 0x33, 0x33, 0xff};
-    const Color fg = WHITE;
+    const Color bg = (Color){0x33, 0x33, 0x33, 0xff}, fg = WHITE;
     const int padding = 20;
     const float width_factor = 1.1f; // 10% extra width
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "entity is NULL");
-    //if (e) {
     hp = e->stats.hp;
     maxhp = e->stats.maxhp;
     mp = e->stats.mp;
     maxmp = e->stats.maxmp;
     level = e->stats.level;
     name = e->name;
-    //}
     snprintf(buffer,
              sizeof(buffer),
              //"Name: %s\nLevel: %d\nHP: %d/%d MP: %d/%d\nTurn: %d",
@@ -955,7 +956,7 @@ static void draw_message_history(gamestate* const g) {
     }
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) { return; }
-    const int font_size = 20;
+    const int font_size = 10;
     const int pad = 40; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
     const int max_messages = 10;
