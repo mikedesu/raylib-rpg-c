@@ -47,6 +47,7 @@ gamestate* gamestateinitptr() {
     g->player_input_received = false;
     g->is_locked = false;
     g->gridon = false;
+    g->display_inventory_menu = false;
     g->processing_actions = false;
     g->cam_lockon = true;
     g->cam2d.target = (Vector2){0, 0};

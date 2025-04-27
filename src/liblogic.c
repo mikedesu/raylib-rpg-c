@@ -1091,6 +1091,17 @@ static void handle_input_camera(const inputstate* const is, gamestate* const g) 
     handle_camera_zoom(g, is);
 }
 
+static void handle_input_inventory(const inputstate* const is, gamestate* const g) {
+    massert(is, "Input state is NULL!");
+    massert(g, "Game state is NULL!");
+
+    if (inputstate_is_pressed(is, KEY_I)) {
+        g->controlmode = CONTROLMODE_PLAYER;
+        g->display_inventory_menu = false;
+        return;
+    }
+}
+
 static inline void change_player_dir(gamestate* const g, direction_t dir) {
     massert(g, "Game state is NULL!");
     entity* const hero = em_get(g->entitymap, g->hero_id);
@@ -1267,7 +1278,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
     const char* action = get_action_key(is, g);
     if (!action) {
-        merror("1 No action found for key");
+        merror("No action found for key");
         return;
     }
     if (g->msg_system.is_active) {
@@ -1283,7 +1294,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         return;
     }
     entity* const hero = em_get(g->entitymap, g->hero_id);
-    massert(hero, "liblogic_handle_input_player: hero is NULL");
+    massert(hero, "hero is NULL");
     // check if the player is dead
     if (hero->dead) return;
     if (action) {
@@ -1321,6 +1332,10 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
 
         if (strcmp(action, "wait") == 0) {
             g->player_changing_direction = true;
+        } else if (strcmp(action, "inventory_menu") == 0) {
+            //g->player_changing_direction = true;
+            g->display_inventory_menu = true;
+            g->controlmode = CONTROLMODE_INVENTORY;
         } else if (strcmp(action, "move_w") == 0) {
             execute_action(g, hero, ENTITY_ACTION_MOVE_LEFT);
         } else if (strcmp(action, "move_e") == 0) {
@@ -1383,6 +1398,8 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         handle_input_player(is, g);
     else if (g->controlmode == CONTROLMODE_CAMERA)
         handle_input_camera(is, g);
+    else if (g->controlmode == CONTROLMODE_INVENTORY)
+        handle_input_inventory(is, g);
     else
         merror("Unknown control mode");
 }

@@ -64,6 +64,8 @@ typedef struct gamestate {
     bool is3d;
     bool gameover;
     bool player_changing_direction;
+    bool test_guard;
+    bool display_inventory_menu;
 
     debugpanel_t debugpanel;
 
@@ -94,8 +96,6 @@ typedef struct gamestate {
     message_history msg_history;
 
     keybinding_list_t keybinding_list;
-
-    bool test_guard;
 
 } gamestate;
 

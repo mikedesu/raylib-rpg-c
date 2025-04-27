@@ -22,6 +22,7 @@ int key_from_string(const char* str) {
     minfo("Converting string to key [%s]", str);
 
     if (!strcmp(str, "W")) return KEY_W;
+    if (!strcmp(str, "I")) return KEY_I;
     if (!strcmp(str, "A")) return KEY_A;
     if (!strcmp(str, "S")) return KEY_S;
     if (!strcmp(str, "D")) return KEY_D;

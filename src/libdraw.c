@@ -55,6 +55,7 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
 
 static bool libdraw_check_default_animations(const gamestate* const g);
 
+static void draw_inventory_menu(gamestate* const g);
 static inline void draw_hud(gamestate* const g);
 static bool libdraw_unload_texture(int txkey);
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
@@ -711,6 +712,7 @@ void libdraw_drawframe(gamestate* const g) {
     draw_message_box(g);
     draw_message_history(g);
     draw_hud(g);
+    draw_inventory_menu(g);
 
     handle_debug_panel(g);
 
@@ -1030,6 +1032,32 @@ static void draw_message_history(gamestate* const g) {
     DrawRectangleLinesEx(box, 2, WHITE);
     // Draw text (centered in box)
     DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
+}
+
+static void draw_inventory_menu(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+
+    if (!g->display_inventory_menu) return;
+
+    const int font_size = 10;
+    const int pad = 20; // Inner padding (text <-> box edges)
+    const float line_spacing = 1.0f;
+
+    const char* placeholder = "Inventory Menu";
+
+    // Measure text (split into lines if needed)
+    const Vector2 text_size = MeasureTextEx(GetFontDefault(), placeholder, font_size, line_spacing);
+    // Calculate box position
+    // we want the box to be in the center of the screen
+    const Rectangle box = {.x = (g->windowwidth - text_size.x) / 2 - pad, // Center X
+                           .y = (g->windowheight - text_size.y) / 2 - pad, // Center Y
+                           .width = text_size.x + pad * 2,
+                           .height = text_size.y + pad * 2};
+    // Draw box (semi-transparent black with white border)
+    DrawRectangleRec(box, (Color){0x33, 0x33, 0x33, 0xff});
+    DrawRectangleLinesEx(box, 2, WHITE);
+    // Draw text (centered in box)
+    DrawTextEx(GetFontDefault(), placeholder, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
 }
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
