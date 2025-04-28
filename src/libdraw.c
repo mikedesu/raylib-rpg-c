@@ -55,8 +55,12 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
 
 static bool libdraw_check_default_animations(const gamestate* const g);
 
+static sprite* get_weapon_back_sprite(const gamestate* g, const entity* e, spritegroup_t* sg);
+static sprite* get_weapon_front_sprite(const gamestate* g, const entity* e, spritegroup_t* sg);
+static sprite* get_shield_front_sprite(const gamestate* g, const entity* e, spritegroup_t* sg);
+static sprite* get_shield_back_sprite(const gamestate* g, const entity* e, spritegroup_t* sg);
 static void draw_inventory_menu(gamestate* const g);
-static inline void draw_hud(gamestate* const g);
+static void draw_hud(gamestate* const g);
 static bool libdraw_unload_texture(int txkey);
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
 static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df);
@@ -135,6 +139,84 @@ static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df)
     return true;
 }
 
+static sprite* get_weapon_front_sprite(const gamestate* g, const entity* e, spritegroup_t* sg) {
+    massert(g, "gamestate is NULL");
+    if (!e || !sg) return NULL;
+    if (e->weapon == -1) return NULL;
+
+    spritegroup_t* weapon_sg = hashtable_entityid_spritegroup_get(spritegroups, e->weapon);
+    if (!weapon_sg) {
+        merror("weapon spritegroup is NULL");
+        return NULL;
+    }
+
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
+        msuccess("is_attacking");
+        return spritegroup_get(weapon_sg, SG_ANIM_LONGSWORD_SLASH_F);
+    }
+    return NULL;
+}
+
+static sprite* get_weapon_back_sprite(const gamestate* g, const entity* e, spritegroup_t* sg) {
+    massert(g, "gamestate is NULL");
+    if (!e || !sg) { return NULL; }
+    if (e->weapon == -1) { return NULL; }
+
+    spritegroup_t* weapon_sg = hashtable_entityid_spritegroup_get(spritegroups, e->weapon);
+    if (!weapon_sg) {
+        merror("weapon spritegroup is NULL");
+        return NULL;
+    }
+
+    //if (e->is_attacking) {
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
+        msuccess("is_attacking");
+        return spritegroup_get(weapon_sg, SG_ANIM_LONGSWORD_SLASH_B);
+    }
+
+    //merror("weapon_back_s is NULL");
+    return NULL;
+}
+
+static sprite* get_shield_front_sprite(const gamestate* g, const entity* e, spritegroup_t* sg) {
+    massert(g, "gamestate is NULL");
+    if (!e || !sg) return NULL;
+    if (e->shield == -1) return NULL;
+
+    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
+    if (!shield_sg) return NULL;
+
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT); }
+    if (e->is_blocking) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT); }
+    return NULL;
+}
+
+static sprite* get_shield_back_sprite(const gamestate* g, const entity* e, spritegroup_t* sg) {
+    massert(g, "gamestate is NULL");
+    if (!e || !sg) return NULL;
+    if (e->shield == -1) return NULL;
+
+    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
+    if (!shield_sg) return NULL;
+
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK); }
+    if (e->is_blocking) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK); }
+    return NULL;
+}
+
+static void draw_shadow_for_entity(spritegroup_t* sg, const entity* e);
+
+static void draw_shadow_for_entity(spritegroup_t* sg, const entity* e) {
+    if (!sg || !e) return;
+    if (e->type != ENTITY_PLAYER && e->type != ENTITY_NPC) return;
+
+    sprite* shadow = sg_get_current_plus_one(sg);
+    if (shadow) {
+        Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
+        DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE);
+    }
+}
+
 static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != -1, "id is -1");
@@ -149,36 +231,31 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(s, "sprite is NULL");
 
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-    if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
-        sprite* shadow = sg_get_current_plus_one(sg);
-        if (shadow) { DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE); }
-    }
+    draw_shadow_for_entity(sg, e);
 
     // check for a shield
-    entityid shield_id = e->shield;
-    spritegroup_t* shield_sg = NULL;
-    sprite* shield_front_s = NULL;
-    sprite* shield_back_s = NULL;
-    if (shield_id != -1 && sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS) {
-        shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
-        if (shield_sg) {
-            shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
-            shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
-        }
-    } else if (shield_id != -1 && e->is_blocking) {
-        shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
-        if (shield_sg) {
-            shield_front_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT);
-            shield_back_s = spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK);
-        }
-    }
+    sprite* shield_front_s = get_shield_front_sprite(g, e, sg);
+    sprite* shield_back_s = get_shield_back_sprite(g, e, sg);
+
+    // check for a weapon
+    sprite* weapon_front_s = get_weapon_front_sprite(g, e, sg);
+    sprite* weapon_back_s = get_weapon_back_sprite(g, e, sg);
 
     if (shield_back_s) DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+
+    if (weapon_back_s) {
+        msuccess("weapon_back_s");
+        DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
 
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
 
     if (shield_front_s) DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    if (weapon_front_s) {
+        msuccess("weapon_front_s");
+        DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
 }
 
 static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y) {
@@ -326,22 +403,44 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, sprite
     }
 }
 
+static void update_weapon_for_entity(gamestate* g, entity_t* e, spritegroup_t* sg) {
+    if (!g || !e || !sg) return;
+    if (e->weapon == ENTITYID_INVALID) return;
+
+    spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, e->weapon);
+    if (!w_sg) return;
+
+    int ctx = sg->sprites[sg->current]->currentcontext;
+    spritegroup_setcontexts(w_sg, ctx);
+    spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
+}
+
 static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
-    if (e->race == RACE_HUMAN)
+    if (e->race == RACE_HUMAN) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_ATTACK);
-    else if (e->race == RACE_ORC)
+        update_weapon_for_entity(g, e, sg);
+        //if (e->weapon != ENTITYID_INVALID) {
+        //    spritegroup_t* weapon_sg = hashtable_entityid_spritegroup_get(spritegroups, e->weapon);
+        //    if (weapon_sg) {
+        //        int player_ctx = sg->sprites[sg->current]->currentcontext;
+        //        spritegroup_setcontexts(weapon_sg, player_ctx);
+        //        spritegroup_set_current(weapon_sg, SG_ANIM_LONGSWORD_SLASH_F);
+        //    }
+        //}
+    } else if (e->race == RACE_ORC) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_ATTACK);
-    else if (e->race == RACE_ELF)
+    } else if (e->race == RACE_ELF) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_ATTACK);
-    else if (e->race == RACE_DWARF)
+    } else if (e->race == RACE_DWARF) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_DWARF_ATTACK);
-    else if (e->race == RACE_HALFLING)
+    } else if (e->race == RACE_HALFLING) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HALFLING_ATTACK);
-    else if (e->race == RACE_GOBLIN)
+    } else if (e->race == RACE_GOBLIN) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_GOBLIN_ATTACK);
+    }
 
     e->is_attacking = false;
 }
@@ -351,7 +450,7 @@ static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, sp
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
     if (e->race == RACE_HUMAN) {
-        sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD;
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD);
         if (e->shield != ENTITYID_INVALID) {
             spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
             if (shield_sg) {
@@ -925,7 +1024,7 @@ static void create_sg_byid(gamestate* const g, entityid id) {
     }
 }
 
-static inline void draw_hud(gamestate* const g) {
+static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // Draw the HUD
     int fontsize = 10;
