@@ -24,14 +24,26 @@ SHELL_FILE = --shell-file /home/darkmage/src/raylib/src/minshell.html
 PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 
+
+UNIT_TEST_OBJS = unit_test.o
+
+
+
 # Targets
-all: game #index.html
+all: game unit_test #index.html
 
 # Desktop build
 game: main.o gameloader.o gamestate.o keybinding.o libdraw.so liblogic.so
 	$(CC) -o $@ main.o gameloader.o gamestate.o keybinding.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
-	#$(CC) -o $@ main.o gameloader.o -L. -ldraw -llogic $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
 	./log_build_stats.sh
+
+
+unit_test: $(UNIT_TEST_OBJS)
+	$(CC) -o $@ $(UNIT_TEST_OBJS) $(WFLAGS) $(CFLAGS)
+
+unit_test.o: unit_test.c unit_test.h
+	    $(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) unit_test.c -o $@
+
 
 # Web build
 index.html: $(WEB_SOURCES)
