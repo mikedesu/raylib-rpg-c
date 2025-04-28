@@ -422,24 +422,21 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, s
     if (e->race == RACE_HUMAN) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_ATTACK);
         update_weapon_for_entity(g, e, sg);
-        //if (e->weapon != ENTITYID_INVALID) {
-        //    spritegroup_t* weapon_sg = hashtable_entityid_spritegroup_get(spritegroups, e->weapon);
-        //    if (weapon_sg) {
-        //        int player_ctx = sg->sprites[sg->current]->currentcontext;
-        //        spritegroup_setcontexts(weapon_sg, player_ctx);
-        //        spritegroup_set_current(weapon_sg, SG_ANIM_LONGSWORD_SLASH_F);
-        //    }
-        //}
     } else if (e->race == RACE_ORC) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_ATTACK);
+        //update_weapon_for_entity(g, e, sg);
     } else if (e->race == RACE_ELF) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_ATTACK);
+        //update_weapon_for_entity(g, e, sg);
     } else if (e->race == RACE_DWARF) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_DWARF_ATTACK);
+        //update_weapon_for_entity(g, e, sg);
     } else if (e->race == RACE_HALFLING) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HALFLING_ATTACK);
+        //update_weapon_for_entity(g, e, sg);
     } else if (e->race == RACE_GOBLIN) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_GOBLIN_ATTACK);
+        //update_weapon_for_entity(g, e, sg);
     }
 
     e->is_attacking = false;
@@ -750,7 +747,7 @@ static void draw_message_box(gamestate* g) {
     const char* msg = g->msg_system.messages[g->msg_system.index];
     Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.5f);
     //Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    int font_size = 20;
+    int font_size = 30;
     int pad = 40; // Inner padding (text <-> box edges)
     float line_spacing = 1.0f;
     // Measure text (split into lines if needed)
@@ -1027,7 +1024,7 @@ static void create_sg_byid(gamestate* const g, entityid id) {
 static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // Draw the HUD
-    int fontsize = 10;
+    int fontsize = 20;
     int hp = -1, maxhp = -1, mp = -1, maxmp = -1, level = 1, turn = g->turn_count;
     char buffer[1024] = {0};
     char* name = NULL;
@@ -1102,7 +1099,7 @@ static void draw_message_history(gamestate* const g) {
     }
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) { return; }
-    const int font_size = 10;
+    const int font_size = 20;
     const int pad = 20; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
     const int max_messages = 20;
@@ -1139,7 +1136,7 @@ static void draw_inventory_menu(gamestate* const g) {
 
     if (!g->display_inventory_menu) return;
 
-    const int font_size = 10;
+    const int font_size = 20;
     const int pad = 20; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
 

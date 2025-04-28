@@ -32,8 +32,8 @@
 14 4 16 0  img/characters/shadows/orc_idle_shadow.png
 15 4 4  0  img/characters/orc_walk.png
 16 4 4  0  img/characters/shadows/orc_walk_shadow.png
-17 4 4  0  img/characters/orc_attack.png
-18 4 4  0  img/characters/shadows/orc_attack_shadow.png
+17 4 4  0  img/characters/orc_attack_slash.png
+18 4 4  0  img/characters/shadows/orc_attack_slash_shadow.png
 19 4 6  0  img/characters/orc_chargedattack.png
 20 4 6  0  img/characters/shadows/orc_chargedattack_shadow.png
 21 4 4  0  img/characters/orc_jump.png
@@ -161,8 +161,8 @@
 122 4 16 0  img/characters/shadows/dwarf_idle_shadow.png
 123 4 4  0  img/characters/dwarf_walk.png
 124 4 4  0  img/characters/shadows/dwarf_walk_shadow.png
-125 4 4  0  img/characters/dwarf_attack.png
-126 4 4  0  img/characters/shadows/dwarf_attack_shadow.png
+125 4 4  0  img/characters/dwarf_attack_slash.png
+126 4 4  0  img/characters/shadows/dwarf_attack_slash_shadow.png
 127 4 4  0  img/characters/dwarf_jump.png
 128 4 4  0  img/characters/shadows/dwarf_jump_shadow.png
 129 1 7  0  img/characters/dwarf_spindie2.png
@@ -179,8 +179,8 @@
 136 4 16 0  img/characters/shadows/elf_idle_shadow.png
 137 4 4  0  img/characters/elf_walk.png
 138 4 4  0  img/characters/shadows/elf_walk_shadow.png
-139 4 4  0  img/characters/elf_attack.png
-140 4 4  0  img/characters/shadows/elf_attack_shadow.png
+139 4 4  0  img/characters/elf_attack_slash.png
+140 4 4  0  img/characters/shadows/elf_attack_slash_shadow.png
 141 4 4  0  img/characters/elf_jump.png
 142 4 4  0  img/characters/shadows/elf_jump_shadow.png
 143 1 7  0  img/characters/elf_spindie2.png
@@ -197,8 +197,8 @@
 150 4 16 0  img/characters/shadows/halfling_idle_shadow.png
 151 4 4  0  img/characters/halfling_walk.png
 152 4 4  0  img/characters/shadows/halfling_walk_shadow.png
-153 4 4  0  img/characters/halfling_attack.png
-154 4 4  0  img/characters/shadows/halfling_attack_shadow.png
+153 4 4  0  img/characters/halfling_attack_slash.png
+154 4 4  0  img/characters/shadows/halfling_attack_slash_shadow.png
 155 4 4  0  img/characters/halfling_jump.png
 156 4 4  0  img/characters/shadows/halfling_jump_shadow.png
 157 4 4  0  img/characters/halfling_dmg.png
@@ -219,8 +219,8 @@
 164 4 16 0  img/characters/shadows/goblin_idle_shadow.png
 165 4 4  0  img/characters/goblin_walk.png
 166 4 4  0  img/characters/shadows/goblin_walk_shadow.png
-167 4 4  0  img/characters/goblin_attack.png
-168 4 4  0  img/characters/shadows/goblin_attack_shadow.png
+167 4 4  0  img/characters/goblin_attack_slash.png
+168 4 4  0  img/characters/shadows/goblin_attack_slash_shadow.png
 169 4 4  0  img/characters/goblin_jump.png
 170 4 4  0  img/characters/shadows/goblin_jump_shadow.png
 171 4 4  0  img/characters/goblin_dmg.png
