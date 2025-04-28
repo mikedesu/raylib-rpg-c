@@ -1,19 +1,33 @@
 # txkey contexts frames dodither path
 0  1 1  1  img/tiles/dirt_00.png
+#
+#
 # atm there are 12 total human sprite animations
+#
+#
 1  4 16 0  img/characters/human_idle.png
 2  4 16 0  img/characters/shadows/human_idle_shadow.png
 3  4 4  0  img/characters/human_walk.png
 4  4 4  0  img/characters/shadows/human_walk_shadow.png
-5  4 4  0  img/characters/human_attack.png
-6  4 4  0  img/characters/shadows/human_attack_shadow.png
+5  4 4  0  img/characters/human_attack_slash.png
+6  4 4  0  img/characters/shadows/human_attack_slash_shadow.png
 7  4 4  0  img/characters/human_jump.png
 8  4 4  0  img/characters/shadows/human_jump_shadow.png
-9  1 7 0  img/characters/human_spindie2.png
-10 1 7 0  img/characters/shadows/human_spindie2_shadow.png
+9  1 7  0  img/characters/human_spindie2.png
+10 1 7  0  img/characters/shadows/human_spindie2_shadow.png
 11 1 12 0  img/characters/human_souldie.png
 12 1 12 0  img/characters/shadows/human_souldie_shadow.png
+66 4 4  0  img/characters/human_guard.png
+67 4 4  0  img/characters/shadows/human_guard_shadow.png
+68 4 3  0  img/characters/human_guard_success.png
+69 4 3  0  img/characters/shadows/human_guard_success_shadow.png
+75 4 4  0  img/characters/human_dmg.png
+76 4 4  0  img/characters/shadows/human_dmg_shadow.png
+#
+#
 # atm there are 14 total orc sprite animations
+#
+#
 13 4 16 0  img/characters/orc_idle.png
 14 4 16 0  img/characters/shadows/orc_idle_shadow.png
 15 4 4  0  img/characters/orc_walk.png
@@ -30,6 +44,11 @@
 24 1 7 0  img/characters/shadows/orc_die2_shadow.png
 25 4 4  0  img/characters/orc_dmg.png
 26 4 4  0  img/characters/shadows/orc_dmg_shadow.png
+#
+#
+#
+#
+#
 27 1 1  0  img/tiles/stone_00.png
 28 1 1  0  img/tiles/stone_01.png
 29 1 1  0  img/tiles/stone_02.png
@@ -69,18 +88,27 @@
 63  1 1  0 img/tiles/dirt_03.png
 64  1 1  0 img/tiles/dirt_04.png
 65  1 1  0 img/tiles/dirt_05.png
-# new human sprites for guarding
-66 4 4 0 img/characters/human_guard.png
-67 4 4 0 img/characters/shadows/human_guard_shadow.png
-68 4 3 0 img/characters/human_guard_success.png
-69 4 3 0 img/characters/shadows/human_guard_success_shadow.png
+#
+#
+#
+#
 70 4 4 0 img/actions/guard_wooden_shield_front.png
 71 4 4 0 img/actions/guard_wooden_shield_back.png
 72 4 3 0 img/actions/guard_wooden_shield_success_front.png
 73 4 3 0 img/actions/guard_wooden_shield_success_back.png
+#
+#
+#
+#
 74 1 4 0 img/shields/wooden_shield.png
-75 4 4 0 img/characters/human_dmg.png
-76 4 4 0 img/characters/shadows/human_dmg_shadow.png
+#
+#
+#
+#
+#
+#
+#
+#
 77 1 1  0  img/tiles/grass_05.png
 78 1 1  0  img/tiles/grass_06.png
 79 1 1  0  img/tiles/grass_07.png
@@ -126,6 +154,9 @@
 119 1 1  0  img/tiles/downstairs_00.png
 120 1 4  0  img/weapons/long_sword.png
 #
+#
+#
+#
 121 4 16 0  img/characters/dwarf_idle.png
 122 4 16 0  img/characters/shadows/dwarf_idle_shadow.png
 123 4 4  0  img/characters/dwarf_walk.png
@@ -140,6 +171,9 @@
 132 1 12 0  img/characters/shadows/dwarf_souldie_shadow.png
 133 4 4  0  img/characters/dwarf_dmg.png
 134 4 4  0  img/characters/shadows/dwarf_dmg_shadow.png
+#
+#
+#
 #
 135 4 16 0  img/characters/elf_idle.png
 136 4 16 0  img/characters/shadows/elf_idle_shadow.png
@@ -156,6 +190,9 @@
 147 4 4  0  img/characters/elf_dmg.png
 148 4 4  0  img/characters/shadows/elf_dmg_shadow.png
 #
+#
+#
+#
 149 4 16 0  img/characters/halfling_idle.png
 150 4 16 0  img/characters/shadows/halfling_idle_shadow.png
 151 4 4  0  img/characters/halfling_walk.png
@@ -168,8 +205,15 @@
 158 4 4  0  img/characters/shadows/halfling_dmg_shadow.png
 159 1 7  0  img/characters/halfling_spindie2.png
 160 1 7  0  img/characters/shadows/halfling_spindie2_shadow.png
+#
+#
+#
+#
 #161 1 12 0  img/characters/halfling_souldie.png
 #162 1 12 0  img/characters/shadows/halfling_souldie_shadow.png
+#
+#
+#
 #
 163 4 16 0  img/characters/goblin_idle.png
 164 4 16 0  img/characters/shadows/goblin_idle_shadow.png
@@ -183,8 +227,16 @@
 172 4 4  0  img/characters/shadows/goblin_dmg_shadow.png
 173 1 7  0  img/characters/goblin_spindie2.png
 174 1 7  0  img/characters/shadows/goblin_spindie2_shadow.png
+#
+#
+#
+#
 #173 1 12 0  img/characters/goblin_souldie.png
 #174 1 12 0  img/characters/shadows/goblin_souldie_shadow.png
+#
+#
+#
+#
 #
 177 4 2  0  img/monsters/bat_idle.png
 178 4 2  0  img/monsters/shadows/bat_idle_shadow.png
@@ -194,6 +246,10 @@
 182 4 4  0  img/monsters/shadows/bat_dmg_shadow.png
 183 3 8  0  img/monsters/bat_sleep.png
 184 3 8  0  img/monsters/shadows/bat_sleep_shadow.png
+#
+#
+#
+#
 #
 185 12 4 0  img/monsters/wolf_idle.png
 186 12 4 0  img/monsters/shadows/wolf_idle_shadow.png
@@ -208,11 +264,20 @@
 195 4  4 0  img/monsters/wolf_die.png
 196 4  4 0  img/monsters/shadows/wolf_die_shadow.png
 #
+#
+#
+#
 197 1 4  0  img/weapons/dagger.png
 198 1 4  0  img/weapons/two_handed_sword.png
 #
+#
+#
+#
 199 1 4  0  img/shields/iron_shield.png
 200 1 4  0  img/shields/wooden_tower_shield.png
+#
+#
+#
 #
 201 1 4  0  img/items/potion_hp_small.png
 202 1 4  0  img/items/potion_hp_medium.png
@@ -220,4 +285,14 @@
 204 1 4  0  img/items/potion_mp_small.png
 205 1 4  0  img/items/potion_mp_medium.png
 206 1 4  0  img/items/potion_mp_large.png
+#
+#
+#
+#
+207 4 4  0  img/actions/slash_axe_b.png
+208 4 4  0  img/actions/slash_axe_f.png
+209 4 4  0  img/actions/slash_dagger_b.png
+210 4 4  0  img/actions/slash_dagger_f.png
+211 4 4  0  img/actions/slash_sword_b.png
+212 4 4  0  img/actions/slash_sword_f.png
 
