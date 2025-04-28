@@ -10,28 +10,20 @@ entity_t* e_new(entityid id, entitytype_t type) {
     massert(id >= 0, "id is less than 0");
     massert(type >= 0, "type is less than 0");
     massert(type < ENTITY_TYPE_COUNT, "type is greater than ENTITY_TYPE_COUNT");
+
     e->id = id;
     e->type = type;
     e->race = RACE_NONE;
     e->direction = DIR_RIGHT;
-    e->x = -1;
-    e->y = -1;
-    e->weapon = -1;
-    e->shield = -1;
-    e->floor = -1;
-    e->stats.hp = 1;
-    e->stats.maxhp = 1;
-    e->do_update = false;
-    e->is_attacking = false;
-    e->is_blocking = false;
-    e->is_damaged = false;
-    e->dead = false;
-    e->sprite_move_x = 0;
-    e->sprite_move_y = 0;
-    e->inventory_count = 0;
+    e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
+
+    e->x = e->y = e->sprite_move_x = e->sprite_move_y = e->inventory_count = 0;
+    e->weapon = e->shield = e->floor = -1;
+    e->stats.hp = e->stats.maxhp = 1;
+    e->do_update = e->is_attacking = e->is_blocking = e->is_damaged = e->dead = false;
+
     e->next = NULL;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
-    e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
     return e;
 }
 
@@ -107,18 +99,33 @@ entity_t* e_new_npc_at(entityid id, race_t r, int x, int y, int floor, const cha
     return e;
 }
 
+entity_t* e_new_weapon(entityid id, const char* name) {
+    entity_t* e = e_new(id, ENTITY_WEAPON);
+    massert(e, "Failed to create weapon entity");
+    e_set_name(e, name);
+    return e;
+}
+
 entity_t* e_new_weapon_at(entityid id, int x, int y, int floor, const char* name) {
-    entity_t* e = e_new_at(id, ENTITY_WEAPON, x, y, floor);
-    massert(e, "Failed to create entity");
+    entity_t* e = e_new_weapon(id, name);
+    massert(e, "Failed to create weapon entity");
+    e_set_xy(e, x, y);
+    e_set_floor(e, floor);
+    return e;
+}
+
+entity_t* e_new_shield(entityid id, const char* name) {
+    entity_t* e = e_new(id, ENTITY_SHIELD);
+    massert(e, "Failed to create shield entity");
     e_set_name(e, name);
     return e;
 }
 
 entity_t* e_new_shield_at(entityid id, int x, int y, int floor, const char* name) {
-    entity_t* e = e_new_at(id, ENTITY_SHIELD, x, y, floor);
-    massert(e, "Failed to create entity");
-    //entity_set_race(e, r);
-    e_set_name(e, name);
+    entity_t* e = e_new_shield(id, name);
+    massert(e, "Failed to create shield entity");
+    e_set_xy(e, x, y);
+    e_set_floor(e, floor);
     return e;
 }
 

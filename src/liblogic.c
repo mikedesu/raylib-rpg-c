@@ -36,6 +36,9 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
 static inline void add_message_history(gamestate* const g, const char* msg);
 static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
+static entity_t* create_shield(gamestate* g);
+static entity_t* create_sword(gamestate* g);
+static void create_shield_at(gamestate* g, int x, int y);
 static void create_goblin_at(gamestate* g, int x, int y);
 static void create_halfling_at(gamestate* g, int x, int y);
 static void create_dwarf_at(gamestate* g, int x, int y);
@@ -616,12 +619,31 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
     return tile;
 }
 
+static entity_t* create_shield(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entityid id = next_entityid++;
+    entity_t* e = e_new_shield(id, "shield");
+    massert(e, "failed to create shield");
+    em_add(g->entitymap, e);
+    gs_add_entityid(g, id);
+    return e;
+}
+
 static void create_shield_at(gamestate* g, int x, int y) {
     entityid id = shield_create(g, x, y, 0, "shield");
     massert(id != ENTITYID_INVALID, "shield create fail");
     entity* s = em_get(g->entitymap, id);
     massert(s, "shield is NULL");
-    // set shield direction if needed here
+}
+
+static entity_t* create_sword(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entityid id = next_entityid++;
+    entity_t* e = e_new_weapon(id, "sword");
+    massert(e, "failed to create sword");
+    em_add(g->entitymap, e);
+    gs_add_entityid(g, id);
+    return e;
 }
 
 static void create_sword_at(gamestate* g, int x, int y) {
@@ -657,27 +679,35 @@ static void init_shield_test(gamestate* g) {
 
 static void init_weapon_test(gamestate* g) {
     massert(g, "gamestate is NULL");
-    dungeon_t* d = g->dungeon;
-    massert(d, "dungeon is NULL");
-    dungeon_floor_t* df = dungeon_get_floor(d, 0);
-    massert(df, "floor is NULL");
     entity* e = em_get(g->entitymap, g->hero_id);
-    massert(e, "e is NULL");
-
-    bool found = false;
-    for (int i = -1; i <= 1 && !found; i++) {
-        for (int j = -1; j <= 1 && !found; j++) {
-            if (i == 0 && j == 0) continue;
-            int nx = e->x + i;
-            int ny = e->y + j;
-            tile_t* tile = df_tile_at(df, nx, ny);
-            if (tile_entity_count(tile) > 0) continue;
-            if (!tile_is_walkable(tile->type)) continue;
-            create_sword_at(g, nx, ny);
-            found = true;
-        }
-    }
+    massert(e, "hero entity is NULL");
+    entity_t* sword = create_sword(g);
+    massert(sword, "failed to create sword");
+    e->weapon = sword->id;
 }
+
+//static void init_weapon_test(gamestate* g) {
+//    massert(g, "gamestate is NULL");
+//    dungeon_t* d = g->dungeon;
+//    massert(d, "dungeon is NULL");
+//    dungeon_floor_t* df = dungeon_get_floor(d, 0);
+//    massert(df, "floor is NULL");
+//    entity* e = em_get(g->entitymap, g->hero_id);
+//    massert(e, "e is NULL");
+//    bool found = false;
+//    for (int i = -1; i <= 1 && !found; i++) {
+//        for (int j = -1; j <= 1 && !found; j++) {
+//            if (i == 0 && j == 0) continue;
+//            int nx = e->x + i;
+//            int ny = e->y + j;
+//            tile_t* tile = df_tile_at(df, nx, ny);
+//            if (tile_entity_count(tile) > 0) continue;
+//            if (!tile_is_walkable(tile->type)) continue;
+//            create_sword_at(g, nx, ny);
+//            found = true;
+//        }
+//    }
+//}
 
 static void init_dungeon(gamestate* const g) {
     massert(g, "gamestate is NULL");
@@ -1511,10 +1541,10 @@ void liblogic_init(gamestate* const g) {
     init_player(g);
     // test to create a weapon
     init_weapon_test(g);
-    init_shield_test(g);
+    //init_shield_test(g);
     // temporarily disabling
     //init_humans_test(g);
-    init_orcs_test(g);
+    //init_orcs_test(g);
     //init_elves_test(g);
     //init_dwarves_test(g);
     //init_halflings_test(g);

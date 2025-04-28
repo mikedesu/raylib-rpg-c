@@ -146,7 +146,10 @@ static sprite* get_weapon_front_sprite(const gamestate* g, const entity* e, spri
 
     spritegroup_t* weapon_sg = hashtable_entityid_spritegroup_get(spritegroups, e->weapon);
     if (!weapon_sg) {
-        merror("weapon spritegroup is NULL");
+        //merror("weapon spritegroup is NULL for id %d", e->weapon);
+
+        massert(e->weapon == -1, "weapon spritegroup is NULL for id %d", e->weapon);
+
         return NULL;
     }
 
