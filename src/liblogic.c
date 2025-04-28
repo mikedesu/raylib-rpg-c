@@ -1514,7 +1514,7 @@ void liblogic_init(gamestate* const g) {
     init_shield_test(g);
     // temporarily disabling
     //init_humans_test(g);
-    //init_orcs_test(g);
+    init_orcs_test(g);
     //init_elves_test(g);
     //init_dwarves_test(g);
     //init_halflings_test(g);
