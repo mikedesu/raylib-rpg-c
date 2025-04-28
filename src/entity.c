@@ -160,10 +160,25 @@ void e_set_xy(entity_t* const e, int x, int y) {
     e_set_y(e, y);
 }
 
-void e_incr_x(entity_t* const e) { e_set_x(e, e->x + 1); }
-void e_incr_y(entity_t* const e) { e_set_y(e, e->y + 1); }
-void e_decr_x(entity_t* const e) { e_set_x(e, e->x - 1); }
-void e_decr_y(entity_t* const e) { e_set_y(e, e->y - 1); }
+void e_incr_x(entity_t* const e) {
+    massert(e, "e is NULL");
+    e_set_x(e, e->x + 1);
+}
+
+void e_incr_y(entity_t* const e) {
+    massert(e, "e is NULL");
+    e_set_y(e, e->y + 1);
+}
+
+void e_decr_x(entity_t* const e) {
+    massert(e, "e is NULL");
+    e_set_x(e, e->x - 1);
+}
+
+void e_decr_y(entity_t* const e) {
+    massert(e, "e is NULL");
+    e_set_y(e, e->y - 1);
+}
 
 void e_set_dir(entity_t* const e, direction_t dir) {
     massert(e, "e is NULL");
@@ -218,6 +233,7 @@ int e_get_maxhp(entity_t* const e) {
 }
 
 void e_set_hpmaxhp(entity_t* const e, int hp, int maxhp) {
+    massert(e, "e is NULL");
     e_set_hp(e, hp);
     e_set_maxhp(e, maxhp);
 }
