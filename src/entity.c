@@ -38,15 +38,6 @@ entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int floor) {
     return e;
 }
 
-bool e_item_is_already_in_inventory(entity_t* const e, entityid item_id) {
-    massert(e, "e is NULL");
-    massert(item_id >= 0, "item_id is less than 0");
-    for (int i = 0; i < e->inventory_count; i++) {
-        if (e->inventory[i] == item_id) return true;
-    }
-    return false;
-}
-
 bool e_add_item_to_inventory(entity_t* const e, entityid item_id) {
     massert(e, "e is NULL");
     massert(item_id >= 0, "item_id is less than 0");
@@ -54,7 +45,7 @@ bool e_add_item_to_inventory(entity_t* const e, entityid item_id) {
         merror("inventory is full");
         return false;
     }
-    if (e_item_is_already_in_inventory(e, item_id)) {
+    if (e_item_is_in_inventory(e, item_id)) {
         merror("item is already in inventory");
         return false;
     }
@@ -71,7 +62,7 @@ bool e_remove_item_from_inventory(entity_t* const e, entityid item_id) {
         return false;
     }
 
-    if (!e_item_is_already_in_inventory(e, item_id)) {
+    if (!e_item_is_in_inventory(e, item_id)) {
         merror("item is not in inventory");
         return false;
     }

@@ -252,6 +252,14 @@ static inline void e_equip_weapon(entity* e, entityid weapon_id) {
     e->weapon = weapon_id;
 }
 
-bool e_item_is_already_in_inventory(entity_t* const e, entityid item_id);
+static inline bool e_item_is_in_inventory(entity_t* const e, entityid item_id) {
+    massert(e, "e is NULL");
+    massert(item_id >= 0, "item_id is less than 0");
+    for (int i = 0; i < e->inventory_count; i++) {
+        if (e->inventory[i] == item_id) return true;
+    }
+    return false;
+}
+
 bool e_add_item_to_inventory(entity_t* const e, entityid item_id);
 bool e_remove_item_from_inventory(entity_t* const e, entityid item_id);
