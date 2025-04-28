@@ -174,8 +174,10 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
 
     if (shield_back_s) DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+
     // Draw sprite on top
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
+
     if (shield_front_s) DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
 }
 
@@ -908,7 +910,6 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             keys = TX_GOBLIN_KEYS;
             num_keys = TX_GOBLIN_KEY_COUNT;
             break;
-
         default: merror("unknown race %d", e->race); return;
         }
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);

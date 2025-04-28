@@ -295,4 +295,4 @@
 210 4 4  0  img/actions/slash_dagger_f.png
 211 4 4  0  img/actions/slash_sword_b.png
 212 4 4  0  img/actions/slash_sword_f.png
-
+#
