@@ -67,6 +67,8 @@ typedef struct gamestate {
     bool test_guard;
     bool display_inventory_menu;
 
+    int inventory_menu_selection;
+
     debugpanel_t debugpanel;
 
     Camera2D cam2d;

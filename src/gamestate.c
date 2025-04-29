@@ -79,6 +79,7 @@ gamestate* gamestateinitptr() {
     g->font_size = 10;
     g->pad = 20;
     g->line_spacing = 1.0f;
+    g->inventory_menu_selection = 0;
     gamestate_init_msg_history(g);
     return g;
 }

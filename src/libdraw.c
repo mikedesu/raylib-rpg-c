@@ -1139,7 +1139,7 @@ static void draw_inventory_menu(gamestate* const g) {
 
     // Menu box size
     float menu_width = g->windowwidth * 0.5f;
-    float menu_height = g->windowheight * 0.6f;
+    float menu_height = g->windowheight * 0.3f;
 
     Rectangle menu_box = {.x = (g->windowwidth - menu_width) / 2.0f, .y = (g->windowheight - menu_height) / 4.0f, .width = menu_width, .height = menu_height};
 
@@ -1169,7 +1169,6 @@ static void draw_inventory_menu(gamestate* const g) {
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
 
-    // Draw inventory items in left_box
     float item_y = left_box.y + item_list_pad;
     for (int i = 0; i < hero->inventory_count && i < max_visible_items; i++) {
         int item_id = hero->inventory[i];
@@ -1177,10 +1176,16 @@ static void draw_inventory_menu(gamestate* const g) {
         entity* item_entity = em_get(g->entitymap, item_id);
         if (!item_entity) continue;
 
-        // Draw each item name
         float item_x = left_box.x + item_list_pad;
-        DrawTextEx(GetFontDefault(), item_entity->name, (Vector2){item_x, item_y}, g->font_size, g->line_spacing, WHITE);
+        char item_display[128];
 
+        if (i == g->inventory_menu_selection) {
+            snprintf(item_display, sizeof(item_display), "> %s", item_entity->name);
+        } else {
+            snprintf(item_display, sizeof(item_display), "  %s", item_entity->name);
+        }
+
+        DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, g->font_size, g->line_spacing, WHITE);
         item_y += g->font_size + 4;
     }
 

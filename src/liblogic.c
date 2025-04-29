@@ -1129,6 +1129,22 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         g->display_inventory_menu = false;
         return;
     }
+
+    entity* const hero = em_get(g->entitymap, g->hero_id);
+    massert(hero, "hero is NULL");
+
+    if (hero->inventory_count == 0) {
+        //add_message(g, "You have no items in your inventory!");
+        return;
+    }
+
+    if (inputstate_is_pressed(is, KEY_DOWN)) {
+        g->inventory_menu_selection++;
+        if (g->inventory_menu_selection >= hero->inventory_count) { g->inventory_menu_selection = 0; }
+    } else if (inputstate_is_pressed(is, KEY_UP)) {
+        g->inventory_menu_selection--;
+        if (g->inventory_menu_selection < 0) { g->inventory_menu_selection = hero->inventory_count - 1; }
+    }
 }
 
 static inline void change_player_dir(gamestate* const g, direction_t dir) {
