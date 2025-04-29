@@ -24,11 +24,11 @@
 //#define DEFAULT_WIN_HEIGHT 480
 //#define DEFAULT_WIN_WIDTH 960
 //#define DEFAULT_WIN_HEIGHT 540
-//#define DEFAULT_WIN_WIDTH 1920
-//#define DEFAULT_WIN_HEIGHT 1080
+#define DEFAULT_WIN_WIDTH 1920
+#define DEFAULT_WIN_HEIGHT 1080
 
-#define DEFAULT_WIN_WIDTH 1280
-#define DEFAULT_WIN_HEIGHT 720
+//#define DEFAULT_WIN_WIDTH 1280
+//#define DEFAULT_WIN_HEIGHT 720
 
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
@@ -752,11 +752,7 @@ static void draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) { return; }
     const char* prompt = "[A] Next";
     const char* msg = g->msg_system.messages[g->msg_system.index];
-    //Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.5f);
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    //int font_size = 10;
-    //int pad = 20; // Inner padding (text <-> box edges)
-    //float line_spacing = 1.0f;
     // Measure text (split into lines if needed)
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, g->font_size, g->line_spacing);
     // Calculate centered box position
@@ -768,15 +764,14 @@ static void draw_message_box(gamestate* g) {
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
     // Draw text (centered in box)
-    DrawTextEx(GetFontDefault(), msg, (Vector2){box.x + g->pad, box.y + g->pad}, g->font_size, g->line_spacing, WHITE);
+    //DrawTextEx(GetFontDefault(), msg, (Vector2){box.x + g->pad, box.y + g->pad}, g->font_size, g->line_spacing, WHITE);
+    DrawText(msg, box.x + g->pad, box.y + g->pad, g->font_size, WHITE);
     // Show "Next" prompt if more messages exist
     if (g->msg_system.count > 1) {
         int prompt_font_size = 10;
         int prompt_offset = 10; // Offset from box edges
-
         char tmp_prompt[1024] = {0};
         snprintf(tmp_prompt, sizeof(tmp_prompt), "%s %d/%d", prompt, g->msg_system.index + 1, g->msg_system.count);
-
         Vector2 prompt_size = MeasureTextEx(GetFontDefault(), tmp_prompt, prompt_font_size, 1.0f);
         DrawText(tmp_prompt,
                  box.x + box.width - prompt_size.x - prompt_offset, // Right-align in box
@@ -1144,7 +1139,8 @@ static void draw_inventory_menu(gamestate* const g) {
     Rectangle menu_box = {.x = (g->windowwidth - menu_width) / 2.0f, .y = (g->windowheight - menu_height) / 4.0f, .width = menu_width, .height = menu_height};
 
     // Draw menu background and border
-    DrawRectangleRec(menu_box, (Color){0x33, 0x33, 0x33, 0xff});
+    //DrawRectangleRec(menu_box, (Color){0x33, 0x33, 0x33, 0xff});
+    DrawRectangleRec(menu_box, (Color){0x33, 0x33, 0x33, 0x99});
     DrawRectangleLinesEx(menu_box, 2, WHITE);
 
     // Draw menu title centered at top
@@ -1160,7 +1156,6 @@ static void draw_inventory_menu(gamestate* const g) {
     Rectangle left_box = {.x = menu_box.x + box_pad, .y = title_y + title_size.y + box_pad, .width = half_width - box_pad, .height = half_height};
 
     // Right box: item info
-    //    Rectangle right_box = {.x = left_box.x + half_width + section_gap, .y = left_box.y, .width = half_width - box_pad, .height = half_height};
     Rectangle right_box = {.x = left_box.x + half_width + section_gap, .y = left_box.y, .width = half_width - box_pad * 2, .height = half_height};
 
     // Draw left and right boxes
@@ -1190,14 +1185,87 @@ static void draw_inventory_menu(gamestate* const g) {
     }
 
     // Draw placeholder info in right_box
+    //const char* info_title = "Item Info:";
+    //const char* info_text = "Select an item to view details here.";
+    //
+    //    float info_title_y = right_box.y + item_list_pad;
+    //    float info_text_y = info_title_y + g->font_size + 8;
+
+    //    DrawTextEx(GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, g->font_size, g->line_spacing, YELLOW);
+    //    DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, g->font_size, g->line_spacing, LIGHTGRAY);
+
+    // Draw item info in right_box
     const char* info_title = "Item Info:";
-    const char* info_text = "Select an item to view details here.";
+
+    char info_text[256] = {0};
+
+    spritegroup_t* sg = NULL;
+
+    if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < hero->inventory_count) {
+        entityid item_id = hero->inventory[g->inventory_menu_selection];
+        entity* item_entity = em_get(g->entitymap, item_id);
+        if (item_entity) {
+            snprintf(info_text, sizeof(info_text), "%s\nType: %d", item_entity->name, item_entity->type);
+
+            sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
+        } else {
+            snprintf(info_text, sizeof(info_text), "Invalid item data");
+        }
+    } else {
+        snprintf(info_text, sizeof(info_text), "Select an item to view details here.");
+    }
 
     float info_title_y = right_box.y + item_list_pad;
     float info_text_y = info_title_y + g->font_size + 8;
 
-    DrawTextEx(GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, g->font_size, g->line_spacing, YELLOW);
-    DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, g->font_size, g->line_spacing, LIGHTGRAY);
+    DrawTextEx(
+        GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, g->font_size, g->line_spacing, (Color){0x66, 0x66, 0x66, 0xff});
+    DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, g->font_size, g->line_spacing, WHITE);
+
+    // Draw item sprite in right_box
+    //    if (sg) {
+    //        sprite* s = sg_get_current(sg);
+    //        if (s) {
+    //            const float sprite_x = right_box.x + right_box.width / 2 - s->width / 2.0;
+    //            const float sprite_y = info_text_y + g->font_size + 8;
+    //            const int scale = 5;
+    //            const float sprite_width = s->width * scale;
+    //            const float sprite_height = s->height * scale;
+    //            // DrawTextureRec(*s->texture, s->src, (Vector2){sprite_x, sprite_y}, WHITE);
+    //            DrawTexturePro(
+    //                *s->texture, s->src, (Rectangle){sprite_x, sprite_y, sprite_width, sprite_height}, (Vector2){sprite_width / 2, sprite_height / 2}, 0.0f, WHITE);
+    //        }
+    //    }
+
+    if (sg) {
+        sprite* s = sg_get_current(sg);
+        if (s) {
+            const int scale = 5;
+            const float sprite_width = s->width * scale;
+            const float sprite_height = s->height * scale;
+            const float sprite_margin = -8 * scale; // space from top and right edges
+
+            // Anchor to top-right of right_box, account for margin
+            const float sprite_x = right_box.x + right_box.width - sprite_margin - sprite_width;
+            const float sprite_y = right_box.y + sprite_margin;
+
+            DrawTexturePro(*s->texture,
+                           s->src,
+                           (Rectangle){sprite_x, sprite_y, sprite_width, sprite_height},
+                           (Vector2){0, 0}, // Top-left corner as origin
+                           0.0f,
+                           WHITE);
+
+            // draw a bounding box around the sprite
+            //DrawRectangleLinesEx((Rectangle){sprite_x, sprite_y, sprite_width, sprite_height}, 2, WHITE);
+
+            // draw a bounding box around the 8x8 center of the sprite
+            // dont forget to scale the 8x8 box
+            //const float center_x = sprite_x + (sprite_width - 8 * scale) / 2;
+            //const float center_y = sprite_y + (sprite_height - 8 * scale) / 2;
+            //DrawRectangleLinesEx((Rectangle){center_x, center_y, 8 * scale, 8 * scale}, 2, WHITE);
+        }
+    }
 }
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }

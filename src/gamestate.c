@@ -76,7 +76,7 @@ gamestate* gamestateinitptr() {
     g->entity_turn = -1;
     g->gameover = false;
     g->test_guard = false;
-    g->font_size = 10;
+    g->font_size = 20;
     g->pad = 20;
     g->line_spacing = 1.0f;
     g->inventory_menu_selection = 0;

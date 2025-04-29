@@ -1208,7 +1208,8 @@ static bool try_entity_pickup(gamestate* const g, entity* const e) {
             tile_remove(tile, id);
             // add the item to the entity inventory
             e_add_item_to_inventory(e, id);
-            e->weapon = id;
+            // disabling auto-equip
+            //e->weapon = id;
             msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return true;
@@ -1222,8 +1223,9 @@ static bool try_entity_pickup(gamestate* const g, entity* const e) {
             tile_remove(tile, id);
             // add the item to the entity inventory
             e_add_item_to_inventory(e, id);
-            update_equipped_shield_dir(g, e);
-            e->shield = id;
+            // disabling auto-equip
+            //update_equipped_shield_dir(g, e);
+            //e->shield = id;
             msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return true;
