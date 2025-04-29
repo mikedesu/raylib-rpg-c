@@ -3,6 +3,7 @@
 #include "dungeon_tile.h"
 #include "entityid.h"
 #include "location.h"
+#include "mprint.h"
 #include "raylib.h"
 #include <stdbool.h>
 
@@ -44,14 +45,52 @@ dungeon_floor_t* df_create(int width, int height);
 void df_init(dungeon_floor_t* df);
 void df_free(dungeon_floor_t* f);
 
-bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y);
-tile_t* df_tile_at(const dungeon_floor_t* const df, int x, int y);
+//bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y);
+//tile_t* df_tile_at(const dungeon_floor_t* const df, int x, int y);
+//tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y);
+
 bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y);
-tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y);
 loc_t df_get_upstairs(const dungeon_floor_t* const df);
 loc_t df_get_downstairs(const dungeon_floor_t* const df);
 int df_count_walkable(const dungeon_floor_t* const df);
 int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
 bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
+
+static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
+    massert(df, "df is NULL");
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
+        merror("x or y out of bounds");
+        return NULL;
+    }
+    return &df->tiles[y][x];
+}
+
+static inline tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y) {
+    massert(df, "df is NULL");
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
+        merror("x or y out of bounds");
+        return TILE_NONE;
+    }
+    return df->tiles[y][x].type;
+}
+
+static inline bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {
+    massert(df, "dungeon floor is NULL");
+    tile_t* tile = df_tile_at(df, x, y);
+    return tile_is_wall(tile->type);
+}
+
+static inline const room_data_t* df_get_room_at(const dungeon_floor_t* df, int px, int py) {
+    massert(df, "dungeon floor is NULL");
+    massert(px >= 0, "px is less than zero");
+    massert(px < df->width, "px is out of bounds");
+    massert(py >= 0, "py is less than zero");
+    massert(py < df->height, "py is out of bounds");
+    for (int i = 0; i < df->room_count; i++) {
+        const room_data_t* r = &df->rooms[i];
+        if (px >= r->x && px < r->x + r->w && py >= r->y && py < r->y + r->h) return r;
+    }
+    return NULL;
+}

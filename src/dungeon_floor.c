@@ -737,24 +737,6 @@ bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y) {
     return r != -1 && r == id;
 }
 
-tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
-    massert(df, "df is NULL");
-    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-        merror("x or y out of bounds");
-        return NULL;
-    }
-    return &df->tiles[y][x];
-}
-
-tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y) {
-    massert(df, "df is NULL");
-    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-        merror("x or y out of bounds");
-        return TILE_NONE;
-    }
-    return df->tiles[y][x].type;
-}
-
 static void df_set_pressure_plate(dungeon_floor_t* const df, const int x, const int y, const int up_tx_key, const int dn_tx_key, const int event) {
     massert(df, "dungeon floor is NULL");
     if (x < 0 || x >= df->width || y < 0 || y >= df->height) return;
@@ -799,12 +781,6 @@ static void df_set_all_tiles_range(dungeon_floor_t* const df, tiletype_t begin, 
             tile_init(current, type);
         }
     }
-}
-
-bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {
-    massert(df, "dungeon floor is NULL");
-    tile_t* tile = df_tile_at(df, x, y);
-    return tile_is_wall(tile->type);
 }
 
 static void df_set_tile_area_range2(dungeon_floor_t* const df, Rectangle r, tiletype_t begin, tiletype_t end) {
@@ -990,8 +966,10 @@ static void df_make_diamond_shape_room(dungeon_floor_t* df, int cx, int cy, int 
 
 static void df_init_test_simple9(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
-    int cx = df_center_x(df), cy = df_center_y(df);
-    int w = 7, h = 7;
+    int cx = df_center_x(df);
+    int cy = df_center_y(df);
+    int w = 7;
+    int h = 7;
     // Diamond-shaped central room
     df_make_diamond_shape_room(df, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     df_assign_downstairs_in_area(df, cx - w / 2, cy - h / 2, w, h);
@@ -1014,12 +992,4 @@ bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* na
     strncpy(r->room_name, name, sizeof(r->room_name) - 1);
     r->room_name[sizeof(r->room_name) - 1] = '\0';
     return true;
-}
-
-const room_data_t* df_get_room_at(const dungeon_floor_t* df, int px, int py) {
-    for (int i = 0; i < df->room_count; i++) {
-        const room_data_t* r = &df->rooms[i];
-        if (px >= r->x && px < r->x + r->w && py >= r->y && py < r->y + r->h) return r;
-    }
-    return NULL;
 }
