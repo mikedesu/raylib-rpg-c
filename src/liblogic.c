@@ -1370,13 +1370,11 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
-    const char* action = get_action_key(is, g);
-    if (!action) {
-        merror("No action found for key");
-        return;
-    }
+
     if (g->msg_system.is_active) {
-        if (strcmp(action, "attack") == 0 || strcmp(action, "pickup") == 0) {
+        if (inputstate_is_pressed(is, KEY_I) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_A) ||
+            inputstate_is_pressed(is, KEY_SPACE) || inputstate_is_pressed(is, KEY_COMMA) || inputstate_is_pressed(is, KEY_PERIOD)) {
+            //if (strcmp(action, "attack") == 0 || strcmp(action, "pickup") == 0) {
             g->msg_system.index++;
             if (g->msg_system.index >= g->msg_system.count) {
                 // Reset when all messages read
@@ -1387,6 +1385,13 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         }
         return;
     }
+
+    const char* action = get_action_key(is, g);
+    if (!action) {
+        merror("No action found for key");
+        return;
+    }
+
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "hero is NULL");
     // check if the player is dead

@@ -1,4 +1,5 @@
 #pragma once
+#include "mprint.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -25,6 +26,9 @@ static inline void inputstate_update(inputstate* is) {
     inputstate_reset(is);
     for (int k = 0; k < MAX_KEYS; k++) {
         if (IsKeyPressed(k)) {
+            // debugging to see if KEY_ENTER is pressed
+            if (k == KEY_ENTER) { msuccess("KEY_ENTER pressed"); }
+
             int idx = k / BITS_PER_LONG;
             int bit = k % BITS_PER_LONG;
             is->pressed[idx] |= (1ULL << bit);
@@ -71,14 +75,8 @@ static inline int inputstate_get_pressed_key(const inputstate* is) {
     return -1; // No key pressed
 }
 
-static inline bool inputstate_is_left_shift_held(const inputstate* is) {
-    return inputstate_is_held(is, KEY_LEFT_SHIFT);
-}
+static inline bool inputstate_is_left_shift_held(const inputstate* is) { return inputstate_is_held(is, KEY_LEFT_SHIFT); }
 
-static inline bool inputstate_is_right_shift_held(const inputstate* is) {
-    return inputstate_is_held(is, KEY_RIGHT_SHIFT);
-}
+static inline bool inputstate_is_right_shift_held(const inputstate* is) { return inputstate_is_held(is, KEY_RIGHT_SHIFT); }
 
-static inline bool inputstate_is_shift_held(const inputstate* is) {
-    return inputstate_is_left_shift_held(is) || inputstate_is_right_shift_held(is);
-}
+static inline bool inputstate_is_shift_held(const inputstate* is) { return inputstate_is_left_shift_held(is) || inputstate_is_right_shift_held(is); }

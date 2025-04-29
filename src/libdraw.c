@@ -22,10 +22,10 @@
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
-//#define DEFAULT_WIN_WIDTH 960
-//#define DEFAULT_WIN_HEIGHT 540
-#define DEFAULT_WIN_WIDTH 1920
-#define DEFAULT_WIN_HEIGHT 1080
+#define DEFAULT_WIN_WIDTH 960
+#define DEFAULT_WIN_HEIGHT 540
+//#define DEFAULT_WIN_WIDTH 1920
+//#define DEFAULT_WIN_HEIGHT 1080
 
 //#define DEFAULT_WIN_WIDTH 1280
 //#define DEFAULT_WIN_HEIGHT 720
@@ -37,7 +37,10 @@ hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 Shader shader_grayscale = {0};
-Shader shader_tile_glow = {0};
+Shader shader_glow = {0};
+Shader shader_red_glow = {0};
+Shader shader_color_noise = {0};
+Shader shader_psychedelic_0 = {0};
 
 RenderTexture2D target = {0};
 Rectangle target_src = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
@@ -331,14 +334,21 @@ static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
 }
 
 static void load_shaders() {
-    //shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
-    //shader_tile_glow = LoadShader(0, "glow.frag");
+    shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
+    shader_glow = LoadShader(0, "glow.frag");
+    shader_red_glow = LoadShader(0, "red-glow.frag");
+    shader_color_noise = LoadShader(0, "colornoise.frag");
+    shader_psychedelic_0 = LoadShader(0, "psychedelic-0.frag");
+
     //shader_tile_glow = LoadShader(0, "psychedelic_ripple.frag");
 }
 
 static void libdraw_unload_shaders() {
     UnloadShader(shader_grayscale);
-    UnloadShader(shader_tile_glow);
+    UnloadShader(shader_glow);
+    UnloadShader(shader_red_glow);
+    UnloadShader(shader_color_noise);
+    UnloadShader(shader_psychedelic_0);
 }
 
 static inline bool libdraw_camera_lock_on(gamestate* const g) {
@@ -812,11 +822,13 @@ void libdraw_drawframe(gamestate* const g) {
     BeginDrawing();
     ClearBackground(WHITE);
     BeginTextureMode(target);
+
+    //BeginShaderMode(shader_psychedelic_0);
+    //float time = (float)GetTime(); // Current time in seconds
+    //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
+
     libdraw_drawframe_2d(g);
 
-    //BeginShaderMode(shader_grayscale);
-    //float time = (float)GetTime(); // Current time in seconds
-    //SetShaderValue(shader_grayscale, GetShaderLocation(shader_grayscale, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
 
     draw_message_box(g);
