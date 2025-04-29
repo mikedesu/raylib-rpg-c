@@ -754,21 +754,21 @@ static void draw_message_box(gamestate* g) {
     const char* msg = g->msg_system.messages[g->msg_system.index];
     //Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.5f);
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    int font_size = 20;
-    int pad = 20; // Inner padding (text <-> box edges)
-    float line_spacing = 1.0f;
+    //int font_size = 10;
+    //int pad = 20; // Inner padding (text <-> box edges)
+    //float line_spacing = 1.0f;
     // Measure text (split into lines if needed)
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, font_size, line_spacing);
+    const Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, g->font_size, g->line_spacing);
     // Calculate centered box position
-    const Rectangle box = {.x = (g->windowwidth - text_size.x) / 2 - pad, // Center X
-                           .y = (g->windowheight - text_size.y) / 2 - pad, // Center Y
-                           .width = text_size.x + pad * 2,
-                           .height = text_size.y + pad * 2};
+    const Rectangle box = {.x = (g->windowwidth - text_size.x) / 2 - g->pad, // Center X
+                           .y = (g->windowheight - text_size.y) / 2 - g->pad, // Center Y
+                           .width = text_size.x + g->pad * 2,
+                           .height = text_size.y + g->pad * 2};
     // Draw box (semi-transparent black with white border)
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
     // Draw text (centered in box)
-    DrawTextEx(GetFontDefault(), msg, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
+    DrawTextEx(GetFontDefault(), msg, (Vector2){box.x + g->pad, box.y + g->pad}, g->font_size, g->line_spacing, WHITE);
     // Show "Next" prompt if more messages exist
     if (g->msg_system.count > 1) {
         int prompt_font_size = 10;
@@ -807,17 +807,18 @@ void libdraw_drawframe(gamestate* const g) {
     BeginTextureMode(target);
     libdraw_drawframe_2d(g);
 
-    EndTextureMode();
     //BeginShaderMode(shader_grayscale);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_grayscale, GetShaderLocation(shader_grayscale, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
-    DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
 
     draw_message_box(g);
     draw_message_history(g);
     draw_hud(g);
     draw_inventory_menu(g);
+
+    EndTextureMode();
+    DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
 
     handle_debug_panel(g);
 
@@ -1026,9 +1027,9 @@ static void create_sg_byid(gamestate* const g, entityid id) {
 
 static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    const int font_size = 20;
-    const int pad = 40; // Inner padding (text <-> box edges)
-    const float line_spacing = 1.0f;
+    //const int font_size = 10;
+    //const int pad = 40; // Inner padding (text <-> box edges)
+    //const float line_spacing = 1.0f;
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "entity is NULL");
     const int turn = g->turn_count, hp = e->stats.hp, maxhp = e->stats.maxhp, mp = e->stats.mp, maxmp = e->stats.maxmp, level = e->stats.level;
@@ -1046,16 +1047,19 @@ static void draw_hud(gamestate* const g) {
              0, // XP placeholder
              turn);
 
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, line_spacing);
-    const int box_w = text_size.x + pad, box_h = text_size.y + pad;
-    const int box_x = (g->windowwidth - box_w) / 2, box_y = (g->windowheight - box_h) * 7 / 8;
+    const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, g->font_size, g->line_spacing);
+    const int box_w = text_size.x + g->pad;
+    const int box_h = text_size.y + g->pad;
+    const int box_x = (g->windowwidth - box_w) / 2;
+    const int box_y = (g->windowheight - box_h) * 7 / 8;
     const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
 
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, 2, fg);
     // Calculate text position to center it within the box
-    const float text_x = box_x + (box_w - text_size.x) / 2, text_y = box_y + (box_h - text_size.y) / 2;
-    DrawTextEx(GetFontDefault(), buffer, (Vector2){text_x, text_y}, font_size, line_spacing, fg);
+    const float text_x = box_x + (box_w - text_size.x) / 2;
+    const float text_y = box_y + (box_h - text_size.y) / 2;
+    DrawTextEx(GetFontDefault(), buffer, (Vector2){text_x, text_y}, g->font_size, g->line_spacing, fg);
 }
 
 void libdraw_init(gamestate* const g) {
@@ -1086,9 +1090,6 @@ static void draw_message_history(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) { return; }
-    const int font_size = 20;
-    const int pad = 20; // Inner padding (text <-> box edges)
-    const float line_spacing = 1.0f;
     const int max_messages = 20;
     const int x = 20;
     const int y = 20;
@@ -1107,91 +1108,91 @@ static void draw_message_history(gamestate* const g) {
     // chop off the last newline
     if (strlen(tmp_buffer) > 0) { tmp_buffer[strlen(tmp_buffer) - 1] = '\0'; }
     // Measure text (split into lines if needed)
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp_buffer, font_size, line_spacing);
+    const Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp_buffer, g->font_size, g->line_spacing);
     // Calculate box position
     // we want the box to be in the top left corner of the screen
-    const Rectangle box = {.x = x, .y = y, .width = text_size.x + pad * 2, .height = text_size.y + pad * 2};
+    const Rectangle box = {.x = x, .y = y, .width = text_size.x + g->pad * 2, .height = text_size.y + g->pad * 2};
     // Draw box (semi-transparent black with white border)
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
     // Draw text (centered in box)
-    DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){box.x + pad, box.y + pad}, font_size, line_spacing, WHITE);
+    DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){box.x + g->pad, box.y + g->pad}, g->font_size, g->line_spacing, WHITE);
 }
 
 static void draw_inventory_menu(gamestate* const g) {
     massert(g, "gamestate is NULL");
-
     if (!g->display_inventory_menu) return;
-
-    const int font_size = 20;
-    const int pad = 20; // Inner padding (text <-> box edges)
-    const float line_spacing = 1.0f;
 
     const char* menu_title = "Inventory Menu";
 
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "hero entity is NULL");
 
-    // Calculate max text width required: start with menu_title width as baseline
-    Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, line_spacing);
-    float max_text_width = title_size.x;
+    // Parameters
+    const int box_pad = g->pad;
+    const int section_gap = 16;
+    const int item_list_pad = g->pad;
+    const int max_visible_items = 12; // arbitrary limit for list height
 
-    // Count inventory items and find longest item name width
-    int item_count = 0;
-    float max_item_width = 0.0f;
-    for (int i = 0; i < hero->inventory_count; i++) {
-        int item_id = hero->inventory[i];
-        if (item_id == 0) continue; // skip empty slots (if 0 means empty)
+    // Measure title
+    Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
 
-        entity* item_entity = em_get(g->entitymap, item_id);
-        if (!item_entity) continue;
+    // Menu box size
+    float menu_width = g->windowwidth * 0.5f;
+    float menu_height = g->windowheight * 0.6f;
 
-        item_count++;
+    Rectangle menu_box = {.x = (g->windowwidth - menu_width) / 2.0f, .y = (g->windowheight - menu_height) / 4.0f, .width = menu_width, .height = menu_height};
 
-        Vector2 item_name_size = MeasureTextEx(GetFontDefault(), item_entity->name, font_size, line_spacing);
-        if (item_name_size.x > max_item_width) { max_item_width = item_name_size.x; }
-    }
+    // Draw menu background and border
+    DrawRectangleRec(menu_box, (Color){0x33, 0x33, 0x33, 0xff});
+    DrawRectangleLinesEx(menu_box, 2, WHITE);
 
-    // Use the larger width between menu title and longest item name
-    if (max_item_width > max_text_width) { max_text_width = max_item_width; }
+    // Draw menu title centered at top
+    float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f;
+    float title_y = menu_box.y + box_pad;
+    DrawTextEx(GetFontDefault(), menu_title, (Vector2){title_x, title_y}, g->font_size, g->line_spacing, WHITE);
 
-    // Calculate box dimensions
-    const int lines_to_draw = item_count + 2; // +1 for title, +1 for blank line
-    Vector2 single_line_size = MeasureTextEx(GetFontDefault(), "A", font_size, line_spacing);
-    float line_height = single_line_size.y;
+    // Partition into left/right halves (with gap)
+    float half_width = (menu_box.width - section_gap) / 2.0f;
+    float half_height = menu_box.height - title_size.y - box_pad * 2.0f - box_pad;
 
-    const float box_width = max_text_width + pad * 2;
-    const float box_height = (line_height * lines_to_draw) + pad * 2;
+    // Left box: inventory list
+    Rectangle left_box = {.x = menu_box.x + box_pad, .y = title_y + title_size.y + box_pad, .width = half_width - box_pad, .height = half_height};
 
-    // Position box centered horizontally, 1/4 down screen vertically
-    const float box_x = (g->windowwidth - box_width) / 2;
-    const float box_y = (g->windowheight - box_height) / 4;
+    // Right box: item info
+    //    Rectangle right_box = {.x = left_box.x + half_width + section_gap, .y = left_box.y, .width = half_width - box_pad, .height = half_height};
+    Rectangle right_box = {.x = left_box.x + half_width + section_gap, .y = left_box.y, .width = half_width - box_pad * 2, .height = half_height};
 
-    // Draw background box and border
-    Rectangle box = {box_x, box_y, box_width, box_height};
-    DrawRectangleRec(box, (Color){0x33, 0x33, 0x33, 0xff});
-    DrawRectangleLinesEx(box, 2, WHITE);
+    // Draw left and right boxes
+    DrawRectangleRec(left_box, (Color){0x22, 0x22, 0x22, 0xff});
+    DrawRectangleLinesEx(left_box, 2, WHITE);
+    DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
+    DrawRectangleLinesEx(right_box, 2, WHITE);
 
-    // Draw the title centered at top inside the box with padding
-    float title_x = box_x + pad + (max_text_width - title_size.x) / 2;
-    float current_y = box_y + pad;
-    DrawTextEx(GetFontDefault(), menu_title, (Vector2){title_x, current_y}, font_size, line_spacing, WHITE);
-
-    // Skip a line after title
-    current_y += line_height;
-    current_y += line_height;
-
-    // Draw each inventory item name left aligned with padding
-    for (int i = 0; i < hero->inventory_count; i++) {
+    // Draw inventory items in left_box
+    float item_y = left_box.y + item_list_pad;
+    for (int i = 0; i < hero->inventory_count && i < max_visible_items; i++) {
         int item_id = hero->inventory[i];
         if (item_id == 0) continue;
-
         entity* item_entity = em_get(g->entitymap, item_id);
         if (!item_entity) continue;
 
-        DrawTextEx(GetFontDefault(), item_entity->name, (Vector2){box_x + pad, current_y}, font_size, line_spacing, WHITE);
-        current_y += line_height;
+        // Draw each item name
+        float item_x = left_box.x + item_list_pad;
+        DrawTextEx(GetFontDefault(), item_entity->name, (Vector2){item_x, item_y}, g->font_size, g->line_spacing, WHITE);
+
+        item_y += g->font_size + 4;
     }
+
+    // Draw placeholder info in right_box
+    const char* info_title = "Item Info:";
+    const char* info_text = "Select an item to view details here.";
+
+    float info_title_y = right_box.y + item_list_pad;
+    float info_text_y = info_title_y + g->font_size + 8;
+
+    DrawTextEx(GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, g->font_size, g->line_spacing, YELLOW);
+    DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, g->font_size, g->line_spacing, LIGHTGRAY);
 }
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }

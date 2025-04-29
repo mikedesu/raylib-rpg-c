@@ -76,6 +76,9 @@ gamestate* gamestateinitptr() {
     g->entity_turn = -1;
     g->gameover = false;
     g->test_guard = false;
+    g->font_size = 10;
+    g->pad = 20;
+    g->line_spacing = 1.0f;
     gamestate_init_msg_history(g);
     return g;
 }

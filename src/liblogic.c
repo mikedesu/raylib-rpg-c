@@ -652,7 +652,6 @@ static entity* create_sword(gamestate* g) {
     return e;
 }
 
-//static void create_sword_at(gamestate* g, int x, int y) {
 static entity* create_sword_at(gamestate* g, int x, int y) {
     entityid id = weapon_create(g, x, y, 0, "sword");
     massert(id != ENTITYID_INVALID, "weapon create fail");

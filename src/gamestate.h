@@ -75,6 +75,9 @@ typedef struct gamestate {
     fadestate_t fadestate;
 
     Font font;
+    int font_size;
+    int pad;
+    float line_spacing;
 
     dungeon_t* dungeon;
 
