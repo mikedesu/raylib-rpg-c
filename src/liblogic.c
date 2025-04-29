@@ -16,6 +16,7 @@
 #include "location.h"
 #include "massert.h"
 #include "mprint.h"
+#include "potiontype.h"
 #include "race.h"
 #include <assert.h>
 #include <math.h>
@@ -47,6 +48,8 @@ static void create_dwarf_at(gamestate* g, int x, int y);
 static void create_elf_at(gamestate* g, int x, int y);
 static void create_orc_at(gamestate* g, int x, int y);
 static void create_human_at(gamestate* g, int x, int y);
+
+static void init_potion_test(gamestate* const g, potiontype_t potion_type, const char* name);
 static void init_humans_test(gamestate* const g);
 static void init_orcs_test(gamestate* const g);
 static void init_elves_test(gamestate* const g);
@@ -501,6 +504,46 @@ static void execute_action(gamestate* const g, entity* const e, entity_action_t 
     }
 }
 
+static entityid potion_create_at(gamestate* const g, potiontype_t potion_type, const char* name, int x, int y, int fl) {
+    massert(g, "gamestate is NULL");
+    em_t* em = gamestate_get_entitymap(g);
+    massert(em, "entitymap is NULL");
+    massert(name && name[0], "name is NULL or empty");
+    massert(potion_type >= 0, "potion_type is NONE or less than 0");
+    massert(potion_type < POTION_COUNT, "potion_type is out of bounds");
+    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    massert(df, "failed to get current dungeon floor");
+    massert(x >= 0, "x is out of bounds");
+    massert(x < df->width, "x is out of bounds");
+    massert(y >= 0, "y is out of bounds");
+    massert(y < df->height, "y is out of bounds");
+    tile_t* const tile = df_tile_at(df, x, y);
+    massert(tile, "failed to get tile");
+    if (!tile_is_walkable(tile->type)) {
+        merror("cannot create entity on wall");
+        return ENTITYID_INVALID;
+    }
+    if (tile_has_live_npcs(tile, em)) {
+        merror("cannot create entity on tile with NPC");
+        return ENTITYID_INVALID;
+    }
+    entity* const e = e_new_potion_at(next_entityid++, potion_type, name, x, y, fl);
+    if (!e) {
+        merror("failed to create entity");
+        return ENTITYID_INVALID;
+    }
+    // FIRST try to add to dungeon floor
+    if (!df_add_at(df, e->id, x, y)) {
+        merror("failed to add entity to dungeon floor");
+        free(e); // Free immediately since EM doesn't own it yet
+        return ENTITYID_INVALID;
+    }
+    // ONLY add to EM after dungeon placement succeeds
+    em_add(gamestate_get_entitymap(g), e);
+    gs_add_entityid(g, e->id);
+    return e->id;
+}
+
 static entityid weapon_create(gamestate* const g, int x, int y, int fl, const char* name) {
     massert(g, "gamestate is NULL");
     em_t* em = gamestate_get_entitymap(g);
@@ -679,6 +722,30 @@ static void init_shield_test(gamestate* g) {
             if (tile_entity_count(tile) > 0) continue;
             if (!tile_is_walkable(tile->type)) continue;
             create_shield_at(g, nx, ny);
+            found = true;
+        }
+    }
+}
+
+static void init_potion_test(gamestate* const g, potiontype_t potion_type, const char* name) {
+    massert(g, "gamestate is NULL");
+    dungeon_t* d = g->dungeon;
+    massert(d, "dungeon is NULL");
+    dungeon_floor_t* df = dungeon_get_floor(d, 0);
+    massert(df, "floor is NULL");
+    entity* e = em_get(g->entitymap, g->hero_id);
+    massert(e, "e is NULL");
+
+    bool found = false;
+    for (int i = -1; i <= 1 && !found; i++) {
+        for (int j = -1; j <= 1 && !found; j++) {
+            if (i == 0 && j == 0) continue;
+            int nx = e->x + i;
+            int ny = e->y + j;
+            tile_t* tile = df_tile_at(df, nx, ny);
+            if (tile_entity_count(tile) > 0) continue;
+            if (!tile_is_walkable(tile->type)) continue;
+            potion_create_at(g, potion_type, name, nx, ny, 0);
             found = true;
         }
     }
@@ -1151,20 +1218,41 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         massert(item, "item is NULL");
 
         if (item->type == ENTITY_WEAPON) {
-            // equip the weapon
+            // attempt to equip the weapon
+            // check if the hero is already equipped with the weapon
+            if (hero->weapon == item_id) {
+                add_message(g, "You are already using %s", item->name);
+                g->controlmode = CONTROLMODE_PLAYER;
+                g->display_inventory_menu = false;
+                return;
+            }
+
             hero->weapon = item_id;
             add_message(g, "Equipped %s", item->name);
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         } else if (item->type == ENTITY_SHIELD) {
-            // equip the shield
+            // attempt to equip the shield
+            // check if the hero is already equipped with the shield
+            if (hero->shield == item_id) {
+                add_message(g, "You are already using %s", item->name);
+                g->controlmode = CONTROLMODE_PLAYER;
+                g->display_inventory_menu = false;
+                return;
+            }
+
             hero->shield = item_id;
             add_message(g, "Equipped %s", item->name);
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (item->type == ENTITY_POTION) {
+            add_message(g, "Potion use is not handled yet!");
+            g->controlmode = CONTROLMODE_PLAYER;
+            g->display_inventory_menu = false;
         }
+
         //else {
         //    add_message(g, "You cannot equip this item!");
         //g->controlmode = CONTROLMODE_PLAYER;
@@ -1245,38 +1333,28 @@ static bool try_entity_pickup(gamestate* const g, entity* const e) {
             merror("Failed to get entity");
             return false;
         }
-        if (it->type == ENTITY_WEAPON) {
-            // pick up the item
-            // picking up an item requires:
-            // 1. removing its id from the tile
-            // 2. adding its id to the entity inventory
-            // remove the item from the tile
+        if (it->type == ENTITY_WEAPON || it->type == ENTITY_SHIELD || it->type == ENTITY_POTION) {
             add_message(g, "Picked up %s", it->name);
             tile_remove(tile, id);
-            // add the item to the entity inventory
             e_add_item_to_inventory(e, id);
-            // disabling auto-equip
-            //e->weapon = id;
-            msuccess("Picked up item: %s", it->name);
-            if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return true;
-        } else if (it->type == ENTITY_SHIELD) {
-            // pick up the item
-            // picking up an item requires:
-            // 1. removing its id from the tile
-            // 2. adding its id to the entity inventory
-            // remove the item from the tile
-            add_message(g, "Picked up %s", it->name);
-            tile_remove(tile, id);
-            // add the item to the entity inventory
-            e_add_item_to_inventory(e, id);
-            // disabling auto-equip
-            //update_equipped_shield_dir(g, e);
-            //e->shield = id;
             msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return true;
         }
+        // else if (it->type == ENTITY_SHIELD) {
+        //     add_message(g, "Picked up %s", it->name);
+        //     tile_remove(tile, id);
+        //     e_add_item_to_inventory(e, id);
+        //     msuccess("Picked up item: %s", it->name);
+        //     if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        //     return true;
+        // } else if (it->type == ENTITY_POTION) {
+        //     add_message(g, "Picked up %s", it->name);
+        //     tile_remove(tile, id);
+        //     e_add_item_to_inventory(e, id);
+        //     msuccess("Picked up item: %s", it->name);
+        //     if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        // }
     }
     add_message(g, "No items to pick up");
     return false;
@@ -1372,7 +1450,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) { return; }
 
     if (g->msg_system.is_active) {
-        if (inputstate_is_pressed(is, KEY_I) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_A) ||
+        if (inputstate_is_pressed(is, KEY_I) || inputstate_is_pressed(is, KEY_U) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_A) ||
             inputstate_is_pressed(is, KEY_SPACE) || inputstate_is_pressed(is, KEY_COMMA) || inputstate_is_pressed(is, KEY_PERIOD)) {
             //if (strcmp(action, "attack") == 0 || strcmp(action, "pickup") == 0) {
             g->msg_system.index++;
@@ -1603,6 +1681,10 @@ void liblogic_init(gamestate* const g) {
     // test to create a weapon
     init_weapon_test(g);
     init_shield_test(g);
+    init_potion_test(g, POTION_HP_SMALL, "small healing potion");
+    init_potion_test(g, POTION_HP_MEDIUM, "medium healing potion");
+    init_potion_test(g, POTION_HP_LARGE, "large healing potion");
+
     // temporarily disabling
     //init_humans_test(g);
     //init_orcs_test(g);

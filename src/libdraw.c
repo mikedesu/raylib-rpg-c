@@ -1,6 +1,7 @@
 #include "direction.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
+#include "entitytype.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
@@ -250,7 +251,7 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(e, "entity is NULL");
 
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-    massert(sg, "spritegroup is NULL");
+    massert(sg, "spritegroup is NULL: id %d name %s", id, e->name);
 
     sprite* s = sg_get_current(sg);
     massert(s, "sprite is NULL");
@@ -1045,6 +1046,23 @@ static void create_sg_byid(gamestate* const g, entityid id) {
         keys = TX_BUCKLER_KEYS;
         num_keys = TX_BUCKLER_KEY_COUNT;
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    } else if (e->type == ENTITY_POTION) {
+        massert(e->potion_type != POTION_NONE, "potion_type is NONE");
+
+        // check the potion type
+        if (e->potion_type == POTION_HP_SMALL) {
+            keys = TX_POTION_HP_SMALL_KEYS;
+            num_keys = TX_POTION_HP_SMALL_KEY_COUNT;
+            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        } else if (e->potion_type == POTION_HP_MEDIUM) {
+            keys = TX_POTION_HP_MEDIUM_KEYS;
+            num_keys = TX_POTION_HP_MEDIUM_KEY_COUNT;
+            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        } else if (e->potion_type == POTION_HP_LARGE) {
+            keys = TX_POTION_HP_LARGE_KEYS;
+            num_keys = TX_POTION_HP_LARGE_KEY_COUNT;
+            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        }
     }
 }
 
@@ -1253,7 +1271,8 @@ static void draw_inventory_menu(gamestate* const g) {
             const int scale = 5;
             const float sprite_width = s->width * scale;
             const float sprite_height = s->height * scale;
-            const float sprite_margin = -8 * scale; // space from top and right edges
+            //const float sprite_margin = -8 * scale; // space from top and right edges
+            const float sprite_margin = 0; // space from top and right edges
 
             // Anchor to top-right of right_box, account for margin
             const float sprite_x = right_box.x + right_box.width - sprite_margin - sprite_width;

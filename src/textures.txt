@@ -282,9 +282,9 @@
 201 1 4  0  img/items/potion_hp_small.png
 202 1 4  0  img/items/potion_hp_medium.png
 203 1 4  0  img/items/potion_hp_large.png
-204 1 4  0  img/items/potion_mp_small.png
-205 1 4  0  img/items/potion_mp_medium.png
-206 1 4  0  img/items/potion_mp_large.png
+#204 1 4  0  img/items/potion_mp_small.png
+#205 1 4  0  img/items/potion_mp_medium.png
+#206 1 4  0  img/items/potion_mp_large.png
 #
 #
 #

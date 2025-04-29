@@ -146,6 +146,7 @@ static inline entity_t* e_new_potion(entityid id, potiontype_t potion_type, cons
     entity_t* e = e_new(id, ENTITY_POTION);
     massert(e, "Failed to create potion entity");
     e_set_name(e, name);
+    e->potion_type = potion_type;
     return e;
 }
 
