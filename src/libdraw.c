@@ -22,13 +22,14 @@
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
-#define DEFAULT_WIN_WIDTH 960
-#define DEFAULT_WIN_HEIGHT 540
+//#define DEFAULT_WIN_WIDTH 960
+//#define DEFAULT_WIN_HEIGHT 540
+
 //#define DEFAULT_WIN_WIDTH 1920
 //#define DEFAULT_WIN_HEIGHT 1080
 
-//#define DEFAULT_WIN_WIDTH 1280
-//#define DEFAULT_WIN_HEIGHT 720
+#define DEFAULT_WIN_WIDTH 1280
+#define DEFAULT_WIN_HEIGHT 720
 
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
@@ -1110,11 +1111,11 @@ static void draw_message_history(gamestate* const g) {
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) { return; }
     const int max_messages = 20;
-    const int x = 20;
-    const int y = 20;
+    const int x = 10;
+    const int y = 10;
     int current_count = 0;
     char tmp_buffer[2048] = {0};
-    Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
+    Color message_bg = (Color){0x33, 0x33, 0x33, 0x1f};
     // instead of a placeholder message, we now need to actually draw the message history
     // we might only render the last N messages
     for (int i = g->msg_history.count - 1; i >= 0 && current_count < max_messages; i--) {
@@ -1155,8 +1156,8 @@ static void draw_inventory_menu(gamestate* const g) {
     Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
 
     // Menu box size
-    float menu_width = g->windowwidth * 0.5f;
-    float menu_height = g->windowheight * 0.3f;
+    float menu_width = g->windowwidth * 0.8f;
+    float menu_height = g->windowheight * 0.8f;
 
     Rectangle menu_box = {.x = (g->windowwidth - menu_width) / 2.0f, .y = (g->windowheight - menu_height) / 4.0f, .width = menu_width, .height = menu_height};
 
@@ -1240,7 +1241,7 @@ static void draw_inventory_menu(gamestate* const g) {
     float info_text_y = info_title_y + g->font_size + 8;
 
     DrawTextEx(
-        GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, g->font_size, g->line_spacing, (Color){0x66, 0x66, 0x66, 0xff});
+        GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, g->font_size, g->line_spacing, (Color){0xaa, 0xaa, 0xaa, 0xff});
     DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, g->font_size, g->line_spacing, WHITE);
 
     if (sg) {
