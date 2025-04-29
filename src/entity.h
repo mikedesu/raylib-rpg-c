@@ -5,6 +5,7 @@
 #include "entityid.h"
 #include "entitytype.h"
 #include "massert.h"
+#include "potiontype.h"
 #include "race.h"
 #include <stdbool.h>
 #include <string.h>
@@ -40,6 +41,9 @@ typedef struct entity_t {
     int sprite_move_y;
 
     entity_stats_t stats;
+
+    // if the entity is a potion...
+    potiontype_t potion_type;
 
     bool do_update;
     bool is_attacking;
@@ -129,6 +133,27 @@ static inline entity_t* e_new_weapon(entityid id, const char* name) {
     entity_t* e = e_new(id, ENTITY_WEAPON);
     massert(e, "Failed to create weapon entity");
     e_set_name(e, name);
+    return e;
+}
+
+static inline entity_t* e_new_potion(entityid id, potiontype_t potion_type, const char* name) {
+    massert(id >= 0, "id is less than 0");
+    massert(potion_type >= 0, "potion_type is less than 0");
+    massert(potion_type < POTION_COUNT, "potion_type is greater than POTION_COUNT");
+    massert(name, "name is NULL");
+    massert(strlen(name) > 0, "name is empty");
+    massert(strlen(name) < ENTITY_NAME_LEN_MAX, "name is too long");
+    entity_t* e = e_new(id, ENTITY_POTION);
+    massert(e, "Failed to create potion entity");
+    e_set_name(e, name);
+    return e;
+}
+
+static inline entity_t* e_new_potion_at(entityid id, potiontype_t potion_type, const char* name, int x, int y, int floor) {
+    entity_t* e = e_new_potion(id, potion_type, name);
+    massert(e, "Failed to create potion entity");
+    e_set_xy(e, x, y);
+    e_set_floor(e, floor);
     return e;
 }
 

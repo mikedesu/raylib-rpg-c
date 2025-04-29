@@ -22,6 +22,8 @@ entity_t* e_new(entityid id, entitytype_t type) {
     e->stats.hp = e->stats.maxhp = 1;
     e->do_update = e->is_attacking = e->is_blocking = e->is_damaged = e->dead = false;
 
+    e->potion_type = POTION_NONE;
+
     e->next = NULL;
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     return e;
