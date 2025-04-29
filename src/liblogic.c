@@ -1170,6 +1170,27 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         //g->controlmode = CONTROLMODE_PLAYER;
         //g->display_inventory_menu = false;
         //}
+    } else if (inputstate_is_pressed(is, KEY_U)) {
+        // we need to grab the entityid of the selected item
+        entityid item_id = hero->inventory[g->inventory_menu_selection];
+        entity* item = em_get(g->entitymap, item_id);
+        massert(item, "item is NULL");
+
+        if (item->type == ENTITY_WEAPON) {
+            // unequip the weapon
+            hero->weapon = ENTITYID_INVALID;
+            add_message(g, "Unequipped %s", item->name);
+            g->controlmode = CONTROLMODE_PLAYER;
+            g->display_inventory_menu = false;
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (item->type == ENTITY_SHIELD) {
+            // equip the shield
+            hero->shield = ENTITYID_INVALID;
+            add_message(g, "Unequipped %s", item->name);
+            g->controlmode = CONTROLMODE_PLAYER;
+            g->display_inventory_menu = false;
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        }
     }
 }
 
