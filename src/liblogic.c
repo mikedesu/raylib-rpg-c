@@ -36,16 +36,17 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
 static inline void add_message_history(gamestate* const g, const char* msg);
 static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
-static entity_t* create_shield(gamestate* g);
-static entity_t* create_sword(gamestate* g);
-static void create_shield_at(gamestate* g, int x, int y);
+static entity* create_shield(gamestate* g);
+static entity* create_sword(gamestate* g);
+static entity* create_sword_at(gamestate* g, int x, int y);
+static entity* create_shield_at(gamestate* g, int x, int y);
+
 static void create_goblin_at(gamestate* g, int x, int y);
 static void create_halfling_at(gamestate* g, int x, int y);
 static void create_dwarf_at(gamestate* g, int x, int y);
 static void create_elf_at(gamestate* g, int x, int y);
 static void create_orc_at(gamestate* g, int x, int y);
 static void create_human_at(gamestate* g, int x, int y);
-static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 static void init_humans_test(gamestate* const g);
 static void init_orcs_test(gamestate* const g);
 static void init_elves_test(gamestate* const g);
@@ -58,14 +59,18 @@ static void init_goblins_test_intermediate(gamestate* const g);
 static void init_halflings_test_intermediate(gamestate* const g);
 static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
-static const char* get_action_key(const inputstate* const is, gamestate* const g);
 static void update_player_state(gamestate* const g);
 static void update_debug_panel_buffer(gamestate* const g);
 static void handle_camera_move(gamestate* const g, const inputstate* const is);
 static void handle_input(const inputstate* const is, gamestate* const g);
 static void handle_input_camera(const inputstate* const is, gamestate* const g);
 static void handle_input_player(const inputstate* const is, gamestate* const g);
+
+static const char* get_action_key(const inputstate* const is, gamestate* const g);
+
 static int tile_npc_count(gamestate* const g, dungeon_floor_t* const df, tile_t* const tile);
+
+static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 
 static inline void add_message_history(gamestate* const g, const char* msg) {
     massert(g, "gamestate is NULL");
@@ -619,24 +624,25 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
     return tile;
 }
 
-static entity_t* create_shield(gamestate* g) {
+static entity* create_shield(gamestate* g) {
     massert(g, "gamestate is NULL");
     entityid id = next_entityid++;
-    entity_t* e = e_new_shield(id, "shield");
+    entity* e = e_new_shield(id, "shield");
     massert(e, "failed to create shield");
     em_add(g->entitymap, e);
     gs_add_entityid(g, id);
     return e;
 }
 
-static void create_shield_at(gamestate* g, int x, int y) {
+static entity* create_shield_at(gamestate* g, int x, int y) {
     entityid id = shield_create(g, x, y, 0, "shield");
     massert(id != ENTITYID_INVALID, "shield create fail");
     entity* s = em_get(g->entitymap, id);
     massert(s, "shield is NULL");
+    return s;
 }
 
-static entity_t* create_sword(gamestate* g) {
+static entity* create_sword(gamestate* g) {
     massert(g, "gamestate is NULL");
     entityid id = next_entityid++;
     entity_t* e = e_new_weapon(id, "sword");
@@ -646,11 +652,13 @@ static entity_t* create_sword(gamestate* g) {
     return e;
 }
 
-static void create_sword_at(gamestate* g, int x, int y) {
+//static void create_sword_at(gamestate* g, int x, int y) {
+static entity* create_sword_at(gamestate* g, int x, int y) {
     entityid id = weapon_create(g, x, y, 0, "sword");
     massert(id != ENTITYID_INVALID, "weapon create fail");
     entity* s = em_get(g->entitymap, id);
     massert(s, "sword is NULL");
+    return s;
 }
 
 static void init_shield_test(gamestate* g) {
@@ -681,11 +689,15 @@ static void init_weapon_test(gamestate* g) {
     massert(g, "gamestate is NULL");
     entity* e = em_get(g->entitymap, g->hero_id);
     massert(e, "hero entity is NULL");
-    entity_t* sword = create_sword(g);
-    massert(sword, "failed to create sword");
 
-    e_add_item_to_inventory(e, sword->id);
-    e->weapon = sword->id;
+    //entity_t* sword = create_sword(g);
+    //massert(sword, "failed to create sword");
+
+    create_sword_at(g, e->x + 1, e->y);
+    //massert(sword, "failed to create sword");
+
+    //e_add_item_to_inventory(e, sword->id);
+    //e->weapon = sword->id;
 }
 
 static void init_dungeon(gamestate* const g) {

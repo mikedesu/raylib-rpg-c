@@ -147,24 +147,31 @@ void gamerun() {
 
     draw_last_write_time = getlastwritetime(LIBDRAW_PATH);
     logic_last_write_time = getlastwritetime(LIBLOGIC_PATH);
+
     load_draw_symbols();
     load_logic_symbols();
+
     myliblogic_init(g);
     mylibdraw_init(g);
+
     while (!mylibdraw_windowshouldclose()) {
         mylibdraw_update_input(&is);
         myliblogic_tick(&is, g);
         mylibdraw_update_sprites(g);
         mylibdraw_drawframe(g);
         autoreload_every_n_sec(5, g);
-        if (inputstate_is_pressed(&is, KEY_ESCAPE)) break;
+        //if (inputstate_is_pressed(&is, KEY_ESCAPE)) break;
     }
+
     mylibdraw_close();
     msuccess("libdraw closed");
+
     myliblogic_close(g);
     msuccess("liblogic closed");
+
     dlclose(draw_handle);
     msuccess("dlclose libdraw");
+
     dlclose(logic_handle);
     msuccess("dlclose liblogic");
 

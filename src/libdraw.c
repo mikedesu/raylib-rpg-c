@@ -22,13 +22,13 @@
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
-#define DEFAULT_WIN_WIDTH 960
-#define DEFAULT_WIN_HEIGHT 540
+//#define DEFAULT_WIN_WIDTH 960
+//#define DEFAULT_WIN_HEIGHT 540
 //#define DEFAULT_WIN_WIDTH 1920
 //#define DEFAULT_WIN_HEIGHT 1080
 
-//#define DEFAULT_WIN_WIDTH 1280
-//#define DEFAULT_WIN_HEIGHT 720
+#define DEFAULT_WIN_WIDTH 1280
+#define DEFAULT_WIN_HEIGHT 720
 
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
@@ -754,7 +754,7 @@ static void draw_message_box(gamestate* g) {
     const char* msg = g->msg_system.messages[g->msg_system.index];
     //Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.5f);
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    int font_size = 10;
+    int font_size = 20;
     int pad = 20; // Inner padding (text <-> box edges)
     float line_spacing = 1.0f;
     // Measure text (split into lines if needed)
@@ -1026,7 +1026,7 @@ static void create_sg_byid(gamestate* const g, entityid id) {
 
 static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    const int font_size = 10;
+    const int font_size = 20;
     const int pad = 40; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
     entity* const e = em_get(g->entitymap, g->hero_id);
@@ -1086,7 +1086,7 @@ static void draw_message_history(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) { return; }
-    const int font_size = 10;
+    const int font_size = 20;
     const int pad = 20; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
     const int max_messages = 20;
@@ -1123,7 +1123,7 @@ static void draw_inventory_menu(gamestate* const g) {
 
     if (!g->display_inventory_menu) return;
 
-    const int font_size = 10;
+    const int font_size = 20;
     const int pad = 20; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
 
