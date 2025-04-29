@@ -753,19 +753,31 @@ static void draw_message_box(gamestate* g) {
     const char* prompt = "[A] Next";
     const char* msg = g->msg_system.messages[g->msg_system.index];
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
+
+    // copy the message to a temporary buffer
+    char tmp[1024] = {0};
+    snprintf(tmp, sizeof(tmp), "%s", msg);
+
     // Measure text (split into lines if needed)
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, g->font_size, g->line_spacing);
+    //const Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, g->font_size, g->line_spacing);
+    //    const Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp, g->font_size, g->line_spacing);
+    int text_width = MeasureText(msg, g->font_size);
+    int text_height = g->font_size;
     // Calculate centered box position
-    const Rectangle box = {.x = (g->windowwidth - text_size.x) / 2 - g->pad, // Center X
-                           .y = (g->windowheight - text_size.y) / 2 - g->pad, // Center Y
-                           .width = text_size.x + g->pad * 2,
-                           .height = text_size.y + g->pad * 2};
+    //   const Rectangle box = {.x = (g->windowwidth - text_size.x) / 2 - g->pad, // Center X
+    //                          .y = (g->windowheight - text_size.y) / 2 - g->pad, // Center Y
+    //                          .width = text_size.x + g->pad * 2,
+    //                          .height = text_size.y + g->pad * 2};
+    const Rectangle box = {.x = (g->windowwidth - text_width) / 2.0 - g->pad,
+                           .y = (g->windowheight - text_height) / 2.0 - g->pad,
+                           .width = text_width + g->pad * 2,
+                           .height = text_height + g->pad * 2};
     // Draw box (semi-transparent black with white border)
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
     // Draw text (centered in box)
-    //DrawTextEx(GetFontDefault(), msg, (Vector2){box.x + g->pad, box.y + g->pad}, g->font_size, g->line_spacing, WHITE);
-    DrawText(msg, box.x + g->pad, box.y + g->pad, g->font_size, WHITE);
+    //DrawText(msg, box.x + g->pad, box.y + g->pad, g->font_size, WHITE);
+    DrawText(tmp, box.x + g->pad, box.y + g->pad, g->font_size, WHITE);
     // Show "Next" prompt if more messages exist
     if (g->msg_system.count > 1) {
         int prompt_font_size = 10;
@@ -1090,11 +1102,9 @@ static void draw_message_history(gamestate* const g) {
     const int y = 20;
     int current_count = 0;
     char tmp_buffer[2048] = {0};
-    //Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.8f);
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     // instead of a placeholder message, we now need to actually draw the message history
     // we might only render the last N messages
-    //int index = g->msg_history.count;
     for (int i = g->msg_history.count - 1; i >= 0 && current_count < max_messages; i--) {
         strncat(tmp_buffer, g->msg_history.messages[i], sizeof(tmp_buffer) - strlen(tmp_buffer) - 1);
         strncat(tmp_buffer, "\n", sizeof(tmp_buffer) - strlen(tmp_buffer) - 1);
@@ -1146,7 +1156,8 @@ static void draw_inventory_menu(gamestate* const g) {
     // Draw menu title centered at top
     float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f;
     float title_y = menu_box.y + box_pad;
-    DrawTextEx(GetFontDefault(), menu_title, (Vector2){title_x, title_y}, g->font_size, g->line_spacing, WHITE);
+    //DrawTextEx(GetFontDefault(), menu_title, (Vector2){title_x, title_y}, g->font_size, g->line_spacing, WHITE);
+    DrawText(menu_title, title_x, title_y, g->font_size, WHITE);
 
     // Partition into left/right halves (with gap)
     float half_width = (menu_box.width - section_gap) / 2.0f;
