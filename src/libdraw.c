@@ -751,7 +751,11 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
 static void libdraw_drawframe_2d(gamestate* const g) {
     BeginMode2D(g->cam2d);
 
+    //BeginShaderMode(shader_color_noise);
+    //float time = (float)GetTime(); // Current time in seconds
+    //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
     ClearBackground(BLACK);
+    //EndShaderMode();
 
     if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
@@ -827,10 +831,9 @@ void libdraw_drawframe(gamestate* const g) {
     //BeginShaderMode(shader_psychedelic_0);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
+    //EndShaderMode();
 
     libdraw_drawframe_2d(g);
-
-    //EndShaderMode();
 
     draw_message_box(g);
     draw_message_history(g);
