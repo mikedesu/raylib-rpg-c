@@ -1144,6 +1144,30 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
     } else if (inputstate_is_pressed(is, KEY_UP)) {
         g->inventory_menu_selection--;
         if (g->inventory_menu_selection < 0) { g->inventory_menu_selection = hero->inventory_count - 1; }
+    } else if (inputstate_is_pressed(is, KEY_ENTER)) {
+        // we need to grab the entityid of the selected item
+        entityid item_id = hero->inventory[g->inventory_menu_selection];
+        entity* item = em_get(g->entitymap, item_id);
+        massert(item, "item is NULL");
+
+        if (item->type == ENTITY_WEAPON) {
+            // equip the weapon
+            hero->weapon = item_id;
+            add_message(g, "Equipped %s", item->name);
+            g->controlmode = CONTROLMODE_PLAYER;
+            g->display_inventory_menu = false;
+        } else if (item->type == ENTITY_SHIELD) {
+            // equip the shield
+            hero->shield = item_id;
+            add_message(g, "Equipped %s", item->name);
+            g->controlmode = CONTROLMODE_PLAYER;
+            g->display_inventory_menu = false;
+        }
+        //else {
+        //    add_message(g, "You cannot equip this item!");
+        //g->controlmode = CONTROLMODE_PLAYER;
+        //g->display_inventory_menu = false;
+        //}
     }
 }
 

@@ -1184,6 +1184,12 @@ static void draw_inventory_menu(gamestate* const g) {
 
         float item_x = left_box.x + item_list_pad;
         char item_display[128];
+        bool is_equipped = false;
+        if (item_entity->type == ENTITY_WEAPON) {
+            is_equipped = (hero->weapon == item_id);
+        } else if (item_entity->type == ENTITY_SHIELD) {
+            is_equipped = (hero->shield == item_id);
+        }
 
         if (i == g->inventory_menu_selection) {
             snprintf(item_display, sizeof(item_display), "> %s", item_entity->name);
@@ -1191,19 +1197,11 @@ static void draw_inventory_menu(gamestate* const g) {
             snprintf(item_display, sizeof(item_display), "  %s", item_entity->name);
         }
 
+        if (is_equipped) { strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1); }
+
         DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, g->font_size, g->line_spacing, WHITE);
         item_y += g->font_size + 4;
     }
-
-    // Draw placeholder info in right_box
-    //const char* info_title = "Item Info:";
-    //const char* info_text = "Select an item to view details here.";
-    //
-    //    float info_title_y = right_box.y + item_list_pad;
-    //    float info_text_y = info_title_y + g->font_size + 8;
-
-    //    DrawTextEx(GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, g->font_size, g->line_spacing, YELLOW);
-    //    DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, g->font_size, g->line_spacing, LIGHTGRAY);
 
     // Draw item info in right_box
     const char* info_title = "Item Info:";
@@ -1233,21 +1231,6 @@ static void draw_inventory_menu(gamestate* const g) {
         GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, g->font_size, g->line_spacing, (Color){0x66, 0x66, 0x66, 0xff});
     DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, g->font_size, g->line_spacing, WHITE);
 
-    // Draw item sprite in right_box
-    //    if (sg) {
-    //        sprite* s = sg_get_current(sg);
-    //        if (s) {
-    //            const float sprite_x = right_box.x + right_box.width / 2 - s->width / 2.0;
-    //            const float sprite_y = info_text_y + g->font_size + 8;
-    //            const int scale = 5;
-    //            const float sprite_width = s->width * scale;
-    //            const float sprite_height = s->height * scale;
-    //            // DrawTextureRec(*s->texture, s->src, (Vector2){sprite_x, sprite_y}, WHITE);
-    //            DrawTexturePro(
-    //                *s->texture, s->src, (Rectangle){sprite_x, sprite_y, sprite_width, sprite_height}, (Vector2){sprite_width / 2, sprite_height / 2}, 0.0f, WHITE);
-    //        }
-    //    }
-
     if (sg) {
         sprite* s = sg_get_current(sg);
         if (s) {
@@ -1266,15 +1249,6 @@ static void draw_inventory_menu(gamestate* const g) {
                            (Vector2){0, 0}, // Top-left corner as origin
                            0.0f,
                            WHITE);
-
-            // draw a bounding box around the sprite
-            //DrawRectangleLinesEx((Rectangle){sprite_x, sprite_y, sprite_width, sprite_height}, 2, WHITE);
-
-            // draw a bounding box around the 8x8 center of the sprite
-            // dont forget to scale the 8x8 box
-            //const float center_x = sprite_x + (sprite_width - 8 * scale) / 2;
-            //const float center_y = sprite_y + (sprite_height - 8 * scale) / 2;
-            //DrawRectangleLinesEx((Rectangle){center_x, center_y, 8 * scale, 8 * scale}, 2, WHITE);
         }
     }
 }
