@@ -1156,12 +1156,14 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             add_message(g, "Equipped %s", item->name);
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         } else if (item->type == ENTITY_SHIELD) {
             // equip the shield
             hero->shield = item_id;
             add_message(g, "Equipped %s", item->name);
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         }
         //else {
         //    add_message(g, "You cannot equip this item!");
