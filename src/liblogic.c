@@ -683,31 +683,10 @@ static void init_weapon_test(gamestate* g) {
     massert(e, "hero entity is NULL");
     entity_t* sword = create_sword(g);
     massert(sword, "failed to create sword");
+
+    e_add_item_to_inventory(e, sword->id);
     e->weapon = sword->id;
 }
-
-//static void init_weapon_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    dungeon_t* d = g->dungeon;
-//    massert(d, "dungeon is NULL");
-//    dungeon_floor_t* df = dungeon_get_floor(d, 0);
-//    massert(df, "floor is NULL");
-//    entity* e = em_get(g->entitymap, g->hero_id);
-//    massert(e, "e is NULL");
-//    bool found = false;
-//    for (int i = -1; i <= 1 && !found; i++) {
-//        for (int j = -1; j <= 1 && !found; j++) {
-//            if (i == 0 && j == 0) continue;
-//            int nx = e->x + i;
-//            int ny = e->y + j;
-//            tile_t* tile = df_tile_at(df, nx, ny);
-//            if (tile_entity_count(tile) > 0) continue;
-//            if (!tile_is_walkable(tile->type)) continue;
-//            create_sword_at(g, nx, ny);
-//            found = true;
-//        }
-//    }
-//}
 
 static void init_dungeon(gamestate* const g) {
     massert(g, "gamestate is NULL");
@@ -1541,7 +1520,7 @@ void liblogic_init(gamestate* const g) {
     init_player(g);
     // test to create a weapon
     init_weapon_test(g);
-    //init_shield_test(g);
+    init_shield_test(g);
     // temporarily disabling
     //init_humans_test(g);
     //init_orcs_test(g);
