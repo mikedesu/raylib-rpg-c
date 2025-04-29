@@ -1458,9 +1458,10 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
                 add_message(g, "You have no weapon to attack with!");
                 // add a message to the message system
             }
-        } else if (strcmp(action, "block") == 0) {
-            msuccess("Block pressed!");
-            try_entity_block(g, hero);
+            //}
+            //else if (strcmp(action, "block") == 0) {
+            //    msuccess("Block pressed!");
+            //    try_entity_block(g, hero);
         } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
             // but eventually this will be generalized
