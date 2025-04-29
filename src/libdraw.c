@@ -952,8 +952,7 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
         spritegroup_destroy(group);
         return;
     }
-    const float w = s->width;
-    const float h = s->height;
+    const float w = s->width, h = s->height;
     const float dst_x = e->x * DEFAULT_TILE_SIZE;
     const float dst_y = e->y * DEFAULT_TILE_SIZE;
     group->current = 0;
@@ -964,10 +963,7 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
 }
 
 static void calc_debugpanel_size(gamestate* const g) {
-    if (!g) {
-        merror("calc_debugpanel_size: gamestate is NULL");
-        return;
-    }
+    massert(g, "gamestate is NULL");
     Vector2 s = MeasureTextEx(GetFontDefault(), g->debugpanel.buffer, g->debugpanel.font_size, 1);
     const float width_factor = 1.1f;
     g->debugpanel.w = s.x * width_factor;
