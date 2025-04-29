@@ -86,10 +86,10 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
 static void libdraw_update_sprite(gamestate* const g, entityid id);
 static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
 static void draw_message_history(gamestate* const g);
+static void draw_message_box(gamestate* g);
 static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
 static void libdraw_draw_debug_panel(gamestate* const g);
 static void libdraw_drawframe_2d(gamestate* const g);
-static void draw_message_box(gamestate* g);
 static void create_sg_byid(gamestate* const g, entityid id);
 static void calc_debugpanel_size(gamestate* const g);
 static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
@@ -752,7 +752,8 @@ static void draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) { return; }
     const char* prompt = "[A] Next";
     const char* msg = g->msg_system.messages[g->msg_system.index];
-    Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.5f);
+    //Color message_bg = Fade((Color){0x33, 0x33, 0x33, 0xff}, 0.5f);
+    Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     int font_size = 10;
     int pad = 20; // Inner padding (text <-> box edges)
     float line_spacing = 1.0f;
@@ -1025,7 +1026,8 @@ static void create_sg_byid(gamestate* const g, entityid id) {
 
 static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    const int font_size = 10, pad = 40; // Inner padding (text <-> box edges)
+    const int font_size = 10;
+    const int pad = 40; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "entity is NULL");
