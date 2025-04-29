@@ -21,10 +21,10 @@
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
-//#define DEFAULT_WIN_WIDTH 960
-//#define DEFAULT_WIN_HEIGHT 540
-#define DEFAULT_WIN_WIDTH 1920
-#define DEFAULT_WIN_HEIGHT 1080
+#define DEFAULT_WIN_WIDTH 960
+#define DEFAULT_WIN_HEIGHT 540
+//#define DEFAULT_WIN_WIDTH 1920
+//#define DEFAULT_WIN_HEIGHT 1080
 
 //#define DEFAULT_WIN_WIDTH 1280
 //#define DEFAULT_WIN_HEIGHT 720
@@ -154,7 +154,7 @@ static sprite* get_weapon_front_sprite(const gamestate* g, const entity* e, spri
     }
 
     if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
-        msuccess("is_attacking");
+        //msuccess("is_attacking");
         return spritegroup_get(weapon_sg, SG_ANIM_LONGSWORD_SLASH_F);
     }
     return NULL;
@@ -173,7 +173,7 @@ static sprite* get_weapon_back_sprite(const gamestate* g, const entity* e, sprit
 
     //if (e->is_attacking) {
     if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
-        msuccess("is_attacking");
+        //msuccess("is_attacking");
         return spritegroup_get(weapon_sg, SG_ANIM_LONGSWORD_SLASH_B);
     }
 
@@ -247,7 +247,7 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     if (shield_back_s) DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
 
     if (weapon_back_s) {
-        msuccess("weapon_back_s");
+        //msuccess("weapon_back_s");
         DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
 
@@ -256,7 +256,7 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
 
     if (shield_front_s) DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     if (weapon_front_s) {
-        msuccess("weapon_front_s");
+        //msuccess("weapon_front_s");
         DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
 }
@@ -1026,45 +1026,35 @@ static void create_sg_byid(gamestate* const g, entityid id) {
 
 static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    // Draw the HUD
-    int fontsize = 20;
-    int hp = -1, maxhp = -1, mp = -1, maxmp = -1, level = 1, turn = g->turn_count;
-    char buffer[1024] = {0};
-    char* name = NULL;
-    const Color bg = (Color){0x33, 0x33, 0x33, 0xff}, fg = WHITE;
-    const int padding = 20;
-    const float width_factor = 1.1f; // 10% extra width
+    const int font_size = 10, pad = 40; // Inner padding (text <-> box edges)
+    const float line_spacing = 1.0f;
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "entity is NULL");
-    hp = e->stats.hp;
-    maxhp = e->stats.maxhp;
-    mp = e->stats.mp;
-    maxmp = e->stats.maxmp;
-    level = e->stats.level;
-    name = e->name;
+    const int turn = g->turn_count, hp = e->stats.hp, maxhp = e->stats.maxhp, mp = e->stats.mp, maxmp = e->stats.maxmp, level = e->stats.level;
+
+    char buffer[1024] = {0};
     snprintf(buffer,
              sizeof(buffer),
-             //"Name: %s\nLevel: %d\nHP: %d/%d MP: %d/%d\nTurn: %d",
              "%s Lvl %d HP %d/%d MP %d/%d XP %d Turn %d",
-             name,
+             e->name,
              level,
              hp,
              maxhp,
              mp,
              maxmp,
-             0,
+             0, // XP placeholder
              turn);
-    const Vector2 size = MeasureTextEx(GetFontDefault(), buffer, fontsize, 1);
-    // Add slight extra width factor to account for text measurement inconsistency
-    const int box_width = (size.x * width_factor) + (padding * 3);
-    const int box_height = size.y + (padding * 2);
-    // Position box
-    const int box_x = (g->windowwidth - box_width) / 2;
-    const int box_y = (g->windowheight - box_height) * 7 / 8;
-    // Draw everything
-    DrawRectangle(box_x, box_y, box_width, box_height, bg);
-    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, fg);
-    DrawText(buffer, box_x + padding, box_y + padding, fontsize, fg);
+
+    const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, line_spacing);
+    const int box_w = text_size.x + pad, box_h = text_size.y + pad;
+    const int box_x = (g->windowwidth - box_w) / 2, box_y = (g->windowheight - box_h) * 7 / 8;
+    const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
+
+    DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
+    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, 2, fg);
+    // Calculate text position to center it within the box
+    const float text_x = box_x + (box_w - text_size.x) / 2, text_y = box_y + (box_h - text_size.y) / 2;
+    DrawTextEx(GetFontDefault(), buffer, (Vector2){text_x, text_y}, font_size, line_spacing, fg);
 }
 
 void libdraw_init(gamestate* const g) {
@@ -1102,7 +1092,7 @@ static void draw_message_history(gamestate* const g) {
     }
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) { return; }
-    const int font_size = 20;
+    const int font_size = 10;
     const int pad = 20; // Inner padding (text <-> box edges)
     const float line_spacing = 1.0f;
     const int max_messages = 20;

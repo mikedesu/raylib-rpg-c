@@ -156,7 +156,7 @@ void gamerun() {
         myliblogic_tick(&is, g);
         mylibdraw_update_sprites(g);
         mylibdraw_drawframe(g);
-        autoreload_every_n_sec(10, g);
+        autoreload_every_n_sec(5, g);
         if (inputstate_is_pressed(&is, KEY_ESCAPE)) break;
     }
     mylibdraw_close();
