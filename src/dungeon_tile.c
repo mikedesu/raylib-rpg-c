@@ -161,6 +161,12 @@ bool tile_has_live_npcs(tile_t* t, em_t* em) {
     return t->cached_live_npcs > 0;
 }
 
+size_t tile_live_npc_count(tile_t* t, em_t* em) {
+    if (!t) return false;
+    recompute_entity_cache(t, em);
+    return t->cached_live_npcs;
+}
+
 bool tile_has_player(tile_t* t, em_t* em) {
     if (!t) return false;
     recompute_entity_cache(t, em);

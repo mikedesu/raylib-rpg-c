@@ -287,5 +287,15 @@ static inline bool e_item_is_in_inventory(entity_t* const e, entityid item_id) {
     return false;
 }
 
+static inline bool e_has_weapon(entity_t* const e) {
+    massert(e, "e is NULL");
+    return e->weapon != ENTITYID_INVALID;
+}
+
+static inline bool e_has_shield(entity_t* const e) {
+    massert(e, "e is NULL");
+    return e->shield != ENTITYID_INVALID;
+}
+
 bool e_add_item_to_inventory(entity_t* const e, entityid item_id);
 bool e_remove_item_from_inventory(entity_t* const e, entityid item_id);

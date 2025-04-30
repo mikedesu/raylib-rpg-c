@@ -64,13 +64,18 @@ int df_center_y(const dungeon_floor_t* const df);
 
 bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
 
+//tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) ;
+
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
+    //minfo("df_tile_at: %d, %d", x, y);
     massert(df, "df is NULL");
     if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-        merror("x or y out of bounds");
+        merror("x or y out of bounds: x: %d, y: %d", x, y);
         return NULL;
     }
-    return &df->tiles[y][x];
+    tile_t* tile = &df->tiles[y][x];
+    massert(tile, "tile is NULL");
+    return tile;
 }
 
 static inline tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y) {

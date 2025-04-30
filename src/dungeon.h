@@ -14,14 +14,31 @@ typedef struct {
 
 bool dungeon_add_floor(dungeon_t* dungeon, int width, int height);
 
-int dungeon_num_floors(const dungeon_t* const dungeon);
-
 dungeon_t* dungeon_create();
-
-dungeon_floor_t* dungeon_get_floor(dungeon_t* const dungeon, const int index);
-dungeon_floor_t* dungeon_get_current_floor(dungeon_t* const dungeon);
 
 void dungeon_destroy(dungeon_t* dungeon);
 void dungeon_free(dungeon_t* dungeon);
-void dungeon_lock(dungeon_t* dungeon);
-void dungeon_unlock(dungeon_t* dungeon);
+
+static inline dungeon_floor_t* dungeon_get_floor(dungeon_t* const dungeon, const int index) {
+    massert(dungeon, "dungeon is NULL");
+    massert(index >= 0, "index is negative");
+    massert(index < dungeon->num_floors, "index is out of bounds");
+    return dungeon->floors[index];
+}
+
+static inline dungeon_floor_t* dungeon_get_current_floor(dungeon_t* const dungeon) { return dungeon_get_floor(dungeon, dungeon->current_floor); }
+
+static inline void dungeon_lock(dungeon_t* dungeon) {
+    massert(dungeon, "dungeon is NULL");
+    dungeon->is_locked = true;
+}
+
+static inline void dungeon_unlock(dungeon_t* dungeon) {
+    massert(dungeon, "dungeon is NULL");
+    dungeon->is_locked = false;
+}
+
+static inline size_t dungeon_num_floors(const dungeon_t* const dungeon) {
+    massert(dungeon, "dungeon is NULL");
+    return dungeon->num_floors;
+}

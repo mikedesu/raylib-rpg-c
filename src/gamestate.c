@@ -52,7 +52,7 @@ gamestate* gamestateinitptr() {
     g->cam_lockon = true;
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){0, 0};
-    g->cam2d.zoom = 6.0f;
+    g->cam2d.zoom = 10.0f;
     g->cam2d.rotation = 0.0;
     g->cam3d = (Camera3D){0};
     g->cam3d.position = (Vector3){0.0f, 20.0f, 20.0f};

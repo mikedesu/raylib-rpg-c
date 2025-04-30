@@ -65,6 +65,8 @@ void tile_set_pressure_plate_up_tx_key(tile_t* const t, int k);
 bool tile_has_live_npcs(tile_t* t, em_t* em);
 bool tile_has_player(tile_t* t, em_t* em);
 
+size_t tile_live_npc_count(tile_t* t, em_t* em);
+
 static inline size_t tile_entity_count(const tile_t* const t) { return !t ? 0 : t->entity_count; }
 static inline entityid tile_get_entity(const tile_t* const t, size_t i) { return !t ? -1 : i < t->entity_max ? t->entities[i] : -1; }
 static inline bool tile_is_wall_switch_on(const tile_t* const t) { return !t ? false : t->wall_switch_on; }

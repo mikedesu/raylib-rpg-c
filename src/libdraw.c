@@ -1137,7 +1137,7 @@ static void draw_message_history(gamestate* const g) {
     const int y = 10;
     int current_count = 0;
     char tmp_buffer[2048] = {0};
-    Color message_bg = (Color){0x33, 0x33, 0x33, 0x1f};
+    Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     // instead of a placeholder message, we now need to actually draw the message history
     // we might only render the last N messages
     for (int i = g->msg_history.count - 1; i >= 0 && current_count < max_messages; i--) {

@@ -33,18 +33,10 @@ bool em_free(em_t* em) {
     return true;
 }
 
-// returns the first item in the set which will be the oldest
-entity_t* const em_get(const em_t* const em, entityid id) {
-    massert(em, "em is NULL");
-    if (id < 0) { return NULL; }
-    const int hash = id % EM_MAX_SLOTS;
-    massert(hash >= 0, "hash is negative");
-    return em->entities[hash];
-}
-
 entity_t* em_get_last(const em_t* const em, entityid id) {
     massert(em, "em is NULL");
-    massert(id >= 0, "id is less than 0");
+    //massert(id >= 0, "id is less than 0");
+    if (id < 0) { return NULL; }
     const int hash = id % EM_MAX_SLOTS;
     massert(hash >= 0, "hash is negative");
     entity_t* current = em->entities[hash];
@@ -91,9 +83,4 @@ entity_t* em_remove_last(em_t* const em, entityid id) {
     current->next = NULL;
     em->count--;
     return last;
-}
-
-int em_count(const em_t* const em) {
-    massert(em, "em is NULL");
-    return em->count;
 }
