@@ -120,12 +120,13 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* c
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) return false;
 
-    const int offset_x = -12, offset_y = -12;
+    const int offset_x = -12;
+    const int offset_y = -12;
     const int dx = x * DEFAULT_TILE_SIZE + offset_x;
     const int dy = y * DEFAULT_TILE_SIZE + offset_y;
 
-    const Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED},
-                    dest = (Rectangle){dx, dy, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+    const Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+    const Rectangle dest = (Rectangle){dx, dy, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
 
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
 
@@ -1268,11 +1269,11 @@ static void draw_inventory_menu(gamestate* const g) {
     if (sg) {
         sprite* s = sg_get_current(sg);
         if (s) {
-            const int scale = 5;
+            const int scale = 8;
             const float sprite_width = s->width * scale;
             const float sprite_height = s->height * scale;
-            //const float sprite_margin = -8 * scale; // space from top and right edges
-            const float sprite_margin = 0; // space from top and right edges
+            const float sprite_margin = -6 * scale; // space from top and right edges
+            //const float sprite_margin = 0; // space from top and right edges
 
             // Anchor to top-right of right_box, account for margin
             const float sprite_x = right_box.x + right_box.width - sprite_margin - sprite_width;

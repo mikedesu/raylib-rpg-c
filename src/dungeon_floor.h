@@ -51,11 +51,17 @@ void df_free(dungeon_floor_t* f);
 
 bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y);
+
 loc_t df_get_upstairs(const dungeon_floor_t* const df);
 loc_t df_get_downstairs(const dungeon_floor_t* const df);
+
 int df_count_walkable(const dungeon_floor_t* const df);
+int df_count_empty(const dungeon_floor_t* const df);
+int df_count_empty_non_walls(const dungeon_floor_t* const df);
+
 int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
+
 bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
 
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {

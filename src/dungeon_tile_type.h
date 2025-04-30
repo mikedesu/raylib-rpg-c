@@ -74,7 +74,13 @@ typedef enum {
     TILE_COUNT
 } tiletype_t;
 
+static inline bool tile_is_none(const tiletype_t type) { return type == TILE_NONE; }
+
+static inline bool tile_is_not_none(const tiletype_t type) { return type != TILE_NONE; }
+
 static inline bool tile_is_wall(const tiletype_t type) { return type >= TILE_STONE_WALL_00 && type <= TILE_STONE_WALL_02; }
+
+static inline bool tile_is_not_wall(const tiletype_t type) { return type != TILE_NONE && type >= TILE_STONE_WALL_00 && type <= TILE_STONE_WALL_02; }
 
 static inline bool tile_is_walkable(const tiletype_t type) { return !tile_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE && type != TILE_COUNT; }
 

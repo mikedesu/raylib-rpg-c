@@ -26,6 +26,10 @@
 
 static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
+static loc_t* get_empty_locs(dungeon_floor_t* const df, int* count);
+static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt);
+static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count);
+
 static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
 static inline loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 static inline bool e_has_weapon(gamestate* const g, entityid id);
@@ -752,14 +756,33 @@ static void init_potion_test(gamestate* const g, potiontype_t potion_type, const
 }
 
 static void init_weapon_test(gamestate* g) {
+    minfo("init_weapon_test");
     massert(g, "gamestate is NULL");
     entity* e = em_get(g->entitymap, g->hero_id);
     massert(e, "hero entity is NULL");
+    minfo("got hero");
 
     //entity_t* sword = create_sword(g);
     //massert(sword, "failed to create sword");
 
-    create_sword_at(g, e->x + 1, e->y);
+    int c = -1;
+    minfo("getting empty locs...");
+    loc_t* locations = get_empty_non_wall_locs(g->dungeon->floors[g->dungeon->current_floor], &c);
+    msuccess("got em...");
+
+    // pick a random location
+    int index = rand() % c;
+    int x = locations[index].x;
+    int y = locations[index].y;
+
+    free(locations);
+
+    minfo("index: %d", index);
+    minfo("c: %d", c);
+    minfo("x: %d", x);
+    minfo("y: %d", y);
+    create_sword_at(g, x, y);
+
     //massert(sword, "failed to create sword");
 
     //e_add_item_to_inventory(e, sword->id);
@@ -899,6 +922,7 @@ static int tile_npc_count_xy(gamestate* const g, dungeon_floor_t* const df, int 
 }
 
 static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt) {
+    massert(df, "dungeon floor is NULL");
     massert(cnt, "cnt is NULL");
     int c = df_count_walkable(df);
     loc_t* locs = malloc(sizeof(loc_t) * c);
@@ -911,6 +935,64 @@ static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt) {
         }
     massert(i == c, "count mismatch");
     *cnt = c;
+    return locs;
+}
+
+static loc_t* get_empty_locs(dungeon_floor_t* const df, int* count) {
+    massert(df, "dungeon floor is NULL");
+    massert(count, "count is NULL");
+    int c = df_count_empty(df);
+    loc_t* locs = malloc(sizeof(loc_t) * c);
+    massert(locs, "malloc failed");
+    int i = 0;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* t = df_tile_at(df, x, y);
+            if (tile_entity_count(t) == 0) {
+                locs[i].x = x;
+                locs[i].y = y;
+                i++;
+            }
+        }
+    }
+    massert(i == c, "count mismatch");
+    *count = c;
+    return locs;
+}
+
+static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count) {
+    //minfo("get_empty_non_wall_locs");
+    //massert(df, "dungeon floor is NULL");
+    //massert(count, "count is NULL");
+    //minfo("counting empty nonwalls...");
+    int c = df_count_empty_non_walls(df);
+    //msuccess("counted %d empty nonwalls", c);
+    loc_t* locs = malloc(sizeof(loc_t) * c);
+    //massert(locs, "malloc failed");
+    //msuccess("malloc succeeded");
+    int i = 0;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            //minfo("checking tile at %d, %d", x, y);
+            tile_t* t = df_tile_at(df, x, y);
+            //msuccess("tile acquired");
+            tiletype_t type = t->type;
+            if (tile_entity_count(t) == 0 && tile_is_walkable(type)) {
+                //if (tile_entity_count(t) == 0 && tile_is_walkable(t->type)) {
+                locs[i].x = x;
+                locs[i].y = y;
+                i++;
+            }
+
+            if (i >= c) {
+                //msuccess("found all empty nonwalls");
+                break;
+            }
+        }
+    }
+    //msuccess("loop completed");
+    massert(i == c, "count mismatch: expected %d, got %d", c, i);
+    *count = c;
     return locs;
 }
 

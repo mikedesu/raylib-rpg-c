@@ -924,6 +924,30 @@ int df_count_walkable(const dungeon_floor_t* const df) {
     return count;
 }
 
+int df_count_empty(const dungeon_floor_t* const df) {
+    massert(df, "df is NULL");
+    int count = 0;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* const t = df_tile_at(df, x, y);
+            if (tile_entity_count(t) == 0) { count++; }
+        }
+    }
+    return count;
+}
+
+int df_count_empty_non_walls(const dungeon_floor_t* const df) {
+    massert(df, "df is NULL");
+    int count = 0;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* const t = df_tile_at(df, x, y);
+            if (tile_entity_count(t) == 0 && t->type != TILE_NONE && !tile_is_wall(t->type)) { count++; }
+        }
+    }
+    return count;
+}
+
 static void df_make_room(dungeon_floor_t* df, int x, int y, int w, int h) { df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
 
 static void df_make_corridor_h(dungeon_floor_t* df, int x, int y, int len) {

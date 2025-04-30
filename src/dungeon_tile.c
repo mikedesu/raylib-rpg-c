@@ -26,6 +26,7 @@ void tile_init(tile_t* const t, tiletype_t type) {
     t->pressure_plate_up_tx_key = t->pressure_plate_down_tx_key = t->pressure_plate_event = -1;
     t->wall_switch_up_tx_key = t->wall_switch_down_tx_key = t->wall_switch_event = -1;
 
+    //t->cached_entities = 0;
     t->cached_live_npcs = 0;
     t->cached_player_present = false;
     t->dirty_entities = true; // Start dirty
@@ -85,7 +86,6 @@ entityid tile_add(tile_t* const t, entityid id) {
         merror("dungeon_tile_add: Invalid tile or entity array");
         return ENTITYID_INVALID;
     }
-
     // Early exit if tile is full and resize fails
     if (t->entity_count >= t->entity_max) {
         mwarning("dungeon_tile_add: Tile full, attempting resize");
@@ -94,7 +94,6 @@ entityid tile_add(tile_t* const t, entityid id) {
             return ENTITYID_INVALID;
         }
     }
-
     // Find first empty slot
     for (size_t i = 0; i < t->entity_max; i++) {
         if (t->entities[i] == ENTITYID_INVALID) {
@@ -104,9 +103,6 @@ entityid tile_add(tile_t* const t, entityid id) {
             return id;
         }
     }
-
-    //return id;
-
     // This should never happen due to earlier check
     merror("dungeon_tile_add: No empty slot found after resize");
     return ENTITYID_INVALID;
@@ -146,59 +142,16 @@ void tile_free(tile_t* t) {
     free(t);
 }
 
-size_t tile_entity_count(const tile_t* const t) { return !t ? 0 : t->entity_count; }
-
-entityid tile_get_entity(const tile_t* const t, size_t i) { return !t ? -1 : i < t->entity_max ? t->entities[i] : -1; }
-
-void tile_set_wall_switch(tile_t* const t, bool b) {
-    if (!t) return;
-    t->has_wall_switch = b;
-}
-
-void tile_set_wall_switch_up_tx_key(tile_t* t, int key) {
-    if (!t) return;
-    t->wall_switch_up_tx_key = key;
-}
-
-void tile_set_wall_switch_down_tx_key(tile_t* const t, int key) {
-    if (!t) return;
-    t->wall_switch_down_tx_key = key;
-}
-
-void tile_set_wall_switch_event(tile_t* const t, int event) {
-    if (!t) return;
-    t->wall_switch_event = event;
-}
-
-bool tile_has_wall_switch(const tile_t* const t) { return !t ? false : t->has_wall_switch; }
-
-int tile_get_wall_switch_up_tx_key(const tile_t* const t) { return !t ? -1 : t->wall_switch_up_tx_key; }
-
-int tile_get_wall_switch_down_tx_key(const tile_t* const t) { return !t ? -1 : t->wall_switch_down_tx_key; }
-
-int tile_get_wall_switch_event(const tile_t* const t) { return !t ? -1 : t->wall_switch_event; }
-
-void tile_set_wall_switch_on(tile_t* const t, bool on) {
-    if (!t) return;
-    t->wall_switch_on = on;
-}
-
-bool tile_is_wall_switch_on(const tile_t* const t) { return !t ? false : t->wall_switch_on; }
-
 static void recompute_entity_cache(tile_t* t, em_t* em) {
     if (!t->dirty_entities) return;
-
     t->cached_live_npcs = 0;
     t->cached_player_present = false;
-
     for (size_t i = 0; i < t->entity_max; i++) {
         entity* e = em_get(em, t->entities[i]);
         if (!e || e->dead) continue;
-
         if (e->type == ENTITY_NPC) t->cached_live_npcs++;
         if (e->type == ENTITY_PLAYER) t->cached_player_present = true;
     }
-
     t->dirty_entities = false;
 }
 
@@ -213,3 +166,11 @@ bool tile_has_player(tile_t* t, em_t* em) {
     recompute_entity_cache(t, em);
     return t->cached_player_present;
 }
+
+//bool tile_has_entities(tile_t* t) {
+//    if (!t) return false;
+//    for (size_t i = 0; i < t->entity_max; i++) {
+//        if (t->entities[i] != ENTITYID_INVALID) return true;
+//    }
+//    return false;
+//}
