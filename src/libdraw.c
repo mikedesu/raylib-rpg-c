@@ -211,7 +211,9 @@ static sprite* get_shield_front_sprite(const gamestate* g, const entity* e, spri
     spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
     if (!shield_sg) return NULL;
 
-    if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT); }
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
+        return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+    }
     if (e->is_blocking) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT); }
     return NULL;
 }
@@ -226,7 +228,9 @@ static sprite* get_shield_back_sprite(const gamestate* g, const entity* e, sprit
     spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
     if (!shield_sg) return NULL;
 
-    if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK); }
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
+        return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
+    }
     if (e->is_blocking) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK); }
     return NULL;
 }
@@ -493,7 +497,18 @@ static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, sp
                 spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_FRONT);
             }
         }
+    } else if (e->race == RACE_ORC) {
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_GUARD);
+        if (e->shield != ENTITYID_INVALID) {
+            spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
+            if (shield_sg) {
+                int player_ctx = sg->sprites[sg->current]->currentcontext;
+                spritegroup_setcontexts(shield_sg, player_ctx);
+                spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_FRONT);
+            }
+        }
     }
+
     g->test_guard = false;
 }
 
@@ -514,7 +529,21 @@ static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, 
                 spritegroup_setcontexts(shield_sg, player_ctx);
             }
         }
+    } else if (e->race == RACE_ORC) {
+        //sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
+        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS);
+
+        if (e->shield != ENTITYID_INVALID) {
+            spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
+            if (shield_sg) {
+                sprite* player_sprite = sg_get_current(sg);
+                int player_ctx = sprite_get_context(player_sprite);
+                spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+                spritegroup_setcontexts(shield_sg, player_ctx);
+            }
+        }
     }
+
     e->block_success = false;
 }
 

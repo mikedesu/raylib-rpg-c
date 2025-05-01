@@ -39,6 +39,14 @@
 #define TX_ORC_DIE_SHADOW 24
 #define TX_ORC_DMG 25
 #define TX_ORC_DMG_SHADOW 26
+//213 4 4  0  img/characters/orc_guard.png
+//214 4 4  0  img/characters/shadows/orc_guard_shadow.png
+//215 4 3  0  img/characters/orc_guard_success.png
+//216 4 3  0  img/characters/shadows/orc_guard_success_shadow.png
+#define TX_ORC_GUARD 213
+#define TX_ORC_GUARD_SHADOW 214
+#define TX_ORC_GUARD_SUCCESS 215
+#define TX_ORC_GUARD_SUCCESS_SHADOW 216
 
 #define TX_DIRT_00 0
 #define TX_STONE_00 27

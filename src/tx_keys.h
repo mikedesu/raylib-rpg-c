@@ -22,7 +22,7 @@ static int TX_HUMAN_KEYS[TX_HUMAN_KEY_COUNT] = {TX_HUMAN_IDLE,
                                                 TX_HUMAN_GUARD_SUCCESS,
                                                 TX_HUMAN_GUARD_SUCCESS_SHADOW};
 
-#define TX_ORC_KEY_COUNT 14
+#define TX_ORC_KEY_COUNT 18
 static int TX_ORC_KEYS[TX_ORC_KEY_COUNT] = {
     TX_ORC_IDLE,
     TX_ORC_IDLE_SHADOW,
@@ -38,6 +38,10 @@ static int TX_ORC_KEYS[TX_ORC_KEY_COUNT] = {
     TX_ORC_DMG_SHADOW,
     TX_ORC_DIE,
     TX_ORC_DIE_SHADOW,
+    TX_ORC_GUARD,
+    TX_ORC_GUARD_SHADOW,
+    TX_ORC_GUARD_SUCCESS,
+    TX_ORC_GUARD_SUCCESS_SHADOW,
 };
 
 #define TX_ELF_KEY_COUNT 14

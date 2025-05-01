@@ -345,32 +345,41 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     if (id == ENTITYID_INVALID) return false;
 
     entity* target = em_get(g->entitymap, id);
-    if (!target) {
-        merror("target entity is NULL");
-        return false;
-    }
+    massert(target, "target entity is NULL");
+    //if (!target) {
+    //    merror("target entity is NULL");
+    //    return false;
+    //}
 
     entitytype_t type = target->type;
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) {
-        merror("target entity is not a player or NPC");
+        //merror("target entity is not a player or NPC");
         return false;
     }
 
-    minfo("Attacking target: %s", target->name);
     if (target->dead) {
-        merror("Target is dead, cannot attack");
+        //merror("Target is dead, cannot attack");
         return false;
     }
 
-    if (target->is_blocking) {
+    // lets try an experiment...
+    if (target->shield != ENTITYID_INVALID) {
         msuccess("Block successful");
         handle_attack_blocked(g, attacker, target, attack_successful);
         return false;
     }
-
     msuccess("Attack successful");
     handle_attack_success(g, attacker, target, attack_successful);
     return true;
+
+    //if (target->is_blocking) {
+    //    msuccess("Block successful");
+    //    handle_attack_blocked(g, attacker, target, attack_successful);
+    //    return false;
+    //}
+    //msuccess("Attack successful");
+    //handle_attack_success(g, attacker, target, attack_successful);
+    //return true;
 }
 
 static void handle_attack_helper(gamestate* const g, tile_t* tile, entity* attacker, bool* successful) {
@@ -1029,7 +1038,7 @@ static void init_orcs_test_intermediate(gamestate* g) {
     massert(df, "floor is NULL");
     int c;
     //loc_t* locs = get_walkable_locs(df, &c);
-    int max = 1;
+    int max = 5;
     int created = 0;
     //int i = 0;
     entity* player = em_get(g->entitymap, g->hero_id);
@@ -1365,20 +1374,6 @@ static inline void change_player_dir(gamestate* const g, direction_t dir) {
     update_equipped_shield_dir(g, hero);
 }
 
-static void try_entity_block(gamestate* const g, entity* const e) {
-    massert(g, "Game state is NULL!");
-    massert(e, "Entity is NULL!");
-    if (!e_has_shield(e)) {
-        add_message(g, "You have no shield to block with!");
-        return;
-    }
-    e->do_update = true;
-    e->is_blocking = true;
-    g->test_guard = true;
-    update_equipped_shield_dir(g, e);
-    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-}
-
 static bool try_entity_pickup(gamestate* const g, entity* const e) {
     minfo("try_entity_pickup: trying to pick up item");
     massert(g, "Game state is NULL!");
@@ -1573,9 +1568,6 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             // add a message to the message system
             //}
             //}
-            //else if (strcmp(action, "block") == 0) {
-            //    msuccess("Block pressed!");
-            //    try_entity_block(g, hero);
         } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
             // but eventually this will be generalized

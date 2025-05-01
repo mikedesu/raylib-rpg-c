@@ -993,8 +993,8 @@ static void df_init_test_simple9(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
     int cx = df_center_x(df);
     int cy = df_center_y(df);
-    int w = 3;
-    int h = 3;
+    int w = 5;
+    int h = 5;
     // Diamond-shaped central room
     df_make_diamond_shape_room(df, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     df_assign_downstairs_in_area(df, cx - w / 2, cy - h / 2, w, h);

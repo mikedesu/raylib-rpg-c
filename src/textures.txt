@@ -44,6 +44,10 @@
 24 1 7 0  img/characters/shadows/orc_die2_shadow.png
 25 4 4  0  img/characters/orc_dmg.png
 26 4 4  0  img/characters/shadows/orc_dmg_shadow.png
+213 4 4  0  img/characters/orc_guard.png
+214 4 4  0  img/characters/shadows/orc_guard_shadow.png
+215 4 3  0  img/characters/orc_guard_success.png
+216 4 3  0  img/characters/shadows/orc_guard_success_shadow.png
 #
 #
 #
