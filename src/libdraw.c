@@ -461,7 +461,7 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, s
         update_weapon_for_entity(g, e, sg);
     } else if (e->race == RACE_ORC) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_ATTACK);
-        //update_weapon_for_entity(g, e, sg);
+        update_weapon_for_entity(g, e, sg);
     } else if (e->race == RACE_ELF) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_ATTACK);
         //update_weapon_for_entity(g, e, sg);
