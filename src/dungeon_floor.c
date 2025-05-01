@@ -38,6 +38,7 @@ static void df_init_test_simple6(dungeon_floor_t* df); // gpt-4.1-mini
 static void df_init_test_simple7(dungeon_floor_t* df); // gpt-4.1-mini
 static void df_init_test_simple8(dungeon_floor_t* df); // gpt-4.1-mini
 static void df_init_test_simple9(dungeon_floor_t* df); // gpt-4.1-mini
+static void df_init_test_simple10(dungeon_floor_t* df); // claude-3.7-sonnet
 
 static void df_assign_stairs(dungeon_floor_t* df);
 
@@ -472,7 +473,8 @@ void df_init(dungeon_floor_t* df) {
     //df_init_test_simple6(df);
     //df_init_test_simple7(df);
     //df_init_test_simple8(df);
-    df_init_test_simple9(df);
+    //df_init_test_simple9(df);
+    df_init_test_simple10(df);
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
@@ -999,6 +1001,29 @@ static void df_init_test_simple9(dungeon_floor_t* df) {
     df_make_diamond_shape_room(df, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     df_assign_downstairs_in_area(df, cx - w / 2, cy - h / 2, w, h);
     df_assign_upstairs_in_area(df, cx - w / 2, cy - h / 2, w, h);
+}
+
+static void df_init_test_simple10(dungeon_floor_t* df) {
+    massert(df, "dungeon floor is NULL");
+    int cx = df_center_x(df);
+    int cy = df_center_y(df);
+    int outer_w = 9;
+    int outer_h = 9;
+    int inner_w = 7;
+    int inner_h = 7;
+
+    // Create outer wall diamond
+    df_make_diamond_shape_room(df, cx, cy, outer_w, outer_h, TILE_STONE_WALL_00, TILE_STONE_WALL_02);
+
+    // Create inner floor diamond
+    //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_STONE_00, TILE_FLOOR_DIRT_GRASS_14);
+    //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_GRASS_00, TILE_FLOOR_GRASS_19);
+    df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_DIRT_00, TILE_FLOOR_DIRT_08);
+
+    // Place stairs inside the room
+    df_assign_downstairs_in_area(df, cx - inner_w / 2, cy - inner_h / 2, inner_w, inner_h);
+    df_assign_upstairs_in_area(df, cx - inner_w / 2, cy - inner_h / 2, inner_w, inner_h);
 }
 
 bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name) {

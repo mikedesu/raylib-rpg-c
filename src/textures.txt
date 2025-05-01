@@ -38,8 +38,6 @@
 20 4 6  0  img/characters/shadows/orc_chargedattack_shadow.png
 21 4 4  0  img/characters/orc_jump.png
 22 4 4  0  img/characters/shadows/orc_jump_shadow.png
-#23 1 12 0  img/characters/orc_die.png
-#24 1 12 0  img/characters/shadows/orc_die_shadow.png
 23 1 7 0  img/characters/orc_die2.png
 24 1 7 0  img/characters/shadows/orc_die2_shadow.png
 25 4 4  0  img/characters/orc_dmg.png
@@ -65,23 +63,50 @@
 36 1 1  0  img/tiles/stone_09.png
 37 1 1  0  img/tiles/stone_10.png
 38 1 1  0  img/tiles/stone_11.png
-#39 1 1  0  img/tiles/stone_12.png
-#40 1 1  0  img/tiles/stone_13.png
+#
+#
+#
+#
 41 1 1  0  img/tiles/stonewall_00.png
 42 1 1  0  img/tiles/stonewall_01.png
 43 1 1  0  img/tiles/stonewall_02.png
-#44 1 1  0  img/tiles/stonewall_03.png
-#45 1 1  0  img/tiles/stonewall_04.png
-#46 1 1  0  img/tiles/stonewall_05.png
-#47 1 1  0  img/tiles/stonewall_06.png
-#48 1 1  0  img/tiles/stonewall_07.png
-#49 1 1  0  img/tiles/stonewall_08.png
-#50 1 1  0  img/tiles/stonewall_09.png
-#51 1 1  0  img/tiles/stonewall_10.png
-#52 1 1  0  img/tiles/stonewall_11.png
-#53 1 1  0  img/tiles/stonewall_12.png
-#54 1 1  0  img/tiles/stonewall_13.png
-#55 1 1  0  img/tiles/stonewall_14.png
+44 1 1  0  img/tiles/stonewall_03.png
+45 1 1  0  img/tiles/stonewall_04.png
+46 1 1  0  img/tiles/stonewall_05.png
+47 1 1  0  img/tiles/stonewall_06.png
+48 1 1  0  img/tiles/stonewall_07.png
+49 1 1  0  img/tiles/stonewall_08.png
+50 1 1  0  img/tiles/stonewall_09.png
+51 1 1  0  img/tiles/stonewall_10.png
+52 1 1  0  img/tiles/stonewall_11.png
+53 1 1  0  img/tiles/stonewall_12.png
+54 1 1  0  img/tiles/stonewall_13.png
+55 1 1  0  img/tiles/stonewall_14.png
+217 1 1  0  img/tiles/stonewall_15.png
+218 1 1  0  img/tiles/stonewall_16.png
+219 1 1  0  img/tiles/stonewall_17.png
+220 1 1  0  img/tiles/stonewall_18.png
+221 1 1  0  img/tiles/stonewall_19.png
+222 1 1  0  img/tiles/stonewall_20.png
+223 1 1  0  img/tiles/stonewall_21.png
+224 1 1  0  img/tiles/stonewall_22.png
+225 1 1  0  img/tiles/stonewall_23.png
+226 1 1  0  img/tiles/stonewall_24.png
+227 1 1  0  img/tiles/stonewall_25.png
+228 1 1  0  img/tiles/stonewall_26.png
+229 1 1  0  img/tiles/stonewall_27.png
+230 1 1  0  img/tiles/stonewall_28.png
+231 1 1  0  img/tiles/stonewall_29.png
+232 1 1  0  img/tiles/stonewall_30.png
+233 1 1  0  img/tiles/stonewall_31.png
+234 1 1  0  img/tiles/stonewall_32.png
+235 1 1  0  img/tiles/stonewall_33.png
+236 1 1  0  img/tiles/stonewall_34.png
+237 1 1  0  img/tiles/stonewall_35.png
+#
+#
+#
+#
 56 1 1  0  img/tiles/grass_00.png
 57 1 1  0  img/tiles/grass_01.png
 58 1 1  0  img/tiles/grass_02.png
@@ -299,4 +324,7 @@
 210 4 4  0  img/actions/slash_dagger_f.png
 211 4 4  0  img/actions/slash_sword_b.png
 212 4 4  0  img/actions/slash_sword_f.png
+#
+#
+#
 #
