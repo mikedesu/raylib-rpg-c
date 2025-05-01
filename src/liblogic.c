@@ -315,6 +315,8 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     int dmg = 1;
     e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
     if (target->type == ENTITY_PLAYER) add_message(g, "%s attacked you for %d damage!", attacker->name, dmg);
+    if (attacker->type == ENTITY_PLAYER) add_message(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
+
     if (e_get_hp(target) <= 0) target->dead = true;
 }
 
@@ -721,6 +723,15 @@ static void init_shield_test(gamestate* g) {
     create_shield_at(g, loc.x, loc.y);
 }
 
+static void init_shield_test2(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    // get the hero entity
+    entity* e = em_get(g->entitymap, g->hero_id);
+    entity* shield = create_shield(g);
+    e_add_item_to_inventory(e, shield->id);
+    e->shield = shield->id;
+}
+
 static void init_potion_test(gamestate* const g, potiontype_t potion_type, const char* name) {
     massert(g, "gamestate is NULL");
     dungeon_t* d = g->dungeon;
@@ -765,6 +776,21 @@ static void init_weapon_test(gamestate* g) {
     // pick a random location
     loc_t loc = get_random_empty_non_wall_loc(g, g->dungeon->current_floor);
     create_sword_at(g, loc);
+}
+
+static void init_weapon_test2(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entity* e = em_get(g->entitymap, g->hero_id);
+    massert(e, "hero entity is NULL");
+    entity* sword = create_sword(g);
+    //massert(sword, "sword is NULL");
+    //massert(sword->type == ENTITY_WEAPON, "sword is not a weapon");
+    //massert(sword->weapon_type == WEAPON_SWORD, "sword is not a sword");
+
+    // add the sword to inventory
+    e_add_item_to_inventory(e, sword->id);
+    // equip the sword
+    e->weapon = sword->id;
 }
 
 static void init_dungeon(gamestate* const g) {
@@ -942,11 +968,19 @@ static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count) {
 }
 
 static void create_orc_at(gamestate* g, int x, int y) {
-    entity* o = npc_create_ptr(g, RACE_ORC, x, y, 0, "orc");
-    massert(o, "orc create fail");
-    e_set_default_action(o, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
-    e_set_maxhp(o, 1);
-    e_set_hp(o, 1);
+    entity* e = npc_create_ptr(g, RACE_ORC, x, y, 0, "orc");
+    massert(e, "orc create fail");
+    e_set_default_action(e, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
+    e_set_maxhp(e, 1);
+    e_set_hp(e, 1);
+
+    entity* sword = create_sword(g);
+    e_add_item_to_inventory(e, sword->id);
+    e->weapon = sword->id;
+
+    entity* shield = create_shield(g);
+    e_add_item_to_inventory(e, shield->id);
+    e->shield = shield->id;
 }
 
 static void create_human_at(gamestate* g, int x, int y) {
@@ -994,28 +1028,32 @@ static void init_orcs_test_intermediate(gamestate* g) {
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
     massert(df, "floor is NULL");
     int c;
-    loc_t* locs = get_walkable_locs(df, &c);
+    //loc_t* locs = get_walkable_locs(df, &c);
     int max = 1;
     int created = 0;
-    int i = 0;
+    //int i = 0;
     entity* player = em_get(g->entitymap, g->hero_id);
-    massert(player, "player NULL");
-    massert(max < c, "max > count");
-    while (created < max && i < c) {
-        if (tile_npc_count_at(g, df, locs[i].x, locs[i].y) > 0) {
-            i++;
-            continue;
-        }
-        if (locs[i].x == player->x && locs[i].y == player->y) {
-            merror("cannot spawn on player");
-            i++;
-            continue;
-        }
-        create_orc_at(g, locs[i].x, locs[i].y);
-        i++;
+    //massert(player, "player NULL");
+    //massert(max < c, "max > count");
+    while (created < max) {
+        loc_t loc = get_random_empty_non_wall_loc(g, g->dungeon->current_floor);
+        create_orc_at(g, loc.x, loc.y);
         created++;
+
+        //if (tile_npc_count_at(g, df, locs[i].x, locs[i].y) > 0) {
+        //    i++;
+        //    continue;
+        //}
+        //if (locs[i].x == player->x && locs[i].y == player->y) {
+        //    merror("cannot spawn on player");
+        //    i++;
+        //    continue;
+        //}
+        //create_orc_at(g, locs[i].x, locs[i].y);
+        //i++;
+        //created++;
     }
-    free(locs);
+    //free(locs);
 }
 
 static void init_humans_test_intermediate(gamestate* const g) {
@@ -1521,17 +1559,19 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         } else if (strcmp(action, "move_se") == 0) {
             execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_RIGHT);
         } else if (strcmp(action, "attack") == 0) {
-            msuccess("attack pressed!");
-            if (e_has_weapon(hero)) {
-                msuccess("Entity has weapon");
-                int tx = hero->x + get_x_from_dir(hero->direction);
-                int ty = hero->y + get_y_from_dir(hero->direction);
-                try_entity_attack(g, hero->id, tx, ty);
-            } else {
-                merror("Entity has no weapon");
-                add_message(g, "You have no weapon to attack with!");
-                // add a message to the message system
-            }
+            //msuccess("attack pressed!");
+            //if (e_has_weapon(hero)) {
+            //msuccess("Entity has weapon");
+            //int tx = hero->x + get_x_from_dir(hero->direction);
+            //int ty = hero->y + get_y_from_dir(hero->direction);
+            loc_t loc = get_loc_from_dir(hero->direction);
+            try_entity_attack(g, hero->id, hero->x + loc.x, hero->y + loc.y);
+            //}
+            //else {
+            //    merror("Entity has no weapon");
+            //    add_message(g, "You have no weapon to attack with!");
+            // add a message to the message system
+            //}
             //}
             //else if (strcmp(action, "block") == 0) {
             //    msuccess("Block pressed!");
@@ -1670,15 +1710,18 @@ void liblogic_init(gamestate* const g) {
     init_em(g);
     init_player(g);
     // test to create a weapon
-    init_weapon_test(g);
-    init_shield_test(g);
-    init_potion_test(g, POTION_HP_SMALL, "small healing potion");
-    init_potion_test(g, POTION_HP_MEDIUM, "medium healing potion");
-    init_potion_test(g, POTION_HP_LARGE, "large healing potion");
+    //init_weapon_test(g);
+    init_weapon_test2(g);
+    //init_shield_test(g);
+    init_shield_test2(g);
+
+    //init_potion_test(g, POTION_HP_SMALL, "small healing potion");
+    //init_potion_test(g, POTION_HP_MEDIUM, "medium healing potion");
+    //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
 
     // temporarily disabling
     //init_humans_test(g);
-    //init_orcs_test(g);
+    init_orcs_test(g);
     //init_elves_test(g);
     //init_dwarves_test(g);
     //init_halflings_test(g);

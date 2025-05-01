@@ -1,5 +1,6 @@
 #pragma once
 
+#include "location.h"
 typedef enum direction_t {
     DIR_NONE,
     DIR_UP,
@@ -18,18 +19,15 @@ static inline int get_x_from_dir(direction_t dir) {
     switch (dir) {
     case DIR_UP_LEFT:
     case DIR_DOWN_LEFT:
-    case DIR_LEFT:
-        return -1;
+    case DIR_LEFT: return -1;
     case DIR_UP_RIGHT:
     case DIR_DOWN_RIGHT:
-    case DIR_RIGHT:
-        return 1;
+    case DIR_RIGHT: return 1;
     case DIR_UP:
     case DIR_DOWN:
     case DIR_NONE:
     case DIR_UNKNOWN:
-    default:
-        return 0;
+    default: return 0;
     }
 }
 
@@ -37,19 +35,34 @@ static inline int get_y_from_dir(direction_t dir) {
     switch (dir) {
     case DIR_UP:
     case DIR_UP_LEFT:
-    case DIR_UP_RIGHT:
-        return -1;
+    case DIR_UP_RIGHT: return -1;
     case DIR_DOWN:
     case DIR_DOWN_LEFT:
-    case DIR_DOWN_RIGHT:
-        return 1;
+    case DIR_DOWN_RIGHT: return 1;
     case DIR_LEFT:
     case DIR_RIGHT:
     case DIR_NONE:
     case DIR_UNKNOWN:
-    default:
-        return 0;
+    default: return 0;
     }
+}
+
+static inline loc_t get_loc_from_dir(direction_t dir) {
+    loc_t loc = {0, 0};
+    switch (dir) {
+    case DIR_UP: loc = (loc_t){0, -1}; break;
+    case DIR_DOWN: loc = (loc_t){0, 1}; break;
+    case DIR_LEFT: loc = (loc_t){-1, 0}; break;
+    case DIR_RIGHT: loc = (loc_t){1, 0}; break;
+    case DIR_UP_LEFT: loc = (loc_t){-1, -1}; break;
+    case DIR_UP_RIGHT: loc = (loc_t){1, -1}; break;
+    case DIR_DOWN_LEFT: loc = (loc_t){-1, 1}; break;
+    case DIR_DOWN_RIGHT: loc = (loc_t){1, 1}; break;
+    case DIR_NONE:
+    case DIR_UNKNOWN:
+    default: loc = (loc_t){0, 0}; break;
+    }
+    return loc;
 }
 
 static inline const direction_t get_dir_from_xy(int x, int y) {
@@ -66,25 +79,18 @@ static inline const direction_t get_dir_from_xy(int x, int y) {
     return DIR_UNKNOWN;
 }
 
+static inline direction_t get_dir_from_loc(loc_t loc) { return get_dir_from_xy(loc.x, loc.y); }
+
 static inline const char* get_dir_as_string(direction_t dir) {
     switch (dir) {
-    case DIR_UP:
-        return "up";
-    case DIR_DOWN:
-        return "down";
-    case DIR_LEFT:
-        return "left";
-    case DIR_RIGHT:
-        return "right";
-    case DIR_UP_LEFT:
-        return "up_left";
-    case DIR_UP_RIGHT:
-        return "up_right";
-    case DIR_DOWN_LEFT:
-        return "down_left";
-    case DIR_DOWN_RIGHT:
-        return "down_right";
-    default:
-        return "unknown";
+    case DIR_UP: return "up";
+    case DIR_DOWN: return "down";
+    case DIR_LEFT: return "left";
+    case DIR_RIGHT: return "right";
+    case DIR_UP_LEFT: return "up_left";
+    case DIR_UP_RIGHT: return "up_right";
+    case DIR_DOWN_LEFT: return "down_left";
+    case DIR_DOWN_RIGHT: return "down_right";
+    default: return "unknown";
     }
 }
