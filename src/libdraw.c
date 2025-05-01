@@ -154,7 +154,7 @@ static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df)
     massert(df, "dungeon_floor is NULL");
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            if (df_tile_is_wall(df, x, y)) continue;
+            //if (df_tile_is_wall(df, x, y)) continue;
             draw_dungeon_floor_tile(g, df, x, y);
         }
     }
@@ -734,19 +734,13 @@ void libdraw_update_sprites(gamestate* const g) {
 }
 
 static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
-    if (!g) {
-        merror("gamestate is NULL");
-        return false;
-    }
+    massert(g, "gamestate is NULL");
     dungeon_floor_t* const df = dungeon_get_current_floor(g->dungeon);
-    if (!df) {
-        merror("dungeon_floor is NULL");
-        return false;
-    }
+    massert(df, "dungeon_floor is NULL");
     draw_dungeon_tiles_2d(g, df);
     draw_entities_2d(g, df, true); // dead entities
     draw_entities_2d(g, df, false); // alive entities
-    draw_wall_tiles_2d(g, df);
+    //draw_wall_tiles_2d(g, df);
     return true;
 }
 
@@ -907,16 +901,16 @@ void libdraw_close() {
 
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path) {
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
-        merror("load_texture: txkey out of bounds");
+        merror("load_texture: txkey out of bounds: %d", txkey);
         return false;
     } else if (ctxs < 0) {
-        merror("load_texture: contexts out of bounds");
+        merror("load_texture: contexts out of bounds: %d", ctxs);
         return false;
     } else if (frames < 0) {
-        merror("load_texture: frames out of bounds");
+        merror("load_texture: frames out of bounds: %d", frames);
         return false;
     } else if (txinfo[txkey].texture.id > 0) {
-        merror("load_texture: texture already loaded");
+        merror("load_texture: texture already loaded: %d", txkey);
         return false;
     } else if (strlen(path) == 0) {
         merror("load_texture: path is empty");

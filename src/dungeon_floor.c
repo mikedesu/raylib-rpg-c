@@ -1021,8 +1021,8 @@ static void df_init_test_simple10(dungeon_floor_t* df) {
     //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_STONE_00, TILE_FLOOR_DIRT_GRASS_14);
 
     //tiletype_t begin_type = TILE_FLOOR_GRASS_00;
-    tiletype_t begin_type = TILE_FLOOR_STONE_DIRT_UL_00;
-    tiletype_t end_type = TILE_FLOOR_STONE_DIRT_DR_00;
+    tiletype_t begin_type = TILE_FLOOR_STONE_00;
+    tiletype_t end_type = TILE_FLOOR_STONE_DIRT_DR_05;
     //tiletype_t end_type = TILE_FLOOR_GRASS_19;
 
     df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, begin_type, end_type);

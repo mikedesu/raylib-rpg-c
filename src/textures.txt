@@ -322,3 +322,44 @@
 244 1 1  0  img/tiles/stone_dirt_dl_00.png
 245 1 1  0  img/tiles/stone_dirt_d_00.png
 246 1 1  0  img/tiles/stone_dirt_dr_00.png
+#
+247 1 1  0  img/tiles/stone_dirt_ul_01.png
+248 1 1  0  img/tiles/stone_dirt_u_01.png
+249 1 1  0  img/tiles/stone_dirt_ur_01.png
+250 1 1  0  img/tiles/stone_dirt_l_01.png
+251 1 1  0  img/tiles/stone_dirt_c_01.png
+252 1 1  0  img/tiles/stone_dirt_r_01.png
+253 1 1  0  img/tiles/stone_dirt_dl_01.png
+254 1 1  0  img/tiles/stone_dirt_d_01.png
+255 1 1  0  img/tiles/stone_dirt_dr_01.png
+#
+256 1 1  0  img/tiles/stone_dirt_ul_02.png
+257 1 1  0  img/tiles/stone_dirt_u_02.png
+258 1 1  0  img/tiles/stone_dirt_ur_02.png
+259 1 1  0  img/tiles/stone_dirt_l_02.png
+260 1 1  0  img/tiles/stone_dirt_c_02.png
+261 1 1  0  img/tiles/stone_dirt_r_02.png
+262 1 1  0  img/tiles/stone_dirt_dl_02.png
+263 1 1  0  img/tiles/stone_dirt_d_02.png
+264 1 1  0  img/tiles/stone_dirt_dr_02.png
+#
+265 1 1  0  img/tiles/stone_dirt_ul_03.png
+266 1 1  0  img/tiles/stone_dirt_u_03.png
+267 1 1  0  img/tiles/stone_dirt_ur_03.png
+268 1 1  0  img/tiles/stone_dirt_dl_03.png
+269 1 1  0  img/tiles/stone_dirt_d_03.png
+270 1 1  0  img/tiles/stone_dirt_dr_03.png
+#
+271 1 1  0  img/tiles/stone_dirt_ul_04.png
+272 1 1  0  img/tiles/stone_dirt_u_04.png
+273 1 1  0  img/tiles/stone_dirt_ur_04.png
+274 1 1  0  img/tiles/stone_dirt_dl_04.png
+275 1 1  0  img/tiles/stone_dirt_d_04.png
+276 1 1  0  img/tiles/stone_dirt_dr_04.png
+#
+277 1 1  0  img/tiles/stone_dirt_ul_05.png
+278 1 1  0  img/tiles/stone_dirt_u_05.png
+279 1 1  0  img/tiles/stone_dirt_ur_05.png
+280 1 1  0  img/tiles/stone_dirt_dl_05.png
+281 1 1  0  img/tiles/stone_dirt_d_05.png
+282 1 1  0  img/tiles/stone_dirt_dr_05.png

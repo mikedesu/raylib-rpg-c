@@ -23,8 +23,49 @@ static inline int get_txkey_for_tiletype(tiletype_t type) {
     case TILE_FLOOR_STONE_DIRT_R_00: key = TX_STONE_DIRT_R_00; break;
     case TILE_FLOOR_STONE_DIRT_DL_00: key = TX_STONE_DIRT_DL_00; break;
     case TILE_FLOOR_STONE_DIRT_D_00: key = TX_STONE_DIRT_D_00; break;
-    case TILE_FLOOR_STONE_DIRT_DR_00:
-        key = TX_STONE_DIRT_DR_00;
+    case TILE_FLOOR_STONE_DIRT_DR_00: key = TX_STONE_DIRT_DR_00; break;
+
+    case TILE_FLOOR_STONE_DIRT_UL_01: key = TX_STONE_DIRT_UL_01; break;
+    case TILE_FLOOR_STONE_DIRT_U_01: key = TX_STONE_DIRT_U_01; break;
+    case TILE_FLOOR_STONE_DIRT_UR_01: key = TX_STONE_DIRT_UR_01; break;
+    case TILE_FLOOR_STONE_DIRT_L_01: key = TX_STONE_DIRT_L_01; break;
+    case TILE_FLOOR_STONE_DIRT_C_01: key = TX_STONE_DIRT_C_01; break;
+    case TILE_FLOOR_STONE_DIRT_R_01: key = TX_STONE_DIRT_R_01; break;
+    case TILE_FLOOR_STONE_DIRT_DL_01: key = TX_STONE_DIRT_DL_01; break;
+    case TILE_FLOOR_STONE_DIRT_D_01: key = TX_STONE_DIRT_D_01; break;
+    case TILE_FLOOR_STONE_DIRT_DR_01: key = TX_STONE_DIRT_DR_01; break;
+
+    case TILE_FLOOR_STONE_DIRT_UL_02: key = TX_STONE_DIRT_UL_02; break;
+    case TILE_FLOOR_STONE_DIRT_U_02: key = TX_STONE_DIRT_U_02; break;
+    case TILE_FLOOR_STONE_DIRT_UR_02: key = TX_STONE_DIRT_UR_02; break;
+    case TILE_FLOOR_STONE_DIRT_L_02: key = TX_STONE_DIRT_L_02; break;
+    case TILE_FLOOR_STONE_DIRT_C_02: key = TX_STONE_DIRT_C_02; break;
+    case TILE_FLOOR_STONE_DIRT_R_02: key = TX_STONE_DIRT_R_02; break;
+    case TILE_FLOOR_STONE_DIRT_DL_02: key = TX_STONE_DIRT_DL_02; break;
+    case TILE_FLOOR_STONE_DIRT_D_02: key = TX_STONE_DIRT_D_02; break;
+    case TILE_FLOOR_STONE_DIRT_DR_02: key = TX_STONE_DIRT_DR_02; break;
+
+    case TILE_FLOOR_STONE_DIRT_UL_03: key = TX_STONE_DIRT_UL_03; break;
+    case TILE_FLOOR_STONE_DIRT_U_03: key = TX_STONE_DIRT_U_03; break;
+    case TILE_FLOOR_STONE_DIRT_UR_03: key = TX_STONE_DIRT_UR_03; break;
+    case TILE_FLOOR_STONE_DIRT_DL_03: key = TX_STONE_DIRT_DL_03; break;
+    case TILE_FLOOR_STONE_DIRT_D_03: key = TX_STONE_DIRT_D_03; break;
+    case TILE_FLOOR_STONE_DIRT_DR_03: key = TX_STONE_DIRT_DR_03; break;
+
+    case TILE_FLOOR_STONE_DIRT_UL_04: key = TX_STONE_DIRT_UL_04; break;
+    case TILE_FLOOR_STONE_DIRT_U_04: key = TX_STONE_DIRT_U_04; break;
+    case TILE_FLOOR_STONE_DIRT_UR_04: key = TX_STONE_DIRT_UR_04; break;
+    case TILE_FLOOR_STONE_DIRT_DL_04: key = TX_STONE_DIRT_DL_04; break;
+    case TILE_FLOOR_STONE_DIRT_D_04: key = TX_STONE_DIRT_D_04; break;
+    case TILE_FLOOR_STONE_DIRT_DR_04: key = TX_STONE_DIRT_DR_04; break;
+
+    case TILE_FLOOR_STONE_DIRT_UL_05: key = TX_STONE_DIRT_UL_05; break;
+    case TILE_FLOOR_STONE_DIRT_U_05: key = TX_STONE_DIRT_U_05; break;
+    case TILE_FLOOR_STONE_DIRT_UR_05: key = TX_STONE_DIRT_UR_05; break;
+    case TILE_FLOOR_STONE_DIRT_DL_05: key = TX_STONE_DIRT_DL_05; break;
+    case TILE_FLOOR_STONE_DIRT_D_05: key = TX_STONE_DIRT_D_05; break;
+    case TILE_FLOOR_STONE_DIRT_DR_05:
+        key = TX_STONE_DIRT_DR_05;
         break;
 
         //case TILE_STONE_WALL_04: key = TX_STONEWALL_04; break;
