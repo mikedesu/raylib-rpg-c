@@ -793,24 +793,17 @@ static void draw_message_box(gamestate* g) {
     const char* prompt = "[A] Next";
     const char* msg = g->msg_system.messages[g->msg_system.index];
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    //Color message_bg = Fade((Color){0x33, 0x33, 0x33}, 0.8f);
 
     // copy the message to a temporary buffer
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg);
 
     // Measure text (split into lines if needed)
-    //const Vector2 text_size = MeasureTextEx(GetFontDefault(), msg, g->font_size, g->line_spacing);
-    //    const Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp, g->font_size, g->line_spacing);
     int text_width = MeasureText(msg, g->font_size);
     int text_height = g->font_size;
     // Calculate centered box position
-    //   const Rectangle box = {.x = (g->windowwidth - text_size.x) / 2 - g->pad, // Center X
-    //                          .y = (g->windowheight - text_size.y) / 2 - g->pad, // Center Y
-    //                          .width = text_size.x + g->pad * 2,
-    //                          .height = text_size.y + g->pad * 2};
     const Rectangle box = {.x = (g->windowwidth - text_width) / 2.0 - g->pad,
-                           .y = (g->windowheight - text_height) / 2.0 - g->pad,
+                           .y = (g->windowheight - text_height) / 8.0 - g->pad,
                            .width = text_width + g->pad * 2,
                            .height = text_height + g->pad * 2};
     // Draw box (semi-transparent black with white border)

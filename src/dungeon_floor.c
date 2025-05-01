@@ -28,17 +28,19 @@ static void df_set_tile_area_range2(dungeon_floor_t* const df, Rectangle r, tile
 static void df_init_rect2(dungeon_floor_t* df, Rectangle r, tiletype_t t1, tiletype_t t2);
 static void df_init_rect(dungeon_floor_t* df, int x, int y, int w, int h, tiletype_t t1, tiletype_t t2);
 static bool df_malloc_tiles(dungeon_floor_t* const df);
+
 static void df_init_test_simple(dungeon_floor_t* df);
 static void df_init_test_simple2(dungeon_floor_t* df);
 static void df_init_test_simple3(dungeon_floor_t* df);
 static void df_init_test_simple4(dungeon_floor_t* df);
 static void df_init_test_simple5(dungeon_floor_t* df);
-
 static void df_init_test_simple6(dungeon_floor_t* df); // gpt-4.1-mini
 static void df_init_test_simple7(dungeon_floor_t* df); // gpt-4.1-mini
 static void df_init_test_simple8(dungeon_floor_t* df); // gpt-4.1-mini
 static void df_init_test_simple9(dungeon_floor_t* df); // gpt-4.1-mini
 static void df_init_test_simple10(dungeon_floor_t* df); // claude-3.7-sonnet
+
+static void df_init_test_complex1(dungeon_floor_t* df);
 
 static void df_assign_stairs(dungeon_floor_t* df);
 
@@ -474,7 +476,8 @@ void df_init(dungeon_floor_t* df) {
     //df_init_test_simple7(df);
     //df_init_test_simple8(df);
     //df_init_test_simple9(df);
-    df_init_test_simple10(df);
+    //df_init_test_simple10(df);
+    df_init_test_complex1(df);
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
@@ -1007,30 +1010,90 @@ static void df_init_test_simple10(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
     int cx = df_center_x(df);
     int cy = df_center_y(df);
-    int outer_w = 9;
-    int outer_h = 9;
+    int outer_w = 15;
+    int outer_h = 15;
     int inner_w = 7;
     int inner_h = 7;
-
     // Create outer wall diamond
-    df_make_diamond_shape_room(df, cx, cy, outer_w + 2, outer_h + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
     df_make_diamond_shape_room(df, cx, cy, outer_w, outer_h, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
-
     // Create inner floor diamond
-    //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-    //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_STONE_00, TILE_FLOOR_DIRT_GRASS_14);
-
     //tiletype_t begin_type = TILE_FLOOR_GRASS_00;
     tiletype_t begin_type = TILE_FLOOR_STONE_00;
     tiletype_t end_type = TILE_FLOOR_STONE_DIRT_DR_05;
-    //tiletype_t end_type = TILE_FLOOR_GRASS_19;
-
     df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, begin_type, end_type);
-    //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_DIRT_00, TILE_FLOOR_DIRT_08);
-
     // Place stairs inside the room
     df_assign_downstairs_in_area(df, cx - inner_w / 2, cy - inner_h / 2, inner_w, inner_h);
     df_assign_upstairs_in_area(df, cx - inner_w / 2, cy - inner_h / 2, inner_w, inner_h);
+}
+
+static void df_init_test_complex1(dungeon_floor_t* df) {
+    massert(df, "dungeon floor is NULL");
+
+    // Configuration
+    int room_size = 3;
+    int gap_size = 1;
+    int grid_size = 5; // 3x3 grid of rooms
+    int total_span = grid_size * room_size + (grid_size - 1) * gap_size;
+
+    // Center of the grid
+    int start_x = df_center_x(df) - total_span / 2;
+    int start_y = df_center_y(df) - total_span / 2;
+
+    // Create walls for the entire area first
+    for (int grid_y = 0; grid_y < grid_size; grid_y++) {
+        for (int grid_x = 0; grid_x < grid_size; grid_x++) {
+            // Calculate top-left corner of this room's outer wall area
+            int room_left = start_x + grid_x * (room_size + gap_size) - 1;
+            int room_top = start_y + grid_y * (room_size + gap_size) - 1;
+
+            // Create wall perimeter (room_size + 2 to include walls)
+            df_set_tile_area_range(df, room_left, room_top, room_size + 2, room_size + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+        }
+    }
+
+    // Create rooms and corridors
+    for (int grid_y = 0; grid_y < grid_size; grid_y++) {
+        for (int grid_x = 0; grid_x < grid_size; grid_x++) {
+            // Calculate top-left corner of this room
+            int room_x = start_x + grid_x * (room_size + gap_size);
+            int room_y = start_y + grid_y * (room_size + gap_size);
+
+            // Create the room
+            tiletype_t floor_start, floor_end;
+            if ((grid_x + grid_y) % 2 == 0) {
+                floor_start = TILE_FLOOR_STONE_00;
+                floor_end = TILE_FLOOR_STONE_11;
+            } else {
+                floor_start = TILE_FLOOR_STONE_DIRT_UL_00;
+                floor_end = TILE_FLOOR_STONE_DIRT_DR_05;
+            }
+
+            df_set_tile_area_range(df, room_x, room_y, room_size, room_size, floor_start, floor_end);
+
+            // Connect to room on the right if not the last column
+            if (grid_x < grid_size - 1) {
+                int corridor_x = room_x + room_size;
+                int corridor_y = room_y + room_size / 2;
+                df_set_tile(df, TILE_FLOOR_STONE_00, corridor_x, corridor_y);
+            }
+
+            // Connect to room below if not the last row
+            if (grid_y < grid_size - 1) {
+                int corridor_x = room_x + room_size / 2;
+                int corridor_y = room_y + room_size;
+                df_set_tile(df, TILE_FLOOR_STONE_00, corridor_x, corridor_y);
+            }
+        }
+    }
+
+    // Place stairs
+    int top_left_x = start_x;
+    int top_left_y = start_y;
+    df_assign_downstairs_in_area(df, top_left_x, top_left_y, room_size, room_size);
+
+    int bottom_right_x = start_x + (grid_size - 1) * (room_size + gap_size);
+    int bottom_right_y = start_y + (grid_size - 1) * (room_size + gap_size);
+    df_assign_upstairs_in_area(df, bottom_right_x, bottom_right_y, room_size, room_size);
 }
 
 bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name) {

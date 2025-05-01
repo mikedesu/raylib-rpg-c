@@ -19,7 +19,7 @@ entity_t* e_new(entityid id, entitytype_t type) {
 
     e->x = e->y = e->sprite_move_x = e->sprite_move_y = e->inventory_count = 0;
     e->weapon = e->shield = e->floor = -1;
-    e->stats.hp = e->stats.maxhp = 1;
+    e->stats.hp = e->stats.maxhp = e->stats.level = 1;
     e->stats.mp = e->stats.maxmp = 0;
     e->do_update = e->is_attacking = e->is_blocking = e->is_damaged = e->dead = false;
 
