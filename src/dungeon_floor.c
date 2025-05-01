@@ -1013,13 +1013,14 @@ static void df_init_test_simple10(dungeon_floor_t* df) {
     int inner_h = 7;
 
     // Create outer wall diamond
-    df_make_diamond_shape_room(df, cx, cy, outer_w, outer_h, TILE_STONE_WALL_00, TILE_STONE_WALL_02);
+    df_make_diamond_shape_room(df, cx, cy, outer_w + 2, outer_h + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+    df_make_diamond_shape_room(df, cx, cy, outer_w, outer_h, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
 
     // Create inner floor diamond
-    //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_STONE_00, TILE_FLOOR_DIRT_GRASS_14);
     //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_GRASS_00, TILE_FLOOR_GRASS_19);
-    df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_DIRT_00, TILE_FLOOR_DIRT_08);
+    //df_make_diamond_shape_room(df, cx, cy, inner_w, inner_h, TILE_FLOOR_DIRT_00, TILE_FLOOR_DIRT_08);
 
     // Place stairs inside the room
     df_assign_downstairs_in_area(df, cx - inner_w / 2, cy - inner_h / 2, inner_w, inner_h);

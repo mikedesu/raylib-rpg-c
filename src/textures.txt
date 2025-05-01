@@ -1,5 +1,5 @@
 # txkey contexts frames dodither path
-0  1 1  1  img/tiles/dirt_00.png
+#0  1 1  1  img/tiles/dirt_00.png
 #
 #
 # atm there are 12 total human sprite animations
@@ -49,8 +49,6 @@
 #
 #
 #
-#
-#
 27 1 1  0  img/tiles/stone_00.png
 28 1 1  0  img/tiles/stone_01.png
 29 1 1  0  img/tiles/stone_02.png
@@ -66,58 +64,55 @@
 #
 #
 #
-#
 41 1 1  0  img/tiles/stonewall_00.png
 42 1 1  0  img/tiles/stonewall_01.png
 43 1 1  0  img/tiles/stonewall_02.png
 44 1 1  0  img/tiles/stonewall_03.png
-45 1 1  0  img/tiles/stonewall_04.png
-46 1 1  0  img/tiles/stonewall_05.png
-47 1 1  0  img/tiles/stonewall_06.png
-48 1 1  0  img/tiles/stonewall_07.png
-49 1 1  0  img/tiles/stonewall_08.png
-50 1 1  0  img/tiles/stonewall_09.png
-51 1 1  0  img/tiles/stonewall_10.png
-52 1 1  0  img/tiles/stonewall_11.png
-53 1 1  0  img/tiles/stonewall_12.png
-54 1 1  0  img/tiles/stonewall_13.png
-55 1 1  0  img/tiles/stonewall_14.png
-217 1 1  0  img/tiles/stonewall_15.png
-218 1 1  0  img/tiles/stonewall_16.png
-219 1 1  0  img/tiles/stonewall_17.png
-220 1 1  0  img/tiles/stonewall_18.png
-221 1 1  0  img/tiles/stonewall_19.png
-222 1 1  0  img/tiles/stonewall_20.png
-223 1 1  0  img/tiles/stonewall_21.png
-224 1 1  0  img/tiles/stonewall_22.png
-225 1 1  0  img/tiles/stonewall_23.png
-226 1 1  0  img/tiles/stonewall_24.png
-227 1 1  0  img/tiles/stonewall_25.png
-228 1 1  0  img/tiles/stonewall_26.png
-229 1 1  0  img/tiles/stonewall_27.png
-230 1 1  0  img/tiles/stonewall_28.png
-231 1 1  0  img/tiles/stonewall_29.png
-232 1 1  0  img/tiles/stonewall_30.png
-233 1 1  0  img/tiles/stonewall_31.png
-234 1 1  0  img/tiles/stonewall_32.png
-235 1 1  0  img/tiles/stonewall_33.png
-236 1 1  0  img/tiles/stonewall_34.png
-237 1 1  0  img/tiles/stonewall_35.png
+#45 1 1  0  img/tiles/stonewall_04.png
+#46 1 1  0  img/tiles/stonewall_05.png
+#47 1 1  0  img/tiles/stonewall_06.png
+#48 1 1  0  img/tiles/stonewall_07.png
+#49 1 1  0  img/tiles/stonewall_08.png
+#50 1 1  0  img/tiles/stonewall_09.png
+#51 1 1  0  img/tiles/stonewall_10.png
+#52 1 1  0  img/tiles/stonewall_11.png
+#53 1 1  0  img/tiles/stonewall_12.png
+#54 1 1  0  img/tiles/stonewall_13.png
+#55 1 1  0  img/tiles/stonewall_14.png
+#217 1 1  0  img/tiles/stonewall_15.png
+#218 1 1  0  img/tiles/stonewall_16.png
+#219 1 1  0  img/tiles/stonewall_17.png
+#220 1 1  0  img/tiles/stonewall_18.png
+#221 1 1  0  img/tiles/stonewall_19.png
+#222 1 1  0  img/tiles/stonewall_20.png
+#223 1 1  0  img/tiles/stonewall_21.png
+#224 1 1  0  img/tiles/stonewall_22.png
+#225 1 1  0  img/tiles/stonewall_23.png
+#226 1 1  0  img/tiles/stonewall_24.png
+#227 1 1  0  img/tiles/stonewall_25.png
+#228 1 1  0  img/tiles/stonewall_26.png
+#229 1 1  0  img/tiles/stonewall_27.png
+#230 1 1  0  img/tiles/stonewall_28.png
+#231 1 1  0  img/tiles/stonewall_29.png
+#232 1 1  0  img/tiles/stonewall_30.png
+#233 1 1  0  img/tiles/stonewall_31.png
+#234 1 1  0  img/tiles/stonewall_32.png
+#235 1 1  0  img/tiles/stonewall_33.png
+#236 1 1  0  img/tiles/stonewall_34.png
+#237 1 1  0  img/tiles/stonewall_35.png
 #
 #
 #
-#
-56 1 1  0  img/tiles/grass_00.png
-57 1 1  0  img/tiles/grass_01.png
-58 1 1  0  img/tiles/grass_02.png
-59 1 1  0  img/tiles/grass_03.png
-60 1 1  0  img/tiles/grass_04.png
-61  1 1  0 img/tiles/dirt_01.png
-62  1 1  0 img/tiles/dirt_02.png
-63  1 1  0 img/tiles/dirt_03.png
-64  1 1  0 img/tiles/dirt_04.png
-65  1 1  0 img/tiles/dirt_05.png
-#
+#56 1 1  0  img/tiles/grass_00.png
+#57 1 1  0  img/tiles/grass_01.png
+#58 1 1  0  img/tiles/grass_02.png
+#59 1 1  0  img/tiles/grass_03.png
+#60 1 1  0  img/tiles/grass_04.png
+#61  1 1  0 img/tiles/dirt_01.png
+#62  1 1  0 img/tiles/dirt_02.png
+#63  1 1  0 img/tiles/dirt_03.png
+#64  1 1  0 img/tiles/dirt_04.png
+#65  1 1  0 img/tiles/dirt_05.png
 #
 #
 #
@@ -128,53 +123,53 @@
 #
 #
 #
-#
 74 1 4 0 img/shields/wooden_shield.png
 #
 #
 #
+#77 1 1  0  img/tiles/grass_05.png
+#78 1 1  0  img/tiles/grass_06.png
+#79 1 1  0  img/tiles/grass_07.png
+#80 1 1  0  img/tiles/grass_08.png
+#81 1 1  0  img/tiles/grass_09.png
+#82 1 1  0  img/tiles/grass_10.png
+#83 1 1  0  img/tiles/grass_11.png
+#84 1 1  0  img/tiles/grass_12.png
+#85 1 1  0  img/tiles/grass_13.png
+#86 1 1  0  img/tiles/grass_14.png
+#87 1 1  0  img/tiles/grass_15.png
+#88 1 1  0  img/tiles/grass_16.png
+#89 1 1  0  img/tiles/grass_17.png
+#90 1 1  0  img/tiles/grass_18.png
+#91 1 1  0  img/tiles/grass_19.png
+#92 1 1  0  img/tiles/dirt_grass_00.png
+#93 1 1  0  img/tiles/dirt_grass_01.png
+#94 1 1  0  img/tiles/dirt_grass_02.png
+#95 1 1  0  img/tiles/dirt_grass_03.png
+#96 1 1  0  img/tiles/dirt_grass_04.png
+#97 1 1  0  img/tiles/dirt_grass_05.png
+#98 1 1  0  img/tiles/dirt_grass_06.png
+#99 1 1  0  img/tiles/dirt_grass_07.png
+#100 1 1  0  img/tiles/dirt_grass_08.png
+#101 1 1  0  img/tiles/dirt_grass_09.png
+#102 1 1  0  img/tiles/dirt_grass_10.png
+#103 1 1  0  img/tiles/dirt_grass_11.png
+#104 1 1  0  img/tiles/dirt_grass_12.png
+#105 1 1  0  img/tiles/dirt_grass_13.png
+#106 1 1  0  img/tiles/dirt_grass_14.png
+#107 1 1  0  img/tiles/water_00.png
+#108 1 1  0  img/tiles/water_01.png
+#109 1 1  0  img/tiles/dirt_06.png
+#110 1 1  0  img/tiles/dirt_07.png
+#111 1 1  0  img/tiles/dirt_08.png
 #
 #
 #
-#
-#
-77 1 1  0  img/tiles/grass_05.png
-78 1 1  0  img/tiles/grass_06.png
-79 1 1  0  img/tiles/grass_07.png
-80 1 1  0  img/tiles/grass_08.png
-81 1 1  0  img/tiles/grass_09.png
-82 1 1  0  img/tiles/grass_10.png
-83 1 1  0  img/tiles/grass_11.png
-84 1 1  0  img/tiles/grass_12.png
-85 1 1  0  img/tiles/grass_13.png
-86 1 1  0  img/tiles/grass_14.png
-87 1 1  0  img/tiles/grass_15.png
-88 1 1  0  img/tiles/grass_16.png
-89 1 1  0  img/tiles/grass_17.png
-90 1 1  0  img/tiles/grass_18.png
-91 1 1  0  img/tiles/grass_19.png
-92 1 1  0  img/tiles/dirt_grass_00.png
-93 1 1  0  img/tiles/dirt_grass_01.png
-94 1 1  0  img/tiles/dirt_grass_02.png
-95 1 1  0  img/tiles/dirt_grass_03.png
-96 1 1  0  img/tiles/dirt_grass_04.png
-97 1 1  0  img/tiles/dirt_grass_05.png
-98 1 1  0  img/tiles/dirt_grass_06.png
-99 1 1  0  img/tiles/dirt_grass_07.png
-100 1 1  0  img/tiles/dirt_grass_08.png
-101 1 1  0  img/tiles/dirt_grass_09.png
-102 1 1  0  img/tiles/dirt_grass_10.png
-103 1 1  0  img/tiles/dirt_grass_11.png
-104 1 1  0  img/tiles/dirt_grass_12.png
-105 1 1  0  img/tiles/dirt_grass_13.png
-106 1 1  0  img/tiles/dirt_grass_14.png
-107 1 1  0  img/tiles/water_00.png
-108 1 1  0  img/tiles/water_01.png
-109 1 1  0  img/tiles/dirt_06.png
-110 1 1  0  img/tiles/dirt_07.png
-111 1 1  0  img/tiles/dirt_08.png
 112 1 1  0  img/switches/pressure-plate-up-00.png
 113 1 1  0  img/switches/pressure-plate-down-00.png
+#
+#
+#
 114 1 1  0  img/tiles/stone_trap_off_00.png
 115 1 1  0  img/tiles/stone_trap_on_00.png
 116 1 1  0  img/switches/wall-switch-up-00.png
@@ -182,7 +177,6 @@
 118 1 1  0  img/tiles/upstairs_00.png
 119 1 1  0  img/tiles/downstairs_00.png
 120 1 4  0  img/weapons/long_sword.png
-#
 #
 #
 #
@@ -203,7 +197,6 @@
 #
 #
 #
-#
 135 4 16 0  img/characters/elf_idle.png
 136 4 16 0  img/characters/shadows/elf_idle_shadow.png
 137 4 4  0  img/characters/elf_walk.png
@@ -218,7 +211,6 @@
 146 1 12 0  img/characters/shadows/elf_souldie_shadow.png
 147 4 4  0  img/characters/elf_dmg.png
 148 4 4  0  img/characters/shadows/elf_dmg_shadow.png
-#
 #
 #
 #
@@ -237,10 +229,8 @@
 #
 #
 #
-#
 #161 1 12 0  img/characters/halfling_souldie.png
 #162 1 12 0  img/characters/shadows/halfling_souldie_shadow.png
-#
 #
 #
 #
@@ -259,10 +249,8 @@
 #
 #
 #
-#
 #173 1 12 0  img/characters/goblin_souldie.png
 #174 1 12 0  img/characters/shadows/goblin_souldie_shadow.png
-#
 #
 #
 #
@@ -275,8 +263,6 @@
 182 4 4  0  img/monsters/shadows/bat_dmg_shadow.png
 183 3 8  0  img/monsters/bat_sleep.png
 184 3 8  0  img/monsters/shadows/bat_sleep_shadow.png
-#
-#
 #
 #
 #
@@ -295,16 +281,13 @@
 #
 #
 #
-#
 197 1 4  0  img/weapons/dagger.png
 198 1 4  0  img/weapons/two_handed_sword.png
 #
 #
 #
-#
 199 1 4  0  img/shields/iron_shield.png
 200 1 4  0  img/shields/wooden_tower_shield.png
-#
 #
 #
 #
@@ -317,14 +300,12 @@
 #
 #
 #
-#
 207 4 4  0  img/actions/slash_axe_b.png
 208 4 4  0  img/actions/slash_axe_f.png
 209 4 4  0  img/actions/slash_dagger_b.png
 210 4 4  0  img/actions/slash_dagger_f.png
 211 4 4  0  img/actions/slash_sword_b.png
 212 4 4  0  img/actions/slash_sword_f.png
-#
 #
 #
 #
