@@ -40,7 +40,6 @@ static inline void reset_player_blocking(gamestate* const g);
 static inline void reset_player_block_success(gamestate* const g);
 static inline void update_npc_state(gamestate* const g, entityid id);
 static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
-static inline void add_message_history(gamestate* const g, const char* msg);
 static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
 static entity* create_shield(gamestate* g);
@@ -84,37 +83,64 @@ static const char* get_action_key(const inputstate* const is, gamestate* const g
 
 static size_t tile_npc_count_at(gamestate* const g, dungeon_floor_t* const df, int x, int y);
 
+static void add_message_history(gamestate* const g, const char* fmt, ...);
+static void add_message_and_history(gamestate* g, const char* fmt, ...);
+static void add_message(gamestate* g, const char* fmt, ...);
+
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 
 static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
 
-static inline void add_message_history(gamestate* const g, const char* msg) {
+static void add_message_history(gamestate* const g, const char* fmt, ...) {
     massert(g, "gamestate is NULL");
-    massert(msg, "msg is NULL");
-    massert(strlen(msg) > 0, "msg is empty");
+    massert(fmt, "fmt is NULL");
     massert(g->msg_history.messages, "g->msg_history.messages is NULL");
     massert(g->msg_history.count >= 0, "g->msg_history.count is negative");
     if (g->msg_history.count >= g->msg_history.max_count) {
         merror("Message history full!");
         return;
     }
-    strncpy(g->msg_history.messages[g->msg_history.count], msg, MAX_MSG_LENGTH - 1);
+
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(g->msg_history.messages[g->msg_history.count], MAX_MSG_LENGTH - 1, fmt, args);
+    va_end(args);
+
     g->msg_history.messages[g->msg_history.count][MAX_MSG_LENGTH - 1] = '\0'; // null term
     g->msg_history.count++;
 }
 
-static void add_message(gamestate* g, const char* fmt, ...) {
-    massert(g, "add_message: gamestate is NULL");
-    massert(fmt, "add_message: format string is NULL");
+static void add_message_and_history(gamestate* g, const char* fmt, ...) {
+    massert(g, "gamestate is NULL");
+    massert(fmt, "format string is NULL");
     if (g->msg_system.count >= MAX_MESSAGES) {
         mwarning("Message queue full!");
         return;
     }
+
     va_list args;
     va_start(args, fmt);
     vsnprintf(g->msg_system.messages[g->msg_system.count], MAX_MSG_LENGTH - 1, fmt, args);
     va_end(args);
+
     add_message_history(g, g->msg_system.messages[g->msg_system.count]);
+    g->msg_system.count++;
+    g->msg_system.is_active = true;
+}
+
+static void add_message(gamestate* g, const char* fmt, ...) {
+    massert(g, "gamestate is NULL");
+    massert(fmt, "format string is NULL");
+    if (g->msg_system.count >= MAX_MESSAGES) {
+        mwarning("Message queue full!");
+        return;
+    }
+
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(g->msg_system.messages[g->msg_system.count], MAX_MSG_LENGTH - 1, fmt, args);
+    va_end(args);
+
     g->msg_system.count++;
     g->msg_system.is_active = true;
 }
@@ -306,8 +332,8 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     target->do_update = true;
     int dmg = 1;
     e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
-    if (target->type == ENTITY_PLAYER) add_message(g, "%s attacked you for %d damage!", attacker->name, dmg);
-    if (attacker->type == ENTITY_PLAYER) add_message(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
+    if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
+    if (attacker->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
 
     if (e_get_hp(target) <= 0) target->dead = true;
 }
@@ -322,7 +348,7 @@ static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* 
     target->is_damaged = false;
     target->block_success = true;
     target->do_update = true;
-    if (target->type == ENTITY_PLAYER) add_message_history(g, "You blocked the attack!");
+    if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
 
 static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entity* attacker, bool* attack_successful) {
@@ -1371,7 +1397,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             }
 
             hero->weapon = item_id;
-            add_message(g, "Equipped %s", item->name);
+            add_message_and_history(g, "%s equipped %s", hero->name, item->name);
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1386,7 +1412,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             }
 
             hero->shield = item_id;
-            add_message(g, "Equipped %s", item->name);
+            add_message_and_history(g, "%s equipped %s", hero->name, item->name);
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1409,14 +1435,14 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         if (item->type == ENTITY_WEAPON) {
             // unequip the weapon
             hero->weapon = ENTITYID_INVALID;
-            add_message(g, "Unequipped %s", item->name);
+            add_message_and_history(g, "%s unequipped %s", hero->name, item->name);
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         } else if (item->type == ENTITY_SHIELD) {
             // equip the shield
             hero->shield = ENTITYID_INVALID;
-            add_message(g, "Unequipped %s", item->name);
+            add_message_and_history(g, "%s unequipped %s", hero->name, item->name);
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1435,7 +1461,6 @@ static inline void change_player_dir(gamestate* const g, direction_t dir) {
 }
 
 static bool try_entity_pickup(gamestate* const g, entity* const e) {
-    //minfo("try_entity_pickup: trying to pick up item");
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
     e->do_update = true;
@@ -1446,10 +1471,10 @@ static bool try_entity_pickup(gamestate* const g, entity* const e) {
         return false;
     }
     tile_t* const tile = df_tile_at(df, e->x, e->y);
-    //if (!tile) {
-    //    merror("Failed to get tile");
-    //    return false;
-    //}
+    if (!tile) {
+        merror("Failed to get tile");
+        return false;
+    }
     if (tile->entity_count == 0) {
         merror("No items on tile");
         return false;
@@ -1462,10 +1487,9 @@ static bool try_entity_pickup(gamestate* const g, entity* const e) {
             return false;
         }
         if (it->type == ENTITY_WEAPON || it->type == ENTITY_SHIELD || it->type == ENTITY_POTION) {
-            add_message(g, "Picked up %s", it->name);
+            add_message_and_history(g, "%s picked up a %s", e->name, it->name);
             tile_remove(tile, id);
             e_add_item_to_inventory(e, id);
-            msuccess("Picked up item: %s", it->name);
             if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return true;
         } else {
@@ -1614,20 +1638,8 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         } else if (strcmp(action, "move_se") == 0) {
             execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_RIGHT);
         } else if (strcmp(action, "attack") == 0) {
-            //msuccess("attack pressed!");
-            //if (e_has_weapon(hero)) {
-            //msuccess("Entity has weapon");
-            //int tx = hero->x + get_x_from_dir(hero->direction);
-            //int ty = hero->y + get_y_from_dir(hero->direction);
             loc_t loc = get_loc_from_dir(hero->direction);
             try_entity_attack(g, hero->id, hero->x + loc.x, hero->y + loc.y);
-            //}
-            //else {
-            //    merror("Entity has no weapon");
-            //    add_message(g, "You have no weapon to attack with!");
-            // add a message to the message system
-            //}
-            //}
         } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
             // but eventually this will be generalized
@@ -1787,7 +1799,7 @@ static void update_player_state(gamestate* const g) {
     massert(e, "liblogic_update_player_state: hero is NULL");
     if (!g->gameover) {
         if (e->dead) {
-            add_message(g, "You died!");
+            add_message_and_history(g, "You died!");
             g->gameover = true;
         }
         return;
