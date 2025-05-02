@@ -36,6 +36,7 @@ static inline loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
 static inline bool player_on_tile(gamestate* g, int x, int y, int floor);
 
+static inline void reset_player_blocking(gamestate* const g);
 static inline void reset_player_block_success(gamestate* const g);
 static inline void update_npc_state(gamestate* const g, entityid id);
 static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
@@ -46,16 +47,15 @@ static entity* create_shield(gamestate* g);
 static entity* create_sword(gamestate* g);
 static entity* create_sword_at(gamestate* g, loc_t loc);
 static entity* create_shield_at(gamestate* g, loc_t loc);
+
 static void create_elf_at(gamestate* g, loc_t loc);
 static void create_human_at(gamestate* g, loc_t loc);
 static void create_orc_at(gamestate* g, loc_t loc);
 static void create_goblin_at(gamestate* g, loc_t loc);
 static void create_halfling_at(gamestate* g, loc_t loc);
 static void create_dwarf_at(gamestate* g, loc_t loc);
-static entityid create_potion_at(gamestate* const g, potiontype_t potion_type, const char* name, loc_t loc);
 
-//static void create_elf_at(gamestate* g, int x, int y);
-//static void create_human_at(gamestate* g, int x, int y);
+static entityid create_potion_at(gamestate* const g, potiontype_t potion_type, const char* name, loc_t loc);
 
 static void init_potion_test(gamestate* const g, potiontype_t potion_type, const char* name);
 static void init_humans_test(gamestate* const g);
@@ -68,6 +68,7 @@ static void init_orcs_test_intermediate(gamestate* const g);
 static void init_elves_test_intermediate(gamestate* const g);
 static void init_goblins_test_intermediate(gamestate* const g);
 static void init_halflings_test_intermediate(gamestate* const g);
+
 static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
 
@@ -1841,7 +1842,7 @@ static void handle_npcs(gamestate* const g) {
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }
 
-static void reset_player_blocking(gamestate* const g) {
+static inline void reset_player_blocking(gamestate* const g) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "hero is NULL");
@@ -1852,7 +1853,7 @@ static void reset_player_blocking(gamestate* const g) {
 static inline void reset_player_block_success(gamestate* const g) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, g->hero_id);
-    massert(e, "liblogic_reset_player_block_success: hero is NULL");
+    massert(e, "hero is NULL");
     e->block_success = false;
 }
 

@@ -45,10 +45,6 @@ dungeon_floor_t* df_create(int width, int height);
 void df_init(dungeon_floor_t* df);
 void df_free(dungeon_floor_t* f);
 
-//bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y);
-//tile_t* df_tile_at(const dungeon_floor_t* const df, int x, int y);
-//tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y);
-
 bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y);
 
@@ -63,8 +59,6 @@ int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
 
 bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
-
-//tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) ;
 
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
     //minfo("df_tile_at: %d, %d", x, y);

@@ -41,62 +41,117 @@ tile_t* tile_create(tiletype_t type);
 
 entityid tile_add(tile_t* const tile, entityid id);
 entityid tile_remove(tile_t* const tile, entityid id);
-//entityid tile_get_entity(const tile_t* const t, size_t i);
-//size_t tile_entity_count(const tile_t* const t);
+
 bool tile_resize(tile_t* t);
-bool tile_has_pressure_plate(const tile_t* const t);
-//bool tile_is_wall_switch_on(const tile_t* const t);
-//bool tile_has_wall_switch(const tile_t* const t);
-int tile_get_pressure_plate_event(const tile_t* const t);
-//int tile_get_wall_switch_event(const tile_t* t);
-//int tile_get_wall_switch_down_tx_key(const tile_t* t);
-//int tile_get_wall_switch_up_tx_key(const tile_t* t);
+
 void tile_init(tile_t* const t, tiletype_t type);
 void tile_free(tile_t* t);
-void tile_set_pressure_plate_down_tx_key(tile_t* const t, int k);
-void tile_set_pressure_plate_event(tile_t* const t, int e);
-void tile_set_pressure_plate(tile_t* const t, bool b);
-void tile_set_pressure_plate_up_tx_key(tile_t* const t, int k);
-//void tile_set_wall_switch_on(tile_t* const t, bool on);
-//void tile_set_wall_switch_event(tile_t* const t, int e);
-//void tile_set_wall_switch_down_tx_key(tile_t* const t, int k);
-//void tile_set_wall_switch_up_tx_key(tile_t* const t, int k);
-//void tile_set_wall_switch(tile_t* const t, bool b);
-bool tile_has_live_npcs(tile_t* t, em_t* em);
-bool tile_has_player(tile_t* t, em_t* em);
+void recompute_entity_cache(tile_t* t, em_t* em);
 
-size_t tile_live_npc_count(tile_t* t, em_t* em);
+static inline void tile_set_pressure_plate(tile_t* const t, bool b) {
+    massert(t, "tile is NULL");
+    t->has_pressure_plate = b;
+}
 
-static inline size_t tile_entity_count(const tile_t* const t) { return !t ? 0 : t->entity_count; }
-static inline entityid tile_get_entity(const tile_t* const t, size_t i) { return !t ? -1 : i < t->entity_max ? t->entities[i] : -1; }
-static inline bool tile_is_wall_switch_on(const tile_t* const t) { return !t ? false : t->wall_switch_on; }
+static inline void tile_set_pressure_plate_up_tx_key(tile_t* const t, int k) {
+    massert(t, "tile is NULL");
+    t->pressure_plate_up_tx_key = k;
+}
+
+static inline void tile_set_pressure_plate_down_tx_key(tile_t* const t, int k) {
+    massert(t, "tile is NULL");
+    t->pressure_plate_down_tx_key = k;
+}
+
+static inline void tile_set_pressure_plate_event(tile_t* const t, int e) {
+    massert(t, "tile is NULL");
+    t->pressure_plate_event = e;
+}
+
+static inline size_t tile_entity_count(const tile_t* const t) {
+    massert(t, "tile is NULL");
+    return t->entity_count;
+}
+
+static inline entityid tile_get_entity(const tile_t* const t, size_t i) {
+    massert(t, "tile is NULL");
+    return i < t->entity_max ? t->entities[i] : -1;
+}
+
+static inline bool tile_is_wall_switch_on(const tile_t* const t) {
+    massert(t, "tile is NULL");
+    return t->wall_switch_on;
+}
 
 static inline void tile_set_wall_switch_on(tile_t* const t, bool on) {
-    if (!t) return;
+    massert(t, "tile is NULL");
     t->wall_switch_on = on;
 }
 
 static inline void tile_set_wall_switch(tile_t* const t, bool b) {
-    if (!t) return;
+    massert(t, "tile is NULL");
     t->has_wall_switch = b;
 }
 
 static inline void tile_set_wall_switch_up_tx_key(tile_t* t, int key) {
-    if (!t) return;
+    massert(t, "tile is NULL");
     t->wall_switch_up_tx_key = key;
 }
 
 static inline void tile_set_wall_switch_down_tx_key(tile_t* const t, int key) {
-    if (!t) return;
+    massert(t, "tile is NULL");
     t->wall_switch_down_tx_key = key;
 }
 
 static inline void tile_set_wall_switch_event(tile_t* const t, int event) {
-    if (!t) return;
+    massert(t, "tile is NULL");
     t->wall_switch_event = event;
 }
 
-static inline bool tile_has_wall_switch(const tile_t* const t) { return !t ? false : t->has_wall_switch; }
-static inline int tile_get_wall_switch_up_tx_key(const tile_t* const t) { return !t ? -1 : t->wall_switch_up_tx_key; }
-static inline int tile_get_wall_switch_down_tx_key(const tile_t* const t) { return !t ? -1 : t->wall_switch_down_tx_key; }
-static inline int tile_get_wall_switch_event(const tile_t* const t) { return !t ? -1 : t->wall_switch_event; }
+static inline bool tile_has_wall_switch(const tile_t* const t) {
+    massert(t, "tile is NULL");
+    return t->has_wall_switch;
+}
+
+static inline int tile_get_wall_switch_up_tx_key(const tile_t* const t) {
+    massert(t, "tile is NULL");
+    return t->wall_switch_up_tx_key;
+}
+
+static inline int tile_get_wall_switch_down_tx_key(const tile_t* const t) {
+    massert(t, "tile is NULL");
+    return t->wall_switch_down_tx_key;
+}
+
+static inline int tile_get_wall_switch_event(const tile_t* const t) {
+    massert(t, "tile is NULL");
+    return t->wall_switch_event;
+}
+
+static inline bool tile_has_pressure_plate(const tile_t* const t) {
+    massert(t, "tile is NULL");
+    return t->has_pressure_plate;
+}
+
+static inline int tile_get_pressure_plate_event(const tile_t* const t) {
+    massert(t, "tile is NULL");
+    return t->pressure_plate_event;
+}
+
+static inline bool tile_has_live_npcs(tile_t* t, em_t* em) {
+    if (!t) return false;
+    recompute_entity_cache(t, em);
+    return t->cached_live_npcs > 0;
+}
+
+static inline size_t tile_live_npc_count(tile_t* t, em_t* em) {
+    massert(t, "tile is NULL");
+    recompute_entity_cache(t, em);
+    return t->cached_live_npcs;
+}
+
+static inline bool tile_has_player(tile_t* t, em_t* em) {
+    if (!t) return false;
+    recompute_entity_cache(t, em);
+    return t->cached_player_present;
+}
