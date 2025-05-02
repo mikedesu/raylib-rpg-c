@@ -553,46 +553,6 @@ static entityid create_potion_at(gamestate* const g, potiontype_t potion_type, c
     return e->id;
 }
 
-//static entityid create_potion_at(gamestate* const g, potiontype_t potion_type, const char* name, int x, int y, int fl) {
-//    massert(g, "gamestate is NULL");
-//    em_t* em = gamestate_get_entitymap(g);
-//    massert(em, "entitymap is NULL");
-//    massert(name && name[0], "name is NULL or empty");
-//    massert(potion_type >= 0, "potion_type is NONE or less than 0");
-//    massert(potion_type < POTION_COUNT, "potion_type is out of bounds");
-//    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
-//    massert(df, "failed to get current dungeon floor");
-//    massert(x >= 0, "x is out of bounds");
-//    massert(x < df->width, "x is out of bounds");
-//    massert(y >= 0, "y is out of bounds");
-//    massert(y < df->height, "y is out of bounds");
-//    tile_t* const tile = df_tile_at(df, x, y);
-//    massert(tile, "failed to get tile");
-//    if (!tile_is_walkable(tile->type)) {
-//        merror("cannot create entity on wall");
-//        return ENTITYID_INVALID;
-//    }
-//    if (tile_has_live_npcs(tile, em)) {
-//        merror("cannot create entity on tile with NPC");
-//        return ENTITYID_INVALID;
-//    }
-//    entity* const e = e_new_potion_at(next_entityid++, potion_type, name, x, y, fl);
-//    if (!e) {
-//        merror("failed to create entity");
-//        return ENTITYID_INVALID;
-//    }
-//    // FIRST try to add to dungeon floor
-//    if (!df_add_at(df, e->id, x, y)) {
-//        merror("failed to add entity to dungeon floor");
-//        free(e); // Free immediately since EM doesn't own it yet
-//        return ENTITYID_INVALID;
-//    }
-//    // ONLY add to EM after dungeon placement succeeds
-//    em_add(gamestate_get_entitymap(g), e);
-//    gs_add_entityid(g, e->id);
-//    return e->id;
-//}
-
 static entityid weapon_create(gamestate* const g, int x, int y, int fl, const char* name) {
     massert(g, "gamestate is NULL");
     em_t* em = gamestate_get_entitymap(g);
@@ -724,14 +684,6 @@ static entity* create_shield(gamestate* g) {
     gs_add_entityid(g, id);
     return e;
 }
-
-//static entity* create_shield_at(gamestate* g, int x, int y) {
-//    entityid id = shield_create(g, x, y, 0, "shield");
-//    massert(id != ENTITYID_INVALID, "shield create fail");
-//    entity* s = em_get(g->entitymap, id);
-//    massert(s, "shield is NULL");
-//    return s;
-//}
 
 static entity* create_shield_at(gamestate* g, loc_t loc) {
     entityid id = shield_create(g, loc.x, loc.y, 0, "shield");
@@ -899,13 +851,9 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     // use the previously-written liblogic_npc_create function
     const entitytype_t type = ENTITY_PLAYER;
     const entityid id = npc_create(g, rt, x, y, fl, name);
-    em_t* em = gamestate_get_entitymap(g);
-    massert(em, "entitymap is NULL");
-    entity_t* const e = em_get(em, id);
-    if (!e) {
-        merror("failed to get entity with id %d", id);
-        return ENTITYID_INVALID;
-    }
+    massert(id != ENTITYID_INVALID, "failed to create player");
+    entity_t* const e = em_get(g->entitymap, id);
+    massert(e, "entity is NULL");
     e_set_type(e, type);
     gamestate_set_hero_id(g, id);
     return id;
