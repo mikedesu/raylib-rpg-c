@@ -792,8 +792,8 @@ static void draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) { return; }
     const char* prompt = "[A] Next";
     const char* msg = g->msg_system.messages[g->msg_system.index];
-    //Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    Color message_bg = (Color){0, 0, 0xff, 0xff};
+    Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
+    //Color message_bg = (Color){0, 0, 0xff, 0xff};
 
     // copy the message to a temporary buffer
     char tmp[1024] = {0};
@@ -1112,8 +1112,8 @@ static void draw_hud(gamestate* const g) {
     const int box_h = text_size.y + g->pad;
     const int box_x = (g->windowwidth - box_w) / 2;
     const int box_y = (g->windowheight - box_h) * 7 / 8;
-    //const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
-    const Color bg = (Color){0, 0, 0xff, 0xFF}, fg = WHITE;
+    const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
+    //const Color bg = (Color){0, 0, 0xff, 0xFF}, fg = WHITE;
 
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, 2, fg);
@@ -1156,8 +1156,8 @@ static void draw_message_history(gamestate* const g) {
     const int y = 10;
     int current_count = 0;
     char tmp_buffer[2048] = {0};
-    //Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    Color message_bg = (Color){0, 0, 0xff, 0xff};
+    Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
+    //Color message_bg = (Color){0, 0, 0xff, 0xff};
     // instead of a placeholder message, we now need to actually draw the message history
     // we might only render the last N messages
     for (int i = g->msg_history.count - 1; i >= 0 && current_count < max_messages; i--) {
