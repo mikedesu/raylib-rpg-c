@@ -16,6 +16,7 @@
 #include "location.h"
 #include "massert.h"
 #include "mprint.h"
+#include "path_node.h"
 #include "potiontype.h"
 #include "race.h"
 #include <assert.h>
@@ -35,6 +36,7 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
 static inline loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
 static inline bool player_on_tile(gamestate* g, int x, int y, int floor);
+static inline bool is_traversable(gamestate* const g, int x, int y, int z);
 
 static inline void reset_player_blocking(gamestate* const g);
 static inline void reset_player_block_success(gamestate* const g);
@@ -905,11 +907,12 @@ static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt) {
     loc_t* locs = malloc(sizeof(loc_t) * c);
     massert(locs, "malloc failed");
     int i = 0;
-    for (int y = 0; y < df->height; y++)
+    for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tile_t* t = df_tile_at(df, x, y);
             if (tile_is_walkable(t->type)) locs[i++] = (loc_t){x, y};
         }
+    }
     massert(i == c, "count mismatch");
     *cnt = c;
     return locs;
@@ -925,11 +928,7 @@ static loc_t* get_empty_locs(dungeon_floor_t* const df, int* count) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tile_t* t = df_tile_at(df, x, y);
-            if (tile_entity_count(t) == 0) {
-                locs[i].x = x;
-                locs[i].y = y;
-                i++;
-            }
+            if (tile_entity_count(t) == 0) { locs[i++] = (loc_t){x, y}; }
         }
     }
     massert(i == c, "count mismatch");
@@ -1847,4 +1846,28 @@ void liblogic_close(gamestate* const g) {
 
     // free the dungeon
     dungeon_free(g->dungeon);
+}
+
+// Check if a location is traversable (walkable and unoccupied)
+static inline bool is_traversable(gamestate* const g, int x, int y, int z) {
+    massert(g, "gamestate is NULL");
+    // get the dungeon floor
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, z);
+    massert(df, "floor is NULL");
+
+    // Check map bounds
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height) return false;
+
+    // Get the current tile
+    tile_t* tile = df_tile_at(df, x, y);
+    massert(tile, "tile is NULL");
+
+    // Check if the tile type is walkable
+    if (!tile_is_walkable(tile->type)) return false;
+
+    // Check for blocking entities
+    // Comment out the next line if entity blocking is interfering with pathfinding tests
+    if (tile_has_live_npcs(tile, g->entitymap)) return false;
+
+    return true;
 }
