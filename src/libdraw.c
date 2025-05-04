@@ -1127,8 +1127,8 @@ void libdraw_init(gamestate* const g) {
     massert(g, "gamestate is NULL");
     const int w = DEFAULT_WIN_WIDTH;
     const int h = DEFAULT_WIN_HEIGHT;
-    const int x = w / 4;
-    const int y = h / 4;
+    const int x = w / 3;
+    const int y = h / 3;
     const char* title = "evildojo666";
     InitWindow(w, h, title);
     g->windowwidth = w;
