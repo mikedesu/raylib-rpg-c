@@ -4,6 +4,7 @@
 #include "entity_actions.h" // Include the new enum
 #include "entityid.h"
 #include "entitytype.h"
+#include "location.h"
 #include "massert.h"
 #include "potiontype.h"
 #include "race.h"
@@ -54,10 +55,21 @@ typedef struct entity_t {
     entityid weapon;
     entityid shield;
     entity_t* next;
+
+    // pathfinding
+    loc_t target;
+    int target_path_length;
+    loc_t* target_path;
 } entity;
 
 entity_t* e_new(entityid id, entitytype_t type);
 entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int floor);
+
+void e_free(entity_t* e);
+void e_free_target_path(entity_t* const e);
+
+bool e_add_item_to_inventory(entity_t* const e, entityid item_id);
+bool e_remove_item_from_inventory(entity_t* const e, entityid item_id);
 
 static inline void e_set_x(entity_t* const e, int x) {
     massert(e, "entity is null");
@@ -296,6 +308,3 @@ static inline bool e_has_shield(entity_t* const e) {
     massert(e, "e is NULL");
     return e->shield != ENTITYID_INVALID;
 }
-
-bool e_add_item_to_inventory(entity_t* const e, entityid item_id);
-bool e_remove_item_from_inventory(entity_t* const e, entityid item_id);

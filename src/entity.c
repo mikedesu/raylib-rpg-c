@@ -26,8 +26,36 @@ entity_t* e_new(entityid id, entitytype_t type) {
     e->potion_type = POTION_NONE;
 
     e->next = NULL;
+    e->target_path = NULL;
+    e->target_path_length = 0;
+    e->target = (loc_t){-1, -1, -1};
     strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     return e;
+}
+
+// one caveat to the way entities are handled:
+// entities may contain a "next" for use with the entitymap
+// you MUST acquire the next pointer externally before calling this function
+// otherwise things will break badly!
+void e_free(entity_t* e) {
+    massert(e, "e is NULL");
+    massert(e->next == NULL, "e->next is not NULL. You MUST acquire the next pointer externally and set it to NULL before calling this function");
+
+    if (e->target_path) {
+        free(e->target_path);
+        e->target_path = NULL;
+        e->target_path_length = 0;
+    }
+    free(e);
+}
+
+void e_free_target_path(entity_t* const e) {
+    massert(e, "e is NULL");
+    if (e->target_path) {
+        free(e->target_path);
+        e->target_path = NULL;
+        e->target_path_length = 0;
+    }
 }
 
 entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int floor) {

@@ -24,7 +24,9 @@ bool em_free(em_t* em) {
         while (current != NULL) {
             entity_t* next = current->next;
             current->next = NULL; // Clear the next pointer
-            free(current);
+
+            // entity free wrapper to handle target_path now
+            e_free(current);
             current = next;
         }
     }
