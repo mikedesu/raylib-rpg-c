@@ -96,6 +96,9 @@ static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
 static void try_entity_move_a_star(gamestate* const g, entity* const e);
 static void try_entity_move(gamestate* const g, entity* const e, int x, int y);
 
+static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1);
+static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
+
 static void add_message_history(gamestate* const g, const char* fmt, ...) {
     massert(g, "gamestate is NULL");
     massert(fmt, "fmt is NULL");
@@ -309,10 +312,28 @@ static void try_entity_move_a_star(gamestate* const g, entity* const e) {
             // instead of grabbing index 0, which is the target destination, AND
             // instead of grabbing index target_path_length -1, which is the entity's current location,
             // we want to grab the second to last index, which is the next location to move to
-            loc_t loc = e->target_path[e->target_path_length - 2];
-            int dx = loc.x - e->x;
-            int dy = loc.y - e->y;
-            try_entity_move(g, e, dx, dy);
+
+            if (e->target_path_length >= 2) {
+                loc_t loc = e->target_path[e->target_path_length - 2];
+                int dx = loc.x - e->x;
+                int dy = loc.y - e->y;
+
+                if (entities_adjacent(g, e->id, h->id)) {
+                    // if the entity is adjacent to the hero, try to attack
+                    try_entity_attack(g, e->id, loc.x, loc.y);
+                } else {
+                    // if the entity is not adjacent to the hero, try to move
+                    try_entity_move(g, e, dx, dy);
+                }
+
+                //try_entity_move(g, e, dx, dy);
+            } else if (e->target_path_length == 1) {
+                // we are at the destination
+                minfo("Entity is at the destination");
+            } else {
+                // find path could not return a valid path
+                merror("find_path returned an invalid path");
+            }
         }
     }
 }
@@ -475,9 +496,10 @@ static void try_entity_attack_player(gamestate* const g, entity* const e) {
 }
 
 static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
-    massert(g, "liblogic_entities_adjacent: gamestate is NULL");
-    massert(id0 != ENTITYID_INVALID, "liblogic_entities_adjacent: id0 is invalid");
-    massert(id1 != ENTITYID_INVALID, "liblogic_entities_adjacent: id1 is invalid");
+    massert(g, "gamestate is NULL");
+    massert(id0 != ENTITYID_INVALID, "id0 is invalid");
+    massert(id1 != ENTITYID_INVALID, "id1 is invalid");
+    massert(id0 != id1, "id0 and id1 are the same");
 
     entity* const e0 = em_get(g->entitymap, id0);
     massert(e0, "liblogic_entities_adjacent: e0 is NULL");
