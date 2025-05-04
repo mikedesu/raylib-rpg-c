@@ -429,9 +429,19 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
 
     // lets try an experiment...
     if (target->shield != ENTITYID_INVALID) {
-        msuccess("Block successful");
-        handle_attack_blocked(g, attacker, target, attack_successful);
-        return false;
+        // introducing a random chance to block if you have a shield...
+
+        int block_chance = rand() % 100;
+
+        if (block_chance < 50) {
+            msuccess("Block successful");
+            handle_attack_blocked(g, attacker, target, attack_successful);
+            return false;
+        }
+
+        //msuccess("Block successful");
+        //handle_attack_blocked(g, attacker, target, attack_successful);
+        //return false;
     }
     msuccess("Attack successful");
     handle_attack_success(g, attacker, target, attack_successful);
@@ -528,7 +538,7 @@ static void try_entity_move_attack_player(gamestate* const g, entity* const e) {
 static void try_entity_wait(gamestate* const g, entity* const e) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
-    if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) e_incr_hp(e, 1);
+    //if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) e_incr_hp(e, 1);
     if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     e->do_update = true;
 }
@@ -1085,7 +1095,7 @@ static void init_orcs_test_intermediate(gamestate* g) {
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
     massert(df, "floor is NULL");
     int c;
-    int max = 10;
+    int max = 100;
     int created = 0;
     entity* player = em_get(g->entitymap, g->hero_id);
     while (created < max) {
