@@ -334,8 +334,8 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     target->do_update = true;
     int dmg = 1;
     e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
-    if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
-    if (attacker->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
+    //if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
+    //if (attacker->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
 
     if (e_get_hp(target) <= 0) target->dead = true;
 }
@@ -350,7 +350,7 @@ static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* 
     target->is_damaged = false;
     target->block_success = true;
     target->do_update = true;
-    if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
+    //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
 
 static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entity* attacker, bool* attack_successful) {
@@ -1025,7 +1025,7 @@ static void init_orcs_test_intermediate(gamestate* g) {
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
     massert(df, "floor is NULL");
     int c;
-    int max = 100;
+    int max = 10;
     int created = 0;
     entity* player = em_get(g->entitymap, g->hero_id);
     while (created < max) {
