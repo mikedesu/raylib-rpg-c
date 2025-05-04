@@ -1592,7 +1592,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             // but eventually this will be generalized
             // for instance u can talk to an NPC merchant using "interact"
             // or open a door, etc
-            msuccess("Space pressed!");
+            //msuccess("Space pressed!");
             int tx = hero->x + get_x_from_dir(hero->direction);
             int ty = hero->y + get_y_from_dir(hero->direction);
             try_flip_switch(g, hero, tx, ty, hero->floor);
@@ -1607,8 +1607,8 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
 }
 
 static void handle_input(const inputstate* const is, gamestate* const g) {
-    massert(is, "handle_input: inputstate is NULL");
-    massert(g, "handle_input: gamestate is NULL");
+    massert(is, "inputstate is NULL");
+    massert(g, "gamestate is NULL");
     // no matter which mode we are in, we can toggle the debug panel
     if (inputstate_is_pressed(is, KEY_D)) {
         msuccess("D pressed!");
