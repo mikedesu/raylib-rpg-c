@@ -51,7 +51,7 @@ static entity* create_shield_at(gamestate* g, loc_t loc);
 
 static void create_elf_at(gamestate* g, loc_t loc);
 static void create_human_at(gamestate* g, loc_t loc);
-static void create_orc_at(gamestate* g, loc_t loc);
+static entity* create_orc_at(gamestate* g, loc_t loc);
 static void create_goblin_at(gamestate* g, loc_t loc);
 static void create_halfling_at(gamestate* g, loc_t loc);
 static void create_dwarf_at(gamestate* g, loc_t loc);
@@ -92,6 +92,9 @@ static void add_message(gamestate* g, const char* fmt, ...);
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 
 static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
+
+static void try_entity_move_a_star(gamestate* const g, entity* const e);
+static void try_entity_move(gamestate* const g, entity* const e, int x, int y);
 
 static void add_message_history(gamestate* const g, const char* fmt, ...) {
     massert(g, "gamestate is NULL");
@@ -281,6 +284,37 @@ static void try_entity_move_player(gamestate* const g, entity* const e) {
     int dx = (h->x > e->x) ? 1 : (h->x < e->x) ? -1 : 0;
     int dy = (h->y > e->y) ? 1 : (h->y < e->y) ? -1 : 0;
     if (dx != 0 || dy != 0) try_entity_move(g, e, dx, dy);
+}
+
+static void try_entity_move_a_star(gamestate* const g, entity* const e) {
+    massert(g, "gamestate is NULL");
+    massert(e, "entity is NULL");
+
+    if (e->target_path) { e_free_target_path(e); }
+
+    // for testing, we will hardcode an update to the entity's target
+    // realistically, we should actually use a target ID and do location lookups on every update
+    // however, for this test, we will instead hardcode the target to point to the hero's location
+    // first, grab the hero id and then the hero entity pointer
+    entity* h = em_get(g->entitymap, g->hero_id);
+    massert(h, "hero is NULL");
+    // set the target to the hero's location
+    e->target.x = h->x;
+    e->target.y = h->y;
+
+    e->target_path = find_path((loc_t){e->x, e->y, e->floor}, e->target, g->dungeon->floors[g->dungeon->current_floor], &e->target_path_length);
+
+    if (e->target_path) {
+        if (e->target_path_length > 0) {
+            // instead of grabbing index 0, which is the target destination, AND
+            // instead of grabbing index target_path_length -1, which is the entity's current location,
+            // we want to grab the second to last index, which is the next location to move to
+            loc_t loc = e->target_path[e->target_path_length - 2];
+            int dx = loc.x - e->x;
+            int dy = loc.y - e->y;
+            try_entity_move(g, e, dx, dy);
+        }
+    }
 }
 
 static void try_entity_move_random(gamestate* const g, entity* const e) {
@@ -503,6 +537,7 @@ static void execute_action(gamestate* const g, entity* const e, entity_action_t 
     case ENTITY_ACTION_MOVE_PLAYER: try_entity_move_player(g, e); break;
     case ENTITY_ACTION_ATTACK_PLAYER: try_entity_attack_player(g, e); break;
     case ENTITY_ACTION_MOVE_ATTACK_PLAYER: try_entity_move_attack_player(g, e); break;
+    case ENTITY_ACTION_MOVE_A_STAR: try_entity_move_a_star(g, e); break;
     case ENTITY_ACTION_INTERACT_DOWN_LEFT:
     case ENTITY_ACTION_INTERACT_DOWN_RIGHT:
     case ENTITY_ACTION_INTERACT_UP_LEFT:
@@ -956,16 +991,19 @@ static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count) {
     return locs;
 }
 
-static void create_orc_at(gamestate* g, loc_t loc) {
+static entity* create_orc_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_ORC, loc.x, loc.y, loc.z, "orc");
     massert(e, "orc create fail");
-    e_set_default_action(e, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
+    //e_set_default_action(e, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
+    e_set_default_action(e, ENTITY_ACTION_MOVE_A_STAR);
     e_set_maxhp(e, 1);
     e_set_hp(e, 1);
 
     entity* sword = create_sword(g);
     e_add_item_to_inventory(e, sword->id);
     e->weapon = sword->id;
+
+    return e;
 
     //entity* shield = create_shield(g);
     //e_add_item_to_inventory(e, shield->id);
@@ -1030,7 +1068,10 @@ static void init_orcs_test_intermediate(gamestate* g) {
     entity* player = em_get(g->entitymap, g->hero_id);
     while (created < max) {
         loc_t loc = get_random_empty_non_wall_loc(g, g->dungeon->current_floor);
-        create_orc_at(g, loc);
+        entity* orc = create_orc_at(g, loc);
+        massert(orc, "orc is NULL");
+        // assign the player as the orc's target
+        orc->target = (loc_t){player->x, player->y, player->floor};
         created++;
     }
 }
@@ -1788,7 +1829,7 @@ static void handle_nth_npc(gamestate* const g, int i) {
     entityid id = g->entityids[i];
     if (id == g->hero_id) return; // Skip the hero
     entity* e = em_get(g->entitymap, id);
-    massert(e, "liblogic_handle_nth_npc: entity is NULL");
+    massert(e, "entity is NULL");
     if (e->type == ENTITY_NPC && !e->dead) execute_action(g, e, e->default_action);
 }
 
