@@ -1095,7 +1095,7 @@ static void init_orcs_test_intermediate(gamestate* g) {
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
     massert(df, "floor is NULL");
     int c;
-    int max = 100;
+    int max = 1;
     int created = 0;
     entity* player = em_get(g->entitymap, g->hero_id);
     while (created < max) {
