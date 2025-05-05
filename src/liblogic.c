@@ -1102,6 +1102,8 @@ static void init_orcs_test_intermediate(gamestate* g) {
         loc_t loc = get_random_empty_non_wall_loc(g, g->dungeon->current_floor);
         entity* orc = create_orc_at(g, loc);
         massert(orc, "orc is NULL");
+        minfo("orc id %d", orc->id);
+        minfo("orc location: (%d, %d)", orc->x, orc->y);
         // assign the player as the orc's target
         orc->target = (loc_t){player->x, player->y, player->floor};
         created++;
@@ -1365,7 +1367,7 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
     massert(is, "Input state is NULL!");
     if (inputstate_is_held(is, KEY_Z)) {
         if (inputstate_is_shift_held(is)) {
-            g->cam2d.zoom -= DEFAULT_ZOOM_INCR;
+            if (g->cam2d.zoom > 1.0) { g->cam2d.zoom -= DEFAULT_ZOOM_INCR; }
         } else {
             g->cam2d.zoom += DEFAULT_ZOOM_INCR;
         }
