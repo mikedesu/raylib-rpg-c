@@ -1105,8 +1105,8 @@ static void df_init_test_complex2(dungeon_floor_t* df, int hallway_length) {
     if (hallway_length <= 0) hallway_length = 3;
 
     // Configuration
-    int room_size = 3;
-    int grid_size = 2; // 3x3 grid of rooms
+    int room_size = 5;
+    int grid_size = 3; // 3x3 grid of rooms
 
     // Adjust gap size to accommodate hallway length
     int gap_size = hallway_length;
