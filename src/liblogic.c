@@ -38,6 +38,7 @@ static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
 static inline bool player_on_tile(gamestate* g, int x, int y, int floor);
 static inline bool is_traversable(gamestate* const g, int x, int y, int z);
+static inline bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl);
 
 static inline void reset_player_blocking(gamestate* const g);
 static inline void reset_player_block_success(gamestate* const g);
@@ -196,6 +197,26 @@ static inline bool player_on_tile(gamestate* g, int x, int y, int floor) {
     return false;
 }
 
+static inline bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl) {
+    // Validate inputs
+    massert(g, "gamestate is NULL");
+    massert(fl >= 0, "floor is out of bounds");
+    massert(fl < g->dungeon->num_floors, "floor is out of bounds");
+    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    massert(df, "failed to get dungeon floor");
+    const tile_t* const t = df_tile_at(df, x, y);
+    massert(t, "failed to get tile");
+    // check for a door entity
+    for (int i = 0; i < t->entity_max; i++) {
+        const entityid eid = tile_get_entity(t, i);
+        if (eid == ENTITYID_INVALID) continue;
+        const entity* const e = em_get(g->entitymap, eid);
+        if (!e) continue;
+        if (e->type == ENTITY_DOOR && !e->door_is_open) return true;
+    }
+    return false;
+}
+
 static inline int tile_npc_living_count(const gamestate* const g, int x, int y, int fl) {
     // Validate inputs
     massert(g, "gamestate is NULL");
@@ -241,6 +262,11 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
         merror("Cannot move, tile is not walkable");
         return;
     }
+    if (tile_has_closed_door(g, ex, ey, floor)) {
+        merror("Cannot move, tile has a closed door");
+        return;
+    }
+
     if (tile_npc_living_count(g, ex, ey, floor) > 0) {
         merror("Cannot move, NPC in the way");
         return;
