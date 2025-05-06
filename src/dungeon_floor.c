@@ -42,6 +42,8 @@ static void df_init_test_simple10(dungeon_floor_t* df); // claude-3.7-sonnet
 
 static void df_init_test_complex1(dungeon_floor_t* df);
 static void df_init_test_complex2(dungeon_floor_t* df, int hallway_length);
+static void df_init_test_complex3(dungeon_floor_t* df);
+static void df_init_test_complex4(dungeon_floor_t* df, int hallway_length);
 
 static void df_assign_stairs(dungeon_floor_t* df);
 
@@ -180,17 +182,33 @@ static void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w,
     massert(h > 0, "h is less than zero");
     massert(x + w <= df->width, "x + w is out of bounds");
     massert(y + h <= df->height, "y + h is out of bounds");
+
+    minfo("assign upstairs 0");
     int count = df_get_possible_upstairs_count_in_area(df, x, y, w, h);
+    massert(count > 0, "no possible upstairs locations");
+
+    minfo("assign upstairs 1");
     loc_t* locations = df_get_possible_upstairs_locs_in_area(df, x, y, w, h);
+    minfo("assign upstairs 2");
     // now that we have a list of possible locations for the upstairs to appear
     // we can randomly select one of them
+
     int upstairs_index = rand() % count;
+
+    minfo("assign upstairs 3");
     loc_t up_loc = locations[upstairs_index];
+    minfo("assign upstairs 4");
     // now we can set the upstairs tile
+    minfo("assign upstairs 5");
     tile_t* const tile = df_tile_at(df, up_loc.x, up_loc.y);
+    minfo("assign upstairs 6");
     massert(tile, "failed to get tile");
     tile_init(tile, TILE_UPSTAIRS);
+    minfo("assign upstairs 7");
     free(locations);
+
+    df->upstairs_loc = up_loc;
+    minfo("assign upstairs 8");
 }
 
 static void df_assign_upstairs(dungeon_floor_t* df) {
@@ -218,11 +236,13 @@ static void df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int 
     // now that we have a list of possible locations for the upstairs to appear
     // we can randomly select one of them
     int downstairs_index = rand() % count;
-    loc_t up_loc = locations[downstairs_index];
+    loc_t down_loc = locations[downstairs_index];
     // now we can set the upstairs tile
-    tile_t* const tile = df_tile_at(df, up_loc.x, up_loc.y);
+    tile_t* const tile = df_tile_at(df, down_loc.x, down_loc.y);
     massert(tile, "failed to get tile");
     tile_init(tile, TILE_DOWNSTAIRS);
+
+    df->downstairs_loc = down_loc;
     free(locations);
 }
 
@@ -459,6 +479,8 @@ void df_init(dungeon_floor_t* df) {
     df->room_capacity = 0;
     df->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
     df->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
+    df->upstairs_loc = (loc_t){-1, -1};
+    df->downstairs_loc = (loc_t){-1, -1};
     df_reset_plates(df);
     df_reset_events(df);
     if (!df_malloc_tiles(df)) {
@@ -479,7 +501,9 @@ void df_init(dungeon_floor_t* df) {
     //df_init_test_simple9(df);
     //df_init_test_simple10(df);
     //df_init_test_complex1(df);
-    df_init_test_complex2(df, 5);
+    //df_init_test_complex2(df, 5);
+    //df_init_test_complex3(df);
+    df_init_test_complex4(df, 5);
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
@@ -1100,23 +1124,19 @@ static void df_init_test_complex1(dungeon_floor_t* df) {
 
 static void df_init_test_complex2(dungeon_floor_t* df, int hallway_length) {
     massert(df, "dungeon floor is NULL");
-
     // Default hallway length if not specified
     if (hallway_length <= 0) hallway_length = 3;
 
     // Configuration
     int room_size = 5;
     int grid_size = 3; // 3x3 grid of rooms
-
     // Adjust gap size to accommodate hallway length
     int gap_size = hallway_length;
-
     int total_span = grid_size * room_size + (grid_size - 1) * gap_size;
 
     // Center of the grid
     int start_x = df_center_x(df) - total_span / 2;
     int start_y = df_center_y(df) - total_span / 2;
-
     // Create walls for the entire area first
     for (int grid_y = 0; grid_y < grid_size; grid_y++) {
         for (int grid_x = 0; grid_x < grid_size; grid_x++) {
@@ -1128,14 +1148,12 @@ static void df_init_test_complex2(dungeon_floor_t* df, int hallway_length) {
             df_set_tile_area_range(df, room_left, room_top, room_size + 2, room_size + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
         }
     }
-
     // Create rooms and corridors
     for (int grid_y = 0; grid_y < grid_size; grid_y++) {
         for (int grid_x = 0; grid_x < grid_size; grid_x++) {
             // Calculate top-left corner of this room
             int room_x = start_x + grid_x * (room_size + gap_size);
             int room_y = start_y + grid_y * (room_size + gap_size);
-
             // Create the room
             tiletype_t floor_start, floor_end;
             if ((grid_x + grid_y) % 2 == 0) {
@@ -1145,20 +1163,16 @@ static void df_init_test_complex2(dungeon_floor_t* df, int hallway_length) {
                 floor_start = TILE_FLOOR_STONE_DIRT_UL_00;
                 floor_end = TILE_FLOOR_STONE_DIRT_DR_05;
             }
-
             df_set_tile_area_range(df, room_x, room_y, room_size, room_size, floor_start, floor_end);
-
             // Connect to room on the right if not the last column
             if (grid_x < grid_size - 1) {
                 // Horizontal corridor
                 int corridor_start_x = room_x + room_size;
                 int corridor_y = room_y + room_size / 2;
-
                 // Create hallway
                 for (int i = 0; i < hallway_length; i++) {
                     // Create floor tile for hallway
                     df_set_tile(df, TILE_FLOOR_STONE_00, corridor_start_x + i, corridor_y);
-
                     // Create wall tiles above and below hallway
                     df_set_tile(df, corridor_start_x + i, corridor_y - 1, TILE_STONE_WALL_00);
                     df_set_tile(df, corridor_start_x + i, corridor_y + 1, TILE_STONE_WALL_00);
@@ -1170,15 +1184,459 @@ static void df_init_test_complex2(dungeon_floor_t* df, int hallway_length) {
                 // Vertical corridor
                 int corridor_x = room_x + room_size / 2;
                 int corridor_start_y = room_y + room_size;
-
                 // Create hallway
                 for (int i = 0; i < hallway_length; i++) {
                     // Create floor tile for hallway
                     df_set_tile(df, TILE_FLOOR_STONE_00, corridor_x, corridor_start_y + i);
-
                     // Create wall tiles to the left and right of hallway
                     df_set_tile(df, corridor_x - 1, corridor_start_y + i, TILE_STONE_WALL_00);
                     df_set_tile(df, corridor_x + 1, corridor_start_y + i, TILE_STONE_WALL_00);
+                }
+            }
+        }
+    }
+
+    // Place stairs
+    int top_left_x = start_x;
+    int top_left_y = start_y;
+    df_assign_downstairs_in_area(df, top_left_x, top_left_y, room_size, room_size);
+
+    int bottom_right_x = start_x + (grid_size - 1) * (room_size + gap_size);
+    int bottom_right_y = start_y + (grid_size - 1) * (room_size + gap_size);
+    df_assign_upstairs_in_area(df, bottom_right_x, bottom_right_y, room_size, room_size);
+}
+
+static void df_init_test_complex3(dungeon_floor_t* df) {
+    massert(df, "dungeon floor is NULL");
+
+    // Configuration
+    int min_room_size = 3;
+    int max_room_size = 6;
+    int min_hallway_length = 2;
+    int max_hallway_length = 5;
+    int grid_size = 5; // 5x5 grid of potential room locations
+    float room_chance = 0.8f; // Probability a grid cell contains a room
+    float hallway_chance = 0.7f; // Probability a hallway exists between adjacent rooms
+
+    // Generate random seed based on time if desired
+    // srand(time(NULL));
+
+    // First, decide which grid cells will contain rooms and their sizes
+    int room_exists[grid_size][grid_size];
+    int room_width[grid_size][grid_size];
+    int room_height[grid_size][grid_size];
+    int hallway_length_h[grid_size][grid_size]; // Horizontal hallways (to the right)
+    int hallway_length_v[grid_size][grid_size]; // Vertical hallways (to the bottom)
+    bool hallway_exists_h[grid_size][grid_size]; // Does horizontal hallway exist?
+    bool hallway_exists_v[grid_size][grid_size]; // Does vertical hallway exist?
+
+    // Initialize with no rooms or hallways
+    memset(room_exists, 0, sizeof(room_exists));
+    memset(hallway_exists_h, 0, sizeof(hallway_exists_h));
+    memset(hallway_exists_v, 0, sizeof(hallway_exists_v));
+
+    // Ensure at least one room exists (top-left)
+    room_exists[0][0] = 1;
+
+    // Randomly decide room existence and sizes
+    for (int y = 0; y < grid_size; y++) {
+        for (int x = 0; x < grid_size; x++) {
+            if (x == 0 && y == 0) continue; // Skip first room, already set
+
+            // Random chance for room to exist
+            room_exists[y][x] = ((float)rand() / RAND_MAX) < room_chance ? 1 : 0;
+
+            // If room exists, determine its size
+            if (room_exists[y][x]) {
+                room_width[y][x] = min_room_size + rand() % (max_room_size - min_room_size + 1);
+                room_height[y][x] = min_room_size + rand() % (max_room_size - min_room_size + 1);
+            }
+        }
+    }
+
+    // Room size for first room
+    room_width[0][0] = min_room_size + rand() % (max_room_size - min_room_size + 1);
+    room_height[0][0] = min_room_size + rand() % (max_room_size - min_room_size + 1);
+
+    // Determine hallway existence and lengths
+    for (int y = 0; y < grid_size; y++) {
+        for (int x = 0; x < grid_size; x++) {
+            if (!room_exists[y][x]) continue;
+
+            // Horizontal hallway (to the right)
+            if (x < grid_size - 1 && room_exists[y][x + 1]) {
+                hallway_exists_h[y][x] = ((float)rand() / RAND_MAX) < hallway_chance;
+                if (hallway_exists_h[y][x]) { hallway_length_h[y][x] = min_hallway_length + rand() % (max_hallway_length - min_hallway_length + 1); }
+            }
+
+            // Vertical hallway (to the bottom)
+            if (y < grid_size - 1 && room_exists[y + 1][x]) {
+                hallway_exists_v[y][x] = ((float)rand() / RAND_MAX) < hallway_chance;
+                if (hallway_exists_v[y][x]) { hallway_length_v[y][x] = min_hallway_length + rand() % (max_hallway_length - min_hallway_length + 1); }
+            }
+        }
+    }
+
+    // Ensure dungeon connectivity using a simplified approach:
+    // Make sure every room (except the first) is connected to at least one other room
+    for (int y = 0; y < grid_size; y++) {
+        for (int x = 0; x < grid_size; x++) {
+            if (!room_exists[y][x] || (x == 0 && y == 0)) continue;
+
+            // Check if this room has any connections
+            bool has_connection = (x > 0 && room_exists[y][x - 1] && hallway_exists_h[y][x - 1]) ||
+                                  (y > 0 && room_exists[y - 1][x] && hallway_exists_v[y - 1][x]) ||
+                                  (x < grid_size - 1 && room_exists[y][x + 1] && hallway_exists_h[y][x]) ||
+                                  (y < grid_size - 1 && room_exists[y + 1][x] && hallway_exists_v[y][x]);
+
+            // If no connections, add one
+            if (!has_connection) {
+                // Try to connect to a random adjacent room
+                int attempts = 0;
+                bool connected = false;
+
+                while (!connected && attempts < 4) {
+                    int direction = rand() % 4; // 0: left, 1: up, 2: right, 3: down
+
+                    switch (direction) {
+                    case 0: // Left
+                        if (x > 0 && room_exists[y][x - 1]) {
+                            hallway_exists_h[y][x - 1] = true;
+                            hallway_length_h[y][x - 1] = min_hallway_length + rand() % (max_hallway_length - min_hallway_length + 1);
+                            connected = true;
+                        }
+                        break;
+                    case 1: // Up
+                        if (y > 0 && room_exists[y - 1][x]) {
+                            hallway_exists_v[y - 1][x] = true;
+                            hallway_length_v[y - 1][x] = min_hallway_length + rand() % (max_hallway_length - min_hallway_length + 1);
+                            connected = true;
+                        }
+                        break;
+                    case 2: // Right
+                        if (x < grid_size - 1 && room_exists[y][x + 1]) {
+                            hallway_exists_h[y][x] = true;
+                            hallway_length_h[y][x] = min_hallway_length + rand() % (max_hallway_length - min_hallway_length + 1);
+                            connected = true;
+                        }
+                        break;
+                    case 3: // Down
+                        if (y < grid_size - 1 && room_exists[y + 1][x]) {
+                            hallway_exists_v[y][x] = true;
+                            hallway_length_v[y][x] = min_hallway_length + rand() % (max_hallway_length - min_hallway_length + 1);
+                            connected = true;
+                        }
+                        break;
+                    }
+
+                    attempts++;
+                }
+
+                // If still not connected, may need to force a connection
+                if (!connected) {
+                    // This is a simple fallback, in a real situation you might
+                    // want to use a more sophisticated approach like connecting to the nearest room
+                    if (x > 0 && room_exists[y][x - 1]) {
+                        hallway_exists_h[y][x - 1] = true;
+                        hallway_length_h[y][x - 1] = min_hallway_length;
+                    } else if (y > 0 && room_exists[y - 1][x]) {
+                        hallway_exists_v[y - 1][x] = true;
+                        hallway_length_v[y - 1][x] = min_hallway_length;
+                    }
+                }
+            }
+        }
+    }
+
+    // Calculate total dungeon size needed
+    int max_total_width = 0;
+    int max_total_height = 0;
+
+    for (int y = 0; y < grid_size; y++) {
+        for (int x = 0; x < grid_size; x++) {
+            if (room_exists[y][x]) {
+                int room_right = (x + 1) * max_room_size + x * max_hallway_length + room_width[y][x];
+                int room_bottom = (y + 1) * max_room_size + y * max_hallway_length + room_height[y][x];
+
+                max_total_width = room_right > max_total_width ? room_right : max_total_width;
+                max_total_height = room_bottom > max_total_height ? room_bottom : max_total_height;
+            }
+        }
+    }
+
+    // Center of the dungeon
+    int start_x = df_center_x(df) - max_total_width / 2;
+    int start_y = df_center_y(df) - max_total_height / 2;
+
+    // Calculate actual room positions
+    //int room_x[grid_size][grid_size] = {0};
+    //int room_y[grid_size][grid_size] = {0};
+    int room_x[grid_size][grid_size];
+    int room_y[grid_size][grid_size];
+
+    memset(room_x, 0, sizeof(room_x));
+    memset(room_y, 0, sizeof(room_y));
+
+    // First room position
+    room_x[0][0] = start_x;
+    room_y[0][0] = start_y;
+
+    // Calculate positions of all other rooms based on hallway lengths
+    for (int y = 0; y < grid_size; y++) {
+        for (int x = 0; x < grid_size; x++) {
+            if (!room_exists[y][x]) continue;
+
+            // If not the first room, position is determined by hallways
+            if (!(x == 0 && y == 0)) {
+                // Initialize with impossible values
+                room_x[y][x] = -1;
+                room_y[y][x] = -1;
+
+                // Check for connection from the left
+                if (x > 0 && room_exists[y][x - 1] && hallway_exists_h[y][x - 1]) {
+                    room_x[y][x] = room_x[y][x - 1] + room_width[y][x - 1] + hallway_length_h[y][x - 1];
+                    room_y[y][x] = room_y[y][x - 1];
+                }
+                // Check for connection from above
+                else if (y > 0 && room_exists[y - 1][x] && hallway_exists_v[y - 1][x]) {
+                    room_x[y][x] = room_x[y - 1][x];
+                    room_y[y][x] = room_y[y - 1][x] + room_height[y - 1][x] + hallway_length_v[y - 1][x];
+                }
+                // If still not placed, this is disconnected - should not happen with our connectivity logic
+                if (room_x[y][x] == -1) {
+                    // Safety fallback
+                    room_x[y][x] = start_x + x * (max_room_size + max_hallway_length);
+                    room_y[y][x] = start_y + y * (max_room_size + max_hallway_length);
+                }
+            }
+        }
+    }
+
+    // Now build the actual dungeon
+
+    // Create walls for the entire area first to ensure enclosed rooms
+    for (int y = 0; y < grid_size; y++) {
+        for (int x = 0; x < grid_size; x++) {
+            if (!room_exists[y][x]) continue;
+
+            // Create wall perimeter (room size + 2 to include walls)
+            int room_left = room_x[y][x] - 1;
+            int room_top = room_y[y][x] - 1;
+
+            df_set_tile_area_range(df, room_left, room_top, room_width[y][x] + 2, room_height[y][x] + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+        }
+    }
+
+    // Create rooms
+    for (int y = 0; y < grid_size; y++) {
+        for (int x = 0; x < grid_size; x++) {
+            if (!room_exists[y][x]) continue;
+
+            // Create the room
+            tiletype_t floor_start, floor_end;
+            if ((x + y) % 3 == 0) {
+                floor_start = TILE_FLOOR_STONE_00;
+                floor_end = TILE_FLOOR_STONE_11;
+            } else if ((x + y) % 3 == 1) {
+                floor_start = TILE_FLOOR_STONE_DIRT_UL_00;
+                floor_end = TILE_FLOOR_STONE_DIRT_DR_05;
+            } else {
+                floor_start = TILE_FLOOR_STONE_00;
+                floor_end = TILE_FLOOR_STONE_11;
+            }
+
+            df_set_tile_area_range(df, room_x[y][x], room_y[y][x], room_width[y][x], room_height[y][x], floor_start, floor_end);
+
+            // Create horizontal hallway to the right
+            if (x < grid_size - 1 && hallway_exists_h[y][x]) {
+                int hallway_start_x = room_x[y][x] + room_width[y][x];
+                int hallway_y = room_y[y][x] + room_height[y][x] / 2;
+
+                for (int i = 0; i < hallway_length_h[y][x]; i++) {
+                    // Floor tile for hallway
+                    df_set_tile(df, TILE_FLOOR_STONE_00, hallway_start_x + i, hallway_y);
+
+                    // Wall tiles above and below
+                    df_set_tile(df, TILE_STONE_WALL_00, hallway_start_x + i, hallway_y - 1);
+                    df_set_tile(df, TILE_STONE_WALL_00, hallway_start_x + i, hallway_y + 1);
+                    //df_set_tile_area_range(df, hallway_start_x + i, hallway_y - 1, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+                    //df_set_tile_area_range(df, hallway_start_x + i, hallway_y + 1, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+                }
+            }
+
+            // Create vertical hallway downward
+            if (y < grid_size - 1 && hallway_exists_v[y][x]) {
+                int hallway_x = room_x[y][x] + room_width[y][x] / 2;
+                int hallway_start_y = room_y[y][x] + room_height[y][x];
+
+                for (int i = 0; i < hallway_length_v[y][x]; i++) {
+                    // Floor tile for hallway
+                    df_set_tile(df, TILE_FLOOR_STONE_00, hallway_x, hallway_start_y + i);
+
+                    // Wall tiles to left and right
+                    df_set_tile(df, TILE_STONE_WALL_00, hallway_x - 1, hallway_start_y + i);
+                    df_set_tile(df, TILE_STONE_WALL_00, hallway_x + 1, hallway_start_y + i);
+                }
+            }
+        }
+    }
+
+    // Find rooms for stairs
+    int start_room_x = 0, start_room_y = 0; // Default first room
+    int end_room_x = -1, end_room_y = -1;
+    int max_manhattan_distance = -1;
+
+    // Find the room furthest from the first room to place exit stairs
+    for (int y = 0; y < grid_size; y++) {
+        for (int x = 0; x < grid_size; x++) {
+            if (!room_exists[y][x]) continue;
+
+            int distance = abs(x - start_room_x) + abs(y - start_room_y);
+            if (distance > max_manhattan_distance) {
+                max_manhattan_distance = distance;
+                end_room_x = x;
+                end_room_y = y;
+            }
+        }
+    }
+
+    // Place stairs
+    df_assign_downstairs_in_area(df,
+                                 room_x[start_room_y][start_room_x],
+                                 room_y[start_room_y][start_room_x],
+                                 room_width[start_room_y][start_room_x],
+                                 room_height[start_room_y][start_room_x]);
+
+    df_assign_upstairs_in_area(
+        df, room_x[end_room_y][end_room_x], room_y[end_room_y][end_room_x], room_width[end_room_y][end_room_x], room_height[end_room_y][end_room_x]);
+}
+
+static void df_init_test_complex4(dungeon_floor_t* df, int hallway_length) {
+    massert(df, "dungeon floor is NULL");
+    // Default hallway length if not specified
+    if (hallway_length <= 0) hallway_length = 3;
+
+    // Configuration
+    int room_size = 3;
+    int grid_size = 5; // 3x3 grid of rooms
+    // Adjust gap size to accommodate hallway length
+    int gap_size = hallway_length;
+    int total_span = grid_size * room_size + (grid_size - 1) * gap_size;
+
+    // Center of the grid
+    int start_x = df_center_x(df) - total_span / 2;
+    int start_y = df_center_y(df) - total_span / 2;
+    // Create walls for the entire area first
+    for (int grid_y = 0; grid_y < grid_size; grid_y++) {
+        for (int grid_x = 0; grid_x < grid_size; grid_x++) {
+            // Calculate top-left corner of this room's outer wall area
+            int room_left = start_x + grid_x * (room_size + gap_size) - 1;
+            int room_top = start_y + grid_y * (room_size + gap_size) - 1;
+
+            // Create wall perimeter (room_size + 2 to include walls)
+            df_set_tile_area_range(df, room_left, room_top, room_size + 2, room_size + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+        }
+    }
+    // Create rooms and corridors
+    for (int grid_y = 0; grid_y < grid_size; grid_y++) {
+        for (int grid_x = 0; grid_x < grid_size; grid_x++) {
+            // Calculate top-left corner of this room
+            int room_x = start_x + grid_x * (room_size + gap_size);
+            int room_y = start_y + grid_y * (room_size + gap_size);
+            // Create the room
+            tiletype_t floor_start, floor_end;
+            if ((grid_x + grid_y) % 2 == 0) {
+                floor_start = TILE_FLOOR_STONE_00;
+                floor_end = TILE_FLOOR_STONE_11;
+            } else {
+                floor_start = TILE_FLOOR_STONE_DIRT_UL_00;
+                floor_end = TILE_FLOOR_STONE_DIRT_DR_05;
+            }
+            df_set_tile_area_range(df, room_x, room_y, room_size, room_size, floor_start, floor_end);
+
+            // Connect to room on the right if not the last column
+            if ((grid_x < grid_size - 1) || (grid_y < grid_size - 1)) {
+                int hallways_created = 0;
+                if (grid_x < grid_size - 1) {
+                    int do_create = rand() % 2;
+
+                    if (do_create) {
+                        // Horizontal corridor
+                        int corridor_start_x = room_x + room_size;
+                        int corridor_y = room_y + room_size / 2;
+                        // Create hallway
+                        for (int i = 0; i < hallway_length; i++) {
+                            // Create floor tile for hallway
+                            df_set_tile(df, TILE_FLOOR_STONE_00, corridor_start_x + i, corridor_y);
+                            // Create wall tiles above and below hallway
+                            df_set_tile(df, corridor_start_x + i, corridor_y - 1, TILE_STONE_WALL_00);
+                            df_set_tile(df, corridor_start_x + i, corridor_y + 1, TILE_STONE_WALL_00);
+                        }
+                        hallways_created++;
+                    }
+                }
+
+                // Connect to room below if not the last row
+                if (grid_y < grid_size - 1) {
+                    int do_create = rand() % 2;
+
+                    if (do_create) {
+                        // Vertical corridor
+                        int corridor_x = room_x + room_size / 2;
+                        int corridor_start_y = room_y + room_size;
+                        // Create hallway
+                        for (int i = 0; i < hallway_length; i++) {
+                            // Create floor tile for hallway
+                            df_set_tile(df, TILE_FLOOR_STONE_00, corridor_x, corridor_start_y + i);
+                            // Create wall tiles to the left and right of hallway
+                            df_set_tile(df, corridor_x - 1, corridor_start_y + i, TILE_STONE_WALL_00);
+                            df_set_tile(df, corridor_x + 1, corridor_start_y + i, TILE_STONE_WALL_00);
+                        }
+                        hallways_created++;
+                    }
+                }
+
+                while (hallways_created < 1) {
+                    if (grid_x < grid_size - 1) {
+                        int do_create = rand() % 2;
+
+                        if (do_create) {
+                            // Horizontal corridor
+                            int corridor_start_x = room_x + room_size;
+                            int corridor_y = room_y + room_size / 2;
+                            // Create hallway
+                            for (int i = 0; i < hallway_length; i++) {
+                                // Create floor tile for hallway
+                                df_set_tile(df, TILE_FLOOR_STONE_00, corridor_start_x + i, corridor_y);
+                                // Create wall tiles above and below hallway
+                                df_set_tile(df, corridor_start_x + i, corridor_y - 1, TILE_STONE_WALL_00);
+                                df_set_tile(df, corridor_start_x + i, corridor_y + 1, TILE_STONE_WALL_00);
+                            }
+                            hallways_created++;
+                        }
+                    }
+
+                    if (hallways_created) { break; }
+
+                    // Connect to room below if not the last row
+                    if (grid_y < grid_size - 1) {
+                        int do_create = rand() % 2;
+
+                        if (do_create) {
+                            // Vertical corridor
+                            int corridor_x = room_x + room_size / 2;
+                            int corridor_start_y = room_y + room_size;
+                            // Create hallway
+                            for (int i = 0; i < hallway_length; i++) {
+                                // Create floor tile for hallway
+                                df_set_tile(df, TILE_FLOOR_STONE_00, corridor_x, corridor_start_y + i);
+                                // Create wall tiles to the left and right of hallway
+                                df_set_tile(df, corridor_x - 1, corridor_start_y + i, TILE_STONE_WALL_00);
+                                df_set_tile(df, corridor_x + 1, corridor_start_y + i, TILE_STONE_WALL_00);
+                            }
+                            hallways_created++;
+                        }
+                    }
                 }
             }
         }

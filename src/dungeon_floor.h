@@ -39,6 +39,9 @@ typedef struct {
     int room_count; // current room number
     int room_capacity; // allocated capacity
 
+    loc_t downstairs_loc;
+    loc_t upstairs_loc;
+
 } dungeon_floor_t;
 
 dungeon_floor_t* df_create(int width, int height);
