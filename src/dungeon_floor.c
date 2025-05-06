@@ -6,6 +6,7 @@
 #include "location.h"
 #include "massert.h"
 #include "mprint.h"
+#include "range.h"
 #include "raylib.h"
 #include <stdlib.h>
 #include <string.h>
@@ -45,6 +46,7 @@ static bool df_malloc_tiles(dungeon_floor_t* const df);
 //static void df_init_test_complex2(dungeon_floor_t* df, int hallway_length);
 //static void df_init_test_complex3(dungeon_floor_t* df);
 static void df_init_test_complex4(dungeon_floor_t* df, int hallway_length);
+static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length);
 
 static void df_assign_stairs(dungeon_floor_t* df);
 
@@ -508,7 +510,8 @@ void df_init(dungeon_floor_t* df) {
     }
     df_set_all_tiles(df, TILE_NONE);
     // at this point, we are free to customize the dungeon floor to our liking
-    df_init_test_complex4(df, 3);
+    //df_init_test_complex4(df, 3);
+    df_init_test_complex5(df, (range){3, 10});
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
@@ -534,6 +537,7 @@ static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, 
 
 static void df_init_test(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
+
     // Rooms
     int txwallup = TX_WALL_SWITCH_UP_00;
     int txwalldown = TX_WALL_SWITCH_DOWN_00;
@@ -1638,6 +1642,154 @@ static void df_init_test_complex4(dungeon_floor_t* df, int hallway_length) {
                             int corridor_start_y = room_y + room_size;
                             // Create hallway
                             for (int i = 0; i < hallway_length; i++) {
+                                // Create floor tile for hallway
+                                df_set_tile(df, TILE_FLOOR_STONE_00, corridor_x, corridor_start_y + i);
+                                // Create wall tiles to the left and right of hallway
+                                df_set_tile(df, corridor_x - 1, corridor_start_y + i, TILE_STONE_WALL_00);
+                                df_set_tile(df, corridor_x + 1, corridor_start_y + i, TILE_STONE_WALL_00);
+                            }
+                            hallways_created++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Place stairs
+    int top_left_x = start_x;
+    int top_left_y = start_y;
+    df_assign_downstairs_in_area(df, top_left_x, top_left_y, room_size, room_size);
+
+    int bottom_right_x = start_x + (grid_size - 1) * (room_size + gap_size);
+    int bottom_right_y = start_y + (grid_size - 1) * (room_size + gap_size);
+    df_assign_upstairs_in_area(df, bottom_right_x, bottom_right_y, room_size, room_size);
+}
+
+static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
+    massert(df, "dungeon floor is NULL");
+
+    // Default hallway length if not specified
+    if (hallway_length.min <= 0) hallway_length.min = 3;
+    if (hallway_length.max <= 0) hallway_length.max = 3;
+
+    // Configuration
+    int room_size = 3;
+    int grid_size = 5; // 3x3 grid of rooms
+    // Adjust gap size to accommodate hallway length
+    //int gap_size = hallway_length;
+    int gap_size = get_random_in_range(hallway_length);
+    int total_span = grid_size * room_size + (grid_size - 1) * gap_size;
+
+    // Center of the grid
+    int start_x = df_center_x(df) - total_span / 2;
+    int start_y = df_center_y(df) - total_span / 2;
+    // Create walls for the entire area first
+    for (int grid_y = 0; grid_y < grid_size; grid_y++) {
+        for (int grid_x = 0; grid_x < grid_size; grid_x++) {
+            // Calculate top-left corner of this room's outer wall area
+            int room_left = start_x + grid_x * (room_size + gap_size) - 1;
+            int room_top = start_y + grid_y * (room_size + gap_size) - 1;
+
+            // Create wall perimeter (room_size + 2 to include walls)
+            df_set_tile_area_range(df, room_left, room_top, room_size + 2, room_size + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+        }
+    }
+    // Create rooms and corridors
+    for (int grid_y = 0; grid_y < grid_size; grid_y++) {
+        for (int grid_x = 0; grid_x < grid_size; grid_x++) {
+            // Calculate top-left corner of this room
+            int room_x = start_x + grid_x * (room_size + gap_size);
+            int room_y = start_y + grid_y * (room_size + gap_size);
+            // Create the room
+            tiletype_t floor_start, floor_end;
+            if ((grid_x + grid_y) % 2 == 0) {
+                floor_start = TILE_FLOOR_STONE_00;
+                floor_end = TILE_FLOOR_STONE_11;
+            } else {
+                floor_start = TILE_FLOOR_STONE_DIRT_UL_00;
+                floor_end = TILE_FLOOR_STONE_DIRT_DR_05;
+            }
+            df_set_tile_area_range(df, room_x, room_y, room_size, room_size, floor_start, floor_end);
+
+            // Connect to room on the right if not the last column
+            if ((grid_x < grid_size - 1) || (grid_y < grid_size - 1)) {
+                int hallways_created = 0;
+                if (grid_x < grid_size - 1) {
+                    int do_create = rand() % 2;
+
+                    if (do_create) {
+                        // Horizontal corridor
+                        int corridor_start_x = room_x + room_size;
+                        int corridor_y = room_y + room_size / 2;
+                        // Create hallway
+                        //for (int i = 0; i < hallway_length; i++) {
+                        for (int i = 0; i < gap_size; i++) {
+                            // Create floor tile for hallway
+                            df_set_tile(df, TILE_FLOOR_STONE_00, corridor_start_x + i, corridor_y);
+                            // Create wall tiles above and below hallway
+                            df_set_tile(df, corridor_start_x + i, corridor_y - 1, TILE_STONE_WALL_00);
+                            df_set_tile(df, corridor_start_x + i, corridor_y + 1, TILE_STONE_WALL_00);
+                        }
+                        hallways_created++;
+                    }
+                }
+
+                // Connect to room below if not the last row
+                if (grid_y < grid_size - 1) {
+                    int do_create = rand() % 2;
+
+                    if (do_create) {
+                        // Vertical corridor
+                        int corridor_x = room_x + room_size / 2;
+                        int corridor_start_y = room_y + room_size;
+                        // Create hallway
+                        //for (int i = 0; i < hallway_length; i++) {
+                        for (int i = 0; i < gap_size; i++) {
+                            // Create floor tile for hallway
+                            df_set_tile(df, TILE_FLOOR_STONE_00, corridor_x, corridor_start_y + i);
+                            // Create wall tiles to the left and right of hallway
+                            df_set_tile(df, corridor_x - 1, corridor_start_y + i, TILE_STONE_WALL_00);
+                            df_set_tile(df, corridor_x + 1, corridor_start_y + i, TILE_STONE_WALL_00);
+                        }
+                        hallways_created++;
+                    }
+                }
+
+                while (hallways_created < 1) {
+                    if (grid_x < grid_size - 1) {
+                        int do_create = rand() % 2;
+
+                        if (do_create) {
+                            // Horizontal corridor
+                            int corridor_start_x = room_x + room_size;
+                            int corridor_y = room_y + room_size / 2;
+                            // Create hallway
+                            //for (int i = 0; i < hallway_length; i++) {
+                            for (int i = 0; i < gap_size; i++) {
+                                // Create floor tile for hallway
+                                df_set_tile(df, TILE_FLOOR_STONE_00, corridor_start_x + i, corridor_y);
+                                // Create wall tiles above and below hallway
+                                df_set_tile(df, corridor_start_x + i, corridor_y - 1, TILE_STONE_WALL_00);
+                                df_set_tile(df, corridor_start_x + i, corridor_y + 1, TILE_STONE_WALL_00);
+                            }
+                            hallways_created++;
+                        }
+                    }
+
+                    if (hallways_created) { break; }
+
+                    // Connect to room below if not the last row
+                    if (grid_y < grid_size - 1) {
+                        int do_create = rand() % 2;
+
+                        if (do_create) {
+                            // Vertical corridor
+                            int corridor_x = room_x + room_size / 2;
+                            int corridor_start_y = room_y + room_size;
+                            // Create hallway
+                            //for (int i = 0; i < hallway_length; i++) {
+                            for (int i = 0; i < gap_size; i++) {
                                 // Create floor tile for hallway
                                 df_set_tile(df, TILE_FLOOR_STONE_00, corridor_x, corridor_start_y + i);
                                 // Create wall tiles to the left and right of hallway
