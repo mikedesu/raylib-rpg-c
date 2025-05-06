@@ -31,9 +31,9 @@ typedef struct {
     df_event_t events[DEFAULT_DF_EVENTS];
     bool plates[DEFAULT_DF_PLATES];
 
-    //room_data_t* rooms; // dynamic array pointer
-    //int room_count; // current room number
-    //int room_capacity; // allocated capacity
+    room_data_t* rooms; // dynamic array pointer
+    int room_count; // current room number
+    int room_capacity; // allocated capacity
 
     loc_t downstairs_loc;
     loc_t upstairs_loc;
@@ -57,7 +57,8 @@ int df_count_empty_non_walls(const dungeon_floor_t* const df);
 int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
 
-//bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
+void df_init_rooms(dungeon_floor_t* df);
+bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
 
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
     //minfo("df_tile_at: %d, %d", x, y);

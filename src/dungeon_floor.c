@@ -47,6 +47,7 @@ static bool df_malloc_tiles(dungeon_floor_t* const df);
 //static void df_init_test_complex3(dungeon_floor_t* df);
 static void df_init_test_complex4(dungeon_floor_t* df, int hallway_length);
 static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length);
+static void df_init_test_complex6(dungeon_floor_t* df, range room_length, range room_width);
 
 static void df_assign_stairs(dungeon_floor_t* df);
 
@@ -495,9 +496,9 @@ static void df_set_tile_area(dungeon_floor_t* const df, tiletype_t type, int x, 
 void df_init(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
 
-    //df->rooms = NULL;
-    //df->room_count = 0;
-    //df->room_capacity = 0;
+    df->rooms = NULL;
+    df->room_count = 0;
+    df->room_capacity = 0;
     df->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
     df->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
     df->upstairs_loc = (loc_t){-1, -1};
@@ -508,10 +509,14 @@ void df_init(dungeon_floor_t* df) {
         merror("failed to malloc tiles");
         return;
     }
+
+    df_init_rooms(df);
+
     df_set_all_tiles(df, TILE_NONE);
     // at this point, we are free to customize the dungeon floor to our liking
     //df_init_test_complex4(df, 3);
-    df_init_test_complex5(df, (range){3, 10});
+    //df_init_test_complex5(df, (range){3, 10});
+    df_init_test_complex6(df, (range){3, 10}, (range){3, 10});
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
@@ -743,10 +748,12 @@ void df_free(dungeon_floor_t* df) {
         df->tiles = NULL;
     }
 
-    //if (df->rooms) {
-    //    free(df->rooms);
-    //    df->rooms = NULL;
-    //}
+    if (df->rooms) {
+        free(df->rooms);
+        df->rooms = NULL;
+        df->room_count = 0;
+        df->room_capacity = 0;
+    }
 
     free(df);
     msuccess("Freed dungeon floor");
@@ -1666,6 +1673,50 @@ static void df_init_test_complex4(dungeon_floor_t* df, int hallway_length) {
     df_assign_upstairs_in_area(df, bottom_right_x, bottom_right_y, room_size, room_size);
 }
 
+static void df_init_test_complex6(dungeon_floor_t* df, range room_length, range room_width) {
+    massert(df, "dungeon floor is NULL");
+    massert(room_length.min > 0, "room_length.min must be greater than 0");
+    massert(room_length.max > 0, "room_length.max must be greater than 0");
+    massert(room_width.min > 0, "room_width.min must be greater than 0");
+    massert(room_width.max > 0, "room_width.max must be greater than 0");
+    // single room
+    int center_x = df_center_x(df);
+    int center_y = df_center_y(df);
+    int room_length_value = get_random_in_range(room_length);
+    int room_width_value = get_random_in_range(room_width);
+    range wall_thickness_range = (range){1, 5};
+    int wall_thickness = get_random_in_range(wall_thickness_range);
+    // Create walls for the entire area first
+    df_set_tile_area_range(df,
+                           center_x - room_length_value / 2 - (wall_thickness),
+                           center_y - room_width_value / 2 - (wall_thickness),
+                           room_length_value + (2 * wall_thickness),
+                           room_width_value + (2 * wall_thickness),
+                           TILE_STONE_WALL_00,
+                           TILE_STONE_WALL_03);
+    // Create the room
+    tiletype_t floor_start, floor_end;
+    if (rand() % 2 == 0) {
+        floor_start = TILE_FLOOR_STONE_00;
+        floor_end = TILE_FLOOR_STONE_11;
+    } else {
+        floor_start = TILE_FLOOR_STONE_DIRT_UL_00;
+        floor_end = TILE_FLOOR_STONE_DIRT_DR_05;
+    }
+
+    int x = center_x - room_length_value / 2;
+    int y = center_y - room_width_value / 2;
+    int w = room_length_value;
+    int h = room_width_value;
+
+    df_set_tile_area_range(df, x, y, w, h, floor_start, floor_end);
+
+    df_add_room(df, x, y, w, h, "room1");
+
+    df_assign_downstairs(df);
+    df_assign_upstairs(df);
+}
+
 static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
     massert(df, "dungeon floor is NULL");
     // Default hallway length if not specified
@@ -1801,20 +1852,43 @@ static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
     df_assign_upstairs_in_area(df, bottom_right_x, bottom_right_y, room_size, room_size);
 }
 
-//bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name) {
-//    if (df->room_count == df->room_capacity) {
-//        int new_cap = df->room_capacity ? df->room_capacity * 2 : 8;
-//        room_data_t* tmp = realloc(df->rooms, sizeof(room_data_t) * new_cap);
-//        if (!tmp) return false;
-//        df->rooms = tmp;
-//        df->room_capacity = new_cap;
-//    }
-//    room_data_t* r = &df->rooms[df->room_count++];
-//    r->x = x;
-//    r->y = y;
-//    r->w = w;
-//    r->h = h;
-//    strncpy(r->room_name, name, sizeof(r->room_name) - 1);
-//    r->room_name[sizeof(r->room_name) - 1] = '\0';
-//    return true;
-//}
+void df_init_rooms(dungeon_floor_t* df) {
+    massert(df, "dungeon floor is NULL");
+
+    const int default_capacity = 10;
+    df->rooms = malloc(sizeof(room_data_t) * default_capacity);
+    massert(df->rooms, "Failed to allocate memory for rooms");
+    df->room_count = 0;
+    df->room_capacity = default_capacity;
+}
+
+bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name) {
+    massert(df, "dungeon floor is NULL");
+    massert(name, "room name is NULL");
+    massert(w > 0 && h > 0, "room dimensions are invalid");
+    massert(x >= 0 && y >= 0, "room coordinates are invalid");
+    massert(x + w <= df->width && y + h <= df->height, "room exceeds dungeon bounds");
+    massert(df->rooms, "room data is NULL");
+    massert(df->room_count < df->room_capacity, "room capacity exceeded");
+    massert(df->room_count >= 0, "room count is invalid");
+    massert(strlen(name) < sizeof(df->rooms[0].room_name), "room name is too long");
+    massert(df->room_capacity > 0, "room capacity is invalid");
+    massert(df->room_count >= 0, "room count is invalid");
+    //massert(df->room_count < df->room_capacity, "room capacity exceeded");
+
+    if (df->room_count == df->room_capacity) {
+        int new_cap = df->room_capacity ? df->room_capacity * 2 : 8;
+        room_data_t* tmp = realloc(df->rooms, sizeof(room_data_t) * new_cap);
+        if (!tmp) return false;
+        df->rooms = tmp;
+        df->room_capacity = new_cap;
+    }
+    room_data_t* r = &df->rooms[df->room_count++];
+    r->x = x;
+    r->y = y;
+    r->w = w;
+    r->h = h;
+    strncpy(r->room_name, name, sizeof(r->room_name) - 1);
+    r->room_name[sizeof(r->room_name) - 1] = '\0';
+    return true;
+}
