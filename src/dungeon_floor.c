@@ -48,6 +48,7 @@ static bool df_malloc_tiles(dungeon_floor_t* const df);
 static void df_init_test_complex4(dungeon_floor_t* df, int hallway_length);
 static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length);
 static void df_init_test_complex6(dungeon_floor_t* df, range room_length, range room_width);
+static void df_init_test_complex7(dungeon_floor_t* df);
 
 static void df_assign_stairs(dungeon_floor_t* df);
 
@@ -516,7 +517,8 @@ void df_init(dungeon_floor_t* df) {
     // at this point, we are free to customize the dungeon floor to our liking
     //df_init_test_complex4(df, 3);
     //df_init_test_complex5(df, (range){3, 10});
-    df_init_test_complex6(df, (range){3, 10}, (range){3, 10});
+    //df_init_test_complex6(df, (range){3, 10}, (range){3, 10});
+    df_init_test_complex7(df);
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
@@ -1715,6 +1717,35 @@ static void df_init_test_complex6(dungeon_floor_t* df, range room_length, range 
 
     df_assign_downstairs(df);
     df_assign_upstairs(df);
+}
+
+static void df_init_test_complex7(dungeon_floor_t* df) {
+    massert(df, "dungeon floor is NULL");
+
+    int center_x = df_center_x(df);
+    int center_y = df_center_y(df);
+
+    int w = 5;
+    int h = 5;
+
+    int x = center_x - w;
+    int y = center_y - h;
+
+    df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    df_add_room(df, x, y, w, h, "room1");
+    df_assign_upstairs_in_area(df, x, y, w, h);
+
+    x += w;
+    y += h / 2;
+
+    df_set_tile(df, TILE_FLOOR_STONE_00, x, y);
+
+    x++;
+    y = center_y - h;
+
+    df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    df_add_room(df, x, y, w, h, "room2");
+    df_assign_downstairs_in_area(df, x, y, w, h);
 }
 
 static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
