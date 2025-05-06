@@ -473,6 +473,15 @@ dungeon_floor_t* df_create(const int width, const int height) {
 
 static void df_set_tile_area(dungeon_floor_t* const df, tiletype_t type, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
+    massert(x >= 0, "x is less than zero");
+    massert(x < df->width, "x is out of bounds");
+    massert(y >= 0, "y is less than zero");
+    massert(y < df->height, "y is out of bounds");
+    massert(w > 0, "w is less than zero");
+    massert(h > 0, "h is less than zero");
+    massert(x + w <= df->width, "x + w is out of bounds");
+    massert(y + h <= df->height, "y + h is out of bounds");
+
     for (int i = y; i < y + h; i++) {
         for (int j = x; j < x + w; j++) {
             tile_t* current = df_tile_at(df, j, i);
@@ -483,6 +492,7 @@ static void df_set_tile_area(dungeon_floor_t* const df, tiletype_t type, int x, 
 
 void df_init(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
+
     df->rooms = NULL;
     df->room_count = 0;
     df->room_capacity = 0;
@@ -498,7 +508,7 @@ void df_init(dungeon_floor_t* df) {
     }
     df_set_all_tiles(df, TILE_NONE);
     // at this point, we are free to customize the dungeon floor to our liking
-    df_init_test_complex1(df);
+    df_init_test_complex4(df, 3);
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
