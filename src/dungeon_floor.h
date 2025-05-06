@@ -5,6 +5,7 @@
 #include "location.h"
 #include "mprint.h"
 #include "raylib.h"
+#include "room_data.h"
 #include <stdbool.h>
 
 #define DEFAULT_DUNGEON_FLOOR_WIDTH 512
@@ -13,11 +14,6 @@
 #define DEFAULT_DF_PLATES 128
 
 typedef int df_event_id;
-
-typedef struct {
-    int x, y, w, h;
-    char room_name[64]; // shorten to reasonable length
-} room_data_t;
 
 typedef struct {
     df_event_id listen_event;
@@ -51,8 +47,8 @@ void df_free(dungeon_floor_t* f);
 bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y);
 
-loc_t df_get_upstairs(const dungeon_floor_t* const df);
-loc_t df_get_downstairs(const dungeon_floor_t* const df);
+loc_t df_get_upstairs(dungeon_floor_t* const df);
+loc_t df_get_downstairs(dungeon_floor_t* const df);
 
 int df_count_walkable(const dungeon_floor_t* const df);
 int df_count_empty(const dungeon_floor_t* const df);
