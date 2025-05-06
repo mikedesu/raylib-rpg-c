@@ -1742,8 +1742,8 @@ static void df_init_test_complex7(dungeon_floor_t* df) {
 
     int center_x = df_center_x(df);
     int center_y = df_center_y(df);
-    int w = 5;
-    int h = 5;
+    int w = 3;
+    int h = 3;
 
     // starting point
     int start_x = center_x - w;
@@ -1959,7 +1959,7 @@ bool df_add_room_info(dungeon_floor_t* df, int x, int y, int w, int h, const cha
     return true;
 }
 
-int loc_is_in_room(dungeon_floor_t* const df, loc_t loc) {
+int df_loc_is_in_room(dungeon_floor_t* const df, loc_t loc) {
     massert(df, "dungeon floor is NULL");
     massert(df->rooms, "room data is NULL");
     massert(df->room_count > 0, "room count is invalid");
@@ -1978,7 +1978,75 @@ const char* df_get_room_name(dungeon_floor_t* const df, loc_t loc) {
     massert(df->room_count > 0, "room count is invalid");
     massert(loc.x >= 0 && loc.y >= 0, "location coordinates are invalid");
     massert(loc.x < df->width && loc.y < df->height, "location exceeds dungeon bounds");
-    int room_index = loc_is_in_room(df, loc);
+    int room_index = df_loc_is_in_room(df, loc);
     if (room_index == -1) { return NULL; }
     return df->rooms[room_index].room_name;
+}
+
+loc_t* const df_get_all_locs(dungeon_floor_t* const df, int* external_count) {
+    massert(df, "dungeon floor is NULL");
+    massert(df->rooms, "room data is NULL");
+    massert(df->room_count > 0, "room count is invalid");
+    massert(external_count, "external count is NULL");
+
+    int count = 0;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* const t = df_tile_at(df, x, y);
+            massert(t, "tile is NULL");
+            if (t->type == TILE_NONE || t->type == TILE_COUNT) { continue; }
+            count++;
+        }
+    }
+
+    loc_t* locs = malloc(sizeof(loc_t) * count);
+    massert(locs, "Failed to allocate memory for locs");
+
+    int index = 0;
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_t* const t = df_tile_at(df, x, y);
+            massert(t, "tile is NULL");
+            if (t->type == TILE_NONE || t->type == TILE_COUNT) { continue; }
+            locs[index].x = x;
+            locs[index].y = y;
+            index++;
+        }
+    }
+    *external_count = count;
+    return locs;
+}
+
+loc_t* const df_get_all_locs_outside_of_rooms(dungeon_floor_t* const df, int* external_count) {
+    massert(df, "dungeon floor is NULL");
+    massert(df->rooms, "room data is NULL");
+    massert(df->room_count > 0, "room count is invalid");
+    massert(external_count, "external count is NULL");
+
+    int all_locs_count = 0;
+    loc_t* all_locs = df_get_all_locs(df, &all_locs_count);
+    massert(all_locs, "Failed to get all locs");
+
+    int count = 0;
+    for (int i = 0; i < all_locs_count; i++) {
+        loc_t loc = all_locs[i];
+        if (df_loc_is_in_room(df, loc) == -1) { count++; }
+    }
+
+    loc_t* outside_locs = malloc(sizeof(loc_t) * count);
+    massert(outside_locs, "Failed to allocate memory for outside locs");
+
+    int index = 0;
+    for (int i = 0; i < all_locs_count; i++) {
+        loc_t loc = all_locs[i];
+        if (df_loc_is_in_room(df, loc) == -1) {
+            outside_locs[index].x = loc.x;
+            outside_locs[index].y = loc.y;
+            index++;
+        }
+    }
+
+    free(all_locs);
+    *external_count = count;
+    return outside_locs;
 }

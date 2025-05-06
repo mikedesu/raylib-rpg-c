@@ -339,6 +339,9 @@
 #define TX_ACTION_SLASH_SWORD_B 211
 #define TX_ACTION_SLASH_SWORD_F 212
 
+#define TX_WOODEN_DOOR_CLOSED 283
+#define TX_WOODEN_DOOR_OPEN 284
+
 //--------------------------------
 
 #define COMPANYSCENE 0

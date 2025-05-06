@@ -52,6 +52,7 @@ typedef struct entity_t {
     bool block_success;
     bool is_damaged;
     bool dead;
+    bool door_is_open;
     entityid weapon;
     entityid shield;
     entity_t* next;
@@ -137,6 +138,13 @@ static inline entity_t* e_new_npc_at(entityid id, race_t r, int x, int y, int fl
     entity_t* e = e_new_at(id, ENTITY_NPC, x, y, floor);
     massert(e, "Failed to create entity");
     e_set_race(e, r);
+    e_set_name(e, name);
+    return e;
+}
+
+static inline entity_t* e_new_door_at(entityid id, int x, int y, int floor, const char* name) {
+    entity_t* e = e_new_at(id, ENTITY_DOOR, x, y, floor);
+    massert(e, "Failed to create entity");
     e_set_name(e, name);
     return e;
 }

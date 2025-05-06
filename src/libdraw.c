@@ -1082,6 +1082,10 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             num_keys = TX_POTION_HP_LARGE_KEY_COUNT;
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         }
+    } else if (e->type == ENTITY_DOOR) {
+        keys = TX_WOODEN_DOOR_KEYS;
+        num_keys = TX_WOODEN_DOOR_KEY_COUNT;
+        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     }
 }
 
