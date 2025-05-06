@@ -59,7 +59,7 @@ static void create_dwarf_at(gamestate* g, loc_t loc);
 
 static entityid create_potion_at(gamestate* const g, potiontype_t potion_type, const char* name, loc_t loc);
 
-static entityid door_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
+static entityid door_create(gamestate* const g, int x, int y, int fl, const char* name);
 static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 
 static void init_potion_test(gamestate* const g, potiontype_t potion_type, const char* name);
@@ -945,13 +945,11 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int fl, 
     return e->id;
 }
 
-static entityid door_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
+static entityid door_create(gamestate* const g, int x, int y, int fl, const char* name) {
     massert(g, "gamestate is NULL");
     em_t* em = gamestate_get_entitymap(g);
     massert(em, "entitymap is NULL");
     massert(name && name[0], "name is NULL or empty");
-    massert(rt >= 0, "race_type is out of bounds: %s: %d", name, rt);
-    massert(rt < RACE_COUNT, "race_type is out of bounds: %s: %d", name, rt);
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
     massert(df, "failed to get current dungeon floor");
     massert(x >= 0, "x is out of bounds: %s: %d", name, x);
@@ -1219,13 +1217,28 @@ static void init_orcs_test_by_room(gamestate* const g, int room_index) {
     room_data_t* room = &df->rooms[room_index];
     massert(room, "room is NULL");
 
-    int count = 4;
-    entity* player = em_get(g->entitymap, g->hero_id);
-    for (int i = 0; i < count; i++) {
-        loc_t loc = get_random_empty_non_wall_loc_in_area(g, g->dungeon->current_floor, room->x, room->y, room->w, room->h);
-        entity* orc = create_orc_at(g, loc);
-        massert(orc, "orc is NULL");
-        orc->target = (loc_t){player->x, player->y, player->floor};
+    //int count = 4;
+    //entity* player = em_get(g->entitymap, g->hero_id);
+    //for (int i = 0; i < count; i++) {
+    //    loc_t loc = get_random_empty_non_wall_loc_in_area(g, g->dungeon->current_floor, room->x, room->y, room->w, room->h);
+    //    entity* orc = create_orc_at(g, loc);
+    //    massert(orc, "orc is NULL");
+    //    orc->target = (loc_t){player->x, player->y, player->floor};
+    //}
+
+    int loc_count = 0;
+    loc_t* locs = df_get_all_locs_outside_of_rooms(df, &loc_count);
+    massert(locs, "locs is NULL");
+    massert(loc_count > 0, "loc_count is 0 or less");
+
+    if (loc_count > 0) {
+        // select a random
+        //int random_index = rand() % loc_count;
+        for (int i = 0; i < loc_count; i++) {
+            loc_t loc = locs[i];
+            entityid doorid = door_create(g, loc.x, loc.y, loc.z, "door");
+            massert(doorid != ENTITYID_INVALID, "door create fail");
+        }
     }
 }
 

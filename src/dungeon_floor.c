@@ -48,7 +48,7 @@ static bool df_malloc_tiles(dungeon_floor_t* const df);
 static void df_init_test_complex4(dungeon_floor_t* df, int hallway_length);
 static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length);
 static void df_init_test_complex6(dungeon_floor_t* df, range room_length, range room_width);
-static void df_init_test_complex7(dungeon_floor_t* df);
+static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range room_length);
 
 static void df_assign_stairs(dungeon_floor_t* df);
 
@@ -520,7 +520,7 @@ void df_init(dungeon_floor_t* df) {
     //df_init_test_complex4(df, 3);
     //df_init_test_complex5(df, (range){3, 10});
     //df_init_test_complex6(df, (range){3, 10}, (range){3, 10});
-    df_init_test_complex7(df);
+    df_init_test_complex7(df, (range){3, 5}, (range){3, 5});
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
@@ -1737,13 +1737,15 @@ static void df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, t
     df_add_room_info(df, x, y, w, h, room_name);
 }
 
-static void df_init_test_complex7(dungeon_floor_t* df) {
+static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range room_length) {
     massert(df, "dungeon floor is NULL");
 
     int center_x = df_center_x(df);
     int center_y = df_center_y(df);
-    int w = 3;
-    int h = 3;
+    //int w = 3;
+    int w = get_random_in_range(room_width);
+    //int h = 3;
+    int h = get_random_in_range(room_length);
 
     // starting point
     int start_x = center_x - w;
@@ -1765,7 +1767,10 @@ static void df_init_test_complex7(dungeon_floor_t* df) {
     df_set_tile(df, TILE_FLOOR_STONE_00, x, y);
 
     x++;
-    y = start_x;
+    y = start_y;
+
+    w = get_random_in_range(room_width);
+    h = get_random_in_range(room_length);
 
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room2");
     //df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
@@ -1778,6 +1783,10 @@ static void df_init_test_complex7(dungeon_floor_t* df) {
 
     x++;
     y = start_y;
+
+    w = get_random_in_range(room_width);
+    h = get_random_in_range(room_length);
+
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room3");
 
     df_assign_downstairs_in_area(df, df->rooms[2].x, df->rooms[2].y, df->rooms[2].w, df->rooms[2].h);
