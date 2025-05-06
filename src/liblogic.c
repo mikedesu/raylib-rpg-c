@@ -30,6 +30,7 @@ static entityid next_entityid = 0; // Start at 0, increment for each new entity
 static loc_t* get_empty_locs(dungeon_floor_t* const df, int* count);
 static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt);
 static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count);
+static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 
 static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
 
@@ -70,6 +71,8 @@ static void init_elves_test_intermediate(gamestate* const g);
 static void init_goblins_test_intermediate(gamestate* const g);
 static void init_halflings_test_intermediate(gamestate* const g);
 
+static void init_orcs_test_by_room(gamestate* const g, int room_index);
+
 static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
 
@@ -91,6 +94,7 @@ static void add_message(gamestate* g, const char* fmt, ...);
 
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
 
+static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
 static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
 
 static void try_entity_move_a_star(gamestate* const g, entity* const e);
@@ -817,29 +821,54 @@ static void init_potion_test(gamestate* const g, potiontype_t potion_type, const
     create_potion_at(g, potion_type, name, loc);
 }
 
-static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor) {
+static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h) {
     massert(g, "gamestate is NULL");
     massert(floor >= 0, "floor is out of bounds");
     massert(floor < g->dungeon->num_floors, "floor is out of bounds");
+    massert(x >= 0, "x is out of bounds");
+    massert(x < g->dungeon->floors[floor]->width, "x is out of bounds");
+    massert(y >= 0, "y is out of bounds");
+    massert(y < g->dungeon->floors[floor]->height, "y is out of bounds");
+    massert(w > 0, "w is out of bounds");
+    massert(h > 0, "h is out of bounds");
+    massert(x + w <= g->dungeon->floors[floor]->width, "x + w is out of bounds");
+    massert(y + h <= g->dungeon->floors[floor]->height, "y + h is out of bounds");
 
     int c = -1;
-    loc_t* locations = get_empty_non_wall_locs(g->dungeon->floors[floor], &c);
-
+    //loc_t* locations = get_empty_non_wall_locs(g->dungeon->floors[floor], &c);
+    loc_t* locations = get_empty_non_wall_locs_in_area(g->dungeon->floors[floor], &c, x, y, w, h);
     massert(locations, "locations is NULL");
     massert(c > 0, "locations count is 0 or less");
     // pick a random location
     int index = rand() % c;
     loc_t loc = locations[index];
     free(locations);
-
     massert(loc.x >= 0, "loc.x is out of bounds");
     massert(loc.x < g->dungeon->floors[floor]->width, "loc.x is out of bounds");
     massert(loc.y >= 0, "loc.y is out of bounds");
     massert(loc.y < g->dungeon->floors[floor]->height, "loc.y is out of bounds");
-
     loc.z = floor;
-
     return loc;
+}
+
+static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor) {
+    massert(g, "gamestate is NULL");
+    massert(floor >= 0, "floor is out of bounds");
+    massert(floor < g->dungeon->num_floors, "floor is out of bounds");
+    //int c = -1;
+    //loc_t* locations = get_empty_non_wall_locs(g->dungeon->floors[floor], &c);
+    //massert(locations, "locations is NULL");
+    //massert(c > 0, "locations count is 0 or less");
+    //// pick a random location
+    //int index = rand() % c;
+    //loc_t loc = locations[index];
+    //free(locations);
+    //massert(loc.x >= 0, "loc.x is out of bounds");
+    //massert(loc.x < g->dungeon->floors[floor]->width, "loc.x is out of bounds");
+    //massert(loc.y >= 0, "loc.y is out of bounds");
+    //massert(loc.y < g->dungeon->floors[floor]->height, "loc.y is out of bounds");
+    //loc.z = floor;
+    return get_random_empty_non_wall_loc_in_area(g, floor, 0, 0, g->dungeon->floors[floor]->width, g->dungeon->floors[floor]->height);
 }
 
 static void init_weapon_test(gamestate* g) {
@@ -878,14 +907,14 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int fl, 
     em_t* em = gamestate_get_entitymap(g);
     massert(em, "entitymap is NULL");
     massert(name && name[0], "name is NULL or empty");
-    massert(rt >= 0, "race_type is out of bounds");
-    massert(rt < RACE_COUNT, "race_type is out of bounds");
+    massert(rt >= 0, "race_type is out of bounds: %s: %d", name, rt);
+    massert(rt < RACE_COUNT, "race_type is out of bounds: %s: %d", name, rt);
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
     massert(df, "failed to get current dungeon floor");
-    massert(x >= 0, "x is out of bounds: %s", name);
-    massert(x < df->width, "x is out of bounds");
-    massert(y >= 0, "y is out of bounds");
-    massert(y < df->height, "y is out of bounds");
+    massert(x >= 0, "x is out of bounds: %s: %d", name, x);
+    massert(x < df->width, "x is out of bounds: %s: %d", name, x);
+    massert(y >= 0, "y is out of bounds: %s: %d", name, y);
+    massert(y < df->height, "y is out of bounds: %s: %d", name, y);
     // can we create an entity at this location? no entities can be made on wall-types etc
     tile_t* const tile = df_tile_at(df, x, y);
     massert(tile, "failed to get tile");
@@ -1003,24 +1032,51 @@ static loc_t* get_empty_locs(dungeon_floor_t* const df, int* count) {
     return locs;
 }
 
-static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count) {
+static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(count, "count is NULL");
-    int c = df_count_empty_non_walls(df);
+    int c = df_count_empty_non_walls_in_area(df, x0, y0, w, h);
     loc_t* locs = malloc(sizeof(loc_t) * c);
     massert(locs, "malloc failed");
     int i = 0;
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            tile_t* t = df_tile_at(df, x, y);
+    for (int y = 0; y < h && y + y0 < df->height; y++) {
+        for (int x = 0; x < w && x + x0 < df->width; x++) {
+            int newx = x + x0;
+            int newy = y + y0;
+
+            tile_t* t = df_tile_at(df, newx, newy);
             tiletype_t type = t->type;
-            if (tile_entity_count(t) == 0 && tile_is_walkable(type)) locs[i++] = (loc_t){x, y};
+            if (tile_entity_count(t) == 0 && tile_is_walkable(type)) locs[i++] = (loc_t){newx, newy};
+            //if (tile_entity_count(t) == 0 && t->type != TILE_NONE && !tile_is_wall(t->type)) { locs[i++] = (loc_t){x, y}; }
             if (i >= c) break;
         }
     }
     massert(i == c, "count mismatch: expected %d, got %d", c, i);
     *count = c;
+    //*count = i;
     return locs;
+}
+
+static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count) {
+    massert(df, "dungeon floor is NULL");
+    massert(count, "count is NULL");
+    //int c = df_count_empty_non_walls(df);
+    //loc_t* locs = malloc(sizeof(loc_t) * c);
+    //massert(locs, "malloc failed");
+    //int i = 0;
+    //for (int y = 0; y < df->height; y++) {
+    //    for (int x = 0; x < df->width; x++) {
+    //        tile_t* t = df_tile_at(df, x, y);
+    //        tiletype_t type = t->type;
+    //        if (tile_entity_count(t) == 0 && tile_is_walkable(type)) locs[i++] = (loc_t){x, y};
+    //        if (i >= c) break;
+    //    }
+    //}
+    //massert(i == c, "count mismatch: expected %d, got %d", c, i);
+    //*count = c;
+    //return locs;
+
+    return get_empty_non_wall_locs_in_area(df, count, 0, 0, df->width, df->height);
 }
 
 static entity* create_orc_at(gamestate* g, loc_t loc) {
@@ -1107,6 +1163,26 @@ static void init_orcs_test_intermediate(gamestate* g) {
         // assign the player as the orc's target
         orc->target = (loc_t){player->x, player->y, player->floor};
         created++;
+    }
+}
+
+static void init_orcs_test_by_room(gamestate* const g, int room_index) {
+    massert(g, "gamestate is NULL");
+    massert(room_index >= 0, "room_index is out of bounds");
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
+    massert(df, "floor is NULL");
+    massert(room_index < df->room_count, "room_index is out of bounds");
+
+    room_data_t* room = &df->rooms[room_index];
+    massert(room, "room is NULL");
+
+    int count = 10;
+    entity* player = em_get(g->entitymap, g->hero_id);
+    for (int i = 0; i < count; i++) {
+        loc_t loc = get_random_empty_non_wall_loc_in_area(g, g->dungeon->current_floor, room->x, room->y, room->w, room->h);
+        entity* orc = create_orc_at(g, loc);
+        massert(orc, "orc is NULL");
+        orc->target = (loc_t){player->x, player->y, player->floor};
     }
 }
 
@@ -1330,6 +1406,7 @@ static void init_goblins_test_intermediate(gamestate* const g) {
 //    free(locs);
 //}
 
+//static void init_orcs_test(gamestate* const g) { init_orcs_test_intermediate(g); }
 static void init_orcs_test(gamestate* const g) { init_orcs_test_intermediate(g); }
 static void init_humans_test(gamestate* const g) { init_humans_test_intermediate(g); }
 static void init_elves_test(gamestate* const g) { init_elves_test_intermediate(g); }
@@ -1807,7 +1884,8 @@ void liblogic_init(gamestate* const g) {
 
     // temporarily disabling
     //init_humans_test(g);
-    init_orcs_test(g);
+    //init_orcs_test(g);
+    init_orcs_test_by_room(g, 2);
     //init_elves_test(g);
     //init_dwarves_test(g);
     //init_halflings_test(g);

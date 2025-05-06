@@ -53,12 +53,13 @@ loc_t df_get_downstairs(dungeon_floor_t* const df);
 int df_count_walkable(const dungeon_floor_t* const df);
 int df_count_empty(const dungeon_floor_t* const df);
 int df_count_empty_non_walls(const dungeon_floor_t* const df);
+int df_count_empty_non_walls_in_area(const dungeon_floor_t* const df, int x0, int y0, int w, int h);
 
 int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
 
 void df_init_rooms(dungeon_floor_t* df);
-bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
+bool df_add_room_info(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
 
 const char* df_get_room_name(dungeon_floor_t* const df, loc_t loc);
 int loc_is_in_room(dungeon_floor_t* const df, loc_t loc);
