@@ -165,12 +165,10 @@ static void update_equipped_shield_dir(gamestate* g, entity* e) {
     massert(e, "entity is NULL");
     if (e->shield != ENTITYID_INVALID) {
         entity* shield = em_get(g->entitymap, e->shield);
-        if (!shield) {
-            merror("Failed to get shield entity");
-            return;
+        if (shield) {
+            shield->direction = e->direction;
+            shield->do_update = true;
         }
-        shield->direction = e->direction;
-        shield->do_update = true;
     }
 }
 
@@ -178,19 +176,21 @@ static inline bool player_on_tile(gamestate* g, int x, int y, int floor) {
     massert(g, "gamestate is NULL");
     // get the tile at x y
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
-    if (!df) {
-        merror("failed to get dungeon floor");
-        return false;
-    }
+    massert(df, "dungeon floor is NULL");
+    //if (!df) {
+    //    merror("failed to get dungeon floor");
+    //    return false;
+    //}
     tile_t* tile = df_tile_at(df, x, y);
     // enumerate entities and check their type
     for (int i = 0; i < tile->entity_max; i++) {
         if (tile->entities[i] == ENTITYID_INVALID) continue;
         entity* e = em_get(g->entitymap, tile->entities[i]);
-        if (!e) {
-            merror("failed to get entity");
-            return false;
-        }
+        massert(e, "failed to get entity");
+        //if (!e) {
+        //    merror("failed to get entity");
+        //    return false;
+        //}
         if (e->type == ENTITY_PLAYER) return true;
     }
     return false;
