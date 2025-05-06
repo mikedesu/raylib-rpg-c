@@ -1892,3 +1892,27 @@ bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* na
     r->room_name[sizeof(r->room_name) - 1] = '\0';
     return true;
 }
+
+int loc_is_in_room(dungeon_floor_t* const df, loc_t loc) {
+    massert(df, "dungeon floor is NULL");
+    massert(df->rooms, "room data is NULL");
+    massert(df->room_count > 0, "room count is invalid");
+    massert(loc.x >= 0 && loc.y >= 0, "location coordinates are invalid");
+    massert(loc.x < df->width && loc.y < df->height, "location exceeds dungeon bounds");
+    for (int i = 0; i < df->room_count; i++) {
+        room_data_t* r = &df->rooms[i];
+        if (loc.x >= r->x && loc.x < r->x + r->w && loc.y >= r->y && loc.y < r->y + r->h) { return i; }
+    }
+    return -1;
+}
+
+const char* df_get_room_name(dungeon_floor_t* const df, loc_t loc) {
+    massert(df, "dungeon floor is NULL");
+    massert(df->rooms, "room data is NULL");
+    massert(df->room_count > 0, "room count is invalid");
+    massert(loc.x >= 0 && loc.y >= 0, "location coordinates are invalid");
+    massert(loc.x < df->width && loc.y < df->height, "location exceeds dungeon bounds");
+    int room_index = loc_is_in_room(df, loc);
+    if (room_index == -1) { return NULL; }
+    return df->rooms[room_index].room_name;
+}

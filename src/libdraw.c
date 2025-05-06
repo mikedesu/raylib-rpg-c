@@ -1094,10 +1094,15 @@ static void draw_hud(gamestate* const g) {
     massert(e, "entity is NULL");
     const int turn = g->turn_count, hp = e->stats.hp, maxhp = e->stats.maxhp, mp = e->stats.mp, maxmp = e->stats.maxmp, level = e->stats.level;
 
+    loc_t loc = (loc_t){e->x, e->y};
+    dungeon_floor_t* const df = dungeon_get_current_floor(g->dungeon);
+    //int i = loc_is_in_room(df, loc);
+    const char* room_name = df_get_room_name(df, loc);
+
     char buffer[1024] = {0};
     snprintf(buffer,
              sizeof(buffer),
-             "%s Lvl %d HP %d/%d MP %d/%d XP %d Turn %d",
+             "%s Lvl %d HP %d/%d MP %d/%d XP %d Room: %s Turn %d",
              e->name,
              level,
              hp,
@@ -1105,6 +1110,7 @@ static void draw_hud(gamestate* const g) {
              mp,
              maxmp,
              0, // XP placeholder
+             room_name,
              turn);
 
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, g->font_size, g->line_spacing);

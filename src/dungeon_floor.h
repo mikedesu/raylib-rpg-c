@@ -60,6 +60,9 @@ int df_center_y(const dungeon_floor_t* const df);
 void df_init_rooms(dungeon_floor_t* df);
 bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
 
+const char* df_get_room_name(dungeon_floor_t* const df, loc_t loc);
+int loc_is_in_room(dungeon_floor_t* const df, loc_t loc);
+
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
     //minfo("df_tile_at: %d, %d", x, y);
     massert(df, "df is NULL");
