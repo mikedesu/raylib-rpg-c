@@ -31,9 +31,9 @@ typedef struct {
     df_event_t events[DEFAULT_DF_EVENTS];
     bool plates[DEFAULT_DF_PLATES];
 
-    room_data_t* rooms; // dynamic array pointer
-    int room_count; // current room number
-    int room_capacity; // allocated capacity
+    //room_data_t* rooms; // dynamic array pointer
+    //int room_count; // current room number
+    //int room_capacity; // allocated capacity
 
     loc_t downstairs_loc;
     loc_t upstairs_loc;
@@ -57,7 +57,7 @@ int df_count_empty_non_walls(const dungeon_floor_t* const df);
 int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
 
-bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
+//bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
 
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
     //minfo("df_tile_at: %d, %d", x, y);
@@ -86,15 +86,15 @@ static inline bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y
     return tile_is_wall(tile->type);
 }
 
-static inline const room_data_t* df_get_room_at(const dungeon_floor_t* df, int px, int py) {
-    massert(df, "dungeon floor is NULL");
-    massert(px >= 0, "px is less than zero");
-    massert(px < df->width, "px is out of bounds");
-    massert(py >= 0, "py is less than zero");
-    massert(py < df->height, "py is out of bounds");
-    for (int i = 0; i < df->room_count; i++) {
-        const room_data_t* r = &df->rooms[i];
-        if (px >= r->x && px < r->x + r->w && py >= r->y && py < r->y + r->h) return r;
-    }
-    return NULL;
-}
+//static inline const room_data_t* df_get_room_at(const dungeon_floor_t* df, int px, int py) {
+//    massert(df, "dungeon floor is NULL");
+//    massert(px >= 0, "px is less than zero");
+//    massert(px < df->width, "px is out of bounds");
+//    massert(py >= 0, "py is less than zero");
+//    massert(py < df->height, "py is out of bounds");
+//    for (int i = 0; i < df->room_count; i++) {
+//        const room_data_t* r = &df->rooms[i];
+//        if (px >= r->x && px < r->x + r->w && py >= r->y && py < r->y + r->h) return r;
+//    }
+//    return NULL;
+//}

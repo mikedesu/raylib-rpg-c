@@ -69,7 +69,7 @@ static int df_get_possible_downstairs_count_in_area(dungeon_floor_t* df, int x, 
 static void df_make_room(dungeon_floor_t* df, int x, int y, int w, int h);
 static void df_make_corridor_h(dungeon_floor_t* df, int x, int y, int len);
 static void df_make_corridor_v(dungeon_floor_t* df, int x, int y, int len);
-static void df_connect_rooms(dungeon_floor_t* df, int x1, int y1, int x2, int y2);
+//static void df_connect_rooms(dungeon_floor_t* df, int x1, int y1, int x2, int y2);
 static void df_make_diamond_shape_room(dungeon_floor_t* df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type);
 
 static int df_get_possible_downstairs_count_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
@@ -495,9 +495,9 @@ static void df_set_tile_area(dungeon_floor_t* const df, tiletype_t type, int x, 
 void df_init(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
 
-    df->rooms = NULL;
-    df->room_count = 0;
-    df->room_capacity = 0;
+    //df->rooms = NULL;
+    //df->room_count = 0;
+    //df->room_capacity = 0;
     df->width = DEFAULT_DUNGEON_FLOOR_WIDTH;
     df->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
     df->upstairs_loc = (loc_t){-1, -1};
@@ -743,10 +743,10 @@ void df_free(dungeon_floor_t* df) {
         df->tiles = NULL;
     }
 
-    if (df->rooms) {
-        free(df->rooms);
-        df->rooms = NULL;
-    }
+    //if (df->rooms) {
+    //    free(df->rooms);
+    //    df->rooms = NULL;
+    //}
 
     free(df);
     msuccess("Freed dungeon floor");
@@ -1071,12 +1071,12 @@ static void df_make_corridor_v(dungeon_floor_t* df, int x, int y, int len) {
     df_set_tile_area_range(df, x, y, 1, len, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
 }
 
-static void df_connect_rooms(dungeon_floor_t* df, int x1, int y1, int x2, int y2) {
-    // Connect by a 1-tile floor at midpoint to simulate door/corridor connection
-    int mx = (x1 + x2) / 2;
-    int my = (y1 + y2) / 2;
-    df_set_tile(df, TILE_FLOOR_STONE_00, mx, my);
-}
+//static void df_connect_rooms(dungeon_floor_t* df, int x1, int y1, int x2, int y2) {
+// Connect by a 1-tile floor at midpoint to simulate door/corridor connection
+//    int mx = (x1 + x2) / 2;
+//    int my = (y1 + y2) / 2;
+//    df_set_tile(df, TILE_FLOOR_STONE_00, mx, my);
+//}
 
 static void df_make_diamond_shape_room(dungeon_floor_t* df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type) {
     massert(df, "dungeon floor is NULL");
@@ -1668,11 +1668,9 @@ static void df_init_test_complex4(dungeon_floor_t* df, int hallway_length) {
 
 static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
     massert(df, "dungeon floor is NULL");
-
     // Default hallway length if not specified
     if (hallway_length.min <= 0) hallway_length.min = 3;
     if (hallway_length.max <= 0) hallway_length.max = 3;
-
     // Configuration
     int room_size = 3;
     int grid_size = 5; // 3x3 grid of rooms
@@ -1680,7 +1678,6 @@ static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
     //int gap_size = hallway_length;
     int gap_size = get_random_in_range(hallway_length);
     int total_span = grid_size * room_size + (grid_size - 1) * gap_size;
-
     // Center of the grid
     int start_x = df_center_x(df) - total_span / 2;
     int start_y = df_center_y(df) - total_span / 2;
@@ -1711,13 +1708,11 @@ static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
                 floor_end = TILE_FLOOR_STONE_DIRT_DR_05;
             }
             df_set_tile_area_range(df, room_x, room_y, room_size, room_size, floor_start, floor_end);
-
             // Connect to room on the right if not the last column
             if ((grid_x < grid_size - 1) || (grid_y < grid_size - 1)) {
                 int hallways_created = 0;
                 if (grid_x < grid_size - 1) {
                     int do_create = rand() % 2;
-
                     if (do_create) {
                         // Horizontal corridor
                         int corridor_start_x = room_x + room_size;
@@ -1734,11 +1729,9 @@ static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
                         hallways_created++;
                     }
                 }
-
                 // Connect to room below if not the last row
                 if (grid_y < grid_size - 1) {
                     int do_create = rand() % 2;
-
                     if (do_create) {
                         // Vertical corridor
                         int corridor_x = room_x + room_size / 2;
@@ -1755,11 +1748,9 @@ static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
                         hallways_created++;
                     }
                 }
-
                 while (hallways_created < 1) {
                     if (grid_x < grid_size - 1) {
                         int do_create = rand() % 2;
-
                         if (do_create) {
                             // Horizontal corridor
                             int corridor_start_x = room_x + room_size;
@@ -1776,13 +1767,10 @@ static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
                             hallways_created++;
                         }
                     }
-
                     if (hallways_created) { break; }
-
                     // Connect to room below if not the last row
                     if (grid_y < grid_size - 1) {
                         int do_create = rand() % 2;
-
                         if (do_create) {
                             // Vertical corridor
                             int corridor_x = room_x + room_size / 2;
@@ -1803,7 +1791,6 @@ static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
             }
         }
     }
-
     // Place stairs
     int top_left_x = start_x;
     int top_left_y = start_y;
@@ -1814,20 +1801,20 @@ static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
     df_assign_upstairs_in_area(df, bottom_right_x, bottom_right_y, room_size, room_size);
 }
 
-bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name) {
-    if (df->room_count == df->room_capacity) {
-        int new_cap = df->room_capacity ? df->room_capacity * 2 : 8;
-        room_data_t* tmp = realloc(df->rooms, sizeof(room_data_t) * new_cap);
-        if (!tmp) return false;
-        df->rooms = tmp;
-        df->room_capacity = new_cap;
-    }
-    room_data_t* r = &df->rooms[df->room_count++];
-    r->x = x;
-    r->y = y;
-    r->w = w;
-    r->h = h;
-    strncpy(r->room_name, name, sizeof(r->room_name) - 1);
-    r->room_name[sizeof(r->room_name) - 1] = '\0';
-    return true;
-}
+//bool df_add_room(dungeon_floor_t* df, int x, int y, int w, int h, const char* name) {
+//    if (df->room_count == df->room_capacity) {
+//        int new_cap = df->room_capacity ? df->room_capacity * 2 : 8;
+//        room_data_t* tmp = realloc(df->rooms, sizeof(room_data_t) * new_cap);
+//        if (!tmp) return false;
+//        df->rooms = tmp;
+//        df->room_capacity = new_cap;
+//    }
+//    room_data_t* r = &df->rooms[df->room_count++];
+//    r->x = x;
+//    r->y = y;
+//    r->w = w;
+//    r->h = h;
+//    strncpy(r->room_name, name, sizeof(r->room_name) - 1);
+//    r->room_name[sizeof(r->room_name) - 1] = '\0';
+//    return true;
+//}
