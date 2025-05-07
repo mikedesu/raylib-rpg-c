@@ -1754,28 +1754,33 @@ static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range r
     int x = start_x;
     int y = start_y;
 
+    df_set_tile_area_range(df, x - 1, y - 1, 20, 10, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room1");
 
     df_assign_upstairs_in_area(df, df->rooms[0].x, df->rooms[0].y, df->rooms[0].w, df->rooms[0].h);
 
-    x += w;
+    x += w - 1;
     y += h / 2;
 
     // single tile hallway between rooms
-    //df_set_tile(df, TILE_FLOOR_STONE_00, x, y);
-    df_add_room(df, x, y, 3, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "hallway1");
+    w = 3;
+    h = 1;
+    //df_set_tile_area_range(df, x, y - 1, w, h + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+    df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "hallway1");
+    //df_set_tile_area_range(df, x, y + 1, w, h, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
 
-    x += 3;
+    x += w;
     y = start_y;
 
     w = get_random_in_range(room_width);
     h = get_random_in_range(room_length);
 
+    //df_set_tile_area_range(df, x - 1, y - 1, w + 2, h + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room2");
 
     x += w;
     y += h / 2;
-    //df_set_tile(df, TILE_FLOOR_STONE_01, x, y);
     df_add_room(df, x, y, 3, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "hallway2");
 
     x += 3;
@@ -1784,9 +1789,11 @@ static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range r
     w = get_random_in_range(room_width);
     h = get_random_in_range(room_length);
 
+    //df_set_tile_area_range(df, x - 1, y - 1, w + 2, h + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room3");
 
-    df_assign_downstairs_in_area(df, df->rooms[4].x, df->rooms[4].y, df->rooms[4].w, df->rooms[4].h);
+    df_assign_downstairs_in_area(
+        df, df->rooms[df->room_count - 1].x, df->rooms[df->room_count - 1].y, df->rooms[df->room_count - 1].w, df->rooms[df->room_count - 1].h);
 }
 
 static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
