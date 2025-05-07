@@ -1287,12 +1287,12 @@ static void init_orcs_test_intermediate(gamestate* g) {
 static void init_orcs_test_by_room(gamestate* const g, int room_index) {
     massert(g, "gamestate is NULL");
     massert(room_index >= 0, "room_index is out of bounds");
-    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
-    massert(df, "floor is NULL");
-    massert(room_index < df->room_count, "room_index is out of bounds");
+    //dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
+    //massert(df, "floor is NULL");
+    //massert(room_index < df->room_count, "room_index is out of bounds");
 
-    room_data_t* room = &df->rooms[room_index];
-    massert(room, "room is NULL");
+    //room_data_t* room = &df->rooms[room_index];
+    //massert(room, "room is NULL");
 
     //int count = 4;
     //entity* player = em_get(g->entitymap, g->hero_id);
@@ -1303,20 +1303,17 @@ static void init_orcs_test_by_room(gamestate* const g, int room_index) {
     //    orc->target = (loc_t){player->x, player->y, player->floor};
     //}
 
-    int loc_count = 0;
-    loc_t* locs = df_get_all_locs_outside_of_rooms(df, &loc_count);
-    massert(locs, "locs is NULL");
-    massert(loc_count > 0, "loc_count is 0 or less");
-
-    if (loc_count > 0) {
-        // select a random
-        //int random_index = rand() % loc_count;
-        for (int i = 0; i < loc_count; i++) {
-            loc_t loc = locs[i];
-            entityid doorid = door_create(g, loc.x, loc.y, loc.z, "door");
-            massert(doorid != ENTITYID_INVALID, "door create fail");
-        }
-    }
+    //int loc_count = 0;
+    //loc_t* locs = df_get_all_locs_outside_of_rooms(df, &loc_count);
+    //massert(locs, "locs is NULL");
+    //massert(loc_count > 0, "loc_count is 0 or less");
+    //if (loc_count > 0) {
+    //    for (int i = 0; i < loc_count; i++) {
+    //        loc_t loc = locs[i];
+    //        entityid doorid = door_create(g, loc.x, loc.y, loc.z, "door");
+    //        massert(doorid != ENTITYID_INVALID, "door create fail");
+    //    }
+    //}
 }
 
 static void init_humans_test_intermediate(gamestate* const g) {

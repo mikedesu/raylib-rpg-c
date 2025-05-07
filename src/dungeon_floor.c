@@ -1740,31 +1740,30 @@ static void df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, t
 static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range room_length) {
     massert(df, "dungeon floor is NULL");
 
-    int center_x = df_center_x(df);
-    int center_y = df_center_y(df);
+    int cx = df_center_x(df);
+    int cy = df_center_y(df);
     //int w = 3;
     int w = get_random_in_range(room_width);
     //int h = 3;
     int h = get_random_in_range(room_length);
 
     // starting point
-    int start_x = center_x - w;
-    int start_y = center_y - h;
+    int start_x = cx - w;
+    int start_y = cy - h;
 
     int x = start_x;
     int y = start_y;
 
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room1");
-    //df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-    //df_add_room_info(df, x, y, w, h, "room1");
-    //df_assign_upstairs_in_area(df, x, y, w, h);
 
     df_assign_upstairs_in_area(df, df->rooms[0].x, df->rooms[0].y, df->rooms[0].w, df->rooms[0].h);
 
     x += w;
     y += h / 2;
 
-    df_set_tile(df, TILE_FLOOR_STONE_00, x, y);
+    // single tile hallway between rooms
+    //df_set_tile(df, TILE_FLOOR_STONE_00, x, y);
+    df_add_room(df, x, y, 1, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "hallway1");
 
     x++;
     y = start_y;
@@ -1773,13 +1772,11 @@ static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range r
     h = get_random_in_range(room_length);
 
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room2");
-    //df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-    //df_add_room_info(df, x, y, w, h, "room2");
-    //df_assign_downstairs_in_area(df, df->rooms[1].x, df->rooms[1].y, df->rooms[1].w, df->rooms[1].h);
 
     x += w;
     y += h / 2;
-    df_set_tile(df, TILE_FLOOR_STONE_01, x, y);
+    //df_set_tile(df, TILE_FLOOR_STONE_01, x, y);
+    df_add_room(df, x, y, 1, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "hallway2");
 
     x++;
     y = start_y;
