@@ -56,10 +56,10 @@ static entity* create_shield(gamestate* g);
 static entity* create_sword(gamestate* g);
 static entity* create_sword_at(gamestate* g, loc_t loc);
 static entity* create_shield_at(gamestate* g, loc_t loc);
-
-static void create_elf_at(gamestate* g, loc_t loc);
-static void create_human_at(gamestate* g, loc_t loc);
+static entity* create_elf_at(gamestate* g, loc_t loc);
 static entity* create_orc_at(gamestate* g, loc_t loc);
+
+static void create_human_at(gamestate* g, loc_t loc);
 static void create_goblin_at(gamestate* g, loc_t loc);
 static void create_halfling_at(gamestate* g, loc_t loc);
 static void create_dwarf_at(gamestate* g, loc_t loc);
@@ -1233,12 +1233,14 @@ static void create_human_at(gamestate* g, loc_t loc) {
     e_set_hp(o, 1);
 }
 
-static void create_elf_at(gamestate* g, loc_t loc) {
-    entity* o = npc_create_ptr(g, RACE_ELF, loc.x, loc.y, loc.z, "elf");
-    massert(o, "elf create fail");
-    e_set_default_action(o, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
-    e_set_maxhp(o, 1);
-    e_set_hp(o, 1);
+static entity* create_elf_at(gamestate* g, loc_t loc) {
+    entity* e = npc_create_ptr(g, RACE_ELF, loc.x, loc.y, loc.z, "elf");
+    massert(e, "elf create fail");
+    e_set_default_action(e, ENTITY_ACTION_MOVE_A_STAR);
+    e_set_maxhp(e, 1);
+    e_set_hp(e, 1);
+
+    return e;
 }
 
 //static void create_elf_at(gamestate* g, int x, int y) {
@@ -1323,7 +1325,8 @@ static void init_orcs_test_by_room(gamestate* const g, int room_index) {
         for (int i = 1; i < room_count; i++) {
             room_data_t room = rooms[i];
             loc_t loc = get_random_empty_non_wall_loc_in_area(g, g->dungeon->current_floor, room.x, room.y, room.w, room.h);
-            entity* orc = create_orc_at(g, loc);
+            //entity* orc = create_orc_at(g, loc);
+            entity* orc = create_elf_at(g, loc);
             massert(orc != ENTITYID_INVALID, "orc create fail");
             orc->target = (loc_t){player->x, player->y, player->floor};
         }
