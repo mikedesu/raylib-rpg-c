@@ -412,15 +412,14 @@ static void try_entity_move_a_star(gamestate* const g, entity* const e) {
                         try_entity_move(g, e, dx, dy);
                     }
                 }
-
-                //try_entity_move(g, e, dx, dy);
-            } else if (e->target_path_length == 1) {
-                // we are at the destination
-                minfo("Entity is at the destination");
-            } else {
-                // find path could not return a valid path
-                merror("find_path returned an invalid path");
             }
+            //else if (e->target_path_length == 1) {
+            // we are at the destination
+            //    minfo("Entity is at the destination");
+            //} else {
+            // find path could not return a valid path
+            //    merror("find_path returned an invalid path");
+            //}
         }
     }
 }
