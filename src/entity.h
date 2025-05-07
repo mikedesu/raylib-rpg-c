@@ -149,6 +149,13 @@ static inline entity_t* e_new_door_at(entityid id, int x, int y, int floor, cons
     return e;
 }
 
+static inline entity_t* e_new_key_at(entityid id, int x, int y, int floor, const char* name) {
+    entity_t* e = e_new_at(id, ENTITY_KEY, x, y, floor);
+    massert(e, "Failed to create entity");
+    e_set_name(e, name);
+    return e;
+}
+
 static inline entity_t* e_new_weapon(entityid id, const char* name) {
     entity_t* e = e_new(id, ENTITY_WEAPON);
     massert(e, "Failed to create weapon entity");

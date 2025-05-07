@@ -75,6 +75,7 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
 static bool libdraw_draw_dungeon_floor(const gamestate* const g);
 static bool libdraw_draw_player_target_box(const gamestate* const g);
 
+static void libdraw_set_sg_door(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
@@ -456,6 +457,26 @@ static void update_weapon_for_entity(gamestate* g, entity_t* e, spritegroup_t* s
     spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
 }
 
+static void libdraw_set_sg_door(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
+    massert(g, "gamestate is NULL");
+    massert(e, "entity is NULL");
+    massert(sg, "spritegroup is NULL");
+
+    if (e->type == ENTITY_DOOR && e->do_update) {
+        //if (e->type == ENTITY_DOOR) {
+        if (e->door_is_open) {
+            //spritegroup_set_current(sg, 1);
+            sg_set_default_anim(sg, 1);
+            //spritegroup_set_current(sg, 1);
+            e->do_update = false;
+        } else {
+            //spritegroup_set_current(sg, 0);
+            sg_set_default_anim(sg, 0);
+            e->do_update = false;
+        }
+    }
+}
+
 static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
     massert(e, "entity is NULL");
@@ -635,6 +656,11 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
     massert(sg, "spritegroup is NULL");
 
     if (e->dead && !spritegroup_is_animating(sg)) return;
+
+    if (e->type == ENTITY_DOOR) {
+        libdraw_set_sg_door(g, e, sg);
+        e->do_update = false;
+    }
 
     if (e->do_update) {
         libdraw_update_sprite_context_ptr(g, sg, e->direction);

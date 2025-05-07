@@ -38,7 +38,10 @@ static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
 static inline bool player_on_tile(gamestate* g, int x, int y, int floor);
 static inline bool is_traversable(gamestate* const g, int x, int y, int z);
+
 static inline bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl);
+static inline bool tile_has_door(const gamestate* const g, int x, int y, int fl);
+static inline entity* const get_door_from_tile(const gamestate* const g, int x, int y, int fl);
 
 static inline void reset_player_blocking(gamestate* const g);
 static inline void reset_player_block_success(gamestate* const g);
@@ -195,6 +198,48 @@ static inline bool player_on_tile(gamestate* g, int x, int y, int floor) {
         if (e->type == ENTITY_PLAYER) return true;
     }
     return false;
+}
+
+static inline bool tile_has_door(const gamestate* const g, int x, int y, int fl) {
+    // Validate inputs
+    massert(g, "gamestate is NULL");
+    massert(fl >= 0, "floor is out of bounds");
+    massert(fl < g->dungeon->num_floors, "floor is out of bounds");
+    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    massert(df, "failed to get dungeon floor");
+    const tile_t* const t = df_tile_at(df, x, y);
+    massert(t, "failed to get tile");
+    // check for a door entity
+    for (int i = 0; i < t->entity_max; i++) {
+        const entityid eid = tile_get_entity(t, i);
+        if (eid == ENTITYID_INVALID) continue;
+        const entity* const e = em_get(g->entitymap, eid);
+        if (!e) continue;
+        if (e->type == ENTITY_DOOR) return true;
+    }
+    return false;
+}
+
+static inline entity* const get_door_from_tile(const gamestate* const g, int x, int y, int fl) {
+    // Validate inputs
+    massert(g, "gamestate is NULL");
+    massert(fl >= 0, "floor is out of bounds");
+    massert(fl < g->dungeon->num_floors, "floor is out of bounds");
+
+    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    massert(df, "failed to get dungeon floor");
+
+    const tile_t* const t = df_tile_at(df, x, y);
+    massert(t, "failed to get tile");
+    // check for a door entity
+    for (int i = 0; i < t->entity_max; i++) {
+        const entityid eid = tile_get_entity(t, i);
+        if (eid == ENTITYID_INVALID) continue;
+        entity* const e = em_get(g->entitymap, eid);
+        if (!e) continue;
+        if (e->type == ENTITY_DOOR) return e;
+    }
+    return NULL;
 }
 
 static inline bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl) {
@@ -993,6 +1038,12 @@ static entityid door_create(gamestate* const g, int x, int y, int fl, const char
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
+    // check for existing door
+    if (tile_has_door(g, x, y, fl)) {
+        merror("cannot create entity on tile with door");
+        return ENTITYID_INVALID;
+    }
+
     entity* const e = e_new_door_at(next_entityid++, x, y, fl, name);
     //massert(e, "failed to create entity");
     if (!e) {
@@ -1682,12 +1733,28 @@ static bool try_entity_pickup(gamestate* const g, entity* const e) {
     return false;
 }
 
+static inline void try_open_close_door(gamestate* const g, entity* const e, int x, int y, int fl) {
+    massert(g, "Game state is NULL!");
+    massert(e, "Entity is NULL!");
+    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    massert(df, "Failed to get dungeon floor");
+    tile_t* const tile = df_tile_at(df, x, y);
+    if (!tile) {
+        merror("Failed to get tile");
+        return;
+    }
+}
+
 static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
     massert(df, "Failed to get dungeon floor");
     tile_t* const tile = df_tile_at(df, x, y);
+    if (!tile) {
+        merror("Failed to get tile");
+        return;
+    }
     //massert(tile, "Failed to get tile");
     if (tile->has_wall_switch) {
         tile->wall_switch_on = !tile->wall_switch_on;
@@ -1821,15 +1888,26 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         } else if (strcmp(action, "attack") == 0) {
             loc_t loc = get_loc_from_dir(hero->direction);
             try_entity_attack(g, hero->id, hero->x + loc.x, hero->y + loc.y);
+
         } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
             // but eventually this will be generalized
             // for instance u can talk to an NPC merchant using "interact"
             // or open a door, etc
             //msuccess("Space pressed!");
+
             int tx = hero->x + get_x_from_dir(hero->direction);
             int ty = hero->y + get_y_from_dir(hero->direction);
-            try_flip_switch(g, hero, tx, ty, hero->floor);
+
+            // check to see if there is a door
+            entity* door = get_door_from_tile(g, tx, ty, hero->floor);
+            if (door) {
+                door->door_is_open = !door->door_is_open;
+                door->do_update = true;
+            }
+
+            //try_flip_switch(g, hero, tx, ty, hero->floor);
+
         } else if (strcmp(action, "pickup") == 0) {
             try_entity_pickup(g, hero);
         } else if (strcmp(action, "toggle_camera") == 0) {

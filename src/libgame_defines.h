@@ -342,6 +342,8 @@
 #define TX_WOODEN_DOOR_CLOSED 283
 #define TX_WOODEN_DOOR_OPEN 284
 
+#define TX_KEY_BASIC 285
+
 //--------------------------------
 
 #define COMPANYSCENE 0
