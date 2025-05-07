@@ -1760,7 +1760,7 @@ static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range r
 
     df_assign_upstairs_in_area(df, df->rooms[0].x, df->rooms[0].y, df->rooms[0].w, df->rooms[0].h);
 
-    x += w - 1;
+    x += w;
     y += h / 2;
 
     // single tile hallway between rooms

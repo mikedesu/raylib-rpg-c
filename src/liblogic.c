@@ -1917,6 +1917,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
                 door->do_update = true;
             }
 
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             //try_flip_switch(g, hero, tx, ty, hero->floor);
 
         } else if (strcmp(action, "pickup") == 0) {
