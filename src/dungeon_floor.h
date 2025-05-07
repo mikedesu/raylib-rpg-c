@@ -64,6 +64,8 @@ int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
 int df_loc_is_in_room(dungeon_floor_t* const df, loc_t loc);
 
+room_data_t* const df_get_rooms_with_prefix(dungeon_floor_t* const df, int* external_count, const char* prefix);
+
 const char* df_get_room_name(dungeon_floor_t* const df, loc_t loc);
 
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {

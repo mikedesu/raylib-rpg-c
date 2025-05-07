@@ -1763,9 +1763,9 @@ static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range r
 
     // single tile hallway between rooms
     //df_set_tile(df, TILE_FLOOR_STONE_00, x, y);
-    df_add_room(df, x, y, 1, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "hallway1");
+    df_add_room(df, x, y, 3, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "hallway1");
 
-    x++;
+    x += 3;
     y = start_y;
 
     w = get_random_in_range(room_width);
@@ -1776,9 +1776,9 @@ static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range r
     x += w;
     y += h / 2;
     //df_set_tile(df, TILE_FLOOR_STONE_01, x, y);
-    df_add_room(df, x, y, 1, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "hallway2");
+    df_add_room(df, x, y, 3, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "hallway2");
 
-    x++;
+    x += 3;
     y = start_y;
 
     w = get_random_in_range(room_width);
@@ -1786,7 +1786,7 @@ static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range r
 
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room3");
 
-    df_assign_downstairs_in_area(df, df->rooms[2].x, df->rooms[2].y, df->rooms[2].w, df->rooms[2].h);
+    df_assign_downstairs_in_area(df, df->rooms[4].x, df->rooms[4].y, df->rooms[4].w, df->rooms[4].h);
 }
 
 static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
@@ -2055,4 +2055,43 @@ loc_t* const df_get_all_locs_outside_of_rooms(dungeon_floor_t* const df, int* ex
     free(all_locs);
     *external_count = count;
     return outside_locs;
+}
+
+room_data_t* const df_get_rooms_with_prefix(dungeon_floor_t* const df, int* external_count, const char* prefix) {
+    massert(df, "dungeon floor is NULL");
+    massert(df->rooms, "room data is NULL");
+
+    // room_count can be 0
+
+    massert(df->room_count >= 0, "room count is invalid");
+
+    massert(external_count, "external count is NULL");
+    massert(prefix, "prefix is NULL");
+    massert(strlen(prefix) > 0, "prefix is empty");
+    //massert(strlen(prefix) < sizeof(df->rooms[0].room_name), "prefix is too long");
+
+    int count = 0;
+    for (int i = 0; i < df->room_count; i++) {
+        room_data_t* r = &df->rooms[i];
+        if (strncmp(r->room_name, prefix, strlen(prefix)) == 0) { count++; }
+    }
+
+    room_data_t* rooms = malloc(sizeof(room_data_t) * count);
+    massert(rooms, "Failed to allocate memory for rooms");
+
+    int index = 0;
+    for (int i = 0; i < df->room_count; i++) {
+        room_data_t* r = &df->rooms[i];
+        if (strncmp(r->room_name, prefix, strlen(prefix)) == 0) {
+            rooms[index].x = r->x;
+            rooms[index].y = r->y;
+            rooms[index].w = r->w;
+            rooms[index].h = r->h;
+            strncpy(rooms[index].room_name, r->room_name, sizeof(rooms[index].room_name) - 1);
+            rooms[index].room_name[sizeof(rooms[index].room_name) - 1] = '\0';
+            index++;
+        }
+    }
+    *external_count = count;
+    return rooms;
 }

@@ -1287,8 +1287,8 @@ static void init_orcs_test_intermediate(gamestate* g) {
 static void init_orcs_test_by_room(gamestate* const g, int room_index) {
     massert(g, "gamestate is NULL");
     massert(room_index >= 0, "room_index is out of bounds");
-    //dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
-    //massert(df, "floor is NULL");
+    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
+    massert(df, "floor is NULL");
     //massert(room_index < df->room_count, "room_index is out of bounds");
 
     //room_data_t* room = &df->rooms[room_index];
@@ -1302,6 +1302,37 @@ static void init_orcs_test_by_room(gamestate* const g, int room_index) {
     //    massert(orc, "orc is NULL");
     //    orc->target = (loc_t){player->x, player->y, player->floor};
     //}
+
+    int hallway_count = 0;
+    room_data_t* hallways = df_get_rooms_with_prefix(df, &hallway_count, "hallway");
+    massert(hallways, "hallways is NULL");
+
+    int room_count = 0;
+    room_data_t* rooms = df_get_rooms_with_prefix(df, &room_count, "room");
+    massert(rooms, "rooms is NULL");
+
+    if (hallway_count > 0) {
+        for (int i = 0; i < hallway_count; i++) {
+            room_data_t hallway = hallways[i];
+            // room data contains an x, y, w, h
+            // we want to select a random tile in this space to place a door
+            loc_t loc = get_random_empty_non_wall_loc_in_area(g, g->dungeon->current_floor, hallway.x, hallway.y, hallway.w, hallway.h);
+            entityid doorid = door_create(g, loc.x, loc.y, loc.z, "door");
+            massert(doorid != ENTITYID_INVALID, "door create fail");
+        }
+    }
+
+    if (room_count > 1) {
+        for (int i = 1; i < room_count; i++) {
+            room_data_t room = rooms[i];
+            // room data contains an x, y, w, h
+            // we want to select a random tile in this space to place a door
+            loc_t loc = get_random_empty_non_wall_loc_in_area(g, g->dungeon->current_floor, room.x, room.y, room.w, room.h);
+            entity* orc = create_orc_at(g, loc);
+            massert(orc != ENTITYID_INVALID, "orc create fail");
+            orc->target = (loc_t){g->hero_id, g->hero_id, g->dungeon->current_floor};
+        }
+    }
 
     //int loc_count = 0;
     //loc_t* locs = df_get_all_locs_outside_of_rooms(df, &loc_count);
