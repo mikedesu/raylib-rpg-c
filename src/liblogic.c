@@ -58,11 +58,11 @@ static entity* create_sword_at(gamestate* g, loc_t loc);
 static entity* create_shield_at(gamestate* g, loc_t loc);
 static entity* create_elf_at(gamestate* g, loc_t loc);
 static entity* create_orc_at(gamestate* g, loc_t loc);
+static entity* create_dwarf_at(gamestate* g, loc_t loc);
 
 static void create_human_at(gamestate* g, loc_t loc);
 static void create_goblin_at(gamestate* g, loc_t loc);
 static void create_halfling_at(gamestate* g, loc_t loc);
-static void create_dwarf_at(gamestate* g, loc_t loc);
 
 static entityid create_potion_at(gamestate* const g, potiontype_t potion_type, const char* name, loc_t loc);
 
@@ -81,7 +81,8 @@ static void init_elves_test_intermediate(gamestate* const g);
 static void init_goblins_test_intermediate(gamestate* const g);
 static void init_halflings_test_intermediate(gamestate* const g);
 
-static void init_orcs_test_by_room(gamestate* const g, int room_index);
+//static void init_npcs_test_by_room(gamestate* const g, int room_index);
+static void init_npcs_test_by_room(gamestate* const g);
 
 static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
@@ -1239,6 +1240,10 @@ static entity* create_elf_at(gamestate* g, loc_t loc) {
     e_set_maxhp(e, 1);
     e_set_hp(e, 1);
 
+    entity* sword = create_sword(g);
+    e_add_item_to_inventory(e, sword->id);
+    e->weapon = sword->id;
+
     return e;
 }
 
@@ -1250,12 +1255,18 @@ static entity* create_elf_at(gamestate* g, loc_t loc) {
 //    e_set_hp(o, 1);
 //}
 
-static void create_dwarf_at(gamestate* g, loc_t loc) {
-    entity* o = npc_create_ptr(g, RACE_DWARF, loc.x, loc.y, loc.z, "dwarf");
-    massert(o, "dwarf create fail");
-    e_set_default_action(o, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
-    e_set_maxhp(o, 1);
-    e_set_hp(o, 1);
+static entity* create_dwarf_at(gamestate* g, loc_t loc) {
+    entity* e = npc_create_ptr(g, RACE_DWARF, loc.x, loc.y, loc.z, "dwarf");
+    massert(e, "dwarf create fail");
+    e_set_default_action(e, ENTITY_ACTION_MOVE_A_STAR);
+    e_set_maxhp(e, 1);
+    e_set_hp(e, 1);
+
+    entity* sword = create_sword(g);
+    e_add_item_to_inventory(e, sword->id);
+    e->weapon = sword->id;
+
+    return e;
 }
 
 static void create_halfling_at(gamestate* g, loc_t loc) {
@@ -1294,9 +1305,8 @@ static void init_orcs_test_intermediate(gamestate* g) {
     }
 }
 
-static void init_orcs_test_by_room(gamestate* const g, int room_index) {
+static void init_npcs_test_by_room(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    massert(room_index >= 0, "room_index is out of bounds");
     dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
     massert(df, "floor is NULL");
 
@@ -1311,6 +1321,7 @@ static void init_orcs_test_by_room(gamestate* const g, int room_index) {
     entity* player = em_get(g->entitymap, g->hero_id);
     massert(player, "player is NULL");
 
+    // create doors in hallways
     if (hallway_count > 0) {
         for (int i = 0; i < hallway_count; i++) {
             room_data_t hallway = hallways[i];
@@ -1320,14 +1331,24 @@ static void init_orcs_test_by_room(gamestate* const g, int room_index) {
         }
     }
 
+    // one NPC per room past the first
     if (room_count > 1) {
         for (int i = 1; i < room_count; i++) {
             room_data_t room = rooms[i];
             loc_t loc = get_random_empty_non_wall_loc_in_area(g, g->dungeon->current_floor, room.x, room.y, room.w, room.h);
-            //entity* orc = create_orc_at(g, loc);
-            entity* orc = create_elf_at(g, loc);
-            massert(orc != ENTITYID_INVALID, "orc create fail");
-            orc->target = (loc_t){player->x, player->y, player->floor};
+
+            entity* e = NULL;
+            int random_choice = rand() % 3;
+            if (random_choice == 0) {
+                e = create_orc_at(g, loc);
+            } else if (random_choice == 1) {
+                e = create_elf_at(g, loc);
+            } else if (random_choice == 2) {
+                e = create_dwarf_at(g, loc);
+            }
+
+            massert(e != ENTITYID_INVALID, "NPC create fail");
+            e->target = (loc_t){player->x, player->y, player->floor};
         }
     }
 }
@@ -2078,7 +2099,7 @@ void liblogic_init(gamestate* const g) {
     // temporarily disabling
     //init_humans_test(g);
     //init_orcs_test(g);
-    init_orcs_test_by_room(g, 2);
+    init_npcs_test_by_room(g, 2);
     //init_elves_test(g);
     //init_dwarves_test(g);
     //init_halflings_test(g);
