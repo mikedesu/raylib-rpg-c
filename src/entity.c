@@ -25,7 +25,7 @@ entity_t* e_new(entityid id, entitytype_t type) {
     e->target_path = NULL;
     e->target_path_length = 0;
     e->target = (loc_t){-1, -1, -1};
-    strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
+    //strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     return e;
 }
 

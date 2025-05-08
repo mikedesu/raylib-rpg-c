@@ -30,7 +30,7 @@ typedef struct entity_t {
     entity_action_t default_action; // New field
     direction_t direction;
     race_t race;
-    char name[ENTITY_NAME_LEN_MAX];
+    //char name[ENTITY_NAME_LEN_MAX];
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
     int x;
@@ -69,17 +69,13 @@ bool e_remove_item_from_inventory(entity_t* const e, entityid item_id);
 static inline void e_set_x(entity_t* const e, int x) {
     massert(e, "entity is null");
     massert(x >= 0, "x is less than 0");
-    if (e) {
-        e->x = x;
-    }
+    if (e) { e->x = x; }
 }
 
 static inline void e_set_y(entity_t* const e, int y) {
     massert(e, "entity is null");
     massert(y >= 0, "y is less than 0");
-    if (e) {
-        e->y = y;
-    }
+    if (e) { e->y = y; }
 }
 
 static inline void e_set_xy(entity_t* const e, int x, int y) {
@@ -96,39 +92,31 @@ static inline void e_set_name(entity_t* const e, const char* name) {
     massert(e, "e is NULL");
     massert(name, "name is NULL");
     massert(strlen(name) < ENTITY_NAME_LEN_MAX, "name is too long");
-    if (e && name) {
-        strncpy(e->name, name, ENTITY_NAME_LEN_MAX);
-        e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null termination
-    }
+    //if (e && name) {
+    //    strncpy(e->name, name, ENTITY_NAME_LEN_MAX);
+    //    e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null termination
+    //}
 }
 
 static inline void e_set_hp(entity_t* const e, int hp) {
     massert(e, "e is NULL");
-    if (e) {
-        e->stats.hp = hp < 0 ? 0 : hp > e->stats.maxhp ? e->stats.maxhp : hp;
-    }
+    if (e) { e->stats.hp = hp < 0 ? 0 : hp > e->stats.maxhp ? e->stats.maxhp : hp; }
 }
 
 static inline void e_set_maxhp(entity_t* const e, int maxhp) {
     massert(e, "e is NULL");
     massert(maxhp > 0, "maxhp is less than 1");
-    if (e) {
-        e->stats.maxhp = maxhp;
-    }
+    if (e) { e->stats.maxhp = maxhp; }
 }
 
 static inline void e_set_is_dead(entity_t* const e, bool dead) {
     massert(e, "e is NULL");
-    if (e) {
-        e->dead = dead;
-    }
+    if (e) { e->dead = dead; }
 }
 
 static inline void e_set_do_update(entity_t* const e, bool do_update) {
     massert(e, "e is NULL");
-    if (e) {
-        e->do_update = do_update;
-    }
+    if (e) { e->do_update = do_update; }
 }
 
 static inline int e_get_inventory_count(entity_t* const e) {
@@ -139,9 +127,7 @@ static inline int e_get_inventory_count(entity_t* const e) {
 static inline void e_set_floor(entity_t* const e, int floor) {
     massert(e, "e is NULL");
     massert(floor >= 0, "floor is less than 0");
-    if (e) {
-        e->floor = floor;
-    }
+    if (e) { e->floor = floor; }
 }
 
 static inline void e_set_race(entity_t* const e, race_t race) {

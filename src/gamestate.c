@@ -80,6 +80,19 @@ gamestate* gamestateinitptr() {
     g->pad = 20;
     g->line_spacing = 1.0f;
     g->inventory_menu_selection = 0;
+
+    g->components = ct_create();
+
+    g->name_list_capacity = NAME_LIST_INIT_CAPACITY;
+    g->name_list_count = 0;
+    g->name_list = (name_component*)malloc(sizeof(name_component) * g->name_list_capacity);
+    massert(g->name_list, "g->name_list is NULL");
+    if (g->name_list == NULL) {
+        merror("g->name_list is NULL");
+        free(g);
+        return NULL;
+    }
+
     gamestate_init_msg_history(g);
     return g;
 }
@@ -131,6 +144,10 @@ void gamestatefree(gamestate* g) {
     //dungeon_destroy(g->dungeon);
     // free message history
     gamestate_free_msg_history(g);
+
+    ct_destroy(g->components);
+    free(g->name_list);
+
     minfo("Freeing g...");
     free(g);
     msuccess("Freed gamestate");
@@ -268,4 +285,80 @@ void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
     }
     g->debugpanel.x = g->windowwidth - g->debugpanel.w;
     g->debugpanel.y = g->debugpanel.pad_right;
+}
+
+bool gs_register_comp(gamestate* const g, entityid id, component comp) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(comp != COMP_COUNT, "comp is invalid");
+    if (g->components == NULL) {
+        merror("g->components is NULL");
+        return false;
+    }
+    if (!ct_has_entity(g->components, id)) {
+        if (!ct_add_entity(g->components, id)) {
+            merror("ct_add_entity failed");
+            return false;
+        }
+    }
+    if (!ct_add_component(g->components, id, comp)) {
+        merror("ct_add_component failed");
+        return false;
+    }
+    return true;
+}
+
+bool gs_register_comps(gamestate* const g, entityid id, ...) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->components == NULL) {
+        merror("g->components is NULL");
+        return false;
+    }
+    if (!ct_has_entity(g->components, id)) {
+        if (!ct_add_entity(g->components, id)) {
+            merror("ct_add_entity failed");
+            return false;
+        }
+    }
+    va_list args;
+    va_start(args, id);
+    component comp;
+    while ((comp = va_arg(args, component)) != COMP_COUNT) {
+        if (!ct_add_component(g->components, id, comp)) {
+            merror("ct_add_component failed");
+            va_end(args);
+            return false;
+        }
+    }
+    va_end(args);
+    return true;
+}
+
+bool gs_add_name_comp(gamestate* const g, entityid id, const char* name) {
+    massert(g, "g is NULL");
+    massert(name, "name is NULL");
+    if (g->name_list_count >= g->name_list_capacity) {
+        g->name_list_capacity *= 2;
+        g->name_list = realloc(g->name_list, sizeof(name_component) * g->name_list_capacity);
+        if (g->name_list == NULL) {
+            merror("g->name_list is NULL");
+            return false;
+        }
+    }
+    init_name_component(&g->name_list[g->name_list_count], id, name);
+    g->name_list_count++;
+    return true;
+}
+
+bool gs_has_component(gamestate* const g, entityid id, component comp) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(comp != COMP_COUNT, "comp is invalid");
+    if (g->components == NULL) {
+        merror("g->components is NULL");
+        return false;
+    }
+    if (!ct_has_entity(g->components, id)) { return false; }
+    return ct_has_component(g->components, id, comp);
 }

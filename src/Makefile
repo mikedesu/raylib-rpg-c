@@ -11,8 +11,10 @@ LINK_MATH = -lm
 RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 CFLAGS ?= # Allow override
 
-LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  em.o dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o entity.o
-LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o dungeon.o keybinding.o path_node.o
+LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  em.o dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o entity.o component_table.o component.o
+LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o dungeon.o keybinding.o path_node.o component_table.o component.o
+
+ 
 
 # Web build setup
 WEB_CC = emcc
@@ -25,7 +27,7 @@ PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-f
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 
 
-UNIT_TEST_OBJS = unit_test.o
+UNIT_TEST_OBJS = unit_test.o component_table.o
 
 
 
@@ -33,15 +35,15 @@ UNIT_TEST_OBJS = unit_test.o
 all: game unit_test #index.html
 
 # Desktop build
-game: main.o gameloader.o gamestate.o keybinding.o libdraw.so liblogic.so
-	$(CC) -o $@ main.o gameloader.o gamestate.o keybinding.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
+game: main.o gameloader.o gamestate.o keybinding.o libdraw.so liblogic.so component_table.o component.o
+	$(CC) -o $@ main.o gameloader.o gamestate.o component_table.o component.o keybinding.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
 	./log_build_stats.sh
 
 
 unit_test: $(UNIT_TEST_OBJS)
 	$(CC) -o $@ $(UNIT_TEST_OBJS) $(WFLAGS) $(CFLAGS)
 
-unit_test.o: unit_test.c unit_test.h
+unit_test.o: unit_test.c unit_test.h 
 	    $(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) unit_test.c -o $@
 
 

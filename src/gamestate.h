@@ -1,5 +1,7 @@
 #pragma once
 
+#include "component.h"
+#include "component_table.h"
 #include "controlmode.h"
 #include "debugpanel.h"
 #include "dungeon.h"
@@ -18,6 +20,8 @@
 #define GAMESTATE_SIZEOFTEXINFOARRAY 1024
 #define MAX_MESSAGES 64
 #define MAX_MSG_LENGTH 256
+
+#define NAME_LIST_INIT_CAPACITY 16
 
 #define DEFAULT_MAX_HISTORY_SIZE 1024
 
@@ -102,6 +106,12 @@ typedef struct gamestate {
 
     keybinding_list_t keybinding_list;
 
+    ct* components;
+
+    name_component* name_list;
+    int name_list_count;
+    int name_list_capacity;
+
 } gamestate;
 
 gamestate* gamestateinitptr();
@@ -127,3 +137,8 @@ void gamestate_set_debug_panel_pos_bottom_left(gamestate* const g);
 void gamestate_set_debug_panel_pos_top_right(gamestate* const g);
 void gamestate_incr_entity_turn(gamestate* const g);
 void gamestate_load_keybindings(gamestate* const g);
+
+bool gs_add_name_comp(gamestate* const g, entityid id, const char* name);
+bool gs_has_component(gamestate* const g, entityid id, component comp);
+bool gs_register_comp(gamestate* const g, entityid id, component comp);
+bool gs_register_comps(gamestate* const g, entityid id, ...);

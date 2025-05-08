@@ -257,7 +257,7 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(e, "entity is NULL");
 
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-    massert(sg, "spritegroup is NULL: id %d name %s", id, e->name);
+    //massert(sg, "spritegroup is NULL: id %d name %s", id, e->name);
 
     sprite* s = sg_get_current(sg);
     massert(s, "sprite is NULL");
@@ -1134,7 +1134,7 @@ static void draw_hud(gamestate* const g) {
     snprintf(buffer,
              sizeof(buffer),
              "%s Lvl %d HP %d/%d MP %d/%d XP %d Room: %s Turn %d",
-             e->name,
+             "[empty_name]",
              level,
              hp,
              maxhp,
@@ -1286,9 +1286,10 @@ static void draw_inventory_menu(gamestate* const g) {
         }
 
         if (i == g->inventory_menu_selection) {
-            snprintf(item_display, sizeof(item_display), "> %s", item_entity->name);
+            //snprintf(item_display, sizeof(item_display), "> %s", item_entity->name);
+            snprintf(item_display, sizeof(item_display), "> %s", "[placeholder]");
         } else {
-            snprintf(item_display, sizeof(item_display), "  %s", item_entity->name);
+            snprintf(item_display, sizeof(item_display), "  %s", "[placeholder]");
         }
 
         if (is_equipped) { strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1); }
@@ -1308,7 +1309,8 @@ static void draw_inventory_menu(gamestate* const g) {
         entityid item_id = hero->inventory[g->inventory_menu_selection];
         entity* item_entity = em_get(g->entitymap, item_id);
         if (item_entity) {
-            snprintf(info_text, sizeof(info_text), "%s\nType: %d", item_entity->name, item_entity->type);
+            //snprintf(info_text, sizeof(info_text), "%s\nType: %d", item_entity->name, item_entity->type);
+            snprintf(info_text, sizeof(info_text), "%s\nType: %d", "[placeholder]", item_entity->type);
 
             sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
         } else {

@@ -416,7 +416,7 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     massert(attacker, "attacker entity is NULL");
     massert(target, "target entity is NULL");
     massert(attack_successful, "attack_successful is NULL");
-    msuccess("Successful Attack on target: %s", target->name);
+    //msuccess("Successful Attack on target: %s", target->name);
     *attack_successful = true;
     target->is_damaged = true;
     target->do_update = true;
@@ -432,7 +432,7 @@ static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* 
     massert(attacker, "attacker entity is NULL");
     massert(target, "target entity is NULL");
     massert(attack_successful, "attack_successful is NULL");
-    msuccess("Successful Block from target: %s", target->name);
+    //msuccess("Successful Block from target: %s", target->name);
     *attack_successful = false;
     target->is_damaged = false;
     target->block_success = true;
@@ -1002,6 +1002,11 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     massert(e, "entity is NULL");
     e_set_type(e, type);
     gamestate_set_hero_id(g, id);
+
+    // beginnings of a real ECS system...
+    gs_register_comps(g, id, COMP_NAME);
+    gs_add_name_comp(g, id, name);
+
     return id;
 }
 
@@ -1303,14 +1308,14 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             // attempt to equip the weapon
             // check if the hero is already equipped with the weapon
             if (hero->weapon == item_id) {
-                add_message(g, "You are already using %s", item->name);
+                add_message(g, "You are already using %s", "[placeholder]");
                 g->controlmode = CONTROLMODE_PLAYER;
                 g->display_inventory_menu = false;
                 return;
             }
 
             hero->weapon = item_id;
-            add_message_and_history(g, "%s equipped %s", hero->name, item->name);
+            add_message_and_history(g, "%s equipped %s", "[placeholder]", "[placeholder]");
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1318,14 +1323,14 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             // attempt to equip the shield
             // check if the hero is already equipped with the shield
             if (hero->shield == item_id) {
-                add_message(g, "You are already using %s", item->name);
+                add_message(g, "You are already using %s", "[placeholder]");
                 g->controlmode = CONTROLMODE_PLAYER;
                 g->display_inventory_menu = false;
                 return;
             }
 
             hero->shield = item_id;
-            add_message_and_history(g, "%s equipped %s", hero->name, item->name);
+            add_message_and_history(g, "%s equipped %s", "[placeholder]", "[placeholder]");
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1348,14 +1353,14 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         if (item->type == ENTITY_WEAPON) {
             // unequip the weapon
             hero->weapon = ENTITYID_INVALID;
-            add_message_and_history(g, "%s unequipped %s", hero->name, item->name);
+            add_message_and_history(g, "%s unequipped %s", "[placeholder]", "[placeholder]");
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         } else if (item->type == ENTITY_SHIELD) {
             // equip the shield
             hero->shield = ENTITYID_INVALID;
-            add_message_and_history(g, "%s unequipped %s", hero->name, item->name);
+            add_message_and_history(g, "%s unequipped %s", "[placeholder]", "[placeholder]");
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1400,7 +1405,7 @@ static bool try_entity_pickup(gamestate* const g, entity* const e) {
             return false;
         }
         if (it->type == ENTITY_WEAPON || it->type == ENTITY_SHIELD || it->type == ENTITY_POTION) {
-            add_message_and_history(g, "%s picked up a %s", e->name, it->name);
+            add_message_and_history(g, "%s picked up a %s", "[placeholder]", "[placeholder]");
             tile_remove(tile, id);
             e_add_item_to_inventory(e, id);
             if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
