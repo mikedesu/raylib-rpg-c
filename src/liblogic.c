@@ -1231,8 +1231,9 @@ static void init_npcs_test_by_room(gamestate* const g) {
     }
 
     // one NPC per room past the first
-    for (int i = 0; i < 5; i++) {
-        room_data_t room = rooms[2];
+    const int max_npcs = 300;
+    for (int i = 0; i < max_npcs; i++) {
+        room_data_t room = rooms[0];
         loc_t loc = get_random_empty_non_wall_loc_in_area(g, g->dungeon->current_floor, room.x, room.y, room.w, room.h);
 
         random_choice = rand() % 5;

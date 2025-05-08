@@ -521,8 +521,8 @@ void df_init(dungeon_floor_t* df) {
     //df_init_test_complex4(df, 3);
     //df_init_test_complex5(df, (range){3, 10});
     //df_init_test_complex6(df, (range){3, 10}, (range){3, 10});
-    df_init_test_complex7(df, (range){3, 5}, (range){3, 5});
-    //df_init_test_complex8(df);
+    //df_init_test_complex7(df, (range){3, 5}, (range){3, 5});
+    df_init_test_complex8(df);
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
@@ -1742,8 +1742,8 @@ static void df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, t
 static void df_init_test_complex8(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
 
-    int w = 5;
-    int h = 5;
+    int w = 20;
+    int h = 20;
     int cx = df_center_x(df);
     int cy = df_center_y(df);
 
@@ -1751,7 +1751,7 @@ static void df_init_test_complex8(dungeon_floor_t* df) {
     int y = cy - h / 2;
 
     // Create walls for the entire area first
-    df_set_tile_area_range(df, x - 1, y - 1, w + 2, h + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+    df_set_tile_area_range(df, x - w, y - h, 3 * w, 3 * h, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
     // Create the room
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room1");
 
@@ -1776,7 +1776,7 @@ static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range r
     int x = start_x;
     int y = start_y;
 
-    //df_set_tile_area_range(df, x - 1, y - 1, 20, 10, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+    df_set_tile_area_range(df, x - 10, y - 10, 40, 40, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
 
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room1");
     df_assign_upstairs_in_area(df, df->rooms[0].x, df->rooms[0].y, df->rooms[0].w, df->rooms[0].h);
