@@ -161,9 +161,15 @@ static bool player_on_tile(gamestate* g, int x, int y, int floor) {
     // enumerate entities and check their type
     for (int i = 0; i < tile->entity_max; i++) {
         if (tile->entities[i] == ENTITYID_INVALID) continue;
-        entity* e = em_get(g->entitymap, tile->entities[i]);
-        massert(e, "failed to get entity");
-        if (e->type == ENTITY_PLAYER) return true;
+        //entity* e = em_get(g->entitymap, tile->entities[i]);
+        //massert(e, "failed to get entity");
+        entityid id = tile->entities[i];
+        //if (e->type == ENTITY_PLAYER) return true;
+
+        if (gs_is_type(g, id, ENTITY_PLAYER)) {
+            // check if the entity is on the same floor
+            if (floor == 0) { return true; }
+        }
     }
     return false;
 }
@@ -183,7 +189,8 @@ static bool tile_has_door(const gamestate* const g, int x, int y, int fl) {
         if (eid == ENTITYID_INVALID) continue;
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) continue;
-        if (e->type == ENTITY_DOOR) return true;
+        //if (e->type == ENTITY_DOOR) return true;
+        if (gs_is_type(g, eid, ENTITY_DOOR)) return true;
     }
     return false;
 }
@@ -203,7 +210,7 @@ static entity* const get_door_from_tile(const gamestate* const g, int x, int y, 
         if (eid == ENTITYID_INVALID) continue;
         entity* const e = em_get(g->entitymap, eid);
         if (!e) continue;
-        if (e->type == ENTITY_DOOR) return e;
+        if (gs_is_type(g, eid, ENTITY_DOOR)) return e;
     }
     return NULL;
 }
@@ -223,7 +230,8 @@ static bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl)
         if (eid == ENTITYID_INVALID) continue;
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) continue;
-        if (e->type == ENTITY_DOOR && !e->door_is_open) return true;
+        //if (e->type == ENTITY_DOOR && !e->door_is_open) return true;
+        if (gs_is_type(g, eid, ENTITY_DOOR) && !e->door_is_open) return true;
     }
     return false;
 }
@@ -244,7 +252,8 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
         if (eid == ENTITYID_INVALID) continue;
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) continue;
-        if (e->type == ENTITY_NPC && !e->dead) count++;
+        //if (e->type == ENTITY_NPC && !e->dead) count++;
+        if (gs_is_type(g, eid, ENTITY_NPC) && !e->dead) count++;
     }
     return count;
 }
@@ -263,7 +272,7 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
         return;
     }
     // i feel like this might be something we can set elsewhere...like after the player input phase?
-    if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    if (gs_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
     tile_t* const tile = df_tile_at(df, ex, ey);
     if (!tile) {
         merror("Cannot move, tile is NULL");
@@ -454,7 +463,8 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     entity* target = em_get(g->entitymap, id);
     massert(target, "target entity is NULL");
 
-    entitytype_t type = target->type;
+    //entitytype_t type = target->type;
+    entitytype_t type = gs_get_type(g, id);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) { return false; }
 
     if (target->dead) { return false; }
@@ -503,7 +513,8 @@ static void try_entity_attack(gamestate* const g, entityid attacker_id, int targ
     e->is_attacking = true;
     e->do_update = true;
     handle_attack_helper(g, tile, e, &ok);
-    handle_attack_success_gamestate_flag(g, e->type, ok);
+    //handle_attack_success_gamestate_flag(g, e->type, ok);
+    handle_attack_success_gamestate_flag(g, gs_get_type(g, e->id), ok);
 }
 
 static void try_entity_attack_random(gamestate* const g, entity* const e) {
@@ -566,7 +577,8 @@ static void try_entity_move_attack_player(gamestate* const g, entity* const e) {
 static void try_entity_wait(gamestate* const g, entity* const e) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
-    if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    if (gs_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
     e->do_update = true;
 }
 
@@ -628,7 +640,7 @@ static entityid create_potion_at(gamestate* const g, potiontype_t potion_type, c
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
-    if (tile_has_live_npcs(tile, em)) {
+    if (tile_has_live_npcs(g, tile, em)) {
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
@@ -666,7 +678,7 @@ static entityid weapon_create(gamestate* const g, int x, int y, int fl, const ch
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
-    if (tile_has_live_npcs(tile, em)) {
+    if (tile_has_live_npcs(g, tile, em)) {
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
@@ -705,7 +717,7 @@ static entityid shield_create(gamestate* const g, int x, int y, int fl, const ch
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
-    if (tile_has_live_npcs(tile, em)) {
+    if (tile_has_live_npcs(g, tile, em)) {
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
@@ -926,7 +938,7 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int fl, 
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
-    if (tile_has_live_npcs(tile, em)) {
+    if (tile_has_live_npcs(g, tile, em)) {
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
@@ -964,7 +976,7 @@ static entityid door_create(gamestate* const g, int x, int y, int fl, const char
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
-    if (tile_has_live_npcs(tile, em)) {
+    if (tile_has_live_npcs(g, tile, em)) {
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
@@ -1000,12 +1012,14 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     massert(id != ENTITYID_INVALID, "failed to create player");
     entity_t* const e = em_get(g->entitymap, id);
     massert(e, "entity is NULL");
-    e_set_type(e, type);
+    //e_set_type(e, type);
     gamestate_set_hero_id(g, id);
 
     // beginnings of a real ECS system...
-    gs_register_comps(g, id, COMP_NAME);
-    gs_add_name_comp(g, id, name);
+    //gs_register_comps(g, id, COMP_NAME);
+    gs_register_comps(g, id, COMP_NAME, COMP_TYPE, 0);
+    gs_add_name(g, id, name);
+    gs_add_type(g, id, type);
 
     return id;
 }
@@ -1048,7 +1062,7 @@ static inline size_t tile_npc_count_at(gamestate* const g, dungeon_floor_t* cons
     massert(y < df->height, "y is out of bounds");
 
     tile_t* const tile = df_tile_at(df, x, y);
-    return tile_live_npc_count(tile, g->entitymap);
+    return tile_live_npc_count(g, tile, g->entitymap);
 }
 
 static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt) {
@@ -1127,9 +1141,9 @@ static entity* create_human_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_HUMAN, loc.x, loc.y, loc.z, "human");
     massert(e, "human create fail");
 
-    entity* sword = create_sword(g);
-    e_add_item_to_inventory(e, sword->id);
-    e->weapon = sword->id;
+    //entity* sword = create_sword(g);
+    //e_add_item_to_inventory(e, sword->id);
+    //e->weapon = sword->id;
 
     return e;
 }
@@ -1138,9 +1152,9 @@ static entity* create_elf_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_ELF, loc.x, loc.y, loc.z, "elf");
     massert(e, "elf create fail");
 
-    entity* sword = create_sword(g);
-    e_add_item_to_inventory(e, sword->id);
-    e->weapon = sword->id;
+    //entity* sword = create_sword(g);
+    //e_add_item_to_inventory(e, sword->id);
+    //e->weapon = sword->id;
 
     return e;
 }
@@ -1149,9 +1163,9 @@ static entity* create_dwarf_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_DWARF, loc.x, loc.y, loc.z, "dwarf");
     massert(e, "dwarf create fail");
 
-    entity* sword = create_sword(g);
-    e_add_item_to_inventory(e, sword->id);
-    e->weapon = sword->id;
+    //entity* sword = create_sword(g);
+    //e_add_item_to_inventory(e, sword->id);
+    //e->weapon = sword->id;
 
     return e;
 }
@@ -1160,9 +1174,9 @@ static entity* create_halfling_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_HALFLING, loc.x, loc.y, loc.z, "halfling");
     massert(e, "halfling create fail");
 
-    entity* sword = create_sword(g);
-    e_add_item_to_inventory(e, sword->id);
-    e->weapon = sword->id;
+    //entity* sword = create_sword(g);
+    //e_add_item_to_inventory(e, sword->id);
+    //e->weapon = sword->id;
 
     return e;
 }
@@ -1171,9 +1185,9 @@ static entity* create_goblin_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_GOBLIN, loc.x, loc.y, loc.z, "goblin");
     massert(e, "goblin create fail");
 
-    entity* sword = create_sword(g);
-    e_add_item_to_inventory(e, sword->id);
-    e->weapon = sword->id;
+    //entity* sword = create_sword(g);
+    //e_add_item_to_inventory(e, sword->id);
+    //e->weapon = sword->id;
 
     return e;
 }
@@ -1304,7 +1318,8 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         entity* item = em_get(g->entitymap, item_id);
         massert(item, "item is NULL");
 
-        if (item->type == ENTITY_WEAPON) {
+        //if (item->type == ENTITY_WEAPON) {
+        if (gs_is_type(g, item_id, ENTITY_WEAPON)) {
             // attempt to equip the weapon
             // check if the hero is already equipped with the weapon
             if (hero->weapon == item_id) {
@@ -1319,7 +1334,8 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (item->type == ENTITY_SHIELD) {
+            //} else if (item->type == ENTITY_SHIELD) {
+        } else if (gs_is_type(g, item_id, ENTITY_SHIELD)) {
             // attempt to equip the shield
             // check if the hero is already equipped with the shield
             if (hero->shield == item_id) {
@@ -1334,12 +1350,14 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (item->type == ENTITY_POTION) {
+            //} else if (item->type == ENTITY_POTION) {
+        } else if (gs_is_type(g, item_id, ENTITY_POTION)) {
             add_message(g, "Potion use is not handled yet!");
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
         } else {
-            add_message(g, "Unhandled item type: %d", item->type);
+            //add_message(g, "Unhandled item type: %d", item->type);
+            add_message(g, "Unhandled item type: %d", gs_get_type(g, item_id));
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
         }
@@ -1350,14 +1368,15 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         entity* item = em_get(g->entitymap, item_id);
         massert(item, "item is NULL");
 
-        if (item->type == ENTITY_WEAPON) {
+        //if (item->type == ENTITY_WEAPON) {
+        if (gs_is_type(g, item_id, ENTITY_WEAPON)) {
             // unequip the weapon
             hero->weapon = ENTITYID_INVALID;
             add_message_and_history(g, "%s unequipped %s", "[placeholder]", "[placeholder]");
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (item->type == ENTITY_SHIELD) {
+        } else if (gs_is_type(g, item_id, ENTITY_SHIELD)) {
             // equip the shield
             hero->shield = ENTITYID_INVALID;
             add_message_and_history(g, "%s unequipped %s", "[placeholder]", "[placeholder]");
@@ -1404,14 +1423,17 @@ static bool try_entity_pickup(gamestate* const g, entity* const e) {
             merror("Failed to get entity");
             return false;
         }
-        if (it->type == ENTITY_WEAPON || it->type == ENTITY_SHIELD || it->type == ENTITY_POTION) {
+
+        entitytype_t type = gs_get_type(g, id);
+
+        if (type == ENTITY_WEAPON || type == ENTITY_SHIELD || type == ENTITY_POTION) {
             add_message_and_history(g, "%s picked up a %s", "[placeholder]", "[placeholder]");
             tile_remove(tile, id);
             e_add_item_to_inventory(e, id);
-            if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            if (gs_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
             return true;
         } else {
-            add_message(g, "Unhandled item type cannot be picked up: %d", it->type);
+            add_message(g, "Unhandled item type cannot be picked up: %d", type);
             return false;
         }
     }
@@ -1458,9 +1480,10 @@ static inline void try_flip_switch(gamestate* const g, entity* const e, int x, i
         // this is the basis for what we need to do next
         // currently we have no entity passed into this function
         // we need to fix that
-        if (e->type == ENTITY_PLAYER) {
+        entitytype_t etype = gs_get_type(g, e->id);
+        if (etype == ENTITY_PLAYER) {
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (e->type == ENTITY_NPC) {
+        } else if (etype == ENTITY_NPC) {
             g->flag = GAMESTATE_FLAG_NPC_ANIM;
         }
         //else {
@@ -1730,13 +1753,13 @@ void liblogic_init(gamestate* const g) {
     init_player(g);
     // test to create a weapon
     //init_weapon_test(g);
-    init_weapon_test2(g);
+    //init_weapon_test2(g);
     //init_shield_test(g);
-    init_shield_test2(g);
+    //init_shield_test2(g);
     //init_potion_test(g, POTION_HP_SMALL, "small healing potion");
     //init_potion_test(g, POTION_HP_MEDIUM, "medium healing potion");
     //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
-    init_npcs_test_by_room(g);
+    //init_npcs_test_by_room(g);
     update_debug_panel_buffer(g);
 }
 
@@ -1789,7 +1812,8 @@ static void handle_nth_npc(gamestate* const g, int i) {
     if (id == g->hero_id) return; // Skip the hero
     entity* e = em_get(g->entitymap, id);
     massert(e, "entity is NULL");
-    if (e->type == ENTITY_NPC && !e->dead) execute_action(g, e, e->default_action);
+    //if (e->type == ENTITY_NPC && !e->dead) execute_action(g, e, e->default_action);
+    if (gs_is_type(g, e->id, ENTITY_NPC) && !e->dead) execute_action(g, e, e->default_action);
 }
 
 static void handle_npcs(gamestate* const g) {
@@ -1856,6 +1880,6 @@ static inline bool is_traversable(gamestate* const g, int x, int y, int z) {
     if (!tile_is_walkable(tile->type)) return false;
     // Check for blocking entities
     // Comment out the next line if entity blocking is interfering with pathfinding tests
-    if (tile_has_live_npcs(tile, g->entitymap)) return false;
+    if (tile_has_live_npcs(g, tile, g->entitymap)) return false;
     return true;
 }

@@ -16,6 +16,7 @@
 
 // forward declaration
 typedef struct entity_t entity_t;
+
 typedef struct {
     int level;
     int hp;
@@ -26,11 +27,12 @@ typedef struct {
 
 typedef struct entity_t {
     entityid id;
-    entitytype_t type;
+    //entitytype_t type;
+    //char name[ENTITY_NAME_LEN_MAX];
+
     entity_action_t default_action; // New field
     direction_t direction;
     race_t race;
-    //char name[ENTITY_NAME_LEN_MAX];
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
     int x;
@@ -243,12 +245,12 @@ static inline direction_t e_get_dir(entity_t* const e) {
     return e->direction;
 }
 
-static inline void e_set_type(entity_t* const e, entitytype_t type) {
-    massert(e, "e is NULL");
-    massert(type >= 0, "type is less than 0");
-    massert(type < ENTITY_TYPE_COUNT, "type is greater than ENTITY_COUNT");
-    e->type = type;
-}
+//static inline void e_set_type(entity_t* const e, entitytype_t type) {
+//    massert(e, "e is NULL");
+//    massert(type >= 0, "type is less than 0");
+//    massert(type < ENTITY_TYPE_COUNT, "type is greater than ENTITY_COUNT");
+//    e->type = type;
+//}
 
 static inline void e_set_default_action(entity_t* const e, entity_action_t action) {
     massert(e, "e is NULL");
@@ -298,10 +300,10 @@ static inline bool e_is_dead(entity_t* const e) {
     return e->dead;
 }
 
-static inline entitytype_t e_get_type(entity_t* const e) {
-    massert(e, "e_get_type: e is NULL");
-    return e->type;
-}
+//static inline entitytype_t e_get_type(entity_t* const e) {
+//    massert(e, "e_get_type: e is NULL");
+//    return e->type;
+//}
 
 static inline void e_equip_weapon(entity* e, entityid weapon_id) {
     massert(e, "entity is NULL");

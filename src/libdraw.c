@@ -90,7 +90,7 @@ static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg
 static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
 static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg);
 static void libdraw_update_sprite(gamestate* const g, entityid id);
-static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg);
+static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegroup_t* const sg);
 static void draw_message_history(gamestate* const g);
 static void draw_message_box(gamestate* g);
 static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
@@ -99,7 +99,7 @@ static void libdraw_drawframe_2d(gamestate* const g);
 static void create_sg_byid(gamestate* const g, entityid id);
 static void calc_debugpanel_size(gamestate* const g);
 static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
-static void draw_shadow_for_entity(spritegroup_t* sg, const entity* e);
+static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, const entity* e);
 
 static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
     massert(g, "gamestate is NULL");
@@ -236,11 +236,13 @@ static sprite* get_shield_back_sprite(const gamestate* g, const entity* e, sprit
     return NULL;
 }
 
-static void draw_shadow_for_entity(spritegroup_t* sg, const entity* e) {
+static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, const entity* e) {
+    massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(e, "entity is NULL");
     //if (!sg || !e) return;
-    if (e->type != ENTITY_PLAYER && e->type != ENTITY_NPC) return;
+    entitytype_t type = gs_get_type(g, e->id);
+    if (type != ENTITY_PLAYER && type != ENTITY_NPC) return;
 
     sprite* shadow = sg_get_current_plus_one(sg);
     if (shadow) {
@@ -263,7 +265,7 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(s, "sprite is NULL");
 
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-    draw_shadow_for_entity(sg, e);
+    draw_shadow_for_entity(g, sg, e);
 
     // check for a shield
     sprite* shield_front_s = get_shield_front_sprite(g, e, sg);
@@ -462,7 +464,8 @@ static void libdraw_set_sg_door(gamestate* const g, entity_t* const e, spritegro
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
 
-    if (e->type == ENTITY_DOOR && e->do_update) {
+    //if (e->type == ENTITY_DOOR && e->do_update) {
+    if (gs_is_type(g, e->id, ENTITY_DOOR) && e->do_update) {
         //if (e->type == ENTITY_DOOR) {
         if (e->door_is_open) {
             //spritegroup_set_current(sg, 1);
@@ -599,7 +602,8 @@ static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg
         sg->move.y = e->sprite_move_y;
         e->sprite_move_x = 0;
         e->sprite_move_y = 0;
-        if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
+        entitytype_t type = gs_get_type(g, e->id);
+        if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
             if (e->race == RACE_HUMAN)
                 sg->current = SPRITEGROUP_ANIM_HUMAN_WALK;
             else if (e->race == RACE_ORC)
@@ -658,7 +662,7 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
 
     if (e->dead && !spritegroup_is_animating(sg)) return;
 
-    if (e->type == ENTITY_DOOR) {
+    if (gs_is_type(g, e->id, ENTITY_DOOR)) {
         libdraw_set_sg_door(g, e, sg);
         e->do_update = false;
     }
@@ -677,8 +681,11 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
     spritegroup_snap_dest(sg, e->x, e->y);
 }
 
-static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
+//static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
+static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegroup_t* const sg) {
+    minfo("libdraw_handle_frame_incr: id %d", id);
     massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
     sprite* const s = sg_get_current(sg);
     massert(s, "sprite is NULL");
@@ -713,7 +720,7 @@ static void libdraw_update_sprite(gamestate* const g, entityid id) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
         if (sg) {
             libdraw_update_sprite_ptr(g, e, sg);
-            libdraw_handle_frame_incr(g, sg);
+            libdraw_handle_frame_incr(g, id, sg);
         }
     }
 }
@@ -1053,7 +1060,8 @@ static void create_sg_byid(gamestate* const g, entityid id) {
     int* keys = NULL;
     int num_keys = 0;
     const int offset_x = -12, offset_y = -12;
-    if (e->type == ENTITY_PLAYER || e->type == ENTITY_NPC) {
+    entitytype_t type = gs_get_type(g, id);
+    if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
         switch (e->race) {
         case RACE_HUMAN:
             keys = TX_HUMAN_KEYS;
@@ -1083,16 +1091,16 @@ static void create_sg_byid(gamestate* const g, entityid id) {
         default: merror("unknown race %d", e->race); return;
         }
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-    } else if (e->type == ENTITY_WEAPON) {
+    } else if (type == ENTITY_WEAPON) {
         // for now we only have 1 sprite for weapons
         keys = TX_LONG_SWORD_KEYS;
         num_keys = TX_LONG_SWORD_KEY_COUNT;
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-    } else if (e->type == ENTITY_SHIELD) {
+    } else if (type == ENTITY_SHIELD) {
         keys = TX_BUCKLER_KEYS;
         num_keys = TX_BUCKLER_KEY_COUNT;
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-    } else if (e->type == ENTITY_POTION) {
+    } else if (type == ENTITY_POTION) {
         massert(e->potion_type != POTION_NONE, "potion_type is NONE");
 
         // check the potion type
@@ -1109,7 +1117,7 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             num_keys = TX_POTION_HP_LARGE_KEY_COUNT;
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         }
-    } else if (e->type == ENTITY_DOOR) {
+    } else if (type == ENTITY_DOOR) {
         keys = TX_WOODEN_DOOR_KEYS;
         num_keys = TX_WOODEN_DOOR_KEY_COUNT;
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
@@ -1134,7 +1142,7 @@ static void draw_hud(gamestate* const g) {
     snprintf(buffer,
              sizeof(buffer),
              "%s Lvl %d HP %d/%d MP %d/%d XP %d Room: %s Turn %d",
-             "[empty_name]",
+             gs_get_name(g, g->hero_id),
              level,
              hp,
              maxhp,
@@ -1279,9 +1287,10 @@ static void draw_inventory_menu(gamestate* const g) {
         float item_x = left_box.x + item_list_pad;
         char item_display[128];
         bool is_equipped = false;
-        if (item_entity->type == ENTITY_WEAPON) {
+        entitytype_t item_type = gs_get_type(g, item_id);
+        if (item_type == ENTITY_WEAPON) {
             is_equipped = (hero->weapon == item_id);
-        } else if (item_entity->type == ENTITY_SHIELD) {
+        } else if (item_type == ENTITY_SHIELD) {
             is_equipped = (hero->shield == item_id);
         }
 
@@ -1310,7 +1319,8 @@ static void draw_inventory_menu(gamestate* const g) {
         entity* item_entity = em_get(g->entitymap, item_id);
         if (item_entity) {
             //snprintf(info_text, sizeof(info_text), "%s\nType: %d", item_entity->name, item_entity->type);
-            snprintf(info_text, sizeof(info_text), "%s\nType: %d", "[placeholder]", item_entity->type);
+
+            snprintf(info_text, sizeof(info_text), "%s\nType: %d", "[placeholder]", gs_get_type(g, item_id));
 
             sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
         } else {

@@ -11,7 +11,7 @@ entity_t* e_new(entityid id, entitytype_t type) {
     massert(type >= 0, "type is less than 0");
     massert(type < ENTITY_TYPE_COUNT, "type is greater than ENTITY_TYPE_COUNT");
     e->id = id;
-    e->type = type;
+    //e->type = type;
     e->race = RACE_NONE;
     e->direction = DIR_RIGHT;
     e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden

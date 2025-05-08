@@ -13,7 +13,17 @@ void init_name_component(name_component* comp, entityid id, const char* name) {
     if (strlen(name) == 0) { return; }
     massert(strlen(name) < sizeof(comp->name), "name is too long");
     if (strlen(name) >= sizeof(comp->name)) { return; }
-
     comp->id = id;
     snprintf(comp->name, sizeof(comp->name), "%s", name);
+}
+
+void init_type_component(type_component* comp, entityid id, entitytype_t type) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
+    if (type <= ENTITY_NONE || type >= ENTITY_TYPE_COUNT) { return; }
+    comp->id = id;
+    comp->type = type;
 }

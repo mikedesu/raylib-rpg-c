@@ -112,6 +112,10 @@ typedef struct gamestate {
     int name_list_count;
     int name_list_capacity;
 
+    type_component* type_list;
+    int type_list_count;
+    int type_list_capacity;
+
 } gamestate;
 
 gamestate* gamestateinitptr();
@@ -138,7 +142,13 @@ void gamestate_set_debug_panel_pos_top_right(gamestate* const g);
 void gamestate_incr_entity_turn(gamestate* const g);
 void gamestate_load_keybindings(gamestate* const g);
 
-bool gs_add_name_comp(gamestate* const g, entityid id, const char* name);
 bool gs_has_component(gamestate* const g, entityid id, component comp);
 bool gs_register_comp(gamestate* const g, entityid id, component comp);
 bool gs_register_comps(gamestate* const g, entityid id, ...);
+
+bool gs_add_name(gamestate* const g, entityid id, const char* name);
+const char* gs_get_name(gamestate* const g, entityid id);
+
+bool gs_add_type(gamestate* const g, entityid id, entitytype_t type);
+entitytype_t gs_get_type(const gamestate* const g, entityid id);
+bool gs_is_type(const gamestate* const g, entityid id, entitytype_t type);

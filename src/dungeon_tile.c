@@ -1,5 +1,6 @@
 #include "dungeon_tile.h"
 #include "em.h"
+#include "gamestate.h"
 #include "mprint.h"
 #include <stdlib.h>
 #include <string.h>
@@ -110,7 +111,8 @@ void tile_free(tile_t* t) {
     free(t);
 }
 
-void recompute_entity_cache(tile_t* t, em_t* em) {
+void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em) {
+    massert(g, "gamestate is NULL");
     massert(t, "tile is NULL");
     massert(em, "em is NULL");
     if (!t->dirty_entities) return;
@@ -119,8 +121,10 @@ void recompute_entity_cache(tile_t* t, em_t* em) {
     for (size_t i = 0; i < t->entity_max; i++) {
         entity* e = em_get(em, t->entities[i]);
         if (!e || e->dead) continue;
-        if (e->type == ENTITY_NPC) t->cached_live_npcs++;
-        if (e->type == ENTITY_PLAYER) t->cached_player_present = true;
+        //if (e->type == ENTITY_NPC) t->cached_live_npcs++;
+        entitytype_t type = gs_get_type(g, t->entities[i]);
+        if (type == ENTITY_NPC) t->cached_live_npcs++;
+        if (type == ENTITY_PLAYER) t->cached_player_present = true;
     }
     t->dirty_entities = false;
 }

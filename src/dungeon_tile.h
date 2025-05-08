@@ -4,11 +4,15 @@
 #include "em.h"
 #include "entityid.h"
 #include "entitytype.h"
+//#include "gamestate.h"
 #include <stdbool.h>
 #include <stddef.h>
 
 #define DUNGEON_TILE_MAX_ENTITIES_DEFAULT 32
 #define DUNGEON_TILE_MAX_ENTITIES_MAX 256
+
+// forward declaration for gamestate
+typedef struct gamestate gamestate;
 
 typedef struct {
     tiletype_t type;
@@ -46,7 +50,7 @@ bool tile_resize(tile_t* t);
 
 void tile_init(tile_t* const t, tiletype_t type);
 void tile_free(tile_t* t);
-void recompute_entity_cache(tile_t* t, em_t* em);
+void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em);
 
 static inline void tile_set_pressure_plate(tile_t* const t, bool b) {
     massert(t, "tile is NULL");
@@ -138,20 +142,20 @@ static inline int tile_get_pressure_plate_event(const tile_t* const t) {
     return t->pressure_plate_event;
 }
 
-static inline bool tile_has_live_npcs(tile_t* t, em_t* em) {
+static inline bool tile_has_live_npcs(gamestate* g, tile_t* t, em_t* em) {
     if (!t) return false;
-    recompute_entity_cache(t, em);
+    recompute_entity_cache(g, t, em);
     return t->cached_live_npcs > 0;
 }
 
-static inline size_t tile_live_npc_count(tile_t* t, em_t* em) {
+static inline size_t tile_live_npc_count(gamestate* g, tile_t* t, em_t* em) {
     massert(t, "tile is NULL");
-    recompute_entity_cache(t, em);
+    recompute_entity_cache(g, t, em);
     return t->cached_live_npcs;
 }
 
-static inline bool tile_has_player(tile_t* t, em_t* em) {
+static inline bool tile_has_player(gamestate* g, tile_t* t, em_t* em) {
     if (!t) return false;
-    recompute_entity_cache(t, em);
+    recompute_entity_cache(g, t, em);
     return t->cached_player_present;
 }
