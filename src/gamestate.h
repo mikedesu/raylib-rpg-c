@@ -124,6 +124,10 @@ typedef struct gamestate {
     int direction_list_count;
     int direction_list_capacity;
 
+    loc_component* loc_list;
+    int loc_list_count;
+    int loc_list_capacity;
+
 } gamestate;
 
 gamestate* gamestateinitptr();
@@ -169,3 +173,9 @@ direction_t g_get_direction(const gamestate* const g, entityid id);
 bool g_add_direction(gamestate* const g, entityid id, direction_t dir);
 bool g_is_direction(gamestate* const g, entityid id, direction_t dir);
 bool g_update_direction(gamestate* const g, entityid id, direction_t dir);
+
+bool g_has_location(const gamestate* const g, entityid id);
+bool g_add_location(gamestate* const g, entityid id, loc_t loc);
+bool g_update_location(gamestate* const g, entityid id, loc_t loc);
+loc_t g_get_location(const gamestate* const g, entityid id);
+bool g_is_location(const gamestate* const g, entityid id, loc_t loc);

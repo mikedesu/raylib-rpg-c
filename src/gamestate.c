@@ -509,3 +509,73 @@ bool g_update_direction(gamestate* const g, entityid id, direction_t dir) {
     }
     return false;
 }
+
+bool g_has_location(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->loc_list == NULL) {
+        merror("g->loc_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->loc_list_count; i++) {
+        if (g->loc_list[i].id == id) { return true; }
+    }
+    return false;
+}
+
+bool g_add_location(gamestate* const g, entityid id, loc_t loc) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->loc_list_count >= g->loc_list_capacity) {
+        g->loc_list_capacity *= 2;
+        g->loc_list = realloc(g->loc_list, sizeof(loc_component) * g->loc_list_capacity);
+        if (g->loc_list == NULL) {
+            merror("g->loc_list is NULL");
+            return false;
+        }
+    }
+    init_loc_component(&g->loc_list[g->loc_list_count], id, loc);
+    g->loc_list_count++;
+    return true;
+}
+
+bool g_update_location(gamestate* const g, entityid id, loc_t loc) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->loc_list == NULL) {
+        merror("g->loc_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->loc_list_count; i++) {
+        if (g->loc_list[i].id == id) {
+            g->loc_list[i].loc = loc;
+            return true;
+        }
+    }
+    return false;
+}
+
+loc_t g_get_location(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->loc_list == NULL) {
+        merror("g->loc_list is NULL");
+        return (loc_t){-1, -1};
+    }
+    for (int i = 0; i < g->loc_list_count; i++) {
+        if (g->loc_list[i].id == id) { return g->loc_list[i].loc; }
+    }
+    merror("id %d not found in loc_list", id);
+    return (loc_t){-1, -1};
+}
+
+bool g_is_location(const gamestate* const g, entityid id, loc_t loc) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->loc_list == NULL) {
+        merror("g->loc_list is NULL");
+        return false;
+    }
+    loc_t loc2 = g_get_location(g, id);
+    return (loc.x == loc2.x && loc.y == loc2.y);
+}

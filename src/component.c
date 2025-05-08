@@ -49,3 +49,12 @@ void init_direction_component(direction_component* comp, entityid id, direction_
     comp->id = id;
     comp->dir = dir;
 }
+
+void init_loc_component(loc_component* comp, entityid id, loc_t loc) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->loc = loc;
+}
