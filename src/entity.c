@@ -10,21 +10,17 @@ entity_t* e_new(entityid id, entitytype_t type) {
     massert(id >= 0, "id is less than 0");
     massert(type >= 0, "type is less than 0");
     massert(type < ENTITY_TYPE_COUNT, "type is greater than ENTITY_TYPE_COUNT");
-
     e->id = id;
     e->type = type;
     e->race = RACE_NONE;
     e->direction = DIR_RIGHT;
     e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
-
     e->x = e->y = e->sprite_move_x = e->sprite_move_y = e->inventory_count = 0;
     e->weapon = e->shield = e->floor = -1;
     e->stats.hp = e->stats.maxhp = e->stats.level = 1;
     e->stats.mp = e->stats.maxmp = 0;
     e->do_update = e->is_attacking = e->is_blocking = e->is_damaged = e->dead = e->door_is_open = false;
-
     e->potion_type = POTION_NONE;
-
     e->next = NULL;
     e->target_path = NULL;
     e->target_path_length = 0;
@@ -40,7 +36,6 @@ entity_t* e_new(entityid id, entitytype_t type) {
 void e_free(entity_t* e) {
     massert(e, "e is NULL");
     massert(e->next == NULL, "e->next is not NULL. You MUST acquire the next pointer externally and set it to NULL before calling this function");
-
     if (e->target_path) {
         free(e->target_path);
         e->target_path = NULL;
@@ -87,17 +82,14 @@ bool e_add_item_to_inventory(entity_t* const e, entityid item_id) {
 bool e_remove_item_from_inventory(entity_t* const e, entityid item_id) {
     massert(e, "e is NULL");
     massert(item_id >= 0, "item_id is less than 0");
-
     if (e->inventory_count <= 0) {
         merror("inventory is empty");
         return false;
     }
-
     if (!e_item_is_in_inventory(e, item_id)) {
         merror("item is not in inventory");
         return false;
     }
-
     for (int i = 0; i < e->inventory_count; i++) {
         if (e->inventory[i] == item_id) {
             e->inventory[i] = e->inventory[--e->inventory_count];

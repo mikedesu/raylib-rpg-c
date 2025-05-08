@@ -1027,7 +1027,11 @@ static entity_t* const npc_create_ptr(gamestate* const g, race_t rt, int x, int 
         merror("failed to create NPC");
         return NULL;
     }
-    return em_get(g->entitymap, id);
+    entity_t* const e = em_get(g->entitymap, id);
+    massert(e, "failed to get NPC");
+    massert(e->id == id, "NPC ID mismatch: %d != %d", e->id, id);
+    e_set_default_action(e, ENTITY_ACTION_MOVE_A_STAR);
+    return e;
 }
 
 static inline size_t tile_npc_count_at(gamestate* const g, dungeon_floor_t* const df, int x, int y) {
@@ -1111,28 +1115,12 @@ static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count) {
 static entity* create_orc_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_ORC, loc.x, loc.y, loc.z, "orc");
     massert(e, "orc create fail");
-    //e_set_default_action(e, ENTITY_ACTION_MOVE_ATTACK_PLAYER);
-    e_set_default_action(e, ENTITY_ACTION_MOVE_A_STAR);
-    e_set_maxhp(e, 1);
-    e_set_hp(e, 1);
-
-    entity* sword = create_sword(g);
-    e_add_item_to_inventory(e, sword->id);
-    e->weapon = sword->id;
-
     return e;
-
-    //entity* shield = create_shield(g);
-    //e_add_item_to_inventory(e, shield->id);
-    //e->shield = shield->id;
 }
 
 static entity* create_human_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_HUMAN, loc.x, loc.y, loc.z, "human");
     massert(e, "human create fail");
-    e_set_default_action(e, ENTITY_ACTION_MOVE_A_STAR);
-    e_set_maxhp(e, 1);
-    e_set_hp(e, 1);
 
     entity* sword = create_sword(g);
     e_add_item_to_inventory(e, sword->id);
@@ -1144,9 +1132,6 @@ static entity* create_human_at(gamestate* g, loc_t loc) {
 static entity* create_elf_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_ELF, loc.x, loc.y, loc.z, "elf");
     massert(e, "elf create fail");
-    e_set_default_action(e, ENTITY_ACTION_MOVE_A_STAR);
-    e_set_maxhp(e, 1);
-    e_set_hp(e, 1);
 
     entity* sword = create_sword(g);
     e_add_item_to_inventory(e, sword->id);
@@ -1158,9 +1143,6 @@ static entity* create_elf_at(gamestate* g, loc_t loc) {
 static entity* create_dwarf_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_DWARF, loc.x, loc.y, loc.z, "dwarf");
     massert(e, "dwarf create fail");
-    e_set_default_action(e, ENTITY_ACTION_MOVE_A_STAR);
-    e_set_maxhp(e, 1);
-    e_set_hp(e, 1);
 
     entity* sword = create_sword(g);
     e_add_item_to_inventory(e, sword->id);
@@ -1172,9 +1154,6 @@ static entity* create_dwarf_at(gamestate* g, loc_t loc) {
 static entity* create_halfling_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_HALFLING, loc.x, loc.y, loc.z, "halfling");
     massert(e, "halfling create fail");
-    e_set_default_action(e, ENTITY_ACTION_MOVE_A_STAR);
-    e_set_maxhp(e, 1);
-    e_set_hp(e, 1);
 
     entity* sword = create_sword(g);
     e_add_item_to_inventory(e, sword->id);
@@ -1186,9 +1165,6 @@ static entity* create_halfling_at(gamestate* g, loc_t loc) {
 static entity* create_goblin_at(gamestate* g, loc_t loc) {
     entity* e = npc_create_ptr(g, RACE_GOBLIN, loc.x, loc.y, loc.z, "goblin");
     massert(e, "goblin create fail");
-    e_set_default_action(e, ENTITY_ACTION_MOVE_A_STAR);
-    e_set_maxhp(e, 1);
-    e_set_hp(e, 1);
 
     entity* sword = create_sword(g);
     e_add_item_to_inventory(e, sword->id);

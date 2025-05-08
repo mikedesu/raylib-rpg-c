@@ -11,11 +11,6 @@ dungeon_t* dungeon_create() {
     massert(dungeon, "dungeon malloc failed");
     dungeon->floors = malloc(sizeof(dungeon_floor_t*) * INITIAL_DUNGEON_CAPACITY);
     massert(dungeon->floors, "dungeon->floors malloc failed");
-    //if (!dungeon->floors) {
-    //    merror("dungeon->floors malloc failed");
-    //    free(dungeon);
-    //    return NULL;
-    //}
     dungeon->current_floor = 0;
     dungeon->num_floors = 0;
     dungeon->capacity_floors = INITIAL_DUNGEON_CAPACITY;
@@ -38,12 +33,10 @@ bool dungeon_add_floor(dungeon_t* const dungeon, int width, int height) {
     massert(dungeon, "dungeon is NULL");
     massert(width > 0, "width is less than 1");
     massert(height > 0, "height is less than 1");
-
     if (dungeon->is_locked) {
         merror("dungeon is locked");
         return false;
     }
-
     if (dungeon->num_floors >= dungeon->capacity_floors) {
         int new_capacity = dungeon->capacity_floors * 2;
         dungeon_floor_t** new_floors = realloc(dungeon->floors, sizeof(dungeon_floor_t*) * new_capacity);
@@ -51,14 +44,12 @@ bool dungeon_add_floor(dungeon_t* const dungeon, int width, int height) {
         dungeon->floors = new_floors;
         dungeon->capacity_floors = new_capacity;
     }
-
     dungeon_floor_t* new_floor = df_create(width, height);
     massert(new_floor, "failed to create new floor");
     if (!new_floor) {
         merror("new_floor is NULL");
         return false;
     }
-
     dungeon->floors[dungeon->num_floors++] = new_floor;
     return true;
 }

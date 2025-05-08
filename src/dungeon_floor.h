@@ -27,17 +27,13 @@ typedef struct {
     tile_t** tiles;
     int width;
     int height;
-
     df_event_t events[DEFAULT_DF_EVENTS];
     bool plates[DEFAULT_DF_PLATES];
-
     room_data_t* rooms; // dynamic array pointer
     int room_count; // current room number
     int room_capacity; // allocated capacity
-
     loc_t downstairs_loc;
     loc_t upstairs_loc;
-
 } dungeon_floor_t;
 
 dungeon_floor_t* df_create(int width, int height);
@@ -45,17 +41,13 @@ dungeon_floor_t* df_create(int width, int height);
 void df_init(dungeon_floor_t* df);
 void df_free(dungeon_floor_t* f);
 void df_init_rooms(dungeon_floor_t* df);
-
 bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_add_room_info(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
-
 loc_t df_get_upstairs(dungeon_floor_t* const df);
 loc_t df_get_downstairs(dungeon_floor_t* const df);
-
 loc_t* const df_get_all_locs(dungeon_floor_t* const df, int* external_count);
 loc_t* const df_get_all_locs_outside_of_rooms(dungeon_floor_t* const df, int* external_count);
-
 int df_count_walkable(const dungeon_floor_t* const df);
 int df_count_empty(const dungeon_floor_t* const df);
 int df_count_empty_non_walls(const dungeon_floor_t* const df);
@@ -63,9 +55,7 @@ int df_count_empty_non_walls_in_area(const dungeon_floor_t* const df, int x0, in
 int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
 int df_loc_is_in_room(dungeon_floor_t* const df, loc_t loc);
-
 room_data_t* const df_get_rooms_with_prefix(dungeon_floor_t* const df, int* external_count, const char* prefix);
-
 const char* df_get_room_name(dungeon_floor_t* const df, loc_t loc);
 
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {

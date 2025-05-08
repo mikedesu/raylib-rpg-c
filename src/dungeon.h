@@ -1,4 +1,3 @@
-// dungeon.h
 #pragma once
 
 #include "dungeon_floor.h"
@@ -13,9 +12,7 @@ typedef struct {
 } dungeon_t;
 
 bool dungeon_add_floor(dungeon_t* dungeon, int width, int height);
-
 dungeon_t* dungeon_create();
-
 void dungeon_destroy(dungeon_t* dungeon);
 void dungeon_free(dungeon_t* dungeon);
 

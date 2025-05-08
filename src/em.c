@@ -2,7 +2,6 @@
 #include "massert.h"
 #include "mprint.h"
 #include <stdlib.h>
-#include <string.h>
 
 em_t* em_new() {
     em_t* em = malloc(sizeof(em_t));

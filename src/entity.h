@@ -12,12 +12,10 @@
 #include <string.h>
 
 #define ENTITY_NAME_LEN_MAX 64
-
 #define ENTITY_INVENTORY_MAX_SIZE 32
 
 // forward declaration
 typedef struct entity_t entity_t;
-
 typedef struct {
     int level;
     int hp;
@@ -40,12 +38,9 @@ typedef struct entity_t {
     int floor;
     int sprite_move_x;
     int sprite_move_y;
-
     entity_stats_t stats;
-
     // if the entity is a potion...
     potiontype_t potion_type;
-
     bool do_update;
     bool is_attacking;
     bool is_blocking;
@@ -56,7 +51,6 @@ typedef struct entity_t {
     entityid weapon;
     entityid shield;
     entity_t* next;
-
     // pathfinding
     loc_t target;
     int target_path_length;
@@ -88,6 +82,7 @@ static inline void e_set_xy(entity_t* const e, int x, int y) {
     e_set_x(e, x);
     e_set_y(e, y);
 }
+
 static inline void e_set_name(entity_t* const e, const char* name) {
     massert(e, "e is NULL");
     massert(name, "name is NULL");
