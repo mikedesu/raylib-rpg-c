@@ -44,7 +44,14 @@ void dungeon_destroy(dungeon_t* d) {
     free(d);
 }
 
-void dungeon_free(dungeon_t* dungeon) { dungeon_destroy(dungeon); }
+void dungeon_free(dungeon_t* dungeon) {
+    if (!dungeon) {
+        merror("Cannot free - dungeon is NULL");
+        return;
+    }
+    minfo("Freeing dungeon with %d floors", dungeon->num_floors);
+    dungeon_destroy(dungeon);
+}
 
 bool dungeon_add_floor(dungeon_t* const dungeon, int width, int height) {
     if (!dungeon) {
