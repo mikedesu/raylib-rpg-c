@@ -52,3 +52,4 @@ src/graphs/*
 */*/*/*.png
 */*/*/*/*.png
 src/minifantasy
+.aider*
