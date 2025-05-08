@@ -353,7 +353,7 @@ bool g_add_name(gamestate* const g, entityid id, const char* name) {
     return true;
 }
 
-bool gs_has_component(gamestate* const g, entityid id, component comp) {
+bool gs_has_component(const gamestate* const g, entityid id, component comp) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(comp != COMP_COUNT, "comp is invalid");
@@ -444,4 +444,68 @@ bool g_is_race(gamestate* const g, entityid id, race_t race) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_get_race(g, id) == race;
+}
+
+direction_t g_get_direction(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!gs_has_component(g, id, COMP_DIRECTION)) {
+        merror("id %d does not have a direction component", id);
+        return DIR_NONE;
+    }
+    for (int i = 0; i < g->direction_list_count; i++) {
+        if (g->direction_list[i].id == id) { return g->direction_list[i].dir; }
+    }
+    return DIR_NONE;
+}
+
+//bool g_has_direction(const gamestate* const g, entityid id) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (g->direction_list == NULL) {
+//        merror("g->direction_list is NULL");
+//        return false;
+//    }
+//    for (int i = 0; i < g->direction_list_count; i++) {
+//        if (g->direction_list[i].id == id) { return true; }
+//    }
+//    return false;
+//}
+
+bool g_add_direction(gamestate* const g, entityid id, direction_t dir) {
+    massert(g, "g is NULL");
+    massert(dir >= 0 && dir < DIR_COUNT, "dir is invalid");
+    if (g->direction_list_count >= g->direction_list_capacity) {
+        g->direction_list_capacity *= 2;
+        g->direction_list = realloc(g->direction_list, sizeof(direction_component) * g->direction_list_capacity);
+        if (g->direction_list == NULL) {
+            merror("g->direction_list is NULL");
+            return false;
+        }
+    }
+    init_direction_component(&g->direction_list[g->direction_list_count], id, dir);
+    g->direction_list_count++;
+    return true;
+}
+
+bool g_is_direction(gamestate* const g, entityid id, direction_t dir) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_get_direction(g, id) == dir;
+}
+
+bool g_update_direction(gamestate* const g, entityid id, direction_t dir) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->direction_list == NULL) {
+        merror("g->direction_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->direction_list_count; i++) {
+        if (g->direction_list[i].id == id) {
+            g->direction_list[i].dir = dir;
+            return true;
+        }
+    }
+    return false;
 }

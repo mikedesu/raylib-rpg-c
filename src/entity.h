@@ -29,15 +29,15 @@ typedef struct entity_t {
     entityid id;
 
     entity_action_t default_action; // New field
-    direction_t direction;
-
-    //race_t race;
+    //direction_t direction;
 
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
+
     int x;
     int y;
     int floor;
+
     int sprite_move_x;
     int sprite_move_y;
     entity_stats_t stats;
@@ -90,16 +90,6 @@ static inline void e_set_xy(entity_t* const e, int x, int y) {
     }
 }
 
-//static inline void e_set_name(entity_t* const e, const char* name) {
-//massert(e, "e is NULL");
-//massert(name, "name is NULL");
-//massert(strlen(name) < ENTITY_NAME_LEN_MAX, "name is too long");
-//if (e && name) {
-//    strncpy(e->name, name, ENTITY_NAME_LEN_MAX);
-//    e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null termination
-//}
-//}
-
 static inline void e_set_hp(entity_t* const e, int hp) {
     massert(e, "e is NULL");
     if (e) { e->stats.hp = hp < 0 ? 0 : hp > e->stats.maxhp ? e->stats.maxhp : hp; }
@@ -132,39 +122,27 @@ static inline void e_set_floor(entity_t* const e, int floor) {
     if (e) { e->floor = floor; }
 }
 
-//static inline void e_set_race(entity_t* const e, race_t race) {
-//    massert(e, "entity is null");
-//    massert(race >= 0, "race is less than 0");
-//    massert(race < RACE_COUNT, "race is greater than RACE_COUNT");
-//    e->race = race;
-//}
-
 static inline entity_t* e_new_npc_at(entityid id, race_t r, int x, int y, int floor, const char* name) {
     entity_t* e = e_new_at(id, ENTITY_NPC, x, y, floor);
     massert(e, "Failed to create entity");
-    //e_set_race(e, r);
-    //e_set_name(e, name);
     return e;
 }
 
 static inline entity_t* e_new_door_at(entityid id, int x, int y, int floor, const char* name) {
     entity_t* e = e_new_at(id, ENTITY_DOOR, x, y, floor);
     massert(e, "Failed to create entity");
-    //e_set_name(e, name);
     return e;
 }
 
 static inline entity_t* e_new_key_at(entityid id, int x, int y, int floor, const char* name) {
     entity_t* e = e_new_at(id, ENTITY_KEY, x, y, floor);
     massert(e, "Failed to create entity");
-    //e_set_name(e, name);
     return e;
 }
 
 static inline entity_t* e_new_weapon(entityid id, const char* name) {
     entity_t* e = e_new(id, ENTITY_WEAPON);
     massert(e, "Failed to create weapon entity");
-    //e_set_name(e, name);
     return e;
 }
 
@@ -231,18 +209,6 @@ static inline void e_decr_x(entity_t* const e) {
 static inline void e_decr_y(entity_t* const e) {
     massert(e, "e is NULL");
     e_set_y(e, e->y - 1);
-}
-
-static inline void e_set_dir(entity_t* const e, direction_t dir) {
-    massert(e, "e is NULL");
-    massert(dir >= 0, "dir is less than 0");
-    massert(dir < DIR_COUNT, "dir is greater than DIR_COUNT");
-    e->direction = dir;
-}
-
-static inline direction_t e_get_dir(entity_t* const e) {
-    massert(e, "e is NULL");
-    return e->direction;
 }
 
 static inline void e_set_default_action(entity_t* const e, entity_action_t action) {

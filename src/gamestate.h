@@ -120,6 +120,10 @@ typedef struct gamestate {
     int race_list_count;
     int race_list_capacity;
 
+    direction_component* direction_list;
+    int direction_list_count;
+    int direction_list_capacity;
+
 } gamestate;
 
 gamestate* gamestateinitptr();
@@ -146,7 +150,7 @@ void gamestate_set_debug_panel_pos_top_right(gamestate* const g);
 void gamestate_incr_entity_turn(gamestate* const g);
 void gamestate_load_keybindings(gamestate* const g);
 
-bool gs_has_component(gamestate* const g, entityid id, component comp);
+bool gs_has_component(const gamestate* const g, entityid id, component comp);
 bool gs_register_comp(gamestate* const g, entityid id, component comp);
 bool gs_register_comps(gamestate* const g, entityid id, ...);
 
@@ -160,3 +164,8 @@ bool g_is_type(const gamestate* const g, entityid id, entitytype_t type);
 race_t g_get_race(gamestate* const g, entityid id);
 bool g_add_race(gamestate* const g, entityid id, race_t race);
 bool g_is_race(gamestate* const g, entityid id, race_t race);
+
+direction_t g_get_direction(const gamestate* const g, entityid id);
+bool g_add_direction(gamestate* const g, entityid id, direction_t dir);
+bool g_is_direction(gamestate* const g, entityid id, direction_t dir);
+bool g_update_direction(gamestate* const g, entityid id, direction_t dir);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "direction.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "location.h"
@@ -13,6 +14,7 @@ typedef enum component_t
     COMP_NAME,
     COMP_TYPE,
     COMP_RACE,
+    COMP_DIRECTION,
     COMP_COUNT
 } component;
 
@@ -31,9 +33,15 @@ typedef struct race_component_t {
     race_t race;
 } race_component;
 
+typedef struct direction_component_t {
+    entityid id;
+    direction_t dir;
+} direction_component;
+
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
 void init_race_component(race_component* comp, entityid id, race_t race);
+void init_direction_component(direction_component* comp, entityid id, direction_t dir);
 
 //typedef struct hp_component_t {
 //    entityid id;

@@ -1,3 +1,4 @@
+#include "component.h"
 #include "controlmode.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
@@ -145,7 +146,10 @@ static void update_equipped_shield_dir(gamestate* g, entity* e) {
     if (e->shield != ENTITYID_INVALID) {
         entity* shield = em_get(g->entitymap, e->shield);
         if (shield) {
-            shield->direction = e->direction;
+            //shield->direction = e->direction;
+
+            g_update_direction(g, shield->id, g_get_direction(g, e->id));
+
             shield->do_update = true;
         }
     }
@@ -262,7 +266,10 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
     e->do_update = true;
-    e->direction = get_dir_from_xy(x, y);
+
+    //e->direction = get_dir_from_xy(x, y);
+    g_update_direction(g, e->id, get_dir_from_xy(x, y));
+
     int ex = e->x + x;
     int ey = e->y + y;
     int floor = e->floor;
@@ -509,7 +516,10 @@ static void try_entity_attack(gamestate* const g, entityid attacker_id, int targ
     bool ok = false;
     int dx = target_x - e->x;
     int dy = target_y - e->y;
-    e->direction = get_dir_from_xy(dx, dy);
+
+    //e->direction = get_dir_from_xy(dx, dy);
+    g_update_direction(g, e->id, get_dir_from_xy(dx, dy));
+
     e->is_attacking = true;
     e->do_update = true;
     handle_attack_helper(g, tile, e, &ok);
@@ -1012,15 +1022,15 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     massert(id != ENTITYID_INVALID, "failed to create player");
     entity_t* const e = em_get(g->entitymap, id);
     massert(e, "entity is NULL");
-    //e_set_type(e, type);
+
     gamestate_set_hero_id(g, id);
 
     // beginnings of a real ECS system...
-    //gs_register_comps(g, id, COMP_NAME);
-    gs_register_comps(g, id, COMP_NAME, COMP_TYPE, COMP_RACE, 0);
+    gs_register_comps(g, id, COMP_NAME, COMP_TYPE, COMP_RACE, COMP_DIRECTION, 0);
     g_add_name(g, id, name);
     g_add_type(g, id, type);
     g_add_race(g, id, RACE_HUMAN);
+    g_add_direction(g, id, DIR_RIGHT);
 
     return id;
 }
@@ -1393,7 +1403,10 @@ static inline void change_player_dir(gamestate* const g, direction_t dir) {
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "hero is NULL");
     if (hero->dead) return;
-    hero->direction = dir;
+
+    //hero->direction = dir;
+    g_update_direction(g, hero->id, dir);
+
     hero->do_update = true;
     update_equipped_shield_dir(g, hero);
 }
@@ -1591,7 +1604,9 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         } else if (strcmp(action, "move_se") == 0) {
             execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_RIGHT);
         } else if (strcmp(action, "attack") == 0) {
-            loc_t loc = get_loc_from_dir(hero->direction);
+            //loc_t loc = get_loc_from_dir(hero->direction);
+            loc_t loc = get_loc_from_dir(g_get_direction(g, hero->id));
+
             try_entity_attack(g, hero->id, hero->x + loc.x, hero->y + loc.y);
         } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
@@ -1599,8 +1614,11 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             // for instance u can talk to an NPC merchant using "interact"
             // or open a door, etc
             //msuccess("Space pressed!");
-            int tx = hero->x + get_x_from_dir(hero->direction);
-            int ty = hero->y + get_y_from_dir(hero->direction);
+            //int tx = hero->x + get_x_from_dir(hero->direction);
+            direction_t dir = g_get_direction(g, hero->id);
+            int tx = hero->x + get_x_from_dir(dir);
+
+            int ty = hero->y + get_y_from_dir(dir);
             // check to see if there is a door
             entity* door = get_door_from_tile(g, tx, ty, hero->floor);
             if (door) {
@@ -1681,12 +1699,14 @@ static void update_debug_panel_buffer(gamestate* const g) {
         x = e->x;
         y = e->y;
         inventory_count = e->inventory_count;
-        player_dir = e->direction;
+        //player_dir = e->direction;
+        player_dir = g_get_direction(g, e->id);
         shield_id = e->shield;
         if (shield_id != -1) {
             entity* const shield = em_get(g->entitymap, shield_id);
             massert(shield, "shield is NULL");
-            shield_dir = shield->direction;
+            //shield_dir = shield->direction;
+            shield_dir = g_get_direction(g, shield->id);
         }
         is_b = e->is_blocking;
     }

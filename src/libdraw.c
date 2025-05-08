@@ -677,7 +677,8 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
     }
 
     if (e->do_update) {
-        libdraw_update_sprite_context_ptr(g, sg, e->direction);
+        //libdraw_update_sprite_context_ptr(g, sg, e->direction);
+        libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, e->id));
         e->do_update = false;
     }
 
@@ -807,7 +808,8 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
     }
     entity* const e = em_get(g->entitymap, id);
     if (!e) return false;
-    direction_t dir = e->direction;
+    //direction_t dir = e->direction;
+    direction_t dir = g_get_direction(g, id);
     int x = e->x + get_x_from_dir(dir), y = e->y + get_y_from_dir(dir), ds = DEFAULT_TILE_SIZE;
     Color base_c = GREEN;
     float a = 0.5f;

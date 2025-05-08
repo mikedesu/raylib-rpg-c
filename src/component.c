@@ -38,3 +38,14 @@ void init_race_component(race_component* comp, entityid id, race_t race) {
     comp->id = id;
     comp->race = race;
 }
+
+void init_direction_component(direction_component* comp, entityid id, direction_t dir) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    massert(dir >= 0 && dir < DIR_COUNT, "dir is invalid: %d", dir);
+    if (dir < 0 || dir >= DIR_COUNT) { return; }
+    comp->id = id;
+    comp->dir = dir;
+}
