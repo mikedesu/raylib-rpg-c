@@ -6,7 +6,7 @@
 
 #define INITIAL_DUNGEON_CAPACITY 4
 
-dungeon_t* dungeon_create() {
+dungeon_t* dungeon_create(void) {
     dungeon_t* dungeon = malloc(sizeof(dungeon_t));
     if (!dungeon) {
         merror("Failed to allocate memory for dungeon");
@@ -28,7 +28,7 @@ dungeon_t* dungeon_create() {
     return dungeon;
 }
 
-void dungeon_destroy(dungeon_t* d) {
+void dungeon_destroy(dungeon_t* const d) {
     if (!d) {
         return;
     }
@@ -44,7 +44,7 @@ void dungeon_destroy(dungeon_t* d) {
     free(d);
 }
 
-void dungeon_free(dungeon_t* dungeon) {
+void dungeon_free(dungeon_t* const dungeon) {
     if (!dungeon) {
         merror("Cannot free - dungeon is NULL");
         return;
@@ -53,7 +53,7 @@ void dungeon_free(dungeon_t* dungeon) {
     dungeon_destroy(dungeon);
 }
 
-bool dungeon_add_floor(dungeon_t* const dungeon, int width, int height) {
+bool dungeon_add_floor(dungeon_t* const dungeon, const int width, const int height) {
     if (!dungeon) {
         merror("dungeon is NULL");
         return false;
