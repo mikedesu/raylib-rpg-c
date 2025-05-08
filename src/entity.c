@@ -15,10 +15,19 @@ entity_t* e_new(entityid id, entitytype_t type) {
     //e->race = RACE_NONE;
     //e->direction = DIR_RIGHT;
     e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
-    e->x = e->y = e->sprite_move_x = e->sprite_move_y = e->inventory_count = 0;
-    e->weapon = e->shield = e->floor = -1;
-    e->stats.hp = e->stats.maxhp = e->stats.level = 1;
-    e->stats.mp = e->stats.maxmp = 0;
+    //e->x = 0;
+    //e->y = 0;
+    //e->floor = 0;
+    e->sprite_move_x = 0;
+    e->sprite_move_y = 0;
+    e->inventory_count = 0;
+    e->weapon = -1;
+    e->shield = -1;
+    e->stats.hp = 1;
+    e->stats.maxhp = 1;
+    e->stats.level = 1;
+    e->stats.mp = 0;
+    e->stats.maxmp = 0;
     e->do_update = e->is_attacking = e->is_blocking = e->is_damaged = e->dead = e->door_is_open = false;
     e->potion_type = POTION_NONE;
     e->next = NULL;
@@ -59,8 +68,8 @@ entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int floor) {
     massert(floor >= 0, "floor is less than 0");
     entity_t* e = e_new(id, type);
     massert(e, "Failed to create entity");
-    e_set_xy(e, x, y);
-    e_set_floor(e, floor);
+    //e_set_xy(e, x, y);
+    //e_set_floor(e, floor);
     return e;
 }
 

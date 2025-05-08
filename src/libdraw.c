@@ -329,18 +329,18 @@ static bool draw_entities_2d(const gamestate* const g, dungeon_floor_t* df, bool
     return true;
 }
 
-static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
-    massert(g, "draw_wall_tiles_2d: gamestate is NULL");
-    massert(df, "draw_wall_tiles_2d: dungeon_floor is NULL");
-    for (int y = 0; y < df->height; y++)
-        for (int x = 0; x < df->width; x++) {
-            tile_t* t = df_tile_at(df, x, y);
-            if (!t) return false;
-            if (!tile_is_wall(t->type)) continue;
-            draw_dungeon_floor_tile(g, df, x, y);
-        }
-    return true;
-}
+//static bool draw_wall_tiles_2d(const gamestate* g, dungeon_floor_t* df) {
+//    massert(g, "draw_wall_tiles_2d: gamestate is NULL");
+//    massert(df, "draw_wall_tiles_2d: dungeon_floor is NULL");
+//    for (int y = 0; y < df->height; y++)
+//        for (int x = 0; x < df->width; x++) {
+//            tile_t* t = df_tile_at(df, x, y);
+//            if (!t) return false;
+//            if (!tile_is_wall(t->type)) continue;
+//            draw_dungeon_floor_tile(g, df, x, y);
+//        }
+//    return true;
+//}
 
 static void load_shaders() {
     shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
@@ -688,7 +688,9 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
     // Update movement as long as sg->move.x/y is non-zero
     spritegroup_update_dest(sg);
     // Snap to the tile position only when movement is fully complete
-    spritegroup_snap_dest(sg, e->x, e->y);
+
+    loc_t loc = g_get_location(g, e->id);
+    spritegroup_snap_dest(sg, loc.x, loc.y);
 }
 
 //static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
@@ -810,7 +812,10 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
     if (!e) return false;
     //direction_t dir = e->direction;
     direction_t dir = g_get_direction(g, id);
-    int x = e->x + get_x_from_dir(dir), y = e->y + get_y_from_dir(dir), ds = DEFAULT_TILE_SIZE;
+    loc_t loc = g_get_location(g, id);
+    int x = loc.x + get_x_from_dir(dir);
+    int y = loc.y + get_y_from_dir(dir);
+    int ds = DEFAULT_TILE_SIZE;
     Color base_c = GREEN;
     float a = 0.5f;
     Color c = Fade(base_c, a);
@@ -1025,8 +1030,9 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
     }
     const int df_w = df->width;
     const int df_h = df->height;
-    if (e->x < 0 || e->x >= df_w || e->y < 0 || e->y >= df_h) {
-        merror("create_spritegroup: entity pos out of bounds %d %d", e->x, e->y);
+    loc_t loc = g_get_location(g, id);
+    if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
+        merror("create_spritegroup: entity pos out of bounds %d %d", loc.x, loc.y);
         spritegroup_destroy(group);
         return;
     }
@@ -1046,8 +1052,8 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
         return;
     }
     const float w = s->width, h = s->height;
-    const float dst_x = e->x * DEFAULT_TILE_SIZE;
-    const float dst_y = e->y * DEFAULT_TILE_SIZE;
+    const float dst_x = loc.x * DEFAULT_TILE_SIZE;
+    const float dst_y = loc.y * DEFAULT_TILE_SIZE;
     group->current = 0;
     group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
     group->off_x = offset_x;
@@ -1143,9 +1149,14 @@ static void draw_hud(gamestate* const g) {
     //const float line_spacing = 1.0f;
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "entity is NULL");
-    const int turn = g->turn_count, hp = e->stats.hp, maxhp = e->stats.maxhp, mp = e->stats.mp, maxmp = e->stats.maxmp, level = e->stats.level;
+    const int turn = g->turn_count;
+    const int hp = e->stats.hp;
+    const int maxhp = e->stats.maxhp;
+    const int mp = e->stats.mp;
+    const int maxmp = e->stats.maxmp;
+    const int level = e->stats.level;
 
-    loc_t loc = (loc_t){e->x, e->y};
+    loc_t loc = g_get_location(g, g->hero_id);
     dungeon_floor_t* const df = dungeon_get_current_floor(g->dungeon);
     //int i = loc_is_in_room(df, loc);
     const char* room_name = df_get_room_name(df, loc);

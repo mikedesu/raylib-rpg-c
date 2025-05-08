@@ -340,6 +340,7 @@ bool gs_register_comps(gamestate* const g, entityid id, ...) {
 bool g_add_name(gamestate* const g, entityid id, const char* name) {
     massert(g, "g is NULL");
     massert(name, "name is NULL");
+    massert(gs_has_component(g, id, COMP_NAME), "id %d does not have a name component", id);
     if (g->name_list_count >= g->name_list_capacity) {
         g->name_list_capacity *= 2;
         g->name_list = realloc(g->name_list, sizeof(name_component) * g->name_list_capacity);
@@ -368,10 +369,11 @@ bool gs_has_component(const gamestate* const g, entityid id, component comp) {
 const char* g_get_name(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!gs_has_component(g, id, COMP_NAME)) {
-        merror("id %d does not have a name component", id);
-        return NULL;
-    }
+    massert(gs_has_component(g, id, COMP_NAME), "id %d does not have a type component", id);
+    //if (!gs_has_component(g, id, COMP_NAME)) {
+    //    merror("id %d does not have a name component", id);
+    //    return NULL;
+    //}
     for (int i = 0; i < g->name_list_count; i++) {
         if (g->name_list[i].id == id) { return g->name_list[i].name; }
     }
@@ -381,6 +383,7 @@ const char* g_get_name(gamestate* const g, entityid id) {
 bool g_add_type(gamestate* const g, entityid id, entitytype_t type) {
     massert(g, "g is NULL");
     massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
+    massert(gs_has_component(g, id, COMP_TYPE), "id %d does not have a type component", id);
     if (g->type_list_count >= g->type_list_capacity) {
         g->type_list_capacity *= 2;
         g->type_list = realloc(g->type_list, sizeof(type_component) * g->type_list_capacity);
@@ -418,6 +421,8 @@ bool g_is_type(const gamestate* const g, entityid id, entitytype_t type) {
 bool g_add_race(gamestate* const g, entityid id, race_t race) {
     massert(g, "g is NULL");
     //massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
+    // make sure the entity has the component
+    massert(gs_has_component(g, id, COMP_RACE), "id %d does not have a race component", id);
     if (g->race_list_count >= g->race_list_capacity) {
         g->race_list_capacity *= 2;
         g->race_list = realloc(g->race_list, sizeof(race_component) * g->race_list_capacity);
@@ -475,6 +480,8 @@ direction_t g_get_direction(const gamestate* const g, entityid id) {
 bool g_add_direction(gamestate* const g, entityid id, direction_t dir) {
     massert(g, "g is NULL");
     massert(dir >= 0 && dir < DIR_COUNT, "dir is invalid");
+    // make sure the entity has the component
+    massert(gs_has_component(g, id, COMP_DIRECTION), "id %d does not have a direction component", id);
     if (g->direction_list_count >= g->direction_list_capacity) {
         g->direction_list_capacity *= 2;
         g->direction_list = realloc(g->direction_list, sizeof(direction_component) * g->direction_list_capacity);
@@ -526,6 +533,8 @@ bool g_has_location(const gamestate* const g, entityid id) {
 bool g_add_location(gamestate* const g, entityid id, loc_t loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the location component
+    massert(gs_has_component(g, id, COMP_LOCATION), "id %d does not have a location component", id);
     if (g->loc_list_count >= g->loc_list_capacity) {
         g->loc_list_capacity *= 2;
         g->loc_list = realloc(g->loc_list, sizeof(loc_component) * g->loc_list_capacity);
