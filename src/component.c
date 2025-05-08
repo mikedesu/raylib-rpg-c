@@ -27,3 +27,14 @@ void init_type_component(type_component* comp, entityid id, entitytype_t type) {
     comp->id = id;
     comp->type = type;
 }
+
+void init_race_component(race_component* comp, entityid id, race_t race) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    massert(race > RACE_NONE && race < RACE_COUNT, "race is invalid: %d", race);
+    if (race <= RACE_NONE || race >= RACE_COUNT) { return; }
+    comp->id = id;
+    comp->race = race;
+}

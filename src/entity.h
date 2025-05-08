@@ -27,12 +27,12 @@ typedef struct {
 
 typedef struct entity_t {
     entityid id;
-    //entitytype_t type;
-    //char name[ENTITY_NAME_LEN_MAX];
 
     entity_action_t default_action; // New field
     direction_t direction;
-    race_t race;
+
+    //race_t race;
+
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
     int x;
@@ -90,15 +90,15 @@ static inline void e_set_xy(entity_t* const e, int x, int y) {
     }
 }
 
-static inline void e_set_name(entity_t* const e, const char* name) {
-    massert(e, "e is NULL");
-    massert(name, "name is NULL");
-    massert(strlen(name) < ENTITY_NAME_LEN_MAX, "name is too long");
-    //if (e && name) {
-    //    strncpy(e->name, name, ENTITY_NAME_LEN_MAX);
-    //    e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null termination
-    //}
-}
+//static inline void e_set_name(entity_t* const e, const char* name) {
+//massert(e, "e is NULL");
+//massert(name, "name is NULL");
+//massert(strlen(name) < ENTITY_NAME_LEN_MAX, "name is too long");
+//if (e && name) {
+//    strncpy(e->name, name, ENTITY_NAME_LEN_MAX);
+//    e->name[ENTITY_NAME_LEN_MAX - 1] = '\0'; // Ensure null termination
+//}
+//}
 
 static inline void e_set_hp(entity_t* const e, int hp) {
     massert(e, "e is NULL");
@@ -132,39 +132,39 @@ static inline void e_set_floor(entity_t* const e, int floor) {
     if (e) { e->floor = floor; }
 }
 
-static inline void e_set_race(entity_t* const e, race_t race) {
-    massert(e, "entity is null");
-    massert(race >= 0, "race is less than 0");
-    massert(race < RACE_COUNT, "race is greater than RACE_COUNT");
-    e->race = race;
-}
+//static inline void e_set_race(entity_t* const e, race_t race) {
+//    massert(e, "entity is null");
+//    massert(race >= 0, "race is less than 0");
+//    massert(race < RACE_COUNT, "race is greater than RACE_COUNT");
+//    e->race = race;
+//}
 
 static inline entity_t* e_new_npc_at(entityid id, race_t r, int x, int y, int floor, const char* name) {
     entity_t* e = e_new_at(id, ENTITY_NPC, x, y, floor);
     massert(e, "Failed to create entity");
-    e_set_race(e, r);
-    e_set_name(e, name);
+    //e_set_race(e, r);
+    //e_set_name(e, name);
     return e;
 }
 
 static inline entity_t* e_new_door_at(entityid id, int x, int y, int floor, const char* name) {
     entity_t* e = e_new_at(id, ENTITY_DOOR, x, y, floor);
     massert(e, "Failed to create entity");
-    e_set_name(e, name);
+    //e_set_name(e, name);
     return e;
 }
 
 static inline entity_t* e_new_key_at(entityid id, int x, int y, int floor, const char* name) {
     entity_t* e = e_new_at(id, ENTITY_KEY, x, y, floor);
     massert(e, "Failed to create entity");
-    e_set_name(e, name);
+    //e_set_name(e, name);
     return e;
 }
 
 static inline entity_t* e_new_weapon(entityid id, const char* name) {
     entity_t* e = e_new(id, ENTITY_WEAPON);
     massert(e, "Failed to create weapon entity");
-    e_set_name(e, name);
+    //e_set_name(e, name);
     return e;
 }
 
@@ -177,7 +177,7 @@ static inline entity_t* e_new_potion(entityid id, potiontype_t potion_type, cons
     massert(strlen(name) < ENTITY_NAME_LEN_MAX, "name is too long");
     entity_t* e = e_new(id, ENTITY_POTION);
     massert(e, "Failed to create potion entity");
-    e_set_name(e, name);
+    //e_set_name(e, name);
     e->potion_type = potion_type;
     return e;
 }
@@ -201,7 +201,7 @@ static inline entity_t* e_new_weapon_at(entityid id, int x, int y, int floor, co
 static inline entity_t* e_new_shield(entityid id, const char* name) {
     entity_t* e = e_new(id, ENTITY_SHIELD);
     massert(e, "Failed to create shield entity");
-    e_set_name(e, name);
+    //e_set_name(e, name);
     return e;
 }
 
@@ -244,13 +244,6 @@ static inline direction_t e_get_dir(entity_t* const e) {
     massert(e, "e is NULL");
     return e->direction;
 }
-
-//static inline void e_set_type(entity_t* const e, entitytype_t type) {
-//    massert(e, "e is NULL");
-//    massert(type >= 0, "type is less than 0");
-//    massert(type < ENTITY_TYPE_COUNT, "type is greater than ENTITY_COUNT");
-//    e->type = type;
-//}
 
 static inline void e_set_default_action(entity_t* const e, entity_action_t action) {
     massert(e, "e is NULL");
@@ -299,11 +292,6 @@ static inline bool e_is_dead(entity_t* const e) {
     massert(e, "e_is_dead: e is NULL");
     return e->dead;
 }
-
-//static inline entitytype_t e_get_type(entity_t* const e) {
-//    massert(e, "e_get_type: e is NULL");
-//    return e->type;
-//}
 
 static inline void e_equip_weapon(entity* e, entityid weapon_id) {
     massert(e, "entity is NULL");

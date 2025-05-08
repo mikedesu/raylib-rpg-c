@@ -337,7 +337,7 @@ bool gs_register_comps(gamestate* const g, entityid id, ...) {
     return true;
 }
 
-bool gs_add_name(gamestate* const g, entityid id, const char* name) {
+bool g_add_name(gamestate* const g, entityid id, const char* name) {
     massert(g, "g is NULL");
     massert(name, "name is NULL");
     if (g->name_list_count >= g->name_list_capacity) {
@@ -361,20 +361,24 @@ bool gs_has_component(gamestate* const g, entityid id, component comp) {
         merror("g->components is NULL");
         return false;
     }
-    if (!ct_has_entity(g->components, id)) { return false; }
+    //if (!ct_has_entity(g->components, id)) { return false; }
     return ct_has_component(g->components, id, comp);
 }
 
-const char* gs_get_name(gamestate* const g, entityid id) {
+const char* g_get_name(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!gs_has_component(g, id, COMP_NAME)) {
+        merror("id %d does not have a name component", id);
+        return NULL;
+    }
     for (int i = 0; i < g->name_list_count; i++) {
         if (g->name_list[i].id == id) { return g->name_list[i].name; }
     }
     return NULL;
 }
 
-bool gs_add_type(gamestate* const g, entityid id, entitytype_t type) {
+bool g_add_type(gamestate* const g, entityid id, entitytype_t type) {
     massert(g, "g is NULL");
     massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
     if (g->type_list_count >= g->type_list_capacity) {
@@ -390,7 +394,7 @@ bool gs_add_type(gamestate* const g, entityid id, entitytype_t type) {
     return true;
 }
 
-entitytype_t gs_get_type(const gamestate* const g, entityid id) {
+entitytype_t g_get_type(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     for (int i = 0; i < g->type_list_count; i++) {
@@ -399,7 +403,7 @@ entitytype_t gs_get_type(const gamestate* const g, entityid id) {
     return ENTITY_NONE;
 }
 
-bool gs_is_type(const gamestate* const g, entityid id, entitytype_t type) {
+bool g_is_type(const gamestate* const g, entityid id, entitytype_t type) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
@@ -408,5 +412,36 @@ bool gs_is_type(const gamestate* const g, entityid id, entitytype_t type) {
         merror("g->type_list is NULL");
         return false;
     }
-    return type == gs_get_type(g, id);
+    return type == g_get_type(g, id);
+}
+
+bool g_add_race(gamestate* const g, entityid id, race_t race) {
+    massert(g, "g is NULL");
+    //massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
+    if (g->race_list_count >= g->race_list_capacity) {
+        g->race_list_capacity *= 2;
+        g->race_list = realloc(g->race_list, sizeof(race_component) * g->race_list_capacity);
+        if (g->race_list == NULL) {
+            merror("g->race_list is NULL");
+            return false;
+        }
+    }
+    init_race_component(&g->race_list[g->race_list_count], id, race);
+    g->race_list_count++;
+    return true;
+}
+
+race_t g_get_race(gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    for (int i = 0; i < g->race_list_count; i++) {
+        if (g->race_list[i].id == id) { return g->race_list[i].race; }
+    }
+    return RACE_NONE;
+}
+
+bool g_is_race(gamestate* const g, entityid id, race_t race) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_get_race(g, id) == race;
 }

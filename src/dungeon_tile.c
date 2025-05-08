@@ -122,7 +122,7 @@ void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em) {
         entity* e = em_get(em, t->entities[i]);
         if (!e || e->dead) continue;
         //if (e->type == ENTITY_NPC) t->cached_live_npcs++;
-        entitytype_t type = gs_get_type(g, t->entities[i]);
+        entitytype_t type = g_get_type(g, t->entities[i]);
         if (type == ENTITY_NPC) t->cached_live_npcs++;
         if (type == ENTITY_PLAYER) t->cached_player_present = true;
     }

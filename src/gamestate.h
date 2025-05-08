@@ -116,6 +116,10 @@ typedef struct gamestate {
     int type_list_count;
     int type_list_capacity;
 
+    race_component* race_list;
+    int race_list_count;
+    int race_list_capacity;
+
 } gamestate;
 
 gamestate* gamestateinitptr();
@@ -146,9 +150,13 @@ bool gs_has_component(gamestate* const g, entityid id, component comp);
 bool gs_register_comp(gamestate* const g, entityid id, component comp);
 bool gs_register_comps(gamestate* const g, entityid id, ...);
 
-bool gs_add_name(gamestate* const g, entityid id, const char* name);
-const char* gs_get_name(gamestate* const g, entityid id);
+bool g_add_name(gamestate* const g, entityid id, const char* name);
+const char* g_get_name(gamestate* const g, entityid id);
 
-bool gs_add_type(gamestate* const g, entityid id, entitytype_t type);
-entitytype_t gs_get_type(const gamestate* const g, entityid id);
-bool gs_is_type(const gamestate* const g, entityid id, entitytype_t type);
+bool g_add_type(gamestate* const g, entityid id, entitytype_t type);
+entitytype_t g_get_type(const gamestate* const g, entityid id);
+bool g_is_type(const gamestate* const g, entityid id, entitytype_t type);
+
+race_t g_get_race(gamestate* const g, entityid id);
+bool g_add_race(gamestate* const g, entityid id, race_t race);
+bool g_is_race(gamestate* const g, entityid id, race_t race);

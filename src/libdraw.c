@@ -170,7 +170,6 @@ static sprite* get_weapon_front_sprite(const gamestate* g, const entity* e, spri
     spritegroup_t* weapon_sg = hashtable_entityid_spritegroup_get(spritegroups, e->weapon);
     if (!weapon_sg) {
         //merror("weapon spritegroup is NULL for id %d", e->weapon);
-
         massert(e->weapon == -1, "weapon spritegroup is NULL for id %d", e->weapon);
 
         return NULL;
@@ -241,7 +240,7 @@ static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, 
     massert(sg, "spritegroup is NULL");
     massert(e, "entity is NULL");
     //if (!sg || !e) return;
-    entitytype_t type = gs_get_type(g, e->id);
+    entitytype_t type = g_get_type(g, e->id);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) return;
 
     sprite* shadow = sg_get_current_plus_one(sg);
@@ -388,17 +387,19 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spr
     massert(e, "libdraw_set_sg_is_damaged: entity is NULL");
     massert(sg, "libdraw_set_sg_is_damaged: spritegroup is NULL");
 
-    if (e->race == RACE_HUMAN)
+    race_t race = g_get_race(g, e->id);
+
+    if (race == RACE_HUMAN)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_DMG);
-    else if (e->race == RACE_ORC)
+    else if (race == RACE_ORC)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_DMG);
-    else if (e->race == RACE_ELF)
+    else if (race == RACE_ELF)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_DMG);
-    else if (e->race == RACE_DWARF)
+    else if (race == RACE_DWARF)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_DWARF_DMG);
-    else if (e->race == RACE_HALFLING)
+    else if (race == RACE_HALFLING)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HALFLING_DMG);
-    else if (e->race == RACE_GOBLIN)
+    else if (race == RACE_GOBLIN)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_GOBLIN_DMG);
 
     e->is_damaged = false;
@@ -411,32 +412,34 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, sprite
 
     if (!e->dead) return;
 
-    if (e->race == RACE_HUMAN) {
+    race_t race = g_get_race(g, e->id);
+
+    if (race == RACE_HUMAN) {
         if (sg->current == SPRITEGROUP_ANIM_HUMAN_SPINDIE) return;
         sg_set_default_anim(sg, SPRITEGROUP_ANIM_HUMAN_SPINDIE);
         spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
-    } else if (e->race == RACE_ORC) {
+    } else if (race == RACE_ORC) {
         if (sg->current == SPRITEGROUP_ANIM_ORC_DIE) return;
         sg_set_default_anim(sg, SPRITEGROUP_ANIM_ORC_DIE);
         spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
-    } else if (e->race == RACE_ELF) {
+    } else if (race == RACE_ELF) {
         if (sg->current == SPRITEGROUP_ANIM_ELF_SPINDIE) return;
         sg_set_default_anim(sg, SPRITEGROUP_ANIM_ELF_SPINDIE);
         spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
-    } else if (e->race == RACE_DWARF) {
+    } else if (race == RACE_DWARF) {
         if (sg->current == SPRITEGROUP_ANIM_DWARF_SPINDIE) return;
         sg_set_default_anim(sg, SPRITEGROUP_ANIM_DWARF_SPINDIE);
         spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
-    } else if (e->race == RACE_HALFLING) {
+    } else if (race == RACE_HALFLING) {
         if (sg->current == SPRITEGROUP_ANIM_HALFLING_SPINDIE) return;
         sg_set_default_anim(sg, SPRITEGROUP_ANIM_HALFLING_SPINDIE);
         spritegroup_set_current(sg, sg->default_anim);
         spritegroup_set_stop_on_last_frame(sg, true);
-    } else if (e->race == RACE_GOBLIN) {
+    } else if (race == RACE_GOBLIN) {
         if (sg->current == SPRITEGROUP_ANIM_GOBLIN_SPINDIE) return;
         sg_set_default_anim(sg, SPRITEGROUP_ANIM_GOBLIN_SPINDIE);
         spritegroup_set_current(sg, sg->default_anim);
@@ -465,7 +468,7 @@ static void libdraw_set_sg_door(gamestate* const g, entity_t* const e, spritegro
     massert(sg, "spritegroup is NULL");
 
     //if (e->type == ENTITY_DOOR && e->do_update) {
-    if (gs_is_type(g, e->id, ENTITY_DOOR) && e->do_update) {
+    if (g_is_type(g, e->id, ENTITY_DOOR) && e->do_update) {
         //if (e->type == ENTITY_DOOR) {
         if (e->door_is_open) {
             //spritegroup_set_current(sg, 1);
@@ -484,22 +487,25 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, s
     massert(g, "gamestate is NULL");
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
-    if (e->race == RACE_HUMAN) {
+
+    race_t race = g_get_race(g, e->id);
+
+    if (race == RACE_HUMAN) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_ATTACK);
         //update_weapon_for_entity(g, e, sg);
-    } else if (e->race == RACE_ORC) {
+    } else if (race == RACE_ORC) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_ATTACK);
         //update_weapon_for_entity(g, e, sg);
-    } else if (e->race == RACE_ELF) {
+    } else if (race == RACE_ELF) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_ATTACK);
         //update_weapon_for_entity(g, e, sg);
-    } else if (e->race == RACE_DWARF) {
+    } else if (race == RACE_DWARF) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_DWARF_ATTACK);
         //update_weapon_for_entity(g, e, sg);
-    } else if (e->race == RACE_HALFLING) {
+    } else if (race == RACE_HALFLING) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HALFLING_ATTACK);
         //update_weapon_for_entity(g, e, sg);
-    } else if (e->race == RACE_GOBLIN) {
+    } else if (race == RACE_GOBLIN) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_GOBLIN_ATTACK);
         //update_weapon_for_entity(g, e, sg);
     }
@@ -512,7 +518,8 @@ static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, sp
     massert(g, "gamestate is NULL");
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
-    if (e->race == RACE_HUMAN) {
+    race_t race = g_get_race(g, e->id);
+    if (race == RACE_HUMAN) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD);
         if (e->shield != ENTITYID_INVALID) {
             spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
@@ -522,7 +529,7 @@ static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, sp
                 spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_FRONT);
             }
         }
-    } else if (e->race == RACE_ORC) {
+    } else if (race == RACE_ORC) {
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_GUARD);
         if (e->shield != ENTITYID_INVALID) {
             spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
@@ -541,7 +548,8 @@ static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, 
     massert(g, "gamestate is NULL");
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
-    if (e->race == RACE_HUMAN) {
+    race_t race = g_get_race(g, e->id);
+    if (race == RACE_HUMAN) {
         //sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS);
 
@@ -554,7 +562,7 @@ static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, 
                 spritegroup_setcontexts(shield_sg, player_ctx);
             }
         }
-    } else if (e->race == RACE_ORC) {
+    } else if (race == RACE_ORC) {
         //sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS);
 
@@ -602,19 +610,20 @@ static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg
         sg->move.y = e->sprite_move_y;
         e->sprite_move_x = 0;
         e->sprite_move_y = 0;
-        entitytype_t type = gs_get_type(g, e->id);
+        entitytype_t type = g_get_type(g, e->id);
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-            if (e->race == RACE_HUMAN)
+            race_t race = g_get_race(g, e->id);
+            if (race == RACE_HUMAN)
                 sg->current = SPRITEGROUP_ANIM_HUMAN_WALK;
-            else if (e->race == RACE_ORC)
+            else if (race == RACE_ORC)
                 sg->current = SPRITEGROUP_ANIM_ORC_WALK;
-            else if (e->race == RACE_ELF)
+            else if (race == RACE_ELF)
                 sg->current = SPRITEGROUP_ANIM_ELF_WALK;
-            else if (e->race == RACE_DWARF)
+            else if (race == RACE_DWARF)
                 sg->current = SPRITEGROUP_ANIM_DWARF_WALK;
-            else if (e->race == RACE_HALFLING)
+            else if (race == RACE_HALFLING)
                 sg->current = SPRITEGROUP_ANIM_HALFLING_WALK;
-            else if (e->race == RACE_GOBLIN)
+            else if (race == RACE_GOBLIN)
                 sg->current = SPRITEGROUP_ANIM_GOBLIN_WALK;
         }
     }
@@ -662,7 +671,7 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
 
     if (e->dead && !spritegroup_is_animating(sg)) return;
 
-    if (gs_is_type(g, e->id, ENTITY_DOOR)) {
+    if (g_is_type(g, e->id, ENTITY_DOOR)) {
         libdraw_set_sg_door(g, e, sg);
         e->do_update = false;
     }
@@ -1060,9 +1069,10 @@ static void create_sg_byid(gamestate* const g, entityid id) {
     int* keys = NULL;
     int num_keys = 0;
     const int offset_x = -12, offset_y = -12;
-    entitytype_t type = gs_get_type(g, id);
+    entitytype_t type = g_get_type(g, id);
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-        switch (e->race) {
+        race_t race = g_get_race(g, id);
+        switch (race) {
         case RACE_HUMAN:
             keys = TX_HUMAN_KEYS;
             num_keys = TX_HUMAN_KEY_COUNT;
@@ -1088,7 +1098,7 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             keys = TX_GOBLIN_KEYS;
             num_keys = TX_GOBLIN_KEY_COUNT;
             break;
-        default: merror("unknown race %d", e->race); return;
+        default: merror("unknown race %d", race); return;
         }
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     } else if (type == ENTITY_WEAPON) {
@@ -1142,7 +1152,7 @@ static void draw_hud(gamestate* const g) {
     snprintf(buffer,
              sizeof(buffer),
              "%s Lvl %d HP %d/%d MP %d/%d XP %d Room: %s Turn %d",
-             gs_get_name(g, g->hero_id),
+             g_get_name(g, g->hero_id),
              level,
              hp,
              maxhp,
@@ -1287,7 +1297,7 @@ static void draw_inventory_menu(gamestate* const g) {
         float item_x = left_box.x + item_list_pad;
         char item_display[128];
         bool is_equipped = false;
-        entitytype_t item_type = gs_get_type(g, item_id);
+        entitytype_t item_type = g_get_type(g, item_id);
         if (item_type == ENTITY_WEAPON) {
             is_equipped = (hero->weapon == item_id);
         } else if (item_type == ENTITY_SHIELD) {
@@ -1320,7 +1330,7 @@ static void draw_inventory_menu(gamestate* const g) {
         if (item_entity) {
             //snprintf(info_text, sizeof(info_text), "%s\nType: %d", item_entity->name, item_entity->type);
 
-            snprintf(info_text, sizeof(info_text), "%s\nType: %d", "[placeholder]", gs_get_type(g, item_id));
+            snprintf(info_text, sizeof(info_text), "%s\nType: %d", "[placeholder]", g_get_type(g, item_id));
 
             sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
         } else {

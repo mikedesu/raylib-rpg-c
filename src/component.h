@@ -3,9 +3,18 @@
 #include "entityid.h"
 #include "entitytype.h"
 #include "location.h"
+#include "race.h"
 #include <stdio.h>
 
-typedef enum component_t { COMP_NONE, COMP_ID, COMP_NAME, COMP_TYPE, COMP_COUNT } component;
+typedef enum component_t
+{
+    COMP_NONE,
+    COMP_ID,
+    COMP_NAME,
+    COMP_TYPE,
+    COMP_RACE,
+    COMP_COUNT
+} component;
 
 typedef struct name_component_t {
     entityid id;
@@ -17,8 +26,14 @@ typedef struct type_component_t {
     entitytype_t type;
 } type_component;
 
+typedef struct race_component_t {
+    entityid id;
+    race_t race;
+} race_component;
+
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
+void init_race_component(race_component* comp, entityid id, race_t race);
 
 //typedef struct hp_component_t {
 //    entityid id;

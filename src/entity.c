@@ -12,7 +12,7 @@ entity_t* e_new(entityid id, entitytype_t type) {
     massert(type < ENTITY_TYPE_COUNT, "type is greater than ENTITY_TYPE_COUNT");
     e->id = id;
     //e->type = type;
-    e->race = RACE_NONE;
+    //e->race = RACE_NONE;
     e->direction = DIR_RIGHT;
     e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
     e->x = e->y = e->sprite_move_x = e->sprite_move_y = e->inventory_count = 0;

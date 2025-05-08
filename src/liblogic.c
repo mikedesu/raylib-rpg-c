@@ -166,7 +166,7 @@ static bool player_on_tile(gamestate* g, int x, int y, int floor) {
         entityid id = tile->entities[i];
         //if (e->type == ENTITY_PLAYER) return true;
 
-        if (gs_is_type(g, id, ENTITY_PLAYER)) {
+        if (g_is_type(g, id, ENTITY_PLAYER)) {
             // check if the entity is on the same floor
             if (floor == 0) { return true; }
         }
@@ -190,7 +190,7 @@ static bool tile_has_door(const gamestate* const g, int x, int y, int fl) {
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) continue;
         //if (e->type == ENTITY_DOOR) return true;
-        if (gs_is_type(g, eid, ENTITY_DOOR)) return true;
+        if (g_is_type(g, eid, ENTITY_DOOR)) return true;
     }
     return false;
 }
@@ -210,7 +210,7 @@ static entity* const get_door_from_tile(const gamestate* const g, int x, int y, 
         if (eid == ENTITYID_INVALID) continue;
         entity* const e = em_get(g->entitymap, eid);
         if (!e) continue;
-        if (gs_is_type(g, eid, ENTITY_DOOR)) return e;
+        if (g_is_type(g, eid, ENTITY_DOOR)) return e;
     }
     return NULL;
 }
@@ -231,7 +231,7 @@ static bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl)
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) continue;
         //if (e->type == ENTITY_DOOR && !e->door_is_open) return true;
-        if (gs_is_type(g, eid, ENTITY_DOOR) && !e->door_is_open) return true;
+        if (g_is_type(g, eid, ENTITY_DOOR) && !e->door_is_open) return true;
     }
     return false;
 }
@@ -253,7 +253,7 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) continue;
         //if (e->type == ENTITY_NPC && !e->dead) count++;
-        if (gs_is_type(g, eid, ENTITY_NPC) && !e->dead) count++;
+        if (g_is_type(g, eid, ENTITY_NPC) && !e->dead) count++;
     }
     return count;
 }
@@ -272,7 +272,7 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
         return;
     }
     // i feel like this might be something we can set elsewhere...like after the player input phase?
-    if (gs_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+    if (g_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
     tile_t* const tile = df_tile_at(df, ex, ey);
     if (!tile) {
         merror("Cannot move, tile is NULL");
@@ -464,7 +464,7 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     massert(target, "target entity is NULL");
 
     //entitytype_t type = target->type;
-    entitytype_t type = gs_get_type(g, id);
+    entitytype_t type = g_get_type(g, id);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) { return false; }
 
     if (target->dead) { return false; }
@@ -514,7 +514,7 @@ static void try_entity_attack(gamestate* const g, entityid attacker_id, int targ
     e->do_update = true;
     handle_attack_helper(g, tile, e, &ok);
     //handle_attack_success_gamestate_flag(g, e->type, ok);
-    handle_attack_success_gamestate_flag(g, gs_get_type(g, e->id), ok);
+    handle_attack_success_gamestate_flag(g, g_get_type(g, e->id), ok);
 }
 
 static void try_entity_attack_random(gamestate* const g, entity* const e) {
@@ -578,7 +578,7 @@ static void try_entity_wait(gamestate* const g, entity* const e) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
     //if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    if (gs_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+    if (g_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
     e->do_update = true;
 }
 
@@ -1017,9 +1017,10 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
 
     // beginnings of a real ECS system...
     //gs_register_comps(g, id, COMP_NAME);
-    gs_register_comps(g, id, COMP_NAME, COMP_TYPE, 0);
-    gs_add_name(g, id, name);
-    gs_add_type(g, id, type);
+    gs_register_comps(g, id, COMP_NAME, COMP_TYPE, COMP_RACE, 0);
+    g_add_name(g, id, name);
+    g_add_type(g, id, type);
+    g_add_race(g, id, RACE_HUMAN);
 
     return id;
 }
@@ -1319,7 +1320,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         massert(item, "item is NULL");
 
         //if (item->type == ENTITY_WEAPON) {
-        if (gs_is_type(g, item_id, ENTITY_WEAPON)) {
+        if (g_is_type(g, item_id, ENTITY_WEAPON)) {
             // attempt to equip the weapon
             // check if the hero is already equipped with the weapon
             if (hero->weapon == item_id) {
@@ -1335,7 +1336,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             //} else if (item->type == ENTITY_SHIELD) {
-        } else if (gs_is_type(g, item_id, ENTITY_SHIELD)) {
+        } else if (g_is_type(g, item_id, ENTITY_SHIELD)) {
             // attempt to equip the shield
             // check if the hero is already equipped with the shield
             if (hero->shield == item_id) {
@@ -1351,13 +1352,13 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             //} else if (item->type == ENTITY_POTION) {
-        } else if (gs_is_type(g, item_id, ENTITY_POTION)) {
+        } else if (g_is_type(g, item_id, ENTITY_POTION)) {
             add_message(g, "Potion use is not handled yet!");
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
         } else {
             //add_message(g, "Unhandled item type: %d", item->type);
-            add_message(g, "Unhandled item type: %d", gs_get_type(g, item_id));
+            add_message(g, "Unhandled item type: %d", g_get_type(g, item_id));
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
         }
@@ -1369,14 +1370,14 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         massert(item, "item is NULL");
 
         //if (item->type == ENTITY_WEAPON) {
-        if (gs_is_type(g, item_id, ENTITY_WEAPON)) {
+        if (g_is_type(g, item_id, ENTITY_WEAPON)) {
             // unequip the weapon
             hero->weapon = ENTITYID_INVALID;
             add_message_and_history(g, "%s unequipped %s", "[placeholder]", "[placeholder]");
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (gs_is_type(g, item_id, ENTITY_SHIELD)) {
+        } else if (g_is_type(g, item_id, ENTITY_SHIELD)) {
             // equip the shield
             hero->shield = ENTITYID_INVALID;
             add_message_and_history(g, "%s unequipped %s", "[placeholder]", "[placeholder]");
@@ -1424,13 +1425,13 @@ static bool try_entity_pickup(gamestate* const g, entity* const e) {
             return false;
         }
 
-        entitytype_t type = gs_get_type(g, id);
+        entitytype_t type = g_get_type(g, id);
 
         if (type == ENTITY_WEAPON || type == ENTITY_SHIELD || type == ENTITY_POTION) {
             add_message_and_history(g, "%s picked up a %s", "[placeholder]", "[placeholder]");
             tile_remove(tile, id);
             e_add_item_to_inventory(e, id);
-            if (gs_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+            if (g_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
             return true;
         } else {
             add_message(g, "Unhandled item type cannot be picked up: %d", type);
@@ -1480,7 +1481,7 @@ static inline void try_flip_switch(gamestate* const g, entity* const e, int x, i
         // this is the basis for what we need to do next
         // currently we have no entity passed into this function
         // we need to fix that
-        entitytype_t etype = gs_get_type(g, e->id);
+        entitytype_t etype = g_get_type(g, e->id);
         if (etype == ENTITY_PLAYER) {
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         } else if (etype == ENTITY_NPC) {
@@ -1813,7 +1814,7 @@ static void handle_nth_npc(gamestate* const g, int i) {
     entity* e = em_get(g->entitymap, id);
     massert(e, "entity is NULL");
     //if (e->type == ENTITY_NPC && !e->dead) execute_action(g, e, e->default_action);
-    if (gs_is_type(g, e->id, ENTITY_NPC) && !e->dead) execute_action(g, e, e->default_action);
+    if (g_is_type(g, e->id, ENTITY_NPC) && !e->dead) execute_action(g, e, e->default_action);
 }
 
 static void handle_npcs(gamestate* const g) {
