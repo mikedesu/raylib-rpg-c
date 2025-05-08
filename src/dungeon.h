@@ -19,7 +19,12 @@ void dungeon_free(dungeon_t* dungeon);
 static inline dungeon_floor_t* dungeon_get_floor(dungeon_t* const dungeon, const int index) {
     massert(dungeon, "dungeon is NULL");
     massert(index >= 0, "index is negative");
-    if (!dungeon || index < 0 || index >= dungeon->num_floors) {
+    if (!dungeon) {
+        merror("dungeon is NULL");
+        return NULL;
+    }
+    if (index < 0 || index >= dungeon->num_floors) {
+        merror("index %d is out of bounds (num_floors: %d)", index, dungeon->num_floors);
         return NULL;
     }
     return dungeon->floors[index];
@@ -28,15 +33,23 @@ static inline dungeon_floor_t* dungeon_get_floor(dungeon_t* const dungeon, const
 static inline dungeon_floor_t* dungeon_get_current_floor(dungeon_t* const dungeon) {
     massert(dungeon, "dungeon is NULL");
     if (!dungeon) {
+        merror("dungeon is NULL");
         return NULL;
     }
-    return dungeon_get_floor(dungeon, dungeon->current_floor);
+    dungeon_floor_t* floor = dungeon_get_floor(dungeon, dungeon->current_floor);
+    if (!floor) {
+        merror("Failed to get current floor %d", dungeon->current_floor);
+    }
+    return floor;
 }
 
 static inline void dungeon_lock(dungeon_t* dungeon) {
     massert(dungeon, "dungeon is NULL");
     if (dungeon) {
         dungeon->is_locked = true;
+        minfo("Locked dungeon");
+    } else {
+        merror("Cannot lock - dungeon is NULL");
     }
 }
 
@@ -44,6 +57,9 @@ static inline void dungeon_unlock(dungeon_t* dungeon) {
     massert(dungeon, "dungeon is NULL");
     if (dungeon) {
         dungeon->is_locked = false;
+        minfo("Unlocked dungeon");
+    } else {
+        merror("Cannot unlock - dungeon is NULL");
     }
 }
 

@@ -9,11 +9,13 @@
 dungeon_t* dungeon_create() {
     dungeon_t* dungeon = malloc(sizeof(dungeon_t));
     if (!dungeon) {
+        merror("Failed to allocate memory for dungeon");
         return NULL;
     }
     
     dungeon->floors = malloc(sizeof(dungeon_floor_t*) * INITIAL_DUNGEON_CAPACITY);
     if (!dungeon->floors) {
+        merror("Failed to allocate memory for dungeon floors");
         free(dungeon);
         return NULL;
     }
@@ -22,6 +24,7 @@ dungeon_t* dungeon_create() {
     dungeon->num_floors = 0;
     dungeon->capacity_floors = INITIAL_DUNGEON_CAPACITY;
     dungeon->is_locked = false;
+    msuccess("Created new dungeon with capacity %d", INITIAL_DUNGEON_CAPACITY);
     return dungeon;
 }
 
@@ -44,7 +47,12 @@ void dungeon_destroy(dungeon_t* d) {
 void dungeon_free(dungeon_t* dungeon) { dungeon_destroy(dungeon); }
 
 bool dungeon_add_floor(dungeon_t* const dungeon, int width, int height) {
-    if (!dungeon || width <= 0 || height <= 0) {
+    if (!dungeon) {
+        merror("dungeon is NULL");
+        return false;
+    }
+    if (width <= 0 || height <= 0) {
+        merror("Invalid floor dimensions %dx%d", width, height);
         return false;
     }
     
@@ -57,17 +65,21 @@ bool dungeon_add_floor(dungeon_t* const dungeon, int width, int height) {
         int new_capacity = dungeon->capacity_floors * 2;
         dungeon_floor_t** new_floors = realloc(dungeon->floors, sizeof(dungeon_floor_t*) * new_capacity);
         if (!new_floors) {
+            merror("Failed to reallocate floors array to capacity %d", new_capacity);
             return false;
         }
         dungeon->floors = new_floors;
         dungeon->capacity_floors = new_capacity;
+        minfo("Expanded dungeon capacity to %d", new_capacity);
     }
     
     dungeon_floor_t* new_floor = df_create(width, height);
     if (!new_floor) {
+        merror("Failed to create new floor");
         return false;
     }
     
     dungeon->floors[dungeon->num_floors++] = new_floor;
+    msuccess("Added new floor %dx%d (total floors: %d)", width, height, dungeon->num_floors);
     return true;
 }
