@@ -406,7 +406,8 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spr
     else if (race == RACE_GOBLIN)
         spritegroup_set_current(sg, SPRITEGROUP_ANIM_GOBLIN_DMG);
 
-    e->is_damaged = false;
+    //e->is_damaged = false;
+    g_set_damaged(g, e->id, false);
 }
 
 static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
@@ -587,7 +588,8 @@ static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, 
         }
     }
 
-    e->block_success = false;
+    //e->block_success = false;
+    g_set_block_success(g, e->id, false);
 }
 
 static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg) {
@@ -599,13 +601,13 @@ static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, sprite
     //if (e->is_attacking) {
     if (g_get_attacking(g, e->id)) {
         libdraw_set_sg_is_attacking(g, e, sg);
-    } else if (e->block_success) {
+    } else if (g_get_block_success(g, e->id)) {
         libdraw_set_sg_block_success(g, e, sg);
     } else if (g->test_guard) {
         libdraw_set_sg_is_blocking(g, e, sg);
-    } else if (e->is_damaged) {
+        //} else if (e->is_damaged) {
+    } else if (g_get_damaged(g, e->id)) {
         libdraw_set_sg_is_damaged(g, e, sg);
-        //} else if (e->dead) {
     } else if (g_is_dead(g, e->id)) {
         libdraw_set_sg_is_dead(g, e, sg);
     }
@@ -1094,8 +1096,9 @@ static void calc_debugpanel_size(gamestate* const g) {
 
 static void create_sg_byid(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
-    entity* const e = em_get(g->entitymap, id);
-    massert(e, "entity is NULL");
+    massert(id != ENTITYID_INVALID, "entityid is invalid");
+    //entity* const e = em_get(g->entitymap, id);
+    //massert(e, "entity is NULL");
     //if (!e) return;
     int* keys = NULL;
     int num_keys = 0;
@@ -1141,28 +1144,28 @@ static void create_sg_byid(gamestate* const g, entityid id) {
         keys = TX_BUCKLER_KEYS;
         num_keys = TX_BUCKLER_KEY_COUNT;
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-    } else if (type == ENTITY_POTION) {
-        massert(e->potion_type != POTION_NONE, "potion_type is NONE");
-
-        // check the potion type
-        if (e->potion_type == POTION_HP_SMALL) {
-            keys = TX_POTION_HP_SMALL_KEYS;
-            num_keys = TX_POTION_HP_SMALL_KEY_COUNT;
-            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        } else if (e->potion_type == POTION_HP_MEDIUM) {
-            keys = TX_POTION_HP_MEDIUM_KEYS;
-            num_keys = TX_POTION_HP_MEDIUM_KEY_COUNT;
-            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        } else if (e->potion_type == POTION_HP_LARGE) {
-            keys = TX_POTION_HP_LARGE_KEYS;
-            num_keys = TX_POTION_HP_LARGE_KEY_COUNT;
-            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        }
-    } else if (type == ENTITY_DOOR) {
-        keys = TX_WOODEN_DOOR_KEYS;
-        num_keys = TX_WOODEN_DOOR_KEY_COUNT;
-        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     }
+    //else if (type == ENTITY_POTION) {
+    //    massert(e->potion_type != POTION_NONE, "potion_type is NONE");
+    //    // check the potion type
+    //    if (e->potion_type == POTION_HP_SMALL) {
+    //        keys = TX_POTION_HP_SMALL_KEYS;
+    //        num_keys = TX_POTION_HP_SMALL_KEY_COUNT;
+    //        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    //    } else if (e->potion_type == POTION_HP_MEDIUM) {
+    //        keys = TX_POTION_HP_MEDIUM_KEYS;
+    //        num_keys = TX_POTION_HP_MEDIUM_KEY_COUNT;
+    //        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    //    } else if (e->potion_type == POTION_HP_LARGE) {
+    //        keys = TX_POTION_HP_LARGE_KEYS;
+    //        num_keys = TX_POTION_HP_LARGE_KEY_COUNT;
+    //        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    //    }
+    //} else if (type == ENTITY_DOOR) {
+    //    keys = TX_WOODEN_DOOR_KEYS;
+    //    num_keys = TX_WOODEN_DOOR_KEY_COUNT;
+    //    create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    //}
 }
 
 static void draw_hud(gamestate* const g) {

@@ -73,8 +73,9 @@ static void add_message_history(gamestate* const g, const char* fmt, ...);
 static void add_message_and_history(gamestate* g, const char* fmt, ...);
 static void add_message(gamestate* g, const char* fmt, ...);
 static void try_entity_open_door(gamestate* g, entity* e, int x, int y);
-static void try_entity_move_a_star(gamestate* const g, entity* const e);
-static void try_entity_move(gamestate* const g, entity* const e, int x, int y);
+//static void try_entity_move_a_star(gamestate* const g, entity* const e);
+static void try_entity_move_a_star(gamestate* const g, entityid id);
+static void try_entity_move(gamestate* const g, entityid id, int x, int y);
 static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
 
 static const char* get_action_key(const inputstate* const is, gamestate* const g);
@@ -140,20 +141,20 @@ static void add_message(gamestate* g, const char* fmt, ...) {
     g->msg_system.is_active = true;
 }
 
-static void update_equipped_shield_dir(gamestate* g, entity* e) {
+//static void update_equipped_shield_dir(gamestate* g, entity* e) {
+static void update_equipped_shield_dir(gamestate* g, entityid id) {
     massert(g, "gamestate is NULL");
-    massert(e, "entity is NULL");
-    if (e->shield != ENTITYID_INVALID) {
-        entity* shield = em_get(g->entitymap, e->shield);
-        if (shield) {
-            //shield->direction = e->direction;
-
-            g_update_direction(g, shield->id, g_get_direction(g, e->id));
-
-            //shield->do_update = true;
-            g_set_update(g, shield->id, true);
-        }
-    }
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
+    //massert(e, "entity is NULL");
+    //if (e->shield != ENTITYID_INVALID) {
+    //    entity* shield = em_get(g->entitymap, e->shield);
+    //    if (shield) {
+    //shield->direction = e->direction;
+    //        g_update_direction(g, shield->id, g_get_direction(g, e->id));
+    //shield->do_update = true;
+    //        g_set_update(g, shield->id, true);
+    //    }
+    //}
 }
 
 static bool player_on_tile(gamestate* g, int x, int y, int floor) {
@@ -265,16 +266,18 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
     return count;
 }
 
-static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
+//static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
+static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     massert(g, "Game state is NULL!");
-    massert(e, "Entity is NULL!");
+    massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
+    //massert(e, "Entity is NULL!");
     //e->do_update = true;
-    g_set_update(g, e->id, true);
+    g_set_update(g, id, true);
 
     //e->direction = get_dir_from_xy(x, y);
-    g_update_direction(g, e->id, get_dir_from_xy(x, y));
+    g_update_direction(g, id, get_dir_from_xy(x, y));
 
-    loc_t loc = g_get_location(g, e->id);
+    loc_t loc = g_get_location(g, id);
     int ex = loc.x + x;
     int ey = loc.y + y;
 
@@ -285,7 +288,7 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
         return;
     }
     // i feel like this might be something we can set elsewhere...like after the player input phase?
-    if (g_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+    if (g_is_type(g, id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
     tile_t* const tile = df_tile_at(df, ex, ey);
     if (!tile) {
         merror("Cannot move, tile is NULL");
@@ -307,19 +310,19 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
         merror("Cannot move, player on tile");
         return;
     }
-    if (!df_remove_at(df, e->id, loc.x, loc.y)) {
+    if (!df_remove_at(df, id, loc.x, loc.y)) {
         merror("Failed to remove entity from old tile");
         return;
     }
-    if (!df_add_at(df, e->id, ex, ey)) {
+    if (!df_add_at(df, id, ex, ey)) {
         merror("Failed to add entity to new tile");
         return;
     }
-    g_update_location(g, e->id, (loc_t){ex, ey, floor});
-    g_update_sprite_move(g, e->id, (loc_t){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
+    g_update_location(g, id, (loc_t){ex, ey, floor});
+    g_update_sprite_move(g, id, (loc_t){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
 
     // at this point the move is 'successful'
-    update_equipped_shield_dir(g, e);
+    update_equipped_shield_dir(g, id);
     // get the entity's new tile
     tile_t* const new_tile = df_tile_at(df, ex, ey);
     if (!new_tile) {
@@ -339,38 +342,38 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
         msuccess("On trap activated!");
         // do something
         //e->stats.hp--;
-        e->is_damaged = true;
+        //e->is_damaged = true;
+        g_set_damaged(g, id, true);
 
         //e->do_update = true;
-        g_set_update(g, e->id, true);
+        g_set_update(g, id, true);
     }
 }
 
-static void try_entity_move_player(gamestate* const g, entity* const e) {
+//static void try_entity_move_player(gamestate* const g, entity* const e) {
+//    massert(g, "gamestate is NULL");
+//    entity* h = em_get(g->entitymap, g->hero_id);
+//    massert(h, "hero is NULL");
+//    loc_t hl = g_get_location(g, h->id);
+//    loc_t el = g_get_location(g, e->id);
+//    int dx = (hl.x > el.x) ? 1 : (hl.x < el.x) ? -1 : 0;
+//    int dy = (hl.y > el.y) ? 1 : (hl.y < el.y) ? -1 : 0;
+//    if (dx != 0 || dy != 0) try_entity_move(g, e, dx, dy);
+//}
+
+//static void try_entity_move_a_star(gamestate* const g, entity* const e) {
+static void try_entity_move_a_star(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
-    entity* h = em_get(g->entitymap, g->hero_id);
-    massert(h, "hero is NULL");
-
-    loc_t hl = g_get_location(g, h->id);
-    loc_t el = g_get_location(g, e->id);
-
-    int dx = (hl.x > el.x) ? 1 : (hl.x < el.x) ? -1 : 0;
-    int dy = (hl.y > el.y) ? 1 : (hl.y < el.y) ? -1 : 0;
-    if (dx != 0 || dy != 0) try_entity_move(g, e, dx, dy);
-}
-
-static void try_entity_move_a_star(gamestate* const g, entity* const e) {
-    massert(g, "gamestate is NULL");
-    massert(e, "entity is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
     if (e->target_path) { e_free_target_path(e); }
     // for testing, we will hardcode an update to the entity's target
     // realistically, we should actually use a target ID and do location lookups on every update
     // however, for this test, we will instead hardcode the target to point to the hero's location
     // first, grab the hero id and then the hero entity pointer
-    entity* h = em_get(g->entitymap, g->hero_id);
+    //entity* h = em_get(g->entitymap, g->hero_id);
     massert(h, "hero is NULL");
 
-    loc_t hloc = g_get_location(g, h->id);
+    loc_t hloc = g_get_location(g, g->hero_id);
     loc_t eloc = g_get_location(g, e->id);
 
     // set the target to the hero's location
@@ -450,7 +453,8 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     massert(attack_successful, "attack_successful is NULL");
     //msuccess("Successful Attack on target: %s", target->name);
     *attack_successful = true;
-    target->is_damaged = true;
+    //target->is_damaged = true;
+    g_set_damaged(g, target->id, true);
 
     //target->do_update = true;
     g_set_update(g, target->id, true);
@@ -471,8 +475,10 @@ static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* 
     massert(attack_successful, "attack_successful is NULL");
     //msuccess("Successful Block from target: %s", target->name);
     *attack_successful = false;
-    target->is_damaged = false;
-    target->block_success = true;
+    //target->is_damaged = false;
+    g_set_damaged(g, target->id, false);
+    //target->block_success = true;
+    g_set_block_success(g, target->id, true);
 
     //target->do_update = true;
     g_set_update(g, target->id, true);
@@ -634,11 +640,13 @@ static void try_entity_wait(gamestate* const g, entity* const e) {
     g_set_update(g, e->id, true);
 }
 
-static void execute_action(gamestate* const g, entity* const e, entity_action_t action) {
+//static void execute_action(gamestate* const g, entity* const e, entity_action_t action) {
+static void execute_action(gamestate* const g, entityid id, entity_action_t action) {
     massert(g, "gamestate is NULL");
-    massert(e, "entity is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
+    //massert(e, "entity is NULL");
 
-    loc_t loc = g_get_location(g, e->id);
+    loc_t loc = g_get_location(g, id);
 
     switch (action) {
     case ENTITY_ACTION_MOVE_LEFT: try_entity_move(g, e, -1, 0); break;
@@ -1003,20 +1011,22 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int fl, 
     }
     //minfo("check complete");
     //minfo("creating entity: %s", name);
-    entity* const e = e_new_npc_at(next_entityid++, rt, x, y, fl,
-                                   name); // Assuming entity_new_at takes name next
-    if (!e) {
-        merror("failed to create entity");
-        return ENTITYID_INVALID;
-    }
-    em_add(em, e);
-    gs_add_entityid(g, e->id);
-    if (!df_add_at(df, e->id, x, y)) {
+    //entity* const e = e_new_npc_at(next_entityid++, rt, x, y, fl,
+    //                               name); // Assuming entity_new_at takes name next
+    //if (!e) {
+    //    merror("failed to create entity");
+    //    return ENTITYID_INVALID;
+    //}
+    //em_add(em, e);
+    //gs_add_entityid(g, e->id);
+    gs_add_entityid(g, next_entityid);
+    //if (!df_add_at(df, e->id, x, y)) {
+    if (!df_add_at(df, next_entityid, x, y)) {
         merror("failed to add entity to dungeon floor");
-        free(e);
+        //free(e);
         return ENTITYID_INVALID;
     }
-    return e->id;
+    return next_entityid++;
 }
 
 //static entityid door_create(gamestate* const g, int x, int y, int fl, const char* name) {
@@ -1071,9 +1081,6 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     const entityid id = npc_create(g, rt, x, y, fl, name);
     massert(id != ENTITYID_INVALID, "failed to create player");
 
-    entity_t* const e = em_get(g->entitymap, id);
-    massert(e, "entity is NULL");
-
     gamestate_set_hero_id(g, id);
 
     // beginnings of a real ECS system...
@@ -1104,8 +1111,8 @@ static void init_player(gamestate* const g) {
     const int id = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
     massert(id != ENTITYID_INVALID, "failed to init hero");
     //minfo("hero id: %d", id);
-    entity* const hero = em_get(g->entitymap, g->hero_id);
-    massert(hero, "hero is NULL");
+    //entity* const hero = em_get(g->entitymap, g->hero_id);
+    //massert(hero, "hero is NULL");
     //e_set_maxhp(hero, 10);
     //e_set_hp(hero, 10);
     g->entity_turn = g->hero_id;
@@ -1593,12 +1600,12 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         merror("No action found for key");
         return;
     }
-    entity* const hero = em_get(g->entitymap, g->hero_id);
-    massert(hero, "hero is NULL");
+    //entity* const hero = em_get(g->entitymap, g->hero_id);
+    //massert(hero, "hero is NULL");
     // check if the player is dead
     //if (hero->dead) return;
     //minfo("calling g_is_dead 8");
-    if (g_is_dead(g, hero->id)) return;
+    if (g_is_dead(g, g->hero_id)) return;
     if (action) {
         if (g->player_changing_direction) {
             if (strcmp(action, "wait") == 0) {
@@ -1741,7 +1748,7 @@ static void update_debug_panel_buffer(gamestate* const g) {
                                        "GAMESTATE_FLAG_NPC_ANIM",
                                        "Unknown"};
     // Get hero position once
-    const entity* const e = em_get(g->entitymap, g->hero_id);
+    //const entity* const e = em_get(g->entitymap, g->hero_id);
     int x = -1;
     int y = -1;
     int inventory_count = -1;
@@ -1750,23 +1757,23 @@ static void update_debug_panel_buffer(gamestate* const g) {
     direction_t shield_dir = DIR_NONE;
     bool is_b = false;
     bool test_guard = g->test_guard;
-    if (e) {
-        loc_t loc = g_get_location(g, e->id);
-        x = loc.x;
-        y = loc.y;
-        inventory_count = e->inventory_count;
-        //player_dir = e->direction;
-        player_dir = g_get_direction(g, e->id);
-        shield_id = e->shield;
-        if (shield_id != -1) {
-            entity* const shield = em_get(g->entitymap, shield_id);
-            massert(shield, "shield is NULL");
-            //shield_dir = shield->direction;
-            shield_dir = g_get_direction(g, shield->id);
-        }
-        //is_b = e->is_blocking;
-        is_b = g_get_blocking(g, e->id);
-    }
+    //if (e) {
+    //    loc_t loc = g_get_location(g, e->id);
+    //    x = loc.x;
+    //    y = loc.y;
+    //    inventory_count = e->inventory_count;
+    //    //player_dir = e->direction;
+    //    player_dir = g_get_direction(g, e->id);
+    //    shield_id = e->shield;
+    //    if (shield_id != -1) {
+    //        entity* const shield = em_get(g->entitymap, shield_id);
+    //        massert(shield, "shield is NULL");
+    //        //shield_dir = shield->direction;
+    //        shield_dir = g_get_direction(g, shield->id);
+    //    }
+    //    //is_b = e->is_blocking;
+    //    is_b = g_get_blocking(g, e->id);
+    //}
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
     const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
@@ -1791,7 +1798,6 @@ static void update_debug_panel_buffer(gamestate* const g) {
              "is_blocking: %d\n"
              "test_guard: %d\n"
              "TEST 12345\n"
-             "block_success: %d\n"
              "TEST 66666\n",
              g->timebeganbuf,
              g->currenttimebuf,
@@ -1814,8 +1820,8 @@ static void update_debug_panel_buffer(gamestate* const g) {
              get_dir_as_string(shield_dir),
              get_dir_as_string(player_dir),
              is_b,
-             test_guard,
-             e->block_success);
+             test_guard);
+    //e->block_success);
 }
 
 void liblogic_init(gamestate* const g) {
@@ -1845,12 +1851,12 @@ void liblogic_init(gamestate* const g) {
 
 static void update_player_state(gamestate* const g) {
     massert(g, "Game state is NULL!");
-    entity* const e = em_get(g->entitymap, g->hero_id);
-    massert(e, "liblogic_update_player_state: hero is NULL");
+    //entity* const e = em_get(g->entitymap, g->hero_id);
+    //massert(e, "liblogic_update_player_state: hero is NULL");
     if (!g->gameover) {
         //if (e->dead) {
         //minfo("calling g_is_dead 0");
-        if (g_is_dead(g, e->id)) {
+        if (g_is_dead(g, g->hero_id)) {
             add_message_and_history(g, "You died!");
             g->gameover = true;
         }
@@ -1858,7 +1864,7 @@ static void update_player_state(gamestate* const g) {
     }
     //if (e->dead) return;
     //minfo("calling g_is_dead 1");
-    if (g_is_dead(g, e->id)) return;
+    if (g_is_dead(g, g->hero_id)) return;
 
     //if (e_get_hp(e) <= 0) {
     //    g_update_dead(g, e->id, true);
@@ -1916,18 +1922,19 @@ static void handle_npcs(gamestate* const g) {
 
 static inline void reset_player_blocking(gamestate* const g) {
     massert(g, "Game state is NULL!");
-    entity* const e = em_get(g->entitymap, g->hero_id);
-    massert(e, "hero is NULL");
+    //entity* const e = em_get(g->entitymap, g->hero_id);
+    //massert(e, "hero is NULL");
     //e->is_blocking = false;
-    g_set_blocking(g, e->id, false);
+    g_set_blocking(g, g->hero_id, false);
     g->test_guard = false;
 }
 
 static inline void reset_player_block_success(gamestate* const g) {
     massert(g, "Game state is NULL!");
-    entity* const e = em_get(g->entitymap, g->hero_id);
-    massert(e, "hero is NULL");
-    e->block_success = false;
+    //entity* const e = em_get(g->entitymap, g->hero_id);
+    //massert(e, "hero is NULL");
+    //e->block_success = false;
+    g_set_block_success(g, g->hero_id, false);
 }
 
 void liblogic_tick(const inputstate* const is, gamestate* const g) {

@@ -11,29 +11,17 @@ entity_t* e_new(entityid id, entitytype_t type) {
     massert(type >= 0, "type is less than 0");
     massert(type < ENTITY_TYPE_COUNT, "type is greater than ENTITY_TYPE_COUNT");
     e->id = id;
-    //e->type = type;
-    //e->race = RACE_NONE;
-    //e->direction = DIR_RIGHT;
     e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
-    //e->x = 0;
-    //e->y = 0;
-    //e->floor = 0;
-    //e->sprite_move_x = 0;
-    //e->sprite_move_y = 0;
     e->inventory_count = 0;
     e->weapon = -1;
     e->shield = -1;
-    //e->do_update = false;
-    //e->is_attacking = false;
-    //e->is_blocking = false;
-    e->is_damaged = false;
+    //e->is_damaged = false;
     e->door_is_open = false;
     e->potion_type = POTION_NONE;
     e->next = NULL;
     e->target_path = NULL;
     e->target_path_length = 0;
     e->target = (loc_t){-1, -1, -1};
-    //strncpy(e->name, "NONAME", ENTITY_NAME_LEN_MAX);
     return e;
 }
 
@@ -62,13 +50,11 @@ void e_free_target_path(entity_t* const e) {
 }
 
 entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int floor) {
-    massert(x >= 0, "x is less than 0");
-    massert(y >= 0, "y is less than 0");
+    //massert(x >= 0, "x is less than 0");
+    //massert(y >= 0, "y is less than 0");
     massert(floor >= 0, "floor is less than 0");
     entity_t* e = e_new(id, type);
     massert(e, "Failed to create entity");
-    //e_set_xy(e, x, y);
-    //e_set_floor(e, floor);
     return e;
 }
 
