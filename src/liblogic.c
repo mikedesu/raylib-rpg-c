@@ -1764,7 +1764,8 @@ static void update_debug_panel_buffer(gamestate* const g) {
             //shield_dir = shield->direction;
             shield_dir = g_get_direction(g, shield->id);
         }
-        is_b = e->is_blocking;
+        //is_b = e->is_blocking;
+        is_b = g_get_blocking(g, e->id);
     }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
@@ -1917,7 +1918,8 @@ static inline void reset_player_blocking(gamestate* const g) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "hero is NULL");
-    e->is_blocking = false;
+    //e->is_blocking = false;
+    g_set_blocking(g, e->id, false);
     g->test_guard = false;
 }
 

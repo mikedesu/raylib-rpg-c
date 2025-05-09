@@ -214,7 +214,8 @@ static sprite* get_shield_front_sprite(const gamestate* g, const entity* e, spri
     if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
         return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
     }
-    if (e->is_blocking) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT); }
+    //if (e->is_blocking) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT); }
+    if (g_get_blocking(g, e->id)) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT); }
     return NULL;
 }
 
@@ -231,7 +232,8 @@ static sprite* get_shield_back_sprite(const gamestate* g, const entity* e, sprit
     if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
         return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
     }
-    if (e->is_blocking) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK); }
+    //if (e->is_blocking) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK); }
+    if (g_get_blocking(g, e->id)) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_BACK); }
     return NULL;
 }
 
