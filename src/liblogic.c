@@ -17,7 +17,7 @@
 #include "location.h"
 #include "massert.h"
 #include "mprint.h"
-#include "path_node.h"
+//#include "path_node.h"
 //#include "potiontype.h"
 #include "race.h"
 #include <assert.h>
@@ -273,14 +273,11 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     //massert(e, "Entity is NULL!");
     //e->do_update = true;
     g_set_update(g, id, true);
-
     //e->direction = get_dir_from_xy(x, y);
     g_update_direction(g, id, get_dir_from_xy(x, y));
-
     loc_t loc = g_get_location(g, id);
     int ex = loc.x + x;
     int ey = loc.y + y;
-
     int floor = loc.z;
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
     if (!df) {
@@ -320,7 +317,6 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     }
     g_update_location(g, id, (loc_t){ex, ey, floor});
     g_update_sprite_move(g, id, (loc_t){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
-
     // at this point the move is 'successful'
     update_equipped_shield_dir(g, id);
     // get the entity's new tile
@@ -344,7 +340,6 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
         //e->stats.hp--;
         //e->is_damaged = true;
         g_set_damaged(g, id, true);
-
         //e->do_update = true;
         g_set_update(g, id, true);
     }
@@ -362,75 +357,71 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
 //}
 
 //static void try_entity_move_a_star(gamestate* const g, entity* const e) {
-static void try_entity_move_a_star(gamestate* const g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entity id is invalid");
-    if (e->target_path) { e_free_target_path(e); }
-    // for testing, we will hardcode an update to the entity's target
-    // realistically, we should actually use a target ID and do location lookups on every update
-    // however, for this test, we will instead hardcode the target to point to the hero's location
-    // first, grab the hero id and then the hero entity pointer
-    //entity* h = em_get(g->entitymap, g->hero_id);
-    massert(h, "hero is NULL");
+//static void try_entity_move_a_star(gamestate* const g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entity id is invalid");
+//    if (e->target_path) { e_free_target_path(e); }
+// for testing, we will hardcode an update to the entity's target
+// realistically, we should actually use a target ID and do location lookups on every update
+// however, for this test, we will instead hardcode the target to point to the hero's location
+// first, grab the hero id and then the hero entity pointer
+//entity* h = em_get(g->entitymap, g->hero_id);
+//    massert(h, "hero is NULL");
+//    loc_t hloc = g_get_location(g, g->hero_id);
+//    loc_t eloc = g_get_location(g, e->id);
+// set the target to the hero's location
+//    e->target.x = hloc.x;
+//    e->target.y = hloc.y;
+//    e->target_path = find_path(eloc, e->target, g->dungeon->floors[g->dungeon->current_floor], &e->target_path_length);
+//    if (e->target_path) {
+//        if (e->target_path_length > 0) {
+//            // instead of grabbing index 0, which is the target destination, AND
+//            // instead of grabbing index target_path_length -1, which is the entity's current location,
+//            // we want to grab the second to last index, which is the next location to move to
+//            if (e->target_path_length >= 2) {
+//                loc_t loc = e->target_path[e->target_path_length - 2];
+//                int dx = loc.x - eloc.x;
+//                int dy = loc.y - eloc.y;
+//                if (entities_adjacent(g, e->id, h->id)) {
+//                    // if the entity is adjacent to the hero, try to attack
+//                    try_entity_attack(g, e->id, loc.x, loc.y);
+//                } else {
+//                    // if the entity is not adjacent to the hero, try to move
+//                    // there might be a door in the way...
+//                    //if (tile_has_closed_door(g, loc.x, loc.y, e->floor)) {
+//                    if (tile_has_closed_door(g, loc.x, loc.y, loc.z)) {
+//                        try_entity_open_door(g, e, loc.x, loc.y);
+//                    } else {
+//                        try_entity_move(g, e, dx, dy);
+//                    }
+//                }
+//            }
+//else if (e->target_path_length == 1) {
+// we are at the destination
+//    minfo("Entity is at the destination");
+//} else {
+// find path could not return a valid path
+//    merror("find_path returned an invalid path");
+//}
+//        }
+//    }
+//}
 
-    loc_t hloc = g_get_location(g, g->hero_id);
-    loc_t eloc = g_get_location(g, e->id);
-
-    // set the target to the hero's location
-    e->target.x = hloc.x;
-    e->target.y = hloc.y;
-    e->target_path = find_path(eloc, e->target, g->dungeon->floors[g->dungeon->current_floor], &e->target_path_length);
-    if (e->target_path) {
-        if (e->target_path_length > 0) {
-            // instead of grabbing index 0, which is the target destination, AND
-            // instead of grabbing index target_path_length -1, which is the entity's current location,
-            // we want to grab the second to last index, which is the next location to move to
-            if (e->target_path_length >= 2) {
-                loc_t loc = e->target_path[e->target_path_length - 2];
-                int dx = loc.x - eloc.x;
-                int dy = loc.y - eloc.y;
-
-                if (entities_adjacent(g, e->id, h->id)) {
-                    // if the entity is adjacent to the hero, try to attack
-                    try_entity_attack(g, e->id, loc.x, loc.y);
-                } else {
-                    // if the entity is not adjacent to the hero, try to move
-                    // there might be a door in the way...
-
-                    //if (tile_has_closed_door(g, loc.x, loc.y, e->floor)) {
-                    if (tile_has_closed_door(g, loc.x, loc.y, loc.z)) {
-                        try_entity_open_door(g, e, loc.x, loc.y);
-                    } else {
-                        try_entity_move(g, e, dx, dy);
-                    }
-                }
-            }
-            //else if (e->target_path_length == 1) {
-            // we are at the destination
-            //    minfo("Entity is at the destination");
-            //} else {
-            // find path could not return a valid path
-            //    merror("find_path returned an invalid path");
-            //}
-        }
-    }
-}
-
-static void try_entity_move_random(gamestate* const g, entity* const e) {
-    massert(g, "gamestate is NULL");
-    massert(e, "entity is NULL");
-    int x = rand() % 3;
-    int y = 0;
-    x = x == 0 ? -1 : x == 1 ? 0 : 1;
-    // if x is 0, y cannot also be 0
-    if (x == 0) {
-        y = rand() % 2 == 0 ? -1 : 1;
-    } else {
-        y = rand() % 3;
-        y = y == 0 ? -1 : y == 1 ? 0 : 1;
-    }
-    try_entity_move(g, e, x, y);
-}
+//static void try_entity_move_random(gamestate* const g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(e, "entity is NULL");
+//    int x = rand() % 3;
+//    int y = 0;
+//    x = x == 0 ? -1 : x == 1 ? 0 : 1;
+//    // if x is 0, y cannot also be 0
+//    if (x == 0) {
+//        y = rand() % 2 == 0 ? -1 : 1;
+//    } else {
+//        y = rand() % 3;
+//        y = y == 0 ? -1 : y == 1 ? 0 : 1;
+//    }
+//    try_entity_move(g, id, x, y);
+//}
 
 static inline void handle_attack_success_gamestate_flag(gamestate* const g, entitytype_t type, bool success) {
     if (!success) {
@@ -619,17 +610,18 @@ static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
     return false;
 }
 
-static void try_entity_move_attack_player(gamestate* const g, entity* const e) {
-    massert(g, "gamestate is NULL");
-    entity* h = em_get(g->entitymap, g->hero_id);
-    massert(h, "hero is NULL");
-    if (entities_adjacent(g, e->id, h->id)) {
-        loc_t loc = g_get_location(g, h->id);
-        try_entity_attack(g, e->id, loc.x, loc.y);
-    } else {
-        try_entity_move_player(g, e);
-    }
-}
+//static void try_entity_move_attack_player(gamestate* const g, entity* const e) {
+//    massert(g, "gamestate is NULL");
+//    entity* h = em_get(g->entitymap, g->hero_id);
+//    massert(h, "hero is NULL");
+//    if (entities_adjacent(g, e->id, h->id)) {
+//        loc_t loc = g_get_location(g, h->id);
+//        try_entity_attack(g, e->id, loc.x, loc.y);
+//    }
+//else {
+//try_entity_move_player(g, e);
+//}
+//}
 
 static void try_entity_wait(gamestate* const g, entity* const e) {
     massert(g, "Game state is NULL!");
@@ -646,42 +638,44 @@ static void execute_action(gamestate* const g, entityid id, entity_action_t acti
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     //massert(e, "entity is NULL");
 
-    loc_t loc = g_get_location(g, id);
+    //loc_t loc = g_get_location(g, id);
 
-    switch (action) {
-    case ENTITY_ACTION_MOVE_LEFT: try_entity_move(g, e, -1, 0); break;
-    case ENTITY_ACTION_MOVE_RIGHT: try_entity_move(g, e, 1, 0); break;
-    case ENTITY_ACTION_MOVE_UP: try_entity_move(g, e, 0, -1); break;
-    case ENTITY_ACTION_MOVE_DOWN: try_entity_move(g, e, 0, 1); break;
-    case ENTITY_ACTION_MOVE_UP_LEFT: try_entity_move(g, e, -1, -1); break;
-    case ENTITY_ACTION_MOVE_UP_RIGHT: try_entity_move(g, e, 1, -1); break;
-    case ENTITY_ACTION_MOVE_DOWN_LEFT: try_entity_move(g, e, -1, 1); break;
-    case ENTITY_ACTION_MOVE_DOWN_RIGHT: try_entity_move(g, e, 1, 1); break;
-    case ENTITY_ACTION_ATTACK_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y); break;
-    case ENTITY_ACTION_ATTACK_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y); break;
-    case ENTITY_ACTION_ATTACK_UP: try_entity_attack(g, e->id, loc.x, loc.y - 1); break;
-    case ENTITY_ACTION_ATTACK_DOWN: try_entity_attack(g, e->id, loc.x, loc.y + 1); break;
-    case ENTITY_ACTION_ATTACK_UP_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y - 1); break;
-    case ENTITY_ACTION_ATTACK_UP_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y - 1); break;
-    case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
-    case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
-    case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, e); break;
-    case ENTITY_ACTION_WAIT: try_entity_wait(g, e); break;
-    case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
-    case ENTITY_ACTION_MOVE_PLAYER: try_entity_move_player(g, e); break;
-    case ENTITY_ACTION_ATTACK_PLAYER: try_entity_attack_player(g, e); break;
-    case ENTITY_ACTION_MOVE_ATTACK_PLAYER: try_entity_move_attack_player(g, e); break;
-    case ENTITY_ACTION_MOVE_A_STAR: try_entity_move_a_star(g, e); break;
-    case ENTITY_ACTION_INTERACT_DOWN_LEFT:
-    case ENTITY_ACTION_INTERACT_DOWN_RIGHT:
-    case ENTITY_ACTION_INTERACT_UP_LEFT:
-    case ENTITY_ACTION_INTERACT_UP_RIGHT:
-    case ENTITY_ACTION_INTERACT_LEFT:
-    case ENTITY_ACTION_INTERACT_RIGHT:
-    case ENTITY_ACTION_INTERACT_UP:
-    case ENTITY_ACTION_INTERACT_DOWN:
-    default: merror("Unknown entity action: %d", action); break;
-    }
+    //switch (action) {
+    //case ENTITY_ACTION_MOVE_LEFT: try_entity_move(g, e, -1, 0); break;
+    //case ENTITY_ACTION_MOVE_RIGHT: try_entity_move(g, e, 1, 0); break;
+    //case ENTITY_ACTION_MOVE_UP: try_entity_move(g, e, 0, -1); break;
+    //case ENTITY_ACTION_MOVE_DOWN: try_entity_move(g, e, 0, 1); break;
+    //case ENTITY_ACTION_MOVE_UP_LEFT: try_entity_move(g, e, -1, -1); break;
+    //case ENTITY_ACTION_MOVE_UP_RIGHT: try_entity_move(g, e, 1, -1); break;
+    //case ENTITY_ACTION_MOVE_DOWN_LEFT: try_entity_move(g, e, -1, 1); break;
+    //case ENTITY_ACTION_MOVE_DOWN_RIGHT: try_entity_move(g, e, 1, 1); break;
+    //case ENTITY_ACTION_ATTACK_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y); break;
+    //case ENTITY_ACTION_ATTACK_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y); break;
+    //case ENTITY_ACTION_ATTACK_UP: try_entity_attack(g, e->id, loc.x, loc.y - 1); break;
+    //case ENTITY_ACTION_ATTACK_DOWN: try_entity_attack(g, e->id, loc.x, loc.y + 1); break;
+    //case ENTITY_ACTION_ATTACK_UP_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y - 1); break;
+    //case ENTITY_ACTION_ATTACK_UP_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y - 1); break;
+    //case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
+    //case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
+    //case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, e); break;
+    //case ENTITY_ACTION_WAIT: try_entity_wait(g, e); break;
+    //case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
+    //case ENTITY_ACTION_MOVE_PLAYER:
+    //    try_entity_move_player(g, e);
+    //    break;
+    //case ENTITY_ACTION_ATTACK_PLAYER: try_entity_attack_player(g, e); break;
+    //case ENTITY_ACTION_MOVE_ATTACK_PLAYER: try_entity_move_attack_player(g, e); break;
+    //case ENTITY_ACTION_MOVE_A_STAR: try_entity_move_a_star(g, e); break;
+    //case ENTITY_ACTION_INTERACT_DOWN_LEFT:
+    //case ENTITY_ACTION_INTERACT_DOWN_RIGHT:
+    //case ENTITY_ACTION_INTERACT_UP_LEFT:
+    //case ENTITY_ACTION_INTERACT_UP_RIGHT:
+    //case ENTITY_ACTION_INTERACT_LEFT:
+    //case ENTITY_ACTION_INTERACT_RIGHT:
+    //case ENTITY_ACTION_INTERACT_UP:
+    //case ENTITY_ACTION_INTERACT_DOWN:
+    //default: merror("Unknown entity action: %d", action); break;
+    //}
 }
 
 //static entityid create_potion_at(gamestate* const g, potiontype_t potion_type, const char* name, loc_t loc) {
@@ -1462,16 +1456,16 @@ static inline void change_player_dir(gamestate* const g, direction_t dir) {
     //hero->do_update = true;
     g_set_update(g, hero->id, true);
 
-    update_equipped_shield_dir(g, hero);
+    update_equipped_shield_dir(g, g->hero_id);
 }
 
-static bool try_entity_pickup(gamestate* const g, entity* const e) {
+static bool try_entity_pickup(gamestate* const g, entityid id) {
     massert(g, "Game state is NULL!");
-    massert(e, "Entity is NULL!");
+    massert(id != ENTITYID_INVALID, "Entity is NULL!");
     //e->do_update = true;
-    g_set_update(g, e->id, true);
+    g_set_update(g, id, true);
     // check if the player is on a tile with an item
-    loc_t loc = g_get_location(g, e->id);
+    loc_t loc = g_get_location(g, id);
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, loc.z);
     if (!df) {
         merror("Failed to get dungeon floor");
@@ -1496,16 +1490,16 @@ static bool try_entity_pickup(gamestate* const g, entity* const e) {
 
         entitytype_t type = g_get_type(g, id);
 
-        if (type == ENTITY_WEAPON || type == ENTITY_SHIELD || type == ENTITY_POTION) {
-            add_message_and_history(g, "%s picked up a %s", "[placeholder]", "[placeholder]");
-            tile_remove(tile, id);
-            e_add_item_to_inventory(e, id);
-            if (g_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
-            return true;
-        } else {
-            add_message(g, "Unhandled item type cannot be picked up: %d", type);
-            return false;
-        }
+        //if (type == ENTITY_WEAPON || type == ENTITY_SHIELD || type == ENTITY_POTION) {
+        //    add_message_and_history(g, "%s picked up a %s", "[placeholder]", "[placeholder]");
+        //    tile_remove(tile, id);
+        //    e_add_item_to_inventory(e, id);
+        //    if (g_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
+        //    return true;
+        //} else {
+        //    add_message(g, "Unhandled item type cannot be picked up: %d", type);
+        //    return false;
+        //}
     }
     add_message(g, "No items to pick up");
     return false;
@@ -1609,7 +1603,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     if (action) {
         if (g->player_changing_direction) {
             if (strcmp(action, "wait") == 0) {
-                execute_action(g, hero, ENTITY_ACTION_WAIT);
+                execute_action(g, g->hero_id, ENTITY_ACTION_WAIT);
                 g->player_changing_direction = false;
             } else if (strcmp(action, "move_w") == 0) {
                 change_player_dir(g, DIR_LEFT);
@@ -1646,26 +1640,27 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             g->display_inventory_menu = true;
             g->controlmode = CONTROLMODE_INVENTORY;
         } else if (strcmp(action, "move_w") == 0) {
-            execute_action(g, hero, ENTITY_ACTION_MOVE_LEFT);
+            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_LEFT);
         } else if (strcmp(action, "move_e") == 0) {
-            execute_action(g, hero, ENTITY_ACTION_MOVE_RIGHT);
+            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_RIGHT);
         } else if (strcmp(action, "move_n") == 0) {
-            execute_action(g, hero, ENTITY_ACTION_MOVE_UP);
+            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP);
         } else if (strcmp(action, "move_s") == 0) {
-            execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN);
+            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN);
         } else if (strcmp(action, "move_nw") == 0) {
-            execute_action(g, hero, ENTITY_ACTION_MOVE_UP_LEFT);
+            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP_LEFT);
         } else if (strcmp(action, "move_ne") == 0) {
-            execute_action(g, hero, ENTITY_ACTION_MOVE_UP_RIGHT);
+            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP_RIGHT);
         } else if (strcmp(action, "move_sw") == 0) {
-            execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_LEFT);
+            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN_LEFT);
         } else if (strcmp(action, "move_se") == 0) {
-            execute_action(g, hero, ENTITY_ACTION_MOVE_DOWN_RIGHT);
+            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN_RIGHT);
         } else if (strcmp(action, "attack") == 0) {
             //loc_t loc = get_loc_from_dir(hero->direction);
-            loc_t loc = get_loc_from_dir(g_get_direction(g, hero->id));
-            loc_t hloc = g_get_location(g, hero->id);
-            try_entity_attack(g, hero->id, hloc.x + loc.x, hloc.y + loc.y);
+            loc_t loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
+            loc_t hloc = g_get_location(g, g->hero_id);
+            //try_entity_attack(g, hero->id, hloc.x + loc.x, hloc.y + loc.y);
+            try_entity_attack(g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
         } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
             // but eventually this will be generalized
@@ -1673,8 +1668,8 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             // or open a door, etc
             //msuccess("Space pressed!");
             //int tx = hero->x + get_x_from_dir(hero->direction);
-            direction_t dir = g_get_direction(g, hero->id);
-            loc_t hloc = g_get_location(g, hero->id);
+            direction_t dir = g_get_direction(g, g->hero_id);
+            loc_t hloc = g_get_location(g, g->hero_id);
             int tx = hloc.x + get_x_from_dir(dir);
 
             int ty = hloc.y + get_y_from_dir(dir);
@@ -1688,7 +1683,8 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             //try_flip_switch(g, hero, tx, ty, hero->floor);
         } else if (strcmp(action, "pickup") == 0) {
-            try_entity_pickup(g, hero);
+            //try_entity_pickup(g, hero);
+            try_entity_pickup(g, g->hero_id);
         } else if (strcmp(action, "toggle_camera") == 0) {
             g->controlmode = CONTROLMODE_CAMERA;
         }
@@ -1902,13 +1898,14 @@ static void handle_nth_npc(gamestate* const g, int i) {
     massert(i < g->index_entityids, "Index is out of bounds!");
     entityid id = g->entityids[i];
     if (id == g->hero_id) return; // Skip the hero
-    entity* e = em_get(g->entitymap, id);
-    massert(e, "entity is NULL");
+    //entity* e = em_get(g->entitymap, id);
+    //massert(e, "entity is NULL");
     //if (e->type == ENTITY_NPC && !e->dead) execute_action(g, e, e->default_action);
     //if (g_is_type(g, e->id, ENTITY_NPC) && !e->dead) execute_action(g, e, e->default_action);
     //
     //minfo("calling g_is_dead 3");
-    if (g_is_type(g, e->id, ENTITY_NPC) && !g_is_dead(g, e->id)) { execute_action(g, e, e->default_action); }
+    //if (g_is_type(g, id, ENTITY_NPC) && !g_is_dead(g, id)) { execute_action(g, e, e->default_action); }
+    if (g_is_type(g, id, ENTITY_NPC) && !g_is_dead(g, id)) { execute_action(g, id, ENTITY_ACTION_MOVE_RANDOM); }
 }
 
 static void handle_npcs(gamestate* const g) {
