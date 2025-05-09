@@ -168,6 +168,7 @@ const char* g_get_name(gamestate* const g, entityid id);
 bool g_add_type(gamestate* const g, entityid id, entitytype_t type);
 entitytype_t g_get_type(const gamestate* const g, entityid id);
 bool g_is_type(const gamestate* const g, entityid id, entitytype_t type);
+bool g_has_type(const gamestate* const g, entityid id);
 
 race_t g_get_race(gamestate* const g, entityid id);
 bool g_add_race(gamestate* const g, entityid id, race_t race);
@@ -178,6 +179,7 @@ direction_t g_get_direction(const gamestate* const g, entityid id);
 bool g_add_direction(gamestate* const g, entityid id, direction_t dir);
 bool g_is_direction(gamestate* const g, entityid id, direction_t dir);
 bool g_update_direction(gamestate* const g, entityid id, direction_t dir);
+bool g_has_direction(const gamestate* const g, entityid id);
 
 bool g_has_location(const gamestate* const g, entityid id);
 bool g_add_location(gamestate* const g, entityid id, loc_t loc);
