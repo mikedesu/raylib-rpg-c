@@ -605,11 +605,14 @@ static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg
     //    merror("spritegroup or entity is NULL");
     //    return;
     //}
-    if (e->sprite_move_x != 0 || e->sprite_move_y != 0) {
-        sg->move.x = e->sprite_move_x;
-        sg->move.y = e->sprite_move_y;
-        e->sprite_move_x = 0;
-        e->sprite_move_y = 0;
+
+    loc_t sprite_move = g_get_sprite_move(g, e->id);
+
+    if (sprite_move.x != 0 || sprite_move.y != 0) {
+        sg->move.x = sprite_move.x;
+        sg->move.y = sprite_move.y;
+        g_update_sprite_move(g, e->id, (loc_t){0, 0, 0});
+
         entitytype_t type = g_get_type(g, e->id);
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
             race_t race = g_get_race(g, e->id);
@@ -682,7 +685,7 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
         e->do_update = false;
     }
 
-    // Copy movement intent from e->sprite_move_x/y if present
+    // Copy movement intent from sprite_move_x/y if present
     libdraw_update_sprite_position(g, sg, e);
     libdraw_update_sprite_attack(g, e, sg);
     // Update movement as long as sg->move.x/y is non-zero

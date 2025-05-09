@@ -18,8 +18,8 @@ entity_t* e_new(entityid id, entitytype_t type) {
     //e->x = 0;
     //e->y = 0;
     //e->floor = 0;
-    e->sprite_move_x = 0;
-    e->sprite_move_y = 0;
+    //e->sprite_move_x = 0;
+    //e->sprite_move_y = 0;
     e->inventory_count = 0;
     e->weapon = -1;
     e->shield = -1;

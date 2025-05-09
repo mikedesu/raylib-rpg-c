@@ -311,12 +311,9 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
         merror("Failed to add entity to new tile");
         return;
     }
-    //e->x = ex;
-    //e->y = ey;
     g_update_location(g, e->id, (loc_t){ex, ey, floor});
+    g_update_sprite_move(g, e->id, (loc_t){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
 
-    e->sprite_move_x = x * DEFAULT_TILE_SIZE;
-    e->sprite_move_y = y * DEFAULT_TILE_SIZE;
     // at this point the move is 'successful'
     update_equipped_shield_dir(g, e);
     // get the entity's new tile

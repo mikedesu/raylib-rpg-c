@@ -30,8 +30,6 @@ typedef struct entity_t {
     entity_action_t default_action; // New field
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
-    int sprite_move_x;
-    int sprite_move_y;
     entity_stats_t stats;
     // if the entity is a potion...
     potiontype_t potion_type;
@@ -86,12 +84,6 @@ static inline int e_get_inventory_count(entity_t* const e) {
     return e ? e->inventory_count : 0;
 }
 
-//static inline void e_set_floor(entity_t* const e, int floor) {
-//    massert(e, "e is NULL");
-//    massert(floor >= 0, "floor is less than 0");
-//    if (e) { e->floor = floor; }
-//}
-
 static inline entity_t* e_new_npc_at(entityid id, race_t r, int x, int y, int floor, const char* name) {
     entity_t* e = e_new_at(id, ENTITY_NPC, x, y, floor);
     massert(e, "Failed to create entity");
@@ -129,57 +121,6 @@ static inline entity_t* e_new_potion(entityid id, potiontype_t potion_type, cons
     e->potion_type = potion_type;
     return e;
 }
-
-//static inline entity_t* e_new_potion_at(entityid id, potiontype_t potion_type, const char* name, int x, int y, int floor) {
-//    entity_t* e = e_new_potion(id, potion_type, name);
-//    massert(e, "Failed to create potion entity");
-//    e_set_xy(e, x, y);
-//    e_set_floor(e, floor);
-//    return e;
-//}
-
-//static inline entity_t* e_new_weapon_at(entityid id, int x, int y, int floor, const char* name) {
-//    entity_t* e = e_new_weapon(id, name);
-//    massert(e, "Failed to create weapon entity");
-//    e_set_xy(e, x, y);
-//    e_set_floor(e, floor);
-//    return e;
-//}
-
-//static inline entity_t* e_new_shield(entityid id, const char* name) {
-//    entity_t* e = e_new(id, ENTITY_SHIELD);
-//    massert(e, "Failed to create shield entity");
-//    //e_set_name(e, name);
-//    return e;
-//}
-
-//static inline entity_t* e_new_shield_at(entityid id, int x, int y, int floor, const char* name) {
-//    entity_t* e = e_new_shield(id, name);
-//    massert(e, "Failed to create shield entity");
-//    e_set_xy(e, x, y);
-//    e_set_floor(e, floor);
-//    return e;
-//}
-
-//static inline void e_incr_x(entity_t* const e) {
-//    massert(e, "e is NULL");
-//    e_set_x(e, e->x + 1);
-//}
-
-//static inline void e_incr_y(entity_t* const e) {
-//    massert(e, "e is NULL");
-//    e_set_y(e, e->y + 1);
-//}
-
-//static inline void e_decr_x(entity_t* const e) {
-//    massert(e, "e is NULL");
-//    e_set_x(e, e->x - 1);
-//}
-
-//static inline void e_decr_y(entity_t* const e) {
-//    massert(e, "e is NULL");
-//    e_set_y(e, e->y - 1);
-//}
 
 static inline void e_set_default_action(entity_t* const e, entity_action_t action) {
     massert(e, "e is NULL");
