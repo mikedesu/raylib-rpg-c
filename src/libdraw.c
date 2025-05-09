@@ -363,10 +363,10 @@ static void libdraw_unload_shaders() {
 }
 
 static inline bool libdraw_camera_lock_on(gamestate* const g) {
-    massert(g, "libdraw_camera_lock_on: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     if (!g->cam_lockon) { return false; }
     spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
-    massert(grp, "libdraw_camera_lock_on: spritegroup is NULL");
+    massert(grp, "spritegroup is NULL");
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
     return true;
 }
@@ -385,9 +385,9 @@ static bool libdraw_check_default_animations(const gamestate* const g) {
 }
 
 static void libdraw_set_sg_is_damaged(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
-    massert(g, "libdraw_set_sg_is_damaged: gamestate is NULL");
-    massert(e, "libdraw_set_sg_is_damaged: entity is NULL");
-    massert(sg, "libdraw_set_sg_is_damaged: spritegroup is NULL");
+    massert(g, "gamestate is NULL");
+    massert(e, "entity is NULL");
+    massert(sg, "spritegroup is NULL");
 
     race_t race = g_get_race(g, e->id);
 
@@ -845,9 +845,9 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     ClearBackground(BLACK);
     //EndShaderMode();
 
-    if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
     if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
+    if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     EndMode2D();
 }
 

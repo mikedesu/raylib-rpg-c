@@ -28,6 +28,7 @@ spritegroup_t* spritegroup_create(int capacity) {
     sg->specifier = SPECIFIER_NONE;
     //sg->move_rate = 1.0 / DEFAULT_ANIM_SPEED;
     sg->move_rate = 1.0;
+    //sg->move_rate = DEFAULT_TILE_SIZE;
     return sg;
 }
 

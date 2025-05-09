@@ -448,14 +448,14 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     *attack_successful = true;
     target->is_damaged = true;
     target->do_update = true;
-    int dmg = 1;
-    e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
+    //int dmg = 1;
+    //e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
     //if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
     //if (attacker->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
-    if (e_get_hp(target) <= 0) {
-        //target->dead = true;
-        g_update_dead(g, target->id, true);
-    }
+    //if (e_get_hp(target) <= 0) {
+    //target->dead = true;
+    g_update_dead(g, target->id, true);
+    //}
 }
 
 static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
@@ -1092,8 +1092,8 @@ static void init_player(gamestate* const g) {
     //minfo("hero id: %d", id);
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "hero is NULL");
-    e_set_maxhp(hero, 10);
-    e_set_hp(hero, 10);
+    //e_set_maxhp(hero, 10);
+    //e_set_hp(hero, 10);
     g->entity_turn = g->hero_id;
     msuccess("hero id %d", g->hero_id);
 }
@@ -1839,12 +1839,11 @@ static void update_player_state(gamestate* const g) {
     //if (e->dead) return;
     //minfo("calling g_is_dead 1");
     if (g_is_dead(g, e->id)) return;
-    if (e_get_hp(e) <= 0) {
-        //e->dead = true;
-        g_update_dead(g, e->id, true);
-        e->do_update = true;
-        return;
-    }
+
+    //if (e_get_hp(e) <= 0) {
+    //    g_update_dead(g, e->id, true);
+    //    e->do_update = true;
+    //}
 }
 
 static inline void update_npc_state(gamestate* const g, entityid id) {
