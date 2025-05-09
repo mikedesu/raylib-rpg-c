@@ -150,7 +150,8 @@ static void update_equipped_shield_dir(gamestate* g, entity* e) {
 
             g_update_direction(g, shield->id, g_get_direction(g, e->id));
 
-            shield->do_update = true;
+            //shield->do_update = true;
+            g_set_update(g, shield->id, true);
         }
     }
 }
@@ -267,7 +268,8 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
 static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
-    e->do_update = true;
+    //e->do_update = true;
+    g_set_update(g, e->id, true);
 
     //e->direction = get_dir_from_xy(x, y);
     g_update_direction(g, e->id, get_dir_from_xy(x, y));
@@ -338,7 +340,9 @@ static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
         // do something
         //e->stats.hp--;
         e->is_damaged = true;
-        e->do_update = true;
+
+        //e->do_update = true;
+        g_set_update(g, e->id, true);
     }
 }
 
@@ -447,7 +451,9 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     //msuccess("Successful Attack on target: %s", target->name);
     *attack_successful = true;
     target->is_damaged = true;
-    target->do_update = true;
+
+    //target->do_update = true;
+    g_set_update(g, target->id, true);
     //int dmg = 1;
     //e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
     //if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
@@ -467,7 +473,9 @@ static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* 
     *attack_successful = false;
     target->is_damaged = false;
     target->block_success = true;
-    target->do_update = true;
+
+    //target->do_update = true;
+    g_set_update(g, target->id, true);
     //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
 
@@ -545,7 +553,8 @@ static void try_entity_attack(gamestate* const g, entityid attacker_id, int targ
     g_update_direction(g, e->id, get_dir_from_xy(dx, dy));
 
     e->is_attacking = true;
-    e->do_update = true;
+    //e->do_update = true;
+    g_set_update(g, e->id, true);
     handle_attack_helper(g, tile, e, &ok);
     //handle_attack_success_gamestate_flag(g, e->type, ok);
     handle_attack_success_gamestate_flag(g, g_get_type(g, e->id), ok);
@@ -619,7 +628,8 @@ static void try_entity_wait(gamestate* const g, entity* const e) {
     massert(e, "Entity is NULL!");
     //if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     if (g_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
-    e->do_update = true;
+    //e->do_update = true;
+    g_set_update(g, e->id, true);
 }
 
 static void execute_action(gamestate* const g, entity* const e, entity_action_t action) {
@@ -1051,25 +1061,21 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int fl, 
 //}
 
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
-    //minfo("creating player");
     massert(g, "gamestate is NULL");
     massert(name, "name is NULL");
     // use the previously-written liblogic_npc_create function
     const entitytype_t type = ENTITY_PLAYER;
 
-    //minfo("creating player: %s", name);
     const entityid id = npc_create(g, rt, x, y, fl, name);
     massert(id != ENTITYID_INVALID, "failed to create player");
 
-    //minfo("player id: %d", id);
     entity_t* const e = em_get(g->entitymap, id);
     massert(e, "entity is NULL");
 
-    //minfo("setting hero id: %d", id);
     gamestate_set_hero_id(g, id);
 
     // beginnings of a real ECS system...
-    g_register_comps(g, id, COMP_NAME, COMP_TYPE, COMP_RACE, COMP_DIRECTION, COMP_LOCATION, COMP_SPRITE_MOVE, COMP_DEAD, 0);
+    g_register_comps(g, id, C_NAME, C_TYPE, C_RACE, C_DIRECTION, C_LOCATION, C_SPRITE_MOVE, C_DEAD, C_UPDATE, 0);
     g_add_name(g, id, name);
     g_add_type(g, id, type);
     g_add_race(g, id, RACE_HUMAN);
@@ -1077,6 +1083,7 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     g_add_location(g, id, (loc_t){x, y, fl});
     g_add_sprite_move(g, id, (loc_t){0, 0}); // default
     g_add_dead(g, id, false);
+    g_add_update(g, id, false);
 
     return id;
 }
@@ -1438,14 +1445,17 @@ static inline void change_player_dir(gamestate* const g, direction_t dir) {
     //hero->direction = dir;
     g_update_direction(g, hero->id, dir);
 
-    hero->do_update = true;
+    //hero->do_update = true;
+    g_set_update(g, hero->id, true);
+
     update_equipped_shield_dir(g, hero);
 }
 
 static bool try_entity_pickup(gamestate* const g, entity* const e) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
-    e->do_update = true;
+    //e->do_update = true;
+    g_set_update(g, e->id, true);
     // check if the player is on a tile with an item
     loc_t loc = g_get_location(g, e->id);
     dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, loc.z);
@@ -1658,7 +1668,8 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             entity* door = get_door_from_tile(g, tx, ty, hloc.z);
             if (door) {
                 door->door_is_open = !door->door_is_open;
-                door->do_update = true;
+                //door->do_update = true;
+                g_set_update(g, door->id, true);
             }
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             //try_flip_switch(g, hero, tx, ty, hero->floor);
@@ -1687,7 +1698,8 @@ static void try_entity_open_door(gamestate* g, entity* e, int x, int y) {
         entity* door = get_door_from_tile(g, x, y, loc.z);
         massert(door, "door is NULL");
         door->door_is_open = !door->door_is_open;
-        door->do_update = true;
+        //door->do_update = true;
+        g_set_update(g, door->id, true);
     }
 }
 

@@ -5,7 +5,7 @@
 ct* ct_create() {
     ct* table = malloc(sizeof(ct));
     if (!table) { return NULL; }
-    table->component_col_count = COMP_COUNT;
+    table->component_col_count = C_COUNT;
     table->component_row_count = 0;
     table->component_capacity = CT_DEFAULT_CAPACITY;
 

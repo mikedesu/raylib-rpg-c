@@ -10,16 +10,17 @@
 
 typedef enum component_t
 {
-    COMP_NONE,
-    COMP_ID,
-    COMP_NAME,
-    COMP_TYPE,
-    COMP_RACE,
-    COMP_DIRECTION,
-    COMP_LOCATION,
-    COMP_SPRITE_MOVE,
-    COMP_DEAD,
-    COMP_COUNT
+    C_NONE,
+    C_ID,
+    C_NAME,
+    C_TYPE,
+    C_RACE,
+    C_DIRECTION,
+    C_LOCATION,
+    C_SPRITE_MOVE,
+    C_DEAD,
+    C_UPDATE,
+    C_COUNT
 } component;
 
 typedef struct name_component_t {
@@ -57,6 +58,11 @@ typedef struct dead_component_t {
     bool dead;
 } dead_component;
 
+typedef struct update_component_t {
+    entityid id;
+    bool update;
+} update_component;
+
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
 void init_race_component(race_component* comp, entityid id, race_t race);
@@ -64,6 +70,7 @@ void init_direction_component(direction_component* comp, entityid id, direction_
 void init_loc_component(loc_component* comp, entityid id, loc_t loc);
 void init_sprite_move_component(sprite_move_component* comp, entityid id, loc_t loc);
 void init_dead_component(dead_component* comp, entityid id, bool dead);
+void init_update_component(update_component* comp, entityid id, bool update);
 
 //typedef struct hp_component_t {
 //    entityid id;

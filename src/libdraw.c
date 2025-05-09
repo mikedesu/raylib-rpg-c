@@ -472,17 +472,20 @@ static void libdraw_set_sg_door(gamestate* const g, entity_t* const e, spritegro
     massert(sg, "spritegroup is NULL");
 
     //if (e->type == ENTITY_DOOR && e->do_update) {
-    if (g_is_type(g, e->id, ENTITY_DOOR) && e->do_update) {
+    //if (g_is_type(g, e->id, ENTITY_DOOR) && e->do_update) {
+    if (g_is_type(g, e->id, ENTITY_DOOR) && g_get_update(g, e->id)) {
         //if (e->type == ENTITY_DOOR) {
         if (e->door_is_open) {
             //spritegroup_set_current(sg, 1);
             sg_set_default_anim(sg, 1);
             //spritegroup_set_current(sg, 1);
-            e->do_update = false;
+            //e->do_update = false;
+            g_set_update(g, e->id, false);
         } else {
             //spritegroup_set_current(sg, 0);
             sg_set_default_anim(sg, 0);
-            e->do_update = false;
+            //e->do_update = false;
+            g_set_update(g, e->id, false);
         }
     }
 }
@@ -686,13 +689,16 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
 
     if (g_is_type(g, e->id, ENTITY_DOOR)) {
         libdraw_set_sg_door(g, e, sg);
-        e->do_update = false;
+        //e->do_update = false;
+        g_set_update(g, e->id, false);
     }
 
-    if (e->do_update) {
+    //if (e->do_update) {
+    if (g_get_update(g, e->id)) {
         //libdraw_update_sprite_context_ptr(g, sg, e->direction);
         libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, e->id));
-        e->do_update = false;
+        //e->do_update = false;
+        g_set_update(g, e->id, false);
     }
 
     // Copy movement intent from sprite_move_x/y if present

@@ -35,7 +35,7 @@ TEST(create_ct_0) {
     ct* table = ct_create();
     ASSERT(table != NULL, "ct creation failed");
     ASSERT(table->component_row_count == 0, "row count should be 0");
-    ASSERT(table->component_col_count == COMP_COUNT, "col count should be COMP_COUNT");
+    ASSERT(table->component_col_count == C_COUNT, "col count should be COMP_COUNT");
     ASSERT(table->component_capacity == CT_DEFAULT_CAPACITY, "capacity should be CT_DEFAULT_CAPACITY");
     ct_destroy(table);
 }
@@ -44,20 +44,20 @@ TEST(create_ct_1) {
     ct* table = ct_create();
     ASSERT(table != NULL, "ct creation failed");
     ASSERT(table->component_row_count == 0, "row count should be 0");
-    ASSERT(table->component_col_count == COMP_COUNT, "col count should be COMP_COUNT");
+    ASSERT(table->component_col_count == C_COUNT, "col count should be COMP_COUNT");
     ASSERT(table->component_capacity == CT_DEFAULT_CAPACITY, "capacity should be CT_DEFAULT_CAPACITY");
 
     entityid id = 0;
 
     ASSERT(ct_add_entity(table, id), "add entity failed");
-    ASSERT(ct_add_component(table, id, COMP_ID), "add component id failed");
-    ASSERT(ct_add_component(table, id, COMP_NAME), "add component name failed");
+    ASSERT(ct_add_component(table, id, C_ID), "add component id failed");
+    ASSERT(ct_add_component(table, id, C_NAME), "add component name failed");
     ASSERT(ct_has_entity(table, id), "entity should exist");
 
     id++;
     ASSERT(ct_add_entity(table, id), "add entity failed");
-    ASSERT(ct_add_component(table, id, COMP_ID), "add component id failed");
-    ASSERT(ct_add_component(table, id, COMP_NAME), "add component name failed");
+    ASSERT(ct_add_component(table, id, C_ID), "add component id failed");
+    ASSERT(ct_add_component(table, id, C_NAME), "add component name failed");
     ASSERT(ct_has_entity(table, id), "entity should exist");
 
     ct_destroy(table);

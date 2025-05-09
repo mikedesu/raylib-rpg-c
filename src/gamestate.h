@@ -21,7 +21,7 @@
 #define MAX_MESSAGES 64
 #define MAX_MSG_LENGTH 256
 
-#define NAME_LIST_INIT_CAPACITY 16
+#define LIST_INIT_CAPACITY 16
 
 #define DEFAULT_MAX_HISTORY_SIZE 1024
 
@@ -39,37 +39,19 @@ typedef struct {
 } message_history;
 
 typedef struct gamestate {
-    int framecount;
-    int fadealpha;
-    int camera_mode;
-    int targetwidth;
-    int targetheight;
-    int windowwidth;
-    int windowheight;
-    int lock;
-    int turn_count;
+    int framecount, fadealpha, camera_mode, targetwidth, targetheight, windowwidth, windowheight, lock, turn_count;
+
     controlmode_t controlmode;
     entityid hero_id;
-    time_t timebegan;
-    time_t currenttime;
+    time_t timebegan, currenttime;
 
     struct tm* timebegantm;
     struct tm* currenttimetm;
 
-    char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF];
-    char currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
+    char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF], currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
 
-    bool debugpanelon;
-    bool gridon;
-    bool cam_lockon;
-    bool player_input_received;
-    bool is_locked;
-    bool processing_actions;
-    bool is3d;
-    bool gameover;
-    bool player_changing_direction;
-    bool test_guard;
-    bool display_inventory_menu;
+    bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard,
+        display_inventory_menu;
 
     int inventory_menu_selection;
 
@@ -81,8 +63,7 @@ typedef struct gamestate {
     fadestate_t fadestate;
 
     Font font;
-    int font_size;
-    int pad;
+    int font_size, pad;
     float line_spacing;
 
     dungeon_t* dungeon;
@@ -90,8 +71,7 @@ typedef struct gamestate {
     em_t* entitymap;
 
     entityid* entityids;
-    int index_entityids;
-    int max_entityids;
+    int index_entityids, max_entityids;
 
     double last_frame_time;
     char frame_time_str[32];
@@ -101,7 +81,6 @@ typedef struct gamestate {
     entityid entity_turn;
 
     message_system msg_system;
-
     message_history msg_history;
 
     keybinding_list_t keybinding_list;
@@ -109,32 +88,17 @@ typedef struct gamestate {
     ct* components;
 
     name_component* name_list;
-    int name_list_count;
-    int name_list_capacity;
-
     type_component* type_list;
-    int type_list_count;
-    int type_list_capacity;
-
     race_component* race_list;
-    int race_list_count;
-    int race_list_capacity;
-
     direction_component* direction_list;
-    int direction_list_count;
-    int direction_list_capacity;
-
     loc_component* loc_list;
-    int loc_list_count;
-    int loc_list_capacity;
-
     sprite_move_component* sprite_move_list;
-    int sprite_move_list_count;
-    int sprite_move_list_capacity;
-
     dead_component* dead_list;
-    int dead_list_count;
-    int dead_list_capacity;
+    update_component* update_list;
+
+    int name_list_count, name_list_capacity, type_list_count, type_list_capacity, race_list_count, race_list_capacity, direction_list_count,
+        direction_list_capacity, loc_list_count, loc_list_capacity, sprite_move_list_count, sprite_move_list_capacity, dead_list_count, dead_list_capacity,
+        update_list_count, update_list_capacity;
 
 } gamestate;
 
@@ -200,3 +164,8 @@ bool g_has_dead(const gamestate* const g, entityid id);
 bool g_add_dead(gamestate* const g, entityid id, bool dead);
 bool g_update_dead(gamestate* const g, entityid id, bool dead);
 bool g_is_dead(const gamestate* const g, entityid id);
+
+bool g_has_update(const gamestate* const g, entityid id);
+bool g_add_update(gamestate* const g, entityid id, bool update);
+bool g_get_update(gamestate* const g, entityid id);
+bool g_set_update(gamestate* const g, entityid id, bool update);

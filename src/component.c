@@ -76,3 +76,12 @@ void init_dead_component(dead_component* comp, entityid id, bool dead) {
     comp->id = id;
     comp->dead = dead;
 }
+
+void init_update_component(update_component* comp, entityid id, bool update) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->update = update;
+}

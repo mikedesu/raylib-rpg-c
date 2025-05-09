@@ -84,15 +84,28 @@ gamestate* gamestateinitptr() {
 
     g->components = ct_create();
 
-    g->name_list_capacity = NAME_LIST_INIT_CAPACITY;
-    g->name_list_count = 0;
+    g->name_list_count = g->type_list_count = g->race_list_count = g->direction_list_count = g->loc_list_count = g->sprite_move_list_count =
+        g->dead_list_count = g->update_list_count = 0;
+
+    g->name_list_capacity = g->type_list_capacity = g->race_list_capacity = g->direction_list_capacity = g->loc_list_capacity = g->sprite_move_list_capacity =
+        g->dead_list_capacity = g->update_list_capacity = LIST_INIT_CAPACITY;
+
     g->name_list = (name_component*)malloc(sizeof(name_component) * g->name_list_capacity);
     massert(g->name_list, "g->name_list is NULL");
-    if (g->name_list == NULL) {
-        merror("g->name_list is NULL");
-        free(g);
-        return NULL;
-    }
+    g->type_list = (type_component*)malloc(sizeof(type_component) * g->type_list_capacity);
+    massert(g->type_list, "g->type_list is NULL");
+    g->race_list = (race_component*)malloc(sizeof(race_component) * g->race_list_capacity);
+    massert(g->race_list, "g->race_list is NULL");
+    g->direction_list = (direction_component*)malloc(sizeof(direction_component) * g->direction_list_capacity);
+    massert(g->direction_list, "g->direction_list is NULL");
+    g->loc_list = (loc_component*)malloc(sizeof(loc_component) * g->loc_list_capacity);
+    massert(g->loc_list, "g->loc_list is NULL");
+    g->sprite_move_list = (sprite_move_component*)malloc(sizeof(sprite_move_component) * g->sprite_move_list_capacity);
+    massert(g->sprite_move_list, "g->sprite_move_list is NULL");
+    g->dead_list = (dead_component*)malloc(sizeof(dead_component) * g->dead_list_capacity);
+    massert(g->dead_list, "g->dead_list is NULL");
+    g->update_list = (update_component*)malloc(sizeof(update_component) * g->update_list_capacity);
+    massert(g->update_list, "g->update_list is NULL");
 
     gamestate_init_msg_history(g);
     return g;
@@ -136,21 +149,20 @@ bool gamestate_free_msg_history(gamestate* const g) {
 
 void gamestatefree(gamestate* g) {
     massert(g, "g is NULL");
-    //minfo("Freeing gamestate");
-    //minfo("Freeing em");
-    //em_free(g->entitymap);
-    //minfo("Freeing entityids");
     free(g->entityids);
     //minfo("Freeing dungeon");
     //dungeon_destroy(g->dungeon);
     // free message history
     gamestate_free_msg_history(g);
-
     ct_destroy(g->components);
     free(g->name_list);
     free(g->type_list);
-
-    //minfo("Freeing g...");
+    free(g->race_list);
+    free(g->direction_list);
+    free(g->loc_list);
+    free(g->sprite_move_list);
+    free(g->dead_list);
+    free(g->update_list);
     free(g);
     msuccess("Freed gamestate");
 }
@@ -292,7 +304,7 @@ void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
 bool g_register_comp(gamestate* const g, entityid id, component comp) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    massert(comp != COMP_COUNT, "comp is invalid");
+    massert(comp != C_COUNT, "comp is invalid");
     if (g->components == NULL) {
         merror("g->components is NULL");
         return false;
@@ -326,7 +338,7 @@ bool g_register_comps(gamestate* const g, entityid id, ...) {
     va_list args;
     va_start(args, id);
     component comp;
-    //while ((comp = va_arg(args, component)) != COMP_COUNT) {
+    //while ((comp = va_arg(args, component)) != C_COUNT) {
     while ((comp = va_arg(args, component)) != 0) {
         if (!ct_add_component(g->components, id, comp)) {
             merror("ct_add_component failed: %d %d", id, comp);
@@ -341,7 +353,7 @@ bool g_register_comps(gamestate* const g, entityid id, ...) {
 bool g_add_name(gamestate* const g, entityid id, const char* name) {
     massert(g, "g is NULL");
     massert(name, "name is NULL");
-    massert(g_has_component(g, id, COMP_NAME), "id %d does not have a name component", id);
+    massert(g_has_component(g, id, C_NAME), "id %d does not have a name component", id);
     if (g->name_list_count >= g->name_list_capacity) {
         g->name_list_capacity *= 2;
         g->name_list = realloc(g->name_list, sizeof(name_component) * g->name_list_capacity);
@@ -358,7 +370,7 @@ bool g_add_name(gamestate* const g, entityid id, const char* name) {
 bool g_has_component(const gamestate* const g, entityid id, component comp) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    massert(comp != COMP_COUNT, "comp is invalid");
+    massert(comp != C_COUNT, "comp is invalid");
     if (g->components == NULL) {
         merror("g->components is NULL");
         return false;
@@ -370,8 +382,8 @@ bool g_has_component(const gamestate* const g, entityid id, component comp) {
 const char* g_get_name(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    massert(g_has_component(g, id, COMP_NAME), "id %d does not have a type component", id);
-    //if (!g_has_component(g, id, COMP_NAME)) {
+    massert(g_has_component(g, id, C_NAME), "id %d does not have a type component", id);
+    //if (!g_has_component(g, id, C_NAME)) {
     //    merror("id %d does not have a name component", id);
     //    return NULL;
     //}
@@ -384,7 +396,7 @@ const char* g_get_name(gamestate* const g, entityid id) {
 bool g_add_type(gamestate* const g, entityid id, entitytype_t type) {
     massert(g, "g is NULL");
     massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
-    massert(g_has_component(g, id, COMP_TYPE), "id %d does not have a type component", id);
+    massert(g_has_component(g, id, C_TYPE), "id %d does not have a type component", id);
     if (g->type_list_count >= g->type_list_capacity) {
         g->type_list_capacity *= 2;
         g->type_list = realloc(g->type_list, sizeof(type_component) * g->type_list_capacity);
@@ -412,7 +424,7 @@ entitytype_t g_get_type(const gamestate* const g, entityid id) {
 bool g_has_type(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_component(g, id, COMP_TYPE);
+    return g_has_component(g, id, C_TYPE);
 }
 
 bool g_is_type(const gamestate* const g, entityid id, entitytype_t type) {
@@ -431,8 +443,8 @@ bool g_add_race(gamestate* const g, entityid id, race_t race) {
     massert(g, "g is NULL");
     //massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
     // make sure the entity has the component
-    massert(g_has_component(g, id, COMP_RACE), "id %d does not have a race component", id);
-    if (g_has_component(g, id, COMP_RACE)) {
+    massert(g_has_component(g, id, C_RACE), "id %d does not have a race component", id);
+    if (g_has_component(g, id, C_RACE)) {
         if (g->race_list_count >= g->race_list_capacity) {
             g->race_list_capacity *= 2;
             g->race_list = realloc(g->race_list, sizeof(race_component) * g->race_list_capacity);
@@ -468,13 +480,13 @@ bool g_is_race(gamestate* const g, entityid id, race_t race) {
 bool g_has_race(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_component(g, id, COMP_RACE);
+    return g_has_component(g, id, C_RACE);
 }
 
 direction_t g_get_direction(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g_has_component(g, id, COMP_DIRECTION)) {
+    if (!g_has_component(g, id, C_DIRECTION)) {
         merror("id %d does not have a direction component", id);
         return DIR_NONE;
     }
@@ -487,14 +499,14 @@ direction_t g_get_direction(const gamestate* const g, entityid id) {
 bool g_has_direction(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_component(g, id, COMP_DIRECTION);
+    return g_has_component(g, id, C_DIRECTION);
 }
 
 bool g_add_direction(gamestate* const g, entityid id, direction_t dir) {
     massert(g, "g is NULL");
     massert(dir >= 0 && dir < DIR_COUNT, "dir is invalid");
     // make sure the entity has the component
-    massert(g_has_component(g, id, COMP_DIRECTION), "id %d does not have a direction component", id);
+    massert(g_has_component(g, id, C_DIRECTION), "id %d does not have a direction component", id);
     if (g->direction_list_count >= g->direction_list_capacity) {
         g->direction_list_capacity *= 2;
         g->direction_list = realloc(g->direction_list, sizeof(direction_component) * g->direction_list_capacity);
@@ -533,14 +545,14 @@ bool g_update_direction(gamestate* const g, entityid id, direction_t dir) {
 bool g_has_location(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_component(g, id, COMP_LOCATION);
+    return g_has_component(g, id, C_LOCATION);
 }
 
 bool g_add_location(gamestate* const g, entityid id, loc_t loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the location component
-    massert(g_has_component(g, id, COMP_LOCATION), "id %d does not have a location component", id);
+    massert(g_has_component(g, id, C_LOCATION), "id %d does not have a location component", id);
     if (g->loc_list_count >= g->loc_list_capacity) {
         g->loc_list_capacity *= 2;
         g->loc_list = realloc(g->loc_list, sizeof(loc_component) * g->loc_list_capacity);
@@ -598,14 +610,14 @@ bool g_is_location(const gamestate* const g, entityid id, loc_t loc) {
 bool g_has_sprite_move(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_component(g, id, COMP_SPRITE_MOVE);
+    return g_has_component(g, id, C_SPRITE_MOVE);
 }
 
 bool g_add_sprite_move(gamestate* const g, entityid id, loc_t loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the sprite move component
-    massert(g_has_component(g, id, COMP_SPRITE_MOVE), "id %d does not have a sprite move component", id);
+    massert(g_has_component(g, id, C_SPRITE_MOVE), "id %d does not have a sprite move component", id);
     if (g->sprite_move_list_count >= g->sprite_move_list_capacity) {
         g->sprite_move_list_capacity *= 2;
         g->sprite_move_list = realloc(g->sprite_move_list, sizeof(sprite_move_component) * g->sprite_move_list_capacity);
@@ -622,8 +634,7 @@ bool g_add_sprite_move(gamestate* const g, entityid id, loc_t loc) {
 bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    massert(g_has_component(g, id, COMP_SPRITE_MOVE), "id %d does not have a sprite move component", id);
-    //if (g_has_component(g, id, COMP_SPRITE_MOVE)) {
+    massert(g_has_component(g, id, C_SPRITE_MOVE), "id %d does not have a sprite move component", id);
     if (g_has_sprite_move(g, id)) {
         if (g->sprite_move_list == NULL) {
             merror("g->sprite_move_list is NULL");
@@ -655,14 +666,14 @@ loc_t g_get_sprite_move(const gamestate* const g, entityid id) {
 bool g_has_dead(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_component(g, id, COMP_DEAD);
+    return g_has_component(g, id, C_DEAD);
 }
 
 bool g_add_dead(gamestate* const g, entityid id, bool dead) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the dead component
-    massert(g_has_component(g, id, COMP_DEAD), "id %d does not have a dead component", id);
+    massert(g_has_component(g, id, C_DEAD), "id %d does not have a dead component", id);
     if (g->dead_list_count >= g->dead_list_capacity) {
         g->dead_list_capacity *= 2;
         g->dead_list = realloc(g->dead_list, sizeof(dead_component) * g->dead_list_capacity);
@@ -679,7 +690,7 @@ bool g_add_dead(gamestate* const g, entityid id, bool dead) {
 bool g_update_dead(gamestate* const g, entityid id, bool dead) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    massert(g_has_component(g, id, COMP_DEAD), "id %d does not have a dead component", id);
+    massert(g_has_component(g, id, C_DEAD), "id %d does not have a dead component", id);
     if (g->dead_list == NULL) {
         merror("g->dead_list is NULL");
         return false;
@@ -703,6 +714,60 @@ bool g_is_dead(const gamestate* const g, entityid id) {
         }
         for (int i = 0; i < g->dead_list_count; i++) {
             if (g->dead_list[i].id == id) { return g->dead_list[i].dead; }
+        }
+    }
+    return false;
+}
+
+bool g_has_update(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_UPDATE);
+}
+
+bool g_add_update(gamestate* const g, entityid id, bool update) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the update component
+    massert(g_has_component(g, id, C_UPDATE), "id %d does not have an update component", id);
+    if (g->update_list_count >= g->update_list_capacity) {
+        g->update_list_capacity *= 2;
+        g->update_list = realloc(g->update_list, sizeof(update_component) * g->update_list_capacity);
+        if (g->update_list == NULL) {
+            merror("g->update_list is NULL");
+            return false;
+        }
+    }
+    init_update_component(&g->update_list[g->update_list_count], id, update);
+    g->update_list_count++;
+    return true;
+}
+
+bool g_get_update(gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->update_list == NULL) {
+        merror("g->update_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->update_list_count; i++) {
+        if (g->update_list[i].id == id) { return g->update_list[i].update; }
+    }
+    merror("id %d not found in update_list", id);
+    return false;
+}
+
+bool g_set_update(gamestate* const g, entityid id, bool update) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->update_list == NULL) {
+        merror("g->update_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->update_list_count; i++) {
+        if (g->update_list[i].id == id) {
+            g->update_list[i].update = update;
+            return true;
         }
     }
     return false;

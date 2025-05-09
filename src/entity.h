@@ -30,16 +30,16 @@ typedef struct entity_t {
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
     //entity_stats_t stats;
-    // if the entity is a potion...
-
     entity_action_t default_action; // New field
+    // if the entity is a potion...
     potiontype_t potion_type;
-    bool do_update;
+
     bool is_attacking;
     bool is_blocking;
     bool block_success;
     bool is_damaged;
     bool door_is_open;
+
     entityid weapon;
     entityid shield;
 
@@ -59,22 +59,6 @@ void e_free_target_path(entity_t* const e);
 
 bool e_add_item_to_inventory(entity_t* const e, entityid item_id);
 bool e_remove_item_from_inventory(entity_t* const e, entityid item_id);
-
-//static inline void e_set_hp(entity_t* const e, int hp) {
-//    massert(e, "e is NULL");
-//if (e) { e->stats.hp = hp < 0 ? 0 : hp > e->stats.maxhp ? e->stats.maxhp : hp; }
-//}
-
-//static inline void e_set_maxhp(entity_t* const e, int maxhp) {
-//    massert(e, "e is NULL");
-//    massert(maxhp > 0, "maxhp is less than 1");
-//if (e) { e->stats.maxhp = maxhp; }
-//}
-
-static inline void e_set_do_update(entity_t* const e, bool do_update) {
-    massert(e, "e is NULL");
-    if (e) { e->do_update = do_update; }
-}
 
 static inline int e_get_inventory_count(entity_t* const e) {
     massert(e, "e is NULL");
@@ -114,7 +98,6 @@ static inline entity_t* e_new_potion(entityid id, potiontype_t potion_type, cons
     massert(strlen(name) < ENTITY_NAME_LEN_MAX, "name is too long");
     entity_t* e = e_new(id, ENTITY_POTION);
     massert(e, "Failed to create potion entity");
-    //e_set_name(e, name);
     e->potion_type = potion_type;
     return e;
 }
@@ -130,32 +113,6 @@ static inline entity_action_t e_get_default_action(entity_t* const e) {
     massert(e, "e is NULL");
     return e->default_action;
 }
-
-//static inline int e_get_hp(entity_t* const e) {
-//    massert(e, "e is NULL");
-//    return 0;
-//}
-
-//static inline int e_get_maxhp(entity_t* const e) {
-//    massert(e, "e is NULL");
-//    return 0;
-//}
-
-//static inline void e_set_hpmaxhp(entity_t* const e, int hp, int maxhp) {
-//    massert(e, "e is NULL");
-//e_set_hp(e, hp);
-//e_set_maxhp(e, maxhp);
-//}
-
-//static inline void e_incr_hp(entity_t* const e, int hp) {
-//    massert(e, "e is NULL");
-//e_set_hp(e, e->stats.hp + hp);
-//}
-
-//static inline void e_decr_hp(entity_t* const e, int hp) {
-//    massert(e, "e is NULL");
-//e_set_hp(e, e->stats.hp - hp);
-//}
 
 static inline void e_equip_weapon(entity* e, entityid weapon_id) {
     massert(e, "entity is NULL");
