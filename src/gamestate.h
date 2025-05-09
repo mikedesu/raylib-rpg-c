@@ -158,9 +158,9 @@ void gamestate_set_debug_panel_pos_top_right(gamestate* const g);
 void gamestate_incr_entity_turn(gamestate* const g);
 void gamestate_load_keybindings(gamestate* const g);
 
-bool gs_has_component(const gamestate* const g, entityid id, component comp);
-bool gs_register_comp(gamestate* const g, entityid id, component comp);
-bool gs_register_comps(gamestate* const g, entityid id, ...);
+bool g_has_component(const gamestate* const g, entityid id, component comp);
+bool g_register_comp(gamestate* const g, entityid id, component comp);
+bool g_register_comps(gamestate* const g, entityid id, ...);
 
 bool g_add_name(gamestate* const g, entityid id, const char* name);
 const char* g_get_name(gamestate* const g, entityid id);

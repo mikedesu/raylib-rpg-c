@@ -1055,7 +1055,7 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     gamestate_set_hero_id(g, id);
 
     // beginnings of a real ECS system...
-    gs_register_comps(g, id, COMP_NAME, COMP_TYPE, COMP_RACE, COMP_DIRECTION, COMP_LOCATION, 0);
+    g_register_comps(g, id, COMP_NAME, COMP_TYPE, COMP_RACE, COMP_DIRECTION, COMP_LOCATION, 0);
     g_add_name(g, id, name);
     g_add_type(g, id, type);
     g_add_race(g, id, RACE_HUMAN);
