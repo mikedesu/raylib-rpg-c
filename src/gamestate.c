@@ -620,39 +620,30 @@ bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(g_has_component(g, id, COMP_SPRITE_MOVE), "id %d does not have a sprite move component", id);
-    if (g->sprite_move_list == NULL) {
-        merror("g->sprite_move_list is NULL");
-        return false;
-    }
-    for (int i = 0; i < g->sprite_move_list_count; i++) {
-        if (g->sprite_move_list[i].id == id) {
-            g->sprite_move_list[i].loc = loc;
-            return true;
+    //if (g_has_component(g, id, COMP_SPRITE_MOVE)) {
+    if (g_has_sprite_move(g, id)) {
+        if (g->sprite_move_list == NULL) {
+            merror("g->sprite_move_list is NULL");
+            return false;
+        }
+        for (int i = 0; i < g->sprite_move_list_count; i++) {
+            if (g->sprite_move_list[i].id == id) {
+                g->sprite_move_list[i].loc = loc;
+                return true;
+            }
         }
     }
     return false;
 }
 
-//bool g_is_sprite_move(gamestate* const g, entityid id, loc_t loc) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->sprite_move_list == NULL) {
-//        merror("g->sprite_move_list is NULL");
-//        return false;
-//    }
-//    loc_t loc2 = g_get_sprite_move(g, id);
-//    return (loc.x == loc2.x && loc.y == loc2.y);
-//}
-
 loc_t g_get_sprite_move(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->sprite_move_list == NULL) {
-        merror("g->sprite_move_list is NULL");
-        return (loc_t){-1, -1};
-    }
-    for (int i = 0; i < g->sprite_move_list_count; i++) {
-        if (g->sprite_move_list[i].id == id) { return g->sprite_move_list[i].loc; }
+    massert(g_has_sprite_move(g, id), "id %d does not have a sprite move component", id);
+    if (g_has_sprite_move(g, id)) {
+        for (int i = 0; i < g->sprite_move_list_count; i++) {
+            if (g->sprite_move_list[i].id == id) { return g->sprite_move_list[i].loc; }
+        }
     }
     merror("id %d not found in sprite_move_list", id);
     return (loc_t){-1, -1};

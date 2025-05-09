@@ -190,5 +190,4 @@ bool g_is_location(const gamestate* const g, entityid id, loc_t loc);
 bool g_has_sprite_move(const gamestate* const g, entityid id);
 bool g_add_sprite_move(gamestate* const g, entityid id, loc_t loc);
 bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc);
-//bool g_is_sprite_move(gamestate* const g, entityid id, loc_t loc);
 loc_t g_get_sprite_move(const gamestate* const g, entityid id);
