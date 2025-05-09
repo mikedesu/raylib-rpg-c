@@ -27,11 +27,12 @@ typedef struct {
 
 typedef struct entity_t {
     entityid id;
-    entity_action_t default_action; // New field
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
     entity_stats_t stats;
     // if the entity is a potion...
+
+    entity_action_t default_action; // New field
     potiontype_t potion_type;
     bool do_update;
     bool is_attacking;
@@ -42,11 +43,13 @@ typedef struct entity_t {
     bool door_is_open;
     entityid weapon;
     entityid shield;
-    entity_t* next;
+
     // pathfinding
     loc_t target;
     int target_path_length;
     loc_t* target_path;
+
+    entity_t* next;
 } entity;
 
 entity_t* e_new(entityid id, entitytype_t type);
