@@ -115,14 +115,15 @@ void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em) {
     massert(g, "gamestate is NULL");
     massert(t, "tile is NULL");
     massert(em, "em is NULL");
+
+    //minfo("recompute_entity_cache: dirty_entities: %d", t->dirty_entities);
     if (!t->dirty_entities) return;
     t->cached_live_npcs = 0;
     t->cached_player_present = false;
     for (size_t i = 0; i < t->entity_max; i++) {
-        entity* e = em_get(em, t->entities[i]);
-        if (!e || e->dead) continue;
-        //if (e->type == ENTITY_NPC) t->cached_live_npcs++;
-        entitytype_t type = g_get_type(g, t->entities[i]);
+        entityid id = t->entities[i];
+        if (g_is_dead(g, id)) continue;
+        entitytype_t type = g_get_type(g, id);
         if (type == ENTITY_NPC) t->cached_live_npcs++;
         if (type == ENTITY_PLAYER) t->cached_player_present = true;
     }

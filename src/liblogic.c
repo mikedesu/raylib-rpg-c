@@ -257,7 +257,9 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
         const entity* const e = em_get(g->entitymap, eid);
         if (!e) continue;
         //if (e->type == ENTITY_NPC && !e->dead) count++;
-        if (g_is_type(g, eid, ENTITY_NPC) && !e->dead) count++;
+        //if (g_is_type(g, eid, ENTITY_NPC) && !e->dead) count++;
+        //minfo("calling g_is_dead 4");
+        if (g_is_type(g, eid, ENTITY_NPC) && !g_is_dead(g, eid)) count++;
     }
     return count;
 }
@@ -450,7 +452,10 @@ static void handle_attack_success(gamestate* const g, entity* attacker, entity* 
     e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
     //if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
     //if (attacker->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
-    if (e_get_hp(target) <= 0) target->dead = true;
+    if (e_get_hp(target) <= 0) {
+        //target->dead = true;
+        g_update_dead(g, target->id, true);
+    }
 }
 
 static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
@@ -484,7 +489,9 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     entitytype_t type = g_get_type(g, id);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) { return false; }
 
-    if (target->dead) { return false; }
+    //if (target->dead) { return false; }
+    //minfo("calling g_is_dead 5");
+    if (g_is_dead(g, target->id)) { return false; }
 
     // lets try an experiment...
     if (target->shield != ENTITYID_INVALID) {
@@ -512,9 +519,10 @@ static void handle_attack_helper(gamestate* const g, tile_t* tile, entity* attac
 
 static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y) {
     massert(g, "gamestate is NULL");
+    //minfo("calling g_is_dead 6");
+    massert(!g_is_dead(g, attacker_id), "attacker entity is dead");
     entity* e = em_get(g->entitymap, attacker_id);
     massert(e, "attacker entity is NULL");
-    massert(!e->dead, "attacker entity is dead");
 
     loc_t loc = g_get_location(g, e->id);
     //dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, e->floor);
@@ -975,10 +983,14 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int fl, 
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
+    //minfo("tile type: %d", tile->type);
+    //minfo("checking for live npcs...");
     if (tile_has_live_npcs(g, tile, em)) {
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
+    //minfo("check complete");
+    //minfo("creating entity: %s", name);
     entity* const e = e_new_npc_at(next_entityid++, rt, x, y, fl,
                                    name); // Assuming entity_new_at takes name next
     if (!e) {
@@ -1044,21 +1056,27 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     massert(name, "name is NULL");
     // use the previously-written liblogic_npc_create function
     const entitytype_t type = ENTITY_PLAYER;
+
+    //minfo("creating player: %s", name);
     const entityid id = npc_create(g, rt, x, y, fl, name);
     massert(id != ENTITYID_INVALID, "failed to create player");
+
+    //minfo("player id: %d", id);
     entity_t* const e = em_get(g->entitymap, id);
     massert(e, "entity is NULL");
 
+    //minfo("setting hero id: %d", id);
     gamestate_set_hero_id(g, id);
 
     // beginnings of a real ECS system...
-    g_register_comps(g, id, COMP_NAME, COMP_TYPE, COMP_RACE, COMP_DIRECTION, COMP_LOCATION, COMP_SPRITE_MOVE, 0);
+    g_register_comps(g, id, COMP_NAME, COMP_TYPE, COMP_RACE, COMP_DIRECTION, COMP_LOCATION, COMP_SPRITE_MOVE, COMP_DEAD, 0);
     g_add_name(g, id, name);
     g_add_type(g, id, type);
     g_add_race(g, id, RACE_HUMAN);
     g_add_direction(g, id, DIR_RIGHT);
     g_add_location(g, id, (loc_t){x, y, fl});
     g_add_sprite_move(g, id, (loc_t){0, 0}); // default
+    g_add_dead(g, id, false);
 
     return id;
 }
@@ -1068,8 +1086,10 @@ static void init_player(gamestate* const g) {
     // setting it up so we can return a loc_t from a function
     // that can scan for an appropriate starting location
     loc_t loc = df_get_upstairs(g->dungeon->floors[g->dungeon->current_floor]);
+    //minfo("loc: %d, %d, %d", loc.x, loc.y, loc.z);
     const int id = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
     massert(id != ENTITYID_INVALID, "failed to init hero");
+    //minfo("hero id: %d", id);
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "hero is NULL");
     e_set_maxhp(hero, 10);
@@ -1411,7 +1431,9 @@ static inline void change_player_dir(gamestate* const g, direction_t dir) {
     massert(g, "Game state is NULL!");
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "hero is NULL");
-    if (hero->dead) return;
+    //if (hero->dead) return;
+    //minfo("calling g_is_dead 7");
+    if (g_is_dead(g, hero->id)) return;
 
     //hero->direction = dir;
     g_update_direction(g, hero->id, dir);
@@ -1557,7 +1579,9 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     entity* const hero = em_get(g->entitymap, g->hero_id);
     massert(hero, "hero is NULL");
     // check if the player is dead
-    if (hero->dead) return;
+    //if (hero->dead) return;
+    //minfo("calling g_is_dead 8");
+    if (g_is_dead(g, hero->id)) return;
     if (action) {
         if (g->player_changing_direction) {
             if (strcmp(action, "wait") == 0) {
@@ -1784,7 +1808,9 @@ void liblogic_init(gamestate* const g) {
     g->msg_system.is_active = false;
     gamestate_load_keybindings(g);
     init_em(g);
+    //minfo("liblogic_init: em initialized");
     init_player(g);
+    //minfo("liblogic_init: player initialized");
     // test to create a weapon
     //init_weapon_test(g);
     //init_weapon_test2(g);
@@ -1802,15 +1828,20 @@ static void update_player_state(gamestate* const g) {
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "liblogic_update_player_state: hero is NULL");
     if (!g->gameover) {
-        if (e->dead) {
+        //if (e->dead) {
+        //minfo("calling g_is_dead 0");
+        if (g_is_dead(g, e->id)) {
             add_message_and_history(g, "You died!");
             g->gameover = true;
         }
         return;
     }
-    if (e->dead) return;
+    //if (e->dead) return;
+    //minfo("calling g_is_dead 1");
+    if (g_is_dead(g, e->id)) return;
     if (e_get_hp(e) <= 0) {
-        e->dead = true;
+        //e->dead = true;
+        g_update_dead(g, e->id, true);
         e->do_update = true;
         return;
     }
@@ -1820,7 +1851,9 @@ static inline void update_npc_state(gamestate* const g, entityid id) {
     massert(g, "Game state is NULL!");
     entity* const e = em_get(g->entitymap, id);
     massert(e, "update_npc_state: entity is NULL");
-    if (e->dead) return;
+    //if (e->dead) return;
+    //minfo("calling g_is_dead 2");
+    if (g_is_dead(g, e->id)) return;
     //if (e->stats.hp <= 0) {
     //    e->dead = true;
     //    e->do_update = true;
@@ -1847,7 +1880,10 @@ static void handle_nth_npc(gamestate* const g, int i) {
     entity* e = em_get(g->entitymap, id);
     massert(e, "entity is NULL");
     //if (e->type == ENTITY_NPC && !e->dead) execute_action(g, e, e->default_action);
-    if (g_is_type(g, e->id, ENTITY_NPC) && !e->dead) execute_action(g, e, e->default_action);
+    //if (g_is_type(g, e->id, ENTITY_NPC) && !e->dead) execute_action(g, e, e->default_action);
+    //
+    //minfo("calling g_is_dead 3");
+    if (g_is_type(g, e->id, ENTITY_NPC) && !g_is_dead(g, e->id)) { execute_action(g, e, e->default_action); }
 }
 
 static void handle_npcs(gamestate* const g) {

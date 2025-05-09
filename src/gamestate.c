@@ -1,4 +1,5 @@
 #include "controlmode.h"
+#include "entityid.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
 #include "massert.h"
@@ -135,10 +136,10 @@ bool gamestate_free_msg_history(gamestate* const g) {
 
 void gamestatefree(gamestate* g) {
     massert(g, "g is NULL");
-    minfo("Freeing gamestate");
+    //minfo("Freeing gamestate");
     //minfo("Freeing em");
     //em_free(g->entitymap);
-    minfo("Freeing entityids");
+    //minfo("Freeing entityids");
     free(g->entityids);
     //minfo("Freeing dungeon");
     //dungeon_destroy(g->dungeon);
@@ -149,7 +150,7 @@ void gamestatefree(gamestate* g) {
     free(g->name_list);
     free(g->type_list);
 
-    minfo("Freeing g...");
+    //minfo("Freeing g...");
     free(g);
     msuccess("Freed gamestate");
 }
@@ -399,9 +400,11 @@ bool g_add_type(gamestate* const g, entityid id, entitytype_t type) {
 
 entitytype_t g_get_type(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    for (int i = 0; i < g->type_list_count; i++) {
-        if (g->type_list[i].id == id) { return g->type_list[i].type; }
+    //massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id != ENTITYID_INVALID) {
+        for (int i = 0; i < g->type_list_count; i++) {
+            if (g->type_list[i].id == id) { return g->type_list[i].type; }
+        }
     }
     return ENTITY_NONE;
 }
@@ -647,4 +650,60 @@ loc_t g_get_sprite_move(const gamestate* const g, entityid id) {
     }
     merror("id %d not found in sprite_move_list", id);
     return (loc_t){-1, -1};
+}
+
+bool g_has_dead(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, COMP_DEAD);
+}
+
+bool g_add_dead(gamestate* const g, entityid id, bool dead) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the dead component
+    massert(g_has_component(g, id, COMP_DEAD), "id %d does not have a dead component", id);
+    if (g->dead_list_count >= g->dead_list_capacity) {
+        g->dead_list_capacity *= 2;
+        g->dead_list = realloc(g->dead_list, sizeof(dead_component) * g->dead_list_capacity);
+        if (g->dead_list == NULL) {
+            merror("g->dead_list is NULL");
+            return false;
+        }
+    }
+    init_dead_component(&g->dead_list[g->dead_list_count], id, dead);
+    g->dead_list_count++;
+    return true;
+}
+
+bool g_update_dead(gamestate* const g, entityid id, bool dead) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(g_has_component(g, id, COMP_DEAD), "id %d does not have a dead component", id);
+    if (g->dead_list == NULL) {
+        merror("g->dead_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->dead_list_count; i++) {
+        if (g->dead_list[i].id == id) {
+            g->dead_list[i].dead = dead;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool g_is_dead(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    //massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id != ENTITYID_INVALID) {
+        if (g->dead_list == NULL) {
+            merror("g->dead_list is NULL");
+            return false;
+        }
+        for (int i = 0; i < g->dead_list_count; i++) {
+            if (g->dead_list[i].id == id) { return g->dead_list[i].dead; }
+        }
+    }
+    return false;
 }

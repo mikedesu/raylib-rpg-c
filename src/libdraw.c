@@ -310,8 +310,10 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
 
     for (int i = 0; i < tile_entity_count(tile); i++) {
         entityid id = tile_get_entity(tile, i);
-        entity* e = em_get(g->entitymap, id);
-        if (e && e->dead == dead) draw_sprite_and_shadow(g, id);
+        //entity* e = em_get(g->entitymap, id);
+        //if (e && e->dead == dead) draw_sprite_and_shadow(g, id);
+        //minfo("draw_entities_2d_at: id %d", id);
+        if (g_is_dead(g, id) == dead) { draw_sprite_and_shadow(g, id); }
     }
 
     return true;
@@ -410,7 +412,9 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entity_t* const e, sprite
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
 
-    if (!e->dead) return;
+    //if (!e->dead) return;
+    //minfo("calling g_is_dead 1");
+    if (!g_is_dead(g, e->id)) return;
 
     race_t race = g_get_race(g, e->id);
 
@@ -584,6 +588,8 @@ static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, sprite
     massert(g, "gamestate is NULL");
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
+
+    //minfo("libdraw_update_sprite_attack: id %d", e->id);
     if (e->is_attacking) {
         libdraw_set_sg_is_attacking(g, e, sg);
     } else if (e->block_success) {
@@ -592,7 +598,8 @@ static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, sprite
         libdraw_set_sg_is_blocking(g, e, sg);
     } else if (e->is_damaged) {
         libdraw_set_sg_is_damaged(g, e, sg);
-    } else if (e->dead) {
+        //} else if (e->dead) {
+    } else if (g_is_dead(g, e->id)) {
         libdraw_set_sg_is_dead(g, e, sg);
     }
 }
@@ -672,7 +679,10 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
     massert(e, "entity is NULL");
     massert(sg, "spritegroup is NULL");
 
-    if (e->dead && !spritegroup_is_animating(sg)) return;
+    //if (e->dead && !spritegroup_is_animating(sg)) return;
+
+    //minfo("0");
+    if (g_is_dead(g, e->id) && !spritegroup_is_animating(sg)) return;
 
     if (g_is_type(g, e->id, ENTITY_DOOR)) {
         libdraw_set_sg_door(g, e, sg);
@@ -698,7 +708,7 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup
 
 //static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
 static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegroup_t* const sg) {
-    minfo("libdraw_handle_frame_incr: id %d", id);
+    //minfo("libdraw_handle_frame_incr: id %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");

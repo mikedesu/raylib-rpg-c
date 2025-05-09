@@ -39,7 +39,6 @@ typedef struct entity_t {
     bool is_blocking;
     bool block_success;
     bool is_damaged;
-    bool dead;
     bool door_is_open;
     entityid weapon;
     entityid shield;
@@ -70,11 +69,6 @@ static inline void e_set_maxhp(entity_t* const e, int maxhp) {
     massert(e, "e is NULL");
     massert(maxhp > 0, "maxhp is less than 1");
     //if (e) { e->stats.maxhp = maxhp; }
-}
-
-static inline void e_set_is_dead(entity_t* const e, bool dead) {
-    massert(e, "e is NULL");
-    if (e) { e->dead = dead; }
 }
 
 static inline void e_set_do_update(entity_t* const e, bool do_update) {
@@ -161,16 +155,6 @@ static inline void e_incr_hp(entity_t* const e, int hp) {
 static inline void e_decr_hp(entity_t* const e, int hp) {
     massert(e, "e is NULL");
     //e_set_hp(e, e->stats.hp - hp);
-}
-
-static inline bool e_is_alive(entity_t* const e) {
-    massert(e, "e is NULL");
-    return !e->dead;
-}
-
-static inline bool e_is_dead(entity_t* const e) {
-    massert(e, "e_is_dead: e is NULL");
-    return e->dead;
 }
 
 static inline void e_equip_weapon(entity* e, entityid weapon_id) {
