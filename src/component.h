@@ -16,6 +16,7 @@ typedef enum component_t
     COMP_RACE,
     COMP_DIRECTION,
     COMP_LOCATION,
+    COMP_SPRITE_MOVE,
     COMP_COUNT
 } component;
 
@@ -44,11 +45,17 @@ typedef struct loc_component_t {
     loc_t loc;
 } loc_component;
 
+typedef struct sprite_move_component_t {
+    entityid id;
+    loc_t loc;
+} sprite_move_component;
+
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
 void init_race_component(race_component* comp, entityid id, race_t race);
 void init_direction_component(direction_component* comp, entityid id, direction_t dir);
 void init_loc_component(loc_component* comp, entityid id, loc_t loc);
+void init_sprite_move_component(sprite_move_component* comp, entityid id, loc_t loc);
 
 //typedef struct hp_component_t {
 //    entityid id;

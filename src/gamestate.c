@@ -439,8 +439,10 @@ bool g_add_race(gamestate* const g, entityid id, race_t race) {
 race_t g_get_race(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    for (int i = 0; i < g->race_list_count; i++) {
-        if (g->race_list[i].id == id) { return g->race_list[i].race; }
+    if (g_has_race(g, id)) {
+        for (int i = 0; i < g->race_list_count; i++) {
+            if (g->race_list[i].id == id) { return g->race_list[i].race; }
+        }
     }
     return RACE_NONE;
 }
@@ -449,6 +451,12 @@ bool g_is_race(gamestate* const g, entityid id, race_t race) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_get_race(g, id) == race;
+}
+
+bool g_has_race(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return gs_has_component(g, id, COMP_RACE);
 }
 
 direction_t g_get_direction(const gamestate* const g, entityid id) {
@@ -464,18 +472,11 @@ direction_t g_get_direction(const gamestate* const g, entityid id) {
     return DIR_NONE;
 }
 
-//bool g_has_direction(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->direction_list == NULL) {
-//        merror("g->direction_list is NULL");
-//        return false;
-//    }
-//    for (int i = 0; i < g->direction_list_count; i++) {
-//        if (g->direction_list[i].id == id) { return true; }
-//    }
-//    return false;
-//}
+bool g_has_direction(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return gs_has_component(g, id, COMP_DIRECTION);
+}
 
 bool g_add_direction(gamestate* const g, entityid id, direction_t dir) {
     massert(g, "g is NULL");
@@ -520,14 +521,7 @@ bool g_update_direction(gamestate* const g, entityid id, direction_t dir) {
 bool g_has_location(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->loc_list == NULL) {
-        merror("g->loc_list is NULL");
-        return false;
-    }
-    for (int i = 0; i < g->loc_list_count; i++) {
-        if (g->loc_list[i].id == id) { return true; }
-    }
-    return false;
+    return gs_has_component(g, id, COMP_LOCATION);
 }
 
 bool g_add_location(gamestate* const g, entityid id, loc_t loc) {
@@ -587,4 +581,70 @@ bool g_is_location(const gamestate* const g, entityid id, loc_t loc) {
     }
     loc_t loc2 = g_get_location(g, id);
     return (loc.x == loc2.x && loc.y == loc2.y);
+}
+
+bool g_has_sprite_move(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return gs_has_component(g, id, COMP_SPRITE_MOVE);
+}
+
+bool g_add_sprite_move(gamestate* const g, entityid id, loc_t loc) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the sprite move component
+    massert(gs_has_component(g, id, COMP_SPRITE_MOVE), "id %d does not have a sprite move component", id);
+    if (g->sprite_move_list_count >= g->sprite_move_list_capacity) {
+        g->sprite_move_list_capacity *= 2;
+        g->sprite_move_list = realloc(g->sprite_move_list, sizeof(sprite_move_component) * g->sprite_move_list_capacity);
+        if (g->sprite_move_list == NULL) {
+            merror("g->sprite_move_list is NULL");
+            return false;
+        }
+    }
+    init_sprite_move_component(&g->sprite_move_list[g->sprite_move_list_count], id, loc);
+    g->sprite_move_list_count++;
+    return true;
+}
+
+bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(gs_has_component(g, id, COMP_SPRITE_MOVE), "id %d does not have a sprite move component", id);
+    if (g->sprite_move_list == NULL) {
+        merror("g->sprite_move_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->sprite_move_list_count; i++) {
+        if (g->sprite_move_list[i].id == id) {
+            g->sprite_move_list[i].loc = loc;
+            return true;
+        }
+    }
+    return false;
+}
+
+//bool g_is_sprite_move(gamestate* const g, entityid id, loc_t loc) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (g->sprite_move_list == NULL) {
+//        merror("g->sprite_move_list is NULL");
+//        return false;
+//    }
+//    loc_t loc2 = g_get_sprite_move(g, id);
+//    return (loc.x == loc2.x && loc.y == loc2.y);
+//}
+
+loc_t g_get_sprite_move(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->sprite_move_list == NULL) {
+        merror("g->sprite_move_list is NULL");
+        return (loc_t){-1, -1};
+    }
+    for (int i = 0; i < g->sprite_move_list_count; i++) {
+        if (g->sprite_move_list[i].id == id) { return g->sprite_move_list[i].loc; }
+    }
+    merror("id %d not found in sprite_move_list", id);
+    return (loc_t){-1, -1};
 }

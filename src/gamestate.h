@@ -128,6 +128,10 @@ typedef struct gamestate {
     int loc_list_count;
     int loc_list_capacity;
 
+    sprite_move_component* sprite_move_list;
+    int sprite_move_list_count;
+    int sprite_move_list_capacity;
+
 } gamestate;
 
 gamestate* gamestateinitptr();
@@ -168,6 +172,7 @@ bool g_is_type(const gamestate* const g, entityid id, entitytype_t type);
 race_t g_get_race(gamestate* const g, entityid id);
 bool g_add_race(gamestate* const g, entityid id, race_t race);
 bool g_is_race(gamestate* const g, entityid id, race_t race);
+bool g_has_race(const gamestate* const g, entityid id);
 
 direction_t g_get_direction(const gamestate* const g, entityid id);
 bool g_add_direction(gamestate* const g, entityid id, direction_t dir);
@@ -179,3 +184,9 @@ bool g_add_location(gamestate* const g, entityid id, loc_t loc);
 bool g_update_location(gamestate* const g, entityid id, loc_t loc);
 loc_t g_get_location(const gamestate* const g, entityid id);
 bool g_is_location(const gamestate* const g, entityid id, loc_t loc);
+
+bool g_has_sprite_move(const gamestate* const g, entityid id);
+bool g_add_sprite_move(gamestate* const g, entityid id, loc_t loc);
+bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc);
+//bool g_is_sprite_move(gamestate* const g, entityid id, loc_t loc);
+loc_t g_get_sprite_move(const gamestate* const g, entityid id);

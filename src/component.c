@@ -58,3 +58,12 @@ void init_loc_component(loc_component* comp, entityid id, loc_t loc) {
     comp->id = id;
     comp->loc = loc;
 }
+
+void init_sprite_move_component(sprite_move_component* comp, entityid id, loc_t loc) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->loc = loc;
+}
