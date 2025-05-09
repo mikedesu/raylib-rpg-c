@@ -17,19 +17,19 @@
 // forward declaration
 typedef struct entity_t entity_t;
 
-typedef struct {
-    int level;
-    int hp;
-    int maxhp;
-    int mp;
-    int maxmp;
-} entity_stats_t;
+//typedef struct {
+//    int level;
+//    int hp;
+//    int maxhp;
+//    int mp;
+//    int maxmp;
+//} entity_stats_t;
 
 typedef struct entity_t {
     entityid id;
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
-    entity_stats_t stats;
+    //entity_stats_t stats;
     // if the entity is a potion...
 
     entity_action_t default_action; // New field
@@ -63,13 +63,13 @@ bool e_remove_item_from_inventory(entity_t* const e, entityid item_id);
 
 static inline void e_set_hp(entity_t* const e, int hp) {
     massert(e, "e is NULL");
-    if (e) { e->stats.hp = hp < 0 ? 0 : hp > e->stats.maxhp ? e->stats.maxhp : hp; }
+    //if (e) { e->stats.hp = hp < 0 ? 0 : hp > e->stats.maxhp ? e->stats.maxhp : hp; }
 }
 
 static inline void e_set_maxhp(entity_t* const e, int maxhp) {
     massert(e, "e is NULL");
     massert(maxhp > 0, "maxhp is less than 1");
-    if (e) { e->stats.maxhp = maxhp; }
+    //if (e) { e->stats.maxhp = maxhp; }
 }
 
 static inline void e_set_is_dead(entity_t* const e, bool dead) {
@@ -139,12 +139,12 @@ static inline entity_action_t e_get_default_action(entity_t* const e) {
 
 static inline int e_get_hp(entity_t* const e) {
     massert(e, "e is NULL");
-    return e->stats.hp;
+    return 0;
 }
 
 static inline int e_get_maxhp(entity_t* const e) {
     massert(e, "e is NULL");
-    return e->stats.maxhp;
+    return 0;
 }
 
 static inline void e_set_hpmaxhp(entity_t* const e, int hp, int maxhp) {
@@ -155,12 +155,12 @@ static inline void e_set_hpmaxhp(entity_t* const e, int hp, int maxhp) {
 
 static inline void e_incr_hp(entity_t* const e, int hp) {
     massert(e, "e is NULL");
-    e_set_hp(e, e->stats.hp + hp);
+    //e_set_hp(e, e->stats.hp + hp);
 }
 
 static inline void e_decr_hp(entity_t* const e, int hp) {
     massert(e, "e is NULL");
-    e_set_hp(e, e->stats.hp - hp);
+    //e_set_hp(e, e->stats.hp - hp);
 }
 
 static inline bool e_is_alive(entity_t* const e) {

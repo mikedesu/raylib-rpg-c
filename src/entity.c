@@ -23,11 +23,6 @@ entity_t* e_new(entityid id, entitytype_t type) {
     e->inventory_count = 0;
     e->weapon = -1;
     e->shield = -1;
-    e->stats.hp = 1;
-    e->stats.maxhp = 1;
-    e->stats.level = 1;
-    e->stats.mp = 0;
-    e->stats.maxmp = 0;
     e->do_update = e->is_attacking = e->is_blocking = e->is_damaged = e->dead = e->door_is_open = false;
     e->potion_type = POTION_NONE;
     e->next = NULL;

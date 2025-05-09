@@ -1153,15 +1153,14 @@ static void draw_hud(gamestate* const g) {
     entity* const e = em_get(g->entitymap, g->hero_id);
     massert(e, "entity is NULL");
     const int turn = g->turn_count;
-    const int hp = e->stats.hp;
-    const int maxhp = e->stats.maxhp;
-    const int mp = e->stats.mp;
-    const int maxmp = e->stats.maxmp;
-    const int level = e->stats.level;
+    const int hp = 0;
+    const int maxhp = 0;
+    const int mp = 0;
+    const int maxmp = 0;
+    const int level = 0;
 
     loc_t loc = g_get_location(g, g->hero_id);
     dungeon_floor_t* const df = dungeon_get_current_floor(g->dungeon);
-    //int i = loc_is_in_room(df, loc);
     const char* room_name = df_get_room_name(df, loc);
 
     char buffer[1024] = {0};
