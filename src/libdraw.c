@@ -518,7 +518,8 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, s
     }
     update_weapon_for_entity(g, e, sg);
 
-    e->is_attacking = false;
+    //e->is_attacking = false;
+    g_set_attacking(g, e->id, false);
 }
 
 static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
@@ -593,7 +594,8 @@ static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, sprite
     massert(sg, "spritegroup is NULL");
 
     //minfo("libdraw_update_sprite_attack: id %d", e->id);
-    if (e->is_attacking) {
+    //if (e->is_attacking) {
+    if (g_get_attacking(g, e->id)) {
         libdraw_set_sg_is_attacking(g, e, sg);
     } else if (e->block_success) {
         libdraw_set_sg_block_success(g, e, sg);

@@ -24,7 +24,7 @@ entity_t* e_new(entityid id, entitytype_t type) {
     e->weapon = -1;
     e->shield = -1;
     //e->do_update = false;
-    e->is_attacking = false;
+    //e->is_attacking = false;
     e->is_blocking = false;
     e->is_damaged = false;
     e->door_is_open = false;

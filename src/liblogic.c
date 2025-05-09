@@ -552,7 +552,9 @@ static void try_entity_attack(gamestate* const g, entityid attacker_id, int targ
     //e->direction = get_dir_from_xy(dx, dy);
     g_update_direction(g, e->id, get_dir_from_xy(dx, dy));
 
-    e->is_attacking = true;
+    //e->is_attacking = true;
+    g_set_attacking(g, e->id, true);
+
     //e->do_update = true;
     g_set_update(g, e->id, true);
     handle_attack_helper(g, tile, e, &ok);
@@ -1075,7 +1077,8 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     gamestate_set_hero_id(g, id);
 
     // beginnings of a real ECS system...
-    g_register_comps(g, id, C_NAME, C_TYPE, C_RACE, C_DIRECTION, C_LOCATION, C_SPRITE_MOVE, C_DEAD, C_UPDATE, 0);
+    g_register_comps(
+        g, id, C_NAME, C_TYPE, C_RACE, C_DIRECTION, C_LOCATION, C_SPRITE_MOVE, C_DEAD, C_UPDATE, C_ATTACKING, C_BLOCKING, C_BLOCK_SUCCESS, C_DAMAGED, 0);
     g_add_name(g, id, name);
     g_add_type(g, id, type);
     g_add_race(g, id, RACE_HUMAN);
@@ -1084,6 +1087,10 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     g_add_sprite_move(g, id, (loc_t){0, 0}); // default
     g_add_dead(g, id, false);
     g_add_update(g, id, false);
+    g_add_attacking(g, id, false);
+    g_add_blocking(g, id, false);
+    g_add_block_success(g, id, false);
+    g_add_damaged(g, id, false);
 
     return id;
 }

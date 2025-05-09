@@ -85,3 +85,86 @@ void init_update_component(update_component* comp, entityid id, bool update) {
     comp->id = id;
     comp->update = update;
 }
+
+void init_attacking_component(attacking_component* comp, entityid id, bool attacking) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->attacking = attacking;
+}
+
+void init_blocking_component(blocking_component* comp, entityid id, bool blocking) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->blocking = blocking;
+}
+
+void init_block_success_component(block_success_component* comp, entityid id, bool block_success) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->block_success = block_success;
+}
+
+void init_damaged_component(damaged_component* comp, entityid id, bool damaged) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->damaged = damaged;
+}
+
+void init_inventory_component(inventory_component* comp, entityid id) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->count = 0;
+    memset(comp->inventory, ENTITYID_INVALID, sizeof(comp->inventory));
+}
+
+void init_equipped_weapon_component(equipped_weapon_component* comp, entityid id, entityid weapon) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->weapon = weapon;
+}
+
+void init_equipped_shield_component(equipped_shield_component* comp, entityid id, entityid shield) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->shield = shield;
+}
+
+void init_target_component(target_component* comp, entityid id, loc_t target) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->target = target;
+}
+
+void init_target_path_component(target_path_component* comp, entityid id, loc_t* target_path, int target_path_length) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->target_path = target_path;
+    comp->target_path_length = target_path_length;
+}

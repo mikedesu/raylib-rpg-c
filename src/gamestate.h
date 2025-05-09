@@ -95,10 +95,22 @@ typedef struct gamestate {
     sprite_move_component* sprite_move_list;
     dead_component* dead_list;
     update_component* update_list;
+    attacking_component* attacking_list;
+    blocking_component* blocking_list;
+    block_success_component* block_success_list;
+    damaged_component* damaged_list;
+    inventory_component* inventory_list;
+    equipped_weapon_component* equipped_weapon_list;
+    equipped_shield_component* equipped_shield_list;
+    target_component* target_list;
+    target_path_component* target_path_list;
 
     int name_list_count, name_list_capacity, type_list_count, type_list_capacity, race_list_count, race_list_capacity, direction_list_count,
         direction_list_capacity, loc_list_count, loc_list_capacity, sprite_move_list_count, sprite_move_list_capacity, dead_list_count, dead_list_capacity,
-        update_list_count, update_list_capacity;
+        update_list_count, update_list_capacity, attacking_list_count, attacking_list_capacity, blocking_list_count, blocking_list_capacity,
+        block_success_list_count, block_success_list_capacity, damaged_list_count, damaged_list_capacity, inventory_list_count, inventory_list_capacity,
+        equipped_weapon_list_count, equipped_weapon_list_capacity, equipped_shield_list_count, equipped_shield_list_capacity, target_list_count,
+        target_list_capacity, target_path_list_count, target_path_list_capacity;
 
 } gamestate;
 
@@ -169,3 +181,27 @@ bool g_has_update(const gamestate* const g, entityid id);
 bool g_add_update(gamestate* const g, entityid id, bool update);
 bool g_get_update(gamestate* const g, entityid id);
 bool g_set_update(gamestate* const g, entityid id, bool update);
+
+bool g_has_attacking(const gamestate* const g, entityid id);
+bool g_add_attacking(gamestate* const g, entityid id, bool attacking);
+bool g_set_attacking(gamestate* const g, entityid id, bool attacking);
+bool g_get_attacking(const gamestate* const g, entityid id);
+
+bool g_has_blocking(const gamestate* const g, entityid id);
+bool g_add_blocking(gamestate* const g, entityid id, bool blocking);
+bool g_set_blocking(gamestate* const g, entityid id, bool blocking);
+bool g_get_blocking(const gamestate* const g, entityid id);
+
+bool g_has_block_success(const gamestate* const g, entityid id);
+bool g_add_block_success(gamestate* const g, entityid id, bool block_success);
+bool g_set_block_success(gamestate* const g, entityid id, bool block_success);
+bool g_get_block_success(const gamestate* const g, entityid id);
+
+bool g_has_damaged(const gamestate* const g, entityid id);
+bool g_add_damaged(gamestate* const g, entityid id, bool damaged);
+bool g_set_damaged(gamestate* const g, entityid id, bool damaged);
+bool g_get_damaged(const gamestate* const g, entityid id);
+
+//bool g_has_inventory(const gamestate* const g, entityid id);
+//bool g_add_inventory(gamestate* const g, entityid id, entityid item_id);
+//bool g_remove_inventory(gamestate* const g, entityid id, entityid item_id);

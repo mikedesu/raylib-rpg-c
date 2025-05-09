@@ -20,6 +20,20 @@ typedef enum component_t
     C_SPRITE_MOVE,
     C_DEAD,
     C_UPDATE,
+    // not yet implemented
+    C_ATTACKING,
+    C_BLOCKING,
+    C_BLOCK_SUCCESS,
+    C_DAMAGED,
+    //C_INVENTORY,
+    //C_EQUIPPED_WEAPON,
+    //C_EQUIPPED_SHIELD,
+    //C_TARGET,
+    //C_TARGET_PATH,
+    //C_DOOR_STATE,
+    //C_DEFAULT_ACTION,
+    //C_ATTRIBUTES,
+    //C_MODIFIERS,
     C_COUNT
 } component;
 
@@ -63,6 +77,53 @@ typedef struct update_component_t {
     bool update;
 } update_component;
 
+typedef struct attacking_component_t {
+    entityid id;
+    bool attacking;
+} attacking_component;
+
+typedef struct blocking_component_t {
+    entityid id;
+    bool blocking;
+} blocking_component;
+
+typedef struct block_success_component_t {
+    entityid id;
+    bool block_success;
+} block_success_component;
+
+typedef struct damaged_component_t {
+    entityid id;
+    bool damaged;
+} damaged_component;
+
+typedef struct inventory_component_t {
+    entityid id;
+    entityid inventory[32]; // max 32 items
+    int count;
+} inventory_component;
+
+typedef struct equipped_weapon_component_t {
+    entityid id;
+    entityid weapon;
+} equipped_weapon_component;
+
+typedef struct equipped_shield_component_t {
+    entityid id;
+    entityid shield;
+} equipped_shield_component;
+
+typedef struct target_component_t {
+    entityid id;
+    loc_t target;
+} target_component;
+
+typedef struct target_path_component_t {
+    entityid id;
+    loc_t* target_path;
+    int target_path_length;
+} target_path_component;
+
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
 void init_race_component(race_component* comp, entityid id, race_t race);
@@ -71,14 +132,12 @@ void init_loc_component(loc_component* comp, entityid id, loc_t loc);
 void init_sprite_move_component(sprite_move_component* comp, entityid id, loc_t loc);
 void init_dead_component(dead_component* comp, entityid id, bool dead);
 void init_update_component(update_component* comp, entityid id, bool update);
-
-//typedef struct hp_component_t {
-//    entityid id;
-//    int hp;
-//    int maxhp;
-//} hp_component;
-
-//typedef struct loc_component_t {
-//    entityid id;
-//    loc_t loc;
-//} loc_component;
+void init_attacking_component(attacking_component* comp, entityid id, bool attacking);
+void init_blocking_component(blocking_component* comp, entityid id, bool blocking);
+void init_block_success_component(block_success_component* comp, entityid id, bool block_success);
+void init_damaged_component(damaged_component* comp, entityid id, bool damaged);
+void init_inventory_component(inventory_component* comp, entityid id);
+void init_equipped_weapon_component(equipped_weapon_component* comp, entityid id, entityid weapon);
+void init_equipped_shield_component(equipped_shield_component* comp, entityid id, entityid shield);
+void init_target_component(target_component* comp, entityid id, loc_t target);
+void init_target_path_component(target_path_component* comp, entityid id, loc_t* target_path, int target_path_length);

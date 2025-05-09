@@ -34,10 +34,11 @@ typedef struct entity_t {
     // if the entity is a potion...
     potiontype_t potion_type;
 
-    bool is_attacking;
+    //bool is_attacking;
     bool is_blocking;
     bool block_success;
     bool is_damaged;
+
     bool door_is_open;
 
     entityid weapon;

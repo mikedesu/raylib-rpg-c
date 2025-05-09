@@ -85,10 +85,13 @@ gamestate* gamestateinitptr() {
     g->components = ct_create();
 
     g->name_list_count = g->type_list_count = g->race_list_count = g->direction_list_count = g->loc_list_count = g->sprite_move_list_count =
-        g->dead_list_count = g->update_list_count = 0;
+        g->dead_list_count = g->update_list_count = g->attacking_list_count = g->blocking_list_count = g->block_success_list_count = g->damaged_list_count =
+            g->inventory_list_count = g->equipped_weapon_list_count = g->equipped_shield_list_count = g->target_list_count = g->target_path_list_count = 0;
 
     g->name_list_capacity = g->type_list_capacity = g->race_list_capacity = g->direction_list_capacity = g->loc_list_capacity = g->sprite_move_list_capacity =
-        g->dead_list_capacity = g->update_list_capacity = LIST_INIT_CAPACITY;
+        g->dead_list_capacity = g->update_list_capacity = g->attacking_list_capacity = g->blocking_list_capacity = g->block_success_list_capacity =
+            g->damaged_list_capacity = g->inventory_list_capacity = g->equipped_weapon_list_capacity = g->equipped_shield_list_capacity =
+                g->target_list_capacity = g->target_path_list_capacity = LIST_INIT_CAPACITY;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * g->name_list_capacity);
     massert(g->name_list, "g->name_list is NULL");
@@ -106,6 +109,24 @@ gamestate* gamestateinitptr() {
     massert(g->dead_list, "g->dead_list is NULL");
     g->update_list = (update_component*)malloc(sizeof(update_component) * g->update_list_capacity);
     massert(g->update_list, "g->update_list is NULL");
+    g->attacking_list = (attacking_component*)malloc(sizeof(attacking_component) * g->attacking_list_capacity);
+    massert(g->attacking_list, "g->attacking_list is NULL");
+    g->blocking_list = (blocking_component*)malloc(sizeof(blocking_component) * g->blocking_list_capacity);
+    massert(g->blocking_list, "g->blocking_list is NULL");
+    g->block_success_list = (block_success_component*)malloc(sizeof(block_success_component) * g->block_success_list_capacity);
+    massert(g->block_success_list, "g->block_success_list is NULL");
+    g->damaged_list = (damaged_component*)malloc(sizeof(damaged_component) * g->damaged_list_capacity);
+    massert(g->damaged_list, "g->damaged_list is NULL");
+    g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * g->inventory_list_capacity);
+    massert(g->inventory_list, "g->inventory_list is NULL");
+    g->equipped_weapon_list = (equipped_weapon_component*)malloc(sizeof(equipped_weapon_component) * g->equipped_weapon_list_capacity);
+    massert(g->equipped_weapon_list, "g->equipped_weapon_list is NULL");
+    g->equipped_shield_list = (equipped_shield_component*)malloc(sizeof(equipped_shield_component) * g->equipped_shield_list_capacity);
+    massert(g->equipped_shield_list, "g->equipped_shield_list is NULL");
+    g->target_list = (target_component*)malloc(sizeof(target_component) * g->target_list_capacity);
+    massert(g->target_list, "g->target_list is NULL");
+    g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * g->target_path_list_capacity);
+    massert(g->target_path_list, "g->target_path_list is NULL");
 
     gamestate_init_msg_history(g);
     return g;
@@ -163,6 +184,15 @@ void gamestatefree(gamestate* g) {
     free(g->sprite_move_list);
     free(g->dead_list);
     free(g->update_list);
+    free(g->attacking_list);
+    free(g->blocking_list);
+    free(g->block_success_list);
+    free(g->damaged_list);
+    free(g->inventory_list);
+    free(g->equipped_weapon_list);
+    free(g->equipped_shield_list);
+    free(g->target_list);
+    free(g->target_path_list);
     free(g);
     msuccess("Freed gamestate");
 }
@@ -770,5 +800,221 @@ bool g_set_update(gamestate* const g, entityid id, bool update) {
             return true;
         }
     }
+    return false;
+}
+
+bool g_has_attacking(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_ATTACKING);
+}
+
+bool g_add_attacking(gamestate* const g, entityid id, bool attacking) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the attacking component
+    massert(g_has_component(g, id, C_ATTACKING), "id %d does not have an attacking component", id);
+    if (g->attacking_list_count >= g->attacking_list_capacity) {
+        g->attacking_list_capacity *= 2;
+        g->attacking_list = realloc(g->attacking_list, sizeof(attacking_component) * g->attacking_list_capacity);
+        if (g->attacking_list == NULL) {
+            merror("g->attacking_list is NULL");
+            return false;
+        }
+    }
+    init_attacking_component(&g->attacking_list[g->attacking_list_count], id, attacking);
+    g->attacking_list_count++;
+    return true;
+}
+
+bool g_set_attacking(gamestate* const g, entityid id, bool attacking) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->attacking_list == NULL) {
+        merror("g->attacking_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->attacking_list_count; i++) {
+        if (g->attacking_list[i].id == id) {
+            g->attacking_list[i].attacking = attacking;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool g_get_attacking(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->attacking_list == NULL) {
+        merror("g->attacking_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->attacking_list_count; i++) {
+        if (g->attacking_list[i].id == id) { return g->attacking_list[i].attacking; }
+    }
+    merror("id %d not found in attacking_list", id);
+    return false;
+}
+
+bool g_has_blocking(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_BLOCKING);
+}
+
+bool g_add_blocking(gamestate* const g, entityid id, bool blocking) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the blocking component
+    massert(g_has_component(g, id, C_BLOCKING), "id %d does not have a blocking component", id);
+    if (g->blocking_list_count >= g->blocking_list_capacity) {
+        g->blocking_list_capacity *= 2;
+        g->blocking_list = realloc(g->blocking_list, sizeof(blocking_component) * g->blocking_list_capacity);
+        if (g->blocking_list == NULL) {
+            merror("g->blocking_list is NULL");
+            return false;
+        }
+    }
+    init_blocking_component(&g->blocking_list[g->blocking_list_count], id, blocking);
+    g->blocking_list_count++;
+    return true;
+}
+
+bool g_set_blocking(gamestate* const g, entityid id, bool blocking) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->blocking_list == NULL) {
+        merror("g->blocking_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->blocking_list_count; i++) {
+        if (g->blocking_list[i].id == id) {
+            g->blocking_list[i].blocking = blocking;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool g_get_blocking(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->blocking_list == NULL) {
+        merror("g->blocking_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->blocking_list_count; i++) {
+        if (g->blocking_list[i].id == id) { return g->blocking_list[i].blocking; }
+    }
+    merror("id %d not found in blocking_list", id);
+    return false;
+}
+
+bool g_has_block_success(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_BLOCK_SUCCESS);
+}
+
+bool g_add_block_success(gamestate* const g, entityid id, bool block_success) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the block success component
+    massert(g_has_component(g, id, C_BLOCK_SUCCESS), "id %d does not have a block success component", id);
+    if (g->block_success_list_count >= g->block_success_list_capacity) {
+        g->block_success_list_capacity *= 2;
+        g->block_success_list = realloc(g->block_success_list, sizeof(block_success_component) * g->block_success_list_capacity);
+        if (g->block_success_list == NULL) {
+            merror("g->block_success_list is NULL");
+            return false;
+        }
+    }
+    init_block_success_component(&g->block_success_list[g->block_success_list_count], id, block_success);
+    g->block_success_list_count++;
+    return true;
+}
+
+bool g_set_block_success(gamestate* const g, entityid id, bool block_success) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->block_success_list == NULL) {
+        merror("g->block_success_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->block_success_list_count; i++) {
+        if (g->block_success_list[i].id == id) {
+            g->block_success_list[i].block_success = block_success;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool g_get_block_success(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->block_success_list == NULL) {
+        merror("g->block_success_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->block_success_list_count; i++) {
+        if (g->block_success_list[i].id == id) { return g->block_success_list[i].block_success; }
+    }
+    merror("id %d not found in block_success_list", id);
+    return false;
+}
+
+bool g_has_damaged(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_DAMAGED);
+}
+
+bool g_add_damaged(gamestate* const g, entityid id, bool damaged) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the damaged component
+    massert(g_has_component(g, id, C_DAMAGED), "id %d does not have a damaged component", id);
+    if (g->damaged_list_count >= g->damaged_list_capacity) {
+        g->damaged_list_capacity *= 2;
+        g->damaged_list = realloc(g->damaged_list, sizeof(damaged_component) * g->damaged_list_capacity);
+        if (g->damaged_list == NULL) {
+            merror("g->damaged_list is NULL");
+            return false;
+        }
+    }
+    init_damaged_component(&g->damaged_list[g->damaged_list_count], id, damaged);
+    g->damaged_list_count++;
+    return true;
+}
+
+bool g_set_damaged(gamestate* const g, entityid id, bool damaged) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->damaged_list == NULL) {
+        merror("g->damaged_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->damaged_list_count; i++) {
+        if (g->damaged_list[i].id == id) {
+            g->damaged_list[i].damaged = damaged;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool g_get_damaged(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->damaged_list == NULL) {
+        merror("g->damaged_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->damaged_list_count; i++) {
+        if (g->damaged_list[i].id == id) { return g->damaged_list[i].damaged; }
+    }
+    merror("id %d not found in damaged_list", id);
     return false;
 }
