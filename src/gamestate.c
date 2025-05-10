@@ -66,7 +66,7 @@ gamestate* gamestateinitptr() {
     g->fadealpha = 0.0f;
     g->controlmode = CONTROLMODE_PLAYER;
     g->fadestate = FADESTATENONE;
-    g->dungeon = NULL;
+    g->d = NULL;
     g->entitymap = NULL;
     g->entityids = NULL;
     g->index_entityids = 0;
@@ -1015,6 +1015,6 @@ bool g_get_damaged(const gamestate* const g, entityid id) {
     for (int i = 0; i < g->damaged_list_count; i++) {
         if (g->damaged_list[i].id == id) { return g->damaged_list[i].damaged; }
     }
-    merror("id %d not found in damaged_list", id);
+    //merror("id %d not found in damaged_list", id);
     return false;
 }

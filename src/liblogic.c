@@ -160,7 +160,7 @@ static void update_equipped_shield_dir(gamestate* g, entityid id) {
 static bool player_on_tile(gamestate* g, int x, int y, int floor) {
     massert(g, "gamestate is NULL");
     // get the tile at x y
-    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, 0);
+    dungeon_floor_t* df = d_get_floor(g->d, 0);
     massert(df, "dungeon floor is NULL");
     tile_t* tile = df_tile_at(df, x, y);
     if (!tile) { return false; }
@@ -205,8 +205,8 @@ static entity* const get_door_from_tile(const gamestate* const g, int x, int y, 
     // Validate inputs
     massert(g, "gamestate is NULL");
     massert(fl >= 0, "floor is out of bounds");
-    massert(fl < g->dungeon->num_floors, "floor is out of bounds");
-    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    massert(fl < g->d->num_floors, "floor is out of bounds");
+    const dungeon_floor_t* const df = d_get_floor(g->d, fl);
     massert(df, "failed to get dungeon floor");
     const tile_t* const t = df_tile_at(df, x, y);
     massert(t, "failed to get tile");
@@ -225,8 +225,8 @@ static bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl)
     // Validate inputs
     massert(g, "gamestate is NULL");
     massert(fl >= 0, "floor is out of bounds");
-    massert(fl < g->dungeon->num_floors, "floor is out of bounds");
-    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    massert(fl < g->d->num_floors, "floor is out of bounds");
+    const dungeon_floor_t* const df = d_get_floor(g->d, fl);
     massert(df, "failed to get dungeon floor");
     const tile_t* const t = df_tile_at(df, x, y);
     massert(t, "failed to get tile");
@@ -246,8 +246,8 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
     // Validate inputs
     massert(g, "gamestate is NULL");
     massert(fl >= 0, "floor is out of bounds");
-    massert(fl < g->dungeon->num_floors, "floor is out of bounds");
-    const dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    massert(fl < g->d->num_floors, "floor is out of bounds");
+    const dungeon_floor_t* const df = d_get_floor(g->d, fl);
     massert(df, "failed to get dungeon floor");
     const tile_t* const t = df_tile_at(df, x, y);
     massert(t, "failed to get tile");
@@ -279,7 +279,7 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     int ex = loc.x + x;
     int ey = loc.y + y;
     int floor = loc.z;
-    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, floor);
+    dungeon_floor_t* const df = d_get_floor(g->d, floor);
     if (!df) {
         merror("Failed to get dungeon floor");
         return;
@@ -521,7 +521,7 @@ static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, in
     massert(g, "gamestate is NULL");
     massert(!g_is_dead(g, atk_id), "attacker entity is dead");
     loc_t loc = g_get_location(g, atk_id);
-    dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, loc.z);
+    dungeon_floor_t* const floor = d_get_floor(g->d, loc.z);
     massert(floor, "failed to get dungeon floor");
     tile_t* const tile = df_tile_at(floor, tgt_x, tgt_y);
     if (!tile) {
@@ -807,7 +807,7 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
     tile_t* tile = NULL;
     for (int i = 0; i < 8; i++) {
         loc_t loc = g_get_location(g, e->id);
-        tile = df_tile_at(g->dungeon->floors[loc.z], locs[i].x, locs[i].y);
+        tile = df_tile_at(g->d->floors[loc.z], locs[i].x, locs[i].y);
         if (!tile) continue;
         if (!tile_is_walkable(tile->type)) continue;
         if (tile_entity_count(tile) > 0) continue;
@@ -950,9 +950,9 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
 
 static void init_dungeon(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    g->dungeon = dungeon_create();
-    massert(g->dungeon, "failed to init dungeon");
-    dungeon_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    g->d = d_create();
+    massert(g->d, "failed to init dungeon");
+    d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 }
 
 static void init_em(gamestate* const g) {
@@ -967,37 +967,25 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int fl, 
     massert(name && name[0], "name is NULL or empty");
     massert(rt >= 0, "race_type is out of bounds: %s: %d", name, rt);
     massert(rt < RACE_COUNT, "race_type is out of bounds: %s: %d", name, rt);
-    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    dungeon_floor_t* const df = d_get_floor(g->d, fl);
     massert(df, "failed to get current dungeon floor");
     massert(x >= 0, "x is out of bounds: %s: %d", name, x);
     massert(x < df->width, "x is out of bounds: %s: %d", name, x);
     massert(y >= 0, "y is out of bounds: %s: %d", name, y);
     massert(y < df->height, "y is out of bounds: %s: %d", name, y);
     // can we create an entity at this location? no entities can be made on wall-types etc
+
     tile_t* const tile = df_tile_at(df, x, y);
     massert(tile, "failed to get tile");
     if (!tile_is_walkable(tile->type)) {
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
-    //minfo("tile type: %d", tile->type);
-    //minfo("checking for live npcs...");
     if (tile_has_live_npcs(g, tile, em)) {
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
-    //minfo("check complete");
-    //minfo("creating entity: %s", name);
-    //entity* const e = e_new_npc_at(next_entityid++, rt, x, y, fl,
-    //                               name); // Assuming entity_new_at takes name next
-    //if (!e) {
-    //    merror("failed to create entity");
-    //    return ENTITYID_INVALID;
-    //}
-    //em_add(em, e);
-    //gs_add_entityid(g, e->id);
     gs_add_entityid(g, next_entityid);
-    //if (!df_add_at(df, e->id, x, y)) {
     if (!df_add_at(df, next_entityid, x, y)) {
         merror("failed to add entity to dungeon floor");
         //free(e);
@@ -1089,7 +1077,7 @@ static void init_player(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // setting it up so we can return a loc_t from a function
     // that can scan for an appropriate starting location
-    loc_t loc = df_get_upstairs(g->dungeon->floors[g->dungeon->current_floor]);
+    loc_t loc = df_get_upstairs(g->d->floors[g->d->current_floor]);
     //minfo("loc: %d, %d, %d", loc.x, loc.y, loc.z);
     const int id = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
     massert(id != ENTITYID_INVALID, "failed to init hero");
@@ -1449,7 +1437,7 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
     g_set_update(g, id, true);
     // check if the player is on a tile with an item
     loc_t loc = g_get_location(g, id);
-    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, loc.z);
+    dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
     if (!df) {
         merror("Failed to get dungeon floor");
         return false;
@@ -1491,7 +1479,7 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
 static inline void try_open_close_door(gamestate* const g, entity* const e, int x, int y, int fl) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
-    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    dungeon_floor_t* const df = d_get_floor(g->d, fl);
     massert(df, "Failed to get dungeon floor");
     tile_t* const tile = df_tile_at(df, x, y);
     if (!tile) {
@@ -1503,7 +1491,7 @@ static inline void try_open_close_door(gamestate* const g, entity* const e, int 
 static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
-    dungeon_floor_t* const df = dungeon_get_floor(g->dungeon, fl);
+    dungeon_floor_t* const df = d_get_floor(g->d, fl);
     massert(df, "Failed to get dungeon floor");
     tile_t* const tile = df_tile_at(df, x, y);
     if (tile && tile->has_wall_switch) {
@@ -1681,7 +1669,7 @@ static void try_entity_open_door(gamestate* g, entity* e, int x, int y) {
     massert(g, "Game state is NULL!");
     massert(e, "Entity is NULL!");
     loc_t loc = g_get_location(g, e->id);
-    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, loc.z);
+    dungeon_floor_t* df = d_get_floor(g->d, loc.z);
     massert(df, "Failed to get dungeon floor");
     tile_t* tile = df_tile_at(df, x, y);
     if (!tile) {
@@ -1788,8 +1776,8 @@ static void update_debug_panel_buffer(gamestate* const g) {
              g->cam2d.offset.y,
              g->cam2d.zoom,
              control_mode,
-             g->dungeon->current_floor + 1, // More user-friendly 1-based
-             g->dungeon->num_floors,
+             g->d->current_floor + 1, // More user-friendly 1-based
+             g->d->num_floors,
              g->index_entityids,
              flag_name,
              g->entity_turn,
@@ -1940,14 +1928,14 @@ void liblogic_close(gamestate* const g) {
     // free the entitymap
     em_free(g->entitymap);
     // free the dungeon
-    dungeon_free(g->dungeon);
+    d_free(g->d);
 }
 
 // Check if a location is traversable (walkable and unoccupied)
 static inline bool is_traversable(gamestate* const g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     // get the dungeon floor
-    dungeon_floor_t* df = dungeon_get_floor(g->dungeon, z);
+    dungeon_floor_t* df = d_get_floor(g->d, z);
     massert(df, "floor is NULL");
     // Check map bounds
     if (x < 0 || x >= df->width || y < 0 || y >= df->height) return false;

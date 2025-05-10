@@ -66,7 +66,7 @@ typedef struct gamestate {
     int font_size, pad;
     float line_spacing;
 
-    dungeon_t* dungeon;
+    dungeon_t* d;
 
     em_t* entitymap;
 

@@ -832,7 +832,7 @@ void libdraw_update_sprites(gamestate* const g) {
 
 static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     massert(g, "gamestate is NULL");
-    dungeon_floor_t* const df = dungeon_get_current_floor(g->dungeon);
+    dungeon_floor_t* const df = d_get_current_floor(g->d);
     massert(df, "dungeon_floor is NULL");
     draw_dungeon_tiles_2d(g, df);
     draw_entities_2d(g, df, true); // dead entities
@@ -1080,7 +1080,7 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
     //}
     //msuccess("entity found %d", id);
     //disabling this check until dungeon_floor created
-    dungeon_floor_t* df = dungeon_get_current_floor(g->dungeon);
+    dungeon_floor_t* df = d_get_current_floor(g->d);
     if (!df) {
         merror("create_spritegroup: dungeon_floor is NULL");
         spritegroup_destroy(group);
@@ -1203,22 +1203,15 @@ static void create_sg_byid(gamestate* const g, entityid id) {
 
 static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    //const int font_size = 10;
-    //const int pad = 40; // Inner padding (text <-> box edges)
-    //const float line_spacing = 1.0f;
-    //entity* const e = em_get(g->entitymap, g->hero_id);
-    //massert(e, "entity is NULL");
     const int turn = g->turn_count;
     const int hp = 0;
     const int maxhp = 0;
     const int mp = 0;
     const int maxmp = 0;
     const int level = 0;
-
     loc_t loc = g_get_location(g, g->hero_id);
-    dungeon_floor_t* const df = dungeon_get_current_floor(g->dungeon);
+    dungeon_floor_t* const df = d_get_current_floor(g->d);
     const char* room_name = df_get_room_name(df, loc);
-
     char buffer[1024] = {0};
     snprintf(buffer,
              sizeof(buffer),
@@ -1232,7 +1225,6 @@ static void draw_hud(gamestate* const g) {
              0, // XP placeholder
              room_name,
              turn);
-
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, g->font_size, g->line_spacing);
     const int box_w = text_size.x + g->pad;
     const int box_h = text_size.y + g->pad;
@@ -1240,7 +1232,6 @@ static void draw_hud(gamestate* const g) {
     const int box_y = (g->windowheight - box_h) * 7 / 8;
     const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
     //const Color bg = (Color){0, 0, 0xff, 0xFF}, fg = WHITE;
-
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, 2, fg);
     // Calculate text position to center it within the box
