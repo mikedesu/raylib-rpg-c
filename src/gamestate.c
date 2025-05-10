@@ -86,12 +86,13 @@ gamestate* gamestateinitptr() {
 
     g->name_list_count = g->type_list_count = g->race_list_count = g->direction_list_count = g->loc_list_count = g->sprite_move_list_count =
         g->dead_list_count = g->update_list_count = g->attacking_list_count = g->blocking_list_count = g->block_success_list_count = g->damaged_list_count =
-            g->inventory_list_count = g->equipped_weapon_list_count = g->equipped_shield_list_count = g->target_list_count = g->target_path_list_count = 0;
+            g->inventory_list_count = g->equipped_weapon_list_count = g->equipped_shield_list_count = g->target_list_count = g->target_path_list_count =
+                g->default_action_list_count = 0;
 
     g->name_list_capacity = g->type_list_capacity = g->race_list_capacity = g->direction_list_capacity = g->loc_list_capacity = g->sprite_move_list_capacity =
         g->dead_list_capacity = g->update_list_capacity = g->attacking_list_capacity = g->blocking_list_capacity = g->block_success_list_capacity =
             g->damaged_list_capacity = g->inventory_list_capacity = g->equipped_weapon_list_capacity = g->equipped_shield_list_capacity =
-                g->target_list_capacity = g->target_path_list_capacity = LIST_INIT_CAPACITY;
+                g->target_list_capacity = g->target_path_list_capacity = g->default_action_list_capacity = LIST_INIT_CAPACITY;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * g->name_list_capacity);
     massert(g->name_list, "g->name_list is NULL");
@@ -127,6 +128,8 @@ gamestate* gamestateinitptr() {
     massert(g->target_list, "g->target_list is NULL");
     g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * g->target_path_list_capacity);
     massert(g->target_path_list, "g->target_path_list is NULL");
+    g->default_action_list = (default_action_component*)malloc(sizeof(default_action_component) * g->default_action_list_capacity);
+    massert(g->default_action_list, "g->default_action_list is NULL");
 
     gamestate_init_msg_history(g);
     return g;
@@ -193,6 +196,7 @@ void gamestatefree(gamestate* g) {
     free(g->equipped_shield_list);
     free(g->target_list);
     free(g->target_path_list);
+    free(g->default_action_list);
     free(g);
     msuccess("Freed gamestate");
 }
@@ -339,11 +343,9 @@ bool g_register_comp(gamestate* const g, entityid id, component comp) {
         merror("g->components is NULL");
         return false;
     }
-    if (!ct_has_entity(g->components, id)) {
-        if (!ct_add_entity(g->components, id)) {
-            merror("ct_add_entity failed");
-            return false;
-        }
+    if (!ct_add_entity(g->components, id)) {
+        minfo("ct_add_entity failed, entity may already exist in table");
+        //    return false;
     }
     if (!ct_add_component(g->components, id, comp)) {
         merror("ct_add_component failed");
@@ -359,11 +361,9 @@ bool g_register_comps(gamestate* const g, entityid id, ...) {
         merror("g->components is NULL");
         return false;
     }
-    if (!ct_has_entity(g->components, id)) {
-        if (!ct_add_entity(g->components, id)) {
-            merror("ct_add_entity failed");
-            return false;
-        }
+    if (!ct_add_entity(g->components, id)) {
+        merror("ct_add_entity failed");
+        return false;
     }
     va_list args;
     va_start(args, id);
@@ -383,6 +383,13 @@ bool g_register_comps(gamestate* const g, entityid id, ...) {
 bool g_add_name(gamestate* const g, entityid id, const char* name) {
     massert(g, "g is NULL");
     massert(name, "name is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(g->name_list, "g->name_list is NULL");
+    massert(g->name_list_count < g->name_list_capacity, "g->name_list_count >= g->name_list_capacity");
+    massert(g->name_list_capacity > 0, "g->name_list_capacity is 0");
+    massert(g->name_list_count >= 0, "g->name_list_count is negative");
+    massert(g->name_list_count < g->max_entityids, "g->name_list_count >= g->max_entityids");
+    massert(ct_has_entity(g->components, id), "id %d does not exist in component table", id);
     massert(g_has_component(g, id, C_NAME), "id %d does not have a name component", id);
     if (g->name_list_count >= g->name_list_capacity) {
         g->name_list_capacity *= 2;
@@ -1017,4 +1024,58 @@ bool g_get_damaged(const gamestate* const g, entityid id) {
     }
     //merror("id %d not found in damaged_list", id);
     return false;
+}
+
+bool g_has_default_action(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_DEFAULT_ACTION);
+}
+
+bool g_add_default_action(gamestate* const g, entityid id, entity_action_t action) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the default action component
+    massert(g_has_component(g, id, C_DEFAULT_ACTION), "id %d does not have a default action component", id);
+    if (g->default_action_list_count >= g->default_action_list_capacity) {
+        g->default_action_list_capacity *= 2;
+        g->default_action_list = realloc(g->default_action_list, sizeof(default_action_component) * g->default_action_list_capacity);
+        if (g->default_action_list == NULL) {
+            merror("g->default_action_list is NULL");
+            return false;
+        }
+    }
+    init_default_action_component(&g->default_action_list[g->default_action_list_count], id, action);
+    g->default_action_list_count++;
+    return true;
+}
+
+bool g_set_default_action(gamestate* const g, entityid id, entity_action_t action) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->default_action_list == NULL) {
+        merror("g->default_action_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->default_action_list_count; i++) {
+        if (g->default_action_list[i].id == id) {
+            g->default_action_list[i].action = action;
+            return true;
+        }
+    }
+    return false;
+}
+
+entity_action_t g_get_default_action(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->default_action_list == NULL) {
+        merror("g->default_action_list is NULL");
+        return ENTITY_ACTION_NONE;
+    }
+    for (int i = 0; i < g->default_action_list_count; i++) {
+        if (g->default_action_list[i].id == id) { return g->default_action_list[i].action; }
+    }
+    merror("id %d not found in default_action_list", id);
+    return ENTITY_ACTION_NONE;
 }

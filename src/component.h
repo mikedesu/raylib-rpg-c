@@ -1,6 +1,7 @@
 #pragma once
 
 #include "direction.h"
+#include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "location.h"
@@ -31,7 +32,7 @@ typedef enum component_t
     //C_TARGET,
     //C_TARGET_PATH,
     //C_DOOR_STATE,
-    //C_DEFAULT_ACTION,
+    C_DEFAULT_ACTION,
     //C_ATTRIBUTES,
     //C_MODIFIERS,
     C_COUNT
@@ -124,6 +125,11 @@ typedef struct target_path_component_t {
     int target_path_length;
 } target_path_component;
 
+typedef struct default_action_component_t {
+    entityid id;
+    entity_action_t action;
+} default_action_component;
+
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
 void init_race_component(race_component* comp, entityid id, race_t race);
@@ -141,3 +147,4 @@ void init_equipped_weapon_component(equipped_weapon_component* comp, entityid id
 void init_equipped_shield_component(equipped_shield_component* comp, entityid id, entityid shield);
 void init_target_component(target_component* comp, entityid id, loc_t target);
 void init_target_path_component(target_path_component* comp, entityid id, loc_t* target_path, int target_path_length);
+void init_default_action_component(default_action_component* comp, entityid id, entity_action_t default_action);

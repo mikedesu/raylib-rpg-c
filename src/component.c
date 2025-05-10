@@ -168,3 +168,12 @@ void init_target_path_component(target_path_component* comp, entityid id, loc_t*
     comp->target_path = target_path;
     comp->target_path_length = target_path_length;
 }
+
+void init_default_action_component(default_action_component* comp, entityid id, entity_action_t default_action) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) { return; }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) { return; }
+    comp->id = id;
+    comp->action = default_action;
+}

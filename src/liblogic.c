@@ -986,7 +986,9 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int z, c
     //}
     entityid id = next_entityid++;
     gs_add_entityid(g, id);
+    minfo("registering name: %s", name);
     g_register_comp(g, id, C_NAME);
+    minfo("registering type: %d", ENTITY_NPC);
     g_register_comp(g, id, C_TYPE);
     g_register_comp(g, id, C_RACE);
     g_register_comp(g, id, C_DIRECTION);
@@ -998,6 +1000,8 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int z, c
     g_register_comp(g, id, C_BLOCKING);
     g_register_comp(g, id, C_BLOCK_SUCCESS);
     g_register_comp(g, id, C_DAMAGED);
+    g_register_comp(g, id, C_DEFAULT_ACTION);
+
     if (!df_add_at(df, id, x, y)) {
         merror("failed to add entity to dungeon floor");
         //free(e);
@@ -1073,6 +1077,7 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     g_add_blocking(g, id, false);
     g_add_block_success(g, id, false);
     g_add_damaged(g, id, false);
+    g_add_default_action(g, id, ENTITY_ACTION_WAIT);
 
     return id;
 }

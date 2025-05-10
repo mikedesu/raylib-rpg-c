@@ -104,13 +104,14 @@ typedef struct gamestate {
     equipped_shield_component* equipped_shield_list;
     target_component* target_list;
     target_path_component* target_path_list;
+    default_action_component* default_action_list;
 
     int name_list_count, name_list_capacity, type_list_count, type_list_capacity, race_list_count, race_list_capacity, direction_list_count,
         direction_list_capacity, loc_list_count, loc_list_capacity, sprite_move_list_count, sprite_move_list_capacity, dead_list_count, dead_list_capacity,
         update_list_count, update_list_capacity, attacking_list_count, attacking_list_capacity, blocking_list_count, blocking_list_capacity,
         block_success_list_count, block_success_list_capacity, damaged_list_count, damaged_list_capacity, inventory_list_count, inventory_list_capacity,
         equipped_weapon_list_count, equipped_weapon_list_capacity, equipped_shield_list_count, equipped_shield_list_capacity, target_list_count,
-        target_list_capacity, target_path_list_count, target_path_list_capacity;
+        target_list_capacity, target_path_list_count, target_path_list_capacity, default_action_list_count, default_action_list_capacity;
 
 } gamestate;
 
@@ -202,6 +203,7 @@ bool g_add_damaged(gamestate* const g, entityid id, bool damaged);
 bool g_set_damaged(gamestate* const g, entityid id, bool damaged);
 bool g_get_damaged(const gamestate* const g, entityid id);
 
-//bool g_has_inventory(const gamestate* const g, entityid id);
-//bool g_add_inventory(gamestate* const g, entityid id, entityid item_id);
-//bool g_remove_inventory(gamestate* const g, entityid id, entityid item_id);
+bool g_has_default_action(const gamestate* const g, entityid id);
+bool g_add_default_action(gamestate* const g, entityid id, entity_action_t action);
+bool g_set_default_action(gamestate* const g, entityid id, entity_action_t action);
+entity_action_t g_get_default_action(const gamestate* const g, entityid id);

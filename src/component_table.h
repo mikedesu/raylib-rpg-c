@@ -16,8 +16,11 @@ typedef struct component_table_t {
 
 ct* ct_create();
 void ct_destroy(ct* table);
+
 bool ct_add_entity(ct* table, entityid id);
 bool ct_remove_entity(ct* table, entityid id);
+bool ct_has_entity(ct* table, entityid id);
+
 bool ct_add_component(ct* table, entityid id, component comp);
 bool ct_has_entity(ct* table, entityid id);
 bool ct_has_component(ct* table, entityid id, component comp);

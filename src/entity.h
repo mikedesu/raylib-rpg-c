@@ -30,17 +30,13 @@ typedef struct entity_t {
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
     //entity_stats_t stats;
-    entity_action_t default_action; // New field
+    //entity_action_t default_action; // New field
     // if the entity is a potion...
     potiontype_t potion_type;
-
     //bool is_damaged;
-
     bool door_is_open;
-
     entityid weapon;
     entityid shield;
-
     // pathfinding
     loc_t target;
     int target_path_length;
@@ -100,17 +96,17 @@ static inline entity_t* e_new_potion(entityid id, potiontype_t potion_type, cons
     return e;
 }
 
-static inline void e_set_default_action(entity_t* const e, entity_action_t action) {
-    massert(e, "e is NULL");
-    massert(action >= 0, "action is less than 0");
-    massert(action < ENTITY_ACTION_COUNT, "action is greater than ENTITY_ACTION_COUNT");
-    e->default_action = action;
-}
+//static inline void e_set_default_action(entity_t* const e, entity_action_t action) {
+//    massert(e, "e is NULL");
+//    massert(action >= 0, "action is less than 0");
+//    massert(action < ENTITY_ACTION_COUNT, "action is greater than ENTITY_ACTION_COUNT");
+//e->default_action = action;
+//}
 
-static inline entity_action_t e_get_default_action(entity_t* const e) {
-    massert(e, "e is NULL");
-    return e->default_action;
-}
+//static inline entity_action_t e_get_default_action(entity_t* const e) {
+//    massert(e, "e is NULL");
+//    return e->default_action;
+//}
 
 static inline void e_equip_weapon(entity* e, entityid weapon_id) {
     massert(e, "entity is NULL");
