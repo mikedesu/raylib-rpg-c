@@ -960,38 +960,50 @@ static void init_em(gamestate* const g) {
     g->entitymap = em_new();
 }
 
-static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name) {
+static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int z, const char* name) {
     massert(g, "gamestate is NULL");
     em_t* em = gamestate_get_entitymap(g);
     massert(em, "entitymap is NULL");
     massert(name && name[0], "name is NULL or empty");
     massert(rt >= 0, "race_type is out of bounds: %s: %d", name, rt);
     massert(rt < RACE_COUNT, "race_type is out of bounds: %s: %d", name, rt);
-    dungeon_floor_t* const df = d_get_floor(g->d, fl);
+    dungeon_floor_t* const df = d_get_floor(g->d, z);
     massert(df, "failed to get current dungeon floor");
     massert(x >= 0, "x is out of bounds: %s: %d", name, x);
     massert(x < df->width, "x is out of bounds: %s: %d", name, x);
     massert(y >= 0, "y is out of bounds: %s: %d", name, y);
     massert(y < df->height, "y is out of bounds: %s: %d", name, y);
     // can we create an entity at this location? no entities can be made on wall-types etc
-
     tile_t* const tile = df_tile_at(df, x, y);
     massert(tile, "failed to get tile");
-    if (!tile_is_walkable(tile->type)) {
+    if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile, em)) {
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
-    if (tile_has_live_npcs(g, tile, em)) {
-        merror("cannot create entity on tile with NPC");
-        return ENTITYID_INVALID;
-    }
-    gs_add_entityid(g, next_entityid);
-    if (!df_add_at(df, next_entityid, x, y)) {
+    //if (tile_has_live_npcs(g, tile, em)) {
+    //    merror("cannot create entity on tile with NPC");
+    //    return ENTITYID_INVALID;
+    //}
+    entityid id = next_entityid++;
+    gs_add_entityid(g, id);
+    g_register_comp(g, id, C_NAME);
+    g_register_comp(g, id, C_TYPE);
+    g_register_comp(g, id, C_RACE);
+    g_register_comp(g, id, C_DIRECTION);
+    g_register_comp(g, id, C_LOCATION);
+    g_register_comp(g, id, C_SPRITE_MOVE);
+    g_register_comp(g, id, C_DEAD);
+    g_register_comp(g, id, C_UPDATE);
+    g_register_comp(g, id, C_ATTACKING);
+    g_register_comp(g, id, C_BLOCKING);
+    g_register_comp(g, id, C_BLOCK_SUCCESS);
+    g_register_comp(g, id, C_DAMAGED);
+    if (!df_add_at(df, id, x, y)) {
         merror("failed to add entity to dungeon floor");
         //free(e);
         return ENTITYID_INVALID;
     }
-    return next_entityid++;
+    return id;
 }
 
 //static entityid door_create(gamestate* const g, int x, int y, int fl, const char* name) {
@@ -1049,14 +1061,6 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     gamestate_set_hero_id(g, id);
 
     // beginnings of a real ECS system...
-    //    g_register_comps(
-    //        g, id, C_NAME, C_TYPE, C_RACE, C_DIRECTION, C_LOCATION, C_SPRITE_MOVE, C_DEAD, C_UPDATE, C_ATTACKING, C_BLOCKING, C_BLOCK_SUCCESS, C_DAMAGED, 0);
-
-    g_register_comp(g, id, C_NAME);
-    g_register_comp(g, id, C_TYPE);
-    g_register_comp(g, id, C_RACE);
-    g_register_comps(g, id, C_DIRECTION, C_LOCATION, C_SPRITE_MOVE, C_DEAD, C_UPDATE, C_ATTACKING, C_BLOCKING, C_BLOCK_SUCCESS, C_DAMAGED, 0);
-
     g_add_name(g, id, name);
     g_add_type(g, id, type);
     g_add_race(g, id, RACE_HUMAN);
