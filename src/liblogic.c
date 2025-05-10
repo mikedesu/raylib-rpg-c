@@ -517,44 +517,36 @@ static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid atta
     for (int i = 0; i < tile->entity_max; i++) handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
 }
 
-static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y) {
+static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
     //minfo("calling g_is_dead 6");
-    massert(!g_is_dead(g, attacker_id), "attacker entity is dead");
-    //entity* e = em_get(g->entitymap, attacker_id);
+    massert(!g_is_dead(g, atk_id), "attacker entity is dead");
+    //entity* e = em_get(g->entitymap, atk_id);
     //massert(e, "attacker entity is NULL");
-
-    loc_t loc = g_get_location(g, attacker_id);
+    loc_t loc = g_get_location(g, atk_id);
     //loc_t loc = g_get_location(g, e->id);
     //dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, e->floor);
     dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, loc.z);
     massert(floor, "failed to get dungeon floor");
-    tile_t* const tile = df_tile_at(floor, target_x, target_y);
+    tile_t* const tile = df_tile_at(floor, tgt_x, tgt_y);
     if (!tile) {
         merror("target tile not found");
         return;
     }
     // Calculate direction based on target position
     bool ok = false;
-
-    loc_t eloc = g_get_location(g, attacker_id);
-
-    int dx = target_x - eloc.x;
-    int dy = target_y - eloc.y;
-
+    loc_t eloc = g_get_location(g, atk_id);
+    int dx = tgt_x - eloc.x;
+    int dy = tgt_y - eloc.y;
     //e->direction = get_dir_from_xy(dx, dy);
-    g_update_direction(g, attacker_id, get_dir_from_xy(dx, dy));
-
+    g_update_direction(g, atk_id, get_dir_from_xy(dx, dy));
     //e->is_attacking = true;
-    g_set_attacking(g, attacker_id, true);
-
+    g_set_attacking(g, atk_id, true);
     //e->do_update = true;
-    g_set_update(g, attacker_id, true);
-
-    handle_attack_helper(g, tile, attacker_id, &ok);
-
+    g_set_update(g, atk_id, true);
+    handle_attack_helper(g, tile, atk_id, &ok);
     //handle_attack_success_gamestate_flag(g, e->type, ok);
-    handle_attack_success_gamestate_flag(g, g_get_type(g, attacker_id), ok);
+    handle_attack_success_gamestate_flag(g, g_get_type(g, atk_id), ok);
 }
 
 static void try_entity_attack_random(gamestate* const g, entity* const e) {
