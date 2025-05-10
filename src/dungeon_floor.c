@@ -47,7 +47,8 @@ static void df_init_test_complex4(dungeon_floor_t* df, int hallway_length);
 static void df_init_test_complex5(dungeon_floor_t* df, range hallway_length);
 static void df_init_test_complex6(dungeon_floor_t* df, range room_length, range room_width);
 static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range room_length);
-static void df_init_test_complex8(dungeon_floor_t* df);
+//static void df_init_test_complex8(dungeon_floor_t* df);
+static void df_init_test_complex8(dungeon_floor_t* df, int w, int h);
 static void df_assign_stairs(dungeon_floor_t* df);
 static void df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name);
 static void df_assign_downstairs(dungeon_floor_t* df);
@@ -479,8 +480,8 @@ void df_init(dungeon_floor_t* df) {
     //df_init_test_complex4(df, 3);
     //df_init_test_complex5(df, (range){3, 10});
     //df_init_test_complex6(df, (range){3, 10}, (range){3, 10});
-    df_init_test_complex7(df, (range){3, 5}, (range){3, 5});
-    //df_init_test_complex8(df);
+    //df_init_test_complex7(df, (range){3, 5}, (range){3, 5});
+    df_init_test_complex8(df, 8, 8);
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
@@ -1636,10 +1637,11 @@ static void df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, t
     df_add_room_info(df, x, y, w, h, room_name);
 }
 
-static void df_init_test_complex8(dungeon_floor_t* df) {
+static void df_init_test_complex8(dungeon_floor_t* df, int w, int h) {
+    //static void df_init_test_complex8(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
-    int w = 20;
-    int h = 20;
+    //int w = 20;
+    //int h = 20;
     int cx = df_center_x(df);
     int cy = df_center_y(df);
     int x = cx - w / 2;

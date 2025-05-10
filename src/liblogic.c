@@ -519,13 +519,8 @@ static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid atta
 
 static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
-    //minfo("calling g_is_dead 6");
     massert(!g_is_dead(g, atk_id), "attacker entity is dead");
-    //entity* e = em_get(g->entitymap, atk_id);
-    //massert(e, "attacker entity is NULL");
     loc_t loc = g_get_location(g, atk_id);
-    //loc_t loc = g_get_location(g, e->id);
-    //dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, e->floor);
     dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, loc.z);
     massert(floor, "failed to get dungeon floor");
     tile_t* const tile = df_tile_at(floor, tgt_x, tgt_y);
@@ -538,14 +533,10 @@ static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, in
     loc_t eloc = g_get_location(g, atk_id);
     int dx = tgt_x - eloc.x;
     int dy = tgt_y - eloc.y;
-    //e->direction = get_dir_from_xy(dx, dy);
     g_update_direction(g, atk_id, get_dir_from_xy(dx, dy));
-    //e->is_attacking = true;
     g_set_attacking(g, atk_id, true);
-    //e->do_update = true;
     g_set_update(g, atk_id, true);
     handle_attack_helper(g, tile, atk_id, &ok);
-    //handle_attack_success_gamestate_flag(g, e->type, ok);
     handle_attack_success_gamestate_flag(g, g_get_type(g, atk_id), ok);
 }
 
@@ -1356,88 +1347,82 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         g->display_inventory_menu = false;
         return;
     }
-    entity* const hero = em_get(g->entitymap, g->hero_id);
-    massert(hero, "hero is NULL");
-    if (hero->inventory_count == 0) { return; }
-    if (inputstate_is_pressed(is, KEY_DOWN)) {
-        g->inventory_menu_selection++;
-        if (g->inventory_menu_selection >= hero->inventory_count) { g->inventory_menu_selection = 0; }
-    } else if (inputstate_is_pressed(is, KEY_UP)) {
-        g->inventory_menu_selection--;
-        if (g->inventory_menu_selection < 0) { g->inventory_menu_selection = hero->inventory_count - 1; }
-    } else if (inputstate_is_pressed(is, KEY_ENTER)) {
-        // we need to grab the entityid of the selected item
-        entityid item_id = hero->inventory[g->inventory_menu_selection];
-        entity* item = em_get(g->entitymap, item_id);
-        massert(item, "item is NULL");
-
-        //if (item->type == ENTITY_WEAPON) {
-        if (g_is_type(g, item_id, ENTITY_WEAPON)) {
-            // attempt to equip the weapon
-            // check if the hero is already equipped with the weapon
-            if (hero->weapon == item_id) {
-                add_message(g, "You are already using %s", "[placeholder]");
-                g->controlmode = CONTROLMODE_PLAYER;
-                g->display_inventory_menu = false;
-                return;
-            }
-
-            hero->weapon = item_id;
-            add_message_and_history(g, "%s equipped %s", "[placeholder]", "[placeholder]");
-            g->controlmode = CONTROLMODE_PLAYER;
-            g->display_inventory_menu = false;
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            //} else if (item->type == ENTITY_SHIELD) {
-        } else if (g_is_type(g, item_id, ENTITY_SHIELD)) {
-            // attempt to equip the shield
-            // check if the hero is already equipped with the shield
-            if (hero->shield == item_id) {
-                add_message(g, "You are already using %s", "[placeholder]");
-                g->controlmode = CONTROLMODE_PLAYER;
-                g->display_inventory_menu = false;
-                return;
-            }
-
-            hero->shield = item_id;
-            add_message_and_history(g, "%s equipped %s", "[placeholder]", "[placeholder]");
-            g->controlmode = CONTROLMODE_PLAYER;
-            g->display_inventory_menu = false;
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            //} else if (item->type == ENTITY_POTION) {
-        } else if (g_is_type(g, item_id, ENTITY_POTION)) {
-            add_message(g, "Potion use is not handled yet!");
-            g->controlmode = CONTROLMODE_PLAYER;
-            g->display_inventory_menu = false;
-        } else {
-            //add_message(g, "Unhandled item type: %d", item->type);
-            add_message(g, "Unhandled item type: %d", g_get_type(g, item_id));
-            g->controlmode = CONTROLMODE_PLAYER;
-            g->display_inventory_menu = false;
-        }
-
-    } else if (inputstate_is_pressed(is, KEY_U)) {
-        // we need to grab the entityid of the selected item
-        entityid item_id = hero->inventory[g->inventory_menu_selection];
-        entity* item = em_get(g->entitymap, item_id);
-        massert(item, "item is NULL");
-
-        //if (item->type == ENTITY_WEAPON) {
-        if (g_is_type(g, item_id, ENTITY_WEAPON)) {
-            // unequip the weapon
-            hero->weapon = ENTITYID_INVALID;
-            add_message_and_history(g, "%s unequipped %s", "[placeholder]", "[placeholder]");
-            g->controlmode = CONTROLMODE_PLAYER;
-            g->display_inventory_menu = false;
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (g_is_type(g, item_id, ENTITY_SHIELD)) {
-            // equip the shield
-            hero->shield = ENTITYID_INVALID;
-            add_message_and_history(g, "%s unequipped %s", "[placeholder]", "[placeholder]");
-            g->controlmode = CONTROLMODE_PLAYER;
-            g->display_inventory_menu = false;
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        }
-    }
+    //entity* const hero = em_get(g->entitymap, g->hero_id);
+    //massert(hero, "hero is NULL");
+    //if (hero->inventory_count == 0) { return; }
+    //if (inputstate_is_pressed(is, KEY_DOWN)) {
+    //    g->inventory_menu_selection++;
+    //    if (g->inventory_menu_selection >= hero->inventory_count) { g->inventory_menu_selection = 0; }
+    //} else if (inputstate_is_pressed(is, KEY_UP)) {
+    //    g->inventory_menu_selection--;
+    //    if (g->inventory_menu_selection < 0) { g->inventory_menu_selection = hero->inventory_count - 1; }
+    //} else if (inputstate_is_pressed(is, KEY_ENTER)) {
+    //    // we need to grab the entityid of the selected item
+    //    entityid item_id = hero->inventory[g->inventory_menu_selection];
+    //    entity* item = em_get(g->entitymap, item_id);
+    //    massert(item, "item is NULL");
+    //    if (g_is_type(g, item_id, ENTITY_WEAPON)) {
+    //        // attempt to equip the weapon
+    //        // check if the hero is already equipped with the weapon
+    //        if (hero->weapon == item_id) {
+    //            add_message(g, "You are already using %s", "[placeholder]");
+    //            g->controlmode = CONTROLMODE_PLAYER;
+    //            g->display_inventory_menu = false;
+    //            return;
+    //        }
+    //        hero->weapon = item_id;
+    //        add_message_and_history(g, "%s equipped %s", "[placeholder]", "[placeholder]");
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //        g->display_inventory_menu = false;
+    //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //        //} else if (item->type == ENTITY_SHIELD) {
+    //    } else if (g_is_type(g, item_id, ENTITY_SHIELD)) {
+    //        // attempt to equip the shield
+    //        // check if the hero is already equipped with the shield
+    //        if (hero->shield == item_id) {
+    //            add_message(g, "You are already using %s", "[placeholder]");
+    //            g->controlmode = CONTROLMODE_PLAYER;
+    //            g->display_inventory_menu = false;
+    //            return;
+    //        }
+    //        hero->shield = item_id;
+    //        add_message_and_history(g, "%s equipped %s", "[placeholder]", "[placeholder]");
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //        g->display_inventory_menu = false;
+    //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //        //} else if (item->type == ENTITY_POTION) {
+    //    } else if (g_is_type(g, item_id, ENTITY_POTION)) {
+    //        add_message(g, "Potion use is not handled yet!");
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //        g->display_inventory_menu = false;
+    //    } else {
+    //        //add_message(g, "Unhandled item type: %d", item->type);
+    //        add_message(g, "Unhandled item type: %d", g_get_type(g, item_id));
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //        g->display_inventory_menu = false;
+    //    }
+    //} else if (inputstate_is_pressed(is, KEY_U)) {
+    //    // we need to grab the entityid of the selected item
+    //    entityid item_id = hero->inventory[g->inventory_menu_selection];
+    //    entity* item = em_get(g->entitymap, item_id);
+    //    massert(item, "item is NULL");
+    //    //if (item->type == ENTITY_WEAPON) {
+    //    if (g_is_type(g, item_id, ENTITY_WEAPON)) {
+    //        // unequip the weapon
+    //        hero->weapon = ENTITYID_INVALID;
+    //        add_message_and_history(g, "%s unequipped %s", "[placeholder]", "[placeholder]");
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //        g->display_inventory_menu = false;
+    //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //    } else if (g_is_type(g, item_id, ENTITY_SHIELD)) {
+    //        // equip the shield
+    //        hero->shield = ENTITYID_INVALID;
+    //        add_message_and_history(g, "%s unequipped %s", "[placeholder]", "[placeholder]");
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //        g->display_inventory_menu = false;
+    //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //    }
+    //}
 }
 
 static inline void change_player_dir(gamestate* const g, direction_t dir) {

@@ -1311,8 +1311,8 @@ static void draw_inventory_menu(gamestate* const g) {
 
     const char* menu_title = "Inventory Menu";
 
-    entity* const hero = em_get(g->entitymap, g->hero_id);
-    massert(hero, "hero entity is NULL");
+    //entity* const hero = em_get(g->entitymap, g->hero_id);
+    //massert(hero, "hero entity is NULL");
 
     // Parameters
     const int box_pad = g->pad;
@@ -1359,34 +1359,30 @@ static void draw_inventory_menu(gamestate* const g) {
     DrawRectangleLinesEx(right_box, 2, WHITE);
 
     float item_y = left_box.y + item_list_pad;
-    for (int i = 0; i < hero->inventory_count && i < max_visible_items; i++) {
-        int item_id = hero->inventory[i];
-        if (item_id == 0) continue;
-        entity* item_entity = em_get(g->entitymap, item_id);
-        if (!item_entity) continue;
-
-        float item_x = left_box.x + item_list_pad;
-        char item_display[128];
-        bool is_equipped = false;
-        entitytype_t item_type = g_get_type(g, item_id);
-        if (item_type == ENTITY_WEAPON) {
-            is_equipped = (hero->weapon == item_id);
-        } else if (item_type == ENTITY_SHIELD) {
-            is_equipped = (hero->shield == item_id);
-        }
-
-        if (i == g->inventory_menu_selection) {
-            //snprintf(item_display, sizeof(item_display), "> %s", item_entity->name);
-            snprintf(item_display, sizeof(item_display), "> %s", "[placeholder]");
-        } else {
-            snprintf(item_display, sizeof(item_display), "  %s", "[placeholder]");
-        }
-
-        if (is_equipped) { strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1); }
-
-        DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, g->font_size, g->line_spacing, WHITE);
-        item_y += g->font_size + 4;
-    }
+    //for (int i = 0; i < hero->inventory_count && i < max_visible_items; i++) {
+    //    int item_id = hero->inventory[i];
+    //    if (item_id == 0) continue;
+    //    entity* item_entity = em_get(g->entitymap, item_id);
+    //    if (!item_entity) continue;
+    //    float item_x = left_box.x + item_list_pad;
+    //    char item_display[128];
+    //    bool is_equipped = false;
+    //    entitytype_t item_type = g_get_type(g, item_id);
+    //    if (item_type == ENTITY_WEAPON) {
+    //        is_equipped = (hero->weapon == item_id);
+    //    } else if (item_type == ENTITY_SHIELD) {
+    //        is_equipped = (hero->shield == item_id);
+    //    }
+    //    if (i == g->inventory_menu_selection) {
+    //        //snprintf(item_display, sizeof(item_display), "> %s", item_entity->name);
+    //        snprintf(item_display, sizeof(item_display), "> %s", "[placeholder]");
+    //    } else {
+    //        snprintf(item_display, sizeof(item_display), "  %s", "[placeholder]");
+    //    }
+    //    if (is_equipped) { strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1); }
+    //    DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, g->font_size, g->line_spacing, WHITE);
+    //    item_y += g->font_size + 4;
+    //}
 
     // Draw item info in right_box
     const char* info_title = "Item Info:";
@@ -1395,21 +1391,19 @@ static void draw_inventory_menu(gamestate* const g) {
 
     spritegroup_t* sg = NULL;
 
-    if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < hero->inventory_count) {
-        entityid item_id = hero->inventory[g->inventory_menu_selection];
-        entity* item_entity = em_get(g->entitymap, item_id);
-        if (item_entity) {
-            //snprintf(info_text, sizeof(info_text), "%s\nType: %d", item_entity->name, item_entity->type);
-
-            snprintf(info_text, sizeof(info_text), "%s\nType: %d", "[placeholder]", g_get_type(g, item_id));
-
-            sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
-        } else {
-            snprintf(info_text, sizeof(info_text), "Invalid item data");
-        }
-    } else {
-        snprintf(info_text, sizeof(info_text), "Select an item to view details here.");
-    }
+    //if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < hero->inventory_count) {
+    //    entityid item_id = hero->inventory[g->inventory_menu_selection];
+    //    entity* item_entity = em_get(g->entitymap, item_id);
+    //    if (item_entity) {
+    //        //snprintf(info_text, sizeof(info_text), "%s\nType: %d", item_entity->name, item_entity->type);
+    //        snprintf(info_text, sizeof(info_text), "%s\nType: %d", "[placeholder]", g_get_type(g, item_id));
+    //        sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
+    //    } else {
+    //        snprintf(info_text, sizeof(info_text), "Invalid item data");
+    //    }
+    //} else {
+    //    snprintf(info_text, sizeof(info_text), "Select an item to view details here.");
+    //}
 
     float info_title_y = right_box.y + item_list_pad;
     float info_text_y = info_title_y + g->font_size + 8;
