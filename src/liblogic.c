@@ -437,25 +437,25 @@ static inline void handle_attack_success_gamestate_flag(gamestate* const g, enti
     }
 }
 
-static void handle_attack_success(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
+//static void handle_attack_success(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
+static void handle_attack_success(gamestate* const g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
     massert(g, "gamestate is NULL");
-    massert(attacker, "attacker entity is NULL");
-    massert(target, "target entity is NULL");
-    massert(attack_successful, "attack_successful is NULL");
+    massert(atk_id, "attacker entity is NULL");
+    massert(tgt_id, "target entity is NULL");
+    massert(atk_successful, "attack_successful is NULL");
     //msuccess("Successful Attack on target: %s", target->name);
-    *attack_successful = true;
+    *atk_successful = true;
     //target->is_damaged = true;
-    g_set_damaged(g, target->id, true);
-
+    g_set_damaged(g, tgt_id, true);
     //target->do_update = true;
-    g_set_update(g, target->id, true);
+    g_set_update(g, tgt_id, true);
     //int dmg = 1;
     //e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
     //if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
     //if (attacker->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
     //if (e_get_hp(target) <= 0) {
     //target->dead = true;
-    g_update_dead(g, target->id, true);
+    g_update_dead(g, tgt_id, true);
     //}
 }
 
@@ -476,60 +476,56 @@ static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* 
     //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
 
-static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entity* attacker, bool* attack_successful) {
+static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entityid attacker_id, bool* attack_successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(i >= 0, "i is out of bounds");
     massert(i < tile->entity_max, "i is out of bounds");
-    massert(attacker, "attacker is NULL");
+    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(attack_successful, "attack_successful is NULL");
-
-    entityid id = tile->entities[i];
-    if (id == ENTITYID_INVALID) return false;
-
-    entity* target = em_get(g->entitymap, id);
-    massert(target, "target entity is NULL");
-
+    entityid target_id = tile->entities[i];
+    if (target_id == ENTITYID_INVALID) return false;
+    //entity* target = em_get(g->entitymap, id);
+    //massert(target, "target entity is NULL");
     //entitytype_t type = target->type;
-    entitytype_t type = g_get_type(g, id);
+    entitytype_t type = g_get_type(g, target_id);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) { return false; }
-
     //if (target->dead) { return false; }
     //minfo("calling g_is_dead 5");
-    if (g_is_dead(g, target->id)) { return false; }
-
+    if (g_is_dead(g, target_id)) { return false; }
     // lets try an experiment...
-    if (target->shield != ENTITYID_INVALID) {
-        // introducing a random chance to block if you have a shield...
-        int block_chance = rand() % 100;
-
-        if (block_chance < 50) {
-            msuccess("Block successful");
-            handle_attack_blocked(g, attacker, target, attack_successful);
-            return false;
-        }
-    }
+    //if (target->shield != ENTITYID_INVALID) {
+    // introducing a random chance to block if you have a shield...
+    //    int block_chance = rand() % 100;
+    //    if (block_chance < 50) {
+    //        msuccess("Block successful");
+    //        handle_attack_blocked(g, attacker, target, attack_successful);
+    //        return false;
+    //    }
+    //}
     msuccess("Attack successful");
-    handle_attack_success(g, attacker, target, attack_successful);
+    handle_attack_success(g, attacker_id, target_id, attack_successful);
     return true;
 }
 
-static void handle_attack_helper(gamestate* const g, tile_t* tile, entity* attacker, bool* successful) {
+//static void handle_attack_helper(gamestate* const g, tile_t* tile, entity* attacker, bool* successful) {
+static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid attacker_id, bool* successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
-    massert(attacker, "attacker is NULL");
+    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(successful, "attack_successful is NULL");
-    for (int i = 0; i < tile->entity_max; i++) handle_attack_helper_innerloop(g, tile, i, attacker, successful);
+    for (int i = 0; i < tile->entity_max; i++) handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
 }
 
 static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y) {
     massert(g, "gamestate is NULL");
     //minfo("calling g_is_dead 6");
     massert(!g_is_dead(g, attacker_id), "attacker entity is dead");
-    entity* e = em_get(g->entitymap, attacker_id);
-    massert(e, "attacker entity is NULL");
+    //entity* e = em_get(g->entitymap, attacker_id);
+    //massert(e, "attacker entity is NULL");
 
-    loc_t loc = g_get_location(g, e->id);
+    loc_t loc = g_get_location(g, attacker_id);
+    //loc_t loc = g_get_location(g, e->id);
     //dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, e->floor);
     dungeon_floor_t* const floor = dungeon_get_floor(g->dungeon, loc.z);
     massert(floor, "failed to get dungeon floor");
@@ -541,22 +537,24 @@ static void try_entity_attack(gamestate* const g, entityid attacker_id, int targ
     // Calculate direction based on target position
     bool ok = false;
 
-    loc_t eloc = g_get_location(g, e->id);
+    loc_t eloc = g_get_location(g, attacker_id);
 
     int dx = target_x - eloc.x;
     int dy = target_y - eloc.y;
 
     //e->direction = get_dir_from_xy(dx, dy);
-    g_update_direction(g, e->id, get_dir_from_xy(dx, dy));
+    g_update_direction(g, attacker_id, get_dir_from_xy(dx, dy));
 
     //e->is_attacking = true;
-    g_set_attacking(g, e->id, true);
+    g_set_attacking(g, attacker_id, true);
 
     //e->do_update = true;
-    g_set_update(g, e->id, true);
-    handle_attack_helper(g, tile, e, &ok);
+    g_set_update(g, attacker_id, true);
+
+    handle_attack_helper(g, tile, attacker_id, &ok);
+
     //handle_attack_success_gamestate_flag(g, e->type, ok);
-    handle_attack_success_gamestate_flag(g, g_get_type(g, e->id), ok);
+    handle_attack_success_gamestate_flag(g, g_get_type(g, attacker_id), ok);
 }
 
 static void try_entity_attack_random(gamestate* const g, entity* const e) {
@@ -640,42 +638,44 @@ static void execute_action(gamestate* const g, entityid id, entity_action_t acti
 
     //loc_t loc = g_get_location(g, id);
 
-    //switch (action) {
-    //case ENTITY_ACTION_MOVE_LEFT: try_entity_move(g, e, -1, 0); break;
-    //case ENTITY_ACTION_MOVE_RIGHT: try_entity_move(g, e, 1, 0); break;
-    //case ENTITY_ACTION_MOVE_UP: try_entity_move(g, e, 0, -1); break;
-    //case ENTITY_ACTION_MOVE_DOWN: try_entity_move(g, e, 0, 1); break;
-    //case ENTITY_ACTION_MOVE_UP_LEFT: try_entity_move(g, e, -1, -1); break;
-    //case ENTITY_ACTION_MOVE_UP_RIGHT: try_entity_move(g, e, 1, -1); break;
-    //case ENTITY_ACTION_MOVE_DOWN_LEFT: try_entity_move(g, e, -1, 1); break;
-    //case ENTITY_ACTION_MOVE_DOWN_RIGHT: try_entity_move(g, e, 1, 1); break;
-    //case ENTITY_ACTION_ATTACK_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y); break;
-    //case ENTITY_ACTION_ATTACK_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y); break;
-    //case ENTITY_ACTION_ATTACK_UP: try_entity_attack(g, e->id, loc.x, loc.y - 1); break;
-    //case ENTITY_ACTION_ATTACK_DOWN: try_entity_attack(g, e->id, loc.x, loc.y + 1); break;
-    //case ENTITY_ACTION_ATTACK_UP_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y - 1); break;
-    //case ENTITY_ACTION_ATTACK_UP_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y - 1); break;
-    //case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
-    //case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
-    //case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, e); break;
-    //case ENTITY_ACTION_WAIT: try_entity_wait(g, e); break;
-    //case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
-    //case ENTITY_ACTION_MOVE_PLAYER:
-    //    try_entity_move_player(g, e);
-    //    break;
-    //case ENTITY_ACTION_ATTACK_PLAYER: try_entity_attack_player(g, e); break;
-    //case ENTITY_ACTION_MOVE_ATTACK_PLAYER: try_entity_move_attack_player(g, e); break;
-    //case ENTITY_ACTION_MOVE_A_STAR: try_entity_move_a_star(g, e); break;
-    //case ENTITY_ACTION_INTERACT_DOWN_LEFT:
-    //case ENTITY_ACTION_INTERACT_DOWN_RIGHT:
-    //case ENTITY_ACTION_INTERACT_UP_LEFT:
-    //case ENTITY_ACTION_INTERACT_UP_RIGHT:
-    //case ENTITY_ACTION_INTERACT_LEFT:
-    //case ENTITY_ACTION_INTERACT_RIGHT:
-    //case ENTITY_ACTION_INTERACT_UP:
-    //case ENTITY_ACTION_INTERACT_DOWN:
-    //default: merror("Unknown entity action: %d", action); break;
-    //}
+    switch (action) {
+    case ENTITY_ACTION_MOVE_LEFT: try_entity_move(g, id, -1, 0); break;
+    case ENTITY_ACTION_MOVE_RIGHT: try_entity_move(g, id, 1, 0); break;
+    case ENTITY_ACTION_MOVE_UP: try_entity_move(g, id, 0, -1); break;
+    case ENTITY_ACTION_MOVE_DOWN: try_entity_move(g, id, 0, 1); break;
+    case ENTITY_ACTION_MOVE_UP_LEFT: try_entity_move(g, id, -1, -1); break;
+    case ENTITY_ACTION_MOVE_UP_RIGHT: try_entity_move(g, id, 1, -1); break;
+    case ENTITY_ACTION_MOVE_DOWN_LEFT: try_entity_move(g, id, -1, 1); break;
+    case ENTITY_ACTION_MOVE_DOWN_RIGHT:
+        try_entity_move(g, id, 1, 1);
+        break;
+        //case ENTITY_ACTION_ATTACK_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y); break;
+        //case ENTITY_ACTION_ATTACK_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y); break;
+        //case ENTITY_ACTION_ATTACK_UP: try_entity_attack(g, e->id, loc.x, loc.y - 1); break;
+        //case ENTITY_ACTION_ATTACK_DOWN: try_entity_attack(g, e->id, loc.x, loc.y + 1); break;
+        //case ENTITY_ACTION_ATTACK_UP_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y - 1); break;
+        //case ENTITY_ACTION_ATTACK_UP_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y - 1); break;
+        //case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
+        //case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
+        //case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, e); break;
+        //case ENTITY_ACTION_WAIT: try_entity_wait(g, e); break;
+        //case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
+        //case ENTITY_ACTION_MOVE_PLAYER:
+        //    try_entity_move_player(g, e);
+        //    break;
+        //case ENTITY_ACTION_ATTACK_PLAYER: try_entity_attack_player(g, e); break;
+        //case ENTITY_ACTION_MOVE_ATTACK_PLAYER: try_entity_move_attack_player(g, e); break;
+        //case ENTITY_ACTION_MOVE_A_STAR: try_entity_move_a_star(g, e); break;
+        //case ENTITY_ACTION_INTERACT_DOWN_LEFT:
+        //case ENTITY_ACTION_INTERACT_DOWN_RIGHT:
+        //case ENTITY_ACTION_INTERACT_UP_LEFT:
+        //case ENTITY_ACTION_INTERACT_UP_RIGHT:
+        //case ENTITY_ACTION_INTERACT_LEFT:
+        //case ENTITY_ACTION_INTERACT_RIGHT:
+        //case ENTITY_ACTION_INTERACT_UP:
+        //case ENTITY_ACTION_INTERACT_DOWN:
+        //default: merror("Unknown entity action: %d", action); break;
+    }
 }
 
 //static entityid create_potion_at(gamestate* const g, potiontype_t potion_type, const char* name, loc_t loc) {
@@ -1078,8 +1078,14 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     gamestate_set_hero_id(g, id);
 
     // beginnings of a real ECS system...
-    g_register_comps(
-        g, id, C_NAME, C_TYPE, C_RACE, C_DIRECTION, C_LOCATION, C_SPRITE_MOVE, C_DEAD, C_UPDATE, C_ATTACKING, C_BLOCKING, C_BLOCK_SUCCESS, C_DAMAGED, 0);
+    //    g_register_comps(
+    //        g, id, C_NAME, C_TYPE, C_RACE, C_DIRECTION, C_LOCATION, C_SPRITE_MOVE, C_DEAD, C_UPDATE, C_ATTACKING, C_BLOCKING, C_BLOCK_SUCCESS, C_DAMAGED, 0);
+
+    g_register_comp(g, id, C_NAME);
+    g_register_comp(g, id, C_TYPE);
+    g_register_comp(g, id, C_RACE);
+    g_register_comps(g, id, C_DIRECTION, C_LOCATION, C_SPRITE_MOVE, C_DEAD, C_UPDATE, C_ATTACKING, C_BLOCKING, C_BLOCK_SUCCESS, C_DAMAGED, 0);
+
     g_add_name(g, id, name);
     g_add_type(g, id, type);
     g_add_race(g, id, RACE_HUMAN);
@@ -1444,17 +1450,17 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
 
 static inline void change_player_dir(gamestate* const g, direction_t dir) {
     massert(g, "Game state is NULL!");
-    entity* const hero = em_get(g->entitymap, g->hero_id);
-    massert(hero, "hero is NULL");
+    //entity* const hero = em_get(g->entitymap, g->hero_id);
+    //massert(hero, "hero is NULL");
     //if (hero->dead) return;
     //minfo("calling g_is_dead 7");
-    if (g_is_dead(g, hero->id)) return;
+    if (g_is_dead(g, g->hero_id)) return;
 
     //hero->direction = dir;
-    g_update_direction(g, hero->id, dir);
+    g_update_direction(g, g->hero_id, dir);
 
     //hero->do_update = true;
-    g_set_update(g, hero->id, true);
+    g_set_update(g, g->hero_id, true);
 
     update_equipped_shield_dir(g, g->hero_id);
 }
@@ -1594,6 +1600,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         merror("No action found for key");
         return;
     }
+    if (strcmp(action, "none") != 0) { minfo("action: %s", action); }
     //entity* const hero = em_get(g->entitymap, g->hero_id);
     //massert(hero, "hero is NULL");
     // check if the player is dead

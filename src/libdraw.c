@@ -23,11 +23,11 @@
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
-//#define DEFAULT_WIN_WIDTH 960
-//#define DEFAULT_WIN_HEIGHT 540
+#define DEFAULT_WIN_WIDTH 960
+#define DEFAULT_WIN_HEIGHT 540
 
-#define DEFAULT_WIN_WIDTH 1920
-#define DEFAULT_WIN_HEIGHT 1080
+//#define DEFAULT_WIN_WIDTH 1920
+//#define DEFAULT_WIN_HEIGHT 1080
 
 //#define DEFAULT_WIN_WIDTH 1280
 //#define DEFAULT_WIN_HEIGHT 720
@@ -275,7 +275,7 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     //massert(sg, "spritegroup is NULL: id %d name %s", id, e->name);
 
-    minfo("draw_sprite_and_shadow: id %d", id);
+    //minfo("draw_sprite_and_shadow: id %d", id);
     sprite* s = sg_get_current(sg);
     massert(s, "sprite is NULL");
 
@@ -305,7 +305,7 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
         //msuccess("weapon_front_s");
         DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
-    msuccess("draw_sprite_and_shadow: id %d", id);
+    //msuccess("draw_sprite_and_shadow: id %d", id);
 }
 
 static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y) {
@@ -838,7 +838,7 @@ static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     draw_entities_2d(g, df, true); // dead entities
     draw_entities_2d(g, df, false); // alive entities
     //draw_wall_tiles_2d(g, df);
-    msuccess("libdraw_draw_dungeon_floor: done");
+    //msuccess("libdraw_draw_dungeon_floor: done");
     return true;
 }
 
@@ -887,7 +887,7 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
     if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
     if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
-    msuccess("libdraw_drawframe_2d: done");
+    //msuccess("libdraw_drawframe_2d: done");
     EndMode2D();
 }
 
@@ -958,19 +958,19 @@ void libdraw_drawframe(gamestate* const g) {
 
     libdraw_drawframe_2d(g);
 
-    minfo("libdraw_drawframe: message box");
+    //minfo("libdraw_drawframe: message box");
     draw_message_box(g);
-    minfo("libdraw_drawframe: message history");
+    //minfo("libdraw_drawframe: message history");
     draw_message_history(g);
-    minfo("libdraw_drawframe: hud");
+    //minfo("libdraw_drawframe: hud");
     draw_hud(g);
-    minfo("libdraw_drawframe: inventory menu");
+    //minfo("libdraw_drawframe: inventory menu");
     draw_inventory_menu(g);
 
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
 
-    minfo("libdraw_drawframe: debug panel");
+    //minfo("libdraw_drawframe: debug panel");
     handle_debug_panel(g);
 
     EndDrawing();
