@@ -959,23 +959,42 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int z, c
     g_register_comp(g, id, C_TARGET_PATH);
     minfo("registering equipment");
     g_register_comp(g, id, C_EQUIPMENT);
+
+    minfo("adding name for id %d: %s", id, name);
     g_add_name(g, id, name);
+    minfo("adding type for id %d: %d", id, ENTITY_NPC);
     g_add_type(g, id, ENTITY_NPC);
+    minfo("adding race for id %d: %d", id, rt);
     g_add_race(g, id, rt);
+    minfo("adding direction for id %d: %d", id, DIR_RIGHT);
     g_add_direction(g, id, DIR_RIGHT);
+    minfo("adding location for id %d: %d, %d, %d", id, x, y, z);
     g_add_location(g, id, (loc_t){x, y, z});
+    minfo("adding sprite_move: %d, %d", 0, 0);
     g_add_sprite_move(g, id, (loc_t){0, 0}); // default
+    minfo("adding dead: %d", false);
     g_add_dead(g, id, false);
+    minfo("adding update: %d", false);
     g_add_update(g, id, false);
+    minfo("adding ");
     g_add_attacking(g, id, false);
+    minfo("adding ");
     g_add_blocking(g, id, false);
+    minfo("adding ");
     g_add_block_success(g, id, false);
+    minfo("adding ");
     g_add_damaged(g, id, false);
+    minfo("adding ");
     g_add_default_action(g, id, ENTITY_ACTION_WAIT);
+    minfo("adding ");
     g_add_inventory(g, id);
+    minfo("adding ");
     g_add_target(g, id, (loc_t){-1, -1, -1});
+    minfo("adding ");
     g_add_target_path(g, id);
+    minfo("adding ");
     g_add_equipment(g, id);
+
     if (!df_add_at(df, id, x, y)) {
         merror("failed to add entity to dungeon floor");
         //free(e);

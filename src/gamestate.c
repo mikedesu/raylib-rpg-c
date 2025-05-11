@@ -85,55 +85,75 @@ gamestate* gamestateinitptr() {
 
     g->components = ct_create();
 
-    g->name_list_count = g->type_list_count = g->race_list_count = g->direction_list_count = g->loc_list_count = g->sprite_move_list_count =
-        g->dead_list_count = g->update_list_count = g->attacking_list_count = g->blocking_list_count = g->block_success_list_count = g->damaged_list_count =
-            g->inventory_list_count = 0;
-    //g->equipped_weapon_list_count = g->equipped_shield_list_count = 0;
-    g->target_list_count = g->target_path_list_count = g->default_action_list_count = 0;
+    g->name_list_count = 0;
+    g->type_list_count = 0;
+    g->race_list_count = 0;
+    g->direction_list_count = 0;
+    g->loc_list_count = 0;
+    g->sprite_move_list_count = 0;
+    g->dead_list_count = 0;
+    g->update_list_count = 0;
+    g->attacking_list_count = 0;
+    g->blocking_list_count = 0;
+    g->block_success_list_count = 0;
+    g->damaged_list_count = 0;
+    g->inventory_list_count = 0;
+    g->target_list_count = 0;
+    g->target_path_list_count = 0;
+    g->default_action_list_count = 0;
+    g->equipment_list_count = 0;
 
-    g->name_list_capacity = g->type_list_capacity = g->race_list_capacity = g->direction_list_capacity = g->loc_list_capacity = g->sprite_move_list_capacity =
-        g->dead_list_capacity = g->update_list_capacity = g->attacking_list_capacity = g->blocking_list_capacity = g->block_success_list_capacity =
-            g->damaged_list_capacity = g->inventory_list_capacity = 0;
-    //g->equipped_weapon_list_capacity = g->equipped_shield_list_capacity =0;
-    g->target_list_capacity = g->target_path_list_capacity = g->default_action_list_capacity = LIST_INIT_CAPACITY;
+    g->name_list_capacity = LIST_INIT_CAPACITY;
+    g->type_list_capacity = LIST_INIT_CAPACITY;
+    g->race_list_capacity = LIST_INIT_CAPACITY;
+    g->direction_list_capacity = LIST_INIT_CAPACITY;
+    g->loc_list_capacity = LIST_INIT_CAPACITY;
+    g->sprite_move_list_capacity = LIST_INIT_CAPACITY;
+    g->dead_list_capacity = LIST_INIT_CAPACITY;
+    g->update_list_capacity = LIST_INIT_CAPACITY;
+    g->attacking_list_capacity = LIST_INIT_CAPACITY;
+    g->blocking_list_capacity = LIST_INIT_CAPACITY;
+    g->block_success_list_capacity = LIST_INIT_CAPACITY;
+    g->damaged_list_capacity = LIST_INIT_CAPACITY;
+    g->inventory_list_capacity = LIST_INIT_CAPACITY;
+    g->target_list_capacity = LIST_INIT_CAPACITY;
+    g->target_path_list_capacity = LIST_INIT_CAPACITY;
+    g->default_action_list_capacity = LIST_INIT_CAPACITY;
+    g->equipment_list_capacity = LIST_INIT_CAPACITY;
 
-    g->name_list = (name_component*)malloc(sizeof(name_component) * g->name_list_capacity);
+    g->name_list = (name_component*)malloc(sizeof(name_component) * LIST_INIT_CAPACITY);
     massert(g->name_list, "g->name_list is NULL");
-    g->type_list = (type_component*)malloc(sizeof(type_component) * g->type_list_capacity);
+    g->type_list = (type_component*)malloc(sizeof(type_component) * LIST_INIT_CAPACITY);
     massert(g->type_list, "g->type_list is NULL");
-    g->race_list = (race_component*)malloc(sizeof(race_component) * g->race_list_capacity);
+    g->race_list = (race_component*)malloc(sizeof(race_component) * LIST_INIT_CAPACITY);
     massert(g->race_list, "g->race_list is NULL");
-    g->direction_list = (direction_component*)malloc(sizeof(direction_component) * g->direction_list_capacity);
+    g->direction_list = (direction_component*)malloc(sizeof(direction_component) * LIST_INIT_CAPACITY);
     massert(g->direction_list, "g->direction_list is NULL");
-    g->loc_list = (loc_component*)malloc(sizeof(loc_component) * g->loc_list_capacity);
+    g->loc_list = (loc_component*)malloc(sizeof(loc_component) * LIST_INIT_CAPACITY);
     massert(g->loc_list, "g->loc_list is NULL");
-    g->sprite_move_list = (sprite_move_component*)malloc(sizeof(sprite_move_component) * g->sprite_move_list_capacity);
+    g->sprite_move_list = (sprite_move_component*)malloc(sizeof(sprite_move_component) * LIST_INIT_CAPACITY);
     massert(g->sprite_move_list, "g->sprite_move_list is NULL");
-    g->dead_list = (dead_component*)malloc(sizeof(dead_component) * g->dead_list_capacity);
+    g->dead_list = (dead_component*)malloc(sizeof(dead_component) * LIST_INIT_CAPACITY);
     massert(g->dead_list, "g->dead_list is NULL");
-    g->update_list = (update_component*)malloc(sizeof(update_component) * g->update_list_capacity);
+    g->update_list = (update_component*)malloc(sizeof(update_component) * LIST_INIT_CAPACITY);
     massert(g->update_list, "g->update_list is NULL");
-    g->attacking_list = (attacking_component*)malloc(sizeof(attacking_component) * g->attacking_list_capacity);
+    g->attacking_list = (attacking_component*)malloc(sizeof(attacking_component) * LIST_INIT_CAPACITY);
     massert(g->attacking_list, "g->attacking_list is NULL");
-    g->blocking_list = (blocking_component*)malloc(sizeof(blocking_component) * g->blocking_list_capacity);
+    g->blocking_list = (blocking_component*)malloc(sizeof(blocking_component) * LIST_INIT_CAPACITY);
     massert(g->blocking_list, "g->blocking_list is NULL");
-    g->block_success_list = (block_success_component*)malloc(sizeof(block_success_component) * g->block_success_list_capacity);
+    g->block_success_list = (block_success_component*)malloc(sizeof(block_success_component) * LIST_INIT_CAPACITY);
     massert(g->block_success_list, "g->block_success_list is NULL");
-    g->damaged_list = (damaged_component*)malloc(sizeof(damaged_component) * g->damaged_list_capacity);
+    g->damaged_list = (damaged_component*)malloc(sizeof(damaged_component) * LIST_INIT_CAPACITY);
     massert(g->damaged_list, "g->damaged_list is NULL");
-    g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * g->inventory_list_capacity);
+    g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * LIST_INIT_CAPACITY);
     massert(g->inventory_list, "g->inventory_list is NULL");
-    //g->equipped_weapon_list = (equipped_weapon_component*)malloc(sizeof(equipped_weapon_component) * g->equipped_weapon_list_capacity);
-    //massert(g->equipped_weapon_list, "g->equipped_weapon_list is NULL");
-    //g->equipped_shield_list = (equipped_shield_component*)malloc(sizeof(equipped_shield_component) * g->equipped_shield_list_capacity);
-    //massert(g->equipped_shield_list, "g->equipped_shield_list is NULL");
-    g->target_list = (target_component*)malloc(sizeof(target_component) * g->target_list_capacity);
+    g->target_list = (target_component*)malloc(sizeof(target_component) * LIST_INIT_CAPACITY);
     massert(g->target_list, "g->target_list is NULL");
-    g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * g->target_path_list_capacity);
+    g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * LIST_INIT_CAPACITY);
     massert(g->target_path_list, "g->target_path_list is NULL");
-    g->default_action_list = (default_action_component*)malloc(sizeof(default_action_component) * g->default_action_list_capacity);
+    g->default_action_list = (default_action_component*)malloc(sizeof(default_action_component) * LIST_INIT_CAPACITY);
     massert(g->default_action_list, "g->default_action_list is NULL");
-    g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * g->equipment_list_count);
+    g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * LIST_INIT_CAPACITY);
     massert(g->equipment_list, "g->equipment_list is NULL");
 
     gamestate_init_msg_history(g);
@@ -199,8 +219,6 @@ void gamestatefree(gamestate* g) {
     free(g->block_success_list);
     free(g->damaged_list);
     free(g->inventory_list);
-    //free(g->equipped_weapon_list);
-    //free(g->equipped_shield_list);
     free(g->target_list);
     free(g->target_path_list);
     free(g->default_action_list);
@@ -401,10 +419,10 @@ bool g_add_name(gamestate* const g, entityid id, const char* name) {
     massert(name, "name is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(g->name_list, "g->name_list is NULL");
-    massert(g->name_list_count < g->name_list_capacity, "g->name_list_count >= g->name_list_capacity");
+    massert(g->name_list_count < g->name_list_capacity, "g->name_list_count >= g->name_list_capacity: %d >= %d", g->name_list_count, g->name_list_capacity);
     massert(g->name_list_capacity > 0, "g->name_list_capacity is 0");
     massert(g->name_list_count >= 0, "g->name_list_count is negative");
-    massert(g->name_list_count < g->max_entityids, "g->name_list_count >= g->max_entityids");
+    massert(g->name_list_count < g->max_entityids, "g->name_list_count >= g->max_entityids: %d >= %d", g->name_list_count, g->max_entityids);
     massert(ct_has_entity(g->components, id), "id %d does not exist in component table", id);
     massert(g_has_component(g, id, C_NAME), "id %d does not have a name component", id);
     if (g->name_list_count >= g->name_list_capacity) {
