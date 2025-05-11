@@ -187,6 +187,15 @@ bool g_has_component(const gamestate* const g, entityid id, component comp);
 bool g_register_comp(gamestate* const g, entityid id, component comp);
 bool g_register_comps(gamestate* const g, entityid id, ...);
 
+bool g_add_component(gamestate* const g,
+                     entityid id,
+                     component comp,
+                     void* data,
+                     size_t component_size,
+                     void** component_list,
+                     int* component_count,
+                     int* component_capacity);
+
 bool g_add_name(gamestate* const g, entityid id, const char* name);
 const char* g_get_name(gamestate* const g, entityid id);
 

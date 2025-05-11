@@ -35,9 +35,6 @@ typedef enum component_t
     C_STATS,
     C_ITEMTYPE,
     C_WEAPONTYPE,
-    // not yet implemented
-    //C_DOOR_STATE,
-    //C_MODIFIERS,
     C_COUNT
 } component;
 
