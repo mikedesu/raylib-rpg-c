@@ -60,6 +60,7 @@ static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
 //static void init_potion_test(gamestate* const g, potiontype_t potion_type, const char* name);
 //static void init_npcs_test_by_room(gamestate* const g);
+static void init_npc_test(gamestate* g);
 
 static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
@@ -1743,13 +1744,16 @@ void liblogic_init(gamestate* const g) {
     //init_potion_test(g, POTION_HP_MEDIUM, "medium healing potion");
     //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
     //init_npcs_test_by_room(g);
+    init_npc_test(g);
     update_debug_panel_buffer(g);
 }
 
 static void init_npc_test(gamestate* g) {
     massert(g, "gamestate is NULL");
-    loc_t loc = {5, 5, 0};
+    loc_t loc = g_get_location(g, g->hero_id);
+    loc.x += 1;
     entityid id = npc_create(g, RACE_ORC, loc, "orc");
+    massert(id != ENTITYID_INVALID, "npc_create failed");
 }
 
 static void update_player_state(gamestate* const g) {
@@ -1776,11 +1780,11 @@ static void update_player_state(gamestate* const g) {
 
 static inline void update_npc_state(gamestate* const g, entityid id) {
     massert(g, "Game state is NULL!");
-    entity* const e = em_get(g->entitymap, id);
-    massert(e, "update_npc_state: entity is NULL");
+    //entity* const e = em_get(g->entitymap, id);
+    //massert(e, "update_npc_state: entity is NULL");
     //if (e->dead) return;
     //minfo("calling g_is_dead 2");
-    if (g_is_dead(g, e->id)) return;
+    if (g_is_dead(g, id)) return;
     //if (e->stats.hp <= 0) {
     //    e->dead = true;
     //    e->do_update = true;
