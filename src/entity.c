@@ -15,7 +15,7 @@ entity_t* e_new(entityid id, entitytype_t type) {
     e->weapon = -1;
     e->shield = -1;
     e->door_is_open = false;
-    e->potion_type = POTION_NONE;
+    //e->potion_type = POTION_NONE;
     e->next = NULL;
     e->target_path = NULL;
     e->target_path_length = 0;

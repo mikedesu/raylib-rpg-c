@@ -32,7 +32,7 @@ typedef struct entity_t {
     //entity_stats_t stats;
     //entity_action_t default_action; // New field
     // if the entity is a potion...
-    potiontype_t potion_type;
+    //potiontype_t potion_type;
     //bool is_damaged;
     bool door_is_open;
     entityid weapon;
