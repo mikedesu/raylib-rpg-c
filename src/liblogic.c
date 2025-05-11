@@ -451,14 +451,11 @@ static inline void handle_attack_success_gamestate_flag(gamestate* const g, enti
 //static void handle_attack_success(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
 static void handle_attack_success(gamestate* const g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
     massert(g, "gamestate is NULL");
-    massert(atk_id, "attacker entity is NULL");
-    massert(tgt_id, "target entity is NULL");
+    massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
+    massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
     massert(atk_successful, "attack_successful is NULL");
-    //msuccess("Successful Attack on target: %s", target->name);
     *atk_successful = true;
-    //target->is_damaged = true;
     g_set_damaged(g, tgt_id, true);
-    //target->do_update = true;
     g_set_update(g, tgt_id, true);
     //int dmg = 1;
     //e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
@@ -470,19 +467,14 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
     //}
 }
 
-static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
+static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* target, bool* atk_successful) {
     massert(g, "gamestate is NULL");
     massert(attacker, "attacker entity is NULL");
     massert(target, "target entity is NULL");
-    massert(attack_successful, "attack_successful is NULL");
-    //msuccess("Successful Block from target: %s", target->name);
-    *attack_successful = false;
-    //target->is_damaged = false;
+    massert(atk_successful, "attack_successful is NULL");
+    *atk_successful = false;
     g_set_damaged(g, target->id, false);
-    //target->block_success = true;
     g_set_block_success(g, target->id, true);
-
-    //target->do_update = true;
     g_set_update(g, target->id, true);
     //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
@@ -523,7 +515,6 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     return true;
 }
 
-//static void handle_attack_helper(gamestate* const g, tile_t* tile, entity* attacker, bool* successful) {
 static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid attacker_id, bool* successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
@@ -573,38 +564,37 @@ static void try_entity_attack_random(gamestate* const g, entity* const e) {
     try_entity_attack(g, e->id, loc.x + x, loc.y + y);
 }
 
-static void try_entity_attack_player(gamestate* const g, entity* const e) {
-    massert(g, "gamestate is NULL");
-    entity* h = em_get(g->entitymap, g->hero_id);
-    massert(h, "hero is NULL");
-    loc_t hl = g_get_location(g, h->id);
-    loc_t el = g_get_location(g, e->id);
-    int dx = hl.x > el.x ? 1 : hl.x < el.x ? -1 : 0;
-    int dy = hl.y > el.y ? 1 : hl.y < el.y ? -1 : 0;
-    if (dx != 0 || dy != 0) try_entity_attack(g, e->id, hl.x, hl.y);
-}
+//static void try_entity_attack_player(gamestate* const g, entity* const e) {
+//massert(g, "gamestate is NULL");
+//entity* h = em_get(g->entitymap, g->hero_id);
+//massert(h, "hero is NULL");
+//loc_t hl = g_get_location(g, h->id);
+//loc_t el = g_get_location(g, e->id);
+//int dx = hl.x > el.x ? 1 : hl.x < el.x ? -1 : 0;
+//int dy = hl.y > el.y ? 1 : hl.y < el.y ? -1 : 0;
+//if (dx != 0 || dy != 0) try_entity_attack(g, e->id, hl.x, hl.y);
+//}
 
-static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
-    massert(g, "gamestate is NULL");
-    massert(id0 != ENTITYID_INVALID, "id0 is invalid");
-    massert(id1 != ENTITYID_INVALID, "id1 is invalid");
-    massert(id0 != id1, "id0 and id1 are the same");
-
-    entity* const e0 = em_get(g->entitymap, id0);
-    massert(e0, "liblogic_entities_adjacent: e0 is NULL");
-    entity* const e1 = em_get(g->entitymap, id1);
-    massert(e1, "liblogic_entities_adjacent: e1 is NULL");
-    // use e0 and check the surrounding 8 tiles
-    for (int y = -1; y <= 1; y++) {
-        for (int x = -1; x <= 1; x++) {
-            if (x == 0 && y == 0) continue;
-            loc_t loc0 = g_get_location(g, e0->id);
-            loc_t loc1 = g_get_location(g, e1->id);
-            if (loc0.x + x == loc1.x && loc0.y + y == loc1.y) return true;
-        }
-    }
-    return false;
-}
+//static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
+//massert(g, "gamestate is NULL");
+//massert(id0 != ENTITYID_INVALID, "id0 is invalid");
+//massert(id1 != ENTITYID_INVALID, "id1 is invalid");
+//massert(id0 != id1, "id0 and id1 are the same");
+//entity* const e0 = em_get(g->entitymap, id0);
+//massert(e0, "liblogic_entities_adjacent: e0 is NULL");
+//entity* const e1 = em_get(g->entitymap, id1);
+//massert(e1, "liblogic_entities_adjacent: e1 is NULL");
+// use e0 and check the surrounding 8 tiles
+//for (int y = -1; y <= 1; y++) {
+//    for (int x = -1; x <= 1; x++) {
+//        if (x == 0 && y == 0) continue;
+//        loc_t loc0 = g_get_location(g, e0->id);
+//        loc_t loc1 = g_get_location(g, e1->id);
+//        if (loc0.x + x == loc1.x && loc0.y + y == loc1.y) return true;
+//    }
+//}
+//return false;
+//}
 
 //static void try_entity_move_attack_player(gamestate* const g, entity* const e) {
 //    massert(g, "gamestate is NULL");
@@ -619,18 +609,17 @@ static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
 //}
 //}
 
-static void try_entity_wait(gamestate* const g, entity* const e) {
-    massert(g, "Game state is NULL!");
-    massert(e, "Entity is NULL!");
-    //if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    if (g_is_type(g, e->id, ENTITY_PLAYER)) {
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    }
-    //e->do_update = true;
-    g_set_update(g, e->id, true);
-}
+//static void try_entity_wait(gamestate* const g, entity* const e) {
+//    massert(g, "Game state is NULL!");
+//    massert(e, "Entity is NULL!");
+//    //if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+//    if (g_is_type(g, e->id, ENTITY_PLAYER)) {
+//        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+//    }
+//    //e->do_update = true;
+//    g_set_update(g, e->id, true);
+//}
 
-//static void execute_action(gamestate* const g, entity* const e, entity_action_t action) {
 static void execute_action(gamestate* const g, entityid id, entity_action_t action) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
