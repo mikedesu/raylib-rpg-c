@@ -6,7 +6,7 @@
 #include "debugpanel.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
-#include "em.h"
+//#include "em.h"
 #include "entityid.h"
 #include "fadestate.h"
 #include "gamestate_flag.h"
@@ -68,7 +68,7 @@ typedef struct gamestate {
 
     dungeon_t* d;
 
-    em_t* entitymap;
+    //em_t* entitymap;
 
     entityid* entityids;
     int index_entityids, max_entityids;

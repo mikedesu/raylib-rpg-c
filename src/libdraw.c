@@ -283,9 +283,6 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
 
-    //entity* e = em_get(g->entitymap, id);
-    //massert(e, "entity is NULL");
-
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     //massert(sg, "spritegroup is NULL: id %d name %s", id, e->name);
 
@@ -343,8 +340,6 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
 
     for (int i = 0; i < tile_entity_count(tile); i++) {
         entityid id = tile_get_entity(tile, i);
-        //entity* e = em_get(g->entitymap, id);
-        //if (e && e->dead == dead) draw_sprite_and_shadow(g, id);
         //minfo("draw_entities_2d_at: id %d", id);
         if (g_is_dead(g, id) == dead) {
             draw_sprite_and_shadow(g, id);
@@ -796,8 +791,6 @@ static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegro
 static void libdraw_update_sprite(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    //entity* const e = em_get(g->entitymap, id);
-    //massert(e, "entity is NULL");
     int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
     for (int i = 0; i < num_spritegroups; i++) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
@@ -881,8 +874,6 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
         merror("libdraw_draw_player_target_box: id is -1");
         return false;
     }
-    //entity* const e = em_get(g->entitymap, id);
-    //if (!e) return false;
     //direction_t dir = e->direction;
     direction_t dir = g_get_direction(g, id);
     loc_t loc = g_get_location(g, id);
@@ -1099,12 +1090,6 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
         return;
     }
     //msuccess("group was not NULL");
-    //const entity* const e = em_get(g->entitymap, id);
-    //if (!e) {
-    //    merror("create_spritegroup: entity not found %d", id);
-    //    spritegroup_destroy(group);
-    //    return;
-    //}
     //msuccess("entity found %d", id);
     //disabling this check until dungeon_floor created
     dungeon_floor_t* df = d_get_current_floor(g->d);
@@ -1157,9 +1142,6 @@ static void calc_debugpanel_size(gamestate* const g) {
 static void create_sg_byid(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    //entity* const e = em_get(g->entitymap, id);
-    //massert(e, "entity is NULL");
-    //if (!e) return;
     int* keys = NULL;
     int num_keys = 0;
     const int offset_x = -12, offset_y = -12;
@@ -1335,9 +1317,6 @@ static void draw_inventory_menu(gamestate* const g) {
 
     const char* menu_title = "Inventory Menu";
 
-    //entity* const hero = em_get(g->entitymap, g->hero_id);
-    //massert(hero, "hero entity is NULL");
-
     // Parameters
     const int box_pad = g->pad;
     const int section_gap = 16;
@@ -1386,8 +1365,6 @@ static void draw_inventory_menu(gamestate* const g) {
     //for (int i = 0; i < hero->inventory_count && i < max_visible_items; i++) {
     //    int item_id = hero->inventory[i];
     //    if (item_id == 0) continue;
-    //    entity* item_entity = em_get(g->entitymap, item_id);
-    //    if (!item_entity) continue;
     //    float item_x = left_box.x + item_list_pad;
     //    char item_display[128];
     //    bool is_equipped = false;
@@ -1417,8 +1394,6 @@ static void draw_inventory_menu(gamestate* const g) {
 
     //if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < hero->inventory_count) {
     //    entityid item_id = hero->inventory[g->inventory_menu_selection];
-    //    entity* item_entity = em_get(g->entitymap, item_id);
-    //    if (item_entity) {
     //        //snprintf(info_text, sizeof(info_text), "%s\nType: %d", item_entity->name, item_entity->type);
     //        snprintf(info_text, sizeof(info_text), "%s\nType: %d", "[placeholder]", g_get_type(g, item_id));
     //        sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);

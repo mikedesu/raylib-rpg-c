@@ -68,7 +68,6 @@ gamestate* gamestateinitptr() {
     g->controlmode = CONTROLMODE_PLAYER;
     g->fadestate = FADESTATENONE;
     g->d = NULL;
-    g->entitymap = NULL;
     g->entityids = NULL;
     g->index_entityids = 0;
     g->max_entityids = -1;
@@ -200,12 +199,12 @@ bool gamestate_free_msg_history(gamestate* const g) {
 
 void gamestatefree(gamestate* g) {
     massert(g, "g is NULL");
-    free(g->entityids);
     //minfo("Freeing dungeon");
     //dungeon_destroy(g->dungeon);
     // free message history
     gamestate_free_msg_history(g);
     ct_destroy(g->components);
+    free(g->entityids);
     free(g->name_list);
     free(g->type_list);
     free(g->race_list);
@@ -245,11 +244,6 @@ void gamestate_set_hero_id(gamestate* const g, entityid id) {
 entityid gamestate_get_hero_id(const gamestate* const g) {
     massert(g, "g is NULL");
     return g->hero_id;
-}
-
-em_t* gamestate_get_entitymap(gamestate* const g) {
-    massert(g, "g is NULL");
-    return g->entitymap;
 }
 
 void gamestate_init_entityids(gamestate* const g) {

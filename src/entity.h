@@ -30,10 +30,6 @@ typedef struct entity_t {
     entityid weapon;
     entityid shield;
     // pathfinding
-    //loc_t target;
-    //int target_path_length;
-    //loc_t* target_path;
-
     entity_t* next;
 } entity;
 
