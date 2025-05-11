@@ -106,6 +106,9 @@ typedef struct gamestate {
     target_path_component* target_path_list;
     default_action_component* default_action_list;
     equipment_component* equipment_list;
+    stats_component* stats_list;
+    itemtype_component* itemtype_list;
+    weapontype_component* weapontype_list;
 
     int name_list_count;
     int name_list_capacity;
@@ -145,6 +148,12 @@ typedef struct gamestate {
     int default_action_list_capacity;
     int equipment_list_count;
     int equipment_list_capacity;
+    int stats_list_count;
+    int stats_list_capacity;
+    int itemtype_list_count;
+    int itemtype_list_capacity;
+    int weapontype_list_count;
+    int weapontype_list_capacity;
 
 } gamestate;
 
@@ -268,3 +277,20 @@ bool g_has_equipment(const gamestate* const g, entityid id);
 bool g_set_equipment(gamestate* const g, entityid id, equipment_slot slot, entityid itemid);
 bool g_unset_equipment(gamestate* const g, entityid id, equipment_slot slot);
 entityid g_get_equipment(const gamestate* const g, entityid id, equipment_slot slot);
+
+bool g_add_stats(gamestate* const g, entityid id);
+bool g_has_stats(const gamestate* const g, entityid id);
+bool g_set_stat(gamestate* const g, entityid id, stats_slot stats_slot, int value);
+int* g_get_stats(const gamestate* const g, entityid id, int* count);
+int g_get_stat(const gamestate* const g, entityid id, stats_slot stats_slot);
+
+bool g_add_itemtype(gamestate* const g, entityid id, itemtype type);
+bool g_has_itemtype(const gamestate* const g, entityid id);
+bool g_set_itemtype(gamestate* const g, entityid id, itemtype type);
+itemtype g_get_itemtype(const gamestate* const g, entityid id);
+
+bool g_add_weapontype(gamestate* const g, entityid id, weapontype type);
+bool g_has_weapontype(const gamestate* const g, entityid id);
+bool g_set_weapontype(gamestate* const g, entityid id, weapontype type);
+weapontype g_get_weapontype(const gamestate* const g, entityid id);
+bool g_is_weapontype(const gamestate* const g, entityid id, weapontype type);

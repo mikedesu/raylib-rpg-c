@@ -101,6 +101,9 @@ gamestate* gamestateinitptr() {
     g->target_path_list_count = 0;
     g->default_action_list_count = 0;
     g->equipment_list_count = 0;
+    g->stats_list_count = 0;
+    g->itemtype_list_count = 0;
+    g->weapontype_list_count = 0;
 
     g->name_list_capacity = LIST_INIT_CAPACITY;
     g->type_list_capacity = LIST_INIT_CAPACITY;
@@ -119,6 +122,9 @@ gamestate* gamestateinitptr() {
     g->target_path_list_capacity = LIST_INIT_CAPACITY;
     g->default_action_list_capacity = LIST_INIT_CAPACITY;
     g->equipment_list_capacity = LIST_INIT_CAPACITY;
+    g->stats_list_capacity = LIST_INIT_CAPACITY;
+    g->itemtype_list_capacity = LIST_INIT_CAPACITY;
+    g->weapontype_list_capacity = LIST_INIT_CAPACITY;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * LIST_INIT_CAPACITY);
     massert(g->name_list, "g->name_list is NULL");
@@ -154,6 +160,12 @@ gamestate* gamestateinitptr() {
     massert(g->default_action_list, "g->default_action_list is NULL");
     g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * LIST_INIT_CAPACITY);
     massert(g->equipment_list, "g->equipment_list is NULL");
+    g->stats_list = (stats_component*)malloc(sizeof(stats_component) * LIST_INIT_CAPACITY);
+    massert(g->stats_list, "g->stats_list is NULL");
+    g->itemtype_list = (itemtype_component*)malloc(sizeof(itemtype_component) * LIST_INIT_CAPACITY);
+    massert(g->itemtype_list, "g->itemtype_list is NULL");
+    g->weapontype_list = (weapontype_component*)malloc(sizeof(weapontype_component) * LIST_INIT_CAPACITY);
+    massert(g->weapontype_list, "g->weapontype_list is NULL");
 
     gamestate_init_msg_history(g);
     return g;
@@ -222,6 +234,7 @@ void gamestatefree(gamestate* g) {
     free(g->target_path_list);
     free(g->default_action_list);
     free(g->equipment_list);
+    free(g->stats_list);
     free(g);
     msuccess("Freed gamestate");
 }
@@ -924,7 +937,7 @@ bool g_get_attacking(const gamestate* const g, entityid id) {
             return g->attacking_list[i].attacking;
         }
     }
-    merror("id %d not found in attacking_list", id);
+    //merror("id %d not found in attacking_list", id);
     return false;
 }
 
@@ -1036,7 +1049,7 @@ bool g_get_block_success(const gamestate* const g, entityid id) {
             return g->block_success_list[i].block_success;
         }
     }
-    merror("id %d not found in block_success_list", id);
+    //merror("id %d not found in block_success_list", id);
     return false;
 }
 
@@ -1148,7 +1161,7 @@ entity_action_t g_get_default_action(const gamestate* const g, entityid id) {
             return g->default_action_list[i].action;
         }
     }
-    merror("id %d not found in default_action_list", id);
+    //merror("id %d not found in default_action_list", id);
     return ENTITY_ACTION_NONE;
 }
 
@@ -1333,7 +1346,7 @@ bool g_get_target(const gamestate* const g, entityid id, loc_t* target) {
             return true;
         }
     }
-    merror("id %d not found in target_list", id);
+    //merror("id %d not found in target_list", id);
     return false;
 }
 
@@ -1394,7 +1407,7 @@ bool g_get_target_path(const gamestate* const g, entityid id, loc_t** target_pat
             return true;
         }
     }
-    merror("id %d not found in target_path_list", id);
+    //merror("id %d not found in target_path_list", id);
     return false;
 }
 
@@ -1412,7 +1425,7 @@ bool g_get_target_path_length(const gamestate* const g, entityid id, int* target
             return true;
         }
     }
-    merror("id %d not found in target_path_list", id);
+    //merror("id %d not found in target_path_list", id);
     return false;
 }
 
@@ -1485,4 +1498,207 @@ entityid g_get_equipment(const gamestate* const g, entityid id, equipment_slot s
 dungeon_t* g_get_dungeon(gamestate* const g) {
     massert(g, "g is NULL");
     return g->d;
+}
+
+bool g_add_stats(gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the stats component
+    massert(g_has_component(g, id, C_STATS), "id %d does not have a stats component", id);
+    if (g->stats_list_count >= g->stats_list_capacity) {
+        g->stats_list_capacity *= 2;
+        g->stats_list = realloc(g->stats_list, sizeof(stats_component) * g->stats_list_capacity);
+        if (g->stats_list == NULL) {
+            merror("g->stats_list is NULL");
+            return false;
+        }
+    }
+    init_stats_component(&g->stats_list[g->stats_list_count], id);
+    g->stats_list_count++;
+    return true;
+}
+
+bool g_has_stats(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_STATS);
+}
+
+bool g_set_stat(gamestate* const g, entityid id, stats_slot stats_slot, int value) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(g->stats_list, "g->stats_list is NULL");
+    if (g->stats_list == NULL) {
+        merror("g->stats_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->stats_list_count; i++) {
+        if (g->stats_list[i].id == id) {
+            g->stats_list[i].stats[stats_slot] = value;
+            return true;
+        }
+    }
+    return false;
+}
+
+int* g_get_stats(const gamestate* const g, entityid id, int* count) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(count, "count is NULL");
+    massert(g->stats_list, "g->stats_list is NULL");
+    if (g->stats_list == NULL) {
+        merror("g->stats_list is NULL");
+        return NULL;
+    }
+    for (int i = 0; i < g->stats_list_count; i++) {
+        if (g->stats_list[i].id == id) {
+            *count = STATS_COUNT;
+            return g->stats_list[i].stats;
+        }
+    }
+    *count = 0;
+    return NULL;
+}
+
+int g_get_stat(const gamestate* const g, entityid id, stats_slot stats_slot) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(g->stats_list, "g->stats_list is NULL");
+    if (g->stats_list == NULL) {
+        merror("g->stats_list is NULL");
+        return 0;
+    }
+    for (int i = 0; i < g->stats_list_count; i++) {
+        if (g->stats_list[i].id == id) {
+            return g->stats_list[i].stats[stats_slot];
+        }
+    }
+    return 0;
+}
+
+bool g_add_itemtype(gamestate* const g, entityid id, itemtype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the itemtype component
+    massert(g_has_component(g, id, C_ITEMTYPE), "id %d does not have an itemtype component", id);
+    if (g->itemtype_list_count >= g->itemtype_list_capacity) {
+        g->itemtype_list_capacity *= 2;
+        g->itemtype_list = realloc(g->itemtype_list, sizeof(itemtype_component) * g->itemtype_list_capacity);
+        if (g->itemtype_list == NULL) {
+            merror("g->itemtype_list is NULL");
+            return false;
+        }
+    }
+    init_itemtype_component(&g->itemtype_list[g->itemtype_list_count], id, type);
+    g->itemtype_list_count++;
+    return true;
+}
+
+bool g_has_itemtype(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_ITEMTYPE);
+}
+
+bool g_set_itemtype(gamestate* const g, entityid id, itemtype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->itemtype_list == NULL) {
+        merror("g->itemtype_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->itemtype_list_count; i++) {
+        if (g->itemtype_list[i].id == id) {
+            g->itemtype_list[i].type = type;
+            return true;
+        }
+    }
+    return false;
+}
+
+itemtype g_get_itemtype(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->itemtype_list == NULL) {
+        merror("g->itemtype_list is NULL");
+        return ITEM_NONE;
+    }
+    for (int i = 0; i < g->itemtype_list_count; i++) {
+        if (g->itemtype_list[i].id == id) {
+            return g->itemtype_list[i].type;
+        }
+    }
+    //merror("id %d not found in itemtype_list", id);
+    return ITEM_NONE;
+}
+
+bool g_add_weapontype(gamestate* const g, entityid id, weapontype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the weapontype component
+    massert(g_has_component(g, id, C_WEAPONTYPE), "id %d does not have a weapontype component", id);
+    if (g->weapontype_list_count >= g->weapontype_list_capacity) {
+        g->weapontype_list_capacity *= 2;
+        g->weapontype_list = realloc(g->weapontype_list, sizeof(weapontype_component) * g->weapontype_list_capacity);
+        if (g->weapontype_list == NULL) {
+            merror("g->weapontype_list is NULL");
+            return false;
+        }
+    }
+    init_weapontype_component(&g->weapontype_list[g->weapontype_list_count], id, type);
+    g->weapontype_list_count++;
+    return true;
+}
+
+bool g_has_weapontype(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_WEAPONTYPE);
+}
+
+bool g_set_weapontype(gamestate* const g, entityid id, weapontype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->weapontype_list == NULL) {
+        merror("g->weapontype_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->weapontype_list_count; i++) {
+        if (g->weapontype_list[i].id == id) {
+            g->weapontype_list[i].type = type;
+            return true;
+        }
+    }
+    return false;
+}
+
+weapontype g_get_weapontype(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->weapontype_list == NULL) {
+        merror("g->weapontype_list is NULL");
+        return WEAPON_NONE;
+    }
+    for (int i = 0; i < g->weapontype_list_count; i++) {
+        if (g->weapontype_list[i].id == id) {
+            return g->weapontype_list[i].type;
+        }
+    }
+    //merror("id %d not found in weapontype_list", id);
+    return WEAPON_NONE;
+}
+
+bool g_is_weapontype(const gamestate* const g, entityid id, weapontype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->weapontype_list == NULL) {
+        merror("g->weapontype_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->weapontype_list_count; i++) {
+        if (g->weapontype_list[i].id == id) {
+            return g->weapontype_list[i].type == type;
+        }
+    }
+    return false;
 }

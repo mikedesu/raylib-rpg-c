@@ -4,8 +4,10 @@
 #include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
+#include "item.h"
 #include "location.h"
 #include "race.h"
+#include "weapon.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -30,9 +32,11 @@ typedef enum component_t
     C_TARGET,
     C_TARGET_PATH,
     C_EQUIPMENT,
+    C_STATS,
+    C_ITEMTYPE,
+    C_WEAPONTYPE,
     // not yet implemented
     //C_DOOR_STATE,
-    //C_ATTRIBUTES,
     //C_MODIFIERS,
     C_COUNT
 } component;
@@ -171,6 +175,31 @@ typedef struct equipment_component_t {
     //entityid amulet;
 } equipment_component;
 
+typedef enum stats_slot_t
+{
+    STATS_LEVEL,
+    STATS_HP,
+    STATS_MAXHP,
+    STATS_COUNT
+} stats_slot;
+
+#define MAX_STATS_SLOTS 3
+
+typedef struct stats_component_t {
+    entityid id;
+    int stats[MAX_STATS_SLOTS];
+} stats_component;
+
+typedef struct itemtype_component_t {
+    entityid id;
+    itemtype type;
+} itemtype_component;
+
+typedef struct weapontype_component_t {
+    entityid id;
+    weapontype type;
+} weapontype_component;
+
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
 void init_race_component(race_component* comp, entityid id, race_t race);
@@ -188,3 +217,6 @@ void init_target_component(target_component* comp, entityid id, loc_t target);
 void init_target_path_component(target_path_component* comp, entityid id, loc_t* target_path, int target_path_length);
 void init_default_action_component(default_action_component* comp, entityid id, entity_action_t default_action);
 void init_equipment_component(equipment_component* comp, entityid id);
+void init_stats_component(stats_component* comp, entityid id);
+void init_itemtype_component(itemtype_component* comp, entityid id, itemtype type);
+void init_weapontype_component(weapontype_component* comp, entityid id, weapontype type);

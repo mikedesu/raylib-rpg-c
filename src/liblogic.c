@@ -42,10 +42,9 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
 //static loc_t* get_empty_locs(dungeon_floor_t* const df, int* count);
 //static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt);
 //static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count);
-//static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
+static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
-//static entity* const get_door_from_tile(const gamestate* const g, int x, int y, int fl);
 //static entity* create_shield(gamestate* g);
 //static entity* create_sword(gamestate* g);
 //static entity* create_sword_at(gamestate* g, loc_t loc);
@@ -60,6 +59,7 @@ static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 //static void init_potion_test(gamestate* const g, potiontype_t potion_type, const char* name);
 //static void init_npcs_test_by_room(gamestate* const g);
 static void init_npc_test(gamestate* g);
+static void init_sword_test(gamestate* g);
 
 //static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
@@ -84,9 +84,11 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
 //static entityid door_create(gamestate* const g, int x, int y, int fl, const char* name);
 //static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int z, const char* name);
 static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char* name);
+static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const char* name);
+static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, const char* name);
 
-//static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
-//static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
+static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
+static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
 
 static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1);
 static bool player_on_tile(gamestate* g, int x, int y, int floor);
@@ -822,41 +824,41 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
     return tile;
 }
 
-//static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h) {
-//    massert(g, "gamestate is NULL");
-//    massert(floor >= 0, "floor is out of bounds");
-//    massert(floor < g->dungeon->num_floors, "floor is out of bounds");
-//    massert(x >= 0, "x is out of bounds");
-//    massert(x < g->dungeon->floors[floor]->width, "x is out of bounds");
-//    massert(y >= 0, "y is out of bounds");
-//    massert(y < g->dungeon->floors[floor]->height, "y is out of bounds");
-//    massert(w > 0, "w is out of bounds");
-//    massert(h > 0, "h is out of bounds");
-//    massert(x + w <= g->dungeon->floors[floor]->width, "x + w is out of bounds");
-//    massert(y + h <= g->dungeon->floors[floor]->height, "y + h is out of bounds");
-//    int c = -1;
-//    //loc_t* locations = get_empty_non_wall_locs(g->dungeon->floors[floor], &c);
-//    loc_t* locations = get_empty_non_wall_locs_in_area(g->dungeon->floors[floor], &c, x, y, w, h);
-//    massert(locations, "locations is NULL");
-//    massert(c > 0, "locations count is 0 or less");
-//    // pick a random location
-//    int index = rand() % c;
-//    loc_t loc = locations[index];
-//    free(locations);
-//    massert(loc.x >= 0, "loc.x is out of bounds");
-//    massert(loc.x < g->dungeon->floors[floor]->width, "loc.x is out of bounds");
-//    massert(loc.y >= 0, "loc.y is out of bounds");
-//    massert(loc.y < g->dungeon->floors[floor]->height, "loc.y is out of bounds");
-//    loc.z = floor;
-//    return loc;
-//}
-
-//static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor) {
-//    massert(g, "gamestate is NULL");
-//    massert(floor >= 0, "floor is out of bounds");
-//    massert(floor < g->dungeon->num_floors, "floor is out of bounds");
-//    return get_random_empty_non_wall_loc_in_area(g, floor, 0, 0, g->dungeon->floors[floor]->width, g->dungeon->floors[floor]->height);
-//}
+static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int z, int x, int y, int w, int h) {
+    massert(g, "gamestate is NULL");
+    massert(z >= 0, "floor is out of bounds");
+    massert(z < g->d->num_floors, "floor is out of bounds");
+    massert(x >= 0, "x is out of bounds");
+    massert(x < g->d->floors[z]->width, "x is out of bounds");
+    massert(y >= 0, "y is out of bounds");
+    massert(y < g->d->floors[z]->height, "y is out of bounds");
+    massert(w > 0, "w is out of bounds");
+    massert(h > 0, "h is out of bounds");
+    massert(x + w <= g->d->floors[z]->width, "x + w is out of bounds");
+    massert(y + h <= g->d->floors[z]->height, "y + h is out of bounds");
+    int c = -1;
+    //    //loc_t* locations = get_empty_non_wall_locs(g->dungeon->floors[floor], &c);
+    loc_t* locations = get_empty_non_wall_locs_in_area(g->d->floors[z], &c, x, y, w, h);
+    massert(locations, "locations is NULL");
+    massert(c > 0, "locations count is 0 or less");
+    //    // pick a random location
+    int index = rand() % c;
+    loc_t loc = locations[index];
+    free(locations);
+    massert(loc.x >= 0, "loc.x is out of bounds");
+    massert(loc.x < g->d->floors[z]->width, "loc.x is out of bounds");
+    massert(loc.y >= 0, "loc.y is out of bounds");
+    massert(loc.y < g->d->floors[z]->height, "loc.y is out of bounds");
+    loc.z = z;
+    return loc;
+    //}
+}
+static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor) {
+    massert(g, "gamestate is NULL");
+    massert(floor >= 0, "floor is out of bounds");
+    massert(floor < g->d->num_floors, "floor is out of bounds");
+    return get_random_empty_non_wall_loc_in_area(g, floor, 0, 0, g->d->floors[floor]->width, g->d->floors[floor]->height);
+}
 
 //static void init_weapon_test(gamestate* g) {
 //    massert(g, "gamestate is NULL");
@@ -880,7 +882,6 @@ static void init_dungeon(gamestate* const g) {
     d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 }
 
-//static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int z, const char* name) {
 static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char* name) {
     massert(g, "gamestate is NULL");
     massert(name && name[0], "name is NULL or empty");
@@ -908,81 +909,213 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     }
     entityid id = next_entityid++;
     gs_add_entityid(g, id);
-    minfo("registering name: %s", name);
+    //minfo("registering name: %s", name);
     g_register_comp(g, id, C_NAME);
-    minfo("registering type: %d", ENTITY_NPC);
+    //minfo("registering type: %d", ENTITY_NPC);
     g_register_comp(g, id, C_TYPE);
-    minfo("registering race: %d", rt);
+    //minfo("registering race: %d", rt);
     g_register_comp(g, id, C_RACE);
-    minfo("registering direction: %d", DIR_RIGHT);
+    //minfo("registering direction: %d", DIR_RIGHT);
     g_register_comp(g, id, C_DIRECTION);
-    minfo("registering location: %d, %d, %d", loc.x, loc.y, loc.z);
+    //minfo("registering location: %d, %d, %d", loc.x, loc.y, loc.z);
     g_register_comp(g, id, C_LOCATION);
-    minfo("registering sprite_move: %d, %d", 0, 0);
+    //minfo("registering sprite_move: %d, %d", 0, 0);
     g_register_comp(g, id, C_SPRITE_MOVE);
-    minfo("registering dead: %d", false);
+    //minfo("registering dead: %d", false);
     g_register_comp(g, id, C_DEAD);
-    minfo("registering update: %d", false);
+    //minfo("registering update: %d", false);
     g_register_comp(g, id, C_UPDATE);
-    minfo("registering attacking: %d", false);
+    //minfo("registering attacking: %d", false);
     g_register_comp(g, id, C_ATTACKING);
-    minfo("registering blocking: %d", false);
+    //minfo("registering blocking: %d", false);
     g_register_comp(g, id, C_BLOCKING);
-    minfo("registering block_success: %d", false);
+    //minfo("registering block_success: %d", false);
     g_register_comp(g, id, C_BLOCK_SUCCESS);
-    minfo("registering damaged: %d", false);
+    //minfo("registering damaged: %d", false);
     g_register_comp(g, id, C_DAMAGED);
-    minfo("registering default_action: %d", ENTITY_ACTION_WAIT);
+    //minfo("registering default_action: %d", ENTITY_ACTION_WAIT);
     g_register_comp(g, id, C_DEFAULT_ACTION);
-    minfo("registering inventory");
+    //minfo("registering inventory");
     g_register_comp(g, id, C_INVENTORY);
-    minfo("registering target");
+    //minfo("registering target");
     g_register_comp(g, id, C_TARGET);
-    minfo("registering target_path");
+    //minfo("registering target_path");
     g_register_comp(g, id, C_TARGET_PATH);
-    minfo("registering equipment");
+    //minfo("registering equipment");
     g_register_comp(g, id, C_EQUIPMENT);
 
-    minfo("adding name for id %d: %s", id, name);
+    g_register_comp(g, id, C_STATS);
+
+    //minfo("adding name for id %d: %s", id, name);
     g_add_name(g, id, name);
-    minfo("adding type for id %d: %d", id, ENTITY_NPC);
+    //minfo("adding type for id %d: %d", id, ENTITY_NPC);
     g_add_type(g, id, ENTITY_NPC);
-    minfo("adding race for id %d: %d", id, rt);
+    //minfo("adding race for id %d: %d", id, rt);
     g_add_race(g, id, rt);
-    minfo("adding direction for id %d: %d", id, DIR_RIGHT);
+    //minfo("adding direction for id %d: %d", id, DIR_RIGHT);
     g_add_direction(g, id, DIR_RIGHT);
-    minfo("adding location for id %d: %d, %d, %d", id, loc.x, loc.y, loc.z);
+    //minfo("adding location for id %d: %d, %d, %d", id, loc.x, loc.y, loc.z);
     g_add_location(g, id, loc);
-    minfo("adding sprite_move: %d, %d", 0, 0);
+    //minfo("adding sprite_move: %d, %d", 0, 0);
     g_add_sprite_move(g, id, (loc_t){0, 0}); // default
-    minfo("adding dead: %d", false);
+    //minfo("adding dead: %d", false);
     g_add_dead(g, id, false);
-    minfo("adding update: %d", false);
+    //minfo("adding update: %d", false);
     g_add_update(g, id, false);
-    minfo("adding ");
+    //minfo("adding ");
     g_add_attacking(g, id, false);
-    minfo("adding ");
+    //minfo("adding ");
     g_add_blocking(g, id, false);
-    minfo("adding ");
+    //minfo("adding ");
     g_add_block_success(g, id, false);
-    minfo("adding ");
+    //minfo("adding ");
     g_add_damaged(g, id, false);
-    minfo("adding ");
+    //minfo("adding ");
     g_add_default_action(g, id, ENTITY_ACTION_WAIT);
-    minfo("adding ");
+    //minfo("adding ");
     g_add_inventory(g, id);
-    minfo("adding ");
+    //minfo("adding ");
     g_add_target(g, id, (loc_t){-1, -1, -1});
-    minfo("adding ");
+    //minfo("adding ");
     g_add_target_path(g, id);
-    minfo("adding ");
+    //minfo("adding ");
     g_add_equipment(g, id);
+
+    g_add_stats(g, id);
+    g_set_stat(g, id, STATS_LEVEL, 1);
+    g_set_stat(g, id, STATS_MAXHP, 3);
+    g_set_stat(g, id, STATS_HP, 3);
 
     if (!df_add_at(df, id, loc.x, loc.y)) {
         merror("failed to add entity to dungeon floor");
         //free(e);
         return ENTITYID_INVALID;
     }
+    return id;
+}
+
+static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const char* name) {
+    massert(g, "gamestate is NULL");
+    massert(name && name[0], "name is NULL or empty");
+    massert(type >= 0, "item_type is out of bounds: %s: %d", name, type);
+    massert(type < ITEM_TYPE_COUNT, "item_type is out of bounds: %s: %d", name, type);
+    massert(loc.z >= 0, "z is out of bounds: %s: %d", name, loc.z);
+    massert(loc.z < g->d->num_floors, "z is out of bounds: %s: %d", name, loc.z);
+    dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
+    massert(df, "failed to get current dungeon floor");
+    massert(loc.x >= 0, "x is out of bounds: %s: %d", name, loc.x);
+    massert(loc.x < df->width, "x is out of bounds: %s: %d", name, loc.x);
+    massert(loc.y >= 0, "y is out of bounds: %s: %d", name, loc.y);
+    massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
+    // can we create an entity at this location? no entities can be made on wall-types etc
+    //tile_t* const tile = df_tile_at(df, x, y);
+    tile_t* const tile = df_tile_at(df, loc);
+    massert(tile, "failed to get tile");
+    if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
+        merror("cannot create entity on wall");
+        return ENTITYID_INVALID;
+    }
+    if (tile_has_live_npcs(g, tile)) {
+        merror("cannot create entity on tile with NPC");
+        return ENTITYID_INVALID;
+    }
+    entityid id = next_entityid++;
+    gs_add_entityid(g, id);
+    //minfo("registering name: %s", name);
+    g_register_comp(g, id, C_NAME);
+    //minfo("registering type: %d", ENTITY_NPC);
+    g_register_comp(g, id, C_TYPE);
+    //minfo("registering race: %d", rt);
+    //g_register_comp(g, id, C_RACE);
+    //minfo("registering direction: %d", DIR_RIGHT);
+    g_register_comp(g, id, C_DIRECTION);
+    //minfo("registering location: %d, %d, %d", loc.x, loc.y, loc.z);
+    g_register_comp(g, id, C_LOCATION);
+    //minfo("registering sprite_move: %d, %d", 0, 0);
+    g_register_comp(g, id, C_SPRITE_MOVE);
+    //minfo("registering dead: %d", false);
+    //g_register_comp(g, id, C_DEAD);
+    //minfo("registering update: %d", false);
+    g_register_comp(g, id, C_UPDATE);
+    g_register_comp(g, id, C_ITEMTYPE);
+    //minfo("registering attacking: %d", false);
+    //g_register_comp(g, id, C_ATTACKING);
+    //minfo("registering blocking: %d", false);
+    //g_register_comp(g, id, C_BLOCKING);
+    //minfo("registering block_success: %d", false);
+    //g_register_comp(g, id, C_BLOCK_SUCCESS);
+    //minfo("registering damaged: %d", false);
+    //g_register_comp(g, id, C_DAMAGED);
+    //minfo("registering default_action: %d", ENTITY_ACTION_WAIT);
+    //g_register_comp(g, id, C_DEFAULT_ACTION);
+    //minfo("registering inventory");
+    //g_register_comp(g, id, C_INVENTORY);
+    //minfo("registering target");
+    //g_register_comp(g, id, C_TARGET);
+    //minfo("registering target_path");
+    //g_register_comp(g, id, C_TARGET_PATH);
+    //minfo("registering equipment");
+    //g_register_comp(g, id, C_EQUIPMENT);
+    //g_register_comp(g, id, C_STATS);
+
+    //minfo("adding name for id %d: %s", id, name);
+    g_add_name(g, id, name);
+    //minfo("adding type for id %d: %d", id, ENTITY_NPC);
+    g_add_type(g, id, ENTITY_ITEM);
+    //minfo("adding race for id %d: %d", id, rt);
+    //g_add_race(g, id, rt);
+    //minfo("adding direction for id %d: %d", id, DIR_RIGHT);
+    g_add_direction(g, id, DIR_RIGHT);
+    //minfo("adding location for id %d: %d, %d, %d", id, loc.x, loc.y, loc.z);
+    g_add_location(g, id, loc);
+    //minfo("adding sprite_move: %d, %d", 0, 0);
+    g_add_sprite_move(g, id, (loc_t){0, 0}); // default
+    //minfo("adding dead: %d", false);
+    //g_add_dead(g, id, false);
+    //minfo("adding update: %d", false);
+    g_add_update(g, id, false);
+    //minfo("adding ");
+    //g_add_attacking(g, id, false);
+    //minfo("adding ");
+    //g_add_blocking(g, id, false);
+    //minfo("adding ");
+    //g_add_block_success(g, id, false);
+    //minfo("adding ");
+    //g_add_damaged(g, id, false);
+    //minfo("adding ");
+    //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
+    //minfo("adding ");
+    //g_add_inventory(g, id);
+    //minfo("adding ");
+    //g_add_target(g, id, (loc_t){-1, -1, -1});
+    //minfo("adding ");
+    //g_add_target_path(g, id);
+    //minfo("adding ");
+    //g_add_equipment(g, id);
+    g_add_itemtype(g, id, type);
+
+    //g_add_stats(g, id);
+    //g_set_stat(g, id, STATS_LEVEL, 1);
+    //g_set_stat(g, id, STATS_MAXHP, 3);
+    //g_set_stat(g, id, STATS_HP, 3);
+
+    if (!df_add_at(df, id, loc.x, loc.y)) {
+        merror("failed to add entity to dungeon floor");
+        //free(e);
+        return ENTITYID_INVALID;
+    }
+    return id;
+}
+
+static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, const char* name) {
+    massert(g, "gamestate is NULL");
+
+    entityid id = item_create(g, ITEM_WEAPON, loc, name);
+    massert(id != ENTITYID_INVALID, "failed to create weapon");
+
+    g_register_comp(g, id, C_WEAPONTYPE);
+    g_add_weapontype(g, id, type);
+
     return id;
 }
 
@@ -1067,28 +1200,28 @@ static void init_player(gamestate* const g) {
 //    return locs;
 //}
 
-//static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
-//    massert(df, "dungeon floor is NULL");
-//    massert(count, "count is NULL");
-//    int c = df_count_empty_non_walls_in_area(df, x0, y0, w, h);
-//    loc_t* locs = malloc(sizeof(loc_t) * c);
-//    massert(locs, "malloc failed");
-//    int i = 0;
-//    for (int y = 0; y < h && y + y0 < df->height; y++) {
-//        for (int x = 0; x < w && x + x0 < df->width; x++) {
-//            int newx = x + x0;
-//            int newy = y + y0;
-//
-//            tile_t* t = df_tile_at(df, newx, newy);
-//            tiletype_t type = t->type;
-//            if (tile_entity_count(t) == 0 && tile_is_walkable(type)) locs[i++] = (loc_t){newx, newy};
-//            if (i >= c) break;
-//        }
-//    }
-//    massert(i == c, "count mismatch: expected %d, got %d", c, i);
-//    *count = c;
-//    return locs;
-//}
+static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
+    massert(df, "dungeon floor is NULL");
+    massert(count, "count is NULL");
+    int c = df_count_empty_non_walls_in_area(df, x0, y0, w, h);
+    loc_t* locs = malloc(sizeof(loc_t) * c);
+    massert(locs, "malloc failed");
+    int i = 0;
+    for (int y = 0; y < h && y + y0 < df->height; y++) {
+        for (int x = 0; x < w && x + x0 < df->width; x++) {
+            int newx = x + x0;
+            int newy = y + y0;
+
+            tile_t* t = df_tile_at(df, (loc_t){newx, newy, -1});
+            tiletype_t type = t->type;
+            if (tile_entity_count(t) == 0 && tile_is_walkable(type)) locs[i++] = (loc_t){newx, newy};
+            if (i >= c) break;
+        }
+    }
+    massert(i == c, "count mismatch: expected %d, got %d", c, i);
+    *count = c;
+    return locs;
+}
 
 //static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count) {
 //    massert(df, "dungeon floor is NULL");
@@ -1700,18 +1833,36 @@ void liblogic_init(gamestate* const g) {
     //init_potion_test(g, POTION_HP_MEDIUM, "medium healing potion");
     //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
     //init_npcs_test_by_room(g);
-    init_npc_test(g);
+    //init_npc_test(g);
+    init_sword_test(g);
     update_debug_panel_buffer(g);
 }
 
 static void init_npc_test(gamestate* g) {
     massert(g, "gamestate is NULL");
-    loc_t loc = g_get_location(g, g->hero_id);
-    loc.x += 1;
-    entityid id = npc_create(g, RACE_ORC, loc, "orc");
-    massert(id != ENTITYID_INVALID, "npc_create failed");
-    //g_set_default_action(g, id, ENTITY_ACTION_MOVE_RANDOM);
-    g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+    //loc_t loc = g_get_location(g, g->hero_id);
+
+    loc_t* locs = get_locs_around_entity(g, g->hero_id);
+    for (int i = 0; i < 8; i++) {
+        entityid id = npc_create(g, RACE_ORC, locs[i], "orc");
+        if (id != ENTITYID_INVALID) {
+            g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+            break;
+        }
+    }
+}
+
+static void init_sword_test(gamestate* g) {
+    massert(g, "gamestate is NULL");
+
+    loc_t* locs = get_locs_around_entity(g, g->hero_id);
+    for (int i = 0; i < 8; i++) {
+        entityid id = weapon_create(g, WEAPON_SWORD, locs[i], "dummy sword");
+        if (id != ENTITYID_INVALID) {
+            // set item properties
+            break;
+        }
+    }
 }
 
 static void update_player_state(gamestate* const g) {

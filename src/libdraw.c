@@ -1177,16 +1177,29 @@ static void create_sg_byid(gamestate* const g, entityid id) {
         default: merror("unknown race %d", race); return;
         }
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-    } else if (type == ENTITY_WEAPON) {
-        // for now we only have 1 sprite for weapons
-        keys = TX_LONG_SWORD_KEYS;
-        num_keys = TX_LONG_SWORD_KEY_COUNT;
-        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-    } else if (type == ENTITY_SHIELD) {
-        keys = TX_BUCKLER_KEYS;
-        num_keys = TX_BUCKLER_KEY_COUNT;
-        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    } else if (type == ENTITY_ITEM) {
+        // check the item type
+        itemtype item_type = g_get_itemtype(g, id);
+        if (item_type == ITEM_WEAPON) {
+            keys = TX_LONG_SWORD_KEYS;
+            num_keys = TX_LONG_SWORD_KEY_COUNT;
+            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        }
+        //else if (item_type == ITEM_SHIELD) {
+        //    keys = TX_BUCKLER_KEYS;
+        //    num_keys = TX_BUCKLER_KEY_COUNT;
+        //    create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        //}
     }
+    //    // for now we only have 1 sprite for weapons
+    //    keys = TX_LONG_SWORD_KEYS;
+    //    num_keys = TX_LONG_SWORD_KEY_COUNT;
+    //    create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    //} else if (type == ENTITY_SHIELD) {
+    //    keys = TX_BUCKLER_KEYS;
+    //    num_keys = TX_BUCKLER_KEY_COUNT;
+    //    create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    //}
     //else if (type == ENTITY_POTION) {
     //    massert(e->potion_type != POTION_NONE, "potion_type is NONE");
     //    // check the potion type
@@ -1213,24 +1226,29 @@ static void create_sg_byid(gamestate* const g, entityid id) {
 static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
     const int turn = g->turn_count;
-    const int hp = 0;
-    const int maxhp = 0;
-    const int mp = 0;
-    const int maxmp = 0;
-    const int level = 0;
+
+    int stat_count = 0;
+    int* stats = g_get_stats(g, g->hero_id, &stat_count);
+    massert(stats, "stats is NULL");
+
+    //const int hp = g_get_stat(g, g->hero_id, STATS_HP);
+    const int hp = stats[STATS_HP];
+    //const int maxhp = g_get_stat(g, g->hero_id, STATS_MAXHP);
+    const int maxhp = stats[STATS_MAXHP];
+    //const int level = g_get_stat(g, g->hero_id, STATS_LEVEL);
+    const int level = stats[STATS_LEVEL];
     loc_t loc = g_get_location(g, g->hero_id);
     dungeon_floor_t* const df = d_get_current_floor(g->d);
     const char* room_name = df_get_room_name(df, loc);
     char buffer[1024] = {0};
     snprintf(buffer,
              sizeof(buffer),
-             "%s Lvl %d HP %d/%d MP %d/%d XP %d Room: %s Turn %d",
+             "%s Lvl %d HP %d/%d XP %d Room: %s Turn %d",
              g_get_name(g, g->hero_id),
              level,
              hp,
              maxhp,
-             mp,
-             maxmp,
+
              0, // XP placeholder
              room_name,
              turn);
