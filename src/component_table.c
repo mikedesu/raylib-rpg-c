@@ -88,7 +88,6 @@ bool ct_add_component(ct* table, entityid id, component comp) {
     if (id >= table->component_row_count) return false;
     massert(ct_has_entity(table, id), "ct_add_component: entity not found");
     //if (!ct_has_entity(table, id)) return false;
-
     if (comp < 0 || comp >= table->component_col_count) return false;
     table->components[id * table->component_col_count + comp] = 1;
     return true;
