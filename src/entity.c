@@ -1,6 +1,6 @@
 #include "entity.h"
 #include "massert.h"
-#include "mprint.h"
+//#include "mprint.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -11,11 +11,9 @@ entity_t* e_new(entityid id, entitytype_t type) {
     massert(type >= 0, "type is less than 0");
     massert(type < ENTITY_TYPE_COUNT, "type is greater than ENTITY_TYPE_COUNT");
     e->id = id;
-    //e->default_action = ENTITY_ACTION_MOVE_RANDOM; // Default for NPCs, can be overridden
     e->inventory_count = 0;
     e->weapon = -1;
     e->shield = -1;
-    //e->is_damaged = false;
     e->door_is_open = false;
     e->potion_type = POTION_NONE;
     e->next = NULL;
@@ -49,46 +47,11 @@ void e_free_target_path(entity_t* const e) {
     }
 }
 
-entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int floor) {
-    //massert(x >= 0, "x is less than 0");
-    //massert(y >= 0, "y is less than 0");
-    massert(floor >= 0, "floor is less than 0");
+entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int z) {
+    massert(x >= 0, "x is less than 0");
+    massert(y >= 0, "y is less than 0");
+    massert(z >= 0, "floor is less than 0");
     entity_t* e = e_new(id, type);
     massert(e, "Failed to create entity");
     return e;
-}
-
-bool e_add_item_to_inventory(entity_t* const e, entityid item_id) {
-    massert(e, "e is NULL");
-    massert(item_id >= 0, "item_id is less than 0");
-    if (e->inventory_count >= ENTITY_INVENTORY_MAX_SIZE) {
-        merror("inventory is full");
-        return false;
-    }
-    if (e_item_is_in_inventory(e, item_id)) {
-        merror("item is already in inventory");
-        return false;
-    }
-    e->inventory[e->inventory_count++] = item_id;
-    return true;
-}
-
-bool e_remove_item_from_inventory(entity_t* const e, entityid item_id) {
-    massert(e, "e is NULL");
-    massert(item_id >= 0, "item_id is less than 0");
-    if (e->inventory_count <= 0) {
-        merror("inventory is empty");
-        return false;
-    }
-    if (!e_item_is_in_inventory(e, item_id)) {
-        merror("item is not in inventory");
-        return false;
-    }
-    for (int i = 0; i < e->inventory_count; i++) {
-        if (e->inventory[i] == item_id) {
-            e->inventory[i] = e->inventory[--e->inventory_count];
-            return true;
-        }
-    }
-    return false;
 }
