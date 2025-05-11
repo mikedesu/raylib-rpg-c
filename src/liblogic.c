@@ -1012,8 +1012,12 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int z, c
     g_register_comp(g, id, C_DAMAGED);
     minfo("registering default_action: %d", ENTITY_ACTION_WAIT);
     g_register_comp(g, id, C_DEFAULT_ACTION);
-    minfo("registering inventory: %d", 0);
+    minfo("registering inventory");
     g_register_comp(g, id, C_INVENTORY);
+    minfo("registering target");
+    g_register_comp(g, id, C_TARGET);
+    minfo("registering target_path");
+    g_register_comp(g, id, C_TARGET_PATH);
 
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_NPC);
@@ -1029,6 +1033,8 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int z, c
     g_add_damaged(g, id, false);
     g_add_default_action(g, id, ENTITY_ACTION_WAIT);
     g_add_inventory(g, id);
+    g_add_target(g, id, (loc_t){-1, -1, -1});
+    g_add_target_path(g, id);
 
     if (!df_add_at(df, id, x, y)) {
         merror("failed to add entity to dungeon floor");

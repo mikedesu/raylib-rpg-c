@@ -1205,3 +1205,140 @@ bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid ite
     }
     return false; //
 }
+
+bool g_has_target(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_TARGET);
+}
+
+bool g_add_target(gamestate* const g, entityid id, loc_t target) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the target component
+    massert(g_has_component(g, id, C_TARGET), "id %d does not have a target component", id);
+    if (g->target_list_count >= g->target_list_capacity) {
+        g->target_list_capacity *= 2;
+        g->target_list = realloc(g->target_list, sizeof(target_component) * g->target_list_capacity);
+        if (g->target_list == NULL) {
+            merror("g->target_list is NULL");
+            return false;
+        }
+    }
+    init_target_component(&g->target_list[g->target_list_count], id, target);
+    g->target_list_count++;
+    return true;
+}
+
+bool g_set_target(gamestate* const g, entityid id, loc_t target) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->target_list == NULL) {
+        merror("g->target_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->target_list_count; i++) {
+        if (g->target_list[i].id == id) {
+            g->target_list[i].target = target;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool g_get_target(const gamestate* const g, entityid id, loc_t* target) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(target, "target is NULL");
+    if (g->target_list == NULL) {
+        merror("g->target_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->target_list_count; i++) {
+        if (g->target_list[i].id == id) {
+            *target = g->target_list[i].target;
+            return true;
+        }
+    }
+    merror("id %d not found in target_list", id);
+    return false;
+}
+
+bool g_has_target_path(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_TARGET_PATH);
+}
+
+bool g_add_target_path(gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the target path component
+    massert(g_has_component(g, id, C_TARGET_PATH), "id %d does not have a target path component", id);
+    if (g->target_path_list_count >= g->target_path_list_capacity) {
+        g->target_path_list_capacity *= 2;
+        g->target_path_list = realloc(g->target_path_list, sizeof(target_path_component) * g->target_path_list_capacity);
+        if (g->target_path_list == NULL) {
+            merror("g->target_path_list is NULL");
+            return false;
+        }
+    }
+    init_target_path_component(&g->target_path_list[g->target_path_list_count], id, NULL, 0);
+    g->target_path_list_count++;
+    return true;
+}
+
+bool g_set_target_path(gamestate* const g, entityid id, loc_t* target_path, int target_path_length) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->target_path_list == NULL) {
+        merror("g->target_path_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->target_path_list_count; i++) {
+        if (g->target_path_list[i].id == id) {
+            g->target_path_list[i].target_path = target_path;
+            g->target_path_list[i].target_path_length = target_path_length;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool g_get_target_path(const gamestate* const g, entityid id, loc_t** target_path, int* target_path_length) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(target_path, "target_path is NULL");
+    massert(target_path_length, "target_path_length is NULL");
+    if (g->target_path_list == NULL) {
+        merror("g->target_path_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->target_path_list_count; i++) {
+        if (g->target_path_list[i].id == id) {
+            *target_path = g->target_path_list[i].target_path;
+            *target_path_length = g->target_path_list[i].target_path_length;
+            return true;
+        }
+    }
+    merror("id %d not found in target_path_list", id);
+    return false;
+}
+
+bool g_get_target_path_length(const gamestate* const g, entityid id, int* target_path_length) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(target_path_length, "target_path_length is NULL");
+    if (g->target_path_list == NULL) {
+        merror("g->target_path_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->target_path_list_count; i++) {
+        if (g->target_path_list[i].id == id) {
+            *target_path_length = g->target_path_list[i].target_path_length;
+            return true;
+        }
+    }
+    merror("id %d not found in target_path_list", id);
+    return false;
+}

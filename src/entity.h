@@ -27,14 +27,12 @@ typedef struct entity_t entity_t;
 
 typedef struct entity_t {
     entityid id;
-    //entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
-    //int inventory_count;
     entityid weapon;
     entityid shield;
     // pathfinding
-    loc_t target;
-    int target_path_length;
-    loc_t* target_path;
+    //loc_t target;
+    //int target_path_length;
+    //loc_t* target_path;
 
     entity_t* next;
 } entity;
@@ -43,7 +41,7 @@ entity_t* e_new(entityid id, entitytype_t type);
 entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int floor);
 
 void e_free(entity_t* e);
-void e_free_target_path(entity_t* const e);
+//void e_free_target_path(entity_t* const e);
 
 //static inline int e_get_inventory_count(entity_t* const e) {
 //    massert(e, "e is NULL");

@@ -14,9 +14,9 @@ entity_t* e_new(entityid id, entitytype_t type) {
     e->weapon = -1;
     e->shield = -1;
     e->next = NULL;
-    e->target_path = NULL;
-    e->target_path_length = 0;
-    e->target = (loc_t){-1, -1, -1};
+    //e->target_path = NULL;
+    //e->target_path_length = 0;
+    //e->target = (loc_t){-1, -1, -1};
     return e;
 }
 
@@ -27,22 +27,22 @@ entity_t* e_new(entityid id, entitytype_t type) {
 void e_free(entity_t* e) {
     massert(e, "e is NULL");
     massert(e->next == NULL, "e->next is not NULL. You MUST acquire the next pointer externally and set it to NULL before calling this function");
-    if (e->target_path) {
-        free(e->target_path);
-        e->target_path = NULL;
-        e->target_path_length = 0;
-    }
+    //if (e->target_path) {
+    //    free(e->target_path);
+    //    e->target_path = NULL;
+    //    e->target_path_length = 0;
+    //}
     free(e);
 }
 
-void e_free_target_path(entity_t* const e) {
-    massert(e, "e is NULL");
-    if (e->target_path) {
-        free(e->target_path);
-        e->target_path = NULL;
-        e->target_path_length = 0;
-    }
-}
+//void e_free_target_path(entity_t* const e) {
+//    massert(e, "e is NULL");
+//if (e->target_path) {
+//    free(e->target_path);
+//    e->target_path = NULL;
+//    e->target_path_length = 0;
+//}
+//}
 
 entity_t* e_new_at(entityid id, entitytype_t type, int x, int y, int z) {
     massert(x >= 0, "x is less than 0");

@@ -21,18 +21,17 @@ typedef enum component_t
     C_SPRITE_MOVE,
     C_DEAD,
     C_UPDATE,
-    // not yet implemented
     C_ATTACKING,
     C_BLOCKING,
     C_BLOCK_SUCCESS,
     C_DAMAGED,
     C_INVENTORY,
-    //C_EQUIPPED_WEAPON,
-    //C_EQUIPPED_SHIELD,
-    //C_TARGET,
-    //C_TARGET_PATH,
-    //C_DOOR_STATE,
     C_DEFAULT_ACTION,
+    // not yet implemented
+    C_TARGET,
+    C_TARGET_PATH,
+    //C_EQUIPMENT,
+    //C_DOOR_STATE,
     //C_ATTRIBUTES,
     //C_MODIFIERS,
     C_COUNT

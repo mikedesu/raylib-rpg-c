@@ -106,12 +106,42 @@ typedef struct gamestate {
     target_path_component* target_path_list;
     default_action_component* default_action_list;
 
-    int name_list_count, name_list_capacity, type_list_count, type_list_capacity, race_list_count, race_list_capacity, direction_list_count,
-        direction_list_capacity, loc_list_count, loc_list_capacity, sprite_move_list_count, sprite_move_list_capacity, dead_list_count, dead_list_capacity,
-        update_list_count, update_list_capacity, attacking_list_count, attacking_list_capacity, blocking_list_count, blocking_list_capacity,
-        block_success_list_count, block_success_list_capacity, damaged_list_count, damaged_list_capacity, inventory_list_count, inventory_list_capacity,
-        equipped_weapon_list_count, equipped_weapon_list_capacity, equipped_shield_list_count, equipped_shield_list_capacity, target_list_count,
-        target_list_capacity, target_path_list_count, target_path_list_capacity, default_action_list_count, default_action_list_capacity;
+    int name_list_count;
+    int name_list_capacity;
+    int type_list_count;
+    int type_list_capacity;
+    int race_list_count;
+    int race_list_capacity;
+    int direction_list_count;
+    int direction_list_capacity;
+    int loc_list_count;
+    int loc_list_capacity;
+    int sprite_move_list_count;
+    int sprite_move_list_capacity;
+    int dead_list_count;
+    int dead_list_capacity;
+    int update_list_count;
+    int update_list_capacity;
+    int attacking_list_count;
+    int attacking_list_capacity;
+    int blocking_list_count;
+    int blocking_list_capacity;
+    int block_success_list_count;
+    int block_success_list_capacity;
+    int damaged_list_count;
+    int damaged_list_capacity;
+    int inventory_list_count;
+    int inventory_list_capacity;
+    int equipped_weapon_list_count;
+    int equipped_weapon_list_capacity;
+    int equipped_shield_list_count;
+    int equipped_shield_list_capacity;
+    int target_list_count;
+    int target_list_capacity;
+    int target_path_list_count;
+    int target_path_list_capacity;
+    int default_action_list_count;
+    int default_action_list_capacity;
 
 } gamestate;
 
@@ -215,3 +245,14 @@ bool g_remove_from_inventory(gamestate* const g, entityid id, entityid itemid);
 entityid* g_get_inventory(const gamestate* const g, entityid id, int* count);
 size_t g_get_inventory_count(const gamestate* const g, entityid id);
 bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid itemid);
+
+bool g_has_target(const gamestate* const g, entityid id);
+bool g_add_target(gamestate* const g, entityid id, loc_t target);
+bool g_set_target(gamestate* const g, entityid id, loc_t target);
+bool g_get_target(const gamestate* const g, entityid id, loc_t* target);
+
+bool g_has_target_path(const gamestate* const g, entityid id);
+bool g_add_target_path(gamestate* const g, entityid id);
+bool g_set_target_path(gamestate* const g, entityid id, loc_t* target_path, int target_path_length);
+bool g_get_target_path(const gamestate* const g, entityid id, loc_t** target_path, int* target_path_length);
+bool g_get_target_path_length(const gamestate* const g, entityid id, int* target_path_length);
