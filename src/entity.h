@@ -29,12 +29,7 @@ typedef struct entity_t {
     entityid id;
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
-    //entity_stats_t stats;
-    //entity_action_t default_action; // New field
-    // if the entity is a potion...
-    //potiontype_t potion_type;
-    //bool is_damaged;
-    bool door_is_open;
+    //bool door_is_open;
     entityid weapon;
     entityid shield;
     // pathfinding
