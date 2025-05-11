@@ -26,7 +26,7 @@ typedef enum component_t
     C_BLOCKING,
     C_BLOCK_SUCCESS,
     C_DAMAGED,
-    //C_INVENTORY,
+    C_INVENTORY,
     //C_EQUIPPED_WEAPON,
     //C_EQUIPPED_SHIELD,
     //C_TARGET,
@@ -37,6 +37,30 @@ typedef enum component_t
     //C_MODIFIERS,
     C_COUNT
 } component;
+
+static inline const char* component2str(component c) {
+    switch (c) {
+    case C_NONE: return "C_NONE";
+    case C_ID: return "C_ID";
+    case C_NAME: return "C_NAME";
+    case C_TYPE: return "C_TYPE";
+    case C_RACE: return "C_RACE";
+    case C_DIRECTION: return "C_DIRECTION";
+    case C_LOCATION: return "C_LOCATION";
+    case C_SPRITE_MOVE: return "C_SPRITE_MOVE";
+    case C_DEAD: return "C_DEAD";
+    case C_UPDATE: return "C_UPDATE";
+    case C_ATTACKING: return "C_ATTACKING";
+    case C_BLOCKING: return "C_BLOCKING";
+    case C_BLOCK_SUCCESS: return "C_BLOCK_SUCCESS";
+    case C_DAMAGED: return "C_DAMAGED";
+    case C_INVENTORY: return "C_INVENTORY";
+    //case C_EQUIPPED_WEAPON:
+    //case C_EQUIPPED_SHIELD:
+    default: break;
+    }
+    return "C_UNKNOWN";
+}
 
 typedef struct name_component_t {
     entityid id;
@@ -98,10 +122,11 @@ typedef struct damaged_component_t {
     bool damaged;
 } damaged_component;
 
+#define MAX_INVENTORY_SIZE 32
 typedef struct inventory_component_t {
     entityid id;
-    entityid inventory[32]; // max 32 items
-    int count;
+    entityid inventory[MAX_INVENTORY_SIZE]; // max 32 items
+    size_t count;
 } inventory_component;
 
 typedef struct equipped_weapon_component_t {

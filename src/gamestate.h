@@ -207,3 +207,11 @@ bool g_has_default_action(const gamestate* const g, entityid id);
 bool g_add_default_action(gamestate* const g, entityid id, entity_action_t action);
 bool g_set_default_action(gamestate* const g, entityid id, entity_action_t action);
 entity_action_t g_get_default_action(const gamestate* const g, entityid id);
+
+bool g_has_inventory(const gamestate* const g, entityid id);
+bool g_add_inventory(gamestate* const g, entityid id);
+bool g_add_to_inventory(gamestate* const g, entityid id, entityid itemid);
+bool g_remove_from_inventory(gamestate* const g, entityid id, entityid itemid);
+entityid* g_get_inventory(const gamestate* const g, entityid id, int* count);
+size_t g_get_inventory_count(const gamestate* const g, entityid id);
+bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid itemid);

@@ -82,6 +82,7 @@ bool ct_has_entity(ct* table, entityid id) {
 }
 
 bool ct_add_component(ct* table, entityid id, component comp) {
+    minfo("ct_add_component: id %d comp %d", id, component2str(comp));
     if (!table) return false;
     if (id <= ENTITYID_INVALID) return false;
     if (id >= table->component_row_count) return false;
@@ -101,6 +102,7 @@ bool ct_add_component(ct* table, entityid id, component comp) {
 //}
 
 bool ct_has_component(ct* table, entityid id, component comp) {
+    //minfo("ct_has_component: id %d comp %s", id, component2str(comp));
     if (!table) { return false; }
     if (id <= ENTITYID_INVALID) { return false; }
     if (id >= table->component_row_count) { return false; }

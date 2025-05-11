@@ -1,3 +1,4 @@
+#include "component.h"
 #include "controlmode.h"
 #include "entityid.h"
 #include "gamestate.h"
@@ -339,6 +340,8 @@ bool g_register_comp(gamestate* const g, entityid id, component comp) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(comp != C_COUNT, "comp is invalid");
+
+    minfo("g_register_comp: id: %d, comp: %d", id, comp);
     if (g->components == NULL) {
         merror("g->components is NULL");
         return false;
@@ -1078,4 +1081,127 @@ entity_action_t g_get_default_action(const gamestate* const g, entityid id) {
     }
     merror("id %d not found in default_action_list", id);
     return ENTITY_ACTION_NONE;
+}
+
+bool g_has_inventory(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_INVENTORY);
+}
+
+bool g_add_inventory(gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the inventory component
+    massert(g_has_component(g, id, C_INVENTORY), "id %d does not have an inventory component", id);
+    if (g->inventory_list_count >= g->inventory_list_capacity) {
+        g->inventory_list_capacity *= 2;
+        g->inventory_list = realloc(g->inventory_list, sizeof(inventory_component) * g->inventory_list_capacity);
+        if (g->inventory_list == NULL) {
+            merror("g->inventory_list is NULL");
+            return false;
+        }
+    }
+    init_inventory_component(&g->inventory_list[g->inventory_list_count], id);
+    g->inventory_list_count++;
+    return true;
+}
+
+bool g_add_to_inventory(gamestate* const g, entityid id, entityid itemid) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(itemid != ENTITYID_INVALID, "itemid is invalid");
+    massert(g->inventory_list, "g->inventory_list is NULL");
+    if (g->inventory_list == NULL) {
+        merror("g->inventory_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->inventory_list_count; i++) {
+        if (g->inventory_list[i].id == id) {
+            if (g->inventory_list[i].count >= MAX_INVENTORY_SIZE) {
+                merror("inventory is full");
+                return false;
+            }
+            g->inventory_list[i].inventory[g->inventory_list[i].count++] = itemid;
+            msuccess("added item %d to inventory %d", itemid, id);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool g_remove_from_inventory(gamestate* const g, entityid id, entityid itemid) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(itemid != ENTITYID_INVALID, "itemid is invalid");
+    massert(g->inventory_list, "g->inventory_list is NULL");
+    if (g->inventory_list == NULL) {
+        merror("g->inventory_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->inventory_list_count; i++) {
+        if (g->inventory_list[i].id == id) {
+            for (int j = 0; j < g->inventory_list[i].count; j++) {
+                if (g->inventory_list[i].inventory[j] == itemid) {
+                    g->inventory_list[i].inventory[j] = g->inventory_list[i].inventory[g->inventory_list[i].count - 1];
+                    g->inventory_list[i].count--;
+                    msuccess("removed item %d from inventory %d", itemid, id);
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+entityid* g_get_inventory(const gamestate* const g, entityid id, int* count) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(count, "count is NULL");
+    massert(g->inventory_list, "g->inventory_list is NULL");
+    if (g->inventory_list == NULL) {
+        merror("g->inventory_list is NULL");
+        return NULL;
+    }
+    for (int i = 0; i < g->inventory_list_count; i++) {
+        if (g->inventory_list[i].id == id) {
+            *count = g->inventory_list[i].count;
+            return g->inventory_list[i].inventory;
+        }
+    }
+    *count = 0;
+    return NULL;
+}
+
+size_t g_get_inventory_count(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(g->inventory_list, "g->inventory_list is NULL");
+    if (g->inventory_list == NULL) {
+        merror("g->inventory_list is NULL");
+        return 0;
+    }
+    for (int i = 0; i < g->inventory_list_count; i++) {
+        if (g->inventory_list[i].id == id) { return g->inventory_list[i].count; }
+    }
+    return 0;
+}
+
+bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid itemid) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(itemid != ENTITYID_INVALID, "itemid is invalid");
+    massert(g->inventory_list, "g->inventory_list is NULL");
+    if (g->inventory_list == NULL) {
+        merror("g->inventory_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->inventory_list_count; i++) {
+        if (g->inventory_list[i].id == id) {
+            for (int j = 0; j < g->inventory_list[i].count; j++) {
+                if (g->inventory_list[i].inventory[j] == itemid) { return true; }
+            }
+        }
+    }
+    return false; //
 }

@@ -29,7 +29,6 @@ typedef struct entity_t {
     entityid id;
     entityid inventory[ENTITY_INVENTORY_MAX_SIZE];
     int inventory_count;
-    //bool door_is_open;
     entityid weapon;
     entityid shield;
     // pathfinding

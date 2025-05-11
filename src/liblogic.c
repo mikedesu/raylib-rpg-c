@@ -990,17 +990,45 @@ static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int z, c
     g_register_comp(g, id, C_NAME);
     minfo("registering type: %d", ENTITY_NPC);
     g_register_comp(g, id, C_TYPE);
+    minfo("registering race: %d", rt);
     g_register_comp(g, id, C_RACE);
+    minfo("registering direction: %d", DIR_RIGHT);
     g_register_comp(g, id, C_DIRECTION);
+    minfo("registering location: %d, %d, %d", x, y, z);
     g_register_comp(g, id, C_LOCATION);
+    minfo("registering sprite_move: %d, %d", 0, 0);
     g_register_comp(g, id, C_SPRITE_MOVE);
+    minfo("registering dead: %d", false);
     g_register_comp(g, id, C_DEAD);
+    minfo("registering update: %d", false);
     g_register_comp(g, id, C_UPDATE);
+    minfo("registering attacking: %d", false);
     g_register_comp(g, id, C_ATTACKING);
+    minfo("registering blocking: %d", false);
     g_register_comp(g, id, C_BLOCKING);
+    minfo("registering block_success: %d", false);
     g_register_comp(g, id, C_BLOCK_SUCCESS);
+    minfo("registering damaged: %d", false);
     g_register_comp(g, id, C_DAMAGED);
+    minfo("registering default_action: %d", ENTITY_ACTION_WAIT);
     g_register_comp(g, id, C_DEFAULT_ACTION);
+    minfo("registering inventory: %d", 0);
+    g_register_comp(g, id, C_INVENTORY);
+
+    g_add_name(g, id, name);
+    g_add_type(g, id, ENTITY_NPC);
+    g_add_race(g, id, rt);
+    g_add_direction(g, id, DIR_RIGHT);
+    g_add_location(g, id, (loc_t){x, y, z});
+    g_add_sprite_move(g, id, (loc_t){0, 0}); // default
+    g_add_dead(g, id, false);
+    g_add_update(g, id, false);
+    g_add_attacking(g, id, false);
+    g_add_blocking(g, id, false);
+    g_add_block_success(g, id, false);
+    g_add_damaged(g, id, false);
+    g_add_default_action(g, id, ENTITY_ACTION_WAIT);
+    g_add_inventory(g, id);
 
     if (!df_add_at(df, id, x, y)) {
         merror("failed to add entity to dungeon floor");
@@ -1063,21 +1091,6 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
     massert(id != ENTITYID_INVALID, "failed to create player");
 
     gamestate_set_hero_id(g, id);
-
-    // beginnings of a real ECS system...
-    g_add_name(g, id, name);
-    g_add_type(g, id, type);
-    g_add_race(g, id, RACE_HUMAN);
-    g_add_direction(g, id, DIR_RIGHT);
-    g_add_location(g, id, (loc_t){x, y, fl});
-    g_add_sprite_move(g, id, (loc_t){0, 0}); // default
-    g_add_dead(g, id, false);
-    g_add_update(g, id, false);
-    g_add_attacking(g, id, false);
-    g_add_blocking(g, id, false);
-    g_add_block_success(g, id, false);
-    g_add_damaged(g, id, false);
-    g_add_default_action(g, id, ENTITY_ACTION_WAIT);
 
     return id;
 }
