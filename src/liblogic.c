@@ -4,8 +4,6 @@
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
-//#include "em.h"
-#include "entity.h"
 #include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
@@ -18,7 +16,6 @@
 #include "massert.h"
 #include "mprint.h"
 //#include "path_node.h"
-//#include "potiontype.h"
 #include "path_node.h"
 #include "race.h"
 #include <assert.h>
@@ -35,11 +32,12 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
 
 static inline bool is_traversable(gamestate* const g, int x, int y, int z);
 
+static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful);
 static inline void reset_player_blocking(gamestate* const g);
 static inline void reset_player_block_success(gamestate* const g);
 static inline void update_npc_state(gamestate* const g, entityid id);
 static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
-static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
+//static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
 //static loc_t* get_empty_locs(dungeon_floor_t* const df, int* count);
 //static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt);
@@ -74,7 +72,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g);
 static void add_message_history(gamestate* const g, const char* fmt, ...);
 static void add_message_and_history(gamestate* g, const char* fmt, ...);
 static void add_message(gamestate* g, const char* fmt, ...);
-static void try_entity_open_door(gamestate* g, entity* e, int x, int y);
+//static void try_entity_open_door(gamestate* g, entity* e, int x, int y);
 static void try_entity_move_a_star(gamestate* const g, entityid id);
 static void try_entity_move(gamestate* const g, entityid id, int x, int y);
 static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
@@ -489,15 +487,15 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
     //}
 }
 
-static void handle_attack_blocked(gamestate* const g, entity* attacker, entity* target, bool* atk_successful) {
+static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful) {
     massert(g, "gamestate is NULL");
-    massert(attacker, "attacker entity is NULL");
-    massert(target, "target entity is NULL");
+    massert(attacker_id != ENTITYID_INVALID, "attacker entity id is invalid");
+    massert(target_id != ENTITYID_INVALID, "target entity id is invalid");
     massert(atk_successful, "attack_successful is NULL");
     *atk_successful = false;
-    g_set_damaged(g, target->id, false);
-    g_set_block_success(g, target->id, true);
-    g_set_update(g, target->id, true);
+    g_set_damaged(g, target_id, false);
+    g_set_block_success(g, target_id, true);
+    g_set_update(g, target_id, true);
     //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
 
@@ -510,14 +508,10 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     massert(attack_successful, "attack_successful is NULL");
     entityid target_id = tile->entities[i];
     if (target_id == ENTITYID_INVALID) return false;
-    //massert(target, "target entity is NULL");
-    //entitytype_t type = target->type;
     entitytype_t type = g_get_type(g, target_id);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) {
         return false;
     }
-    //if (target->dead) { return false; }
-    //minfo("calling g_is_dead 5");
     if (g_is_dead(g, target_id)) {
         return false;
     }
@@ -567,9 +561,9 @@ static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, in
     handle_attack_success_gamestate_flag(g, g_get_type(g, atk_id), ok);
 }
 
-static void try_entity_attack_random(gamestate* const g, entity* const e) {
+static void try_entity_attack_random(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
-    massert(e, "entity is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
     int x = rand() % 3;
     int y = 0;
     x = x == 0 ? -1 : x == 1 ? 0 : 1;
@@ -581,8 +575,8 @@ static void try_entity_attack_random(gamestate* const g, entity* const e) {
         y = rand() % 3;
         y = y == 0 ? -1 : y == 1 ? 0 : 1;
     }
-    loc_t loc = g_get_location(g, e->id);
-    try_entity_attack(g, e->id, loc.x + x, loc.y + y);
+    loc_t loc = g_get_location(g, id);
+    try_entity_attack(g, id, loc.x + x, loc.y + y);
 }
 
 //static void try_entity_attack_player(gamestate* const g, entity* const e) {

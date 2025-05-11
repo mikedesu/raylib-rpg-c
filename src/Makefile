@@ -12,9 +12,11 @@ RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 CFLAGS ?= # Allow override
 
 #LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  em.o dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o entity.o component_table.o component.o
-LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o entity.o component_table.o component.o
+#LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o entity.o component_table.o component.o
+LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o component_table.o component.o
 #LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o dungeon.o keybinding.o path_node.o component_table.o component.o
-LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o entity.o dungeon.o keybinding.o path_node.o component_table.o component.o
+#LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o entity.o dungeon.o keybinding.o path_node.o component_table.o component.o
+LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o dungeon.o keybinding.o path_node.o component_table.o component.o
 
  
 
@@ -77,9 +79,6 @@ liblogic.so: $(LIBLOGIC_OBJECTS)
 	rm -rfv liblogic.so.lockfile
 
 
-# ... rest of the object file rules unchanged ...
-#entity.o: entity.c entity.h
-#	$(CC) $(OBJ) $(WFLAGS) $(CFLAGS) entity.c -o $@
 
 
 
