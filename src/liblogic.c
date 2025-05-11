@@ -418,21 +418,21 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
 //    }
 //}
 
-//static void try_entity_move_random(gamestate* const g, entityid id) {
-//    massert(g, "gamestate is NULL");
-//    massert(e, "entity is NULL");
-//    int x = rand() % 3;
-//    int y = 0;
-//    x = x == 0 ? -1 : x == 1 ? 0 : 1;
-//    // if x is 0, y cannot also be 0
-//    if (x == 0) {
-//        y = rand() % 2 == 0 ? -1 : 1;
-//    } else {
-//        y = rand() % 3;
-//        y = y == 0 ? -1 : y == 1 ? 0 : 1;
-//    }
-//    try_entity_move(g, id, x, y);
-//}
+static void try_entity_move_random(gamestate* const g, entityid id) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
+    int x = rand() % 3;
+    int y = 0;
+    x = x == 0 ? -1 : x == 1 ? 0 : 1;
+    // if x is 0, y cannot also be 0
+    if (x == 0) {
+        y = rand() % 2 == 0 ? -1 : 1;
+    } else {
+        y = rand() % 3;
+        y = y == 0 ? -1 : y == 1 ? 0 : 1;
+    }
+    try_entity_move(g, id, x, y);
+}
 
 static inline void handle_attack_success_gamestate_flag(gamestate* const g, entitytype_t type, bool success) {
     if (!success) {
@@ -609,24 +609,20 @@ static void try_entity_attack_random(gamestate* const g, entity* const e) {
 //}
 //}
 
-//static void try_entity_wait(gamestate* const g, entity* const e) {
-//    massert(g, "Game state is NULL!");
-//    massert(e, "Entity is NULL!");
-//    //if (e->type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-//    if (g_is_type(g, e->id, ENTITY_PLAYER)) {
-//        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-//    }
-//    //e->do_update = true;
-//    g_set_update(g, e->id, true);
-//}
+static void try_entity_wait(gamestate* const g, entityid id) {
+    massert(g, "Game state is NULL!");
+    massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
+    if (g_is_type(g, id, ENTITY_PLAYER)) {
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    }
+    g_set_update(g, id, true);
+}
 
 static void execute_action(gamestate* const g, entityid id, entity_action_t action) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     //massert(e, "entity is NULL");
-
     //loc_t loc = g_get_location(g, id);
-
     switch (action) {
     case ENTITY_ACTION_MOVE_LEFT: try_entity_move(g, id, -1, 0); break;
     case ENTITY_ACTION_MOVE_RIGHT: try_entity_move(g, id, 1, 0); break;
@@ -635,19 +631,19 @@ static void execute_action(gamestate* const g, entityid id, entity_action_t acti
     case ENTITY_ACTION_MOVE_UP_LEFT: try_entity_move(g, id, -1, -1); break;
     case ENTITY_ACTION_MOVE_UP_RIGHT: try_entity_move(g, id, 1, -1); break;
     case ENTITY_ACTION_MOVE_DOWN_LEFT: try_entity_move(g, id, -1, 1); break;
-    case ENTITY_ACTION_MOVE_DOWN_RIGHT:
-        try_entity_move(g, id, 1, 1);
+    case ENTITY_ACTION_MOVE_DOWN_RIGHT: try_entity_move(g, id, 1, 1); break;
+    //case ENTITY_ACTION_ATTACK_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y); break;
+    //case ENTITY_ACTION_ATTACK_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y); break;
+    //case ENTITY_ACTION_ATTACK_UP: try_entity_attack(g, e->id, loc.x, loc.y - 1); break;
+    //case ENTITY_ACTION_ATTACK_DOWN: try_entity_attack(g, e->id, loc.x, loc.y + 1); break;
+    //case ENTITY_ACTION_ATTACK_UP_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y - 1); break;
+    //case ENTITY_ACTION_ATTACK_UP_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y - 1); break;
+    //case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
+    //case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
+    case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, id); break;
+    case ENTITY_ACTION_WAIT:
+        try_entity_wait(g, id);
         break;
-        //case ENTITY_ACTION_ATTACK_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y); break;
-        //case ENTITY_ACTION_ATTACK_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y); break;
-        //case ENTITY_ACTION_ATTACK_UP: try_entity_attack(g, e->id, loc.x, loc.y - 1); break;
-        //case ENTITY_ACTION_ATTACK_DOWN: try_entity_attack(g, e->id, loc.x, loc.y + 1); break;
-        //case ENTITY_ACTION_ATTACK_UP_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y - 1); break;
-        //case ENTITY_ACTION_ATTACK_UP_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y - 1); break;
-        //case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
-        //case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
-        //case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, e); break;
-        //case ENTITY_ACTION_WAIT: try_entity_wait(g, e); break;
         //case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
         //case ENTITY_ACTION_MOVE_PLAYER:
         //    try_entity_move_player(g, e);
@@ -1006,11 +1002,12 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
     massert(g, "gamestate is NULL");
     massert(name, "name is NULL");
     // use the previously-written liblogic_npc_create function
-    const entitytype_t type = ENTITY_PLAYER;
+    //const entitytype_t type = ENTITY_PLAYER;
     //const entityid id = npc_create(g, rt, x, y, fl, name);
     const entityid id = npc_create(g, rt, (loc_t){x, y, z}, name);
     massert(id != ENTITYID_INVALID, "failed to create player");
     gamestate_set_hero_id(g, id);
+    g_set_type(g, id, ENTITY_PLAYER);
     return id;
 }
 
@@ -1745,6 +1742,7 @@ static void init_npc_test(gamestate* g) {
     loc.x += 1;
     entityid id = npc_create(g, RACE_ORC, loc, "orc");
     massert(id != ENTITYID_INVALID, "npc_create failed");
+    g_set_default_action(g, id, ENTITY_ACTION_MOVE_RANDOM);
 }
 
 static void update_player_state(gamestate* const g) {
@@ -1798,8 +1796,12 @@ static void handle_nth_npc(gamestate* const g, int i) {
     massert(i >= 0, "Index is out of bounds!");
     massert(i < g->index_entityids, "Index is out of bounds!");
     entityid id = g->entityids[i];
-    if (id == g->hero_id) return; // Skip the hero
+    if (id == g->hero_id) {
+        minfo("Skipping hero");
+        return; // Skip the hero
+    }
     if (g_is_type(g, id, ENTITY_NPC) && !g_is_dead(g, id)) {
+        minfo("Handling NPC %d", id);
         execute_action(g, id, g_get_default_action(g, id));
     }
 }

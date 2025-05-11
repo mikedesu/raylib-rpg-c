@@ -182,6 +182,7 @@ bool g_add_name(gamestate* const g, entityid id, const char* name);
 const char* g_get_name(gamestate* const g, entityid id);
 
 bool g_add_type(gamestate* const g, entityid id, entitytype_t type);
+bool g_set_type(gamestate* const g, entityid id, entitytype_t type);
 entitytype_t g_get_type(const gamestate* const g, entityid id);
 bool g_is_type(const gamestate* const g, entityid id, entitytype_t type);
 bool g_has_type(const gamestate* const g, entityid id);

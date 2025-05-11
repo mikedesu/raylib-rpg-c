@@ -496,6 +496,24 @@ entitytype_t g_get_type(const gamestate* const g, entityid id) {
     return ENTITY_NONE;
 }
 
+bool g_set_type(gamestate* const g, entityid id, entitytype_t type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
+    massert(g->type_list, "g->type_list is NULL");
+    if (g->type_list == NULL) {
+        merror("g->type_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->type_list_count; i++) {
+        if (g->type_list[i].id == id) {
+            g->type_list[i].type = type;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool g_has_type(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
