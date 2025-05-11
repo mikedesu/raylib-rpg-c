@@ -157,7 +157,7 @@ entityid gamestate_get_hero_id(const gamestate* const g);
 int gamestate_get_entityid_index(const gamestate* const g, entityid id);
 int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, int index);
 
-em_t* gamestate_get_entitymap(gamestate* const g);
+//em_t* gamestate_get_entitymap(gamestate* const g);
 
 bool gs_add_entityid(gamestate* const g, entityid id);
 bool gamestate_init_msg_history(gamestate* const g);
