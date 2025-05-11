@@ -19,6 +19,7 @@
 #include "mprint.h"
 //#include "path_node.h"
 //#include "potiontype.h"
+#include "path_node.h"
 #include "race.h"
 #include <assert.h>
 #include <math.h>
@@ -74,7 +75,6 @@ static void add_message_history(gamestate* const g, const char* fmt, ...);
 static void add_message_and_history(gamestate* g, const char* fmt, ...);
 static void add_message(gamestate* g, const char* fmt, ...);
 static void try_entity_open_door(gamestate* g, entity* e, int x, int y);
-//static void try_entity_move_a_star(gamestate* const g, entity* const e);
 static void try_entity_move_a_star(gamestate* const g, entityid id);
 static void try_entity_move(gamestate* const g, entityid id, int x, int y);
 static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
@@ -368,20 +368,50 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
 //}
 
 //static void try_entity_move_a_star(gamestate* const g, entity* const e) {
-//static void try_entity_move_a_star(gamestate* const g, entityid id) {
-//    massert(g, "gamestate is NULL");
-//    massert(id != ENTITYID_INVALID, "entity id is invalid");
-//    if (e->target_path) { e_free_target_path(e); }
-// for testing, we will hardcode an update to the entity's target
-// realistically, we should actually use a target ID and do location lookups on every update
-// however, for this test, we will instead hardcode the target to point to the hero's location
-// first, grab the hero id and then the hero entity pointer
-//entity* h = em_get(g->entitymap, g->hero_id);
-//    massert(h, "hero is NULL");
-//    loc_t hloc = g_get_location(g, g->hero_id);
-//    loc_t eloc = g_get_location(g, e->id);
-// set the target to the hero's location
-//    e->target.x = hloc.x;
+static void try_entity_move_a_star(gamestate* const g, entityid id) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
+    //    if (e->target_path) { e_free_target_path(e); }
+    // for testing, we will hardcode an update to the entity's target
+    // realistically, we should actually use a target ID and do location lookups on every update
+    // however, for this test, we will instead hardcode the target to point to the hero's location
+    // first, grab the hero id and then the hero entity pointer
+    //entity* h = em_get(g->entitymap, g->hero_id);
+    //    massert(h, "hero is NULL");
+    loc_t hloc = g_get_location(g, g->hero_id);
+    loc_t eloc = g_get_location(g, id);
+
+    dungeon_floor_t* df = d_get_floor(g->d, eloc.z);
+    massert(df, "dungeon floor is NULL");
+
+    int target_path_length = 0;
+    loc_t* target_path = find_path(eloc, hloc, df, &target_path_length);
+    if (target_path) {
+        if (target_path_length >= 2) {
+            loc_t loc = target_path[target_path_length - 2];
+            int dx = loc.x - eloc.x;
+            int dy = loc.y - eloc.y;
+            if (entities_adjacent(g, id, g->hero_id)) {
+                //                    // if the entity is adjacent to the hero, try to attack
+                try_entity_attack(g, id, loc.x, loc.y);
+            } else {
+                //                    // if the entity is not adjacent to the hero, try to move
+                //                    // there might be a door in the way...
+                //                    //if (tile_has_closed_door(g, loc.x, loc.y, e->floor)) {
+                //                    if (tile_has_closed_door(g, loc.x, loc.y, loc.z)) {
+                //                        try_entity_open_door(g, e, loc.x, loc.y);
+                //                    } else {
+                int dx = loc.x - eloc.x;
+                int dy = loc.y - eloc.y;
+                try_entity_move(g, id, dx, dy);
+                //                    }
+            }
+            //            }
+        }
+    }
+    // set the target to the hero's location
+    //    e->target.x = hloc.x;
+}
 //    e->target.y = hloc.y;
 //    e->target_path = find_path(eloc, e->target, g->dungeon->floors[g->dungeon->current_floor], &e->target_path_length);
 //    if (e->target_path) {
@@ -575,26 +605,26 @@ static void try_entity_attack_random(gamestate* const g, entity* const e) {
 //if (dx != 0 || dy != 0) try_entity_attack(g, e->id, hl.x, hl.y);
 //}
 
-//static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
-//massert(g, "gamestate is NULL");
-//massert(id0 != ENTITYID_INVALID, "id0 is invalid");
-//massert(id1 != ENTITYID_INVALID, "id1 is invalid");
-//massert(id0 != id1, "id0 and id1 are the same");
-//entity* const e0 = em_get(g->entitymap, id0);
-//massert(e0, "liblogic_entities_adjacent: e0 is NULL");
-//entity* const e1 = em_get(g->entitymap, id1);
-//massert(e1, "liblogic_entities_adjacent: e1 is NULL");
-// use e0 and check the surrounding 8 tiles
-//for (int y = -1; y <= 1; y++) {
-//    for (int x = -1; x <= 1; x++) {
-//        if (x == 0 && y == 0) continue;
-//        loc_t loc0 = g_get_location(g, e0->id);
-//        loc_t loc1 = g_get_location(g, e1->id);
-//        if (loc0.x + x == loc1.x && loc0.y + y == loc1.y) return true;
-//    }
-//}
-//return false;
-//}
+static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
+    massert(g, "gamestate is NULL");
+    massert(id0 != ENTITYID_INVALID, "id0 is invalid");
+    massert(id1 != ENTITYID_INVALID, "id1 is invalid");
+    massert(id0 != id1, "id0 and id1 are the same");
+    //entity* const e0 = em_get(g->entitymap, id0);
+    //massert(e0, "liblogic_entities_adjacent: e0 is NULL");
+    //entity* const e1 = em_get(g->entitymap, id1);
+    //massert(e1, "liblogic_entities_adjacent: e1 is NULL");
+    // use e0 and check the surrounding 8 tiles
+    for (int y = -1; y <= 1; y++) {
+        for (int x = -1; x <= 1; x++) {
+            if (x == 0 && y == 0) continue;
+            loc_t loc0 = g_get_location(g, id0);
+            loc_t loc1 = g_get_location(g, id1);
+            if (loc0.x + x == loc1.x && loc0.y + y == loc1.y) return true;
+        }
+    }
+    return false;
+}
 
 //static void try_entity_move_attack_player(gamestate* const g, entity* const e) {
 //    massert(g, "gamestate is NULL");
@@ -641,16 +671,16 @@ static void execute_action(gamestate* const g, entityid id, entity_action_t acti
     //case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
     //case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
     case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, id); break;
-    case ENTITY_ACTION_WAIT:
-        try_entity_wait(g, id);
+    case ENTITY_ACTION_WAIT: try_entity_wait(g, id); break;
+    //case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
+    //case ENTITY_ACTION_MOVE_PLAYER:
+    //    try_entity_move_player(g, e);
+    //    break;
+    //case ENTITY_ACTION_ATTACK_PLAYER: try_entity_attack_player(g, e); break;
+    //case ENTITY_ACTION_MOVE_ATTACK_PLAYER: try_entity_move_attack_player(g, e); break;
+    case ENTITY_ACTION_MOVE_A_STAR:
+        try_entity_move_a_star(g, id);
         break;
-        //case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
-        //case ENTITY_ACTION_MOVE_PLAYER:
-        //    try_entity_move_player(g, e);
-        //    break;
-        //case ENTITY_ACTION_ATTACK_PLAYER: try_entity_attack_player(g, e); break;
-        //case ENTITY_ACTION_MOVE_ATTACK_PLAYER: try_entity_move_attack_player(g, e); break;
-        //case ENTITY_ACTION_MOVE_A_STAR: try_entity_move_a_star(g, e); break;
         //case ENTITY_ACTION_INTERACT_DOWN_LEFT:
         //case ENTITY_ACTION_INTERACT_DOWN_RIGHT:
         //case ENTITY_ACTION_INTERACT_UP_LEFT:
@@ -1742,7 +1772,8 @@ static void init_npc_test(gamestate* g) {
     loc.x += 1;
     entityid id = npc_create(g, RACE_ORC, loc, "orc");
     massert(id != ENTITYID_INVALID, "npc_create failed");
-    g_set_default_action(g, id, ENTITY_ACTION_MOVE_RANDOM);
+    //g_set_default_action(g, id, ENTITY_ACTION_MOVE_RANDOM);
+    g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
 }
 
 static void update_player_state(gamestate* const g) {
