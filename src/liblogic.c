@@ -263,8 +263,8 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
     for (int i = 0; i < t->entity_max; i++) {
         const entityid eid = tile_get_entity(t, i);
         if (eid == ENTITYID_INVALID) continue;
-        const entity* const e = em_get(g->entitymap, eid);
-        if (!e) continue;
+        //const entity* const e = em_get(g->entitymap, eid);
+        //if (!e) continue;
         //if (e->type == ENTITY_NPC && !e->dead) count++;
         //if (g_is_type(g, eid, ENTITY_NPC) && !e->dead) count++;
         //minfo("calling g_is_dead 4");
@@ -292,9 +292,7 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
         return;
     }
     // i feel like this might be something we can set elsewhere...like after the player input phase?
-    if (g_is_type(g, id, ENTITY_PLAYER)) {
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    }
+
     tile_t* const tile = df_tile_at(df, (loc_t){ex, ey, z});
     if (!tile) {
         merror("Cannot move, tile is NULL");
@@ -327,13 +325,13 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     g_update_location(g, id, (loc_t){ex, ey, z});
     g_update_sprite_move(g, id, (loc_t){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
     // at this point the move is 'successful'
-    update_equipped_shield_dir(g, id);
+    //update_equipped_shield_dir(g, id);
     // get the entity's new tile
-    tile_t* const new_tile = df_tile_at(df, (loc_t){ex, ey, z});
-    if (!new_tile) {
-        merror("Failed to get new tile");
-        return;
-    }
+    //tile_t* const new_tile = df_tile_at(df, (loc_t){ex, ey, z});
+    //if (!new_tile) {
+    //    merror("Failed to get new tile");
+    //    return;
+    //}
     // do not remove!!!
     // check if the tile has a pressure plate
     //if (new_tile->has_pressure_plate) {
@@ -343,14 +341,18 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     //msuccessint("Pressure plate event", new_tile->pressure_plate_event);
     //}
     // check if the tile is an ON TRAP
-    if (new_tile->type == TILE_FLOOR_STONE_TRAP_ON_00) {
-        msuccess("On trap activated!");
-        // do something
-        //e->stats.hp--;
-        //e->is_damaged = true;
-        g_set_damaged(g, id, true);
-        //e->do_update = true;
-        g_set_update(g, id, true);
+    //if (new_tile->type == TILE_FLOOR_STONE_TRAP_ON_00) {
+    //    msuccess("On trap activated!");
+    // do something
+    //e->stats.hp--;
+    //e->is_damaged = true;
+    //    g_set_damaged(g, id, true);
+    //e->do_update = true;
+    //    g_set_update(g, id, true);
+    //}
+
+    if (g_is_type(g, id, ENTITY_PLAYER)) {
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     }
 }
 
