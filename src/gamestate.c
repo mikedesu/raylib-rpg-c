@@ -87,13 +87,15 @@ gamestate* gamestateinitptr() {
 
     g->name_list_count = g->type_list_count = g->race_list_count = g->direction_list_count = g->loc_list_count = g->sprite_move_list_count =
         g->dead_list_count = g->update_list_count = g->attacking_list_count = g->blocking_list_count = g->block_success_list_count = g->damaged_list_count =
-            g->inventory_list_count = g->equipped_weapon_list_count = g->equipped_shield_list_count = g->target_list_count = g->target_path_list_count =
-                g->default_action_list_count = 0;
+            g->inventory_list_count = 0;
+    //g->equipped_weapon_list_count = g->equipped_shield_list_count = 0;
+    g->target_list_count = g->target_path_list_count = g->default_action_list_count = 0;
 
     g->name_list_capacity = g->type_list_capacity = g->race_list_capacity = g->direction_list_capacity = g->loc_list_capacity = g->sprite_move_list_capacity =
         g->dead_list_capacity = g->update_list_capacity = g->attacking_list_capacity = g->blocking_list_capacity = g->block_success_list_capacity =
-            g->damaged_list_capacity = g->inventory_list_capacity = g->equipped_weapon_list_capacity = g->equipped_shield_list_capacity =
-                g->target_list_capacity = g->target_path_list_capacity = g->default_action_list_capacity = LIST_INIT_CAPACITY;
+            g->damaged_list_capacity = g->inventory_list_capacity = 0;
+    //g->equipped_weapon_list_capacity = g->equipped_shield_list_capacity =0;
+    g->target_list_capacity = g->target_path_list_capacity = g->default_action_list_capacity = LIST_INIT_CAPACITY;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * g->name_list_capacity);
     massert(g->name_list, "g->name_list is NULL");
@@ -121,16 +123,18 @@ gamestate* gamestateinitptr() {
     massert(g->damaged_list, "g->damaged_list is NULL");
     g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * g->inventory_list_capacity);
     massert(g->inventory_list, "g->inventory_list is NULL");
-    g->equipped_weapon_list = (equipped_weapon_component*)malloc(sizeof(equipped_weapon_component) * g->equipped_weapon_list_capacity);
-    massert(g->equipped_weapon_list, "g->equipped_weapon_list is NULL");
-    g->equipped_shield_list = (equipped_shield_component*)malloc(sizeof(equipped_shield_component) * g->equipped_shield_list_capacity);
-    massert(g->equipped_shield_list, "g->equipped_shield_list is NULL");
+    //g->equipped_weapon_list = (equipped_weapon_component*)malloc(sizeof(equipped_weapon_component) * g->equipped_weapon_list_capacity);
+    //massert(g->equipped_weapon_list, "g->equipped_weapon_list is NULL");
+    //g->equipped_shield_list = (equipped_shield_component*)malloc(sizeof(equipped_shield_component) * g->equipped_shield_list_capacity);
+    //massert(g->equipped_shield_list, "g->equipped_shield_list is NULL");
     g->target_list = (target_component*)malloc(sizeof(target_component) * g->target_list_capacity);
     massert(g->target_list, "g->target_list is NULL");
     g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * g->target_path_list_capacity);
     massert(g->target_path_list, "g->target_path_list is NULL");
     g->default_action_list = (default_action_component*)malloc(sizeof(default_action_component) * g->default_action_list_capacity);
     massert(g->default_action_list, "g->default_action_list is NULL");
+    g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * g->equipment_list_count);
+    massert(g->equipment_list, "g->equipment_list is NULL");
 
     gamestate_init_msg_history(g);
     return g;
@@ -150,7 +154,9 @@ bool gamestate_init_msg_history(gamestate* const g) {
         g->msg_history.messages[i] = (char*)malloc(sizeof(char) * MAX_MSG_LENGTH);
         if (g->msg_history.messages[i] == NULL) {
             merror("g->msg_history.messages[%d] is NULL", i);
-            for (int j = 0; j < i; j++) { free(g->msg_history.messages[j]); }
+            for (int j = 0; j < i; j++) {
+                free(g->msg_history.messages[j]);
+            }
             free(g->msg_history.messages);
             //free(g);
             return false;
@@ -193,11 +199,12 @@ void gamestatefree(gamestate* g) {
     free(g->block_success_list);
     free(g->damaged_list);
     free(g->inventory_list);
-    free(g->equipped_weapon_list);
-    free(g->equipped_shield_list);
+    //free(g->equipped_weapon_list);
+    //free(g->equipped_shield_list);
     free(g->target_list);
     free(g->target_path_list);
     free(g->default_action_list);
+    free(g->equipment_list);
     free(g);
     msuccess("Freed gamestate");
 }
@@ -234,7 +241,9 @@ void gamestate_init_entityids(gamestate* const g) {
         merror("g->entityids is NULL");
         return;
     }
-    for (int i = 0; i < g->max_entityids; i++) { g->entityids[i] = -1; }
+    for (int i = 0; i < g->max_entityids; i++) {
+        g->entityids[i] = -1;
+    }
     g->index_entityids = 0;
     g->max_entityids = GAMESTATE_INIT_ENTITYIDS_MAX;
 }
@@ -256,7 +265,9 @@ int gamestate_get_entityid_index(const gamestate* const g, entityid id) {
         return -1;
     }
     for (int i = 0; i < g->max_entityids; i++) {
-        if (g->entityids[i] == id) { return i; }
+        if (g->entityids[i] == id) {
+            return i;
+        }
     }
     return -1;
 }
@@ -267,7 +278,9 @@ int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, int ind
         return -1;
     }
     for (int i = index + 1; i < g->max_entityids; i++) {
-        if (g->entityids[i] != -1) { return g->entityids[i]; }
+        if (g->entityids[i] != -1) {
+            return g->entityids[i];
+        }
     }
     return -1;
 }
@@ -428,7 +441,9 @@ const char* g_get_name(gamestate* const g, entityid id) {
     //    return NULL;
     //}
     for (int i = 0; i < g->name_list_count; i++) {
-        if (g->name_list[i].id == id) { return g->name_list[i].name; }
+        if (g->name_list[i].id == id) {
+            return g->name_list[i].name;
+        }
     }
     return NULL;
 }
@@ -455,7 +470,9 @@ entitytype_t g_get_type(const gamestate* const g, entityid id) {
     //massert(id != ENTITYID_INVALID, "id is invalid");
     if (id != ENTITYID_INVALID) {
         for (int i = 0; i < g->type_list_count; i++) {
-            if (g->type_list[i].id == id) { return g->type_list[i].type; }
+            if (g->type_list[i].id == id) {
+                return g->type_list[i].type;
+            }
         }
     }
     return ENTITY_NONE;
@@ -505,7 +522,9 @@ race_t g_get_race(gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g_has_race(g, id)) {
         for (int i = 0; i < g->race_list_count; i++) {
-            if (g->race_list[i].id == id) { return g->race_list[i].race; }
+            if (g->race_list[i].id == id) {
+                return g->race_list[i].race;
+            }
         }
     }
     return RACE_NONE;
@@ -531,7 +550,9 @@ direction_t g_get_direction(const gamestate* const g, entityid id) {
         return DIR_NONE;
     }
     for (int i = 0; i < g->direction_list_count; i++) {
-        if (g->direction_list[i].id == id) { return g->direction_list[i].dir; }
+        if (g->direction_list[i].id == id) {
+            return g->direction_list[i].dir;
+        }
     }
     return DIR_NONE;
 }
@@ -630,7 +651,9 @@ loc_t g_get_location(const gamestate* const g, entityid id) {
         return (loc_t){-1, -1};
     }
     for (int i = 0; i < g->loc_list_count; i++) {
-        if (g->loc_list[i].id == id) { return g->loc_list[i].loc; }
+        if (g->loc_list[i].id == id) {
+            return g->loc_list[i].loc;
+        }
     }
     merror("id %d not found in loc_list", id);
     return (loc_t){-1, -1};
@@ -696,7 +719,9 @@ loc_t g_get_sprite_move(const gamestate* const g, entityid id) {
     massert(g_has_sprite_move(g, id), "id %d does not have a sprite move component", id);
     if (g_has_sprite_move(g, id)) {
         for (int i = 0; i < g->sprite_move_list_count; i++) {
-            if (g->sprite_move_list[i].id == id) { return g->sprite_move_list[i].loc; }
+            if (g->sprite_move_list[i].id == id) {
+                return g->sprite_move_list[i].loc;
+            }
         }
     }
     merror("id %d not found in sprite_move_list", id);
@@ -753,7 +778,9 @@ bool g_is_dead(const gamestate* const g, entityid id) {
             return false;
         }
         for (int i = 0; i < g->dead_list_count; i++) {
-            if (g->dead_list[i].id == id) { return g->dead_list[i].dead; }
+            if (g->dead_list[i].id == id) {
+                return g->dead_list[i].dead;
+            }
         }
     }
     return false;
@@ -791,7 +818,9 @@ bool g_get_update(gamestate* const g, entityid id) {
         return false;
     }
     for (int i = 0; i < g->update_list_count; i++) {
-        if (g->update_list[i].id == id) { return g->update_list[i].update; }
+        if (g->update_list[i].id == id) {
+            return g->update_list[i].update;
+        }
     }
     merror("id %d not found in update_list", id);
     return false;
@@ -861,7 +890,9 @@ bool g_get_attacking(const gamestate* const g, entityid id) {
         return false;
     }
     for (int i = 0; i < g->attacking_list_count; i++) {
-        if (g->attacking_list[i].id == id) { return g->attacking_list[i].attacking; }
+        if (g->attacking_list[i].id == id) {
+            return g->attacking_list[i].attacking;
+        }
     }
     merror("id %d not found in attacking_list", id);
     return false;
@@ -915,7 +946,9 @@ bool g_get_blocking(const gamestate* const g, entityid id) {
         return false;
     }
     for (int i = 0; i < g->blocking_list_count; i++) {
-        if (g->blocking_list[i].id == id) { return g->blocking_list[i].blocking; }
+        if (g->blocking_list[i].id == id) {
+            return g->blocking_list[i].blocking;
+        }
     }
     merror("id %d not found in blocking_list", id);
     return false;
@@ -969,7 +1002,9 @@ bool g_get_block_success(const gamestate* const g, entityid id) {
         return false;
     }
     for (int i = 0; i < g->block_success_list_count; i++) {
-        if (g->block_success_list[i].id == id) { return g->block_success_list[i].block_success; }
+        if (g->block_success_list[i].id == id) {
+            return g->block_success_list[i].block_success;
+        }
     }
     merror("id %d not found in block_success_list", id);
     return false;
@@ -1023,7 +1058,9 @@ bool g_get_damaged(const gamestate* const g, entityid id) {
         return false;
     }
     for (int i = 0; i < g->damaged_list_count; i++) {
-        if (g->damaged_list[i].id == id) { return g->damaged_list[i].damaged; }
+        if (g->damaged_list[i].id == id) {
+            return g->damaged_list[i].damaged;
+        }
     }
     //merror("id %d not found in damaged_list", id);
     return false;
@@ -1077,7 +1114,9 @@ entity_action_t g_get_default_action(const gamestate* const g, entityid id) {
         return ENTITY_ACTION_NONE;
     }
     for (int i = 0; i < g->default_action_list_count; i++) {
-        if (g->default_action_list[i].id == id) { return g->default_action_list[i].action; }
+        if (g->default_action_list[i].id == id) {
+            return g->default_action_list[i].action;
+        }
     }
     merror("id %d not found in default_action_list", id);
     return ENTITY_ACTION_NONE;
@@ -1182,7 +1221,9 @@ size_t g_get_inventory_count(const gamestate* const g, entityid id) {
         return 0;
     }
     for (int i = 0; i < g->inventory_list_count; i++) {
-        if (g->inventory_list[i].id == id) { return g->inventory_list[i].count; }
+        if (g->inventory_list[i].id == id) {
+            return g->inventory_list[i].count;
+        }
     }
     return 0;
 }
@@ -1199,7 +1240,9 @@ bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid ite
     for (int i = 0; i < g->inventory_list_count; i++) {
         if (g->inventory_list[i].id == id) {
             for (int j = 0; j < g->inventory_list[i].count; j++) {
-                if (g->inventory_list[i].inventory[j] == itemid) { return true; }
+                if (g->inventory_list[i].inventory[j] == itemid) {
+                    return true;
+                }
             }
         }
     }
@@ -1341,4 +1384,75 @@ bool g_get_target_path_length(const gamestate* const g, entityid id, int* target
     }
     merror("id %d not found in target_path_list", id);
     return false;
+}
+
+bool g_add_equipment(gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the equipment component
+    massert(g_has_component(g, id, C_EQUIPMENT), "id %d does not have an equipment component", id);
+    if (g->equipment_list_count >= g->equipment_list_capacity) {
+        g->equipment_list_capacity *= 2;
+        g->equipment_list = realloc(g->equipment_list, sizeof(equipment_component) * g->equipment_list_capacity);
+        if (g->equipment_list == NULL) {
+            merror("g->equipment_list is NULL");
+            return false;
+        }
+    }
+    init_equipment_component(&g->equipment_list[g->equipment_list_count], id);
+    g->equipment_list_count++;
+    return true;
+}
+
+bool g_has_equipment(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_EQUIPMENT);
+}
+
+bool g_set_equipment(gamestate* const g, entityid id, equipment_slot slot, entityid itemid) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(itemid != ENTITYID_INVALID, "itemid is invalid");
+    if (g->equipment_list != NULL) {
+        for (int i = 0; i < g->equipment_list_count; i++) {
+            if (g->equipment_list[i].id == id) {
+                g->equipment_list[i].equipment[slot] = itemid;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool g_unset_equipment(gamestate* const g, entityid id, equipment_slot slot) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->equipment_list != NULL) {
+        for (int i = 0; i < g->equipment_list_count; i++) {
+            if (g->equipment_list[i].id == id) {
+                g->equipment_list[i].equipment[slot] = ENTITYID_INVALID;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+entityid g_get_equipment(const gamestate* const g, entityid id, equipment_slot slot) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->equipment_list != NULL) {
+        for (int i = 0; i < g->equipment_list_count; i++) {
+            if (g->equipment_list[i].id == id) {
+                return g->equipment_list[i].equipment[slot];
+            }
+        }
+    }
+    return ENTITYID_INVALID;
+}
+
+dungeon_t* g_get_dungeon(gamestate* const g) {
+    massert(g, "g is NULL");
+    return g->d;
 }

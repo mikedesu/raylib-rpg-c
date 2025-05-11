@@ -100,11 +100,12 @@ typedef struct gamestate {
     block_success_component* block_success_list;
     damaged_component* damaged_list;
     inventory_component* inventory_list;
-    equipped_weapon_component* equipped_weapon_list;
-    equipped_shield_component* equipped_shield_list;
+    //equipped_weapon_component* equipped_weapon_list;
+    //equipped_shield_component* equipped_shield_list;
     target_component* target_list;
     target_path_component* target_path_list;
     default_action_component* default_action_list;
+    equipment_component* equipment_list;
 
     int name_list_count;
     int name_list_capacity;
@@ -132,20 +133,24 @@ typedef struct gamestate {
     int damaged_list_capacity;
     int inventory_list_count;
     int inventory_list_capacity;
-    int equipped_weapon_list_count;
-    int equipped_weapon_list_capacity;
-    int equipped_shield_list_count;
-    int equipped_shield_list_capacity;
+    //int equipped_weapon_list_count;
+    //int equipped_weapon_list_capacity;
+    //int equipped_shield_list_count;
+    //int equipped_shield_list_capacity;
     int target_list_count;
     int target_list_capacity;
     int target_path_list_count;
     int target_path_list_capacity;
     int default_action_list_count;
     int default_action_list_capacity;
+    int equipment_list_count;
+    int equipment_list_capacity;
 
 } gamestate;
 
 gamestate* gamestateinitptr();
+
+dungeon_t* g_get_dungeon(gamestate* const g);
 
 entityid gamestate_get_entityid_unsafe(const gamestate* const g, int index);
 entityid gamestate_get_hero_id(const gamestate* const g);
@@ -256,3 +261,9 @@ bool g_add_target_path(gamestate* const g, entityid id);
 bool g_set_target_path(gamestate* const g, entityid id, loc_t* target_path, int target_path_length);
 bool g_get_target_path(const gamestate* const g, entityid id, loc_t** target_path, int* target_path_length);
 bool g_get_target_path_length(const gamestate* const g, entityid id, int* target_path_length);
+
+bool g_add_equipment(gamestate* const g, entityid id);
+bool g_has_equipment(const gamestate* const g, entityid id);
+bool g_set_equipment(gamestate* const g, entityid id, equipment_slot slot, entityid itemid);
+bool g_unset_equipment(gamestate* const g, entityid id, equipment_slot slot);
+entityid g_get_equipment(const gamestate* const g, entityid id, equipment_slot slot);

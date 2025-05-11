@@ -1,5 +1,6 @@
 #pragma once
 
+//#include "dungeon.h"
 #include "dungeon_tile_type.h"
 #include "em.h"
 #include "entityid.h"
@@ -50,7 +51,10 @@ bool tile_resize(tile_t* t);
 
 void tile_init(tile_t* const t, tiletype_t type);
 void tile_free(tile_t* t);
-void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em);
+//void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em);
+void recompute_entity_cache(gamestate* g, tile_t* t);
+void recompute_entity_cache_at(gamestate* g, int x, int y, int z);
+size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z);
 
 static inline void tile_set_pressure_plate(tile_t* const t, bool b) {
     massert(t, "tile is NULL");
@@ -142,20 +146,20 @@ static inline int tile_get_pressure_plate_event(const tile_t* const t) {
     return t->pressure_plate_event;
 }
 
-static inline bool tile_has_live_npcs(gamestate* g, tile_t* t, em_t* em) {
+static inline bool tile_has_live_npcs(gamestate* g, tile_t* t) {
     if (!t) return false;
-    recompute_entity_cache(g, t, em);
+    recompute_entity_cache(g, t);
     return t->cached_live_npcs > 0;
 }
 
-static inline size_t tile_live_npc_count(gamestate* g, tile_t* t, em_t* em) {
+static inline size_t tile_live_npc_count(gamestate* g, tile_t* t) {
     massert(t, "tile is NULL");
-    recompute_entity_cache(g, t, em);
+    recompute_entity_cache(g, t);
     return t->cached_live_npcs;
 }
 
-static inline bool tile_has_player(gamestate* g, tile_t* t, em_t* em) {
+static inline bool tile_has_player(gamestate* g, tile_t* t) {
     if (!t) return false;
-    recompute_entity_cache(g, t, em);
+    recompute_entity_cache(g, t);
     return t->cached_player_present;
 }

@@ -1,5 +1,5 @@
 #include "dungeon_tile.h"
-#include "em.h"
+//#include "em.h"
 #include "gamestate.h"
 #include "mprint.h"
 #include <stdlib.h>
@@ -111,11 +111,11 @@ void tile_free(tile_t* t) {
     free(t);
 }
 
-void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em) {
+//void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em) {
+void recompute_entity_cache(gamestate* g, tile_t* t) {
     massert(g, "gamestate is NULL");
     massert(t, "tile is NULL");
-    massert(em, "em is NULL");
-
+    //massert(em, "em is NULL");
     //minfo("recompute_entity_cache: dirty_entities: %d", t->dirty_entities);
     if (!t->dirty_entities) return;
     t->cached_live_npcs = 0;
@@ -128,4 +128,37 @@ void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em) {
         if (type == ENTITY_PLAYER) t->cached_player_present = true;
     }
     t->dirty_entities = false;
+}
+
+void recompute_entity_cache_at(gamestate* g, int x, int y, int z) {
+    massert(g, "gamestate is NULL");
+    massert(x >= 0, "x is out of bounds");
+    massert(y >= 0, "y is out of bounds");
+    massert(z >= 0, "z is out of bounds");
+    massert(z < g->d->num_floors, "z is out of bounds");
+    dungeon_floor_t* const df = d_get_floor(g->d, z);
+    massert(df, "failed to get dungeon floor");
+    tile_t* const t = df_tile_at(df, x, y);
+    if (!t) {
+        merror("tile not found");
+        return;
+    }
+    recompute_entity_cache(g, t);
+}
+
+size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z) {
+    massert(g, "gamestate is NULL");
+    massert(x >= 0, "x is out of bounds");
+    massert(y >= 0, "y is out of bounds");
+    massert(z >= 0, "z is out of bounds");
+    recompute_entity_cache_at(g, x, y, z);
+    dungeon_t* d = g_get_dungeon(g);
+    massert(d, "failed to get dungeon");
+    dungeon_floor_t* df = d_get_floor(d, z);
+    massert(df, "failed to get dungeon floor");
+    massert(x < df->width, "x is out of bounds");
+    massert(y < df->height, "y is out of bounds");
+    tile_t* t = df_tile_at(df, x, y);
+    massert(t, "failed to get tile");
+    return tile_live_npc_count(g, t);
 }

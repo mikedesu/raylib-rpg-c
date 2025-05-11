@@ -27,10 +27,10 @@ typedef enum component_t
     C_DAMAGED,
     C_INVENTORY,
     C_DEFAULT_ACTION,
-    // not yet implemented
     C_TARGET,
     C_TARGET_PATH,
-    //C_EQUIPMENT,
+    C_EQUIPMENT,
+    // not yet implemented
     //C_DOOR_STATE,
     //C_ATTRIBUTES,
     //C_MODIFIERS,
@@ -54,8 +54,10 @@ static inline const char* component2str(component c) {
     case C_BLOCK_SUCCESS: return "C_BLOCK_SUCCESS";
     case C_DAMAGED: return "C_DAMAGED";
     case C_INVENTORY: return "C_INVENTORY";
-    //case C_EQUIPPED_WEAPON:
-    //case C_EQUIPPED_SHIELD:
+    case C_DEFAULT_ACTION: return "C_DEFAULT_ACTION";
+    case C_TARGET: return "C_TARGET";
+    case C_TARGET_PATH: return "C_TARGET_PATH";
+    case C_EQUIPMENT: return "C_EQUIPMENT";
     default: break;
     }
     return "C_UNKNOWN";
@@ -128,16 +130,6 @@ typedef struct inventory_component_t {
     size_t count;
 } inventory_component;
 
-typedef struct equipped_weapon_component_t {
-    entityid id;
-    entityid weapon;
-} equipped_weapon_component;
-
-typedef struct equipped_shield_component_t {
-    entityid id;
-    entityid shield;
-} equipped_shield_component;
-
 typedef struct target_component_t {
     entityid id;
     loc_t target;
@@ -154,6 +146,31 @@ typedef struct default_action_component_t {
     entity_action_t action;
 } default_action_component;
 
+typedef enum equipment_slot_t
+{
+    EQUIPMENT_SLOT_WEAPON,
+    // add more equipment slots here
+    //EQUIPMENT_SLOT_SHIELD,
+    //EQUIPMENT_SLOT_ARMOR,
+    //EQUIPMENT_SLOT_HELMET,
+    //EQUIPMENT_SLOT_RING,
+    //EQUIPMENT_SLOT_AMULET,
+    EQUIPMENT_SLOT_COUNT
+} equipment_slot;
+
+#define MAX_EQUIPMENT_SLOTS 1
+
+typedef struct equipment_component_t {
+    entityid id;
+    entityid equipment[MAX_EQUIPMENT_SLOTS];
+    // add more equipment types here
+    //entityid shield;
+    //entityid armor;
+    //entityid helmet;
+    //entityid ring;
+    //entityid amulet;
+} equipment_component;
+
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
 void init_race_component(race_component* comp, entityid id, race_t race);
@@ -167,8 +184,7 @@ void init_blocking_component(blocking_component* comp, entityid id, bool blockin
 void init_block_success_component(block_success_component* comp, entityid id, bool block_success);
 void init_damaged_component(damaged_component* comp, entityid id, bool damaged);
 void init_inventory_component(inventory_component* comp, entityid id);
-void init_equipped_weapon_component(equipped_weapon_component* comp, entityid id, entityid weapon);
-void init_equipped_shield_component(equipped_shield_component* comp, entityid id, entityid shield);
 void init_target_component(target_component* comp, entityid id, loc_t target);
 void init_target_path_component(target_path_component* comp, entityid id, loc_t* target_path, int target_path_length);
 void init_default_action_component(default_action_component* comp, entityid id, entity_action_t default_action);
+void init_equipment_component(equipment_component* comp, entityid id);
