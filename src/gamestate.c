@@ -245,6 +245,7 @@ bool gs_add_entityid(gamestate* const g, entityid id) {
     massert(id != -1, "id is -1");
     massert(g->index_entityids < g->max_entityids, "index_entityids >= max_entityids");
     massert(g->entityids, "g->entityids is NULL");
+    massert(g->index_entityids == id, "index_entityids != id");
     g->entityids[g->index_entityids] = id;
     g->index_entityids++;
     return true;

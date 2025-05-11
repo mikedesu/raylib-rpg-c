@@ -1483,9 +1483,18 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         return false;
     }
     for (int i = 0; i < tile->entity_count; i++) {
-        entityid id = tile->entities[i];
-        entitytype_t type = g_get_type(g, id);
-        //if (type == ENTITY_WEAPON || type == ENTITY_SHIELD || type == ENTITY_POTION) {
+        entityid itemid = tile->entities[i];
+        entitytype_t type = g_get_type(g, itemid);
+        minfo("Item %s type: %d", g_get_name(g, itemid), type);
+        if (type == ENTITY_ITEM) {
+            add_message_and_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
+            tile_remove(tile, itemid);
+            g_add_to_inventory(g, id, itemid);
+            if (g_is_type(g, id, ENTITY_PLAYER)) {
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            }
+            return true;
+        }
         //    add_message_and_history(g, "%s picked up a %s", "[placeholder]", "[placeholder]");
         //    tile_remove(tile, id);
         //    e_add_item_to_inventory(e, id);
