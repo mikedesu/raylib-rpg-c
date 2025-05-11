@@ -58,14 +58,15 @@ int df_loc_is_in_room(dungeon_floor_t* const df, loc_t loc);
 room_data_t* const df_get_rooms_with_prefix(dungeon_floor_t* const df, int* external_count, const char* prefix);
 const char* df_get_room_name(dungeon_floor_t* const df, loc_t loc);
 
-static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
+//static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
+static inline tile_t* df_tile_at(const dungeon_floor_t* const df, loc_t loc) {
     //minfo("df_tile_at: %d, %d", x, y);
     massert(df, "df is NULL");
-    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-        merror("x or y out of bounds: x: %d, y: %d", x, y);
+    if (loc.x < 0 || loc.x >= df->width || loc.y < 0 || loc.y >= df->height) {
+        merror("x or y out of bounds: x: %d, y: %d", loc.x, loc.y);
         return NULL;
     }
-    tile_t* tile = &df->tiles[y][x];
+    tile_t* tile = &df->tiles[loc.y][loc.x];
     massert(tile, "tile is NULL");
     return tile;
 }
@@ -81,7 +82,7 @@ static inline tiletype_t df_type_at(const dungeon_floor_t* const df, const int x
 
 static inline bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {
     massert(df, "dungeon floor is NULL");
-    tile_t* tile = df_tile_at(df, x, y);
+    tile_t* tile = df_tile_at(df, (loc_t){x, y, -1});
     return tile_is_wall(tile->type);
 }
 

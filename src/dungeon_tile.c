@@ -138,7 +138,7 @@ void recompute_entity_cache_at(gamestate* g, int x, int y, int z) {
     massert(z < g->d->num_floors, "z is out of bounds");
     dungeon_floor_t* const df = d_get_floor(g->d, z);
     massert(df, "failed to get dungeon floor");
-    tile_t* const t = df_tile_at(df, x, y);
+    tile_t* const t = df_tile_at(df, (loc_t){x, y, z});
     if (!t) {
         merror("tile not found");
         return;
@@ -158,7 +158,7 @@ size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z) {
     massert(df, "failed to get dungeon floor");
     massert(x < df->width, "x is out of bounds");
     massert(y < df->height, "y is out of bounds");
-    tile_t* t = df_tile_at(df, x, y);
+    tile_t* t = df_tile_at(df, (loc_t){x, y, z});
     massert(t, "failed to get tile");
     return tile_live_npc_count(g, t);
 }

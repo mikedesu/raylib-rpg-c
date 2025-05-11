@@ -23,7 +23,9 @@ path_node* create_path_node(loc_t position, path_node* parent, loc_t target) {
 
 bool location_in_list(path_node** list, int list_size, loc_t pos) {
     for (int i = 0; i < list_size; i++) {
-        if (locations_equal(list[i]->pos, pos)) { return true; }
+        if (locations_equal(list[i]->pos, pos)) {
+            return true;
+        }
     }
     return false;
 }
@@ -48,10 +50,12 @@ void get_neighbors(loc_t pos, loc_t neighbors[8]) {
 
 bool is_position_walkable(loc_t pos, dungeon_floor_t* df) {
     // Check bounds
-    if (pos.x < 0 || pos.x >= df->width || pos.y < 0 || pos.y >= df->height) { return false; }
+    if (pos.x < 0 || pos.x >= df->width || pos.y < 0 || pos.y >= df->height) {
+        return false;
+    }
 
     // Get the tile at the position and check if walkable
-    tile_t* t = df_tile_at(df, pos.x, pos.y);
+    tile_t* t = df_tile_at(df, pos);
     return tile_is_walkable(t->type);
 }
 
@@ -163,7 +167,9 @@ loc_t* find_path(loc_t start, loc_t end, dungeon_floor_t* df, int* path_length) 
             loc_t neighbor_pos = neighbors[i];
 
             // Check if neighbor is walkable
-            if (!is_position_walkable(neighbor_pos, df)) { continue; }
+            if (!is_position_walkable(neighbor_pos, df)) {
+                continue;
+            }
 
             // Check if neighbor is in closed list
             bool in_closed = false;

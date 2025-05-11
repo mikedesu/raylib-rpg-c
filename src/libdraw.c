@@ -72,10 +72,15 @@ static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegro
 static void draw_inventory_menu(gamestate* const g);
 static void draw_hud(gamestate* const g);
 static bool libdraw_unload_texture(int txkey);
-static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
-static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df);
-static bool draw_entities_2d(const gamestate* const g, dungeon_floor_t* df, bool dead);
-static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y);
+//static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y);
+static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z);
+//static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df);
+static bool draw_dungeon_tiles_2d(const gamestate* const g, int z, dungeon_floor_t* df);
+//static bool draw_entities_2d(const gamestate* const g, dungeon_floor_t* df, bool dead);
+static bool draw_entities_2d(const gamestate* const g, int z, dungeon_floor_t* df, bool dead);
+//static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y);
+//static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y, int z);
+static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, loc_t loc);
 static bool libdraw_draw_dungeon_floor(const gamestate* const g);
 static bool libdraw_draw_player_target_box(const gamestate* const g);
 
@@ -114,15 +119,17 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
 //static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, const entity* e);
 static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, entityid id);
 
-static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
+//static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
+static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
-    massert(df, "dungeon_floor is NULL");
+    //massert(df, "dungeon_floor is NULL");
     massert(x >= 0, "x is less than 0");
-    massert(x < df->width, "x is out of bounds");
     massert(y >= 0, "y is less than 0");
+    dungeon_floor_t* df = d_get_floor(g->d, z);
+    massert(x < df->width, "x is out of bounds");
     massert(y < df->height, "y is out of bounds");
-
-    tile_t* tile = df_tile_at(df, x, y);
+    massert(df, "dungeon_floor is NULL");
+    tile_t* tile = df_tile_at(df, (loc_t){x, y, z});
     massert(tile, "tile is NULL");
     // check if the tile type is none
     if (tile->type == TILE_NONE) return true;
@@ -163,13 +170,20 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* c
     return true;
 }
 
-static bool draw_dungeon_tiles_2d(const gamestate* const g, dungeon_floor_t* df) {
+static bool draw_dungeon_tiles_2d(const gamestate* const g, int z, dungeon_floor_t* df) {
+    //static bool draw_dungeon_tiles_2d(const gamestate* const g, int z) {
     massert(g, "gamestate is NULL");
+    //massert(z >= 0, "z is less than 0");
+    //massert(z < g->d->num_floors, "z is out of bounds");
+    //dungeon_floor_t* df = d_get_floor(g->d, z);
     massert(df, "dungeon_floor is NULL");
+    //massert(df->width > 0, "dungeon_floor width is less than 0");
+    //massert(df->height > 0, "dungeon_floor height is less than 0");
+    //massert(df, "dungeon_floor is NULL");
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             //if (df_tile_is_wall(df, x, y)) continue;
-            draw_dungeon_floor_tile(g, df, x, y);
+            draw_dungeon_floor_tile(g, x, y, z);
         }
     }
     return true;
@@ -308,19 +322,21 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     //msuccess("draw_sprite_and_shadow: id %d", id);
 }
 
-static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y) {
+//static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, int x, int y, int z) {
+static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, loc_t loc) {
     massert(g, "draw_entities_2d: gamestate is NULL");
     massert(df, "draw_entities_2d: dungeon_floor is NULL");
     massert(df->width > 0, "draw_entities_2d: dungeon_floor width is 0");
     massert(df->height > 0, "draw_entities_2d: dungeon_floor height is 0");
     massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
     massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
-    massert(x >= 0, "draw_entities_2d: x is out of bounds");
-    massert(x < df->width, "draw_entities_2d: x is out of bounds");
-    massert(y >= 0, "draw_entities_2d: y is out of bounds");
-    massert(y < df->height, "draw_entities_2d: y is out of bounds");
+    massert(loc.x >= 0, "draw_entities_2d: x is out of bounds");
+    massert(loc.x < df->width, "draw_entities_2d: x is out of bounds");
+    massert(loc.y >= 0, "draw_entities_2d: y is out of bounds");
+    massert(loc.y < df->height, "draw_entities_2d: y is out of bounds");
 
-    tile_t* tile = df_tile_at(df, x, y);
+    //tile_t* tile = df_tile_at(df, (loc_t){x, y, z});
+    tile_t* tile = df_tile_at(df, loc);
     if (!tile) return false;
 
     if (tile_is_wall(tile->type)) return false;
@@ -330,7 +346,9 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
         //entity* e = em_get(g->entitymap, id);
         //if (e && e->dead == dead) draw_sprite_and_shadow(g, id);
         //minfo("draw_entities_2d_at: id %d", id);
-        if (g_is_dead(g, id) == dead) { draw_sprite_and_shadow(g, id); }
+        if (g_is_dead(g, id) == dead) {
+            draw_sprite_and_shadow(g, id);
+        }
     }
 
     //msuccess("draw_entities_2d_at: x %d y %d", x, y);
@@ -338,7 +356,7 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     return true;
 }
 
-static bool draw_entities_2d(const gamestate* const g, dungeon_floor_t* df, bool dead) {
+static bool draw_entities_2d(const gamestate* const g, int z, dungeon_floor_t* df, bool dead) {
     massert(g, "draw_entities_2d: gamestate is NULL");
     massert(df, "draw_entities_2d: dungeon_floor is NULL");
     massert(df->width > 0, "draw_entities_2d: dungeon_floor width is 0");
@@ -346,7 +364,7 @@ static bool draw_entities_2d(const gamestate* const g, dungeon_floor_t* df, bool
     massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
     massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
     for (int y = 0; y < df->height; y++)
-        for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, dead, x, y);
+        for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, dead, (loc_t){x, y, z});
     return true;
 }
 
@@ -383,7 +401,9 @@ static void libdraw_unload_shaders() {
 
 static inline bool libdraw_camera_lock_on(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    if (!g->cam_lockon) { return false; }
+    if (!g->cam_lockon) {
+        return false;
+    }
     spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     massert(grp, "spritegroup is NULL");
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
@@ -834,9 +854,10 @@ static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     massert(g, "gamestate is NULL");
     dungeon_floor_t* const df = d_get_current_floor(g->d);
     massert(df, "dungeon_floor is NULL");
-    draw_dungeon_tiles_2d(g, df);
-    draw_entities_2d(g, df, true); // dead entities
-    draw_entities_2d(g, df, false); // alive entities
+    int z = g->d->current_floor;
+    draw_dungeon_tiles_2d(g, z, df);
+    draw_entities_2d(g, z, df, true); // dead entities
+    draw_entities_2d(g, z, df, false); // alive entities
     //draw_wall_tiles_2d(g, df);
     //msuccess("libdraw_draw_dungeon_floor: done");
     return true;
@@ -892,7 +913,9 @@ static void libdraw_drawframe_2d(gamestate* const g) {
 }
 
 static void draw_message_box(gamestate* g) {
-    if (!g->msg_system.is_active || g->msg_system.count == 0) { return; }
+    if (!g->msg_system.is_active || g->msg_system.count == 0) {
+        return;
+    }
     const char* prompt = "[A] Next";
     const char* msg = g->msg_system.messages[g->msg_system.index];
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
@@ -992,7 +1015,9 @@ static bool libdraw_unload_texture(int txkey) {
 }
 
 static void libdraw_unload_textures() {
-    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) { libdraw_unload_texture(i); }
+    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) {
+        libdraw_unload_texture(i);
+    }
 }
 
 void libdraw_close() {
@@ -1022,7 +1047,9 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
         return false;
     }
     Image image = LoadImage(path);
-    if (do_dither) { ImageDither(&image, 4, 4, 4, 4); }
+    if (do_dither) {
+        ImageDither(&image, 4, 4, 4, 4);
+    }
     Texture2D texture = LoadTextureFromImage(image);
     UnloadImage(image);
     txinfo[txkey].texture = texture;
@@ -1256,7 +1283,9 @@ void libdraw_init(gamestate* const g) {
     target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
     load_textures();
-    for (int i = 0; i < g->index_entityids; i++) { create_sg_byid(g, g->entityids[i]); }
+    for (int i = 0; i < g->index_entityids; i++) {
+        create_sg_byid(g, g->entityids[i]);
+    }
     calc_debugpanel_size(g);
     load_shaders();
     g->cam2d.offset = (Vector2){x, y};
@@ -1267,7 +1296,9 @@ void libdraw_init(gamestate* const g) {
 static void draw_message_history(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // if there are no messages in the message history, return
-    if (g->msg_history.count == 0) { return; }
+    if (g->msg_history.count == 0) {
+        return;
+    }
     const int max_messages = 20;
     const int x = 10;
     const int y = 10;
@@ -1283,7 +1314,9 @@ static void draw_message_history(gamestate* const g) {
         current_count++;
     }
     // chop off the last newline
-    if (strlen(tmp_buffer) > 0) { tmp_buffer[strlen(tmp_buffer) - 1] = '\0'; }
+    if (strlen(tmp_buffer) > 0) {
+        tmp_buffer[strlen(tmp_buffer) - 1] = '\0';
+    }
     // Measure text (split into lines if needed)
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp_buffer, g->font_size, g->line_spacing);
     // Calculate box position
