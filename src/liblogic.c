@@ -1111,7 +1111,11 @@ static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, co
     massert(g, "gamestate is NULL");
 
     entityid id = item_create(g, ITEM_WEAPON, loc, name);
-    massert(id != ENTITYID_INVALID, "failed to create weapon");
+    if (id == ENTITYID_INVALID) {
+        merror("failed to create weapon");
+        return ENTITYID_INVALID;
+    }
+    //massert(id != ENTITYID_INVALID, "failed to create weapon");
 
     g_register_comp(g, id, C_WEAPONTYPE);
     g_add_weapontype(g, id, type);
@@ -1888,7 +1892,7 @@ void liblogic_init(gamestate* const g) {
     //init_potion_test(g, POTION_HP_MEDIUM, "medium healing potion");
     //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
     //init_npcs_test_by_room(g);
-    //init_npc_test(g);
+    init_npc_test(g);
     init_sword_test(g);
     update_debug_panel_buffer(g);
 }
@@ -1915,7 +1919,7 @@ static void init_sword_test(gamestate* g) {
         entityid id = weapon_create(g, WEAPON_SWORD, locs[i], "dummy sword");
         if (id != ENTITYID_INVALID) {
             // set item properties
-            //break;
+            break;
         }
     }
 }
