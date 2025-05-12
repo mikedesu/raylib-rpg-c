@@ -1902,11 +1902,16 @@ static void init_npc_test(gamestate* g) {
     //loc_t loc = g_get_location(g, g->hero_id);
 
     loc_t* locs = get_locs_around_entity(g, g->hero_id);
+    int count = 0;
+    int max = 2;
     for (int i = 0; i < 8; i++) {
         entityid id = npc_create(g, RACE_ORC, locs[i], "orc");
         if (id != ENTITYID_INVALID) {
             g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-            break;
+            count++;
+            if (count >= max) {
+                break;
+            }
         }
     }
 }
