@@ -1401,6 +1401,38 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         //if (g->inventory_menu_selection < 0) {
         //    g->inventory_menu_selection = count - 1;
         //}
+        //}
+        // drop item
+    } else if (inputstate_is_pressed(is, KEY_X)) {
+        // we need to grab the entityid of the selected item
+        entityid item_id = inventory[g->inventory_menu_selection];
+        g_remove_from_inventory(g, g->hero_id, item_id);
+        // add the item to the tile where the player is located at
+        loc_t loc = g_get_location(g, g->hero_id);
+        dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
+        massert(df, "Dungeon floor is NULL!");
+        //if (!df) {
+        //    merror("Failed to get dungeon floor");
+        //    return;
+
+        minfo("Dropping item %d at %d, %d, %d", item_id, loc.x, loc.y, loc.z);
+
+        tile_t* const tile = df_tile_at(df, loc);
+        massert(tile, "Tile is NULL!");
+        //if (!tile) {
+        //    merror("Failed to get tile");
+        //    return;
+        //}
+        if (!tile_add(tile, item_id)) {
+            merror("Failed to add item to tile");
+            return;
+        }
+
+        // we also have to update the location of the item
+        g_update_location(g, item_id, loc);
+
+        g->controlmode = CONTROLMODE_PLAYER;
+        g->display_inventory_menu = false;
     }
     //} else if (inputstate_is_pressed(is, KEY_ENTER)) {
     //    // we need to grab the entityid of the selected item
@@ -1500,7 +1532,8 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         entitytype_t type = g_get_type(g, itemid);
         minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
-            add_message_and_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
+            //add_message_and_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
+            add_message_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
             tile_remove(tile, itemid);
             g_add_to_inventory(g, id, itemid);
             if (g_is_type(g, id, ENTITY_PLAYER)) {
