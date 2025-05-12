@@ -468,8 +468,10 @@ static inline void handle_attack_success_gamestate_flag(gamestate* const g, enti
         } else {
             g->flag = GAMESTATE_FLAG_NONE;
         }
-    } else if (type == ENTITY_PLAYER) {
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    } else {
+        if (type == ENTITY_PLAYER) {
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        }
     }
 }
 
@@ -479,29 +481,64 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
     massert(atk_successful, "attack_successful is NULL");
-    *atk_successful = true;
-    g_set_damaged(g, tgt_id, true);
-    g_set_update(g, tgt_id, true);
-    int dmg = 1;
-    int hp = g_get_stat(g, tgt_id, STATS_HP);
-    if (hp <= 0) {
-        merror("Target is already dead");
-        g_update_dead(g, tgt_id, true);
-        return;
-    }
-    hp -= dmg;
-    g_set_stat(g, tgt_id, STATS_HP, hp);
-    if (hp <= 0) {
-        g_update_dead(g, tgt_id, true);
-    } else {
-        g_update_dead(g, tgt_id, false);
-    }
+
+    //*atk_successful = true;
+    *atk_successful = rand() % 2 == 0;
+
     entitytype_t tgttype = g_get_type(g, tgt_id);
     entitytype_t atktype = g_get_type(g, atk_id);
-    if (tgttype == ENTITY_PLAYER) {
-        add_message_and_history(g, "%s attacked you for %d damage!", g_get_name(g, atk_id), dmg);
-    } else if (tgttype == ENTITY_NPC) {
-        add_message_and_history(g, "%s attacked %s for %d damage!", g_get_name(g, atk_id), g_get_name(g, tgt_id), dmg);
+
+    if (*atk_successful) {
+        entityid attacker_weapon_id = g_get_equipment(g, atk_id, EQUIP_SLOT_WEAPON);
+        int dmg = 1;
+        if (attacker_weapon_id == ENTITYID_INVALID) {
+            // no weapon
+            dmg = 1;
+        } else {
+            // weapon
+            // we will calculate damage based on weapon attributes
+            // but for now we will just set it to 3
+            dmg = 3;
+        }
+        g_set_damaged(g, tgt_id, true);
+        g_set_update(g, tgt_id, true);
+        int hp = g_get_stat(g, tgt_id, STATS_HP);
+        if (hp <= 0) {
+            merror("Target is already dead, hp was: %d", hp);
+            g_update_dead(g, tgt_id, true);
+            return;
+        }
+        hp -= dmg;
+        g_set_stat(g, tgt_id, STATS_HP, hp);
+
+        if (tgttype == ENTITY_PLAYER) {
+            add_message_and_history(g, "%s attacked you for %d damage!", g_get_name(g, atk_id), dmg);
+        } else if (tgttype == ENTITY_NPC) {
+            add_message_and_history(g, "%s attacked %s for %d damage!", g_get_name(g, atk_id), g_get_name(g, tgt_id), dmg);
+        }
+
+        if (hp <= 0) {
+            g_update_dead(g, tgt_id, true);
+            if (tgttype == ENTITY_NPC) {
+                add_message_and_history(g, "%s killed %s!", g_get_name(g, atk_id), g_get_name(g, tgt_id));
+                // increment attacker's xp
+                //int xp = g_get_stat(g, atk_id, STATS_XP);
+                g_set_stat(g, atk_id, STATS_XP, g_get_stat(g, atk_id, STATS_XP) + 1);
+            }
+            //else if (tgttype == ENTITY_PLAYER) {
+            //    add_message_and_history(g, "You are dead!");
+            //}
+        } else {
+            g_update_dead(g, tgt_id, false);
+        }
+
+    } else {
+        // handle attack miss
+        if (tgttype == ENTITY_PLAYER) {
+            add_message_and_history(g, "%s's attack missed!", g_get_name(g, atk_id));
+        } else if (tgttype == ENTITY_NPC) {
+            add_message_and_history(g, "%s missed %s!", g_get_name(g, atk_id), g_get_name(g, tgt_id));
+        }
     }
 
     //e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
@@ -1007,8 +1044,9 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
 
     g_add_stats(g, id);
     g_set_stat(g, id, STATS_LEVEL, 1);
-    g_set_stat(g, id, STATS_MAXHP, 3);
-    g_set_stat(g, id, STATS_HP, 3);
+    g_set_stat(g, id, STATS_XP, 0);
+    g_set_stat(g, id, STATS_MAXHP, 1);
+    g_set_stat(g, id, STATS_HP, 1);
 
     if (!df_add_at(df, id, loc.x, loc.y)) {
         merror("failed to add entity to dungeon floor");
@@ -1164,6 +1202,8 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
     massert(id != ENTITYID_INVALID, "failed to create player");
     gamestate_set_hero_id(g, id);
     g_set_type(g, id, ENTITY_PLAYER);
+    g_set_stat(g, id, STATS_MAXHP, 3);
+    g_set_stat(g, id, STATS_HP, 3);
     return id;
 }
 

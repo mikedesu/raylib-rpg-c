@@ -176,12 +176,13 @@ typedef struct equipment_component_t {
 typedef enum stats_slot_t
 {
     STATS_LEVEL,
+    STATS_XP,
     STATS_HP,
     STATS_MAXHP,
     STATS_COUNT
 } stats_slot;
 
-#define MAX_STATS_SLOTS 3
+#define MAX_STATS_SLOTS 4
 
 typedef struct stats_component_t {
     entityid id;
