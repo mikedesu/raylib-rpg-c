@@ -775,31 +775,32 @@ static void libdraw_update_sprite(gamestate* const g, entityid id) {
 
 static void libdraw_handle_gamestate_flag(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    //const bool done = libdraw_check_default_animations(g);
-    //if (done) {
-    //if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-    //minfo("PLAYER INPUT");
-    //g->flag = GAMESTATE_FLAG_NPC_TURN;
-    //g->test_guard = false;
-    //} else
-    if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-        //minfo("PLAYER ANIM");
-        g->flag = GAMESTATE_FLAG_NPC_TURN;
-        g->test_guard = false;
-    } else if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
-        //minfo("NPC TURN");
-        //g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
-        //g->turn_count++;
-        //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-        //    g->flag = GAMESTATE_FLAG_NPC_TURN;
-        //    g->test_guard = false;
-    } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
-        //minfo("NPC ANIM");
-        g->entity_turn = g->hero_id; // Reset directly to hero
-        g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
-        g->turn_count++;
+    const bool done = libdraw_check_default_animations(g);
+    if (done) {
+        //if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+        //minfo("PLAYER INPUT");
+        //g->flag = GAMESTATE_FLAG_NPC_TURN;
+        //g->test_guard = false;
+        //} else
+        if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+            //minfo("PLAYER ANIM");
+            g->flag = GAMESTATE_FLAG_NPC_TURN;
+            g->test_guard = false;
+            //}
+            //else if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
+            //minfo("NPC TURN");
+            //g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+            //g->turn_count++;
+            //if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+            //    g->flag = GAMESTATE_FLAG_NPC_TURN;
+            //    g->test_guard = false;
+        } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
+            //minfo("NPC ANIM");
+            g->entity_turn = g->hero_id; // Reset directly to hero
+            g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+            g->turn_count++;
+        }
     }
-    //}
 }
 
 void libdraw_update_sprites(gamestate* const g) {

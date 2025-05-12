@@ -482,13 +482,34 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
     *atk_successful = true;
     g_set_damaged(g, tgt_id, true);
     g_set_update(g, tgt_id, true);
-    //int dmg = 1;
+    int dmg = 1;
+    int hp = g_get_stat(g, tgt_id, STATS_HP);
+    if (hp <= 0) {
+        merror("Target is already dead");
+        g_update_dead(g, tgt_id, true);
+        return;
+    }
+    hp -= dmg;
+    g_set_stat(g, tgt_id, STATS_HP, hp);
+    if (hp <= 0) {
+        g_update_dead(g, tgt_id, true);
+    } else {
+        g_update_dead(g, tgt_id, false);
+    }
+    entitytype_t tgttype = g_get_type(g, tgt_id);
+    entitytype_t atktype = g_get_type(g, atk_id);
+    if (tgttype == ENTITY_PLAYER) {
+        add_message_and_history(g, "%s attacked you for %d damage!", g_get_name(g, atk_id), dmg);
+    } else if (tgttype == ENTITY_NPC) {
+        add_message_and_history(g, "%s attacked %s for %d damage!", g_get_name(g, atk_id), g_get_name(g, tgt_id), dmg);
+    }
+
     //e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
     //if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
     //if (attacker->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
     //if (e_get_hp(target) <= 0) {
     //target->dead = true;
-    g_update_dead(g, tgt_id, true);
+    //g_update_dead(g, tgt_id, true);
     //}
 }
 
