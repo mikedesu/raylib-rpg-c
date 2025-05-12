@@ -202,11 +202,9 @@ static sprite* get_weapon_front_sprite(const gamestate* g, entityid id, spritegr
     spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
     if (!w_sg) {
         merror("weapon spritegroup is NULL for id %d", weapon);
-        //    massert(e->weapon == -1, "weapon spritegroup is NULL for id %d", e->weapon);
         return NULL;
     }
     if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
-        //    //msuccess("is_attacking");
         return spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
     }
     return NULL;
@@ -217,19 +215,16 @@ static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegro
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-    //if (!e || !sg) { return NULL; }
-    //if (e->weapon == -1) { return NULL; }
-    //spritegroup_t* weapon_sg = hashtable_entityid_spritegroup_get(spritegroups, e->weapon);
-    //if (!weapon_sg) {
-    //    merror("weapon spritegroup is NULL");
-    //    return NULL;
-    //}
-    //if (e->is_attacking) {
-    //if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
-    //msuccess("is_attacking");
-    //    return spritegroup_get(weapon_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    //}
-    //merror("weapon_back_s is NULL");
+    entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
+    if (weapon == ENTITYID_INVALID) return NULL;
+    spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
+    if (!w_sg) {
+        merror("weapon spritegroup is NULL for id %d", weapon);
+        return NULL;
+    }
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
+        return spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
+    }
     return NULL;
 }
 
@@ -238,15 +233,14 @@ static sprite* get_shield_front_sprite(const gamestate* g, entityid id, spritegr
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
-    //if (!e || !sg) return NULL;
-    //if (e->shield == -1) return NULL;
 
-    //spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
-    //if (!shield_sg) return NULL;
-
-    //if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
-    //    return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
-    //}
+    entityid shield = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
+    if (shield == ENTITYID_INVALID) return NULL;
+    spritegroup_t* s_sg = hashtable_entityid_spritegroup_get(spritegroups, shield);
+    if (!s_sg) return NULL;
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
+        return spritegroup_get(s_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+    }
     //if (e->is_blocking) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT); }
     //if (g_get_blocking(g, e->id)) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT); }
     return NULL;
@@ -257,6 +251,13 @@ static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegro
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
+    entityid shield = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
+    if (shield == ENTITYID_INVALID) return NULL;
+    spritegroup_t* s_sg = hashtable_entityid_spritegroup_get(spritegroups, shield);
+    if (!s_sg) return NULL;
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
+        return spritegroup_get(s_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
+    }
     //if (e->shield == ENTITYID_INVALID) return NULL;
     //spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
     //if (!shield_sg) return NULL;
@@ -1149,12 +1150,11 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             keys = TX_LONG_SWORD_KEYS;
             num_keys = TX_LONG_SWORD_KEY_COUNT;
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        } else if (item_type == ITEM_SHIELD) {
+            keys = TX_BUCKLER_KEYS;
+            num_keys = TX_BUCKLER_KEY_COUNT;
+            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         }
-        //else if (item_type == ITEM_SHIELD) {
-        //    keys = TX_BUCKLER_KEYS;
-        //    num_keys = TX_BUCKLER_KEY_COUNT;
-        //    create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        //}
     }
     //    // for now we only have 1 sprite for weapons
     //    keys = TX_LONG_SWORD_KEYS;

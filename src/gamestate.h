@@ -109,6 +109,7 @@ typedef struct gamestate {
     stats_component* stats_list;
     itemtype_component* itemtype_list;
     weapontype_component* weapontype_list;
+    shieldtype_component* shieldtype_list;
 
     int name_list_count;
     int name_list_capacity;
@@ -154,6 +155,8 @@ typedef struct gamestate {
     int itemtype_list_capacity;
     int weapontype_list_count;
     int weapontype_list_capacity;
+    int shieldtype_list_count;
+    int shieldtype_list_capacity;
 
 } gamestate;
 
@@ -304,3 +307,9 @@ bool g_has_weapontype(const gamestate* const g, entityid id);
 bool g_set_weapontype(gamestate* const g, entityid id, weapontype type);
 weapontype g_get_weapontype(const gamestate* const g, entityid id);
 bool g_is_weapontype(const gamestate* const g, entityid id, weapontype type);
+
+bool g_add_shieldtype(gamestate* const g, entityid id, shieldtype type);
+bool g_has_shieldtype(const gamestate* const g, entityid id);
+bool g_set_shieldtype(gamestate* const g, entityid id, shieldtype type);
+shieldtype g_get_shieldtype(const gamestate* const g, entityid id);
+bool g_is_shieldtype(const gamestate* const g, entityid id, shieldtype type);

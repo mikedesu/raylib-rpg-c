@@ -105,68 +105,74 @@ gamestate* gamestateinitptr() {
     g->stats_list_count = 0;
     g->itemtype_list_count = 0;
     g->weapontype_list_count = 0;
+    g->shieldtype_list_count = 0;
 
-    g->name_list_capacity = LIST_INIT_CAPACITY;
-    g->type_list_capacity = LIST_INIT_CAPACITY;
-    g->race_list_capacity = LIST_INIT_CAPACITY;
-    g->direction_list_capacity = LIST_INIT_CAPACITY;
-    g->loc_list_capacity = LIST_INIT_CAPACITY;
-    g->sprite_move_list_capacity = LIST_INIT_CAPACITY;
-    g->dead_list_capacity = LIST_INIT_CAPACITY;
-    g->update_list_capacity = LIST_INIT_CAPACITY;
-    g->attacking_list_capacity = LIST_INIT_CAPACITY;
-    g->blocking_list_capacity = LIST_INIT_CAPACITY;
-    g->block_success_list_capacity = LIST_INIT_CAPACITY;
-    g->damaged_list_capacity = LIST_INIT_CAPACITY;
-    g->inventory_list_capacity = LIST_INIT_CAPACITY;
-    g->target_list_capacity = LIST_INIT_CAPACITY;
-    g->target_path_list_capacity = LIST_INIT_CAPACITY;
-    g->default_action_list_capacity = LIST_INIT_CAPACITY;
-    g->equipment_list_capacity = LIST_INIT_CAPACITY;
-    g->stats_list_capacity = LIST_INIT_CAPACITY;
-    g->itemtype_list_capacity = LIST_INIT_CAPACITY;
-    g->weapontype_list_capacity = LIST_INIT_CAPACITY;
+    const size_t n = LIST_INIT_CAPACITY;
 
-    g->name_list = (name_component*)malloc(sizeof(name_component) * LIST_INIT_CAPACITY);
+    g->name_list_capacity = n;
+    g->type_list_capacity = n;
+    g->race_list_capacity = n;
+    g->direction_list_capacity = n;
+    g->loc_list_capacity = n;
+    g->sprite_move_list_capacity = n;
+    g->dead_list_capacity = n;
+    g->update_list_capacity = n;
+    g->attacking_list_capacity = n;
+    g->blocking_list_capacity = n;
+    g->block_success_list_capacity = n;
+    g->damaged_list_capacity = n;
+    g->inventory_list_capacity = n;
+    g->target_list_capacity = n;
+    g->target_path_list_capacity = n;
+    g->default_action_list_capacity = n;
+    g->equipment_list_capacity = n;
+    g->stats_list_capacity = n;
+    g->itemtype_list_capacity = n;
+    g->weapontype_list_capacity = n;
+    g->shieldtype_list_capacity = n;
+
+    g->name_list = (name_component*)malloc(sizeof(name_component) * n);
     massert(g->name_list, "g->name_list is NULL");
-    g->type_list = (type_component*)malloc(sizeof(type_component) * LIST_INIT_CAPACITY);
+    g->type_list = (type_component*)malloc(sizeof(type_component) * n);
     massert(g->type_list, "g->type_list is NULL");
-    g->race_list = (race_component*)malloc(sizeof(race_component) * LIST_INIT_CAPACITY);
+    g->race_list = (race_component*)malloc(sizeof(race_component) * n);
     massert(g->race_list, "g->race_list is NULL");
-    g->direction_list = (direction_component*)malloc(sizeof(direction_component) * LIST_INIT_CAPACITY);
+    g->direction_list = (direction_component*)malloc(sizeof(direction_component) * n);
     massert(g->direction_list, "g->direction_list is NULL");
-    g->loc_list = (loc_component*)malloc(sizeof(loc_component) * LIST_INIT_CAPACITY);
+    g->loc_list = (loc_component*)malloc(sizeof(loc_component) * n);
     massert(g->loc_list, "g->loc_list is NULL");
-    g->sprite_move_list = (sprite_move_component*)malloc(sizeof(sprite_move_component) * LIST_INIT_CAPACITY);
+    g->sprite_move_list = (sprite_move_component*)malloc(sizeof(sprite_move_component) * n);
     massert(g->sprite_move_list, "g->sprite_move_list is NULL");
-    g->dead_list = (dead_component*)malloc(sizeof(dead_component) * LIST_INIT_CAPACITY);
+    g->dead_list = (dead_component*)malloc(sizeof(dead_component) * n);
     massert(g->dead_list, "g->dead_list is NULL");
-    g->update_list = (update_component*)malloc(sizeof(update_component) * LIST_INIT_CAPACITY);
+    g->update_list = (update_component*)malloc(sizeof(update_component) * n);
     massert(g->update_list, "g->update_list is NULL");
-    g->attacking_list = (attacking_component*)malloc(sizeof(attacking_component) * LIST_INIT_CAPACITY);
+    g->attacking_list = (attacking_component*)malloc(sizeof(attacking_component) * n);
     massert(g->attacking_list, "g->attacking_list is NULL");
-    g->blocking_list = (blocking_component*)malloc(sizeof(blocking_component) * LIST_INIT_CAPACITY);
+    g->blocking_list = (blocking_component*)malloc(sizeof(blocking_component) * n);
     massert(g->blocking_list, "g->blocking_list is NULL");
-    g->block_success_list = (block_success_component*)malloc(sizeof(block_success_component) * LIST_INIT_CAPACITY);
+    g->block_success_list = (block_success_component*)malloc(sizeof(block_success_component) * n);
     massert(g->block_success_list, "g->block_success_list is NULL");
-    g->damaged_list = (damaged_component*)malloc(sizeof(damaged_component) * LIST_INIT_CAPACITY);
+    g->damaged_list = (damaged_component*)malloc(sizeof(damaged_component) * n);
     massert(g->damaged_list, "g->damaged_list is NULL");
-    g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * LIST_INIT_CAPACITY);
+    g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * n);
     massert(g->inventory_list, "g->inventory_list is NULL");
-    g->target_list = (target_component*)malloc(sizeof(target_component) * LIST_INIT_CAPACITY);
+    g->target_list = (target_component*)malloc(sizeof(target_component) * n);
     massert(g->target_list, "g->target_list is NULL");
-    g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * LIST_INIT_CAPACITY);
+    g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * n);
     massert(g->target_path_list, "g->target_path_list is NULL");
-    g->default_action_list = (default_action_component*)malloc(sizeof(default_action_component) * LIST_INIT_CAPACITY);
+    g->default_action_list = (default_action_component*)malloc(sizeof(default_action_component) * n);
     massert(g->default_action_list, "g->default_action_list is NULL");
-    g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * LIST_INIT_CAPACITY);
+    g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * n);
     massert(g->equipment_list, "g->equipment_list is NULL");
-    g->stats_list = (stats_component*)malloc(sizeof(stats_component) * LIST_INIT_CAPACITY);
+    g->stats_list = (stats_component*)malloc(sizeof(stats_component) * n);
     massert(g->stats_list, "g->stats_list is NULL");
-    g->itemtype_list = (itemtype_component*)malloc(sizeof(itemtype_component) * LIST_INIT_CAPACITY);
+    g->itemtype_list = (itemtype_component*)malloc(sizeof(itemtype_component) * n);
     massert(g->itemtype_list, "g->itemtype_list is NULL");
-    g->weapontype_list = (weapontype_component*)malloc(sizeof(weapontype_component) * LIST_INIT_CAPACITY);
+    g->weapontype_list = (weapontype_component*)malloc(sizeof(weapontype_component) * n);
     massert(g->weapontype_list, "g->weapontype_list is NULL");
+    g->shieldtype_list = (shieldtype_component*)malloc(sizeof(shieldtype_component) * n);
+    massert(g->shieldtype_list, "g->shieldtype_list is NULL");
 
     gamestate_init_msg_history(g);
     return g;
@@ -1576,6 +1582,66 @@ bool g_is_weapontype(const gamestate* const g, entityid id, weapontype type) {
     for (int i = 0; i < g->weapontype_list_count; i++) {
         if (g->weapontype_list[i].id == id) {
             return g->weapontype_list[i].type == type;
+        }
+    }
+    return false;
+}
+
+bool g_add_shieldtype(gamestate* const g, entityid id, shieldtype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the shieldtype component
+    return g_add_component(
+        g, id, C_SHIELDTYPE, (void*)&type, sizeof(shieldtype_component), (void**)&g->shieldtype_list, &g->shieldtype_list_count, &g->shieldtype_list_capacity);
+}
+
+bool g_has_shieldtype(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_SHIELDTYPE);
+}
+
+bool g_set_shieldtype(gamestate* const g, entityid id, shieldtype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->shieldtype_list == NULL) {
+        merror("g->shieldtype_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->shieldtype_list_count; i++) {
+        if (g->shieldtype_list[i].id == id) {
+            g->shieldtype_list[i].type = type;
+            return true;
+        }
+    }
+    return false;
+}
+
+shieldtype g_get_shieldtype(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->shieldtype_list == NULL) {
+        merror("g->shieldtype_list is NULL");
+        return SHIELD_NONE;
+    }
+    for (int i = 0; i < g->shieldtype_list_count; i++) {
+        if (g->shieldtype_list[i].id == id) {
+            return g->shieldtype_list[i].type;
+        }
+    }
+    return SHIELD_NONE;
+}
+
+bool g_is_shieldtype(const gamestate* const g, entityid id, shieldtype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->shieldtype_list == NULL) {
+        merror("g->shieldtype_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->shieldtype_list_count; i++) {
+        if (g->shieldtype_list[i].id == id) {
+            return g->shieldtype_list[i].type == type;
         }
     }
     return false;

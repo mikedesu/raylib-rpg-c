@@ -112,7 +112,6 @@ sprite* sg_get_current(spritegroup_t* const sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->current >= 0, "current is negative");
     massert(sg->current < sg->size, "current is out of bounds");
-
     return sg->sprites[sg->current];
 }
 

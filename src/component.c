@@ -295,3 +295,20 @@ void init_weapontype_component(weapontype_component* comp, entityid id, weaponty
     comp->id = id;
     comp->type = type;
 }
+
+void init_shieldtype_component(shieldtype_component* comp, entityid id, shieldtype type) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) {
+        return;
+    }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        return;
+    }
+    massert(type > SHIELD_NONE && type < SHIELD_TYPE_COUNT, "type is invalid: %d", type);
+    if (type <= SHIELD_NONE || type >= SHIELD_TYPE_COUNT) {
+        return;
+    }
+    comp->id = id;
+    comp->type = type;
+}

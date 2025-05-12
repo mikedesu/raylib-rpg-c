@@ -7,6 +7,7 @@
 #include "item.h"
 #include "location.h"
 #include "race.h"
+#include "shield.h"
 #include "weapon.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -35,6 +36,7 @@ typedef enum component_t
     C_STATS,
     C_ITEMTYPE,
     C_WEAPONTYPE,
+    C_SHIELDTYPE,
     C_COUNT
 } component;
 
@@ -59,6 +61,11 @@ static inline const char* component2str(component c) {
     case C_TARGET: return "C_TARGET";
     case C_TARGET_PATH: return "C_TARGET_PATH";
     case C_EQUIPMENT: return "C_EQUIPMENT";
+    case C_STATS: return "C_STATS";
+    case C_ITEMTYPE: return "C_ITEMTYPE";
+    case C_WEAPONTYPE: return "C_WEAPONTYPE";
+    case C_SHIELDTYPE: return "C_SHIELDTYPE";
+    case C_COUNT: return "C_COUNT";
     default: break;
     }
     return "C_UNKNOWN";
@@ -150,8 +157,8 @@ typedef struct default_action_component_t {
 typedef enum equipment_slot_t
 {
     EQUIP_SLOT_WEAPON,
+    EQUIP_SLOT_SHIELD,
     // add more equipment slots here
-    //EQUIPMENT_SLOT_SHIELD,
     //EQUIPMENT_SLOT_ARMOR,
     //EQUIPMENT_SLOT_HELMET,
     //EQUIPMENT_SLOT_RING,
@@ -159,17 +166,11 @@ typedef enum equipment_slot_t
     EQUIPMENT_SLOT_COUNT
 } equipment_slot;
 
-#define MAX_EQUIPMENT_SLOTS 1
+#define MAX_EQUIPMENT_SLOTS 2
 
 typedef struct equipment_component_t {
     entityid id;
     entityid equipment[MAX_EQUIPMENT_SLOTS];
-    // add more equipment types here
-    //entityid shield;
-    //entityid armor;
-    //entityid helmet;
-    //entityid ring;
-    //entityid amulet;
 } equipment_component;
 
 typedef enum stats_slot_t
@@ -197,6 +198,11 @@ typedef struct weapontype_component_t {
     weapontype type;
 } weapontype_component;
 
+typedef struct shieldtype_component_t {
+    entityid id;
+    shieldtype type;
+} shieldtype_component;
+
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
 void init_race_component(race_component* comp, entityid id, race_t race);
@@ -217,3 +223,4 @@ void init_equipment_component(equipment_component* comp, entityid id);
 void init_stats_component(stats_component* comp, entityid id);
 void init_itemtype_component(itemtype_component* comp, entityid id, itemtype type);
 void init_weapontype_component(weapontype_component* comp, entityid id, weapontype type);
+void init_shieldtype_component(shieldtype_component* comp, entityid id, shieldtype type);

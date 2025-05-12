@@ -15,6 +15,7 @@
 #include "location.h"
 #include "massert.h"
 #include "mprint.h"
+#include "shield.h"
 //#include "path_node.h"
 #include "path_node.h"
 #include "race.h"
@@ -60,6 +61,7 @@ static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 //static void init_npcs_test_by_room(gamestate* const g);
 static void init_npc_test(gamestate* g);
 static void init_sword_test(gamestate* g);
+static void init_shield_test(gamestate* g);
 
 //static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
@@ -86,6 +88,7 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
 static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char* name);
 static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const char* name);
 static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, const char* name);
+static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, const char* name);
 
 static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
 static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
@@ -1057,7 +1060,6 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
     //minfo("registering equipment");
     //g_register_comp(g, id, C_EQUIPMENT);
     //g_register_comp(g, id, C_STATS);
-
     //minfo("adding name for id %d: %s", id, name);
     g_add_name(g, id, name);
     //minfo("adding type for id %d: %d", id, ENTITY_NPC);
@@ -1093,12 +1095,10 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
     //minfo("adding ");
     //g_add_equipment(g, id);
     g_add_itemtype(g, id, type);
-
     //g_add_stats(g, id);
     //g_set_stat(g, id, STATS_LEVEL, 1);
     //g_set_stat(g, id, STATS_MAXHP, 3);
     //g_set_stat(g, id, STATS_HP, 3);
-
     if (!df_add_at(df, id, loc.x, loc.y)) {
         merror("failed to add entity to dungeon floor");
         //free(e);
@@ -1109,17 +1109,27 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
 
 static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, const char* name) {
     massert(g, "gamestate is NULL");
-
     entityid id = item_create(g, ITEM_WEAPON, loc, name);
     if (id == ENTITYID_INVALID) {
         merror("failed to create weapon");
         return ENTITYID_INVALID;
     }
     //massert(id != ENTITYID_INVALID, "failed to create weapon");
-
     g_register_comp(g, id, C_WEAPONTYPE);
     g_add_weapontype(g, id, type);
+    return id;
+}
 
+static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, const char* name) {
+    massert(g, "gamestate is NULL");
+    entityid id = item_create(g, ITEM_SHIELD, loc, name);
+    if (id == ENTITYID_INVALID) {
+        merror("failed to create shield");
+        return ENTITYID_INVALID;
+    }
+    //massert(id != ENTITYID_INVALID, "failed to create weapon");
+    g_register_comp(g, id, C_SHIELDTYPE);
+    g_add_shieldtype(g, id, type);
     return id;
 }
 
@@ -1386,10 +1396,8 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         g->display_inventory_menu = false;
         return;
     }
-
     int count = 0;
     entityid* inventory = g_get_inventory(g, g->hero_id, &count);
-
     if (count == 0) {
         return;
     }
@@ -1430,21 +1438,56 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
     } else if (inputstate_is_pressed(is, KEY_E)) {
         entityid item_id = inventory[g->inventory_menu_selection];
         // we will eventually adjust this to check which slot it needs to go into based on its various types
-        g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
+        entitytype_t type = g_get_type(g, item_id);
+        if (type == ENTITY_ITEM) {
+            itemtype item_type = g_get_itemtype(g, item_id);
+            if (item_type == ITEM_WEAPON) {
+                // check if the item is already equipped
+                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
+                if (equipped_item != ENTITYID_INVALID) {
+                    // unequip the currently equipped item
+                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
+                    add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                } else {
+                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
+                    add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                }
+            } else if (item_type == ITEM_SHIELD) {
+                //g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
+                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
+                if (equipped_item != ENTITYID_INVALID) {
+                    // unequip the currently equipped item
+                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
+                    add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                } else {
+                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
+                    add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                }
+            }
+        }
         g->controlmode = CONTROLMODE_PLAYER;
         g->display_inventory_menu = false;
-        add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-        g->controlmode = CONTROLMODE_PLAYER;
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    } else if (inputstate_is_pressed(is, KEY_U)) {
-        entityid item_id = inventory[g->inventory_menu_selection];
-        g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
-        g->controlmode = CONTROLMODE_PLAYER;
-        g->display_inventory_menu = false;
-        add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
         g->controlmode = CONTROLMODE_PLAYER;
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     }
+    //else if (inputstate_is_pressed(is, KEY_U)) {
+    //        entityid item_id = inventory[g->inventory_menu_selection];
+    //        entitytype_t type = g_get_type(g, item_id);
+    //        if (type == ENTITY_ITEM) {
+    //            itemtype item_type = g_get_itemtype(g, item_id);
+    //            if (item_type == ITEM_WEAPON) {
+    //                g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
+    //            } else if (item_type == ITEM_SHIELD) {
+    //                g_unset_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
+    //            }
+    //        }
+    //        //g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //        g->display_inventory_menu = false;
+    //        add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //    }
     //} else if (inputstate_is_pressed(is, KEY_ENTER)) {
     //    // we need to grab the entityid of the selected item
     //    entityid item_id = hero->inventory[g->inventory_menu_selection];
@@ -1893,7 +1936,6 @@ void liblogic_init(gamestate* const g) {
     // test to create a weapon
     //init_weapon_test(g);
     //init_weapon_test2(g);
-    //init_shield_test(g);
     //init_shield_test2(g);
     //init_potion_test(g, POTION_HP_SMALL, "small healing potion");
     //init_potion_test(g, POTION_HP_MEDIUM, "medium healing potion");
@@ -1901,6 +1943,7 @@ void liblogic_init(gamestate* const g) {
     //init_npcs_test_by_room(g);
     init_npc_test(g);
     init_sword_test(g);
+    init_shield_test(g);
     update_debug_panel_buffer(g);
 }
 
@@ -1925,10 +1968,21 @@ static void init_npc_test(gamestate* g) {
 
 static void init_sword_test(gamestate* g) {
     massert(g, "gamestate is NULL");
-
     loc_t* locs = get_locs_around_entity(g, g->hero_id);
     for (int i = 0; i < 8; i++) {
         entityid id = weapon_create(g, WEAPON_SWORD, locs[i], "dummy sword");
+        if (id != ENTITYID_INVALID) {
+            // set item properties
+            break;
+        }
+    }
+}
+
+static void init_shield_test(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    loc_t* locs = get_locs_around_entity(g, g->hero_id);
+    for (int i = 0; i < 8; i++) {
+        entityid id = shield_create(g, SHIELD_BUCKLER, locs[i], "dummy shield");
         if (id != ENTITYID_INVALID) {
             // set item properties
             break;
