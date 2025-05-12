@@ -1382,13 +1382,26 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         g->display_inventory_menu = false;
         return;
     }
-    //if (hero->inventory_count == 0) { return; }
-    //if (inputstate_is_pressed(is, KEY_DOWN)) {
-    //    g->inventory_menu_selection++;
-    //    if (g->inventory_menu_selection >= hero->inventory_count) { g->inventory_menu_selection = 0; }
-    //} else if (inputstate_is_pressed(is, KEY_UP)) {
-    //    g->inventory_menu_selection--;
-    //    if (g->inventory_menu_selection < 0) { g->inventory_menu_selection = hero->inventory_count - 1; }
+
+    int count = 0;
+    entityid* inventory = g_get_inventory(g, g->hero_id, &count);
+
+    if (count == 0) {
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_DOWN)) {
+        g->inventory_menu_selection = g->inventory_menu_selection + 1 >= count ? 0 : g->inventory_menu_selection + 1;
+        //g->inventory_menu_selection++;
+        //if (g->inventory_menu_selection >= count) {
+        //    g->inventory_menu_selection = 0;
+        //}
+    } else if (inputstate_is_pressed(is, KEY_UP)) {
+        g->inventory_menu_selection = g->inventory_menu_selection - 1 < 0 ? count - 1 : g->inventory_menu_selection - 1;
+        //g->inventory_menu_selection--;
+        //if (g->inventory_menu_selection < 0) {
+        //    g->inventory_menu_selection = count - 1;
+        //}
+    }
     //} else if (inputstate_is_pressed(is, KEY_ENTER)) {
     //    // we need to grab the entityid of the selected item
     //    entityid item_id = hero->inventory[g->inventory_menu_selection];
@@ -1869,7 +1882,7 @@ static void init_sword_test(gamestate* g) {
         entityid id = weapon_create(g, WEAPON_SWORD, locs[i], "dummy sword");
         if (id != ENTITYID_INVALID) {
             // set item properties
-            break;
+            //break;
         }
     }
 }

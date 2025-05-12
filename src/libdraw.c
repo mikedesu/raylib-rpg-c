@@ -973,9 +973,9 @@ void libdraw_drawframe(gamestate* const g) {
     libdraw_drawframe_2d(g);
 
     //minfo("libdraw_drawframe: message box");
+    draw_message_history(g);
     draw_message_box(g);
     //minfo("libdraw_drawframe: message history");
-    draw_message_history(g);
     //minfo("libdraw_drawframe: hud");
     draw_hud(g);
     //minfo("libdraw_drawframe: inventory menu");
