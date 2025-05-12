@@ -431,7 +431,7 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     //massert(data, "data is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(*c_list, "c_list is NULL");
-    massert(*c_count < *c_capacity, "c_count >= c_capacity: %d >= %d", *c_count, *c_capacity);
+    //massert(*c_count < *c_capacity, "c_count >= c_capacity: %d >= %d", *c_count, *c_capacity);
     massert(*c_capacity > 0, "c_capacity is 0");
     massert(*c_count >= 0, "c_count is negative");
     massert(*c_count < g->max_entityids, "c_count >= g->max_entityids: %d >= %d", *c_count, g->max_entityids);

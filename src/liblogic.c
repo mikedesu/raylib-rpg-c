@@ -1901,17 +1901,17 @@ static void init_npc_test(gamestate* g) {
     massert(g, "gamestate is NULL");
     //loc_t loc = g_get_location(g, g->hero_id);
 
-    loc_t* locs = get_locs_around_entity(g, g->hero_id);
+    //loc_t* locs = get_locs_around_entity(g, g->hero_id);
     int count = 0;
-    int max = 2;
-    for (int i = 0; i < 8; i++) {
-        entityid id = npc_create(g, RACE_ORC, locs[i], "orc");
+    int max = 100;
+    //for (int i = 0; i < 8; i++) {
+    while (count < max) {
+        loc_t loc = get_random_empty_non_wall_loc(g, 0);
+        entityid id = npc_create(g, RACE_ORC, loc, "orc");
+        //entityid id = npc_create(g, RACE_ORC, locs[i], "orc");
         if (id != ENTITYID_INVALID) {
             g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
             count++;
-            if (count >= max) {
-                break;
-            }
         }
     }
 }
