@@ -1447,10 +1447,13 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                 if (equipped_item != ENTITYID_INVALID) {
                     // unequip the currently equipped item
                     g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
-                    add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+
                 } else {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
-                    add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                 }
             } else if (item_type == ITEM_SHIELD) {
                 //g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
@@ -1458,10 +1461,12 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                 if (equipped_item != ENTITYID_INVALID) {
                     // unequip the currently equipped item
                     g_unset_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
-                    add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                 } else {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
-                    add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                 }
             }
         }
@@ -1514,15 +1519,6 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
             }
             return true;
         }
-        //    add_message_and_history(g, "%s picked up a %s", "[placeholder]", "[placeholder]");
-        //    tile_remove(tile, id);
-        //    e_add_item_to_inventory(e, id);
-        //    if (g_is_type(g, e->id, ENTITY_PLAYER)) { g->flag = GAMESTATE_FLAG_PLAYER_ANIM; }
-        //    return true;
-        //} else {
-        //    add_message(g, "Unhandled item type cannot be picked up: %d", type);
-        //    return false;
-        //}
     }
     add_message(g, "No items to pick up");
     return false;
@@ -1887,25 +1883,21 @@ static void init_npc_test(gamestate* g) {
 
 static void init_sword_test(gamestate* g) {
     massert(g, "gamestate is NULL");
-    loc_t* locs = get_locs_around_entity(g, g->hero_id);
-    for (int i = 0; i < 8; i++) {
-        entityid id = weapon_create(g, WEAPON_SWORD, locs[i], "dummy sword");
-        if (id != ENTITYID_INVALID) {
-            // set item properties
-            break;
-        }
+    //loc_t* locs = get_locs_around_entity(g, g->hero_id);
+    //for (int i = 0; i < 8; i++) {
+    entityid id = ENTITYID_INVALID;
+    while (id == ENTITYID_INVALID) {
+        loc_t loc = get_random_empty_non_wall_loc(g, 0);
+        id = weapon_create(g, WEAPON_SWORD, loc, "dummy sword");
     }
 }
 
 static void init_shield_test(gamestate* g) {
     massert(g, "gamestate is NULL");
-    loc_t* locs = get_locs_around_entity(g, g->hero_id);
-    for (int i = 0; i < 8; i++) {
-        entityid id = shield_create(g, SHIELD_BUCKLER, locs[i], "dummy shield");
-        if (id != ENTITYID_INVALID) {
-            // set item properties
-            break;
-        }
+    entityid id = ENTITYID_INVALID;
+    while (id == ENTITYID_INVALID) {
+        loc_t loc = get_random_empty_non_wall_loc(g, 0);
+        id = shield_create(g, SHIELD_BUCKLER, loc, "dummy buckler");
     }
 }
 
