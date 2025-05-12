@@ -2,6 +2,7 @@
 
 #include "entityid.h"
 #include "libgame_defines.h"
+#include "location.h"
 #include "specifier.h"
 #include "sprite.h"
 
@@ -45,6 +46,7 @@ void spritegroup_set_specifier(spritegroup_t* const sg, specifier_t spec);
 
 void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop);
 void spritegroup_update_dest(spritegroup_t* const sg);
-void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y);
+//void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y);
+void spritegroup_snap_dest(spritegroup_t* const sg, loc_t loc);
 
 void sg_set_default_anim(spritegroup_t* const sg, int anim);

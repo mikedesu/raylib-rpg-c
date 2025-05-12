@@ -149,7 +149,7 @@ typedef struct default_action_component_t {
 
 typedef enum equipment_slot_t
 {
-    EQUIPMENT_SLOT_WEAPON,
+    EQUIP_SLOT_WEAPON,
     // add more equipment slots here
     //EQUIPMENT_SLOT_SHIELD,
     //EQUIPMENT_SLOT_ARMOR,

@@ -102,7 +102,8 @@ static void libdraw_unload_textures();
 //static void libdraw_update_sprite_attack(gamestate* const g, entity_t* e, spritegroup_t* sg);
 static void libdraw_update_sprite_attack(gamestate* const g, entityid id, spritegroup_t* sg);
 //static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entity_t* e);
-static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entityid id);
+//static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entityid id);
+static void libdraw_update_sprite_position(gamestate* const g, entityid id, spritegroup_t* sg);
 static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
 //static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg);
 static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegroup_t* sg);
@@ -653,7 +654,8 @@ static void libdraw_update_sprite_attack(gamestate* const g, entityid id, sprite
 }
 
 //static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entity_t* e) {
-static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entityid id) {
+//static void libdraw_update_sprite_position(gamestate* const g, spritegroup_t* sg, entityid id) {
+static void libdraw_update_sprite_position(gamestate* const g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -723,40 +725,23 @@ static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t*
     spritegroup_setcontexts(group, ctx);
 }
 
-//static void libdraw_update_sprite_ptr(gamestate* const g, entity* e, spritegroup_t* sg) {
 static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
-
-    //if (e->dead && !spritegroup_is_animating(sg)) return;
-
-    //minfo("0");
     if (g_is_dead(g, id) && !spritegroup_is_animating(sg)) return;
-
-    //if (g_is_type(g, id, ENTITY_DOOR)) {
-    //libdraw_set_sg_door(g, e, sg);
-    //e->do_update = false;
-    //g_set_update(g, id, false);
-    //}
-
-    //if (e->do_update) {
     if (g_get_update(g, id)) {
-        //libdraw_update_sprite_context_ptr(g, sg, e->direction);
         libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, id));
-        //e->do_update = false;
         g_set_update(g, id, false);
     }
-
     // Copy movement intent from sprite_move_x/y if present
-    libdraw_update_sprite_position(g, sg, id);
+    libdraw_update_sprite_position(g, id, sg);
     libdraw_update_sprite_attack(g, id, sg);
     // Update movement as long as sg->move.x/y is non-zero
     spritegroup_update_dest(sg);
     // Snap to the tile position only when movement is fully complete
-
     loc_t loc = g_get_location(g, id);
-    spritegroup_snap_dest(sg, loc.x, loc.y);
+    spritegroup_snap_dest(sg, loc);
 }
 
 //static void libdraw_handle_frame_incr(gamestate* const g, spritegroup_t* const sg) {
@@ -1386,9 +1371,9 @@ static void draw_inventory_menu(gamestate* const g) {
         //    if (item_id == 0) continue;
         float item_x = left_box.x + item_list_pad;
         char item_display[128];
-        //    bool is_equipped = false;
-        //    entitytype_t item_type = g_get_type(g, item_id);
-        //    if (item_type == ENTITY_WEAPON) {
+        entitytype_t item_type = g_get_type(g, item_id);
+        bool is_equipped = g_is_equipped(g, g->hero_id, item_id);
+        //if (item_type == ENTITY_WEAPON) {
         //        is_equipped = (hero->weapon == item_id);
         //    } else if (item_type == ENTITY_SHIELD) {
         //        is_equipped = (hero->shield == item_id);
@@ -1400,7 +1385,9 @@ static void draw_inventory_menu(gamestate* const g) {
         } else {
             snprintf(item_display, sizeof(item_display), "  %s", g_get_name(g, item_id));
         }
-        //    if (is_equipped) { strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1); }
+        if (is_equipped) {
+            strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1);
+        }
         DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, g->font_size, g->line_spacing, WHITE);
         item_y += g->font_size + 4;
     }

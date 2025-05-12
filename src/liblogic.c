@@ -1415,28 +1415,35 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         loc_t loc = g_get_location(g, g->hero_id);
         dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
         massert(df, "Dungeon floor is NULL!");
-        //if (!df) {
-        //    merror("Failed to get dungeon floor");
-        //    return;
-
         minfo("Dropping item %d at %d, %d, %d", item_id, loc.x, loc.y, loc.z);
-
         tile_t* const tile = df_tile_at(df, loc);
         massert(tile, "Tile is NULL!");
-        //if (!tile) {
-        //    merror("Failed to get tile");
-        //    return;
-        //}
         if (!tile_add(tile, item_id)) {
             merror("Failed to add item to tile");
             return;
         }
-
         // we also have to update the location of the item
         g_update_location(g, item_id, loc);
-
         g->controlmode = CONTROLMODE_PLAYER;
         g->display_inventory_menu = false;
+        //}
+    } else if (inputstate_is_pressed(is, KEY_E)) {
+        entityid item_id = inventory[g->inventory_menu_selection];
+        // we will eventually adjust this to check which slot it needs to go into based on its various types
+        g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
+        g->controlmode = CONTROLMODE_PLAYER;
+        g->display_inventory_menu = false;
+        add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+        g->controlmode = CONTROLMODE_PLAYER;
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    } else if (inputstate_is_pressed(is, KEY_U)) {
+        entityid item_id = inventory[g->inventory_menu_selection];
+        g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
+        g->controlmode = CONTROLMODE_PLAYER;
+        g->display_inventory_menu = false;
+        add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+        g->controlmode = CONTROLMODE_PLAYER;
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     }
     //} else if (inputstate_is_pressed(is, KEY_ENTER)) {
     //    // we need to grab the entityid of the selected item
@@ -1650,9 +1657,9 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         merror("No action found for key");
         return;
     }
-    if (strcmp(action, "none") != 0) {
-        minfo("action: %s", action);
-    }
+    //if (strcmp(action, "none") != 0) {
+    //    minfo("action: %s", action);
+    //}
     // check if the player is dead
     //if (hero->dead) return;
     //minfo("calling g_is_dead 8");
@@ -1979,7 +1986,7 @@ static void handle_nth_npc(gamestate* const g, int i) {
     massert(i < g->index_entityids, "Index is out of bounds!");
     entityid id = g->entityids[i];
     if (id == g->hero_id) {
-        minfo("Skipping hero");
+        //minfo("Skipping hero");
         return; // Skip the hero
     }
     if (g_is_type(g, id, ENTITY_NPC) && !g_is_dead(g, id)) {

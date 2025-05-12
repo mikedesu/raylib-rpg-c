@@ -4,23 +4,22 @@
 #include "raylib.h"
 
 const char* get_action_for_key(keybinding_list_t* kb, int key) {
-    minfo("Getting action for key %d", key);
+    //minfo("Getting action for key %d", key);
     massert(kb, "Keybinding list is NULL");
     massert(kb->count > 0, "Keybinding list is empty");
     massert(key >= 0, "Key is less than 0");
     for (int i = 0; i < kb->count; i++) {
         if (kb->bindings[i].key == key) {
-            minfo("Key %d found in keybinding list", key);
+            //minfo("Key %d found in keybinding list", key);
             return kb->bindings[i].action;
         }
     }
-    minfo("Key %d not found in keybinding list", key);
+    //minfo("Key %d not found in keybinding list", key);
     return NULL;
 }
 
 int key_from_string(const char* str) {
-    minfo("Converting string to key [%s]", str);
-
+    //minfo("Converting string to key [%s]", str);
     if (!strcmp(str, "W")) return KEY_W;
     if (!strcmp(str, "I")) return KEY_I;
     if (!strcmp(str, "A")) return KEY_A;
@@ -54,25 +53,22 @@ int key_from_string(const char* str) {
 }
 
 void load_keybindings(const char* filename, keybinding_list_t* kb) {
-    minfo("Loading keybindings from %s", filename);
+    //minfo("Loading keybindings from %s", filename);
     FILE* file = fopen(filename, "r");
     if (!file) return;
-
     msuccess("Keybindings file opened successfully");
-
     char line[128];
     kb->count = 0;
-
-    minfo("Parsing keybindings file");
+    //minfo("Parsing keybindings file");
     while (fgets(line, sizeof(line), file) && kb->count < KEYBINDING_LIST_MAX_LENGTH) {
-        minfo("Parsing line %s", line);
+        //minfo("Parsing line %s", line);
         massert(line, "Keybinding line is NULL");
         char keyname[64], action[64];
         if (sscanf(line, " %63[^=] = %63s", keyname, action) == 2) {
             int key = key_from_string(keyname);
             if (key > 0) {
-                minfo("Key %s", keyname);
-                minfo("Action %s", action);
+                //minfo("Key %s", keyname);
+                //minfo("Action %s", action);
                 kb->bindings[kb->count].key = key;
                 strncpy(kb->bindings[kb->count].action, action, sizeof(kb->bindings[kb->count].action) - 1);
                 kb->bindings[kb->count].action[sizeof(kb->bindings[kb->count].action) - 1] = '\0';

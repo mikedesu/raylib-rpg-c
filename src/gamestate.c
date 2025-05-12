@@ -1386,6 +1386,24 @@ entityid g_get_equipment(const gamestate* const g, entityid id, equipment_slot s
     return ENTITYID_INVALID;
 }
 
+bool g_is_equipped(const gamestate* const g, entityid id, entityid itemid) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(itemid != ENTITYID_INVALID, "itemid is invalid");
+    if (g->equipment_list != NULL) {
+        for (int i = 0; i < g->equipment_list_count; i++) {
+            if (g->equipment_list[i].id == id) {
+                for (int j = 0; j < EQUIPMENT_SLOT_COUNT; j++) {
+                    if (g->equipment_list[i].equipment[j] == itemid) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
 dungeon_t* g_get_dungeon(gamestate* const g) {
     massert(g, "g is NULL");
     return g->d;

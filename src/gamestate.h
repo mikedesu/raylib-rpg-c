@@ -286,6 +286,7 @@ bool g_has_equipment(const gamestate* const g, entityid id);
 bool g_set_equipment(gamestate* const g, entityid id, equipment_slot slot, entityid itemid);
 bool g_unset_equipment(gamestate* const g, entityid id, equipment_slot slot);
 entityid g_get_equipment(const gamestate* const g, entityid id, equipment_slot slot);
+bool g_is_equipped(const gamestate* const g, entityid id, entityid itemid);
 
 bool g_add_stats(gamestate* const g, entityid id);
 bool g_has_stats(const gamestate* const g, entityid id);

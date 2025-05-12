@@ -1,4 +1,5 @@
 #include "libgame_defines.h"
+//#include "location.h"
 #include "massert.h"
 #include "mprint.h"
 #include "spritegroup.h"
@@ -84,10 +85,18 @@ void spritegroup_set(spritegroup_t* const sg, int index, sprite* s) {
 void spritegroup_setcontexts(spritegroup_t* const sg, int context) {
     massert(sg, "spritegroup is NULL");
     for (int i = 0; i < sg->size; i++) {
-        if (!sg->sprites[i]) { continue; }
-        if (sg->sprites[i]->numcontexts <= 0) { continue; }
-        if (context < 0) { continue; }
-        if (context >= sg->sprites[i]->numcontexts) { continue; }
+        if (!sg->sprites[i]) {
+            continue;
+        }
+        if (sg->sprites[i]->numcontexts <= 0) {
+            continue;
+        }
+        if (context < 0) {
+            continue;
+        }
+        if (context >= sg->sprites[i]->numcontexts) {
+            continue;
+        }
         sprite_setcontext(sg->sprites[i], context);
     }
 }
@@ -110,7 +119,9 @@ sprite* sg_get_current(spritegroup_t* const sg) {
 sprite* sg_get_current_plus_one(spritegroup_t* const sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->current >= 0, "current is negative");
-    if (sg->current + 1 >= sg->size) { return NULL; }
+    if (sg->current + 1 >= sg->size) {
+        return NULL;
+    }
     return sg->sprites[sg->current + 1];
 }
 
@@ -149,7 +160,9 @@ void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop) {
         return;
     }
     sprite* shadow = spritegroup_get(sg, sg->current + 1);
-    if (!shadow) { return; }
+    if (!shadow) {
+        return;
+    }
     shadow->stop_on_last_frame = do_stop;
 }
 
@@ -166,11 +179,19 @@ bool spritegroup_is_animating(spritegroup_t* const sg) {
     return s->is_animating;
 }
 
-void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y) {
+//void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y) {
+//    massert(sg, "spritegroup is NULL");
+//    if (sg->move.x == 0 && sg->move.y == 0) {
+//        sg->dest.x = x * DEFAULT_TILE_SIZE + sg->off_x;
+//        sg->dest.y = y * DEFAULT_TILE_SIZE + sg->off_y;
+//    }
+//}
+
+void spritegroup_snap_dest(spritegroup_t* const sg, loc_t loc) {
     massert(sg, "spritegroup is NULL");
     if (sg->move.x == 0 && sg->move.y == 0) {
-        sg->dest.x = x * DEFAULT_TILE_SIZE + sg->off_x;
-        sg->dest.y = y * DEFAULT_TILE_SIZE + sg->off_y;
+        sg->dest.x = loc.x * DEFAULT_TILE_SIZE + sg->off_x;
+        sg->dest.y = loc.y * DEFAULT_TILE_SIZE + sg->off_y;
     }
 }
 
