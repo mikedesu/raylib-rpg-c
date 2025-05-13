@@ -1199,6 +1199,18 @@ static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, co
     return id;
 }
 
+static entityid potion_create(gamestate* const g, loc_t loc, const char* name) {
+    massert(g, "gamestate is NULL");
+    entityid id = item_create(g, ITEM_POTION, loc, name);
+    if (id == ENTITYID_INVALID) {
+        merror("failed to create potion");
+        return ENTITYID_INVALID;
+    }
+    g_register_comp(g, id, C_POTIONTYPE);
+    g_add_potiontype(g, id, POTION_HEALTH);
+    return id;
+}
+
 static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, const char* name) {
     massert(g, "gamestate is NULL");
     entityid id = item_create(g, ITEM_SHIELD, loc, name);

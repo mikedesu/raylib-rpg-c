@@ -7,6 +7,7 @@
 #include "massert.h"
 #include "mprint.h"
 #include <raylib.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1637,4 +1638,70 @@ bool g_is_shieldtype(const gamestate* const g, entityid id, shieldtype type) {
         }
     }
     return false;
+}
+
+bool g_add_potiontype(gamestate* const g, entityid id, potiontype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the potiontype component
+    return g_add_component(g,
+                           id,
+                           C_POTIONTYPE,
+                           (void*)&type,
+                           sizeof(potiontype_component),
+                           (void**)&g->potion_type_list,
+                           &g->potion_type_list_count,
+                           &g->potion_type_list_capacity);
+}
+
+bool g_has_potiontype(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_POTIONTYPE);
+}
+
+bool g_set_potiontype(gamestate* const g, entityid id, potiontype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->potion_type_list == NULL) {
+        merror("g->potion_type_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->potion_type_list_count; i++) {
+        if (g->potion_type_list[i].id == id) {
+            g->potion_type_list[i].type = type;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool g_is_potion(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->potion_type_list == NULL) {
+        merror("g->potion_type_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->potion_type_list_count; i++) {
+        if (g->potion_type_list[i].id == id) {
+            return g->potion_type_list[i].type == POTION_NONE;
+        }
+    }
+    return false;
+}
+
+potiontype g_get_potiontype(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->potion_type_list == NULL) {
+        merror("g->potion_type_list is NULL");
+        return POTION_NONE;
+    }
+    for (int i = 0; i < g->potion_type_list_count; i++) {
+        if (g->potion_type_list[i].id == id) {
+            return g->potion_type_list[i].type;
+        }
+    }
+    return POTION_NONE;
 }

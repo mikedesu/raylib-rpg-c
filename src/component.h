@@ -14,6 +14,7 @@
 #include "weapon.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef enum component_t
 {
@@ -40,6 +41,7 @@ typedef enum component_t
     C_ITEMTYPE,
     C_WEAPONTYPE,
     C_SHIELDTYPE,
+    C_POTIONTYPE,
     C_COUNT
 } component;
 
@@ -68,6 +70,7 @@ static inline const char* component2str(component c) {
     case C_ITEMTYPE: return "C_ITEMTYPE";
     case C_WEAPONTYPE: return "C_WEAPONTYPE";
     case C_SHIELDTYPE: return "C_SHIELDTYPE";
+    case C_POTIONTYPE: return "C_POTIONTYPE";
     case C_COUNT: return "C_COUNT";
     default: break;
     }
@@ -209,11 +212,10 @@ typedef struct shieldtype_component_t {
 
 #define MAX_POTION_EFFECTS 4
 
-typedef struct potion_component_t {
+typedef struct potion_type_component_t {
     entityid id;
-    potion_effect potioneffect[MAX_POTION_EFFECTS];
-    size_t num_effects;
-} potion_component;
+    potiontype type;
+} potiontype_component;
 
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
@@ -236,4 +238,5 @@ void init_stats_component(stats_component* comp, entityid id);
 void init_itemtype_component(itemtype_component* comp, entityid id, itemtype type);
 void init_weapontype_component(weapontype_component* comp, entityid id, weapontype type);
 void init_shieldtype_component(shieldtype_component* comp, entityid id, shieldtype type);
-void init_potion_component(potion_component* comp, entityid id, potion_effect* effects, size_t num_effects);
+//void init_potion_component(potiontype_component* comp, entityid id, potiontype type);
+void init_potiontype_component(potiontype_component* comp, entityid id, potiontype type);

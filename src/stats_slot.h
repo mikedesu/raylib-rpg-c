@@ -7,6 +7,12 @@ typedef enum stats_slot_t
     STATS_XP,
     STATS_HP,
     STATS_MAXHP,
+    //STATS_STR,
+    //STATS_DEX,
+    //STATS_CON,
+    //STATS_INT,
+    //STATS_WIS,
+    //STATS_CHA,
     STATS_COUNT
 } stats_slot;
 
