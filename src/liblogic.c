@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static entityid next_entityid = 0; // Start at 0, increment for each new entity
+//static entityid next_entityid = 0; // Start at 0, increment for each new entity
 
 //static inline size_t tile_npc_count_at(gamestate* const g, int x, int y, int z);
 
@@ -968,8 +968,8 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
-    entityid id = next_entityid++;
-    gs_add_entityid(g, id);
+    entityid id = g->next_entityid++;
+    //gs_add_entityid(g, id);
     //minfo("registering name: %s", name);
     g_register_comp(g, id, C_NAME);
     //minfo("registering type: %d", ENTITY_NPC);
@@ -1081,8 +1081,8 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
-    entityid id = next_entityid++;
-    gs_add_entityid(g, id);
+    entityid id = g->next_entityid++;
+    //gs_add_entityid(g, id);
     //minfo("registering name: %s", name);
     g_register_comp(g, id, C_NAME);
     //minfo("registering type: %d", ENTITY_NPC);
@@ -1882,7 +1882,7 @@ static void update_debug_panel_buffer(gamestate* const g) {
              control_mode,
              g->d->current_floor + 1, // More user-friendly 1-based
              g->d->num_floors,
-             g->index_entityids,
+             g->next_entityid,
              flag_name,
              g->entity_turn,
              x,
@@ -1900,7 +1900,7 @@ void liblogic_init(gamestate* const g) {
     massert(g, "liblogic_init: gamestate is NULL");
     srand(time(NULL));
     init_dungeon(g);
-    gamestate_init_entityids(g);
+    //gamestate_init_entityids(g);
     g->msg_system.count = 0;
     g->msg_system.index = 0;
     g->msg_system.is_active = false;
@@ -1999,18 +1999,19 @@ static inline void update_npc_state(gamestate* const g, entityid id) {
 
 static void update_npcs_state(gamestate* const g) {
     massert(g, "Game state is NULL!");
-    for (int i = 0; i < g->index_entityids; i++) {
-        entityid id = g->entityids[i];
+    //for (int i = 0; i < g->index_entityids; i++) {
+    for (entityid id = 0; id < g->next_entityid; id++) {
         if (id == g->hero_id) continue;
         update_npc_state(g, id);
     }
 }
 
-static void handle_nth_npc(gamestate* const g, int i) {
+//static void handle_nth_npc(gamestate* const g, int i) {
+static void handle_npc(gamestate* const g, entityid id) {
     massert(g, "Game state is NULL!");
-    massert(i >= 0, "Index is out of bounds!");
-    massert(i < g->index_entityids, "Index is out of bounds!");
-    entityid id = g->entityids[i];
+    //massert(i >= 0, "Index is out of bounds!");
+    //massert(i < g->index_entityids, "Index is out of bounds!");
+    //entityid id = g->entityids[i];
     if (id == g->hero_id) {
         //minfo("Skipping hero");
         return; // Skip the hero
@@ -2025,7 +2026,8 @@ static void handle_npcs(gamestate* const g) {
     massert(g, "Game state is NULL!");
     massert(g->flag == GAMESTATE_FLAG_NPC_TURN, "Game state is not in NPC turn!");
     // Process all NPCs
-    for (int i = 0; i < g->index_entityids; i++) handle_nth_npc(g, i);
+    //for (int i = 0; i < g->index_entityids; i++) handle_nth_npc(g, i);
+    for (entityid id = 0; id < g->next_entityid; id++) handle_npc(g, id);
     // After processing all NPCs, set the flag to animate all movements together
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }

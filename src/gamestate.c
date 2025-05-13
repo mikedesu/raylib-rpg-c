@@ -69,16 +69,16 @@ gamestate* gamestateinitptr() {
     g->controlmode = CONTROLMODE_PLAYER;
     g->fadestate = FADESTATENONE;
     g->d = NULL;
-    g->entityids = NULL;
-    g->index_entityids = 0;
-    g->max_entityids = -1;
+    //g->entityids = NULL;
+    //g->index_entityids = 0;
+    //g->max_entityids = -1;
     g->hero_id = -1;
     // current displayed dungeon floor
     g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
     g->entity_turn = -1;
     g->gameover = false;
     g->test_guard = false;
-    g->font_size = 20;
+    g->font_size = 10;
     g->pad = 20;
     g->line_spacing = 1.0f;
     g->inventory_menu_selection = 0;
@@ -174,6 +174,8 @@ gamestate* gamestateinitptr() {
     g->shieldtype_list = (shieldtype_component*)malloc(sizeof(shieldtype_component) * n);
     massert(g->shieldtype_list, "g->shieldtype_list is NULL");
 
+    g->next_entityid = 0;
+
     gamestate_init_msg_history(g);
     return g;
 }
@@ -223,7 +225,7 @@ void gamestatefree(gamestate* g) {
     // free message history
     gamestate_free_msg_history(g);
     ct_destroy(g->components);
-    free(g->entityids);
+    //free(g->entityids);
     free(g->name_list);
     free(g->type_list);
     free(g->race_list);
@@ -246,16 +248,16 @@ void gamestatefree(gamestate* g) {
     msuccess("Freed gamestate");
 }
 
-bool gs_add_entityid(gamestate* const g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != -1, "id is -1");
-    massert(g->index_entityids < g->max_entityids, "index_entityids >= max_entityids");
-    massert(g->entityids, "g->entityids is NULL");
-    massert(g->index_entityids == id, "index_entityids != id");
-    g->entityids[g->index_entityids] = id;
-    g->index_entityids++;
-    return true;
-}
+//bool gs_add_entityid(gamestate* const g, entityid id) {
+//    massert(g, "g is NULL");
+//    massert(id != -1, "id is -1");
+//    massert(g->index_entityids < g->max_entityids, "index_entityids >= max_entityids");
+//    massert(g->entityids, "g->entityids is NULL");
+//    massert(g->index_entityids == id, "index_entityids != id");
+//    g->entityids[g->index_entityids] = id;
+//    g->index_entityids++;
+//    return true;
+//}
 
 void gamestate_set_hero_id(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
@@ -267,21 +269,21 @@ entityid gamestate_get_hero_id(const gamestate* const g) {
     return g->hero_id;
 }
 
-void gamestate_init_entityids(gamestate* const g) {
-    massert(g, "g is NULL");
-    g->entityids = (entityid*)malloc(sizeof(entityid) * GAMESTATE_INIT_ENTITYIDS_MAX);
-    if (g->entityids == NULL) {
-        merror("g->entityids is NULL");
-        return;
-    }
-    for (int i = 0; i < g->max_entityids; i++) {
-        g->entityids[i] = -1;
-    }
-    g->index_entityids = 0;
-    g->max_entityids = GAMESTATE_INIT_ENTITYIDS_MAX;
-}
+//void gamestate_init_entityids(gamestate* const g) {
+//    massert(g, "g is NULL");
+//    g->entityids = (entityid*)malloc(sizeof(entityid) * GAMESTATE_INIT_ENTITYIDS_MAX);
+//    if (g->entityids == NULL) {
+//        merror("g->entityids is NULL");
+//        return;
+//    }
+//    for (int i = 0; i < g->max_entityids; i++) {
+//        g->entityids[i] = -1;
+//    }
+//    g->index_entityids = 0;
+//    g->max_entityids = GAMESTATE_INIT_ENTITYIDS_MAX;
+//}
 
-entityid gamestate_get_entityid_unsafe(const gamestate* const g, int index) { return g->entityids[index]; }
+//entityid gamestate_get_entityid_unsafe(const gamestate* const g, int index) { return g->entityids[index]; }
 
 //void gamestate_dungeon_destroy(gamestate* const g) {
 //    if (!g) {
@@ -292,54 +294,54 @@ entityid gamestate_get_entityid_unsafe(const gamestate* const g, int index) { re
 //    g->dungeon = NULL;
 //}
 
-int gamestate_get_entityid_index(const gamestate* const g, entityid id) {
-    if (!g) {
-        merror("g is NULL");
-        return -1;
-    }
-    for (int i = 0; i < g->max_entityids; i++) {
-        if (g->entityids[i] == id) {
-            return i;
-        }
-    }
-    return -1;
-}
+//int gamestate_get_entityid_index(const gamestate* const g, entityid id) {
+//    if (!g) {
+//        merror("g is NULL");
+//        return -1;
+//    }
+//    for (int i = 0; i < g->max_entityids; i++) {
+//        if (g->entityids[i] == id) {
+//            return i;
+//        }
+//    }
+//    return -1;
+//}
 
-int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, int index) {
-    if (!g) {
-        merror("g is NULL");
-        return -1;
-    }
-    for (int i = index + 1; i < g->max_entityids; i++) {
-        if (g->entityids[i] != -1) {
-            return g->entityids[i];
-        }
-    }
-    return -1;
-}
+//int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, int index) {
+//    if (!g) {
+//        merror("g is NULL");
+//        return -1;
+//    }
+//    for (int i = index + 1; i < g->max_entityids; i++) {
+//        if (g->entityids[i] != -1) {
+//            return g->entityids[i];
+//        }
+//    }
+//    return -1;
+//}
 
-void gamestate_incr_entity_turn(gamestate* const g) {
-    if (!g) {
-        merror("g is NULL");
-        return;
-    }
-    if (g->entity_turn == -1) {
-        if (g->hero_id == -1) {
-            merror("both g->entity_turn and g->hero_id are -1");
-            return;
-        }
-        g->entity_turn = g->hero_id;
-    } else {
-        // given that entity_turn is an entityid, we need to find the next entity in our
-        // entityids array that belongs to an NPC
-        const int index = gamestate_get_entityid_index(g, g->entity_turn);
-        if (index == -1) {
-            merror("index is -1");
-            return;
-        }
-        g->entity_turn = gamestate_get_next_npc_entityid_from_index(g, index);
-    }
-}
+//void gamestate_incr_entity_turn(gamestate* const g) {
+//    if (!g) {
+//        merror("g is NULL");
+//        return;
+//    }
+//    if (g->entity_turn == -1) {
+//        if (g->hero_id == -1) {
+//            merror("both g->entity_turn and g->hero_id are -1");
+//            return;
+//        }
+//        g->entity_turn = g->hero_id;
+//    } else {
+//        // given that entity_turn is an entityid, we need to find the next entity in our
+//        // entityids array that belongs to an NPC
+//        const int index = gamestate_get_entityid_index(g, g->entity_turn);
+//        if (index == -1) {
+//            merror("index is -1");
+//            return;
+//        }
+//        g->entity_turn = gamestate_get_next_npc_entityid_from_index(g, index);
+//    }
+//}
 
 void gamestate_load_keybindings(gamestate* const g) {
     if (!g) {
@@ -440,7 +442,9 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     //massert(*c_count < *c_capacity, "c_count >= c_capacity: %d >= %d", *c_count, *c_capacity);
     massert(*c_capacity > 0, "c_capacity is 0");
     massert(*c_count >= 0, "c_count is negative");
-    massert(*c_count < g->max_entityids, "c_count >= g->max_entityids: %d >= %d", *c_count, g->max_entityids);
+    //massert(*c_count < g->max_entityids, "c_count >= g->max_entityids: %d >= %d", *c_count, g->max_entityids);
+    massert(*c_count <= g->next_entityid, "c_count >= g->next_entityid: %d >= %d", *c_count, g->next_entityid);
+
     massert(ct_has_entity(g->components, id), "id %d does not exist in component table", id);
     massert(g_has_component(g, id, comp), "id %d does not have the required component registered", id);
 

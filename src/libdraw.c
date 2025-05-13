@@ -24,11 +24,11 @@
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
-#define DEFAULT_WIN_WIDTH 960
-#define DEFAULT_WIN_HEIGHT 540
+//#define DEFAULT_WIN_WIDTH 960
+//#define DEFAULT_WIN_HEIGHT 540
 
-//#define DEFAULT_WIN_WIDTH 1920
-//#define DEFAULT_WIN_HEIGHT 1080
+#define DEFAULT_WIN_WIDTH 1920
+#define DEFAULT_WIN_HEIGHT 1080
 
 //#define DEFAULT_WIN_WIDTH 1280
 //#define DEFAULT_WIN_HEIGHT 720
@@ -398,9 +398,9 @@ static inline bool libdraw_camera_lock_on(gamestate* const g) {
 }
 
 static bool libdraw_check_default_animations(const gamestate* const g) {
-    massert(g, "libdraw_check_default_animations: gamestate is NULL");
-    for (int i = 0; i < g->index_entityids; i++) {
-        const entityid id = g->entityids[i];
+    massert(g, "gamestate is NULL");
+    for (entityid id = 0; id < g->next_entityid; id++) {
+        //const entityid id = g->entityids[i];
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
         if (sg && sg->current != sg->default_anim) {
             // which sg isnt done?
@@ -809,8 +809,8 @@ void libdraw_update_sprites(gamestate* const g) {
         return;
     }
     // for each entityid in our entitymap, update the spritegroup
-    for (int i = 0; i < g->index_entityids; i++) {
-        const entityid id = g->entityids[i];
+    //for (int i = 0; i < g->index_entityids; i++) {
+    for (entityid id = 0; id < g->next_entityid; id++) {
         libdraw_update_sprite(g, id);
     }
     libdraw_handle_gamestate_flag(g);
@@ -884,11 +884,9 @@ static void draw_message_box(gamestate* g) {
     const char* msg = g->msg_system.messages[g->msg_system.index];
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     //Color message_bg = (Color){0, 0, 0xff, 0xff};
-
     // copy the message to a temporary buffer
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg);
-
     // Measure text (split into lines if needed)
     int text_width = MeasureText(msg, g->font_size);
     int text_height = g->font_size;
@@ -904,7 +902,7 @@ static void draw_message_box(gamestate* g) {
     //DrawText(msg, box.x + g->pad, box.y + g->pad, g->font_size, WHITE);
     DrawText(tmp, box.x + g->pad, box.y + g->pad, g->font_size, WHITE);
     // Show "Next" prompt if more messages exist
-    if (g->msg_system.count > 1) {
+    if (g->msg_system.count > 1 && g->msg_system.index < g->msg_system.count - 1) {
         int prompt_font_size = 10;
         int prompt_offset = 10; // Offset from box edges
         char tmp_prompt[1024] = {0};
@@ -912,7 +910,7 @@ static void draw_message_box(gamestate* g) {
         Vector2 prompt_size = MeasureTextEx(GetFontDefault(), tmp_prompt, prompt_font_size, 1.0f);
         DrawText(tmp_prompt,
                  box.x + box.width - prompt_size.x - prompt_offset, // Right-align in box
-                 box.y + box.height - prompt_size.y - prompt_offset, // Bottom of box
+                 box.y + box.height - prompt_size.y - prompt_offset / 2.0, // Bottom of box
                  prompt_font_size,
                  WHITE);
     }
@@ -1021,7 +1019,7 @@ static void load_textures() {
     const char* textures_file = "textures.txt";
     FILE* file = fopen(textures_file, "r");
     if (!file) {
-        merror("load_textures: textures.txt not found");
+        merror("textures.txt not found");
         return;
     }
     char line[1024] = {0};
@@ -1032,10 +1030,13 @@ static void load_textures() {
         int do_dither = 0;
         char path[512] = {0};
         // check if the line begins with a #
-        if (line[0] == '#') continue;
+        if (line[0] == '#') {
+            minfo("skipping comment line");
+            continue;
+        }
         sscanf(line, "%d %d %d %d %s", &txkey, &contexts, &frames, &do_dither, path);
         if (txkey < 0 || contexts < 0 || frames < 0) {
-            merror("libdraw_load_textures: invalid line in textures.txt");
+            merror("invalid line in textures.txt");
             continue;
         }
         load_texture(txkey, contexts, frames, do_dither, path);
@@ -1046,22 +1047,19 @@ static void load_textures() {
 static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
     //minfo("create_spritegroup");
     if (!g) {
-        merror("create_spritegroup: gamestate is NULL");
+        merror("gamestate is NULL");
         return;
     }
-    //msuccess("g was not NULL");
     // can hold up to 32 sprites
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
     if (!group) {
-        merror("create_spritegroup: failed to create spritegroup");
+        merror("failed to create spritegroup");
         return;
     }
-    //msuccess("group was not NULL");
-    //msuccess("entity found %d", id);
     //disabling this check until dungeon_floor created
     dungeon_floor_t* df = d_get_current_floor(g->d);
     if (!df) {
-        merror("create_spritegroup: dungeon_floor is NULL");
+        merror("dungeon_floor is NULL");
         spritegroup_destroy(group);
         return;
     }
@@ -1069,11 +1067,10 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
     const int df_h = df->height;
     loc_t loc = g_get_location(g, id);
     if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
-        merror("create_spritegroup: entity pos out of bounds %d %d", loc.x, loc.y);
+        merror("entity pos out of bounds %d %d", loc.x, loc.y);
         spritegroup_destroy(group);
         return;
     }
-    //minfo("create_spritegroup: creating spritegroup for entityid %d", id);
     for (int i = 0; i < num_keys; i++) {
         const int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
@@ -1084,15 +1081,12 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
     group->id = id;
     sprite* s = spritegroup_get(group, 0);
     if (!s) {
-        merror("create_spritegroup: sprite is NULL");
+        merror("sprite is NULL");
         spritegroup_destroy(group);
         return;
     }
-    const float w = s->width, h = s->height;
-    const float dst_x = loc.x * DEFAULT_TILE_SIZE;
-    const float dst_y = loc.y * DEFAULT_TILE_SIZE;
     group->current = 0;
-    group->dest = (Rectangle){dst_x + offset_x, dst_y + offset_y, w, h};
+    group->dest = (Rectangle){loc.x * DEFAULT_TILE_SIZE + offset_x, loc.y * DEFAULT_TILE_SIZE + offset_y, s->width, s->height};
     group->off_x = offset_x;
     group->off_y = offset_y;
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
@@ -1210,8 +1204,10 @@ static void draw_hud(gamestate* const g) {
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, g->font_size, g->line_spacing);
     const int box_w = text_size.x + g->pad;
     const int box_h = text_size.y + g->pad;
-    const int box_x = (g->windowwidth - box_w) / 2;
-    const int box_y = (g->windowheight - box_h) * 7 / 8;
+    //const int box_x = (g->windowwidth - box_w) / 2;
+    //const int box_y = (g->windowheight - box_h) * 7 / 8;
+    const int box_x = 0;
+    const int box_y = 0;
     const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
     //const Color bg = (Color){0, 0, 0xff, 0xFF}, fg = WHITE;
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
@@ -1238,9 +1234,7 @@ void libdraw_init(gamestate* const g) {
     target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
     load_textures();
-    for (int i = 0; i < g->index_entityids; i++) {
-        create_sg_byid(g, g->entityids[i]);
-    }
+    for (entityid i = 0; i < g->next_entityid; i++) create_sg_byid(g, i);
     calc_debugpanel_size(g);
     load_shaders();
     g->cam2d.offset = (Vector2){x, y};
@@ -1255,8 +1249,8 @@ static void draw_message_history(gamestate* const g) {
         return;
     }
     const int max_messages = 20;
-    const int x = 10;
-    const int y = 10;
+    const int x = 0;
+    const int y = 42;
     int current_count = 0;
     char tmp_buffer[2048] = {0};
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
@@ -1276,12 +1270,16 @@ static void draw_message_history(gamestate* const g) {
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp_buffer, g->font_size, g->line_spacing);
     // Calculate box position
     // we want the box to be in the top left corner of the screen
-    const Rectangle box = {.x = x, .y = y, .width = text_size.x + g->pad * 2, .height = text_size.y + g->pad * 2};
+    //const Rectangle box = {.x = x, .y = y, .width = text_size.x + g->pad * 2, .height = text_size.y + g->pad * 2};
+    const Rectangle box = {.x = x, .y = y, .width = text_size.x + g->pad, .height = text_size.y + g->pad};
     // Draw box (semi-transparent black with white border)
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
     // Draw text (centered in box)
-    DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){box.x + g->pad, box.y + g->pad}, g->font_size, g->line_spacing, WHITE);
+    const float text_x = box.x + (box.width - text_size.x) / 2;
+    const float text_y = box.y + (box.height - text_size.y) / 2;
+    //DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){box.x + g->pad, box.y + g->pad}, g->font_size, g->line_spacing, WHITE);
+    DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){text_x, text_y}, g->font_size, g->line_spacing, WHITE);
 }
 
 static void draw_inventory_menu(gamestate* const g) {
