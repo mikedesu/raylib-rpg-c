@@ -160,6 +160,10 @@ typedef struct gamestate {
 
     entityid next_entityid; // Start at 0, increment for each new entity
 
+    bool dirty_entities; // true if new entities created this turn
+    entityid new_entityid_begin;
+    entityid new_entityid_end;
+
 } gamestate;
 
 gamestate* gamestateinitptr();

@@ -968,7 +968,16 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
-    entityid id = g->next_entityid++;
+    entityid id = g->next_entityid;
+    if (!g->dirty_entities) {
+        g->dirty_entities = true;
+        g->new_entityid_begin = id;
+        g->new_entityid_end = id + 1;
+    } else {
+        //g->dirty_entities = true;
+        g->new_entityid_end = id + 1;
+    }
+    g->next_entityid++;
     //gs_add_entityid(g, id);
     //minfo("registering name: %s", name);
     g_register_comp(g, id, C_NAME);
@@ -1081,7 +1090,18 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
-    entityid id = g->next_entityid++;
+    //entityid id = g->next_entityid++;
+    entityid id = g->next_entityid;
+    if (!g->dirty_entities) {
+        g->dirty_entities = true;
+        g->new_entityid_begin = id;
+        g->new_entityid_end = id + 1;
+    } else {
+        //g->dirty_entities = true;
+        g->new_entityid_end = id + 1;
+    }
+    g->next_entityid++;
+
     //gs_add_entityid(g, id);
     //minfo("registering name: %s", name);
     g_register_comp(g, id, C_NAME);
@@ -1917,7 +1937,7 @@ void liblogic_init(gamestate* const g) {
     //init_potion_test(g, POTION_HP_MEDIUM, "medium healing potion");
     //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
     //init_npcs_test_by_room(g);
-    init_npc_test(g);
+    //init_npc_test(g);
     init_sword_test(g);
     init_shield_test(g);
     update_debug_panel_buffer(g);
@@ -2046,6 +2066,26 @@ static inline void reset_player_block_success(gamestate* const g) {
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
+
+    // test entity creation on the fly
+    static bool do_this_once = true;
+    if (g->turn_count % 5 == 0) {
+        bool success = false;
+        if (do_this_once) {
+            while (!success) {
+                loc_t loc = get_random_empty_non_wall_loc(g, 0);
+                entityid id = npc_create(g, RACE_ORC, loc, "orc");
+                if (id != ENTITYID_INVALID) {
+                    g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+                    success = true;
+                }
+            }
+            do_this_once = false;
+        }
+    } else {
+        do_this_once = true;
+    }
+
     update_player_state(g);
     update_npcs_state(g);
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {

@@ -176,6 +176,10 @@ gamestate* gamestateinitptr() {
 
     g->next_entityid = 0;
 
+    g->dirty_entities = false;
+    g->new_entityid_begin = -1;
+    g->new_entityid_end = -1;
+
     gamestate_init_msg_history(g);
     return g;
 }

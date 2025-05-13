@@ -761,6 +761,7 @@ static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegro
 }
 
 static void libdraw_update_sprite(gamestate* const g, entityid id) {
+    minfo("update sprite: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
@@ -804,16 +805,25 @@ static void libdraw_handle_gamestate_flag(gamestate* const g) {
 }
 
 void libdraw_update_sprites(gamestate* const g) {
-    if (!g) {
-        merror("gamestate is NULL");
-        return;
+    minfo("libdraw_update_sprites");
+    if (g) {
+        if (g->dirty_entities) {
+            minfo("libdraw_update_sprites: dirty_entities");
+            for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++) {
+                create_sg_byid(g, i);
+            }
+
+            g->dirty_entities = false;
+            g->new_entityid_begin = ENTITYID_INVALID;
+            g->new_entityid_end = ENTITYID_INVALID;
+        }
+        // for each entityid in our entitymap, update the spritegroup
+        //for (int i = 0; i < g->index_entityids; i++) {
+        for (entityid id = 0; id < g->next_entityid; id++) {
+            libdraw_update_sprite(g, id);
+        }
+        libdraw_handle_gamestate_flag(g);
     }
-    // for each entityid in our entitymap, update the spritegroup
-    //for (int i = 0; i < g->index_entityids; i++) {
-    for (entityid id = 0; id < g->next_entityid; id++) {
-        libdraw_update_sprite(g, id);
-    }
-    libdraw_handle_gamestate_flag(g);
 }
 
 static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
@@ -1234,7 +1244,7 @@ void libdraw_init(gamestate* const g) {
     target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
     load_textures();
-    for (entityid i = 0; i < g->next_entityid; i++) create_sg_byid(g, i);
+    //for (entityid i = 0; i < g->next_entityid; i++) create_sg_byid(g, i);
     calc_debugpanel_size(g);
     load_shaders();
     g->cam2d.offset = (Vector2){x, y};
