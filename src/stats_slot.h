@@ -1,0 +1,13 @@
+#pragma once
+
+typedef enum stats_slot_t
+{
+    STATS_NONE,
+    STATS_LEVEL,
+    STATS_XP,
+    STATS_HP,
+    STATS_MAXHP,
+    STATS_COUNT
+} stats_slot;
+
+#define MAX_STATS_SLOTS 5

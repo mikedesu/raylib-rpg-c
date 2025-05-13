@@ -761,7 +761,7 @@ static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegro
 }
 
 static void libdraw_update_sprite(gamestate* const g, entityid id) {
-    minfo("update sprite: %d", id);
+    //minfo("update sprite: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
@@ -805,7 +805,7 @@ static void libdraw_handle_gamestate_flag(gamestate* const g) {
 }
 
 void libdraw_update_sprites(gamestate* const g) {
-    minfo("libdraw_update_sprites");
+    //minfo("libdraw_update_sprites");
     if (g) {
         if (g->dirty_entities) {
             minfo("libdraw_update_sprites: dirty_entities");

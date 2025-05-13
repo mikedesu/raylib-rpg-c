@@ -85,51 +85,33 @@ gamestate* gamestateinitptr() {
 
     g->components = ct_create();
 
-    g->name_list_count = 0;
-    g->type_list_count = 0;
-    g->race_list_count = 0;
-    g->direction_list_count = 0;
-    g->loc_list_count = 0;
-    g->sprite_move_list_count = 0;
-    g->dead_list_count = 0;
-    g->update_list_count = 0;
-    g->attacking_list_count = 0;
-    g->blocking_list_count = 0;
-    g->block_success_list_count = 0;
-    g->damaged_list_count = 0;
-    g->inventory_list_count = 0;
-    g->target_list_count = 0;
-    g->target_path_list_count = 0;
-    g->default_action_list_count = 0;
-    g->equipment_list_count = 0;
-    g->stats_list_count = 0;
-    g->itemtype_list_count = 0;
-    g->weapontype_list_count = 0;
+    g->name_list_count = g->type_list_count = 0;
+    g->race_list_count = g->direction_list_count = 0;
+    g->loc_list_count = g->sprite_move_list_count = 0;
+    g->dead_list_count = g->update_list_count = 0;
+    g->attacking_list_count = g->blocking_list_count = 0;
+    g->block_success_list_count = g->damaged_list_count = 0;
+    g->inventory_list_count = g->target_list_count = 0;
+    g->target_path_list_count = g->default_action_list_count = 0;
+    g->equipment_list_count = g->stats_list_count = 0;
+    g->itemtype_list_count = g->weapontype_list_count = 0;
     g->shieldtype_list_count = 0;
+    //g->potion_list_count = 0;
 
     const size_t n = LIST_INIT_CAPACITY;
 
-    g->name_list_capacity = n;
-    g->type_list_capacity = n;
-    g->race_list_capacity = n;
-    g->direction_list_capacity = n;
-    g->loc_list_capacity = n;
-    g->sprite_move_list_capacity = n;
-    g->dead_list_capacity = n;
-    g->update_list_capacity = n;
-    g->attacking_list_capacity = n;
-    g->blocking_list_capacity = n;
-    g->block_success_list_capacity = n;
-    g->damaged_list_capacity = n;
-    g->inventory_list_capacity = n;
-    g->target_list_capacity = n;
-    g->target_path_list_capacity = n;
-    g->default_action_list_capacity = n;
-    g->equipment_list_capacity = n;
-    g->stats_list_capacity = n;
-    g->itemtype_list_capacity = n;
-    g->weapontype_list_capacity = n;
+    g->name_list_capacity = g->type_list_capacity = n;
+    g->race_list_capacity = g->direction_list_capacity = n;
+    g->loc_list_capacity = g->sprite_move_list_capacity = n;
+    g->dead_list_capacity = g->update_list_capacity = n;
+    g->attacking_list_capacity = g->blocking_list_capacity = n;
+    g->block_success_list_capacity = g->damaged_list_capacity = n;
+    g->inventory_list_capacity = g->target_list_capacity = n;
+    g->target_path_list_capacity = g->default_action_list_capacity = n;
+    g->equipment_list_capacity = g->stats_list_capacity = n;
+    g->itemtype_list_capacity = g->weapontype_list_capacity = n;
     g->shieldtype_list_capacity = n;
+    //g->potion_list_capacity = n;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * n);
     massert(g->name_list, "g->name_list is NULL");
@@ -173,6 +155,8 @@ gamestate* gamestateinitptr() {
     massert(g->weapontype_list, "g->weapontype_list is NULL");
     g->shieldtype_list = (shieldtype_component*)malloc(sizeof(shieldtype_component) * n);
     massert(g->shieldtype_list, "g->shieldtype_list is NULL");
+    //g->potion_list = (potion_component*)malloc(sizeof(potion_component) * n);
+    //massert(g->potion_list, "g->potion_list is NULL");
 
     g->next_entityid = 0;
 

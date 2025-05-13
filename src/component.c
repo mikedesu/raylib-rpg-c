@@ -312,3 +312,19 @@ void init_shieldtype_component(shieldtype_component* comp, entityid id, shieldty
     comp->id = id;
     comp->type = type;
 }
+
+void init_potion_component(potion_component* comp, entityid id, potion_effect* effects, size_t num_effects) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) {
+        return;
+    }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        return;
+    }
+    comp->id = id;
+    comp->num_effects = num_effects;
+    for (size_t i = 0; i < num_effects; i++) {
+        comp->potioneffect[i] = effects[i];
+    }
+}

@@ -1,13 +1,16 @@
 #pragma once
 
+#include "attrib_effect.h"
 #include "direction.h"
 #include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "item.h"
 #include "location.h"
+#include "potion.h"
 #include "race.h"
 #include "shield.h"
+#include "stats_slot.h"
 #include "weapon.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -173,16 +176,16 @@ typedef struct equipment_component_t {
     entityid equipment[MAX_EQUIPMENT_SLOTS];
 } equipment_component;
 
-typedef enum stats_slot_t
-{
-    STATS_LEVEL,
-    STATS_XP,
-    STATS_HP,
-    STATS_MAXHP,
-    STATS_COUNT
-} stats_slot;
+//typedef enum stats_slot_t
+//{
+//    STATS_LEVEL,
+//    STATS_XP,
+//    STATS_HP,
+//    STATS_MAXHP,
+//    STATS_COUNT
+//} stats_slot;
 
-#define MAX_STATS_SLOTS 4
+//#define MAX_STATS_SLOTS 4
 
 typedef struct stats_component_t {
     entityid id;
@@ -203,6 +206,14 @@ typedef struct shieldtype_component_t {
     entityid id;
     shieldtype type;
 } shieldtype_component;
+
+#define MAX_POTION_EFFECTS 4
+
+typedef struct potion_component_t {
+    entityid id;
+    potion_effect potioneffect[MAX_POTION_EFFECTS];
+    size_t num_effects;
+} potion_component;
 
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
@@ -225,3 +236,4 @@ void init_stats_component(stats_component* comp, entityid id);
 void init_itemtype_component(itemtype_component* comp, entityid id, itemtype type);
 void init_weapontype_component(weapontype_component* comp, entityid id, weapontype type);
 void init_shieldtype_component(shieldtype_component* comp, entityid id, shieldtype type);
+void init_potion_component(potion_component* comp, entityid id, potion_effect* effects, size_t num_effects);

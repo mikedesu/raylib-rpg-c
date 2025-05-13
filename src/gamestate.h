@@ -110,6 +110,7 @@ typedef struct gamestate {
     itemtype_component* itemtype_list;
     weapontype_component* weapontype_list;
     shieldtype_component* shieldtype_list;
+    //potion_component* potion_list;
 
     int name_list_count;
     int name_list_capacity;
@@ -157,6 +158,8 @@ typedef struct gamestate {
     int weapontype_list_capacity;
     int shieldtype_list_count;
     int shieldtype_list_capacity;
+    //int potion_list_count;
+    //int potion_list_capacity;
 
     entityid next_entityid; // Start at 0, increment for each new entity
 
@@ -319,3 +322,5 @@ bool g_has_shieldtype(const gamestate* const g, entityid id);
 bool g_set_shieldtype(gamestate* const g, entityid id, shieldtype type);
 shieldtype g_get_shieldtype(const gamestate* const g, entityid id);
 bool g_is_shieldtype(const gamestate* const g, entityid id, shieldtype type);
+
+//bool g_add_potion(gamestate* const g, entityid id, attrib_effect effect);
