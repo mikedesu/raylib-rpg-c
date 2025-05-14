@@ -97,7 +97,7 @@ gamestate* gamestateinitptr() {
     g->equipment_list_count = g->stats_list_count = 0;
     g->itemtype_list_count = g->weapontype_list_count = 0;
     g->shieldtype_list_count = 0;
-    //g->potion_list_count = 0;
+    g->potion_type_list_count = 0;
 
     const size_t n = LIST_INIT_CAPACITY;
 
@@ -112,7 +112,7 @@ gamestate* gamestateinitptr() {
     g->equipment_list_capacity = g->stats_list_capacity = n;
     g->itemtype_list_capacity = g->weapontype_list_capacity = n;
     g->shieldtype_list_capacity = n;
-    //g->potion_list_capacity = n;
+    g->potion_type_list_capacity = n;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * n);
     massert(g->name_list, "g->name_list is NULL");
@@ -156,8 +156,8 @@ gamestate* gamestateinitptr() {
     massert(g->weapontype_list, "g->weapontype_list is NULL");
     g->shieldtype_list = (shieldtype_component*)malloc(sizeof(shieldtype_component) * n);
     massert(g->shieldtype_list, "g->shieldtype_list is NULL");
-    //g->potion_list = (potion_component*)malloc(sizeof(potion_component) * n);
-    //massert(g->potion_list, "g->potion_list is NULL");
+    g->potion_type_list = (potiontype_component*)malloc(sizeof(potiontype_component) * n);
+    massert(g->potion_type_list, "g->potion_list is NULL");
 
     g->next_entityid = 0;
 
@@ -374,6 +374,7 @@ void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
 }
 
 bool g_register_comp(gamestate* const g, entityid id, component comp) {
+    minfo("g_register_comp: id: %d, comp: %s", id, component2str(comp));
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(comp != C_COUNT, "comp is invalid");
@@ -420,6 +421,7 @@ bool g_register_comps(gamestate* const g, entityid id, ...) {
 }
 
 bool g_add_component(gamestate* const g, entityid id, component comp, void* data, size_t c_size, void** c_list, int* c_count, int* c_capacity) {
+    minfo("g_add_component: id: %d, comp: %s", id, component2str(comp));
     massert(g, "g is NULL");
     if (!data) {
         mwarning("data is NULL");
@@ -427,7 +429,9 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
 
     //massert(data, "data is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
+
     massert(*c_list, "c_list is NULL");
+
     //massert(*c_count < *c_capacity, "c_count >= c_capacity: %d >= %d", *c_count, *c_capacity);
     massert(*c_capacity > 0, "c_capacity is 0");
     massert(*c_count >= 0, "c_count is negative");
@@ -441,7 +445,8 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
         *c_capacity *= 2;
         *c_list = realloc(*c_list, c_size * (*c_capacity));
         if (*c_list == NULL) {
-            merror("c_list is NULL");
+            merror("c_list is NULL: realloc failed");
+            merror("c_count: %d, c_capacity: %d", *c_count, *c_capacity);
             return false;
         }
     }
@@ -472,10 +477,14 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     case C_STATS: init_stats_component((stats_component*)c_ptr, id); break;
     case C_ITEMTYPE: init_itemtype_component((itemtype_component*)c_ptr, id, *(itemtype*)data); break;
     case C_WEAPONTYPE: init_weapontype_component((weapontype_component*)c_ptr, id, *(weapontype*)data); break;
-    default: merror("Unsupported component type: %d", comp); return false;
+    case C_SHIELDTYPE: init_shieldtype_component((shieldtype_component*)c_ptr, id, *(shieldtype*)data); break;
+    case C_POTIONTYPE: init_potiontype_component((potiontype_component*)c_ptr, id, *(potiontype*)data); break;
+    default: merror("Unsupported component type: %s", component2str(comp)); return false;
     }
 
     (*c_count)++;
+
+    msuccess("Added component %s to entity %d", component2str(comp), id);
     return true;
 }
 
@@ -1683,12 +1692,13 @@ bool g_is_potion(const gamestate* const g, entityid id) {
         merror("g->potion_type_list is NULL");
         return false;
     }
-    for (int i = 0; i < g->potion_type_list_count; i++) {
-        if (g->potion_type_list[i].id == id) {
-            return g->potion_type_list[i].type == POTION_NONE;
-        }
-    }
-    return false;
+    return g_has_potiontype(g, id);
+    //for (int i = 0; i < g->potion_type_list_count; i++) {
+    //    if (g->potion_type_list[i].id == id) {
+    //        return g->potion_type_list[i].type == POTION_NONE;
+    //    }
+    //}
+    //return false;
 }
 
 potiontype g_get_potiontype(const gamestate* const g, entityid id) {

@@ -210,7 +210,7 @@ typedef struct shieldtype_component_t {
     shieldtype type;
 } shieldtype_component;
 
-#define MAX_POTION_EFFECTS 4
+//#define MAX_POTION_EFFECTS 4
 
 typedef struct potion_type_component_t {
     entityid id;

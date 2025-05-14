@@ -4,7 +4,9 @@
 
 ct* ct_create() {
     ct* table = malloc(sizeof(ct));
-    if (!table) { return NULL; }
+    if (!table) {
+        return NULL;
+    }
     table->component_col_count = C_COUNT;
     table->component_row_count = 0;
     table->component_capacity = CT_DEFAULT_CAPACITY;
@@ -20,7 +22,9 @@ ct* ct_create() {
 
 void ct_destroy(ct* table) {
     if (table) {
-        if (table->components) { free(table->components); }
+        if (table->components) {
+            free(table->components);
+        }
         free(table);
     }
 }
@@ -38,7 +42,9 @@ bool ct_add_entity(ct* table, entityid id) {
         merror("id is out of bounds: %u >= %zu", id, table->component_row_count);
         return false;
     }
-    if (ct_has_entity(table, id)) { return false; }
+    if (ct_has_entity(table, id)) {
+        return false;
+    }
     if (table->component_row_count >= table->component_capacity) {
         size_t new_capacity = table->component_capacity == 0 ? 1 : table->component_capacity * 2;
         int* new_components = realloc(table->components, new_capacity * table->component_col_count * sizeof(int));
@@ -50,7 +56,9 @@ bool ct_add_entity(ct* table, entityid id) {
         table->components = new_components;
         table->component_capacity = new_capacity;
     }
-    for (size_t i = 0; i < table->component_col_count; ++i) { table->components[table->component_row_count * table->component_col_count + i] = 0; }
+    for (size_t i = 0; i < table->component_col_count; ++i) {
+        table->components[table->component_row_count * table->component_col_count + i] = 0;
+    }
     // the first index in the row is the entity id
     table->components[table->component_row_count * table->component_col_count] = id;
     ++table->component_row_count;
@@ -58,10 +66,18 @@ bool ct_add_entity(ct* table, entityid id) {
 }
 
 bool ct_remove_entity(ct* table, entityid id) {
-    if (!table) { return false; }
-    if (id <= ENTITYID_INVALID) { return false; }
-    if (id >= table->component_row_count) { return false; }
-    if (!ct_has_entity(table, id)) { return false; }
+    if (!table) {
+        return false;
+    }
+    if (id <= ENTITYID_INVALID) {
+        return false;
+    }
+    if (id >= table->component_row_count) {
+        return false;
+    }
+    if (!ct_has_entity(table, id)) {
+        return false;
+    }
     for (size_t i = id; i < table->component_row_count - 1; ++i) {
         for (size_t j = 0; j < table->component_col_count; ++j) {
             table->components[i * table->component_col_count + j] = table->components[(i + 1) * table->component_col_count + j];
@@ -72,17 +88,25 @@ bool ct_remove_entity(ct* table, entityid id) {
 }
 
 bool ct_has_entity(ct* table, entityid id) {
-    if (!table) { return false; }
-    if (id <= ENTITYID_INVALID) { return false; }
-    if (id >= table->component_row_count) { return false; }
+    if (!table) {
+        return false;
+    }
+    if (id <= ENTITYID_INVALID) {
+        return false;
+    }
+    if (id >= table->component_row_count) {
+        return false;
+    }
     for (size_t i = 0; i < table->component_row_count; ++i) {
-        if (table->components[i * table->component_col_count] == id) { return true; }
+        if (table->components[i * table->component_col_count] == id) {
+            return true;
+        }
     }
     return false;
 }
 
 bool ct_add_component(ct* table, entityid id, component comp) {
-    minfo("ct_add_component: id %d comp %d", id, component2str(comp));
+    minfo("ct_add_component: id %d comp %s", id, component2str(comp));
     if (!table) return false;
     if (id <= ENTITYID_INVALID) return false;
     if (id >= table->component_row_count) return false;
@@ -90,6 +114,7 @@ bool ct_add_component(ct* table, entityid id, component comp) {
     //if (!ct_has_entity(table, id)) return false;
     if (comp < 0 || comp >= table->component_col_count) return false;
     table->components[id * table->component_col_count + comp] = 1;
+    msuccess("ct_add_component: id %d comp %s", id, component2str(comp));
     return true;
 }
 
@@ -102,9 +127,17 @@ bool ct_add_component(ct* table, entityid id, component comp) {
 
 bool ct_has_component(ct* table, entityid id, component comp) {
     //minfo("ct_has_component: id %d comp %s", id, component2str(comp));
-    if (!table) { return false; }
-    if (id <= ENTITYID_INVALID) { return false; }
-    if (id >= table->component_row_count) { return false; }
-    if (comp < 0 || comp >= table->component_col_count) { return false; }
+    if (!table) {
+        return false;
+    }
+    if (id <= ENTITYID_INVALID) {
+        return false;
+    }
+    if (id >= table->component_row_count) {
+        return false;
+    }
+    if (comp < 0 || comp >= table->component_col_count) {
+        return false;
+    }
     return table->components[id * table->component_col_count + comp] == 1;
 }

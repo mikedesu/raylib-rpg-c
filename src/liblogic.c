@@ -15,6 +15,7 @@
 #include "location.h"
 #include "massert.h"
 #include "mprint.h"
+#include "potion.h"
 #include "shield.h"
 //#include "path_node.h"
 #include "path_node.h"
@@ -62,6 +63,9 @@ static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 static void init_npc_test(gamestate* g);
 static void init_sword_test(gamestate* g);
 static void init_shield_test(gamestate* g);
+static void init_potion_test(gamestate* g);
+//static entityid potion_create(gamestate* const g, loc_t loc, const char* name);
+static entityid potion_create(gamestate* const g, loc_t loc, potiontype type, const char* name);
 
 //static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
@@ -1199,7 +1203,8 @@ static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, co
     return id;
 }
 
-static entityid potion_create(gamestate* const g, loc_t loc, const char* name) {
+static entityid potion_create(gamestate* const g, loc_t loc, potiontype type, const char* name) {
+    minfo("potion create...");
     massert(g, "gamestate is NULL");
     entityid id = item_create(g, ITEM_POTION, loc, name);
     if (id == ENTITYID_INVALID) {
@@ -1207,7 +1212,8 @@ static entityid potion_create(gamestate* const g, loc_t loc, const char* name) {
         return ENTITYID_INVALID;
     }
     g_register_comp(g, id, C_POTIONTYPE);
-    g_add_potiontype(g, id, POTION_HEALTH);
+    g_add_potiontype(g, id, type);
+    msuccess("potion created!");
     return id;
 }
 
@@ -1952,6 +1958,7 @@ void liblogic_init(gamestate* const g) {
     //init_npc_test(g);
     init_sword_test(g);
     init_shield_test(g);
+    init_potion_test(g);
     update_debug_panel_buffer(g);
 }
 
@@ -1991,6 +1998,15 @@ static void init_shield_test(gamestate* g) {
     while (id == ENTITYID_INVALID) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = shield_create(g, SHIELD_BUCKLER, loc, "dummy buckler");
+    }
+}
+
+static void init_potion_test(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entityid id = ENTITYID_INVALID;
+    while (id == ENTITYID_INVALID) {
+        loc_t loc = get_random_empty_non_wall_loc(g, 0);
+        id = potion_create(g, loc, POTION_HEALTH_SMALL, "small health potion");
     }
 }
 

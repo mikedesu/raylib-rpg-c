@@ -1159,6 +1159,20 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             keys = TX_BUCKLER_KEYS;
             num_keys = TX_BUCKLER_KEY_COUNT;
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        } else if (item_type == ITEM_POTION) {
+            potiontype potion_type = g_get_potiontype(g, id);
+            if (potion_type == POTION_HEALTH_SMALL) {
+                keys = TX_POTION_HP_SMALL_KEYS;
+                num_keys = TX_POTION_HP_SMALL_KEY_COUNT;
+            } else if (potion_type == POTION_HEALTH_MEDIUM) {
+                keys = TX_POTION_HP_MEDIUM_KEYS;
+                num_keys = TX_POTION_HP_MEDIUM_KEY_COUNT;
+            } else if (potion_type == POTION_HEALTH_LARGE) {
+                keys = TX_POTION_HP_LARGE_KEYS;
+                num_keys = TX_POTION_HP_LARGE_KEY_COUNT;
+            }
+
+            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         }
     }
     //    // for now we only have 1 sprite for weapons

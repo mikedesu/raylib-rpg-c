@@ -7,7 +7,9 @@
 typedef enum potion_type_t
 {
     POTION_NONE,
-    POTION_HEALTH,
+    POTION_HEALTH_SMALL,
+    POTION_HEALTH_MEDIUM,
+    POTION_HEALTH_LARGE,
     POTION_TYPE_COUNT
 } potiontype;
 

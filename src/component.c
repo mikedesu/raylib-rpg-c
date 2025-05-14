@@ -1,5 +1,6 @@
 #include "component.h"
 #include "massert.h"
+#include "mprint.h"
 #include <string.h>
 
 void init_name_component(name_component* comp, entityid id, const char* name) {
@@ -315,6 +316,7 @@ void init_shieldtype_component(shieldtype_component* comp, entityid id, shieldty
 
 //void init_potion_component(potion_component* comp, entityid id, potioneffect* effects, size_t num_effects) {
 void init_potiontype_component(potiontype_component* comp, entityid id, potiontype type) {
+    minfo("init_potiontype_component: id %d type %d", id, type);
     massert(comp != NULL, "comp is NULL");
     if (!comp) {
         return;
