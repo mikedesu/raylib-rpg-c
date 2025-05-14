@@ -15,6 +15,7 @@ typedef struct spritegroup_t {
     int off_x;
     int off_y;
     int default_anim; // the default animation to return to after the timer expires
+    int alpha;
     specifier_t specifier;
     entityid id; // the id of the entity that this spritegroup belongs to
     // note this allows for one entity to have multiple spritegroups
@@ -43,10 +44,8 @@ void spritegroup_set(spritegroup_t* const sg, int index, sprite* s);
 void spritegroup_setcontexts(spritegroup_t* const sg, int context);
 void spritegroup_destroy(spritegroup_t* sg);
 void spritegroup_set_specifier(spritegroup_t* const sg, specifier_t spec);
-
 void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop);
 void spritegroup_update_dest(spritegroup_t* const sg);
-//void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y);
 void spritegroup_snap_dest(spritegroup_t* const sg, loc_t loc);
-
 void sg_set_default_anim(spritegroup_t* const sg, int anim);
+//void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y);

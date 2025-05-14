@@ -14,7 +14,7 @@
 
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
-#define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 10
+#define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
 #define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
 
 // have to update this function when we introduce new fields to Gamestate
@@ -79,7 +79,7 @@ gamestate* gamestateinitptr() {
     g->entity_turn = -1;
     g->gameover = false;
     g->test_guard = false;
-    g->font_size = 10;
+    g->font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
     g->pad = 20;
     g->line_spacing = 1.0f;
     g->inventory_menu_selection = 0;
@@ -421,7 +421,7 @@ bool g_register_comps(gamestate* const g, entityid id, ...) {
 }
 
 bool g_add_component(gamestate* const g, entityid id, component comp, void* data, size_t c_size, void** c_list, int* c_count, int* c_capacity) {
-    minfo("g_add_component: id: %d, comp: %s", id, component2str(comp));
+    //minfo("g_add_component: id: %d, comp: %s", id, component2str(comp));
     massert(g, "g is NULL");
     if (!data) {
         mwarning("data is NULL");
@@ -1650,6 +1650,7 @@ bool g_is_shieldtype(const gamestate* const g, entityid id, shieldtype type) {
 }
 
 bool g_add_potiontype(gamestate* const g, entityid id, potiontype type) {
+    minfo("g_add_potiontype");
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the potiontype component

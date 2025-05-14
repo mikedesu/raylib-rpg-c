@@ -528,6 +528,13 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
                 // increment attacker's xp
                 //int xp = g_get_stat(g, atk_id, STATS_XP);
                 g_set_stat(g, atk_id, STATS_XP, g_get_stat(g, atk_id, STATS_XP) + 1);
+
+                loc_t loc = g_get_location(g, tgt_id);
+                entityid id = ENTITYID_INVALID;
+                while (id == ENTITYID_INVALID) {
+                    id = potion_create(g, loc, POTION_HEALTH_SMALL, "small health potion");
+                }
+                msuccess("Potion created at %d %d %d", loc.x, loc.y, loc.z);
             }
             //else if (tgttype == ENTITY_PLAYER) {
             //    add_message_and_history(g, "You are dead!");
@@ -1573,6 +1580,49 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         g->display_inventory_menu = false;
         g->controlmode = CONTROLMODE_PLAYER;
         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    } else if (inputstate_is_pressed(is, KEY_ENTER)) {
+        entityid item_id = inventory[g->inventory_menu_selection];
+        // we will eventually adjust this to check which slot it needs to go into based on its various types
+        entitytype_t type = g_get_type(g, item_id);
+        if (type == ENTITY_ITEM) {
+            itemtype item_type = g_get_itemtype(g, item_id);
+            if (item_type == ITEM_POTION) {
+                potiontype potion_type = g_get_potiontype(g, item_id);
+
+                if (potion_type == POTION_HEALTH_SMALL) {
+                    int hp = g_get_stat(g, g->hero_id, STATS_HP);
+                    int maxhp = g_get_stat(g, g->hero_id, STATS_MAXHP);
+                    if (hp < maxhp) {
+                        const int small_hp_health_roll = rand() % 4 + 1;
+                        hp += small_hp_health_roll;
+                        if (hp > maxhp) {
+                            hp = maxhp;
+                        }
+
+                        g_set_stat(g, g->hero_id, STATS_HP, hp);
+                        //add_message_and_history(g, "%s drank a %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                        add_message_history(g, "%s drank a %s and recovered %d HP", g_get_name(g, g->hero_id), g_get_name(g, item_id), small_hp_health_roll);
+                        // remove the potion from the inventory
+                        g_remove_from_inventory(g, g->hero_id, item_id);
+                        // add the potion to the tile where the player is located at
+                        //loc_t loc = g_get_location(g, g->hero_id);
+                        //dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
+                        //massert(df, "Dungeon floor is NULL!");
+                        //tile_t* const tile = df_tile_at(df, loc);
+                        //massert(tile, "Tile is NULL!");
+                        //if (!tile_add(tile, item_id)) {
+                        //    merror("Failed to add item to tile");
+                        //    return;
+                        //}
+
+                        g->controlmode = CONTROLMODE_PLAYER;
+                        g->display_inventory_menu = false;
+                        g->controlmode = CONTROLMODE_PLAYER;
+                        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    }
+                }
+            }
+        }
     }
 }
 

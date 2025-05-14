@@ -365,3 +365,5 @@
 #define DEFAULT_CAMERA_ZOOM 10.0f
 
 #define DEFAULT_ANIM_SPEED 10
+
+#define WINDOW_TITLE "@evildojo666 presents: project.rpg"

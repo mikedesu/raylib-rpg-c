@@ -13,6 +13,7 @@ spritegroup_t* spritegroup_create(int capacity) {
         return NULL;
     }
     sg->current = 0;
+    sg->alpha = 255;
     sg->size = 0;
     sg->off_x = 0;
     sg->off_y = 0;

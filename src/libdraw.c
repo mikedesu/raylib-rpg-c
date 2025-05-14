@@ -308,7 +308,8 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     }
 
     // Draw sprite on top
-    DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
+    //DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
+    DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, (Color){255, 255, 255, 255});
 
     if (shield_front_s) DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     if (weapon_front_s) {
@@ -1248,7 +1249,7 @@ void libdraw_init(gamestate* const g) {
     const int h = DEFAULT_WIN_HEIGHT;
     const int x = w / 3;
     const int y = h / 3;
-    const char* title = "evildojo666";
+    const char* title = WINDOW_TITLE;
     InitWindow(w, h, title);
     g->windowwidth = w;
     g->windowheight = h;
@@ -1322,8 +1323,8 @@ static void draw_inventory_menu(gamestate* const g) {
     Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
 
     // Menu box size
-    float menu_width_percent = 0.95f;
-    float menu_height_percent = 0.95f;
+    float menu_width_percent = 0.80f;
+    float menu_height_percent = 0.80f;
     float menu_width = g->windowwidth * menu_width_percent;
     float menu_height = g->windowheight * menu_height_percent;
 
