@@ -1553,13 +1553,13 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                 if (equipped_item != ENTITYID_INVALID) {
                     // unequip the currently equipped item
                     g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
-                    //add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
 
                 } else {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
-                    //add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                 }
             } else if (item_type == ITEM_SHIELD) {
                 //g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
@@ -1567,12 +1567,12 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                 if (equipped_item != ENTITYID_INVALID) {
                     // unequip the currently equipped item
                     g_unset_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
-                    //add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                 } else {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
-                    //add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                 }
             }
         }
@@ -1600,8 +1600,8 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                         }
 
                         g_set_stat(g, g->hero_id, STATS_HP, hp);
-                        //add_message_and_history(g, "%s drank a %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                        add_message_history(g, "%s drank a %s and recovered %d HP", g_get_name(g, g->hero_id), g_get_name(g, item_id), small_hp_health_roll);
+                        add_message_and_history(
+                            g, "%s drank a %s and recovered %d HP", g_get_name(g, g->hero_id), g_get_name(g, item_id), small_hp_health_roll);
                         // remove the potion from the inventory
                         g_remove_from_inventory(g, g->hero_id, item_id);
                         // add the potion to the tile where the player is located at
@@ -1614,7 +1614,6 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                         //    merror("Failed to add item to tile");
                         //    return;
                         //}
-
                         g->controlmode = CONTROLMODE_PLAYER;
                         g->display_inventory_menu = false;
                         g->controlmode = CONTROLMODE_PLAYER;
@@ -1659,8 +1658,8 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         entitytype_t type = g_get_type(g, itemid);
         minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
-            //add_message_and_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
-            add_message_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
+            add_message_and_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
+            //add_message_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
             tile_remove(tile, itemid);
             g_add_to_inventory(g, id, itemid);
             if (g_is_type(g, id, ENTITY_PLAYER)) {
