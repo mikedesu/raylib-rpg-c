@@ -587,12 +587,15 @@ static void libdraw_set_sg_block_success(gamestate* const g, entityid id, sprite
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
     race_t race = g_get_race(g, id);
-    if (race == RACE_HUMAN) {
-        //sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
-        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS);
 
-        //if (e->shield != ENTITYID_INVALID) {
-        //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
+    int anim_index = -1;
+
+    if (race == RACE_HUMAN) {
+        anim_index = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
+        //spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS);
+        //entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
+        //if (shield_id != ENTITYID_INVALID) {
+        //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
         //    if (shield_sg) {
         //        sprite* player_sprite = sg_get_current(sg);
         //        int player_ctx = sprite_get_context(player_sprite);
@@ -601,11 +604,11 @@ static void libdraw_set_sg_block_success(gamestate* const g, entityid id, sprite
         //    }
         //}
     } else if (race == RACE_ORC) {
-        //sg->current = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
-        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS);
-
-        //if (e->shield != ENTITYID_INVALID) {
-        //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
+        anim_index = SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS;
+        //spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS);
+        //entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
+        //if (shield_id != ENTITYID_INVALID) {
+        //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
         //    if (shield_sg) {
         //        sprite* player_sprite = sg_get_current(sg);
         //        int player_ctx = sprite_get_context(player_sprite);
@@ -613,6 +616,18 @@ static void libdraw_set_sg_block_success(gamestate* const g, entityid id, sprite
         //        spritegroup_setcontexts(shield_sg, player_ctx);
         //    }
         //}
+    }
+    spritegroup_set_current(sg, anim_index);
+
+    entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
+    if (shield_id != ENTITYID_INVALID) {
+        spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+        if (shield_sg) {
+            sprite* player_sprite = sg_get_current(sg);
+            int player_ctx = sprite_get_context(player_sprite);
+            spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+            spritegroup_setcontexts(shield_sg, player_ctx);
+        }
     }
 
     //e->block_success = false;
@@ -631,8 +646,9 @@ static void libdraw_update_sprite_attack(gamestate* const g, entityid id, sprite
         libdraw_set_sg_is_attacking(g, id, sg);
     } else if (g_get_block_success(g, id)) {
         libdraw_set_sg_block_success(g, id, sg);
-    } else if (g->test_guard) {
-        libdraw_set_sg_is_blocking(g, id, sg);
+        //}
+        //else if (g->test_guard) {
+        //    libdraw_set_sg_is_blocking(g, id, sg);
         //} else if (e->is_damaged) {
     } else if (g_get_damaged(g, id)) {
         libdraw_set_sg_is_damaged(g, id, sg);

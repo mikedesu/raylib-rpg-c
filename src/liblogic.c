@@ -590,13 +590,17 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
         return false;
     }
     // lets try an experiment...
-    //if (target->shield != ENTITYID_INVALID) {
+
+    // if you have a shield at all, the attack will get auto-blocked
+    entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
+    if (shield_id != ENTITYID_INVALID) {
+        msuccess("Block successful");
+        handle_attack_blocked(g, attacker_id, target_id, attack_successful);
+        return false;
+    }
     // introducing a random chance to block if you have a shield...
     //    int block_chance = rand() % 100;
     //    if (block_chance < 50) {
-    //        msuccess("Block successful");
-    //        handle_attack_blocked(g, attacker, target, attack_successful);
-    //        return false;
     //    }
     //}
     msuccess("Attack successful");
@@ -1901,7 +1905,8 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
 static void update_debug_panel_buffer(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // Static buffers to avoid reallocating every frame
-    static const char* control_modes[] = {"Player", "Camera", "Unknown"};
+    //static const char* control_modes[] = {"Player", "Camera", "Unknown"};
+    static const char* control_modes[] = {"Camera", "Player", "Unknown"};
     static const char* flag_names[] = {"GAMESTATE_FLAG_NONE",
                                        "GAMESTATE_FLAG_PLAYER_INPUT",
                                        "GAMESTATE_FLAG_PLAYER_ANIM",
@@ -1984,7 +1989,7 @@ static void update_debug_panel_buffer(gamestate* const g) {
 }
 
 void liblogic_init(gamestate* const g) {
-    massert(g, "liblogic_init: gamestate is NULL");
+    massert(g, "gamestate is NULL");
     srand(time(NULL));
     init_dungeon(g);
     //gamestate_init_entityids(g);
@@ -1992,10 +1997,8 @@ void liblogic_init(gamestate* const g) {
     g->msg_system.index = 0;
     g->msg_system.is_active = false;
     gamestate_load_keybindings(g);
-    //init_em(g);
-    //minfo("liblogic_init: em initialized");
     init_player(g);
-    //minfo("liblogic_init: player initialized");
+    //minfo("player initialized");
     // test to create a weapon
     //init_weapon_test(g);
     //init_weapon_test2(g);
@@ -2014,7 +2017,6 @@ void liblogic_init(gamestate* const g) {
 static void init_npc_test(gamestate* g) {
     massert(g, "gamestate is NULL");
     //loc_t loc = g_get_location(g, g->hero_id);
-
     //loc_t* locs = get_locs_around_entity(g, g->hero_id);
     int count = 0;
     int max = 1;
@@ -2106,12 +2108,9 @@ static void update_npcs_state(gamestate* const g) {
 //static void handle_nth_npc(gamestate* const g, int i) {
 static void handle_npc(gamestate* const g, entityid id) {
     massert(g, "Game state is NULL!");
-    //massert(i >= 0, "Index is out of bounds!");
-    //massert(i < g->index_entityids, "Index is out of bounds!");
-    //entityid id = g->entityids[i];
+    massert(id != ENTITYID_INVALID, "Entity is NULL!");
     if (id == g->hero_id) {
-        //minfo("Skipping hero");
-        return; // Skip the hero
+        return;
     }
     if (g_is_type(g, id, ENTITY_NPC) && !g_is_dead(g, id)) {
         minfo("Handling NPC %d", id);
