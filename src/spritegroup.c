@@ -12,13 +12,8 @@ spritegroup_t* spritegroup_create(int capacity) {
         merror("failed to allocate memory for spritegroup_t");
         return NULL;
     }
-    sg->current = 0;
+    sg->current = sg->size = sg->off_x = sg->off_y = sg->default_anim = sg->id = 0;
     sg->alpha = 255;
-    sg->size = 0;
-    sg->off_x = 0;
-    sg->off_y = 0;
-    sg->default_anim = 0;
-    sg->id = 0;
     sg->capacity = capacity;
     sg->sprites = malloc(sizeof(sprite*) * capacity);
     if (!sg->sprites) {

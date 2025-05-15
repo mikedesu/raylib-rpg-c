@@ -1961,7 +1961,8 @@ static void update_debug_panel_buffer(gamestate* const g) {
              "player_dir_str: %s\n"
              "is_blocking: %d\n"
              "test_guard: %d\n"
-             "TEST 12345\n"
+             "HELLO TWITCH AND YOUTUBE!\n"
+             //"TEST 12345\n"
              "TEST 66666\n",
              g->timebeganbuf,
              g->currenttimebuf,
@@ -2145,7 +2146,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
 
     // test entity creation on the fly
     static bool do_this_once = true;
-    if (g->turn_count % 5 == 0) {
+    if (g->turn_count % 2 == 0) {
         bool success = false;
         if (do_this_once) {
             while (!success) {
