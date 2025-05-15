@@ -22,12 +22,15 @@ LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dunge
 
 # Web build setup
 WEB_CC = emcc
-WEB_SOURCES = $(MAIN_C) gameloader_web.c libdraw.c liblogic.c gamestate.c hashtable_entityid_spritegroup.c  specifier.c dungeon_floor.c dungeon_tile.c entity.c em.c sprite.c spritegroup.c race.c dungeon.c keybinding.c path_node.c component_table.c component.c
+WEB_SOURCES = $(MAIN_C) gameloader_web.c libdraw.c liblogic.c gamestate.c hashtable_entityid_spritegroup.c  specifier.c dungeon_floor.c dungeon_tile.c sprite.c spritegroup.c race.c dungeon.c keybinding.c path_node.c component_table.c component.c
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
-EMCC_OPTIONS = -s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall
+
+EMCC_OPTIONS = -s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall -s ALLOW_MEMORY_GROWTH
+#EMCC_OPTIONS = -s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall 
+
 SHELL_FILE = --shell-file /home/darkmage/src/raylib/src/minshell.html
-PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img
+PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img --preload-file keybindings.ini
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 
 
