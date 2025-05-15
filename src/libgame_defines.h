@@ -344,6 +344,9 @@
 
 #define TX_KEY_BASIC 285
 
+//286 1 4  0  img/weapons/axe.png
+#define TX_AXE 286
+
 //--------------------------------
 
 #define COMPANYSCENE 0

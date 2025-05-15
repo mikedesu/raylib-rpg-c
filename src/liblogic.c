@@ -48,8 +48,6 @@ static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* co
 static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
 //static entity* create_shield(gamestate* g);
-//static entity* create_sword(gamestate* g);
-//static entity* create_sword_at(gamestate* g, loc_t loc);
 //static entity* create_shield_at(gamestate* g, loc_t loc);
 //static entity* create_elf_at(gamestate* g, loc_t loc);
 //static entity* create_orc_at(gamestate* g, loc_t loc);
@@ -62,6 +60,8 @@ static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 //static void init_npcs_test_by_room(gamestate* const g);
 static void init_npc_test(gamestate* g);
 static void init_sword_test(gamestate* g);
+static void init_dagger_test(gamestate* g);
+static void init_axe_test(gamestate* g);
 static void init_shield_test(gamestate* g);
 static void init_potion_test(gamestate* g);
 //static entityid potion_create(gamestate* const g, loc_t loc, const char* name);
@@ -965,12 +965,10 @@ static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor) {
 //    massert(g, "gamestate is NULL");
 //    // pick a random location
 //    loc_t loc = get_random_empty_non_wall_loc(g, g->dungeon->current_floor);
-//    create_sword_at(g, loc);
 //}
 
 //static void init_weapon_test2(gamestate* g) {
 //    massert(g, "gamestate is NULL");
-//    entity* sword = create_sword(g);
 //    e_add_item_to_inventory(e, sword->id);
 //    // equip the sword
 //    e->weapon = sword->id;
@@ -1408,7 +1406,6 @@ static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* co
 //static entity* create_human_at(gamestate* g, loc_t loc) {
 //    entity* e = npc_create_ptr(g, RACE_HUMAN, loc.x, loc.y, loc.z, "human");
 //    massert(e, "human create fail");
-//entity* sword = create_sword(g);
 //e_add_item_to_inventory(e, sword->id);
 //e->weapon = sword->id;
 //    return e;
@@ -1417,7 +1414,6 @@ static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* co
 //static entity* create_elf_at(gamestate* g, loc_t loc) {
 //    entity* e = npc_create_ptr(g, RACE_ELF, loc.x, loc.y, loc.z, "elf");
 //    massert(e, "elf create fail");
-//entity* sword = create_sword(g);
 //e_add_item_to_inventory(e, sword->id);
 //e->weapon = sword->id;
 //    return e;
@@ -1426,7 +1422,6 @@ static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* co
 //static entity* create_dwarf_at(gamestate* g, loc_t loc) {
 //    entity* e = npc_create_ptr(g, RACE_DWARF, loc.x, loc.y, loc.z, "dwarf");
 //    massert(e, "dwarf create fail");
-//entity* sword = create_sword(g);
 //e_add_item_to_inventory(e, sword->id);
 //e->weapon = sword->id;
 //    return e;
@@ -1435,7 +1430,6 @@ static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* co
 //static entity* create_halfling_at(gamestate* g, loc_t loc) {
 //    entity* e = npc_create_ptr(g, RACE_HALFLING, loc.x, loc.y, loc.z, "halfling");
 //    massert(e, "halfling create fail");
-//entity* sword = create_sword(g);
 //e_add_item_to_inventory(e, sword->id);
 //e->weapon = sword->id;
 //    return e;
@@ -1444,7 +1438,6 @@ static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* co
 //static entity* create_goblin_at(gamestate* g, loc_t loc) {
 //    entity* e = npc_create_ptr(g, RACE_GOBLIN, loc.x, loc.y, loc.z, "goblin");
 //    massert(e, "goblin create fail");
-//entity* sword = create_sword(g);
 //e_add_item_to_inventory(e, sword->id);
 //e->weapon = sword->id;
 //    return e;
@@ -2056,7 +2049,9 @@ void liblogic_init(gamestate* const g) {
     //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
     //init_npcs_test_by_room(g);
     //init_npc_test(g);
-    init_sword_test(g);
+    //init_sword_test(g);
+    //init_dagger_test(g);
+    init_axe_test(g);
     init_shield_test(g);
     init_potion_test(g);
     update_debug_panel_buffer(g);
@@ -2082,12 +2077,28 @@ static void init_npc_test(gamestate* g) {
 
 static void init_sword_test(gamestate* g) {
     massert(g, "gamestate is NULL");
-    //loc_t* locs = get_locs_around_entity(g, g->hero_id);
-    //for (int i = 0; i < 8; i++) {
     entityid id = ENTITYID_INVALID;
     while (id == ENTITYID_INVALID) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = weapon_create(g, WEAPON_SWORD, loc, "dummy sword");
+    }
+}
+
+static void init_dagger_test(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entityid id = ENTITYID_INVALID;
+    while (id == ENTITYID_INVALID) {
+        loc_t loc = get_random_empty_non_wall_loc(g, 0);
+        id = weapon_create(g, WEAPON_DAGGER, loc, "dummy dagger");
+    }
+}
+
+static void init_axe_test(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entityid id = ENTITYID_INVALID;
+    while (id == ENTITYID_INVALID) {
+        loc_t loc = get_random_empty_non_wall_loc(g, 0);
+        id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
     }
 }
 

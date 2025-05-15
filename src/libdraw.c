@@ -1169,8 +1169,19 @@ static void create_sg_byid(gamestate* const g, entityid id) {
         // check the item type
         itemtype item_type = g_get_itemtype(g, id);
         if (item_type == ITEM_WEAPON) {
-            keys = TX_LONG_SWORD_KEYS;
-            num_keys = TX_LONG_SWORD_KEY_COUNT;
+            // check the weapon type
+            weapontype weapon_type = g_get_weapontype(g, id);
+            if (weapon_type == WEAPON_SWORD) {
+                keys = TX_LONG_SWORD_KEYS;
+                num_keys = TX_LONG_SWORD_KEY_COUNT;
+            } else if (weapon_type == WEAPON_DAGGER) {
+                keys = TX_DAGGER_KEYS;
+                num_keys = TX_DAGGER_KEY_COUNT;
+            } else if (weapon_type == WEAPON_AXE) {
+                keys = TX_AXE_KEYS;
+                num_keys = TX_AXE_KEY_COUNT;
+            }
+
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         } else if (item_type == ITEM_SHIELD) {
             keys = TX_BUCKLER_KEYS;
