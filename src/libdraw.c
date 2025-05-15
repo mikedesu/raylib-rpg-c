@@ -1237,11 +1237,12 @@ static void draw_hud(gamestate* const g) {
     //const int level = g_get_stat(g, g->hero_id, STATS_LEVEL);
     const int level = stats[STATS_LEVEL];
     const int xp = stats[STATS_XP];
+    const int ac = stats[STATS_AC];
     loc_t loc = g_get_location(g, g->hero_id);
     dungeon_floor_t* const df = d_get_current_floor(g->d);
     const char* room_name = df_get_room_name(df, loc);
     char buffer[1024] = {0};
-    snprintf(buffer, sizeof(buffer), "%s Lvl %d HP %d/%d XP %d Room: %s Turn %d", g_get_name(g, g->hero_id), level, hp, maxhp, xp, room_name, turn);
+    snprintf(buffer, sizeof(buffer), "%s Lvl %d HP %d/%d AC: %d XP %d Room: %s Turn %d", g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, room_name, turn);
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, g->font_size, g->line_spacing);
     const int box_w = text_size.x + g->pad;
     const int box_h = text_size.y + g->pad;

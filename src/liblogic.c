@@ -487,7 +487,7 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
     massert(atk_successful, "attack_successful is NULL");
 
     //*atk_successful = true;
-    *atk_successful = rand() % 2 == 0;
+    //*atk_successful = rand() % 2 == 0;
 
     entitytype_t tgttype = g_get_type(g, tgt_id);
     entitytype_t atktype = g_get_type(g, atk_id);
@@ -542,7 +542,6 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
         } else {
             g_update_dead(g, tgt_id, false);
         }
-
     } else {
         // handle attack miss
         if (tgttype == ENTITY_PLAYER) {
@@ -570,6 +569,12 @@ static void handle_attack_blocked(gamestate* const g, entityid attacker_id, enti
     g_set_damaged(g, target_id, false);
     g_set_block_success(g, target_id, true);
     g_set_update(g, target_id, true);
+    entitytype_t tgttype = g_get_type(g, target_id);
+    //if (tgttype == ENTITY_PLAYER) {
+    //} else if (tgttype == ENTITY_NPC) {
+    add_message_and_history(g, "%s blocked %s's attack!", g_get_name(g, target_id), g_get_name(g, attacker_id));
+    //}
+
     //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
 
@@ -591,21 +596,41 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     }
     // lets try an experiment...
 
-    // if you have a shield at all, the attack will get auto-blocked
-    entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
-    if (shield_id != ENTITYID_INVALID) {
-        msuccess("Block successful");
-        handle_attack_blocked(g, attacker_id, target_id, attack_successful);
-        return false;
+    // get the armor class of the target
+    const int ac = g_get_stat(g, target_id, STATS_AC);
+
+    const int attack_roll = rand() % 20 + 1;
+    *attack_successful = false;
+
+    if (attack_roll >= ac) {
+        // if you have a shield at all, the attack will get auto-blocked
+        entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
+        if (shield_id != ENTITYID_INVALID) {
+            int block_roll = rand() % 100;
+            const int block_chance = 90;
+            if (block_roll < block_chance) {
+                msuccess("Block successful");
+                handle_attack_blocked(g, attacker_id, target_id, attack_successful);
+                return false;
+            }
+            //msuccess("Block successful");
+            //handle_attack_blocked(g, attacker_id, target_id, attack_successful);
+            //return false;
+        }
+        // introducing a random chance to block if you have a shield...
+        //    if (block_chance < 50) {
+        //    }
+        //}
+        msuccess("Attack successful");
+        *attack_successful = true;
+        handle_attack_success(g, attacker_id, target_id, attack_successful);
+        return true;
     }
-    // introducing a random chance to block if you have a shield...
-    //    int block_chance = rand() % 100;
-    //    if (block_chance < 50) {
-    //    }
-    //}
-    msuccess("Attack successful");
+    // attack misses
+    merror("Attack missed");
+    //*attack_successful = false;
     handle_attack_success(g, attacker_id, target_id, attack_successful);
-    return true;
+    return false;
 }
 
 static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid attacker_id, bool* successful) {
@@ -995,41 +1020,61 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g->next_entityid++;
     //gs_add_entityid(g, id);
     //minfo("registering name: %s", name);
-    g_register_comp(g, id, C_NAME);
+    g_register_comps(g,
+                     id,
+                     C_NAME,
+                     C_TYPE,
+                     C_RACE,
+                     C_DIRECTION,
+                     C_LOCATION,
+                     C_SPRITE_MOVE,
+                     C_DEAD,
+                     C_UPDATE,
+                     C_ATTACKING,
+                     C_BLOCKING,
+                     C_BLOCK_SUCCESS,
+                     C_DAMAGED,
+                     C_DEFAULT_ACTION,
+                     C_INVENTORY,
+                     C_TARGET,
+                     C_TARGET_PATH,
+                     C_EQUIPMENT,
+                     C_STATS,
+                     0);
+    //g_register_comp(g, id, C_NAME);
     //minfo("registering type: %d", ENTITY_NPC);
-    g_register_comp(g, id, C_TYPE);
+    //g_register_comp(g, id, C_TYPE);
     //minfo("registering race: %d", rt);
-    g_register_comp(g, id, C_RACE);
+    //g_register_comp(g, id, C_RACE);
     //minfo("registering direction: %d", DIR_RIGHT);
-    g_register_comp(g, id, C_DIRECTION);
+    //g_register_comp(g, id, C_DIRECTION);
     //minfo("registering location: %d, %d, %d", loc.x, loc.y, loc.z);
-    g_register_comp(g, id, C_LOCATION);
+    //g_register_comp(g, id, C_LOCATION);
     //minfo("registering sprite_move: %d, %d", 0, 0);
-    g_register_comp(g, id, C_SPRITE_MOVE);
-    //minfo("registering dead: %d", false);
-    g_register_comp(g, id, C_DEAD);
-    //minfo("registering update: %d", false);
-    g_register_comp(g, id, C_UPDATE);
-    //minfo("registering attacking: %d", false);
-    g_register_comp(g, id, C_ATTACKING);
-    //minfo("registering blocking: %d", false);
-    g_register_comp(g, id, C_BLOCKING);
-    //minfo("registering block_success: %d", false);
-    g_register_comp(g, id, C_BLOCK_SUCCESS);
-    //minfo("registering damaged: %d", false);
-    g_register_comp(g, id, C_DAMAGED);
-    //minfo("registering default_action: %d", ENTITY_ACTION_WAIT);
-    g_register_comp(g, id, C_DEFAULT_ACTION);
-    //minfo("registering inventory");
-    g_register_comp(g, id, C_INVENTORY);
-    //minfo("registering target");
-    g_register_comp(g, id, C_TARGET);
-    //minfo("registering target_path");
-    g_register_comp(g, id, C_TARGET_PATH);
-    //minfo("registering equipment");
-    g_register_comp(g, id, C_EQUIPMENT);
-
-    g_register_comp(g, id, C_STATS);
+    //g_register_comp(g, id, C_SPRITE_MOVE);
+    ////minfo("registering dead: %d", false);
+    //g_register_comp(g, id, C_DEAD);
+    ////minfo("registering update: %d", false);
+    //g_register_comp(g, id, C_UPDATE);
+    ////minfo("registering attacking: %d", false);
+    //g_register_comp(g, id, C_ATTACKING);
+    ////minfo("registering blocking: %d", false);
+    //g_register_comp(g, id, C_BLOCKING);
+    ////minfo("registering block_success: %d", false);
+    //g_register_comp(g, id, C_BLOCK_SUCCESS);
+    ////minfo("registering damaged: %d", false);
+    //g_register_comp(g, id, C_DAMAGED);
+    ////minfo("registering default_action: %d", ENTITY_ACTION_WAIT);
+    //g_register_comp(g, id, C_DEFAULT_ACTION);
+    ////minfo("registering inventory");
+    //g_register_comp(g, id, C_INVENTORY);
+    ////minfo("registering target");
+    //g_register_comp(g, id, C_TARGET);
+    ////minfo("registering target_path");
+    //g_register_comp(g, id, C_TARGET_PATH);
+    ////minfo("registering equipment");
+    //g_register_comp(g, id, C_EQUIPMENT);
+    //g_register_comp(g, id, C_STATS);
 
     //minfo("adding name for id %d: %s", id, name);
     g_add_name(g, id, name);
@@ -1071,6 +1116,7 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g_set_stat(g, id, STATS_XP, 0);
     g_set_stat(g, id, STATS_MAXHP, 1);
     g_set_stat(g, id, STATS_HP, 1);
+    g_set_stat(g, id, STATS_AC, 10);
 
     if (!df_add_at(df, id, loc.x, loc.y)) {
         merror("failed to add entity to dungeon floor");
@@ -1751,7 +1797,8 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     }
     if (g->msg_system.is_active) {
         if (inputstate_is_pressed(is, KEY_I) || inputstate_is_pressed(is, KEY_U) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_A) ||
-            inputstate_is_pressed(is, KEY_SPACE) || inputstate_is_pressed(is, KEY_COMMA) || inputstate_is_pressed(is, KEY_PERIOD)) {
+            inputstate_is_pressed(is, KEY_SPACE) || inputstate_is_pressed(is, KEY_COMMA) || inputstate_is_pressed(is, KEY_PERIOD) ||
+            inputstate_is_pressed(is, KEY_SLASH) || inputstate_is_pressed(is, KEY_E)) {
             g->msg_system.index++;
             if (g->msg_system.index >= g->msg_system.count) {
                 // Reset when all messages read
@@ -2146,7 +2193,8 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
 
     // test entity creation on the fly
     static bool do_this_once = true;
-    if (g->turn_count % 2 == 0) {
+    const int every_nth_turn = 10;
+    if (g->turn_count % every_nth_turn == 0) {
         bool success = false;
         if (do_this_once) {
             while (!success) {
