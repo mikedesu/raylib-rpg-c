@@ -95,7 +95,7 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entityid id, spritegroup_
 //static void libdraw_set_sg_is_attacking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_is_attacking(gamestate* const g, entityid id, spritegroup_t* const sg);
 //static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
-static void libdraw_set_sg_is_blocking(gamestate* const g, entityid id, spritegroup_t* const sg);
+//static void libdraw_set_sg_is_blocking(gamestate* const g, entityid id, spritegroup_t* const sg);
 //static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, spritegroup_t* const sg);
 static void libdraw_set_sg_block_success(gamestate* const g, entityid id, spritegroup_t* const sg);
 static void load_shaders();
@@ -551,35 +551,34 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entityid id, spriteg
 }
 
 //static void libdraw_set_sg_is_blocking(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
-static void libdraw_set_sg_is_blocking(gamestate* const g, entityid id, spritegroup_t* const sg) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    massert(sg, "spritegroup is NULL");
-    race_t race = g_get_race(g, id);
-    if (race == RACE_HUMAN) {
-        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD);
-        //if (e->shield != ENTITYID_INVALID) {
-        //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
-        //    if (shield_sg) {
-        //        int player_ctx = sg->sprites[sg->current]->currentcontext;
-        //        spritegroup_setcontexts(shield_sg, player_ctx);
-        //        spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_FRONT);
-        //    }
-        //}
-    } else if (race == RACE_ORC) {
-        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_GUARD);
-        //if (e->shield != ENTITYID_INVALID) {
-        //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
-        //    if (shield_sg) {
-        //        int player_ctx = sg->sprites[sg->current]->currentcontext;
-        //        spritegroup_setcontexts(shield_sg, player_ctx);
-        //        spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_FRONT);
-        //    }
-        //}
-    }
-
-    g->test_guard = false;
-}
+//static void libdraw_set_sg_is_blocking(gamestate* const g, entityid id, spritegroup_t* const sg) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entityid is invalid");
+//    massert(sg, "spritegroup is NULL");
+//    race_t race = g_get_race(g, id);
+//    if (race == RACE_HUMAN) {
+//        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD);
+//if (e->shield != ENTITYID_INVALID) {
+//    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
+//    if (shield_sg) {
+//        int player_ctx = sg->sprites[sg->current]->currentcontext;
+//        spritegroup_setcontexts(shield_sg, player_ctx);
+//        spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_FRONT);
+//    }
+//}
+//    } else if (race == RACE_ORC) {
+//        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_GUARD);
+//if (e->shield != ENTITYID_INVALID) {
+//    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, e->shield);
+//    if (shield_sg) {
+//        int player_ctx = sg->sprites[sg->current]->currentcontext;
+//        spritegroup_setcontexts(shield_sg, player_ctx);
+//        spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_FRONT);
+//    }
+//}
+//    }
+//    g->test_guard = false;
+//}
 
 //static void libdraw_set_sg_block_success(gamestate* const g, entity_t* const e, spritegroup_t* const sg) {
 static void libdraw_set_sg_block_success(gamestate* const g, entityid id, spritegroup_t* const sg) {

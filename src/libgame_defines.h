@@ -163,8 +163,8 @@
 #define TX_DIRT_04 64
 #define TX_DIRT_05 65
 
-#define TX_GUARD_BUCKLER_FRONT 70
-#define TX_GUARD_BUCKLER_BACK 71
+//#define TX_GUARD_BUCKLER_FRONT 70
+//#define TX_GUARD_BUCKLER_BACK 71
 #define TX_GUARD_BUCKLER_SUCCESS_FRONT 72
 #define TX_GUARD_BUCKLER_SUCCESS_BACK 73
 
@@ -346,6 +346,28 @@
 
 //286 1 4  0  img/weapons/axe.png
 #define TX_AXE 286
+
+//287 4 4  0  img/characters/dwarf_guard_success.png
+//288 4 4  0  img/characters/shadows/dwarf_guard_success_shadow.png
+//289 4 4  0  img/characters/elf_guard_success.png
+//290 4 4  0  img/characters/shadows/elf_guard_success_shadow.png
+#define TX_DWARF_GUARD_SUCCESS 287
+#define TX_DWARF_GUARD_SUCCESS_SHADOW 288
+#define TX_ELF_GUARD_SUCCESS 289
+#define TX_ELF_GUARD_SUCCESS_SHADOW 290
+#define TX_HALFLING_GUARD_SUCCESS 291
+#define TX_HALFLING_GUARD_SUCCESS_SHADOW 292
+#define TX_GOBLIN_GUARD_SUCCESS 293
+#define TX_GOBLIN_GUARD_SUCCESS_SHADOW 294
+
+//295 4 3 0 img/actions/guard_buckler_success_front.png
+//296 4 3 0 img/actions/guard_buckler_success_back.png
+//297 4 3 0 img/actions/guard_iron_shield_success_front.png
+//298 4 3 0 img/actions/guard_iron_shield_success_back.png
+#define TX_GUARD_WOODEN_SHIELD_SUCCESS_FRONT 295
+#define TX_GUARD_WOODEN_SHIELD_SUCCESS_BACK 296
+#define TX_GUARD_IRON_SHIELD_SUCCESS_FRONT 297
+#define TX_GUARD_IRON_SHIELD_SUCCESS_BACK 298
 
 //--------------------------------
 

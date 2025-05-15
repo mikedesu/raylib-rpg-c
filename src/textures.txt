@@ -120,10 +120,10 @@
 #
 #
 #
-70 4 4 0 img/actions/guard_wooden_shield_front.png
-71 4 4 0 img/actions/guard_wooden_shield_back.png
-72 4 3 0 img/actions/guard_wooden_shield_success_front.png
-73 4 3 0 img/actions/guard_wooden_shield_success_back.png
+#70 4 4 0 img/actions/guard__front.png
+#71 4 4 0 img/actions/guard_wooden_shield_back.png
+72 4 3 0 img/actions/guard_buckler_success_front.png
+73 4 3 0 img/actions/guard_buckler_success_back.png
 #
 #
 #
@@ -369,3 +369,18 @@
 285 1 4  0  img/items/key_basic.png
 #
 286 1 4  0  img/weapons/axe.png
+#
+287 4 4  0  img/characters/dwarf_guard_success.png
+288 4 4  0  img/characters/shadows/dwarf_guard_success_shadow.png
+289 4 4  0  img/characters/elf_guard_success.png
+290 4 4  0  img/characters/shadows/elf_guard_success_shadow.png
+#
+291 4 4  0  img/characters/halfling_guard_success.png
+292 4 4  0  img/characters/shadows/halfling_guard_success_shadow.png
+293 4 4  0  img/characters/goblin_guard_success.png
+294 4 4  0  img/characters/shadows/goblin_guard_success_shadow.png
+#
+295 4 3 0 img/actions/guard_wooden_shield_success_front.png
+296 4 3 0 img/actions/guard_wooden_shield_success_back.png
+297 4 3 0 img/actions/guard_iron_shield_success_front.png
+298 4 3 0 img/actions/guard_iron_shield_success_back.png

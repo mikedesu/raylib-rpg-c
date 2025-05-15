@@ -2210,7 +2210,11 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
         if (do_this_once) {
             while (!success) {
                 loc_t loc = get_random_empty_non_wall_loc(g, 0);
-                entityid id = npc_create(g, RACE_ORC, loc, "orc");
+                //entityid id = npc_create(g, RACE_ORC, loc, "orc");
+                //entityid id = npc_create(g, RACE_ELF, loc, "elf");
+                //entityid id = npc_create(g, RACE_DWARF, loc, "dwarf");
+                entityid id = npc_create(g, RACE_HALFLING, loc, "dwarf");
+                //entityid id = npc_create(g, RACE_GOBLIN, loc, "dwarf");
                 if (id != ENTITYID_INVALID) {
                     g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
                     success = true;
