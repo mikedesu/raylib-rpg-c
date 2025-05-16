@@ -3,10 +3,13 @@
 #include "arrow.h"
 #include "arrow_component.h"
 #include "attrib_effect.h"
+#include "default_action_component.h"
 #include "direction.h"
 #include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
+#include "equipment_component.h"
+#include "equipment_slot.h"
 #include "item.h"
 #include "itemtype_component.h"
 #include "location.h"
@@ -16,6 +19,7 @@
 #include "race.h"
 #include "shield.h"
 #include "shieldtype_component.h"
+#include "stats_component.h"
 #include "stats_slot.h"
 #include "weapon.h"
 #include "weapontype_component.h"
@@ -24,7 +28,6 @@
 #include <stdlib.h>
 
 #define MAX_INVENTORY_SIZE 32
-#define MAX_EQUIPMENT_SLOTS 2
 
 typedef enum component_t
 {
@@ -163,33 +166,6 @@ typedef struct target_path_component_t {
     loc_t* target_path;
     int target_path_length;
 } target_path_component;
-
-typedef struct default_action_component_t {
-    entityid id;
-    entity_action_t action;
-} default_action_component;
-
-typedef enum equipment_slot_t
-{
-    EQUIP_SLOT_WEAPON,
-    EQUIP_SLOT_SHIELD,
-    // add more equipment slots here
-    //EQUIPMENT_SLOT_ARMOR,
-    //EQUIPMENT_SLOT_HELMET,
-    //EQUIPMENT_SLOT_RING,
-    //EQUIPMENT_SLOT_AMULET,
-    EQUIPMENT_SLOT_COUNT
-} equipment_slot;
-
-typedef struct equipment_component_t {
-    entityid id;
-    entityid equipment[MAX_EQUIPMENT_SLOTS];
-} equipment_component;
-
-typedef struct stats_component_t {
-    entityid id;
-    int stats[MAX_STATS_SLOTS];
-} stats_component;
 
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
