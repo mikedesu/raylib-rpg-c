@@ -6,5 +6,6 @@ typedef enum weapontype_t
     WEAPON_DAGGER,
     WEAPON_SWORD,
     WEAPON_AXE,
+    WEAPON_BOW,
     WEAPON_TYPE_COUNT
 } weapontype;

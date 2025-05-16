@@ -19,6 +19,7 @@
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
 #include "tx_keys.h"
+#include "weapon.h"
 #include <raylib.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
@@ -1179,8 +1180,10 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             } else if (weapon_type == WEAPON_AXE) {
                 keys = TX_AXE_KEYS;
                 num_keys = TX_AXE_KEY_COUNT;
+            } else if (weapon_type == WEAPON_BOW) {
+                keys = TX_BOW_KEYS;
+                num_keys = TX_BOW_KEY_COUNT;
             }
-
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         } else if (item_type == ITEM_SHIELD) {
             keys = TX_BUCKLER_KEYS;

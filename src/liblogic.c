@@ -62,6 +62,7 @@ static void init_npc_test(gamestate* g);
 static void init_sword_test(gamestate* g);
 static void init_dagger_test(gamestate* g);
 static void init_axe_test(gamestate* g);
+static void init_bow_test(gamestate* g);
 static void init_shield_test(gamestate* g);
 static void init_potion_test(gamestate* g);
 //static entityid potion_create(gamestate* const g, loc_t loc, const char* name);
@@ -2051,8 +2052,9 @@ void liblogic_init(gamestate* const g) {
     //init_npc_test(g);
     //init_sword_test(g);
     //init_dagger_test(g);
-    init_axe_test(g);
-    init_shield_test(g);
+    //init_axe_test(g);
+    init_bow_test(g);
+    //init_shield_test(g);
     init_potion_test(g);
     update_debug_panel_buffer(g);
 }
@@ -2099,6 +2101,15 @@ static void init_axe_test(gamestate* g) {
     while (id == ENTITYID_INVALID) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
+    }
+}
+
+static void init_bow_test(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entityid id = ENTITYID_INVALID;
+    while (id == ENTITYID_INVALID) {
+        loc_t loc = get_random_empty_non_wall_loc(g, 0);
+        id = weapon_create(g, WEAPON_BOW, loc, "dummy bow");
     }
 }
 

@@ -369,6 +369,42 @@
 #define TX_GUARD_IRON_SHIELD_SUCCESS_FRONT 297
 #define TX_GUARD_IRON_SHIELD_SUCCESS_BACK 298
 
+//299 1 4 0 img/weapons/bow.png
+//#
+//300 4 8 0 img/characters/human_shot.png
+//301 4 8 0 img/characters/shadows/human_shot_shadow.png
+//302 4 8 0 img/characters/orc_shot.png
+//303 4 8 0 img/characters/shadows/orc_shot_shadow.png
+//304 4 8 0 img/characters/dwarf_shot.png
+//305 4 8 0 img/characters/shadows/dwarf_shot_shadow.png
+//306 4 8 0 img/characters/elf_shot.png
+//307 4 8 0 img/characters/shadows/elf_shot_shadow.png
+//308 4 8 0 img/characters/halfling_shot.png
+//309 4 8 0 img/characters/shadows/halfling_shot_shadow.png
+//310 4 8 0 img/characters/goblin_shot.png
+//311 4 8 0 img/characters/shadows/goblin_shot_shadow.png
+#define TX_BOW 299
+
+#define TX_HUMAN_SHOT 300
+#define TX_HUMAN_SHOT_SHADOW 301
+#define TX_ORC_SHOT 302
+#define TX_ORC_SHOT_SHADOW 303
+#define TX_DWARF_SHOT 304
+#define TX_DWARF_SHOT_SHADOW 305
+#define TX_ELF_SHOT 306
+#define TX_ELF_SHOT_SHADOW 307
+#define TX_HALFLING_SHOT 308
+#define TX_HALFLING_SHOT_SHADOW 309
+#define TX_GOBLIN_SHOT 310
+#define TX_GOBLIN_SHOT_SHADOW 311
+
+//312 4 8 0 img/actions/shot_bow_f.png
+//313 4 8 0 img/actions/shot_bow_b.png
+//314 4 8 0 img/actions/shot_bow_b_halfling_goblin_dwarf.png
+#define TX_ACTION_SHOT_BOW_F 312
+#define TX_ACTION_SHOT_BOW_B 313
+#define TX_ACTION_SHOT_BOW_B_HALFLING_GOBLIN_DWARF 314
+
 //--------------------------------
 
 #define COMPANYSCENE 0
