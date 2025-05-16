@@ -1068,7 +1068,11 @@ bool g_add_default_action(gamestate* const g, entityid id, entity_action_t actio
 
 bool g_set_default_action(gamestate* const g, entityid id, entity_action_t action) {
     massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
+    //massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        merror("id is invalid");
+        return false;
+    }
     if (g->default_action_list == NULL) {
         merror("g->default_action_list is NULL");
         return false;
@@ -1719,4 +1723,54 @@ potiontype g_get_potiontype(const gamestate* const g, entityid id) {
         }
     }
     return POTION_NONE;
+}
+
+bool g_add_damage(gamestate* const g, entityid id, roll r) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the damage component
+    massert(g_has_component(g, id, C_DAMAGE), "id %d does not have a damage component", id);
+    return g_add_component(g, id, C_DAMAGE, (void*)&r, sizeof(damage_component), (void**)&g->damage_list, &g->damage_list_count, &g->damage_list_capacity);
+}
+
+bool g_has_damage(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_DAMAGE);
+}
+
+bool g_set_damage(gamestate* const g, entityid id, roll r) {
+    massert(g, "g is NULL");
+    //massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        merror("id is invalid");
+        return false;
+    }
+    if (g->damage_list == NULL) {
+        merror("g->damage_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->damage_list_count; i++) {
+        if (g->damage_list[i].id == id) {
+            g->damage_list[i].r = r;
+            return true;
+        }
+    }
+    return false;
+}
+
+roll g_get_damage(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    //massert(damage, "damage is NULL");
+    if (g->damage_list == NULL) {
+        merror("g->damage_list is NULL");
+        return (roll){0};
+    }
+    for (int i = 0; i < g->damage_list_count; i++) {
+        if (g->damage_list[i].id == id) {
+            return g->damage_list[i].r;
+        }
+    }
+    return (roll){0};
 }

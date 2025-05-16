@@ -3,6 +3,7 @@
 #include "component.h"
 #include "component_table.h"
 #include "controlmode.h"
+#include "damage_component.h"
 #include "debugpanel.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
@@ -111,6 +112,7 @@ typedef struct gamestate {
     weapontype_component* weapontype_list;
     shieldtype_component* shieldtype_list;
     potiontype_component* potion_type_list;
+    damage_component* damage_list;
 
     int name_list_count;
     int name_list_capacity;
@@ -160,6 +162,8 @@ typedef struct gamestate {
     int shieldtype_list_capacity;
     int potion_type_list_count;
     int potion_type_list_capacity;
+    int damage_list_count;
+    int damage_list_capacity;
 
     entityid next_entityid; // Start at 0, increment for each new entity
 
@@ -328,3 +332,8 @@ bool g_has_potiontype(const gamestate* const g, entityid id);
 bool g_set_potiontype(gamestate* const g, entityid id, potiontype type);
 bool g_is_potion(const gamestate* const g, entityid id);
 potiontype g_get_potiontype(const gamestate* const g, entityid id);
+
+bool g_add_damage(gamestate* const g, entityid id, roll r);
+bool g_has_damage(const gamestate* const g, entityid id);
+bool g_set_damage(gamestate* const g, entityid id, roll r);
+roll g_get_damage(const gamestate* const g, entityid id);

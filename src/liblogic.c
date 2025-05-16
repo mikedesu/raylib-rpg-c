@@ -2067,8 +2067,8 @@ void liblogic_init(gamestate* const g) {
     //init_sword_test(g);
     init_dagger_test(g);
     //init_axe_test(g);
-    init_bow_test(g);
-    //init_shield_test(g);
+    //init_bow_test(g);
+    init_shield_test(g);
     init_potion_test(g);
     update_debug_panel_buffer(g);
 }
@@ -2106,6 +2106,9 @@ static void init_dagger_test(gamestate* g) {
     while (id == ENTITYID_INVALID) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = weapon_create(g, WEAPON_DAGGER, loc, "dummy dagger");
+        //if (id != ENTITYID_INVALID) {
+        g_set_damage(g, id, (roll){1, 4, 0});
+        //}
     }
 }
 
@@ -2115,6 +2118,7 @@ static void init_axe_test(gamestate* g) {
     while (id == ENTITYID_INVALID) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
+        g_set_damage(g, id, (roll){1, 6, 0});
     }
 }
 
@@ -2124,6 +2128,7 @@ static void init_bow_test(gamestate* g) {
     while (id == ENTITYID_INVALID) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = weapon_create(g, WEAPON_BOW, loc, "dummy bow");
+        g_set_damage(g, id, (roll){1, 6, 0});
     }
 }
 

@@ -3,6 +3,7 @@
 #include "arrow.h"
 #include "arrow_component.h"
 #include "attrib_effect.h"
+#include "damage_component.h"
 #include "default_action_component.h"
 #include "direction.h"
 #include "entity_actions.h"
@@ -21,6 +22,7 @@
 #include "shieldtype_component.h"
 #include "stats_component.h"
 #include "stats_slot.h"
+#include "target_path_component.h"
 #include "weapon.h"
 #include "weapontype_component.h"
 #include <stdbool.h>
@@ -55,6 +57,7 @@ typedef enum component_t
     C_WEAPONTYPE,
     C_SHIELDTYPE,
     C_POTIONTYPE,
+    C_DAMAGE,
     C_COUNT
 } component;
 
@@ -84,6 +87,7 @@ static inline const char* component2str(component c) {
     case C_WEAPONTYPE: return "C_WEAPONTYPE";
     case C_SHIELDTYPE: return "C_SHIELDTYPE";
     case C_POTIONTYPE: return "C_POTIONTYPE";
+    case C_DAMAGE: return "C_DAMAGE";
     case C_COUNT: return "C_COUNT";
     default: break;
     }
@@ -161,12 +165,6 @@ typedef struct target_component_t {
     loc_t target;
 } target_component;
 
-typedef struct target_path_component_t {
-    entityid id;
-    loc_t* target_path;
-    int target_path_length;
-} target_path_component;
-
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
 void init_race_component(race_component* comp, entityid id, race_t race);
@@ -191,3 +189,4 @@ void init_shieldtype_component(shieldtype_component* comp, entityid id, shieldty
 void init_potiontype_component(potiontype_component* comp, entityid id, potiontype type);
 void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype type);
 void init_quiver_component(quiver_component* comp, entityid id, int capacity);
+void init_damage_component(damage_component* comp, entityid id, roll r);

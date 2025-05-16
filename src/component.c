@@ -366,3 +366,16 @@ void init_quiver_component(quiver_component* comp, entityid id, int capacity) {
     comp->id = id;
     comp->capacity = capacity;
 }
+
+void init_damage_component(damage_component* comp, entityid id, roll r) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) {
+        return;
+    }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        return;
+    }
+    comp->id = id;
+    comp->r = r;
+}
