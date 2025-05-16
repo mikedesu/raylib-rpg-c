@@ -86,33 +86,23 @@ gamestate* gamestateinitptr() {
 
     g->components = ct_create();
 
-    g->name_list_count = g->type_list_count = 0;
-    g->race_list_count = g->direction_list_count = 0;
-    g->loc_list_count = g->sprite_move_list_count = 0;
-    g->dead_list_count = g->update_list_count = 0;
-    g->attacking_list_count = g->blocking_list_count = 0;
-    g->block_success_list_count = g->damaged_list_count = 0;
-    g->inventory_list_count = g->target_list_count = 0;
-    g->target_path_list_count = g->default_action_list_count = 0;
-    g->equipment_list_count = g->stats_list_count = 0;
-    g->itemtype_list_count = g->weapontype_list_count = 0;
-    g->shieldtype_list_count = 0;
-    g->potion_type_list_count = 0;
+    g->name_list_count = g->type_list_count = g->race_list_count = g->direction_list_count = 0;
+    g->loc_list_count = g->sprite_move_list_count = g->dead_list_count = g->update_list_count = 0;
+    g->attacking_list_count = g->blocking_list_count = g->block_success_list_count = g->damaged_list_count = 0;
+    g->inventory_list_count = g->target_list_count = g->target_path_list_count = g->default_action_list_count = 0;
+    g->equipment_list_count = g->stats_list_count = g->itemtype_list_count = g->weapontype_list_count = 0;
+    g->shieldtype_list_count = g->potion_type_list_count = 0;
+    g->damage_list_count = 0;
 
     const size_t n = LIST_INIT_CAPACITY;
 
-    g->name_list_capacity = g->type_list_capacity = n;
-    g->race_list_capacity = g->direction_list_capacity = n;
-    g->loc_list_capacity = g->sprite_move_list_capacity = n;
-    g->dead_list_capacity = g->update_list_capacity = n;
-    g->attacking_list_capacity = g->blocking_list_capacity = n;
-    g->block_success_list_capacity = g->damaged_list_capacity = n;
-    g->inventory_list_capacity = g->target_list_capacity = n;
-    g->target_path_list_capacity = g->default_action_list_capacity = n;
-    g->equipment_list_capacity = g->stats_list_capacity = n;
-    g->itemtype_list_capacity = g->weapontype_list_capacity = n;
-    g->shieldtype_list_capacity = n;
-    g->potion_type_list_capacity = n;
+    g->name_list_capacity = g->type_list_capacity = g->race_list_capacity = g->direction_list_capacity = n;
+    g->loc_list_capacity = g->sprite_move_list_capacity = g->dead_list_capacity = g->update_list_capacity = n;
+    g->attacking_list_capacity = g->blocking_list_capacity = g->block_success_list_capacity = g->damaged_list_capacity = n;
+    g->inventory_list_capacity = g->target_list_capacity = g->target_path_list_capacity = g->default_action_list_capacity = n;
+    g->equipment_list_capacity = g->stats_list_capacity = g->itemtype_list_capacity = g->weapontype_list_capacity = n;
+    g->shieldtype_list_capacity = g->potion_type_list_capacity = n;
+    g->damage_list_capacity = n;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * n);
     massert(g->name_list, "g->name_list is NULL");
@@ -158,6 +148,8 @@ gamestate* gamestateinitptr() {
     massert(g->shieldtype_list, "g->shieldtype_list is NULL");
     g->potion_type_list = (potiontype_component*)malloc(sizeof(potiontype_component) * n);
     massert(g->potion_type_list, "g->potion_list is NULL");
+    g->damage_list = (damage_component*)malloc(sizeof(damage_component) * n);
+    massert(g->damage_list, "g->damage_list is NULL");
 
     g->next_entityid = 0;
 
@@ -233,6 +225,11 @@ void gamestatefree(gamestate* g) {
     free(g->default_action_list);
     free(g->equipment_list);
     free(g->stats_list);
+    free(g->itemtype_list);
+    free(g->weapontype_list);
+    free(g->shieldtype_list);
+    free(g->potion_type_list);
+    free(g->damage_list);
     free(g);
     msuccess("Freed gamestate");
 }
@@ -479,6 +476,7 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     case C_WEAPONTYPE: init_weapontype_component((weapontype_component*)c_ptr, id, *(weapontype*)data); break;
     case C_SHIELDTYPE: init_shieldtype_component((shieldtype_component*)c_ptr, id, *(shieldtype*)data); break;
     case C_POTIONTYPE: init_potiontype_component((potiontype_component*)c_ptr, id, *(potiontype*)data); break;
+    case C_DAMAGE: init_damage_component((damage_component*)c_ptr, id, *(roll*)data); break;
     default: merror("Unsupported component type: %s", component2str(comp)); return false;
     }
 
@@ -1756,6 +1754,7 @@ bool g_set_damage(gamestate* const g, entityid id, roll r) {
             return true;
         }
     }
+    merror("Could not find id %d in damage list", id);
     return false;
 }
 

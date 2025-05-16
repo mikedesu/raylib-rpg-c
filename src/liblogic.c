@@ -1256,7 +1256,9 @@ static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, co
     }
     //massert(id != ENTITYID_INVALID, "failed to create weapon");
     g_register_comp(g, id, C_WEAPONTYPE);
+    g_register_comp(g, id, C_DAMAGE);
     g_add_weapontype(g, id, type);
+    g_add_damage(g, id, (roll){0, 0, 0});
     return id;
 }
 
@@ -2107,7 +2109,7 @@ static void init_dagger_test(gamestate* g) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = weapon_create(g, WEAPON_DAGGER, loc, "dummy dagger");
         //if (id != ENTITYID_INVALID) {
-        g_set_damage(g, id, (roll){1, 4, 0});
+        massert(g_set_damage(g, id, (roll){1, 4, 0}), "Failed to set damage");
         //}
     }
 }

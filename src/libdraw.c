@@ -1468,7 +1468,25 @@ static void draw_inventory_menu(gamestate* const g) {
 
     if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < inventory_count) {
         entityid item_id = inventory[g->inventory_menu_selection];
-        snprintf(info_text, sizeof(info_text), "%s\nType: %d", g_get_name(g, item_id), g_get_type(g, item_id));
+
+        const char* name = g_get_name(g, item_id);
+        itemtype item_type = g_get_itemtype(g, item_id);
+
+        if (g_has_damage(g, item_id)) {
+            roll dmg_roll = g_get_damage(g, item_id);
+            int n = dmg_roll.n;
+            int sides = dmg_roll.sides;
+            int modifier = dmg_roll.modifier;
+
+            if (modifier) {
+                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d+%d", name, item_type, n, sides, modifier);
+            } else {
+                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d", name, item_type, n, sides);
+            }
+        } else {
+            snprintf(info_text, sizeof(info_text), "%s\nType: %d", name, item_type);
+        }
+
         //    entityid item_id = hero->inventory[g->inventory_menu_selection];
         //        //snprintf(info_text, sizeof(info_text), "%s\nType: %d", item_entity->name, item_entity->type);
         //        snprintf(info_text, sizeof(info_text), "%s\nType: %d", "[placeholder]", g_get_type(g, item_id));
