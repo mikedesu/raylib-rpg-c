@@ -208,6 +208,9 @@ static sprite* get_weapon_front_sprite(const gamestate* g, entityid id, spritegr
     if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
         return spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
     }
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_SHOT) {
+        return spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_F);
+    }
     return NULL;
 }
 
@@ -225,6 +228,9 @@ static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegro
     }
     if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
         return spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
+    }
+    if (sg->current == SPRITEGROUP_ANIM_HUMAN_SHOT) {
+        return spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_B);
     }
     return NULL;
 }
@@ -302,17 +308,20 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     // check for a weapon
     sprite* weapon_front_s = get_weapon_front_sprite(g, id, sg);
     sprite* weapon_back_s = get_weapon_back_sprite(g, id, sg);
-    if (shield_back_s) DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    if (shield_back_s) {
+        DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
     if (weapon_back_s) {
         //msuccess("weapon_back_s");
         DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
 
     // Draw sprite on top
-    //DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, WHITE);
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, (Color){255, 255, 255, 255});
 
-    if (shield_front_s) DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    if (shield_front_s) {
+        DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
     if (weapon_front_s) {
         //msuccess("weapon_front_s");
         DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
@@ -529,10 +538,15 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entityid id, spriteg
     massert(sg, "spritegroup is NULL");
 
     race_t race = g_get_race(g, id);
+    entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
+    weapontype wtype = g_get_weapontype(g, weapon);
     int cur = 0;
 
     if (race == RACE_HUMAN) {
         cur = SPRITEGROUP_ANIM_HUMAN_ATTACK;
+        if (wtype == WEAPON_BOW) {
+            cur = SPRITEGROUP_ANIM_HUMAN_SHOT;
+        }
     } else if (race == RACE_ORC) {
         cur = SPRITEGROUP_ANIM_ORC_ATTACK;
     } else if (race == RACE_ELF) {
@@ -544,7 +558,7 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entityid id, spriteg
     } else if (race == RACE_GOBLIN) {
         cur = SPRITEGROUP_ANIM_GOBLIN_ATTACK;
     }
-    spritegroup_set_current(sg, SPRITEGROUP_ANIM_GOBLIN_ATTACK);
+    spritegroup_set_current(sg, cur);
     update_weapon_for_entity(g, id, sg);
 
     //e->is_attacking = false;

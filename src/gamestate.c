@@ -1561,7 +1561,11 @@ bool g_set_weapontype(gamestate* const g, entityid id, weapontype type) {
 
 weapontype g_get_weapontype(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
+    //massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        merror("id is invalid");
+        return WEAPON_NONE;
+    }
     if (g->weapontype_list == NULL) {
         merror("g->weapontype_list is NULL");
         return WEAPON_NONE;
