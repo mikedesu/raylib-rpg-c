@@ -1,20 +1,30 @@
 #pragma once
 
+#include "arrow.h"
+#include "arrow_component.h"
 #include "attrib_effect.h"
 #include "direction.h"
 #include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "item.h"
+#include "itemtype_component.h"
 #include "location.h"
 #include "potion.h"
+#include "potion_component.h"
+#include "quiver_component.h"
 #include "race.h"
 #include "shield.h"
+#include "shieldtype_component.h"
 #include "stats_slot.h"
 #include "weapon.h"
+#include "weapontype_component.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define MAX_INVENTORY_SIZE 32
+#define MAX_EQUIPMENT_SLOTS 2
 
 typedef enum component_t
 {
@@ -137,7 +147,6 @@ typedef struct damaged_component_t {
     bool damaged;
 } damaged_component;
 
-#define MAX_INVENTORY_SIZE 32
 typedef struct inventory_component_t {
     entityid id;
     entityid inventory[MAX_INVENTORY_SIZE]; // max 32 items
@@ -172,50 +181,15 @@ typedef enum equipment_slot_t
     EQUIPMENT_SLOT_COUNT
 } equipment_slot;
 
-#define MAX_EQUIPMENT_SLOTS 2
-
 typedef struct equipment_component_t {
     entityid id;
     entityid equipment[MAX_EQUIPMENT_SLOTS];
 } equipment_component;
 
-//typedef enum stats_slot_t
-//{
-//    STATS_LEVEL,
-//    STATS_XP,
-//    STATS_HP,
-//    STATS_MAXHP,
-//    STATS_COUNT
-//} stats_slot;
-
-//#define MAX_STATS_SLOTS 4
-
 typedef struct stats_component_t {
     entityid id;
     int stats[MAX_STATS_SLOTS];
 } stats_component;
-
-typedef struct itemtype_component_t {
-    entityid id;
-    itemtype type;
-} itemtype_component;
-
-typedef struct weapontype_component_t {
-    entityid id;
-    weapontype type;
-} weapontype_component;
-
-typedef struct shieldtype_component_t {
-    entityid id;
-    shieldtype type;
-} shieldtype_component;
-
-//#define MAX_POTION_EFFECTS 4
-
-typedef struct potion_type_component_t {
-    entityid id;
-    potiontype type;
-} potiontype_component;
 
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);
@@ -238,5 +212,6 @@ void init_stats_component(stats_component* comp, entityid id);
 void init_itemtype_component(itemtype_component* comp, entityid id, itemtype type);
 void init_weapontype_component(weapontype_component* comp, entityid id, weapontype type);
 void init_shieldtype_component(shieldtype_component* comp, entityid id, shieldtype type);
-//void init_potion_component(potiontype_component* comp, entityid id, potiontype type);
 void init_potiontype_component(potiontype_component* comp, entityid id, potiontype type);
+void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype type);
+void init_quiver_component(quiver_component* comp, entityid id, int capacity);
