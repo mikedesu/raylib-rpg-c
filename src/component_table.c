@@ -28,7 +28,35 @@ void ct_destroy(ct* table) {
 
 bool ct_add_entity(ct* table, entityid id) {
     massert(table, "table is NULL");
-    if (!table || id == ENTITYID_INVALID || id >= table->component_row_count || ct_has_entity(table, id)) return false;
+    if (!table || id == ENTITYID_INVALID) {
+        // id >= table->component_row_count || ct_has_entity(table, id)) {
+        merror("ct_add_entity: fail for id %d", id);
+        return false;
+    }
+    if (id >= table->component_capacity) {
+        minfo("ct_add_entity: id %d is out of bounds", id);
+        minfo("growing ct...");
+
+        size_t new_capacity = table->component_capacity == 0 ? 1 : table->component_capacity * 2;
+        long int* new_components = realloc(table->components, new_capacity * table->ints_per_row * sizeof(long int));
+        if (!new_components) {
+            merror("realloc failed");
+            return false;
+        }
+        table->components = new_components;
+        table->component_capacity = new_capacity;
+
+        minfo("ct_add_entity: new capacity %zu", table->component_capacity);
+    }
+    if (id < table->component_row_count) {
+        merror("ct_add_entity: id %d already exists", id);
+        return false;
+    }
+    if (ct_has_entity(table, id)) {
+        merror("ct_add_entity: entity %d already exists", id);
+        return false;
+    }
+
     if (table->component_row_count >= table->component_capacity) {
         size_t new_capacity = table->component_capacity == 0 ? 1 : table->component_capacity * 2;
         long int* new_components = realloc(table->components, new_capacity * table->ints_per_row * sizeof(long int));
@@ -38,6 +66,7 @@ bool ct_add_entity(ct* table, entityid id) {
         }
         table->components = new_components;
         table->component_capacity = new_capacity;
+        minfo("ct_add_entity: new capacity %zu", table->component_capacity);
     }
     // instead of using a loop to zero the row out, cant we just use memset?
     memset(&table->components[table->component_row_count * table->ints_per_row], 0, table->ints_per_row * sizeof(long int));
@@ -54,7 +83,7 @@ bool ct_has_entity(ct* table, entityid id) {
 
 bool ct_add_component(ct* table, entityid id, component comp) {
     massert(table, "table is NULL");
-    minfo("ct_add_component: id %d comp %s", id, component2str(comp));
+    //minfo("ct_add_component: id %d comp %s", id, component2str(comp));
     if (!table || id <= ENTITYID_INVALID || id >= table->component_row_count || comp < 0 || comp >= table->component_col_count) return false;
     massert(ct_has_entity(table, id), "ct_add_component: entity not found");
     size_t int_index = comp / 64, bit_index = comp % 64; // Determine which bit to set
