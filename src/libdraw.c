@@ -1,4 +1,4 @@
-#include "component.h"
+//#include "component.h"
 #include "direction.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
@@ -205,10 +205,10 @@ static sprite* get_weapon_front_sprite(const gamestate* g, entityid id, spritegr
         merror("weapon spritegroup is NULL for id %d", weapon);
         return NULL;
     }
-    if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
+    if (sg->current == SG_ANIM_NPC_ATTACK) {
         return spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
     }
-    if (sg->current == SPRITEGROUP_ANIM_HUMAN_SHOT) {
+    if (sg->current == SG_ANIM_NPC_SHOT) {
         return spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_F);
     }
     return NULL;
@@ -226,10 +226,10 @@ static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegro
         merror("weapon spritegroup is NULL for id %d", weapon);
         return NULL;
     }
-    if (sg->current == SPRITEGROUP_ANIM_HUMAN_ATTACK) {
+    if (sg->current == SG_ANIM_NPC_ATTACK) {
         return spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
     }
-    if (sg->current == SPRITEGROUP_ANIM_HUMAN_SHOT) {
+    if (sg->current == SG_ANIM_NPC_SHOT) {
         return spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_B);
     }
     return NULL;
@@ -245,7 +245,8 @@ static sprite* get_shield_front_sprite(const gamestate* g, entityid id, spritegr
     if (shield == ENTITYID_INVALID) return NULL;
     spritegroup_t* s_sg = hashtable_entityid_spritegroup_get(spritegroups, shield);
     if (!s_sg) return NULL;
-    if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
+    //if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
+    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) {
         return spritegroup_get(s_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
     }
     //if (e->is_blocking) { return spritegroup_get(shield_sg, SG_ANIM_BUCKLER_FRONT); }
@@ -262,7 +263,8 @@ static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegro
     if (shield == ENTITYID_INVALID) return NULL;
     spritegroup_t* s_sg = hashtable_entityid_spritegroup_get(spritegroups, shield);
     if (!s_sg) return NULL;
-    if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
+    //if (sg->current == SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS || sg->current == SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS) {
+    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) {
         return spritegroup_get(s_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
     }
     //if (e->shield == ENTITYID_INVALID) return NULL;
@@ -427,20 +429,21 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entityid id, spritegro
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
 
-    race_t race = g_get_race(g, id);
+    //race_t race = g_get_race(g, id);
+    spritegroup_set_current(sg, SG_ANIM_NPC_DMG);
 
-    if (race == RACE_HUMAN)
-        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_DMG);
-    else if (race == RACE_ORC)
-        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_DMG);
-    else if (race == RACE_ELF)
-        spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_DMG);
-    else if (race == RACE_DWARF)
-        spritegroup_set_current(sg, SPRITEGROUP_ANIM_DWARF_DMG);
-    else if (race == RACE_HALFLING)
-        spritegroup_set_current(sg, SPRITEGROUP_ANIM_HALFLING_DMG);
-    else if (race == RACE_GOBLIN)
-        spritegroup_set_current(sg, SPRITEGROUP_ANIM_GOBLIN_DMG);
+    //if (race == RACE_HUMAN)
+    //    spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_DMG);
+    //else if (race == RACE_ORC)
+    //    spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_DMG);
+    //else if (race == RACE_ELF)
+    //    spritegroup_set_current(sg, SPRITEGROUP_ANIM_ELF_DMG);
+    //else if (race == RACE_DWARF)
+    //    spritegroup_set_current(sg, SPRITEGROUP_ANIM_DWARF_DMG);
+    //else if (race == RACE_HALFLING)
+    //    spritegroup_set_current(sg, SPRITEGROUP_ANIM_HALFLING_DMG);
+    //else if (race == RACE_GOBLIN)
+    //    spritegroup_set_current(sg, SPRITEGROUP_ANIM_GOBLIN_DMG);
 
     //e->is_damaged = false;
     g_set_damaged(g, id, false);
@@ -456,39 +459,54 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entityid id, spritegroup_
     //minfo("calling g_is_dead 1");
     if (!g_is_dead(g, id)) return;
 
-    race_t race = g_get_race(g, id);
+    //race_t race = g_get_race(g, id);
+    if (sg->current == SG_ANIM_NPC_SPINDIE) return;
+    sg_set_default_anim(sg, SG_ANIM_NPC_SPINDIE);
+    spritegroup_set_current(sg, sg->default_anim);
+    spritegroup_set_stop_on_last_frame(sg, true);
 
-    if (race == RACE_HUMAN) {
-        if (sg->current == SPRITEGROUP_ANIM_HUMAN_SPINDIE) return;
-        sg_set_default_anim(sg, SPRITEGROUP_ANIM_HUMAN_SPINDIE);
-        spritegroup_set_current(sg, sg->default_anim);
-        spritegroup_set_stop_on_last_frame(sg, true);
-    } else if (race == RACE_ORC) {
-        if (sg->current == SPRITEGROUP_ANIM_ORC_DIE) return;
-        sg_set_default_anim(sg, SPRITEGROUP_ANIM_ORC_DIE);
-        spritegroup_set_current(sg, sg->default_anim);
-        spritegroup_set_stop_on_last_frame(sg, true);
-    } else if (race == RACE_ELF) {
-        if (sg->current == SPRITEGROUP_ANIM_ELF_SPINDIE) return;
-        sg_set_default_anim(sg, SPRITEGROUP_ANIM_ELF_SPINDIE);
-        spritegroup_set_current(sg, sg->default_anim);
-        spritegroup_set_stop_on_last_frame(sg, true);
-    } else if (race == RACE_DWARF) {
-        if (sg->current == SPRITEGROUP_ANIM_DWARF_SPINDIE) return;
-        sg_set_default_anim(sg, SPRITEGROUP_ANIM_DWARF_SPINDIE);
-        spritegroup_set_current(sg, sg->default_anim);
-        spritegroup_set_stop_on_last_frame(sg, true);
-    } else if (race == RACE_HALFLING) {
-        if (sg->current == SPRITEGROUP_ANIM_HALFLING_SPINDIE) return;
-        sg_set_default_anim(sg, SPRITEGROUP_ANIM_HALFLING_SPINDIE);
-        spritegroup_set_current(sg, sg->default_anim);
-        spritegroup_set_stop_on_last_frame(sg, true);
-    } else if (race == RACE_GOBLIN) {
-        if (sg->current == SPRITEGROUP_ANIM_GOBLIN_SPINDIE) return;
-        sg_set_default_anim(sg, SPRITEGROUP_ANIM_GOBLIN_SPINDIE);
-        spritegroup_set_current(sg, sg->default_anim);
-        spritegroup_set_stop_on_last_frame(sg, true);
-    }
+    //if (race == RACE_HUMAN) {
+    //    //if (sg->current == SPRITEGROUP_ANIM_HUMAN_SPINDIE) return;
+    //    if (sg->current == SG_ANIM_NPC_SPINDIE) return;
+    //    sg_set_default_anim(sg, SG_ANIM_NPC_SPINDIE);
+    //    spritegroup_set_current(sg, sg->default_anim);
+    //    spritegroup_set_stop_on_last_frame(sg, true);
+    //} else if (race == RACE_ORC) {
+    //    if (sg->current == SG_ANIM_NPC_SPINDIE) return;
+    //    sg_set_default_anim(sg, SG_ANIM_NPC_SPINDIE);
+    //    //if (sg->current == SPRITEGROUP_ANIM_ORC_DIE) return;
+    //    //sg_set_default_anim(sg, SPRITEGROUP_ANIM_ORC_DIE);
+    //    spritegroup_set_current(sg, sg->default_anim);
+    //    spritegroup_set_stop_on_last_frame(sg, true);
+    //} else if (race == RACE_ELF) {
+    //    if (sg->current == SG_ANIM_NPC_SPINDIE) return;
+    //    sg_set_default_anim(sg, SG_ANIM_NPC_SPINDIE);
+    //    //if (sg->current == SPRITEGROUP_ANIM_ELF_SPINDIE) return;
+    //    //sg_set_default_anim(sg, SPRITEGROUP_ANIM_ELF_SPINDIE);
+    //    spritegroup_set_current(sg, sg->default_anim);
+    //    spritegroup_set_stop_on_last_frame(sg, true);
+    //} else if (race == RACE_DWARF) {
+    //    if (sg->current == SG_ANIM_NPC_SPINDIE) return;
+    //    sg_set_default_anim(sg, SG_ANIM_NPC_SPINDIE);
+    //    //if (sg->current == SPRITEGROUP_ANIM_DWARF_SPINDIE) return;
+    //    //sg_set_default_anim(sg, SPRITEGROUP_ANIM_DWARF_SPINDIE);
+    //    spritegroup_set_current(sg, sg->default_anim);
+    //    spritegroup_set_stop_on_last_frame(sg, true);
+    //} else if (race == RACE_HALFLING) {
+    //    if (sg->current == SG_ANIM_NPC_SPINDIE) return;
+    //    sg_set_default_anim(sg, SG_ANIM_NPC_SPINDIE);
+    //    //if (sg->current == SPRITEGROUP_ANIM_HALFLING_SPINDIE) return;
+    //    //sg_set_default_anim(sg, SPRITEGROUP_ANIM_HALFLING_SPINDIE);
+    //    spritegroup_set_current(sg, sg->default_anim);
+    //    spritegroup_set_stop_on_last_frame(sg, true);
+    //} else if (race == RACE_GOBLIN) {
+    //    if (sg->current == SG_ANIM_NPC_SPINDIE) return;
+    //    sg_set_default_anim(sg, SG_ANIM_NPC_SPINDIE);
+    //    //if (sg->current == SPRITEGROUP_ANIM_GOBLIN_SPINDIE) return;
+    //    //sg_set_default_anim(sg, SPRITEGROUP_ANIM_GOBLIN_SPINDIE);
+    //    spritegroup_set_current(sg, sg->default_anim);
+    //    spritegroup_set_stop_on_last_frame(sg, true);
+    //}
 }
 
 static void update_weapon_for_entity(gamestate* g, entityid id, spritegroup_t* sg) {
@@ -541,23 +559,22 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entityid id, spriteg
     entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
     weapontype wtype = g_get_weapontype(g, weapon);
     int cur = 0;
-
-    if (race == RACE_HUMAN) {
-        cur = SPRITEGROUP_ANIM_HUMAN_ATTACK;
-        if (wtype == WEAPON_BOW) {
-            cur = SPRITEGROUP_ANIM_HUMAN_SHOT;
-        }
-    } else if (race == RACE_ORC) {
-        cur = SPRITEGROUP_ANIM_ORC_ATTACK;
-    } else if (race == RACE_ELF) {
-        cur = SPRITEGROUP_ANIM_ELF_ATTACK;
-    } else if (race == RACE_DWARF) {
-        cur = SPRITEGROUP_ANIM_DWARF_ATTACK;
-    } else if (race == RACE_HALFLING) {
-        cur = SPRITEGROUP_ANIM_HALFLING_ATTACK;
-    } else if (race == RACE_GOBLIN) {
-        cur = SPRITEGROUP_ANIM_GOBLIN_ATTACK;
+    cur = SG_ANIM_NPC_ATTACK;
+    if (wtype == WEAPON_BOW) {
+        cur = SG_ANIM_NPC_SHOT;
     }
+    //if (race == RACE_HUMAN) {
+    //} else if (race == RACE_ORC) {
+    //    cur = SPRITEGROUP_ANIM_ORC_ATTACK;
+    //} else if (race == RACE_ELF) {
+    //    cur = SPRITEGROUP_ANIM_ELF_ATTACK;
+    //} else if (race == RACE_DWARF) {
+    //    cur = SPRITEGROUP_ANIM_DWARF_ATTACK;
+    //} else if (race == RACE_HALFLING) {
+    //    cur = SPRITEGROUP_ANIM_HALFLING_ATTACK;
+    //} else if (race == RACE_GOBLIN) {
+    //    cur = SPRITEGROUP_ANIM_GOBLIN_ATTACK;
+    //}
     spritegroup_set_current(sg, cur);
     update_weapon_for_entity(g, id, sg);
 
@@ -603,34 +620,36 @@ static void libdraw_set_sg_block_success(gamestate* const g, entityid id, sprite
     race_t race = g_get_race(g, id);
 
     int anim_index = -1;
+    anim_index = SG_ANIM_NPC_GUARD_SUCCESS;
 
-    if (race == RACE_HUMAN) {
-        anim_index = SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS;
-        //spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS);
-        //entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
-        //if (shield_id != ENTITYID_INVALID) {
-        //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
-        //    if (shield_sg) {
-        //        sprite* player_sprite = sg_get_current(sg);
-        //        int player_ctx = sprite_get_context(player_sprite);
-        //        spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
-        //        spritegroup_setcontexts(shield_sg, player_ctx);
-        //    }
-        //}
-    } else if (race == RACE_ORC) {
-        anim_index = SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS;
-        //spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS);
-        //entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
-        //if (shield_id != ENTITYID_INVALID) {
-        //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
-        //    if (shield_sg) {
-        //        sprite* player_sprite = sg_get_current(sg);
-        //        int player_ctx = sprite_get_context(player_sprite);
-        //        spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
-        //        spritegroup_setcontexts(shield_sg, player_ctx);
-        //    }
-        //}
-    }
+    //if (race == RACE_HUMAN) {
+    //    anim_index = SG_ANIM_NPC_GUARD_SUCCESS;
+    //spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_GUARD_SUCCESS);
+    //entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
+    //if (shield_id != ENTITYID_INVALID) {
+    //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+    //    if (shield_sg) {
+    //        sprite* player_sprite = sg_get_current(sg);
+    //        int player_ctx = sprite_get_context(player_sprite);
+    //        spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+    //        spritegroup_setcontexts(shield_sg, player_ctx);
+    //    }
+    //}
+    //} else if (race == RACE_ORC) {
+    //    anim_index = SG_ANIM_NPC_GUARD_SUCCESS;
+    //anim_index = SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS;
+    //spritegroup_set_current(sg, SPRITEGROUP_ANIM_ORC_GUARD_SUCCESS);
+    //entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
+    //if (shield_id != ENTITYID_INVALID) {
+    //    spritegroup_t* shield_sg = hashtable_entityid_spritegroup_get(spritegroups, shield_id);
+    //    if (shield_sg) {
+    //        sprite* player_sprite = sg_get_current(sg);
+    //        int player_ctx = sprite_get_context(player_sprite);
+    //        spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+    //        spritegroup_setcontexts(shield_sg, player_ctx);
+    //    }
+    //}
+    //}
     spritegroup_set_current(sg, anim_index);
 
     entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
@@ -692,18 +711,23 @@ static void libdraw_update_sprite_position(gamestate* const g, entityid id, spri
         entitytype_t type = g_get_type(g, id);
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
             race_t race = g_get_race(g, id);
-            if (race == RACE_HUMAN)
-                sg->current = SPRITEGROUP_ANIM_HUMAN_WALK;
+            if (race == RACE_HUMAN) sg->current = SG_ANIM_NPC_WALK;
+            //sg->current = SPRITEGROUP_ANIM_HUMAN_WALK;
             else if (race == RACE_ORC)
-                sg->current = SPRITEGROUP_ANIM_ORC_WALK;
+                sg->current = SG_ANIM_NPC_WALK;
+            //sg->current = SPRITEGROUP_ANIM_ORC_WALK;
             else if (race == RACE_ELF)
-                sg->current = SPRITEGROUP_ANIM_ELF_WALK;
+                sg->current = SG_ANIM_NPC_WALK;
+            //sg->current = SPRITEGROUP_ANIM_ELF_WALK;
             else if (race == RACE_DWARF)
-                sg->current = SPRITEGROUP_ANIM_DWARF_WALK;
+                sg->current = SG_ANIM_NPC_WALK;
+            //sg->current = SPRITEGROUP_ANIM_DWARF_WALK;
             else if (race == RACE_HALFLING)
-                sg->current = SPRITEGROUP_ANIM_HALFLING_WALK;
+                sg->current = SG_ANIM_NPC_WALK;
+            //sg->current = SPRITEGROUP_ANIM_HALFLING_WALK;
             else if (race == RACE_GOBLIN)
-                sg->current = SPRITEGROUP_ANIM_GOBLIN_WALK;
+                sg->current = SG_ANIM_NPC_WALK;
+            //sg->current = SPRITEGROUP_ANIM_GOBLIN_WALK;
         }
     }
 }
