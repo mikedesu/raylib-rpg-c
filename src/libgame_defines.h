@@ -405,6 +405,9 @@
 #define TX_ACTION_SHOT_BOW_B 313
 #define TX_ACTION_SHOT_BOW_B_HALFLING_GOBLIN_DWARF 314
 
+//315 1 4 0 img/items/arrow.png
+#define TX_ARROW 315
+
 //--------------------------------
 
 #define COMPANYSCENE 0

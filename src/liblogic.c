@@ -93,6 +93,7 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
 static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char* name);
 static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const char* name);
 static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, const char* name);
+static entityid arrow_create(gamestate* const g, loc_t loc, const char* name);
 static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, const char* name);
 
 static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
@@ -1256,6 +1257,19 @@ static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, co
     //massert(id != ENTITYID_INVALID, "failed to create weapon");
     g_register_comp(g, id, C_WEAPONTYPE);
     g_add_weapontype(g, id, type);
+    return id;
+}
+
+static entityid arrow_create(gamestate* const g, loc_t loc, const char* name) {
+    massert(g, "gamestate is NULL");
+    entityid id = item_create(g, ITEM_ARROW, loc, name);
+    if (id == ENTITYID_INVALID) {
+        merror("failed to create arrow");
+        return ENTITYID_INVALID;
+    }
+    //massert(id != ENTITYID_INVALID, "failed to create weapon");
+    //g_register_comp(g, id, C_WEAPONTYPE);
+    //g_add_weapontype(g, id, type);
     return id;
 }
 
