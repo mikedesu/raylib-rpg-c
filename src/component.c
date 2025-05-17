@@ -379,3 +379,20 @@ void init_damage_component(damage_component* comp, entityid id, roll r) {
     comp->id = id;
     comp->r = r;
 }
+
+void init_ac_component(ac_component* comp, entityid id, int ac) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) {
+        return;
+    }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        return;
+    }
+    massert(ac >= 0, "ac is invalid: %d", ac);
+    if (ac < 0) {
+        return;
+    }
+    comp->id = id;
+    comp->ac = ac;
+}

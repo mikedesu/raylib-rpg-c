@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ac_component.h"
 #include "component.h"
 #include "component_table.h"
 #include "controlmode.h"
@@ -113,6 +114,7 @@ typedef struct gamestate {
     shieldtype_component* shieldtype_list;
     potiontype_component* potion_type_list;
     damage_component* damage_list;
+    ac_component* ac_list;
 
     int name_list_count;
     int name_list_capacity;
@@ -164,6 +166,8 @@ typedef struct gamestate {
     int potion_type_list_capacity;
     int damage_list_count;
     int damage_list_capacity;
+    int ac_list_count;
+    int ac_list_capacity;
 
     entityid next_entityid; // Start at 0, increment for each new entity
 
@@ -337,3 +341,8 @@ bool g_add_damage(gamestate* const g, entityid id, roll r);
 bool g_has_damage(const gamestate* const g, entityid id);
 bool g_set_damage(gamestate* const g, entityid id, roll r);
 roll g_get_damage(const gamestate* const g, entityid id);
+
+bool g_add_ac(gamestate* const g, entityid id, int ac);
+bool g_has_ac(const gamestate* const g, entityid id);
+bool g_set_ac(gamestate* const g, entityid id, int ac);
+int g_get_ac(const gamestate* const g, entityid id);

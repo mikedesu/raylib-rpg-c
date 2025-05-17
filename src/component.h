@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ac_component.h"
 #include "arrow.h"
 #include "arrow_component.h"
 #include "attacking_component.h"
@@ -70,6 +71,7 @@ typedef enum component_t
     C_SHIELDTYPE,
     C_POTIONTYPE,
     C_DAMAGE,
+    C_AC,
     C_COUNT
 } component;
 
@@ -100,6 +102,7 @@ static inline const char* component2str(component c) {
     case C_SHIELDTYPE: return "C_SHIELDTYPE";
     case C_POTIONTYPE: return "C_POTIONTYPE";
     case C_DAMAGE: return "C_DAMAGE";
+    case C_AC: return "C_AC";
     case C_COUNT: return "C_COUNT";
     default: break;
     }
@@ -131,3 +134,4 @@ void init_potiontype_component(potiontype_component* comp, entityid id, potionty
 void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype type);
 void init_quiver_component(quiver_component* comp, entityid id, int capacity);
 void init_damage_component(damage_component* comp, entityid id, roll r);
+void init_ac_component(ac_component* comp, entityid id, int ac);

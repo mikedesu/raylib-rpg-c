@@ -601,22 +601,32 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     // lets try an experiment...
 
     // get the armor class of the target
-    const int ac = g_get_stat(g, target_id, STATS_AC);
+    const int base_ac = g_get_stat(g, target_id, STATS_AC);
 
     const int attack_roll = rand() % 20 + 1;
     *attack_successful = false;
 
-    if (attack_roll >= ac) {
+    if (attack_roll >= base_ac) {
         // if you have a shield at all, the attack will get auto-blocked
         entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
         if (shield_id != ENTITYID_INVALID) {
-            int block_roll = rand() % 100;
-            const int block_chance = 90;
-            if (block_roll < block_chance) {
-                msuccess("Block successful");
+            const int shield_ac = g_get_ac(g, shield_id);
+            const int total_ac = base_ac + shield_ac;
+
+            if (attack_roll < total_ac) {
+                //merror("Attack successful, but blocked by shield");
+                *attack_successful = false;
                 handle_attack_blocked(g, attacker_id, target_id, attack_successful);
                 return false;
             }
+
+            //int block_roll = rand() % 100;
+            //const int block_chance = 90;
+            //if (block_roll < block_chance) {
+            //    msuccess("Block successful");
+            //    handle_attack_blocked(g, attacker_id, target_id, attack_successful);
+            //    return false;
+            //}
             //msuccess("Block successful");
             //handle_attack_blocked(g, attacker_id, target_id, attack_successful);
             //return false;
@@ -1301,6 +1311,8 @@ static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, co
     //massert(id != ENTITYID_INVALID, "failed to create weapon");
     g_register_comp(g, id, C_SHIELDTYPE);
     g_add_shieldtype(g, id, type);
+    g_register_comp(g, id, C_AC);
+    g_add_ac(g, id, 2);
     return id;
 }
 
@@ -2264,59 +2276,48 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     // test entity creation on the fly
     static bool do_this_once = true;
     const int every_nth_turn = 10;
-    if (g->turn_count % every_nth_turn == 0) {
-        bool success = false;
-        if (do_this_once) {
-            while (!success) {
-                loc_t loc = get_random_empty_non_wall_loc(g, 0);
-                //entityid id = npc_create(g, RACE_ORC, loc, "orc");
-                //entityid id = npc_create(g, RACE_ELF, loc, "elf");
-                //entityid id = npc_create(g, RACE_DWARF, loc, "dwarf");
-
-                entityid id = ENTITYID_INVALID;
-                race_t race = RACE_HUMAN;
-
-                int choice = rand() % 6;
-                switch (choice) {
-                case 0: race = RACE_HUMAN; break;
-                case 1: race = RACE_ELF; break;
-                case 2: race = RACE_DWARF; break;
-                case 3: race = RACE_HALFLING; break;
-                case 4: race = RACE_ORC; break;
-                case 5: race = RACE_GOBLIN; break;
-                default: break;
-                }
-
-                id = npc_create(g, race, loc, "NPC");
-                if (id != ENTITYID_INVALID) {
-                    //g_set_max_hp(g, id, 10);
-
-                    int hit_die = 4;
-                    switch (race) {
-                    case RACE_HUMAN: hit_die = 6; break;
-                    case RACE_ELF: hit_die = 6; break;
-                    case RACE_DWARF: hit_die = 6; break;
-                    case RACE_ORC: hit_die = 8; break;
-                    case RACE_GOBLIN: hit_die = 4; break;
-                    case RACE_HALFLING: hit_die = 4; break;
-                    default: break;
-                    }
-
-                    roll r = {1, hit_die, 0};
-
-                    const int max_hp = do_roll(r);
-
-                    g_set_stat(g, id, STATS_MAXHP, max_hp);
-                    g_set_stat(g, id, STATS_HP, max_hp);
-                    g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-                    success = true;
-                }
-            }
-            do_this_once = false;
-        }
-    } else {
-        do_this_once = true;
-    }
+    //if (g->turn_count % every_nth_turn == 0) {
+    //    bool success = false;
+    //    if (do_this_once) {
+    //        while (!success) {
+    //            loc_t loc = get_random_empty_non_wall_loc(g, 0);
+    //            entityid id = ENTITYID_INVALID;
+    //            race_t race = RACE_HUMAN;
+    //            int choice = rand() % 6;
+    //            switch (choice) {
+    //            case 0: race = RACE_HUMAN; break;
+    //            case 1: race = RACE_ELF; break;
+    //            case 2: race = RACE_DWARF; break;
+    //            case 3: race = RACE_HALFLING; break;
+    //            case 4: race = RACE_ORC; break;
+    //            case 5: race = RACE_GOBLIN; break;
+    //            default: break;
+    //            }
+    //            id = npc_create(g, race, loc, "NPC");
+    //            if (id != ENTITYID_INVALID) {
+    //                int hit_die = 4;
+    //                switch (race) {
+    //                case RACE_HUMAN: hit_die = 6; break;
+    //                case RACE_ELF: hit_die = 6; break;
+    //                case RACE_DWARF: hit_die = 6; break;
+    //                case RACE_ORC: hit_die = 8; break;
+    //                case RACE_GOBLIN: hit_die = 4; break;
+    //                case RACE_HALFLING: hit_die = 4; break;
+    //                default: break;
+    //                }
+    //                roll r = {1, hit_die, 0};
+    //                const int max_hp = do_roll(r);
+    //                g_set_stat(g, id, STATS_MAXHP, max_hp);
+    //                g_set_stat(g, id, STATS_HP, max_hp);
+    //                g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+    //                success = true;
+    //            }
+    //        }
+    //        do_this_once = false;
+    //    }
+    //} else {
+    //    do_this_once = true;
+    //}
 
     update_player_state(g);
     update_npcs_state(g);

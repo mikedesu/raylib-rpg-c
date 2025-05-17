@@ -1281,6 +1281,26 @@ static void create_sg_byid(gamestate* const g, entityid id) {
     //}
 }
 
+static int get_total_ac(gamestate* const g, entityid id);
+static int get_total_ac(gamestate* const g, entityid id) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entityid is invalid");
+    // get the ac stat
+    int stat_count = 0;
+    int* stats = g_get_stats(g, id, &stat_count);
+    massert(stats, "stats is NULL");
+    int ac = stats[STATS_AC];
+    // get the equipped shield
+    entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
+    if (shield_id != ENTITYID_INVALID) {
+        // get the shield's ac
+        int shield_ac = g_get_ac(g, shield_id);
+        massert(shield_ac >= 0, "shield_ac is negative");
+        ac += shield_ac;
+    }
+    return ac;
+}
+
 static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
     const int turn = g->turn_count;
@@ -1294,7 +1314,10 @@ static void draw_hud(gamestate* const g) {
     //const int level = g_get_stat(g, g->hero_id, STATS_LEVEL);
     const int level = stats[STATS_LEVEL];
     const int xp = stats[STATS_XP];
-    const int ac = stats[STATS_AC];
+
+    //const int ac = stats[STATS_AC];
+    const int ac = get_total_ac(g, g->hero_id);
+
     loc_t loc = g_get_location(g, g->hero_id);
     dungeon_floor_t* const df = d_get_current_floor(g->d);
     const char* room_name = df_get_room_name(df, loc);
@@ -1490,7 +1513,20 @@ static void draw_inventory_menu(gamestate* const g) {
             } else {
                 snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d", name, item_type, n, sides);
             }
-        } else {
+        } else if (g_has_ac(g, item_id)) {
+            int ac = g_get_ac(g, item_id);
+            snprintf(info_text, sizeof(info_text), "%s\nType: %d\nAC: %d", name, item_type, ac);
+        }
+        //else if (g_has_heal(g, item_id)) {
+        //    int heal = g_get_heal(g, item_id);
+        //    snprintf(info_text, sizeof(info_text), "%s\nType: %d\nHeal: %d", name, item_type, heal);
+        //}
+        //else if (g_has_effect(g, item_id)) {
+        //    effect_t effect = g_get_effect(g, item_id);
+        //    snprintf(info_text, sizeof(info_text), "%s\nType: %d\nEffect: %d", name, item_type, effect);
+        //
+        //        }
+        else {
             snprintf(info_text, sizeof(info_text), "%s\nType: %d", name, item_type);
         }
 
