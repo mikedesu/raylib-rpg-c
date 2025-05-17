@@ -1538,32 +1538,63 @@ static void draw_inventory_menu(gamestate* const g) {
 static void draw_quit_menu(const gamestate* const g) {
     massert(g, "gamestate is NULL");
     const char* text = "Press Q again to Exit or ESC to Cancel";
-    // draw box and text in center of screen
-    // draw box with semi-transparent black with white border
-
     const int box_pad = g->pad;
     const int section_gap = 16;
     const int item_list_pad = g->pad;
     const int max_visible_items = 12; // arbitrary limit for list height
-        //
-    // Measure text
-    Vector2 text_size = MeasureTextEx(GetFontDefault(), text, g->font_size, g->line_spacing);
-    // Menu box size
-    // box size should encompass the text plus padding
-    const float box_width = text_size.x + box_pad * 2;
-    const float box_height = text_size.y + box_pad * 2;
+    // Measure text using DrawText
+    int text_width = MeasureText(text, g->font_size);
+    int text_height = g->font_size;
+    // Calculate box size to fit the text with padding
+    const float box_width = text_width + box_pad * 2;
+    const float box_height = text_height + box_pad * 2;
+    // Calculate box position to center it on the screen
     const float box_x = (g->windowwidth - box_width) / 2.0f;
     const float box_y = (g->windowheight - box_height) / 2.0f;
+    // Define colors
     const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
-    //const Color bg = (Color){0, 0, 0xff, 0xFF}, fg = WHITE;
+    // Draw the box and border
     DrawRectangleRec((Rectangle){box_x, box_y, box_width, box_height}, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, fg);
     // Calculate text position to center it within the box
-    const float text_x = box_x + (box_width - text_size.x) / 2;
-    const float text_y = box_y + (box_height - text_size.y) / 2;
-    // Draw text (centered in box)
-    DrawTextEx(GetFontDefault(), text, (Vector2){text_x, text_y}, g->font_size, g->line_spacing, fg);
+    const float text_x = box_x + box_pad;
+    const float text_y = box_y + box_pad;
+    // Draw the text
+    DrawText(text, text_x, text_y, g->font_size, fg);
 }
+
+//static void draw_quit_menu(const gamestate* const g) {
+//    massert(g, "gamestate is NULL");
+//    const char* text = "Press Q again to Exit or ESC to Cancel";
+// draw box and text in center of screen
+// draw box with semi-transparent black with white border
+//    const int box_pad = g->pad;
+//    const int section_gap = 16;
+//    const int item_list_pad = g->pad;
+//    const int max_visible_items = 12; // arbitrary limit for list height
+// Measure text
+//    Vector2 text_size = MeasureTextEx(GetFontDefault(), text, g->font_size, g->line_spacing);
+// Menu box size
+// box size should encompass the text plus padding
+// using DrawText, the text is popping out of the box
+// so we need to add padding to the box size
+//const float box_width = text_size.x + box_pad * 2;
+//    const float box_width = text_size.x + box_pad * 4;
+//    const float box_height = text_size.y + box_pad * 2;
+//    const float box_x = (g->windowwidth - box_width) / 2.0f;
+//    const float box_y = (g->windowheight - box_height) / 2.0f;
+//    const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
+//const Color bg = (Color){0, 0, 0xff, 0xFF}, fg = WHITE;
+//    DrawRectangleRec((Rectangle){box_x, box_y, box_width, box_height}, bg);
+//    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, fg);
+// Calculate text position to center it within the box
+//    const float text_x = box_x + (box_width - text_size.x) / 2;
+//    const float text_y = box_y + (box_height - text_size.y) / 2;
+// Draw text (centered in box)
+//DrawTextEx(GetFontDefault(), text, (Vector2){text_x, text_y}, g->font_size, g->line_spacing, fg);
+// dont use DrawTextEx, use DrawText
+//    DrawText(text, text_x, text_y, g->font_size, fg);
+//}
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
 

@@ -2091,9 +2091,9 @@ void liblogic_init(gamestate* const g) {
     //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
     //init_npcs_test_by_room(g);
     //init_npc_test(g);
-    //init_sword_test(g);
+    init_sword_test(g);
     init_dagger_test(g);
-    //init_axe_test(g);
+    init_axe_test(g);
     //init_bow_test(g);
     init_shield_test(g);
     init_potion_test(g);
@@ -2124,6 +2124,7 @@ static void init_sword_test(gamestate* g) {
     while (id == ENTITYID_INVALID) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = weapon_create(g, WEAPON_SWORD, loc, "dummy sword");
+        g_set_damage(g, id, (roll){1, 6, 0});
     }
 }
 
@@ -2134,7 +2135,8 @@ static void init_dagger_test(gamestate* g) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = weapon_create(g, WEAPON_DAGGER, loc, "dummy dagger");
         //if (id != ENTITYID_INVALID) {
-        massert(g_set_damage(g, id, (roll){1, 4, 0}), "Failed to set damage");
+        //massert(g_set_damage(g, id, (roll){1, 4, 0}), "Failed to set damage");
+        g_set_damage(g, id, (roll){1, 4, 0});
         //}
     }
 }
@@ -2145,7 +2147,7 @@ static void init_axe_test(gamestate* g) {
     while (id == ENTITYID_INVALID) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
-        g_set_damage(g, id, (roll){1, 6, 0});
+        g_set_damage(g, id, (roll){1, 8, 0});
     }
 }
 
@@ -2270,9 +2272,42 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
                 //entityid id = npc_create(g, RACE_ORC, loc, "orc");
                 //entityid id = npc_create(g, RACE_ELF, loc, "elf");
                 //entityid id = npc_create(g, RACE_DWARF, loc, "dwarf");
-                entityid id = npc_create(g, RACE_HALFLING, loc, "dwarf");
-                //entityid id = npc_create(g, RACE_GOBLIN, loc, "dwarf");
+
+                entityid id = ENTITYID_INVALID;
+                race_t race = RACE_HUMAN;
+
+                int choice = rand() % 3;
+                switch (choice) {
+                case 0: race = RACE_HUMAN; break;
+                case 1: race = RACE_ELF; break;
+                case 2: race = RACE_DWARF; break;
+                case 3: race = RACE_HALFLING; break;
+                case 4: race = RACE_ORC; break;
+                case 5: race = RACE_GOBLIN; break;
+                default: break;
+                }
+
+                id = npc_create(g, race, loc, "NPC");
                 if (id != ENTITYID_INVALID) {
+                    //g_set_max_hp(g, id, 10);
+
+                    int hit_die = 4;
+                    switch (race) {
+                    case RACE_HUMAN: hit_die = 6; break;
+                    case RACE_ELF: hit_die = 6; break;
+                    case RACE_DWARF: hit_die = 6; break;
+                    case RACE_ORC: hit_die = 6; break;
+                    case RACE_GOBLIN: hit_die = 4; break;
+                    case RACE_HALFLING: hit_die = 4; break;
+                    default: break;
+                    }
+
+                    roll r = {1, hit_die, 0};
+
+                    const int max_hp = do_roll(r);
+
+                    g_set_stat(g, id, STATS_MAXHP, max_hp);
+                    g_set_stat(g, id, STATS_HP, max_hp);
                     g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
                     success = true;
                 }
