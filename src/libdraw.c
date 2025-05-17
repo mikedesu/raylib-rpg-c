@@ -123,6 +123,7 @@ static void calc_debugpanel_size(gamestate* const g);
 static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
 //static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, const entity* e);
 static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, entityid id);
+static void draw_quit_menu(const gamestate* const g);
 
 //static bool draw_dungeon_floor_tile(const gamestate* const g, dungeon_floor_t* const df, int x, int y) {
 static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z) {
@@ -1017,6 +1018,11 @@ void libdraw_drawframe(gamestate* const g) {
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     //minfo("libdraw_drawframe: debug panel");
     handle_debug_panel(g);
+
+    if (g->display_quit_menu) {
+        draw_quit_menu(g);
+    }
+
     EndDrawing();
     //double elapsed_time = GetTime() - start_time;
     g->last_frame_time = GetTime() - start_time;
@@ -1342,7 +1348,7 @@ static void draw_message_history(gamestate* const g) {
     if (g->msg_history.count == 0) {
         return;
     }
-    const int max_messages = 20;
+    const int max_messages = 30;
     const int x = 0;
     const int y = 42;
     int current_count = 0;
@@ -1527,6 +1533,36 @@ static void draw_inventory_menu(gamestate* const g) {
                            WHITE);
         }
     }
+}
+
+static void draw_quit_menu(const gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    const char* text = "Press Q again to Exit or ESC to Cancel";
+    // draw box and text in center of screen
+    // draw box with semi-transparent black with white border
+
+    const int box_pad = g->pad;
+    const int section_gap = 16;
+    const int item_list_pad = g->pad;
+    const int max_visible_items = 12; // arbitrary limit for list height
+        //
+    // Measure text
+    Vector2 text_size = MeasureTextEx(GetFontDefault(), text, g->font_size, g->line_spacing);
+    // Menu box size
+    // box size should encompass the text plus padding
+    const float box_width = text_size.x + box_pad * 2;
+    const float box_height = text_size.y + box_pad * 2;
+    const float box_x = (g->windowwidth - box_width) / 2.0f;
+    const float box_y = (g->windowheight - box_height) / 2.0f;
+    const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
+    //const Color bg = (Color){0, 0, 0xff, 0xFF}, fg = WHITE;
+    DrawRectangleRec((Rectangle){box_x, box_y, box_width, box_height}, bg);
+    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, fg);
+    // Calculate text position to center it within the box
+    const float text_x = box_x + (box_width - text_size.x) / 2;
+    const float text_y = box_y + (box_height - text_size.y) / 2;
+    // Draw text (centered in box)
+    DrawTextEx(GetFontDefault(), text, (Vector2){text_x, text_y}, g->font_size, g->line_spacing, fg);
 }
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }

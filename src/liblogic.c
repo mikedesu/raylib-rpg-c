@@ -1952,13 +1952,6 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         return;
     }
 
-    if (!g->display_quit_menu) {
-        if (inputstate_is_pressed(is, KEY_Q)) {
-            g->display_quit_menu = true;
-            return;
-        }
-    }
-
     if (g->display_quit_menu) {
         if (inputstate_is_pressed(is, KEY_ESCAPE)) {
             g->display_quit_menu = false;
@@ -1969,17 +1962,25 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
             //CloseWindow();
 
             g->do_quit = true;
+            return;
         }
     }
 
-    if (g->controlmode == CONTROLMODE_PLAYER) {
-        handle_input_player(is, g);
-    } else if (g->controlmode == CONTROLMODE_CAMERA) {
-        handle_input_camera(is, g);
-    } else if (g->controlmode == CONTROLMODE_INVENTORY) {
-        handle_input_inventory(is, g);
-    } else {
-        merror("Unknown control mode");
+    if (!g->display_quit_menu) {
+        if (inputstate_is_pressed(is, KEY_Q)) {
+            g->display_quit_menu = true;
+            return;
+        }
+
+        if (g->controlmode == CONTROLMODE_PLAYER) {
+            handle_input_player(is, g);
+        } else if (g->controlmode == CONTROLMODE_CAMERA) {
+            handle_input_camera(is, g);
+        } else if (g->controlmode == CONTROLMODE_INVENTORY) {
+            handle_input_inventory(is, g);
+        } else {
+            merror("Unknown control mode");
+        }
     }
 }
 
