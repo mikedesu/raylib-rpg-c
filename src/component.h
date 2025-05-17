@@ -2,34 +2,46 @@
 
 #include "arrow.h"
 #include "arrow_component.h"
+#include "attacking_component.h"
 #include "attrib_effect.h"
+#include "block_success_component.h"
+#include "blocking_component.h"
 #include "damage_component.h"
+#include "damaged_component.h"
+#include "dead_component.h"
 #include "default_action_component.h"
 #include "direction.h"
+#include "direction_component.h"
 #include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "equipment_component.h"
 #include "equipment_slot.h"
+#include "inventory_component.h"
 #include "item.h"
 #include "itemtype_component.h"
+#include "loc_component.h"
 #include "location.h"
+#include "name_component.h"
 #include "potion.h"
 #include "potion_component.h"
 #include "quiver_component.h"
 #include "race.h"
+#include "race_component.h"
 #include "shield.h"
 #include "shieldtype_component.h"
+#include "sprite_move_component.h"
 #include "stats_component.h"
 #include "stats_slot.h"
+#include "target_component.h"
 #include "target_path_component.h"
+#include "type_component.h"
+#include "update_component.h"
 #include "weapon.h"
 #include "weapontype_component.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#define MAX_INVENTORY_SIZE 32
 
 typedef enum component_t
 {
@@ -93,77 +105,6 @@ static inline const char* component2str(component c) {
     }
     return "C_UNKNOWN";
 }
-
-typedef struct name_component_t {
-    entityid id;
-    char name[32];
-} name_component;
-
-typedef struct type_component_t {
-    entityid id;
-    entitytype_t type;
-} type_component;
-
-typedef struct race_component_t {
-    entityid id;
-    race_t race;
-} race_component;
-
-typedef struct direction_component_t {
-    entityid id;
-    direction_t dir;
-} direction_component;
-
-typedef struct loc_component_t {
-    entityid id;
-    loc_t loc;
-} loc_component;
-
-typedef struct sprite_move_component_t {
-    entityid id;
-    loc_t loc;
-} sprite_move_component;
-
-typedef struct dead_component_t {
-    entityid id;
-    bool dead;
-} dead_component;
-
-typedef struct update_component_t {
-    entityid id;
-    bool update;
-} update_component;
-
-typedef struct attacking_component_t {
-    entityid id;
-    bool attacking;
-} attacking_component;
-
-typedef struct blocking_component_t {
-    entityid id;
-    bool blocking;
-} blocking_component;
-
-typedef struct block_success_component_t {
-    entityid id;
-    bool block_success;
-} block_success_component;
-
-typedef struct damaged_component_t {
-    entityid id;
-    bool damaged;
-} damaged_component;
-
-typedef struct inventory_component_t {
-    entityid id;
-    entityid inventory[MAX_INVENTORY_SIZE]; // max 32 items
-    size_t count;
-} inventory_component;
-
-typedef struct target_component_t {
-    entityid id;
-    loc_t target;
-} target_component;
 
 void init_name_component(name_component* comp, entityid id, const char* name);
 void init_type_component(type_component* comp, entityid id, entitytype_t type);

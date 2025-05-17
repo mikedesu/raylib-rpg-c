@@ -122,8 +122,8 @@
 #
 #70 4 4 0 img/actions/guard__front.png
 #71 4 4 0 img/actions/guard_wooden_shield_back.png
-72 4 3 0 img/actions/guard_buckler_success_front.png
-73 4 3 0 img/actions/guard_buckler_success_back.png
+72 4 3 0 img/actions/guard_wooden_shield_success_front.png
+73 4 3 0 img/actions/guard_wooden_shield_success_back.png
 #
 #
 #
