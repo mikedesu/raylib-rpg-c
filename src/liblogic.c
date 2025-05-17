@@ -2276,7 +2276,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
                 entityid id = ENTITYID_INVALID;
                 race_t race = RACE_HUMAN;
 
-                int choice = rand() % 3;
+                int choice = rand() % 6;
                 switch (choice) {
                 case 0: race = RACE_HUMAN; break;
                 case 1: race = RACE_ELF; break;
@@ -2296,7 +2296,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
                     case RACE_HUMAN: hit_die = 6; break;
                     case RACE_ELF: hit_die = 6; break;
                     case RACE_DWARF: hit_die = 6; break;
-                    case RACE_ORC: hit_die = 6; break;
+                    case RACE_ORC: hit_die = 8; break;
                     case RACE_GOBLIN: hit_die = 4; break;
                     case RACE_HALFLING: hit_die = 4; break;
                     default: break;
