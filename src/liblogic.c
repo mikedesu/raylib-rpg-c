@@ -9,6 +9,7 @@
 #include "entitytype.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
+#include "inputstate.h"
 #include "keybinding.h"
 #include "libgame_defines.h"
 #include "liblogic.h"
@@ -503,8 +504,10 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
         } else {
             // weapon
             // we will calculate damage based on weapon attributes
-            // but for now we will just set it to 3
-            dmg = 3;
+            roll dmg_roll = g_get_damage(g, attacker_weapon_id);
+
+            //dmg = 3;
+            dmg = do_roll(dmg_roll);
         }
         g_set_damaged(g, tgt_id, true);
         g_set_update(g, tgt_id, true);
@@ -1808,7 +1811,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     if (g->msg_system.is_active) {
         if (inputstate_is_pressed(is, KEY_I) || inputstate_is_pressed(is, KEY_U) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_A) ||
             inputstate_is_pressed(is, KEY_SPACE) || inputstate_is_pressed(is, KEY_COMMA) || inputstate_is_pressed(is, KEY_PERIOD) ||
-            inputstate_is_pressed(is, KEY_SLASH) || inputstate_is_pressed(is, KEY_E)) {
+            inputstate_is_pressed(is, KEY_SLASH) || inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_S)) {
             g->msg_system.index++;
             if (g->msg_system.index >= g->msg_system.count) {
                 // Reset when all messages read
