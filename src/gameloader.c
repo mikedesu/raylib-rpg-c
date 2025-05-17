@@ -19,7 +19,10 @@
 void* draw_handle = NULL;
 void (*mylibdraw_init)(const gamestate* const) = NULL;
 void (*mylibdraw_close)() = NULL;
-bool (*mylibdraw_windowshouldclose)() = NULL;
+
+//bool (*mylibdraw_windowshouldclose)() = NULL;
+bool (*mylibdraw_windowshouldclose)(const gamestate* const) = NULL;
+
 void (*mylibdraw_drawframe)(const gamestate* const) = NULL;
 void (*mylibdraw_update_sprites)(gamestate* const) = NULL;
 void (*mylibdraw_update_input)(inputstate* const) = NULL;
@@ -154,7 +157,8 @@ void gamerun() {
     myliblogic_init(g);
     mylibdraw_init(g);
 
-    while (!mylibdraw_windowshouldclose()) {
+    //while (!mylibdraw_windowshouldclose()) {
+    while (!mylibdraw_windowshouldclose(g)) {
         mylibdraw_update_input(&is);
         myliblogic_tick(&is, g);
         mylibdraw_update_sprites(g);
@@ -163,18 +167,23 @@ void gamerun() {
         //if (inputstate_is_pressed(&is, KEY_ESCAPE)) break;
     }
 
+    minfo("Closing libdraw...");
     mylibdraw_close();
     msuccess("libdraw closed");
 
+    minfo("Closing liblogic...");
     myliblogic_close(g);
     msuccess("liblogic closed");
 
+    minfo("Closing draw handle...");
     dlclose(draw_handle);
     msuccess("dlclose libdraw");
 
+    minfo("Closing logic handle...");
     dlclose(logic_handle);
     msuccess("dlclose liblogic");
 
+    minfo("Freeing gamestate...");
     gamestatefree(g);
     msuccess("gamestate freed");
 }

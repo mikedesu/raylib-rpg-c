@@ -1319,6 +1319,7 @@ void libdraw_init(gamestate* const g) {
     const int y = h / 3;
     const char* title = WINDOW_TITLE;
     InitWindow(w, h, title);
+    SetExitKey(KEY_NULL);
     g->windowwidth = w;
     g->windowheight = h;
     SetTargetFPS(60);
@@ -1530,4 +1531,8 @@ static void draw_inventory_menu(gamestate* const g) {
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
 
-bool libdraw_windowshouldclose() { return WindowShouldClose(); }
+//bool libdraw_windowshouldclose() { return WindowShouldClose(); }
+bool libdraw_windowshouldclose(const gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    return g->do_quit;
+}

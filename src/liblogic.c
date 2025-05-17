@@ -504,9 +504,8 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
         } else {
             // weapon
             // we will calculate damage based on weapon attributes
+            massert(g_has_damage(g, attacker_weapon_id), "attacker weapon does not have damage attached");
             roll dmg_roll = g_get_damage(g, attacker_weapon_id);
-
-            //dmg = 3;
             dmg = do_roll(dmg_roll);
         }
         g_set_damaged(g, tgt_id, true);
@@ -1950,7 +1949,29 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
     if (inputstate_is_pressed(is, KEY_D)) {
         msuccess("D pressed!");
         g->debugpanelon = !g->debugpanelon;
+        return;
     }
+
+    if (!g->display_quit_menu) {
+        if (inputstate_is_pressed(is, KEY_Q)) {
+            g->display_quit_menu = true;
+            return;
+        }
+    }
+
+    if (g->display_quit_menu) {
+        if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+            g->display_quit_menu = false;
+            return;
+        }
+        if (inputstate_is_pressed(is, KEY_Q)) {
+            // this forces the window to close but this is crashing on exit
+            //CloseWindow();
+
+            g->do_quit = true;
+        }
+    }
+
     if (g->controlmode == CONTROLMODE_PLAYER) {
         handle_input_player(is, g);
     } else if (g->controlmode == CONTROLMODE_CAMERA) {

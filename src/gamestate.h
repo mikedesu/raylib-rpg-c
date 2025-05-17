@@ -52,7 +52,7 @@ typedef struct gamestate {
     char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF], currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
 
     bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard,
-        display_inventory_menu;
+        display_inventory_menu, display_quit_menu, do_quit;
 
     int inventory_menu_selection;
 
