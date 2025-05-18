@@ -34,7 +34,7 @@ PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-f
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 
 
-UNIT_TEST_OBJS = unit_test.o component.o component_table.o gamestate.o keybindings.o
+UNIT_TEST_OBJS = unit_test.o component.o component_table.o keybindings.o gamestate.o
 
 
 
