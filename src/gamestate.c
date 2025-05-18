@@ -439,8 +439,21 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     //massert(*c_count < g->max_entityids, "c_count >= g->max_entityids: %d >= %d", *c_count, g->max_entityids);
     massert(*c_count <= g->next_entityid, "c_count >= g->next_entityid: %d >= %d", *c_count, g->next_entityid);
 
-    massert(ct_has_entity(g->components, id), "id %d does not exist in component table", id);
-    massert(g_has_component(g, id, comp), "id %d does not have the required component registered", id);
+    // Ensure entity exists in component table
+    if (!ct_has_entity(g->components, id)) {
+        if (!ct_add_entity(g->components, id)) {
+            merror("Failed to add entity %d to component table", id);
+            return false;
+        }
+    }
+
+    // Automatically register component if not already registered
+    if (!g_has_component(g, id, comp)) {
+        if (!g_register_comp(g, id, comp)) {
+            merror("Failed to register component %s for entity %d", component2str(comp), id);
+            return false;
+        }
+    }
 
     if (*c_count >= *c_capacity) {
         *c_capacity *= 2;
