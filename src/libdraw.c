@@ -860,19 +860,25 @@ static void libdraw_handle_gamestate_flag(gamestate* const g) {
     }
 }
 
+static void libdraw_handle_dirty_entities(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    if (g->dirty_entities) {
+        minfo("libdraw_handle_dirty_entities: creating new spritegroups");
+        for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++) {
+            create_sg_byid(g, i);
+        }
+
+        g->dirty_entities = false;
+        g->new_entityid_begin = ENTITYID_INVALID;
+        g->new_entityid_end = ENTITYID_INVALID;
+    }
+}
+
 void libdraw_update_sprites(gamestate* const g) {
     //minfo("libdraw_update_sprites");
     if (g) {
-        if (g->dirty_entities) {
-            minfo("libdraw_update_sprites: dirty_entities");
-            for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++) {
-                create_sg_byid(g, i);
-            }
-
-            g->dirty_entities = false;
-            g->new_entityid_begin = ENTITYID_INVALID;
-            g->new_entityid_end = ENTITYID_INVALID;
-        }
+        libdraw_handle_dirty_entities(g);
+        
         // for each entityid in our entitymap, update the spritegroup
         //for (int i = 0; i < g->index_entityids; i++) {
         for (entityid id = 0; id < g->next_entityid; id++) {
