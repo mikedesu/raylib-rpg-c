@@ -582,6 +582,24 @@ static void handle_attack_blocked(gamestate* const g, entityid attacker_id, enti
     //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
 
+static bool handle_shield_check(gamestate* const g, entityid attacker_id, entityid target_id, int attack_roll, int base_ac, bool* attack_successful) {
+    // if you have a shield at all, the attack will get auto-blocked
+    entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
+    if (shield_id != ENTITYID_INVALID) {
+        const int shield_ac = g_get_ac(g, shield_id);
+        const int total_ac = base_ac + shield_ac;
+        if (attack_roll < total_ac) {
+            *attack_successful = false;
+            handle_attack_blocked(g, attacker_id, target_id, attack_successful);
+            return false;
+        }
+    }
+    msuccess("Attack successful");
+    *attack_successful = true;
+    handle_attack_success(g, attacker_id, target_id, attack_successful);
+    return true;
+}
+
 static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entityid attacker_id, bool* attack_successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
@@ -605,22 +623,7 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     const int attack_roll = rand() % 20 + 1;
     *attack_successful = false;
     if (attack_roll >= base_ac) {
-        // if you have a shield at all, the attack will get auto-blocked
-        entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
-        if (shield_id != ENTITYID_INVALID) {
-            const int shield_ac = g_get_ac(g, shield_id);
-            const int total_ac = base_ac + shield_ac;
-            if (attack_roll < total_ac) {
-                //merror("Attack successful, but blocked by shield");
-                *attack_successful = false;
-                handle_attack_blocked(g, attacker_id, target_id, attack_successful);
-                return false;
-            }
-        }
-        msuccess("Attack successful");
-        *attack_successful = true;
-        handle_attack_success(g, attacker_id, target_id, attack_successful);
-        return true;
+        return handle_shield_check(g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
     }
     // attack misses
     merror("Attack missed");
