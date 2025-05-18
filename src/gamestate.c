@@ -28,7 +28,7 @@ gamestate* gamestateinitptr() {
     g->debugpanel.w = 200;
     g->debugpanel.h = 200;
     g->debugpanel.fg_color = RAYWHITE;
-    g->debugpanel.bg_color = Fade(RED, 0.8f);
+    g->debugpanel.bg_color = RED;
     g->debugpanel.pad_top = 0;
     g->debugpanel.pad_left = 0;
     g->debugpanel.pad_right = 0;
