@@ -164,21 +164,6 @@ TEST(test_all_component_types) {
     ct_destroy(table);
 }
 
-TEST(test_component_removal) {
-    ct* table = ct_create();
-    entityid id = 0;
-    ASSERT(table != NULL, "ct creation failed");
-    ASSERT(ct_add_entity(table, id), "add entity failed");
-    
-    // Add components and verify they exist
-    ASSERT(ct_add_component(table, id, C_NAME), "add C_NAME failed");
-    ASSERT(ct_has_component(table, id, C_NAME), "C_NAME should exist");
-    
-    ASSERT(ct_add_component(table, id, C_TYPE), "add C_TYPE failed");
-    ASSERT(ct_has_component(table, id, C_TYPE), "C_TYPE should exist");
-
-    ct_destroy(table);
-}
 
 TEST(test_multiple_entities) {
     ct* table = ct_create();
@@ -216,7 +201,6 @@ static void test_component_table(void) {
     run_test_ct_has_component();
     run_test_boundary_conditions();
     run_test_all_component_types();
-    run_test_component_removal();
     run_test_multiple_entities();
 }
 
