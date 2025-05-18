@@ -1245,7 +1245,7 @@ bool g_add_target(gamestate* const g, entityid id, loc_t target) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the target component
-    massert(g_has_component(g, id, C_TARGET), "id %d does not have a target component", id);
+    //massert(g_has_component(g, id, C_TARGET), "id %d does not have a target component", id);
     return g_add_component(g, id, C_TARGET, (void*)&target, sizeof(target_component), (void**)&g->target_list, &g->target_list_count, &g->target_list_capacity);
 }
 
@@ -1292,7 +1292,7 @@ bool g_add_target_path(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the target path component
-    massert(g_has_component(g, id, C_TARGET_PATH), "id %d does not have a target path component", id);
+    //massert(g_has_component(g, id, C_TARGET_PATH), "id %d does not have a target path component", id);
     return g_add_component(g,
                            id,
                            C_TARGET_PATH,
@@ -1361,7 +1361,7 @@ bool g_add_equipment(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the equipment component
-    massert(g_has_component(g, id, C_EQUIPMENT), "id %d does not have an equipment component", id);
+    //massert(g_has_component(g, id, C_EQUIPMENT), "id %d does not have an equipment component", id);
     return g_add_component(
         g, id, C_EQUIPMENT, (void*)NULL, sizeof(equipment_component), (void**)&g->equipment_list, &g->equipment_list_count, &g->equipment_list_capacity);
 }
@@ -1441,7 +1441,7 @@ bool g_add_stats(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the stats component
-    massert(g_has_component(g, id, C_STATS), "id %d does not have a stats component", id);
+    //massert(g_has_component(g, id, C_STATS), "id %d does not have a stats component", id);
     return g_add_component(g, id, C_STATS, (void*)NULL, sizeof(stats_component), (void**)&g->stats_list, &g->stats_list_count, &g->stats_list_capacity);
 }
 

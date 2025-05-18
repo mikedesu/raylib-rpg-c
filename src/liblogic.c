@@ -1017,95 +1017,43 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g->next_entityid++;
     //gs_add_entityid(g, id);
     //minfo("registering name: %s", name);
-    g_register_comps(g,
-                     id,
-                     C_NAME,
-                     C_TYPE,
-                     C_RACE,
-                     C_DIRECTION,
-                     C_LOCATION,
-                     C_SPRITE_MOVE,
-                     C_DEAD,
-                     C_UPDATE,
-                     C_ATTACKING,
-                     C_BLOCKING,
-                     C_BLOCK_SUCCESS,
-                     C_DAMAGED,
-                     C_DEFAULT_ACTION,
-                     C_INVENTORY,
-                     C_TARGET,
-                     C_TARGET_PATH,
-                     C_EQUIPMENT,
-                     C_STATS,
-                     0);
-    //g_register_comp(g, id, C_NAME);
-    //minfo("registering type: %d", ENTITY_NPC);
-    //g_register_comp(g, id, C_TYPE);
-    //minfo("registering race: %d", rt);
-    //g_register_comp(g, id, C_RACE);
-    //minfo("registering direction: %d", DIR_RIGHT);
-    //g_register_comp(g, id, C_DIRECTION);
-    //minfo("registering location: %d, %d, %d", loc.x, loc.y, loc.z);
-    //g_register_comp(g, id, C_LOCATION);
-    //minfo("registering sprite_move: %d, %d", 0, 0);
-    //g_register_comp(g, id, C_SPRITE_MOVE);
-    ////minfo("registering dead: %d", false);
-    //g_register_comp(g, id, C_DEAD);
-    ////minfo("registering update: %d", false);
-    //g_register_comp(g, id, C_UPDATE);
-    ////minfo("registering attacking: %d", false);
-    //g_register_comp(g, id, C_ATTACKING);
-    ////minfo("registering blocking: %d", false);
-    //g_register_comp(g, id, C_BLOCKING);
-    ////minfo("registering block_success: %d", false);
-    //g_register_comp(g, id, C_BLOCK_SUCCESS);
-    ////minfo("registering damaged: %d", false);
-    //g_register_comp(g, id, C_DAMAGED);
-    ////minfo("registering default_action: %d", ENTITY_ACTION_WAIT);
-    //g_register_comp(g, id, C_DEFAULT_ACTION);
-    ////minfo("registering inventory");
-    //g_register_comp(g, id, C_INVENTORY);
-    ////minfo("registering target");
-    //g_register_comp(g, id, C_TARGET);
-    ////minfo("registering target_path");
-    //g_register_comp(g, id, C_TARGET_PATH);
-    ////minfo("registering equipment");
-    //g_register_comp(g, id, C_EQUIPMENT);
-    //g_register_comp(g, id, C_STATS);
-
-    //minfo("adding name for id %d: %s", id, name);
+    //g_register_comps(g,
+    //                 id,
+    //                 C_NAME,
+    //                 C_TYPE,
+    //                 C_RACE,
+    //                 C_DIRECTION,
+    //                 C_LOCATION,
+    //                 C_SPRITE_MOVE,
+    //                 C_DEAD,
+    //                 C_UPDATE,
+    //                 C_ATTACKING,
+    //                 C_BLOCKING,
+    //                 C_BLOCK_SUCCESS,
+    //                 C_DAMAGED,
+    //                 C_DEFAULT_ACTION,
+    //                 C_INVENTORY,
+    //                 C_TARGET,
+    //                 C_TARGET_PATH,
+    //                 C_EQUIPMENT,
+    //                 C_STATS,
+    //                 0);
     g_add_name(g, id, name);
-    //minfo("adding type for id %d: %d", id, ENTITY_NPC);
     g_add_type(g, id, ENTITY_NPC);
-    //minfo("adding race for id %d: %d", id, rt);
     g_add_race(g, id, rt);
-    //minfo("adding direction for id %d: %d", id, DIR_RIGHT);
     g_add_direction(g, id, DIR_RIGHT);
-    //minfo("adding location for id %d: %d, %d, %d", id, loc.x, loc.y, loc.z);
     g_add_location(g, id, loc);
-    //minfo("adding sprite_move: %d, %d", 0, 0);
     g_add_sprite_move(g, id, (loc_t){0, 0}); // default
-    //minfo("adding dead: %d", false);
     g_add_dead(g, id, false);
-    //minfo("adding update: %d", false);
     g_add_update(g, id, false);
-    //minfo("adding ");
     g_add_attacking(g, id, false);
-    //minfo("adding ");
-    g_add_blocking(g, id, false);
-    //minfo("adding ");
+    //g_add_blocking(g, id, false);
     g_add_block_success(g, id, false);
-    //minfo("adding ");
     g_add_damaged(g, id, false);
-    //minfo("adding ");
     g_add_default_action(g, id, ENTITY_ACTION_WAIT);
-    //minfo("adding ");
     g_add_inventory(g, id);
-    //minfo("adding ");
     g_add_target(g, id, (loc_t){-1, -1, -1});
-    //minfo("adding ");
     g_add_target_path(g, id);
-    //minfo("adding ");
     g_add_equipment(g, id);
 
     g_add_stats(g, id);
