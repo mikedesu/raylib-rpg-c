@@ -1005,16 +1005,19 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
-    entityid id = g->next_entityid;
-    if (!g->dirty_entities) {
-        g->dirty_entities = true;
-        g->new_entityid_begin = id;
-        g->new_entityid_end = id + 1;
-    } else {
-        //g->dirty_entities = true;
-        g->new_entityid_end = id + 1;
-    }
-    g->next_entityid++;
+
+    entityid id = g_add_entity(g);
+    //entityid id = g->next_entityid;
+    //if (!g->dirty_entities) {
+    //    g->dirty_entities = true;
+    //    g->new_entityid_begin = id;
+    //    g->new_entityid_end = id + 1;
+    //} else {
+    //    //g->dirty_entities = true;
+    //    g->new_entityid_end = id + 1;
+    //}
+    //g->next_entityid++;
+
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_NPC);
     g_add_race(g, id, rt);

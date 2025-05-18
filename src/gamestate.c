@@ -1841,3 +1841,17 @@ int g_get_ac(const gamestate* const g, entityid id) {
     }
     return 0;
 }
+
+entityid g_add_entity(gamestate* const g) {
+    entityid id = g->next_entityid;
+    if (!g->dirty_entities) {
+        g->dirty_entities = true;
+        g->new_entityid_begin = id;
+        g->new_entityid_end = id + 1;
+    } else {
+        //g->dirty_entities = true;
+        g->new_entityid_end = id + 1;
+    }
+    g->next_entityid++;
+    return id;
+}

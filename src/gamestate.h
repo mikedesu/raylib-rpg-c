@@ -347,3 +347,5 @@ bool g_add_ac(gamestate* const g, entityid id, int ac);
 bool g_has_ac(const gamestate* const g, entityid id);
 bool g_set_ac(gamestate* const g, entityid id, int ac);
 int g_get_ac(const gamestate* const g, entityid id);
+
+entityid g_add_entity(gamestate* const g);

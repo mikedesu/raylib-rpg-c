@@ -213,20 +213,20 @@ TEST(test_gamestate_create_destroy) {
 TEST(test_gamestate_add_entity) {
     gamestate* g = gamestateinitptr();
     ASSERT(g != NULL, "gamestate creation failed");
-    
-    entityid id = 0;
-    ASSERT(g_add_entity(g, id), "add entity failed");
-    
+
+    entityid id = g_add_entity(g);
+    ASSERT(id != ENTITYID_INVALID, "entity creation failed");
+
     // Add and verify some components
     ASSERT(g_add_name(g, id, "Test Entity"), "add name failed");
     ASSERT(g_has_name(g, id), "name should exist");
-    
+
     ASSERT(g_add_type(g, id, ENTITY_PLAYER), "add type failed");
     ASSERT(g_has_type(g, id), "type should exist");
-    
+
     ASSERT(g_add_location(g, id, (loc_t){0, 0, 0}), "add location failed");
     ASSERT(g_has_location(g, id), "location should exist");
-    
+
     gamestatefree(g);
 }
 
