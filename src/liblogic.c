@@ -1063,8 +1063,6 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
     massert(loc.x < df->width, "x is out of bounds: %s: %d", name, loc.x);
     massert(loc.y >= 0, "y is out of bounds: %s: %d", name, loc.y);
     massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
-    // can we create an entity at this location? no entities can be made on wall-types etc
-    //tile_t* const tile = df_tile_at(df, x, y);
     tile_t* const tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
     if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
@@ -1075,88 +1073,26 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
         merror("cannot create entity on tile with NPC");
         return ENTITYID_INVALID;
     }
-    //entityid id = g->next_entityid++;
     entityid id = g_add_entity(g);
 
-    //gs_add_entityid(g, id);
-    //minfo("registering name: %s", name);
     g_register_comp(g, id, C_NAME);
-    //minfo("registering type: %d", ENTITY_NPC);
     g_register_comp(g, id, C_TYPE);
-    //minfo("registering race: %d", rt);
-    //g_register_comp(g, id, C_RACE);
-    //minfo("registering direction: %d", DIR_RIGHT);
     g_register_comp(g, id, C_DIRECTION);
-    //minfo("registering location: %d, %d, %d", loc.x, loc.y, loc.z);
     g_register_comp(g, id, C_LOCATION);
-    //minfo("registering sprite_move: %d, %d", 0, 0);
     g_register_comp(g, id, C_SPRITE_MOVE);
-    //minfo("registering dead: %d", false);
-    //g_register_comp(g, id, C_DEAD);
-    //minfo("registering update: %d", false);
     g_register_comp(g, id, C_UPDATE);
     g_register_comp(g, id, C_ITEMTYPE);
-    //minfo("registering attacking: %d", false);
-    //g_register_comp(g, id, C_ATTACKING);
-    //minfo("registering blocking: %d", false);
-    //g_register_comp(g, id, C_BLOCKING);
-    //minfo("registering block_success: %d", false);
-    //g_register_comp(g, id, C_BLOCK_SUCCESS);
-    //minfo("registering damaged: %d", false);
-    //g_register_comp(g, id, C_DAMAGED);
-    //minfo("registering default_action: %d", ENTITY_ACTION_WAIT);
-    //g_register_comp(g, id, C_DEFAULT_ACTION);
-    //minfo("registering inventory");
-    //g_register_comp(g, id, C_INVENTORY);
-    //minfo("registering target");
-    //g_register_comp(g, id, C_TARGET);
-    //minfo("registering target_path");
-    //g_register_comp(g, id, C_TARGET_PATH);
-    //minfo("registering equipment");
-    //g_register_comp(g, id, C_EQUIPMENT);
-    //g_register_comp(g, id, C_STATS);
-    //minfo("adding name for id %d: %s", id, name);
+
     g_add_name(g, id, name);
-    //minfo("adding type for id %d: %d", id, ENTITY_NPC);
     g_add_type(g, id, ENTITY_ITEM);
-    //minfo("adding race for id %d: %d", id, rt);
-    //g_add_race(g, id, rt);
-    //minfo("adding direction for id %d: %d", id, DIR_RIGHT);
     g_add_direction(g, id, DIR_RIGHT);
-    //minfo("adding location for id %d: %d, %d, %d", id, loc.x, loc.y, loc.z);
     g_add_location(g, id, loc);
-    //minfo("adding sprite_move: %d, %d", 0, 0);
-    g_add_sprite_move(g, id, (loc_t){0, 0}); // default
-    //minfo("adding dead: %d", false);
-    //g_add_dead(g, id, false);
-    //minfo("adding update: %d", false);
+    g_add_sprite_move(g, id, (loc_t){0, 0});
     g_add_update(g, id, false);
-    //minfo("adding ");
-    //g_add_attacking(g, id, false);
-    //minfo("adding ");
-    //g_add_blocking(g, id, false);
-    //minfo("adding ");
-    //g_add_block_success(g, id, false);
-    //minfo("adding ");
-    //g_add_damaged(g, id, false);
-    //minfo("adding ");
-    //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
-    //minfo("adding ");
-    //g_add_inventory(g, id);
-    //minfo("adding ");
-    //g_add_target(g, id, (loc_t){-1, -1, -1});
-    //minfo("adding ");
-    //g_add_target_path(g, id);
-    //minfo("adding ");
-    //g_add_equipment(g, id);
     g_add_itemtype(g, id, type);
-    //g_add_stats(g, id);
-    //g_set_stat(g, id, STATS_LEVEL, 1);
-    //g_set_stat(g, id, STATS_MAXHP, 3);
-    //g_set_stat(g, id, STATS_HP, 3);
+
     if (!df_add_at(df, id, loc.x, loc.y)) {
         merror("failed to add entity to dungeon floor");
-        //free(e);
         return ENTITYID_INVALID;
     }
     return id;
