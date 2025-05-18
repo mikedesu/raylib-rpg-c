@@ -1098,8 +1098,6 @@ static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, co
         return ENTITYID_INVALID;
     }
     //massert(id != ENTITYID_INVALID, "failed to create weapon");
-    g_register_comp(g, id, C_WEAPONTYPE);
-    g_register_comp(g, id, C_DAMAGE);
     g_add_weapontype(g, id, type);
     g_add_damage(g, id, (roll){0, 0, 0});
     return id;
