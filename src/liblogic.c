@@ -2106,7 +2106,7 @@ void liblogic_init(gamestate* const g) {
     init_sword_test(g);
     init_dagger_test(g);
     init_axe_test(g);
-    //init_bow_test(g);
+    init_bow_test(g);
     init_shield_test(g);
     //init_potion_test(g);
     update_debug_panel_buffer(g);
@@ -2276,48 +2276,48 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     // test entity creation on the fly
     static bool do_this_once = true;
     const int every_nth_turn = 10;
-    //if (g->turn_count % every_nth_turn == 0) {
-    //    bool success = false;
-    //    if (do_this_once) {
-    //        while (!success) {
-    //            loc_t loc = get_random_empty_non_wall_loc(g, 0);
-    //            entityid id = ENTITYID_INVALID;
-    //            race_t race = RACE_HUMAN;
-    //            int choice = rand() % 6;
-    //            switch (choice) {
-    //            case 0: race = RACE_HUMAN; break;
-    //            case 1: race = RACE_ELF; break;
-    //            case 2: race = RACE_DWARF; break;
-    //            case 3: race = RACE_HALFLING; break;
-    //            case 4: race = RACE_ORC; break;
-    //            case 5: race = RACE_GOBLIN; break;
-    //            default: break;
-    //            }
-    //            id = npc_create(g, race, loc, "NPC");
-    //            if (id != ENTITYID_INVALID) {
-    //                int hit_die = 4;
-    //                switch (race) {
-    //                case RACE_HUMAN: hit_die = 6; break;
-    //                case RACE_ELF: hit_die = 6; break;
-    //                case RACE_DWARF: hit_die = 6; break;
-    //                case RACE_ORC: hit_die = 8; break;
-    //                case RACE_GOBLIN: hit_die = 4; break;
-    //                case RACE_HALFLING: hit_die = 4; break;
-    //                default: break;
-    //                }
-    //                roll r = {1, hit_die, 0};
-    //                const int max_hp = do_roll(r);
-    //                g_set_stat(g, id, STATS_MAXHP, max_hp);
-    //                g_set_stat(g, id, STATS_HP, max_hp);
-    //                g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-    //                success = true;
-    //            }
-    //        }
-    //        do_this_once = false;
-    //    }
-    //} else {
-    //    do_this_once = true;
-    //}
+    if (g->turn_count % every_nth_turn == 0) {
+        bool success = false;
+        if (do_this_once) {
+            while (!success) {
+                loc_t loc = get_random_empty_non_wall_loc(g, 0);
+                entityid id = ENTITYID_INVALID;
+                race_t race = RACE_HUMAN;
+                int choice = rand() % 6;
+                switch (choice) {
+                case 0: race = RACE_HUMAN; break;
+                case 1: race = RACE_ELF; break;
+                case 2: race = RACE_DWARF; break;
+                case 3: race = RACE_HALFLING; break;
+                case 4: race = RACE_ORC; break;
+                case 5: race = RACE_GOBLIN; break;
+                default: break;
+                }
+                id = npc_create(g, race, loc, "NPC");
+                if (id != ENTITYID_INVALID) {
+                    int hit_die = 4;
+                    switch (race) {
+                    case RACE_HUMAN: hit_die = 6; break;
+                    case RACE_ELF: hit_die = 6; break;
+                    case RACE_DWARF: hit_die = 6; break;
+                    case RACE_ORC: hit_die = 8; break;
+                    case RACE_GOBLIN: hit_die = 4; break;
+                    case RACE_HALFLING: hit_die = 4; break;
+                    default: break;
+                    }
+                    roll r = {1, hit_die, 0};
+                    const int max_hp = do_roll(r);
+                    g_set_stat(g, id, STATS_MAXHP, max_hp);
+                    g_set_stat(g, id, STATS_HP, max_hp);
+                    g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+                    success = true;
+                }
+            }
+            do_this_once = false;
+        }
+    } else {
+        do_this_once = true;
+    }
 
     update_player_state(g);
     update_npcs_state(g);
