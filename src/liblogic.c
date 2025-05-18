@@ -1075,14 +1075,6 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
     }
     entityid id = g_add_entity(g);
 
-    g_register_comp(g, id, C_NAME);
-    g_register_comp(g, id, C_TYPE);
-    g_register_comp(g, id, C_DIRECTION);
-    g_register_comp(g, id, C_LOCATION);
-    g_register_comp(g, id, C_SPRITE_MOVE);
-    g_register_comp(g, id, C_UPDATE);
-    g_register_comp(g, id, C_ITEMTYPE);
-
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_ITEM);
     g_add_direction(g, id, DIR_RIGHT);
