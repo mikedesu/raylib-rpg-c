@@ -204,8 +204,15 @@ static void test_component_table(void) {
     run_test_multiple_entities();
 }
 
+TEST(test_gamestate_create_destroy) {
+    gamestate* g = gamestateinitptr();
+    ASSERT(g != NULL, "gamestate creation failed");
+    gamestatefree(g);
+}
+
 int main(void) {
     test_component_table();
+    run_test_gamestate_create_destroy();
     unit_test_summary();
     return 0;
 }
