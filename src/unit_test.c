@@ -82,13 +82,17 @@ TEST(test_boundary_conditions) {
     ct_destroy(table);
 }
 
-int main(void) {
+static void test_component_table(void) {
     run_create_ct_0();
     run_create_ct_1();
     run_test_ct_has_entity();
     run_test_ct_add_component();
     run_test_ct_has_component();
     run_test_boundary_conditions();
+}
+
+int main(void) {
+    test_component_table();
     unit_test_summary();
     return 0;
 }
