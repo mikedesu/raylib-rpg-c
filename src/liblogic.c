@@ -1124,7 +1124,6 @@ static entityid potion_create(gamestate* const g, loc_t loc, potiontype type, co
         merror("failed to create potion");
         return ENTITYID_INVALID;
     }
-    g_register_comp(g, id, C_POTIONTYPE);
     g_add_potiontype(g, id, type);
     msuccess("potion created!");
     return id;
@@ -1138,9 +1137,7 @@ static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, co
         return ENTITYID_INVALID;
     }
     //massert(id != ENTITYID_INVALID, "failed to create weapon");
-    g_register_comp(g, id, C_SHIELDTYPE);
     g_add_shieldtype(g, id, type);
-    g_register_comp(g, id, C_AC);
     g_add_ac(g, id, 10);
     return id;
 }
