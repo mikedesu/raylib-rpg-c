@@ -1076,16 +1076,7 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
         return ENTITYID_INVALID;
     }
     //entityid id = g->next_entityid++;
-    entityid id = g->next_entityid;
-    if (!g->dirty_entities) {
-        g->dirty_entities = true;
-        g->new_entityid_begin = id;
-        g->new_entityid_end = id + 1;
-    } else {
-        //g->dirty_entities = true;
-        g->new_entityid_end = id + 1;
-    }
-    g->next_entityid++;
+    entityid id = g_add_entity(g);
 
     //gs_add_entityid(g, id);
     //minfo("registering name: %s", name);
