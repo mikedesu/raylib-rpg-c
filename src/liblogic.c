@@ -602,39 +602,21 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
 
     // get the armor class of the target
     const int base_ac = g_get_stat(g, target_id, STATS_AC);
-
     const int attack_roll = rand() % 20 + 1;
     *attack_successful = false;
-
     if (attack_roll >= base_ac) {
         // if you have a shield at all, the attack will get auto-blocked
         entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
         if (shield_id != ENTITYID_INVALID) {
             const int shield_ac = g_get_ac(g, shield_id);
             const int total_ac = base_ac + shield_ac;
-
             if (attack_roll < total_ac) {
                 //merror("Attack successful, but blocked by shield");
                 *attack_successful = false;
                 handle_attack_blocked(g, attacker_id, target_id, attack_successful);
                 return false;
             }
-
-            //int block_roll = rand() % 100;
-            //const int block_chance = 90;
-            //if (block_roll < block_chance) {
-            //    msuccess("Block successful");
-            //    handle_attack_blocked(g, attacker_id, target_id, attack_successful);
-            //    return false;
-            //}
-            //msuccess("Block successful");
-            //handle_attack_blocked(g, attacker_id, target_id, attack_successful);
-            //return false;
         }
-        // introducing a random chance to block if you have a shield...
-        //    if (block_chance < 50) {
-        //    }
-        //}
         msuccess("Attack successful");
         *attack_successful = true;
         handle_attack_success(g, attacker_id, target_id, attack_successful);
@@ -2184,10 +2166,10 @@ static void init_shield_test(gamestate* g) {
 
 static void try_spawn_npc(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    
+
     static bool do_this_once = true;
     const int every_nth_turn = 10;
-    
+
     if (g->turn_count % every_nth_turn == 0) {
         bool success = false;
         if (do_this_once) {
