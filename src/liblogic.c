@@ -1297,7 +1297,7 @@ static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, co
     g_register_comp(g, id, C_SHIELDTYPE);
     g_add_shieldtype(g, id, type);
     g_register_comp(g, id, C_AC);
-    g_add_ac(g, id, 2);
+    g_add_ac(g, id, 10);
     return id;
 }
 
