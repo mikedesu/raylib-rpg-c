@@ -1015,29 +1015,6 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
         g->new_entityid_end = id + 1;
     }
     g->next_entityid++;
-    //gs_add_entityid(g, id);
-    //minfo("registering name: %s", name);
-    //g_register_comps(g,
-    //                 id,
-    //                 C_NAME,
-    //                 C_TYPE,
-    //                 C_RACE,
-    //                 C_DIRECTION,
-    //                 C_LOCATION,
-    //                 C_SPRITE_MOVE,
-    //                 C_DEAD,
-    //                 C_UPDATE,
-    //                 C_ATTACKING,
-    //                 C_BLOCKING,
-    //                 C_BLOCK_SUCCESS,
-    //                 C_DAMAGED,
-    //                 C_DEFAULT_ACTION,
-    //                 C_INVENTORY,
-    //                 C_TARGET,
-    //                 C_TARGET_PATH,
-    //                 C_EQUIPMENT,
-    //                 C_STATS,
-    //                 0);
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_NPC);
     g_add_race(g, id, rt);
@@ -1047,7 +1024,6 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g_add_dead(g, id, false);
     g_add_update(g, id, false);
     g_add_attacking(g, id, false);
-    //g_add_blocking(g, id, false);
     g_add_block_success(g, id, false);
     g_add_damaged(g, id, false);
     g_add_default_action(g, id, ENTITY_ACTION_WAIT);
