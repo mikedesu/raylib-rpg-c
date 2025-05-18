@@ -217,6 +217,7 @@ bool g_add_component(gamestate* const g,
                      int* component_capacity);
 
 bool g_add_name(gamestate* const g, entityid id, const char* name);
+bool g_has_name(const gamestate* const g, entityid id);
 const char* g_get_name(gamestate* const g, entityid id);
 
 bool g_add_type(gamestate* const g, entityid id, entitytype_t type);

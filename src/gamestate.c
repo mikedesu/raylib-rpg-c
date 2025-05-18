@@ -523,10 +523,16 @@ bool g_has_component(const gamestate* const g, entityid id, component comp) {
     return ct_has_component(g->components, id, comp);
 }
 
+bool g_has_name(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_NAME);
+}
+
 const char* g_get_name(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    massert(g_has_component(g, id, C_NAME), "id %d does not have a type component", id);
+    massert(g_has_name(g, id), "id %d does not have a name component", id);
     for (int i = 0; i < g->name_list_count; i++) {
         if (g->name_list[i].id == id) {
             return g->name_list[i].name;
