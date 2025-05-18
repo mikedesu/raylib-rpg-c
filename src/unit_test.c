@@ -1,4 +1,5 @@
 #include "component_table.h"
+#include "gamestate.h"
 #include "unit_test.h"
 
 TEST(create_ct_0) {
