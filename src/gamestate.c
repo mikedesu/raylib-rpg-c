@@ -1513,7 +1513,7 @@ bool g_add_itemtype(gamestate* const g, entityid id, itemtype type) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the itemtype component
-    massert(g_has_component(g, id, C_ITEMTYPE), "id %d does not have an itemtype component", id);
+    //massert(g_has_component(g, id, C_ITEMTYPE), "id %d does not have an itemtype component", id);
     return g_add_component(
         g, id, C_ITEMTYPE, (void*)&type, sizeof(itemtype_component), (void**)&g->itemtype_list, &g->itemtype_list_count, &g->itemtype_list_capacity);
 }
@@ -1751,7 +1751,7 @@ bool g_add_damage(gamestate* const g, entityid id, roll r) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the damage component
-    massert(g_has_component(g, id, C_DAMAGE), "id %d does not have a damage component", id);
+    //massert(g_has_component(g, id, C_DAMAGE), "id %d does not have a damage component", id);
     return g_add_component(g, id, C_DAMAGE, (void*)&r, sizeof(damage_component), (void**)&g->damage_list, &g->damage_list_count, &g->damage_list_capacity);
 }
 
