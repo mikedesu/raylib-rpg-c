@@ -235,7 +235,7 @@ void gamestatefree(gamestate* g) {
     free(g->damage_list);
     free(g->ac_list);
     free(g);
-    msuccess("Freed gamestate");
+    //msuccess("Freed gamestate");
 }
 
 //bool gs_add_entityid(gamestate* const g, entityid id) {
@@ -375,19 +375,19 @@ void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
 }
 
 bool g_register_comp(gamestate* const g, entityid id, component comp) {
-    minfo("g_register_comp: id: %d, comp: %s", id, component2str(comp));
+    //minfo("g_register_comp: id: %d, comp: %s", id, component2str(comp));
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(comp != C_COUNT, "comp is invalid");
-    minfo("g_register_comp: id: %d, comp: %d", id, comp);
+    //minfo("g_register_comp: id: %d, comp: %d", id, comp);
     if (g->components == NULL) {
         merror("g->components is NULL");
         return false;
     }
-    if (!ct_add_entity(g->components, id)) {
-        minfo("ct_add_entity failed, entity may already exist in table");
-        //    return false;
-    }
+    ct_add_entity(g->components, id); // {
+    //minfo("ct_add_entity failed, entity may already exist in table");
+    //    return false;
+    //}
     if (!ct_add_component(g->components, id, comp)) {
         merror("ct_add_component failed");
         return false;
@@ -500,7 +500,7 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
 
     (*c_count)++;
 
-    msuccess("Added component %s to entity %d", component2str(comp), id);
+    //msuccess("Added component %s to entity %d", component2str(comp), id);
     return true;
 }
 
