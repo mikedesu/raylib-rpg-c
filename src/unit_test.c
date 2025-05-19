@@ -63,6 +63,65 @@ TEST(test_gamestate_multiple_entities) {
     gamestatefree(g);
 }
 
+TEST(test_gamestate_components) {
+    gamestate* g = gamestateinitptr();
+    ASSERT(g != NULL, "gamestate creation failed");
+    
+    entityid id = g_add_entity(g);
+    ASSERT(id != ENTITYID_INVALID, "entity creation failed");
+
+    // Test basic components
+    ASSERT(g_add_name(g, id, "Test Entity"), "add name failed");
+    ASSERT(g_has_name(g, id), "name should exist");
+    ASSERT(strcmp(g_get_name(g, id), "Test Entity") == 0, "name should match");
+
+    ASSERT(g_add_type(g, id, ENTITY_PLAYER), "add type failed");
+    ASSERT(g_has_type(g, id), "type should exist");
+    ASSERT(g_get_type(g, id) == ENTITY_PLAYER, "type should be ENTITY_PLAYER");
+
+    loc_t loc = {10, 20, 0};
+    ASSERT(g_add_location(g, id, loc), "add location failed");
+    ASSERT(g_has_location(g, id), "location should exist");
+    loc_t actual_loc = g_get_location(g, id);
+    ASSERT(actual_loc.x == loc.x && actual_loc.y == loc.y, "location should match");
+
+    // Test stats components
+    ASSERT(g_add_stats(g, id), "add stats failed");
+    ASSERT(g_has_stats(g, id), "stats should exist");
+    ASSERT(g_set_stat(g, id, STATS_HP, 100), "set stat failed");
+    ASSERT(g_get_stat(g, id, STATS_HP) == 100, "get stat failed");
+
+    // Test equipment components
+    ASSERT(g_add_equipment(g, id), "add equipment failed");
+    ASSERT(g_has_equipment(g, id), "equipment should exist");
+    entityid weapon_id = g_add_entity(g);
+    ASSERT(g_set_equipment(g, id, EQUIP_SLOT_WEAPON, weapon_id), "set equipment failed");
+    ASSERT(g_get_equipment(g, id, EQUIP_SLOT_WEAPON) == weapon_id, "get equipment failed");
+
+    // Test inventory components
+    ASSERT(g_add_inventory(g, id), "add inventory failed");
+    ASSERT(g_has_inventory(g, id), "inventory should exist");
+    entityid item_id = g_add_entity(g);
+    ASSERT(g_add_to_inventory(g, id, item_id), "add to inventory failed");
+    ASSERT(g_has_item_in_inventory(g, id, item_id), "item should be in inventory");
+
+    // Test damage components
+    roll damage_roll = {1, 6, 2};
+    ASSERT(g_add_damage(g, id, damage_roll), "add damage failed");
+    ASSERT(g_has_damage(g, id), "damage should exist");
+    roll actual_damage = g_get_damage(g, id);
+    ASSERT(actual_damage.n == damage_roll.n && 
+           actual_damage.sides == damage_roll.sides && 
+           actual_damage.modifier == damage_roll.modifier, "damage should match");
+
+    // Test AC components
+    ASSERT(g_add_ac(g, id, 15), "add AC failed");
+    ASSERT(g_has_ac(g, id), "AC should exist");
+    ASSERT(g_get_ac(g, id) == 15, "AC should match");
+
+    gamestatefree(g);
+}
+
 static void test_gamestate(void) {
     run_test_gamestate_create_destroy();
     run_test_gamestate_add_entity();
