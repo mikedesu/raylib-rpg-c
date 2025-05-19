@@ -156,6 +156,24 @@ TEST(test_multiple_entities) {
     ct_destroy(table);
 }
 
+TEST(test_ct_remove_component) {
+    ct* table = ct_create();
+    entityid id = 0;
+    ASSERT(table != NULL, "ct creation failed");
+    ASSERT(ct_add_entity(table, id), "add entity failed");
+    
+    // Add and verify component exists
+    ASSERT(ct_add_component(table, id, C_NAME), "add C_NAME failed");
+    ASSERT(ct_has_component(table, id, C_NAME), "C_NAME should exist");
+    
+    // Remove component and verify it's gone
+    size_t int_index = C_NAME / 64, bit_index = C_NAME % 64;
+    table->components[id * table->ints_per_row + int_index] &= ~(1UL << bit_index);
+    ASSERT(!ct_has_component(table, id, C_NAME), "C_NAME should be removed");
+    
+    ct_destroy(table);
+}
+
 void test_component_table(void) {
     run_create_ct_0();
     run_create_ct_1();
@@ -165,4 +183,5 @@ void test_component_table(void) {
     run_test_boundary_conditions();
     run_test_all_component_types();
     run_test_multiple_entities();
+    run_test_ct_remove_component();
 }
