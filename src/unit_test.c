@@ -220,12 +220,58 @@ TEST(test_gamestate_add_entity) {
     // Add and verify some components
     ASSERT(g_add_name(g, id, "Test Entity"), "add name failed");
     ASSERT(g_has_name(g, id), "name should exist");
+    ASSERT(strcmp(g_get_name(g, id), "Test Entity") == 0, "name should match");
 
     ASSERT(g_add_type(g, id, ENTITY_PLAYER), "add type failed");
     ASSERT(g_has_type(g, id), "type should exist");
+    ASSERT(g_get_type(g, id) == ENTITY_PLAYER, "type should be ENTITY_PLAYER");
 
-    ASSERT(g_add_location(g, id, (loc_t){0, 0, 0}), "add location failed");
+    loc_t loc = {1, 2, 0};
+    ASSERT(g_add_location(g, id, loc), "add location failed");
     ASSERT(g_has_location(g, id), "location should exist");
+    loc_t actual_loc = g_get_location(g, id);
+    ASSERT(actual_loc.x == loc.x && actual_loc.y == loc.y, "location should match");
+
+    gamestatefree(g);
+}
+
+TEST(test_gamestate_multiple_entities) {
+    gamestate* g = gamestateinitptr();
+    ASSERT(g != NULL, "gamestate creation failed");
+
+    // Create first entity
+    entityid id1 = g_add_entity(g);
+    ASSERT(id1 != ENTITYID_INVALID, "entity creation failed");
+    ASSERT(g_add_name(g, id1, "Entity 1"), "add name failed");
+    ASSERT(g_add_type(g, id1, ENTITY_NPC), "add type failed");
+    ASSERT(g_add_location(g, id1, (loc_t){3, 4, 0}), "add location failed");
+
+    // Create second entity
+    entityid id2 = g_add_entity(g);
+    ASSERT(id2 != ENTITYID_INVALID, "entity creation failed");
+    ASSERT(g_add_name(g, id2, "Entity 2"), "add name failed");
+    ASSERT(g_add_type(g, id2, ENTITY_ITEM), "add type failed");
+    ASSERT(g_add_location(g, id2, (loc_t){5, 6, 0}), "add location failed");
+
+    // Verify first entity
+    ASSERT(g_has_name(g, id1), "entity 1 should have name");
+    ASSERT(strcmp(g_get_name(g, id1), "Entity 1") == 0, "entity 1 name should match");
+    ASSERT(g_get_type(g, id1) == ENTITY_NPC, "entity 1 type should be ENTITY_NPC");
+    loc_t loc1 = g_get_location(g, id1);
+    ASSERT(loc1.x == 3 && loc1.y == 4, "entity 1 location should match");
+
+    // Verify second entity
+    ASSERT(g_has_name(g, id2), "entity 2 should have name");
+    ASSERT(strcmp(g_get_name(g, id2), "Entity 2") == 0, "entity 2 name should match");
+    ASSERT(g_get_type(g, id2) == ENTITY_ITEM, "entity 2 type should be ENTITY_ITEM");
+    loc_t loc2 = g_get_location(g, id2);
+    ASSERT(loc2.x == 5 && loc2.y == 6, "entity 2 location should match");
+
+    // Verify entity counts
+    ASSERT(g->next_entityid == 2, "should have 2 entities");
+    ASSERT(g->name_list_count == 2, "should have 2 name components");
+    ASSERT(g->type_list_count == 2, "should have 2 type components");
+    ASSERT(g->loc_list_count == 2, "should have 2 location components");
 
     gamestatefree(g);
 }
@@ -233,6 +279,7 @@ TEST(test_gamestate_add_entity) {
 static void test_gamestate(void) {
     run_test_gamestate_create_destroy();
     run_test_gamestate_add_entity();
+    run_test_gamestate_multiple_entities();
 }
 
 int main(void) {
