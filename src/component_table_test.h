@@ -156,6 +156,15 @@ TEST(test_multiple_entities) {
     ct_destroy(table);
 }
 
+TEST(test_invalid_entity_component) {
+    ct* table = ct_create();
+    ASSERT(table != NULL, "ct creation failed");
+    // Try to add component to invalid entity ID
+    entityid invalid_id = -1;
+    ASSERT(!ct_add_component(table, invalid_id, C_NAME), "should fail to add component to invalid entity");
+    ct_destroy(table);
+}
+
 void test_component_table(void) {
     run_create_ct_0();
     run_create_ct_1();
@@ -165,4 +174,5 @@ void test_component_table(void) {
     run_test_boundary_conditions();
     run_test_all_component_types();
     run_test_multiple_entities();
+    run_test_invalid_entity_component();
 }
