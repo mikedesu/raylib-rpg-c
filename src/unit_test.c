@@ -67,6 +67,7 @@ static void test_gamestate(void) {
     run_test_gamestate_create_destroy();
     run_test_gamestate_add_entity();
     run_test_gamestate_multiple_entities();
+    run_test_gamestate_components();
 }
 
 int main(void) {
