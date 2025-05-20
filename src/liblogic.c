@@ -1,4 +1,4 @@
-#include "component.h"
+//#include "component.h"
 #include "controlmode.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
@@ -16,20 +16,15 @@
 #include "location.h"
 #include "massert.h"
 #include "mprint.h"
-#include "potion.h"
-#include "shield.h"
-//#include "path_node.h"
 #include "path_node.h"
+#include "potion.h"
 #include "race.h"
+#include "shield.h"
 #include <assert.h>
 #include <math.h>
 #include <raylib.h>
 #include <stdlib.h>
 #include <string.h>
-
-//static entityid next_entityid = 0; // Start at 0, increment for each new entity
-
-//static inline size_t tile_npc_count_at(gamestate* const g, int x, int y, int z);
 
 static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
 
@@ -42,9 +37,6 @@ static inline void update_npc_state(gamestate* const g, entityid id);
 static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
 //static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
-//static loc_t* get_empty_locs(dungeon_floor_t* const df, int* count);
-//static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt);
-//static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count);
 static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
@@ -67,9 +59,7 @@ static void init_bow_test(gamestate* g);
 static void init_shield_test(gamestate* g);
 static void init_potion_test(gamestate* g);
 //static entityid potion_create(gamestate* const g, loc_t loc, const char* name);
-static entityid potion_create(gamestate* const g, loc_t loc, potiontype type, const char* name);
 
-//static void init_em(gamestate* const g);
 static void init_dungeon(gamestate* const g);
 static void update_player_state(gamestate* const g);
 static void update_debug_panel_buffer(gamestate* const g);
@@ -80,22 +70,20 @@ static void handle_input_player(const inputstate* const is, gamestate* const g);
 static void add_message_history(gamestate* const g, const char* fmt, ...);
 static void add_message_and_history(gamestate* g, const char* fmt, ...);
 static void add_message(gamestate* g, const char* fmt, ...);
-//static void try_entity_open_door(gamestate* g, entity* e, int x, int y);
 static void try_entity_move_a_star(gamestate* const g, entityid id);
 static void try_entity_move(gamestate* const g, entityid id, int x, int y);
 static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
+//static void try_entity_open_door(gamestate* g, entity* e, int x, int y);
 
 static const char* get_action_key(const inputstate* const is, gamestate* const g);
 
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
-//static entityid create_potion_at(gamestate* const g, potiontype_t potion_type, const char* name, loc_t loc);
-//static entityid door_create(gamestate* const g, int x, int y, int fl, const char* name);
-//static entityid npc_create(gamestate* const g, race_t rt, int x, int y, int z, const char* name);
 static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char* name);
 static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const char* name);
 static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, const char* name);
 static entityid arrow_create(gamestate* const g, loc_t loc, const char* name);
 static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, const char* name);
+static entityid potion_create(gamestate* const g, loc_t loc, potiontype type, const char* name);
 
 static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
 static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
@@ -1929,11 +1917,12 @@ void liblogic_init(gamestate* const g) {
     //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
     //init_npcs_test_by_room(g);
     //init_npc_test(g);
-    init_sword_test(g);
-    init_dagger_test(g);
-    init_axe_test(g);
-    init_bow_test(g);
-    init_shield_test(g);
+
+    //init_sword_test(g);
+    //init_dagger_test(g);
+    //init_axe_test(g);
+    //init_bow_test(g);
+    //init_shield_test(g);
     //init_potion_test(g);
     update_debug_panel_buffer(g);
 }
@@ -2021,16 +2010,17 @@ static void try_spawn_npc(gamestate* const g) {
                 loc_t loc = get_random_empty_non_wall_loc(g, 0);
                 entityid id = ENTITYID_INVALID;
                 race_t race = RACE_HUMAN;
-                int choice = rand() % 6;
-                switch (choice) {
-                case 0: race = RACE_HUMAN; break;
-                case 1: race = RACE_ELF; break;
-                case 2: race = RACE_DWARF; break;
-                case 3: race = RACE_HALFLING; break;
-                case 4: race = RACE_ORC; break;
-                case 5: race = RACE_GOBLIN; break;
-                default: break;
-                }
+                //int choice = rand() % 6;
+                //switch (choice) {
+                //case 0: race = RACE_HUMAN; break;
+                //case 1: race = RACE_ELF; break;
+                //case 2: race = RACE_DWARF; break;
+                //case 3: race = RACE_HALFLING; break;
+                //case 4: race = RACE_ORC; break;
+                //case 5: race = RACE_GOBLIN; break;
+                //default: break;
+                //}
+                race = RACE_WOLF;
                 id = npc_create(g, race, loc, "NPC");
                 if (id != ENTITYID_INVALID) {
                     int hit_die = 4;
@@ -2041,6 +2031,7 @@ static void try_spawn_npc(gamestate* const g) {
                     case RACE_ORC: hit_die = 8; break;
                     case RACE_GOBLIN: hit_die = 4; break;
                     case RACE_HALFLING: hit_die = 4; break;
+                    case RACE_WOLF: hit_die = 4; break;
                     default: break;
                     }
                     roll r = {1, hit_die, 0};

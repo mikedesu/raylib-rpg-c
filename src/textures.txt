@@ -259,29 +259,29 @@
 #
 #
 #
-177 4 2  0  img/monsters/bat_idle.png
-178 4 2  0  img/monsters/shadows/bat_idle_shadow.png
-179 4 4  0  img/monsters/bat_attack.png
-180 4 4  0  img/monsters/shadows/bat_attack_shadow.png
-181 4 4  0  img/monsters/bat_dmg.png
-182 4 4  0  img/monsters/shadows/bat_dmg_shadow.png
-183 3 8  0  img/monsters/bat_sleep.png
-184 3 8  0  img/monsters/shadows/bat_sleep_shadow.png
+177 4 2  0  img/monsters/bat/bat_idle.png
+178 4 2  0  img/monsters/bat/shadows/bat_idle_shadow.png
+179 4 4  0  img/monsters/bat/bat_attack.png
+180 4 4  0  img/monsters/bat/shadows/bat_attack_shadow.png
+181 4 4  0  img/monsters/bat/bat_dmg.png
+182 4 4  0  img/monsters/bat/shadows/bat_dmg_shadow.png
+183 3 8  0  img/monsters/bat/bat_sleep.png
+184 3 8  0  img/monsters/bat/shadows/bat_sleep_shadow.png
 #
 #
 #
-185 12 4 0  img/monsters/wolf_idle.png
-186 12 4 0  img/monsters/shadows/wolf_idle_shadow.png
-187 12 4 0  img/monsters/wolf_walk.png
-188 12 4 0  img/monsters/shadows/wolf_walk_shadow.png
-189 4  4 0  img/monsters/wolf_attack.png
-190 4  4 0  img/monsters/shadows/wolf_attack_shadow.png
-191 4  4 0  img/monsters/wolf_dmg.png
-192 4  4 0  img/monsters/shadows/wolf_dmg_shadow.png
-193 4  4 0  img/monsters/wolf_jump.png
-194 4  4 0  img/monsters/shadows/wolf_jump_shadow.png
-195 4  4 0  img/monsters/wolf_die.png
-196 4  4 0  img/monsters/shadows/wolf_die_shadow.png
+185 4 12 0  img/monsters/wolf/wolf_idle.png
+186 4 12 0  img/monsters/wolf/shadows/wolf_idle_shadow.png
+187 4 12 0  img/monsters/wolf/wolf_walk.png
+188 4 12 0  img/monsters/wolf/shadows/wolf_walk_shadow.png
+189 4  4 0  img/monsters/wolf/wolf_attack.png
+190 4  4 0  img/monsters/wolf/shadows/wolf_attack_shadow.png
+191 4  4 0  img/monsters/wolf/wolf_dmg.png
+192 4  4 0  img/monsters/wolf/shadows/wolf_dmg_shadow.png
+193 4  4 0  img/monsters/wolf/wolf_jump.png
+194 4  4 0  img/monsters/wolf/shadows/wolf_jump_shadow.png
+195 4  4 0  img/monsters/wolf/wolf_die.png
+196 4  4 0  img/monsters/wolf/shadows/wolf_die_shadow.png
 #
 #
 #

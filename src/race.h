@@ -9,5 +9,6 @@ typedef enum
     RACE_DWARF,
     RACE_HALFLING,
     RACE_GOBLIN,
+    RACE_WOLF,
     RACE_COUNT
 } race_t;

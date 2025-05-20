@@ -54,6 +54,7 @@ Vector2 zero_vec = {0, 0};
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
+static int get_total_ac(gamestate* const g, entityid id);
 static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
@@ -298,22 +299,25 @@ static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, 
 static void draw_entity_sprite(const gamestate* const g, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
-    
+
     sprite* s = sg_get_current(sg);
     massert(s, "sprite is NULL");
-    
+
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, (Color){255, 255, 255, 255});
+
+    // draw a box around the sprite
+    //DrawRectangleLinesEx(dest, 1, (Color){255, 0, 0, 255});
 }
 
 static void draw_shield_sprites(const gamestate* const g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
-    
+
     sprite* shield_back_s = get_shield_back_sprite(g, id, sg);
     sprite* shield_front_s = get_shield_front_sprite(g, id, sg);
-    
+
     if (shield_back_s) {
         DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
@@ -326,10 +330,10 @@ static void draw_weapon_sprites(const gamestate* const g, entityid id, spritegro
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
-    
+
     sprite* weapon_back_s = get_weapon_back_sprite(g, id, sg);
     sprite* weapon_front_s = get_weapon_front_sprite(g, id, sg);
-    
+
     if (weapon_back_s) {
         DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
@@ -341,10 +345,10 @@ static void draw_weapon_sprites(const gamestate* const g, entityid id, spritegro
 static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    
+
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     massert(sg, "spritegroup is NULL");
-    
+
     // Draw components in correct order
     draw_shadow_for_entity(g, sg, id);
     draw_shield_sprites(g, id, sg);
@@ -898,7 +902,7 @@ void libdraw_update_sprites(gamestate* const g) {
     //minfo("libdraw_update_sprites");
     if (g) {
         libdraw_handle_dirty_entities(g);
-        
+
         // for each entityid in our entitymap, update the spritegroup
         //for (int i = 0; i < g->index_entityids; i++) {
         for (entityid id = 0; id < g->next_entityid; id++) {
@@ -1132,6 +1136,10 @@ static void load_textures() {
             continue;
         }
         sscanf(line, "%d %d %d %d %s", &txkey, &contexts, &frames, &do_dither, path);
+        massert(txkey >= 0, "txkey is invalid");
+        massert(contexts >= 0, "contexts is invalid");
+        massert(frames >= 0, "frames is invalid");
+
         if (txkey < 0 || contexts < 0 || frames < 0) {
             merror("invalid line in textures.txt");
             continue;
@@ -1202,7 +1210,8 @@ static void create_sg_byid(gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     int* keys = NULL;
     int num_keys = 0;
-    const int offset_x = -12, offset_y = -12;
+    const int offset_x = -12;
+    const int offset_y = -12;
     entitytype_t type = g_get_type(g, id);
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
         race_t race = g_get_race(g, id);
@@ -1231,6 +1240,10 @@ static void create_sg_byid(gamestate* const g, entityid id) {
         case RACE_GOBLIN:
             keys = TX_GOBLIN_KEYS;
             num_keys = TX_GOBLIN_KEY_COUNT;
+            break;
+        case RACE_WOLF:
+            keys = TX_WOLF_KEYS;
+            num_keys = TX_WOLF_KEY_COUNT;
             break;
         default: merror("unknown race %d", race); return;
         }
@@ -1307,7 +1320,6 @@ static void create_sg_byid(gamestate* const g, entityid id) {
     //}
 }
 
-static int get_total_ac(gamestate* const g, entityid id);
 static int get_total_ac(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
