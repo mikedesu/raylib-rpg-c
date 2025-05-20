@@ -274,8 +274,8 @@
 #
 185 4 12 0  img/monsters/wolf/wolf_idle.png
 186 4 12 0  img/monsters/wolf/shadows/wolf_idle_shadow.png
-187 4 12 0  img/monsters/wolf/wolf_walk.png
-188 4 12 0  img/monsters/wolf/shadows/wolf_walk_shadow.png
+187 4  4 0  img/monsters/wolf/wolf_walk.png
+188 4  4 0  img/monsters/wolf/shadows/wolf_walk_shadow.png
 189 4  4 0  img/monsters/wolf/wolf_attack.png
 190 4  4 0  img/monsters/wolf/shadows/wolf_attack_shadow.png
 191 4  4 0  img/monsters/wolf/wolf_dmg.png

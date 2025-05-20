@@ -2010,17 +2010,19 @@ static void try_spawn_npc(gamestate* const g) {
                 loc_t loc = get_random_empty_non_wall_loc(g, 0);
                 entityid id = ENTITYID_INVALID;
                 race_t race = RACE_HUMAN;
-                //int choice = rand() % 6;
-                //switch (choice) {
+                int choice = rand() % 4;
+                switch (choice) {
+                case 0: race = RACE_BAT; break;
+                case 1: race = RACE_WOLF; break;
                 //case 0: race = RACE_HUMAN; break;
                 //case 1: race = RACE_ELF; break;
                 //case 2: race = RACE_DWARF; break;
                 //case 3: race = RACE_HALFLING; break;
-                //case 4: race = RACE_ORC; break;
-                //case 5: race = RACE_GOBLIN; break;
-                //default: break;
-                //}
-                race = RACE_BAT;
+                case 2: race = RACE_ORC; break;
+                case 3: race = RACE_GOBLIN; break;
+                default: break;
+                }
+                //race = RACE_BAT;
                 id = npc_create(g, race, loc, "NPC");
                 if (id != ENTITYID_INVALID) {
                     int hit_die = 4;
