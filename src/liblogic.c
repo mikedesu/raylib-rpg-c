@@ -90,6 +90,7 @@ static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
 
 static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1);
 static bool player_on_tile(gamestate* g, int x, int y, int floor);
+static void try_entity_traverse_floors(gamestate* const g, entityid id);
 //static bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl);
 //static bool tile_has_door(const gamestate* const g, int x, int y, int fl);
 
@@ -1746,9 +1747,41 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             try_entity_pickup(g, g->hero_id);
         } else if (strcmp(action, "toggle_camera") == 0) {
             g->controlmode = CONTROLMODE_CAMERA;
+        } else if (strcmp(action, "traverse") == 0) {
+            // we need to attempt to navigate either up or down a floor depending on the tile beneath the player
+            try_entity_traverse_floors(g, g->hero_id);
         }
     } else {
         merror("No action found for key");
+    }
+}
+
+static void try_entity_traverse_floors(gamestate* const g, entityid id) {
+    loc_t loc = g_get_location(g, id);
+    dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
+    massert(df, "Dungeon floor is NULL!");
+    tile_t* const tile = df_tile_at(df, loc);
+    massert(tile, "Tile is NULL!");
+    if (tile->type == TILE_UPSTAIRS) {
+        // we need to check if the player is on the stairs
+        // and if so, we need to move them up a floor
+        //g_traverse_up(g, g->hero_id);
+        // we need to check to see which floor we are currently on
+        if (g->d->current_floor > 0) {
+            if (id == g->hero_id) add_message(g, "You ascend the stairs");
+        } else {
+            if (id == g->hero_id) add_message(g, "You are already at the top floor");
+        }
+    } else if (tile->type == TILE_DOWNSTAIRS) {
+        // we need to check if the player is on the stairs
+        // and if so, we need to move them down a floor
+        //g_traverse_down(g, g->hero_id);
+
+        if (g->d->current_floor < g->d->num_floors - 1) {
+            if (id == g->hero_id) add_message(g, "You descend the stairs");
+        } else {
+            if (id == g->hero_id) add_message(g, "You are already at the bottom floor");
+        }
     }
 }
 
