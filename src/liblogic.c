@@ -1918,11 +1918,11 @@ void liblogic_init(gamestate* const g) {
     //init_npcs_test_by_room(g);
     //init_npc_test(g);
 
-    //init_sword_test(g);
-    //init_dagger_test(g);
-    //init_axe_test(g);
+    init_sword_test(g);
+    init_dagger_test(g);
+    init_axe_test(g);
     //init_bow_test(g);
-    //init_shield_test(g);
+    init_shield_test(g);
     //init_potion_test(g);
     update_debug_panel_buffer(g);
 }

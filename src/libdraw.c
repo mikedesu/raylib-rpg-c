@@ -59,6 +59,10 @@ static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
 static void libdraw_handle_gamestate_flag(gamestate* const g);
+static void draw_weapon_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg);
+static void draw_weapon_sprite_back(const gamestate* const g, entityid id, spritegroup_t* sg);
+static void draw_shield_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg);
+static void draw_shield_sprite_back(const gamestate* const g, entityid id, spritegroup_t* sg);
 
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 
@@ -314,13 +318,39 @@ static void draw_shield_sprites(const gamestate* const g, entityid id, spritegro
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
-
     sprite* shield_back_s = get_shield_back_sprite(g, id, sg);
     sprite* shield_front_s = get_shield_front_sprite(g, id, sg);
-
     if (shield_back_s) {
         DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
+    if (shield_front_s) {
+        DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
+}
+
+static void draw_shield_sprite_back(const gamestate* const g, entityid id, spritegroup_t* sg) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(sg, "spritegroup is NULL");
+    sprite* shield_back_s = get_shield_back_sprite(g, id, sg);
+    //sprite* shield_front_s = get_shield_front_sprite(g, id, sg);
+    if (shield_back_s) {
+        DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
+    //if (shield_front_s) {
+    //    DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    //}
+}
+
+static void draw_shield_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(sg, "spritegroup is NULL");
+    //sprite* shield_back_s = get_shield_back_sprite(g, id, sg);
+    sprite* shield_front_s = get_shield_front_sprite(g, id, sg);
+    //if (shield_back_s) {
+    //    DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    //}
     if (shield_front_s) {
         DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
@@ -330,13 +360,39 @@ static void draw_weapon_sprites(const gamestate* const g, entityid id, spritegro
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
-
     sprite* weapon_back_s = get_weapon_back_sprite(g, id, sg);
     sprite* weapon_front_s = get_weapon_front_sprite(g, id, sg);
-
     if (weapon_back_s) {
         DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
+    if (weapon_front_s) {
+        DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
+}
+
+static void draw_weapon_sprite_back(const gamestate* const g, entityid id, spritegroup_t* sg) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(sg, "spritegroup is NULL");
+    sprite* weapon_back_s = get_weapon_back_sprite(g, id, sg);
+    //sprite* weapon_front_s = get_weapon_front_sprite(g, id, sg);
+    if (weapon_back_s) {
+        DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
+    //if (weapon_front_s) {
+    //    DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    //}
+}
+
+static void draw_weapon_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(sg, "spritegroup is NULL");
+    //sprite* weapon_back_s = get_weapon_back_sprite(g, id, sg);
+    sprite* weapon_front_s = get_weapon_front_sprite(g, id, sg);
+    //if (weapon_back_s) {
+    //    DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    //}
     if (weapon_front_s) {
         DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
@@ -351,9 +407,12 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
 
     // Draw components in correct order
     draw_shadow_for_entity(g, sg, id);
-    draw_shield_sprites(g, id, sg);
-    draw_weapon_sprites(g, id, sg);
+    draw_shield_sprite_back(g, id, sg);
+    //draw_weapon_sprites(g, id, sg);
+    draw_weapon_sprite_back(g, id, sg);
     draw_entity_sprite(g, sg);
+    draw_shield_sprite_front(g, id, sg);
+    draw_weapon_sprite_front(g, id, sg);
 }
 
 static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, loc_t loc) {

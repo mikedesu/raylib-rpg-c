@@ -280,8 +280,8 @@
 192 4  4 0  img/monsters/wolf/shadows/wolf_dmg_shadow.png
 193 4  4 0  img/monsters/wolf/wolf_jump.png
 194 4  4 0  img/monsters/wolf/shadows/wolf_jump_shadow.png
-195 4  4 0  img/monsters/wolf/wolf_die.png
-196 4  4 0  img/monsters/wolf/shadows/wolf_die_shadow.png
+195 1  5 0  img/monsters/wolf/wolf_die.png
+196 1  5 0  img/monsters/wolf/shadows/wolf_die_shadow.png
 #
 #
 #
