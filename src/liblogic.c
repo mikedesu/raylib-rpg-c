@@ -1768,9 +1768,36 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
         //g_traverse_up(g, g->hero_id);
         // we need to check to see which floor we are currently on
         if (g->d->current_floor > 0) {
-            if (id == g->hero_id) add_message(g, "You ascend the stairs");
+            if (id == g->hero_id) {
+                add_message(g, "You ascend the stairs");
+
+                if (!df_remove_at(df, id, loc.x, loc.y)) {
+                    merror("Failed to remove entity from old tile");
+                    return;
+                }
+
+                loc_t next_downstairs_loc = df_get_downstairs(g->d->floors[g->d->current_floor - 1]);
+                massert(next_downstairs_loc.x != -1 && next_downstairs_loc.y != -1, "Failed to get next downstairs location");
+                // we need to set the player's location to the corresponding TILE_downstairs
+                next_downstairs_loc.z = g->d->current_floor - 1;
+                g_update_location(g, id, next_downstairs_loc);
+                // we need to set the player's floor to the next floor
+                g->d->current_floor--;
+
+                // get the next dungeon floor
+                dungeon_floor_t* const next_floor = d_get_floor(g->d, g->d->current_floor);
+                int ex = next_downstairs_loc.x;
+                int ey = next_downstairs_loc.y;
+
+                if (!df_add_at(next_floor, id, ex, ey)) {
+                    merror("Failed to add entity to new tile");
+                    return;
+                }
+            }
         } else {
-            if (id == g->hero_id) add_message(g, "You are already at the top floor");
+            if (id == g->hero_id) {
+                add_message(g, "You are already at the top floor");
+            }
         }
     } else if (tile->type == TILE_DOWNSTAIRS) {
         // we need to check if the player is on the stairs
@@ -1778,9 +1805,36 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
         //g_traverse_down(g, g->hero_id);
 
         if (g->d->current_floor < g->d->num_floors - 1) {
-            if (id == g->hero_id) add_message(g, "You descend the stairs");
+            if (id == g->hero_id) {
+                add_message(g, "You descend the stairs");
+
+                if (!df_remove_at(df, id, loc.x, loc.y)) {
+                    merror("Failed to remove entity from old tile");
+                    return;
+                }
+
+                loc_t next_upstairs_loc = df_get_upstairs(g->d->floors[g->d->current_floor + 1]);
+                massert(next_upstairs_loc.x != -1 && next_upstairs_loc.y != -1, "Failed to get next upstairs location");
+                // we need to set the player's location to the corresponding TILE_UPSTAIRS
+                next_upstairs_loc.z = g->d->current_floor + 1;
+                g_update_location(g, id, next_upstairs_loc);
+                // we need to set the player's floor to the next floor
+                g->d->current_floor++;
+
+                // get the next dungeon floor
+                dungeon_floor_t* const next_floor = d_get_floor(g->d, g->d->current_floor);
+                int ex = next_upstairs_loc.x;
+                int ey = next_upstairs_loc.y;
+
+                if (!df_add_at(next_floor, id, ex, ey)) {
+                    merror("Failed to add entity to new tile");
+                    return;
+                }
+            }
         } else {
-            if (id == g->hero_id) add_message(g, "You are already at the bottom floor");
+            if (id == g->hero_id) {
+                add_message(g, "You are already at the bottom floor");
+            }
         }
     }
 }
@@ -1862,12 +1916,17 @@ static void update_debug_panel_buffer(gamestate* const g) {
     // Get hero position once
     int x = -1;
     int y = -1;
+    int z = -1;
     int inventory_count = -1;
     entityid shield_id = -1;
     direction_t player_dir = DIR_NONE;
     direction_t shield_dir = DIR_NONE;
     bool is_b = false;
     bool test_guard = g->test_guard;
+    loc_t loc = g_get_location(g, g->hero_id);
+    x = loc.x;
+    y = loc.y;
+    z = loc.z;
     //if (e) {
     //    loc_t loc = g_get_location(g, e->id);
     //    x = loc.x;
@@ -1899,7 +1958,7 @@ static void update_debug_panel_buffer(gamestate* const g) {
              "Cam: (%.0f,%.0f) Zoom: %.1f\n"
              "Mode: %s | Floor: %d/%d\n"
              "Entities: %d | Flag: %s\n"
-             "Turn: %d | Hero: (%d,%d)\n"
+             "Turn: %d | Hero: (%d,%d,%d)\n"
              "Inventory: %d\n"
              "msg_history.count: %d\n"
              "shield_dir_str: %s\n"
@@ -1925,6 +1984,7 @@ static void update_debug_panel_buffer(gamestate* const g) {
              g->entity_turn,
              x,
              y,
+             z,
              inventory_count,
              g->msg_history.count,
              get_dir_as_string(shield_dir),
