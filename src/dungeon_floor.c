@@ -481,7 +481,15 @@ void df_init(dungeon_floor_t* df) {
     //df_init_test_complex5(df, (range){3, 10});
     //df_init_test_complex6(df, (range){3, 10}, (range){3, 10});
     //df_init_test_complex7(df, (range){3, 5}, (range){3, 5});
-    df_init_test_complex8(df, 8, 8);
+
+    int max_w = 16;
+    int max_h = 16;
+    int min_w = 4;
+    int min_h = 4;
+    int w = rand() % (max_w - min_w + 1) + min_w;
+    int h = rand() % (max_h - min_h + 1) + min_h;
+
+    df_init_test_complex8(df, w, h);
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
