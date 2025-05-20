@@ -1,0 +1,5 @@
+#pragma once
+
+#define SG_CONTEXT_BAT_SLEEP 0
+#define SG_CONTEXT_BAT_SLEEP_TO_AWAKE 1
+#define SG_CONTEXT_BAT_AWAKE_TO_SLEEP 2

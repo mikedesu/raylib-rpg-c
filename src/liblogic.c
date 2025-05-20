@@ -2020,7 +2020,7 @@ static void try_spawn_npc(gamestate* const g) {
                 //case 5: race = RACE_GOBLIN; break;
                 //default: break;
                 //}
-                race = RACE_WOLF;
+                race = RACE_BAT;
                 id = npc_create(g, race, loc, "NPC");
                 if (id != ENTITYID_INVALID) {
                     int hit_die = 4;
@@ -2032,6 +2032,7 @@ static void try_spawn_npc(gamestate* const g) {
                     case RACE_GOBLIN: hit_die = 4; break;
                     case RACE_HALFLING: hit_die = 4; break;
                     case RACE_WOLF: hit_die = 4; break;
+                    case RACE_BAT: hit_die = 2; break;
                     default: break;
                     }
                     roll r = {1, hit_die, 0};

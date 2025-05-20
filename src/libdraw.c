@@ -513,8 +513,15 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entityid id, spritegro
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
 
-    //race_t race = g_get_race(g, id);
-    spritegroup_set_current(sg, SG_ANIM_NPC_DMG);
+    race_t race = g_get_race(g, id);
+
+    int anim_index = SG_ANIM_NPC_DMG;
+
+    if (race == RACE_BAT) {
+        anim_index = SG_ANIM_BAT_DMG;
+    }
+
+    spritegroup_set_current(sg, anim_index);
 
     //if (race == RACE_HUMAN)
     //    spritegroup_set_current(sg, SPRITEGROUP_ANIM_HUMAN_DMG);
@@ -543,9 +550,16 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entityid id, spritegroup_
     //minfo("calling g_is_dead 1");
     if (!g_is_dead(g, id)) return;
 
-    //race_t race = g_get_race(g, id);
-    if (sg->current == SG_ANIM_NPC_SPINDIE) return;
-    sg_set_default_anim(sg, SG_ANIM_NPC_SPINDIE);
+    race_t race = g_get_race(g, id);
+
+    int anim_index = SG_ANIM_NPC_SPINDIE;
+    if (race == RACE_BAT) {
+        anim_index = SG_ANIM_BAT_DIE;
+    }
+
+    if (sg->current == anim_index) return;
+
+    sg_set_default_anim(sg, anim_index);
     spritegroup_set_current(sg, sg->default_anim);
     spritegroup_set_stop_on_last_frame(sg, true);
 
@@ -647,6 +661,11 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entityid id, spriteg
     if (wtype == WEAPON_BOW) {
         cur = SG_ANIM_NPC_SHOT;
     }
+
+    if (race == RACE_BAT) {
+        cur = SG_ANIM_BAT_ATTACK;
+    }
+
     //if (race == RACE_HUMAN) {
     //} else if (race == RACE_ORC) {
     //    cur = SPRITEGROUP_ANIM_ORC_ATTACK;
@@ -705,6 +724,10 @@ static void libdraw_set_sg_block_success(gamestate* const g, entityid id, sprite
 
     int anim_index = -1;
     anim_index = SG_ANIM_NPC_GUARD_SUCCESS;
+
+    if (race == RACE_BAT) {
+        anim_index = SG_ANIM_BAT_IDLE;
+    }
 
     //if (race == RACE_HUMAN) {
     //    anim_index = SG_ANIM_NPC_GUARD_SUCCESS;
@@ -811,7 +834,10 @@ static void libdraw_update_sprite_position(gamestate* const g, entityid id, spri
             //sg->current = SPRITEGROUP_ANIM_HALFLING_WALK;
             else if (race == RACE_GOBLIN)
                 sg->current = SG_ANIM_NPC_WALK;
-            //sg->current = SPRITEGROUP_ANIM_GOBLIN_WALK;
+            else if (race == RACE_WOLF)
+                sg->current = SG_ANIM_NPC_WALK;
+            else if (race == RACE_BAT)
+                sg->current = SG_ANIM_BAT_IDLE;
         }
     }
 }
@@ -1304,6 +1330,11 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             keys = TX_WOLF_KEYS;
             num_keys = TX_WOLF_KEY_COUNT;
             break;
+        case RACE_BAT:
+            keys = TX_BAT_KEYS;
+            num_keys = TX_BAT_KEY_COUNT;
+            break;
+
         default: merror("unknown race %d", race); return;
         }
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
