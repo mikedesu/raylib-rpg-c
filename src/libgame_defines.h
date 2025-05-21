@@ -410,6 +410,48 @@
 //315 1 4 0 img/items/arrow.png
 #define TX_ARROW 315
 
+//318 4 12 0  img/monsters/warg/warg_idle.png
+//319 4 12 0  img/monsters/warg/shadows/warg_idle_shadow.png
+//320 4  4 0  img/monsters/warg/warg_walk.png
+//321 4  4 0  img/monsters/warg/shadows/warg_walk_shadow.png
+//322 4  4 0  img/monsters/warg/warg_attack.png
+//323 4  4 0  img/monsters/warg/shadows/warg_attack_shadow.png
+//324 4  4 0  img/monsters/warg/warg_dmg.png
+//325 4  4 0  img/monsters/warg/shadows/warg_dmg_shadow.png
+//326 4  4 0  img/monsters/warg/warg_jump.png
+//327 4  4 0  img/monsters/warg/shadows/warg_jump_shadow.png
+//328 1  5 0  img/monsters/warg/warg_die.png
+//329 1  5 0  img/monsters/warg/shadows/warg_die_shadow.png
+#define TX_WARG_IDLE 318
+#define TX_WARG_IDLE_SHADOW 319
+#define TX_WARG_WALK 320
+#define TX_WARG_WALK_SHADOW 321
+#define TX_WARG_ATTACK 322
+#define TX_WARG_ATTACK_SHADOW 323
+#define TX_WARG_DMG 324
+#define TX_WARG_DMG_SHADOW 325
+#define TX_WARG_JUMP 326
+#define TX_WARG_JUMP_SHADOW 327
+#define TX_WARG_DIE 328
+#define TX_WARG_DIE_SHADOW 329
+
+//330 4  8 0  img/monsters/green_slime/SlimeGreenIdle.png
+//331 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenIdle.png
+//332 4  8 0  img/monsters/green_slime/SlimeGreenJumpAttack.png
+//333 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenJumpAttack.png
+//334 4  8 0  img/monsters/green_slime/SlimeGreenDmg.png
+//335 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDmg.png
+//336 4  8 0  img/monsters/green_slime/SlimeGreenDie.png
+//337 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDie.png
+#define TX_GREEN_SLIME_IDLE 330
+#define TX_GREEN_SLIME_IDLE_SHADOW 331
+#define TX_GREEN_SLIME_JUMP_ATTACK 332
+#define TX_GREEN_SLIME_JUMP_ATTACK_SHADOW 333
+#define TX_GREEN_SLIME_DMG 334
+#define TX_GREEN_SLIME_DMG_SHADOW 335
+#define TX_GREEN_SLIME_DIE 336
+#define TX_GREEN_SLIME_DIE_SHADOW 337
+
 //--------------------------------
 
 #define COMPANYSCENE 0

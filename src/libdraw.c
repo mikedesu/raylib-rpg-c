@@ -1303,36 +1303,36 @@ static void create_sg_byid(gamestate* const g, entityid id) {
         switch (race) {
         case RACE_HUMAN:
             keys = TX_HUMAN_KEYS;
-            num_keys = TX_HUMAN_KEY_COUNT;
+            num_keys = TX_HUMAN_COUNT;
             break;
         // Add cases for other races here
         case RACE_ORC:
             keys = TX_ORC_KEYS;
-            num_keys = TX_ORC_KEY_COUNT;
+            num_keys = TX_ORC_COUNT;
             break;
         case RACE_ELF:
             keys = TX_ELF_KEYS;
-            num_keys = TX_ELF_KEY_COUNT;
+            num_keys = TX_ELF_COUNT;
             break;
         case RACE_DWARF:
             keys = TX_DWARF_KEYS;
-            num_keys = TX_DWARF_KEY_COUNT;
+            num_keys = TX_DWARF_COUNT;
             break;
         case RACE_HALFLING:
             keys = TX_HALFLING_KEYS;
-            num_keys = TX_HALFLING_KEY_COUNT;
+            num_keys = TX_HALFLING_COUNT;
             break;
         case RACE_GOBLIN:
             keys = TX_GOBLIN_KEYS;
-            num_keys = TX_GOBLIN_KEY_COUNT;
+            num_keys = TX_GOBLIN_COUNT;
             break;
         case RACE_WOLF:
             keys = TX_WOLF_KEYS;
-            num_keys = TX_WOLF_KEY_COUNT;
+            num_keys = TX_WOLF_COUNT;
             break;
         case RACE_BAT:
             keys = TX_BAT_KEYS;
-            num_keys = TX_BAT_KEY_COUNT;
+            num_keys = TX_BAT_COUNT;
             break;
 
         default: merror("unknown race %d", race); return;
@@ -1346,33 +1346,33 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             weapontype weapon_type = g_get_weapontype(g, id);
             if (weapon_type == WEAPON_SWORD) {
                 keys = TX_LONG_SWORD_KEYS;
-                num_keys = TX_LONG_SWORD_KEY_COUNT;
+                num_keys = TX_LONG_SWORD_COUNT;
             } else if (weapon_type == WEAPON_DAGGER) {
                 keys = TX_DAGGER_KEYS;
-                num_keys = TX_DAGGER_KEY_COUNT;
+                num_keys = TX_DAGGER_COUNT;
             } else if (weapon_type == WEAPON_AXE) {
                 keys = TX_AXE_KEYS;
-                num_keys = TX_AXE_KEY_COUNT;
+                num_keys = TX_AXE_COUNT;
             } else if (weapon_type == WEAPON_BOW) {
                 keys = TX_BOW_KEYS;
-                num_keys = TX_BOW_KEY_COUNT;
+                num_keys = TX_BOW_COUNT;
             }
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         } else if (item_type == ITEM_SHIELD) {
             keys = TX_BUCKLER_KEYS;
-            num_keys = TX_BUCKLER_KEY_COUNT;
+            num_keys = TX_BUCKLER_COUNT;
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         } else if (item_type == ITEM_POTION) {
             potiontype potion_type = g_get_potiontype(g, id);
             if (potion_type == POTION_HEALTH_SMALL) {
                 keys = TX_POTION_HP_SMALL_KEYS;
-                num_keys = TX_POTION_HP_SMALL_KEY_COUNT;
+                num_keys = TX_POTION_HP_SMALL_COUNT;
             } else if (potion_type == POTION_HEALTH_MEDIUM) {
                 keys = TX_POTION_HP_MEDIUM_KEYS;
-                num_keys = TX_POTION_HP_MEDIUM_KEY_COUNT;
+                num_keys = TX_POTION_HP_MEDIUM_COUNT;
             } else if (potion_type == POTION_HEALTH_LARGE) {
                 keys = TX_POTION_HP_LARGE_KEYS;
-                num_keys = TX_POTION_HP_LARGE_KEY_COUNT;
+                num_keys = TX_POTION_HP_LARGE_COUNT;
             }
 
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
