@@ -2087,19 +2087,19 @@ static void try_spawn_npc(gamestate* const g) {
                 int current_floor = g->d->current_floor;
                 loc_t loc = get_random_empty_non_wall_loc(g, current_floor);
                 entityid id = ENTITYID_INVALID;
-                race_t race = RACE_HUMAN;
-                int choice = rand() % 4;
-                switch (choice) {
-                case 0: race = RACE_BAT; break;
-                case 1: race = RACE_WOLF; break;
+                race_t race = RACE_GREEN_SLIME;
+                //int choice = rand() % 4;
+                //switch (choice) {
+                //case 0: race = RACE_BAT; break;
+                //case 1: race = RACE_WOLF; break;
                 //case 0: race = RACE_HUMAN; break;
                 //case 1: race = RACE_ELF; break;
                 //case 2: race = RACE_DWARF; break;
                 //case 3: race = RACE_HALFLING; break;
-                case 2: race = RACE_ORC; break;
-                case 3: race = RACE_GOBLIN; break;
-                default: break;
-                }
+                //case 2: race = RACE_ORC; break;
+                //case 3: race = RACE_GOBLIN; break;
+                //default: break;
+                //}
                 //race = RACE_BAT;
                 id = npc_create(g, race, loc, "NPC");
                 if (id != ENTITYID_INVALID) {
@@ -2113,6 +2113,8 @@ static void try_spawn_npc(gamestate* const g) {
                     case RACE_HALFLING: hit_die = 4; break;
                     case RACE_WOLF: hit_die = 4; break;
                     case RACE_BAT: hit_die = 2; break;
+                    case RACE_WARG: hit_die = 8; break;
+                    case RACE_GREEN_SLIME: hit_die = 4; break;
                     default: break;
                     }
                     roll r = {1, hit_die, 0};

@@ -423,9 +423,9 @@
 #
 330 4  8 0  img/monsters/green_slime/SlimeGreenIdle.png
 331 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenIdle.png
-332 4  8 0  img/monsters/green_slime/SlimeGreenJumpAttack.png
-333 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenJumpAttack.png
-334 4  8 0  img/monsters/green_slime/SlimeGreenDmg.png
-335 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDmg.png
-336 4  8 0  img/monsters/green_slime/SlimeGreenDie.png
-337 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDie.png
+332 4  4 0  img/monsters/green_slime/SlimeGreenJumpAttack.png
+333 4  4 0  img/monsters/green_slime/shadows/ShadowSlimeGreenJumpAttack.png
+334 4  4 0  img/monsters/green_slime/SlimeGreenDmg.png
+335 4  4 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDmg.png
+336 1  8 0  img/monsters/green_slime/SlimeGreenDie.png
+337 1  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDie.png
