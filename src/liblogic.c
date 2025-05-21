@@ -40,17 +40,6 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
 static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
-//static entity* create_shield(gamestate* g);
-//static entity* create_shield_at(gamestate* g, loc_t loc);
-//static entity* create_elf_at(gamestate* g, loc_t loc);
-//static entity* create_orc_at(gamestate* g, loc_t loc);
-//static entity* create_dwarf_at(gamestate* g, loc_t loc);
-//static entity* create_human_at(gamestate* g, loc_t loc);
-//static entity* create_goblin_at(gamestate* g, loc_t loc);
-//static entity* create_halfling_at(gamestate* g, loc_t loc);
-
-//static void init_potion_test(gamestate* const g, potiontype_t potion_type, const char* name);
-//static void init_npcs_test_by_room(gamestate* const g);
 static void init_npc_test(gamestate* g);
 static void init_sword_test(gamestate* g);
 static void init_dagger_test(gamestate* g);
@@ -58,8 +47,6 @@ static void init_axe_test(gamestate* g);
 static void init_bow_test(gamestate* g);
 static void init_shield_test(gamestate* g);
 static void init_potion_test(gamestate* g);
-//static entityid potion_create(gamestate* const g, loc_t loc, const char* name);
-
 static void init_dungeon(gamestate* const g);
 static void update_player_state(gamestate* const g);
 static void update_debug_panel_buffer(gamestate* const g);
@@ -73,7 +60,6 @@ static void add_message(gamestate* g, const char* fmt, ...);
 static void try_entity_move_a_star(gamestate* const g, entityid id);
 static void try_entity_move(gamestate* const g, entityid id, int x, int y);
 static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
-//static void try_entity_open_door(gamestate* g, entity* e, int x, int y);
 
 static const char* get_action_key(const inputstate* const is, gamestate* const g);
 
@@ -89,7 +75,7 @@ static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor
 static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
 
 static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1);
-static bool player_on_tile(gamestate* g, int x, int y, int floor);
+static bool player_on_tile(gamestate* g, int x, int y, int z);
 static void try_entity_traverse_floors(gamestate* const g, entityid id);
 //static bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl);
 //static bool tile_has_door(const gamestate* const g, int x, int y, int fl);
@@ -169,16 +155,9 @@ static bool player_on_tile(gamestate* g, int x, int y, int z) {
     // enumerate entities and check their type
     for (int i = 0; i < tile->entity_max; i++) {
         if (tile->entities[i] == ENTITYID_INVALID) continue;
-        //massert(e, "failed to get entity");
         entityid id = tile->entities[i];
-        //if (e->type == ENTITY_PLAYER) return true;
-
         if (g_is_type(g, id, ENTITY_PLAYER)) {
-            // check if the entity is on the same floor
-            // hardcoded, FIX THIS!!!
-            if (z == 0) {
-                return true;
-            }
+            return true;
         }
     }
     return false;
@@ -262,6 +241,7 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
         //if (g_is_type(g, eid, ENTITY_NPC) && !e->dead) count++;
         //minfo("calling g_is_dead 4");
         if (g_is_type(g, eid, ENTITY_NPC) && !g_is_dead(g, eid)) count++;
+        if (g_is_type(g, eid, ENTITY_PLAYER) && !g_is_dead(g, eid)) count++;
     }
     return count;
 }
@@ -303,10 +283,10 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
         merror("Cannot move, NPC in the way");
         return;
     }
-    if (player_on_tile(g, ex, ey, z)) {
-        merror("Cannot move, player on tile");
-        return;
-    }
+    //if (player_on_tile(g, ex, ey, z)) {
+    //    merror("Cannot move, player on tile");
+    //    return;
+    //}
     if (!df_remove_at(df, id, loc.x, loc.y)) {
         merror("Failed to remove entity from old tile");
         return;
@@ -2104,7 +2084,8 @@ static void try_spawn_npc(gamestate* const g) {
         bool success = false;
         if (do_this_once) {
             while (!success) {
-                loc_t loc = get_random_empty_non_wall_loc(g, 0);
+                int current_floor = g->d->current_floor;
+                loc_t loc = get_random_empty_non_wall_loc(g, current_floor);
                 entityid id = ENTITYID_INVALID;
                 race_t race = RACE_HUMAN;
                 int choice = rand() % 4;
