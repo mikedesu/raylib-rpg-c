@@ -11,3 +11,29 @@ TEST(test_tile_creation) {
     ASSERT(tile->entity_max == DUNGEON_TILE_MAX_ENTITIES_DEFAULT, "Entity max not initialized correctly");
     tile_free(tile);
 }
+
+TEST(test_tile_entity_management) {
+    tile_t* tile = tile_create(TILE_NONE);
+    ASSERT(tile != NULL, "Failed to create tile");
+    
+    // Test adding entities
+    entityid id1 = 1;
+    entityid id2 = 2;
+    entityid id3 = 3;
+    
+    ASSERT(tile_add(tile, id1) == id1, "Failed to add first entity");
+    ASSERT(tile->entity_count == 1, "Entity count incorrect after first add");
+    
+    ASSERT(tile_add(tile, id2) == id2, "Failed to add second entity");
+    ASSERT(tile->entity_count == 2, "Entity count incorrect after second add");
+    
+    ASSERT(tile_add(tile, id3) == id3, "Failed to add third entity");
+    ASSERT(tile->entity_count == 3, "Entity count incorrect after third add");
+    
+    // Test removing entities
+    ASSERT(tile_remove(tile, id2) == id2, "Failed to remove entity");
+    ASSERT(tile->entity_count == 2, "Entity count incorrect after removal");
+    
+    // Clean up
+    tile_free(tile);
+}
