@@ -37,6 +37,7 @@ static inline void update_npc_state(gamestate* const g, entityid id);
 static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
 //static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
+static int get_hitdie_for_race(race_t race);
 static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
@@ -1070,7 +1071,6 @@ static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, co
         merror("failed to create weapon");
         return ENTITYID_INVALID;
     }
-    //massert(id != ENTITYID_INVALID, "failed to create weapon");
     g_add_weapontype(g, id, type);
     g_add_damage(g, id, (roll){0, 0, 0});
     return id;
@@ -1145,59 +1145,6 @@ static void init_player(gamestate* const g) {
     msuccess("hero id %d", g->hero_id);
 }
 
-//static inline size_t tile_npc_count_at(gamestate* const g, int x, int y, int z) {
-//    massert(g, "gamestate is NULL");
-//    massert(df, "dungeon floor is NULL");
-//    massert(x >= 0, "x is out of bounds");
-//    massert(x < df->width, "x is out of bounds");
-//    massert(y >= 0, "y is out of bounds");
-//    massert(y < df->height, "y is out of bounds");
-//    massert(z >= 0, "z is out of bounds");
-//    massert(z < g->d->num_floors, "z is out of bounds");
-//    dungeon_floor_t* const df = d_get_floor(g->d, z);
-//    massert(df, "failed to get current dungeon floor");
-//    tile_t* const tile = df_tile_at(df, x, y);
-//    massert(tile, "failed to get tile");
-//    return tile_live_npc_count(g, tile);
-//}
-
-//static loc_t* get_walkable_locs(dungeon_floor_t* df, int* cnt) {
-//    massert(df, "dungeon floor is NULL");
-//    massert(cnt, "cnt is NULL");
-//    int c = df_count_walkable(df);
-//    loc_t* locs = malloc(sizeof(loc_t) * c);
-//    massert(locs, "malloc failed");
-//    int i = 0;
-//    for (int y = 0; y < df->height; y++) {
-//        for (int x = 0; x < df->width; x++) {
-//            tile_t* t = df_tile_at(df, x, y);
-//            massert(t, "tile is NULL");
-//            if (tile_is_walkable(t->type)) locs[i++] = (loc_t){x, y};
-//        }
-//    }
-//    massert(i == c, "count mismatch");
-//    *cnt = c;
-//    return locs;
-//}
-
-//static loc_t* get_empty_locs(dungeon_floor_t* const df, int* count) {
-//    massert(df, "dungeon floor is NULL");
-//    massert(count, "count is NULL");
-//    int c = df_count_empty(df);
-//    loc_t* locs = malloc(sizeof(loc_t) * c);
-//    massert(locs, "malloc failed");
-//    int i = 0;
-//    for (int y = 0; y < df->height; y++) {
-//        for (int x = 0; x < df->width; x++) {
-//            tile_t* t = df_tile_at(df, x, y);
-//            if (tile_entity_count(t) == 0) { locs[i++] = (loc_t){x, y}; }
-//        }
-//    }
-//    massert(i == c, "count mismatch");
-//    *count = c;
-//    return locs;
-//}
-
 static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(count, "count is NULL");
@@ -1220,58 +1167,6 @@ static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* co
     *count = c;
     return locs;
 }
-
-//static loc_t* get_empty_non_wall_locs(dungeon_floor_t* const df, int* count) {
-//    massert(df, "dungeon floor is NULL");
-//    massert(count, "count is NULL");
-//    return get_empty_non_wall_locs_in_area(df, count, 0, 0, df->width, df->height);
-//}
-
-//static entity* create_orc_at(gamestate* g, loc_t loc) {
-//    entity* e = npc_create_ptr(g, RACE_ORC, loc.x, loc.y, loc.z, "orc");
-//    massert(e, "orc create fail");
-//    return e;
-//}
-
-//static entity* create_human_at(gamestate* g, loc_t loc) {
-//    entity* e = npc_create_ptr(g, RACE_HUMAN, loc.x, loc.y, loc.z, "human");
-//    massert(e, "human create fail");
-//e_add_item_to_inventory(e, sword->id);
-//e->weapon = sword->id;
-//    return e;
-//}
-
-//static entity* create_elf_at(gamestate* g, loc_t loc) {
-//    entity* e = npc_create_ptr(g, RACE_ELF, loc.x, loc.y, loc.z, "elf");
-//    massert(e, "elf create fail");
-//e_add_item_to_inventory(e, sword->id);
-//e->weapon = sword->id;
-//    return e;
-//}
-
-//static entity* create_dwarf_at(gamestate* g, loc_t loc) {
-//    entity* e = npc_create_ptr(g, RACE_DWARF, loc.x, loc.y, loc.z, "dwarf");
-//    massert(e, "dwarf create fail");
-//e_add_item_to_inventory(e, sword->id);
-//e->weapon = sword->id;
-//    return e;
-//}
-
-//static entity* create_halfling_at(gamestate* g, loc_t loc) {
-//    entity* e = npc_create_ptr(g, RACE_HALFLING, loc.x, loc.y, loc.z, "halfling");
-//    massert(e, "halfling create fail");
-//e_add_item_to_inventory(e, sword->id);
-//e->weapon = sword->id;
-//    return e;
-//}
-
-//static entity* create_goblin_at(gamestate* g, loc_t loc) {
-//    entity* e = npc_create_ptr(g, RACE_GOBLIN, loc.x, loc.y, loc.z, "goblin");
-//    massert(e, "goblin create fail");
-//e_add_item_to_inventory(e, sword->id);
-//e->weapon = sword->id;
-//    return e;
-//}
 
 //static void init_npcs_test_by_room(gamestate* const g) {
 //    massert(g, "gamestate is NULL");
@@ -2074,12 +1969,28 @@ static void init_shield_test(gamestate* g) {
     }
 }
 
+static int get_hitdie_for_race(race_t race) {
+    int hit_die = 4;
+    switch (race) {
+    case RACE_HUMAN: hit_die = 6; break;
+    case RACE_ELF: hit_die = 6; break;
+    case RACE_DWARF: hit_die = 6; break;
+    case RACE_ORC: hit_die = 8; break;
+    case RACE_GOBLIN: hit_die = 4; break;
+    case RACE_HALFLING: hit_die = 4; break;
+    case RACE_WOLF: hit_die = 4; break;
+    case RACE_BAT: hit_die = 2; break;
+    case RACE_WARG: hit_die = 8; break;
+    case RACE_GREEN_SLIME: hit_die = 4; break;
+    default: break;
+    }
+    return hit_die;
+}
+
 static void try_spawn_npc(gamestate* const g) {
     massert(g, "gamestate is NULL");
-
     static bool do_this_once = true;
     const int every_nth_turn = 10;
-
     if (g->turn_count % every_nth_turn == 0) {
         bool success = false;
         if (do_this_once) {
@@ -2103,20 +2014,7 @@ static void try_spawn_npc(gamestate* const g) {
                 //race = RACE_BAT;
                 id = npc_create(g, race, loc, "NPC");
                 if (id != ENTITYID_INVALID) {
-                    int hit_die = 4;
-                    switch (race) {
-                    case RACE_HUMAN: hit_die = 6; break;
-                    case RACE_ELF: hit_die = 6; break;
-                    case RACE_DWARF: hit_die = 6; break;
-                    case RACE_ORC: hit_die = 8; break;
-                    case RACE_GOBLIN: hit_die = 4; break;
-                    case RACE_HALFLING: hit_die = 4; break;
-                    case RACE_WOLF: hit_die = 4; break;
-                    case RACE_BAT: hit_die = 2; break;
-                    case RACE_WARG: hit_die = 8; break;
-                    case RACE_GREEN_SLIME: hit_die = 4; break;
-                    default: break;
-                    }
+                    int hit_die = get_hitdie_for_race(race);
                     roll r = {1, hit_die, 0};
                     const int max_hp = do_roll(r);
                     g_set_stat(g, id, STATS_MAXHP, max_hp);
