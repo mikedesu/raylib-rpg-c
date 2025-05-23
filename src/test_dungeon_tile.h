@@ -39,6 +39,7 @@ TEST(test_tile_serialization) {
     size_t bytes_written = tile_serialize(original, buffer, buffer_size);
     printf("Serialized size: %zu\n", bytes_written);
     printf("Buffer size: %zu\n", buffer_size);
+    printf("Difference: %zd\n", (ssize_t)bytes_written - (ssize_t)buffer_size);
     printf("Serialized data: ");
     for (size_t i = 0; i < bytes_written; i++) {
         printf("%02X ", (unsigned char)buffer[i]);
@@ -47,32 +48,32 @@ TEST(test_tile_serialization) {
     ASSERT(bytes_written == buffer_size, "Serialization wrote incorrect number of bytes");
 
     // Deserialize
-    //tile_t* deserialized = tile_create(TILE_NONE); // Create empty tile
-    //ASSERT(deserialized != NULL, "Failed to create deserialized tile");
+    tile_t* deserialized = tile_create(TILE_NONE); // Create empty tile
+    ASSERT(deserialized != NULL, "Failed to create deserialized tile");
 
-    //bool success = tile_deserialize(deserialized, buffer, buffer_size);
-    //ASSERT(success, "Deserialization failed");
+    bool success = tile_deserialize(deserialized, buffer, buffer_size);
+    ASSERT(success, "Deserialization failed");
 
     // Verify all fields match
-    //ASSERT(deserialized->type == original->type, "Type mismatch after deserialization");
-    //ASSERT(deserialized->visible == original->visible, "Visible mismatch after deserialization");
-    //ASSERT(deserialized->explored == original->explored, "Explored mismatch after deserialization");
-    //ASSERT(deserialized->has_pressure_plate == original->has_pressure_plate, "Pressure plate mismatch");
-    //ASSERT(deserialized->pressure_plate_event == original->pressure_plate_event, "Pressure plate event mismatch");
-    //ASSERT(deserialized->has_wall_switch == original->has_wall_switch, "Wall switch mismatch");
-    //ASSERT(deserialized->wall_switch_on == original->wall_switch_on, "Wall switch state mismatch");
-    //ASSERT(deserialized->wall_switch_event == original->wall_switch_event, "Wall switch event mismatch");
-    //ASSERT(deserialized->entity_count == original->entity_count, "Entity count mismatch");
-    //ASSERT(deserialized->entity_max == original->entity_max, "Entity max mismatch");
+    ASSERT(deserialized->type == original->type, "Type mismatch after deserialization");
+    ASSERT(deserialized->visible == original->visible, "Visible mismatch after deserialization");
+    ASSERT(deserialized->explored == original->explored, "Explored mismatch after deserialization");
+    ASSERT(deserialized->has_pressure_plate == original->has_pressure_plate, "Pressure plate mismatch");
+    ASSERT(deserialized->pressure_plate_event == original->pressure_plate_event, "Pressure plate event mismatch");
+    ASSERT(deserialized->has_wall_switch == original->has_wall_switch, "Wall switch mismatch");
+    ASSERT(deserialized->wall_switch_on == original->wall_switch_on, "Wall switch state mismatch");
+    ASSERT(deserialized->wall_switch_event == original->wall_switch_event, "Wall switch event mismatch");
+    ASSERT(deserialized->entity_count == original->entity_count, "Entity count mismatch");
+    ASSERT(deserialized->entity_max == original->entity_max, "Entity max mismatch");
 
     // Verify entities
-    //for (size_t i = 0; i < original->entity_count; i++) {
-    //    ASSERT(deserialized->entities[i] == original->entities[i], "Entity mismatch at index %zu");
-    //}
+    for (size_t i = 0; i < original->entity_count; i++) {
+        ASSERT(deserialized->entities[i] == original->entities[i], "Entity mismatch at index %zu", i);
+    }
 
     // Clean up
     tile_free(original);
-    //tile_free(deserialized);
+    tile_free(deserialized);
     free(buffer);
 }
 

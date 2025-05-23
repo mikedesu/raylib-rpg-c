@@ -179,15 +179,21 @@ size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z) {
 
 size_t tile_serialized_size(const tile_t* t) {
     massert(t, "tile is NULL");
-    // Calculate total size needed:
-    // tiletype_t + 8 bools + 9 ints + 2 size_t + (entity_max * sizeof(entityid))
-    size_t size = sizeof(tiletype_t) + (8 * sizeof(bool)) + (9 * sizeof(int)) + (2 * sizeof(size_t)) + (t->entity_max * sizeof(entityid));
-
-    // Add padding bytes that may be inserted by compiler alignment
-    // On 64-bit systems, the compiler may insert padding between fields
-    // to align them on 8-byte boundaries. We need to account for this.
-    //size += 4; // Estimated padding based on struct layout
-
+    
+    // Calculate size by exactly matching what's written in tile_serialize
+    size_t size = 0;
+    
+    // Basic fields
+    size += sizeof(tiletype_t);  // type
+    size += 8 * sizeof(bool);    // 8 boolean fields
+    
+    // Integer fields
+    size += 7 * sizeof(int);     // 7 integer fields
+    
+    // Entity data
+    size += 2 * sizeof(size_t);  // entity_count and entity_max
+    size += t->entity_max * sizeof(entityid); // entities array
+    
     return size;
 }
 
