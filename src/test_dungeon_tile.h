@@ -10,6 +10,7 @@ static void run_test_tile_entity_management(void);
 void test_dungeon_tiles(void) {
     run_test_tile_creation();
     run_test_tile_entity_management();
+    run_test_tile_visibility_and_exploration();
 }
 
 TEST(test_tile_creation) {
