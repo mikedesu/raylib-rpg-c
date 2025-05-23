@@ -3,31 +3,25 @@
 #include "dungeon_tile.h"
 #include "gamestate.h"
 #include "unit_test.h"
-
+#include <stdlib.h>
 // Forward declarations of test functions
-static void run_test_tile_creation(void);
-static void run_test_tile_entity_management(void);
-static void run_test_tile_visibility_and_exploration(void);
-static void run_test_tile_features_and_resizing(void);
+//static void run_test_tile_creation(void);
+//static void run_test_tile_entity_management(void);
+//static void run_test_tile_visibility_and_exploration(void);
+//static void run_test_tile_features_and_resizing(void);
 
-void test_dungeon_tiles(void) {
-    run_test_tile_creation();
-    run_test_tile_entity_management();
-    run_test_tile_visibility_and_exploration();
-    run_test_tile_features_and_resizing();
-    run_test_tile_serialization();
-}
+void test_dungeon_tiles(void);
 
 TEST(test_tile_serialization) {
     // Create and populate a test tile
     tile_t* original = tile_create(TILE_STONE_WALL_00);
     ASSERT(original != NULL, "Failed to create original tile");
-    
+
     // Add some entities
     tile_add(original, 1);
     tile_add(original, 2);
     tile_add(original, 3);
-    
+
     // Set various properties
     original->visible = true;
     original->explored = true;
@@ -36,22 +30,24 @@ TEST(test_tile_serialization) {
     original->has_wall_switch = true;
     original->wall_switch_on = true;
     original->wall_switch_event = 99;
-    
+
     // Serialize
     size_t buffer_size = tile_serialized_size(original);
-    char* buffer = malloc(buffer_size);
+    char* buffer = (char*)malloc(buffer_size);
     ASSERT(buffer != NULL, "Failed to allocate serialization buffer");
-    
+
     size_t bytes_written = tile_serialize(original, buffer, buffer_size);
+    printf("Serialized size: %zu\n", bytes_written);
+    printf("Buffer size: %zu\n", buffer_size);
     ASSERT(bytes_written == buffer_size, "Serialization wrote incorrect number of bytes");
-    
+
     // Deserialize
     tile_t* deserialized = tile_create(TILE_NONE); // Create empty tile
     ASSERT(deserialized != NULL, "Failed to create deserialized tile");
-    
+
     bool success = tile_deserialize(deserialized, buffer, buffer_size);
     ASSERT(success, "Deserialization failed");
-    
+
     // Verify all fields match
     ASSERT(deserialized->type == original->type, "Type mismatch after deserialization");
     ASSERT(deserialized->visible == original->visible, "Visible mismatch after deserialization");
@@ -63,13 +59,12 @@ TEST(test_tile_serialization) {
     ASSERT(deserialized->wall_switch_event == original->wall_switch_event, "Wall switch event mismatch");
     ASSERT(deserialized->entity_count == original->entity_count, "Entity count mismatch");
     ASSERT(deserialized->entity_max == original->entity_max, "Entity max mismatch");
-    
+
     // Verify entities
     for (size_t i = 0; i < original->entity_count; i++) {
-        ASSERT(deserialized->entities[i] == original->entities[i], 
-               "Entity mismatch at index %zu", i);
+        ASSERT(deserialized->entities[i] == original->entities[i], "Entity mismatch at index %zu");
     }
-    
+
     // Clean up
     tile_free(original);
     tile_free(deserialized);
@@ -161,4 +156,12 @@ TEST(test_tile_visibility_and_exploration) {
     ASSERT(tile->explored == true, "Tile exploration state should persist");
     // Clean up
     tile_free(tile);
+}
+
+void test_dungeon_tiles(void) {
+    run_test_tile_creation();
+    run_test_tile_entity_management();
+    run_test_tile_visibility_and_exploration();
+    run_test_tile_features_and_resizing();
+    run_test_tile_serialization();
 }
