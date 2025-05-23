@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define DUNGEON_TILE_MAX_ENTITIES_DEFAULT 32
+#define DUNGEON_TILE_MAX_ENTITIES_DEFAULT 8
 #define DUNGEON_TILE_MAX_ENTITIES_MAX 256
 
 // forward declaration for gamestate
