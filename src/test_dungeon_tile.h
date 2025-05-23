@@ -3,6 +3,10 @@
 #include "dungeon_tile.h"
 #include "unit_test.h"
 
+// Forward declarations of test functions
+static void run_test_tile_creation(void);
+static void run_test_tile_entity_management(void);
+
 void test_dungeon_tiles(void) {
     run_test_tile_creation();
     run_test_tile_entity_management();
