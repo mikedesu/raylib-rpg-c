@@ -1868,6 +1868,25 @@ void df_init_rooms(dungeon_floor_t* df) {
     df->room_capacity = default_capacity;
 }
 
+static bool rects_overlap(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
+    // Check if one rectangle is to the left of the other
+    if (x1 + w1 <= x2 || x2 + w2 <= x1) return false;
+    // Check if one rectangle is above the other
+    if (y1 + h1 <= y2 || y2 + h2 <= y1) return false;
+    // If neither, they overlap
+    return true;
+}
+
+static bool room_overlaps_any(dungeon_floor_t* df, int x, int y, int w, int h) {
+    for (int i = 0; i < df->room_count; i++) {
+        room_data_t* r = &df->rooms[i];
+        if (rects_overlap(x, y, w, h, r->x, r->y, r->w, r->h)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool df_add_room_info(dungeon_floor_t* df, int x, int y, int w, int h, const char* name) {
     massert(df, "dungeon floor is NULL");
     massert(name, "room name is NULL");
@@ -1875,12 +1894,16 @@ bool df_add_room_info(dungeon_floor_t* df, int x, int y, int w, int h, const cha
     massert(x >= 0 && y >= 0, "room coordinates are invalid");
     massert(x + w <= df->width && y + h <= df->height, "room exceeds dungeon bounds");
     massert(df->rooms, "room data is NULL");
-    massert(df->room_count < df->room_capacity, "room capacity exceeded");
     massert(df->room_count >= 0, "room count is invalid");
     massert(strlen(name) < sizeof(df->rooms[0].room_name), "room name is too long");
     massert(df->room_capacity > 0, "room capacity is invalid");
-    massert(df->room_count >= 0, "room count is invalid");
-    //massert(df->room_count < df->room_capacity, "room capacity exceeded");
+
+    // Check for overlaps with existing rooms
+    if (room_overlaps_any(df, x, y, w, h)) {
+        return false;
+    }
+
+    // Handle capacity
     if (df->room_count == df->room_capacity) {
         int new_cap = df->room_capacity ? df->room_capacity * 2 : 8;
         room_data_t* tmp = realloc(df->rooms, sizeof(room_data_t) * new_cap);
@@ -1888,6 +1911,8 @@ bool df_add_room_info(dungeon_floor_t* df, int x, int y, int w, int h, const cha
         df->rooms = tmp;
         df->room_capacity = new_cap;
     }
+
+    // Add the new room
     room_data_t* r = &df->rooms[df->room_count++];
     r->x = x;
     r->y = y;
