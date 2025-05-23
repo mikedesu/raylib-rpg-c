@@ -36,6 +36,18 @@ static void run_test_df_rooms(void) {
         printf("Room name at location: %s\n", room_name ? room_name : "NULL");
     }
 
+    // Test overlapping rooms
+    bool overlap_result = df_add_room_info(df, 12, 12, 5, 5, "OverlapRoom");
+    printf("Add overlapping room result: %d\n", overlap_result);
+    printf("Room count after overlap attempt: %d\n", df->room_count);
+    ASSERT(!overlap_result, "Should not be able to add overlapping room");
+
+    // Test adjacent rooms (should be allowed)
+    bool adjacent_result = df_add_room_info(df, 15, 15, 5, 5, "AdjacentRoom");
+    printf("Add adjacent room result: %d\n", adjacent_result);
+    printf("Room count after adjacent add: %d\n", df->room_count);
+    ASSERT(adjacent_result, "Should be able to add adjacent room");
+
     df_free(df);
     printf("df_room tests completed\n");
 }
