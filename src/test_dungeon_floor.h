@@ -4,7 +4,7 @@
 #include "unit_test.h"
 #include <string.h>
 
-static void run_test_df_create_destroy(void) {
+TEST(test_df_create_destroy) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     ASSERT(df != NULL, "Failed to create dungeon floor");
 
@@ -18,7 +18,7 @@ static void run_test_df_create_destroy(void) {
     printf("df_create and df_destroy passed\n");
 }
 
-static void run_test_df_rooms(void) {
+TEST(test_df_rooms) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     printf("Initial room count: %d\n", df->room_count);
 
@@ -53,7 +53,7 @@ static void run_test_df_rooms(void) {
     printf("df_room tests completed\n");
 }
 
-static void run_test_df_tiles(void) {
+TEST(test_df_tiles) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Test tile access
@@ -66,7 +66,7 @@ static void run_test_df_tiles(void) {
     printf("df_tile tests passed\n");
 }
 
-static void run_test_df_stairs(void) {
+TEST(test_df_stairs) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Create a room to place stairs in
@@ -84,7 +84,7 @@ static void run_test_df_stairs(void) {
     printf("df_stair tests passed\n");
 }
 
-static void run_test_df_get_room_at(void) {
+TEST(test_df_get_room_at) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Create a test room
@@ -113,7 +113,7 @@ static void run_test_df_get_room_at(void) {
     printf("df_get_room_at tests passed\n");
 }
 
-static void run_test_df_count_walkable(void) {
+TEST(test_df_count_walkable) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Create a test room
@@ -136,7 +136,7 @@ static void run_test_df_count_walkable(void) {
     printf("df_count_walkable tests passed\n");
 }
 
-static void run_test_df_init(void) {
+TEST(test_df_init) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Initialize the dungeon floor
@@ -181,4 +181,5 @@ void test_dungeon_floors(void) {
     run_test_df_init();
     run_test_df_get_room_at();
     run_test_df_count_walkable();
+    unit_test_summary();
 }
