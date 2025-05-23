@@ -84,6 +84,35 @@ static void run_test_df_stairs(void) {
     printf("df_stair tests passed\n");
 }
 
+static void run_test_df_get_room_at(void) {
+    dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+
+    // Create a test room
+    int room_x = 10, room_y = 10, room_w = 5, room_h = 5;
+    const char* room_name = "TestRoom";
+    ASSERT(df_add_room_info(df, room_x, room_y, room_w, room_h, room_name), "Failed to add room");
+
+    // Test points inside the room
+    for (int y = room_y; y < room_y + room_h; y++) {
+        for (int x = room_x; x < room_x + room_w; x++) {
+            const room_data_t* room = df_get_room_at(df, x, y);
+            ASSERT(room != NULL, "Should find room for point inside room");
+            ASSERT(strcmp(room->room_name, room_name) == 0, "Room name mismatch");
+            ASSERT(room->x == room_x && room->y == room_y, "Room coordinates mismatch");
+            ASSERT(room->w == room_w && room->h == room_h, "Room dimensions mismatch");
+        }
+    }
+
+    // Test points outside the room
+    ASSERT(df_get_room_at(df, room_x - 1, room_y) == NULL, "Should not find room for point left of room");
+    ASSERT(df_get_room_at(df, room_x + room_w, room_y) == NULL, "Should not find room for point right of room");
+    ASSERT(df_get_room_at(df, room_x, room_y - 1) == NULL, "Should not find room for point above room");
+    ASSERT(df_get_room_at(df, room_x, room_y + room_h) == NULL, "Should not find room for point below room");
+
+    df_free(df);
+    printf("df_get_room_at tests passed\n");
+}
+
 static void run_test_df_init(void) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
@@ -127,4 +156,5 @@ void test_dungeon_floors(void) {
     run_test_df_tiles();
     run_test_df_stairs();
     run_test_df_init();
+    run_test_df_get_room_at();
 }
