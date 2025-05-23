@@ -6,6 +6,7 @@
 // Forward declarations of test functions
 static void run_test_tile_creation(void);
 static void run_test_tile_entity_management(void);
+static void run_test_tile_visibility_and_exploration(void);
 
 void test_dungeon_tiles(void) {
     run_test_tile_creation();
