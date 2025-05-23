@@ -244,9 +244,13 @@ size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
     memcpy(ptr, &t->entity_max, sizeof(size_t));
     ptr += sizeof(size_t);
     
-    // Always serialize entity array, even if empty
-    memcpy(ptr, t->entities, t->entity_max * sizeof(entityid));
-    ptr += t->entity_max * sizeof(entityid);
+    // Serialize entity array - write full size even if empty
+    size_t entity_array_size = t->entity_max * sizeof(entityid);
+    memset(ptr, 0xFF, entity_array_size); // Initialize to all -1 (empty)
+    if (t->entity_count > 0) {
+        memcpy(ptr, t->entities, entity_array_size);
+    }
+    ptr += entity_array_size;
     
     return ptr - buffer;
 }
