@@ -3,6 +3,11 @@
 #include "dungeon_tile.h"
 #include "unit_test.h"
 
+void test_dungeon_tiles(void) {
+    run_test_tile_creation();
+    run_test_tile_entity_management();
+}
+
 TEST(test_tile_creation) {
     tile_t* tile = tile_create(TILE_NONE);
     ASSERT(tile != NULL, "Failed to create tile");

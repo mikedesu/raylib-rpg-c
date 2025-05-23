@@ -5,8 +5,7 @@
 int main(void) {
     test_component_table();
     test_gamestate();
-    run_test_tile_creation();
-    run_test_tile_entity_management();
+    test_dungeon_tiles();
     unit_test_summary();
     return 0;
 }
