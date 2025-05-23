@@ -113,6 +113,34 @@ static void run_test_df_get_room_at(void) {
     printf("df_get_room_at tests passed\n");
 }
 
+static void run_test_df_count_walkable(void) {
+    dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+
+    // Create a test room
+    int room_x = 10, room_y = 10, room_w = 5, room_h = 5;
+    ASSERT(df_add_room_info(df, room_x, room_y, room_w, room_h, "TestRoom"), "Failed to add room");
+
+    // Count walkable tiles in the room
+    int expected_walkable = room_w * room_h;
+    int actual_walkable = df_count_walkable(df);
+    ASSERT(actual_walkable >= expected_walkable, "Too few walkable tiles");
+
+    // Add some walls and verify count decreases
+    df_set_tile(df, TILE_STONE_WALL_00, room_x, room_y);
+    df_set_tile(df, TILE_STONE_WALL_00, room_x + 1, room_y);
+    int new_walkable = df_count_walkable(df);
+    ASSERT(new_walkable == actual_walkable - 2, "Walkable count should decrease after adding walls");
+
+    // Test empty floor
+    dungeon_floor_t* empty_df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    int empty_walkable = df_count_walkable(empty_df);
+    ASSERT(empty_walkable == 0, "Empty floor should have no walkable tiles");
+    df_free(empty_df);
+
+    df_free(df);
+    printf("df_count_walkable tests passed\n");
+}
+
 static void run_test_df_init(void) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
@@ -157,4 +185,5 @@ void test_dungeon_floors(void) {
     run_test_df_stairs();
     run_test_df_init();
     run_test_df_get_room_at();
+    run_test_df_count_walkable();
 }
