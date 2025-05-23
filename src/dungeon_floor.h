@@ -46,6 +46,11 @@ bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_add_room_info(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
 loc_t df_get_upstairs(dungeon_floor_t* const df);
 loc_t df_get_downstairs(dungeon_floor_t* const df);
+
+// Add these function declarations
+void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y);
+void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
+void df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
 loc_t* const df_get_all_locs(dungeon_floor_t* const df, int* external_count);
 loc_t* const df_get_all_locs_outside_of_rooms(dungeon_floor_t* const df, int* external_count);
 int df_count_walkable(const dungeon_floor_t* const df);

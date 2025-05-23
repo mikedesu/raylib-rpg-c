@@ -194,7 +194,7 @@ static loc_t* df_get_possible_downstairs_locs_in_area(dungeon_floor_t* df, int* 
     return locations;
 }
 
-static void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
+void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
@@ -229,7 +229,7 @@ static void df_assign_downstairs(dungeon_floor_t* df) {
     df_assign_downstairs_in_area(df, 0, 0, df->width, df->height);
 }
 
-static void df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
+void df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
@@ -657,7 +657,7 @@ static void df_init_test(dungeon_floor_t* df) {
     free(locations);
 }
 
-static void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y) {
+void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y) {
     massert(df, "dungeon floor is NULL");
     tile_t* current = &df->tiles[y][x];
     tile_init(current, type);

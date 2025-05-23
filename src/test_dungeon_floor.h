@@ -2,10 +2,6 @@
 
 #include "dungeon_floor.h"
 
-// Declare functions that are static in dungeon_floor.c
-void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y);
-void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
-void df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
 
 static void run_test_df_create_destroy(void) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
@@ -29,9 +25,8 @@ static void run_test_df_rooms(void) {
     massert(df->room_count == 1, "Room count incorrect");
     
     // Test room location
-    loc_t loc = {12, 12};
-    massert(df_loc_is_in_room(df, loc) == 0, "Failed to locate room");
-    massert(strcmp(df_get_room_name(df, loc), "TestRoom1") == 0, "Room name incorrect");
+    massert(df_loc_is_in_room(df, (loc_t){12, 12}) == 0, "Failed to locate room");
+    massert(strcmp(df_get_room_name(df, (loc_t){12, 12}), "TestRoom1") == 0, "Room name incorrect");
     
     df_free(df);
     msuccess("df_room tests passed");
