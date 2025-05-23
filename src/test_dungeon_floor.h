@@ -64,9 +64,48 @@ static void run_test_df_stairs(void) {
     msuccess("df_stair tests passed");
 }
 
+static void run_test_df_init(void) {
+    dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    
+    // Initialize the dungeon floor
+    df_init(df);
+    
+    // Test basic initialization
+    massert(df->tiles != NULL, "Tiles not initialized");
+    massert(df->rooms != NULL, "Rooms not initialized");
+    massert(df->room_count > 0, "No rooms created");
+    
+    // Test tile initialization
+    int walkable_count = df_count_walkable(df);
+    massert(walkable_count > 0, "No walkable tiles created");
+    
+    // Test room initialization
+    int room_count = 0;
+    room_data_t* rooms = df_get_rooms_with_prefix(df, &room_count, "room");
+    massert(room_count > 0, "No rooms created");
+    
+    // Test stair placement
+    loc_t upstairs = df_get_upstairs(df);
+    loc_t downstairs = df_get_downstairs(df);
+    massert(upstairs.x != -1 && upstairs.y != -1, "Upstairs not placed");
+    massert(downstairs.x != -1 && downstairs.y != -1, "Downstairs not placed");
+    massert(!(upstairs.x == downstairs.x && upstairs.y == downstairs.y), 
+           "Stairs in same location");
+    
+    // Test tile types
+    tile_t* up_tile = df_tile_at(df, upstairs);
+    tile_t* down_tile = df_tile_at(df, downstairs);
+    massert(up_tile->type == TILE_UPSTAIRS, "Upstairs tile type incorrect");
+    massert(down_tile->type == TILE_DOWNSTAIRS, "Downstairs tile type incorrect");
+    
+    df_free(df);
+    msuccess("df_init tests passed");
+}
+
 void test_dungeon_floors(void) {
     run_test_df_create_destroy();
     run_test_df_rooms();
     run_test_df_tiles();
     run_test_df_stairs();
+    run_test_df_init();
 }
