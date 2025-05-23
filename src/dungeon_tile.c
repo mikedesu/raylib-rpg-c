@@ -115,18 +115,32 @@ void tile_free(tile_t* t) {
 void recompute_entity_cache(gamestate* g, tile_t* t) {
     massert(g, "gamestate is NULL");
     massert(t, "tile is NULL");
-    //massert(em, "em is NULL");
-    //minfo("recompute_entity_cache: dirty_entities: %d", t->dirty_entities);
+    
+    // Only recompute if cache is dirty
     if (!t->dirty_entities) return;
+    
+    // Reset counters
     t->cached_live_npcs = 0;
     t->cached_player_present = false;
+    
+    // Iterate through all entities on the tile
     for (size_t i = 0; i < t->entity_max; i++) {
         entityid id = t->entities[i];
+        if (id == ENTITYID_INVALID) continue;
+        
+        // Skip dead entities
         if (g_is_dead(g, id)) continue;
+        
+        // Check entity type
         entitytype_t type = g_get_type(g, id);
-        if (type == ENTITY_NPC) t->cached_live_npcs++;
-        if (type == ENTITY_PLAYER) t->cached_player_present = true;
+        if (type == ENTITY_NPC) {
+            t->cached_live_npcs++;
+        } else if (type == ENTITY_PLAYER) {
+            t->cached_player_present = true;
+        }
     }
+    
+    // Cache is now clean
     t->dirty_entities = false;
 }
 
