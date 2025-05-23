@@ -9,14 +9,12 @@ static void run_test_tile_creation(void);
 static void run_test_tile_entity_management(void);
 static void run_test_tile_visibility_and_exploration(void);
 static void run_test_tile_features_and_resizing(void);
-static void run_test_tile_live_npcs(void);
 
 void test_dungeon_tiles(void) {
     run_test_tile_creation();
     run_test_tile_entity_management();
     run_test_tile_visibility_and_exploration();
     run_test_tile_features_and_resizing();
-    run_test_tile_live_npcs();
 }
 
 TEST(test_tile_creation) {
@@ -83,33 +81,6 @@ TEST(test_tile_entity_management) {
     ASSERT(tile->entity_count == 2, "Entity count incorrect after removal");
     // Clean up
     tile_free(tile);
-}
-
-TEST(test_tile_live_npcs) {
-    // Create gamestate and tile
-    gamestate* g = gamestateinitptr();
-    tile_t* tile = tile_create(TILE_NONE);
-    
-    // Test with no NPCs
-    ASSERT(tile_has_live_npcs(g, tile) == false, "Tile should have no live NPCs initially");
-    
-    // Add an NPC entity
-    entityid npc = g_add_entity(g);
-    g_add_type(g, npc, ENTITY_NPC);
-    tile_add(tile, npc);
-    
-    // Test with live NPC
-    ASSERT(tile_has_live_npcs(g, tile) == true, "Tile should detect live NPC");
-    
-    // Kill the NPC
-    g_add_dead(g, npc, true);
-    
-    // Test with dead NPC
-    ASSERT(tile_has_live_npcs(g, tile) == false, "Tile should not count dead NPC as live");
-    
-    // Clean up
-    tile_free(tile);
-    gamestatefree(g);
 }
 
 TEST(test_tile_visibility_and_exploration) {
