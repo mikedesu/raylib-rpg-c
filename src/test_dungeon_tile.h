@@ -68,7 +68,7 @@ TEST(test_tile_serialization) {
 
     // Verify entities
     for (size_t i = 0; i < original->entity_count; i++) {
-        ASSERT(deserialized->entities[i] == original->entities[i], "Entity mismatch at index %zu", i);
+        ASSERT(deserialized->entities[i] == original->entities[i], "Entity mismatch");
     }
 
     // Clean up
