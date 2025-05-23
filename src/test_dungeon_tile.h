@@ -9,6 +9,7 @@ static void run_test_tile_creation(void);
 static void run_test_tile_entity_management(void);
 static void run_test_tile_visibility_and_exploration(void);
 static void run_test_tile_features_and_resizing(void);
+static void run_test_tile_live_npcs(void);
 
 void test_dungeon_tiles(void) {
     run_test_tile_creation();
