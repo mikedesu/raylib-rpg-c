@@ -15,6 +15,65 @@ void test_dungeon_tiles(void) {
     run_test_tile_entity_management();
     run_test_tile_visibility_and_exploration();
     run_test_tile_features_and_resizing();
+    run_test_tile_serialization();
+}
+
+TEST(test_tile_serialization) {
+    // Create and populate a test tile
+    tile_t* original = tile_create(TILE_STONE_WALL_00);
+    ASSERT(original != NULL, "Failed to create original tile");
+    
+    // Add some entities
+    tile_add(original, 1);
+    tile_add(original, 2);
+    tile_add(original, 3);
+    
+    // Set various properties
+    original->visible = true;
+    original->explored = true;
+    original->has_pressure_plate = true;
+    original->pressure_plate_event = 42;
+    original->has_wall_switch = true;
+    original->wall_switch_on = true;
+    original->wall_switch_event = 99;
+    
+    // Serialize
+    size_t buffer_size = tile_serialized_size(original);
+    char* buffer = malloc(buffer_size);
+    ASSERT(buffer != NULL, "Failed to allocate serialization buffer");
+    
+    size_t bytes_written = tile_serialize(original, buffer, buffer_size);
+    ASSERT(bytes_written == buffer_size, "Serialization wrote incorrect number of bytes");
+    
+    // Deserialize
+    tile_t* deserialized = tile_create(TILE_NONE); // Create empty tile
+    ASSERT(deserialized != NULL, "Failed to create deserialized tile");
+    
+    bool success = tile_deserialize(deserialized, buffer, buffer_size);
+    ASSERT(success, "Deserialization failed");
+    
+    // Verify all fields match
+    ASSERT(deserialized->type == original->type, "Type mismatch after deserialization");
+    ASSERT(deserialized->visible == original->visible, "Visible mismatch after deserialization");
+    ASSERT(deserialized->explored == original->explored, "Explored mismatch after deserialization");
+    ASSERT(deserialized->has_pressure_plate == original->has_pressure_plate, "Pressure plate mismatch");
+    ASSERT(deserialized->pressure_plate_event == original->pressure_plate_event, "Pressure plate event mismatch");
+    ASSERT(deserialized->has_wall_switch == original->has_wall_switch, "Wall switch mismatch");
+    ASSERT(deserialized->wall_switch_on == original->wall_switch_on, "Wall switch state mismatch");
+    ASSERT(deserialized->wall_switch_event == original->wall_switch_event, "Wall switch event mismatch");
+    ASSERT(deserialized->entity_count == original->entity_count, "Entity count mismatch");
+    ASSERT(deserialized->entity_max == original->entity_max, "Entity max mismatch");
+    
+    // Verify entities
+    for (size_t i = 0; i < original->entity_count; i++) {
+        ASSERT(deserialized->entities[i] == original->entities[i], 
+               "Entity mismatch at index %zu", i);
+    }
+    
+    // Clean up
+    tile_free(original);
+    tile_free(deserialized);
+    free(buffer);
 }
 
 TEST(test_tile_creation) {

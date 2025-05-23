@@ -176,3 +176,136 @@ size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z) {
     massert(t, "failed to get tile");
     return tile_live_npc_count(g, t);
 }
+
+size_t tile_serialized_size(const tile_t* t) {
+    massert(t, "tile is NULL");
+    // Calculate total size needed:
+    // tiletype_t + 7 bools + 9 ints + entity_count + (entity_max * sizeof(entityid))
+    return sizeof(tiletype_t) + (7 * sizeof(bool)) + (9 * sizeof(int)) + 
+           sizeof(size_t) + (t->entity_max * sizeof(entityid));
+}
+
+size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
+    massert(t, "tile is NULL");
+    massert(buffer, "buffer is NULL");
+    
+    size_t required_size = tile_serialized_size(t);
+    if (buffer_size < required_size) {
+        merror("Buffer too small for serialization");
+        return 0;
+    }
+    
+    char* ptr = buffer;
+    
+    // Serialize basic fields
+    memcpy(ptr, &t->type, sizeof(tiletype_t));
+    ptr += sizeof(tiletype_t);
+    
+    memcpy(ptr, &t->visible, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(ptr, &t->explored, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(ptr, &t->has_pressure_plate, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(ptr, &t->has_wall_switch, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(ptr, &t->wall_switch_on, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(ptr, &t->cached_player_present, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(ptr, &t->dirty_entities, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(ptr, &t->dirty_visibility, sizeof(bool));
+    ptr += sizeof(bool);
+    
+    // Serialize integer fields
+    memcpy(ptr, &t->pressure_plate_up_tx_key, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, &t->pressure_plate_down_tx_key, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, &t->pressure_plate_event, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, &t->wall_switch_up_tx_key, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, &t->wall_switch_down_tx_key, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, &t->wall_switch_event, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, &t->cached_live_npcs, sizeof(int));
+    ptr += sizeof(int);
+    
+    // Serialize entity data
+    memcpy(ptr, &t->entity_count, sizeof(size_t));
+    ptr += sizeof(size_t);
+    memcpy(ptr, &t->entity_max, sizeof(size_t));
+    ptr += sizeof(size_t);
+    memcpy(ptr, t->entities, t->entity_max * sizeof(entityid));
+    ptr += t->entity_max * sizeof(entityid);
+    
+    return ptr - buffer;
+}
+
+bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
+    massert(t, "tile is NULL");
+    massert(buffer, "buffer is NULL");
+    
+    const char* ptr = buffer;
+    
+    // Deserialize basic fields
+    memcpy(&t->type, ptr, sizeof(tiletype_t));
+    ptr += sizeof(tiletype_t);
+    
+    memcpy(&t->visible, ptr, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(&t->explored, ptr, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(&t->has_pressure_plate, ptr, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(&t->has_wall_switch, ptr, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(&t->wall_switch_on, ptr, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(&t->cached_player_present, ptr, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(&t->dirty_entities, ptr, sizeof(bool));
+    ptr += sizeof(bool);
+    memcpy(&t->dirty_visibility, ptr, sizeof(bool));
+    ptr += sizeof(bool);
+    
+    // Deserialize integer fields
+    memcpy(&t->pressure_plate_up_tx_key, ptr, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(&t->pressure_plate_down_tx_key, ptr, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(&t->pressure_plate_event, ptr, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(&t->wall_switch_up_tx_key, ptr, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(&t->wall_switch_down_tx_key, ptr, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(&t->wall_switch_event, ptr, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(&t->cached_live_npcs, ptr, sizeof(int));
+    ptr += sizeof(int);
+    
+    // Deserialize entity data
+    size_t entity_count, entity_max;
+    memcpy(&entity_count, ptr, sizeof(size_t));
+    ptr += sizeof(size_t);
+    memcpy(&entity_max, ptr, sizeof(size_t));
+    ptr += sizeof(size_t);
+    
+    // Allocate entities array
+    t->entities = malloc(entity_max * sizeof(entityid));
+    if (!t->entities) {
+        merror("Failed to allocate entities array during deserialization");
+        return false;
+    }
+    memcpy(t->entities, ptr, entity_max * sizeof(entityid));
+    ptr += entity_max * sizeof(entityid);
+    
+    t->entity_count = entity_count;
+    t->entity_max = entity_max;
+    
+    return true;
+}
