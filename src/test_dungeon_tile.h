@@ -46,3 +46,30 @@ TEST(test_tile_entity_management) {
     // Clean up
     tile_free(tile);
 }
+
+TEST(test_tile_visibility_and_exploration) {
+    tile_t* tile = tile_create(TILE_NONE);
+    ASSERT(tile != NULL, "Failed to create tile");
+    
+    // Initial state checks
+    ASSERT(tile->visible == false, "Tile should not be visible by default");
+    ASSERT(tile->explored == false, "Tile should not be explored by default");
+    
+    // Test visibility
+    tile->visible = true;
+    ASSERT(tile->visible == true, "Failed to set tile visibility");
+    
+    // Test exploration
+    tile->explored = true;
+    ASSERT(tile->explored == true, "Failed to set tile exploration");
+    
+    // Test visibility reset
+    tile->visible = false;
+    ASSERT(tile->visible == false, "Failed to reset tile visibility");
+    
+    // Exploration should persist after visibility reset
+    ASSERT(tile->explored == true, "Tile exploration state should persist");
+    
+    // Clean up
+    tile_free(tile);
+}
