@@ -180,9 +180,9 @@ size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z) {
 size_t tile_serialized_size(const tile_t* t) {
     massert(t, "tile is NULL");
     // Calculate total size needed:
-    // tiletype_t + 7 bools + 9 ints + entity_count + (entity_max * sizeof(entityid))
-    return sizeof(tiletype_t) + (7 * sizeof(bool)) + (9 * sizeof(int)) + 
-           sizeof(size_t) + (t->entity_max * sizeof(entityid));
+    // tiletype_t + 8 bools + 9 ints + 2 size_t + (entity_max * sizeof(entityid))
+    return sizeof(tiletype_t) + (8 * sizeof(bool)) + (9 * sizeof(int)) + 
+           (2 * sizeof(size_t)) + (t->entity_max * sizeof(entityid));
 }
 
 size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
@@ -234,13 +234,17 @@ size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
     memcpy(ptr, &t->cached_live_npcs, sizeof(int));
     ptr += sizeof(int);
     
-    // Serialize entity data
+    // Serialize entity data - count and max
     memcpy(ptr, &t->entity_count, sizeof(size_t));
     ptr += sizeof(size_t);
     memcpy(ptr, &t->entity_max, sizeof(size_t));
     ptr += sizeof(size_t);
-    memcpy(ptr, t->entities, t->entity_max * sizeof(entityid));
-    ptr += t->entity_max * sizeof(entityid);
+    
+    // Serialize entity array
+    if (t->entity_max > 0) {
+        memcpy(ptr, t->entities, t->entity_max * sizeof(entityid));
+        ptr += t->entity_max * sizeof(entityid);
+    }
     
     return ptr - buffer;
 }
