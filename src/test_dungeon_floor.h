@@ -123,7 +123,8 @@ static void run_test_df_count_walkable(void) {
     // Count walkable tiles in the room
     int expected_walkable = room_w * room_h;
     int actual_walkable = df_count_walkable(df);
-    ASSERT(actual_walkable >= expected_walkable, "Too few walkable tiles");
+    printf("Expected walkable tiles: %d, Actual walkable tiles: %d\n", expected_walkable, actual_walkable);
+    ASSERT(actual_walkable == expected_walkable, "Too few walkable tiles");
 
     // Add some walls and verify count decreases
     df_set_tile(df, TILE_STONE_WALL_00, room_x, room_y);

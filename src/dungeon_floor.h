@@ -91,15 +91,15 @@ static inline bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y
     return tile_is_wall(tile->type);
 }
 
-//static inline const room_data_t* df_get_room_at(const dungeon_floor_t* df, int px, int py) {
-//    massert(df, "dungeon floor is NULL");
-//    massert(px >= 0, "px is less than zero");
-//    massert(px < df->width, "px is out of bounds");
-//    massert(py >= 0, "py is less than zero");
-//    massert(py < df->height, "py is out of bounds");
-//    for (int i = 0; i < df->room_count; i++) {
-//        const room_data_t* r = &df->rooms[i];
-//        if (px >= r->x && px < r->x + r->w && py >= r->y && py < r->y + r->h) return r;
-//    }
-//    return NULL;
-//}
+static inline const room_data_t* df_get_room_at(const dungeon_floor_t* df, int px, int py) {
+    massert(df, "dungeon floor is NULL");
+    massert(px >= 0, "px is less than zero");
+    massert(px < df->width, "px is out of bounds");
+    massert(py >= 0, "py is less than zero");
+    massert(py < df->height, "py is out of bounds");
+    for (int i = 0; i < df->room_count; i++) {
+        const room_data_t* r = &df->rooms[i];
+        if (px >= r->x && px < r->x + r->w && py >= r->y && py < r->y + r->h) return r;
+    }
+    return NULL;
+}
