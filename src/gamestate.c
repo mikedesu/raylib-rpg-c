@@ -797,8 +797,24 @@ bool g_has_dead(const gamestate* const g, entityid id) {
 bool g_add_dead(gamestate* const g, entityid id, bool dead) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    // make sure the entity has the dead component
-    return g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(dead_component), (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
+    
+    // Add dead component
+    bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(dead_component), 
+                                (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
+    
+    // If entity died and has a location, mark its tile as dirty
+    if (dead && g_has_location(g, id)) {
+        loc_t loc = g_get_location(g, id);
+        dungeon_floor_t* df = d_get_floor(g->d, loc.z);
+        if (df) {
+            tile_t* tile = df_tile_at(df, loc);
+            if (tile) {
+                tile->dirty_entities = true;
+            }
+        }
+    }
+    
+    return result;
 }
 
 bool g_update_dead(gamestate* const g, entityid id, bool dead) {
