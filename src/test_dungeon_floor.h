@@ -181,5 +181,4 @@ void test_dungeon_floors(void) {
     run_test_df_init();
     run_test_df_get_room_at();
     run_test_df_count_walkable();
-    unit_test_summary();
 }
