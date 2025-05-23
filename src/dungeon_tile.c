@@ -181,8 +181,12 @@ size_t tile_serialized_size(const tile_t* t) {
     massert(t, "tile is NULL");
     // Calculate total size needed:
     // tiletype_t + 8 bools + 9 ints + 2 size_t + (entity_max * sizeof(entityid))
-    return sizeof(tiletype_t) + (8 * sizeof(bool)) + (9 * sizeof(int)) + 
-           (2 * sizeof(size_t)) + (t->entity_max * sizeof(entityid));
+    size_t size = sizeof(tiletype_t) 
+                + (8 * sizeof(bool)) 
+                + (9 * sizeof(int)) 
+                + (2 * sizeof(size_t)) 
+                + (t->entity_max * sizeof(entityid));
+    return size;
 }
 
 size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
@@ -240,11 +244,9 @@ size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
     memcpy(ptr, &t->entity_max, sizeof(size_t));
     ptr += sizeof(size_t);
     
-    // Serialize entity array
-    if (t->entity_max > 0) {
-        memcpy(ptr, t->entities, t->entity_max * sizeof(entityid));
-        ptr += t->entity_max * sizeof(entityid);
-    }
+    // Always serialize entity array, even if empty
+    memcpy(ptr, t->entities, t->entity_max * sizeof(entityid));
+    ptr += t->entity_max * sizeof(entityid);
     
     return ptr - buffer;
 }
