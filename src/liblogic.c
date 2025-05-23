@@ -1637,6 +1637,8 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
     massert(df, "Dungeon floor is NULL!");
     tile_t* const tile = df_tile_at(df, loc);
     massert(tile, "Tile is NULL!");
+    entitytype_t type = g_get_type(g, id);
+
     if (tile->type == TILE_UPSTAIRS) {
         // we need to check if the player is on the stairs
         // and if so, we need to move them up a floor
@@ -1645,12 +1647,10 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
         if (g->d->current_floor > 0) {
             if (id == g->hero_id) {
                 add_message(g, "You ascend the stairs");
-
                 if (!df_remove_at(df, id, loc.x, loc.y)) {
                     merror("Failed to remove entity from old tile");
                     return;
                 }
-
                 loc_t next_downstairs_loc = df_get_downstairs(g->d->floors[g->d->current_floor - 1]);
                 massert(next_downstairs_loc.x != -1 && next_downstairs_loc.y != -1, "Failed to get next downstairs location");
                 // we need to set the player's location to the corresponding TILE_downstairs
@@ -1658,7 +1658,6 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                 g_update_location(g, id, next_downstairs_loc);
                 // we need to set the player's floor to the next floor
                 g->d->current_floor--;
-
                 // get the next dungeon floor
                 dungeon_floor_t* const next_floor = d_get_floor(g->d, g->d->current_floor);
                 int ex = next_downstairs_loc.x;
@@ -1667,6 +1666,10 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                 if (!df_add_at(next_floor, id, ex, ey)) {
                     merror("Failed to add entity to new tile");
                     return;
+                }
+
+                if (type == ENTITY_PLAYER) {
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 }
             }
         } else {
@@ -1678,16 +1681,13 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
         // we need to check if the player is on the stairs
         // and if so, we need to move them down a floor
         //g_traverse_down(g, g->hero_id);
-
         if (g->d->current_floor < g->d->num_floors - 1) {
             if (id == g->hero_id) {
                 add_message(g, "You descend the stairs");
-
                 if (!df_remove_at(df, id, loc.x, loc.y)) {
                     merror("Failed to remove entity from old tile");
                     return;
                 }
-
                 loc_t next_upstairs_loc = df_get_upstairs(g->d->floors[g->d->current_floor + 1]);
                 massert(next_upstairs_loc.x != -1 && next_upstairs_loc.y != -1, "Failed to get next upstairs location");
                 // we need to set the player's location to the corresponding TILE_UPSTAIRS
@@ -1695,15 +1695,17 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                 g_update_location(g, id, next_upstairs_loc);
                 // we need to set the player's floor to the next floor
                 g->d->current_floor++;
-
                 // get the next dungeon floor
                 dungeon_floor_t* const next_floor = d_get_floor(g->d, g->d->current_floor);
                 int ex = next_upstairs_loc.x;
                 int ey = next_upstairs_loc.y;
-
                 if (!df_add_at(next_floor, id, ex, ey)) {
                     merror("Failed to add entity to new tile");
                     return;
+                }
+
+                if (type == ENTITY_PLAYER) {
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 }
             }
         } else {
