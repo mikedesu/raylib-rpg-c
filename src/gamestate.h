@@ -8,7 +8,6 @@
 #include "debugpanel.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
-//#include "em.h"
 #include "entityid.h"
 #include "fadestate.h"
 #include "gamestate_flag.h"
@@ -41,21 +40,40 @@ typedef struct {
 } message_history;
 
 typedef struct gamestate {
-    int framecount, fadealpha, camera_mode, targetwidth, targetheight, windowwidth, windowheight, lock, turn_count;
-
     controlmode_t controlmode;
-    entityid hero_id;
+    entityid hero_id, new_entityid_begin, new_entityid_end, next_entityid;
     time_t timebegan, currenttime;
-
-    struct tm* timebegantm;
-    struct tm* currenttimetm;
-
+    struct tm *timebegantm, *currenttimetm;
     char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF], currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
-
     bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard,
-        display_inventory_menu, display_quit_menu, do_quit;
+        display_inventory_menu, display_quit_menu, do_quit, dirty_entities; // true if new entities created this turn
 
-    int inventory_menu_selection;
+    int framecount, fadealpha, camera_mode, targetwidth, targetheight, windowwidth, windowheight, lock, turn_count;
+    int font_size, pad, inventory_menu_selection;
+    int name_list_count, name_list_capacity;
+    int type_list_count, type_list_capacity;
+    int race_list_count, race_list_capacity;
+    int direction_list_count, direction_list_capacity;
+    int loc_list_count, loc_list_capacity;
+    int sprite_move_list_count, sprite_move_list_capacity;
+    int dead_list_count, dead_list_capacity;
+    int update_list_count, update_list_capacity;
+    int attacking_list_count, attacking_list_capacity;
+    int blocking_list_count, blocking_list_capacity;
+    int block_success_list_count, block_success_list_capacity;
+    int damaged_list_count, damaged_list_capacity;
+    int inventory_list_count, inventory_list_capacity;
+    int target_list_count, target_list_capacity;
+    int target_path_list_count, target_path_list_capacity;
+    int default_action_list_count, default_action_list_capacity;
+    int equipment_list_count, equipment_list_capacity;
+    int stats_list_count, stats_list_capacity;
+    int itemtype_list_count, itemtype_list_capacity;
+    int weapontype_list_count, weapontype_list_capacity;
+    int shieldtype_list_count, shieldtype_list_capacity;
+    int potion_type_list_count, potion_type_list_capacity;
+    int damage_list_count, damage_list_capacity;
+    int ac_list_count, ac_list_capacity;
 
     debugpanel_t debugpanel;
 
@@ -65,15 +83,9 @@ typedef struct gamestate {
     fadestate_t fadestate;
 
     Font font;
-    int font_size, pad;
     float line_spacing;
 
     dungeon_t* d;
-
-    //em_t* entitymap;
-
-    //entityid* entityids;
-    //int index_entityids, max_entityids;
 
     double last_frame_time;
     char frame_time_str[32];
@@ -102,8 +114,6 @@ typedef struct gamestate {
     block_success_component* block_success_list;
     damaged_component* damaged_list;
     inventory_component* inventory_list;
-    //equipped_weapon_component* equipped_weapon_list;
-    //equipped_shield_component* equipped_shield_list;
     target_component* target_list;
     target_path_component* target_path_list;
     default_action_component* default_action_list;
@@ -116,77 +126,13 @@ typedef struct gamestate {
     damage_component* damage_list;
     ac_component* ac_list;
 
-    int name_list_count;
-    int name_list_capacity;
-    int type_list_count;
-    int type_list_capacity;
-    int race_list_count;
-    int race_list_capacity;
-    int direction_list_count;
-    int direction_list_capacity;
-    int loc_list_count;
-    int loc_list_capacity;
-    int sprite_move_list_count;
-    int sprite_move_list_capacity;
-    int dead_list_count;
-    int dead_list_capacity;
-    int update_list_count;
-    int update_list_capacity;
-    int attacking_list_count;
-    int attacking_list_capacity;
-    int blocking_list_count;
-    int blocking_list_capacity;
-    int block_success_list_count;
-    int block_success_list_capacity;
-    int damaged_list_count;
-    int damaged_list_capacity;
-    int inventory_list_count;
-    int inventory_list_capacity;
-    //int equipped_weapon_list_count;
-    //int equipped_weapon_list_capacity;
-    //int equipped_shield_list_count;
-    //int equipped_shield_list_capacity;
-    int target_list_count;
-    int target_list_capacity;
-    int target_path_list_count;
-    int target_path_list_capacity;
-    int default_action_list_count;
-    int default_action_list_capacity;
-    int equipment_list_count;
-    int equipment_list_capacity;
-    int stats_list_count;
-    int stats_list_capacity;
-    int itemtype_list_count;
-    int itemtype_list_capacity;
-    int weapontype_list_count;
-    int weapontype_list_capacity;
-    int shieldtype_list_count;
-    int shieldtype_list_capacity;
-    int potion_type_list_count;
-    int potion_type_list_capacity;
-    int damage_list_count;
-    int damage_list_capacity;
-    int ac_list_count;
-    int ac_list_capacity;
-
-    entityid next_entityid; // Start at 0, increment for each new entity
-
-    bool dirty_entities; // true if new entities created this turn
-    entityid new_entityid_begin;
-    entityid new_entityid_end;
-
 } gamestate;
 
 gamestate* gamestateinitptr();
 
 dungeon_t* g_get_dungeon(gamestate* const g);
 
-//entityid gamestate_get_entityid_unsafe(const gamestate* const g, int index);
 entityid gamestate_get_hero_id(const gamestate* const g);
-//int gamestate_get_entityid_index(const gamestate* const g, entityid id);
-//int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, int index);
-
-//em_t* gamestate_get_entitymap(gamestate* const g);
 
 bool gs_add_entityid(gamestate* const g, entityid id);
 bool gamestate_init_msg_history(gamestate* const g);
@@ -195,12 +141,9 @@ bool gamestate_free_msg_history(gamestate* const g);
 bool gamestate_add_msg_history(gamestate* const g, const char* msg);
 
 void gamestatefree(gamestate* g);
-//void gamestate_dungeon_destroy(gamestate* const g);
-//void gamestate_init_entityids(gamestate* const g);
 void gamestate_set_hero_id(gamestate* const g, entityid id);
 void gamestate_set_debug_panel_pos_bottom_left(gamestate* const g);
 void gamestate_set_debug_panel_pos_top_right(gamestate* const g);
-//void gamestate_incr_entity_turn(gamestate* const g);
 void gamestate_load_keybindings(gamestate* const g);
 
 bool g_has_component(const gamestate* const g, entityid id, component comp);
