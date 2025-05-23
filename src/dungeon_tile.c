@@ -186,6 +186,12 @@ size_t tile_serialized_size(const tile_t* t) {
                 + (9 * sizeof(int)) 
                 + (2 * sizeof(size_t)) 
                 + (t->entity_max * sizeof(entityid));
+    
+    // Add padding bytes that may be inserted by compiler alignment
+    // On 64-bit systems, the compiler may insert padding between fields
+    // to align them on 8-byte boundaries. We need to account for this.
+    size += 4; // Estimated padding based on struct layout
+    
     return size;
 }
 
