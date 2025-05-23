@@ -12,7 +12,7 @@ static void run_test_df_create_destroy(void) {
     massert(df->tiles != NULL, "Tiles array not allocated");
     massert(df->rooms != NULL, "Rooms array not allocated");
 
-    df_destroy(df);
+    df_free(df);
     msuccess("df_create and df_destroy passed");
 }
 
