@@ -15,7 +15,7 @@ TEST(test_df_create_destroy) {
     ASSERT(df->rooms != NULL, "Rooms array not allocated");
 
     df_free(df);
-    printf("df_create and df_destroy passed\n");
+    //printf("df_create and df_destroy passed\n");
 }
 
 TEST(test_df_rooms) {
@@ -24,8 +24,8 @@ TEST(test_df_rooms) {
 
     // Test room creation
     bool add_result = df_add_room_info(df, 10, 10, 5, 5, "TestRoom1");
-    printf("Add room result: %d\n", add_result);
-    printf("Room count after add: %d\n", df->room_count);
+    //printf("Add room result: %d\n", add_result);
+    //printf("Room count after add: %d\n", df->room_count);
 
     if (add_result) {
         // Test room location
@@ -38,19 +38,19 @@ TEST(test_df_rooms) {
 
     // Test overlapping rooms - should fail
     bool overlap_result = df_add_room_info(df, 10, 10, 5, 5, "OverlapRoom");
-    printf("Add overlapping room result: %d\n", overlap_result);
-    printf("Room count after overlap attempt: %d\n", df->room_count);
+    //printf("Add overlapping room result: %d\n", overlap_result);
+    //printf("Room count after overlap attempt: %d\n", df->room_count);
     ASSERT(!overlap_result, "Should not be able to add overlapping room");
     ASSERT(df->room_count == 2, "Room count should not increase after failed overlap");
 
     // Test adjacent rooms (should be allowed)
     bool adjacent_result = df_add_room_info(df, 15, 15, 5, 5, "AdjacentRoom");
-    printf("Add adjacent room result: %d\n", adjacent_result);
-    printf("Room count after adjacent add: %d\n", df->room_count);
+    //printf("Add adjacent room result: %d\n", adjacent_result);
+    //printf("Room count after adjacent add: %d\n", df->room_count);
     ASSERT(adjacent_result, "Should be able to add adjacent room");
 
     df_free(df);
-    printf("df_room tests completed\n");
+    //printf("df_room tests completed\n");
 }
 
 TEST(test_df_tiles) {
@@ -63,7 +63,7 @@ TEST(test_df_tiles) {
     ASSERT(df_type_at(df, loc.x, loc.y) == TILE_STONE_WALL_00, "Tile type not set");
 
     df_free(df);
-    printf("df_tile tests passed\n");
+    //printf("df_tile tests passed\n");
 }
 
 TEST(test_df_stairs) {
@@ -81,7 +81,7 @@ TEST(test_df_stairs) {
     ASSERT(df_get_upstairs(df).x != df_get_downstairs(df).x || df_get_upstairs(df).y != df_get_downstairs(df).y, "Stairs in same location");
 
     df_free(df);
-    printf("df_stair tests passed\n");
+    //printf("df_stair tests passed\n");
 }
 
 TEST(test_df_get_room_at) {
@@ -110,7 +110,7 @@ TEST(test_df_get_room_at) {
     ASSERT(df_get_room_at(df, room_x, room_y + room_h) == NULL, "Should not find room for point below room");
 
     df_free(df);
-    printf("df_get_room_at tests passed\n");
+    //printf("df_get_room_at tests passed\n");
 }
 
 TEST(test_df_count_walkable) {
@@ -123,7 +123,7 @@ TEST(test_df_count_walkable) {
     // Count walkable tiles in the room
     int expected_walkable = room_w * room_h;
     int actual_walkable = df_count_walkable(df);
-    printf("Expected walkable tiles: %d, Actual walkable tiles: %d\n", expected_walkable, actual_walkable);
+    //printf("Expected walkable tiles: %d, Actual walkable tiles: %d\n", expected_walkable, actual_walkable);
     ASSERT(actual_walkable >= expected_walkable, "Too few walkable tiles");
 
     // Add some walls and verify count decreases
@@ -133,7 +133,7 @@ TEST(test_df_count_walkable) {
     ASSERT(new_walkable >= actual_walkable - 2, "Walkable count should decrease after adding walls");
 
     df_free(df);
-    printf("df_count_walkable tests passed\n");
+    //printf("df_count_walkable tests passed\n");
 }
 
 TEST(test_df_init) {
@@ -170,7 +170,7 @@ TEST(test_df_init) {
     ASSERT(down_tile->type == TILE_DOWNSTAIRS, "Downstairs tile type incorrect");
 
     df_free(df);
-    printf("df_init tests passed\n");
+    //printf("df_init tests passed\n");
 }
 
 void test_dungeon_floors(void) {
