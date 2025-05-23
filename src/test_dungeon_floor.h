@@ -26,12 +26,12 @@ static void run_test_df_rooms(void) {
     bool add_result = df_add_room_info(df, 10, 10, 5, 5, "TestRoom1");
     printf("Add room result: %d\n", add_result);
     printf("Room count after add: %d\n", df->room_count);
-    
+
     if (add_result) {
         // Test room location
         int in_room = df_loc_is_in_room(df, (loc_t){12, 12});
         printf("Location in room result: %d\n", in_room);
-        
+
         const char* room_name = df_get_room_name(df, (loc_t){12, 12});
         printf("Room name at location: %s\n", room_name ? room_name : "NULL");
     }
@@ -87,9 +87,9 @@ static void run_test_df_init(void) {
     ASSERT(walkable_count > 0, "No walkable tiles created");
 
     // Test room initialization
-    //int room_count = 0;
-    //room_data_t* rooms = df_get_rooms_with_prefix(df, &room_count, "room");
-    //ASSERT(room_count > 0, "No rooms created");
+    int room_count = 0;
+    room_data_t* rooms = df_get_rooms_with_prefix(df, &room_count, "room");
+    ASSERT(room_count > 0, "No rooms created");
 
     // Test stair placement
     loc_t upstairs = df_get_upstairs(df);
