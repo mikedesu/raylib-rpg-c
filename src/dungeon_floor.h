@@ -63,6 +63,11 @@ int df_loc_is_in_room(dungeon_floor_t* const df, loc_t loc);
 room_data_t* const df_get_rooms_with_prefix(dungeon_floor_t* const df, int* external_count, const char* prefix);
 const char* df_get_room_name(dungeon_floor_t* const df, loc_t loc);
 
+// Serialization functions
+size_t df_serialized_size(const dungeon_floor_t* df);
+size_t df_serialize(const dungeon_floor_t* df, char* buffer, size_t buffer_size);
+bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size);
+
 //static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, loc_t loc) {
     //minfo("df_tile_at: %d, %d", x, y);
