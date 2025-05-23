@@ -20,17 +20,24 @@ static void run_test_df_create_destroy(void) {
 
 static void run_test_df_rooms(void) {
     dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    printf("Initial room count: %d\n", df->room_count);
 
     // Test room creation
-    //ASSERT(df_add_room_info(df, 10, 10, 5, 5, "TestRoom1"), "Failed to add room");
-    //ASSERT(df->room_count == 1, "Room count incorrect");
-
-    // Test room location
-    //ASSERT(df_loc_is_in_room(df, (loc_t){12, 12}) == 0, "Failed to locate room");
-    //ASSERT(strcmp(df_get_room_name(df, (loc_t){12, 12}), "TestRoom1") == 0, "Room name incorrect");
+    bool add_result = df_add_room_info(df, 10, 10, 5, 5, "TestRoom1");
+    printf("Add room result: %d\n", add_result);
+    printf("Room count after add: %d\n", df->room_count);
+    
+    if (add_result) {
+        // Test room location
+        int in_room = df_loc_is_in_room(df, (loc_t){12, 12});
+        printf("Location in room result: %d\n", in_room);
+        
+        const char* room_name = df_get_room_name(df, (loc_t){12, 12});
+        printf("Room name at location: %s\n", room_name ? room_name : "NULL");
+    }
 
     df_free(df);
-    printf("df_room tests passed\n");
+    printf("df_room tests completed\n");
 }
 
 static void run_test_df_tiles(void) {
