@@ -164,3 +164,23 @@ static inline bool tile_has_player(gamestate* g, tile_t* t) {
     recompute_entity_cache(g, t);
     return t->cached_player_present;
 }
+
+static inline bool tile_is_visible(const tile_t* const t) {
+    massert(t, "tile is NULL");
+    return t->visible;
+}
+
+static inline void tile_set_visible(tile_t* const t, bool visible) {
+    massert(t, "tile is NULL");
+    t->visible = visible;
+}
+
+static inline bool tile_is_explored(const tile_t* const t) {
+    massert(t, "tile is NULL");
+    return t->explored;
+}
+
+static inline void tile_set_explored(tile_t* const t, bool explored) {
+    massert(t, "tile is NULL");
+    t->explored = explored;
+}
