@@ -2140,6 +2140,15 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
     massert(df, "dungeon floor is NULL");
     massert(buffer, "buffer is NULL");
 
+    // Initialize the dungeon floor with default values
+    df->rooms = NULL;
+    df->room_count = 0;
+    df->room_capacity = 0;
+    df->upstairs_loc = (loc_t){-1, -1};
+    df->downstairs_loc = (loc_t){-1, -1};
+    df_reset_plates(df);
+    df_reset_events(df);
+
     const char* ptr = buffer;
 
     // Deserialize basic fields

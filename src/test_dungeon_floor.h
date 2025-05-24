@@ -197,6 +197,7 @@ TEST(test_df_serialization) {
     // Create a new dungeon floor for deserialization
     dungeon_floor_t* df2 = malloc(sizeof(dungeon_floor_t));
     ASSERT(df2 != NULL, "Failed to allocate new dungeon floor");
+    memset(df2, 0, sizeof(dungeon_floor_t)); // Initialize to zeros
     
     // Deserialize
     bool success = df_deserialize(df2, buffer, size);
