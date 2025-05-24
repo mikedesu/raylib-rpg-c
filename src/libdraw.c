@@ -601,17 +601,17 @@ static void libdraw_update_sprite(gamestate* const g, entityid id) {
 
 static void libdraw_handle_gamestate_flag(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    const bool done = libdraw_check_default_animations(g);
-    if (done) {
-        if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-            g->flag = GAMESTATE_FLAG_NPC_TURN;
-            g->test_guard = false;
-        } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
-            g->entity_turn = g->hero_id; // Reset directly to hero
-            g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
-            g->turn_count++;
-        }
+    //const bool done = libdraw_check_default_animations(g);
+    //if (done) {
+    if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+        g->flag = GAMESTATE_FLAG_NPC_TURN;
+        g->test_guard = false;
+    } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
+        g->entity_turn = g->hero_id; // Reset directly to hero
+        g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
+        g->turn_count++;
     }
+    //}
 }
 
 static void libdraw_handle_dirty_entities(gamestate* const g) {
