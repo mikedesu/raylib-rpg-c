@@ -62,6 +62,9 @@ size_t tile_serialized_size(const tile_t* t);
 size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size);
 bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size);
 
+// Memory size calculation
+size_t tile_memory_size(const tile_t* t);
+
 static inline void tile_set_pressure_plate(tile_t* const t, bool b) {
     massert(t, "tile is NULL");
     t->has_pressure_plate = b;

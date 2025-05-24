@@ -241,6 +241,49 @@ TEST(test_df_serialization) {
     df_free(df2);
 }
 
+TEST(test_df_memory_size) {
+    // Create a small dungeon floor for testing
+    dungeon_floor_t* df = df_create(10, 10);
+    
+    // Calculate initial memory size
+    size_t initial_size = df_memory_size(df);
+    printf("Initial dungeon floor memory size (10x10): %zu bytes\n", initial_size);
+    
+    // Add a room and recalculate
+    df_add_room_info(df, 0, 0, 5, 5, "TestRoom");
+    size_t with_room_size = df_memory_size(df);
+    printf("Memory size after adding a room: %zu bytes\n", with_room_size);
+    printf("Difference: %zu bytes\n", with_room_size - initial_size);
+    
+    // Add entities to some tiles
+    for (int y = 0; y < 5; y++) {
+        for (int x = 0; x < 5; x++) {
+            tile_add(&df->tiles[y][x], y * 10 + x);
+        }
+    }
+    
+    size_t with_entities_size = df_memory_size(df);
+    printf("Memory size after adding entities: %zu bytes\n", with_entities_size);
+    printf("Difference: %zu bytes\n", with_entities_size - with_room_size);
+    
+    // Calculate average memory per tile
+    size_t total_tiles = df->width * df->height;
+    printf("Average memory per tile: %zu bytes\n", with_entities_size / total_tiles);
+    
+    // Clean up
+    df_free(df);
+    
+    // Test with different sizes to see scaling
+    int sizes[] = {5, 20, 50};
+    for (int i = 0; i < 3; i++) {
+        int size = sizes[i];
+        dungeon_floor_t* df_test = df_create(size, size);
+        size_t test_size = df_memory_size(df_test);
+        printf("Memory size for %dx%d dungeon floor: %zu bytes\n", size, size, test_size);
+        df_free(df_test);
+    }
+}
+
 void test_dungeon_floors(void) {
     run_test_df_create_destroy();
     run_test_df_rooms();
@@ -250,4 +293,5 @@ void test_dungeon_floors(void) {
     run_test_df_get_room_at();
     run_test_df_count_walkable();
     run_test_df_serialization();
+    run_test_df_memory_size();
 }

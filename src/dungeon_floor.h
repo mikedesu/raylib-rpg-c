@@ -68,6 +68,9 @@ size_t df_serialized_size(const dungeon_floor_t* df);
 size_t df_serialize(const dungeon_floor_t* df, char* buffer, size_t buffer_size);
 bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size);
 
+// Memory size calculation
+size_t df_memory_size(const dungeon_floor_t* df);
+
 //static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, loc_t loc) {
     //minfo("df_tile_at: %d, %d", x, y);

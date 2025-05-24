@@ -2226,3 +2226,40 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
 
     return true;
 }
+
+size_t df_memory_size(const dungeon_floor_t* df) {
+    massert(df, "dungeon floor is NULL");
+    
+    // Calculate the memory size of a dungeon floor
+    size_t size = 0;
+    
+    // Size of the dungeon_floor_t struct itself
+    size += sizeof(dungeon_floor_t);
+    
+    // Size of rooms array
+    if (df->rooms) {
+        size += df->room_capacity * sizeof(room_data_t);
+    }
+    
+    // Size of tiles array and all tiles
+    if (df->tiles) {
+        // Size of the tile pointers array
+        size += df->height * sizeof(tile_t*);
+        
+        // Size of each row of tiles
+        for (int y = 0; y < df->height; y++) {
+            if (df->tiles[y]) {
+                // Size of the row itself
+                size += df->width * sizeof(tile_t);
+                
+                // Size of each tile's dynamic memory
+                for (int x = 0; x < df->width; x++) {
+                    // Subtract the size of the tile_t struct since we already counted it
+                    size += tile_memory_size(&df->tiles[y][x]) - sizeof(tile_t);
+                }
+            }
+        }
+    }
+    
+    return size;
+}

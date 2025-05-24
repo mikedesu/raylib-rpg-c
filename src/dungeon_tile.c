@@ -358,3 +358,20 @@ bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
 
     return true;
 }
+
+size_t tile_memory_size(const tile_t* t) {
+    massert(t, "tile is NULL");
+    
+    // Calculate the memory size of a tile
+    size_t size = 0;
+    
+    // Size of the tile_t struct itself
+    size += sizeof(tile_t);
+    
+    // Size of dynamically allocated entities array
+    if (t->entities) {
+        size += t->entity_max * sizeof(entityid);
+    }
+    
+    return size;
+}
