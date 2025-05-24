@@ -1516,7 +1516,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     if (g->msg_system.is_active) {
         if (inputstate_is_pressed(is, KEY_I) || inputstate_is_pressed(is, KEY_U) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_A) ||
             inputstate_is_pressed(is, KEY_SPACE) || inputstate_is_pressed(is, KEY_COMMA) || inputstate_is_pressed(is, KEY_PERIOD) ||
-            inputstate_is_pressed(is, KEY_SLASH) || inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_S)) {
+            inputstate_is_pressed(is, KEY_SLASH) || inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_X)) {
             g->msg_system.index++;
             if (g->msg_system.index >= g->msg_system.count) {
                 // Reset when all messages read
@@ -2001,18 +2001,18 @@ static void try_spawn_npc(gamestate* const g) {
                 loc_t loc = get_random_empty_non_wall_loc(g, current_floor);
                 entityid id = ENTITYID_INVALID;
                 race_t race = RACE_GREEN_SLIME;
-                //int choice = rand() % 4;
-                //switch (choice) {
-                //case 0: race = RACE_BAT; break;
-                //case 1: race = RACE_WOLF; break;
-                //case 0: race = RACE_HUMAN; break;
-                //case 1: race = RACE_ELF; break;
-                //case 2: race = RACE_DWARF; break;
-                //case 3: race = RACE_HALFLING; break;
-                //case 2: race = RACE_ORC; break;
-                //case 3: race = RACE_GOBLIN; break;
-                //default: break;
-                //}
+                int choice = rand() % 8;
+                switch (choice) {
+                case 0: race = RACE_BAT; break;
+                case 1: race = RACE_WOLF; break;
+                case 2: race = RACE_HUMAN; break;
+                case 3: race = RACE_ELF; break;
+                case 4: race = RACE_DWARF; break;
+                case 5: race = RACE_HALFLING; break;
+                case 6: race = RACE_ORC; break;
+                case 7: race = RACE_GOBLIN; break;
+                default: break;
+                }
                 //race = RACE_BAT;
                 id = npc_create(g, race, loc, "NPC");
                 if (id != ENTITYID_INVALID) {
