@@ -2205,7 +2205,7 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
             size_t tile_size = tile_serialized_size(&df->tiles[y][x]);
             if (!tile_deserialize(&df->tiles[y][x], ptr, tile_size)) {
                 merror("Failed to deserialize tile at %d,%d", x, y);
-                printf("Failed to deserialize tile at %d,%d", x, y);
+                printf("Failed to deserialize tile at %d,%d\n", x, y);
                 return false;
             }
             ptr += tile_size;
