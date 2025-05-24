@@ -267,11 +267,24 @@ bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
     massert(t, "tile is NULL");
     massert(buffer, "buffer is NULL");
 
+    // Validate buffer size
+    size_t required_size = tile_serialized_size(t);
+    if (buffer_size < required_size) {
+        merror("Buffer too small for tile deserialization: %zu < %zu", buffer_size, required_size);
+        return false;
+    }
+
     const char* ptr = buffer;
 
     // Deserialize basic fields
     memcpy(&t->type, ptr, sizeof(tiletype_t));
     ptr += sizeof(tiletype_t);
+
+    // Validate tile type
+    if (t->type < TILE_NONE || t->type >= TILE_COUNT) {
+        merror("Invalid tile type during deserialization: %d", t->type);
+        return false;
+    }
 
     memcpy(&t->visible, ptr, sizeof(bool));
     ptr += sizeof(bool);
@@ -313,12 +326,30 @@ bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
     memcpy(&entity_max, ptr, sizeof(size_t));
     ptr += sizeof(size_t);
 
+    // Validate entity data
+    if (entity_max > DUNGEON_TILE_MAX_ENTITIES_MAX) {
+        merror("Invalid entity_max during deserialization: %zu", entity_max);
+        return false;
+    }
+
+    if (entity_count > entity_max) {
+        merror("Invalid entity_count during deserialization: %zu > %zu", entity_count, entity_max);
+        return false;
+    }
+
     // Allocate entities array
     t->entities = malloc(entity_max * sizeof(entityid));
     if (!t->entities) {
         merror("Failed to allocate entities array during deserialization");
         return false;
     }
+
+    // Initialize all entities to invalid
+    for (size_t i = 0; i < entity_max; i++) {
+        t->entities[i] = ENTITYID_INVALID;
+    }
+
+    // Copy entity data
     memcpy(t->entities, ptr, entity_max * sizeof(entityid));
     ptr += entity_max * sizeof(entityid);
 

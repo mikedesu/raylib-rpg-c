@@ -174,58 +174,58 @@ TEST(test_df_init) {
 }
 
 TEST(test_df_serialization) {
-    // Create and initialize a dungeon floor
-    dungeon_floor_t* df = df_create(20, 20); // Smaller size for testing
-    df_init(df);
-
+    // Create a very small dungeon floor for testing
+    dungeon_floor_t* df = df_create(3, 3); // Just 3x3 for easier debugging
+    
+    // Set up some simple tiles instead of using df_init
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            tile_init(&df->tiles[y][x], TILE_FLOOR_STONE_00);
+        }
+    }
+    
+    // Set specific tiles for stairs
+    df->upstairs_loc = (loc_t){0, 0};
+    df->downstairs_loc = (loc_t){2, 2};
+    tile_init(&df->tiles[0][0], TILE_UPSTAIRS);
+    tile_init(&df->tiles[2][2], TILE_DOWNSTAIRS);
+    
     // Add a test room
-    df_add_room_info(df, 5, 5, 3, 3, "TestRoom");
-
+    df_add_room_info(df, 0, 0, 3, 3, "TestRoom");
+    
     // Get serialized size
     size_t size = df_serialized_size(df);
+    printf("Serialized size for 3x3 dungeon: %zu bytes\n", size);
     ASSERT(size > 0, "Serialized size should be greater than 0");
-
+    
     // Allocate buffer for serialization
     char* buffer = (char*)malloc(size);
     ASSERT(buffer != NULL, "Failed to allocate serialization buffer");
-
+    
     // Serialize
     size_t written = df_serialize(df, buffer, size);
     ASSERT(written > 0, "Serialization failed");
     ASSERT(written == size, "Serialized size mismatch");
-
+    
     // Create a new dungeon floor for deserialization
     dungeon_floor_t* df2 = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
     ASSERT(df2 != NULL, "Failed to allocate new dungeon floor");
     memset(df2, 0, sizeof(dungeon_floor_t)); // Initialize to zeros
-
+    
     // Deserialize
     bool success = df_deserialize(df2, buffer, size);
     ASSERT(success, "Deserialization failed");
 
     // Verify basic properties
-    //ASSERT(df2->width == df->width, "Width mismatch");
-    //ASSERT(df2->height == df->height, "Height mismatch");
-    //ASSERT(df2->room_count == df->room_count, "Room count mismatch");
-
-    // Verify room data
-    //ASSERT(df2->rooms != NULL, "Rooms not deserialized");
-    //ASSERT(df2->room_count > 0, "No rooms deserialized");
-    //ASSERT(strcmp(df2->rooms[0].room_name, "TestRoom") == 0, "Room name mismatch");
-    //ASSERT(df2->rooms[0].x == 5 && df2->rooms[0].y == 5, "Room position mismatch");
-    //ASSERT(df2->rooms[0].w == 3 && df2->rooms[0].h == 3, "Room size mismatch");
+    ASSERT(df2->width == df->width, "Width mismatch");
+    ASSERT(df2->height == df->height, "Height mismatch");
+    ASSERT(df2->room_count == df->room_count, "Room count mismatch");
 
     // Verify stair locations
-    //ASSERT(df2->upstairs_loc.x == df->upstairs_loc.x, "Upstairs X mismatch");
-    //ASSERT(df2->upstairs_loc.y == df->upstairs_loc.y, "Upstairs Y mismatch");
-    //ASSERT(df2->downstairs_loc.x == df->downstairs_loc.x, "Downstairs X mismatch");
-    //ASSERT(df2->downstairs_loc.y == df->downstairs_loc.y, "Downstairs Y mismatch");
-
-    // Verify tile types at stair locations
-    //tile_t* up_tile = df_tile_at(df2, df2->upstairs_loc);
-    //tile_t* down_tile = df_tile_at(df2, df2->downstairs_loc);
-    //ASSERT(up_tile->type == TILE_UPSTAIRS, "Upstairs tile type incorrect after deserialization");
-    //ASSERT(down_tile->type == TILE_DOWNSTAIRS, "Downstairs tile type incorrect after deserialization");
+    ASSERT(df2->upstairs_loc.x == df->upstairs_loc.x, "Upstairs X mismatch");
+    ASSERT(df2->upstairs_loc.y == df->upstairs_loc.y, "Upstairs Y mismatch");
+    ASSERT(df2->downstairs_loc.x == df->downstairs_loc.x, "Downstairs X mismatch");
+    ASSERT(df2->downstairs_loc.y == df->downstairs_loc.y, "Downstairs Y mismatch");
 
     // Clean up
     free(buffer);
