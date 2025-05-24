@@ -1105,14 +1105,24 @@ static entityid potion_create(gamestate* const g, loc_t loc, potiontype type, co
 
 static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, const char* name) {
     massert(g, "gamestate is NULL");
-    entityid id = item_create(g, ITEM_SHIELD, loc, name);
+
+    int random_ac = do_roll((roll){1, 4, 0});
+
+    char name_buffer[128];
+    if (name && name[0]) {
+        snprintf(name_buffer, sizeof(name_buffer), "%s + %d", name, random_ac);
+    }
+
+    entityid id = item_create(g, ITEM_SHIELD, loc, name_buffer);
     if (id == ENTITYID_INVALID) {
         merror("failed to create shield");
         return ENTITYID_INVALID;
     }
     //massert(id != ENTITYID_INVALID, "failed to create weapon");
     g_add_shieldtype(g, id, type);
-    g_add_ac(g, id, 10);
+
+    g_add_ac(g, id, random_ac);
+
     return id;
 }
 
@@ -1131,8 +1141,11 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
     //int con_roll = do_roll_best_of_3((roll){3, 6, 0});
     int str_roll = do_roll((roll){3, 6, 0});
     int con_roll = do_roll((roll){3, 6, 0});
+    int dex_roll = do_roll((roll){3, 6, 0});
+
     g_set_stat(g, id, STATS_STR, str_roll);
     g_set_stat(g, id, STATS_CON, con_roll);
+    g_set_stat(g, id, STATS_DEX, dex_roll);
 
     int maxhp_roll = do_roll((roll){1, 8, 0}) + bonus_calc(con_roll);
     while (maxhp_roll < 1) {

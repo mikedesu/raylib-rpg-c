@@ -10,7 +10,7 @@ typedef enum stats_slot_t
     STATS_AC,
     STATS_STR,
     STATS_CON,
-    //STATS_DEX,
+    STATS_DEX,
     //STATS_INT,
     //STATS_WIS,
     //STATS_CHA,

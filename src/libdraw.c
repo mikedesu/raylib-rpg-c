@@ -1,4 +1,5 @@
 //#include "component.h"
+#include "bonus_table.h"
 #include "direction.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
@@ -1020,6 +1021,9 @@ static int get_total_ac(gamestate* const g, entityid id) {
         massert(shield_ac >= 0, "shield_ac is negative");
         ac += shield_ac;
     }
+    int dex = g_get_stat(g, id, STATS_DEX);
+    int dex_bonus = bonus_calc(dex);
+    ac += dex_bonus;
     return ac;
 }
 
@@ -1035,14 +1039,15 @@ static void draw_hud(gamestate* const g) {
     const int xp = stats[STATS_XP];
     const int str = stats[STATS_STR];
     const int con = stats[STATS_CON];
+    const int dex = stats[STATS_DEX];
     const int ac = get_total_ac(g, g->hero_id);
     loc_t loc = g_get_location(g, g->hero_id);
     dungeon_floor_t* const df = d_get_current_floor(g->d);
     const char* room_name = df_get_room_name(df, loc);
     char buffer[1024] = {0};
-    const char* format_str = "%s Lvl %d HP %d/%d AC: %d XP %d STR: %d CON: %d Room: %s Turn %d";
+    const char* format_str = "%s Lvl %d HP %d/%d AC: %d XP %d STR: %d CON: %d DEX: %d Room: %s Turn %d";
     //snprintf(buffer, sizeof(buffer), "%s Lvl %d HP %d/%d AC: %d XP %d Room: %s Turn %d", g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, room_name, turn);
-    snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, str, con, room_name, turn);
+    snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, str, con, dex, room_name, turn);
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, g->font_size, g->line_spacing);
     const int box_w = text_size.x + g->pad;
     const int box_h = text_size.y + g->pad;
@@ -1084,12 +1089,15 @@ static void draw_message_history(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) return;
-    const int max_messages = 30;
+    int font_size = 10;
+    //int font_size = g->font_size;
+    const int max_messages = 40;
     const int x = 0;
     const int y = 42;
     int current_count = 0;
     char tmp_buffer[2048] = {0};
-    Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
+    //Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
+    Color message_bg = (Color){0x33, 0x33, 0x33, 0x99}; // semi-transparent
     //Color message_bg = (Color){0, 0, 0xff, 0xff};
     // instead of a placeholder message, we now need to actually draw the message history
     // we might only render the last N messages
@@ -1101,7 +1109,7 @@ static void draw_message_history(gamestate* const g) {
     // chop off the last newline
     if (strlen(tmp_buffer) > 0) tmp_buffer[strlen(tmp_buffer) - 1] = '\0';
     // Measure text (split into lines if needed)
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp_buffer, g->font_size, g->line_spacing);
+    const Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp_buffer, font_size, g->line_spacing);
     // Calculate box position
     // we want the box to be in the top left corner of the screen
     //const Rectangle box = {.x = x, .y = y, .width = text_size.x + g->pad * 2, .height = text_size.y + g->pad * 2};
@@ -1113,7 +1121,7 @@ static void draw_message_history(gamestate* const g) {
     const float text_x = box.x + (box.width - text_size.x) / 2;
     const float text_y = box.y + (box.height - text_size.y) / 2;
     //DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){box.x + g->pad, box.y + g->pad}, g->font_size, g->line_spacing, WHITE);
-    DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){text_x, text_y}, g->font_size, g->line_spacing, WHITE);
+    DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, WHITE);
 }
 
 static void draw_inventory_menu(gamestate* const g) {
