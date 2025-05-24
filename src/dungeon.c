@@ -49,6 +49,187 @@ void d_free(dungeon_t* const dungeon) {
     d_destroy(dungeon);
 }
 
+size_t d_serialized_size(const dungeon_t* d) {
+    massert(d, "dungeon is NULL");
+    
+    // Calculate size by exactly matching what's written in d_serialize
+    size_t size = 0;
+    
+    // Basic fields
+    size += sizeof(int) * 3;  // num_floors, capacity_floors, current_floor
+    size += sizeof(bool);     // is_locked
+    
+    // Floors
+    for (int i = 0; i < d->num_floors; i++) {
+        size += sizeof(size_t);  // Size of the serialized floor
+        size += df_serialized_size(d->floors[i]);
+    }
+    
+    return size;
+}
+
+size_t d_serialize(const dungeon_t* d, char* buffer, size_t buffer_size) {
+    massert(d, "dungeon is NULL");
+    massert(buffer, "buffer is NULL");
+
+    size_t required_size = d_serialized_size(d);
+    if (buffer_size < required_size) {
+        merror("Buffer too small for dungeon serialization: %zu < %zu", buffer_size, required_size);
+        return 0;
+    }
+
+    char* ptr = buffer;
+
+    // Serialize basic fields
+    memcpy(ptr, &d->num_floors, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, &d->capacity_floors, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, &d->current_floor, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, &d->is_locked, sizeof(bool));
+    ptr += sizeof(bool);
+    
+    // Serialize each floor
+    for (int i = 0; i < d->num_floors; i++) {
+        // First write the size of the serialized floor
+        size_t floor_size = df_serialized_size(d->floors[i]);
+        memcpy(ptr, &floor_size, sizeof(size_t));
+        ptr += sizeof(size_t);
+        
+        // Then serialize the floor
+        size_t written = df_serialize(d->floors[i], ptr, floor_size);
+        if (written == 0) {
+            merror("Failed to serialize floor %d", i);
+            return 0;
+        }
+        ptr += written;
+    }
+
+    return ptr - buffer;
+}
+
+bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size) {
+    massert(d, "dungeon is NULL");
+    massert(buffer, "buffer is NULL");
+
+    // Initialize the dungeon with default values
+    d->floors = NULL;
+    d->num_floors = 0;
+    d->capacity_floors = 0;
+    d->current_floor = 0;
+    d->is_locked = false;
+
+    const char* ptr = buffer;
+    size_t remaining = buffer_size;
+
+    // Deserialize basic fields
+    if (remaining < sizeof(int) * 3 + sizeof(bool)) {
+        merror("Buffer too small for dungeon basic fields");
+        return false;
+    }
+    
+    memcpy(&d->num_floors, ptr, sizeof(int));
+    ptr += sizeof(int);
+    remaining -= sizeof(int);
+    
+    memcpy(&d->capacity_floors, ptr, sizeof(int));
+    ptr += sizeof(int);
+    remaining -= sizeof(int);
+    
+    memcpy(&d->current_floor, ptr, sizeof(int));
+    ptr += sizeof(int);
+    remaining -= sizeof(int);
+    
+    memcpy(&d->is_locked, ptr, sizeof(bool));
+    ptr += sizeof(bool);
+    remaining -= sizeof(bool);
+    
+    // Validate fields
+    if (d->num_floors < 0 || d->capacity_floors < d->num_floors || 
+        (d->num_floors > 0 && (d->current_floor < 0 || d->current_floor >= d->num_floors))) {
+        merror("Invalid dungeon fields after deserialization");
+        return false;
+    }
+    
+    // Allocate memory for floors
+    d->floors = malloc(d->capacity_floors * sizeof(dungeon_floor_t*));
+    if (!d->floors) {
+        merror("Failed to allocate memory for floors during deserialization");
+        return false;
+    }
+    
+    // Initialize all floor pointers to NULL
+    for (int i = 0; i < d->capacity_floors; i++) {
+        d->floors[i] = NULL;
+    }
+    
+    // Deserialize each floor
+    for (int i = 0; i < d->num_floors; i++) {
+        // First read the size of the serialized floor
+        if (remaining < sizeof(size_t)) {
+            merror("Buffer too small for floor size");
+            d_destroy(d);
+            return false;
+        }
+        
+        size_t floor_size;
+        memcpy(&floor_size, ptr, sizeof(size_t));
+        ptr += sizeof(size_t);
+        remaining -= sizeof(size_t);
+        
+        if (remaining < floor_size) {
+            merror("Buffer too small for floor data");
+            d_destroy(d);
+            return false;
+        }
+        
+        // Create a new floor
+        d->floors[i] = malloc(sizeof(dungeon_floor_t));
+        if (!d->floors[i]) {
+            merror("Failed to allocate memory for floor %d", i);
+            d_destroy(d);
+            return false;
+        }
+        
+        // Deserialize the floor
+        if (!df_deserialize(d->floors[i], ptr, floor_size)) {
+            merror("Failed to deserialize floor %d", i);
+            d_destroy(d);
+            return false;
+        }
+        
+        ptr += floor_size;
+        remaining -= floor_size;
+    }
+
+    return true;
+}
+
+size_t d_memory_size(const dungeon_t* d) {
+    massert(d, "dungeon is NULL");
+    
+    // Calculate the memory size of a dungeon
+    size_t size = 0;
+    
+    // Size of the dungeon_t struct itself
+    size += sizeof(dungeon_t);
+    
+    // Size of floors array
+    if (d->floors) {
+        size += d->capacity_floors * sizeof(dungeon_floor_t*);
+        
+        // Size of each floor
+        for (int i = 0; i < d->num_floors; i++) {
+            if (d->floors[i]) {
+                size += df_memory_size(d->floors[i]);
+            }
+        }
+    }
+    
+    return size;
+}
+
 bool d_add_floor(dungeon_t* const dungeon, int width, int height) {
     if (!dungeon) {
         merror("dungeon is NULL");
