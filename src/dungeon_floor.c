@@ -2050,29 +2050,29 @@ room_data_t* const df_get_rooms_with_prefix(dungeon_floor_t* const df, int* exte
 
 size_t df_serialized_size(const dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
-    
+
     // Calculate size by exactly matching what's written in df_serialize
     size_t size = 0;
-    
+
     // Basic fields
-    size += sizeof(int) * 2;  // width and height
+    size += sizeof(int) * 2; // width and height
     size += sizeof(loc_t) * 2; // upstairs_loc and downstairs_loc
-    
+
     // Room data
-    size += sizeof(int) * 2;  // room_count and room_capacity
+    size += sizeof(int) * 2; // room_count and room_capacity
     size += df->room_count * sizeof(room_data_t); // rooms array
-    
+
     // Events and plates
     size += sizeof(df_event_t) * DEFAULT_DF_EVENTS;
     size += sizeof(bool) * DEFAULT_DF_PLATES;
-    
+
     // Tiles
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             size += tile_serialized_size(&df->tiles[y][x]);
         }
     }
-    
+
     return size;
 }
 
@@ -2093,33 +2093,33 @@ size_t df_serialize(const dungeon_floor_t* df, char* buffer, size_t buffer_size)
     ptr += sizeof(int);
     memcpy(ptr, &df->height, sizeof(int));
     ptr += sizeof(int);
-    
+
     // Serialize locations
     memcpy(ptr, &df->upstairs_loc, sizeof(loc_t));
     ptr += sizeof(loc_t);
     memcpy(ptr, &df->downstairs_loc, sizeof(loc_t));
     ptr += sizeof(loc_t);
-    
+
     // Serialize room data
     memcpy(ptr, &df->room_count, sizeof(int));
     ptr += sizeof(int);
     memcpy(ptr, &df->room_capacity, sizeof(int));
     ptr += sizeof(int);
-    
+
     // Serialize rooms array if it exists
     if (df->room_count > 0 && df->rooms) {
         memcpy(ptr, df->rooms, df->room_count * sizeof(room_data_t));
     }
     ptr += df->room_count * sizeof(room_data_t);
-    
+
     // Serialize events
     memcpy(ptr, df->events, sizeof(df_event_t) * DEFAULT_DF_EVENTS);
     ptr += sizeof(df_event_t) * DEFAULT_DF_EVENTS;
-    
+
     // Serialize plates
     memcpy(ptr, df->plates, sizeof(bool) * DEFAULT_DF_PLATES);
     ptr += sizeof(bool) * DEFAULT_DF_PLATES;
-    
+
     // Serialize tiles
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
@@ -2156,54 +2156,56 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
     ptr += sizeof(int);
     memcpy(&df->height, ptr, sizeof(int));
     ptr += sizeof(int);
-    
+
     // Deserialize locations
     memcpy(&df->upstairs_loc, ptr, sizeof(loc_t));
     ptr += sizeof(loc_t);
     memcpy(&df->downstairs_loc, ptr, sizeof(loc_t));
     ptr += sizeof(loc_t);
-    
+
     // Deserialize room data
     int room_count, room_capacity;
     memcpy(&room_count, ptr, sizeof(int));
     ptr += sizeof(int);
     memcpy(&room_capacity, ptr, sizeof(int));
     ptr += sizeof(int);
-    
+
     // Allocate and deserialize rooms array
     df->rooms = malloc(room_capacity * sizeof(room_data_t));
     if (!df->rooms) {
         merror("Failed to allocate memory for rooms during deserialization");
         return false;
     }
-    
+
     if (room_count > 0) {
         memcpy(df->rooms, ptr, room_count * sizeof(room_data_t));
     }
     df->room_count = room_count;
     df->room_capacity = room_capacity;
     ptr += room_count * sizeof(room_data_t);
-    
+
     // Deserialize events
     memcpy(df->events, ptr, sizeof(df_event_t) * DEFAULT_DF_EVENTS);
     ptr += sizeof(df_event_t) * DEFAULT_DF_EVENTS;
-    
+
     // Deserialize plates
     memcpy(df->plates, ptr, sizeof(bool) * DEFAULT_DF_PLATES);
     ptr += sizeof(bool) * DEFAULT_DF_PLATES;
-    
+
     // Allocate memory for tiles
     if (!df_malloc_tiles(df)) {
         merror("Failed to allocate memory for tiles during deserialization");
+        printf("Failed to allocate memory for tiles during deserialization");
         return false;
     }
-    
+
     // Deserialize tiles
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             size_t tile_size = tile_serialized_size(&df->tiles[y][x]);
             if (!tile_deserialize(&df->tiles[y][x], ptr, tile_size)) {
                 merror("Failed to deserialize tile at %d,%d", x, y);
+                printf("Failed to deserialize tile at %d,%d", x, y);
                 return false;
             }
             ptr += tile_size;
