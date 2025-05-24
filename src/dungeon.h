@@ -16,6 +16,14 @@ dungeon_t* d_create();
 void d_destroy(dungeon_t* dungeon);
 void d_free(dungeon_t* dungeon);
 
+// Serialization functions
+size_t d_serialized_size(const dungeon_t* d);
+size_t d_serialize(const dungeon_t* d, char* buffer, size_t buffer_size);
+bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size);
+
+// Memory size calculation
+size_t d_memory_size(const dungeon_t* d);
+
 static inline dungeon_floor_t* d_get_floor(dungeon_t* const dungeon, int index) {
     massert(dungeon, "dungeon is NULL");
     massert(index >= 0, "index is negative");
