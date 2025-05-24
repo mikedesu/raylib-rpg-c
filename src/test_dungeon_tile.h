@@ -297,6 +297,30 @@ void test_dungeon_tiles(void) {
     run_test_tile_entity_management();
     run_test_tile_visibility_and_exploration();
     run_test_tile_features_and_resizing();
+    
+    // Add a simple standalone test for tile serialization
+    printf("\n--- Running standalone tile serialization test ---\n");
+    tile_t* test_tile = tile_create(TILE_FLOOR_STONE_00);
+    size_t size = tile_serialized_size(test_tile);
+    char* buffer = malloc(size);
+    if (buffer) {
+        size_t written = tile_serialize(test_tile, buffer, size);
+        printf("Tile serialized: %zu bytes\n", written);
+        
+        tile_t* copy_tile = tile_create(TILE_NONE);
+        bool success = tile_deserialize(copy_tile, buffer, size);
+        printf("Tile deserialization %s\n", success ? "succeeded" : "failed");
+        
+        if (success) {
+            printf("Original type: %d, Copy type: %d\n", test_tile->type, copy_tile->type);
+        }
+        
+        free(buffer);
+        tile_free(copy_tile);
+    }
+    tile_free(test_tile);
+    printf("--- Standalone tile serialization test complete ---\n");
+    
     run_test_tile_serialization();
     run_test_tile_serialization_edge_cases();
 }

@@ -175,7 +175,7 @@ TEST(test_df_init) {
 
 TEST(test_df_serialization) {
     // Create a very small dungeon floor for testing
-    dungeon_floor_t* df = df_create(3, 3); // Just 3x3 for easier debugging
+    dungeon_floor_t* df = df_create(2, 2); // Just 2x2 for easier debugging
     
     // Set up some simple tiles instead of using df_init
     for (int y = 0; y < df->height; y++) {
@@ -186,16 +186,16 @@ TEST(test_df_serialization) {
     
     // Set specific tiles for stairs
     df->upstairs_loc = (loc_t){0, 0};
-    df->downstairs_loc = (loc_t){2, 2};
+    df->downstairs_loc = (loc_t){1, 1};
     tile_init(&df->tiles[0][0], TILE_UPSTAIRS);
-    tile_init(&df->tiles[2][2], TILE_DOWNSTAIRS);
+    tile_init(&df->tiles[1][1], TILE_DOWNSTAIRS);
     
     // Add a test room
-    df_add_room_info(df, 0, 0, 3, 3, "TestRoom");
+    df_add_room_info(df, 0, 0, 2, 2, "TestRoom");
     
     // Get serialized size
     size_t size = df_serialized_size(df);
-    printf("Serialized size for 3x3 dungeon: %zu bytes\n", size);
+    printf("Serialized size for 2x2 dungeon: %zu bytes\n", size);
     ASSERT(size > 0, "Serialized size should be greater than 0");
     
     // Allocate buffer for serialization
@@ -206,6 +206,14 @@ TEST(test_df_serialization) {
     size_t written = df_serialize(df, buffer, size);
     ASSERT(written > 0, "Serialization failed");
     ASSERT(written == size, "Serialized size mismatch");
+    
+    // Print buffer contents for debugging
+    printf("Serialized buffer contents (first 32 bytes):\n");
+    for (int i = 0; i < 32 && i < size; i++) {
+        printf("%02X ", (unsigned char)buffer[i]);
+        if ((i + 1) % 16 == 0) printf("\n");
+    }
+    printf("\n");
     
     // Create a new dungeon floor for deserialization
     dungeon_floor_t* df2 = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));

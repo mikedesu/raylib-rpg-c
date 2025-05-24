@@ -2202,7 +2202,19 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
     // Deserialize tiles
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
+            // Initialize the tile with default values first
+            tile_init(&df->tiles[y][x], TILE_NONE);
+            
             size_t tile_size = tile_serialized_size(&df->tiles[y][x]);
+            printf("Deserializing tile at %d,%d with size %zu\n", x, y, tile_size);
+            
+            // Debug: Print first few bytes of the buffer
+            printf("Buffer data: ");
+            for (int i = 0; i < 8 && i < tile_size; i++) {
+                printf("%02X ", (unsigned char)ptr[i]);
+            }
+            printf("\n");
+            
             if (!tile_deserialize(&df->tiles[y][x], ptr, tile_size)) {
                 merror("Failed to deserialize tile at %d,%d", x, y);
                 printf("Failed to deserialize tile at %d,%d\n", x, y);
