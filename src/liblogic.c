@@ -1,4 +1,5 @@
 //#include "component.h"
+#include "bonus_table.h"
 #include "controlmode.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
@@ -19,6 +20,7 @@
 #include "path_node.h"
 #include "potion.h"
 #include "race.h"
+#include "roll.h"
 #include "shield.h"
 #include <assert.h>
 #include <math.h>
@@ -452,15 +454,11 @@ static inline void handle_attack_success_gamestate_flag(gamestate* const g, enti
     }
 }
 
-//static void handle_attack_success(gamestate* const g, entity* attacker, entity* target, bool* attack_successful) {
 static void handle_attack_success(gamestate* const g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
     massert(g, "gamestate is NULL");
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
     massert(atk_successful, "attack_successful is NULL");
-
-    //*atk_successful = true;
-    //*atk_successful = rand() % 2 == 0;
 
     entitytype_t tgttype = g_get_type(g, tgt_id);
     entitytype_t atktype = g_get_type(g, atk_id);
@@ -590,7 +588,10 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
 
     // get the armor class of the target
     const int base_ac = g_get_stat(g, target_id, STATS_AC);
-    const int attack_roll = rand() % 20 + 1;
+    const int base_str = g_get_stat(g, attacker_id, STATS_STR);
+    const int str_bonus = bonus_calc(base_str);
+    const int attack_roll = rand() % 20 + 1 + str_bonus; // 1d20 + str bonus
+        //
     *attack_successful = false;
     if (attack_roll >= base_ac) {
         return handle_shield_check(g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
@@ -1125,8 +1126,22 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
     massert(id != ENTITYID_INVALID, "failed to create player");
     gamestate_set_hero_id(g, id);
     g_set_type(g, id, ENTITY_PLAYER);
-    g_set_stat(g, id, STATS_MAXHP, 3);
-    g_set_stat(g, id, STATS_HP, 3);
+
+    //int str_roll = do_roll_best_of_3((roll){3, 6, 0});
+    //int con_roll = do_roll_best_of_3((roll){3, 6, 0});
+    int str_roll = do_roll((roll){3, 6, 0});
+    int con_roll = do_roll((roll){3, 6, 0});
+    g_set_stat(g, id, STATS_STR, str_roll);
+    g_set_stat(g, id, STATS_CON, con_roll);
+
+    int maxhp_roll = do_roll((roll){1, 8, 0}) + bonus_calc(con_roll);
+    while (maxhp_roll < 1) {
+        maxhp_roll = do_roll((roll){1, 8, 0}) + bonus_calc(con_roll);
+    }
+
+    g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
+    g_set_stat(g, id, STATS_HP, maxhp_roll);
+
     return id;
 }
 
@@ -1516,7 +1531,11 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
     if (g->msg_system.is_active) {
         if (inputstate_is_pressed(is, KEY_I) || inputstate_is_pressed(is, KEY_U) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_A) ||
             inputstate_is_pressed(is, KEY_SPACE) || inputstate_is_pressed(is, KEY_COMMA) || inputstate_is_pressed(is, KEY_PERIOD) ||
-            inputstate_is_pressed(is, KEY_SLASH) || inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_X)) {
+            inputstate_is_pressed(is, KEY_SLASH) || inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_X) ||
+            inputstate_is_pressed(is, KEY_KP_0) || inputstate_is_pressed(is, KEY_KP_1) || inputstate_is_pressed(is, KEY_KP_2) ||
+            inputstate_is_pressed(is, KEY_KP_3) || inputstate_is_pressed(is, KEY_KP_4) || inputstate_is_pressed(is, KEY_KP_5) ||
+            inputstate_is_pressed(is, KEY_KP_6) || inputstate_is_pressed(is, KEY_KP_7) || inputstate_is_pressed(is, KEY_KP_8) ||
+            inputstate_is_pressed(is, KEY_KP_9) || inputstate_is_pressed(is, KEY_KP_ENTER)) {
             g->msg_system.index++;
             if (g->msg_system.index >= g->msg_system.count) {
                 // Reset when all messages read

@@ -1033,12 +1033,16 @@ static void draw_hud(gamestate* const g) {
     const int maxhp = stats[STATS_MAXHP];
     const int level = stats[STATS_LEVEL];
     const int xp = stats[STATS_XP];
+    const int str = stats[STATS_STR];
+    const int con = stats[STATS_CON];
     const int ac = get_total_ac(g, g->hero_id);
     loc_t loc = g_get_location(g, g->hero_id);
     dungeon_floor_t* const df = d_get_current_floor(g->d);
     const char* room_name = df_get_room_name(df, loc);
     char buffer[1024] = {0};
-    snprintf(buffer, sizeof(buffer), "%s Lvl %d HP %d/%d AC: %d XP %d Room: %s Turn %d", g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, room_name, turn);
+    const char* format_str = "%s Lvl %d HP %d/%d AC: %d XP %d STR: %d CON: %d Room: %s Turn %d";
+    //snprintf(buffer, sizeof(buffer), "%s Lvl %d HP %d/%d AC: %d XP %d Room: %s Turn %d", g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, room_name, turn);
+    snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, str, con, room_name, turn);
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, g->font_size, g->line_spacing);
     const int box_w = text_size.x + g->pad;
     const int box_h = text_size.y + g->pad;
