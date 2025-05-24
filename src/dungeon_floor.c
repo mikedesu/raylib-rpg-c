@@ -2204,17 +2204,17 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
         for (int x = 0; x < df->width; x++) {
             // Initialize the tile with default values first
             tile_init(&df->tiles[y][x], TILE_NONE);
-            
+
             size_t tile_size = tile_serialized_size(&df->tiles[y][x]);
-            printf("Deserializing tile at %d,%d with size %zu\n", x, y, tile_size);
-            
+            //printf("Deserializing tile at %d,%d with size %zu\n", x, y, tile_size);
+
             // Debug: Print first few bytes of the buffer
-            printf("Buffer data: ");
-            for (int i = 0; i < 8 && i < tile_size; i++) {
-                printf("%02X ", (unsigned char)ptr[i]);
-            }
-            printf("\n");
-            
+            //printf("Buffer data: ");
+            //for (int i = 0; i < 8 && i < tile_size; i++) {
+            //    printf("%02X ", (unsigned char)ptr[i]);
+            //}
+            //printf("\n");
+
             if (!tile_deserialize(&df->tiles[y][x], ptr, tile_size)) {
                 merror("Failed to deserialize tile at %d,%d", x, y);
                 printf("Failed to deserialize tile at %d,%d\n", x, y);
@@ -2229,29 +2229,29 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
 
 size_t df_memory_size(const dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
-    
+
     // Calculate the memory size of a dungeon floor
     size_t size = 0;
-    
+
     // Size of the dungeon_floor_t struct itself
     size += sizeof(dungeon_floor_t);
-    
+
     // Size of rooms array
     if (df->rooms) {
         size += df->room_capacity * sizeof(room_data_t);
     }
-    
+
     // Size of tiles array and all tiles
     if (df->tiles) {
         // Size of the tile pointers array
         size += df->height * sizeof(tile_t*);
-        
+
         // Size of each row of tiles
         for (int y = 0; y < df->height; y++) {
             if (df->tiles[y]) {
                 // Size of the row itself
                 size += df->width * sizeof(tile_t);
-                
+
                 // Size of each tile's dynamic memory
                 for (int x = 0; x < df->width; x++) {
                     // Subtract the size of the tile_t struct since we already counted it
@@ -2260,6 +2260,6 @@ size_t df_memory_size(const dungeon_floor_t* df) {
             }
         }
     }
-    
+
     return size;
 }
