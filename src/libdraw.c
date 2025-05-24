@@ -672,8 +672,15 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
     int x = loc.x + get_x_from_dir(dir);
     int y = loc.y + get_y_from_dir(dir);
     int ds = DEFAULT_TILE_SIZE;
+
     Color base_c = GREEN;
+
     float a = 0.25f;
+
+    if (g->player_changing_direction) {
+        a = 1.0f;
+    }
+
     Color c = Fade(base_c, a);
     DrawRectangleLinesEx((Rectangle){x * ds, y * ds, ds, ds}, 1, c);
     return true;

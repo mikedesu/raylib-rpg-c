@@ -22,6 +22,7 @@
 #include "race.h"
 #include "roll.h"
 #include "shield.h"
+#include "stats_slot.h"
 #include <assert.h>
 #include <math.h>
 #include <raylib.h>
@@ -2050,7 +2051,14 @@ static void try_spawn_npc(gamestate* const g) {
                 if (id != ENTITYID_INVALID) {
                     int hit_die = get_hitdie_for_race(race);
                     roll r = {1, hit_die, 0};
-                    const int max_hp = do_roll(r);
+                    int max_hp = do_roll(r);
+                    g_set_stat(g, id, STATS_AC, 10);
+                    g_set_stat(g, id, STATS_XP, 0);
+                    g_set_stat(g, id, STATS_LEVEL, 1);
+                    g_set_stat(g, id, STATS_STR, do_roll((roll){3, 6, 0}));
+                    g_set_stat(g, id, STATS_DEX, do_roll((roll){3, 6, 0}));
+                    g_set_stat(g, id, STATS_CON, do_roll((roll){3, 6, 0}));
+                    max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
                     g_set_stat(g, id, STATS_MAXHP, max_hp);
                     g_set_stat(g, id, STATS_HP, max_hp);
                     g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
