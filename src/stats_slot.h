@@ -8,7 +8,7 @@ typedef enum stats_slot_t
     STATS_HP,
     STATS_MAXHP,
     STATS_AC,
-    //STATS_STR,
+    STATS_STR,
     //STATS_DEX,
     //STATS_CON,
     //STATS_INT,
@@ -17,4 +17,4 @@ typedef enum stats_slot_t
     STATS_COUNT
 } stats_slot;
 
-#define MAX_STATS_SLOTS 6
+#define MAX_STATS_SLOTS STATS_COUNT

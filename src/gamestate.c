@@ -797,11 +797,10 @@ bool g_has_dead(const gamestate* const g, entityid id) {
 bool g_add_dead(gamestate* const g, entityid id, bool dead) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    
+
     // Add dead component
-    bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(dead_component), 
-                                (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
-    
+    bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(dead_component), (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
+
     // If entity died and has a location, mark its tile as dirty
     if (dead && g_has_location(g, id)) {
         loc_t loc = g_get_location(g, id);
@@ -813,7 +812,7 @@ bool g_add_dead(gamestate* const g, entityid id, bool dead) {
             }
         }
     }
-    
+
     return result;
 }
 
@@ -1462,8 +1461,6 @@ dungeon_t* g_get_dungeon(gamestate* const g) {
 bool g_add_stats(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    // make sure the entity has the stats component
-    //massert(g_has_component(g, id, C_STATS), "id %d does not have a stats component", id);
     return g_add_component(g, id, C_STATS, (void*)NULL, sizeof(stats_component), (void**)&g->stats_list, &g->stats_list_count, &g->stats_list_capacity);
 }
 
@@ -1528,8 +1525,6 @@ int g_get_stat(const gamestate* const g, entityid id, stats_slot stats_slot) {
 bool g_add_itemtype(gamestate* const g, entityid id, itemtype type) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    // make sure the entity has the itemtype component
-    //massert(g_has_component(g, id, C_ITEMTYPE), "id %d does not have an itemtype component", id);
     return g_add_component(
         g, id, C_ITEMTYPE, (void*)&type, sizeof(itemtype_component), (void**)&g->itemtype_list, &g->itemtype_list_count, &g->itemtype_list_capacity);
 }
