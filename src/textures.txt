@@ -28,24 +28,24 @@
 # atm there are 14 total orc sprite animations
 #
 #
-13 4 16 0  img/characters/orc_idle.png
-14 4 16 0  img/characters/shadows/orc_idle_shadow.png
-15 4 4  0  img/characters/orc_walk.png
-16 4 4  0  img/characters/shadows/orc_walk_shadow.png
-17 4 4  0  img/characters/orc_attack_slash.png
-18 4 4  0  img/characters/shadows/orc_attack_slash_shadow.png
-19 4 6  0  img/characters/orc_chargedattack.png
-20 4 6  0  img/characters/shadows/orc_chargedattack_shadow.png
-21 4 4  0  img/characters/orc_jump.png
-22 4 4  0  img/characters/shadows/orc_jump_shadow.png
-23 1 7 0  img/characters/orc_die2.png
-24 1 7 0  img/characters/shadows/orc_die2_shadow.png
-25 4 4  0  img/characters/orc_dmg.png
-26 4 4  0  img/characters/shadows/orc_dmg_shadow.png
-213 4 4  0  img/characters/orc_guard.png
-214 4 4  0  img/characters/shadows/orc_guard_shadow.png
-215 4 3  0  img/characters/orc_guard_success.png
-216 4 3  0  img/characters/shadows/orc_guard_success_shadow.png
+13  4 16 0  img/characters/orc/orc_idle.png
+14  4 16 0  img/characters/orc/shadows/orc_idle_shadow.png
+15  4 4  0  img/characters/orc/orc_walk.png
+16  4 4  0  img/characters/orc/shadows/orc_walk_shadow.png
+17  4 4  0  img/characters/orc/orc_attack_slash.png
+18  4 4  0  img/characters/orc/shadows/orc_attack_slash_shadow.png
+19  4 6  0  img/characters/orc/orc_chargedattack.png
+20  4 6  0  img/characters/orc/shadows/orc_chargedattack_shadow.png
+21  4 4  0  img/characters/orc/orc_jump.png
+22  4 4  0  img/characters/orc/shadows/orc_jump_shadow.png
+23  1 7  0  img/characters/orc/orc_die2.png
+24  1 7  0  img/characters/orc/shadows/orc_die2_shadow.png
+25  4 4  0  img/characters/orc/orc_dmg.png
+26  4 4  0  img/characters/orc/shadows/orc_dmg_shadow.png
+213 4 4  0  img/characters/orc/orc_guard.png
+214 4 4  0  img/characters/orc/shadows/orc_guard_shadow.png
+215 4 3  0  img/characters/orc/orc_guard_success.png
+216 4 3  0  img/characters/orc/shadows/orc_guard_success_shadow.png
 #
 #
 #

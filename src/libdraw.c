@@ -695,7 +695,7 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     //EndShaderMode();
     if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
     if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
-    if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
+    //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     //msuccess("libdraw_drawframe_2d: done");
     EndMode2D();
 }
@@ -1050,11 +1050,13 @@ static void draw_hud(gamestate* const g) {
     const int ac = get_total_ac(g, g->hero_id);
     loc_t loc = g_get_location(g, g->hero_id);
     dungeon_floor_t* const df = d_get_current_floor(g->d);
-    const char* room_name = df_get_room_name(df, loc);
+    int floor = g->d->current_floor;
+
+    //const char* room_name = df_get_room_name(df, loc);
     char buffer[1024] = {0};
-    const char* format_str = "%s Lvl %d HP %d/%d AC: %d XP %d STR: %d CON: %d DEX: %d Room: %s Turn %d";
+    const char* format_str = "%s Lvl %d HP %d/%d AC: %d XP %d STR: %d CON: %d DEX: %d Floor: %d Turn %d";
     //snprintf(buffer, sizeof(buffer), "%s Lvl %d HP %d/%d AC: %d XP %d Room: %s Turn %d", g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, room_name, turn);
-    snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, str, con, dex, room_name, turn);
+    snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, str, con, dex, floor, turn);
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, g->font_size, g->line_spacing);
     const int box_w = text_size.x + g->pad;
     const int box_h = text_size.y + g->pad;
@@ -1090,6 +1092,15 @@ void libdraw_init(gamestate* const g) {
     load_shaders();
     g->cam2d.offset = (Vector2){x, y};
     gamestate_set_debug_panel_pos_top_right(g);
+
+    // set the camera target to the center of the dungeon
+    dungeon_floor_t* const df = d_get_current_floor(g->d);
+    massert(df, "dungeon_floor is NULL");
+    int df_w = df->width;
+    int df_h = df->height;
+    g->cam2d.target = (Vector2){df_w * DEFAULT_TILE_SIZE / 2.0f, df_h * DEFAULT_TILE_SIZE / 2.0f};
+
+    //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
 }
 
 static void draw_message_history(gamestate* const g) {

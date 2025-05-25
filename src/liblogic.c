@@ -489,15 +489,15 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
         g_set_stat(g, tgt_id, STATS_HP, hp);
 
         if (tgttype == ENTITY_PLAYER) {
-            add_message_and_history(g, "%s attacked you for %d damage!", g_get_name(g, atk_id), dmg);
+            add_message_history(g, "%s attacked you for %d damage!", g_get_name(g, atk_id), dmg);
         } else if (tgttype == ENTITY_NPC) {
-            add_message_and_history(g, "%s attacked %s for %d damage!", g_get_name(g, atk_id), g_get_name(g, tgt_id), dmg);
+            add_message_history(g, "%s attacked %s for %d damage!", g_get_name(g, atk_id), g_get_name(g, tgt_id), dmg);
         }
 
         if (hp <= 0) {
             g_update_dead(g, tgt_id, true);
             if (tgttype == ENTITY_NPC) {
-                add_message_and_history(g, "%s killed %s!", g_get_name(g, atk_id), g_get_name(g, tgt_id));
+                add_message_history(g, "%s killed %s!", g_get_name(g, atk_id), g_get_name(g, tgt_id));
                 // increment attacker's xp
                 //int xp = g_get_stat(g, atk_id, STATS_XP);
                 g_set_stat(g, atk_id, STATS_XP, g_get_stat(g, atk_id, STATS_XP) + 1);
@@ -518,9 +518,9 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
     } else {
         // handle attack miss
         if (tgttype == ENTITY_PLAYER) {
-            add_message_and_history(g, "%s's attack missed!", g_get_name(g, atk_id));
+            add_message_history(g, "%s's attack missed!", g_get_name(g, atk_id));
         } else if (tgttype == ENTITY_NPC) {
-            add_message_and_history(g, "%s missed %s!", g_get_name(g, atk_id), g_get_name(g, tgt_id));
+            add_message_history(g, "%s missed %s!", g_get_name(g, atk_id), g_get_name(g, tgt_id));
         }
     }
 
@@ -545,7 +545,7 @@ static void handle_attack_blocked(gamestate* const g, entityid attacker_id, enti
     entitytype_t tgttype = g_get_type(g, target_id);
     //if (tgttype == ENTITY_PLAYER) {
     //} else if (tgttype == ENTITY_NPC) {
-    add_message_and_history(g, "%s blocked %s's attack!", g_get_name(g, target_id), g_get_name(g, attacker_id));
+    add_message_history(g, "%s blocked %s's attack!", g_get_name(g, target_id), g_get_name(g, attacker_id));
     //}
 
     //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
@@ -949,11 +949,11 @@ static void init_dungeon(gamestate* const g) {
     massert(g, "gamestate is NULL");
     g->d = d_create();
     massert(g->d, "failed to init dungeon");
-    d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+
+    const int df_count = 20;
+    for (int i = 0; i < df_count; i++) {
+        d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    }
 }
 
 static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char* name) {
@@ -1350,12 +1350,12 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                 if (equipped_item != ENTITYID_INVALID) {
                     // unequip the currently equipped item
                     g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
-                    add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                     //add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
 
                 } else {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
-                    add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                     //add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                 }
             } else if (item_type == ITEM_SHIELD) {
@@ -1364,11 +1364,11 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                 if (equipped_item != ENTITYID_INVALID) {
                     // unequip the currently equipped item
                     g_unset_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
-                    add_message_and_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                     //add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                 } else {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
-                    add_message_and_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                     //add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                 }
             }
@@ -1397,8 +1397,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                         }
 
                         g_set_stat(g, g->hero_id, STATS_HP, hp);
-                        add_message_and_history(
-                            g, "%s drank a %s and recovered %d HP", g_get_name(g, g->hero_id), g_get_name(g, item_id), small_hp_health_roll);
+                        add_message_history(g, "%s drank a %s and recovered %d HP", g_get_name(g, g->hero_id), g_get_name(g, item_id), small_hp_health_roll);
                         // remove the potion from the inventory
                         g_remove_from_inventory(g, g->hero_id, item_id);
                         // add the potion to the tile where the player is located at
@@ -1455,7 +1454,7 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         entitytype_t type = g_get_type(g, itemid);
         minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
-            add_message_and_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
+            add_message_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
             //add_message_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
             tile_remove(tile, itemid);
             g_add_to_inventory(g, id, itemid);
@@ -1924,10 +1923,9 @@ void liblogic_init(gamestate* const g) {
     //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
     //init_npcs_test_by_room(g);
     //init_npc_test(g);
-
-    init_sword_test(g);
+    //init_sword_test(g);
     init_dagger_test(g);
-    init_axe_test(g);
+    //init_axe_test(g);
     //init_bow_test(g);
     init_shield_test(g);
     //init_potion_test(g);
@@ -1967,7 +1965,7 @@ static void init_dagger_test(gamestate* g) {
     entityid id = ENTITYID_INVALID;
     while (id == ENTITYID_INVALID) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
-        id = weapon_create(g, WEAPON_DAGGER, loc, "dummy dagger");
+        id = weapon_create(g, WEAPON_DAGGER, loc, "dagger");
         //if (id != ENTITYID_INVALID) {
         //massert(g_set_damage(g, id, (roll){1, 4, 0}), "Failed to set damage");
         g_set_damage(g, id, (roll){1, 4, 0});
@@ -2088,7 +2086,7 @@ static void update_player_state(gamestate* const g) {
         //if (e->dead) {
         //minfo("calling g_is_dead 0");
         if (g_is_dead(g, g->hero_id)) {
-            add_message_and_history(g, "You died!");
+            add_message_history(g, "You died!");
             g->gameover = true;
         }
         return;
