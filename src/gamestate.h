@@ -75,6 +75,7 @@ typedef struct gamestate {
     int damage_list_count, damage_list_capacity;
     int ac_list_count, ac_list_capacity;
     int zapping_list_count, zapping_list_capacity;
+    int spell_effect_list_count, spell_effect_list_capacity;
 
     debugpanel_t debugpanel;
 
@@ -127,6 +128,7 @@ typedef struct gamestate {
     potiontype_component* potion_type_list;
     damage_component* damage_list;
     ac_component* ac_list;
+    spell_effect_component* spell_effect_list;
 
 } gamestate;
 
@@ -299,3 +301,13 @@ bool g_has_attacking(const gamestate* const g, entityid id);
 bool g_add_attacking(gamestate* const g, entityid id, bool attacking);
 bool g_set_attacking(gamestate* const g, entityid id, bool attacking);
 bool g_get_attacking(const gamestate* const g, entityid id);
+
+bool g_has_zapping(const gamestate* const g, entityid id);
+bool g_add_zapping(gamestate* const g, entityid id, bool zapping);
+bool g_set_zapping(gamestate* const g, entityid id, bool zapping);
+bool g_get_zapping(const gamestate* const g, entityid id);
+
+bool g_add_spell_effect(gamestate* const g, entityid id, spell_effect effect);
+bool g_has_spell_effect(const gamestate* const g, entityid id);
+bool g_set_spell_effect(gamestate* const g, entityid id, spell_effect effect);
+spell_effect g_get_spell_effect(const gamestate* const g, entityid id);

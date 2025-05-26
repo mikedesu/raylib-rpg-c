@@ -409,3 +409,16 @@ void init_zapping_component(zapping_component* comp, entityid id, bool zapping) 
     comp->id = id;
     comp->zapping = zapping;
 }
+
+void init_spell_effect_component(spell_effect_component* comp, entityid id, spell_effect effect) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) {
+        return;
+    }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        return;
+    }
+    comp->id = id;
+    comp->effect = effect;
+}

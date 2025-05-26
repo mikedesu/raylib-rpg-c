@@ -5,6 +5,7 @@
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
+#include "elemental.h"
 #include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
@@ -1139,6 +1140,8 @@ static entityid wand_create(gamestate* const g, loc_t loc, const char* name) {
         return ENTITYID_INVALID;
     }
     //g_add_potiontype(g, id, type);
+    spell_effect effect = {0, ELEMENTAL_FIRE, 1, {1, 6, 0}};
+    g_add_spell_effect(g, id, effect);
     msuccess("wand created!");
     return id;
 }

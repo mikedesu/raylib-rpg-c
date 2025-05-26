@@ -31,6 +31,7 @@
 #include "race_component.h"
 #include "shield.h"
 #include "shieldtype_component.h"
+#include "spell_effect_component.h"
 #include "sprite_move_component.h"
 #include "stats_component.h"
 #include "stats_slot.h"
@@ -74,6 +75,7 @@ typedef enum component_t
     C_DAMAGE,
     C_AC,
     C_ZAPPING,
+    C_SPELL_EFFECT,
     C_COUNT
 } component;
 
@@ -105,6 +107,8 @@ static inline const char* component2str(component c) {
     case C_POTIONTYPE: return "C_POTIONTYPE";
     case C_DAMAGE: return "C_DAMAGE";
     case C_AC: return "C_AC";
+    case C_ZAPPING: return "C_ZAPPING";
+    case C_SPELL_EFFECT: return "C_SPELL_EFFECT";
     case C_COUNT: return "C_COUNT";
     default: break;
     }
@@ -138,3 +142,4 @@ void init_quiver_component(quiver_component* comp, entityid id, int capacity);
 void init_damage_component(damage_component* comp, entityid id, roll r);
 void init_ac_component(ac_component* comp, entityid id, int ac);
 void init_zapping_component(zapping_component* comp, entityid id, bool zapping);
+void init_spell_effect_component(spell_effect_component* comp, entityid id, spell_effect effect);

@@ -431,3 +431,8 @@
 337 1  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDie.png
 #
 338 1  4 0  img/wands/basic-wand.png
+#
+339 1 24 0  img/spells/full_fire.png
+340 1  8 0  img/spells/cast_fire.png
+341 1  8 0  img/spells/persist_fire.png
+342 1  8 0  img/spells/end_fire.png

@@ -96,6 +96,7 @@ gamestate* gamestateinitptr() {
     g->shieldtype_list_count = g->potion_type_list_count = 0;
     g->damage_list_count = g->ac_list_count = 0;
     g->zapping_list_count = 0;
+    g->spell_effect_list_count = 0;
 
     const size_t n = LIST_INIT_CAPACITY;
 
@@ -107,6 +108,7 @@ gamestate* gamestateinitptr() {
     g->shieldtype_list_capacity = g->potion_type_list_capacity = n;
     g->damage_list_capacity = g->ac_list_capacity = n;
     g->zapping_list_capacity = n;
+    g->spell_effect_list_capacity = n;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * n);
     massert(g->name_list, "g->name_list is NULL");
@@ -158,9 +160,10 @@ gamestate* gamestateinitptr() {
     massert(g->ac_list, "g->ac_list is NULL");
     g->zapping_list = (zapping_component*)malloc(sizeof(zapping_component) * n);
     massert(g->zapping_list, "g->zapping_list is NULL");
+    g->spell_effect_list = (spell_effect_component*)malloc(sizeof(spell_effect_component) * n);
+    massert(g->spell_effect_list, "g->spell_effect_list is NULL");
 
     g->next_entityid = 0;
-
     g->dirty_entities = false;
     g->new_entityid_begin = g->new_entityid_end = -1;
 
@@ -238,6 +241,8 @@ void gamestatefree(gamestate* g) {
     free(g->potion_type_list);
     free(g->damage_list);
     free(g->ac_list);
+    free(g->zapping_list);
+    free(g->spell_effect_list);
     free(g);
     //msuccess("Freed gamestate");
 }
@@ -500,6 +505,7 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     case C_POTIONTYPE: init_potiontype_component((potiontype_component*)c_ptr, id, *(potiontype*)data); break;
     case C_DAMAGE: init_damage_component((damage_component*)c_ptr, id, *(roll*)data); break;
     case C_AC: init_ac_component((ac_component*)c_ptr, id, *(int*)data); break;
+    case C_SPELL_EFFECT: init_spell_effect_component((spell_effect_component*)c_ptr, id, *(spell_effect*)data); break;
     default: merror("Unsupported component type: %s", component2str(comp)); return false;
     }
 
@@ -1915,4 +1921,55 @@ bool g_get_zapping(const gamestate* const g, entityid id) {
         }
     }
     return false; // not zapping
+}
+
+bool g_add_spell_effect(gamestate* const g, entityid id, spell_effect effect) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the spell effect component
+    return g_add_component(g,
+                           id,
+                           C_SPELL_EFFECT,
+                           (void*)&effect,
+                           sizeof(spell_effect_component),
+                           (void**)&g->spell_effect_list,
+                           &g->spell_effect_list_count,
+                           &g->spell_effect_list_capacity);
+}
+
+bool g_has_spell_effect(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_SPELL_EFFECT);
+}
+
+bool g_set_spell_effect(gamestate* const g, entityid id, spell_effect effect) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->spell_effect_list == NULL) {
+        merror("g->spell_effect_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->spell_effect_list_count; i++) {
+        if (g->spell_effect_list[i].id == id) {
+            g->spell_effect_list[i].effect = effect;
+            return true;
+        }
+    }
+    return false;
+}
+
+spell_effect g_get_spell_effect(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->spell_effect_list == NULL) {
+        merror("g->spell_effect_list is NULL");
+        return (spell_effect){-1, ELEMENTAL_NONE, -1, (roll){0, 0, 0}};
+    }
+    for (int i = 0; i < g->spell_effect_list_count; i++) {
+        if (g->spell_effect_list[i].id == id) {
+            return g->spell_effect_list[i].effect;
+        }
+    }
+    return (spell_effect){-1, ELEMENTAL_NONE, -1, (roll){0, 0, 0}};
 }
