@@ -396,3 +396,16 @@ void init_ac_component(ac_component* comp, entityid id, int ac) {
     comp->id = id;
     comp->ac = ac;
 }
+
+void init_zapping_component(zapping_component* comp, entityid id, bool zapping) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) {
+        return;
+    }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        return;
+    }
+    comp->id = id;
+    comp->zapping = zapping;
+}

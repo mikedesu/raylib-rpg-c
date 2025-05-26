@@ -40,6 +40,7 @@
 #include "update_component.h"
 #include "weapon.h"
 #include "weapontype_component.h"
+#include "zapping_component.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,6 +73,7 @@ typedef enum component_t
     C_POTIONTYPE,
     C_DAMAGE,
     C_AC,
+    C_ZAPPING,
     C_COUNT
 } component;
 
@@ -135,3 +137,4 @@ void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype 
 void init_quiver_component(quiver_component* comp, entityid id, int capacity);
 void init_damage_component(damage_component* comp, entityid id, roll r);
 void init_ac_component(ac_component* comp, entityid id, int ac);
+void init_zapping_component(zapping_component* comp, entityid id, bool zapping);

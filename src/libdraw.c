@@ -52,6 +52,8 @@ Rectangle target_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 Vector2 target_origin = {0, 0};
 Vector2 zero_vec = {0, 0};
 
+Music music;
+
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 static int get_total_ac(gamestate* const g, entityid id);
@@ -291,7 +293,9 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-    massert(sg, "spritegroup is NULL");
+
+    entitytype_t type = g_get_type(g, id);
+    massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));
     // Draw components in correct order
     draw_shadow_for_entity(g, sg, id);
     draw_shield_sprite_back(g, id, sg);
@@ -630,6 +634,7 @@ static void libdraw_handle_dirty_entities(gamestate* const g) {
 
 void libdraw_update_sprites(gamestate* const g) {
     if (g) {
+        UpdateMusicStream(music);
         libdraw_handle_dirty_entities(g);
         for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite(g, id);
         libdraw_handle_gamestate_flag(g);
@@ -793,6 +798,9 @@ static void libdraw_unload_textures() {
 }
 
 void libdraw_close() {
+    UnloadMusicStream(music);
+    CloseAudioDevice();
+
     libdraw_unload_textures();
     libdraw_unload_shaders();
     CloseWindow();
@@ -1008,6 +1016,10 @@ static void create_sg_byid(gamestate* const g, entityid id) {
                 num_keys = TX_POTION_HP_LARGE_COUNT;
             }
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        } else if (item_type == ITEM_WAND) {
+            keys = TX_WAND_BASIC_KEYS;
+            num_keys = TX_WAND_BASIC_COUNT;
+            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         }
     }
 }
@@ -1099,6 +1111,19 @@ void libdraw_init(gamestate* const g) {
     int df_w = df->width;
     int df_h = df->height;
     g->cam2d.target = (Vector2){df_w * DEFAULT_TILE_SIZE / 2.0f, df_h * DEFAULT_TILE_SIZE / 2.0f};
+
+    InitAudioDevice();
+
+    int r = rand() % 5;
+    switch (r) {
+    case 0: music = LoadMusicStream("audio/music/boss-mode.mp3"); break;
+    case 1: music = LoadMusicStream("audio/music/dungeon-crawling.mp3"); break;
+    case 2: music = LoadMusicStream("audio/music/curry-sauce.mp3"); break;
+    case 3: music = LoadMusicStream("audio/music/dungeon-chillin.mp3"); break;
+    case 4: music = LoadMusicStream("audio/music/dungeon-coolin.mp3"); break;
+    default: break;
+    }
+    PlayMusicStream(music);
 
     //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
 }

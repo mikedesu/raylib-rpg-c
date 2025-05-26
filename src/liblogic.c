@@ -51,6 +51,7 @@ static void init_axe_test(gamestate* g);
 static void init_bow_test(gamestate* g);
 static void init_shield_test(gamestate* g);
 static void init_potion_test(gamestate* g);
+static void init_wand_test(gamestate* g);
 static void init_dungeon(gamestate* const g);
 static void update_player_state(gamestate* const g);
 static void update_debug_panel_buffer(gamestate* const g);
@@ -64,6 +65,7 @@ static void add_message(gamestate* g, const char* fmt, ...);
 static void try_entity_move_a_star(gamestate* const g, entityid id);
 static void try_entity_move(gamestate* const g, entityid id, int x, int y);
 static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
+static void try_entity_zap(gamestate* const g, entityid attacker_id, loc_t target_loc);
 
 static const char* get_action_key(const inputstate* const is, gamestate* const g);
 
@@ -74,6 +76,7 @@ static entityid weapon_create(gamestate* const g, weapontype type, loc_t loc, co
 static entityid arrow_create(gamestate* const g, loc_t loc, const char* name);
 static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, const char* name);
 static entityid potion_create(gamestate* const g, loc_t loc, potiontype type, const char* name);
+static entityid wand_create(gamestate* const g, loc_t loc, const char* name);
 
 static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
 static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor);
@@ -612,6 +615,28 @@ static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid atta
     for (int i = 0; i < tile->entity_max; i++) handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
 }
 
+static void try_entity_zap(gamestate* const g, entityid atkid, loc_t targetloc) {
+    massert(g, "gamestate is NULL");
+    massert(!g_is_dead(g, atkid), "zapper entity is dead");
+    loc_t loc = g_get_location(g, atkid);
+    dungeon_floor_t* const floor = d_get_floor(g->d, loc.z);
+    massert(floor, "failed to get dungeon floor");
+    tile_t* const tile = df_tile_at(floor, targetloc);
+    if (!tile) {
+        merror("target tile not found");
+        return;
+    }
+    bool ok = false;
+    loc_t eloc = g_get_location(g, atkid);
+    int dx = targetloc.x - eloc.x;
+    int dy = targetloc.y - eloc.y;
+    g_update_direction(g, atkid, get_dir_from_xy(dx, dy));
+    //g_set_zapping(g, atkid, true);
+    g_set_update(g, atkid, true);
+    //handle_zap_helper(g, tile, atkid, &ok);
+    //handle_zap_success_gamestate_flag(g, g_get_type(g, atkid), ok);
+}
+
 static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
     massert(!g_is_dead(g, atk_id), "attacker entity is dead");
@@ -1003,6 +1028,7 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g_add_dead(g, id, false);
     g_add_update(g, id, false);
     g_add_attacking(g, id, false);
+    g_add_zapping(g, id, false);
     g_add_block_success(g, id, false);
     g_add_damaged(g, id, false);
     g_add_default_action(g, id, ENTITY_ACTION_WAIT);
@@ -1101,6 +1127,19 @@ static entityid potion_create(gamestate* const g, loc_t loc, potiontype type, co
     }
     g_add_potiontype(g, id, type);
     msuccess("potion created!");
+    return id;
+}
+
+static entityid wand_create(gamestate* const g, loc_t loc, const char* name) {
+    minfo("wand create...");
+    massert(g, "gamestate is NULL");
+    entityid id = item_create(g, ITEM_WAND, loc, name);
+    if (id == ENTITYID_INVALID) {
+        merror("failed to create wand");
+        return ENTITYID_INVALID;
+    }
+    //g_add_potiontype(g, id, type);
+    msuccess("wand created!");
     return id;
 }
 
@@ -1370,6 +1409,17 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
                     add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                     //add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                }
+
+            } else if (item_type == ITEM_WAND) {
+                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
+                if (equipped_item != ENTITYID_INVALID) {
+                    // unequip the currently equipped item
+                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
+                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                } else {
+                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WAND, item_id);
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                 }
             }
         }
@@ -1924,10 +1974,11 @@ void liblogic_init(gamestate* const g) {
     //init_npcs_test_by_room(g);
     //init_npc_test(g);
     //init_sword_test(g);
-    init_dagger_test(g);
+    //init_dagger_test(g);
     //init_axe_test(g);
     //init_bow_test(g);
-    init_shield_test(g);
+    //init_shield_test(g);
+    init_wand_test(g);
     //init_potion_test(g);
     update_debug_panel_buffer(g);
 }
@@ -1999,6 +2050,15 @@ static void init_shield_test(gamestate* g) {
     while (id == ENTITYID_INVALID) {
         loc_t loc = get_random_empty_non_wall_loc(g, 0);
         id = shield_create(g, SHIELD_BUCKLER, loc, "dummy buckler");
+    }
+}
+
+static void init_wand_test(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entityid id = ENTITYID_INVALID;
+    while (id == ENTITYID_INVALID) {
+        loc_t loc = get_random_empty_non_wall_loc(g, 0);
+        id = wand_create(g, loc, "dummy wand");
     }
 }
 

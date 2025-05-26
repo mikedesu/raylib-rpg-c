@@ -451,7 +451,8 @@
 #define TX_GREEN_SLIME_DMG_SHADOW 335
 #define TX_GREEN_SLIME_DIE 336
 #define TX_GREEN_SLIME_DIE_SHADOW 337
-
+//--------------------------------
+#define TX_WAND_BASIC 338
 //--------------------------------
 
 #define COMPANYSCENE 0

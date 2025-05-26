@@ -74,6 +74,7 @@ typedef struct gamestate {
     int potion_type_list_count, potion_type_list_capacity;
     int damage_list_count, damage_list_capacity;
     int ac_list_count, ac_list_capacity;
+    int zapping_list_count, zapping_list_capacity;
 
     debugpanel_t debugpanel;
 
@@ -110,6 +111,7 @@ typedef struct gamestate {
     dead_component* dead_list;
     update_component* update_list;
     attacking_component* attacking_list;
+    zapping_component* zapping_list;
     blocking_component* blocking_list;
     block_success_component* block_success_list;
     damaged_component* damaged_list;
@@ -292,3 +294,8 @@ bool g_set_ac(gamestate* const g, entityid id, int ac);
 int g_get_ac(const gamestate* const g, entityid id);
 
 entityid g_add_entity(gamestate* const g);
+
+bool g_has_attacking(const gamestate* const g, entityid id);
+bool g_add_attacking(gamestate* const g, entityid id, bool attacking);
+bool g_set_attacking(gamestate* const g, entityid id, bool attacking);
+bool g_get_attacking(const gamestate* const g, entityid id);

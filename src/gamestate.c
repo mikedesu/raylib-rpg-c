@@ -95,6 +95,7 @@ gamestate* gamestateinitptr() {
     g->equipment_list_count = g->stats_list_count = g->itemtype_list_count = g->weapontype_list_count = 0;
     g->shieldtype_list_count = g->potion_type_list_count = 0;
     g->damage_list_count = g->ac_list_count = 0;
+    g->zapping_list_count = 0;
 
     const size_t n = LIST_INIT_CAPACITY;
 
@@ -105,6 +106,7 @@ gamestate* gamestateinitptr() {
     g->equipment_list_capacity = g->stats_list_capacity = g->itemtype_list_capacity = g->weapontype_list_capacity = n;
     g->shieldtype_list_capacity = g->potion_type_list_capacity = n;
     g->damage_list_capacity = g->ac_list_capacity = n;
+    g->zapping_list_capacity = n;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * n);
     massert(g->name_list, "g->name_list is NULL");
@@ -154,6 +156,8 @@ gamestate* gamestateinitptr() {
     massert(g->damage_list, "g->damage_list is NULL");
     g->ac_list = (ac_component*)malloc(sizeof(ac_component) * n);
     massert(g->ac_list, "g->ac_list is NULL");
+    g->zapping_list = (zapping_component*)malloc(sizeof(zapping_component) * n);
+    massert(g->zapping_list, "g->zapping_list is NULL");
 
     g->next_entityid = 0;
 
@@ -480,6 +484,7 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     case C_DEAD: init_dead_component((dead_component*)c_ptr, id, *(bool*)data); break;
     case C_UPDATE: init_update_component((update_component*)c_ptr, id, *(bool*)data); break;
     case C_ATTACKING: init_attacking_component((attacking_component*)c_ptr, id, *(bool*)data); break;
+    case C_ZAPPING: init_zapping_component((zapping_component*)c_ptr, id, *(bool*)data); break;
     case C_BLOCKING: init_blocking_component((blocking_component*)c_ptr, id, *(bool*)data); break;
     case C_BLOCK_SUCCESS: init_block_success_component((block_success_component*)c_ptr, id, *(bool*)data); break;
     case C_DAMAGED: init_damaged_component((damaged_component*)c_ptr, id, *(bool*)data); break;
@@ -1865,4 +1870,49 @@ entityid g_add_entity(gamestate* const g) {
     }
     g->next_entityid++;
     return id;
+}
+
+bool g_has_zapping(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_ZAPPING);
+}
+
+bool g_add_zapping(gamestate* const g, entityid id, bool zapping) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the zapping component
+    return g_add_component(
+        g, id, C_ZAPPING, (void*)&zapping, sizeof(zapping_component), (void**)&g->zapping_list, &g->zapping_list_count, &g->zapping_list_capacity);
+}
+
+bool g_set_zapping(gamestate* const g, entityid id, bool zapping) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->zapping_list == NULL) {
+        merror("g->zapping_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->zapping_list_count; i++) {
+        if (g->zapping_list[i].id == id) {
+            g->zapping_list[i].zapping = zapping;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool g_get_zapping(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->zapping_list == NULL) {
+        merror("g->zapping_list is NULL");
+        return false;
+    }
+    for (int i = 0; i < g->zapping_list_count; i++) {
+        if (g->zapping_list[i].id == id) {
+            return g->zapping_list[i].zapping;
+        }
+    }
+    return false; // not zapping
 }

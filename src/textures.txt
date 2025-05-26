@@ -429,3 +429,5 @@
 335 4  4 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDmg.png
 336 1  8 0  img/monsters/green_slime/SlimeGreenDie.png
 337 1  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDie.png
+#
+338 1  4 0  img/wands/basic-wand.png
