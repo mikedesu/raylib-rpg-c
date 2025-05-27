@@ -17,10 +17,16 @@
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
 #define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
 
+static void gamestate_init_music_paths(gamestate* const g);
+
 // have to update this function when we introduce new fields to Gamestate
 gamestate* gamestateinitptr() {
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     massert(g, "g is NULL");
+
+    g->version = GAME_VERSION;
+    g->cam_lockon = true;
+
     g->framecount = 0;
     g->turn_count = 0;
     g->debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
@@ -55,7 +61,6 @@ gamestate* gamestateinitptr() {
     g->display_quit_menu = false;
     g->do_quit = false;
     g->processing_actions = false;
-    g->cam_lockon = false;
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){0, 0};
     g->cam2d.zoom = 4.0f;
@@ -167,8 +172,45 @@ gamestate* gamestateinitptr() {
     g->dirty_entities = false;
     g->new_entityid_begin = g->new_entityid_end = -1;
 
+    g->current_music_index = 0;
+    g->total_music_paths = 0;
+    gamestate_init_music_paths(g);
     gamestate_init_msg_history(g);
     return g;
+}
+
+static void gamestate_init_music_paths(gamestate* const g) {
+    massert(g, "g is NULL");
+    const char* music_path_file = "music.txt";
+
+    FILE* file = fopen(music_path_file, "r");
+    massert(file, "Could not open music path file: %s", music_path_file);
+    int i = 0;
+    char buffer[1024];
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        // Remove newline character if present
+        size_t len = strlen(buffer);
+        if (len > 0 && buffer[len - 1] == '\n') {
+            buffer[len - 1] = '\0';
+        }
+        // if it begins with a #, skip for now
+        if (buffer[0] == '#') {
+            continue;
+        }
+        // copy into g->music_file_paths[i]
+        // we have to add "audio/music/" to the beginning of the path
+        if (i < 1024) {
+            //strncpy(g->music_file_paths[i], buffer, sizeof(g->music_file_paths[i]) - 1);
+            snprintf(g->music_file_paths[i], sizeof(g->music_file_paths[i]), "audio/music/%s", buffer);
+            g->music_file_paths[i][sizeof(g->music_file_paths[i]) - 1] = '\0'; // Ensure null termination
+            i++;
+        } else {
+            merror("Too many music paths in %s", music_path_file);
+            break;
+        }
+    }
+    fclose(file);
+    g->total_music_paths = i;
 }
 
 bool gamestate_init_msg_history(gamestate* const g) {

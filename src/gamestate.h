@@ -16,6 +16,8 @@
 #include <stdbool.h>
 #include <time.h>
 
+#define GAME_VERSION "v0.0.1"
+
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
 #define GAMESTATE_SIZEOFTEXINFOARRAY 1024
@@ -129,6 +131,12 @@ typedef struct gamestate {
     damage_component* damage_list;
     ac_component* ac_list;
     spell_effect_component* spell_effect_list;
+
+    int current_music_index;
+    int total_music_paths;
+    char music_file_paths[1024][128];
+
+    char* version;
 
 } gamestate;
 

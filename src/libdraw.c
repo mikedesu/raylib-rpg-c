@@ -113,6 +113,7 @@ static void calc_debugpanel_size(gamestate* const g);
 static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
 static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, entityid id);
 static void draw_quit_menu(const gamestate* const g);
+void draw_version(const gamestate* const g);
 
 static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
@@ -698,9 +699,10 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
     ClearBackground(BLACK);
     //EndShaderMode();
+    libdraw_camera_lock_on(g);
+    //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
     if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
-    //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     //msuccess("libdraw_drawframe_2d: done");
     EndMode2D();
 }
@@ -712,10 +714,11 @@ static void draw_message_box(gamestate* g) {
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     //Color message_bg = (Color){0, 0, 0xff, 0xff};
     // copy the message to a temporary buffer
+    int font_size = 20;
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg);
     // Measure text (split into lines if needed)
-    int text_width = MeasureText(msg, g->font_size);
+    int text_width = MeasureText(msg, font_size);
     int text_height = g->font_size;
     // Calculate centered box position
     const Rectangle box = {.x = (g->windowwidth - text_width) / 2.0 - g->pad,
@@ -727,7 +730,7 @@ static void draw_message_box(gamestate* g) {
     DrawRectangleLinesEx(box, 2, WHITE);
     // Draw text (centered in box)
     //DrawText(msg, box.x + g->pad, box.y + g->pad, g->font_size, WHITE);
-    DrawText(tmp, box.x + g->pad, box.y + g->pad, g->font_size, WHITE);
+    DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
     // Show "Next" prompt if more messages exist
     if (g->msg_system.count > 1 && g->msg_system.index < g->msg_system.count - 1) {
         int prompt_font_size = 10;
@@ -773,6 +776,7 @@ void libdraw_drawframe(gamestate* const g) {
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     handle_debug_panel(g);
+    draw_version(g);
     if (g->display_quit_menu) {
         draw_quit_menu(g);
     }
@@ -1089,8 +1093,13 @@ void libdraw_init(gamestate* const g) {
     const int h = DEFAULT_WIN_HEIGHT;
     const int x = w / 3;
     const int y = h / 3;
+
     const char* title = WINDOW_TITLE;
-    InitWindow(w, h, title);
+
+    char full_title[1024] = {0};
+    snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version);
+
+    InitWindow(w, h, full_title);
     SetExitKey(KEY_NULL);
     g->windowwidth = w;
     g->windowheight = h;
@@ -1114,15 +1123,25 @@ void libdraw_init(gamestate* const g) {
 
     InitAudioDevice();
 
-    int r = rand() % 5;
-    switch (r) {
-    case 0: music = LoadMusicStream("audio/music/boss-mode.mp3"); break;
-    case 1: music = LoadMusicStream("audio/music/dungeon-crawling.mp3"); break;
-    case 2: music = LoadMusicStream("audio/music/curry-sauce.mp3"); break;
-    case 3: music = LoadMusicStream("audio/music/dungeon-chillin.mp3"); break;
-    case 4: music = LoadMusicStream("audio/music/dungeon-coolin.mp3"); break;
-    default: break;
-    }
+    //int r = rand() % 5;
+    //switch (r) {
+    //case 0: music = LoadMusicStream("audio/music/boss-mode.mp3"); break;
+    //case 1: music = LoadMusicStream("audio/music/dungeon-crawling.mp3"); break;
+    //case 2: music = LoadMusicStream("audio/music/curry-sauce.mp3"); break;
+    //case 3: music = LoadMusicStream("audio/music/dungeon-chillin.mp3"); break;
+    //case 4: music = LoadMusicStream("audio/music/dungeon-coolin.mp3"); break;
+    //default: break;
+    //}
+
+    // select a random indices for current music
+    g->current_music_index = rand() % g->total_music_paths;
+    // load the music stream from the selected path
+    const char* music_path = g->music_file_paths[g->current_music_index];
+    massert(music_path, "music_path is NULL");
+    minfo("Loading music from path: %s", music_path);
+    music = LoadMusicStream(music_path);
+
+    SetMusicVolume(music, 0.50f); // Set initial music volume
     PlayMusicStream(music);
 
     //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
@@ -1132,7 +1151,7 @@ static void draw_message_history(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) return;
-    int font_size = 10;
+    int font_size = 20;
     //int font_size = g->font_size;
     const int max_messages = 40;
     const int x = 0;
@@ -1140,7 +1159,7 @@ static void draw_message_history(gamestate* const g) {
     int current_count = 0;
     char tmp_buffer[2048] = {0};
     //Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    Color message_bg = (Color){0x33, 0x33, 0x33, 0x99}; // semi-transparent
+    Color message_bg = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent
     //Color message_bg = (Color){0, 0, 0xff, 0xff};
     // instead of a placeholder message, we now need to actually draw the message history
     // we might only render the last N messages
@@ -1339,4 +1358,16 @@ void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
 bool libdraw_windowshouldclose(const gamestate* const g) {
     massert(g, "gamestate is NULL");
     return g->do_quit;
+}
+
+void draw_version(const gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    const char* version = g->version;
+    const int font_size = 10;
+    const Vector2 text_size = MeasureTextEx(GetFontDefault(), version, font_size, 1.0f);
+    const float x = g->windowwidth - text_size.x - g->pad;
+    //const float y = g->windowheight - text_size.y - g->pad;
+    //const float x = 0;
+    const float y = 0;
+    DrawTextEx(GetFontDefault(), version, (Vector2){x, y}, font_size, 1.0f, WHITE);
 }

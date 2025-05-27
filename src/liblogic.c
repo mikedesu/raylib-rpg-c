@@ -1825,42 +1825,41 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
     massert(is, "inputstate is NULL");
     massert(g, "gamestate is NULL");
     // no matter which mode we are in, we can toggle the debug panel
-    if (inputstate_is_pressed(is, KEY_D)) {
-        msuccess("D pressed!");
-        g->debugpanelon = !g->debugpanelon;
-        return;
+    //if (inputstate_is_pressed(is, KEY_D)) {
+    //    msuccess("D pressed!");
+    //    g->debugpanelon = !g->debugpanelon;
+    //    return;
+    //}
+
+    //if (g->display_quit_menu) {
+    //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+    //        g->display_quit_menu = false;
+    //        return;
+    //    }
+    //if (inputstate_is_pressed(is, KEY_Q)) {
+    // this forces the window to close but this is crashing on exit
+    //CloseWindow();
+    //    g->do_quit = true;
+    //    return;
+    //}
+    //}
+
+    //if (!g->display_quit_menu) {
+    //if (inputstate_is_pressed(is, KEY_Q)) {
+    //    g->display_quit_menu = true;
+    //    return;
+    //}
+
+    if (g->controlmode == CONTROLMODE_PLAYER) {
+        handle_input_player(is, g);
+    } else if (g->controlmode == CONTROLMODE_CAMERA) {
+        handle_input_camera(is, g);
+    } else if (g->controlmode == CONTROLMODE_INVENTORY) {
+        handle_input_inventory(is, g);
+    } else {
+        merror("Unknown control mode");
     }
-
-    if (g->display_quit_menu) {
-        if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-            g->display_quit_menu = false;
-            return;
-        }
-        if (inputstate_is_pressed(is, KEY_Q)) {
-            // this forces the window to close but this is crashing on exit
-            //CloseWindow();
-
-            g->do_quit = true;
-            return;
-        }
-    }
-
-    if (!g->display_quit_menu) {
-        if (inputstate_is_pressed(is, KEY_Q)) {
-            g->display_quit_menu = true;
-            return;
-        }
-
-        if (g->controlmode == CONTROLMODE_PLAYER) {
-            handle_input_player(is, g);
-        } else if (g->controlmode == CONTROLMODE_CAMERA) {
-            handle_input_camera(is, g);
-        } else if (g->controlmode == CONTROLMODE_INVENTORY) {
-            handle_input_inventory(is, g);
-        } else {
-            merror("Unknown control mode");
-        }
-    }
+    //}
 }
 
 static void update_debug_panel_buffer(gamestate* const g) {
@@ -1977,11 +1976,11 @@ void liblogic_init(gamestate* const g) {
     //init_npcs_test_by_room(g);
     //init_npc_test(g);
     //init_sword_test(g);
-    //init_dagger_test(g);
+    init_dagger_test(g);
     //init_axe_test(g);
     //init_bow_test(g);
-    //init_shield_test(g);
-    init_wand_test(g);
+    init_shield_test(g);
+    //init_wand_test(g);
     //init_potion_test(g);
     update_debug_panel_buffer(g);
 }
