@@ -27,7 +27,9 @@ static inline void inputstate_update(inputstate* is) {
     for (int k = 0; k < MAX_KEYS; k++) {
         if (IsKeyPressed(k)) {
             // debugging to see if KEY_ENTER is pressed
-            if (k == KEY_ENTER) { msuccess("KEY_ENTER pressed"); }
+            if (k == KEY_ENTER) {
+                msuccess("KEY_ENTER pressed");
+            }
 
             int idx = k / BITS_PER_LONG;
             int bit = k % BITS_PER_LONG;
@@ -47,6 +49,15 @@ static inline bool inputstate_is_pressed(const inputstate* is, int key) {
     int idx = key / BITS_PER_LONG;
     int bit = key % BITS_PER_LONG;
     return (is->pressed[idx] & (1ULL << bit)) != 0;
+}
+
+// Check if ANY key was pressed this frame
+static inline bool inputstate_any_pressed(const inputstate* is) {
+    if (!is) return false; // Invalid inputstate
+    for (int idx = 0; idx < NUM_LONGS; idx++) {
+        if (is->pressed[idx] != 0) return true; // At least one key pressed
+    }
+    return false;
 }
 
 // Check if a key is held down

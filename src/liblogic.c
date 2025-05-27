@@ -1346,21 +1346,13 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
     if (count == 0) {
         return;
     }
-    if (inputstate_is_pressed(is, KEY_DOWN)) {
+    if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
         g->inventory_menu_selection = g->inventory_menu_selection + 1 >= count ? 0 : g->inventory_menu_selection + 1;
-        //g->inventory_menu_selection++;
-        //if (g->inventory_menu_selection >= count) {
-        //    g->inventory_menu_selection = 0;
-        //}
-    } else if (inputstate_is_pressed(is, KEY_UP)) {
+        //} else if (inputstate_is_pressed(is, KEY_UP)) {
+    } else if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
         g->inventory_menu_selection = g->inventory_menu_selection - 1 < 0 ? count - 1 : g->inventory_menu_selection - 1;
-        //g->inventory_menu_selection--;
-        //if (g->inventory_menu_selection < 0) {
-        //    g->inventory_menu_selection = count - 1;
-        //}
-        //}
         // drop item
-    } else if (inputstate_is_pressed(is, KEY_X)) {
+    } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
         // we need to grab the entityid of the selected item
         entityid item_id = inventory[g->inventory_menu_selection];
         g_remove_from_inventory(g, g->hero_id, item_id);
@@ -1380,57 +1372,52 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         g->controlmode = CONTROLMODE_PLAYER;
         g->display_inventory_menu = false;
         //}
-    } else if (inputstate_is_pressed(is, KEY_E)) {
-        entityid item_id = inventory[g->inventory_menu_selection];
-        // we will eventually adjust this to check which slot it needs to go into based on its various types
-        entitytype_t type = g_get_type(g, item_id);
-        if (type == ENTITY_ITEM) {
-            itemtype item_type = g_get_itemtype(g, item_id);
-            if (item_type == ITEM_WEAPON) {
-                // check if the item is already equipped
-                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
-                if (equipped_item != ENTITYID_INVALID) {
-                    // unequip the currently equipped item
-                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
-                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    //add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-
-                } else {
-                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
-                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    //add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                }
-            } else if (item_type == ITEM_SHIELD) {
-                //g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
-                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
-                if (equipped_item != ENTITYID_INVALID) {
-                    // unequip the currently equipped item
-                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
-                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    //add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                } else {
-                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
-                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    //add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                }
-
-            } else if (item_type == ITEM_WAND) {
-                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
-                if (equipped_item != ENTITYID_INVALID) {
-                    // unequip the currently equipped item
-                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
-                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                } else {
-                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WAND, item_id);
-                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                }
-            }
-        }
-        g->controlmode = CONTROLMODE_PLAYER;
-        g->display_inventory_menu = false;
-        g->controlmode = CONTROLMODE_PLAYER;
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    } else if (inputstate_is_pressed(is, KEY_ENTER)) {
+    }
+    //else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+    //        entityid item_id = inventory[g->inventory_menu_selection];
+    // we will eventually adjust this to check which slot it needs to go into based on its various types
+    //        entitytype_t type = g_get_type(g, item_id);
+    //        if (type == ENTITY_ITEM) {
+    //            itemtype item_type = g_get_itemtype(g, item_id);
+    //            if (item_type == ITEM_WEAPON) {
+    //                // check if the item is already equipped
+    //                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
+    //                if (equipped_item != ENTITYID_INVALID) {
+    //                    // unequip the currently equipped item
+    //                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
+    //                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+    //                } else {
+    //                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
+    //                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+    //                }
+    //            } else if (item_type == ITEM_SHIELD) {
+    //                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
+    //                if (equipped_item != ENTITYID_INVALID) {
+    //                    // unequip the currently equipped item
+    //                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
+    //                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+    //                } else {
+    //                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
+    //                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+    //                }
+    //            } else if (item_type == ITEM_WAND) {
+    //                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
+    //                if (equipped_item != ENTITYID_INVALID) {
+    //                    // unequip the currently equipped item
+    //                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
+    //                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+    //                } else {
+    //                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WAND, item_id);
+    //                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+    //                }
+    //            }
+    //        }
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //        g->display_inventory_menu = false;
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    // }
+    else if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_APOSTROPHE)) {
         entityid item_id = inventory[g->inventory_menu_selection];
         // we will eventually adjust this to check which slot it needs to go into based on its various types
         entitytype_t type = g_get_type(g, item_id);
@@ -1469,6 +1456,53 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                         g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                     }
                 }
+            } else if (item_type == ITEM_WEAPON) {
+                // check if the item is already equipped
+                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
+                if (equipped_item != ENTITYID_INVALID) {
+                    // unequip the currently equipped item
+                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
+                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                } else {
+                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                }
+                g->controlmode = CONTROLMODE_PLAYER;
+                g->display_inventory_menu = false;
+                g->controlmode = CONTROLMODE_PLAYER;
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+
+            } else if (item_type == ITEM_SHIELD) {
+                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
+                if (equipped_item != ENTITYID_INVALID) {
+                    // unequip the currently equipped item
+                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
+                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                } else {
+                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                }
+
+                g->controlmode = CONTROLMODE_PLAYER;
+                g->display_inventory_menu = false;
+                g->controlmode = CONTROLMODE_PLAYER;
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+
+            } else if (item_type == ITEM_WAND) {
+                entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
+                if (equipped_item != ENTITYID_INVALID) {
+                    // unequip the currently equipped item
+                    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
+                    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                } else {
+                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WAND, item_id);
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                }
+
+                g->controlmode = CONTROLMODE_PLAYER;
+                g->display_inventory_menu = false;
+                g->controlmode = CONTROLMODE_PLAYER;
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             }
         }
     }
@@ -1595,13 +1629,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         return;
     }
     if (g->msg_system.is_active) {
-        if (inputstate_is_pressed(is, KEY_I) || inputstate_is_pressed(is, KEY_U) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_A) ||
-            inputstate_is_pressed(is, KEY_SPACE) || inputstate_is_pressed(is, KEY_COMMA) || inputstate_is_pressed(is, KEY_PERIOD) ||
-            inputstate_is_pressed(is, KEY_SLASH) || inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_X) ||
-            inputstate_is_pressed(is, KEY_KP_0) || inputstate_is_pressed(is, KEY_KP_1) || inputstate_is_pressed(is, KEY_KP_2) ||
-            inputstate_is_pressed(is, KEY_KP_3) || inputstate_is_pressed(is, KEY_KP_4) || inputstate_is_pressed(is, KEY_KP_5) ||
-            inputstate_is_pressed(is, KEY_KP_6) || inputstate_is_pressed(is, KEY_KP_7) || inputstate_is_pressed(is, KEY_KP_8) ||
-            inputstate_is_pressed(is, KEY_KP_9) || inputstate_is_pressed(is, KEY_KP_ENTER)) {
+        if (inputstate_any_pressed(is)) {
             g->msg_system.index++;
             if (g->msg_system.index >= g->msg_system.count) {
                 // Reset when all messages read
