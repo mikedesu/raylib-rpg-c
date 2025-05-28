@@ -496,6 +496,8 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
             massert(g_has_damage(g, attacker_weapon_id), "attacker weapon does not have damage attached");
             roll dmg_roll = g_get_damage(g, attacker_weapon_id);
             dmg = do_roll(dmg_roll);
+            const int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
+            dmg += atk_bonus;
         }
         g_set_damaged(g, tgt_id, true);
         g_set_update(g, tgt_id, true);
@@ -599,20 +601,16 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     entityid target_id = tile->entities[i];
     if (target_id == ENTITYID_INVALID) return false;
     entitytype_t type = g_get_type(g, target_id);
-    if (type != ENTITY_PLAYER && type != ENTITY_NPC) {
-        return false;
-    }
-    if (g_is_dead(g, target_id)) {
-        return false;
-    }
+    if (type != ENTITY_PLAYER && type != ENTITY_NPC) return false;
+    if (g_is_dead(g, target_id)) return false;
     // lets try an experiment...
 
     // get the armor class of the target
     const int base_ac = g_get_stat(g, target_id, STATS_AC);
     const int base_str = g_get_stat(g, attacker_id, STATS_STR);
     const int str_bonus = bonus_calc(base_str);
-    const int attack_roll = rand() % 20 + 1 + str_bonus; // 1d20 + str bonus
-        //
+    const int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
+    const int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
     *attack_successful = false;
     if (attack_roll >= base_ac) {
         return handle_shield_check(g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
@@ -1061,6 +1059,12 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g_set_stat(g, id, STATS_NEXT_LEVEL_XP, calc_next_lvl_xp(g, id));
     g_set_stat(g, id, STATS_MAXHP, 1);
     g_set_stat(g, id, STATS_HP, 1);
+    g_set_stat(g, id, STATS_HITDIE, 1);
+    g_set_stat(g, id, STATS_STR, 10);
+    g_set_stat(g, id, STATS_DEX, 10);
+    g_set_stat(g, id, STATS_CON, 10);
+    g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
+
     g_set_stat(g, id, STATS_AC, 10);
 
     if (!df_add_at(df, id, loc.x, loc.y)) {
@@ -1200,17 +1204,20 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
 
     //int str_roll = do_roll_best_of_3((roll){3, 6, 0});
     //int con_roll = do_roll_best_of_3((roll){3, 6, 0});
-    int str_roll = do_roll((roll){3, 6, 0});
-    int con_roll = do_roll((roll){3, 6, 0});
-    int dex_roll = do_roll((roll){3, 6, 0});
+    int str_roll = do_roll_best_of_3((roll){3, 6, 0});
+    int con_roll = do_roll_best_of_3((roll){3, 6, 0});
+    int dex_roll = do_roll_best_of_3((roll){3, 6, 0});
 
     g_set_stat(g, id, STATS_STR, str_roll);
     g_set_stat(g, id, STATS_CON, con_roll);
     g_set_stat(g, id, STATS_DEX, dex_roll);
 
-    int maxhp_roll = do_roll((roll){1, 8, 0}) + bonus_calc(con_roll);
+    int hitdie = 8;
+    g_set_stat(g, id, STATS_HITDIE, hitdie);
+
+    int maxhp_roll = do_roll_best_of_3((roll){1, hitdie, 0}) + bonus_calc(con_roll);
     while (maxhp_roll < 1) {
-        maxhp_roll = do_roll((roll){1, 8, 0}) + bonus_calc(con_roll);
+        maxhp_roll = do_roll_best_of_3((roll){1, hitdie, 0}) + bonus_calc(con_roll);
     }
 
     g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
@@ -2197,15 +2204,47 @@ static void update_player_state(gamestate* const g) {
             add_message_history(g, "You died!");
             g->gameover = true;
         }
-        return;
+        //if (e->dead) return;
+        //minfo("calling g_is_dead 1");
+        //if (e_get_hp(e) <= 0) {
+        //    g_update_dead(g, e->id, true);
+        //    e->do_update = true;
+        //}
+
+        // check for player level up
+        int xp = g_get_stat(g, g->hero_id, STATS_XP);
+        int level = g_get_stat(g, g->hero_id, STATS_LEVEL);
+        int next_level_xp = g_get_stat(g, g->hero_id, STATS_NEXT_LEVEL_XP);
+
+        if (xp >= next_level_xp) {
+            // Level up the player
+            level++;
+            g_set_stat(g, g->hero_id, STATS_LEVEL, level);
+            // Increase attack bonus
+            int old_attack_bonus = g_get_stat(g, g->hero_id, STATS_ATTACK_BONUS);
+            int new_attack_bonus = old_attack_bonus + 1; // Example: increase by 1
+            g_set_stat(g, g->hero_id, STATS_ATTACK_BONUS, new_attack_bonus);
+
+            // Increase max HP based on Constitution bonus
+            int con_bonus = bonus_calc(g_get_stat(g, g->hero_id, STATS_CON));
+
+            int old_max_hp = g_get_stat(g, g->hero_id, STATS_MAXHP);
+            int new_max_hp = old_max_hp + con_bonus;
+            if (new_max_hp <= old_max_hp) new_max_hp = old_max_hp + 1; // Ensure max HP increases
+
+            int new_next_level_xp = calc_next_lvl_xp(g, g->hero_id);
+            g_set_stat(g, g->hero_id, STATS_MAXHP, new_max_hp);
+            g_set_stat(g, g->hero_id, STATS_HP, new_max_hp); // Restore HP to max
+            // Set next level XP requirement (example: 1000 XP for next level)
+            g_set_stat(g, g->hero_id, STATS_NEXT_LEVEL_XP, new_next_level_xp);
+
+            add_message_and_history(g, "You leveled up!");
+            add_message_and_history(g, "Level %d", level);
+            add_message_and_history(g, "Max HP increased to %d", new_max_hp);
+        }
     }
-    //if (e->dead) return;
-    //minfo("calling g_is_dead 1");
+
     if (g_is_dead(g, g->hero_id)) return;
-    //if (e_get_hp(e) <= 0) {
-    //    g_update_dead(g, e->id, true);
-    //    e->do_update = true;
-    //}
 }
 
 static inline void update_npc_state(gamestate* const g, entityid id) {
