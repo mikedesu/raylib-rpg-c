@@ -89,6 +89,64 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id);
 //static bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl);
 //static bool tile_has_door(const gamestate* const g, int x, int y, int fl);
 static int calc_next_lvl_xp(gamestate* const g, entityid id);
+static int calc_challenge_rating(gamestate* const g, entityid id);
+static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id);
+
+static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id) {
+    massert(g, "gamestate is NULL");
+    massert(attacker_id != ENTITYID_INVALID, "attacker id is invalid");
+    massert(target_id != ENTITYID_INVALID, "target id is invalid");
+    // get the entity type
+    entitytype_t attacker_type = g_get_type(g, attacker_id);
+    massert(attacker_type == ENTITY_NPC || attacker_type == ENTITY_PLAYER, "attacker type is not NPC or Player");
+    entitytype_t target_type = g_get_type(g, target_id);
+    massert(target_type == ENTITY_NPC || target_type == ENTITY_PLAYER, "target type is not NPC or Player");
+    // get the challenge rating
+    int challenge_rating = calc_challenge_rating(g, target_id);
+    massert(challenge_rating >= 0, "challenge rating is negative");
+    // get the attacker's level
+    int attacker_level = g_get_stat(g, attacker_id, STATS_LEVEL);
+    massert(attacker_level >= 0, "attacker level is negative");
+    // calculate the reward xp
+    int base_xp = challenge_rating;
+    int xp_modifier = pow(1.5, challenge_rating - attacker_level);
+    int reward_xp = (int)(base_xp * xp_modifier);
+    massert(reward_xp >= 0, "reward xp is negative");
+    return reward_xp;
+}
+
+static int calc_challenge_rating(gamestate* const g, entityid id) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
+    // get the entity type
+    entitytype_t type = g_get_type(g, id);
+    massert(type == ENTITY_NPC, "entity type is not NPC");
+
+    // get the current level
+    int lvl = g_get_stat(g, id, STATS_LEVEL);
+    massert(lvl >= 0, "level is negative");
+
+    int wpn_bonus = 0;
+    // check to see if the NPC has an equipped weapon
+    entityid weapon_id = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
+    if (weapon_id != ENTITYID_INVALID) {
+        wpn_bonus = 1;
+    }
+
+    // check to see if the NPC has an equipped shield
+    int shield_bonus = 0;
+    entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
+    if (shield_id != ENTITYID_INVALID) {
+        shield_bonus = 1;
+    }
+
+    // calculate the challenge rating
+    int challenge_rating = lvl + wpn_bonus + shield_bonus;
+
+    massert(challenge_rating >= 0, "challenge rating is negative");
+    // set the challenge rating
+    return challenge_rating;
+}
 
 static int calc_next_lvl_xp(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
@@ -522,7 +580,20 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
                 add_message_history(g, "%s killed %s!", g_get_name(g, atk_id), g_get_name(g, tgt_id));
                 // increment attacker's xp
                 //int xp = g_get_stat(g, atk_id, STATS_XP);
-                g_set_stat(g, atk_id, STATS_XP, g_get_stat(g, atk_id, STATS_XP) + 1);
+
+                //g_set_stat(g, atk_id, STATS_XP, g_get_stat(g, atk_id, STATS_XP) + 1);
+
+                int old_xp = g_get_stat(g, atk_id, STATS_XP);
+                massert(old_xp >= 0, "attacker's xp is negative");
+
+                int reward_xp = calc_reward_xp(g, atk_id, tgt_id);
+                massert(reward_xp >= 0, "reward xp is negative");
+
+                minfo("Reward XP: %d", reward_xp);
+                int new_xp = old_xp + reward_xp;
+                massert(new_xp >= 0, "new xp is negative");
+                minfo("New XP: %d", new_xp);
+                g_set_stat(g, atk_id, STATS_XP, new_xp);
 
                 loc_t loc = g_get_location(g, tgt_id);
                 entityid id = ENTITYID_INVALID;
