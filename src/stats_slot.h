@@ -5,6 +5,7 @@ typedef enum stats_slot_t
     STATS_NONE,
     STATS_LEVEL,
     STATS_XP,
+    STATS_NEXT_LEVEL_XP,
     STATS_HP,
     STATS_MAXHP,
     STATS_AC,

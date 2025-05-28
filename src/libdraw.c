@@ -29,8 +29,12 @@
 //#define DEFAULT_WIN_HEIGHT 480
 //#define DEFAULT_WIN_WIDTH 960
 //#define DEFAULT_WIN_HEIGHT 540
+
+//#define DEFAULT_WIN_WIDTH 640
+//#define DEFAULT_WIN_HEIGHT 360
 #define DEFAULT_WIN_WIDTH 1920
 #define DEFAULT_WIN_HEIGHT 1080
+
 //#define DEFAULT_WIN_WIDTH 1280
 //#define DEFAULT_WIN_HEIGHT 720
 
@@ -636,6 +640,29 @@ static void libdraw_handle_dirty_entities(gamestate* const g) {
 void libdraw_update_sprites(gamestate* const g) {
     if (g) {
         UpdateMusicStream(music);
+
+        float timePlayed = GetMusicTimePlayed(music) / GetMusicTimeLength(music);
+        if (timePlayed >= 1.0f) {
+            // stop music
+            StopMusicStream(music);
+            // we have to randomly select the next music track
+            // the music path list and values are in gamestate
+            int next_music_index = GetRandomValue(0, g->total_music_paths - 1);
+            // load the next music track
+            if (g->total_music_paths > 0 && next_music_index >= 0 && next_music_index < g->total_music_paths) {
+                const char* next_music_path = g->music_file_paths[next_music_index];
+                if (next_music_path) {
+                    minfo("libdraw_update_sprites: loading next music track: %s", next_music_path);
+                    LoadMusicStream(next_music_path);
+                    PlayMusicStream(music);
+                } else {
+                    merror("libdraw_update_sprites: next music path is NULL");
+                }
+            } else {
+                merror("libdraw_update_sprites: invalid next music index: %d", next_music_index);
+            }
+        }
+
         libdraw_handle_dirty_entities(g);
         for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite(g, id);
         libdraw_handle_gamestate_flag(g);
@@ -714,12 +741,14 @@ static void draw_message_box(gamestate* g) {
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     //Color message_bg = (Color){0, 0, 0xff, 0xff};
     // copy the message to a temporary buffer
-    int font_size = 20;
+    int font_size = 10;
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg);
     // Measure text (split into lines if needed)
-    int text_width = MeasureText(msg, font_size);
-    int text_height = g->font_size;
+    Vector2 measure = MeasureTextEx(GetFontDefault(), tmp, font_size, 1.0f);
+    int text_width = measure.x;
+    //int text_height = g->font_size;
+    int text_height = measure.y;
     // Calculate centered box position
     const Rectangle box = {.x = (g->windowwidth - text_width) / 2.0 - g->pad,
                            .y = (g->windowheight - text_height) / 8.0 - g->pad,
@@ -1067,13 +1096,15 @@ static void draw_hud(gamestate* const g) {
     loc_t loc = g_get_location(g, g->hero_id);
     dungeon_floor_t* const df = d_get_current_floor(g->d);
     int floor = g->d->current_floor;
+    //int font_size = g->font_size;
+    int font_size = 10;
 
     //const char* room_name = df_get_room_name(df, loc);
     char buffer[1024] = {0};
     const char* format_str = "%s Lvl %d HP %d/%d AC: %d XP %d STR: %d CON: %d DEX: %d Floor: %d Turn %d";
     //snprintf(buffer, sizeof(buffer), "%s Lvl %d HP %d/%d AC: %d XP %d Room: %s Turn %d", g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, room_name, turn);
     snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, str, con, dex, floor, turn);
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, g->font_size, g->line_spacing);
+    const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
     const int box_w = text_size.x + g->pad;
     const int box_h = text_size.y + g->pad;
     const int box_x = 0;
@@ -1084,7 +1115,7 @@ static void draw_hud(gamestate* const g) {
     // Calculate text position to center it within the box
     const float text_x = box_x + (box_w - text_size.x) / 2;
     const float text_y = box_y + (box_h - text_size.y) / 2;
-    DrawTextEx(GetFontDefault(), buffer, (Vector2){text_x, text_y}, g->font_size, g->line_spacing, fg);
+    DrawTextEx(GetFontDefault(), buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, fg);
 }
 
 void libdraw_init(gamestate* const g) {
@@ -1142,6 +1173,8 @@ void libdraw_init(gamestate* const g) {
     music = LoadMusicStream(music_path);
 
     SetMusicVolume(music, 0.50f); // Set initial music volume
+
+    //SetMusicLooping(music, true); // Loop the music
     PlayMusicStream(music);
 
     //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
@@ -1151,9 +1184,9 @@ static void draw_message_history(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) return;
-    int font_size = 20;
+    int font_size = 10;
     //int font_size = g->font_size;
-    const int max_messages = 40;
+    const int max_messages = 20;
     const int x = 0;
     const int y = 42;
     int current_count = 0;
@@ -1194,9 +1227,12 @@ static void draw_inventory_menu(gamestate* const g) {
     const int box_pad = g->pad;
     const int section_gap = 16;
     const int item_list_pad = g->pad;
+    //const int font_size = g->font_size;
+    const int font_size = 10;
     const int max_visible_items = 12; // arbitrary limit for list height
     // Measure title
-    Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
+    //Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
+    Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g->line_spacing);
     // Menu box size
     float menu_width_percent = 0.80f;
     float menu_height_percent = 0.80f;
@@ -1211,7 +1247,7 @@ static void draw_inventory_menu(gamestate* const g) {
     float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f;
     float title_y = menu_box.y + box_pad;
     //DrawTextEx(GetFontDefault(), menu_title, (Vector2){title_x, title_y}, g->font_size, g->line_spacing, WHITE);
-    DrawText(menu_title, title_x, title_y, g->font_size, WHITE);
+    DrawText(menu_title, title_x, title_y, font_size, WHITE);
     // Partition into left/right halves (with gap)
     float half_width = (menu_box.width - section_gap) / 2.0f;
     float half_height = menu_box.height - title_size.y - box_pad * 2.0f - box_pad;
@@ -1252,8 +1288,8 @@ static void draw_inventory_menu(gamestate* const g) {
         if (is_equipped) {
             strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1);
         }
-        DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, g->font_size, g->line_spacing, WHITE);
-        item_y += g->font_size + 4;
+        DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, font_size, g->line_spacing, WHITE);
+        item_y += font_size + 4;
     }
     // Draw item info in right_box
     const char* info_title = "Item Info:";
@@ -1300,10 +1336,9 @@ static void draw_inventory_menu(gamestate* const g) {
         snprintf(info_text, sizeof(info_text), "Select an item to view details here.");
     }
     float info_title_y = right_box.y + item_list_pad;
-    float info_text_y = info_title_y + g->font_size + 8;
-    DrawTextEx(
-        GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, g->font_size, g->line_spacing, (Color){0xaa, 0xaa, 0xaa, 0xff});
-    DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, g->font_size, g->line_spacing, WHITE);
+    float info_text_y = info_title_y + font_size + 8;
+    DrawTextEx(GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, font_size, g->line_spacing, (Color){0xaa, 0xaa, 0xaa, 0xff});
+    DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, font_size, g->line_spacing, WHITE);
     if (sg) {
         sprite* s = sg_get_current(sg);
         if (s) {

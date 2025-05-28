@@ -60,6 +60,7 @@ static void handle_camera_move(gamestate* const g, const inputstate* const is);
 static void handle_input(const inputstate* const is, gamestate* const g);
 static void handle_input_camera(const inputstate* const is, gamestate* const g);
 static void handle_input_player(const inputstate* const is, gamestate* const g);
+static void handle_input_inventory(const inputstate* const is, gamestate* const g);
 static void add_message_history(gamestate* const g, const char* fmt, ...);
 static void add_message_and_history(gamestate* g, const char* fmt, ...);
 static void add_message(gamestate* g, const char* fmt, ...);
@@ -87,6 +88,21 @@ static bool player_on_tile(gamestate* g, int x, int y, int z);
 static void try_entity_traverse_floors(gamestate* const g, entityid id);
 //static bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl);
 //static bool tile_has_door(const gamestate* const g, int x, int y, int fl);
+static int calc_next_lvl_xp(gamestate* const g, entityid id);
+
+static int calc_next_lvl_xp(gamestate* const g, entityid id) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
+    // get the current level
+    int lvl = g_get_stat(g, id, STATS_LEVEL);
+    massert(lvl >= 0, "level is negative");
+    // calculate the next level's xp
+    const int base_xp = 10;
+    int next_lvl_xp = base_xp * (powl(2, lvl) - 1);
+    massert(next_lvl_xp >= 0, "next level xp is negative");
+    // set the next level's xp
+    return next_lvl_xp;
+}
 
 static void add_message_history(gamestate* const g, const char* fmt, ...) {
     massert(g, "gamestate is NULL");
@@ -1041,6 +1057,8 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g_add_stats(g, id);
     g_set_stat(g, id, STATS_LEVEL, 1);
     g_set_stat(g, id, STATS_XP, 0);
+
+    g_set_stat(g, id, STATS_NEXT_LEVEL_XP, calc_next_lvl_xp(g, id));
     g_set_stat(g, id, STATS_MAXHP, 1);
     g_set_stat(g, id, STATS_HP, 1);
     g_set_stat(g, id, STATS_AC, 10);
@@ -1336,7 +1354,7 @@ static void handle_input_camera(const inputstate* const is, gamestate* const g) 
 static void handle_input_inventory(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-    if (inputstate_is_pressed(is, KEY_I)) {
+    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->controlmode = CONTROLMODE_PLAYER;
         g->display_inventory_menu = false;
         return;
