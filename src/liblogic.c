@@ -2227,9 +2227,14 @@ static void update_player_state(gamestate* const g) {
 
             // Increase max HP based on Constitution bonus
             int con_bonus = bonus_calc(g_get_stat(g, g->hero_id, STATS_CON));
+            int hitdie = g_get_stat(g, g->hero_id, STATS_HITDIE);
+
+            // roll the hitdie
+            roll r = {1, hitdie, 0}; // 1d(hitdie)
+            int hp_gain = do_roll(r) + con_bonus; // Add Constitution bonus to HP gain
 
             int old_max_hp = g_get_stat(g, g->hero_id, STATS_MAXHP);
-            int new_max_hp = old_max_hp + con_bonus;
+            int new_max_hp = old_max_hp + hp_gain; // Increase max HP by the rolled amount
             if (new_max_hp <= old_max_hp) new_max_hp = old_max_hp + 1; // Ensure max HP increases
 
             int new_next_level_xp = calc_next_lvl_xp(g, g->hero_id);
