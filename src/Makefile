@@ -30,7 +30,7 @@ EMCC_OPTIONS = -s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall -s ALLOW_MEMORY_G
 #EMCC_OPTIONS = -s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall 
 
 SHELL_FILE = --shell-file /home/darkmage/src/raylib/src/minshell.html
-PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img --preload-file keybindings.ini --preload-file ./audio/music --preload-file ./music.txt
+PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img --preload-file keybindings.ini --preload-file ./audio/music --preload-file ./music.txt 
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 
 

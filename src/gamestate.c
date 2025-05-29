@@ -19,6 +19,33 @@
 
 static void gamestate_init_music_paths(gamestate* const g);
 
+//static void gamestate_load_help_menu_text(gamestate* const g) {
+//    massert(g, "gamestate is NULL");
+//    const char* help_text_file = "helpmenu.txt";
+//    FILE* file = fopen(help_text_file, "r");
+//    if (!file) {
+//        merror("Failed to open help menu text file: %s", help_text_file);
+//        return;
+//    }
+//    char line[256];
+//    size_t index = 0;
+//    while (fgets(line, sizeof(line), file) && index < sizeof(g->help_menu_text) - 1) {
+//        // Remove newline character if present
+//        line[strcspn(line, "\n")] = '\0';
+//        // Append to help menu text
+//        strncat(g->help_menu_text, line, sizeof(g->help_menu_text) - strlen(g->help_menu_text) - 1);
+//        // Add a newline for formatting
+//        if (index + strlen(line) < sizeof(g->help_menu_text) - 1) {
+//            strncat(g->help_menu_text, "\n", sizeof(g->help_menu_text) - strlen(g->help_menu_text) - 1);
+//        }
+//        index += strlen(line) + 1; // +1 for the newline character
+//    }
+//    fclose(file);
+//    // Ensure the string is null-terminated
+//    g->help_menu_text[sizeof(g->help_menu_text) - 1] = '\0'; // Ensure null termination
+//    msuccess("Help menu text loaded successfully from %s", help_text_file);
+//}
+
 // have to update this function when we introduce new fields to Gamestate
 gamestate* gamestateinitptr() {
     gamestate* g = (gamestate*)malloc(sizeof(gamestate));
@@ -59,6 +86,10 @@ gamestate* gamestateinitptr() {
     g->gridon = false;
     g->display_inventory_menu = false;
     g->display_quit_menu = false;
+    g->display_help_menu = false;
+
+    //bzero(g->help_menu_text, sizeof(g->help_menu_text));
+
     g->do_quit = false;
     g->processing_actions = false;
     g->cam2d.target = (Vector2){0, 0};
@@ -176,6 +207,7 @@ gamestate* gamestateinitptr() {
     g->total_music_paths = 0;
     gamestate_init_music_paths(g);
     gamestate_init_msg_history(g);
+    //gamestate_load_help_menu_text(g);
     return g;
 }
 

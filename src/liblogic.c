@@ -41,6 +41,7 @@ static inline void update_npc_state(gamestate* const g, entityid id);
 static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
 //static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
+static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
 static int get_hitdie_for_race(race_t race);
 static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
@@ -1741,17 +1742,19 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         }
         return;
     }
+
+    if (inputstate_is_shift_held(is) && inputstate_is_pressed(is, KEY_SLASH)) {
+        g->display_help_menu = true;
+        g->controlmode = CONTROLMODE_HELP;
+        return;
+    }
+
     const char* action = get_action_key(is, g);
     if (!action) {
         merror("No action found for key");
         return;
     }
-    //if (strcmp(action, "none") != 0) {
-    //    minfo("action: %s", action);
-    //}
-    // check if the player is dead
-    //if (hero->dead) return;
-    //minfo("calling g_is_dead 8");
+
     if (g_is_dead(g, g->hero_id)) return;
     if (action) {
         if (g->player_changing_direction) {
@@ -1985,10 +1988,21 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         handle_input_camera(is, g);
     } else if (g->controlmode == CONTROLMODE_INVENTORY) {
         handle_input_inventory(is, g);
+    } else if (g->controlmode == CONTROLMODE_HELP) {
+        handle_input_help_menu(is, g);
     } else {
         merror("Unknown control mode");
     }
-    //}
+}
+
+static void handle_input_help_menu(const inputstate* const is, gamestate* const g) {
+    massert(is, "Input state is NULL!");
+    massert(g, "Game state is NULL!");
+    if (inputstate_any_pressed(is)) {
+        g->display_help_menu = false;
+        g->controlmode = CONTROLMODE_PLAYER;
+        return;
+    }
 }
 
 static void update_debug_panel_buffer(gamestate* const g) {

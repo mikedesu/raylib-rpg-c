@@ -50,6 +50,9 @@ typedef struct gamestate {
     bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard,
         display_inventory_menu, display_quit_menu, do_quit, dirty_entities; // true if new entities created this turn
 
+    bool display_help_menu;
+    //char help_menu_text[2048];
+
     int framecount, fadealpha, camera_mode, targetwidth, targetheight, windowwidth, windowheight, lock, turn_count;
     int font_size, pad, inventory_menu_selection;
     int name_list_count, name_list_capacity;

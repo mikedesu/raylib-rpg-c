@@ -788,6 +788,45 @@ static inline void handle_debug_panel(gamestate* const g) {
     }
 }
 
+static void draw_help_menu(gamestate* const g) {
+    if (!g->display_help_menu) return;
+        // const char* help_text = g->help_menu_text;
+
+#define HELP_TEXT_COUNT 17
+    char* help_text[HELP_TEXT_COUNT] = {"# Help Menu",
+                                        "",
+                                        "## Controls",
+                                        "-----------------------------------",
+                                        "- Movement: q w e a d z x c",
+                                        "- Attack: '",
+                                        "- Pickup Item: /",
+                                        "- Turn In Place: s [movement]",
+                                        "- Wait: s s",
+                                        "- Traverse: ]",
+                                        "- Inventory: Esc",
+                                        "- Nav Inventory: arrow up/down, w/x",
+                                        "- Use/Equip/Unequip Item: enter, '",
+                                        "- Drop Item: ]",
+                                        "",
+                                        "Press any key to close this menu.",
+                                        ""};
+
+    Color bg_color = Fade((Color){0x33, 0x33, 0x33}, 1.0f);
+    int font_size = 10;
+    int measure = MeasureText(help_text[11], font_size);
+    int text_width = measure;
+    int text_height = font_size;
+    int x = (g->windowwidth - text_width) / 2;
+    int y = (g->windowheight - text_height * HELP_TEXT_COUNT) / 2;
+    // Draw background box
+    DrawRectangle(x - 10, y - 10, text_width + 20, text_height * HELP_TEXT_COUNT + 20, bg_color);
+    DrawRectangleLines(x - 10, y - 10, text_width + 20, text_height * HELP_TEXT_COUNT + 20, WHITE);
+    // Draw each line of help text
+    for (int i = 0; i < HELP_TEXT_COUNT; i++) {
+        DrawText(help_text[i], x, y + i * text_height, font_size, WHITE);
+    }
+}
+
 void libdraw_drawframe(gamestate* const g) {
     double start_time = GetTime();
     BeginDrawing();
@@ -806,9 +845,15 @@ void libdraw_drawframe(gamestate* const g) {
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     handle_debug_panel(g);
     draw_version(g);
+
     if (g->display_quit_menu) {
         draw_quit_menu(g);
     }
+
+    if (g->display_help_menu) {
+        draw_help_menu(g);
+    }
+
     EndDrawing();
     //double elapsed_time = GetTime() - start_time;
     g->last_frame_time = GetTime() - start_time;
@@ -1236,8 +1281,8 @@ static void draw_inventory_menu(gamestate* const g) {
     //Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
     Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g->line_spacing);
     // Menu box size
-    float menu_width_percent = 0.80f;
-    float menu_height_percent = 0.80f;
+    float menu_width_percent = 0.5f;
+    float menu_height_percent = 0.5f;
     float menu_width = g->windowwidth * menu_width_percent;
     float menu_height = g->windowheight * menu_height_percent;
     Rectangle menu_box = {.x = (g->windowwidth - menu_width) / 2.0f, .y = (g->windowheight - menu_height) / 4.0f, .width = menu_width, .height = menu_height};
