@@ -422,3 +422,16 @@ void init_spell_effect_component(spell_effect_component* comp, entityid id, spel
     comp->id = id;
     comp->effect = effect;
 }
+
+void init_base_attack_damage_component(base_attack_damage_component* comp, entityid id, roll r) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) {
+        return;
+    }
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        return;
+    }
+    comp->id = id;
+    comp->damage = r;
+}

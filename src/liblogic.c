@@ -41,9 +41,13 @@ static inline void update_npc_state(gamestate* const g, entityid id);
 static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
 //static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
-static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
 static int get_hitdie_for_race(race_t race);
+static roll get_base_attack_damage_for_race(race_t race);
+
+static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
+
 static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
+
 static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
 static void handle_level_up(gamestate* const g, entityid id);
@@ -553,7 +557,11 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
         int dmg = 1;
         if (attacker_weapon_id == ENTITYID_INVALID) {
             // no weapon
-            dmg = 1;
+            // get the entity's base attack damage
+            roll dmg_roll = g_get_base_attack_damage(g, atk_id);
+            dmg = do_roll(dmg_roll);
+            const int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
+            dmg += atk_bonus;
         } else {
             // weapon
             // we will calculate damage based on weapon attributes
@@ -704,7 +712,9 @@ static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid atta
     massert(tile, "tile is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(successful, "attack_successful is NULL");
-    for (int i = 0; i < tile->entity_max; i++) handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
+    for (int i = 0; i < tile->entity_max; i++) {
+        handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
+    }
 }
 
 static void try_entity_zap(gamestate* const g, entityid atkid, loc_t targetloc) {
@@ -1087,7 +1097,6 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     massert(loc.y >= 0, "y is out of bounds: %s: %d", name, loc.y);
     massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
     // can we create an entity at this location? no entities can be made on wall-types etc
-    //tile_t* const tile = df_tile_at(df, x, y);
     tile_t* const tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
     if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
@@ -1100,16 +1109,6 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     }
 
     entityid id = g_add_entity(g);
-    //entityid id = g->next_entityid;
-    //if (!g->dirty_entities) {
-    //    g->dirty_entities = true;
-    //    g->new_entityid_begin = id;
-    //    g->new_entityid_end = id + 1;
-    //} else {
-    //    //g->dirty_entities = true;
-    //    g->new_entityid_end = id + 1;
-    //}
-    //g->next_entityid++;
 
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_NPC);
@@ -1128,6 +1127,7 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g_add_target(g, id, (loc_t){-1, -1, -1});
     g_add_target_path(g, id);
     g_add_equipment(g, id);
+    g_add_base_attack_damage(g, id, (roll){1, 4, 0});
 
     g_add_stats(g, id);
     g_set_stat(g, id, STATS_LEVEL, 1);
@@ -2226,6 +2226,24 @@ static int get_hitdie_for_race(race_t race) {
     return hit_die;
 }
 
+static roll get_base_attack_damage_for_race(race_t race) {
+    roll r = {1, 4, 0}; // Default base attack damage
+    switch (race) {
+    case RACE_GREEN_SLIME: r = (roll){1, 1, 0}; break;
+    case RACE_BAT: r = (roll){1, 2, 0}; break;
+    case RACE_HALFLING: r = (roll){1, 4, 0}; break;
+    case RACE_GOBLIN: r = (roll){1, 4, 0}; break;
+    case RACE_WOLF: r = (roll){1, 6, 0}; break;
+    case RACE_HUMAN: r = (roll){1, 4, 0}; break;
+    case RACE_ELF: r = (roll){1, 4, 0}; break;
+    case RACE_DWARF: r = (roll){1, 4, 0}; break;
+    case RACE_ORC: r = (roll){1, 6, 0}; break;
+    case RACE_WARG: r = (roll){1, 12, 0}; break;
+    default: break;
+    }
+    return r;
+}
+
 static race_t get_random_race() {
     race_t race = RACE_NONE;
     int num_choices = 10;
@@ -2246,6 +2264,15 @@ static race_t get_random_race() {
     return race;
 }
 
+static race_t get_random_race_for_floor(int floor) {
+    race_t race = RACE_NONE;
+    int num_choices = 1;
+    if (floor == 0) {
+        return RACE_GREEN_SLIME;
+    }
+    return get_random_race();
+}
+
 static bool npc_create_set_stats(gamestate* const g, loc_t loc, race_t race) {
     entityid id = ENTITYID_INVALID;
     bool success = false;
@@ -2261,20 +2288,8 @@ static bool npc_create_set_stats(gamestate* const g, loc_t loc, race_t race) {
         g_set_stat(g, id, STATS_XP, 0);
         g_set_stat(g, id, STATS_LEVEL, 1);
 
-        //int hitdie = 6;
-        //switch (race) {
-        //case RACE_GREEN_SLIME: hitdie = 4; break;
-        //case RACE_BAT: hitdie = 4; break;
-        //case RACE_HALFLING: hitdie = 6; break;
-        //case RACE_GOBLIN: hitdie = 6; break;
-        //case RACE_WOLF: hitdie = 6; break;
-        //case RACE_HUMAN: hitdie = 8; break;
-        //case RACE_ELF: hitdie = 8; break;
-        //case RACE_DWARF: hitdie = 8; break;
-        //case RACE_ORC: hitdie = 10; break;
-        //case RACE_WARG: hitdie = 12; break;
-        //default: break;
-        //}
+        roll base_attack_dmg = get_base_attack_damage_for_race(race);
+        g_set_base_attack_damage(g, id, base_attack_dmg);
 
         g_set_stat(g, id, STATS_STR, do_roll_best_of_3((roll){3, 6, 0}));
         g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((roll){3, 6, 0}));
@@ -2284,6 +2299,7 @@ static bool npc_create_set_stats(gamestate* const g, loc_t loc, race_t race) {
             merror("Max HP is less than or equal to 0, setting to 1");
             max_hp = 1; // Ensure max HP is at least 1
         }
+
         g_set_stat(g, id, STATS_MAXHP, max_hp);
         g_set_stat(g, id, STATS_HP, max_hp);
         g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
@@ -2314,7 +2330,8 @@ static void try_spawn_npc(gamestate* const g) {
                 loc_t loc = get_random_empty_non_wall_loc(g, current_floor);
                 entityid id = ENTITYID_INVALID;
                 //race_t race = RACE_GREEN_SLIME;
-                race_t race = get_random_race();
+                //race_t race = get_random_race();
+                race_t race = get_random_race_for_floor(current_floor);
                 success = npc_create_set_stats(g, loc, race);
                 //id = npc_create(g, race, loc, "NPC");
                 //if (id != ENTITYID_INVALID) {

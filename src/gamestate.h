@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ac_component.h"
+#include "base_attack_damage_component.h"
 #include "component.h"
 #include "component_table.h"
 #include "controlmode.h"
@@ -16,7 +17,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-#define GAME_VERSION "v0.0.3"
+#define GAME_VERSION "v0.0.3.1"
 
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
@@ -81,6 +82,7 @@ typedef struct gamestate {
     int ac_list_count, ac_list_capacity;
     int zapping_list_count, zapping_list_capacity;
     int spell_effect_list_count, spell_effect_list_capacity;
+    int base_attack_damage_list_count, base_attack_damage_list_capacity;
 
     debugpanel_t debugpanel;
 
@@ -134,6 +136,7 @@ typedef struct gamestate {
     damage_component* damage_list;
     ac_component* ac_list;
     spell_effect_component* spell_effect_list;
+    base_attack_damage_component* base_attack_damage_list;
 
     int current_music_index;
     int total_music_paths;
@@ -322,3 +325,8 @@ bool g_add_spell_effect(gamestate* const g, entityid id, spell_effect effect);
 bool g_has_spell_effect(const gamestate* const g, entityid id);
 bool g_set_spell_effect(gamestate* const g, entityid id, spell_effect effect);
 spell_effect g_get_spell_effect(const gamestate* const g, entityid id);
+
+bool g_add_base_attack_damage(gamestate* const g, entityid id, roll damage);
+bool g_has_base_attack_damage(const gamestate* const g, entityid id);
+bool g_set_base_attack_damage(gamestate* const g, entityid id, roll damage);
+roll g_get_base_attack_damage(const gamestate* const g, entityid id);

@@ -5,6 +5,7 @@
 #include "arrow_component.h"
 #include "attacking_component.h"
 #include "attrib_effect.h"
+#include "base_attack_damage_component.h"
 #include "block_success_component.h"
 #include "blocking_component.h"
 #include "damage_component.h"
@@ -76,6 +77,7 @@ typedef enum component_t
     C_AC,
     C_ZAPPING,
     C_SPELL_EFFECT,
+    C_BASE_ATTACK_DAMAGE,
     C_COUNT
 } component;
 
@@ -109,6 +111,7 @@ static inline const char* component2str(component c) {
     case C_AC: return "C_AC";
     case C_ZAPPING: return "C_ZAPPING";
     case C_SPELL_EFFECT: return "C_SPELL_EFFECT";
+    case C_BASE_ATTACK_DAMAGE: return "C_BASE_ATTACK_DAMAGE";
     case C_COUNT: return "C_COUNT";
     default: break;
     }
@@ -143,3 +146,4 @@ void init_damage_component(damage_component* comp, entityid id, roll r);
 void init_ac_component(ac_component* comp, entityid id, int ac);
 void init_zapping_component(zapping_component* comp, entityid id, bool zapping);
 void init_spell_effect_component(spell_effect_component* comp, entityid id, spell_effect effect);
+void init_base_attack_damage_component(base_attack_damage_component* comp, entityid id, roll r);
