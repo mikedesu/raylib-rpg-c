@@ -45,6 +45,7 @@ static int get_hitdie_for_race(race_t race);
 static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
+static void handle_level_up(gamestate* const g, entityid id);
 static void init_npc_test(gamestate* g);
 static void init_sword_test(gamestate* g);
 static void init_dagger_test(gamestate* g);
@@ -91,6 +92,9 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id);
 static int calc_next_lvl_xp(gamestate* const g, entityid id);
 static int calc_challenge_rating(gamestate* const g, entityid id);
 static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id);
+static race_t get_random_race();
+static bool npc_create_set_stats(gamestate* const g, loc_t loc, race_t race);
+static void check_and_handle_level_up(gamestate* const g, entityid id);
 
 static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id) {
     massert(g, "gamestate is NULL");
@@ -104,6 +108,7 @@ static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid tar
     // get the challenge rating
     int challenge_rating = calc_challenge_rating(g, target_id);
     massert(challenge_rating >= 0, "challenge rating is negative");
+    minfo("Challenge rating for target %d is %d", target_id, challenge_rating);
     // get the attacker's level
     int attacker_level = g_get_stat(g, attacker_id, STATS_LEVEL);
     massert(attacker_level >= 0, "attacker level is negative");
@@ -2191,19 +2196,96 @@ static void init_wand_test(gamestate* g) {
 static int get_hitdie_for_race(race_t race) {
     int hit_die = 4;
     switch (race) {
-    case RACE_HUMAN: hit_die = 6; break;
-    case RACE_ELF: hit_die = 6; break;
-    case RACE_DWARF: hit_die = 6; break;
-    case RACE_ORC: hit_die = 8; break;
-    case RACE_GOBLIN: hit_die = 4; break;
-    case RACE_HALFLING: hit_die = 4; break;
-    case RACE_WOLF: hit_die = 4; break;
-    case RACE_BAT: hit_die = 2; break;
-    case RACE_WARG: hit_die = 8; break;
     case RACE_GREEN_SLIME: hit_die = 4; break;
+    case RACE_BAT: hit_die = 4; break;
+    case RACE_HALFLING: hit_die = 6; break;
+    case RACE_GOBLIN: hit_die = 6; break;
+    case RACE_WOLF: hit_die = 6; break;
+    case RACE_HUMAN: hit_die = 8; break;
+    case RACE_ELF: hit_die = 8; break;
+    case RACE_DWARF: hit_die = 8; break;
+    case RACE_ORC: hit_die = 10; break;
+    case RACE_WARG: hit_die = 12; break;
+
     default: break;
     }
     return hit_die;
+}
+
+static race_t get_random_race() {
+    race_t race = RACE_NONE;
+    int num_choices = 10;
+    int choice = rand() % num_choices;
+    switch (choice) {
+    case 0: race = RACE_BAT; break;
+    case 1: race = RACE_WOLF; break;
+    case 2: race = RACE_HUMAN; break;
+    case 3: race = RACE_ELF; break;
+    case 4: race = RACE_DWARF; break;
+    case 5: race = RACE_HALFLING; break;
+    case 6: race = RACE_ORC; break;
+    case 7: race = RACE_GOBLIN; break;
+    case 8: race = RACE_GREEN_SLIME; break;
+    case 9: race = RACE_WARG; break;
+    default: break;
+    }
+    return race;
+}
+
+static bool npc_create_set_stats(gamestate* const g, loc_t loc, race_t race) {
+    entityid id = ENTITYID_INVALID;
+    bool success = false;
+    id = npc_create(g, race, loc, "NPC");
+    if (id != ENTITYID_INVALID) {
+        int floor = loc.z + 1;
+        minfo("Spawning entity at %d, %d, %d on floor %d with HP %d", loc.x, loc.y, loc.z, floor, g_get_stat(g, id, STATS_HP));
+        int hit_die = get_hitdie_for_race(race);
+        roll r = {1, hit_die, 0};
+        int max_hp = do_roll(r);
+        g_set_stat(g, id, STATS_HITDIE, hit_die);
+        g_set_stat(g, id, STATS_AC, 10);
+        g_set_stat(g, id, STATS_XP, 0);
+        g_set_stat(g, id, STATS_LEVEL, 1);
+
+        //int hitdie = 6;
+        //switch (race) {
+        //case RACE_GREEN_SLIME: hitdie = 4; break;
+        //case RACE_BAT: hitdie = 4; break;
+        //case RACE_HALFLING: hitdie = 6; break;
+        //case RACE_GOBLIN: hitdie = 6; break;
+        //case RACE_WOLF: hitdie = 6; break;
+        //case RACE_HUMAN: hitdie = 8; break;
+        //case RACE_ELF: hitdie = 8; break;
+        //case RACE_DWARF: hitdie = 8; break;
+        //case RACE_ORC: hitdie = 10; break;
+        //case RACE_WARG: hitdie = 12; break;
+        //default: break;
+        //}
+
+        g_set_stat(g, id, STATS_STR, do_roll_best_of_3((roll){3, 6, 0}));
+        g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((roll){3, 6, 0}));
+        g_set_stat(g, id, STATS_CON, do_roll_best_of_3((roll){3, 6, 0}));
+        max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
+        if (max_hp <= 0) {
+            merror("Max HP is less than or equal to 0, setting to 1");
+            max_hp = 1; // Ensure max HP is at least 1
+        }
+        g_set_stat(g, id, STATS_MAXHP, max_hp);
+        g_set_stat(g, id, STATS_HP, max_hp);
+        g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+
+        for (int i = 1; i < floor; i++) {
+            minfo("Handling level up for entity %d level %d", id, i + 1);
+            handle_level_up(g, id);
+        }
+
+        int new_level = g_get_stat(g, id, STATS_LEVEL);
+        massert(new_level == floor, "New level %d does not match floor %d", new_level, floor);
+
+        msuccess("Spawned entity of Level %d with %d HP at %d, %d, %d", g_get_stat(g, id, STATS_LEVEL), max_hp, loc.x, loc.y, loc.z);
+        success = true;
+    }
+    return success;
 }
 
 static void try_spawn_npc(gamestate* const g) {
@@ -2217,37 +2299,26 @@ static void try_spawn_npc(gamestate* const g) {
                 int current_floor = g->d->current_floor;
                 loc_t loc = get_random_empty_non_wall_loc(g, current_floor);
                 entityid id = ENTITYID_INVALID;
-                race_t race = RACE_GREEN_SLIME;
-                int choice = rand() % 8;
-                switch (choice) {
-                case 0: race = RACE_BAT; break;
-                case 1: race = RACE_WOLF; break;
-                case 2: race = RACE_HUMAN; break;
-                case 3: race = RACE_ELF; break;
-                case 4: race = RACE_DWARF; break;
-                case 5: race = RACE_HALFLING; break;
-                case 6: race = RACE_ORC; break;
-                case 7: race = RACE_GOBLIN; break;
-                default: break;
-                }
-                //race = RACE_BAT;
-                id = npc_create(g, race, loc, "NPC");
-                if (id != ENTITYID_INVALID) {
-                    int hit_die = get_hitdie_for_race(race);
-                    roll r = {1, hit_die, 0};
-                    int max_hp = do_roll(r);
-                    g_set_stat(g, id, STATS_AC, 10);
-                    g_set_stat(g, id, STATS_XP, 0);
-                    g_set_stat(g, id, STATS_LEVEL, 1);
-                    g_set_stat(g, id, STATS_STR, do_roll((roll){3, 6, 0}));
-                    g_set_stat(g, id, STATS_DEX, do_roll((roll){3, 6, 0}));
-                    g_set_stat(g, id, STATS_CON, do_roll((roll){3, 6, 0}));
-                    max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
-                    g_set_stat(g, id, STATS_MAXHP, max_hp);
-                    g_set_stat(g, id, STATS_HP, max_hp);
-                    g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-                    success = true;
-                }
+                //race_t race = RACE_GREEN_SLIME;
+                race_t race = get_random_race();
+                success = npc_create_set_stats(g, loc, race);
+                //id = npc_create(g, race, loc, "NPC");
+                //if (id != ENTITYID_INVALID) {
+                //    int hit_die = get_hitdie_for_race(race);
+                //    roll r = {1, hit_die, 0};
+                //    int max_hp = do_roll(r);
+                //    g_set_stat(g, id, STATS_AC, 10);
+                //    g_set_stat(g, id, STATS_XP, 0);
+                //    g_set_stat(g, id, STATS_LEVEL, 1);
+                //    g_set_stat(g, id, STATS_STR, do_roll((roll){3, 6, 0}));
+                //    g_set_stat(g, id, STATS_DEX, do_roll((roll){3, 6, 0}));
+                //    g_set_stat(g, id, STATS_CON, do_roll((roll){3, 6, 0}));
+                //    max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
+                //    g_set_stat(g, id, STATS_MAXHP, max_hp);
+                //    g_set_stat(g, id, STATS_HP, max_hp);
+                //    g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+                //    success = true;
+                //}
             }
             do_this_once = false;
         }
@@ -2283,44 +2354,129 @@ static void update_player_state(gamestate* const g) {
         //}
 
         // check for player level up
-        int xp = g_get_stat(g, g->hero_id, STATS_XP);
-        int level = g_get_stat(g, g->hero_id, STATS_LEVEL);
-        int next_level_xp = g_get_stat(g, g->hero_id, STATS_NEXT_LEVEL_XP);
-
-        if (xp >= next_level_xp) {
-            // Level up the player
-            level++;
-            g_set_stat(g, g->hero_id, STATS_LEVEL, level);
-            // Increase attack bonus
-            int old_attack_bonus = g_get_stat(g, g->hero_id, STATS_ATTACK_BONUS);
-            int new_attack_bonus = old_attack_bonus + 1; // Example: increase by 1
-            g_set_stat(g, g->hero_id, STATS_ATTACK_BONUS, new_attack_bonus);
-
-            // Increase max HP based on Constitution bonus
-            int con_bonus = bonus_calc(g_get_stat(g, g->hero_id, STATS_CON));
-            int hitdie = g_get_stat(g, g->hero_id, STATS_HITDIE);
-
-            // roll the hitdie
-            roll r = {1, hitdie, 0}; // 1d(hitdie)
-            int hp_gain = do_roll(r) + con_bonus; // Add Constitution bonus to HP gain
-
-            int old_max_hp = g_get_stat(g, g->hero_id, STATS_MAXHP);
-            int new_max_hp = old_max_hp + hp_gain; // Increase max HP by the rolled amount
-            if (new_max_hp <= old_max_hp) new_max_hp = old_max_hp + 1; // Ensure max HP increases
-
-            int new_next_level_xp = calc_next_lvl_xp(g, g->hero_id);
-            g_set_stat(g, g->hero_id, STATS_MAXHP, new_max_hp);
-            g_set_stat(g, g->hero_id, STATS_HP, new_max_hp); // Restore HP to max
-            // Set next level XP requirement (example: 1000 XP for next level)
-            g_set_stat(g, g->hero_id, STATS_NEXT_LEVEL_XP, new_next_level_xp);
-
-            add_message_and_history(g, "You leveled up!");
-            add_message_and_history(g, "Level %d", level);
-            add_message_and_history(g, "Max HP increased to %d", new_max_hp);
-        }
+        check_and_handle_level_up(g, g->hero_id);
+        //int xp = g_get_stat(g, g->hero_id, STATS_XP);
+        //int level = g_get_stat(g, g->hero_id, STATS_LEVEL);
+        //int next_level_xp = g_get_stat(g, g->hero_id, STATS_NEXT_LEVEL_XP);
+        //if (xp >= next_level_xp) {
+        //    // Level up the player
+        //    level++;
+        //    g_set_stat(g, g->hero_id, STATS_LEVEL, level);
+        //    // Increase attack bonus
+        //    int old_attack_bonus = g_get_stat(g, g->hero_id, STATS_ATTACK_BONUS);
+        //    int new_attack_bonus = old_attack_bonus + 1; // Example: increase by 1
+        //    g_set_stat(g, g->hero_id, STATS_ATTACK_BONUS, new_attack_bonus);
+        //    // Increase max HP based on Constitution bonus
+        //    int con_bonus = bonus_calc(g_get_stat(g, g->hero_id, STATS_CON));
+        //    int hitdie = g_get_stat(g, g->hero_id, STATS_HITDIE);
+        //    // roll the hitdie
+        //    roll r = {1, hitdie, 0}; // 1d(hitdie)
+        //    int hp_gain = do_roll(r) + con_bonus; // Add Constitution bonus to HP gain
+        //    int old_max_hp = g_get_stat(g, g->hero_id, STATS_MAXHP);
+        //    int new_max_hp = old_max_hp + hp_gain; // Increase max HP by the rolled amount
+        //    if (new_max_hp <= old_max_hp) new_max_hp = old_max_hp + 1; // Ensure max HP increases
+        //    int new_next_level_xp = calc_next_lvl_xp(g, g->hero_id);
+        //    g_set_stat(g, g->hero_id, STATS_MAXHP, new_max_hp);
+        //    g_set_stat(g, g->hero_id, STATS_HP, new_max_hp); // Restore HP to max
+        //    // Set next level XP requirement (example: 1000 XP for next level)
+        //    g_set_stat(g, g->hero_id, STATS_NEXT_LEVEL_XP, new_next_level_xp);
+        //    add_message_and_history(g, "You leveled up!");
+        //    add_message_and_history(g, "Level %d", level);
+        //    add_message_and_history(g, "Max HP increased to %d", new_max_hp);
+        //}
     }
 
     if (g_is_dead(g, g->hero_id)) return;
+}
+
+static void handle_level_up(gamestate* const g, entityid id) {
+    int xp = g_get_stat(g, id, STATS_XP);
+    int level = g_get_stat(g, id, STATS_LEVEL);
+    int next_level_xp = g_get_stat(g, id, STATS_NEXT_LEVEL_XP);
+
+    // Level up the entity
+    level++;
+    g_set_stat(g, id, STATS_LEVEL, level);
+    int test_level = g_get_stat(g, id, STATS_LEVEL);
+    massert(test_level == level, "Failed to set level");
+
+    // Increase attack bonus
+    int old_attack_bonus = g_get_stat(g, id, STATS_ATTACK_BONUS);
+    int new_attack_bonus = old_attack_bonus + 1; // Example: increase by 1
+    g_set_stat(g, id, STATS_ATTACK_BONUS, new_attack_bonus);
+
+    // Increase max HP based on Constitution bonus
+    int con_bonus = bonus_calc(g_get_stat(g, id, STATS_CON));
+    if (con_bonus < 0) con_bonus = 0; // Ensure Constitution bonus is not negative
+    int hitdie = g_get_stat(g, id, STATS_HITDIE);
+
+    // roll the hitdie
+    roll r = {1, hitdie, 0}; // 1d(hitdie)
+    int hp_gain = do_roll(r) + con_bonus; // Add Constitution bonus to HP gain
+
+    int old_max_hp = g_get_stat(g, id, STATS_MAXHP);
+    int new_max_hp = old_max_hp + hp_gain; // Increase max HP by the rolled amount
+    if (new_max_hp <= old_max_hp) new_max_hp = old_max_hp + 1; // Ensure max HP increases
+
+    int new_next_level_xp = calc_next_lvl_xp(g, id);
+    g_set_stat(g, id, STATS_MAXHP, new_max_hp);
+    g_set_stat(g, id, STATS_HP, new_max_hp); // Restore HP to max
+    // Set next level XP requirement (example: 1000 XP for next level)
+    g_set_stat(g, id, STATS_NEXT_LEVEL_XP, new_next_level_xp);
+
+    if (id == g->hero_id) {
+        add_message_and_history(g, "You leveled up!");
+        add_message_and_history(g, "Level %d", level);
+        add_message_and_history(g, "Max HP increased to %d", new_max_hp);
+    } else {
+        msuccess("NPC %d leveled up to Level %d with %d HP", id, level, new_max_hp);
+    }
+}
+
+static void check_and_handle_level_up(gamestate* const g, entityid id) {
+    int xp = g_get_stat(g, id, STATS_XP);
+    int level = g_get_stat(g, id, STATS_LEVEL);
+    int next_level_xp = g_get_stat(g, id, STATS_NEXT_LEVEL_XP);
+
+    if (xp >= next_level_xp) {
+        handle_level_up(g, id);
+        // Level up the player
+        //level++;
+        //g_set_stat(g, id, STATS_LEVEL, level);
+        //int test_level = g_get_stat(g, id, STATS_LEVEL);
+        //massert(test_level == level, "Failed to set level");
+
+        // Increase attack bonus
+        //int old_attack_bonus = g_get_stat(g, id, STATS_ATTACK_BONUS);
+        //int new_attack_bonus = old_attack_bonus + 1; // Example: increase by 1
+        //g_set_stat(g, id, STATS_ATTACK_BONUS, new_attack_bonus);
+
+        // Increase max HP based on Constitution bonus
+        //int con_bonus = bonus_calc(g_get_stat(g, id, STATS_CON));
+        //int hitdie = g_get_stat(g, id, STATS_HITDIE);
+
+        // roll the hitdie
+        //roll r = {1, hitdie, 0}; // 1d(hitdie)
+        //int hp_gain = do_roll(r) + con_bonus; // Add Constitution bonus to HP gain
+
+        //int old_max_hp = g_get_stat(g, id, STATS_MAXHP);
+        //int new_max_hp = old_max_hp + hp_gain; // Increase max HP by the rolled amount
+        //if (new_max_hp <= old_max_hp) new_max_hp = old_max_hp + 1; // Ensure max HP increases
+
+        //int new_next_level_xp = calc_next_lvl_xp(g, id);
+        //g_set_stat(g, id, STATS_MAXHP, new_max_hp);
+        //g_set_stat(g, id, STATS_HP, new_max_hp); // Restore HP to max
+        // Set next level XP requirement (example: 1000 XP for next level)
+        //g_set_stat(g, id, STATS_NEXT_LEVEL_XP, new_next_level_xp);
+
+        //if (id == g->hero_id) {
+        //    add_message_and_history(g, "You leveled up!");
+        //    add_message_and_history(g, "Level %d", level);
+        //    add_message_and_history(g, "Max HP increased to %d", new_max_hp);
+        //} else {
+        //    msuccess("NPC %d leveled up to Level %d with %d HP", id, level, new_max_hp);
+        //}
+    }
 }
 
 static inline void update_npc_state(gamestate* const g, entityid id) {
