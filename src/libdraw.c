@@ -641,28 +641,6 @@ void libdraw_update_sprites(gamestate* const g) {
     if (g) {
         UpdateMusicStream(music);
 
-        float timePlayed = GetMusicTimePlayed(music) / GetMusicTimeLength(music);
-        if (timePlayed >= 1.0f) {
-            // stop music
-            StopMusicStream(music);
-            // we have to randomly select the next music track
-            // the music path list and values are in gamestate
-            int next_music_index = GetRandomValue(0, g->total_music_paths - 1);
-            // load the next music track
-            if (g->total_music_paths > 0 && next_music_index >= 0 && next_music_index < g->total_music_paths) {
-                const char* next_music_path = g->music_file_paths[next_music_index];
-                if (next_music_path) {
-                    minfo("libdraw_update_sprites: loading next music track: %s", next_music_path);
-                    LoadMusicStream(next_music_path);
-                    PlayMusicStream(music);
-                } else {
-                    merror("libdraw_update_sprites: next music path is NULL");
-                }
-            } else {
-                merror("libdraw_update_sprites: invalid next music index: %d", next_music_index);
-            }
-        }
-
         libdraw_handle_dirty_entities(g);
         for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite(g, id);
         libdraw_handle_gamestate_flag(g);
@@ -1201,23 +1179,19 @@ void libdraw_init(gamestate* const g) {
 
     InitAudioDevice();
 
-    //int r = rand() % 5;
-    //switch (r) {
-    //case 0: music = LoadMusicStream("audio/music/boss-mode.mp3"); break;
-    //case 1: music = LoadMusicStream("audio/music/dungeon-crawling.mp3"); break;
-    //case 2: music = LoadMusicStream("audio/music/curry-sauce.mp3"); break;
-    //case 3: music = LoadMusicStream("audio/music/dungeon-chillin.mp3"); break;
-    //case 4: music = LoadMusicStream("audio/music/dungeon-coolin.mp3"); break;
-    //default: break;
-    //}
-
     // select a random indices for current music
     g->current_music_index = rand() % g->total_music_paths;
     // load the music stream from the selected path
+
     const char* music_path = g->music_file_paths[g->current_music_index];
+
     massert(music_path, "music_path is NULL");
     minfo("Loading music from path: %s", music_path);
-    music = LoadMusicStream(music_path);
+
+    char real_music_path[1024] = {0};
+    snprintf(real_music_path, sizeof(real_music_path), "%s%s", "audio/music/", music_path);
+
+    music = LoadMusicStream(real_music_path);
 
     SetMusicVolume(music, 0.50f); // Set initial music volume
 
@@ -1446,10 +1420,20 @@ void draw_version(const gamestate* const g) {
     massert(g, "gamestate is NULL");
     const char* version = g->version;
     const int font_size = 10;
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), version, font_size, 1.0f);
+
+    // also grab the current music track path
+    const char* current_music_path = g->music_file_paths[g->current_music_index];
+
+    char buffer[1024] = {0};
+    snprintf(buffer, sizeof(buffer), "%s | Music: %s", version, current_music_path);
+
+    //const Vector2 text_size = MeasureTextEx(GetFontDefault(), version, font_size, 1.0f);
+    const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
+
     const float x = g->windowwidth - text_size.x - g->pad;
     //const float y = g->windowheight - text_size.y - g->pad;
     //const float x = 0;
     const float y = 0;
-    DrawTextEx(GetFontDefault(), version, (Vector2){x, y}, font_size, 1.0f, WHITE);
+    //DrawTextEx(GetFontDefault(), version, (Vector2){x, y}, font_size, 1.0f, WHITE);
+    DrawTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
 }

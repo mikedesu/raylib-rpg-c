@@ -3,15 +3,15 @@
 typedef enum
 {
     RACE_NONE = 0,
+    RACE_GREEN_SLIME,
+    RACE_BAT,
+    RACE_GOBLIN,
+    RACE_HALFLING,
+    RACE_WOLF,
     RACE_HUMAN,
     RACE_ELF,
     RACE_DWARF,
-    RACE_HALFLING,
-    RACE_GOBLIN,
     RACE_ORC,
-    RACE_WOLF,
     RACE_WARG,
-    RACE_BAT,
-    RACE_GREEN_SLIME,
     RACE_COUNT
 } race_t;

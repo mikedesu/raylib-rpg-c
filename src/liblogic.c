@@ -2266,9 +2266,18 @@ static race_t get_random_race() {
 
 static race_t get_random_race_for_floor(int floor) {
     race_t race = RACE_NONE;
-    int num_choices = 1;
     if (floor == 0) {
         return RACE_GREEN_SLIME;
+    } else if (floor >= 1 && floor <= 4) {
+        int num_choices = 3;
+        int choice = rand() % num_choices;
+        switch (choice) {
+        case 0: race = RACE_GREEN_SLIME; break;
+        case 1: race = RACE_BAT; break;
+        case 2: race = RACE_WOLF; break;
+        default: break;
+        }
+        return race;
     }
     return get_random_race();
 }

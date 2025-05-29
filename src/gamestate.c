@@ -237,7 +237,8 @@ static void gamestate_init_music_paths(gamestate* const g) {
         // we have to add "audio/music/" to the beginning of the path
         if (i < 1024) {
             //strncpy(g->music_file_paths[i], buffer, sizeof(g->music_file_paths[i]) - 1);
-            snprintf(g->music_file_paths[i], sizeof(g->music_file_paths[i]), "audio/music/%s", buffer);
+            //snprintf(g->music_file_paths[i], sizeof(g->music_file_paths[i]), "audio/music/%s", buffer);
+            snprintf(g->music_file_paths[i], sizeof(g->music_file_paths[i]), "%s", buffer);
             g->music_file_paths[i][sizeof(g->music_file_paths[i]) - 1] = '\0'; // Ensure null termination
             i++;
         } else {
