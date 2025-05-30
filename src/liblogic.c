@@ -122,8 +122,10 @@ static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid tar
     massert(attacker_level >= 0, "attacker level is negative");
     // calculate the reward xp
     int base_xp = challenge_rating;
-    int xp_modifier = pow(1.5, challenge_rating - attacker_level);
-    int reward_xp = (int)(base_xp * xp_modifier);
+    //int xp_modifier = pow(1.5, challenge_rating - attacker_level);
+    float xp_modifier = pow(2, challenge_rating - attacker_level);
+
+    int reward_xp = (int)round(base_xp * xp_modifier);
     massert(reward_xp >= 0, "reward xp is negative");
     return reward_xp;
 }
@@ -1183,14 +1185,15 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
     massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
     tile_t* const tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
-    if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
+    //if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
+    if (!tile_is_walkable(tile->type)) {
         merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
-    if (tile_has_live_npcs(g, tile)) {
-        merror("cannot create entity on tile with NPC");
-        return ENTITYID_INVALID;
-    }
+    //if (tile_has_live_npcs(g, tile)) {
+    //    merror("cannot create entity on tile with NPC");
+    //    return ENTITYID_INVALID;
+    //}
     entityid id = g_add_entity(g);
 
     g_add_name(g, id, name);

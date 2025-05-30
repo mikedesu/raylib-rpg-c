@@ -725,7 +725,7 @@ static void draw_message_box(gamestate* g) {
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     //Color message_bg = (Color){0, 0, 0xff, 0xff};
     // copy the message to a temporary buffer
-    int font_size = 10;
+    int font_size = 20;
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg);
     // Measure text (split into lines if needed)
@@ -1128,7 +1128,7 @@ static void draw_hud(gamestate* const g) {
     dungeon_floor_t* const df = d_get_current_floor(g->d);
     int floor = g->d->current_floor;
     //int font_size = g->font_size;
-    int font_size = 10;
+    int font_size = 20;
 
     //const char* room_name = df_get_room_name(df, loc);
     char buffer[1024] = {0};
@@ -1211,7 +1211,7 @@ static void draw_message_history(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) return;
-    int font_size = 10;
+    int font_size = 20;
     //int font_size = g->font_size;
     const int max_messages = 20;
     const int x = 0;
@@ -1255,7 +1255,7 @@ static void draw_inventory_menu(gamestate* const g) {
     const int section_gap = 16;
     const int item_list_pad = g->pad;
     //const int font_size = g->font_size;
-    const int font_size = 10;
+    const int font_size = 20;
     const int max_visible_items = 12; // arbitrary limit for list height
     // Measure title
     //Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
@@ -1396,7 +1396,8 @@ static void draw_quit_menu(const gamestate* const g) {
     const int max_visible_items = 12; // arbitrary limit for list height
     // Measure text using DrawText
     int text_width = MeasureText(text, g->font_size);
-    int text_height = g->font_size;
+    //int text_height = g->font_size;
+    int text_height = 10;
     // Calculate box size to fit the text with padding
     const float box_width = text_width + box_pad * 2;
     const float box_height = text_height + box_pad * 2;
@@ -1412,7 +1413,8 @@ static void draw_quit_menu(const gamestate* const g) {
     const float text_x = box_x + box_pad;
     const float text_y = box_y + box_pad;
     // Draw the text
-    DrawText(text, text_x, text_y, g->font_size, fg);
+    //DrawText(text, text_x, text_y, g->font_size, fg);
+    DrawText(text, text_x, text_y, 10, fg);
 }
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
