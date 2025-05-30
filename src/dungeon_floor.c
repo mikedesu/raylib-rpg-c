@@ -1723,7 +1723,7 @@ static void df_init_test_complex9(dungeon_floor_t* df, int grid_cell_w, int grid
             int x = (grid_col_index + j) * grid_cell_w;
             int y = (grid_row_index + i) * grid_cell_h;
             // Horizontal hallway to the right
-            if (j < 2) {
+            if (j < local_grid_cols - 1) {
                 int hallway_start_x = x + (rand() % (grid_cell_w - hallway_length));
                 int hallway_y = y + grid_cell_h / 2;
                 for (int k = 0; k <= hallway_length; k++) {
@@ -1733,7 +1733,7 @@ static void df_init_test_complex9(dungeon_floor_t* df, int grid_cell_w, int grid
                 }
             }
             // Vertical hallway downward
-            if (i < 2) {
+            if (i < local_grid_rows - 1) {
                 int hallway_x = x + grid_cell_w / 2;
                 int hallway_start_y = y + (rand() % (grid_cell_h - hallway_length));
                 for (int k = 0; k <= hallway_length; k++) {
