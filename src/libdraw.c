@@ -729,10 +729,10 @@ static void draw_message_box(gamestate* g) {
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg);
     // Measure text (split into lines if needed)
-    Vector2 measure = MeasureTextEx(GetFontDefault(), tmp, font_size, 1.0f);
-    int text_width = measure.x;
+    int measure = MeasureText(tmp, font_size);
+    int text_width = measure;
     //int text_height = g->font_size;
-    int text_height = measure.y;
+    int text_height = font_size;
     // Calculate centered box position
     const Rectangle box = {.x = (g->windowwidth - text_width) / 2.0 - g->pad,
                            .y = (g->windowheight - text_height) / 8.0 - g->pad,
