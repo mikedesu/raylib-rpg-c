@@ -2409,7 +2409,11 @@ static race_t get_random_race_for_floor(int floor) {
 static bool npc_create_set_stats(gamestate* const g, loc_t loc, race_t race) {
     entityid id = ENTITYID_INVALID;
     bool success = false;
-    id = npc_create(g, race, loc, "NPC");
+
+    const char* race_name = get_race_str(race);
+
+    id = npc_create(g, race, loc, race_name);
+
     if (id != ENTITYID_INVALID) {
         int floor = loc.z + 1;
         minfo("Spawning entity at %d, %d, %d on floor %d with HP %d", loc.x, loc.y, loc.z, floor, g_get_stat(g, id, STATS_HP));

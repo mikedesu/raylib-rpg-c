@@ -1,5 +1,7 @@
 #pragma once
 
+#include "massert.h"
+
 typedef enum
 {
     RACE_NONE = 0,
@@ -15,3 +17,9 @@ typedef enum
     RACE_WARG,
     RACE_COUNT
 } race_t;
+
+static inline const char* get_race_str(race_t race) {
+    const char* race_strings[RACE_COUNT] = {"None", "Green Slime", "Bat", "Goblin", "Halfling", "Wolf", "Human", "Elf", "Dwarf", "Orc", "Warg"};
+    massert(race >= RACE_NONE && race < RACE_COUNT, "Invalid race name");
+    return race_strings[race];
+}
