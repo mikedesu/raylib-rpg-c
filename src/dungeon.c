@@ -258,7 +258,8 @@ bool d_add_floor(dungeon_t* const dungeon, int width, int height) {
         dungeon->capacity_floors = new_capacity;
         minfo("Expanded dungeon capacity to %d", new_capacity);
     }
-    dungeon_floor_t* new_floor = df_create(width, height);
+    int current_floor = dungeon->num_floors;
+    dungeon_floor_t* new_floor = df_create(current_floor, width, height);
     if (!new_floor) {
         merror("Failed to create new floor");
         return false;

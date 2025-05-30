@@ -5,7 +5,7 @@
 #include <string.h>
 
 TEST(test_df_create_destroy) {
-    dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     ASSERT(df != NULL, "Failed to create dungeon floor");
 
     // Basic sanity checks
@@ -19,7 +19,7 @@ TEST(test_df_create_destroy) {
 }
 
 TEST(test_df_rooms) {
-    dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     printf("Initial room count: %d\n", df->room_count);
 
     // Test room creation
@@ -54,7 +54,7 @@ TEST(test_df_rooms) {
 }
 
 TEST(test_df_tiles) {
-    dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Test tile access
     loc_t loc = {5, 5};
@@ -67,7 +67,7 @@ TEST(test_df_tiles) {
 }
 
 TEST(test_df_stairs) {
-    dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Create a room to place stairs in
     df_add_room_info(df, 10, 10, 5, 5, "StairRoom");
@@ -85,7 +85,7 @@ TEST(test_df_stairs) {
 }
 
 TEST(test_df_get_room_at) {
-    dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Create a test room
     int room_x = 10, room_y = 10, room_w = 5, room_h = 5;
@@ -114,7 +114,7 @@ TEST(test_df_get_room_at) {
 }
 
 TEST(test_df_count_walkable) {
-    dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Create a test room
     int room_x = 10, room_y = 10, room_w = 5, room_h = 5;
@@ -137,7 +137,7 @@ TEST(test_df_count_walkable) {
 }
 
 TEST(test_df_init) {
-    dungeon_floor_t* df = df_create(DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Initialize the dungeon floor
     df_init(df);
@@ -175,38 +175,38 @@ TEST(test_df_init) {
 
 TEST(test_df_serialization) {
     // Create a very small dungeon floor for testing
-    dungeon_floor_t* df = df_create(2, 2); // Just 2x2 for easier debugging
-    
+    dungeon_floor_t* df = df_create(0, 2, 2); // Just 2x2 for easier debugging
+
     // Set up some simple tiles instead of using df_init
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tile_init(&df->tiles[y][x], TILE_FLOOR_STONE_00);
         }
     }
-    
+
     // Set specific tiles for stairs
     df->upstairs_loc = (loc_t){0, 0};
     df->downstairs_loc = (loc_t){1, 1};
     tile_init(&df->tiles[0][0], TILE_UPSTAIRS);
     tile_init(&df->tiles[1][1], TILE_DOWNSTAIRS);
-    
+
     // Add a test room
     df_add_room_info(df, 0, 0, 2, 2, "TestRoom");
-    
+
     // Get serialized size
     size_t size = df_serialized_size(df);
     printf("Serialized size for 2x2 dungeon: %zu bytes\n", size);
     ASSERT(size > 0, "Serialized size should be greater than 0");
-    
+
     // Allocate buffer for serialization
     char* buffer = (char*)malloc(size);
     ASSERT(buffer != NULL, "Failed to allocate serialization buffer");
-    
+
     // Serialize
     size_t written = df_serialize(df, buffer, size);
     ASSERT(written > 0, "Serialization failed");
     ASSERT(written == size, "Serialized size mismatch");
-    
+
     // Print buffer contents for debugging
     printf("Serialized buffer contents (first 32 bytes):\n");
     for (int i = 0; i < 32 && i < size; i++) {
@@ -214,12 +214,12 @@ TEST(test_df_serialization) {
         if ((i + 1) % 16 == 0) printf("\n");
     }
     printf("\n");
-    
+
     // Create a new dungeon floor for deserialization
     dungeon_floor_t* df2 = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
     ASSERT(df2 != NULL, "Failed to allocate new dungeon floor");
     memset(df2, 0, sizeof(dungeon_floor_t)); // Initialize to zeros
-    
+
     // Deserialize
     bool success = df_deserialize(df2, buffer, size);
     ASSERT(success, "Deserialization failed");
@@ -243,41 +243,41 @@ TEST(test_df_serialization) {
 
 TEST(test_df_memory_size) {
     // Create a small dungeon floor for testing
-    dungeon_floor_t* df = df_create(10, 10);
-    
+    dungeon_floor_t* df = df_create(0, 10, 10);
+
     // Calculate initial memory size
     size_t initial_size = df_memory_size(df);
     printf("Initial dungeon floor memory size (10x10): %zu bytes\n", initial_size);
-    
+
     // Add a room and recalculate
     df_add_room_info(df, 0, 0, 5, 5, "TestRoom");
     size_t with_room_size = df_memory_size(df);
     printf("Memory size after adding a room: %zu bytes\n", with_room_size);
     printf("Difference: %zu bytes\n", with_room_size - initial_size);
-    
+
     // Add entities to some tiles
     for (int y = 0; y < 5; y++) {
         for (int x = 0; x < 5; x++) {
             tile_add(&df->tiles[y][x], y * 10 + x);
         }
     }
-    
+
     size_t with_entities_size = df_memory_size(df);
     printf("Memory size after adding entities: %zu bytes\n", with_entities_size);
     printf("Difference: %zu bytes\n", with_entities_size - with_room_size);
-    
+
     // Calculate average memory per tile
     size_t total_tiles = df->width * df->height;
     printf("Average memory per tile: %zu bytes\n", with_entities_size / total_tiles);
-    
+
     // Clean up
     df_free(df);
-    
+
     // Test with different sizes to see scaling
     int sizes[] = {5, 20, 50};
     for (int i = 0; i < 3; i++) {
         int size = sizes[i];
-        dungeon_floor_t* df_test = df_create(size, size);
+        dungeon_floor_t* df_test = df_create(0, size, size);
         size_t test_size = df_memory_size(df_test);
         printf("Memory size for %dx%d dungeon floor: %zu bytes\n", size, size, test_size);
         df_free(df_test);

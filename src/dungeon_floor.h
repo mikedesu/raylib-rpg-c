@@ -8,8 +8,8 @@
 #include "room_data.h"
 #include <stdbool.h>
 
-#define DEFAULT_DUNGEON_FLOOR_WIDTH 128
-#define DEFAULT_DUNGEON_FLOOR_HEIGHT 128
+#define DEFAULT_DUNGEON_FLOOR_WIDTH 256
+#define DEFAULT_DUNGEON_FLOOR_HEIGHT 256
 #define DEFAULT_DF_EVENTS 64
 #define DEFAULT_DF_PLATES 64
 
@@ -25,6 +25,7 @@ typedef struct {
 
 typedef struct {
     tile_t** tiles;
+    int floor; // the floor number, starting from 0
     int width;
     int height;
     df_event_t events[DEFAULT_DF_EVENTS];
@@ -36,7 +37,8 @@ typedef struct {
     loc_t upstairs_loc;
 } dungeon_floor_t;
 
-dungeon_floor_t* df_create(int width, int height);
+//dungeon_floor_t* df_create(int width, int height);
+dungeon_floor_t* df_create(int floor, int width, int height);
 
 void df_init(dungeon_floor_t* df);
 void df_free(dungeon_floor_t* f);
