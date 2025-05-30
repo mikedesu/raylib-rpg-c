@@ -52,9 +52,9 @@ bool tile_resize(tile_t* t);
 
 void tile_init(tile_t* const t, tiletype_t type);
 void tile_free(tile_t* t);
-//void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em);
 void recompute_entity_cache(gamestate* g, tile_t* t);
 void recompute_entity_cache_at(gamestate* g, int x, int y, int z);
+
 size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z);
 
 // Serialization functions

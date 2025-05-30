@@ -327,6 +327,9 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     tile_t* tile = df_tile_at(df, loc);
     if (!tile) return false;
     if (tile_is_wall(tile->type)) return false;
+
+    if (!tile->visible) return true; // Do not draw entities on invisible tiles
+
     for (int i = 0; i < tile_entity_count(tile); i++) {
         entityid id = tile_get_entity(tile, i);
         if (g_is_dead(g, id) == dead) {

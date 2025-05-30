@@ -1,5 +1,4 @@
 #include "dungeon_tile.h"
-//#include "em.h"
 #include "gamestate.h"
 #include "mprint.h"
 #include <stdlib.h>
@@ -19,7 +18,6 @@ void tile_init(tile_t* const t, tiletype_t type) {
     }
     memset(t->entities, -1, malloc_sz);
     t->entity_max = DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
-
     t->pressure_plate_up_tx_key = t->pressure_plate_down_tx_key = t->pressure_plate_event = -1;
     t->wall_switch_up_tx_key = t->wall_switch_down_tx_key = t->wall_switch_event = -1;
     t->entity_count = t->cached_live_npcs = 0;
@@ -115,22 +113,17 @@ void tile_free(tile_t* t) {
 void recompute_entity_cache(gamestate* g, tile_t* t) {
     massert(g, "gamestate is NULL");
     massert(t, "tile is NULL");
-
     // Only recompute if cache is dirty
     if (!t->dirty_entities) return;
-
     // Reset counters
     t->cached_live_npcs = 0;
     t->cached_player_present = false;
-
     // Iterate through all entities on the tile
     for (size_t i = 0; i < t->entity_max; i++) {
         entityid id = t->entities[i];
         if (id == ENTITYID_INVALID) continue;
-
         // Skip dead entities
         if (g_is_dead(g, id)) continue;
-
         // Check entity type
         entitytype_t type = g_get_type(g, id);
         if (type == ENTITY_NPC) {
@@ -139,7 +132,6 @@ void recompute_entity_cache(gamestate* g, tile_t* t) {
             t->cached_player_present = true;
         }
     }
-
     // Cache is now clean
     t->dirty_entities = false;
 }
@@ -179,40 +171,31 @@ size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z) {
 
 size_t tile_serialized_size(const tile_t* t) {
     massert(t, "tile is NULL");
-    
     // Calculate size by exactly matching what's written in tile_serialize
     size_t size = 0;
-    
     // Basic fields
-    size += sizeof(tiletype_t);  // type
-    size += 8 * sizeof(bool);    // 8 boolean fields
-    
+    size += sizeof(tiletype_t); // type
+    size += 8 * sizeof(bool); // 8 boolean fields
     // Integer fields
-    size += 7 * sizeof(int);     // 7 integer fields
-    
+    size += 7 * sizeof(int); // 7 integer fields
     // Entity data
-    size += 2 * sizeof(size_t);  // entity_count and entity_max
+    size += 2 * sizeof(size_t); // entity_count and entity_max
     size += t->entity_max * sizeof(entityid); // entities array
-    
     return size;
 }
 
 size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
     massert(t, "tile is NULL");
     massert(buffer, "buffer is NULL");
-
     size_t required_size = tile_serialized_size(t);
     if (buffer_size < required_size) {
         merror("Buffer too small for serialization");
         return 0;
     }
-
     char* ptr = buffer;
-
     // Serialize basic fields
     memcpy(ptr, &t->type, sizeof(tiletype_t));
     ptr += sizeof(tiletype_t);
-
     memcpy(ptr, &t->visible, sizeof(bool));
     ptr += sizeof(bool);
     memcpy(ptr, &t->explored, sizeof(bool));
@@ -229,7 +212,6 @@ size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
     ptr += sizeof(bool);
     memcpy(ptr, &t->dirty_visibility, sizeof(bool));
     ptr += sizeof(bool);
-
     // Serialize integer fields
     memcpy(ptr, &t->pressure_plate_up_tx_key, sizeof(int));
     ptr += sizeof(int);
@@ -245,13 +227,11 @@ size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
     ptr += sizeof(int);
     memcpy(ptr, &t->cached_live_npcs, sizeof(int));
     ptr += sizeof(int);
-
     // Serialize entity data - count and max
     memcpy(ptr, &t->entity_count, sizeof(size_t));
     ptr += sizeof(size_t);
     memcpy(ptr, &t->entity_max, sizeof(size_t));
     ptr += sizeof(size_t);
-
     // Serialize entity array - write full size even if empty
     size_t entity_array_size = t->entity_max * sizeof(entityid);
     memset(ptr, 0xFF, entity_array_size); // Initialize to all -1 (empty)
@@ -259,33 +239,27 @@ size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
         memcpy(ptr, t->entities, entity_array_size);
     }
     ptr += entity_array_size;
-
     return ptr - buffer;
 }
 
 bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
     massert(t, "tile is NULL");
     massert(buffer, "buffer is NULL");
-
     // Validate buffer size
     size_t required_size = tile_serialized_size(t);
     if (buffer_size < required_size) {
         merror("Buffer too small for tile deserialization: %zu < %zu", buffer_size, required_size);
         return false;
     }
-
     const char* ptr = buffer;
-
     // Deserialize basic fields
     memcpy(&t->type, ptr, sizeof(tiletype_t));
     ptr += sizeof(tiletype_t);
-
     // Validate tile type
     if (t->type < TILE_NONE || t->type >= TILE_COUNT) {
         merror("Invalid tile type during deserialization: %d", t->type);
         return false;
     }
-
     memcpy(&t->visible, ptr, sizeof(bool));
     ptr += sizeof(bool);
     memcpy(&t->explored, ptr, sizeof(bool));
@@ -302,7 +276,6 @@ bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
     ptr += sizeof(bool);
     memcpy(&t->dirty_visibility, ptr, sizeof(bool));
     ptr += sizeof(bool);
-
     // Deserialize integer fields
     memcpy(&t->pressure_plate_up_tx_key, ptr, sizeof(int));
     ptr += sizeof(int);
@@ -318,60 +291,48 @@ bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
     ptr += sizeof(int);
     memcpy(&t->cached_live_npcs, ptr, sizeof(int));
     ptr += sizeof(int);
-
     // Deserialize entity data
     size_t entity_count, entity_max;
     memcpy(&entity_count, ptr, sizeof(size_t));
     ptr += sizeof(size_t);
     memcpy(&entity_max, ptr, sizeof(size_t));
     ptr += sizeof(size_t);
-
     // Validate entity data
     if (entity_max > DUNGEON_TILE_MAX_ENTITIES_MAX) {
         merror("Invalid entity_max during deserialization: %zu", entity_max);
         return false;
     }
-
     if (entity_count > entity_max) {
         merror("Invalid entity_count during deserialization: %zu > %zu", entity_count, entity_max);
         return false;
     }
-
     // Allocate entities array
     t->entities = malloc(entity_max * sizeof(entityid));
     if (!t->entities) {
         merror("Failed to allocate entities array during deserialization");
         return false;
     }
-
     // Initialize all entities to invalid
     for (size_t i = 0; i < entity_max; i++) {
         t->entities[i] = ENTITYID_INVALID;
     }
-
     // Copy entity data
     memcpy(t->entities, ptr, entity_max * sizeof(entityid));
     ptr += entity_max * sizeof(entityid);
-
     t->entity_count = entity_count;
     t->entity_max = entity_max;
-
     return true;
 }
 
 size_t tile_memory_size(const tile_t* t) {
     massert(t, "tile is NULL");
-    
     // Calculate the memory size of a tile
     size_t size = 0;
-    
     // Size of the tile_t struct itself
     size += sizeof(tile_t);
-    
     // Size of dynamically allocated entities array
     if (t->entities) {
         size += t->entity_max * sizeof(entityid);
     }
-    
     return size;
 }

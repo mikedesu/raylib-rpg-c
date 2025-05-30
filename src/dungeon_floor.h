@@ -59,6 +59,9 @@ int df_count_walkable(const dungeon_floor_t* const df);
 int df_count_empty(const dungeon_floor_t* const df);
 int df_count_empty_non_walls(const dungeon_floor_t* const df);
 int df_count_empty_non_walls_in_area(const dungeon_floor_t* const df, int x0, int y0, int w, int h);
+int df_count_non_walls_in_area(const dungeon_floor_t* const df, int x0, int y0, int w, int h);
+int df_count_non_walls(const dungeon_floor_t* const df);
+
 int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
 int df_loc_is_in_room(dungeon_floor_t* const df, loc_t loc);

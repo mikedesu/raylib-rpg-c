@@ -32,6 +32,8 @@
 
 static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
 
+static loc_t* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
+static loc_t get_random_available_loc_in_area(gamestate* const g, int floor, int x0, int y0, int w, int h);
 static inline bool is_traversable(gamestate* const g, int x, int y, int z);
 
 static void update_player_tiles_explored(gamestate* const g);
@@ -1058,11 +1060,19 @@ static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int z, in
     return loc;
     //}
 }
+
 static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor) {
     massert(g, "gamestate is NULL");
     massert(floor >= 0, "floor is out of bounds");
     massert(floor < g->d->num_floors, "floor is out of bounds");
     return get_random_empty_non_wall_loc_in_area(g, floor, 0, 0, g->d->floors[floor]->width, g->d->floors[floor]->height);
+}
+
+static loc_t get_random_available_loc(gamestate* const g, int floor) {
+    massert(g, "gamestate is NULL");
+    massert(floor >= 0, "floor is out of bounds");
+    massert(floor < g->d->num_floors, "floor is out of bounds");
+    return get_random_available_loc_in_area(g, floor, 0, 0, g->d->floors[floor]->width, g->d->floors[floor]->height);
 }
 
 //static void init_weapon_test(gamestate* g) {
@@ -1379,6 +1389,69 @@ static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* co
     massert(i == c, "count mismatch: expected %d, got %d", c, i);
     *count = c;
     return locs;
+}
+
+static loc_t* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
+    massert(df, "dungeon floor is NULL");
+    massert(count, "count is NULL");
+
+    //int c = df_count_empty_non_walls_in_area(df, x0, y0, w, h);
+    int c = df_count_non_walls_in_area(df, x0, y0, w, h);
+
+    loc_t* locs = malloc(sizeof(loc_t) * c);
+    massert(locs, "malloc failed");
+    int i = 0;
+
+    // given the list of non-walls...
+    // c: count of non-wall tiles in area
+    // i: index and count of locs that dont have living NPCs found
+    // i should never exceed c, but might be less than or equal to c
+    for (int y = 0; y < h && y + y0 < df->height; y++) {
+        for (int x = 0; x < w && x + x0 < df->width; x++) {
+            int newx = x + x0;
+            int newy = y + y0;
+
+            //tile_t* t = df_tile_at(df, (loc_t){newx, newy, -1});
+            tile_t* t = df_tile_at(df, (loc_t){newx, newy, df->floor});
+            tiletype_t type = t->type;
+            //if (tile_entity_count(t) == 0 && tile_is_walkable(type)) locs[i++] = (loc_t){newx, newy};
+            if (tile_live_npc_count(g, t) == 0 && !tile_has_player(g, t) && tile_is_walkable(type)) locs[i++] = (loc_t){newx, newy, df->floor};
+            if (i >= c) break;
+        }
+    }
+    // its possible there are no available locations
+    massert(i <= c, "count mismatch: expected %d, got %d", c, i);
+    *count = i;
+    return locs;
+}
+
+static loc_t get_random_available_loc_in_area(gamestate* const g, int floor, int x0, int y0, int w, int h) {
+    massert(g, "gamestate is NULL");
+    massert(floor >= 0, "floor is out of bounds");
+    massert(floor < g->d->num_floors, "floor is out of bounds");
+    dungeon_floor_t* df = d_get_floor(g->d, floor);
+    massert(df, "failed to get current dungeon floor");
+    massert(x0 >= 0 && x0 < df->width, "x0 is out of bounds");
+    massert(y0 >= 0 && y0 < df->height, "y0 is out of bounds");
+    massert(w > 0 && w <= df->width - x0, "w is out of bounds");
+    massert(h > 0 && h <= df->height - y0, "h is out of bounds");
+
+    int c = 0;
+    loc_t* locs = get_available_locs_in_area(g, df, &c, x0, y0, w, h);
+    massert(locs, "locs is NULL");
+    massert(c >= 0, "locs count is less than 0");
+
+    if (c == 0) {
+        merror("no available locations found in area (%d, %d, %d, %d)", x0, y0, w, h);
+        free(locs);
+        return (loc_t){-1, -1, -1}; // return an invalid location
+    }
+
+    // pick a random location
+    int index = rand() % c;
+    loc_t loc = locs[index];
+    free(locs);
+    return loc;
 }
 
 //static void init_npcs_test_by_room(gamestate* const g) {
@@ -2384,7 +2457,14 @@ static void try_spawn_npc(gamestate* const g) {
         if (do_this_once) {
             while (!success) {
                 int current_floor = g->d->current_floor;
-                loc_t loc = get_random_empty_non_wall_loc(g, current_floor);
+
+                //loc_t loc = get_random_empty_non_wall_loc(g, current_floor);
+                loc_t loc = get_random_available_loc(g, current_floor);
+                if (loc.x == -1 && loc.y == -1 && loc.z == -1) {
+                    merror("No available location found for NPC spawn");
+                    return; // No valid location found, exit early
+                }
+
                 entityid id = ENTITYID_INVALID;
                 //race_t race = RACE_GREEN_SLIME;
                 //race_t race = get_random_race();

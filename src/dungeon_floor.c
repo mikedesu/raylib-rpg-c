@@ -1002,6 +1002,25 @@ int df_count_empty(const dungeon_floor_t* const df) {
     return count;
 }
 
+int df_count_non_walls_in_area(const dungeon_floor_t* const df, int x0, int y0, int w, int h) {
+    massert(df, "df is NULL");
+    int count = 0;
+    for (int y = 0; y < h && y + y0 < df->height; y++) {
+        for (int x = 0; x < w && x + x0 < df->width; x++) {
+            int newx = x + x0;
+            int newy = y + y0;
+            tile_t* const t = df_tile_at(df, (loc_t){newx, newy, -1});
+            if (tile_is_walkable(t->type)) count++;
+        }
+    }
+    return count;
+}
+
+int df_count_non_walls(const dungeon_floor_t* const df) {
+    massert(df, "df is NULL");
+    return df_count_non_walls_in_area(df, 0, 0, df->width, df->height);
+}
+
 int df_count_empty_non_walls_in_area(const dungeon_floor_t* const df, int x0, int y0, int w, int h) {
     massert(df, "df is NULL");
     int count = 0;

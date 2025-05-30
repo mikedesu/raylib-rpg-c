@@ -17,7 +17,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-#define GAME_VERSION "v0.0.3.3"
+#define GAME_VERSION "v0.0.3.5"
 
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
