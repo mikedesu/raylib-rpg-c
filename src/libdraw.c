@@ -132,6 +132,9 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     massert(tile, "tile is NULL");
     // check if the tile type is none
     if (tile->type == TILE_NONE) return true;
+    // check if tile is visible
+    if (!tile->visible) return true;
+
     // just draw the tile itself
     // tile values in get_txkey_for_tiletype.h
     int txkey = get_txkey_for_tiletype(tile->type);

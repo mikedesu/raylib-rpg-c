@@ -34,6 +34,7 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
 
 static inline bool is_traversable(gamestate* const g, int x, int y, int z);
 
+static void update_player_tiles_explored(gamestate* const g);
 static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful);
 static inline void reset_player_blocking(gamestate* const g);
 static inline void reset_player_block_success(gamestate* const g);
@@ -389,6 +390,11 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     }
     g_update_location(g, id, (loc_t){ex, ey, z});
     g_update_sprite_move(g, id, (loc_t){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
+
+    if (id == g->hero_id) {
+        update_player_tiles_explored(g);
+    }
+
     // at this point the move is 'successful'
     //update_equipped_shield_dir(g, id);
     // get the entity's new tile
@@ -1268,6 +1274,38 @@ static entityid shield_create(gamestate* const g, shieldtype type, loc_t loc, co
     return id;
 }
 
+static void update_player_tiles_explored(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    entityid hero_id = g->hero_id;
+    massert(hero_id != ENTITYID_INVALID, "hero id is invalid");
+    dungeon_floor_t* df = d_get_floor(g->d, g->d->current_floor);
+    massert(df, "failed to get current dungeon floor");
+    loc_t loc = g_get_location(g, hero_id);
+
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            loc_t loc2 = {loc.x + i, loc.y + j, loc.z};
+            if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 || loc2.y >= df->height) {
+                continue; // skip out of bounds
+            }
+            tile_t* tile = df_tile_at(df, loc2);
+            massert(tile, "failed to get tile at hero location");
+
+            tile->explored = true;
+            tile->visible = true;
+        }
+    }
+
+    //tile_t* tile = df_tile_at(df, loc);
+    //massert(tile, "failed to get tile at hero location");
+    //if (tile->explored) {
+    //    //minfo("tile already discovered at %d, %d", tile->loc.x, tile->loc.y);
+    //    return;
+    //}
+    //tile->explored = true;
+    //tile->visible = true;
+}
+
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z, const char* name) {
     massert(g, "gamestate is NULL");
     massert(name, "name is NULL");
@@ -1299,6 +1337,8 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
 
     g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
     g_set_stat(g, id, STATS_HP, maxhp_roll);
+
+    update_player_tiles_explored(g);
 
     return id;
 }
@@ -1885,6 +1925,10 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                     return;
                 }
 
+                if (id == g->hero_id) {
+                    update_player_tiles_explored(g);
+                }
+
                 if (type == ENTITY_PLAYER) {
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 }
@@ -1919,6 +1963,10 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                 if (!df_add_at(next_floor, id, ex, ey)) {
                     merror("Failed to add entity to new tile");
                     return;
+                }
+
+                if (id == g->hero_id) {
+                    update_player_tiles_explored(g);
                 }
 
                 if (type == ENTITY_PLAYER) {
