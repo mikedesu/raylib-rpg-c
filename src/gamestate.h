@@ -144,6 +144,9 @@ typedef struct gamestate {
 
     char* version;
 
+    int restart_count;
+    bool do_restart;
+
 } gamestate;
 
 gamestate* gamestateinitptr();

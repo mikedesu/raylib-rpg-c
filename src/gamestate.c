@@ -209,9 +209,14 @@ gamestate* gamestateinitptr() {
 
     g->current_music_index = 0;
     g->total_music_paths = 0;
+
+    g->restart_count = 0;
+    g->do_restart = false;
+
     gamestate_init_music_paths(g);
     gamestate_init_msg_history(g);
     //gamestate_load_help_menu_text(g);
+
     return g;
 }
 
@@ -322,6 +327,8 @@ void gamestatefree(gamestate* g) {
     free(g->ac_list);
     free(g->zapping_list);
     free(g->spell_effect_list);
+    free(g->base_attack_damage_list);
+
     free(g);
     //msuccess("Freed gamestate");
 }

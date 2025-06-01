@@ -30,6 +30,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+int liblogic_restart_count = 0;
+
 static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
 
 static loc_t* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
@@ -53,6 +55,7 @@ static loc_t* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* co
 
 static loc_t* get_locs_around_entity(gamestate* const g, entityid id);
 
+void liblogic_restart(gamestate* const g);
 static void handle_level_up(gamestate* const g, entityid id);
 static void init_npc_test(gamestate* g);
 static void init_sword_test(gamestate* g);
@@ -121,7 +124,9 @@ static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid tar
     int attacker_level = g_get_stat(g, attacker_id, STATS_LEVEL);
     massert(attacker_level >= 0, "attacker level is negative");
     // calculate the reward xp
-    int base_xp = challenge_rating;
+
+    int base_xp = challenge_rating * 2;
+
     //int xp_modifier = pow(1.5, challenge_rating - attacker_level);
     float xp_modifier = pow(2, challenge_rating - attacker_level);
 
@@ -1046,7 +1051,6 @@ static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int z, in
     massert(x + w <= g->d->floors[z]->width, "x + w is out of bounds");
     massert(y + h <= g->d->floors[z]->height, "y + h is out of bounds");
     int c = -1;
-    //    //loc_t* locations = get_empty_non_wall_locs(g->dungeon->floors[floor], &c);
     loc_t* locations = get_empty_non_wall_locs_in_area(g->d->floors[z], &c, x, y, w, h);
     massert(locations, "locations is NULL");
     massert(c > 0, "locations count is 0 or less");
@@ -1060,7 +1064,6 @@ static loc_t get_random_empty_non_wall_loc_in_area(gamestate* const g, int z, in
     massert(loc.y < g->d->floors[z]->height, "loc.y is out of bounds");
     loc.z = z;
     return loc;
-    //}
 }
 
 static loc_t get_random_empty_non_wall_loc(gamestate* const g, int floor) {
@@ -1076,19 +1079,6 @@ static loc_t get_random_available_loc(gamestate* const g, int floor) {
     massert(floor < g->d->num_floors, "floor is out of bounds");
     return get_random_available_loc_in_area(g, floor, 0, 0, g->d->floors[floor]->width, g->d->floors[floor]->height);
 }
-
-//static void init_weapon_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    // pick a random location
-//    loc_t loc = get_random_empty_non_wall_loc(g, g->dungeon->current_floor);
-//}
-
-//static void init_weapon_test2(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    e_add_item_to_inventory(e, sword->id);
-//    // equip the sword
-//    e->weapon = sword->id;
-//}
 
 static void init_dungeon(gamestate* const g) {
     massert(g, "gamestate is NULL");
@@ -2106,6 +2096,15 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
     //    return;
     //}
 
+    if (g->gameover) {
+        if (inputstate_any_pressed(is)) {
+            minfo("gameover key pressed");
+
+            liblogic_restart(g);
+        }
+        return;
+    }
+
     if (g->controlmode == CONTROLMODE_PLAYER) {
         handle_input_player(is, g);
     } else if (g->controlmode == CONTROLMODE_CAMERA) {
@@ -2755,4 +2754,10 @@ static inline bool is_traversable(gamestate* const g, int x, int y, int z) {
     // Comment out the next line if entity blocking is interfering with pathfinding tests
     if (tile_has_live_npcs(g, tile)) return false;
     return true;
+}
+
+void liblogic_restart(gamestate* const g) {
+    massert(g, "liblogic_restart: gamestate is NULL");
+    //liblogic_close(g);
+    g->do_restart = true;
 }

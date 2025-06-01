@@ -116,26 +116,19 @@ void reload_logic() {
 void autoreload_every_n_sec(int n, gamestate* g) {
     static double last = 0;
     double now = GetTime();
-
     if (now - last >= n) {
         // Check draw lib
-
         if (file_changed(LIBDRAW_PATH, &draw_last_write_time)) {
             minfo("Checking libdraw.so...");
-
             while (file_exists(LIBDRAW_PATH ".lockfile")) usleep(1000);
-
             msuccess("Reloading libdraw.so...");
             reload_draw(g);
             last = now; // Reset timer immediately
         }
-
         // Check logic lib
         if (file_changed(LIBLOGIC_PATH, &logic_last_write_time)) {
             minfo("Checking liblogic.so...");
-
             while (file_exists(LIBLOGIC_PATH ".lockfile")) usleep(1000);
-
             msuccess("Reloading liblogic.so...");
             reload_logic();
             last = now; // Reset timer immediately
@@ -145,18 +138,13 @@ void autoreload_every_n_sec(int n, gamestate* g) {
 
 void gamerun() {
     inputstate is = {0};
-
     gamestate* g = gamestateinitptr();
-
     draw_last_write_time = getlastwritetime(LIBDRAW_PATH);
     logic_last_write_time = getlastwritetime(LIBLOGIC_PATH);
-
     load_draw_symbols();
     load_logic_symbols();
-
     myliblogic_init(g);
     mylibdraw_init(g);
-
     //while (!mylibdraw_windowshouldclose()) {
     while (!mylibdraw_windowshouldclose(g)) {
         mylibdraw_update_input(&is);
@@ -164,7 +152,21 @@ void gamerun() {
         mylibdraw_update_sprites(g);
         mylibdraw_drawframe(g);
         autoreload_every_n_sec(5, g);
-        //if (inputstate_is_pressed(&is, KEY_ESCAPE)) break;
+
+        if (g->do_restart) {
+            msuccess("Restarting game...");
+            mylibdraw_close();
+            //dlclose(draw_handle);
+            myliblogic_close(g);
+            //dlclose(logic_handle);
+            gamestatefree(g);
+            g = gamestateinitptr();
+            //load_draw_symbols();
+            //load_logic_symbols();
+            myliblogic_init(g);
+            mylibdraw_init(g);
+            g->do_restart = false; // Reset restart flag
+        }
     }
 
     minfo("Closing libdraw...");

@@ -60,6 +60,8 @@ Music music;
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
+int libdraw_restart_count = 0;
+
 static int get_total_ac(gamestate* const g, entityid id);
 
 static inline bool libdraw_camera_lock_on(gamestate* const g);
@@ -811,6 +813,33 @@ static void draw_help_menu(gamestate* const g) {
     }
 }
 
+static void draw_gameover_menu(gamestate* const g) {
+    if (!g->gameover) return;
+    const char* gameover_text = "Game Over";
+    const char* restart_text = "Press any key to try again";
+    //Color bg_color = Fade((Color){0x33, 0x33, 0x33}, 1.0f);
+    Color bg_color = BLACK;
+    int font_size = 20;
+    int measure = MeasureText(restart_text, font_size);
+    int text_width = measure;
+    int text_height = font_size;
+    int x = (g->windowwidth - text_width) / 2;
+    int y = (g->windowheight - text_height * 2) / 2;
+
+    Rectangle rect = {x - 10, y - 10, text_width + 20, text_height * 2 + 20};
+
+    // Draw background box
+    DrawRectangle(x - 10, y - 10, text_width + 20, text_height * 2 + 20, bg_color);
+    //DrawRectangleLines(x - 10, y - 10, text_width + 20, text_height * 2 + 20, WHITE);
+    DrawRectangleLinesEx(rect, 2, RED);
+    // Draw game over text
+    //DrawText(gameover_text, x, y, font_size, WHITE);
+    DrawText(gameover_text, x, y, font_size, RED);
+    // Draw restart/quit prompt
+    //DrawText(restart_text, x, y + text_height, font_size, WHITE);
+    DrawText(restart_text, x, y + text_height, font_size, RED);
+}
+
 void libdraw_drawframe(gamestate* const g) {
     double start_time = GetTime();
     BeginDrawing();
@@ -836,6 +865,10 @@ void libdraw_drawframe(gamestate* const g) {
 
     if (g->display_help_menu) {
         draw_help_menu(g);
+    }
+
+    if (g->gameover) {
+        draw_gameover_menu(g);
     }
 
     EndDrawing();
