@@ -1478,3 +1478,7 @@ void draw_version(const gamestate* const g) {
     //DrawTextEx(GetFontDefault(), version, (Vector2){x, y}, font_size, 1.0f, WHITE);
     DrawTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
 }
+
+//void libdraw_restart() {
+//
+//}
