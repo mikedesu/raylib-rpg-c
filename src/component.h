@@ -12,7 +12,7 @@
 #include "damage_component.h"
 #include "damaged_component.h"
 #include "dead_component.h"
-#include "default_action_component.h"
+//#include "default_action_component.h"
 //#include "direction.h"
 //#include "entity_actions.h"
 #include "entityid.h"

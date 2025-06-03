@@ -1189,14 +1189,8 @@ bool g_add_default_action(gamestate* const g, entityid id, entity_action_t actio
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the default action component
-    return g_add_component(g,
-                           id,
-                           C_DEFAULT_ACTION,
-                           (void*)&action,
-                           sizeof(default_action_component),
-                           (void**)&g->default_action_list,
-                           &g->default_action_list_count,
-                           &g->default_action_list_capacity);
+    return g_add_component(
+        g, id, C_DEFAULT_ACTION, (void*)&action, sizeof(int_component), (void**)&g->default_action_list, &g->default_action_list_count, &g->default_action_list_capacity);
 }
 
 bool g_set_default_action(gamestate* const g, entityid id, entity_action_t action) {
@@ -1781,8 +1775,7 @@ bool g_add_potiontype(gamestate* const g, entityid id, potiontype type) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the potiontype component
-    return g_add_component(
-        g, id, C_POTIONTYPE, (void*)&type, sizeof(int_component), (void**)&g->potion_type_list, &g->potion_type_list_count, &g->potion_type_list_capacity);
+    return g_add_component(g, id, C_POTIONTYPE, (void*)&type, sizeof(int_component), (void**)&g->potion_type_list, &g->potion_type_list_count, &g->potion_type_list_capacity);
 }
 
 bool g_has_potiontype(const gamestate* const g, entityid id) {
