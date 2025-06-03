@@ -111,11 +111,21 @@ typedef struct gamestate {
     ct* components;
 
     name_component* name_list;
+
     type_component* type_list;
     race_component* race_list;
     direction_component* direction_list;
+    default_action_component* default_action_list;
+    itemtype_component* itemtype_list;
+    weapontype_component* weapontype_list;
+    shieldtype_component* shieldtype_list;
+    potiontype_component* potion_type_list;
+    ac_component* ac_list;
+
     loc_component* loc_list;
     sprite_move_component* sprite_move_list;
+    target_component* target_list;
+
     dead_component* dead_list;
     update_component* update_list;
     attacking_component* attacking_list;
@@ -123,20 +133,16 @@ typedef struct gamestate {
     blocking_component* blocking_list;
     block_success_component* block_success_list;
     damaged_component* damaged_list;
+
     inventory_component* inventory_list;
-    target_component* target_list;
     target_path_component* target_path_list;
-    default_action_component* default_action_list;
     equipment_component* equipment_list;
     stats_component* stats_list;
-    itemtype_component* itemtype_list;
-    weapontype_component* weapontype_list;
-    shieldtype_component* shieldtype_list;
-    potiontype_component* potion_type_list;
+
     damage_component* damage_list;
-    ac_component* ac_list;
-    spell_effect_component* spell_effect_list;
     base_attack_damage_component* base_attack_damage_list;
+
+    spell_effect_component* spell_effect_list;
 
     int current_music_index;
     int total_music_paths;
