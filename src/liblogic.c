@@ -1892,6 +1892,17 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
                 change_player_dir(g, DIR_DOWN_RIGHT);
                 g->player_changing_direction = false;
             }
+
+            // suggestion by patreon supporter hllcgn:
+            // pressing 'attack' while in 'change direction' mode
+            // should cause an attack right away so the player
+            // does not have to get out of change-dir mode
+            else if (strcmp(action, "attack") == 0) {
+                g->player_changing_direction = false;
+                loc_t loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
+                loc_t hloc = g_get_location(g, g->hero_id);
+                try_entity_attack(g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
+            }
             return;
         }
         if (strcmp(action, "wait") == 0) {
@@ -1938,7 +1949,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             //    //door->do_update = true;
             //    g_set_update(g, door->id, true);
             //}
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             //try_flip_switch(g, hero, tx, ty, hero->floor);
         } else if (strcmp(action, "pickup") == 0) {
             //try_entity_pickup(g, hero);
