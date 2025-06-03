@@ -137,7 +137,9 @@ typedef struct gamestate {
     sprite_move_component* sprite_move_list;
     target_component* target_list;
 
-    dead_component* dead_list;
+    //dead_component* dead_list;
+    int_component* dead_list;
+
     update_component* update_list;
     attacking_component* attacking_list;
     zapping_component* zapping_list;
@@ -223,7 +225,8 @@ bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc);
 loc_t g_get_sprite_move(const gamestate* const g, entityid id);
 
 bool g_has_dead(const gamestate* const g, entityid id);
-bool g_add_dead(gamestate* const g, entityid id, bool dead);
+//bool g_add_dead(gamestate* const g, entityid id, bool dead);
+bool g_add_dead(gamestate* const g, entityid id, int dead);
 bool g_update_dead(gamestate* const g, entityid id, bool dead);
 bool g_is_dead(const gamestate* const g, entityid id);
 

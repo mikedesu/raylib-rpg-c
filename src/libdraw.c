@@ -24,6 +24,7 @@
 #include <raylib.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
+#define DEFAULT_MUSIC_VOLUME 0.0f
 
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
@@ -1232,7 +1233,8 @@ void libdraw_init(gamestate* const g) {
 
     music = LoadMusicStream(real_music_path);
 
-    SetMusicVolume(music, 0.50f); // Set initial music volume
+    //SetMusicVolume(music, 0.50f); // Set initial music volume
+    SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
 
     //SetMusicLooping(music, true); // Loop the music
     PlayMusicStream(music);

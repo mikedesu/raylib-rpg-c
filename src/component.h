@@ -11,7 +11,7 @@
 #include "blocking_component.h"
 #include "damage_component.h"
 #include "damaged_component.h"
-#include "dead_component.h"
+//#include "dead_component.h"
 //#include "default_action_component.h"
 //#include "direction.h"
 //#include "entity_actions.h"
@@ -127,7 +127,7 @@ void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype 
 void init_quiver_component(quiver_component* comp, entityid id, int capacity);
 
 // bool components
-void init_dead_component(dead_component* comp, entityid id, bool dead);
+//void init_dead_component(dead_component* comp, entityid id, bool dead);
 void init_update_component(update_component* comp, entityid id, bool update);
 void init_attacking_component(attacking_component* comp, entityid id, bool attacking);
 void init_blocking_component(blocking_component* comp, entityid id, bool blocking);

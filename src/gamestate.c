@@ -161,7 +161,8 @@ gamestate* gamestateinitptr() {
     massert(g->loc_list, "g->loc_list is NULL");
     g->sprite_move_list = (sprite_move_component*)malloc(sizeof(sprite_move_component) * n);
     massert(g->sprite_move_list, "g->sprite_move_list is NULL");
-    g->dead_list = (dead_component*)malloc(sizeof(dead_component) * n);
+    //g->dead_list = (dead_component*)malloc(sizeof(dead_component) * n);
+    g->dead_list = (int_component*)malloc(sizeof(int_component) * n);
     massert(g->dead_list, "g->dead_list is NULL");
     g->update_list = (update_component*)malloc(sizeof(update_component) * n);
     massert(g->update_list, "g->update_list is NULL");
@@ -580,7 +581,9 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     case C_SHIELDTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     case C_DEFAULT_ACTION: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
 
-    case C_DEAD: init_dead_component((dead_component*)c_ptr, id, *(bool*)data); break;
+    //case C_DEAD: init_dead_component((dead_component*)c_ptr, id, *(bool*)data); break;
+    case C_DEAD: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
+
     case C_UPDATE: init_update_component((update_component*)c_ptr, id, *(bool*)data); break;
     case C_ATTACKING: init_attacking_component((attacking_component*)c_ptr, id, *(bool*)data); break;
     case C_ZAPPING: init_zapping_component((zapping_component*)c_ptr, id, *(bool*)data); break;
@@ -893,13 +896,13 @@ bool g_has_dead(const gamestate* const g, entityid id) {
     return g_has_component(g, id, C_DEAD);
 }
 
-bool g_add_dead(gamestate* const g, entityid id, bool dead) {
+//bool g_add_dead(gamestate* const g, entityid id, bool dead) {
+bool g_add_dead(gamestate* const g, entityid id, int dead) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-
     // Add dead component
-    bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(dead_component), (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
-
+    //bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(dead_component), (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
+    bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(int_component), (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
     // If entity died and has a location, mark its tile as dirty
     if (dead && g_has_location(g, id)) {
         loc_t loc = g_get_location(g, id);
@@ -911,7 +914,6 @@ bool g_add_dead(gamestate* const g, entityid id, bool dead) {
             }
         }
     }
-
     return result;
 }
 
@@ -925,7 +927,7 @@ bool g_update_dead(gamestate* const g, entityid id, bool dead) {
     }
     for (int i = 0; i < g->dead_list_count; i++) {
         if (g->dead_list[i].id == id) {
-            g->dead_list[i].dead = dead;
+            g->dead_list[i].data = dead;
             return true;
         }
     }
@@ -941,7 +943,7 @@ bool g_is_dead(const gamestate* const g, entityid id) {
         }
         for (int i = 0; i < g->dead_list_count; i++) {
             if (g->dead_list[i].id == id) {
-                return g->dead_list[i].dead;
+                return g->dead_list[i].data;
             }
         }
     }

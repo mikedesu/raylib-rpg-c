@@ -1124,7 +1124,9 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g_add_direction(g, id, DIR_RIGHT);
     g_add_location(g, id, loc);
     g_add_sprite_move(g, id, (loc_t){0, 0}); // default
-    g_add_dead(g, id, false);
+
+    g_add_dead(g, id, 0);
+
     g_add_update(g, id, false);
     g_add_attacking(g, id, false);
     g_add_zapping(g, id, false);
