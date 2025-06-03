@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ac_component.h"
+//#include "ac_component.h"
 #include "base_attack_damage_component.h"
 #include "component.h"
 #include "component_table.h"
@@ -8,6 +8,7 @@
 #include "damage_component.h"
 #include "debugpanel.h"
 #include "dungeon.h"
+#include "direction.h"
 #include "dungeon_floor.h"
 #include "entityid.h"
 #include "fadestate.h"
@@ -48,8 +49,8 @@ typedef struct gamestate {
     time_t timebegan, currenttime;
     struct tm *timebegantm, *currenttimetm;
     char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF], currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
-    bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard,
-        display_inventory_menu, display_quit_menu, do_quit, dirty_entities; // true if new entities created this turn
+    bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard, display_inventory_menu,
+        display_quit_menu, do_quit, dirty_entities; // true if new entities created this turn
 
     bool display_help_menu;
     //char help_menu_text[2048];
@@ -112,15 +113,24 @@ typedef struct gamestate {
 
     name_component* name_list;
 
-    type_component* type_list;
-    race_component* race_list;
-    direction_component* direction_list;
-    default_action_component* default_action_list;
-    itemtype_component* itemtype_list;
-    weapontype_component* weapontype_list;
-    shieldtype_component* shieldtype_list;
-    potiontype_component* potion_type_list;
-    ac_component* ac_list;
+    int_component* type_list;
+    int_component* race_list;
+    int_component* direction_list;
+    int_component* default_action_list;
+    int_component* itemtype_list;
+    int_component* weapontype_list;
+    int_component* shieldtype_list;
+    int_component* potion_type_list;
+    int_component* ac_list;
+
+    //race_component* race_list;
+    //direction_component* direction_list;
+    //default_action_component* default_action_list;
+    //itemtype_component* itemtype_list;
+    //weapontype_component* weapontype_list;
+    //shieldtype_component* shieldtype_list;
+    //potiontype_component* potion_type_list;
+    //ac_component* ac_list;
 
     loc_component* loc_list;
     sprite_move_component* sprite_move_list;
@@ -177,14 +187,7 @@ bool g_has_component(const gamestate* const g, entityid id, component comp);
 bool g_register_comp(gamestate* const g, entityid id, component comp);
 bool g_register_comps(gamestate* const g, entityid id, ...);
 
-bool g_add_component(gamestate* const g,
-                     entityid id,
-                     component comp,
-                     void* data,
-                     size_t component_size,
-                     void** component_list,
-                     int* component_count,
-                     int* component_capacity);
+bool g_add_component(gamestate* const g, entityid id, component comp, void* data, size_t component_size, void** component_list, int* component_count, int* component_capacity);
 
 bool g_add_name(gamestate* const g, entityid id, const char* name);
 bool g_has_name(const gamestate* const g, entityid id);

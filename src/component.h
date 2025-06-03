@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ac_component.h"
+//#include "direction_component.h"
+//#include "ac_component.h"
 #include "arrow.h"
 #include "arrow_component.h"
 #include "attacking_component.h"
@@ -12,36 +13,34 @@
 #include "damaged_component.h"
 #include "dead_component.h"
 #include "default_action_component.h"
-#include "direction.h"
-#include "direction_component.h"
-#include "entity_actions.h"
+//#include "direction.h"
+//#include "entity_actions.h"
 #include "entityid.h"
-#include "entitytype.h"
+//#include "entitytype.h"
 #include "equipment_component.h"
 #include "equipment_slot.h"
+#include "int_component.h"
 #include "inventory_component.h"
 #include "item.h"
-#include "itemtype_component.h"
 #include "loc_component.h"
 #include "location.h"
 #include "name_component.h"
 #include "potion.h"
-#include "potion_component.h"
+//#include "potion_component.h"
+//#include "itemtype_component.h"
 #include "quiver_component.h"
 #include "race.h"
-#include "race_component.h"
 #include "shield.h"
-#include "shieldtype_component.h"
+//#include "shieldtype_component.h"
 #include "spell_effect_component.h"
 #include "sprite_move_component.h"
 #include "stats_component.h"
 #include "stats_slot.h"
 #include "target_component.h"
 #include "target_path_component.h"
-#include "type_component.h"
 #include "update_component.h"
 #include "weapon.h"
-#include "weapontype_component.h"
+//#include "weapontype_component.h"
 #include "zapping_component.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -55,6 +54,11 @@ typedef enum component_t
     C_TYPE,
     C_RACE,
     C_DIRECTION,
+    C_ITEMTYPE,
+    C_WEAPONTYPE,
+    C_SHIELDTYPE,
+    C_POTIONTYPE,
+    C_AC,
     C_LOCATION,
     C_SPRITE_MOVE,
     C_DEAD,
@@ -63,21 +67,16 @@ typedef enum component_t
     C_BLOCKING,
     C_BLOCK_SUCCESS,
     C_DAMAGED,
+    C_ZAPPING,
     C_INVENTORY,
     C_DEFAULT_ACTION,
     C_TARGET,
     C_TARGET_PATH,
     C_EQUIPMENT,
     C_STATS,
-    C_ITEMTYPE,
-    C_WEAPONTYPE,
-    C_SHIELDTYPE,
-    C_POTIONTYPE,
     C_DAMAGE,
-    C_AC,
-    C_ZAPPING,
-    C_SPELL_EFFECT,
     C_BASE_ATTACK_DAMAGE,
+    C_SPELL_EFFECT,
     C_COUNT
 } component;
 
@@ -122,17 +121,10 @@ static inline const char* component2str(component c) {
 void init_name_component(name_component* comp, entityid id, const char* name);
 
 // int components
-void init_type_component(type_component* comp, entityid id, entitytype_t type);
-void init_race_component(race_component* comp, entityid id, race_t race);
-void init_direction_component(direction_component* comp, entityid id, direction_t dir);
-void init_default_action_component(default_action_component* comp, entityid id, entity_action_t default_action);
-void init_weapontype_component(weapontype_component* comp, entityid id, weapontype type);
-void init_shieldtype_component(shieldtype_component* comp, entityid id, shieldtype type);
-void init_potiontype_component(potiontype_component* comp, entityid id, potiontype type);
-void init_itemtype_component(itemtype_component* comp, entityid id, itemtype type);
+void init_int_component(int_component* comp, entityid id, int data);
+
 void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype type);
 void init_quiver_component(quiver_component* comp, entityid id, int capacity);
-void init_ac_component(ac_component* comp, entityid id, int ac);
 
 // bool components
 void init_dead_component(dead_component* comp, entityid id, bool dead);
