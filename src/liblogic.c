@@ -884,7 +884,10 @@ static void execute_action(gamestate* const g, entityid id, entity_action_t acti
         //case ENTITY_ACTION_INTERACT_RIGHT:
         //case ENTITY_ACTION_INTERACT_UP:
         //case ENTITY_ACTION_INTERACT_DOWN:
-        //default: merror("Unknown entity action: %d", action); break;
+    case ENTITY_ACTION_NONE:
+        // do nothing
+        break;
+    default: merror("Unknown entity action: %d", action); break;
     }
 }
 

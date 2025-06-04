@@ -896,12 +896,10 @@ bool g_has_dead(const gamestate* const g, entityid id) {
     return g_has_component(g, id, C_DEAD);
 }
 
-//bool g_add_dead(gamestate* const g, entityid id, bool dead) {
 bool g_add_dead(gamestate* const g, entityid id, int dead) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // Add dead component
-    //bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(dead_component), (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
     bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(int_component), (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
     // If entity died and has a location, mark its tile as dirty
     if (dead && g_has_location(g, id)) {
@@ -909,22 +907,17 @@ bool g_add_dead(gamestate* const g, entityid id, int dead) {
         dungeon_floor_t* df = d_get_floor(g->d, loc.z);
         if (df) {
             tile_t* tile = df_tile_at(df, loc);
-            if (tile) {
-                tile->dirty_entities = true;
-            }
+            if (tile) tile->dirty_entities = true;
         }
     }
     return result;
 }
 
-bool g_update_dead(gamestate* const g, entityid id, bool dead) {
+bool g_update_dead(gamestate* const g, entityid id, int dead) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(g_has_component(g, id, C_DEAD), "id %d does not have a dead component", id);
-    if (g->dead_list == NULL) {
-        merror("g->dead_list is NULL");
-        return false;
-    }
+    if (g->dead_list == NULL) return false;
     for (int i = 0; i < g->dead_list_count; i++) {
         if (g->dead_list[i].id == id) {
             g->dead_list[i].data = dead;
@@ -937,15 +930,9 @@ bool g_update_dead(gamestate* const g, entityid id, bool dead) {
 bool g_is_dead(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     if (id != ENTITYID_INVALID) {
-        if (g->dead_list == NULL) {
-            merror("g->dead_list is NULL");
-            return false;
-        }
-        for (int i = 0; i < g->dead_list_count; i++) {
-            if (g->dead_list[i].id == id) {
-                return g->dead_list[i].data;
-            }
-        }
+        if (g->dead_list == NULL) return false;
+        for (int i = 0; i < g->dead_list_count; i++)
+            if (g->dead_list[i].id == id) return g->dead_list[i].data;
     }
     return false;
 }

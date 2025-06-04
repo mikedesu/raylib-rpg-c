@@ -225,9 +225,8 @@ bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc);
 loc_t g_get_sprite_move(const gamestate* const g, entityid id);
 
 bool g_has_dead(const gamestate* const g, entityid id);
-//bool g_add_dead(gamestate* const g, entityid id, bool dead);
 bool g_add_dead(gamestate* const g, entityid id, int dead);
-bool g_update_dead(gamestate* const g, entityid id, bool dead);
+bool g_update_dead(gamestate* const g, entityid id, int dead);
 bool g_is_dead(const gamestate* const g, entityid id);
 
 bool g_has_update(const gamestate* const g, entityid id);
