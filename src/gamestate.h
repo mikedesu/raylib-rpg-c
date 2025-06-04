@@ -123,6 +123,13 @@ typedef struct gamestate {
     int_component* shieldtype_list;
     int_component* potion_type_list;
     int_component* ac_list;
+    int_component* dead_list;
+    int_component* update_list;
+    int_component* attacking_list;
+    int_component* zapping_list;
+    int_component* blocking_list;
+    int_component* block_success_list;
+    int_component* damaged_list;
 
     //race_component* race_list;
     //direction_component* direction_list;
@@ -136,16 +143,6 @@ typedef struct gamestate {
     loc_component* loc_list;
     sprite_move_component* sprite_move_list;
     target_component* target_list;
-
-    //dead_component* dead_list;
-    int_component* dead_list;
-
-    update_component* update_list;
-    attacking_component* attacking_list;
-    zapping_component* zapping_list;
-    blocking_component* blocking_list;
-    block_success_component* block_success_list;
-    damaged_component* damaged_list;
 
     inventory_component* inventory_list;
     target_path_component* target_path_list;
