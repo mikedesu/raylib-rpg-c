@@ -196,21 +196,21 @@ bool g_add_name(gamestate* const g, entityid id, const char* name);
 bool g_has_name(const gamestate* const g, entityid id);
 const char* g_get_name(gamestate* const g, entityid id);
 
-bool g_add_type(gamestate* const g, entityid id, entitytype_t type);
-bool g_set_type(gamestate* const g, entityid id, entitytype_t type);
+bool g_add_type(gamestate* const g, entityid id, int type);
+bool g_set_type(gamestate* const g, entityid id, int type);
 entitytype_t g_get_type(const gamestate* const g, entityid id);
-bool g_is_type(const gamestate* const g, entityid id, entitytype_t type);
+bool g_is_type(const gamestate* const g, entityid id, int type);
 bool g_has_type(const gamestate* const g, entityid id);
 
 race_t g_get_race(gamestate* const g, entityid id);
-bool g_add_race(gamestate* const g, entityid id, race_t race);
-bool g_is_race(gamestate* const g, entityid id, race_t race);
+bool g_add_race(gamestate* const g, entityid id, int race);
+bool g_is_race(gamestate* const g, entityid id, int race);
 bool g_has_race(const gamestate* const g, entityid id);
 
 direction_t g_get_direction(const gamestate* const g, entityid id);
-bool g_add_direction(gamestate* const g, entityid id, direction_t dir);
-bool g_is_direction(gamestate* const g, entityid id, direction_t dir);
-bool g_update_direction(gamestate* const g, entityid id, direction_t dir);
+bool g_add_direction(gamestate* const g, entityid id, int dir);
+bool g_is_direction(gamestate* const g, entityid id, int dir);
+bool g_update_direction(gamestate* const g, entityid id, int dir);
 bool g_has_direction(const gamestate* const g, entityid id);
 
 bool g_has_location(const gamestate* const g, entityid id);
@@ -230,33 +230,33 @@ bool g_update_dead(gamestate* const g, entityid id, int dead);
 bool g_is_dead(const gamestate* const g, entityid id);
 
 bool g_has_update(const gamestate* const g, entityid id);
-bool g_add_update(gamestate* const g, entityid id, bool update);
+bool g_add_update(gamestate* const g, entityid id, int update);
 bool g_get_update(gamestate* const g, entityid id);
-bool g_set_update(gamestate* const g, entityid id, bool update);
+bool g_set_update(gamestate* const g, entityid id, int update);
 
 bool g_has_attacking(const gamestate* const g, entityid id);
-bool g_add_attacking(gamestate* const g, entityid id, bool attacking);
-bool g_set_attacking(gamestate* const g, entityid id, bool attacking);
+bool g_add_attacking(gamestate* const g, entityid id, int attacking);
+bool g_set_attacking(gamestate* const g, entityid id, int attacking);
 bool g_get_attacking(const gamestate* const g, entityid id);
 
 bool g_has_blocking(const gamestate* const g, entityid id);
-bool g_add_blocking(gamestate* const g, entityid id, bool blocking);
-bool g_set_blocking(gamestate* const g, entityid id, bool blocking);
+bool g_add_blocking(gamestate* const g, entityid id, int blocking);
+bool g_set_blocking(gamestate* const g, entityid id, int blocking);
 bool g_get_blocking(const gamestate* const g, entityid id);
 
 bool g_has_block_success(const gamestate* const g, entityid id);
-bool g_add_block_success(gamestate* const g, entityid id, bool block_success);
-bool g_set_block_success(gamestate* const g, entityid id, bool block_success);
+bool g_add_block_success(gamestate* const g, entityid id, int block_success);
+bool g_set_block_success(gamestate* const g, entityid id, int block_success);
 bool g_get_block_success(const gamestate* const g, entityid id);
 
 bool g_has_damaged(const gamestate* const g, entityid id);
-bool g_add_damaged(gamestate* const g, entityid id, bool damaged);
-bool g_set_damaged(gamestate* const g, entityid id, bool damaged);
+bool g_add_damaged(gamestate* const g, entityid id, int damaged);
+bool g_set_damaged(gamestate* const g, entityid id, int damaged);
 bool g_get_damaged(const gamestate* const g, entityid id);
 
 bool g_has_default_action(const gamestate* const g, entityid id);
-bool g_add_default_action(gamestate* const g, entityid id, entity_action_t action);
-bool g_set_default_action(gamestate* const g, entityid id, entity_action_t action);
+bool g_add_default_action(gamestate* const g, entityid id, int action);
+bool g_set_default_action(gamestate* const g, entityid id, int action);
 entity_action_t g_get_default_action(const gamestate* const g, entityid id);
 
 bool g_has_inventory(const gamestate* const g, entityid id);
@@ -291,26 +291,26 @@ bool g_set_stat(gamestate* const g, entityid id, stats_slot stats_slot, int valu
 int* g_get_stats(const gamestate* const g, entityid id, int* count);
 int g_get_stat(const gamestate* const g, entityid id, stats_slot stats_slot);
 
-bool g_add_itemtype(gamestate* const g, entityid id, itemtype type);
+bool g_add_itemtype(gamestate* const g, entityid id, int type);
 bool g_has_itemtype(const gamestate* const g, entityid id);
-bool g_set_itemtype(gamestate* const g, entityid id, itemtype type);
+bool g_set_itemtype(gamestate* const g, entityid id, int type);
 itemtype g_get_itemtype(const gamestate* const g, entityid id);
 
-bool g_add_weapontype(gamestate* const g, entityid id, weapontype type);
+bool g_add_weapontype(gamestate* const g, entityid id, int type);
 bool g_has_weapontype(const gamestate* const g, entityid id);
-bool g_set_weapontype(gamestate* const g, entityid id, weapontype type);
+bool g_set_weapontype(gamestate* const g, entityid id, int type);
 weapontype g_get_weapontype(const gamestate* const g, entityid id);
-bool g_is_weapontype(const gamestate* const g, entityid id, weapontype type);
+bool g_is_weapontype(const gamestate* const g, entityid id, int type);
 
-bool g_add_shieldtype(gamestate* const g, entityid id, shieldtype type);
+bool g_add_shieldtype(gamestate* const g, entityid id, int type);
 bool g_has_shieldtype(const gamestate* const g, entityid id);
-bool g_set_shieldtype(gamestate* const g, entityid id, shieldtype type);
+bool g_set_shieldtype(gamestate* const g, entityid id, int type);
 shieldtype g_get_shieldtype(const gamestate* const g, entityid id);
-bool g_is_shieldtype(const gamestate* const g, entityid id, shieldtype type);
+bool g_is_shieldtype(const gamestate* const g, entityid id, int type);
 
-bool g_add_potiontype(gamestate* const g, entityid id, potiontype type);
+bool g_add_potiontype(gamestate* const g, entityid id, int type);
 bool g_has_potiontype(const gamestate* const g, entityid id);
-bool g_set_potiontype(gamestate* const g, entityid id, potiontype type);
+bool g_set_potiontype(gamestate* const g, entityid id, int type);
 bool g_is_potion(const gamestate* const g, entityid id);
 potiontype g_get_potiontype(const gamestate* const g, entityid id);
 
@@ -327,13 +327,13 @@ int g_get_ac(const gamestate* const g, entityid id);
 entityid g_add_entity(gamestate* const g);
 
 bool g_has_attacking(const gamestate* const g, entityid id);
-bool g_add_attacking(gamestate* const g, entityid id, bool attacking);
-bool g_set_attacking(gamestate* const g, entityid id, bool attacking);
+bool g_add_attacking(gamestate* const g, entityid id, int attacking);
+bool g_set_attacking(gamestate* const g, entityid id, int attacking);
 bool g_get_attacking(const gamestate* const g, entityid id);
 
 bool g_has_zapping(const gamestate* const g, entityid id);
-bool g_add_zapping(gamestate* const g, entityid id, bool zapping);
-bool g_set_zapping(gamestate* const g, entityid id, bool zapping);
+bool g_add_zapping(gamestate* const g, entityid id, int zapping);
+bool g_set_zapping(gamestate* const g, entityid id, int zapping);
 bool g_get_zapping(const gamestate* const g, entityid id);
 
 bool g_add_spell_effect(gamestate* const g, entityid id, spell_effect effect);

@@ -2,6 +2,15 @@
 
 //#include "direction_component.h"
 //#include "ac_component.h"
+//#include "dead_component.h"
+//#include "default_action_component.h"
+//#include "direction.h"
+//#include "entity_actions.h"
+//#include "entitytype.h"
+//#include "shieldtype_component.h"
+//#include "weapontype_component.h"
+//#include "potion_component.h"
+//#include "itemtype_component.h"
 #include "arrow.h"
 #include "arrow_component.h"
 #include "attacking_component.h"
@@ -11,12 +20,7 @@
 #include "blocking_component.h"
 #include "damage_component.h"
 #include "damaged_component.h"
-//#include "dead_component.h"
-//#include "default_action_component.h"
-//#include "direction.h"
-//#include "entity_actions.h"
 #include "entityid.h"
-//#include "entitytype.h"
 #include "equipment_component.h"
 #include "equipment_slot.h"
 #include "int_component.h"
@@ -26,12 +30,9 @@
 #include "location.h"
 #include "name_component.h"
 #include "potion.h"
-//#include "potion_component.h"
-//#include "itemtype_component.h"
 #include "quiver_component.h"
 #include "race.h"
 #include "shield.h"
-//#include "shieldtype_component.h"
 #include "spell_effect_component.h"
 #include "sprite_move_component.h"
 #include "stats_component.h"
@@ -40,7 +41,6 @@
 #include "target_path_component.h"
 #include "update_component.h"
 #include "weapon.h"
-//#include "weapontype_component.h"
 #include "zapping_component.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -128,12 +128,12 @@ void init_quiver_component(quiver_component* comp, entityid id, int capacity);
 
 // bool components
 //void init_dead_component(dead_component* comp, entityid id, bool dead);
-void init_update_component(update_component* comp, entityid id, bool update);
-void init_attacking_component(attacking_component* comp, entityid id, bool attacking);
-void init_blocking_component(blocking_component* comp, entityid id, bool blocking);
-void init_block_success_component(block_success_component* comp, entityid id, bool block_success);
-void init_damaged_component(damaged_component* comp, entityid id, bool damaged);
-void init_zapping_component(zapping_component* comp, entityid id, bool zapping);
+//void init_update_component(update_component* comp, entityid id, bool update);
+//void init_attacking_component(attacking_component* comp, entityid id, bool attacking);
+//void init_blocking_component(blocking_component* comp, entityid id, bool blocking);
+//void init_block_success_component(block_success_component* comp, entityid id, bool block_success);
+//void init_damaged_component(damaged_component* comp, entityid id, bool damaged);
+//void init_zapping_component(zapping_component* comp, entityid id, bool zapping);
 
 // loc components
 void init_loc_component(loc_component* comp, entityid id, loc_t loc);
