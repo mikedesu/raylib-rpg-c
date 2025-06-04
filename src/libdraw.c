@@ -76,7 +76,7 @@ static void draw_shield_sprite_front(const gamestate* const g, entityid id, spri
 static void draw_shield_sprite_back(const gamestate* const g, entityid id, spritegroup_t* sg);
 
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
-static bool libdraw_check_default_animations(const gamestate* const g);
+//static bool libdraw_check_default_animations(const gamestate* const g);
 
 static void update_weapon_for_entity(gamestate* g, entityid id, spritegroup_t* sg);
 
@@ -382,17 +382,17 @@ static inline bool libdraw_camera_lock_on(gamestate* const g) {
     return true;
 }
 
-static bool libdraw_check_default_animations(const gamestate* const g) {
-    massert(g, "gamestate is NULL");
-    for (entityid id = 0; id < g->next_entityid; id++) {
-        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-        if (sg && sg->current != sg->default_anim) {
-            // which sg isnt done?
-            return false;
-        }
-    }
-    return true;
-}
+//static bool libdraw_check_default_animations(const gamestate* const g) {
+//    massert(g, "gamestate is NULL");
+//    for (entityid id = 0; id < g->next_entityid; id++) {
+//        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+//        if (sg && sg->current != sg->default_anim) {
+//            // which sg isnt done?
+//            return false;
+//        }
+//    }
+//    return true;
+//}
 
 static void libdraw_set_sg_is_damaged(gamestate* const g, entityid id, spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
@@ -1104,13 +1104,14 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             if (potion_type == POTION_HEALTH_SMALL) {
                 keys = TX_POTION_HP_SMALL_KEYS;
                 num_keys = TX_POTION_HP_SMALL_COUNT;
-            } else if (potion_type == POTION_HEALTH_MEDIUM) {
-                keys = TX_POTION_HP_MEDIUM_KEYS;
-                num_keys = TX_POTION_HP_MEDIUM_COUNT;
-            } else if (potion_type == POTION_HEALTH_LARGE) {
-                keys = TX_POTION_HP_LARGE_KEYS;
-                num_keys = TX_POTION_HP_LARGE_COUNT;
             }
+            //else if (potion_type == POTION_HEALTH_MEDIUM) {
+            //    keys = TX_POTION_HP_MEDIUM_KEYS;
+            //    num_keys = TX_POTION_HP_MEDIUM_COUNT;
+            //} else if (potion_type == POTION_HEALTH_LARGE) {
+            //    keys = TX_POTION_HP_LARGE_KEYS;
+            //    num_keys = TX_POTION_HP_LARGE_COUNT;
+            //}
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         } else if (item_type == ITEM_WAND) {
             keys = TX_WAND_BASIC_KEYS;
@@ -1158,8 +1159,8 @@ static void draw_hud(gamestate* const g) {
     const int con = stats[STATS_CON];
     const int dex = stats[STATS_DEX];
     const int ac = get_total_ac(g, g->hero_id);
-    loc_t loc = g_get_location(g, g->hero_id);
-    dungeon_floor_t* const df = d_get_current_floor(g->d);
+    //loc_t loc = g_get_location(g, g->hero_id);
+    //dungeon_floor_t* const df = d_get_current_floor(g->d);
     int floor = g->d->current_floor;
     //int font_size = g->font_size;
     int font_size = 20;
@@ -1333,7 +1334,7 @@ static void draw_inventory_menu(gamestate* const g) {
         //    if (item_id == 0) continue;
         float item_x = left_box.x + item_list_pad;
         char item_display[128];
-        entitytype_t item_type = g_get_type(g, item_id);
+        //entitytype_t item_type = g_get_type(g, item_id);
         bool is_equipped = g_is_equipped(g, g->hero_id, item_id);
         //if (item_type == ENTITY_WEAPON) {
         //        is_equipped = (hero->weapon == item_id);
@@ -1426,9 +1427,9 @@ static void draw_quit_menu(const gamestate* const g) {
     massert(g, "gamestate is NULL");
     const char* text = "Press Q again to Exit or ESC to Cancel";
     const int box_pad = g->pad;
-    const int section_gap = 16;
-    const int item_list_pad = g->pad;
-    const int max_visible_items = 12; // arbitrary limit for list height
+    //const int section_gap = 16;
+    //const int item_list_pad = g->pad;
+    //const int max_visible_items = 12; // arbitrary limit for list height
     // Measure text using DrawText
     int text_width = MeasureText(text, g->font_size);
     //int text_height = g->font_size;
