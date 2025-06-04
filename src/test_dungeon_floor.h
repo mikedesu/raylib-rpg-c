@@ -138,37 +138,30 @@ TEST(test_df_count_walkable) {
 
 TEST(test_df_init) {
     dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-
     // Initialize the dungeon floor
     df_init(df);
-
     // Test basic initialization
     ASSERT(df->tiles != NULL, "Tiles not initialized");
     ASSERT(df->rooms != NULL, "Rooms not initialized");
     ASSERT(df->room_count > 0, "No rooms created");
-
     // Test tile initialization
     int walkable_count = df_count_walkable(df);
     ASSERT(walkable_count > 0, "No walkable tiles created");
-
     // Test room initialization
     //int room_count = 0;
     //room_data_t* rooms = df_get_rooms_with_prefix(df, &room_count, "room");
     //ASSERT(room_count > 0, "No rooms created");
-
     // Test stair placement
     loc_t upstairs = df_get_upstairs(df);
     loc_t downstairs = df_get_downstairs(df);
     ASSERT(upstairs.x != -1 && upstairs.y != -1, "Upstairs not placed");
     ASSERT(downstairs.x != -1 && downstairs.y != -1, "Downstairs not placed");
     ASSERT(!(upstairs.x == downstairs.x && upstairs.y == downstairs.y), "Stairs in same location");
-
     // Test tile types
     tile_t* up_tile = df_tile_at(df, upstairs);
     tile_t* down_tile = df_tile_at(df, downstairs);
     ASSERT(up_tile->type == TILE_UPSTAIRS, "Upstairs tile type incorrect");
     ASSERT(down_tile->type == TILE_DOWNSTAIRS, "Downstairs tile type incorrect");
-
     df_free(df);
     //printf("df_init tests passed\n");
 }
@@ -176,37 +169,30 @@ TEST(test_df_init) {
 TEST(test_df_serialization) {
     // Create a very small dungeon floor for testing
     dungeon_floor_t* df = df_create(0, 2, 2); // Just 2x2 for easier debugging
-
     // Set up some simple tiles instead of using df_init
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tile_init(&df->tiles[y][x], TILE_FLOOR_STONE_00);
         }
     }
-
     // Set specific tiles for stairs
     df->upstairs_loc = (loc_t){0, 0};
     df->downstairs_loc = (loc_t){1, 1};
     tile_init(&df->tiles[0][0], TILE_UPSTAIRS);
     tile_init(&df->tiles[1][1], TILE_DOWNSTAIRS);
-
     // Add a test room
     df_add_room_info(df, 0, 0, 2, 2, "TestRoom");
-
     // Get serialized size
     size_t size = df_serialized_size(df);
     printf("Serialized size for 2x2 dungeon: %zu bytes\n", size);
     ASSERT(size > 0, "Serialized size should be greater than 0");
-
     // Allocate buffer for serialization
     char* buffer = (char*)malloc(size);
     ASSERT(buffer != NULL, "Failed to allocate serialization buffer");
-
     // Serialize
     size_t written = df_serialize(df, buffer, size);
     ASSERT(written > 0, "Serialization failed");
     ASSERT(written == size, "Serialized size mismatch");
-
     // Print buffer contents for debugging
     printf("Serialized buffer contents (first 32 bytes):\n");
     for (int i = 0; i < 32 && i < size; i++) {
@@ -214,27 +200,22 @@ TEST(test_df_serialization) {
         if ((i + 1) % 16 == 0) printf("\n");
     }
     printf("\n");
-
     // Create a new dungeon floor for deserialization
     dungeon_floor_t* df2 = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
     ASSERT(df2 != NULL, "Failed to allocate new dungeon floor");
     memset(df2, 0, sizeof(dungeon_floor_t)); // Initialize to zeros
-
     // Deserialize
     bool success = df_deserialize(df2, buffer, size);
     ASSERT(success, "Deserialization failed");
-
     // Verify basic properties
     ASSERT(df2->width == df->width, "Width mismatch");
     ASSERT(df2->height == df->height, "Height mismatch");
     ASSERT(df2->room_count == df->room_count, "Room count mismatch");
-
     // Verify stair locations
     ASSERT(df2->upstairs_loc.x == df->upstairs_loc.x, "Upstairs X mismatch");
     ASSERT(df2->upstairs_loc.y == df->upstairs_loc.y, "Upstairs Y mismatch");
     ASSERT(df2->downstairs_loc.x == df->downstairs_loc.x, "Downstairs X mismatch");
     ASSERT(df2->downstairs_loc.y == df->downstairs_loc.y, "Downstairs Y mismatch");
-
     // Clean up
     free(buffer);
     df_free(df);
