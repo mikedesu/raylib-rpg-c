@@ -1,7 +1,9 @@
 #pragma once
 
-#include "location.h"
-typedef enum direction_t {
+//#include "location.h"
+#include "vec3.h"
+typedef enum direction_t
+{
     DIR_NONE,
     DIR_UP,
     DIR_DOWN,
@@ -47,20 +49,20 @@ static inline int get_y_from_dir(direction_t dir) {
     }
 }
 
-static inline loc_t get_loc_from_dir(direction_t dir) {
-    loc_t loc = {0, 0};
+static inline vec3 get_loc_from_dir(direction_t dir) {
+    vec3 loc = {0, 0, 0};
     switch (dir) {
-    case DIR_UP: loc = (loc_t){0, -1}; break;
-    case DIR_DOWN: loc = (loc_t){0, 1}; break;
-    case DIR_LEFT: loc = (loc_t){-1, 0}; break;
-    case DIR_RIGHT: loc = (loc_t){1, 0}; break;
-    case DIR_UP_LEFT: loc = (loc_t){-1, -1}; break;
-    case DIR_UP_RIGHT: loc = (loc_t){1, -1}; break;
-    case DIR_DOWN_LEFT: loc = (loc_t){-1, 1}; break;
-    case DIR_DOWN_RIGHT: loc = (loc_t){1, 1}; break;
+    case DIR_UP: loc = (vec3){0, -1}; break;
+    case DIR_DOWN: loc = (vec3){0, 1}; break;
+    case DIR_LEFT: loc = (vec3){-1, 0}; break;
+    case DIR_RIGHT: loc = (vec3){1, 0}; break;
+    case DIR_UP_LEFT: loc = (vec3){-1, -1}; break;
+    case DIR_UP_RIGHT: loc = (vec3){1, -1}; break;
+    case DIR_DOWN_LEFT: loc = (vec3){-1, 1}; break;
+    case DIR_DOWN_RIGHT: loc = (vec3){1, 1}; break;
     case DIR_NONE:
     case DIR_UNKNOWN:
-    default: loc = (loc_t){0, 0}; break;
+    default: loc = (vec3){0, 0}; break;
     }
     return loc;
 }
@@ -79,7 +81,7 @@ static inline const direction_t get_dir_from_xy(int x, int y) {
     return DIR_UNKNOWN;
 }
 
-static inline direction_t get_dir_from_loc(loc_t loc) { return get_dir_from_xy(loc.x, loc.y); }
+static inline direction_t get_dir_from_loc(vec3 loc) { return get_dir_from_xy(loc.x, loc.y); }
 
 static inline const char* get_dir_as_string(direction_t dir) {
     switch (dir) {

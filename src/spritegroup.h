@@ -2,9 +2,9 @@
 
 #include "entityid.h"
 #include "libgame_defines.h"
-#include "location.h"
 #include "specifier.h"
 #include "sprite.h"
+#include "vec3.h"
 
 #define SPRITEGROUP_ANIM_QUEUE_MAX 32
 
@@ -46,6 +46,6 @@ void spritegroup_destroy(spritegroup_t* sg);
 void spritegroup_set_specifier(spritegroup_t* const sg, specifier_t spec);
 void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop);
 void spritegroup_update_dest(spritegroup_t* const sg);
-void spritegroup_snap_dest(spritegroup_t* const sg, loc_t loc);
+void spritegroup_snap_dest(spritegroup_t* const sg, vec3 loc);
 void sg_set_default_anim(spritegroup_t* const sg, int anim);
 //void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y);

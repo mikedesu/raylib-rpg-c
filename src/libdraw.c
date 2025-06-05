@@ -92,7 +92,7 @@ static bool libdraw_unload_texture(int txkey);
 static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z);
 static bool draw_dungeon_tiles_2d(const gamestate* const g, int z, dungeon_floor_t* df);
 static bool draw_entities_2d(const gamestate* const g, int z, dungeon_floor_t* df, bool dead);
-static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, loc_t loc);
+static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, vec3 loc);
 static bool libdraw_draw_dungeon_floor(const gamestate* const g);
 static bool libdraw_draw_player_target_box(const gamestate* const g);
 
@@ -131,7 +131,7 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     massert(x < df->width, "x is out of bounds");
     massert(y < df->height, "y is out of bounds");
     massert(df, "dungeon_floor is NULL");
-    tile_t* tile = df_tile_at(df, (loc_t){x, y, z});
+    tile_t* tile = df_tile_at(df, (vec3){x, y, z});
     massert(tile, "tile is NULL");
     // check if the tile type is none
     if (tile->type == TILE_NONE) return true;
@@ -316,7 +316,7 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     draw_weapon_sprite_front(g, id, sg);
 }
 
-static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, loc_t loc) {
+static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, vec3 loc) {
     massert(g, "draw_entities_2d: gamestate is NULL");
     massert(df, "draw_entities_2d: dungeon_floor is NULL");
     massert(df->width > 0, "draw_entities_2d: dungeon_floor width is 0");
@@ -350,7 +350,7 @@ static bool draw_entities_2d(const gamestate* const g, int z, dungeon_floor_t* d
     massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
     massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
     for (int y = 0; y < df->height; y++)
-        for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, dead, (loc_t){x, y, z});
+        for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, dead, (vec3){x, y, z});
     return true;
 }
 
@@ -580,7 +580,7 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegro
     spritegroup_update_dest(sg);
     // Snap to the tile position only when movement is fully complete
     vec3 loc = g_get_location(g, id);
-    loc_t loc_cast = {loc.x, loc.y, loc.z};
+    vec3 loc_cast = {loc.x, loc.y, loc.z};
     spritegroup_snap_dest(sg, loc_cast);
 }
 

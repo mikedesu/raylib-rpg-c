@@ -15,18 +15,14 @@
 #include "int_component.h"
 #include "inventory_component.h"
 #include "item.h"
-#include "loc_component.h"
-#include "location.h"
 #include "name_component.h"
 #include "potion.h"
 #include "quiver_component.h"
 #include "race.h"
 #include "shield.h"
 #include "spell_effect_component.h"
-#include "sprite_move_component.h"
 #include "stats_component.h"
 #include "stats_slot.h"
-#include "target_component.h"
 #include "target_path_component.h"
 #include "update_component.h"
 #include "vec3_component.h"
@@ -124,7 +120,7 @@ void init_base_attack_damage_component(base_attack_damage_component* comp, entit
 void init_inventory_component(inventory_component* comp, entityid id);
 void init_equipment_component(equipment_component* comp, entityid id);
 void init_stats_component(stats_component* comp, entityid id);
-void init_target_path_component(target_path_component* comp, entityid id, loc_t* target_path, int target_path_length);
+void init_target_path_component(target_path_component* comp, entityid id, vec3* target_path, int target_path_length);
 
 // complex components
 void init_spell_effect_component(spell_effect_component* comp, entityid id, spell_effect effect);

@@ -1,7 +1,8 @@
 #include "path_node.h"
+#include "vec3.h"
 #include <stdlib.h>
 
-path_node* create_path_node(loc_t position, path_node* parent, loc_t target) {
+path_node* create_path_node(vec3 position, path_node* parent, vec3 target) {
     path_node* node = malloc(sizeof(path_node));
     if (!node) return NULL;
 
@@ -21,7 +22,7 @@ path_node* create_path_node(loc_t position, path_node* parent, loc_t target) {
     return node;
 }
 
-bool location_in_list(path_node** list, int list_size, loc_t pos) {
+bool location_in_list(path_node** list, int list_size, vec3 pos) {
     for (int i = 0; i < list_size; i++) {
         if (locations_equal(list[i]->pos, pos)) {
             return true;
@@ -30,25 +31,25 @@ bool location_in_list(path_node** list, int list_size, loc_t pos) {
     return false;
 }
 
-void get_neighbors(loc_t pos, loc_t neighbors[8]) {
-    neighbors[0] = (loc_t){pos.x, pos.y - 1, pos.z}; // Up
-    neighbors[1] = (loc_t){pos.x + 1, pos.y - 1, pos.z}; // Up-Right
-    neighbors[2] = (loc_t){pos.x + 1, pos.y, pos.z}; // Right
-    neighbors[3] = (loc_t){pos.x + 1, pos.y + 1, pos.z}; // Down-Right
-    neighbors[4] = (loc_t){pos.x, pos.y + 1, pos.z}; // Down
-    neighbors[5] = (loc_t){pos.x - 1, pos.y + 1, pos.z}; // Down-Left
-    neighbors[6] = (loc_t){pos.x - 1, pos.y, pos.z}; // Left
-    neighbors[7] = (loc_t){pos.x - 1, pos.y - 1, pos.z}; // Up-Left
+void get_neighbors(vec3 pos, vec3 neighbors[8]) {
+    neighbors[0] = (vec3){pos.x, pos.y - 1, pos.z}; // Up
+    neighbors[1] = (vec3){pos.x + 1, pos.y - 1, pos.z}; // Up-Right
+    neighbors[2] = (vec3){pos.x + 1, pos.y, pos.z}; // Right
+    neighbors[3] = (vec3){pos.x + 1, pos.y + 1, pos.z}; // Down-Right
+    neighbors[4] = (vec3){pos.x, pos.y + 1, pos.z}; // Down
+    neighbors[5] = (vec3){pos.x - 1, pos.y + 1, pos.z}; // Down-Left
+    neighbors[6] = (vec3){pos.x - 1, pos.y, pos.z}; // Left
+    neighbors[7] = (vec3){pos.x - 1, pos.y - 1, pos.z}; // Up-Left
 }
 
-//void get_neighbors(loc_t pos, loc_t neighbors[4]) {
-//    neighbors[0] = (loc_t){pos.x, pos.y - 1, pos.z}; // Up
-//    neighbors[1] = (loc_t){pos.x + 1, pos.y, pos.z}; // Right
-//    neighbors[2] = (loc_t){pos.x, pos.y + 1, pos.z}; // Down
-//    neighbors[3] = (loc_t){pos.x - 1, pos.y, pos.z}; // Left
+//void get_neighbors(vec3 pos, vec3 neighbors[4]) {
+//    neighbors[0] = (vec3){pos.x, pos.y - 1, pos.z}; // Up
+//    neighbors[1] = (vec3){pos.x + 1, pos.y, pos.z}; // Right
+//    neighbors[2] = (vec3){pos.x, pos.y + 1, pos.z}; // Down
+//    neighbors[3] = (vec3){pos.x - 1, pos.y, pos.z}; // Left
 //}
 
-bool is_position_walkable(loc_t pos, dungeon_floor_t* df) {
+bool is_position_walkable(vec3 pos, dungeon_floor_t* df) {
     // Check bounds
     if (pos.x < 0 || pos.x >= df->width || pos.y < 0 || pos.y >= df->height) {
         return false;
@@ -59,12 +60,12 @@ bool is_position_walkable(loc_t pos, dungeon_floor_t* df) {
     return tile_is_walkable(t->type);
 }
 
-loc_t* find_path(loc_t start, loc_t end, dungeon_floor_t* df, int* path_length) {
+vec3* find_path(vec3 start, vec3 end, dungeon_floor_t* df, int* path_length) {
     *path_length = 0;
 
     // If start and end are the same
     if (locations_equal(start, end)) {
-        loc_t* path = malloc(sizeof(loc_t));
+        vec3* path = malloc(sizeof(vec3));
         if (!path) return NULL;
 
         path[0] = start;
@@ -131,7 +132,7 @@ loc_t* find_path(loc_t start, loc_t end, dungeon_floor_t* df, int* path_length) 
                 node = node->parent;
             }
 
-            loc_t* path = malloc(count * sizeof(loc_t));
+            vec3* path = malloc(count * sizeof(vec3));
             if (!path) {
                 // Clean up
                 for (int i = 0; i < open_count; i++) free(open_list[i]);
@@ -160,11 +161,11 @@ loc_t* find_path(loc_t start, loc_t end, dungeon_floor_t* df, int* path_length) 
         }
 
         // Check neighbors
-        loc_t neighbors[8];
+        vec3 neighbors[8];
         get_neighbors(current->pos, neighbors);
 
         for (int i = 0; i < 8; i++) {
-            loc_t neighbor_pos = neighbors[i];
+            vec3 neighbor_pos = neighbors[i];
 
             // Check if neighbor is walkable
             if (!is_position_walkable(neighbor_pos, df)) {

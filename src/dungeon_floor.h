@@ -2,10 +2,11 @@
 
 #include "dungeon_tile.h"
 #include "entityid.h"
-#include "location.h"
+//#include "location.h"
 #include "mprint.h"
 #include "raylib.h"
 #include "room_data.h"
+#include "vec3.h"
 #include <stdbool.h>
 
 #define DEFAULT_DUNGEON_FLOOR_WIDTH 256
@@ -33,8 +34,8 @@ typedef struct {
     room_data_t* rooms; // dynamic array pointer
     int room_count; // current room number
     int room_capacity; // allocated capacity
-    loc_t downstairs_loc;
-    loc_t upstairs_loc;
+    vec3 downstairs_loc;
+    vec3 upstairs_loc;
 } dungeon_floor_t;
 
 //dungeon_floor_t* df_create(int width, int height);
@@ -46,15 +47,15 @@ void df_init_rooms(dungeon_floor_t* df);
 bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_add_room_info(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
-loc_t df_get_upstairs(dungeon_floor_t* const df);
-loc_t df_get_downstairs(dungeon_floor_t* const df);
+vec3 df_get_upstairs(dungeon_floor_t* const df);
+vec3 df_get_downstairs(dungeon_floor_t* const df);
 
 // Add these function declarations
 void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y);
 void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
 void df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
-loc_t* const df_get_all_locs(dungeon_floor_t* const df, int* external_count);
-loc_t* const df_get_all_locs_outside_of_rooms(dungeon_floor_t* const df, int* external_count);
+vec3* const df_get_all_locs(dungeon_floor_t* const df, int* external_count);
+vec3* const df_get_all_locs_outside_of_rooms(dungeon_floor_t* const df, int* external_count);
 int df_count_walkable(const dungeon_floor_t* const df);
 int df_count_empty(const dungeon_floor_t* const df);
 int df_count_empty_non_walls(const dungeon_floor_t* const df);
@@ -64,9 +65,9 @@ int df_count_non_walls(const dungeon_floor_t* const df);
 
 int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
-int df_loc_is_in_room(dungeon_floor_t* const df, loc_t loc);
+int df_loc_is_in_room(dungeon_floor_t* const df, vec3 loc);
 room_data_t* const df_get_rooms_with_prefix(dungeon_floor_t* const df, int* external_count, const char* prefix);
-const char* df_get_room_name(dungeon_floor_t* const df, loc_t loc);
+const char* df_get_room_name(dungeon_floor_t* const df, vec3 loc);
 
 // Serialization functions
 size_t df_serialized_size(const dungeon_floor_t* df);
@@ -77,7 +78,7 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
 size_t df_memory_size(const dungeon_floor_t* df);
 
 //static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
-static inline tile_t* df_tile_at(const dungeon_floor_t* const df, loc_t loc) {
+static inline tile_t* df_tile_at(const dungeon_floor_t* const df, vec3 loc) {
     //minfo("df_tile_at: %d, %d", x, y);
     massert(df, "df is NULL");
     if (loc.x < 0 || loc.x >= df->width || loc.y < 0 || loc.y >= df->height) {
@@ -100,7 +101,7 @@ static inline tiletype_t df_type_at(const dungeon_floor_t* const df, const int x
 
 static inline bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {
     massert(df, "dungeon floor is NULL");
-    tile_t* tile = df_tile_at(df, (loc_t){x, y, -1});
+    tile_t* tile = df_tile_at(df, (vec3){x, y, -1});
     return tile_is_wall(tile->type);
 }
 

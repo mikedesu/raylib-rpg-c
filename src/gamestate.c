@@ -757,7 +757,7 @@ bool g_add_dead(gamestate* const g, entityid id, int dead) {
         vec3 loc = g_get_location(g, id);
         dungeon_floor_t* df = d_get_floor(g->d, loc.z);
         if (df) {
-            loc_t loc_cast = {loc.x, loc.y, loc.z};
+            vec3 loc_cast = {loc.x, loc.y, loc.z};
             tile_t* tile = df_tile_at(df, loc_cast);
             if (tile) tile->dirty_entities = true;
         }
@@ -1159,7 +1159,7 @@ bool g_add_target_path(gamestate* const g, entityid id) {
     return true;
 }
 
-bool g_set_target_path(gamestate* const g, entityid id, loc_t* target_path, int target_path_length) {
+bool g_set_target_path(gamestate* const g, entityid id, vec3* target_path, int target_path_length) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->target_path_list == NULL) return false;
@@ -1173,7 +1173,7 @@ bool g_set_target_path(gamestate* const g, entityid id, loc_t* target_path, int 
     return false;
 }
 
-bool g_get_target_path(const gamestate* const g, entityid id, loc_t** target_path, int* target_path_length) {
+bool g_get_target_path(const gamestate* const g, entityid id, vec3** target_path, int* target_path_length) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(target_path, "target_path is NULL");

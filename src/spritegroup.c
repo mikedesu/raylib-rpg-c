@@ -182,7 +182,7 @@ bool spritegroup_is_animating(spritegroup_t* const sg) {
 //    }
 //}
 
-void spritegroup_snap_dest(spritegroup_t* const sg, loc_t loc) {
+void spritegroup_snap_dest(spritegroup_t* const sg, vec3 loc) {
     massert(sg, "spritegroup is NULL");
     if (sg->move.x == 0 && sg->move.y == 0) {
         sg->dest.x = loc.x * DEFAULT_TILE_SIZE + sg->off_x;

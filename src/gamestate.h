@@ -219,18 +219,11 @@ bool g_add_location(gamestate* const g, entityid id, vec3 loc);
 bool g_update_location(gamestate* const g, entityid id, vec3 loc);
 vec3 g_get_location(const gamestate* const g, entityid id);
 bool g_is_location(const gamestate* const g, entityid id, vec3 loc);
-//loc_t g_get_location(const gamestate* const g, entityid id);
-//bool g_add_location(gamestate* const g, entityid id, loc_t loc);
-//bool g_update_location(gamestate* const g, entityid id, loc_t loc);
-//bool g_is_location(const gamestate* const g, entityid id, loc_t loc);
 
 bool g_has_sprite_move(const gamestate* const g, entityid id);
 bool g_add_sprite_move(gamestate* const g, entityid id, vec3 loc);
 bool g_update_sprite_move(gamestate* const g, entityid id, vec3 loc);
 vec3 g_get_sprite_move(const gamestate* const g, entityid id);
-//bool g_add_sprite_move(gamestate* const g, entityid id, loc_t loc);
-//bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc);
-//loc_t g_get_sprite_move(const gamestate* const g, entityid id);
 
 bool g_has_dead(const gamestate* const g, entityid id);
 bool g_add_dead(gamestate* const g, entityid id, int dead);
@@ -282,8 +275,8 @@ bool g_get_target(const gamestate* const g, entityid id, vec3* target);
 
 bool g_has_target_path(const gamestate* const g, entityid id);
 bool g_add_target_path(gamestate* const g, entityid id);
-bool g_set_target_path(gamestate* const g, entityid id, loc_t* target_path, int target_path_length);
-bool g_get_target_path(const gamestate* const g, entityid id, loc_t** target_path, int* target_path_length);
+bool g_set_target_path(gamestate* const g, entityid id, vec3* target_path, int target_path_length);
+bool g_get_target_path(const gamestate* const g, entityid id, vec3** target_path, int* target_path_length);
 bool g_get_target_path_length(const gamestate* const g, entityid id, int* target_path_length);
 
 bool g_add_equipment(gamestate* const g, entityid id);

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "location.h"
 #include "path_node.h"
+#include "vec3.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -56,23 +56,29 @@ static path_node queue_pop(node_queue* queue) {
     queue->count--;
 
     // Shift remaining nodes
-    if (queue->count > 0) { memmove(&queue->nodes[0], &queue->nodes[1], queue->count * sizeof(path_node)); }
+    if (queue->count > 0) {
+        memmove(&queue->nodes[0], &queue->nodes[1], queue->count * sizeof(path_node));
+    }
 
     return node;
 }
 
 // Check if a position is already in the queue
-static bool queue_contains_position(node_queue* queue, loc_t pos) {
+static bool queue_contains_position(node_queue* queue, vec3 pos) {
     for (int i = 0; i < queue->count; i++) {
-        if (queue->nodes[i].pos.x == pos.x && queue->nodes[i].pos.y == pos.y) { return true; }
+        if (queue->nodes[i].pos.x == pos.x && queue->nodes[i].pos.y == pos.y) {
+            return true;
+        }
     }
     return false;
 }
 
 // Find a node with a specific position
-static int queue_find_node_index(node_queue* queue, loc_t pos) {
+static int queue_find_node_index(node_queue* queue, vec3 pos) {
     for (int i = 0; i < queue->count; i++) {
-        if (queue->nodes[i].pos.x == pos.x && queue->nodes[i].pos.y == pos.y) { return i; }
+        if (queue->nodes[i].pos.x == pos.x && queue->nodes[i].pos.y == pos.y) {
+            return i;
+        }
     }
     return -1;
 }

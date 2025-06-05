@@ -120,16 +120,16 @@ void init_inventory_component(inventory_component* comp, entityid id) {
     memset(comp->inventory, ENTITYID_INVALID, sizeof(comp->inventory));
 }
 
-void init_target_component(target_component* comp, entityid id, loc_t target) {
-    massert(comp != NULL, "comp is NULL");
-    if (!comp) return;
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (id == ENTITYID_INVALID) return;
-    comp->id = id;
-    comp->target = target;
-}
+//void init_target_component(target_component* comp, entityid id, loc_t target) {
+//    massert(comp != NULL, "comp is NULL");
+//    if (!comp) return;
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (id == ENTITYID_INVALID) return;
+//    comp->id = id;
+//    comp->target = target;
+//}
 
-void init_target_path_component(target_path_component* comp, entityid id, loc_t* target_path, int target_path_length) {
+void init_target_path_component(target_path_component* comp, entityid id, vec3* target_path, int target_path_length) {
     massert(comp != NULL, "comp is NULL");
     if (!comp) return;
     massert(id != ENTITYID_INVALID, "id is invalid");
