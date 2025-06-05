@@ -113,15 +113,8 @@ void init_name_component(name_component* comp, entityid id, const char* name);
 // int components
 void init_int_component(int_component* comp, entityid id, int data);
 
-//void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype type);
-//void init_quiver_component(quiver_component* comp, entityid id, int capacity);
-
 // loc components: 3 integer
 void init_vec3_component(vec3_component* comp, entityid id, vec3 v);
-
-//void init_loc_component(loc_component* comp, entityid id, loc_t loc);
-//void init_sprite_move_component(sprite_move_component* comp, entityid id, loc_t loc);
-//void init_target_component(target_component* comp, entityid id, loc_t target);
 
 // roll components: 3 integer
 void init_damage_component(damage_component* comp, entityid id, roll r);
