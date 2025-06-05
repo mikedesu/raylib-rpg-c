@@ -167,14 +167,19 @@ TEST(test_df_init) {
             ASSERT(tile->type == TILE_FLOOR_STONE_00 || tile->type == TILE_FLOOR_STONE_01, "Tile type should be one of the room floor types");
         }
     }
-    //int room_count = 0;
-    //room_data_t* rooms = df_get_rooms_with_prefix(df, &room_count, "room");
-    //ASSERT(room_count > 0, "No rooms created");
+    int room_count2 = 0;
+    const char* prefix = "room";
+    room_data_t* rooms = df_get_rooms_with_prefix(df, &room_count2, prefix);
+    ASSERT(room_count2 == 0, "No rooms with prefix [room] should have been created");
+    rooms = df_get_rooms_with_prefix(df, &room_count2, "TestRoom");
+    ASSERT(room_count2 == 1, "One room with prefix [TestRoom] should have been created");
     // Test stair placement
-    //vec3 upstairs = df_get_upstairs(df);
-    //vec3 downstairs = df_get_downstairs(df);
-    //ASSERT(upstairs.x != -1 && upstairs.y != -1, "Upstairs not placed");
-    //ASSERT(downstairs.x != -1 && downstairs.y != -1, "Downstairs not placed");
+    vec3 upstairs = df_get_upstairs(df);
+    // stairs should not exist yet
+    //ASSERT(upstairs.x == -1 && upstairs.y == -1, "Upstairs should not be placed yet");
+    ASSERT(vec3_equal(upstairs, (vec3){-1, -1, -1}), "Upstairs should not be placed yet");
+    vec3 downstairs = df_get_downstairs(df);
+    ASSERT(vec3_equal(downstairs, (vec3){-1, -1, -1}), "Dnstairs should not be placed yet");
     //ASSERT(!(upstairs.x == downstairs.x && upstairs.y == downstairs.y), "Stairs in same location");
     // Test tile types
     //tile_t* up_tile = df_tile_at(df, upstairs);

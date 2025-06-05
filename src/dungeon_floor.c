@@ -960,7 +960,7 @@ vec3 df_get_downstairs(dungeon_floor_t* const df) {
     if (df->downstairs_loc.x != -1 && df->downstairs_loc.y != -1) {
         return df->downstairs_loc;
     }
-    vec3 loc = {-1, -1};
+    vec3 loc = {-1, -1, -1};
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tile_t* const tile = df_tile_at(df, (vec3){x, y, -1});
