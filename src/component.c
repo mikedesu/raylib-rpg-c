@@ -1,5 +1,7 @@
 #include "component.h"
 #include "massert.h"
+#include "vec3.h"
+#include "vec3_component.h"
 //#include "mprint.h"
 #include <string.h>
 
@@ -27,23 +29,32 @@ void init_int_component(int_component* comp, entityid id, int data) {
     comp->data = data;
 }
 
-void init_loc_component(loc_component* comp, entityid id, loc_t loc) {
+void init_vec3_component(vec3_component* comp, entityid id, vec3 v) {
     massert(comp != NULL, "comp is NULL");
     if (!comp) return;
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (id == ENTITYID_INVALID) return;
     comp->id = id;
-    comp->loc = loc;
+    comp->data = v;
 }
 
-void init_sprite_move_component(sprite_move_component* comp, entityid id, loc_t loc) {
-    massert(comp != NULL, "comp is NULL");
-    if (!comp) return;
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (id == ENTITYID_INVALID) return;
-    comp->id = id;
-    comp->loc = loc;
-}
+//void init_loc_component(loc_component* comp, entityid id, loc_t loc) {
+//    massert(comp != NULL, "comp is NULL");
+//    if (!comp) return;
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (id == ENTITYID_INVALID) return;
+//    comp->id = id;
+//    comp->loc = loc;
+//}
+
+//void init_sprite_move_component(sprite_move_component* comp, entityid id, loc_t loc) {
+//    massert(comp != NULL, "comp is NULL");
+//    if (!comp) return;
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (id == ENTITYID_INVALID) return;
+//    comp->id = id;
+//    comp->loc = loc;
+//}
 
 //void init_dead_component(dead_component* comp, entityid id, bool dead) {
 //    massert(comp != NULL, "comp is NULL");

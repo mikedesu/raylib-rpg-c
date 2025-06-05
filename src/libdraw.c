@@ -508,11 +508,14 @@ static void libdraw_update_sprite_position(gamestate* const g, entityid id, spri
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    loc_t sprite_move = g_get_sprite_move(g, id);
+
+    //loc_t sprite_move = g_get_sprite_move(g, id);
+    vec3 sprite_move = g_get_sprite_move(g, id);
+
     if (sprite_move.x != 0 || sprite_move.y != 0) {
         sg->move.x = sprite_move.x;
         sg->move.y = sprite_move.y;
-        g_update_sprite_move(g, id, (loc_t){0, 0, 0});
+        g_update_sprite_move(g, id, (vec3){0, 0, 0});
         entitytype_t type = g_get_type(g, id);
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
             race_t race = g_get_race(g, id);
@@ -576,8 +579,9 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegro
     // Update movement as long as sg->move.x/y is non-zero
     spritegroup_update_dest(sg);
     // Snap to the tile position only when movement is fully complete
-    loc_t loc = g_get_location(g, id);
-    spritegroup_snap_dest(sg, loc);
+    vec3 loc = g_get_location(g, id);
+    loc_t loc_cast = {loc.x, loc.y, loc.z};
+    spritegroup_snap_dest(sg, loc_cast);
 }
 
 static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegroup_t* const sg) {
@@ -688,7 +692,7 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
         return false;
     }
     direction_t dir = g_get_direction(g, id);
-    loc_t loc = g_get_location(g, id);
+    vec3 loc = g_get_location(g, id);
     int x = loc.x + get_x_from_dir(dir);
     int y = loc.y + get_y_from_dir(dir);
     int ds = DEFAULT_TILE_SIZE;
@@ -985,7 +989,7 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
     }
     const int df_w = df->width;
     const int df_h = df->height;
-    loc_t loc = g_get_location(g, id);
+    vec3 loc = g_get_location(g, id);
     if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
         merror("entity pos out of bounds %d %d", loc.x, loc.y);
         spritegroup_destroy(group);

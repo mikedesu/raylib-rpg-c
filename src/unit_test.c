@@ -1,7 +1,7 @@
 //#include "test_btree_int.h"
 #include "test_component_table.h"
-#include "test_dungeon.h"
-#include "test_dungeon_floor.h"
+//#include "test_dungeon.h"
+//#include "test_dungeon_floor.h"
 #include "test_dungeon_tile.h"
 #include "test_gamestate.h"
 

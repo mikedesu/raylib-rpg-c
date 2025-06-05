@@ -140,9 +140,13 @@ typedef struct gamestate {
     //potiontype_component* potion_type_list;
     //ac_component* ac_list;
 
-    loc_component* loc_list;
-    sprite_move_component* sprite_move_list;
-    target_component* target_list;
+    //loc_component* loc_list;
+    //sprite_move_component* sprite_move_list;
+    //target_component* target_list;
+
+    vec3_component* loc_list;
+    vec3_component* sprite_move_list;
+    vec3_component* target_list;
 
     inventory_component* inventory_list;
     target_path_component* target_path_list;
@@ -211,15 +215,22 @@ bool g_update_direction(gamestate* const g, entityid id, int dir);
 bool g_has_direction(const gamestate* const g, entityid id);
 
 bool g_has_location(const gamestate* const g, entityid id);
-bool g_add_location(gamestate* const g, entityid id, loc_t loc);
-bool g_update_location(gamestate* const g, entityid id, loc_t loc);
-loc_t g_get_location(const gamestate* const g, entityid id);
-bool g_is_location(const gamestate* const g, entityid id, loc_t loc);
+bool g_add_location(gamestate* const g, entityid id, vec3 loc);
+bool g_update_location(gamestate* const g, entityid id, vec3 loc);
+vec3 g_get_location(const gamestate* const g, entityid id);
+bool g_is_location(const gamestate* const g, entityid id, vec3 loc);
+//loc_t g_get_location(const gamestate* const g, entityid id);
+//bool g_add_location(gamestate* const g, entityid id, loc_t loc);
+//bool g_update_location(gamestate* const g, entityid id, loc_t loc);
+//bool g_is_location(const gamestate* const g, entityid id, loc_t loc);
 
 bool g_has_sprite_move(const gamestate* const g, entityid id);
-bool g_add_sprite_move(gamestate* const g, entityid id, loc_t loc);
-bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc);
-loc_t g_get_sprite_move(const gamestate* const g, entityid id);
+bool g_add_sprite_move(gamestate* const g, entityid id, vec3 loc);
+bool g_update_sprite_move(gamestate* const g, entityid id, vec3 loc);
+vec3 g_get_sprite_move(const gamestate* const g, entityid id);
+//bool g_add_sprite_move(gamestate* const g, entityid id, loc_t loc);
+//bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc);
+//loc_t g_get_sprite_move(const gamestate* const g, entityid id);
 
 bool g_has_dead(const gamestate* const g, entityid id);
 bool g_add_dead(gamestate* const g, entityid id, int dead);
@@ -265,9 +276,9 @@ size_t g_get_inventory_count(const gamestate* const g, entityid id);
 bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid itemid);
 
 bool g_has_target(const gamestate* const g, entityid id);
-bool g_add_target(gamestate* const g, entityid id, loc_t target);
-bool g_set_target(gamestate* const g, entityid id, loc_t target);
-bool g_get_target(const gamestate* const g, entityid id, loc_t* target);
+bool g_add_target(gamestate* const g, entityid id, vec3 target);
+bool g_set_target(gamestate* const g, entityid id, vec3 target);
+bool g_get_target(const gamestate* const g, entityid id, vec3* target);
 
 bool g_has_target_path(const gamestate* const g, entityid id);
 bool g_add_target_path(gamestate* const g, entityid id);

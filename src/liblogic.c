@@ -5,7 +5,7 @@
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
-#include "elemental.h"
+//#include "elemental.h"
 #include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
@@ -357,7 +357,7 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     g_set_update(g, id, true);
     //e->direction = get_dir_from_xy(x, y);
     g_update_direction(g, id, get_dir_from_xy(x, y));
-    loc_t loc = g_get_location(g, id);
+    vec3 loc = g_get_location(g, id);
     int ex = loc.x + x;
     int ey = loc.y + y;
     int z = loc.z;
@@ -397,8 +397,10 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
         merror("Failed to add entity to new tile");
         return;
     }
-    g_update_location(g, id, (loc_t){ex, ey, z});
-    g_update_sprite_move(g, id, (loc_t){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
+
+    g_update_location(g, id, (vec3){ex, ey, z});
+
+    g_update_sprite_move(g, id, (vec3){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
 
     if (id == g->hero_id) {
         update_player_tiles_explored(g);
@@ -456,14 +458,18 @@ static void try_entity_move_a_star(gamestate* const g, entityid id) {
     // however, for this test, we will instead hardcode the target to point to the hero's location
     // first, grab the hero id and then the hero entity pointer
     //    massert(h, "hero is NULL");
-    loc_t hloc = g_get_location(g, g->hero_id);
-    loc_t eloc = g_get_location(g, id);
+    vec3 hloc = g_get_location(g, g->hero_id);
+    vec3 eloc = g_get_location(g, id);
+
+    loc_t hloc_cast = {hloc.x, hloc.y, hloc.z};
+    loc_t eloc_cast = {eloc.x, eloc.y, eloc.z};
 
     dungeon_floor_t* df = d_get_floor(g->d, eloc.z);
     massert(df, "dungeon floor is NULL");
 
     int target_path_length = 0;
-    loc_t* target_path = find_path(eloc, hloc, df, &target_path_length);
+    loc_t* target_path = find_path(eloc_cast, hloc_cast, df, &target_path_length);
+
     if (target_path) {
         if (target_path_length >= 2) {
             loc_t loc = target_path[target_path_length - 2];
@@ -624,10 +630,12 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
                 minfo("New XP: %d", new_xp);
                 g_set_stat(g, atk_id, STATS_XP, new_xp);
 
-                loc_t loc = g_get_location(g, tgt_id);
+                vec3 loc = g_get_location(g, tgt_id);
+                loc_t loc_cast = {loc.x, loc.y, loc.z};
+
                 entityid id = ENTITYID_INVALID;
                 while (id == ENTITYID_INVALID) {
-                    id = potion_create(g, loc, POTION_HEALTH_SMALL, "small health potion");
+                    id = potion_create(g, loc_cast, POTION_HEALTH_SMALL, "small health potion");
                 }
                 msuccess("Potion created at %d %d %d", loc.x, loc.y, loc.z);
             }
@@ -757,7 +765,9 @@ static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid atta
 static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
     massert(!g_is_dead(g, atk_id), "attacker entity is dead");
-    loc_t loc = g_get_location(g, atk_id);
+
+    vec3 loc = g_get_location(g, atk_id);
+
     dungeon_floor_t* const floor = d_get_floor(g->d, loc.z);
     massert(floor, "failed to get dungeon floor");
     tile_t* const tile = df_tile_at(floor, (loc_t){tgt_x, tgt_y, loc.z});
@@ -767,7 +777,7 @@ static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, in
     }
     // Calculate direction based on target position
     bool ok = false;
-    loc_t eloc = g_get_location(g, atk_id);
+    vec3 eloc = g_get_location(g, atk_id);
     int dx = tgt_x - eloc.x;
     int dy = tgt_y - eloc.y;
     g_update_direction(g, atk_id, get_dir_from_xy(dx, dy));
@@ -814,8 +824,8 @@ static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
     for (int y = -1; y <= 1; y++) {
         for (int x = -1; x <= 1; x++) {
             if (x == 0 && y == 0) continue;
-            loc_t loc0 = g_get_location(g, id0);
-            loc_t loc1 = g_get_location(g, id1);
+            vec3 loc0 = g_get_location(g, id0);
+            vec3 loc1 = g_get_location(g, id1);
             if (loc0.x + x == loc1.x && loc0.y + y == loc1.y) return true;
         }
     }
@@ -1005,7 +1015,7 @@ static loc_t* get_locs_around_entity(gamestate* const g, entityid id) {
     loc_t* locs = malloc(sizeof(loc_t) * 8);
     massert(locs, "failed to allocate memory for locs");
     int index = 0;
-    loc_t oldloc = g_get_location(g, id);
+    vec3 oldloc = g_get_location(g, id);
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
             if (i == 0 && j == 0) continue;
@@ -1023,7 +1033,7 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
     bool found = false;
     tile_t* tile = NULL;
     for (int i = 0; i < 8; i++) {
-        loc_t loc = g_get_location(g, id);
+        vec3 loc = g_get_location(g, id);
         //tile = df_tile_at(g->d->floors[loc.z], locs[i].x, locs[i].y);
         tile = df_tile_at(g->d->floors[loc.z], locs[i]);
         if (!tile) continue;
@@ -1125,8 +1135,11 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g_add_type(g, id, ENTITY_NPC);
     g_add_race(g, id, rt);
     g_add_direction(g, id, DIR_RIGHT);
-    g_add_location(g, id, loc);
-    g_add_sprite_move(g, id, (loc_t){0, 0}); // default
+
+    vec3 loc_vec = {loc.x, loc.y, loc.z};
+    g_add_location(g, id, loc_vec);
+
+    g_add_sprite_move(g, id, (vec3){0, 0, 0}); // default
 
     g_add_dead(g, id, 0);
 
@@ -1137,7 +1150,7 @@ static entityid npc_create(gamestate* const g, race_t rt, loc_t loc, const char*
     g_add_damaged(g, id, false);
     g_add_default_action(g, id, ENTITY_ACTION_WAIT);
     g_add_inventory(g, id);
-    g_add_target(g, id, (loc_t){-1, -1, -1});
+    g_add_target(g, id, (vec3){-1, -1, -1});
     g_add_target_path(g, id);
     g_add_equipment(g, id);
     g_add_base_attack_damage(g, id, (roll){1, 4, 0});
@@ -1194,8 +1207,11 @@ static entityid item_create(gamestate* const g, itemtype type, loc_t loc, const 
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_ITEM);
     g_add_direction(g, id, DIR_RIGHT);
-    g_add_location(g, id, loc);
-    g_add_sprite_move(g, id, (loc_t){0, 0});
+
+    vec3 loc_vec = {loc.x, loc.y, loc.z};
+    g_add_location(g, id, loc_vec);
+
+    g_add_sprite_move(g, id, (vec3){0, 0, 0});
     g_add_update(g, id, false);
     g_add_itemtype(g, id, type);
 
@@ -1288,7 +1304,7 @@ static void update_player_tiles_explored(gamestate* const g) {
     massert(hero_id != ENTITYID_INVALID, "hero id is invalid");
     dungeon_floor_t* df = d_get_floor(g->d, g->d->current_floor);
     massert(df, "failed to get current dungeon floor");
-    loc_t loc = g_get_location(g, hero_id);
+    vec3 loc = g_get_location(g, hero_id);
 
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
@@ -1570,11 +1586,13 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         entityid item_id = inventory[g->inventory_menu_selection];
         g_remove_from_inventory(g, g->hero_id, item_id);
         // add the item to the tile where the player is located at
-        loc_t loc = g_get_location(g, g->hero_id);
+        vec3 loc = g_get_location(g, g->hero_id);
         dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
         massert(df, "Dungeon floor is NULL!");
         minfo("Dropping item %d at %d, %d, %d", item_id, loc.x, loc.y, loc.z);
-        tile_t* const tile = df_tile_at(df, loc);
+
+        loc_t loc_cast = {loc.x, loc.y, loc.z};
+        tile_t* const tile = df_tile_at(df, loc_cast);
         massert(tile, "Tile is NULL!");
         if (!tile_add(tile, item_id)) {
             merror("Failed to add item to tile");
@@ -1734,13 +1752,17 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
     g_set_update(g, id, true);
     // check if the player is on a tile with an item
-    loc_t loc = g_get_location(g, id);
+
+    //loc_t loc = g_get_location(g, id);
+    vec3 loc = g_get_location(g, id);
+    loc_t loc_cast = {loc.x, loc.y, loc.z};
+
     dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
     if (!df) {
         merror("Failed to get dungeon floor");
         return false;
     }
-    tile_t* const tile = df_tile_at(df, loc);
+    tile_t* const tile = df_tile_at(df, loc_cast);
     if (!tile) {
         merror("Failed to get tile");
         return false;
@@ -1905,7 +1927,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             else if (strcmp(action, "attack") == 0) {
                 g->player_changing_direction = false;
                 loc_t loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
-                loc_t hloc = g_get_location(g, g->hero_id);
+                vec3 hloc = g_get_location(g, g->hero_id);
                 try_entity_attack(g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
             }
             return;
@@ -1934,7 +1956,7 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN_RIGHT);
         } else if (strcmp(action, "attack") == 0) {
             loc_t loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
-            loc_t hloc = g_get_location(g, g->hero_id);
+            vec3 hloc = g_get_location(g, g->hero_id);
             try_entity_attack(g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
         } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
@@ -1971,10 +1993,11 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
 }
 
 static void try_entity_traverse_floors(gamestate* const g, entityid id) {
-    loc_t loc = g_get_location(g, id);
+    vec3 loc = g_get_location(g, id);
+    loc_t loc_cast = {loc.x, loc.y, loc.z};
     dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
     massert(df, "Dungeon floor is NULL!");
-    tile_t* const tile = df_tile_at(df, loc);
+    tile_t* const tile = df_tile_at(df, loc_cast);
     massert(tile, "Tile is NULL!");
     entitytype_t type = g_get_type(g, id);
 
@@ -1994,7 +2017,9 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                 massert(next_downstairs_loc.x != -1 && next_downstairs_loc.y != -1, "Failed to get next downstairs location");
                 // we need to set the player's location to the corresponding TILE_downstairs
                 next_downstairs_loc.z = g->d->current_floor - 1;
-                g_update_location(g, id, next_downstairs_loc);
+
+                vec3 next_downstairs_loc_vec3 = {next_downstairs_loc.x, next_downstairs_loc.y, next_downstairs_loc.z};
+                g_update_location(g, id, next_downstairs_loc_vec3);
                 // we need to set the player's floor to the next floor
                 g->d->current_floor--;
                 // get the next dungeon floor
@@ -2035,7 +2060,9 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                 massert(next_upstairs_loc.x != -1 && next_upstairs_loc.y != -1, "Failed to get next upstairs location");
                 // we need to set the player's location to the corresponding TILE_UPSTAIRS
                 next_upstairs_loc.z = g->d->current_floor + 1;
-                g_update_location(g, id, next_upstairs_loc);
+
+                vec3 next_upstairs_loc_vec3 = {next_upstairs_loc.x, next_upstairs_loc.y, next_upstairs_loc.z};
+                g_update_location(g, id, next_upstairs_loc_vec3);
                 // we need to set the player's floor to the next floor
                 g->d->current_floor++;
                 // get the next dungeon floor
@@ -2166,7 +2193,7 @@ static void update_debug_panel_buffer(gamestate* const g) {
     direction_t shield_dir = DIR_NONE;
     bool is_b = false;
     bool test_guard = g->test_guard;
-    loc_t loc = g_get_location(g, g->hero_id);
+    vec3 loc = g_get_location(g, g->hero_id);
     x = loc.x;
     y = loc.y;
     z = loc.z;

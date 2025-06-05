@@ -130,33 +130,31 @@ gamestate* gamestateinitptr() {
     massert(g->race_list, "g->race_list is NULL");
     g->direction_list = (int_component*)malloc(sizeof(int_component) * n);
     massert(g->direction_list, "g->direction_list is NULL");
-    g->loc_list = (loc_component*)malloc(sizeof(loc_component) * n);
+
+    g->loc_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
     massert(g->loc_list, "g->loc_list is NULL");
-    g->sprite_move_list = (sprite_move_component*)malloc(sizeof(sprite_move_component) * n);
+
+    g->sprite_move_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
     massert(g->sprite_move_list, "g->sprite_move_list is NULL");
-    //g->dead_list = (dead_component*)malloc(sizeof(dead_component) * n);
+
+    g->target_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
+    massert(g->target_list, "g->target_list is NULL");
+
     g->dead_list = (int_component*)malloc(sizeof(int_component) * n);
     massert(g->dead_list, "g->dead_list is NULL");
-
     g->update_list = (int_component*)malloc(sizeof(int_component) * n);
     massert(g->update_list, "g->update_list is NULL");
-
     g->attacking_list = (int_component*)malloc(sizeof(int_component) * n);
     massert(g->attacking_list, "g->attacking_list is NULL");
-
     g->blocking_list = (int_component*)malloc(sizeof(int_component) * n);
     massert(g->blocking_list, "g->blocking_list is NULL");
-
     g->block_success_list = (int_component*)malloc(sizeof(int_component) * n);
     massert(g->block_success_list, "g->block_success_list is NULL");
-
     g->damaged_list = (int_component*)malloc(sizeof(int_component) * n);
     massert(g->damaged_list, "g->damaged_list is NULL");
 
     g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * n);
     massert(g->inventory_list, "g->inventory_list is NULL");
-    g->target_list = (target_component*)malloc(sizeof(target_component) * n);
-    massert(g->target_list, "g->target_list is NULL");
     g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * n);
     massert(g->target_path_list, "g->target_path_list is NULL");
     g->default_action_list = (int_component*)malloc(sizeof(int_component) * n);
@@ -496,9 +494,10 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     case C_BLOCK_SUCCESS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     case C_DAMAGED: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
 
-    case C_LOCATION: init_loc_component((loc_component*)c_ptr, id, *(loc_t*)data); break;
-    case C_SPRITE_MOVE: init_sprite_move_component((sprite_move_component*)c_ptr, id, *(loc_t*)data); break;
-    case C_TARGET: init_target_component((target_component*)c_ptr, id, *(loc_t*)data); break;
+    case C_LOCATION: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
+    case C_SPRITE_MOVE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
+    case C_TARGET: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
+
     case C_INVENTORY: init_inventory_component((inventory_component*)c_ptr, id); break;
     case C_TARGET_PATH: init_target_path_component((target_path_component*)c_ptr, id, NULL, 0);
     case C_EQUIPMENT: init_equipment_component((equipment_component*)c_ptr, id); break;
@@ -660,42 +659,45 @@ bool g_has_location(const gamestate* const g, entityid id) {
     return g_has_component(g, id, C_LOCATION);
 }
 
-bool g_add_location(gamestate* const g, entityid id, loc_t loc) {
+//bool g_add_location(gamestate* const g, entityid id, loc_t loc) {
+bool g_add_location(gamestate* const g, entityid id, vec3 loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the location component
-    return g_add_component(g, id, C_LOCATION, (void*)&loc, sizeof(loc_component), (void**)&g->loc_list, &g->loc_list_count, &g->loc_list_capacity);
+    return g_add_component(g, id, C_LOCATION, (void*)&loc, sizeof(vec3_component), (void**)&g->loc_list, &g->loc_list_count, &g->loc_list_capacity);
 }
 
-bool g_update_location(gamestate* const g, entityid id, loc_t loc) {
+bool g_update_location(gamestate* const g, entityid id, vec3 loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->loc_list == NULL) return false;
     for (int i = 0; i < g->loc_list_count; i++) {
         if (g->loc_list[i].id == id) {
-            g->loc_list[i].loc = loc;
+            g->loc_list[i].data = loc;
             return true;
         }
     }
     return false;
 }
 
-loc_t g_get_location(const gamestate* const g, entityid id) {
+//loc_t g_get_location(const gamestate* const g, entityid id) {
+vec3 g_get_location(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->loc_list == NULL) return (loc_t){-1, -1};
+    //if (g->loc_list == NULL) return (loc_t){-1, -1};
+    if (g->loc_list == NULL) return (vec3){-1, -1, -1};
     for (int i = 0; i < g->loc_list_count; i++)
-        if (g->loc_list[i].id == id) return g->loc_list[i].loc;
+        if (g->loc_list[i].id == id) return g->loc_list[i].data;
     //merror("id %d not found in loc_list", id);
-    return (loc_t){-1, -1};
+    return (vec3){-1, -1, -1};
 }
 
-bool g_is_location(const gamestate* const g, entityid id, loc_t loc) {
+bool g_is_location(const gamestate* const g, entityid id, vec3 loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->loc_list == NULL) return false;
-    loc_t loc2 = g_get_location(g, id);
-    return (loc.x == loc2.x && loc.y == loc2.y);
+    vec3 loc2 = g_get_location(g, id);
+    return (loc.x == loc2.x && loc.y == loc2.y && loc.z == loc2.z);
 }
 
 bool g_has_sprite_move(const gamestate* const g, entityid id) {
@@ -704,15 +706,14 @@ bool g_has_sprite_move(const gamestate* const g, entityid id) {
     return g_has_component(g, id, C_SPRITE_MOVE);
 }
 
-bool g_add_sprite_move(gamestate* const g, entityid id, loc_t loc) {
+bool g_add_sprite_move(gamestate* const g, entityid id, vec3 loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the sprite move component
-    return g_add_component(
-        g, id, C_SPRITE_MOVE, (void*)&loc, sizeof(sprite_move_component), (void**)&g->sprite_move_list, &g->sprite_move_list_count, &g->sprite_move_list_capacity);
+    return g_add_component(g, id, C_SPRITE_MOVE, (void*)&loc, sizeof(vec3_component), (void**)&g->sprite_move_list, &g->sprite_move_list_count, &g->sprite_move_list_capacity);
 }
 
-bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc) {
+bool g_update_sprite_move(gamestate* const g, entityid id, vec3 loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(g_has_component(g, id, C_SPRITE_MOVE), "id %d does not have a sprite move component", id);
@@ -720,7 +721,7 @@ bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc) {
         if (g->sprite_move_list == NULL) return false;
         for (int i = 0; i < g->sprite_move_list_count; i++) {
             if (g->sprite_move_list[i].id == id) {
-                g->sprite_move_list[i].loc = loc;
+                g->sprite_move_list[i].data = loc;
                 return true;
             }
         }
@@ -728,16 +729,16 @@ bool g_update_sprite_move(gamestate* const g, entityid id, loc_t loc) {
     return false;
 }
 
-loc_t g_get_sprite_move(const gamestate* const g, entityid id) {
+vec3 g_get_sprite_move(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(g_has_sprite_move(g, id), "id %d does not have a sprite move component", id);
     if (g_has_sprite_move(g, id)) {
         for (int i = 0; i < g->sprite_move_list_count; i++)
-            if (g->sprite_move_list[i].id == id) return g->sprite_move_list[i].loc;
+            if (g->sprite_move_list[i].id == id) return g->sprite_move_list[i].data;
     }
     merror("id %d not found in sprite_move_list", id);
-    return (loc_t){-1, -1};
+    return (vec3){-1, -1, -1};
 }
 
 bool g_has_dead(const gamestate* const g, entityid id) {
@@ -753,10 +754,11 @@ bool g_add_dead(gamestate* const g, entityid id, int dead) {
     bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(int_component), (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
     // If entity died and has a location, mark its tile as dirty
     if (dead && g_has_location(g, id)) {
-        loc_t loc = g_get_location(g, id);
+        vec3 loc = g_get_location(g, id);
         dungeon_floor_t* df = d_get_floor(g->d, loc.z);
         if (df) {
-            tile_t* tile = df_tile_at(df, loc);
+            loc_t loc_cast = {loc.x, loc.y, loc.z};
+            tile_t* tile = df_tile_at(df, loc_cast);
             if (tile) tile->dirty_entities = true;
         }
     }
@@ -1108,34 +1110,34 @@ bool g_has_target(const gamestate* const g, entityid id) {
     return g_has_component(g, id, C_TARGET);
 }
 
-bool g_add_target(gamestate* const g, entityid id, loc_t target) {
+bool g_add_target(gamestate* const g, entityid id, vec3 target) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the target component
-    return g_add_component(g, id, C_TARGET, (void*)&target, sizeof(target_component), (void**)&g->target_list, &g->target_list_count, &g->target_list_capacity);
+    return g_add_component(g, id, C_TARGET, (void*)&target, sizeof(vec3_component), (void**)&g->target_list, &g->target_list_count, &g->target_list_capacity);
 }
 
-bool g_set_target(gamestate* const g, entityid id, loc_t target) {
+bool g_set_target(gamestate* const g, entityid id, vec3 target) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->target_list == NULL) return false;
     for (int i = 0; i < g->target_list_count; i++) {
         if (g->target_list[i].id == id) {
-            g->target_list[i].target = target;
+            g->target_list[i].data = target;
             return true;
         }
     }
     return false;
 }
 
-bool g_get_target(const gamestate* const g, entityid id, loc_t* target) {
+bool g_get_target(const gamestate* const g, entityid id, vec3* target) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(target, "target is NULL");
     if (g->target_list == NULL) return false;
     for (int i = 0; i < g->target_list_count; i++) {
         if (g->target_list[i].id == id) {
-            *target = g->target_list[i].target;
+            *target = g->target_list[i].data;
             return true;
         }
     }

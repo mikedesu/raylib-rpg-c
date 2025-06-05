@@ -29,6 +29,7 @@
 #include "target_component.h"
 #include "target_path_component.h"
 #include "update_component.h"
+#include "vec3_component.h"
 #include "weapon.h"
 #include "zapping_component.h"
 #include <stdbool.h>
@@ -116,19 +117,21 @@ void init_int_component(int_component* comp, entityid id, int data);
 //void init_quiver_component(quiver_component* comp, entityid id, int capacity);
 
 // loc components: 3 integer
-void init_loc_component(loc_component* comp, entityid id, loc_t loc);
-void init_sprite_move_component(sprite_move_component* comp, entityid id, loc_t loc);
-void init_target_component(target_component* comp, entityid id, loc_t target);
+void init_vec3_component(vec3_component* comp, entityid id, vec3 v);
+
+//void init_loc_component(loc_component* comp, entityid id, loc_t loc);
+//void init_sprite_move_component(sprite_move_component* comp, entityid id, loc_t loc);
+//void init_target_component(target_component* comp, entityid id, loc_t target);
+
+// roll components: 3 integer
+void init_damage_component(damage_component* comp, entityid id, roll r);
+void init_base_attack_damage_component(base_attack_damage_component* comp, entityid id, roll r);
 
 // list components
 void init_inventory_component(inventory_component* comp, entityid id);
 void init_equipment_component(equipment_component* comp, entityid id);
 void init_stats_component(stats_component* comp, entityid id);
 void init_target_path_component(target_path_component* comp, entityid id, loc_t* target_path, int target_path_length);
-
-// roll components: 3 integer
-void init_damage_component(damage_component* comp, entityid id, roll r);
-void init_base_attack_damage_component(base_attack_damage_component* comp, entityid id, roll r);
 
 // complex components
 void init_spell_effect_component(spell_effect_component* comp, entityid id, spell_effect effect);
