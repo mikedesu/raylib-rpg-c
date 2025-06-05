@@ -39,7 +39,7 @@ UNIT_TEST_OBJS = unit_test.o component.o component_table.o keybinding.o gamestat
 
 
 # Targets
-all: game unit_test #index.html
+all: game test #index.html
 
 # Desktop build
 game: main.o gameloader.o gamestate.o keybinding.o libdraw.so liblogic.so component_table.o component.o
@@ -47,7 +47,7 @@ game: main.o gameloader.o gamestate.o keybinding.o libdraw.so liblogic.so compon
 	./log_build_stats.sh
 
 
-unit_test: $(UNIT_TEST_OBJS)
+test: $(UNIT_TEST_OBJS)
 	$(CC) -o $@ $(UNIT_TEST_OBJS) $(WFLAGS) $(CFLAGS)
 
 unit_test.o: unit_test.c unit_test.h 

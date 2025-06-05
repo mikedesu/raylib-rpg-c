@@ -47,6 +47,7 @@ void df_init_rooms(dungeon_floor_t* df);
 bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y);
 bool df_add_room_info(dungeon_floor_t* df, int x, int y, int w, int h, const char* name);
+bool df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name);
 vec3 df_get_upstairs(dungeon_floor_t* const df);
 vec3 df_get_downstairs(dungeon_floor_t* const df);
 

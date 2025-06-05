@@ -2,7 +2,8 @@
 
 #include <stdbool.h>
 
-typedef enum {
+typedef enum
+{
     TILE_NONE,
     TILE_UPSTAIRS,
     TILE_DOWNSTAIRS,
@@ -165,9 +166,31 @@ static inline bool tile_is_wall(const tiletype_t type) { return type >= TILE_STO
 static inline bool tile_is_not_wall(const tiletype_t type) { return tile_is_not_none(type) && !tile_is_wall(type); }
 static inline bool tile_is_walkable(const tiletype_t type) { return !tile_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE && type != TILE_COUNT; }
 static inline bool tile_is_trap(const tiletype_t type) { return type == TILE_FLOOR_STONE_TRAP_OFF_00 || type == TILE_FLOOR_STONE_TRAP_ON_00; }
-static inline bool tile_is_possible_upstairs(const tiletype_t type) {
-    return tile_is_walkable(type) && !tile_is_trap(type) && type != TILE_DOWNSTAIRS && type != TILE_COUNT;
-}
-static inline bool tile_is_possible_downstairs(const tiletype_t type) {
-    return tile_is_walkable(type) && !tile_is_trap(type) && type != TILE_UPSTAIRS && type != TILE_COUNT;
+static inline bool tile_is_possible_upstairs(const tiletype_t type) { return tile_is_walkable(type) && !tile_is_trap(type) && type != TILE_DOWNSTAIRS && type != TILE_COUNT; }
+static inline bool tile_is_possible_downstairs(const tiletype_t type) { return tile_is_walkable(type) && !tile_is_trap(type) && type != TILE_UPSTAIRS && type != TILE_COUNT; }
+
+static inline const char* tiletype_to_str(const tiletype_t type) {
+    switch (type) {
+    case TILE_NONE: return "TILE_NONE";
+    case TILE_UPSTAIRS: return "TILE_UPSTAIRS";
+    case TILE_DOWNSTAIRS: return "TILE_DOWNSTAIRS";
+    case TILE_STONE_WALL_00: return "TILE_STONE_WALL_00";
+    case TILE_STONE_WALL_01: return "TILE_STONE_WALL_01";
+    case TILE_STONE_WALL_02: return "TILE_STONE_WALL_02";
+    case TILE_STONE_WALL_03: return "TILE_STONE_WALL_03";
+    case TILE_FLOOR_STONE_00: return "TILE_FLOOR_STONE_00";
+    case TILE_FLOOR_STONE_01: return "TILE_FLOOR_STONE_01";
+    case TILE_FLOOR_STONE_02: return "TILE_FLOOR_STONE_02";
+    case TILE_FLOOR_STONE_03: return "TILE_FLOOR_STONE_03";
+    case TILE_FLOOR_STONE_04: return "TILE_FLOOR_STONE_04";
+    case TILE_FLOOR_STONE_05: return "TILE_FLOOR_STONE_05";
+    case TILE_FLOOR_STONE_06: return "TILE_FLOOR_STONE_06";
+    case TILE_FLOOR_STONE_07: return "TILE_FLOOR_STONE_07";
+    case TILE_FLOOR_STONE_08: return "TILE_FLOOR_STONE_08";
+    case TILE_FLOOR_STONE_09: return "TILE_FLOOR_STONE_09";
+    case TILE_FLOOR_STONE_10: return "TILE_FLOOR_STONE_10";
+    case TILE_FLOOR_STONE_11: return "TILE_FLOOR_STONE_11";
+    // Add more cases for other tile types as needed
+    default: return "UNKNOWN_TILE_TYPE";
+    }
 }

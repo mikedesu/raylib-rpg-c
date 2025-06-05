@@ -37,7 +37,7 @@ static void df_init_test_complex7(dungeon_floor_t* df, range room_width, range r
 static void df_init_test_complex8(dungeon_floor_t* df, int w, int h);
 static void df_init_test_complex9(dungeon_floor_t* df, int grid_cell_w, int grid_cell_h);
 static void df_assign_stairs(dungeon_floor_t* df);
-static void df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name);
+bool df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name);
 static void df_assign_downstairs(dungeon_floor_t* df);
 static void df_assign_upstairs(dungeon_floor_t* df);
 void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
@@ -484,7 +484,7 @@ void df_init(dungeon_floor_t* df) {
     //int w = rand() % (max_w - min_w + 1) + min_w;
     //int h = rand() % (max_h - min_h + 1) + min_h;
     //df_init_test_complex8(df, w, h);
-    df_init_test_complex9(df, 4, 4);
+    //df_init_test_complex9(df, 4, 4);
 }
 
 static void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
@@ -981,7 +981,10 @@ int df_count_walkable(const dungeon_floor_t* const df) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tiletype_t type = df_type_at(df, x, y);
-            if (tile_is_walkable(type)) count++;
+            if (tile_is_walkable(type)) {
+                minfo("type is walkable: %d %s", type, tiletype_to_str(type));
+                count++;
+            }
         }
     }
     return count;
@@ -1667,10 +1670,10 @@ static void df_init_test_complex6(dungeon_floor_t* df, range room_length, range 
     df_assign_upstairs(df);
 }
 
-static void df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name) {
+bool df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name) {
     massert(df, "dungeon floor is NULL");
     df_set_tile_area_range(df, x, y, w, h, begin, end);
-    df_add_room_info(df, x, y, w, h, room_name);
+    return df_add_room_info(df, x, y, w, h, room_name);
 }
 
 // for this test, we will be constructing rooms based on a grid system
@@ -1998,21 +2001,20 @@ bool df_add_room_info(dungeon_floor_t* df, int x, int y, int w, int h, const cha
     massert(df->room_count >= 0, "room count is invalid");
     massert(strlen(name) < sizeof(df->rooms[0].room_name), "room name is too long");
     massert(df->room_capacity > 0, "room capacity is invalid");
-
     // Check for overlaps with existing rooms
     if (room_overlaps_any(df, x, y, w, h)) {
         return false;
     }
-
     // Handle capacity
     if (df->room_count == df->room_capacity) {
         int new_cap = df->room_capacity ? df->room_capacity * 2 : 8;
         room_data_t* tmp = realloc(df->rooms, sizeof(room_data_t) * new_cap);
-        if (!tmp) return false;
+        if (!tmp) {
+            return false;
+        }
         df->rooms = tmp;
         df->room_capacity = new_cap;
     }
-
     // Add the new room
     room_data_t* r = &df->rooms[df->room_count++];
     r->x = x;
