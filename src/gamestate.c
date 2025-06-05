@@ -1318,15 +1318,9 @@ int g_get_stat(const gamestate* const g, entityid id, stats_slot stats_slot) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(g->stats_list, "g->stats_list is NULL");
-    if (g->stats_list == NULL) {
-        merror("g->stats_list is NULL");
-        return 0;
-    }
-    for (int i = 0; i < g->stats_list_count; i++) {
-        if (g->stats_list[i].id == id) {
-            return g->stats_list[i].stats[stats_slot];
-        }
-    }
+    if (g->stats_list == NULL) return 0;
+    for (int i = 0; i < g->stats_list_count; i++)
+        if (g->stats_list[i].id == id) return g->stats_list[i].stats[stats_slot];
     return 0;
 }
 
