@@ -29,10 +29,10 @@ TEST(test_df_rooms) {
 
     if (add_result) {
         // Test room location
-        int in_room = df_loc_is_in_room(df, (loc_t){12, 12});
+        int in_room = df_loc_is_in_room(df, (vec3){12, 12});
         printf("Location in room result: %d\n", in_room);
 
-        const char* room_name = df_get_room_name(df, (loc_t){12, 12});
+        const char* room_name = df_get_room_name(df, (vec3){12, 12});
         printf("Room name at location: %s\n", room_name ? room_name : "NULL");
     }
 
@@ -57,7 +57,7 @@ TEST(test_df_tiles) {
     dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     // Test tile access
-    loc_t loc = {5, 5};
+    vec3 loc = {5, 5};
     ASSERT(df_tile_at(df, loc) != NULL, "Failed to get tile");
     df_set_tile(df, TILE_STONE_WALL_00, loc.x, loc.y);
     ASSERT(df_type_at(df, loc.x, loc.y) == TILE_STONE_WALL_00, "Tile type not set");
@@ -152,8 +152,8 @@ TEST(test_df_init) {
     //room_data_t* rooms = df_get_rooms_with_prefix(df, &room_count, "room");
     //ASSERT(room_count > 0, "No rooms created");
     // Test stair placement
-    loc_t upstairs = df_get_upstairs(df);
-    loc_t downstairs = df_get_downstairs(df);
+    vec3 upstairs = df_get_upstairs(df);
+    vec3 downstairs = df_get_downstairs(df);
     ASSERT(upstairs.x != -1 && upstairs.y != -1, "Upstairs not placed");
     ASSERT(downstairs.x != -1 && downstairs.y != -1, "Downstairs not placed");
     ASSERT(!(upstairs.x == downstairs.x && upstairs.y == downstairs.y), "Stairs in same location");
@@ -176,8 +176,8 @@ TEST(test_df_serialization) {
         }
     }
     // Set specific tiles for stairs
-    df->upstairs_loc = (loc_t){0, 0};
-    df->downstairs_loc = (loc_t){1, 1};
+    df->upstairs_loc = (vec3){0, 0};
+    df->downstairs_loc = (vec3){1, 1};
     tile_init(&df->tiles[0][0], TILE_UPSTAIRS);
     tile_init(&df->tiles[1][1], TILE_DOWNSTAIRS);
     // Add a test room
