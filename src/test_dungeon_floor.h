@@ -72,68 +72,62 @@ TEST(test_df_stairs) {
     df_free(df);
 }
 
-//TEST(test_df_get_room_at) {
-//    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-//    // Create a test room
-//    int room_x = 10, room_y = 10, room_w = 5, room_h = 5;
-//    const char* room_name = "TestRoom";
-//    ASSERT(df_add_room_info(df, room_x, room_y, room_w, room_h, room_name), "Failed to add room");
-//    // Test points inside the room
-//    for (int y = room_y; y < room_y + room_h; y++) {
-//        for (int x = room_x; x < room_x + room_w; x++) {
-//            const room_data_t* room = df_get_room_at(df, x, y);
-//            ASSERT(room != NULL, "Should find room for point inside room");
-//            ASSERT(strcmp(room->room_name, room_name) == 0, "Room name mismatch");
-//            ASSERT(room->x == room_x && room->y == room_y, "Room coordinates mismatch");
-//            ASSERT(room->w == room_w && room->h == room_h, "Room dimensions mismatch");
-//        }
-//    }
-//    // Test points outside the room
-//    ASSERT(df_get_room_at(df, room_x - 1, room_y) == NULL, "Should not find room for point left of room");
-//    ASSERT(df_get_room_at(df, room_x + room_w, room_y) == NULL, "Should not find room for point right of room");
-//    ASSERT(df_get_room_at(df, room_x, room_y - 1) == NULL, "Should not find room for point above room");
-//    ASSERT(df_get_room_at(df, room_x, room_y + room_h) == NULL, "Should not find room for point below room");
-//    df_free(df);
-//    //printf("df_get_room_at tests passed\n");
-//}
+TEST(test_df_get_room_at) {
+    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    // Create a test room
+    int x = 10, y = 10, w = 5, h = 5;
+    const char* room_name = "TestRoom";
+    ASSERT(df_add_room_info(df, x, y, w, h, room_name), "Failed to add room");
+    // Test points inside the room
+    for (int y0 = y; y0 < y + h; y0++) {
+        for (int x0 = x; x0 < x + w; x0++) {
+            const room_data_t* room = df_get_room_at(df, x0, y0);
+            ASSERT(room != NULL, "Should find room for point inside room");
+            ASSERT(strcmp(room->room_name, room_name) == 0, "Room name mismatch");
+            ASSERT(room->x == x && room->y == y, "Room coordinates mismatch");
+            ASSERT(room->w == w && room->h == h, "Room dimensions mismatch");
+        }
+    }
+    // Test points outside the room
+    ASSERT(df_get_room_at(df, x - 1, y) == NULL, "Should not find room for point left of room");
+    ASSERT(df_get_room_at(df, x + w, y) == NULL, "Should not find room for point right of room");
+    ASSERT(df_get_room_at(df, x, y - 1) == NULL, "Should not find room for point above room");
+    ASSERT(df_get_room_at(df, x, y + h) == NULL, "Should not find room for point below room");
+    df_free(df);
+}
 
 TEST(test_df_count_empty) {
     dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    // Create a test room
-    //int room_x = 10, room_y = 10, room_w = 5, room_h = 5;
-    //ASSERT(df_add_room_info(df, room_x, room_y, room_w, room_h, "TestRoom"), "Failed to add room");
     // Count walkable tiles in the room
     int expected_walkable = 0;
     int actual_walkable = df_count_walkable(df);
     minfo("Expected walkable tiles: %d, Actual walkable tiles: %d\n", expected_walkable, actual_walkable);
     ASSERT(actual_walkable == expected_walkable, "Too few walkable tiles");
-    // Add some walls and verify count decreases
-    //df_set_tile(df, TILE_STONE_WALL_00, room_x, room_y);
-    //df_set_tile(df, TILE_STONE_WALL_00, room_x + 1, room_y);
-    //int new_walkable = df_count_walkable(df);
-    //ASSERT(new_walkable >= actual_walkable - 2, "Walkable count should decrease after adding walls");
     df_free(df);
-    //printf("df_count_walkable tests passed\n");
 }
 
-//TEST(test_df_count_walkable) {
-//    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-//    // Create a test room
-//    int room_x = 10, room_y = 10, room_w = 5, room_h = 5;
-//    ASSERT(df_add_room_info(df, room_x, room_y, room_w, room_h, "TestRoom"), "Failed to add room");
-//    // Count walkable tiles in the room
-//    int expected_walkable = room_w * room_h;
-//    int actual_walkable = df_count_walkable(df);
-//    minfo("Expected walkable tiles: %d, Actual walkable tiles: %d\n", expected_walkable, actual_walkable);
-//    ASSERT(actual_walkable >= expected_walkable, "Too few walkable tiles");
-//    // Add some walls and verify count decreases
-//    df_set_tile(df, TILE_STONE_WALL_00, room_x, room_y);
-//    df_set_tile(df, TILE_STONE_WALL_00, room_x + 1, room_y);
-//    int new_walkable = df_count_walkable(df);
-//    ASSERT(new_walkable >= actual_walkable - 2, "Walkable count should decrease after adding walls");
-//    df_free(df);
-//    //printf("df_count_walkable tests passed\n");
-//}
+TEST(test_df_count_walkable) {
+    dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    // Create a test room
+    int x = 10;
+    int y = 10;
+    int w = 5;
+    int h = 5;
+    ASSERT(df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_01, "TestRoom"), "Failed to add room");
+    // room count should be 1
+    ASSERT(df->room_count == 1, "Room count should be 1 after adding a room");
+    // Count walkable tiles in the room
+    int expected_walkable = w * h;
+    int actual_walkable = df_count_walkable(df);
+    minfo("Expected walkable tiles: %d, Actual walkable tiles: %d", expected_walkable, actual_walkable);
+    ASSERT(actual_walkable >= expected_walkable, "Too few walkable tiles");
+    // Add some walls and verify count decreases
+    df_set_tile(df, TILE_STONE_WALL_00, x, y);
+    //df_set_tile(df, TILE_STONE_WALL_00, room_x + 1, room_y);
+    int new_walkable = df_count_walkable(df);
+    ASSERT(new_walkable >= actual_walkable - 1, "Walkable count should decrease after adding walls");
+    df_free(df);
+}
 
 TEST(test_df_init) {
     dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
@@ -180,109 +174,120 @@ TEST(test_df_init) {
     ASSERT(vec3_equal(upstairs, (vec3){-1, -1, -1}), "Upstairs should not be placed yet");
     vec3 downstairs = df_get_downstairs(df);
     ASSERT(vec3_equal(downstairs, (vec3){-1, -1, -1}), "Dnstairs should not be placed yet");
-    //ASSERT(!(upstairs.x == downstairs.x && upstairs.y == downstairs.y), "Stairs in same location");
+    ASSERT(upstairs.x == downstairs.x && upstairs.y == downstairs.y && upstairs.z == downstairs.z,
+           "Upstairs and downstairs should be at the same location because they are not placed yet");
+    // Assign stairs in the room
+    df_assign_upstairs_in_area(df, x, y, w, h);
+    df_assign_downstairs_in_area(df, x, y, w, h);
+    upstairs = df_get_upstairs(df);
+    downstairs = df_get_downstairs(df);
+    // Stairs should now be placed
+    ASSERT(upstairs.x != -1 && upstairs.y != -1, "Upstairs should be placed now");
+    ASSERT(downstairs.x != -1 && downstairs.y != -1, "Downstairs should be placed now");
     // Test tile types
-    //tile_t* up_tile = df_tile_at(df, upstairs);
-    //tile_t* down_tile = df_tile_at(df, downstairs);
-    //ASSERT(up_tile->type == TILE_UPSTAIRS, "Upstairs tile type incorrect");
-    //ASSERT(down_tile->type == TILE_DOWNSTAIRS, "Downstairs tile type incorrect");
+    tile_t* up_tile = df_tile_at(df, upstairs);
+    tile_t* down_tile = df_tile_at(df, downstairs);
+    ASSERT(up_tile->type == TILE_UPSTAIRS, "Upstairs tile type incorrect");
+    ASSERT(down_tile->type == TILE_DOWNSTAIRS, "Downstairs tile type incorrect");
     df_free(df);
 }
 
-//TEST(test_df_serialization) {
-//    // Create a very small dungeon floor for testing
-//    dungeon_floor_t* df = df_create(0, 2, 2); // Just 2x2 for easier debugging
-//    // Set up some simple tiles instead of using df_init
-//    for (int y = 0; y < df->height; y++) {
-//        for (int x = 0; x < df->width; x++) {
-//            tile_init(&df->tiles[y][x], TILE_FLOOR_STONE_00);
-//        }
-//    }
-//    // Set specific tiles for stairs
-//    df->upstairs_loc = (vec3){0, 0};
-//    df->downstairs_loc = (vec3){1, 1};
-//    tile_init(&df->tiles[0][0], TILE_UPSTAIRS);
-//    tile_init(&df->tiles[1][1], TILE_DOWNSTAIRS);
-//    // Add a test room
-//    df_add_room_info(df, 0, 0, 2, 2, "TestRoom");
-//    // Get serialized size
-//    size_t size = df_serialized_size(df);
-//    printf("Serialized size for 2x2 dungeon: %zu bytes\n", size);
-//    ASSERT(size > 0, "Serialized size should be greater than 0");
-//    // Allocate buffer for serialization
-//    char* buffer = (char*)malloc(size);
-//    ASSERT(buffer != NULL, "Failed to allocate serialization buffer");
-//    // Serialize
-//    size_t written = df_serialize(df, buffer, size);
-//    ASSERT(written > 0, "Serialization failed");
-//    ASSERT(written == size, "Serialized size mismatch");
-//    // Print buffer contents for debugging
-//    printf("Serialized buffer contents (first 32 bytes):\n");
-//    for (int i = 0; i < 32 && i < size; i++) {
-//        printf("%02X ", (unsigned char)buffer[i]);
-//        if ((i + 1) % 16 == 0) printf("\n");
-//    }
-//    printf("\n");
-//    // Create a new dungeon floor for deserialization
-//    dungeon_floor_t* df2 = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
-//    ASSERT(df2 != NULL, "Failed to allocate new dungeon floor");
-//    memset(df2, 0, sizeof(dungeon_floor_t)); // Initialize to zeros
-//    // Deserialize
-//    bool success = df_deserialize(df2, buffer, size);
-//    ASSERT(success, "Deserialization failed");
-//    // Verify basic properties
-//    ASSERT(df2->width == df->width, "Width mismatch");
-//    ASSERT(df2->height == df->height, "Height mismatch");
-//    ASSERT(df2->room_count == df->room_count, "Room count mismatch");
-//    // Verify stair locations
-//    ASSERT(df2->upstairs_loc.x == df->upstairs_loc.x, "Upstairs X mismatch");
-//    ASSERT(df2->upstairs_loc.y == df->upstairs_loc.y, "Upstairs Y mismatch");
-//    ASSERT(df2->downstairs_loc.x == df->downstairs_loc.x, "Downstairs X mismatch");
-//    ASSERT(df2->downstairs_loc.y == df->downstairs_loc.y, "Downstairs Y mismatch");
-//    // Clean up
-//    free(buffer);
-//    df_free(df);
-//    df_free(df2);
-//}
+TEST(test_df_serialization) {
+    // Create a very small dungeon floor for testing
+    dungeon_floor_t* df = df_create(0, 2, 2); // Just 2x2 for easier debugging
+    // Set up some simple tiles instead of using df_init
+    for (int y = 0; y < df->height; y++)
+        for (int x = 0; x < df->width; x++) tile_init(&df->tiles[y][x], TILE_FLOOR_STONE_00);
+    // Set specific tiles for stairs
+    df->upstairs_loc = (vec3){0, 0};
+    df->downstairs_loc = (vec3){1, 1};
+    tile_init(&df->tiles[0][0], TILE_UPSTAIRS);
+    tile_init(&df->tiles[1][1], TILE_DOWNSTAIRS);
+    // Add a test room
+    df_add_room_info(df, 0, 0, 2, 2, "TestRoom");
+    // Get serialized size
+    size_t size = df_serialized_size(df);
+    printf("Serialized size for 2x2 dungeon: %zu bytes\n", size);
+    ASSERT(size > 0, "Serialized size should be greater than 0");
+    // Allocate buffer for serialization
+    char* buffer = (char*)malloc(size);
+    ASSERT(buffer != NULL, "Failed to allocate serialization buffer");
+    // Serialize
+    size_t written = df_serialize(df, buffer, size);
+    ASSERT(written > 0, "Serialization failed");
+    ASSERT(written == size, "Serialized size mismatch");
+    // Print buffer contents for debugging
+    //printf("Serialized buffer contents (first 32 bytes):\n");
+    //for (int i = 0; i < 32 && i < size; i++) {
+    //    printf("%02X ", (unsigned char)buffer[i]);
+    //    if ((i + 1) % 16 == 0) printf("\n");
+    //}
+    //printf("\n");
+    // Create a new dungeon floor for deserialization
+    dungeon_floor_t* df2 = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
+    ASSERT(df2 != NULL, "Failed to allocate new dungeon floor");
+    memset(df2, 0, sizeof(dungeon_floor_t)); // Initialize to zeros
+    // Deserialize
+    bool success = df_deserialize(df2, buffer, size);
+    ASSERT(success, "Deserialization failed");
+    // Verify basic properties
+    ASSERT(df2->width == df->width, "Width mismatch");
+    ASSERT(df2->height == df->height, "Height mismatch");
+    ASSERT(df2->room_count == df->room_count, "Room count mismatch");
+    // Verify stair locations
+    ASSERT(df2->upstairs_loc.x == df->upstairs_loc.x, "Upstairs X mismatch");
+    ASSERT(df2->upstairs_loc.y == df->upstairs_loc.y, "Upstairs Y mismatch");
+    ASSERT(df2->downstairs_loc.x == df->downstairs_loc.x, "Downstairs X mismatch");
+    ASSERT(df2->downstairs_loc.y == df->downstairs_loc.y, "Downstairs Y mismatch");
+    // Clean up
+    free(buffer);
+    df_free(df);
+    df_free(df2);
+}
 
-//TEST(test_df_memory_size) {
-//    dungeon_floor_t* df = df_create(0, 10, 10);
-//    size_t initial_size = df_memory_size(df);
-//    printf("Initial dungeon floor memory size (10x10): %zu bytes\n", initial_size);
-//    df_add_room_info(df, 0, 0, 5, 5, "TestRoom");
-//    size_t with_room_size = df_memory_size(df);
-//    printf("Memory size after adding a room: %zu bytes\n", with_room_size);
-//    printf("Difference: %zu bytes\n", with_room_size - initial_size);
-//    for (int y = 0; y < 5; y++) {
-//        for (int x = 0; x < 5; x++) {
-//            tile_add(&df->tiles[y][x], y * 10 + x);
-//        }
-//    }
-//    size_t with_entities_size = df_memory_size(df);
-//    printf("Memory size after adding entities: %zu bytes\n", with_entities_size);
-//    printf("Difference: %zu bytes\n", with_entities_size - with_room_size);
-//    size_t total_tiles = df->width * df->height;
-//    printf("Average memory per tile: %zu bytes\n", with_entities_size / total_tiles);
-//    df_free(df);
-//    int sizes[] = {5, 20, 50};
-//    for (int i = 0; i < 3; i++) {
-//        int size = sizes[i];
-//        dungeon_floor_t* df_test = df_create(0, size, size);
-//        size_t test_size = df_memory_size(df_test);
-//        printf("Memory size for %dx%d dungeon floor: %zu bytes\n", size, size, test_size);
-//        df_free(df_test);
-//    }
-//}
+TEST(test_df_memory_size) {
+    dungeon_floor_t* df = df_create(0, 10, 10);
+    size_t initial_size = df_memory_size(df);
+    printf("Initial dungeon floor memory size (10x10): %zu bytes\n", initial_size);
+    df_add_room_info(df, 0, 0, 5, 5, "TestRoom");
+    size_t with_room_size = df_memory_size(df);
+    printf("Memory size after adding a room: %zu bytes\n", with_room_size);
+    printf("Difference: %zu bytes\n", with_room_size - initial_size);
+    for (int y = 0; y < 5; y++) {
+        for (int x = 0; x < 5; x++) {
+            tile_add(&df->tiles[y][x], y * 10 + x);
+        }
+    }
+    size_t with_entities_size = df_memory_size(df);
+    printf("Memory size after adding entities: %zu bytes\n", with_entities_size);
+    printf("Difference: %zu bytes\n", with_entities_size - with_room_size);
+    size_t total_tiles = df->width * df->height;
+    printf("Average memory per tile: %zu bytes\n", with_entities_size / total_tiles);
+    df_free(df);
+    //int sizes[] = {5, 20, 50};
+    int sizes[] = {DEFAULT_DUNGEON_FLOOR_WIDTH};
+    int sizes_count = sizeof(sizes) / sizeof(sizes[0]);
+    //for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < sizes_count; i++) {
+        int size = sizes[i];
+        dungeon_floor_t* df_test = df_create(0, size, size);
+        size_t test_size = df_memory_size(df_test);
+        printf("Memory size for %dx%d dungeon floor: %zu bytes\n", size, size, test_size);
+        printf("Memory size for %dx%d dungeon floor: %zu kilobytes\n", size, size, test_size / 1024);
+        printf("Memory size for %dx%d dungeon floor: %zu megabytes\n", size, size, test_size / 1024 / 1024);
+        df_free(df_test);
+    }
+}
 
 void test_dungeon_floors(void) {
     run_test_df_create_destroy();
     run_test_df_rooms();
     run_test_df_tiles();
     run_test_df_stairs();
+    run_test_df_count_empty();
+    run_test_df_count_walkable();
     run_test_df_init();
-    //run_test_df_count_empty();
-    //run_test_df_count_walkable();
-    //run_test_df_serialization();
-    //run_test_df_memory_size();
-    //run_test_df_get_room_at();
+    run_test_df_serialization();
+    run_test_df_memory_size();
+    run_test_df_get_room_at();
 }

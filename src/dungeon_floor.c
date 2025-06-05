@@ -467,7 +467,6 @@ void df_init(dungeon_floor_t* df) {
     df_reset_plates(df);
     df_reset_events(df);
     if (!df_malloc_tiles(df)) {
-        merror("failed to malloc tiles");
         return;
     }
     df_init_rooms(df);
@@ -581,7 +580,6 @@ static void df_init_test(dungeon_floor_t* df) {
         //    df_create_trap_event(df, x + rand() % w, y - 1, trap_on, trap_off, id);
         //    y = y - 2;
         //} else {
-        //    merror("df_init_test: invalid random number");
         //    continue;
         //}
         //prev_r = r;
@@ -638,14 +636,12 @@ static void df_init_test(dungeon_floor_t* df) {
     // now we can set the upstairs tile
     tile_t* const tile = df_tile_at(df, up_loc);
     if (!tile) {
-        merror("df_init_test: failed to get tile");
         return;
     }
     tile_init(tile, TILE_UPSTAIRS);
     // now we can set the downstairs tile
     tile_t* const tile2 = df_tile_at(df, down_loc);
     if (!tile2) {
-        merror("df_init_test: failed to get tile");
         return;
     }
     tile_init(tile2, TILE_DOWNSTAIRS);
@@ -725,7 +721,7 @@ void df_free(dungeon_floor_t* df) {
         df->room_capacity = 0;
     }
     free(df);
-    msuccess("Freed dungeon floor");
+    //msuccess("Freed dungeon floor");
 }
 
 bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y) {
@@ -748,17 +744,7 @@ bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y) {
     massert(x < df->width, "x is out of bounds");
     massert(y >= 0, "y is less than zero");
     massert(y < df->height, "y is out of bounds");
-    //if (id == -1) {
-    //    merror("id is -1");
-    //    return false;
-    //}
-    //if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
-    //    merror("x or y out of bounds");
-    //    return false;
-    //}
     const entityid r = tile_remove(&df->tiles[y][x], id);
-    //massert(r != ENTITYID_INVALID, "tile_remove failed");
-    //massert(r == id, "tile_remove failed");
     return r != -1 && r == id;
 }
 
@@ -768,9 +754,6 @@ static void df_set_pressure_plate(dungeon_floor_t* const df, const int x, const 
     massert(x < df->width, "x is out of bounds");
     massert(y >= 0, "y is less than zero");
     massert(y < df->height, "y is out of bounds");
-    //massert(up_tx_key >= 0, "up_tx_key is out of bounds");
-    //massert(up_tx_key < TILE_COUNT, "up_tx_key is out of bounds");
-    //if (x < 0 || x >= df->width || y < 0 || y >= df->height) return;
     tile_set_pressure_plate(&df->tiles[y][x], true);
     tile_set_pressure_plate_up_tx_key(&df->tiles[y][x], up_tx_key);
     tile_set_pressure_plate_down_tx_key(&df->tiles[y][x], dn_tx_key);
@@ -795,7 +778,6 @@ static void df_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_k
 
 static void df_set_all_tiles(dungeon_floor_t* const df, tiletype_t type) {
     massert(df, "dungeon floor is NULL");
-    // rewrite this function using df_set_tile_area
     df_set_tile_area(df, type, 0, 0, df->width, df->height);
 }
 
@@ -858,20 +840,19 @@ static void df_set_tile_area_range(dungeon_floor_t* const df, int x, int y, int 
 
 static void df_reset_plates(dungeon_floor_t* const df) {
     massert(df, "dungeon floor is NULL");
-    for (int i = 0; i < DEFAULT_DF_PLATES; i++) {
-        df->plates[i] = false;
-    }
+    memset(df->plates, 0, sizeof(bool) * DEFAULT_DF_PLATES);
 }
 
 static void df_reset_events(dungeon_floor_t* const df) {
     massert(df, "dungeon floor is NULL");
-    for (int i = 0; i < DEFAULT_DF_EVENTS; i++) {
-        df->events[i].listen_event = -1;
-        df->events[i].x = -1;
-        df->events[i].y = -1;
-        df->events[i].on_type = TILE_NONE;
-        df->events[i].off_type = TILE_NONE;
-    }
+    memset(df->events, 0, sizeof(df_event_t) * DEFAULT_DF_EVENTS);
+    //for (int i = 0; i < DEFAULT_DF_EVENTS; i++) {
+    //    df->events[i].listen_event = -1;
+    //    df->events[i].x = -1;
+    //    df->events[i].y = -1;
+    //    df->events[i].on_type = TILE_NONE;
+    //    df->events[i].off_type = TILE_NONE;
+    //}
 }
 
 static bool df_malloc_tiles(dungeon_floor_t* const df) {
@@ -883,11 +864,9 @@ static bool df_malloc_tiles(dungeon_floor_t* const df) {
     memset(df->tiles, 0, sizeof(tile_t*) * df->height);
     for (int i = 0; i < df->height; i++) {
         df->tiles[i] = malloc(sizeof(tile_t) * df->width);
+        // malloc failed and we need to free everything up to this point
         if (df->tiles[i] == NULL) {
-            // malloc failed and we need to free everything up to this point
-            for (int j = 0; j < i; j++) {
-                free(df->tiles[j]);
-            }
+            for (int j = 0; j < i; j++) free(df->tiles[j]);
             return false;
         }
     }
@@ -957,9 +936,7 @@ vec3 df_get_upstairs(dungeon_floor_t* const df) {
 
 vec3 df_get_downstairs(dungeon_floor_t* const df) {
     massert(df, "dungeon floor is NULL");
-    if (df->downstairs_loc.x != -1 && df->downstairs_loc.y != -1) {
-        return df->downstairs_loc;
-    }
+    if (df->downstairs_loc.x != -1 && df->downstairs_loc.y != -1) return df->downstairs_loc;
     vec3 loc = {-1, -1, -1};
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
@@ -981,10 +958,7 @@ int df_count_walkable(const dungeon_floor_t* const df) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tiletype_t type = df_type_at(df, x, y);
-            if (tile_is_walkable(type)) {
-                minfo("type is walkable: %d %s", type, tiletype_to_str(type));
-                count++;
-            }
+            if (tile_is_walkable(type)) count++;
         }
     }
     return count;
@@ -996,9 +970,7 @@ int df_count_empty(const dungeon_floor_t* const df) {
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             tile_t* const t = df_tile_at(df, (vec3){x, y, -1});
-            if (tile_entity_count(t) == 0) {
-                count++;
-            }
+            if (tile_entity_count(t) == 0) count++;
         }
     }
     return count;
@@ -1031,7 +1003,6 @@ int df_count_empty_non_walls_in_area(const dungeon_floor_t* const df, int x0, in
             int newx = x + x0;
             int newy = y + y0;
             tile_t* const t = df_tile_at(df, (vec3){newx, newy, -1});
-            //if (tile_entity_count(t) == 0 && t->type != TILE_NONE && !tile_is_wall(t->type)) { count++; }
             if (tile_entity_count(t) == 0 && tile_is_walkable(t->type)) count++;
         }
     }
@@ -1044,9 +1015,7 @@ int df_count_empty_non_walls(const dungeon_floor_t* const df) {
 }
 
 static void df_make_room(dungeon_floor_t* df, int x, int y, int w, int h) { df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
-
 static void df_make_corridor_h(dungeon_floor_t* df, int x, int y, int len) { df_set_tile_area_range(df, x, y, len, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
-
 static void df_make_corridor_v(dungeon_floor_t* df, int x, int y, int len) { df_set_tile_area_range(df, x, y, 1, len, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
 
 //static void df_connect_rooms(dungeon_floor_t* df, int x1, int y1, int x2, int y2) {
@@ -1702,7 +1671,6 @@ static void df_init_test_complex9(dungeon_floor_t* df, int grid_cell_w, int grid
     int grid_col_index = grid_cols / 2;
     start_x = grid_col_index * grid_cell_w;
     start_y = grid_row_index * grid_cell_h;
-    minfo("creating grid starting at %d,%d", start_x, start_y);
 
     int local_grid_rows = df->floor + 1;
     int local_grid_cols = df->floor + 1;
@@ -1714,7 +1682,6 @@ static void df_init_test_complex9(dungeon_floor_t* df, int grid_cell_w, int grid
         for (int j = 0; j < local_grid_cols; j++) {
             int x = (grid_col_index + j) * grid_cell_w;
             int y = (grid_row_index + i) * grid_cell_h;
-            minfo("x, y: %d, %d", x, y);
             // Random room size within the grid cell
             int room_w = min_room_size + rand() % (max_room_size - min_room_size + 1);
             int room_h = min_room_size + rand() % (max_room_size - min_room_size + 1);
@@ -2183,7 +2150,6 @@ size_t df_serialize(const dungeon_floor_t* df, char* buffer, size_t buffer_size)
 
     size_t required_size = df_serialized_size(df);
     if (buffer_size < required_size) {
-        merror("Buffer too small for serialization");
         return 0;
     }
 
@@ -2227,7 +2193,6 @@ size_t df_serialize(const dungeon_floor_t* df, char* buffer, size_t buffer_size)
             size_t tile_size = tile_serialized_size(&df->tiles[y][x]);
             size_t written = tile_serialize(&df->tiles[y][x], ptr, tile_size);
             if (written == 0) {
-                merror("Failed to serialize tile at %d,%d", x, y);
                 return 0;
             }
             ptr += written;
@@ -2274,7 +2239,6 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
     // Allocate and deserialize rooms array
     df->rooms = malloc(room_capacity * sizeof(room_data_t));
     if (!df->rooms) {
-        merror("Failed to allocate memory for rooms during deserialization");
         return false;
     }
 
@@ -2295,8 +2259,6 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
 
     // Allocate memory for tiles
     if (!df_malloc_tiles(df)) {
-        merror("Failed to allocate memory for tiles during deserialization");
-        printf("Failed to allocate memory for tiles during deserialization");
         return false;
     }
 
@@ -2317,8 +2279,6 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
             //printf("\n");
 
             if (!tile_deserialize(&df->tiles[y][x], ptr, tile_size)) {
-                merror("Failed to deserialize tile at %d,%d", x, y);
-                printf("Failed to deserialize tile at %d,%d\n", x, y);
                 return false;
             }
             ptr += tile_size;
@@ -2330,37 +2290,25 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
 
 size_t df_memory_size(const dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
-
     // Calculate the memory size of a dungeon floor
     size_t size = 0;
-
     // Size of the dungeon_floor_t struct itself
     size += sizeof(dungeon_floor_t);
-
     // Size of rooms array
-    if (df->rooms) {
-        size += df->room_capacity * sizeof(room_data_t);
-    }
-
+    if (df->rooms) size += df->room_capacity * sizeof(room_data_t);
     // Size of tiles array and all tiles
     if (df->tiles) {
         // Size of the tile pointers array
         size += df->height * sizeof(tile_t*);
-
         // Size of each row of tiles
         for (int y = 0; y < df->height; y++) {
             if (df->tiles[y]) {
                 // Size of the row itself
                 size += df->width * sizeof(tile_t);
-
                 // Size of each tile's dynamic memory
-                for (int x = 0; x < df->width; x++) {
-                    // Subtract the size of the tile_t struct since we already counted it
-                    size += tile_memory_size(&df->tiles[y][x]) - sizeof(tile_t);
-                }
+                for (int x = 0; x < df->width; x++) size += tile_memory_size(&df->tiles[y][x]) - sizeof(tile_t);
             }
         }
     }
-
     return size;
 }
