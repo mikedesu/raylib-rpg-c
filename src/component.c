@@ -146,27 +146,27 @@ void init_stats_component(stats_component* comp, entityid id) {
     memset(comp->stats, 0, sizeof(comp->stats));
 }
 
-void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype type) {
-    massert(comp != NULL, "comp is NULL");
-    if (!comp) return;
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (id == ENTITYID_INVALID) return;
-    massert(type > ARROW_NONE && type < ARROW_TYPE_COUNT, "type is invalid: %d", type);
-    if (type <= ARROW_NONE || type >= ARROW_TYPE_COUNT) return;
-    comp->id = id;
-    comp->type = type;
-}
+//void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype type) {
+//    massert(comp != NULL, "comp is NULL");
+//    if (!comp) return;
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (id == ENTITYID_INVALID) return;
+//    massert(type > ARROW_NONE && type < ARROW_TYPE_COUNT, "type is invalid: %d", type);
+//    if (type <= ARROW_NONE || type >= ARROW_TYPE_COUNT) return;
+//    comp->id = id;
+//    comp->type = type;
+//}
 
-void init_quiver_component(quiver_component* comp, entityid id, int capacity) {
-    massert(comp != NULL, "comp is NULL");
-    if (!comp) return;
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (id == ENTITYID_INVALID) return;
-    massert(capacity > 0, "capacity is invalid: %d", capacity);
-    if (capacity <= 0) return;
-    comp->id = id;
-    comp->capacity = capacity;
-}
+//void init_quiver_component(quiver_component* comp, entityid id, int capacity) {
+//    massert(comp != NULL, "comp is NULL");
+//    if (!comp) return;
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (id == ENTITYID_INVALID) return;
+//    massert(capacity > 0, "capacity is invalid: %d", capacity);
+//    if (capacity <= 0) return;
+//    comp->id = id;
+//    comp->capacity = capacity;
+//}
 
 void init_damage_component(damage_component* comp, entityid id, roll r) {
     massert(comp != NULL, "comp is NULL");

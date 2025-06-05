@@ -1,16 +1,5 @@
 #pragma once
 
-//#include "direction_component.h"
-//#include "ac_component.h"
-//#include "dead_component.h"
-//#include "default_action_component.h"
-//#include "direction.h"
-//#include "entity_actions.h"
-//#include "entitytype.h"
-//#include "shieldtype_component.h"
-//#include "weapontype_component.h"
-//#include "potion_component.h"
-//#include "itemtype_component.h"
 #include "arrow.h"
 #include "arrow_component.h"
 #include "attacking_component.h"
@@ -123,19 +112,10 @@ void init_name_component(name_component* comp, entityid id, const char* name);
 // int components
 void init_int_component(int_component* comp, entityid id, int data);
 
-void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype type);
-void init_quiver_component(quiver_component* comp, entityid id, int capacity);
+//void init_arrowtype_component(arrowtype_component* comp, entityid id, arrowtype type);
+//void init_quiver_component(quiver_component* comp, entityid id, int capacity);
 
-// bool components
-//void init_dead_component(dead_component* comp, entityid id, bool dead);
-//void init_update_component(update_component* comp, entityid id, bool update);
-//void init_attacking_component(attacking_component* comp, entityid id, bool attacking);
-//void init_blocking_component(blocking_component* comp, entityid id, bool blocking);
-//void init_block_success_component(block_success_component* comp, entityid id, bool block_success);
-//void init_damaged_component(damaged_component* comp, entityid id, bool damaged);
-//void init_zapping_component(zapping_component* comp, entityid id, bool zapping);
-
-// loc components
+// loc components: 3 integer
 void init_loc_component(loc_component* comp, entityid id, loc_t loc);
 void init_sprite_move_component(sprite_move_component* comp, entityid id, loc_t loc);
 void init_target_component(target_component* comp, entityid id, loc_t target);
@@ -146,7 +126,7 @@ void init_equipment_component(equipment_component* comp, entityid id);
 void init_stats_component(stats_component* comp, entityid id);
 void init_target_path_component(target_path_component* comp, entityid id, loc_t* target_path, int target_path_length);
 
-// roll components
+// roll components: 3 integer
 void init_damage_component(damage_component* comp, entityid id, roll r);
 void init_base_attack_damage_component(base_attack_damage_component* comp, entityid id, roll r);
 
