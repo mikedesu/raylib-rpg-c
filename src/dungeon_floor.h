@@ -53,8 +53,8 @@ vec3 df_get_downstairs(dungeon_floor_t* const df);
 
 // Add these function declarations
 void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y);
-void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
-void df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
+bool df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
+bool df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
 vec3* const df_get_all_locs(dungeon_floor_t* const df, int* external_count);
 vec3* const df_get_all_locs_outside_of_rooms(dungeon_floor_t* const df, int* external_count);
 int df_count_walkable(const dungeon_floor_t* const df);

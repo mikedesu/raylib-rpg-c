@@ -4,7 +4,7 @@
 #include "entityid.h"
 #include "libgame_defines.h"
 #include "massert.h"
-#include "mprint.h"
+//#include "mprint.h"
 #include "range.h"
 #include "raylib.h"
 #include "vec3.h"
@@ -40,8 +40,8 @@ static void df_assign_stairs(dungeon_floor_t* df);
 bool df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name);
 static void df_assign_downstairs(dungeon_floor_t* df);
 static void df_assign_upstairs(dungeon_floor_t* df);
-void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
-void df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
+bool df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
+bool df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
 static int df_get_possible_upstairs_count(dungeon_floor_t* df);
 static int df_get_possible_downstairs_count(dungeon_floor_t* df);
 static vec3* df_get_possible_upstairs_locs(dungeon_floor_t* df, int* external_count);
@@ -183,7 +183,7 @@ static vec3* df_get_possible_downstairs_locs_in_area(dungeon_floor_t* df, int* e
     return locations;
 }
 
-void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
+bool df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
@@ -206,6 +206,7 @@ void df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h)
     tile_init(tile, TILE_UPSTAIRS);
     free(locations);
     df->upstairs_loc = up_loc;
+    return true;
 }
 
 static void df_assign_upstairs(dungeon_floor_t* df) {
@@ -218,7 +219,7 @@ static void df_assign_downstairs(dungeon_floor_t* df) {
     df_assign_downstairs_in_area(df, 0, 0, df->width, df->height);
 }
 
-void df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
+bool df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
@@ -240,6 +241,7 @@ void df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int 
     tile_init(tile, TILE_DOWNSTAIRS);
     free(locations);
     df->downstairs_loc = down_loc;
+    return true;
 }
 
 int df_center_x(const dungeon_floor_t* const df) {

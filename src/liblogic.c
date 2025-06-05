@@ -944,6 +944,7 @@ static void init_player(gamestate* const g) {
     vec3 loc = df_get_upstairs(g->d->floors[g->d->current_floor]);
     //minfo("loc: %d, %d, %d", loc.x, loc.y, loc.z);
     const int id = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
+
     massert(id != ENTITYID_INVALID, "failed to init hero");
     //minfo("hero id: %d", id);
     //e_set_maxhp(hero, 10);
@@ -1681,6 +1682,7 @@ void liblogic_init(gamestate* const g) {
     g->msg_system.index = 0;
     g->msg_system.is_active = false;
     gamestate_load_keybindings(g);
+
     init_player(g);
     //minfo("player initialized");
     // test to create a weapon

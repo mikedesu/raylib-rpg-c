@@ -1,5 +1,6 @@
 // dungeon.c
 #include "dungeon.h"
+#include "dungeon_tile_type.h"
 //#include "massert.h"
 #include "mprint.h"
 #include <stdlib.h>
@@ -149,25 +150,21 @@ bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size) {
     memcpy(&d->is_locked, ptr, sizeof(bool));
     ptr += sizeof(bool);
     remaining -= sizeof(bool);
-
     // Validate fields
     if (d->num_floors < 0 || d->capacity_floors < d->num_floors || (d->num_floors > 0 && (d->current_floor < 0 || d->current_floor >= d->num_floors))) {
         merror("Invalid dungeon fields after deserialization");
         return false;
     }
-
     // Allocate memory for floors
     d->floors = malloc(d->capacity_floors * sizeof(dungeon_floor_t*));
     if (!d->floors) {
         merror("Failed to allocate memory for floors during deserialization");
         return false;
     }
-
     // Initialize all floor pointers to NULL
     for (int i = 0; i < d->capacity_floors; i++) {
         d->floors[i] = NULL;
     }
-
     // Deserialize each floor
     for (int i = 0; i < d->num_floors; i++) {
         // First read the size of the serialized floor
@@ -176,18 +173,15 @@ bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size) {
             d_destroy(d);
             return false;
         }
-
         size_t floor_size;
         memcpy(&floor_size, ptr, sizeof(size_t));
         ptr += sizeof(size_t);
         remaining -= sizeof(size_t);
-
         if (remaining < floor_size) {
             merror("Buffer too small for floor data");
             d_destroy(d);
             return false;
         }
-
         // Create a new floor
         d->floors[i] = malloc(sizeof(dungeon_floor_t));
         if (!d->floors[i]) {
@@ -195,76 +189,60 @@ bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size) {
             d_destroy(d);
             return false;
         }
-
         // Deserialize the floor
         if (!df_deserialize(d->floors[i], ptr, floor_size)) {
             merror("Failed to deserialize floor %d", i);
             d_destroy(d);
             return false;
         }
-
         ptr += floor_size;
         remaining -= floor_size;
     }
-
     return true;
 }
 
 size_t d_memory_size(const dungeon_t* d) {
     massert(d, "dungeon is NULL");
-
     // Calculate the memory size of a dungeon
-    size_t size = 0;
-
     // Size of the dungeon_t struct itself
-    size += sizeof(dungeon_t);
-
+    size_t size = sizeof(dungeon_t);
     // Size of floors array
     if (d->floors) {
         size += d->capacity_floors * sizeof(dungeon_floor_t*);
-
         // Size of each floor
-        for (int i = 0; i < d->num_floors; i++) {
-            if (d->floors[i]) {
-                size += df_memory_size(d->floors[i]);
-            }
-        }
+        for (int i = 0; i < d->num_floors; i++)
+            if (d->floors[i]) size += df_memory_size(d->floors[i]);
     }
-
     return size;
 }
 
 bool d_add_floor(dungeon_t* const dungeon, int width, int height) {
-    if (!dungeon) {
-        merror("dungeon is NULL");
-        return false;
-    }
-    if (width <= 0 || height <= 0) {
-        merror("Invalid floor dimensions %dx%d", width, height);
-        return false;
-    }
-    if (dungeon->is_locked) {
-        merror("dungeon is locked");
-        return false;
-    }
+    if (!dungeon) return false;
+    if (width <= 0 || height <= 0) return false;
+    if (dungeon->is_locked) return false;
     if (dungeon->num_floors >= dungeon->capacity_floors) {
         int new_capacity = dungeon->capacity_floors * 2;
         dungeon_floor_t** new_floors = realloc(dungeon->floors, sizeof(dungeon_floor_t*) * new_capacity);
-        if (!new_floors) {
-            merror("Failed to reallocate floors array to capacity %d", new_capacity);
-            return false;
-        }
+        if (!new_floors) return false;
         dungeon->floors = new_floors;
         dungeon->capacity_floors = new_capacity;
-        minfo("Expanded dungeon capacity to %d", new_capacity);
     }
     int current_floor = dungeon->num_floors;
     dungeon_floor_t* new_floor = df_create(current_floor, width, height);
-    if (!new_floor) {
-        merror("Failed to create new floor");
+    if (!new_floor) return false;
+    // Initialize the new floor
+    df_init(new_floor);
+    // Add a room
+    bool res = df_add_room(new_floor, 0, 0, width, height, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "TestRoom");
+    if (!res) {
+        merror("Failed to add room to new floor");
+        df_free(new_floor);
         return false;
     }
+    // Assign upstairs and downstairs locations
+    res = df_assign_upstairs_in_area(new_floor, 0, 0, width, height);
+    df_assign_downstairs_in_area(new_floor, 0, 0, width, height);
+    // Add the new floor to the dungeon
     dungeon->floors[dungeon->num_floors++] = new_floor;
-    msuccess("Added new floor %dx%d (total floors: %d)", width, height, dungeon->num_floors);
     return true;
 }
