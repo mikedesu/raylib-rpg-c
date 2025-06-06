@@ -1482,6 +1482,8 @@ void draw_version(const gamestate* const g) {
 void draw_title_screen(const gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
     const char* title_text = "project.rpg";
+    const char* version_text = g->version;
+
     const char* start_text = "Press any key to begin";
 
     const int sm_font_size = 20;
@@ -1498,12 +1500,19 @@ void draw_title_screen(const gamestate* const g, bool show_menu) {
     float y = (g->windowheight - font_size * 2) / 2.0f;
     float start_x = (g->windowwidth - start_measure) / 2.0f;
     // Below the title text
-    float start_y = y + font_size * 1 + 10;
     ClearBackground(BLACK);
     // Draw background rectangle
     //DrawRectangle(0, 0, g->windowwidth, g->windowheight, bg_color);
     // Draw title text
     DrawText(title_text, x, y, font_size, WHITE);
+    // Draw version text
+    int version_measure = MeasureText(version_text, sm_font_size);
+    float version_x = (g->windowwidth - version_measure) / 2.0f;
+    float version_y = y + font_size + 10; // Below the title text
+
+    DrawText(version_text, version_x, version_y, sm_font_size, WHITE);
+    float start_y = y + font_size * 1 + 20 + sm_font_size; // Below the version text
+
     if (show_menu) {
         // If show_menu is true, draw the new game, continue, options selection text
         const char* menu_text[3] = {"New Game", "Continue", "Settings"};
