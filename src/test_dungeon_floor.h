@@ -19,7 +19,7 @@ TEST(test_df_create_destroy) {
 
 TEST(test_df_rooms) {
     dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    minfo("Initial room count: %d", df->room_count);
+    //minfo("Initial room count: %d", df->room_count);
     // Test room creation
     bool add_result = df_add_room_info(df, 10, 10, 5, 5, "TestRoom1");
     //printf("Add room result: %d\n", add_result);
@@ -27,9 +27,9 @@ TEST(test_df_rooms) {
     if (add_result) {
         // Test room location
         int in_room = df_loc_is_in_room(df, (vec3){12, 12});
-        minfo("Location in room result: %d", in_room);
+        //minfo("Location in room result: %d", in_room);
         const char* room_name = df_get_room_name(df, (vec3){12, 12});
-        minfo("Room name at location: %s", room_name ? room_name : "NULL");
+        //minfo("Room name at location: %s", room_name ? room_name : "NULL");
     }
     // Test overlapping rooms - should fail
     bool overlap_result = df_add_room_info(df, 10, 10, 5, 5, "OverlapRoom");
@@ -65,8 +65,8 @@ TEST(test_df_stairs) {
     df_assign_downstairs_in_area(df, 10, 10, 5, 5);
     ASSERT(df_get_upstairs(df).x != -1, "Upstairs not placed");
     ASSERT(df_get_downstairs(df).x != -1, "Downstairs not placed");
-    minfo("Upstairs location: (%d, %d)", df_get_upstairs(df).x, df_get_upstairs(df).y);
-    minfo("Dnstairs location: (%d, %d)", df_get_downstairs(df).x, df_get_downstairs(df).y);
+    //minfo("Upstairs location: (%d, %d)", df_get_upstairs(df).x, df_get_upstairs(df).y);
+    //minfo("Dnstairs location: (%d, %d)", df_get_downstairs(df).x, df_get_downstairs(df).y);
     // make sure stairs are not in the same location
     ASSERT(df_get_upstairs(df).x != df_get_downstairs(df).x || df_get_upstairs(df).y != df_get_downstairs(df).y, "Stairs in same location");
     df_free(df);
@@ -101,7 +101,7 @@ TEST(test_df_count_empty) {
     // Count walkable tiles in the room
     int expected_walkable = 0;
     int actual_walkable = df_count_walkable(df);
-    minfo("Expected walkable tiles: %d, Actual walkable tiles: %d\n", expected_walkable, actual_walkable);
+    //minfo("Expected walkable tiles: %d, Actual walkable tiles: %d\n", expected_walkable, actual_walkable);
     ASSERT(actual_walkable == expected_walkable, "Too few walkable tiles");
     df_free(df);
 }
@@ -119,7 +119,7 @@ TEST(test_df_count_walkable) {
     // Count walkable tiles in the room
     int expected_walkable = w * h;
     int actual_walkable = df_count_walkable(df);
-    minfo("Expected walkable tiles: %d, Actual walkable tiles: %d", expected_walkable, actual_walkable);
+    //minfo("Expected walkable tiles: %d, Actual walkable tiles: %d", expected_walkable, actual_walkable);
     ASSERT(actual_walkable >= expected_walkable, "Too few walkable tiles");
     // Add some walls and verify count decreases
     df_set_tile(df, TILE_STONE_WALL_00, x, y);

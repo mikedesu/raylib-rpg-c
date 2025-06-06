@@ -453,7 +453,10 @@ bool g_register_comps(gamestate* const g, entityid id, ...) {
 bool g_add_component(gamestate* const g, entityid id, component comp, void* data, size_t c_size, void** c_list, int* c_count, int* c_capacity) {
     //minfo("g_add_component: id: %d, comp: %s", id, component2str(comp));
     massert(g, "g is NULL");
-    if (!data) mwarning("data is NULL");
+    if (!data) {
+        mwarning("data is NULL");
+        printf("g_add_component called with data==NULL\n");
+    }
     //massert(data, "data is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(*c_list, "c_list is NULL");

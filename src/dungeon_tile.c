@@ -51,9 +51,9 @@ entityid tile_add(tile_t* const t, entityid id) {
     massert(t->entities, "tile entities is NULL");
     // Early exit if tile is full and resize fails
     if (t->entity_count >= t->entity_max) {
-        mwarning("dungeon_tile_add: Tile full, attempting resize");
+        ////mwarning("dungeon_tile_add: Tile full, attempting resize");
         if (!tile_resize(t)) {
-            merror("dungeon_tile_add: Resize failed");
+            //merror("dungeon_tile_add: Resize failed");
             return ENTITYID_INVALID;
         }
     }
