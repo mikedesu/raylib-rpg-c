@@ -78,6 +78,7 @@ static void draw_shield_sprite_back(const gamestate* const g, entityid id, sprit
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 static bool libdraw_check_default_animations(const gamestate* const g);
 
+void draw_title_screen(const gamestate* const g);
 static void update_weapon_for_entity(gamestate* g, entityid id, spritegroup_t* sg);
 
 static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
@@ -855,27 +856,40 @@ void libdraw_drawframe(gamestate* const g) {
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
-    libdraw_drawframe_2d(g);
-    draw_message_history(g);
-    draw_message_box(g);
-    draw_hud(g);
-    draw_inventory_menu(g);
+
+    if (g->current_scene == SCENE_TITLE) {
+        draw_title_screen(g);
+    } else if (g->current_scene == SCENE_GAMEPLAY) {
+        libdraw_drawframe_2d(g);
+        // should prob go inside drawframe_2d
+        draw_message_history(g);
+        // should prob go inside drawframe_2d
+        draw_message_box(g);
+        // should prob go inside drawframe_2d
+        draw_hud(g);
+        // should prob go inside drawframe_2d
+        draw_inventory_menu(g);
+
+        handle_debug_panel(g);
+        draw_version(g);
+
+        if (g->display_quit_menu) {
+            // should prob go inside drawframe_2d
+            draw_quit_menu(g);
+        }
+
+        if (g->display_help_menu) {
+            // should prob go inside drawframe_2d
+            draw_help_menu(g);
+        }
+
+        if (g->gameover) {
+            draw_gameover_menu(g);
+        }
+    }
+
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-    handle_debug_panel(g);
-    draw_version(g);
-
-    if (g->display_quit_menu) {
-        draw_quit_menu(g);
-    }
-
-    if (g->display_help_menu) {
-        draw_help_menu(g);
-    }
-
-    if (g->gameover) {
-        draw_gameover_menu(g);
-    }
 
     EndDrawing();
     //double elapsed_time = GetTime() - start_time;
@@ -1185,16 +1199,11 @@ static void draw_hud(gamestate* const g) {
 
 void libdraw_init(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    const int w = DEFAULT_WIN_WIDTH;
-    const int h = DEFAULT_WIN_HEIGHT;
-    const int x = w / 3;
-    const int y = h / 3;
-
+    const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
+    const int x = w / 3, y = h / 3;
     const char* title = WINDOW_TITLE;
-
     char full_title[1024] = {0};
     snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version);
-
     InitWindow(w, h, full_title);
     SetExitKey(KEY_NULL);
     g->windowwidth = w;
@@ -1209,36 +1218,25 @@ void libdraw_init(gamestate* const g) {
     load_shaders();
     g->cam2d.offset = (Vector2){x, y};
     gamestate_set_debug_panel_pos_top_right(g);
-
     // set the camera target to the center of the dungeon
     dungeon_floor_t* const df = d_get_current_floor(g->d);
     massert(df, "dungeon_floor is NULL");
-    int df_w = df->width;
-    int df_h = df->height;
+    int df_w = df->width, df_h = df->height;
     g->cam2d.target = (Vector2){df_w * DEFAULT_TILE_SIZE / 2.0f, df_h * DEFAULT_TILE_SIZE / 2.0f};
-
     InitAudioDevice();
-
     // select a random indices for current music
     g->current_music_index = rand() % g->total_music_paths;
     // load the music stream from the selected path
-
     const char* music_path = g->music_file_paths[g->current_music_index];
-
     massert(music_path, "music_path is NULL");
     minfo("Loading music from path: %s", music_path);
-
     char real_music_path[1024] = {0};
     snprintf(real_music_path, sizeof(real_music_path), "%s%s", "audio/music/", music_path);
-
     music = LoadMusicStream(real_music_path);
-
     //SetMusicVolume(music, 0.50f); // Set initial music volume
     SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
-
     //SetMusicLooping(music, true); // Loop the music
     PlayMusicStream(music);
-
     //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
 }
 
@@ -1247,7 +1245,6 @@ static void draw_message_history(gamestate* const g) {
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) return;
     int font_size = 20;
-    //int font_size = g->font_size;
     const int max_messages = 20;
     const int x = 0;
     const int y = 42;
@@ -1481,6 +1478,28 @@ void draw_version(const gamestate* const g) {
     DrawTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
 }
 
-//void libdraw_restart() {
-//
-//}
+void draw_title_screen(const gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    const char* title_text = "project.rpg";
+    const char* start_text = "Press any key to begin";
+    const int font_size = 20;
+    Color bg_color = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent background
+
+    // Measure text
+    int measure = MeasureText(title_text, font_size);
+    int start_measure = MeasureText(start_text, font_size);
+
+    // Calculate positions
+    float x = (g->windowwidth - measure) / 2.0f;
+    float y = (g->windowheight - font_size * 2) / 2.0f; // Center vertically
+
+    float start_x = (g->windowwidth - start_measure) / 2.0f;
+    float start_y = y + font_size * 2 + 10; // Below the title text
+
+    // Draw background rectangle
+    DrawRectangle(0, 0, g->windowwidth, g->windowheight, bg_color);
+    // Draw title text
+    DrawText(title_text, x, y, font_size, WHITE);
+    // Draw start text
+    DrawText(start_text, start_x, start_y, font_size, WHITE);
+}

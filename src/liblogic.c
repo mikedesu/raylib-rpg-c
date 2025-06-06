@@ -1525,20 +1525,28 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
     //    g->display_quit_menu = true;
     //    return;
     //}
-    if (g->gameover) {
-        if (inputstate_any_pressed(is)) liblogic_restart(g);
-        return;
-    }
-    if (g->controlmode == CONTROLMODE_PLAYER) {
-        handle_input_player(is, g);
-    } else if (g->controlmode == CONTROLMODE_CAMERA) {
-        handle_input_camera(is, g);
-    } else if (g->controlmode == CONTROLMODE_INVENTORY) {
-        handle_input_inventory(is, g);
-    } else if (g->controlmode == CONTROLMODE_HELP) {
-        handle_input_help_menu(is, g);
+
+    if (g->current_scene == SCENE_GAMEPLAY) {
+        if (g->gameover) {
+            if (inputstate_any_pressed(is)) liblogic_restart(g);
+            return;
+        }
+        if (g->controlmode == CONTROLMODE_PLAYER) {
+            handle_input_player(is, g);
+        } else if (g->controlmode == CONTROLMODE_CAMERA) {
+            handle_input_camera(is, g);
+        } else if (g->controlmode == CONTROLMODE_INVENTORY) {
+            handle_input_inventory(is, g);
+        } else if (g->controlmode == CONTROLMODE_HELP) {
+            handle_input_help_menu(is, g);
+        } else {
+            merror("Unknown control mode");
+        }
+    } else if (g->current_scene == SCENE_TITLE) {
+        if (inputstate_any_pressed(is)) {
+            g->current_scene = SCENE_GAMEPLAY;
+        }
     } else {
-        merror("Unknown control mode");
     }
 }
 

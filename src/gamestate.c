@@ -186,6 +186,7 @@ gamestate* gamestateinitptr() {
     g->next_entityid = g->current_music_index = g->total_music_paths = g->restart_count = g->do_restart = 0;
     gamestate_init_music_paths(g);
     gamestate_init_msg_history(g);
+    g->current_scene = SCENE_TITLE;
     //gamestate_load_help_menu_text(g);
     return g;
 }
