@@ -84,7 +84,7 @@ typedef struct gamestate {
     int damage_list_count, damage_list_capacity;
     int ac_list_count, ac_list_capacity;
     int zapping_list_count, zapping_list_capacity;
-    int spell_effect_list_count, spell_effect_list_capacity;
+    //int spell_effect_list_count, spell_effect_list_capacity;
     int base_attack_damage_list_count, base_attack_damage_list_capacity;
 
     debugpanel_t debugpanel;
@@ -161,7 +161,7 @@ typedef struct gamestate {
     //base_attack_damage_component* base_attack_damage_list;
     vec3_component* base_attack_damage_list;
 
-    spell_effect_component* spell_effect_list;
+    //spell_effect_component* spell_effect_list;
 
     int current_music_index;
     int total_music_paths;
@@ -342,10 +342,10 @@ bool g_add_zapping(gamestate* const g, entityid id, int zapping);
 bool g_set_zapping(gamestate* const g, entityid id, int zapping);
 bool g_get_zapping(const gamestate* const g, entityid id);
 
-bool g_add_spell_effect(gamestate* const g, entityid id, spell_effect effect);
-bool g_has_spell_effect(const gamestate* const g, entityid id);
-bool g_set_spell_effect(gamestate* const g, entityid id, spell_effect effect);
-spell_effect g_get_spell_effect(const gamestate* const g, entityid id);
+//bool g_add_spell_effect(gamestate* const g, entityid id, spell_effect effect);
+//bool g_has_spell_effect(const gamestate* const g, entityid id);
+//bool g_set_spell_effect(gamestate* const g, entityid id, spell_effect effect);
+//spell_effect g_get_spell_effect(const gamestate* const g, entityid id);
 
 bool g_add_base_attack_damage(gamestate* const g, entityid id, vec3 damage);
 bool g_has_base_attack_damage(const gamestate* const g, entityid id);

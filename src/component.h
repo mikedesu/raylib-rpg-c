@@ -20,7 +20,7 @@
 #include "race.h"
 #include "rect_component.h"
 #include "shield.h"
-#include "spell_effect_component.h"
+//#include "spell_effect_component.h"
 #include "stats_component.h"
 #include "stats_slot.h"
 #include "target_path_component.h"
@@ -63,7 +63,7 @@ typedef enum component_t
     C_STATS,
     C_DAMAGE,
     C_BASE_ATTACK_DAMAGE,
-    C_SPELL_EFFECT,
+    //C_SPELL_EFFECT,
     C_COUNT
 } component;
 
@@ -96,7 +96,7 @@ static inline const char* component2str(component c) {
     case C_DAMAGE: return "C_DAMAGE";
     case C_AC: return "C_AC";
     case C_ZAPPING: return "C_ZAPPING";
-    case C_SPELL_EFFECT: return "C_SPELL_EFFECT";
+    //case C_SPELL_EFFECT: return "C_SPELL_EFFECT";
     case C_BASE_ATTACK_DAMAGE: return "C_BASE_ATTACK_DAMAGE";
     case C_COUNT: return "C_COUNT";
     default: break;
@@ -123,4 +123,4 @@ void init_stats_component(stats_component* comp, entityid id);
 void init_target_path_component(target_path_component* comp, entityid id, vec3* target_path, int target_path_length);
 
 // complex components
-void init_spell_effect_component(spell_effect_component* comp, entityid id, spell_effect effect);
+//void init_spell_effect_component(spell_effect_component* comp, entityid id, spell_effect effect);
