@@ -1483,20 +1483,25 @@ void draw_title_screen(const gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
     const char* title_text = "project.rpg";
     const char* start_text = "Press any key to begin";
-    const int font_size = 20;
+
+    const int sm_font_size = 20;
+    const int font_size = 80;
+
     Color bg_color = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent background
     // Measure text
     int measure = MeasureText(title_text, font_size);
-    int start_measure = MeasureText(start_text, font_size);
+
+    int start_measure = MeasureText(start_text, sm_font_size);
     // Calculate positions
     float x = (g->windowwidth - measure) / 2.0f;
     // Center vertically
     float y = (g->windowheight - font_size * 2) / 2.0f;
     float start_x = (g->windowwidth - start_measure) / 2.0f;
     // Below the title text
-    float start_y = y + font_size * 2 + 10;
+    float start_y = y + font_size * 1 + 10;
+    ClearBackground(BLACK);
     // Draw background rectangle
-    DrawRectangle(0, 0, g->windowwidth, g->windowheight, bg_color);
+    //DrawRectangle(0, 0, g->windowwidth, g->windowheight, bg_color);
     // Draw title text
     DrawText(title_text, x, y, font_size, WHITE);
     if (show_menu) {
@@ -1505,32 +1510,24 @@ void draw_title_screen(const gamestate* const g, bool show_menu) {
         const int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
         const int menu_spacing = 10; // Space between menu items
         const int current_selection_index = g->title_screen_selection;
-
         const Color active_color = WHITE;
         const Color disabled_color = {0x99, 0x99, 0x99, 0xFF}; // Gray for disabled items
-
         for (int i = 0; i < menu_count; i++) {
-            float menu_x = (g->windowwidth - MeasureText(menu_text[i], font_size)) / 2.0f;
-            float menu_y = start_y + (i * (font_size + menu_spacing));
-
+            float menu_x = (g->windowwidth - MeasureText(menu_text[i], sm_font_size)) / 2.0f;
+            float menu_y = start_y + (i * (sm_font_size + menu_spacing));
             char buffer[1024] = {0};
-            if (i == current_selection_index) {
+            if (i == current_selection_index)
                 snprintf(buffer, sizeof(buffer), "> %s", menu_text[i]);
-            } else {
+            else
                 snprintf(buffer, sizeof(buffer), "  %s", menu_text[i]);
-            }
-
             Color selection_color = active_color;
-            if (i > 0) {
-                selection_color = disabled_color;
-            }
-
+            if (i > 0) selection_color = disabled_color;
             //DrawText(menu_text[i], menu_x, menu_y, font_size, WHITE);
-            DrawText(buffer, menu_x, menu_y, font_size, selection_color);
+            DrawText(buffer, menu_x, menu_y, sm_font_size, selection_color);
         }
     } else {
         // If show_menu is false, draw the start text
-        DrawText(start_text, start_x, start_y, font_size, WHITE);
+        DrawText(start_text, start_x, start_y, sm_font_size, WHITE);
     }
 }
 
