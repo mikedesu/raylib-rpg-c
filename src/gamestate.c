@@ -187,6 +187,8 @@ gamestate* gamestateinitptr() {
     gamestate_init_music_paths(g);
     gamestate_init_msg_history(g);
     g->current_scene = SCENE_TITLE;
+    g->title_screen_selection = 0;
+    g->max_title_screen_selections = 3;
     //gamestate_load_help_menu_text(g);
     return g;
 }

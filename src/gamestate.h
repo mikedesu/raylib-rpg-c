@@ -107,6 +107,9 @@ typedef struct gamestate {
 
     scene_t current_scene;
 
+    int title_screen_selection;
+    int max_title_screen_selections;
+
     entityid entity_turn;
 
     message_system msg_system;

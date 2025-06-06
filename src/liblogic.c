@@ -1544,7 +1544,36 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         }
     } else if (g->current_scene == SCENE_TITLE) {
         if (inputstate_any_pressed(is)) {
-            g->current_scene = SCENE_GAMEPLAY;
+            g->current_scene = SCENE_MAIN_MENU;
+        }
+    } else if (g->current_scene == SCENE_MAIN_MENU) {
+        if (inputstate_is_pressed(is, KEY_DOWN)) {
+            //if (g->title_screen_selection == g->max_title_screen_selections - 1) {
+            //    g->title_screen_selection = 0;
+            //} else {
+            //    g->title_screen_selection++;
+            //}
+            //minfo("Title screen selection: %d", g->title_screen_selection);
+        } else if (inputstate_is_pressed(is, KEY_UP)) {
+            //if (g->title_screen_selection == 0) {
+            //    g->title_screen_selection = g->max_title_screen_selections - 1;
+            //} else {
+            //    g->title_screen_selection--;
+            //}
+            //minfo("Title screen selection: %d", g->title_screen_selection);
+
+        } else if (inputstate_is_pressed(is, KEY_ENTER)) {
+            if (g->title_screen_selection == 0) {
+                g->current_scene = SCENE_GAMEPLAY;
+            }
+        }
+        //else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+        //    g->do_quit = true;
+        //}
+
+    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+        if (inputstate_any_pressed(is)) {
+            minfo("Character creation");
         }
     } else {
     }

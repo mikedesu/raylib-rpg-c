@@ -14,6 +14,7 @@
 #include "mprint.h"
 #include "race.h"
 #include "rlgl.h"
+#include "scene.h"
 #include "specifier.h"
 #include "sprite.h"
 #include "spritegroup.h"
@@ -78,7 +79,8 @@ static void draw_shield_sprite_back(const gamestate* const g, entityid id, sprit
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 static bool libdraw_check_default_animations(const gamestate* const g);
 
-void draw_title_screen(const gamestate* const g);
+//void draw_title_screen(const gamestate* const g);
+void draw_title_screen(const gamestate* const g, bool show_menu);
 static void update_weapon_for_entity(gamestate* g, entityid id, spritegroup_t* sg);
 
 static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
@@ -88,6 +90,7 @@ static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegro
 
 static void draw_inventory_menu(gamestate* const g);
 static void draw_hud(gamestate* const g);
+void draw_character_creation_screen(gamestate* const g);
 
 static bool libdraw_unload_texture(int txkey);
 static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z);
@@ -719,7 +722,7 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
     ClearBackground(BLACK);
     //EndShaderMode();
-    //libdraw_camera_lock_on(g);
+    libdraw_camera_lock_on(g);
     //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
     if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
@@ -858,7 +861,11 @@ void libdraw_drawframe(gamestate* const g) {
     //EndShaderMode();
 
     if (g->current_scene == SCENE_TITLE) {
-        draw_title_screen(g);
+        draw_title_screen(g, false);
+    } else if (g->current_scene == SCENE_MAIN_MENU) {
+        draw_title_screen(g, true);
+    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+        draw_character_creation_screen(g);
     } else if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_drawframe_2d(g);
         // should prob go inside drawframe_2d
@@ -869,20 +876,16 @@ void libdraw_drawframe(gamestate* const g) {
         draw_hud(g);
         // should prob go inside drawframe_2d
         draw_inventory_menu(g);
-
         handle_debug_panel(g);
         draw_version(g);
-
         if (g->display_quit_menu) {
             // should prob go inside drawframe_2d
             draw_quit_menu(g);
         }
-
         if (g->display_help_menu) {
             // should prob go inside drawframe_2d
             draw_help_menu(g);
         }
-
         if (g->gameover) {
             draw_gameover_menu(g);
         }
@@ -890,9 +893,7 @@ void libdraw_drawframe(gamestate* const g) {
 
     EndTextureMode();
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-
     EndDrawing();
-    //double elapsed_time = GetTime() - start_time;
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
 }
@@ -1478,28 +1479,86 @@ void draw_version(const gamestate* const g) {
     DrawTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
 }
 
-void draw_title_screen(const gamestate* const g) {
+void draw_title_screen(const gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
     const char* title_text = "project.rpg";
     const char* start_text = "Press any key to begin";
     const int font_size = 20;
     Color bg_color = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent background
-
     // Measure text
     int measure = MeasureText(title_text, font_size);
     int start_measure = MeasureText(start_text, font_size);
+    // Calculate positions
+    float x = (g->windowwidth - measure) / 2.0f;
+    // Center vertically
+    float y = (g->windowheight - font_size * 2) / 2.0f;
+    float start_x = (g->windowwidth - start_measure) / 2.0f;
+    // Below the title text
+    float start_y = y + font_size * 2 + 10;
+    // Draw background rectangle
+    DrawRectangle(0, 0, g->windowwidth, g->windowheight, bg_color);
+    // Draw title text
+    DrawText(title_text, x, y, font_size, WHITE);
+    if (show_menu) {
+        // If show_menu is true, draw the new game, continue, options selection text
+        const char* menu_text[3] = {"New Game", "Continue", "Settings"};
+        const int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
+        const int menu_spacing = 10; // Space between menu items
+        const int current_selection_index = g->title_screen_selection;
 
+        const Color active_color = WHITE;
+        const Color disabled_color = {0x99, 0x99, 0x99, 0xFF}; // Gray for disabled items
+
+        for (int i = 0; i < menu_count; i++) {
+            float menu_x = (g->windowwidth - MeasureText(menu_text[i], font_size)) / 2.0f;
+            float menu_y = start_y + (i * (font_size + menu_spacing));
+
+            char buffer[1024] = {0};
+            if (i == current_selection_index) {
+                snprintf(buffer, sizeof(buffer), "> %s", menu_text[i]);
+            } else {
+                snprintf(buffer, sizeof(buffer), "  %s", menu_text[i]);
+            }
+
+            Color selection_color = active_color;
+            if (i > 0) {
+                selection_color = disabled_color;
+            }
+
+            //DrawText(menu_text[i], menu_x, menu_y, font_size, WHITE);
+            DrawText(buffer, menu_x, menu_y, font_size, selection_color);
+        }
+    } else {
+        // If show_menu is false, draw the start text
+        DrawText(start_text, start_x, start_y, font_size, WHITE);
+    }
+}
+
+void draw_character_creation_screen(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    const char* title_text = "Character Creation";
+    // we will draw some more stuff here later
+    // for right now, lets get some text up that shows your basic stats
+    // similar to how we draw the hud screen
+    // we can use placeholder values just to mock the screen up
+    const char* placeholder_text = "Name: Hero\nRace: Human\nClass: Warrior\nStrength: 10\nDexterity: 10\nConstitution: 10\nIntelligence: 10\nWisdom: 10\nCharisma: 10";
+    const int font_size = 20;
+    Color bg_color = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent background
+
+    // Measure text
+    int measure = MeasureText(title_text, font_size);
+    int placeholder_measure = MeasureText(placeholder_text, font_size);
     // Calculate positions
     float x = (g->windowwidth - measure) / 2.0f;
     float y = (g->windowheight - font_size * 2) / 2.0f; // Center vertically
 
-    float start_x = (g->windowwidth - start_measure) / 2.0f;
-    float start_y = y + font_size * 2 + 10; // Below the title text
+    float placeholder_x = (g->windowwidth - placeholder_measure) / 2.0f;
+    float placeholder_y = y + font_size * 2 + 10; // Below the title text
 
     // Draw background rectangle
     DrawRectangle(0, 0, g->windowwidth, g->windowheight, bg_color);
     // Draw title text
     DrawText(title_text, x, y, font_size, WHITE);
-    // Draw start text
-    DrawText(start_text, start_x, start_y, font_size, WHITE);
+    // Draw placeholder text
+    DrawText(placeholder_text, placeholder_x, placeholder_y, font_size, WHITE);
 }
