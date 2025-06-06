@@ -47,7 +47,7 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
 //static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
 static int get_hitdie_for_race(race_t race);
-static roll get_base_attack_damage_for_race(race_t race);
+static vec3 get_base_attack_damage_for_race(race_t race);
 
 static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
 
@@ -409,7 +409,7 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
         if (attacker_weapon_id == ENTITYID_INVALID) {
             // no weapon
             // get the entity's base attack damage
-            roll dmg_roll = g_get_base_attack_damage(g, atk_id);
+            vec3 dmg_roll = g_get_base_attack_damage(g, atk_id);
             dmg = do_roll(dmg_roll);
             const int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
             dmg += atk_bonus;
@@ -417,7 +417,7 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
             // weapon
             // we will calculate damage based on weapon attributes
             massert(g_has_damage(g, attacker_weapon_id), "attacker weapon does not have damage attached");
-            roll dmg_roll = g_get_damage(g, attacker_weapon_id);
+            vec3 dmg_roll = g_get_damage(g, attacker_weapon_id);
             dmg = do_roll(dmg_roll);
             const int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
             dmg += atk_bonus;
@@ -736,24 +736,25 @@ static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* 
     massert(loc.y >= 0, "y is out of bounds: %s: %d", name, loc.y);
     massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
     // can we create an entity at this location? no entities can be made on wall-types etc
+
     tile_t* const tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
-    if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
-        //merror("cannot create entity on wall");
-        return ENTITYID_INVALID;
-    }
+    if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) return ENTITYID_INVALID;
+
     //if (tile_has_live_npcs(g, tile)) {
     //merror("cannot create entity on tile with NPC");
     //    return ENTITYID_INVALID;
     //}
+
     entityid id = g_add_entity(g);
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_NPC);
     g_add_race(g, id, rt);
     g_add_direction(g, id, DIR_RIGHT);
+
     vec3 loc_vec = {loc.x, loc.y, loc.z};
     g_add_location(g, id, loc_vec);
-    //g_add_sprite_move(g, id, (vec3){0, 0, 0}); // default
+
     g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
     g_add_dead(g, id, 0);
     g_add_update(g, id, false);
@@ -766,7 +767,8 @@ static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* 
     g_add_target(g, id, (vec3){-1, -1, -1});
     g_add_target_path(g, id);
     g_add_equipment(g, id);
-    g_add_base_attack_damage(g, id, (roll){1, 4, 0});
+    g_add_base_attack_damage(g, id, (vec3){1, 4, 0});
+
     g_add_stats(g, id);
     g_set_stat(g, id, STATS_LEVEL, 1);
     g_set_stat(g, id, STATS_XP, 0);
@@ -779,7 +781,9 @@ static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* 
     g_set_stat(g, id, STATS_CON, 10);
     g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
     g_set_stat(g, id, STATS_AC, 10);
+
     if (!df_add_at(df, id, loc.x, loc.y)) return ENTITYID_INVALID;
+
     return id;
 }
 
@@ -825,7 +829,7 @@ static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, con
     entityid id = item_create(g, ITEM_WEAPON, loc, name);
     if (id == ENTITYID_INVALID) return ENTITYID_INVALID;
     g_add_weapontype(g, id, type);
-    g_add_damage(g, id, (roll){0, 0, 0});
+    g_add_damage(g, id, (vec3){0, 0, 0});
     return id;
 }
 
@@ -841,7 +845,7 @@ static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, con
 
 static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, const char* name) {
     massert(g, "gamestate is NULL");
-    int random_ac = do_roll((roll){1, 4, 0});
+    int random_ac = do_roll((vec3){1, 4, 0});
     char name_buffer[128];
     if (name && name[0]) {
         snprintf(name_buffer, sizeof(name_buffer), "%s + %d", name, random_ac);
@@ -887,17 +891,17 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
     g_set_type(g, id, ENTITY_PLAYER);
     //int str_roll = do_roll_best_of_3((roll){3, 6, 0});
     //int con_roll = do_roll_best_of_3((roll){3, 6, 0});
-    int str_roll = do_roll_best_of_3((roll){3, 6, 0});
-    int con_roll = do_roll_best_of_3((roll){3, 6, 0});
-    int dex_roll = do_roll_best_of_3((roll){3, 6, 0});
+    int str_roll = do_roll_best_of_3((vec3){3, 6, 0});
+    int con_roll = do_roll_best_of_3((vec3){3, 6, 0});
+    int dex_roll = do_roll_best_of_3((vec3){3, 6, 0});
     g_set_stat(g, id, STATS_STR, str_roll);
     g_set_stat(g, id, STATS_CON, con_roll);
     g_set_stat(g, id, STATS_DEX, dex_roll);
     int hitdie = 8;
     g_set_stat(g, id, STATS_HITDIE, hitdie);
-    int maxhp_roll = do_roll_best_of_3((roll){1, hitdie, 0}) + bonus_calc(con_roll);
+    int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
     while (maxhp_roll < 1) {
-        maxhp_roll = do_roll_best_of_3((roll){1, hitdie, 0}) + bonus_calc(con_roll);
+        maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
     }
     g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
     g_set_stat(g, id, STATS_HP, maxhp_roll);
@@ -1704,7 +1708,7 @@ static void init_dagger_test(gamestate* g) {
         id = weapon_create(g, WEAPON_DAGGER, loc, "dagger");
         //if (id != ENTITYID_INVALID) {
         //massert(g_set_damage(g, id, (roll){1, 4, 0}), "Failed to set damage");
-        g_set_damage(g, id, (roll){1, 4, 0});
+        g_set_damage(g, id, (vec3){1, 4, 0});
         //}
     }
 }
@@ -1756,19 +1760,19 @@ static int get_hitdie_for_race(race_t race) {
     return hit_die;
 }
 
-static roll get_base_attack_damage_for_race(race_t race) {
-    roll r = {1, 4, 0}; // Default base attack damage
+static vec3 get_base_attack_damage_for_race(race_t race) {
+    vec3 r = {1, 4, 0}; // Default base attack damage
     switch (race) {
-    case RACE_GREEN_SLIME: r = (roll){1, 1, 0}; break;
-    case RACE_BAT: r = (roll){1, 2, 0}; break;
-    case RACE_HALFLING: r = (roll){1, 4, 0}; break;
-    case RACE_GOBLIN: r = (roll){1, 4, 0}; break;
-    case RACE_WOLF: r = (roll){1, 6, 0}; break;
-    case RACE_HUMAN: r = (roll){1, 4, 0}; break;
-    case RACE_ELF: r = (roll){1, 4, 0}; break;
-    case RACE_DWARF: r = (roll){1, 4, 0}; break;
-    case RACE_ORC: r = (roll){1, 6, 0}; break;
-    case RACE_WARG: r = (roll){1, 12, 0}; break;
+    case RACE_GREEN_SLIME: r = (vec3){1, 1, 0}; break;
+    case RACE_BAT: r = (vec3){1, 2, 0}; break;
+    case RACE_HALFLING: r = (vec3){1, 4, 0}; break;
+    case RACE_GOBLIN: r = (vec3){1, 4, 0}; break;
+    case RACE_WOLF: r = (vec3){1, 6, 0}; break;
+    case RACE_HUMAN: r = (vec3){1, 4, 0}; break;
+    case RACE_ELF: r = (vec3){1, 4, 0}; break;
+    case RACE_DWARF: r = (vec3){1, 4, 0}; break;
+    case RACE_ORC: r = (vec3){1, 6, 0}; break;
+    case RACE_WARG: r = (vec3){1, 12, 0}; break;
     default: break;
     }
     return r;
@@ -1821,17 +1825,17 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         int floor = loc.z + 1;
         //minfo("Spawning entity at %d, %d, %d on floor %d with HP %d", loc.x, loc.y, loc.z, floor, g_get_stat(g, id, STATS_HP));
         int hit_die = get_hitdie_for_race(race);
-        roll r = {1, hit_die, 0};
+        vec3 r = {1, hit_die, 0};
         int max_hp = do_roll(r);
         g_set_stat(g, id, STATS_HITDIE, hit_die);
         g_set_stat(g, id, STATS_AC, 10);
         g_set_stat(g, id, STATS_XP, 0);
         g_set_stat(g, id, STATS_LEVEL, 1);
-        roll base_attack_dmg = get_base_attack_damage_for_race(race);
+        vec3 base_attack_dmg = get_base_attack_damage_for_race(race);
         g_set_base_attack_damage(g, id, base_attack_dmg);
-        g_set_stat(g, id, STATS_STR, do_roll_best_of_3((roll){3, 6, 0}));
-        g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((roll){3, 6, 0}));
-        g_set_stat(g, id, STATS_CON, do_roll_best_of_3((roll){3, 6, 0}));
+        g_set_stat(g, id, STATS_STR, do_roll_best_of_3((vec3){3, 6, 0}));
+        g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
+        g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
         max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
         if (max_hp <= 0) {
             //merror("Max HP is less than or equal to 0, setting to 1");
@@ -1926,7 +1930,7 @@ static void handle_level_up(gamestate* const g, entityid id) {
     if (con_bonus < 0) con_bonus = 0; // Ensure Constitution bonus is not negative
     int hitdie = g_get_stat(g, id, STATS_HITDIE);
     // roll the hitdie
-    roll r = {1, hitdie, 0}; // 1d(hitdie)
+    vec3 r = {1, hitdie, 0}; // 1d(hitdie)
     int hp_gain = do_roll(r) + con_bonus; // Add Constitution bonus to HP gain
     int old_max_hp = g_get_stat(g, id, STATS_MAXHP);
     int new_max_hp = old_max_hp + hp_gain; // Increase max HP by the rolled amount

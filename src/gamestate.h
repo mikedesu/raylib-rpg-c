@@ -1,11 +1,11 @@
 #pragma once
 
 //#include "ac_component.h"
-#include "base_attack_damage_component.h"
+//#include "base_attack_damage_component.h"
 #include "component.h"
 #include "component_table.h"
 #include "controlmode.h"
-#include "damage_component.h"
+//#include "damage_component.h"
 #include "debugpanel.h"
 #include "direction.h"
 #include "dungeon.h"
@@ -157,8 +157,9 @@ typedef struct gamestate {
     equipment_component* equipment_list;
     stats_component* stats_list;
 
-    damage_component* damage_list;
-    base_attack_damage_component* base_attack_damage_list;
+    vec3_component* damage_list;
+    //base_attack_damage_component* base_attack_damage_list;
+    vec3_component* base_attack_damage_list;
 
     spell_effect_component* spell_effect_list;
 
@@ -319,10 +320,10 @@ bool g_set_potiontype(gamestate* const g, entityid id, int type);
 bool g_is_potion(const gamestate* const g, entityid id);
 potiontype g_get_potiontype(const gamestate* const g, entityid id);
 
-bool g_add_damage(gamestate* const g, entityid id, roll r);
+bool g_add_damage(gamestate* const g, entityid id, vec3 r);
 bool g_has_damage(const gamestate* const g, entityid id);
-bool g_set_damage(gamestate* const g, entityid id, roll r);
-roll g_get_damage(const gamestate* const g, entityid id);
+bool g_set_damage(gamestate* const g, entityid id, vec3 r);
+vec3 g_get_damage(const gamestate* const g, entityid id);
 
 bool g_add_ac(gamestate* const g, entityid id, int ac);
 bool g_has_ac(const gamestate* const g, entityid id);
@@ -346,7 +347,7 @@ bool g_has_spell_effect(const gamestate* const g, entityid id);
 bool g_set_spell_effect(gamestate* const g, entityid id, spell_effect effect);
 spell_effect g_get_spell_effect(const gamestate* const g, entityid id);
 
-bool g_add_base_attack_damage(gamestate* const g, entityid id, roll damage);
+bool g_add_base_attack_damage(gamestate* const g, entityid id, vec3 damage);
 bool g_has_base_attack_damage(const gamestate* const g, entityid id);
-bool g_set_base_attack_damage(gamestate* const g, entityid id, roll damage);
-roll g_get_base_attack_damage(const gamestate* const g, entityid id);
+bool g_set_base_attack_damage(gamestate* const g, entityid id, vec3 damage);
+vec3 g_get_base_attack_damage(const gamestate* const g, entityid id);

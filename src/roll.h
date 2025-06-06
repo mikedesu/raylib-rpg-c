@@ -1,29 +1,31 @@
 #pragma once
 
 #include "massert.h"
+#include "vec3.h"
 #include <stdlib.h>
 
-typedef struct roll_t {
-    int n;
-    int sides;
-    int modifier;
-} roll;
+//typedef struct roll_t {
+//    int n;
+//    int sides;
+//    int modifier;
+//} roll;
 
-static inline int do_roll(roll r) {
-    massert(r.n > 0, "n is negative");
-    massert(r.sides > 0, "sides is negative");
+//static inline int do_roll(roll r) {
+static inline int do_roll(vec3 r) {
+    massert(r.x > 0, "n is negative");
+    massert(r.y > 0, "sides is negative");
     int total = 0;
     // if sides is 1, then we just return n + modifier
-    if (r.sides == 1) {
-        return r.n + r.modifier;
+    if (r.y == 1) {
+        return r.x + r.z;
     }
-    for (int i = 0; i < r.n; i++) total += (rand() % r.sides) + 1;
-    return total + r.modifier;
+    for (int i = 0; i < r.x; i++) total += (rand() % r.y) + 1;
+    return total + r.z;
 }
 
-static inline int do_roll_best_of_3(roll r) {
-    massert(r.n > 0, "n is negative");
-    massert(r.sides > 0, "sides is negative");
+static inline int do_roll_best_of_3(vec3 r) {
+    massert(r.x > 0, "n is negative");
+    massert(r.y > 0, "sides is negative");
     int a, b, c;
     a = do_roll(r);
     b = do_roll(r);

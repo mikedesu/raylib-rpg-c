@@ -3,11 +3,10 @@
 #include "arrow.h"
 #include "arrow_component.h"
 #include "attacking_component.h"
-#include "attrib_effect.h"
-#include "base_attack_damage_component.h"
+//#include "attrib_effect.h"
 #include "block_success_component.h"
 #include "blocking_component.h"
-#include "damage_component.h"
+//#include "damage_component.h"
 #include "damaged_component.h"
 #include "entityid.h"
 #include "equipment_component.h"
@@ -116,10 +115,6 @@ void init_vec3_component(vec3_component* comp, entityid id, vec3 v);
 
 // Rectangle component
 void init_rect_component(rect_component* comp, entityid id, Rectangle rect);
-
-// roll components: 3 integer
-void init_damage_component(damage_component* comp, entityid id, roll r);
-void init_base_attack_damage_component(base_attack_damage_component* comp, entityid id, roll r);
 
 // list components
 void init_inventory_component(inventory_component* comp, entityid id);

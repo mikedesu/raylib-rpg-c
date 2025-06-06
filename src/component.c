@@ -179,14 +179,14 @@ void init_stats_component(stats_component* comp, entityid id) {
 //    comp->capacity = capacity;
 //}
 
-void init_damage_component(damage_component* comp, entityid id, roll r) {
-    massert(comp != NULL, "comp is NULL");
-    if (!comp) return;
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (id == ENTITYID_INVALID) return;
-    comp->id = id;
-    comp->r = r;
-}
+//void init_damage_component(damage_component* comp, entityid id, roll r) {
+//    massert(comp != NULL, "comp is NULL");
+//    if (!comp) return;
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (id == ENTITYID_INVALID) return;
+//    comp->id = id;
+//    comp->r = r;
+//}
 
 //void init_zapping_component(zapping_component* comp, entityid id, bool zapping) {
 //    massert(comp != NULL, "comp is NULL");
@@ -206,11 +206,11 @@ void init_spell_effect_component(spell_effect_component* comp, entityid id, spel
     comp->effect = effect;
 }
 
-void init_base_attack_damage_component(base_attack_damage_component* comp, entityid id, roll r) {
-    massert(comp != NULL, "comp is NULL");
-    if (!comp) return;
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (id == ENTITYID_INVALID) return;
-    comp->id = id;
-    comp->damage = r;
-}
+//void init_base_attack_damage_component(base_attack_damage_component* comp, entityid id, roll r) {
+//    massert(comp != NULL, "comp is NULL");
+//    if (!comp) return;
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (id == ENTITYID_INVALID) return;
+//    comp->id = id;
+//    comp->damage = r;
+//}

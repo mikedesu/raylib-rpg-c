@@ -17,9 +17,8 @@ typedef struct potion_effect_t {
     potiontype type;
     stats_slot stat;
     bool curative;
-    roll calc;
+    //roll calc;
     //roll duration;
-
 } potioneffect;
 
 // example "effect" based on attack: 1d3 damage

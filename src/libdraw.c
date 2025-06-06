@@ -1362,10 +1362,10 @@ static void draw_inventory_menu(gamestate* const g) {
         const char* name = g_get_name(g, item_id);
         itemtype item_type = g_get_itemtype(g, item_id);
         if (g_has_damage(g, item_id)) {
-            roll dmg_roll = g_get_damage(g, item_id);
-            int n = dmg_roll.n;
-            int sides = dmg_roll.sides;
-            int modifier = dmg_roll.modifier;
+            vec3 dmg_roll = g_get_damage(g, item_id);
+            int n = dmg_roll.x;
+            int sides = dmg_roll.y;
+            int modifier = dmg_roll.z;
             if (modifier) {
                 snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d+%d", name, item_type, n, sides, modifier);
             } else {

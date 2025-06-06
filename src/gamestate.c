@@ -105,7 +105,7 @@ gamestate* gamestateinitptr() {
     g->shieldtype_list_count = g->potion_type_list_count = 0;
     g->damage_list_count = g->ac_list_count = 0;
     g->zapping_list_count = 0;
-    g->spell_effect_list_count = 0;
+    //g->spell_effect_list_count = 0;
     g->base_attack_damage_list_count = 0;
 
     const size_t n = LIST_INIT_CAPACITY;
@@ -118,7 +118,7 @@ gamestate* gamestateinitptr() {
     g->shieldtype_list_capacity = g->potion_type_list_capacity = n;
     g->damage_list_capacity = g->ac_list_capacity = n;
     g->zapping_list_capacity = n;
-    g->spell_effect_list_capacity = n;
+    //g->spell_effect_list_capacity = n;
     g->base_attack_damage_list_capacity = n;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * n);
@@ -175,11 +175,11 @@ gamestate* gamestateinitptr() {
     massert(g->ac_list, "g->ac_list is NULL");
     g->zapping_list = (int_component*)malloc(sizeof(int_component) * n);
     massert(g->zapping_list, "g->zapping_list is NULL");
-    g->damage_list = (damage_component*)malloc(sizeof(damage_component) * n);
+    g->damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
     massert(g->damage_list, "g->damage_list is NULL");
-    g->spell_effect_list = (spell_effect_component*)malloc(sizeof(spell_effect_component) * n);
-    massert(g->spell_effect_list, "g->spell_effect_list is NULL");
-    g->base_attack_damage_list = (base_attack_damage_component*)malloc(sizeof(base_attack_damage_component) * n);
+    //g->spell_effect_list = (spell_effect_component*)malloc(sizeof(spell_effect_component) * n);
+    //massert(g->spell_effect_list, "g->spell_effect_list is NULL");
+    g->base_attack_damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
     massert(g->base_attack_damage_list, "g->base_attack_damage_list is NULL");
     g->dirty_entities = false;
     g->new_entityid_begin = g->new_entityid_end = -1;
@@ -290,7 +290,7 @@ void gamestatefree(gamestate* g) {
     free(g->damage_list);
     free(g->ac_list);
     free(g->zapping_list);
-    free(g->spell_effect_list);
+    //free(g->spell_effect_list);
     free(g->base_attack_damage_list);
     free(g);
     //msuccess("Freed gamestate");
@@ -502,9 +502,9 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     case C_TARGET_PATH: init_target_path_component((target_path_component*)c_ptr, id, NULL, 0);
     case C_EQUIPMENT: init_equipment_component((equipment_component*)c_ptr, id); break;
     case C_STATS: init_stats_component((stats_component*)c_ptr, id); break;
-    case C_DAMAGE: init_damage_component((damage_component*)c_ptr, id, *(roll*)data); break;
-    case C_BASE_ATTACK_DAMAGE: init_base_attack_damage_component((base_attack_damage_component*)c_ptr, id, *(roll*)data); break;
-    case C_SPELL_EFFECT: init_spell_effect_component((spell_effect_component*)c_ptr, id, *(spell_effect*)data); break;
+    case C_DAMAGE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
+    case C_BASE_ATTACK_DAMAGE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
+    //case C_SPELL_EFFECT: init_spell_effect_component((spell_effect_component*)c_ptr, id, *(spell_effect*)data); break;
     default: merror("Unsupported component type: %s", component2str(comp)); return false;
     }
     (*c_count)++;
@@ -1495,12 +1495,10 @@ potiontype g_get_potiontype(const gamestate* const g, entityid id) {
     return POTION_NONE;
 }
 
-bool g_add_damage(gamestate* const g, entityid id, roll r) {
+bool g_add_damage(gamestate* const g, entityid id, vec3 r) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    // make sure the entity has the damage component
-    //massert(g_has_component(g, id, C_DAMAGE), "id %d does not have a damage component", id);
-    return g_add_component(g, id, C_DAMAGE, (void*)&r, sizeof(damage_component), (void**)&g->damage_list, &g->damage_list_count, &g->damage_list_capacity);
+    return g_add_component(g, id, C_DAMAGE, (void*)&r, sizeof(vec3_component), (void**)&g->damage_list, &g->damage_list_count, &g->damage_list_capacity);
 }
 
 bool g_has_damage(const gamestate* const g, entityid id) {
@@ -1509,41 +1507,26 @@ bool g_has_damage(const gamestate* const g, entityid id) {
     return g_has_component(g, id, C_DAMAGE);
 }
 
-bool g_set_damage(gamestate* const g, entityid id, roll r) {
+bool g_set_damage(gamestate* const g, entityid id, vec3 r) {
     massert(g, "g is NULL");
-    //massert(id != ENTITYID_INVALID, "id is invalid");
-    if (id == ENTITYID_INVALID) {
-        merror("id is invalid");
-        return false;
-    }
-    if (g->damage_list == NULL) {
-        merror("g->damage_list is NULL");
-        return false;
-    }
+    if (id == ENTITYID_INVALID) return false;
+    if (g->damage_list == NULL) return false;
     for (int i = 0; i < g->damage_list_count; i++) {
         if (g->damage_list[i].id == id) {
-            g->damage_list[i].r = r;
+            g->damage_list[i].data = r;
             return true;
         }
     }
-    merror("Could not find id %d in damage list", id);
     return false;
 }
 
-roll g_get_damage(const gamestate* const g, entityid id) {
+vec3 g_get_damage(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    //massert(damage, "damage is NULL");
-    if (g->damage_list == NULL) {
-        merror("g->damage_list is NULL");
-        return (roll){0};
-    }
-    for (int i = 0; i < g->damage_list_count; i++) {
-        if (g->damage_list[i].id == id) {
-            return g->damage_list[i].r;
-        }
-    }
-    return (roll){0};
+    if (g->damage_list == NULL) return (vec3){0, 0, 0};
+    for (int i = 0; i < g->damage_list_count; i++)
+        if (g->damage_list[i].id == id) return g->damage_list[i].data;
+    return (vec3){0, 0, 0};
 }
 
 bool g_add_ac(gamestate* const g, entityid id, int ac) {
@@ -1639,49 +1622,49 @@ bool g_get_zapping(const gamestate* const g, entityid id) {
     return false; // not zapping
 }
 
-bool g_add_spell_effect(gamestate* const g, entityid id, spell_effect effect) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // make sure the entity has the spell effect component
-    return g_add_component(
-        g, id, C_SPELL_EFFECT, (void*)&effect, sizeof(spell_effect_component), (void**)&g->spell_effect_list, &g->spell_effect_list_count, &g->spell_effect_list_capacity);
-}
+//bool g_add_spell_effect(gamestate* const g, entityid id, spell_effect effect) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    // make sure the entity has the spell effect component
+//    return g_add_component(
+//        g, id, C_SPELL_EFFECT, (void*)&effect, sizeof(spell_effect_component), (void**)&g->spell_effect_list, &g->spell_effect_list_count, &g->spell_effect_list_capacity);
+//}
 
-bool g_has_spell_effect(const gamestate* const g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_component(g, id, C_SPELL_EFFECT);
-}
+//bool g_has_spell_effect(const gamestate* const g, entityid id) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    return g_has_component(g, id, C_SPELL_EFFECT);
+//}
 
-bool g_set_spell_effect(gamestate* const g, entityid id, spell_effect effect) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->spell_effect_list == NULL) return false;
-    for (int i = 0; i < g->spell_effect_list_count; i++) {
-        if (g->spell_effect_list[i].id == id) {
-            g->spell_effect_list[i].effect = effect;
-            return true;
-        }
-    }
-    return false;
-}
+//bool g_set_spell_effect(gamestate* const g, entityid id, spell_effect effect) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (g->spell_effect_list == NULL) return false;
+//    for (int i = 0; i < g->spell_effect_list_count; i++) {
+//        if (g->spell_effect_list[i].id == id) {
+//            g->spell_effect_list[i].effect = effect;
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
-spell_effect g_get_spell_effect(const gamestate* const g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->spell_effect_list == NULL) {
-        merror("g->spell_effect_list is NULL");
-        return (spell_effect){-1, ELEMENTAL_NONE, -1, (roll){0, 0, 0}};
-    }
-    for (int i = 0; i < g->spell_effect_list_count; i++) {
-        if (g->spell_effect_list[i].id == id) {
-            return g->spell_effect_list[i].effect;
-        }
-    }
-    return (spell_effect){-1, ELEMENTAL_NONE, -1, (roll){0, 0, 0}};
-}
+//spell_effect g_get_spell_effect(const gamestate* const g, entityid id) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (g->spell_effect_list == NULL) {
+//        merror("g->spell_effect_list is NULL");
+//        return (spell_effect){-1, ELEMENTAL_NONE, -1, (roll){0, 0, 0}};
+//    }
+//    for (int i = 0; i < g->spell_effect_list_count; i++) {
+//        if (g->spell_effect_list[i].id == id) {
+//            return g->spell_effect_list[i].effect;
+//        }
+//    }
+//    return (spell_effect){-1, ELEMENTAL_NONE, -1, (roll){0, 0, 0}};
+//}
 
-bool g_add_base_attack_damage(gamestate* const g, entityid id, roll damage) {
+bool g_add_base_attack_damage(gamestate* const g, entityid id, vec3 damage) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the base attack damage component
@@ -1689,7 +1672,7 @@ bool g_add_base_attack_damage(gamestate* const g, entityid id, roll damage) {
                            id,
                            C_BASE_ATTACK_DAMAGE,
                            (void*)&damage,
-                           sizeof(base_attack_damage_component),
+                           sizeof(vec3_component),
                            (void**)&g->base_attack_damage_list,
                            &g->base_attack_damage_list_count,
                            &g->base_attack_damage_list_capacity);
@@ -1701,33 +1684,25 @@ bool g_has_base_attack_damage(const gamestate* const g, entityid id) {
     return g_has_component(g, id, C_BASE_ATTACK_DAMAGE);
 }
 
-bool g_set_base_attack_damage(gamestate* const g, entityid id, roll damage) {
+bool g_set_base_attack_damage(gamestate* const g, entityid id, vec3 damage) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->base_attack_damage_list == NULL) {
-        merror("g->base_attack_damage_list is NULL");
-        return false;
-    }
+    if (g->base_attack_damage_list == NULL) return false;
     for (int i = 0; i < g->base_attack_damage_list_count; i++) {
         if (g->base_attack_damage_list[i].id == id) {
-            g->base_attack_damage_list[i].damage = damage;
+            g->base_attack_damage_list[i].data = damage;
             return true;
         }
     }
     return false;
 }
 
-roll g_get_base_attack_damage(const gamestate* const g, entityid id) {
+vec3 g_get_base_attack_damage(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->base_attack_damage_list == NULL) {
-        merror("g->base_attack_damage_list is NULL");
-        return (roll){0, 0, 0};
-    }
+    if (g->base_attack_damage_list == NULL) return (vec3){0, 0, 0};
     for (int i = 0; i < g->base_attack_damage_list_count; i++) {
-        if (g->base_attack_damage_list[i].id == id) {
-            return g->base_attack_damage_list[i].damage;
-        }
+        if (g->base_attack_damage_list[i].id == id) return g->base_attack_damage_list[i].data;
     }
-    return (roll){0, 0, 0};
+    return (vec3){0, 0, 0};
 }

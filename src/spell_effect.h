@@ -2,12 +2,12 @@
 
 #include "elemental.h"
 #include "entityid.h"
-#include "roll.h"
+//#include "roll.h"
 
 typedef struct spell_effect_t {
     entityid id;
     elemental element;
     int area;
-    roll damage;
+    //roll damage;
 
 } spell_effect;

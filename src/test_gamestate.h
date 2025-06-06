@@ -107,11 +107,11 @@ TEST(test_gamestate_components) {
     ASSERT(g_has_item_in_inventory(g, id, item_id), "item should be in inventory");
 
     // Test damage components
-    roll damage_roll = {1, 6, 2};
+    vec3 damage_roll = {1, 6, 2};
     ASSERT(g_add_damage(g, id, damage_roll), "add damage failed");
     ASSERT(g_has_damage(g, id), "damage should exist");
-    roll actual_damage = g_get_damage(g, id);
-    ASSERT(actual_damage.n == damage_roll.n && actual_damage.sides == damage_roll.sides && actual_damage.modifier == damage_roll.modifier, "damage should match");
+    vec3 actual_damage = g_get_damage(g, id);
+    ASSERT(actual_damage.x == damage_roll.x && actual_damage.y == damage_roll.y && actual_damage.z == damage_roll.z, "damage should match");
 
     // Test AC components
     ASSERT(g_add_ac(g, id, 15), "add AC failed");
