@@ -9,7 +9,6 @@ spritegroup_t* spritegroup_create(int capacity) {
     if (capacity <= 0) return NULL;
     spritegroup_t* sg = malloc(sizeof(spritegroup_t));
     if (!sg) {
-        merror("failed to allocate memory for spritegroup_t");
         return NULL;
     }
     sg->current = sg->size = sg->off_x = sg->off_y = sg->default_anim = sg->id = 0;
@@ -17,7 +16,6 @@ spritegroup_t* spritegroup_create(int capacity) {
     sg->capacity = capacity;
     sg->sprites = malloc(sizeof(sprite*) * capacity);
     if (!sg->sprites) {
-        merror("failed to allocate memory for spritegroup_t->sprites");
         free(sg);
         return NULL;
     }
@@ -25,47 +23,29 @@ spritegroup_t* spritegroup_create(int capacity) {
     sg->specifier = SPECIFIER_NONE;
     //sg->move_rate = 1.0 / DEFAULT_ANIM_SPEED;
     sg->move_rate = 1.0;
-    //sg->move_rate = DEFAULT_TILE_SIZE;
     return sg;
 }
 
-void spritegroup_set_specifier(spritegroup_t* const sg, specifier_t spec) {
-    if (!sg) {
-        merror("spritegroup is NULL");
-        return;
-    }
-    sg->specifier = (spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT) ? spec : SPECIFIER_NONE;
-}
+//void spritegroup_set_specifier(spritegroup_t* const sg, specifier_t spec) {
+//    if (!sg) {
+//        return;
+//    }
+//    sg->specifier = (spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT) ? spec : SPECIFIER_NONE;
+//}
 
 void spritegroup_destroy(spritegroup_t* sg) {
-    //minfo("destroying spritegroup_t");
-    if (!sg) {
-        merror("spritegroup is NULL");
-        return;
-    }
-    if (!sg->sprites) {
-        merror("spritegroup->sprites is NULL");
-        return;
-    }
+    if (!sg) return;
+    if (!sg->sprites) return;
     for (int i = 0; i < sg->size; i++) sprite_destroy(sg->sprites[i]);
     free(sg->sprites);
     free(sg);
 }
 
 void spritegroup_add(spritegroup_t* const sg, sprite* s) {
-    if (!sg) {
-        merror("spritegroup is NULL");
-        return;
-    }
-    if (!s) {
-        merror("sprite is NULL");
-        return;
-    }
-    if (sg->size < sg->capacity) {
-        sg->sprites[sg->size++] = s;
-    } else {
-        mwarning("spritegroup is full");
-    }
+    if (!sg) return;
+    if (!s) return;
+    if (sg->size < sg->capacity) sg->sprites[sg->size++] = s;
+    //else mwarning("spritegroup is full");
 }
 
 void spritegroup_set(spritegroup_t* const sg, int index, sprite* s) {
@@ -81,18 +61,10 @@ void spritegroup_set(spritegroup_t* const sg, int index, sprite* s) {
 void spritegroup_setcontexts(spritegroup_t* const sg, int context) {
     massert(sg, "spritegroup is NULL");
     for (int i = 0; i < sg->size; i++) {
-        if (!sg->sprites[i]) {
-            continue;
-        }
-        if (sg->sprites[i]->numcontexts <= 0) {
-            continue;
-        }
-        if (context < 0) {
-            continue;
-        }
-        if (context >= sg->sprites[i]->numcontexts) {
-            continue;
-        }
+        if (!sg->sprites[i]) continue;
+        if (sg->sprites[i]->numcontexts <= 0) continue;
+        if (context < 0) continue;
+        if (context >= sg->sprites[i]->numcontexts) continue;
         sprite_setcontext(sg->sprites[i], context);
     }
 }
@@ -114,9 +86,7 @@ sprite* sg_get_current(spritegroup_t* const sg) {
 sprite* sg_get_current_plus_one(spritegroup_t* const sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->current >= 0, "current is negative");
-    if (sg->current + 1 >= sg->size) {
-        return NULL;
-    }
+    if (sg->current + 1 >= sg->size) return NULL;
     return sg->sprites[sg->current + 1];
 }
 
@@ -124,15 +94,13 @@ bool spritegroup_set_current(spritegroup_t* const sg, int index) {
     massert(sg, "spritegroup is NULL");
     massert(index >= 0, "index is negative: %d, %d", index, sg->size);
     massert(index < sg->size, "index is out of bounds for id %d: %d, %d", sg->id, index, sg->size);
-
     // Debug log for death animation tracking
     if (sg->current != index) minfo("Animation change: %d -> %d (EntityID: %d)", sg->current, index, sg->id);
-
     sg->current = index;
     return true;
 }
 
-specifier_t spritegroup_get_specifier(spritegroup_t* const sg) { return sg ? sg->specifier : SPECIFIER_NONE; }
+//specifier_t spritegroup_get_specifier(spritegroup_t* const sg) { return sg ? sg->specifier : SPECIFIER_NONE; }
 
 int spritegroup_get_first_context(spritegroup_t* const sg) {
     massert(sg, "spritegroup is NULL");
@@ -182,11 +150,12 @@ bool spritegroup_is_animating(spritegroup_t* const sg) {
 //    }
 //}
 
-void spritegroup_snap_dest(spritegroup_t* const sg, vec3 loc) {
+//void spritegroup_snap_dest(spritegroup_t* const sg, vec3 loc) {
+void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y) {
     massert(sg, "spritegroup is NULL");
     if (sg->move.x == 0 && sg->move.y == 0) {
-        sg->dest.x = loc.x * DEFAULT_TILE_SIZE + sg->off_x;
-        sg->dest.y = loc.y * DEFAULT_TILE_SIZE + sg->off_y;
+        sg->dest.x = x * DEFAULT_TILE_SIZE + sg->off_x;
+        sg->dest.y = y * DEFAULT_TILE_SIZE + sg->off_y;
     }
 }
 

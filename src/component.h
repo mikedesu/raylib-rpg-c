@@ -19,6 +19,7 @@
 #include "potion.h"
 #include "quiver_component.h"
 #include "race.h"
+#include "rect_component.h"
 #include "shield.h"
 #include "spell_effect_component.h"
 #include "stats_component.h"
@@ -28,6 +29,7 @@
 #include "vec3_component.h"
 #include "weapon.h"
 #include "zapping_component.h"
+#include <raylib.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -111,6 +113,9 @@ void init_int_component(int_component* comp, entityid id, int data);
 
 // loc components: 3 integer
 void init_vec3_component(vec3_component* comp, entityid id, vec3 v);
+
+// Rectangle component
+void init_rect_component(rect_component* comp, entityid id, Rectangle rect);
 
 // roll components: 3 integer
 void init_damage_component(damage_component* comp, entityid id, roll r);

@@ -134,7 +134,7 @@ gamestate* gamestateinitptr() {
     g->loc_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
     massert(g->loc_list, "g->loc_list is NULL");
 
-    g->sprite_move_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
+    g->sprite_move_list = (rect_component*)malloc(sizeof(rect_component) * n);
     massert(g->sprite_move_list, "g->sprite_move_list is NULL");
 
     g->target_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
@@ -706,14 +706,14 @@ bool g_has_sprite_move(const gamestate* const g, entityid id) {
     return g_has_component(g, id, C_SPRITE_MOVE);
 }
 
-bool g_add_sprite_move(gamestate* const g, entityid id, vec3 loc) {
+bool g_add_sprite_move(gamestate* const g, entityid id, Rectangle loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the sprite move component
-    return g_add_component(g, id, C_SPRITE_MOVE, (void*)&loc, sizeof(vec3_component), (void**)&g->sprite_move_list, &g->sprite_move_list_count, &g->sprite_move_list_capacity);
+    return g_add_component(g, id, C_SPRITE_MOVE, (void*)&loc, sizeof(rect_component), (void**)&g->sprite_move_list, &g->sprite_move_list_count, &g->sprite_move_list_capacity);
 }
 
-bool g_update_sprite_move(gamestate* const g, entityid id, vec3 loc) {
+bool g_update_sprite_move(gamestate* const g, entityid id, Rectangle loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(g_has_component(g, id, C_SPRITE_MOVE), "id %d does not have a sprite move component", id);
@@ -729,7 +729,7 @@ bool g_update_sprite_move(gamestate* const g, entityid id, vec3 loc) {
     return false;
 }
 
-vec3 g_get_sprite_move(const gamestate* const g, entityid id) {
+Rectangle g_get_sprite_move(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(g_has_sprite_move(g, id), "id %d does not have a sprite move component", id);
@@ -737,8 +737,8 @@ vec3 g_get_sprite_move(const gamestate* const g, entityid id) {
         for (int i = 0; i < g->sprite_move_list_count; i++)
             if (g->sprite_move_list[i].id == id) return g->sprite_move_list[i].data;
     }
-    merror("id %d not found in sprite_move_list", id);
-    return (vec3){-1, -1, -1};
+    //merror("id %d not found in sprite_move_list", id);
+    return (Rectangle){0, 0, 0, 0}; // Return an empty rectangle if not found
 }
 
 bool g_has_dead(const gamestate* const g, entityid id) {

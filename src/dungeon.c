@@ -233,9 +233,15 @@ bool d_add_floor(dungeon_t* const dungeon, int width, int height) {
     // Initialize the new floor
     df_init(new_floor);
     // Add a room
-    bool res = df_add_room(new_floor, 0, 0, width, height, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "TestRoom");
+    int w = 20;
+    int h = 20;
+    // Get center of the floor
+    int cx = width / 2;
+    int cy = height / 2;
+
+    bool res = df_add_room(new_floor, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "TestRoom");
     if (!res) {
-        merror("Failed to add room to new floor");
+        //merror("Failed to add room to new floor");
         df_free(new_floor);
         return false;
     }

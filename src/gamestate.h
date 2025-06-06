@@ -64,6 +64,7 @@ typedef struct gamestate {
     int direction_list_count, direction_list_capacity;
     int loc_list_count, loc_list_capacity;
     int sprite_move_list_count, sprite_move_list_capacity;
+
     int dead_list_count, dead_list_capacity;
     int update_list_count, update_list_capacity;
     int attacking_list_count, attacking_list_capacity;
@@ -145,7 +146,10 @@ typedef struct gamestate {
     //target_component* target_list;
 
     vec3_component* loc_list;
-    vec3_component* sprite_move_list;
+
+    //vec3_component* sprite_move_list;
+    rect_component* sprite_move_list;
+
     vec3_component* target_list;
 
     inventory_component* inventory_list;
@@ -221,9 +225,9 @@ vec3 g_get_location(const gamestate* const g, entityid id);
 bool g_is_location(const gamestate* const g, entityid id, vec3 loc);
 
 bool g_has_sprite_move(const gamestate* const g, entityid id);
-bool g_add_sprite_move(gamestate* const g, entityid id, vec3 loc);
-bool g_update_sprite_move(gamestate* const g, entityid id, vec3 loc);
-vec3 g_get_sprite_move(const gamestate* const g, entityid id);
+bool g_add_sprite_move(gamestate* const g, entityid id, Rectangle loc);
+bool g_update_sprite_move(gamestate* const g, entityid id, Rectangle loc);
+Rectangle g_get_sprite_move(const gamestate* const g, entityid id);
 
 bool g_has_dead(const gamestate* const g, entityid id);
 bool g_add_dead(gamestate* const g, entityid id, int dead);

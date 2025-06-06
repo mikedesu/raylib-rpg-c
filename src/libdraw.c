@@ -76,7 +76,7 @@ static void draw_shield_sprite_front(const gamestate* const g, entityid id, spri
 static void draw_shield_sprite_back(const gamestate* const g, entityid id, spritegroup_t* sg);
 
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
-//static bool libdraw_check_default_animations(const gamestate* const g);
+static bool libdraw_check_default_animations(const gamestate* const g);
 
 static void update_weapon_for_entity(gamestate* g, entityid id, spritegroup_t* sg);
 
@@ -373,26 +373,24 @@ static void libdraw_unload_shaders() {
 
 static inline bool libdraw_camera_lock_on(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    if (!g->cam_lockon) {
-        return false;
-    }
+    if (!g->cam_lockon) return false;
     spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     massert(grp, "spritegroup is NULL");
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
     return true;
 }
 
-//static bool libdraw_check_default_animations(const gamestate* const g) {
-//    massert(g, "gamestate is NULL");
-//    for (entityid id = 0; id < g->next_entityid; id++) {
-//        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-//        if (sg && sg->current != sg->default_anim) {
-//            // which sg isnt done?
-//            return false;
-//        }
-//    }
-//    return true;
-//}
+static bool libdraw_check_default_animations(const gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    for (entityid id = 0; id < g->next_entityid; id++) {
+        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+        if (sg && sg->current != sg->default_anim) {
+            // which sg isnt done?
+            return false;
+        }
+    }
+    return true;
+}
 
 static void libdraw_set_sg_is_damaged(gamestate* const g, entityid id, spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
@@ -508,27 +506,26 @@ static void libdraw_update_sprite_position(gamestate* const g, entityid id, spri
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-
-    //loc_t sprite_move = g_get_sprite_move(g, id);
-    vec3 sprite_move = g_get_sprite_move(g, id);
-
+    Rectangle sprite_move = g_get_sprite_move(g, id);
     if (sprite_move.x != 0 || sprite_move.y != 0) {
         sg->move.x = sprite_move.x;
         sg->move.y = sprite_move.y;
-        g_update_sprite_move(g, id, (vec3){0, 0, 0});
+        g_update_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
         entitytype_t type = g_get_type(g, id);
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
             race_t race = g_get_race(g, id);
-            if (race == RACE_BAT)
-                sg->current = SG_ANIM_BAT_IDLE;
-            else if (race == RACE_GREEN_SLIME)
-                sg->current = SG_ANIM_SLIME_IDLE;
-            else if (race > RACE_NONE && race < RACE_COUNT)
-                sg->current = SG_ANIM_NPC_WALK;
-            else {
-                merror("error: unknown race, expect crashes: %d", race);
-                sg->current = SG_ANIM_NPC_WALK;
-            }
+            sg->current = race == RACE_BAT                        ? SG_ANIM_BAT_IDLE
+                          : race == RACE_GREEN_SLIME              ? SG_ANIM_SLIME_IDLE
+                          : race > RACE_NONE && race < RACE_COUNT ? SG_ANIM_NPC_WALK
+                                                                  : SG_ANIM_NPC_WALK;
+            //if (race == RACE_BAT)
+            //    sg->current = SG_ANIM_BAT_IDLE;
+            //else if (race == RACE_GREEN_SLIME)
+            //    sg->current = SG_ANIM_SLIME_IDLE;
+            //else if (race > RACE_NONE && race < RACE_COUNT)
+            //    sg->current = SG_ANIM_NPC_WALK;
+            //else
+            //    sg->current = SG_ANIM_NPC_WALK;
         }
     }
 }
@@ -580,8 +577,12 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegro
     spritegroup_update_dest(sg);
     // Snap to the tile position only when movement is fully complete
     vec3 loc = g_get_location(g, id);
-    vec3 loc_cast = {loc.x, loc.y, loc.z};
-    spritegroup_snap_dest(sg, loc_cast);
+    //vec3 loc_cast = {loc.x, loc.y, loc.z};
+    //spritegroup_snap_dest(sg, loc_cast);
+    //const bool done = libdraw_check_default_animations(g);
+    //if (done) {
+    spritegroup_snap_dest(sg, loc.x, loc.y);
+    //}
 }
 
 static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegroup_t* const sg) {
@@ -717,7 +718,7 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
     ClearBackground(BLACK);
     //EndShaderMode();
-    libdraw_camera_lock_on(g);
+    //libdraw_camera_lock_on(g);
     //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
     if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
@@ -971,19 +972,16 @@ static void load_textures() {
 
 static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
     if (!g) {
-        merror("gamestate is NULL");
         return;
     }
     // can hold up to 32 sprites
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
     if (!group) {
-        merror("failed to create spritegroup");
         return;
     }
     //disabling this check until dungeon_floor created
     dungeon_floor_t* df = d_get_current_floor(g->d);
     if (!df) {
-        merror("dungeon_floor is NULL");
         spritegroup_destroy(group);
         return;
     }
@@ -991,7 +989,6 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
     const int df_h = df->height;
     vec3 loc = g_get_location(g, id);
     if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
-        merror("entity pos out of bounds %d %d", loc.x, loc.y);
         spritegroup_destroy(group);
         return;
     }
@@ -1001,11 +998,9 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
         sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
         spritegroup_add(group, s);
     }
-    spritegroup_set_specifier(group, spec);
     group->id = id;
     sprite* s = spritegroup_get(group, 0);
     if (!s) {
-        merror("sprite is NULL");
         spritegroup_destroy(group);
         return;
     }

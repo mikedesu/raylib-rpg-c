@@ -283,50 +283,28 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     int ey = loc.y + y;
     int z = loc.z;
     dungeon_floor_t* const df = d_get_floor(g->d, z);
-    if (!df) {
-        merror("Failed to get dungeon floor");
-        return;
-    }
+    if (!df) return;
     // i feel like this might be something we can set elsewhere...like after the player input phase?
-
     tile_t* const tile = df_tile_at(df, (vec3){ex, ey, z});
-    if (!tile) {
-        merror("Cannot move, tile is NULL");
-        return;
-    }
-    if (!tile_is_walkable(tile->type)) {
-        merror("Cannot move, tile is not walkable");
-        return;
-    }
+    if (!tile) return;
+    if (!tile_is_walkable(tile->type)) return;
     //if (tile_has_closed_door(g, ex, ey, floor)) {
     //    merror("Cannot move, tile has a closed door");
     //    return;
     //}
-    if (tile_npc_living_count(g, ex, ey, z) > 0) {
-        merror("Cannot move, NPC in the way");
-        return;
-    }
+    if (tile_npc_living_count(g, ex, ey, z) > 0) return;
     //if (player_on_tile(g, ex, ey, z)) {
     //    merror("Cannot move, player on tile");
     //    return;
     //}
-    if (!df_remove_at(df, id, loc.x, loc.y)) {
-        merror("Failed to remove entity from old tile");
-        return;
-    }
-    if (!df_add_at(df, id, ex, ey)) {
-        merror("Failed to add entity to new tile");
-        return;
-    }
-
+    if (!df_remove_at(df, id, loc.x, loc.y)) return;
+    if (!df_add_at(df, id, ex, ey)) return;
     g_update_location(g, id, (vec3){ex, ey, z});
 
-    g_update_sprite_move(g, id, (vec3){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
+    //g_update_sprite_move(g, id, (vec3){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
+    g_update_sprite_move(g, id, (Rectangle){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0, 0});
 
-    if (id == g->hero_id) {
-        update_player_tiles_explored(g);
-    }
-
+    if (id == g->hero_id) update_player_tiles_explored(g);
     // at this point the move is 'successful'
     //update_equipped_shield_dir(g, id);
     // get the entity's new tile
@@ -353,10 +331,7 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     //e->do_update = true;
     //    g_set_update(g, id, true);
     //}
-
-    if (g_is_type(g, id, ENTITY_PLAYER)) {
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    }
+    if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
 
 static void try_entity_move_a_star(gamestate* const g, entityid id) {
@@ -368,21 +343,16 @@ static void try_entity_move_a_star(gamestate* const g, entityid id) {
     // first, grab the hero id and then the hero entity pointer
     vec3 hloc = g_get_location(g, g->hero_id);
     vec3 eloc = g_get_location(g, id);
-
     vec3 hloc_cast = {hloc.x, hloc.y, hloc.z};
     vec3 eloc_cast = {eloc.x, eloc.y, eloc.z};
-
     dungeon_floor_t* df = d_get_floor(g->d, eloc.z);
     massert(df, "dungeon floor is NULL");
-
     int target_path_length = 0;
     vec3* target_path = find_path(eloc_cast, hloc_cast, df, &target_path_length);
-
     if (target_path) {
         if (target_path_length >= 2) {
             vec3 loc = target_path[target_path_length - 2];
             if (entities_adjacent(g, id, g->hero_id)) {
-                //                    // if the entity is adjacent to the hero, try to attack
                 try_entity_attack(g, id, loc.x, loc.y);
             } else {
                 int dx = loc.x - eloc.x;
@@ -748,11 +718,8 @@ static void init_dungeon(gamestate* const g) {
     massert(g, "gamestate is NULL");
     g->d = d_create();
     massert(g->d, "failed to init dungeon");
-
     const int df_count = 20;
-    for (int i = 0; i < df_count; i++) {
-        d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    }
+    for (int i = 0; i < df_count; i++) d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 }
 
 static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name) {
@@ -772,13 +739,13 @@ static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* 
     tile_t* const tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
     if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
-        merror("cannot create entity on wall");
+        //merror("cannot create entity on wall");
         return ENTITYID_INVALID;
     }
-    if (tile_has_live_npcs(g, tile)) {
-        merror("cannot create entity on tile with NPC");
-        return ENTITYID_INVALID;
-    }
+    //if (tile_has_live_npcs(g, tile)) {
+    //merror("cannot create entity on tile with NPC");
+    //    return ENTITYID_INVALID;
+    //}
     entityid id = g_add_entity(g);
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_NPC);
@@ -786,7 +753,8 @@ static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* 
     g_add_direction(g, id, DIR_RIGHT);
     vec3 loc_vec = {loc.x, loc.y, loc.z};
     g_add_location(g, id, loc_vec);
-    g_add_sprite_move(g, id, (vec3){0, 0, 0}); // default
+    //g_add_sprite_move(g, id, (vec3){0, 0, 0}); // default
+    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
     g_add_dead(g, id, 0);
     g_add_update(g, id, false);
     g_add_attacking(g, id, false);
@@ -845,7 +813,7 @@ static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const c
     g_add_direction(g, id, DIR_RIGHT);
     vec3 loc_vec = {loc.x, loc.y, loc.z};
     g_add_location(g, id, loc_vec);
-    g_add_sprite_move(g, id, (vec3){0, 0, 0});
+    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
     g_add_update(g, id, false);
     g_add_itemtype(g, id, type);
     if (!df_add_at(df, id, loc.x, loc.y)) return ENTITYID_INVALID;
@@ -2029,7 +1997,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     // Spawn NPCs periodically
-    try_spawn_npc(g);
+    //try_spawn_npc(g);
     update_player_state(g);
     update_npcs_state(g);
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
