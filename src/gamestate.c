@@ -187,8 +187,16 @@ gamestate* gamestateinitptr() {
     gamestate_init_music_paths(g);
     gamestate_init_msg_history(g);
     g->current_scene = SCENE_TITLE;
+    //g->current_scene = SCENE_CHARACTER_CREATION;
     g->title_screen_selection = 0;
     g->max_title_screen_selections = 3;
+
+    g->chara_creation = (character_creation){0};
+    //g->chara_creation.strength = 10;
+    //g->chara_creation.dexterity = 10;
+    //g->chara_creation.constitution = 10;
+    //g->chara_creation.hitdie = 10;
+
     //gamestate_load_help_menu_text(g);
     return g;
 }

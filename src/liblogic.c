@@ -1564,7 +1564,7 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
 
         } else if (inputstate_is_pressed(is, KEY_ENTER)) {
             if (g->title_screen_selection == 0) {
-                g->current_scene = SCENE_GAMEPLAY;
+                g->current_scene = SCENE_CHARACTER_CREATION;
             }
         }
         //else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
@@ -1572,8 +1572,36 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         //}
 
     } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
-        if (inputstate_any_pressed(is)) {
+        //if (inputstate_any_pressed(is)) {
+        if (inputstate_is_pressed(is, KEY_ENTER)) {
             minfo("Character creation");
+            // we need to copy the character creation stats to the hero entity
+            // hero has already been created, so its id is available
+            g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
+            g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
+            g_set_stat(g, g->hero_id, STATS_CON, g->chara_creation.constitution);
+
+            int hitdie = 8;
+            int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(g->chara_creation.constitution);
+            while (maxhp_roll < 1) {
+                maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(g->chara_creation.constitution);
+            }
+            g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
+            g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
+
+            g->current_scene = SCENE_GAMEPLAY;
+
+        } else if (inputstate_is_pressed(is, KEY_SPACE)) {
+            // re-roll character creation stats
+
+            g->chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
+            g->chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
+            g->chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
+
+        } else if (inputstate_is_pressed(is, KEY_LEFT)) {
+            // change race/class
+        } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
+            // change race/class
         }
     } else {
     }
@@ -1711,6 +1739,13 @@ void liblogic_init(gamestate* const g) {
     //init_wand_test(g);
     //init_potion_test(g);
     update_debug_panel_buffer(g);
+
+    strncpy(g->chara_creation.name, "Hero", sizeof(g->chara_creation.name) - 1);
+    g->chara_creation.race = RACE_HUMAN;
+    g->chara_creation.strength = 10;
+    g->chara_creation.dexterity = 10;
+    g->chara_creation.constitution = 10;
+    g->chara_creation.hitdie = 8;
 }
 
 //static void init_npc_test(gamestate* g) {

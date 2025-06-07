@@ -2,6 +2,7 @@
 
 //#include "ac_component.h"
 //#include "base_attack_damage_component.h"
+#include "character_creation.h"
 #include "component.h"
 #include "component_table.h"
 #include "controlmode.h"
@@ -158,6 +159,8 @@ typedef struct gamestate {
 
     int restart_count;
     bool do_restart;
+
+    character_creation chara_creation;
 
 } gamestate;
 
