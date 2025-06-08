@@ -1206,6 +1206,7 @@ void libdraw_init(gamestate* const g) {
     char full_title[1024] = {0};
     snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version);
     InitWindow(w, h, full_title);
+    ToggleFullscreen();
     SetExitKey(KEY_NULL);
     g->windowwidth = w;
     g->windowheight = h;
