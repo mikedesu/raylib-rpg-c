@@ -1,4 +1,4 @@
-screenshots
+ccreenshots
 screenshots/*
 src/screenshots
 src/screenshots/*
@@ -25,8 +25,7 @@ unit_test
 src/unit_test
 *.so
 src/*.so
-*.html
-src/*.html
+src/index.html
 *.js
 src/*.js
 *.data
