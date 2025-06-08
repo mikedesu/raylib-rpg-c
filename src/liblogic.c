@@ -1900,7 +1900,9 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         vec3 r = {1, hit_die, 0};
         int max_hp = do_roll(r);
         g_set_stat(g, id, STATS_HITDIE, hit_die);
+
         g_set_stat(g, id, STATS_AC, 10);
+
         g_set_stat(g, id, STATS_XP, 0);
         g_set_stat(g, id, STATS_LEVEL, 1);
         vec3 base_attack_dmg = get_base_attack_damage_for_race(race);

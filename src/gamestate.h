@@ -2,11 +2,11 @@
 
 //#include "ac_component.h"
 //#include "base_attack_damage_component.h"
+//#include "damage_component.h"
 #include "character_creation.h"
 #include "component.h"
 #include "component_table.h"
 #include "controlmode.h"
-//#include "damage_component.h"
 #include "debugpanel.h"
 #include "direction.h"
 #include "dungeon.h"
@@ -16,6 +16,7 @@
 #include "fadestate.h"
 #include "gamestate_flag.h"
 #include "keybinding.h"
+#include "monster_def.h"
 #include "scene.h"
 #include <raylib.h>
 #include <stdbool.h>
@@ -161,6 +162,11 @@ typedef struct gamestate {
     bool do_restart;
 
     character_creation chara_creation;
+    // Array of monster definitions
+    monster_def* monster_defs;
+    // Number of monster definitions
+    int monster_def_count;
+    int monster_def_capacity;
 
 } gamestate;
 
@@ -169,6 +175,8 @@ gamestate* gamestateinitptr();
 dungeon_t* g_get_dungeon(gamestate* const g);
 
 entityid gamestate_get_hero_id(const gamestate* const g);
+
+monster_def* g_get_monster_def(gamestate* const g, race_t r);
 
 bool gs_add_entityid(gamestate* const g, entityid id);
 bool gamestate_init_msg_history(gamestate* const g);
