@@ -34,11 +34,11 @@
 
 //#define DEFAULT_WIN_WIDTH 640
 //#define DEFAULT_WIN_HEIGHT 360
-#define DEFAULT_WIN_WIDTH 1920
-#define DEFAULT_WIN_HEIGHT 1080
+//#define DEFAULT_WIN_WIDTH 1920
+//#define DEFAULT_WIN_HEIGHT 1080
 
-//#define DEFAULT_WIN_WIDTH 1280
-//#define DEFAULT_WIN_HEIGHT 720
+#define DEFAULT_WIN_WIDTH 1280
+#define DEFAULT_WIN_HEIGHT 720
 
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
@@ -1206,7 +1206,7 @@ void libdraw_init(gamestate* const g) {
     char full_title[1024] = {0};
     snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version);
     InitWindow(w, h, full_title);
-    ToggleFullscreen();
+    //ToggleFullscreen();
     SetExitKey(KEY_NULL);
     g->windowwidth = w;
     g->windowheight = h;
