@@ -29,7 +29,8 @@ WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-s
 EMCC_OPTIONS = -s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall -s ALLOW_MEMORY_GROWTH
 #EMCC_OPTIONS = -s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall 
 
-SHELL_FILE = --shell-file /home/darkmage/src/raylib/src/minshell.html
+#SHELL_FILE = --shell-file /home/darkmage/src/raylib/src/minshell.html
+SHELL_FILE = --shell-file minshell.html
 PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img --preload-file keybindings.ini --preload-file ./audio/music --preload-file ./music.txt --preload-file ./monsters.csv
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 
