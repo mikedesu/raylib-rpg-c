@@ -1545,9 +1545,11 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
     } else if (g->current_scene == SCENE_TITLE) {
         if (inputstate_any_pressed(is)) {
             g->current_scene = SCENE_MAIN_MENU;
+            g->frame_dirty = true;
         }
     } else if (g->current_scene == SCENE_MAIN_MENU) {
         if (inputstate_is_pressed(is, KEY_DOWN)) {
+            g->frame_dirty = true;
             //if (g->title_screen_selection == g->max_title_screen_selections - 1) {
             //    g->title_screen_selection = 0;
             //} else {
@@ -1555,6 +1557,7 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
             //}
             //minfo("Title screen selection: %d", g->title_screen_selection);
         } else if (inputstate_is_pressed(is, KEY_UP)) {
+            g->frame_dirty = true;
             //if (g->title_screen_selection == 0) {
             //    g->title_screen_selection = g->max_title_screen_selections - 1;
             //} else {
@@ -1565,6 +1568,7 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         } else if (inputstate_is_pressed(is, KEY_ENTER)) {
             if (g->title_screen_selection == 0) {
                 g->current_scene = SCENE_CHARACTER_CREATION;
+                g->frame_dirty = true;
             }
         }
         //else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
@@ -1575,6 +1579,7 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         //if (inputstate_any_pressed(is)) {
         if (inputstate_is_pressed(is, KEY_ENTER)) {
             minfo("Character creation");
+            g->frame_dirty = true;
             // we need to copy the character creation stats to the hero entity
             // hero has already been created, so its id is available
             g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
@@ -1594,14 +1599,17 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         } else if (inputstate_is_pressed(is, KEY_SPACE)) {
             // re-roll character creation stats
 
+            g->frame_dirty = true;
             g->chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
             g->chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
             g->chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
 
         } else if (inputstate_is_pressed(is, KEY_LEFT)) {
             // change race/class
+            g->frame_dirty = true;
         } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
             // change race/class
+            g->frame_dirty = true;
         }
     } else {
     }

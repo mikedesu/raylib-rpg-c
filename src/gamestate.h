@@ -94,6 +94,8 @@ typedef struct gamestate {
 
     Camera2D cam2d;
     Camera3D cam3d;
+    bool cam_changed;
+    bool frame_dirty;
 
     fadestate_t fadestate;
 

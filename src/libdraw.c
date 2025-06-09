@@ -52,6 +52,9 @@ Shader shader_red_glow = {0};
 Shader shader_color_noise = {0};
 Shader shader_psychedelic_0 = {0};
 
+RenderTexture2D title_target_texture = {0};
+RenderTexture2D char_creation_target_texture = {0};
+
 RenderTexture2D target = {0};
 Rectangle target_src = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 Rectangle target_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
@@ -70,6 +73,9 @@ static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
 
+static void draw_help_menu(gamestate* const g);
+static void draw_gameover_menu(gamestate* const g);
+
 static void libdraw_update_sprite_post(gamestate* const g, entityid id);
 static void libdraw_update_sprite_pre(gamestate* const g, entityid id);
 
@@ -84,6 +90,8 @@ static bool libdraw_check_default_animations(const gamestate* const g);
 
 //void draw_title_screen(const gamestate* const g);
 void draw_title_screen(const gamestate* const g, bool show_menu);
+void draw_title_screen_to_texture(const gamestate* const g, bool show_menu);
+void draw_title_screen_from_texture(const gamestate* const g);
 static void update_weapon_for_entity(gamestate* g, entityid id, spritegroup_t* sg);
 
 static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
@@ -93,12 +101,15 @@ static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegro
 
 static void draw_inventory_menu(gamestate* const g);
 static void draw_hud(gamestate* const g);
+
 void draw_character_creation_screen(gamestate* const g);
+void draw_character_creation_screen_from_texture(gamestate* const g);
+void draw_character_creation_screen_to_texture(gamestate* const g);
 
 static bool libdraw_unload_texture(int txkey);
 static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z);
 static bool draw_dungeon_tiles_2d(const gamestate* const g, int z, dungeon_floor_t* df);
-static bool draw_entities_2d(const gamestate* const g, int z, dungeon_floor_t* df, bool dead);
+//static bool draw_entities_2d(const gamestate* const g, int z, dungeon_floor_t* df, bool dead);
 static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, vec3 loc);
 static bool libdraw_draw_dungeon_floor(const gamestate* const g);
 static bool libdraw_draw_player_target_box(const gamestate* const g);
@@ -349,17 +360,17 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     return true;
 }
 
-static bool draw_entities_2d(const gamestate* const g, int z, dungeon_floor_t* df, bool dead) {
-    massert(g, "draw_entities_2d: gamestate is NULL");
-    massert(df, "draw_entities_2d: dungeon_floor is NULL");
-    massert(df->width > 0, "draw_entities_2d: dungeon_floor width is 0");
-    massert(df->height > 0, "draw_entities_2d: dungeon_floor height is 0");
-    massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
-    massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
-    for (int y = 0; y < df->height; y++)
-        for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, dead, (vec3){x, y, z});
-    return true;
-}
+//static bool draw_entities_2d(const gamestate* const g, int z, dungeon_floor_t* df, bool dead) {
+//    massert(g, "draw_entities_2d: gamestate is NULL");
+//    massert(df, "draw_entities_2d: dungeon_floor is NULL");
+//    massert(df->width > 0, "draw_entities_2d: dungeon_floor width is 0");
+//    massert(df->height > 0, "draw_entities_2d: dungeon_floor height is 0");
+//    massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
+//    massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
+//    for (int y = 0; y < df->height; y++)
+//        for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, dead, (vec3){x, y, z});
+//    return true;
+//}
 
 static void load_shaders() {
     shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
@@ -383,7 +394,19 @@ static inline bool libdraw_camera_lock_on(gamestate* const g) {
     if (!g->cam_lockon) return false;
     spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     massert(grp, "spritegroup is NULL");
+
+    // get the old camera position
+    Vector2 old_target = g->cam2d.target;
+
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
+
+    // if the target changes, we need to set a flag indicating as such
+    if (old_target.x != g->cam2d.target.x || old_target.y != g->cam2d.target.y) {
+        g->cam_changed = true;
+    } else {
+        g->cam_changed = false;
+    }
+
     return true;
 }
 
@@ -719,10 +742,21 @@ static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     massert(df, "dungeon_floor is NULL");
     int z = g->d->current_floor;
     draw_dungeon_tiles_2d(g, z, df);
-    draw_entities_2d(g, z, df, true); // dead entities
-    draw_entities_2d(g, z, df, false); // alive entities
-    //draw_wall_tiles_2d(g, df);
-    //msuccess("libdraw_draw_dungeon_floor: done");
+    //draw_entities_2d(g, z, df, true); // dead entities
+    //draw_entities_2d(g, z, df, false); // alive entities
+
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            draw_entities_2d_at(g, df, true, (vec3){x, y, z});
+        }
+    }
+
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            draw_entities_2d_at(g, df, false, (vec3){x, y, z});
+        }
+    }
+
     return true;
 }
 
@@ -776,6 +810,22 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
     //msuccess("libdraw_drawframe_2d: done");
     EndMode2D();
+
+    draw_message_history(g);
+    draw_message_box(g);
+    draw_hud(g);
+    draw_inventory_menu(g);
+    handle_debug_panel(g);
+    draw_version(g);
+    if (g->display_quit_menu) {
+        draw_quit_menu(g);
+    }
+    if (g->display_help_menu) {
+        draw_help_menu(g);
+    }
+    if (g->gameover) {
+        draw_gameover_menu(g);
+    }
 }
 
 static void draw_message_box(gamestate* g) {
@@ -911,34 +961,29 @@ void libdraw_drawframe(gamestate* const g) {
     //minfo("drawframe current scene: %d", g->current_scene);
 
     if (g->current_scene == SCENE_TITLE) {
-        draw_title_screen(g, false);
+        if (g->frame_dirty) {
+            draw_title_screen_to_texture(g, false);
+            g->frame_dirty = false;
+        }
+        draw_title_screen_from_texture(g);
+
     } else if (g->current_scene == SCENE_MAIN_MENU) {
-        draw_title_screen(g, true);
+        //draw_title_screen(g, true);
+        if (g->frame_dirty) {
+            draw_title_screen_to_texture(g, true);
+            g->frame_dirty = false;
+        }
+        draw_title_screen_from_texture(g);
+
     } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
-        draw_character_creation_screen(g);
+        if (g->frame_dirty) {
+            draw_character_creation_screen_to_texture(g);
+            g->frame_dirty = false;
+        }
+        draw_character_creation_screen_from_texture(g);
+
     } else if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_drawframe_2d(g);
-        // should prob go inside drawframe_2d
-        draw_message_history(g);
-        // should prob go inside drawframe_2d
-        draw_message_box(g);
-        // should prob go inside drawframe_2d
-        draw_hud(g);
-        // should prob go inside drawframe_2d
-        draw_inventory_menu(g);
-        handle_debug_panel(g);
-        draw_version(g);
-        if (g->display_quit_menu) {
-            // should prob go inside drawframe_2d
-            draw_quit_menu(g);
-        }
-        if (g->display_help_menu) {
-            // should prob go inside drawframe_2d
-            draw_help_menu(g);
-        }
-        if (g->gameover) {
-            draw_gameover_menu(g);
-        }
     }
 
     EndTextureMode();
@@ -961,6 +1006,10 @@ static bool libdraw_unload_texture(int txkey) {
 
 static void libdraw_unload_textures() {
     for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) libdraw_unload_texture(i);
+
+    UnloadRenderTexture(title_target_texture);
+    UnloadRenderTexture(char_creation_target_texture);
+    UnloadRenderTexture(target);
 }
 
 void libdraw_close_partial() {
@@ -1264,6 +1313,9 @@ void libdraw_init_rest(gamestate* const g) {
     g->windowwidth = w;
     g->windowheight = h;
     target = LoadRenderTexture(w, h);
+    title_target_texture = LoadRenderTexture(w, h);
+    char_creation_target_texture = LoadRenderTexture(w, h);
+
     target_src = (Rectangle){0, 0, w, -h};
     target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
@@ -1277,6 +1329,10 @@ void libdraw_init_rest(gamestate* const g) {
     massert(df, "dungeon_floor is NULL");
     int df_w = df->width, df_h = df->height;
     g->cam2d.target = (Vector2){df_w * DEFAULT_TILE_SIZE / 2.0f, df_h * DEFAULT_TILE_SIZE / 2.0f};
+
+    draw_title_screen_to_texture(g, false);
+    draw_character_creation_screen_to_texture(g);
+
     InitAudioDevice();
     // select a random indices for current music
     g->current_music_index = rand() % g->total_music_paths;
@@ -1581,18 +1637,18 @@ void draw_version(const gamestate* const g) {
 
 void draw_title_screen(const gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
-    const char* title_text = "project.rpg";
+    //const char* title_text = "project.rpg";
+    const char* title_text_0 = "project.";
+    const char* title_text_1 = "rpg";
+    const Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}; // gray
+    const Color title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF}; // white
     const char* version_text = g->version;
-
     const char* start_text = "Press any key to begin";
-
     const int sm_font_size = 20;
     const int font_size = 80;
-
     Color bg_color = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent background
     // Measure text
-    int measure = MeasureText(title_text, font_size);
-
+    int measure = MeasureText(title_text_0, font_size);
     int start_measure = MeasureText(start_text, sm_font_size);
     // Calculate positions
     float x = (g->windowwidth - measure) / 2.0f;
@@ -1602,17 +1658,20 @@ void draw_title_screen(const gamestate* const g, bool show_menu) {
     // Below the title text
     ClearBackground(BLACK);
     // Draw background rectangle
-    //DrawRectangle(0, 0, g->windowwidth, g->windowheight, bg_color);
-    // Draw title text
-    DrawText(title_text, x, y, font_size, WHITE);
+    // Draw title text 0
+    DrawText(title_text_0, x, y, font_size, title_text_0_color);
+    // calculate and place title text 1 next to title text 0
+    int title_text_1_measure = MeasureText(title_text_1, font_size);
+    const int padding = 10; // Space between title texts
+    float title_text_1_x = x + measure + padding; // Right of title_text_0
+    // Draw title text 1
+    DrawText(title_text_1, title_text_1_x, y, font_size, title_text_1_color);
     // Draw version text
     int version_measure = MeasureText(version_text, sm_font_size);
     float version_x = (g->windowwidth - version_measure) / 2.0f;
     float version_y = y + font_size + 10; // Below the title text
-
     DrawText(version_text, version_x, version_y, sm_font_size, WHITE);
     float start_y = y + font_size * 1 + 20 + sm_font_size; // Below the version text
-
     if (show_menu) {
         // If show_menu is true, draw the new game, continue, options selection text
         const char* menu_text[3] = {"New Game", "Continue", "Settings"};
@@ -1638,6 +1697,32 @@ void draw_title_screen(const gamestate* const g, bool show_menu) {
         // If show_menu is false, draw the start text
         DrawText(start_text, start_x, start_y, sm_font_size, WHITE);
     }
+}
+
+void draw_title_screen_to_texture(const gamestate* const g, bool show_menu) {
+    massert(g, "gamestate is NULL");
+    BeginTextureMode(title_target_texture);
+    draw_title_screen(g, show_menu);
+    EndTextureMode();
+}
+
+void draw_title_screen_from_texture(const gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    // Draw the title screen texture
+    DrawTexturePro(title_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
+}
+
+void draw_character_creation_screen_to_texture(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    BeginTextureMode(char_creation_target_texture);
+    draw_character_creation_screen(g);
+    EndTextureMode();
+}
+
+void draw_character_creation_screen_from_texture(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    // Draw the character creation screen texture
+    DrawTexturePro(char_creation_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 void draw_character_creation_screen(gamestate* const g) {

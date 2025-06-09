@@ -77,6 +77,8 @@ gamestate* gamestateinitptr() {
     g->cam3d.fovy = 45.0f;
     g->cam3d.projection = CAMERA_PERSPECTIVE;
     g->camera_mode = CAMERA_FREE;
+    g->cam_changed = false;
+    g->frame_dirty = true;
     g->is3d = false;
     g->fadealpha = 0.0f;
     g->controlmode = CONTROLMODE_PLAYER;
