@@ -10,12 +10,16 @@ extern Shader shader_grayscale; // Global shader
 extern Shader shader_tile_glow; // Global shader
 
 void libdraw_init(gamestate* const g);
+void libdraw_init_rest(gamestate* const g);
 void libdraw_update_input(inputstate* const is);
 void libdraw_drawframe(gamestate* const g);
 void libdraw_close();
+void libdraw_close_partial();
 //bool libdraw_windowshouldclose();
 bool libdraw_windowshouldclose(const gamestate* const g);
 void libdraw_update_sprites(gamestate* const g);
+void libdraw_update_sprites_post(gamestate* const g);
+void libdraw_update_sprites_pre(gamestate* const g);
 
 //void libdraw_draw_message_history_placeholder(gamestate* const g);
 //void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t dir);

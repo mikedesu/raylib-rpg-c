@@ -18,13 +18,17 @@
 
 void* draw_handle = NULL;
 void (*mylibdraw_init)(const gamestate* const) = NULL;
+void (*mylibdraw_init_rest)(const gamestate* const) = NULL;
 void (*mylibdraw_close)() = NULL;
+void (*mylibdraw_close_partial)() = NULL;
 
 //bool (*mylibdraw_windowshouldclose)() = NULL;
 bool (*mylibdraw_windowshouldclose)(const gamestate* const) = NULL;
 
 void (*mylibdraw_drawframe)(const gamestate* const) = NULL;
 void (*mylibdraw_update_sprites)(gamestate* const) = NULL;
+void (*mylibdraw_update_sprites_pre)(gamestate* const) = NULL;
+void (*mylibdraw_update_sprites_post)(gamestate* const) = NULL;
 void (*mylibdraw_update_input)(inputstate* const) = NULL;
 
 void* logic_handle = NULL;
@@ -62,16 +66,27 @@ void load_draw_symbols() {
     massert(draw_handle, "dlopen failed for %s: %s", LIBDRAW_PATH, dlerror());
     mylibdraw_init = dlsym(draw_handle, "libdraw_init");
     checksymbol(mylibdraw_init, "libdraw_init");
+    mylibdraw_init_rest = dlsym(draw_handle, "libdraw_init_rest");
+    checksymbol(mylibdraw_init_rest, "libdraw_init_rest");
     mylibdraw_close = dlsym(draw_handle, "libdraw_close");
     checksymbol(mylibdraw_close, "libdraw_close");
+    mylibdraw_close_partial = dlsym(draw_handle, "libdraw_close_partial");
+    checksymbol(mylibdraw_close_partial, "libdraw_close_partial");
     mylibdraw_windowshouldclose = dlsym(draw_handle, "libdraw_windowshouldclose");
     checksymbol(mylibdraw_windowshouldclose, "libdraw_windowshouldclose");
     mylibdraw_drawframe = dlsym(draw_handle, "libdraw_drawframe");
     checksymbol(mylibdraw_drawframe, "libdraw_drawframe");
     mylibdraw_update_input = dlsym(draw_handle, "libdraw_update_input");
     checksymbol(mylibdraw_update_input, "libdraw_update_input");
+
     mylibdraw_update_sprites = dlsym(draw_handle, "libdraw_update_sprites");
     checksymbol(mylibdraw_update_sprites, "libdraw_update_sprites");
+
+    mylibdraw_update_sprites_pre = dlsym(draw_handle, "libdraw_update_sprites_pre");
+    checksymbol(mylibdraw_update_sprites_pre, "libdraw_update_sprites_pre");
+
+    mylibdraw_update_sprites_post = dlsym(draw_handle, "libdraw_update_sprites_post");
+    checksymbol(mylibdraw_update_sprites_post, "libdraw_update_sprites_post");
 }
 
 void load_logic_symbols() {
@@ -148,14 +163,23 @@ void gamerun() {
     //while (!mylibdraw_windowshouldclose()) {
     while (!mylibdraw_windowshouldclose(g)) {
         mylibdraw_update_input(&is);
+
         myliblogic_tick(&is, g);
-        mylibdraw_update_sprites(g);
+
+        //mylibdraw_update_sprites(g);
+        mylibdraw_update_sprites_pre(g);
+
         mylibdraw_drawframe(g);
+
+        mylibdraw_update_sprites_post(g);
+
         autoreload_every_n_sec(5, g);
 
         if (g->do_restart) {
             msuccess("Restarting game...");
-            mylibdraw_close();
+            //mylibdraw_close();
+            mylibdraw_close_partial();
+
             //dlclose(draw_handle);
             myliblogic_close(g);
             //dlclose(logic_handle);
@@ -164,7 +188,8 @@ void gamerun() {
             //load_draw_symbols();
             //load_logic_symbols();
             myliblogic_init(g);
-            mylibdraw_init(g);
+            //mylibdraw_init(g);
+            mylibdraw_init_rest(g);
             g->do_restart = false; // Reset restart flag
         }
     }

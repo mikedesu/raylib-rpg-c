@@ -34,11 +34,11 @@
 
 //#define DEFAULT_WIN_WIDTH 640
 //#define DEFAULT_WIN_HEIGHT 360
-//#define DEFAULT_WIN_WIDTH 1920
-//#define DEFAULT_WIN_HEIGHT 1080
+#define DEFAULT_WIN_WIDTH 1920
+#define DEFAULT_WIN_HEIGHT 1080
 
-#define DEFAULT_WIN_WIDTH 1280
-#define DEFAULT_WIN_HEIGHT 720
+//#define DEFAULT_WIN_WIDTH 1280
+//#define DEFAULT_WIN_HEIGHT 720
 
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
@@ -69,6 +69,9 @@ static int get_total_ac(gamestate* const g, entityid id);
 static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
+
+static void libdraw_update_sprite_post(gamestate* const g, entityid id);
+static void libdraw_update_sprite_pre(gamestate* const g, entityid id);
 
 static void libdraw_handle_gamestate_flag(gamestate* const g);
 static void draw_weapon_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg);
@@ -627,6 +630,32 @@ static void libdraw_update_sprite(gamestate* const g, entityid id) {
     }
 }
 
+static void libdraw_update_sprite_pre(gamestate* const g, entityid id) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entityid is invalid");
+    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+    for (int i = 0; i < num_spritegroups; i++) {
+        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+        if (sg) {
+            libdraw_update_sprite_ptr(g, id, sg);
+            //libdraw_handle_frame_incr(g, id, sg);
+        }
+    }
+}
+
+static void libdraw_update_sprite_post(gamestate* const g, entityid id) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entityid is invalid");
+    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+    for (int i = 0; i < num_spritegroups; i++) {
+        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+        if (sg) {
+            //libdraw_update_sprite_ptr(g, id, sg);
+            libdraw_handle_frame_incr(g, id, sg);
+        }
+    }
+}
+
 static void libdraw_handle_gamestate_flag(gamestate* const g) {
     massert(g, "gamestate is NULL");
     //const bool done = libdraw_check_default_animations(g);
@@ -661,6 +690,25 @@ void libdraw_update_sprites(gamestate* const g) {
 
         libdraw_handle_dirty_entities(g);
         for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite(g, id);
+        libdraw_handle_gamestate_flag(g);
+    }
+}
+
+void libdraw_update_sprites_pre(gamestate* const g) {
+    if (g) {
+        UpdateMusicStream(music);
+
+        libdraw_handle_dirty_entities(g);
+        for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite_pre(g, id);
+        libdraw_handle_gamestate_flag(g);
+    }
+}
+
+void libdraw_update_sprites_post(gamestate* const g) {
+    if (g) {
+        UpdateMusicStream(music);
+        libdraw_handle_dirty_entities(g);
+        for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite_post(g, id);
         libdraw_handle_gamestate_flag(g);
     }
 }
@@ -860,6 +908,8 @@ void libdraw_drawframe(gamestate* const g) {
     //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
 
+    //minfo("drawframe current scene: %d", g->current_scene);
+
     if (g->current_scene == SCENE_TITLE) {
         draw_title_screen(g, false);
     } else if (g->current_scene == SCENE_MAIN_MENU) {
@@ -913,12 +963,17 @@ static void libdraw_unload_textures() {
     for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) libdraw_unload_texture(i);
 }
 
-void libdraw_close() {
+void libdraw_close_partial() {
     UnloadMusicStream(music);
     CloseAudioDevice();
 
     libdraw_unload_textures();
     libdraw_unload_shaders();
+    //CloseWindow();
+}
+
+void libdraw_close() {
+    libdraw_close_partial();
     CloseWindow();
 }
 
@@ -1198,19 +1253,16 @@ static void draw_hud(gamestate* const g) {
     DrawTextEx(GetFontDefault(), buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, fg);
 }
 
-void libdraw_init(gamestate* const g) {
-    massert(g, "gamestate is NULL");
+void libdraw_init_rest(gamestate* const g) {
+    minfo("libdraw_init_rest: initializing rest of the libdraw");
+    SetExitKey(KEY_NULL);
+    SetTargetFPS(60);
     const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
     const int x = w / 3, y = h / 3;
-    const char* title = WINDOW_TITLE;
-    char full_title[1024] = {0};
-    snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version);
-    InitWindow(w, h, full_title);
-    //ToggleFullscreen();
-    SetExitKey(KEY_NULL);
+    minfo("libdraw_init_rest: window size: %dx%d", w, h);
+    massert(w > 0 && h > 0, "window width or height is not set properly");
     g->windowwidth = w;
     g->windowheight = h;
-    SetTargetFPS(60);
     target = LoadRenderTexture(w, h);
     target_src = (Rectangle){0, 0, w, -h};
     target_dest = (Rectangle){0, 0, w, h};
@@ -1239,6 +1291,53 @@ void libdraw_init(gamestate* const g) {
     SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
     //SetMusicLooping(music, true); // Loop the music
     PlayMusicStream(music);
+    //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
+    msuccess("libdraw_init_rest: done");
+}
+
+void libdraw_init(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
+    const int x = w / 3, y = h / 3;
+    const char* title = WINDOW_TITLE;
+    char full_title[1024] = {0};
+    snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version);
+    InitWindow(w, h, full_title);
+    //g->windowwidth = w;
+    //g->windowheight = h;
+
+    libdraw_init_rest(g);
+
+    //SetExitKey(KEY_NULL);
+    //SetTargetFPS(60);
+    //target = LoadRenderTexture(w, h);
+    //target_src = (Rectangle){0, 0, w, -h};
+    //target_dest = (Rectangle){0, 0, w, h};
+    //spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
+    //load_textures();
+    //calc_debugpanel_size(g);
+    //load_shaders();
+    //g->cam2d.offset = (Vector2){x, y};
+    //gamestate_set_debug_panel_pos_top_right(g);
+    //// set the camera target to the center of the dungeon
+    //dungeon_floor_t* const df = d_get_current_floor(g->d);
+    //massert(df, "dungeon_floor is NULL");
+    //int df_w = df->width, df_h = df->height;
+    //g->cam2d.target = (Vector2){df_w * DEFAULT_TILE_SIZE / 2.0f, df_h * DEFAULT_TILE_SIZE / 2.0f};
+    //InitAudioDevice();
+    //// select a random indices for current music
+    //g->current_music_index = rand() % g->total_music_paths;
+    //// load the music stream from the selected path
+    //const char* music_path = g->music_file_paths[g->current_music_index];
+    //massert(music_path, "music_path is NULL");
+    //minfo("Loading music from path: %s", music_path);
+    //char real_music_path[1024] = {0};
+    //snprintf(real_music_path, sizeof(real_music_path), "%s%s", "audio/music/", music_path);
+    //music = LoadMusicStream(real_music_path);
+    ////SetMusicVolume(music, 0.50f); // Set initial music volume
+    //SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
+    ////SetMusicLooping(music, true); // Loop the music
+    //PlayMusicStream(music);
     //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
 }
 
