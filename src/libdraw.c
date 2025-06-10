@@ -1630,55 +1630,48 @@ static void draw_character_creation_screen_from_texture(gamestate* const g) {
 static void draw_character_creation_screen(gamestate* const g) {
     massert(g, "gamestate is NULL");
     const char* title_text = "Character Creation";
-    char buffer[2048] = {0};
+    const char* stats_fmt[] = {
+        "Name: %s", "Race: %s", "Hitdie: %d", 
+        "Strength: %d", "Dexterity: %d", "Constitution: %d"
+    };
+    const char* remaining_text[] = {
+        "Press SPACE to re-roll stats", 
+        "Press LEFT/RIGHT to change race (unavailable for now)", 
+        "Press UP/DOWN to change class (unavailable for now)", 
+        "Press ENTER to confirm"
+    };
+    
     int font_size = 40;
     int cx = g->windowwidth / 2;
-    //int cy = g->windowheight / 2;
     int sy = g->windowheight / 4;
-    ClearBackground(BLACK);
-    // Draw title text
     int x = cx;
     int y = sy;
+    char buffer[2048] = {0};
+
+    ClearBackground(BLACK);
     DrawText(title_text, x, y, font_size, WHITE);
     y += font_size;
     font_size = 20;
-    // Draw character creation stats
-    snprintf(buffer, sizeof(buffer), "Name: %s", g->chara_creation.name);
-    DrawText(buffer, x, y, font_size, WHITE);
-    y += font_size + 4;
-    bzero(buffer, sizeof(buffer));
-    snprintf(buffer, sizeof(buffer), "Race: %s", get_race_str(g->chara_creation.race));
-    DrawText(buffer, x, y, font_size, WHITE);
-    y += font_size + 4;
-    bzero(buffer, sizeof(buffer));
-    snprintf(buffer, sizeof(buffer), "Hitdie: %d", g->chara_creation.hitdie);
-    DrawText(buffer, x, y, font_size, WHITE);
-    y += font_size + 4;
-    bzero(buffer, sizeof(buffer));
-    snprintf(buffer, sizeof(buffer), "Strength: %d", g->chara_creation.strength);
-    DrawText(buffer, x, y, font_size, WHITE);
-    y += font_size + 4;
-    bzero(buffer, sizeof(buffer));
-    snprintf(buffer, sizeof(buffer), "Dexterity: %d", g->chara_creation.dexterity);
-    DrawText(buffer, x, y, font_size, WHITE);
-    y += font_size + 4;
-    bzero(buffer, sizeof(buffer));
-    snprintf(buffer, sizeof(buffer), "Constitution: %d", g->chara_creation.constitution);
-    DrawText(buffer, x, y, font_size, WHITE);
-    y += font_size + 4;
-    // we will come back here to draw a representative sprite for when you select race etc
-    // to do this, i will create "false entities" that can be destroyed or left in for later use
-    // they will likely be created before any of the other main entities get instantiated
-    // for right now, lets draw a red thick box in the left side of the screen, parallel to the text vertically
-    // the red box will represent where we want the sprite to go when we come back to draw it later
-    Rectangle sprite_box = {.x = cx - 200 - 10, .y = sy, .width = 200, .height = 200};
-    DrawRectangleLinesEx(sprite_box, 4, RED);
-    const char* remaining_text[4] = {
-        "Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race (unavailable for now)", "Press UP/DOWN to change class (unavailable for now)", "Press ENTER to confirm"};
-    int remaining_count = sizeof(remaining_text) / sizeof(remaining_text[0]);
-    // add spacing
+
+    // Draw character stats
+    for (int i = 0; i < sizeof(stats_fmt)/sizeof(stats_fmt[0]); i++) {
+        snprintf(buffer, sizeof(buffer), stats_fmt[i], 
+            i == 0 ? g->chara_creation.name :
+            i == 1 ? get_race_str(g->chara_creation.race) :
+            i == 2 ? g->chara_creation.hitdie :
+            i == 3 ? g->chara_creation.strength :
+            i == 4 ? g->chara_creation.dexterity :
+            g->chara_creation.constitution);
+        DrawText(buffer, x, y, font_size, WHITE);
+        y += font_size + 4;
+    }
+
+    // Draw sprite placeholder
+    DrawRectangleLinesEx((Rectangle){cx - 210, sy, 200, 200}, 4, RED);
+
+    // Draw instructions
     y += font_size + 8;
-    for (int i = 0; i < remaining_count; i++) {
+    for (int i = 0; i < sizeof(remaining_text)/sizeof(remaining_text[0]); i++) {
         DrawText(remaining_text[i], x, y, font_size, WHITE);
         y += font_size + 4;
     }
