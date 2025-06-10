@@ -6,15 +6,19 @@
 #include <stdlib.h>
 
 spritegroup_t* spritegroup_create(int capacity) {
+    massert(capacity > 0, "capacity must be greater than 0, got %d", capacity);
     if (capacity <= 0) return NULL;
     spritegroup_t* sg = malloc(sizeof(spritegroup_t));
+    massert(sg, "spritegroup is NULL");
     if (!sg) {
+        merror("Failed to allocate memory for spritegroup");
         return NULL;
     }
     sg->current = sg->size = sg->off_x = sg->off_y = sg->default_anim = sg->id = 0;
     sg->alpha = 255;
     sg->capacity = capacity;
     sg->sprites = malloc(sizeof(sprite*) * capacity);
+    massert(sg->sprites, "spritegroup sprites is NULL");
     if (!sg->sprites) {
         free(sg);
         return NULL;
@@ -25,13 +29,6 @@ spritegroup_t* spritegroup_create(int capacity) {
     sg->move_rate = 1.0;
     return sg;
 }
-
-//void spritegroup_set_specifier(spritegroup_t* const sg, specifier_t spec) {
-//    if (!sg) {
-//        return;
-//    }
-//    sg->specifier = (spec >= SPECIFIER_NONE && spec < SPECIFIER_COUNT) ? spec : SPECIFIER_NONE;
-//}
 
 void spritegroup_destroy(spritegroup_t* sg) {
     if (!sg) return;

@@ -70,54 +70,31 @@ int libdraw_restart_count = 0;
 
 static int get_total_ac(gamestate* const g, entityid id);
 
-static void libdraw_drawframe_2d_from_texture(gamestate* const g);
-static void libdraw_drawframe_2d_to_texture(gamestate* const g);
-
 static inline bool libdraw_camera_lock_on(gamestate* const g);
+
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
 
+static void libdraw_drawframe_2d_from_texture(gamestate* const g);
+static void libdraw_drawframe_2d_to_texture(gamestate* const g);
 static void draw_help_menu(gamestate* const g);
 static void draw_gameover_menu(gamestate* const g);
-
-static void libdraw_update_sprite_post(gamestate* const g, entityid id);
+//static void libdraw_update_sprite_post(gamestate* const g, entityid id);
 static void libdraw_update_sprite_pre(gamestate* const g, entityid id);
-
 static void libdraw_handle_gamestate_flag(gamestate* const g);
 static void draw_weapon_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg);
 static void draw_weapon_sprite_back(const gamestate* const g, entityid id, spritegroup_t* sg);
 static void draw_shield_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg);
 static void draw_shield_sprite_back(const gamestate* const g, entityid id, spritegroup_t* sg);
-
-static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
-static bool libdraw_check_default_animations(const gamestate* const g);
-
-//void draw_title_screen(const gamestate* const g);
-void draw_title_screen(gamestate* const g, bool show_menu);
-void draw_title_screen_to_texture(gamestate* const g, bool show_menu);
-void draw_title_screen_from_texture(gamestate* const g);
 static void update_weapon_for_entity(gamestate* g, entityid id, spritegroup_t* sg);
-
-static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
-static sprite* get_weapon_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
-static sprite* get_shield_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
-static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
-
 static void draw_inventory_menu(gamestate* const g);
 static void draw_hud(gamestate* const g);
-
-void draw_character_creation_screen(gamestate* const g);
-void draw_character_creation_screen_from_texture(gamestate* const g);
-void draw_character_creation_screen_to_texture(gamestate* const g);
-
-static bool libdraw_unload_texture(int txkey);
-static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z);
-static bool draw_dungeon_tiles_2d(const gamestate* const g, int z, dungeon_floor_t* df);
-//static bool draw_entities_2d(const gamestate* const g, int z, dungeon_floor_t* df, bool dead);
-static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, vec3 loc);
-static bool libdraw_draw_dungeon_floor(const gamestate* const g);
-static bool libdraw_draw_player_target_box(const gamestate* const g);
-
+static void draw_title_screen(gamestate* const g, bool show_menu);
+static void draw_title_screen_to_texture(gamestate* const g, bool show_menu);
+static void draw_title_screen_from_texture(gamestate* const g);
+static void draw_character_creation_screen(gamestate* const g);
+static void draw_character_creation_screen_from_texture(gamestate* const g);
+static void draw_character_creation_screen_to_texture(gamestate* const g);
 static void libdraw_set_sg_is_damaged(gamestate* const g, entityid id, spritegroup_t* const sg);
 static void libdraw_set_sg_is_dead(gamestate* const g, entityid id, spritegroup_t* const sg);
 static void libdraw_set_sg_is_attacking(gamestate* const g, entityid id, spritegroup_t* const sg);
@@ -141,8 +118,21 @@ static void create_sg_byid(gamestate* const g, entityid id);
 static void calc_debugpanel_size(gamestate* const g);
 static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
 static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, entityid id);
-static void draw_quit_menu(const gamestate* const g);
-void draw_version(const gamestate* const g);
+static void draw_version(const gamestate* const g);
+
+static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
+static sprite* get_weapon_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
+static sprite* get_shield_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
+static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
+
+static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
+//static bool libdraw_check_default_animations(const gamestate* const g);
+static bool libdraw_unload_texture(int txkey);
+static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z);
+static bool draw_dungeon_tiles_2d(const gamestate* const g, int z, dungeon_floor_t* df);
+static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, vec3 loc);
+static bool libdraw_draw_dungeon_floor(const gamestate* const g);
+static bool libdraw_draw_player_target_box(const gamestate* const g);
 
 static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
@@ -156,18 +146,20 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     tile_t* tile = df_tile_at(df, (vec3){x, y, z});
     massert(tile, "tile is NULL");
     // check if the tile type is none
-    if (tile->type == TILE_NONE) return true;
+    if (tile->type == TILE_NONE) {
+        return true;
+    }
     // check if tile is visible
-    if (!tile->visible) return true;
-
+    if (!tile->visible) {
+        return true;
+    }
     // just draw the tile itself
     // tile values in get_txkey_for_tiletype.h
     int txkey = get_txkey_for_tiletype(tile->type);
     if (txkey < 0) return false;
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) return false;
-    const int offset_x = -12;
-    const int offset_y = -12;
+    const int offset_x = -12, offset_y = -12;
     const int dx = x * DEFAULT_TILE_SIZE + offset_x;
     const int dy = y * DEFAULT_TILE_SIZE + offset_y;
     const Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
@@ -258,9 +250,13 @@ static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegro
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
     entityid shield = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
-    if (shield == ENTITYID_INVALID) return NULL;
+    if (shield == ENTITYID_INVALID) {
+        return NULL;
+    }
     spritegroup_t* s_sg = hashtable_entityid_spritegroup_get(spritegroups, shield);
-    if (!s_sg) return NULL;
+    if (!s_sg) {
+        return NULL;
+    }
     sprite* retval = NULL;
     if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) retval = spritegroup_get(s_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
     return retval;
@@ -271,7 +267,9 @@ static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, 
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     entitytype_t type = g_get_type(g, id);
-    if (type != ENTITY_PLAYER && type != ENTITY_NPC) return;
+    if (type != ENTITY_PLAYER && type != ENTITY_NPC) {
+        return;
+    }
     sprite* shadow = sg_get_current_plus_one(sg);
     if (shadow) {
         Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
@@ -326,7 +324,6 @@ static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-
     entitytype_t type = g_get_type(g, id);
     massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));
     // Draw components in correct order
@@ -352,9 +349,7 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     tile_t* tile = df_tile_at(df, loc);
     if (!tile) return false;
     if (tile_is_wall(tile->type)) return false;
-
     if (!tile->visible) return true; // Do not draw entities on invisible tiles
-
     for (int i = 0; i < tile_entity_count(tile); i++) {
         entityid id = tile_get_entity(tile, i);
         if (g_is_dead(g, id) == dead) {
@@ -398,35 +393,29 @@ static inline bool libdraw_camera_lock_on(gamestate* const g) {
     if (!g->cam_lockon) return false;
     spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     massert(grp, "spritegroup is NULL");
-
     // get the old camera position
     Vector2 old_target = g->cam2d.target;
-
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
-
     // if the target changes, we need to set a flag indicating as such
     if (old_target.x != g->cam2d.target.x || old_target.y != g->cam2d.target.y) {
-        minfo("xxxxx");
-        g->cam_changed = true;
-        g->frame_dirty = true;
+        g->cam_changed = g->frame_dirty = true;
     } else {
         g->cam_changed = false;
     }
-
     return true;
 }
 
-static bool libdraw_check_default_animations(const gamestate* const g) {
-    massert(g, "gamestate is NULL");
-    for (entityid id = 0; id < g->next_entityid; id++) {
-        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-        if (sg && sg->current != sg->default_anim) {
-            // which sg isnt done?
-            return false;
-        }
-    }
-    return true;
-}
+//static bool libdraw_check_default_animations(const gamestate* const g) {
+//    massert(g, "gamestate is NULL");
+//    for (entityid id = 0; id < g->next_entityid; id++) {
+//        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+//        if (sg && sg->current != sg->default_anim) {
+//            // which sg isnt done?
+//            return false;
+//        }
+//    }
+//    return true;
+//}
 
 static void libdraw_set_sg_is_damaged(gamestate* const g, entityid id, spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
@@ -614,12 +603,10 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegro
     libdraw_update_sprite_position(g, id, sg);
     libdraw_update_sprite_attack(g, id, sg);
     // Update movement as long as sg->move.x/y is non-zero
-
     if (spritegroup_update_dest(sg)) {
         minfo("update dest");
         g->frame_dirty = true;
     }
-
     // Snap to the tile position only when movement is fully complete
     vec3 loc = g_get_location(g, id);
     //vec3 loc_cast = {loc.x, loc.y, loc.z};
@@ -683,18 +670,18 @@ static void libdraw_update_sprite_pre(gamestate* const g, entityid id) {
     }
 }
 
-static void libdraw_update_sprite_post(gamestate* const g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
-    for (int i = 0; i < num_spritegroups; i++) {
-        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
-        if (sg) {
-            //libdraw_update_sprite_ptr(g, id, sg);
-            libdraw_handle_frame_incr(g, id, sg);
-        }
-    }
-}
+//static void libdraw_update_sprite_post(gamestate* const g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entityid is invalid");
+//    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+//    for (int i = 0; i < num_spritegroups; i++) {
+//        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+//        if (sg) {
+//            //libdraw_update_sprite_ptr(g, id, sg);
+//            libdraw_handle_frame_incr(g, id, sg);
+//        }
+//    }
+//}
 
 static void libdraw_handle_gamestate_flag(gamestate* const g) {
     massert(g, "gamestate is NULL");
@@ -725,7 +712,6 @@ static void libdraw_handle_dirty_entities(gamestate* const g) {
 void libdraw_update_sprites(gamestate* const g) {
     if (g) {
         UpdateMusicStream(music);
-
         if (g->current_scene == SCENE_GAMEPLAY) {
             libdraw_handle_dirty_entities(g);
             for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite(g, id);
@@ -751,26 +737,24 @@ void libdraw_update_sprites_post(gamestate* const g) {
         UpdateMusicStream(music);
         if (g->current_scene == SCENE_GAMEPLAY) {
             libdraw_handle_dirty_entities(g);
-
             if (g->framecount % ANIM_SPEED == 0) {
-                //minfo("ANIM SPEED: %d", ANIM_SPEED);
-                //printf("ANIM SPEED: %d\n", ANIM_SPEED);
                 for (entityid id = 0; id < g->next_entityid; id++) {
                     int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
                     for (int i = 0; i < num_spritegroups; i++) {
                         spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
                         if (sg) {
-                            // libdraw_handle_frame_incr(g, id, sg);
                             sprite* const s = sg_get_current(sg);
                             massert(s, "sprite is NULL");
-                            g->frame_dirty = true;
-                            sprite_incrframe(s);
-                            if (s->num_loops >= 1) {
-                                sg->current = sg->default_anim;
-                                s->num_loops = 0;
-                            }
                             // attempt to grab the sprite's shadow
                             sprite* const s_shadow = sg_get_current_plus_one(sg);
+                            g->frame_dirty = true;
+                            if (s) {
+                                sprite_incrframe(s);
+                                if (s->num_loops >= 1) {
+                                    sg->current = sg->default_anim;
+                                    s->num_loops = 0;
+                                }
+                            }
                             if (s_shadow) {
                                 sprite_incrframe(s_shadow);
                                 if (s_shadow->num_loops >= 1) {
@@ -782,7 +766,6 @@ void libdraw_update_sprites_post(gamestate* const g) {
                     }
                 }
             }
-
             libdraw_handle_gamestate_flag(g);
         }
     }
@@ -796,19 +779,16 @@ static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     draw_dungeon_tiles_2d(g, z, df);
     //draw_entities_2d(g, z, df, true); // dead entities
     //draw_entities_2d(g, z, df, false); // alive entities
-
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             draw_entities_2d_at(g, df, true, (vec3){x, y, z});
         }
     }
-
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             draw_entities_2d_at(g, df, false, (vec3){x, y, z});
         }
     }
-
     return true;
 }
 
@@ -835,15 +815,11 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
     int x = loc.x + get_x_from_dir(dir);
     int y = loc.y + get_y_from_dir(dir);
     int ds = DEFAULT_TILE_SIZE;
-
     Color base_c = GREEN;
-
     float a = 0.25f;
-
     if (g->player_changing_direction) {
         a = 1.0f;
     }
-
     Color c = Fade(base_c, a);
     DrawRectangleLinesEx((Rectangle){x * ds, y * ds, ds, ds}, 1, c);
     return true;
@@ -870,9 +846,6 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     draw_inventory_menu(g);
     handle_debug_panel(g);
     draw_version(g);
-    if (g->display_quit_menu) {
-        draw_quit_menu(g);
-    }
     if (g->display_help_menu) {
         draw_help_menu(g);
     }
@@ -999,9 +972,7 @@ static void draw_gameover_menu(gamestate* const g) {
     int text_height = font_size;
     int x = (g->windowwidth - text_width) / 2;
     int y = (g->windowheight - text_height * 2) / 2;
-
     Rectangle rect = {x - 10, y - 10, text_width + 20, text_height * 2 + 20};
-
     // Draw background box
     DrawRectangle(x - 10, y - 10, text_width + 20, text_height * 2 + 20, bg_color);
     //DrawRectangleLines(x - 10, y - 10, text_width + 20, text_height * 2 + 20, WHITE);
@@ -1023,10 +994,8 @@ void libdraw_drawframe(gamestate* const g) {
     //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
     //minfo("drawframe current scene: %d", g->current_scene);
-
     //BeginTextureMode(target);
     //ClearBackground(BLUE);
-
     if (g->frame_dirty) {
         if (g->current_scene == SCENE_TITLE) {
             draw_title_screen_to_texture(g, false);
@@ -1040,7 +1009,6 @@ void libdraw_drawframe(gamestate* const g) {
         g->frame_dirty = false;
         g->frame_updates++;
     }
-
     BeginTextureMode(target);
     ClearBackground(BLUE);
     if (g->current_scene == SCENE_TITLE) {
@@ -1053,7 +1021,6 @@ void libdraw_drawframe(gamestate* const g) {
         libdraw_drawframe_2d_from_texture(g);
     }
     EndTextureMode();
-
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     EndDrawing();
     g->last_frame_time = GetTime() - start_time;
@@ -1062,6 +1029,7 @@ void libdraw_drawframe(gamestate* const g) {
 }
 
 static bool libdraw_unload_texture(int txkey) {
+    massert(txkey >= 0, "txkey is invalid");
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
         merror("libdraw_unload_texture: txkey out of bounds");
         return false;
@@ -1073,8 +1041,9 @@ static bool libdraw_unload_texture(int txkey) {
 }
 
 static void libdraw_unload_textures() {
-    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) libdraw_unload_texture(i);
-
+    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) {
+        libdraw_unload_texture(i);
+    }
     UnloadRenderTexture(title_target_texture);
     UnloadRenderTexture(char_creation_target_texture);
     UnloadRenderTexture(main_game_target_texture);
@@ -1096,6 +1065,11 @@ void libdraw_close() {
 }
 
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path) {
+    massert(path, "path is NULL");
+    massert(txkey >= 0, "txkey is invalid");
+    massert(ctxs >= 0, "contexts is invalid");
+    massert(frames >= 0, "frames is invalid");
+    //msuccess("load_texture: txkey: %d, contexts: %d, frames: %d, path: %s", txkey, ctxs, frames, path);
     if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
         merror("load_texture: txkey out of bounds: %d", txkey);
         return false;
@@ -1116,7 +1090,9 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
         return false;
     }
     Image image = LoadImage(path);
-    if (do_dither) ImageDither(&image, 4, 4, 4, 4);
+    if (do_dither) {
+        ImageDither(&image, 4, 4, 4, 4);
+    }
     Texture2D texture = LoadTextureFromImage(image);
     UnloadImage(image);
     txinfo[txkey].texture = texture;
@@ -1129,6 +1105,7 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
 static void load_textures() {
     const char* textures_file = "textures.txt";
     FILE* file = fopen(textures_file, "r");
+    massert(file, "textures.txt file is NULL");
     if (!file) {
         merror("textures.txt not found");
         return;
@@ -1159,23 +1136,21 @@ static void load_textures() {
 }
 
 static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
-    if (!g) {
-        return;
-    }
+    massert(g, "gamestate is NULL");
     // can hold up to 32 sprites
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
-    if (!group) {
-        return;
-    }
+    massert(group, "spritegroup is NULL");
     //disabling this check until dungeon_floor created
     dungeon_floor_t* df = d_get_current_floor(g->d);
+    massert(df, "dungeon_floor is NULL");
     if (!df) {
         spritegroup_destroy(group);
         return;
     }
-    const int df_w = df->width;
-    const int df_h = df->height;
+    const int df_w = df->width, df_h = df->height;
     vec3 loc = g_get_location(g, id);
+    massert(loc.x >= 0 && loc.x < df_w, "location x out of bounds: %d", loc.x);
+    massert(loc.y >= 0 && loc.y < df_h, "location y out of bounds: %d", loc.y);
     if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
         spritegroup_destroy(group);
         return;
@@ -1188,6 +1163,7 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
     }
     group->id = id;
     sprite* s = spritegroup_get(group, 0);
+    massert(s, "sprite is NULL");
     if (!s) {
         spritegroup_destroy(group);
         return;
@@ -1385,7 +1361,6 @@ void libdraw_init_rest(gamestate* const g) {
     title_target_texture = LoadRenderTexture(w, h);
     char_creation_target_texture = LoadRenderTexture(w, h);
     main_game_target_texture = LoadRenderTexture(w, h);
-
     target_src = (Rectangle){0, 0, w, -h};
     target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
@@ -1399,10 +1374,8 @@ void libdraw_init_rest(gamestate* const g) {
     massert(df, "dungeon_floor is NULL");
     int df_w = df->width, df_h = df->height;
     g->cam2d.target = (Vector2){df_w * DEFAULT_TILE_SIZE / 2.0f, df_h * DEFAULT_TILE_SIZE / 2.0f};
-
     draw_title_screen_to_texture(g, false);
     draw_character_creation_screen_to_texture(g);
-
     InitAudioDevice();
     // select a random indices for current music
     g->current_music_index = rand() % g->total_music_paths;
@@ -1423,48 +1396,14 @@ void libdraw_init_rest(gamestate* const g) {
 
 void libdraw_init(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
-    const int x = w / 3, y = h / 3;
+    int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
+    //int x = w / 3;
+    //int y = h / 3;
     const char* title = WINDOW_TITLE;
     char full_title[1024] = {0};
     snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version);
     InitWindow(w, h, full_title);
-    //g->windowwidth = w;
-    //g->windowheight = h;
-
     libdraw_init_rest(g);
-
-    //SetExitKey(KEY_NULL);
-    //SetTargetFPS(60);
-    //target = LoadRenderTexture(w, h);
-    //target_src = (Rectangle){0, 0, w, -h};
-    //target_dest = (Rectangle){0, 0, w, h};
-    //spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
-    //load_textures();
-    //calc_debugpanel_size(g);
-    //load_shaders();
-    //g->cam2d.offset = (Vector2){x, y};
-    //gamestate_set_debug_panel_pos_top_right(g);
-    //// set the camera target to the center of the dungeon
-    //dungeon_floor_t* const df = d_get_current_floor(g->d);
-    //massert(df, "dungeon_floor is NULL");
-    //int df_w = df->width, df_h = df->height;
-    //g->cam2d.target = (Vector2){df_w * DEFAULT_TILE_SIZE / 2.0f, df_h * DEFAULT_TILE_SIZE / 2.0f};
-    //InitAudioDevice();
-    //// select a random indices for current music
-    //g->current_music_index = rand() % g->total_music_paths;
-    //// load the music stream from the selected path
-    //const char* music_path = g->music_file_paths[g->current_music_index];
-    //massert(music_path, "music_path is NULL");
-    //minfo("Loading music from path: %s", music_path);
-    //char real_music_path[1024] = {0};
-    //snprintf(real_music_path, sizeof(real_music_path), "%s%s", "audio/music/", music_path);
-    //music = LoadMusicStream(real_music_path);
-    ////SetMusicVolume(music, 0.50f); // Set initial music volume
-    //SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
-    ////SetMusicLooping(music, true); // Loop the music
-    //PlayMusicStream(music);
-    //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
 }
 
 static void draw_message_history(gamestate* const g) {
@@ -1646,36 +1585,6 @@ static void draw_inventory_menu(gamestate* const g) {
     }
 }
 
-static void draw_quit_menu(const gamestate* const g) {
-    massert(g, "gamestate is NULL");
-    const char* text = "Press Q again to Exit or ESC to Cancel";
-    const int box_pad = g->pad;
-    //const int section_gap = 16;
-    //const int item_list_pad = g->pad;
-    //const int max_visible_items = 12; // arbitrary limit for list height
-    // Measure text using DrawText
-    int text_width = MeasureText(text, g->font_size);
-    //int text_height = g->font_size;
-    int text_height = 10;
-    // Calculate box size to fit the text with padding
-    const float box_width = text_width + box_pad * 2;
-    const float box_height = text_height + box_pad * 2;
-    // Calculate box position to center it on the screen
-    const float box_x = (g->windowwidth - box_width) / 2.0f;
-    const float box_y = (g->windowheight - box_height) / 2.0f;
-    // Define colors
-    const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
-    // Draw the box and border
-    DrawRectangleRec((Rectangle){box_x, box_y, box_width, box_height}, bg);
-    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, fg);
-    // Calculate text position to center it within the box
-    const float text_x = box_x + box_pad;
-    const float text_y = box_y + box_pad;
-    // Draw the text
-    //DrawText(text, text_x, text_y, g->font_size, fg);
-    DrawText(text, text_x, text_y, 10, fg);
-}
-
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
 
 bool libdraw_windowshouldclose(const gamestate* const g) {
@@ -1683,29 +1592,21 @@ bool libdraw_windowshouldclose(const gamestate* const g) {
     return g->do_quit;
 }
 
-void draw_version(const gamestate* const g) {
+static void draw_version(const gamestate* const g) {
     massert(g, "gamestate is NULL");
     const char* version = g->version;
     const int font_size = 10;
-
     // also grab the current music track path
     const char* current_music_path = g->music_file_paths[g->current_music_index];
-
     char buffer[1024] = {0};
     snprintf(buffer, sizeof(buffer), "%s | Music: %s", version, current_music_path);
-
-    //const Vector2 text_size = MeasureTextEx(GetFontDefault(), version, font_size, 1.0f);
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
-
     const float x = g->windowwidth - text_size.x - g->pad;
-    //const float y = g->windowheight - text_size.y - g->pad;
-    //const float x = 0;
     const float y = 0;
-    //DrawTextEx(GetFontDefault(), version, (Vector2){x, y}, font_size, 1.0f, WHITE);
     DrawTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
 }
 
-void draw_title_screen(gamestate* const g, bool show_menu) {
+static void draw_title_screen(gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
     //const char* title_text = "project.rpg";
     const char* title_text_0 = "project.";
@@ -1716,7 +1617,7 @@ void draw_title_screen(gamestate* const g, bool show_menu) {
     const char* start_text = "Press any key to begin";
     const int sm_font_size = 20;
     const int font_size = 80;
-    Color bg_color = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent background
+    //Color bg_color = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent background
     // Measure text
     int measure = MeasureText(title_text_0, font_size);
     int start_measure = MeasureText(start_text, sm_font_size);
@@ -1731,7 +1632,7 @@ void draw_title_screen(gamestate* const g, bool show_menu) {
     // Draw title text 0
     DrawText(title_text_0, x, y, font_size, title_text_0_color);
     // calculate and place title text 1 next to title text 0
-    int title_text_1_measure = MeasureText(title_text_1, font_size);
+    //int title_text_1_measure = MeasureText(title_text_1, font_size);
     const int padding = 10; // Space between title texts
     float title_text_1_x = x + measure + padding; // Right of title_text_0
     // Draw title text 1
@@ -1769,7 +1670,7 @@ void draw_title_screen(gamestate* const g, bool show_menu) {
     }
 }
 
-void draw_title_screen_to_texture(gamestate* const g, bool show_menu) {
+static void draw_title_screen_to_texture(gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(title_target_texture);
     draw_title_screen(g, show_menu);
@@ -1777,13 +1678,13 @@ void draw_title_screen_to_texture(gamestate* const g, bool show_menu) {
     EndTextureMode();
 }
 
-void draw_title_screen_from_texture(gamestate* const g) {
+static void draw_title_screen_from_texture(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // Draw the title screen texture
     DrawTexturePro(title_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
-void draw_character_creation_screen_to_texture(gamestate* const g) {
+static void draw_character_creation_screen_to_texture(gamestate* const g) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(char_creation_target_texture);
     draw_character_creation_screen(g);
@@ -1791,13 +1692,13 @@ void draw_character_creation_screen_to_texture(gamestate* const g) {
     EndTextureMode();
 }
 
-void draw_character_creation_screen_from_texture(gamestate* const g) {
+static void draw_character_creation_screen_from_texture(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // Draw the character creation screen texture
     DrawTexturePro(char_creation_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
-void draw_character_creation_screen(gamestate* const g) {
+static void draw_character_creation_screen(gamestate* const g) {
     massert(g, "gamestate is NULL");
     const char* title_text = "Character Creation";
     // we will draw some more stuff here later
@@ -1805,77 +1706,59 @@ void draw_character_creation_screen(gamestate* const g) {
     // similar to how we draw the hud screen
     // we can use placeholder values just to mock the screen up
     //const char* placeholder_text = "Name: Hero\nRace: Human\nClass: Warrior\nStrength: 10\nDexterity: 10\nConstitution: 10\nIntelligence: 10\nWisdom: 10\nCharisma: 10";
-
     // we no longer need placeholder text and can pull values directly from the g->chara_creation struct
-    char buffer[1024] = {0};
+    char buffer[2048] = {0};
     //snprintf(buffer, 1024, "name: %s", g->chara_creation.name);
     int font_size = 40;
-
     int cx = g->windowwidth / 2;
-    int cy = g->windowheight / 2;
+    //int cy = g->windowheight / 2;
     int sy = g->windowheight / 4;
-
     ClearBackground(BLACK);
-
     // Draw title text
-    int measure = MeasureText(title_text, font_size);
+    //int measure = MeasureText(title_text, font_size);
     int x = cx;
     int y = sy;
-
     DrawText(title_text, x, y, font_size, WHITE);
     y += font_size;
-
     font_size = 20;
-
     // Draw character creation stats
     //int line_spacing = 4;
     snprintf(buffer, sizeof(buffer), "Name: %s", g->chara_creation.name);
     DrawText(buffer, x, y, font_size, WHITE);
     y += font_size + 4;
-
     bzero(buffer, sizeof(buffer));
     //snprintf(buffer, sizeof(buffer), "Race: %d", g->chara_creation.race);
     snprintf(buffer, sizeof(buffer), "Race: %s", get_race_str(g->chara_creation.race));
     DrawText(buffer, x, y, font_size, WHITE);
     y += font_size + 4;
-
     bzero(buffer, sizeof(buffer));
     snprintf(buffer, sizeof(buffer), "Hitdie: %d", g->chara_creation.hitdie);
     DrawText(buffer, x, y, font_size, WHITE);
     y += font_size + 4;
-
     bzero(buffer, sizeof(buffer));
     snprintf(buffer, sizeof(buffer), "Strength: %d", g->chara_creation.strength);
     DrawText(buffer, x, y, font_size, WHITE);
     y += font_size + 4;
-
     bzero(buffer, sizeof(buffer));
     snprintf(buffer, sizeof(buffer), "Dexterity: %d", g->chara_creation.dexterity);
     DrawText(buffer, x, y, font_size, WHITE);
     y += font_size + 4;
-
     bzero(buffer, sizeof(buffer));
     snprintf(buffer, sizeof(buffer), "Constitution: %d", g->chara_creation.constitution);
     DrawText(buffer, x, y, font_size, WHITE);
     y += font_size + 4;
-
     // we will come back here to draw a representative sprite for when you select race etc
     // to do this, i will create "false entities" that can be destroyed or left in for later use
     // they will likely be created before any of the other main entities get instantiated
-
     // for right now, lets draw a red thick box in the left side of the screen, parallel to the text vertically
     // the red box will represent where we want the sprite to go when we come back to draw it later
     Rectangle sprite_box = {.x = cx - 200 - 10, .y = sy, .width = 200, .height = 200};
-
     DrawRectangleLinesEx(sprite_box, 4, RED);
-
     const char* remaining_text[4] = {
         "Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race (unavailable for now)", "Press UP/DOWN to change class (unavailable for now)", "Press ENTER to confirm"};
     const int remaining_count = sizeof(remaining_text) / sizeof(remaining_text[0]);
-
     // add spacing
     y += font_size + 8;
-
     for (int i = 0; i < remaining_count; i++) {
         DrawText(remaining_text[i], x, y, font_size, WHITE);
         y += font_size + 4;
