@@ -175,7 +175,7 @@ static int calc_next_lvl_xp(gamestate* const g, entityid id) {
     int lvl = g_get_stat(g, id, STATS_LEVEL);
     massert(lvl >= 0, "level is negative");
     // calculate the next level's xp
-    const int base_xp = 10;
+    int base_xp = 10;
     int next_lvl_xp = base_xp * (powl(2, lvl) - 1);
     massert(next_lvl_xp >= 0, "next level xp is negative");
     // set the next level's xp
@@ -411,7 +411,7 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
             // get the entity's base attack damage
             vec3 dmg_roll = g_get_base_attack_damage(g, atk_id);
             dmg = do_roll(dmg_roll);
-            const int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
+            int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
             dmg += atk_bonus;
         } else {
             // weapon
@@ -419,7 +419,7 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
             massert(g_has_damage(g, attacker_weapon_id), "attacker weapon does not have damage attached");
             vec3 dmg_roll = g_get_damage(g, attacker_weapon_id);
             dmg = do_roll(dmg_roll);
-            const int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
+            int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
             dmg += atk_bonus;
         }
         g_set_damaged(g, tgt_id, true);
@@ -493,8 +493,8 @@ static bool handle_shield_check(gamestate* const g, entityid attacker_id, entity
     // if you have a shield at all, the attack will get auto-blocked
     entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
     if (shield_id != ENTITYID_INVALID) {
-        const int shield_ac = g_get_ac(g, shield_id);
-        const int total_ac = base_ac + shield_ac;
+        int shield_ac = g_get_ac(g, shield_id);
+        int total_ac = base_ac + shield_ac;
         if (attack_roll < total_ac) {
             *attack_successful = false;
             handle_attack_blocked(g, attacker_id, target_id, attack_successful);
@@ -521,11 +521,11 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     if (g_is_dead(g, target_id)) return false;
     // lets try an experiment...
     // get the armor class of the target
-    const int base_ac = g_get_stat(g, target_id, STATS_AC);
-    const int base_str = g_get_stat(g, attacker_id, STATS_STR);
-    const int str_bonus = bonus_calc(base_str);
-    const int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
-    const int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
+    int base_ac = g_get_stat(g, target_id, STATS_AC);
+    int base_str = g_get_stat(g, attacker_id, STATS_STR);
+    int str_bonus = bonus_calc(base_str);
+    int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
+    int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
     *attack_successful = false;
     if (attack_roll >= base_ac) return handle_shield_check(g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
     // attack misses
@@ -718,7 +718,7 @@ static void init_dungeon(gamestate* const g) {
     massert(g, "gamestate is NULL");
     g->d = d_create();
     massert(g->d, "failed to init dungeon");
-    const int df_count = 20;
+    int df_count = 20;
     for (int i = 0; i < df_count; i++) d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 }
 
@@ -915,7 +915,7 @@ static void init_player(gamestate* const g) {
     // that can scan for an appropriate starting location
     vec3 loc = df_get_upstairs(g->d->floors[g->d->current_floor]);
     //minfo("loc: %d, %d, %d", loc.x, loc.y, loc.z);
-    const int id = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
+    int id = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
 
     massert(id != ENTITYID_INVALID, "failed to init hero");
     //minfo("hero id: %d", id);
@@ -1053,7 +1053,7 @@ static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int 
 //}
 
 static const char* get_action_key(const inputstate* const is, gamestate* const g) {
-    const int key = inputstate_get_pressed_key(is);
+    int key = inputstate_get_pressed_key(is);
     // can return early if key == -1
     if (key == -1) return "none";
     return get_action_for_key(&g->keybinding_list, key);
@@ -1139,7 +1139,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     int hp = g_get_stat(g, g->hero_id, STATS_HP);
                     int maxhp = g_get_stat(g, g->hero_id, STATS_MAXHP);
                     if (hp < maxhp) {
-                        const int small_hp_health_roll = rand() % 4 + 1;
+                        int small_hp_health_roll = rand() % 4 + 1;
                         hp += small_hp_health_roll;
                         if (hp > maxhp) hp = maxhp;
                         g_set_stat(g, g->hero_id, STATS_HP, hp);
@@ -1974,7 +1974,7 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
 static void try_spawn_npc(gamestate* const g) {
     massert(g, "gamestate is NULL");
     static bool do_this_once = true;
-    const int every_nth_turn = 10;
+    int every_nth_turn = 10;
     if (g->turn_count % every_nth_turn == 0) {
         bool success = false;
         if (do_this_once) {

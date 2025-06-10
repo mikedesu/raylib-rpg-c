@@ -159,21 +159,21 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     if (txkey < 0) return false;
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) return false;
-    const int offset_x = -12, offset_y = -12;
-    const int dx = x * DEFAULT_TILE_SIZE + offset_x;
-    const int dy = y * DEFAULT_TILE_SIZE + offset_y;
+    int offset_x = -12, offset_y = -12;
+    int dx = x * DEFAULT_TILE_SIZE + offset_x;
+    int dy = y * DEFAULT_TILE_SIZE + offset_y;
     const Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
     const Rectangle dest = (Rectangle){dx, dy, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     if (tile->has_pressure_plate) {
-        const int txkey2 = tile->pressure_plate_up_tx_key;
+        int txkey2 = tile->pressure_plate_up_tx_key;
         if (txkey2 < 0) return false;
         Texture2D* texture = &txinfo[txkey2].texture;
         if (texture->id <= 0) return false;
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
     if (tile->has_wall_switch) {
-        const int txkey = tile->wall_switch_on ? tile->wall_switch_down_tx_key : tile->wall_switch_up_tx_key;
+        int txkey = tile->wall_switch_on ? tile->wall_switch_down_tx_key : tile->wall_switch_up_tx_key;
         if (txkey < 0) return false;
         Texture2D* texture = &txinfo[txkey].texture;
         if (texture->id <= 0) return false;
@@ -559,7 +559,7 @@ static void libdraw_update_sprite_position(gamestate* const g, entityid id, spri
 static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir) {
     massert(g, "gamestate is NULL");
     massert(group != NULL, "group is NULL");
-    const int old_ctx = group->sprites[group->current]->currentcontext;
+    int old_ctx = group->sprites[group->current]->currentcontext;
     int ctx = old_ctx;
     ctx = dir == DIR_NONE                                      ? old_ctx
           : dir == DIR_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
@@ -604,7 +604,7 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegro
     libdraw_update_sprite_attack(g, id, sg);
     // Update movement as long as sg->move.x/y is non-zero
     if (spritegroup_update_dest(sg)) {
-        minfo("update dest");
+        //minfo("update dest");
         g->frame_dirty = true;
     }
     // Snap to the tile position only when movement is fully complete
@@ -795,10 +795,10 @@ static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
 static void libdraw_draw_debug_panel(gamestate* const g) {
     massert(g, "gamestate is NULL");
     const Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f), fg = WHITE;
-    const int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
-    const int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
-    const int x1 = g->debugpanel.x + g->debugpanel.pad_left;
-    const int y1 = g->debugpanel.y + g->debugpanel.pad_top;
+    int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
+    int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
+    int x1 = g->debugpanel.x + g->debugpanel.pad_left;
+    int y1 = g->debugpanel.y + g->debugpanel.pad_top;
     DrawRectangle(g->debugpanel.x, g->debugpanel.y, w0, h0, bg);
     DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
 }
@@ -807,7 +807,7 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
     massert(g, "gamestate is NULL");
     const entityid id = g->hero_id;
     if (id == -1) {
-        merror("libdraw_draw_player_target_box: id is -1");
+        //merror("libdraw_draw_player_target_box: id is -1");
         return false;
     }
     direction_t dir = g_get_direction(g, id);
@@ -826,13 +826,13 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
 }
 
 static void libdraw_drawframe_2d(gamestate* const g) {
-    BeginMode2D(g->cam2d);
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
+    libdraw_camera_lock_on(g);
+    BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     //EndShaderMode();
-    libdraw_camera_lock_on(g);
     //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     libdraw_draw_dungeon_floor(g);
     //if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
@@ -1147,7 +1147,7 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
         spritegroup_destroy(group);
         return;
     }
-    const int df_w = df->width, df_h = df->height;
+    int df_w = df->width, df_h = df->height;
     vec3 loc = g_get_location(g, id);
     massert(loc.x >= 0 && loc.x < df_w, "location x out of bounds: %d", loc.x);
     massert(loc.y >= 0 && loc.y < df_h, "location y out of bounds: %d", loc.y);
@@ -1156,7 +1156,7 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
         return;
     }
     for (int i = 0; i < num_keys; i++) {
-        const int k = keys[i];
+        int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
         sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
         spritegroup_add(group, s);
@@ -1188,8 +1188,8 @@ static void create_sg_byid(gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     int* keys = NULL;
     int num_keys = 0;
-    const int offset_x = -12;
-    const int offset_y = -12;
+    int offset_x = -12;
+    int offset_y = -12;
     entitytype_t type = g_get_type(g, id);
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
         race_t race = g_get_race(g, id);
@@ -1308,20 +1308,20 @@ static int get_total_ac(gamestate* const g, entityid id) {
 
 static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    const int turn = g->turn_count;
+    int turn = g->turn_count;
     int stat_count = 0;
     int* stats = g_get_stats(g, g->hero_id, &stat_count);
     massert(stats, "stats is NULL");
-    const int hp = stats[STATS_HP];
-    const int maxhp = stats[STATS_MAXHP];
-    const int level = stats[STATS_LEVEL];
-    const int xp = stats[STATS_XP];
-    const int next_level_xp = stats[STATS_NEXT_LEVEL_XP];
-    const int attack_bonus = stats[STATS_ATTACK_BONUS];
-    const int str = stats[STATS_STR];
-    const int con = stats[STATS_CON];
-    const int dex = stats[STATS_DEX];
-    const int ac = get_total_ac(g, g->hero_id);
+    int hp = stats[STATS_HP];
+    int maxhp = stats[STATS_MAXHP];
+    int level = stats[STATS_LEVEL];
+    int xp = stats[STATS_XP];
+    int next_level_xp = stats[STATS_NEXT_LEVEL_XP];
+    int attack_bonus = stats[STATS_ATTACK_BONUS];
+    int str = stats[STATS_STR];
+    int con = stats[STATS_CON];
+    int dex = stats[STATS_DEX];
+    int ac = get_total_ac(g, g->hero_id);
     //loc_t loc = g_get_location(g, g->hero_id);
     //dungeon_floor_t* const df = d_get_current_floor(g->d);
     int floor = g->d->current_floor;
@@ -1334,10 +1334,10 @@ static void draw_hud(gamestate* const g) {
     //snprintf(buffer, sizeof(buffer), "%s Lvl %d HP %d/%d AC: %d XP %d Room: %s Turn %d", g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, room_name, turn);
     snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp, str, con, dex, floor, turn);
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
-    const int box_w = text_size.x + g->pad;
-    const int box_h = text_size.y + g->pad;
-    const int box_x = 0;
-    const int box_y = 0;
+    int box_w = text_size.x + g->pad;
+    int box_h = text_size.y + g->pad;
+    int box_x = 0;
+    int box_y = 0;
     const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, 2, fg);
@@ -1351,8 +1351,8 @@ void libdraw_init_rest(gamestate* const g) {
     minfo("libdraw_init_rest: initializing rest of the libdraw");
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);
-    const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
-    const int x = w / 3, y = h / 3;
+    int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
+    int x = w / 3, y = h / 3;
     minfo("libdraw_init_rest: window size: %dx%d", w, h);
     massert(w > 0 && h > 0, "window width or height is not set properly");
     g->windowwidth = w;
@@ -1411,9 +1411,9 @@ static void draw_message_history(gamestate* const g) {
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) return;
     int font_size = 20;
-    const int max_messages = 20;
-    const int x = 0;
-    const int y = 42;
+    int max_messages = 20;
+    int x = 0;
+    int y = 42;
     int current_count = 0;
     char tmp_buffer[2048] = {0};
     //Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
@@ -1449,63 +1449,46 @@ static void draw_inventory_menu(gamestate* const g) {
     if (!g->display_inventory_menu) return;
     const char* menu_title = "Inventory Menu";
     // Parameters
-    const int box_pad = g->pad;
-    const int section_gap = 8;
-    const int item_list_pad = g->pad;
-    //const int font_size = g->font_size;
-    const int font_size = 20;
-    const int max_visible_items = 12; // arbitrary limit for list height
+    int box_pad = g->pad, section_gap = 8, item_list_pad = g->pad, font_size = 20, max_visible_items = 12, inventory_count = 0, scale = 8;
     // Measure title
     //Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
     Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g->line_spacing);
     // Menu box size
-    float menu_width_percent = 0.75f;
-    float menu_height_percent = 0.75f;
-    float menu_width = g->windowwidth * menu_width_percent;
-    float menu_height = g->windowheight * menu_height_percent;
+    float menu_width_percent = 0.75f, menu_height_percent = 0.75f;
+    float menu_width = g->windowwidth * menu_width_percent, menu_height = g->windowheight * menu_height_percent;
     Rectangle menu_box = {.x = (g->windowwidth - menu_width) / 2.0f, .y = (g->windowheight - menu_height) / 4.0f, .width = menu_width, .height = menu_height};
+    float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f, title_y = menu_box.y + box_pad, half_width = (menu_box.width - section_gap) / 2.0f,
+          half_height = menu_box.height - title_size.y - box_pad * 2.0f - box_pad;
+    const char* info_title = "Item Info:";
+    char info_text[256] = {0};
+    spritegroup_t* sg = NULL;
     // Draw menu background and border
     //DrawRectangleRec(menu_box, (Color){0x33, 0x33, 0x33, 0xff});
     DrawRectangleRec(menu_box, (Color){0x33, 0x33, 0x33, 0x99});
     DrawRectangleLinesEx(menu_box, 2, WHITE);
     // Draw menu title centered at top
-    float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f;
-    float title_y = menu_box.y + box_pad;
     //DrawTextEx(GetFontDefault(), menu_title, (Vector2){title_x, title_y}, g->font_size, g->line_spacing, WHITE);
     DrawText(menu_title, title_x, title_y, font_size, WHITE);
     // Partition into left/right halves (with gap)
-    float half_width = (menu_box.width - section_gap) / 2.0f;
-    float half_height = menu_box.height - title_size.y - box_pad * 2.0f - box_pad;
     // Left box: inventory list
-    Rectangle left_box = {.x = menu_box.x + box_pad, .y = title_y + title_size.y + box_pad, .width = half_width - box_pad, .height = half_height};
     // Right box: item info
-    Rectangle right_box = {.x = left_box.x + half_width + section_gap, .y = left_box.y, .width = half_width - box_pad * 2, .height = half_height};
+    Rectangle left_box = {.x = menu_box.x + box_pad, .y = title_y + title_size.y + box_pad, .width = half_width - box_pad, .height = half_height},
+              right_box = {.x = left_box.x + half_width + section_gap, .y = left_box.y, .width = half_width - box_pad * 2, .height = half_height};
     // Draw left and right boxes
+    float item_y = left_box.y + item_list_pad, info_title_y = right_box.y + item_list_pad, info_text_y = info_title_y + font_size + 8;
     DrawRectangleRec(left_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(left_box, 2, WHITE);
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
-    float item_y = left_box.y + item_list_pad;
-    int inventory_count = 0;
     entityid* inventory = g_get_inventory(g, g->hero_id, &inventory_count);
     //for (int i = 0; i < hero->inventory_count && i < max_visible_items; i++) {
     for (int i = 0; i < g_get_inventory_count(g, g->hero_id) && i < max_visible_items; i++) {
         entityid item_id = inventory[i];
         if (item_id == ENTITYID_INVALID) continue;
-        //int item_id = g_get_inventory_item(g, g->hero_id, i);
-        //    if (item_id == 0) continue;
         float item_x = left_box.x + item_list_pad;
         char item_display[128];
-        //entitytype_t item_type = g_get_type(g, item_id);
         bool is_equipped = g_is_equipped(g, g->hero_id, item_id);
-        //if (item_type == ENTITY_WEAPON) {
-        //        is_equipped = (hero->weapon == item_id);
-        //    } else if (item_type == ENTITY_SHIELD) {
-        //        is_equipped = (hero->shield == item_id);
-        //    }
         if (i == g->inventory_menu_selection) {
-            //        //snprintf(item_display, sizeof(item_display), "> %s", item_entity->name);
-            //snprintf(item_display, sizeof(item_display), "> %s", "[placeholder]");
             snprintf(item_display, sizeof(item_display), "> %s", g_get_name(g, item_id));
         } else {
             snprintf(item_display, sizeof(item_display), "  %s", g_get_name(g, item_id));
@@ -1517,9 +1500,6 @@ static void draw_inventory_menu(gamestate* const g) {
         item_y += font_size + 4;
     }
     // Draw item info in right_box
-    const char* info_title = "Item Info:";
-    char info_text[256] = {0};
-    spritegroup_t* sg = NULL;
     if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < inventory_count) {
         entityid item_id = inventory[g->inventory_menu_selection];
         const char* name = g_get_name(g, item_id);
@@ -1537,44 +1517,21 @@ static void draw_inventory_menu(gamestate* const g) {
         } else if (g_has_ac(g, item_id)) {
             int ac = g_get_ac(g, item_id);
             snprintf(info_text, sizeof(info_text), "%s\nType: %d\nAC: %d", name, item_type, ac);
-        }
-        //else if (g_has_heal(g, item_id)) {
-        //    int heal = g_get_heal(g, item_id);
-        //    snprintf(info_text, sizeof(info_text), "%s\nType: %d\nHeal: %d", name, item_type, heal);
-        //}
-        //else if (g_has_effect(g, item_id)) {
-        //    effect_t effect = g_get_effect(g, item_id);
-        //    snprintf(info_text, sizeof(info_text), "%s\nType: %d\nEffect: %d", name, item_type, effect);
-        //
-        //        }
-        else {
+        } else {
             snprintf(info_text, sizeof(info_text), "%s\nType: %d", name, item_type);
         }
-        //    entityid item_id = hero->inventory[g->inventory_menu_selection];
-        //        //snprintf(info_text, sizeof(info_text), "%s\nType: %d", item_entity->name, item_entity->type);
-        //        snprintf(info_text, sizeof(info_text), "%s\nType: %d", "[placeholder]", g_get_type(g, item_id));
         sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
-        //} else {
-        //    snprintf(info_text, sizeof(info_text), "Invalid item data");
-        //}
     } else {
         snprintf(info_text, sizeof(info_text), "Select an item to view details here.");
     }
-    float info_title_y = right_box.y + item_list_pad;
-    float info_text_y = info_title_y + font_size + 8;
     DrawTextEx(GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, font_size, g->line_spacing, (Color){0xaa, 0xaa, 0xaa, 0xff});
     DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, font_size, g->line_spacing, WHITE);
     if (sg) {
         sprite* s = sg_get_current(sg);
         if (s) {
-            const int scale = 8;
-            const float sprite_width = s->width * scale;
-            const float sprite_height = s->height * scale;
-            const float sprite_margin = -6 * scale; // space from top and right edges
-            //const float sprite_margin = 0; // space from top and right edges
+            float sprite_width = s->width * scale, sprite_height = s->height * scale, sprite_margin = -6 * scale;
             // Anchor to top-right of right_box, account for margin
-            const float sprite_x = right_box.x + right_box.width - sprite_margin - sprite_width;
-            const float sprite_y = right_box.y + sprite_margin;
+            const float sprite_x = right_box.x + right_box.width - sprite_margin - sprite_width, sprite_y = right_box.y + sprite_margin;
             DrawTexturePro(*s->texture,
                            s->src,
                            (Rectangle){sprite_x, sprite_y, sprite_width, sprite_height},
@@ -1595,7 +1552,7 @@ bool libdraw_windowshouldclose(const gamestate* const g) {
 static void draw_version(const gamestate* const g) {
     massert(g, "gamestate is NULL");
     const char* version = g->version;
-    const int font_size = 10;
+    int font_size = 10;
     // also grab the current music track path
     const char* current_music_path = g->music_file_paths[g->current_music_index];
     char buffer[1024] = {0};
@@ -1609,64 +1566,36 @@ static void draw_version(const gamestate* const g) {
 static void draw_title_screen(gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
     //const char* title_text = "project.rpg";
-    const char* title_text_0 = "project.";
-    const char* title_text_1 = "rpg";
-    const Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}; // gray
-    const Color title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF}; // white
-    const char* version_text = g->version;
-    const char* start_text = "Press any key to begin";
-    const int sm_font_size = 20;
-    const int font_size = 80;
-    //Color bg_color = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent background
-    // Measure text
-    int measure = MeasureText(title_text_0, font_size);
-    int start_measure = MeasureText(start_text, sm_font_size);
-    // Calculate positions
-    float x = (g->windowwidth - measure) / 2.0f;
-    // Center vertically
-    float y = (g->windowheight - font_size * 2) / 2.0f;
-    float start_x = (g->windowwidth - start_measure) / 2.0f;
-    // Below the title text
+    // Space between title texts
+    Color active_color = WHITE, disabled_color = {0x99, 0x99, 0x99, 0xFF}, selection_color;
+    const char* menu_text[3] = {"New Game", "Continue", "Settings"};
+    const char *title_text_0 = "project.", *title_text_1 = "rpg", *version_text = g->version, *start_text = "Press any key to begin";
+    char buffer[1024] = {0};
+    Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
+    int sm_font_size = 20, font_size = 80, measure = MeasureText(title_text_0, font_size), start_measure = MeasureText(start_text, sm_font_size), padding = 10,
+        version_measure = MeasureText(version_text, sm_font_size);
+    float x = (g->windowwidth - measure) / 2.0f, y = (g->windowheight - font_size * 2) / 2.0f, start_x = (g->windowwidth - start_measure) / 2.0f,
+          title_text_1_x = x + measure + padding, version_x = (g->windowwidth - version_measure) / 2.0f, version_y = y + font_size + 10,
+          start_y = y + font_size * 1 + 20 + sm_font_size;
     ClearBackground(BLACK);
-    // Draw background rectangle
-    // Draw title text 0
     DrawText(title_text_0, x, y, font_size, title_text_0_color);
-    // calculate and place title text 1 next to title text 0
-    //int title_text_1_measure = MeasureText(title_text_1, font_size);
-    const int padding = 10; // Space between title texts
-    float title_text_1_x = x + measure + padding; // Right of title_text_0
-    // Draw title text 1
     DrawText(title_text_1, title_text_1_x, y, font_size, title_text_1_color);
-    // Draw version text
-    int version_measure = MeasureText(version_text, sm_font_size);
-    float version_x = (g->windowwidth - version_measure) / 2.0f;
-    float version_y = y + font_size + 10; // Below the title text
     DrawText(version_text, version_x, version_y, sm_font_size, WHITE);
-    float start_y = y + font_size * 1 + 20 + sm_font_size; // Below the version text
-    if (show_menu) {
-        // If show_menu is true, draw the new game, continue, options selection text
-        const char* menu_text[3] = {"New Game", "Continue", "Settings"};
-        const int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
-        const int menu_spacing = 10; // Space between menu items
-        const int current_selection_index = g->title_screen_selection;
-        const Color active_color = WHITE;
-        const Color disabled_color = {0x99, 0x99, 0x99, 0xFF}; // Gray for disabled items
-        for (int i = 0; i < menu_count; i++) {
-            float menu_x = (g->windowwidth - MeasureText(menu_text[i], sm_font_size)) / 2.0f;
-            float menu_y = start_y + (i * (sm_font_size + menu_spacing));
-            char buffer[1024] = {0};
-            if (i == current_selection_index)
-                snprintf(buffer, sizeof(buffer), "> %s", menu_text[i]);
-            else
-                snprintf(buffer, sizeof(buffer), "  %s", menu_text[i]);
-            Color selection_color = active_color;
-            if (i > 0) selection_color = disabled_color;
-            //DrawText(menu_text[i], menu_x, menu_y, font_size, WHITE);
-            DrawText(buffer, menu_x, menu_y, sm_font_size, selection_color);
-        }
-    } else {
-        // If show_menu is false, draw the start text
+    if (!show_menu) {
         DrawText(start_text, start_x, start_y, sm_font_size, WHITE);
+        return;
+    }
+    // If show_menu is true, draw the new game, continue, options selection text
+    int menu_count = sizeof(menu_text) / sizeof(menu_text[0]), menu_spacing = 10, current_selection_index = g->title_screen_selection;
+    for (int i = 0; i < menu_count; i++) {
+        bzero(buffer, sizeof(buffer));
+        float menu_x = (g->windowwidth - MeasureText(menu_text[i], sm_font_size)) / 2.0f, menu_y = start_y + (i * (sm_font_size + menu_spacing));
+        if (i == current_selection_index)
+            snprintf(buffer, sizeof(buffer), "> %s", menu_text[i]);
+        else
+            snprintf(buffer, sizeof(buffer), "  %s", menu_text[i]);
+        selection_color = i == 0 ? active_color : disabled_color; // First item is always active
+        DrawText(buffer, menu_x, menu_y, sm_font_size, selection_color);
     }
 }
 
@@ -1701,33 +1630,23 @@ static void draw_character_creation_screen_from_texture(gamestate* const g) {
 static void draw_character_creation_screen(gamestate* const g) {
     massert(g, "gamestate is NULL");
     const char* title_text = "Character Creation";
-    // we will draw some more stuff here later
-    // for right now, lets get some text up that shows your basic stats
-    // similar to how we draw the hud screen
-    // we can use placeholder values just to mock the screen up
-    //const char* placeholder_text = "Name: Hero\nRace: Human\nClass: Warrior\nStrength: 10\nDexterity: 10\nConstitution: 10\nIntelligence: 10\nWisdom: 10\nCharisma: 10";
-    // we no longer need placeholder text and can pull values directly from the g->chara_creation struct
     char buffer[2048] = {0};
-    //snprintf(buffer, 1024, "name: %s", g->chara_creation.name);
     int font_size = 40;
     int cx = g->windowwidth / 2;
     //int cy = g->windowheight / 2;
     int sy = g->windowheight / 4;
     ClearBackground(BLACK);
     // Draw title text
-    //int measure = MeasureText(title_text, font_size);
     int x = cx;
     int y = sy;
     DrawText(title_text, x, y, font_size, WHITE);
     y += font_size;
     font_size = 20;
     // Draw character creation stats
-    //int line_spacing = 4;
     snprintf(buffer, sizeof(buffer), "Name: %s", g->chara_creation.name);
     DrawText(buffer, x, y, font_size, WHITE);
     y += font_size + 4;
     bzero(buffer, sizeof(buffer));
-    //snprintf(buffer, sizeof(buffer), "Race: %d", g->chara_creation.race);
     snprintf(buffer, sizeof(buffer), "Race: %s", get_race_str(g->chara_creation.race));
     DrawText(buffer, x, y, font_size, WHITE);
     y += font_size + 4;
@@ -1756,7 +1675,7 @@ static void draw_character_creation_screen(gamestate* const g) {
     DrawRectangleLinesEx(sprite_box, 4, RED);
     const char* remaining_text[4] = {
         "Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race (unavailable for now)", "Press UP/DOWN to change class (unavailable for now)", "Press ENTER to confirm"};
-    const int remaining_count = sizeof(remaining_text) / sizeof(remaining_text[0]);
+    int remaining_count = sizeof(remaining_text) / sizeof(remaining_text[0]);
     // add spacing
     y += font_size + 8;
     for (int i = 0; i < remaining_count; i++) {
