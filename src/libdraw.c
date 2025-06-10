@@ -1338,7 +1338,7 @@ static void draw_inventory_menu(gamestate* const g) {
     if (!g->display_inventory_menu) return;
     const char* menu_title = "Inventory Menu";
     // Parameters
-    int box_pad = g->pad, section_gap = 8, item_list_pad = g->pad, font_size = 20, max_visible_items = 12, inventory_count = 0, scale = 8;
+    int box_pad = g->pad, section_gap = 8, item_list_pad = g->pad, font_size = 20, inventory_count = 0, scale = 8;
     // Measure title
     //Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
     Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g->line_spacing);
@@ -1370,24 +1370,27 @@ static void draw_inventory_menu(gamestate* const g) {
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
     entityid* inventory = g_get_inventory(g, g->hero_id, &inventory_count);
-    //for (int i = 0; i < hero->inventory_count && i < max_visible_items; i++) {
-    for (int i = 0; i < g_get_inventory_count(g, g->hero_id) && i < max_visible_items; i++) {
+
+    // BEGIN FIXME
+    // this code is supposed to display the items in our inventory but it does not behave well
+    // at the moment, this code results in the selected inventory item appearing at the top of the list
+    //int max_visible_items = 32; // overflows menu
+    int max_visible_items = 20; // approximate guess
+    for (int i = g->inventory_menu_selection; i < g_get_inventory_count(g, g->hero_id) && i < max_visible_items; i++) {
         entityid item_id = inventory[i];
         if (item_id == ENTITYID_INVALID) continue;
         float item_x = left_box.x + item_list_pad;
         char item_display[128];
         bool is_equipped = g_is_equipped(g, g->hero_id, item_id);
-        if (i == g->inventory_menu_selection) {
+        if (i == g->inventory_menu_selection)
             snprintf(item_display, sizeof(item_display), "> %s", g_get_name(g, item_id));
-        } else {
+        else
             snprintf(item_display, sizeof(item_display), "  %s", g_get_name(g, item_id));
-        }
-        if (is_equipped) {
-            strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1);
-        }
+        if (is_equipped) strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1);
         DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, font_size, g->line_spacing, WHITE);
         item_y += font_size + 4;
     }
+    // END FIXME
     // Draw item info in right_box
     if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < inventory_count) {
         entityid item_id = inventory[g->inventory_menu_selection];
@@ -1395,14 +1398,11 @@ static void draw_inventory_menu(gamestate* const g) {
         itemtype item_type = g_get_itemtype(g, item_id);
         if (g_has_damage(g, item_id)) {
             vec3 dmg_roll = g_get_damage(g, item_id);
-            int n = dmg_roll.x;
-            int sides = dmg_roll.y;
-            int modifier = dmg_roll.z;
-            if (modifier) {
+            int n = dmg_roll.x, sides = dmg_roll.y, modifier = dmg_roll.z;
+            if (modifier)
                 snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d+%d", name, item_type, n, sides, modifier);
-            } else {
+            else
                 snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d", name, item_type, n, sides);
-            }
         } else if (g_has_ac(g, item_id)) {
             int ac = g_get_ac(g, item_id);
             snprintf(info_text, sizeof(info_text), "%s\nType: %d\nAC: %d", name, item_type, ac);
