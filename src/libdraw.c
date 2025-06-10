@@ -1371,23 +1371,47 @@ static void draw_inventory_menu(gamestate* const g) {
     DrawRectangleLinesEx(right_box, 2, WHITE);
     entityid* inventory = g_get_inventory(g, g->hero_id, &inventory_count);
 
-    // BEGIN FIXME
-    // this code is supposed to display the items in our inventory but it does not behave well
-    // at the moment, this code results in the selected inventory item appearing at the top of the list
-    //int max_visible_items = 32; // overflows menu
-    int max_visible_items = 20; // approximate guess
-    for (int i = g->inventory_menu_selection; i < g_get_inventory_count(g, g->hero_id) && i < max_visible_items; i++) {
+    // Calculate viewport bounds based on selection
+    int inventory_count = g_get_inventory_count(g, g->hero_id);
+    int max_visible_items = 20;
+    int start_index = 0;
+    
+    // If selection is below middle, scroll down
+    if (g->inventory_menu_selection > max_visible_items/2 && 
+        inventory_count > max_visible_items) {
+        start_index = g->inventory_menu_selection - max_visible_items/2;
+        // Don't scroll past end of inventory
+        if (start_index + max_visible_items > inventory_count) {
+            start_index = inventory_count - max_visible_items;
+        }
+    }
+    
+    // Draw visible items
+    for (int i = start_index; 
+         i < inventory_count && i < start_index + max_visible_items; 
+         i++) {
         entityid item_id = inventory[i];
         if (item_id == ENTITYID_INVALID) continue;
         float item_x = left_box.x + item_list_pad;
         char item_display[128];
         bool is_equipped = g_is_equipped(g, g->hero_id, item_id);
-        if (i == g->inventory_menu_selection)
+        
+        // Highlight selected item with arrow
+        if (i == g->inventory_menu_selection) {
             snprintf(item_display, sizeof(item_display), "> %s", g_get_name(g, item_id));
-        else
+            // Draw selection highlight background
+            DrawRectangle(left_box.x, item_y - 2, left_box.width, font_size + 4, 
+                        (Color){0x44, 0x44, 0x44, 0xFF});
+        } else {
             snprintf(item_display, sizeof(item_display), "  %s", g_get_name(g, item_id));
-        if (is_equipped) strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1);
-        DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, font_size, g->line_spacing, WHITE);
+        }
+        
+        if (is_equipped) {
+            strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1);
+        }
+        
+        DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, 
+                  font_size, g->line_spacing, WHITE);
         item_y += font_size + 4;
     }
     // END FIXME
