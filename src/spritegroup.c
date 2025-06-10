@@ -151,30 +151,39 @@ bool spritegroup_is_animating(spritegroup_t* const sg) {
 //}
 
 //void spritegroup_snap_dest(spritegroup_t* const sg, vec3 loc) {
-void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y) {
+bool spritegroup_snap_dest(spritegroup_t* const sg, int x, int y) {
     massert(sg, "spritegroup is NULL");
+    bool retval = false;
     if (sg->move.x == 0 && sg->move.y == 0) {
         sg->dest.x = x * DEFAULT_TILE_SIZE + sg->off_x;
         sg->dest.y = y * DEFAULT_TILE_SIZE + sg->off_y;
+        retval = true;
     }
+    return retval;
 }
 
-void spritegroup_update_dest(spritegroup_t* const sg) {
+bool spritegroup_update_dest(spritegroup_t* const sg) {
     massert(sg, "spritegroup is NULL");
+    bool retval = false;
     if (sg->move.x > 0) {
         sg->dest.x += sg->move_rate;
         sg->move.x -= sg->move_rate;
+        retval = true;
     } else if (sg->move.x < 0) {
         sg->dest.x -= sg->move_rate;
         sg->move.x += sg->move_rate;
+        retval = true;
     }
     if (sg->move.y > 0) {
         sg->dest.y += sg->move_rate;
         sg->move.y -= sg->move_rate;
+        retval = true;
     } else if (sg->move.y < 0) {
         sg->dest.y -= sg->move_rate;
         sg->move.y += sg->move_rate;
+        retval = true;
     }
+    return retval;
 }
 
 void sg_set_default_anim(spritegroup_t* const sg, int anim) {

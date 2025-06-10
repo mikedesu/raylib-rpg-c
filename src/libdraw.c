@@ -54,6 +54,7 @@ Shader shader_psychedelic_0 = {0};
 
 RenderTexture2D title_target_texture = {0};
 RenderTexture2D char_creation_target_texture = {0};
+RenderTexture2D main_game_target_texture = {0};
 
 RenderTexture2D target = {0};
 Rectangle target_src = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
@@ -68,6 +69,9 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
 static int get_total_ac(gamestate* const g, entityid id);
+
+static void libdraw_drawframe_2d_from_texture(gamestate* const g);
+static void libdraw_drawframe_2d_to_texture(gamestate* const g);
 
 static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
@@ -89,9 +93,9 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
 static bool libdraw_check_default_animations(const gamestate* const g);
 
 //void draw_title_screen(const gamestate* const g);
-void draw_title_screen(const gamestate* const g, bool show_menu);
-void draw_title_screen_to_texture(const gamestate* const g, bool show_menu);
-void draw_title_screen_from_texture(const gamestate* const g);
+void draw_title_screen(gamestate* const g, bool show_menu);
+void draw_title_screen_to_texture(gamestate* const g, bool show_menu);
+void draw_title_screen_from_texture(gamestate* const g);
 static void update_weapon_for_entity(gamestate* g, entityid id, spritegroup_t* sg);
 
 static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
@@ -402,7 +406,9 @@ static inline bool libdraw_camera_lock_on(gamestate* const g) {
 
     // if the target changes, we need to set a flag indicating as such
     if (old_target.x != g->cam2d.target.x || old_target.y != g->cam2d.target.y) {
+        minfo("xxxxx");
         g->cam_changed = true;
+        g->frame_dirty = true;
     } else {
         g->cam_changed = false;
     }
@@ -557,6 +563,7 @@ static void libdraw_update_sprite_position(gamestate* const g, entityid id, spri
             //else
             //    sg->current = SG_ANIM_NPC_WALK;
         }
+        g->frame_dirty = true;
     }
 }
 
@@ -587,7 +594,10 @@ static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t*
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
                                                                : old_ctx;
-    //if (ctx != old_ctx) minfo("ctx changed from %d to %d", old_ctx, ctx);
+    if (ctx != old_ctx) {
+        minfo("ctx changed from %d to %d", old_ctx, ctx);
+        g->frame_dirty = true;
+    }
     spritegroup_setcontexts(group, ctx);
 }
 
@@ -604,7 +614,12 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegro
     libdraw_update_sprite_position(g, id, sg);
     libdraw_update_sprite_attack(g, id, sg);
     // Update movement as long as sg->move.x/y is non-zero
-    spritegroup_update_dest(sg);
+
+    if (spritegroup_update_dest(sg)) {
+        minfo("update dest");
+        g->frame_dirty = true;
+    }
+
     // Snap to the tile position only when movement is fully complete
     vec3 loc = g_get_location(g, id);
     //vec3 loc_cast = {loc.x, loc.y, loc.z};
@@ -612,6 +627,9 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegro
     //const bool done = libdraw_check_default_animations(g);
     //if (done) {
     spritegroup_snap_dest(sg, loc.x, loc.y);
+    //if (spritegroup_snap_dest(sg, loc.x, loc.y)) {
+    //minfo("snap dest");
+    //g->frame_dirty = true;
     //}
 }
 
@@ -622,20 +640,19 @@ static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegro
     sprite* const s = sg_get_current(sg);
     massert(s, "sprite is NULL");
     //sprite* const s_shadow = sg->sprites[sg->current + 1];
-    if (g->framecount % ANIM_SPEED == 0) {
-        sprite_incrframe(s);
-        if (s->num_loops >= 1) {
+    g->frame_dirty = true;
+    sprite_incrframe(s);
+    if (s->num_loops >= 1) {
+        sg->current = sg->default_anim;
+        s->num_loops = 0;
+    }
+    // attempt to grab the sprite's shadow
+    sprite* const s_shadow = sg_get_current_plus_one(sg);
+    if (s_shadow) {
+        sprite_incrframe(s_shadow);
+        if (s_shadow->num_loops >= 1) {
             sg->current = sg->default_anim;
-            s->num_loops = 0;
-        }
-        // attempt to grab the sprite's shadow
-        sprite* const s_shadow = sg_get_current_plus_one(sg);
-        if (s_shadow) {
-            sprite_incrframe(s_shadow);
-            if (s_shadow->num_loops >= 1) {
-                sg->current = sg->default_anim;
-                s_shadow->num_loops = 0;
-            }
+            s_shadow->num_loops = 0;
         }
     }
 }
@@ -681,8 +698,6 @@ static void libdraw_update_sprite_post(gamestate* const g, entityid id) {
 
 static void libdraw_handle_gamestate_flag(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    //const bool done = libdraw_check_default_animations(g);
-    //if (done) {
     if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
         g->flag = GAMESTATE_FLAG_NPC_TURN;
         g->test_guard = false;
@@ -691,7 +706,6 @@ static void libdraw_handle_gamestate_flag(gamestate* const g) {
         g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
         g->turn_count++;
     }
-    //}
 }
 
 static void libdraw_handle_dirty_entities(gamestate* const g) {
@@ -704,6 +718,7 @@ static void libdraw_handle_dirty_entities(gamestate* const g) {
         g->dirty_entities = false;
         g->new_entityid_begin = ENTITYID_INVALID;
         g->new_entityid_end = ENTITYID_INVALID;
+        g->frame_dirty = true;
     }
 }
 
@@ -711,28 +726,65 @@ void libdraw_update_sprites(gamestate* const g) {
     if (g) {
         UpdateMusicStream(music);
 
-        libdraw_handle_dirty_entities(g);
-        for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite(g, id);
-        libdraw_handle_gamestate_flag(g);
+        if (g->current_scene == SCENE_GAMEPLAY) {
+            libdraw_handle_dirty_entities(g);
+            for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite(g, id);
+            libdraw_handle_gamestate_flag(g);
+        }
     }
 }
 
 void libdraw_update_sprites_pre(gamestate* const g) {
     if (g) {
         UpdateMusicStream(music);
-
-        libdraw_handle_dirty_entities(g);
-        for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite_pre(g, id);
-        libdraw_handle_gamestate_flag(g);
+        if (g->current_scene == SCENE_GAMEPLAY) {
+            libdraw_handle_dirty_entities(g);
+            for (entityid id = 0; id < g->next_entityid; id++) {
+                libdraw_update_sprite_pre(g, id);
+            }
+        }
     }
 }
 
 void libdraw_update_sprites_post(gamestate* const g) {
     if (g) {
         UpdateMusicStream(music);
-        libdraw_handle_dirty_entities(g);
-        for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite_post(g, id);
-        libdraw_handle_gamestate_flag(g);
+        if (g->current_scene == SCENE_GAMEPLAY) {
+            libdraw_handle_dirty_entities(g);
+
+            if (g->framecount % ANIM_SPEED == 0) {
+                //minfo("ANIM SPEED: %d", ANIM_SPEED);
+                //printf("ANIM SPEED: %d\n", ANIM_SPEED);
+                for (entityid id = 0; id < g->next_entityid; id++) {
+                    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+                    for (int i = 0; i < num_spritegroups; i++) {
+                        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+                        if (sg) {
+                            // libdraw_handle_frame_incr(g, id, sg);
+                            sprite* const s = sg_get_current(sg);
+                            massert(s, "sprite is NULL");
+                            g->frame_dirty = true;
+                            sprite_incrframe(s);
+                            if (s->num_loops >= 1) {
+                                sg->current = sg->default_anim;
+                                s->num_loops = 0;
+                            }
+                            // attempt to grab the sprite's shadow
+                            sprite* const s_shadow = sg_get_current_plus_one(sg);
+                            if (s_shadow) {
+                                sprite_incrframe(s_shadow);
+                                if (s_shadow->num_loops >= 1) {
+                                    sg->current = sg->default_anim;
+                                    s_shadow->num_loops = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            libdraw_handle_gamestate_flag(g);
+        }
     }
 }
 
@@ -806,11 +858,12 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     //EndShaderMode();
     libdraw_camera_lock_on(g);
     //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
-    if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
-    if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
+    libdraw_draw_dungeon_floor(g);
+    //if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
+    libdraw_draw_player_target_box(g);
+    //if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
     //msuccess("libdraw_drawframe_2d: done");
     EndMode2D();
-
     draw_message_history(g);
     draw_message_box(g);
     draw_hud(g);
@@ -826,6 +879,19 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     if (g->gameover) {
         draw_gameover_menu(g);
     }
+}
+
+static void libdraw_drawframe_2d_to_texture(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    BeginTextureMode(main_game_target_texture);
+    libdraw_drawframe_2d(g);
+    EndTextureMode();
+}
+
+static void libdraw_drawframe_2d_from_texture(gamestate* const g) {
+    massert(g, "gamestate is NULL");
+    //DrawTexturePro(title_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(main_game_target_texture.texture, target_src, (Rectangle){0, 0, g->windowwidth, g->windowheight}, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 static void draw_message_box(gamestate* g) {
@@ -951,46 +1017,48 @@ static void draw_gameover_menu(gamestate* const g) {
 void libdraw_drawframe(gamestate* const g) {
     double start_time = GetTime();
     BeginDrawing();
-    ClearBackground(WHITE);
-    BeginTextureMode(target);
+    ClearBackground(RED);
     //BeginShaderMode(shader_psychedelic_0);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
-
     //minfo("drawframe current scene: %d", g->current_scene);
 
-    if (g->current_scene == SCENE_TITLE) {
-        if (g->frame_dirty) {
+    //BeginTextureMode(target);
+    //ClearBackground(BLUE);
+
+    if (g->frame_dirty) {
+        if (g->current_scene == SCENE_TITLE) {
             draw_title_screen_to_texture(g, false);
-            g->frame_dirty = false;
-        }
-        draw_title_screen_from_texture(g);
-
-    } else if (g->current_scene == SCENE_MAIN_MENU) {
-        //draw_title_screen(g, true);
-        if (g->frame_dirty) {
+        } else if (g->current_scene == SCENE_MAIN_MENU) {
             draw_title_screen_to_texture(g, true);
-            g->frame_dirty = false;
-        }
-        draw_title_screen_from_texture(g);
-
-    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
-        if (g->frame_dirty) {
+        } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
             draw_character_creation_screen_to_texture(g);
-            g->frame_dirty = false;
+        } else if (g->current_scene == SCENE_GAMEPLAY) {
+            libdraw_drawframe_2d_to_texture(g);
         }
-        draw_character_creation_screen_from_texture(g);
-
-    } else if (g->current_scene == SCENE_GAMEPLAY) {
-        libdraw_drawframe_2d(g);
+        g->frame_dirty = false;
+        g->frame_updates++;
     }
 
+    BeginTextureMode(target);
+    ClearBackground(BLUE);
+    if (g->current_scene == SCENE_TITLE) {
+        draw_title_screen_from_texture(g);
+    } else if (g->current_scene == SCENE_MAIN_MENU) {
+        draw_title_screen_from_texture(g);
+    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+        draw_character_creation_screen_from_texture(g);
+    } else if (g->current_scene == SCENE_GAMEPLAY) {
+        libdraw_drawframe_2d_from_texture(g);
+    }
     EndTextureMode();
+
     DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     EndDrawing();
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
+    //g->frame_dirty = false;
 }
 
 static bool libdraw_unload_texture(int txkey) {
@@ -1009,6 +1077,7 @@ static void libdraw_unload_textures() {
 
     UnloadRenderTexture(title_target_texture);
     UnloadRenderTexture(char_creation_target_texture);
+    UnloadRenderTexture(main_game_target_texture);
     UnloadRenderTexture(target);
 }
 
@@ -1315,6 +1384,7 @@ void libdraw_init_rest(gamestate* const g) {
     target = LoadRenderTexture(w, h);
     title_target_texture = LoadRenderTexture(w, h);
     char_creation_target_texture = LoadRenderTexture(w, h);
+    main_game_target_texture = LoadRenderTexture(w, h);
 
     target_src = (Rectangle){0, 0, w, -h};
     target_dest = (Rectangle){0, 0, w, h};
@@ -1441,7 +1511,7 @@ static void draw_inventory_menu(gamestate* const g) {
     const char* menu_title = "Inventory Menu";
     // Parameters
     const int box_pad = g->pad;
-    const int section_gap = 16;
+    const int section_gap = 8;
     const int item_list_pad = g->pad;
     //const int font_size = g->font_size;
     const int font_size = 20;
@@ -1450,8 +1520,8 @@ static void draw_inventory_menu(gamestate* const g) {
     //Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
     Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g->line_spacing);
     // Menu box size
-    float menu_width_percent = 0.5f;
-    float menu_height_percent = 0.5f;
+    float menu_width_percent = 0.75f;
+    float menu_height_percent = 0.75f;
     float menu_width = g->windowwidth * menu_width_percent;
     float menu_height = g->windowheight * menu_height_percent;
     Rectangle menu_box = {.x = (g->windowwidth - menu_width) / 2.0f, .y = (g->windowheight - menu_height) / 4.0f, .width = menu_width, .height = menu_height};
@@ -1635,7 +1705,7 @@ void draw_version(const gamestate* const g) {
     DrawTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
 }
 
-void draw_title_screen(const gamestate* const g, bool show_menu) {
+void draw_title_screen(gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
     //const char* title_text = "project.rpg";
     const char* title_text_0 = "project.";
@@ -1699,14 +1769,15 @@ void draw_title_screen(const gamestate* const g, bool show_menu) {
     }
 }
 
-void draw_title_screen_to_texture(const gamestate* const g, bool show_menu) {
+void draw_title_screen_to_texture(gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(title_target_texture);
     draw_title_screen(g, show_menu);
+    handle_debug_panel(g);
     EndTextureMode();
 }
 
-void draw_title_screen_from_texture(const gamestate* const g) {
+void draw_title_screen_from_texture(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // Draw the title screen texture
     DrawTexturePro(title_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
@@ -1716,6 +1787,7 @@ void draw_character_creation_screen_to_texture(gamestate* const g) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(char_creation_target_texture);
     draw_character_creation_screen(g);
+    handle_debug_panel(g);
     EndTextureMode();
 }
 

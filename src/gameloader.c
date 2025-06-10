@@ -153,10 +153,9 @@ void autoreload_every_n_sec(int n, gamestate* g) {
 
 void handle_do_restart(gamestate* g) {
     if (g->do_restart) {
-        msuccess("Restarting game...");
+        minfo("Restarting game...");
         //mylibdraw_close();
         mylibdraw_close_partial();
-
         //dlclose(draw_handle);
         myliblogic_close(g);
         //dlclose(logic_handle);
@@ -167,7 +166,9 @@ void handle_do_restart(gamestate* g) {
         myliblogic_init(g);
         //mylibdraw_init(g);
         mylibdraw_init_rest(g);
+        minfo("Game restarted, setting g->do_restart = false...");
         g->do_restart = false; // Reset restart flag
+        msuccess("game restarted!");
     }
 }
 
@@ -195,7 +196,26 @@ void gamerun() {
 
         autoreload_every_n_sec(5, g);
 
-        handle_do_restart(g);
+        //handle_do_restart(g);
+
+        if (g->do_restart) {
+            minfo("Restarting game...");
+            //mylibdraw_close();
+            mylibdraw_close_partial();
+            //dlclose(draw_handle);
+            myliblogic_close(g);
+            //dlclose(logic_handle);
+            gamestatefree(g);
+            g = gamestateinitptr();
+            //load_draw_symbols();
+            //load_logic_symbols();
+            myliblogic_init(g);
+            //mylibdraw_init(g);
+            mylibdraw_init_rest(g);
+            minfo("Game restarted, setting g->do_restart = false...");
+            g->do_restart = false; // Reset restart flag
+            msuccess("game restarted!");
+        }
     }
 
     minfo("Closing libdraw...");

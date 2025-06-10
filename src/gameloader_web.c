@@ -16,8 +16,12 @@ gamestate* g = NULL;
 void gameloop() {
     libdraw_update_input(&is);
     liblogic_tick(&is, g);
-    libdraw_update_sprites(g);
+
+    //libdraw_update_sprites(g);
+    libdraw_update_sprites_pre(g);
+
     libdraw_drawframe(g);
+    libdraw_update_sprites_post(g);
 
     if (g->do_restart) {
         msuccess("Restarting game...");

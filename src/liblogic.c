@@ -1314,12 +1314,14 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
                 g->msg_system.count = 0;
                 g->msg_system.is_active = false;
             }
+            g->frame_dirty = true;
         }
         return;
     }
     if (inputstate_is_shift_held(is) && inputstate_is_pressed(is, KEY_SLASH)) {
         g->display_help_menu = true;
         g->controlmode = CONTROLMODE_HELP;
+        g->frame_dirty = true;
         return;
     }
     const char* action = get_action_key(is, g);
@@ -1330,30 +1332,39 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             if (strcmp(action, "wait") == 0) {
                 execute_action(g, g->hero_id, ENTITY_ACTION_WAIT);
                 g->player_changing_direction = false;
+                g->frame_dirty = true;
             } else if (strcmp(action, "move_w") == 0) {
                 change_player_dir(g, DIR_LEFT);
                 g->player_changing_direction = false;
+                g->frame_dirty = true;
             } else if (strcmp(action, "move_e") == 0) {
                 change_player_dir(g, DIR_RIGHT);
                 g->player_changing_direction = false;
+                g->frame_dirty = true;
             } else if (strcmp(action, "move_s") == 0) {
                 change_player_dir(g, DIR_DOWN);
                 g->player_changing_direction = false;
+                g->frame_dirty = true;
             } else if (strcmp(action, "move_n") == 0) {
                 change_player_dir(g, DIR_UP);
                 g->player_changing_direction = false;
+                g->frame_dirty = true;
             } else if (strcmp(action, "move_nw") == 0) {
                 change_player_dir(g, DIR_UP_LEFT);
                 g->player_changing_direction = false;
+                g->frame_dirty = true;
             } else if (strcmp(action, "move_ne") == 0) {
                 change_player_dir(g, DIR_UP_RIGHT);
                 g->player_changing_direction = false;
+                g->frame_dirty = true;
             } else if (strcmp(action, "move_sw") == 0) {
                 change_player_dir(g, DIR_DOWN_LEFT);
                 g->player_changing_direction = false;
+                g->frame_dirty = true;
             } else if (strcmp(action, "move_se") == 0) {
                 change_player_dir(g, DIR_DOWN_RIGHT);
                 g->player_changing_direction = false;
+                g->frame_dirty = true;
             }
             // suggestion by patreon supporter hllcgn:
             // pressing 'attack' while in 'change direction' mode
@@ -1364,35 +1375,47 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
                 vec3 loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
                 vec3 hloc = g_get_location(g, g->hero_id);
                 try_entity_attack(g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
+                g->frame_dirty = true;
             }
             return;
         }
         if (strcmp(action, "wait") == 0) {
             g->player_changing_direction = true;
+            g->frame_dirty = true;
         } else if (strcmp(action, "inventory_menu") == 0) {
             //g->player_changing_direction = true;
             g->display_inventory_menu = true;
+            g->frame_dirty = true;
             g->controlmode = CONTROLMODE_INVENTORY;
         } else if (strcmp(action, "move_w") == 0) {
             execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_LEFT);
+            g->frame_dirty = true;
         } else if (strcmp(action, "move_e") == 0) {
             execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_RIGHT);
+            g->frame_dirty = true;
         } else if (strcmp(action, "move_n") == 0) {
             execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP);
+            g->frame_dirty = true;
         } else if (strcmp(action, "move_s") == 0) {
             execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN);
+            g->frame_dirty = true;
         } else if (strcmp(action, "move_nw") == 0) {
             execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP_LEFT);
+            g->frame_dirty = true;
         } else if (strcmp(action, "move_ne") == 0) {
             execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP_RIGHT);
+            g->frame_dirty = true;
         } else if (strcmp(action, "move_sw") == 0) {
             execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN_LEFT);
+            g->frame_dirty = true;
         } else if (strcmp(action, "move_se") == 0) {
             execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN_RIGHT);
+            g->frame_dirty = true;
         } else if (strcmp(action, "attack") == 0) {
             vec3 loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
             vec3 hloc = g_get_location(g, g->hero_id);
             try_entity_attack(g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
+            g->frame_dirty = true;
         } else if (strcmp(action, "interact") == 0) {
             // we are hardcoding the flip switch interaction for now
             // but eventually this will be generalized
@@ -1413,14 +1436,17 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
             //}
             //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             //try_flip_switch(g, hero, tx, ty, hero->floor);
+            //g->frame_dirty = true;
         } else if (strcmp(action, "pickup") == 0) {
             //try_entity_pickup(g, hero);
             try_entity_pickup(g, g->hero_id);
+            g->frame_dirty = true;
         } else if (strcmp(action, "toggle_camera") == 0) {
             g->controlmode = CONTROLMODE_CAMERA;
         } else if (strcmp(action, "traverse") == 0) {
             // we need to attempt to navigate either up or down a floor depending on the tile beneath the player
             try_entity_traverse_floors(g, g->hero_id);
+            g->frame_dirty = true;
         }
     } else {
         merror("No action found for key");
@@ -1457,11 +1483,17 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                 int ex = next_downstairs_loc.x;
                 int ey = next_downstairs_loc.y;
                 if (!df_add_at(next_floor, id, ex, ey)) return;
-                if (id == g->hero_id) update_player_tiles_explored(g);
-                if (type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                if (id == g->hero_id) {
+                    update_player_tiles_explored(g);
+                }
+                if (type == ENTITY_PLAYER) {
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                }
             }
         } else {
-            if (id == g->hero_id) add_message(g, "You are already at the top floor");
+            if (id == g->hero_id) {
+                add_message(g, "You are already at the top floor");
+            }
         }
     } else if (tile->type == TILE_DOWNSTAIRS) {
         // we need to check if the player is on the stairs
@@ -1494,7 +1526,9 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                 if (type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             }
         } else {
-            if (id == g->hero_id) add_message(g, "You are already at the bottom floor");
+            if (id == g->hero_id) {
+                add_message(g, "You are already at the bottom floor");
+            }
         }
     }
 }
@@ -1503,11 +1537,10 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
     massert(is, "inputstate is NULL");
     massert(g, "gamestate is NULL");
     // no matter which mode we are in, we can toggle the debug panel
-    //if (inputstate_is_pressed(is, KEY_D)) {
-    //    msuccess("D pressed!");
-    //    g->debugpanelon = !g->debugpanelon;
-    //    return;
-    //}
+    if (inputstate_is_pressed(is, KEY_P)) {
+        g->debugpanelon = !g->debugpanelon;
+        return;
+    }
     //if (g->display_quit_menu) {
     //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
     //        g->display_quit_menu = false;
@@ -1544,6 +1577,7 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         }
     } else if (g->current_scene == SCENE_TITLE) {
         if (inputstate_any_pressed(is)) {
+            minfo("Title screen input detected, switching to main menu");
             g->current_scene = SCENE_MAIN_MENU;
             g->frame_dirty = true;
         }
@@ -1579,13 +1613,11 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         //if (inputstate_any_pressed(is)) {
         if (inputstate_is_pressed(is, KEY_ENTER)) {
             minfo("Character creation");
-            g->frame_dirty = true;
             // we need to copy the character creation stats to the hero entity
             // hero has already been created, so its id is available
             g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
             g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
             g_set_stat(g, g->hero_id, STATS_CON, g->chara_creation.constitution);
-
             int hitdie = 8;
             int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(g->chara_creation.constitution);
             while (maxhp_roll < 1) {
@@ -1593,17 +1625,14 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
             }
             g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
             g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
-
             g->current_scene = SCENE_GAMEPLAY;
-
+            g->frame_dirty = true;
         } else if (inputstate_is_pressed(is, KEY_SPACE)) {
             // re-roll character creation stats
-
             g->frame_dirty = true;
             g->chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
             g->chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
             g->chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
-
         } else if (inputstate_is_pressed(is, KEY_LEFT)) {
             // change race/class
             g->frame_dirty = true;
@@ -1676,7 +1705,9 @@ static void update_debug_panel_buffer(gamestate* const g) {
              sizeof(g->debugpanel.buffer),
              "%s\n" // timebeganbuf
              "%s\n" // currenttimebuf
-             "Frame: %d\n"
+             "Frame : %d\n"
+             "Update: %d\n"
+             "Frame Dirty: %d\n"
              "Draw Time: %.1fms\n"
              "Is3D: %d\n"
              "Cam: (%.0f,%.0f) Zoom: %.1f\n"
@@ -1695,6 +1726,8 @@ static void update_debug_panel_buffer(gamestate* const g) {
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
+             g->frame_updates,
+             g->frame_dirty,
              g->last_frame_time * 1000,
              g->is3d,
              g->cam2d.offset.x,
@@ -2082,6 +2115,8 @@ static inline void reset_player_block_success(gamestate* const g) {
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
+
+    //minfo("liblogic_tick: Game state tick started");
     // Spawn NPCs periodically
     try_spawn_npc(g);
     update_player_state(g);
@@ -2096,6 +2131,8 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+
+    //msuccess("liblogic_tick: Game state tick completed");
 }
 
 void liblogic_close(gamestate* const g) {

@@ -733,10 +733,9 @@ bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y) {
     massert(x < df->width, "x is out of bounds");
     massert(y >= 0, "y is less than zero");
     massert(y < df->height, "y is out of bounds");
-    bool retval = false;
-    retval = tile_add(&df->tiles[y][x], id) != -1;
-    massert(retval != ENTITYID_INVALID, "tile_add failed");
-    return retval;
+    entityid result = tile_add(&df->tiles[y][x], id) != -1;
+    massert(result != ENTITYID_INVALID, "tile_add failed");
+    return result != ENTITYID_INVALID;
 }
 
 bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y) {

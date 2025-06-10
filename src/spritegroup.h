@@ -45,10 +45,11 @@ void spritegroup_setcontexts(spritegroup_t* const sg, int context);
 void spritegroup_destroy(spritegroup_t* sg);
 //void spritegroup_set_specifier(spritegroup_t* const sg, specifier_t spec);
 void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop);
-void spritegroup_update_dest(spritegroup_t* const sg);
+//void spritegroup_update_dest(spritegroup_t* const sg);
+bool spritegroup_update_dest(spritegroup_t* const sg);
 
 //void spritegroup_snap_dest(spritegroup_t* const sg, vec3 loc);
-void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y);
+bool spritegroup_snap_dest(spritegroup_t* const sg, int x, int y);
 
 void sg_set_default_anim(spritegroup_t* const sg, int anim);
 //void spritegroup_snap_dest(spritegroup_t* const sg, int x, int y);

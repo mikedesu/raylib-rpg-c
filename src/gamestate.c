@@ -42,6 +42,7 @@ gamestate* gamestateinitptr() {
     g->debugpanel.pad_bottom = 0;
     g->debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
     g->lock = 0;
+    g->frame_updates = 0;
     g->targetwidth = -1;
     g->targetheight = -1;
     g->windowwidth = -1;

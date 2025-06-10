@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-#define GAME_VERSION "v0.0.3.10"
+#define GAME_VERSION "v0.0.3.11"
 
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
@@ -60,6 +60,7 @@ typedef struct gamestate {
     //char help_menu_text[2048];
 
     int framecount, fadealpha, camera_mode, targetwidth, targetheight, windowwidth, windowheight, lock, turn_count;
+    int frame_updates;
     int font_size, pad, inventory_menu_selection;
     int name_list_count, name_list_capacity;
     int type_list_count, type_list_capacity;
