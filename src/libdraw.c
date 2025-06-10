@@ -1374,7 +1374,7 @@ static void draw_inventory_menu(gamestate* const g) {
 
     // Calculate viewport bounds based on selection
     //int inventory_count = g_get_inventory_count(g, g->hero_id);
-    int max_visible_items = 16;
+    int max_visible_items = 15;
     int start_index = 0;
 
     // If selection is below middle, scroll down
@@ -1387,10 +1387,22 @@ static void draw_inventory_menu(gamestate* const g) {
     }
 
     // Draw visible items
+    // At the top before the list begins, lets display the current selection number and how many items are in the inventory
+    // example: "Item 1 of 20 selected"
+    float item_x = left_box.x + item_list_pad;
+    if (inventory_count > 0) {
+        char selection_info[64] = {0};
+        snprintf(selection_info, sizeof(selection_info), "Item %d of %d selected", g->inventory_menu_selection + 1, inventory_count);
+        DrawTextEx(GetFontDefault(), selection_info, (Vector2){item_x, item_y}, font_size, g->line_spacing, WHITE);
+    } else {
+        DrawTextEx(GetFontDefault(), "No items in inventory", (Vector2){left_box.x + item_list_pad, left_box.y + item_list_pad}, font_size, g->line_spacing, WHITE);
+    }
+
+    item_y += font_size + 4;
+
     for (int i = start_index; i < inventory_count && i < start_index + max_visible_items; i++) {
         entityid item_id = inventory[i];
         if (item_id == ENTITYID_INVALID) continue;
-        float item_x = left_box.x + item_list_pad;
         char item_display[128];
         bool is_equipped = g_is_equipped(g, g->hero_id, item_id);
 
