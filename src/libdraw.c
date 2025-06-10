@@ -1338,7 +1338,7 @@ static void draw_inventory_menu(gamestate* const g) {
     if (!g->display_inventory_menu) return;
     const char* menu_title = "Inventory Menu";
     // Parameters
-    int box_pad = g->pad, section_gap = 8, item_list_pad = g->pad, font_size = 20, inventory_count = 0, scale = 8;
+    int box_pad = g->pad, section_gap = 8, item_list_pad = g->pad, font_size = 20, scale = 8;
     // Measure title
     //Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, g->font_size, g->line_spacing);
     Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g->line_spacing);
@@ -1556,7 +1556,7 @@ static void draw_character_creation_screen(gamestate* const g) {
                  stats_fmt[i],
                  i == 0   ? g->chara_creation.name
                  : i == 1 ? get_race_str(g->chara_creation.race)
-                 : i == 2 ? g->chara_creation.hitdie
+                 : i == 2 ? (int)g->chara_creation.hitdie
                  : i == 3 ? g->chara_creation.strength
                  : i == 4 ? g->chara_creation.dexterity
                           : g->chara_creation.constitution);
