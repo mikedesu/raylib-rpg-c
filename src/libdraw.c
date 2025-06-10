@@ -1369,6 +1369,7 @@ static void draw_inventory_menu(gamestate* const g) {
     DrawRectangleLinesEx(left_box, 2, WHITE);
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
+    int inventory_count = 0;
     entityid* inventory = g_get_inventory(g, g->hero_id, &inventory_count);
 
     // Calculate viewport bounds based on selection
