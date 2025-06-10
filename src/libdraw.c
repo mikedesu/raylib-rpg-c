@@ -107,8 +107,8 @@ static void libdraw_update_sprite_attack(gamestate* const g, entityid id, sprite
 static void libdraw_update_sprite_position(gamestate* const g, entityid id, spritegroup_t* sg);
 static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
 static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegroup_t* sg);
-static void libdraw_update_sprite(gamestate* const g, entityid id);
-static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegroup_t* const sg);
+//static void libdraw_update_sprite(gamestate* const g, entityid id);
+//static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegroup_t* const sg);
 static void draw_message_history(gamestate* const g);
 static void draw_message_box(gamestate* g);
 static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
@@ -620,42 +620,42 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegro
     //}
 }
 
-static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegroup_t* const sg) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    massert(sg, "spritegroup is NULL");
-    sprite* const s = sg_get_current(sg);
-    massert(s, "sprite is NULL");
-    //sprite* const s_shadow = sg->sprites[sg->current + 1];
-    g->frame_dirty = true;
-    sprite_incrframe(s);
-    if (s->num_loops >= 1) {
-        sg->current = sg->default_anim;
-        s->num_loops = 0;
-    }
-    // attempt to grab the sprite's shadow
-    sprite* const s_shadow = sg_get_current_plus_one(sg);
-    if (s_shadow) {
-        sprite_incrframe(s_shadow);
-        if (s_shadow->num_loops >= 1) {
-            sg->current = sg->default_anim;
-            s_shadow->num_loops = 0;
-        }
-    }
-}
+//static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegroup_t* const sg) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entityid is invalid");
+//    massert(sg, "spritegroup is NULL");
+//    sprite* const s = sg_get_current(sg);
+//    massert(s, "sprite is NULL");
+//    //sprite* const s_shadow = sg->sprites[sg->current + 1];
+//    g->frame_dirty = true;
+//    sprite_incrframe(s);
+//    if (s->num_loops >= 1) {
+//        sg->current = sg->default_anim;
+//        s->num_loops = 0;
+//    }
+// attempt to grab the sprite's shadow
+//    sprite* const s_shadow = sg_get_current_plus_one(sg);
+//    if (s_shadow) {
+//        sprite_incrframe(s_shadow);
+//        if (s_shadow->num_loops >= 1) {
+//            sg->current = sg->default_anim;
+//            s_shadow->num_loops = 0;
+//        }
+//    }
+//}
 
-static void libdraw_update_sprite(gamestate* const g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
-    for (int i = 0; i < num_spritegroups; i++) {
-        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
-        if (sg) {
-            libdraw_update_sprite_ptr(g, id, sg);
-            libdraw_handle_frame_incr(g, id, sg);
-        }
-    }
-}
+//static void libdraw_update_sprite(gamestate* const g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entityid is invalid");
+//    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+//    for (int i = 0; i < num_spritegroups; i++) {
+//        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+//        if (sg) {
+//            libdraw_update_sprite_ptr(g, id, sg);
+//            libdraw_handle_frame_incr(g, id, sg);
+//        }
+//    }
+//}
 
 static void libdraw_update_sprite_pre(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
@@ -709,26 +709,12 @@ static void libdraw_handle_dirty_entities(gamestate* const g) {
     }
 }
 
-void libdraw_update_sprites(gamestate* const g) {
-    if (g) {
-        UpdateMusicStream(music);
-        if (g->current_scene == SCENE_GAMEPLAY) {
-            libdraw_handle_dirty_entities(g);
-            for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite(g, id);
-            libdraw_handle_gamestate_flag(g);
-        }
-    }
-}
-
 void libdraw_update_sprites_pre(gamestate* const g) {
-    if (g) {
-        UpdateMusicStream(music);
-        if (g->current_scene == SCENE_GAMEPLAY) {
-            libdraw_handle_dirty_entities(g);
-            for (entityid id = 0; id < g->next_entityid; id++) {
-                libdraw_update_sprite_pre(g, id);
-            }
-        }
+    massert(g, "gamestate is NULL");
+    UpdateMusicStream(music);
+    if (g->current_scene == SCENE_GAMEPLAY) {
+        libdraw_handle_dirty_entities(g);
+        for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite_pre(g, id);
     }
 }
 
@@ -745,7 +731,6 @@ void libdraw_update_sprites_post(gamestate* const g) {
                         if (sg) {
                             sprite* const s = sg_get_current(sg);
                             massert(s, "sprite is NULL");
-                            // attempt to grab the sprite's shadow
                             sprite* const s_shadow = sg_get_current_plus_one(sg);
                             g->frame_dirty = true;
                             if (s) {
@@ -777,50 +762,33 @@ static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     massert(df, "dungeon_floor is NULL");
     int z = g->d->current_floor;
     draw_dungeon_tiles_2d(g, z, df);
-    //draw_entities_2d(g, z, df, true); // dead entities
-    //draw_entities_2d(g, z, df, false); // alive entities
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            draw_entities_2d_at(g, df, true, (vec3){x, y, z});
-        }
-    }
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            draw_entities_2d_at(g, df, false, (vec3){x, y, z});
-        }
-    }
+    for (int y = 0; y < df->height; y++)
+        for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, true, (vec3){x, y, z});
+    for (int y = 0; y < df->height; y++)
+        for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, false, (vec3){x, y, z});
     return true;
 }
 
 static void libdraw_draw_debug_panel(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    const Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f), fg = WHITE;
-    int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
-    int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
-    int x1 = g->debugpanel.x + g->debugpanel.pad_left;
-    int y1 = g->debugpanel.y + g->debugpanel.pad_top;
+    Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f), fg = WHITE;
+    int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4, h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom,
+        x1 = g->debugpanel.x + g->debugpanel.pad_left, y1 = g->debugpanel.y + g->debugpanel.pad_top;
     DrawRectangle(g->debugpanel.x, g->debugpanel.y, w0, h0, bg);
     DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
 }
 
 static bool libdraw_draw_player_target_box(const gamestate* const g) {
     massert(g, "gamestate is NULL");
-    const entityid id = g->hero_id;
-    if (id == -1) {
-        //merror("libdraw_draw_player_target_box: id is -1");
-        return false;
-    }
+    entityid id = g->hero_id;
+    if (id == -1) return false;
     direction_t dir = g_get_direction(g, id);
     vec3 loc = g_get_location(g, id);
-    int x = loc.x + get_x_from_dir(dir);
-    int y = loc.y + get_y_from_dir(dir);
-    int ds = DEFAULT_TILE_SIZE;
-    Color base_c = GREEN;
+    int x = loc.x + get_x_from_dir(dir), y = loc.y + get_y_from_dir(dir), ds = DEFAULT_TILE_SIZE;
+    Color base_c = GREEN, c;
     float a = 0.25f;
-    if (g->player_changing_direction) {
-        a = 1.0f;
-    }
-    Color c = Fade(base_c, a);
+    if (g->player_changing_direction) a = 1.0f;
+    c = Fade(base_c, a);
     DrawRectangleLinesEx((Rectangle){x * ds, y * ds, ds, ds}, 1, c);
     return true;
 }
@@ -833,12 +801,8 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     //EndShaderMode();
-    //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
     libdraw_draw_dungeon_floor(g);
-    //if (!libdraw_draw_dungeon_floor(g)) merror("failed to draw dungeon floor");
     libdraw_draw_player_target_box(g);
-    //if (!libdraw_draw_player_target_box(g)) merror("failed to draw player target box");
-    //msuccess("libdraw_drawframe_2d: done");
     EndMode2D();
     draw_message_history(g);
     draw_message_box(g);
@@ -846,12 +810,8 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     draw_inventory_menu(g);
     handle_debug_panel(g);
     draw_version(g);
-    if (g->display_help_menu) {
-        draw_help_menu(g);
-    }
-    if (g->gameover) {
-        draw_gameover_menu(g);
-    }
+    if (g->display_help_menu) draw_help_menu(g);
+    if (g->gameover) draw_gameover_menu(g);
 }
 
 static void libdraw_drawframe_2d_to_texture(gamestate* const g) {
@@ -863,40 +823,24 @@ static void libdraw_drawframe_2d_to_texture(gamestate* const g) {
 
 static void libdraw_drawframe_2d_from_texture(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    //DrawTexturePro(title_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(main_game_target_texture.texture, target_src, (Rectangle){0, 0, g->windowwidth, g->windowheight}, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 static void draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) return;
-    const char* prompt = "[A] Next";
-    const char* msg = g->msg_system.messages[g->msg_system.index];
+    const char *prompt = "[A] Next", *msg = g->msg_system.messages[g->msg_system.index];
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    //Color message_bg = (Color){0, 0, 0xff, 0xff};
-    // copy the message to a temporary buffer
-    int font_size = 20;
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg);
-    // Measure text (split into lines if needed)
-    int measure = MeasureText(tmp, font_size);
-    int text_width = measure;
-    //int text_height = g->font_size;
-    int text_height = font_size;
-    // Calculate centered box position
+    int font_size = 20, measure = MeasureText(tmp, font_size), text_width = measure, text_height = font_size, prompt_font_size = 10, prompt_offset = 10;
     const Rectangle box = {.x = (g->windowwidth - text_width) / 2.0 - g->pad,
                            .y = (g->windowheight - text_height) / 8.0 - g->pad,
                            .width = text_width + g->pad * 2,
                            .height = text_height + g->pad * 2};
-    // Draw box (semi-transparent black with white border)
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
-    // Draw text (centered in box)
-    //DrawText(msg, box.x + g->pad, box.y + g->pad, g->font_size, WHITE);
     DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
-    // Show "Next" prompt if more messages exist
     if (g->msg_system.count > 1 && g->msg_system.index < g->msg_system.count - 1) {
-        int prompt_font_size = 10;
-        int prompt_offset = 10; // Offset from box edges
         char tmp_prompt[1024] = {0};
         snprintf(tmp_prompt, sizeof(tmp_prompt), "%s %d/%d", prompt, g->msg_system.index + 1, g->msg_system.count);
         Vector2 prompt_size = MeasureTextEx(GetFontDefault(), tmp_prompt, prompt_font_size, 1.0f);
@@ -921,11 +865,10 @@ static inline void handle_debug_panel(gamestate* const g) {
     }
 }
 
+#define HELP_TEXT_COUNT 17
 static void draw_help_menu(gamestate* const g) {
     if (!g->display_help_menu) return;
-        // const char* help_text = g->help_menu_text;
-
-#define HELP_TEXT_COUNT 17
+    // const char* help_text = g->help_menu_text;
     char* help_text[HELP_TEXT_COUNT] = {"# Help Menu",
                                         "",
                                         "## Controls",
@@ -943,14 +886,9 @@ static void draw_help_menu(gamestate* const g) {
                                         "",
                                         "Press any key to close this menu.",
                                         ""};
-
     Color bg_color = Fade((Color){0x33, 0x33, 0x33}, 1.0f);
-    int font_size = 10;
-    int measure = MeasureText(help_text[11], font_size);
-    int text_width = measure;
-    int text_height = font_size;
-    int x = (g->windowwidth - text_width) / 2;
-    int y = (g->windowheight - text_height * HELP_TEXT_COUNT) / 2;
+    int font_size = 10, measure = MeasureText(help_text[11], font_size), text_width = measure, text_height = font_size, x = (g->windowwidth - text_width) / 2,
+        y = (g->windowheight - text_height * HELP_TEXT_COUNT) / 2;
     // Draw background box
     DrawRectangle(x - 10, y - 10, text_width + 20, text_height * HELP_TEXT_COUNT + 20, bg_color);
     DrawRectangleLines(x - 10, y - 10, text_width + 20, text_height * HELP_TEXT_COUNT + 20, WHITE);
@@ -962,26 +900,14 @@ static void draw_help_menu(gamestate* const g) {
 
 static void draw_gameover_menu(gamestate* const g) {
     if (!g->gameover) return;
-    const char* gameover_text = "Game Over";
-    const char* restart_text = "Press any key to try again";
-    //Color bg_color = Fade((Color){0x33, 0x33, 0x33}, 1.0f);
+    const char *gameover_text = "Game Over", *restart_text = "Press any key to try again";
     Color bg_color = BLACK;
-    int font_size = 20;
-    int measure = MeasureText(restart_text, font_size);
-    int text_width = measure;
-    int text_height = font_size;
-    int x = (g->windowwidth - text_width) / 2;
-    int y = (g->windowheight - text_height * 2) / 2;
+    int font_size = 20, measure = MeasureText(restart_text, font_size), text_width = measure, text_height = font_size, x = (g->windowwidth - text_width) / 2,
+        y = (g->windowheight - text_height * 2) / 2;
     Rectangle rect = {x - 10, y - 10, text_width + 20, text_height * 2 + 20};
-    // Draw background box
     DrawRectangle(x - 10, y - 10, text_width + 20, text_height * 2 + 20, bg_color);
-    //DrawRectangleLines(x - 10, y - 10, text_width + 20, text_height * 2 + 20, WHITE);
     DrawRectangleLinesEx(rect, 2, RED);
-    // Draw game over text
-    //DrawText(gameover_text, x, y, font_size, WHITE);
     DrawText(gameover_text, x, y, font_size, RED);
-    // Draw restart/quit prompt
-    //DrawText(restart_text, x, y + text_height, font_size, WHITE);
     DrawText(restart_text, x, y + text_height, font_size, RED);
 }
 
@@ -993,9 +919,6 @@ void libdraw_drawframe(gamestate* const g) {
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
-    //minfo("drawframe current scene: %d", g->current_scene);
-    //BeginTextureMode(target);
-    //ClearBackground(BLUE);
     if (g->frame_dirty) {
         if (g->current_scene == SCENE_TITLE) {
             draw_title_screen_to_texture(g, false);
@@ -1025,7 +948,6 @@ void libdraw_drawframe(gamestate* const g) {
     EndDrawing();
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
-    //g->frame_dirty = false;
 }
 
 static bool libdraw_unload_texture(int txkey) {
@@ -1112,10 +1034,7 @@ static void load_textures() {
     }
     char line[1024] = {0};
     while (fgets(line, sizeof(line), file)) {
-        int txkey = -1;
-        int contexts = -1;
-        int frames = -1;
-        int do_dither = 0;
+        int txkey = -1, contexts = -1, frames = -1, do_dither = 0;
         char path[512] = {0};
         // check if the line begins with a #
         if (line[0] == '#') {
@@ -1178,7 +1097,7 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
 static void calc_debugpanel_size(gamestate* const g) {
     massert(g, "gamestate is NULL");
     Vector2 s = MeasureTextEx(GetFontDefault(), g->debugpanel.buffer, g->debugpanel.font_size, 1);
-    const float width_factor = 1.1f;
+    float width_factor = 1.1f;
     g->debugpanel.w = s.x * width_factor;
     g->debugpanel.h = s.y;
 }
@@ -1291,7 +1210,7 @@ static int get_total_ac(gamestate* const g, entityid id) {
     int stat_count = 0;
     int* stats = g_get_stats(g, id, &stat_count);
     massert(stats, "stats is NULL");
-    int ac = stats[STATS_AC];
+    int ac = stats[STATS_AC], dex = g_get_stat(g, id, STATS_DEX), dex_bonus = bonus_calc(dex);
     // get the equipped shield
     entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
     if (shield_id != ENTITYID_INVALID) {
@@ -1300,44 +1219,24 @@ static int get_total_ac(gamestate* const g, entityid id) {
         massert(shield_ac >= 0, "shield_ac is negative");
         ac += shield_ac;
     }
-    int dex = g_get_stat(g, id, STATS_DEX);
-    int dex_bonus = bonus_calc(dex);
     ac += dex_bonus;
     return ac;
 }
 
 static void draw_hud(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    int turn = g->turn_count;
     int stat_count = 0;
     int* stats = g_get_stats(g, g->hero_id, &stat_count);
     massert(stats, "stats is NULL");
-    int hp = stats[STATS_HP];
-    int maxhp = stats[STATS_MAXHP];
-    int level = stats[STATS_LEVEL];
-    int xp = stats[STATS_XP];
-    int next_level_xp = stats[STATS_NEXT_LEVEL_XP];
-    int attack_bonus = stats[STATS_ATTACK_BONUS];
-    int str = stats[STATS_STR];
-    int con = stats[STATS_CON];
-    int dex = stats[STATS_DEX];
-    int ac = get_total_ac(g, g->hero_id);
-    //loc_t loc = g_get_location(g, g->hero_id);
-    //dungeon_floor_t* const df = d_get_current_floor(g->d);
+    int turn = g->turn_count, hp = stats[STATS_HP], maxhp = stats[STATS_MAXHP], level = stats[STATS_LEVEL], xp = stats[STATS_XP], next_level_xp = stats[STATS_NEXT_LEVEL_XP],
+        attack_bonus = stats[STATS_ATTACK_BONUS], str = stats[STATS_STR], con = stats[STATS_CON], dex = stats[STATS_DEX], ac = get_total_ac(g, g->hero_id);
     int floor = g->d->current_floor;
-    //int font_size = g->font_size;
     int font_size = 20;
-
-    //const char* room_name = df_get_room_name(df, loc);
     char buffer[1024] = {0};
     const char* format_str = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d STR: %d CON: %d DEX: %d Floor: %d Turn %d";
-    //snprintf(buffer, sizeof(buffer), "%s Lvl %d HP %d/%d AC: %d XP %d Room: %s Turn %d", g_get_name(g, g->hero_id), level, hp, maxhp, ac, xp, room_name, turn);
     snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp, str, con, dex, floor, turn);
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
-    int box_w = text_size.x + g->pad;
-    int box_h = text_size.y + g->pad;
-    int box_x = 0;
-    int box_y = 0;
+    int box_w = text_size.x + g->pad, box_h = text_size.y + g->pad, box_x = 0, box_y = 0;
     const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, 2, fg);
@@ -1351,12 +1250,10 @@ void libdraw_init_rest(gamestate* const g) {
     minfo("libdraw_init_rest: initializing rest of the libdraw");
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);
-    int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
-    int x = w / 3, y = h / 3;
+    int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT, x = w * 10 / 16, y = h / 3;
     minfo("libdraw_init_rest: window size: %dx%d", w, h);
     massert(w > 0 && h > 0, "window width or height is not set properly");
-    g->windowwidth = w;
-    g->windowheight = h;
+    g->windowwidth = w, g->windowheight = h;
     target = LoadRenderTexture(w, h);
     title_target_texture = LoadRenderTexture(w, h);
     char_creation_target_texture = LoadRenderTexture(w, h);
@@ -1367,7 +1264,9 @@ void libdraw_init_rest(gamestate* const g) {
     load_textures();
     calc_debugpanel_size(g);
     load_shaders();
+
     g->cam2d.offset = (Vector2){x, y};
+
     gamestate_set_debug_panel_pos_top_right(g);
     // set the camera target to the center of the dungeon
     dungeon_floor_t* const df = d_get_current_floor(g->d);
@@ -1410,15 +1309,9 @@ static void draw_message_history(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) return;
-    int font_size = 20;
-    int max_messages = 20;
-    int x = 0;
-    int y = 42;
-    int current_count = 0;
+    int font_size = 20, max_messages = 20, x = 0, y = 42, current_count = 0;
     char tmp_buffer[2048] = {0};
-    //Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     Color message_bg = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent
-    //Color message_bg = (Color){0, 0, 0xff, 0xff};
     // instead of a placeholder message, we now need to actually draw the message history
     // we might only render the last N messages
     for (int i = g->msg_history.count - 1; i >= 0 && current_count < max_messages; i--) {
@@ -1428,19 +1321,15 @@ static void draw_message_history(gamestate* const g) {
     }
     // chop off the last newline
     if (strlen(tmp_buffer) > 0) tmp_buffer[strlen(tmp_buffer) - 1] = '\0';
-    // Measure text (split into lines if needed)
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp_buffer, font_size, g->line_spacing);
+    Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp_buffer, font_size, g->line_spacing);
     // Calculate box position
     // we want the box to be in the top left corner of the screen
-    //const Rectangle box = {.x = x, .y = y, .width = text_size.x + g->pad * 2, .height = text_size.y + g->pad * 2};
-    const Rectangle box = {.x = x, .y = y, .width = text_size.x + g->pad, .height = text_size.y + g->pad};
+    Rectangle box = {.x = x, .y = y, .width = text_size.x + g->pad, .height = text_size.y + g->pad};
     // Draw box (semi-transparent black with white border)
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
     // Draw text (centered in box)
-    const float text_x = box.x + (box.width - text_size.x) / 2;
-    const float text_y = box.y + (box.height - text_size.y) / 2;
-    //DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){box.x + g->pad, box.y + g->pad}, g->font_size, g->line_spacing, WHITE);
+    float text_x = box.x + (box.width - text_size.x) / 2, text_y = box.y + (box.height - text_size.y) / 2;
     DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, WHITE);
 }
 
@@ -1553,13 +1442,12 @@ static void draw_version(const gamestate* const g) {
     massert(g, "gamestate is NULL");
     const char* version = g->version;
     int font_size = 10;
+    char buffer[1024] = {0};
     // also grab the current music track path
     const char* current_music_path = g->music_file_paths[g->current_music_index];
-    char buffer[1024] = {0};
     snprintf(buffer, sizeof(buffer), "%s | Music: %s", version, current_music_path);
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
-    const float x = g->windowwidth - text_size.x - g->pad;
-    const float y = 0;
+    Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
+    float x = g->windowwidth - text_size.x - g->pad, y = 0;
     DrawTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
 }
 
@@ -1609,7 +1497,6 @@ static void draw_title_screen_to_texture(gamestate* const g, bool show_menu) {
 
 static void draw_title_screen_from_texture(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    // Draw the title screen texture
     DrawTexturePro(title_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
@@ -1623,55 +1510,40 @@ static void draw_character_creation_screen_to_texture(gamestate* const g) {
 
 static void draw_character_creation_screen_from_texture(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    // Draw the character creation screen texture
     DrawTexturePro(char_creation_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 static void draw_character_creation_screen(gamestate* const g) {
     massert(g, "gamestate is NULL");
     const char* title_text = "Character Creation";
-    const char* stats_fmt[] = {
-        "Name: %s", "Race: %s", "Hitdie: %d", 
-        "Strength: %d", "Dexterity: %d", "Constitution: %d"
-    };
+    const char* stats_fmt[] = {"Name: %s", "Race: %s", "Hitdie: %d", "Strength: %d", "Dexterity: %d", "Constitution: %d"};
     const char* remaining_text[] = {
-        "Press SPACE to re-roll stats", 
-        "Press LEFT/RIGHT to change race (unavailable for now)", 
-        "Press UP/DOWN to change class (unavailable for now)", 
-        "Press ENTER to confirm"
-    };
-    
-    int font_size = 40;
-    int cx = g->windowwidth / 2;
-    int sy = g->windowheight / 4;
-    int x = cx;
-    int y = sy;
+        "Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race (unavailable for now)", "Press UP/DOWN to change class (unavailable for now)", "Press ENTER to confirm"};
+    int font_size = 40, cx = g->windowwidth / 2, sy = g->windowheight / 4, x = cx, y = sy;
     char buffer[2048] = {0};
-
     ClearBackground(BLACK);
     DrawText(title_text, x, y, font_size, WHITE);
     y += font_size;
     font_size = 20;
-
     // Draw character stats
-    for (int i = 0; i < sizeof(stats_fmt)/sizeof(stats_fmt[0]); i++) {
-        snprintf(buffer, sizeof(buffer), stats_fmt[i], 
-            i == 0 ? g->chara_creation.name :
-            i == 1 ? get_race_str(g->chara_creation.race) :
-            i == 2 ? g->chara_creation.hitdie :
-            i == 3 ? g->chara_creation.strength :
-            i == 4 ? g->chara_creation.dexterity :
-            g->chara_creation.constitution);
+    for (int i = 0; i < sizeof(stats_fmt) / sizeof(stats_fmt[0]); i++) {
+        snprintf(buffer,
+                 sizeof(buffer),
+                 stats_fmt[i],
+                 i == 0   ? g->chara_creation.name
+                 : i == 1 ? get_race_str(g->chara_creation.race)
+                 : i == 2 ? g->chara_creation.hitdie
+                 : i == 3 ? g->chara_creation.strength
+                 : i == 4 ? g->chara_creation.dexterity
+                          : g->chara_creation.constitution);
         DrawText(buffer, x, y, font_size, WHITE);
         y += font_size + 4;
     }
-
     // Draw sprite placeholder
     DrawRectangleLinesEx((Rectangle){cx - 210, sy, 200, 200}, 4, RED);
-
     // Draw instructions
     y += font_size + 8;
-    for (int i = 0; i < sizeof(remaining_text)/sizeof(remaining_text[0]); i++) {
+    for (int i = 0; i < sizeof(remaining_text) / sizeof(remaining_text[0]); i++) {
         DrawText(remaining_text[i], x, y, font_size, WHITE);
         y += font_size + 4;
     }

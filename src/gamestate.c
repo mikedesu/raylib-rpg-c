@@ -43,7 +43,10 @@ gamestate* gamestateinitptr() {
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
     g->debugpanelon = g->player_input_received = g->is_locked = g->gridon = g->display_inventory_menu = g->display_quit_menu = g->display_help_menu = g->do_quit =
         g->processing_actions = g->cam_changed = g->is3d = g->gameover = g->test_guard = g->dirty_entities = false;
-    g->cam2d.target = g->cam2d.offset = (Vector2){0, 0};
+
+    g->cam2d.target = (Vector2){0, 0};
+    g->cam2d.offset = (Vector2){800, 0};
+
     g->cam2d.zoom = 4.0f;
     g->cam2d.rotation = g->fadealpha = 0.0;
     g->cam3d = (Camera3D){0};

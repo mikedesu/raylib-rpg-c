@@ -26,7 +26,6 @@ void (*mylibdraw_close_partial)() = NULL;
 bool (*mylibdraw_windowshouldclose)(const gamestate* const) = NULL;
 
 void (*mylibdraw_drawframe)(const gamestate* const) = NULL;
-void (*mylibdraw_update_sprites)(gamestate* const) = NULL;
 void (*mylibdraw_update_sprites_pre)(gamestate* const) = NULL;
 void (*mylibdraw_update_sprites_post)(gamestate* const) = NULL;
 void (*mylibdraw_update_input)(inputstate* const) = NULL;
@@ -78,13 +77,8 @@ void load_draw_symbols() {
     checksymbol(mylibdraw_drawframe, "libdraw_drawframe");
     mylibdraw_update_input = dlsym(draw_handle, "libdraw_update_input");
     checksymbol(mylibdraw_update_input, "libdraw_update_input");
-
-    mylibdraw_update_sprites = dlsym(draw_handle, "libdraw_update_sprites");
-    checksymbol(mylibdraw_update_sprites, "libdraw_update_sprites");
-
     mylibdraw_update_sprites_pre = dlsym(draw_handle, "libdraw_update_sprites_pre");
     checksymbol(mylibdraw_update_sprites_pre, "libdraw_update_sprites_pre");
-
     mylibdraw_update_sprites_post = dlsym(draw_handle, "libdraw_update_sprites_post");
     checksymbol(mylibdraw_update_sprites_post, "libdraw_update_sprites_post");
 }
@@ -184,33 +178,18 @@ void gamerun() {
     //while (!mylibdraw_windowshouldclose()) {
     while (!mylibdraw_windowshouldclose(g)) {
         mylibdraw_update_input(&is);
-
         myliblogic_tick(&is, g);
-
-        //mylibdraw_update_sprites(g);
         mylibdraw_update_sprites_pre(g);
-
         mylibdraw_drawframe(g);
-
         mylibdraw_update_sprites_post(g);
-
         autoreload_every_n_sec(5, g);
-
-        //handle_do_restart(g);
-
         if (g->do_restart) {
             minfo("Restarting game...");
-            //mylibdraw_close();
             mylibdraw_close_partial();
-            //dlclose(draw_handle);
             myliblogic_close(g);
-            //dlclose(logic_handle);
             gamestatefree(g);
             g = gamestateinitptr();
-            //load_draw_symbols();
-            //load_logic_symbols();
             myliblogic_init(g);
-            //mylibdraw_init(g);
             mylibdraw_init_rest(g);
             minfo("Game restarted, setting g->do_restart = false...");
             g->do_restart = false; // Reset restart flag
