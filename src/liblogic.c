@@ -1125,6 +1125,7 @@ static void handle_input_gameplay_settings(const inputstate* const is, gamestate
     }
     // cycle menus
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_RIGHT)) {
+        minfo("cycling menus");
         g->controlmode = CONTROLMODE_INVENTORY;
         g->display_settings_menu = false;
         g->display_inventory_menu = true;
@@ -1147,7 +1148,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
 
     // cycle menus
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_RIGHT)) {
-        g->controlmode = CONTROLMODE_INVENTORY;
+        g->controlmode = CONTROLMODE_SETTINGS;
         g->display_settings_menu = true;
         g->display_inventory_menu = false;
         return;
