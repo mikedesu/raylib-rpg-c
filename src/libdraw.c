@@ -338,19 +338,24 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     massert(loc.x < df->width, "draw_entities_2d: x is out of bounds");
     massert(loc.y >= 0, "draw_entities_2d: y is out of bounds");
     massert(loc.y < df->height, "draw_entities_2d: y is out of bounds");
-    // BEGIN FIXME
-    // this function currently draws the entity regardless of anything else.
-    // what i want is the following:
-    // using `draw_dungeon_floor_tile` as a reference, i only want entities drawn IF
-    // they are in the player's light radius and visibility radius
-    // note that the radius is a diamond shape
     tile_t* tile = df_tile_at(df, loc);
     if (!tile) return false;
     if (tile_is_wall(tile->type)) return false;
     if (!tile->visible) return true; // Do not draw entities on invisible tiles
-    for (int i = 0; i < tile_entity_count(tile); i++) {
-        entityid id = tile_get_entity(tile, i);
-        if (g_is_dead(g, id) == dead) draw_sprite_and_shadow(g, id);
+
+    // Get hero's vision distance and location
+    int vision_distance = g_get_vision_distance(g, g->hero_id);
+    vec3 hero_loc = g_get_location(g, g->hero_id);
+
+    // Calculate Manhattan distance from hero to this tile (diamond pattern)
+    int distance = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
+
+    // Only draw entities within vision distance
+    if (distance <= vision_distance) {
+        for (int i = 0; i < tile_entity_count(tile); i++) {
+            entityid id = tile_get_entity(tile, i);
+            if (g_is_dead(g, id) == dead) draw_sprite_and_shadow(g, id);
+        }
     }
     return true;
     // END FIXME
