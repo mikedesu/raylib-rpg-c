@@ -145,12 +145,20 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     massert(df, "dungeon_floor is NULL");
     tile_t* tile = df_tile_at(df, (vec3){x, y, z});
     massert(tile, "tile is NULL");
-    // check if the tile type is none
+    // BEGIN FIXME
+    // The way this function currently works is it draws the tile if it is visible and thats all
+    // What I want is the following:
+    // in addition to checking the tile visibility, we want to utilize the new vision distance component
+    // if a tile is visible, but it is outside of the hero's vision distance, we want to draw it as a shadow tile
+    // to determine if a tile is a shadow tile, we can check if the tile is visible and if it is outside of the hero's vision distance
+    // to draw a shadow tile, we can draw the tile as normal, but also draw a faded color black box on top of it
+    // so that it looks like a shadow tile
+    // if the tile is not visible, we return true just like we do now
+    // make sure the code that you write is clean and neat like below is now
+    // good luck!
     if (tile->type == TILE_NONE) return true;
-
     // check if tile is visible
     if (!tile->visible) return true;
-
     // just draw the tile itself
     // tile values in get_txkey_for_tiletype.h
     int txkey = get_txkey_for_tiletype(tile->type);
@@ -178,6 +186,7 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
     return true;
+    // END FIXME
 }
 
 static bool draw_dungeon_tiles_2d(const gamestate* const g, int z, dungeon_floor_t* df) {
