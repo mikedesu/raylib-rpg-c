@@ -1319,6 +1319,7 @@ static void draw_inventory_menu(gamestate* const g) {
     }
 }
 
+// use this as a reference for the FIXME in liblogic.c `handle_input_gameplay_settings`
 static void draw_settings_menu(gamestate* const g) {
     massert(g, "gamestate is NULL");
     if (!g->display_settings_menu) return;
