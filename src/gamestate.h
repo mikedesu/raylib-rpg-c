@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-#define GAME_VERSION "v0.0.3.13"
+#define GAME_VERSION "v0.0.3.14"
 
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024

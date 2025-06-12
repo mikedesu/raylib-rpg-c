@@ -1335,7 +1335,8 @@ static void draw_title_screen(gamestate* const g, bool show_menu) {
     // Space between title texts
     Color active_color = WHITE, disabled_color = {0x99, 0x99, 0x99, 0xFF}, selection_color;
     const char* menu_text[3] = {"New Game", "Continue", "Settings"};
-    const char *title_text_0 = "project.", *title_text_1 = "rpg", *version_text = g->version, *start_text = "Press any key to begin";
+    //const char *title_text_0 = "project.", *title_text_1 = "rpg", *version_text = g->version, *start_text = "Press any key to begin";
+    const char *title_text_0 = "project.", *title_text_1 = "rpg", *version_text = g->version, *start_text = "Press enter or space to begin";
     char buffer[1024] = {0};
     Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
     int sm_font_size = 20, font_size = 80, measure = MeasureText(title_text_0, font_size), start_measure = MeasureText(start_text, sm_font_size), padding = 10,

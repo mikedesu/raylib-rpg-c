@@ -1595,8 +1595,9 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
             merror("Unknown control mode");
         }
     } else if (g->current_scene == SCENE_TITLE) {
-        if (inputstate_any_pressed(is)) {
-            minfo("Title screen input detected, switching to main menu");
+        //if (inputstate_any_pressed(is)) {
+        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+            //minfo("Title screen input detected, switching to main menu");
             g->current_scene = SCENE_MAIN_MENU;
             g->frame_dirty = true;
         }
