@@ -358,7 +358,6 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
         }
     }
     return true;
-    // END FIXME
 }
 
 static void load_shaders() {
