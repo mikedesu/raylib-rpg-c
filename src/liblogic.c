@@ -874,20 +874,18 @@ static void update_player_tiles_explored(gamestate* const g) {
     int light_radius = g_get_light_radius(g, hero_id);
     massert(light_radius >= 0, "light radius is negative");
     
-    // Reveal tiles within the light radius
+    // Reveal tiles in a diamond pattern
     for (int i = -light_radius; i <= light_radius; i++) {
         for (int j = -light_radius; j <= light_radius; j++) {
-            vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
-            // Skip if out of bounds
-            if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 || loc2.y >= df->height) continue;
-            
-            // Calculate distance from player
-            int dx = abs(i);
-            int dy = abs(j);
-            int dist = dx > dy ? dx : dy;  // Chebyshev distance
+            // Calculate Manhattan distance for diamond shape
+            int dist = abs(i) + abs(j);
             
             // Only reveal tiles within the light radius
             if (dist <= light_radius) {
+                vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
+                // Skip if out of bounds
+                if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 || loc2.y >= df->height) continue;
+                
                 tile_t* tile = df_tile_at(df, loc2);
                 massert(tile, "failed to get tile at hero location");
                 tile->explored = true;
