@@ -768,6 +768,8 @@ static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* 
     g_add_target_path(g, id);
     g_add_equipment(g, id);
     g_add_base_attack_damage(g, id, (vec3){1, 4, 0});
+    g_add_vision_distance(g, id, 0);
+    g_add_light_radius(g, id, 0);
 
     g_add_stats(g, id);
     g_set_stat(g, id, STATS_LEVEL, 1);
@@ -867,6 +869,11 @@ static void update_player_tiles_explored(gamestate* const g) {
     dungeon_floor_t* df = d_get_floor(g->d, g->d->current_floor);
     massert(df, "failed to get current dungeon floor");
     vec3 loc = g_get_location(g, hero_id);
+    // BEGIN FIXME
+    // at the moment, the below loops do the following:
+    // reveal the 3x3 area around the player
+    // what i want is, using the new light radius component,
+    // to reveal the area around the player based on the light radius
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
             vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
@@ -877,6 +884,7 @@ static void update_player_tiles_explored(gamestate* const g) {
             tile->visible = true;
         }
     }
+    // END FIXME
 }
 
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z, const char* name) {
@@ -1959,13 +1967,26 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         g_set_stat(g, id, STATS_MAXHP, max_hp);
         g_set_stat(g, id, STATS_HP, max_hp);
         g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-        for (int i = 1; i < floor; i++) {
-            //minfo("Handling level up for entity %d level %d", id, i + 1);
-            handle_level_up(g, id);
-        }
+
+        // we will update this to do an appropriate difficulty-scaling
+        // level-up is too powerful and results in imbalance
+        // the goal is to make the spawns challenge rating approximate
+        // and close either above or below the player's level and cr
+        for (int i = 1; i < floor; i++) handle_level_up(g, id);
+
         int new_level = g_get_stat(g, id, STATS_LEVEL);
         massert(new_level == floor, "New level %d does not match floor %d", new_level, floor);
         msuccess("Spawned entity of Level %d with %d HP at %d, %d, %d", g_get_stat(g, id, STATS_LEVEL), max_hp, loc.x, loc.y, loc.z);
+
+        // update vision distance
+        // this will be appropriately set on a per-npc basis but for now...
+        // hard code 5
+        g_set_vision_distance(g, id, 5);
+        // update light radius
+        // this will be appropriately set on a per-npc basis but for now...
+        // hard code 3
+        g_set_light_radius(g, id, 3);
+
         success = true;
     }
     return success;
