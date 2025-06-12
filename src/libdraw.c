@@ -25,7 +25,7 @@
 #include <raylib.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
-#define DEFAULT_MUSIC_VOLUME 0.0f
+#define DEFAULT_MUSIC_VOLUME 0.5f
 
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
