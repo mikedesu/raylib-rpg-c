@@ -54,13 +54,11 @@ typedef struct gamestate {
     struct tm *timebegantm, *currenttimetm;
     char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF], currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
     bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard, display_inventory_menu,
-        display_quit_menu, do_quit, dirty_entities; // true if new entities created this turn
+        display_quit_menu, do_quit, dirty_entities, display_help_menu, cam_changed, frame_dirty;
 
-    bool display_help_menu;
     //char help_menu_text[2048];
 
-    int framecount, fadealpha, camera_mode, targetwidth, targetheight, windowwidth, windowheight, lock, turn_count;
-    int frame_updates;
+    int framecount, fadealpha, camera_mode, targetwidth, targetheight, windowwidth, windowheight, lock, turn_count, frame_updates;
     int font_size, pad, inventory_menu_selection;
     int name_list_count, name_list_capacity;
     int type_list_count, type_list_capacity;
@@ -68,7 +66,6 @@ typedef struct gamestate {
     int direction_list_count, direction_list_capacity;
     int loc_list_count, loc_list_capacity;
     int sprite_move_list_count, sprite_move_list_capacity;
-
     int dead_list_count, dead_list_capacity;
     int update_list_count, update_list_capacity;
     int attacking_list_count, attacking_list_capacity;
@@ -88,15 +85,16 @@ typedef struct gamestate {
     int damage_list_count, damage_list_capacity;
     int ac_list_count, ac_list_capacity;
     int zapping_list_count, zapping_list_capacity;
-    //int spell_effect_list_count, spell_effect_list_capacity;
     int base_attack_damage_list_count, base_attack_damage_list_capacity;
+    int vision_distance_list_count, vision_distance_list_capacity;
+    int light_radius_list_count, light_radius_list_capacity;
+
+    //int spell_effect_list_count, spell_effect_list_capacity;
 
     debugpanel_t debugpanel;
 
     Camera2D cam2d;
     Camera3D cam3d;
-    bool cam_changed;
-    bool frame_dirty;
 
     fadestate_t fadestate;
 
@@ -142,6 +140,8 @@ typedef struct gamestate {
     int_component* blocking_list;
     int_component* block_success_list;
     int_component* damaged_list;
+    int_component* vision_distance_list;
+    int_component* light_radius_list;
 
     rect_component* sprite_move_list;
 
@@ -352,3 +352,13 @@ bool g_add_base_attack_damage(gamestate* const g, entityid id, vec3 damage);
 bool g_has_base_attack_damage(const gamestate* const g, entityid id);
 bool g_set_base_attack_damage(gamestate* const g, entityid id, vec3 damage);
 vec3 g_get_base_attack_damage(const gamestate* const g, entityid id);
+
+bool g_add_vision_distance(gamestate* const g, entityid id, int distance);
+bool g_has_vision_distance(const gamestate* const g, entityid id);
+bool g_set_vision_distance(gamestate* const g, entityid id, int distance);
+int g_get_vision_distance(const gamestate* const g, entityid id);
+
+bool g_add_light_radius(gamestate* const g, entityid id, int radius);
+bool g_has_light_radius(const gamestate* const g, entityid id);
+bool g_set_light_radius(gamestate* const g, entityid id, int radius);
+int g_get_light_radius(const gamestate* const g, entityid id);

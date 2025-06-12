@@ -27,16 +27,13 @@ gamestate* gamestateinitptr() {
     massert(g, "g is NULL");
     g->version = GAME_VERSION;
     g->cam_lockon = g->frame_dirty = true;
-    g->debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
-    g->debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
+    g->debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X, g->debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
     g->debugpanel.w = g->debugpanel.h = 200;
-    g->debugpanel.fg_color = RAYWHITE;
-    g->debugpanel.bg_color = RED;
+    g->debugpanel.fg_color = RAYWHITE, g->debugpanel.bg_color = RED;
     g->debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
     g->targetwidth = g->targetheight = g->windowwidth = g->windowheight = g->hero_id = g->entity_turn = g->new_entityid_begin = g->new_entityid_end = -1;
     g->timebegan = g->currenttime = time(NULL);
-    g->timebegantm = localtime(&(g->timebegan));
-    g->currenttimetm = localtime(&(g->currenttime));
+    g->timebegantm = localtime(&(g->timebegan)), g->currenttimetm = localtime(&(g->currenttime));
     bzero(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
     bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
     strftime(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", g->timebegantm);
@@ -44,18 +41,13 @@ gamestate* gamestateinitptr() {
     g->debugpanelon = g->player_input_received = g->is_locked = g->gridon = g->display_inventory_menu = g->display_quit_menu = g->display_help_menu = g->do_quit =
         g->processing_actions = g->cam_changed = g->is3d = g->gameover = g->test_guard = g->dirty_entities = false;
 
-    g->cam2d.target = (Vector2){0, 0};
-    g->cam2d.offset = (Vector2){800, 0};
+    g->cam2d.target = (Vector2){0, 0}, g->cam2d.offset = (Vector2){800, 0};
+    g->cam2d.zoom = 4.0f, g->cam2d.rotation = g->fadealpha = 0.0;
 
-    g->cam2d.zoom = 4.0f;
-    g->cam2d.rotation = g->fadealpha = 0.0;
     g->cam3d = (Camera3D){0};
-    g->cam3d.position = (Vector3){0.0f, 20.0f, 20.0f};
-    g->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
-    g->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
+    g->cam3d.position = (Vector3){0.0f, 20.0f, 20.0f}, g->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f}, g->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
     g->cam3d.fovy = 45.0f;
-    g->cam3d.projection = CAMERA_PERSPECTIVE;
-    g->camera_mode = CAMERA_FREE;
+    g->cam3d.projection = CAMERA_PERSPECTIVE, g->camera_mode = CAMERA_FREE;
     g->controlmode = CONTROLMODE_PLAYER;
     g->fadestate = FADESTATENONE;
     // current displayed dungeon floor
@@ -64,43 +56,37 @@ gamestate* gamestateinitptr() {
     g->pad = 20;
     g->line_spacing = 1.0f;
     g->components = ct_create();
-    g->debugpanel.pad_top = g->debugpanel.pad_left = g->debugpanel.pad_right = g->debugpanel.pad_bottom = g->inventory_menu_selection = g->name_list_count = g->type_list_count =
-        g->race_list_count = g->direction_list_count = g->loc_list_count = g->sprite_move_list_count = g->dead_list_count = g->update_list_count = g->attacking_list_count =
-            g->blocking_list_count = g->block_success_list_count = g->damaged_list_count = g->inventory_list_count = g->target_list_count = g->target_path_list_count =
-                g->default_action_list_count = g->equipment_list_count = g->stats_list_count = g->itemtype_list_count = g->weapontype_list_count = g->shieldtype_list_count =
-                    g->potion_type_list_count = g->damage_list_count = g->ac_list_count = g->zapping_list_count = g->base_attack_damage_list_count = 0;
+
+    g->next_entityid = g->current_music_index = g->total_music_paths = g->restart_count = g->do_restart = g->title_screen_selection = g->monster_def_count =
+        g->monster_def_capacity = g->lock = g->frame_updates = g->framecount = g->turn_count = g->debugpanel.pad_top = g->debugpanel.pad_left = g->debugpanel.pad_right =
+            g->debugpanel.pad_bottom = g->inventory_menu_selection = g->name_list_count = g->type_list_count = g->race_list_count = g->direction_list_count = g->loc_list_count =
+                g->sprite_move_list_count = g->dead_list_count = g->update_list_count = g->attacking_list_count = g->blocking_list_count = g->block_success_list_count =
+                    g->damaged_list_count = g->inventory_list_count = g->target_list_count = g->target_path_list_count = g->default_action_list_count = g->equipment_list_count =
+                        g->stats_list_count = g->itemtype_list_count = g->weapontype_list_count = g->shieldtype_list_count = g->potion_type_list_count = g->damage_list_count =
+                            g->ac_list_count = g->zapping_list_count = g->base_attack_damage_list_count = g->vision_distance_list_count = g->light_radius_list_count = 0;
 
     g->name_list_capacity = g->type_list_capacity = g->race_list_capacity = g->direction_list_capacity = g->loc_list_capacity = g->sprite_move_list_capacity =
         g->dead_list_capacity = g->update_list_capacity = g->attacking_list_capacity = g->blocking_list_capacity = g->block_success_list_capacity = g->damaged_list_capacity =
             g->inventory_list_capacity = g->target_list_capacity = g->target_path_list_capacity = g->default_action_list_capacity = g->equipment_list_capacity =
                 g->stats_list_capacity = g->itemtype_list_capacity = g->weapontype_list_capacity = g->shieldtype_list_capacity = g->potion_type_list_capacity =
-                    g->damage_list_capacity = g->ac_list_capacity = g->zapping_list_capacity = g->base_attack_damage_list_capacity = n;
+                    g->damage_list_capacity = g->ac_list_capacity = g->zapping_list_capacity = g->base_attack_damage_list_capacity = g->vision_distance_list_capacity =
+                        g->light_radius_list_capacity = n;
 
-    g->name_list = (name_component*)malloc(sizeof(name_component) * n);
-    g->type_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->race_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->direction_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->loc_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
-    g->sprite_move_list = (rect_component*)malloc(sizeof(rect_component) * n);
-    g->target_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
-    g->dead_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->update_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->attacking_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->blocking_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->block_success_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->damaged_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * n);
-    g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * n);
-    g->default_action_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * n);
-    g->stats_list = (stats_component*)malloc(sizeof(stats_component) * n);
-    g->itemtype_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->weapontype_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->shieldtype_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->potion_type_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->ac_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->zapping_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
+    g->name_list = (name_component*)malloc(sizeof(name_component) * n), g->type_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->race_list = (int_component*)malloc(sizeof(int_component) * n), g->direction_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->loc_list = (vec3_component*)malloc(sizeof(vec3_component) * n), g->sprite_move_list = (rect_component*)malloc(sizeof(rect_component) * n);
+    g->target_list = (vec3_component*)malloc(sizeof(vec3_component) * n), g->dead_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->update_list = (int_component*)malloc(sizeof(int_component) * n), g->attacking_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->blocking_list = (int_component*)malloc(sizeof(int_component) * n), g->block_success_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->damaged_list = (int_component*)malloc(sizeof(int_component) * n), g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * n);
+    g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * n), g->default_action_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * n), g->stats_list = (stats_component*)malloc(sizeof(stats_component) * n);
+    g->itemtype_list = (int_component*)malloc(sizeof(int_component) * n), g->weapontype_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->shieldtype_list = (int_component*)malloc(sizeof(int_component) * n), g->potion_type_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->ac_list = (int_component*)malloc(sizeof(int_component) * n), g->zapping_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n), g->base_attack_damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
+    g->vision_distance_list = (int_component*)malloc(sizeof(int_component) * n), g->light_radius_list = (int_component*)malloc(sizeof(int_component) * n);
+
     massert(g->name_list, "g->name_list is NULL");
     massert(g->type_list, "g->type_list is NULL");
     massert(g->race_list, "g->race_list is NULL");
@@ -126,20 +112,17 @@ gamestate* gamestateinitptr() {
     massert(g->ac_list, "g->ac_list is NULL");
     massert(g->zapping_list, "g->zapping_list is NULL");
     massert(g->damage_list, "g->damage_list is NULL");
-
-    g->d = NULL;
-    g->monster_defs = NULL;
-    //g->spell_effect_list = (spell_effect_component*)malloc(sizeof(spell_effect_component) * n);
-    //massert(g->spell_effect_list, "g->spell_effect_list is NULL");
-    g->base_attack_damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
     massert(g->base_attack_damage_list, "g->base_attack_damage_list is NULL");
-    g->next_entityid = g->current_music_index = g->total_music_paths = g->restart_count = g->do_restart = g->title_screen_selection = g->monster_def_count =
-        g->monster_def_capacity = g->lock = g->frame_updates = g->framecount = g->turn_count = 0;
+    massert(g->vision_distance_list, "g->vision_distance_list is NULL");
+    massert(g->light_radius_list, "g->light_radius_list is NULL");
+
+    g->d = NULL, g->monster_defs = NULL;
+
     gamestate_init_music_paths(g);
     gamestate_init_msg_history(g);
-    g->current_scene = SCENE_TITLE;
     g->max_title_screen_selections = 3;
     g->chara_creation = (character_creation){0};
+    g->current_scene = SCENE_TITLE;
     gamestate_load_monster_defs(g);
     return g;
 }
@@ -156,10 +139,8 @@ static void gamestate_load_monster_defs(gamestate* const g) {
     int count = 0;
     // first we need to run thru and count the num of entries we need space for
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        // Remove newline character if present
         size_t len = strlen(buffer);
         if (len > 0 && buffer[len - 1] == '\n') buffer[len - 1] = '\0';
-        // if it begins with a #, skip for now
         if (buffer[0] == '#') continue;
         count++;
     }
@@ -168,8 +149,7 @@ static void gamestate_load_monster_defs(gamestate* const g) {
     // now we can allocate space for the monster definitions
     g->monster_defs = (monster_def*)malloc(sizeof(monster_def) * count);
     massert(g->monster_defs, "g->monster_defs is NULL");
-    g->monster_def_count = 0;
-    g->monster_def_capacity = count;
+    g->monster_def_count = 0, g->monster_def_capacity = count;
     // now we can read the file again and fill the monster definitions
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
         // Remove newline character if present
@@ -205,9 +185,8 @@ static void gamestate_load_monster_defs(gamestate* const g) {
 }
 
 monster_def* g_get_monster_def(gamestate* const g, race_t r) {
-    for (int i = 0; i < g->monster_def_count; i++) {
+    for (int i = 0; i < g->monster_def_count; i++)
         if (g->monster_defs[i].race == r) return &g->monster_defs[i];
-    }
     return NULL; // Not found
 }
 
@@ -221,13 +200,9 @@ static void gamestate_init_music_paths(gamestate* const g) {
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
         // Remove newline character if present
         size_t len = strlen(buffer);
-        if (len > 0 && buffer[len - 1] == '\n') {
-            buffer[len - 1] = '\0';
-        }
+        if (len > 0 && buffer[len - 1] == '\n') buffer[len - 1] = '\0';
         // if it begins with a #, skip for now
-        if (buffer[0] == '#') {
-            continue;
-        }
+        if (buffer[0] == '#') continue;
         // copy into g->music_file_paths[i]
         // we have to add "audio/music/" to the beginning of the path
         if (i < 1024) {
@@ -245,8 +220,7 @@ static void gamestate_init_music_paths(gamestate* const g) {
 
 bool gamestate_init_msg_history(gamestate* const g) {
     massert(g, "g is NULL");
-    g->msg_history.count = 0;
-    g->msg_history.max_count = DEFAULT_MAX_HISTORY_SIZE;
+    g->msg_history.count = 0, g->msg_history.max_count = DEFAULT_MAX_HISTORY_SIZE;
     g->msg_history.messages = (char**)malloc(sizeof(char*) * g->msg_history.max_count);
     if (g->msg_history.messages == NULL) {
         merror("g->msg_history.messages is NULL");
@@ -256,7 +230,7 @@ bool gamestate_init_msg_history(gamestate* const g) {
     for (int i = 0; i < g->msg_history.max_count; i++) {
         g->msg_history.messages[i] = (char*)malloc(sizeof(char) * MAX_MSG_LENGTH);
         if (g->msg_history.messages[i] == NULL) {
-            merror("g->msg_history.messages[%d] is NULL", i);
+            //merror("g->msg_history.messages[%d] is NULL", i);
             for (int j = 0; j < i; j++) free(g->msg_history.messages[j]);
             free(g->msg_history.messages);
             return false;
@@ -308,22 +282,12 @@ void gamestatefree(gamestate* g) {
     free(g->damage_list);
     free(g->ac_list);
     free(g->zapping_list);
-    //free(g->spell_effect_list);
     free(g->base_attack_damage_list);
+    free(g->vision_distance_list);
+    free(g->light_radius_list);
     free(g);
     //msuccess("Freed gamestate");
 }
-
-//bool gs_add_entityid(gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != -1, "id is -1");
-//    massert(g->index_entityids < g->max_entityids, "index_entityids >= max_entityids");
-//    massert(g->entityids, "g->entityids is NULL");
-//    massert(g->index_entityids == id, "index_entityids != id");
-//    g->entityids[g->index_entityids] = id;
-//    g->index_entityids++;
-//    return true;
-//}
 
 void gamestate_set_hero_id(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
@@ -334,80 +298,6 @@ entityid gamestate_get_hero_id(const gamestate* const g) {
     massert(g, "g is NULL");
     return g->hero_id;
 }
-
-//void gamestate_init_entityids(gamestate* const g) {
-//    massert(g, "g is NULL");
-//    g->entityids = (entityid*)malloc(sizeof(entityid) * GAMESTATE_INIT_ENTITYIDS_MAX);
-//    if (g->entityids == NULL) {
-//        merror("g->entityids is NULL");
-//        return;
-//    }
-//    for (int i = 0; i < g->max_entityids; i++) {
-//        g->entityids[i] = -1;
-//    }
-//    g->index_entityids = 0;
-//    g->max_entityids = GAMESTATE_INIT_ENTITYIDS_MAX;
-//}
-
-//entityid gamestate_get_entityid_unsafe(const gamestate* const g, int index) { return g->entityids[index]; }
-
-//void gamestate_dungeon_destroy(gamestate* const g) {
-//    if (!g) {
-//        merror("g is NULL");
-//        return;
-//    }
-//    dungeon_destroy(g->dungeon);
-//    g->dungeon = NULL;
-//}
-
-//int gamestate_get_entityid_index(const gamestate* const g, entityid id) {
-//    if (!g) {
-//        merror("g is NULL");
-//        return -1;
-//    }
-//    for (int i = 0; i < g->max_entityids; i++) {
-//        if (g->entityids[i] == id) {
-//            return i;
-//        }
-//    }
-//    return -1;
-//}
-
-//int gamestate_get_next_npc_entityid_from_index(const gamestate* const g, int index) {
-//    if (!g) {
-//        merror("g is NULL");
-//        return -1;
-//    }
-//    for (int i = index + 1; i < g->max_entityids; i++) {
-//        if (g->entityids[i] != -1) {
-//            return g->entityids[i];
-//        }
-//    }
-//    return -1;
-//}
-
-//void gamestate_incr_entity_turn(gamestate* const g) {
-//    if (!g) {
-//        merror("g is NULL");
-//        return;
-//    }
-//    if (g->entity_turn == -1) {
-//        if (g->hero_id == -1) {
-//            merror("both g->entity_turn and g->hero_id are -1");
-//            return;
-//        }
-//        g->entity_turn = g->hero_id;
-//    } else {
-//        // given that entity_turn is an entityid, we need to find the next entity in our
-//        // entityids array that belongs to an NPC
-//        const int index = gamestate_get_entityid_index(g, g->entity_turn);
-//        if (index == -1) {
-//            merror("index is -1");
-//            return;
-//        }
-//        g->entity_turn = gamestate_get_next_npc_entityid_from_index(g, index);
-//    }
-//}
 
 void gamestate_load_keybindings(gamestate* const g) {
     if (!g) return;
@@ -427,15 +317,13 @@ bool gamestate_add_msg_history(gamestate* const g, const char* msg) {
 void gamestate_set_debug_panel_pos_bottom_left(gamestate* const g) {
     massert(g, "g is NULL");
     if (g->windowwidth == -1 || g->windowheight == -1) return;
-    g->debugpanel.x = 0;
-    g->debugpanel.y = g->windowheight - g->debugpanel.h;
+    g->debugpanel.x = 0, g->debugpanel.y = g->windowheight - g->debugpanel.h;
 }
 
 void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
     massert(g, "g is NULL");
     if (g->windowwidth == -1 || g->windowheight == -1) return;
-    g->debugpanel.x = g->windowwidth - g->debugpanel.w;
-    g->debugpanel.y = g->debugpanel.pad_right;
+    g->debugpanel.x = g->windowwidth - g->debugpanel.w, g->debugpanel.y = g->debugpanel.pad_right;
 }
 
 bool g_register_comp(gamestate* const g, entityid id, component comp) {
@@ -473,15 +361,11 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     massert(g, "g is NULL");
     if (!data) {
         mwarning("data is NULL");
-        printf("g_add_component called with data==NULL\n");
     }
-    //massert(data, "data is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(*c_list, "c_list is NULL");
-    //massert(*c_count < *c_capacity, "c_count >= c_capacity: %d >= %d", *c_count, *c_capacity);
     massert(*c_capacity > 0, "c_capacity is 0");
     massert(*c_count >= 0, "c_count is negative");
-    //massert(*c_count < g->max_entityids, "c_count >= g->max_entityids: %d >= %d", *c_count, g->max_entityids);
     massert(*c_count <= g->next_entityid, "c_count >= g->next_entityid: %d >= %d", *c_count, g->next_entityid);
     // Ensure entity exists in component table
     if (!ct_has_entity(g->components, id) && !ct_add_entity(g->components, id)) return false;
@@ -494,10 +378,8 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     }
     // Initialize the component
     void* c_ptr = *c_list + (*c_count * c_size);
-
     switch (comp) {
     case C_NAME: init_name_component((name_component*)c_ptr, id, (const char*)data); break;
-
     case C_TYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     case C_RACE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     case C_DIRECTION: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
@@ -514,17 +396,17 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     case C_BLOCKING: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     case C_BLOCK_SUCCESS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     case C_DAMAGED: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-
     case C_LOCATION: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
     case C_SPRITE_MOVE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
     case C_TARGET: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-
     case C_INVENTORY: init_inventory_component((inventory_component*)c_ptr, id); break;
     case C_TARGET_PATH: init_target_path_component((target_path_component*)c_ptr, id, NULL, 0);
     case C_EQUIPMENT: init_equipment_component((equipment_component*)c_ptr, id); break;
     case C_STATS: init_stats_component((stats_component*)c_ptr, id); break;
     case C_DAMAGE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
     case C_BASE_ATTACK_DAMAGE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
+    case C_LIGHT_RADIUS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
+    case C_VISION_DISTANCE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     //case C_SPELL_EFFECT: init_spell_effect_component((spell_effect_component*)c_ptr, id, *(spell_effect*)data); break;
     default: merror("Unsupported component type: %s", component2str(comp)); return false;
     }
@@ -701,15 +583,12 @@ bool g_update_location(gamestate* const g, entityid id, vec3 loc) {
     return false;
 }
 
-//loc_t g_get_location(const gamestate* const g, entityid id) {
 vec3 g_get_location(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    //if (g->loc_list == NULL) return (loc_t){-1, -1};
     if (g->loc_list == NULL) return (vec3){-1, -1, -1};
     for (int i = 0; i < g->loc_list_count; i++)
         if (g->loc_list[i].id == id) return g->loc_list[i].data;
-    //merror("id %d not found in loc_list", id);
     return (vec3){-1, -1, -1};
 }
 
@@ -1643,48 +1522,6 @@ bool g_get_zapping(const gamestate* const g, entityid id) {
     return false; // not zapping
 }
 
-//bool g_add_spell_effect(gamestate* const g, entityid id, spell_effect effect) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    // make sure the entity has the spell effect component
-//    return g_add_component(
-//        g, id, C_SPELL_EFFECT, (void*)&effect, sizeof(spell_effect_component), (void**)&g->spell_effect_list, &g->spell_effect_list_count, &g->spell_effect_list_capacity);
-//}
-
-//bool g_has_spell_effect(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_SPELL_EFFECT);
-//}
-
-//bool g_set_spell_effect(gamestate* const g, entityid id, spell_effect effect) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->spell_effect_list == NULL) return false;
-//    for (int i = 0; i < g->spell_effect_list_count; i++) {
-//        if (g->spell_effect_list[i].id == id) {
-//            g->spell_effect_list[i].effect = effect;
-//            return true;
-//        }
-//    }
-//    return false;
-//}
-
-//spell_effect g_get_spell_effect(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->spell_effect_list == NULL) {
-//        merror("g->spell_effect_list is NULL");
-//        return (spell_effect){-1, ELEMENTAL_NONE, -1, (roll){0, 0, 0}};
-//    }
-//    for (int i = 0; i < g->spell_effect_list_count; i++) {
-//        if (g->spell_effect_list[i].id == id) {
-//            return g->spell_effect_list[i].effect;
-//        }
-//    }
-//    return (spell_effect){-1, ELEMENTAL_NONE, -1, (roll){0, 0, 0}};
-//}
-
 bool g_add_base_attack_damage(gamestate* const g, entityid id, vec3 damage) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
@@ -1726,4 +1563,78 @@ vec3 g_get_base_attack_damage(const gamestate* const g, entityid id) {
         if (g->base_attack_damage_list[i].id == id) return g->base_attack_damage_list[i].data;
     }
     return (vec3){0, 0, 0};
+}
+
+bool g_add_vision_distance(gamestate* const g, entityid id, int distance) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the vision distance component
+    return g_add_component(
+        g, id, C_VISION_DISTANCE, (void*)&distance, sizeof(int_component), (void**)&g->vision_distance_list, &g->vision_distance_list_count, &g->vision_distance_list_capacity);
+}
+
+bool g_has_vision_distance(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_VISION_DISTANCE);
+}
+
+bool g_set_vision_distance(gamestate* const g, entityid id, int distance) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->vision_distance_list == NULL) return false;
+    for (int i = 0; i < g->vision_distance_list_count; i++) {
+        if (g->vision_distance_list[i].id == id) {
+            g->vision_distance_list[i].data = distance;
+            return true;
+        }
+    }
+    return false;
+}
+
+int g_get_vision_distance(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->vision_distance_list == NULL) return 0;
+    for (int i = 0; i < g->vision_distance_list_count; i++) {
+        if (g->vision_distance_list[i].id == id) return g->vision_distance_list[i].data;
+    }
+    return 0;
+}
+
+bool g_add_light_radius(gamestate* const g, entityid id, int radius) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the light radius component
+    return g_add_component(
+        g, id, C_LIGHT_RADIUS, (void*)&radius, sizeof(int_component), (void**)&g->light_radius_list, &g->light_radius_list_count, &g->light_radius_list_capacity);
+}
+
+bool g_has_light_radius(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_LIGHT_RADIUS);
+}
+
+bool g_set_light_radius(gamestate* const g, entityid id, int radius) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->light_radius_list == NULL) return false;
+    for (int i = 0; i < g->light_radius_list_count; i++) {
+        if (g->light_radius_list[i].id == id) {
+            g->light_radius_list[i].data = radius;
+            return true;
+        }
+    }
+    return false;
+}
+
+int g_get_light_radius(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->light_radius_list == NULL) return 0;
+    for (int i = 0; i < g->light_radius_list_count; i++) {
+        if (g->light_radius_list[i].id == id) return g->light_radius_list[i].data;
+    }
+    return 0;
 }

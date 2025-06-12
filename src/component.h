@@ -3,10 +3,8 @@
 #include "arrow.h"
 #include "arrow_component.h"
 #include "attacking_component.h"
-//#include "attrib_effect.h"
 #include "block_success_component.h"
 #include "blocking_component.h"
-//#include "damage_component.h"
 #include "damaged_component.h"
 #include "entityid.h"
 #include "equipment_component.h"
@@ -20,7 +18,6 @@
 #include "race.h"
 #include "rect_component.h"
 #include "shield.h"
-//#include "spell_effect_component.h"
 #include "stats_component.h"
 #include "stats_slot.h"
 #include "target_path_component.h"
@@ -32,6 +29,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+//#include "spell_effect_component.h"
+//#include "attrib_effect.h"
+//#include "damage_component.h"
 
 typedef enum component_t
 {
@@ -63,6 +63,8 @@ typedef enum component_t
     C_STATS,
     C_DAMAGE,
     C_BASE_ATTACK_DAMAGE,
+    C_VISION_DISTANCE,
+    C_LIGHT_RADIUS,
     //C_SPELL_EFFECT,
     C_COUNT
 } component;
