@@ -164,10 +164,8 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     int vision_distance = g_get_vision_distance(g, g->hero_id);
     vec3 hero_loc = g_get_location(g, g->hero_id);
 
-    // Calculate Chebyshev distance from hero to this tile
-    int dx = abs(x - hero_loc.x);
-    int dy = abs(y - hero_loc.y);
-    int distance = dx > dy ? dx : dy;
+    // Calculate Manhattan distance from hero to this tile (diamond pattern)
+    int distance = abs(x - hero_loc.x) + abs(y - hero_loc.y);
 
     // Get tile texture
     int txkey = get_txkey_for_tiletype(tile->type);
