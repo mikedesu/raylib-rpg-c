@@ -1131,9 +1131,9 @@ static void handle_input_gameplay_settings(const inputstate* const is, gamestate
         g->display_inventory_menu = true;
         return;
     }
-    // FILL IN HERE
+    // FIXME: use `draw_settings_menu` as a reference from libdraw.c
 
-    // END FILL IN
+    // END OF FIXME
 }
 
 static void handle_input_inventory(const inputstate* const is, gamestate* const g) {
@@ -1620,17 +1620,6 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
             }
             return;
         }
-
-        //if (g->controlmode == CONTROLMODE_PLAYER)
-        //    handle_input_player(is, g);
-        //else if (g->controlmode == CONTROLMODE_CAMERA)
-        //    handle_input_camera(is, g);
-        //else if (g->controlmode == CONTROLMODE_INVENTORY)
-        //    handle_input_inventory(is, g);
-        //else if (g->controlmode == CONTROLMODE_HELP)
-        //    handle_input_help_menu(is, g);
-        //else
-        //    merror("Unknown control mode");
 
         switch (g->controlmode) {
         case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
