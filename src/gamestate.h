@@ -59,6 +59,7 @@ typedef struct gamestate {
 
     int framecount, fadealpha, camera_mode, targetwidth, targetheight, windowwidth, windowheight, lock, turn_count, frame_updates;
     int font_size, pad, inventory_menu_selection;
+    int settings_menu_selection;
     int name_list_count, name_list_capacity;
     int type_list_count, type_list_capacity;
     int race_list_count, race_list_capacity;

@@ -75,6 +75,7 @@ static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
 
+static void draw_settings_menu(gamestate* const g);
 static void libdraw_drawframe_2d_from_texture(gamestate* const g);
 static void libdraw_drawframe_2d_to_texture(gamestate* const g);
 static void draw_help_menu(gamestate* const g);
@@ -719,7 +720,12 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     draw_message_history(g);
     draw_message_box(g);
     draw_hud(g);
-    draw_inventory_menu(g);
+
+    if (g->display_inventory_menu)
+        draw_inventory_menu(g);
+    else if (g->display_settings_menu)
+        draw_settings_menu(g);
+
     handle_debug_panel(g);
     draw_version(g);
     if (g->display_help_menu) draw_help_menu(g);
@@ -1313,56 +1319,37 @@ static void draw_inventory_menu(gamestate* const g) {
     }
 }
 
-void draw_settings_menu(gamestate* const g) {
-    // we will use a basic interface for the settings menu
-    // the settings menu will be drawn similar to the other menus like the hud, the message history,
-    // the inventory, etc
-    // current selection will work similar to the main menu screen, but at the moment, we will use
-    // placeholder values
-    //
-    // at the moment, we only have 2 real settings we can immediately tweak that will only impact
-    // the player's aesthetic experience:
-    //
-    // g->music_volume
-    // g->message_history_bgcolor
-
+// FIXME
+static void draw_settings_menu(gamestate* const g) {
     massert(g, "gamestate is NULL");
     if (!g->display_settings_menu) return;
-
-    const char* menu_title = "Settings Menu";
     // Parameters
     const char* menu_title = "Settings Menu";
     int font_size = 20, menu_spacing = 10;
-    const char* menu_text[] = {
-        "Music Volume",
-        "Message History Background",
-        "Back"
-    };
+    const char* menu_text[] = {"Music Volume", "Window BG Color", "Back"};
     int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
     int current_selection = g->settings_menu_selection;
-
     // Calculate menu dimensions
     int max_text_width = 0;
     for (int i = 0; i < menu_count; i++) {
         int width = MeasureText(menu_text[i], font_size);
         if (width > max_text_width) max_text_width = width;
     }
-    
     int box_width = max_text_width + 40;
     int box_height = (font_size + menu_spacing) * menu_count + 20;
     int box_x = (g->windowwidth - box_width) / 2;
     int box_y = (g->windowheight - box_height) / 2;
-
     // Draw background box
     DrawRectangle(box_x, box_y, box_width, box_height, (Color){0x33, 0x33, 0x33, 0x99});
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, WHITE);
-
     // Draw menu items
     int y = box_y + 10;
+    // during the drawing of menu items, the snprintf is causing the text to exceed
+    // the bounds of the drawn underneath the menu items
+    // this needs to be fixed
     for (int i = 0; i < menu_count; i++) {
         Color color = (i == current_selection) ? YELLOW : WHITE;
         const char* text = menu_text[i];
-        
         // Add special indicators for settings
         if (i == 0) {
             char vol_text[32];
@@ -1370,14 +1357,9 @@ void draw_settings_menu(gamestate* const g) {
             text = vol_text;
         } else if (i == 1) {
             char bg_text[64];
-            snprintf(bg_text, sizeof(bg_text), "%s: %02x%02x%02x", 
-                    text, 
-                    g->message_history_bgcolor.r,
-                    g->message_history_bgcolor.g,
-                    g->message_history_bgcolor.b);
+            snprintf(bg_text, sizeof(bg_text), "%s: %02x%02x%02x", text, g->message_history_bgcolor.r, g->message_history_bgcolor.g, g->message_history_bgcolor.b);
             text = bg_text;
         }
-
         int x = box_x + (box_width - MeasureText(text, font_size)) / 2;
         if (i == current_selection) {
             DrawText(">", x - 20, y, font_size, color);

@@ -38,6 +38,7 @@ static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* con
 static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int x0, int y0, int w, int h);
 static inline bool is_traversable(gamestate* const g, int x, int y, int z);
 
+static void handle_input_gameplay_settings(const inputstate* const is, gamestate* const g);
 static void update_player_tiles_explored(gamestate* const g);
 static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful);
 static inline void reset_player_blocking(gamestate* const g);
@@ -1113,14 +1114,45 @@ static void handle_input_camera(const inputstate* const is, gamestate* const g) 
     handle_camera_zoom(g, is);
 }
 
+static void handle_input_gameplay_settings(const inputstate* const is, gamestate* const g) {
+    massert(is, "Input state is NULL!");
+    massert(g, "Game state is NULL!");
+    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+        g->controlmode = CONTROLMODE_PLAYER;
+        g->display_settings_menu = false;
+        g->display_inventory_menu = false;
+        return;
+    }
+    // cycle menus
+    if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_RIGHT)) {
+        g->controlmode = CONTROLMODE_INVENTORY;
+        g->display_settings_menu = false;
+        g->display_inventory_menu = true;
+        return;
+    }
+    // FILL IN HERE
+
+    // END FILL IN
+}
+
 static void handle_input_inventory(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->controlmode = CONTROLMODE_PLAYER;
+        g->display_settings_menu = false;
         g->display_inventory_menu = false;
         return;
     }
+
+    // cycle menus
+    if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_RIGHT)) {
+        g->controlmode = CONTROLMODE_INVENTORY;
+        g->display_settings_menu = true;
+        g->display_inventory_menu = false;
+        return;
+    }
+
     int count = 0;
     entityid* inventory = g_get_inventory(g, g->hero_id, &count);
     if (count == 0) return;
@@ -1603,6 +1635,7 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
         case CONTROLMODE_CAMERA: handle_input_camera(is, g); break;
         case CONTROLMODE_INVENTORY: handle_input_inventory(is, g); break;
+        case CONTROLMODE_SETTINGS: handle_input_gameplay_settings(is, g); break;
         case CONTROLMODE_HELP: handle_input_help_menu(is, g); break;
         default: merror("Unknown control mode: %d", g->controlmode); break;
         }
