@@ -145,18 +145,6 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     massert(df, "dungeon_floor is NULL");
     tile_t* tile = df_tile_at(df, (vec3){x, y, z});
     massert(tile, "tile is NULL");
-    // BEGIN FIXME
-    // The way this function currently works is it draws the tile if it is visible and thats all
-    // What I want is the following:
-    // in addition to checking the tile visibility, we want to utilize the new vision distance component
-    // if a tile is visible, but it is outside of the hero's vision distance, we want to draw it as a shadow tile
-    // the
-    // to determine if a tile is a shadow tile, we can check if the tile is visible and if it is outside of the hero's vision distance
-    // to draw a shadow tile, we can draw the tile as normal, but also draw a faded color black box on top of it
-    // so that it looks like a shadow tile
-    // if the tile is not visible, we return true just like we do now
-    // make sure the code that you write is clean and neat like below is now
-    // good luck!
     if (tile->type == TILE_NONE) return true;
     if (!tile->visible) return true;
 
@@ -200,7 +188,6 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
     return true;
-    // END FIXME
 }
 
 static bool draw_dungeon_tiles_2d(const gamestate* const g, int z, dungeon_floor_t* df) {
@@ -351,6 +338,12 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     massert(loc.x < df->width, "draw_entities_2d: x is out of bounds");
     massert(loc.y >= 0, "draw_entities_2d: y is out of bounds");
     massert(loc.y < df->height, "draw_entities_2d: y is out of bounds");
+    // BEGIN FIXME
+    // this function currently draws the entity regardless of anything else.
+    // what i want is the following:
+    // using `draw_dungeon_floor_tile` as a reference, i only want entities drawn IF
+    // they are in the player's light radius and visibility radius
+    // note that the radius is a diamond shape
     tile_t* tile = df_tile_at(df, loc);
     if (!tile) return false;
     if (tile_is_wall(tile->type)) return false;
@@ -360,6 +353,7 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
         if (g_is_dead(g, id) == dead) draw_sprite_and_shadow(g, id);
     }
     return true;
+    // END FIXME
 }
 
 static void load_shaders() {
