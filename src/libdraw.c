@@ -1331,9 +1331,60 @@ void draw_settings_menu(gamestate* const g) {
 
     const char* menu_title = "Settings Menu";
     // Parameters
-    // FILL IN HERE
+    const char* menu_title = "Settings Menu";
+    int font_size = 20, menu_spacing = 10;
+    const char* menu_text[] = {
+        "Music Volume",
+        "Message History Background",
+        "Back"
+    };
+    int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
+    int current_selection = g->settings_menu_selection;
 
-    // END FILL IN
+    // Calculate menu dimensions
+    int max_text_width = 0;
+    for (int i = 0; i < menu_count; i++) {
+        int width = MeasureText(menu_text[i], font_size);
+        if (width > max_text_width) max_text_width = width;
+    }
+    
+    int box_width = max_text_width + 40;
+    int box_height = (font_size + menu_spacing) * menu_count + 20;
+    int box_x = (g->windowwidth - box_width) / 2;
+    int box_y = (g->windowheight - box_height) / 2;
+
+    // Draw background box
+    DrawRectangle(box_x, box_y, box_width, box_height, (Color){0x33, 0x33, 0x33, 0x99});
+    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, WHITE);
+
+    // Draw menu items
+    int y = box_y + 10;
+    for (int i = 0; i < menu_count; i++) {
+        Color color = (i == current_selection) ? YELLOW : WHITE;
+        const char* text = menu_text[i];
+        
+        // Add special indicators for settings
+        if (i == 0) {
+            char vol_text[32];
+            snprintf(vol_text, sizeof(vol_text), "%s: %.1f", text, g->music_volume);
+            text = vol_text;
+        } else if (i == 1) {
+            char bg_text[64];
+            snprintf(bg_text, sizeof(bg_text), "%s: %02x%02x%02x", 
+                    text, 
+                    g->message_history_bgcolor.r,
+                    g->message_history_bgcolor.g,
+                    g->message_history_bgcolor.b);
+            text = bg_text;
+        }
+
+        int x = box_x + (box_width - MeasureText(text, font_size)) / 2;
+        if (i == current_selection) {
+            DrawText(">", x - 20, y, font_size, color);
+        }
+        DrawText(text, x, y, font_size, color);
+        y += font_size + menu_spacing;
+    }
 }
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
