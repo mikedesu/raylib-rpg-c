@@ -1319,52 +1319,83 @@ static void draw_inventory_menu(gamestate* const g) {
     }
 }
 
-// FIXME
 static void draw_settings_menu(gamestate* const g) {
     massert(g, "gamestate is NULL");
     if (!g->display_settings_menu) return;
+
     // Parameters
     const char* menu_title = "Settings Menu";
-    int font_size = 20, menu_spacing = 10;
-    const char* menu_text[] = {"Music Volume", "Window BG Color", "Back"};
+    int font_size = 20;
+    int menu_spacing = 15;
+    const char* menu_text[] = {"Music Volume", "Message History BG", "Back"};
     int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
     int current_selection = g->settings_menu_selection;
-    // Calculate menu dimensions
-    int max_text_width = 0;
+
+    // Calculate max width needed for menu items and their values
+    int max_text_width = MeasureText(menu_title, font_size);
     for (int i = 0; i < menu_count; i++) {
         int width = MeasureText(menu_text[i], font_size);
         if (width > max_text_width) max_text_width = width;
     }
-    int box_width = max_text_width + 40;
-    int box_height = (font_size + menu_spacing) * menu_count + 20;
+    
+    // Add space for values and padding
+    int box_width = max_text_width + 150;
+    int box_height = (font_size + menu_spacing) * menu_count + 40;
     int box_x = (g->windowwidth - box_width) / 2;
     int box_y = (g->windowheight - box_height) / 2;
+
     // Draw background box
-    DrawRectangle(box_x, box_y, box_width, box_height, (Color){0x33, 0x33, 0x33, 0x99});
+    DrawRectangle(box_x, box_y, box_width, box_height, (Color){0x33, 0x33, 0x33, 0xcc});
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, WHITE);
+
+    // Draw menu title
+    int title_x = box_x + (box_width - MeasureText(menu_title, font_size)) / 2;
+    DrawText(menu_title, title_x, box_y + 10, font_size, WHITE);
+
     // Draw menu items
-    int y = box_y + 10;
-    // during the drawing of menu items, the snprintf is causing the text to exceed
-    // the bounds of the drawn underneath the menu items
-    // this needs to be fixed
+    int y = box_y + 40;
+    int left_pad = box_x + 20;
+    
     for (int i = 0; i < menu_count; i++) {
         Color color = (i == current_selection) ? YELLOW : WHITE;
-        const char* text = menu_text[i];
-        // Add special indicators for settings
-        if (i == 0) {
-            char vol_text[32];
-            snprintf(vol_text, sizeof(vol_text), "%s: %.1f", text, g->music_volume);
-            text = vol_text;
-        } else if (i == 1) {
-            char bg_text[64];
-            snprintf(bg_text, sizeof(bg_text), "%s: %02x%02x%02x", text, g->message_history_bgcolor.r, g->message_history_bgcolor.g, g->message_history_bgcolor.b);
-            text = bg_text;
-        }
-        int x = box_x + (box_width - MeasureText(text, font_size)) / 2;
+        
+        // Draw selection indicator
         if (i == current_selection) {
-            DrawText(">", x - 20, y, font_size, color);
+            DrawText(">", left_pad - 20, y, font_size, color);
         }
-        DrawText(text, x, y, font_size, color);
+
+        // Draw menu text
+        DrawText(menu_text[i], left_pad, y, font_size, color);
+
+        // Draw current values right-aligned
+        int value_x = box_x + box_width - 30;
+        char value_text[32];
+        
+        if (i == 0) { // Music Volume
+            snprintf(value_text, sizeof(value_text), "%.1f", g->music_volume);
+            value_x -= MeasureText(value_text, font_size);
+            DrawText(value_text, value_x, y, font_size, color);
+            
+            // Draw volume indicator
+            int bar_width = 100;
+            int bar_x = value_x - bar_width - 10;
+            int bar_y = y + font_size/2;
+            DrawRectangle(bar_x, bar_y, bar_width, 2, Fade(WHITE, 0.3f));
+            DrawRectangle(bar_x, bar_y, (int)(bar_width * g->music_volume), 2, color);
+            
+        } else if (i == 1) { // BG Color
+            snprintf(value_text, sizeof(value_text), "#%02x%02x%02x", 
+                    g->message_history_bgcolor.r,
+                    g->message_history_bgcolor.g,
+                    g->message_history_bgcolor.b);
+            value_x -= MeasureText(value_text, font_size);
+            DrawText(value_text, value_x, y, font_size, color);
+            
+            // Draw color swatch
+            DrawRectangle(value_x - 30, y, 20, font_size, g->message_history_bgcolor);
+            DrawRectangleLines(value_x - 30, y, 20, font_size, WHITE);
+        }
+
         y += font_size + menu_spacing;
     }
 }
