@@ -862,6 +862,7 @@ static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, con
     return id;
 }
 
+// REFERENCE FOR AIDER TO USE IN UPDATING libdraw.c's draw_dungeon_floor_tile function
 static void update_player_tiles_explored(gamestate* const g) {
     massert(g, "gamestate is NULL");
     entityid hero_id = g->hero_id;
@@ -869,24 +870,20 @@ static void update_player_tiles_explored(gamestate* const g) {
     dungeon_floor_t* df = d_get_floor(g->d, g->d->current_floor);
     massert(df, "failed to get current dungeon floor");
     vec3 loc = g_get_location(g, hero_id);
-
     // Get the player's light radius
     int light_radius = g_get_light_radius(g, hero_id);
     minfo("hero light radius: %d", light_radius);
     massert(light_radius > 0, "light radius is negative");
-
     // Reveal tiles in a diamond pattern
     for (int i = -light_radius; i <= light_radius; i++) {
         for (int j = -light_radius; j <= light_radius; j++) {
             // Calculate Manhattan distance for diamond shape
             int dist = abs(i) + abs(j);
-
             // Only reveal tiles within the light radius
             if (dist <= light_radius) {
                 vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
                 // Skip if out of bounds
                 if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 || loc2.y >= df->height) continue;
-
                 tile_t* tile = df_tile_at(df, loc2);
                 massert(tile, "failed to get tile at hero location");
                 tile->explored = true;

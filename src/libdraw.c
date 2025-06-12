@@ -25,7 +25,7 @@
 #include <raylib.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
-#define DEFAULT_MUSIC_VOLUME 0.5f
+#define DEFAULT_MUSIC_VOLUME 0.0f
 
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
@@ -163,7 +163,7 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     // Get hero's vision distance and location
     int vision_distance = g_get_vision_distance(g, g->hero_id);
     vec3 hero_loc = g_get_location(g, g->hero_id);
-    
+
     // Calculate Chebyshev distance from hero to this tile
     int dx = abs(x - hero_loc.x);
     int dy = abs(y - hero_loc.y);
@@ -174,7 +174,7 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     if (txkey < 0) return false;
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) return false;
-    
+
     // Calculate drawing position
     int offset_x = -12, offset_y = -12;
     int px = x * DEFAULT_TILE_SIZE + offset_x;
@@ -183,10 +183,9 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
 
     // Draw tile with fade if beyond vision distance
-    Color draw_color = distance > vision_distance ? 
-        Fade(WHITE, 0.4f) :  // Faded for out-of-range tiles
-        WHITE;                // Normal for in-range tiles
-    
+    Color draw_color = distance > vision_distance ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
+                           WHITE; // Normal for in-range tiles
+
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
     if (tile->has_pressure_plate) {
         int txkey2 = tile->pressure_plate_up_tx_key;
