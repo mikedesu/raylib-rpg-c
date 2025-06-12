@@ -869,23 +869,24 @@ static void update_player_tiles_explored(gamestate* const g) {
     dungeon_floor_t* df = d_get_floor(g->d, g->d->current_floor);
     massert(df, "failed to get current dungeon floor");
     vec3 loc = g_get_location(g, hero_id);
-    
+
     // Get the player's light radius
     int light_radius = g_get_light_radius(g, hero_id);
-    massert(light_radius >= 0, "light radius is negative");
-    
+    minfo("hero light radius: %d", light_radius);
+    massert(light_radius > 0, "light radius is negative");
+
     // Reveal tiles in a diamond pattern
     for (int i = -light_radius; i <= light_radius; i++) {
         for (int j = -light_radius; j <= light_radius; j++) {
             // Calculate Manhattan distance for diamond shape
             int dist = abs(i) + abs(j);
-            
+
             // Only reveal tiles within the light radius
             if (dist <= light_radius) {
                 vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
                 // Skip if out of bounds
                 if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 || loc2.y >= df->height) continue;
-                
+
                 tile_t* tile = df_tile_at(df, loc2);
                 massert(tile, "failed to get tile at hero location");
                 tile->explored = true;
@@ -921,6 +922,11 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
     }
     g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
     g_set_stat(g, id, STATS_HP, maxhp_roll);
+
+    int default_vision_distance = 2;
+    int default_light_radius = 2;
+    g_set_light_radius(g, id, default_light_radius);
+    g_set_vision_distance(g, id, default_vision_distance);
     update_player_tiles_explored(g);
     return id;
 }
@@ -1968,28 +1974,28 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
         g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
         max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
-        if (max_hp <= 0) {
-            //merror("Max HP is less than or equal to 0, setting to 1");
-            max_hp = 1; // Ensure max HP is at least 1
-        }
+        if (max_hp <= 0) max_hp = 1; // Ensure max HP is at least 1
         g_set_stat(g, id, STATS_MAXHP, max_hp);
         g_set_stat(g, id, STATS_HP, max_hp);
         g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-
         // we will update this to do an appropriate difficulty-scaling
         // level-up is too powerful and results in imbalance
         // the goal is to make the spawns challenge rating approximate
         // and close either above or below the player's level and cr
         for (int i = 1; i < floor; i++) handle_level_up(g, id);
-
         int new_level = g_get_stat(g, id, STATS_LEVEL);
         massert(new_level == floor, "New level %d does not match floor %d", new_level, floor);
         msuccess("Spawned entity of Level %d with %d HP at %d, %d, %d", g_get_stat(g, id, STATS_LEVEL), max_hp, loc.x, loc.y, loc.z);
-
         // update vision distance
         // this will be appropriately set on a per-npc basis but for now...
         // hard code 5
-        g_set_vision_distance(g, id, 5);
+
+        int vision_distance0 = g_get_vision_distance(g, id);
+        g_set_vision_distance(g, id, vision_distance0);
+        // verify vision distance
+        int vision_distance = g_get_vision_distance(g, id);
+        massert(vision_distance == vision_distance0, "Vision distance %d does not match expected value 5", vision_distance);
+
         // update light radius
         // this will be appropriately set on a per-npc basis but for now...
         // hard code 3
