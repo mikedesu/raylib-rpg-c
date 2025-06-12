@@ -812,7 +812,8 @@ static void draw_help_menu(gamestate* const g) {
 
 static void draw_gameover_menu(gamestate* const g) {
     if (!g->gameover) return;
-    const char *gameover_text = "Game Over", *restart_text = "Press any key to try again";
+    //const char *gameover_text = "Game Over", *restart_text = "Press any key to try again";
+    const char *gameover_text = "Game Over", *restart_text = "Press enter or space to return to the title screen";
     Color bg_color = BLACK;
     int font_size = 20, measure = MeasureText(restart_text, font_size), text_width = measure, text_height = font_size, x = (g->windowwidth - text_width) / 2,
         y = (g->windowheight - text_height * 2) / 2;
@@ -1334,7 +1335,8 @@ static void draw_title_screen(gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
     // Space between title texts
     Color active_color = WHITE, disabled_color = {0x99, 0x99, 0x99, 0xFF}, selection_color;
-    const char* menu_text[3] = {"New Game", "Continue", "Settings"};
+    //const char* menu_text[3] = {"New Game", "Continue", "Settings"};
+    const char* menu_text[2] = {"New Game", "Continue (coming soon)"};
     //const char *title_text_0 = "project.", *title_text_1 = "rpg", *version_text = g->version, *start_text = "Press any key to begin";
     const char *title_text_0 = "project.", *title_text_1 = "rpg", *version_text = g->version, *start_text = "Press enter or space to begin";
     char buffer[1024] = {0};

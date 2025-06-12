@@ -1580,7 +1580,11 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
 
     if (g->current_scene == SCENE_GAMEPLAY) {
         if (g->gameover) {
-            if (inputstate_any_pressed(is)) liblogic_restart(g);
+            //if (inputstate_any_pressed(is)) liblogic_restart(g);
+            //if (inputstate_any_pressed(is)) {
+            if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+                liblogic_restart(g);
+            }
             return;
         }
         if (g->controlmode == CONTROLMODE_PLAYER) {
