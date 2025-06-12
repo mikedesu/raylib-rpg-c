@@ -124,6 +124,9 @@ gamestate* gamestateinitptr() {
     g->chara_creation = (character_creation){0};
     g->current_scene = SCENE_TITLE;
     gamestate_load_monster_defs(g);
+
+    g->music_volume = DEFAULT_MUSIC_VOLUME;
+
     return g;
 }
 
@@ -179,6 +182,9 @@ static void gamestate_load_monster_defs(gamestate* const g) {
         race_t race = str2race(race_name_buffer);
         def->race = race;
         g->monster_def_count++;
+
+        g->message_history_bgcolor = DEFAULT_MSG_HIST_BGCOLOR;
+        g->display_settings_menu = false;
     }
     fclose(file);
     // at this point, we have loaded all the monster definitions and can use them

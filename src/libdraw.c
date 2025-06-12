@@ -25,7 +25,7 @@
 #include <raylib.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
-#define DEFAULT_MUSIC_VOLUME 0.5f
+//#define DEFAULT_MUSIC_VOLUME 0.5f
 
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
@@ -1154,7 +1154,8 @@ void libdraw_init_rest(gamestate* const g) {
     snprintf(real_music_path, sizeof(real_music_path), "%s%s", "audio/music/", music_path);
     music = LoadMusicStream(real_music_path);
     //SetMusicVolume(music, 0.50f); // Set initial music volume
-    SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
+    //SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
+    SetMusicVolume(music, g->music_volume); // Set initial music volume
     //SetMusicLooping(music, true); // Loop the music
     PlayMusicStream(music);
     //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
@@ -1177,7 +1178,8 @@ static void draw_message_history(gamestate* const g) {
     if (g->msg_history.count == 0) return;
     int font_size = 20, max_messages = 20, x = 0, y = 42, current_count = 0;
     char tmp_buffer[2048] = {0};
-    Color message_bg = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent
+    //Color message_bg = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent
+    Color message_bg = g->message_history_bgcolor;
     // instead of a placeholder message, we now need to actually draw the message history
     // we might only render the last N messages
     for (int i = g->msg_history.count - 1; i >= 0 && current_count < max_messages; i--) {
@@ -1309,6 +1311,29 @@ static void draw_inventory_menu(gamestate* const g) {
                            WHITE);
         }
     }
+}
+
+void draw_settings_menu(gamestate* const g) {
+    // we will use a basic interface for the settings menu
+    // the settings menu will be drawn similar to the other menus like the hud, the message history,
+    // the inventory, etc
+    // current selection will work similar to the main menu screen, but at the moment, we will use
+    // placeholder values
+    //
+    // at the moment, we only have 2 real settings we can immediately tweak that will only impact
+    // the player's aesthetic experience:
+    //
+    // g->music_volume
+    // g->message_history_bgcolor
+
+    massert(g, "gamestate is NULL");
+    if (!g->display_settings_menu) return;
+
+    const char* menu_title = "Settings Menu";
+    // Parameters
+    // FILL IN HERE
+
+    // END FILL IN
 }
 
 void libdraw_update_input(inputstate* const is) { inputstate_update(is); }

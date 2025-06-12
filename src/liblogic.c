@@ -1587,17 +1587,26 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
             }
             return;
         }
-        if (g->controlmode == CONTROLMODE_PLAYER) {
-            handle_input_player(is, g);
-        } else if (g->controlmode == CONTROLMODE_CAMERA) {
-            handle_input_camera(is, g);
-        } else if (g->controlmode == CONTROLMODE_INVENTORY) {
-            handle_input_inventory(is, g);
-        } else if (g->controlmode == CONTROLMODE_HELP) {
-            handle_input_help_menu(is, g);
-        } else {
-            merror("Unknown control mode");
+
+        //if (g->controlmode == CONTROLMODE_PLAYER)
+        //    handle_input_player(is, g);
+        //else if (g->controlmode == CONTROLMODE_CAMERA)
+        //    handle_input_camera(is, g);
+        //else if (g->controlmode == CONTROLMODE_INVENTORY)
+        //    handle_input_inventory(is, g);
+        //else if (g->controlmode == CONTROLMODE_HELP)
+        //    handle_input_help_menu(is, g);
+        //else
+        //    merror("Unknown control mode");
+
+        switch (g->controlmode) {
+        case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
+        case CONTROLMODE_CAMERA: handle_input_camera(is, g); break;
+        case CONTROLMODE_INVENTORY: handle_input_inventory(is, g); break;
+        case CONTROLMODE_HELP: handle_input_help_menu(is, g); break;
+        default: merror("Unknown control mode: %d", g->controlmode); break;
         }
+
     } else if (g->current_scene == SCENE_TITLE) {
         //if (inputstate_any_pressed(is)) {
         if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {

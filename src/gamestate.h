@@ -23,15 +23,14 @@
 #include <time.h>
 
 #define GAME_VERSION "v0.0.3.14"
-
+#define DEFAULT_MUSIC_VOLUME 0.0f
+#define DEFAULT_MSG_HIST_BGCOLOR ((Color){0x33, 0x33, 0x33, 255})
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
 #define GAMESTATE_SIZEOFTEXINFOARRAY 1024
 #define MAX_MESSAGES 64
 #define MAX_MSG_LENGTH 256
-
 #define LIST_INIT_CAPACITY 16
-
 #define DEFAULT_MAX_HISTORY_SIZE 1024
 
 typedef struct {
@@ -54,7 +53,7 @@ typedef struct gamestate {
     struct tm *timebegantm, *currenttimetm;
     char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF], currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
     bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard, display_inventory_menu,
-        display_quit_menu, do_quit, dirty_entities, display_help_menu, cam_changed, frame_dirty;
+        display_quit_menu, do_quit, dirty_entities, display_help_menu, cam_changed, frame_dirty, display_settings_menu;
 
     //char help_menu_text[2048];
 
@@ -170,6 +169,10 @@ typedef struct gamestate {
     // Number of monster definitions
     int monster_def_count;
     int monster_def_capacity;
+
+    float music_volume;
+
+    Color message_history_bgcolor;
 
 } gamestate;
 
