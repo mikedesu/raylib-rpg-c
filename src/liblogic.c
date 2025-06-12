@@ -1117,23 +1117,48 @@ static void handle_input_camera(const inputstate* const is, gamestate* const g) 
 static void handle_input_gameplay_settings(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
+    
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->controlmode = CONTROLMODE_PLAYER;
         g->display_settings_menu = false;
         g->display_inventory_menu = false;
         return;
     }
-    // cycle menus
+
+    // Cycle between settings and inventory menus
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_RIGHT)) {
-        minfo("cycling menus");
         g->controlmode = CONTROLMODE_INVENTORY;
         g->display_settings_menu = false;
         g->display_inventory_menu = true;
         return;
     }
-    // FIXME: use `draw_settings_menu` as a reference from libdraw.c
 
-    // END OF FIXME
+    // Handle menu navigation
+    if (inputstate_is_pressed(is, KEY_UP)) {
+        g->settings_menu_selection = (g->settings_menu_selection - 1 + 3) % 3;
+        g->frame_dirty = true;
+    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+        g->settings_menu_selection = (g->settings_menu_selection + 1) % 3;
+        g->frame_dirty = true;
+    }
+
+    // Handle menu item selection
+    if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+        switch (g->settings_menu_selection) {
+            case 0: // Music Volume
+                // Volume adjustment will be handled elsewhere
+                break;
+                
+            case 1: // Message History Background
+                // Background color cycling will be handled elsewhere
+                break;
+                
+            case 2: // Back
+                g->controlmode = CONTROLMODE_PLAYER;
+                g->display_settings_menu = false;
+                break;
+        }
+    }
 }
 
 static void handle_input_inventory(const inputstate* const is, gamestate* const g) {
