@@ -158,20 +158,36 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     // make sure the code that you write is clean and neat like below is now
     // good luck!
     if (tile->type == TILE_NONE) return true;
-    // check if tile is visible
     if (!tile->visible) return true;
-    // just draw the tile itself
-    // tile values in get_txkey_for_tiletype.h
+
+    // Get hero's vision distance and location
+    int vision_distance = g_get_vision_distance(g, g->hero_id);
+    vec3 hero_loc = g_get_location(g, g->hero_id);
+    
+    // Calculate Chebyshev distance from hero to this tile
+    int dx = abs(x - hero_loc.x);
+    int dy = abs(y - hero_loc.y);
+    int distance = dx > dy ? dx : dy;
+
+    // Get tile texture
     int txkey = get_txkey_for_tiletype(tile->type);
     if (txkey < 0) return false;
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) return false;
+    
+    // Calculate drawing position
     int offset_x = -12, offset_y = -12;
-    int dx = x * DEFAULT_TILE_SIZE + offset_x;
-    int dy = y * DEFAULT_TILE_SIZE + offset_y;
-    const Rectangle src = (Rectangle){0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
-    const Rectangle dest = (Rectangle){dx, dy, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
-    DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
+    int px = x * DEFAULT_TILE_SIZE + offset_x;
+    int py = y * DEFAULT_TILE_SIZE + offset_y;
+    const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+    const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+
+    // Draw tile with fade if beyond vision distance
+    Color draw_color = distance > vision_distance ? 
+        Fade(WHITE, 0.4f) :  // Faded for out-of-range tiles
+        WHITE;                // Normal for in-range tiles
+    
+    DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
     if (tile->has_pressure_plate) {
         int txkey2 = tile->pressure_plate_up_tx_key;
         if (txkey2 < 0) return false;
