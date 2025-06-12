@@ -869,22 +869,32 @@ static void update_player_tiles_explored(gamestate* const g) {
     dungeon_floor_t* df = d_get_floor(g->d, g->d->current_floor);
     massert(df, "failed to get current dungeon floor");
     vec3 loc = g_get_location(g, hero_id);
-    // BEGIN FIXME
-    // at the moment, the below loops do the following:
-    // reveal the 3x3 area around the player
-    // what i want is, using the new light radius component,
-    // to reveal the area around the player based on the light radius
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
+    
+    // Get the player's light radius
+    int light_radius = g_get_light_radius(g, hero_id);
+    massert(light_radius >= 0, "light radius is negative");
+    
+    // Reveal tiles within the light radius
+    for (int i = -light_radius; i <= light_radius; i++) {
+        for (int j = -light_radius; j <= light_radius; j++) {
             vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
+            // Skip if out of bounds
             if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 || loc2.y >= df->height) continue;
-            tile_t* tile = df_tile_at(df, loc2);
-            massert(tile, "failed to get tile at hero location");
-            tile->explored = true;
-            tile->visible = true;
+            
+            // Calculate distance from player
+            int dx = abs(i);
+            int dy = abs(j);
+            int dist = dx > dy ? dx : dy;  // Chebyshev distance
+            
+            // Only reveal tiles within the light radius
+            if (dist <= light_radius) {
+                tile_t* tile = df_tile_at(df, loc2);
+                massert(tile, "failed to get tile at hero location");
+                tile->explored = true;
+                tile->visible = true;
+            }
         }
     }
-    // END FIXME
 }
 
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z, const char* name) {
