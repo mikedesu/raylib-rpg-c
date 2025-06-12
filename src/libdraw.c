@@ -150,6 +150,7 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     // What I want is the following:
     // in addition to checking the tile visibility, we want to utilize the new vision distance component
     // if a tile is visible, but it is outside of the hero's vision distance, we want to draw it as a shadow tile
+    // the
     // to determine if a tile is a shadow tile, we can check if the tile is visible and if it is outside of the hero's vision distance
     // to draw a shadow tile, we can draw the tile as normal, but also draw a faded color black box on top of it
     // so that it looks like a shadow tile
