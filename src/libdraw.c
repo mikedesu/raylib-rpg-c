@@ -75,6 +75,7 @@ static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
 
+void draw_sort_inventory_menu(gamestate* const g);
 static void draw_settings_menu(gamestate* const g);
 static void libdraw_drawframe_2d_from_texture(gamestate* const g);
 static void libdraw_drawframe_2d_to_texture(gamestate* const g);
@@ -1515,4 +1516,9 @@ static void draw_character_creation_screen(gamestate* const g) {
         DrawText(remaining_text[i], x, y, font_size, WHITE);
         y += font_size + 4;
     }
+}
+
+// FIXME
+void draw_sort_inventory_menu(gamestate* const g) {
+    // code goes here...
 }
