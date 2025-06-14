@@ -1331,6 +1331,13 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     g->display_inventory_menu = false;
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                } else if (item_type == ITEM_RING) {
+                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_RING, item_id);
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    g->controlmode = CONTROLMODE_PLAYER;
+                    g->display_inventory_menu = false;
+                    g->controlmode = CONTROLMODE_PLAYER;
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 }
             }
         }
