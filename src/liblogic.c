@@ -877,7 +877,25 @@ static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, con
     return id;
 }
 
-// REFERENCE FOR AIDER TO USE IN UPDATING libdraw.c's draw_dungeon_floor_tile function
+// this should only take into account any equipment that has light radius bonus equipment
+//static int get_entity_total_light_radius_bonus(gamestate* const g, entityid id) {
+//    int total_light_radius_bonus = 0;
+//    // get the light radius bonus from the equipment
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entity id is invalid");
+//    // check each equipment slot
+//    for (int i = 0; i < EQUIPMENT_SLOT_COUNT; i++) {
+//        entityid equip_id = g_get_equipment(g, id, i);
+//        if (equip_id == ENTITYID_INVALID) continue;
+//        if (!g_has_light_radius_bonus(g, equip_id)) continue;
+//        int light_radius_bonus = g_get_light_radius_bonus(g, equip_id);
+//        total_light_radius_bonus += light_radius_bonus;
+//    }
+//    // only return the total light radius bonus
+//    // it is fine if it is negative that might be fun for cursed items
+//    return total_light_radius_bonus;
+//}
+
 static void update_player_tiles_explored(gamestate* const g) {
     massert(g, "gamestate is NULL");
     entityid hero_id = g->hero_id;
@@ -887,6 +905,9 @@ static void update_player_tiles_explored(gamestate* const g) {
     vec3 loc = g_get_location(g, hero_id);
     // Get the player's light radius
     int light_radius = g_get_light_radius(g, hero_id);
+    int light_radius_bonus = g_get_entity_total_light_radius_bonus(g, hero_id);
+    light_radius += light_radius_bonus;
+
     minfo("hero light radius: %d", light_radius);
     massert(light_radius > 0, "light radius is negative");
     // Reveal tiles in a diamond pattern
@@ -2001,7 +2022,10 @@ static void init_ring_test(gamestate* g) {
     while (id == ENTITYID_INVALID) {
         vec3 loc = get_random_empty_non_wall_loc(g, 0);
         //id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
-        id = ring_create(g, RING_GOLD, loc, "dummy gold ring");
+        id = ring_create(g, RING_GOLD, loc, "light ring +1");
+        // as a test, lets add a light radius bonus of +1
+        g_add_light_radius_bonus(g, id, 1);
+
         //g_set_damage(g, id, (roll){1, 8, 0});
         //g_set_damage(g, id, (vec3){1, 8, 0});
     }

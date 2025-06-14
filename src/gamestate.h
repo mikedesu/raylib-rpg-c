@@ -392,3 +392,5 @@ bool g_add_ringtype(gamestate* const g, entityid id, int type);
 bool g_has_ringtype(const gamestate* const g, entityid id);
 bool g_set_ringtype(gamestate* const g, entityid id, int type);
 ringtype g_get_ringtype(const gamestate* const g, entityid id);
+
+int g_get_entity_total_light_radius_bonus(const gamestate* const g, entityid id);

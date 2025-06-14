@@ -154,7 +154,10 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     if (!tile->visible) return true;
 
     // Get hero's vision distance and location
-    int vision_distance = g_get_vision_distance(g, g->hero_id);
+    //int vision_distance = g_get_vision_distance(g, g->hero_id);
+    // its not actually the vision distance we need,
+    // its the total light radius
+    int vision_distance = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
     vec3 hero_loc = g_get_location(g, g->hero_id);
 
     // Calculate Manhattan distance from hero to this tile (diamond pattern)

@@ -1832,3 +1832,22 @@ int g_get_light_radius_bonus(const gamestate* const g, entityid id) {
     }
     return 0;
 }
+
+//int g_get_entity_total_light_radius_bonus(gamestate* const g, entityid id) {
+int g_get_entity_total_light_radius_bonus(const gamestate* const g, entityid id) {
+    int total_light_radius_bonus = 0;
+    // get the light radius bonus from the equipment
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
+    // check each equipment slot
+    for (int i = 0; i < EQUIPMENT_SLOT_COUNT; i++) {
+        entityid equip_id = g_get_equipment(g, id, i);
+        if (equip_id == ENTITYID_INVALID) continue;
+        if (!g_has_light_radius_bonus(g, equip_id)) continue;
+        int light_radius_bonus = g_get_light_radius_bonus(g, equip_id);
+        total_light_radius_bonus += light_radius_bonus;
+    }
+    // only return the total light radius bonus
+    // it is fine if it is negative that might be fun for cursed items
+    return total_light_radius_bonus;
+}
