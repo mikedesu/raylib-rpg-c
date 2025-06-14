@@ -24,6 +24,7 @@
 #include "tx_keys.h"
 #include "weapon.h"
 #include <raylib.h>
+#include <stdlib.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_MUSIC_VOLUME 0.5f
@@ -1219,7 +1220,7 @@ static int compare_by_name(const void* a, const void* b, void* arg) {
     return strcmp(name_a, name_b);
 }
 
-// Comparison function for sorting by type 
+// Comparison function for sorting by type
 static int compare_by_type(const void* a, const void* b, void* arg) {
     gamestate* g = (gamestate*)arg;
     entityid id_a = *(entityid*)a;
@@ -1241,15 +1242,11 @@ entityid* sort_inventory(gamestate* const g, entityid* inventory, int inv_count,
 
     // Sort based on the specified type
     switch (sort_type) {
-        case SORT_BY_NAME:
-            qsort_r(sorted_inv, inv_count, sizeof(entityid), compare_by_name, g);
-            break;
-        case SORT_BY_TYPE:
-            qsort_r(sorted_inv, inv_count, sizeof(entityid), compare_by_type, g);
-            break;
-        default:
-            // No sorting needed, return copy as-is
-            break;
+    case INV_SORT_NAME: qsort_r(sorted_inv, inv_count, sizeof(entityid), compare_by_name, g); break;
+    case INV_SORT_TYPE: qsort_r(sorted_inv, inv_count, sizeof(entityid), compare_by_type, g); break;
+    default:
+        // No sorting needed, return copy as-is
+        break;
     }
 
     return sorted_inv;
