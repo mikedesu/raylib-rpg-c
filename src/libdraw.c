@@ -1292,7 +1292,6 @@ static void draw_inventory_menu(gamestate* const g) {
         item_y += font_size + 4;
     }
     // Draw item info in right_box
-    /*
     if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < inventory_count) {
         entityid item_id = inventory[g->inventory_menu_selection];
         const char* name = g_get_name(g, item_id);
@@ -1329,8 +1328,9 @@ static void draw_inventory_menu(gamestate* const g) {
                            WHITE);
         }
     }
-    */
+    /*
     draw_inventory_item_info(g, inventory[g->inventory_menu_selection]);
+    */
 
     // also try drawing the inv sort options
     draw_sort_inventory_menu(g);
