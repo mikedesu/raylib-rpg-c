@@ -65,6 +65,7 @@ typedef enum component_t
     C_BASE_ATTACK_DAMAGE,
     C_VISION_DISTANCE,
     C_LIGHT_RADIUS,
+    C_RINGTYPE,
     //C_SPELL_EFFECT,
     C_COUNT
 } component;
@@ -98,6 +99,9 @@ static inline const char* component2str(component c) {
     case C_DAMAGE: return "C_DAMAGE";
     case C_AC: return "C_AC";
     case C_ZAPPING: return "C_ZAPPING";
+    case C_VISION_DISTANCE: return "C_VISION_DISTANCE";
+    case C_LIGHT_RADIUS: return "C_LIGHT_RADIUS";
+    case C_RINGTYPE: return "C_RINGTYPE";
     //case C_SPELL_EFFECT: return "C_SPELL_EFFECT";
     case C_BASE_ATTACK_DAMAGE: return "C_BASE_ATTACK_DAMAGE";
     case C_COUNT: return "C_COUNT";

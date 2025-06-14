@@ -454,7 +454,35 @@
 //--------------------------------
 #define TX_WAND_BASIC 338
 //--------------------------------
+//
+//
+//
+// spells (unimplemented)
+//
+//339 1 24 0  img/spells/full_fire.png
+//340 1  8 0  img/spells/cast_fire.png
+//341 1  8 0  img/spells/persist_fire.png
+//342 1  8 0  img/spells/end_fire.png
+//
+//--------------------------------
 
+#define TX_SPELL_FIRE_FULL 339
+#define TX_SPELL_FIRE_CAST 340
+#define TX_SPELL_FIRE_PERSIST 341
+#define TX_SPELL_FIRE_END 342
+
+//--------------------------------
+//--------------------------------
+//--------------------------------
+// rings
+//--------------------------------
+//--------------------------------
+//--------------------------------
+#define TX_RING_GOLD 343
+#define TX_RING_SILVER 344
+#define TX_RING_IRON 345
+
+//--------------------------------
 #define COMPANYSCENE 0
 #define TITLESCENE 1
 #define GAMEPLAYSCENE 2

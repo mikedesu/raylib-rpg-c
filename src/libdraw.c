@@ -1080,6 +1080,19 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             keys = TX_WAND_BASIC_KEYS;
             num_keys = TX_WAND_BASIC_COUNT;
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        } else if (item_type == ITEM_RING) {
+            ringtype ring_type = g_get_ringtype(g, id);
+            if (ring_type == RING_GOLD) {
+                keys = TX_GOLD_RING_KEYS;
+                num_keys = TX_GOLD_RING_COUNT;
+            } else if (ring_type == RING_SILVER) {
+                keys = TX_SILVER_RING_KEYS;
+                num_keys = TX_SILVER_RING_COUNT;
+            }
+
+            //keys = TX_RING_KEYS;
+            //num_keys = TX_RING_COUNT;
+            create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         }
     }
 }

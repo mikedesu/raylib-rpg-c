@@ -18,6 +18,7 @@
 #include "inventory_sort.h"
 #include "keybinding.h"
 #include "monster_def.h"
+#include "ringtype.h"
 #include "scene.h"
 #include <raylib.h>
 #include <stdbool.h>
@@ -96,6 +97,7 @@ typedef struct gamestate {
     int base_attack_damage_list_count, base_attack_damage_list_capacity;
     int vision_distance_list_count, vision_distance_list_capacity;
     int light_radius_list_count, light_radius_list_capacity;
+    int ringtype_list_count, ringtype_list_capacity;
 
     //int spell_effect_list_count, spell_effect_list_capacity;
 
@@ -150,6 +152,7 @@ typedef struct gamestate {
     int_component* damaged_list;
     int_component* vision_distance_list;
     int_component* light_radius_list;
+    int_component* ringtype_list;
 
     rect_component* sprite_move_list;
 
@@ -377,3 +380,8 @@ bool g_add_light_radius(gamestate* const g, entityid id, int radius);
 bool g_has_light_radius(const gamestate* const g, entityid id);
 bool g_set_light_radius(gamestate* const g, entityid id, int radius);
 int g_get_light_radius(const gamestate* const g, entityid id);
+
+bool g_add_ringtype(gamestate* const g, entityid id, int type);
+bool g_has_ringtype(const gamestate* const g, entityid id);
+bool g_set_ringtype(gamestate* const g, entityid id, int type);
+ringtype g_get_ringtype(const gamestate* const g, entityid id);

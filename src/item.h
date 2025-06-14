@@ -9,6 +9,7 @@ typedef enum itemtype_t
     ITEM_ARROW,
     ITEM_QUIVER,
     ITEM_WAND,
+    ITEM_RING,
     ITEM_TYPE_COUNT
 } itemtype;
 

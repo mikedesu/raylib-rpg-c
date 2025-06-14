@@ -64,6 +64,7 @@ static void handle_level_up(gamestate* const g, entityid id);
 static void init_dagger_test(gamestate* g);
 static void init_sword_test(gamestate* g);
 static void init_axe_test(gamestate* g);
+static void init_ring_test(gamestate* g);
 //static void init_axe_test(gamestate* g);
 //static void init_bow_test(gamestate* g);
 static void init_shield_test(gamestate* g);
@@ -840,6 +841,15 @@ static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, con
     return id;
 }
 
+static entityid ring_create(gamestate* const g, ringtype type, vec3 loc, const char* name) {
+    massert(g, "gamestate is NULL");
+    entityid id = item_create(g, ITEM_RING, loc, name);
+    if (id == ENTITYID_INVALID) return ENTITYID_INVALID;
+    g_add_ringtype(g, id, type);
+    // rings can have various effects, so we will not set any default stats here
+    return id;
+}
+
 static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name) {
     minfo("potion create...");
     massert(g, "gamestate is NULL");
@@ -1290,10 +1300,6 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     // check if the item is already equipped
                     entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
                     if (equipped_item != ENTITYID_INVALID) {
-                        // unequip the currently equipped item
-                        g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
-                        add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    } else {
                         g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
                         add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                     }
@@ -1304,10 +1310,6 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                 } else if (item_type == ITEM_SHIELD) {
                     entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
                     if (equipped_item != ENTITYID_INVALID) {
-                        // unequip the currently equipped item
-                        g_unset_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
-                        add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    } else {
                         g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
                         add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                     }
@@ -1927,6 +1929,7 @@ void liblogic_init(gamestate* const g) {
     init_axe_test(g);
     //init_bow_test(g);
     init_shield_test(g);
+    init_ring_test(g);
     //init_wand_test(g);
     //init_potion_test(g);
     update_debug_panel_buffer(g);
@@ -1982,6 +1985,18 @@ static void init_axe_test(gamestate* g) {
         id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
         //g_set_damage(g, id, (roll){1, 8, 0});
         g_set_damage(g, id, (vec3){1, 8, 0});
+    }
+}
+
+static void init_ring_test(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entityid id = ENTITYID_INVALID;
+    while (id == ENTITYID_INVALID) {
+        vec3 loc = get_random_empty_non_wall_loc(g, 0);
+        //id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
+        id = ring_create(g, RING_GOLD, loc, "dummy gold ring");
+        //g_set_damage(g, id, (roll){1, 8, 0});
+        //g_set_damage(g, id, (vec3){1, 8, 0});
     }
 }
 

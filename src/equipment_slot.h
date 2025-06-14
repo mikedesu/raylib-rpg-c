@@ -4,6 +4,7 @@ typedef enum equipment_slot_t
     EQUIP_SLOT_WEAPON,
     EQUIP_SLOT_SHIELD,
     EQUIP_SLOT_WAND,
+    EQUIP_SLOT_RING,
     // add more equipment slots here
     //EQUIPMENT_SLOT_ARMOR,
     //EQUIPMENT_SLOT_HELMET,
