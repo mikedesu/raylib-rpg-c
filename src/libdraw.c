@@ -8,6 +8,7 @@
 #include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
+#include "inventory_sort.h"
 #include "libdraw.h"
 #include "libgame_defines.h"
 #include "massert.h"
@@ -1208,6 +1209,16 @@ static void draw_message_history(gamestate* const g) {
     DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, WHITE);
 }
 
+// FIXME
+entityid* sort_inventory(gamestate* const g, entityid* inventory, int inv_count, inventory_sort sort_type) {
+    // using the new enum inventory_sort, i want us to:
+    // 1. copy the contents of inventory into a new array
+    // 2. using the sort_type, sort the new array
+    // 3. return the new array (remember to free it in the calling function when done!)
+    // 4. note that sorting the inventory will invalidate the selection and the selection handling
+    // will need to take the current sort into account!
+}
+
 static void draw_inventory_menu(gamestate* const g) {
     massert(g, "gamestate is NULL");
     if (!g->display_inventory_menu) return;
@@ -1242,7 +1253,9 @@ static void draw_inventory_menu(gamestate* const g) {
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
     int inventory_count = 0;
+
     entityid* inventory = g_get_inventory(g, g->hero_id, &inventory_count);
+
     // Calculate viewport bounds based on selection
     int max_visible_items = 15;
     int start_index = 0;
@@ -1318,6 +1331,9 @@ static void draw_inventory_menu(gamestate* const g) {
                            WHITE);
         }
     }
+
+    // also try drawing the inv sort options
+    draw_sort_inventory_menu(g);
 }
 
 // use this as a reference for the FIXME in liblogic.c `handle_input_gameplay_settings`
@@ -1526,9 +1542,11 @@ void draw_sort_inventory_menu(gamestate* const g) {
     const char* menu_title = "Sort By";
     int font_size = 20;
     int menu_spacing = 15;
-    const char* menu_text[] = {"Name", "Type", "Damage", "AC", "Cancel"};
+    const char* menu_text[] = {"Name", "Type"};
+
     int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
-    int current_selection = g->sort_menu_selection;
+    int current_selection = g->sort_inventory_menu_selection;
+    massert(current_selection >= 0 && current_selection < menu_count, "current_selection is out of bounds");
 
     // Calculate menu size based on longest text
     int max_text_width = MeasureText(menu_title, font_size);
@@ -1554,15 +1572,15 @@ void draw_sort_inventory_menu(gamestate* const g) {
     // Draw menu items
     float item_x = menu_x + 20;
     float item_y = menu_y + 40;
-    
+
     for (int i = 0; i < menu_count; i++) {
         Color color = (i == current_selection) ? YELLOW : WHITE;
-        
+
         // Draw selection indicator
         if (i == current_selection) {
             DrawText(">", item_x - 15, item_y, font_size, color);
         }
-        
+
         DrawText(menu_text[i], item_x, item_y, font_size, color);
         item_y += font_size + menu_spacing;
     }

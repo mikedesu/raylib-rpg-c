@@ -53,11 +53,15 @@ typedef struct gamestate {
     struct tm *timebegantm, *currenttimetm;
     char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF], currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
     bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard, display_inventory_menu,
-        display_quit_menu, do_quit, dirty_entities, display_help_menu, cam_changed, frame_dirty, display_settings_menu;
+        display_quit_menu, do_quit, dirty_entities, display_help_menu, cam_changed, frame_dirty, display_settings_menu, display_sort_inventory_menu;
 
     //char help_menu_text[2048];
 
     int framecount, fadealpha, camera_mode, targetwidth, targetheight, windowwidth, windowheight, lock, turn_count, frame_updates;
+
+    int sort_inventory_menu_selection;
+    int sort_inventory_menu_selection_max;
+
     int font_size, pad, inventory_menu_selection;
     int settings_menu_selection;
     int name_list_count, name_list_capacity;
