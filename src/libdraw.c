@@ -99,6 +99,7 @@ static void draw_title_screen_from_texture(gamestate* const g);
 static void draw_character_creation_screen(gamestate* const g);
 static void draw_character_creation_screen_from_texture(gamestate* const g);
 static void draw_character_creation_screen_to_texture(gamestate* const g);
+static void draw_inventory_item_info(gamestate* const g, entityid item_id);
 static void libdraw_set_sg_is_damaged(gamestate* const g, entityid id, spritegroup_t* const sg);
 static void libdraw_set_sg_is_dead(gamestate* const g, entityid id, spritegroup_t* const sg);
 static void libdraw_set_sg_is_attacking(gamestate* const g, entityid id, spritegroup_t* const sg);
@@ -1210,51 +1211,6 @@ static void draw_message_history(gamestate* const g) {
     DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, WHITE);
 }
 
-// Temporary global for qsort comparisons
-static gamestate* g_sort_context = NULL;
-
-// Comparison function for sorting by name
-static int compare_by_name(const void* a, const void* b) {
-    entityid id_a = *(entityid*)a;
-    entityid id_b = *(entityid*)b;
-    const char* name_a = g_get_name(g_sort_context, id_a);
-    const char* name_b = g_get_name(g_sort_context, id_b);
-    return strcmp(name_a, name_b);
-}
-
-// Comparison function for sorting by type
-static int compare_by_type(const void* a, const void* b) {
-    entityid id_a = *(entityid*)a;
-    entityid id_b = *(entityid*)b;
-    itemtype type_a = g_get_itemtype(g_sort_context, id_a);
-    itemtype type_b = g_get_itemtype(g_sort_context, id_b);
-    return type_a - type_b;
-}
-
-entityid* sort_inventory(gamestate* const g, entityid* inventory, int inv_count, inventory_sort sort_type) {
-    massert(g, "gamestate is NULL");
-    massert(inventory, "inventory is NULL");
-    massert(inv_count >= 0, "invalid inventory count");
-
-    // Create a copy of the inventory array
-    entityid* sorted_inv = malloc(inv_count * sizeof(entityid));
-    massert(sorted_inv, "failed to allocate memory for sorted inventory");
-    memcpy(sorted_inv, inventory, inv_count * sizeof(entityid));
-
-    // Sort based on the specified type
-    g_sort_context = g;  // Set global context
-    switch (sort_type) {
-    case INV_SORT_NAME: qsort(sorted_inv, inv_count, sizeof(entityid), compare_by_name); break;
-    case INV_SORT_TYPE: qsort(sorted_inv, inv_count, sizeof(entityid), compare_by_type); break;
-    default:
-        // No sorting needed, return copy as-is
-        break;
-    }
-    g_sort_context = NULL;  // Clear global context
-
-    return sorted_inv;
-}
-
 static void draw_inventory_menu(gamestate* const g) {
     massert(g, "gamestate is NULL");
     if (!g->display_inventory_menu) return;
@@ -1289,9 +1245,12 @@ static void draw_inventory_menu(gamestate* const g) {
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
     int inventory_count = 0;
-
     entityid* inventory = g_get_inventory(g, g->hero_id, &inventory_count);
-
+    //massert(inventory, "inventory is NULL");
+    if (inventory == NULL) {
+        merror("inventory is NULL");
+        return;
+    }
     // Calculate viewport bounds based on selection
     int max_visible_items = 15;
     int start_index = 0;
@@ -1319,18 +1278,21 @@ static void draw_inventory_menu(gamestate* const g) {
         char item_display[128];
         bool is_equipped = g_is_equipped(g, g->hero_id, item_id);
         // Highlight selected item with arrow
+        const char* item_name = g_get_name(g, item_id);
         if (i == g->inventory_menu_selection) {
-            snprintf(item_display, sizeof(item_display), "> %s", g_get_name(g, item_id));
+            snprintf(item_display, sizeof(item_display), "> %s", item_name);
             // Draw selection highlight background
             DrawRectangle(left_box.x, item_y - 2, left_box.width, font_size + 4, (Color){0x44, 0x44, 0x44, 0xFF});
         } else {
-            snprintf(item_display, sizeof(item_display), "  %s", g_get_name(g, item_id));
+            //snprintf(item_display, sizeof(item_display), "  %s", g_get_name(g, item_id));
+            snprintf(item_display, sizeof(item_display), "  %s", item_name);
         }
         if (is_equipped) strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1);
         DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, font_size, g->line_spacing, WHITE);
         item_y += font_size + 4;
     }
     // Draw item info in right_box
+    /*
     if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < inventory_count) {
         entityid item_id = inventory[g->inventory_menu_selection];
         const char* name = g_get_name(g, item_id);
@@ -1367,9 +1329,80 @@ static void draw_inventory_menu(gamestate* const g) {
                            WHITE);
         }
     }
+    */
+    draw_inventory_item_info(g, inventory[g->inventory_menu_selection]);
 
     // also try drawing the inv sort options
     draw_sort_inventory_menu(g);
+}
+
+static void draw_inventory_item_info(gamestate* const g, entityid item_id) {
+    massert(g, "gamestate is NULL");
+    //massert(item_id != ENTITYID_INVALID, "item_id is invalid");
+    if (item_id == ENTITYID_INVALID) {
+        merror("item_id is invalid");
+        return;
+    }
+
+    // Parameters
+    const char* info_title = "Item Info:";
+    char info_text[256] = {0};
+    spritegroup_t* sg = NULL;
+    // Measure title
+    int font_size = 20, scale = 8;
+    Vector2 title_size = MeasureTextEx(GetFontDefault(), info_title, font_size, g->line_spacing);
+    // Menu box size
+    float menu_width_percent = 0.75f, menu_height_percent = 0.75f;
+    float menu_width = g->windowwidth * menu_width_percent, menu_height = g->windowheight * menu_height_percent;
+    Rectangle menu_box = {.x = (g->windowwidth - menu_width) / 2.0f, .y = (g->windowheight - menu_height) / 4.0f, .width = menu_width, .height = menu_height};
+    float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f, title_y = menu_box.y + g->pad, half_width = (menu_box.width - g->pad * 2) / 2.0f,
+          half_height = menu_box.height - title_size.y - g->pad * 2.0f;
+
+    entityid* inventory = NULL;
+    int inventory_count = 0;
+    inventory = g_get_inventory(g, g->hero_id, &inventory_count);
+
+    // right box
+    Rectangle right_box = {.x = menu_box.x + half_width + g->pad, .y = title_y + title_size.y + g->pad, .width = half_width - g->pad, .height = half_height};
+    // item list pad
+    float item_list_pad = g->pad, info_title_y = right_box.y + item_list_pad, info_text_y = info_title_y + font_size + 8;
+
+    if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < inventory_count) {
+        entityid item_id = inventory[g->inventory_menu_selection];
+        const char* name = g_get_name(g, item_id);
+        itemtype item_type = g_get_itemtype(g, item_id);
+        if (g_has_damage(g, item_id)) {
+            vec3 dmg_roll = g_get_damage(g, item_id);
+            int n = dmg_roll.x, sides = dmg_roll.y, modifier = dmg_roll.z;
+            if (modifier)
+                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d+%d", name, item_type, n, sides, modifier);
+            else
+                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d", name, item_type, n, sides);
+        } else if (g_has_ac(g, item_id)) {
+            int ac = g_get_ac(g, item_id);
+            snprintf(info_text, sizeof(info_text), "%s\nType: %d\nAC: %d", name, item_type, ac);
+        } else {
+            snprintf(info_text, sizeof(info_text), "%s\nType: %d", name, item_type);
+        }
+        sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
+    } else
+        snprintf(info_text, sizeof(info_text), "Select an item to view details here.");
+    DrawTextEx(GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, font_size, g->line_spacing, (Color){0xaa, 0xaa, 0xaa, 0xff});
+    DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, font_size, g->line_spacing, WHITE);
+    if (sg) {
+        sprite* s = sg_get_current(sg);
+        if (s) {
+            float sprite_width = s->width * scale, sprite_height = s->height * scale, sprite_margin = -6 * scale;
+            // Anchor to top-right of right_box, account for margin
+            const float sprite_x = right_box.x + right_box.width - sprite_margin - sprite_width, sprite_y = right_box.y + sprite_margin;
+            DrawTexturePro(*s->texture,
+                           s->src,
+                           (Rectangle){sprite_x, sprite_y, sprite_width, sprite_height},
+                           (Vector2){0, 0}, // Top-left corner as origin
+                           0.0f,
+                           WHITE);
+        }
+    }
 }
 
 // use this as a reference for the FIXME in liblogic.c `handle_input_gameplay_settings`

@@ -15,6 +15,7 @@
 #include "entityid.h"
 #include "fadestate.h"
 #include "gamestate_flag.h"
+#include "inventory_sort.h"
 #include "keybinding.h"
 #include "monster_def.h"
 #include "scene.h"
@@ -61,6 +62,9 @@ typedef struct gamestate {
 
     int sort_inventory_menu_selection;
     int sort_inventory_menu_selection_max;
+
+    entityid* hero_inventory_sorted_by_name;
+    entityid* hero_inventory_sorted_by_type;
 
     int font_size, pad, inventory_menu_selection;
     int settings_menu_selection;
@@ -274,6 +278,7 @@ bool g_add_default_action(gamestate* const g, entityid id, int action);
 bool g_set_default_action(gamestate* const g, entityid id, int action);
 entity_action_t g_get_default_action(const gamestate* const g, entityid id);
 
+entityid* g_sort_inventory(gamestate* const g, entityid* inventory, int inv_count, inventory_sort sort_type);
 bool g_has_inventory(const gamestate* const g, entityid id);
 bool g_add_inventory(gamestate* const g, entityid id);
 bool g_add_to_inventory(gamestate* const g, entityid id, entityid itemid);
@@ -281,6 +286,8 @@ bool g_remove_from_inventory(gamestate* const g, entityid id, entityid itemid);
 entityid* g_get_inventory(const gamestate* const g, entityid id, int* count);
 size_t g_get_inventory_count(const gamestate* const g, entityid id);
 bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid itemid);
+//bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory);
+bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory, int new_inventory_count);
 
 bool g_has_target(const gamestate* const g, entityid id);
 bool g_add_target(gamestate* const g, entityid id, vec3 target);

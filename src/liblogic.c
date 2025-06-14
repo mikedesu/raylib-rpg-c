@@ -13,6 +13,7 @@
 #include "gamestate.h"
 #include "gamestate_flag.h"
 #include "inputstate.h"
+#include "inventory_sort.h"
 #include "keybinding.h"
 #include "libgame_defines.h"
 #include "liblogic.h"
@@ -61,6 +62,8 @@ static void handle_level_up(gamestate* const g, entityid id);
 //static void init_npc_test(gamestate* g);
 //static void init_sword_test(gamestate* g);
 static void init_dagger_test(gamestate* g);
+static void init_sword_test(gamestate* g);
+static void init_axe_test(gamestate* g);
 //static void init_axe_test(gamestate* g);
 //static void init_bow_test(gamestate* g);
 static void init_shield_test(gamestate* g);
@@ -1162,6 +1165,22 @@ static void handle_input_gameplay_settings(const inputstate* const is, gamestate
     }
 }
 
+static void handle_sort_inventory(gamestate* const g) {
+    g->display_sort_inventory_menu = false;
+    // we need to sort the inventory based on the selected type
+    inventory_sort sort_type = g->sort_inventory_menu_selection;
+    int count = 0;
+    entityid* inventory = g_get_inventory(g, g->hero_id, &count);
+    massert(inventory, "inventory is NULL");
+    massert(count >= 0, "inventory count is less than 0");
+    // sort the inventory
+    entityid* sorted_inventory = g_sort_inventory(g, inventory, count, sort_type);
+    massert(sorted_inventory, "sorted inventory is NULL");
+
+    // now we have our original inventory and our sorted inventory...
+    g_update_inventory(g, g->hero_id, sorted_inventory, count);
+}
+
 static void handle_input_sort_inventory(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
@@ -1177,10 +1196,8 @@ static void handle_input_sort_inventory(const inputstate* const is, gamestate* c
         if (g->sort_inventory_menu_selection >= g->sort_inventory_menu_selection_max) {
             g->sort_inventory_menu_selection = 0;
         }
-    }
-
-    else if (inputstate_is_pressed(is, KEY_S)) {
-        g->display_sort_inventory_menu = false;
+    } else if (inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+        handle_sort_inventory(g);
     }
 }
 
@@ -1230,6 +1247,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             // we need to grab the entityid of the selected item
             entityid item_id = inventory[g->inventory_menu_selection];
             g_remove_from_inventory(g, g->hero_id, item_id);
+            //handle_sort_inventory(g);
             // add the item to the tile where the player is located at
             vec3 loc = g_get_location(g, g->hero_id);
             dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
@@ -1353,7 +1371,14 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         if (type == ENTITY_ITEM) {
             add_message_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
             tile_remove(tile, itemid);
-            g_add_to_inventory(g, id, itemid);
+            bool result = g_add_to_inventory(g, id, itemid);
+            if (!result) {
+                merror("Failed to add item to inventory");
+                return false;
+            } else {
+                minfo("Item %s added to inventory", g_get_name(g, itemid));
+            }
+            //handle_sort_inventory(g);
             if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return true;
         }
@@ -1800,6 +1825,9 @@ static void update_debug_panel_buffer(gamestate* const g) {
     x = loc.x;
     y = loc.y;
     z = loc.z;
+
+    int inventory_sort_menu_selection = g->sort_inventory_menu_selection;
+
     //if (e) {
     //    vec3 loc = g_get_location(g, e->id);
     //    x = loc.x;
@@ -1840,9 +1868,9 @@ static void update_debug_panel_buffer(gamestate* const g) {
              "player_dir_str: %s\n"
              "is_blocking: %d\n"
              "test_guard: %d\n"
+             "inventory_sort_menu_selection: %d\n"
              "HELLO TWITCH AND YOUTUBE!\n"
-             //"TEST 12345\n"
-             "TEST 66666\n",
+             "66666\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -1867,7 +1895,8 @@ static void update_debug_panel_buffer(gamestate* const g) {
              get_dir_as_string(shield_dir),
              get_dir_as_string(player_dir),
              is_b,
-             test_guard);
+             test_guard,
+             inventory_sort_menu_selection);
     //e->block_success);
 }
 
@@ -1892,9 +1921,9 @@ void liblogic_init(gamestate* const g) {
     //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
     //init_npcs_test_by_room(g);
     //init_npc_test(g);
-    //init_sword_test(g);
+    init_sword_test(g);
     init_dagger_test(g);
-    //init_axe_test(g);
+    init_axe_test(g);
     //init_bow_test(g);
     init_shield_test(g);
     //init_wand_test(g);
@@ -1923,15 +1952,16 @@ void liblogic_init(gamestate* const g) {
 //    }
 //}
 
-//static void init_sword_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    entityid id = ENTITYID_INVALID;
-//    while (id == ENTITYID_INVALID) {
-//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-//        id = weapon_create(g, WEAPON_SWORD, loc, "dummy sword");
-//        g_set_damage(g, id, (roll){1, 6, 0});
-//    }
-//}
+static void init_sword_test(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entityid id = ENTITYID_INVALID;
+    while (id == ENTITYID_INVALID) {
+        vec3 loc = get_random_empty_non_wall_loc(g, 0);
+        id = weapon_create(g, WEAPON_SWORD, loc, "dummy sword");
+        //g_set_damage(g, id, (roll){1, 6, 0});
+        g_set_damage(g, id, (vec3){1, 6, 0});
+    }
+}
 
 static void init_dagger_test(gamestate* g) {
     massert(g, "gamestate is NULL");
@@ -1939,22 +1969,20 @@ static void init_dagger_test(gamestate* g) {
     while (id == ENTITYID_INVALID) {
         vec3 loc = get_random_empty_non_wall_loc(g, 0);
         id = weapon_create(g, WEAPON_DAGGER, loc, "dagger");
-        //if (id != ENTITYID_INVALID) {
-        //massert(g_set_damage(g, id, (roll){1, 4, 0}), "Failed to set damage");
         g_set_damage(g, id, (vec3){1, 4, 0});
-        //}
     }
 }
 
-//static void init_axe_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    entityid id = ENTITYID_INVALID;
-//    while (id == ENTITYID_INVALID) {
-//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-//        id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
-//        g_set_damage(g, id, (roll){1, 8, 0});
-//    }
-//}
+static void init_axe_test(gamestate* g) {
+    massert(g, "gamestate is NULL");
+    entityid id = ENTITYID_INVALID;
+    while (id == ENTITYID_INVALID) {
+        vec3 loc = get_random_empty_non_wall_loc(g, 0);
+        id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
+        //g_set_damage(g, id, (roll){1, 8, 0});
+        g_set_damage(g, id, (vec3){1, 8, 0});
+    }
+}
 
 //static void init_bow_test(gamestate* g) {
 //    massert(g, "gamestate is NULL");

@@ -3,6 +3,7 @@
 #include "entityid.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
+#include "inventory_sort.h"
 #include "item.h"
 #include "massert.h"
 #include "mprint.h"
@@ -14,8 +15,10 @@
 
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
-#define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 10
+#define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
 #define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
+// Temporary global for qsort comparisons
+static gamestate* g_sort_context = NULL;
 
 static void gamestate_init_music_paths(gamestate* const g);
 static void gamestate_load_monster_defs(gamestate* const g);
@@ -43,6 +46,9 @@ gamestate* gamestateinitptr() {
 
     g->sort_inventory_menu_selection = 0;
     g->sort_inventory_menu_selection_max = 2;
+
+    g->hero_inventory_sorted_by_name = NULL;
+    g->hero_inventory_sorted_by_type = NULL;
 
     g->cam2d.target = (Vector2){0, 0}, g->cam2d.offset = (Vector2){800, 0};
     g->cam2d.zoom = 4.0f, g->cam2d.rotation = g->fadealpha = 0.0;
@@ -447,7 +453,11 @@ bool g_has_name(const gamestate* const g, entityid id) {
 const char* g_get_name(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    massert(g_has_name(g, id), "id %d does not have a name component", id);
+    //massert(g_has_name(g, id), "id %d does not have a name component, is type %s", id, entitytype_to_string(g_get_type(g, id)));
+
+    // if something doesn't have a name, we return NULL
+    if (!g_has_name(g, id)) return NULL;
+
     for (int i = 0; i < g->name_list_count; i++)
         if (g->name_list[i].id == id) return g->name_list[i].name;
     return NULL;
@@ -934,6 +944,54 @@ bool g_add_inventory(gamestate* const g, entityid id) {
     return true;
 }
 
+// Comparison function for sorting by name
+static int compare_by_name(const void* a, const void* b) {
+    entityid id_a = *(entityid*)a;
+    entityid id_b = *(entityid*)b;
+    const char* name_a = g_get_name(g_sort_context, id_a);
+    const char* name_b = g_get_name(g_sort_context, id_b);
+    return strcmp(name_a, name_b);
+}
+// Comparison function for sorting by type
+static int compare_by_type(const void* a, const void* b) {
+    entityid id_a = *(entityid*)a;
+    entityid id_b = *(entityid*)b;
+    itemtype type_a = g_get_itemtype(g_sort_context, id_a);
+    itemtype type_b = g_get_itemtype(g_sort_context, id_b);
+    return type_a - type_b;
+}
+
+entityid* g_sort_inventory(gamestate* const g, entityid* inventory, int inv_count, inventory_sort sort_type) {
+    massert(g, "gamestate is NULL");
+    massert(inventory, "inventory is NULL");
+    massert(inv_count >= 0, "invalid inventory count");
+
+    minfo("Sorting inventory...");
+    minfo("Item count: %d", inv_count);
+
+    // Create a copy of the inventory array
+    entityid* sorted_inv = malloc(inv_count * sizeof(entityid));
+    massert(sorted_inv, "failed to allocate memory for sorted inventory");
+    memcpy(sorted_inv, inventory, inv_count * sizeof(entityid));
+
+    if (inv_count == 0 || inv_count == 1) {
+        minfo("No sorting needed, returning original inventory");
+        return sorted_inv; // No need to sort if there's 0 or 1 item
+    }
+
+    // Sort based on the specified type
+    g_sort_context = g; // Set global context
+    switch (sort_type) {
+    case INV_SORT_NAME: qsort(sorted_inv, inv_count, sizeof(entityid), compare_by_name); break;
+    case INV_SORT_TYPE: qsort(sorted_inv, inv_count, sizeof(entityid), compare_by_type); break;
+    default:
+        // No sorting needed, return copy as-is
+        break;
+    }
+    g_sort_context = NULL; // Clear global context
+    return sorted_inv;
+}
+
 bool g_add_to_inventory(gamestate* const g, entityid id, entityid itemid) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
@@ -1011,6 +1069,35 @@ bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid ite
         }
     }
     return false; //
+}
+
+// updated inventory should have the same num of items as the original
+bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory, int new_inventory_count) {
+    // this assumes id has an inventory but lets verify
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(new_inventory, "new_inventory is NULL");
+    massert(g->inventory_list, "g->inventory_list is NULL");
+    if (g->inventory_list == NULL) return false;
+    massert(g_has_inventory(g, id), "id %d does not have an inventory component", id);
+
+    for (int i = 0; i < g->inventory_list_count; i++) {
+        if (g->inventory_list[i].id == id) {
+            // clear the old inventory
+            g->inventory_list[i].count = 0;
+            // copy the new inventory
+            //for (int j = 0; j < MAX_INVENTORY_SIZE && new_inventory[j] != ENTITYID_INVALID; j++) {
+            for (int j = 0; j < new_inventory_count && j < MAX_INVENTORY_SIZE; j++) {
+                g->inventory_list[i].inventory[j] = new_inventory[j];
+                g->inventory_list[i].count++;
+            }
+            massert(g->inventory_list[i].count == new_inventory_count, "new inventory count %d does not match expected count %d", g->inventory_list[i].count, new_inventory_count);
+
+            return true;
+        }
+    }
+    merror("id %d not found in inventory_list", id);
+    return false;
 }
 
 bool g_has_target(const gamestate* const g, entityid id) {
