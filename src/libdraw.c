@@ -25,6 +25,7 @@
 #include "weapon.h"
 #include <raylib.h>
 #include <stdlib.h>
+#include <sys/param.h>
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
 //#define DEFAULT_MUSIC_VOLUME 0.5f
@@ -157,7 +158,7 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     //int vision_distance = g_get_vision_distance(g, g->hero_id);
     // its not actually the vision distance we need,
     // its the total light radius
-    int vision_distance = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
+    int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
     vec3 hero_loc = g_get_location(g, g->hero_id);
 
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
@@ -177,7 +178,8 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
 
     // Draw tile with fade if beyond vision distance
-    Color draw_color = distance > vision_distance ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
+    //Color draw_color = distance > vision_distance ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
+    Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
                            WHITE; // Normal for in-range tiles
 
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
@@ -353,13 +355,17 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
 
     // Get hero's vision distance and location
     int vision_distance = g_get_vision_distance(g, g->hero_id);
+    int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
     vec3 hero_loc = g_get_location(g, g->hero_id);
+
+    int dist_to_check = MAX(vision_distance, light_dist);
 
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
     int distance = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
 
     // Only draw entities within vision distance
-    if (distance <= vision_distance) {
+    //if (distance <= vision_distance) {
+    if (distance <= dist_to_check) {
         for (int i = 0; i < tile_entity_count(tile); i++) {
             entityid id = tile_get_entity(tile, i);
             if (g_is_dead(g, id) == dead) draw_sprite_and_shadow(g, id);

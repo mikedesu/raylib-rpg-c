@@ -1221,7 +1221,7 @@ static void handle_input_sort_inventory(const inputstate* const is, gamestate* c
         if (g->sort_inventory_menu_selection < 0) {
             g->sort_inventory_menu_selection = g->sort_inventory_menu_selection_max - 1;
         }
-    } else if (inputstate_is_pressed(is, KEY_UP)) {
+    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
         minfo("sort inv menu++");
         g->sort_inventory_menu_selection++;
         if (g->sort_inventory_menu_selection >= g->sort_inventory_menu_selection_max) {
@@ -1319,35 +1319,35 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     }
                 } else if (item_type == ITEM_WEAPON) {
                     // check if the item is already equipped
-                    entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
-                    if (equipped_item != ENTITYID_INVALID) {
-                        g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
-                        add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    }
+                    //entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
+                    //if (equipped_item != ENTITYID_INVALID) {
+                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //}
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->display_inventory_menu = false;
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 } else if (item_type == ITEM_SHIELD) {
-                    entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
-                    if (equipped_item != ENTITYID_INVALID) {
-                        g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
-                        add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    }
+                    //entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
+                    //if (equipped_item != ENTITYID_INVALID) {
+                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //}
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->display_inventory_menu = false;
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 } else if (item_type == ITEM_WAND) {
                     entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
-                    if (equipped_item != ENTITYID_INVALID) {
-                        // unequip the currently equipped item
-                        g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
-                        add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    } else {
-                        g_set_equipment(g, g->hero_id, EQUIP_SLOT_WAND, item_id);
-                        add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-                    }
+                    //if (equipped_item != ENTITYID_INVALID) {
+                    // unequip the currently equipped item
+                    //    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
+                    //    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //} else {
+                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WAND, item_id);
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+                    //}
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->display_inventory_menu = false;
                     g->controlmode = CONTROLMODE_PLAYER;
@@ -1355,6 +1355,10 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                 } else if (item_type == ITEM_RING) {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_RING, item_id);
                     add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
+
+                    // update player tiles
+                    update_player_tiles_explored(g);
+
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->display_inventory_menu = false;
                     g->controlmode = CONTROLMODE_PLAYER;
@@ -2020,14 +2024,14 @@ static void init_ring_test(gamestate* g) {
     massert(g, "gamestate is NULL");
     entityid id = ENTITYID_INVALID;
     while (id == ENTITYID_INVALID) {
+        int bonus = rand() % 4 + 1; // Random bonus between 1 and 4
+
         vec3 loc = get_random_empty_non_wall_loc(g, 0);
         //id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
-        id = ring_create(g, RING_GOLD, loc, "light ring +1");
+        //id = ring_create(g, RING_GOLD, loc, "light ring +1");
+        id = ring_create(g, RING_GOLD, loc, TextFormat("light ring +%d", bonus));
         // as a test, lets add a light radius bonus of +1
-        g_add_light_radius_bonus(g, id, 1);
-
-        //g_set_damage(g, id, (roll){1, 8, 0});
-        //g_set_damage(g, id, (vec3){1, 8, 0});
+        g_add_light_radius_bonus(g, id, bonus);
     }
 }
 
@@ -2326,7 +2330,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
 
     //minfo("liblogic_tick: Game state tick started");
     // Spawn NPCs periodically
-    //try_spawn_npc(g);
+    try_spawn_npc(g);
     update_player_state(g);
     update_npcs_state(g);
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
