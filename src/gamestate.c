@@ -45,6 +45,7 @@ gamestate* gamestateinitptr() {
         g->processing_actions = g->cam_changed = g->is3d = g->gameover = g->test_guard = g->dirty_entities = g->display_sort_inventory_menu = false;
 
     g->ringtype_list_count = 0;
+    g->light_radius_bonus_list_count = 0;
 
     g->sort_inventory_menu_selection = 0;
     g->sort_inventory_menu_selection_max = 2;
@@ -83,6 +84,7 @@ gamestate* gamestateinitptr() {
                     g->damage_list_capacity = g->ac_list_capacity = g->zapping_list_capacity = g->base_attack_damage_list_capacity = g->vision_distance_list_capacity =
                         g->light_radius_list_capacity = n;
     g->ringtype_list_capacity = n;
+    g->light_radius_bonus_list_capacity = n;
 
     g->name_list = (name_component*)malloc(sizeof(name_component) * n), g->type_list = (int_component*)malloc(sizeof(int_component) * n);
     g->race_list = (int_component*)malloc(sizeof(int_component) * n), g->direction_list = (int_component*)malloc(sizeof(int_component) * n);
@@ -99,6 +101,7 @@ gamestate* gamestateinitptr() {
     g->damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n), g->base_attack_damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
     g->vision_distance_list = (int_component*)malloc(sizeof(int_component) * n), g->light_radius_list = (int_component*)malloc(sizeof(int_component) * n);
     g->ringtype_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->light_radius_bonus_list = (int_component*)malloc(sizeof(int_component) * n);
 
     massert(g->name_list, "g->name_list is NULL");
     massert(g->type_list, "g->type_list is NULL");
@@ -128,6 +131,7 @@ gamestate* gamestateinitptr() {
     massert(g->base_attack_damage_list, "g->base_attack_damage_list is NULL");
     massert(g->vision_distance_list, "g->vision_distance_list is NULL");
     massert(g->light_radius_list, "g->light_radius_list is NULL");
+    massert(g->light_radius_bonus_list, "g->light_radius_bonus_list is NULL");
     massert(g->ringtype_list, "g->ringtype_list is NULL");
 
     g->d = NULL, g->monster_defs = NULL;
@@ -426,6 +430,7 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     case C_DAMAGE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
     case C_BASE_ATTACK_DAMAGE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
     case C_LIGHT_RADIUS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
+    case C_LIGHT_RADIUS_BONUS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     case C_VISION_DISTANCE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     case C_RINGTYPE:
         init_int_component((int_component*)c_ptr, id, *(int*)data);
@@ -1783,4 +1788,47 @@ ringtype g_get_ringtype(const gamestate* const g, entityid id) {
         if (g->ringtype_list[i].id == id) return g->ringtype_list[i].data;
     }
     return RING_NONE;
+}
+
+bool g_add_light_radius_bonus(gamestate* const g, entityid id, int radius) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // make sure the entity has the light radius bonus component
+    return g_add_component(g,
+                           id,
+                           C_LIGHT_RADIUS_BONUS,
+                           (void*)&radius,
+                           sizeof(int_component),
+                           (void**)&g->light_radius_bonus_list,
+                           &g->light_radius_bonus_list_count,
+                           &g->light_radius_bonus_list_capacity);
+}
+
+bool g_has_light_radius_bonus(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_component(g, id, C_LIGHT_RADIUS_BONUS);
+}
+
+bool g_set_light_radius_bonus(gamestate* const g, entityid id, int radius) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->light_radius_bonus_list == NULL) return false;
+    for (int i = 0; i < g->light_radius_bonus_list_count; i++) {
+        if (g->light_radius_bonus_list[i].id == id) {
+            g->light_radius_bonus_list[i].data = radius;
+            return true;
+        }
+    }
+    return false;
+}
+
+int g_get_light_radius_bonus(const gamestate* const g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->light_radius_bonus_list == NULL) return 0;
+    for (int i = 0; i < g->light_radius_bonus_list_count; i++) {
+        if (g->light_radius_bonus_list[i].id == id) return g->light_radius_bonus_list[i].data;
+    }
+    return 0;
 }
