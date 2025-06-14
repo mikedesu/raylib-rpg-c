@@ -1209,14 +1209,50 @@ static void draw_message_history(gamestate* const g) {
     DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, WHITE);
 }
 
-// FIXME
+// Comparison function for sorting by name
+static int compare_by_name(const void* a, const void* b, void* arg) {
+    gamestate* g = (gamestate*)arg;
+    entityid id_a = *(entityid*)a;
+    entityid id_b = *(entityid*)b;
+    const char* name_a = g_get_name(g, id_a);
+    const char* name_b = g_get_name(g, id_b);
+    return strcmp(name_a, name_b);
+}
+
+// Comparison function for sorting by type 
+static int compare_by_type(const void* a, const void* b, void* arg) {
+    gamestate* g = (gamestate*)arg;
+    entityid id_a = *(entityid*)a;
+    entityid id_b = *(entityid*)b;
+    itemtype type_a = g_get_itemtype(g, id_a);
+    itemtype type_b = g_get_itemtype(g, id_b);
+    return type_a - type_b;
+}
+
 entityid* sort_inventory(gamestate* const g, entityid* inventory, int inv_count, inventory_sort sort_type) {
-    // using the new enum inventory_sort, i want us to:
-    // 1. copy the contents of inventory into a new array
-    // 2. using the sort_type, sort the new array
-    // 3. return the new array (remember to free it in the calling function when done!)
-    // 4. note that sorting the inventory will invalidate the selection and the selection handling
-    // will need to take the current sort into account!
+    massert(g, "gamestate is NULL");
+    massert(inventory, "inventory is NULL");
+    massert(inv_count >= 0, "invalid inventory count");
+
+    // Create a copy of the inventory array
+    entityid* sorted_inv = malloc(inv_count * sizeof(entityid));
+    massert(sorted_inv, "failed to allocate memory for sorted inventory");
+    memcpy(sorted_inv, inventory, inv_count * sizeof(entityid));
+
+    // Sort based on the specified type
+    switch (sort_type) {
+        case SORT_BY_NAME:
+            qsort_r(sorted_inv, inv_count, sizeof(entityid), compare_by_name, g);
+            break;
+        case SORT_BY_TYPE:
+            qsort_r(sorted_inv, inv_count, sizeof(entityid), compare_by_type, g);
+            break;
+        default:
+            // No sorting needed, return copy as-is
+            break;
+    }
+
+    return sorted_inv;
 }
 
 static void draw_inventory_menu(gamestate* const g) {
