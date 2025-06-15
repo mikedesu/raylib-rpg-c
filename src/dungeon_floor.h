@@ -1,8 +1,8 @@
 #pragma once
 
+//#include "location.h"
 #include "dungeon_tile.h"
 #include "entityid.h"
-//#include "location.h"
 #include "mprint.h"
 #include "raylib.h"
 #include "room_data.h"
@@ -38,7 +38,6 @@ typedef struct {
     vec3 upstairs_loc;
 } dungeon_floor_t;
 
-//dungeon_floor_t* df_create(int width, int height);
 dungeon_floor_t* df_create(int floor, int width, int height);
 
 void df_init(dungeon_floor_t* df);

@@ -43,7 +43,7 @@ gamestate* gamestateinitptr() {
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
     g->debugpanelon = g->player_input_received = g->is_locked = g->gridon = g->display_inventory_menu = g->display_quit_menu = g->display_help_menu = g->do_quit =
         g->processing_actions = g->cam_changed = g->is3d = g->gameover = g->test_guard = g->dirty_entities = g->display_sort_inventory_menu = false;
-
+    g->music_volume_changed = false;
     g->ringtype_list_count = 0;
     g->light_radius_bonus_list_count = 0;
 
@@ -52,6 +52,8 @@ gamestate* gamestateinitptr() {
 
     g->hero_inventory_sorted_by_name = NULL;
     g->hero_inventory_sorted_by_type = NULL;
+
+    g->gameplay_settings_menu_selection = 0;
 
     g->cam2d.target = (Vector2){0, 0}, g->cam2d.offset = (Vector2){800, 0};
     g->cam2d.zoom = 4.0f, g->cam2d.rotation = g->fadealpha = 0.0;
@@ -202,15 +204,18 @@ static void gamestate_load_monster_defs(gamestate* const g) {
         g->monster_def_count++;
 
         g->message_history_bgcolor = DEFAULT_MSG_HIST_BGCOLOR;
-        g->display_settings_menu = false;
+        g->display_gameplay_settings_menu = false;
     }
     fclose(file);
     // at this point, we have loaded all the monster definitions and can use them
 }
 
 monster_def* g_get_monster_def(gamestate* const g, race_t r) {
-    for (int i = 0; i < g->monster_def_count; i++)
-        if (g->monster_defs[i].race == r) return &g->monster_defs[i];
+    for (int i = 0; i < g->monster_def_count; i++) {
+        if (g->monster_defs[i].race == r) {
+            return &g->monster_defs[i];
+        }
+    }
     return NULL; // Not found
 }
 

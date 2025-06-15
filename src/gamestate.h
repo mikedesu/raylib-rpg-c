@@ -25,7 +25,7 @@
 #include <time.h>
 
 #define GAME_VERSION "v0.0.3.14-20250614"
-#define DEFAULT_MUSIC_VOLUME 0.5f
+#define DEFAULT_MUSIC_VOLUME 0.25f
 #define DEFAULT_MSG_HIST_BGCOLOR ((Color){0x33, 0x33, 0x33, 255})
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
@@ -55,7 +55,9 @@ typedef struct gamestate {
     struct tm *timebegantm, *currenttimetm;
     char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF], currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
     bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard, display_inventory_menu,
-        display_quit_menu, do_quit, dirty_entities, display_help_menu, cam_changed, frame_dirty, display_settings_menu, display_sort_inventory_menu;
+        display_quit_menu, do_quit, dirty_entities, display_help_menu, cam_changed, frame_dirty;
+    bool display_gameplay_settings_menu, display_sort_inventory_menu;
+    bool music_volume_changed;
 
     //char help_menu_text[2048];
 
@@ -68,7 +70,7 @@ typedef struct gamestate {
     entityid* hero_inventory_sorted_by_type;
 
     int font_size, pad, inventory_menu_selection;
-    int settings_menu_selection;
+    int gameplay_settings_menu_selection;
     int name_list_count, name_list_capacity;
     int type_list_count, type_list_capacity;
     int race_list_count, race_list_capacity;

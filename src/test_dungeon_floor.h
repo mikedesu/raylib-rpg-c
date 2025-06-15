@@ -21,16 +21,18 @@ TEST(test_df_rooms) {
     dungeon_floor_t* df = df_create(0, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     //minfo("Initial room count: %d", df->room_count);
     // Test room creation
-    bool add_result = df_add_room_info(df, 10, 10, 5, 5, "TestRoom1");
+    //bool add_result = df_add_room_info(df, 10, 10, 5, 5, "TestRoom1");
+    df_add_room_info(df, 10, 10, 5, 5, "TestRoom1");
     //printf("Add room result: %d\n", add_result);
     //printf("Room count after add: %d\n", df->room_count);
-    if (add_result) {
-        // Test room location
-        int in_room = df_loc_is_in_room(df, (vec3){12, 12});
-        //minfo("Location in room result: %d", in_room);
-        const char* room_name = df_get_room_name(df, (vec3){12, 12});
-        //minfo("Room name at location: %s", room_name ? room_name : "NULL");
-    }
+    //if (add_result) {
+    // Test room location
+    //int in_room = df_loc_is_in_room(df, (vec3){12, 12});
+    //minfo("Location in room result: %d", in_room);
+    //const char* room_name = df_get_room_name(df, (vec3){12, 12});
+    //df_get_room_name(df, (vec3){12, 12});
+    //minfo("Room name at location: %s", room_name ? room_name : "NULL");
+    //}
     // Test overlapping rooms - should fail
     bool overlap_result = df_add_room_info(df, 10, 10, 5, 5, "OverlapRoom");
     //printf("Add overlapping room result: %d\n", overlap_result);
@@ -163,9 +165,11 @@ TEST(test_df_init) {
     }
     int room_count2 = 0;
     const char* prefix = "room";
-    room_data_t* rooms = df_get_rooms_with_prefix(df, &room_count2, prefix);
+    //room_data_t* rooms = df_get_rooms_with_prefix(df, &room_count2, prefix);
+    df_get_rooms_with_prefix(df, &room_count2, prefix);
     ASSERT(room_count2 == 0, "No rooms with prefix [room] should have been created");
-    rooms = df_get_rooms_with_prefix(df, &room_count2, "TestRoom");
+    //rooms = df_get_rooms_with_prefix(df, &room_count2, "TestRoom");
+    df_get_rooms_with_prefix(df, &room_count2, "TestRoom");
     ASSERT(room_count2 == 1, "One room with prefix [TestRoom] should have been created");
     // Test stair placement
     vec3 upstairs = df_get_upstairs(df);

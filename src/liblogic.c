@@ -1155,7 +1155,7 @@ static void handle_input_gameplay_settings(const inputstate* const is, gamestate
 
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->controlmode = CONTROLMODE_PLAYER;
-        g->display_settings_menu = false;
+        g->display_gameplay_settings_menu = false;
         g->display_inventory_menu = false;
         return;
     }
@@ -1163,35 +1163,38 @@ static void handle_input_gameplay_settings(const inputstate* const is, gamestate
     // Cycle between settings and inventory menus
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_RIGHT)) {
         g->controlmode = CONTROLMODE_INVENTORY;
-        g->display_settings_menu = false;
+        g->display_gameplay_settings_menu = false;
         g->display_inventory_menu = true;
         return;
     }
 
     // Handle menu navigation
+    int max_selections = 2; // 0: Music Volume, 1: Back
     if (inputstate_is_pressed(is, KEY_UP)) {
-        g->settings_menu_selection = (g->settings_menu_selection - 1 + 3) % 3;
+        //g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection - 1 + 3) % 3;
+        g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection - 1 + max_selections) % max_selections;
         g->frame_dirty = true;
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
-        g->settings_menu_selection = (g->settings_menu_selection + 1) % 3;
+        g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection + 1) % max_selections;
         g->frame_dirty = true;
     }
 
     // Handle menu item selection
-    if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
-        switch (g->settings_menu_selection) {
-        case 0: // Music Volume
-            // Volume adjustment will be handled elsewhere
-            break;
+    if (g->gameplay_settings_menu_selection == 0) {
+        // Music Volume
+        if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
+            g->music_volume = g->music_volume > 0 ? g->music_volume - 0.1f : 0.0f;
+            g->music_volume_changed = true;
+        } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
+            g->music_volume = g->music_volume < 1 ? g->music_volume + 0.1f : 1.0f;
+            g->music_volume_changed = true;
+        }
 
-        case 1: // Message History Background
-            // Background color cycling will be handled elsewhere
-            break;
-
-        case 2: // Back
+    } else if (g->gameplay_settings_menu_selection == 0) {
+        // Back
+        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
             g->controlmode = CONTROLMODE_PLAYER;
-            g->display_settings_menu = false;
-            break;
+            g->display_gameplay_settings_menu = false;
         }
     }
 }
@@ -1237,7 +1240,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
     massert(g, "Game state is NULL!");
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->controlmode = CONTROLMODE_PLAYER;
-        g->display_settings_menu = false;
+        g->display_gameplay_settings_menu = false;
         g->display_inventory_menu = false;
         g->display_sort_inventory_menu = false;
         return;
@@ -1245,8 +1248,8 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
 
     // cycle menus
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_RIGHT)) {
-        g->controlmode = CONTROLMODE_SETTINGS;
-        g->display_settings_menu = true;
+        g->controlmode = CONTROLMODE_GAMEPLAY_SETTINGS;
+        g->display_gameplay_settings_menu = true;
         g->display_inventory_menu = false;
         return;
     }
@@ -1339,7 +1342,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 } else if (item_type == ITEM_WAND) {
-                    entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
+                    //entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
                     //if (equipped_item != ENTITYID_INVALID) {
                     // unequip the currently equipped item
                     //    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
@@ -1749,7 +1752,7 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
         case CONTROLMODE_CAMERA: handle_input_camera(is, g); break;
         case CONTROLMODE_INVENTORY: handle_input_inventory(is, g); break;
-        case CONTROLMODE_SETTINGS: handle_input_gameplay_settings(is, g); break;
+        case CONTROLMODE_GAMEPLAY_SETTINGS: handle_input_gameplay_settings(is, g); break;
         case CONTROLMODE_HELP: handle_input_help_menu(is, g); break;
         default: merror("Unknown control mode: %d", g->controlmode); break;
         }

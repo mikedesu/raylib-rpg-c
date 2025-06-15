@@ -8,7 +8,7 @@
 #include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
-#include "inventory_sort.h"
+//#include "inventory_sort.h"
 #include "libdraw.h"
 #include "libgame_defines.h"
 #include "massert.h"
@@ -79,12 +79,12 @@ static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
 
 void draw_sort_inventory_menu(gamestate* const g);
-static void draw_settings_menu(gamestate* const g);
+
+static void draw_gameplay_settings_menu(gamestate* const g);
 static void libdraw_drawframe_2d_from_texture(gamestate* const g);
 static void libdraw_drawframe_2d_to_texture(gamestate* const g);
 static void draw_help_menu(gamestate* const g);
 static void draw_gameover_menu(gamestate* const g);
-//static void libdraw_update_sprite_post(gamestate* const g, entityid id);
 static void libdraw_update_sprite_pre(gamestate* const g, entityid id);
 static void libdraw_handle_gamestate_flag(gamestate* const g);
 static void draw_weapon_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg);
@@ -100,7 +100,6 @@ static void draw_title_screen_from_texture(gamestate* const g);
 static void draw_character_creation_screen(gamestate* const g);
 static void draw_character_creation_screen_from_texture(gamestate* const g);
 static void draw_character_creation_screen_to_texture(gamestate* const g);
-static void draw_inventory_item_info(gamestate* const g, entityid item_id);
 static void libdraw_set_sg_is_damaged(gamestate* const g, entityid id, spritegroup_t* const sg);
 static void libdraw_set_sg_is_dead(gamestate* const g, entityid id, spritegroup_t* const sg);
 static void libdraw_set_sg_is_attacking(gamestate* const g, entityid id, spritegroup_t* const sg);
@@ -113,8 +112,6 @@ static void libdraw_update_sprite_attack(gamestate* const g, entityid id, sprite
 static void libdraw_update_sprite_position(gamestate* const g, entityid id, spritegroup_t* sg);
 static void libdraw_update_sprite_context_ptr(gamestate* const g, spritegroup_t* group, direction_t dir);
 static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegroup_t* sg);
-//static void libdraw_update_sprite(gamestate* const g, entityid id);
-//static void libdraw_handle_frame_incr(gamestate* const g, entityid id, spritegroup_t* const sg);
 static void draw_message_history(gamestate* const g);
 static void draw_message_box(gamestate* g);
 static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
@@ -633,7 +630,13 @@ static void libdraw_handle_dirty_entities(gamestate* const g) {
 
 void libdraw_update_sprites_pre(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    UpdateMusicStream(music);
+    //UpdateMusicStream(music);
+
+    //if (g->music_volume_changed) {
+    //    SetMusicVolume(music, g->music_volume);
+    //    g->music_volume_changed = false;
+    //}
+
     if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_handle_dirty_entities(g);
         for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite_pre(g, id);
@@ -642,7 +645,14 @@ void libdraw_update_sprites_pre(gamestate* const g) {
 
 void libdraw_update_sprites_post(gamestate* const g) {
     massert(g, "gamestate is NULL");
+
+    if (g->music_volume_changed) {
+        SetMusicVolume(music, g->music_volume);
+        g->music_volume_changed = false;
+    }
+
     UpdateMusicStream(music);
+
     if (g->current_scene != SCENE_GAMEPLAY) {
         //g->frame_dirty = false;
         return;
@@ -733,16 +743,19 @@ static void libdraw_drawframe_2d(gamestate* const g) {
     draw_message_history(g);
     draw_message_box(g);
     draw_hud(g);
-
-    if (g->display_inventory_menu)
+    if (g->display_inventory_menu) {
         draw_inventory_menu(g);
-    else if (g->display_settings_menu)
-        draw_settings_menu(g);
-
+    } else if (g->display_gameplay_settings_menu) {
+        draw_gameplay_settings_menu(g);
+    }
     handle_debug_panel(g);
     draw_version(g);
-    if (g->display_help_menu) draw_help_menu(g);
-    if (g->gameover) draw_gameover_menu(g);
+    if (g->display_help_menu) {
+        draw_help_menu(g);
+    }
+    if (g->gameover) {
+        draw_gameover_menu(g);
+    }
 }
 
 static void libdraw_drawframe_2d_to_texture(gamestate* const g) {
@@ -796,14 +809,16 @@ static inline void handle_debug_panel(gamestate* const g) {
     }
 }
 
-#define HELP_TEXT_COUNT 17
+#define HELP_TEXT_COUNT 32
 static void draw_help_menu(gamestate* const g) {
     if (!g->display_help_menu) return;
     // const char* help_text = g->help_menu_text;
     char* help_text[HELP_TEXT_COUNT] = {"# Help Menu",
                                         "",
                                         "## Controls",
+                                        "",
                                         "-----------------------------------",
+                                        "",
                                         "- Movement: q w e a d z x c",
                                         "- Attack: '",
                                         "- Pickup Item: /",
@@ -815,11 +830,29 @@ static void draw_help_menu(gamestate* const g) {
                                         "- Use/Equip/Unequip Item: enter, '",
                                         "- Drop Item: ]",
                                         "",
+                                        "-----------------------------------",
+                                        "",
+                                        "From the Inventory menu, you can",
+                                        "cycle menus with arrow left and right",
+                                        "Sort inventory menu with the s key",
+                                        "",
+                                        "-----------------------------------",
+                                        "",
+                                        "Music volume can be adjusted on the",
+                                        "Settings menu with left and right bracket",
+                                        "",
+                                        "-----------------------------------",
+                                        "",
                                         "Press any key to close this menu.",
                                         ""};
     Color bg_color = Fade((Color){0x33, 0x33, 0x33}, 1.0f);
-    int font_size = 10, measure = MeasureText(help_text[11], font_size), text_width = measure, text_height = font_size, x = (g->windowwidth - text_width) / 2,
-        y = (g->windowheight - text_height * HELP_TEXT_COUNT) / 2;
+    int font_size = 10;
+    int idx_of_longest = 26;
+    int measure = MeasureText(help_text[idx_of_longest], font_size);
+    int text_width = measure;
+    int text_height = font_size;
+    int x = (g->windowwidth - text_width) / 2;
+    int y = (g->windowheight - text_height * HELP_TEXT_COUNT) / 2;
     // Draw background box
     DrawRectangle(x - 10, y - 10, text_width + 20, text_height * HELP_TEXT_COUNT + 20, bg_color);
     DrawRectangleLines(x - 10, y - 10, text_width + 20, text_height * HELP_TEXT_COUNT + 20, WHITE);
@@ -1358,6 +1391,7 @@ static void draw_inventory_menu(gamestate* const g) {
     draw_sort_inventory_menu(g);
 }
 
+/*
 static void draw_inventory_item_info(gamestate* const g, entityid item_id) {
     massert(g, "gamestate is NULL");
     //massert(item_id != ENTITYID_INVALID, "item_id is invalid");
@@ -1426,19 +1460,20 @@ static void draw_inventory_item_info(gamestate* const g, entityid item_id) {
         }
     }
 }
+*/
 
-// use this as a reference for the FIXME in liblogic.c `handle_input_gameplay_settings`
-static void draw_settings_menu(gamestate* const g) {
+static void draw_gameplay_settings_menu(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    if (!g->display_settings_menu) return;
+    if (!g->display_gameplay_settings_menu) return;
 
     // Parameters
     const char* menu_title = "Settings Menu";
     int font_size = 20;
     int menu_spacing = 15;
-    const char* menu_text[] = {"Music Volume", "Message History BG", "Back"};
+    //const char* menu_text[] = {"Music Volume", "Message History BG", "Back"};
+    const char* menu_text[] = {"Music Volume", "Back"};
     int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
-    int current_selection = g->settings_menu_selection;
+    int current_selection = g->gameplay_settings_menu_selection;
 
     // Calculate max width needed for menu items and their values
     int max_text_width = MeasureText(menu_title, font_size);
@@ -1472,11 +1507,10 @@ static void draw_settings_menu(gamestate* const g) {
         if (i == current_selection) {
             DrawText(">", left_pad - 20, y, font_size, color);
         }
-
         // Draw menu text
         DrawText(menu_text[i], left_pad, y, font_size, color);
-
         // Draw current values right-aligned
+
         int value_x = box_x + box_width - 30;
         char value_text[32];
 
@@ -1484,24 +1518,18 @@ static void draw_settings_menu(gamestate* const g) {
             snprintf(value_text, sizeof(value_text), "%.1f", g->music_volume);
             value_x -= MeasureText(value_text, font_size);
             DrawText(value_text, value_x, y, font_size, color);
-
             // Draw volume indicator
-            int bar_width = 100;
+            int bar_width = 50;
             int bar_x = value_x - bar_width - 10;
             int bar_y = y + font_size / 2;
             DrawRectangle(bar_x, bar_y, bar_width, 2, Fade(WHITE, 0.3f));
             DrawRectangle(bar_x, bar_y, (int)(bar_width * g->music_volume), 2, color);
-
-        } else if (i == 1) { // BG Color
-            snprintf(value_text, sizeof(value_text), "# %02x%02x%02x", g->message_history_bgcolor.r, g->message_history_bgcolor.g, g->message_history_bgcolor.b);
-            value_x -= MeasureText(value_text, font_size);
-            DrawText(value_text, value_x, y, font_size, color);
-
-            // Draw color swatch
-            //DrawRectangle(value_x - 30, y, 20, font_size, g->message_history_bgcolor);
-            //DrawRectangleLines(value_x - 30, y, 20, font_size, WHITE);
         }
-
+        //else if (i == 1) { // BG Color
+        //    snprintf(value_text, sizeof(value_text), "# %02x%02x%02x", g->message_history_bgcolor.r, g->message_history_bgcolor.g, g->message_history_bgcolor.b);
+        //    value_x -= MeasureText(value_text, font_size);
+        //    DrawText(value_text, value_x, y, font_size, color);
+        //}
         y += font_size + menu_spacing;
     }
 }
@@ -1529,11 +1557,14 @@ static void draw_version(const gamestate* const g) {
 static void draw_title_screen(gamestate* const g, bool show_menu) {
     massert(g, "gamestate is NULL");
     // Space between title texts
-    Color active_color = WHITE, disabled_color = {0x99, 0x99, 0x99, 0xFF}, selection_color;
-    //const char* menu_text[3] = {"New Game", "Continue", "Settings"};
+    Color active_color = WHITE;
+    Color disabled_color = {0x99, 0x99, 0x99, 0xFF};
+    Color selection_color;
     const char* menu_text[2] = {"New Game", "Continue (coming soon)"};
-    //const char *title_text_0 = "project.", *title_text_1 = "rpg", *version_text = g->version, *start_text = "Press any key to begin";
-    const char *title_text_0 = "project.", *title_text_1 = "rpg", *version_text = g->version, *start_text = "Press enter or space to begin";
+    const char* title_text_0 = "project.";
+    const char* title_text_1 = "rpg";
+    const char* version_text = g->version;
+    const char* start_text = "Press enter or space to begin";
     char buffer[1024] = {0};
     Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
     int sm_font_size = 20, font_size = 80, measure = MeasureText(title_text_0, font_size), start_measure = MeasureText(start_text, sm_font_size), padding = 10,
@@ -1628,50 +1659,40 @@ static void draw_character_creation_screen(gamestate* const g) {
 void draw_sort_inventory_menu(gamestate* const g) {
     massert(g, "gamestate is NULL");
     if (!g->display_sort_inventory_menu) return;
-
     // Parameters
     const char* menu_title = "Sort By";
     int font_size = 20;
     int menu_spacing = 15;
     const char* menu_text[] = {"Name", "Type"};
-
     int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
     int current_selection = g->sort_inventory_menu_selection;
     massert(current_selection >= 0 && current_selection < menu_count, "current_selection is out of bounds");
-
     // Calculate menu size based on longest text
     int max_text_width = MeasureText(menu_title, font_size);
     for (int i = 0; i < menu_count; i++) {
         int width = MeasureText(menu_text[i], font_size);
         if (width > max_text_width) max_text_width = width;
     }
-
     // Position menu centered within inventory menu
     float menu_width = max_text_width + 40;
     float menu_height = (font_size + menu_spacing) * menu_count + 30;
     float menu_x = (g->windowwidth - menu_width) / 2;
     float menu_y = (g->windowheight - menu_height) / 2;
-
     // Draw background box
     DrawRectangle(menu_x, menu_y, menu_width, menu_height, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx((Rectangle){menu_x, menu_y, menu_width, menu_height}, 2, WHITE);
-
     // Draw title
     float title_x = menu_x + (menu_width - MeasureText(menu_title, font_size)) / 2;
     DrawText(menu_title, title_x, menu_y + 10, font_size, WHITE);
-
     // Draw menu items
     float item_x = menu_x + 20;
     float item_y = menu_y + 40;
-
     for (int i = 0; i < menu_count; i++) {
         Color color = (i == current_selection) ? YELLOW : WHITE;
-
         // Draw selection indicator
         if (i == current_selection) {
             DrawText(">", item_x - 15, item_y, font_size, color);
         }
-
         DrawText(menu_text[i], item_x, item_y, font_size, color);
         item_y += font_size + menu_spacing;
     }
