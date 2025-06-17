@@ -40,8 +40,11 @@
 //#define DEFAULT_WIN_WIDTH 1920
 //#define DEFAULT_WIN_HEIGHT 1080
 
-#define DEFAULT_WIN_WIDTH 800
-#define DEFAULT_WIN_HEIGHT 480
+#define DEFAULT_WIN_WIDTH 1280
+#define DEFAULT_WIN_HEIGHT 720
+
+#define DEFAULT_TARGET_WIDTH 800
+#define DEFAULT_TARGET_HEIGHT 480
 
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
@@ -60,8 +63,9 @@ RenderTexture2D char_creation_target_texture = {0};
 RenderTexture2D main_game_target_texture = {0};
 
 RenderTexture2D target = {0};
-Rectangle target_src = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
-Rectangle target_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
+Rectangle target_src = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
+Rectangle target_dest = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
+Rectangle win_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 Vector2 target_origin = {0, 0};
 Vector2 zero_vec = {0, 0};
 
@@ -767,16 +771,23 @@ static void libdraw_drawframe_2d_to_texture(gamestate* const g) {
 
 static void libdraw_drawframe_2d_from_texture(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    DrawTexturePro(main_game_target_texture.texture, target_src, (Rectangle){0, 0, g->windowwidth, g->windowheight}, (Vector2){0, 0}, 0.0f, WHITE);
+    //DrawTexturePro(main_game_target_texture.texture, target_src, (Rectangle){0, 0, g->windowwidth, g->windowheight}, (Vector2){0, 0}, 0.0f, WHITE);
+    //DrawTexturePro(main_game_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(main_game_target_texture.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
 }
 
 static void draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) return;
-    const char *prompt = "[A] Next", *msg = g->msg_system.messages[g->msg_system.index];
+    const char* prompt = "[A] Next";
+    const char* msg = g->msg_system.messages[g->msg_system.index];
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg);
-    int font_size = 20, measure = MeasureText(tmp, font_size), text_width = measure, text_height = font_size, prompt_font_size = 10, prompt_offset = 10;
+    int font_size = 20, measure = MeasureText(tmp, font_size);
+    int text_width = measure;
+    int text_height = font_size;
+    int prompt_font_size = 10;
+    int prompt_offset = 10;
     const Rectangle box = {.x = (g->windowwidth - text_width) / 2.0 - g->pad,
                            .y = (g->windowheight - text_height) / 8.0 - g->pad,
                            .width = text_width + g->pad * 2,
@@ -899,16 +910,20 @@ void libdraw_drawframe(gamestate* const g) {
     }
     BeginTextureMode(target);
     ClearBackground(BLUE);
-    if (g->current_scene == SCENE_TITLE)
+    if (g->current_scene == SCENE_TITLE) {
         draw_title_screen_from_texture(g);
-    else if (g->current_scene == SCENE_MAIN_MENU)
+    } else if (g->current_scene == SCENE_MAIN_MENU) {
         draw_title_screen_from_texture(g);
-    else if (g->current_scene == SCENE_CHARACTER_CREATION)
+    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
         draw_character_creation_screen_from_texture(g);
-    else if (g->current_scene == SCENE_GAMEPLAY)
+    } else if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_drawframe_2d_from_texture(g);
+    }
     EndTextureMode();
-    DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+
+    // draw the target texture to the window
+    //DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+    DrawTexturePro(target.texture, target_src, win_dest, target_origin, 0.0f, WHITE);
     EndDrawing();
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
@@ -1186,13 +1201,31 @@ void libdraw_init_rest(gamestate* const g) {
     minfo("libdraw_init_rest: initializing rest of the libdraw");
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);
-    int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT, x = w * 10 / 16, y = h / 3;
+    int w = DEFAULT_WIN_WIDTH;
+    int h = DEFAULT_WIN_HEIGHT;
+    int x = w * 10 / 16;
+    int y = h / 3;
+
+    int target_w = DEFAULT_TARGET_WIDTH;
+    int target_h = DEFAULT_TARGET_HEIGHT;
+
     minfo("libdraw_init_rest: window size: %dx%d", w, h);
     massert(w > 0 && h > 0, "window width or height is not set properly");
-    g->windowwidth = w, g->windowheight = h;
-    target = LoadRenderTexture(w, h), title_target_texture = LoadRenderTexture(w, h), char_creation_target_texture = LoadRenderTexture(w, h),
-    main_game_target_texture = LoadRenderTexture(w, h);
-    target_src = (Rectangle){0, 0, w, -h}, target_dest = (Rectangle){0, 0, w, h};
+    g->windowwidth = w;
+    g->windowheight = h;
+
+    target = LoadRenderTexture(target_w, target_h);
+    //target = LoadRenderTexture(w, h);
+
+    title_target_texture = LoadRenderTexture(target_w, target_h);
+    char_creation_target_texture = LoadRenderTexture(target_w, target_h);
+    main_game_target_texture = LoadRenderTexture(target_w, target_h);
+
+    target_src = (Rectangle){0, 0, target_w, -target_h};
+
+    target_dest = (Rectangle){0, 0, target_w, target_h};
+    //target_dest = (Rectangle){0, 0, w, h};
+
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
     load_textures();
     calc_debugpanel_size(g);
@@ -1567,11 +1600,23 @@ static void draw_title_screen(gamestate* const g, bool show_menu) {
     const char* start_text = "Press enter or space to begin";
     char buffer[1024] = {0};
     Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
-    int sm_font_size = 20, font_size = 80, measure = MeasureText(title_text_0, font_size), start_measure = MeasureText(start_text, sm_font_size), padding = 10,
-        version_measure = MeasureText(version_text, sm_font_size);
-    float x = (g->windowwidth - measure) / 2.0f, y = (g->windowheight - font_size * 2) / 2.0f, start_x = (g->windowwidth - start_measure) / 2.0f,
-          title_text_1_x = x + measure + padding, version_x = (g->windowwidth - version_measure) / 2.0f, version_y = y + font_size + 10,
-          start_y = y + font_size * 1 + 20 + sm_font_size;
+    int sm_font_size = 10;
+    int font_size = 40;
+    int measure = MeasureText(title_text_0, font_size);
+    int start_measure = MeasureText(start_text, sm_font_size);
+    int padding = 10;
+
+    int w = DEFAULT_TARGET_WIDTH;
+    int h = DEFAULT_TARGET_HEIGHT;
+
+    int version_measure = MeasureText(version_text, sm_font_size);
+    float x = (w - measure) / 2.0f;
+    float y = (h - font_size * 2) / 2.0f;
+    float start_x = (w - start_measure) / 2.0f;
+    float title_text_1_x = x + measure + padding;
+    float version_x = (w - version_measure) / 2.0f;
+    float version_y = y + font_size + 10;
+    float start_y = y + font_size * 1 + 20 + sm_font_size;
     ClearBackground(BLACK);
     DrawText(title_text_0, x, y, font_size, title_text_0_color);
     DrawText(title_text_1, title_text_1_x, y, font_size, title_text_1_color);
@@ -1581,14 +1626,18 @@ static void draw_title_screen(gamestate* const g, bool show_menu) {
         return;
     }
     // If show_menu is true, draw the new game, continue, options selection text
-    int menu_count = sizeof(menu_text) / sizeof(menu_text[0]), menu_spacing = 10, current_selection_index = g->title_screen_selection;
+    int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
+    int menu_spacing = 10;
+    int current_selection_index = g->title_screen_selection;
     for (int i = 0; i < menu_count; i++) {
         bzero(buffer, sizeof(buffer));
-        float menu_x = (g->windowwidth - MeasureText(menu_text[i], sm_font_size)) / 2.0f, menu_y = start_y + (i * (sm_font_size + menu_spacing));
-        if (i == current_selection_index)
+        float menu_x = (w - MeasureText(menu_text[i], sm_font_size)) / 2.0f;
+        float menu_y = start_y + (i * (sm_font_size + menu_spacing));
+        if (i == current_selection_index) {
             snprintf(buffer, sizeof(buffer), "> %s", menu_text[i]);
-        else
+        } else {
             snprintf(buffer, sizeof(buffer), "  %s", menu_text[i]);
+        }
         selection_color = i == 0 ? active_color : disabled_color; // First item is always active
         DrawText(buffer, menu_x, menu_y, sm_font_size, selection_color);
     }
@@ -1626,12 +1675,16 @@ static void draw_character_creation_screen(gamestate* const g) {
     const char* stats_fmt[] = {"Name: %s", "Race: %s", "Hitdie: %d", "Strength: %d", "Dexterity: %d", "Constitution: %d"};
     const char* remaining_text[] = {
         "Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race (unavailable for now)", "Press UP/DOWN to change class (unavailable for now)", "Press ENTER to confirm"};
-    int font_size = 40, cx = g->windowwidth / 2, sy = g->windowheight / 4, x = cx, y = sy;
+    int font_size = 20;
+    int cx = g->windowwidth / 2;
+    int sy = g->windowheight / 4;
+    int x = cx;
+    int y = sy;
     char buffer[2048] = {0};
     ClearBackground(BLACK);
     DrawText(title_text, x, y, font_size, WHITE);
     y += font_size;
-    font_size = 20;
+    font_size = 10;
     // Draw character stats
     for (int i = 0; i < sizeof(stats_fmt) / sizeof(stats_fmt[0]); i++) {
         snprintf(buffer,
