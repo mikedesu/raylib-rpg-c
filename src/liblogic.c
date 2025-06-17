@@ -2132,6 +2132,7 @@ static race_t get_random_race_for_floor(int floor) {
 }
 
 static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
+    minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
     entityid id = ENTITYID_INVALID;
     bool success = false;
     const char* race_name = get_race_str(race);
@@ -2143,9 +2144,7 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         vec3 r = {1, hit_die, 0};
         int max_hp = do_roll(r);
         g_set_stat(g, id, STATS_HITDIE, hit_die);
-
         g_set_stat(g, id, STATS_AC, 10);
-
         g_set_stat(g, id, STATS_XP, 0);
         g_set_stat(g, id, STATS_LEVEL, 1);
         vec3 base_attack_dmg = get_base_attack_damage_for_race(race);
@@ -2169,18 +2168,15 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         // update vision distance
         // this will be appropriately set on a per-npc basis but for now...
         // hard code 5
-
         int vision_distance0 = g_get_vision_distance(g, id);
         g_set_vision_distance(g, id, vision_distance0);
         // verify vision distance
         int vision_distance = g_get_vision_distance(g, id);
         massert(vision_distance == vision_distance0, "Vision distance %d does not match expected value 5", vision_distance);
-
         // update light radius
         // this will be appropriately set on a per-npc basis but for now...
         // hard code 3
         g_set_light_radius(g, id, 3);
-
         success = true;
     }
     return success;
