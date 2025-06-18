@@ -119,7 +119,7 @@ static void libdraw_update_sprite_ptr(gamestate* const g, entityid id, spritegro
 static void draw_message_history(gamestate* const g);
 static void draw_message_box(gamestate* g);
 static void draw_sprite_and_shadow(const gamestate* const g, entityid id);
-static void libdraw_draw_debug_panel(gamestate* const g);
+static void draw_debug_panel(gamestate* const g);
 static void libdraw_drawframe_2d(gamestate* const g);
 static void create_sg_byid(gamestate* const g, entityid id);
 static void calc_debugpanel_size(gamestate* const g);
@@ -712,13 +712,26 @@ static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     return true;
 }
 
-static void libdraw_draw_debug_panel(gamestate* const g) {
+static void draw_debug_panel(gamestate* const g) {
     massert(g, "gamestate is NULL");
     Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f), fg = WHITE;
-    int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4, h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom,
-        x1 = g->debugpanel.x + g->debugpanel.pad_left, y1 = g->debugpanel.y + g->debugpanel.pad_top;
-    DrawRectangle(g->debugpanel.x, g->debugpanel.y, w0, h0, bg);
-    DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
+
+    // temporary hook for positioning the debug panel
+
+    int w = DEFAULT_TARGET_WIDTH;
+    int h = DEFAULT_TARGET_HEIGHT;
+    int x = 0;
+    int y = 0;
+    int fontsize = 10;
+
+    int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
+    int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
+    int x1 = g->debugpanel.x + g->debugpanel.pad_left;
+    int y1 = g->debugpanel.y + g->debugpanel.pad_top;
+    //DrawRectangle(g->debugpanel.x, g->debugpanel.y, w0, h0, bg);
+    DrawRectangle(x, y, w0, h0, bg);
+    //DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
+    DrawText(g->debugpanel.buffer, x, y, fontsize, fg);
 }
 
 static bool libdraw_draw_player_target_box(const gamestate* const g) {
@@ -822,7 +835,7 @@ static inline void update_debug_panel(gamestate* const g) {
 static inline void handle_debug_panel(gamestate* const g) {
     if (g->debugpanelon) {
         update_debug_panel(g);
-        libdraw_draw_debug_panel(g);
+        draw_debug_panel(g);
     }
 }
 
@@ -884,8 +897,14 @@ static void draw_gameover_menu(gamestate* const g) {
     //const char *gameover_text = "Game Over", *restart_text = "Press any key to try again";
     const char *gameover_text = "Game Over", *restart_text = "Press enter or space to return to the title screen";
     Color bg_color = BLACK;
-    int font_size = 20, measure = MeasureText(restart_text, font_size), text_width = measure, text_height = font_size, x = (g->windowwidth - text_width) / 2,
-        y = (g->windowheight - text_height * 2) / 2;
+    int font_size = 10;
+    int measure = MeasureText(restart_text, font_size);
+    int text_width = measure;
+    int text_height = font_size;
+    int w = DEFAULT_TARGET_WIDTH;
+    int h = DEFAULT_TARGET_HEIGHT;
+    int x = (w - text_width) / 2;
+    int y = (h - text_height * 2) / 2;
     Rectangle rect = {x - 10, y - 10, text_width + 20, text_height * 2 + 20};
     DrawRectangle(x - 10, y - 10, text_width + 20, text_height * 2 + 20, bg_color);
     DrawRectangleLinesEx(rect, 2, RED);
@@ -1201,17 +1220,18 @@ static void draw_hud(gamestate* const g) {
     char buffer[1024] = {0};
     const char* format_str = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d STR: %d CON: %d DEX: %d Floor: %d Turn %d";
     snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp, str, con, dex, floor, turn);
-    const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
+    Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
     int box_w = text_size.x + g->pad;
     int box_h = text_size.y + g->pad;
     int box_x = 0;
     int box_y = 0;
-    const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
+    Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
-    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, 2, fg);
+    int line_thickness = 1;
+    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, line_thickness, fg);
     // Calculate text position to center it within the box
-    const float text_x = box_x + (box_w - text_size.x) / 2;
-    const float text_y = box_y + (box_h - text_size.y) / 2;
+    float text_x = box_x + (box_w - text_size.x) / 2;
+    float text_y = box_y + (box_h - text_size.y) / 2;
     DrawTextEx(GetFontDefault(), buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, fg);
 }
 
