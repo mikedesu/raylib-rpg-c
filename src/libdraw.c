@@ -204,8 +204,11 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
 static bool draw_dungeon_tiles_2d(const gamestate* const g, int z, dungeon_floor_t* df) {
     massert(g, "gamestate is NULL");
     massert(df, "dungeon_floor is NULL");
-    for (int y = 0; y < df->height; y++)
-        for (int x = 0; x < df->width; x++) draw_dungeon_floor_tile(g, x, y, z);
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            draw_dungeon_floor_tile(g, x, y, z);
+        }
+    }
     return true;
 }
 
@@ -724,10 +727,14 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
     if (id == -1) return false;
     direction_t dir = g_get_direction(g, id);
     vec3 loc = g_get_location(g, id);
-    int x = loc.x + get_x_from_dir(dir), y = loc.y + get_y_from_dir(dir), ds = DEFAULT_TILE_SIZE;
+    int x = loc.x + get_x_from_dir(dir);
+    int y = loc.y + get_y_from_dir(dir);
+    int ds = DEFAULT_TILE_SIZE;
     Color base_c = GREEN, c;
     float a = 0.25f;
-    if (g->player_changing_direction) a = 1.0f;
+    if (g->player_changing_direction) {
+        a = 1.0f;
+    }
     c = Fade(base_c, a);
     DrawRectangleLinesEx((Rectangle){x * ds, y * ds, ds, ds}, 1, c);
     return true;
@@ -788,10 +795,9 @@ static void draw_message_box(gamestate* g) {
     int text_height = font_size;
     int prompt_font_size = 10;
     int prompt_offset = 10;
-    const Rectangle box = {.x = (g->windowwidth - text_width) / 2.0 - g->pad,
-                           .y = (g->windowheight - text_height) / 8.0 - g->pad,
-                           .width = text_width + g->pad * 2,
-                           .height = text_height + g->pad * 2};
+    int w = DEFAULT_TARGET_WIDTH;
+    int h = DEFAULT_TARGET_HEIGHT;
+    const Rectangle box = {(w - text_width) / 2.0 - g->pad, (h - text_height) / 8.0 - g->pad, text_width + g->pad * 2, text_height + g->pad * 2};
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 2, WHITE);
     DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
@@ -1179,15 +1185,27 @@ static void draw_hud(gamestate* const g) {
     int stat_count = 0;
     int* stats = g_get_stats(g, g->hero_id, &stat_count);
     massert(stats, "stats is NULL");
-    int turn = g->turn_count, hp = stats[STATS_HP], maxhp = stats[STATS_MAXHP], level = stats[STATS_LEVEL], xp = stats[STATS_XP], next_level_xp = stats[STATS_NEXT_LEVEL_XP],
-        attack_bonus = stats[STATS_ATTACK_BONUS], str = stats[STATS_STR], con = stats[STATS_CON], dex = stats[STATS_DEX], ac = get_total_ac(g, g->hero_id);
+    int turn = g->turn_count;
+    int hp = stats[STATS_HP];
+    int maxhp = stats[STATS_MAXHP];
+    int level = stats[STATS_LEVEL];
+    int xp = stats[STATS_XP];
+    int next_level_xp = stats[STATS_NEXT_LEVEL_XP];
+    int attack_bonus = stats[STATS_ATTACK_BONUS];
+    int str = stats[STATS_STR];
+    int con = stats[STATS_CON];
+    int dex = stats[STATS_DEX];
+    int ac = get_total_ac(g, g->hero_id);
     int floor = g->d->current_floor;
-    int font_size = 20;
+    int font_size = 10;
     char buffer[1024] = {0};
     const char* format_str = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d STR: %d CON: %d DEX: %d Floor: %d Turn %d";
     snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp, str, con, dex, floor, turn);
     const Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
-    int box_w = text_size.x + g->pad, box_h = text_size.y + g->pad, box_x = 0, box_y = 0;
+    int box_w = text_size.x + g->pad;
+    int box_h = text_size.y + g->pad;
+    int box_x = 0;
+    int box_y = 0;
     const Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, 2, fg);
@@ -1274,7 +1292,11 @@ static void draw_message_history(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // if there are no messages in the message history, return
     if (g->msg_history.count == 0) return;
-    int font_size = 20, max_messages = 20, x = 0, y = 42, current_count = 0;
+    int font_size = 10;
+    int max_messages = 10;
+    int x = 0;
+    int y = 42;
+    int current_count = 0;
     char tmp_buffer[2048] = {0};
     //Color message_bg = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent
     Color message_bg = g->message_history_bgcolor;
@@ -1304,15 +1326,25 @@ static void draw_inventory_menu(gamestate* const g) {
     if (!g->display_inventory_menu) return;
     const char* menu_title = "Inventory Menu";
     // Parameters
-    int box_pad = g->pad, section_gap = 8, item_list_pad = g->pad, font_size = 20, scale = 8;
+    int box_pad = g->pad;
+    int section_gap = 8;
+    int item_list_pad = g->pad;
+    int font_size = 10;
+    int scale = 4;
     // Measure title
     Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g->line_spacing);
     // Menu box size
-    float menu_width_percent = 0.75f, menu_height_percent = 0.75f;
-    float menu_width = g->windowwidth * menu_width_percent, menu_height = g->windowheight * menu_height_percent;
-    Rectangle menu_box = {.x = (g->windowwidth - menu_width) / 2.0f, .y = (g->windowheight - menu_height) / 4.0f, .width = menu_width, .height = menu_height};
-    float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f, title_y = menu_box.y + box_pad, half_width = (menu_box.width - section_gap) / 2.0f,
-          half_height = menu_box.height - title_size.y - box_pad * 2.0f - box_pad;
+    float menu_width_percent = 0.75f;
+    float menu_height_percent = 0.75f;
+    int w = DEFAULT_TARGET_WIDTH;
+    int h = DEFAULT_TARGET_HEIGHT;
+    float menu_width = w * menu_width_percent;
+    float menu_height = h * menu_height_percent;
+    Rectangle menu_box = {(w - menu_width) / 2.0f, (h - menu_height) / 4.0f, menu_width, menu_height};
+    float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f;
+    float title_y = menu_box.y + box_pad;
+    float half_width = (menu_box.width - section_gap) / 2.0f;
+    float half_height = menu_box.height - title_size.y - box_pad * 2.0f - box_pad;
     const char* info_title = "Item Info:";
     char info_text[256] = {0};
     spritegroup_t* sg = NULL;
@@ -1324,10 +1356,12 @@ static void draw_inventory_menu(gamestate* const g) {
     // Partition into left/right halves (with gap)
     // Left box: inventory list
     // Right box: item info
-    Rectangle left_box = {.x = menu_box.x + box_pad, .y = title_y + title_size.y + box_pad, .width = half_width - box_pad, .height = half_height},
-              right_box = {.x = left_box.x + half_width + section_gap, .y = left_box.y, .width = half_width - box_pad * 2, .height = half_height};
+    Rectangle left_box = {menu_box.x + box_pad, title_y + title_size.y + box_pad, half_width - box_pad, half_height};
+    Rectangle right_box = {left_box.x + half_width + section_gap, left_box.y, half_width - box_pad * 2, half_height};
     // Draw left and right boxes
-    float item_y = left_box.y + item_list_pad, info_title_y = right_box.y + item_list_pad, info_text_y = info_title_y + font_size + 8;
+    float item_y = left_box.y + item_list_pad;
+    float info_title_y = right_box.y + item_list_pad;
+    float info_text_y = info_title_y + font_size + 8;
     DrawRectangleRec(left_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(left_box, 2, WHITE);
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
@@ -1516,10 +1550,12 @@ static void draw_gameplay_settings_menu(gamestate* const g) {
     }
 
     // Add space for values and padding
+    int w = DEFAULT_TARGET_WIDTH;
+    int h = DEFAULT_TARGET_HEIGHT;
     int box_width = max_text_width + 150;
     int box_height = (font_size + menu_spacing) * menu_count + 40;
-    int box_x = (g->windowwidth - box_width) / 2;
-    int box_y = (g->windowheight - box_height) / 2;
+    int box_x = (w - box_width) / 2;
+    int box_y = (h - box_height) / 2;
 
     // Draw background box
     DrawRectangle(box_x, box_y, box_width, box_height, (Color){0x33, 0x33, 0x33, 0xcc});
@@ -1676,8 +1712,12 @@ static void draw_character_creation_screen(gamestate* const g) {
     const char* remaining_text[] = {
         "Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race (unavailable for now)", "Press UP/DOWN to change class (unavailable for now)", "Press ENTER to confirm"};
     int font_size = 20;
-    int cx = g->windowwidth / 2;
-    int sy = g->windowheight / 4;
+
+    int w = DEFAULT_TARGET_WIDTH;
+    int h = DEFAULT_TARGET_HEIGHT;
+
+    int cx = w / 2;
+    int sy = h / 4;
     int x = cx;
     int y = sy;
     char buffer[2048] = {0};
@@ -1729,8 +1769,10 @@ void draw_sort_inventory_menu(gamestate* const g) {
     // Position menu centered within inventory menu
     float menu_width = max_text_width + 40;
     float menu_height = (font_size + menu_spacing) * menu_count + 30;
-    float menu_x = (g->windowwidth - menu_width) / 2;
-    float menu_y = (g->windowheight - menu_height) / 2;
+    int w = DEFAULT_TARGET_WIDTH;
+    int h = DEFAULT_TARGET_HEIGHT;
+    float menu_x = (w - menu_width) / 2;
+    float menu_y = (h - menu_height) / 2;
     // Draw background box
     DrawRectangle(menu_x, menu_y, menu_width, menu_height, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx((Rectangle){menu_x, menu_y, menu_width, menu_height}, 2, WHITE);

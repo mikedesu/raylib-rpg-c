@@ -68,6 +68,8 @@ typedef enum component_t
     C_RINGTYPE,
     C_LIGHT_RADIUS_BONUS,
     //C_SPELL_EFFECT,
+    C_EXPLORED_LIST,
+    C_VISIBLE_LIST,
     C_COUNT
 } component;
 
