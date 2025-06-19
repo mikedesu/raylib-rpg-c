@@ -10,6 +10,7 @@
 #include "hashtable_entityid_spritegroup.h"
 //#include "inventory_sort.h"
 #include "libdraw.h"
+#include "libdraw_sort_inventory_menu.h"
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
@@ -26,33 +27,6 @@
 #include <raylib.h>
 #include <stdlib.h>
 #include <sys/param.h>
-
-#define DEFAULT_SPRITEGROUPS_SIZE 128
-//#define DEFAULT_MUSIC_VOLUME 0.5f
-
-//#define DEFAULT_WIN_WIDTH 800
-//#define DEFAULT_WIN_HEIGHT 480
-
-//#define DEFAULT_WIN_WIDTH 640
-//#define DEFAULT_WIN_HEIGHT 360
-//#define DEFAULT_WIN_WIDTH 1920
-//#define DEFAULT_WIN_HEIGHT 1080
-//#define DEFAULT_WIN_WIDTH 1280
-//#define DEFAULT_WIN_HEIGHT 720
-#define DEFAULT_WIN_WIDTH 960
-#define DEFAULT_WIN_HEIGHT 540
-
-//#define DEFAULT_TARGET_WIDTH 1280
-//#define DEFAULT_TARGET_HEIGHT 720
-#define DEFAULT_TARGET_WIDTH 960
-#define DEFAULT_TARGET_HEIGHT 540
-//#define DEFAULT_TARGET_WIDTH 800
-//#define DEFAULT_TARGET_HEIGHT 480
-//#define DEFAULT_TARGET_WIDTH 640
-//#define DEFAULT_TARGET_HEIGHT 360
-
-#define SPRITEGROUP_DEFAULT_SIZE 32
-#define DEFAULT_TILE_SIZE_SCALED 32
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -87,13 +61,13 @@ static inline bool libdraw_camera_lock_on(gamestate* const g);
 static inline void update_debug_panel(gamestate* const g);
 static inline void handle_debug_panel(gamestate* const g);
 
-void draw_sort_inventory_menu(gamestate* const g);
-
 static void draw_gameplay_settings_menu(gamestate* const g);
 static void libdraw_drawframe_2d_from_texture(gamestate* const g);
 static void libdraw_drawframe_2d_to_texture(gamestate* const g);
 static void draw_help_menu(gamestate* const g);
+
 static void draw_gameover_menu(gamestate* const g);
+
 static void libdraw_update_sprite_pre(gamestate* const g, entityid id);
 static void libdraw_handle_gamestate_flag(gamestate* const g);
 static void draw_weapon_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg);
@@ -157,8 +131,10 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     massert(df, "dungeon_floor is NULL");
     tile_t* tile = df_tile_at(df, (vec3){x, y, z});
     massert(tile, "tile is NULL");
-    if (tile->type == TILE_NONE) return true;
-    if (!tile->visible) return true;
+    if (tile->type == TILE_NONE || !tile->visible) {
+        return true;
+    }
+
     // Get hero's vision distance and location
     //int vision_distance = g_get_vision_distance(g, g->hero_id);
     // its not actually the vision distance we need,
@@ -173,11 +149,12 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) return false;
     // Calculate drawing position
-    int offset_x = -12, offset_y = -12;
+    int offset_x = -12;
+    int offset_y = -12;
     int px = x * DEFAULT_TILE_SIZE + offset_x;
     int py = y * DEFAULT_TILE_SIZE + offset_y;
-    const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
-    const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+    Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+    Rectangle dest = {px, py, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
     // Draw tile with fade if beyond vision distance
     //Color draw_color = distance > vision_distance ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
     Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
@@ -185,16 +162,24 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
     if (tile->has_pressure_plate) {
         int txkey2 = tile->pressure_plate_up_tx_key;
-        if (txkey2 < 0) return false;
+        if (txkey2 < 0) {
+            return false;
+        }
         Texture2D* texture = &txinfo[txkey2].texture;
-        if (texture->id <= 0) return false;
+        if (texture->id <= 0) {
+            return false;
+        }
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
     if (tile->has_wall_switch) {
         int txkey = tile->wall_switch_on ? tile->wall_switch_down_tx_key : tile->wall_switch_up_tx_key;
-        if (txkey < 0) return false;
+        if (txkey < 0) {
+            return false;
+        }
         Texture2D* texture = &txinfo[txkey].texture;
-        if (texture->id <= 0) return false;
+        if (texture->id <= 0) {
+            return false;
+        }
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
     }
     return true;
@@ -218,12 +203,15 @@ static sprite* get_weapon_front_sprite(const gamestate* g, entityid id, spritegr
     entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
     if (weapon == ENTITYID_INVALID) return NULL;
     spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    if (!w_sg) return NULL;
+    if (!w_sg) {
+        return NULL;
+    }
     sprite* retval = NULL;
-    if (sg->current == SG_ANIM_NPC_ATTACK)
+    if (sg->current == SG_ANIM_NPC_ATTACK) {
         retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
-    else if (sg->current == SG_ANIM_NPC_SHOT)
+    } else if (sg->current == SG_ANIM_NPC_SHOT) {
         retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_F);
+    }
     return retval;
 }
 
@@ -232,14 +220,19 @@ static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegro
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
     entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
-    if (weapon == ENTITYID_INVALID) return NULL;
+    if (weapon == ENTITYID_INVALID) {
+        return NULL;
+    }
     spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    if (!w_sg) return NULL;
+    if (!w_sg) {
+        return NULL;
+    }
     sprite* retval = NULL;
-    if (sg->current == SG_ANIM_NPC_ATTACK)
+    if (sg->current == SG_ANIM_NPC_ATTACK) {
         retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    else if (sg->current == SG_ANIM_NPC_SHOT)
+    } else if (sg->current == SG_ANIM_NPC_SHOT) {
         retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_B);
+    }
     return retval;
 }
 
@@ -250,9 +243,13 @@ static sprite* get_shield_front_sprite(const gamestate* g, entityid id, spritegr
     entityid shield = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
     if (shield == ENTITYID_INVALID) return NULL;
     spritegroup_t* s_sg = hashtable_entityid_spritegroup_get(spritegroups, shield);
-    if (!s_sg) return NULL;
+    if (!s_sg) {
+        return NULL;
+    }
     sprite* retval = NULL;
-    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) retval = spritegroup_get(s_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) {
+        retval = spritegroup_get(s_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+    }
     return retval;
 }
 
@@ -299,7 +296,9 @@ static void draw_shield_sprite_back(const gamestate* const g, entityid id, sprit
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
     sprite* shield_back_s = get_shield_back_sprite(g, id, sg);
-    if (shield_back_s) DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    if (shield_back_s) {
+        DrawTexturePro(*shield_back_s->texture, shield_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
 }
 
 static void draw_shield_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg) {
@@ -315,7 +314,9 @@ static void draw_weapon_sprite_back(const gamestate* const g, entityid id, sprit
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
     sprite* weapon_back_s = get_weapon_back_sprite(g, id, sg);
-    if (weapon_back_s) DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    if (weapon_back_s) {
+        DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
 }
 
 static void draw_weapon_sprite_front(const gamestate* const g, entityid id, spritegroup_t* sg) {
@@ -323,7 +324,9 @@ static void draw_weapon_sprite_front(const gamestate* const g, entityid id, spri
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
     sprite* weapon_front_s = get_weapon_front_sprite(g, id, sg);
-    if (weapon_front_s) DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    if (weapon_front_s) {
+        DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    }
 }
 
 static void draw_sprite_and_shadow(const gamestate* const g, entityid id) {
@@ -356,7 +359,6 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     if (!tile) return false;
     if (tile_is_wall(tile->type)) return false;
     if (!tile->visible) return true; // Do not draw entities on invisible tiles
-
     // Get hero's vision distance and location
     int vision_distance = g_get_vision_distance(g, g->hero_id);
     int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
@@ -851,7 +853,7 @@ static inline void handle_debug_panel(gamestate* const g) {
 
 #define HELP_TEXT_COUNT 32
 static void draw_help_menu(gamestate* const g) {
-    if (!g->display_help_menu) return;
+    //if (!g->display_help_menu) return;
     // const char* help_text = g->help_menu_text;
     char* help_text[HELP_TEXT_COUNT] = {"# Help Menu",
                                         "",
@@ -903,9 +905,8 @@ static void draw_help_menu(gamestate* const g) {
 }
 
 static void draw_gameover_menu(gamestate* const g) {
-    if (!g->gameover) return;
-    //const char *gameover_text = "Game Over", *restart_text = "Press any key to try again";
-    const char *gameover_text = "Game Over", *restart_text = "Press enter or space to return to the title screen";
+    const char* gameover_text = "Game Over";
+    const char* restart_text = "Press enter or space to return to the title screen";
     Color bg_color = BLACK;
     int font_size = 10;
     int measure = MeasureText(restart_text, font_size);
@@ -955,7 +956,6 @@ void libdraw_drawframe(gamestate* const g) {
         libdraw_drawframe_2d_from_texture(g);
     }
     EndTextureMode();
-
     // draw the target texture to the window
     //DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
     DrawTexturePro(target.texture, target_src, win_dest, target_origin, 0.0f, WHITE);
@@ -1006,7 +1006,9 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
     if (do_dither) ImageDither(&image, 4, 4, 4, 4);
     Texture2D texture = LoadTextureFromImage(image);
     UnloadImage(image);
-    txinfo[txkey].texture = texture, txinfo[txkey].contexts = ctxs, txinfo[txkey].num_frames = frames;
+    txinfo[txkey].texture = texture;
+    txinfo[txkey].contexts = ctxs;
+    txinfo[txkey].num_frames = frames;
     return true;
 }
 
@@ -1014,10 +1016,15 @@ static void load_textures() {
     const char* textures_file = "textures.txt";
     FILE* file = fopen(textures_file, "r");
     massert(file, "textures.txt file is NULL");
-    if (!file) return;
+    if (!file) {
+        return;
+    }
     char line[1024] = {0};
     while (fgets(line, sizeof(line), file)) {
-        int txkey = -1, contexts = -1, frames = -1, do_dither = 0;
+        int txkey = -1;
+        int contexts = -1;
+        int frames = -1;
+        int do_dither = 0;
         char path[512] = {0};
         // check if the line begins with a #
         if (line[0] == '#') continue;
@@ -1025,7 +1032,9 @@ static void load_textures() {
         massert(txkey >= 0, "txkey is invalid");
         massert(contexts >= 0, "contexts is invalid");
         massert(frames >= 0, "frames is invalid");
-        if (txkey < 0 || contexts < 0 || frames < 0) continue;
+        if (txkey < 0 || contexts < 0 || frames < 0) {
+            continue;
+        }
         load_texture(txkey, contexts, frames, do_dither, path);
     }
     fclose(file);
@@ -1043,7 +1052,8 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
         spritegroup_destroy(group);
         return;
     }
-    int df_w = df->width, df_h = df->height;
+    int df_w = df->width;
+    int df_h = df->height;
     vec3 loc = g_get_location(g, id);
     massert(loc.x >= 0 && loc.x < df_w, "location x out of bounds: %d", loc.x);
     massert(loc.y >= 0 && loc.y < df_h, "location y out of bounds: %d", loc.y);
@@ -1081,7 +1091,9 @@ static void create_sg_byid(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     int* keys = NULL;
-    int num_keys = 0, offset_x = -12, offset_y = -12;
+    int num_keys = 0;
+    int offset_x = -12;
+    int offset_y = -12;
     entitytype_t type = g_get_type(g, id);
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
         race_t race = g_get_race(g, id);
@@ -1181,7 +1193,6 @@ static void create_sg_byid(gamestate* const g, entityid id) {
                 keys = TX_SILVER_RING_KEYS;
                 num_keys = TX_SILVER_RING_COUNT;
             }
-
             //keys = TX_RING_KEYS;
             //num_keys = TX_RING_COUNT;
             create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
@@ -1251,15 +1262,12 @@ void libdraw_init_rest(gamestate* const g) {
     SetTargetFPS(60);
     int w = DEFAULT_WIN_WIDTH;
     int h = DEFAULT_WIN_HEIGHT;
-
     int target_w = DEFAULT_TARGET_WIDTH;
     int target_h = DEFAULT_TARGET_HEIGHT;
-
     minfo("libdraw_init_rest: window size: %dx%d", w, h);
     massert(w > 0 && h > 0, "window width or height is not set properly");
     g->windowwidth = w;
     g->windowheight = h;
-
     TextureFilter filter = TEXTURE_FILTER_POINT; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_BILINEAR; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_TRILINEAR; // Use trilinear filtering for better quality
@@ -1267,33 +1275,24 @@ void libdraw_init_rest(gamestate* const g) {
     target = LoadRenderTexture(target_w, target_h);
     //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     SetTextureFilter(target.texture, filter); // Use anisotropic filtering for better quality
-
     //target = LoadRenderTexture(w, h);
-
     title_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(title_target_texture.texture, filter);
-
     char_creation_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(char_creation_target_texture.texture, filter);
-
     main_game_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(main_game_target_texture.texture, filter);
-
     target_src = (Rectangle){0, 0, target_w, -target_h};
-
     target_dest = (Rectangle){0, 0, target_w, target_h};
     //target_dest = (Rectangle){0, 0, w, h};
-
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
     load_textures();
     calc_debugpanel_size(g);
     load_shaders();
-
     int x = target_w / 2;
     int y = target_h / 2;
     g->cam2d.offset = (Vector2){x, y};
     g->cam2d.zoom = 1.0f;
-
     gamestate_set_debug_panel_pos_top_right(g);
     // set the camera target to the center of the dungeon
     dungeon_floor_t* const df = d_get_current_floor(g->d);
@@ -1411,7 +1410,7 @@ static void draw_inventory_menu(gamestate* const g) {
     DrawRectangleLinesEx(left_box, 2, WHITE);
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
-    int inventory_count = 0;
+    size_t inventory_count = 0;
     entityid* inventory = g_get_inventory(g, g->hero_id, &inventory_count);
     //massert(inventory, "inventory is NULL");
     if (inventory == NULL) {
@@ -1433,7 +1432,7 @@ static void draw_inventory_menu(gamestate* const g) {
     float item_x = left_box.x + item_list_pad;
     if (inventory_count > 0) {
         char selection_info[64] = {0};
-        snprintf(selection_info, sizeof(selection_info), "Item %d of %d selected", g->inventory_menu_selection + 1, inventory_count);
+        snprintf(selection_info, sizeof(selection_info), "Item %d of %zu selected", g->inventory_menu_selection + 1, inventory_count);
         DrawTextEx(GetFontDefault(), selection_info, (Vector2){item_x, item_y}, font_size, g->line_spacing, WHITE);
     } else {
         DrawTextEx(GetFontDefault(), "No items in inventory", (Vector2){left_box.x + item_list_pad, left_box.y + item_list_pad}, font_size, g->line_spacing, WHITE);
@@ -1495,89 +1494,13 @@ static void draw_inventory_menu(gamestate* const g) {
                            WHITE);
         }
     }
-    /*
-    draw_inventory_item_info(g, inventory[g->inventory_menu_selection]);
-    */
-
     // also try drawing the inv sort options
     draw_sort_inventory_menu(g);
 }
 
-/*
-static void draw_inventory_item_info(gamestate* const g, entityid item_id) {
-    massert(g, "gamestate is NULL");
-    //massert(item_id != ENTITYID_INVALID, "item_id is invalid");
-    if (item_id == ENTITYID_INVALID) {
-        merror("item_id is invalid");
-        return;
-    }
-
-    // Parameters
-    const char* info_title = "Item Info:";
-    char info_text[256] = {0};
-    spritegroup_t* sg = NULL;
-    // Measure title
-    int font_size = 20, scale = 8;
-    Vector2 title_size = MeasureTextEx(GetFontDefault(), info_title, font_size, g->line_spacing);
-    // Menu box size
-    float menu_width_percent = 0.75f, menu_height_percent = 0.75f;
-    float menu_width = g->windowwidth * menu_width_percent, menu_height = g->windowheight * menu_height_percent;
-    Rectangle menu_box = {.x = (g->windowwidth - menu_width) / 2.0f, .y = (g->windowheight - menu_height) / 4.0f, .width = menu_width, .height = menu_height};
-    float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f, title_y = menu_box.y + g->pad, half_width = (menu_box.width - g->pad * 2) / 2.0f,
-          half_height = menu_box.height - title_size.y - g->pad * 2.0f;
-
-    entityid* inventory = NULL;
-    int inventory_count = 0;
-    inventory = g_get_inventory(g, g->hero_id, &inventory_count);
-
-    // right box
-    Rectangle right_box = {.x = menu_box.x + half_width + g->pad, .y = title_y + title_size.y + g->pad, .width = half_width - g->pad, .height = half_height};
-    // item list pad
-    float item_list_pad = g->pad, info_title_y = right_box.y + item_list_pad, info_text_y = info_title_y + font_size + 8;
-
-    if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < inventory_count) {
-        entityid item_id = inventory[g->inventory_menu_selection];
-        const char* name = g_get_name(g, item_id);
-        itemtype item_type = g_get_itemtype(g, item_id);
-        if (g_has_damage(g, item_id)) {
-            vec3 dmg_roll = g_get_damage(g, item_id);
-            int n = dmg_roll.x, sides = dmg_roll.y, modifier = dmg_roll.z;
-            if (modifier)
-                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d+%d", name, item_type, n, sides, modifier);
-            else
-                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d", name, item_type, n, sides);
-        } else if (g_has_ac(g, item_id)) {
-            int ac = g_get_ac(g, item_id);
-            snprintf(info_text, sizeof(info_text), "%s\nType: %d\nAC: %d", name, item_type, ac);
-        } else {
-            snprintf(info_text, sizeof(info_text), "%s\nType: %d", name, item_type);
-        }
-        sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
-    } else
-        snprintf(info_text, sizeof(info_text), "Select an item to view details here.");
-    DrawTextEx(GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, font_size, g->line_spacing, (Color){0xaa, 0xaa, 0xaa, 0xff});
-    DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, font_size, g->line_spacing, WHITE);
-    if (sg) {
-        sprite* s = sg_get_current(sg);
-        if (s) {
-            float sprite_width = s->width * scale, sprite_height = s->height * scale, sprite_margin = -6 * scale;
-            // Anchor to top-right of right_box, account for margin
-            const float sprite_x = right_box.x + right_box.width - sprite_margin - sprite_width, sprite_y = right_box.y + sprite_margin;
-            DrawTexturePro(*s->texture,
-                           s->src,
-                           (Rectangle){sprite_x, sprite_y, sprite_width, sprite_height},
-                           (Vector2){0, 0}, // Top-left corner as origin
-                           0.0f,
-                           WHITE);
-        }
-    }
-}
-*/
-
 static void draw_gameplay_settings_menu(gamestate* const g) {
     massert(g, "gamestate is NULL");
     if (!g->display_gameplay_settings_menu) return;
-
     // Parameters
     const char* menu_title = "Settings Menu";
     int font_size = 20;
@@ -1586,14 +1509,12 @@ static void draw_gameplay_settings_menu(gamestate* const g) {
     const char* menu_text[] = {"Music Volume", "Back"};
     int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
     int current_selection = g->gameplay_settings_menu_selection;
-
     // Calculate max width needed for menu items and their values
     int max_text_width = MeasureText(menu_title, font_size);
     for (int i = 0; i < menu_count; i++) {
         int width = MeasureText(menu_text[i], font_size);
         if (width > max_text_width) max_text_width = width;
     }
-
     // Add space for values and padding
     int w = DEFAULT_TARGET_WIDTH;
     int h = DEFAULT_TARGET_HEIGHT;
@@ -1601,22 +1522,17 @@ static void draw_gameplay_settings_menu(gamestate* const g) {
     int box_height = (font_size + menu_spacing) * menu_count + 40;
     int box_x = (w - box_width) / 2;
     int box_y = (h - box_height) / 2;
-
     // Draw background box
     DrawRectangle(box_x, box_y, box_width, box_height, (Color){0x33, 0x33, 0x33, 0xcc});
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, WHITE);
-
     // Draw menu title
     int title_x = box_x + (box_width - MeasureText(menu_title, font_size)) / 2;
     DrawText(menu_title, title_x, box_y + 10, font_size, WHITE);
-
     // Draw menu items
     int y = box_y + 40;
     int left_pad = box_x + 20;
-
     for (int i = 0; i < menu_count; i++) {
         Color color = (i == current_selection) ? YELLOW : WHITE;
-
         // Draw selection indicator
         if (i == current_selection) {
             DrawText(">", left_pad - 20, y, font_size, color);
@@ -1624,10 +1540,8 @@ static void draw_gameplay_settings_menu(gamestate* const g) {
         // Draw menu text
         DrawText(menu_text[i], left_pad, y, font_size, color);
         // Draw current values right-aligned
-
         int value_x = box_x + box_width - 30;
         char value_text[32];
-
         if (i == 0) { // Music Volume
             snprintf(value_text, sizeof(value_text), "%.1f", g->music_volume);
             value_x -= MeasureText(value_text, font_size);
@@ -1689,10 +1603,8 @@ static void draw_title_screen(gamestate* const g, bool show_menu) {
     int measure = MeasureText(title_text_0, font_size);
     int start_measure = MeasureText(start_text, sm_font_size);
     int padding = 10;
-
     int w = DEFAULT_TARGET_WIDTH;
     int h = DEFAULT_TARGET_HEIGHT;
-
     int version_measure = MeasureText(version_text, sm_font_size);
     float x = (w - measure) / 2.0f;
     float y = (h - font_size * 2) / 2.0f;
@@ -1760,10 +1672,8 @@ static void draw_character_creation_screen(gamestate* const g) {
     const char* remaining_text[] = {
         "Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race (unavailable for now)", "Press UP/DOWN to change class (unavailable for now)", "Press ENTER to confirm"};
     int font_size = 20;
-
     int w = DEFAULT_TARGET_WIDTH;
     int h = DEFAULT_TARGET_HEIGHT;
-
     int cx = w / 2;
     int sy = h / 4;
     int x = cx;
@@ -1794,49 +1704,5 @@ static void draw_character_creation_screen(gamestate* const g) {
     for (int i = 0; i < sizeof(remaining_text) / sizeof(remaining_text[0]); i++) {
         DrawText(remaining_text[i], x, y, font_size, WHITE);
         y += font_size + 4;
-    }
-}
-
-void draw_sort_inventory_menu(gamestate* const g) {
-    massert(g, "gamestate is NULL");
-    if (!g->display_sort_inventory_menu) return;
-    // Parameters
-    const char* menu_title = "Sort By";
-    int font_size = 20;
-    int menu_spacing = 15;
-    const char* menu_text[] = {"Name", "Type"};
-    int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
-    int current_selection = g->sort_inventory_menu_selection;
-    massert(current_selection >= 0 && current_selection < menu_count, "current_selection is out of bounds");
-    // Calculate menu size based on longest text
-    int max_text_width = MeasureText(menu_title, font_size);
-    for (int i = 0; i < menu_count; i++) {
-        int width = MeasureText(menu_text[i], font_size);
-        if (width > max_text_width) max_text_width = width;
-    }
-    // Position menu centered within inventory menu
-    float menu_width = max_text_width + 40;
-    float menu_height = (font_size + menu_spacing) * menu_count + 30;
-    int w = DEFAULT_TARGET_WIDTH;
-    int h = DEFAULT_TARGET_HEIGHT;
-    float menu_x = (w - menu_width) / 2;
-    float menu_y = (h - menu_height) / 2;
-    // Draw background box
-    DrawRectangle(menu_x, menu_y, menu_width, menu_height, (Color){0x22, 0x22, 0x22, 0xff});
-    DrawRectangleLinesEx((Rectangle){menu_x, menu_y, menu_width, menu_height}, 2, WHITE);
-    // Draw title
-    float title_x = menu_x + (menu_width - MeasureText(menu_title, font_size)) / 2;
-    DrawText(menu_title, title_x, menu_y + 10, font_size, WHITE);
-    // Draw menu items
-    float item_x = menu_x + 20;
-    float item_y = menu_y + 40;
-    for (int i = 0; i < menu_count; i++) {
-        Color color = (i == current_selection) ? YELLOW : WHITE;
-        // Draw selection indicator
-        if (i == current_selection) {
-            DrawText(">", item_x - 15, item_y, font_size, color);
-        }
-        DrawText(menu_text[i], item_x, item_y, font_size, color);
-        item_y += font_size + menu_spacing;
     }
 }
