@@ -30,7 +30,7 @@ SHELL_FILE = --shell-file minshell.html
 PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img --preload-file keybindings.ini --preload-file ./audio/music --preload-file ./music.txt --preload-file ./monsters.csv
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 
-UNIT_TEST_OBJS = unit_test.o component.o component_table.o keybinding.o gamestate.o dungeon_tile.o dungeon_floor.o dungeon.o 
+UNIT_TEST_OBJS = unit_test.o component.o component_table.o keybinding.o gamestate.o dungeon_tile.o dungeon_floor.o dungeon.o btree_entityid_int.o
 
 # Targets
 all: game test #index.html
@@ -75,3 +75,4 @@ liblogic.so: $(LIBLOGIC_OBJECTS)
 
 clean:
 	rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.data test
+	#rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.datat export_to_code test

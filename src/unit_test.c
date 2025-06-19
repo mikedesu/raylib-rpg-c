@@ -1,6 +1,7 @@
 //#include "test_btree_int.h"
-#include "test_component_table.h"
 //#include "test_dungeon.h"
+#include "test_btree_entityid_int.h"
+#include "test_component_table.h"
 #include "test_dungeon_floor.h"
 #include "test_dungeon_tile.h"
 #include "test_gamestate.h"
@@ -12,6 +13,7 @@ int main(void) {
     test_dungeon_floors();
     //test_dungeon();
     //test_btree_int_tests();
+    test_btree_entityid_int();
     unit_test_summary();
     return 0;
 }
