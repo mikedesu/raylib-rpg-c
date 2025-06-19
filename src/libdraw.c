@@ -39,12 +39,13 @@
 //#define DEFAULT_WIN_HEIGHT 360
 //#define DEFAULT_WIN_WIDTH 1920
 //#define DEFAULT_WIN_HEIGHT 1080
-
 #define DEFAULT_WIN_WIDTH 1280
 #define DEFAULT_WIN_HEIGHT 720
 
-#define DEFAULT_TARGET_WIDTH 800
-#define DEFAULT_TARGET_HEIGHT 480
+//#define DEFAULT_TARGET_WIDTH 800
+//#define DEFAULT_TARGET_HEIGHT 480
+#define DEFAULT_TARGET_WIDTH 640
+#define DEFAULT_TARGET_HEIGHT 360
 
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
@@ -803,16 +804,20 @@ static void draw_message_box(gamestate* g) {
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg);
-    int font_size = 20, measure = MeasureText(tmp, font_size);
+    int font_size = 10;
+    int measure = MeasureText(tmp, font_size);
     int text_width = measure;
     int text_height = font_size;
     int prompt_font_size = 10;
     int prompt_offset = 10;
     int w = DEFAULT_TARGET_WIDTH;
     int h = DEFAULT_TARGET_HEIGHT;
-    const Rectangle box = {(w - text_width) / 2.0 - g->pad, (h - text_height) / 8.0 - g->pad, text_width + g->pad * 2, text_height + g->pad * 2};
+    int x = (w - text_width) / 2.0 - g->pad;
+    //int y = (h - text_height) / 8.0 - g->pad;
+    int y = 42;
+    Rectangle box = {x, y, text_width + g->pad * 2, text_height + g->pad * 2};
     DrawRectangleRec(box, message_bg);
-    DrawRectangleLinesEx(box, 2, WHITE);
+    DrawRectangleLinesEx(box, 1, WHITE);
     DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
     if (g->msg_system.count > 1 && g->msg_system.index < g->msg_system.count - 1) {
         char tmp_prompt[1024] = {0};
@@ -1241,8 +1246,6 @@ void libdraw_init_rest(gamestate* const g) {
     SetTargetFPS(60);
     int w = DEFAULT_WIN_WIDTH;
     int h = DEFAULT_WIN_HEIGHT;
-    int x = w * 10 / 16;
-    int y = h / 3;
 
     int target_w = DEFAULT_TARGET_WIDTH;
     int target_h = DEFAULT_TARGET_HEIGHT;
@@ -1252,12 +1255,24 @@ void libdraw_init_rest(gamestate* const g) {
     g->windowwidth = w;
     g->windowheight = h;
 
+    TextureFilter filter = TEXTURE_FILTER_POINT; // Use trilinear filtering for better quality
+    //TextureFilter filter = TEXTURE_FILTER_BILINEAR; // Use trilinear filtering for better quality
+    //TextureFilter filter = TEXTURE_FILTER_TRILINEAR; // Use trilinear filtering for better quality
+    //TextureFilter filter = TEXTURE_FILTER_ANISOTROPIC_16X;
     target = LoadRenderTexture(target_w, target_h);
+    //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    SetTextureFilter(target.texture, filter); // Use anisotropic filtering for better quality
+
     //target = LoadRenderTexture(w, h);
 
     title_target_texture = LoadRenderTexture(target_w, target_h);
+    SetTextureFilter(title_target_texture.texture, filter);
+
     char_creation_target_texture = LoadRenderTexture(target_w, target_h);
+    SetTextureFilter(char_creation_target_texture.texture, filter);
+
     main_game_target_texture = LoadRenderTexture(target_w, target_h);
+    SetTextureFilter(main_game_target_texture.texture, filter);
 
     target_src = (Rectangle){0, 0, target_w, -target_h};
 
@@ -1269,7 +1284,10 @@ void libdraw_init_rest(gamestate* const g) {
     calc_debugpanel_size(g);
     load_shaders();
 
+    int x = target_w / 2;
+    int y = target_h / 2;
     g->cam2d.offset = (Vector2){x, y};
+    g->cam2d.zoom = 1.0f;
 
     gamestate_set_debug_panel_pos_top_right(g);
     // set the camera target to the center of the dungeon
@@ -1335,10 +1353,12 @@ static void draw_message_history(gamestate* const g) {
     Rectangle box = {.x = x, .y = y, .width = text_size.x + g->pad, .height = text_size.y + g->pad};
     // Draw box (semi-transparent black with white border)
     DrawRectangleRec(box, message_bg);
-    DrawRectangleLinesEx(box, 2, WHITE);
+    DrawRectangleLinesEx(box, 1, WHITE);
     // Draw text (centered in box)
-    float text_x = box.x + (box.width - text_size.x) / 2, text_y = box.y + (box.height - text_size.y) / 2;
-    DrawTextEx(GetFontDefault(), tmp_buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, WHITE);
+    float text_x = box.x + (box.width - text_size.x) / 2;
+    float text_y = box.y + (box.height - text_size.y) / 2;
+    Vector2 text_pos = {text_x, text_y};
+    DrawTextEx(GetFontDefault(), tmp_buffer, text_pos, font_size, g->line_spacing, WHITE);
 }
 
 static void draw_inventory_menu(gamestate* const g) {
