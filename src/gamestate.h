@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-#define GAME_VERSION "v0.0.3.15-20250618"
+#define GAME_VERSION "v0.0.3.16-20250619"
 #define DEFAULT_MUSIC_VOLUME 0.0f
 #define DEFAULT_MSG_HIST_BGCOLOR ((Color){0x33, 0x33, 0x33, 255})
 #define GAMESTATE_SIZEOFTIMEBUF 64
