@@ -727,15 +727,15 @@ static void draw_debug_panel(gamestate* const g) {
     massert(g, "gamestate is NULL");
     Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f), fg = WHITE;
     // temporary hook for positioning the debug panel
-    int w = DEFAULT_TARGET_WIDTH;
-    int h = DEFAULT_TARGET_HEIGHT;
+    //int w = DEFAULT_TARGET_WIDTH;
+    //int h = DEFAULT_TARGET_HEIGHT;
     int x = 0;
     int y = 0;
     int fontsize = 10;
     int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
     int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
-    int x1 = g->debugpanel.x + g->debugpanel.pad_left;
-    int y1 = g->debugpanel.y + g->debugpanel.pad_top;
+    //int x1 = g->debugpanel.x + g->debugpanel.pad_left;
+    //int y1 = g->debugpanel.y + g->debugpanel.pad_top;
     //DrawRectangle(g->debugpanel.x, g->debugpanel.y, w0, h0, bg);
     DrawRectangle(x, y, w0, h0, bg);
     //DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
@@ -806,8 +806,8 @@ static void libdraw_drawframe_2d_from_texture(gamestate* const g) {
 
 static void draw_message_box(gamestate* g) {
     if (!g->msg_system.is_active || g->msg_system.count == 0) return;
-    const char* prompt = "[A] Next";
-    const char* msg = g->msg_system.messages[g->msg_system.index];
+    //const char* prompt = "[A] Next";
+    char* msg = g->msg_system.messages[g->msg_system.index];
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg);
@@ -815,10 +815,10 @@ static void draw_message_box(gamestate* g) {
     int measure = MeasureText(tmp, font_size);
     int text_width = measure;
     int text_height = font_size;
-    int prompt_font_size = 10;
-    int prompt_offset = 10;
+    //int prompt_font_size = 10;
+    //int prompt_offset = 10;
     int w = DEFAULT_TARGET_WIDTH;
-    int h = DEFAULT_TARGET_HEIGHT;
+    //int h = DEFAULT_TARGET_HEIGHT;
     int x = (w - text_width) / 2.0 - g->pad;
     //int y = (h - text_height) / 8.0 - g->pad;
     int y = 42;

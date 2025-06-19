@@ -74,4 +74,4 @@ liblogic.so: $(LIBLOGIC_OBJECTS)
 	rm -rfv liblogic.so.lockfile
 
 clean:
-	rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.data export_to_code
+	rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.data test

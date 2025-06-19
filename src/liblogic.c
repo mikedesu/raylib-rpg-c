@@ -1,6 +1,3 @@
-//#include "component.h"
-//#include "elemental.h"
-//#include "location.h"
 #include "bonus_table.h"
 #include "controlmode.h"
 #include "dungeon.h"
@@ -122,6 +119,15 @@ static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid tar
     massert(attacker_type == ENTITY_NPC || attacker_type == ENTITY_PLAYER, "attacker type is not NPC or Player");
     entitytype_t target_type = g_get_type(g, target_id);
     massert(target_type == ENTITY_NPC || target_type == ENTITY_PLAYER, "target type is not NPC or Player");
+    if (target_type != ENTITY_NPC && target_type != ENTITY_PLAYER) {
+        merror("Target type is not NPC or Player");
+        return 0; // no reward for non-NPC/Player targets
+    }
+    if (attacker_type == ENTITY_PLAYER && target_type == ENTITY_PLAYER) {
+        merror("Cannot calculate reward xp for player vs player combat");
+        return 0; // no reward for player vs player combat
+    }
+
     // get the challenge rating
     int challenge_rating = calc_challenge_rating(g, target_id);
     massert(challenge_rating >= 0, "challenge rating is negative");
@@ -145,7 +151,11 @@ static int calc_challenge_rating(gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     // get the entity type
     entitytype_t type = g_get_type(g, id);
-    massert(type == ENTITY_NPC, "entity type is not NPC");
+    massert(type == ENTITY_NPC || type == ENTITY_PLAYER, "entity type is not NPC or Player");
+    if (type != ENTITY_NPC || type != ENTITY_PLAYER) {
+        merror("Entity type is not NPC or Player");
+        return 0; // no challenge rating for non-NPC entities
+    }
     // get the current level
     int lvl = g_get_stat(g, id, STATS_LEVEL);
     massert(lvl >= 0, "level is negative");
@@ -231,19 +241,19 @@ static void add_message(gamestate* g, const char* fmt, ...) {
 }
 
 //static void update_equipped_shield_dir(gamestate* g, entity* e) {
-static void update_equipped_shield_dir(gamestate* g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entity id is invalid");
-    //massert(e, "entity is NULL");
-    //if (e->shield != ENTITYID_INVALID) {
-    //    if (shield) {
-    //shield->direction = e->direction;
-    //        g_update_direction(g, shield->id, g_get_direction(g, e->id));
-    //shield->do_update = true;
-    //        g_set_update(g, shield->id, true);
-    //    }
-    //}
-}
+//static void update_equipped_shield_dir(gamestate* g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entity id is invalid");
+//massert(e, "entity is NULL");
+//if (e->shield != ENTITYID_INVALID) {
+//    if (shield) {
+//shield->direction = e->direction;
+//        g_update_direction(g, shield->id, g_get_direction(g, e->id));
+//shield->do_update = true;
+//        g_set_update(g, shield->id, true);
+//    }
+//}
+//}
 
 static inline int tile_npc_living_count(const gamestate* const g, int x, int y, int z) {
     // Validate inputs
@@ -962,14 +972,9 @@ static void init_player(gamestate* const g) {
     // setting it up so we can return a vec3 from a function
     // that can scan for an appropriate starting location
     vec3 loc = df_get_upstairs(g->d->floors[g->d->current_floor]);
-    //minfo("loc: %d, %d, %d", loc.x, loc.y, loc.z);
-    int id = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
-
-    massert(id != ENTITYID_INVALID, "failed to init hero");
-    //minfo("hero id: %d", id);
-    //e_set_maxhp(hero, 10);
-    //e_set_hp(hero, 10);
-    g->entity_turn = g->hero_id;
+    g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
+    massert(g->entity_turn != ENTITYID_INVALID, "failed to init hero");
+    massert(g->hero_id == g->entity_turn, "hero id mismatch");
     msuccess("hero id %d", g->hero_id);
 }
 
@@ -998,7 +1003,6 @@ static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* cou
 static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(count, "count is NULL");
-    //int c = df_count_empty_non_walls_in_area(df, x0, y0, w, h);
     int c = df_count_non_walls_in_area(df, x0, y0, w, h);
     vec3* locs = malloc(sizeof(vec3) * c);
     massert(locs, "malloc failed");
@@ -1011,12 +1015,14 @@ static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* con
         for (int x = 0; x < w && x + x0 < df->width; x++) {
             int newx = x + x0;
             int newy = y + y0;
-            //tile_t* t = df_tile_at(df, (vec3){newx, newy, -1});
             tile_t* t = df_tile_at(df, (vec3){newx, newy, df->floor});
             tiletype_t type = t->type;
-            //if (tile_entity_count(t) == 0 && tile_is_walkable(type)) locs[i++] = (vec3){newx, newy};
-            if (tile_live_npc_count(g, t) == 0 && !tile_has_player(g, t) && tile_is_walkable(type)) locs[i++] = (vec3){newx, newy, df->floor};
-            if (i >= c) break;
+            if (tile_live_npc_count(g, t) == 0 && !tile_has_player(g, t) && tile_is_walkable(type)) {
+                locs[i++] = (vec3){newx, newy, df->floor};
+            }
+            if (i >= c) {
+                break;
+            }
         }
     }
     // its possible there are no available locations
@@ -1370,7 +1376,7 @@ static inline void change_player_dir(gamestate* const g, direction_t dir) {
     if (g_is_dead(g, g->hero_id)) return;
     g_update_direction(g, g->hero_id, dir);
     g_set_update(g, g->hero_id, true);
-    update_equipped_shield_dir(g, g->hero_id);
+    //update_equipped_shield_dir(g, g->hero_id);
 }
 
 static bool try_entity_pickup(gamestate* const g, entityid id) {
@@ -2157,19 +2163,21 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         for (int i = 1; i < floor; i++) {
             handle_level_up(g, id);
         }
-        int new_level = g_get_stat(g, id, STATS_LEVEL);
-        massert(new_level == floor, "New level %d does not match floor %d", new_level, floor);
+        //int new_level = g_get_stat(g, id, STATS_LEVEL);
+        //massert(g_get_stat(g, id, STATS_LEVEL) == floor, "New level %d does not match floor %d", new_level, floor);
         msuccess("Spawned entity of Level %d with %d HP at %d, %d, %d", g_get_stat(g, id, STATS_LEVEL), max_hp, loc.x, loc.y, loc.z);
         // update vision distance
         // this will be appropriately set on a per-npc basis but for now...
         // hard code 5
-        int vision_distance0 = g_get_vision_distance(g, id);
-        g_set_vision_distance(g, id, vision_distance0);
+        //int vision_distance0 = g_get_vision_distance(g, id);
+        g_set_vision_distance(g, id, 5);
         // verify vision distance
-        int vision_distance = g_get_vision_distance(g, id);
-        massert(vision_distance == vision_distance0, "Vision distance %d does not match expected value 5", vision_distance);
-        int default_light_radius = 3;
-        g_set_light_radius(g, id, default_light_radius);
+        //int vision_distance = g_get_vision_distance(g, id);
+        //massert(g_get_vision_distance(g, id) == 5, "Vision distance %d does not match expected value 5", vision_distance);
+        //int default_light_radius = 3;
+        g_set_light_radius(g, id, 3);
+        // verify light radius
+        massert(g_get_light_radius(g, id) == 3, "Light radius %d does not match expected value 3", g_get_light_radius(g, id));
         success = true;
     }
     return success;
@@ -2218,8 +2226,8 @@ static void handle_level_up(gamestate* const g, entityid id) {
     // Level up the entity
     level++;
     g_set_stat(g, id, STATS_LEVEL, level);
-    int test_level = g_get_stat(g, id, STATS_LEVEL);
-    massert(test_level == level, "Failed to set level");
+    //int test_level = g_get_stat(g, id, STATS_LEVEL);
+    massert(g_get_stat(g, id, STATS_LEVEL) == level, "Failed to set level");
     // Increase attack bonus
     int old_attack_bonus = g_get_stat(g, id, STATS_ATTACK_BONUS);
     int new_attack_bonus = old_attack_bonus + 1; // Example: increase by 1
