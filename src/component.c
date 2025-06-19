@@ -25,7 +25,8 @@ void init_int_component(int_component* comp, entityid id, int data) {
     if (!comp) return;
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (id == ENTITYID_INVALID) return;
-    comp->id = id, comp->data = data;
+    comp->id = id;
+    comp->data = data;
 }
 
 void init_vec3_component(vec3_component* comp, entityid id, vec3 v) {
@@ -33,7 +34,8 @@ void init_vec3_component(vec3_component* comp, entityid id, vec3 v) {
     if (!comp) return;
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (id == ENTITYID_INVALID) return;
-    comp->id = id, comp->data = v;
+    comp->id = id;
+    comp->data = v;
 }
 
 void init_inventory_component(inventory_component* comp, entityid id) {
@@ -41,7 +43,8 @@ void init_inventory_component(inventory_component* comp, entityid id) {
     if (!comp) return;
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (id == ENTITYID_INVALID) return;
-    comp->id = id, comp->count = 0;
+    comp->id = id;
+    comp->count = 0;
     memset(comp->inventory, ENTITYID_INVALID, sizeof(comp->inventory));
 }
 
@@ -50,7 +53,9 @@ void init_target_path_component(target_path_component* comp, entityid id, vec3* 
     if (!comp) return;
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (id == ENTITYID_INVALID) return;
-    comp->id = id, comp->target_path = target_path, comp->target_path_length = target_path_length;
+    comp->id = id;
+    comp->target_path = target_path;
+    comp->target_path_length = target_path_length;
 }
 
 void init_equipment_component(equipment_component* comp, entityid id) {
@@ -69,4 +74,15 @@ void init_stats_component(stats_component* comp, entityid id) {
     if (id == ENTITYID_INVALID) return;
     comp->id = id;
     memset(comp->stats, 0, sizeof(comp->stats));
+}
+
+void init_vec3_list_component(vec3_list_component* comp, entityid id, vec3* list, int list_length) {
+    massert(comp != NULL, "comp is NULL");
+    if (!comp) return;
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) return;
+    comp->id = id;
+    comp->list = list;
+    comp->count = list_length;
+    comp->capacity = list_length; // assuming the list is already allocated with the correct capacity
 }

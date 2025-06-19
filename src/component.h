@@ -23,6 +23,7 @@
 #include "target_path_component.h"
 #include "update_component.h"
 #include "vec3_component.h"
+#include "vec3_list_component.h"
 #include "weapon.h"
 #include "zapping_component.h"
 #include <raylib.h>
@@ -108,6 +109,8 @@ static inline const char* component2str(component c) {
     case C_RINGTYPE: return "C_RINGTYPE";
     //case C_SPELL_EFFECT: return "C_SPELL_EFFECT";
     case C_BASE_ATTACK_DAMAGE: return "C_BASE_ATTACK_DAMAGE";
+    case C_EXPLORED_LIST: return "C_EXPLORED_LIST";
+    case C_VISIBLE_LIST: return "C_VISIBLE_LIST";
     case C_COUNT: return "C_COUNT";
     default: break;
     }
@@ -122,6 +125,8 @@ void init_int_component(int_component* comp, entityid id, int data);
 
 // loc components: 3 integer
 void init_vec3_component(vec3_component* comp, entityid id, vec3 v);
+// vec3 list components
+void init_vec3_list_component(vec3_list_component* comp, entityid id, vec3* list, int list_length);
 
 // Rectangle component
 void init_rect_component(rect_component* comp, entityid id, Rectangle rect);

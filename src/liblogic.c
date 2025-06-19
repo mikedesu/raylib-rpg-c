@@ -901,7 +901,6 @@ static void update_player_tiles_explored(gamestate* const g) {
     int light_radius = g_get_light_radius(g, hero_id);
     int light_radius_bonus = g_get_entity_total_light_radius_bonus(g, hero_id);
     light_radius += light_radius_bonus;
-
     minfo("hero light radius: %d", light_radius);
     massert(light_radius > 0, "light radius is negative");
     // Reveal tiles in a diamond pattern

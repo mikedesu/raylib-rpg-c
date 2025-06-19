@@ -11,6 +11,7 @@
 #include "entity_actions.h"
 #include "entityid.h"
 #include "fadestate.h"
+#include "gamestate_explored_list.h"
 #include "gamestate_flag.h"
 #include "gamestate_light_radius.h"
 #include "inventory_sort.h"
@@ -47,18 +48,49 @@ typedef struct {
 
 typedef struct gamestate {
     controlmode_t controlmode;
-    entityid hero_id, new_entityid_begin, new_entityid_end, next_entityid;
-    time_t timebegan, currenttime;
-    struct tm *timebegantm, *currenttimetm;
-    char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF], currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
-    bool debugpanelon, gridon, cam_lockon, player_input_received, is_locked, processing_actions, is3d, gameover, player_changing_direction, test_guard, display_inventory_menu,
-        display_quit_menu, do_quit, dirty_entities, display_help_menu, cam_changed, frame_dirty;
-    bool display_gameplay_settings_menu, display_sort_inventory_menu;
+    entityid hero_id;
+    entityid new_entityid_begin;
+    entityid new_entityid_end;
+    entityid next_entityid;
+    time_t timebegan;
+    time_t currenttime;
+    struct tm* timebegantm;
+    struct tm* currenttimetm;
+    char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF];
+    char currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
+    bool debugpanelon;
+    bool gridon;
+    bool cam_lockon;
+    bool player_input_received;
+    bool is_locked;
+    bool processing_actions;
+    bool is3d;
+    bool gameover;
+    bool player_changing_direction;
+    bool test_guard;
+    bool display_inventory_menu;
+    bool display_quit_menu;
+    bool do_quit;
+    bool dirty_entities;
+    bool display_help_menu;
+    bool cam_changed;
+    bool frame_dirty;
+    bool display_gameplay_settings_menu;
+    bool display_sort_inventory_menu;
     bool music_volume_changed;
 
     //char help_menu_text[2048];
 
-    int framecount, fadealpha, camera_mode, targetwidth, targetheight, windowwidth, windowheight, lock, turn_count, frame_updates;
+    int framecount;
+    int fadealpha;
+    int camera_mode;
+    int targetwidth;
+    int targetheight;
+    int windowwidth;
+    int windowheight;
+    int lock;
+    int turn_count;
+    int frame_updates;
 
     int sort_inventory_menu_selection;
     int sort_inventory_menu_selection_max;
@@ -66,38 +98,74 @@ typedef struct gamestate {
     entityid* hero_inventory_sorted_by_name;
     entityid* hero_inventory_sorted_by_type;
 
-    int font_size, pad, inventory_menu_selection;
+    int font_size;
+    int pad;
+    int inventory_menu_selection;
     int gameplay_settings_menu_selection;
-    int name_list_count, name_list_capacity;
-    int type_list_count, type_list_capacity;
-    int race_list_count, race_list_capacity;
-    int direction_list_count, direction_list_capacity;
-    int loc_list_count, loc_list_capacity;
-    int sprite_move_list_count, sprite_move_list_capacity;
-    int dead_list_count, dead_list_capacity;
-    int update_list_count, update_list_capacity;
-    int attacking_list_count, attacking_list_capacity;
-    int blocking_list_count, blocking_list_capacity;
-    int block_success_list_count, block_success_list_capacity;
-    int damaged_list_count, damaged_list_capacity;
-    int inventory_list_count, inventory_list_capacity;
-    int target_list_count, target_list_capacity;
-    int target_path_list_count, target_path_list_capacity;
-    int default_action_list_count, default_action_list_capacity;
-    int equipment_list_count, equipment_list_capacity;
-    int stats_list_count, stats_list_capacity;
-    int itemtype_list_count, itemtype_list_capacity;
-    int weapontype_list_count, weapontype_list_capacity;
-    int shieldtype_list_count, shieldtype_list_capacity;
-    int potion_type_list_count, potion_type_list_capacity;
-    int damage_list_count, damage_list_capacity;
-    int ac_list_count, ac_list_capacity;
-    int zapping_list_count, zapping_list_capacity;
-    int base_attack_damage_list_count, base_attack_damage_list_capacity;
-    int vision_distance_list_count, vision_distance_list_capacity;
-    int light_radius_list_count, light_radius_list_capacity;
-    int light_radius_bonus_list_count, light_radius_bonus_list_capacity;
-    int ringtype_list_count, ringtype_list_capacity;
+    int name_list_count;
+    int name_list_capacity;
+    int type_list_count;
+    int type_list_capacity;
+    int race_list_count;
+    int race_list_capacity;
+    int direction_list_count;
+    int direction_list_capacity;
+    int loc_list_count;
+    int loc_list_capacity;
+    int sprite_move_list_count;
+    int sprite_move_list_capacity;
+    int dead_list_count;
+    int dead_list_capacity;
+    int update_list_count;
+    int update_list_capacity;
+    int attacking_list_count;
+    int attacking_list_capacity;
+    int blocking_list_count;
+    int blocking_list_capacity;
+    int block_success_list_count;
+    int block_success_list_capacity;
+    int damaged_list_count;
+    int damaged_list_capacity;
+    int inventory_list_count;
+    int inventory_list_capacity;
+    int target_list_count;
+    int target_list_capacity;
+    int target_path_list_count;
+    int target_path_list_capacity;
+    int default_action_list_count;
+    int default_action_list_capacity;
+    int equipment_list_count;
+    int equipment_list_capacity;
+    int stats_list_count;
+    int stats_list_capacity;
+    int itemtype_list_count;
+    int itemtype_list_capacity;
+    int weapontype_list_count;
+    int weapontype_list_capacity;
+    int shieldtype_list_count;
+    int shieldtype_list_capacity;
+    int potion_type_list_count;
+    int potion_type_list_capacity;
+    int damage_list_count;
+    int damage_list_capacity;
+    int ac_list_count;
+    int ac_list_capacity;
+    int zapping_list_count;
+    int zapping_list_capacity;
+    int base_attack_damage_list_count;
+    int base_attack_damage_list_capacity;
+    int vision_distance_list_count;
+    int vision_distance_list_capacity;
+    int light_radius_list_count;
+    int light_radius_list_capacity;
+    int light_radius_bonus_list_count;
+    int light_radius_bonus_list_capacity;
+    int ringtype_list_count;
+    int ringtype_list_capacity;
+    int explored_list_count;
+    int explored_list_capacity;
+    int visible_list_count;
+    int visible_list_capacity;
 
     //int spell_effect_list_count, spell_effect_list_capacity;
 
@@ -166,6 +234,9 @@ typedef struct gamestate {
     target_path_component* target_path_list;
     equipment_component* equipment_list;
     stats_component* stats_list;
+
+    vec3_list_component* explored_list; // List of explored tiles
+    vec3_list_component* visible_list; // List of visible tiles
 
     int current_music_index;
     int total_music_paths;
@@ -282,19 +353,14 @@ bool g_add_default_action(gamestate* const g, entityid id, int action);
 bool g_set_default_action(gamestate* const g, entityid id, int action);
 entity_action_t g_get_default_action(const gamestate* const g, entityid id);
 
-//entityid* g_sort_inventory(gamestate* const g, entityid* inventory, int inv_count, inventory_sort sort_type);
 entityid* g_sort_inventory(gamestate* const g, entityid* inventory, size_t inv_count, inventory_sort sort_type);
-//entityid* g_sort_inventory(gamestate* const g, entityid* inventory, int inv_count, inventory_sort sort_type);
 bool g_has_inventory(const gamestate* const g, entityid id);
 bool g_add_inventory(gamestate* const g, entityid id);
 bool g_add_to_inventory(gamestate* const g, entityid id, entityid itemid);
 bool g_remove_from_inventory(gamestate* const g, entityid id, entityid itemid);
-//entityid* g_get_inventory(const gamestate* const g, entityid id, int* count);
 entityid* g_get_inventory(const gamestate* const g, entityid id, size_t* count);
 size_t g_get_inventory_count(const gamestate* const g, entityid id);
 bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid itemid);
-//bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory);
-//bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory, int new_inventory_count);
 bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory, size_t new_inventory_count);
 
 bool g_has_target(const gamestate* const g, entityid id);
@@ -380,19 +446,6 @@ bool g_add_vision_distance(gamestate* const g, entityid id, int distance);
 bool g_has_vision_distance(const gamestate* const g, entityid id);
 bool g_set_vision_distance(gamestate* const g, entityid id, int distance);
 int g_get_vision_distance(const gamestate* const g, entityid id);
-
-//bool g_add_light_radius(gamestate* const g, entityid id, int radius);
-//bool g_has_light_radius(const gamestate* const g, entityid id);
-//bool g_set_light_radius(gamestate* const g, entityid id, int radius);
-//int g_get_light_radius(const gamestate* const g, entityid id);
-
-/*
-bool g_add_light_radius_bonus(gamestate* const g, entityid id, int radius);
-bool g_has_light_radius_bonus(const gamestate* const g, entityid id);
-bool g_set_light_radius_bonus(gamestate* const g, entityid id, int radius);
-int g_get_light_radius_bonus(const gamestate* const g, entityid id);
-int g_get_entity_total_light_radius_bonus(const gamestate* const g, entityid id);
-*/
 
 bool g_add_ringtype(gamestate* const g, entityid id, int type);
 bool g_has_ringtype(const gamestate* const g, entityid id);

@@ -60,9 +60,9 @@ gamestate* gamestateinitptr() {
     g->dirty_entities = false;
     g->display_sort_inventory_menu = false;
     g->music_volume_changed = false;
-    g->ringtype_list_count = 0;
-    g->light_radius_bonus_list_count = 0;
+
     g->sort_inventory_menu_selection = 0;
+
     g->sort_inventory_menu_selection_max = 2;
     g->hero_inventory_sorted_by_name = NULL;
     g->hero_inventory_sorted_by_type = NULL;
@@ -131,6 +131,11 @@ gamestate* gamestateinitptr() {
     g->base_attack_damage_list_count = 0;
     g->vision_distance_list_count = 0;
     g->light_radius_list_count = 0;
+    g->light_radius_bonus_list_count = 0;
+    g->ringtype_list_count = 0;
+    g->explored_list_count = 0;
+    g->visible_list_count = 0;
+
     g->name_list_capacity = n;
     g->type_list_capacity = n;
     g->race_list_capacity = n;
@@ -161,6 +166,9 @@ gamestate* gamestateinitptr() {
     g->light_radius_list_capacity = n;
     g->ringtype_list_capacity = n;
     g->light_radius_bonus_list_capacity = n;
+    g->explored_list_capacity = n;
+    g->visible_list_capacity = n;
+
     g->name_list = (name_component*)malloc(sizeof(name_component) * n);
     g->type_list = (int_component*)malloc(sizeof(int_component) * n);
     g->race_list = (int_component*)malloc(sizeof(int_component) * n);
@@ -191,6 +199,8 @@ gamestate* gamestateinitptr() {
     g->light_radius_list = (int_component*)malloc(sizeof(int_component) * n);
     g->ringtype_list = (int_component*)malloc(sizeof(int_component) * n);
     g->light_radius_bonus_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->explored_list = (vec3_list_component*)malloc(sizeof(vec3_list_component) * n);
+    g->visible_list = (vec3_list_component*)malloc(sizeof(vec3_list_component) * n);
 
     massert(g->name_list, "g->name_list is NULL");
     massert(g->type_list, "g->type_list is NULL");
@@ -222,6 +232,8 @@ gamestate* gamestateinitptr() {
     massert(g->light_radius_list, "g->light_radius_list is NULL");
     massert(g->light_radius_bonus_list, "g->light_radius_bonus_list is NULL");
     massert(g->ringtype_list, "g->ringtype_list is NULL");
+    massert(g->explored_list, "g->explored_list is NULL");
+    massert(g->visible_list, "g->visible_list is NULL");
 
     g->d = NULL;
     g->monster_defs = NULL;
@@ -404,6 +416,8 @@ void gamestatefree(gamestate* g) {
     free(g->light_radius_list);
     free(g->ringtype_list);
     free(g->light_radius_bonus_list);
+    free(g->explored_list);
+    free(g->visible_list);
     if (g->monster_defs) {
         free(g->monster_defs);
         g->monster_defs = NULL;
@@ -530,8 +544,10 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     case C_LIGHT_RADIUS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     case C_LIGHT_RADIUS_BONUS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
     case C_VISION_DISTANCE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_RINGTYPE:
-        init_int_component((int_component*)c_ptr, id, *(int*)data);
+    case C_RINGTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
+    case C_EXPLORED_LIST: init_vec3_list_component((vec3_list_component*)c_ptr, id, NULL, 0); break;
+    case C_VISIBLE_LIST:
+        init_vec3_list_component((vec3_list_component*)c_ptr, id, NULL, 0);
         break;
         //case C_SPELL_EFFECT: init_spell_effect_component((spell_effect_component*)c_ptr, id, *(spell_effect*)data); break;
     default: merror("Unsupported component type: %s", component2str(comp)); return false;
