@@ -12,6 +12,7 @@
 #include "entityid.h"
 #include "fadestate.h"
 #include "gamestate_flag.h"
+#include "gamestate_light_radius.h"
 #include "inventory_sort.h"
 #include "keybinding.h"
 #include "monster_def.h"
@@ -21,7 +22,6 @@
 #include <stdbool.h>
 #include <time.h>
 
-#define GAME_VERSION "v0.0.3.16-20250619"
 #define DEFAULT_MUSIC_VOLUME 0.0f
 #define DEFAULT_MSG_HIST_BGCOLOR ((Color){0x33, 0x33, 0x33, 255})
 #define GAMESTATE_SIZEOFTIMEBUF 64
@@ -381,19 +381,20 @@ bool g_has_vision_distance(const gamestate* const g, entityid id);
 bool g_set_vision_distance(gamestate* const g, entityid id, int distance);
 int g_get_vision_distance(const gamestate* const g, entityid id);
 
-bool g_add_light_radius(gamestate* const g, entityid id, int radius);
-bool g_has_light_radius(const gamestate* const g, entityid id);
-bool g_set_light_radius(gamestate* const g, entityid id, int radius);
-int g_get_light_radius(const gamestate* const g, entityid id);
+//bool g_add_light_radius(gamestate* const g, entityid id, int radius);
+//bool g_has_light_radius(const gamestate* const g, entityid id);
+//bool g_set_light_radius(gamestate* const g, entityid id, int radius);
+//int g_get_light_radius(const gamestate* const g, entityid id);
 
+/*
 bool g_add_light_radius_bonus(gamestate* const g, entityid id, int radius);
 bool g_has_light_radius_bonus(const gamestate* const g, entityid id);
 bool g_set_light_radius_bonus(gamestate* const g, entityid id, int radius);
 int g_get_light_radius_bonus(const gamestate* const g, entityid id);
+int g_get_entity_total_light_radius_bonus(const gamestate* const g, entityid id);
+*/
 
 bool g_add_ringtype(gamestate* const g, entityid id, int type);
 bool g_has_ringtype(const gamestate* const g, entityid id);
 bool g_set_ringtype(gamestate* const g, entityid id, int type);
 ringtype g_get_ringtype(const gamestate* const g, entityid id);
-
-int g_get_entity_total_light_radius_bonus(const gamestate* const g, entityid id);

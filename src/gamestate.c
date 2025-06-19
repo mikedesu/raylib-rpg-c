@@ -5,6 +5,7 @@
 #include "gamestate_flag.h"
 #include "inventory_sort.h"
 #include "item.h"
+#include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
 #include <raylib.h>
@@ -30,9 +31,11 @@ gamestate* gamestateinitptr() {
     massert(g, "g is NULL");
     g->version = GAME_VERSION;
     g->cam_lockon = g->frame_dirty = true;
-    g->debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X, g->debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
+    g->debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
+    g->debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
     g->debugpanel.w = g->debugpanel.h = 200;
-    g->debugpanel.fg_color = RAYWHITE, g->debugpanel.bg_color = RED;
+    g->debugpanel.fg_color = RAYWHITE;
+    g->debugpanel.bg_color = RED;
     g->debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
     g->targetwidth = g->targetheight = g->windowwidth = g->windowheight = g->hero_id = g->entity_turn = g->new_entityid_begin = g->new_entityid_end = -1;
     g->timebegan = g->currenttime = time(NULL);
@@ -1813,6 +1816,7 @@ int g_get_vision_distance(const gamestate* const g, entityid id) {
     return 0;
 }
 
+/*
 bool g_add_light_radius(gamestate* const g, entityid id, int radius) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
@@ -1849,6 +1853,7 @@ int g_get_light_radius(const gamestate* const g, entityid id) {
     }
     return 0;
 }
+*/
 
 bool g_add_ringtype(gamestate* const g, entityid id, int type) {
     massert(g, "g is NULL");
@@ -1892,6 +1897,7 @@ ringtype g_get_ringtype(const gamestate* const g, entityid id) {
     return RING_NONE;
 }
 
+/*
 bool g_add_light_radius_bonus(gamestate* const g, entityid id, int radius) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
@@ -1930,15 +1936,15 @@ int g_get_light_radius_bonus(const gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->light_radius_bonus_list == NULL) return 0;
     for (int i = 0; i < g->light_radius_bonus_list_count; i++) {
-        if (g->light_radius_bonus_list[i].id == id) return g->light_radius_bonus_list[i].data;
+        if (g->light_radius_bonus_list[i].id == id) {
+            return g->light_radius_bonus_list[i].data;
+        }
     }
     return 0;
 }
 
-//int g_get_entity_total_light_radius_bonus(gamestate* const g, entityid id) {
 int g_get_entity_total_light_radius_bonus(const gamestate* const g, entityid id) {
     int total_light_radius_bonus = 0;
-    // get the light radius bonus from the equipment
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     // check each equipment slot
@@ -1946,10 +1952,10 @@ int g_get_entity_total_light_radius_bonus(const gamestate* const g, entityid id)
         entityid equip_id = g_get_equipment(g, id, i);
         if (equip_id == ENTITYID_INVALID) continue;
         if (!g_has_light_radius_bonus(g, equip_id)) continue;
-        int light_radius_bonus = g_get_light_radius_bonus(g, equip_id);
-        total_light_radius_bonus += light_radius_bonus;
+        total_light_radius_bonus += g_get_light_radius_bonus(g, equip_id);
     }
     // only return the total light radius bonus
     // it is fine if it is negative that might be fun for cursed items
     return total_light_radius_bonus;
 }
+*/

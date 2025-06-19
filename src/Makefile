@@ -13,16 +13,18 @@ CFLAGS ?= # Allow override
 
 #LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  em.o dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o entity.o component_table.o component.o
 #LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o entity.o component_table.o component.o
-LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o component_table.o component.o libdraw_sort_inventory_menu.o
+#LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o component_table.o component.o libdraw_sort_inventory_menu.o
+LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  dungeon.o gamestate.o gamestate_light_radius.o dungeon_floor.o dungeon_tile.o component_table.o component.o libdraw_sort_inventory_menu.o
 #LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o em.o entity.o dungeon.o keybinding.o path_node.o component_table.o component.o
 #LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o entity.o dungeon.o keybinding.o path_node.o component_table.o component.o
-LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o dungeon.o keybinding.o path_node.o component_table.o component.o 
+#LIBLOGIC_OBJECTS = liblogic.o gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o dungeon.o keybinding.o path_node.o component_table.o component.o 
+LIBLOGIC_OBJECTS = liblogic.o gamestate.o gamestate_light_radius.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o dungeon.o keybinding.o path_node.o component_table.o component.o 
 
  
 
 # Web build setup
 WEB_CC = emcc
-WEB_SOURCES = $(MAIN_C) gameloader_web.c libdraw.c liblogic.c gamestate.c hashtable_entityid_spritegroup.c  specifier.c dungeon_floor.c dungeon_tile.c sprite.c spritegroup.c race.c dungeon.c keybinding.c path_node.c component_table.c component.c
+WEB_SOURCES = $(MAIN_C) gameloader_web.c libdraw.c liblogic.c gamestate.c gamestate_light_radius.c hashtable_entityid_spritegroup.c  specifier.c dungeon_floor.c dungeon_tile.c sprite.c spritegroup.c race.c dungeon.c keybinding.c path_node.c component_table.c component.c
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
 
@@ -43,8 +45,8 @@ UNIT_TEST_OBJS = unit_test.o component.o component_table.o keybinding.o gamestat
 all: game test #index.html
 
 # Desktop build
-game: main.o gameloader.o gamestate.o keybinding.o libdraw.so liblogic.so component_table.o component.o
-	$(CC) -o $@ main.o gameloader.o gamestate.o component_table.o component.o keybinding.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
+game: main.o gameloader.o gamestate.o gamestate_light_radius.o keybinding.o libdraw.so liblogic.so component_table.o component.o
+	$(CC) -o $@ main.o gameloader.o gamestate.o gamestate_light_radius.o component_table.o component.o keybinding.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
 	./log_build_stats.sh
 
 
