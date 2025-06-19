@@ -159,35 +159,29 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     massert(tile, "tile is NULL");
     if (tile->type == TILE_NONE) return true;
     if (!tile->visible) return true;
-
     // Get hero's vision distance and location
     //int vision_distance = g_get_vision_distance(g, g->hero_id);
     // its not actually the vision distance we need,
     // its the total light radius
     int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
     vec3 hero_loc = g_get_location(g, g->hero_id);
-
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
     int distance = abs(x - hero_loc.x) + abs(y - hero_loc.y);
-
     // Get tile texture
     int txkey = get_txkey_for_tiletype(tile->type);
     if (txkey < 0) return false;
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0) return false;
-
     // Calculate drawing position
     int offset_x = -12, offset_y = -12;
     int px = x * DEFAULT_TILE_SIZE + offset_x;
     int py = y * DEFAULT_TILE_SIZE + offset_y;
     const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
     const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
-
     // Draw tile with fade if beyond vision distance
     //Color draw_color = distance > vision_distance ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
     Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
                            WHITE; // Normal for in-range tiles
-
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
     if (tile->has_pressure_plate) {
         int txkey2 = tile->pressure_plate_up_tx_key;
@@ -271,7 +265,9 @@ static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegro
     spritegroup_t* s_sg = hashtable_entityid_spritegroup_get(spritegroups, shield);
     if (!s_sg) return NULL;
     sprite* retval = NULL;
-    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) retval = spritegroup_get(s_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
+    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) {
+        retval = spritegroup_get(s_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
+    }
     return retval;
 }
 
@@ -279,12 +275,11 @@ static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, 
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
-    entitytype_t type = g_get_type(g, id);
-    if (type != ENTITY_PLAYER && type != ENTITY_NPC) return;
-    sprite* shadow = sg_get_current_plus_one(sg);
-    if (shadow) {
-        Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-        DrawTexturePro(*shadow->texture, shadow->src, dest, (Vector2){0, 0}, 0, WHITE);
+    entitytype_t t = g_get_type(g, id);
+    if (t != ENTITY_PLAYER && t != ENTITY_NPC) return;
+    sprite* sh = sg_get_current_plus_one(sg);
+    if (sh) {
+        DrawTexturePro(*sh->texture, sh->src, (Rectangle){sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height}, (Vector2){0, 0}, 0, WHITE);
     }
 }
 
@@ -366,12 +361,9 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     int vision_distance = g_get_vision_distance(g, g->hero_id);
     int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
     vec3 hero_loc = g_get_location(g, g->hero_id);
-
     int dist_to_check = MAX(vision_distance, light_dist);
-
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
     int distance = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
-
     // Only draw entities within vision distance
     //if (distance <= vision_distance) {
     if (distance <= dist_to_check) {
@@ -450,11 +442,14 @@ static void libdraw_set_sg_is_dead(gamestate* const g, entityid id, spritegroup_
     if (!g_is_dead(g, id)) return;
     race_t race = g_get_race(g, id);
     int anim_index = SG_ANIM_NPC_SPINDIE;
-    if (race == RACE_BAT)
+    if (race == RACE_BAT) {
         anim_index = SG_ANIM_BAT_DIE;
-    else if (race == RACE_GREEN_SLIME)
+    } else if (race == RACE_GREEN_SLIME) {
         anim_index = SG_ANIM_SLIME_DIE;
-    if (sg->current == anim_index) return;
+    }
+    if (sg->current == anim_index) {
+        return;
+    }
     sg_set_default_anim(sg, anim_index);
     spritegroup_set_current(sg, sg->default_anim);
     spritegroup_set_stop_on_last_frame(sg, true);
@@ -482,11 +477,14 @@ static void libdraw_set_sg_is_attacking(gamestate* const g, entityid id, spriteg
     weapontype wtype = g_get_weapontype(g, weapon);
     int cur = 0;
     cur = SG_ANIM_NPC_ATTACK;
-    if (wtype == WEAPON_BOW) cur = SG_ANIM_NPC_SHOT;
-    if (race == RACE_BAT)
+    if (wtype == WEAPON_BOW) {
+        cur = SG_ANIM_NPC_SHOT;
+    }
+    if (race == RACE_BAT) {
         cur = SG_ANIM_BAT_ATTACK;
-    else if (race == RACE_GREEN_SLIME)
+    } else if (race == RACE_GREEN_SLIME) {
         cur = SG_ANIM_SLIME_ATTACK;
+    }
     spritegroup_set_current(sg, cur);
     update_weapon_for_entity(g, id, sg);
     //e->is_attacking = false;
@@ -500,10 +498,11 @@ static void libdraw_set_sg_block_success(gamestate* const g, entityid id, sprite
     race_t race = g_get_race(g, id);
     int anim_index = -1;
     anim_index = SG_ANIM_NPC_GUARD_SUCCESS;
-    if (race == RACE_BAT)
+    if (race == RACE_BAT) {
         anim_index = SG_ANIM_BAT_IDLE;
-    else if (race == RACE_GREEN_SLIME)
+    } else if (race == RACE_GREEN_SLIME) {
         anim_index = SG_ANIM_SLIME_IDLE;
+    }
     spritegroup_set_current(sg, anim_index);
     entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
     if (shield_id != ENTITYID_INVALID) {
@@ -522,14 +521,15 @@ static void libdraw_update_sprite_attack(gamestate* const g, entityid id, sprite
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
-    if (g_get_attacking(g, id))
+    if (g_get_attacking(g, id)) {
         libdraw_set_sg_is_attacking(g, id, sg);
-    else if (g_get_block_success(g, id))
+    } else if (g_get_block_success(g, id)) {
         libdraw_set_sg_block_success(g, id, sg);
-    else if (g_get_damaged(g, id))
+    } else if (g_get_damaged(g, id)) {
         libdraw_set_sg_is_damaged(g, id, sg);
-    else if (g_is_dead(g, id))
+    } else if (g_is_dead(g, id)) {
         libdraw_set_sg_is_dead(g, id, sg);
+    }
 }
 
 static void libdraw_update_sprite_position(gamestate* const g, entityid id, spritegroup_t* sg) {
@@ -613,7 +613,9 @@ static void libdraw_update_sprite_pre(gamestate* const g, entityid id) {
     int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
     for (int i = 0; i < num_spritegroups; i++) {
         spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
-        if (sg) libdraw_update_sprite_ptr(g, id, sg);
+        if (sg) {
+            libdraw_update_sprite_ptr(g, id, sg);
+        }
     }
 }
 
@@ -643,33 +645,29 @@ static void libdraw_handle_dirty_entities(gamestate* const g) {
 void libdraw_update_sprites_pre(gamestate* const g) {
     massert(g, "gamestate is NULL");
     //UpdateMusicStream(music);
-
     //if (g->music_volume_changed) {
     //    SetMusicVolume(music, g->music_volume);
     //    g->music_volume_changed = false;
     //}
-
     if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_handle_dirty_entities(g);
-        for (entityid id = 0; id < g->next_entityid; id++) libdraw_update_sprite_pre(g, id);
+        for (entityid id = 0; id < g->next_entityid; id++) {
+            libdraw_update_sprite_pre(g, id);
+        }
     }
 }
 
 void libdraw_update_sprites_post(gamestate* const g) {
     massert(g, "gamestate is NULL");
-
     if (g->music_volume_changed) {
         SetMusicVolume(music, g->music_volume);
         g->music_volume_changed = false;
     }
-
     UpdateMusicStream(music);
-
     if (g->current_scene != SCENE_GAMEPLAY) {
         //g->frame_dirty = false;
         return;
     }
-
     if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_handle_dirty_entities(g);
         if (g->framecount % ANIM_SPEED == 0) {
@@ -710,25 +708,28 @@ static bool libdraw_draw_dungeon_floor(const gamestate* const g) {
     massert(df, "dungeon_floor is NULL");
     int z = g->d->current_floor;
     draw_dungeon_tiles_2d(g, z, df);
-    for (int y = 0; y < df->height; y++)
-        for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, true, (vec3){x, y, z});
-    for (int y = 0; y < df->height; y++)
-        for (int x = 0; x < df->width; x++) draw_entities_2d_at(g, df, false, (vec3){x, y, z});
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            draw_entities_2d_at(g, df, true, (vec3){x, y, z});
+        }
+    }
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            draw_entities_2d_at(g, df, false, (vec3){x, y, z});
+        }
+    }
     return true;
 }
 
 static void draw_debug_panel(gamestate* const g) {
     massert(g, "gamestate is NULL");
     Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f), fg = WHITE;
-
     // temporary hook for positioning the debug panel
-
     int w = DEFAULT_TARGET_WIDTH;
     int h = DEFAULT_TARGET_HEIGHT;
     int x = 0;
     int y = 0;
     int fontsize = 10;
-
     int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
     int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
     int x1 = g->debugpanel.x + g->debugpanel.pad_left;

@@ -33,43 +33,32 @@
 
 int liblogic_restart_count = 0;
 
-static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
-
-static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
-static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int x0, int y0, int w, int h);
 static inline bool is_traversable(gamestate* const g, int x, int y, int z);
-
-static void handle_input_gameplay_settings(const inputstate* const is, gamestate* const g);
-static void update_player_tiles_explored(gamestate* const g);
-static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful);
+static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
 static inline void reset_player_blocking(gamestate* const g);
 static inline void reset_player_block_success(gamestate* const g);
 static inline void update_npc_state(gamestate* const g, entityid id);
 static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
-//static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
-static int get_hitdie_for_race(race_t race);
+static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int x0, int y0, int w, int h);
 static vec3 get_base_attack_damage_for_race(race_t race);
 
-static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
-
+static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
-
 static vec3* get_locs_around_entity(gamestate* const g, entityid id);
 
 void liblogic_restart(gamestate* const g);
+
+static void handle_input_gameplay_settings(const inputstate* const is, gamestate* const g);
+static void update_player_tiles_explored(gamestate* const g);
+static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful);
+static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
 static void handle_level_up(gamestate* const g, entityid id);
-//static void init_npc_test(gamestate* g);
-//static void init_sword_test(gamestate* g);
 static void init_dagger_test(gamestate* g);
 static void init_sword_test(gamestate* g);
 static void init_axe_test(gamestate* g);
 static void init_ring_test(gamestate* g);
-//static void init_axe_test(gamestate* g);
-//static void init_bow_test(gamestate* g);
 static void init_shield_test(gamestate* g);
-//static void init_potion_test(gamestate* g);
-//static void init_wand_test(gamestate* g);
 static void handle_input_sort_inventory(const inputstate* const is, gamestate* const g);
 static void init_dungeon(gamestate* const g);
 static void update_player_state(gamestate* const g);
@@ -85,7 +74,8 @@ static void add_message(gamestate* g, const char* fmt, ...);
 static void try_entity_move_a_star(gamestate* const g, entityid id);
 static void try_entity_move(gamestate* const g, entityid id, int x, int y);
 static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
-//static void try_entity_zap(gamestate* const g, entityid attacker_id, vec3 target_loc);
+static void try_entity_traverse_floors(gamestate* const g, entityid id);
+static void check_and_handle_level_up(gamestate* const g, entityid id);
 
 static const char* get_action_key(const inputstate* const is, gamestate* const g);
 
@@ -93,25 +83,35 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
 static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name);
 static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name);
 static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, const char* name);
-//static entityid arrow_create(gamestate* const g, vec3 loc, const char* name);
 static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, const char* name);
 static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name);
-//static entityid wand_create(gamestate* const g, vec3 loc, const char* name);
 
 static vec3 get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
 static vec3 get_random_empty_non_wall_loc(gamestate* const g, int floor);
 
 static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1);
-//static bool player_on_tile(gamestate* g, int x, int y, int z);
-static void try_entity_traverse_floors(gamestate* const g, entityid id);
-//static bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl);
-//static bool tile_has_door(const gamestate* const g, int x, int y, int fl);
+static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race);
+
+static int get_hitdie_for_race(race_t race);
 static int calc_next_lvl_xp(gamestate* const g, entityid id);
 static int calc_challenge_rating(gamestate* const g, entityid id);
 static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id);
+
 static race_t get_random_race();
-static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race);
-static void check_and_handle_level_up(gamestate* const g, entityid id);
+
+//static void init_npc_test(gamestate* g);
+//static void init_sword_test(gamestate* g);
+//static void init_axe_test(gamestate* g);
+//static void init_bow_test(gamestate* g);
+//static void init_potion_test(gamestate* g);
+//static void init_wand_test(gamestate* g);
+//static void try_entity_zap(gamestate* const g, entityid attacker_id, vec3 target_loc);
+//static bool player_on_tile(gamestate* g, int x, int y, int z);
+//static bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl);
+//static bool tile_has_door(const gamestate* const g, int x, int y, int fl);
+//static entityid arrow_create(gamestate* const g, vec3 loc, const char* name);
+//static entityid wand_create(gamestate* const g, vec3 loc, const char* name);
+//static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
 
 static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id) {
     massert(g, "gamestate is NULL");
@@ -130,12 +130,11 @@ static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid tar
     int attacker_level = g_get_stat(g, attacker_id, STATS_LEVEL);
     massert(attacker_level >= 0, "attacker level is negative");
     // calculate the reward xp
-
     int base_xp = challenge_rating * 2;
-
     //int xp_modifier = pow(1.5, challenge_rating - attacker_level);
-    float xp_modifier = pow(2, challenge_rating - attacker_level);
-
+    int base = 2;
+    int exponent = challenge_rating - attacker_level;
+    float xp_modifier = pow(base, exponent);
     int reward_xp = (int)round(base_xp * xp_modifier);
     massert(reward_xp >= 0, "reward xp is negative");
     return reward_xp;
@@ -147,28 +146,23 @@ static int calc_challenge_rating(gamestate* const g, entityid id) {
     // get the entity type
     entitytype_t type = g_get_type(g, id);
     massert(type == ENTITY_NPC, "entity type is not NPC");
-
     // get the current level
     int lvl = g_get_stat(g, id, STATS_LEVEL);
     massert(lvl >= 0, "level is negative");
-
     int wpn_bonus = 0;
     // check to see if the NPC has an equipped weapon
     entityid weapon_id = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
     if (weapon_id != ENTITYID_INVALID) {
         wpn_bonus = 1;
     }
-
     // check to see if the NPC has an equipped shield
     int shield_bonus = 0;
     entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
     if (shield_id != ENTITYID_INVALID) {
         shield_bonus = 1;
     }
-
     // calculate the challenge rating
     int challenge_rating = lvl + wpn_bonus + shield_bonus;
-
     massert(challenge_rating >= 0, "challenge rating is negative");
     // set the challenge rating
     return challenge_rating;
@@ -1203,7 +1197,7 @@ static void handle_sort_inventory(gamestate* const g) {
     g->display_sort_inventory_menu = false;
     // we need to sort the inventory based on the selected type
     inventory_sort sort_type = g->sort_inventory_menu_selection;
-    int count = 0;
+    size_t count = 0;
     entityid* inventory = g_get_inventory(g, g->hero_id, &count);
     massert(inventory, "inventory is NULL");
     massert(count >= 0, "inventory count is less than 0");
@@ -1260,7 +1254,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         return;
     }
 
-    int count = 0;
+    size_t count = 0;
     entityid* inventory = g_get_inventory(g, g->hero_id, &count);
 
     if (g->display_inventory_menu && g->display_sort_inventory_menu) {
@@ -2161,7 +2155,9 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         // level-up is too powerful and results in imbalance
         // the goal is to make the spawns challenge rating approximate
         // and close either above or below the player's level and cr
-        for (int i = 1; i < floor; i++) handle_level_up(g, id);
+        for (int i = 1; i < floor; i++) {
+            handle_level_up(g, id);
+        }
         int new_level = g_get_stat(g, id, STATS_LEVEL);
         massert(new_level == floor, "New level %d does not match floor %d", new_level, floor);
         msuccess("Spawned entity of Level %d with %d HP at %d, %d, %d", g_get_stat(g, id, STATS_LEVEL), max_hp, loc.x, loc.y, loc.z);
@@ -2173,10 +2169,8 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         // verify vision distance
         int vision_distance = g_get_vision_distance(g, id);
         massert(vision_distance == vision_distance0, "Vision distance %d does not match expected value 5", vision_distance);
-        // update light radius
-        // this will be appropriately set on a per-npc basis but for now...
-        // hard code 3
-        g_set_light_radius(g, id, 3);
+        int default_light_radius = 3;
+        g_set_light_radius(g, id, default_light_radius);
         success = true;
     }
     return success;
@@ -2196,28 +2190,8 @@ static void try_spawn_npc(gamestate* const g) {
                     merror("No available location found for NPC spawn");
                     return; // No valid location found, exit early
                 }
-                //entityid id = ENTITYID_INVALID;
-                //race_t race = RACE_GREEN_SLIME;
-                //race_t race = get_random_race();
                 race_t race = get_random_race_for_floor(current_floor);
                 success = npc_create_set_stats(g, loc, race);
-                //id = npc_create(g, race, loc, "NPC");
-                //if (id != ENTITYID_INVALID) {
-                //    int hit_die = get_hitdie_for_race(race);
-                //    roll r = {1, hit_die, 0};
-                //    int max_hp = do_roll(r);
-                //    g_set_stat(g, id, STATS_AC, 10);
-                //    g_set_stat(g, id, STATS_XP, 0);
-                //    g_set_stat(g, id, STATS_LEVEL, 1);
-                //    g_set_stat(g, id, STATS_STR, do_roll((roll){3, 6, 0}));
-                //    g_set_stat(g, id, STATS_DEX, do_roll((roll){3, 6, 0}));
-                //    g_set_stat(g, id, STATS_CON, do_roll((roll){3, 6, 0}));
-                //    max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
-                //    g_set_stat(g, id, STATS_MAXHP, max_hp);
-                //    g_set_stat(g, id, STATS_HP, max_hp);
-                //    g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-                //    success = true;
-                //}
             }
             do_this_once = false;
         }
@@ -2235,13 +2209,13 @@ static void update_player_state(gamestate* const g) {
         }
         check_and_handle_level_up(g, g->hero_id);
     }
-    if (g_is_dead(g, g->hero_id)) return;
+    if (g_is_dead(g, g->hero_id)) {
+        return;
+    }
 }
 
 static void handle_level_up(gamestate* const g, entityid id) {
-    //int xp = g_get_stat(g, id, STATS_XP);
     int level = g_get_stat(g, id, STATS_LEVEL);
-    //int next_level_xp = g_get_stat(g, id, STATS_NEXT_LEVEL_XP);
     // Level up the entity
     level++;
     g_set_stat(g, id, STATS_LEVEL, level);
@@ -2276,7 +2250,9 @@ static void handle_level_up(gamestate* const g, entityid id) {
 }
 
 static void check_and_handle_level_up(gamestate* const g, entityid id) {
-    if (g_get_stat(g, id, STATS_XP) >= g_get_stat(g, id, STATS_NEXT_LEVEL_XP)) handle_level_up(g, id);
+    if (g_get_stat(g, id, STATS_XP) >= g_get_stat(g, id, STATS_NEXT_LEVEL_XP)) {
+        handle_level_up(g, id);
+    }
 }
 
 static inline void update_npc_state(gamestate* const g, entityid id) {
@@ -2291,7 +2267,6 @@ static void update_npcs_state(gamestate* const g) {
     }
 }
 
-//static void handle_nth_npc(gamestate* const g, int i) {
 static void handle_npc(gamestate* const g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
@@ -2307,7 +2282,9 @@ static void handle_npcs(gamestate* const g) {
     massert(g->flag == GAMESTATE_FLAG_NPC_TURN, "Game state is not in NPC turn!");
     // Process all NPCs
     //for (int i = 0; i < g->index_entityids; i++) handle_nth_npc(g, i);
-    for (entityid id = 0; id < g->next_entityid; id++) handle_npc(g, id);
+    for (entityid id = 0; id < g->next_entityid; id++) {
+        handle_npc(g, id);
+    }
     // After processing all NPCs, set the flag to animate all movements together
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }
@@ -2326,8 +2303,6 @@ static inline void reset_player_block_success(gamestate* const g) {
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-
-    //minfo("liblogic_tick: Game state tick started");
     // Spawn NPCs periodically
     try_spawn_npc(g);
     update_player_state(g);
@@ -2337,18 +2312,17 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
         reset_player_block_success(g);
     }
     handle_input(is, g);
-    if (g->flag == GAMESTATE_FLAG_NPC_TURN) handle_npcs(g);
+    if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
+        handle_npcs(g);
+    }
     update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
-
-    //msuccess("liblogic_tick: Game state tick completed");
 }
 
 void liblogic_close(gamestate* const g) {
     massert(g, "liblogic_close: gamestate is NULL");
-    // free the dungeon
     d_free(g->d);
 }
 
@@ -2359,7 +2333,9 @@ static inline bool is_traversable(gamestate* const g, int x, int y, int z) {
     dungeon_floor_t* df = d_get_floor(g->d, z);
     massert(df, "floor is NULL");
     // Check map bounds
-    if (x < 0 || x >= df->width || y < 0 || y >= df->height) return false;
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
+        return false;
+    }
     // Get the current tile
     tile_t* tile = df_tile_at(df, (vec3){x, y, z});
     massert(tile, "tile is NULL");

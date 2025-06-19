@@ -220,7 +220,8 @@ gamestate* gamestateinitptr() {
     massert(g->light_radius_bonus_list, "g->light_radius_bonus_list is NULL");
     massert(g->ringtype_list, "g->ringtype_list is NULL");
 
-    g->d = NULL, g->monster_defs = NULL;
+    g->d = NULL;
+    g->monster_defs = NULL;
 
     gamestate_init_music_paths(g);
     gamestate_init_msg_history(g);
@@ -398,8 +399,13 @@ void gamestatefree(gamestate* g) {
     free(g->base_attack_damage_list);
     free(g->vision_distance_list);
     free(g->light_radius_list);
+    free(g->ringtype_list);
+    free(g->light_radius_bonus_list);
+    if (g->monster_defs) {
+        free(g->monster_defs);
+        g->monster_defs = NULL;
+    }
     free(g);
-    //msuccess("Freed gamestate");
 }
 
 void gamestate_set_hero_id(gamestate* const g, entityid id) {
@@ -1063,13 +1069,14 @@ static int compare_by_type(const void* a, const void* b) {
     return type_a - type_b;
 }
 
-entityid* g_sort_inventory(gamestate* const g, entityid* inventory, int inv_count, inventory_sort sort_type) {
+//entityid* g_sort_inventory(gamestate* const g, entityid* inventory, int inv_count, inventory_sort sort_type) {
+entityid* g_sort_inventory(gamestate* const g, entityid* inventory, size_t inv_count, inventory_sort sort_type) {
     massert(g, "gamestate is NULL");
     massert(inventory, "inventory is NULL");
     massert(inv_count >= 0, "invalid inventory count");
 
     minfo("Sorting inventory...");
-    minfo("Item count: %d", inv_count);
+    //minfo("Item count: %d", inv_count);
 
     // Create a copy of the inventory array
     entityid* sorted_inv = malloc(inv_count * sizeof(entityid));
@@ -1132,7 +1139,8 @@ bool g_remove_from_inventory(gamestate* const g, entityid id, entityid itemid) {
     return false;
 }
 
-entityid* g_get_inventory(const gamestate* const g, entityid id, int* count) {
+//entityid* g_get_inventory(const gamestate* const g, entityid id, int* count) {
+entityid* g_get_inventory(const gamestate* const g, entityid id, size_t* count) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(count, "count is NULL");
@@ -1174,7 +1182,8 @@ bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid ite
 }
 
 // updated inventory should have the same num of items as the original
-bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory, int new_inventory_count) {
+//bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory, int new_inventory_count) {
+bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory, size_t new_inventory_count) {
     // this assumes id has an inventory but lets verify
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
@@ -1193,9 +1202,13 @@ bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory
                 g->inventory_list[i].inventory[j] = new_inventory[j];
                 g->inventory_list[i].count++;
             }
-            massert(g->inventory_list[i].count == new_inventory_count, "new inventory count %d does not match expected count %d", g->inventory_list[i].count, new_inventory_count);
-
-            return true;
+            massert(g->inventory_list[i].count == new_inventory_count, "new inventory count %d does not match expected count %zu", g->inventory_list[i].count, new_inventory_count);
+            if (g->inventory_list[i].count == new_inventory_count) {
+                msuccess("updated inventory for id %d with %d items", id, new_inventory_count);
+                return true;
+            }
+            merror("updated inventory for id %d but count mismatch: expected %d, got %d", id, new_inventory_count, g->inventory_list[i].count);
+            return false;
         }
     }
     merror("id %d not found in inventory_list", id);
