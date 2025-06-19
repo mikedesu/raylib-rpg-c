@@ -32,20 +32,24 @@
 
 //#define DEFAULT_WIN_WIDTH 800
 //#define DEFAULT_WIN_HEIGHT 480
-//#define DEFAULT_WIN_WIDTH 960
-//#define DEFAULT_WIN_HEIGHT 540
 
-#define DEFAULT_WIN_WIDTH 640
-#define DEFAULT_WIN_HEIGHT 360
+//#define DEFAULT_WIN_WIDTH 640
+//#define DEFAULT_WIN_HEIGHT 360
 //#define DEFAULT_WIN_WIDTH 1920
 //#define DEFAULT_WIN_HEIGHT 1080
 //#define DEFAULT_WIN_WIDTH 1280
 //#define DEFAULT_WIN_HEIGHT 720
+#define DEFAULT_WIN_WIDTH 960
+#define DEFAULT_WIN_HEIGHT 540
 
+//#define DEFAULT_TARGET_WIDTH 1280
+//#define DEFAULT_TARGET_HEIGHT 720
+#define DEFAULT_TARGET_WIDTH 960
+#define DEFAULT_TARGET_HEIGHT 540
 //#define DEFAULT_TARGET_WIDTH 800
 //#define DEFAULT_TARGET_HEIGHT 480
-#define DEFAULT_TARGET_WIDTH 640
-#define DEFAULT_TARGET_HEIGHT 360
+//#define DEFAULT_TARGET_WIDTH 640
+//#define DEFAULT_TARGET_HEIGHT 360
 
 #define SPRITEGROUP_DEFAULT_SIZE 32
 #define DEFAULT_TILE_SIZE_SCALED 32
@@ -819,16 +823,16 @@ static void draw_message_box(gamestate* g) {
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);
     DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
-    if (g->msg_system.count > 1 && g->msg_system.index < g->msg_system.count - 1) {
-        char tmp_prompt[1024] = {0};
-        snprintf(tmp_prompt, sizeof(tmp_prompt), "%s %d/%d", prompt, g->msg_system.index + 1, g->msg_system.count);
-        Vector2 prompt_size = MeasureTextEx(GetFontDefault(), tmp_prompt, prompt_font_size, 1.0f);
-        DrawText(tmp_prompt,
-                 box.x + box.width - prompt_size.x - prompt_offset, // Right-align in box
-                 box.y + box.height - prompt_size.y - prompt_offset / 2.0, // Bottom of box
-                 prompt_font_size,
-                 WHITE);
-    }
+    //if (g->msg_system.count > 1 && g->msg_system.index < g->msg_system.count - 1) {
+    //    char tmp_prompt[1024] = {0};
+    //    snprintf(tmp_prompt, sizeof(tmp_prompt), "%s %d/%d", prompt, g->msg_system.index + 1, g->msg_system.count);
+    //    Vector2 prompt_size = MeasureTextEx(GetFontDefault(), tmp_prompt, prompt_font_size, 1.0f);
+    //    DrawText(tmp_prompt,
+    //             box.x + box.width - prompt_size.x - prompt_offset, // Right-align in box
+    //             box.y + box.height - prompt_size.y - prompt_offset / 2.0, // Bottom of box
+    //             prompt_font_size,
+    //             WHITE);
+    //}
 }
 
 static inline void update_debug_panel(gamestate* const g) {
