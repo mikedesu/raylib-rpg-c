@@ -1385,7 +1385,6 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
     g_set_update(g, id, true);
     // check if the player is on a tile with an item
-    //vec3 loc = g_get_location(g, id);
     vec3 loc = g_get_location(g, id);
     vec3 loc_cast = {loc.x, loc.y, loc.z};
     dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
@@ -1408,16 +1407,17 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
             add_message_history(g, "%s picked up a %s", g_get_name(g, id), g_get_name(g, itemid));
-            tile_remove(tile, itemid);
             bool result = g_add_to_inventory(g, id, itemid);
             if (!result) {
                 merror("Failed to add item to inventory");
                 return false;
             } else {
                 minfo("Item %s added to inventory", g_get_name(g, itemid));
+                tile_remove(tile, itemid);
             }
-            //handle_sort_inventory(g);
-            if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            if (g_is_type(g, id, ENTITY_PLAYER)) {
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            }
             return true;
         }
     }
