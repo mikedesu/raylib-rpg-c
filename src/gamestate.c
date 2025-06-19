@@ -41,26 +41,34 @@ gamestate* gamestateinitptr() {
     bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
     strftime(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", g->timebegantm);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
-    g->debugpanelon = g->player_input_received = g->is_locked = g->gridon = g->display_inventory_menu = g->display_quit_menu = g->display_help_menu = g->do_quit =
-        g->processing_actions = g->cam_changed = g->is3d = g->gameover = g->test_guard = g->dirty_entities = g->display_sort_inventory_menu = false;
+    g->debugpanelon = false;
+    g->player_input_received = false;
+    g->is_locked = false;
+    g->gridon = false;
+    g->display_inventory_menu = false;
+    g->display_quit_menu = false;
+    g->display_help_menu = false;
+    g->do_quit = false;
+    g->processing_actions = false;
+    g->cam_changed = false;
+    g->is3d = false;
+    g->gameover = false;
+    g->test_guard = false;
+    g->dirty_entities = false;
+    g->display_sort_inventory_menu = false;
     g->music_volume_changed = false;
     g->ringtype_list_count = 0;
     g->light_radius_bonus_list_count = 0;
-
     g->sort_inventory_menu_selection = 0;
     g->sort_inventory_menu_selection_max = 2;
-
     g->hero_inventory_sorted_by_name = NULL;
     g->hero_inventory_sorted_by_type = NULL;
-
     g->gameplay_settings_menu_selection = 0;
-
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){0, 0};
     g->cam2d.zoom = 1.0f;
     g->cam2d.rotation = 0.0;
     g->fadealpha = 0.0;
-
     g->cam3d = (Camera3D){0};
     g->cam3d.position = (Vector3){0.0f, 20.0f, 20.0f};
     g->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
@@ -75,38 +83,109 @@ gamestate* gamestateinitptr() {
     g->pad = 20;
     g->line_spacing = 1.0f;
     g->components = ct_create();
-
-    g->next_entityid = g->current_music_index = g->total_music_paths = g->restart_count = g->do_restart = g->title_screen_selection = g->monster_def_count =
-        g->monster_def_capacity = g->lock = g->frame_updates = g->framecount = g->turn_count = g->debugpanel.pad_top = g->debugpanel.pad_left = g->debugpanel.pad_right =
-            g->debugpanel.pad_bottom = g->inventory_menu_selection = g->name_list_count = g->type_list_count = g->race_list_count = g->direction_list_count = g->loc_list_count =
-                g->sprite_move_list_count = g->dead_list_count = g->update_list_count = g->attacking_list_count = g->blocking_list_count = g->block_success_list_count =
-                    g->damaged_list_count = g->inventory_list_count = g->target_list_count = g->target_path_list_count = g->default_action_list_count = g->equipment_list_count =
-                        g->stats_list_count = g->itemtype_list_count = g->weapontype_list_count = g->shieldtype_list_count = g->potion_type_list_count = g->damage_list_count =
-                            g->ac_list_count = g->zapping_list_count = g->base_attack_damage_list_count = g->vision_distance_list_count = g->light_radius_list_count = 0;
-
-    g->name_list_capacity = g->type_list_capacity = g->race_list_capacity = g->direction_list_capacity = g->loc_list_capacity = g->sprite_move_list_capacity =
-        g->dead_list_capacity = g->update_list_capacity = g->attacking_list_capacity = g->blocking_list_capacity = g->block_success_list_capacity = g->damaged_list_capacity =
-            g->inventory_list_capacity = g->target_list_capacity = g->target_path_list_capacity = g->default_action_list_capacity = g->equipment_list_capacity =
-                g->stats_list_capacity = g->itemtype_list_capacity = g->weapontype_list_capacity = g->shieldtype_list_capacity = g->potion_type_list_capacity =
-                    g->damage_list_capacity = g->ac_list_capacity = g->zapping_list_capacity = g->base_attack_damage_list_capacity = g->vision_distance_list_capacity =
-                        g->light_radius_list_capacity = n;
+    g->next_entityid = 0;
+    g->current_music_index = 0;
+    g->total_music_paths = 0;
+    g->restart_count = 0;
+    g->do_restart = 0;
+    g->title_screen_selection = 0;
+    g->monster_def_count = 0;
+    g->monster_def_capacity = 0;
+    g->lock = 0;
+    g->frame_updates = 0;
+    g->framecount = 0;
+    g->turn_count = 0;
+    g->debugpanel.pad_top = 0;
+    g->debugpanel.pad_left = 0;
+    g->debugpanel.pad_right = 0;
+    g->debugpanel.pad_bottom = 0;
+    g->inventory_menu_selection = 0;
+    g->name_list_count = 0;
+    g->type_list_count = 0;
+    g->race_list_count = 0;
+    g->direction_list_count = 0;
+    g->loc_list_count = 0;
+    g->sprite_move_list_count = 0;
+    g->dead_list_count = 0;
+    g->update_list_count = 0;
+    g->attacking_list_count = 0;
+    g->blocking_list_count = 0;
+    g->block_success_list_count = 0;
+    g->damaged_list_count = 0;
+    g->inventory_list_count = 0;
+    g->target_list_count = 0;
+    g->target_path_list_count = 0;
+    g->default_action_list_count = 0;
+    g->equipment_list_count = 0;
+    g->stats_list_count = 0;
+    g->itemtype_list_count = 0;
+    g->weapontype_list_count = 0;
+    g->shieldtype_list_count = 0;
+    g->potion_type_list_count = 0;
+    g->damage_list_count = 0;
+    g->ac_list_count = 0;
+    g->zapping_list_count = 0;
+    g->base_attack_damage_list_count = 0;
+    g->vision_distance_list_count = 0;
+    g->light_radius_list_count = 0;
+    g->name_list_capacity = n;
+    g->type_list_capacity = n;
+    g->race_list_capacity = n;
+    g->direction_list_capacity = n;
+    g->loc_list_capacity = n;
+    g->sprite_move_list_capacity = n;
+    g->dead_list_capacity = n;
+    g->update_list_capacity = n;
+    g->attacking_list_capacity = n;
+    g->blocking_list_capacity = n;
+    g->block_success_list_capacity = n;
+    g->damaged_list_capacity = n;
+    g->inventory_list_capacity = n;
+    g->target_list_capacity = n;
+    g->target_path_list_capacity = n;
+    g->default_action_list_capacity = n;
+    g->equipment_list_capacity = n;
+    g->stats_list_capacity = n;
+    g->itemtype_list_capacity = n;
+    g->weapontype_list_capacity = n;
+    g->shieldtype_list_capacity = n;
+    g->potion_type_list_capacity = n;
+    g->damage_list_capacity = n;
+    g->ac_list_capacity = n;
+    g->zapping_list_capacity = n;
+    g->base_attack_damage_list_capacity = n;
+    g->vision_distance_list_capacity = n;
+    g->light_radius_list_capacity = n;
     g->ringtype_list_capacity = n;
     g->light_radius_bonus_list_capacity = n;
-
-    g->name_list = (name_component*)malloc(sizeof(name_component) * n), g->type_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->race_list = (int_component*)malloc(sizeof(int_component) * n), g->direction_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->loc_list = (vec3_component*)malloc(sizeof(vec3_component) * n), g->sprite_move_list = (rect_component*)malloc(sizeof(rect_component) * n);
-    g->target_list = (vec3_component*)malloc(sizeof(vec3_component) * n), g->dead_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->update_list = (int_component*)malloc(sizeof(int_component) * n), g->attacking_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->blocking_list = (int_component*)malloc(sizeof(int_component) * n), g->block_success_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->damaged_list = (int_component*)malloc(sizeof(int_component) * n), g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * n);
-    g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * n), g->default_action_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * n), g->stats_list = (stats_component*)malloc(sizeof(stats_component) * n);
-    g->itemtype_list = (int_component*)malloc(sizeof(int_component) * n), g->weapontype_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->shieldtype_list = (int_component*)malloc(sizeof(int_component) * n), g->potion_type_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->ac_list = (int_component*)malloc(sizeof(int_component) * n), g->zapping_list = (int_component*)malloc(sizeof(int_component) * n);
-    g->damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n), g->base_attack_damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
-    g->vision_distance_list = (int_component*)malloc(sizeof(int_component) * n), g->light_radius_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->name_list = (name_component*)malloc(sizeof(name_component) * n);
+    g->type_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->race_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->direction_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->loc_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
+    g->sprite_move_list = (rect_component*)malloc(sizeof(rect_component) * n);
+    g->target_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
+    g->dead_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->update_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->attacking_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->blocking_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->block_success_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->damaged_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * n);
+    g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * n);
+    g->default_action_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * n);
+    g->stats_list = (stats_component*)malloc(sizeof(stats_component) * n);
+    g->itemtype_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->weapontype_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->shieldtype_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->potion_type_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->ac_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->zapping_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
+    g->base_attack_damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
+    g->vision_distance_list = (int_component*)malloc(sizeof(int_component) * n);
+    g->light_radius_list = (int_component*)malloc(sizeof(int_component) * n);
     g->ringtype_list = (int_component*)malloc(sizeof(int_component) * n);
     g->light_radius_bonus_list = (int_component*)malloc(sizeof(int_component) * n);
 

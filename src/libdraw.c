@@ -35,12 +35,12 @@
 //#define DEFAULT_WIN_WIDTH 960
 //#define DEFAULT_WIN_HEIGHT 540
 
-//#define DEFAULT_WIN_WIDTH 640
-//#define DEFAULT_WIN_HEIGHT 360
+#define DEFAULT_WIN_WIDTH 640
+#define DEFAULT_WIN_HEIGHT 360
 //#define DEFAULT_WIN_WIDTH 1920
 //#define DEFAULT_WIN_HEIGHT 1080
-#define DEFAULT_WIN_WIDTH 1280
-#define DEFAULT_WIN_HEIGHT 720
+//#define DEFAULT_WIN_WIDTH 1280
+//#define DEFAULT_WIN_HEIGHT 720
 
 //#define DEFAULT_TARGET_WIDTH 800
 //#define DEFAULT_TARGET_HEIGHT 480
@@ -1656,10 +1656,13 @@ static void draw_version(const gamestate* const g) {
     int font_size = 10;
     char buffer[1024] = {0};
     // also grab the current music track path
-    const char* current_music_path = g->music_file_paths[g->current_music_index];
-    snprintf(buffer, sizeof(buffer), "%s | Music: %s", version, current_music_path);
+    //const char* current_music_path = g->music_file_paths[g->current_music_index];
+    //snprintf(buffer, sizeof(buffer), "%s | Music: %s", version, current_music_path);
+    snprintf(buffer, sizeof(buffer), "%s", version);
     Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
-    float x = g->windowwidth - text_size.x - g->pad, y = 0;
+    int w = DEFAULT_TARGET_WIDTH;
+    float x = w - text_size.x - g->pad;
+    float y = 0;
     DrawTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
 }
 
