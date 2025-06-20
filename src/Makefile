@@ -1,6 +1,6 @@
-CC = gcc
+CXX = g++
 OBJ = -c
-WFLAGS = -Wall 
+WFLAGS = -Wall -std=c++17
 #WFLAGS = -Wall -Werror
 SHARED = -shared
 STATIC_LINK_RAYLIB = -l:libraylib.a  # Desktop Raylib
@@ -49,17 +49,9 @@ index.html: $(WEB_SOURCES)
 	$(WEB_CC) -o $@ $(WEB_SOURCES) $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS) $(CFLAGS)
 
 # Object files (unchanged below)
-main.o: main.c gameloader.h
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) main.c -o $@
-
-gameloader.o: gameloader.c gameloader.h gamestate.h inputstate.h
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) gameloader.c -o $@
-
-libdraw.o: libdraw.c libdraw.h
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) libdraw.c -o $@
-
-liblogic.o: liblogic.c liblogic.h
-	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) liblogic.c -o $@
+# C++ source files
+%.o: %.cpp
+	$(CXX) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CXXFLAGS) $< -o $@
 
 clean:
 	rm -rfv game *.o time.txt index.html index.js index.wasm index.data test
