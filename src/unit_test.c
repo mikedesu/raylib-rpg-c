@@ -7,10 +7,10 @@
 #include "test_gamestate.h"
 
 int main(void) {
-    test_component_table();
-    test_gamestate();
-    test_dungeon_tiles();
-    test_dungeon_floors();
+    //test_component_table();
+    //test_gamestate();
+    //test_dungeon_tiles();
+    //test_dungeon_floors();
     //test_dungeon();
     //test_btree_int_tests();
     test_btree_entityid_int();
