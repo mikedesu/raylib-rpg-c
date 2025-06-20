@@ -7,11 +7,10 @@
 #include <dlfcn.h>
 #include <raylib.h>
 #include <stdbool.h>
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+static long getlastwritetime(const char* filename);
 
 #define LIBDRAW_PATH "./libdraw.so"
 #define LIBLOGIC_PATH "./liblogic.so"
@@ -54,10 +53,12 @@ bool file_changed(const char* path, long* last_time) {
     return false;
 }
 
-long getlastwritetime(const char* filename) {
+static long getlastwritetime(const char* filename) {
     struct stat f_stat;
-    if (stat(filename, &f_stat) == 0) return f_stat.st_mtime;
-    return 0;
+    if (stat(filename, &f_stat) == 0) {
+        return (long)f_stat.st_mtime;
+    }
+    return 0L;
 }
 
 void load_draw_symbols() {
