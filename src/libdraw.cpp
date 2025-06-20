@@ -1685,15 +1685,33 @@ static void draw_character_creation_screen(gamestate* const g) {
     font_size = 10;
     // Draw character stats
     for (int i = 0; i < sizeof(stats_fmt) / sizeof(stats_fmt[0]); i++) {
-        snprintf(buffer,
-                 sizeof(buffer),
-                 stats_fmt[i],
-                 i == 0   ? g->chara_creation.name
-                 : i == 1 ? get_race_str(g->chara_creation.race)
-                 : i == 2 ? (int)g->chara_creation.hitdie
-                 : i == 3 ? g->chara_creation.strength
-                 : i == 4 ? g->chara_creation.dexterity
-                          : g->chara_creation.constitution);
+        //snprintf(buffer,
+        //         sizeof(buffer),
+        //         stats_fmt[i],
+        //         i == 0   ? g->chara_creation.name
+        //         : i == 1 ? get_race_str(g->chara_creation.race)
+        //         : i == 2 ? (int)g->chara_creation.hitdie
+        //         : i == 3 ? g->chara_creation.strength
+        //         : i == 4 ? g->chara_creation.dexterity
+        //                  : g->chara_creation.constitution);
+
+        if (i == 0) {
+            snprintf(buffer, sizeof(buffer), stats_fmt[i], g->chara_creation.name);
+        } else if (i == 1) {
+            snprintf(buffer, sizeof(buffer), stats_fmt[i], get_race_str(g->chara_creation.race));
+        } else if (i == 2) {
+            snprintf(buffer, sizeof(buffer), stats_fmt[i], g->chara_creation.hitdie);
+        } else if (i == 3) {
+            snprintf(buffer, sizeof(buffer), stats_fmt[i], g->chara_creation.strength);
+        } else if (i == 4) {
+            snprintf(buffer, sizeof(buffer), stats_fmt[i], g->chara_creation.dexterity);
+        } else if (i == 5) {
+            snprintf(buffer, sizeof(buffer), stats_fmt[i], g->chara_creation.constitution);
+        } else {
+            merror("Unknown index %d in stats_fmt", i);
+            continue;
+        }
+
         DrawText(buffer, x, y, font_size, WHITE);
         y += font_size + 4;
     }

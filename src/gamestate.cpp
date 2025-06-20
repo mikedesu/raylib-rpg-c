@@ -1,5 +1,7 @@
 #include "component.h"
 #include "controlmode.h"
+#include "direction.h"
+#include "entity_actions.h"
 #include "entityid.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
@@ -8,6 +10,10 @@
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
+#include "potion.h"
+#include "ringtype.h"
+#include "shield.h"
+#include "weapon.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -598,9 +604,13 @@ bool g_add_type(gamestate* const g, entityid id, int type) {
 
 entitytype_t g_get_type(const gamestate* const g, entityid id) {
     massert(g, "g is NULL");
-    if (id != ENTITYID_INVALID)
-        for (int i = 0; i < g->type_list_count; i++)
-            if (g->type_list[i].id == id) return g->type_list[i].data;
+    if (id != ENTITYID_INVALID) {
+        for (int i = 0; i < g->type_list_count; i++) {
+            if (g->type_list[i].id == id) {
+                return (entitytype_t)g->type_list[i].data;
+            }
+        }
+    }
     return ENTITY_NONE;
 }
 
@@ -645,7 +655,7 @@ race_t g_get_race(gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g_has_race(g, id))
         for (int i = 0; i < g->race_list_count; i++)
-            if (g->race_list[i].id == id) return g->race_list[i].data;
+            if (g->race_list[i].id == id) return (race_t)g->race_list[i].data;
     return RACE_NONE;
 }
 
@@ -666,7 +676,7 @@ direction_t g_get_direction(const gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (!g_has_component(g, id, C_DIRECTION)) return DIR_NONE;
     for (int i = 0; i < g->direction_list_count; i++)
-        if (g->direction_list[i].id == id) return g->direction_list[i].data;
+        if (g->direction_list[i].id == id) return (direction_t)g->direction_list[i].data;
     return DIR_NONE;
 }
 
@@ -1053,7 +1063,7 @@ entity_action_t g_get_default_action(const gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->default_action_list == NULL) return ENTITY_ACTION_NONE;
     for (int i = 0; i < g->default_action_list_count; i++)
-        if (g->default_action_list[i].id == id) return g->default_action_list[i].data;
+        if (g->default_action_list[i].id == id) return (entity_action_t)g->default_action_list[i].data;
     return ENTITY_ACTION_NONE;
 }
 
@@ -1098,7 +1108,7 @@ entityid* g_sort_inventory(gamestate* const g, entityid* inventory, size_t inv_c
     //minfo("Item count: %d", inv_count);
 
     // Create a copy of the inventory array
-    entityid* sorted_inv = malloc(inv_count * sizeof(entityid));
+    entityid* sorted_inv = (entityid*)malloc(inv_count * sizeof(entityid));
     massert(sorted_inv, "failed to allocate memory for sorted inventory");
     memcpy(sorted_inv, inventory, inv_count * sizeof(entityid));
 
@@ -1484,7 +1494,7 @@ itemtype g_get_itemtype(const gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->itemtype_list == NULL) return ITEM_NONE;
     for (int i = 0; i < g->itemtype_list_count; i++)
-        if (g->itemtype_list[i].id == id) return g->itemtype_list[i].data;
+        if (g->itemtype_list[i].id == id) return (itemtype)g->itemtype_list[i].data;
     return ITEM_NONE;
 }
 
@@ -1519,7 +1529,7 @@ weapontype g_get_weapontype(const gamestate* const g, entityid id) {
     if (id == ENTITYID_INVALID) return WEAPON_NONE;
     if (g->weapontype_list == NULL) return WEAPON_NONE;
     for (int i = 0; i < g->weapontype_list_count; i++)
-        if (g->weapontype_list[i].id == id) return g->weapontype_list[i].data;
+        if (g->weapontype_list[i].id == id) return (weapontype)g->weapontype_list[i].data;
     return WEAPON_NONE;
 }
 
@@ -1563,7 +1573,7 @@ shieldtype g_get_shieldtype(const gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->shieldtype_list == NULL) return SHIELD_NONE;
     for (int i = 0; i < g->shieldtype_list_count; i++)
-        if (g->shieldtype_list[i].id == id) return g->shieldtype_list[i].data;
+        if (g->shieldtype_list[i].id == id) return (shieldtype)g->shieldtype_list[i].data;
     return SHIELD_NONE;
 }
 
@@ -1619,7 +1629,7 @@ potiontype g_get_potiontype(const gamestate* const g, entityid id) {
     }
     for (int i = 0; i < g->potion_type_list_count; i++) {
         if (g->potion_type_list[i].id == id) {
-            return g->potion_type_list[i].data;
+            return (potiontype)g->potion_type_list[i].data;
         }
     }
     return POTION_NONE;
@@ -1908,7 +1918,7 @@ ringtype g_get_ringtype(const gamestate* const g, entityid id) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->ringtype_list == NULL) return RING_NONE;
     for (int i = 0; i < g->ringtype_list_count; i++) {
-        if (g->ringtype_list[i].id == id) return g->ringtype_list[i].data;
+        if (g->ringtype_list[i].id == id) return (ringtype)g->ringtype_list[i].data;
     }
     return RING_NONE;
 }

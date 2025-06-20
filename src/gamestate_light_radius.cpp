@@ -87,8 +87,10 @@ int g_get_entity_total_light_radius_bonus(const gamestate* const g, entityid id)
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     // check each equipment slot
+    //for (int i = 0; i < EQUIPMENT_SLOT_COUNT; i++) {
     for (int i = 0; i < EQUIPMENT_SLOT_COUNT; i++) {
-        entityid equip_id = g_get_equipment(g, id, i);
+        equipment_slot ei = (equipment_slot)i;
+        entityid equip_id = g_get_equipment(g, id, ei);
         if (equip_id == ENTITYID_INVALID) continue;
         if (!g_has_light_radius_bonus(g, equip_id)) continue;
         total_light_radius_bonus += g_get_light_radius_bonus(g, equip_id);
