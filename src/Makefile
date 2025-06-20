@@ -12,9 +12,7 @@ CFLAGS ?= # Allow override
 
 GAMESTATE_OBJECTS = gamestate.o gamestate_light_radius.o gamestate_explored_list.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o dungeon.o keybinding.o path_node.o component_table.o component.o
 
-#LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  dungeon.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o dungeon_floor.o dungeon_tile.o component_table.o component.o libdraw_sort_inventory_menu.o
-LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o  dungeon.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o dungeon_floor.o dungeon_tile.o component_table.o component.o libdraw_sort_inventory_menu.o
-#LIBLOGIC_OBJECTS = liblogic.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o dungeon.o keybinding.o path_node.o component_table.o component.o 
+LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o dungeon_floor.o dungeon_tile.o component_table.o component.o libdraw_sort_inventory_menu.o
 LIBLOGIC_OBJECTS = liblogic.o $(GAMESTATE_OBJECTS)
 
 # Web build setup
@@ -36,8 +34,8 @@ UNIT_TEST_OBJS = unit_test.o component.o component_table.o keybinding.o gamestat
 all: game test #index.html
 
 # Desktop build
-game: main.o gameloader.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o keybinding.o libdraw.so liblogic.so component_table.o component.o
-	$(CC) -o $@ main.o gameloader.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o component_table.o component.o keybinding.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
+game: main.o gameloader.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o keybinding.o libdraw.o liblogic.o component_table.o component.o
+	$(CC) -o $@ main.o gameloader.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o component_table.o component.o keybinding.o libdraw.o liblogic.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
 	./log_build_stats.sh
 
 test: $(UNIT_TEST_OBJS)
@@ -58,21 +56,10 @@ gameloader.o: gameloader.c gameloader.h gamestate.h inputstate.h
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) gameloader.c -o $@
 
 libdraw.o: libdraw.c libdraw.h
-	touch libdraw.so.lockfile
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) libdraw.c -o $@
 
-libdraw.so: $(LIBDRAW_OBJECTS)
-	$(CC) $(SHARED) -o $@ $(LIBDRAW_OBJECTS) $(RAYLIB_LIBS) $(LINK_MATH) $(WFLAGS) $(CFLAGS)
-	rm -rfv libdraw.so.lockfile
-
 liblogic.o: liblogic.c liblogic.h
-	touch liblogic.so.lockfile
 	$(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) liblogic.c -o $@
 
-liblogic.so: $(LIBLOGIC_OBJECTS)
-	$(CC) $(SHARED) -o $@ $(LIBLOGIC_OBJECTS) $(LINK_MATH) $(WFLAGS) $(CFLAGS)
-	rm -rfv liblogic.so.lockfile
-
 clean:
-	rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.data test
-	#rm -rfv game *.o *.so *.lockfile time.txt index.html index.js index.wasm index.datat export_to_code test
+	rm -rfv game *.o time.txt index.html index.js index.wasm index.data test
