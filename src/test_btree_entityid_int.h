@@ -47,8 +47,34 @@ TEST(test_btree_entityid_int_node_insert) {
     btree_entityid_int_node_destroy(root);
 }
 
+TEST(test_btree_entityid_int_node_contains) {
+    // Create a small tree
+    btree_entityid_int_node* root = btree_entityid_int_node_create(50, 100);
+    root = btree_entityid_int_node_insert(root, 30, 200);
+    root = btree_entityid_int_node_insert(root, 70, 300);
+    root = btree_entityid_int_node_insert(root, 20, 400);
+    root = btree_entityid_int_node_insert(root, 40, 500);
+    root = btree_entityid_int_node_insert(root, 60, 600);
+    root = btree_entityid_int_node_insert(root, 80, 700);
+
+    // Test existing keys
+    ASSERT(btree_entityid_int_node_contains(root, 50), "root key should exist");
+    ASSERT(btree_entityid_int_node_contains(root, 30), "left child key should exist");
+    ASSERT(btree_entityid_int_node_contains(root, 70), "right child key should exist");
+    ASSERT(btree_entityid_int_node_contains(root, 20), "leftmost key should exist");
+    ASSERT(btree_entityid_int_node_contains(root, 80), "rightmost key should exist");
+
+    // Test non-existing keys
+    ASSERT(!btree_entityid_int_node_contains(root, 10), "key 10 should not exist");
+    ASSERT(!btree_entityid_int_node_contains(root, 90), "key 90 should not exist");
+    ASSERT(!btree_entityid_int_node_contains(root, 55), "key 55 should not exist");
+
+    // Clean up
+    btree_entityid_int_node_destroy(root);
+}
+
 void test_btree_entityid_int(void) {
     run_test_btree_entityid_int_node_create_destroy();
     run_test_btree_entityid_int_node_insert();
-    // run_test_btree_entityid_int_node_contains();
+    run_test_btree_entityid_int_node_contains();
 }
