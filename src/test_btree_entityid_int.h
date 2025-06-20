@@ -73,8 +73,44 @@ TEST(test_btree_entityid_int_node_contains) {
     btree_entityid_int_node_destroy(root);
 }
 
+TEST(test_btree_entityid_int_node_remove) {
+    // Create a small tree
+    btree_entityid_int_node* root = btree_entityid_int_node_create(50, 100);
+    root = btree_entityid_int_node_insert(root, 30, 200);
+    root = btree_entityid_int_node_insert(root, 70, 300);
+    root = btree_entityid_int_node_insert(root, 20, 400);
+    root = btree_entityid_int_node_insert(root, 40, 500);
+    root = btree_entityid_int_node_insert(root, 60, 600);
+    root = btree_entityid_int_node_insert(root, 80, 700);
+
+    // Test removing a leaf node
+    root = btree_entityid_int_node_remove(root, 20);
+    ASSERT(!btree_entityid_int_node_contains(root, 20), "key 20 should be removed");
+    ASSERT(btree_entityid_int_node_contains(root, 30), "parent node should still exist");
+
+    // Test removing a node with one child
+    root = btree_entityid_int_node_remove(root, 30);
+    ASSERT(!btree_entityid_int_node_contains(root, 30), "key 30 should be removed");
+    ASSERT(btree_entityid_int_node_contains(root, 40), "child node should still exist");
+
+    // Test removing a node with two children
+    root = btree_entityid_int_node_remove(root, 50);
+    ASSERT(!btree_entityid_int_node_contains(root, 50), "key 50 should be removed");
+    ASSERT(btree_entityid_int_node_contains(root, 60), "right subtree should still exist");
+    ASSERT(btree_entityid_int_node_contains(root, 40), "left subtree should still exist");
+
+    // Test removing non-existent key
+    btree_entityid_int_node* original_root = root;
+    root = btree_entityid_int_node_remove(root, 99);
+    ASSERT(root == original_root, "tree should remain unchanged when removing non-existent key");
+
+    // Clean up
+    btree_entityid_int_node_destroy(root);
+}
+
 void test_btree_entityid_int(void) {
     run_test_btree_entityid_int_node_create_destroy();
     run_test_btree_entityid_int_node_insert();
     run_test_btree_entityid_int_node_contains();
+    run_test_btree_entityid_int_node_remove();
 }
