@@ -34,8 +34,8 @@ UNIT_TEST_OBJS = unit_test.o component.o component_table.o keybinding.o gamestat
 all: game test #index.html
 
 # Desktop build
-game: main.o gameloader.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o keybinding.o libdraw.o liblogic.o component_table.o component.o
-	$(CC) -o $@ main.o gameloader.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o component_table.o component.o keybinding.o libdraw.o liblogic.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
+game: main.o gameloader.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o keybinding.o libdraw.o liblogic.o component_table.o component.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o path_node.o
+	$(CC) -o $@ main.o gameloader.o gamestate.o gamestate_light_radius.o gamestate_explored_list.o component_table.o component.o keybinding.o libdraw.o liblogic.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o path_node.o -L. $(RAYLIB_LIBS) $(WFLAGS) $(POSITION_INDEPENDENT_CODE) $(CFLAGS)
 	./log_build_stats.sh
 
 test: $(UNIT_TEST_OBJS)
