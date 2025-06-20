@@ -108,9 +108,50 @@ TEST(test_btree_entityid_int_node_remove) {
     btree_entityid_int_node_destroy(root);
 }
 
+TEST(test_btree_entityid_int_node_get) {
+    // Create a small tree
+    btree_entityid_int_node* root = btree_entityid_int_node_create(50, 100);
+    root = btree_entityid_int_node_insert(root, 30, 200);
+    root = btree_entityid_int_node_insert(root, 70, 300);
+    root = btree_entityid_int_node_insert(root, 20, 400);
+    root = btree_entityid_int_node_insert(root, 40, 500);
+    root = btree_entityid_int_node_insert(root, 60, 600);
+    root = btree_entityid_int_node_insert(root, 80, 700);
+
+    // Test getting existing nodes
+    btree_entityid_int_node* node = btree_entityid_int_node_get(root, 50);
+    ASSERT(node != NULL, "root node should exist");
+    ASSERT(node->key == 50, "root node key should match");
+    ASSERT(node->value == 100, "root node value should match");
+
+    node = btree_entityid_int_node_get(root, 20);
+    ASSERT(node != NULL, "leftmost node should exist");
+    ASSERT(node->key == 20, "leftmost node key should match");
+    ASSERT(node->value == 400, "leftmost node value should match");
+
+    node = btree_entityid_int_node_get(root, 80);
+    ASSERT(node != NULL, "rightmost node should exist");
+    ASSERT(node->key == 80, "rightmost node key should match");
+    ASSERT(node->value == 700, "rightmost node value should match");
+
+    // Test getting non-existent nodes
+    node = btree_entityid_int_node_get(root, 10);
+    ASSERT(node == NULL, "non-existent key 10 should return NULL");
+
+    node = btree_entityid_int_node_get(root, 90);
+    ASSERT(node == NULL, "non-existent key 90 should return NULL");
+
+    node = btree_entityid_int_node_get(root, 55);
+    ASSERT(node == NULL, "non-existent key 55 should return NULL");
+
+    // Clean up
+    btree_entityid_int_node_destroy(root);
+}
+
 void test_btree_entityid_int(void) {
     run_test_btree_entityid_int_node_create_destroy();
     run_test_btree_entityid_int_node_insert();
     run_test_btree_entityid_int_node_contains();
     run_test_btree_entityid_int_node_remove();
+    run_test_btree_entityid_int_node_get();
 }
