@@ -12,30 +12,31 @@
 
 ### Requirements
 
-- `raylib`
-- `gcc` or `clang` (but the `Makefile` assumes `gcc` for now)
-- `emsdk`
-- `make`
-- `liblua5.4-dev`
-- A custom-built version of `liblua.a` for the web build
+- **Raylib** (development libraries)
+- **GCC** or **Clang** (C++17 compatible)
+- **Emscripten** (for WebAssembly builds)
+- **Make**
 
-
-### Instructions
+### Build Instructions
 
 1. Clone the repository
-2. Change directory: `cd raylib-rpg-c/src`
-3. Run the following command:
-
+2. Change to source directory:
+```bash
+cd src
 ```
+
+#### Standard Build
+```bash
 make
 ```
 
-#### WebAssembly executable
-
-You will have to edit some of the hardcoded paths in the `emcc` instruction. 
-I will provide details for this in the near future.
-
+#### Debug Build
+```bash
+CFLAGS="-DDEBUG=1" make
 ```
+
+#### WebAssembly Build
+```bash
 make index.html
 ```
 
@@ -43,15 +44,28 @@ make index.html
 
 ## Running
 
-### Linux 
-
-```
+### Native Executable
+```bash
 ./game
 ```
 
-### WebAssembly
-
-```
+### WebAssembly Version
+```bash
 emrun index.html
 ```
+
+### Running Tests
+```bash
+make test
+./test
+```
+
+-----
+
+## Development Notes
+
+- The project is written in C++ (C++17 standard)
+- The Makefile supports both native and WebAssembly builds
+- Debug builds enable additional logging and debugging features
+- Unit tests can be built and run using the `test` target
 
