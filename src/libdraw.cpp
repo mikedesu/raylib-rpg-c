@@ -154,7 +154,7 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     int px = x * DEFAULT_TILE_SIZE + offset_x;
     int py = y * DEFAULT_TILE_SIZE + offset_y;
     Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
-    Rectangle dest = {px, py, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+    Rectangle dest = {(float)px, (float)py, (float)DEFAULT_TILE_SIZE_SCALED, (float)DEFAULT_TILE_SIZE_SCALED};
     // Draw tile with fade if beyond vision distance
     //Color draw_color = distance > vision_distance ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
     Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
@@ -757,7 +757,7 @@ static bool libdraw_draw_player_target_box(const gamestate* const g) {
         a = 1.0f;
     }
     c = Fade(base_c, a);
-    DrawRectangleLinesEx((Rectangle){x * ds, y * ds, ds, ds}, 1, c);
+    DrawRectangleLinesEx((Rectangle){(float)x * ds, (float)y * ds, (float)ds, (float)ds}, 1, c);
     return true;
 }
 
@@ -822,7 +822,7 @@ static void draw_message_box(gamestate* g) {
     int x = (w - text_width) / 2.0 - g->pad;
     //int y = (h - text_height) / 8.0 - g->pad;
     int y = 42;
-    Rectangle box = {x, y, text_width + g->pad * 2, text_height + g->pad * 2};
+    Rectangle box = {(float)x, (float)y, (float)text_width + g->pad * 2, (float)text_height + g->pad * 2};
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);
     DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
@@ -916,7 +916,7 @@ static void draw_gameover_menu(gamestate* const g) {
     int h = DEFAULT_TARGET_HEIGHT;
     int x = (w - text_width) / 2;
     int y = (h - text_height * 2) / 2;
-    Rectangle rect = {x - 10, y - 10, text_width + 20, text_height * 2 + 20};
+    Rectangle rect = {(float)x - 10, (float)y - 10, (float)text_width + 20, (float)text_height * 2 + 20};
     DrawRectangle(x - 10, y - 10, text_width + 20, text_height * 2 + 20, bg_color);
     DrawRectangleLinesEx(rect, 2, RED);
     DrawText(gameover_text, x, y, font_size, RED);
@@ -1075,7 +1075,7 @@ static void create_spritegroup(gamestate* const g, entityid id, int* keys, int n
         return;
     }
     group->current = 0;
-    group->dest = (Rectangle){loc.x * DEFAULT_TILE_SIZE + offset_x, loc.y * DEFAULT_TILE_SIZE + offset_y, s->width, s->height};
+    group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
     group->off_x = offset_x, group->off_y = offset_y;
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
 }
@@ -1247,9 +1247,9 @@ static void draw_hud(gamestate* const g) {
     int box_x = 0;
     int box_y = 0;
     Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
-    DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
+    DrawRectangleRec((Rectangle){(float)box_x, (float)box_y, (float)box_w, (float)box_h}, bg);
     int line_thickness = 1;
-    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, line_thickness, fg);
+    DrawRectangleLinesEx((Rectangle){(float)box_x, (float)box_y, (float)box_w, (float)box_h}, line_thickness, fg);
     // Calculate text position to center it within the box
     float text_x = box_x + (box_w - text_size.x) / 2;
     float text_y = box_y + (box_h - text_size.y) / 2;
@@ -1282,8 +1282,8 @@ void libdraw_init_rest(gamestate* const g) {
     SetTextureFilter(char_creation_target_texture.texture, filter);
     main_game_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(main_game_target_texture.texture, filter);
-    target_src = (Rectangle){0, 0, target_w, -target_h};
-    target_dest = (Rectangle){0, 0, target_w, target_h};
+    target_src = (Rectangle){(float)0, (float)0, (float)target_w, (float)-target_h};
+    target_dest = (Rectangle){(float)0, (float)0, (float)target_w, (float)target_h};
     //target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
     load_textures();
@@ -1291,7 +1291,7 @@ void libdraw_init_rest(gamestate* const g) {
     load_shaders();
     int x = target_w / 2;
     int y = target_h / 2;
-    g->cam2d.offset = (Vector2){x, y};
+    g->cam2d.offset = (Vector2){(float)x, (float)y};
     g->cam2d.zoom = 1.0f;
     gamestate_set_debug_panel_pos_top_right(g);
     // set the camera target to the center of the dungeon
@@ -1354,7 +1354,7 @@ static void draw_message_history(gamestate* const g) {
     Vector2 text_size = MeasureTextEx(GetFontDefault(), tmp_buffer, font_size, g->line_spacing);
     // Calculate box position
     // we want the box to be in the top left corner of the screen
-    Rectangle box = {.x = x, .y = y, .width = text_size.x + g->pad, .height = text_size.y + g->pad};
+    Rectangle box = {(float)x, (float)y, (float)text_size.x + g->pad, (float)text_size.y + g->pad};
     // Draw box (semi-transparent black with white border)
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);
@@ -1524,7 +1524,7 @@ static void draw_gameplay_settings_menu(gamestate* const g) {
     int box_y = (h - box_height) / 2;
     // Draw background box
     DrawRectangle(box_x, box_y, box_width, box_height, (Color){0x33, 0x33, 0x33, 0xcc});
-    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 2, WHITE);
+    DrawRectangleLinesEx((Rectangle){(float)box_x, (float)box_y, (float)box_width, (float)box_height}, 2, WHITE);
     // Draw menu title
     int title_x = box_x + (box_width - MeasureText(menu_title, font_size)) / 2;
     DrawText(menu_title, title_x, box_y + 10, font_size, WHITE);
@@ -1716,7 +1716,7 @@ static void draw_character_creation_screen(gamestate* const g) {
         y += font_size + 4;
     }
     // Draw sprite placeholder
-    DrawRectangleLinesEx((Rectangle){cx - 210, sy, 200, 200}, 4, RED);
+    DrawRectangleLinesEx((Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200}, 4, RED);
     // Draw instructions
     y += font_size + 8;
     for (int i = 0; i < sizeof(remaining_text) / sizeof(remaining_text[0]); i++) {

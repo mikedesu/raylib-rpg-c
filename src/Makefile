@@ -5,7 +5,7 @@ WFLAGS = -Wall -std=c++17
 SHARED = -shared
 STATIC_LINK_RAYLIB = -l:libraylib.a  # Desktop Raylib
 POSITION_INDEPENDENT_CODE = -fPIC
-MAIN_C = main.c
+MAIN_C = main.cpp
 LINK_MATH = -lm
 RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 CFLAGS ?= # Allow override
@@ -17,7 +17,7 @@ LIBLOGIC_OBJECTS = liblogic.o $(GAMESTATE_OBJECTS)
 
 # Web build setup
 WEB_CC = emcc
-WEB_SOURCES = $(MAIN_C) gameloader_web.c libdraw.c liblogic.c gamestate.c gamestate_light_radius.c gamestate_explored_list.c hashtable_entityid_spritegroup.c  specifier.c dungeon_floor.c dungeon_tile.c sprite.c spritegroup.c race.c dungeon.c keybinding.c path_node.c component_table.c component.c
+WEB_SOURCES = $(MAIN_C) gameloader_web.cpp libdraw.cpp libdraw_sort_inventory_menu.cpp liblogic.cpp gamestate.cpp gamestate_light_radius.cpp gamestate_explored_list.cpp hashtable_entityid_spritegroup.cpp  specifier.cpp dungeon_floor.cpp dungeon_tile.cpp sprite.cpp spritegroup.cpp race.cpp dungeon.cpp keybinding.cpp path_node.cpp component_table.cpp component.cpp
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
 

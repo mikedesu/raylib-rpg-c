@@ -519,7 +519,11 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
         if (*c_list == NULL) return false;
     }
     // Initialize the component
-    void* c_ptr = *c_list + (*c_count * c_size);
+    //void* c_ptr = *c_list + (*c_count * c_size);
+    // the above line generates an error: Arithmetic on pointer to void
+    // we need to cast it to the correct type
+    void* c_ptr = (char*)(*c_list) + (*c_count * c_size);
+
     switch (comp) {
     case C_NAME: init_name_component((name_component*)c_ptr, id, (const char*)data); break;
     case C_TYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
