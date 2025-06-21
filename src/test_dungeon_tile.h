@@ -297,58 +297,58 @@ void test_dungeon_tiles(void) {
     run_test_tile_entity_management();
     run_test_tile_visibility_and_exploration();
     run_test_tile_features_and_resizing();
-    
+
     // Add a simple standalone test for tile serialization
     printf("\n--- Running standalone tile serialization test ---\n");
     tile_t* test_tile = tile_create(TILE_FLOOR_STONE_00);
     size_t size = tile_serialized_size(test_tile);
-    char* buffer = malloc(size);
+    char* buffer = (char*)malloc(size);
     if (buffer) {
         size_t written = tile_serialize(test_tile, buffer, size);
         printf("Tile serialized: %zu bytes\n", written);
-        
+
         tile_t* copy_tile = tile_create(TILE_NONE);
         bool success = tile_deserialize(copy_tile, buffer, size);
         printf("Tile deserialization %s\n", success ? "succeeded" : "failed");
-        
+
         if (success) {
             printf("Original type: %d, Copy type: %d\n", test_tile->type, copy_tile->type);
         }
-        
+
         free(buffer);
         tile_free(copy_tile);
     }
     tile_free(test_tile);
     printf("--- Standalone tile serialization test complete ---\n");
-    
+
     // Test tile memory size
     printf("\n--- Testing tile memory size ---\n");
     tile_t* memory_test_tile = tile_create(TILE_FLOOR_STONE_00);
-    
+
     // Calculate and print the memory size
     size_t base_memory_size = tile_memory_size(memory_test_tile);
     printf("Base tile memory size: %zu bytes\n", base_memory_size);
-    
+
     // Add some entities and recalculate
     for (int i = 0; i < 5; i++) {
         tile_add(memory_test_tile, i + 1);
     }
-    
+
     size_t with_entities_size = tile_memory_size(memory_test_tile);
     printf("Tile with 5 entities memory size: %zu bytes\n", with_entities_size);
-    
+
     // Test with resized entities array
     while (memory_test_tile->entity_count < DUNGEON_TILE_MAX_ENTITIES_DEFAULT + 1) {
         tile_add(memory_test_tile, memory_test_tile->entity_count + 100);
     }
-    
+
     size_t resized_memory_size = tile_memory_size(memory_test_tile);
     printf("Tile after resize memory size: %zu bytes\n", resized_memory_size);
     printf("Entity array size: %zu bytes\n", memory_test_tile->entity_max * sizeof(entityid));
-    
+
     tile_free(memory_test_tile);
     printf("--- Tile memory size testing complete ---\n");
-    
+
     run_test_tile_serialization();
     run_test_tile_serialization_edge_cases();
 }

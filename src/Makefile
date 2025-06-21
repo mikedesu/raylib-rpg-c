@@ -41,8 +41,8 @@ game: main.o gameloader.o gamestate.o gamestate_light_radius.o gamestate_explore
 test: $(UNIT_TEST_OBJS)
 	$(CC) -o $@ $(UNIT_TEST_OBJS) $(WFLAGS) $(CFLAGS)
 
-unit_test.o: unit_test.c unit_test.h 
-	    $(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) unit_test.c -o $@
+#unit_test.o: unit_test.cpp unit_test.h 
+#	    $(CC) $(OBJ) $(POSITION_INDEPENDENT_CODE) $(WFLAGS) $(CFLAGS) unit_test.cpp -o $@
 
 # Web build
 index.html: $(WEB_SOURCES)
