@@ -312,7 +312,7 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     g_update_location(g, id, (vec3){ex, ey, z});
 
     //g_update_sprite_move(g, id, (vec3){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
-    g_update_sprite_move(g, id, (Rectangle){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0, 0});
+    g_update_sprite_move(g, id, (Rectangle){(float)(x * DEFAULT_TILE_SIZE), (float)(y * DEFAULT_TILE_SIZE), 0, 0});
 
     if (id == g->hero_id) update_player_tiles_explored(g);
     // at this point the move is 'successful'
@@ -643,7 +643,8 @@ static void execute_action(gamestate* const g, entityid id, entity_action_t acti
 
 static vec3* get_locs_around_entity(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
-    vec3* locs = malloc(sizeof(vec3) * 8);
+    //vec3* locs = malloc(sizeof(vec3) * 8);
+    vec3* locs = (vec3*)malloc(sizeof(vec3) * 8);
     massert(locs, "failed to allocate memory for locs");
     int index = 0;
     vec3 oldloc = g_get_location(g, id);
@@ -982,7 +983,7 @@ static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* cou
     massert(df, "dungeon floor is NULL");
     massert(count, "count is NULL");
     int c = df_count_empty_non_walls_in_area(df, x0, y0, w, h);
-    vec3* locs = malloc(sizeof(vec3) * c);
+    vec3* locs = (vec3*)malloc(sizeof(vec3) * c);
     massert(locs, "malloc failed");
     int i = 0;
     for (int y = 0; y < h && y + y0 < df->height; y++) {
@@ -1004,7 +1005,7 @@ static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* con
     massert(df, "dungeon floor is NULL");
     massert(count, "count is NULL");
     int c = df_count_non_walls_in_area(df, x0, y0, w, h);
-    vec3* locs = malloc(sizeof(vec3) * c);
+    vec3* locs = (vec3*)malloc(sizeof(vec3) * c);
     massert(locs, "malloc failed");
     int i = 0;
     // given the list of non-walls...
@@ -1201,7 +1202,7 @@ static void handle_input_gameplay_settings(const inputstate* const is, gamestate
 static void handle_sort_inventory(gamestate* const g) {
     g->display_sort_inventory_menu = false;
     // we need to sort the inventory based on the selected type
-    inventory_sort sort_type = g->sort_inventory_menu_selection;
+    inventory_sort sort_type = (inventory_sort)g->sort_inventory_menu_selection;
     size_t count = 0;
     entityid* inventory = g_get_inventory(g, g->hero_id, &count);
     massert(inventory, "inventory is NULL");

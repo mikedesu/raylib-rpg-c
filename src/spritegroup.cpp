@@ -8,7 +8,7 @@
 spritegroup_t* spritegroup_create(int capacity) {
     massert(capacity > 0, "capacity must be greater than 0, got %d", capacity);
     if (capacity <= 0) return NULL;
-    spritegroup_t* sg = malloc(sizeof(spritegroup_t));
+    spritegroup_t* sg = (spritegroup_t*)malloc(sizeof(spritegroup_t));
     massert(sg, "spritegroup is NULL");
     if (!sg) {
         merror("Failed to allocate memory for spritegroup");
@@ -17,7 +17,7 @@ spritegroup_t* spritegroup_create(int capacity) {
     sg->current = sg->size = sg->off_x = sg->off_y = sg->default_anim = sg->id = 0;
     sg->alpha = 255;
     sg->capacity = capacity;
-    sg->sprites = malloc(sizeof(sprite*) * capacity);
+    sg->sprites = (sprite**)malloc(sizeof(sprite*) * capacity);
     massert(sg->sprites, "spritegroup sprites is NULL");
     if (!sg->sprites) {
         free(sg);

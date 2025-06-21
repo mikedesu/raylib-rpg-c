@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 path_node* create_path_node(vec3 position, path_node* parent, vec3 target) {
-    path_node* node = malloc(sizeof(path_node));
+    path_node* node = (path_node*)malloc(sizeof(path_node));
     if (!node) return NULL;
 
     node->pos = position;
@@ -65,7 +65,7 @@ vec3* find_path(vec3 start, vec3 end, dungeon_floor_t* df, int* path_length) {
 
     // If start and end are the same
     if (locations_equal(start, end)) {
-        vec3* path = malloc(sizeof(vec3));
+        vec3* path = (vec3*)malloc(sizeof(vec3));
         if (!path) return NULL;
 
         path[0] = start;
@@ -89,7 +89,7 @@ vec3* find_path(vec3 start, vec3 end, dungeon_floor_t* df, int* path_length) {
     // Add to open list
     if (open_count == open_capacity) {
         open_capacity = open_capacity == 0 ? 8 : open_capacity * 2;
-        open_list = realloc(open_list, open_capacity * sizeof(path_node*));
+        open_list = (path_node**)realloc(open_list, open_capacity * sizeof(path_node*));
         if (!open_list) {
             free(start_node);
             return NULL;
@@ -111,7 +111,7 @@ vec3* find_path(vec3 start, vec3 end, dungeon_floor_t* df, int* path_length) {
         // Add current to closed list
         if (closed_count == closed_capacity) {
             closed_capacity = closed_capacity == 0 ? 8 : closed_capacity * 2;
-            closed_list = realloc(closed_list, closed_capacity * sizeof(path_node*));
+            closed_list = (path_node**)realloc(closed_list, closed_capacity * sizeof(path_node*));
             if (!closed_list) {
                 // Clean up
                 for (int i = 0; i < open_count; i++) free(open_list[i]);
@@ -132,7 +132,7 @@ vec3* find_path(vec3 start, vec3 end, dungeon_floor_t* df, int* path_length) {
                 node = node->parent;
             }
 
-            vec3* path = malloc(count * sizeof(vec3));
+            vec3* path = (vec3*)malloc(count * sizeof(vec3));
             if (!path) {
                 // Clean up
                 for (int i = 0; i < open_count; i++) free(open_list[i]);
@@ -217,7 +217,7 @@ vec3* find_path(vec3 start, vec3 end, dungeon_floor_t* df, int* path_length) {
 
                 if (open_count == open_capacity) {
                     open_capacity = open_capacity * 2;
-                    path_node** new_open_list = realloc(open_list, open_capacity * sizeof(path_node*));
+                    path_node** new_open_list = (path_node**)realloc(open_list, open_capacity * sizeof(path_node*));
                     if (!new_open_list) {
                         // Clean up
                         free(new_neighbor);

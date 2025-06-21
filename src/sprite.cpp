@@ -8,7 +8,7 @@ sprite* sprite_create(Texture2D* t, int numcontexts, int numframes) {
         merror("sprite_create failed: texture is null");
         return NULL;
     }
-    sprite* s = malloc(sizeof(sprite));
+    sprite* s = (sprite*)malloc(sizeof(sprite));
     if (!s) {
         merror("sprite_create failed: could not allocate memory for sprite");
         return NULL;
@@ -29,7 +29,7 @@ sprite* sprite_create(Texture2D* t, int numcontexts, int numframes) {
     // to calculate the source rectangle we need to know the width and height of the sprite
     // given the current frame and current context,
     // the width is the current frame times the width of the sprite
-    s->src = (Rectangle){s->currentframe * s->width, s->currentcontext * s->height, s->width, s->height};
+    s->src = (Rectangle){(float)(s->currentframe * s->width), (float)(s->currentcontext * s->height), (float)s->width, (float)s->height};
     s->dest = (Rectangle){0, 0, 0, 0};
     return s;
 }

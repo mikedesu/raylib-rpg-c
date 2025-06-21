@@ -1,5 +1,6 @@
 // dungeon.c
 #include "dungeon.h"
+#include "dungeon_floor.h"
 #include "dungeon_tile_type.h"
 //#include "massert.h"
 #include "mprint.h"
@@ -9,12 +10,12 @@
 #define INITIAL_DUNGEON_CAPACITY 4
 
 dungeon_t* d_create() {
-    dungeon_t* dungeon = malloc(sizeof(dungeon_t));
+    dungeon_t* dungeon = (dungeon_t*)malloc(sizeof(dungeon_t));
     if (!dungeon) {
         merror("Failed to allocate memory for dungeon");
         return NULL;
     }
-    dungeon->floors = malloc(sizeof(dungeon_floor_t*) * INITIAL_DUNGEON_CAPACITY);
+    dungeon->floors = (dungeon_floor_t**)malloc(sizeof(dungeon_floor_t*) * INITIAL_DUNGEON_CAPACITY);
     if (!dungeon->floors) {
         merror("Failed to allocate memory for dungeon floors");
         free(dungeon);
@@ -138,7 +139,7 @@ bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size) {
         return false;
     }
     // Allocate memory for floors
-    d->floors = malloc(d->capacity_floors * sizeof(dungeon_floor_t*));
+    d->floors = (dungeon_floor_t**)malloc(d->capacity_floors * sizeof(dungeon_floor_t*));
     if (!d->floors) {
         merror("Failed to allocate memory for floors during deserialization");
         return false;
@@ -165,7 +166,7 @@ bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size) {
             return false;
         }
         // Create a new floor
-        d->floors[i] = malloc(sizeof(dungeon_floor_t));
+        d->floors[i] = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
         if (!d->floors[i]) {
             merror("Failed to allocate memory for floor %d", i);
             d_destroy(d);
@@ -204,7 +205,7 @@ bool d_add_floor(dungeon_t* const dungeon, int width, int height) {
     if (dungeon->is_locked) return false;
     if (dungeon->num_floors >= dungeon->capacity_floors) {
         int new_capacity = dungeon->capacity_floors * 2;
-        dungeon_floor_t** new_floors = realloc(dungeon->floors, sizeof(dungeon_floor_t*) * new_capacity);
+        dungeon_floor_t** new_floors = (dungeon_floor_t**)realloc(dungeon->floors, sizeof(dungeon_floor_t*) * new_capacity);
         if (!new_floors) return false;
         dungeon->floors = new_floors;
         dungeon->capacity_floors = new_capacity;

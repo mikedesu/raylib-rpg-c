@@ -1,4 +1,5 @@
 #include "dungeon_tile.h"
+#include "entityid.h"
 #include "gamestate.h"
 #include "mprint.h"
 #include <stdlib.h>
@@ -10,7 +11,7 @@ void tile_init(tile_t* const t, tiletype_t type) {
     t->visible = t->explored = t->has_pressure_plate = t->has_wall_switch = t->wall_switch_on = t->cached_player_present = false;
     t->dirty_entities = t->dirty_visibility = true;
     const size_t malloc_sz = sizeof(entityid) * DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
-    t->entities = malloc(malloc_sz);
+    t->entities = (entityid*)malloc(malloc_sz);
     if (!t->entities) {
         merror("dungeon_tile_init: failed to allocate entities array");
         t->type = TILE_NONE; // Reset to safe state
@@ -33,7 +34,7 @@ bool tile_resize(tile_t* t) {
         return false;
     }
     size_t sz = sizeof(entityid) * new_max;
-    entityid* new_e = malloc(sz);
+    entityid* new_e = (entityid*)malloc(sz);
     if (!new_e) {
         merror("dungeon_tile_resize: malloc failed");
         return false;
@@ -97,7 +98,7 @@ entityid tile_remove(tile_t* tile, entityid id) {
 tile_t* tile_create(tiletype_t type) {
     massert(type >= TILE_NONE, "tile_create: type is invalid");
     massert(type < TILE_COUNT, "tile_create: type is out of bounds");
-    tile_t* t = malloc(sizeof(tile_t));
+    tile_t* t = (tile_t*)malloc(sizeof(tile_t));
     if (!t) return NULL;
     tile_init(t, type);
     return t;
@@ -307,7 +308,7 @@ bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
         return false;
     }
     // Allocate entities array
-    t->entities = malloc(entity_max * sizeof(entityid));
+    t->entities = (entityid*)malloc(entity_max * sizeof(entityid));
     if (!t->entities) {
         merror("Failed to allocate entities array during deserialization");
         return false;

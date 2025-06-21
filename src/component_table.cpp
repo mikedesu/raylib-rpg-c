@@ -5,13 +5,13 @@
 #include <string.h>
 
 ct* ct_create() {
-    ct* table = malloc(sizeof(ct));
+    ct* table = (ct*)malloc(sizeof(ct));
     massert(table, "malloc failed");
     table->component_col_count = C_COUNT;
     table->component_row_count = 0;
     table->component_capacity = CT_DEFAULT_CAPACITY;
     table->ints_per_row = (table->component_col_count / 64) + 1;
-    table->components = malloc(table->component_capacity * table->ints_per_row * sizeof(long int));
+    table->components = (long int*)malloc(table->component_capacity * table->ints_per_row * sizeof(long int));
     if (!table->components) {
         free(table);
         return NULL;
@@ -31,7 +31,7 @@ bool ct_add_entity(ct* table, entityid id) {
     if (!table || id == ENTITYID_INVALID) return false;
     if (id >= table->component_capacity) {
         size_t new_capacity = table->component_capacity == 0 ? 1 : table->component_capacity * 2;
-        long int* new_components = realloc(table->components, new_capacity * table->ints_per_row * sizeof(long int));
+        long int* new_components = (long int*)realloc(table->components, new_capacity * table->ints_per_row * sizeof(long int));
         if (!new_components) return false;
         table->components = new_components;
         table->component_capacity = new_capacity;
@@ -40,7 +40,7 @@ bool ct_add_entity(ct* table, entityid id) {
     if (ct_has_entity(table, id)) return false;
     if (table->component_row_count >= table->component_capacity) {
         size_t new_capacity = table->component_capacity == 0 ? 1 : table->component_capacity * 2;
-        long int* new_components = realloc(table->components, new_capacity * table->ints_per_row * sizeof(long int));
+        long int* new_components = (long int*)realloc(table->components, new_capacity * table->ints_per_row * sizeof(long int));
         if (!new_components) return false;
         table->components = new_components;
         table->component_capacity = new_capacity;
