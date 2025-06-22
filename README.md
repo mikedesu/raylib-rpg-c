@@ -2,6 +2,8 @@
 
 # Project.RPG 
 
+The most recent release can be played online at [https://evildojo.itch.io/projectrpg](https://evildojo.itch.io/projectrpg)
+
 ![projectrpg](https://github.com/user-attachments/assets/2b86ab6b-b9c8-4887-8505-d5c9b669cd61)
 
 *with art assets by Krishna Palacio* [https://www.minifantasy.net](https://www.minifantasy.net)
@@ -64,8 +66,10 @@ make test
 
 ## Development Notes
 
-- The project is written in C++ (C++17 standard)
+- The project was originally developed in C, but has been ported to C++
 - The Makefile supports both native and WebAssembly builds
 - Debug builds enable additional logging and debugging features
 - Unit tests can be built and run using the `test` target
-
+- The game graphic and audio assets are not included in the repository
+  - The graphics are licensed such that I cannot distribute them
+  - The audio assets I have not decided how to license yet
