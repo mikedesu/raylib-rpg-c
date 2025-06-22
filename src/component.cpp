@@ -7,11 +7,19 @@
 
 void init_name_component(name_component* comp, entityid id, string name) {
     massert(comp != NULL, "comp is NULL");
-    if (!comp) return;
+    if (!comp) {
+        return;
+    }
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (id == ENTITYID_INVALID) return;
-    if (name == "") return;
-    if (name.length() == 0) return;
+    if (id == ENTITYID_INVALID) {
+        return;
+    }
+    if (name == "") {
+        return;
+    }
+    if (name.length() == 0) {
+        return;
+    }
     comp->id = id;
     comp->name = name;
 }

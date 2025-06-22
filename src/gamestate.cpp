@@ -676,15 +676,17 @@ void g_add_name(gamestate* const g, entityid id, string name) {
     massert(name != "", "name is empty string");
     massert(id != ENTITYID_INVALID, "id is invalid");
     printf("g_add_name: id: %d, name: %s\n", id, name.c_str());
-
-    //g->name_list.insert({id, name});
-
-    //g->name_list[id] = name;
-    //g->name_list[id] = name;
+    if (!ct_has_entity(g->components, id) && !ct_add_entity(g->components, id)) return;
+    // Automatically register component if not already registered
+    if (!g_has_component(g, id, C_NAME) && !g_register_comp(g, id, C_NAME)) return;
     if (g->name_list) {
         //        (*g->name_list)[id] = name;
         g->name_list->insert({id, name});
     }
+    // we have to allocate space for the name component
+    //name_component* c_ptr = (name_component*)malloc(sizeof(name_component));
+    //massert(c_ptr, "c_ptr is NULL");
+    //init_name_component(c_ptr, id, name);
     //return g_add_component(g, id, C_NAME, (void*)name, sizeof(name_component), (void**)&g->name_list, &g->name_list_count, &g->name_list_capacity);
 }
 
@@ -706,7 +708,10 @@ bool g_has_name(const gamestate* const g, entityid id) {
 string g_get_name(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g_has_name(g, id)) return "";
+    if (!g_has_name(g, id)) {
+        merror("g_get_name: id %d does not have a name component", id);
+        return "";
+    }
     //return g->name_list[id];
     if (g->name_list) {
         auto it = g->name_list->find(id);
@@ -714,6 +719,7 @@ string g_get_name(gamestate* const g, entityid id) {
             return it->second; // Return the name associated with the id
         }
     }
+    merror("g_get_name: id %d does not have a name but it does have a name component", id);
     return ""; // Return an empty string if the id is not found
 }
 

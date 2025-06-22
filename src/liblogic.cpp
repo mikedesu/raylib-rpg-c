@@ -80,7 +80,7 @@ static void check_and_handle_level_up(gamestate* const g, entityid id);
 
 static const char* get_action_key(const inputstate* const is, gamestate* const g);
 
-static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
+static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, string name);
 //static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name);
 static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name);
 static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name);
@@ -806,7 +806,9 @@ static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name)
     printf("adding entity...\n");
     entityid id = g_add_entity(g);
     printf("adding entity name: %s...\n", name.c_str());
+
     g_add_name(g, id, name);
+
     printf("adding entity type...\n");
     g_add_type(g, id, ENTITY_NPC);
     printf("adding entity race...\n");
@@ -987,10 +989,10 @@ static void update_player_tiles_explored(gamestate* const g) {
     }
 }
 
-static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z, const char* name) {
+static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z, string name) {
     printf("begin player_create...\n");
     massert(g, "gamestate is NULL");
-    massert(name, "name is NULL");
+    massert(name != "", "name is empty string");
     // use the previously-written liblogic_npc_create function
     //const entitytype_t type = ENTITY_PLAYER;
     //const entityid id = npc_create(g, rt, x, y, fl, name);
@@ -1039,7 +1041,7 @@ static void init_player(gamestate* const g) {
     printf("calling df_get_upstairs...\n");
     vec3 loc = df_get_upstairs(g->d->floors[g->d->current_floor]);
     printf("calling player_create...\n");
-    g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
+    g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "darkmage");
     massert(g->entity_turn != ENTITYID_INVALID, "failed to init hero");
     massert(g->hero_id == g->entity_turn, "hero id mismatch");
     msuccess("hero id %d", g->hero_id);
