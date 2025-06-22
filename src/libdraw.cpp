@@ -855,38 +855,38 @@ static inline void handle_debug_panel(gamestate* const g) {
 static void draw_help_menu(gamestate* const g) {
     //if (!g->display_help_menu) return;
     // const char* help_text = g->help_menu_text;
-    char* help_text[HELP_TEXT_COUNT] = {"# Help Menu",
-                                        "",
-                                        "## Controls",
-                                        "",
-                                        "-----------------------------------",
-                                        "",
-                                        "- Movement: q w e a d z x c",
-                                        "- Attack: '",
-                                        "- Pickup Item: /",
-                                        "- Turn In Place: s [movement]",
-                                        "- Wait: s s",
-                                        "- Traverse: ]",
-                                        "- Inventory: Esc",
-                                        "- Nav Inventory: arrow up/down, w/x",
-                                        "- Use/Equip/Unequip Item: enter, '",
-                                        "- Drop Item: ]",
-                                        "",
-                                        "-----------------------------------",
-                                        "",
-                                        "From the Inventory menu, you can",
-                                        "cycle menus with arrow left and right",
-                                        "Sort inventory menu with the s key",
-                                        "",
-                                        "-----------------------------------",
-                                        "",
-                                        "Music volume can be adjusted on the",
-                                        "Settings menu with left and right bracket",
-                                        "",
-                                        "-----------------------------------",
-                                        "",
-                                        "Press any key to close this menu.",
-                                        ""};
+    const char* help_text[HELP_TEXT_COUNT] = {"# Help Menu",
+                                              "",
+                                              "## Controls",
+                                              "",
+                                              "-----------------------------------",
+                                              "",
+                                              "- Movement: q w e a d z x c",
+                                              "- Attack: '",
+                                              "- Pickup Item: /",
+                                              "- Turn In Place: s [movement]",
+                                              "- Wait: s s",
+                                              "- Traverse: ]",
+                                              "- Inventory: Esc",
+                                              "- Nav Inventory: arrow up/down, w/x",
+                                              "- Use/Equip/Unequip Item: enter, '",
+                                              "- Drop Item: ]",
+                                              "",
+                                              "-----------------------------------",
+                                              "",
+                                              "From the Inventory menu, you can",
+                                              "cycle menus with arrow left and right",
+                                              "Sort inventory menu with the s key",
+                                              "",
+                                              "-----------------------------------",
+                                              "",
+                                              "Music volume can be adjusted on the",
+                                              "Settings menu with left and right bracket",
+                                              "",
+                                              "-----------------------------------",
+                                              "",
+                                              "Press any key to close this menu.",
+                                              ""};
     Color bg_color = Fade((Color){0x33, 0x33, 0x33}, 1.0f);
     int font_size = 10;
     int idx_of_longest = 26;
@@ -1240,7 +1240,7 @@ static void draw_hud(gamestate* const g) {
     int font_size = 10;
     char buffer[1024] = {0};
     const char* format_str = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d STR: %d CON: %d DEX: %d Floor: %d Turn %d";
-    snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp, str, con, dex, floor, turn);
+    snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id).c_str(), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp, str, con, dex, floor, turn);
     Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
     int box_w = text_size.x + g->pad;
     int box_h = text_size.y + g->pad;
@@ -1325,7 +1325,7 @@ void libdraw_init(gamestate* const g) {
     int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
     const char* title = WINDOW_TITLE;
     char full_title[1024] = {0};
-    snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version);
+    snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version.c_str());
     InitWindow(w, h, full_title);
     libdraw_init_rest(g);
 }
@@ -1444,14 +1444,15 @@ static void draw_inventory_menu(gamestate* const g) {
         char item_display[128];
         bool is_equipped = g_is_equipped(g, g->hero_id, item_id);
         // Highlight selected item with arrow
-        const char* item_name = g_get_name(g, item_id);
+        //const char* item_name = g_get_name(g, item_id);
+        string item_name = g_get_name(g, item_id);
         if (i == g->inventory_menu_selection) {
-            snprintf(item_display, sizeof(item_display), "> %s", item_name);
+            snprintf(item_display, sizeof(item_display), "> %s", item_name.c_str());
             // Draw selection highlight background
             DrawRectangle(left_box.x, item_y - 2, left_box.width, font_size + 4, (Color){0x44, 0x44, 0x44, 0xFF});
         } else {
             //snprintf(item_display, sizeof(item_display), "  %s", g_get_name(g, item_id));
-            snprintf(item_display, sizeof(item_display), "  %s", item_name);
+            snprintf(item_display, sizeof(item_display), "  %s", item_name.c_str());
         }
         if (is_equipped) strncat(item_display, " (Equipped)", sizeof(item_display) - strlen(item_display) - 1);
         DrawTextEx(GetFontDefault(), item_display, (Vector2){item_x, item_y}, font_size, g->line_spacing, WHITE);
@@ -1460,20 +1461,21 @@ static void draw_inventory_menu(gamestate* const g) {
     // Draw item info in right_box
     if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < inventory_count) {
         entityid item_id = inventory[g->inventory_menu_selection];
-        const char* name = g_get_name(g, item_id);
+        //const char* name = g_get_name(g, item_id);
+        string name = g_get_name(g, item_id);
         itemtype item_type = g_get_itemtype(g, item_id);
         if (g_has_damage(g, item_id)) {
             vec3 dmg_roll = g_get_damage(g, item_id);
             int n = dmg_roll.x, sides = dmg_roll.y, modifier = dmg_roll.z;
             if (modifier)
-                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d+%d", name, item_type, n, sides, modifier);
+                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d+%d", name.c_str(), item_type, n, sides, modifier);
             else
-                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d", name, item_type, n, sides);
+                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d", name.c_str(), item_type, n, sides);
         } else if (g_has_ac(g, item_id)) {
             int ac = g_get_ac(g, item_id);
-            snprintf(info_text, sizeof(info_text), "%s\nType: %d\nAC: %d", name, item_type, ac);
+            snprintf(info_text, sizeof(info_text), "%s\nType: %d\nAC: %d", name.c_str(), item_type, ac);
         } else {
-            snprintf(info_text, sizeof(info_text), "%s\nType: %d", name, item_type);
+            snprintf(info_text, sizeof(info_text), "%s\nType: %d", name.c_str(), item_type);
         }
         sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
     } else
@@ -1571,7 +1573,7 @@ bool libdraw_windowshouldclose(const gamestate* const g) {
 
 static void draw_version(const gamestate* const g) {
     massert(g, "gamestate is NULL");
-    const char* version = g->version;
+    const char* version = g->version.c_str();
     int font_size = 10;
     char buffer[1024] = {0};
     // also grab the current music track path
@@ -1594,7 +1596,7 @@ static void draw_title_screen(gamestate* const g, bool show_menu) {
     const char* menu_text[2] = {"New Game", "Continue (coming soon)"};
     const char* title_text_0 = "project.";
     const char* title_text_1 = "rpg";
-    const char* version_text = g->version;
+    const char* version_text = g->version.c_str();
     const char* start_text = "Press enter or space to begin";
     char buffer[1024] = {0};
     Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};

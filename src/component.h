@@ -118,7 +118,8 @@ static inline const char* component2str(component c) {
 }
 
 // string components
-void init_name_component(name_component* comp, entityid id, const char* name);
+//void init_name_component(name_component* comp, entityid id, const char* name);
+void init_name_component(name_component* comp, entityid id, string name);
 
 // int components
 void init_int_component(int_component* comp, entityid id, int data);

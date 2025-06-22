@@ -43,9 +43,18 @@ gamestate* gamestateinitptr() {
     g->debugpanel.fg_color = RAYWHITE;
     g->debugpanel.bg_color = RED;
     g->debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
-    g->targetwidth = g->targetheight = g->windowwidth = g->windowheight = g->hero_id = g->entity_turn = g->new_entityid_begin = g->new_entityid_end = -1;
-    g->timebegan = g->currenttime = time(NULL);
-    g->timebegantm = localtime(&(g->timebegan)), g->currenttimetm = localtime(&(g->currenttime));
+    g->targetwidth = -1;
+    g->targetheight = -1;
+    g->windowwidth = -1;
+    g->windowheight = -1;
+    g->hero_id = -1;
+    g->entity_turn = -1;
+    g->new_entityid_begin = -1;
+    g->new_entityid_end = -1;
+    g->timebegan = time(NULL);
+    g->currenttime = time(NULL);
+    g->timebegantm = localtime(&(g->timebegan));
+    g->currenttimetm = localtime(&(g->currenttime));
     bzero(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
     bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
     strftime(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", g->timebegantm);
@@ -109,7 +118,7 @@ gamestate* gamestateinitptr() {
     g->debugpanel.pad_right = 0;
     g->debugpanel.pad_bottom = 0;
     g->inventory_menu_selection = 0;
-    g->name_list_count = 0;
+    //g->name_list_count = 0;
     g->type_list_count = 0;
     g->race_list_count = 0;
     g->direction_list_count = 0;
@@ -142,7 +151,7 @@ gamestate* gamestateinitptr() {
     g->explored_list_count = 0;
     g->visible_list_count = 0;
 
-    g->name_list_capacity = n;
+    //g->name_list_capacity = n;
     g->type_list_capacity = n;
     g->race_list_capacity = n;
     g->direction_list_capacity = n;
@@ -175,7 +184,7 @@ gamestate* gamestateinitptr() {
     g->explored_list_capacity = n;
     g->visible_list_capacity = n;
 
-    g->name_list = (name_component*)malloc(sizeof(name_component) * n);
+    //g->name_list = (name_component*)malloc(sizeof(name_component) * n);
     g->type_list = (int_component*)malloc(sizeof(int_component) * n);
     g->race_list = (int_component*)malloc(sizeof(int_component) * n);
     g->direction_list = (int_component*)malloc(sizeof(int_component) * n);
@@ -208,7 +217,7 @@ gamestate* gamestateinitptr() {
     g->explored_list = (vec3_list_component*)malloc(sizeof(vec3_list_component) * n);
     g->visible_list = (vec3_list_component*)malloc(sizeof(vec3_list_component) * n);
 
-    massert(g->name_list, "g->name_list is NULL");
+    //massert(g->name_list, "g->name_list is NULL");
     massert(g->type_list, "g->type_list is NULL");
     massert(g->race_list, "g->race_list is NULL");
     massert(g->direction_list, "g->direction_list is NULL");
@@ -392,7 +401,7 @@ void gamestatefree(gamestate* g) {
     // free message history
     gamestate_free_msg_history(g);
     ct_destroy(g->components);
-    free(g->name_list);
+    //free(g->name_list);
     free(g->type_list);
     free(g->race_list);
     free(g->direction_list);
@@ -566,11 +575,13 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     return true;
 }
 
-bool g_add_name(gamestate* const g, entityid id, const char* name) {
+//bool g_add_name(gamestate* const g, entityid id, const char* name) {
+void g_add_name(gamestate* const g, entityid id, string name) {
     massert(g, "g is NULL");
     massert(name, "name is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_add_component(g, id, C_NAME, (void*)name, sizeof(name_component), (void**)&g->name_list, &g->name_list_count, &g->name_list_capacity);
+    g->name_list[id] = name;
+    //return g_add_component(g, id, C_NAME, (void*)name, sizeof(name_component), (void**)&g->name_list, &g->name_list_count, &g->name_list_capacity);
 }
 
 bool g_has_component(const gamestate* const g, entityid id, component comp) {
@@ -587,17 +598,12 @@ bool g_has_name(const gamestate* const g, entityid id) {
     return g_has_component(g, id, C_NAME);
 }
 
-const char* g_get_name(gamestate* const g, entityid id) {
+//const char* g_get_name(gamestate* const g, entityid id) {
+string g_get_name(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    //massert(g_has_name(g, id), "id %d does not have a name component, is type %s", id, entitytype_to_string(g_get_type(g, id)));
-
-    // if something doesn't have a name, we return NULL
-    if (!g_has_name(g, id)) return NULL;
-
-    for (int i = 0; i < g->name_list_count; i++)
-        if (g->name_list[i].id == id) return g->name_list[i].name;
-    return NULL;
+    if (!g_has_name(g, id)) return "";
+    return g->name_list[id];
 }
 
 bool g_add_type(gamestate* const g, entityid id, int type) {
@@ -1089,9 +1095,9 @@ bool g_add_inventory(gamestate* const g, entityid id) {
 static int compare_by_name(const void* a, const void* b) {
     entityid id_a = *(entityid*)a;
     entityid id_b = *(entityid*)b;
-    const char* name_a = g_get_name(g_sort_context, id_a);
-    const char* name_b = g_get_name(g_sort_context, id_b);
-    return strcmp(name_a, name_b);
+    string name_a = g_get_name(g_sort_context, id_a);
+    string name_b = g_get_name(g_sort_context, id_b);
+    return name_a == name_b;
 }
 // Comparison function for sorting by type
 static int compare_by_type(const void* a, const void* b) {

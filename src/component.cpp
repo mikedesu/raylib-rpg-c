@@ -2,22 +2,18 @@
 #include "massert.h"
 #include "vec3.h"
 #include "vec3_component.h"
-#include <string.h>
+#include <cstring>
 //#include "mprint.h"
 
-void init_name_component(name_component* comp, entityid id, const char* name) {
+void init_name_component(name_component* comp, entityid id, string name) {
     massert(comp != NULL, "comp is NULL");
     if (!comp) return;
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (id == ENTITYID_INVALID) return;
-    massert(name != NULL, "name is NULL");
-    if (!name) return;
-    massert(strlen(name) > 0, "name is empty");
-    if (strlen(name) == 0) return;
-    massert(strlen(name) < sizeof(comp->name), "name is too long");
-    if (strlen(name) >= sizeof(comp->name)) return;
+    if (name == "") return;
+    if (name.length() == 0) return;
     comp->id = id;
-    snprintf(comp->name, sizeof(comp->name), "%s", name);
+    comp->name = name;
 }
 
 void init_int_component(int_component* comp, entityid id, int data) {

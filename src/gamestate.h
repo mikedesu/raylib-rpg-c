@@ -23,6 +23,9 @@
 #include <stdbool.h>
 #include <time.h>
 
+#include <unordered_map>
+using namespace std;
+
 #define DEFAULT_MUSIC_VOLUME 0.0f
 #define DEFAULT_MSG_HIST_BGCOLOR ((Color){0x33, 0x33, 0x33, 255})
 #define GAMESTATE_SIZEOFTIMEBUF 64
@@ -107,9 +110,10 @@ typedef struct gamestate {
     equipment_component* equipment_list;
     stats_component* stats_list;
 
-    name_component* name_list;
-    int name_list_count;
-    int name_list_capacity;
+    //name_component* name_list;
+    //int name_list_count;
+    //int name_list_capacity;
+    unordered_map<entityid, string> name_list;
 
     int_component* type_list;
     int type_list_count;
@@ -268,7 +272,8 @@ typedef struct gamestate {
     int total_music_paths;
     char music_file_paths[1024][128];
 
-    char* version;
+    //char* version;
+    string version;
 
     int restart_count;
     bool do_restart;
@@ -312,9 +317,10 @@ bool g_register_comps(gamestate* const g, entityid id, ...);
 
 bool g_add_component(gamestate* const g, entityid id, component comp, void* data, size_t component_size, void** component_list, int* component_count, int* component_capacity);
 
-bool g_add_name(gamestate* const g, entityid id, const char* name);
+//bool g_add_name(gamestate* const g, entityid id, const char* name);
+void g_add_name(gamestate* const g, entityid id, string name);
 bool g_has_name(const gamestate* const g, entityid id);
-const char* g_get_name(gamestate* const g, entityid id);
+string g_get_name(gamestate* const g, entityid id);
 
 bool g_add_type(gamestate* const g, entityid id, int type);
 bool g_set_type(gamestate* const g, entityid id, int type);
