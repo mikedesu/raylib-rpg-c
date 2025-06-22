@@ -19,6 +19,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
+
+using std::string;
 
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
@@ -118,7 +121,6 @@ gamestate* gamestateinitptr() {
     g->debugpanel.pad_right = 0;
     g->debugpanel.pad_bottom = 0;
     g->inventory_menu_selection = 0;
-    //g->name_list_count = 0;
     g->type_list_count = 0;
     g->race_list_count = 0;
     g->direction_list_count = 0;
@@ -151,7 +153,6 @@ gamestate* gamestateinitptr() {
     g->explored_list_count = 0;
     g->visible_list_count = 0;
 
-    //g->name_list_capacity = n;
     g->type_list_capacity = n;
     g->race_list_capacity = n;
     g->direction_list_capacity = n;
@@ -184,7 +185,6 @@ gamestate* gamestateinitptr() {
     g->explored_list_capacity = n;
     g->visible_list_capacity = n;
 
-    //g->name_list = (name_component*)malloc(sizeof(name_component) * n);
     g->type_list = (int_component*)malloc(sizeof(int_component) * n);
     g->race_list = (int_component*)malloc(sizeof(int_component) * n);
     g->direction_list = (int_component*)malloc(sizeof(int_component) * n);
@@ -217,7 +217,6 @@ gamestate* gamestateinitptr() {
     g->explored_list = (vec3_list_component*)malloc(sizeof(vec3_list_component) * n);
     g->visible_list = (vec3_list_component*)malloc(sizeof(vec3_list_component) * n);
 
-    //massert(g->name_list, "g->name_list is NULL");
     massert(g->type_list, "g->type_list is NULL");
     massert(g->race_list, "g->race_list is NULL");
     massert(g->direction_list, "g->direction_list is NULL");
@@ -261,6 +260,8 @@ gamestate* gamestateinitptr() {
     gamestate_load_monster_defs(g);
 
     g->music_volume = DEFAULT_MUSIC_VOLUME;
+
+    g->name_list = new unordered_map<entityid, string>();
 
     return g;
 }
@@ -401,7 +402,12 @@ void gamestatefree(gamestate* g) {
     // free message history
     gamestate_free_msg_history(g);
     ct_destroy(g->components);
-    //free(g->name_list);
+
+    if (g->name_list) {
+        delete g->name_list;
+        g->name_list = NULL;
+    }
+
     free(g->type_list);
     free(g->race_list);
     free(g->direction_list);
@@ -580,7 +586,16 @@ void g_add_name(gamestate* const g, entityid id, string name) {
     massert(g, "g is NULL");
     massert(name, "name is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    g->name_list[id] = name;
+    printf("g_add_name: id: %d, name: %s\n", id, name.c_str());
+
+    //g->name_list.insert({id, name});
+
+    //g->name_list[id] = name;
+    //g->name_list[id] = name;
+    if (g->name_list) {
+        //        (*g->name_list)[id] = name;
+        g->name_list->insert({id, name});
+    }
     //return g_add_component(g, id, C_NAME, (void*)name, sizeof(name_component), (void**)&g->name_list, &g->name_list_count, &g->name_list_capacity);
 }
 
@@ -603,7 +618,14 @@ string g_get_name(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (!g_has_name(g, id)) return "";
-    return g->name_list[id];
+    //return g->name_list[id];
+    if (g->name_list) {
+        auto it = g->name_list->find(id);
+        if (it != g->name_list->end()) {
+            return it->second; // Return the name associated with the id
+        }
+    }
+    return ""; // Return an empty string if the id is not found
 }
 
 bool g_add_type(gamestate* const g, entityid id, int type) {

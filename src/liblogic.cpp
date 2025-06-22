@@ -80,7 +80,8 @@ static void check_and_handle_level_up(gamestate* const g, entityid id);
 static const char* get_action_key(const inputstate* const is, gamestate* const g);
 
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, const char* name);
-static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name);
+//static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name);
+static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name);
 static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name);
 static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, const char* name);
 static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, const char* name);
@@ -737,23 +738,28 @@ static void init_dungeon(gamestate* const g) {
     for (int i = 0; i < df_count; i++) d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 }
 
-static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name) {
+//static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name) {
+static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name) {
+    printf("begin npc_create...\n");
     massert(g, "gamestate is NULL");
-    massert(name && name[0], "name is NULL or empty");
-    massert(rt >= 0, "race_type is out of bounds: %s: %d", name, rt);
-    massert(rt < RACE_COUNT, "race_type is out of bounds: %s: %d", name, rt);
-    massert(loc.z >= 0, "z is out of bounds: %s: %d", name, loc.z);
-    massert(loc.z < g->d->num_floors, "z is out of bounds: %s: %d", name, loc.z);
+    //massert(name && name[0], "name is NULL or empty");
+    //massert(rt >= 0, "race_type is out of bounds: %s: %d", name, rt);
+    //massert(rt < RACE_COUNT, "race_type is out of bounds: %s: %d", name, rt);
+    //massert(loc.z >= 0, "z is out of bounds: %s: %d", name, loc.z);
+    //massert(loc.z < g->d->num_floors, "z is out of bounds: %s: %d", name, loc.z);
+    printf("calling d_get_floor...\n");
     dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
-    massert(df, "failed to get current dungeon floor");
-    massert(loc.x >= 0, "x is out of bounds: %s: %d", name, loc.x);
-    massert(loc.x < df->width, "x is out of bounds: %s: %d", name, loc.x);
-    massert(loc.y >= 0, "y is out of bounds: %s: %d", name, loc.y);
-    massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
+    //massert(df, "failed to get current dungeon floor");
+    //massert(loc.x >= 0, "x is out of bounds: %s: %d", name, loc.x);
+    //massert(loc.x < df->width, "x is out of bounds: %s: %d", name, loc.x);
+    //massert(loc.y >= 0, "y is out of bounds: %s: %d", name, loc.y);
+    //massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
     // can we create an entity at this location? no entities can be made on wall-types etc
 
+    printf("calling df_tile_at...\n");
     tile_t* const tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
+    printf("checking if tile is walkable and empty...\n");
     if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) return ENTITYID_INVALID;
 
     //if (tile_has_live_npcs(g, tile)) {
@@ -761,15 +767,22 @@ static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* 
     //    return ENTITYID_INVALID;
     //}
 
+    printf("adding entity...\n");
     entityid id = g_add_entity(g);
+    printf("adding entity name...\n");
     g_add_name(g, id, name);
+    printf("adding entity type...\n");
     g_add_type(g, id, ENTITY_NPC);
+    printf("adding entity race...\n");
     g_add_race(g, id, rt);
+    printf("adding entity dir...\n");
     g_add_direction(g, id, DIR_RIGHT);
 
     vec3 loc_vec = {loc.x, loc.y, loc.z};
+    printf("adding entity loc...\n");
     g_add_location(g, id, loc_vec);
 
+    printf("adding remaining entity components...\n");
     g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
     g_add_dead(g, id, 0);
     g_add_update(g, id, false);
@@ -799,6 +812,7 @@ static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* 
     g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
     g_set_stat(g, id, STATS_AC, 10);
 
+    printf("adding entity to dungeon floor...\n");
     if (!df_add_at(df, id, loc.x, loc.y)) return ENTITYID_INVALID;
 
     return id;
@@ -938,20 +952,26 @@ static void update_player_tiles_explored(gamestate* const g) {
 }
 
 static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z, const char* name) {
+    printf("begin player_create...\n");
     massert(g, "gamestate is NULL");
     massert(name, "name is NULL");
     // use the previously-written liblogic_npc_create function
     //const entitytype_t type = ENTITY_PLAYER;
     //const entityid id = npc_create(g, rt, x, y, fl, name);
+    printf("calling npc_create...\n");
     const entityid id = npc_create(g, rt, (vec3){x, y, z}, name);
     massert(id != ENTITYID_INVALID, "failed to create player");
+    printf("calling gamestate_set_hero_id...\n");
     gamestate_set_hero_id(g, id);
+    printf("calling g_set_type...\n");
     g_set_type(g, id, ENTITY_PLAYER);
     //int str_roll = do_roll_best_of_3((roll){3, 6, 0});
     //int con_roll = do_roll_best_of_3((roll){3, 6, 0});
+    printf("rolling stats...\n");
     int str_roll = do_roll_best_of_3((vec3){3, 6, 0});
     int con_roll = do_roll_best_of_3((vec3){3, 6, 0});
     int dex_roll = do_roll_best_of_3((vec3){3, 6, 0});
+    printf("calling set stats...\n");
     g_set_stat(g, id, STATS_STR, str_roll);
     g_set_stat(g, id, STATS_CON, con_roll);
     g_set_stat(g, id, STATS_DEX, dex_roll);
@@ -966,21 +986,28 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
 
     int default_vision_distance = 2;
     int default_light_radius = 2;
+    printf("calling set light radius...\n");
     g_set_light_radius(g, id, default_light_radius);
+    printf("calling set vision radius...\n");
     g_set_vision_distance(g, id, default_vision_distance);
+    printf("calling update player tiles explored...\n");
     update_player_tiles_explored(g);
     return id;
 }
 
 static void init_player(gamestate* const g) {
     massert(g, "gamestate is NULL");
+    printf("begin init_player...\n");
     // setting it up so we can return a vec3 from a function
     // that can scan for an appropriate starting location
+    printf("calling df_get_upstairs...\n");
     vec3 loc = df_get_upstairs(g->d->floors[g->d->current_floor]);
+    printf("calling player_create...\n");
     g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "hero");
     massert(g->entity_turn != ENTITYID_INVALID, "failed to init hero");
     massert(g->hero_id == g->entity_turn, "hero id mismatch");
     msuccess("hero id %d", g->hero_id);
+    printf("end init_player...\n");
 }
 
 static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
@@ -1947,12 +1974,12 @@ void liblogic_init(gamestate* const g) {
     srand(time(NULL));
     printf("calling init_dungeon(g)...\n");
     init_dungeon(g);
-    //gamestate_init_entityids(g);
     g->msg_system.count = 0;
     g->msg_system.index = 0;
     g->msg_system.is_active = false;
     //gamestate_load_keybindings(g);
-    //init_player(g);
+    printf("calling init_player(g)...\n");
+    init_player(g);
     //minfo("player initialized");
     // test to create a weapon
     //init_weapon_test(g);

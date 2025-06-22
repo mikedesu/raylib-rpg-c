@@ -110,10 +110,7 @@ typedef struct gamestate {
     equipment_component* equipment_list;
     stats_component* stats_list;
 
-    //name_component* name_list;
-    //int name_list_count;
-    //int name_list_capacity;
-    unordered_map<entityid, string> name_list;
+    unordered_map<entityid, string>* name_list;
 
     int_component* type_list;
     int type_list_count;
