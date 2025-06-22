@@ -255,7 +255,22 @@ gamestate* gamestateinitptr() {
     gamestate_init_music_paths(g);
     gamestate_init_msg_history(g);
     g->max_title_screen_selections = 3;
-    g->chara_creation = (character_creation){0};
+    //g->chara_creation = (character_creation){0};
+
+    minfo("Gamestate initialized with version: %s", g->version.c_str());
+
+    g->chara_creation.name = "hero";
+    g->chara_creation.strength = 10;
+    g->chara_creation.dexterity = 10;
+    g->chara_creation.constitution = 10;
+    g->chara_creation.hitdie = 6; // 1d6 hit die
+    g->chara_creation.race = RACE_HUMAN;
+    // why is the above line crashing?
+    // g->chara_creation.name = string("");
+    // the above line is also crashing
+    // g->chara_creation .name = std::string("");
+    msuccess("Gamestate character creation name set to empty string");
+
     g->current_scene = SCENE_TITLE;
     gamestate_load_monster_defs(g);
 
@@ -376,7 +391,8 @@ bool gamestate_init_msg_history(gamestate* const g) {
         g->msg_history.messages[i] = (char*)malloc(sizeof(char) * MAX_MSG_LENGTH);
         if (g->msg_history.messages[i] == NULL) {
             //merror("g->msg_history.messages[%d] is NULL", i);
-            for (int j = 0; j < i; j++) free(g->msg_history.messages[j]);
+            for (int j = 0; j < i; j++)
+                free(g->msg_history.messages[j]);
             free(g->msg_history.messages);
             return false;
         }
@@ -516,7 +532,14 @@ bool g_register_comps(gamestate* const g, entityid id, ...) {
     return true;
 }
 
-bool g_add_component(gamestate* const g, entityid id, component comp, void* data, size_t c_size, void** c_list, int* c_count, int* c_capacity) {
+bool g_add_component(gamestate* const g,
+                     entityid id,
+                     component comp,
+                     void* data,
+                     size_t c_size,
+                     void** c_list,
+                     int* c_count,
+                     int* c_capacity) {
     //minfo("g_add_component: id: %d, comp: %s", id, component2str(comp));
     massert(g, "g is NULL");
     if (!data) {
@@ -543,42 +566,105 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
     void* c_ptr = (char*)(*c_list) + (*c_count * c_size);
 
     switch (comp) {
-    case C_NAME: init_name_component((name_component*)c_ptr, id, (const char*)data); break;
-    case C_TYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_RACE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_DIRECTION: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_ITEMTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_POTIONTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_AC: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_WEAPONTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_SHIELDTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_DEFAULT_ACTION: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_DEAD: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_UPDATE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_ATTACKING: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_ZAPPING: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_BLOCKING: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_BLOCK_SUCCESS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_DAMAGED: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_LOCATION: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-    case C_SPRITE_MOVE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-    case C_TARGET: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-    case C_INVENTORY: init_inventory_component((inventory_component*)c_ptr, id); break;
-    case C_TARGET_PATH: init_target_path_component((target_path_component*)c_ptr, id, NULL, 0);
-    case C_EQUIPMENT: init_equipment_component((equipment_component*)c_ptr, id); break;
-    case C_STATS: init_stats_component((stats_component*)c_ptr, id); break;
-    case C_DAMAGE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-    case C_BASE_ATTACK_DAMAGE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-    case C_LIGHT_RADIUS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_LIGHT_RADIUS_BONUS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_VISION_DISTANCE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_RINGTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-    case C_EXPLORED_LIST: init_vec3_list_component((vec3_list_component*)c_ptr, id, NULL, 0); break;
+    case C_NAME:
+        init_name_component((name_component*)c_ptr, id, (const char*)data);
+        break;
+    case C_TYPE:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_RACE:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_DIRECTION:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_ITEMTYPE:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_POTIONTYPE:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_AC:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_WEAPONTYPE:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_SHIELDTYPE:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_DEFAULT_ACTION:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_DEAD:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_UPDATE:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_ATTACKING:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_ZAPPING:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_BLOCKING:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_BLOCK_SUCCESS:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_DAMAGED:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_LOCATION:
+        init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data);
+        break;
+    case C_SPRITE_MOVE:
+        init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data);
+        break;
+    case C_TARGET:
+        init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data);
+        break;
+    case C_INVENTORY:
+        init_inventory_component((inventory_component*)c_ptr, id);
+        break;
+    case C_TARGET_PATH:
+        init_target_path_component((target_path_component*)c_ptr, id, NULL, 0);
+    case C_EQUIPMENT:
+        init_equipment_component((equipment_component*)c_ptr, id);
+        break;
+    case C_STATS:
+        init_stats_component((stats_component*)c_ptr, id);
+        break;
+    case C_DAMAGE:
+        init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data);
+        break;
+    case C_BASE_ATTACK_DAMAGE:
+        init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data);
+        break;
+    case C_LIGHT_RADIUS:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_LIGHT_RADIUS_BONUS:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_VISION_DISTANCE:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_RINGTYPE:
+        init_int_component((int_component*)c_ptr, id, *(int*)data);
+        break;
+    case C_EXPLORED_LIST:
+        init_vec3_list_component((vec3_list_component*)c_ptr, id, NULL, 0);
+        break;
     case C_VISIBLE_LIST:
         init_vec3_list_component((vec3_list_component*)c_ptr, id, NULL, 0);
         break;
         //case C_SPELL_EFFECT: init_spell_effect_component((spell_effect_component*)c_ptr, id, *(spell_effect*)data); break;
-    default: merror("Unsupported component type: %s", component2str(comp)); return false;
+    default:
+        merror("Unsupported component type: %s", component2str(comp));
+        return false;
     }
     (*c_count)++;
     return true;
@@ -587,7 +673,7 @@ bool g_add_component(gamestate* const g, entityid id, component comp, void* data
 //bool g_add_name(gamestate* const g, entityid id, const char* name) {
 void g_add_name(gamestate* const g, entityid id, string name) {
     massert(g, "g is NULL");
-    massert(name, "name is NULL");
+    massert(name != "", "name is empty string");
     massert(id != ENTITYID_INVALID, "id is invalid");
     printf("g_add_name: id: %d, name: %s\n", id, name.c_str());
 
@@ -634,7 +720,14 @@ string g_get_name(gamestate* const g, entityid id) {
 bool g_add_type(gamestate* const g, entityid id, int type) {
     massert(g, "g is NULL");
     massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
-    return g_add_component(g, id, C_TYPE, (void*)&type, sizeof(int_component), (void**)&g->type_list, &g->type_list_count, &g->type_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_TYPE,
+                           (void*)&type,
+                           sizeof(int_component),
+                           (void**)&g->type_list,
+                           &g->type_list_count,
+                           &g->type_list_capacity);
 }
 
 entitytype_t g_get_type(const gamestate* const g, entityid id) {
@@ -682,7 +775,14 @@ bool g_is_type(const gamestate* const g, entityid id, int type) {
 bool g_add_race(gamestate* const g, entityid id, int race) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_add_component(g, id, C_RACE, (void*)&race, sizeof(int_component), (void**)&g->race_list, &g->race_list_count, &g->race_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_RACE,
+                           (void*)&race,
+                           sizeof(int_component),
+                           (void**)&g->race_list,
+                           &g->race_list_count,
+                           &g->race_list_capacity);
 }
 
 race_t g_get_race(gamestate* const g, entityid id) {
@@ -725,7 +825,14 @@ bool g_add_direction(gamestate* const g, entityid id, int dir) {
     massert(g, "g is NULL");
     massert(dir >= 0 && dir < DIR_COUNT, "dir is invalid");
     // make sure the entity has the component
-    return g_add_component(g, id, C_DIRECTION, (void*)&dir, sizeof(int_component), (void**)&g->direction_list, &g->direction_list_count, &g->direction_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_DIRECTION,
+                           (void*)&dir,
+                           sizeof(int_component),
+                           (void**)&g->direction_list,
+                           &g->direction_list_count,
+                           &g->direction_list_capacity);
 }
 
 bool g_is_direction(gamestate* const g, entityid id, int dir) {
@@ -758,7 +865,14 @@ bool g_add_location(gamestate* const g, entityid id, vec3 loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the location component
-    return g_add_component(g, id, C_LOCATION, (void*)&loc, sizeof(vec3_component), (void**)&g->loc_list, &g->loc_list_count, &g->loc_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_LOCATION,
+                           (void*)&loc,
+                           sizeof(vec3_component),
+                           (void**)&g->loc_list,
+                           &g->loc_list_count,
+                           &g->loc_list_capacity);
 }
 
 bool g_update_location(gamestate* const g, entityid id, vec3 loc) {
@@ -801,7 +915,14 @@ bool g_add_sprite_move(gamestate* const g, entityid id, Rectangle loc) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the sprite move component
-    return g_add_component(g, id, C_SPRITE_MOVE, (void*)&loc, sizeof(rect_component), (void**)&g->sprite_move_list, &g->sprite_move_list_count, &g->sprite_move_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_SPRITE_MOVE,
+                           (void*)&loc,
+                           sizeof(rect_component),
+                           (void**)&g->sprite_move_list,
+                           &g->sprite_move_list_count,
+                           &g->sprite_move_list_capacity);
 }
 
 bool g_update_sprite_move(gamestate* const g, entityid id, Rectangle loc) {
@@ -842,7 +963,14 @@ bool g_add_dead(gamestate* const g, entityid id, int dead) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // Add dead component
-    bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(int_component), (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
+    bool result = g_add_component(g,
+                                  id,
+                                  C_DEAD,
+                                  (void*)&dead,
+                                  sizeof(int_component),
+                                  (void**)&g->dead_list,
+                                  &g->dead_list_count,
+                                  &g->dead_list_capacity);
     // If entity died and has a location, mark its tile as dirty
     if (dead && g_has_location(g, id)) {
         vec3 loc = g_get_location(g, id);
@@ -890,7 +1018,14 @@ bool g_add_update(gamestate* const g, entityid id, int update) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the update component
-    return g_add_component(g, id, C_UPDATE, (void*)&update, sizeof(update_component), (void**)&g->update_list, &g->update_list_count, &g->update_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_UPDATE,
+                           (void*)&update,
+                           sizeof(update_component),
+                           (void**)&g->update_list,
+                           &g->update_list_count,
+                           &g->update_list_capacity);
 }
 
 bool g_get_update(gamestate* const g, entityid id) {
@@ -926,7 +1061,14 @@ bool g_add_attacking(gamestate* const g, entityid id, int attacking) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the attacking component
-    return g_add_component(g, id, C_ATTACKING, (void*)&attacking, sizeof(attacking_component), (void**)&g->attacking_list, &g->attacking_list_count, &g->attacking_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_ATTACKING,
+                           (void*)&attacking,
+                           sizeof(attacking_component),
+                           (void**)&g->attacking_list,
+                           &g->attacking_list_count,
+                           &g->attacking_list_capacity);
 }
 
 bool g_set_attacking(gamestate* const g, entityid id, int attacking) {
@@ -963,7 +1105,14 @@ bool g_add_blocking(gamestate* const g, entityid id, int blocking) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the blocking component
     massert(g_has_component(g, id, C_BLOCKING), "id %d does not have a blocking component", id);
-    return g_add_component(g, id, C_BLOCKING, (void*)&blocking, sizeof(blocking_component), (void**)&g->blocking_list, &g->blocking_list_count, &g->blocking_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_BLOCKING,
+                           (void*)&blocking,
+                           sizeof(blocking_component),
+                           (void**)&g->blocking_list,
+                           &g->blocking_list_count,
+                           &g->blocking_list_capacity);
 }
 
 bool g_set_blocking(gamestate* const g, entityid id, int blocking) {
@@ -1041,7 +1190,14 @@ bool g_add_damaged(gamestate* const g, entityid id, int damaged) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the damaged component
-    return g_add_component(g, id, C_DAMAGED, (void*)&damaged, sizeof(damaged_component), (void**)&g->damaged_list, &g->damaged_list_count, &g->damaged_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_DAMAGED,
+                           (void*)&damaged,
+                           sizeof(damaged_component),
+                           (void**)&g->damaged_list,
+                           &g->damaged_list_count,
+                           &g->damaged_list_capacity);
 }
 
 bool g_set_damaged(gamestate* const g, entityid id, int damaged) {
@@ -1076,8 +1232,14 @@ bool g_add_default_action(gamestate* const g, entityid id, int action) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the default action component
-    return g_add_component(
-        g, id, C_DEFAULT_ACTION, (void*)&action, sizeof(int_component), (void**)&g->default_action_list, &g->default_action_list_count, &g->default_action_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_DEFAULT_ACTION,
+                           (void*)&action,
+                           sizeof(int_component),
+                           (void**)&g->default_action_list,
+                           &g->default_action_list_count,
+                           &g->default_action_list_capacity);
 }
 
 bool g_set_default_action(gamestate* const g, entityid id, int action) {
@@ -1112,7 +1274,14 @@ bool g_add_inventory(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the inventory component
-    return g_add_component(g, id, C_INVENTORY, (void*)NULL, sizeof(inventory_component), (void**)&g->inventory_list, &g->inventory_list_count, &g->inventory_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_INVENTORY,
+                           (void*)NULL,
+                           sizeof(inventory_component),
+                           (void**)&g->inventory_list,
+                           &g->inventory_list_count,
+                           &g->inventory_list_capacity);
     return true;
 }
 
@@ -1155,8 +1324,12 @@ entityid* g_sort_inventory(gamestate* const g, entityid* inventory, size_t inv_c
     // Sort based on the specified type
     g_sort_context = g; // Set global context
     switch (sort_type) {
-    case INV_SORT_NAME: qsort(sorted_inv, inv_count, sizeof(entityid), compare_by_name); break;
-    case INV_SORT_TYPE: qsort(sorted_inv, inv_count, sizeof(entityid), compare_by_type); break;
+    case INV_SORT_NAME:
+        qsort(sorted_inv, inv_count, sizeof(entityid), compare_by_name);
+        break;
+    case INV_SORT_TYPE:
+        qsort(sorted_inv, inv_count, sizeof(entityid), compare_by_type);
+        break;
     default:
         // No sorting needed, return copy as-is
         break;
@@ -1266,12 +1439,18 @@ bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory
                 g->inventory_list[i].inventory[j] = new_inventory[j];
                 g->inventory_list[i].count++;
             }
-            massert(g->inventory_list[i].count == new_inventory_count, "new inventory count %d does not match expected count %zu", g->inventory_list[i].count, new_inventory_count);
+            massert(g->inventory_list[i].count == new_inventory_count,
+                    "new inventory count %d does not match expected count %zu",
+                    g->inventory_list[i].count,
+                    new_inventory_count);
             if (g->inventory_list[i].count == new_inventory_count) {
                 msuccess("updated inventory for id %d with %d items", id, new_inventory_count);
                 return true;
             }
-            merror("updated inventory for id %d but count mismatch: expected %d, got %d", id, new_inventory_count, g->inventory_list[i].count);
+            merror("updated inventory for id %d but count mismatch: expected %d, got %d",
+                   id,
+                   new_inventory_count,
+                   g->inventory_list[i].count);
             return false;
         }
     }
@@ -1289,7 +1468,14 @@ bool g_add_target(gamestate* const g, entityid id, vec3 target) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the target component
-    return g_add_component(g, id, C_TARGET, (void*)&target, sizeof(vec3_component), (void**)&g->target_list, &g->target_list_count, &g->target_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_TARGET,
+                           (void*)&target,
+                           sizeof(vec3_component),
+                           (void**)&g->target_list,
+                           &g->target_list_count,
+                           &g->target_list_capacity);
 }
 
 bool g_set_target(gamestate* const g, entityid id, vec3 target) {
@@ -1329,8 +1515,14 @@ bool g_add_target_path(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the target path component
-    return g_add_component(
-        g, id, C_TARGET_PATH, (void*)NULL, sizeof(target_path_component), (void**)&g->target_path_list, &g->target_path_list_count, &g->target_path_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_TARGET_PATH,
+                           (void*)NULL,
+                           sizeof(target_path_component),
+                           (void**)&g->target_path_list,
+                           &g->target_path_list_count,
+                           &g->target_path_list_capacity);
     return true;
 }
 
@@ -1382,7 +1574,14 @@ bool g_add_equipment(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the equipment component
-    return g_add_component(g, id, C_EQUIPMENT, (void*)NULL, sizeof(equipment_component), (void**)&g->equipment_list, &g->equipment_list_count, &g->equipment_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_EQUIPMENT,
+                           (void*)NULL,
+                           sizeof(equipment_component),
+                           (void**)&g->equipment_list,
+                           &g->equipment_list_count,
+                           &g->equipment_list_capacity);
 }
 
 bool g_has_equipment(const gamestate* const g, entityid id) {
@@ -1450,7 +1649,14 @@ dungeon_t* g_get_dungeon(gamestate* const g) {
 bool g_add_stats(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_add_component(g, id, C_STATS, (void*)NULL, sizeof(stats_component), (void**)&g->stats_list, &g->stats_list_count, &g->stats_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_STATS,
+                           (void*)NULL,
+                           sizeof(stats_component),
+                           (void**)&g->stats_list,
+                           &g->stats_list_count,
+                           &g->stats_list_capacity);
 }
 
 bool g_has_stats(const gamestate* const g, entityid id) {
@@ -1502,7 +1708,14 @@ int g_get_stat(const gamestate* const g, entityid id, stats_slot stats_slot) {
 bool g_add_itemtype(gamestate* const g, entityid id, int type) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_add_component(g, id, C_ITEMTYPE, (void*)&type, sizeof(int_component), (void**)&g->itemtype_list, &g->itemtype_list_count, &g->itemtype_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_ITEMTYPE,
+                           (void*)&type,
+                           sizeof(int_component),
+                           (void**)&g->itemtype_list,
+                           &g->itemtype_list_count,
+                           &g->itemtype_list_capacity);
 }
 
 bool g_has_itemtype(const gamestate* const g, entityid id) {
@@ -1537,7 +1750,14 @@ bool g_add_weapontype(gamestate* const g, entityid id, int type) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the weapontype component
-    return g_add_component(g, id, C_WEAPONTYPE, (void*)&type, sizeof(int_component), (void**)&g->weapontype_list, &g->weapontype_list_count, &g->weapontype_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_WEAPONTYPE,
+                           (void*)&type,
+                           sizeof(int_component),
+                           (void**)&g->weapontype_list,
+                           &g->weapontype_list_count,
+                           &g->weapontype_list_capacity);
 }
 
 bool g_has_weapontype(const gamestate* const g, entityid id) {
@@ -1581,7 +1801,14 @@ bool g_add_shieldtype(gamestate* const g, entityid id, int type) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the shieldtype component
-    return g_add_component(g, id, C_SHIELDTYPE, (void*)&type, sizeof(int_component), (void**)&g->shieldtype_list, &g->shieldtype_list_count, &g->shieldtype_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_SHIELDTYPE,
+                           (void*)&type,
+                           sizeof(int_component),
+                           (void**)&g->shieldtype_list,
+                           &g->shieldtype_list_count,
+                           &g->shieldtype_list_capacity);
 }
 
 bool g_has_shieldtype(const gamestate* const g, entityid id) {
@@ -1626,7 +1853,14 @@ bool g_add_potiontype(gamestate* const g, entityid id, int type) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the potiontype component
-    return g_add_component(g, id, C_POTIONTYPE, (void*)&type, sizeof(int_component), (void**)&g->potion_type_list, &g->potion_type_list_count, &g->potion_type_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_POTIONTYPE,
+                           (void*)&type,
+                           sizeof(int_component),
+                           (void**)&g->potion_type_list,
+                           &g->potion_type_list_count,
+                           &g->potion_type_list_capacity);
 }
 
 bool g_has_potiontype(const gamestate* const g, entityid id) {
@@ -1673,7 +1907,14 @@ potiontype g_get_potiontype(const gamestate* const g, entityid id) {
 bool g_add_damage(gamestate* const g, entityid id, vec3 r) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_add_component(g, id, C_DAMAGE, (void*)&r, sizeof(vec3_component), (void**)&g->damage_list, &g->damage_list_count, &g->damage_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_DAMAGE,
+                           (void*)&r,
+                           sizeof(vec3_component),
+                           (void**)&g->damage_list,
+                           &g->damage_list_count,
+                           &g->damage_list_capacity);
 }
 
 bool g_has_damage(const gamestate* const g, entityid id) {
@@ -1708,7 +1949,8 @@ bool g_add_ac(gamestate* const g, entityid id, int ac) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the ac component
-    return g_add_component(g, id, C_AC, (void*)&ac, sizeof(int_component), (void**)&g->ac_list, &g->ac_list_count, &g->ac_list_capacity);
+    return g_add_component(
+        g, id, C_AC, (void*)&ac, sizeof(int_component), (void**)&g->ac_list, &g->ac_list_count, &g->ac_list_capacity);
 }
 
 bool g_has_ac(const gamestate* const g, entityid id) {
@@ -1772,7 +2014,14 @@ bool g_add_zapping(gamestate* const g, entityid id, int zapping) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the zapping component
-    return g_add_component(g, id, C_ZAPPING, (void*)&zapping, sizeof(zapping_component), (void**)&g->zapping_list, &g->zapping_list_count, &g->zapping_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_ZAPPING,
+                           (void*)&zapping,
+                           sizeof(zapping_component),
+                           (void**)&g->zapping_list,
+                           &g->zapping_list_count,
+                           &g->zapping_list_capacity);
 }
 
 bool g_set_zapping(gamestate* const g, entityid id, int zapping) {
@@ -1844,8 +2093,14 @@ bool g_add_vision_distance(gamestate* const g, entityid id, int distance) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // make sure the entity has the vision distance component
-    return g_add_component(
-        g, id, C_VISION_DISTANCE, (void*)&distance, sizeof(int_component), (void**)&g->vision_distance_list, &g->vision_distance_list_count, &g->vision_distance_list_capacity);
+    return g_add_component(g,
+                           id,
+                           C_VISION_DISTANCE,
+                           (void*)&distance,
+                           sizeof(int_component),
+                           (void**)&g->vision_distance_list,
+                           &g->vision_distance_list_count,
+                           &g->vision_distance_list_capacity);
 }
 
 bool g_has_vision_distance(const gamestate* const g, entityid id) {
@@ -1925,7 +2180,14 @@ bool g_add_ringtype(gamestate* const g, entityid id, int type) {
         return false;
     }
 
-    g_add_component(g, id, C_RINGTYPE, (void*)&type, sizeof(int_component), (void**)&g->ringtype_list, &g->ringtype_list_count, &g->ringtype_list_capacity);
+    g_add_component(g,
+                    id,
+                    C_RINGTYPE,
+                    (void*)&type,
+                    sizeof(int_component),
+                    (void**)&g->ringtype_list,
+                    &g->ringtype_list_count,
+                    &g->ringtype_list_capacity);
     return true;
 }
 
