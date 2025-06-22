@@ -1,9 +1,9 @@
 #pragma once
 
-//#include <raylib.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstddef>
+#include <cstdio>
+#include <cstring>
+
 #define KEYBINDING_MAX_ACTION_LENGTH 32
 #define KEYBINDING_LIST_MAX_LENGTH 400
 
@@ -18,5 +18,8 @@ typedef struct {
 } keybinding_list_t;
 
 const char* get_action_for_key(keybinding_list_t* kb, int key);
+
 int key_from_string(const char* str);
+
 void load_keybindings(const char* filename, keybinding_list_t* kb);
+void print_keybindings(const keybinding_list_t* kb);

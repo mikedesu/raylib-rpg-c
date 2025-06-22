@@ -1,5 +1,6 @@
 #pragma once
-#include "mprint.h"
+//#include "mprint.h"
+#include <cstdio>
 #include <raylib.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,7 +29,7 @@ static inline void inputstate_update(inputstate* is) {
         if (IsKeyPressed(k)) {
             // debugging to see if KEY_ENTER is pressed
             if (k == KEY_ENTER) {
-                msuccess("KEY_ENTER pressed");
+                printf("KEY_ENTER pressed\n");
             }
 
             int idx = k / BITS_PER_LONG;
@@ -70,19 +71,25 @@ static inline bool inputstate_is_held(const inputstate* is, int key) {
 
 // Get the first key pressed this frame
 static inline int inputstate_get_pressed_key(const inputstate* is) {
-    if (!is) return -1; // Invalid inputstate
+    if (!is) {
+        printf("inputstate is NULL\n");
+        return -1;
+    } // Invalid inputstate
     for (int idx = 0; idx < NUM_LONGS; idx++) {
         uint64_t bits = is->pressed[idx];
         if (bits != 0) { // At least one key pressed in this block
             for (int bit = 0; bit < BITS_PER_LONG; bit++) {
                 if (bits & (1ULL << bit)) {
                     int key = idx * BITS_PER_LONG + bit;
-                    if (key < MAX_KEYS) return key; // Return first pressed key
+                    if (key < MAX_KEYS) {
+                        return key;
+                    } // Return first pressed key
                     break; // Invalid key, stop searching this block
                 }
             }
         }
     }
+    //printf("No keys pressed in inputstate\n");
     return -1; // No key pressed
 }
 

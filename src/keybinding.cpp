@@ -5,9 +5,9 @@
 
 const char* get_action_for_key(keybinding_list_t* kb, int key) {
     //minfo("Getting action for key %d", key);
-    massert(kb, "Keybinding list is NULL");
-    massert(kb->count > 0, "Keybinding list is empty");
-    massert(key >= 0, "Key is less than 0");
+    //massert(kb, "Keybinding list is NULL");
+    //massert(kb->count > 0, "Keybinding list is empty");
+    //massert(key >= 0, "Key is less than 0");
     for (int i = 0; i < kb->count; i++) {
         if (kb->bindings[i].key == key) {
             //minfo("Key %d found in keybinding list", key);
@@ -79,8 +79,13 @@ int key_from_string(const char* str) {
 
 void load_keybindings(const char* filename, keybinding_list_t* kb) {
     //minfo("Loading keybindings from %s", filename);
+    //printf("Loading keybindings from %s\n", filename);
     FILE* file = fopen(filename, "r");
-    if (!file) return;
+    if (!file) {
+        fprintf(stderr, "Failed to open keybindings file: %s\n", filename);
+        exit(EXIT_FAILURE);
+        //return;
+    }
     msuccess("Keybindings file opened successfully");
     char line[128];
     kb->count = 0;
@@ -104,6 +109,13 @@ void load_keybindings(const char* filename, keybinding_list_t* kb) {
         }
         bzero(line, sizeof(line));
     }
-
     fclose(file);
+    //printf("Successfully loaded %d keybindings\n", kb->count);
+}
+
+void print_keybindings(const keybinding_list_t* kb) {
+    printf("Keybindings:\n");
+    for (int i = 0; i < kb->count; i++) {
+        printf("Key: %d, Action: %s\n", kb->bindings[i].key, kb->bindings[i].action);
+    }
 }

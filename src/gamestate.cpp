@@ -262,7 +262,7 @@ gamestate* gamestateinitptr() {
     g->music_volume = DEFAULT_MUSIC_VOLUME;
 
     g->name_list = new unordered_map<entityid, string>();
-
+    gamestate_load_keybindings(g);
     return g;
 }
 
@@ -457,9 +457,12 @@ entityid gamestate_get_hero_id(const gamestate* const g) {
 }
 
 void gamestate_load_keybindings(gamestate* const g) {
-    if (!g) return;
+    if (!g) {
+        return;
+    }
     const char* filename = "keybindings.ini";
     load_keybindings(filename, &g->keybinding_list);
+    print_keybindings(&g->keybinding_list);
 }
 
 bool gamestate_add_msg_history(gamestate* const g, const char* msg) {

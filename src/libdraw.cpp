@@ -1,4 +1,3 @@
-//#include "component.h"
 #include "bonus_table.h"
 #include "direction.h"
 #include "dungeon_tile_type.h"
@@ -8,7 +7,6 @@
 #include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
-//#include "inventory_sort.h"
 #include "libdraw.h"
 #include "libdraw_sort_inventory_menu.h"
 #include "libgame_defines.h"
@@ -27,6 +25,8 @@
 #include <raylib.h>
 #include <stdlib.h>
 #include <sys/param.h>
+//#include "component.h"
+//#include "inventory_sort.h"
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -112,13 +112,13 @@ static sprite* get_shield_front_sprite(const gamestate* g, entityid id, spritegr
 static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
 
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
-//static bool libdraw_check_default_animations(const gamestate* const g);
 static bool libdraw_unload_texture(int txkey);
 static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z);
 static bool draw_dungeon_tiles_2d(const gamestate* const g, int z, dungeon_floor_t* df);
 static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const df, bool dead, vec3 loc);
 static bool libdraw_draw_dungeon_floor(const gamestate* const g);
 static bool libdraw_draw_player_target_box(const gamestate* const g);
+//static bool libdraw_check_default_animations(const gamestate* const g);
 
 static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int z) {
     massert(g, "gamestate is NULL");

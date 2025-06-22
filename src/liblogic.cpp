@@ -1141,7 +1141,9 @@ static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int 
 static const char* get_action_key(const inputstate* const is, gamestate* const g) {
     int key = inputstate_get_pressed_key(is);
     // can return early if key == -1
-    if (key == -1) return "none";
+    if (key == -1) {
+        return "none";
+    }
     return get_action_for_key(&g->keybinding_list, key);
 }
 
@@ -1514,7 +1516,10 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
 static void handle_input_player(const inputstate* const is, gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) return;
+    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
+        printf("handle_input_player: flag is not GAMESTATE_FLAG_PLAYER_INPUT, returning\n");
+        return;
+    }
     if (g->msg_system.is_active) {
         if (inputstate_any_pressed(is)) {
             g->msg_system.index++;
@@ -1534,10 +1539,22 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         g->frame_dirty = true;
         return;
     }
+
+    // test enter key
+    if (inputstate_is_pressed(is, KEY_ENTER)) {
+        printf("handle_input_player: enter key pressed\n");
+        return;
+    }
+
     const char* action = get_action_key(is, g);
-    if (!action) return;
-    if (g_is_dead(g, g->hero_id)) return;
+    if (!action) {
+        return;
+    }
+    if (g_is_dead(g, g->hero_id)) {
+        return;
+    }
     if (action) {
+        //printf("handle_input_player: action is %s\n", action);
         if (g->player_changing_direction) {
             if (strcmp(action, "wait") == 0) {
                 execute_action(g, g->hero_id, ENTITY_ACTION_WAIT);
@@ -1751,6 +1768,7 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         g->debugpanelon = !g->debugpanelon;
         return;
     }
+
     //if (g->display_quit_menu) {
     //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
     //        g->display_quit_menu = false;
@@ -1778,6 +1796,7 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
             }
             return;
         }
+        //printf("Current control mode: %d\n", g->controlmode);
 
         switch (g->controlmode) {
         case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
