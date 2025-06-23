@@ -1,6 +1,6 @@
 #pragma once
 
-#define GAME_VERSION "v0.0.3.16-20250619"
+#define GAME_VERSION "v0.0.3.17-20250623"
 
 #define DEFAULT_TARGET_FPS 60
 #define FRAMEINTERVAL 10
