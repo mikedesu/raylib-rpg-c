@@ -51,8 +51,13 @@
         }
         #canvas-container {
             border: 4px solid red; 
-            width: 100vw;
-            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
     </style>
@@ -106,13 +111,19 @@
                 var canvas = document.getElementById('canvas');
                 var container = document.getElementById('canvas-container');
                 
-                // Fill container completely
-                canvas.style.width = container.clientWidth + 'px';
-                canvas.style.height = container.clientHeight + 'px';
+                // Get exact viewport dimensions
+                var vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+                var vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+                
+                // Set container and canvas to match viewport exactly
+                container.style.width = vw + 'px';
+                container.style.height = vh + 'px';
+                canvas.style.width = vw + 'px';
+                canvas.style.height = vh + 'px';
                 
                 // Update canvas resolution if needed
                 if (Module.setCanvasSize) {
-                    Module.setCanvasSize(container.clientWidth, container.clientHeight);
+                    Module.setCanvasSize(vw, vh);
                 }
             }
             
