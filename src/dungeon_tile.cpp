@@ -8,7 +8,8 @@
 void tile_init(tile_t* const t, tiletype_t type) {
     massert(t, "tile is NULL");
     t->type = type;
-    t->visible = t->explored = t->has_pressure_plate = t->has_wall_switch = t->wall_switch_on = t->cached_player_present = false;
+    t->visible = t->explored = t->has_pressure_plate = t->has_wall_switch = t->wall_switch_on =
+        t->cached_player_present = false;
     t->dirty_entities = t->dirty_visibility = true;
     const size_t malloc_sz = sizeof(entityid) * DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
     t->entities = (entityid*)malloc(malloc_sz);
@@ -77,7 +78,8 @@ entityid tile_remove(tile_t* tile, entityid id) {
     massert(tile->entities, "tile entities is NULL");
     massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
     bool did_remove = false;
-    for (int i = 0; i < tile->entity_max; i++) {
+    //for (int i = 0; i < tile->entity_max; i++) {
+    for (size_t i = 0; i < tile->entity_max; i++) {
         if (tile->entities[i] == id) {
             tile->entities[i] = -1;
             // shift all elements to the left with memcpy

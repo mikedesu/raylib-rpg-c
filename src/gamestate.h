@@ -35,6 +35,8 @@ using namespace std;
 #define MAX_MSG_LENGTH 256
 #define LIST_INIT_CAPACITY 16
 #define DEFAULT_MAX_HISTORY_SIZE 1024
+#define MAX_MUSIC_PATHS 1024
+#define MAX_MUSIC_PATH_LENGTH 256
 
 typedef struct {
     char messages[MAX_MESSAGES][MAX_MSG_LENGTH];
@@ -112,6 +114,7 @@ typedef struct gamestate {
 
     unordered_map<entityid, string>* name_list;
 
+    unordered_map<entityid, int>* type_list2;
     int_component* type_list;
     int type_list_count;
     int type_list_capacity;
@@ -267,7 +270,8 @@ typedef struct gamestate {
 
     int current_music_index;
     int total_music_paths;
-    char music_file_paths[1024][128];
+    //char music_file_paths[1024][128];
+    char music_file_paths[MAX_MUSIC_PATHS][MAX_MUSIC_PATH_LENGTH];
 
     //char* version;
     string version;
@@ -310,12 +314,21 @@ void gamestate_load_keybindings(gamestate* const g);
 
 bool g_has_component(const gamestate* const g, entityid id, component comp);
 bool g_register_comp(gamestate* const g, entityid id, component comp);
-bool g_register_comps(gamestate* const g, entityid id, ...);
+//bool g_register_comps(gamestate* const g, entityid id, ...);
 
-bool g_add_component(gamestate* const g, entityid id, component comp, void* data, size_t component_size, void** component_list, int* component_count, int* component_capacity);
+bool g_add_component(gamestate* const g,
+                     entityid id,
+                     component comp,
+                     void* data,
+                     size_t component_size,
+                     void** component_list,
+                     int* component_count,
+                     int* component_capacity);
+
+bool g_add_component2(gamestate* const g, entityid id, component comp);
 
 //bool g_add_name(gamestate* const g, entityid id, const char* name);
-void g_add_name(gamestate* const g, entityid id, string name);
+bool g_add_name(gamestate* const g, entityid id, string name);
 bool g_has_name(const gamestate* const g, entityid id);
 string g_get_name(gamestate* const g, entityid id);
 

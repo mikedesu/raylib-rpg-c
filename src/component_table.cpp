@@ -34,7 +34,11 @@ bool ct_add_entity(ct* table, entityid id) {
     if (!table || id == ENTITYID_INVALID) {
         return false;
     }
-    if (id >= table->component_capacity) {
+    if (ct_has_entity(table, id)) {
+        return false;
+    }
+
+    if ((size_t)id >= table->component_capacity) {
         size_t new_capacity;
         if (table->component_capacity == 0) {
             new_capacity = 1;
@@ -55,12 +59,10 @@ bool ct_add_entity(ct* table, entityid id) {
         table->components = new_components;
         table->component_capacity = new_capacity;
     }
-    if (id < table->component_row_count) {
+    if ((size_t)id < table->component_row_count) {
         return false;
     }
-    if (ct_has_entity(table, id)) {
-        return false;
-    }
+
     if (table->component_row_count >= table->component_capacity) {
         size_t new_capacity = table->component_capacity == 0 ? 1 : table->component_capacity * 2;
         size_t num_rows = new_capacity * table->ints_per_row;
@@ -82,7 +84,7 @@ bool ct_add_entity(ct* table, entityid id) {
 
 bool ct_has_entity(ct* table, entityid id) {
     massert(table, "table is NULL");
-    return table && id > ENTITYID_INVALID && id < table->component_row_count;
+    return table && id > ENTITYID_INVALID && (size_t)id < table->component_row_count;
 }
 
 bool ct_add_component(ct* table, entityid id, component comp) {
@@ -96,10 +98,10 @@ bool ct_add_component(ct* table, entityid id, component comp) {
         return false;
     }
 
-    if (id >= table->component_row_count) {
-        merror("ct_add_component: id out of range: %d >= %zu", id, table->component_row_count);
-        return false;
-    }
+    //if (id >= table->component_row_count) {
+    //    merror("ct_add_component: id out of range: %d >= %zu", id, table->component_row_count);
+    //    return false;
+    //}
 
     if (comp < 0 || comp >= table->component_col_count) {
         merror("ct_add_component: component out of range: %d not in [0, %zu)", comp, table->component_col_count);
@@ -130,10 +132,10 @@ bool ct_has_component(ct* table, entityid id, component comp) {
         return false;
     }
 
-    if (id >= table->component_row_count) {
-        merror("ct_has_component: id out of range: %d >= %zu", id, table->component_row_count);
-        return false;
-    }
+    //if (id >= table->component_row_count) {
+    //    merror("ct_has_component: id out of range: %d >= %zu", id, table->component_row_count);
+    //    return false;
+    //}
 
     if (comp < 0 || comp >= table->component_col_count) {
         merror("ct_has_component: component out of range: %d not in [0, %zu)", comp, table->component_col_count);

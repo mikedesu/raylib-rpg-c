@@ -45,7 +45,7 @@ static vec3 get_base_attack_damage_for_race(race_t race);
 
 static vec3*
 get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
-static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
+//static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 static vec3* get_locs_around_entity(gamestate* const g, entityid id);
 
 void liblogic_restart(gamestate* const g);
@@ -55,11 +55,11 @@ static void update_player_tiles_explored(gamestate* const g);
 static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful);
 static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
 static void handle_level_up(gamestate* const g, entityid id);
-static void init_dagger_test(gamestate* g);
-static void init_sword_test(gamestate* g);
-static void init_axe_test(gamestate* g);
-static void init_ring_test(gamestate* g);
-static void init_shield_test(gamestate* g);
+//static void init_dagger_test(gamestate* g);
+//static void init_sword_test(gamestate* g);
+//static void init_axe_test(gamestate* g);
+//static void init_ring_test(gamestate* g);
+//static void init_shield_test(gamestate* g);
 static void handle_input_sort_inventory(const inputstate* const is, gamestate* const g);
 static void init_dungeon(gamestate* const g);
 static void update_player_state(gamestate* const g);
@@ -84,12 +84,12 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int f
 //static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name);
 static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name);
 static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name);
-static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, const char* name);
-static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, const char* name);
+//static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, const char* name);
+//static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, const char* name);
 static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name);
 
-static vec3 get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
-static vec3 get_random_empty_non_wall_loc(gamestate* const g, int floor);
+//static vec3 get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
+//static vec3 get_random_empty_non_wall_loc(gamestate* const g, int floor);
 
 static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1);
 static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race);
@@ -271,7 +271,7 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
     massert(t, "failed to get tile");
     // Count living NPCs
     int count = 0;
-    for (int i = 0; i < t->entity_max; i++) {
+    for (size_t i = 0; i < t->entity_max; i++) {
         const entityid eid = tile_get_entity(t, i);
         if (eid == ENTITYID_INVALID) continue;
         //if (!e) continue;
@@ -536,7 +536,7 @@ handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entityid
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(i >= 0, "i is out of bounds");
-    massert(i < tile->entity_max, "i is out of bounds");
+    massert((size_t)i < tile->entity_max, "i is out of bounds");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(attack_successful, "attack_successful is NULL");
     entityid target_id = tile->entities[i];
@@ -564,8 +564,9 @@ static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid atta
     massert(tile, "tile is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(successful, "attack_successful is NULL");
-    for (int i = 0; i < tile->entity_max; i++)
+    for (size_t i = 0; i < tile->entity_max; i++) {
         handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
+    }
 }
 
 static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, int tgt_y) {
@@ -722,41 +723,41 @@ static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, ent
     return tile;
 }
 
-static vec3 get_random_empty_non_wall_loc_in_area(gamestate* const g, int z, int x, int y, int w, int h) {
-    massert(g, "gamestate is NULL");
-    massert(z >= 0, "floor is out of bounds");
-    massert(z < g->d->num_floors, "floor is out of bounds");
-    massert(x >= 0, "x is out of bounds");
-    massert(x < g->d->floors[z]->width, "x is out of bounds");
-    massert(y >= 0, "y is out of bounds");
-    massert(y < g->d->floors[z]->height, "y is out of bounds");
-    massert(w > 0, "w is out of bounds");
-    massert(h > 0, "h is out of bounds");
-    massert(x + w <= g->d->floors[z]->width, "x + w is out of bounds");
-    massert(y + h <= g->d->floors[z]->height, "y + h is out of bounds");
-    int c = -1;
-    vec3* locations = get_empty_non_wall_locs_in_area(g->d->floors[z], &c, x, y, w, h);
-    massert(locations, "locations is NULL");
-    massert(c > 0, "locations count is 0 or less");
-    //    // pick a random location
-    int index = rand() % c;
-    vec3 loc = locations[index];
-    free(locations);
-    massert(loc.x >= 0, "loc.x is out of bounds");
-    massert(loc.x < g->d->floors[z]->width, "loc.x is out of bounds");
-    massert(loc.y >= 0, "loc.y is out of bounds");
-    massert(loc.y < g->d->floors[z]->height, "loc.y is out of bounds");
-    loc.z = z;
-    return loc;
-}
+//static vec3 get_random_empty_non_wall_loc_in_area(gamestate* const g, int z, int x, int y, int w, int h) {
+//    massert(g, "gamestate is NULL");
+//    massert(z >= 0, "floor is out of bounds");
+//    massert(z < g->d->num_floors, "floor is out of bounds");
+//    massert(x >= 0, "x is out of bounds");
+//    massert(x < g->d->floors[z]->width, "x is out of bounds");
+//    massert(y >= 0, "y is out of bounds");
+//    massert(y < g->d->floors[z]->height, "y is out of bounds");
+//    massert(w > 0, "w is out of bounds");
+//    massert(h > 0, "h is out of bounds");
+//    massert(x + w <= g->d->floors[z]->width, "x + w is out of bounds");
+//    massert(y + h <= g->d->floors[z]->height, "y + h is out of bounds");
+//    int c = -1;
+//    vec3* locations = get_empty_non_wall_locs_in_area(g->d->floors[z], &c, x, y, w, h);
+//    massert(locations, "locations is NULL");
+//    massert(c > 0, "locations count is 0 or less");
+//    //    // pick a random location
+//    int index = rand() % c;
+//    vec3 loc = locations[index];
+//    free(locations);
+//    massert(loc.x >= 0, "loc.x is out of bounds");
+//    massert(loc.x < g->d->floors[z]->width, "loc.x is out of bounds");
+//    massert(loc.y >= 0, "loc.y is out of bounds");
+//    massert(loc.y < g->d->floors[z]->height, "loc.y is out of bounds");
+//    loc.z = z;
+//    return loc;
+//}
 
-static vec3 get_random_empty_non_wall_loc(gamestate* const g, int floor) {
-    massert(g, "gamestate is NULL");
-    massert(floor >= 0, "floor is out of bounds");
-    massert(floor < g->d->num_floors, "floor is out of bounds");
-    return get_random_empty_non_wall_loc_in_area(
-        g, floor, 0, 0, g->d->floors[floor]->width, g->d->floors[floor]->height);
-}
+//static vec3 get_random_empty_non_wall_loc(gamestate* const g, int floor) {
+//    massert(g, "gamestate is NULL");
+//    massert(floor >= 0, "floor is out of bounds");
+//    massert(floor < g->d->num_floors, "floor is out of bounds");
+//    return get_random_empty_non_wall_loc_in_area(
+//        g, floor, 0, 0, g->d->floors[floor]->width, g->d->floors[floor]->height);
+//}
 
 static vec3 get_random_available_loc(gamestate* const g, int floor) {
     massert(g, "gamestate is NULL");
@@ -893,23 +894,23 @@ static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const c
     return id;
 }
 
-static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, const char* name) {
-    massert(g, "gamestate is NULL");
-    entityid id = item_create(g, ITEM_WEAPON, loc, name);
-    if (id == ENTITYID_INVALID) return ENTITYID_INVALID;
-    g_add_weapontype(g, id, type);
-    g_add_damage(g, id, (vec3){0, 0, 0});
-    return id;
-}
+//static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, const char* name) {
+//    massert(g, "gamestate is NULL");
+//    entityid id = item_create(g, ITEM_WEAPON, loc, name);
+//    if (id == ENTITYID_INVALID) return ENTITYID_INVALID;
+//    g_add_weapontype(g, id, type);
+//    g_add_damage(g, id, (vec3){0, 0, 0});
+//    return id;
+//}
 
-static entityid ring_create(gamestate* const g, ringtype type, vec3 loc, const char* name) {
-    massert(g, "gamestate is NULL");
-    entityid id = item_create(g, ITEM_RING, loc, name);
-    if (id == ENTITYID_INVALID) return ENTITYID_INVALID;
-    g_add_ringtype(g, id, type);
-    // rings can have various effects, so we will not set any default stats here
-    return id;
-}
+//static entityid ring_create(gamestate* const g, ringtype type, vec3 loc, const char* name) {
+//    massert(g, "gamestate is NULL");
+//    entityid id = item_create(g, ITEM_RING, loc, name);
+//    if (id == ENTITYID_INVALID) return ENTITYID_INVALID;
+//    g_add_ringtype(g, id, type);
+//    // rings can have various effects, so we will not set any default stats here
+//    return id;
+//}
 
 static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name) {
     minfo("potion create...");
@@ -921,22 +922,22 @@ static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, con
     return id;
 }
 
-static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, const char* name) {
-    massert(g, "gamestate is NULL");
-    int random_ac = do_roll((vec3){1, 4, 0});
-    char name_buffer[128];
-    if (name && name[0]) {
-        snprintf(name_buffer, sizeof(name_buffer), "%s + %d", name, random_ac);
-    }
-    entityid id = item_create(g, ITEM_SHIELD, loc, name_buffer);
-    if (id == ENTITYID_INVALID) {
-        merror("failed to create shield");
-        return ENTITYID_INVALID;
-    }
-    g_add_shieldtype(g, id, type);
-    g_add_ac(g, id, random_ac);
-    return id;
-}
+//static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, const char* name) {
+//    massert(g, "gamestate is NULL");
+//    int random_ac = do_roll((vec3){1, 4, 0});
+//    char name_buffer[128];
+//    if (name && name[0]) {
+//        snprintf(name_buffer, sizeof(name_buffer), "%s + %d", name, random_ac);
+//    }
+//    entityid id = item_create(g, ITEM_SHIELD, loc, name_buffer);
+//    if (id == ENTITYID_INVALID) {
+//        merror("failed to create shield");
+//        return ENTITYID_INVALID;
+//    }
+//    g_add_shieldtype(g, id, type);
+//    g_add_ac(g, id, random_ac);
+//    return id;
+//}
 
 // this should only take into account any equipment that has light radius bonus equipment
 //static int get_entity_total_light_radius_bonus(gamestate* const g, entityid id) {
@@ -1048,27 +1049,27 @@ static void init_player(gamestate* const g) {
     printf("end init_player...\n");
 }
 
-static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
-    massert(df, "dungeon floor is NULL");
-    massert(count, "count is NULL");
-    int c = df_count_empty_non_walls_in_area(df, x0, y0, w, h);
-    vec3* locs = (vec3*)malloc(sizeof(vec3) * c);
-    massert(locs, "malloc failed");
-    int i = 0;
-    for (int y = 0; y < h && y + y0 < df->height; y++) {
-        for (int x = 0; x < w && x + x0 < df->width; x++) {
-            int newx = x + x0;
-            int newy = y + y0;
-            tile_t* t = df_tile_at(df, (vec3){newx, newy, -1});
-            tiletype_t type = t->type;
-            if (tile_entity_count(t) == 0 && tile_is_walkable(type)) locs[i++] = (vec3){newx, newy};
-            if (i >= c) break;
-        }
-    }
-    massert(i == c, "count mismatch: expected %d, got %d", c, i);
-    *count = c;
-    return locs;
-}
+//static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
+//    massert(df, "dungeon floor is NULL");
+//    massert(count, "count is NULL");
+//    int c = df_count_empty_non_walls_in_area(df, x0, y0, w, h);
+//    vec3* locs = (vec3*)malloc(sizeof(vec3) * c);
+//    massert(locs, "malloc failed");
+//    int i = 0;
+//    for (int y = 0; y < h && y + y0 < df->height; y++) {
+//        for (int x = 0; x < w && x + x0 < df->width; x++) {
+//            int newx = x + x0;
+//            int newy = y + y0;
+//            tile_t* t = df_tile_at(df, (vec3){newx, newy, -1});
+//            tiletype_t type = t->type;
+//            if (tile_entity_count(t) == 0 && tile_is_walkable(type)) locs[i++] = (vec3){newx, newy};
+//            if (i >= c) break;
+//        }
+//    }
+//    massert(i == c, "count mismatch: expected %d, got %d", c, i);
+//    *count = c;
+//    return locs;
+//}
 
 static vec3*
 get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
@@ -1349,7 +1350,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
     if (g->display_inventory_menu && !g->display_sort_inventory_menu) {
         if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
             g->inventory_menu_selection =
-                g->inventory_menu_selection + 1 >= count ? 0 : g->inventory_menu_selection + 1;
+                (size_t)g->inventory_menu_selection + 1 >= count ? 0 : g->inventory_menu_selection + 1;
         } else if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
             g->inventory_menu_selection =
                 g->inventory_menu_selection - 1 < 0 ? count - 1 : g->inventory_menu_selection - 1;
@@ -1485,10 +1486,10 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         merror("No items on tile");
         return false;
     }
-    for (int i = 0; i < tile->entity_count; i++) {
+    for (size_t i = 0; i < tile->entity_count; i++) {
         entityid itemid = tile->entities[i];
         entitytype_t type = g_get_type(g, itemid);
-        minfo("Item %s type: %d", g_get_name(g, itemid), type);
+        //minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
             add_message_history(g, "%s picked up a %s", g_get_name(g, id).c_str(), g_get_name(g, itemid).c_str());
             bool result = g_add_to_inventory(g, id, itemid);
@@ -1496,7 +1497,7 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
                 merror("Failed to add item to inventory");
                 return false;
             } else {
-                minfo("Item %s added to inventory", g_get_name(g, itemid));
+                //minfo("Item %s added to inventory", g_get_name(g, itemid));
                 tile_remove(tile, itemid);
             }
             if (g_is_type(g, id, ENTITY_PLAYER)) {
@@ -2105,52 +2106,47 @@ void liblogic_init(gamestate* const g) {
 //    }
 //}
 
-static void init_sword_test(gamestate* g) {
-    massert(g, "gamestate is NULL");
-    entityid id = ENTITYID_INVALID;
-    while (id == ENTITYID_INVALID) {
-        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-        id = weapon_create(g, WEAPON_SWORD, loc, "dummy sword");
-        //g_set_damage(g, id, (roll){1, 6, 0});
-        g_set_damage(g, id, (vec3){1, 6, 0});
-    }
-}
+//static void init_sword_test(gamestate* g) {
+//    massert(g, "gamestate is NULL");
+//    entityid id = ENTITYID_INVALID;
+//    while (id == ENTITYID_INVALID) {
+//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
+//        id = weapon_create(g, WEAPON_SWORD, loc, "dummy sword");
+//        g_set_damage(g, id, (vec3){1, 6, 0});
+//    }
+//}
 
-static void init_dagger_test(gamestate* g) {
-    massert(g, "gamestate is NULL");
-    entityid id = ENTITYID_INVALID;
-    while (id == ENTITYID_INVALID) {
-        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-        id = weapon_create(g, WEAPON_DAGGER, loc, "dagger");
-        g_set_damage(g, id, (vec3){1, 4, 0});
-    }
-}
+//static void init_dagger_test(gamestate* g) {
+//    massert(g, "gamestate is NULL");
+//    entityid id = ENTITYID_INVALID;
+//    while (id == ENTITYID_INVALID) {
+//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
+//        id = weapon_create(g, WEAPON_DAGGER, loc, "dagger");
+//        g_set_damage(g, id, (vec3){1, 4, 0});
+//    }
+//}
 
-static void init_axe_test(gamestate* g) {
-    massert(g, "gamestate is NULL");
-    entityid id = ENTITYID_INVALID;
-    while (id == ENTITYID_INVALID) {
-        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-        id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
-        //g_set_damage(g, id, (roll){1, 8, 0});
-        g_set_damage(g, id, (vec3){1, 8, 0});
-    }
-}
+//static void init_axe_test(gamestate* g) {
+//    massert(g, "gamestate is NULL");
+//    entityid id = ENTITYID_INVALID;
+//    while (id == ENTITYID_INVALID) {
+//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
+//        id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
+//        //g_set_damage(g, id, (roll){1, 8, 0});
+//        g_set_damage(g, id, (vec3){1, 8, 0});
+//    }
+//}
 
-static void init_ring_test(gamestate* g) {
-    massert(g, "gamestate is NULL");
-    entityid id = ENTITYID_INVALID;
-    while (id == ENTITYID_INVALID) {
-        int bonus = rand() % 4 + 1; // Random bonus between 1 and 4
-
-        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-        //id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
-        //id = ring_create(g, RING_GOLD, loc, "light ring +1");
-        id = ring_create(g, RING_GOLD, loc, TextFormat("light ring +%d", bonus));
-        // as a test, lets add a light radius bonus of +1
-        g_add_light_radius_bonus(g, id, bonus);
-    }
-}
+//static void init_ring_test(gamestate* g) {
+//    massert(g, "gamestate is NULL");
+//    entityid id = ENTITYID_INVALID;
+//    while (id == ENTITYID_INVALID) {
+//        int bonus = rand() % 4 + 1; // Random bonus between 1 and 4
+//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
+//        id = ring_create(g, RING_GOLD, loc, TextFormat("light ring +%d", bonus));
+//        g_add_light_radius_bonus(g, id, bonus);
+//    }
+//}
 
 //static void init_bow_test(gamestate* g) {
 //    massert(g, "gamestate is NULL");
@@ -2162,14 +2158,14 @@ static void init_ring_test(gamestate* g) {
 //    }
 //}
 
-static void init_shield_test(gamestate* g) {
-    massert(g, "gamestate is NULL");
-    entityid id = ENTITYID_INVALID;
-    while (id == ENTITYID_INVALID) {
-        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-        id = shield_create(g, SHIELD_BUCKLER, loc, "dummy buckler");
-    }
-}
+//static void init_shield_test(gamestate* g) {
+//    massert(g, "gamestate is NULL");
+//    entityid id = ENTITYID_INVALID;
+//    while (id == ENTITYID_INVALID) {
+//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
+//        id = shield_create(g, SHIELD_BUCKLER, loc, "dummy buckler");
+//    }
+//}
 
 static int get_hitdie_for_race(race_t race) {
     int hit_die = 4;

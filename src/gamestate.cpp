@@ -356,7 +356,7 @@ static void gamestate_init_music_paths(gamestate* const g) {
     FILE* file = fopen(music_path_file, "r");
     massert(file, "Could not open music path file: %s", music_path_file);
     int i = 0;
-    char buffer[1024];
+    char buffer[128];
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
         // Remove newline character if present
         size_t len = strlen(buffer);
@@ -512,25 +512,25 @@ bool g_register_comp(gamestate* const g, entityid id, component comp) {
     return true;
 }
 
-bool g_register_comps(gamestate* const g, entityid id, ...) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->components == NULL) return false;
-    if (!ct_add_entity(g->components, id)) return false;
-    va_list args;
-    va_start(args, id);
-    component comp;
-    //while ((comp = va_arg(args, component)) != C_COUNT) {
-    while ((comp = va_arg(args, component)) != 0) {
-        if (!ct_add_component(g->components, id, comp)) {
-            merror("ct_add_component failed: %d %d", id, comp);
-            va_end(args);
-            return false;
-        }
-    }
-    va_end(args);
-    return true;
-}
+//bool g_register_comps(gamestate* const g, entityid id, ...) {
+//massert(g, "g is NULL");
+//massert(id != ENTITYID_INVALID, "id is invalid");
+//if (g->components == NULL) return false;
+//if (!ct_add_entity(g->components, id)) return false;
+//va_list args;
+//va_start(args, id);
+//component comp;
+//while ((comp = va_arg(args, component)) != C_COUNT) {
+//while ((comp = va_arg(args, component)) != 0) {
+//    if (!ct_add_component(g->components, id, comp)) {
+//        merror("ct_add_component failed: %d %d", id, comp);
+//        va_end(args);
+//        return false;
+//    }
+//}
+//va_end(args);
+//return true;
+//}
 
 bool g_add_component(gamestate* const g,
                      entityid id,
@@ -670,24 +670,35 @@ bool g_add_component(gamestate* const g,
     return true;
 }
 
-//bool g_add_name(gamestate* const g, entityid id, const char* name) {
-void g_add_name(gamestate* const g, entityid id, string name) {
+
+
+
+bool g_add_component2(gamestate* const g, entityid id, component comp) {
+    if (!ct_has_entity(g->components, id) && !ct_add_entity(g->components, id)) {
+        return false;
+    }
+    if (!g_has_component(g, id, C_NAME) && !g_register_comp(g, id, C_NAME)) {
+        return false;
+    }
+    return true;
+}
+
+
+
+bool g_add_name(gamestate* const g, entityid id, string name) {
     massert(g, "g is NULL");
     massert(name != "", "name is empty string");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    printf("g_add_name: id: %d, name: %s\n", id, name.c_str());
-    if (!ct_has_entity(g->components, id) && !ct_add_entity(g->components, id)) return;
+    // Ensure entity exists in component table
     // Automatically register component if not already registered
-    if (!g_has_component(g, id, C_NAME) && !g_register_comp(g, id, C_NAME)) return;
-    if (g->name_list) {
-        //        (*g->name_list)[id] = name;
-        g->name_list->insert({id, name});
+    if (!g_add_component2(g, id, C_NAME)) {
+        merror("g_add_component2 failed for id %d", id);
+        return false;
     }
-    // we have to allocate space for the name component
-    //name_component* c_ptr = (name_component*)malloc(sizeof(name_component));
-    //massert(c_ptr, "c_ptr is NULL");
-    //init_name_component(c_ptr, id, name);
-    //return g_add_component(g, id, C_NAME, (void*)name, sizeof(name_component), (void**)&g->name_list, &g->name_list_count, &g->name_list_capacity);
+    massert(g->name_list, "g->name_list is NULL");
+    //if (g->name_list) {
+    g->name_list->insert({id, name});
+    return true;
 }
 
 bool g_has_component(const gamestate* const g, entityid id, component comp) {
@@ -1369,7 +1380,7 @@ bool g_remove_from_inventory(gamestate* const g, entityid id, entityid itemid) {
     if (g->inventory_list == NULL) return false;
     for (int i = 0; i < g->inventory_list_count; i++) {
         if (g->inventory_list[i].id == id) {
-            for (int j = 0; j < g->inventory_list[i].count; j++) {
+            for (size_t j = 0; j < g->inventory_list[i].count; j++) {
                 if (g->inventory_list[i].inventory[j] == itemid) {
                     g->inventory_list[i].inventory[j] = g->inventory_list[i].inventory[g->inventory_list[i].count - 1];
                     g->inventory_list[i].count--;
@@ -1417,7 +1428,7 @@ bool g_has_item_in_inventory(const gamestate* const g, entityid id, entityid ite
     if (g->inventory_list == NULL) return false;
     for (int i = 0; i < g->inventory_list_count; i++) {
         if (g->inventory_list[i].id == id) {
-            for (int j = 0; j < g->inventory_list[i].count; j++)
+            for (size_t j = 0; j < g->inventory_list[i].count; j++)
                 if (g->inventory_list[i].inventory[j] == itemid) return true;
         }
     }
@@ -1441,19 +1452,19 @@ bool g_update_inventory(gamestate* const g, entityid id, entityid* new_inventory
             g->inventory_list[i].count = 0;
             // copy the new inventory
             //for (int j = 0; j < MAX_INVENTORY_SIZE && new_inventory[j] != ENTITYID_INVALID; j++) {
-            for (int j = 0; j < new_inventory_count && j < MAX_INVENTORY_SIZE; j++) {
+            for (size_t j = 0; j < new_inventory_count && j < MAX_INVENTORY_SIZE; j++) {
                 g->inventory_list[i].inventory[j] = new_inventory[j];
                 g->inventory_list[i].count++;
             }
             massert(g->inventory_list[i].count == new_inventory_count,
-                    "new inventory count %d does not match expected count %zu",
+                    "new inventory count %ld does not match expected count %zu",
                     g->inventory_list[i].count,
                     new_inventory_count);
             if (g->inventory_list[i].count == new_inventory_count) {
-                msuccess("updated inventory for id %d with %d items", id, new_inventory_count);
+                msuccess("updated inventory for id %d with %ld items", id, new_inventory_count);
                 return true;
             }
-            merror("updated inventory for id %d but count mismatch: expected %d, got %d",
+            merror("updated inventory for id %d but count mismatch: expected %ld, got %ld",
                    id,
                    new_inventory_count,
                    g->inventory_list[i].count);

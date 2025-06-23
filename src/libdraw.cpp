@@ -376,9 +376,11 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     // Only draw entities within vision distance
     //if (distance <= vision_distance) {
     if (distance <= dist_to_check) {
-        for (int i = 0; i < tile_entity_count(tile); i++) {
+        for (size_t i = 0; i < tile_entity_count(tile); i++) {
             entityid id = tile_get_entity(tile, i);
-            if (g_is_dead(g, id) == dead) draw_sprite_and_shadow(g, id);
+            if (g_is_dead(g, id) == dead) {
+                draw_sprite_and_shadow(g, id);
+            }
         }
     }
     return true;
@@ -1452,13 +1454,15 @@ static void draw_inventory_menu(gamestate* const g) {
         return;
     }
     // Calculate viewport bounds based on selection
-    int max_visible_items = 15;
+    size_t max_visible_items = 15;
     int start_index = 0;
     // If selection is below middle, scroll down
-    if (g->inventory_menu_selection > max_visible_items / 2 && inventory_count > max_visible_items) {
+    if ((size_t)g->inventory_menu_selection > max_visible_items / 2 && inventory_count > max_visible_items) {
         start_index = g->inventory_menu_selection - max_visible_items / 2;
         // Don't scroll past end of inventory
-        if (start_index + max_visible_items > inventory_count) start_index = inventory_count - max_visible_items;
+        if ((size_t)start_index + max_visible_items > inventory_count) {
+            start_index = inventory_count - max_visible_items;
+        }
     }
     // Draw visible items
     // At the top before the list begins, lets display the current selection number and how many items are in the inventory
@@ -1481,7 +1485,7 @@ static void draw_inventory_menu(gamestate* const g) {
                    WHITE);
     }
     item_y += font_size + 4;
-    for (int i = start_index; i < inventory_count && i < start_index + max_visible_items; i++) {
+    for (size_t i = start_index; i < inventory_count && i < start_index + max_visible_items; i++) {
         entityid item_id = inventory[i];
         if (item_id == ENTITYID_INVALID) continue;
         char item_display[128];
@@ -1489,7 +1493,7 @@ static void draw_inventory_menu(gamestate* const g) {
         // Highlight selected item with arrow
         //const char* item_name = g_get_name(g, item_id);
         string item_name = g_get_name(g, item_id);
-        if (i == g->inventory_menu_selection) {
+        if (i == (size_t)g->inventory_menu_selection) {
             snprintf(item_display, sizeof(item_display), "> %s", item_name.c_str());
             // Draw selection highlight background
             DrawRectangle(left_box.x, item_y - 2, left_box.width, font_size + 4, (Color){0x44, 0x44, 0x44, 0xFF});
@@ -1502,7 +1506,7 @@ static void draw_inventory_menu(gamestate* const g) {
         item_y += font_size + 4;
     }
     // Draw item info in right_box
-    if (g->inventory_menu_selection >= 0 && g->inventory_menu_selection < inventory_count) {
+    if (g->inventory_menu_selection >= 0 && (size_t)g->inventory_menu_selection < inventory_count) {
         entityid item_id = inventory[g->inventory_menu_selection];
         //const char* name = g_get_name(g, item_id);
         string name = g_get_name(g, item_id);
@@ -1747,7 +1751,7 @@ static void draw_character_creation_screen(gamestate* const g) {
     int sy = h / 4;
     int x = cx;
     int y = sy;
-    char buffer[2048] = {0};
+    //char buffer[2048] = {0};
     ClearBackground(BLACK);
     DrawText(title_text, x, y, font_size, WHITE);
     y += font_size;
@@ -1795,7 +1799,7 @@ static void draw_character_creation_screen(gamestate* const g) {
     DrawRectangleLinesEx((Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200}, 4, RED);
     // Draw instructions
     y += font_size + 8;
-    for (int i = 0; i < sizeof(remaining_text) / sizeof(remaining_text[0]); i++) {
+    for (size_t i = 0; i < sizeof(remaining_text) / sizeof(remaining_text[0]); i++) {
         DrawText(remaining_text[i], x, y, font_size, WHITE);
         y += font_size + 4;
     }
