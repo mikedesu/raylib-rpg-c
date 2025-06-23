@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 
-LOC=$(find . -name '*.c' -o -name '*.h' | xargs grep -hv '^\s*//' | grep -v '^\s*$' | grep -v '^$' | wc -l);
+#LOC=$(find . -name '*.c' -o -name '*.h' | xargs grep -hv '^\s*//' | grep -v '^\s*$' | grep -v '^$' | wc -l);
+LOC=$(find . -name '*.cpp' -o -name '*.h' | xargs grep -hv '^\s*//' | grep -v '^\s*$' | grep -v '^$' | wc -l);
 DATE=$(date +%s);
 TOKENS=$(python3 count_tokens.py);
 
