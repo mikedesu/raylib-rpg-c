@@ -28,6 +28,9 @@
 //#include "component.h"
 //#include "inventory_sort.h"
 
+//#define MAX(a, b) ((a)>(b)? (a) : (b))
+//#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
@@ -44,7 +47,9 @@ RenderTexture2D main_game_target_texture = {0};
 RenderTexture2D target = {0};
 Rectangle target_src = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
 Rectangle target_dest = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
+
 Rectangle win_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
+
 Vector2 target_origin = {0, 0};
 Vector2 zero_vec = {0, 0};
 
@@ -102,8 +107,7 @@ static void draw_debug_panel(gamestate* const g);
 static void libdraw_drawframe_2d(gamestate* const g);
 static void create_sg_byid(gamestate* const g, entityid id);
 static void calc_debugpanel_size(gamestate* const g);
-static void create_spritegroup(
-    gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
+static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
 static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, entityid id);
 static void draw_version(const gamestate* const g);
 
@@ -277,12 +281,7 @@ static void draw_shadow_for_entity(const gamestate* const g, spritegroup_t* sg, 
     if (t != ENTITY_PLAYER && t != ENTITY_NPC) return;
     sprite* sh = sg_get_current_plus_one(sg);
     if (sh) {
-        DrawTexturePro(*sh->texture,
-                       sh->src,
-                       (Rectangle){sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height},
-                       (Vector2){0, 0},
-                       0,
-                       WHITE);
+        DrawTexturePro(*sh->texture, sh->src, (Rectangle){sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height}, (Vector2){0, 0}, 0, WHITE);
     }
 }
 
@@ -312,8 +311,7 @@ static void draw_shield_sprite_front(const gamestate* const g, entityid id, spri
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
     sprite* shield_front_s = get_shield_front_sprite(g, id, sg);
-    if (shield_front_s)
-        DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
+    if (shield_front_s) DrawTexturePro(*shield_front_s->texture, shield_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
 }
 
 static void draw_weapon_sprite_back(const gamestate* const g, entityid id, spritegroup_t* sg) {
@@ -437,9 +435,7 @@ static void libdraw_set_sg_is_damaged(gamestate* const g, entityid id, spritegro
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
     race_t race = g_get_race(g, id);
-    int anim_index = race == RACE_BAT           ? SG_ANIM_BAT_DMG
-                     : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_DMG
-                                                : SG_ANIM_NPC_DMG;
+    int anim_index = race == RACE_BAT ? SG_ANIM_BAT_DMG : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_DMG : SG_ANIM_NPC_DMG;
     //if (race == RACE_BAT)
     //    anim_index = SG_ANIM_BAT_DMG;
     //else if (race == RACE_GREEN_SLIME)
@@ -556,9 +552,7 @@ static void libdraw_update_sprite_position(gamestate* const g, entityid id, spri
         entitytype_t type = g_get_type(g, id);
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
             race_t race = g_get_race(g, id);
-            sg->current = race == RACE_BAT           ? SG_ANIM_BAT_IDLE
-                          : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE
-                                                     : SG_ANIM_NPC_WALK;
+            sg->current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
             //if (race == RACE_BAT)
             //    sg->current = SG_ANIM_BAT_IDLE;
             //else if (race == RACE_GREEN_SLIME)
@@ -649,8 +643,7 @@ static void libdraw_handle_gamestate_flag(gamestate* const g) {
 static void libdraw_handle_dirty_entities(gamestate* const g) {
     massert(g, "gamestate is NULL");
     if (g->dirty_entities) {
-        for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++)
-            create_sg_byid(g, i);
+        for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++) create_sg_byid(g, i);
         g->dirty_entities = false;
         g->new_entityid_begin = ENTITYID_INVALID;
         g->new_entityid_end = ENTITYID_INVALID;
@@ -958,6 +951,8 @@ void libdraw_drawframe(gamestate* const g) {
         g->frame_dirty = false;
         g->frame_updates++;
     }
+
+    // draw to the target texture
     BeginTextureMode(target);
     ClearBackground(BLUE);
     if (g->current_scene == SCENE_TITLE) {
@@ -972,6 +967,16 @@ void libdraw_drawframe(gamestate* const g) {
     EndTextureMode();
     // draw the target texture to the window
     //DrawTexturePro(target.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+
+    // draw to the target texture
+    //float scale = MIN((float)GetScreenWidth() / DEFAULT_TARGET_WIDTH, (float)GetScreenHeight() / DEFAULT_TARGET_WIDTH);
+    //minfo("scale: %f, tw: %d, th: %d, win_w: %d, win_h: %d", scale, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT, GetScreenWidth(), GetScreenHeight());
+    // update the win_dest rectangle to match the screen size with the scale
+    //win_dest.x = (GetScreenWidth() - DEFAULT_TARGET_WIDTH * scale) * 0.5f;
+    //win_dest.y = (GetScreenHeight() - DEFAULT_TARGET_HEIGHT * scale) * 0.5f;
+    win_dest.width = GetScreenWidth();
+    win_dest.height = GetScreenHeight();
+
     DrawTexturePro(target.texture, target_src, win_dest, target_origin, 0.0f, WHITE);
     EndDrawing();
     g->last_frame_time = GetTime() - start_time;
@@ -988,8 +993,7 @@ static bool libdraw_unload_texture(int txkey) {
 }
 
 static void libdraw_unload_textures() {
-    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++)
-        libdraw_unload_texture(i);
+    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) libdraw_unload_texture(i);
     UnloadRenderTexture(title_target_texture);
     UnloadRenderTexture(char_creation_target_texture);
     UnloadRenderTexture(main_game_target_texture);
@@ -1055,8 +1059,7 @@ static void load_textures() {
     fclose(file);
 }
 
-static void create_spritegroup(
-    gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
+static void create_spritegroup(gamestate* const g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
     massert(g, "gamestate is NULL");
     // can hold up to 32 sprites
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
@@ -1091,10 +1094,7 @@ static void create_spritegroup(
         return;
     }
     group->current = 0;
-    group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x,
-                              (float)loc.y * DEFAULT_TILE_SIZE + offset_y,
-                              (float)s->width,
-                              (float)s->height};
+    group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
     group->off_x = offset_x, group->off_y = offset_y;
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
 }
@@ -1158,9 +1158,7 @@ static void create_sg_byid(gamestate* const g, entityid id) {
             keys = TX_GREEN_SLIME_KEYS;
             num_keys = TX_GREEN_SLIME_COUNT;
             break;
-        default:
-            merror("unknown race %d", race);
-            return;
+        default: merror("unknown race %d", race); return;
         }
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     } else if (type == ENTITY_ITEM) {
@@ -1261,22 +1259,7 @@ static void draw_hud(gamestate* const g) {
     int font_size = 10;
     char buffer[1024] = {0};
     const char* format_str = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d STR: %d CON: %d DEX: %d Floor: %d Turn %d";
-    snprintf(buffer,
-             sizeof(buffer),
-             format_str,
-             g_get_name(g, g->hero_id).c_str(),
-             level,
-             hp,
-             maxhp,
-             attack_bonus,
-             ac,
-             xp,
-             next_level_xp,
-             str,
-             con,
-             dex,
-             floor,
-             turn);
+    snprintf(buffer, sizeof(buffer), format_str, g_get_name(g, g->hero_id).c_str(), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp, str, con, dex, floor, turn);
     Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
     int box_w = text_size.x + g->pad;
     int box_h = text_size.y + g->pad;
@@ -1358,11 +1341,17 @@ void libdraw_init_rest(gamestate* const g) {
 
 void libdraw_init(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
+    int w = DEFAULT_WIN_WIDTH;
+    int h = DEFAULT_WIN_HEIGHT;
     const char* title = WINDOW_TITLE;
     char full_title[1024] = {0};
     snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version.c_str());
+
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
+
     InitWindow(w, h, full_title);
+    SetWindowMinSize(320, 240);
+
     libdraw_init_rest(g);
 }
 
@@ -1470,19 +1459,10 @@ static void draw_inventory_menu(gamestate* const g) {
     float item_x = left_box.x + item_list_pad;
     if (inventory_count > 0) {
         char selection_info[64] = {0};
-        snprintf(selection_info,
-                 sizeof(selection_info),
-                 "Item %d of %zu selected",
-                 g->inventory_menu_selection + 1,
-                 inventory_count);
+        snprintf(selection_info, sizeof(selection_info), "Item %d of %zu selected", g->inventory_menu_selection + 1, inventory_count);
         DrawTextEx(GetFontDefault(), selection_info, (Vector2){item_x, item_y}, font_size, g->line_spacing, WHITE);
     } else {
-        DrawTextEx(GetFontDefault(),
-                   "No items in inventory",
-                   (Vector2){left_box.x + item_list_pad, left_box.y + item_list_pad},
-                   font_size,
-                   g->line_spacing,
-                   WHITE);
+        DrawTextEx(GetFontDefault(), "No items in inventory", (Vector2){left_box.x + item_list_pad, left_box.y + item_list_pad}, font_size, g->line_spacing, WHITE);
     }
     item_y += font_size + 4;
     for (size_t i = start_index; i < inventory_count && i < start_index + max_visible_items; i++) {
@@ -1515,17 +1495,9 @@ static void draw_inventory_menu(gamestate* const g) {
             vec3 dmg_roll = g_get_damage(g, item_id);
             int n = dmg_roll.x, sides = dmg_roll.y, modifier = dmg_roll.z;
             if (modifier)
-                snprintf(info_text,
-                         sizeof(info_text),
-                         "%s\nType: %d\nDamage: %dd%d+%d",
-                         name.c_str(),
-                         item_type,
-                         n,
-                         sides,
-                         modifier);
+                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d+%d", name.c_str(), item_type, n, sides, modifier);
             else
-                snprintf(
-                    info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d", name.c_str(), item_type, n, sides);
+                snprintf(info_text, sizeof(info_text), "%s\nType: %d\nDamage: %dd%d", name.c_str(), item_type, n, sides);
         } else if (g_has_ac(g, item_id)) {
             int ac = g_get_ac(g, item_id);
             snprintf(info_text, sizeof(info_text), "%s\nType: %d\nAC: %d", name.c_str(), item_type, ac);
@@ -1535,25 +1507,14 @@ static void draw_inventory_menu(gamestate* const g) {
         sg = hashtable_entityid_spritegroup_get(spritegroups, item_id);
     } else
         snprintf(info_text, sizeof(info_text), "Select an item to view details here.");
-    DrawTextEx(GetFontDefault(),
-               info_title,
-               (Vector2){right_box.x + item_list_pad, info_title_y},
-               font_size,
-               g->line_spacing,
-               (Color){0xaa, 0xaa, 0xaa, 0xff});
-    DrawTextEx(GetFontDefault(),
-               info_text,
-               (Vector2){right_box.x + item_list_pad, info_text_y},
-               font_size,
-               g->line_spacing,
-               WHITE);
+    DrawTextEx(GetFontDefault(), info_title, (Vector2){right_box.x + item_list_pad, info_title_y}, font_size, g->line_spacing, (Color){0xaa, 0xaa, 0xaa, 0xff});
+    DrawTextEx(GetFontDefault(), info_text, (Vector2){right_box.x + item_list_pad, info_text_y}, font_size, g->line_spacing, WHITE);
     if (sg) {
         sprite* s = sg_get_current(sg);
         if (s) {
             float sprite_width = s->width * scale, sprite_height = s->height * scale, sprite_margin = -6 * scale;
             // Anchor to top-right of right_box, account for margin
-            const float sprite_x = right_box.x + right_box.width - sprite_margin - sprite_width,
-                        sprite_y = right_box.y + sprite_margin;
+            const float sprite_x = right_box.x + right_box.width - sprite_margin - sprite_width, sprite_y = right_box.y + sprite_margin;
             DrawTexturePro(*s->texture,
                            s->src,
                            (Rectangle){sprite_x, sprite_y, sprite_width, sprite_height},
@@ -1630,9 +1591,7 @@ static void draw_gameplay_settings_menu(gamestate* const g) {
     }
 }
 
-void libdraw_update_input(inputstate* const is) {
-    inputstate_update(is);
-}
+void libdraw_update_input(inputstate* const is) { inputstate_update(is); }
 
 bool libdraw_windowshouldclose(const gamestate* const g) {
     massert(g, "gamestate is NULL");
@@ -1740,10 +1699,8 @@ static void draw_character_creation_screen(gamestate* const g) {
     const char* title_text = "Character Creation";
     //const char* stats_fmt[] = {
     //    "Name: %s", "Race: %s", "Hitdie: %d", "Strength: %d", "Dexterity: %d", "Constitution: %d"};
-    const char* remaining_text[] = {"Press SPACE to re-roll stats",
-                                    "Press LEFT/RIGHT to change race (unavailable for now)",
-                                    "Press UP/DOWN to change class (unavailable for now)",
-                                    "Press ENTER to confirm"};
+    const char* remaining_text[] = {
+        "Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race (unavailable for now)", "Press UP/DOWN to change class (unavailable for now)", "Press ENTER to confirm"};
     int font_size = 20;
     int w = DEFAULT_TARGET_WIDTH;
     int h = DEFAULT_TARGET_HEIGHT;
@@ -1771,8 +1728,6 @@ static void draw_character_creation_screen(gamestate* const g) {
     y += font_size + 4;
     DrawText(TextFormat("Constitution: %d", g->chara_creation.constitution), x, y, font_size, WHITE);
     y += font_size + 4;
-
-
 
     //for (int i = 0; i < sizeof(stats_fmt) / sizeof(stats_fmt[0]); i++) {
     //if (i == 0) {
