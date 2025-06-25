@@ -2,14 +2,11 @@
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
-//#include "libgame_defines.h"
 #include "massert.h"
-//#include "range.h"
 #include "raylib.h"
-//#include "room_data.h"
 #include "vec3.h"
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 void df_init_test(dungeon_floor_t* df);
 void df_set_tile_perimeter_range(dungeon_floor_t* const df, tiletype_t begin, tiletype_t end, int x, int y, int w, int h);
