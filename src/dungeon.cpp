@@ -229,14 +229,16 @@ bool d_add_floor(dungeon_t* const dungeon, int width, int height) {
     // Get center of the floor
     int cx = width / 2;
     int cy = height / 2;
-    bool res = df_add_room(new_floor, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "TestRoom");
-    if (!res) {
-        //merror("Failed to add room to new floor");
-        df_free(new_floor);
-        return false;
-    }
+    //bool res = df_add_room(new_floor, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "TestRoom");
+    df_set_tile_area_range(new_floor, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    //if (!res) {
+    //merror("Failed to add room to new floor");
+    //    df_free(new_floor);
+    //    return false;
+    //}
     // Assign upstairs and downstairs locations
-    res = df_assign_upstairs_in_area(new_floor, 0, 0, width, height);
+    //bool res = df_assign_upstairs_in_area(new_floor, 0, 0, width, height);
+    df_assign_upstairs_in_area(new_floor, 0, 0, width, height);
     df_assign_downstairs_in_area(new_floor, 0, 0, width, height);
     // Add the new floor to the dungeon
     dungeon->floors[dungeon->num_floors++] = new_floor;
