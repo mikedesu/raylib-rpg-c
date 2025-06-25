@@ -2,8 +2,10 @@
 #include "entityid.h"
 #include "gamestate.h"
 #include "mprint.h"
-#include <stdlib.h>
-#include <string.h>
+#include <vector>
+#include <algorithm>
+
+using std::vector;
 
 void tile_init(tile_t* const t, tiletype_t type) {
     massert(t, "tile is NULL");
@@ -17,16 +19,8 @@ void tile_init(tile_t* const t, tiletype_t type) {
     t->dirty_entities = true;
     t->dirty_visibility = true;
 
-    const size_t malloc_sz = sizeof(entityid) * DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
-    t->entities = (entityid*)malloc(malloc_sz);
-    if (!t->entities) {
-        merror("dungeon_tile_init: failed to allocate entities array");
-        t->type = TILE_NONE; // Reset to safe state
-        return;
-    }
-    memset(t->entities, -1, malloc_sz);
-
-    t->entity_max = DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
+    t->entities = new vector<entityid>();
+    t->entities->reserve(DUNGEON_TILE_MAX_ENTITIES_DEFAULT);
     //t->pressure_plate_up_tx_key = -1;
     //t->pressure_plate_down_tx_key = -1;
     //t->pressure_plate_event = -1;
@@ -40,22 +34,11 @@ void tile_init(tile_t* const t, tiletype_t type) {
 bool tile_resize(tile_t* t) {
     massert(t, "tile is NULL");
     massert(t->entities, "tile entities is NULL");
-    size_t new_max = t->entity_max * 2;
-    if (new_max > DUNGEON_TILE_MAX_ENTITIES_MAX) {
-        merror("dungeon_tile_resize: new_max exceeds max entities");
+    if (t->entities->capacity() * 2 > DUNGEON_TILE_MAX_ENTITIES_MAX) {
+        merror("dungeon_tile_resize: new capacity exceeds max entities");
         return false;
     }
-    size_t sz = sizeof(entityid) * new_max;
-    entityid* new_e = (entityid*)malloc(sz);
-    if (!new_e) {
-        merror("dungeon_tile_resize: malloc failed");
-        return false;
-    }
-    memset(new_e, -1, sz);
-    memcpy(new_e, t->entities, sizeof(entityid) * t->entity_max);
-    free(t->entities);
-    t->entities = new_e;
-    t->entity_max = new_max;
+    t->entities->reserve(t->entities->capacity() * 2);
     return true;
 }
 
@@ -70,42 +53,23 @@ entityid tile_add(tile_t* const t, entityid id) {
             return ENTITYID_INVALID;
         }
     }
-    // Find first empty slot
-    for (size_t i = 0; i < t->entity_max; i++) {
-        if (t->entities[i] == ENTITYID_INVALID) {
-            t->entities[i] = id;
-            t->entity_count++;
-            t->dirty_entities = true;
-            return id;
-        }
-    }
-    // This should never happen due to earlier check
-    merror("dungeon_tile_add: No empty slot found after resize");
-    return ENTITYID_INVALID;
+    t->entities->push_back(id);
+    t->dirty_entities = true;
+    return id;
 }
 
 entityid tile_remove(tile_t* tile, entityid id) {
     massert(tile, "tile is NULL");
     massert(tile->entities, "tile entities is NULL");
     massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
-    bool did_remove = false;
-    //for (int i = 0; i < tile->entity_max; i++) {
-    for (size_t i = 0; i < tile->entity_max; i++) {
-        if (tile->entities[i] == id) {
-            tile->entities[i] = -1;
-            // shift all elements to the left with memcpy
-            memcpy(&tile->entities[i], &tile->entities[i + 1], sizeof(entityid) * (tile->entity_max - i - 1));
-            tile->entities[tile->entity_max - 1] = -1;
-            tile->entity_count--;
-            tile->dirty_entities = did_remove = true;
-            break;
-        }
+    auto it = std::find(tile->entities->begin(), tile->entities->end(), id);
+    if (it != tile->entities->end()) {
+        tile->entities->erase(it);
+        tile->dirty_entities = true;
+        return id;
     }
-    if (!did_remove) {
-        merror("dungeon_tile_remove: entity not found");
-        return -1;
-    }
-    return id;
+    merror("dungeon_tile_remove: entity not found");
+    return ENTITYID_INVALID;
 }
 
 tile_t* tile_create(tiletype_t type) {
@@ -119,7 +83,7 @@ tile_t* tile_create(tiletype_t type) {
 
 void tile_free(tile_t* t) {
     if (!t) return;
-    free(t->entities);
+    delete t->entities;
     free(t);
 }
 
@@ -133,9 +97,7 @@ void recompute_entity_cache(gamestate* g, tile_t* t) {
     t->cached_live_npcs = 0;
     t->cached_player_present = false;
     // Iterate through all entities on the tile
-    for (size_t i = 0; i < t->entity_max; i++) {
-        entityid id = t->entities[i];
-        if (id == ENTITYID_INVALID) continue;
+    for (entityid id : *t->entities) {
         // Skip dead entities
         if (g_is_dead(g, id)) continue;
         // Check entity type
@@ -350,9 +312,10 @@ size_t tile_memory_size(const tile_t* t) {
     size_t size = 0;
     // Size of the tile_t struct itself
     size += sizeof(tile_t);
-    // Size of dynamically allocated entities array
+    // Size of vector and its contents
     if (t->entities) {
-        size += t->entity_max * sizeof(entityid);
+        size += sizeof(vector<entityid>);
+        size += t->entities->capacity() * sizeof(entityid);
     }
     return size;
 }

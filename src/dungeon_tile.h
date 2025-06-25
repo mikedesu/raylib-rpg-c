@@ -4,9 +4,9 @@
 #include "entityid.h"
 #include "entitytype.h"
 #include "massert.h"
-//#include <stdbool.h>
-//#include <stddef.h>
-#include <cstddef>
+#include <vector>
+
+using std::vector;
 
 #define DUNGEON_TILE_MAX_ENTITIES_DEFAULT 8
 #define DUNGEON_TILE_MAX_ENTITIES_MAX 256
@@ -19,9 +19,7 @@ typedef struct {
     bool visible;
     bool explored;
 
-    entityid* entities;
-    size_t entity_count;
-    size_t entity_max;
+    vector<entityid>* entities;
 
     //bool has_pressure_plate;
     //int pressure_plate_up_tx_key;
@@ -85,12 +83,12 @@ size_t tile_memory_size(const tile_t* t);
 
 static inline size_t tile_entity_count(const tile_t* const t) {
     massert(t, "tile is NULL");
-    return t->entity_count;
+    return t->entities->size();
 }
 
 static inline entityid tile_get_entity(const tile_t* const t, size_t i) {
     massert(t, "tile is NULL");
-    return i < t->entity_max ? t->entities[i] : -1;
+    return i < t->entities->size() ? t->entities->at(i) : ENTITYID_INVALID;
 }
 
 //static inline bool tile_is_wall_switch_on(const tile_t* const t) {
