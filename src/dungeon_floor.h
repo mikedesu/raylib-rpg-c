@@ -1,6 +1,5 @@
 #pragma once
 
-//#include "location.h"
 #include "dungeon_tile.h"
 #include "entityid.h"
 #include "mprint.h"
@@ -11,26 +10,12 @@
 
 #define DEFAULT_DUNGEON_FLOOR_WIDTH 256
 #define DEFAULT_DUNGEON_FLOOR_HEIGHT 256
-//#define DEFAULT_DF_EVENTS 64
-//#define DEFAULT_DF_PLATES 64
-
-//typedef int df_event_id;
-
-//typedef struct {
-//    df_event_id listen_event;
-//    int x;
-//    int y;
-//    tiletype_t on_type;
-//    tiletype_t off_type;
-//} df_event_t;
 
 typedef struct {
     tile_t** tiles;
     int floor; // the floor number, starting from 0
     int width;
     int height;
-    //df_event_t events[DEFAULT_DF_EVENTS];
-    //bool plates[DEFAULT_DF_PLATES];
     room_data_t* rooms; // dynamic array pointer
     int room_count; // current room number
     int room_capacity; // allocated capacity
@@ -69,17 +54,7 @@ int df_loc_is_in_room(dungeon_floor_t* const df, vec3 loc);
 room_data_t* const df_get_rooms_with_prefix(dungeon_floor_t* const df, int* external_count, const char* prefix);
 const char* df_get_room_name(dungeon_floor_t* const df, vec3 loc);
 
-// Serialization functions
-//size_t df_serialized_size(const dungeon_floor_t* df);
-//size_t df_serialize(const dungeon_floor_t* df, char* buffer, size_t buffer_size);
-//bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size);
-
-// Memory size calculation
-//size_t df_memory_size(const dungeon_floor_t* df);
-
-//static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, vec3 loc) {
-    //minfo("df_tile_at: %d, %d", x, y);
     massert(df, "df is NULL");
     if (loc.x < 0 || loc.x >= df->width || loc.y < 0 || loc.y >= df->height) {
         merror("x or y out of bounds: x: %d, y: %d", loc.x, loc.y);

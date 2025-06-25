@@ -737,7 +737,9 @@ static void init_dungeon(gamestate* const g) {
     g->d = d_create();
     massert(g->d, "failed to init dungeon");
     int df_count = 20;
-    for (int i = 0; i < df_count; i++) d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    for (int i = 0; i < df_count; i++) {
+        d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    }
 }
 
 //static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name) {
