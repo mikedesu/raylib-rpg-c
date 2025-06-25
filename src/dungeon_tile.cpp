@@ -2,8 +2,8 @@
 #include "entityid.h"
 #include "gamestate.h"
 #include "mprint.h"
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 using std::vector;
 
@@ -27,7 +27,7 @@ void tile_init(tile_t* const t, tiletype_t type) {
     //t->wall_switch_up_tx_key = -1;
     //t->wall_switch_down_tx_key = -1;
     //t->wall_switch_event = -1;
-    t->entity_count = 0;
+    //t->entity_count = 0;
     t->cached_live_npcs = 0;
 }
 
@@ -46,13 +46,13 @@ entityid tile_add(tile_t* const t, entityid id) {
     massert(t, "tile is NULL");
     massert(t->entities, "tile entities is NULL");
     // Early exit if tile is full and resize fails
-    if (t->entity_count >= t->entity_max) {
-        ////mwarning("dungeon_tile_add: Tile full, attempting resize");
-        if (!tile_resize(t)) {
-            //merror("dungeon_tile_add: Resize failed");
-            return ENTITYID_INVALID;
-        }
-    }
+    //if (t->entity_count >= t->entity_max) {
+    //    ////mwarning("dungeon_tile_add: Tile full, attempting resize");
+    //    if (!tile_resize(t)) {
+    //        //merror("dungeon_tile_add: Resize failed");
+    //        return ENTITYID_INVALID;
+    //    }
+    //}
     t->entities->push_back(id);
     t->dirty_entities = true;
     return id;

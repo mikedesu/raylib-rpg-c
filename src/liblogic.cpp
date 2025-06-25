@@ -43,8 +43,7 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
 static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int x0, int y0, int w, int h);
 static vec3 get_base_attack_damage_for_race(race_t race);
 
-static vec3*
-get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
+static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 //static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
 static vec3* get_locs_around_entity(gamestate* const g, entityid id);
 
@@ -271,7 +270,8 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
     massert(t, "failed to get tile");
     // Count living NPCs
     int count = 0;
-    for (size_t i = 0; i < t->entity_max; i++) {
+
+    for (entityid i = 0; i < t->entities->size(); i++) {
         const entityid eid = tile_get_entity(t, i);
         if (eid == ENTITYID_INVALID) continue;
         //if (!e) continue;
@@ -281,6 +281,7 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
         if (g_is_type(g, eid, ENTITY_NPC) && !g_is_dead(g, eid)) count++;
         if (g_is_type(g, eid, ENTITY_PLAYER) && !g_is_dead(g, eid)) count++;
     }
+
     return count;
 }
 
@@ -450,8 +451,7 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
         if (tgttype == ENTITY_PLAYER) {
             add_message_history(g, "%s attacked you for %d damage!", g_get_name(g, atk_id).c_str(), dmg);
         } else if (tgttype == ENTITY_NPC) {
-            add_message_history(
-                g, "%s attacked %s for %d damage!", g_get_name(g, atk_id).c_str(), g_get_name(g, tgt_id).c_str(), dmg);
+            add_message_history(g, "%s attacked %s for %d damage!", g_get_name(g, atk_id).c_str(), g_get_name(g, tgt_id).c_str(), dmg);
         }
         if (hp <= 0) {
             g_update_dead(g, tgt_id, true);
@@ -468,8 +468,7 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
                 vec3 loc = g_get_location(g, tgt_id);
                 vec3 loc_cast = {loc.x, loc.y, loc.z};
                 entityid id = ENTITYID_INVALID;
-                while (id == ENTITYID_INVALID)
-                    id = potion_create(g, loc_cast, POTION_HEALTH_SMALL, "small health potion");
+                while (id == ENTITYID_INVALID) id = potion_create(g, loc_cast, POTION_HEALTH_SMALL, "small health potion");
             }
         } else {
             g_update_dead(g, tgt_id, false);
@@ -502,18 +501,12 @@ static void handle_attack_blocked(gamestate* const g, entityid attacker_id, enti
     //entitytype_t tgttype = g_get_type(g, target_id);
     //if (tgttype == ENTITY_PLAYER) {
     //} else if (tgttype == ENTITY_NPC) {
-    add_message_history(
-        g, "%s blocked %s's attack!", g_get_name(g, target_id).c_str(), g_get_name(g, attacker_id).c_str());
+    add_message_history(g, "%s blocked %s's attack!", g_get_name(g, target_id).c_str(), g_get_name(g, attacker_id).c_str());
     //}
     //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
 
-static bool handle_shield_check(gamestate* const g,
-                                entityid attacker_id,
-                                entityid target_id,
-                                int attack_roll,
-                                int base_ac,
-                                bool* attack_successful) {
+static bool handle_shield_check(gamestate* const g, entityid attacker_id, entityid target_id, int attack_roll, int base_ac, bool* attack_successful) {
     // if you have a shield at all, the attack will get auto-blocked
     entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
     if (shield_id != ENTITYID_INVALID) {
@@ -531,15 +524,16 @@ static bool handle_shield_check(gamestate* const g,
     return true;
 }
 
-static inline bool
-handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entityid attacker_id, bool* attack_successful) {
+static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entityid attacker_id, bool* attack_successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(i >= 0, "i is out of bounds");
-    massert((size_t)i < tile->entity_max, "i is out of bounds");
+    //massert((size_t)i < tile->entity_max, "i is out of bounds");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(attack_successful, "attack_successful is NULL");
-    entityid target_id = tile->entities[i];
+
+    entityid target_id = tile->entities->at(i);
+
     if (target_id == ENTITYID_INVALID) return false;
     entitytype_t type = g_get_type(g, target_id);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) return false;
@@ -552,8 +546,7 @@ handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entityid
     int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
     int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
     *attack_successful = false;
-    if (attack_roll >= base_ac)
-        return handle_shield_check(g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
+    if (attack_roll >= base_ac) return handle_shield_check(g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
     // attack misses
     handle_attack_success(g, attacker_id, target_id, attack_successful);
     return false;
@@ -564,7 +557,8 @@ static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid atta
     massert(tile, "tile is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(successful, "attack_successful is NULL");
-    for (size_t i = 0; i < tile->entity_max; i++) {
+    //for (size_t i = 0; i < tile->entity_max; i++) {
+    for (entityid i = 0; i < tile->entities->size(); i++) {
         handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
     }
 }
@@ -617,30 +611,14 @@ static void execute_action(gamestate* const g, entityid id, entity_action_t acti
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     switch (action) {
-    case ENTITY_ACTION_MOVE_LEFT:
-        try_entity_move(g, id, -1, 0);
-        break;
-    case ENTITY_ACTION_MOVE_RIGHT:
-        try_entity_move(g, id, 1, 0);
-        break;
-    case ENTITY_ACTION_MOVE_UP:
-        try_entity_move(g, id, 0, -1);
-        break;
-    case ENTITY_ACTION_MOVE_DOWN:
-        try_entity_move(g, id, 0, 1);
-        break;
-    case ENTITY_ACTION_MOVE_UP_LEFT:
-        try_entity_move(g, id, -1, -1);
-        break;
-    case ENTITY_ACTION_MOVE_UP_RIGHT:
-        try_entity_move(g, id, 1, -1);
-        break;
-    case ENTITY_ACTION_MOVE_DOWN_LEFT:
-        try_entity_move(g, id, -1, 1);
-        break;
-    case ENTITY_ACTION_MOVE_DOWN_RIGHT:
-        try_entity_move(g, id, 1, 1);
-        break;
+    case ENTITY_ACTION_MOVE_LEFT: try_entity_move(g, id, -1, 0); break;
+    case ENTITY_ACTION_MOVE_RIGHT: try_entity_move(g, id, 1, 0); break;
+    case ENTITY_ACTION_MOVE_UP: try_entity_move(g, id, 0, -1); break;
+    case ENTITY_ACTION_MOVE_DOWN: try_entity_move(g, id, 0, 1); break;
+    case ENTITY_ACTION_MOVE_UP_LEFT: try_entity_move(g, id, -1, -1); break;
+    case ENTITY_ACTION_MOVE_UP_RIGHT: try_entity_move(g, id, 1, -1); break;
+    case ENTITY_ACTION_MOVE_DOWN_LEFT: try_entity_move(g, id, -1, 1); break;
+    case ENTITY_ACTION_MOVE_DOWN_RIGHT: try_entity_move(g, id, 1, 1); break;
     //case ENTITY_ACTION_ATTACK_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y); break;
     //case ENTITY_ACTION_ATTACK_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y); break;
     //case ENTITY_ACTION_ATTACK_UP: try_entity_attack(g, e->id, loc.x, loc.y - 1); break;
@@ -649,12 +627,8 @@ static void execute_action(gamestate* const g, entityid id, entity_action_t acti
     //case ENTITY_ACTION_ATTACK_UP_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y - 1); break;
     //case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
     //case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
-    case ENTITY_ACTION_MOVE_RANDOM:
-        try_entity_move_random(g, id);
-        break;
-    case ENTITY_ACTION_WAIT:
-        try_entity_wait(g, id);
-        break;
+    case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, id); break;
+    case ENTITY_ACTION_WAIT: try_entity_wait(g, id); break;
     //case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
     //case ENTITY_ACTION_MOVE_PLAYER:
     //    try_entity_move_player(g, e);
@@ -675,9 +649,7 @@ static void execute_action(gamestate* const g, entityid id, entity_action_t acti
     case ENTITY_ACTION_NONE:
         // do nothing
         break;
-    default:
-        merror("Unknown entity action: %d", action);
-        break;
+    default: merror("Unknown entity action: %d", action); break;
     }
 }
 
@@ -771,8 +743,7 @@ static void init_dungeon(gamestate* const g) {
     g->d = d_create();
     massert(g->d, "failed to init dungeon");
     int df_count = 20;
-    for (int i = 0; i < df_count; i++)
-        d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    for (int i = 0; i < df_count; i++) d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
 }
 
 //static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name) {
@@ -1071,8 +1042,7 @@ static void init_player(gamestate* const g) {
 //    return locs;
 //}
 
-static vec3*
-get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
+static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(count, "count is NULL");
     int c = df_count_non_walls_in_area(df, x0, y0, w, h);
@@ -1245,8 +1215,7 @@ static void handle_input_gameplay_settings(const inputstate* const is, gamestate
     int max_selections = 2; // 0: Music Volume, 1: Back
     if (inputstate_is_pressed(is, KEY_UP)) {
         //g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection - 1 + 3) % 3;
-        g->gameplay_settings_menu_selection =
-            (g->gameplay_settings_menu_selection - 1 + max_selections) % max_selections;
+        g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection - 1 + max_selections) % max_selections;
         g->frame_dirty = true;
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
         g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection + 1) % max_selections;
@@ -1304,8 +1273,7 @@ static void handle_input_sort_inventory(const inputstate* const is, gamestate* c
         if (g->sort_inventory_menu_selection >= g->sort_inventory_menu_selection_max) {
             g->sort_inventory_menu_selection = 0;
         }
-    } else if (inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_ENTER) ||
-               inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+    } else if (inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_APOSTROPHE)) {
         handle_sort_inventory(g);
     }
 }
@@ -1349,11 +1317,9 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
 
     if (g->display_inventory_menu && !g->display_sort_inventory_menu) {
         if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
-            g->inventory_menu_selection =
-                (size_t)g->inventory_menu_selection + 1 >= count ? 0 : g->inventory_menu_selection + 1;
+            g->inventory_menu_selection = (size_t)g->inventory_menu_selection + 1 >= count ? 0 : g->inventory_menu_selection + 1;
         } else if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
-            g->inventory_menu_selection =
-                g->inventory_menu_selection - 1 < 0 ? count - 1 : g->inventory_menu_selection - 1;
+            g->inventory_menu_selection = g->inventory_menu_selection - 1 < 0 ? count - 1 : g->inventory_menu_selection - 1;
             // drop item
         } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
             // we need to grab the entityid of the selected item
@@ -1388,11 +1354,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                             hp += small_hp_health_roll;
                             if (hp > maxhp) hp = maxhp;
                             g_set_stat(g, g->hero_id, STATS_HP, hp);
-                            add_message_history(g,
-                                                "%s drank a %s and recovered %d HP",
-                                                g_get_name(g, g->hero_id).c_str(),
-                                                g_get_name(g, item_id).c_str(),
-                                                small_hp_health_roll);
+                            add_message_history(g, "%s drank a %s and recovered %d HP", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str(), small_hp_health_roll);
                             // remove the potion from the inventory
                             g_remove_from_inventory(g, g->hero_id, item_id);
                             g->controlmode = CONTROLMODE_PLAYER;
@@ -1406,8 +1368,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     //entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
                     //if (equipped_item != ENTITYID_INVALID) {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
-                    add_message_history(
-                        g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
                     //}
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->display_inventory_menu = false;
@@ -1417,8 +1378,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     //entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
                     //if (equipped_item != ENTITYID_INVALID) {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
-                    add_message_history(
-                        g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
                     //}
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->display_inventory_menu = false;
@@ -1432,8 +1392,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     //    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                     //} else {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_WAND, item_id);
-                    add_message_history(
-                        g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
                     //}
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->display_inventory_menu = false;
@@ -1441,8 +1400,7 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 } else if (item_type == ITEM_RING) {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_RING, item_id);
-                    add_message_history(
-                        g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
+                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
 
                     // update player tiles
                     update_player_tiles_explored(g);
@@ -1482,12 +1440,12 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         merror("Failed to get tile");
         return false;
     }
-    if (tile->entity_count == 0) {
+    if (tile->entities->size() == 0) {
         merror("No items on tile");
         return false;
     }
-    for (size_t i = 0; i < tile->entity_count; i++) {
-        entityid itemid = tile->entities[i];
+    for (int i = 0; i < tile->entities->size(); i++) {
+        entityid itemid = tile->entities->at(i);
         entitytype_t type = g_get_type(g, itemid);
         //minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
@@ -1750,8 +1708,7 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                 add_message(g, "You ascend the stairs");
                 if (!df_remove_at(df, id, loc.x, loc.y)) return;
                 vec3 next_downstairs_loc = df_get_downstairs(g->d->floors[g->d->current_floor - 1]);
-                massert(next_downstairs_loc.x != -1 && next_downstairs_loc.y != -1,
-                        "Failed to get next downstairs location");
+                massert(next_downstairs_loc.x != -1 && next_downstairs_loc.y != -1, "Failed to get next downstairs location");
                 // we need to set the player's location to the corresponding TILE_downstairs
                 next_downstairs_loc.z = g->d->current_floor - 1;
                 vec3 next_downstairs_loc_vec3 = {next_downstairs_loc.x, next_downstairs_loc.y, next_downstairs_loc.z};
@@ -1852,24 +1809,12 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         //printf("Current control mode: %d\n", g->controlmode);
 
         switch (g->controlmode) {
-        case CONTROLMODE_PLAYER:
-            handle_input_player(is, g);
-            break;
-        case CONTROLMODE_CAMERA:
-            handle_input_camera(is, g);
-            break;
-        case CONTROLMODE_INVENTORY:
-            handle_input_inventory(is, g);
-            break;
-        case CONTROLMODE_GAMEPLAY_SETTINGS:
-            handle_input_gameplay_settings(is, g);
-            break;
-        case CONTROLMODE_HELP:
-            handle_input_help_menu(is, g);
-            break;
-        default:
-            merror("Unknown control mode: %d", g->controlmode);
-            break;
+        case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
+        case CONTROLMODE_CAMERA: handle_input_camera(is, g); break;
+        case CONTROLMODE_INVENTORY: handle_input_inventory(is, g); break;
+        case CONTROLMODE_GAMEPLAY_SETTINGS: handle_input_gameplay_settings(is, g); break;
+        case CONTROLMODE_HELP: handle_input_help_menu(is, g); break;
+        default: merror("Unknown control mode: %d", g->controlmode); break;
         }
 
     } else if (g->current_scene == SCENE_TITLE) {
@@ -1998,8 +1943,7 @@ static void update_debug_panel_buffer(gamestate* const g) {
     //}
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
-    const char* flag_name =
-        flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
+    const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
     // zero out the buffer
     memset(g->debugpanel.buffer, 0, sizeof(g->debugpanel.buffer));
     // Format the string in one pass
@@ -2170,38 +2114,17 @@ void liblogic_init(gamestate* const g) {
 static int get_hitdie_for_race(race_t race) {
     int hit_die = 4;
     switch (race) {
-    case RACE_GREEN_SLIME:
-        hit_die = 4;
-        break;
-    case RACE_BAT:
-        hit_die = 4;
-        break;
-    case RACE_HALFLING:
-        hit_die = 6;
-        break;
-    case RACE_GOBLIN:
-        hit_die = 6;
-        break;
-    case RACE_WOLF:
-        hit_die = 6;
-        break;
-    case RACE_HUMAN:
-        hit_die = 8;
-        break;
-    case RACE_ELF:
-        hit_die = 8;
-        break;
-    case RACE_DWARF:
-        hit_die = 8;
-        break;
-    case RACE_ORC:
-        hit_die = 10;
-        break;
-    case RACE_WARG:
-        hit_die = 12;
-        break;
-    default:
-        break;
+    case RACE_GREEN_SLIME: hit_die = 4; break;
+    case RACE_BAT: hit_die = 4; break;
+    case RACE_HALFLING: hit_die = 6; break;
+    case RACE_GOBLIN: hit_die = 6; break;
+    case RACE_WOLF: hit_die = 6; break;
+    case RACE_HUMAN: hit_die = 8; break;
+    case RACE_ELF: hit_die = 8; break;
+    case RACE_DWARF: hit_die = 8; break;
+    case RACE_ORC: hit_die = 10; break;
+    case RACE_WARG: hit_die = 12; break;
+    default: break;
     }
     return hit_die;
 }
@@ -2209,38 +2132,17 @@ static int get_hitdie_for_race(race_t race) {
 static vec3 get_base_attack_damage_for_race(race_t race) {
     vec3 r = {1, 4, 0}; // Default base attack damage
     switch (race) {
-    case RACE_GREEN_SLIME:
-        r = (vec3){1, 1, 0};
-        break;
-    case RACE_BAT:
-        r = (vec3){1, 2, 0};
-        break;
-    case RACE_HALFLING:
-        r = (vec3){1, 4, 0};
-        break;
-    case RACE_GOBLIN:
-        r = (vec3){1, 4, 0};
-        break;
-    case RACE_WOLF:
-        r = (vec3){1, 6, 0};
-        break;
-    case RACE_HUMAN:
-        r = (vec3){1, 4, 0};
-        break;
-    case RACE_ELF:
-        r = (vec3){1, 4, 0};
-        break;
-    case RACE_DWARF:
-        r = (vec3){1, 4, 0};
-        break;
-    case RACE_ORC:
-        r = (vec3){1, 6, 0};
-        break;
-    case RACE_WARG:
-        r = (vec3){1, 12, 0};
-        break;
-    default:
-        break;
+    case RACE_GREEN_SLIME: r = (vec3){1, 1, 0}; break;
+    case RACE_BAT: r = (vec3){1, 2, 0}; break;
+    case RACE_HALFLING: r = (vec3){1, 4, 0}; break;
+    case RACE_GOBLIN: r = (vec3){1, 4, 0}; break;
+    case RACE_WOLF: r = (vec3){1, 6, 0}; break;
+    case RACE_HUMAN: r = (vec3){1, 4, 0}; break;
+    case RACE_ELF: r = (vec3){1, 4, 0}; break;
+    case RACE_DWARF: r = (vec3){1, 4, 0}; break;
+    case RACE_ORC: r = (vec3){1, 6, 0}; break;
+    case RACE_WARG: r = (vec3){1, 12, 0}; break;
+    default: break;
     }
     return r;
 }
@@ -2250,38 +2152,17 @@ static race_t get_random_race() {
     int num_choices = 10;
     int choice = rand() % num_choices;
     switch (choice) {
-    case 0:
-        race = RACE_BAT;
-        break;
-    case 1:
-        race = RACE_WOLF;
-        break;
-    case 2:
-        race = RACE_HUMAN;
-        break;
-    case 3:
-        race = RACE_ELF;
-        break;
-    case 4:
-        race = RACE_DWARF;
-        break;
-    case 5:
-        race = RACE_HALFLING;
-        break;
-    case 6:
-        race = RACE_ORC;
-        break;
-    case 7:
-        race = RACE_GOBLIN;
-        break;
-    case 8:
-        race = RACE_GREEN_SLIME;
-        break;
-    case 9:
-        race = RACE_WARG;
-        break;
-    default:
-        break;
+    case 0: race = RACE_BAT; break;
+    case 1: race = RACE_WOLF; break;
+    case 2: race = RACE_HUMAN; break;
+    case 3: race = RACE_ELF; break;
+    case 4: race = RACE_DWARF; break;
+    case 5: race = RACE_HALFLING; break;
+    case 6: race = RACE_ORC; break;
+    case 7: race = RACE_GOBLIN; break;
+    case 8: race = RACE_GREEN_SLIME; break;
+    case 9: race = RACE_WARG; break;
+    default: break;
     }
     return race;
 }
@@ -2294,17 +2175,10 @@ static race_t get_random_race_for_floor(int floor) {
         int num_choices = 3;
         int choice = rand() % num_choices;
         switch (choice) {
-        case 0:
-            race = RACE_GREEN_SLIME;
-            break;
-        case 1:
-            race = RACE_BAT;
-            break;
-        case 2:
-            race = RACE_WOLF;
-            break;
-        default:
-            break;
+        case 0: race = RACE_GREEN_SLIME; break;
+        case 1: race = RACE_BAT; break;
+        case 2: race = RACE_WOLF; break;
+        default: break;
         }
         return race;
     }
@@ -2347,12 +2221,7 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         }
         //int new_level = g_get_stat(g, id, STATS_LEVEL);
         //massert(g_get_stat(g, id, STATS_LEVEL) == floor, "New level %d does not match floor %d", new_level, floor);
-        msuccess("Spawned entity of Level %d with %d HP at %d, %d, %d",
-                 g_get_stat(g, id, STATS_LEVEL),
-                 max_hp,
-                 loc.x,
-                 loc.y,
-                 loc.z);
+        msuccess("Spawned entity of Level %d with %d HP at %d, %d, %d", g_get_stat(g, id, STATS_LEVEL), max_hp, loc.x, loc.y, loc.z);
         // update vision distance
         // this will be appropriately set on a per-npc basis but for now...
         // hard code 5
@@ -2364,9 +2233,7 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         //int default_light_radius = 3;
         g_set_light_radius(g, id, 3);
         // verify light radius
-        massert(g_get_light_radius(g, id) == 3,
-                "Light radius %d does not match expected value 3",
-                g_get_light_radius(g, id));
+        massert(g_get_light_radius(g, id) == 3, "Light radius %d does not match expected value 3", g_get_light_radius(g, id));
         success = true;
     }
     return success;
