@@ -271,7 +271,8 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
     // Count living NPCs
     int count = 0;
 
-    for (entityid i = 0; i < t->entities->size(); i++) {
+    //for (entityid i = 0; i < t->entities->size(); i++) {
+    for (int i = 0; (size_t)i < t->entities->size(); i++) {
         const entityid eid = tile_get_entity(t, i);
         if (eid == ENTITYID_INVALID) continue;
         //if (!e) continue;
@@ -558,7 +559,7 @@ static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid atta
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(successful, "attack_successful is NULL");
     //for (size_t i = 0; i < tile->entity_max; i++) {
-    for (entityid i = 0; i < tile->entities->size(); i++) {
+    for (int i = 0; (size_t)i < tile->entities->size(); i++) {
         handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
     }
 }
@@ -1444,7 +1445,7 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         merror("No items on tile");
         return false;
     }
-    for (int i = 0; i < tile->entities->size(); i++) {
+    for (int i = 0; (size_t)i < tile->entities->size(); i++) {
         entityid itemid = tile->entities->at(i);
         entitytype_t type = g_get_type(g, itemid);
         //minfo("Item %s type: %d", g_get_name(g, itemid), type);

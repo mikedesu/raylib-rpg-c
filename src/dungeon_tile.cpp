@@ -45,14 +45,13 @@ bool tile_resize(tile_t* t) {
 entityid tile_add(tile_t* const t, entityid id) {
     massert(t, "tile is NULL");
     massert(t->entities, "tile entities is NULL");
-    // Early exit if tile is full and resize fails
-    //if (t->entity_count >= t->entity_max) {
-    //    ////mwarning("dungeon_tile_add: Tile full, attempting resize");
-    //    if (!tile_resize(t)) {
-    //        //merror("dungeon_tile_add: Resize failed");
-    //        return ENTITYID_INVALID;
-    //    }
-    //}
+
+    // Check if the entity already exists
+    if (std::find(t->entities->begin(), t->entities->end(), id) != t->entities->end()) {
+        merror("tile_add: entity already exists on tile");
+        return ENTITYID_INVALID;
+    }
+
     t->entities->push_back(id);
     t->dirty_entities = true;
     return id;
