@@ -8,9 +8,15 @@
 void tile_init(tile_t* const t, tiletype_t type) {
     massert(t, "tile is NULL");
     t->type = type;
-    t->visible = t->explored = t->has_pressure_plate = t->has_wall_switch = t->wall_switch_on =
-        t->cached_player_present = false;
-    t->dirty_entities = t->dirty_visibility = true;
+    t->visible = false;
+    t->explored = false;
+    t->has_pressure_plate = false;
+    t->has_wall_switch = false;
+    t->wall_switch_on = false;
+    t->cached_player_present = false;
+    t->dirty_entities = true;
+    t->dirty_visibility = true;
+
     const size_t malloc_sz = sizeof(entityid) * DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
     t->entities = (entityid*)malloc(malloc_sz);
     if (!t->entities) {
@@ -19,11 +25,16 @@ void tile_init(tile_t* const t, tiletype_t type) {
         return;
     }
     memset(t->entities, -1, malloc_sz);
+
     t->entity_max = DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
-    t->pressure_plate_up_tx_key = t->pressure_plate_down_tx_key = t->pressure_plate_event = -1;
-    t->wall_switch_up_tx_key = t->wall_switch_down_tx_key = t->wall_switch_event = -1;
-    t->entity_count = t->cached_live_npcs = 0;
-    // Start dirty
+    t->pressure_plate_up_tx_key = -1;
+    t->pressure_plate_down_tx_key = -1;
+    t->pressure_plate_event = -1;
+    t->wall_switch_up_tx_key = -1;
+    t->wall_switch_down_tx_key = -1;
+    t->wall_switch_event = -1;
+    t->entity_count = 0;
+    t->cached_live_npcs = 0;
 }
 
 bool tile_resize(tile_t* t) {

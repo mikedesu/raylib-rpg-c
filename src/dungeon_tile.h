@@ -1,12 +1,9 @@
 #pragma once
 
-//#include "dungeon.h"
 #include "dungeon_tile_type.h"
-//#include "em.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "massert.h"
-//#include "gamestate.h"
 #include <stdbool.h>
 #include <stddef.h>
 
