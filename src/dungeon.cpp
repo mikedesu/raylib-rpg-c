@@ -55,6 +55,7 @@ void d_free(dungeon_t* const dungeon) {
     d_destroy(dungeon);
 }
 
+/*
 size_t d_serialized_size(const dungeon_t* d) {
     massert(d, "dungeon is NULL");
     // Calculate size by exactly matching what's written in d_serialize
@@ -69,7 +70,9 @@ size_t d_serialized_size(const dungeon_t* d) {
     }
     return size;
 }
+*/
 
+/*
 size_t d_serialize(const dungeon_t* d, char* buffer, size_t buffer_size) {
     massert(d, "dungeon is NULL");
     massert(buffer, "buffer is NULL");
@@ -104,7 +107,9 @@ size_t d_serialize(const dungeon_t* d, char* buffer, size_t buffer_size) {
     }
     return ptr - buffer;
 }
+*/
 
+/*
 bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size) {
     massert(d, "dungeon is NULL");
     massert(buffer, "buffer is NULL");
@@ -183,7 +188,9 @@ bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size) {
     }
     return true;
 }
+*/
 
+/*
 size_t d_memory_size(const dungeon_t* d) {
     massert(d, "dungeon is NULL");
     // Calculate the memory size of a dungeon
@@ -198,6 +205,7 @@ size_t d_memory_size(const dungeon_t* d) {
     }
     return size;
 }
+*/
 
 bool d_add_floor(dungeon_t* const dungeon, int width, int height) {
     if (!dungeon) return false;

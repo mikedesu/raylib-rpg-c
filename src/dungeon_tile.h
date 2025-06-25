@@ -18,6 +18,7 @@ typedef struct {
     tiletype_t type;
     bool visible;
     bool explored;
+
     entityid* entities;
     size_t entity_count;
     size_t entity_max;
@@ -55,9 +56,9 @@ void recompute_entity_cache_at(gamestate* g, int x, int y, int z);
 size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z);
 
 // Serialization functions
-size_t tile_serialized_size(const tile_t* t);
-size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size);
-bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size);
+//size_t tile_serialized_size(const tile_t* t);
+//size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size);
+//bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size);
 
 // Memory size calculation
 size_t tile_memory_size(const tile_t* t);

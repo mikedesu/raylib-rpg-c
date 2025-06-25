@@ -10,9 +10,9 @@ void tile_init(tile_t* const t, tiletype_t type) {
     t->type = type;
     t->visible = false;
     t->explored = false;
-    t->has_pressure_plate = false;
-    t->has_wall_switch = false;
-    t->wall_switch_on = false;
+    //t->has_pressure_plate = false;
+    //t->has_wall_switch = false;
+    //t->wall_switch_on = false;
     t->cached_player_present = false;
     t->dirty_entities = true;
     t->dirty_visibility = true;
@@ -27,12 +27,12 @@ void tile_init(tile_t* const t, tiletype_t type) {
     memset(t->entities, -1, malloc_sz);
 
     t->entity_max = DUNGEON_TILE_MAX_ENTITIES_DEFAULT;
-    t->pressure_plate_up_tx_key = -1;
-    t->pressure_plate_down_tx_key = -1;
-    t->pressure_plate_event = -1;
-    t->wall_switch_up_tx_key = -1;
-    t->wall_switch_down_tx_key = -1;
-    t->wall_switch_event = -1;
+    //t->pressure_plate_up_tx_key = -1;
+    //t->pressure_plate_down_tx_key = -1;
+    //t->pressure_plate_event = -1;
+    //t->wall_switch_up_tx_key = -1;
+    //t->wall_switch_down_tx_key = -1;
+    //t->wall_switch_event = -1;
     t->entity_count = 0;
     t->cached_live_npcs = 0;
 }
@@ -183,6 +183,7 @@ size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z) {
     return tile_live_npc_count(g, t);
 }
 
+/*
 size_t tile_serialized_size(const tile_t* t) {
     massert(t, "tile is NULL");
     // Calculate size by exactly matching what's written in tile_serialize
@@ -197,7 +198,9 @@ size_t tile_serialized_size(const tile_t* t) {
     size += t->entity_max * sizeof(entityid); // entities array
     return size;
 }
+*/
 
+/*
 size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
     massert(t, "tile is NULL");
     massert(buffer, "buffer is NULL");
@@ -255,7 +258,9 @@ size_t tile_serialize(const tile_t* t, char* buffer, size_t buffer_size) {
     ptr += entity_array_size;
     return ptr - buffer;
 }
+*/
 
+/*
 bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
     massert(t, "tile is NULL");
     massert(buffer, "buffer is NULL");
@@ -337,6 +342,7 @@ bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
     t->entity_max = entity_max;
     return true;
 }
+*/
 
 size_t tile_memory_size(const tile_t* t) {
     massert(t, "tile is NULL");

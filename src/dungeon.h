@@ -17,12 +17,12 @@ void d_destroy(dungeon_t* dungeon);
 void d_free(dungeon_t* dungeon);
 
 // Serialization functions
-size_t d_serialized_size(const dungeon_t* d);
-size_t d_serialize(const dungeon_t* d, char* buffer, size_t buffer_size);
-bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size);
+//size_t d_serialized_size(const dungeon_t* d);
+//size_t d_serialize(const dungeon_t* d, char* buffer, size_t buffer_size);
+//bool d_deserialize(dungeon_t* d, const char* buffer, size_t buffer_size);
 
 // Memory size calculation
-size_t d_memory_size(const dungeon_t* d);
+//size_t d_memory_size(const dungeon_t* d);
 
 static inline dungeon_floor_t* d_get_floor(dungeon_t* const dungeon, int index) {
     massert(dungeon, "dungeon is NULL");
@@ -45,7 +45,9 @@ static inline dungeon_floor_t* d_get_current_floor(dungeon_t* const dungeon) {
         return NULL;
     }
     dungeon_floor_t* floor = d_get_floor(dungeon, dungeon->current_floor);
-    if (!floor) { merror("Failed to get current floor %d", dungeon->current_floor); }
+    if (!floor) {
+        merror("Failed to get current floor %d", dungeon->current_floor);
+    }
     return floor;
 }
 

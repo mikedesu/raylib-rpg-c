@@ -70,12 +70,12 @@ room_data_t* const df_get_rooms_with_prefix(dungeon_floor_t* const df, int* exte
 const char* df_get_room_name(dungeon_floor_t* const df, vec3 loc);
 
 // Serialization functions
-size_t df_serialized_size(const dungeon_floor_t* df);
-size_t df_serialize(const dungeon_floor_t* df, char* buffer, size_t buffer_size);
-bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size);
+//size_t df_serialized_size(const dungeon_floor_t* df);
+//size_t df_serialize(const dungeon_floor_t* df, char* buffer, size_t buffer_size);
+//bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size);
 
 // Memory size calculation
-size_t df_memory_size(const dungeon_floor_t* df);
+//size_t df_memory_size(const dungeon_floor_t* df);
 
 //static inline tile_t* df_tile_at(const dungeon_floor_t* const df, const int x, const int y) {
 static inline tile_t* df_tile_at(const dungeon_floor_t* const df, vec3 loc) {

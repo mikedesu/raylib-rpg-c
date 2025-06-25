@@ -18,11 +18,9 @@ void df_reset_plates(dungeon_floor_t* const df);
 void df_reset_events(dungeon_floor_t* const df);
 void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type);
 void df_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_key, int dn_key, int event);
-void df_set_pressure_plate(
-    dungeon_floor_t* const df, const int x, const int y, const int up_tx_key, const int dn_tx_key, const int event);
+void df_set_pressure_plate(dungeon_floor_t* const df, const int x, const int y, const int up_tx_key, const int dn_tx_key, const int event);
 void df_init_test(dungeon_floor_t* df);
-void df_set_tile_perimeter_range(
-    dungeon_floor_t* const df, tiletype_t begin, tiletype_t end, int x, int y, int w, int h);
+void df_set_tile_perimeter_range(dungeon_floor_t* const df, tiletype_t begin, tiletype_t end, int x, int y, int w, int h);
 void df_set_tile_perimeter(dungeon_floor_t* const df, tiletype_t type, int x, int y, int w, int h);
 void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y);
 void df_set_all_tiles_range(dungeon_floor_t* const df, tiletype_t begin, tiletype_t end);
@@ -40,8 +38,7 @@ void df_init_test_complex7(dungeon_floor_t* df, range room_width, range room_len
 void df_init_test_complex8(dungeon_floor_t* df, int w, int h);
 void df_init_test_complex9(dungeon_floor_t* df, int grid_cell_w, int grid_cell_h);
 void df_assign_stairs(dungeon_floor_t* df);
-bool df_add_room(
-    dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name);
+bool df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name);
 void df_assign_downstairs(dungeon_floor_t* df);
 void df_assign_upstairs(dungeon_floor_t* df);
 bool df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
@@ -58,8 +55,7 @@ void df_make_room(dungeon_floor_t* df, int x, int y, int w, int h);
 void df_make_corridor_h(dungeon_floor_t* df, int x, int y, int len);
 void df_make_corridor_v(dungeon_floor_t* df, int x, int y, int len);
 // void df_connect_rooms(dungeon_floor_t* df, int x1, int y1, int x2, int y2);
-void df_make_diamond_shape_room(
-    dungeon_floor_t* df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type);
+void df_make_diamond_shape_room(dungeon_floor_t* df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type);
 
 int df_get_possible_downstairs_count_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
@@ -107,13 +103,9 @@ void df_assign_stairs(dungeon_floor_t* df) {
     df_assign_downstairs_in_area(df, 0, 0, df->width, df->height);
 }
 
-int df_get_possible_upstairs_count(dungeon_floor_t* df) {
-    return df_get_possible_upstairs_count_in_area(df, 0, 0, df->width, df->height);
-}
+int df_get_possible_upstairs_count(dungeon_floor_t* df) { return df_get_possible_upstairs_count_in_area(df, 0, 0, df->width, df->height); }
 
-int df_get_possible_downstairs_count(dungeon_floor_t* df) {
-    return df_get_possible_downstairs_count_in_area(df, 0, 0, df->width, df->height);
-}
+int df_get_possible_downstairs_count(dungeon_floor_t* df) { return df_get_possible_downstairs_count_in_area(df, 0, 0, df->width, df->height); }
 
 vec3* df_get_possible_upstairs_locs(dungeon_floor_t* df, int* external_count) {
     massert(df, "dungeon floor is NULL");
@@ -685,8 +677,7 @@ void df_set_tile_perimeter(dungeon_floor_t* const df, tiletype_t type, int x, in
     }
 }
 
-void df_set_tile_perimeter_range(
-    dungeon_floor_t* const df, tiletype_t begin, tiletype_t end, int x, int y, int w, int h) {
+void df_set_tile_perimeter_range(dungeon_floor_t* const df, tiletype_t begin, tiletype_t end, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     tiletype_t begin_type = begin;
     tiletype_t end_type = end;
@@ -759,17 +750,16 @@ bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y) {
     return r != -1 && r == id;
 }
 
-void df_set_pressure_plate(
-    dungeon_floor_t* const df, const int x, const int y, const int up_tx_key, const int dn_tx_key, const int event) {
+void df_set_pressure_plate(dungeon_floor_t* const df, const int x, const int y, const int up_tx_key, const int dn_tx_key, const int event) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
     massert(y >= 0, "y is less than zero");
     massert(y < df->height, "y is out of bounds");
-    tile_set_pressure_plate(&df->tiles[y][x], true);
-    tile_set_pressure_plate_up_tx_key(&df->tiles[y][x], up_tx_key);
-    tile_set_pressure_plate_down_tx_key(&df->tiles[y][x], dn_tx_key);
-    tile_set_pressure_plate_event(&df->tiles[y][x], event);
+    //tile_set_pressure_plate(&df->tiles[y][x], true);
+    //tile_set_pressure_plate_up_tx_key(&df->tiles[y][x], up_tx_key);
+    //tile_set_pressure_plate_down_tx_key(&df->tiles[y][x], dn_tx_key);
+    //tile_set_pressure_plate_event(&df->tiles[y][x], event);
 }
 
 void df_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_key, int dn_key, int event) {
@@ -782,10 +772,10 @@ void df_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_key, int
     tile_t* const t = df_tile_at(df, (vec3){x, y, -1});
     if (!t) return;
     if (!tile_is_wall(t->type)) return;
-    tile_set_wall_switch(t, true);
-    tile_set_wall_switch_up_tx_key(t, up_key);
-    tile_set_wall_switch_down_tx_key(t, dn_key);
-    tile_set_wall_switch_event(t, event);
+    //tile_set_wall_switch(t, true);
+    //tile_set_wall_switch_up_tx_key(t, up_key);
+    //tile_set_wall_switch_down_tx_key(t, dn_key);
+    //tile_set_wall_switch_event(t, event);
 }
 
 void df_set_all_tiles(dungeon_floor_t* const df, tiletype_t type) {
@@ -878,8 +868,7 @@ bool df_malloc_tiles(dungeon_floor_t* const df) {
         df->tiles[i] = (tile_t*)malloc(sizeof(tile_t) * df->width);
         // malloc failed and we need to free everything up to this point
         if (df->tiles[i] == NULL) {
-            for (int j = 0; j < i; j++)
-                free(df->tiles[j]);
+            for (int j = 0; j < i; j++) free(df->tiles[j]);
             return false;
         }
     }
@@ -1027,15 +1016,9 @@ int df_count_empty_non_walls(const dungeon_floor_t* const df) {
     return df_count_empty_non_walls_in_area(df, 0, 0, df->width, df->height);
 }
 
-void df_make_room(dungeon_floor_t* df, int x, int y, int w, int h) {
-    df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-}
-void df_make_corridor_h(dungeon_floor_t* df, int x, int y, int len) {
-    df_set_tile_area_range(df, x, y, len, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-}
-void df_make_corridor_v(dungeon_floor_t* df, int x, int y, int len) {
-    df_set_tile_area_range(df, x, y, 1, len, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-}
+void df_make_room(dungeon_floor_t* df, int x, int y, int w, int h) { df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
+void df_make_corridor_h(dungeon_floor_t* df, int x, int y, int len) { df_set_tile_area_range(df, x, y, len, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
+void df_make_corridor_v(dungeon_floor_t* df, int x, int y, int len) { df_set_tile_area_range(df, x, y, 1, len, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
 
 //static void df_connect_rooms(dungeon_floor_t* df, int x1, int y1, int x2, int y2) {
 // Connect by a 1-tile floor at midpoint to simulate door/corridor connection
@@ -1044,8 +1027,7 @@ void df_make_corridor_v(dungeon_floor_t* df, int x, int y, int len) {
 //    df_set_tile(df, TILE_FLOOR_STONE_00, mx, my);
 //}
 
-void df_make_diamond_shape_room(
-    dungeon_floor_t* df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type) {
+void df_make_diamond_shape_room(dungeon_floor_t* df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type) {
     massert(df, "dungeon floor is NULL");
     massert(w > 0 && h > 0, "width and height must be positive");
     massert(w >= 3 && h >= 3, "width and height must be at least 3 for diamond shape");
@@ -1510,8 +1492,7 @@ void df_init_test_complex4(dungeon_floor_t* df, int hallway_length) {
             int room_left = start_x + grid_x * (room_size + gap_size) - 1;
             int room_top = start_y + grid_y * (room_size + gap_size) - 1;
             // Create wall perimeter (room_size + 2 to include walls)
-            df_set_tile_area_range(
-                df, room_left, room_top, room_size + 2, room_size + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+            df_set_tile_area_range(df, room_left, room_top, room_size + 2, room_size + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
         }
     }
     // Create rooms and corridors
@@ -1660,8 +1641,7 @@ void df_init_test_complex6(dungeon_floor_t* df, range room_length, range room_wi
     df_assign_upstairs(df);
 }
 
-bool df_add_room(
-    dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name) {
+bool df_add_room(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end, const char* room_name) {
     massert(df, "dungeon floor is NULL");
     df_set_tile_area_range(df, x, y, w, h, begin, end);
     return df_add_room_info(df, x, y, w, h, room_name);
@@ -1753,10 +1733,8 @@ void df_init_test_complex9(dungeon_floor_t* df, int grid_cell_w, int grid_cell_h
     // Place stairs
     int top_left_x = start_x;
     int top_left_y = start_y;
-    df_assign_downstairs_in_area(
-        df, top_left_x, top_left_y, grid_cell_w * local_grid_cols, grid_cell_h * local_grid_rows);
-    df_assign_upstairs_in_area(
-        df, top_left_x, top_left_y, grid_cell_w * local_grid_cols, grid_cell_h * local_grid_rows);
+    df_assign_downstairs_in_area(df, top_left_x, top_left_y, grid_cell_w * local_grid_cols, grid_cell_h * local_grid_rows);
+    df_assign_upstairs_in_area(df, top_left_x, top_left_y, grid_cell_w * local_grid_cols, grid_cell_h * local_grid_rows);
 }
 
 void df_init_test_complex8(dungeon_floor_t* df, int w, int h) {
@@ -1815,11 +1793,7 @@ void df_init_test_complex7(dungeon_floor_t* df, range room_width, range room_len
     h = get_random_in_range(room_length);
     //df_set_tile_area_range(df, x - 1, y - 1, w + 2, h + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
     df_add_room(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, "room3");
-    df_assign_downstairs_in_area(df,
-                                 df->rooms[df->room_count - 1].x,
-                                 df->rooms[df->room_count - 1].y,
-                                 df->rooms[df->room_count - 1].w,
-                                 df->rooms[df->room_count - 1].h);
+    df_assign_downstairs_in_area(df, df->rooms[df->room_count - 1].x, df->rooms[df->room_count - 1].y, df->rooms[df->room_count - 1].w, df->rooms[df->room_count - 1].h);
 }
 
 void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
@@ -1845,8 +1819,7 @@ void df_init_test_complex5(dungeon_floor_t* df, range hallway_length) {
             int room_top = start_y + grid_y * (room_size + gap_size) - 1;
 
             // Create wall perimeter (room_size + 2 to include walls)
-            df_set_tile_area_range(
-                df, room_left, room_top, room_size + 2, room_size + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
+            df_set_tile_area_range(df, room_left, room_top, room_size + 2, room_size + 2, TILE_STONE_WALL_00, TILE_STONE_WALL_03);
         }
     }
     // Create rooms and corridors
@@ -2147,34 +2120,31 @@ room_data_t* const df_get_rooms_with_prefix(dungeon_floor_t* const df, int* exte
     return rooms;
 }
 
+/*
 size_t df_serialized_size(const dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
-
     // Calculate size by exactly matching what's written in df_serialize
     size_t size = 0;
-
     // Basic fields
     size += sizeof(int) * 2; // width and height
     size += sizeof(vec3) * 2; // upstairs_loc and downstairs_loc
-
     // Room data
     size += sizeof(int) * 2; // room_count and room_capacity
     size += df->room_count * sizeof(room_data_t); // rooms array
-
     // Events and plates
     size += sizeof(df_event_t) * DEFAULT_DF_EVENTS;
     size += sizeof(bool) * DEFAULT_DF_PLATES;
-
     // Tiles
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             size += tile_serialized_size(&df->tiles[y][x]);
         }
     }
-
     return size;
 }
+*/
 
+/*
 size_t df_serialize(const dungeon_floor_t* df, char* buffer, size_t buffer_size) {
     massert(df, "dungeon floor is NULL");
     massert(buffer, "buffer is NULL");
@@ -2232,7 +2202,9 @@ size_t df_serialize(const dungeon_floor_t* df, char* buffer, size_t buffer_size)
 
     return ptr - buffer;
 }
+*/
 
+/*
 bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size) {
     massert(df, "dungeon floor is NULL");
     massert(buffer, "buffer is NULL");
@@ -2318,7 +2290,9 @@ bool df_deserialize(dungeon_floor_t* df, const char* buffer, size_t buffer_size)
 
     return true;
 }
+*/
 
+/*
 size_t df_memory_size(const dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
     // Calculate the memory size of a dungeon floor
@@ -2337,10 +2311,10 @@ size_t df_memory_size(const dungeon_floor_t* df) {
                 // Size of the row itself
                 size += df->width * sizeof(tile_t);
                 // Size of each tile's dynamic memory
-                for (int x = 0; x < df->width; x++)
-                    size += tile_memory_size(&df->tiles[y][x]) - sizeof(tile_t);
+                for (int x = 0; x < df->width; x++) size += tile_memory_size(&df->tiles[y][x]) - sizeof(tile_t);
             }
         }
     }
     return size;
 }
+*/

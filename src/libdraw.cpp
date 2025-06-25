@@ -165,28 +165,28 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
                            WHITE; // Normal for in-range tiles
     DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
-    if (tile->has_pressure_plate) {
-        int txkey2 = tile->pressure_plate_up_tx_key;
-        if (txkey2 < 0) {
-            return false;
-        }
-        Texture2D* texture = &txinfo[txkey2].texture;
-        if (texture->id <= 0) {
-            return false;
-        }
-        DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
-    }
-    if (tile->has_wall_switch) {
-        int txkey = tile->wall_switch_on ? tile->wall_switch_down_tx_key : tile->wall_switch_up_tx_key;
-        if (txkey < 0) {
-            return false;
-        }
-        Texture2D* texture = &txinfo[txkey].texture;
-        if (texture->id <= 0) {
-            return false;
-        }
-        DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
-    }
+    //if (tile->has_pressure_plate) {
+    //    int txkey2 = tile->pressure_plate_up_tx_key;
+    //    if (txkey2 < 0) {
+    //        return false;
+    //    }
+    //    Texture2D* texture = &txinfo[txkey2].texture;
+    //    if (texture->id <= 0) {
+    //        return false;
+    //    }
+    //    DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
+    //}
+    //if (tile->has_wall_switch) {
+    //    int txkey = tile->wall_switch_on ? tile->wall_switch_down_tx_key : tile->wall_switch_up_tx_key;
+    //    if (txkey < 0) {
+    //        return false;
+    //    }
+    //    Texture2D* texture = &txinfo[txkey].texture;
+    //    if (texture->id <= 0) {
+    //        return false;
+    //    }
+    //    DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, WHITE);
+    //}
     return true;
 }
 
