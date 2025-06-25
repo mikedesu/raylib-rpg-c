@@ -35,7 +35,6 @@ int df_get_possible_downstairs_count_in_area(dungeon_floor_t* df, int x, int y, 
 void df_make_room(dungeon_floor_t* df, int x, int y, int w, int h);
 void df_make_corridor_h(dungeon_floor_t* df, int x, int y, int len);
 void df_make_corridor_v(dungeon_floor_t* df, int x, int y, int len);
-// void df_connect_rooms(dungeon_floor_t* df, int x1, int y1, int x2, int y2);
 void df_make_diamond_shape_room(dungeon_floor_t* df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type);
 
 int df_get_possible_downstairs_count_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
