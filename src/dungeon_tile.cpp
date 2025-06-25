@@ -306,6 +306,7 @@ bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size) {
 }
 */
 
+/*
 size_t tile_memory_size(const tile_t* t) {
     massert(t, "tile is NULL");
     // Calculate the memory size of a tile
@@ -319,3 +320,4 @@ size_t tile_memory_size(const tile_t* t) {
     }
     return size;
 }
+*/
