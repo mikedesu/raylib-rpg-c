@@ -6,8 +6,6 @@
 #include "massert.h"
 #include <vector>
 
-using std::vector;
-
 #define DUNGEON_TILE_MAX_ENTITIES_DEFAULT 8
 #define DUNGEON_TILE_MAX_ENTITIES_MAX 256
 
@@ -19,7 +17,7 @@ typedef struct {
     bool visible;
     bool explored;
 
-    vector<entityid>* entities;
+    std::vector<entityid>* entities;
 
     //bool has_pressure_plate;
     //int pressure_plate_up_tx_key;
