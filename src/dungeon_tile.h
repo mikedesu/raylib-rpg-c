@@ -4,8 +4,9 @@
 #include "entityid.h"
 #include "entitytype.h"
 #include "massert.h"
-#include <stdbool.h>
-#include <stddef.h>
+//#include <stdbool.h>
+//#include <stddef.h>
+#include <cstddef>
 
 #define DUNGEON_TILE_MAX_ENTITIES_DEFAULT 8
 #define DUNGEON_TILE_MAX_ENTITIES_MAX 256
@@ -21,16 +22,15 @@ typedef struct {
     size_t entity_count;
     size_t entity_max;
 
-    bool has_pressure_plate;
-    int pressure_plate_up_tx_key;
-    int pressure_plate_down_tx_key;
-    int pressure_plate_event;
-
-    bool has_wall_switch;
-    bool wall_switch_on;
-    int wall_switch_up_tx_key;
-    int wall_switch_down_tx_key;
-    int wall_switch_event;
+    //bool has_pressure_plate;
+    //int pressure_plate_up_tx_key;
+    //int pressure_plate_down_tx_key;
+    //int pressure_plate_event;
+    //bool has_wall_switch;
+    //bool wall_switch_on;
+    //int wall_switch_up_tx_key;
+    //int wall_switch_down_tx_key;
+    //int wall_switch_event;
 
     //int cached_entities;
     int cached_live_npcs;
@@ -62,25 +62,25 @@ bool tile_deserialize(tile_t* t, const char* buffer, size_t buffer_size);
 // Memory size calculation
 size_t tile_memory_size(const tile_t* t);
 
-static inline void tile_set_pressure_plate(tile_t* const t, bool b) {
-    massert(t, "tile is NULL");
-    t->has_pressure_plate = b;
-}
+//static inline void tile_set_pressure_plate(tile_t* const t, bool b) {
+//    massert(t, "tile is NULL");
+//    t->has_pressure_plate = b;
+//}
 
-static inline void tile_set_pressure_plate_up_tx_key(tile_t* const t, int k) {
-    massert(t, "tile is NULL");
-    t->pressure_plate_up_tx_key = k;
-}
+//static inline void tile_set_pressure_plate_up_tx_key(tile_t* const t, int k) {
+//    massert(t, "tile is NULL");
+//    t->pressure_plate_up_tx_key = k;
+//}
 
-static inline void tile_set_pressure_plate_down_tx_key(tile_t* const t, int k) {
-    massert(t, "tile is NULL");
-    t->pressure_plate_down_tx_key = k;
-}
+//static inline void tile_set_pressure_plate_down_tx_key(tile_t* const t, int k) {
+//    massert(t, "tile is NULL");
+//    t->pressure_plate_down_tx_key = k;
+//}
 
-static inline void tile_set_pressure_plate_event(tile_t* const t, int e) {
-    massert(t, "tile is NULL");
-    t->pressure_plate_event = e;
-}
+//static inline void tile_set_pressure_plate_event(tile_t* const t, int e) {
+//    massert(t, "tile is NULL");
+//    t->pressure_plate_event = e;
+//}
 
 static inline size_t tile_entity_count(const tile_t* const t) {
     massert(t, "tile is NULL");
@@ -92,65 +92,65 @@ static inline entityid tile_get_entity(const tile_t* const t, size_t i) {
     return i < t->entity_max ? t->entities[i] : -1;
 }
 
-static inline bool tile_is_wall_switch_on(const tile_t* const t) {
-    massert(t, "tile is NULL");
-    return t->wall_switch_on;
-}
+//static inline bool tile_is_wall_switch_on(const tile_t* const t) {
+//    massert(t, "tile is NULL");
+//    return t->wall_switch_on;
+//}
 
-static inline void tile_set_wall_switch_on(tile_t* const t, bool on) {
-    massert(t, "tile is NULL");
-    t->wall_switch_on = on;
-}
+//static inline void tile_set_wall_switch_on(tile_t* const t, bool on) {
+//    massert(t, "tile is NULL");
+//    t->wall_switch_on = on;
+//}
 
-static inline void tile_set_wall_switch(tile_t* const t, bool b) {
-    massert(t, "tile is NULL");
-    t->has_wall_switch = b;
-}
+//static inline void tile_set_wall_switch(tile_t* const t, bool b) {
+//    massert(t, "tile is NULL");
+//    t->has_wall_switch = b;
+//}
 
-static inline void tile_set_wall_switch_up_tx_key(tile_t* t, int key) {
-    massert(t, "tile is NULL");
-    t->wall_switch_up_tx_key = key;
-}
+//static inline void tile_set_wall_switch_up_tx_key(tile_t* t, int key) {
+//    massert(t, "tile is NULL");
+//    t->wall_switch_up_tx_key = key;
+//}
 
-static inline void tile_set_wall_switch_down_tx_key(tile_t* const t, int key) {
-    massert(t, "tile is NULL");
-    t->wall_switch_down_tx_key = key;
-}
+//static inline void tile_set_wall_switch_down_tx_key(tile_t* const t, int key) {
+//    massert(t, "tile is NULL");
+//    t->wall_switch_down_tx_key = key;
+//}
 
-static inline void tile_set_wall_switch_event(tile_t* const t, int event) {
-    massert(t, "tile is NULL");
-    t->wall_switch_event = event;
-}
+//static inline void tile_set_wall_switch_event(tile_t* const t, int event) {
+//    massert(t, "tile is NULL");
+//    t->wall_switch_event = event;
+//}
 
-static inline bool tile_has_wall_switch(const tile_t* const t) {
-    massert(t, "tile is NULL");
-    return t->has_wall_switch;
-}
+//static inline bool tile_has_wall_switch(const tile_t* const t) {
+//    massert(t, "tile is NULL");
+//    return t->has_wall_switch;
+//}
 
-static inline int tile_get_wall_switch_up_tx_key(const tile_t* const t) {
-    massert(t, "tile is NULL");
-    return t->wall_switch_up_tx_key;
-}
+//static inline int tile_get_wall_switch_up_tx_key(const tile_t* const t) {
+//    massert(t, "tile is NULL");
+//    return t->wall_switch_up_tx_key;
+//}
 
-static inline int tile_get_wall_switch_down_tx_key(const tile_t* const t) {
-    massert(t, "tile is NULL");
-    return t->wall_switch_down_tx_key;
-}
+//static inline int tile_get_wall_switch_down_tx_key(const tile_t* const t) {
+//    massert(t, "tile is NULL");
+//    return t->wall_switch_down_tx_key;
+//}
 
-static inline int tile_get_wall_switch_event(const tile_t* const t) {
-    massert(t, "tile is NULL");
-    return t->wall_switch_event;
-}
+//static inline int tile_get_wall_switch_event(const tile_t* const t) {
+//    massert(t, "tile is NULL");
+//    return t->wall_switch_event;
+//}
 
-static inline bool tile_has_pressure_plate(const tile_t* const t) {
-    massert(t, "tile is NULL");
-    return t->has_pressure_plate;
-}
+//static inline bool tile_has_pressure_plate(const tile_t* const t) {
+//    massert(t, "tile is NULL");
+//    return t->has_pressure_plate;
+//}
 
-static inline int tile_get_pressure_plate_event(const tile_t* const t) {
-    massert(t, "tile is NULL");
-    return t->pressure_plate_event;
-}
+//static inline int tile_get_pressure_plate_event(const tile_t* const t) {
+//    massert(t, "tile is NULL");
+//    return t->pressure_plate_event;
+//}
 
 static inline bool tile_has_live_npcs(gamestate* g, tile_t* t) {
     if (!t) return false;
