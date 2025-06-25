@@ -270,19 +270,12 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
     massert(t, "failed to get tile");
     // Count living NPCs
     int count = 0;
-
-    //for (entityid i = 0; i < t->entities->size(); i++) {
     for (int i = 0; (size_t)i < t->entities->size(); i++) {
         const entityid eid = tile_get_entity(t, i);
         if (eid == ENTITYID_INVALID) continue;
-        //if (!e) continue;
-        //if (e->type == ENTITY_NPC && !e->dead) count++;
-        //if (g_is_type(g, eid, ENTITY_NPC) && !e->dead) count++;
-        //minfo("calling g_is_dead 4");
         if (g_is_type(g, eid, ENTITY_NPC) && !g_is_dead(g, eid)) count++;
         if (g_is_type(g, eid, ENTITY_PLAYER) && !g_is_dead(g, eid)) count++;
     }
-
     return count;
 }
 

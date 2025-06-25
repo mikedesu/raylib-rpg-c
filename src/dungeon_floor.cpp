@@ -12,11 +12,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-void df_create_trap_event(dungeon_floor_t* df, int x, int y, tiletype_t on, tiletype_t off, df_event_id id);
-void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id);
+//void df_create_trap_event(dungeon_floor_t* df, int x, int y, tiletype_t on, tiletype_t off, df_event_id id);
+//void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id);
 void df_reset_plates(dungeon_floor_t* const df);
-void df_reset_events(dungeon_floor_t* const df);
-void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type);
+//void df_reset_events(dungeon_floor_t* const df);
+//void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type);
 void df_set_wall_switch(dungeon_floor_t* const df, int x, int y, int up_key, int dn_key, int event);
 void df_set_pressure_plate(dungeon_floor_t* const df, const int x, const int y, const int up_tx_key, const int dn_tx_key, const int event);
 void df_init_test(dungeon_floor_t* df);
@@ -467,8 +467,8 @@ void df_init(dungeon_floor_t* df) {
     //df->height = DEFAULT_DUNGEON_FLOOR_HEIGHT;
     df->upstairs_loc = (vec3){-1, -1, -1};
     df->downstairs_loc = (vec3){-1, -1, -1};
-    df_reset_plates(df);
-    df_reset_events(df);
+    //df_reset_plates(df);
+    //df_reset_events(df);
     if (!df_malloc_tiles(df)) {
         return;
     }
@@ -489,36 +489,36 @@ void df_init(dungeon_floor_t* df) {
     //df_init_test_complex9(df, 4, 4);
 }
 
-void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
-    massert(df, "dungeon floor is NULL");
-    massert(x >= 0, "x is less than zero");
-    massert(x < df->width, "x is out of bounds");
-    massert(y >= 0, "y is less than zero");
-    massert(y < df->height, "y is out of bounds");
-    massert(on_type >= 0, "on_type is out of bounds");
-    massert(on_type < TILE_COUNT, "on_type is out of bounds");
-    massert(off_type >= 0, "off_type is out of bounds");
-    massert(off_type < TILE_COUNT, "off_type is out of bounds");
-    massert(event_id >= 0, "event_id is less than zero");
-    massert(event_id < DEFAULT_DF_EVENTS, "event_id is out of bounds");
-    massert(df->events, "events is NULL");
-    df->events[event_id].x = x;
-    df->events[event_id].y = y;
-    df->events[event_id].on_type = on_type;
-    df->events[event_id].off_type = off_type;
-    df->events[event_id].listen_event = event_id;
-}
+//void df_set_event(dungeon_floor_t* const df, int x, int y, int event_id, tiletype_t on_type, tiletype_t off_type) {
+//    massert(df, "dungeon floor is NULL");
+//    massert(x >= 0, "x is less than zero");
+//    massert(x < df->width, "x is out of bounds");
+//    massert(y >= 0, "y is less than zero");
+//    massert(y < df->height, "y is out of bounds");
+//    massert(on_type >= 0, "on_type is out of bounds");
+//    massert(on_type < TILE_COUNT, "on_type is out of bounds");
+//    massert(off_type >= 0, "off_type is out of bounds");
+//    massert(off_type < TILE_COUNT, "off_type is out of bounds");
+//    massert(event_id >= 0, "event_id is less than zero");
+//    massert(event_id < DEFAULT_DF_EVENTS, "event_id is out of bounds");
+//massert(df->events, "events is NULL");
+//df->events[event_id].x = x;
+//df->events[event_id].y = y;
+//df->events[event_id].on_type = on_type;
+//df->events[event_id].off_type = off_type;
+//df->events[event_id].listen_event = event_id;
+//}
 
 void df_init_test(dungeon_floor_t* df) {
     massert(df, "dungeon floor is NULL");
     // Rooms
     //int txwallup = TX_WALL_SWITCH_UP_00;
     //int txwalldown = TX_WALL_SWITCH_DOWN_00;
-    tiletype_t trap_on = TILE_FLOOR_STONE_TRAP_ON_00;
-    tiletype_t trap_off = TILE_FLOOR_STONE_TRAP_OFF_00;
+    //tiletype_t trap_on = TILE_FLOOR_STONE_TRAP_ON_00;
+    //tiletype_t trap_off = TILE_FLOOR_STONE_TRAP_OFF_00;
     tiletype_t begin_type = TILE_FLOOR_STONE_00;
     tiletype_t end_type = TILE_FLOOR_STONE_11;
-    df_event_id id = 1;
+    //df_event_id id = 1;
     // First Room and Trap and Switch
     int x = 0;
     int y = 0;
@@ -562,7 +562,7 @@ void df_init_test(dungeon_floor_t* df) {
         df_init_rect2(df, r, begin_type, end_type);
         //df_place_wall_switch(df, r.x + rand() % (int)r.width, r.y + rand() % (int)r.height, txwallup, txwalldown, id);
         //df_create_trap_event(df, r.x + r.width, r.y + rand() % (int)r.height, trap_on, trap_off, id);
-        id++;
+        //id++;
     }
     while (count < total_rooms) {
         df_init_rect2(df, (Rectangle){(float)x, (float)y, (float)w, (float)h}, begin_type, end_type);
@@ -570,10 +570,10 @@ void df_init_test(dungeon_floor_t* df) {
         r = rand() % 2;
         //while (r == prev_r) { r = rand() % 4; }
         if (r == 0) {
-            df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
+            //df_create_trap_event(df, x + w, y + rand() % h, trap_on, trap_off, id);
             x = x + w + 1;
         } else if (r == 1) {
-            df_create_trap_event(df, x + rand() % w, y + h, trap_on, trap_off, id);
+            //df_create_trap_event(df, x + rand() % w, y + h, trap_on, trap_off, id);
             y = y + h + 1;
         }
         //else if (r == 2) {
@@ -586,7 +586,7 @@ void df_init_test(dungeon_floor_t* df) {
         //    continue;
         //}
         //prev_r = r;
-        id++;
+        //id++;
         count++;
         //w++;
         //h++;
@@ -840,14 +840,14 @@ void df_set_tile_area_range(dungeon_floor_t* const df, int x, int y, int w, int 
     }
 }
 
-void df_reset_plates(dungeon_floor_t* const df) {
-    massert(df, "dungeon floor is NULL");
-    memset(df->plates, 0, sizeof(bool) * DEFAULT_DF_PLATES);
-}
+//void df_reset_plates(dungeon_floor_t* const df) {
+//massert(df, "dungeon floor is NULL");
+//memset(df->plates, 0, sizeof(bool) * DEFAULT_DF_PLATES);
+//}
 
 void df_reset_events(dungeon_floor_t* const df) {
     massert(df, "dungeon floor is NULL");
-    memset(df->events, 0, sizeof(df_event_t) * DEFAULT_DF_EVENTS);
+    //memset(df->events, 0, sizeof(df_event_t) * DEFAULT_DF_EVENTS);
     //for (int i = 0; i < DEFAULT_DF_EVENTS; i++) {
     //    df->events[i].listen_event = -1;
     //    df->events[i].x = -1;
@@ -902,19 +902,19 @@ void df_init_rect2(dungeon_floor_t* df, Rectangle r, tiletype_t t1, tiletype_t t
     df_set_tile_area_range2(df, r, t1, t2);
 }
 
-void df_create_trap_event(dungeon_floor_t* df, int x, int y, tiletype_t on, tiletype_t off, df_event_id id) {
-    massert(df, "dungeon floor is NULL");
-    if (id >= DEFAULT_DF_EVENTS) return;
-    df->events[id] = (df_event_t){.listen_event = id, .x = x, .y = y, .on_type = on, .off_type = off};
-    df_set_tile(df, off, x, y);
-}
+//void df_create_trap_event(dungeon_floor_t* df, int x, int y, tiletype_t on, tiletype_t off, df_event_id id) {
+//    massert(df, "dungeon floor is NULL");
+//    if (id >= DEFAULT_DF_EVENTS) return;
+//    //df->events[id] = (df_event_t){.listen_event = id, .x = x, .y = y, .on_type = on, .off_type = off};
+//    df_set_tile(df, off, x, y);
+//}
 
-void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id) {
-    massert(df, "dungeon floor is NULL");
-    tiletype_t type = TILE_STONE_WALL_02;
-    df_set_tile(df, type, x, y);
-    df_set_wall_switch(df, x, y, up, down, trigger_id);
-}
+//void df_place_wall_switch(dungeon_floor_t* df, int x, int y, int up, int down, df_event_id trigger_id) {
+//    massert(df, "dungeon floor is NULL");
+//    tiletype_t type = TILE_STONE_WALL_02;
+//    df_set_tile(df, type, x, y);
+//    df_set_wall_switch(df, x, y, up, down, trigger_id);
+//}
 
 vec3 df_get_upstairs(dungeon_floor_t* const df) {
     massert(df, "dungeon floor is NULL");

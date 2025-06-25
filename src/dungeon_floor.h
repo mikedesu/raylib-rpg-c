@@ -11,26 +11,26 @@
 
 #define DEFAULT_DUNGEON_FLOOR_WIDTH 256
 #define DEFAULT_DUNGEON_FLOOR_HEIGHT 256
-#define DEFAULT_DF_EVENTS 64
-#define DEFAULT_DF_PLATES 64
+//#define DEFAULT_DF_EVENTS 64
+//#define DEFAULT_DF_PLATES 64
 
-typedef int df_event_id;
+//typedef int df_event_id;
 
-typedef struct {
-    df_event_id listen_event;
-    int x;
-    int y;
-    tiletype_t on_type;
-    tiletype_t off_type;
-} df_event_t;
+//typedef struct {
+//    df_event_id listen_event;
+//    int x;
+//    int y;
+//    tiletype_t on_type;
+//    tiletype_t off_type;
+//} df_event_t;
 
 typedef struct {
     tile_t** tiles;
     int floor; // the floor number, starting from 0
     int width;
     int height;
-    df_event_t events[DEFAULT_DF_EVENTS];
-    bool plates[DEFAULT_DF_PLATES];
+    //df_event_t events[DEFAULT_DF_EVENTS];
+    //bool plates[DEFAULT_DF_PLATES];
     room_data_t* rooms; // dynamic array pointer
     int room_count; // current room number
     int room_capacity; // allocated capacity
