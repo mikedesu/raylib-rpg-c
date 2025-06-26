@@ -52,7 +52,8 @@ void get_neighbors(vec3 pos, vec3 neighbors[8]) {
 //    neighbors[3] = (vec3){pos.x - 1, pos.y, pos.z}; // Left
 //}
 
-bool is_position_walkable(vec3 pos, dungeon_floor_t* df) {
+//bool is_position_walkable(vec3 pos, dungeon_floor_t* df) {
+bool is_position_walkable(vec3 pos, shared_ptr<dungeon_floor_t> df) {
     // Check bounds
     if (pos.x < 0 || pos.x >= df->width || pos.y < 0 || pos.y >= df->height) {
         return false;
@@ -65,7 +66,8 @@ bool is_position_walkable(vec3 pos, dungeon_floor_t* df) {
     return tile_is_walkable(t->type);
 }
 
-vec3* find_path(vec3 start, vec3 end, dungeon_floor_t* df, int* path_length) {
+//vec3* find_path(vec3 start, vec3 end, dungeon_floor_t* df, int* path_length) {
+vec3* find_path(vec3 start, vec3 end, shared_ptr<dungeon_floor_t> df, int* path_length) {
     *path_length = 0;
 
     // If start and end are the same

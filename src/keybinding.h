@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
+#include <memory>
+#include <string>
 
 #define KEYBINDING_MAX_ACTION_LENGTH 32
 #define KEYBINDING_LIST_MAX_LENGTH 400
@@ -17,9 +19,7 @@ typedef struct {
     int count;
 } keybinding_list_t;
 
-const char* get_action_for_key(keybinding_list_t* kb, int key);
-
-int key_from_string(const char* str);
-
-void load_keybindings(const char* filename, keybinding_list_t* kb);
-void print_keybindings(const keybinding_list_t* kb);
+const char* get_action_for_key(std::shared_ptr<keybinding_list_t> kb, int key);
+int key_from_string(std::string str);
+void load_keybindings(std::string filename, std::shared_ptr<keybinding_list_t> kb);
+void print_keybindings(std::shared_ptr<keybinding_list_t> kb);

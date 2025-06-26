@@ -3,23 +3,20 @@
 #include "inputstate.h"
 #include "specifier.h"
 #include "spritegroup.h"
+#include <memory>
 #include <raylib.h>
-#include <stdbool.h>
 
 extern Shader shader_grayscale; // Global shader
 extern Shader shader_tile_glow; // Global shader
 
-void libdraw_init(gamestate* const g);
-void libdraw_init_rest(gamestate* const g);
-void libdraw_update_input(inputstate* const is);
-void libdraw_drawframe(gamestate* const g);
+bool libdraw_windowshouldclose(std::shared_ptr<gamestate> g);
+
+void libdraw_init(std::shared_ptr<gamestate> g);
+void libdraw_init_rest(std::shared_ptr<gamestate> g);
+void libdraw_update_input(std::shared_ptr<inputstate> is);
+void libdraw_drawframe(std::shared_ptr<gamestate> g);
 void libdraw_close();
 void libdraw_close_partial();
-//bool libdraw_windowshouldclose();
-bool libdraw_windowshouldclose(const gamestate* const g);
-void libdraw_update_sprites(gamestate* const g);
-void libdraw_update_sprites_post(gamestate* const g);
-void libdraw_update_sprites_pre(gamestate* const g);
-
-//void libdraw_draw_message_history_placeholder(gamestate* const g);
-//void libdraw_update_sprite_context(gamestate* const g, entityid id, direction_t dir);
+void libdraw_update_sprites(std::shared_ptr<gamestate> g);
+void libdraw_update_sprites_post(std::shared_ptr<gamestate> g);
+void libdraw_update_sprites_pre(std::shared_ptr<gamestate> g);

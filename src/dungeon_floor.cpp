@@ -13,36 +13,36 @@ using std::shared_ptr;
 using std::unordered_map;
 using std::vector;
 
-void df_init_test(dungeon_floor_t* df);
-void df_set_tile_perimeter_range(dungeon_floor_t* const df, tiletype_t begin, tiletype_t end, int x, int y, int w, int h);
-void df_set_tile_perimeter(dungeon_floor_t* const df, tiletype_t type, int x, int y, int w, int h);
-void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y);
-void df_set_all_tiles_range(dungeon_floor_t* const df, tiletype_t begin, tiletype_t end);
-void df_set_all_tiles(dungeon_floor_t* const df, tiletype_t type);
-void df_set_tile_area(dungeon_floor_t* const df, tiletype_t type, int x, int y, int w, int h);
-void df_set_tile_area_range2(dungeon_floor_t* const df, Rectangle r, tiletype_t begin, tiletype_t end);
-void df_init_rect2(dungeon_floor_t* df, Rectangle r, tiletype_t t1, tiletype_t t2);
-void df_init_rect(dungeon_floor_t* df, int x, int y, int w, int h, tiletype_t t1, tiletype_t t2);
-//bool df_malloc_tiles(dungeon_floor_t* const df);
-void df_assign_stairs(dungeon_floor_t* df);
-void df_assign_downstairs(dungeon_floor_t* df);
-void df_assign_upstairs(dungeon_floor_t* df);
-bool df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
-bool df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
-int df_get_possible_upstairs_count(dungeon_floor_t* df);
-int df_get_possible_downstairs_count(dungeon_floor_t* df);
-vec3* df_get_possible_upstairs_locs(dungeon_floor_t* df, int* external_count);
-vec3* df_get_possible_downstairs_locs(dungeon_floor_t* df, int* external_count);
-vec3* df_get_possible_upstairs_locs_in_area(dungeon_floor_t* df, int* external_count, int x, int y, int w, int h);
-vec3* df_get_possible_downstairs_locs_in_area(dungeon_floor_t* df, int* external_count, int x, int y, int w, int h);
-int df_get_possible_upstairs_count_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
-int df_get_possible_downstairs_count_in_area(dungeon_floor_t* df, int x, int y, int w, int h);
-void df_make_room(dungeon_floor_t* df, int x, int y, int w, int h);
-void df_make_corridor_h(dungeon_floor_t* df, int x, int y, int len);
-void df_make_corridor_v(dungeon_floor_t* df, int x, int y, int len);
-void df_make_diamond_shape_room(dungeon_floor_t* df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type);
+void df_init_test(shared_ptr<dungeon_floor_t> df);
+void df_set_tile_perimeter_range(shared_ptr<dungeon_floor_t> const df, tiletype_t begin, tiletype_t end, int x, int y, int w, int h);
+void df_set_tile_perimeter(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y, int w, int h);
+void df_set_tile(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y);
+void df_set_all_tiles_range(shared_ptr<dungeon_floor_t> const df, tiletype_t begin, tiletype_t end);
+void df_set_all_tiles(shared_ptr<dungeon_floor_t> const df, tiletype_t type);
+void df_set_tile_area(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y, int w, int h);
+void df_set_tile_area_range2(shared_ptr<dungeon_floor_t> const df, Rectangle r, tiletype_t begin, tiletype_t end);
+void df_init_rect2(shared_ptr<dungeon_floor_t> df, Rectangle r, tiletype_t t1, tiletype_t t2);
+void df_init_rect(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h, tiletype_t t1, tiletype_t t2);
+//bool df_malloc_tiles(shared_ptr<dungeon_floor_t> const df);
+void df_assign_stairs(shared_ptr<dungeon_floor_t> df);
+void df_assign_downstairs(shared_ptr<dungeon_floor_t> df);
+void df_assign_upstairs(shared_ptr<dungeon_floor_t> df);
+bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+int df_get_possible_upstairs_count(shared_ptr<dungeon_floor_t> df);
+int df_get_possible_downstairs_count(shared_ptr<dungeon_floor_t> df);
+vec3* df_get_possible_upstairs_locs(shared_ptr<dungeon_floor_t> df, int* external_count);
+vec3* df_get_possible_downstairs_locs(shared_ptr<dungeon_floor_t> df, int* external_count);
+vec3* df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int* external_count, int x, int y, int w, int h);
+vec3* df_get_possible_downstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int* external_count, int x, int y, int w, int h);
+int df_get_possible_upstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+int df_get_possible_downstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+void df_make_room(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+void df_make_corridor_h(shared_ptr<dungeon_floor_t> df, int x, int y, int len);
+void df_make_corridor_v(shared_ptr<dungeon_floor_t> df, int x, int y, int len);
+void df_make_diamond_shape_room(shared_ptr<dungeon_floor_t> df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type);
 
-int df_get_possible_downstairs_count_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
+int df_get_possible_downstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
@@ -66,7 +66,7 @@ int df_get_possible_downstairs_count_in_area(dungeon_floor_t* df, int x, int y, 
     return count;
 }
 
-int df_get_possible_upstairs_count_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
+int df_get_possible_upstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
@@ -87,17 +87,17 @@ int df_get_possible_upstairs_count_in_area(dungeon_floor_t* df, int x, int y, in
     return count;
 }
 
-void df_assign_stairs(dungeon_floor_t* df) {
+void df_assign_stairs(shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
     df_assign_upstairs_in_area(df, 0, 0, df->width, df->height);
     df_assign_downstairs_in_area(df, 0, 0, df->width, df->height);
 }
 
-int df_get_possible_upstairs_count(dungeon_floor_t* df) { return df_get_possible_upstairs_count_in_area(df, 0, 0, df->width, df->height); }
+int df_get_possible_upstairs_count(shared_ptr<dungeon_floor_t> df) { return df_get_possible_upstairs_count_in_area(df, 0, 0, df->width, df->height); }
 
-int df_get_possible_downstairs_count(dungeon_floor_t* df) { return df_get_possible_downstairs_count_in_area(df, 0, 0, df->width, df->height); }
+int df_get_possible_downstairs_count(shared_ptr<dungeon_floor_t> df) { return df_get_possible_downstairs_count_in_area(df, 0, 0, df->width, df->height); }
 
-vec3* df_get_possible_upstairs_locs(dungeon_floor_t* df, int* external_count) {
+vec3* df_get_possible_upstairs_locs(shared_ptr<dungeon_floor_t> df, int* external_count) {
     massert(df, "dungeon floor is NULL");
     massert(external_count, "external_count is NULL");
     int count = -1;
@@ -108,7 +108,7 @@ vec3* df_get_possible_upstairs_locs(dungeon_floor_t* df, int* external_count) {
     return locs;
 }
 
-vec3* df_get_possible_downstairs_locs(dungeon_floor_t* df, int* external_count) {
+vec3* df_get_possible_downstairs_locs(shared_ptr<dungeon_floor_t> df, int* external_count) {
     massert(df, "dungeon floor is NULL");
     massert(external_count, "external_count is NULL");
     int count = -1;
@@ -119,7 +119,7 @@ vec3* df_get_possible_downstairs_locs(dungeon_floor_t* df, int* external_count) 
     return locs;
 }
 
-vec3* df_get_possible_upstairs_locs_in_area(dungeon_floor_t* df, int* external_count, int x, int y, int w, int h) {
+vec3* df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int* external_count, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     int count = df_get_possible_upstairs_count_in_area(df, x, y, w, h);
     vec3* locations = (vec3*)malloc(sizeof(vec3) * count);
@@ -145,7 +145,7 @@ vec3* df_get_possible_upstairs_locs_in_area(dungeon_floor_t* df, int* external_c
     return locations;
 }
 
-vec3* df_get_possible_downstairs_locs_in_area(dungeon_floor_t* df, int* external_count, int x, int y, int w, int h) {
+vec3* df_get_possible_downstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int* external_count, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(external_count, "external_count is NULL");
     massert(x >= 0, "x is less than zero");
@@ -176,7 +176,7 @@ vec3* df_get_possible_downstairs_locs_in_area(dungeon_floor_t* df, int* external
     return locations;
 }
 
-bool df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
+bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
@@ -203,17 +203,17 @@ bool df_assign_upstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h)
     return true;
 }
 
-void df_assign_upstairs(dungeon_floor_t* df) {
+void df_assign_upstairs(shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
     df_assign_upstairs_in_area(df, 0, 0, df->width, df->height);
 }
 
-void df_assign_downstairs(dungeon_floor_t* df) {
+void df_assign_downstairs(shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
     df_assign_downstairs_in_area(df, 0, 0, df->width, df->height);
 }
 
-bool df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int h) {
+bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
@@ -239,22 +239,25 @@ bool df_assign_downstairs_in_area(dungeon_floor_t* df, int x, int y, int w, int 
     return true;
 }
 
-int df_center_x(const dungeon_floor_t* const df) {
+int df_center_x(const shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
     return df->width / 2;
 }
 
-int df_center_y(const dungeon_floor_t* const df) {
+int df_center_y(const shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
     return df->height / 2;
 }
 
-dungeon_floor_t* df_create(int floor, int width, int height) {
+shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height) {
     massert(width > 0, "width must be greater than zero");
     massert(height > 0, "height must be greater than zero");
     massert(floor >= 0, "floor must be greater than or equal to zero");
-    dungeon_floor_t* df = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
+
+    //dungeon_floor_t* df = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
+    shared_ptr<dungeon_floor_t> df = make_shared<dungeon_floor_t>();
     massert(df, "failed to malloc dungeon floor");
+
     df->floor = floor;
     df->width = width;
     df->height = height;
@@ -269,7 +272,7 @@ dungeon_floor_t* df_create(int floor, int width, int height) {
     return df;
 }
 
-void df_set_tile_area(dungeon_floor_t* const df, tiletype_t type, int x, int y, int w, int h) {
+void df_set_tile_area(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
@@ -288,7 +291,7 @@ void df_set_tile_area(dungeon_floor_t* const df, tiletype_t type, int x, int y, 
     }
 }
 
-void df_init(dungeon_floor_t* df) {
+void df_init(shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
     df->upstairs_loc = (vec3){-1, -1, -1};
     df->downstairs_loc = (vec3){-1, -1, -1};
@@ -297,19 +300,15 @@ void df_init(dungeon_floor_t* df) {
     // at this point, we are free to customize the dungeon floor to our liking
 }
 
-void df_set_tile(dungeon_floor_t* const df, tiletype_t type, int x, int y) {
+void df_set_tile(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y) {
     massert(df, "dungeon floor is NULL");
-
-    // tile_t* current = &df->tiles[y][x];
     shared_ptr<tile_t> current = df_tile_at(df, (vec3){x, y, -1});
-
     tile_init(current, type);
 }
 
-void df_set_tile_perimeter(dungeon_floor_t* const df, tiletype_t type, int x, int y, int w, int h) {
+void df_set_tile_perimeter(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     for (int i = 0; i <= w; i++) {
-        //tile_t* current = &df->tiles[y][x + i];
         shared_ptr<tile_t> current = df_tile_at(df, (vec3){x + i, y, -1});
         tile_init(current, type);
     }
@@ -327,7 +326,7 @@ void df_set_tile_perimeter(dungeon_floor_t* const df, tiletype_t type, int x, in
     }
 }
 
-void df_set_tile_perimeter_range(dungeon_floor_t* const df, tiletype_t begin, tiletype_t end, int x, int y, int w, int h) {
+void df_set_tile_perimeter_range(shared_ptr<dungeon_floor_t> const df, tiletype_t begin, tiletype_t end, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     tiletype_t begin_type = begin;
     tiletype_t end_type = end;
@@ -358,7 +357,7 @@ void df_set_tile_perimeter_range(dungeon_floor_t* const df, tiletype_t begin, ti
     }
 }
 
-void df_free(dungeon_floor_t* df) {
+void df_free(shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
 
     if (df->tiles) {
@@ -369,17 +368,16 @@ void df_free(dungeon_floor_t* df) {
         df->tile_map->clear();
     }
 
-    free(df);
+    //free(df);
 }
 
-bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y) {
+bool df_add_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y) {
     massert(df, "df is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
     massert(y >= 0, "y is less than zero");
     massert(y < df->height, "y is out of bounds");
-
     //entityid result = tile_add(&df->tiles[y][x], id) != -1;
     shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, -1});
     massert(tile, "tile is NULL at (%d, %d)", x, y);
@@ -388,7 +386,7 @@ bool df_add_at(dungeon_floor_t* const df, entityid id, int x, int y) {
     return result != ENTITYID_INVALID;
 }
 
-bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y) {
+bool df_remove_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y) {
     massert(df, "df is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(x >= 0, "x is less than zero");
@@ -402,12 +400,12 @@ bool df_remove_at(dungeon_floor_t* const df, entityid id, int x, int y) {
     return r != -1 && r == id;
 }
 
-void df_set_all_tiles(dungeon_floor_t* const df, tiletype_t type) {
+void df_set_all_tiles(shared_ptr<dungeon_floor_t> const df, tiletype_t type) {
     massert(df, "dungeon floor is NULL");
     df_set_tile_area(df, type, 0, 0, df->width, df->height);
 }
 
-void df_set_all_tiles_range(dungeon_floor_t* const df, tiletype_t begin, tiletype_t end) {
+void df_set_all_tiles_range(shared_ptr<dungeon_floor_t> const df, tiletype_t begin, tiletype_t end) {
     massert(df, "dungeon floor is NULL");
     tiletype_t begin_type = begin;
     tiletype_t end_type = end;
@@ -428,7 +426,7 @@ void df_set_all_tiles_range(dungeon_floor_t* const df, tiletype_t begin, tiletyp
     }
 }
 
-void df_set_tile_area_range2(dungeon_floor_t* const df, Rectangle r, tiletype_t begin, tiletype_t end) {
+void df_set_tile_area_range2(shared_ptr<dungeon_floor_t> const df, Rectangle r, tiletype_t begin, tiletype_t end) {
     massert(df, "dungeon floor is NULL");
     tiletype_t begin_type = begin;
     tiletype_t end_type = end;
@@ -448,7 +446,7 @@ void df_set_tile_area_range2(dungeon_floor_t* const df, Rectangle r, tiletype_t 
     }
 }
 
-void df_set_tile_area_range(dungeon_floor_t* const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end) {
+void df_set_tile_area_range(shared_ptr<dungeon_floor_t> const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end) {
     massert(df, "dungeon floor is NULL");
     tiletype_t begin_type = begin;
     tiletype_t end_type = end;
@@ -468,25 +466,7 @@ void df_set_tile_area_range(dungeon_floor_t* const df, int x, int y, int w, int 
     }
 }
 
-//bool df_malloc_tiles(dungeon_floor_t* const df) {
-//    massert(df, "dungeon floor is NULL");
-//    massert(df->width > 0, "width is less than zero");
-//    massert(df->height > 0, "height is less than zero");
-//    df->tiles = (tile_t**)malloc(sizeof(tile_t*) * df->height);
-//    massert(df->tiles, "failed to malloc tiles");
-//    memset(df->tiles, 0, sizeof(tile_t*) * df->height);
-//    for (int i = 0; i < df->height; i++) {
-//        df->tiles[i] = (tile_t*)malloc(sizeof(tile_t) * df->width);
-//        // malloc failed and we need to free everything up to this point
-//        if (df->tiles[i] == NULL) {
-//            for (int j = 0; j < i; j++) free(df->tiles[j]);
-//            return false;
-//        }
-//    }
-//    return true;
-//}
-
-void df_init_rect(dungeon_floor_t* df, int x, int y, int w, int h, tiletype_t t1, tiletype_t t2) {
+void df_init_rect(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h, tiletype_t t1, tiletype_t t2) {
     massert(df, "dungeon floor is NULL");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
@@ -497,7 +477,7 @@ void df_init_rect(dungeon_floor_t* df, int x, int y, int w, int h, tiletype_t t1
     df_set_tile_area_range(df, x, y, w, h, t1, t2);
 }
 
-void df_init_rect2(dungeon_floor_t* df, Rectangle r, tiletype_t t1, tiletype_t t2) {
+void df_init_rect2(shared_ptr<dungeon_floor_t> df, Rectangle r, tiletype_t t1, tiletype_t t2) {
     massert(df, "dungeon floor is NULL");
     massert(r.x >= 0, "x is less than zero");
     massert(r.x < df->width, "x is out of bounds");
@@ -513,7 +493,7 @@ void df_init_rect2(dungeon_floor_t* df, Rectangle r, tiletype_t t1, tiletype_t t
     df_set_tile_area_range2(df, r, t1, t2);
 }
 
-vec3 df_get_upstairs(dungeon_floor_t* const df) {
+vec3 df_get_upstairs(shared_ptr<dungeon_floor_t> const df) {
     massert(df, "dungeon floor is NULL");
     if (df->upstairs_loc.x != -1 && df->upstairs_loc.y != -1) {
         return df->upstairs_loc;
@@ -534,7 +514,7 @@ vec3 df_get_upstairs(dungeon_floor_t* const df) {
     return loc;
 }
 
-vec3 df_get_downstairs(dungeon_floor_t* const df) {
+vec3 df_get_downstairs(shared_ptr<dungeon_floor_t> const df) {
     massert(df, "dungeon floor is NULL");
     if (df->downstairs_loc.x != -1 && df->downstairs_loc.y != -1) return df->downstairs_loc;
     vec3 loc = {-1, -1, -1};
@@ -553,7 +533,7 @@ vec3 df_get_downstairs(dungeon_floor_t* const df) {
     return loc;
 }
 
-int df_count_walkable(const dungeon_floor_t* const df) {
+int df_count_walkable(const shared_ptr<dungeon_floor_t> df) {
     massert(df, "df is NULL");
     int count = 0;
     for (int y = 0; y < df->height; y++) {
@@ -565,7 +545,7 @@ int df_count_walkable(const dungeon_floor_t* const df) {
     return count;
 }
 
-int df_count_empty(const dungeon_floor_t* const df) {
+int df_count_empty(const shared_ptr<dungeon_floor_t> df) {
     massert(df, "df is NULL");
     int count = 0;
     for (int y = 0; y < df->height; y++) {
@@ -579,7 +559,7 @@ int df_count_empty(const dungeon_floor_t* const df) {
     return count;
 }
 
-int df_count_non_walls_in_area(const dungeon_floor_t* const df, int x0, int y0, int w, int h) {
+int df_count_non_walls_in_area(const shared_ptr<dungeon_floor_t> df, int x0, int y0, int w, int h) {
     massert(df, "df is NULL");
     int count = 0;
     for (int y = 0; y < h && y + y0 < df->height; y++) {
@@ -595,12 +575,12 @@ int df_count_non_walls_in_area(const dungeon_floor_t* const df, int x0, int y0, 
     return count;
 }
 
-int df_count_non_walls(const dungeon_floor_t* const df) {
+int df_count_non_walls(const shared_ptr<dungeon_floor_t> df) {
     massert(df, "df is NULL");
     return df_count_non_walls_in_area(df, 0, 0, df->width, df->height);
 }
 
-int df_count_empty_non_walls_in_area(const dungeon_floor_t* const df, int x0, int y0, int w, int h) {
+int df_count_empty_non_walls_in_area(const shared_ptr<dungeon_floor_t> df, int x0, int y0, int w, int h) {
     massert(df, "df is NULL");
     int count = 0;
     for (int y = 0; y < h && y + y0 < df->height; y++) {
@@ -608,6 +588,7 @@ int df_count_empty_non_walls_in_area(const dungeon_floor_t* const df, int x0, in
             int newx = x + x0;
             int newy = y + y0;
             //tile_t* const t = df_tile_at(df, (vec3){newx, newy, -1});
+            //shared_ptr<tile_t> t = df_tile_at(df, (vec3){newx, newy, -1});
             shared_ptr<tile_t> t = df_tile_at(df, (vec3){newx, newy, -1});
             massert(t, "tile is NULL at (%d, %d)", newx, newy);
             if (tile_entity_count(t) == 0 && tile_is_walkable(t->type)) count++;
@@ -616,16 +597,18 @@ int df_count_empty_non_walls_in_area(const dungeon_floor_t* const df, int x0, in
     return count;
 }
 
-int df_count_empty_non_walls(const dungeon_floor_t* const df) {
+int df_count_empty_non_walls(const shared_ptr<dungeon_floor_t> df) {
     massert(df, "df is NULL");
     return df_count_empty_non_walls_in_area(df, 0, 0, df->width, df->height);
 }
 
-void df_make_room(dungeon_floor_t* df, int x, int y, int w, int h) { df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
-void df_make_corridor_h(dungeon_floor_t* df, int x, int y, int len) { df_set_tile_area_range(df, x, y, len, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
-void df_make_corridor_v(dungeon_floor_t* df, int x, int y, int len) { df_set_tile_area_range(df, x, y, 1, len, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
+void df_make_room(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) { df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
 
-void df_make_diamond_shape_room(dungeon_floor_t* df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type) {
+void df_make_corridor_h(shared_ptr<dungeon_floor_t> df, int x, int y, int len) { df_set_tile_area_range(df, x, y, len, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
+
+void df_make_corridor_v(shared_ptr<dungeon_floor_t> df, int x, int y, int len) { df_set_tile_area_range(df, x, y, 1, len, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11); }
+
+void df_make_diamond_shape_room(shared_ptr<dungeon_floor_t> df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type) {
     massert(df, "dungeon floor is NULL");
     massert(w > 0 && h > 0, "width and height must be positive");
     massert(w >= 3 && h >= 3, "width and height must be at least 3 for diamond shape");
@@ -646,10 +629,8 @@ void df_make_diamond_shape_room(dungeon_floor_t* df, int cx, int cy, int w, int 
     }
 }
 
-vec3* const df_get_all_locs(dungeon_floor_t* const df, int* external_count) {
+vec3* const df_get_all_locs(shared_ptr<dungeon_floor_t> const df, int* external_count) {
     massert(df, "dungeon floor is NULL");
-    //massert(df->rooms, "room data is NULL");
-    //massert(df->room_count > 0, "room count is invalid");
     massert(external_count, "external count is NULL");
     int count = 0;
     for (int y = 0; y < df->height; y++) {
@@ -668,10 +649,11 @@ vec3* const df_get_all_locs(dungeon_floor_t* const df, int* external_count) {
     int index = 0;
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            //tile_t* const t = df_tile_at(df, (vec3){x, y, -1});
             shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, -1});
             massert(t, "tile is NULL");
-            if (t->type == TILE_NONE || t->type == TILE_COUNT) continue;
+            if (t->type == TILE_NONE || t->type == TILE_COUNT) {
+                continue;
+            }
             locs[index++] = (vec3){x, y, -1};
         }
     }

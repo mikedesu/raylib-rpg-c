@@ -20,103 +20,157 @@
 #include "potion.h"
 #include "race.h"
 #include "roll.h"
-//#include "shield.h"
 #include "stats_slot.h"
-//#include <assert.h>
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <raylib.h>
-//#include <string>
 
-using namespace std;
+using std::shared_ptr;
+using std::string;
+using std::vector;
 
 int liblogic_restart_count = 0;
 
-static inline bool is_traversable(gamestate* const g, int x, int y, int z);
-//static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
-static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(gamestate* const g, entityid id);
-static inline void reset_player_blocking(gamestate* const g);
-static inline void reset_player_block_success(gamestate* const g);
-static inline void update_npc_state(gamestate* const g, entityid id);
-static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is);
+static inline bool is_traversable(shared_ptr<gamestate> g, int x, int y, int z) {
+    massert(g, "gamestate is NULL");
+    massert(z >= 0, "floor is out of bounds");
+    massert(z < g->d->num_floors, "floor is out of bounds");
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
+    massert(df, "failed to get dungeon floor");
+    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
+    massert(t, "failed to get tile");
+    return tile_is_walkable(t->type);
+}
 
-static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int x0, int y0, int w, int h);
+static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
+    vec3 loc = g_get_location(g, id);
+    massert(loc.z >= 0 && loc.z < g->d->num_floors, "floor is out of bounds");
+    //dungeon_floor_t* const df = d_get_floor(g->dungeon, loc.z);
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+    massert(df, "failed to get dungeon floor");
+    // check the 8 surrounding tiles
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            if (dx == 0 && dy == 0) continue; // skip the entity's own tile
+            int x = loc.x + dx;
+            int y = loc.y + dy;
+            if (is_traversable(g, x, y, loc.z)) {
+                shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, loc.z});
+                if (t && t->entities->empty()) {
+                    return t; // found an empty tile
+                }
+            }
+        }
+    }
+    return nullptr; // no empty tile found
+}
+
+static inline void reset_player_blocking(shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    g_set_blocking(g, g->hero_id, false);
+    g_set_block_success(g, g->hero_id, false);
+    g_set_update(g, g->hero_id, true);
+}
+
+static inline void reset_player_block_success(shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    g_set_block_success(g, g->hero_id, false);
+    g_set_update(g, g->hero_id, true);
+}
+
+static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is invalid");
+    // check if the NPC is dead
+    if (g_is_dead(g, id)) return;
+    // check if the NPC is blocking
+    if (g_get_blocking(g, id)) {
+        // reset the blocking state
+        g_set_blocking(g, id, false);
+        g_set_update(g, id, true);
+    }
+    // check if the NPC is blocked
+    if (g_get_block_success(g, id)) {
+        g_set_block_success(g, id, false);
+        g_set_update(g, id, true);
+    }
+}
+
+static void update_player_tiles_explored(shared_ptr<gamestate> g);
+static vec3 get_random_available_loc_in_area(shared_ptr<gamestate> g, int floor, int x0, int y0, int w, int h);
 static vec3 get_base_attack_damage_for_race(race_t race);
+static vec3* get_available_locs_in_area(shared_ptr<gamestate> g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
+static int calc_challenge_rating(shared_ptr<gamestate> g, entityid id);
+//static vec3* get_locs_around_entity(gamestate* const g, entityid id);
+static vec3* get_locs_around_entity(shared_ptr<gamestate> g, entityid id, int* count);
+//static void handle_input_gameplay_settings(const inputstate* const is, gamestate* const g);
+static void handle_input_gameplay_settings(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
+//static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful);
+static void handle_attack_blocked(shared_ptr<gamestate> g, entityid attacker_id, entityid target_id, bool* atk_successful);
+//static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
+static void handle_input_help_menu(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
+//static void handle_level_up(gamestate* const g, entityid id);
+static void handle_level_up(shared_ptr<gamestate> g, entityid id);
+//static void handle_input_sort_inventory(const inputstate* const is, gamestate* const g);
+static void handle_input_sort_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
+//static void init_dungeon(gamestate* const g);
+static void init_dungeon(shared_ptr<gamestate> g);
+//static void update_player_state(gamestate* const g);
+static void update_player_state(shared_ptr<gamestate> g);
+//static void update_debug_panel_buffer(gamestate* const g);
+static void update_debug_panel_buffer(shared_ptr<gamestate> g);
+//static void handle_camera_move(gamestate* const g, const inputstate* const is);
+static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+//static void handle_input(const inputstate* const is, gamestate* const g);
+static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static void handle_input_camera(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static void handle_input_inventory(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+//static void add_message_history(gamestate* const g, const char* fmt, ...);
+static void add_message_history(shared_ptr<gamestate> g, const char* fmt, ...);
+//static void add_message_and_history(gamestate* g, const char* fmt, ...);
+static void add_message_and_history(shared_ptr<gamestate> g, const char* fmt, ...);
+//static void add_message(gamestate* g, const char* fmt, ...);
+static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
+//static void try_entity_move_a_star(gamestate* const g, entityid id);
+static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id);
+//static void try_entity_move(gamestate* const g, entityid id, int x, int y);
+static void try_entity_move(shared_ptr<gamestate> g, entityid id, int x, int y);
+//static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
+static void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
+//static void try_entity_traverse_floors(gamestate* const g, entityid id);
+static void try_entity_traverse_floors(shared_ptr<gamestate> g, entityid id);
+//static void check_and_handle_level_up(gamestate* const g, entityid id);
+static void check_and_handle_level_up(shared_ptr<gamestate> g, entityid id);
+//static const char* get_action_key(const inputstate* const is, gamestate* const g);
+static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+//static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, string name);
+static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int fl, string name);
+//static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name);
+static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+//static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name);
+static entityid item_create(shared_ptr<gamestate> g, itemtype type, vec3 loc, const char* name);
+//static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name);
+static entityid potion_create(shared_ptr<gamestate> g, vec3 loc, potiontype type, const char* name);
 
-static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
-//static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
-static vec3* get_locs_around_entity(gamestate* const g, entityid id);
-
-void liblogic_restart(gamestate* const g);
-
-static void handle_input_gameplay_settings(const inputstate* const is, gamestate* const g);
-static void update_player_tiles_explored(gamestate* const g);
-static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful);
-static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
-static void handle_level_up(gamestate* const g, entityid id);
-//static void init_dagger_test(gamestate* g);
-//static void init_sword_test(gamestate* g);
-//static void init_axe_test(gamestate* g);
-//static void init_ring_test(gamestate* g);
-//static void init_shield_test(gamestate* g);
-static void handle_input_sort_inventory(const inputstate* const is, gamestate* const g);
-static void init_dungeon(gamestate* const g);
-static void update_player_state(gamestate* const g);
-static void update_debug_panel_buffer(gamestate* const g);
-static void handle_camera_move(gamestate* const g, const inputstate* const is);
-static void handle_input(const inputstate* const is, gamestate* const g);
-static void handle_input_camera(const inputstate* const is, gamestate* const g);
-static void handle_input_player(const inputstate* const is, gamestate* const g);
-static void handle_input_inventory(const inputstate* const is, gamestate* const g);
-static void add_message_history(gamestate* const g, const char* fmt, ...);
-static void add_message_and_history(gamestate* g, const char* fmt, ...);
-static void add_message(gamestate* g, const char* fmt, ...);
-static void try_entity_move_a_star(gamestate* const g, entityid id);
-static void try_entity_move(gamestate* const g, entityid id, int x, int y);
-static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
-static void try_entity_traverse_floors(gamestate* const g, entityid id);
-static void check_and_handle_level_up(gamestate* const g, entityid id);
-
-static const char* get_action_key(const inputstate* const is, gamestate* const g);
-
-static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, string name);
-//static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name);
-static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name);
-static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name);
-//static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, const char* name);
-//static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, const char* name);
-static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name);
-
-//static vec3 get_random_empty_non_wall_loc_in_area(gamestate* const g, int floor, int x, int y, int w, int h);
-//static vec3 get_random_empty_non_wall_loc(gamestate* const g, int floor);
-
-static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1);
-static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race);
+//static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1);
+//static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race);
+//static int calc_next_lvl_xp(gamestate* const g, entityid id);
+//static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id);
+static bool entities_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1);
+static entityid npc_create_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
 
 static int get_hitdie_for_race(race_t race);
-static int calc_next_lvl_xp(gamestate* const g, entityid id);
-static int calc_challenge_rating(gamestate* const g, entityid id);
-static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id);
+static int calc_next_lvl_xp(shared_ptr<gamestate> g, entityid id);
+static int calc_reward_xp(shared_ptr<gamestate> g, entityid attacker_id, entityid target_id);
 
 static race_t get_random_race();
 
-//static void init_npc_test(gamestate* g);
-//static void init_sword_test(gamestate* g);
-//static void init_axe_test(gamestate* g);
-//static void init_bow_test(gamestate* g);
-//static void init_potion_test(gamestate* g);
-//static void init_wand_test(gamestate* g);
-//static void try_entity_zap(gamestate* const g, entityid attacker_id, vec3 target_loc);
-//static bool player_on_tile(gamestate* g, int x, int y, int z);
-//static bool tile_has_closed_door(const gamestate* const g, int x, int y, int fl);
-//static bool tile_has_door(const gamestate* const g, int x, int y, int fl);
-//static entityid arrow_create(gamestate* const g, vec3 loc, const char* name);
-//static entityid wand_create(gamestate* const g, vec3 loc, const char* name);
-//static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl);
-
-static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id) {
+static int calc_reward_xp(shared_ptr<gamestate> g, entityid attacker_id, entityid target_id) {
     massert(g, "gamestate is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker id is invalid");
     massert(target_id != ENTITYID_INVALID, "target id is invalid");
@@ -152,7 +206,8 @@ static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid tar
     return reward_xp;
 }
 
-static int calc_challenge_rating(gamestate* const g, entityid id) {
+//static int calc_challenge_rating(gamestate* const g, entityid id) {
+static int calc_challenge_rating(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     // get the entity type
@@ -184,7 +239,8 @@ static int calc_challenge_rating(gamestate* const g, entityid id) {
     return challenge_rating;
 }
 
-static int calc_next_lvl_xp(gamestate* const g, entityid id) {
+//static int calc_next_lvl_xp(gamestate* const g, entityid id) {
+static int calc_next_lvl_xp(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     // get the current level
@@ -261,12 +317,14 @@ static void add_message(gamestate* g, const char* fmt, ...) {
 //}
 //}
 
-static inline int tile_npc_living_count(const gamestate* const g, int x, int y, int z) {
+//static inline int tile_npc_living_count(const gamestate* const g, int x, int y, int z) {
+static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
     // Validate inputs
     massert(g, "gamestate is NULL");
     massert(z >= 0, "floor is out of bounds");
     massert(z < g->d->num_floors, "floor is out of bounds");
-    const dungeon_floor_t* const df = d_get_floor(g->d, z);
+    //const dungeon_floor_t* const df = d_get_floor(g->dungeon, z);
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
     massert(df, "failed to get dungeon floor");
     //const tile_t* const t = df_tile_at(df, (vec3){x, y, z});
     shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
@@ -283,11 +341,13 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
 }
 
 //static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
-static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
+//static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
+static void try_entity_move(shared_ptr<gamestate> g, entityid id, int x, int y) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     //massert(e, "Entity is NULL!");
     //e->do_update = true;
+    //g_set_update(g, id, true);
     g_set_update(g, id, true);
     //e->direction = get_dir_from_xy(x, y);
     g_update_direction(g, id, get_dir_from_xy(x, y));
@@ -295,7 +355,8 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     int ex = loc.x + x;
     int ey = loc.y + y;
     int z = loc.z;
-    dungeon_floor_t* const df = d_get_floor(g->d, z);
+    //dungeon_floor_t* const df = d_get_floor(g->dungeon, z);
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
     if (!df) return;
     // i feel like this might be something we can set elsewhere...like after the player input phase?
     //tile_t* const tile = df_tile_at(df, (vec3){ex, ey, z});
@@ -311,6 +372,7 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     //    merror("Cannot move, player on tile");
     //    return;
     //}
+    //if (!df_remove_at(df, id, loc.x, loc.y)) return;
     if (!df_remove_at(df, id, loc.x, loc.y)) return;
     if (!df_add_at(df, id, ex, ey)) return;
     g_update_location(g, id, (vec3){ex, ey, z});
@@ -318,7 +380,9 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     //g_update_sprite_move(g, id, (vec3){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
     g_update_sprite_move(g, id, (Rectangle){(float)(x * DEFAULT_TILE_SIZE), (float)(y * DEFAULT_TILE_SIZE), 0, 0});
 
-    if (id == g->hero_id) update_player_tiles_explored(g);
+    if (id == g->hero_id) {
+        update_player_tiles_explored(g);
+    }
     // at this point the move is 'successful'
     //update_equipped_shield_dir(g, id);
     // get the entity's new tile
@@ -348,7 +412,8 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
 
-static void try_entity_move_a_star(gamestate* const g, entityid id) {
+//static void try_entity_move_a_star(gamestate* const g, entityid id) {
+static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     // for testing, we will hardcode an update to the entity's target
@@ -359,8 +424,9 @@ static void try_entity_move_a_star(gamestate* const g, entityid id) {
     vec3 eloc = g_get_location(g, id);
     vec3 hloc_cast = {hloc.x, hloc.y, hloc.z};
     vec3 eloc_cast = {eloc.x, eloc.y, eloc.z};
-    dungeon_floor_t* df = d_get_floor(g->d, eloc.z);
-    massert(df, "dungeon floor is NULL");
+    //dungeon_floor_t* df = d_get_floor(g->dungeon, eloc.z);
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, eloc.z);
+    //massert(df, "dungeon floor is NULL");
     int target_path_length = 0;
     vec3* target_path = find_path(eloc_cast, hloc_cast, df, &target_path_length);
     if (target_path) {
@@ -377,12 +443,13 @@ static void try_entity_move_a_star(gamestate* const g, entityid id) {
     }
 }
 
-static void try_entity_move_random(gamestate* const g, entityid id) {
+//static void try_entity_move_random(gamestate* const g, entityid id) {
+static void try_entity_move_random(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
-    int x = rand() % 3;
+    int x = (rand() % 3) - 1;
     int y = 0;
-    x = x == 0 ? -1 : x == 1 ? 0 : 1;
+    //x = x == 0 ? -1 : x == 1 ? 0 : 1;
     // if x is 0, y cannot also be 0
     if (x == 0) {
         y = rand() % 2 == 0 ? -1 : 1;
@@ -393,7 +460,7 @@ static void try_entity_move_random(gamestate* const g, entityid id) {
     try_entity_move(g, id, x, y);
 }
 
-static inline void handle_attack_success_gamestate_flag(gamestate* const g, entitytype_t type, bool success) {
+static inline void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success) {
     //if (!success) {
     //    if (type == ENTITY_PLAYER)
     //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -411,7 +478,8 @@ static inline void handle_attack_success_gamestate_flag(gamestate* const g, enti
                                                   : g->flag;
 }
 
-static void handle_attack_success(gamestate* const g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
+//static void handle_attack_success(gamestate* const g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
+static void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
     massert(g, "gamestate is NULL");
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
@@ -487,7 +555,8 @@ static void handle_attack_success(gamestate* const g, entityid atk_id, entityid 
     //}
 }
 
-static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful) {
+//static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful) {
+static void handle_attack_blocked(shared_ptr<gamestate> g, entityid attacker_id, entityid target_id, bool* atk_successful) {
     massert(g, "gamestate is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(target_id != ENTITYID_INVALID, "target entity id is invalid");
@@ -504,7 +573,7 @@ static void handle_attack_blocked(gamestate* const g, entityid attacker_id, enti
     //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
 
-static bool handle_shield_check(gamestate* const g, entityid attacker_id, entityid target_id, int attack_roll, int base_ac, bool* attack_successful) {
+static bool handle_shield_check(shared_ptr<gamestate> g, entityid attacker_id, entityid target_id, int attack_roll, int base_ac, bool* attack_successful) {
     // if you have a shield at all, the attack will get auto-blocked
     entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
     if (shield_id != ENTITYID_INVALID) {
@@ -523,7 +592,7 @@ static bool handle_shield_check(gamestate* const g, entityid attacker_id, entity
 }
 
 //static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entityid attacker_id, bool* attack_successful) {
-static inline bool handle_attack_helper_innerloop(gamestate* const g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful) {
+static inline bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(i >= 0, "i is out of bounds");
@@ -552,7 +621,7 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, shared_ptr
 }
 
 //static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid attacker_id, bool* successful) {
-static void handle_attack_helper(gamestate* const g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful) {
+static void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
@@ -563,11 +632,12 @@ static void handle_attack_helper(gamestate* const g, shared_ptr<tile_t> tile, en
     }
 }
 
-static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, int tgt_y) {
+static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
     massert(!g_is_dead(g, atk_id), "attacker entity is dead");
     vec3 loc = g_get_location(g, atk_id);
-    dungeon_floor_t* const floor = d_get_floor(g->d, loc.z);
+    //dungeon_floor_t* const floor = d_get_floor(g->dungeon, loc.z);
+    shared_ptr<dungeon_floor_t> floor = d_get_floor(g->dungeon, loc.z);
     massert(floor, "failed to get dungeon floor");
     //tile_t* const tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
     shared_ptr<tile_t> tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
@@ -584,7 +654,7 @@ static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, in
     handle_attack_success_gamestate_flag(g, g_get_type(g, atk_id), ok);
 }
 
-static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
+static bool entities_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1) {
     massert(g, "gamestate is NULL");
     massert(id0 != ENTITYID_INVALID, "id0 is invalid");
     massert(id1 != ENTITYID_INVALID, "id1 is invalid");
@@ -601,14 +671,14 @@ static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1) {
     return false;
 }
 
-static void try_entity_wait(gamestate* const g, entityid id) {
+static void try_entity_wait(shared_ptr<gamestate> g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     g_set_update(g, id, true);
 }
 
-static void execute_action(gamestate* const g, entityid id, entity_action_t action) {
+static void execute_action(shared_ptr<gamestate> g, entityid id, entity_action_t action) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     switch (action) {
@@ -654,7 +724,8 @@ static void execute_action(gamestate* const g, entityid id, entity_action_t acti
     }
 }
 
-static vec3* get_locs_around_entity(gamestate* const g, entityid id) {
+//static vec3* get_locs_around_entity(gamestate* const g, entityid id) {
+static vec3* get_locs_around_entity(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     //vec3* locs = malloc(sizeof(vec3) * 8);
     vec3* locs = (vec3*)malloc(sizeof(vec3) * 8);
@@ -672,33 +743,31 @@ static vec3* get_locs_around_entity(gamestate* const g, entityid id) {
 }
 
 //static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id) {
-static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(gamestate* const g, entityid id) {
-    massert(g, "gamestate is NULL");
-    vec3* locs = get_locs_around_entity(g, id);
-    massert(locs, "locs is NULL");
-    bool found = false;
-
-    //tile_t* tile = NULL;
-    shared_ptr<tile_t> tile = nullptr;
-
-    for (int i = 0; i < 8; i++) {
-        vec3 loc = g_get_location(g, id);
-        //tile = df_tile_at(g->d->floors[loc.z], locs[i].x, locs[i].y);
-        tile = df_tile_at(g->d->floors[loc.z], locs[i]);
-        if (!tile) continue;
-        if (!tile_is_walkable(tile->type)) continue;
-        if (tile_entity_count(tile) > 0) continue;
-        // found an empty tile
-        found = true;
-        break;
-    }
-    free(locs);
-    if (!found) {
-        merror("no empty tile found");
-        return NULL;
-    }
-    return tile;
-}
+//static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    vec3* locs = get_locs_around_entity(g, id);
+//    massert(locs, "locs is NULL");
+//    bool found = false;
+//    //tile_t* tile = NULL;
+//    shared_ptr<tile_t> tile = nullptr;
+//    for (int i = 0; i < 8; i++) {
+//        vec3 loc = g_get_location(g, id);
+//        //tile = df_tile_at(g->d->floors[loc.z], locs[i].x, locs[i].y);
+//        tile = df_tile_at(g->d->floors[loc.z], locs[i]);
+//        if (!tile) continue;
+//        if (!tile_is_walkable(tile->type)) continue;
+//        if (tile_entity_count(tile) > 0) continue;
+//        // found an empty tile
+//        found = true;
+//        break;
+//    }
+//    free(locs);
+//    if (!found) {
+//        merror("no empty tile found");
+//        return NULL;
+//    }
+//    return tile;
+//}
 
 //static vec3 get_random_empty_non_wall_loc_in_area(gamestate* const g, int z, int x, int y, int w, int h) {
 //    massert(g, "gamestate is NULL");
@@ -736,34 +805,39 @@ static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(gamestate* c
 //        g, floor, 0, 0, g->d->floors[floor]->width, g->d->floors[floor]->height);
 //}
 
-static vec3 get_random_available_loc(gamestate* const g, int floor) {
+//static vec3 get_random_available_loc(gamestate* const g, int floor) {
+static vec3 get_random_available_loc(shared_ptr<gamestate> g, int floor) {
     massert(g, "gamestate is NULL");
     massert(floor >= 0, "floor is out of bounds");
     massert(floor < g->d->num_floors, "floor is out of bounds");
-    return get_random_available_loc_in_area(g, floor, 0, 0, g->d->floors[floor]->width, g->d->floors[floor]->height);
+
+    int w = g->dungeon->floors->at(floor)->width;
+    int h = g->dungeon->floors->at(floor)->height;
+
+    return get_random_available_loc_in_area(g, floor, 0, 0, w, h);
 }
 
 static void init_dungeon(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    g->d = d_create();
+    g->dungeon = d_create();
     massert(g->d, "failed to init dungeon");
     int df_count = 20;
     for (int i = 0; i < df_count; i++) {
-        d_add_floor(g->d, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+        d_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     }
 }
 
 //static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name) {
-static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name) {
-    printf("begin npc_create...\n");
+//static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name) {
+static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
     massert(g, "gamestate is NULL");
     //massert(name && name[0], "name is NULL or empty");
     //massert(rt >= 0, "race_type is out of bounds: %s: %d", name, rt);
     //massert(rt < RACE_COUNT, "race_type is out of bounds: %s: %d", name, rt);
     //massert(loc.z >= 0, "z is out of bounds: %s: %d", name, loc.z);
     //massert(loc.z < g->d->num_floors, "z is out of bounds: %s: %d", name, loc.z);
-    printf("calling d_get_floor...\n");
-    dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
+    //dungeon_floor_t* const df = d_get_floor(g->dungeon, loc.z);
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     //massert(df, "failed to get current dungeon floor");
     //massert(loc.x >= 0, "x is out of bounds: %s: %d", name, loc.x);
     //massert(loc.x < df->width, "x is out of bounds: %s: %d", name, loc.x);
@@ -938,7 +1012,8 @@ static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, con
 //    return total_light_radius_bonus;
 //}
 
-static void update_player_tiles_explored(gamestate* const g) {
+//static void update_player_tiles_explored(gamestate* const g) {
+static void update_player_tiles_explored(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     entityid hero_id = g->hero_id;
     massert(hero_id != ENTITYID_INVALID, "hero id is invalid");
@@ -1052,7 +1127,8 @@ static void init_player(gamestate* const g) {
 //    return locs;
 //}
 
-static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
+//static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
+static vec3* get_available_locs_in_area(shared_ptr<gamestate> g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
     massert(df, "dungeon floor is NULL");
     massert(count, "count is NULL");
     int c = df_count_non_walls_in_area(df, x0, y0, w, h);
@@ -2009,121 +2085,17 @@ static void update_debug_panel_buffer(gamestate* const g) {
              is_b,
              test_guard,
              inventory_sort_menu_selection);
-    //e->block_success);
 }
 
-void liblogic_init(gamestate* const g) {
+void liblogic_init(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     srand(time(NULL));
-    printf("calling init_dungeon(g)...\n");
     init_dungeon(g);
     g->msg_system.count = 0;
     g->msg_system.index = 0;
     g->msg_system.is_active = false;
-    //gamestate_load_keybindings(g);
-    printf("calling init_player(g)...\n");
     init_player(g);
-    //minfo("player initialized");
-    // test to create a weapon
-    //init_weapon_test(g);
-    //init_weapon_test2(g);
-    //init_shield_test2(g);
-    //init_potion_test(g, POTION_HP_SMALL, "small healing potion");
-    //init_potion_test(g, POTION_HP_MEDIUM, "medium healing potion");
-    //init_potion_test(g, POTION_HP_LARGE, "large healing potion");
-    //init_npcs_test_by_room(g);
-    //init_npc_test(g);
-    //init_sword_test(g);
-    //init_dagger_test(g);
-    //init_axe_test(g);
-    //init_bow_test(g);
-    //init_shield_test(g);
-    //init_ring_test(g);
-    //init_wand_test(g);
-    //init_potion_test(g);
-    //update_debug_panel_buffer(g);
-    //strncpy(g->chara_creation.name, "Hero", sizeof(g->chara_creation.name) - 1);
-    //g->chara_creation.race = RACE_HUMAN;
-    //g->chara_creation.strength = 10;
-    //g->chara_creation.dexterity = 10;
-    //g->chara_creation.constitution = 10;
-    //g->chara_creation.hitdie = 8;
 }
-
-//static void init_npc_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    int count = 0;
-//    int max = 1;
-//    while (count < max) {
-//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-//        entityid id = npc_create(g, RACE_ORC, loc, "orc");
-//        if (id != ENTITYID_INVALID) {
-//            g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-//            count++;
-//        }
-//    }
-//}
-
-//static void init_sword_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    entityid id = ENTITYID_INVALID;
-//    while (id == ENTITYID_INVALID) {
-//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-//        id = weapon_create(g, WEAPON_SWORD, loc, "dummy sword");
-//        g_set_damage(g, id, (vec3){1, 6, 0});
-//    }
-//}
-
-//static void init_dagger_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    entityid id = ENTITYID_INVALID;
-//    while (id == ENTITYID_INVALID) {
-//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-//        id = weapon_create(g, WEAPON_DAGGER, loc, "dagger");
-//        g_set_damage(g, id, (vec3){1, 4, 0});
-//    }
-//}
-
-//static void init_axe_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    entityid id = ENTITYID_INVALID;
-//    while (id == ENTITYID_INVALID) {
-//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-//        id = weapon_create(g, WEAPON_AXE, loc, "dummy axe");
-//        //g_set_damage(g, id, (roll){1, 8, 0});
-//        g_set_damage(g, id, (vec3){1, 8, 0});
-//    }
-//}
-
-//static void init_ring_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    entityid id = ENTITYID_INVALID;
-//    while (id == ENTITYID_INVALID) {
-//        int bonus = rand() % 4 + 1; // Random bonus between 1 and 4
-//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-//        id = ring_create(g, RING_GOLD, loc, TextFormat("light ring +%d", bonus));
-//        g_add_light_radius_bonus(g, id, bonus);
-//    }
-//}
-
-//static void init_bow_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    entityid id = ENTITYID_INVALID;
-//    while (id == ENTITYID_INVALID) {
-//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-//        id = weapon_create(g, WEAPON_BOW, loc, "dummy bow");
-//        g_set_damage(g, id, (roll){1, 6, 0});
-//    }
-//}
-
-//static void init_shield_test(gamestate* g) {
-//    massert(g, "gamestate is NULL");
-//    entityid id = ENTITYID_INVALID;
-//    while (id == ENTITYID_INVALID) {
-//        vec3 loc = get_random_empty_non_wall_loc(g, 0);
-//        id = shield_create(g, SHIELD_BUCKLER, loc, "dummy buckler");
-//    }
-//}
 
 static int get_hitdie_for_race(race_t race) {
     int hit_die = 4;

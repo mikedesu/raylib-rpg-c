@@ -2,8 +2,9 @@
 
 #include "dungeon_floor.h"
 #include "vec3.h"
-#include <math.h>
-#include <stdbool.h>
+#include <cmath>
+#include <memory>
+//#include <stdbool.h>
 
 typedef struct path_node_t {
     vec3 pos; // Position
@@ -13,10 +14,11 @@ typedef struct path_node_t {
     struct path_node_t* parent; // Parent node for reconstructing path
 } path_node;
 
+//bool is_position_walkable(vec3 pos, dungeon_floor_t* df);
+//vec3* find_path(vec3 start, vec3 end, dungeon_floor_t* df, int* path_length);
 path_node* create_path_node(vec3 position, path_node* parent, vec3 target);
-bool is_position_walkable(vec3 pos, dungeon_floor_t* df);
-vec3* find_path(vec3 start, vec3 end, dungeon_floor_t* df, int* path_length);
-
+bool is_position_walkable(vec3 pos, std::shared_ptr<dungeon_floor_t> df);
+vec3* find_path(vec3 start, vec3 end, std::shared_ptr<dungeon_floor_t> df, int* path_length);
 void get_neighbors(vec3 pos, vec3 neighbors[4]);
 
 // Calculate Manhattan distance (heuristic for A*)
