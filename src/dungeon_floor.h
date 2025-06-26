@@ -6,16 +6,28 @@
 #include "raylib.h"
 #include "room_data.h"
 #include "vec3.h"
-#include <stdbool.h>
+//#include <stdbool.h>
+#include "tile_id.h"
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
 #define DEFAULT_DUNGEON_FLOOR_WIDTH 256
 #define DEFAULT_DUNGEON_FLOOR_HEIGHT 256
 
 typedef struct {
-    tile_t** tiles;
+    //tile_id** tiles;
+    //tile_id** tiles;
+    std::shared_ptr<std::vector<tile_id>> tiles; // 2D vector of shared pointers to tile_t
+
+    //tile_t** tiles;
     int floor; // the floor number, starting from 0
     int width;
     int height;
+
+    // this will replace the tiles array
+    std::shared_ptr<std::unordered_map<tile_id, std::shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
+
     vec3 downstairs_loc;
     vec3 upstairs_loc;
 } dungeon_floor_t;
@@ -47,15 +59,34 @@ int df_count_non_walls(const dungeon_floor_t* const df);
 int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
 
-static inline tile_t* df_tile_at(const dungeon_floor_t* const df, vec3 loc) {
+//static inline tile_t* df_tile_at(const dungeon_floor_t* const df, vec3 loc) {
+static inline std::shared_ptr<tile_t> df_tile_at(const dungeon_floor_t* const df, vec3 loc) {
     massert(df, "df is NULL");
     if (loc.x < 0 || loc.x >= df->width || loc.y < 0 || loc.y >= df->height) {
         merror("x or y out of bounds: x: %d, y: %d", loc.x, loc.y);
         return NULL;
     }
-    tile_t* tile = &df->tiles[loc.y][loc.x];
-    massert(tile, "tile is NULL");
-    return tile;
+
+    // given that tiles is a 2D vector of shared pointers to tile_t
+    // we can access the tile using the x and y coordinates
+    // and calculate the index
+    int index = loc.y * df->width + loc.x;
+    if (index < 0 || index >= df->tiles->size()) {
+        merror("Index out of bounds: %d", index);
+        return NULL;
+    }
+    tile_id id = df->tiles->at(index);
+    // Check if the tile_id exists in the map
+    //auto it = df->tile_map.find(id);
+    //if (it != df->tile_map.end()) {
+    //    return it->second; // Return the shared pointer to tile_t
+    //}
+    auto it = df->tile_map->find(id);
+    if (it != df->tile_map->end()) {
+        return it->second; // Return the shared pointer to tile_t
+    }
+    merror("Tile not found at location (%d, %d)", loc.x, loc.y);
+    return NULL; // Tile not found
 }
 
 static inline tiletype_t df_type_at(const dungeon_floor_t* const df, const int x, const int y) {
@@ -64,11 +95,29 @@ static inline tiletype_t df_type_at(const dungeon_floor_t* const df, const int x
         merror("x or y out of bounds");
         return TILE_NONE;
     }
-    return df->tiles[y][x].type;
+    tile_id id = df->tiles->at(y * df->width + x);
+    //auto it = df->tile_map.find(id);
+    //if (it != df->tile_map.end()) {
+    //    return it->second->type; // Return the tile type
+    //}
+    auto it = df->tile_map->find(id);
+    if (it != df->tile_map->end()) {
+        return it->second->type; // Return the tile type
+    }
+
+    merror("Tile not found at (%d, %d)", x, y);
+    return TILE_NONE; // Tile not found
 }
 
 static inline bool df_tile_is_wall(const dungeon_floor_t* const df, int x, int y) {
     massert(df, "dungeon floor is NULL");
-    tile_t* tile = df_tile_at(df, (vec3){x, y, -1});
-    return tile_is_wall(tile->type);
+    //tile_t* tile = df_tile_at(df, (vec3){x, y, -1});
+    //return tile_is_wall(tile->type);
+
+    tiletype_t type = df_type_at(df, x, y);
+    if (type == TILE_NONE || type == TILE_COUNT) {
+        merror("Tile type is invalid at (%d, %d)", x, y);
+        return false;
+    }
+    return tile_is_wall(type);
 }

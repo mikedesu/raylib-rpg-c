@@ -20,21 +20,23 @@
 #include "potion.h"
 #include "race.h"
 #include "roll.h"
-#include "shield.h"
+//#include "shield.h"
 #include "stats_slot.h"
-#include <assert.h>
-#include <math.h>
+//#include <assert.h>
+#include <cassert>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
 #include <raylib.h>
-#include <stdlib.h>
-#include <string.h>
-#include <string>
+//#include <string>
 
 using namespace std;
 
 int liblogic_restart_count = 0;
 
 static inline bool is_traversable(gamestate* const g, int x, int y, int z);
-static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
+//static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id);
+static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(gamestate* const g, entityid id);
 static inline void reset_player_blocking(gamestate* const g);
 static inline void reset_player_block_success(gamestate* const g);
 static inline void update_npc_state(gamestate* const g, entityid id);
@@ -266,7 +268,8 @@ static inline int tile_npc_living_count(const gamestate* const g, int x, int y, 
     massert(z < g->d->num_floors, "floor is out of bounds");
     const dungeon_floor_t* const df = d_get_floor(g->d, z);
     massert(df, "failed to get dungeon floor");
-    const tile_t* const t = df_tile_at(df, (vec3){x, y, z});
+    //const tile_t* const t = df_tile_at(df, (vec3){x, y, z});
+    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
     massert(t, "failed to get tile");
     // Count living NPCs
     int count = 0;
@@ -295,7 +298,8 @@ static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
     dungeon_floor_t* const df = d_get_floor(g->d, z);
     if (!df) return;
     // i feel like this might be something we can set elsewhere...like after the player input phase?
-    tile_t* const tile = df_tile_at(df, (vec3){ex, ey, z});
+    //tile_t* const tile = df_tile_at(df, (vec3){ex, ey, z});
+    shared_ptr<tile_t> tile = df_tile_at(df, (vec3){ex, ey, z});
     if (!tile) return;
     if (!tile_is_walkable(tile->type)) return;
     //if (tile_has_closed_door(g, ex, ey, floor)) {
@@ -518,7 +522,8 @@ static bool handle_shield_check(gamestate* const g, entityid attacker_id, entity
     return true;
 }
 
-static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entityid attacker_id, bool* attack_successful) {
+//static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entityid attacker_id, bool* attack_successful) {
+static inline bool handle_attack_helper_innerloop(gamestate* const g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(i >= 0, "i is out of bounds");
@@ -546,7 +551,8 @@ static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* ti
     return false;
 }
 
-static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid attacker_id, bool* successful) {
+//static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid attacker_id, bool* successful) {
+static void handle_attack_helper(gamestate* const g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
@@ -563,7 +569,8 @@ static void try_entity_attack(gamestate* const g, entityid atk_id, int tgt_x, in
     vec3 loc = g_get_location(g, atk_id);
     dungeon_floor_t* const floor = d_get_floor(g->d, loc.z);
     massert(floor, "failed to get dungeon floor");
-    tile_t* const tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
+    //tile_t* const tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
+    shared_ptr<tile_t> tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
     if (!tile) return;
     // Calculate direction based on target position
     bool ok = false;
@@ -664,12 +671,16 @@ static vec3* get_locs_around_entity(gamestate* const g, entityid id) {
     return locs;
 }
 
-static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id) {
+//static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id) {
+static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(gamestate* const g, entityid id) {
     massert(g, "gamestate is NULL");
     vec3* locs = get_locs_around_entity(g, id);
     massert(locs, "locs is NULL");
     bool found = false;
-    tile_t* tile = NULL;
+
+    //tile_t* tile = NULL;
+    shared_ptr<tile_t> tile = nullptr;
+
     for (int i = 0; i < 8; i++) {
         vec3 loc = g_get_location(g, id);
         //tile = df_tile_at(g->d->floors[loc.z], locs[i].x, locs[i].y);
@@ -761,7 +772,8 @@ static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name)
     // can we create an entity at this location? no entities can be made on wall-types etc
 
     printf("calling df_tile_at...\n");
-    tile_t* const tile = df_tile_at(df, loc);
+    //tile_t* const tile = df_tile_at(df, loc);
+    shared_ptr<tile_t> tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
     printf("checking if tile is walkable and empty...\n");
     if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) return ENTITYID_INVALID;
@@ -837,7 +849,8 @@ static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const c
     massert(loc.x < df->width, "x is out of bounds: %s: %d", name, loc.x);
     massert(loc.y >= 0, "y is out of bounds: %s: %d", name, loc.y);
     massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
-    tile_t* const tile = df_tile_at(df, loc);
+    //tile_t* const tile = df_tile_at(df, loc);
+    shared_ptr<tile_t> tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
     //if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
     if (!tile_is_walkable(tile->type)) {
@@ -948,7 +961,8 @@ static void update_player_tiles_explored(gamestate* const g) {
                 vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
                 // Skip if out of bounds
                 if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 || loc2.y >= df->height) continue;
-                tile_t* tile = df_tile_at(df, loc2);
+                //tile_t* tile = df_tile_at(df, loc2);
+                shared_ptr<tile_t> tile = df_tile_at(df, loc2);
                 massert(tile, "failed to get tile at hero location");
                 tile->explored = true;
                 tile->visible = true;
@@ -1053,7 +1067,8 @@ static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* con
         for (int x = 0; x < w && x + x0 < df->width; x++) {
             int newx = x + x0;
             int newy = y + y0;
-            tile_t* t = df_tile_at(df, (vec3){newx, newy, df->floor});
+            //tile_t* t = df_tile_at(df, (vec3){newx, newy, df->floor});
+            shared_ptr<tile_t> t = df_tile_at(df, (vec3){newx, newy, df->floor});
             tiletype_t type = t->type;
             if (tile_live_npc_count(g, t) == 0 && !tile_has_player(g, t) && tile_is_walkable(type)) {
                 locs[i++] = (vec3){newx, newy, df->floor};
@@ -1327,7 +1342,8 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
             massert(df, "Dungeon floor is NULL!");
             vec3 loc_cast = {loc.x, loc.y, loc.z};
-            tile_t* const tile = df_tile_at(df, loc_cast);
+            //tile_t* const tile = df_tile_at(df, loc_cast);
+            shared_ptr<tile_t> tile = df_tile_at(df, loc_cast);
             massert(tile, "Tile is NULL!");
             if (!tile_add(tile, item_id)) return;
             // we also have to update the location of the item
@@ -1431,7 +1447,8 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         merror("Failed to get dungeon floor");
         return false;
     }
-    tile_t* const tile = df_tile_at(df, loc_cast);
+    //tile_t* const tile = df_tile_at(df, loc_cast);
+    shared_ptr<tile_t> tile = df_tile_at(df, loc_cast);
     if (!tile) {
         merror("Failed to get tile");
         return false;
@@ -1691,7 +1708,8 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
     vec3 loc_cast = {loc.x, loc.y, loc.z};
     dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
     massert(df, "Dungeon floor is NULL!");
-    tile_t* const tile = df_tile_at(df, loc_cast);
+    //tile_t* const tile = df_tile_at(df, loc_cast);
+    shared_ptr<tile_t> tile = df_tile_at(df, loc_cast);
     massert(tile, "Tile is NULL!");
     entitytype_t type = g_get_type(g, id);
     if (tile->type == TILE_UPSTAIRS) {
@@ -2397,7 +2415,8 @@ static inline bool is_traversable(gamestate* const g, int x, int y, int z) {
         return false;
     }
     // Get the current tile
-    tile_t* tile = df_tile_at(df, (vec3){x, y, z});
+    //tile_t* tile = df_tile_at(df, (vec3){x, y, z});
+    shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, z});
     massert(tile, "tile is NULL");
     // Check if the tile type is walkable
     if (!tile_is_walkable(tile->type)) return false;

@@ -1,6 +1,9 @@
 #include "path_node.h"
 #include "vec3.h"
-#include <stdlib.h>
+#include <cstdlib>
+#include <memory>
+
+using std::shared_ptr;
 
 path_node* create_path_node(vec3 position, path_node* parent, vec3 target) {
     path_node* node = (path_node*)malloc(sizeof(path_node));
@@ -56,7 +59,9 @@ bool is_position_walkable(vec3 pos, dungeon_floor_t* df) {
     }
 
     // Get the tile at the position and check if walkable
-    tile_t* t = df_tile_at(df, pos);
+    //tile_t* t = df_tile_at(df, pos);
+    shared_ptr<tile_t> t = df_tile_at(df, pos);
+
     return tile_is_walkable(t->type);
 }
 

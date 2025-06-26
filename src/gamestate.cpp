@@ -15,13 +15,20 @@
 #include "shield.h"
 #include "weapon.h"
 #include <raylib.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+//#include <stdbool.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <memory>
 #include <string>
+#include <unordered_map>
+//#include <vector>
 
+using std::shared_ptr;
 using std::string;
+using std::unordered_map;
+//using std::vector;
 
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
@@ -880,7 +887,9 @@ bool g_add_dead(gamestate* const g, entityid id, int dead) {
         dungeon_floor_t* df = d_get_floor(g->d, loc.z);
         if (df) {
             vec3 loc_cast = {loc.x, loc.y, loc.z};
-            tile_t* tile = df_tile_at(df, loc_cast);
+            //tile_t* tile = df_tile_at(df, loc_cast);
+            shared_ptr<tile_t> tile = df_tile_at(df, loc_cast);
+
             if (tile) tile->dirty_entities = true;
         }
     }

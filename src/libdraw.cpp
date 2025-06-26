@@ -22,9 +22,15 @@
 #include "textureinfo.h"
 #include "tx_keys.h"
 #include "weapon.h"
+#include <cstdlib>
+#include <memory>
 #include <raylib.h>
-#include <stdlib.h>
 #include <sys/param.h>
+//#include <unordered_map>
+//#include <vector>
+
+using std::shared_ptr;
+
 //#include "component.h"
 //#include "inventory_sort.h"
 
@@ -134,7 +140,8 @@ static bool draw_dungeon_floor_tile(const gamestate* const g, int x, int y, int 
     massert(x < df->width, "x is out of bounds");
     massert(y < df->height, "y is out of bounds");
     massert(df, "dungeon_floor is NULL");
-    tile_t* tile = df_tile_at(df, (vec3){x, y, z});
+    //tile_t* tile = df_tile_at(df, (vec3){x, y, z});
+    shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, z});
     massert(tile, "tile is NULL");
     if (tile->type == TILE_NONE || !tile->visible) {
         return true;
@@ -360,7 +367,8 @@ static bool draw_entities_2d_at(const gamestate* const g, dungeon_floor_t* const
     massert(loc.x < df->width, "draw_entities_2d: x is out of bounds");
     massert(loc.y >= 0, "draw_entities_2d: y is out of bounds");
     massert(loc.y < df->height, "draw_entities_2d: y is out of bounds");
-    tile_t* tile = df_tile_at(df, loc);
+    //tile_t* tile = df_tile_at(df, loc);
+    shared_ptr<tile_t> tile = df_tile_at(df, loc);
     if (!tile) return false;
     if (tile_is_wall(tile->type)) return false;
     if (!tile->visible) return true; // Do not draw entities on invisible tiles
