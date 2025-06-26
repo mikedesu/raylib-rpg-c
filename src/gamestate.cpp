@@ -256,7 +256,8 @@ gamestate* gamestateinitptr() {
     massert(g->explored_list, "g->explored_list is NULL");
     massert(g->visible_list, "g->visible_list is NULL");
 
-    g->d = NULL;
+    //g->d = NULL;
+    g->dungeon = nullptr;
     g->monster_defs = NULL;
 
     gamestate_init_music_paths(g);
@@ -884,7 +885,8 @@ bool g_add_dead(gamestate* const g, entityid id, int dead) {
     // If entity died and has a location, mark its tile as dirty
     if (dead && g_has_location(g, id)) {
         vec3 loc = g_get_location(g, id);
-        dungeon_floor_t* df = d_get_floor(g->d, loc.z);
+        //dungeon_floor_t* df = d_get_floor(g->d, loc.z);
+        shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
         if (df) {
             vec3 loc_cast = {loc.x, loc.y, loc.z};
             //tile_t* tile = df_tile_at(df, loc_cast);
@@ -1483,9 +1485,10 @@ bool g_is_equipped(const gamestate* const g, entityid id, entityid itemid) {
     return false;
 }
 
-dungeon_t* g_get_dungeon(gamestate* const g) {
+//dungeon_t* g_get_dungeon(gamestate* const g) {
+shared_ptr<dungeon_t> g_get_dungeon(gamestate* const g) {
     massert(g, "g is NULL");
-    return g->d;
+    return g->dungeon;
 }
 
 bool g_add_stats(gamestate* const g, entityid id) {

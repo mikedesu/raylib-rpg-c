@@ -60,7 +60,8 @@ int df_center_x(const dungeon_floor_t* const df);
 int df_center_y(const dungeon_floor_t* const df);
 
 //static inline tile_t* df_tile_at(const dungeon_floor_t* const df, vec3 loc) {
-static inline std::shared_ptr<tile_t> df_tile_at(const dungeon_floor_t* const df, vec3 loc) {
+//static inline std::shared_ptr<tile_t> df_tile_at(const dungeon_floor_t* const df, vec3 loc) {
+static inline std::shared_ptr<tile_t> df_tile_at(std::shared_ptr<dungeon_floor_t> df, vec3 loc) {
     massert(df, "df is NULL");
     if (loc.x < 0 || loc.x >= df->width || loc.y < 0 || loc.y >= df->height) {
         merror("x or y out of bounds: x: %d, y: %d", loc.x, loc.y);

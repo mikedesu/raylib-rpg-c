@@ -247,7 +247,8 @@ typedef struct gamestate {
     Font font;
     float line_spacing;
 
-    dungeon_t* d;
+    //dungeon_t* d;
+    std::shared_ptr<dungeon_t> dungeon;
 
     double last_frame_time;
     char frame_time_str[32];
@@ -294,7 +295,7 @@ typedef struct gamestate {
 
 gamestate* gamestateinitptr();
 
-dungeon_t* g_get_dungeon(gamestate* const g);
+shared_ptr<dungeon_t> g_get_dungeon(gamestate* const g);
 
 entityid gamestate_get_hero_id(const gamestate* const g);
 
@@ -316,14 +317,7 @@ bool g_has_component(const gamestate* const g, entityid id, component comp);
 bool g_register_comp(gamestate* const g, entityid id, component comp);
 //bool g_register_comps(gamestate* const g, entityid id, ...);
 
-bool g_add_component(gamestate* const g,
-                     entityid id,
-                     component comp,
-                     void* data,
-                     size_t component_size,
-                     void** component_list,
-                     int* component_count,
-                     int* component_capacity);
+bool g_add_component(gamestate* const g, entityid id, component comp, void* data, size_t component_size, void** component_list, int* component_count, int* component_capacity);
 
 bool g_add_component2(gamestate* const g, entityid id, component comp);
 
