@@ -2160,9 +2160,31 @@ static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     if (g->current_scene == SCENE_TITLE) {
         //if (inputstate_any_pressed(is)) {
         if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
-            //minfo("Title screen input detected, switching to main menu");
+            minfo("Title screen input detected, switching to main menu");
             g->current_scene = SCENE_MAIN_MENU;
             g->frame_dirty = true;
+        }
+    } else if (g->current_scene == SCENE_MAIN_MENU) {
+        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+            if (g->title_screen_selection == 0) {
+                minfo("Switching to character creation scene");
+                g->current_scene = SCENE_CHARACTER_CREATION;
+                g->frame_dirty = true;
+            }
+        } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+            minfo("Title screen selection++");
+            g->title_screen_selection++;
+            if (g->title_screen_selection >= g->max_title_screen_selections) {
+                g->title_screen_selection = 0;
+            }
+        } else if (inputstate_is_pressed(is, KEY_UP)) {
+            minfo("Title screen selection--");
+            g->title_screen_selection--;
+            if (g->title_screen_selection < 0) {
+                g->title_screen_selection = g->max_title_screen_selections - 1;
+            }
+        } else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+            g->do_quit = true;
         }
     }
 

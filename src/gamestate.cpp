@@ -74,14 +74,8 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->currenttimetm = localtime(&(g->currenttime));
     bzero(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
     bzero(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
-    strftime(g->timebeganbuf,
-             GAMESTATE_SIZEOFTIMEBUF,
-             "Start Time: %Y-%m-%d %H:%M:%S",
-             g->timebegantm);
-    strftime(g->currenttimebuf,
-             GAMESTATE_SIZEOFTIMEBUF,
-             "Current Time: %Y-%m-%d %H:%M:%S",
-             g->currenttimetm);
+    strftime(g->timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", g->timebegantm);
+    strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
     g->debugpanelon = false;
     g->player_input_received = false;
     g->is_locked = false;
@@ -123,7 +117,10 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->total_music_paths = 0;
     g->restart_count = 0;
     g->do_restart = 0;
+
     g->title_screen_selection = 0;
+    g->max_title_screen_selections = 2;
+
     g->monster_def_count = 0;
     g->monster_def_capacity = 0;
     g->lock = 0;
@@ -144,7 +141,6 @@ shared_ptr<gamestate> gamestateinitptr() {
     gamestate_init_msg_history(g);
     g->msg_history = new vector<string>();
 
-    g->max_title_screen_selections = 3;
 
     g->chara_creation.name = "hero";
     g->chara_creation.strength = 10;
@@ -175,8 +171,7 @@ static void gamestate_load_monster_defs(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
     const char* monster_defs_file = "monsters.csv";
     FILE* file = fopen(monster_defs_file, "r");
-    massert(
-        file, "Could not open monster definitions file: %s", monster_defs_file);
+    massert(file, "Could not open monster definitions file: %s", monster_defs_file);
     char buffer[1024] = {0};
     // read the file line by line
     // only skip lines beginning with a #
@@ -211,18 +206,7 @@ static void gamestate_load_monster_defs(shared_ptr<gamestate> g) {
         // hd_num hd_sides hd_mod ac st dx cn nt ws ch
         int hd_num, hd_sides, hd_mod, ac, st, dx, cn, nt, ws, ch;
         const char* format = "%d %d %d %d %d %d %d %d %d %d";
-        fscanf(file,
-               format,
-               &hd_num,
-               &hd_sides,
-               &hd_mod,
-               &ac,
-               &st,
-               &dx,
-               &cn,
-               &nt,
-               &ws,
-               &ch);
+        fscanf(file, format, &hd_num, &hd_sides, &hd_mod, &ac, &st, &dx, &cn, &nt, &ws, &ch);
         def->hitdie = (vec3){hd_num, hd_sides, hd_mod};
         def->stats[STATS_AC] = ac;
         def->stats[STATS_STR] = st;
@@ -268,12 +252,8 @@ static void gamestate_init_music_paths(shared_ptr<gamestate> g) {
         // copy into g->music_file_paths[i]
         // we have to add "audio/music/" to the beginning of the path
         if (i < 1024) {
-            snprintf(g->music_file_paths[i],
-                     sizeof(g->music_file_paths[i]),
-                     "%s",
-                     buffer);
-            g->music_file_paths[i][sizeof(g->music_file_paths[i]) - 1] =
-                '\0'; // Ensure null termination
+            snprintf(g->music_file_paths[i], sizeof(g->music_file_paths[i]), "%s", buffer);
+            g->music_file_paths[i][sizeof(g->music_file_paths[i]) - 1] = '\0'; // Ensure null termination
             i++;
         } else {
             merror("Too many music paths in %s", music_path_file);
@@ -414,8 +394,7 @@ void gamestate_set_debug_panel_pos_bottom_left(gamestate* const g) {
 void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
     massert(g, "g is NULL");
     if (g->windowwidth == -1 || g->windowheight == -1) return;
-    g->debugpanel.x = g->windowwidth - g->debugpanel.w,
-    g->debugpanel.y = g->debugpanel.pad_right;
+    g->debugpanel.x = g->windowwidth - g->debugpanel.w, g->debugpanel.y = g->debugpanel.pad_right;
 }
 
 
@@ -428,24 +407,19 @@ bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp) {
         if (g->component_table->find(id) == g->component_table->end()) {
             (*g->component_table)[id] = 0; // Initialize with 0 components
         }
-        (*g->component_table)[id] |=
-            (1 << comp); // Set the bit for the component
+        (*g->component_table)[id] |= (1 << comp); // Set the bit for the component
     }
     // Check if the component was successfully registered
     if (g_has_comp(g, id, comp)) {
         minfo("Component %s registered for entity %d", component2str(comp), id);
         return true;
     }
-    merror("Failed to register component %s for entity %d",
-           component2str(comp),
-           id);
+    merror("Failed to register component %s for entity %d", component2str(comp), id);
     return false;
 }
 
 
-bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp) {
-    return g_register_comp(g, id, comp);
-}
+bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp) { return g_register_comp(g, id, comp); }
 
 
 bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp) {
@@ -469,9 +443,7 @@ bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp) {
 }
 
 
-bool g_has_name(shared_ptr<gamestate> g, entityid id) {
-    return g_has_comp(g, id, C_NAME);
-}
+bool g_has_name(shared_ptr<gamestate> g, entityid id) { return g_has_comp(g, id, C_NAME); }
 
 
 bool g_add_name(shared_ptr<gamestate> g, entityid id, string name) {
@@ -497,9 +469,7 @@ string g_get_name(shared_ptr<gamestate> g, entityid id) {
     }
     if (g->name_list) {
         // we can assume that the id is in the name_list
-        massert(g->name_list->find(id) != g->name_list->end(),
-                "g_get_name: id %d not found in name_list",
-                id);
+        massert(g->name_list->find(id) != g->name_list->end(), "g_get_name: id %d not found in name_list", id);
         return g->name_list->at(id);
     }
     return "no-name"; // Return an empty string if the id is not found
@@ -527,9 +497,7 @@ entitytype_t g_get_type(shared_ptr<gamestate> g, entityid id) {
         return ENTITY_NONE; // Return ENTITY_NONE if the type component is not present
     }
     if (g->type_list) {
-        massert(g->type_list->find(id) != g->type_list->end(),
-                "g_get_type: id %d not found in type_list",
-                id);
+        massert(g->type_list->find(id) != g->type_list->end(), "g_get_type: id %d not found in type_list", id);
         return g->type_list->at(id);
     }
     return ENTITY_NONE; // Return ENTITY_NONE if the id is not found
