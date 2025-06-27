@@ -903,13 +903,17 @@ static void draw_debug_panel(shared_ptr<gamestate> g) {
     //int h = DEFAULT_TARGET_HEIGHT;
     int x = 0;
     int y = 0;
-    int fontsize = 10;
-    int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
-    int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
+    int fontsize = 20;
+    //int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
+    //int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
     //int x1 = g->debugpanel.x + g->debugpanel.pad_left;
     //int y1 = g->debugpanel.y + g->debugpanel.pad_top;
     //DrawRectangle(g->debugpanel.x, g->debugpanel.y, w0, h0, bg);
-    DrawRectangle(x, y, w0, h0, bg);
+
+    int w = MeasureText(g->debugpanel.buffer, fontsize);
+    int h = fontsize * 22; // Assuming single line text for now
+
+    DrawRectangle(x, y, w, h, bg);
     //DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
     DrawText(g->debugpanel.buffer, x, y, fontsize, fg);
 }
@@ -1156,10 +1160,9 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
             draw_title_screen_to_texture(g, true);
         } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
             draw_character_creation_screen_to_texture(g);
+        } else if (g->current_scene == SCENE_GAMEPLAY) {
+            //    libdraw_drawframe_2d_to_texture(g);
         }
-        //else if (g->current_scene == SCENE_GAMEPLAY) {
-        //    libdraw_drawframe_2d_to_texture(g);
-        //}
         g->frame_dirty = false;
         g->frame_updates++;
     }
@@ -1177,6 +1180,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     //else if (g->current_scene == SCENE_GAMEPLAY) {
     //    libdraw_drawframe_2d_from_texture(g);
     //}
+    handle_debug_panel(g);
     EndTextureMode();
     // draw the target texture to the window
     win_dest.width = GetScreenWidth();
