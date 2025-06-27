@@ -153,7 +153,7 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 //static void update_player_state(gamestate* const g);
 //static void update_player_state(shared_ptr<gamestate> g);
 //static void update_debug_panel_buffer(gamestate* const g);
-//static void update_debug_panel_buffer(shared_ptr<gamestate> g);
+static void update_debug_panel_buffer(shared_ptr<gamestate> g);
 //static void handle_camera_move(gamestate* const g, const inputstate* const is);
 //static void handle_camera_move(shared_ptr<gamestate> g,
 //                               shared_ptr<inputstate> is);
@@ -2156,6 +2156,12 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
 static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "inputstate is NULL");
     massert(g, "gamestate is NULL");
+    // no matter which mode we are in, we can toggle the debug panel
+    if (inputstate_is_pressed(is, KEY_P)) {
+        g->debugpanelon = !g->debugpanelon;
+        minfo("Toggling debug panel: %s", g->debugpanelon ? "ON" : "OFF");
+        return;
+    }
 
     if (g->current_scene == SCENE_TITLE) {
         //if (inputstate_any_pressed(is)) {
@@ -2186,14 +2192,35 @@ static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
         } else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
             g->do_quit = true;
         }
+    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+        if (inputstate_is_pressed(is, KEY_ENTER)) {
+            minfo("Character creation confirmed");
+            // we need to copy the character creation stats to the hero entity
+            // hero has already been created, so its id is available
+            //g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
+            //g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
+            //g_set_stat(g, g->hero_id, STATS_CON, g->chara_creation.constitution);
+            int hitdie = 8;
+            int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
+            //bonus_calc(g->chara_creation.constitution);
+            while (maxhp_roll < 1) {
+                maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
+                //bonus_calc(g->chara_creation.constitution);
+            }
+            //g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
+            //g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
+            g->current_scene = SCENE_GAMEPLAY;
+            g->frame_dirty = true;
+        } else if (inputstate_is_pressed(is, KEY_SPACE)) {
+            // re-roll character creation stats
+            minfo("Re-rolling character creation stats");
+            g->frame_dirty = true;
+            g->chara_creation->strength = do_roll_best_of_3((vec3){3, 6, 0});
+            g->chara_creation->dexterity = do_roll_best_of_3((vec3){3, 6, 0});
+            g->chara_creation->constitution = do_roll_best_of_3((vec3){3, 6, 0});
+        }
     }
 
-
-    // no matter which mode we are in, we can toggle the debug panel
-    //if (inputstate_is_pressed(is, KEY_P)) {
-    //    g->debugpanelon = !g->debugpanelon;
-    //    return;
-    //}
 
     //if (g->display_quit_menu) {
     //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
@@ -2325,8 +2352,7 @@ static void handle_input_help_menu(const inputstate* const is,
 }
 */
 
-/*
-static void update_debug_panel_buffer(gamestate* const g) {
+static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     // Static buffers to avoid reallocating every frame
     //static const char* control_modes[] = {"Player", "Camera", "Unknown"};
@@ -2348,12 +2374,12 @@ static void update_debug_panel_buffer(gamestate* const g) {
     direction_t shield_dir = DIR_NONE;
     bool is_b = false;
     bool test_guard = g->test_guard;
-    vec3 loc = g_get_location(g, g->hero_id);
-    x = loc.x;
-    y = loc.y;
-    z = loc.z;
+    //vec3 loc = g_get_location(g, g->hero_id);
+    //x = loc.x;
+    //y = loc.y;
+    //z = loc.z;
 
-    int inventory_sort_menu_selection = g->sort_inventory_menu_selection;
+    //int inventory_sort_menu_selection = g->sort_inventory_menu_selection;
 
     //if (e) {
     //    vec3 loc = g_get_location(g, e->id);
@@ -2371,14 +2397,8 @@ static void update_debug_panel_buffer(gamestate* const g) {
     //    is_b = g_get_blocking(g, e->id);
     //}
     // Determine control mode and flag strings
-    const char* control_mode =
-        control_modes[(g->controlmode >= 0 && g->controlmode < 2)
-                          ? g->controlmode
-                          : 2];
-    const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE &&
-                                        g->flag < GAMESTATE_FLAG_COUNT)
-                                           ? g->flag
-                                           : GAMESTATE_FLAG_COUNT];
+    const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
+    const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
     // zero out the buffer
     memset(g->debugpanel.buffer, 0, sizeof(g->debugpanel.buffer));
     // Format the string in one pass
@@ -2415,8 +2435,8 @@ static void update_debug_panel_buffer(gamestate* const g) {
              g->cam2d.offset.y,
              g->cam2d.zoom,
              control_mode,
-             g->d->current_floor + 1, // More user-friendly 1-based
-             g->d->num_floors,
+             0, //g->d->current_floor + 1, // More user-friendly 1-based
+             0, //g->d->num_floors,
              g->next_entityid,
              flag_name,
              g->entity_turn,
@@ -2424,13 +2444,14 @@ static void update_debug_panel_buffer(gamestate* const g) {
              y,
              z,
              inventory_count,
-             g->msg_history.count,
+             0, //g->msg_history.count,
              get_dir_as_string(shield_dir),
              get_dir_as_string(player_dir),
              is_b,
              test_guard,
-             inventory_sort_menu_selection);
+             0);
 }
+/*
 */
 
 void liblogic_init(shared_ptr<gamestate> g) {
@@ -2757,7 +2778,7 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     //if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
     //    handle_npcs(g);
     //}
-    //update_debug_panel_buffer(g);
+    update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);

@@ -142,12 +142,15 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->msg_history = new vector<string>();
 
 
-    g->chara_creation.name = "hero";
-    g->chara_creation.strength = 10;
-    g->chara_creation.dexterity = 10;
-    g->chara_creation.constitution = 10;
-    g->chara_creation.hitdie = 6; // 1d6 hit die
-    g->chara_creation.race = RACE_HUMAN;
+    // initialize character creation
+    g->chara_creation = make_shared<character_creation>();
+
+    g->chara_creation->name = "hero";
+    g->chara_creation->strength = 10;
+    g->chara_creation->dexterity = 10;
+    g->chara_creation->constitution = 10;
+    g->chara_creation->hitdie = 6; // 1d6 hit die
+    g->chara_creation->race = RACE_HUMAN;
     // why is the above line crashing?
     // the above line is also crashing
     msuccess("Gamestate character creation name set to empty string");
@@ -279,6 +282,14 @@ bool gamestate_init_msg_history(shared_ptr<gamestate> g) {
 
 void gamestate_free(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
+    minfo("Freeing gamestate");
+
+    //if (g->chara_creation) {
+    //    g->chara_creation->name.clear(); // Clear the name string
+    //    g->chara_creation.reset(); // Reset the shared pointer
+    //    g->chara_creation = nullptr; // Set to nullptr
+    //}
+
     // free message history
     if (!g->msg_history) {
         g->msg_history->clear();

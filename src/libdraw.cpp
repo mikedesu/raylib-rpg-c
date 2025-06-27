@@ -68,7 +68,7 @@ static int get_total_ac(shared_ptr<gamestate> g, entityid id);
 
 static inline bool libdraw_camera_lock_on(shared_ptr<gamestate> g);
 static inline void update_debug_panel(shared_ptr<gamestate> g);
-//static inline void handle_debug_panel(shared_ptr<gamestate> g);
+static inline void handle_debug_panel(shared_ptr<gamestate> g);
 
 static void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
@@ -78,59 +78,31 @@ static void draw_help_menu(shared_ptr<gamestate> g);
 static void draw_gameover_menu(shared_ptr<gamestate> g);
 static void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id);
 static void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g);
-static void draw_weapon_sprite_front(shared_ptr<gamestate> g,
-                                     entityid id,
-                                     spritegroup_t* sg);
-static void draw_weapon_sprite_back(shared_ptr<gamestate> g,
-                                    entityid id,
-                                    spritegroup_t* sg);
-static void draw_shield_sprite_front(shared_ptr<gamestate> g,
-                                     entityid id,
-                                     spritegroup_t* sg);
-static void draw_shield_sprite_back(shared_ptr<gamestate> g,
-                                    entityid id,
-                                    spritegroup_t* sg);
-static void update_weapon_for_entity(shared_ptr<gamestate> g,
-                                     entityid id,
-                                     spritegroup_t* sg);
+static void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_inventory_menu(shared_ptr<gamestate> g);
 static void draw_hud(shared_ptr<gamestate> g);
 static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu);
-static void draw_title_screen_to_texture(shared_ptr<gamestate> g,
-                                         bool show_menu);
+static void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
 static void draw_title_screen_from_texture(shared_ptr<gamestate> g);
 static void draw_character_creation_screen(shared_ptr<gamestate> g);
-static void
-draw_character_creation_screen_from_texture(shared_ptr<gamestate> g);
+static void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g);
 static void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
-static void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g,
-                                      entityid id,
-                                      spritegroup_t* const sg);
-static void libdraw_set_sg_is_dead(shared_ptr<gamestate> g,
-                                   entityid id,
-                                   spritegroup_t* const sg);
-static void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g,
-                                        entityid id,
-                                        spritegroup_t* const sg);
-static void libdraw_set_sg_block_success(shared_ptr<gamestate> g,
-                                         entityid id,
-                                         spritegroup_t* const sg);
+static void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+static void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+static void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+static void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
 static void load_shaders();
 static void libdraw_unload_shaders();
 static void load_textures();
 static void libdraw_unload_textures();
-static void libdraw_update_sprite_attack(shared_ptr<gamestate> g,
-                                         entityid id,
-                                         spritegroup_t* sg);
-static void libdraw_update_sprite_position(shared_ptr<gamestate> g,
-                                           entityid id,
-                                           spritegroup_t* sg);
-static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g,
-                                              spritegroup_t* group,
-                                              direction_t dir);
-static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g,
-                                      entityid id,
-                                      spritegroup_t* sg);
+static void libdraw_update_sprite_attack(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
+static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_message_history(shared_ptr<gamestate> g);
 static void draw_message_box(gamestate* g);
 static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id);
@@ -138,45 +110,27 @@ static void draw_debug_panel(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d(shared_ptr<gamestate> g);
 static void create_sg_byid(shared_ptr<gamestate> g, entityid id);
 //static void calc_debugpanel_size(shared_ptr<gamestate> g);
-static void create_spritegroup(shared_ptr<gamestate> g,
-                               entityid id,
-                               int* keys,
-                               int num_keys,
-                               int offset_x,
-                               int offset_y,
-                               specifier_t spec);
+static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
 //static void draw_shadow_for_entity(const shared_ptr<gamestate> g,
 //                                   spritegroup_t* sg,
 //                                   entityid id);
 static void draw_version(const shared_ptr<gamestate> g);
 
-static sprite*
-get_weapon_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
-static sprite*
-get_weapon_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
-static sprite*
-get_shield_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
-static sprite*
-get_shield_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
+static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
+static sprite* get_weapon_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
+static sprite* get_shield_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
+static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
 
-static bool
-load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
+static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 static bool libdraw_unload_texture(int txkey);
-static bool
-draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z);
-static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g,
-                                  int z,
-                                  dungeon_floor_t* df);
-static bool draw_entities_2d_at(const shared_ptr<gamestate> g,
-                                dungeon_floor_t* const df,
-                                bool dead,
-                                vec3 loc);
+static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z);
+static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, dungeon_floor_t* df);
+static bool draw_entities_2d_at(const shared_ptr<gamestate> g, dungeon_floor_t* const df, bool dead, vec3 loc);
 static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
 static bool libdraw_draw_player_target_box(const shared_ptr<gamestate> g);
 //static bool libdraw_check_default_animations(const shared_ptr<gamestate> g);
 
-static bool
-draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z) {
+static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     //massert(df, "dungeon_floor is NULL");
     massert(x >= 0, "x is less than 0");
@@ -217,10 +171,7 @@ draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z) {
     int px = x * DEFAULT_TILE_SIZE + offset_x;
     int py = y * DEFAULT_TILE_SIZE + offset_y;
     Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
-    Rectangle dest = {(float)px,
-                      (float)py,
-                      (float)DEFAULT_TILE_SIZE_SCALED,
-                      (float)DEFAULT_TILE_SIZE_SCALED};
+    Rectangle dest = {(float)px, (float)py, (float)DEFAULT_TILE_SIZE_SCALED, (float)DEFAULT_TILE_SIZE_SCALED};
     // Draw tile with fade if beyond vision distance
     //Color draw_color = distance > vision_distance ? Fade(WHITE, 0.4f) : // Faded for out-of-range tiles
     Color draw_color = WHITE;
@@ -250,9 +201,7 @@ draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z) {
     return true;
 }
 
-static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g,
-                                  int z,
-                                  dungeon_floor_t* df) {
+static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, dungeon_floor_t* df) {
     massert(g, "gamestate is NULL");
     massert(df, "dungeon_floor is NULL");
     for (int y = 0; y < df->height; y++) {
@@ -376,15 +325,13 @@ static sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
 //    }
 //}
 
-static void draw_entity_sprite(const shared_ptr<gamestate> g,
-                               spritegroup_t* sg) {
+static void draw_entity_sprite(const shared_ptr<gamestate> g, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     sprite* s = sg_get_current(sg);
     massert(s, "sprite is NULL");
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-    DrawTexturePro(
-        *s->texture, s->src, dest, zero_vec, 0, (Color){255, 255, 255, 255});
+    DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, (Color){255, 255, 255, 255});
     // draw a box around the sprite
     //DrawRectangleLinesEx(dest, 1, (Color){255, 0, 0, 255});
 }
@@ -529,8 +476,7 @@ static bool draw_entities_2d_at(const shared_ptr<gamestate> g,
 */
 
 static void load_shaders() {
-    shader_grayscale =
-        LoadShader(0, "grayscale.frag"); // No vertex shader needed
+    shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
     shader_glow = LoadShader(0, "glow.frag");
     shader_red_glow = LoadShader(0, "red-glow.frag");
     shader_color_noise = LoadShader(0, "colornoise.frag");
@@ -549,16 +495,15 @@ static void libdraw_unload_shaders() {
 static inline bool libdraw_camera_lock_on(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (!g->cam_lockon) return false;
-    spritegroup_t* grp =
-        hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
+    spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     massert(grp, "spritegroup is NULL");
     // get the old camera position
     Vector2 old_target = g->cam2d.target;
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
     // if the target changes, we need to set a flag indicating as such
-    if (old_target.x != g->cam2d.target.x ||
-        old_target.y != g->cam2d.target.y) {
-        g->cam_changed = g->frame_dirty = true;
+    if (old_target.x != g->cam2d.target.x || old_target.y != g->cam2d.target.y) {
+        g->cam_changed = true;
+        g->frame_dirty = true;
     } else {
         g->cam_changed = false;
     }
@@ -889,7 +834,7 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
     //}
     //UpdateMusicStream(music);
     if (g->current_scene != SCENE_GAMEPLAY) {
-        //g->frame_dirty = false;
+        g->frame_dirty = false;
         return;
     }
     //if (g->current_scene == SCENE_GAMEPLAY) {
@@ -959,8 +904,7 @@ static void draw_debug_panel(shared_ptr<gamestate> g) {
     int x = 0;
     int y = 0;
     int fontsize = 10;
-    int w0 =
-        g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
+    int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
     int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
     //int x1 = g->debugpanel.x + g->debugpanel.pad_left;
     //int y1 = g->debugpanel.y + g->debugpanel.pad_top;
@@ -1086,24 +1030,22 @@ static void draw_message_box(gamestate* g) {
 */
 
 
-/*
 static inline void update_debug_panel(shared_ptr<gamestate> g) {
     // concat a string onto the end of the debug panel message
     char tmp[1024] = {0};
-    strncat(g->debugpanel.buffer,
-            tmp,
-            sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
+    strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
 }
+/*
 */
 
 
-/*
 static inline void handle_debug_panel(shared_ptr<gamestate> g) {
     if (g->debugpanelon) {
         update_debug_panel(g);
         draw_debug_panel(g);
     }
 }
+/*
 */
 
 
@@ -1212,10 +1154,10 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
             draw_title_screen_to_texture(g, false);
         } else if (g->current_scene == SCENE_MAIN_MENU) {
             draw_title_screen_to_texture(g, true);
+        } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+            draw_character_creation_screen_to_texture(g);
         }
-        //else if (g->current_scene == SCENE_CHARACTER_CREATION) {
-        //    draw_character_creation_screen_to_texture(g);
-        //} else if (g->current_scene == SCENE_GAMEPLAY) {
+        //else if (g->current_scene == SCENE_GAMEPLAY) {
         //    libdraw_drawframe_2d_to_texture(g);
         //}
         g->frame_dirty = false;
@@ -1229,18 +1171,17 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
         draw_title_screen_from_texture(g);
     } else if (g->current_scene == SCENE_MAIN_MENU) {
         draw_title_screen_from_texture(g);
+    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+        draw_character_creation_screen_from_texture(g);
     }
-    //else if (g->current_scene == SCENE_CHARACTER_CREATION) {
-    //    draw_character_creation_screen_from_texture(g);
-    //} else if (g->current_scene == SCENE_GAMEPLAY) {
+    //else if (g->current_scene == SCENE_GAMEPLAY) {
     //    libdraw_drawframe_2d_from_texture(g);
     //}
     EndTextureMode();
     // draw the target texture to the window
     win_dest.width = GetScreenWidth();
     win_dest.height = GetScreenHeight();
-    DrawTexturePro(
-        target.texture, target_src, win_dest, target_origin, 0.0f, WHITE);
+    DrawTexturePro(target.texture, target_src, win_dest, target_origin, 0.0f, WHITE);
     EndDrawing();
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
@@ -1284,17 +1225,13 @@ void libdraw_close() {
 }
 
 
-static bool
-load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path) {
+static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path) {
     massert(path, "path is NULL");
     massert(txkey >= 0, "txkey is invalid");
     massert(ctxs >= 0, "contexts is invalid");
     massert(frames >= 0, "frames is invalid");
-    massert(txkey < GAMESTATE_SIZEOFTEXINFOARRAY,
-            "txkey is out of bounds: %d",
-            txkey);
-    massert(
-        txinfo[txkey].texture.id == 0, "txinfo[%d].texture.id is not 0", txkey);
+    massert(txkey < GAMESTATE_SIZEOFTEXINFOARRAY, "txkey is out of bounds: %d", txkey);
+    massert(txinfo[txkey].texture.id == 0, "txinfo[%d].texture.id is not 0", txkey);
     massert(strlen(path) > 0, "load_texture: path is empty");
     massert(strcmp(path, "\n") != 0, "load_texture: path is newline");
     Image image = LoadImage(path);
@@ -1323,13 +1260,7 @@ static void load_textures() {
         char path[512] = {0};
         // check if the line begins with a #
         if (line[0] == '#') continue;
-        sscanf(line,
-               "%d %d %d %d %s",
-               &txkey,
-               &contexts,
-               &frames,
-               &do_dither,
-               path);
+        sscanf(line, "%d %d %d %d %s", &txkey, &contexts, &frames, &do_dither, path);
         massert(txkey >= 0, "txkey is invalid");
         massert(contexts >= 0, "contexts is invalid");
         massert(frames >= 0, "frames is invalid");
@@ -1625,8 +1556,7 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     massert(w > 0 && h > 0, "window width or height is not set properly");
     g->windowwidth = w;
     g->windowheight = h;
-    TextureFilter filter =
-        TEXTURE_FILTER_POINT; // Use trilinear filtering for better quality
+    TextureFilter filter = TEXTURE_FILTER_POINT; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_BILINEAR; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_TRILINEAR; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_ANISOTROPIC_16X;
@@ -1644,14 +1574,11 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     main_game_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(main_game_target_texture.texture, filter);
 
-    target_src =
-        (Rectangle){(float)0, (float)0, (float)target_w, (float)-target_h};
-    target_dest =
-        (Rectangle){(float)0, (float)0, (float)target_w, (float)target_h};
+    target_src = (Rectangle){(float)0, (float)0, (float)target_w, (float)-target_h};
+    target_dest = (Rectangle){(float)0, (float)0, (float)target_w, (float)target_h};
 
     //target_dest = (Rectangle){0, 0, w, h};
-    spritegroups =
-        hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
+    spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
 
     load_textures();
 
@@ -1708,8 +1635,7 @@ void libdraw_init(shared_ptr<gamestate> g) {
     int h = DEFAULT_WIN_HEIGHT;
     const char* title = WINDOW_TITLE;
     char full_title[1024] = {0};
-    snprintf(
-        full_title, sizeof(full_title), "%s - %s", title, g->version.c_str());
+    snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version.c_str());
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
 
@@ -2081,13 +2007,11 @@ static void draw_version(const shared_ptr<gamestate> g) {
     //const char* current_music_path = g->music_file_paths[g->current_music_index];
     //snprintf(buffer, sizeof(buffer), "%s | Music: %s", version, current_music_path);
     snprintf(buffer, sizeof(buffer), "%s", version);
-    Vector2 text_size =
-        MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
+    Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
     int w = DEFAULT_TARGET_WIDTH;
     float x = w - text_size.x - g->pad;
     float y = 0;
-    DrawTextEx(
-        GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
+    DrawTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
 }
 
 
@@ -2103,8 +2027,7 @@ static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     const char* version_text = g->version.c_str();
     const char* start_text = "Press enter or space to begin";
     char buffer[1024] = {0};
-    Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF},
-          title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
+    Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
     int sm_font_size = 10;
     int font_size = 40;
     int measure = MeasureText(title_text_0, font_size);
@@ -2141,32 +2064,24 @@ static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
         } else {
             snprintf(buffer, sizeof(buffer), "  %s", menu_text[i]);
         }
-        selection_color = i == 0
-                              ? active_color
-                              : disabled_color; // First item is always active
+        selection_color = i == 0 ? active_color : disabled_color; // First item is always active
         DrawText(buffer, menu_x, menu_y, sm_font_size, selection_color);
     }
 }
 
 
-static void draw_title_screen_to_texture(shared_ptr<gamestate> g,
-                                         bool show_menu) {
+static void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(title_target_texture);
     draw_title_screen(g, show_menu);
-    //handle_debug_panel(g);
+    handle_debug_panel(g);
     EndTextureMode();
 }
 
 
 static void draw_title_screen_from_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    DrawTexturePro(title_target_texture.texture,
-                   target_src,
-                   target_dest,
-                   (Vector2){0, 0},
-                   0.0f,
-                   WHITE);
+    DrawTexturePro(title_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 
@@ -2174,20 +2089,14 @@ static void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(char_creation_target_texture);
     draw_character_creation_screen(g);
-    //handle_debug_panel(g);
+    handle_debug_panel(g);
     EndTextureMode();
 }
 
 
-static void
-draw_character_creation_screen_from_texture(shared_ptr<gamestate> g) {
+static void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    DrawTexturePro(char_creation_target_texture.texture,
-                   target_src,
-                   target_dest,
-                   (Vector2){0, 0},
-                   0.0f,
-                   WHITE);
+    DrawTexturePro(char_creation_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 
@@ -2196,11 +2105,10 @@ static void draw_character_creation_screen(shared_ptr<gamestate> g) {
     const char* title_text = "Character Creation";
     //const char* stats_fmt[] = {
     //    "Name: %s", "Race: %s", "Hitdie: %d", "Strength: %d", "Dexterity: %d", "Constitution: %d"};
-    const char* remaining_text[] = {
-        "Press SPACE to re-roll stats",
-        "Press LEFT/RIGHT to change race (unavailable for now)",
-        "Press UP/DOWN to change class (unavailable for now)",
-        "Press ENTER to confirm"};
+    const char* remaining_text[] = {"Press SPACE to re-roll stats",
+                                    "Press LEFT/RIGHT to change race (unavailable for now)",
+                                    "Press UP/DOWN to change class (unavailable for now)",
+                                    "Press ENTER to confirm"};
     int font_size = 20;
     int w = DEFAULT_TARGET_WIDTH;
     int h = DEFAULT_TARGET_HEIGHT;
@@ -2216,42 +2124,17 @@ static void draw_character_creation_screen(shared_ptr<gamestate> g) {
     // Draw character stats
 
     //DrawText(buffer, x, y, font_size, WHITE);
-    DrawText(TextFormat("Name: %s", g->chara_creation.name.c_str()),
-             x,
-             y,
-             font_size,
-             WHITE);
+    DrawText(TextFormat("Name: %s", g->chara_creation->name.c_str()), x, y, font_size, WHITE);
     y += font_size + 4;
-    DrawText(
-        TextFormat("Race: %s", get_race_str(g->chara_creation.race).c_str()),
-        x,
-        y,
-        font_size,
-        WHITE);
+    DrawText(TextFormat("Race: %s", get_race_str(g->chara_creation->race).c_str()), x, y, font_size, WHITE);
     y += font_size + 4;
-    DrawText(TextFormat("Hitdie: %d", g->chara_creation.hitdie),
-             x,
-             y,
-             font_size,
-             WHITE);
+    DrawText(TextFormat("Hitdie: %d", g->chara_creation->hitdie), x, y, font_size, WHITE);
     y += font_size + 4;
-    DrawText(TextFormat("Strength: %d", g->chara_creation.strength),
-             x,
-             y,
-             font_size,
-             WHITE);
+    DrawText(TextFormat("Strength: %d", g->chara_creation->strength), x, y, font_size, WHITE);
     y += font_size + 4;
-    DrawText(TextFormat("Dexterity: %d", g->chara_creation.dexterity),
-             x,
-             y,
-             font_size,
-             WHITE);
+    DrawText(TextFormat("Dexterity: %d", g->chara_creation->dexterity), x, y, font_size, WHITE);
     y += font_size + 4;
-    DrawText(TextFormat("Constitution: %d", g->chara_creation.constitution),
-             x,
-             y,
-             font_size,
-             WHITE);
+    DrawText(TextFormat("Constitution: %d", g->chara_creation->constitution), x, y, font_size, WHITE);
     y += font_size + 4;
 
     //for (int i = 0; i < sizeof(stats_fmt) / sizeof(stats_fmt[0]); i++) {
@@ -2276,14 +2159,10 @@ static void draw_character_creation_screen(shared_ptr<gamestate> g) {
     //    y += font_size + 4;
     //}
     // Draw sprite placeholder
-    DrawRectangleLinesEx(
-        (Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200},
-        4,
-        RED);
+    DrawRectangleLinesEx((Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200}, 4, RED);
     // Draw instructions
     y += font_size + 8;
-    for (size_t i = 0; i < sizeof(remaining_text) / sizeof(remaining_text[0]);
-         i++) {
+    for (size_t i = 0; i < sizeof(remaining_text) / sizeof(remaining_text[0]); i++) {
         DrawText(remaining_text[i], x, y, font_size, WHITE);
         y += font_size + 4;
     }
