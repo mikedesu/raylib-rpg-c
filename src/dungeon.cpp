@@ -21,10 +21,10 @@ shared_ptr<dungeon_t> d_create() {
         merror("Failed to allocate memory for dungeon");
         return nullptr;
     }
-    dungeon->floors = make_shared<vector<shared_ptr<dungeon_floor_t>>>(INITIAL_DUNGEON_CAPACITY);
+    dungeon->floors = make_shared<vector<shared_ptr<dungeon_floor_t>>>();
     dungeon->current_floor = 0;
     dungeon->is_locked = false;
-    msuccess("Created new dungeon with capacity %d", INITIAL_DUNGEON_CAPACITY);
+    msuccess("Created new dungeon");
     return dungeon;
 }
 

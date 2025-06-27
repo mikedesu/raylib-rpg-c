@@ -1,5 +1,6 @@
 //#include "bonus_table.h"
 #include "direction.h"
+#include "dungeon_floor.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
 //#include "entitytype.h"
@@ -124,19 +125,20 @@ static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegro
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 static bool libdraw_unload_texture(int txkey);
 static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z);
-static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, dungeon_floor_t* df);
-static bool draw_entities_2d_at(const shared_ptr<gamestate> g, dungeon_floor_t* const df, bool dead, vec3 loc);
+//static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, dungeon_floor_t* df);
+static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df);
+//static bool draw_entities_2d_at(const shared_ptr<gamestate> g, dungeon_floor_t* const df, bool dead, vec3 loc);
+static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
 static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
 static bool libdraw_draw_player_target_box(const shared_ptr<gamestate> g);
 //static bool libdraw_check_default_animations(const shared_ptr<gamestate> g);
 
 static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
-    //massert(df, "dungeon_floor is NULL");
     massert(x >= 0, "x is less than 0");
     massert(y >= 0, "y is less than 0");
-    //dungeon_floor_t* df = d_get_floor(g->dungeon, z);
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
+    massert(df, "dungeon_floor is NULL");
     massert(x < df->width, "x is out of bounds");
     massert(y < df->height, "y is out of bounds");
     massert(df, "dungeon_floor is NULL");
@@ -201,7 +203,7 @@ static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y,
     return true;
 }
 
-static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, dungeon_floor_t* df) {
+static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df) {
     massert(g, "gamestate is NULL");
     massert(df, "dungeon_floor is NULL");
     for (int y = 0; y < df->height; y++) {
@@ -431,48 +433,49 @@ static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
 }
 */
 
-/*
-static bool draw_entities_2d_at(const shared_ptr<gamestate> g,
-                                shared_ptr<dungeon_floor_t> df,
-                                bool dead,
-                                vec3 loc) {
+static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc) {
     massert(g, "draw_entities_2d: gamestate is NULL");
     massert(df, "draw_entities_2d: dungeon_floor is NULL");
     massert(df->width > 0, "draw_entities_2d: dungeon_floor width is 0");
     massert(df->height > 0, "draw_entities_2d: dungeon_floor height is 0");
-    massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH,
-            "draw_entities_2d: dungeon_floor width is too large");
-    massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT,
-            "draw_entities_2d: dungeon_floor height is too large");
+    massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
+    massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
     massert(loc.x >= 0, "draw_entities_2d: x is out of bounds");
     massert(loc.x < df->width, "draw_entities_2d: x is out of bounds");
     massert(loc.y >= 0, "draw_entities_2d: y is out of bounds");
     massert(loc.y < df->height, "draw_entities_2d: y is out of bounds");
-    //tile_t* tile = df_tile_at(df, loc);
+
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
-    if (!tile) return false;
-    if (tile_is_wall(tile->type)) return false;
-    if (!tile->visible) return true; // Do not draw entities on invisible tiles
+    if (!tile) {
+        return false;
+    }
+    if (tile_is_wall(tile->type)) {
+        return false;
+    }
+    if (!tile->visible) {
+        return true; // Do not draw entities on invisible tiles
+    }
     // Get hero's vision distance and location
-    int vision_distance = g_get_vision_distance(g, g->hero_id);
-    int light_dist = g_get_light_radius(g, g->hero_id) +
-                     g_get_entity_total_light_radius_bonus(g, g->hero_id);
-    vec3 hero_loc = g_get_location(g, g->hero_id);
-    int dist_to_check = MAX(vision_distance, light_dist);
+    //int vision_distance = g_get_vision_distance(g, g->hero_id);
+    //int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
+    int light_dist = 3;
+    //vec3 hero_loc = g_get_location(g, g->hero_id);
+    //int dist_to_check = MAX(vision_distance, light_dist);
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
-    int distance = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
+    //int distance = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
     // Only draw entities within vision distance
     //if (distance <= vision_distance) {
-    if (distance <= dist_to_check) {
-        for (size_t i = 0; i < tile_entity_count(tile); i++) {
-            entityid id = tile_get_entity(tile, i);
-            if (g_is_dead(g, id) == dead) {
-                draw_sprite_and_shadow(g, id);
-            }
-        }
-    }
+    //if (distance <= dist_to_check) {
+    //for (size_t i = 0; i < tile_entity_count(tile); i++) {
+    //entityid id = tile_get_entity(tile, i);
+    //if (g_is_dead(g, id) == dead) {
+    //    draw_sprite_and_shadow(g, id);
+    //}
+    //}
+    //}
     return true;
 }
+/*
 */
 
 static void load_shaders() {
@@ -876,25 +879,26 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
     //}
 }
 
-/*
 static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    dungeon_floor_t* const df = d_get_current_floor(g->d);
+    //dungeon_floor_t* const df = d_get_current_floor(g->d);
+    shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
     massert(df, "dungeon_floor is NULL");
-    int z = g->d->current_floor;
+    int z = g->dungeon->current_floor;
     draw_dungeon_tiles_2d(g, z, df);
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            draw_entities_2d_at(g, df, true, (vec3){x, y, z});
-        }
-    }
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            draw_entities_2d_at(g, df, false, (vec3){x, y, z});
-        }
-    }
+    //for (int y = 0; y < df->height; y++) {
+    //    for (int x = 0; x < df->width; x++) {
+    //        draw_entities_2d_at(g, df, true, (vec3){x, y, z});
+    //    }
+    //}
+    //for (int y = 0; y < df->height; y++) {
+    //    for (int x = 0; x < df->width; x++) {
+    //        draw_entities_2d_at(g, df, false, (vec3){x, y, z});
+    //    }
+    //}
     return true;
 }
+/*
 */
 
 static void draw_debug_panel(shared_ptr<gamestate> g) {
@@ -952,7 +956,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     ClearBackground(BLACK);
     //EndShaderMode();
 
-    //libdraw_draw_dungeon_floor(g);
+    libdraw_draw_dungeon_floor(g);
     //libdraw_draw_player_target_box(g);
 
     EndMode2D();

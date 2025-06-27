@@ -1276,17 +1276,17 @@ player_create(gamestate* const g, race_t rt, int x, int y, int z, string name) {
 /*
 static void init_player(gamestate* const g) {
     massert(g, "gamestate is NULL");
-    printf("begin init_player...\n");
+    minfo("begin init_player...");
     // setting it up so we can return a vec3 from a function
     // that can scan for an appropriate starting location
-    printf("calling df_get_upstairs...\n");
-    vec3 loc = df_get_upstairs(g->d->floors[g->d->current_floor]);
-    printf("calling player_create...\n");
-    g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "darkmage");
+    minfo("calling df_get_upstairs...");
+    //vec3 loc = df_get_upstairs(g->d->floors[g->d->current_floor]);
+    minfo("calling player_create...");
+    //g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "darkmage");
     massert(g->entity_turn != ENTITYID_INVALID, "failed to init hero");
     massert(g->hero_id == g->entity_turn, "hero id mismatch");
     msuccess("hero id %d", g->hero_id);
-    printf("end init_player...\n");
+    //printf("end init_player...\n");
 }
 */
 
@@ -2464,7 +2464,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //g->msg_system.index = 0;
     //g->msg_system.is_active = false;
     //
-    // init_player(g);
+    //init_player(g);
     msuccess("liblogic_init: Game state initialized");
 }
 
