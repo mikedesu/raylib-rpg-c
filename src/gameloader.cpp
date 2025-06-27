@@ -18,14 +18,14 @@ void gamerun() {
     shared_ptr<gamestate> g = gamestateinitptr();
     msuccess("gamestate initialized");
 
-    //liblogic_init(g);
+    liblogic_init(g);
     minfo("Initializing libdraw...");
     libdraw_init(g);
     msuccess("libdraw initialized");
 
     while (!libdraw_windowshouldclose(g)) {
-        // libdraw_update_input(is);
-        // liblogic_tick(is, g);
+        libdraw_update_input(is);
+        liblogic_tick(is, g);
         libdraw_update_sprites_pre(g);
         libdraw_drawframe(g);
         libdraw_update_sprites_post(g);
@@ -46,9 +46,9 @@ void gamerun() {
     libdraw_close();
     msuccess("libdraw closed");
 
-    //minfo("Closing liblogic...");
-    //liblogic_close(g);
-    //msuccess("liblogic closed");
+    minfo("Closing liblogic...");
+    liblogic_close(g);
+    msuccess("liblogic closed");
 
     minfo("Freeing gamestate...");
     gamestate_free(g);

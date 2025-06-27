@@ -47,7 +47,9 @@ static inline void inputstate_update(std::shared_ptr<inputstate> is) {
 }
 
 // Check if a key was pressed this frame
-static inline bool inputstate_is_pressed(const inputstate* is, int key) {
+//static inline bool inputstate_is_pressed(const inputstate* is, int key) {
+static inline bool inputstate_is_pressed(std::shared_ptr<inputstate> is,
+                                         int key) {
     if (key < 0 || key >= MAX_KEYS) return false;
     int idx = key / BITS_PER_LONG;
     int bit = key % BITS_PER_LONG;

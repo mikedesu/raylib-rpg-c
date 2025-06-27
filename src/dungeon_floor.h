@@ -32,7 +32,7 @@ std::shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height);
 
 void df_set_tile_area_range(std::shared_ptr<dungeon_floor_t> const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end);
 
-void df_init(std::shared_ptr<dungeon_floor_t> df);
+//void df_init(std::shared_ptr<dungeon_floor_t> df);
 void df_free(std::shared_ptr<dungeon_floor_t> df);
 bool df_add_at(std::shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y);
 bool df_remove_at(std::shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y);

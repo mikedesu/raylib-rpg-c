@@ -8,8 +8,8 @@
 using std::shared_ptr;
 using std::vector;
 
-//void tile_init(tile_t* const t, tiletype_t type) {
 void tile_init(shared_ptr<tile_t> t, tiletype_t type) {
+    minfo("tile_init: Initializing tile of type %d", type);
     massert(t, "tile is NULL");
     t->type = type;
     t->visible = false;
@@ -50,8 +50,7 @@ entityid tile_add(shared_ptr<tile_t> t, entityid id) {
     massert(t, "tile is NULL");
     massert(t->entities, "tile entities is NULL");
     // Check if the entity already exists
-    if (std::find(t->entities->begin(), t->entities->end(), id) !=
-        t->entities->end()) {
+    if (std::find(t->entities->begin(), t->entities->end(), id) != t->entities->end()) {
         merror("tile_add: entity already exists on tile");
         return ENTITYID_INVALID;
     }

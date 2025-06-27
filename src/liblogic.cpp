@@ -3,7 +3,7 @@
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
-#include "dungeon_tile_type.h"
+//#include "dungeon_tile_type.h"
 //#include "entity_actions.h"
 //#include "entityid.h"
 //#include "entitytype.h"
@@ -994,13 +994,14 @@ static void init_dungeon(shared_ptr<gamestate> g) {
     g->dungeon = d_create();
 
     massert(g->dungeon, "failed to init dungeon");
+    msuccess("Dungeon initialized successfully");
 
+    minfo("adding floors...");
     int df_count = 1;
     for (int i = 0; i < df_count; i++) {
-        d_add_floor(g->dungeon,
-                    DEFAULT_DUNGEON_FLOOR_WIDTH,
-                    DEFAULT_DUNGEON_FLOOR_HEIGHT);
+        d_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     }
+    msuccess("Added %d floors to dungeon", df_count);
 }
 
 /*
@@ -2151,14 +2152,26 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
 }
 */
 
-static void handle_input(const inputstate* const is, gamestate* const g) {
+//static void handle_input(const inputstate* const is, gamestate* const g) {
+static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "inputstate is NULL");
     massert(g, "gamestate is NULL");
-    // no matter which mode we are in, we can toggle the debug panel
-    if (inputstate_is_pressed(is, KEY_P)) {
-        g->debugpanelon = !g->debugpanelon;
-        return;
+
+    if (g->current_scene == SCENE_TITLE) {
+        //if (inputstate_any_pressed(is)) {
+        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+            //minfo("Title screen input detected, switching to main menu");
+            g->current_scene = SCENE_MAIN_MENU;
+            g->frame_dirty = true;
+        }
     }
+
+
+    // no matter which mode we are in, we can toggle the debug panel
+    //if (inputstate_is_pressed(is, KEY_P)) {
+    //    g->debugpanelon = !g->debugpanelon;
+    //    return;
+    //}
 
     //if (g->display_quit_menu) {
     //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
@@ -2409,6 +2422,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //g->msg_system.is_active = false;
     //
     // init_player(g);
+    msuccess("liblogic_init: Game state initialized");
 }
 
 /*
@@ -2705,7 +2719,7 @@ static inline void reset_player_block_success(gamestate* const g) {
 }
 */
 
-void liblogic_tick(const inputstate* const is, gamestate* const g) {
+void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     //minfo("liblogic_tick: is=%p, g=%p", is, g);
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
@@ -2724,10 +2738,7 @@ void liblogic_tick(const inputstate* const is, gamestate* const g) {
     //update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
-    strftime(g->currenttimebuf,
-             GAMESTATE_SIZEOFTIMEBUF,
-             "Current Time: %Y-%m-%d %H:%M:%S",
-             g->currenttimetm);
+    strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 }
 
 //void liblogic_close(gamestate* const g) {

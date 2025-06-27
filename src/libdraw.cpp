@@ -2,7 +2,7 @@
 #include "direction.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
-#include "entitytype.h"
+//#include "entitytype.h"
 #include "gamestate.h"
 //#include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
@@ -18,9 +18,9 @@
 #include "specifier.h"
 #include "sprite.h"
 #include "spritegroup.h"
-#include "spritegroup_anim.h"
+//#include "spritegroup_anim.h"
 #include "textureinfo.h"
-#include "tx_keys.h"
+//#include "tx_keys.h"
 //#include "weapon.h"
 #include <cstdlib>
 #include <memory>
@@ -1210,10 +1210,10 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     if (g->frame_dirty) {
         if (g->current_scene == SCENE_TITLE) {
             draw_title_screen_to_texture(g, false);
+        } else if (g->current_scene == SCENE_MAIN_MENU) {
+            draw_title_screen_to_texture(g, true);
         }
-        //else if (g->current_scene == SCENE_MAIN_MENU) {
-        //    draw_title_screen_to_texture(g, true);
-        //} else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+        //else if (g->current_scene == SCENE_CHARACTER_CREATION) {
         //    draw_character_creation_screen_to_texture(g);
         //} else if (g->current_scene == SCENE_GAMEPLAY) {
         //    libdraw_drawframe_2d_to_texture(g);
@@ -1227,10 +1227,10 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     ClearBackground(BLUE);
     if (g->current_scene == SCENE_TITLE) {
         draw_title_screen_from_texture(g);
+    } else if (g->current_scene == SCENE_MAIN_MENU) {
+        draw_title_screen_from_texture(g);
     }
-    //else if (g->current_scene == SCENE_MAIN_MENU) {
-    //    draw_title_screen_from_texture(g);
-    //} else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+    //else if (g->current_scene == SCENE_CHARACTER_CREATION) {
     //    draw_character_creation_screen_from_texture(g);
     //} else if (g->current_scene == SCENE_GAMEPLAY) {
     //    libdraw_drawframe_2d_from_texture(g);
