@@ -198,6 +198,7 @@ bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, in
     shared_ptr<tile_t> tile = df_tile_at(df, up_loc);
     massert(tile, "failed to get tile");
     tile_init(tile, TILE_UPSTAIRS);
+    tile->visible = true; // make sure the upstairs tile is visible
     free(locations);
     df->upstairs_loc = up_loc;
     return true;
@@ -234,6 +235,7 @@ bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, 
     shared_ptr<tile_t> tile = df_tile_at(df, down_loc);
     massert(tile, "failed to get tile");
     tile_init(tile, TILE_DOWNSTAIRS);
+    tile->visible = true; // make sure the upstairs tile is visible
     free(locations);
     df->downstairs_loc = down_loc;
     return true;

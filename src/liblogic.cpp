@@ -13,7 +13,7 @@
 #include "inputstate.h"
 //#include "inventory_sort.h"
 //#include "keybinding.h"
-//#include "libgame_defines.h"
+#include "libgame_defines.h"
 #include "liblogic.h"
 #include "massert.h"
 //#include "mprint.h"
@@ -158,10 +158,10 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 static void update_debug_panel_buffer(shared_ptr<gamestate> g);
 
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 
 //static void handle_input(const inputstate* const is, gamestate* const g);
 //static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static void handle_input_camera(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 //static void handle_input_player(shared_ptr<gamestate> g,
 //                                shared_ptr<inputstate> is);
 //static void handle_input_inventory(shared_ptr<gamestate> g,
@@ -1463,17 +1463,12 @@ static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> i
         g->cam2d.offset.y -= move;
     } else if (inputstate_is_held(is, KEY_DOWN)) {
         g->cam2d.offset.y += move;
-    } else if (action && strcmp(action, "toggle_camera") == 0) {
-        g->cam2d.zoom = roundf(g->cam2d.zoom);
-        g->controlmode = CONTROLMODE_PLAYER;
     }
 }
 /*
 */
 
-/*
-static inline void handle_camera_zoom(gamestate* const g,
-                                      const inputstate* const is) {
+static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(g, "Game state is NULL!");
     massert(is, "Input state is NULL!");
     if (inputstate_is_held(is, KEY_Z)) {
@@ -1483,17 +1478,9 @@ static inline void handle_camera_zoom(gamestate* const g,
             g->cam2d.zoom += DEFAULT_ZOOM_INCR;
     }
 }
-*/
-
-//static void handle_input_camera(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
-static void handle_input_camera(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    massert(is, "Input state is NULL!");
-    massert(g, "Game state is NULL!");
-    handle_camera_move(g, is);
-    //handle_camera_zoom(g, is);
-}
 /*
 */
+
 
 /*
 static void handle_input_gameplay_settings(const inputstate* const is,
@@ -2220,15 +2207,21 @@ static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
         }
     } else if (g->current_scene == SCENE_GAMEPLAY) {
         if (inputstate_is_pressed(is, KEY_B)) {
-            g->controlmode = CONTROLMODE_CAMERA;
+            if (g->controlmode == CONTROLMODE_PLAYER) {
+                g->controlmode = CONTROLMODE_CAMERA;
+            } else if (g->controlmode == CONTROLMODE_CAMERA) {
+                g->controlmode = CONTROLMODE_PLAYER;
+            }
+
             g->frame_dirty = true;
             return;
         }
 
-
         if (g->controlmode == CONTROLMODE_CAMERA) {
-            handle_input_camera(g, is);
+            handle_camera_move(g, is);
+            handle_camera_zoom(g, is);
             g->frame_dirty = true;
+            return;
         }
     }
 
@@ -2266,7 +2259,6 @@ static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
 
         switch (g->controlmode) {
         case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
-        case CONTROLMODE_CAMERA: handle_input_camera(is, g); break;
         case CONTROLMODE_INVENTORY: handle_input_inventory(is, g); break;
         case CONTROLMODE_GAMEPLAY_SETTINGS:
             handle_input_gameplay_settings(is, g);
