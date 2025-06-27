@@ -10,10 +10,11 @@
 #include "dungeon_floor.h"
 #include "entity_actions.h"
 #include "entityid.h"
+#include "entitytype.h"
 #include "fadestate.h"
-#include "gamestate_explored_list.h"
 #include "gamestate_flag.h"
-#include "gamestate_light_radius.h"
+//#include "gamestate_explored_list.h"
+//#include "gamestate_light_radius.h"
 #include "inventory_sort.h"
 #include "keybinding.h"
 #include "monster_def.h"
@@ -115,52 +116,19 @@ typedef struct gamestate {
     //stats_component* stats_list;
 
     unordered_map<entityid, string>* name_list;
-    unordered_map<entityid, int>* type_list;
+    unordered_map<entityid, entitytype_t>* type_list;
+    //unordered_map<entityid, race_t>* race_list;
+    //unordered_map<entityid, direction_t>* direction_list;
+    //unordered_map<entityid, vec3>* loc_list;
+    //unordered_map<entityid, Rectangle>* sprite_move_list;
+    //unordered_map<entityid, bool>* dead_list;
+    //unordered_map<entityid, bool>* update_list;
+    //unordered_map<entityid, bool>* attacking_list;
+    //unordered_map<entityid, bool>* blocking_list;
+    //unordered_map<entityid, bool>* block_success_list;
+    //unordered_map<entityid, bool>* damaged_list;
 
-    //int_component* type_list;
-    //int type_list_count;
-    //int type_list_capacity;
-
-    //int_component* race_list;
-    //int race_list_count;
-    //int race_list_capacity;
-
-    //int_component* direction_list;
-    //int direction_list_count;
-    //int direction_list_capacity;
-
-    //vec3_component* loc_list;
-    //int loc_list_count;
-    //int loc_list_capacity;
-
-    //rect_component* sprite_move_list;
-    //int sprite_move_list_count;
-    //int sprite_move_list_capacity;
-
-    //int_component* dead_list;
-    //int dead_list_count;
-    //int dead_list_capacity;
-
-    //int_component* update_list;
-    //int update_list_count;
-    //int update_list_capacity;
-
-    //int_component* attacking_list;
-    //int attacking_list_count;
-    //int attacking_list_capacity;
-
-    //int_component* blocking_list;
-    //int blocking_list_count;
-    //int blocking_list_capacity;
-
-    //int_component* block_success_list;
-    //int block_success_list_count;
-    //int block_success_list_capacity;
-
-    //int_component* damaged_list;
-    //int damaged_list_count;
-    //int damaged_list_capacity;
-
+    //unordered_map<entityid, inventory_component>* inventory_list;
     //inventory_component* inventory_list;
     //int inventory_list_count;
     //int inventory_list_capacity;
@@ -306,26 +274,23 @@ bool gs_add_entityid(std::shared_ptr<gamestate> g, entityid id);
 bool gamestate_add_msg_history(std::shared_ptr<gamestate> g, string msg);
 bool gamestate_init_msg_history(std::shared_ptr<gamestate> g);
 
-void gamestatefree(std::shared_ptr<gamestate> g);
+void gamestate_free(std::shared_ptr<gamestate> g);
 void gamestate_set_hero_id(std::shared_ptr<gamestate> g, entityid id);
 void gamestate_set_debug_panel_pos_bottom_left(std::shared_ptr<gamestate> g);
 void gamestate_set_debug_panel_pos_top_right(std::shared_ptr<gamestate> g);
 void gamestate_load_keybindings(std::shared_ptr<gamestate> g);
 
-bool g_has_component(std::shared_ptr<gamestate> g, entityid id, component comp);
-//bool g_register_comp(std::shared_ptr<gamestate> g, entityid id, component comp);
-
-bool g_add_component(std::shared_ptr<gamestate> g, entityid id, component comp);
+bool g_has_comp(std::shared_ptr<gamestate> g, entityid id, component comp);
+bool g_register_comp(std::shared_ptr<gamestate> g, entityid id, component comp);
+bool g_add_comp(std::shared_ptr<gamestate> g, entityid id, component comp);
 
 bool g_add_name(std::shared_ptr<gamestate> g, entityid id, string name);
 bool g_has_name(std::shared_ptr<gamestate> g, entityid id);
 string g_get_name(std::shared_ptr<gamestate> g, entityid id);
 
-//bool g_add_type(std::shared_ptr<gamestate> g, entityid id, int type);
-//bool g_set_type(std::shared_ptr<gamestate> g, entityid id, int type);
-//entitytype_t g_get_type(std::shared_ptr<gamestate> g, entityid id);
-//bool g_is_type(std::shared_ptr<gamestate> g, entityid id, int type);
-//bool g_has_type(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_type(std::shared_ptr<gamestate> g, entityid id, entitytype_t type);
+entitytype_t g_get_type(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_type(std::shared_ptr<gamestate> g, entityid id);
 
 //race_t g_get_race(std::shared_ptr<gamestate> g, entityid id);
 //bool g_add_race(std::shared_ptr<gamestate> g, entityid id, race_t race);
@@ -390,12 +355,22 @@ entityid g_add_entity(std::shared_ptr<gamestate> g);
 
 bool g_has_inventory(std::shared_ptr<gamestate> g, entityid id);
 bool g_add_inventory(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_to_inventory(std::shared_ptr<gamestate> g, entityid id, entityid itemid);
-bool g_remove_from_inventory(std::shared_ptr<gamestate> g, entityid id, entityid itemid);
-entityid* g_get_inventory(const std::shared_ptr<gamestate> g, entityid id, size_t* count);
+bool g_add_to_inventory(std::shared_ptr<gamestate> g,
+                        entityid id,
+                        entityid itemid);
+bool g_remove_from_inventory(std::shared_ptr<gamestate> g,
+                             entityid id,
+                             entityid itemid);
+entityid*
+g_get_inventory(const std::shared_ptr<gamestate> g, entityid id, size_t* count);
 size_t g_get_inventory_count(const std::shared_ptr<gamestate> g, entityid id);
-bool g_has_item_in_inventory(std::shared_ptr<gamestate> g, entityid id, entityid itemid);
-bool g_update_inventory(std::shared_ptr<gamestate> g, entityid id, entityid* new_inventory, size_t new_inventory_count);
+bool g_has_item_in_inventory(std::shared_ptr<gamestate> g,
+                             entityid id,
+                             entityid itemid);
+bool g_update_inventory(std::shared_ptr<gamestate> g,
+                        entityid id,
+                        entityid* new_inventory,
+                        size_t new_inventory_count);
 
 bool g_has_target(std::shared_ptr<gamestate> g, entityid id);
 bool g_add_target(std::shared_ptr<gamestate> g, entityid id, vec3 target);
@@ -404,22 +379,41 @@ bool g_get_target(std::shared_ptr<gamestate> g, entityid id, vec3* target);
 
 bool g_has_target_path(std::shared_ptr<gamestate> g, entityid id);
 bool g_add_target_path(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_target_path(std::shared_ptr<gamestate> g, entityid id, vec3* target_path, int target_path_length);
-bool g_get_target_path(std::shared_ptr<gamestate> g, entityid id, vec3** target_path, int* target_path_length);
-bool g_get_target_path_length(std::shared_ptr<gamestate> g, entityid id, int* target_path_length);
+bool g_set_target_path(std::shared_ptr<gamestate> g,
+                       entityid id,
+                       vec3* target_path,
+                       int target_path_length);
+bool g_get_target_path(std::shared_ptr<gamestate> g,
+                       entityid id,
+                       vec3** target_path,
+                       int* target_path_length);
+bool g_get_target_path_length(std::shared_ptr<gamestate> g,
+                              entityid id,
+                              int* target_path_length);
 
 bool g_add_equipment(std::shared_ptr<gamestate> g, entityid id);
 bool g_has_equipment(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_equipment(std::shared_ptr<gamestate> g, entityid id, equipment_slot slot, entityid itemid);
-bool g_unset_equipment(std::shared_ptr<gamestate> g, entityid id, equipment_slot slot);
-entityid g_get_equipment(std::shared_ptr<gamestate> g, entityid id, equipment_slot slot);
+bool g_set_equipment(std::shared_ptr<gamestate> g,
+                     entityid id,
+                     equipment_slot slot,
+                     entityid itemid);
+bool g_unset_equipment(std::shared_ptr<gamestate> g,
+                       entityid id,
+                       equipment_slot slot);
+entityid
+g_get_equipment(std::shared_ptr<gamestate> g, entityid id, equipment_slot slot);
 bool g_is_equipped(std::shared_ptr<gamestate> g, entityid id, entityid itemid);
 
 bool g_add_stats(std::shared_ptr<gamestate> g, entityid id);
 bool g_has_stats(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_stat(std::shared_ptr<gamestate> g, entityid id, stats_slot stats_slot, int value);
+bool g_set_stat(std::shared_ptr<gamestate> g,
+                entityid id,
+                stats_slot stats_slot,
+                int value);
 int* g_get_stats(std::shared_ptr<gamestate> g, entityid id, int* count);
-int g_get_stat(std::shared_ptr<gamestate> g, entityid id, stats_slot stats_slot);
+int g_get_stat(std::shared_ptr<gamestate> g,
+               entityid id,
+               stats_slot stats_slot);
 
 bool g_add_itemtype(std::shared_ptr<gamestate> g, entityid id, int type);
 bool g_has_itemtype(std::shared_ptr<gamestate> g, entityid id);
@@ -464,14 +458,22 @@ bool g_add_zapping(std::shared_ptr<gamestate> g, entityid id, int zapping);
 bool g_set_zapping(std::shared_ptr<gamestate> g, entityid id, int zapping);
 bool g_get_zapping(std::shared_ptr<gamestate> g, entityid id);
 
-bool g_add_base_attack_damage(std::shared_ptr<gamestate> g, entityid id, vec3 damage);
+bool g_add_base_attack_damage(std::shared_ptr<gamestate> g,
+                              entityid id,
+                              vec3 damage);
 bool g_has_base_attack_damage(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_base_attack_damage(std::shared_ptr<gamestate> g, entityid id, vec3 damage);
+bool g_set_base_attack_damage(std::shared_ptr<gamestate> g,
+                              entityid id,
+                              vec3 damage);
 vec3 g_get_base_attack_damage(std::shared_ptr<gamestate> g, entityid id);
 
-bool g_add_vision_distance(std::shared_ptr<gamestate> g, entityid id, int distance);
+bool g_add_vision_distance(std::shared_ptr<gamestate> g,
+                           entityid id,
+                           int distance);
 bool g_has_vision_distance(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_vision_distance(std::shared_ptr<gamestate> g, entityid id, int distance);
+bool g_set_vision_distance(std::shared_ptr<gamestate> g,
+                           entityid id,
+                           int distance);
 int g_get_vision_distance(std::shared_ptr<gamestate> g, entityid id);
 
 bool g_add_ringtype(std::shared_ptr<gamestate> g, entityid id, ringtype type);

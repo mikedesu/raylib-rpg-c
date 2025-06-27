@@ -50,7 +50,8 @@ entityid tile_add(shared_ptr<tile_t> t, entityid id) {
     massert(t, "tile is NULL");
     massert(t->entities, "tile entities is NULL");
     // Check if the entity already exists
-    if (std::find(t->entities->begin(), t->entities->end(), id) != t->entities->end()) {
+    if (std::find(t->entities->begin(), t->entities->end(), id) !=
+        t->entities->end()) {
         merror("tile_add: entity already exists on tile");
         return ENTITYID_INVALID;
     }
@@ -103,56 +104,60 @@ void tile_free(shared_ptr<tile_t> t) {
 
 //void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em) {
 //void recompute_entity_cache(gamestate* g, tile_t* t) {
-void recompute_entity_cache(gamestate* g, shared_ptr<tile_t> t) {
-    massert(g, "gamestate is NULL");
-    massert(t, "tile is NULL");
-    // Only recompute if cache is dirty
-    if (!t->dirty_entities) return;
-    // Reset counters
-    t->cached_live_npcs = 0;
-    t->cached_player_present = false;
-    // Iterate through all entities on the tile
-    for (entityid id : *t->entities) {
-        // Skip dead entities
-        if (g_is_dead(g, id)) continue;
-        // Check entity type
-        entitytype_t type = g_get_type(g, id);
-        if (type == ENTITY_NPC) {
-            t->cached_live_npcs++;
-        } else if (type == ENTITY_PLAYER) {
-            t->cached_player_present = true;
-        }
-    }
-    // Cache is now clean
-    t->dirty_entities = false;
-}
+//void recompute_entity_cache(gamestate* g, shared_ptr<tile_t> t) {
+//    massert(g, "gamestate is NULL");
+//    massert(t, "tile is NULL");
+//    // Only recompute if cache is dirty
+//    if (!t->dirty_entities) return;
+//    // Reset counters
+//    t->cached_live_npcs = 0;
+//    t->cached_player_present = false;
+//    // Iterate through all entities on the tile
+//    for (entityid id : *t->entities) {
+//        // Skip dead entities
+//        //if (g_is_dead(g, id)) continue;
+//        // Check entity type
+//        entitytype_t type = g_get_type(g, id);
+//        if (type == ENTITY_NPC) {
+//            t->cached_live_npcs++;
+//        } else if (type == ENTITY_PLAYER) {
+//            t->cached_player_present = true;
+//        }
+//    }
+//    // Cache is now clean
+//    t->dirty_entities = false;
+//}
 
-void recompute_entity_cache_at(gamestate* g, int x, int y, int z) {
+//void recompute_entity_cache_at(gamestate* g, int x, int y, int z) {
+//    massert(g, "gamestate is NULL");
+//    massert(x >= 0, "x is out of bounds");
+//    massert(y >= 0, "y is out of bounds");
+//    massert(z >= 0, "z is out of bounds");
+//    massert(z < g->d->num_floors, "z is out of bounds");
+//    //dungeon_floor_t* const df = d_get_floor(g->dungeon, z);
+//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
+//    massert(df, "failed to get dungeon floor");
+//    //tile_t* const t = df_tile_at(df, (vec3){x, y, z});
+//    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
+//    if (!t) {
+//        merror("tile not found");
+//        return;
+//    }
+//    //recompute_entity_cache(g, t);
+//}
+
+//size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z) {
+size_t tile_live_npc_count_at(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     massert(x >= 0, "x is out of bounds");
     massert(y >= 0, "y is out of bounds");
     massert(z >= 0, "z is out of bounds");
-    massert(z < g->d->num_floors, "z is out of bounds");
-    dungeon_floor_t* const df = d_get_floor(g->d, z);
-    massert(df, "failed to get dungeon floor");
-    //tile_t* const t = df_tile_at(df, (vec3){x, y, z});
-    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
-    if (!t) {
-        merror("tile not found");
-        return;
-    }
-    recompute_entity_cache(g, t);
-}
-
-size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z) {
-    massert(g, "gamestate is NULL");
-    massert(x >= 0, "x is out of bounds");
-    massert(y >= 0, "y is out of bounds");
-    massert(z >= 0, "z is out of bounds");
-    recompute_entity_cache_at(g, x, y, z);
-    dungeon_t* d = g_get_dungeon(g);
+    //recompute_entity_cache_at(g, x, y, z);
+    //dungeon_t* d = g_get_dungeon(g);
+    shared_ptr<dungeon_t> d = g->dungeon;
     massert(d, "failed to get dungeon");
-    dungeon_floor_t* df = d_get_floor(d, z);
+    //dungeon_floor_t* df = d_get_floor(d, z);
+    shared_ptr<dungeon_floor_t> df = d_get_floor(d, z);
     massert(df, "failed to get dungeon floor");
     massert(x < df->width, "x is out of bounds");
     massert(y < df->height, "y is out of bounds");

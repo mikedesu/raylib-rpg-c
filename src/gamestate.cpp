@@ -44,9 +44,9 @@ static void gamestate_load_monster_defs(shared_ptr<gamestate> g);
 
 // have to update this function when we introduce new fields to Gamestate
 shared_ptr<gamestate> gamestateinitptr() {
+    minfo("Initializing gamestate");
     const size_t n = LIST_INIT_CAPACITY;
 
-    //gamestate* g = (gamestate*)malloc(sizeof(gamestate));
     shared_ptr<gamestate> g = make_shared<gamestate>();
     massert(g, "g is NULL");
 
@@ -98,10 +98,6 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->dirty_entities = false;
     g->display_sort_inventory_menu = false;
     g->music_volume_changed = false;
-    //g->sort_inventory_menu_selection_max = 2;
-    //g->hero_inventory_sorted_by_name = NULL;
-    //g->hero_inventory_sorted_by_type = NULL;
-    //g->sort_inventory_menu_selection = 0;
     g->gameplay_settings_menu_selection = 0;
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){0, 0};
@@ -121,7 +117,6 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
     g->pad = 20;
     g->line_spacing = 1.0f;
-    //g->components = ct_create();
 
     g->next_entityid = 0;
     g->current_music_index = 0;
@@ -140,135 +135,6 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->debugpanel.pad_right = 0;
     g->debugpanel.pad_bottom = 0;
     g->inventory_menu_selection = 0;
-    //g->type_list_count = 0;
-    //g->race_list_count = 0;
-    //g->direction_list_count = 0;
-    //g->loc_list_count = 0;
-    //g->sprite_move_list_count = 0;
-    //g->dead_list_count = 0;
-    //g->update_list_count = 0;
-    //g->attacking_list_count = 0;
-    //g->blocking_list_count = 0;
-    //g->block_success_list_count = 0;
-    //g->damaged_list_count = 0;
-    //g->inventory_list_count = 0;
-    //g->target_list_count = 0;
-    //g->target_path_list_count = 0;
-    //g->default_action_list_count = 0;
-    //g->equipment_list_count = 0;
-    //g->stats_list_count = 0;
-    //g->itemtype_list_count = 0;
-    //g->weapontype_list_count = 0;
-    //g->shieldtype_list_count = 0;
-    //g->potion_type_list_count = 0;
-    //g->damage_list_count = 0;
-    //g->ac_list_count = 0;
-    //g->zapping_list_count = 0;
-    //g->base_attack_damage_list_count = 0;
-    //g->vision_distance_list_count = 0;
-    //g->light_radius_list_count = 0;
-    //g->light_radius_bonus_list_count = 0;
-    //g->ringtype_list_count = 0;
-    //g->explored_list_count = 0;
-    //g->visible_list_count = 0;
-
-    //g->type_list_capacity = n;
-    //g->race_list_capacity = n;
-    //g->direction_list_capacity = n;
-    //g->loc_list_capacity = n;
-    //g->sprite_move_list_capacity = n;
-    //g->dead_list_capacity = n;
-    //g->update_list_capacity = n;
-    //g->attacking_list_capacity = n;
-    //g->blocking_list_capacity = n;
-    //g->block_success_list_capacity = n;
-    //g->damaged_list_capacity = n;
-    //g->inventory_list_capacity = n;
-    //g->target_list_capacity = n;
-    //g->target_path_list_capacity = n;
-    //g->default_action_list_capacity = n;
-    //g->equipment_list_capacity = n;
-    //g->stats_list_capacity = n;
-    //g->itemtype_list_capacity = n;
-    //g->weapontype_list_capacity = n;
-    //g->shieldtype_list_capacity = n;
-    //g->potion_type_list_capacity = n;
-    //g->damage_list_capacity = n;
-    //g->ac_list_capacity = n;
-    //g->zapping_list_capacity = n;
-    //g->base_attack_damage_list_capacity = n;
-    //g->vision_distance_list_capacity = n;
-    //g->light_radius_list_capacity = n;
-    //g->ringtype_list_capacity = n;
-    //g->light_radius_bonus_list_capacity = n;
-    //g->explored_list_capacity = n;
-    //g->visible_list_capacity = n;
-
-    //g->type_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->race_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->direction_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->loc_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
-    //g->sprite_move_list = (rect_component*)malloc(sizeof(rect_component) * n);
-    //g->target_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
-    //g->dead_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->update_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->attacking_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->blocking_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->block_success_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->damaged_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->inventory_list = (inventory_component*)malloc(sizeof(inventory_component) * n);
-    //g->target_path_list = (target_path_component*)malloc(sizeof(target_path_component) * n);
-    //g->default_action_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->equipment_list = (equipment_component*)malloc(sizeof(equipment_component) * n);
-    //g->stats_list = (stats_component*)malloc(sizeof(stats_component) * n);
-    //g->itemtype_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->weapontype_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->shieldtype_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->potion_type_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->ac_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->zapping_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
-    //g->base_attack_damage_list = (vec3_component*)malloc(sizeof(vec3_component) * n);
-    //g->vision_distance_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->light_radius_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->ringtype_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->light_radius_bonus_list = (int_component*)malloc(sizeof(int_component) * n);
-    //g->explored_list = (vec3_list_component*)malloc(sizeof(vec3_list_component) * n);
-    //g->visible_list = (vec3_list_component*)malloc(sizeof(vec3_list_component) * n);
-
-    //massert(g->type_list, "g->type_list is NULL");
-    //massert(g->race_list, "g->race_list is NULL");
-    //massert(g->direction_list, "g->direction_list is NULL");
-    //massert(g->loc_list, "g->loc_list is NULL");
-    //massert(g->sprite_move_list, "g->sprite_move_list is NULL");
-    //massert(g->target_list, "g->target_list is NULL");
-    //massert(g->dead_list, "g->dead_list is NULL");
-    //massert(g->update_list, "g->update_list is NULL");
-    //massert(g->attacking_list, "g->attacking_list is NULL");
-    //massert(g->blocking_list, "g->blocking_list is NULL");
-    //massert(g->block_success_list, "g->block_success_list is NULL");
-    //massert(g->damaged_list, "g->damaged_list is NULL");
-    //massert(g->inventory_list, "g->inventory_list is NULL");
-    //massert(g->target_path_list, "g->target_path_list is NULL");
-    //massert(g->default_action_list, "g->default_action_list is NULL");
-    //massert(g->equipment_list, "g->equipment_list is NULL");
-    //massert(g->stats_list, "g->stats_list is NULL");
-    //massert(g->itemtype_list, "g->itemtype_list is NULL");
-    //massert(g->weapontype_list, "g->weapontype_list is NULL");
-    //massert(g->shieldtype_list, "g->shieldtype_list is NULL");
-    //massert(g->potion_type_list, "g->potion_list is NULL");
-    //massert(g->ac_list, "g->ac_list is NULL");
-    //massert(g->zapping_list, "g->zapping_list is NULL");
-    //massert(g->damage_list, "g->damage_list is NULL");
-    //massert(g->base_attack_damage_list, "g->base_attack_damage_list is NULL");
-    //massert(g->vision_distance_list, "g->vision_distance_list is NULL");
-    //massert(g->light_radius_list, "g->light_radius_list is NULL");
-    //massert(g->light_radius_bonus_list, "g->light_radius_bonus_list is NULL");
-    //massert(g->ringtype_list, "g->ringtype_list is NULL");
-    //massert(g->explored_list, "g->explored_list is NULL");
-    //massert(g->visible_list, "g->visible_list is NULL");
-
-    //g->d = NULL;
 
     g->dungeon = nullptr;
 
@@ -279,9 +145,6 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->msg_history = new vector<string>();
 
     g->max_title_screen_selections = 3;
-    //g->chara_creation = (character_creation){0};
-
-    // minfo("Gamestate initialized with version: %s", g->version.c_str());
 
     g->chara_creation.name = "hero";
     g->chara_creation.strength = 10;
@@ -290,9 +153,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->chara_creation.hitdie = 6; // 1d6 hit die
     g->chara_creation.race = RACE_HUMAN;
     // why is the above line crashing?
-    // g->chara_creation.name = string("");
     // the above line is also crashing
-    // g->chara_creation .name = std::string("");
     msuccess("Gamestate character creation name set to empty string");
 
     g->current_scene = SCENE_TITLE;
@@ -303,8 +164,10 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->component_table = new unordered_map<entityid, long>();
 
     g->name_list = new unordered_map<entityid, string>();
+    g->type_list = new unordered_map<entityid, entitytype_t>();
 
     gamestate_load_keybindings(g);
+    msuccess("Gamestate initialized successfully");
     return g;
 }
 
@@ -389,7 +252,6 @@ monster_def* g_get_monster_def(gamestate* const g, race_t r) {
     return NULL; // Not found
 }
 
-//static void gamestate_init_music_paths(gamestate* const g) {
 static void gamestate_init_music_paths(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
     const char* music_path_file = "music.txt";
@@ -424,32 +286,17 @@ static void gamestate_init_music_paths(shared_ptr<gamestate> g) {
 
 bool gamestate_init_msg_history(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
-
     g->msg_history = new vector<string>();
     if (!g->msg_history) {
         merror("Failed to allocate memory for message history");
         return false;
     }
-
     // no need to initialize the vector, it starts empty
     // no need to set max_count, we will use the vector's size
     return true;
 }
 
-//bool gamestate_free_msg_history(gamestate* const g) {
-//    massert(g, "g is NULL");
-//    for (int i = 0; i < g->msg_history.max_count; i++) {
-//        if (g->msg_history.messages[i]) {
-//            free(g->msg_history.messages[i]);
-//            g->msg_history.messages[i] = NULL;
-//        }
-//    }
-//    free(g->msg_history.messages);
-//    g->msg_history.messages = NULL;
-//    return true;
-//}
 
-//void gamestatefree(gamestate* g) {
 void gamestate_free(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
     // free message history
@@ -466,11 +313,17 @@ void gamestate_free(shared_ptr<gamestate> g) {
     }
 
     if (g->name_list) {
+        g->name_list->clear();
         delete g->name_list;
         g->name_list = NULL;
     }
 
-    //free(g->type_list);
+    if (g->type_list) {
+        g->type_list->clear();
+        delete g->type_list;
+        g->type_list = NULL;
+    }
+
     //free(g->race_list);
     //free(g->direction_list);
     //free(g->loc_list);
@@ -508,28 +361,39 @@ void gamestate_free(shared_ptr<gamestate> g) {
     //free(g);
 }
 
+
 void gamestate_set_hero_id(gamestate* const g, entityid id) {
     massert(g, "g is NULL");
     g->hero_id = id;
 }
+
 
 entityid gamestate_get_hero_id(const gamestate* const g) {
     massert(g, "g is NULL");
     return g->hero_id;
 }
 
-//void gamestate_load_keybindings(gamestate* const g) {
+
 void gamestate_load_keybindings(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
+    minfo("Loading keybindings from file");
     string filename = "keybindings.ini";
+
+    // keybinding_list needs to be initialized
+    if (!g->keybinding_list) {
+        g->keybinding_list = make_shared<keybinding_list_t>();
+        massert(g->keybinding_list, "g->keybinding_list is NULL");
+    }
+
+
     load_keybindings(filename, g->keybinding_list);
     print_keybindings(g->keybinding_list);
 }
 
-//bool gamestate_add_msg_history(gamestate* const g, const char* msg) {
+
 bool gamestate_add_msg_history(shared_ptr<gamestate> g, string msg) {
     massert(g, "g is NULL");
-    massert(msg, "msg is NULL");
+    massert(msg != "", "msg is empty string");
     if (!g->msg_history) {
         merror("Message history is not initialized");
         return false;
@@ -539,11 +403,13 @@ bool gamestate_add_msg_history(shared_ptr<gamestate> g, string msg) {
     return true;
 }
 
+
 void gamestate_set_debug_panel_pos_bottom_left(gamestate* const g) {
     massert(g, "g is NULL");
     if (g->windowwidth == -1 || g->windowheight == -1) return;
     g->debugpanel.x = 0, g->debugpanel.y = g->windowheight - g->debugpanel.h;
 }
+
 
 void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
     massert(g, "g is NULL");
@@ -552,13 +418,12 @@ void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
     g->debugpanel.y = g->debugpanel.pad_right;
 }
 
-//bool g_register_comp(gamestate* const g, entityid id, component comp) {
+
 bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(comp != C_COUNT, "comp is invalid");
-
-    if (!g_has_component(g, id, comp)) {
+    if (!g_has_comp(g, id, comp)) {
         // If the component is not already registered, add it
         if (g->component_table->find(id) == g->component_table->end()) {
             (*g->component_table)[id] = 0; // Initialize with 0 components
@@ -566,9 +431,8 @@ bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp) {
         (*g->component_table)[id] |=
             (1 << comp); // Set the bit for the component
     }
-
     // Check if the component was successfully registered
-    if (g_has_component(g, id, comp)) {
+    if (g_has_comp(g, id, comp)) {
         minfo("Component %s registered for entity %d", component2str(comp), id);
         return true;
     }
@@ -578,105 +442,22 @@ bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp) {
     return false;
 }
 
-//bool g_add_component(gamestate* const g, entityid id, component comp, void* data, size_t c_size, void** c_list, int* c_count, int* c_capacity) {
-//minfo("g_add_component: id: %d, comp: %s", id, component2str(comp));
-//    massert(g, "g is NULL");
-//    if (!data) {
-//        mwarning("data is NULL");
-//    }
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    massert(*c_list, "c_list is NULL");
-//    massert(*c_capacity > 0, "c_capacity is 0");
-//    massert(*c_count >= 0, "c_count is negative");
-//    massert(*c_count <= g->next_entityid, "c_count >= g->next_entityid: %d >= %d", *c_count, g->next_entityid);
-// Ensure entity exists in component table
-//    if (!ct_has_entity(g->components, id) && !ct_add_entity(g->components, id)) return false;
-// Automatically register component if not already registered
-//    if (!g_has_component(g, id, comp) && !g_register_comp(g, id, comp)) return false;
-//    if (*c_count >= *c_capacity) {
-//        *c_capacity *= 2;
-//        *c_list = realloc(*c_list, c_size * (*c_capacity));
-//        if (*c_list == NULL) return false;
-//    }
-// Initialize the component
-//void* c_ptr = *c_list + (*c_count * c_size);
-// the above line generates an error: Arithmetic on pointer to void
-// we need to cast it to the correct type
-//    void* c_ptr = (char*)(*c_list) + (*c_count * c_size);
-
-//    switch (comp) {
-//    case C_NAME: init_name_component((name_component*)c_ptr, id, (const char*)data); break;
-//    case C_TYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_RACE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_DIRECTION: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_ITEMTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_POTIONTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_AC: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_WEAPONTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_SHIELDTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_DEFAULT_ACTION: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_DEAD: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_UPDATE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_ATTACKING: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_ZAPPING: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_BLOCKING: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_BLOCK_SUCCESS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_DAMAGED: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_LOCATION: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-//    case C_SPRITE_MOVE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-//    case C_TARGET: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-//    case C_INVENTORY: init_inventory_component((inventory_component*)c_ptr, id); break;
-//    case C_TARGET_PATH: init_target_path_component((target_path_component*)c_ptr, id, NULL, 0);
-//    case C_EQUIPMENT: init_equipment_component((equipment_component*)c_ptr, id); break;
-//    case C_STATS: init_stats_component((stats_component*)c_ptr, id); break;
-//    case C_DAMAGE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-//    case C_BASE_ATTACK_DAMAGE: init_vec3_component((vec3_component*)c_ptr, id, *(vec3*)data); break;
-//    case C_LIGHT_RADIUS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_LIGHT_RADIUS_BONUS: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_VISION_DISTANCE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_RINGTYPE: init_int_component((int_component*)c_ptr, id, *(int*)data); break;
-//    case C_EXPLORED_LIST: init_vec3_list_component((vec3_list_component*)c_ptr, id, NULL, 0); break;
-//    case C_VISIBLE_LIST:
-//        init_vec3_list_component((vec3_list_component*)c_ptr, id, NULL, 0);
-//        break;
-//case C_SPELL_EFFECT: init_spell_effect_component((spell_effect_component*)c_ptr, id, *(spell_effect*)data); break;
-//    default: merror("Unsupported component type: %s", component2str(comp)); return false;
-//    }
-//    (*c_count)++;
-//    return true;
-//}
 
 bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp) {
     return g_register_comp(g, id, comp);
 }
 
-bool g_add_name(shared_ptr<gamestate> g, entityid id, string name) {
-    massert(g, "g is NULL");
-    massert(name != "", "name is empty string");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Ensure entity exists in component table
-    // Automatically register component if not already registered
-    if (!g_add_component(g, id, C_NAME)) {
-        merror("g_add_component failed for id %d", id);
-        return false;
-    }
-    massert(g->name_list, "g->name_list is NULL");
-    g->name_list->insert({id, name});
-    return true;
-}
 
-bool g_has_component(shared_ptr<gamestate> g, entityid id, component comp) {
+bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(comp != C_COUNT, "comp is invalid");
     massert(g->component_table, "g->component_table is NULL");
-
     // Check if the entity exists in the component table
     // component table is now an unordered_map
     if (g->component_table->find(id) == g->component_table->end()) {
         return false; // Entity does not exist
     }
-
     // Check if the component is registered for the entity
     long components = g->component_table->at(id);
     // Check if the component bit is set
@@ -687,18 +468,29 @@ bool g_has_component(shared_ptr<gamestate> g, entityid id, component comp) {
     return false; // Component is not registered
 }
 
-//bool g_has_name(const gamestate* const g, entityid id) {
+
 bool g_has_name(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    //return g_has_component(g, id, C_NAME);
-    return g_has_component(g, id, C_NAME);
+    return g_has_comp(g, id, C_NAME);
 }
 
-//string g_get_name(gamestate* const g, entityid id) {
+
+bool g_add_name(shared_ptr<gamestate> g, entityid id, string name) {
+    // Ensure entity exists in component table
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_NAME)) {
+        merror("g_add_component failed for id %d", id);
+        return false;
+    }
+    if (!g->name_list) {
+        merror("g->name_list is NULL");
+        return false;
+    }
+    (*g->name_list)[id] = name; // Insert or update the name
+    return true;
+}
+
+
 string g_get_name(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
     if (!g_has_name(g, id)) {
         merror("g_get_name: id %d does not have a name component", id);
         return "no-name-comp";
@@ -708,67 +500,48 @@ string g_get_name(shared_ptr<gamestate> g, entityid id) {
         massert(g->name_list->find(id) != g->name_list->end(),
                 "g_get_name: id %d not found in name_list",
                 id);
-        // return the name associated with the id
         return g->name_list->at(id);
-        //auto it = g->name_list->find(id);
-        //if (it != g->name_list->end()) {
-        //    return it->second; // Return the name associated with the id
-        //}
     }
-    merror("g_get_name: id %d does not have a name but it does have a name "
-           "component",
-           id);
     return "no-name"; // Return an empty string if the id is not found
 }
 
-//bool g_add_type(gamestate* const g, entityid id, int type) {
-//bool g_add_type(shared_ptr<gamestate> g, entityid id, int type) {
-//    massert(g, "g is NULL");
-//    massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
-//    return g_add_component(g, id, C_TYPE, (void*)&type, sizeof(int_component), (void**)&g->type_list, &g->type_list_count, &g->type_list_capacity);
-//}
 
-//entitytype_t g_get_type(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    if (id != ENTITYID_INVALID) {
-//        for (int i = 0; i < g->type_list_count; i++) {
-//            if (g->type_list[i].id == id) {
-//                return (entitytype_t)g->type_list[i].data;
-//            }
-//        }
-//    }
-//    return ENTITY_NONE;
-//}
+bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type) {
+    if (!g_add_comp(g, id, C_TYPE)) {
+        merror("g_add_type: Failed to add component C_TYPE for id %d", id);
+        return false;
+    }
+    if (!g->type_list) {
+        merror("g->type_list is NULL");
+        return false;
+    }
+    // Check if the type already exists for the entity
+    (*g->type_list)[id] = type; // Insert or update the type
+    return true;
+}
 
-//bool g_set_type(gamestate* const g, entityid id, int type) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
-//    massert(g->type_list, "g->type_list is NULL");
-//    if (g->type_list == NULL) return false;
-//    for (int i = 0; i < g->type_list_count; i++) {
-//        if (g->type_list[i].id == id) {
-//            g->type_list[i].data = type;
-//            return true;
-//        }
-//    }
-//    return false;
-//}
 
-//bool g_has_type(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_TYPE);
-//}
+entitytype_t g_get_type(shared_ptr<gamestate> g, entityid id) {
+    if (!g_has_comp(g, id, C_TYPE)) {
+        merror("g_get_type: id %d does not have a type component", id);
+        return ENTITY_NONE; // Return ENTITY_NONE if the type component is not present
+    }
+    if (g->type_list) {
+        massert(g->type_list->find(id) != g->type_list->end(),
+                "g_get_type: id %d not found in type_list",
+                id);
+        return g->type_list->at(id);
+    }
+    return ENTITY_NONE; // Return ENTITY_NONE if the id is not found
+}
 
-//bool g_is_type(const gamestate* const g, entityid id, int type) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    massert(type > ENTITY_NONE && type < ENTITY_TYPE_COUNT, "type is invalid");
-//    massert(g->type_list, "g->type_list is NULL");
-//    if (g->type_list == NULL) return false;
-//    return type == g_get_type(g, id);
-//}
+
+bool g_has_type(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_TYPE);
+}
+
 
 //bool g_add_race(gamestate* const g, entityid id, int race) {
 //    massert(g, "g is NULL");

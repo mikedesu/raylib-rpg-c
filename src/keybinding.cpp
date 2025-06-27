@@ -6,7 +6,6 @@
 using std::shared_ptr;
 using std::string;
 
-//const char* get_action_for_key(keybinding_list_t* kb, int key) {
 const char* get_action_for_key(shared_ptr<keybinding_list_t> kb, int key) {
     for (int i = 0; i < kb->count; i++) {
         if (kb->bindings[i].key == key) {
@@ -74,17 +73,19 @@ int key_from_string(string str) {
     return -1;
 }
 
-//void load_keybindings(const char* filename, keybinding_list_t* kb) {
 void load_keybindings(string filename, shared_ptr<keybinding_list_t> kb) {
+    minfo("Loading keybindings from file: %s", filename.c_str());
     FILE* file = fopen(filename.c_str(), "r");
     if (!file) {
-        fprintf(stderr, "Failed to open keybindings file: %s\n", filename.c_str());
+        fprintf(
+            stderr, "Failed to open keybindings file: %s\n", filename.c_str());
         exit(EXIT_FAILURE);
     }
     msuccess("Keybindings file opened successfully");
     char line[128];
     kb->count = 0;
-    while (fgets(line, sizeof(line), file) && kb->count < KEYBINDING_LIST_MAX_LENGTH) {
+    while (fgets(line, sizeof(line), file) &&
+           kb->count < KEYBINDING_LIST_MAX_LENGTH) {
         massert(line, "Keybinding line is NULL");
         char keyname[64];
         char action[64];
@@ -92,8 +93,11 @@ void load_keybindings(string filename, shared_ptr<keybinding_list_t> kb) {
             int key = key_from_string(keyname);
             if (key > 0) {
                 kb->bindings[kb->count].key = key;
-                strncpy(kb->bindings[kb->count].action, action, sizeof(kb->bindings[kb->count].action) - 1);
-                kb->bindings[kb->count].action[sizeof(kb->bindings[kb->count].action) - 1] = '\0';
+                strncpy(kb->bindings[kb->count].action,
+                        action,
+                        sizeof(kb->bindings[kb->count].action) - 1);
+                kb->bindings[kb->count]
+                    .action[sizeof(kb->bindings[kb->count].action) - 1] = '\0';
                 kb->count++;
             } else {
                 merror("Invalid key %s", keyname);
@@ -107,6 +111,8 @@ void load_keybindings(string filename, shared_ptr<keybinding_list_t> kb) {
 void print_keybindings(shared_ptr<keybinding_list_t> kb) {
     printf("Keybindings:\n");
     for (int i = 0; i < kb->count; i++) {
-        printf("Key: %d, Action: %s\n", kb->bindings[i].key, kb->bindings[i].action);
+        printf("Key: %d, Action: %s\n",
+               kb->bindings[i].key,
+               kb->bindings[i].action);
     }
 }
