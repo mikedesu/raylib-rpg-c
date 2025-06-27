@@ -1,26 +1,26 @@
-#include "bonus_table.h"
-#include "controlmode.h"
+//#include "bonus_table.h"
+//#include "controlmode.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
-#include "entity_actions.h"
-#include "entityid.h"
-#include "entitytype.h"
+//#include "entity_actions.h"
+//#include "entityid.h"
+//#include "entitytype.h"
 #include "gamestate.h"
-#include "gamestate_flag.h"
+//#include "gamestate_flag.h"
 #include "inputstate.h"
-#include "inventory_sort.h"
-#include "keybinding.h"
-#include "libgame_defines.h"
+//#include "inventory_sort.h"
+//#include "keybinding.h"
+//#include "libgame_defines.h"
 #include "liblogic.h"
 #include "massert.h"
-#include "mprint.h"
-#include "path_node.h"
-#include "potion.h"
-#include "race.h"
-#include "roll.h"
-#include "stats_slot.h"
+//#include "mprint.h"
+//#include "path_node.h"
+//#include "potion.h"
+//#include "race.h"
+//#include "roll.h"
+//#include "stats_slot.h"
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
@@ -29,11 +29,13 @@
 
 using std::shared_ptr;
 using std::string;
-using std::vector;
+//using std::vector;
 
 int liblogic_restart_count = 0;
 
-static inline bool is_traversable(shared_ptr<gamestate> g, int x, int y, int z) {
+/*
+static inline bool
+is_traversable(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     massert(z >= 0, "floor is out of bounds");
     massert(z < g->d->num_floors, "floor is out of bounds");
@@ -43,8 +45,12 @@ static inline bool is_traversable(shared_ptr<gamestate> g, int x, int y, int z) 
     massert(t, "failed to get tile");
     return tile_is_walkable(t->type);
 }
+*/
 
-static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(shared_ptr<gamestate> g, entityid id) {
+
+/*
+static inline shared_ptr<tile_t>
+get_first_empty_tile_around_entity(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     vec3 loc = g_get_location(g, id);
@@ -68,20 +74,26 @@ static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(shared_ptr<g
     }
     return nullptr; // no empty tile found
 }
+*/
 
+/*
 static inline void reset_player_blocking(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     g_set_blocking(g, g->hero_id, false);
     g_set_block_success(g, g->hero_id, false);
     g_set_update(g, g->hero_id, true);
 }
+*/
 
+/*
 static inline void reset_player_block_success(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     g_set_block_success(g, g->hero_id, false);
     g_set_update(g, g->hero_id, true);
 }
+*/
 
+/*
 static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
@@ -99,86 +111,133 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
         g_set_update(g, id, true);
     }
 }
+*/
 
-static void update_player_tiles_explored(shared_ptr<gamestate> g);
-static vec3 get_random_available_loc_in_area(shared_ptr<gamestate> g, int floor, int x0, int y0, int w, int h);
-static vec3 get_base_attack_damage_for_race(race_t race);
-static vec3* get_available_locs_in_area(shared_ptr<gamestate> g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h);
-static int calc_challenge_rating(shared_ptr<gamestate> g, entityid id);
+//static void update_player_tiles_explored(shared_ptr<gamestate> g);
+//static vec3 get_random_available_loc_in_area(shared_ptr<gamestate> g,
+//                                             int floor,
+//                                             int x0,
+//                                             int y0,
+//                                             int w,
+//                                             int h);
+//static vec3 get_base_attack_damage_for_race(race_t race);
+//static vec3* get_available_locs_in_area(shared_ptr<gamestate> g,
+//                                        dungeon_floor_t* const df,
+//                                        int* count,
+//                                        int x0,
+//                                        int y0,
+//                                        int w,
+//                                        int h);
+//static int calc_challenge_rating(shared_ptr<gamestate> g, entityid id);
 //static vec3* get_locs_around_entity(gamestate* const g, entityid id);
-static vec3* get_locs_around_entity(shared_ptr<gamestate> g, entityid id, int* count);
+//static vec3*
+//get_locs_around_entity(shared_ptr<gamestate> g, entityid id, int* count);
 //static void handle_input_gameplay_settings(const inputstate* const is, gamestate* const g);
-static void handle_input_gameplay_settings(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
+//static void handle_input_gameplay_settings(shared_ptr<inputstate> is,
+//                                           shared_ptr<gamestate> g);
 //static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful);
-static void handle_attack_blocked(shared_ptr<gamestate> g, entityid attacker_id, entityid target_id, bool* atk_successful);
+//static void handle_attack_blocked(shared_ptr<gamestate> g,
+//                                  entityid attacker_id,
+//                                  entityid target_id,
+//                                  bool* atk_successful);
 //static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
-static void handle_input_help_menu(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
+//static void handle_input_help_menu(shared_ptr<inputstate> is,
+//                                   shared_ptr<gamestate> g);
 //static void handle_level_up(gamestate* const g, entityid id);
-static void handle_level_up(shared_ptr<gamestate> g, entityid id);
+//static void handle_level_up(shared_ptr<gamestate> g, entityid id);
 //static void handle_input_sort_inventory(const inputstate* const is, gamestate* const g);
-static void handle_input_sort_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
+//static void handle_input_sort_inventory(shared_ptr<inputstate> is,
+//                                        shared_ptr<gamestate> g);
 //static void init_dungeon(gamestate* const g);
-static void init_dungeon(shared_ptr<gamestate> g);
+//static void init_dungeon(shared_ptr<gamestate> g);
 //static void update_player_state(gamestate* const g);
-static void update_player_state(shared_ptr<gamestate> g);
+//static void update_player_state(shared_ptr<gamestate> g);
 //static void update_debug_panel_buffer(gamestate* const g);
-static void update_debug_panel_buffer(shared_ptr<gamestate> g);
+//static void update_debug_panel_buffer(shared_ptr<gamestate> g);
 //static void handle_camera_move(gamestate* const g, const inputstate* const is);
-static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+//static void handle_camera_move(shared_ptr<gamestate> g,
+//                               shared_ptr<inputstate> is);
 //static void handle_input(const inputstate* const is, gamestate* const g);
-static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static void handle_input_camera(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static void handle_input_inventory(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+//static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+//static void handle_input_camera(shared_ptr<gamestate> g,
+//                                shared_ptr<inputstate> is);
+//static void handle_input_player(shared_ptr<gamestate> g,
+//                                shared_ptr<inputstate> is);
+//static void handle_input_inventory(shared_ptr<gamestate> g,
+//                                   shared_ptr<inputstate> is);
 //static void add_message_history(gamestate* const g, const char* fmt, ...);
-static void add_message_history(shared_ptr<gamestate> g, const char* fmt, ...);
+//static void add_message_history(shared_ptr<gamestate> g, const char* fmt, ...);
 //static void add_message_and_history(gamestate* g, const char* fmt, ...);
-static void add_message_and_history(shared_ptr<gamestate> g, const char* fmt, ...);
+//static void
+//add_message_and_history(shared_ptr<gamestate> g, const char* fmt, ...);
 //static void add_message(gamestate* g, const char* fmt, ...);
-static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
+//static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
 //static void try_entity_move_a_star(gamestate* const g, entityid id);
-static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id);
+//static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id);
 //static void try_entity_move(gamestate* const g, entityid id, int x, int y);
-static void try_entity_move(shared_ptr<gamestate> g, entityid id, int x, int y);
+//static void try_entity_move(shared_ptr<gamestate> g, entityid id, int x, int y);
 //static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
-static void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
+//static void try_entity_attack(shared_ptr<gamestate> g,
+//                              entityid attacker_id,
+//                              int target_x,
+//                              int target_y);
 //static void try_entity_traverse_floors(gamestate* const g, entityid id);
-static void try_entity_traverse_floors(shared_ptr<gamestate> g, entityid id);
+//static void try_entity_traverse_floors(shared_ptr<gamestate> g, entityid id);
 //static void check_and_handle_level_up(gamestate* const g, entityid id);
-static void check_and_handle_level_up(shared_ptr<gamestate> g, entityid id);
+//static void check_and_handle_level_up(shared_ptr<gamestate> g, entityid id);
 //static const char* get_action_key(const inputstate* const is, gamestate* const g);
-static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+//static const char* get_action_key(shared_ptr<gamestate> g,
+//                                  shared_ptr<inputstate> is);
 //static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, string name);
-static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int fl, string name);
+//static entityid player_create(shared_ptr<gamestate> g,
+//                              race_t rt,
+//                              int x,
+//                              int y,
+//                              int fl,
+//                              string name);
 //static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name);
-static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+//static entityid
+//npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
 //static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name);
-static entityid item_create(shared_ptr<gamestate> g, itemtype type, vec3 loc, const char* name);
+//static entityid
+//item_create(shared_ptr<gamestate> g, itemtype type, vec3 loc, const char* name);
 //static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name);
-static entityid potion_create(shared_ptr<gamestate> g, vec3 loc, potiontype type, const char* name);
+//static entityid potion_create(shared_ptr<gamestate> g,
+//                              vec3 loc,
+//                              potiontype type,
+//                              const char* name);
 
 //static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1);
 //static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race);
 //static int calc_next_lvl_xp(gamestate* const g, entityid id);
 //static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id);
-static bool entities_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1);
-static entityid npc_create_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
+//static bool
+//entities_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1);
+//static entityid
+//npc_create_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
 
-static int get_hitdie_for_race(race_t race);
-static int calc_next_lvl_xp(shared_ptr<gamestate> g, entityid id);
-static int calc_reward_xp(shared_ptr<gamestate> g, entityid attacker_id, entityid target_id);
+//static int get_hitdie_for_race(race_t race);
+//static int calc_next_lvl_xp(shared_ptr<gamestate> g, entityid id);
+//static int calc_reward_xp(shared_ptr<gamestate> g,
+//                          entityid attacker_id,
+//                          entityid target_id);
 
-static race_t get_random_race();
+//static race_t get_random_race();
 
-static int calc_reward_xp(shared_ptr<gamestate> g, entityid attacker_id, entityid target_id) {
+/*
+static int calc_reward_xp(shared_ptr<gamestate> g,
+                          entityid attacker_id,
+                          entityid target_id) {
     massert(g, "gamestate is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker id is invalid");
     massert(target_id != ENTITYID_INVALID, "target id is invalid");
     // get the entity type
     entitytype_t attacker_type = g_get_type(g, attacker_id);
-    massert(attacker_type == ENTITY_NPC || attacker_type == ENTITY_PLAYER, "attacker type is not NPC or Player");
+    massert(attacker_type == ENTITY_NPC || attacker_type == ENTITY_PLAYER,
+            "attacker type is not NPC or Player");
     entitytype_t target_type = g_get_type(g, target_id);
-    massert(target_type == ENTITY_NPC || target_type == ENTITY_PLAYER, "target type is not NPC or Player");
+    massert(target_type == ENTITY_NPC || target_type == ENTITY_PLAYER,
+            "target type is not NPC or Player");
     if (target_type != ENTITY_NPC && target_type != ENTITY_PLAYER) {
         merror("Target type is not NPC or Player");
         return 0; // no reward for non-NPC/Player targets
@@ -205,14 +264,17 @@ static int calc_reward_xp(shared_ptr<gamestate> g, entityid attacker_id, entityi
     massert(reward_xp >= 0, "reward xp is negative");
     return reward_xp;
 }
+*/
 
 //static int calc_challenge_rating(gamestate* const g, entityid id) {
+/*
 static int calc_challenge_rating(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     // get the entity type
     entitytype_t type = g_get_type(g, id);
-    massert(type == ENTITY_NPC || type == ENTITY_PLAYER, "entity type is not NPC or Player");
+    massert(type == ENTITY_NPC || type == ENTITY_PLAYER,
+            "entity type is not NPC or Player");
     if (type != ENTITY_NPC || type != ENTITY_PLAYER) {
         merror("Entity type is not NPC or Player");
         return 0; // no challenge rating for non-NPC entities
@@ -238,8 +300,10 @@ static int calc_challenge_rating(shared_ptr<gamestate> g, entityid id) {
     // set the challenge rating
     return challenge_rating;
 }
+*/
 
 //static int calc_next_lvl_xp(gamestate* const g, entityid id) {
+/*
 static int calc_next_lvl_xp(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
@@ -253,7 +317,9 @@ static int calc_next_lvl_xp(shared_ptr<gamestate> g, entityid id) {
     // set the next level's xp
     return next_lvl_xp;
 }
+*/
 
+/*
 static void add_message_history(gamestate* const g, const char* fmt, ...) {
     massert(g, "gamestate is NULL");
     massert(fmt, "fmt is NULL");
@@ -265,12 +331,18 @@ static void add_message_history(gamestate* const g, const char* fmt, ...) {
     }
     va_list args;
     va_start(args, fmt);
-    vsnprintf(g->msg_history.messages[g->msg_history.count], MAX_MSG_LENGTH - 1, fmt, args);
+    vsnprintf(g->msg_history.messages[g->msg_history.count],
+              MAX_MSG_LENGTH - 1,
+              fmt,
+              args);
     va_end(args);
-    g->msg_history.messages[g->msg_history.count][MAX_MSG_LENGTH - 1] = '\0'; // null term
+    g->msg_history.messages[g->msg_history.count][MAX_MSG_LENGTH - 1] =
+        '\0'; // null term
     g->msg_history.count++;
 }
+*/
 
+/*
 static void add_message_and_history(gamestate* g, const char* fmt, ...) {
     massert(g, "gamestate is NULL");
     massert(fmt, "format string is NULL");
@@ -280,13 +352,18 @@ static void add_message_and_history(gamestate* g, const char* fmt, ...) {
     }
     va_list args;
     va_start(args, fmt);
-    vsnprintf(g->msg_system.messages[g->msg_system.count], MAX_MSG_LENGTH - 1, fmt, args);
+    vsnprintf(g->msg_system.messages[g->msg_system.count],
+              MAX_MSG_LENGTH - 1,
+              fmt,
+              args);
     va_end(args);
     add_message_history(g, g->msg_system.messages[g->msg_system.count]);
     g->msg_system.count++;
     g->msg_system.is_active = true;
 }
+*/
 
+/*
 static void add_message(gamestate* g, const char* fmt, ...) {
     massert(g, "gamestate is NULL");
     massert(fmt, "format string is NULL");
@@ -296,11 +373,15 @@ static void add_message(gamestate* g, const char* fmt, ...) {
     }
     va_list args;
     va_start(args, fmt);
-    vsnprintf(g->msg_system.messages[g->msg_system.count], MAX_MSG_LENGTH - 1, fmt, args);
+    vsnprintf(g->msg_system.messages[g->msg_system.count],
+              MAX_MSG_LENGTH - 1,
+              fmt,
+              args);
     va_end(args);
     g->msg_system.count++;
     g->msg_system.is_active = true;
 }
+*/
 
 //static void update_equipped_shield_dir(gamestate* g, entity* e) {
 //static void update_equipped_shield_dir(gamestate* g, entityid id) {
@@ -318,7 +399,9 @@ static void add_message(gamestate* g, const char* fmt, ...) {
 //}
 
 //static inline int tile_npc_living_count(const gamestate* const g, int x, int y, int z) {
-static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
+/*
+static inline int
+tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
     // Validate inputs
     massert(g, "gamestate is NULL");
     massert(z >= 0, "floor is out of bounds");
@@ -339,10 +422,13 @@ static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, i
     }
     return count;
 }
+*/
 
 //static void try_entity_move(gamestate* const g, entity* const e, int x, int y) {
 //static void try_entity_move(gamestate* const g, entityid id, int x, int y) {
-static void try_entity_move(shared_ptr<gamestate> g, entityid id, int x, int y) {
+/*
+static void
+try_entity_move(shared_ptr<gamestate> g, entityid id, int x, int y) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     //massert(e, "Entity is NULL!");
@@ -378,7 +464,12 @@ static void try_entity_move(shared_ptr<gamestate> g, entityid id, int x, int y) 
     g_update_location(g, id, (vec3){ex, ey, z});
 
     //g_update_sprite_move(g, id, (vec3){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
-    g_update_sprite_move(g, id, (Rectangle){(float)(x * DEFAULT_TILE_SIZE), (float)(y * DEFAULT_TILE_SIZE), 0, 0});
+    g_update_sprite_move(g,
+                         id,
+                         (Rectangle){(float)(x * DEFAULT_TILE_SIZE),
+                                     (float)(y * DEFAULT_TILE_SIZE),
+                                     0,
+                                     0});
 
     if (id == g->hero_id) {
         update_player_tiles_explored(g);
@@ -411,8 +502,10 @@ static void try_entity_move(shared_ptr<gamestate> g, entityid id, int x, int y) 
     //}
     if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
+*/
 
 //static void try_entity_move_a_star(gamestate* const g, entityid id) {
+/*
 static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
@@ -428,7 +521,8 @@ static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id) {
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, eloc.z);
     //massert(df, "dungeon floor is NULL");
     int target_path_length = 0;
-    vec3* target_path = find_path(eloc_cast, hloc_cast, df, &target_path_length);
+    vec3* target_path =
+        find_path(eloc_cast, hloc_cast, df, &target_path_length);
     if (target_path) {
         if (target_path_length >= 2) {
             vec3 loc = target_path[target_path_length - 2];
@@ -442,8 +536,10 @@ static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id) {
         }
     }
 }
+*/
 
 //static void try_entity_move_random(gamestate* const g, entityid id) {
+/*
 static void try_entity_move_random(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
@@ -459,8 +555,12 @@ static void try_entity_move_random(shared_ptr<gamestate> g, entityid id) {
     }
     try_entity_move(g, id, x, y);
 }
+*/
 
-static inline void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success) {
+/*
+static inline void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g,
+                                                        entitytype_t type,
+                                                        bool success) {
     //if (!success) {
     //    if (type == ENTITY_PLAYER)
     //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -477,16 +577,22 @@ static inline void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g,
               : !success                          ? GAMESTATE_FLAG_NONE
                                                   : g->flag;
 }
+*/
 
 //static void handle_attack_success(gamestate* const g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
-static void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
+/*
+static void handle_attack_success(shared_ptr<gamestate> g,
+                                  entityid atk_id,
+                                  entityid tgt_id,
+                                  bool* atk_successful) {
     massert(g, "gamestate is NULL");
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
     massert(atk_successful, "attack_successful is NULL");
     entitytype_t tgttype = g_get_type(g, tgt_id);
     if (*atk_successful) {
-        entityid attacker_weapon_id = g_get_equipment(g, atk_id, EQUIP_SLOT_WEAPON);
+        entityid attacker_weapon_id =
+            g_get_equipment(g, atk_id, EQUIP_SLOT_WEAPON);
         int dmg = 1;
         if (attacker_weapon_id == ENTITYID_INVALID) {
             // no weapon
@@ -498,7 +604,8 @@ static void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, enti
         } else {
             // weapon
             // we will calculate damage based on weapon attributes
-            massert(g_has_damage(g, attacker_weapon_id), "attacker weapon does not have damage attached");
+            massert(g_has_damage(g, attacker_weapon_id),
+                    "attacker weapon does not have damage attached");
             vec3 dmg_roll = g_get_damage(g, attacker_weapon_id);
             dmg = do_roll(dmg_roll);
             int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
@@ -515,14 +622,24 @@ static void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, enti
         hp -= dmg;
         g_set_stat(g, tgt_id, STATS_HP, hp);
         if (tgttype == ENTITY_PLAYER) {
-            add_message_history(g, "%s attacked you for %d damage!", g_get_name(g, atk_id).c_str(), dmg);
+            add_message_history(g,
+                                "%s attacked you for %d damage!",
+                                g_get_name(g, atk_id).c_str(),
+                                dmg);
         } else if (tgttype == ENTITY_NPC) {
-            add_message_history(g, "%s attacked %s for %d damage!", g_get_name(g, atk_id).c_str(), g_get_name(g, tgt_id).c_str(), dmg);
+            add_message_history(g,
+                                "%s attacked %s for %d damage!",
+                                g_get_name(g, atk_id).c_str(),
+                                g_get_name(g, tgt_id).c_str(),
+                                dmg);
         }
         if (hp <= 0) {
             g_update_dead(g, tgt_id, true);
             if (tgttype == ENTITY_NPC) {
-                add_message_history(g, "%s killed %s!", g_get_name(g, atk_id).c_str(), g_get_name(g, tgt_id).c_str());
+                add_message_history(g,
+                                    "%s killed %s!",
+                                    g_get_name(g, atk_id).c_str(),
+                                    g_get_name(g, tgt_id).c_str());
                 // increment attacker's xp
                 int old_xp = g_get_stat(g, atk_id, STATS_XP);
                 massert(old_xp >= 0, "attacker's xp is negative");
@@ -534,7 +651,11 @@ static void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, enti
                 vec3 loc = g_get_location(g, tgt_id);
                 vec3 loc_cast = {loc.x, loc.y, loc.z};
                 entityid id = ENTITYID_INVALID;
-                while (id == ENTITYID_INVALID) id = potion_create(g, loc_cast, POTION_HEALTH_SMALL, "small health potion");
+                while (id == ENTITYID_INVALID)
+                    id = potion_create(g,
+                                       loc_cast,
+                                       POTION_HEALTH_SMALL,
+                                       "small health potion");
             }
         } else {
             g_update_dead(g, tgt_id, false);
@@ -542,9 +663,13 @@ static void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, enti
     } else {
         // handle attack miss
         if (tgttype == ENTITY_PLAYER)
-            add_message_history(g, "%s's attack missed!", g_get_name(g, atk_id).c_str());
+            add_message_history(
+                g, "%s's attack missed!", g_get_name(g, atk_id).c_str());
         else if (tgttype == ENTITY_NPC)
-            add_message_history(g, "%s missed %s!", g_get_name(g, atk_id).c_str(), g_get_name(g, tgt_id).c_str());
+            add_message_history(g,
+                                "%s missed %s!",
+                                g_get_name(g, atk_id).c_str(),
+                                g_get_name(g, tgt_id).c_str());
     }
     //e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
     //if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
@@ -554,9 +679,14 @@ static void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, enti
     //g_update_dead(g, tgt_id, true);
     //}
 }
+*/
 
 //static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful) {
-static void handle_attack_blocked(shared_ptr<gamestate> g, entityid attacker_id, entityid target_id, bool* atk_successful) {
+/*
+static void handle_attack_blocked(shared_ptr<gamestate> g,
+                                  entityid attacker_id,
+                                  entityid target_id,
+                                  bool* atk_successful) {
     massert(g, "gamestate is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(target_id != ENTITYID_INVALID, "target entity id is invalid");
@@ -568,12 +698,22 @@ static void handle_attack_blocked(shared_ptr<gamestate> g, entityid attacker_id,
     //entitytype_t tgttype = g_get_type(g, target_id);
     //if (tgttype == ENTITY_PLAYER) {
     //} else if (tgttype == ENTITY_NPC) {
-    add_message_history(g, "%s blocked %s's attack!", g_get_name(g, target_id).c_str(), g_get_name(g, attacker_id).c_str());
+    add_message_history(g,
+                        "%s blocked %s's attack!",
+                        g_get_name(g, target_id).c_str(),
+                        g_get_name(g, attacker_id).c_str());
     //}
     //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
 }
+*/
 
-static bool handle_shield_check(shared_ptr<gamestate> g, entityid attacker_id, entityid target_id, int attack_roll, int base_ac, bool* attack_successful) {
+/*
+static bool handle_shield_check(shared_ptr<gamestate> g,
+                                entityid attacker_id,
+                                entityid target_id,
+                                int attack_roll,
+                                int base_ac,
+                                bool* attack_successful) {
     // if you have a shield at all, the attack will get auto-blocked
     entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
     if (shield_id != ENTITYID_INVALID) {
@@ -590,9 +730,15 @@ static bool handle_shield_check(shared_ptr<gamestate> g, entityid attacker_id, e
     handle_attack_success(g, attacker_id, target_id, attack_successful);
     return true;
 }
+*/
 
 //static inline bool handle_attack_helper_innerloop(gamestate* const g, tile_t* tile, int i, entityid attacker_id, bool* attack_successful) {
-static inline bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful) {
+/*
+static inline bool handle_attack_helper_innerloop(shared_ptr<gamestate> g,
+                                                  shared_ptr<tile_t> tile,
+                                                  int i,
+                                                  entityid attacker_id,
+                                                  bool* attack_successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(i >= 0, "i is out of bounds");
@@ -612,16 +758,24 @@ static inline bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, share
     int base_str = g_get_stat(g, attacker_id, STATS_STR);
     int str_bonus = bonus_calc(base_str);
     int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
-    int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
+    int attack_roll = rand() % 20 + 1 + str_bonus +
+                      atk_bonus; // 1d20 + str bonus + attack bonus
     *attack_successful = false;
-    if (attack_roll >= base_ac) return handle_shield_check(g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
+    if (attack_roll >= base_ac)
+        return handle_shield_check(
+            g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
     // attack misses
     handle_attack_success(g, attacker_id, target_id, attack_successful);
     return false;
 }
+*/
 
 //static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid attacker_id, bool* successful) {
-static void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful) {
+/*
+static void handle_attack_helper(shared_ptr<gamestate> g,
+                                 shared_ptr<tile_t> tile,
+                                 entityid attacker_id,
+                                 bool* successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
@@ -631,8 +785,13 @@ static void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> til
         handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
     }
 }
+*/
 
-static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
+/*
+static void try_entity_attack(shared_ptr<gamestate> g,
+                              entityid atk_id,
+                              int tgt_x,
+                              int tgt_y) {
     massert(g, "gamestate is NULL");
     massert(!g_is_dead(g, atk_id), "attacker entity is dead");
     vec3 loc = g_get_location(g, atk_id);
@@ -653,8 +812,11 @@ static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_
     handle_attack_helper(g, tile, atk_id, &ok);
     handle_attack_success_gamestate_flag(g, g_get_type(g, atk_id), ok);
 }
+*/
 
-static bool entities_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1) {
+/*
+static bool
+entities_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1) {
     massert(g, "gamestate is NULL");
     massert(id0 != ENTITYID_INVALID, "id0 is invalid");
     massert(id1 != ENTITYID_INVALID, "id1 is invalid");
@@ -670,15 +832,20 @@ static bool entities_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id
     }
     return false;
 }
+*/
 
+/*
 static void try_entity_wait(shared_ptr<gamestate> g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
     g_set_update(g, id, true);
 }
+*/
 
-static void execute_action(shared_ptr<gamestate> g, entityid id, entity_action_t action) {
+/*
+static void
+execute_action(shared_ptr<gamestate> g, entityid id, entity_action_t action) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is invalid");
     switch (action) {
@@ -723,8 +890,10 @@ static void execute_action(shared_ptr<gamestate> g, entityid id, entity_action_t
     default: merror("Unknown entity action: %d", action); break;
     }
 }
+*/
 
 //static vec3* get_locs_around_entity(gamestate* const g, entityid id) {
+/*
 static vec3* get_locs_around_entity(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     //vec3* locs = malloc(sizeof(vec3) * 8);
@@ -741,6 +910,7 @@ static vec3* get_locs_around_entity(shared_ptr<gamestate> g, entityid id) {
     }
     return locs;
 }
+*/
 
 //static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id) {
 //static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(shared_ptr<gamestate> g, entityid id) {
@@ -806,6 +976,7 @@ static vec3* get_locs_around_entity(shared_ptr<gamestate> g, entityid id) {
 //}
 
 //static vec3 get_random_available_loc(gamestate* const g, int floor) {
+/*
 static vec3 get_random_available_loc(shared_ptr<gamestate> g, int floor) {
     massert(g, "gamestate is NULL");
     massert(floor >= 0, "floor is out of bounds");
@@ -816,107 +987,105 @@ static vec3 get_random_available_loc(shared_ptr<gamestate> g, int floor) {
 
     return get_random_available_loc_in_area(g, floor, 0, 0, w, h);
 }
+*/
 
-static void init_dungeon(gamestate* const g) {
+static void init_dungeon(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     g->dungeon = d_create();
-    massert(g->d, "failed to init dungeon");
-    int df_count = 20;
+
+    massert(g->dungeon, "failed to init dungeon");
+
+    int df_count = 1;
     for (int i = 0; i < df_count; i++) {
-        d_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+        d_add_floor(g->dungeon,
+                    DEFAULT_DUNGEON_FLOOR_WIDTH,
+                    DEFAULT_DUNGEON_FLOOR_HEIGHT);
     }
 }
 
-//static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, const char* name) {
-//static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name) {
-static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
+/*
+static entityid
+npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
     massert(g, "gamestate is NULL");
-    //massert(name && name[0], "name is NULL or empty");
-    //massert(rt >= 0, "race_type is out of bounds: %s: %d", name, rt);
-    //massert(rt < RACE_COUNT, "race_type is out of bounds: %s: %d", name, rt);
-    //massert(loc.z >= 0, "z is out of bounds: %s: %d", name, loc.z);
-    //massert(loc.z < g->d->num_floors, "z is out of bounds: %s: %d", name, loc.z);
-    //dungeon_floor_t* const df = d_get_floor(g->dungeon, loc.z);
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-    //massert(df, "failed to get current dungeon floor");
-    //massert(loc.x >= 0, "x is out of bounds: %s: %d", name, loc.x);
-    //massert(loc.x < df->width, "x is out of bounds: %s: %d", name, loc.x);
-    //massert(loc.y >= 0, "y is out of bounds: %s: %d", name, loc.y);
-    //massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
-    // can we create an entity at this location? no entities can be made on wall-types etc
-
-    printf("calling df_tile_at...\n");
-    //tile_t* const tile = df_tile_at(df, loc);
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
     printf("checking if tile is walkable and empty...\n");
-    if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) return ENTITYID_INVALID;
-
+    if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
+        return ENTITYID_INVALID;
+    }
     //if (tile_has_live_npcs(g, tile)) {
     //merror("cannot create entity on tile with NPC");
     //    return ENTITYID_INVALID;
     //}
 
-    printf("adding entity...\n");
     entityid id = g_add_entity(g);
-    printf("adding entity name: %s...\n", name.c_str());
 
     g_add_name(g, id, name);
 
-    printf("adding entity type...\n");
+    //printf("adding entity type...\n");
     g_add_type(g, id, ENTITY_NPC);
-    printf("adding entity race...\n");
+    //printf("adding entity race...\n");
     g_add_race(g, id, rt);
-    printf("adding entity dir...\n");
+    //printf("adding entity dir...\n");
     g_add_direction(g, id, DIR_RIGHT);
 
-    vec3 loc_vec = {loc.x, loc.y, loc.z};
-    printf("adding entity loc...\n");
-    g_add_location(g, id, loc_vec);
+    //vec3 loc_vec = {loc.x, loc.y, loc.z};
+    //printf("adding entity loc...\n");
+    //g_add_location(g, id, loc_vec);
 
-    printf("adding remaining entity components...\n");
-    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
-    g_add_dead(g, id, 0);
-    g_add_update(g, id, false);
-    g_add_attacking(g, id, false);
-    g_add_zapping(g, id, false);
-    g_add_block_success(g, id, false);
-    g_add_damaged(g, id, false);
-    g_add_default_action(g, id, ENTITY_ACTION_WAIT);
-    g_add_inventory(g, id);
-    g_add_target(g, id, (vec3){-1, -1, -1});
-    g_add_target_path(g, id);
-    g_add_equipment(g, id);
-    g_add_base_attack_damage(g, id, (vec3){1, 4, 0});
-    g_add_vision_distance(g, id, 0);
-    g_add_light_radius(g, id, 0);
+    //printf("adding remaining entity components...\n");
+    //g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
+    //g_add_dead(g, id, 0);
+    //g_add_update(g, id, false);
+    //g_add_attacking(g, id, false);
+    //g_add_zapping(g, id, false);
+    //g_add_block_success(g, id, false);
+    //g_add_damaged(g, id, false);
+    //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
+    //g_add_inventory(g, id);
+    //g_add_target(g, id, (vec3){-1, -1, -1});
+    //g_add_target_path(g, id);
+    //g_add_equipment(g, id);
+    //g_add_base_attack_damage(g, id, (vec3){1, 4, 0});
+    //g_add_vision_distance(g, id, 0);
+    //g_add_light_radius(g, id, 0);
 
-    g_add_stats(g, id);
-    g_set_stat(g, id, STATS_LEVEL, 1);
-    g_set_stat(g, id, STATS_XP, 0);
-    g_set_stat(g, id, STATS_NEXT_LEVEL_XP, calc_next_lvl_xp(g, id));
-    g_set_stat(g, id, STATS_MAXHP, 1);
-    g_set_stat(g, id, STATS_HP, 1);
-    g_set_stat(g, id, STATS_HITDIE, 1);
-    g_set_stat(g, id, STATS_STR, 10);
-    g_set_stat(g, id, STATS_DEX, 10);
-    g_set_stat(g, id, STATS_CON, 10);
-    g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
-    g_set_stat(g, id, STATS_AC, 10);
+    //g_add_stats(g, id);
+    //g_set_stat(g, id, STATS_LEVEL, 1);
+    //g_set_stat(g, id, STATS_XP, 0);
+    //g_set_stat(g, id, STATS_NEXT_LEVEL_XP, calc_next_lvl_xp(g, id));
+    //g_set_stat(g, id, STATS_MAXHP, 1);
+    //g_set_stat(g, id, STATS_HP, 1);
+    //g_set_stat(g, id, STATS_HITDIE, 1);
+    //g_set_stat(g, id, STATS_STR, 10);
+    //g_set_stat(g, id, STATS_DEX, 10);
+    //g_set_stat(g, id, STATS_CON, 10);
+    //g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
+    //g_set_stat(g, id, STATS_AC, 10);
 
-    printf("adding entity to dungeon floor...\n");
-    if (!df_add_at(df, id, loc.x, loc.y)) return ENTITYID_INVALID;
+    //printf("adding entity to dungeon floor...\n");
+    if (!df_add_at(df, id, loc.x, loc.y)) {
+        return ENTITYID_INVALID;
+    }
 
     return id;
 }
+*/
 
-static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name) {
+/*
+static entityid
+item_create(gamestate* const g, itemtype type, vec3 loc, const char* name) {
     massert(g, "gamestate is NULL");
     massert(name && name[0], "name is NULL or empty");
     massert(type >= 0, "item_type is out of bounds: %s: %d", name, type);
-    massert(type < ITEM_TYPE_COUNT, "item_type is out of bounds: %s: %d", name, type);
+    massert(type < ITEM_TYPE_COUNT,
+            "item_type is out of bounds: %s: %d",
+            name,
+            type);
     massert(loc.z >= 0, "z is out of bounds: %s: %d", name, loc.z);
-    massert(loc.z < g->d->num_floors, "z is out of bounds: %s: %d", name, loc.z);
+    massert(
+        loc.z < g->d->num_floors, "z is out of bounds: %s: %d", name, loc.z);
     dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
     massert(df, "failed to get current dungeon floor");
     massert(loc.x >= 0, "x is out of bounds: %s: %d", name, loc.x);
@@ -947,6 +1116,7 @@ static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const c
     if (!df_add_at(df, id, loc.x, loc.y)) return ENTITYID_INVALID;
     return id;
 }
+*/
 
 //static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, const char* name) {
 //    massert(g, "gamestate is NULL");
@@ -966,7 +1136,9 @@ static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const c
 //    return id;
 //}
 
-static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name) {
+/*
+static entityid
+potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name) {
     minfo("potion create...");
     massert(g, "gamestate is NULL");
     entityid id = item_create(g, ITEM_POTION, loc, name);
@@ -975,6 +1147,7 @@ static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, con
     msuccess("potion created!");
     return id;
 }
+*/
 
 //static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, const char* name) {
 //    massert(g, "gamestate is NULL");
@@ -1013,6 +1186,7 @@ static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, con
 //}
 
 //static void update_player_tiles_explored(gamestate* const g) {
+/*
 static void update_player_tiles_explored(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     entityid hero_id = g->hero_id;
@@ -1035,7 +1209,9 @@ static void update_player_tiles_explored(shared_ptr<gamestate> g) {
             if (dist <= light_radius) {
                 vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
                 // Skip if out of bounds
-                if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 || loc2.y >= df->height) continue;
+                if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 ||
+                    loc2.y >= df->height)
+                    continue;
                 //tile_t* tile = df_tile_at(df, loc2);
                 shared_ptr<tile_t> tile = df_tile_at(df, loc2);
                 massert(tile, "failed to get tile at hero location");
@@ -1045,8 +1221,11 @@ static void update_player_tiles_explored(shared_ptr<gamestate> g) {
         }
     }
 }
+*/
 
-static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z, string name) {
+/*
+static entityid
+player_create(gamestate* const g, race_t rt, int x, int y, int z, string name) {
     printf("begin player_create...\n");
     massert(g, "gamestate is NULL");
     massert(name != "", "name is empty string");
@@ -1072,9 +1251,11 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
     g_set_stat(g, id, STATS_DEX, dex_roll);
     int hitdie = 8;
     g_set_stat(g, id, STATS_HITDIE, hitdie);
-    int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
+    int maxhp_roll =
+        do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
     while (maxhp_roll < 1) {
-        maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
+        maxhp_roll =
+            do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
     }
     g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
     g_set_stat(g, id, STATS_HP, maxhp_roll);
@@ -1089,7 +1270,9 @@ static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z
     update_player_tiles_explored(g);
     return id;
 }
+*/
 
+/*
 static void init_player(gamestate* const g) {
     massert(g, "gamestate is NULL");
     printf("begin init_player...\n");
@@ -1104,6 +1287,7 @@ static void init_player(gamestate* const g) {
     msuccess("hero id %d", g->hero_id);
     printf("end init_player...\n");
 }
+*/
 
 //static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
 //    massert(df, "dungeon floor is NULL");
@@ -1128,7 +1312,14 @@ static void init_player(gamestate* const g) {
 //}
 
 //static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
-static vec3* get_available_locs_in_area(shared_ptr<gamestate> g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
+/*
+static vec3* get_available_locs_in_area(shared_ptr<gamestate> g,
+                                        dungeon_floor_t* const df,
+                                        int* count,
+                                        int x0,
+                                        int y0,
+                                        int w,
+                                        int h) {
     massert(df, "dungeon floor is NULL");
     massert(count, "count is NULL");
     int c = df_count_non_walls_in_area(df, x0, y0, w, h);
@@ -1144,9 +1335,11 @@ static vec3* get_available_locs_in_area(shared_ptr<gamestate> g, dungeon_floor_t
             int newx = x + x0;
             int newy = y + y0;
             //tile_t* t = df_tile_at(df, (vec3){newx, newy, df->floor});
-            shared_ptr<tile_t> t = df_tile_at(df, (vec3){newx, newy, df->floor});
+            shared_ptr<tile_t> t =
+                df_tile_at(df, (vec3){newx, newy, df->floor});
             tiletype_t type = t->type;
-            if (tile_live_npc_count(g, t) == 0 && !tile_has_player(g, t) && tile_is_walkable(type)) {
+            if (tile_live_npc_count(g, t) == 0 && !tile_has_player(g, t) &&
+                tile_is_walkable(type)) {
                 locs[i++] = (vec3){newx, newy, df->floor};
             }
             if (i >= c) {
@@ -1159,8 +1352,15 @@ static vec3* get_available_locs_in_area(shared_ptr<gamestate> g, dungeon_floor_t
     *count = i;
     return locs;
 }
+*/
 
-static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int x0, int y0, int w, int h) {
+/*
+static vec3 get_random_available_loc_in_area(gamestate* const g,
+                                             int floor,
+                                             int x0,
+                                             int y0,
+                                             int w,
+                                             int h) {
     massert(g, "gamestate is NULL");
     massert(floor >= 0, "floor is out of bounds");
     massert(floor < g->d->num_floors, "floor is out of bounds");
@@ -1175,7 +1375,11 @@ static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int 
     massert(locs, "locs is NULL");
     massert(c >= 0, "locs count is less than 0");
     if (c == 0) {
-        merror("no available locations found in area (%d, %d, %d, %d)", x0, y0, w, h);
+        merror("no available locations found in area (%d, %d, %d, %d)",
+               x0,
+               y0,
+               w,
+               h);
         free(locs);
         return (vec3){-1, -1, -1}; // return an invalid location
     }
@@ -1185,6 +1389,7 @@ static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int 
     free(locs);
     return loc;
 }
+*/
 
 //static void init_npcs_test_by_room(gamestate* const g) {
 //    massert(g, "gamestate is NULL");
@@ -1235,7 +1440,9 @@ static vec3 get_random_available_loc_in_area(gamestate* const g, int floor, int 
 //    }
 //}
 
-static const char* get_action_key(const inputstate* const is, gamestate* const g) {
+/*
+static const char* get_action_key(const inputstate* const is,
+                                  gamestate* const g) {
     int key = inputstate_get_pressed_key(is);
     // can return early if key == -1
     if (key == -1) {
@@ -1243,7 +1450,9 @@ static const char* get_action_key(const inputstate* const is, gamestate* const g
     }
     return get_action_for_key(&g->keybinding_list, key);
 }
+*/
 
+/*
 static void handle_camera_move(gamestate* const g, const inputstate* const is) {
     const float move = g->cam2d.zoom;
     const char* action = get_action_key(is, g);
@@ -1260,8 +1469,11 @@ static void handle_camera_move(gamestate* const g, const inputstate* const is) {
         g->controlmode = CONTROLMODE_PLAYER;
     }
 }
+*/
 
-static inline void handle_camera_zoom(gamestate* const g, const inputstate* const is) {
+/*
+static inline void handle_camera_zoom(gamestate* const g,
+                                      const inputstate* const is) {
     massert(g, "Game state is NULL!");
     massert(is, "Input state is NULL!");
     if (inputstate_is_held(is, KEY_Z)) {
@@ -1271,15 +1483,21 @@ static inline void handle_camera_zoom(gamestate* const g, const inputstate* cons
             g->cam2d.zoom += DEFAULT_ZOOM_INCR;
     }
 }
+*/
 
-static void handle_input_camera(const inputstate* const is, gamestate* const g) {
+/*
+static void handle_input_camera(const inputstate* const is,
+                                gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     handle_camera_move(g, is);
     handle_camera_zoom(g, is);
 }
+*/
 
-static void handle_input_gameplay_settings(const inputstate* const is, gamestate* const g) {
+/*
+static void handle_input_gameplay_settings(const inputstate* const is,
+                                           gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
 
@@ -1291,7 +1509,8 @@ static void handle_input_gameplay_settings(const inputstate* const is, gamestate
     }
 
     // Cycle between settings and inventory menus
-    if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_RIGHT)) {
+    if (inputstate_is_pressed(is, KEY_LEFT) ||
+        inputstate_is_pressed(is, KEY_RIGHT)) {
         g->controlmode = CONTROLMODE_INVENTORY;
         g->display_gameplay_settings_menu = false;
         g->display_inventory_menu = true;
@@ -1302,10 +1521,13 @@ static void handle_input_gameplay_settings(const inputstate* const is, gamestate
     int max_selections = 2; // 0: Music Volume, 1: Back
     if (inputstate_is_pressed(is, KEY_UP)) {
         //g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection - 1 + 3) % 3;
-        g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection - 1 + max_selections) % max_selections;
+        g->gameplay_settings_menu_selection =
+            (g->gameplay_settings_menu_selection - 1 + max_selections) %
+            max_selections;
         g->frame_dirty = true;
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
-        g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection + 1) % max_selections;
+        g->gameplay_settings_menu_selection =
+            (g->gameplay_settings_menu_selection + 1) % max_selections;
         g->frame_dirty = true;
     }
 
@@ -1313,22 +1535,27 @@ static void handle_input_gameplay_settings(const inputstate* const is, gamestate
     if (g->gameplay_settings_menu_selection == 0) {
         // Music Volume
         if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
-            g->music_volume = g->music_volume > 0 ? g->music_volume - 0.1f : 0.0f;
+            g->music_volume =
+                g->music_volume > 0 ? g->music_volume - 0.1f : 0.0f;
             g->music_volume_changed = true;
         } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
-            g->music_volume = g->music_volume < 1 ? g->music_volume + 0.1f : 1.0f;
+            g->music_volume =
+                g->music_volume < 1 ? g->music_volume + 0.1f : 1.0f;
             g->music_volume_changed = true;
         }
 
     } else if (g->gameplay_settings_menu_selection == 0) {
         // Back
-        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+        if (inputstate_is_pressed(is, KEY_ENTER) ||
+            inputstate_is_pressed(is, KEY_SPACE)) {
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_gameplay_settings_menu = false;
         }
     }
 }
+*/
 
+/*
 static void handle_sort_inventory(gamestate* const g) {
     g->display_sort_inventory_menu = false;
     // we need to sort the inventory based on the selected type
@@ -1338,34 +1565,45 @@ static void handle_sort_inventory(gamestate* const g) {
     massert(inventory, "inventory is NULL");
     massert(count >= 0, "inventory count is less than 0");
     // sort the inventory
-    entityid* sorted_inventory = g_sort_inventory(g, inventory, count, sort_type);
+    entityid* sorted_inventory =
+        g_sort_inventory(g, inventory, count, sort_type);
     massert(sorted_inventory, "sorted inventory is NULL");
 
     // now we have our original inventory and our sorted inventory...
     g_update_inventory(g, g->hero_id, sorted_inventory, count);
 }
+*/
 
-static void handle_input_sort_inventory(const inputstate* const is, gamestate* const g) {
+/*
+static void handle_input_sort_inventory(const inputstate* const is,
+                                        gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (inputstate_is_pressed(is, KEY_UP)) {
         minfo("sort inv menu--");
         g->sort_inventory_menu_selection--;
         if (g->sort_inventory_menu_selection < 0) {
-            g->sort_inventory_menu_selection = g->sort_inventory_menu_selection_max - 1;
+            g->sort_inventory_menu_selection =
+                g->sort_inventory_menu_selection_max - 1;
         }
     } else if (inputstate_is_pressed(is, KEY_DOWN)) {
         minfo("sort inv menu++");
         g->sort_inventory_menu_selection++;
-        if (g->sort_inventory_menu_selection >= g->sort_inventory_menu_selection_max) {
+        if (g->sort_inventory_menu_selection >=
+            g->sort_inventory_menu_selection_max) {
             g->sort_inventory_menu_selection = 0;
         }
-    } else if (inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+    } else if (inputstate_is_pressed(is, KEY_S) ||
+               inputstate_is_pressed(is, KEY_ENTER) ||
+               inputstate_is_pressed(is, KEY_APOSTROPHE)) {
         handle_sort_inventory(g);
     }
 }
+*/
 
-static void handle_input_inventory(const inputstate* const is, gamestate* const g) {
+/*
+static void handle_input_inventory(const inputstate* const is,
+                                   gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
@@ -1377,7 +1615,8 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
     }
 
     // cycle menus
-    if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_RIGHT)) {
+    if (inputstate_is_pressed(is, KEY_LEFT) ||
+        inputstate_is_pressed(is, KEY_RIGHT)) {
         g->controlmode = CONTROLMODE_GAMEPLAY_SETTINGS;
         g->display_gameplay_settings_menu = true;
         g->display_inventory_menu = false;
@@ -1403,10 +1642,17 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
     // make sure we separate control of inv menu from its sort inv menu
 
     if (g->display_inventory_menu && !g->display_sort_inventory_menu) {
-        if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
-            g->inventory_menu_selection = (size_t)g->inventory_menu_selection + 1 >= count ? 0 : g->inventory_menu_selection + 1;
-        } else if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
-            g->inventory_menu_selection = g->inventory_menu_selection - 1 < 0 ? count - 1 : g->inventory_menu_selection - 1;
+        if (inputstate_is_pressed(is, KEY_DOWN) ||
+            inputstate_is_pressed(is, KEY_X)) {
+            g->inventory_menu_selection =
+                (size_t)g->inventory_menu_selection + 1 >= count
+                    ? 0
+                    : g->inventory_menu_selection + 1;
+        } else if (inputstate_is_pressed(is, KEY_UP) ||
+                   inputstate_is_pressed(is, KEY_W)) {
+            g->inventory_menu_selection = g->inventory_menu_selection - 1 < 0
+                                              ? count - 1
+                                              : g->inventory_menu_selection - 1;
             // drop item
         } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
             // we need to grab the entityid of the selected item
@@ -1426,7 +1672,8 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
             g_update_location(g, item_id, loc);
             g->controlmode = CONTROLMODE_PLAYER;
             g->display_inventory_menu = false;
-        } else if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+        } else if (inputstate_is_pressed(is, KEY_ENTER) ||
+                   inputstate_is_pressed(is, KEY_APOSTROPHE)) {
             entityid item_id = inventory[g->inventory_menu_selection];
             // we will eventually adjust this to check which slot it needs to go into based on its various types
             entitytype_t type = g_get_type(g, item_id);
@@ -1442,7 +1689,12 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                             hp += small_hp_health_roll;
                             if (hp > maxhp) hp = maxhp;
                             g_set_stat(g, g->hero_id, STATS_HP, hp);
-                            add_message_history(g, "%s drank a %s and recovered %d HP", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str(), small_hp_health_roll);
+                            add_message_history(
+                                g,
+                                "%s drank a %s and recovered %d HP",
+                                g_get_name(g, g->hero_id).c_str(),
+                                g_get_name(g, item_id).c_str(),
+                                small_hp_health_roll);
                             // remove the potion from the inventory
                             g_remove_from_inventory(g, g->hero_id, item_id);
                             g->controlmode = CONTROLMODE_PLAYER;
@@ -1456,7 +1708,10 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     //entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
                     //if (equipped_item != ENTITYID_INVALID) {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
-                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
+                    add_message_history(g,
+                                        "%s equipped %s",
+                                        g_get_name(g, g->hero_id).c_str(),
+                                        g_get_name(g, item_id).c_str());
                     //}
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->display_inventory_menu = false;
@@ -1466,7 +1721,10 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     //entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
                     //if (equipped_item != ENTITYID_INVALID) {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
-                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
+                    add_message_history(g,
+                                        "%s equipped %s",
+                                        g_get_name(g, g->hero_id).c_str(),
+                                        g_get_name(g, item_id).c_str());
                     //}
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->display_inventory_menu = false;
@@ -1480,7 +1738,10 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     //    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
                     //} else {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_WAND, item_id);
-                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
+                    add_message_history(g,
+                                        "%s equipped %s",
+                                        g_get_name(g, g->hero_id).c_str(),
+                                        g_get_name(g, item_id).c_str());
                     //}
                     g->controlmode = CONTROLMODE_PLAYER;
                     g->display_inventory_menu = false;
@@ -1488,7 +1749,10 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 } else if (item_type == ITEM_RING) {
                     g_set_equipment(g, g->hero_id, EQUIP_SLOT_RING, item_id);
-                    add_message_history(g, "%s equipped %s", g_get_name(g, g->hero_id).c_str(), g_get_name(g, item_id).c_str());
+                    add_message_history(g,
+                                        "%s equipped %s",
+                                        g_get_name(g, g->hero_id).c_str(),
+                                        g_get_name(g, item_id).c_str());
 
                     // update player tiles
                     update_player_tiles_explored(g);
@@ -1502,7 +1766,9 @@ static void handle_input_inventory(const inputstate* const is, gamestate* const 
         }
     }
 }
+*/
 
+/*
 static inline void change_player_dir(gamestate* const g, direction_t dir) {
     massert(g, "Game state is NULL!");
     if (g_is_dead(g, g->hero_id)) return;
@@ -1510,7 +1776,9 @@ static inline void change_player_dir(gamestate* const g, direction_t dir) {
     g_set_update(g, g->hero_id, true);
     //update_equipped_shield_dir(g, g->hero_id);
 }
+*/
 
+/*
 static bool try_entity_pickup(gamestate* const g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
@@ -1538,7 +1806,10 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
         entitytype_t type = g_get_type(g, itemid);
         //minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
-            add_message_history(g, "%s picked up a %s", g_get_name(g, id).c_str(), g_get_name(g, itemid).c_str());
+            add_message_history(g,
+                                "%s picked up a %s",
+                                g_get_name(g, id).c_str(),
+                                g_get_name(g, itemid).c_str());
             bool result = g_add_to_inventory(g, id, itemid);
             if (!result) {
                 merror("Failed to add item to inventory");
@@ -1556,6 +1827,7 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
     add_message(g, "No items to pick up");
     return false;
 }
+*/
 
 //static inline void try_flip_switch(gamestate* const g, entity* const e, int x, int y, int fl) {
 //    massert(g, "Game state is NULL!");
@@ -1612,11 +1884,14 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
 //    }
 //}
 
-static void handle_input_player(const inputstate* const is, gamestate* const g) {
+/*
+static void handle_input_player(const inputstate* const is,
+                                gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
-        printf("handle_input_player: flag is not GAMESTATE_FLAG_PLAYER_INPUT, returning\n");
+        printf("handle_input_player: flag is not GAMESTATE_FLAG_PLAYER_INPUT, "
+               "returning\n");
         return;
     }
     if (g->msg_system.is_active) {
@@ -1700,7 +1975,8 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
                 g->player_changing_direction = false;
                 vec3 loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
                 vec3 hloc = g_get_location(g, g->hero_id);
-                try_entity_attack(g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
+                try_entity_attack(
+                    g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
                 g->frame_dirty = true;
             }
             return;
@@ -1778,7 +2054,10 @@ static void handle_input_player(const inputstate* const is, gamestate* const g) 
         merror("No action found for key");
     }
 }
+*/
 
+
+/*
 static void try_entity_traverse_floors(gamestate* const g, entityid id) {
     vec3 loc = g_get_location(g, id);
     vec3 loc_cast = {loc.x, loc.y, loc.z};
@@ -1797,16 +2076,22 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
             if (id == g->hero_id) {
                 add_message(g, "You ascend the stairs");
                 if (!df_remove_at(df, id, loc.x, loc.y)) return;
-                vec3 next_downstairs_loc = df_get_downstairs(g->d->floors[g->d->current_floor - 1]);
-                massert(next_downstairs_loc.x != -1 && next_downstairs_loc.y != -1, "Failed to get next downstairs location");
+                vec3 next_downstairs_loc =
+                    df_get_downstairs(g->d->floors[g->d->current_floor - 1]);
+                massert(next_downstairs_loc.x != -1 &&
+                            next_downstairs_loc.y != -1,
+                        "Failed to get next downstairs location");
                 // we need to set the player's location to the corresponding TILE_downstairs
                 next_downstairs_loc.z = g->d->current_floor - 1;
-                vec3 next_downstairs_loc_vec3 = {next_downstairs_loc.x, next_downstairs_loc.y, next_downstairs_loc.z};
+                vec3 next_downstairs_loc_vec3 = {next_downstairs_loc.x,
+                                                 next_downstairs_loc.y,
+                                                 next_downstairs_loc.z};
                 g_update_location(g, id, next_downstairs_loc_vec3);
                 // we need to set the player's floor to the next floor
                 g->d->current_floor--;
                 // get the next dungeon floor
-                dungeon_floor_t* const next_floor = d_get_floor(g->d, g->d->current_floor);
+                dungeon_floor_t* const next_floor =
+                    d_get_floor(g->d, g->d->current_floor);
                 int ex = next_downstairs_loc.x;
                 int ey = next_downstairs_loc.y;
                 if (!df_add_at(next_floor, id, ex, ey)) return;
@@ -1833,16 +2118,21 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
                     merror("Failed to remove entity from old tile");
                     return;
                 }
-                vec3 next_upstairs_loc = df_get_upstairs(g->d->floors[g->d->current_floor + 1]);
-                massert(next_upstairs_loc.x != -1 && next_upstairs_loc.y != -1, "Failed to get next upstairs location");
+                vec3 next_upstairs_loc =
+                    df_get_upstairs(g->d->floors[g->d->current_floor + 1]);
+                massert(next_upstairs_loc.x != -1 && next_upstairs_loc.y != -1,
+                        "Failed to get next upstairs location");
                 // we need to set the player's location to the corresponding TILE_UPSTAIRS
                 next_upstairs_loc.z = g->d->current_floor + 1;
-                vec3 next_upstairs_loc_vec3 = {next_upstairs_loc.x, next_upstairs_loc.y, next_upstairs_loc.z};
+                vec3 next_upstairs_loc_vec3 = {next_upstairs_loc.x,
+                                               next_upstairs_loc.y,
+                                               next_upstairs_loc.z};
                 g_update_location(g, id, next_upstairs_loc_vec3);
                 // we need to set the player's floor to the next floor
                 g->d->current_floor++;
                 // get the next dungeon floor
-                dungeon_floor_t* const next_floor = d_get_floor(g->d, g->d->current_floor);
+                dungeon_floor_t* const next_floor =
+                    d_get_floor(g->d, g->d->current_floor);
                 int ex = next_upstairs_loc.x;
                 int ey = next_upstairs_loc.y;
                 if (!df_add_at(next_floor, id, ex, ey)) {
@@ -1859,6 +2149,7 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
         }
     }
 }
+*/
 
 static void handle_input(const inputstate* const is, gamestate* const g) {
     massert(is, "inputstate is NULL");
@@ -1887,11 +2178,13 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
     //    return;
     //}
 
+    /*
     if (g->current_scene == SCENE_GAMEPLAY) {
         if (g->gameover) {
             //if (inputstate_any_pressed(is)) liblogic_restart(g);
             //if (inputstate_any_pressed(is)) {
-            if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+            if (inputstate_is_pressed(is, KEY_ENTER) ||
+                inputstate_is_pressed(is, KEY_SPACE)) {
                 liblogic_restart(g);
             }
             return;
@@ -1902,14 +2195,17 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
         case CONTROLMODE_CAMERA: handle_input_camera(is, g); break;
         case CONTROLMODE_INVENTORY: handle_input_inventory(is, g); break;
-        case CONTROLMODE_GAMEPLAY_SETTINGS: handle_input_gameplay_settings(is, g); break;
+        case CONTROLMODE_GAMEPLAY_SETTINGS:
+            handle_input_gameplay_settings(is, g);
+            break;
         case CONTROLMODE_HELP: handle_input_help_menu(is, g); break;
         default: merror("Unknown control mode: %d", g->controlmode); break;
         }
 
     } else if (g->current_scene == SCENE_TITLE) {
         //if (inputstate_any_pressed(is)) {
-        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+        if (inputstate_is_pressed(is, KEY_ENTER) ||
+            inputstate_is_pressed(is, KEY_SPACE)) {
             //minfo("Title screen input detected, switching to main menu");
             g->current_scene = SCENE_MAIN_MENU;
             g->frame_dirty = true;
@@ -1950,11 +2246,14 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
             // hero has already been created, so its id is available
             g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
             g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
-            g_set_stat(g, g->hero_id, STATS_CON, g->chara_creation.constitution);
+            g_set_stat(
+                g, g->hero_id, STATS_CON, g->chara_creation.constitution);
             int hitdie = 8;
-            int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(g->chara_creation.constitution);
+            int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) +
+                             bonus_calc(g->chara_creation.constitution);
             while (maxhp_roll < 1) {
-                maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(g->chara_creation.constitution);
+                maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) +
+                             bonus_calc(g->chara_creation.constitution);
             }
             g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
             g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
@@ -1975,9 +2274,12 @@ static void handle_input(const inputstate* const is, gamestate* const g) {
         }
     } else {
     }
+*/
 }
 
-static void handle_input_help_menu(const inputstate* const is, gamestate* const g) {
+/*
+static void handle_input_help_menu(const inputstate* const is,
+                                   gamestate* const g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (inputstate_any_pressed(is)) {
@@ -1986,7 +2288,9 @@ static void handle_input_help_menu(const inputstate* const is, gamestate* const 
         return;
     }
 }
+*/
 
+/*
 static void update_debug_panel_buffer(gamestate* const g) {
     massert(g, "gamestate is NULL");
     // Static buffers to avoid reallocating every frame
@@ -2032,8 +2336,14 @@ static void update_debug_panel_buffer(gamestate* const g) {
     //    is_b = g_get_blocking(g, e->id);
     //}
     // Determine control mode and flag strings
-    const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
-    const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
+    const char* control_mode =
+        control_modes[(g->controlmode >= 0 && g->controlmode < 2)
+                          ? g->controlmode
+                          : 2];
+    const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE &&
+                                        g->flag < GAMESTATE_FLAG_COUNT)
+                                           ? g->flag
+                                           : GAMESTATE_FLAG_COUNT];
     // zero out the buffer
     memset(g->debugpanel.buffer, 0, sizeof(g->debugpanel.buffer));
     // Format the string in one pass
@@ -2086,17 +2396,22 @@ static void update_debug_panel_buffer(gamestate* const g) {
              test_guard,
              inventory_sort_menu_selection);
 }
+*/
 
 void liblogic_init(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     srand(time(NULL));
+
     init_dungeon(g);
-    g->msg_system.count = 0;
-    g->msg_system.index = 0;
-    g->msg_system.is_active = false;
-    init_player(g);
+
+    //g->msg_system.count = 0;
+    //g->msg_system.index = 0;
+    //g->msg_system.is_active = false;
+    //
+    // init_player(g);
 }
 
+/*
 static int get_hitdie_for_race(race_t race) {
     int hit_die = 4;
     switch (race) {
@@ -2114,7 +2429,9 @@ static int get_hitdie_for_race(race_t race) {
     }
     return hit_die;
 }
+*/
 
+/*
 static vec3 get_base_attack_damage_for_race(race_t race) {
     vec3 r = {1, 4, 0}; // Default base attack damage
     switch (race) {
@@ -2132,7 +2449,9 @@ static vec3 get_base_attack_damage_for_race(race_t race) {
     }
     return r;
 }
+*/
 
+/*
 static race_t get_random_race() {
     race_t race = RACE_NONE;
     int num_choices = 10;
@@ -2152,7 +2471,9 @@ static race_t get_random_race() {
     }
     return race;
 }
+*/
 
+/*
 static race_t get_random_race_for_floor(int floor) {
     race_t race = RACE_NONE;
     if (floor == 0) {
@@ -2170,7 +2491,9 @@ static race_t get_random_race_for_floor(int floor) {
     }
     return get_random_race();
 }
+*/
 
+/*
 static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
     minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
     entityid id = ENTITYID_INVALID;
@@ -2207,7 +2530,12 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         }
         //int new_level = g_get_stat(g, id, STATS_LEVEL);
         //massert(g_get_stat(g, id, STATS_LEVEL) == floor, "New level %d does not match floor %d", new_level, floor);
-        msuccess("Spawned entity of Level %d with %d HP at %d, %d, %d", g_get_stat(g, id, STATS_LEVEL), max_hp, loc.x, loc.y, loc.z);
+        msuccess("Spawned entity of Level %d with %d HP at %d, %d, %d",
+                 g_get_stat(g, id, STATS_LEVEL),
+                 max_hp,
+                 loc.x,
+                 loc.y,
+                 loc.z);
         // update vision distance
         // this will be appropriately set on a per-npc basis but for now...
         // hard code 5
@@ -2219,12 +2547,16 @@ static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
         //int default_light_radius = 3;
         g_set_light_radius(g, id, 3);
         // verify light radius
-        massert(g_get_light_radius(g, id) == 3, "Light radius %d does not match expected value 3", g_get_light_radius(g, id));
+        massert(g_get_light_radius(g, id) == 3,
+                "Light radius %d does not match expected value 3",
+                g_get_light_radius(g, id));
         success = true;
     }
     return success;
 }
+*/
 
+/*
 static void try_spawn_npc(gamestate* const g) {
     massert(g, "gamestate is NULL");
     static bool do_this_once = true;
@@ -2248,7 +2580,9 @@ static void try_spawn_npc(gamestate* const g) {
         do_this_once = true;
     }
 }
+*/
 
+/*
 static void update_player_state(gamestate* const g) {
     massert(g, "Game state is NULL!");
     if (!g->gameover) {
@@ -2262,7 +2596,9 @@ static void update_player_state(gamestate* const g) {
         return;
     }
 }
+*/
 
+/*
 static void handle_level_up(gamestate* const g, entityid id) {
     int level = g_get_stat(g, id, STATS_LEVEL);
     // Level up the entity
@@ -2276,14 +2612,17 @@ static void handle_level_up(gamestate* const g, entityid id) {
     g_set_stat(g, id, STATS_ATTACK_BONUS, new_attack_bonus);
     // Increase max HP based on Constitution bonus
     int con_bonus = bonus_calc(g_get_stat(g, id, STATS_CON));
-    if (con_bonus < 0) con_bonus = 0; // Ensure Constitution bonus is not negative
+    if (con_bonus < 0)
+        con_bonus = 0; // Ensure Constitution bonus is not negative
     int hitdie = g_get_stat(g, id, STATS_HITDIE);
     // roll the hitdie
     vec3 r = {1, hitdie, 0}; // 1d(hitdie)
     int hp_gain = do_roll(r) + con_bonus; // Add Constitution bonus to HP gain
     int old_max_hp = g_get_stat(g, id, STATS_MAXHP);
-    int new_max_hp = old_max_hp + hp_gain; // Increase max HP by the rolled amount
-    if (new_max_hp <= old_max_hp) new_max_hp = old_max_hp + 1; // Ensure max HP increases
+    int new_max_hp =
+        old_max_hp + hp_gain; // Increase max HP by the rolled amount
+    if (new_max_hp <= old_max_hp)
+        new_max_hp = old_max_hp + 1; // Ensure max HP increases
     int new_next_level_xp = calc_next_lvl_xp(g, id);
     g_set_stat(g, id, STATS_MAXHP, new_max_hp);
     g_set_stat(g, id, STATS_HP, new_max_hp); // Restore HP to max
@@ -2294,20 +2633,27 @@ static void handle_level_up(gamestate* const g, entityid id) {
         add_message_and_history(g, "Level %d", level);
         add_message_and_history(g, "Max HP increased to %d", new_max_hp);
     } else {
-        msuccess("NPC %d leveled up to Level %d with %d HP", id, level, new_max_hp);
+        msuccess(
+            "NPC %d leveled up to Level %d with %d HP", id, level, new_max_hp);
     }
 }
+*/
 
+/*
 static void check_and_handle_level_up(gamestate* const g, entityid id) {
     if (g_get_stat(g, id, STATS_XP) >= g_get_stat(g, id, STATS_NEXT_LEVEL_XP)) {
         handle_level_up(g, id);
     }
 }
+*/
 
+/*
 static inline void update_npc_state(gamestate* const g, entityid id) {
     if (g_is_dead(g, id)) return;
 }
+*/
 
+/*
 static void update_npcs_state(gamestate* const g) {
     massert(g, "Game state is NULL!");
     for (entityid id = 0; id < g->next_entityid; id++) {
@@ -2315,7 +2661,9 @@ static void update_npcs_state(gamestate* const g) {
         update_npc_state(g, id);
     }
 }
+*/
 
+/*
 static void handle_npc(gamestate* const g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
@@ -2325,10 +2673,13 @@ static void handle_npc(gamestate* const g, entityid id) {
         execute_action(g, id, g_get_default_action(g, id));
     }
 }
+*/
 
+/*
 static void handle_npcs(gamestate* const g) {
     massert(g, "Game state is NULL!");
-    massert(g->flag == GAMESTATE_FLAG_NPC_TURN, "Game state is not in NPC turn!");
+    massert(g->flag == GAMESTATE_FLAG_NPC_TURN,
+            "Game state is not in NPC turn!");
     // Process all NPCs
     //for (int i = 0; i < g->index_entityids; i++) handle_nth_npc(g, i);
     for (entityid id = 0; id < g->next_entityid; id++) {
@@ -2337,46 +2688,56 @@ static void handle_npcs(gamestate* const g) {
     // After processing all NPCs, set the flag to animate all movements together
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }
+*/
 
+/*
 static inline void reset_player_blocking(gamestate* const g) {
     massert(g, "Game state is NULL!");
     g_set_blocking(g, g->hero_id, false);
     g->test_guard = false;
 }
+*/
 
+/*
 static inline void reset_player_block_success(gamestate* const g) {
     massert(g, "Game state is NULL!");
     g_set_block_success(g, g->hero_id, false);
 }
+*/
 
 void liblogic_tick(const inputstate* const is, gamestate* const g) {
     //minfo("liblogic_tick: is=%p, g=%p", is, g);
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     // Spawn NPCs periodically
-    try_spawn_npc(g);
-    update_player_state(g);
-    update_npcs_state(g);
-    if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-        reset_player_blocking(g);
-        reset_player_block_success(g);
-    }
+    //try_spawn_npc(g);
+    //update_player_state(g);
+    //update_npcs_state(g);
+    //if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+    //    reset_player_blocking(g);
+    //    reset_player_block_success(g);
+    //}
     handle_input(is, g);
-    if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
-        handle_npcs(g);
-    }
-    update_debug_panel_buffer(g);
+    //if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
+    //    handle_npcs(g);
+    //}
+    //update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
-    strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+    strftime(g->currenttimebuf,
+             GAMESTATE_SIZEOFTIMEBUF,
+             "Current Time: %Y-%m-%d %H:%M:%S",
+             g->currenttimetm);
 }
 
-void liblogic_close(gamestate* const g) {
+//void liblogic_close(gamestate* const g) {
+void liblogic_close(shared_ptr<gamestate> g) {
     massert(g, "liblogic_close: gamestate is NULL");
-    d_free(g->d);
+    d_free(g->dungeon);
 }
 
 // Check if a location is traversable (walkable and unoccupied)
+/*
 static inline bool is_traversable(gamestate* const g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     // get the dungeon floor
@@ -2397,8 +2758,11 @@ static inline bool is_traversable(gamestate* const g, int x, int y, int z) {
     if (tile_has_live_npcs(g, tile)) return false;
     return true;
 }
+*/
 
+/*
 void liblogic_restart(gamestate* const g) {
     massert(g, "liblogic_restart: gamestate is NULL");
     g->do_restart = true;
 }
+*/

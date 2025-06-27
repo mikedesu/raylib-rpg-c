@@ -1611,19 +1611,19 @@ bool g_has_type(shared_ptr<gamestate> g, entityid id) {
 //    return 0;
 //}
 
-//entityid g_add_entity(gamestate* const g) {
-//    entityid id = g->next_entityid;
-//    if (!g->dirty_entities) {
-//        g->dirty_entities = true;
-//        g->new_entityid_begin = id;
-//        g->new_entityid_end = id + 1;
-//    } else {
-//        //g->dirty_entities = true;
-//        g->new_entityid_end = id + 1;
-//    }
-//    g->next_entityid++;
-//    return id;
-//}
+entityid g_add_entity(shared_ptr<gamestate> g) {
+    entityid id = g->next_entityid;
+    if (!g->dirty_entities) {
+        g->dirty_entities = true;
+        g->new_entityid_begin = id;
+        g->new_entityid_end = id + 1;
+    } else {
+        //g->dirty_entities = true;
+        g->new_entityid_end = id + 1;
+    }
+    g->next_entityid++;
+    return id;
+}
 
 //bool g_has_zapping(const gamestate* const g, entityid id) {
 //    massert(g, "g is NULL");

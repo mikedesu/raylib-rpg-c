@@ -1,10 +1,8 @@
 CXX = g++
 OBJ = -c
 WFLAGS = -Wall -std=c++17
-#WFLAGS = -Wall -Werror
 SHARED = -shared
 STATIC_LINK_RAYLIB = -l:libraylib.a  # Desktop Raylib
-#POSITION_INDEPENDENT_CODE = -fPIC
 MAIN_C = main.cpp
 LINK_MATH = -lm
 RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
@@ -37,7 +35,7 @@ all: game
 # Desktop build
 
 #game: main.o gameloader.o gamestate.o keybinding.o libdraw.o liblogic.o component_table.o component.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o path_node.o libdraw_sort_inventory_menu.o
-game: main.o gameloader.o gamestate.o keybinding.o libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o dungeon_tile.o path_node.o
+game: main.o gameloader.o gamestate.o keybinding.o libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o dungeon_tile.o path_node.o liblogic.o
 	$(CXX) -o $@ $^ -L. $(RAYLIB_LIBS) $(WFLAGS) $(CFLAGS)
 	#./log_build_stats.sh
 
@@ -77,7 +75,8 @@ libdraw.o: libdraw.cpp
 path_node.o: path_node.cpp
 	$(CXX) $(CXXFLAGS) $^ -c 
 
-
+liblogic.o: liblogic.cpp
+	$(CXX) $(CXXFLAGS) $^ -c
 
 
 
