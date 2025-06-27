@@ -799,8 +799,9 @@ static void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
 static void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (g->dirty_entities) {
-        for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++)
+        for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++) {
             create_sg_byid(g, i);
+        }
         g->dirty_entities = false;
         g->new_entityid_begin = ENTITYID_INVALID;
         g->new_entityid_end = ENTITYID_INVALID;
@@ -817,12 +818,12 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     //    g->music_volume_changed = false;
     //}
 
-    //if (g->current_scene == SCENE_GAMEPLAY) {
-    //    libdraw_handle_dirty_entities(g);
-    //    for (entityid id = 0; id < g->next_entityid; id++) {
-    //        libdraw_update_sprite_pre(g, id);
-    //    }
-    //}
+    if (g->current_scene == SCENE_GAMEPLAY) {
+        //    libdraw_handle_dirty_entities(g);
+        //    for (entityid id = 0; id < g->next_entityid; id++) {
+        //        libdraw_update_sprite_pre(g, id);
+        //    }
+    }
 }
 
 void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
@@ -837,9 +838,10 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
         g->frame_dirty = false;
         return;
     }
-    //if (g->current_scene == SCENE_GAMEPLAY) {
-    //    libdraw_handle_dirty_entities(g);
-    //    if (g->framecount % ANIM_SPEED == 0) {
+    if (g->framecount % ANIM_SPEED == 0) {
+        //libdraw_handle_dirty_entities(g);
+        g->frame_dirty = true;
+    }
     //        for (entityid id = 0; id < g->next_entityid; id++) {
     //            int num_spritegroups =
     //                ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
@@ -869,7 +871,7 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
     //                }
     //            }
     //        }
-    //    }
+    //}
     //    libdraw_handle_gamestate_flag(g);
     //}
 }
@@ -940,58 +942,58 @@ static bool libdraw_draw_player_target_box(const shared_ptr<gamestate> g) {
 }
 */
 
-/*
 static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
-    libdraw_camera_lock_on(g);
+
+    //libdraw_camera_lock_on(g);
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     //EndShaderMode();
-    libdraw_draw_dungeon_floor(g);
-    libdraw_draw_player_target_box(g);
+
+    //libdraw_draw_dungeon_floor(g);
+    //libdraw_draw_player_target_box(g);
+
     EndMode2D();
-    draw_message_history(g);
+
+    //draw_message_history(g);
     //draw_message_box(g);
-    draw_hud(g);
-    if (g->display_inventory_menu) {
-        draw_inventory_menu(g);
-    } else if (g->display_gameplay_settings_menu) {
-        draw_gameplay_settings_menu(g);
-    }
+    //draw_hud(g);
+
+    //if (g->display_inventory_menu) {
+    //    draw_inventory_menu(g);
+    //} else if (g->display_gameplay_settings_menu) {
+    //    draw_gameplay_settings_menu(g);
+    //}
+
     handle_debug_panel(g);
     draw_version(g);
-    if (g->display_help_menu) {
-        draw_help_menu(g);
-    }
-    if (g->gameover) {
-        draw_gameover_menu(g);
-    }
+
+    //if (g->display_help_menu) {
+    //    draw_help_menu(g);
+    //}
+    //if (g->gameover) {
+    //    draw_gameover_menu(g);
+    //}
 }
+/*
 */
 
-/*
 static void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(main_game_target_texture);
     libdraw_drawframe_2d(g);
     EndTextureMode();
 }
+/*
 */
 
-/*
 static void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    //DrawTexturePro(main_game_target_texture.texture, target_src, (Rectangle){0, 0, g->windowwidth, g->windowheight}, (Vector2){0, 0}, 0.0f, WHITE);
-    //DrawTexturePro(main_game_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
-    DrawTexturePro(main_game_target_texture.texture,
-                   target_src,
-                   target_dest,
-                   target_origin,
-                   0.0f,
-                   WHITE);
+    DrawTexturePro(main_game_target_texture.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
 }
+/*
 */
 
 /*
@@ -1161,7 +1163,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
         } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
             draw_character_creation_screen_to_texture(g);
         } else if (g->current_scene == SCENE_GAMEPLAY) {
-            //    libdraw_drawframe_2d_to_texture(g);
+            libdraw_drawframe_2d_to_texture(g);
         }
         g->frame_dirty = false;
         g->frame_updates++;
@@ -1176,11 +1178,11 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
         draw_title_screen_from_texture(g);
     } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
         draw_character_creation_screen_from_texture(g);
+    } else if (g->current_scene == SCENE_GAMEPLAY) {
+        libdraw_drawframe_2d_from_texture(g);
     }
-    //else if (g->current_scene == SCENE_GAMEPLAY) {
-    //    libdraw_drawframe_2d_from_texture(g);
-    //}
-    handle_debug_panel(g);
+    DrawFPS(0, 0);
+    //handle_debug_panel(g);
     EndTextureMode();
     // draw the target texture to the window
     win_dest.width = GetScreenWidth();
