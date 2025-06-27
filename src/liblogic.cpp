@@ -1,5 +1,6 @@
 //#include "bonus_table.h"
 //#include "controlmode.h"
+#include "controlmode.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
@@ -25,6 +26,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <memory>
 #include <raylib.h>
 
 using std::shared_ptr;
@@ -154,13 +156,12 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 //static void update_player_state(shared_ptr<gamestate> g);
 //static void update_debug_panel_buffer(gamestate* const g);
 static void update_debug_panel_buffer(shared_ptr<gamestate> g);
-//static void handle_camera_move(gamestate* const g, const inputstate* const is);
-//static void handle_camera_move(shared_ptr<gamestate> g,
-//                               shared_ptr<inputstate> is);
+
+static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+
 //static void handle_input(const inputstate* const is, gamestate* const g);
 //static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-//static void handle_input_camera(shared_ptr<gamestate> g,
-//                                shared_ptr<inputstate> is);
+static void handle_input_camera(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 //static void handle_input_player(shared_ptr<gamestate> g,
 //                                shared_ptr<inputstate> is);
 //static void handle_input_inventory(shared_ptr<gamestate> g,
@@ -186,8 +187,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g);
 //static void check_and_handle_level_up(gamestate* const g, entityid id);
 //static void check_and_handle_level_up(shared_ptr<gamestate> g, entityid id);
 //static const char* get_action_key(const inputstate* const is, gamestate* const g);
-//static const char* get_action_key(shared_ptr<gamestate> g,
-//                                  shared_ptr<inputstate> is);
+static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 //static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, string name);
 //static entityid player_create(shared_ptr<gamestate> g,
 //                              race_t rt,
@@ -1441,22 +1441,20 @@ static vec3 get_random_available_loc_in_area(gamestate* const g,
 //    }
 //}
 
-/*
-static const char* get_action_key(const inputstate* const is,
-                                  gamestate* const g) {
+static const char* get_action_key(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     int key = inputstate_get_pressed_key(is);
     // can return early if key == -1
     if (key == -1) {
         return "none";
     }
-    return get_action_for_key(&g->keybinding_list, key);
+    return get_action_for_key(g->keybinding_list, key);
 }
-*/
 
-/*
-static void handle_camera_move(gamestate* const g, const inputstate* const is) {
+
+static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     const float move = g->cam2d.zoom;
     const char* action = get_action_key(is, g);
+
     if (inputstate_is_held(is, KEY_RIGHT)) {
         g->cam2d.offset.x += move;
     } else if (inputstate_is_held(is, KEY_LEFT)) {
@@ -1470,6 +1468,7 @@ static void handle_camera_move(gamestate* const g, const inputstate* const is) {
         g->controlmode = CONTROLMODE_PLAYER;
     }
 }
+/*
 */
 
 /*
@@ -1486,14 +1485,14 @@ static inline void handle_camera_zoom(gamestate* const g,
 }
 */
 
-/*
-static void handle_input_camera(const inputstate* const is,
-                                gamestate* const g) {
+//static void handle_input_camera(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+static void handle_input_camera(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     handle_camera_move(g, is);
-    handle_camera_zoom(g, is);
+    //handle_camera_zoom(g, is);
 }
+/*
 */
 
 /*
@@ -2218,6 +2217,18 @@ static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
             g->chara_creation->strength = do_roll_best_of_3((vec3){3, 6, 0});
             g->chara_creation->dexterity = do_roll_best_of_3((vec3){3, 6, 0});
             g->chara_creation->constitution = do_roll_best_of_3((vec3){3, 6, 0});
+        }
+    } else if (g->current_scene == SCENE_GAMEPLAY) {
+        if (inputstate_is_pressed(is, KEY_B)) {
+            g->controlmode = CONTROLMODE_CAMERA;
+            g->frame_dirty = true;
+            return;
+        }
+
+
+        if (g->controlmode == CONTROLMODE_CAMERA) {
+            handle_input_camera(g, is);
+            g->frame_dirty = true;
         }
     }
 

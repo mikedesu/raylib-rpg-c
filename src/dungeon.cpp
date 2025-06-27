@@ -75,7 +75,7 @@ bool d_add_floor(shared_ptr<dungeon_t> dungeon, int width, int height) {
     int cx = width / 2;
     int cy = height / 2;
     minfo("Creating room at center (%d, %d) with size %dx%d", cx, cy, w, h);
-    df_set_tile_area_range(new_floor, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    //df_set_tile_area_range(new_floor, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     // Assign upstairs and downstairs locations
     minfo("Assigning upstairs and downstairs in area (%d, %d, %d, %d)", 0, 0, width, height);
     df_assign_upstairs_in_area(new_floor, 0, 0, width, height);

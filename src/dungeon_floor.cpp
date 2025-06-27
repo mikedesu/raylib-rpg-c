@@ -274,7 +274,9 @@ shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height) {
 
         shared_ptr<tile_t> tile = make_shared<tile_t>();
         tile->id = i;
-        tile->type = TILE_NONE;
+        //tile->type = TILE_NONE;
+        tile->type = TILE_FLOOR_STONE_00;
+        tile->visible = true;
 
         df->tile_map->insert({i, tile});
     }

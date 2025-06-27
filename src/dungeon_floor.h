@@ -11,8 +11,8 @@
 #include <unordered_map>
 #include <vector>
 
-#define DEFAULT_DUNGEON_FLOOR_WIDTH 256
-#define DEFAULT_DUNGEON_FLOOR_HEIGHT 256
+#define DEFAULT_DUNGEON_FLOOR_WIDTH 32
+#define DEFAULT_DUNGEON_FLOOR_HEIGHT 32
 
 typedef struct {
     std::shared_ptr<std::vector<tile_id>> tiles; // 2D vector of shared pointers to tile_t

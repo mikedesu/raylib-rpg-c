@@ -48,8 +48,7 @@ static inline void inputstate_update(std::shared_ptr<inputstate> is) {
 
 // Check if a key was pressed this frame
 //static inline bool inputstate_is_pressed(const inputstate* is, int key) {
-static inline bool inputstate_is_pressed(std::shared_ptr<inputstate> is,
-                                         int key) {
+static inline bool inputstate_is_pressed(std::shared_ptr<inputstate> is, int key) {
     if (key < 0 || key >= MAX_KEYS) return false;
     int idx = key / BITS_PER_LONG;
     int bit = key % BITS_PER_LONG;
@@ -66,7 +65,8 @@ static inline bool inputstate_any_pressed(const inputstate* is) {
 }
 
 // Check if a key is held down
-static inline bool inputstate_is_held(const inputstate* is, int key) {
+//static inline bool inputstate_is_held(const inputstate* is, int key) {
+static inline bool inputstate_is_held(std::shared_ptr<inputstate> is, int key) {
     if (key < 0 || key >= MAX_KEYS) return false;
     int idx = key / BITS_PER_LONG;
     int bit = key % BITS_PER_LONG;
@@ -74,7 +74,8 @@ static inline bool inputstate_is_held(const inputstate* is, int key) {
 }
 
 // Get the first key pressed this frame
-static inline int inputstate_get_pressed_key(const inputstate* is) {
+//static inline int inputstate_get_pressed_key(const inputstate* is) {
+static inline int inputstate_get_pressed_key(std::shared_ptr<inputstate> is) {
     if (!is) {
         printf("inputstate is NULL\n");
         return -1;
@@ -97,15 +98,9 @@ static inline int inputstate_get_pressed_key(const inputstate* is) {
     return -1; // No key pressed
 }
 
-static inline bool inputstate_is_left_shift_held(const inputstate* is) {
-    return inputstate_is_held(is, KEY_LEFT_SHIFT);
-}
+//static inline bool inputstate_is_left_shift_held(const inputstate* is) { return inputstate_is_held(is, KEY_LEFT_SHIFT); }
+static inline bool inputstate_is_left_shift_held(std::shared_ptr<inputstate> is) { return inputstate_is_held(is, KEY_LEFT_SHIFT); }
 
-static inline bool inputstate_is_right_shift_held(const inputstate* is) {
-    return inputstate_is_held(is, KEY_RIGHT_SHIFT);
-}
+static inline bool inputstate_is_right_shift_held(std::shared_ptr<inputstate> is) { return inputstate_is_held(is, KEY_RIGHT_SHIFT); }
 
-static inline bool inputstate_is_shift_held(const inputstate* is) {
-    return inputstate_is_left_shift_held(is) ||
-           inputstate_is_right_shift_held(is);
-}
+static inline bool inputstate_is_shift_held(std::shared_ptr<inputstate> is) { return inputstate_is_left_shift_held(is) || inputstate_is_right_shift_held(is); }

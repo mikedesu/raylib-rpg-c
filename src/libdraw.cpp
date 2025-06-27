@@ -142,13 +142,17 @@ static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y,
     massert(x < df->width, "x is out of bounds");
     massert(y < df->height, "y is out of bounds");
     massert(df, "dungeon_floor is NULL");
-    //tile_t* tile = df_tile_at(df, (vec3){x, y, z});
     shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, z});
     massert(tile, "tile is NULL");
-    if (tile->type == TILE_NONE || !tile->visible) {
+    if (tile->type == TILE_NONE) {
+        //merror("Tile at (%d, %d) is TILE_NONE", x, y);
         return true;
     }
-
+    if (!tile->visible) {
+        //merror("Tile at (%d, %d) is not visible", x, y);
+        return true;
+    }
+    //minfo("Drawing tile at (%d, %d) with type %d", x, y, tile->type);
     // Get hero's vision distance and location
     //int vision_distance = g_get_vision_distance(g, g->hero_id);
     // its not actually the vision distance we need,
