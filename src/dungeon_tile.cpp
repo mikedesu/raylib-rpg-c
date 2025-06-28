@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <vector>
 
+using std::make_shared;
 using std::shared_ptr;
 using std::vector;
 
@@ -12,6 +13,7 @@ void tile_init(shared_ptr<tile_t> t, tiletype_t type) {
     minfo("tile_init: Initializing tile of type %d", type);
     massert(t, "tile is NULL");
     t->type = type;
+    //t->visible = false;
     t->visible = false;
     t->explored = false;
     //t->has_pressure_plate = false;
@@ -22,7 +24,7 @@ void tile_init(shared_ptr<tile_t> t, tiletype_t type) {
     t->dirty_visibility = true;
     //t->entities = new vector<entityid>();
     t->entities = make_shared<vector<entityid>>();
-    t->entities->reserve(DUNGEON_TILE_MAX_ENTITIES_DEFAULT);
+    //t->entities->reserve(DUNGEON_TILE_MAX_ENTITIES_DEFAULT);
     //t->pressure_plate_up_tx_key = -1;
     //t->pressure_plate_down_tx_key = -1;
     //t->pressure_plate_event = -1;

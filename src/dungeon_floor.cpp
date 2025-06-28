@@ -275,6 +275,11 @@ shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height) {
         df->tiles->push_back(i);
 
         shared_ptr<tile_t> tile = make_shared<tile_t>();
+
+        massert(tile, "failed to create tile");
+
+        tile_init(tile, TILE_FLOOR_STONE_00);
+
         tile->id = i;
         //tile->type = TILE_NONE;
         tile->type = TILE_FLOOR_STONE_00;
@@ -401,6 +406,8 @@ bool df_add_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y) 
     //entityid result = tile_add(&df->tiles[y][x], id) != -1;
     shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, -1});
     massert(tile, "tile is NULL at (%d, %d)", x, y);
+
+    minfo("df_add_at: calling tile_add with id %d at (%d, %d)", id, x, y);
     entityid result = tile_add(tile, id);
     massert(result != ENTITYID_INVALID, "tile_add failed");
     return result != ENTITYID_INVALID;

@@ -30,14 +30,12 @@ using std::make_shared;
 using std::shared_ptr;
 using std::string;
 using std::unordered_map;
-//using std::vector;
+using std::vector;
 
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
 #define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
-// Temporary global for qsort comparisons
-static gamestate* g_sort_context = NULL;
 
 static void gamestate_init_music_paths(shared_ptr<gamestate> g);
 static void gamestate_load_monster_defs(shared_ptr<gamestate> g);
@@ -164,6 +162,8 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->name_list = new unordered_map<entityid, string>();
     g->type_list = new unordered_map<entityid, entitytype_t>();
+    g->race_list = new unordered_map<entityid, race_t>();
+
 
     gamestate_load_keybindings(g);
     msuccess("Gamestate initialized successfully");
@@ -315,6 +315,12 @@ void gamestate_free(shared_ptr<gamestate> g) {
         g->type_list = NULL;
     }
 
+    if (g->race_list) {
+        g->race_list->clear();
+        delete g->race_list;
+        g->race_list = NULL;
+    }
+
     //free(g->race_list);
     //free(g->direction_list);
     //free(g->loc_list);
@@ -353,9 +359,16 @@ void gamestate_free(shared_ptr<gamestate> g) {
 }
 
 
-void gamestate_set_hero_id(gamestate* const g, entityid id) {
+bool g_set_hero_id(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (id == ENTITYID_INVALID) {
+        merror("g_set_hero_id: id is invalid");
+        return false;
+    }
     g->hero_id = id;
+    msuccess("Hero ID set to %d", id);
+    return true;
 }
 
 
@@ -503,7 +516,8 @@ bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type) {
 
 
 entitytype_t g_get_type(shared_ptr<gamestate> g, entityid id) {
-    if (!g_has_comp(g, id, C_TYPE)) {
+    //if (!g_has_comp(g, id, C_TYPE)) {
+    if (!g_has_type(g, id)) {
         merror("g_get_type: id %d does not have a type component", id);
         return ENTITY_NONE; // Return ENTITY_NONE if the type component is not present
     }
@@ -522,32 +536,44 @@ bool g_has_type(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-//bool g_add_race(gamestate* const g, entityid id, int race) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_add_component(g, id, C_RACE, (void*)&race, sizeof(int_component), (void**)&g->race_list, &g->race_list_count, &g->race_list_capacity);
-//}
+bool g_has_race(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_RACE);
+}
 
-//race_t g_get_race(gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g_has_race(g, id))
-//        for (int i = 0; i < g->race_list_count; i++)
-//            if (g->race_list[i].id == id) return (race_t)g->race_list[i].data;
-//    return RACE_NONE;
-//}
 
-//bool g_is_race(gamestate* const g, entityid id, int race) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_get_race(g, id) == race;
-//}
+race_t g_get_race(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g_has_race(g, id)) {
+        if (g->race_list) {
+            massert(g->race_list->find(id) != g->race_list->end(), "g_get_race: id %d not found in race list", id);
+            return g->race_list->at(id);
+        }
+    }
+    merror("race component not found for id %d", id);
+    return RACE_NONE;
+}
 
-//bool g_has_race(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_RACE);
-//}
+
+bool g_add_race(shared_ptr<gamestate> g, entityid id, race_t race) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_RACE)) {
+        merror("g_add_comp failed for id %d", id);
+        return false;
+    }
+    if (!g->race_list) {
+        merror("g->race_list is NULL");
+        return false;
+    }
+    // Check if the type already exists for the entity
+    (*g->race_list)[id] = race; // Insert or update the type
+    return true;
+}
+
 
 //direction_t g_get_direction(const gamestate* const g, entityid id) {
 //    massert(g, "g is NULL");

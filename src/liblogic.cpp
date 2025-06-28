@@ -1,21 +1,21 @@
-//#include "bonus_table.h"
-//#include "controlmode.h"
 #include "controlmode.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
+#include "gamestate.h"
+#include "inputstate.h"
+#include "libgame_defines.h"
+#include "liblogic.h"
+#include "massert.h"
+//#include "bonus_table.h"
+//#include "controlmode.h"
 //#include "dungeon_tile_type.h"
 //#include "entity_actions.h"
 //#include "entityid.h"
 //#include "entitytype.h"
-#include "gamestate.h"
 //#include "gamestate_flag.h"
-#include "inputstate.h"
 //#include "inventory_sort.h"
 //#include "keybinding.h"
-#include "libgame_defines.h"
-#include "liblogic.h"
-#include "massert.h"
 //#include "mprint.h"
 //#include "path_node.h"
 //#include "potion.h"
@@ -189,15 +189,9 @@ static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputs
 //static const char* get_action_key(const inputstate* const is, gamestate* const g);
 static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 //static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, string name);
-//static entityid player_create(shared_ptr<gamestate> g,
-//                              race_t rt,
-//                              int x,
-//                              int y,
-//                              int fl,
-//                              string name);
+static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int fl, string name);
 //static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name);
-//static entityid
-//npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
 //static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name);
 //static entityid
 //item_create(shared_ptr<gamestate> g, itemtype type, vec3 loc, const char* name);
@@ -1004,38 +998,41 @@ static void init_dungeon(shared_ptr<gamestate> g) {
     msuccess("Added %d floors to dungeon", df_count);
 }
 
-/*
-static entityid
-npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
+static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
     massert(g, "gamestate is NULL");
+    minfo("calling d_get_floor...");
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+    minfo("calling df_tile_at...");
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
-    printf("checking if tile is walkable and empty...\n");
-    if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
+    minfo("checking if tile is walkable...");
+
+    if (!tile_is_walkable(tile->type)) {
+        merror("cannot create entity on non-walkable tile");
         return ENTITYID_INVALID;
     }
-    //if (tile_has_live_npcs(g, tile)) {
-    //merror("cannot create entity on tile with NPC");
-    //    return ENTITYID_INVALID;
-    //}
 
+    minfo("checking if tile has live NPCs...");
+
+    if (tile_has_live_npcs(g, tile)) {
+        merror("cannot create entity on tile with live NPCs");
+        return ENTITYID_INVALID;
+    }
+
+    minfo("attempting to add entity...");
     entityid id = g_add_entity(g);
 
+    minfo("attempting to add name...");
     g_add_name(g, id, name);
-
-    //printf("adding entity type...\n");
+    minfo("attempting to add type...");
     g_add_type(g, id, ENTITY_NPC);
-    //printf("adding entity race...\n");
+    minfo("attempting to add race...");
     g_add_race(g, id, rt);
-    //printf("adding entity dir...\n");
-    g_add_direction(g, id, DIR_RIGHT);
 
-    //vec3 loc_vec = {loc.x, loc.y, loc.z};
-    //printf("adding entity loc...\n");
+    msuccess("so far so good...");
+
+    //g_add_direction(g, id, DIR_RIGHT);
     //g_add_location(g, id, loc_vec);
-
-    //printf("adding remaining entity components...\n");
     //g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
     //g_add_dead(g, id, 0);
     //g_add_update(g, id, false);
@@ -1065,13 +1062,15 @@ npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
     //g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
     //g_set_stat(g, id, STATS_AC, 10);
 
-    //printf("adding entity to dungeon floor...\n");
+    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
     if (!df_add_at(df, id, loc.x, loc.y)) {
         return ENTITYID_INVALID;
     }
 
+    msuccess("returning NPC entity ID: %d", id);
     return id;
 }
+/*
 */
 
 /*
@@ -1224,70 +1223,69 @@ static void update_player_tiles_explored(shared_ptr<gamestate> g) {
 }
 */
 
-/*
-static entityid
-player_create(gamestate* const g, race_t rt, int x, int y, int z, string name) {
-    printf("begin player_create...\n");
+//static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z, string name) {
+static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int z, string name) {
     massert(g, "gamestate is NULL");
     massert(name != "", "name is empty string");
     // use the previously-written liblogic_npc_create function
     //const entitytype_t type = ENTITY_PLAYER;
     //const entityid id = npc_create(g, rt, x, y, fl, name);
-    printf("calling npc_create...\n");
+    minfo("calling npc_create...");
     const entityid id = npc_create(g, rt, (vec3){x, y, z}, name);
+    msuccess("npc_create successful, id: %d", id);
     massert(id != ENTITYID_INVALID, "failed to create player");
-    printf("calling gamestate_set_hero_id...\n");
-    gamestate_set_hero_id(g, id);
-    printf("calling g_set_type...\n");
-    g_set_type(g, id, ENTITY_PLAYER);
+    g_set_hero_id(g, id);
+    g_add_type(g, id, ENTITY_PLAYER);
     //int str_roll = do_roll_best_of_3((roll){3, 6, 0});
     //int con_roll = do_roll_best_of_3((roll){3, 6, 0});
-    printf("rolling stats...\n");
-    int str_roll = do_roll_best_of_3((vec3){3, 6, 0});
-    int con_roll = do_roll_best_of_3((vec3){3, 6, 0});
-    int dex_roll = do_roll_best_of_3((vec3){3, 6, 0});
-    printf("calling set stats...\n");
-    g_set_stat(g, id, STATS_STR, str_roll);
-    g_set_stat(g, id, STATS_CON, con_roll);
-    g_set_stat(g, id, STATS_DEX, dex_roll);
-    int hitdie = 8;
-    g_set_stat(g, id, STATS_HITDIE, hitdie);
-    int maxhp_roll =
-        do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
-    while (maxhp_roll < 1) {
-        maxhp_roll =
-            do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
-    }
-    g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
-    g_set_stat(g, id, STATS_HP, maxhp_roll);
-
-    int default_vision_distance = 2;
-    int default_light_radius = 2;
-    printf("calling set light radius...\n");
-    g_set_light_radius(g, id, default_light_radius);
-    printf("calling set vision radius...\n");
-    g_set_vision_distance(g, id, default_vision_distance);
-    printf("calling update player tiles explored...\n");
-    update_player_tiles_explored(g);
+    //printf("rolling stats...\n");
+    //int str_roll = do_roll_best_of_3((vec3){3, 6, 0});
+    //int con_roll = do_roll_best_of_3((vec3){3, 6, 0});
+    //int dex_roll = do_roll_best_of_3((vec3){3, 6, 0});
+    //printf("calling set stats...\n");
+    //g_set_stat(g, id, STATS_STR, str_roll);
+    //g_set_stat(g, id, STATS_CON, con_roll);
+    //g_set_stat(g, id, STATS_DEX, dex_roll);
+    //int hitdie = 8;
+    //g_set_stat(g, id, STATS_HITDIE, hitdie);
+    //int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
+    //while (maxhp_roll < 1) {
+    //    maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
+    //}
+    //int maxhp_roll = 5;
+    //g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
+    //g_set_stat(g, id, STATS_HP, maxhp_roll);
+    //int default_vision_distance = 2;
+    //int default_light_radius = 2;
+    //printf("calling set light radius...\n");
+    //g_set_light_radius(g, id, default_light_radius);
+    //printf("calling set vision radius...\n");
+    //g_set_vision_distance(g, id, default_vision_distance);
+    //printf("calling update player tiles explored...\n");
+    //update_player_tiles_explored(g);
     return id;
 }
+/*
 */
 
-/*
-static void init_player(gamestate* const g) {
+//static void init_player(gamestate* const g) {
+static void init_player(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     minfo("begin init_player...");
     // setting it up so we can return a vec3 from a function
     // that can scan for an appropriate starting location
     minfo("calling df_get_upstairs...");
     //vec3 loc = df_get_upstairs(g->d->floors[g->d->current_floor]);
+    vec3 loc = (vec3){0, 0, 0};
     minfo("calling player_create...");
-    //g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "darkmage");
+    g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "darkmage");
+    msuccess("player_create successful...");
     massert(g->entity_turn != ENTITYID_INVALID, "failed to init hero");
     massert(g->hero_id == g->entity_turn, "hero id mismatch");
     msuccess("hero id %d", g->hero_id);
     //printf("end init_player...\n");
 }
+/*
 */
 
 //static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
@@ -2138,7 +2136,6 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
 }
 */
 
-//static void handle_input(const inputstate* const is, gamestate* const g) {
 static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "inputstate is NULL");
     massert(g, "gamestate is NULL");
@@ -2467,7 +2464,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //g->msg_system.index = 0;
     //g->msg_system.is_active = false;
     //
-    //init_player(g);
+    init_player(g);
     msuccess("liblogic_init: Game state initialized");
 }
 
