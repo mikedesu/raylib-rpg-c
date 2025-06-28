@@ -19,9 +19,9 @@
 #include "specifier.h"
 #include "sprite.h"
 #include "spritegroup.h"
-//#include "spritegroup_anim.h"
+#include "spritegroup_anim.h"
 #include "textureinfo.h"
-//#include "tx_keys.h"
+#include "tx_keys.h"
 //#include "weapon.h"
 #include <cstdlib>
 #include <memory>
@@ -417,24 +417,21 @@ static void draw_weapon_sprite_front(const shared_ptr<gamestate> g,
 }
 */
 
-/*
 static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     entitytype_t type = g_get_type(g, id);
-    massert(sg,
-            "spritegroup is NULL: id %d type: %s",
-            id,
-            entitytype_to_string(type));
+    massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));
     // Draw components in correct order
     //draw_shadow_for_entity(g, sg, id);
-    draw_shield_sprite_back(g, id, sg);
-    draw_weapon_sprite_back(g, id, sg);
+    //draw_shield_sprite_back(g, id, sg);
+    //draw_weapon_sprite_back(g, id, sg);
     draw_entity_sprite(g, sg);
-    draw_shield_sprite_front(g, id, sg);
-    draw_weapon_sprite_front(g, id, sg);
+    //draw_shield_sprite_front(g, id, sg);
+    //draw_weapon_sprite_front(g, id, sg);
 }
+/*
 */
 
 static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc) {
@@ -451,18 +448,21 @@ static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeo
 
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
     if (!tile) {
+        merror("draw_entities_2d: tile is NULL at (%d, %d)", (int)loc.x, (int)loc.y);
         return false;
     }
     if (tile_is_wall(tile->type)) {
+        merror("draw_entities_2d: tile is a wall at (%d, %d)", (int)loc.x, (int)loc.y);
         return false;
     }
     if (!tile->visible) {
+        merror("draw_entities_2d: tile is not visible at (%d, %d)", (int)loc.x, (int)loc.y);
         return true; // Do not draw entities on invisible tiles
     }
     // Get hero's vision distance and location
     //int vision_distance = g_get_vision_distance(g, g->hero_id);
     //int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
-    int light_dist = 3;
+    //int light_dist = 3;
     //vec3 hero_loc = g_get_location(g, g->hero_id);
     //int dist_to_check = MAX(vision_distance, light_dist);
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
@@ -470,11 +470,11 @@ static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeo
     // Only draw entities within vision distance
     //if (distance <= vision_distance) {
     //if (distance <= dist_to_check) {
-    //for (size_t i = 0; i < tile_entity_count(tile); i++) {
-    //entityid id = tile_get_entity(tile, i);
-    //if (g_is_dead(g, id) == dead) {
-    //    draw_sprite_and_shadow(g, id);
-    //}
+    for (size_t i = 0; i < tile_entity_count(tile); i++) {
+        entityid id = tile_get_entity(tile, i);
+        //if (g_is_dead(g, id) == dead) {
+        draw_sprite_and_shadow(g, id);
+    }
     //}
     //}
     return true;
@@ -698,94 +698,77 @@ static void libdraw_update_sprite_position(shared_ptr<gamestate> g,
 }
 */
 
-/*
-static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g,
-                                              spritegroup_t* group,
-                                              direction_t dir) {
+static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir) {
     massert(g, "gamestate is NULL");
     massert(group != NULL, "group is NULL");
     int old_ctx = group->sprites[group->current]->currentcontext;
     int ctx = old_ctx;
-    ctx = dir == DIR_NONE         ? old_ctx
-          : dir == DIR_DOWN_RIGHT ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIR_DOWN_LEFT  ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIR_UP_RIGHT   ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIR_UP_LEFT    ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D
-              ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D
-              ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U
-              ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U
-              ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_D
-              ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_D
-              ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_U
-              ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_U
-              ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D
-              ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D
-              ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U
-              ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U
-              ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D
-              ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D
-              ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U
-              ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U
-              ? SPRITEGROUP_CONTEXT_L_U
-              : old_ctx;
-    if (ctx != old_ctx) g->frame_dirty = true;
+    ctx = dir == DIR_NONE                                      ? old_ctx
+          : dir == DIR_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIR_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIR_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIR_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
+          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
+          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
+          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
+          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
+                                                               : old_ctx;
+    if (ctx != old_ctx) {
+        g->frame_dirty = true;
+    }
     spritegroup_setcontexts(group, ctx);
 }
+/*
 */
 
-/*
-static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g,
-                                      entityid id,
-                                      spritegroup_t* sg) {
+static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
-    if (g_is_dead(g, id) && !spritegroup_is_animating(sg)) return;
-    if (g_get_update(g, id)) {
-        libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, id));
-        g_set_update(g, id, false);
-    }
+    //if (g_is_dead(g, id) && !spritegroup_is_animating(sg)) return;
+    //if (g_get_update(g, id)) {
+    //libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, id));
+    libdraw_update_sprite_context_ptr(g, sg, DIR_DOWN_RIGHT);
+    //    g_set_update(g, id, false);
+    //}
     // Copy movement intent from sprite_move_x/y if present
-    libdraw_update_sprite_position(g, id, sg);
-    libdraw_update_sprite_attack(g, id, sg);
+    //libdraw_update_sprite_position(g, id, sg);
+    //libdraw_update_sprite_attack(g, id, sg);
     // Update movement as long as sg->move.x/y is non-zero
-    if (spritegroup_update_dest(sg)) g->frame_dirty = true;
+    if (spritegroup_update_dest(sg)) {
+        g->frame_dirty = true;
+    }
     // Snap to the tile position only when movement is fully complete
-    vec3 loc = g_get_location(g, id);
+    vec3 loc = g_get_loc(g, id);
     spritegroup_snap_dest(sg, loc.x, loc.y);
 }
+/*
 */
 
-/*
 static void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    int num_spritegroups =
-        ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
     for (int i = 0; i < num_spritegroups; i++) {
-        spritegroup_t* const sg =
-            hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
         if (sg) {
             libdraw_update_sprite_ptr(g, id, sg);
         }
     }
 }
+/*
 */
 
 /*
@@ -802,7 +785,6 @@ static void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
 }
 */
 
-/*
 static void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (g->dirty_entities) {
@@ -815,6 +797,7 @@ static void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
         g->frame_dirty = true;
     }
 }
+/*
 */
 
 void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
@@ -826,10 +809,10 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     //}
 
     if (g->current_scene == SCENE_GAMEPLAY) {
-        //    libdraw_handle_dirty_entities(g);
-        //    for (entityid id = 0; id < g->next_entityid; id++) {
-        //        libdraw_update_sprite_pre(g, id);
-        //    }
+        libdraw_handle_dirty_entities(g);
+        for (entityid id = 0; id < g->next_entityid; id++) {
+            libdraw_update_sprite_pre(g, id);
+        }
     }
 }
 
@@ -895,11 +878,11 @@ static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     //        draw_entities_2d_at(g, df, true, (vec3){x, y, z});
     //    }
     //}
-    //for (int y = 0; y < df->height; y++) {
-    //    for (int x = 0; x < df->width; x++) {
-    //        draw_entities_2d_at(g, df, false, (vec3){x, y, z});
-    //    }
-    //}
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            draw_entities_2d_at(g, df, false, (vec3){x, y, z});
+        }
+    }
     return true;
 }
 /*
@@ -1287,20 +1270,13 @@ static void load_textures() {
 }
 
 
-/*
-static void create_spritegroup(shared_ptr<gamestate> g,
-                               entityid id,
-                               int* keys,
-                               int num_keys,
-                               int offset_x,
-                               int offset_y,
-                               specifier_t spec) {
+static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
     massert(g, "gamestate is NULL");
     // can hold up to 32 sprites
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
     massert(group, "spritegroup is NULL");
     //disabling this check until dungeon_floor created
-    dungeon_floor_t* df = d_get_current_floor(g->d);
+    shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
     massert(df, "dungeon_floor is NULL");
     if (!df) {
         spritegroup_destroy(group);
@@ -1308,7 +1284,7 @@ static void create_spritegroup(shared_ptr<gamestate> g,
     }
     int df_w = df->width;
     int df_h = df->height;
-    vec3 loc = g_get_location(g, id);
+    vec3 loc = g_get_loc(g, id);
     massert(loc.x >= 0 && loc.x < df_w, "location x out of bounds: %d", loc.x);
     massert(loc.y >= 0 && loc.y < df_h, "location y out of bounds: %d", loc.y);
     if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
@@ -1318,8 +1294,7 @@ static void create_spritegroup(shared_ptr<gamestate> g,
     for (int i = 0; i < num_keys; i++) {
         int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
-        sprite* s =
-            sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
+        sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
         spritegroup_add(group, s);
     }
     group->id = id;
@@ -1330,13 +1305,12 @@ static void create_spritegroup(shared_ptr<gamestate> g,
         return;
     }
     group->current = 0;
-    group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x,
-                              (float)loc.y * DEFAULT_TILE_SIZE + offset_y,
-                              (float)s->width,
-                              (float)s->height};
-    group->off_x = offset_x, group->off_y = offset_y;
+    group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
+    group->off_x = offset_x;
+    group->off_y = offset_y;
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
 }
+/*
 */
 
 /*
@@ -1349,7 +1323,6 @@ static void calc_debugpanel_size(shared_ptr<gamestate> g) {
 }
 */
 
-/*
 static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -1365,7 +1338,8 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             keys = TX_HUMAN_KEYS;
             num_keys = TX_HUMAN_COUNT;
             break;
-        // Add cases for other races here
+            // Add cases for other races here
+            /*
         case RACE_ORC:
             keys = TX_ORC_KEYS;
             num_keys = TX_ORC_COUNT;
@@ -1402,11 +1376,15 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             keys = TX_GREEN_SLIME_KEYS;
             num_keys = TX_GREEN_SLIME_COUNT;
             break;
+*/
         default: merror("unknown race %d", race); return;
         }
-        create_spritegroup(
-            g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-    } else if (type == ENTITY_ITEM) {
+        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    }
+}
+
+/*
+    else if (type == ENTITY_ITEM) {
         // check the item type
         itemtype item_type = g_get_itemtype(g, id);
         if (item_type == ITEM_WEAPON) {
@@ -1467,7 +1445,8 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
                 g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         }
     }
-}
+*/
+/*
 */
 
 /*
