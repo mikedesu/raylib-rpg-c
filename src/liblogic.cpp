@@ -1028,6 +1028,8 @@ static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
     g_add_type(g, id, ENTITY_NPC);
     minfo("attempting to add race...");
     g_add_race(g, id, rt);
+    minfo("attempting to add loc...");
+    g_add_loc(g, id, loc);
 
     msuccess("so far so good...");
 

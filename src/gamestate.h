@@ -21,7 +21,6 @@
 #include <ctime>
 #include <raylib.h>
 #include <unordered_map>
-//#include <stdbool.h>
 //#include "gamestate_explored_list.h"
 //#include "gamestate_light_radius.h"
 
@@ -39,18 +38,6 @@
 #define MAX_MUSIC_PATHS 1024
 #define MAX_MUSIC_PATH_LENGTH 256
 
-//typedef struct {
-//    char messages[MAX_MESSAGES][MAX_MSG_LENGTH];
-//    int count; // Total messages in queue
-//    int index; // Current message being shown
-//    bool is_active; // Blocks input when true
-//} message_system;
-
-//typedef struct {
-//    char** messages;
-//    int count;
-//    int max_count;
-//} message_history;
 
 typedef struct gamestate {
     controlmode_t controlmode;
@@ -85,8 +72,6 @@ typedef struct gamestate {
     bool display_sort_inventory_menu;
     bool music_volume_changed;
 
-    //char help_menu_text[2048];
-
     int framecount;
     int fadealpha;
     int camera_mode;
@@ -98,26 +83,20 @@ typedef struct gamestate {
     int turn_count;
     int frame_updates;
 
-    //int sort_inventory_menu_selection;
-    //int sort_inventory_menu_selection_max;
-    //entityid* hero_inventory_sorted_by_name;
-    //entityid* hero_inventory_sorted_by_type;
-
     int font_size;
     int pad;
 
     int inventory_menu_selection;
     int gameplay_settings_menu_selection;
 
-    //ct* components;
     std::unordered_map<entityid, long>* component_table;
 
-    //equipment_component* equipment_list;
-    //stats_component* stats_list;
 
     std::unordered_map<entityid, string>* name_list;
     std::unordered_map<entityid, entitytype_t>* type_list;
     std::unordered_map<entityid, race_t>* race_list;
+    std::unordered_map<entityid, vec3>* loc_list;
+
     //unordered_map<entityid, direction_t>* direction_list;
     //unordered_map<entityid, vec3>* loc_list;
     //unordered_map<entityid, Rectangle>* sprite_move_list;
@@ -206,6 +185,9 @@ typedef struct gamestate {
     //vec3_list_component* visible_list; // List of visible tiles
     //int visible_list_count;
     //int visible_list_capacity;
+
+    //equipment_component* equipment_list;
+    //stats_component* stats_list;
 
     debugpanel_t debugpanel;
 
@@ -312,6 +294,12 @@ bool g_has_type(std::shared_ptr<gamestate> g, entityid id);
 bool g_has_race(std::shared_ptr<gamestate> g, entityid id);
 race_t g_get_race(std::shared_ptr<gamestate> g, entityid id);
 bool g_add_race(std::shared_ptr<gamestate> g, entityid id, race_t race);
+
+
+bool g_has_loc(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_loc(std::shared_ptr<gamestate> g, entityid id, vec3 loc);
+bool g_update_loc(std::shared_ptr<gamestate> g, entityid id, vec3 loc);
+vec3 g_get_loc(std::shared_ptr<gamestate> g, entityid id);
 
 
 //direction_t g_get_direction(std::shared_ptr<gamestate> g, entityid id);
