@@ -162,8 +162,7 @@ static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputs
 
 //static void handle_input(const inputstate* const is, gamestate* const g);
 //static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-//static void handle_input_player(shared_ptr<gamestate> g,
-//                                shared_ptr<inputstate> is);
+static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 //static void handle_input_inventory(shared_ptr<gamestate> g,
 //                                   shared_ptr<inputstate> is);
 //static void add_message_history(gamestate* const g, const char* fmt, ...);
@@ -1870,177 +1869,173 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
 //}
 //    }
 //}
-
-/*
-static void handle_input_player(const inputstate* const is,
-                                gamestate* const g) {
+static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
-        printf("handle_input_player: flag is not GAMESTATE_FLAG_PLAYER_INPUT, "
-               "returning\n");
+        merror("handle_input_player: flag is not GAMESTATE_FLAG_PLAYER_INPUT returning");
         return;
     }
-    if (g->msg_system.is_active) {
-        if (inputstate_any_pressed(is)) {
-            g->msg_system.index++;
-            if (g->msg_system.index >= g->msg_system.count) {
-                // Reset when all messages read
-                g->msg_system.index = 0;
-                g->msg_system.count = 0;
-                g->msg_system.is_active = false;
-            }
-            g->frame_dirty = true;
-        }
-        return;
-    }
-    if (inputstate_is_shift_held(is) && inputstate_is_pressed(is, KEY_SLASH)) {
-        g->display_help_menu = true;
-        g->controlmode = CONTROLMODE_HELP;
-        g->frame_dirty = true;
-        return;
-    }
-
     // test enter key
     if (inputstate_is_pressed(is, KEY_ENTER)) {
-        printf("handle_input_player: enter key pressed\n");
+        minfo("handle_input_player: enter key pressed");
         return;
-    }
-
-    const char* action = get_action_key(is, g);
-    if (!action) {
-        return;
-    }
-    if (g_is_dead(g, g->hero_id)) {
-        return;
-    }
-    if (action) {
-        //printf("handle_input_player: action is %s\n", action);
-        if (g->player_changing_direction) {
-            if (strcmp(action, "wait") == 0) {
-                execute_action(g, g->hero_id, ENTITY_ACTION_WAIT);
-                g->player_changing_direction = false;
-                g->frame_dirty = true;
-            } else if (strcmp(action, "move_w") == 0) {
-                change_player_dir(g, DIR_LEFT);
-                g->player_changing_direction = false;
-                g->frame_dirty = true;
-            } else if (strcmp(action, "move_e") == 0) {
-                change_player_dir(g, DIR_RIGHT);
-                g->player_changing_direction = false;
-                g->frame_dirty = true;
-            } else if (strcmp(action, "move_s") == 0) {
-                change_player_dir(g, DIR_DOWN);
-                g->player_changing_direction = false;
-                g->frame_dirty = true;
-            } else if (strcmp(action, "move_n") == 0) {
-                change_player_dir(g, DIR_UP);
-                g->player_changing_direction = false;
-                g->frame_dirty = true;
-            } else if (strcmp(action, "move_nw") == 0) {
-                change_player_dir(g, DIR_UP_LEFT);
-                g->player_changing_direction = false;
-                g->frame_dirty = true;
-            } else if (strcmp(action, "move_ne") == 0) {
-                change_player_dir(g, DIR_UP_RIGHT);
-                g->player_changing_direction = false;
-                g->frame_dirty = true;
-            } else if (strcmp(action, "move_sw") == 0) {
-                change_player_dir(g, DIR_DOWN_LEFT);
-                g->player_changing_direction = false;
-                g->frame_dirty = true;
-            } else if (strcmp(action, "move_se") == 0) {
-                change_player_dir(g, DIR_DOWN_RIGHT);
-                g->player_changing_direction = false;
-                g->frame_dirty = true;
-            }
-            // suggestion by patreon supporter hllcgn:
-            // pressing 'attack' while in 'change direction' mode
-            // should cause an attack right away so the player
-            // does not have to get out of change-dir mode
-            else if (strcmp(action, "attack") == 0) {
-                g->player_changing_direction = false;
-                vec3 loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
-                vec3 hloc = g_get_location(g, g->hero_id);
-                try_entity_attack(
-                    g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
-                g->frame_dirty = true;
-            }
-            return;
-        }
-        if (strcmp(action, "wait") == 0) {
-            g->player_changing_direction = true;
-            g->frame_dirty = true;
-        } else if (strcmp(action, "inventory_menu") == 0) {
-            //g->player_changing_direction = true;
-            g->display_inventory_menu = true;
-            g->frame_dirty = true;
-            g->controlmode = CONTROLMODE_INVENTORY;
-        } else if (strcmp(action, "move_w") == 0) {
-            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_LEFT);
-            g->frame_dirty = true;
-        } else if (strcmp(action, "move_e") == 0) {
-            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_RIGHT);
-            g->frame_dirty = true;
-        } else if (strcmp(action, "move_n") == 0) {
-            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP);
-            g->frame_dirty = true;
-        } else if (strcmp(action, "move_s") == 0) {
-            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN);
-            g->frame_dirty = true;
-        } else if (strcmp(action, "move_nw") == 0) {
-            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP_LEFT);
-            g->frame_dirty = true;
-        } else if (strcmp(action, "move_ne") == 0) {
-            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP_RIGHT);
-            g->frame_dirty = true;
-        } else if (strcmp(action, "move_sw") == 0) {
-            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN_LEFT);
-            g->frame_dirty = true;
-        } else if (strcmp(action, "move_se") == 0) {
-            execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN_RIGHT);
-            g->frame_dirty = true;
-        } else if (strcmp(action, "attack") == 0) {
-            vec3 loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
-            vec3 hloc = g_get_location(g, g->hero_id);
-            try_entity_attack(g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
-            g->frame_dirty = true;
-        } else if (strcmp(action, "interact") == 0) {
-            // we are hardcoding the flip switch interaction for now
-            // but eventually this will be generalized
-            // for instance u can talk to an NPC merchant using "interact"
-            // or open a door, etc
-            //msuccess("Space pressed!");
-            //int tx = hero->x + get_x_from_dir(hero->direction);
-            //direction_t dir = g_get_direction(g, g->hero_id);
-            //vec3 hloc = g_get_location(g, g->hero_id);
-            //int tx = hloc.x + get_x_from_dir(dir);
-            //int ty = hloc.y + get_y_from_dir(dir);
-            // check to see if there is a door
-            //entity* door = get_door_from_tile(g, tx, ty, hloc.z);
-            //if (door) {
-            //    door->door_is_open = !door->door_is_open;
-            //    //door->do_update = true;
-            //    g_set_update(g, door->id, true);
-            //}
-            //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            //try_flip_switch(g, hero, tx, ty, hero->floor);
-            //g->frame_dirty = true;
-        } else if (strcmp(action, "pickup") == 0) {
-            //try_entity_pickup(g, hero);
-            try_entity_pickup(g, g->hero_id);
-            g->frame_dirty = true;
-        } else if (strcmp(action, "toggle_camera") == 0) {
-            g->controlmode = CONTROLMODE_CAMERA;
-        } else if (strcmp(action, "traverse") == 0) {
-            // we need to attempt to navigate either up or down a floor depending on the tile beneath the player
-            try_entity_traverse_floors(g, g->hero_id);
-            g->frame_dirty = true;
-        }
-    } else {
-        merror("No action found for key");
     }
 }
+//if (g->msg_system.is_active) {
+//    if (inputstate_any_pressed(is)) {
+//        g->msg_system.index++;
+//        if (g->msg_system.index >= g->msg_system.count) {
+//            // Reset when all messages read
+//            g->msg_system.index = 0;
+//            g->msg_system.count = 0;
+//            g->msg_system.is_active = false;
+//        }
+//        g->frame_dirty = true;
+//    }
+//    return;
+//}
+//if (inputstate_is_shift_held(is) && inputstate_is_pressed(is, KEY_SLASH)) {
+//    g->display_help_menu = true;
+//    g->controlmode = CONTROLMODE_HELP;
+//    g->frame_dirty = true;
+//    return;
+//}
+
+
+//const char* action = get_action_key(is, g);
+//if (!action) {
+//    return;
+//}
+//if (g_is_dead(g, g->hero_id)) {
+//    return;
+//}
+//if (action) {
+//printf("handle_input_player: action is %s\n", action);
+//    if (g->player_changing_direction) {
+//        if (strcmp(action, "wait") == 0) {
+//            execute_action(g, g->hero_id, ENTITY_ACTION_WAIT);
+//            g->player_changing_direction = false;
+//            g->frame_dirty = true;
+//        } else if (strcmp(action, "move_w") == 0) {
+//            change_player_dir(g, DIR_LEFT);
+//            g->player_changing_direction = false;
+//            g->frame_dirty = true;
+//        } else if (strcmp(action, "move_e") == 0) {
+//            change_player_dir(g, DIR_RIGHT);
+//            g->player_changing_direction = false;
+//            g->frame_dirty = true;
+//        } else if (strcmp(action, "move_s") == 0) {
+//            change_player_dir(g, DIR_DOWN);
+//            g->player_changing_direction = false;
+//            g->frame_dirty = true;
+//        } else if (strcmp(action, "move_n") == 0) {
+//            change_player_dir(g, DIR_UP);
+//            g->player_changing_direction = false;
+//            g->frame_dirty = true;
+//        } else if (strcmp(action, "move_nw") == 0) {
+//            change_player_dir(g, DIR_UP_LEFT);
+//            g->player_changing_direction = false;
+//            g->frame_dirty = true;
+//        } else if (strcmp(action, "move_ne") == 0) {
+//            change_player_dir(g, DIR_UP_RIGHT);
+//            g->player_changing_direction = false;
+//            g->frame_dirty = true;
+//        } else if (strcmp(action, "move_sw") == 0) {
+//            change_player_dir(g, DIR_DOWN_LEFT);
+//            g->player_changing_direction = false;
+//            g->frame_dirty = true;
+//        } else if (strcmp(action, "move_se") == 0) {
+//            change_player_dir(g, DIR_DOWN_RIGHT);
+//            g->player_changing_direction = false;
+//            g->frame_dirty = true;
+//        }
+// suggestion by patreon supporter hllcgn:
+// pressing 'attack' while in 'change direction' mode
+// should cause an attack right away so the player
+// does not have to get out of change-dir mode
+//else if (strcmp(action, "attack") == 0) {
+//    g->player_changing_direction = false;
+//    vec3 loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
+//    vec3 hloc = g_get_location(g, g->hero_id);
+//    try_entity_attack(g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
+//    g->frame_dirty = true;
+//}
+//return;
+//}
+//if (strcmp(action, "wait") == 0) {
+//    g->player_changing_direction = true;
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "inventory_menu") == 0) {
+//    //g->player_changing_direction = true;
+//    g->display_inventory_menu = true;
+//    g->frame_dirty = true;
+//    g->controlmode = CONTROLMODE_INVENTORY;
+//} else if (strcmp(action, "move_w") == 0) {
+//    execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_LEFT);
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "move_e") == 0) {
+//    execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_RIGHT);
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "move_n") == 0) {
+//    execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP);
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "move_s") == 0) {
+//    execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN);
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "move_nw") == 0) {
+//    execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP_LEFT);
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "move_ne") == 0) {
+//    execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_UP_RIGHT);
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "move_sw") == 0) {
+//    execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN_LEFT);
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "move_se") == 0) {
+//    execute_action(g, g->hero_id, ENTITY_ACTION_MOVE_DOWN_RIGHT);
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "attack") == 0) {
+//    vec3 loc = get_loc_from_dir(g_get_direction(g, g->hero_id));
+//    vec3 hloc = g_get_location(g, g->hero_id);
+//    try_entity_attack(g, g->hero_id, hloc.x + loc.x, hloc.y + loc.y);
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "interact") == 0) {
+// we are hardcoding the flip switch interaction for now
+// but eventually this will be generalized
+// for instance u can talk to an NPC merchant using "interact"
+// or open a door, etc
+//msuccess("Space pressed!");
+//int tx = hero->x + get_x_from_dir(hero->direction);
+//direction_t dir = g_get_direction(g, g->hero_id);
+//vec3 hloc = g_get_location(g, g->hero_id);
+//int tx = hloc.x + get_x_from_dir(dir);
+//int ty = hloc.y + get_y_from_dir(dir);
+// check to see if there is a door
+//entity* door = get_door_from_tile(g, tx, ty, hloc.z);
+//if (door) {
+//    door->door_is_open = !door->door_is_open;
+//    //door->do_update = true;
+//    g_set_update(g, door->id, true);
+//}
+//g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+//try_flip_switch(g, hero, tx, ty, hero->floor);
+//g->frame_dirty = true;
+//} else if (strcmp(action, "pickup") == 0) {
+//try_entity_pickup(g, hero);
+//    try_entity_pickup(g, g->hero_id);
+//    g->frame_dirty = true;
+//} else if (strcmp(action, "toggle_camera") == 0) {
+//    g->controlmode = CONTROLMODE_CAMERA;
+//} else if (strcmp(action, "traverse") == 0) {
+// we need to attempt to navigate either up or down a floor depending on the tile beneath the player
+//    try_entity_traverse_floors(g, g->hero_id);
+//    g->frame_dirty = true;
+//}
+//} else {
+//    merror("No action found for key");
+//}
+/*
 */
 
 
@@ -2221,6 +2216,18 @@ static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
             handle_camera_zoom(g, is);
             g->frame_dirty = true;
             return;
+        }
+
+        if (g->controlmode == CONTROLMODE_PLAYER) {
+            //if (g->gameover) {
+            //    // if the game is over, we can restart the game
+            //    if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+            //        liblogic_restart(g);
+            //    }
+            //    return;
+            //}
+            // handle player input
+            handle_input_player(g, is);
         }
     }
 
