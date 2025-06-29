@@ -1,15 +1,11 @@
-//#include "bonus_table.h"
 #include "direction.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
-//#include "entitytype.h"
 #include "gamestate.h"
-//#include "gamestate_flag.h"
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "libdraw.h"
-//#include "libdraw_sort_inventory_menu.h"
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
@@ -22,20 +18,24 @@
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
 #include "tx_keys.h"
-//#include "weapon.h"
 #include <cstdlib>
 #include <memory>
 #include <raylib.h>
 #include <sys/param.h>
+//#include "weapon.h"
+//#include "gamestate_flag.h"
+//#include "libdraw_sort_inventory_menu.h"
+//#include "bonus_table.h"
+//#include "entitytype.h"
 //#include <unordered_map>
 //#include <vector>
-
-using std::shared_ptr;
-
 //#include "component.h"
 //#include "inventory_sort.h"
+
 //#define MAX(a, b) ((a)>(b)? (a) : (b))
 //#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
+using std::shared_ptr;
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -739,7 +739,8 @@ static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spri
     //if (g_is_dead(g, id) && !spritegroup_is_animating(sg)) return;
     if (g_get_update(g, id)) {
         //libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, id));
-        libdraw_update_sprite_context_ptr(g, sg, DIR_DOWN_RIGHT);
+        //libdraw_update_sprite_context_ptr(g, sg, DIR_DOWN_LEFT);
+        libdraw_update_sprite_context_ptr(g, sg, g_get_dir(g, id));
         g_set_update(g, id, false);
     }
     // Copy movement intent from sprite_move_x/y if present

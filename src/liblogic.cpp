@@ -1037,6 +1037,7 @@ static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
     //minfo("attempting to add ...");
     minfo("attempting to add dir...");
     g_add_dir(g, id, DIR_DOWN_RIGHT);
+    //g_add_dir(g, id, DIR_UP_RIGHT);
 
     msuccess("so far so good...");
 
@@ -1886,41 +1887,57 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
     if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
         g_update_loc(g, g->hero_id, (vec3){loc.x, loc.y - 1, loc.z});
         g_update_sprite_move(g, g->hero_id, (Rectangle){0, -8, 0, 0});
+        g_update_dir(g, g->hero_id, DIR_UP);
+        g_set_update(g, g->hero_id, true);
         return;
     }
     if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
         g_update_loc(g, g->hero_id, (vec3){loc.x, loc.y + 1, loc.z});
         g_update_sprite_move(g, g->hero_id, (Rectangle){0, 8, 0, 0});
+        g_update_dir(g, g->hero_id, DIR_DOWN);
+        g_set_update(g, g->hero_id, true);
         return;
     }
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
         g_update_loc(g, g->hero_id, (vec3){loc.x - 1, loc.y, loc.z});
         g_update_sprite_move(g, g->hero_id, (Rectangle){-8, 0, 0, 0});
+        g_update_dir(g, g->hero_id, DIR_LEFT);
+        g_set_update(g, g->hero_id, true);
         return;
     }
     if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
         g_update_loc(g, g->hero_id, (vec3){loc.x + 1, loc.y, loc.z});
         g_update_sprite_move(g, g->hero_id, (Rectangle){8, 0, 0, 0});
+        g_update_dir(g, g->hero_id, DIR_RIGHT);
+        g_set_update(g, g->hero_id, true);
         return;
     }
     if (inputstate_is_pressed(is, KEY_Q)) {
         g_update_loc(g, g->hero_id, (vec3){loc.x - 1, loc.y - 1, loc.z});
         g_update_sprite_move(g, g->hero_id, (Rectangle){-8, -8, 0, 0});
+        g_update_dir(g, g->hero_id, DIR_UP_LEFT);
+        g_set_update(g, g->hero_id, true);
         return;
     }
     if (inputstate_is_pressed(is, KEY_E)) {
         g_update_loc(g, g->hero_id, (vec3){loc.x + 1, loc.y - 1, loc.z});
         g_update_sprite_move(g, g->hero_id, (Rectangle){8, -8, 0, 0});
+        g_update_dir(g, g->hero_id, DIR_UP_RIGHT);
+        g_set_update(g, g->hero_id, true);
         return;
     }
     if (inputstate_is_pressed(is, KEY_Z)) {
         g_update_loc(g, g->hero_id, (vec3){loc.x - 1, loc.y + 1, loc.z});
         g_update_sprite_move(g, g->hero_id, (Rectangle){-8, 8, 0, 0});
+        g_update_dir(g, g->hero_id, DIR_DOWN_LEFT);
+        g_set_update(g, g->hero_id, true);
         return;
     }
     if (inputstate_is_pressed(is, KEY_C)) {
         g_update_loc(g, g->hero_id, (vec3){loc.x + 1, loc.y + 1, loc.z});
         g_update_sprite_move(g, g->hero_id, (Rectangle){8, 8, 0, 0});
+        g_update_dir(g, g->hero_id, DIR_DOWN_RIGHT);
+        g_set_update(g, g->hero_id, true);
         return;
     }
 }
