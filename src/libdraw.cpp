@@ -1580,7 +1580,7 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     int x = target_w / 2;
     int y = target_h / 2;
     g->cam2d.offset = (Vector2){(float)x, (float)y};
-    g->cam2d.zoom = 1.0f;
+    //g->cam2d.zoom = 1.0f;
 
     //gamestate_set_debug_panel_pos_top_right(g);
 

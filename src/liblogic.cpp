@@ -1871,7 +1871,10 @@ static bool try_entity_pickup(gamestate* const g, entityid id) {
 //    }
 //}
 //    }
-//}
+//}\
+
+
+
 static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");

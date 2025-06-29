@@ -21,10 +21,7 @@
 #include <ctime>
 #include <raylib.h>
 #include <unordered_map>
-//#include "gamestate_explored_list.h"
-//#include "gamestate_light_radius.h"
 
-//using namespace std;
 
 #define DEFAULT_MUSIC_VOLUME 0.0f
 #define DEFAULT_MSG_HIST_BGCOLOR ((Color){0x33, 0x33, 0x33, 255})
@@ -82,15 +79,12 @@ typedef struct gamestate {
     int lock;
     int turn_count;
     int frame_updates;
-
     int font_size;
     int pad;
-
     int inventory_menu_selection;
     int gameplay_settings_menu_selection;
 
     std::unordered_map<entityid, long>* component_table;
-
 
     std::unordered_map<entityid, string>* name_list;
     std::unordered_map<entityid, entitytype_t>* type_list;
@@ -98,7 +92,6 @@ typedef struct gamestate {
     std::unordered_map<entityid, vec3>* loc_list;
     std::unordered_map<entityid, Rectangle>* sprite_move_list;
     std::unordered_map<entityid, direction_t>* dir_list;
-
     std::unordered_map<entityid, bool>* dead_list;
     std::unordered_map<entityid, bool>* update_list;
 
@@ -106,86 +99,63 @@ typedef struct gamestate {
     //unordered_map<entityid, bool>* blocking_list;
     //unordered_map<entityid, bool>* block_success_list;
     //unordered_map<entityid, bool>* damaged_list;
-
     //unordered_map<entityid, inventory_component>* inventory_list;
     //inventory_component* inventory_list;
     //int inventory_list_count;
     //int inventory_list_capacity;
-
     //vec3_component* target_list;
     //int target_list_count;
     //int target_list_capacity;
-
     //target_path_component* target_path_list;
     //int target_path_list_count;
     //int target_path_list_capacity;
-
     //int_component* default_action_list;
     //int default_action_list_count;
     //int default_action_list_capacity;
-
     //int equipment_list_count;
     //int equipment_list_capacity;
-
     //int stats_list_count;
     //int stats_list_capacity;
-
     //int_component* itemtype_list;
-    //int itemtype_list_count;
-    //int itemtype_list_capacity;
-
     //int_component* weapontype_list;
     //int weapontype_list_count;
     //int weapontype_list_capacity;
-
     //int_component* shieldtype_list;
     //int shieldtype_list_count;
     //int shieldtype_list_capacity;
-
     //int_component* potion_type_list;
     //int potion_type_list_count;
     //int potion_type_list_capacity;
-
     //vec3_component* damage_list;
     //int damage_list_count;
     //int damage_list_capacity;
-
     //int_component* ac_list;
     //int ac_list_count;
     //int ac_list_capacity;
-
     //int_component* zapping_list;
     //int zapping_list_count;
     //int zapping_list_capacity;
-
     //vec3_component* base_attack_damage_list;
     //int base_attack_damage_list_count;
     //int base_attack_damage_list_capacity;
-
     //int_component* vision_distance_list;
     //int vision_distance_list_count;
     //int vision_distance_list_capacity;
-
     //int_component* light_radius_list;
     //int light_radius_list_count;
     //int light_radius_list_capacity;
-
     //int_component* light_radius_bonus_list;
     //int light_radius_bonus_list_count;
     //int light_radius_bonus_list_capacity;
-
     //int_component* ringtype_list;
     //int ringtype_list_count;
     //int ringtype_list_capacity;
-
     //vec3_list_component* explored_list; // List of explored tiles
     //int explored_list_count;
     //int explored_list_capacity;
-
     //vec3_list_component* visible_list; // List of visible tiles
     //int visible_list_count;
     //int visible_list_capacity;
-
     //equipment_component* equipment_list;
     //stats_component* stats_list;
 
@@ -199,7 +169,6 @@ typedef struct gamestate {
     Font font;
     float line_spacing;
 
-    //dungeon_t* d;
     std::shared_ptr<dungeon_t> dungeon;
 
     double last_frame_time;
@@ -218,7 +187,6 @@ typedef struct gamestate {
     std::vector<string>* msg_system;
     std::vector<string>* msg_history;
 
-    //keybinding_list_t keybinding_list;
     std::shared_ptr<keybinding_list_t> keybinding_list;
 
     int current_music_index;
