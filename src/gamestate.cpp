@@ -1,5 +1,6 @@
 #include "component.h"
 #include "controlmode.h"
+#include "direction.h"
 #include "entityid.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
@@ -163,7 +164,10 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->type_list = new unordered_map<entityid, entitytype_t>();
     g->race_list = new unordered_map<entityid, race_t>();
     g->loc_list = new unordered_map<entityid, vec3>();
-
+    g->sprite_move_list = new unordered_map<entityid, Rectangle>();
+    g->dir_list = new unordered_map<entityid, direction_t>();
+    g->dead_list = new unordered_map<entityid, bool>();
+    g->update_list = new unordered_map<entityid, bool>();
 
     gamestate_load_keybindings(g);
     msuccess("Gamestate initialized successfully");
@@ -290,50 +294,22 @@ void gamestate_free(shared_ptr<gamestate> g) {
     //    g->chara_creation = nullptr; // Set to nullptr
     //}
 
-    // free message history
-    if (!g->msg_history) {
-        g->msg_history->clear();
-        delete g->msg_history;
-        g->msg_history = NULL;
+    if (g->msg_system) delete g->msg_system;
+    if (g->msg_history) delete g->msg_history;
+    if (g->component_table) delete g->component_table;
+    if (g->name_list) delete g->name_list;
+    if (g->type_list) delete g->type_list;
+    if (g->race_list) delete g->race_list;
+    if (g->loc_list) delete g->loc_list;
+    if (g->sprite_move_list) delete g->sprite_move_list;
+    if (g->dir_list) delete g->dir_list;
+    if (g->dead_list) delete g->dead_list;
+    if (g->update_list) delete g->update_list;
+
+    if (g->monster_defs) {
+        free(g->monster_defs);
     }
 
-    if (g->component_table) {
-        g->component_table->clear();
-        delete g->component_table;
-        g->component_table = NULL;
-    }
-
-    if (g->name_list) {
-        g->name_list->clear();
-        delete g->name_list;
-        g->name_list = NULL;
-    }
-
-    if (g->type_list) {
-        g->type_list->clear();
-        delete g->type_list;
-        g->type_list = NULL;
-    }
-
-    if (g->race_list) {
-        g->race_list->clear();
-        delete g->race_list;
-        g->race_list = NULL;
-    }
-
-
-    if (g->loc_list) {
-        g->loc_list->clear();
-        delete g->loc_list;
-        g->loc_list = NULL;
-    }
-
-    //free(g->race_list);
-    //free(g->direction_list);
-    //free(g->loc_list);
-    //free(g->sprite_move_list);
-    //free(g->dead_list);
-    //free(g->update_list);
     //free(g->attacking_list);
     //free(g->blocking_list);
     //free(g->block_success_list);
@@ -358,11 +334,21 @@ void gamestate_free(shared_ptr<gamestate> g) {
     //free(g->light_radius_bonus_list);
     //free(g->explored_list);
     //free(g->visible_list);
-    if (g->monster_defs) {
-        free(g->monster_defs);
-        g->monster_defs = NULL;
+}
+
+
+entityid g_add_entity(shared_ptr<gamestate> g) {
+    entityid id = g->next_entityid;
+    if (!g->dirty_entities) {
+        g->dirty_entities = true;
+        g->new_entityid_begin = id;
+        g->new_entityid_end = id + 1;
+    } else {
+        //g->dirty_entities = true;
+        g->new_entityid_end = id + 1;
     }
-    //free(g);
+    g->next_entityid++;
+    return id;
 }
 
 
@@ -639,130 +625,229 @@ bool g_update_loc(shared_ptr<gamestate> g, entityid id, vec3 loc) {
 }
 
 
-//direction_t g_get_direction(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (!g_has_component(g, id, C_DIRECTION)) return DIR_NONE;
-//    for (int i = 0; i < g->direction_list_count; i++)
-//        if (g->direction_list[i].id == id) return (direction_t)g->direction_list[i].data;
-//    return DIR_NONE;
-//}
+bool g_has_sprite_move(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_SPRITE_MOVE);
+}
 
-//bool g_has_direction(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_DIRECTION);
-//}
+Rectangle g_get_sprite_move(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g_has_sprite_move(g, id)) {
+        if (g->sprite_move_list) {
+            massert(g->sprite_move_list->find(id) != g->sprite_move_list->end(), "g_get_sprite_move: id %d not found in sprite move list", id);
+            return g->sprite_move_list->at(id);
+        }
+    }
+    merror("Sprite move component not found for id %d", id);
+    return (Rectangle){0, 0, 0, 0}; // Return an empty rectangle if not found
+}
 
-//bool g_add_direction(gamestate* const g, entityid id, int dir) {
-//    massert(g, "g is NULL");
-//    massert(dir >= 0 && dir < DIR_COUNT, "dir is invalid");
-//    // make sure the entity has the component
-//    return g_add_component(g, id, C_DIRECTION, (void*)&dir, sizeof(int_component), (void**)&g->direction_list, &g->direction_list_count, &g->direction_list_capacity);
-//}
 
-//bool g_is_direction(gamestate* const g, entityid id, int dir) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_get_direction(g, id) == dir;
-//}
+bool g_add_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_SPRITE_MOVE)) {
+        merror("g_add_comp failed for id %d", id);
+        return false;
+    }
+    if (!g->sprite_move_list) {
+        merror("g->sprite_move_list is NULL");
+        return false;
+    }
+    // Check if the sprite move already exists for the entity
+    (*g->sprite_move_list)[id] = loc; // Insert or update the sprite move
+    return true;
+}
 
-//bool g_update_direction(gamestate* const g, entityid id, int dir) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->direction_list == NULL) return false;
-//    for (int i = 0; i < g->direction_list_count; i++) {
-//        if (g->direction_list[i].id == id) {
-//            g->direction_list[i].data = dir;
-//            return true;
-//        }
-//    }
-//    return false;
-//}
 
-//bool g_has_location(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_LOCATION);
-//}
+bool g_update_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->sprite_move_list) {
+        merror("g->sprite_move_list is NULL");
+        return false;
+    }
+    // Check if the entity has a sprite move component
+    if (g_has_sprite_move(g, id)) {
+        // Update the sprite move for the entity
+        (*g->sprite_move_list)[id] = loc; // Update the sprite move
+        return true;
+    }
+    merror("g_update_sprite_move: id %d does not have a sprite move component", id);
+    return false;
+}
 
-//bool g_add_location(gamestate* const g, entityid id, vec3 loc) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    // make sure the entity has the location component
-//    return g_add_component(g, id, C_LOCATION, (void*)&loc, sizeof(vec3_component), (void**)&g->loc_list, &g->loc_list_count, &g->loc_list_capacity);
-//}
 
-//bool g_update_location(gamestate* const g, entityid id, vec3 loc) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->loc_list == NULL) return false;
-//    for (int i = 0; i < g->loc_list_count; i++) {
-//        if (g->loc_list[i].id == id) {
-//            g->loc_list[i].data = loc;
-//            return true;
-//        }
-//    }
-//    return false;
-//}
+bool g_has_dir(std::shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_DIRECTION);
+}
 
-//vec3 g_get_location(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->loc_list == NULL) return (vec3){-1, -1, -1};
-//    for (int i = 0; i < g->loc_list_count; i++)
-//        if (g->loc_list[i].id == id) return g->loc_list[i].data;
-//    return (vec3){-1, -1, -1};
-//}
 
-//bool g_is_location(const gamestate* const g, entityid id, vec3 loc) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->loc_list == NULL) return false;
-//    vec3 loc2 = g_get_location(g, id);
-//    return (loc.x == loc2.x && loc.y == loc2.y && loc.z == loc2.z);
-//}
+direction_t g_get_dir(std::shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g_has_dir(g, id)) {
+        if (g->dir_list) {
+            massert(g->dir_list->find(id) != g->dir_list->end(), "g_get_dir: id %d not found in direction list", id);
+            return g->dir_list->at(id);
+        }
+    }
+    merror("Direction component not found for id %d", id);
+    return DIR_NONE; // Return DIR_NONE if not found
+}
 
-//bool g_has_sprite_move(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_SPRITE_MOVE);
-//}
 
-//bool g_add_sprite_move(gamestate* const g, entityid id, Rectangle loc) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-// make sure the entity has the sprite move component
-//    return g_add_component(g, id, C_SPRITE_MOVE, (void*)&loc, sizeof(rect_component), (void**)&g->sprite_move_list, &g->sprite_move_list_count, &g->sprite_move_list_capacity);
-//}
+bool g_add_dir(std::shared_ptr<gamestate> g, entityid id, direction_t dir) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_DIRECTION)) {
+        merror("g_add_comp failed for id %d", id);
+        return false;
+    }
+    if (!g->dir_list) {
+        merror("g->dir_list is NULL");
+        return false;
+    }
+    // Check if the direction already exists for the entity
+    (*g->dir_list)[id] = dir; // Insert or update the direction
+    return true;
+}
 
-//bool g_update_sprite_move(gamestate* const g, entityid id, Rectangle loc) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    massert(g_has_component(g, id, C_SPRITE_MOVE), "id %d does not have a sprite move component", id);
-//    if (g_has_sprite_move(g, id)) {
-//        if (g->sprite_move_list == NULL) return false;
-//        for (int i = 0; i < g->sprite_move_list_count; i++) {
-//            if (g->sprite_move_list[i].id == id) {
-//                g->sprite_move_list[i].data = loc;
-//                return true;
-//            }
-//        }
-//    }
-//    return false;
-//}
 
-//Rectangle g_get_sprite_move(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    massert(g_has_sprite_move(g, id), "id %d does not have a sprite move component", id);
-//    if (g_has_sprite_move(g, id)) {
-//        for (int i = 0; i < g->sprite_move_list_count; i++)
-//            if (g->sprite_move_list[i].id == id) return g->sprite_move_list[i].data;
-//    }
-//    //merror("id %d not found in sprite_move_list", id);
-//    return (Rectangle){0, 0, 0, 0}; // Return an empty rectangle if not found
-//}
+bool g_update_dir(std::shared_ptr<gamestate> g, entityid id, direction_t dir) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->dir_list) {
+        merror("g->dir_list is NULL");
+        return false;
+    }
+    // Check if the entity has a direction component
+    if (g_has_dir(g, id)) {
+        // Update the direction for the entity
+        (*g->dir_list)[id] = dir; // Update the direction
+        return true;
+    }
+    merror("g_update_dir: id %d does not have a direction component", id);
+    return false;
+}
+
+
+bool g_has_dead(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_DEAD);
+}
+
+
+bool g_add_dead(shared_ptr<gamestate> g, entityid id, int dead) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_DEAD)) {
+        merror("g_add_dead: Failed to add component C_DEAD for id %d", id);
+        return false;
+    }
+    if (!g->dead_list) {
+        merror("g->dead_list is NULL");
+        return false;
+    }
+    // Check if the dead status already exists for the entity
+    (*g->dead_list)[id] = dead; // Insert or update the dead status
+    return true;
+}
+
+
+bool g_update_dead(shared_ptr<gamestate> g, entityid id, int dead) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->dead_list) {
+        merror("g->dead_list is NULL");
+        return false;
+    }
+    // Check if the entity has a dead component
+    if (g_has_dead(g, id)) {
+        // Update the dead status for the entity
+        (*g->dead_list)[id] = dead; // Update the dead status
+        return true;
+    }
+    merror("g_update_dead: id %d does not have a dead component", id);
+    return false;
+}
+
+
+bool g_is_dead(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    if (id != ENTITYID_INVALID) {
+        if (g->dead_list) {
+            massert(g->dead_list->find(id) != g->dead_list->end(), "g_is_dead: id %d not found in dead list", id);
+            return g->dead_list->at(id);
+        }
+    }
+    merror("g_is_dead: id %d does not have a dead component", id);
+    return false;
+}
+
+
+bool g_has_update(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_UPDATE);
+}
+
+
+bool g_add_update(shared_ptr<gamestate> g, entityid id, int update) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_UPDATE)) {
+        merror("g_add_update: Failed to add component C_UPDATE for id %d", id);
+        return false;
+    }
+    if (!g->update_list) {
+        merror("g->update_list is NULL");
+        return false;
+    }
+    // Check if the update status already exists for the entity
+    (*g->update_list)[id] = update; // Insert or update the update status
+    return true;
+}
+
+
+bool g_get_update(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->update_list) {
+        massert(g->update_list->find(id) != g->update_list->end(), "g_get_update: id %d not found in update list", id);
+        return g->update_list->at(id);
+    }
+    merror("g_get_update: id %d does not have an update component", id);
+    return false; // Return false if the id is not found
+}
+
+
+bool g_set_update(shared_ptr<gamestate> g, entityid id, int update) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->update_list) {
+        merror("g->update_list is NULL");
+        return false;
+    }
+    // Check if the entity has an update component
+    if (g_has_update(g, id)) {
+        // Update the update status for the entity
+        (*g->update_list)[id] = update; // Update the update status
+        return true;
+    }
+    merror("g_set_update: id %d does not have an update component", id);
+    return false;
+}
+
 
 //bool g_has_dead(const gamestate* const g, entityid id) {
 //    massert(g, "g is NULL");
@@ -1680,19 +1765,6 @@ bool g_update_loc(shared_ptr<gamestate> g, entityid id, vec3 loc) {
 //    return 0;
 //}
 
-entityid g_add_entity(shared_ptr<gamestate> g) {
-    entityid id = g->next_entityid;
-    if (!g->dirty_entities) {
-        g->dirty_entities = true;
-        g->new_entityid_begin = id;
-        g->new_entityid_end = id + 1;
-    } else {
-        //g->dirty_entities = true;
-        g->new_entityid_end = id + 1;
-    }
-    g->next_entityid++;
-    return id;
-}
 
 //bool g_has_zapping(const gamestate* const g, entityid id) {
 //    massert(g, "g is NULL");

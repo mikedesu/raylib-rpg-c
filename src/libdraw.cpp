@@ -829,7 +829,7 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
         return;
     }
     if (g->framecount % ANIM_SPEED == 0) {
-        //libdraw_handle_dirty_entities(g);
+        libdraw_handle_dirty_entities(g);
         g->frame_dirty = true;
     }
     //        for (entityid id = 0; id < g->next_entityid; id++) {

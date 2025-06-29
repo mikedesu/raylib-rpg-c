@@ -96,12 +96,11 @@ typedef struct gamestate {
     std::unordered_map<entityid, entitytype_t>* type_list;
     std::unordered_map<entityid, race_t>* race_list;
     std::unordered_map<entityid, vec3>* loc_list;
+    std::unordered_map<entityid, Rectangle>* sprite_move_list;
+    std::unordered_map<entityid, direction_t>* dir_list;
 
-    //unordered_map<entityid, direction_t>* direction_list;
-    //unordered_map<entityid, vec3>* loc_list;
-    //unordered_map<entityid, Rectangle>* sprite_move_list;
-    //unordered_map<entityid, bool>* dead_list;
-    //unordered_map<entityid, bool>* update_list;
+    std::unordered_map<entityid, bool>* dead_list;
+    std::unordered_map<entityid, bool>* update_list;
     //unordered_map<entityid, bool>* attacking_list;
     //unordered_map<entityid, bool>* blocking_list;
     //unordered_map<entityid, bool>* block_success_list;
@@ -302,32 +301,25 @@ bool g_update_loc(std::shared_ptr<gamestate> g, entityid id, vec3 loc);
 vec3 g_get_loc(std::shared_ptr<gamestate> g, entityid id);
 
 
-//direction_t g_get_direction(std::shared_ptr<gamestate> g, entityid id);
-//bool g_add_direction(std::shared_ptr<gamestate> g, entityid id, direction_t dir);
-//bool g_is_direction(std::shared_ptr<gamestate> g, entityid id, direction_t dir);
-//bool g_update_direction(std::shared_ptr<gamestate> g, entityid id, direction_t dir);
-//bool g_has_direction(std::shared_ptr<gamestate> g, entityid id);
+direction_t g_get_dir(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_dir(std::shared_ptr<gamestate> g, entityid id, direction_t dir);
+bool g_update_dir(std::shared_ptr<gamestate> g, entityid id, direction_t dir);
+bool g_has_dir(std::shared_ptr<gamestate> g, entityid id);
 
-//bool g_has_location(std::shared_ptr<gamestate> g, entityid id);
-//bool g_add_location(std::shared_ptr<gamestate> g, entityid id, vec3 loc);
-//bool g_update_location(std::shared_ptr<gamestate> g, entityid id, vec3 loc);
-//vec3 g_get_location(std::shared_ptr<gamestate> g, entityid id);
-//bool g_is_location(std::shared_ptr<gamestate> g, entityid id, vec3 loc);
+bool g_has_sprite_move(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_sprite_move(std::shared_ptr<gamestate> g, entityid id, Rectangle loc);
+bool g_update_sprite_move(std::shared_ptr<gamestate> g, entityid id, Rectangle loc);
+Rectangle g_get_sprite_move(std::shared_ptr<gamestate> g, entityid id);
 
-//bool g_has_sprite_move(std::shared_ptr<gamestate> g, entityid id);
-//bool g_add_sprite_move(std::shared_ptr<gamestate> g, entityid id, Rectangle loc);
-//bool g_update_sprite_move(std::shared_ptr<gamestate> g, entityid id, Rectangle loc);
-//Rectangle g_get_sprite_move(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_dead(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_dead(std::shared_ptr<gamestate> g, entityid id, int dead);
+bool g_update_dead(std::shared_ptr<gamestate> g, entityid id, int dead);
+bool g_is_dead(std::shared_ptr<gamestate> g, entityid id);
 
-//bool g_has_dead(std::shared_ptr<gamestate> g, entityid id);
-//bool g_add_dead(std::shared_ptr<gamestate> g, entityid id, int dead);
-//bool g_update_dead(std::shared_ptr<gamestate> g, entityid id, int dead);
-//bool g_is_dead(std::shared_ptr<gamestate> g, entityid id);
-
-//bool g_has_update(std::shared_ptr<gamestate> g, entityid id);
-//bool g_add_update(std::shared_ptr<gamestate> g, entityid id, int update);
-//bool g_get_update(std::shared_ptr<gamestate> g, entityid id);
-//bool g_set_update(std::shared_ptr<gamestate> g, entityid id, int update);
+bool g_has_update(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_update(std::shared_ptr<gamestate> g, entityid id, int update);
+bool g_get_update(std::shared_ptr<gamestate> g, entityid id);
+bool g_set_update(std::shared_ptr<gamestate> g, entityid id, int update);
 
 //bool g_has_attacking(std::shared_ptr<gamestate> g, entityid id);
 //bool g_add_attacking(std::shared_ptr<gamestate> g, entityid id, int attacking);

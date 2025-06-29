@@ -1874,90 +1874,59 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         return;
     }
     if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
-        minfo("handle_input_player: up key pressed");
-
-        // get the player's current location
         vec3 loc = g_get_loc(g, g->hero_id);
         loc.y -= 1;
         g_update_loc(g, g->hero_id, loc);
-
         return;
     }
     if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
-        minfo("handle_input_player: down key pressed");
-
-        // get the player's current location
         vec3 loc = g_get_loc(g, g->hero_id);
         loc.y += 1;
         g_update_loc(g, g->hero_id, loc);
-
         return;
     }
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
-        minfo("handle_input_player: left key pressed");
-
-        // get the player's current location
         vec3 loc = g_get_loc(g, g->hero_id);
         loc.x -= 1;
         g_update_loc(g, g->hero_id, loc);
-
         return;
     }
     if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
-        minfo("handle_input_player: right key pressed");
-
-        // get the player's current location
         vec3 loc = g_get_loc(g, g->hero_id);
         loc.x += 1;
         g_update_loc(g, g->hero_id, loc);
-
         return;
     }
     if (inputstate_is_pressed(is, KEY_Q)) {
-        minfo("handle_input_player: q key pressed");
-
-        // get the player's current location
         vec3 loc = g_get_loc(g, g->hero_id);
         loc.x -= 1;
         loc.y -= 1;
         g_update_loc(g, g->hero_id, loc);
-
         return;
     }
     if (inputstate_is_pressed(is, KEY_E)) {
-        minfo("handle_input_player: e key pressed");
-
-        // get the player's current location
         vec3 loc = g_get_loc(g, g->hero_id);
         loc.x += 1;
         loc.y -= 1;
         g_update_loc(g, g->hero_id, loc);
-
         return;
     }
     if (inputstate_is_pressed(is, KEY_Z)) {
-        minfo("handle_input_player: e key pressed");
-
-        // get the player's current location
         vec3 loc = g_get_loc(g, g->hero_id);
         loc.x -= 1;
         loc.y += 1;
         g_update_loc(g, g->hero_id, loc);
-
         return;
     }
     if (inputstate_is_pressed(is, KEY_C)) {
-        minfo("handle_input_player: c key pressed");
-
-        // get the player's current location
         vec3 loc = g_get_loc(g, g->hero_id);
         loc.x += 1;
         loc.y += 1;
         g_update_loc(g, g->hero_id, loc);
-
         return;
     }
 }
+
 //if (g->msg_system.is_active) {
 //    if (inputstate_any_pressed(is)) {
 //        g->msg_system.index++;
@@ -2209,6 +2178,110 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
 }
 */
 
+
+static void handle_input_title_scene(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+    if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+        minfo("Title screen input detected, switching to main menu");
+        g->current_scene = SCENE_MAIN_MENU;
+        g->frame_dirty = true;
+    }
+}
+
+
+static void handle_input_main_menu_scene(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+    if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+        if (g->title_screen_selection == 0) {
+            minfo("Switching to character creation scene");
+            g->current_scene = SCENE_CHARACTER_CREATION;
+            g->frame_dirty = true;
+        }
+    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+        minfo("Title screen selection++");
+        g->title_screen_selection++;
+        if (g->title_screen_selection >= g->max_title_screen_selections) {
+            g->title_screen_selection = 0;
+        }
+    } else if (inputstate_is_pressed(is, KEY_UP)) {
+        minfo("Title screen selection--");
+        g->title_screen_selection--;
+        if (g->title_screen_selection < 0) {
+            g->title_screen_selection = g->max_title_screen_selections - 1;
+        }
+    } else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+        g->do_quit = true;
+    }
+
+    g->frame_dirty = true;
+}
+
+
+static void handle_input_character_creation_scene(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+    massert(is, "Input state is NULL!");
+    massert(g, "Game state is NULL!");
+
+    if (inputstate_is_pressed(is, KEY_ENTER)) {
+        minfo("Character creation confirmed");
+        // we need to copy the character creation stats to the hero entity
+        // hero has already been created, so its id is available
+        //g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
+        //g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
+        //g_set_stat(g, g->hero_id, STATS_CON, g->chara_creation.constitution);
+        int hitdie = 8;
+        int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
+        //bonus_calc(g->chara_creation.constitution);
+        while (maxhp_roll < 1) {
+            maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
+            //bonus_calc(g->chara_creation.constitution);
+        }
+        //g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
+        //g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
+        g->current_scene = SCENE_GAMEPLAY;
+    } else if (inputstate_is_pressed(is, KEY_SPACE)) {
+        // re-roll character creation stats
+        minfo("Re-rolling character creation stats");
+        g->chara_creation->strength = do_roll_best_of_3((vec3){3, 6, 0});
+        g->chara_creation->dexterity = do_roll_best_of_3((vec3){3, 6, 0});
+        g->chara_creation->constitution = do_roll_best_of_3((vec3){3, 6, 0});
+    } else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+        minfo("Exiting character creation");
+        g->current_scene = SCENE_TITLE;
+    }
+
+    g->frame_dirty = true;
+}
+
+
+static void handle_input_gameplay_scene(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+    if (inputstate_is_pressed(is, KEY_B)) {
+        if (g->controlmode == CONTROLMODE_PLAYER) {
+            g->controlmode = CONTROLMODE_CAMERA;
+        } else if (g->controlmode == CONTROLMODE_CAMERA) {
+            g->controlmode = CONTROLMODE_PLAYER;
+        }
+        g->frame_dirty = true;
+        return;
+    }
+
+    if (g->controlmode == CONTROLMODE_CAMERA) {
+        handle_camera_move(g, is);
+        handle_camera_zoom(g, is);
+        g->frame_dirty = true;
+        return;
+    }
+
+    if (g->controlmode == CONTROLMODE_PLAYER) {
+        handle_input_player(g, is);
+        //if (g->gameover) {
+        //    // if the game is over, we can restart the game
+        //    if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+        //        liblogic_restart(g);
+        //    }
+        //    return;
+        //}
+    }
+}
+
+
 static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "inputstate is NULL");
     massert(g, "gamestate is NULL");
@@ -2220,91 +2293,23 @@ static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     }
 
     if (g->current_scene == SCENE_TITLE) {
-        //if (inputstate_any_pressed(is)) {
-        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
-            minfo("Title screen input detected, switching to main menu");
-            g->current_scene = SCENE_MAIN_MENU;
-            g->frame_dirty = true;
-        }
-    } else if (g->current_scene == SCENE_MAIN_MENU) {
-        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
-            if (g->title_screen_selection == 0) {
-                minfo("Switching to character creation scene");
-                g->current_scene = SCENE_CHARACTER_CREATION;
-                g->frame_dirty = true;
-            }
-        } else if (inputstate_is_pressed(is, KEY_DOWN)) {
-            minfo("Title screen selection++");
-            g->title_screen_selection++;
-            if (g->title_screen_selection >= g->max_title_screen_selections) {
-                g->title_screen_selection = 0;
-            }
-        } else if (inputstate_is_pressed(is, KEY_UP)) {
-            minfo("Title screen selection--");
-            g->title_screen_selection--;
-            if (g->title_screen_selection < 0) {
-                g->title_screen_selection = g->max_title_screen_selections - 1;
-            }
-        } else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-            g->do_quit = true;
-        }
-    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
-        if (inputstate_is_pressed(is, KEY_ENTER)) {
-            minfo("Character creation confirmed");
-            // we need to copy the character creation stats to the hero entity
-            // hero has already been created, so its id is available
-            //g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
-            //g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
-            //g_set_stat(g, g->hero_id, STATS_CON, g->chara_creation.constitution);
-            int hitdie = 8;
-            int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
-            //bonus_calc(g->chara_creation.constitution);
-            while (maxhp_roll < 1) {
-                maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
-                //bonus_calc(g->chara_creation.constitution);
-            }
-            //g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
-            //g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
-            g->current_scene = SCENE_GAMEPLAY;
-            g->frame_dirty = true;
-        } else if (inputstate_is_pressed(is, KEY_SPACE)) {
-            // re-roll character creation stats
-            minfo("Re-rolling character creation stats");
-            g->frame_dirty = true;
-            g->chara_creation->strength = do_roll_best_of_3((vec3){3, 6, 0});
-            g->chara_creation->dexterity = do_roll_best_of_3((vec3){3, 6, 0});
-            g->chara_creation->constitution = do_roll_best_of_3((vec3){3, 6, 0});
-        }
-    } else if (g->current_scene == SCENE_GAMEPLAY) {
-        if (inputstate_is_pressed(is, KEY_B)) {
-            if (g->controlmode == CONTROLMODE_PLAYER) {
-                g->controlmode = CONTROLMODE_CAMERA;
-            } else if (g->controlmode == CONTROLMODE_CAMERA) {
-                g->controlmode = CONTROLMODE_PLAYER;
-            }
+        handle_input_title_scene(is, g);
+        return;
+    }
 
-            g->frame_dirty = true;
-            return;
-        }
+    if (g->current_scene == SCENE_MAIN_MENU) {
+        handle_input_main_menu_scene(is, g);
+        return;
+    }
 
-        if (g->controlmode == CONTROLMODE_CAMERA) {
-            handle_camera_move(g, is);
-            handle_camera_zoom(g, is);
-            g->frame_dirty = true;
-            return;
-        }
+    if (g->current_scene == SCENE_CHARACTER_CREATION) {
+        handle_input_character_creation_scene(is, g);
+        return;
+    }
 
-        if (g->controlmode == CONTROLMODE_PLAYER) {
-            //if (g->gameover) {
-            //    // if the game is over, we can restart the game
-            //    if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
-            //        liblogic_restart(g);
-            //    }
-            //    return;
-            //}
-            // handle player input
-            handle_input_player(g, is);
-        }
+    if (g->current_scene == SCENE_GAMEPLAY) {
+        handle_input_gameplay_scene(is, g);
+        return;
     }
 
 
