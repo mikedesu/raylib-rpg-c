@@ -720,7 +720,7 @@ bool g_has_dead(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-bool g_add_dead(shared_ptr<gamestate> g, entityid id, int dead) {
+bool g_add_dead(shared_ptr<gamestate> g, entityid id, bool dead) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // Automatically register component if not already registered
@@ -738,7 +738,7 @@ bool g_add_dead(shared_ptr<gamestate> g, entityid id, int dead) {
 }
 
 
-bool g_update_dead(shared_ptr<gamestate> g, entityid id, int dead) {
+bool g_update_dead(shared_ptr<gamestate> g, entityid id, bool dead) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (!g->dead_list) {
@@ -776,7 +776,7 @@ bool g_has_update(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-bool g_add_update(shared_ptr<gamestate> g, entityid id, int update) {
+bool g_add_update(shared_ptr<gamestate> g, entityid id, bool update) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // Automatically register component if not already registered
@@ -806,7 +806,7 @@ bool g_get_update(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-bool g_set_update(shared_ptr<gamestate> g, entityid id, int update) {
+bool g_set_update(shared_ptr<gamestate> g, entityid id, bool update) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (!g->update_list) {
@@ -823,93 +823,6 @@ bool g_set_update(shared_ptr<gamestate> g, entityid id, int update) {
     return false;
 }
 
-
-//bool g_has_dead(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_DEAD);
-//}
-
-//bool g_add_dead(gamestate* const g, entityid id, int dead) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    // Add dead component
-//    bool result = g_add_component(g, id, C_DEAD, (void*)&dead, sizeof(int_component), (void**)&g->dead_list, &g->dead_list_count, &g->dead_list_capacity);
-//    // If entity died and has a location, mark its tile as dirty
-//    if (dead && g_has_location(g, id)) {
-//        vec3 loc = g_get_location(g, id);
-//        //dungeon_floor_t* df = d_get_floor(g->d, loc.z);
-//        shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-//        if (df) {
-//            vec3 loc_cast = {loc.x, loc.y, loc.z};
-//            //tile_t* tile = df_tile_at(df, loc_cast);
-//            shared_ptr<tile_t> tile = df_tile_at(df, loc_cast);
-//
-//            if (tile) tile->dirty_entities = true;
-//        }
-//    }
-//    return result;
-//}
-
-//bool g_update_dead(gamestate* const g, entityid id, int dead) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    massert(g_has_component(g, id, C_DEAD), "id %d does not have a dead component", id);
-//    if (g->dead_list == NULL) return false;
-//    for (int i = 0; i < g->dead_list_count; i++) {
-//        if (g->dead_list[i].id == id) {
-//            g->dead_list[i].data = dead;
-//            return true;
-//        }
-//    }
-//    return false;
-//}
-
-//bool g_is_dead(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    if (id != ENTITYID_INVALID) {
-//        if (g->dead_list == NULL) return false;
-//        for (int i = 0; i < g->dead_list_count; i++)
-//            if (g->dead_list[i].id == id) return g->dead_list[i].data;
-//    }
-//    return false;
-//}
-
-//bool g_has_update(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_UPDATE);
-//}
-
-//bool g_add_update(gamestate* const g, entityid id, int update) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    // make sure the entity has the update component
-//    return g_add_component(g, id, C_UPDATE, (void*)&update, sizeof(update_component), (void**)&g->update_list, &g->update_list_count, &g->update_list_capacity);
-//}
-
-//bool g_get_update(gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->update_list == NULL) return false;
-//    for (int i = 0; i < g->update_list_count; i++)
-//        if (g->update_list[i].id == id) return g->update_list[i].data;
-//    merror("id %d not found in update_list", id);
-//    return false;
-//}
-
-//bool g_set_update(gamestate* const g, entityid id, int update) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->update_list == NULL) return false;
-//    for (int i = 0; i < g->update_list_count; i++) {
-//        if (g->update_list[i].id == id) {
-//            g->update_list[i].data = update;
-//            return true;
-//        }
-//    }
-//    return false;
-//}
 
 //bool g_has_attacking(const gamestate* const g, entityid id) {
 //    massert(g, "g is NULL");

@@ -1028,6 +1028,15 @@ static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
     g_add_race(g, id, rt);
     minfo("attempting to add loc...");
     g_add_loc(g, id, loc);
+    minfo("attempting to add sprite_move...");
+    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
+    minfo("attempting to add dead...");
+    g_add_dead(g, id, false);
+    minfo("attempting to add update...");
+    g_add_update(g, id, true);
+    //minfo("attempting to add ...");
+    minfo("attempting to add dir...");
+    g_add_dir(g, id, DIR_DOWN_RIGHT);
 
     msuccess("so far so good...");
 

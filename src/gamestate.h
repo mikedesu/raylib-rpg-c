@@ -101,6 +101,7 @@ typedef struct gamestate {
 
     std::unordered_map<entityid, bool>* dead_list;
     std::unordered_map<entityid, bool>* update_list;
+
     //unordered_map<entityid, bool>* attacking_list;
     //unordered_map<entityid, bool>* blocking_list;
     //unordered_map<entityid, bool>* block_success_list;
@@ -312,14 +313,14 @@ bool g_update_sprite_move(std::shared_ptr<gamestate> g, entityid id, Rectangle l
 Rectangle g_get_sprite_move(std::shared_ptr<gamestate> g, entityid id);
 
 bool g_has_dead(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_dead(std::shared_ptr<gamestate> g, entityid id, int dead);
-bool g_update_dead(std::shared_ptr<gamestate> g, entityid id, int dead);
+bool g_add_dead(std::shared_ptr<gamestate> g, entityid id, bool dead);
+bool g_update_dead(std::shared_ptr<gamestate> g, entityid id, bool dead);
 bool g_is_dead(std::shared_ptr<gamestate> g, entityid id);
 
 bool g_has_update(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_update(std::shared_ptr<gamestate> g, entityid id, int update);
+bool g_add_update(std::shared_ptr<gamestate> g, entityid id, bool update);
 bool g_get_update(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_update(std::shared_ptr<gamestate> g, entityid id, int update);
+bool g_set_update(std::shared_ptr<gamestate> g, entityid id, bool update);
 
 //bool g_has_attacking(std::shared_ptr<gamestate> g, entityid id);
 //bool g_add_attacking(std::shared_ptr<gamestate> g, entityid id, int attacking);
