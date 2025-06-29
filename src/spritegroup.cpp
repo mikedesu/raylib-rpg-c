@@ -31,17 +31,30 @@ spritegroup_t* spritegroup_create(int capacity) {
 }
 
 void spritegroup_destroy(spritegroup_t* sg) {
-    if (!sg) return;
-    if (!sg->sprites) return;
-    for (int i = 0; i < sg->size; i++) sprite_destroy(sg->sprites[i]);
+    if (!sg) {
+        return;
+    }
+    if (!sg->sprites) {
+        return;
+    }
+    for (int i = 0; i < sg->size; i++) {
+        sprite_destroy(sg->sprites[i]);
+    }
     free(sg->sprites);
     free(sg);
 }
 
 void spritegroup_add(spritegroup_t* const sg, sprite* s) {
-    if (!sg) return;
-    if (!s) return;
-    if (sg->size < sg->capacity) sg->sprites[sg->size++] = s;
+    if (!sg) {
+        return;
+    }
+    if (!s) {
+        return;
+    }
+    if (sg->size < sg->capacity) {
+        sg->sprites[sg->size] = s;
+        sg->size++;
+    }
     //else mwarning("spritegroup is full");
 }
 
@@ -51,7 +64,9 @@ void spritegroup_set(spritegroup_t* const sg, int index, sprite* s) {
     massert(index >= 0, "index is negative");
     massert(index < sg->capacity, "index is out of bounds");
     // only set if the sprite is not NULL and sg->sprites[index] is NULL
-    if (sg->sprites[index] == NULL) sg->sprites[index] = s;
+    if (sg->sprites[index] == NULL) {
+        sg->sprites[index] = s;
+    }
 }
 
 // each sprite has a 'context' that corresponds to different directions

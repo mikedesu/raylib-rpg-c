@@ -1882,56 +1882,45 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         minfo("handle_input_player: enter key pressed");
         return;
     }
+    vec3 loc = g_get_loc(g, g->hero_id);
     if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
-        vec3 loc = g_get_loc(g, g->hero_id);
-        loc.y -= 1;
-        g_update_loc(g, g->hero_id, loc);
+        g_update_loc(g, g->hero_id, (vec3){loc.x, loc.y - 1, loc.z});
+        g_update_sprite_move(g, g->hero_id, (Rectangle){0, -8, 0, 0});
         return;
     }
     if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
-        vec3 loc = g_get_loc(g, g->hero_id);
-        loc.y += 1;
-        g_update_loc(g, g->hero_id, loc);
+        g_update_loc(g, g->hero_id, (vec3){loc.x, loc.y + 1, loc.z});
+        g_update_sprite_move(g, g->hero_id, (Rectangle){0, 8, 0, 0});
         return;
     }
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
-        vec3 loc = g_get_loc(g, g->hero_id);
-        loc.x -= 1;
-        g_update_loc(g, g->hero_id, loc);
+        g_update_loc(g, g->hero_id, (vec3){loc.x - 1, loc.y, loc.z});
+        g_update_sprite_move(g, g->hero_id, (Rectangle){-8, 0, 0, 0});
         return;
     }
     if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
-        vec3 loc = g_get_loc(g, g->hero_id);
-        loc.x += 1;
-        g_update_loc(g, g->hero_id, loc);
+        g_update_loc(g, g->hero_id, (vec3){loc.x + 1, loc.y, loc.z});
+        g_update_sprite_move(g, g->hero_id, (Rectangle){8, 0, 0, 0});
         return;
     }
     if (inputstate_is_pressed(is, KEY_Q)) {
-        vec3 loc = g_get_loc(g, g->hero_id);
-        loc.x -= 1;
-        loc.y -= 1;
-        g_update_loc(g, g->hero_id, loc);
+        g_update_loc(g, g->hero_id, (vec3){loc.x - 1, loc.y - 1, loc.z});
+        g_update_sprite_move(g, g->hero_id, (Rectangle){-8, -8, 0, 0});
         return;
     }
     if (inputstate_is_pressed(is, KEY_E)) {
-        vec3 loc = g_get_loc(g, g->hero_id);
-        loc.x += 1;
-        loc.y -= 1;
-        g_update_loc(g, g->hero_id, loc);
+        g_update_loc(g, g->hero_id, (vec3){loc.x + 1, loc.y - 1, loc.z});
+        g_update_sprite_move(g, g->hero_id, (Rectangle){8, -8, 0, 0});
         return;
     }
     if (inputstate_is_pressed(is, KEY_Z)) {
-        vec3 loc = g_get_loc(g, g->hero_id);
-        loc.x -= 1;
-        loc.y += 1;
-        g_update_loc(g, g->hero_id, loc);
+        g_update_loc(g, g->hero_id, (vec3){loc.x - 1, loc.y + 1, loc.z});
+        g_update_sprite_move(g, g->hero_id, (Rectangle){-8, 8, 0, 0});
         return;
     }
     if (inputstate_is_pressed(is, KEY_C)) {
-        vec3 loc = g_get_loc(g, g->hero_id);
-        loc.x += 1;
-        loc.y += 1;
-        g_update_loc(g, g->hero_id, loc);
+        g_update_loc(g, g->hero_id, (vec3){loc.x + 1, loc.y + 1, loc.z});
+        g_update_sprite_move(g, g->hero_id, (Rectangle){8, 8, 0, 0});
         return;
     }
 }

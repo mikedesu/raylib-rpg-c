@@ -501,7 +501,9 @@ static void libdraw_unload_shaders() {
 
 static inline bool libdraw_camera_lock_on(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    if (!g->cam_lockon) return false;
+    if (!g->cam_lockon) {
+        return false;
+    }
     spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     massert(grp, "spritegroup is NULL");
     // get the old camera position
@@ -667,35 +669,32 @@ static void libdraw_update_sprite_attack(shared_ptr<gamestate> g,
 }
 */
 
-/*
-static void libdraw_update_sprite_position(shared_ptr<gamestate> g,
-                                           entityid id,
-                                           spritegroup_t* sg) {
+static void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     Rectangle sprite_move = g_get_sprite_move(g, id);
     if (sprite_move.x != 0 || sprite_move.y != 0) {
-        sg->move.x = sprite_move.x, sg->move.y = sprite_move.y;
+        sg->move.x = sprite_move.x;
+        sg->move.y = sprite_move.y;
         g_update_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
         entitytype_t type = g_get_type(g, id);
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
             race_t race = g_get_race(g, id);
-            sg->current = race == RACE_BAT           ? SG_ANIM_BAT_IDLE
-                          : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE
-                                                     : SG_ANIM_NPC_WALK;
-            //if (race == RACE_BAT)
+            //sg->current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
+            //if (loc == RACE_BAT)
             //    sg->current = SG_ANIM_BAT_IDLE;
             //else if (race == RACE_GREEN_SLIME)
             //    sg->current = SG_ANIM_SLIME_IDLE;
             //else if (race > RACE_NONE && race < RACE_COUNT)
             //    sg->current = SG_ANIM_NPC_WALK;
             //else
-            //    sg->current = SG_ANIM_NPC_WALK;
+            sg->current = SG_ANIM_NPC_WALK;
         }
         g->frame_dirty = true;
     }
 }
+/*
 */
 
 static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir) {
@@ -738,13 +737,13 @@ static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spri
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
     //if (g_is_dead(g, id) && !spritegroup_is_animating(sg)) return;
-    //if (g_get_update(g, id)) {
-    //libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, id));
-    libdraw_update_sprite_context_ptr(g, sg, DIR_DOWN_RIGHT);
-    //    g_set_update(g, id, false);
-    //}
+    if (g_get_update(g, id)) {
+        //libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, id));
+        libdraw_update_sprite_context_ptr(g, sg, DIR_DOWN_RIGHT);
+        g_set_update(g, id, false);
+    }
     // Copy movement intent from sprite_move_x/y if present
-    //libdraw_update_sprite_position(g, id, sg);
+    libdraw_update_sprite_position(g, id, sg);
     //libdraw_update_sprite_attack(g, id, sg);
     // Update movement as long as sg->move.x/y is non-zero
     if (spritegroup_update_dest(sg)) {
@@ -828,42 +827,40 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
         g->frame_dirty = false;
         return;
     }
+
+    // for the gameplay scene...
     if (g->framecount % ANIM_SPEED == 0) {
         libdraw_handle_dirty_entities(g);
         g->frame_dirty = true;
+        for (entityid id = 0; id < g->next_entityid; id++) {
+            int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+            for (int i = 0; i < num_spritegroups; i++) {
+                spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+                if (sg) {
+                    sprite* const s = sg_get_current(sg);
+                    massert(s, "sprite is NULL");
+                    //sprite* const s_shadow = sg_get_current_plus_one(sg);
+                    g->frame_dirty = true;
+                    if (s) {
+                        //minfo("advancing sprite frame");
+                        sprite_incrframe(s);
+                        if (s->num_loops >= 1) {
+                            sg->current = sg->default_anim;
+                            s->num_loops = 0;
+                        }
+                    }
+                    //if (s_shadow) {
+                    //    sprite_incrframe(s_shadow);
+                    //    if (s_shadow->num_loops >= 1) {
+                    //        sg->current = sg->default_anim;
+                    //        s_shadow->num_loops = 0;
+                    //    }
+                    //}
+                }
+            }
+        }
+        //libdraw_handle_gamestate_flag(g);
     }
-    //        for (entityid id = 0; id < g->next_entityid; id++) {
-    //            int num_spritegroups =
-    //                ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
-    //            for (int i = 0; i < num_spritegroups; i++) {
-    //                spritegroup_t* const sg =
-    //                    hashtable_entityid_spritegroup_get_by_index(
-    //                        spritegroups, id, i);
-    //                if (sg) {
-    //                    sprite* const s = sg_get_current(sg);
-    //                    massert(s, "sprite is NULL");
-    //                    sprite* const s_shadow = sg_get_current_plus_one(sg);
-    //                    g->frame_dirty = true;
-    //                    if (s) {
-    //                        sprite_incrframe(s);
-    //                        if (s->num_loops >= 1) {
-    //                            sg->current = sg->default_anim;
-    //                            s->num_loops = 0;
-    //                        }
-    //                    }
-    //                    if (s_shadow) {
-    //                        sprite_incrframe(s_shadow);
-    //                        if (s_shadow->num_loops >= 1) {
-    //                            sg->current = sg->default_anim;
-    //                            s_shadow->num_loops = 0;
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //}
-    //    libdraw_handle_gamestate_flag(g);
-    //}
 }
 
 static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {

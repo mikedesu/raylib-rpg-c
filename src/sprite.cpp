@@ -54,9 +54,14 @@ void sprite_incrframe(sprite* const s) {
     }
 
     s->currentframe++;
-    if (s->currentframe >= s->numframes) s->currentframe = 0;
+    if (s->currentframe >= s->numframes) {
+        s->currentframe = 0;
+    }
+
     s->src.x = s->width * s->currentframe;
-    if (s->currentframe == 0) s->num_loops++;
+    if (s->currentframe == 0) {
+        s->num_loops++;
+    }
 }
 
 void sprite_setcontext(sprite* const s, int context) {
