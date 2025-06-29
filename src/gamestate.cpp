@@ -309,31 +309,6 @@ void gamestate_free(shared_ptr<gamestate> g) {
     if (g->monster_defs) {
         free(g->monster_defs);
     }
-
-    //free(g->attacking_list);
-    //free(g->blocking_list);
-    //free(g->block_success_list);
-    //free(g->damaged_list);
-    //free(g->inventory_list);
-    //free(g->target_list);
-    //free(g->target_path_list);
-    //free(g->default_action_list);
-    //free(g->equipment_list);
-    //free(g->stats_list);
-    //free(g->itemtype_list);
-    //free(g->weapontype_list);
-    //free(g->shieldtype_list);
-    //free(g->potion_type_list);
-    //free(g->damage_list);
-    //free(g->ac_list);
-    //free(g->zapping_list);
-    //free(g->base_attack_damage_list);
-    //free(g->vision_distance_list);
-    //free(g->light_radius_list);
-    //free(g->ringtype_list);
-    //free(g->light_radius_bonus_list);
-    //free(g->explored_list);
-    //free(g->visible_list);
 }
 
 
