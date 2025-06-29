@@ -187,7 +187,6 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
 //static void check_and_handle_level_up(shared_ptr<gamestate> g, entityid id);
 //static const char* get_action_key(const inputstate* const is, gamestate* const g);
 static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-//static entityid player_create(gamestate* const g, race_t rt, int x, int y, int fl, string name);
 static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int fl, string name);
 //static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name);
 static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
@@ -1224,13 +1223,11 @@ static void update_player_tiles_explored(shared_ptr<gamestate> g) {
 }
 */
 
-//static entityid player_create(gamestate* const g, race_t rt, int x, int y, int z, string name) {
+
 static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int z, string name) {
     massert(g, "gamestate is NULL");
     massert(name != "", "name is empty string");
     // use the previously-written liblogic_npc_create function
-    //const entitytype_t type = ENTITY_PLAYER;
-    //const entityid id = npc_create(g, rt, x, y, fl, name);
     minfo("calling npc_create...");
     const entityid id = npc_create(g, rt, (vec3){x, y, z}, name);
     msuccess("npc_create successful, id: %d", id);
@@ -1269,14 +1266,12 @@ static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, 
 /*
 */
 
-//static void init_player(gamestate* const g) {
 static void init_player(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     minfo("begin init_player...");
     // setting it up so we can return a vec3 from a function
     // that can scan for an appropriate starting location
     minfo("calling df_get_upstairs...");
-    //vec3 loc = df_get_upstairs(g->d->floors[g->d->current_floor]);
     vec3 loc = (vec3){0, 0, 0};
     minfo("calling player_create...");
     g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "darkmage");
@@ -1284,10 +1279,8 @@ static void init_player(shared_ptr<gamestate> g) {
     massert(g->entity_turn != ENTITYID_INVALID, "failed to init hero");
     massert(g->hero_id == g->entity_turn, "hero id mismatch");
     msuccess("hero id %d", g->hero_id);
-    //printf("end init_player...\n");
 }
-/*
-*/
+
 
 //static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
 //    massert(df, "dungeon floor is NULL");
@@ -1876,9 +1869,92 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         merror("handle_input_player: flag is not GAMESTATE_FLAG_PLAYER_INPUT returning");
         return;
     }
-    // test enter key
     if (inputstate_is_pressed(is, KEY_ENTER)) {
         minfo("handle_input_player: enter key pressed");
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
+        minfo("handle_input_player: up key pressed");
+
+        // get the player's current location
+        vec3 loc = g_get_loc(g, g->hero_id);
+        loc.y -= 1;
+        g_update_loc(g, g->hero_id, loc);
+
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
+        minfo("handle_input_player: down key pressed");
+
+        // get the player's current location
+        vec3 loc = g_get_loc(g, g->hero_id);
+        loc.y += 1;
+        g_update_loc(g, g->hero_id, loc);
+
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+        minfo("handle_input_player: left key pressed");
+
+        // get the player's current location
+        vec3 loc = g_get_loc(g, g->hero_id);
+        loc.x -= 1;
+        g_update_loc(g, g->hero_id, loc);
+
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
+        minfo("handle_input_player: right key pressed");
+
+        // get the player's current location
+        vec3 loc = g_get_loc(g, g->hero_id);
+        loc.x += 1;
+        g_update_loc(g, g->hero_id, loc);
+
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_Q)) {
+        minfo("handle_input_player: q key pressed");
+
+        // get the player's current location
+        vec3 loc = g_get_loc(g, g->hero_id);
+        loc.x -= 1;
+        loc.y -= 1;
+        g_update_loc(g, g->hero_id, loc);
+
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_E)) {
+        minfo("handle_input_player: e key pressed");
+
+        // get the player's current location
+        vec3 loc = g_get_loc(g, g->hero_id);
+        loc.x += 1;
+        loc.y -= 1;
+        g_update_loc(g, g->hero_id, loc);
+
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_Z)) {
+        minfo("handle_input_player: e key pressed");
+
+        // get the player's current location
+        vec3 loc = g_get_loc(g, g->hero_id);
+        loc.x -= 1;
+        loc.y += 1;
+        g_update_loc(g, g->hero_id, loc);
+
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_C)) {
+        minfo("handle_input_player: c key pressed");
+
+        // get the player's current location
+        vec3 loc = g_get_loc(g, g->hero_id);
+        loc.x += 1;
+        loc.y += 1;
+        g_update_loc(g, g->hero_id, loc);
+
         return;
     }
 }
