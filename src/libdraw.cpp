@@ -726,9 +726,9 @@ static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spri
     libdraw_update_sprite_position(g, id, sg);
     //libdraw_update_sprite_attack(g, id, sg);
 
-    //if (g_get_attacking(g, id)) {
-    //    libdraw_set_sg_is_attacking(g, id, sg);
-    //}
+    if (g_get_attacking(g, id)) {
+        libdraw_set_sg_is_attacking(g, id, sg);
+    }
     //else if (g_get_block_success(g, id)) {
     //    libdraw_set_sg_block_success(g, id, sg);
     //} else if (g_get_damaged(g, id)) {
@@ -766,7 +766,7 @@ static void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
         g->flag = GAMESTATE_FLAG_NPC_TURN;
-        g->test_guard = false;
+        //g->test_guard = false;
     } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
         g->entity_turn = g->hero_id; // Reset directly to hero
         g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
@@ -849,7 +849,7 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
                 }
             }
         }
-        //libdraw_handle_gamestate_flag(g);
+        libdraw_handle_gamestate_flag(g);
     }
 }
 

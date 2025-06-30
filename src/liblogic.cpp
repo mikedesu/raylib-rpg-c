@@ -3,6 +3,7 @@
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
 #include "gamestate.h"
+#include "gamestate_flag.h"
 #include "inputstate.h"
 #include "libgame_defines.h"
 #include "liblogic.h"
@@ -34,7 +35,7 @@ using std::string;
 
 int liblogic_restart_count = 0;
 
-static inline void reset_player_blocking(shared_ptr<gamestate> g);
+//static inline void reset_player_blocking(shared_ptr<gamestate> g);
 static inline void reset_player_block_success(shared_ptr<gamestate> g);
 static void update_player_state(shared_ptr<gamestate> g);
 static void update_debug_panel_buffer(shared_ptr<gamestate> g);
@@ -244,6 +245,7 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         g_update_sprite_move(g, g->hero_id, (Rectangle){0, -8, 0, 0});
         g_update_dir(g, g->hero_id, DIR_UP);
         g_set_update(g, g->hero_id, true);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }
     if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
@@ -251,6 +253,7 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         g_update_sprite_move(g, g->hero_id, (Rectangle){0, 8, 0, 0});
         g_update_dir(g, g->hero_id, DIR_DOWN);
         g_set_update(g, g->hero_id, true);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
@@ -258,6 +261,7 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         g_update_sprite_move(g, g->hero_id, (Rectangle){-8, 0, 0, 0});
         g_update_dir(g, g->hero_id, DIR_LEFT);
         g_set_update(g, g->hero_id, true);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }
     if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
@@ -265,6 +269,7 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         g_update_sprite_move(g, g->hero_id, (Rectangle){8, 0, 0, 0});
         g_update_dir(g, g->hero_id, DIR_RIGHT);
         g_set_update(g, g->hero_id, true);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }
     if (inputstate_is_pressed(is, KEY_Q)) {
@@ -272,6 +277,7 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         g_update_sprite_move(g, g->hero_id, (Rectangle){-8, -8, 0, 0});
         g_update_dir(g, g->hero_id, DIR_UP_LEFT);
         g_set_update(g, g->hero_id, true);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }
     if (inputstate_is_pressed(is, KEY_E)) {
@@ -279,6 +285,7 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         g_update_sprite_move(g, g->hero_id, (Rectangle){8, -8, 0, 0});
         g_update_dir(g, g->hero_id, DIR_UP_RIGHT);
         g_set_update(g, g->hero_id, true);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }
     if (inputstate_is_pressed(is, KEY_Z)) {
@@ -286,6 +293,7 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         g_update_sprite_move(g, g->hero_id, (Rectangle){-8, 8, 0, 0});
         g_update_dir(g, g->hero_id, DIR_DOWN_LEFT);
         g_set_update(g, g->hero_id, true);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }
     if (inputstate_is_pressed(is, KEY_C)) {
@@ -293,6 +301,7 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         g_update_sprite_move(g, g->hero_id, (Rectangle){8, 8, 0, 0});
         g_update_dir(g, g->hero_id, DIR_DOWN_RIGHT);
         g_set_update(g, g->hero_id, true);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }
 
@@ -304,6 +313,7 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
 
         g_set_attacking(g, g->hero_id, true);
         g_set_update(g, g->hero_id, true);
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }
 }
@@ -449,13 +459,13 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
     // Static buffers to avoid reallocating every frame
     //static const char* control_modes[] = {"Player", "Camera", "Unknown"};
     static const char* control_modes[] = {"Camera", "Player", "Unknown"};
-    static const char* flag_names[] = {"GAMESTATE_FLAG_NONE",
-                                       "GAMESTATE_FLAG_PLAYER_INPUT",
-                                       "GAMESTATE_FLAG_PLAYER_ANIM",
-                                       "GAMESTATE_FLAG_COUNT",
-                                       "GAMESTATE_FLAG_NPC_TURN",
-                                       "GAMESTATE_FLAG_NPC_ANIM",
-                                       "Unknown"};
+    //static const char* flag_names[] = {"GAMESTATE_FLAG_NONE",
+    //                                   "GAMESTATE_FLAG_PLAYER_INPUT",
+    //                                   "GAMESTATE_FLAG_PLAYER_ANIM",
+    //                                   "GAMESTATE_FLAG_NPC_TURN",
+    //                                   "GAMESTATE_FLAG_NPC_ANIM",
+    //                                   "GAMESTATE_FLAG_COUNT",
+    //                                   "Unknown"};
     // Get hero position once
     int x = -1;
     int y = -1;
@@ -490,7 +500,8 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
     //}
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
-    const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
+    //const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
+    const char* flag_name = GAMESTATE_FLAG_TOSTR(g->flag);
     // zero out the buffer
     memset(g->debugpanel.buffer, 0, sizeof(g->debugpanel.buffer));
     // Format the string in one pass
@@ -504,8 +515,8 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
              "Draw Time: %.1fms\n"
              "Is3D: %d\n"
              "Cam: (%.0f,%.0f) Zoom: %.1f\n"
-             "Mode: %s | Floor: %d/%d\n"
-             "Entities: %d | Flag: %s\n"
+             "Mode: %s | Floor: %d/%d | Entities: %d\n"
+             "Flag: %s\n"
              "Turn: %d | Hero: (%d,%d,%d)\n"
              "Inventory: %d\n"
              "msg_history.count: %d\n"
@@ -565,10 +576,11 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     //try_spawn_npc(g);
     update_player_state(g);
     //update_npcs_state(g);
-    //if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-    //    reset_player_blocking(g);
-    //    reset_player_block_success(g);
-    //}
+    if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+        g_set_blocking(g, g->hero_id, false);
+        //reset_player_blocking(g);
+        //    reset_player_block_success(g);
+    }
     handle_input(is, g);
     //if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
     //    handle_npcs(g);
@@ -586,18 +598,18 @@ void liblogic_close(shared_ptr<gamestate> g) {
 }
 
 
-static inline void reset_player_blocking(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    g_set_blocking(g, g->hero_id, false);
-    g_set_block_success(g, g->hero_id, false);
-    g_set_update(g, g->hero_id, true);
-}
+//static inline void reset_player_blocking(shared_ptr<gamestate> g) {
+//    massert(g, "gamestate is NULL");
+//    g_set_blocking(g, g->hero_id, false);
+//g_set_block_success(g, g->hero_id, false);
+//g_set_update(g, g->hero_id, true);
+//}
 
 
 static inline void reset_player_block_success(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     g_set_block_success(g, g->hero_id, false);
-    g_set_update(g, g->hero_id, true);
+    //g_set_update(g, g->hero_id, true);
 }
 
 
