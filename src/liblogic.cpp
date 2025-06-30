@@ -7,6 +7,12 @@
 #include "libgame_defines.h"
 #include "liblogic.h"
 #include "massert.h"
+#include <cassert>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <memory>
+#include <raylib.h>
 //#include "bonus_table.h"
 //#include "controlmode.h"
 //#include "dungeon_tile_type.h"
@@ -22,16 +28,9 @@
 //#include "race.h"
 //#include "roll.h"
 //#include "stats_slot.h"
-#include <cassert>
-#include <cmath>
-#include <cstdlib>
-#include <cstring>
-#include <memory>
-#include <raylib.h>
 
 using std::shared_ptr;
 using std::string;
-//using std::vector;
 
 int liblogic_restart_count = 0;
 
@@ -156,13 +155,161 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 //static void update_player_state(shared_ptr<gamestate> g);
 //static void update_debug_panel_buffer(gamestate* const g);
 static void update_debug_panel_buffer(shared_ptr<gamestate> g);
-
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int fl, string name);
+static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+
+
+static void init_dungeon(shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    g->dungeon = d_create();
+    massert(g->dungeon, "failed to init dungeon");
+    msuccess("Dungeon initialized successfully");
+    minfo("adding floors...");
+    int df_count = 1;
+    for (int i = 0; i < df_count; i++) {
+        d_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+    }
+    msuccess("Added %d floors to dungeon", df_count);
+}
+
+static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
+    massert(g, "gamestate is NULL");
+    minfo("calling d_get_floor...");
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+    minfo("calling df_tile_at...");
+    shared_ptr<tile_t> tile = df_tile_at(df, loc);
+    massert(tile, "failed to get tile");
+    minfo("checking if tile is walkable...");
+    if (!tile_is_walkable(tile->type)) {
+        merror("cannot create entity on non-walkable tile");
+        return ENTITYID_INVALID;
+    }
+    minfo("checking if tile has live NPCs...");
+    if (tile_has_live_npcs(g, tile)) {
+        merror("cannot create entity on tile with live NPCs");
+        return ENTITYID_INVALID;
+    }
+    minfo("attempting to add entity...");
+    entityid id = g_add_entity(g);
+    minfo("attempting to add name...");
+    g_add_name(g, id, name);
+    minfo("attempting to add type...");
+    g_add_type(g, id, ENTITY_NPC);
+    minfo("attempting to add race...");
+    g_add_race(g, id, rt);
+    minfo("attempting to add loc...");
+    g_add_loc(g, id, loc);
+    minfo("attempting to add sprite_move...");
+    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
+    minfo("attempting to add dead...");
+    g_add_dead(g, id, false);
+    minfo("attempting to add update...");
+    g_add_update(g, id, true);
+    //minfo("attempting to add ...");
+    minfo("attempting to add dir...");
+    g_add_dir(g, id, DIR_DOWN_RIGHT);
+    //g_add_dir(g, id, DIR_UP_RIGHT);
+    msuccess("so far so good...");
+    //g_add_direction(g, id, DIR_RIGHT);
+    //g_add_location(g, id, loc_vec);
+    //g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
+    //g_add_dead(g, id, 0);
+    //g_add_update(g, id, false);
+    //g_add_attacking(g, id, false);
+    //g_add_zapping(g, id, false);
+    //g_add_block_success(g, id, false);
+    //g_add_damaged(g, id, false);
+    //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
+    //g_add_inventory(g, id);
+    //g_add_target(g, id, (vec3){-1, -1, -1});
+    //g_add_target_path(g, id);
+    //g_add_equipment(g, id);
+    //g_add_base_attack_damage(g, id, (vec3){1, 4, 0});
+    //g_add_vision_distance(g, id, 0);
+    //g_add_light_radius(g, id, 0);
+    //g_add_stats(g, id);
+    //g_set_stat(g, id, STATS_LEVEL, 1);
+    //g_set_stat(g, id, STATS_XP, 0);
+    //g_set_stat(g, id, STATS_NEXT_LEVEL_XP, calc_next_lvl_xp(g, id));
+    //g_set_stat(g, id, STATS_MAXHP, 1);
+    //g_set_stat(g, id, STATS_HP, 1);
+    //g_set_stat(g, id, STATS_HITDIE, 1);
+    //g_set_stat(g, id, STATS_STR, 10);
+    //g_set_stat(g, id, STATS_DEX, 10);
+    //g_set_stat(g, id, STATS_CON, 10);
+    //g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
+    //g_set_stat(g, id, STATS_AC, 10);
+    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+    if (!df_add_at(df, id, loc.x, loc.y)) {
+        return ENTITYID_INVALID;
+    }
+    msuccess("returning NPC entity ID: %d", id);
+    return id;
+}
+
+
+static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int z, string name) {
+    massert(g, "gamestate is NULL");
+    massert(name != "", "name is empty string");
+    // use the previously-written liblogic_npc_create function
+    minfo("calling npc_create...");
+    const entityid id = npc_create(g, rt, (vec3){x, y, z}, name);
+    msuccess("npc_create successful, id: %d", id);
+    massert(id != ENTITYID_INVALID, "failed to create player");
+    g_set_hero_id(g, id);
+    g_add_type(g, id, ENTITY_PLAYER);
+    //int str_roll = do_roll_best_of_3((roll){3, 6, 0});
+    //int con_roll = do_roll_best_of_3((roll){3, 6, 0});
+    //printf("rolling stats...\n");
+    //int str_roll = do_roll_best_of_3((vec3){3, 6, 0});
+    //int con_roll = do_roll_best_of_3((vec3){3, 6, 0});
+    //int dex_roll = do_roll_best_of_3((vec3){3, 6, 0});
+    //printf("calling set stats...\n");
+    //g_set_stat(g, id, STATS_STR, str_roll);
+    //g_set_stat(g, id, STATS_CON, con_roll);
+    //g_set_stat(g, id, STATS_DEX, dex_roll);
+    //int hitdie = 8;
+    //g_set_stat(g, id, STATS_HITDIE, hitdie);
+    //int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
+    //while (maxhp_roll < 1) {
+    //    maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
+    //}
+    //int maxhp_roll = 5;
+    //g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
+    //g_set_stat(g, id, STATS_HP, maxhp_roll);
+    //int default_vision_distance = 2;
+    //int default_light_radius = 2;
+    //printf("calling set light radius...\n");
+    //g_set_light_radius(g, id, default_light_radius);
+    //printf("calling set vision radius...\n");
+    //g_set_vision_distance(g, id, default_vision_distance);
+    //printf("calling update player tiles explored...\n");
+    //update_player_tiles_explored(g);
+    return id;
+}
+
+
+static void init_player(shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    minfo("begin init_player...");
+    // setting it up so we can return a vec3 from a function
+    // that can scan for an appropriate starting location
+    minfo("calling df_get_upstairs...");
+    vec3 loc = (vec3){0, 0, 0};
+    minfo("calling player_create...");
+    g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "darkmage");
+    msuccess("player_create successful...");
+    massert(g->entity_turn != ENTITYID_INVALID, "failed to init hero");
+    massert(g->hero_id == g->entity_turn, "hero id mismatch");
+    msuccess("hero id %d", g->hero_id);
+}
 
 //static void handle_input(const inputstate* const is, gamestate* const g);
 //static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 //static void handle_input_inventory(shared_ptr<gamestate> g,
 //                                   shared_ptr<inputstate> is);
 //static void add_message_history(gamestate* const g, const char* fmt, ...);
@@ -186,10 +333,7 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
 //static void check_and_handle_level_up(gamestate* const g, entityid id);
 //static void check_and_handle_level_up(shared_ptr<gamestate> g, entityid id);
 //static const char* get_action_key(const inputstate* const is, gamestate* const g);
-static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int fl, string name);
 //static entityid npc_create(gamestate* const g, race_t rt, vec3 loc, string name);
-static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
 //static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name);
 //static entityid
 //item_create(shared_ptr<gamestate> g, itemtype type, vec3 loc, const char* name);
@@ -981,107 +1125,6 @@ static vec3 get_random_available_loc(shared_ptr<gamestate> g, int floor) {
 }
 */
 
-static void init_dungeon(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    g->dungeon = d_create();
-
-    massert(g->dungeon, "failed to init dungeon");
-    msuccess("Dungeon initialized successfully");
-
-    minfo("adding floors...");
-    int df_count = 1;
-    for (int i = 0; i < df_count; i++) {
-        d_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    }
-    msuccess("Added %d floors to dungeon", df_count);
-}
-
-static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
-    massert(g, "gamestate is NULL");
-    minfo("calling d_get_floor...");
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-    minfo("calling df_tile_at...");
-    shared_ptr<tile_t> tile = df_tile_at(df, loc);
-    massert(tile, "failed to get tile");
-    minfo("checking if tile is walkable...");
-
-    if (!tile_is_walkable(tile->type)) {
-        merror("cannot create entity on non-walkable tile");
-        return ENTITYID_INVALID;
-    }
-
-    minfo("checking if tile has live NPCs...");
-
-    if (tile_has_live_npcs(g, tile)) {
-        merror("cannot create entity on tile with live NPCs");
-        return ENTITYID_INVALID;
-    }
-
-    minfo("attempting to add entity...");
-    entityid id = g_add_entity(g);
-
-    minfo("attempting to add name...");
-    g_add_name(g, id, name);
-    minfo("attempting to add type...");
-    g_add_type(g, id, ENTITY_NPC);
-    minfo("attempting to add race...");
-    g_add_race(g, id, rt);
-    minfo("attempting to add loc...");
-    g_add_loc(g, id, loc);
-    minfo("attempting to add sprite_move...");
-    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
-    minfo("attempting to add dead...");
-    g_add_dead(g, id, false);
-    minfo("attempting to add update...");
-    g_add_update(g, id, true);
-    //minfo("attempting to add ...");
-    minfo("attempting to add dir...");
-    g_add_dir(g, id, DIR_DOWN_RIGHT);
-    //g_add_dir(g, id, DIR_UP_RIGHT);
-
-    msuccess("so far so good...");
-
-    //g_add_direction(g, id, DIR_RIGHT);
-    //g_add_location(g, id, loc_vec);
-    //g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
-    //g_add_dead(g, id, 0);
-    //g_add_update(g, id, false);
-    //g_add_attacking(g, id, false);
-    //g_add_zapping(g, id, false);
-    //g_add_block_success(g, id, false);
-    //g_add_damaged(g, id, false);
-    //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
-    //g_add_inventory(g, id);
-    //g_add_target(g, id, (vec3){-1, -1, -1});
-    //g_add_target_path(g, id);
-    //g_add_equipment(g, id);
-    //g_add_base_attack_damage(g, id, (vec3){1, 4, 0});
-    //g_add_vision_distance(g, id, 0);
-    //g_add_light_radius(g, id, 0);
-
-    //g_add_stats(g, id);
-    //g_set_stat(g, id, STATS_LEVEL, 1);
-    //g_set_stat(g, id, STATS_XP, 0);
-    //g_set_stat(g, id, STATS_NEXT_LEVEL_XP, calc_next_lvl_xp(g, id));
-    //g_set_stat(g, id, STATS_MAXHP, 1);
-    //g_set_stat(g, id, STATS_HP, 1);
-    //g_set_stat(g, id, STATS_HITDIE, 1);
-    //g_set_stat(g, id, STATS_STR, 10);
-    //g_set_stat(g, id, STATS_DEX, 10);
-    //g_set_stat(g, id, STATS_CON, 10);
-    //g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
-    //g_set_stat(g, id, STATS_AC, 10);
-
-    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-    if (!df_add_at(df, id, loc.x, loc.y)) {
-        return ENTITYID_INVALID;
-    }
-
-    msuccess("returning NPC entity ID: %d", id);
-    return id;
-}
-/*
-*/
 
 /*
 static entityid
@@ -1232,64 +1275,6 @@ static void update_player_tiles_explored(shared_ptr<gamestate> g) {
     }
 }
 */
-
-
-static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int z, string name) {
-    massert(g, "gamestate is NULL");
-    massert(name != "", "name is empty string");
-    // use the previously-written liblogic_npc_create function
-    minfo("calling npc_create...");
-    const entityid id = npc_create(g, rt, (vec3){x, y, z}, name);
-    msuccess("npc_create successful, id: %d", id);
-    massert(id != ENTITYID_INVALID, "failed to create player");
-    g_set_hero_id(g, id);
-    g_add_type(g, id, ENTITY_PLAYER);
-    //int str_roll = do_roll_best_of_3((roll){3, 6, 0});
-    //int con_roll = do_roll_best_of_3((roll){3, 6, 0});
-    //printf("rolling stats...\n");
-    //int str_roll = do_roll_best_of_3((vec3){3, 6, 0});
-    //int con_roll = do_roll_best_of_3((vec3){3, 6, 0});
-    //int dex_roll = do_roll_best_of_3((vec3){3, 6, 0});
-    //printf("calling set stats...\n");
-    //g_set_stat(g, id, STATS_STR, str_roll);
-    //g_set_stat(g, id, STATS_CON, con_roll);
-    //g_set_stat(g, id, STATS_DEX, dex_roll);
-    //int hitdie = 8;
-    //g_set_stat(g, id, STATS_HITDIE, hitdie);
-    //int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
-    //while (maxhp_roll < 1) {
-    //    maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
-    //}
-    //int maxhp_roll = 5;
-    //g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
-    //g_set_stat(g, id, STATS_HP, maxhp_roll);
-    //int default_vision_distance = 2;
-    //int default_light_radius = 2;
-    //printf("calling set light radius...\n");
-    //g_set_light_radius(g, id, default_light_radius);
-    //printf("calling set vision radius...\n");
-    //g_set_vision_distance(g, id, default_vision_distance);
-    //printf("calling update player tiles explored...\n");
-    //update_player_tiles_explored(g);
-    return id;
-}
-/*
-*/
-
-static void init_player(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    minfo("begin init_player...");
-    // setting it up so we can return a vec3 from a function
-    // that can scan for an appropriate starting location
-    minfo("calling df_get_upstairs...");
-    vec3 loc = (vec3){0, 0, 0};
-    minfo("calling player_create...");
-    g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "darkmage");
-    msuccess("player_create successful...");
-    massert(g->entity_turn != ENTITYID_INVALID, "failed to init hero");
-    massert(g->hero_id == g->entity_turn, "hero id mismatch");
-    msuccess("hero id %d", g->hero_id);
-}
 
 
 //static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
@@ -2329,136 +2314,8 @@ static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
         handle_input_gameplay_scene(is, g);
         return;
     }
-
-
-    //if (g->display_quit_menu) {
-    //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-    //        g->display_quit_menu = false;
-    //        return;
-    //    }
-    //if (inputstate_is_pressed(is, KEY_Q)) {
-    // this forces the window to close but this is crashing on exit
-    //CloseWindow();
-    //    g->do_quit = true;
-    //    return;
-    //}
-    //}
-    //if (!g->display_quit_menu) {
-    //if (inputstate_is_pressed(is, KEY_Q)) {
-    //    g->display_quit_menu = true;
-    //    return;
-    //}
-
-    /*
-    if (g->current_scene == SCENE_GAMEPLAY) {
-        if (g->gameover) {
-            //if (inputstate_any_pressed(is)) liblogic_restart(g);
-            //if (inputstate_any_pressed(is)) {
-            if (inputstate_is_pressed(is, KEY_ENTER) ||
-                inputstate_is_pressed(is, KEY_SPACE)) {
-                liblogic_restart(g);
-            }
-            return;
-        }
-        //printf("Current control mode: %d\n", g->controlmode);
-
-        switch (g->controlmode) {
-        case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
-        case CONTROLMODE_INVENTORY: handle_input_inventory(is, g); break;
-        case CONTROLMODE_GAMEPLAY_SETTINGS:
-            handle_input_gameplay_settings(is, g);
-            break;
-        case CONTROLMODE_HELP: handle_input_help_menu(is, g); break;
-        default: merror("Unknown control mode: %d", g->controlmode); break;
-        }
-
-    } else if (g->current_scene == SCENE_TITLE) {
-        //if (inputstate_any_pressed(is)) {
-        if (inputstate_is_pressed(is, KEY_ENTER) ||
-            inputstate_is_pressed(is, KEY_SPACE)) {
-            //minfo("Title screen input detected, switching to main menu");
-            g->current_scene = SCENE_MAIN_MENU;
-            g->frame_dirty = true;
-        }
-    } else if (g->current_scene == SCENE_MAIN_MENU) {
-        if (inputstate_is_pressed(is, KEY_DOWN)) {
-            g->frame_dirty = true;
-            //if (g->title_screen_selection == g->max_title_screen_selections - 1) {
-            //    g->title_screen_selection = 0;
-            //} else {
-            //    g->title_screen_selection++;
-            //}
-            //minfo("Title screen selection: %d", g->title_screen_selection);
-        } else if (inputstate_is_pressed(is, KEY_UP)) {
-            g->frame_dirty = true;
-            //if (g->title_screen_selection == 0) {
-            //    g->title_screen_selection = g->max_title_screen_selections - 1;
-            //} else {
-            //    g->title_screen_selection--;
-            //}
-            //minfo("Title screen selection: %d", g->title_screen_selection);
-
-        } else if (inputstate_is_pressed(is, KEY_ENTER)) {
-            if (g->title_screen_selection == 0) {
-                g->current_scene = SCENE_CHARACTER_CREATION;
-                g->frame_dirty = true;
-            }
-        }
-        //else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-        //    g->do_quit = true;
-        //}
-
-    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
-        //if (inputstate_any_pressed(is)) {
-        if (inputstate_is_pressed(is, KEY_ENTER)) {
-            minfo("Character creation");
-            // we need to copy the character creation stats to the hero entity
-            // hero has already been created, so its id is available
-            g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
-            g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
-            g_set_stat(
-                g, g->hero_id, STATS_CON, g->chara_creation.constitution);
-            int hitdie = 8;
-            int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) +
-                             bonus_calc(g->chara_creation.constitution);
-            while (maxhp_roll < 1) {
-                maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) +
-                             bonus_calc(g->chara_creation.constitution);
-            }
-            g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
-            g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
-            g->current_scene = SCENE_GAMEPLAY;
-            g->frame_dirty = true;
-        } else if (inputstate_is_pressed(is, KEY_SPACE)) {
-            // re-roll character creation stats
-            g->frame_dirty = true;
-            g->chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
-            g->chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
-            g->chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
-        } else if (inputstate_is_pressed(is, KEY_LEFT)) {
-            // change race/class
-            g->frame_dirty = true;
-        } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
-            // change race/class
-            g->frame_dirty = true;
-        }
-    } else {
-    }
-*/
 }
 
-/*
-static void handle_input_help_menu(const inputstate* const is,
-                                   gamestate* const g) {
-    massert(is, "Input state is NULL!");
-    massert(g, "Game state is NULL!");
-    if (inputstate_any_pressed(is)) {
-        g->display_help_menu = false;
-        g->controlmode = CONTROLMODE_PLAYER;
-        return;
-    }
-}
-*/
 
 static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -2559,22 +2416,177 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
              test_guard,
              0);
 }
-/*
-*/
+
 
 void liblogic_init(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     srand(time(NULL));
-
     init_dungeon(g);
-
     //g->msg_system.count = 0;
     //g->msg_system.index = 0;
     //g->msg_system.is_active = false;
-    //
     init_player(g);
     msuccess("liblogic_init: Game state initialized");
 }
+
+
+void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+    //minfo("liblogic_tick: is=%p, g=%p", is, g);
+    massert(is, "Input state is NULL!");
+    massert(g, "Game state is NULL!");
+    // Spawn NPCs periodically
+    //try_spawn_npc(g);
+    //update_player_state(g);
+    //update_npcs_state(g);
+    //if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+    //    reset_player_blocking(g);
+    //    reset_player_block_success(g);
+    //}
+    handle_input(is, g);
+    //if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
+    //    handle_npcs(g);
+    //}
+    update_debug_panel_buffer(g);
+    g->currenttime = time(NULL);
+    g->currenttimetm = localtime(&g->currenttime);
+    strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+}
+
+
+void liblogic_close(shared_ptr<gamestate> g) {
+    massert(g, "liblogic_close: gamestate is NULL");
+    d_free(g->dungeon);
+}
+
+//if (g->display_quit_menu) {
+//    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+//        g->display_quit_menu = false;
+//        return;
+//    }
+//if (inputstate_is_pressed(is, KEY_Q)) {
+// this forces the window to close but this is crashing on exit
+//CloseWindow();
+//    g->do_quit = true;
+//    return;
+//}
+//}
+//if (!g->display_quit_menu) {
+//if (inputstate_is_pressed(is, KEY_Q)) {
+//    g->display_quit_menu = true;
+//    return;
+//}
+
+/*
+    if (g->current_scene == SCENE_GAMEPLAY) {
+        if (g->gameover) {
+            //if (inputstate_any_pressed(is)) liblogic_restart(g);
+            //if (inputstate_any_pressed(is)) {
+            if (inputstate_is_pressed(is, KEY_ENTER) ||
+                inputstate_is_pressed(is, KEY_SPACE)) {
+                liblogic_restart(g);
+            }
+            return;
+        }
+        //printf("Current control mode: %d\n", g->controlmode);
+
+        switch (g->controlmode) {
+        case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
+        case CONTROLMODE_INVENTORY: handle_input_inventory(is, g); break;
+        case CONTROLMODE_GAMEPLAY_SETTINGS:
+            handle_input_gameplay_settings(is, g);
+            break;
+        case CONTROLMODE_HELP: handle_input_help_menu(is, g); break;
+        default: merror("Unknown control mode: %d", g->controlmode); break;
+        }
+
+    } else if (g->current_scene == SCENE_TITLE) {
+        //if (inputstate_any_pressed(is)) {
+        if (inputstate_is_pressed(is, KEY_ENTER) ||
+            inputstate_is_pressed(is, KEY_SPACE)) {
+            //minfo("Title screen input detected, switching to main menu");
+            g->current_scene = SCENE_MAIN_MENU;
+            g->frame_dirty = true;
+        }
+    } else if (g->current_scene == SCENE_MAIN_MENU) {
+        if (inputstate_is_pressed(is, KEY_DOWN)) {
+            g->frame_dirty = true;
+            //if (g->title_screen_selection == g->max_title_screen_selections - 1) {
+            //    g->title_screen_selection = 0;
+            //} else {
+            //    g->title_screen_selection++;
+            //}
+            //minfo("Title screen selection: %d", g->title_screen_selection);
+        } else if (inputstate_is_pressed(is, KEY_UP)) {
+            g->frame_dirty = true;
+            //if (g->title_screen_selection == 0) {
+            //    g->title_screen_selection = g->max_title_screen_selections - 1;
+            //} else {
+            //    g->title_screen_selection--;
+            //}
+            //minfo("Title screen selection: %d", g->title_screen_selection);
+
+        } else if (inputstate_is_pressed(is, KEY_ENTER)) {
+            if (g->title_screen_selection == 0) {
+                g->current_scene = SCENE_CHARACTER_CREATION;
+                g->frame_dirty = true;
+            }
+        }
+        //else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+        //    g->do_quit = true;
+        //}
+
+    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+        //if (inputstate_any_pressed(is)) {
+        if (inputstate_is_pressed(is, KEY_ENTER)) {
+            minfo("Character creation");
+            // we need to copy the character creation stats to the hero entity
+            // hero has already been created, so its id is available
+            g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
+            g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
+            g_set_stat(
+                g, g->hero_id, STATS_CON, g->chara_creation.constitution);
+            int hitdie = 8;
+            int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) +
+                             bonus_calc(g->chara_creation.constitution);
+            while (maxhp_roll < 1) {
+                maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) +
+                             bonus_calc(g->chara_creation.constitution);
+            }
+            g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
+            g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
+            g->current_scene = SCENE_GAMEPLAY;
+            g->frame_dirty = true;
+        } else if (inputstate_is_pressed(is, KEY_SPACE)) {
+            // re-roll character creation stats
+            g->frame_dirty = true;
+            g->chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
+            g->chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
+            g->chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
+        } else if (inputstate_is_pressed(is, KEY_LEFT)) {
+            // change race/class
+            g->frame_dirty = true;
+        } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
+            // change race/class
+            g->frame_dirty = true;
+        }
+    } else {
+    }
+*/
+
+
+/*
+static void handle_input_help_menu(const inputstate* const is,
+                                   gamestate* const g) {
+    massert(is, "Input state is NULL!");
+    massert(g, "Game state is NULL!");
+    if (inputstate_any_pressed(is)) {
+        g->display_help_menu = false;
+        g->controlmode = CONTROLMODE_PLAYER;
+        return;
+    }
+}
+*/
+
 
 /*
 static int get_hitdie_for_race(race_t race) {
@@ -2870,33 +2882,6 @@ static inline void reset_player_block_success(gamestate* const g) {
 }
 */
 
-void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
-    //minfo("liblogic_tick: is=%p, g=%p", is, g);
-    massert(is, "Input state is NULL!");
-    massert(g, "Game state is NULL!");
-    // Spawn NPCs periodically
-    //try_spawn_npc(g);
-    //update_player_state(g);
-    //update_npcs_state(g);
-    //if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-    //    reset_player_blocking(g);
-    //    reset_player_block_success(g);
-    //}
-    handle_input(is, g);
-    //if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
-    //    handle_npcs(g);
-    //}
-    update_debug_panel_buffer(g);
-    g->currenttime = time(NULL);
-    g->currenttimetm = localtime(&g->currenttime);
-    strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
-}
-
-//void liblogic_close(gamestate* const g) {
-void liblogic_close(shared_ptr<gamestate> g) {
-    massert(g, "liblogic_close: gamestate is NULL");
-    d_free(g->dungeon);
-}
 
 // Check if a location is traversable (walkable and unoccupied)
 /*
