@@ -95,10 +95,11 @@ typedef struct gamestate {
     std::unordered_map<entityid, bool>* dead_list;
     std::unordered_map<entityid, bool>* update_list;
 
-    //std::unordered_map<entityid, bool>* attacking_list;
-    //std::unordered_map<entityid, bool>* blocking_list;
-    //std::unordered_map<entityid, bool>* block_success_list;
-    //std::unordered_map<entityid, bool>* damaged_list;
+    std::unordered_map<entityid, bool>* attacking_list;
+    std::unordered_map<entityid, bool>* blocking_list;
+    std::unordered_map<entityid, bool>* block_success_list;
+    std::unordered_map<entityid, bool>* damaged_list;
+
     //std::unordered_map<entityid, inventory_component>* inventory_list;
 
     //inventory_component* inventory_list;
@@ -291,25 +292,25 @@ bool g_add_update(std::shared_ptr<gamestate> g, entityid id, bool update);
 bool g_get_update(std::shared_ptr<gamestate> g, entityid id);
 bool g_set_update(std::shared_ptr<gamestate> g, entityid id, bool update);
 
-//bool g_has_attacking(std::shared_ptr<gamestate> g, entityid id);
-//bool g_add_attacking(std::shared_ptr<gamestate> g, entityid id, int attacking);
-//bool g_set_attacking(std::shared_ptr<gamestate> g, entityid id, int attacking);
-//bool g_get_attacking(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_attacking(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_attacking(std::shared_ptr<gamestate> g, entityid id, int attacking);
+bool g_set_attacking(std::shared_ptr<gamestate> g, entityid id, int attacking);
+bool g_get_attacking(std::shared_ptr<gamestate> g, entityid id);
 
-//bool g_has_blocking(std::shared_ptr<gamestate> g, entityid id);
-//bool g_add_blocking(std::shared_ptr<gamestate> g, entityid id, int blocking);
-//bool g_set_blocking(std::shared_ptr<gamestate> g, entityid id, int blocking);
-//bool g_get_blocking(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_blocking(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_blocking(std::shared_ptr<gamestate> g, entityid id, int blocking);
+bool g_set_blocking(std::shared_ptr<gamestate> g, entityid id, int blocking);
+bool g_get_blocking(std::shared_ptr<gamestate> g, entityid id);
 
-//bool g_has_block_success(std::shared_ptr<gamestate> g, entityid id);
-//bool g_add_block_success(std::shared_ptr<gamestate> g, entityid id, int block_success);
-//bool g_set_block_success(std::shared_ptr<gamestate> g, entityid id, int block_success);
-//bool g_get_block_success(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_block_success(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_block_success(std::shared_ptr<gamestate> g, entityid id, int block_success);
+bool g_set_block_success(std::shared_ptr<gamestate> g, entityid id, int block_success);
+bool g_get_block_success(std::shared_ptr<gamestate> g, entityid id);
 
-//bool g_has_damaged(std::shared_ptr<gamestate> g, entityid id);
-//bool g_add_damaged(std::shared_ptr<gamestate> g, entityid id, int damaged);
-//bool g_set_damaged(std::shared_ptr<gamestate> g, entityid id, int damaged);
-//bool g_get_damaged(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_damaged(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_damaged(std::shared_ptr<gamestate> g, entityid id, int damaged);
+bool g_set_damaged(std::shared_ptr<gamestate> g, entityid id, int damaged);
+bool g_get_damaged(std::shared_ptr<gamestate> g, entityid id);
 
 //bool g_has_default_action(std::shared_ptr<gamestate> g, entityid id);
 //bool g_add_default_action(std::shared_ptr<gamestate> g, entityid id, int action);

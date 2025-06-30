@@ -168,6 +168,10 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->dir_list = new unordered_map<entityid, direction_t>();
     g->dead_list = new unordered_map<entityid, bool>();
     g->update_list = new unordered_map<entityid, bool>();
+    g->attacking_list = new unordered_map<entityid, bool>();
+    g->blocking_list = new unordered_map<entityid, bool>();
+    g->block_success_list = new unordered_map<entityid, bool>();
+    g->damaged_list = new unordered_map<entityid, bool>();
 
     gamestate_load_keybindings(g);
     msuccess("Gamestate initialized successfully");
@@ -305,6 +309,11 @@ void gamestate_free(shared_ptr<gamestate> g) {
     if (g->dir_list) delete g->dir_list;
     if (g->dead_list) delete g->dead_list;
     if (g->update_list) delete g->update_list;
+    if (g->attacking_list) delete g->attacking_list;
+    if (g->blocking_list) delete g->blocking_list;
+    if (g->block_success_list) delete g->block_success_list;
+    if (g->damaged_list) delete g->damaged_list;
+
 
     if (g->monster_defs) {
         free(g->monster_defs);
@@ -656,14 +665,14 @@ bool g_update_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc) {
 }
 
 
-bool g_has_dir(std::shared_ptr<gamestate> g, entityid id) {
+bool g_has_dir(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_has_comp(g, id, C_DIRECTION);
 }
 
 
-direction_t g_get_dir(std::shared_ptr<gamestate> g, entityid id) {
+direction_t g_get_dir(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g_has_dir(g, id)) {
@@ -677,7 +686,7 @@ direction_t g_get_dir(std::shared_ptr<gamestate> g, entityid id) {
 }
 
 
-bool g_add_dir(std::shared_ptr<gamestate> g, entityid id, direction_t dir) {
+bool g_add_dir(shared_ptr<gamestate> g, entityid id, direction_t dir) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     // Automatically register component if not already registered
@@ -695,7 +704,7 @@ bool g_add_dir(std::shared_ptr<gamestate> g, entityid id, direction_t dir) {
 }
 
 
-bool g_update_dir(std::shared_ptr<gamestate> g, entityid id, direction_t dir) {
+bool g_update_dir(shared_ptr<gamestate> g, entityid id, direction_t dir) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (!g->dir_list) {
@@ -824,155 +833,225 @@ bool g_set_update(shared_ptr<gamestate> g, entityid id, bool update) {
 }
 
 
-//bool g_has_attacking(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_ATTACKING);
-//}
+bool g_has_attacking(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_ATTACKING);
+}
 
-//bool g_add_attacking(gamestate* const g, entityid id, int attacking) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    // make sure the entity has the attacking component
-//    return g_add_component(g, id, C_ATTACKING, (void*)&attacking, sizeof(attacking_component), (void**)&g->attacking_list, &g->attacking_list_count, &g->attacking_list_capacity);
-//}
 
-//bool g_set_attacking(gamestate* const g, entityid id, int attacking) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->attacking_list == NULL) return false;
-//    for (int i = 0; i < g->attacking_list_count; i++) {
-//        if (g->attacking_list[i].id == id) {
-//            g->attacking_list[i].data = attacking;
-//            return true;
-//        }
-//    }
-//    return false;
-//}
+bool g_add_attacking(shared_ptr<gamestate> g, entityid id, int attacking) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_ATTACKING)) {
+        merror("g_add_attacking: Failed to add component C_ATTACKING for id %d", id);
+        return false;
+    }
+    if (!g->attacking_list) {
+        merror("g->attacking_list is NULL");
+        return false;
+    }
+    // Check if the attacking status already exists for the entity
+    (*g->attacking_list)[id] = attacking; // Insert or update the attacking status
+    return true;
+}
 
-//bool g_get_attacking(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->attacking_list == NULL) return false;
-//    for (int i = 0; i < g->attacking_list_count; i++)
-//        if (g->attacking_list[i].id == id) return g->attacking_list[i].data;
-//    //merror("id %d not found in attacking_list", id);
-//    return false;
-//}
 
-//bool g_has_blocking(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_BLOCKING);
-//}
+bool g_set_attacking(shared_ptr<gamestate> g, entityid id, int attacking) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->attacking_list) {
+        merror("g->attacking_list is NULL");
+        return false;
+    }
+    // Check if the entity has an attacking component
+    if (g_has_attacking(g, id)) {
+        // Update the attacking status for the entity
+        (*g->attacking_list)[id] = attacking; // Update the attacking status
+        return true;
+    }
+    merror("g_set_attacking: id %d does not have an attacking component", id);
+    return false;
+}
 
-//bool g_add_blocking(gamestate* const g, entityid id, int blocking) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    // make sure the entity has the blocking component
-//    massert(g_has_component(g, id, C_BLOCKING), "id %d does not have a blocking component", id);
-//    return g_add_component(g, id, C_BLOCKING, (void*)&blocking, sizeof(blocking_component), (void**)&g->blocking_list, &g->blocking_list_count, &g->blocking_list_capacity);
-//}
 
-//bool g_set_blocking(gamestate* const g, entityid id, int blocking) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->blocking_list == NULL) return false;
-//    for (int i = 0; i < g->blocking_list_count; i++) {
-//        if (g->blocking_list[i].id == id) {
-//            g->blocking_list[i].data = blocking;
-//            return true;
-//        }
-//    }
-//    return false;
-//}
+bool g_get_attacking(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->attacking_list) {
+        massert(g->attacking_list->find(id) != g->attacking_list->end(), "g_get_attacking: id %d not found in attacking list", id);
+        return g->attacking_list->at(id);
+    }
+    merror("g_get_attacking: id %d does not have an attacking component", id);
+    return false; // Return false if the id is not found
+}
 
-//bool g_get_blocking(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->blocking_list == NULL) return false;
-//    for (int i = 0; i < g->blocking_list_count; i++)
-//        if (g->blocking_list[i].id == id) return g->blocking_list[i].data;
-//    //merror("id %d not found in blocking_list", id);
-//    return false;
-//}
 
-//bool g_has_block_success(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_BLOCK_SUCCESS);
-//}
+bool g_has_blocking(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_BLOCKING);
+}
 
-//bool g_add_block_success(gamestate* const g, entityid id, int block_success) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    // make sure the entity has the block success component
-//    return g_add_component(g,
-//                           id,
-//                           C_BLOCK_SUCCESS,
-//                           (void*)&block_success,
-//                           sizeof(block_success_component),
-//                           (void**)&g->block_success_list,
-//                           &g->block_success_list_count,
-//                           &g->block_success_list_capacity);
-//}
 
-//bool g_set_block_success(gamestate* const g, entityid id, int block_success) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->block_success_list == NULL) return false;
-//    for (int i = 0; i < g->block_success_list_count; i++) {
-//        if (g->block_success_list[i].id == id) {
-//            g->block_success_list[i].data = block_success;
-//            return true;
-//        }
-//    }
-//    return false;
-//}
+bool g_add_blocking(shared_ptr<gamestate> g, entityid id, int blocking) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_BLOCKING)) {
+        merror("g_add_blocking: Failed to add component C_BLOCKING for id %d", id);
+        return false;
+    }
+    if (!g->blocking_list) {
+        merror("g->blocking_list is NULL");
+        return false;
+    }
+    // Check if the blocking status already exists for the entity
+    (*g->blocking_list)[id] = blocking; // Insert or update the blocking status
+    return true;
+}
 
-//bool g_get_block_success(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->block_success_list == NULL) return false;
-//    for (int i = 0; i < g->block_success_list_count; i++)
-//        if (g->block_success_list[i].id == id) return g->block_success_list[i].data;
-//    return false;
-//}
 
-//bool g_has_damaged(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_component(g, id, C_DAMAGED);
-//}
+bool g_set_blocking(shared_ptr<gamestate> g, entityid id, int blocking) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->blocking_list) {
+        merror("g->blocking_list is NULL");
+        return false;
+    }
+    // Check if the entity has a blocking component
+    if (g_has_blocking(g, id)) {
+        // Update the blocking status for the entity
+        (*g->blocking_list)[id] = blocking; // Update the blocking status
+        return true;
+    }
+    merror("g_set_blocking: id %d does not have a blocking component", id);
+    return false;
+}
 
-//bool g_add_damaged(gamestate* const g, entityid id, int damaged) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    // make sure the entity has the damaged component
-//    return g_add_component(g, id, C_DAMAGED, (void*)&damaged, sizeof(damaged_component), (void**)&g->damaged_list, &g->damaged_list_count, &g->damaged_list_capacity);
-//}
 
-//bool g_set_damaged(gamestate* const g, entityid id, int damaged) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->damaged_list == NULL) return false;
-//    for (int i = 0; i < g->damaged_list_count; i++) {
-//        if (g->damaged_list[i].id == id) {
-//            g->damaged_list[i].data = damaged;
-//            return true;
-//        }
-//    }
-//    return false;
-//}
+bool g_get_blocking(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->blocking_list) {
+        massert(g->blocking_list->find(id) != g->blocking_list->end(), "g_get_blocking: id %d not found in blocking list", id);
+        return g->blocking_list->at(id);
+    }
+    merror("g_get_blocking: id %d does not have a blocking component", id);
+    return false; // Return false if the id is not found
+}
 
-//bool g_get_damaged(const gamestate* const g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g->damaged_list == NULL) return false;
-//    for (int i = 0; i < g->damaged_list_count; i++)
-//        if (g->damaged_list[i].id == id) return g->damaged_list[i].data;
-//    return false;
-//}
+
+bool g_has_block_success(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_BLOCK_SUCCESS);
+}
+
+
+bool g_add_block_success(shared_ptr<gamestate> g, entityid id, int block_success) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_BLOCK_SUCCESS)) {
+        merror("g_add_block_success: Failed to add component C_BLOCK_SUCCESS for id %d", id);
+        return false;
+    }
+    if (!g->block_success_list) {
+        merror("g->block_success_list is NULL");
+        return false;
+    }
+    // Check if the block success status already exists for the entity
+    (*g->block_success_list)[id] = block_success; // Insert or update the block success status
+    return true;
+}
+
+
+bool g_set_block_success(shared_ptr<gamestate> g, entityid id, int block_success) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->block_success_list) {
+        merror("g->block_success_list is NULL");
+        return false;
+    }
+    // Check if the entity has a block success component
+    if (g_has_block_success(g, id)) {
+        // Update the block success status for the entity
+        (*g->block_success_list)[id] = block_success; // Update the block success status
+        return true;
+    }
+    merror("g_set_block_success: id %d does not have a block success component", id);
+    return false;
+}
+
+
+bool g_get_block_success(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->block_success_list) {
+        massert(g->block_success_list->find(id) != g->block_success_list->end(), "g_get_block_success: id %d not found in block success list", id);
+        return g->block_success_list->at(id);
+    }
+    merror("g_get_block_success: id %d does not have a block success component", id);
+    return false; // Return false if the id is not found
+}
+
+
+bool g_has_damaged(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_DAMAGED);
+}
+
+
+bool g_add_damaged(shared_ptr<gamestate> g, entityid id, int damaged) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_DAMAGED)) {
+        merror("g_add_damaged: Failed to add component C_DAMAGED for id %d", id);
+        return false;
+    }
+    if (!g->damaged_list) {
+        merror("g->damaged_list is NULL");
+        return false;
+    }
+    // Check if the damaged status already exists for the entity
+    (*g->damaged_list)[id] = damaged; // Insert or update the damaged status
+    return true;
+}
+
+
+bool g_set_damaged(shared_ptr<gamestate> g, entityid id, int damaged) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->damaged_list) {
+        merror("g->damaged_list is NULL");
+        return false;
+    }
+    // Check if the entity has a damaged component
+    if (g_has_damaged(g, id)) {
+        // Update the damaged status for the entity
+        (*g->damaged_list)[id] = damaged; // Update the damaged status
+        return true;
+    }
+    merror("g_set_damaged: id %d does not have a damaged component", id);
+    return false;
+}
+
+
+bool g_get_damaged(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->damaged_list) {
+        massert(g->damaged_list->find(id) != g->damaged_list->end(), "g_get_damaged: id %d not found in damaged list", id);
+        return g->damaged_list->at(id);
+    }
+    merror("g_get_damaged: id %d does not have a damaged component", id);
+    return false; // Return false if the id is not found
+}
+
 
 //bool g_has_default_action(const gamestate* const g, entityid id) {
 //    massert(g, "g is NULL");

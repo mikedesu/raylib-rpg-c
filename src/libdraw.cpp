@@ -83,7 +83,7 @@ static void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, sprit
 static void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+//static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_inventory_menu(shared_ptr<gamestate> g);
 static void draw_hud(shared_ptr<gamestate> g);
 static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu);
@@ -100,7 +100,6 @@ static void load_shaders();
 static void libdraw_unload_shaders();
 static void load_textures();
 static void libdraw_unload_textures();
-static void libdraw_update_sprite_attack(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
 static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
@@ -592,31 +591,29 @@ update_weapon_for_entity(gamestate* g, entityid id, spritegroup_t* sg) {
 }
 */
 
-/*
-static void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g,
-                                        entityid id,
-                                        spritegroup_t* const sg) {
+static void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
     race_t race = g_get_race(g, id);
-    entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
-    weapontype wtype = g_get_weapontype(g, weapon);
+    //entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
+    //weapontype wtype = g_get_weapontype(g, weapon);
     int cur = 0;
     cur = SG_ANIM_NPC_ATTACK;
-    if (wtype == WEAPON_BOW) {
-        cur = SG_ANIM_NPC_SHOT;
-    }
-    if (race == RACE_BAT) {
-        cur = SG_ANIM_BAT_ATTACK;
-    } else if (race == RACE_GREEN_SLIME) {
-        cur = SG_ANIM_SLIME_ATTACK;
-    }
+    //if (wtype == WEAPON_BOW) {
+    //    cur = SG_ANIM_NPC_SHOT;
+    //}
+    //if (race == RACE_BAT) {
+    //    cur = SG_ANIM_BAT_ATTACK;
+    //} else if (race == RACE_GREEN_SLIME) {
+    //    cur = SG_ANIM_SLIME_ATTACK;
+    //}
     spritegroup_set_current(sg, cur);
-    update_weapon_for_entity(g, id, sg);
+    //update_weapon_for_entity(g, id, sg);
     //e->is_attacking = false;
     g_set_attacking(g, id, false);
 }
+/*
 */
 
 /*
@@ -650,24 +647,6 @@ static void libdraw_set_sg_block_success(shared_ptr<gamestate> g,
 }
 */
 
-/*
-static void libdraw_update_sprite_attack(shared_ptr<gamestate> g,
-                                         entityid id,
-                                         spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    massert(sg, "spritegroup is NULL");
-    if (g_get_attacking(g, id)) {
-        libdraw_set_sg_is_attacking(g, id, sg);
-    } else if (g_get_block_success(g, id)) {
-        libdraw_set_sg_block_success(g, id, sg);
-    } else if (g_get_damaged(g, id)) {
-        libdraw_set_sg_is_damaged(g, id, sg);
-    } else if (g_is_dead(g, id)) {
-        libdraw_set_sg_is_dead(g, id, sg);
-    }
-}
-*/
 
 static void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
@@ -746,6 +725,18 @@ static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spri
     // Copy movement intent from sprite_move_x/y if present
     libdraw_update_sprite_position(g, id, sg);
     //libdraw_update_sprite_attack(g, id, sg);
+
+    //if (g_get_attacking(g, id)) {
+    //    libdraw_set_sg_is_attacking(g, id, sg);
+    //}
+    //else if (g_get_block_success(g, id)) {
+    //    libdraw_set_sg_block_success(g, id, sg);
+    //} else if (g_get_damaged(g, id)) {
+    //    libdraw_set_sg_is_damaged(g, id, sg);
+    //} else if (g_is_dead(g, id)) {
+    //    libdraw_set_sg_is_dead(g, id, sg);
+    //}
+
     // Update movement as long as sg->move.x/y is non-zero
     if (spritegroup_update_dest(sg)) {
         g->frame_dirty = true;
@@ -771,7 +762,6 @@ static void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
 /*
 */
 
-/*
 static void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
@@ -783,7 +773,6 @@ static void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
         g->turn_count++;
     }
 }
-*/
 
 static void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");

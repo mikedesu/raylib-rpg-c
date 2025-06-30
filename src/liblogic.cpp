@@ -34,6 +34,9 @@ using std::string;
 
 int liblogic_restart_count = 0;
 
+static inline void reset_player_blocking(shared_ptr<gamestate> g);
+static inline void reset_player_block_success(shared_ptr<gamestate> g);
+static void update_player_state(shared_ptr<gamestate> g);
 static void update_debug_panel_buffer(shared_ptr<gamestate> g);
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -94,10 +97,11 @@ static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
     g_add_dir(g, id, DIR_DOWN_RIGHT);
     msuccess("so far so good...");
 
-    //g_add_attacking(g, id, false);
+    g_add_attacking(g, id, false);
+    g_add_blocking(g, id, false);
     //g_add_zapping(g, id, false);
-    //g_add_block_success(g, id, false);
-    //g_add_damaged(g, id, false);
+    g_add_block_success(g, id, false);
+    g_add_damaged(g, id, false);
     //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
     //g_add_inventory(g, id);
     //g_add_target(g, id, (vec3){-1, -1, -1});
@@ -288,6 +292,17 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
         g_update_loc(g, g->hero_id, (vec3){loc.x + 1, loc.y + 1, loc.z});
         g_update_sprite_move(g, g->hero_id, (Rectangle){8, 8, 0, 0});
         g_update_dir(g, g->hero_id, DIR_DOWN_RIGHT);
+        g_set_update(g, g->hero_id, true);
+        return;
+    }
+
+
+    if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+        //g_update_loc(g, g->hero_id, (vec3){loc.x + 1, loc.y + 1, loc.z});
+        //g_update_sprite_move(g, g->hero_id, (Rectangle){8, 8, 0, 0});
+        //g_update_dir(g, g->hero_id, DIR_DOWN_RIGHT);
+
+        g_set_attacking(g, g->hero_id, true);
         g_set_update(g, g->hero_id, true);
         return;
     }
@@ -548,7 +563,7 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(g, "Game state is NULL!");
     // Spawn NPCs periodically
     //try_spawn_npc(g);
-    //update_player_state(g);
+    update_player_state(g);
     //update_npcs_state(g);
     //if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
     //    reset_player_blocking(g);
@@ -568,6 +583,21 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
 void liblogic_close(shared_ptr<gamestate> g) {
     massert(g, "liblogic_close: gamestate is NULL");
     d_free(g->dungeon);
+}
+
+
+static inline void reset_player_blocking(shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    g_set_blocking(g, g->hero_id, false);
+    g_set_block_success(g, g->hero_id, false);
+    g_set_update(g, g->hero_id, true);
+}
+
+
+static inline void reset_player_block_success(shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    g_set_block_success(g, g->hero_id, false);
+    g_set_update(g, g->hero_id, true);
 }
 
 
@@ -614,22 +644,6 @@ get_first_empty_tile_around_entity(shared_ptr<gamestate> g, entityid id) {
 }
 */
 
-/*
-static inline void reset_player_blocking(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    g_set_blocking(g, g->hero_id, false);
-    g_set_block_success(g, g->hero_id, false);
-    g_set_update(g, g->hero_id, true);
-}
-*/
-
-/*
-static inline void reset_player_block_success(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    g_set_block_success(g, g->hero_id, false);
-    g_set_update(g, g->hero_id, true);
-}
-*/
 
 /*
 static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
@@ -688,8 +702,6 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 //                                        shared_ptr<gamestate> g);
 //static void init_dungeon(gamestate* const g);
 //static void init_dungeon(shared_ptr<gamestate> g);
-//static void update_player_state(gamestate* const g);
-//static void update_player_state(shared_ptr<gamestate> g);
 //static void update_debug_panel_buffer(gamestate* const g);
 
 
@@ -2756,21 +2768,19 @@ static void try_spawn_npc(gamestate* const g) {
 }
 */
 
-/*
-static void update_player_state(gamestate* const g) {
+static void update_player_state(shared_ptr<gamestate> g) {
     massert(g, "Game state is NULL!");
     if (!g->gameover) {
         if (g_is_dead(g, g->hero_id)) {
-            add_message_history(g, "You died!");
+            //add_message_history(g, "You died!");
             g->gameover = true;
         }
-        check_and_handle_level_up(g, g->hero_id);
+        //check_and_handle_level_up(g, g->hero_id);
     }
     if (g_is_dead(g, g->hero_id)) {
         return;
     }
 }
-*/
 
 /*
 static void handle_level_up(gamestate* const g, entityid id) {
