@@ -95,11 +95,12 @@ typedef struct gamestate {
     std::unordered_map<entityid, bool>* dead_list;
     std::unordered_map<entityid, bool>* update_list;
 
-    //unordered_map<entityid, bool>* attacking_list;
-    //unordered_map<entityid, bool>* blocking_list;
-    //unordered_map<entityid, bool>* block_success_list;
-    //unordered_map<entityid, bool>* damaged_list;
-    //unordered_map<entityid, inventory_component>* inventory_list;
+    //std::unordered_map<entityid, bool>* attacking_list;
+    //std::unordered_map<entityid, bool>* blocking_list;
+    //std::unordered_map<entityid, bool>* block_success_list;
+    //std::unordered_map<entityid, bool>* damaged_list;
+    //std::unordered_map<entityid, inventory_component>* inventory_list;
+
     //inventory_component* inventory_list;
     //int inventory_list_count;
     //int inventory_list_capacity;

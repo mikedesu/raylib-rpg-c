@@ -2012,6 +2012,10 @@ static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     Color active_color = WHITE;
     Color disabled_color = {0x99, 0x99, 0x99, 0xFF};
     Color selection_color;
+
+    // this will go above the title text
+    const char* evidojo_presents_text = "@evildojo666 presents";
+
     const char* menu_text[2] = {"New Game", "Continue (coming soon)"};
     const char* title_text_0 = "project.";
     const char* title_text_1 = "rpg";
@@ -2021,12 +2025,15 @@ static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
     int sm_font_size = 10;
     int font_size = 40;
+    int font_size2 = 20;
+
+    int evidojo_presents_measure = MeasureText(evidojo_presents_text, sm_font_size);
     int measure = MeasureText(title_text_0, font_size);
     int start_measure = MeasureText(start_text, sm_font_size);
+    int version_measure = MeasureText(version_text, sm_font_size);
     int padding = 10;
     int w = DEFAULT_TARGET_WIDTH;
     int h = DEFAULT_TARGET_HEIGHT;
-    int version_measure = MeasureText(version_text, sm_font_size);
     float x = (w - measure) / 2.0f;
     float y = (h - font_size * 2) / 2.0f;
     float start_x = (w - start_measure) / 2.0f;
@@ -2035,6 +2042,13 @@ static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     float version_y = y + font_size + 10;
     float start_y = y + font_size * 1 + 20 + sm_font_size;
     ClearBackground(BLACK);
+
+    // Draw the "evidojo666 presents" text at the top
+    int evidojo_x = (w - evidojo_presents_measure) / 2.0f;
+    int evidojo_y = y - sm_font_size - 5; // Position it above the title text
+
+    DrawText(evidojo_presents_text, evidojo_x, evidojo_y, sm_font_size, WHITE);
+
     DrawText(title_text_0, x, y, font_size, title_text_0_color);
     DrawText(title_text_1, title_text_1_x, y, font_size, title_text_1_color);
     DrawText(version_text, version_x, version_y, sm_font_size, WHITE);
