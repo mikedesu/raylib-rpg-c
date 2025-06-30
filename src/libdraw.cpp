@@ -1326,7 +1326,6 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             num_keys = TX_HUMAN_COUNT;
             break;
             // Add cases for other races here
-            /*
         case RACE_ORC:
             keys = TX_ORC_KEYS;
             num_keys = TX_ORC_COUNT;
@@ -1363,7 +1362,6 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             keys = TX_GREEN_SLIME_KEYS;
             num_keys = TX_GREEN_SLIME_COUNT;
             break;
-*/
         default: merror("unknown race %d", race); return;
         }
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);

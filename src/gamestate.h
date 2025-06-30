@@ -264,6 +264,7 @@ bool g_has_type(std::shared_ptr<gamestate> g, entityid id);
 bool g_has_race(std::shared_ptr<gamestate> g, entityid id);
 race_t g_get_race(std::shared_ptr<gamestate> g, entityid id);
 bool g_add_race(std::shared_ptr<gamestate> g, entityid id, race_t race);
+bool g_update_race(std::shared_ptr<gamestate> g, entityid id, race_t race);
 
 
 bool g_has_loc(std::shared_ptr<gamestate> g, entityid id);

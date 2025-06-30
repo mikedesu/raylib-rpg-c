@@ -36,6 +36,10 @@ using std::string;
 int liblogic_restart_count = 0;
 
 //static inline void reset_player_blocking(shared_ptr<gamestate> g);
+static void try_spawn_npc(shared_ptr<gamestate> const g);
+static entityid npc_create_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
+static void handle_npcs(shared_ptr<gamestate> g);
+static void handle_npc(shared_ptr<gamestate> g, entityid id);
 static inline void reset_player_block_success(shared_ptr<gamestate> g);
 static void update_player_state(shared_ptr<gamestate> g);
 static void update_debug_panel_buffer(shared_ptr<gamestate> g);
@@ -78,31 +82,20 @@ static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
         merror("cannot create entity on tile with live NPCs");
         return ENTITYID_INVALID;
     }
-    minfo("attempting to add entity...");
     entityid id = g_add_entity(g);
-    minfo("attempting to add name...");
     g_add_name(g, id, name);
-    minfo("attempting to add type...");
     g_add_type(g, id, ENTITY_NPC);
-    minfo("attempting to add race...");
     g_add_race(g, id, rt);
-    minfo("attempting to add loc...");
     g_add_loc(g, id, loc);
-    minfo("attempting to add sprite_move...");
     g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
-    minfo("attempting to add dead...");
     g_add_dead(g, id, false);
-    minfo("attempting to add update...");
     g_add_update(g, id, true);
-    minfo("attempting to add dir...");
     g_add_dir(g, id, DIR_DOWN_RIGHT);
-    msuccess("so far so good...");
-
     g_add_attacking(g, id, false);
     g_add_blocking(g, id, false);
-    //g_add_zapping(g, id, false);
     g_add_block_success(g, id, false);
     g_add_damaged(g, id, false);
+    //g_add_zapping(g, id, false);
     //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
     //g_add_inventory(g, id);
     //g_add_target(g, id, (vec3){-1, -1, -1});
@@ -142,6 +135,8 @@ static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, 
     massert(id != ENTITYID_INVALID, "failed to create player");
     g_set_hero_id(g, id);
     g_add_type(g, id, ENTITY_PLAYER);
+    //g_update_race(g, id, RACE_GREEN_SLIME);
+
     //int str_roll = do_roll_best_of_3((roll){3, 6, 0});
     //int con_roll = do_roll_best_of_3((roll){3, 6, 0});
     //printf("rolling stats...\n");
@@ -232,13 +227,13 @@ static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> 
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
-        merror("handle_input_player: flag is not GAMESTATE_FLAG_PLAYER_INPUT returning");
+        //merror("handle_input_player: flag is not GAMESTATE_FLAG_PLAYER_INPUT returning");
         return;
     }
-    if (inputstate_is_pressed(is, KEY_ENTER)) {
-        minfo("handle_input_player: enter key pressed");
-        return;
-    }
+    //if (inputstate_is_pressed(is, KEY_ENTER)) {
+    //minfo("handle_input_player: enter key pressed");
+    //    return;
+    //}
     vec3 loc = g_get_loc(g, g->hero_id);
     if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
         g_update_loc(g, g->hero_id, (vec3){loc.x, loc.y - 1, loc.z});
@@ -480,9 +475,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
     //x = loc.x;
     //y = loc.y;
     //z = loc.z;
-
     //int inventory_sort_menu_selection = g->sort_inventory_menu_selection;
-
     //if (e) {
     //    vec3 loc = g_get_location(g, e->id);
     //    x = loc.x;
@@ -564,6 +557,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //g->msg_system.index = 0;
     //g->msg_system.is_active = false;
     init_player(g);
+    npc_create_set_stats(g, (vec3){2, 2, 0}, RACE_GREEN_SLIME);
     msuccess("liblogic_init: Game state initialized");
 }
 
@@ -573,7 +567,7 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     // Spawn NPCs periodically
-    //try_spawn_npc(g);
+    try_spawn_npc(g);
     update_player_state(g);
     //update_npcs_state(g);
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
@@ -582,9 +576,9 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
         //    reset_player_block_success(g);
     }
     handle_input(is, g);
-    //if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
-    //    handle_npcs(g);
-    //}
+    if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
+        handle_npcs(g);
+    }
     update_debug_panel_buffer(g);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
@@ -754,8 +748,6 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 //static int calc_reward_xp(gamestate* const g, entityid attacker_id, entityid target_id);
 //static bool
 //entities_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1);
-//static entityid
-//npc_create_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
 
 //static int get_hitdie_for_race(race_t race);
 //static int calc_next_lvl_xp(shared_ptr<gamestate> g, entityid id);
@@ -2691,85 +2683,98 @@ static race_t get_random_race_for_floor(int floor) {
 }
 */
 
-/*
-static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
+//static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
+static entityid npc_create_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
     minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
     entityid id = ENTITYID_INVALID;
-    bool success = false;
+    //bool success = false;
     //const char* race_name = get_race_str(race);
     string race_name = get_race_str(race);
     id = npc_create(g, race, loc, race_name);
     if (id != ENTITYID_INVALID) {
         int floor = loc.z + 1;
         //minfo("Spawning entity at %d, %d, %d on floor %d with HP %d", loc.x, loc.y, loc.z, floor, g_get_stat(g, id, STATS_HP));
-        int hit_die = get_hitdie_for_race(race);
+        //int hit_die = get_hitdie_for_race(race);
+        int hit_die = 8;
         vec3 r = {1, hit_die, 0};
         int max_hp = do_roll(r);
-        g_set_stat(g, id, STATS_HITDIE, hit_die);
-        g_set_stat(g, id, STATS_AC, 10);
-        g_set_stat(g, id, STATS_XP, 0);
-        g_set_stat(g, id, STATS_LEVEL, 1);
-        vec3 base_attack_dmg = get_base_attack_damage_for_race(race);
-        g_set_base_attack_damage(g, id, base_attack_dmg);
-        g_set_stat(g, id, STATS_STR, do_roll_best_of_3((vec3){3, 6, 0}));
-        g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
-        g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
-        max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
-        if (max_hp <= 0) max_hp = 1; // Ensure max HP is at least 1
-        g_set_stat(g, id, STATS_MAXHP, max_hp);
-        g_set_stat(g, id, STATS_HP, max_hp);
-        g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+
+        //g_set_stat(g, id, STATS_HITDIE, hit_die);
+        //g_set_stat(g, id, STATS_AC, 10);
+        //g_set_stat(g, id, STATS_XP, 0);
+        //g_set_stat(g, id, STATS_LEVEL, 1);
+
+        //vec3 base_attack_dmg = get_base_attack_damage_for_race(race);
+
+        //g_set_base_attack_damage(g, id, base_attack_dmg);
+        //g_set_stat(g, id, STATS_STR, do_roll_best_of_3((vec3){3, 6, 0}));
+        //g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
+        //g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
+
+        //max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
+
+        //if (max_hp <= 0) max_hp = 1; // Ensure max HP is at least 1
+
+        //g_set_stat(g, id, STATS_MAXHP, max_hp);
+        //g_set_stat(g, id, STATS_HP, max_hp);
+        //g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+
         // we will update this to do an appropriate difficulty-scaling
         // level-up is too powerful and results in imbalance
         // the goal is to make the spawns challenge rating approximate
         // and close either above or below the player's level and cr
-        for (int i = 1; i < floor; i++) {
-            handle_level_up(g, id);
-        }
+        //for (int i = 1; i < floor; i++) {
+        //    handle_level_up(g, id);
+        //}
         //int new_level = g_get_stat(g, id, STATS_LEVEL);
         //massert(g_get_stat(g, id, STATS_LEVEL) == floor, "New level %d does not match floor %d", new_level, floor);
-        msuccess("Spawned entity of Level %d with %d HP at %d, %d, %d",
-                 g_get_stat(g, id, STATS_LEVEL),
-                 max_hp,
-                 loc.x,
-                 loc.y,
-                 loc.z);
+        msuccess("Spawned entity at %d, %d, %d", loc.x, loc.y, loc.z);
         // update vision distance
         // this will be appropriately set on a per-npc basis but for now...
         // hard code 5
         //int vision_distance0 = g_get_vision_distance(g, id);
-        g_set_vision_distance(g, id, 5);
+        //g_set_vision_distance(g, id, 5);
         // verify vision distance
         //int vision_distance = g_get_vision_distance(g, id);
         //massert(g_get_vision_distance(g, id) == 5, "Vision distance %d does not match expected value 5", vision_distance);
         //int default_light_radius = 3;
-        g_set_light_radius(g, id, 3);
+        //g_set_light_radius(g, id, 3);
         // verify light radius
-        massert(g_get_light_radius(g, id) == 3,
-                "Light radius %d does not match expected value 3",
-                g_get_light_radius(g, id));
-        success = true;
+        //massert(g_get_light_radius(g, id) == 3,
+        //        "Light radius %d does not match expected value 3",
+        //        g_get_light_radius(g, id));
+        //success = true;
     }
-    return success;
+    return id;
 }
-*/
 
-/*
-static void try_spawn_npc(gamestate* const g) {
+
+//static void try_spawn_npc(gamestate* const g) {
+static void try_spawn_npc(shared_ptr<gamestate> const g) {
     massert(g, "gamestate is NULL");
     static bool do_this_once = true;
-    int every_nth_turn = 10;
+    //static int x = 1;
+    //static int y = 1;
+    int every_nth_turn = 100;
     if (g->turn_count % every_nth_turn == 0) {
-        bool success = false;
+        entityid success = ENTITYID_INVALID;
         if (do_this_once) {
-            while (!success) {
-                int current_floor = g->d->current_floor;
-                vec3 loc = get_random_available_loc(g, current_floor);
+            while (success == ENTITYID_INVALID) {
+                int current_floor = g->dungeon->current_floor;
+                //vec3 loc = get_random_available_loc(g, current_floor);
+                vec3 loc = (vec3){1, 1, current_floor}; // Placeholder for actual location logic
                 if (loc.x == -1 && loc.y == -1 && loc.z == -1) {
                     merror("No available location found for NPC spawn");
                     return; // No valid location found, exit early
                 }
-                race_t race = get_random_race_for_floor(current_floor);
+                //if (x > g->dungeon->floors->at(current_floor)->width) {
+                //    x = 1; // Reset x to 1 if it exceeds width
+                //}
+                //if (y > g->dungeon->floors->at(current_floor)->height) {
+                //    y = 1; // Reset y to 1 if it exceeds height
+                //}
+                //race_t race = get_random_race_for_floor(current_floor);
+                race_t race = RACE_ORC;
                 success = npc_create_set_stats(g, loc, race);
             }
             do_this_once = false;
@@ -2778,6 +2783,7 @@ static void try_spawn_npc(gamestate* const g) {
         do_this_once = true;
     }
 }
+/*
 */
 
 static void update_player_state(shared_ptr<gamestate> g) {
@@ -2859,23 +2865,24 @@ static void update_npcs_state(gamestate* const g) {
 }
 */
 
-/*
-static void handle_npc(gamestate* const g, entityid id) {
+static void handle_npc(shared_ptr<gamestate> g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
-    if (id == g->hero_id) return;
-    if (g_is_type(g, id, ENTITY_NPC) && !g_is_dead(g, id)) {
+    if (id == g->hero_id) {
+        merror("Tried to handle hero as NPC! This should not happen.");
+        return;
+    }
+    if (g_get_type(g, id) == ENTITY_NPC && !g_is_dead(g, id)) {
+        //if (g_get_type(g, id) == ENTITY_NPC) {
         minfo("Handling NPC %d", id);
-        execute_action(g, id, g_get_default_action(g, id));
+        //execute_action(g, id, g_get_default_action(g, id));
     }
 }
-*/
 
-/*
-static void handle_npcs(gamestate* const g) {
+
+static void handle_npcs(shared_ptr<gamestate> g) {
     massert(g, "Game state is NULL!");
-    massert(g->flag == GAMESTATE_FLAG_NPC_TURN,
-            "Game state is not in NPC turn!");
+    massert(g->flag == GAMESTATE_FLAG_NPC_TURN, "Game state is not in NPC turn!");
     // Process all NPCs
     //for (int i = 0; i < g->index_entityids; i++) handle_nth_npc(g, i);
     for (entityid id = 0; id < g->next_entityid; id++) {
@@ -2884,6 +2891,7 @@ static void handle_npcs(gamestate* const g) {
     // After processing all NPCs, set the flag to animate all movements together
     g->flag = GAMESTATE_FLAG_NPC_ANIM;
 }
+/*
 */
 
 /*

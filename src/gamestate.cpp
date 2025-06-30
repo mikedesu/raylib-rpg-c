@@ -552,6 +552,23 @@ bool g_add_race(shared_ptr<gamestate> g, entityid id, race_t race) {
 }
 
 
+bool g_update_race(shared_ptr<gamestate> g, entityid id, race_t race) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g_has_race(g, id)) {
+        merror("g_update_race: id %d does not have a race component", id);
+        return false;
+    }
+    if (!g->race_list) {
+        merror("g->race_list is NULL");
+        return false;
+    }
+    // Update
+    (*g->race_list)[id] = race; // Insert or update the type
+    return true;
+}
+
+
 bool g_has_loc(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
