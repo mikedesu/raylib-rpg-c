@@ -2118,7 +2118,7 @@ static void draw_character_creation_screen(shared_ptr<gamestate> g) {
     //DrawText(buffer, x, y, font_size, WHITE);
     DrawText(TextFormat("Name: %s", g->chara_creation->name.c_str()), x, y, font_size, WHITE);
     y += font_size + 4;
-    DrawText(TextFormat("Race: %s", get_race_str(g->chara_creation->race).c_str()), x, y, font_size, WHITE);
+    DrawText(TextFormat("Race: %s", race2str(g->chara_creation->race).c_str()), x, y, font_size, WHITE);
     y += font_size + 4;
     DrawText(TextFormat("Hitdie: %d", g->chara_creation->hitdie), x, y, font_size, WHITE);
     y += font_size + 4;
