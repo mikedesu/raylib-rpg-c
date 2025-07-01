@@ -434,15 +434,7 @@ static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
 static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     // Static buffers to avoid reallocating every frame
-    //static const char* control_modes[] = {"Player", "Camera", "Unknown"};
     static const char* control_modes[] = {"Camera", "Player", "Unknown"};
-    //static const char* flag_names[] = {"GAMESTATE_FLAG_NONE",
-    //                                   "GAMESTATE_FLAG_PLAYER_INPUT",
-    //                                   "GAMESTATE_FLAG_PLAYER_ANIM",
-    //                                   "GAMESTATE_FLAG_NPC_TURN",
-    //                                   "GAMESTATE_FLAG_NPC_ANIM",
-    //                                   "GAMESTATE_FLAG_COUNT",
-    //                                   "Unknown"};
     // Get hero position once
     int x = -1;
     int y = -1;
@@ -453,7 +445,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
     direction_t shield_dir = DIR_NONE;
     bool is_b = false;
     bool test_guard = g->test_guard;
-    //vec3 loc = g_get_location(g, g->hero_id);
+    vec3 loc = g_get_loc(g, g->hero_id);
     //x = loc.x;
     //y = loc.y;
     //z = loc.z;
@@ -518,9 +510,9 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
              g->next_entityid,
              flag_name,
              g->entity_turn,
-             x,
-             y,
-             z,
+             loc.x,
+             loc.y,
+             loc.z,
              inventory_count,
              0, //g->msg_history.count,
              get_dir_as_string(shield_dir),
@@ -945,8 +937,10 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     vec3 loc = g_get_loc(g, id);
     // we will have a special case for traversing floors so ignore v.z
     vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
+
     minfo("Entity %d trying to move in (%d, %d, %d) direction", id, v.x, v.y, v.z);
     minfo("Entity %d is currently at (%d, %d, %d)", id, loc.x, loc.y, loc.z);
+    minfo("Entity %d wants to go to (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
 
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     if (!df) {
@@ -993,8 +987,10 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
         return false;
     }
 
-    g_update_loc(g, g->hero_id, aloc);
-    g_update_sprite_move(g, g->hero_id, (Rectangle){mx, my, 0, 0});
+    g_update_loc(g, id, aloc);
+    g_update_sprite_move(g, id, (Rectangle){mx, my, 0, 0});
+
+    msuccess("Entity %d moved to (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
 
     return true;
 
@@ -2887,7 +2883,7 @@ static void handle_npc(shared_ptr<gamestate> g, entityid id) {
         race_t race = g_get_race(g, id);
         minfo("NPC %d race: %s", id, race2str(race).c_str());
 
-        //try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+        try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
 
         //if (g_get_type(g, id) == ENTITY_NPC) {
         //execute_action(g, id, g_get_default_action(g, id));
