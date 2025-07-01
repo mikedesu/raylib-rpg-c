@@ -107,7 +107,9 @@ bool spritegroup_set_current(spritegroup_t* const sg, int index) {
     massert(index >= 0, "index is negative: %d, %d", index, sg->size);
     massert(index < sg->size, "index is out of bounds for id %d: %d, %d", sg->id, index, sg->size);
     // Debug log for death animation tracking
-    if (sg->current != index) minfo("Animation change: %d -> %d (EntityID: %d)", sg->current, index, sg->id);
+    //if (sg->current != index) {
+    //    minfo("Animation change: %d -> %d (EntityID: %d)", sg->current, index, sg->id);
+    //}
     sg->current = index;
     return true;
 }
