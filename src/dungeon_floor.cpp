@@ -281,8 +281,10 @@ shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height) {
         tile_init(tile, TILE_FLOOR_STONE_00);
 
         tile->id = i;
-        //tile->type = TILE_NONE;
-        tile->type = TILE_FLOOR_STONE_00;
+        ////tile->type = TILE_NONE;
+        // for each tile in the dungeon floor, select a random tile between TILE_FLOOR_STONE_00 and 11
+        tile->type = (tiletype_t)(TILE_FLOOR_STONE_00 + (rand() % (TILE_FLOOR_STONE_11 - TILE_FLOOR_STONE_00 + 1)));
+        //tile->type = TILE_FLOOR_STONE_00;
         tile->visible = true;
 
         df->tile_map->insert({i, tile});

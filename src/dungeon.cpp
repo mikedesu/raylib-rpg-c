@@ -67,22 +67,24 @@ bool d_add_floor(shared_ptr<dungeon_t> dungeon, int width, int height) {
     }
     // Initialize the new floor
     minfo("Initializing new floor with dimensions %dx%d", width, height);
+
+
     //df_init(new_floor);
     // Add a room
-    int w = 20;
-    int h = 20;
+    //int w = 20;
+    //int h = 20;
     // Get center of the floor
-    int cx = width / 2;
-    int cy = height / 2;
-    minfo("Creating room at center (%d, %d) with size %dx%d", cx, cy, w, h);
+    //int cx = width / 2;
+    //int cy = height / 2;
+    //minfo("Creating room at center (%d, %d) with size %dx%d", cx, cy, w, h);
     //df_set_tile_area_range(new_floor, cx, cy, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     // Assign upstairs and downstairs locations
-    minfo("Assigning upstairs and downstairs in area (%d, %d, %d, %d)", 0, 0, width, height);
+    //minfo("Assigning upstairs and downstairs in area (%d, %d, %d, %d)", 0, 0, width, height);
     df_assign_upstairs_in_area(new_floor, 0, 0, width, height);
-    minfo("Assigning downstairs in area (%d, %d, %d, %d)", 0, 0, width, height);
+    //minfo("Assigning downstairs in area (%d, %d, %d, %d)", 0, 0, width, height);
     df_assign_downstairs_in_area(new_floor, 0, 0, width, height);
     // Add the new floor to the dungeon
-    minfo("Adding new floor to dungeon");
+    //minfo("Adding new floor to dungeon");
     dungeon->floors->push_back(shared_ptr<dungeon_floor_t>(new_floor));
     msuccess("Added new floor %d to dungeon", current_floor);
     return true;
