@@ -337,55 +337,57 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
     }
 
     if (g->controlmode == CONTROLMODE_PLAYER) {
-        vec3 loc = g_get_loc(g, g->hero_id);
-        if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
-            try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return;
-        }
-        if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
-            try_entity_move(g, g->hero_id, (vec3){0, 1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return;
-        }
-        if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
-            try_entity_move(g, g->hero_id, (vec3){-1, 0, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return;
-        }
-        if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
-            try_entity_move(g, g->hero_id, (vec3){1, 0, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return;
-        }
-        if (inputstate_is_pressed(is, KEY_Q)) {
-            try_entity_move(g, g->hero_id, (vec3){-1, -1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return;
-        }
-        if (inputstate_is_pressed(is, KEY_E)) {
-            try_entity_move(g, g->hero_id, (vec3){1, -1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return;
-        }
-        if (inputstate_is_pressed(is, KEY_Z)) {
-            try_entity_move(g, g->hero_id, (vec3){-1, 1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return;
-        }
-        if (inputstate_is_pressed(is, KEY_C)) {
-            try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return;
+        if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+            vec3 loc = g_get_loc(g, g->hero_id);
+            if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
+                try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
+            }
+            if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
+                try_entity_move(g, g->hero_id, (vec3){0, 1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
+            }
+            if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+                try_entity_move(g, g->hero_id, (vec3){-1, 0, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
+            }
+            if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
+                try_entity_move(g, g->hero_id, (vec3){1, 0, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
+            }
+            if (inputstate_is_pressed(is, KEY_Q)) {
+                try_entity_move(g, g->hero_id, (vec3){-1, -1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
+            }
+            if (inputstate_is_pressed(is, KEY_E)) {
+                try_entity_move(g, g->hero_id, (vec3){1, -1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
+            }
+            if (inputstate_is_pressed(is, KEY_Z)) {
+                try_entity_move(g, g->hero_id, (vec3){-1, 1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
+            }
+            if (inputstate_is_pressed(is, KEY_C)) {
+                try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
+            }
+            if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+                g_set_attacking(g, g->hero_id, true);
+                g_set_update(g, g->hero_id, true);
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
+            }
         }
 
-
-        if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-            g_set_attacking(g, g->hero_id, true);
-            g_set_update(g, g->hero_id, true);
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return;
-        }
+        // if g->flag is not player input, the player might still have access to menus
 
         //if (g->gameover) {
         //    // if the game is over, we can restart the game
@@ -468,7 +470,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
     //const char* flag_name = flag_names[(g->flag >= GAMESTATE_FLAG_NONE && g->flag < GAMESTATE_FLAG_COUNT) ? g->flag : GAMESTATE_FLAG_COUNT];
-    const char* flag_name = GAMESTATE_FLAG_TOSTR(g->flag);
+    //const char* flag_name = GAMESTATE_FLAG_TOSTR(g->flag);
     // zero out the buffer
     memset(g->debugpanel.buffer, 0, sizeof(g->debugpanel.buffer));
     // Format the string in one pass
@@ -483,7 +485,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
              "Is3D: %d\n"
              "Cam: (%.0f,%.0f) Zoom: %.1f\n"
              "Mode: %s | Floor: %d/%d | Entities: %d\n"
-             "Flag: %s\n"
+             "Flag: %d\n"
              "Turn: %d | Hero: (%d,%d,%d)\n"
              "Inventory: %d\n"
              "msg_history.count: %d\n"
@@ -508,7 +510,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
              0, //g->d->current_floor + 1, // More user-friendly 1-based
              0, //g->d->num_floors,
              g->next_entityid,
-             flag_name,
+             g->flag,
              g->entity_turn,
              loc.x,
              loc.y,
@@ -532,6 +534,8 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //g->msg_system.is_active = false;
     init_player(g);
     npc_create_set_stats(g, (vec3){2, 2, 0}, RACE_GREEN_SLIME);
+    npc_create_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
+    npc_create_set_stats(g, (vec3){4, 4, 0}, RACE_WOLF);
     msuccess("liblogic_init: Game state initialized");
 }
 
@@ -541,7 +545,7 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     // Spawn NPCs periodically
-    //try_spawn_npc(g);
+    try_spawn_npc(g);
     update_player_state(g);
     //update_npcs_state(g);
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
@@ -2759,7 +2763,7 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
     static bool do_this_once = true;
     //static int x = 1;
     //static int y = 1;
-    int every_nth_turn = 100;
+    int every_nth_turn = 4;
     if (g->turn_count % every_nth_turn == 0) {
         entityid success = ENTITYID_INVALID;
         if (do_this_once) {

@@ -67,7 +67,7 @@ int libdraw_restart_count = 0;
 //static int get_total_ac(gamestate* const g, entityid id);
 static int get_total_ac(shared_ptr<gamestate> g, entityid id);
 
-static inline bool libdraw_camera_lock_on(shared_ptr<gamestate> g);
+static inline bool camera_lock_on(shared_ptr<gamestate> g);
 static inline void update_debug_panel(shared_ptr<gamestate> g);
 static inline void handle_debug_panel(shared_ptr<gamestate> g);
 
@@ -498,13 +498,19 @@ static void libdraw_unload_shaders() {
     UnloadShader(shader_psychedelic_0);
 }
 
-static inline bool libdraw_camera_lock_on(shared_ptr<gamestate> g) {
+static inline bool camera_lock_on(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (!g->cam_lockon) {
         return false;
     }
     spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
-    massert(grp, "spritegroup is NULL");
+    if (!grp) {
+        merror("camera_lock_on: spritegroup is NULL for hero_id %d", g->hero_id);
+        minfo("hero may not have been created yet");
+        return false;
+    }
+
+    //massert(grp, "spritegroup is NULL");
     // get the old camera position
     Vector2 old_target = g->cam2d.target;
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
@@ -925,7 +931,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
 
-    //libdraw_camera_lock_on(g);
+    camera_lock_on(g);
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     //EndShaderMode();
@@ -937,7 +943,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
 
     //draw_message_history(g);
     //draw_message_box(g);
-    //draw_hud(g);
+    draw_hud(g);
 
     //if (g->display_inventory_menu) {
     //    draw_inventory_menu(g);
@@ -1457,24 +1463,23 @@ static int get_total_ac(shared_ptr<gamestate> g, entityid id) {
 }
 */
 
-/*
 static void draw_hud(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    int stat_count = 0;
-    int* stats = g_get_stats(g, g->hero_id, &stat_count);
-    massert(stats, "stats is NULL");
+    //int stat_count = 0;
+    //int* stats = g_get_stats(g, g->hero_id, &stat_count);
+    //massert(stats, "stats is NULL");
     int turn = g->turn_count;
-    int hp = stats[STATS_HP];
-    int maxhp = stats[STATS_MAXHP];
-    int level = stats[STATS_LEVEL];
-    int xp = stats[STATS_XP];
-    int next_level_xp = stats[STATS_NEXT_LEVEL_XP];
-    int attack_bonus = stats[STATS_ATTACK_BONUS];
-    int str = stats[STATS_STR];
-    int con = stats[STATS_CON];
-    int dex = stats[STATS_DEX];
-    int ac = get_total_ac(g, g->hero_id);
-    int floor = g->d->current_floor;
+    int hp = 0;
+    int maxhp = 0;
+    int level = 0;
+    int xp = 0;
+    int next_level_xp = 0;
+    int attack_bonus = 0;
+    int str = 0;
+    int con = 0;
+    int dex = 0;
+    int ac = 0;
+    int floor = g->dungeon->current_floor;
     int font_size = 10;
     char buffer[1024] = {0};
     const char* format_str = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d STR: "
@@ -1495,31 +1500,21 @@ static void draw_hud(shared_ptr<gamestate> g) {
              dex,
              floor,
              turn);
-    Vector2 text_size =
-        MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
+    Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
     int box_w = text_size.x + g->pad;
     int box_h = text_size.y + g->pad;
     int box_x = 0;
     int box_y = 0;
     Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
-    DrawRectangleRec(
-        (Rectangle){(float)box_x, (float)box_y, (float)box_w, (float)box_h},
-        bg);
+    DrawRectangleRec((Rectangle){(float)box_x, (float)box_y, (float)box_w, (float)box_h}, bg);
     int line_thickness = 1;
-    DrawRectangleLinesEx(
-        (Rectangle){(float)box_x, (float)box_y, (float)box_w, (float)box_h},
-        line_thickness,
-        fg);
+    DrawRectangleLinesEx((Rectangle){(float)box_x, (float)box_y, (float)box_w, (float)box_h}, line_thickness, fg);
     // Calculate text position to center it within the box
     float text_x = box_x + (box_w - text_size.x) / 2;
     float text_y = box_y + (box_h - text_size.y) / 2;
-    DrawTextEx(GetFontDefault(),
-               buffer,
-               (Vector2){text_x, text_y},
-               font_size,
-               g->line_spacing,
-               fg);
+    DrawTextEx(GetFontDefault(), buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, fg);
 }
+/*
 */
 
 void libdraw_init_rest(shared_ptr<gamestate> g) {
@@ -1602,7 +1597,7 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     //SetMusicVolume(music, g->music_volume); // Set initial music volume
     //SetMusicLooping(music, true); // Loop the music
     //PlayMusicStream(music);
-    //if (!libdraw_camera_lock_on(g)) merror("failed to lock camera on hero");
+    if (!camera_lock_on(g)) merror("failed to lock camera on hero");
 
     msuccess("libdraw_init_rest: done");
 }
