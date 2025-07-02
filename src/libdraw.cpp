@@ -104,7 +104,8 @@ static void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id,
 static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
 static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_message_history(shared_ptr<gamestate> g);
-static void draw_message_box(gamestate* g);
+//static void draw_message_box(gamestate* g);
+static void draw_message_box(shared_ptr<gamestate> g);
 static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id);
 static void draw_debug_panel(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d(shared_ptr<gamestate> g);
@@ -942,7 +943,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     EndMode2D();
 
     //draw_message_history(g);
-    //draw_message_box(g);
+    draw_message_box(g);
     draw_hud(g);
 
     //if (g->display_inventory_menu) {
@@ -980,14 +981,20 @@ static void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g) {
 /*
 */
 
-/*
-static void draw_message_box(gamestate* g) {
-    if (!g->msg_system.is_active || g->msg_system.count == 0) return;
+//static void draw_message_box(gamestate* g) {
+static void draw_message_box(shared_ptr<gamestate> g) {
+    if (!g->msg_system_is_active || g->msg_system->size() == 0) {
+        return;
+    }
     //const char* prompt = "[A] Next";
-    char* msg = g->msg_system.messages[g->msg_system.index];
+    //char* msg = g->msg_system.messages[g->msg_system.index];
+    //char* msg = g->msg_system.messages[g->msg_system.index];
+    //string msg = g->msg_system->at(g->msg_system->size() - 1);
+    string msg = g->msg_system->at(0);
+    //char* msg = g->msg_system->at(g->msg_system->size()-1);
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     char tmp[1024] = {0};
-    snprintf(tmp, sizeof(tmp), "%s", msg);
+    snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
     int font_size = 10;
     int measure = MeasureText(tmp, font_size);
     int text_width = measure;
@@ -999,10 +1006,7 @@ static void draw_message_box(gamestate* g) {
     int x = (w - text_width) / 2.0 - g->pad;
     //int y = (h - text_height) / 8.0 - g->pad;
     int y = 42;
-    Rectangle box = {(float)x,
-                     (float)y,
-                     (float)text_width + g->pad * 2,
-                     (float)text_height + g->pad * 2};
+    Rectangle box = {(float)x, (float)y, (float)text_width + g->pad * 2, (float)text_height + g->pad * 2};
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);
     DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
@@ -1017,7 +1021,6 @@ static void draw_message_box(gamestate* g) {
     //             WHITE);
     //}
 }
-*/
 
 
 static inline void update_debug_panel(shared_ptr<gamestate> g) {

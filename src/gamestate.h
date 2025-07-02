@@ -189,6 +189,8 @@ typedef struct gamestate {
     std::vector<string>* msg_system;
     std::vector<string>* msg_history;
 
+    bool msg_system_is_active;
+
     std::shared_ptr<keybinding_list_t> keybinding_list;
 
     int current_music_index;

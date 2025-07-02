@@ -337,6 +337,17 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
     }
 
     if (g->controlmode == CONTROLMODE_PLAYER) {
+        if (g->msg_system_is_active) {
+            // press enter to cycle thru message
+            if (inputstate_is_pressed(is, KEY_ENTER)) {
+                // only erase the first in the vector
+                g->msg_system->erase(g->msg_system->begin());
+            }
+            // player must advance thru new messages
+            return;
+        }
+
+
         if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
             vec3 loc = g_get_loc(g, g->hero_id);
             if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
@@ -385,6 +396,7 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 return;
             }
+            return;
         }
 
         // if g->flag is not player input, the player might still have access to menus

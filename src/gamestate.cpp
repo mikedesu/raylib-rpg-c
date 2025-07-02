@@ -16,8 +16,6 @@
 #include <string>
 #include <unordered_map>
 
-//#include "direction.h"
-//#include "entity_actions.h"
 //#include "inventory_sort.h"
 //#include "item.h"
 //#include "potion.h"
@@ -49,6 +47,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     shared_ptr<gamestate> g = make_shared<gamestate>();
     massert(g, "g is NULL");
 
+    g->msg_system_is_active = false;
     g->version = GAME_VERSION;
     g->cam_lockon = true;
     g->frame_dirty = true;
