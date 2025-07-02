@@ -37,6 +37,7 @@ using std::string;
 int liblogic_restart_count = 0;
 
 //static inline void reset_player_blocking(shared_ptr<gamestate> g);
+static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
 static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -344,6 +345,11 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
                 g->msg_system->erase(g->msg_system->begin());
             }
             // player must advance thru new messages
+
+            if (g->msg_system->size() == 0) {
+                g->msg_system_is_active = false;
+            }
+
             return;
         }
 
@@ -488,6 +494,8 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
     // Format the string in one pass
     snprintf(g->debugpanel.buffer,
              sizeof(g->debugpanel.buffer),
+             "@evildojo666\n"
+             "project.rpg\n"
              "%s\n" // timebeganbuf
              "%s\n" // currenttimebuf
              "Frame : %d\n"
@@ -496,18 +504,19 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
              "Draw Time: %.1fms\n"
              "Is3D: %d\n"
              "Cam: (%.0f,%.0f) Zoom: %.1f\n"
-             "Mode: %s | Floor: %d/%d | Entities: %d\n"
+             "Mode: %s \n"
+             "Floor: %d/%d \n"
+             "Entities: %d\n"
              "Flag: %d\n"
-             "Turn: %d | Hero: (%d,%d,%d)\n"
+             "Turn: %d\n"
+             "Hero: (%d,%d,%d)\n"
              "Inventory: %d\n"
              "msg_history.count: %d\n"
              "shield_dir_str: %s\n"
              "player_dir_str: %s\n"
              "is_blocking: %d\n"
              "test_guard: %d\n"
-             "inventory_sort_menu_selection: %d\n"
-             "HELLO TWITCH AND YOUTUBE!\n"
-             "66666\n",
+             "inventory_sort_menu_selection: %d\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -548,6 +557,11 @@ void liblogic_init(shared_ptr<gamestate> g) {
     npc_create_set_stats(g, (vec3){2, 2, 0}, RACE_GREEN_SLIME);
     npc_create_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
     npc_create_set_stats(g, (vec3){4, 4, 0}, RACE_WOLF);
+
+
+    add_message(g, "Welcome to the game!");
+    add_message(g, "To move around, press q w e a d z x c");
+
     msuccess("liblogic_init: Game state initialized");
 }
 
@@ -884,24 +898,35 @@ static void add_message_and_history(gamestate* g, const char* fmt, ...) {
 }
 */
 
-/*
-static void add_message(gamestate* g, const char* fmt, ...) {
+static void add_message(shared_ptr<gamestate> g, const char* fmt, ...) {
     massert(g, "gamestate is NULL");
     massert(fmt, "format string is NULL");
-    if (g->msg_system.count >= MAX_MESSAGES) {
-        mwarning("Message queue full!");
-        return;
-    }
+    //if (g->msg_system.count >= MAX_MESSAGES) {
+    //    mwarning("Message queue full!");
+    //    return;
+    //}
+
+
+    minfo("attempting to add message...");
     va_list args;
     va_start(args, fmt);
-    vsnprintf(g->msg_system.messages[g->msg_system.count],
-              MAX_MSG_LENGTH - 1,
-              fmt,
-              args);
+
+    char buffer[MAX_MSG_LENGTH];
+
+    //vsnprintf(g->msg_system.messages[g->msg_system.count], MAX_MSG_LENGTH - 1, fmt, args);
+    minfo("calling vsnprintf...");
+    vsnprintf(buffer, MAX_MSG_LENGTH - 1, fmt, args);
     va_end(args);
-    g->msg_system.count++;
-    g->msg_system.is_active = true;
+
+    minfo("creating string...");
+    string s(buffer);
+    minfo("pushing string...");
+    g->msg_system->push_back(s);
+    //g->msg_system.count++;
+    g->msg_system_is_active = true;
+    msuccess("message added");
 }
+/*
 */
 
 //static void update_equipped_shield_dir(gamestate* g, entity* e) {

@@ -104,7 +104,6 @@ static void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id,
 static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
 static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_message_history(shared_ptr<gamestate> g);
-//static void draw_message_box(gamestate* g);
 static void draw_message_box(shared_ptr<gamestate> g);
 static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id);
 static void draw_debug_panel(shared_ptr<gamestate> g);
@@ -884,25 +883,15 @@ static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
 
 static void draw_debug_panel(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f), fg = WHITE;
-    // temporary hook for positioning the debug panel
-    //int w = DEFAULT_TARGET_WIDTH;
-    //int h = DEFAULT_TARGET_HEIGHT;
-    int x = 0;
-    int y = 0;
-    int fontsize = 20;
-    //int w0 = g->debugpanel.w + g->debugpanel.pad_left + g->debugpanel.pad_right * 4;
-    //int h0 = g->debugpanel.h + g->debugpanel.pad_top + g->debugpanel.pad_bottom;
-    //int x1 = g->debugpanel.x + g->debugpanel.pad_left;
-    //int y1 = g->debugpanel.y + g->debugpanel.pad_top;
-    //DrawRectangle(g->debugpanel.x, g->debugpanel.y, w0, h0, bg);
-
+    Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f);
+    Color fg = WHITE;
+    int fontsize = 10;
     int w = MeasureText(g->debugpanel.buffer, fontsize);
-    int h = fontsize * 22; // Assuming single line text for now
-
-    DrawRectangle(x, y, w, h, bg);
-    //DrawText(g->debugpanel.buffer, x1, y1, g->debugpanel.font_size, fg);
-    DrawText(g->debugpanel.buffer, x, y, fontsize, fg);
+    int h = fontsize * 30; // Assuming single line text for now
+    int x = DEFAULT_TARGET_WIDTH - w;
+    int y = fontsize * 2;
+    DrawRectangle(x - 10 - 20, y - 10, w + 20, h + 20, bg);
+    DrawText(g->debugpanel.buffer, x - 20, y, fontsize, fg);
 }
 
 /*
@@ -981,21 +970,15 @@ static void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g) {
 /*
 */
 
-//static void draw_message_box(gamestate* g) {
 static void draw_message_box(shared_ptr<gamestate> g) {
     if (!g->msg_system_is_active || g->msg_system->size() == 0) {
         return;
     }
-    //const char* prompt = "[A] Next";
-    //char* msg = g->msg_system.messages[g->msg_system.index];
-    //char* msg = g->msg_system.messages[g->msg_system.index];
-    //string msg = g->msg_system->at(g->msg_system->size() - 1);
     string msg = g->msg_system->at(0);
-    //char* msg = g->msg_system->at(g->msg_system->size()-1);
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
-    int font_size = 10;
+    int font_size = 20;
     int measure = MeasureText(tmp, font_size);
     int text_width = measure;
     int text_height = font_size;
@@ -1168,7 +1151,8 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     } else if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_drawframe_2d_from_texture(g);
     }
-    DrawFPS(0, 0);
+    DrawFPS(0, DEFAULT_TARGET_HEIGHT - 20);
+
     //handle_debug_panel(g);
     EndTextureMode();
     // draw the target texture to the window

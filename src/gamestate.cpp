@@ -138,6 +138,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     gamestate_init_music_paths(g);
 
     g->msg_history = new vector<string>();
+    g->msg_system = new vector<string>();
 
     // initialize character creation
     g->chara_creation = make_shared<character_creation>();
