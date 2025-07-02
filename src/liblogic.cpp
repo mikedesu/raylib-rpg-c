@@ -757,7 +757,7 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 //                          entityid attacker_id,
 //                          entityid target_id);
 
-//static race_t get_random_race();
+static race_t get_random_race();
 
 /*
 static int calc_reward_xp(shared_ptr<gamestate> g,
@@ -2686,7 +2686,6 @@ static vec3 get_base_attack_damage_for_race(race_t race) {
 }
 */
 
-/*
 static race_t get_random_race() {
     race_t race = RACE_NONE;
     int num_choices = 10;
@@ -2706,6 +2705,7 @@ static race_t get_random_race() {
     }
     return race;
 }
+/*
 */
 
 /*
@@ -2807,7 +2807,22 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
             while (success == ENTITYID_INVALID) {
                 int current_floor = g->dungeon->current_floor;
                 //vec3 loc = get_random_available_loc(g, current_floor);
-                vec3 loc = (vec3){1, 1, current_floor}; // Placeholder for actual location logic
+
+                // generate a random location for NPC spawn
+
+                int x = rand() % g->dungeon->floors->at(current_floor)->width + 1;
+                int y = rand() % g->dungeon->floors->at(current_floor)->height + 1;
+                // Get the tile at that location and check the type of the tile
+                // If the tile is not walkable, success is still invalid and we should continue
+
+                vec3 loc = {x, y, current_floor};
+                shared_ptr<tile_t> tile = df_tile_at(g->dungeon->floors->at(current_floor), loc);
+                if (!tile || tile_is_walkable(tile->type) == false) {
+                    merror("Tile at %d, %d, %d is not walkable", x, y, current_floor);
+                    continue; // Tile is not walkable, try again
+                }
+
+                //vec3 loc = (vec3){1, 1, current_floor}; // Placeholder for actual location logic
                 if (loc.x == -1 && loc.y == -1 && loc.z == -1) {
                     merror("No available location found for NPC spawn");
                     return; // No valid location found, exit early
@@ -2818,8 +2833,9 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
                 //if (y > g->dungeon->floors->at(current_floor)->height) {
                 //    y = 1; // Reset y to 1 if it exceeds height
                 //}
-                //race_t race = get_random_race_for_floor(current_floor);
-                race_t race = RACE_ORC;
+                race_t race = get_random_race();
+                //race_t race = RACE_ORC;
+
                 success = npc_create_set_stats(g, loc, race);
             }
             do_this_once = false;
