@@ -70,6 +70,7 @@ typedef enum component_t
     C_LIGHT_RADIUS_BONUS = 31,
     C_EXPLORED_LIST = 32,
     C_VISIBLE_LIST = 33,
+    C_TX_ALPHA = 34,
     C_COUNT
     //C_SPELL_EFFECT,
 } component;

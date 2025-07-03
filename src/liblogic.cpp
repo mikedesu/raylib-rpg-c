@@ -2800,7 +2800,7 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
     static bool do_this_once = true;
     //static int x = 1;
     //static int y = 1;
-    int every_nth_turn = 4;
+    int every_nth_turn = 2;
     if (g->turn_count % every_nth_turn == 0) {
         entityid success = ENTITYID_INVALID;
         if (do_this_once) {

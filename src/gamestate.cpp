@@ -173,6 +173,10 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->block_success_list = new unordered_map<entityid, bool>();
     g->damaged_list = new unordered_map<entityid, bool>();
 
+
+    g->tx_alpha_list = new unordered_map<entityid, int>();
+
+
     gamestate_load_keybindings(g);
     msuccess("Gamestate initialized successfully");
     return g;
@@ -313,7 +317,7 @@ void gamestate_free(shared_ptr<gamestate> g) {
     if (g->blocking_list) delete g->blocking_list;
     if (g->block_success_list) delete g->block_success_list;
     if (g->damaged_list) delete g->damaged_list;
-
+    if (g->tx_alpha_list) delete g->tx_alpha_list;
 
     if (g->monster_defs) {
         free(g->monster_defs);
@@ -1067,6 +1071,90 @@ bool g_get_damaged(shared_ptr<gamestate> g, entityid id) {
     }
     merror("g_get_damaged: id %d does not have a damaged component", id);
     return false; // Return false if the id is not found
+}
+
+
+bool g_get_tx_alpha(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->tx_alpha_list) {
+        massert(g->tx_alpha_list->find(id) != g->tx_alpha_list->end(), "g_get_tx_alpha: id %d not found in tx alpha list", id);
+        return g->tx_alpha_list->at(id);
+    }
+    merror("g_get_tx_alpha: id %d does not have a tx alpha component", id);
+    return -1; // Return -1 if the id is not found
+}
+
+
+bool g_set_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->tx_alpha_list) {
+        merror("g->tx_alpha_list is NULL");
+        return false;
+    }
+    // Check if the entity has a tx alpha component
+    if (g->tx_alpha_list->find(id) != g->tx_alpha_list->end()) {
+        // Update the tx alpha for the entity
+        (*g->tx_alpha_list)[id] = alpha; // Update the tx alpha
+        return true;
+    }
+    merror("g_set_tx_alpha: id %d does not have a tx alpha component", id);
+    return false;
+}
+
+
+bool g_add_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_TX_ALPHA)) {
+        merror("g_add_tx_alpha: Failed to add component C_TX_ALPHA for id %d", id);
+        return false;
+    }
+    if (!g->tx_alpha_list) {
+        merror("g->tx_alpha_list is NULL");
+        return false;
+    }
+    // Check if the tx alpha already exists for the entity
+    (*g->tx_alpha_list)[id] = alpha; // Insert or update the tx alpha
+    return true;
+}
+
+
+bool g_incr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->tx_alpha_list) {
+        merror("g->tx_alpha_list is NULL");
+        return false;
+    }
+    // Check if the entity has a tx alpha component
+    if (g->tx_alpha_list->find(id) != g->tx_alpha_list->end()) {
+        // Increment the tx alpha for the entity
+        (*g->tx_alpha_list)[id] += alpha; // Increment the tx alpha
+        return true;
+    }
+    merror("g_incr_tx_alpha: id %d does not have a tx alpha component", id);
+    return false;
+}
+
+
+bool g_decr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->tx_alpha_list) {
+        merror("g->tx_alpha_list is NULL");
+        return false;
+    }
+    // Check if the entity has a tx alpha component
+    if (g->tx_alpha_list->find(id) != g->tx_alpha_list->end()) {
+        // Decrement the tx alpha for the entity
+        (*g->tx_alpha_list)[id] -= alpha; // Decrement the tx alpha
+        return true;
+    }
+    merror("g_decr_tx_alpha: id %d does not have a tx alpha component", id);
+    return false;
 }
 
 

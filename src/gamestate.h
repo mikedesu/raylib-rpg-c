@@ -100,6 +100,8 @@ typedef struct gamestate {
     std::unordered_map<entityid, bool>* block_success_list;
     std::unordered_map<entityid, bool>* damaged_list;
 
+    std::unordered_map<entityid, int>* tx_alpha_list;
+
     //std::unordered_map<entityid, inventory_component>* inventory_list;
 
     //inventory_component* inventory_list;
@@ -314,6 +316,14 @@ bool g_has_damaged(std::shared_ptr<gamestate> g, entityid id);
 bool g_add_damaged(std::shared_ptr<gamestate> g, entityid id, int damaged);
 bool g_set_damaged(std::shared_ptr<gamestate> g, entityid id, int damaged);
 bool g_get_damaged(std::shared_ptr<gamestate> g, entityid id);
+
+
+bool g_get_tx_alpha(std::shared_ptr<gamestate> g, entityid id);
+bool g_set_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
+bool g_add_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
+bool g_incr_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
+bool g_decr_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
+
 
 //bool g_has_default_action(std::shared_ptr<gamestate> g, entityid id);
 //bool g_add_default_action(std::shared_ptr<gamestate> g, entityid id, int action);
