@@ -30,7 +30,9 @@ typedef struct {
 
 std::shared_ptr<tile_t> tile_create(tiletype_t type);
 
+//entityid tile_add(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> tile, entityid id);
 entityid tile_add(std::shared_ptr<tile_t> tile, entityid id);
+//entityid tile_remove(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> tile, entityid id);
 entityid tile_remove(std::shared_ptr<tile_t> tile, entityid id);
 
 size_t tile_live_npc_count_at(std::shared_ptr<gamestate> g, int x, int y, int z);
@@ -47,7 +49,11 @@ static inline size_t tile_entity_count(const std::shared_ptr<tile_t> t) {
 
 static inline entityid tile_get_entity(const std::shared_ptr<tile_t> t, size_t i) {
     massert(t, "tile is NULL");
-    return i < t->entities->size() ? t->entities->at(i) : ENTITYID_INVALID;
+    entityid retval = ENTITYID_INVALID;
+    if (i < t->entities->size()) {
+        retval = t->entities->at(i);
+    }
+    return retval;
 }
 
 static inline bool tile_has_live_npcs(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> t) {
@@ -65,7 +71,9 @@ static inline size_t tile_live_npc_count(std::shared_ptr<gamestate> g, std::shar
 }
 
 static inline bool tile_has_player(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> t) {
-    if (!t) return false;
+    if (!t) {
+        return false;
+    }
     recompute_entity_cache(g, t);
     return t->cached_player_present;
 }

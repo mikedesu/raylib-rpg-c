@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <vector>
 
+using std::find;
 using std::make_shared;
 using std::shared_ptr;
 using std::vector;
@@ -34,11 +35,11 @@ void tile_init(shared_ptr<tile_t> t, tiletype_t type) {
 }
 
 
-entityid tile_add(shared_ptr<tile_t> t, entityid id) {
+entityid tile_add(std::shared_ptr<tile_t> t, entityid id) {
     massert(t, "tile is NULL");
     massert(t->entities, "tile entities is NULL");
     // Check if the entity already exists
-    if (std::find(t->entities->begin(), t->entities->end(), id) != t->entities->end()) {
+    if (find(t->entities->begin(), t->entities->end(), id) != t->entities->end()) {
         merror("tile_add: entity already exists on tile");
         return ENTITYID_INVALID;
     }
@@ -48,11 +49,11 @@ entityid tile_add(shared_ptr<tile_t> t, entityid id) {
 }
 
 
-entityid tile_remove(shared_ptr<tile_t> tile, entityid id) {
+entityid tile_remove(std::shared_ptr<tile_t> tile, entityid id) {
     massert(tile, "tile is NULL");
     massert(tile->entities, "tile entities is NULL");
     massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
-    auto it = std::find(tile->entities->begin(), tile->entities->end(), id);
+    auto it = find(tile->entities->begin(), tile->entities->end(), id);
     if (it != tile->entities->end()) {
         tile->entities->erase(it);
         tile->dirty_entities = true;
@@ -77,9 +78,9 @@ shared_ptr<tile_t> tile_create(tiletype_t type) {
 
 
 void tile_free(shared_ptr<tile_t> t) {
-    if (!t) return;
-    t->entities->clear(); // Clear the entities vector
-    // Note: shared_ptr will automatically free the memory when it goes out of scope
+    if (t) {
+        t->entities->clear();
+    }
 }
 
 
@@ -98,6 +99,7 @@ void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
         entityid id = t->entities->at(i);
         // Skip dead entities
         if (g_is_dead(g, id)) {
+            merror("entity %d is dead", id);
             continue;
         }
         // Check entity type
@@ -121,7 +123,6 @@ void recompute_entity_cache_at(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(z < g->dungeon->floors->size(), "z is out of bounds");
     shared_ptr<dungeon_floor_t> df = g->dungeon->floors->at(z);
     massert(df, "failed to get dungeon floor");
-    //shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
     shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
     massert(t, "tile not found");
     recompute_entity_cache(g, t);
@@ -133,7 +134,7 @@ size_t tile_live_npc_count_at(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(x >= 0, "x is out of bounds");
     massert(y >= 0, "y is out of bounds");
     massert(z >= 0, "z is out of bounds");
-    //recompute_entity_cache_at(g, x, y, z);
+    recompute_entity_cache_at(g, x, y, z);
     shared_ptr<dungeon_t> d = g->dungeon;
     massert(d, "failed to get dungeon");
     shared_ptr<dungeon_floor_t> df = d_get_floor(d, z);
