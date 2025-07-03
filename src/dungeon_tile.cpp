@@ -35,19 +35,20 @@ void tile_init(shared_ptr<tile_t> t, tiletype_t type) {
     t->cached_live_npcs = 0;
 }
 
-//bool tile_resize(tile_t* t) {
-bool tile_resize(shared_ptr<tile_t> t) {
-    massert(t, "tile is NULL");
-    massert(t->entities, "tile entities is NULL");
-    if (t->entities->capacity() * 2 > DUNGEON_TILE_MAX_ENTITIES_MAX) {
-        merror("dungeon_tile_resize: new capacity exceeds max entities");
-        return false;
-    }
-    t->entities->reserve(t->entities->capacity() * 2);
-    return true;
-}
 
-//entityid tile_add(tile_t* const t, entityid id) {
+//bool tile_resize(tile_t* t) {
+//bool tile_resize(shared_ptr<tile_t> t) {
+//    massert(t, "tile is NULL");
+//    massert(t->entities, "tile entities is NULL");
+//    if (t->entities->capacity() * 2 > DUNGEON_TILE_MAX_ENTITIES_MAX) {
+//        merror("dungeon_tile_resize: new capacity exceeds max entities");
+//        return false;
+//    }
+//    t->entities->reserve(t->entities->capacity() * 2);
+//    return true;
+//}
+
+
 entityid tile_add(shared_ptr<tile_t> t, entityid id) {
     massert(t, "tile is NULL");
     massert(t->entities, "tile entities is NULL");
@@ -61,7 +62,7 @@ entityid tile_add(shared_ptr<tile_t> t, entityid id) {
     return id;
 }
 
-//entityid tile_remove(tile_t* tile, entityid id) {
+
 entityid tile_remove(shared_ptr<tile_t> tile, entityid id) {
     massert(tile, "tile is NULL");
     massert(tile->entities, "tile entities is NULL");
@@ -80,10 +81,6 @@ entityid tile_remove(shared_ptr<tile_t> tile, entityid id) {
 std::shared_ptr<tile_t> tile_create(tiletype_t type) {
     massert(type >= TILE_NONE, "tile_create: type is invalid");
     massert(type < TILE_COUNT, "tile_create: type is out of bounds");
-    //tile_t* t = (tile_t*)malloc(sizeof(tile_t));
-    //if (!t) {
-    //    return NULL;
-    //}
     shared_ptr<tile_t> t = make_shared<tile_t>();
     if (!t) {
         merror("tile_create: failed to allocate memory for tile");
@@ -93,61 +90,63 @@ std::shared_ptr<tile_t> tile_create(tiletype_t type) {
     return t;
 }
 
-//void tile_free(tile_t* t) {
+
 void tile_free(shared_ptr<tile_t> t) {
     if (!t) return;
     t->entities->clear(); // Clear the entities vector
-    //delete t->entities;
-    //free(t);
-    //t.reset(); // Use shared_ptr's reset to free memory
     // Note: shared_ptr will automatically free the memory when it goes out of scope
 }
 
-//void recompute_entity_cache(gamestate* g, tile_t* t, em_t* em) {
-//void recompute_entity_cache(gamestate* g, tile_t* t) {
-//void recompute_entity_cache(gamestate* g, shared_ptr<tile_t> t) {
-//    massert(g, "gamestate is NULL");
-//    massert(t, "tile is NULL");
-//    // Only recompute if cache is dirty
-//    if (!t->dirty_entities) return;
-//    // Reset counters
-//    t->cached_live_npcs = 0;
-//    t->cached_player_present = false;
-//    // Iterate through all entities on the tile
-//    for (entityid id : *t->entities) {
-//        // Skip dead entities
-//        //if (g_is_dead(g, id)) continue;
-//        // Check entity type
-//        entitytype_t type = g_get_type(g, id);
-//        if (type == ENTITY_NPC) {
-//            t->cached_live_npcs++;
-//        } else if (type == ENTITY_PLAYER) {
-//            t->cached_player_present = true;
-//        }
-//    }
-//    // Cache is now clean
-//    t->dirty_entities = false;
-//}
 
-//void recompute_entity_cache_at(gamestate* g, int x, int y, int z) {
-//    massert(g, "gamestate is NULL");
-//    massert(x >= 0, "x is out of bounds");
-//    massert(y >= 0, "y is out of bounds");
-//    massert(z >= 0, "z is out of bounds");
-//    massert(z < g->d->num_floors, "z is out of bounds");
-//    //dungeon_floor_t* const df = d_get_floor(g->dungeon, z);
-//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
-//    massert(df, "failed to get dungeon floor");
-//    //tile_t* const t = df_tile_at(df, (vec3){x, y, z});
-//    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
-//    if (!t) {
-//        merror("tile not found");
-//        return;
-//    }
-//    //recompute_entity_cache(g, t);
-//}
+void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
+    massert(g, "gamestate is NULL");
+    massert(t, "tile is NULL");
+    // Only recompute if cache is dirty
+    if (!t->dirty_entities) {
+        return;
+    }
+    // Reset counters
+    t->cached_live_npcs = 0;
+    t->cached_player_present = false;
+    // Iterate through all entities on the tile
+    for (int i = 0; i < t->entities->size(); i++) {
+        entityid id = t->entities->at(i);
+        // Skip dead entities
+        if (g_is_dead(g, id)) {
+            continue;
+        }
+        // Check entity type
+        entitytype_t type = g_get_type(g, id);
+        if (type == ENTITY_NPC) {
+            t->cached_live_npcs++;
+        } else if (type == ENTITY_PLAYER) {
+            t->cached_player_present = true;
+        }
+    }
+    // Cache is now clean
+    t->dirty_entities = false;
+}
 
-//size_t tile_live_npc_count_at(gamestate* g, int x, int y, int z) {
+
+void recompute_entity_cache_at(shared_ptr<gamestate> g, int x, int y, int z) {
+    massert(g, "gamestate is NULL");
+    massert(x >= 0, "x is out of bounds");
+    massert(y >= 0, "y is out of bounds");
+    massert(z >= 0, "z is out of bounds");
+    massert(z < g->dungeon->floors->size(), "z is out of bounds");
+    shared_ptr<dungeon_floor_t> df = g->dungeon->floors->at(z);
+    massert(df, "failed to get dungeon floor");
+    //shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
+    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
+    massert(t, "tile not found");
+    //if (!t) {
+    //    merror("tile not found");
+    //    return;
+    //}
+    recompute_entity_cache(g, t);
+}
+
+
 size_t tile_live_npc_count_at(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     massert(x >= 0, "x is out of bounds");

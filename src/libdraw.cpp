@@ -1545,8 +1545,8 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
 
     load_shaders();
 
-    int x = target_w / 2;
-    int y = target_h / 2;
+    int x = target_w / 2 - DEFAULT_TILE_SIZE;
+    int y = target_h / 2 - DEFAULT_TILE_SIZE * 10;
     g->cam2d.offset = (Vector2){(float)x, (float)y};
     //g->cam2d.zoom = 1.0f;
 

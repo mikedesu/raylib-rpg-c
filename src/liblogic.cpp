@@ -225,13 +225,15 @@ static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> i
 static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(g, "Game state is NULL!");
     massert(is, "Input state is NULL!");
-    if (inputstate_is_held(is, KEY_Z)) {
-        if (inputstate_is_shift_held(is)) {
-            g->cam2d.zoom -= (g->cam2d.zoom > 1.0) ? DEFAULT_ZOOM_INCR : 0.0;
-        } else {
-            g->cam2d.zoom += DEFAULT_ZOOM_INCR;
-        }
-    }
+
+
+    //if (inputstate_is_held(is, KEY_Z)) {
+    //    if (inputstate_is_shift_held(is)) {
+    //        g->cam2d.zoom -= (g->cam2d.zoom > 1.0) ? DEFAULT_ZOOM_INCR : 0.0;
+    //    } else {
+    //        g->cam2d.zoom += DEFAULT_ZOOM_INCR;
+    //    }
+    //}
 }
 
 
@@ -325,22 +327,22 @@ static void handle_input_character_creation_scene(shared_ptr<gamestate> g, share
 
 
 static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    if (inputstate_is_pressed(is, KEY_B)) {
-        if (g->controlmode == CONTROLMODE_PLAYER) {
-            g->controlmode = CONTROLMODE_CAMERA;
-        } else if (g->controlmode == CONTROLMODE_CAMERA) {
-            g->controlmode = CONTROLMODE_PLAYER;
-        }
-        g->frame_dirty = true;
-        return;
-    }
+    //if (inputstate_is_pressed(is, KEY_B)) {
+    //    if (g->controlmode == CONTROLMODE_PLAYER) {
+    //        g->controlmode = CONTROLMODE_CAMERA;
+    //    } else if (g->controlmode == CONTROLMODE_CAMERA) {
+    //        g->controlmode = CONTROLMODE_PLAYER;
+    //    }
+    //    g->frame_dirty = true;
+    //    return;
+    //}
 
-    if (g->controlmode == CONTROLMODE_CAMERA) {
-        handle_camera_move(g, is);
-        handle_camera_zoom(g, is);
-        g->frame_dirty = true;
-        return;
-    }
+    //if (g->controlmode == CONTROLMODE_CAMERA) {
+    //    handle_camera_move(g, is);
+    //handle_camera_zoom(g, is);
+    //    g->frame_dirty = true;
+    //    return;
+    //}
 
     if (g->controlmode == CONTROLMODE_PLAYER) {
         if (g->msg_system_is_active) {
@@ -360,6 +362,17 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
 
 
         if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+            if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
+                g->cam2d.zoom += DEFAULT_ZOOM_INCR;
+                g->frame_dirty = true;
+                return;
+            } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
+                g->cam2d.zoom -= (g->cam2d.zoom > 1.0) ? DEFAULT_ZOOM_INCR : 0.0;
+                g->frame_dirty = true;
+                return;
+            }
+
+
             vec3 loc = g_get_loc(g, g->hero_id);
             if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
                 try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
@@ -559,9 +572,9 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //g->msg_system.index = 0;
     //g->msg_system.is_active = false;
     init_player(g);
-    npc_create_set_stats(g, (vec3){2, 2, 0}, RACE_GREEN_SLIME);
-    npc_create_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
-    npc_create_set_stats(g, (vec3){4, 4, 0}, RACE_WOLF);
+    //npc_create_set_stats(g, (vec3){2, 2, 0}, RACE_GREEN_SLIME);
+    //npc_create_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
+    //npc_create_set_stats(g, (vec3){4, 4, 0}, RACE_WOLF);
 
 
     add_message(g, "Welcome to the game!");
@@ -2812,7 +2825,6 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
             while (success == ENTITYID_INVALID) {
                 int current_floor = g->dungeon->current_floor;
                 //vec3 loc = get_random_available_loc(g, current_floor);
-
                 // generate a random location for NPC spawn
 
                 int x = rand() % g->dungeon->floors->at(current_floor)->width + 1;
@@ -2821,17 +2833,25 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
                 // If the tile is not walkable, success is still invalid and we should continue
 
                 vec3 loc = {x, y, current_floor};
+                //if (loc.x == -1 && loc.y == -1 && loc.z == -1) {
+                //    merror("No available location found for NPC spawn");
+                //    return; // No valid location found, exit early
+                //}
+
+
                 shared_ptr<tile_t> tile = df_tile_at(g->dungeon->floors->at(current_floor), loc);
                 if (!tile || tile_is_walkable(tile->type) == false) {
                     merror("Tile at %d, %d, %d is not walkable", x, y, current_floor);
                     continue; // Tile is not walkable, try again
                 }
 
-                //vec3 loc = (vec3){1, 1, current_floor}; // Placeholder for actual location logic
-                if (loc.x == -1 && loc.y == -1 && loc.z == -1) {
-                    merror("No available location found for NPC spawn");
-                    return; // No valid location found, exit early
+
+                // if the tile contains entities, try again
+                if (tile_has_live_npcs(g, tile)) {
+                    merror("Tile is not empty");
+                    continue;
                 }
+
                 //if (x > g->dungeon->floors->at(current_floor)->width) {
                 //    x = 1; // Reset x to 1 if it exceeds width
                 //}
@@ -2855,7 +2875,7 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
 static void update_player_state(shared_ptr<gamestate> g) {
     massert(g, "Game state is NULL!");
     if (!g->gameover) {
-        g_incr_tx_alpha(g, g->hero_id, 1);
+        g_incr_tx_alpha(g, g->hero_id, 2);
 
         if (g_is_dead(g, g->hero_id)) {
             //add_message_history(g, "You died!");
@@ -2929,7 +2949,7 @@ static void update_npcs_state(shared_ptr<gamestate> g) {
         if (id == g->hero_id) {
             continue;
         }
-        g_incr_tx_alpha(g, id, 1);
+        g_incr_tx_alpha(g, id, 4);
         //update_npc_state(g, id);
     }
 }
