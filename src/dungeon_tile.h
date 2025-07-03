@@ -33,8 +33,6 @@ std::shared_ptr<tile_t> tile_create(tiletype_t type);
 entityid tile_add(std::shared_ptr<tile_t> tile, entityid id);
 entityid tile_remove(std::shared_ptr<tile_t> tile, entityid id);
 
-//bool tile_resize(std::shared_ptr<tile_t> t);
-
 size_t tile_live_npc_count_at(std::shared_ptr<gamestate> g, int x, int y, int z);
 
 void tile_init(std::shared_ptr<tile_t> t, tiletype_t type);
@@ -56,19 +54,19 @@ static inline bool tile_has_live_npcs(std::shared_ptr<gamestate> g, std::shared_
     if (!t) {
         return false;
     }
-    //recompute_entity_cache(g, t);
+    recompute_entity_cache(g, t);
     return t->cached_live_npcs > 0;
 }
 
 static inline size_t tile_live_npc_count(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> t) {
     massert(t, "tile is NULL");
-    //recompute_entity_cache(g, t);
+    recompute_entity_cache(g, t);
     return t->cached_live_npcs;
 }
 
 static inline bool tile_has_player(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> t) {
     if (!t) return false;
-    //recompute_entity_cache(g, t);
+    recompute_entity_cache(g, t);
     return t->cached_player_present;
 }
 
