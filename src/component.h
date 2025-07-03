@@ -112,6 +112,7 @@ static inline const char* component2str(component c) {
     case C_BASE_ATTACK_DAMAGE: return "C_BASE_ATTACK_DAMAGE";
     case C_EXPLORED_LIST: return "C_EXPLORED_LIST";
     case C_VISIBLE_LIST: return "C_VISIBLE_LIST";
+    case C_TX_ALPHA: return "C_TX_ALPHA";
     case C_COUNT: return "C_COUNT";
     default: break;
     }
@@ -120,24 +121,24 @@ static inline const char* component2str(component c) {
 
 // string components
 //void init_name_component(name_component* comp, entityid id, const char* name);
-void init_name_component(name_component* comp, entityid id, string name);
+//void init_name_component(name_component* comp, entityid id, string name);
 
 // int components
-void init_int_component(int_component* comp, entityid id, int data);
+//void init_int_component(int_component* comp, entityid id, int data);
 
 // loc components: 3 integer
-void init_vec3_component(vec3_component* comp, entityid id, vec3 v);
+//void init_vec3_component(vec3_component* comp, entityid id, vec3 v);
 // vec3 list components
-void init_vec3_list_component(vec3_list_component* comp, entityid id, vec3* list, int list_length);
+//void init_vec3_list_component(vec3_list_component* comp, entityid id, vec3* list, int list_length);
 
 // Rectangle component
-void init_rect_component(rect_component* comp, entityid id, Rectangle rect);
+//void init_rect_component(rect_component* comp, entityid id, Rectangle rect);
 
 // list components
-void init_inventory_component(inventory_component* comp, entityid id);
-void init_equipment_component(equipment_component* comp, entityid id);
-void init_stats_component(stats_component* comp, entityid id);
-void init_target_path_component(target_path_component* comp, entityid id, vec3* target_path, int target_path_length);
+//void init_inventory_component(inventory_component* comp, entityid id);
+//void init_equipment_component(equipment_component* comp, entityid id);
+//void init_stats_component(stats_component* comp, entityid id);
+//void init_target_path_component(target_path_component* comp, entityid id, vec3* target_path, int target_path_length);
 
 // complex components
 //void init_spell_effect_component(spell_effect_component* comp, entityid id, spell_effect effect);

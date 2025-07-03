@@ -102,3 +102,12 @@ index.html: $(WEB_SOURCES)
 
 clean:
 	rm -rfv game *.o time.txt index.html index.js index.wasm index.data test
+
+
+
+
+
+
+
+
+

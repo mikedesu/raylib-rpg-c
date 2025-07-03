@@ -37,6 +37,7 @@ using std::string;
 int liblogic_restart_count = 0;
 
 //static inline void reset_player_blocking(shared_ptr<gamestate> g);
+static void update_npcs_state(shared_ptr<gamestate> g);
 static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
 static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -102,6 +103,9 @@ static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
     g_add_blocking(g, id, false);
     g_add_block_success(g, id, false);
     g_add_damaged(g, id, false);
+
+    g_add_tx_alpha(g, id, 0);
+
     //g_add_zapping(g, id, false);
     //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
     //g_add_inventory(g, id);
@@ -142,6 +146,7 @@ static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, 
     massert(id != ENTITYID_INVALID, "failed to create player");
     g_set_hero_id(g, id);
     g_add_type(g, id, ENTITY_PLAYER);
+    g_set_tx_alpha(g, id, 0);
     //g_update_race(g, id, RACE_GREEN_SLIME);
 
     //int str_roll = do_roll_best_of_3((roll){3, 6, 0});
@@ -573,7 +578,7 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     // Spawn NPCs periodically
     try_spawn_npc(g);
     update_player_state(g);
-    //update_npcs_state(g);
+    update_npcs_state(g);
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
         g_set_blocking(g, g->hero_id, false);
         //reset_player_blocking(g);
@@ -2850,6 +2855,8 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
 static void update_player_state(shared_ptr<gamestate> g) {
     massert(g, "Game state is NULL!");
     if (!g->gameover) {
+        g_incr_tx_alpha(g, g->hero_id, 1);
+
         if (g_is_dead(g, g->hero_id)) {
             //add_message_history(g, "You died!");
             g->gameover = true;
@@ -2916,15 +2923,16 @@ static inline void update_npc_state(gamestate* const g, entityid id) {
 }
 */
 
-/*
-static void update_npcs_state(gamestate* const g) {
+static void update_npcs_state(shared_ptr<gamestate> g) {
     massert(g, "Game state is NULL!");
     for (entityid id = 0; id < g->next_entityid; id++) {
-        if (id == g->hero_id) continue;
-        update_npc_state(g, id);
+        if (id == g->hero_id) {
+            continue;
+        }
+        g_incr_tx_alpha(g, id, 1);
+        //update_npc_state(g, id);
     }
 }
-*/
 
 static void handle_npc(shared_ptr<gamestate> g, entityid id) {
     massert(g, "Game state is NULL!");

@@ -363,14 +363,11 @@ void gamestate_load_keybindings(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
     minfo("Loading keybindings from file");
     string filename = "keybindings.ini";
-
     // keybinding_list needs to be initialized
     if (!g->keybinding_list) {
         g->keybinding_list = make_shared<keybinding_list_t>();
         massert(g->keybinding_list, "g->keybinding_list is NULL");
     }
-
-
     load_keybindings(filename, g->keybinding_list);
     print_keybindings(g->keybinding_list);
 }
@@ -392,14 +389,16 @@ bool gamestate_add_msg_history(shared_ptr<gamestate> g, string msg) {
 void gamestate_set_debug_panel_pos_bottom_left(gamestate* const g) {
     massert(g, "g is NULL");
     if (g->windowwidth == -1 || g->windowheight == -1) return;
-    g->debugpanel.x = 0, g->debugpanel.y = g->windowheight - g->debugpanel.h;
+    g->debugpanel.x = 0;
+    g->debugpanel.y = g->windowheight - g->debugpanel.h;
 }
 
 
 void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
     massert(g, "g is NULL");
     if (g->windowwidth == -1 || g->windowheight == -1) return;
-    g->debugpanel.x = g->windowwidth - g->debugpanel.w, g->debugpanel.y = g->debugpanel.pad_right;
+    g->debugpanel.x = g->windowwidth - g->debugpanel.w;
+    g->debugpanel.y = g->debugpanel.pad_right;
 }
 
 
@@ -407,12 +406,21 @@ bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(comp != C_COUNT, "comp is invalid");
+
+    minfo("g_register_comp: Registering component %s for entity %d", component2str(comp), id);
     if (!g_has_comp(g, id, comp)) {
         // If the component is not already registered, add it
         if (g->component_table->find(id) == g->component_table->end()) {
             (*g->component_table)[id] = 0; // Initialize with 0 components
         }
-        (*g->component_table)[id] |= (1 << comp); // Set the bit for the component
+        (*g->component_table)[id] |= (1L << comp); // Set the bit for the component
+        // assert that the bit has been set correctly
+        long components = g->component_table->at(id);
+        long comp_bit = 1L << comp; // Shift 1 to the left by 'comp' positions
+        massert((components & comp_bit) != 0, "g_register_comp: Component %s not set for entity %d", component2str(comp), id);
+        //merror("g_register_comp: Failed to set component %s for entity %d", component2str(comp), id);
+        //return false; // Failed to set the component
+        //}
     }
     // Check if the component was successfully registered
     if (g_has_comp(g, id, comp)) {
@@ -434,6 +442,7 @@ bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp) {
     massert(g->component_table, "g->component_table is NULL");
     // Check if the entity exists in the component table
     // component table is now an unordered_map
+    //minfo("g_has_comp: Checking if entity %d has component %s", id, component2str(comp));
     if (g->component_table->find(id) == g->component_table->end()) {
         return false; // Entity does not exist
     }
@@ -1074,15 +1083,30 @@ bool g_get_damaged(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-bool g_get_tx_alpha(shared_ptr<gamestate> g, entityid id) {
+int g_get_tx_alpha(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->tx_alpha_list) {
-        massert(g->tx_alpha_list->find(id) != g->tx_alpha_list->end(), "g_get_tx_alpha: id %d not found in tx alpha list", id);
-        return g->tx_alpha_list->at(id);
+        if (g_has_tx_alpha(g, id)) {
+            return g->tx_alpha_list->at(id);
+        }
+        merror("g_get_tx_alpha: id %d does not have a tx alpha component", id);
+        return 255;
     }
-    merror("g_get_tx_alpha: id %d does not have a tx alpha component", id);
-    return -1; // Return -1 if the id is not found
+    merror("g_get_tx_alpha: g->tx_alpha_list is NULL");
+    return 255; // Return -1 if the id is not found
+}
+
+
+bool g_has_tx_alpha(std::shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->tx_alpha_list) {
+        merror("g->tx_alpha_list is NULL");
+        return false;
+    }
+    // Check if the entity has a tx alpha component
+    return g->tx_alpha_list->find(id) != g->tx_alpha_list->end();
 }
 
 
@@ -1094,7 +1118,7 @@ bool g_set_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha) {
         return false;
     }
     // Check if the entity has a tx alpha component
-    if (g->tx_alpha_list->find(id) != g->tx_alpha_list->end()) {
+    if (g_has_tx_alpha(g, id)) {
         // Update the tx alpha for the entity
         (*g->tx_alpha_list)[id] = alpha; // Update the tx alpha
         return true;
@@ -1132,7 +1156,18 @@ bool g_incr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha) {
     // Check if the entity has a tx alpha component
     if (g->tx_alpha_list->find(id) != g->tx_alpha_list->end()) {
         // Increment the tx alpha for the entity
-        (*g->tx_alpha_list)[id] += alpha; // Increment the tx alpha
+        //(*g->tx_alpha_list)[id] += alpha; // Increment the tx alpha
+
+        // if the alpha is < 255, increment
+        if ((*g->tx_alpha_list)[id] < 255) {
+            (*g->tx_alpha_list)[id] += alpha; // Increment the tx alpha
+            if ((*g->tx_alpha_list)[id] > 255) {
+                (*g->tx_alpha_list)[id] = 255; // Cap at 255
+            }
+        }
+        //else {
+        //    merror("g_incr_tx_alpha: id %d already has max tx alpha", id);
+        //}
         return true;
     }
     merror("g_incr_tx_alpha: id %d does not have a tx alpha component", id);

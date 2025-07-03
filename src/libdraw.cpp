@@ -126,7 +126,6 @@ static bool libdraw_unload_texture(int txkey);
 static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z);
 //static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, dungeon_floor_t* df);
 static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df);
-//static bool draw_entities_2d_at(const shared_ptr<gamestate> g, dungeon_floor_t* const df, bool dead, vec3 loc);
 static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
 static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
 static bool libdraw_draw_player_target_box(const shared_ptr<gamestate> g);
@@ -336,7 +335,10 @@ static void draw_entity_sprite(const shared_ptr<gamestate> g, spritegroup_t* sg)
     sprite* s = sg_get_current(sg);
     massert(s, "sprite is NULL");
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-    DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, (Color){255, 255, 255, 255});
+
+    //unsigned char a = 255;
+    unsigned char a = (unsigned char)g_get_tx_alpha(g, sg->id);
+    DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, (Color){255, 255, 255, a});
     // draw a box around the sprite
     //DrawRectangleLinesEx(dest, 1, (Color){255, 0, 0, 255});
 }
@@ -474,12 +476,9 @@ static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeo
         //if (g_is_dead(g, id) == dead) {
         draw_sprite_and_shadow(g, id);
     }
-    //}
-    //}
     return true;
 }
-/*
-*/
+
 
 static void load_shaders() {
     shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed

@@ -318,7 +318,8 @@ bool g_set_damaged(std::shared_ptr<gamestate> g, entityid id, int damaged);
 bool g_get_damaged(std::shared_ptr<gamestate> g, entityid id);
 
 
-bool g_get_tx_alpha(std::shared_ptr<gamestate> g, entityid id);
+int g_get_tx_alpha(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_tx_alpha(std::shared_ptr<gamestate> g, entityid id);
 bool g_set_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
 bool g_add_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
 bool g_incr_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
