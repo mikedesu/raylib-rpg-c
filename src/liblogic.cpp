@@ -574,11 +574,13 @@ void liblogic_init(shared_ptr<gamestate> g) {
     init_player(g);
     entityid box_id = create_wooden_box(g, (vec3){2, 2, 0});
     massert(box_id != ENTITYID_INVALID, "box failed to spawn!");
-    //merror("
-    //}
-    //npc_create_set_stats(g, (vec3){2, 2, 0}, RACE_GREEN_SLIME);
-    //npc_create_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
-    //npc_create_set_stats(g, (vec3){4, 4, 0}, RACE_WOLF);
+    entityid box_id0 = create_wooden_box(g, (vec3){3, 3, 0});
+    massert(box_id0 != ENTITYID_INVALID, "box failed to spawn!");
+    entityid box_id1 = create_wooden_box(g, (vec3){4, 4, 0});
+    massert(box_id1 != ENTITYID_INVALID, "box failed to spawn!");
+    npc_create_set_stats(g, (vec3){2, 3, 0}, RACE_GREEN_SLIME);
+    npc_create_set_stats(g, (vec3){3, 4, 0}, RACE_ORC);
+    npc_create_set_stats(g, (vec3){4, 5, 0}, RACE_WOLF);
     add_message(g, "Welcome to the game!");
     add_message(g, "To move around, press q w e a d z x c");
 
@@ -987,7 +989,7 @@ static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, i
 }
 
 
-static inline bool tile_has_box(shared_ptr<gamestate> g, int x, int y, int z) {
+static inline entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     massert(z >= 0, "floor is out of bounds");
     massert(z < g->dungeon->floors->size(), "floor is out of bounds");
@@ -999,10 +1001,10 @@ static inline bool tile_has_box(shared_ptr<gamestate> g, int x, int y, int z) {
         entityid id = tile_get_entity(t, i);
         entitytype_t type = g_get_type(g, id);
         if (id != ENTITYID_INVALID && type == ENTITY_WOODEN_BOX) {
-            return true;
+            return id;
         }
     }
-    return false;
+    return ENTITYID_INVALID;
 }
 
 
@@ -1037,7 +1039,9 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
         return false;
     }
 
-    if (tile_has_box(g, aloc.x, aloc.y, aloc.z)) {
+    entityid box_id = tile_has_box(g, aloc.x, aloc.y, aloc.z);
+    if (box_id != ENTITYID_INVALID) {
+        try_entity_move(g, box_id, v);
         merror("Cannot move, tile has box at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
         return false;
     }
