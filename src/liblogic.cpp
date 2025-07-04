@@ -37,6 +37,7 @@ using std::string;
 int liblogic_restart_count = 0;
 
 //static inline void reset_player_blocking(shared_ptr<gamestate> g);
+static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc);
 static void update_npcs_state(shared_ptr<gamestate> g);
 static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
 static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -103,8 +104,13 @@ static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
     g_add_blocking(g, id, false);
     g_add_block_success(g, id, false);
     g_add_damaged(g, id, false);
-
     g_add_tx_alpha(g, id, 0);
+    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+    if (!df_add_at(df, id, loc.x, loc.y)) {
+        return ENTITYID_INVALID;
+    }
+    msuccess("returning NPC entity ID: %d", id);
+    return id;
 
     //g_add_zapping(g, id, false);
     //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
@@ -127,12 +133,6 @@ static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
     //g_set_stat(g, id, STATS_CON, 10);
     //g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
     //g_set_stat(g, id, STATS_AC, 10);
-    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-    if (!df_add_at(df, id, loc.x, loc.y)) {
-        return ENTITYID_INVALID;
-    }
-    msuccess("returning NPC entity ID: %d", id);
-    return id;
 }
 
 
@@ -572,6 +572,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //g->msg_system.index = 0;
     //g->msg_system.is_active = false;
     init_player(g);
+    entityid box_id = create_wooden_box(g, (vec3){2, 2, 0});
+    massert(box_id != ENTITYID_INVALID, "box failed to spawn!");
+    //merror("
+    //}
     //npc_create_set_stats(g, (vec3){2, 2, 0}, RACE_GREEN_SLIME);
     //npc_create_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
     //npc_create_set_stats(g, (vec3){4, 4, 0}, RACE_WOLF);
@@ -588,8 +592,11 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(g, "Game state is NULL!");
     // Spawn NPCs periodically
     //try_spawn_npc(g);
+    // update ALL entities
     update_player_state(g);
     update_npcs_state(g);
+    //update_boxes_state(g);
+
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
         g_set_blocking(g, g->hero_id, false);
         //reset_player_blocking(g);
@@ -2744,42 +2751,65 @@ static race_t get_random_race_for_floor(int floor) {
 }
 */
 
-//static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race) {
+
+static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc) {
+    massert(g, "gamestate is NULL");
+    minfo("calling d_get_floor...");
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+    minfo("calling df_tile_at...");
+    shared_ptr<tile_t> tile = df_tile_at(df, loc);
+    massert(tile, "failed to get tile");
+    minfo("checking if tile is walkable...");
+    if (!tile_is_walkable(tile->type)) {
+        merror("cannot create entity on non-walkable tile");
+        return ENTITYID_INVALID;
+    }
+    minfo("checking if tile has live NPCs...");
+    if (tile_has_live_npcs(g, tile)) {
+        merror("cannot create entity on tile with live NPCs");
+        return ENTITYID_INVALID;
+    }
+    entityid id = g_add_entity(g);
+    g_add_name(g, id, "wooden box");
+    g_add_type(g, id, ENTITY_WOODEN_BOX);
+    g_add_loc(g, id, loc);
+    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
+    g_add_update(g, id, true);
+    g_add_tx_alpha(g, id, 255);
+    g_add_pushable(g, id);
+    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+    if (!df_add_at(df, id, loc.x, loc.y)) {
+        return ENTITYID_INVALID;
+    }
+    msuccess("returning box entity ID: %d", id);
+    return id;
+}
+
+
 static entityid npc_create_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
     minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
     entityid id = ENTITYID_INVALID;
-    //bool success = false;
-    //const char* race_name = get_race_str(race);
     string race_name = race2str(race);
     id = npc_create(g, race, loc, race_name);
     if (id != ENTITYID_INVALID) {
         int floor = loc.z + 1;
-        //minfo("Spawning entity at %d, %d, %d on floor %d with HP %d", loc.x, loc.y, loc.z, floor, g_get_stat(g, id, STATS_HP));
-        //int hit_die = get_hitdie_for_race(race);
         int hit_die = 8;
         vec3 r = {1, hit_die, 0};
         int max_hp = do_roll(r);
-
         //g_set_stat(g, id, STATS_HITDIE, hit_die);
         //g_set_stat(g, id, STATS_AC, 10);
         //g_set_stat(g, id, STATS_XP, 0);
         //g_set_stat(g, id, STATS_LEVEL, 1);
-
         //vec3 base_attack_dmg = get_base_attack_damage_for_race(race);
-
         //g_set_base_attack_damage(g, id, base_attack_dmg);
         //g_set_stat(g, id, STATS_STR, do_roll_best_of_3((vec3){3, 6, 0}));
         //g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
         //g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
-
         //max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
-
         //if (max_hp <= 0) max_hp = 1; // Ensure max HP is at least 1
-
         //g_set_stat(g, id, STATS_MAXHP, max_hp);
         //g_set_stat(g, id, STATS_HP, max_hp);
         //g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-
         // we will update this to do an appropriate difficulty-scaling
         // level-up is too powerful and results in imbalance
         // the goal is to make the spawns challenge rating approximate

@@ -1357,6 +1357,10 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
         default: merror("unknown race %d", race); return;
         }
         create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+    } else if (type == ENTITY_WOODEN_BOX) {
+        keys = TX_WOODEN_BOX_KEYS;
+        num_keys = TX_WOODEN_BOX_COUNT;
+        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
     }
 }
 

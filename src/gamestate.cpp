@@ -37,7 +37,6 @@ using std::vector;
 #define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
 
 static void gamestate_init_music_paths(shared_ptr<gamestate> g);
-static void gamestate_load_monster_defs(shared_ptr<gamestate> g);
 
 // have to update this function when we introduce new fields to Gamestate
 shared_ptr<gamestate> gamestateinitptr() {
@@ -119,8 +118,6 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->title_screen_selection = 0;
     g->max_title_screen_selections = 2;
 
-    g->monster_def_count = 0;
-    g->monster_def_capacity = 0;
     g->lock = 0;
     g->frame_updates = 0;
     g->framecount = 0;
@@ -133,7 +130,6 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->dungeon = nullptr;
 
-    g->monster_defs = NULL;
 
     gamestate_init_music_paths(g);
 
@@ -154,24 +150,30 @@ shared_ptr<gamestate> gamestateinitptr() {
     msuccess("Gamestate character creation name set to empty string");
 
     g->current_scene = SCENE_TITLE;
-    gamestate_load_monster_defs(g);
 
     g->music_volume = DEFAULT_MUSIC_VOLUME;
 
     g->component_table = new unordered_map<entityid, long>();
 
     g->name_list = new unordered_map<entityid, string>();
+
     g->type_list = new unordered_map<entityid, entitytype_t>();
+
     g->race_list = new unordered_map<entityid, race_t>();
+
     g->loc_list = new unordered_map<entityid, vec3>();
+
     g->sprite_move_list = new unordered_map<entityid, Rectangle>();
+
     g->dir_list = new unordered_map<entityid, direction_t>();
+
     g->dead_list = new unordered_map<entityid, bool>();
     g->update_list = new unordered_map<entityid, bool>();
     g->attacking_list = new unordered_map<entityid, bool>();
     g->blocking_list = new unordered_map<entityid, bool>();
     g->block_success_list = new unordered_map<entityid, bool>();
     g->damaged_list = new unordered_map<entityid, bool>();
+    //g->pushable_list = new unordered_map<entityid, bool>();
 
 
     g->tx_alpha_list = new unordered_map<entityid, int>();
@@ -182,74 +184,6 @@ shared_ptr<gamestate> gamestateinitptr() {
     return g;
 }
 
-static void gamestate_load_monster_defs(shared_ptr<gamestate> g) {
-    massert(g, "g is NULL");
-    const char* monster_defs_file = "monsters.csv";
-    FILE* file = fopen(monster_defs_file, "r");
-    massert(file, "Could not open monster definitions file: %s", monster_defs_file);
-    char buffer[1024] = {0};
-    // read the file line by line
-    // only skip lines beginning with a #
-    // even tho it is a .csv, the entries are separated by whitespace
-    int count = 0;
-    // first we need to run thru and count the num of entries we need space for
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        size_t len = strlen(buffer);
-        if (len > 0 && buffer[len - 1] == '\n') buffer[len - 1] = '\0';
-        if (buffer[0] == '#') continue;
-        count++;
-    }
-    // rewind the file to the beginning
-    rewind(file);
-    // now we can allocate space for the monster definitions
-    g->monster_defs = (monster_def*)malloc(sizeof(monster_def) * count);
-    massert(g->monster_defs, "g->monster_defs is NULL");
-    g->monster_def_count = 0, g->monster_def_capacity = count;
-    // now we can read the file again and fill the monster definitions
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        // Remove newline character if present
-        size_t len = strlen(buffer);
-        if (len > 0 && buffer[len - 1] == '\n') buffer[len - 1] = '\0';
-        // if it begins with a #, skip for now
-        if (buffer[0] == '#') continue;
-        // parse the line into a monster_def
-        monster_def* def = &g->monster_defs[g->monster_def_count];
-        char race_name_buffer[1024] = {0};
-        fscanf(file, "%s", race_name_buffer);
-        // the below line is outdated
-        // there are some new stats, so we need to read them all
-        // hd_num hd_sides hd_mod ac st dx cn nt ws ch
-        int hd_num, hd_sides, hd_mod, ac, st, dx, cn, nt, ws, ch;
-        const char* format = "%d %d %d %d %d %d %d %d %d %d";
-        fscanf(file, format, &hd_num, &hd_sides, &hd_mod, &ac, &st, &dx, &cn, &nt, &ws, &ch);
-        def->hitdie = (vec3){hd_num, hd_sides, hd_mod};
-        def->stats[STATS_AC] = ac;
-        def->stats[STATS_STR] = st;
-        def->stats[STATS_DEX] = dx;
-        def->stats[STATS_CON] = cn;
-        // we have not implemented these yet...
-        //def->stats[STATS_INT] = nt;
-        //def->stats[STATS_WIS] = ws;
-        //def->stats[STATS_CHA] = ch;
-        race_t race = str2race(race_name_buffer);
-        def->race = race;
-        g->monster_def_count++;
-
-        g->message_history_bgcolor = DEFAULT_MSG_HIST_BGCOLOR;
-        g->display_gameplay_settings_menu = false;
-    }
-    fclose(file);
-    // at this point, we have loaded all the monster definitions and can use them
-}
-
-monster_def* g_get_monster_def(gamestate* const g, race_t r) {
-    for (int i = 0; i < g->monster_def_count; i++) {
-        if (g->monster_defs[i].race == r) {
-            return &g->monster_defs[i];
-        }
-    }
-    return NULL; // Not found
-}
 
 static void gamestate_init_music_paths(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
@@ -295,13 +229,11 @@ bool gamestate_init_msg_history(shared_ptr<gamestate> g) {
 void gamestate_free(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
     minfo("Freeing gamestate");
-
     //if (g->chara_creation) {
     //    g->chara_creation->name.clear(); // Clear the name string
     //    g->chara_creation.reset(); // Reset the shared pointer
     //    g->chara_creation = nullptr; // Set to nullptr
     //}
-
     if (g->msg_system) delete g->msg_system;
     if (g->msg_history) delete g->msg_history;
     if (g->component_table) delete g->component_table;
@@ -318,10 +250,6 @@ void gamestate_free(shared_ptr<gamestate> g) {
     if (g->block_success_list) delete g->block_success_list;
     if (g->damaged_list) delete g->damaged_list;
     if (g->tx_alpha_list) delete g->tx_alpha_list;
-
-    if (g->monster_defs) {
-        free(g->monster_defs);
-    }
 }
 
 
@@ -711,7 +639,7 @@ direction_t g_get_dir(shared_ptr<gamestate> g, entityid id) {
             return g->dir_list->at(id);
         }
     }
-    merror("Direction component not found for id %d", id);
+    //merror("Direction component not found for id %d", id);
     return DIR_NONE; // Return DIR_NONE if not found
 }
 
@@ -910,7 +838,11 @@ bool g_get_attacking(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->attacking_list) {
-        massert(g->attacking_list->find(id) != g->attacking_list->end(), "g_get_attacking: id %d not found in attacking list", id);
+        //massert(g->attacking_list->find(id) != g->attacking_list->end(), "g_get_attacking: id %d not found in attacking list", id);
+        if (g->attacking_list->find(id) == g->attacking_list->end()) {
+            //merror("g_get_attacking: id %d not found in attacking list", id);
+            return false; // Return false if the id is not found
+        }
         return g->attacking_list->at(id);
     }
     merror("g_get_attacking: id %d does not have an attacking component", id);
@@ -1190,6 +1122,26 @@ bool g_decr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha) {
     }
     merror("g_decr_tx_alpha: id %d does not have a tx alpha component", id);
     return false;
+}
+
+
+bool g_add_pushable(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_PUSHABLE)) {
+        merror("g_add_pushable: Failed to add component C_PUSHABLE for id %d", id);
+        return false;
+    }
+    // verify that the entity has a pushable component
+    return g_has_comp(g, id, C_PUSHABLE);
+}
+
+
+bool g_is_pushable(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    return g_has_comp(g, id, C_PUSHABLE);
 }
 
 

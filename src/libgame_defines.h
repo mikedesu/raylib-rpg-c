@@ -483,6 +483,8 @@
 #define TX_RING_GOLD 343
 #define TX_RING_SILVER 344
 #define TX_RING_IRON 345
+//--------------------------------
+#define TX_WOODEN_BOX 346
 
 //--------------------------------
 #define COMPANYSCENE 0
@@ -492,7 +494,7 @@
 #define COMPANYNAME "@evildojo666"
 #define COMPANYFILL "   x  x x   "
 
-#define DEFAULT_FONT_PATH "fonts/hack.ttf"
+//#define DEFAULT_FONT_PATH "fonts/hack.ttf"
 
 #define DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE 16
 

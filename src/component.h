@@ -71,6 +71,7 @@ typedef enum component_t
     C_EXPLORED_LIST = 32,
     C_VISIBLE_LIST = 33,
     C_TX_ALPHA = 34,
+    C_PUSHABLE = 35,
     C_COUNT
     //C_SPELL_EFFECT,
 } component;
@@ -108,15 +109,17 @@ static inline const char* component2str(component c) {
     case C_LIGHT_RADIUS: return "C_LIGHT_RADIUS";
     case C_LIGHT_RADIUS_BONUS: return "C_LIGHT_RADIUS_BONUS";
     case C_RINGTYPE: return "C_RINGTYPE";
-    //case C_SPELL_EFFECT: return "C_SPELL_EFFECT";
     case C_BASE_ATTACK_DAMAGE: return "C_BASE_ATTACK_DAMAGE";
     case C_EXPLORED_LIST: return "C_EXPLORED_LIST";
     case C_VISIBLE_LIST: return "C_VISIBLE_LIST";
     case C_TX_ALPHA: return "C_TX_ALPHA";
+    case C_PUSHABLE: return "C_PUSHABLE";
+
     case C_COUNT: return "C_COUNT";
     default: break;
     }
     return "C_UNKNOWN";
+    //case C_SPELL_EFFECT: return "C_SPELL_EFFECT";
 }
 
 // string components
