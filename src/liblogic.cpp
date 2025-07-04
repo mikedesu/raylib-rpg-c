@@ -968,19 +968,13 @@ static void add_message(shared_ptr<gamestate> g, const char* fmt, ...) {
 //}
 
 static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
-    // Validate inputs
     massert(g, "gamestate is NULL");
     massert(z >= 0, "floor is out of bounds");
-    //massert(z < g->dungeon->num_floors, "floor is out of bounds");
     massert(z < g->dungeon->floors->size(), "floor is out of bounds");
-
-    //const dungeon_floor_t* const df = d_get_floor(g->dungeon, z);
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
     massert(df, "failed to get dungeon floor");
-    //const tile_t* const t = df_tile_at(df, (vec3){x, y, z});
     shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
     massert(t, "failed to get tile");
-    // Count living NPCs
     int count = 0;
     for (int i = 0; (size_t)i < t->entities->size(); i++) {
         entityid id = tile_get_entity(t, i);
@@ -990,6 +984,25 @@ static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, i
         }
     }
     return count;
+}
+
+
+static inline bool tile_has_box(shared_ptr<gamestate> g, int x, int y, int z) {
+    massert(g, "gamestate is NULL");
+    massert(z >= 0, "floor is out of bounds");
+    massert(z < g->dungeon->floors->size(), "floor is out of bounds");
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
+    massert(df, "failed to get dungeon floor");
+    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
+    massert(t, "failed to get tile");
+    for (int i = 0; (size_t)i < t->entities->size(); i++) {
+        entityid id = tile_get_entity(t, i);
+        entitytype_t type = g_get_type(g, id);
+        if (id != ENTITYID_INVALID && type == ENTITY_WOODEN_BOX) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -1024,6 +1037,11 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
         return false;
     }
 
+    if (tile_has_box(g, aloc.x, aloc.y, aloc.z)) {
+        merror("Cannot move, tile has box at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
+        return false;
+    }
+
     //if (tile_has_closed_door(g, ex, ey, floor)) {
     //    merror("Cannot move, tile has a closed door");
     //    return;
@@ -1032,6 +1050,7 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
         merror("Cannot move, tile has living NPCs");
         return false;
     }
+
 
     float mx = v.x * DEFAULT_TILE_SIZE;
     float my = v.y * DEFAULT_TILE_SIZE;
