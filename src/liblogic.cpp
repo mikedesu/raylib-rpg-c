@@ -575,8 +575,6 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //npc_create_set_stats(g, (vec3){2, 2, 0}, RACE_GREEN_SLIME);
     //npc_create_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
     //npc_create_set_stats(g, (vec3){4, 4, 0}, RACE_WOLF);
-
-
     add_message(g, "Welcome to the game!");
     add_message(g, "To move around, press q w e a d z x c");
 
@@ -589,7 +587,7 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     // Spawn NPCs periodically
-    try_spawn_npc(g);
+    //try_spawn_npc(g);
     update_player_state(g);
     update_npcs_state(g);
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
