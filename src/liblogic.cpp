@@ -572,17 +572,18 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //g->msg_system.index = 0;
     //g->msg_system.is_active = false;
     init_player(g);
-    entityid box_id = create_wooden_box(g, (vec3){2, 2, 0});
-    massert(box_id != ENTITYID_INVALID, "box failed to spawn!");
-    entityid box_id0 = create_wooden_box(g, (vec3){3, 3, 0});
-    massert(box_id0 != ENTITYID_INVALID, "box failed to spawn!");
-    entityid box_id1 = create_wooden_box(g, (vec3){4, 4, 0});
-    massert(box_id1 != ENTITYID_INVALID, "box failed to spawn!");
-    npc_create_set_stats(g, (vec3){2, 3, 0}, RACE_GREEN_SLIME);
-    npc_create_set_stats(g, (vec3){3, 4, 0}, RACE_ORC);
-    npc_create_set_stats(g, (vec3){4, 5, 0}, RACE_WOLF);
-    add_message(g, "Welcome to the game!");
-    add_message(g, "To move around, press q w e a d z x c");
+    //entityid box_id = create_wooden_box(g, (vec3){2, 2, 0});
+    create_wooden_box(g, (vec3){2, 2, 0});
+    //massert(box_id != ENTITYID_INVALID, "box failed to spawn!");
+    create_wooden_box(g, (vec3){3, 3, 0});
+    //massert(box_id0 != ENTITYID_INVALID, "box failed to spawn!");
+    create_wooden_box(g, (vec3){4, 4, 0});
+    //massert(box_id1 != ENTITYID_INVALID, "box failed to spawn!");
+    //npc_create_set_stats(g, (vec3){2, 3, 0}, RACE_GREEN_SLIME);
+    //npc_create_set_stats(g, (vec3){3, 4, 0}, RACE_ORC);
+    //npc_create_set_stats(g, (vec3){4, 5, 0}, RACE_WOLF);
+    //add_message(g, "Welcome to the game!");
+    //add_message(g, "To move around, press q w e a d z x c");
 
     msuccess("liblogic_init: Game state initialized");
 }
@@ -1017,9 +1018,9 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     // we will have a special case for traversing floors so ignore v.z
     vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
 
-    minfo("Entity %d trying to move in (%d, %d, %d) direction", id, v.x, v.y, v.z);
-    minfo("Entity %d is currently at (%d, %d, %d)", id, loc.x, loc.y, loc.z);
-    minfo("Entity %d wants to go to (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
+    //minfo("Entity %d trying to move in (%d, %d, %d) direction", id, v.x, v.y, v.z);
+    //minfo("Entity %d is currently at (%d, %d, %d)", id, loc.x, loc.y, loc.z);
+    //minfo("Entity %d wants to go to (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
 
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     if (!df) {
