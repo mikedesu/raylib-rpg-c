@@ -128,7 +128,7 @@ static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y,
 static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df);
 static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
 static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
-static bool libdraw_draw_player_target_box(const shared_ptr<gamestate> g);
+static bool libdraw_draw_player_target_box(shared_ptr<gamestate> g);
 //static bool libdraw_check_default_animations(const shared_ptr<gamestate> g);
 
 static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z) {
@@ -893,27 +893,28 @@ static void draw_debug_panel(shared_ptr<gamestate> g) {
     DrawText(g->debugpanel.buffer, x - 20, y, fontsize, fg);
 }
 
-/*
-static bool libdraw_draw_player_target_box(const shared_ptr<gamestate> g) {
+
+static bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     entityid id = g->hero_id;
     if (id == -1) return false;
-    direction_t dir = g_get_direction(g, id);
-    vec3 loc = g_get_location(g, id);
-    int x = loc.x + get_x_from_dir(dir);
-    int y = loc.y + get_y_from_dir(dir);
-    int ds = DEFAULT_TILE_SIZE;
-    Color base_c = GREEN, c;
-    float a = 0.25f;
-    if (g->player_changing_direction) {
+    direction_t dir = g_get_dir(g, id);
+    vec3 loc = g_get_loc(g, id);
+    float x = loc.x + get_x_from_dir(dir);
+    float y = loc.y + get_y_from_dir(dir);
+    float w = DEFAULT_TILE_SIZE;
+    float h = DEFAULT_TILE_SIZE;
+    Color base_c = GREEN;
+    //c;
+    float a = 0.75f;
+    if (g->player_changing_dir) {
         a = 1.0f;
     }
-    c = Fade(base_c, a);
-    DrawRectangleLinesEx(
-        (Rectangle){(float)x * ds, (float)y * ds, (float)ds, (float)ds}, 1, c);
+    //c = Fade(GREEN, a);
+    DrawRectangleLinesEx((Rectangle){x * w, y * h, w, h}, 1, Fade(GREEN, a));
     return true;
 }
-*/
+
 
 static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
@@ -926,7 +927,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //EndShaderMode();
 
     libdraw_draw_dungeon_floor(g);
-    //libdraw_draw_player_target_box(g);
+    libdraw_draw_player_target_box(g);
 
     EndMode2D();
 

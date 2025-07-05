@@ -56,7 +56,7 @@ typedef struct gamestate {
     bool processing_actions;
     bool is3d;
     bool gameover;
-    bool player_changing_direction;
+    bool player_changing_dir;
     bool test_guard;
     bool display_inventory_menu;
     bool display_quit_menu;

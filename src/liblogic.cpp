@@ -37,6 +37,7 @@ using std::string;
 int liblogic_restart_count = 0;
 
 //static inline void reset_player_blocking(shared_ptr<gamestate> g);
+static race_t get_random_race();
 static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc);
 static void update_npcs_state(shared_ptr<gamestate> g);
 static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
@@ -54,10 +55,23 @@ static void update_player_state(shared_ptr<gamestate> g);
 static void update_debug_panel_buffer(shared_ptr<gamestate> g);
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 //static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+//static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int fl, string name);
 static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+
+
+static inline void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
+    massert(g, "Game state is NULL!");
+    if (g_is_dead(g, g->hero_id)) {
+        return;
+    }
+    g_update_dir(g, g->hero_id, dir);
+    g_set_update(g, g->hero_id, true);
+    g->player_changing_dir = false;
+    g->frame_dirty = true;
+    //update_equipped_shield_dir(g, g->hero_id);
+}
 
 
 static void init_dungeon(shared_ptr<gamestate> g) {
@@ -222,19 +236,17 @@ static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> i
 }
 
 
-static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    massert(g, "Game state is NULL!");
-    massert(is, "Input state is NULL!");
-
-
-    //if (inputstate_is_held(is, KEY_Z)) {
-    //    if (inputstate_is_shift_held(is)) {
-    //        g->cam2d.zoom -= (g->cam2d.zoom > 1.0) ? DEFAULT_ZOOM_INCR : 0.0;
-    //    } else {
-    //        g->cam2d.zoom += DEFAULT_ZOOM_INCR;
-    //    }
-    //}
-}
+//static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+//    massert(g, "Game state is NULL!");
+//    massert(is, "Input state is NULL!");
+//if (inputstate_is_held(is, KEY_Z)) {
+//    if (inputstate_is_shift_held(is)) {
+//        g->cam2d.zoom -= (g->cam2d.zoom > 1.0) ? DEFAULT_ZOOM_INCR : 0.0;
+//    } else {
+//        g->cam2d.zoom += DEFAULT_ZOOM_INCR;
+//    }
+//}
+//}
 
 
 //static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
@@ -327,22 +339,22 @@ static void handle_input_character_creation_scene(shared_ptr<gamestate> g, share
 
 
 static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    //if (inputstate_is_pressed(is, KEY_B)) {
-    //    if (g->controlmode == CONTROLMODE_PLAYER) {
-    //        g->controlmode = CONTROLMODE_CAMERA;
-    //    } else if (g->controlmode == CONTROLMODE_CAMERA) {
-    //        g->controlmode = CONTROLMODE_PLAYER;
-    //    }
-    //    g->frame_dirty = true;
-    //    return;
-    //}
+    if (inputstate_is_pressed(is, KEY_B)) {
+        if (g->controlmode == CONTROLMODE_PLAYER) {
+            g->controlmode = CONTROLMODE_CAMERA;
+        } else if (g->controlmode == CONTROLMODE_CAMERA) {
+            g->controlmode = CONTROLMODE_PLAYER;
+        }
+        g->frame_dirty = true;
+        return;
+    }
 
-    //if (g->controlmode == CONTROLMODE_CAMERA) {
-    //    handle_camera_move(g, is);
-    //handle_camera_zoom(g, is);
-    //    g->frame_dirty = true;
-    //    return;
-    //}
+    if (g->controlmode == CONTROLMODE_CAMERA) {
+        handle_camera_move(g, is);
+        //handle_camera_zoom(g, is);
+        g->frame_dirty = true;
+        return;
+    }
 
     if (g->controlmode == CONTROLMODE_PLAYER) {
         if (g->msg_system_is_active) {
@@ -373,7 +385,71 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
             }
 
 
+            if (g->player_changing_dir) {
+                // double 's' is wait one turn
+                if (inputstate_is_pressed(is, KEY_S)) {
+                    g->player_changing_dir = false;
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    return;
+                }
+                if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
+                    change_player_dir(g, DIR_UP);
+                    //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    return;
+                }
+                if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
+                    change_player_dir(g, DIR_DOWN);
+                    //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    return;
+                }
+                if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+                    change_player_dir(g, DIR_LEFT);
+                    //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    return;
+                }
+                if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
+                    change_player_dir(g, DIR_RIGHT);
+                    //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    return;
+                }
+                if (inputstate_is_pressed(is, KEY_Q)) {
+                    change_player_dir(g, DIR_UP_LEFT);
+                    //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    return;
+                }
+                if (inputstate_is_pressed(is, KEY_E)) {
+                    change_player_dir(g, DIR_UP_RIGHT);
+                    //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    return;
+                }
+                if (inputstate_is_pressed(is, KEY_Z)) {
+                    change_player_dir(g, DIR_DOWN_LEFT);
+                    //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    return;
+                }
+                if (inputstate_is_pressed(is, KEY_C)) {
+                    change_player_dir(g, DIR_DOWN_RIGHT);
+                    //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    return;
+                }
+                if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+                    g_set_attacking(g, g->hero_id, true);
+                    g_set_update(g, g->hero_id, true);
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    g->player_changing_dir = false;
+                    return;
+                }
+            }
+
+
+            if (inputstate_is_pressed(is, KEY_S)) {
+                g->player_changing_dir = true;
+                //g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
+            }
+
             vec3 loc = g_get_loc(g, g->hero_id);
+
             if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
                 try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -783,7 +859,6 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 //                          entityid attacker_id,
 //                          entityid target_id);
 
-static race_t get_random_race();
 
 /*
 static int calc_reward_xp(shared_ptr<gamestate> g,
@@ -924,36 +999,22 @@ static void add_message_and_history(gamestate* g, const char* fmt, ...) {
 }
 */
 
+
 static void add_message(shared_ptr<gamestate> g, const char* fmt, ...) {
     massert(g, "gamestate is NULL");
     massert(fmt, "format string is NULL");
-    //if (g->msg_system.count >= MAX_MESSAGES) {
-    //    mwarning("Message queue full!");
-    //    return;
-    //}
-
-
     minfo("attempting to add message...");
+    char buffer[MAX_MSG_LENGTH];
     va_list args;
     va_start(args, fmt);
-
-    char buffer[MAX_MSG_LENGTH];
-
-    //vsnprintf(g->msg_system.messages[g->msg_system.count], MAX_MSG_LENGTH - 1, fmt, args);
     minfo("calling vsnprintf...");
     vsnprintf(buffer, MAX_MSG_LENGTH - 1, fmt, args);
     va_end(args);
-
-    minfo("creating string...");
     string s(buffer);
-    minfo("pushing string...");
     g->msg_system->push_back(s);
-    //g->msg_system.count++;
     g->msg_system_is_active = true;
-    msuccess("message added");
 }
-/*
-*/
+
 
 //static void update_equipped_shield_dir(gamestate* g, entity* e) {
 //static void update_equipped_shield_dir(gamestate* g, entityid id) {
@@ -969,6 +1030,7 @@ static void add_message(shared_ptr<gamestate> g, const char* fmt, ...) {
 //    }
 //}
 //}
+
 
 static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
@@ -1017,36 +1079,27 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     vec3 loc = g_get_loc(g, id);
     // we will have a special case for traversing floors so ignore v.z
     vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
-
-    //minfo("Entity %d trying to move in (%d, %d, %d) direction", id, v.x, v.y, v.z);
-    //minfo("Entity %d is currently at (%d, %d, %d)", id, loc.x, loc.y, loc.z);
-    //minfo("Entity %d wants to go to (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
-
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     if (!df) {
         merror("Dungeon floor is NULL for z=%d", loc.z);
         return false; // Floor does not exist
     }
-
     // i feel like this might be something we can set elsewhere...like after the player input phase?
     shared_ptr<tile_t> tile = df_tile_at(df, aloc);
     if (!tile) {
         merror("Tile at (%d, %d, %d) is NULL", aloc.x, aloc.y, aloc.z);
         return false; // Tile does not exist
     }
-
     if (!tile_is_walkable(tile->type)) {
         merror("Cannot move, tile is not walkable at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
         return false;
     }
-
     entityid box_id = tile_has_box(g, aloc.x, aloc.y, aloc.z);
     if (box_id != ENTITYID_INVALID) {
         try_entity_move(g, box_id, v);
         merror("Cannot move, tile has box at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
         return false;
     }
-
     //if (tile_has_closed_door(g, ex, ey, floor)) {
     //    merror("Cannot move, tile has a closed door");
     //    return;
@@ -1055,33 +1108,24 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
         merror("Cannot move, tile has living NPCs");
         return false;
     }
-
-
     float mx = v.x * DEFAULT_TILE_SIZE;
     float my = v.y * DEFAULT_TILE_SIZE;
-
     shared_ptr<tile_t> current_tile = df_tile_at(df, loc);
     massert(current_tile, "Current tile is NULL at (%d, %d, %d)", loc.x, loc.y, loc.z);
-
     // remove the entity from the current tile
     if (!df_remove_at(df, id, loc.x, loc.y)) {
         merror("Failed to remove entity %d from tile (%d, %d, %d)", id, loc.x, loc.y, loc.z);
         return false;
     }
-
     // add the entity to the new tile
     if (!df_add_at(df, id, aloc.x, aloc.y)) {
         merror("Failed to add entity %d to tile (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
         return false;
     }
-
     g_update_loc(g, id, aloc);
     g_update_sprite_move(g, id, (Rectangle){mx, my, 0, 0});
-
-    msuccess("Entity %d moved to (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
-
+    //msuccess("Entity %d moved to (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
     return true;
-
     //if (player_on_tile(g, ex, ey, z)) {
     //    merror("Cannot move, player on tile");
     //    return;
@@ -1128,6 +1172,7 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     //}
     //if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
+
 
 //static void try_entity_move_a_star(gamestate* const g, entityid id) {
 /*
@@ -2193,15 +2238,6 @@ static void handle_input_inventory(const inputstate* const is,
 }
 */
 
-/*
-static inline void change_player_dir(gamestate* const g, direction_t dir) {
-    massert(g, "Game state is NULL!");
-    if (g_is_dead(g, g->hero_id)) return;
-    g_update_direction(g, g->hero_id, dir);
-    g_set_update(g, g->hero_id, true);
-    //update_equipped_shield_dir(g, g->hero_id);
-}
-*/
 
 /*
 static bool try_entity_pickup(gamestate* const g, entityid id) {

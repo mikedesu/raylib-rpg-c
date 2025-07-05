@@ -109,6 +109,8 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->pad = 20;
     g->line_spacing = 1.0f;
 
+    g->player_changing_dir = false;
+
     g->next_entityid = 0;
     g->current_music_index = 0;
     g->total_music_paths = 0;
