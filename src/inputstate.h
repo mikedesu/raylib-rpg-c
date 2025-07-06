@@ -15,7 +15,6 @@ typedef struct inputstate {
 } inputstate;
 
 // Reset all bits to 0
-//static inline void inputstate_reset(inputstate* is) {
 static inline void inputstate_reset(std::shared_ptr<inputstate> is) {
     for (int i = 0; i < NUM_LONGS; i++) {
         is->pressed[i] = 0;
@@ -24,7 +23,6 @@ static inline void inputstate_reset(std::shared_ptr<inputstate> is) {
 }
 
 // Update all key states from Raylib
-//static inline void inputstate_update(inputstate* is) {
 static inline void inputstate_update(std::shared_ptr<inputstate> is) {
     inputstate_reset(is);
     for (int k = 0; k < MAX_KEYS; k++) {
@@ -47,7 +45,6 @@ static inline void inputstate_update(std::shared_ptr<inputstate> is) {
 }
 
 // Check if a key was pressed this frame
-//static inline bool inputstate_is_pressed(const inputstate* is, int key) {
 static inline bool inputstate_is_pressed(std::shared_ptr<inputstate> is, int key) {
     if (key < 0 || key >= MAX_KEYS) return false;
     int idx = key / BITS_PER_LONG;
@@ -65,7 +62,6 @@ static inline bool inputstate_any_pressed(const inputstate* is) {
 }
 
 // Check if a key is held down
-//static inline bool inputstate_is_held(const inputstate* is, int key) {
 static inline bool inputstate_is_held(std::shared_ptr<inputstate> is, int key) {
     if (key < 0 || key >= MAX_KEYS) return false;
     int idx = key / BITS_PER_LONG;
@@ -74,7 +70,6 @@ static inline bool inputstate_is_held(std::shared_ptr<inputstate> is, int key) {
 }
 
 // Get the first key pressed this frame
-//static inline int inputstate_get_pressed_key(const inputstate* is) {
 static inline int inputstate_get_pressed_key(std::shared_ptr<inputstate> is) {
     if (!is) {
         printf("inputstate is NULL\n");
@@ -94,7 +89,6 @@ static inline int inputstate_get_pressed_key(std::shared_ptr<inputstate> is) {
             }
         }
     }
-    //printf("No keys pressed in inputstate\n");
     return -1; // No key pressed
 }
 
