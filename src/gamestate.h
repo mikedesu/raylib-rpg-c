@@ -154,6 +154,12 @@ typedef struct gamestate {
 
     float music_volume;
 
+
+    // last click position
+
+    Vector2 last_click_screen_pos;
+
+
     Color message_history_bgcolor;
 
 } gamestate;

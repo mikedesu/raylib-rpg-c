@@ -52,7 +52,9 @@ static void handle_npcs(shared_ptr<gamestate> g);
 static void handle_npc(shared_ptr<gamestate> g, entityid id);
 static inline void reset_player_block_success(shared_ptr<gamestate> g);
 static void update_player_state(shared_ptr<gamestate> g);
-static void update_debug_panel_buffer(shared_ptr<gamestate> g);
+//static void update_debug_panel_buffer(shared_ptr<gamestate> g);
+static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 //static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 //static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -496,6 +498,21 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 return;
             }
+
+            if (inputstate_is_mouse_pressed(is, MOUSE_BUTTON_LEFT)) {
+                // if the player clicks on the map, we will try to move there
+                Vector2 mouse_pos = inputstate_get_mouse_position(is);
+                g->last_click_screen_pos = mouse_pos;
+                //vec3 target_loc = g_get_target_location(g, mouse_pos);
+                //if (target_loc.x != -1 && target_loc.y != -1) {
+                //    if (try_entity_move(g, g->hero_id, target_loc)) {
+                //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                //    }
+                //}
+                return;
+            }
+
+
             return;
         }
 
@@ -512,7 +529,6 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
 }
 
 
-//static void handle_input(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
 static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "inputstate is NULL");
     massert(g, "gamestate is NULL");
@@ -545,7 +561,7 @@ static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
 }
 
 
-static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
+static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(g, "gamestate is NULL");
     // Static buffers to avoid reallocating every frame
     static const char* control_modes[] = {"Camera", "Player", "Unknown"};
@@ -594,6 +610,8 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
              "%s\n" // currenttimebuf
              "Frame : %d\n"
              "Update: %d\n"
+             "Mouse: %.01f, %.01f\n"
+             "Last Clicked: %.01f, %.01f\n"
              "Frame Dirty: %d\n"
              "Draw Time: %.1fms\n"
              "Is3D: %d\n"
@@ -615,6 +633,12 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g) {
              g->currenttimebuf,
              g->framecount,
              g->frame_updates,
+
+             is->mouse_position.x,
+             is->mouse_position.y,
+             g->last_click_screen_pos.x,
+             g->last_click_screen_pos.y,
+
              g->frame_dirty,
              g->last_frame_time * 1000,
              g->is3d,
@@ -685,7 +709,7 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
         handle_npcs(g);
     }
-    update_debug_panel_buffer(g);
+    update_debug_panel_buffer(g, is);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);

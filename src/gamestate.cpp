@@ -180,6 +180,7 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->tx_alpha_list = new unordered_map<entityid, int>();
 
+    g->last_click_screen_pos = (Vector2){-1, -1};
 
     gamestate_load_keybindings(g);
     msuccess("Gamestate initialized successfully");

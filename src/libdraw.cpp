@@ -129,6 +129,7 @@ static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_p
 static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
 static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
 static bool libdraw_draw_player_target_box(shared_ptr<gamestate> g);
+static bool libdraw_draw_mouse_box(shared_ptr<gamestate> g);
 //static bool libdraw_check_default_animations(const shared_ptr<gamestate> g);
 
 static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z) {
@@ -905,13 +906,39 @@ static bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     float w = DEFAULT_TILE_SIZE;
     float h = DEFAULT_TILE_SIZE;
     Color base_c = GREEN;
-    //c;
     float a = 0.75f;
     if (g->player_changing_dir) {
         a = 1.0f;
     }
-    //c = Fade(GREEN, a);
     DrawRectangleLinesEx((Rectangle){x * w, y * h, w, h}, 1, Fade(GREEN, a));
+    return true;
+}
+
+
+static bool libdraw_draw_mouse_box(shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    //entityid id = g->hero_id;
+    //if (id == -1) return false;
+    //direction_t dir = g_get_dir(g, id);
+    Vector2 l = g->last_click_screen_pos;
+    if (l.x == -1 && l.y == -1) {
+        return false;
+    }
+
+    // translate loc into the world position
+    Vector2 p = GetScreenToWorld2D(l, g->cam2d);
+    //minfo("Drawing mouse box at %.01f, %.01f", p.x, p.y);
+    //float x = loc.x + get_x_from_dir(dir);
+    //float y = loc.y + get_y_from_dir(dir);
+    float w = DEFAULT_TILE_SIZE; //* g->cam2d.zoom;
+    float h = DEFAULT_TILE_SIZE; //* g->cam2d.zoom;
+    //Color base_c = GREEN;
+    float a = 1.0f;
+    //if (g->player_changing_dir) {
+    //    a = 1.0f;
+    //}
+    //DrawRectangleLinesEx((Rectangle){p.x * w, p.y * h, w, h}, 1, Fade(ORANGE, a));
+    DrawRectangleLinesEx((Rectangle){p.x, p.y, w, h}, 1, BLUE);
     return true;
 }
 
@@ -928,6 +955,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
 
     libdraw_draw_dungeon_floor(g);
     libdraw_draw_player_target_box(g);
+    libdraw_draw_mouse_box(g);
 
     EndMode2D();
 
@@ -1953,7 +1981,7 @@ static void draw_gameplay_settings_menu(shared_ptr<gamestate> g) {
 */
 
 
-void libdraw_update_input(shared_ptr<inputstate> is) { inputstate_update(is); }
+//void libdraw_update_input(shared_ptr<inputstate> is) { inputstate_update(is); }
 
 
 bool libdraw_windowshouldclose(const shared_ptr<gamestate> g) {

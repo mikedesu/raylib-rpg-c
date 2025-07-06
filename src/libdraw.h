@@ -13,7 +13,7 @@ bool libdraw_windowshouldclose(std::shared_ptr<gamestate> g);
 
 void libdraw_init(std::shared_ptr<gamestate> g);
 void libdraw_init_rest(std::shared_ptr<gamestate> g);
-void libdraw_update_input(std::shared_ptr<inputstate> is);
+//void libdraw_update_input(std::shared_ptr<inputstate> is);
 void libdraw_drawframe(std::shared_ptr<gamestate> g);
 void libdraw_close();
 void libdraw_close_partial();
