@@ -36,31 +36,53 @@ using std::string;
 
 int liblogic_restart_count = 0;
 
-//static inline void reset_player_blocking(shared_ptr<gamestate> g);
-static race_t get_random_race();
-static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc);
-static void update_npcs_state(shared_ptr<gamestate> g);
-static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
-static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
-static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 loc);
-static void try_spawn_npc(shared_ptr<gamestate> const g);
-static entityid npc_create_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
-static void handle_npcs(shared_ptr<gamestate> g);
-static void handle_npc(shared_ptr<gamestate> g, entityid id);
-static inline void reset_player_block_success(shared_ptr<gamestate> g);
-static void update_player_state(shared_ptr<gamestate> g);
-//static void update_debug_panel_buffer(shared_ptr<gamestate> g);
-static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 
-static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-//static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-//static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int fl, string name);
-static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+static inline void reset_player_block_success(shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    g_set_block_success(g, g->hero_id, false);
+    //g_set_update(g, g->hero_id, true);
+}
+
+
+static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
+    massert(g, "gamestate is NULL");
+    massert(z >= 0, "floor is out of bounds");
+    massert(z < g->dungeon->floors->size(), "floor is out of bounds");
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
+    massert(df, "failed to get dungeon floor");
+    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
+    massert(t, "failed to get tile");
+    int count = 0;
+    for (int i = 0; (size_t)i < t->entities->size(); i++) {
+        entityid id = tile_get_entity(t, i);
+        entitytype_t type = g_get_type(g, id);
+        if (id != ENTITYID_INVALID && (type == ENTITY_NPC || type == ENTITY_PLAYER) && !g_is_dead(g, id)) {
+            count++;
+        }
+    }
+    return count;
+}
+
+
+static inline race_t get_random_race() {
+    race_t race = RACE_NONE;
+    int num_choices = 10;
+    int choice = rand() % num_choices;
+    switch (choice) {
+    case 0: race = RACE_BAT; break;
+    case 1: race = RACE_WOLF; break;
+    case 2: race = RACE_HUMAN; break;
+    case 3: race = RACE_ELF; break;
+    case 4: race = RACE_DWARF; break;
+    case 5: race = RACE_HALFLING; break;
+    case 6: race = RACE_ORC; break;
+    case 7: race = RACE_GOBLIN; break;
+    case 8: race = RACE_GREEN_SLIME; break;
+    case 9: race = RACE_WARG; break;
+    default: break;
+    }
+    return race;
+}
 
 
 static inline void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
@@ -74,6 +96,27 @@ static inline void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
     g->frame_dirty = true;
     //update_equipped_shield_dir(g, g->hero_id);
 }
+
+
+//static void update_npcs_state(shared_ptr<gamestate> g);
+static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
+static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static void handle_npc(shared_ptr<gamestate> g, entityid id);
+static void update_player_state(shared_ptr<gamestate> g);
+static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static void try_spawn_npc(shared_ptr<gamestate> const g);
+
+static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+
+static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 loc);
+
+static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc);
+static entityid npc_create_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
+static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int fl, string name);
+static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
 
 
 static void init_dungeon(shared_ptr<gamestate> g) {
@@ -696,19 +739,44 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     // Spawn NPCs periodically
     //try_spawn_npc(g);
     // update ALL entities
-    update_player_state(g);
-    update_npcs_state(g);
-    //update_boxes_state(g);
+    //update_player_state(g);
+    //update_npcs_state(g);
+    // this was update player state
+    if (!g->gameover) {
+        g_incr_tx_alpha(g, g->hero_id, 2);
+        if (g_is_dead(g, g->hero_id)) {
+            //add_message_history(g, "You died!");
+            g->gameover = true;
+        }
+        //check_and_handle_level_up(g, g->hero_id);
+    }
+    if (g_is_dead(g, g->hero_id)) {
+        return;
+    }
+
+    // this was update_npcs_state
+    for (entityid id = 0; id < g->next_entityid; id++) {
+        if (id == g->hero_id) {
+            continue;
+        }
+        g_incr_tx_alpha(g, id, 4);
+    }
 
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
         g_set_blocking(g, g->hero_id, false);
-        //reset_player_blocking(g);
-        //    reset_player_block_success(g);
+        g_set_block_success(g, g->hero_id, false);
     }
+
     handle_input(g, is);
+
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
-        handle_npcs(g);
+        for (entityid id = 0; id < g->next_entityid; id++) {
+            handle_npc(g, id);
+        }
+        // After processing all NPCs, set the flag to animate all movements together
+        g->flag = GAMESTATE_FLAG_NPC_ANIM;
     }
+
     update_debug_panel_buffer(g, is);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
@@ -728,13 +796,6 @@ void liblogic_close(shared_ptr<gamestate> g) {
 //g_set_block_success(g, g->hero_id, false);
 //g_set_update(g, g->hero_id, true);
 //}
-
-
-static inline void reset_player_block_success(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    g_set_block_success(g, g->hero_id, false);
-    //g_set_update(g, g->hero_id, true);
-}
 
 
 /*
@@ -1054,26 +1115,6 @@ static void add_message(shared_ptr<gamestate> g, const char* fmt, ...) {
 //    }
 //}
 //}
-
-
-static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
-    massert(g, "gamestate is NULL");
-    massert(z >= 0, "floor is out of bounds");
-    massert(z < g->dungeon->floors->size(), "floor is out of bounds");
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
-    massert(df, "failed to get dungeon floor");
-    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
-    massert(t, "failed to get tile");
-    int count = 0;
-    for (int i = 0; (size_t)i < t->entities->size(); i++) {
-        entityid id = tile_get_entity(t, i);
-        entitytype_t type = g_get_type(g, id);
-        if (id != ENTITYID_INVALID && (type == ENTITY_NPC || type == ENTITY_PLAYER) && !g_is_dead(g, id)) {
-            count++;
-        }
-    }
-    return count;
-}
 
 
 static inline entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z) {
@@ -2793,25 +2834,7 @@ static vec3 get_base_attack_damage_for_race(race_t race) {
 }
 */
 
-static race_t get_random_race() {
-    race_t race = RACE_NONE;
-    int num_choices = 10;
-    int choice = rand() % num_choices;
-    switch (choice) {
-    case 0: race = RACE_BAT; break;
-    case 1: race = RACE_WOLF; break;
-    case 2: race = RACE_HUMAN; break;
-    case 3: race = RACE_ELF; break;
-    case 4: race = RACE_DWARF; break;
-    case 5: race = RACE_HALFLING; break;
-    case 6: race = RACE_ORC; break;
-    case 7: race = RACE_GOBLIN; break;
-    case 8: race = RACE_GREEN_SLIME; break;
-    case 9: race = RACE_WARG; break;
-    default: break;
-    }
-    return race;
-}
+
 /*
 */
 
@@ -3055,16 +3078,16 @@ static inline void update_npc_state(gamestate* const g, entityid id) {
 }
 */
 
-static void update_npcs_state(shared_ptr<gamestate> g) {
-    massert(g, "Game state is NULL!");
-    for (entityid id = 0; id < g->next_entityid; id++) {
-        if (id == g->hero_id) {
-            continue;
-        }
-        g_incr_tx_alpha(g, id, 4);
-        //update_npc_state(g, id);
-    }
-}
+//static void update_npcs_state(shared_ptr<gamestate> g) {
+//    massert(g, "Game state is NULL!");
+//    for (entityid id = 0; id < g->next_entityid; id++) {
+//        if (id == g->hero_id) {
+//            continue;
+//        }
+//        g_incr_tx_alpha(g, id, 4);
+//update_npc_state(g, id);
+//    }
+//}
 
 static void handle_npc(shared_ptr<gamestate> g, entityid id) {
     massert(g, "Game state is NULL!");
@@ -3073,34 +3096,15 @@ static void handle_npc(shared_ptr<gamestate> g, entityid id) {
         //merror("Tried to handle hero id %d as NPC! This should not happen.", id);
         return;
     }
-    //if (g_get_type(g, id) == ENTITY_NPC && !g_is_dead(g, id)) {
     if (g_get_type(g, id) == ENTITY_NPC) {
         minfo("Handling NPC %d", id);
-
         race_t race = g_get_race(g, id);
         minfo("NPC %d race: %s", id, race2str(race).c_str());
-
         try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
-
-        //if (g_get_type(g, id) == ENTITY_NPC) {
         //execute_action(g, id, g_get_default_action(g, id));
     }
 }
 
-
-static void handle_npcs(shared_ptr<gamestate> g) {
-    massert(g, "Game state is NULL!");
-    massert(g->flag == GAMESTATE_FLAG_NPC_TURN, "Game state is not in NPC turn!");
-    // Process all NPCs
-    //for (int i = 0; i < g->index_entityids; i++) handle_nth_npc(g, i);
-    for (entityid id = 0; id < g->next_entityid; id++) {
-        handle_npc(g, id);
-    }
-    // After processing all NPCs, set the flag to animate all movements together
-    g->flag = GAMESTATE_FLAG_NPC_ANIM;
-}
-/*
-*/
 
 /*
 static inline void reset_player_blocking(gamestate* const g) {
