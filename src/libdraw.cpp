@@ -928,17 +928,18 @@ static bool libdraw_draw_mouse_box(shared_ptr<gamestate> g) {
     // translate loc into the world position
     Vector2 p = GetScreenToWorld2D(l, g->cam2d);
     //minfo("Drawing mouse box at %.01f, %.01f", p.x, p.y);
-    //float x = loc.x + get_x_from_dir(dir);
-    //float y = loc.y + get_y_from_dir(dir);
     float w = DEFAULT_TILE_SIZE; //* g->cam2d.zoom;
     float h = DEFAULT_TILE_SIZE; //* g->cam2d.zoom;
+    float x = p.x - w / 2.0f;
+    float y = p.y - h / 2.0f;
+    //float y = loc.y + get_y_from_dir(dir);
     //Color base_c = GREEN;
-    float a = 1.0f;
+    float a = 0.8f;
     //if (g->player_changing_dir) {
     //    a = 1.0f;
     //}
     //DrawRectangleLinesEx((Rectangle){p.x * w, p.y * h, w, h}, 1, Fade(ORANGE, a));
-    DrawRectangleLinesEx((Rectangle){p.x, p.y, w, h}, 1, BLUE);
+    DrawRectangleLinesEx((Rectangle){x, y, w, h}, 1, Fade(BLUE, a));
     return true;
 }
 
