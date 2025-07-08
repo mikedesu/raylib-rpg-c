@@ -24,7 +24,7 @@ spritegroup_t* spritegroup_create(int capacity) {
         return NULL;
     }
     sg->dest = sg->move = (Rectangle){0, 0, 0, 0};
-    sg->specifier = SPECIFIER_NONE;
+    //sg->specifier = SPECIFIER_NONE;
     //sg->move_rate = 1.0 / DEFAULT_ANIM_SPEED;
     sg->move_rate = 1.0;
     return sg;

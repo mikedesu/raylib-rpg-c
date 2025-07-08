@@ -2,7 +2,7 @@
 
 #include "entityid.h"
 #include "libgame_defines.h"
-#include "specifier.h"
+//#include "specifier.h"
 #include "sprite.h"
 #include "vec3.h"
 
@@ -16,7 +16,7 @@ typedef struct spritegroup_t {
     int off_y;
     int default_anim; // the default animation to return to after the timer expires
     int alpha;
-    specifier_t specifier;
+    //specifier_t specifier;
     entityid id; // the id of the entity that this spritegroup belongs to
     // note this allows for one entity to have multiple spritegroups
     Rectangle dest;

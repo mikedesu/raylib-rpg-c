@@ -1,7 +1,7 @@
 #pragma once
 #include "gamestate.h"
 #include "inputstate.h"
-#include "specifier.h"
+//#include "specifier.h"
 #include "spritegroup.h"
 #include <memory>
 #include <raylib.h>

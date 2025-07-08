@@ -12,7 +12,7 @@
 #include "race.h"
 #include "rlgl.h"
 #include "scene.h"
-#include "specifier.h"
+//#include "specifier.h"
 #include "sprite.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -110,7 +110,8 @@ static void draw_debug_panel(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d(shared_ptr<gamestate> g);
 static void create_sg_byid(shared_ptr<gamestate> g, entityid id);
 //static void calc_debugpanel_size(shared_ptr<gamestate> g);
-static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
+//static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
+static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
 //static void draw_shadow_for_entity(const shared_ptr<gamestate> g,
 //                                   spritegroup_t* sg,
 //                                   entityid id);
@@ -1279,7 +1280,8 @@ static void load_textures() {
 }
 
 
-static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
+//static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
+static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
     massert(g, "gamestate is NULL");
     // can hold up to 32 sprites
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
@@ -1386,11 +1388,13 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             break;
         default: merror("unknown race %d", race); return;
         }
-        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        //create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y);
     } else if (type == ENTITY_WOODEN_BOX) {
         keys = TX_WOODEN_BOX_KEYS;
         num_keys = TX_WOODEN_BOX_COUNT;
-        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        //create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
+        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y);
     }
 }
 
