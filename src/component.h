@@ -1,31 +1,17 @@
 #pragma once
 
 #include "arrow.h"
-#include "arrow_component.h"
-#include "attacking_component.h"
-#include "block_success_component.h"
-#include "blocking_component.h"
-#include "damaged_component.h"
 #include "entityid.h"
-#include "equipment_component.h"
 #include "equipment_slot.h"
-#include "int_component.h"
-#include "inventory_component.h"
 #include "item.h"
-#include "name_component.h"
 #include "potion.h"
-#include "quiver_component.h"
 #include "race.h"
-#include "rect_component.h"
 #include "shield.h"
-#include "stats_component.h"
 #include "stats_slot.h"
-#include "update_component.h"
 #include "weapon.h"
+#include <cstdio>
+#include <cstdlib>
 #include <raylib.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 
 typedef enum component_t
@@ -67,8 +53,8 @@ typedef enum component_t
     C_TX_ALPHA = 34,
     C_PUSHABLE = 35,
     C_COUNT
-    //C_SPELL_EFFECT,
 } component;
+
 
 static inline const char* component2str(component c) {
     switch (c) {
@@ -113,29 +99,4 @@ static inline const char* component2str(component c) {
     default: break;
     }
     return "C_UNKNOWN";
-    //case C_SPELL_EFFECT: return "C_SPELL_EFFECT";
 }
-
-// string components
-//void init_name_component(name_component* comp, entityid id, const char* name);
-//void init_name_component(name_component* comp, entityid id, string name);
-
-// int components
-//void init_int_component(int_component* comp, entityid id, int data);
-
-// loc components: 3 integer
-//void init_vec3_component(vec3_component* comp, entityid id, vec3 v);
-// vec3 list components
-//void init_vec3_list_component(vec3_list_component* comp, entityid id, vec3* list, int list_length);
-
-// Rectangle component
-//void init_rect_component(rect_component* comp, entityid id, Rectangle rect);
-
-// list components
-//void init_inventory_component(inventory_component* comp, entityid id);
-//void init_equipment_component(equipment_component* comp, entityid id);
-//void init_stats_component(stats_component* comp, entityid id);
-//void init_target_path_component(target_path_component* comp, entityid id, vec3* target_path, int target_path_length);
-
-// complex components
-//void init_spell_effect_component(spell_effect_component* comp, entityid id, spell_effect effect);
