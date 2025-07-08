@@ -25,7 +25,7 @@
 #include "vec3_component.h"
 #include "vec3_list_component.h"
 #include "weapon.h"
-#include "zapping_component.h"
+//#include "zapping_component.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <stdio.h>
