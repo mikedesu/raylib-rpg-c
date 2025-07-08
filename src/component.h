@@ -20,19 +20,13 @@
 #include "shield.h"
 #include "stats_component.h"
 #include "stats_slot.h"
-#include "target_path_component.h"
 #include "update_component.h"
-#include "vec3_component.h"
-#include "vec3_list_component.h"
 #include "weapon.h"
-//#include "zapping_component.h"
 #include <raylib.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include "spell_effect_component.h"
-//#include "attrib_effect.h"
-//#include "damage_component.h"
+
 
 typedef enum component_t
 {
