@@ -180,6 +180,8 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->tx_alpha_list = new unordered_map<entityid, int>();
 
+    g->item_type_list = new unordered_map<entityid, itemtype>();
+
     g->last_click_screen_pos = (Vector2){-1, -1};
 
     gamestate_load_keybindings(g);
@@ -253,6 +255,7 @@ void gamestate_free(shared_ptr<gamestate> g) {
     if (g->block_success_list) delete g->block_success_list;
     if (g->damaged_list) delete g->damaged_list;
     if (g->tx_alpha_list) delete g->tx_alpha_list;
+    if (g->item_type_list) delete g->item_type_list;
 }
 
 
@@ -1145,6 +1148,69 @@ bool g_is_pushable(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_has_comp(g, id, C_PUSHABLE);
+}
+
+
+bool g_add_item_type(shared_ptr<gamestate> g, entityid id, itemtype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_ITEMTYPE)) {
+        merror("g_add_item_type: Failed to add component C_ITEM_TYPE for id %d", id);
+        return false;
+    }
+    if (!g->item_type_list) {
+        merror("g->item_type_list is NULL");
+        return false;
+    }
+    // Check if the item type already exists for the entity
+    (*g->item_type_list)[id] = type; // Insert or update the item type
+
+    return true;
+}
+
+
+bool g_has_item_type(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->item_type_list) {
+        merror("g->item_type_list is NULL");
+        return false;
+    }
+    // Check if the entity has an item type component
+    return g->item_type_list->find(id) != g->item_type_list->end();
+}
+
+
+itemtype g_get_item_type(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->item_type_list) {
+        if (g_has_item_type(g, id)) {
+            massert(g->item_type_list->find(id) != g->item_type_list->end(), "g_get_item_type: id %d not found in item type list", id);
+            return g->item_type_list->at(id);
+        }
+    }
+    merror("g_get_item_type: id %d does not have an item type component", id);
+    return ITEM_NONE; // Return ITEMTYPE_NONE if not found
+}
+
+
+bool g_set_item_type(shared_ptr<gamestate> g, entityid id, itemtype type) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->item_type_list) {
+        merror("g->item_type_list is NULL");
+        return false;
+    }
+    // Check if the entity has an item type component
+    if (g_has_item_type(g, id)) {
+        // Update the item type for the entity
+        (*g->item_type_list)[id] = type; // Update the item type
+        return true;
+    }
+    merror("g_set_item_type: id %d does not have an item type component", id);
+    return false;
 }
 
 

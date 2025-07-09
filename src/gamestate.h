@@ -103,6 +103,8 @@ typedef struct gamestate {
 
     std::unordered_map<entityid, int>* tx_alpha_list;
 
+    std::unordered_map<entityid, itemtype>* item_type_list;
+
     debugpanel_t debugpanel;
 
     Camera2D cam2d;
@@ -281,3 +283,9 @@ bool g_decr_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
 
 bool g_add_pushable(std::shared_ptr<gamestate> g, entityid id);
 bool g_is_pushable(std::shared_ptr<gamestate> g, entityid id);
+
+
+bool g_add_item_type(std::shared_ptr<gamestate> g, entityid id, itemtype type);
+bool g_has_item_type(std::shared_ptr<gamestate> g, entityid id);
+itemtype g_get_item_type(std::shared_ptr<gamestate> g, entityid id);
+bool g_set_item_type(std::shared_ptr<gamestate> g, entityid id, itemtype type);

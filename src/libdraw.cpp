@@ -12,7 +12,6 @@
 #include "race.h"
 #include "rlgl.h"
 #include "scene.h"
-//#include "specifier.h"
 #include "sprite.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -22,23 +21,14 @@
 #include <memory>
 #include <raylib.h>
 #include <sys/param.h>
-//#include "weapon.h"
-//#include "gamestate_flag.h"
-//#include "libdraw_sort_inventory_menu.h"
-//#include "bonus_table.h"
-//#include "entitytype.h"
-//#include <unordered_map>
-//#include <vector>
-//#include "component.h"
-//#include "inventory_sort.h"
 
-//#define MAX(a, b) ((a)>(b)? (a) : (b))
-//#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 using std::shared_ptr;
 
+
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
+
 
 Shader shader_grayscale = {0};
 Shader shader_glow = {0};
@@ -46,36 +36,44 @@ Shader shader_red_glow = {0};
 Shader shader_color_noise = {0};
 Shader shader_psychedelic_0 = {0};
 
+
 RenderTexture2D title_target_texture = {0};
 RenderTexture2D char_creation_target_texture = {0};
 RenderTexture2D main_game_target_texture = {0};
+
 
 RenderTexture2D target = {0};
 Rectangle target_src = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
 Rectangle target_dest = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
 Rectangle win_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 
+
 Vector2 target_origin = {0, 0};
 Vector2 zero_vec = {0, 0};
 
+
 Music music;
+
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
+
 int libdraw_restart_count = 0;
+
 
 //static int get_total_ac(gamestate* const g, entityid id);
 static int get_total_ac(shared_ptr<gamestate> g, entityid id);
+
 
 static inline bool camera_lock_on(shared_ptr<gamestate> g);
 static inline void update_debug_panel(shared_ptr<gamestate> g);
 static inline void handle_debug_panel(shared_ptr<gamestate> g);
 
+
 static void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
 static void draw_help_menu(shared_ptr<gamestate> g);
-
 static void draw_gameover_menu(shared_ptr<gamestate> g);
 static void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id);
 static void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g);
@@ -83,7 +81,6 @@ static void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, sprit
 static void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-//static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_inventory_menu(shared_ptr<gamestate> g);
 static void draw_hud(shared_ptr<gamestate> g);
 static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu);
@@ -109,29 +106,33 @@ static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id);
 static void draw_debug_panel(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d(shared_ptr<gamestate> g);
 static void create_sg_byid(shared_ptr<gamestate> g, entityid id);
+static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
+static void draw_version(const shared_ptr<gamestate> g);
+
+//static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 //static void calc_debugpanel_size(shared_ptr<gamestate> g);
 //static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
-static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
 //static void draw_shadow_for_entity(const shared_ptr<gamestate> g,
 //                                   spritegroup_t* sg,
 //                                   entityid id);
-static void draw_version(const shared_ptr<gamestate> g);
 
 static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
 static sprite* get_weapon_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
 static sprite* get_shield_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
 static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
 
+
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 static bool libdraw_unload_texture(int txkey);
 static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z);
-//static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, dungeon_floor_t* df);
 static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df);
 static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
 static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
 static bool libdraw_draw_player_target_box(shared_ptr<gamestate> g);
 static bool libdraw_draw_mouse_box(shared_ptr<gamestate> g);
+//static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, dungeon_floor_t* df);
 //static bool libdraw_check_default_animations(const shared_ptr<gamestate> g);
+
 
 static bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
