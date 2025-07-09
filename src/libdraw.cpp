@@ -950,7 +950,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
 
-    camera_lock_on(g);
+    //camera_lock_on(g);
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     //EndShaderMode();
@@ -1008,21 +1008,27 @@ static void draw_message_box(shared_ptr<gamestate> g) {
     Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
-    int font_size = 20;
+    int font_size = 10;
     int measure = MeasureText(tmp, font_size);
-    int text_width = measure;
-    int text_height = font_size;
+    float text_width = measure;
+    float text_height = font_size;
     //int prompt_font_size = 10;
     //int prompt_offset = 10;
-    int w = DEFAULT_TARGET_WIDTH;
     //int h = DEFAULT_TARGET_HEIGHT;
-    int x = (w - text_width) / 2.0 - g->pad;
     //int y = (h - text_height) / 8.0 - g->pad;
-    int y = 42;
-    Rectangle box = {(float)x, (float)y, (float)text_width + g->pad * 2, (float)text_height + g->pad * 2};
+    int w = DEFAULT_TARGET_WIDTH;
+    //float x = (w - text_width) / 2.0 - g->pad;
+    //float y = 42;
+    //Rectangle box = {x, y, text_width + g->pad * 2, text_height + g->pad * 2};
+    // instead, lets center the msg box in the middle of the screen
+    float x = (w - text_width) / 2.0 - g->pad;
+    float y = (DEFAULT_TARGET_HEIGHT - text_height) / 2.0 - g->pad;
+    Rectangle box = {x, y, text_width + g->pad * 2, text_height + g->pad * 2};
+
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);
     DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
+
     //if (g->msg_system.count > 1 && g->msg_system.index < g->msg_system.count - 1) {
     //    char tmp_prompt[1024] = {0};
     //    snprintf(tmp_prompt, sizeof(tmp_prompt), "%s %d/%d", prompt, g->msg_system.index + 1, g->msg_system.count);
@@ -1280,7 +1286,6 @@ static void load_textures() {
 }
 
 
-//static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec) {
 static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
     massert(g, "gamestate is NULL");
     // can hold up to 32 sprites
@@ -1321,18 +1326,7 @@ static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
     group->off_y = offset_y;
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
 }
-/*
-*/
 
-/*
-static void calc_debugpanel_size(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    Vector2 s = MeasureTextEx(
-        GetFontDefault(), g->debugpanel.buffer, g->debugpanel.font_size, 1);
-    float width_factor = 1.1f;
-    g->debugpanel.w = s.x * width_factor, g->debugpanel.h = s.y;
-}
-*/
 
 static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
@@ -1505,57 +1499,59 @@ static void draw_hud(shared_ptr<gamestate> g) {
     int ac = 0;
     int floor = g->dungeon->current_floor;
     int font_size = 10;
-    char buffer[1024] = {0};
-    const char* format_str = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d STR: "
-                             "%d CON: %d DEX: %d Floor: %d Turn %d";
-    snprintf(buffer,
-             sizeof(buffer),
-             format_str,
-             g_get_name(g, g->hero_id).c_str(),
-             level,
-             hp,
-             maxhp,
-             attack_bonus,
-             ac,
-             xp,
-             next_level_xp,
-             str,
-             con,
-             dex,
-             floor,
-             turn);
-    Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, g->line_spacing);
-    int box_w = text_size.x + g->pad;
-    int box_h = text_size.y + g->pad;
-    int box_x = 0;
-    int box_y = 0;
+
+    char buffer0[1024] = {0};
+    char buffer1[1024] = {0};
+
+    const char* format_str_0 = "%s Lvl %02d HP %02d/%02d Atk: %02d AC: %02d XP %05d/%05d";
+    const char* format_str_1 = "Floor %02d Turn %d";
+
+    snprintf(buffer0, sizeof(buffer0), format_str_0, g_get_name(g, g->hero_id).c_str(), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp);
+    snprintf(buffer1, sizeof(buffer1), format_str_1, floor, turn);
+
+    Vector2 text_size0 = MeasureTextEx(GetFontDefault(), buffer0, font_size, g->line_spacing);
+
+    float box_w = text_size0.x + g->pad;
+    float box_h = text_size0.y * 2 + g->pad;
+
+    // instead, lets position the HUD at the top right corner of the screen
+    float box_x = DEFAULT_TARGET_WIDTH - box_w;
+    float box_y = 0;
     Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
-    DrawRectangleRec((Rectangle){(float)box_x, (float)box_y, (float)box_w, (float)box_h}, bg);
+
+    DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
     int line_thickness = 1;
-    DrawRectangleLinesEx((Rectangle){(float)box_x, (float)box_y, (float)box_w, (float)box_h}, line_thickness, fg);
+    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, line_thickness, fg);
+
     // Calculate text position to center it within the box
-    float text_x = box_x + (box_w - text_size.x) / 2;
-    float text_y = box_y + (box_h - text_size.y) / 2;
-    DrawTextEx(GetFontDefault(), buffer, (Vector2){text_x, text_y}, font_size, g->line_spacing, fg);
+    int text_x = box_x + (box_w - text_size0.x) / 2;
+    int text_y = box_y + (box_h - text_size0.y) / 4;
+
+    DrawText(buffer0, text_x, text_y, font_size, fg);
+
+    text_y = box_y + (box_h - text_size0.y) * 3 / 4;
+    DrawText(buffer1, text_x, text_y, font_size, fg);
 }
-/*
-*/
+
 
 void libdraw_init_rest(shared_ptr<gamestate> g) {
     minfo("libdraw_init_rest: initializing rest of the libdraw");
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);
+
     int w = DEFAULT_WIN_WIDTH;
     int h = DEFAULT_WIN_HEIGHT;
+
     int target_w = DEFAULT_TARGET_WIDTH;
     int target_h = DEFAULT_TARGET_HEIGHT;
+
     minfo("libdraw_init_rest: window size: %dx%d", w, h);
     massert(w > 0 && h > 0, "window width or height is not set properly");
     g->windowwidth = w;
     g->windowheight = h;
-    TextureFilter filter = TEXTURE_FILTER_POINT; // Use trilinear filtering for better quality
+    //TextureFilter filter = TEXTURE_FILTER_POINT; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_BILINEAR; // Use trilinear filtering for better quality
-    //TextureFilter filter = TEXTURE_FILTER_TRILINEAR; // Use trilinear filtering for better quality
+    TextureFilter filter = TEXTURE_FILTER_TRILINEAR; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_ANISOTROPIC_16X;
     target = LoadRenderTexture(target_w, target_h);
     //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
@@ -1571,8 +1567,8 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     main_game_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(main_game_target_texture.texture, filter);
 
-    target_src = (Rectangle){(float)0, (float)0, (float)target_w, (float)-target_h};
-    target_dest = (Rectangle){(float)0, (float)0, (float)target_w, (float)target_h};
+    target_src = (Rectangle){0, 0, target_w * 1.0f, -target_h * 1.0f};
+    target_dest = (Rectangle){0, 0, target_w * 1.0f, target_h * 1.0f};
 
     //target_dest = (Rectangle){0, 0, w, h};
     spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
@@ -1583,9 +1579,11 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
 
     load_shaders();
 
-    int x = target_w / 2 - DEFAULT_TILE_SIZE;
-    int y = target_h / 2 - DEFAULT_TILE_SIZE * 10;
-    g->cam2d.offset = (Vector2){(float)x, (float)y};
+    //float x = target_w / 2.0f - DEFAULT_TILE_SIZE;
+    float x = DEFAULT_TILE_SIZE * 4;
+    //float y = target_h / 2.0f - DEFAULT_TILE_SIZE * 10;
+    float y = DEFAULT_TILE_SIZE * 8;
+    g->cam2d.offset = (Vector2){x, y};
     //g->cam2d.zoom = 1.0f;
 
     //gamestate_set_debug_panel_pos_top_right(g);
@@ -1621,7 +1619,8 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     //SetMusicVolume(music, g->music_volume); // Set initial music volume
     //SetMusicLooping(music, true); // Loop the music
     //PlayMusicStream(music);
-    if (!camera_lock_on(g)) merror("failed to lock camera on hero");
+
+    //if (!camera_lock_on(g)) merror("failed to lock camera on hero");
 
     msuccess("libdraw_init_rest: done");
 }
@@ -1986,9 +1985,6 @@ static void draw_gameplay_settings_menu(shared_ptr<gamestate> g) {
 */
 
 
-//void libdraw_update_input(shared_ptr<inputstate> is) { inputstate_update(is); }
-
-
 bool libdraw_windowshouldclose(const shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     return g->do_quit;
@@ -2006,9 +2002,11 @@ static void draw_version(const shared_ptr<gamestate> g) {
     snprintf(buffer, sizeof(buffer), "%s", version);
     Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
     int w = DEFAULT_TARGET_WIDTH;
-    float x = w - text_size.x - g->pad;
-    float y = 0;
-    DrawTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
+    //float x = w - text_size.x - g->pad;
+    int x = 0;
+    int y = 0;
+    //awTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
+    DrawText(buffer, x, y, font_size, WHITE);
 }
 
 
@@ -2051,7 +2049,7 @@ static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
 
     // Draw the "evidojo666 presents" text at the top
     int evidojo_x = (w - evidojo_presents_measure) / 2.0f;
-    int evidojo_y = y - sm_font_size - 5; // Position it above the title text
+    int evidojo_y = y - sm_font_size - 10; // Position it above the title text
 
     DrawText(evidojo_presents_text, evidojo_x, evidojo_y, sm_font_size, WHITE);
 
@@ -2114,8 +2112,6 @@ static void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g)
 static void draw_character_creation_screen(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     const char* title_text = "Character Creation";
-    //const char* stats_fmt[] = {
-    //    "Name: %s", "Race: %s", "Hitdie: %d", "Strength: %d", "Dexterity: %d", "Constitution: %d"};
     const char* remaining_text[] = {"Press SPACE to re-roll stats",
                                     "Press LEFT/RIGHT to change race (unavailable for now)",
                                     "Press UP/DOWN to change class (unavailable for now)",
@@ -2130,23 +2126,23 @@ static void draw_character_creation_screen(shared_ptr<gamestate> g) {
     //char buffer[2048] = {0};
     ClearBackground(BLACK);
     DrawText(title_text, x, y, font_size, WHITE);
-    y += font_size;
+    y += font_size + 10;
+
     font_size = 10;
     // Draw character stats
 
-    //DrawText(buffer, x, y, font_size, WHITE);
     DrawText(TextFormat("Name: %s", g->chara_creation->name.c_str()), x, y, font_size, WHITE);
-    y += font_size + 4;
+    y += font_size + 10;
     DrawText(TextFormat("Race: %s", race2str(g->chara_creation->race).c_str()), x, y, font_size, WHITE);
-    y += font_size + 4;
+    y += font_size + 10;
     DrawText(TextFormat("Hitdie: %d", g->chara_creation->hitdie), x, y, font_size, WHITE);
-    y += font_size + 4;
+    y += font_size + 10;
     DrawText(TextFormat("Strength: %d", g->chara_creation->strength), x, y, font_size, WHITE);
-    y += font_size + 4;
+    y += font_size + 10;
     DrawText(TextFormat("Dexterity: %d", g->chara_creation->dexterity), x, y, font_size, WHITE);
-    y += font_size + 4;
+    y += font_size + 10;
     DrawText(TextFormat("Constitution: %d", g->chara_creation->constitution), x, y, font_size, WHITE);
-    y += font_size + 4;
+    y += font_size + 10;
 
     //for (int i = 0; i < sizeof(stats_fmt) / sizeof(stats_fmt[0]); i++) {
     //if (i == 0) {

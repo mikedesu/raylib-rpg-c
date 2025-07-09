@@ -9,11 +9,14 @@
 #include <memory>
 #include <vector>
 
+
 using std::make_shared;
 using std::shared_ptr;
 using std::vector;
 
+
 #define INITIAL_DUNGEON_CAPACITY 4
+
 
 shared_ptr<dungeon_t> d_create() {
     shared_ptr<dungeon_t> dungeon = make_shared<dungeon_t>();
@@ -28,7 +31,7 @@ shared_ptr<dungeon_t> d_create() {
     return dungeon;
 }
 
-//void d_destroy(dungeon_t* const d) {
+
 void d_destroy(shared_ptr<dungeon_t> d) {
     massert(d, "dungeon is NULL");
     if (d->floors) {
@@ -38,12 +41,13 @@ void d_destroy(shared_ptr<dungeon_t> d) {
     //free(d);
 }
 
-//void d_free(dungeon_t* const dungeon) {
+
 void d_free(shared_ptr<dungeon_t> dungeon) {
     massert(dungeon, "dungeon is NULL");
     //minfo("Freeing dungeon with %d floors", dungeon->num_floors);
     d_destroy(dungeon);
 }
+
 
 bool d_add_floor(shared_ptr<dungeon_t> dungeon, int width, int height) {
     minfo("d_add_floor: Adding new floor with dimensions %dx%d", width, height);

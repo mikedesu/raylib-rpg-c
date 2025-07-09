@@ -23,7 +23,6 @@ void df_set_tile_area(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int
 void df_set_tile_area_range2(shared_ptr<dungeon_floor_t> const df, Rectangle r, tiletype_t begin, tiletype_t end);
 void df_init_rect2(shared_ptr<dungeon_floor_t> df, Rectangle r, tiletype_t t1, tiletype_t t2);
 void df_init_rect(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h, tiletype_t t1, tiletype_t t2);
-//bool df_malloc_tiles(shared_ptr<dungeon_floor_t> const df);
 void df_assign_stairs(shared_ptr<dungeon_floor_t> df);
 void df_assign_downstairs(shared_ptr<dungeon_floor_t> df);
 void df_assign_upstairs(shared_ptr<dungeon_floor_t> df);
@@ -41,6 +40,7 @@ void df_make_room(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 void df_make_corridor_h(shared_ptr<dungeon_floor_t> df, int x, int y, int len);
 void df_make_corridor_v(shared_ptr<dungeon_floor_t> df, int x, int y, int len);
 void df_make_diamond_shape_room(shared_ptr<dungeon_floor_t> df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type);
+
 
 int df_get_possible_downstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
