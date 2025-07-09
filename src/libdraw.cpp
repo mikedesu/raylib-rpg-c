@@ -436,8 +436,7 @@ static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
     //draw_shield_sprite_front(g, id, sg);
     //draw_weapon_sprite_front(g, id, sg);
 }
-/*
-*/
+
 
 static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc) {
     massert(g, "draw_entities_2d: gamestate is NULL");
@@ -1333,40 +1332,53 @@ static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
 static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    int offx = -12;
-    int offy = -12;
     entitytype_t type = g_get_type(g, id);
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
         race_t race = g_get_race(g, id);
         switch (race) {
-        case RACE_HUMAN: create_spritegroup(g, id, TX_HUMAN_KEYS, TX_HUMAN_COUNT, offx, offy); break;
-        case RACE_ORC: create_spritegroup(g, id, TX_ORC_KEYS, TX_ORC_COUNT, offx, offy); break;
-        case RACE_ELF: create_spritegroup(g, id, TX_ELF_KEYS, TX_ELF_COUNT, offx, offy); break;
-        case RACE_DWARF: create_spritegroup(g, id, TX_DWARF_KEYS, TX_DWARF_COUNT, offx, offy); break;
-        case RACE_HALFLING: create_spritegroup(g, id, TX_HALFLING_KEYS, TX_HALFLING_COUNT, offx, offy); break;
-        case RACE_GOBLIN: create_spritegroup(g, id, TX_GOBLIN_KEYS, TX_GOBLIN_COUNT, offx, offy); break;
-        case RACE_WOLF: create_spritegroup(g, id, TX_WOLF_KEYS, TX_WOLF_COUNT, offx, offy); break;
-        case RACE_BAT: create_spritegroup(g, id, TX_BAT_KEYS, TX_BAT_COUNT, offx, offy); break;
-        case RACE_WARG: create_spritegroup(g, id, TX_WARG_KEYS, TX_WARG_COUNT, offx, offy); break;
-        case RACE_GREEN_SLIME: create_spritegroup(g, id, TX_GREEN_SLIME_KEYS, TX_GREEN_SLIME_COUNT, offx, offy); break;
+        case RACE_HUMAN: create_spritegroup(g, id, TX_HUMAN_KEYS, TX_HUMAN_COUNT, -12, -12); break;
+        case RACE_ORC: create_spritegroup(g, id, TX_ORC_KEYS, TX_ORC_COUNT, -12, -12); break;
+        case RACE_ELF: create_spritegroup(g, id, TX_ELF_KEYS, TX_ELF_COUNT, -12, -12); break;
+        case RACE_DWARF: create_spritegroup(g, id, TX_DWARF_KEYS, TX_DWARF_COUNT, -12, -12); break;
+        case RACE_HALFLING: create_spritegroup(g, id, TX_HALFLING_KEYS, TX_HALFLING_COUNT, -12, -12); break;
+        case RACE_GOBLIN: create_spritegroup(g, id, TX_GOBLIN_KEYS, TX_GOBLIN_COUNT, -12, -12); break;
+        case RACE_WOLF: create_spritegroup(g, id, TX_WOLF_KEYS, TX_WOLF_COUNT, -12, -12); break;
+        case RACE_BAT: create_spritegroup(g, id, TX_BAT_KEYS, TX_BAT_COUNT, -12, -12); break;
+        case RACE_WARG: create_spritegroup(g, id, TX_WARG_KEYS, TX_WARG_COUNT, -12, -12); break;
+        case RACE_GREEN_SLIME: create_spritegroup(g, id, TX_GREEN_SLIME_KEYS, TX_GREEN_SLIME_COUNT, -12, -12); break;
         default: merror("unknown race %d", race); return;
         }
     } else if (type == ENTITY_WOODEN_BOX) {
-        create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, offx, offy);
+        create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
     } else if (type == ENTITY_ITEM) {
         itemtype item_type = g_get_item_type(g, id);
         if (item_type == ITEM_POTION) {
             potiontype potion_type = g_get_potion_type(g, id);
-            if (potion_type == POTION_HP_SMALL) {
-                create_spritegroup(g, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, offx, offy);
+
+            switch (potion_type) {
+            case POTION_HP_SMALL: create_spritegroup(g, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, -12, -12); break;
+            case POTION_HP_MEDIUM: create_spritegroup(g, id, TX_POTION_HP_MEDIUM_KEYS, TX_POTION_HP_MEDIUM_COUNT, -12, -12); break;
+            case POTION_HP_LARGE: create_spritegroup(g, id, TX_POTION_HP_LARGE_KEYS, TX_POTION_HP_LARGE_COUNT, -12, -12); break;
+            case POTION_MP_SMALL: create_spritegroup(g, id, TX_POTION_MP_SMALL_KEYS, TX_POTION_MP_SMALL_COUNT, -12, -12); break;
+            case POTION_MP_MEDIUM: create_spritegroup(g, id, TX_POTION_MP_MEDIUM_KEYS, TX_POTION_MP_MEDIUM_COUNT, -12, -12); break;
+            case POTION_MP_LARGE: create_spritegroup(g, id, TX_POTION_MP_LARGE_KEYS, TX_POTION_MP_LARGE_COUNT, -12, -12); break;
+            default: merror("unknown potion type %d", potion_type); return;
             }
-            //    else if (potion_type == POTION_HEALTH_MEDIUM) {
-            //        keys = TX_POTION_HP_MEDIUM_KEYS;
-            //        num_keys = TX_POTION_HP_MEDIUM_COUNT;
-            //    } else if (potion_type == POTION_HEALTH_LARGE) {
-            //        keys = TX_POTION_HP_LARGE_KEYS;
-            //        num_keys = TX_POTION_HP_LARGE_COUNT;
-            //    }
+
+
+            //if (potion_type == POTION_HP_SMALL) {
+            //    create_spritegroup(g, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, -12, -12);
+            //} else if (potion_type == POTION_HP_MEDIUM) {
+            //    create_spritegroup(g, id, TX_POTION_HP_MEDIUM_KEYS, TX_POTION_HP_MEDIUM_COUNT, -12, -12);
+            //} else if (potion_type == POTION_HP_LARGE) {
+            //    create_spritegroup(g, id, TX_POTION_HP_LARGE_KEYS, TX_POTION_HP_LARGE_COUNT, -12, -12);
+            //} else if (potion_type == POTION_MP_SMALL) {
+            //    create_spritegroup(g, id, TX_POTION_MP_SMALL_KEYS, TX_POTION_MP_SMALL_COUNT, -12, -12);
+            //} else if (potion_type == POTION_MP_MEDIUM) {
+            //    create_spritegroup(g, id, TX_POTION_MP_MEDIUM_KEYS, TX_POTION_MP_MEDIUM_COUNT, -12, -12);
+            //} else if (potion_type == POTION_MP_LARGE) {
+            //    create_spritegroup(g, id, TX_POTION_MP_LARGE_KEYS, TX_POTION_MP_LARGE_COUNT, -12, -12);
+            //}
         }
     }
 }

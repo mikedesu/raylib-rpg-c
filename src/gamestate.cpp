@@ -182,6 +182,8 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->item_type_list = new unordered_map<entityid, itemtype>();
 
+    g->potion_type_list = new unordered_map<entityid, potiontype>();
+
     g->last_click_screen_pos = (Vector2){-1, -1};
 
     gamestate_load_keybindings(g);
@@ -1030,7 +1032,7 @@ int g_get_tx_alpha(shared_ptr<gamestate> g, entityid id) {
         if (g_has_tx_alpha(g, id)) {
             return g->tx_alpha_list->at(id);
         }
-        merror("g_get_tx_alpha: id %d does not have a tx alpha component", id);
+        //merror("g_get_tx_alpha: id %d does not have a tx alpha component", id);
         return 255;
     }
     merror("g_get_tx_alpha: g->tx_alpha_list is NULL");

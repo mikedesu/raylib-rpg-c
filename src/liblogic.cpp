@@ -9,6 +9,7 @@
 #include "libgame_defines.h"
 #include "liblogic.h"
 #include "massert.h"
+#include "potion.h"
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
@@ -28,7 +29,7 @@
 //#include "path_node.h"
 //#include "potion.h"
 //#include "race.h"
-//#include "roll.h"
+#include "roll.h"
 //#include "stats_slot.h"
 
 using std::shared_ptr;
@@ -115,8 +116,9 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 loc);
 
 static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc);
 static entityid npc_create_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
-static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int fl, string name);
+static entityid player_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
 static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+static entityid potion_create(shared_ptr<gamestate> g, vec3 loc, potiontype type);
 
 
 static void init_dungeon(shared_ptr<gamestate> g) {
@@ -195,63 +197,61 @@ static entityid npc_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
 }
 
 
-static entityid player_create(shared_ptr<gamestate> g, race_t rt, int x, int y, int z, string name) {
+static entityid potion_create(shared_ptr<gamestate> g, vec3 loc, potiontype type) {
+    minfo("potion create...");
+    massert(g, "gamestate is NULL");
+
+    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+    minfo("calling df_tile_at...");
+    shared_ptr<tile_t> tile = df_tile_at(df, loc);
+    massert(tile, "failed to get tile");
+    minfo("checking if tile is walkable...");
+    if (!tile_is_walkable(tile->type)) {
+        merror("cannot create entity on non-walkable tile");
+        return ENTITYID_INVALID;
+    }
+    minfo("checking if tile has live NPCs...");
+    if (tile_has_live_npcs(g, tile)) {
+        merror("cannot create entity on tile with live NPCs");
+        return ENTITYID_INVALID;
+    }
+
+    entityid id = g_add_entity(g);
+    g_add_type(g, id, ENTITY_ITEM);
+    g_add_item_type(g, id, ITEM_POTION);
+    g_add_potion_type(g, id, type);
+    g_add_name(g, id, potiontype2str(type));
+    g_add_loc(g, id, loc);
+    g_add_tx_alpha(g, id, 255);
+    g_add_update(g, id, true);
+    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
+
+
+    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+    if (!df_add_at(df, id, loc.x, loc.y)) {
+        return ENTITYID_INVALID;
+    }
+
+    //entityid id = item_create(g, ITEM_POTION, loc, "");
+    //if (id == ENTITYID_INVALID) return ENTITYID_INVALID;
+    //g_add_potiontype(g, id, type);
+    //msuccess("potion created!");
+    return ENTITYID_INVALID;
+}
+
+
+static entityid player_create(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
     massert(g, "gamestate is NULL");
     massert(name != "", "name is empty string");
     // use the previously-written liblogic_npc_create function
     minfo("calling npc_create...");
-    const entityid id = npc_create(g, rt, (vec3){x, y, z}, name);
+    entityid id = npc_create(g, rt, loc, name);
     msuccess("npc_create successful, id: %d", id);
     massert(id != ENTITYID_INVALID, "failed to create player");
     g_set_hero_id(g, id);
     g_add_type(g, id, ENTITY_PLAYER);
     g_set_tx_alpha(g, id, 0);
-    //g_update_race(g, id, RACE_GREEN_SLIME);
-
-    //int str_roll = do_roll_best_of_3((roll){3, 6, 0});
-    //int con_roll = do_roll_best_of_3((roll){3, 6, 0});
-    //printf("rolling stats...\n");
-    //int str_roll = do_roll_best_of_3((vec3){3, 6, 0});
-    //int con_roll = do_roll_best_of_3((vec3){3, 6, 0});
-    //int dex_roll = do_roll_best_of_3((vec3){3, 6, 0});
-    //printf("calling set stats...\n");
-    //g_set_stat(g, id, STATS_STR, str_roll);
-    //g_set_stat(g, id, STATS_CON, con_roll);
-    //g_set_stat(g, id, STATS_DEX, dex_roll);
-    //int hitdie = 8;
-    //g_set_stat(g, id, STATS_HITDIE, hitdie);
-    //int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
-    //while (maxhp_roll < 1) {
-    //    maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) + bonus_calc(con_roll);
-    //}
-    //int maxhp_roll = 5;
-    //g_set_stat(g, id, STATS_MAXHP, maxhp_roll);
-    //g_set_stat(g, id, STATS_HP, maxhp_roll);
-    //int default_vision_distance = 2;
-    //int default_light_radius = 2;
-    //printf("calling set light radius...\n");
-    //g_set_light_radius(g, id, default_light_radius);
-    //printf("calling set vision radius...\n");
-    //g_set_vision_distance(g, id, default_vision_distance);
-    //printf("calling update player tiles explored...\n");
-    //update_player_tiles_explored(g);
     return id;
-}
-
-
-static void init_player(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    minfo("begin init_player...");
-    // setting it up so we can return a vec3 from a function
-    // that can scan for an appropriate starting location
-    minfo("calling df_get_upstairs...");
-    vec3 loc = (vec3){0, 0, 0};
-    minfo("calling player_create...");
-    g->entity_turn = player_create(g, RACE_HUMAN, loc.x, loc.y, 0, "darkmage");
-    msuccess("player_create successful...");
-    massert(g->entity_turn != ENTITYID_INVALID, "failed to init hero");
-    massert(g->hero_id == g->entity_turn, "hero id mismatch");
-    msuccess("hero id %d", g->hero_id);
 }
 
 
@@ -711,20 +711,25 @@ void liblogic_init(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     srand(time(NULL));
     init_dungeon(g);
-    //g->msg_system.count = 0;
-    //g->msg_system.index = 0;
-    //g->msg_system.is_active = false;
-    init_player(g);
-    //entityid box_id = create_wooden_box(g, (vec3){2, 2, 0});
-    create_wooden_box(g, (vec3){2, 2, 0});
-    //massert(box_id != ENTITYID_INVALID, "box failed to spawn!");
-    create_wooden_box(g, (vec3){3, 3, 0});
-    //massert(box_id0 != ENTITYID_INVALID, "box failed to spawn!");
-    create_wooden_box(g, (vec3){4, 4, 0});
-    //massert(box_id1 != ENTITYID_INVALID, "box failed to spawn!");
-    npc_create_set_stats(g, (vec3){2, 3, 0}, RACE_GREEN_SLIME);
-    npc_create_set_stats(g, (vec3){3, 4, 0}, RACE_ORC);
-    npc_create_set_stats(g, (vec3){4, 5, 0}, RACE_WOLF);
+
+    g->entity_turn = player_create(g, RACE_HUMAN, (vec3){0, 0, 0}, "darkmage");
+
+    //create_wooden_box(g, (vec3){2, 2, 0});
+    //create_wooden_box(g, (vec3){3, 3, 0});
+    //create_wooden_box(g, (vec3){4, 4, 0});
+
+    //npc_create_set_stats(g, (vec3){2, 3, 0}, RACE_GREEN_SLIME);
+    //npc_create_set_stats(g, (vec3){3, 4, 0}, RACE_ORC);
+    //npc_create_set_stats(g, (vec3){4, 5, 0}, RACE_WOLF);
+
+    potion_create(g, (vec3){1, 1, 0}, POTION_HP_SMALL);
+    potion_create(g, (vec3){2, 1, 0}, POTION_MP_SMALL);
+    potion_create(g, (vec3){3, 1, 0}, POTION_HP_MEDIUM);
+    potion_create(g, (vec3){4, 1, 0}, POTION_MP_MEDIUM);
+    potion_create(g, (vec3){5, 1, 0}, POTION_HP_LARGE);
+    potion_create(g, (vec3){6, 1, 0}, POTION_MP_LARGE);
+
+
     add_message(g, "Welcome to the game!");
     add_message(g, "To move around, press q w e a d z x c");
     msuccess("liblogic_init: Game state initialized");
@@ -924,11 +929,7 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 //static entityid item_create(gamestate* const g, itemtype type, vec3 loc, const char* name);
 //static entityid
 //item_create(shared_ptr<gamestate> g, itemtype type, vec3 loc, const char* name);
-//static entityid potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name);
-//static entityid potion_create(shared_ptr<gamestate> g,
-//                              vec3 loc,
-//                              potiontype type,
-//                              const char* name);
+
 
 //static bool entities_adjacent(gamestate* const g, entityid id0, entityid id1);
 //static bool npc_create_set_stats(gamestate* const g, vec3 loc, race_t race);
@@ -1785,18 +1786,6 @@ item_create(gamestate* const g, itemtype type, vec3 loc, const char* name) {
 //    return id;
 //}
 
-/*
-static entityid
-potion_create(gamestate* const g, vec3 loc, potiontype type, const char* name) {
-    minfo("potion create...");
-    massert(g, "gamestate is NULL");
-    entityid id = item_create(g, ITEM_POTION, loc, name);
-    if (id == ENTITYID_INVALID) return ENTITYID_INVALID;
-    g_add_potiontype(g, id, type);
-    msuccess("potion created!");
-    return id;
-}
-*/
 
 //static entityid shield_create(gamestate* const g, shieldtype type, vec3 loc, const char* name) {
 //    massert(g, "gamestate is NULL");
