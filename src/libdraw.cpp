@@ -1354,7 +1354,6 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
         itemtype item_type = g_get_item_type(g, id);
         if (item_type == ITEM_POTION) {
             potiontype potion_type = g_get_potion_type(g, id);
-
             switch (potion_type) {
             case POTION_HP_SMALL: create_spritegroup(g, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, -12, -12); break;
             case POTION_HP_MEDIUM: create_spritegroup(g, id, TX_POTION_HP_MEDIUM_KEYS, TX_POTION_HP_MEDIUM_COUNT, -12, -12); break;
@@ -1364,22 +1363,31 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             case POTION_MP_LARGE: create_spritegroup(g, id, TX_POTION_MP_LARGE_KEYS, TX_POTION_MP_LARGE_COUNT, -12, -12); break;
             default: merror("unknown potion type %d", potion_type); return;
             }
-
-
-            //if (potion_type == POTION_HP_SMALL) {
-            //    create_spritegroup(g, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, -12, -12);
-            //} else if (potion_type == POTION_HP_MEDIUM) {
-            //    create_spritegroup(g, id, TX_POTION_HP_MEDIUM_KEYS, TX_POTION_HP_MEDIUM_COUNT, -12, -12);
-            //} else if (potion_type == POTION_HP_LARGE) {
-            //    create_spritegroup(g, id, TX_POTION_HP_LARGE_KEYS, TX_POTION_HP_LARGE_COUNT, -12, -12);
-            //} else if (potion_type == POTION_MP_SMALL) {
-            //    create_spritegroup(g, id, TX_POTION_MP_SMALL_KEYS, TX_POTION_MP_SMALL_COUNT, -12, -12);
-            //} else if (potion_type == POTION_MP_MEDIUM) {
-            //    create_spritegroup(g, id, TX_POTION_MP_MEDIUM_KEYS, TX_POTION_MP_MEDIUM_COUNT, -12, -12);
-            //} else if (potion_type == POTION_MP_LARGE) {
-            //    create_spritegroup(g, id, TX_POTION_MP_LARGE_KEYS, TX_POTION_MP_LARGE_COUNT, -12, -12);
-            //}
+            return;
+        } else if (item_type == ITEM_WEAPON) {
+            weapontype weapon_type = g_get_weapon_type(g, id);
+            switch (weapon_type) {
+            case WEAPON_DAGGER: create_spritegroup(g, id, TX_DAGGER_KEYS, TX_DAGGER_COUNT, -12, -12); break;
+            case WEAPON_SWORD: create_spritegroup(g, id, TX_SWORD_KEYS, TX_SWORD_COUNT, -12, -12); break;
+            case WEAPON_AXE: create_spritegroup(g, id, TX_AXE_KEYS, TX_AXE_COUNT, -12, -12); break;
+            //case WEAPON_BOW: create_spritegroup(g, id, TX_BOW_KEYS, TX_BOW_COUNT, -12, -12); break;
+            default: merror("unknown weapon type %d", weapon_type); return;
+            }
+            return;
         }
+        //else if (item_type == ITEM_SHIELD) {
+        //    create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12);
+        //} else if (item_type == ITEM_WAND) {
+        //    create_spritegroup(g, id, TX_WAND_BASIC_KEYS, TX_WAND_BASIC_COUNT, -12, -12);
+        //} else if (item_type == ITEM_RING) {
+        //    ringtype ring_type = g_get_ring_type(g, id);
+        //    switch (ring_type) {
+        //    case RING_GOLD: create_spritegroup(g, id, TX_GOLD_RING_KEYS, TX_GOLD_RING_COUNT, -12, -12); break;
+        //    case RING_SILVER: create_spritegroup(g, id, TX_SILVER_RING_KEYS, TX_SILVER_RING_COUNT, -12, -12); break;
+        //    default: merror("unknown ring type %d", ring_type); return;
+        //    }
+        //} else {
+        //    merror("unknown item type %d", item_type);
     }
 }
 
