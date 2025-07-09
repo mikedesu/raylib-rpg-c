@@ -2,7 +2,6 @@
 
 #include "character_creation.h"
 #include "component.h"
-//#include "component_table.h"
 #include "controlmode.h"
 #include "debugpanel.h"
 #include "direction.h"
@@ -105,6 +104,7 @@ typedef struct gamestate {
 
     std::unordered_map<entityid, itemtype>* item_type_list;
     std::unordered_map<entityid, potiontype>* potion_type_list;
+    std::unordered_map<entityid, weapontype>* weapon_type_list;
 
     debugpanel_t debugpanel;
 
@@ -287,8 +287,15 @@ bool g_has_item_type(std::shared_ptr<gamestate> g, entityid id);
 itemtype g_get_item_type(std::shared_ptr<gamestate> g, entityid id);
 bool g_set_item_type(std::shared_ptr<gamestate> g, entityid id, itemtype type);
 
+
 // set up declarations for potion type just like item type
 bool g_add_potion_type(std::shared_ptr<gamestate> g, entityid id, potiontype type);
 bool g_has_potion_type(std::shared_ptr<gamestate> g, entityid id);
 potiontype g_get_potion_type(std::shared_ptr<gamestate> g, entityid id);
 bool g_set_potion_type(std::shared_ptr<gamestate> g, entityid id, potiontype type);
+
+
+bool g_add_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype type);
+bool g_has_weapon_type(std::shared_ptr<gamestate> g, entityid id);
+weapontype g_get_weapon_type(std::shared_ptr<gamestate> g, entityid id);
+bool g_set_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype type);
