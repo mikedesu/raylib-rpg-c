@@ -722,12 +722,11 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //massert(box_id0 != ENTITYID_INVALID, "box failed to spawn!");
     create_wooden_box(g, (vec3){4, 4, 0});
     //massert(box_id1 != ENTITYID_INVALID, "box failed to spawn!");
-    //npc_create_set_stats(g, (vec3){2, 3, 0}, RACE_GREEN_SLIME);
-    //npc_create_set_stats(g, (vec3){3, 4, 0}, RACE_ORC);
-    //npc_create_set_stats(g, (vec3){4, 5, 0}, RACE_WOLF);
+    npc_create_set_stats(g, (vec3){2, 3, 0}, RACE_GREEN_SLIME);
+    npc_create_set_stats(g, (vec3){3, 4, 0}, RACE_ORC);
+    npc_create_set_stats(g, (vec3){4, 5, 0}, RACE_WOLF);
     add_message(g, "Welcome to the game!");
     add_message(g, "To move around, press q w e a d z x c");
-
     msuccess("liblogic_init: Game state initialized");
 }
 

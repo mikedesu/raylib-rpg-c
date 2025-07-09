@@ -1333,8 +1333,8 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     int* keys = NULL;
     int num_keys = 0;
-    int offset_x = -12;
-    int offset_y = -12;
+    int off_x = -12;
+    int off_y = -12;
     entitytype_t type = g_get_type(g, id);
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
         race_t race = g_get_race(g, id);
@@ -1382,15 +1382,30 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             break;
         default: merror("unknown race %d", race); return;
         }
-        //create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y);
+        create_spritegroup(g, id, keys, num_keys, off_x, off_y);
     } else if (type == ENTITY_WOODEN_BOX) {
         keys = TX_WOODEN_BOX_KEYS;
         num_keys = TX_WOODEN_BOX_COUNT;
-        //create_spritegroup(g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        create_spritegroup(g, id, keys, num_keys, offset_x, offset_y);
+        create_spritegroup(g, id, keys, num_keys, off_x, off_y);
+    } else if (type == ENTITY_ITEM) {
+        // preparing for item sprites
+        //itemtype item_type = g_get_itemtype(g, id);
+        //if (item_type == ITEM_POTION) {
+        //    potiontype potion_type = g_get_potiontype(g, id);
+        //    if (potion_type == POTION_HEALTH_SMALL) {
+        //        keys = TX_POTION_HP_SMALL_KEYS;
+        //        num_keys = TX_POTION_HP_SMALL_COUNT;
+        //    }
+        //    else if (potion_type == POTION_HEALTH_MEDIUM) {
+        //        keys = TX_POTION_HP_MEDIUM_KEYS;
+        //        num_keys = TX_POTION_HP_MEDIUM_COUNT;
+        //    } else if (potion_type == POTION_HEALTH_LARGE) {
+        //        keys = TX_POTION_HP_LARGE_KEYS;
+        //        num_keys = TX_POTION_HP_LARGE_COUNT;
+        //    }
     }
 }
+
 
 /*
     else if (type == ENTITY_ITEM) {
@@ -1414,24 +1429,27 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             }
             create_spritegroup(
                 g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        } else if (item_type == ITEM_SHIELD) {
+        } else 
+        if (item_type == ITEM_SHIELD) {
             keys = TX_BUCKLER_KEYS;
             num_keys = TX_BUCKLER_COUNT;
             create_spritegroup(
                 g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        } else if (item_type == ITEM_POTION) {
+        }
+        else 
+        if (item_type == ITEM_POTION) {
             potiontype potion_type = g_get_potiontype(g, id);
             if (potion_type == POTION_HEALTH_SMALL) {
                 keys = TX_POTION_HP_SMALL_KEYS;
                 num_keys = TX_POTION_HP_SMALL_COUNT;
             }
-            //else if (potion_type == POTION_HEALTH_MEDIUM) {
-            //    keys = TX_POTION_HP_MEDIUM_KEYS;
-            //    num_keys = TX_POTION_HP_MEDIUM_COUNT;
-            //} else if (potion_type == POTION_HEALTH_LARGE) {
-            //    keys = TX_POTION_HP_LARGE_KEYS;
-            //    num_keys = TX_POTION_HP_LARGE_COUNT;
-            //}
+            else if (potion_type == POTION_HEALTH_MEDIUM) {
+                keys = TX_POTION_HP_MEDIUM_KEYS;
+                num_keys = TX_POTION_HP_MEDIUM_COUNT;
+            } else if (potion_type == POTION_HEALTH_LARGE) {
+                keys = TX_POTION_HP_LARGE_KEYS;
+                num_keys = TX_POTION_HP_LARGE_COUNT;
+            }
             create_spritegroup(
                 g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         } else if (item_type == ITEM_WAND) {
