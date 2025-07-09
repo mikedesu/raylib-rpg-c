@@ -2,7 +2,7 @@
 
 #include "character_creation.h"
 #include "component.h"
-#include "component_table.h"
+//#include "component_table.h"
 #include "controlmode.h"
 #include "debugpanel.h"
 #include "direction.h"
