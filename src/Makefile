@@ -38,7 +38,7 @@ all: game
 #game: main.o gameloader.o gamestate.o keybinding.o libdraw.o liblogic.o component_table.o component.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o path_node.o libdraw_sort_inventory_menu.o
 game: main.o gameloader.o gamestate.o keybinding.o libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o dungeon_tile.o path_node.o liblogic.o
 	$(CXX) -o $@ $^ -L. $(RAYLIB_LIBS) $(WFLAGS) $(CFLAGS)
-	#./log_build_stats.sh
+	./log_build_stats.sh
 
 main.o: main.cpp
 	$(CXX) $(CXXFLAGS) $^ -c 
