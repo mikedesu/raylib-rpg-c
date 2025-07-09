@@ -19,7 +19,7 @@ shared_ptr<inputstate> is = make_shared<inputstate>();
 shared_ptr<gamestate> g = gamestateinitptr();
 
 void gameloop() {
-    libdraw_update_input(is);
+    inputstate_update(is);
     liblogic_tick(is, g);
     libdraw_update_sprites_pre(g);
     libdraw_drawframe(g);
