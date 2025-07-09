@@ -17,6 +17,7 @@
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
 #include "tx_keys.h"
+#include "tx_keys_npcs.h"
 #include <cstdlib>
 #include <memory>
 #include <raylib.h>
@@ -1332,78 +1333,41 @@ static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
 static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    int* keys = NULL;
-    int num_keys = 0;
-    int off_x = -12;
-    int off_y = -12;
+    int offx = -12;
+    int offy = -12;
     entitytype_t type = g_get_type(g, id);
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
         race_t race = g_get_race(g, id);
         switch (race) {
-        case RACE_HUMAN:
-            keys = TX_HUMAN_KEYS;
-            num_keys = TX_HUMAN_COUNT;
-            break;
-            // Add cases for other races here
-        case RACE_ORC:
-            keys = TX_ORC_KEYS;
-            num_keys = TX_ORC_COUNT;
-            break;
-        case RACE_ELF:
-            keys = TX_ELF_KEYS;
-            num_keys = TX_ELF_COUNT;
-            break;
-        case RACE_DWARF:
-            keys = TX_DWARF_KEYS;
-            num_keys = TX_DWARF_COUNT;
-            break;
-        case RACE_HALFLING:
-            keys = TX_HALFLING_KEYS;
-            num_keys = TX_HALFLING_COUNT;
-            break;
-        case RACE_GOBLIN:
-            keys = TX_GOBLIN_KEYS;
-            num_keys = TX_GOBLIN_COUNT;
-            break;
-        case RACE_WOLF:
-            keys = TX_WOLF_KEYS;
-            num_keys = TX_WOLF_COUNT;
-            break;
-        case RACE_BAT:
-            keys = TX_BAT_KEYS;
-            num_keys = TX_BAT_COUNT;
-            break;
-        case RACE_WARG:
-            keys = TX_WARG_KEYS;
-            num_keys = TX_WARG_COUNT;
-            break;
-        case RACE_GREEN_SLIME:
-            keys = TX_GREEN_SLIME_KEYS;
-            num_keys = TX_GREEN_SLIME_COUNT;
-            break;
+        case RACE_HUMAN: create_spritegroup(g, id, TX_HUMAN_KEYS, TX_HUMAN_COUNT, offx, offy); break;
+        case RACE_ORC: create_spritegroup(g, id, TX_ORC_KEYS, TX_ORC_COUNT, offx, offy); break;
+        case RACE_ELF: create_spritegroup(g, id, TX_ELF_KEYS, TX_ELF_COUNT, offx, offy); break;
+        case RACE_DWARF: create_spritegroup(g, id, TX_DWARF_KEYS, TX_DWARF_COUNT, offx, offy); break;
+        case RACE_HALFLING: create_spritegroup(g, id, TX_HALFLING_KEYS, TX_HALFLING_COUNT, offx, offy); break;
+        case RACE_GOBLIN: create_spritegroup(g, id, TX_GOBLIN_KEYS, TX_GOBLIN_COUNT, offx, offy); break;
+        case RACE_WOLF: create_spritegroup(g, id, TX_WOLF_KEYS, TX_WOLF_COUNT, offx, offy); break;
+        case RACE_BAT: create_spritegroup(g, id, TX_BAT_KEYS, TX_BAT_COUNT, offx, offy); break;
+        case RACE_WARG: create_spritegroup(g, id, TX_WARG_KEYS, TX_WARG_COUNT, offx, offy); break;
+        case RACE_GREEN_SLIME: create_spritegroup(g, id, TX_GREEN_SLIME_KEYS, TX_GREEN_SLIME_COUNT, offx, offy); break;
         default: merror("unknown race %d", race); return;
         }
-        create_spritegroup(g, id, keys, num_keys, off_x, off_y);
     } else if (type == ENTITY_WOODEN_BOX) {
-        keys = TX_WOODEN_BOX_KEYS;
-        num_keys = TX_WOODEN_BOX_COUNT;
-        create_spritegroup(g, id, keys, num_keys, off_x, off_y);
+        create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, offx, offy);
     } else if (type == ENTITY_ITEM) {
-        // preparing for item sprites
-        //itemtype item_type = g_get_itemtype(g, id);
-        //if (item_type == ITEM_POTION) {
-        //    potiontype potion_type = g_get_potiontype(g, id);
-        //    if (potion_type == POTION_HEALTH_SMALL) {
-        //        keys = TX_POTION_HP_SMALL_KEYS;
-        //        num_keys = TX_POTION_HP_SMALL_COUNT;
-        //    }
-        //    else if (potion_type == POTION_HEALTH_MEDIUM) {
-        //        keys = TX_POTION_HP_MEDIUM_KEYS;
-        //        num_keys = TX_POTION_HP_MEDIUM_COUNT;
-        //    } else if (potion_type == POTION_HEALTH_LARGE) {
-        //        keys = TX_POTION_HP_LARGE_KEYS;
-        //        num_keys = TX_POTION_HP_LARGE_COUNT;
-        //    }
+        itemtype item_type = g_get_item_type(g, id);
+        if (item_type == ITEM_POTION) {
+            potiontype potion_type = g_get_potion_type(g, id);
+            if (potion_type == POTION_HP_SMALL) {
+                create_spritegroup(g, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, offx, offy);
+            }
+            //    else if (potion_type == POTION_HEALTH_MEDIUM) {
+            //        keys = TX_POTION_HP_MEDIUM_KEYS;
+            //        num_keys = TX_POTION_HP_MEDIUM_COUNT;
+            //    } else if (potion_type == POTION_HEALTH_LARGE) {
+            //        keys = TX_POTION_HP_LARGE_KEYS;
+            //        num_keys = TX_POTION_HP_LARGE_COUNT;
+            //    }
+        }
     }
 }
 

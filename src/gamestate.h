@@ -104,6 +104,7 @@ typedef struct gamestate {
     std::unordered_map<entityid, int>* tx_alpha_list;
 
     std::unordered_map<entityid, itemtype>* item_type_list;
+    std::unordered_map<entityid, potiontype>* potion_type_list;
 
     debugpanel_t debugpanel;
 
@@ -129,7 +130,6 @@ typedef struct gamestate {
 
     entityid entity_turn;
 
-    //message_system msg_system;
     std::vector<string>* msg_system;
     std::vector<string>* msg_history;
 
@@ -146,13 +146,10 @@ typedef struct gamestate {
     int restart_count;
     bool do_restart;
 
-    //character_creation chara_creation;
     std::shared_ptr<character_creation> chara_creation;
+
     // Array of monster definitions
     //monster_def* monster_defs;
-    // Number of monster definitions
-    //int monster_def_count;
-    //int monster_def_capacity;
 
     float music_volume;
 
@@ -289,3 +286,9 @@ bool g_add_item_type(std::shared_ptr<gamestate> g, entityid id, itemtype type);
 bool g_has_item_type(std::shared_ptr<gamestate> g, entityid id);
 itemtype g_get_item_type(std::shared_ptr<gamestate> g, entityid id);
 bool g_set_item_type(std::shared_ptr<gamestate> g, entityid id, itemtype type);
+
+// set up declarations for potion type just like item type
+bool g_add_potion_type(std::shared_ptr<gamestate> g, entityid id, potiontype type);
+bool g_has_potion_type(std::shared_ptr<gamestate> g, entityid id);
+potiontype g_get_potion_type(std::shared_ptr<gamestate> g, entityid id);
+bool g_set_potion_type(std::shared_ptr<gamestate> g, entityid id, potiontype type);
