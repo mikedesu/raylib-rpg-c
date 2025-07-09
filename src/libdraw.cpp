@@ -963,9 +963,9 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
 
     EndMode2D();
 
-    //draw_message_history(g);
-    draw_message_box(g);
     draw_hud(g);
+    draw_message_history(g);
+    draw_message_box(g);
 
     //if (g->display_inventory_menu) {
     //    draw_inventory_menu(g);
@@ -1014,33 +1014,36 @@ static void draw_message_box(shared_ptr<gamestate> g) {
     int measure = MeasureText(tmp, font_size);
     float text_width = measure;
     float text_height = font_size;
-    //int prompt_font_size = 10;
-    //int prompt_offset = 10;
-    //int h = DEFAULT_TARGET_HEIGHT;
-    //int y = (h - text_height) / 8.0 - g->pad;
     int w = DEFAULT_TARGET_WIDTH;
-    //float x = (w - text_width) / 2.0 - g->pad;
-    //float y = 42;
-    //Rectangle box = {x, y, text_width + g->pad * 2, text_height + g->pad * 2};
     // instead, lets center the msg box in the middle of the screen
     float x = (w - text_width) / 2.0 - g->pad;
     float y = (DEFAULT_TARGET_HEIGHT - text_height) / 2.0 - g->pad;
     Rectangle box = {x, y, text_width + g->pad * 2, text_height + g->pad * 2};
-
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);
     DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
+}
 
-    //if (g->msg_system.count > 1 && g->msg_system.index < g->msg_system.count - 1) {
-    //    char tmp_prompt[1024] = {0};
-    //    snprintf(tmp_prompt, sizeof(tmp_prompt), "%s %d/%d", prompt, g->msg_system.index + 1, g->msg_system.count);
-    //    Vector2 prompt_size = MeasureTextEx(GetFontDefault(), tmp_prompt, prompt_font_size, 1.0f);
-    //    DrawText(tmp_prompt,
-    //             box.x + box.width - prompt_size.x - prompt_offset, // Right-align in box
-    //             box.y + box.height - prompt_size.y - prompt_offset / 2.0, // Bottom of box
-    //             prompt_font_size,
-    //             WHITE);
+
+static void draw_message_history(shared_ptr<gamestate> g) {
+    //if (!g->msg_system_is_active || g->msg_system->size() == 0) {
+    //    return;
     //}
+    int font_size = 10;
+    Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
+    // message history will now be a box directly beneath the hud
+    // it should be static in size, that is, unchanging and const
+    // first, lets calc that box position and size
+    float x, y, w, h;
+    w = 100;
+    h = font_size * 5 + g->pad * 2;
+    x = DEFAULT_TARGET_WIDTH - w;
+    y = font_size * 2 + g->pad * 2;
+
+    Rectangle box = {x, y, w, h};
+    DrawRectangleRec(box, message_bg);
+    DrawRectangleLinesEx(box, 1, WHITE);
+    //DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
 }
 
 
@@ -1049,8 +1052,6 @@ static inline void update_debug_panel(shared_ptr<gamestate> g) {
     char tmp[1024] = {0};
     strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
 }
-/*
-*/
 
 
 static inline void handle_debug_panel(shared_ptr<gamestate> g) {
@@ -1059,8 +1060,6 @@ static inline void handle_debug_panel(shared_ptr<gamestate> g) {
         draw_debug_panel(g);
     }
 }
-/*
-*/
 
 
 #define HELP_TEXT_COUNT 32

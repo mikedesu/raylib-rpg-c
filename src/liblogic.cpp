@@ -432,7 +432,15 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
             // press enter to cycle thru message
             if (inputstate_is_pressed(is, KEY_ENTER)) {
                 // only erase the first in the vector
-                g->msg_system->erase(g->msg_system->begin());
+                //g->msg_system->erase(g->msg_system->begin());
+
+
+                // instead of just erasing, we want to actually push the message to g->msg_history before removing...
+
+                if (g->msg_system->size() > 0) {
+                    g->msg_history->push_back(g->msg_system->front());
+                    g->msg_system->erase(g->msg_system->begin());
+                }
             }
             // player must advance thru new messages
 
