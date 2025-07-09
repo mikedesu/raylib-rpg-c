@@ -741,12 +741,30 @@ void liblogic_init(shared_ptr<gamestate> g) {
     g->entity_turn = create_player(g, RACE_HUMAN, (vec3){0, 0, 0}, "darkmage");
 
     create_wooden_box(g, (vec3){2, 2, 0});
-    create_wooden_box(g, (vec3){3, 3, 0});
-    create_wooden_box(g, (vec3){4, 4, 0});
+    create_wooden_box(g, (vec3){3, 2, 0});
+    create_wooden_box(g, (vec3){4, 2, 0});
+    create_wooden_box(g, (vec3){5, 2, 0});
+    create_wooden_box(g, (vec3){6, 2, 0});
+    create_wooden_box(g, (vec3){7, 2, 0});
 
-    create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_GREEN_SLIME);
-    create_npc_set_stats(g, (vec3){3, 4, 0}, RACE_ORC);
-    create_npc_set_stats(g, (vec3){4, 5, 0}, RACE_WOLF);
+    create_wooden_box(g, (vec3){7, 3, 0});
+    create_wooden_box(g, (vec3){7, 4, 0});
+    create_wooden_box(g, (vec3){7, 5, 0});
+    create_wooden_box(g, (vec3){7, 6, 0});
+    create_wooden_box(g, (vec3){7, 7, 0});
+
+
+    create_npc_set_stats(g, (vec3){5, 3, 0}, RACE_HUMAN);
+    create_npc_set_stats(g, (vec3){5, 4, 0}, RACE_ELF);
+    create_npc_set_stats(g, (vec3){5, 5, 0}, RACE_DWARF);
+    create_npc_set_stats(g, (vec3){5, 6, 0}, RACE_GOBLIN);
+    create_npc_set_stats(g, (vec3){5, 7, 0}, RACE_HALFLING);
+
+    create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
+    create_npc_set_stats(g, (vec3){6, 4, 0}, RACE_ORC);
+    create_npc_set_stats(g, (vec3){6, 5, 0}, RACE_WOLF);
+    create_npc_set_stats(g, (vec3){6, 6, 0}, RACE_WARG);
+    create_npc_set_stats(g, (vec3){6, 7, 0}, RACE_BAT);
 
     create_potion(g, (vec3){1, 1, 0}, POTION_HP_SMALL);
     create_potion(g, (vec3){2, 1, 0}, POTION_MP_SMALL);
@@ -756,7 +774,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_potion(g, (vec3){6, 1, 0}, POTION_MP_LARGE);
 
     create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
-
+    create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
+    create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
+    create_weapon(g, (vec3){1, 5, 0}, WEAPON_TWO_HANDED_SWORD);
+    create_weapon(g, (vec3){1, 6, 0}, WEAPON_BOW);
 
     add_message(g, "Welcome to the game!");
     add_message(g, "To move around, press q w e a d z x c");
