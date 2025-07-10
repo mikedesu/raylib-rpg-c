@@ -49,11 +49,10 @@ static inline size_t tile_entity_count(const std::shared_ptr<tile_t> t) {
 
 static inline entityid tile_get_entity(const std::shared_ptr<tile_t> t, size_t i) {
     massert(t, "tile is NULL");
-    entityid retval = ENTITYID_INVALID;
-    if (i < t->entities->size()) {
-        retval = t->entities->at(i);
-    }
-    return retval;
+    //entityid retval = ENTITYID_INVALID;
+    //if (i < t->entities->size()) retval = t->entities->at(i);
+    //return retval;
+    return !t ? ENTITYID_INVALID : i < t->entities->size() ? t->entities->at(i) : ENTITYID_INVALID;
 }
 
 static inline bool tile_has_live_npcs(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> t) {
