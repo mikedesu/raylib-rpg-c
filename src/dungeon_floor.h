@@ -15,34 +15,30 @@
 #define DEFAULT_DUNGEON_FLOOR_HEIGHT 12
 
 typedef struct {
-    std::shared_ptr<std::vector<tile_id>> tiles; // 2D vector of shared pointers to tile_t
-
     int floor; // the floor number, starting from 0
     int width;
     int height;
 
-    // this will replace the tiles array
-    std::shared_ptr<std::unordered_map<tile_id, std::shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
-
     vec3 downstairs_loc;
     vec3 upstairs_loc;
+
+    std::shared_ptr<std::vector<tile_id>> tiles; // 2D vector of shared pointers to tile_t
+    std::shared_ptr<std::unordered_map<tile_id, std::shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
 } dungeon_floor_t;
 
 std::shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height);
 
 void df_set_tile_area_range(std::shared_ptr<dungeon_floor_t> const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end);
-
-//void df_init(std::shared_ptr<dungeon_floor_t> df);
-//vec3* const df_get_all_locs(std::shared_ptr<dungeon_floor_t> const df, int* external_count);
 void df_free(std::shared_ptr<dungeon_floor_t> df);
+void df_set_tile(std::shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y);
+
 bool df_add_at(std::shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y);
 bool df_remove_at(std::shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y);
-vec3 df_get_upstairs(std::shared_ptr<dungeon_floor_t> const df);
-vec3 df_get_downstairs(std::shared_ptr<dungeon_floor_t> const df);
-
-void df_set_tile(std::shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y);
 bool df_assign_upstairs_in_area(std::shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 bool df_assign_downstairs_in_area(std::shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+
+vec3 df_get_upstairs(std::shared_ptr<dungeon_floor_t> const df);
+vec3 df_get_downstairs(std::shared_ptr<dungeon_floor_t> const df);
 
 int df_count_walkable(std::shared_ptr<dungeon_floor_t> const df);
 int df_count_empty(std::shared_ptr<dungeon_floor_t> const df);
@@ -50,9 +46,9 @@ int df_count_empty_non_walls(std::shared_ptr<dungeon_floor_t> const df);
 int df_count_empty_non_walls_in_area(std::shared_ptr<dungeon_floor_t> const df, int x0, int y0, int w, int h);
 int df_count_non_walls_in_area(std::shared_ptr<dungeon_floor_t> const df, int x0, int y0, int w, int h);
 int df_count_non_walls(std::shared_ptr<dungeon_floor_t> const df);
-
 int df_center_x(std::shared_ptr<dungeon_floor_t> const df);
 int df_center_y(std::shared_ptr<dungeon_floor_t> const df);
+
 
 static inline std::shared_ptr<tile_t> df_tile_at(std::shared_ptr<dungeon_floor_t> df, vec3 loc) {
     massert(df, "df is NULL");
@@ -71,9 +67,8 @@ static inline std::shared_ptr<tile_t> df_tile_at(std::shared_ptr<dungeon_floor_t
     tile_id id = df->tiles->at(index);
     // Check if the tile_id exists in the map
     auto it = df->tile_map->find(id);
-    if (it != df->tile_map->end()) {
-        return it->second; // Return the shared pointer to tile_t
-    }
+    if (it != df->tile_map->end()) return it->second;
+
     merror("Tile not found at location (%d, %d)", loc.x, loc.y);
     return NULL; // Tile not found
 }
@@ -97,7 +92,7 @@ static inline tiletype_t df_type_at(std::shared_ptr<dungeon_floor_t> df, int x, 
 
 
 static inline bool df_tile_is_wall(std::shared_ptr<dungeon_floor_t> df, int x, int y) {
-    massert(df, "dungeon floor is NULL");
+    //massert(df, "dungeon floor is NULL");
     tiletype_t type = df_type_at(df, x, y);
     if (type == TILE_NONE || type == TILE_COUNT) {
         merror("Tile type is invalid at (%d, %d)", x, y);
