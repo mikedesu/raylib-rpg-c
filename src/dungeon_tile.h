@@ -42,57 +42,42 @@ void tile_free(std::shared_ptr<tile_t> t);
 void recompute_entity_cache(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> t);
 void recompute_entity_cache_at(std::shared_ptr<gamestate> g, int x, int y, int z);
 
-static inline size_t tile_entity_count(const std::shared_ptr<tile_t> t) {
-    massert(t, "tile is NULL");
-    return t->entities->size();
-}
+
+static inline size_t tile_entity_count(const std::shared_ptr<tile_t> t) { return t->entities->size(); }
+
 
 static inline entityid tile_get_entity(const std::shared_ptr<tile_t> t, size_t i) {
-    massert(t, "tile is NULL");
-    //entityid retval = ENTITYID_INVALID;
-    //if (i < t->entities->size()) retval = t->entities->at(i);
-    //return retval;
     return !t ? ENTITYID_INVALID : i < t->entities->size() ? t->entities->at(i) : ENTITYID_INVALID;
 }
 
+
 static inline bool tile_has_live_npcs(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> t) {
-    if (!t) {
-        return false;
-    }
+    if (!t) return false;
     recompute_entity_cache(g, t);
     return t->cached_live_npcs > 0;
 }
 
+
 static inline size_t tile_live_npc_count(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> t) {
-    massert(t, "tile is NULL");
     recompute_entity_cache(g, t);
     return t->cached_live_npcs;
 }
 
+
 static inline bool tile_has_player(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> t) {
-    if (!t) {
-        return false;
-    }
+    if (!t) return false;
     recompute_entity_cache(g, t);
     return t->cached_player_present;
 }
 
-static inline bool tile_is_visible(const std::shared_ptr<tile_t> t) {
-    massert(t, "tile is NULL");
-    return t->visible;
-}
 
-static inline void tile_set_visible(std::shared_ptr<tile_t> t, bool visible) {
-    massert(t, "tile is NULL");
-    t->visible = visible;
-}
+static inline bool tile_is_visible(const std::shared_ptr<tile_t> t) { return t->visible; }
 
-static inline bool tile_is_explored(const std::shared_ptr<tile_t> t) {
-    massert(t, "tile is NULL");
-    return t->explored;
-}
 
-static inline void tile_set_explored(std::shared_ptr<tile_t> t, bool explored) {
-    massert(t, "tile is NULL");
-    t->explored = explored;
-}
+static inline void tile_set_visible(std::shared_ptr<tile_t> t, bool visible) { t->visible = visible; }
+
+
+static inline bool tile_is_explored(const std::shared_ptr<tile_t> t) { return t->explored; }
+
+
+static inline void tile_set_explored(std::shared_ptr<tile_t> t, bool explored) { t->explored = explored; }
