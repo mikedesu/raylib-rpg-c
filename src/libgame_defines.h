@@ -486,6 +486,8 @@
 #define TX_RING_IRON 345
 //--------------------------------
 #define TX_WOODEN_BOX 346
+//--------------------------------
+#define TX_WARHAMMER 347
 
 //--------------------------------
 #define COMPANYSCENE 0

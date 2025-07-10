@@ -12,6 +12,7 @@ typedef enum weapontype_t
     WEAPON_AXE,
     WEAPON_BOW,
     WEAPON_TWO_HANDED_SWORD,
+    WEAPON_WARHAMMER,
     WEAPON_TYPE_COUNT
 } weapontype;
 
@@ -24,5 +25,6 @@ static inline std::string weapontype2str(weapontype type) {
     if (type == WEAPON_AXE) return "axe";
     if (type == WEAPON_BOW) return "bow";
     if (type == WEAPON_TWO_HANDED_SWORD) return "two-handed sword";
+    if (type == WEAPON_WARHAMMER) return "warhammer";
     return "unknown";
 }

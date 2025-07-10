@@ -11,8 +11,8 @@
 #include <unordered_map>
 #include <vector>
 
-#define DEFAULT_DUNGEON_FLOOR_WIDTH 16
-#define DEFAULT_DUNGEON_FLOOR_HEIGHT 12
+#define DEFAULT_DUNGEON_FLOOR_WIDTH (16)
+#define DEFAULT_DUNGEON_FLOOR_HEIGHT (12)
 
 typedef struct {
     int floor; // the floor number, starting from 0

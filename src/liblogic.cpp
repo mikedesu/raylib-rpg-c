@@ -672,6 +672,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     srand(time(NULL));
     init_dungeon(g);
     g->entity_turn = create_player(g, RACE_HUMAN, (vec3){0, 0, 0}, "darkmage");
+    /*
     create_wooden_box(g, (vec3){2, 2, 0});
     create_wooden_box(g, (vec3){3, 2, 0});
     create_wooden_box(g, (vec3){4, 2, 0});
@@ -707,6 +708,8 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
     create_weapon(g, (vec3){1, 5, 0}, WEAPON_TWO_HANDED_SWORD);
     create_weapon(g, (vec3){1, 6, 0}, WEAPON_BOW);
+    */
+    create_weapon(g, (vec3){1, 6, 0}, WEAPON_WARHAMMER);
 
     add_message(g, "Welcome to the game!");
     add_message(g, "To move around, press q w e a d z x c");

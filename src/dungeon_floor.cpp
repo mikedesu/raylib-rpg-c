@@ -39,9 +39,6 @@ vec3* df_get_possible_downstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, in
 int df_get_possible_upstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 int df_get_possible_downstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 void df_make_room(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
-//void df_make_corridor_h(shared_ptr<dungeon_floor_t> df, int x, int y, int len);
-//void df_make_corridor_v(shared_ptr<dungeon_floor_t> df, int x, int y, int len);
-//void df_make_diamond_shape_room(shared_ptr<dungeon_floor_t> df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type);
 
 
 int df_get_possible_downstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) {
@@ -629,70 +626,3 @@ int df_count_empty_non_walls(const shared_ptr<dungeon_floor_t> df) { return df_c
 void df_make_room(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) {
     df_set_tile_area_range(df, x, y, w, h, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
 }
-
-
-//void df_make_corridor_h(shared_ptr<dungeon_floor_t> df, int x, int y, int len) {
-//    df_set_tile_area_range(df, x, y, len, 1, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-//}
-
-
-//void df_make_corridor_v(shared_ptr<dungeon_floor_t> df, int x, int y, int len) {
-//    df_set_tile_area_range(df, x, y, 1, len, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-//}
-
-
-/*
-void df_make_diamond_shape_room(shared_ptr<dungeon_floor_t> df, int cx, int cy, int w, int h, tiletype_t begin_type, tiletype_t end_type) {
-    massert(df, "dungeon floor is NULL");
-    massert(w > 0 && h > 0, "width and height must be positive");
-    massert(w >= 3 && h >= 3, "width and height must be at least 3 for diamond shape");
-    massert(cx >= 0 && cx < df->width, "cx out of bounds");
-    massert(cy >= 0 && cy < df->height, "cy out of bounds");
-    massert(begin_type >= 0 && begin_type < TILE_COUNT, "begin_type out of bounds");
-    massert(end_type >= 0 && end_type < TILE_COUNT, "end_type out of bounds");
-    int ry = h / 2;
-    int max_w = (w % 2) ? w : w - 1; // ensure odd width for perfect diamond
-    for (int y = cy - ry; y <= cy + ry; y++) {
-        int dy = abs(y - cy);
-        int row_w = max_w - 2 * dy; // width shrinks by 2 per step from center line
-        int start_x = cx - row_w / 2;
-        for (int x = start_x; x < start_x + row_w; x++) {
-            tiletype_t t = (tiletype_t)(begin_type + rand() % (end_type - begin_type + 1));
-            df_set_tile(df, t, x, y);
-        }
-    }
-}
-*/
-
-
-/*
-vec3* const df_get_all_locs(shared_ptr<dungeon_floor_t> const df, int* external_count) {
-    massert(df, "dungeon floor is NULL");
-    massert(external_count, "external count is NULL");
-    int count = 0;
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            //tile_t* const t = df_tile_at(df, (vec3){x, y, -1});
-            shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, -1});
-            //massert(t, "tile is NULL");
-            if (!t || t->type == TILE_NONE || t->type == TILE_COUNT) continue;
-            count++;
-        }
-    }
-    vec3* locs = (vec3*)malloc(sizeof(vec3) * count);
-    massert(locs, "Failed to allocate memory for locs");
-    int index = 0;
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, -1});
-            massert(t, "tile is NULL");
-            if (t->type == TILE_NONE || t->type == TILE_COUNT) {
-                continue;
-            }
-            locs[index++] = (vec3){x, y, -1};
-        }
-    }
-    *external_count = count;
-    return locs;
-}
-*/
