@@ -475,7 +475,8 @@ static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeo
     // Only draw entities within vision distance
     //if (distance <= vision_distance) {
     //if (distance <= dist_to_check) {
-    for (size_t i = 0; i < tile_entity_count(tile); i++) {
+    //for (size_t i = 0; i < tile_entity_count(tile); i++) {
+    for (size_t i = 0; i < tile->entities->size(); i++) {
         entityid id = tile_get_entity(tile, i);
         //if (g_is_dead(g, id) == dead) {
         draw_sprite_and_shadow(g, id);

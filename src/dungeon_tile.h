@@ -43,7 +43,7 @@ void recompute_entity_cache(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t
 void recompute_entity_cache_at(std::shared_ptr<gamestate> g, int x, int y, int z);
 
 
-static inline size_t tile_entity_count(const std::shared_ptr<tile_t> t) { return t->entities->size(); }
+//static inline size_t tile_entity_count(const std::shared_ptr<tile_t> t) { return t->entities->size(); }
 
 
 static inline entityid tile_get_entity(const std::shared_ptr<tile_t> t, size_t i) {
@@ -71,13 +71,7 @@ static inline bool tile_has_player(std::shared_ptr<gamestate> g, std::shared_ptr
 }
 
 
-static inline bool tile_is_visible(const std::shared_ptr<tile_t> t) { return t->visible; }
-
-
-static inline void tile_set_visible(std::shared_ptr<tile_t> t, bool visible) { t->visible = visible; }
-
-
-static inline bool tile_is_explored(const std::shared_ptr<tile_t> t) { return t->explored; }
-
-
-static inline void tile_set_explored(std::shared_ptr<tile_t> t, bool explored) { t->explored = explored; }
+//static inline bool tile_is_visible(const std::shared_ptr<tile_t> t) { return t->visible; }
+//static inline void tile_set_explored(std::shared_ptr<tile_t> t, bool explored) { t->explored = explored; }
+//static inline void tile_set_visible(std::shared_ptr<tile_t> t, bool visible) { t->visible = visible; }
+//static inline bool tile_is_explored(const std::shared_ptr<tile_t> t) { return t->explored; }
