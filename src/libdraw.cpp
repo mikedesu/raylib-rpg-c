@@ -2048,15 +2048,11 @@ static void draw_version(const shared_ptr<gamestate> g) {
     int font_size = 10;
     char buffer[1024] = {0};
     // also grab the current music track path
-    //const char* current_music_path = g->music_file_paths[g->current_music_index];
-    //snprintf(buffer, sizeof(buffer), "%s | Music: %s", version, current_music_path);
     snprintf(buffer, sizeof(buffer), "%s", version);
     Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
     int w = DEFAULT_TARGET_WIDTH;
-    //float x = w - text_size.x - g->pad;
-    int x = 0;
-    int y = 0;
-    //awTextEx(GetFontDefault(), buffer, (Vector2){x, y}, font_size, 1.0f, WHITE);
+    int x = 20;
+    int y = 20;
     DrawText(buffer, x, y, font_size, WHITE);
 }
 
