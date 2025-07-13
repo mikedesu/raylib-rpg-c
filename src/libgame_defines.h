@@ -231,8 +231,8 @@
 #define TX_DWARF_JUMP_SHADOW 128
 #define TX_DWARF_SPIN_DIE 129
 #define TX_DWARF_SPIN_DIE_SHADOW 130
-#define TX_DWARF_SOUL_DIE 131
-#define TX_DWARF_SOUL_DIE_SHADOW 132
+//#define TX_DWARF_SOUL_DIE 131
+//#define TX_DWARF_SOUL_DIE_SHADOW 132
 #define TX_DWARF_DMG 133
 #define TX_DWARF_DMG_SHADOW 134
 //#define TX_DWARF_GUARD 66
@@ -250,8 +250,8 @@
 #define TX_ELF_JUMP_SHADOW 142
 #define TX_ELF_SPIN_DIE 143
 #define TX_ELF_SPIN_DIE_SHADOW 144
-#define TX_ELF_SOUL_DIE 145
-#define TX_ELF_SOUL_DIE_SHADOW 146
+//#define TX_ELF_SOUL_DIE 145
+//#define TX_ELF_SOUL_DIE_SHADOW 146
 #define TX_ELF_DMG 147
 #define TX_ELF_DMG_SHADOW 148
 //#define TX_ELF_GUARD 66
@@ -392,8 +392,8 @@
 
 #define TX_HUMAN_SHOT 300
 #define TX_HUMAN_SHOT_SHADOW 301
-#define TX_ORC_SHOT 302
-#define TX_ORC_SHOT_SHADOW 303
+//#define TX_ORC_SHOT 302
+//#define TX_ORC_SHOT_SHADOW 303
 #define TX_DWARF_SHOT 304
 #define TX_DWARF_SHOT_SHADOW 305
 #define TX_ELF_SHOT 306
@@ -447,15 +447,15 @@
 //336 4  8 0  img/monsters/green_slime/SlimeGreenDie.png
 //337 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDie.png
 #define TX_GREEN_SLIME_IDLE 330
-#define TX_GREEN_SLIME_IDLE_SHADOW 331
 #define TX_GREEN_SLIME_JUMP_ATTACK 332
-#define TX_GREEN_SLIME_JUMP_ATTACK_SHADOW 333
 #define TX_GREEN_SLIME_DMG 334
-#define TX_GREEN_SLIME_DMG_SHADOW 335
 #define TX_GREEN_SLIME_DIE 336
+#define TX_GREEN_SLIME_IDLE_SHADOW 331
+#define TX_GREEN_SLIME_JUMP_ATTACK_SHADOW 333
+#define TX_GREEN_SLIME_DMG_SHADOW 335
 #define TX_GREEN_SLIME_DIE_SHADOW 337
 //--------------------------------
-#define TX_WAND_BASIC 338
+//#define TX_WAND_BASIC 338
 //--------------------------------
 //
 //
@@ -488,6 +488,7 @@
 #define TX_WOODEN_BOX 346
 //--------------------------------
 #define TX_WARHAMMER 347
+#define TX_WHIP 348
 
 //--------------------------------
 #define COMPANYSCENE 0

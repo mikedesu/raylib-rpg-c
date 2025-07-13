@@ -19,7 +19,7 @@ static int TX_HUMAN_KEYS[TX_HUMAN_COUNT] = {TX_HUMAN_IDLE,
                                             TX_HUMAN_SHOT,
                                             TX_HUMAN_SHOT_SHADOW};
 
-#define TX_ORC_COUNT 16
+#define TX_ORC_COUNT 14
 static int TX_ORC_KEYS[TX_ORC_COUNT] = {
     TX_ORC_IDLE,
     TX_ORC_IDLE_SHADOW,
@@ -35,9 +35,10 @@ static int TX_ORC_KEYS[TX_ORC_COUNT] = {
     TX_ORC_DIE_SHADOW,
     TX_ORC_GUARD_SUCCESS,
     TX_ORC_GUARD_SUCCESS_SHADOW,
-    TX_ORC_SHOT,
-    TX_ORC_SHOT_SHADOW,
+    //TX_ORC_SHOT,
+    //TX_ORC_SHOT_SHADOW,
 };
+
 
 #define TX_ELF_COUNT 16
 static int TX_ELF_KEYS[TX_ELF_COUNT] = {
@@ -58,6 +59,7 @@ static int TX_ELF_KEYS[TX_ELF_COUNT] = {
     TX_ELF_SHOT,
     TX_ELF_SHOT_SHADOW,
 };
+
 
 #define TX_DWARF_COUNT 16
 static int TX_DWARF_KEYS[TX_DWARF_COUNT] = {

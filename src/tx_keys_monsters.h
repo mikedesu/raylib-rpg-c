@@ -1,6 +1,7 @@
 #pragma once
 #include "libgame_defines.h"
 
+
 #define TX_WOLF_COUNT 12
 static int TX_WOLF_KEYS[TX_WOLF_COUNT] = {
     TX_WOLF_IDLE,
@@ -17,6 +18,7 @@ static int TX_WOLF_KEYS[TX_WOLF_COUNT] = {
     TX_WOLF_DIE_SHADOW,
 };
 
+
 #define TX_BAT_COUNT 10
 static int TX_BAT_KEYS[TX_BAT_COUNT] = {
     TX_BAT_IDLE,
@@ -30,6 +32,7 @@ static int TX_BAT_KEYS[TX_BAT_COUNT] = {
     TX_BAT_DIE,
     TX_BAT_DIE_SHADOW,
 };
+
 
 #define TX_WARG_COUNT 12
 static int TX_WARG_KEYS[TX_WARG_COUNT] = {
@@ -46,6 +49,7 @@ static int TX_WARG_KEYS[TX_WARG_COUNT] = {
     TX_WARG_DIE,
     TX_WARG_DIE_SHADOW,
 };
+
 
 #define TX_GREEN_SLIME_COUNT 8
 static int TX_GREEN_SLIME_KEYS[TX_GREEN_SLIME_COUNT] = {

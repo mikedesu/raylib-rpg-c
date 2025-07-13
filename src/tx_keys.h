@@ -6,7 +6,7 @@
 #include "tx_keys_potions.h"
 #include "tx_keys_rings.h"
 #include "tx_keys_shields.h"
-#include "tx_keys_wands.h"
+//#include "tx_keys_wands.h"
 #include "tx_keys_weapons.h"
 
 //#define TX_ARROW_COUNT 1

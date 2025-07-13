@@ -161,13 +161,24 @@ typedef enum
 } tiletype_t;
 
 static inline bool tile_is_none(const tiletype_t type) { return type == TILE_NONE; }
+
 static inline bool tile_is_not_none(const tiletype_t type) { return type != TILE_NONE; }
+
 static inline bool tile_is_wall(const tiletype_t type) { return type >= TILE_STONE_WALL_00 && type <= TILE_STONE_WALL_03; }
+
 static inline bool tile_is_not_wall(const tiletype_t type) { return tile_is_not_none(type) && !tile_is_wall(type); }
+
 static inline bool tile_is_walkable(const tiletype_t type) { return !tile_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE && type != TILE_COUNT; }
+
 static inline bool tile_is_trap(const tiletype_t type) { return type == TILE_FLOOR_STONE_TRAP_OFF_00 || type == TILE_FLOOR_STONE_TRAP_ON_00; }
-static inline bool tile_is_possible_upstairs(const tiletype_t type) { return tile_is_walkable(type) && !tile_is_trap(type) && type != TILE_DOWNSTAIRS && type != TILE_COUNT; }
-static inline bool tile_is_possible_downstairs(const tiletype_t type) { return tile_is_walkable(type) && !tile_is_trap(type) && type != TILE_UPSTAIRS && type != TILE_COUNT; }
+
+static inline bool tile_is_possible_upstairs(const tiletype_t type) {
+    return tile_is_walkable(type) && !tile_is_trap(type) && type != TILE_DOWNSTAIRS && type != TILE_COUNT;
+}
+
+static inline bool tile_is_possible_downstairs(const tiletype_t type) {
+    return tile_is_walkable(type) && !tile_is_trap(type) && type != TILE_UPSTAIRS && type != TILE_COUNT;
+}
 
 static inline const char* tiletype_to_str(const tiletype_t type) {
     switch (type) {

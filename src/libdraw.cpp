@@ -1285,15 +1285,22 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
     massert(txinfo[txkey].texture.id == 0, "txinfo[%d].texture.id is not 0", txkey);
     massert(strlen(path) > 0, "load_texture: path is empty");
     massert(strcmp(path, "\n") != 0, "load_texture: path is newline");
+
     Image image = LoadImage(path);
+    // crash if there is a problem loading the image
+    massert(image.data != NULL, "load_texture: image data is NULL for path: %s", path);
+
     if (do_dither) ImageDither(&image, 4, 4, 4, 4);
     Texture2D texture = LoadTextureFromImage(image);
+
+
     UnloadImage(image);
     txinfo[txkey].texture = texture;
     txinfo[txkey].contexts = ctxs;
     txinfo[txkey].num_frames = frames;
     return true;
 }
+
 
 static void load_textures() {
     const char* textures_file = "textures.txt";
@@ -1312,6 +1319,7 @@ static void load_textures() {
         // check if the line begins with a #
         if (line[0] == '#') continue;
         sscanf(line, "%d %d %d %d %s", &txkey, &contexts, &frames, &do_dither, path);
+        minfo("Path: %s", path);
         massert(txkey >= 0, "txkey is invalid");
         massert(contexts >= 0, "contexts is invalid");
         massert(frames >= 0, "frames is invalid");
@@ -1410,6 +1418,7 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             case WEAPON_BOW: create_spritegroup(g, id, TX_BOW_KEYS, TX_BOW_COUNT, -12, -12); break;
             case WEAPON_TWO_HANDED_SWORD: create_spritegroup(g, id, TX_TWO_HANDED_SWORD_KEYS, TX_TWO_HANDED_SWORD_COUNT, -12, -12); break;
             case WEAPON_WARHAMMER: create_spritegroup(g, id, TX_WARHAMMER_KEYS, TX_WARHAMMER_COUNT, -12, -12); break;
+            case WEAPON_FLAIL: create_spritegroup(g, id, TX_WHIP_KEYS, TX_WHIP_COUNT, -12, -12); break;
             default: merror("unknown weapon type %d", weapon_type); return;
             }
             return;

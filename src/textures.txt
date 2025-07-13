@@ -14,6 +14,9 @@
 7  4 4  0  img/characters/human_jump.png
 8  4 4  0  img/characters/shadows/human_jump_shadow.png
 9  1 7  0  img/characters/human_spindie2.png
+#
+#
+#
 10 1 7  0  img/characters/shadows/human_spindie2_shadow.png
 11 1 12 0  img/characters/human_souldie.png
 12 1 12 0  img/characters/shadows/human_souldie_shadow.png
@@ -194,8 +197,8 @@
 128 4 4  0  img/characters/shadows/dwarf_jump_shadow.png
 129 1 7  0  img/characters/dwarf_spindie2.png
 130 1 7  0  img/characters/shadows/dwarf_spindie2_shadow.png
-131 1 12 0  img/characters/dwarf_souldie.png
-132 1 12 0  img/characters/shadows/dwarf_souldie_shadow.png
+#131 1 12 0  img/characters/dwarf_souldie.png
+#132 1 12 0  img/characters/shadows/dwarf_souldie_shadow.png
 133 4 4  0  img/characters/dwarf_dmg.png
 134 4 4  0  img/characters/shadows/dwarf_dmg_shadow.png
 #
@@ -211,8 +214,8 @@
 142 4 4  0  img/characters/shadows/elf_jump_shadow.png
 143 1 7  0  img/characters/elf_spindie2.png
 144 1 7  0  img/characters/shadows/elf_spindie2_shadow.png
-145 1 12 0  img/characters/elf_souldie.png
-146 1 12 0  img/characters/shadows/elf_souldie_shadow.png
+#145 1 12 0  img/characters/elf_souldie.png
+#146 1 12 0  img/characters/shadows/elf_souldie_shadow.png
 147 4 4  0  img/characters/elf_dmg.png
 148 4 4  0  img/characters/shadows/elf_dmg_shadow.png
 #
@@ -391,8 +394,8 @@
 #
 300 4 8 0 img/characters/human_shot.png
 301 4 8 0 img/characters/shadows/human_shot_shadow.png
-302 4 8 0 img/characters/orc_shot.png
-303 4 8 0 img/characters/shadows/orc_shot_shadow.png
+#302 4 8 0 img/characters/orc_shot.png
+#303 4 8 0 img/characters/shadows/orc_shot_shadow.png
 304 4 8 0 img/characters/dwarf_shot.png
 305 4 8 0 img/characters/shadows/dwarf_shot_shadow.png
 306 4 8 0 img/characters/elf_shot.png
@@ -422,15 +425,15 @@
 329 1  5 0  img/monsters/warg/shadows/warg_die_shadow.png
 #
 330 4  8 0  img/monsters/green_slime/SlimeGreenIdle.png
-331 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenIdle.png
 332 4  4 0  img/monsters/green_slime/SlimeGreenJumpAttack.png
-333 4  4 0  img/monsters/green_slime/shadows/ShadowSlimeGreenJumpAttack.png
 334 4  4 0  img/monsters/green_slime/SlimeGreenDmg.png
-335 4  4 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDmg.png
 336 1  8 0  img/monsters/green_slime/SlimeGreenDie.png
-337 1  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDie.png
+331 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeIdle.png
+333 4  4 0  img/monsters/green_slime/shadows/ShadowSlimeJump.png
+335 4  4 0  img/monsters/green_slime/shadows/ShadowSlimeDmg.png
+337 1  8 0  img/monsters/green_slime/shadows/ShadowSlimeDie.png
 #
-338 1  4 0  img/wands/basic-wand.png
+#338 1  4 0  img/wands/basic-wand.png
 #
 339 1 24 0  img/spells/full_fire.png
 340 1  8 0  img/spells/cast_fire.png
@@ -454,3 +457,19 @@
 #
 #
 347 1  4 0  img/weapons/warhammer.png
+348 1  4 0  img/weapons/flail.png
+#
+349  4 4  0  img/characters/human_attack_thrust.png
+350  4 4  0  img/characters/elf_attack_thrust.png
+351  4 4  0  img/characters/dwarf_attack_thrust.png
+352  4 4  0  img/characters/halfling_attack_thrust.png
+353  4 4  0  img/characters/orc_attack_thrust.png
+354  4 4  0  img/characters/goblin_attack_thrust.png
+#
+355  4 4  0  img/characters/shadows/human_attack_thrust_shadow.png
+356  4 4  0  img/characters/shadows/elf_attack_thrust_shadow.png
+357  4 4  0  img/characters/shadows/dwarf_attack_thrust_shadow.png
+358  4 4  0  img/characters/shadows/halfling_attack_thrust_shadow.png
+359  4 4  0  img/characters/shadows/orc_attack_thrust_shadow.png
+360  4 4  0  img/characters/shadows/goblin_attack_thrust_shadow.png
+#

@@ -3,20 +3,18 @@
 #include "inputstate.h"
 #include "libdraw.h"
 #include "liblogic.h"
-//#include "mprint.h"
-#include <emscripten/emscripten.h>
-#include <raylib.h>
-//#include <stdbool.h>
 #include <cstdio>
+#include <cstdlib>
+#include <emscripten/emscripten.h>
 #include <memory>
-#include <stdlib.h>
+#include <raylib.h>
+
 
 using std::make_shared;
 using std::shared_ptr;
-//inputstate is = {0};
-//gamestate* g = NULL;
 shared_ptr<inputstate> is = make_shared<inputstate>();
 shared_ptr<gamestate> g = gamestateinitptr();
+
 
 void gameloop() {
     inputstate_update(is);
@@ -39,6 +37,7 @@ void gameloop() {
     //    g->do_restart = false; // Reset restart flag
     //}
 }
+
 
 void gamerun() {
     g = gamestateinitptr();

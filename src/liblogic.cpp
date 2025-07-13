@@ -703,13 +703,14 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_potion(g, (vec3){5, 1, 0}, POTION_HP_LARGE);
     create_potion(g, (vec3){6, 1, 0}, POTION_MP_LARGE);
 
-    create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
-    create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
-    create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
     create_weapon(g, (vec3){1, 5, 0}, WEAPON_TWO_HANDED_SWORD);
     create_weapon(g, (vec3){1, 6, 0}, WEAPON_BOW);
     */
-    create_weapon(g, (vec3){1, 6, 0}, WEAPON_WARHAMMER);
+    create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
+    create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
+    create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
+    //create_weapon(g, (vec3){1, 6, 0}, WEAPON_WARHAMMER);
+    create_weapon(g, (vec3){1, 6, 0}, WEAPON_FLAIL);
 
     add_message(g, "Welcome to the game!");
     add_message(g, "To move around, press q w e a d z x c");
