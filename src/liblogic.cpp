@@ -306,6 +306,8 @@ static entityid create_player(shared_ptr<gamestate> g, race_t rt, vec3 loc, stri
 
     g_set_stat(g, id, STATS_LEVEL, 666);
 
+    g_add_equipped_weapon(g, id, -1);
+
     return id;
 }
 

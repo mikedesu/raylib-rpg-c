@@ -153,19 +153,12 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->music_volume = DEFAULT_MUSIC_VOLUME;
 
     g->component_table = new unordered_map<entityid, long>();
-
     g->name_list = new unordered_map<entityid, string>();
-
     g->type_list = new unordered_map<entityid, entitytype_t>();
-
     g->race_list = new unordered_map<entityid, race_t>();
-
     g->loc_list = new unordered_map<entityid, vec3>();
-
     g->sprite_move_list = new unordered_map<entityid, Rectangle>();
-
     g->dir_list = new unordered_map<entityid, direction_t>();
-
     g->dead_list = new unordered_map<entityid, bool>();
     g->update_list = new unordered_map<entityid, bool>();
     g->attacking_list = new unordered_map<entityid, bool>();
@@ -173,22 +166,13 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->block_success_list = new unordered_map<entityid, bool>();
     g->damaged_list = new unordered_map<entityid, bool>();
     g->pushable_list = new unordered_map<entityid, bool>();
-
-
     g->tx_alpha_list = new unordered_map<entityid, int>();
-
     g->item_type_list = new unordered_map<entityid, itemtype>();
-
     g->potion_type_list = new unordered_map<entityid, potiontype>();
     g->weapon_type_list = new unordered_map<entityid, weapontype>();
-
-    //g->stats_list = new unordered_map<entityid, int[STATS_COUNT]>();
-
-    //std::shared_ptr<std::unordered_map<entityid, std::shared_ptr<std::vector<int>>>> stats_list;
-
-    //g->stats_list = make_shared<unordered_map<entityid, shared_ptr<vector<int>>>>();
-    //std::shared_ptr<std::unordered_map<entityid, std::shared_ptr<std::unordered_map<int, int>>>> stats_list;
     g->stats_list = make_shared<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>>();
+    g->equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
+
 
     g->last_click_screen_pos = (Vector2){-1, -1};
 
@@ -1352,7 +1336,6 @@ bool g_set_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype typ
 bool g_add_stats(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
     if (!g_add_comp(g, id, C_STATS)) {
         merror("g_add_stats: Failed to add component C_STATS for id %d", id);
         return false;
@@ -1362,16 +1345,13 @@ bool g_add_stats(shared_ptr<gamestate> g, entityid id) {
         return false;
     }
 
-    // Check if the stats component already exists for the entity
     if (g->stats_list->find(id) != g->stats_list->end()) {
         merror("g_add_stats: id %d already has a stats component", id);
-        return false; // Stats component already exists
+        return false;
     }
 
-    // Initialize the stats component for the entity
     (*g->stats_list)[id] = make_shared<unordered_map<int, int>>();
 
-    // init all the slots to 0
     for (int i = 0; i < STATS_COUNT; i++) {
         (*(*g->stats_list)[id])[i] = 0;
     }
@@ -1387,7 +1367,6 @@ bool g_has_stats(shared_ptr<gamestate> g, entityid id) {
         merror("g->stats_list is NULL");
         return false;
     }
-    // Check if the entity has a stats component
     return g->stats_list->find(id) != g->stats_list->end();
 }
 
@@ -1399,10 +1378,8 @@ bool g_set_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot, int value
         merror("g->stats_list is NULL");
         return false;
     }
-    // Check if the entity has a stats component
     if (g_has_stats(g, id)) {
-        // Update the stat for the entity
-        (*(*g->stats_list)[id])[slot] = value; // Update the stat value
+        (*(*g->stats_list)[id])[slot] = value;
         return true;
     }
     merror("g_set_stat: id %d does not have a stats component", id);
@@ -1415,7 +1392,7 @@ int g_get_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (!g->stats_list) {
         merror("g->stats_list is NULL");
-        return 0; // Return 0 if stats list is not initialized
+        return 0;
     }
     // Check if the entity has a stats component
     if (g_has_stats(g, id)) {
@@ -1423,7 +1400,69 @@ int g_get_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot) {
         return (*(*g->stats_list)[id])[slot]; // Return the stat value
     }
     merror("g_get_stat: id %d does not have a stats component", id);
-    return 0; // Return 0 if the stat is not found
+    return 0;
+}
+
+
+bool g_add_equipped_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_EQUIPPED_WEAPON)) {
+        merror("g_add_equipped_weapon: Failed to add component C_EQUIPPED_WEAPON for id %d", id);
+        return false;
+    }
+    if (!g->equipped_weapon_list) {
+        merror("g->equipped_weapon_list is NULL");
+        return false;
+    }
+    // Check if the equipped weapon already exists for the entity
+    (*g->equipped_weapon_list)[id] = wpn_id; // Insert or update the equipped weapon
+    return true;
+}
+
+
+bool g_has_equipped_weapon(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->equipped_weapon_list) {
+        merror("g->equipped_weapon_list is NULL");
+        return false;
+    }
+    // Check if the entity has an equipped weapon component
+    return g->equipped_weapon_list->find(id) != g->equipped_weapon_list->end();
+}
+
+
+bool g_set_equipped_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->equipped_weapon_list) {
+        merror("g->equipped_weapon_list is NULL");
+        return false;
+    }
+    // Check if the entity has an equipped weapon component
+    if (g_has_equipped_weapon(g, id)) {
+        // Update the equipped weapon for the entity
+        (*g->equipped_weapon_list)[id] = wpn_id; // Update the equipped weapon
+        return true;
+    }
+    merror("g_set_equipped_weapon: id %d does not have an equipped weapon component", id);
+    return false;
+}
+
+
+entityid g_get_equipped_weapon(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->equipped_weapon_list) {
+        if (g_has_equipped_weapon(g, id)) {
+            massert(g->equipped_weapon_list->find(id) != g->equipped_weapon_list->end(), "g_get_equipped_weapon: id %d not found in equipped weapon list", id);
+            return g->equipped_weapon_list->at(id);
+        }
+    }
+    merror("g_get_equipped_weapon: id %d does not have an equipped weapon component", id);
+    return ENTITYID_INVALID; // Return ENTITYID_INVALID if not found
 }
 
 

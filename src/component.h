@@ -40,7 +40,7 @@ typedef enum component_t
     C_DEFAULT_ACTION = 21,
     C_TARGET = 22,
     C_TARGET_PATH = 23,
-    C_EQUIPMENT = 24,
+    C_EQUIPPED_WEAPON = 24,
     C_STATS = 25,
     C_DAMAGE = 26,
     C_BASE_ATTACK_DAMAGE = 27,
@@ -58,45 +58,44 @@ typedef enum component_t
 
 static inline const char* component2str(component c) {
     switch (c) {
-    case C_NONE: return "C_NONE";
-    case C_ID: return "C_ID";
-    case C_NAME: return "C_NAME";
-    case C_TYPE: return "C_TYPE";
-    case C_RACE: return "C_RACE";
-    case C_DIRECTION: return "C_DIRECTION";
-    case C_LOCATION: return "C_LOCATION";
-    case C_SPRITE_MOVE: return "C_SPRITE_MOVE";
-    case C_DEAD: return "C_DEAD";
-    case C_UPDATE: return "C_UPDATE";
-    case C_ATTACKING: return "C_ATTACKING";
-    case C_BLOCKING: return "C_BLOCKING";
-    case C_BLOCK_SUCCESS: return "C_BLOCK_SUCCESS";
-    case C_DAMAGED: return "C_DAMAGED";
-    case C_INVENTORY: return "C_INVENTORY";
-    case C_DEFAULT_ACTION: return "C_DEFAULT_ACTION";
-    case C_TARGET: return "C_TARGET";
-    case C_TARGET_PATH: return "C_TARGET_PATH";
-    case C_EQUIPMENT: return "C_EQUIPMENT";
-    case C_STATS: return "C_STATS";
-    case C_ITEMTYPE: return "C_ITEMTYPE";
-    case C_WEAPONTYPE: return "C_WEAPONTYPE";
-    case C_SHIELDTYPE: return "C_SHIELDTYPE";
-    case C_POTIONTYPE: return "C_POTIONTYPE";
-    case C_DAMAGE: return "C_DAMAGE";
-    case C_AC: return "C_AC";
-    case C_ZAPPING: return "C_ZAPPING";
-    case C_VISION_DISTANCE: return "C_VISION_DISTANCE";
-    case C_LIGHT_RADIUS: return "C_LIGHT_RADIUS";
-    case C_LIGHT_RADIUS_BONUS: return "C_LIGHT_RADIUS_BONUS";
-    case C_RINGTYPE: return "C_RINGTYPE";
-    case C_BASE_ATTACK_DAMAGE: return "C_BASE_ATTACK_DAMAGE";
-    case C_EXPLORED_LIST: return "C_EXPLORED_LIST";
-    case C_VISIBLE_LIST: return "C_VISIBLE_LIST";
-    case C_TX_ALPHA: return "C_TX_ALPHA";
-    case C_PUSHABLE: return "C_PUSHABLE";
-
-    case C_COUNT: return "C_COUNT";
+    case C_NONE: return "NONE";
+    case C_ID: return "ID";
+    case C_NAME: return "NAME";
+    case C_TYPE: return "TYPE";
+    case C_RACE: return "RACE";
+    case C_DIRECTION: return "DIRECTION";
+    case C_LOCATION: return "LOCATION";
+    case C_SPRITE_MOVE: return "SPRITE_MOVE";
+    case C_DEAD: return "DEAD";
+    case C_UPDATE: return "UPDATE";
+    case C_ATTACKING: return "ATTACKING";
+    case C_BLOCKING: return "BLOCKING";
+    case C_BLOCK_SUCCESS: return "BLOCK_SUCCESS";
+    case C_DAMAGED: return "DAMAGED";
+    case C_INVENTORY: return "INVENTORY";
+    case C_DEFAULT_ACTION: return "DEFAULT_ACTION";
+    case C_TARGET: return "TARGET";
+    case C_TARGET_PATH: return "TARGET_PATH";
+    case C_EQUIPPED_WEAPON: return "EQUIPPED_WEAPON";
+    case C_STATS: return "STATS";
+    case C_ITEMTYPE: return "ITEMTYPE";
+    case C_WEAPONTYPE: return "WEAPONTYPE";
+    case C_SHIELDTYPE: return "SHIELDTYPE";
+    case C_POTIONTYPE: return "POTIONTYPE";
+    case C_DAMAGE: return "DAMAGE";
+    case C_AC: return "AC";
+    case C_ZAPPING: return "ZAPPING";
+    case C_VISION_DISTANCE: return "VISION_DISTANCE";
+    case C_LIGHT_RADIUS: return "LIGHT_RADIUS";
+    case C_LIGHT_RADIUS_BONUS: return "LIGHT_RADIUS_BONUS";
+    case C_RINGTYPE: return "RINGTYPE";
+    case C_BASE_ATTACK_DAMAGE: return "BASE_ATTACK_DAMAGE";
+    case C_EXPLORED_LIST: return "EXPLORED_LIST";
+    case C_VISIBLE_LIST: return "VISIBLE_LIST";
+    case C_TX_ALPHA: return "TX_ALPHA";
+    case C_PUSHABLE: return "PUSHABLE";
+    case C_COUNT: return "COUNT";
     default: break;
     }
-    return "C_UNKNOWN";
+    return "UNKNOWN";
 }

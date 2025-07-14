@@ -105,11 +105,9 @@ typedef struct gamestate {
     std::unordered_map<entityid, potiontype>* potion_type_list;
     std::unordered_map<entityid, weapontype>* weapon_type_list;
 
-    //std::unordered_map<entityid, int[STATS_COUNT]>* stats_list;
-    //std::unordered_map<entityid, >* stats_list;
-
-    //std::shared_ptr<std::unordered_map<entityid, std::shared_ptr<std::vector<int>>>> stats_list;
     std::shared_ptr<std::unordered_map<entityid, std::shared_ptr<std::unordered_map<int, int>>>> stats_list;
+
+    std::shared_ptr<std::unordered_map<entityid, entityid>> equipped_weapon_list;
 
 
     debugpanel_t debugpanel;
@@ -311,3 +309,9 @@ bool g_add_stats(std::shared_ptr<gamestate> g, entityid id);
 bool g_has_stats(std::shared_ptr<gamestate> g, entityid id);
 bool g_set_stat(std::shared_ptr<gamestate> g, entityid id, stats_slot slot, int value);
 int g_get_stat(std::shared_ptr<gamestate> g, entityid id, stats_slot slot);
+
+
+bool g_add_equipped_weapon(std::shared_ptr<gamestate> g, entityid id, entityid wpn_id);
+bool g_has_equipped_weapon(std::shared_ptr<gamestate> g, entityid id);
+bool g_set_equipped_weapon(std::shared_ptr<gamestate> g, entityid id, entityid wpn_id);
+entityid g_get_equipped_weapon(std::shared_ptr<gamestate> g, entityid id);
