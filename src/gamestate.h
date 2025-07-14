@@ -136,6 +136,9 @@ typedef struct gamestate {
 
     std::vector<string>* msg_system;
     std::vector<string>* msg_history;
+    int msg_history_max_len_msg;
+    int msg_history_max_len_msg_measure;
+
 
     bool msg_system_is_active;
 

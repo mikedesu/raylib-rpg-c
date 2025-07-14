@@ -108,6 +108,8 @@ static inline void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
 //static void handle_npc(shared_ptr<gamestate> g, entityid id);
 
 static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
+//static void add_message_history(shared_ptr<gamestate> g, const char* fmt, ...);
+static void cycle_messages(shared_ptr<gamestate> g);
 static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -351,21 +353,6 @@ static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> i
 //}
 
 
-//static void handle_input_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-//    massert(is, "Input state is NULL!");
-//    massert(g, "Game state is NULL!");
-//    if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT) {
-//merror("handle_input_player: flag is not GAMESTATE_FLAG_PLAYER_INPUT returning");
-//        return;
-//    }
-//if (inputstate_is_pressed(is, KEY_ENTER)) {
-//minfo("handle_input_player: enter key pressed");
-//    return;
-//}
-//}
-
-
-//static void handle_input_title_scene(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
 static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
         minfo("Title screen input detected, switching to main menu");
@@ -375,7 +362,6 @@ static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputst
 }
 
 
-//static void handle_input_main_menu_scene(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
 static void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
         if (g->title_screen_selection == 0) {
@@ -403,7 +389,6 @@ static void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inp
 }
 
 
-//static void handle_input_character_creation_scene(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
 static void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
@@ -440,7 +425,100 @@ static void handle_input_character_creation_scene(shared_ptr<gamestate> g, share
 }
 
 
+static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+    if (g->msg_system_is_active) {
+        // press enter to cycle thru message
+        if (inputstate_is_pressed(is, KEY_ENTER)) {
+            cycle_messages(g);
+        }
+        return;
+    }
+
+    if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+        if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
+            g->cam2d.zoom += DEFAULT_ZOOM_INCR;
+            g->frame_dirty = true;
+            //return;
+        } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
+            g->cam2d.zoom -= (g->cam2d.zoom > 1.0) ? DEFAULT_ZOOM_INCR : 0.0;
+            g->frame_dirty = true;
+        }
+
+        if (g->player_changing_dir) {
+            // double 's' is wait one turn
+            if (inputstate_is_pressed(is, KEY_S)) {
+                g->player_changing_dir = false;
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
+                change_player_dir(g, DIR_UP);
+            } else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
+                change_player_dir(g, DIR_DOWN);
+            } else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+                change_player_dir(g, DIR_LEFT);
+            } else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
+                change_player_dir(g, DIR_RIGHT);
+            } else if (inputstate_is_pressed(is, KEY_Q)) {
+                change_player_dir(g, DIR_UP_LEFT);
+            } else if (inputstate_is_pressed(is, KEY_E)) {
+                change_player_dir(g, DIR_UP_RIGHT);
+            } else if (inputstate_is_pressed(is, KEY_Z)) {
+                change_player_dir(g, DIR_DOWN_LEFT);
+            } else if (inputstate_is_pressed(is, KEY_C)) {
+                change_player_dir(g, DIR_DOWN_RIGHT);
+            } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+                g_set_attacking(g, g->hero_id, true);
+                g_set_update(g, g->hero_id, true);
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                g->player_changing_dir = false;
+            }
+            //return;
+        }
+
+        if (inputstate_is_pressed(is, KEY_S)) {
+            g->player_changing_dir = true;
+            //return;
+        }
+
+        vec3 loc = g_get_loc(g, g->hero_id);
+
+        if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
+            try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
+            try_entity_move(g, g->hero_id, (vec3){0, 1, 0});
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+            try_entity_move(g, g->hero_id, (vec3){-1, 0, 0});
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
+            try_entity_move(g, g->hero_id, (vec3){1, 0, 0});
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (inputstate_is_pressed(is, KEY_Q)) {
+            try_entity_move(g, g->hero_id, (vec3){-1, -1, 0});
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (inputstate_is_pressed(is, KEY_E)) {
+            try_entity_move(g, g->hero_id, (vec3){1, -1, 0});
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (inputstate_is_pressed(is, KEY_Z)) {
+            try_entity_move(g, g->hero_id, (vec3){-1, 1, 0});
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (inputstate_is_pressed(is, KEY_C)) {
+            try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+            g_set_attacking(g, g->hero_id, true);
+            g_set_update(g, g->hero_id, true);
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        }
+        //return;
+    }
+}
+
+
 static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+    massert(g, "Game state is NULL!");
+    massert(is, "Input state is NULL!");
+
     if (inputstate_is_pressed(is, KEY_B)) {
         if (g->controlmode == CONTROLMODE_PLAYER) {
             g->controlmode = CONTROLMODE_CAMERA;
@@ -448,123 +526,18 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
             g->controlmode = CONTROLMODE_PLAYER;
         }
         g->frame_dirty = true;
-        return;
+        //    //return;
     }
 
     if (g->controlmode == CONTROLMODE_CAMERA) {
         handle_camera_move(g, is);
         g->frame_dirty = true;
-        return;
+        //return;
     }
 
     if (g->controlmode == CONTROLMODE_PLAYER) {
-        if (g->msg_system_is_active) {
-            // press enter to cycle thru message
-            if (inputstate_is_pressed(is, KEY_ENTER)) {
-                if (g->msg_system->size() > 0) {
-                    g->msg_history->push_back(g->msg_system->front());
-                    g->msg_system->erase(g->msg_system->begin());
-                }
-            }
-            // player must advance thru new messages
-            if (g->msg_system->size() == 0) {
-                g->msg_system_is_active = false;
-            }
-            return;
-        }
-
-        if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-            if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
-                g->cam2d.zoom += DEFAULT_ZOOM_INCR;
-                g->frame_dirty = true;
-                return;
-            } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
-                g->cam2d.zoom -= (g->cam2d.zoom > 1.0) ? DEFAULT_ZOOM_INCR : 0.0;
-                g->frame_dirty = true;
-                return;
-            }
-
-            if (g->player_changing_dir) {
-                // double 's' is wait one turn
-                if (inputstate_is_pressed(is, KEY_S)) {
-                    g->player_changing_dir = false;
-                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-                } else if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
-                    change_player_dir(g, DIR_UP);
-                } else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
-                    change_player_dir(g, DIR_DOWN);
-                } else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
-                    change_player_dir(g, DIR_LEFT);
-                } else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
-                    change_player_dir(g, DIR_RIGHT);
-                } else if (inputstate_is_pressed(is, KEY_Q)) {
-                    change_player_dir(g, DIR_UP_LEFT);
-                } else if (inputstate_is_pressed(is, KEY_E)) {
-                    change_player_dir(g, DIR_UP_RIGHT);
-                } else if (inputstate_is_pressed(is, KEY_Z)) {
-                    change_player_dir(g, DIR_DOWN_LEFT);
-                } else if (inputstate_is_pressed(is, KEY_C)) {
-                    change_player_dir(g, DIR_DOWN_RIGHT);
-                } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-                    g_set_attacking(g, g->hero_id, true);
-                    g_set_update(g, g->hero_id, true);
-                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-                    g->player_changing_dir = false;
-                }
-                return;
-            }
-
-            if (inputstate_is_pressed(is, KEY_S)) {
-                g->player_changing_dir = true;
-                return;
-            }
-
-            vec3 loc = g_get_loc(g, g->hero_id);
-
-            if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
-                try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
-                try_entity_move(g, g->hero_id, (vec3){0, 1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
-                try_entity_move(g, g->hero_id, (vec3){-1, 0, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
-                try_entity_move(g, g->hero_id, (vec3){1, 0, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_Q)) {
-                try_entity_move(g, g->hero_id, (vec3){-1, -1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_E)) {
-                try_entity_move(g, g->hero_id, (vec3){1, -1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_Z)) {
-                try_entity_move(g, g->hero_id, (vec3){-1, 1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_C)) {
-                try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-                g_set_attacking(g, g->hero_id, true);
-                g_set_update(g, g->hero_id, true);
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            }
-            return;
-
-            //if (inputstate_is_mouse_pressed(is, MOUSE_BUTTON_LEFT)) {
-            // if the player clicks on the map, we will try to move there
-            //    Vector2 mouse_pos = inputstate_get_mouse_position(is);
-            //    g->last_click_screen_pos = mouse_pos;
-            //vec3 target_loc = g_get_target_location(g, mouse_pos);
-            //if (target_loc.x != -1 && target_loc.y != -1) {
-            //    if (try_entity_move(g, g->hero_id, target_loc)) {
-            //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            //    }
-            //}
-            //    return;
-            //}
-        }
+        handle_input_gameplay_controlmode_player(g, is);
+        //return;
     }
 }
 
@@ -720,8 +693,9 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon(g, (vec3){1, 6, 0}, WEAPON_WARHAMMER);
     create_weapon(g, (vec3){1, 6, 0}, WEAPON_FLAIL);
 
-    add_message(g, "Welcome to the game!");
+    add_message(g, "Welcome to the game! Press enter to cycle messages.");
     add_message(g, "To move around, press q w e a d z x c");
+    add_message(g, "This is a test message to demonstrate the resizing of the message history box");
     msuccess("liblogic_init: Game state initialized");
 }
 
@@ -908,7 +882,6 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 
 
 //static void add_message_history(gamestate* const g, const char* fmt, ...);
-//static void add_message_history(shared_ptr<gamestate> g, const char* fmt, ...);
 //static void add_message_and_history(gamestate* g, const char* fmt, ...);
 //static void
 //add_message_and_history(shared_ptr<gamestate> g, const char* fmt, ...);
@@ -1041,28 +1014,28 @@ static int calc_next_lvl_xp(shared_ptr<gamestate> g, entityid id) {
 }
 */
 
-/*
-static void add_message_history(gamestate* const g, const char* fmt, ...) {
+static void cycle_messages(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    massert(fmt, "fmt is NULL");
-    massert(g->msg_history.messages, "g->msg_history.messages is NULL");
-    massert(g->msg_history.count >= 0, "g->msg_history.count is negative");
-    if (g->msg_history.count >= g->msg_history.max_count) {
-        merror("Message history full!");
-        return;
+    if (g->msg_system->size() > 0) {
+        string msg = g->msg_system->front();
+        int len = msg.length();
+        // measure the length of the message as calculated by MeasureText
+
+        if (len > g->msg_history_max_len_msg) {
+            g->msg_history_max_len_msg = len;
+            int font_size = 10;
+            int measure = MeasureText(msg.c_str(), font_size);
+            //if (measure > g->msg_history_max_len_msg_measure) {
+            g->msg_history_max_len_msg_measure = measure;
+        }
+
+        g->msg_history->push_back(g->msg_system->front());
+        g->msg_system->erase(g->msg_system->begin());
     }
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(g->msg_history.messages[g->msg_history.count],
-              MAX_MSG_LENGTH - 1,
-              fmt,
-              args);
-    va_end(args);
-    g->msg_history.messages[g->msg_history.count][MAX_MSG_LENGTH - 1] =
-        '\0'; // null term
-    g->msg_history.count++;
+    if (g->msg_system->size() == 0) {
+        g->msg_system_is_active = false;
+    }
 }
-*/
 
 /*
 static void add_message_and_history(gamestate* g, const char* fmt, ...) {

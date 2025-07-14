@@ -1045,17 +1045,16 @@ static void draw_message_history(shared_ptr<gamestate> g) {
         return;
     }
 
-    max_measure = -1;
+    //max_measure = -1;
+    //for (int i = 0; i < msg_count; i++) {
+    //    msg = g->msg_history->at(i);
+    //    measure = MeasureText(msg.c_str(), font_size);
+    //    if (measure > max_measure) {
+    //        max_measure = measure;
+    //    }
+    //}
 
-
-    for (int i = 0; i < msg_count; i++) {
-        msg = g->msg_history->at(i);
-        measure = MeasureText(msg.c_str(), font_size);
-        if (measure > max_measure) {
-            max_measure = measure;
-        }
-    }
-
+    max_measure = g->msg_history_max_len_msg_measure;
 
     w = max_measure + g->pad;
     //h = font_size * 5 + g->pad * 2;

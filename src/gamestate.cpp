@@ -134,6 +134,8 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->msg_history = new vector<string>();
     g->msg_system = new vector<string>();
+    g->msg_history_max_len_msg = 0;
+    g->msg_history_max_len_msg_measure = 0;
 
     // initialize character creation
     g->chara_creation = make_shared<character_creation>();
