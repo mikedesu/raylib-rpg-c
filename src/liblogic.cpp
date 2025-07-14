@@ -156,7 +156,8 @@ static void init_dungeon(shared_ptr<gamestate> g) {
     minfo("adding floors...");
     int df_count = 1;
     for (int i = 0; i < df_count; i++) {
-        d_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
+        d_add_floor(g->dungeon, 8, 8);
+        //d_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     }
     msuccess("Added %d floors to dungeon", df_count);
 }
@@ -472,12 +473,12 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 g->player_changing_dir = false;
             }
-            //return;
+            return;
         }
 
         if (inputstate_is_pressed(is, KEY_S)) {
             g->player_changing_dir = true;
-            //return;
+            return;
         }
 
         vec3 loc = g_get_loc(g, g->hero_id);
@@ -516,7 +517,7 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
             try_entity_pickup(g, g->hero_id);
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
         }
-        //return;
+        return;
     }
 }
 

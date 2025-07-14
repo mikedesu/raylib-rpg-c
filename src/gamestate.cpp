@@ -89,7 +89,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->gameplay_settings_menu_selection = 0;
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){0, 0};
-    g->cam2d.zoom = 4.0f;
+    g->cam2d.zoom = 7.0f;
     g->cam2d.rotation = 0.0;
     g->fadealpha = 0.0;
     g->cam3d = (Camera3D){0};
@@ -1463,7 +1463,7 @@ entityid g_get_equipped_weapon(shared_ptr<gamestate> g, entityid id) {
             return g->equipped_weapon_list->at(id);
         }
     }
-    merror("g_get_equipped_weapon: id %d does not have an equipped weapon component", id);
+    //merror("g_get_equipped_weapon: id %d does not have an equipped weapon component", id);
     return ENTITYID_INVALID; // Return ENTITYID_INVALID if not found
 }
 

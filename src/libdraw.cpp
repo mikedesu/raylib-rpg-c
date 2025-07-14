@@ -58,8 +58,6 @@ Music music;
 
 
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
-
-
 int libdraw_restart_count = 0;
 
 
@@ -97,7 +95,7 @@ static void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, sp
 static void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
 static void load_shaders();
 static void libdraw_unload_shaders();
-static void load_textures();
+static bool load_textures();
 static void libdraw_unload_textures();
 static void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
@@ -108,10 +106,10 @@ static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id);
 static void draw_debug_panel(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d(shared_ptr<gamestate> g);
 static void create_sg_byid(shared_ptr<gamestate> g, entityid id);
-static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
+static bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
 static void draw_version(const shared_ptr<gamestate> g);
 
-//static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 //static void calc_debugpanel_size(shared_ptr<gamestate> g);
 //static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y, specifier_t spec);
 //static void draw_shadow_for_entity(const shared_ptr<gamestate> g,
@@ -225,17 +223,17 @@ static sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spr
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-    //entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
-    //if (weapon == ENTITYID_INVALID) return NULL;
-    //spritegroup_t* w_sg =
-    //    hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    //if (!w_sg) {
-    //    return NULL;
-    //}
+    entityid weapon = g_get_equipped_weapon(g, id);
+    if (weapon == ENTITYID_INVALID) return NULL;
+    spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
+    if (!w_sg) {
+        return NULL;
+    }
     sprite* retval = NULL;
-    //if (sg->current == SG_ANIM_NPC_ATTACK) {
-    //    retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
-    //} else if (sg->current == SG_ANIM_NPC_SHOT) {
+    if (sg->current == SG_ANIM_NPC_ATTACK) {
+        retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
+    }
+    //else if (sg->current == SG_ANIM_NPC_SHOT) {
     //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_F);
     //}
     return retval;
@@ -246,19 +244,19 @@ static sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spri
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-    //entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
-    //if (weapon == ENTITYID_INVALID) {
-    //    return NULL;
-    //}
-    //spritegroup_t* w_sg =
-    //    hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    //if (!w_sg) {
-    //    return NULL;
-    //}
+    entityid weapon = g_get_equipped_weapon(g, id);
+    if (weapon == ENTITYID_INVALID) {
+        return NULL;
+    }
+    spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
+    if (!w_sg) {
+        return NULL;
+    }
     sprite* retval = NULL;
-    //if (sg->current == SG_ANIM_NPC_ATTACK) {
-    //    retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    //} else if (sg->current == SG_ANIM_NPC_SHOT) {
+    if (sg->current == SG_ANIM_NPC_ATTACK) {
+        retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
+    }
+    //else if (sg->current == SG_ANIM_NPC_SHOT) {
     //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_B);
     //}
     return retval;
@@ -408,10 +406,10 @@ static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
     // Draw components in correct order
     //draw_shadow_for_entity(g, sg, id);
     //draw_shield_sprite_back(g, id, sg);
-    //draw_weapon_sprite_back(g, id, sg);
+    draw_weapon_sprite_back(g, id, sg);
     draw_entity_sprite(g, sg);
     //draw_shield_sprite_front(g, id, sg);
-    //draw_weapon_sprite_front(g, id, sg);
+    draw_weapon_sprite_front(g, id, sg);
 }
 
 
@@ -560,22 +558,19 @@ static void libdraw_set_sg_is_dead(shared_ptr<gamestate> g,
 }
 */
 
-/*
-static void
-update_weapon_for_entity(gamestate* g, entityid id, spritegroup_t* sg) {
+static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
-    entityid weaponid = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
+    entityid weaponid = g_get_equipped_weapon(g, id);
     if (weaponid == ENTITYID_INVALID) return;
-    spritegroup_t* w_sg =
-        hashtable_entityid_spritegroup_get(spritegroups, weaponid);
+    spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weaponid);
     if (!w_sg) return;
     int ctx = sg->sprites[sg->current]->currentcontext;
     spritegroup_setcontexts(w_sg, ctx);
     spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
 }
-*/
+
 
 static void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
@@ -584,8 +579,7 @@ static void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, sp
     race_t race = g_get_race(g, id);
     //entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
     //weapontype wtype = g_get_weapontype(g, weapon);
-    int cur = 0;
-    cur = SG_ANIM_NPC_ATTACK;
+    int cur = SG_ANIM_NPC_ATTACK;
     //if (wtype == WEAPON_BOW) {
     //    cur = SG_ANIM_NPC_SHOT;
     //}
@@ -595,8 +589,7 @@ static void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, sp
     //    cur = SG_ANIM_SLIME_ATTACK;
     //}
     spritegroup_set_current(sg, cur);
-    //update_weapon_for_entity(g, id, sg);
-    //e->is_attacking = false;
+    update_weapon_for_entity(g, id, sg);
     g_set_attacking(g, id, false);
 }
 /*
@@ -710,7 +703,6 @@ static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spri
     }
     // Copy movement intent from sprite_move_x/y if present
     libdraw_update_sprite_position(g, id, sg);
-    //libdraw_update_sprite_attack(g, id, sg);
 
     if (g_get_attacking(g, id)) {
         libdraw_set_sg_is_attacking(g, id, sg);
@@ -731,8 +723,7 @@ static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spri
     vec3 loc = g_get_loc(g, id);
     spritegroup_snap_dest(sg, loc.x, loc.y);
 }
-/*
-*/
+
 
 static void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
@@ -745,8 +736,7 @@ static void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
         }
     }
 }
-/*
-*/
+
 
 static void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -760,6 +750,7 @@ static void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
     }
 }
 
+
 static void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (g->dirty_entities) {
@@ -772,8 +763,7 @@ static void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
         g->frame_dirty = true;
     }
 }
-/*
-*/
+
 
 void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -782,7 +772,6 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     //    SetMusicVolume(music, g->music_volume);
     //    g->music_volume_changed = false;
     //}
-
     if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_handle_dirty_entities(g);
         for (entityid id = 0; id < g->next_entityid; id++) {
@@ -791,9 +780,9 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     }
 }
 
+
 void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-
     //if (g->music_volume_changed) {
     //    SetMusicVolume(music, g->music_volume);
     //    g->music_volume_changed = false;
@@ -839,6 +828,7 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
     }
 }
 
+
 static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     //dungeon_floor_t* const df = d_get_current_floor(g->d);
@@ -858,8 +848,7 @@ static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     }
     return true;
 }
-/*
-*/
+
 
 static void draw_debug_panel(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -928,31 +917,24 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
-
     //camera_lock_on(g);
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     //EndShaderMode();
-
     libdraw_draw_dungeon_floor(g);
     libdraw_draw_player_target_box(g);
     libdraw_draw_mouse_box(g);
-
     EndMode2D();
-
     draw_hud(g);
     draw_message_history(g);
     draw_message_box(g);
-
     //if (g->display_inventory_menu) {
     //    draw_inventory_menu(g);
     //} else if (g->display_gameplay_settings_menu) {
     //    draw_gameplay_settings_menu(g);
     //}
-
     handle_debug_panel(g);
     //draw_version(g);
-
     //if (g->display_help_menu) {
     //    draw_help_menu(g);
     //}
@@ -960,8 +942,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //    draw_gameover_menu(g);
     //}
 }
-/*
-*/
+
 
 static void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -969,15 +950,13 @@ static void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g) {
     libdraw_drawframe_2d(g);
     EndTextureMode();
 }
-/*
-*/
+
 
 static void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     DrawTexturePro(main_game_target_texture.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
 }
-/*
-*/
+
 
 static void draw_message_box(shared_ptr<gamestate> g) {
     if (!g->msg_system_is_active || g->msg_system->size() == 0) {
@@ -1077,98 +1056,6 @@ static inline void handle_debug_panel(shared_ptr<gamestate> g) {
 }
 
 
-#define HELP_TEXT_COUNT 32
-/*
-static void draw_help_menu(shared_ptr<gamestate> g) {
-    //if (!g->display_help_menu) return;
-    // const char* help_text = g->help_menu_text;
-    const char* help_text[HELP_TEXT_COUNT] = {
-        "# Help Menu",
-        "",
-        "## Controls",
-        "",
-        "-----------------------------------",
-        "",
-        "- Movement: q w e a d z x c",
-        "- Attack: '",
-        "- Pickup Item: /",
-        "- Turn In Place: s [movement]",
-        "- Wait: s s",
-        "- Traverse: ]",
-        "- Inventory: Esc",
-        "- Nav Inventory: arrow up/down, w/x",
-        "- Use/Equip/Unequip Item: enter, '",
-        "- Drop Item: ]",
-        "",
-        "-----------------------------------",
-        "",
-        "From the Inventory menu, you can",
-        "cycle menus with arrow left and right",
-        "Sort inventory menu with the s key",
-        "",
-        "-----------------------------------",
-        "",
-        "Music volume can be adjusted on the",
-        "Settings menu with left and right bracket",
-        "",
-        "-----------------------------------",
-        "",
-        "Press any key to close this menu.",
-        ""};
-    Color bg_color = Fade((Color){0x33, 0x33, 0x33}, 1.0f);
-    int font_size = 10;
-    int idx_of_longest = 26;
-    int measure = MeasureText(help_text[idx_of_longest], font_size);
-    int text_width = measure;
-    int text_height = font_size;
-    int x = (g->windowwidth - text_width) / 2;
-    int y = (g->windowheight - text_height * HELP_TEXT_COUNT) / 2;
-    // Draw background box
-    DrawRectangle(x - 10,
-                  y - 10,
-                  text_width + 20,
-                  text_height * HELP_TEXT_COUNT + 20,
-                  bg_color);
-    DrawRectangleLines(x - 10,
-                       y - 10,
-                       text_width + 20,
-                       text_height * HELP_TEXT_COUNT + 20,
-                       WHITE);
-    // Draw each line of help text
-    for (int i = 0; i < HELP_TEXT_COUNT; i++) {
-        DrawText(help_text[i], x, y + i * text_height, font_size, WHITE);
-    }
-}
-*/
-
-
-/*
-static void draw_gameover_menu(shared_ptr<gamestate> g) {
-    const char* gameover_text = "Game Over";
-    const char* restart_text =
-        "Press enter or space to return to the title screen";
-    Color bg_color = BLACK;
-    int font_size = 10;
-    int measure = MeasureText(restart_text, font_size);
-    int text_width = measure;
-    int text_height = font_size;
-    int w = DEFAULT_TARGET_WIDTH;
-    int h = DEFAULT_TARGET_HEIGHT;
-    int x = (w - text_width) / 2;
-    int y = (h - text_height * 2) / 2;
-    Rectangle rect = {(float)x - 10,
-                      (float)y - 10,
-                      (float)text_width + 20,
-                      (float)text_height * 2 + 20};
-    DrawRectangle(
-        x - 10, y - 10, text_width + 20, text_height * 2 + 20, bg_color);
-    DrawRectangleLinesEx(rect, 2, RED);
-    DrawText(gameover_text, x, y, font_size, RED);
-    DrawText(restart_text, x, y + text_height, font_size, RED);
-}
-*/
-
-
 void libdraw_drawframe(shared_ptr<gamestate> g) {
     double start_time = GetTime();
     BeginDrawing();
@@ -1219,9 +1106,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
 
 static bool libdraw_unload_texture(int txkey) {
     massert(txkey >= 0, "txkey is invalid");
-    if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) {
-        return false;
-    }
+    if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) return false;
     UnloadTexture(txinfo[txkey].texture);
     txinfo[txkey].texture = (Texture2D){0};
     txinfo[txkey].contexts = 0;
@@ -1230,9 +1115,7 @@ static bool libdraw_unload_texture(int txkey) {
 
 
 static void libdraw_unload_textures() {
-    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) {
-        libdraw_unload_texture(i);
-    }
+    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) libdraw_unload_texture(i);
     UnloadRenderTexture(title_target_texture);
     UnloadRenderTexture(char_creation_target_texture);
     UnloadRenderTexture(main_game_target_texture);
@@ -1271,7 +1154,6 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
     if (do_dither) ImageDither(&image, 4, 4, 4, 4);
     Texture2D texture = LoadTextureFromImage(image);
 
-
     UnloadImage(image);
     txinfo[txkey].texture = texture;
     txinfo[txkey].contexts = ctxs;
@@ -1280,12 +1162,12 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
 }
 
 
-static void load_textures() {
+static bool load_textures() {
     const char* textures_file = "textures.txt";
     FILE* file = fopen(textures_file, "r");
     massert(file, "textures.txt file is NULL");
     if (!file) {
-        return;
+        return false;
     }
     char line[1024] = {0};
     while (fgets(line, sizeof(line), file)) {
@@ -1301,16 +1183,19 @@ static void load_textures() {
         massert(txkey >= 0, "txkey is invalid");
         massert(contexts >= 0, "contexts is invalid");
         massert(frames >= 0, "frames is invalid");
-        if (txkey < 0 || contexts < 0 || frames < 0) {
-            continue;
+        if (txkey < 0 || contexts < 0 || frames < 0) continue;
+        bool tx_loaded = load_texture(txkey, contexts, frames, do_dither, path);
+        if (!tx_loaded) {
+            merror("Failed to load %s, hard-crashing!", path);
+            exit(-1);
         }
-        load_texture(txkey, contexts, frames, do_dither, path);
     }
     fclose(file);
+    return true;
 }
 
 
-static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
+static bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
     massert(g, "gamestate is NULL");
     // can hold up to 32 sprites
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
@@ -1320,7 +1205,7 @@ static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
     massert(df, "dungeon_floor is NULL");
     if (!df) {
         spritegroup_destroy(group);
-        return;
+        return false;
     }
     int df_w = df->width;
     int df_h = df->height;
@@ -1329,7 +1214,7 @@ static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
     massert(loc.y >= 0 && loc.y < df_h, "location y out of bounds: %d", loc.y);
     if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
         spritegroup_destroy(group);
-        return;
+        return false;
     }
     for (int i = 0; i < num_keys; i++) {
         int k = keys[i];
@@ -1342,13 +1227,14 @@ static void create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
     massert(s, "sprite is NULL");
     if (!s) {
         spritegroup_destroy(group);
-        return;
+        return false;
     }
     group->current = 0;
     group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
     group->off_x = offset_x;
     group->off_y = offset_y;
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
+    return true;
 }
 
 
@@ -1483,8 +1369,6 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
                 g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
         }
     }
-*/
-/*
 */
 
 /*
