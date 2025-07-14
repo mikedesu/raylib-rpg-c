@@ -18,8 +18,10 @@
 #include "ringtype.h"
 #include "scene.h"
 #include <ctime>
+#include <memory>
 #include <raylib.h>
 #include <unordered_map>
+#include <vector>
 
 
 #define DEFAULT_MUSIC_VOLUME 0.0f
@@ -93,18 +95,22 @@ typedef struct gamestate {
     std::unordered_map<entityid, direction_t>* dir_list;
     std::unordered_map<entityid, bool>* dead_list;
     std::unordered_map<entityid, bool>* update_list;
-
     std::unordered_map<entityid, bool>* attacking_list;
     std::unordered_map<entityid, bool>* blocking_list;
     std::unordered_map<entityid, bool>* block_success_list;
     std::unordered_map<entityid, bool>* damaged_list;
     std::unordered_map<entityid, bool>* pushable_list;
-
     std::unordered_map<entityid, int>* tx_alpha_list;
-
     std::unordered_map<entityid, itemtype>* item_type_list;
     std::unordered_map<entityid, potiontype>* potion_type_list;
     std::unordered_map<entityid, weapontype>* weapon_type_list;
+
+    //std::unordered_map<entityid, int[STATS_COUNT]>* stats_list;
+    //std::unordered_map<entityid, >* stats_list;
+
+    //std::shared_ptr<std::unordered_map<entityid, std::shared_ptr<std::vector<int>>>> stats_list;
+    std::shared_ptr<std::unordered_map<entityid, std::shared_ptr<std::unordered_map<int, int>>>> stats_list;
+
 
     debugpanel_t debugpanel;
 
@@ -299,3 +305,9 @@ bool g_add_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype typ
 bool g_has_weapon_type(std::shared_ptr<gamestate> g, entityid id);
 weapontype g_get_weapon_type(std::shared_ptr<gamestate> g, entityid id);
 bool g_set_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype type);
+
+
+bool g_add_stats(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_stats(std::shared_ptr<gamestate> g, entityid id);
+bool g_set_stat(std::shared_ptr<gamestate> g, entityid id, stats_slot slot, int value);
+int g_get_stat(std::shared_ptr<gamestate> g, entityid id, stats_slot slot);

@@ -1543,7 +1543,7 @@ static void draw_hud(shared_ptr<gamestate> g) {
     int turn = g->turn_count;
     int hp = 0;
     int maxhp = 0;
-    int level = 0;
+    int level = g_get_stat(g, g->hero_id, STATS_LEVEL);
     int xp = 0;
     int next_level_xp = 0;
     int attack_bonus = 0;
@@ -1604,14 +1604,14 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     massert(w > 0 && h > 0, "window width or height is not set properly");
     g->windowwidth = w;
     g->windowheight = h;
-    //TextureFilter filter = TEXTURE_FILTER_POINT; // Use trilinear filtering for better quality
+    TextureFilter filter = TEXTURE_FILTER_POINT; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_BILINEAR; // Use trilinear filtering for better quality
-    TextureFilter filter = TEXTURE_FILTER_TRILINEAR; // Use trilinear filtering for better quality
+    //TextureFilter filter = TEXTURE_FILTER_TRILINEAR; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_ANISOTROPIC_16X;
     target = LoadRenderTexture(target_w, target_h);
     //SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
-    SetTextureFilter(target.texture,
-                     filter); // Use anisotropic filtering for better quality
+    SetTextureFilter(target.texture, filter);
+    // Use anisotropic filtering for better quality
     //target = LoadRenderTexture(w, h);
     title_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(title_target_texture.texture, filter);
@@ -1634,7 +1634,7 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
 
     load_shaders();
 
-    float x = target_w / 2.0f - DEFAULT_TILE_SIZE;
+    float x = target_w / 2.0f - DEFAULT_TILE_SIZE * 4;
     //float y = target_h / 16.0f;
     float y = DEFAULT_TILE_SIZE * 2;
     //float x = DEFAULT_TILE_SIZE * 4;

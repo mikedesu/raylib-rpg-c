@@ -190,6 +190,8 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
     g_add_block_success(g, id, false);
     g_add_damaged(g, id, false);
     g_add_tx_alpha(g, id, 0);
+    g_add_stats(g, id);
+
     minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
     if (!df_add_at(df, id, loc.x, loc.y)) {
         return ENTITYID_INVALID;
@@ -297,9 +299,13 @@ static entityid create_player(shared_ptr<gamestate> g, race_t rt, vec3 loc, stri
     entityid id = create_npc(g, rt, loc, name);
     msuccess("npc_create successful, id: %d", id);
     massert(id != ENTITYID_INVALID, "failed to create player");
+
     g_set_hero_id(g, id);
     g_add_type(g, id, ENTITY_PLAYER);
     g_set_tx_alpha(g, id, 0);
+
+    g_set_stat(g, id, STATS_LEVEL, 666);
+
     return id;
 }
 
@@ -672,7 +678,6 @@ void liblogic_init(shared_ptr<gamestate> g) {
     srand(time(NULL));
     init_dungeon(g);
     g->entity_turn = create_player(g, RACE_HUMAN, (vec3){0, 0, 0}, "darkmage");
-    /*
     create_wooden_box(g, (vec3){2, 2, 0});
     create_wooden_box(g, (vec3){3, 2, 0});
     create_wooden_box(g, (vec3){4, 2, 0});
@@ -685,6 +690,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_wooden_box(g, (vec3){7, 6, 0});
     create_wooden_box(g, (vec3){7, 7, 0});
 
+    /*
     create_npc_set_stats(g, (vec3){5, 3, 0}, RACE_HUMAN);
     create_npc_set_stats(g, (vec3){5, 4, 0}, RACE_ELF);
     create_npc_set_stats(g, (vec3){5, 5, 0}, RACE_DWARF);

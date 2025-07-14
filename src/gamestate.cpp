@@ -7,6 +7,7 @@
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
+#include "stats_slot.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -181,6 +182,14 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->potion_type_list = new unordered_map<entityid, potiontype>();
     g->weapon_type_list = new unordered_map<entityid, weapontype>();
 
+    //g->stats_list = new unordered_map<entityid, int[STATS_COUNT]>();
+
+    //std::shared_ptr<std::unordered_map<entityid, std::shared_ptr<std::vector<int>>>> stats_list;
+
+    //g->stats_list = make_shared<unordered_map<entityid, shared_ptr<vector<int>>>>();
+    //std::shared_ptr<std::unordered_map<entityid, std::shared_ptr<std::unordered_map<int, int>>>> stats_list;
+    g->stats_list = make_shared<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>>();
+
     g->last_click_screen_pos = (Vector2){-1, -1};
 
     gamestate_load_keybindings(g);
@@ -258,6 +267,7 @@ void gamestate_free(shared_ptr<gamestate> g) {
     if (g->potion_type_list) delete g->potion_type_list;
     if (g->weapon_type_list) delete g->weapon_type_list;
     if (g->pushable_list) delete g->pushable_list;
+    //if (g->stats_list) delete g->stats_list;
 }
 
 
@@ -1295,27 +1305,23 @@ bool g_add_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype typ
         merror("g->weapon_type_list is NULL");
         return false;
     }
-    // Check if the weapon type already exists for the entity
     (*g->weapon_type_list)[id] = type; // Insert or update the weapon type
     return true;
 }
 
 
 bool g_has_weapon_type(std::shared_ptr<gamestate> g, entityid id) {
-    //TODO
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (!g->weapon_type_list) {
         merror("g->weapon_type_list is NULL");
         return false;
     }
-    // Check if the entity has a weapon type component
     return g->weapon_type_list->find(id) != g->weapon_type_list->end();
 }
 
 
 weapontype g_get_weapon_type(std::shared_ptr<gamestate> g, entityid id) {
-    //TODO
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->weapon_type_list) {
@@ -1324,27 +1330,100 @@ weapontype g_get_weapon_type(std::shared_ptr<gamestate> g, entityid id) {
             return g->weapon_type_list->at(id);
         }
     }
-    merror("g_get_weapon_type: id %d does not have a weapon type component", id);
     return WEAPON_NONE; // Return WEAPON_NONE if not found
 }
 
 
 bool g_set_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype type) {
-    //TODO
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (!g->weapon_type_list) {
         merror("g->weapon_type_list is NULL");
         return false;
     }
-    // Check if the entity has a weapon type component
     if (g_has_weapon_type(g, id)) {
-        // Update the weapon type for the entity
         (*g->weapon_type_list)[id] = type; // Update the weapon type
         return true;
     }
-    merror("g_set_weapon_type: id %d does not have a weapon type component", id);
     return false;
+}
+
+
+bool g_add_stats(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_STATS)) {
+        merror("g_add_stats: Failed to add component C_STATS for id %d", id);
+        return false;
+    }
+    if (!g->stats_list) {
+        merror("g->stats_list is NULL");
+        return false;
+    }
+
+    // Check if the stats component already exists for the entity
+    if (g->stats_list->find(id) != g->stats_list->end()) {
+        merror("g_add_stats: id %d already has a stats component", id);
+        return false; // Stats component already exists
+    }
+
+    // Initialize the stats component for the entity
+    (*g->stats_list)[id] = make_shared<unordered_map<int, int>>();
+
+    // init all the slots to 0
+    for (int i = 0; i < STATS_COUNT; i++) {
+        (*(*g->stats_list)[id])[i] = 0;
+    }
+
+    return true;
+}
+
+
+bool g_has_stats(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->stats_list) {
+        merror("g->stats_list is NULL");
+        return false;
+    }
+    // Check if the entity has a stats component
+    return g->stats_list->find(id) != g->stats_list->end();
+}
+
+
+bool g_set_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot, int value) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->stats_list) {
+        merror("g->stats_list is NULL");
+        return false;
+    }
+    // Check if the entity has a stats component
+    if (g_has_stats(g, id)) {
+        // Update the stat for the entity
+        (*(*g->stats_list)[id])[slot] = value; // Update the stat value
+        return true;
+    }
+    merror("g_set_stat: id %d does not have a stats component", id);
+    return false;
+}
+
+
+int g_get_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->stats_list) {
+        merror("g->stats_list is NULL");
+        return 0; // Return 0 if stats list is not initialized
+    }
+    // Check if the entity has a stats component
+    if (g_has_stats(g, id)) {
+        massert(g->stats_list->find(id) != g->stats_list->end(), "g_get_stat: id %d not found in stats list", id);
+        return (*(*g->stats_list)[id])[slot]; // Return the stat value
+    }
+    merror("g_get_stat: id %d does not have a stats component", id);
+    return 0; // Return 0 if the stat is not found
 }
 
 
