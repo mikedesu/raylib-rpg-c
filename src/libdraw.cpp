@@ -975,7 +975,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //}
 
     handle_debug_panel(g);
-    draw_version(g);
+    //draw_version(g);
 
     //if (g->display_help_menu) {
     //    draw_help_menu(g);
@@ -1027,51 +1027,54 @@ static void draw_message_box(shared_ptr<gamestate> g) {
 
 
 static void draw_message_history(shared_ptr<gamestate> g) {
-    int font_size, msg_count, measure, pad;
+    int font_size, msg_count, measure, max_measure, pad;
     Color message_bg;
     //float x, y, w, h, text_width, text_height, msg_x, msg_y;
     float x, y, w, h, text_width, msg_x, msg_y;
     Rectangle box;
     char tmp[1024] = {0};
     string msg;
+    font_size = 10;
     // message history will now be a box directly beneath the hud
     // it should be static in size, that is, unchanging and const
     // first, lets calc that box position and size
-
-    font_size = 10;
     message_bg = {0x33, 0x33, 0x33, 0xff};
-
     msg_count = g->msg_history->size();
-
     if (msg_count == 0) {
         // if there are no messages, we don't need to draw anything
         return;
     }
 
-    w = 320;
+    max_measure = -1;
 
+
+    for (int i = 0; i < msg_count; i++) {
+        msg = g->msg_history->at(i);
+        measure = MeasureText(msg.c_str(), font_size);
+        if (measure > max_measure) {
+            max_measure = measure;
+        }
+    }
+
+
+    w = max_measure + g->pad;
     //h = font_size * 5 + g->pad * 2;
     pad = 10;
     h = font_size * msg_count + pad * 2;
-
-    x = DEFAULT_TARGET_WIDTH - w;
-    y = font_size * 2 + g->pad * 2;
+    //x = DEFAULT_TARGET_WIDTH - w;
+    x = 0;
+    y = font_size + g->pad + 5;
 
     box = {x, y, w, h};
-
-
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);
-
     // now lets draw each message in the history
     for (int i = 0; i < msg_count; i++) {
         msg = g->msg_history->at(i);
-
         bzero(tmp, 1024);
         snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
-
         //measure = MeasureText(tmp, font_size);
-        text_width = MeasureText(tmp, font_size);
+        //text_width = MeasureText(tmp, font_size);
         //text_height = font_size;
         //text_width = measure;
         msg_x = box.x + pad;
@@ -1554,19 +1557,20 @@ static void draw_hud(shared_ptr<gamestate> g) {
     char buffer0[1024] = {0};
     char buffer1[1024] = {0};
 
-    const char* format_str_0 = "%s Lvl %02d HP %02d/%02d Atk: %02d AC: %02d XP %05d/%05d";
-    const char* format_str_1 = "Floor %02d Turn %d";
+    const char* format_str_0 = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d";
+    const char* format_str_1 = "Floor %d Turn %d";
 
     snprintf(buffer0, sizeof(buffer0), format_str_0, g_get_name(g, g->hero_id).c_str(), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp);
     snprintf(buffer1, sizeof(buffer1), format_str_1, floor, turn);
 
-    Vector2 text_size0 = MeasureTextEx(GetFontDefault(), buffer0, font_size, g->line_spacing);
+    //Vector2 text_size0 = MeasureTextEx(GetFontDefault(), buffer0, font_size, g->line_spacing);
+    int text_size0 = MeasureText(buffer0, font_size);
 
-    float box_w = text_size0.x + g->pad;
-    float box_h = text_size0.y * 2 + g->pad;
+    float box_w = text_size0 + g->pad * 2;
+    float box_h = font_size + g->pad;
 
     // instead, lets position the HUD at the top right corner of the screen
-    float box_x = DEFAULT_TARGET_WIDTH - box_w;
+    float box_x = 0;
     float box_y = 0;
     Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
 
@@ -1575,13 +1579,13 @@ static void draw_hud(shared_ptr<gamestate> g) {
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, line_thickness, fg);
 
     // Calculate text position to center it within the box
-    int text_x = box_x + (box_w - text_size0.x) / 2;
-    int text_y = box_y + (box_h - text_size0.y) / 4;
+    int text_x = box_x + 10;
+    int text_y = box_y + (box_h - font_size) / 2;
 
     DrawText(buffer0, text_x, text_y, font_size, fg);
 
-    text_y = box_y + (box_h - text_size0.y) * 3 / 4;
-    DrawText(buffer1, text_x, text_y, font_size, fg);
+    //text_y += font_size;
+    //DrawText(buffer1, text_x, text_y, font_size, fg);
 }
 
 
@@ -1630,10 +1634,14 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
 
     load_shaders();
 
-    //float x = target_w / 2.0f - DEFAULT_TILE_SIZE;
-    float x = DEFAULT_TILE_SIZE * 4;
-    //float y = target_h / 2.0f - DEFAULT_TILE_SIZE * 10;
-    float y = DEFAULT_TILE_SIZE * 8;
+    float x = target_w / 2.0f - DEFAULT_TILE_SIZE;
+    //float y = target_h / 16.0f;
+    float y = DEFAULT_TILE_SIZE * 2;
+    //float x = DEFAULT_TILE_SIZE * 4;
+    //float y = DEFAULT_TILE_SIZE * 8;
+    //float x = 0;
+    //float y = 0;
+
     g->cam2d.offset = (Vector2){x, y};
     //g->cam2d.zoom = 1.0f;
 
@@ -1692,55 +1700,6 @@ void libdraw_init(shared_ptr<gamestate> g) {
     libdraw_init_rest(g);
 }
 
-/*
-static void draw_message_history(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    // if there are no messages in the message history, return
-    if (g->msg_history.count == 0) return;
-    int font_size = 10;
-    int max_messages = 10;
-    int x = 0;
-    int y = 42;
-    int current_count = 0;
-    char tmp_buffer[2048] = {0};
-    //Color message_bg = (Color){0x33, 0x33, 0x33, 200}; // semi-transparent
-    Color message_bg = g->message_history_bgcolor;
-    // instead of a placeholder message, we now need to actually draw the message history
-    // we might only render the last N messages
-    for (int i = g->msg_history.count - 1;
-         i >= 0 && current_count < max_messages;
-         i--) {
-        strncat(tmp_buffer,
-                g->msg_history.messages[i],
-                sizeof(tmp_buffer) - strlen(tmp_buffer) - 1);
-        strncat(tmp_buffer, "\n", sizeof(tmp_buffer) - strlen(tmp_buffer) - 1);
-        current_count++;
-    }
-    // chop off the last newline
-    if (strlen(tmp_buffer) > 0) tmp_buffer[strlen(tmp_buffer) - 1] = '\0';
-    Vector2 text_size =
-        MeasureTextEx(GetFontDefault(), tmp_buffer, font_size, g->line_spacing);
-    // Calculate box position
-    // we want the box to be in the top left corner of the screen
-    Rectangle box = {(float)x,
-                     (float)y,
-                     (float)text_size.x + g->pad,
-                     (float)text_size.y + g->pad};
-    // Draw box (semi-transparent black with white border)
-    DrawRectangleRec(box, message_bg);
-    DrawRectangleLinesEx(box, 1, WHITE);
-    // Draw text (centered in box)
-    float text_x = box.x + (box.width - text_size.x) / 2;
-    float text_y = box.y + (box.height - text_size.y) / 2;
-    Vector2 text_pos = {text_x, text_y};
-    DrawTextEx(GetFontDefault(),
-               tmp_buffer,
-               text_pos,
-               font_size,
-               g->line_spacing,
-               WHITE);
-}
-*/
 
 /*
 static void draw_inventory_menu(shared_ptr<gamestate> g) {
