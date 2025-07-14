@@ -2283,8 +2283,12 @@ static bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
                     add_message(g, "Equipped itemid %d", itemid);
                 } else {
                     tile_remove(tile, itemid);
+                    g_update_loc(g, equipped_wpn_id, (vec3){-1, -1, -1});
                     g_set_equipped_weapon(g, id, itemid);
                     add_message(g, "Equipped itemid %d", itemid);
+
+                    // update the loc of the equipped_wpn_id
+                    g_update_loc(g, equipped_wpn_id, loc);
                     tile_add(tile, equipped_wpn_id);
                     add_message(g, "Added equipped_wpn_id %d", equipped_wpn_id);
                 }
