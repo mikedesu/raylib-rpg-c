@@ -118,10 +118,10 @@ static void draw_version(const shared_ptr<gamestate> g);
 //                                   spritegroup_t* sg,
 //                                   entityid id);
 
-static sprite* get_weapon_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
-static sprite* get_weapon_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
-static sprite* get_shield_front_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
-static sprite* get_shield_back_sprite(const gamestate* g, entityid id, spritegroup_t* sg);
+static sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static sprite* get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
 
 static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
@@ -221,55 +221,48 @@ static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_p
     return true;
 }
 
-/*
-static sprite* get_weapon_front_sprite(const shared_ptr<gamestate> g,
-                                       entityid id,
-                                       spritegroup_t* sg) {
+static sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-    entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
-    if (weapon == ENTITYID_INVALID) return NULL;
-    spritegroup_t* w_sg =
-        hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    if (!w_sg) {
-        return NULL;
-    }
+    //entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
+    //if (weapon == ENTITYID_INVALID) return NULL;
+    //spritegroup_t* w_sg =
+    //    hashtable_entityid_spritegroup_get(spritegroups, weapon);
+    //if (!w_sg) {
+    //    return NULL;
+    //}
     sprite* retval = NULL;
-    if (sg->current == SG_ANIM_NPC_ATTACK) {
-        retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
-    } else if (sg->current == SG_ANIM_NPC_SHOT) {
-        retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_F);
-    }
+    //if (sg->current == SG_ANIM_NPC_ATTACK) {
+    //    retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
+    //} else if (sg->current == SG_ANIM_NPC_SHOT) {
+    //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_F);
+    //}
     return retval;
 }
-*/
 
-/*
-static sprite* get_weapon_back_sprite(const shared_ptr<gamestate> g,
-                                      entityid id,
-                                      spritegroup_t* sg) {
+
+static sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-    entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
-    if (weapon == ENTITYID_INVALID) {
-        return NULL;
-    }
-    spritegroup_t* w_sg =
-        hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    if (!w_sg) {
-        return NULL;
-    }
+    //entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
+    //if (weapon == ENTITYID_INVALID) {
+    //    return NULL;
+    //}
+    //spritegroup_t* w_sg =
+    //    hashtable_entityid_spritegroup_get(spritegroups, weapon);
+    //if (!w_sg) {
+    //    return NULL;
+    //}
     sprite* retval = NULL;
-    if (sg->current == SG_ANIM_NPC_ATTACK) {
-        retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    } else if (sg->current == SG_ANIM_NPC_SHOT) {
-        retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_B);
-    }
+    //if (sg->current == SG_ANIM_NPC_ATTACK) {
+    //    retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
+    //} else if (sg->current == SG_ANIM_NPC_SHOT) {
+    //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_B);
+    //}
     return retval;
 }
-*/
 
 /*
 static sprite* get_shield_front_sprite(const shared_ptr<gamestate> g,
@@ -385,43 +378,26 @@ static void draw_shield_sprite_front(const shared_ptr<gamestate> g,
 }
 */
 
-/*
-static void draw_weapon_sprite_back(const shared_ptr<gamestate> g,
-                                    entityid id,
-                                    spritegroup_t* sg) {
+static void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
     sprite* weapon_back_s = get_weapon_back_sprite(g, id, sg);
     if (weapon_back_s) {
-        DrawTexturePro(*weapon_back_s->texture,
-                       weapon_back_s->src,
-                       sg->dest,
-                       (Vector2){0, 0},
-                       0,
-                       WHITE);
+        DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
 }
-*/
 
-/*
-static void draw_weapon_sprite_front(const shared_ptr<gamestate> g,
-                                     entityid id,
-                                     spritegroup_t* sg) {
+static void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
     sprite* weapon_front_s = get_weapon_front_sprite(g, id, sg);
     if (weapon_front_s) {
-        DrawTexturePro(*weapon_front_s->texture,
-                       weapon_front_s->src,
-                       sg->dest,
-                       (Vector2){0, 0},
-                       0,
-                       WHITE);
+        DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
 }
-*/
+
 
 static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
