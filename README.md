@@ -72,4 +72,4 @@ make test
 - Unit tests can be built and run using the `test` target
 - The game graphic and audio assets are not included in the repository
   - The graphics are licensed such that I cannot distribute them
-  - The audio assets I have not decided how to license yet
+  - The sound effects are licensed such that I cannot distribute them  
