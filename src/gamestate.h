@@ -37,18 +37,27 @@
 #define MAX_MUSIC_PATH_LENGTH 256
 
 
+using std::shared_ptr;
+using std::unordered_map;
+using std::vector;
+
 typedef struct gamestate {
     controlmode_t controlmode;
+
     entityid hero_id;
     entityid new_entityid_begin;
     entityid new_entityid_end;
     entityid next_entityid;
+
     time_t timebegan;
     time_t currenttime;
+
     struct tm* timebegantm;
     struct tm* currenttimetm;
+
     char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF];
     char currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
+
     bool debugpanelon;
     bool gridon;
     bool cam_lockon;
@@ -85,30 +94,26 @@ typedef struct gamestate {
     int inventory_menu_selection;
     int gameplay_settings_menu_selection;
 
-    std::unordered_map<entityid, long>* component_table;
-
-    std::unordered_map<entityid, string>* name_list;
-    std::unordered_map<entityid, entitytype_t>* type_list;
-    std::unordered_map<entityid, race_t>* race_list;
-    std::unordered_map<entityid, vec3>* loc_list;
-    std::unordered_map<entityid, Rectangle>* sprite_move_list;
-    std::unordered_map<entityid, direction_t>* dir_list;
-    std::unordered_map<entityid, bool>* dead_list;
-    std::unordered_map<entityid, bool>* update_list;
-    std::unordered_map<entityid, bool>* attacking_list;
-    std::unordered_map<entityid, bool>* blocking_list;
-    std::unordered_map<entityid, bool>* block_success_list;
-    std::unordered_map<entityid, bool>* damaged_list;
-    std::unordered_map<entityid, bool>* pushable_list;
-    std::unordered_map<entityid, int>* tx_alpha_list;
-    std::unordered_map<entityid, itemtype>* item_type_list;
-    std::unordered_map<entityid, potiontype>* potion_type_list;
-    std::unordered_map<entityid, weapontype>* weapon_type_list;
-
-    std::shared_ptr<std::unordered_map<entityid, std::shared_ptr<std::unordered_map<int, int>>>> stats_list;
-
-    std::shared_ptr<std::unordered_map<entityid, entityid>> equipped_weapon_list;
-
+    shared_ptr<unordered_map<entityid, long>> component_table;
+    shared_ptr<unordered_map<entityid, string>> name_list;
+    shared_ptr<unordered_map<entityid, entitytype_t>> type_list;
+    shared_ptr<unordered_map<entityid, race_t>> race_list;
+    shared_ptr<unordered_map<entityid, vec3>> loc_list;
+    shared_ptr<unordered_map<entityid, Rectangle>> sprite_move_list;
+    shared_ptr<unordered_map<entityid, direction_t>> dir_list;
+    shared_ptr<unordered_map<entityid, bool>> dead_list;
+    shared_ptr<unordered_map<entityid, bool>> update_list;
+    shared_ptr<unordered_map<entityid, bool>> attacking_list;
+    shared_ptr<unordered_map<entityid, bool>> blocking_list;
+    shared_ptr<unordered_map<entityid, bool>> block_success_list;
+    shared_ptr<unordered_map<entityid, bool>> damaged_list;
+    shared_ptr<unordered_map<entityid, bool>> pushable_list;
+    shared_ptr<unordered_map<entityid, int>> tx_alpha_list;
+    shared_ptr<unordered_map<entityid, itemtype>> item_type_list;
+    shared_ptr<unordered_map<entityid, potiontype>> potion_type_list;
+    shared_ptr<unordered_map<entityid, weapontype>> weapon_type_list;
+    shared_ptr<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>> stats_list;
+    shared_ptr<unordered_map<entityid, entityid>> equipped_weapon_list;
 
     debugpanel_t debugpanel;
 
@@ -118,11 +123,13 @@ typedef struct gamestate {
     fadestate_t fadestate;
 
     Font font;
+
     float line_spacing;
 
-    std::shared_ptr<dungeon_t> dungeon;
+    shared_ptr<dungeon_t> dungeon;
 
     double last_frame_time;
+
     char frame_time_str[32];
 
     gamestate_flag_t flag;
@@ -134,38 +141,33 @@ typedef struct gamestate {
 
     entityid entity_turn;
 
-    std::vector<string>* msg_system;
-    std::vector<string>* msg_history;
+    shared_ptr<vector<string>> msg_system;
+    shared_ptr<vector<string>> msg_history;
+    shared_ptr<keybinding_list_t> keybinding_list;
+    shared_ptr<character_creation> chara_creation;
+
     int msg_history_max_len_msg;
     int msg_history_max_len_msg_measure;
 
-
     bool msg_system_is_active;
 
-    std::shared_ptr<keybinding_list_t> keybinding_list;
 
     int current_music_index;
     int total_music_paths;
+
     char music_file_paths[MAX_MUSIC_PATHS][MAX_MUSIC_PATH_LENGTH];
 
     string version;
 
     int restart_count;
-    bool do_restart;
 
-    std::shared_ptr<character_creation> chara_creation;
+    bool do_restart;
 
     // Array of monster definitions
     //monster_def* monster_defs;
-
     float music_volume;
-
-
     // last click position
-
     Vector2 last_click_screen_pos;
-
-
     Color message_history_bgcolor;
 
 } gamestate;

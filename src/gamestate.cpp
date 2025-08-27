@@ -129,11 +129,10 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->dungeon = nullptr;
 
-
     gamestate_init_music_paths(g);
 
-    g->msg_history = new vector<string>();
-    g->msg_system = new vector<string>();
+    g->msg_history = make_shared<vector<string>>();
+    g->msg_system = make_shared<vector<string>>();
     g->msg_history_max_len_msg = 0;
     g->msg_history_max_len_msg_measure = 0;
 
@@ -154,27 +153,26 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->music_volume = DEFAULT_MUSIC_VOLUME;
 
-    g->component_table = new unordered_map<entityid, long>();
-    g->name_list = new unordered_map<entityid, string>();
-    g->type_list = new unordered_map<entityid, entitytype_t>();
-    g->race_list = new unordered_map<entityid, race_t>();
-    g->loc_list = new unordered_map<entityid, vec3>();
-    g->sprite_move_list = new unordered_map<entityid, Rectangle>();
-    g->dir_list = new unordered_map<entityid, direction_t>();
-    g->dead_list = new unordered_map<entityid, bool>();
-    g->update_list = new unordered_map<entityid, bool>();
-    g->attacking_list = new unordered_map<entityid, bool>();
-    g->blocking_list = new unordered_map<entityid, bool>();
-    g->block_success_list = new unordered_map<entityid, bool>();
-    g->damaged_list = new unordered_map<entityid, bool>();
-    g->pushable_list = new unordered_map<entityid, bool>();
-    g->tx_alpha_list = new unordered_map<entityid, int>();
-    g->item_type_list = new unordered_map<entityid, itemtype>();
-    g->potion_type_list = new unordered_map<entityid, potiontype>();
-    g->weapon_type_list = new unordered_map<entityid, weapontype>();
+    g->component_table = make_shared<unordered_map<entityid, long>>();
+    g->name_list = make_shared<unordered_map<entityid, string>>();
+    g->type_list = make_shared<unordered_map<entityid, entitytype_t>>();
+    g->race_list = make_shared<unordered_map<entityid, race_t>>();
+    g->loc_list = make_shared<unordered_map<entityid, vec3>>();
+    g->sprite_move_list = make_shared<unordered_map<entityid, Rectangle>>();
+    g->dir_list = make_shared<unordered_map<entityid, direction_t>>();
+    g->dead_list = make_shared<unordered_map<entityid, bool>>();
+    g->update_list = make_shared<unordered_map<entityid, bool>>();
+    g->attacking_list = make_shared<unordered_map<entityid, bool>>();
+    g->blocking_list = make_shared<unordered_map<entityid, bool>>();
+    g->block_success_list = make_shared<unordered_map<entityid, bool>>();
+    g->damaged_list = make_shared<unordered_map<entityid, bool>>();
+    g->pushable_list = make_shared<unordered_map<entityid, bool>>();
+    g->tx_alpha_list = make_shared<unordered_map<entityid, int>>();
+    g->item_type_list = make_shared<unordered_map<entityid, itemtype>>();
+    g->potion_type_list = make_shared<unordered_map<entityid, potiontype>>();
+    g->weapon_type_list = make_shared<unordered_map<entityid, weapontype>>();
     g->stats_list = make_shared<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>>();
     g->equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
-
 
     g->last_click_screen_pos = (Vector2){-1, -1};
 
@@ -212,17 +210,17 @@ static void gamestate_init_music_paths(shared_ptr<gamestate> g) {
     g->total_music_paths = i;
 }
 
-bool gamestate_init_msg_history(shared_ptr<gamestate> g) {
-    massert(g, "g is NULL");
-    g->msg_history = new vector<string>();
-    if (!g->msg_history) {
-        merror("Failed to allocate memory for message history");
-        return false;
-    }
-    // no need to initialize the vector, it starts empty
-    // no need to set max_count, we will use the vector's size
-    return true;
-}
+//bool gamestate_init_msg_history(shared_ptr<gamestate> g) {
+//    massert(g, "g is NULL");
+//g->msg_history = new vector<string>();
+//if (!g->msg_history) {
+//    merror("Failed to allocate memory for message history");
+//    return false;
+//}
+// no need to initialize the vector, it starts empty
+// no need to set max_count, we will use the vector's size
+//    return true;
+//}
 
 
 void gamestate_free(shared_ptr<gamestate> g) {
@@ -233,27 +231,8 @@ void gamestate_free(shared_ptr<gamestate> g) {
     //    g->chara_creation.reset(); // Reset the shared pointer
     //    g->chara_creation = nullptr; // Set to nullptr
     //}
-    if (g->msg_system) delete g->msg_system;
-    if (g->msg_history) delete g->msg_history;
-    if (g->component_table) delete g->component_table;
-    if (g->name_list) delete g->name_list;
-    if (g->type_list) delete g->type_list;
-    if (g->race_list) delete g->race_list;
-    if (g->loc_list) delete g->loc_list;
-    if (g->sprite_move_list) delete g->sprite_move_list;
-    if (g->dir_list) delete g->dir_list;
-    if (g->dead_list) delete g->dead_list;
-    if (g->update_list) delete g->update_list;
-    if (g->attacking_list) delete g->attacking_list;
-    if (g->blocking_list) delete g->blocking_list;
-    if (g->block_success_list) delete g->block_success_list;
-    if (g->damaged_list) delete g->damaged_list;
-    if (g->tx_alpha_list) delete g->tx_alpha_list;
-    if (g->item_type_list) delete g->item_type_list;
-    if (g->potion_type_list) delete g->potion_type_list;
-    if (g->weapon_type_list) delete g->weapon_type_list;
-    if (g->pushable_list) delete g->pushable_list;
-    //if (g->stats_list) delete g->stats_list;
+    //if (g->msg_system) delete g->msg_system;
+    //if (g->msg_history) delete g->msg_history;
 }
 
 
