@@ -1601,7 +1601,7 @@ bool g_add_inventory(shared_ptr<gamestate> g, entityid id) {
         merror("g_add_inventory:fid %d already has an inventory component", id);
         return false;
     }
-    (*g->inventory_list)[id] = make_shared<item_container>();
+    (*g->inventory_list)[id] = make_shared<item_container>(2, 5);
     return true;
 }
 
