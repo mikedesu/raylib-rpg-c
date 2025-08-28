@@ -120,6 +120,8 @@ static void try_spawn_npc(shared_ptr<gamestate> const g);
 
 static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 
+//static void handle_input_help_menu(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
+static void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 loc);
 static bool try_entity_pickup(shared_ptr<gamestate> g, entityid id);
 
@@ -428,6 +430,10 @@ static void handle_input_character_creation_scene(shared_ptr<gamestate> g, share
 
 
 static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+    if (g->display_help_menu) {
+        handle_input_help_menu(g, is);
+    }
+
     if (g->msg_system_is_active) {
         // press enter to cycle thru message
         if (inputstate_is_pressed(is, KEY_ENTER)) {
@@ -516,6 +522,12 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
 
             try_entity_pickup(g, g->hero_id);
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (inputstate_is_pressed(is, KEY_SLASH) && inputstate_is_shift_held(is)) {
+            // open inventory
+            //g->inventory_is_open = !g->inventory_is_open;
+
+            g->display_help_menu = !g->display_help_menu;
+            g->frame_dirty = true;
         }
         return;
     }
@@ -876,8 +888,6 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 //                                  entityid target_id,
 //                                  bool* atk_successful);
 //static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
-//static void handle_input_help_menu(shared_ptr<inputstate> is,
-//                                   shared_ptr<gamestate> g);
 //static void handle_level_up(gamestate* const g, entityid id);
 //static void handle_level_up(shared_ptr<gamestate> g, entityid id);
 //static void handle_input_sort_inventory(const inputstate* const is, gamestate* const g);
@@ -2388,12 +2398,6 @@ static bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
 //    }
 //    return;
 //}
-//if (inputstate_is_shift_held(is) && inputstate_is_pressed(is, KEY_SLASH)) {
-//    g->display_help_menu = true;
-//    g->controlmode = CONTROLMODE_HELP;
-//    g->frame_dirty = true;
-//    return;
-//}
 
 
 //const char* action = get_action_key(is, g);
@@ -2743,9 +2747,8 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
 */
 
 
-/*
-static void handle_input_help_menu(const inputstate* const is,
-                                   gamestate* const g) {
+//static void handle_input_help_menu(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+static void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (inputstate_any_pressed(is)) {
@@ -2754,7 +2757,6 @@ static void handle_input_help_menu(const inputstate* const is,
         return;
     }
 }
-*/
 
 
 /*

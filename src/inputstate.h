@@ -13,8 +13,8 @@ typedef struct inputstate {
     uint64_t pressed[NUM_LONGS]; // Bits for keys pressed this frame
     uint64_t held[NUM_LONGS]; // Bits for keys held down
     bool mouse_pressed[3]; // Left, Right, Middle buttons pressed this frame
-    bool mouse_held[3];    // Left, Right, Middle buttons held down
-    bool mouse_released[3];// Left, Right, Middle buttons released this frame
+    bool mouse_held[3]; // Left, Right, Middle buttons held down
+    bool mouse_released[3]; // Left, Right, Middle buttons released this frame
     Vector2 mouse_position; // Current mouse position
 } inputstate;
 
@@ -34,7 +34,7 @@ static inline void inputstate_reset(std::shared_ptr<inputstate> is) {
 // Update all key states from Raylib
 static inline void inputstate_update(std::shared_ptr<inputstate> is) {
     inputstate_reset(is);
-    
+
     // Update keyboard state
     for (int k = 0; k < MAX_KEYS; k++) {
         if (IsKeyPressed(k)) {
@@ -51,7 +51,7 @@ static inline void inputstate_update(std::shared_ptr<inputstate> is) {
             is->held[idx] |= (1ULL << bit);
         }
     }
-    
+
     // Update mouse state
     is->mouse_position = GetMousePosition();
     for (int button = 0; button < 3; button++) {
@@ -70,7 +70,8 @@ static inline bool inputstate_is_pressed(std::shared_ptr<inputstate> is, int key
 }
 
 // Check if ANY key was pressed this frame
-static inline bool inputstate_any_pressed(const inputstate* is) {
+//static inline bool inputstate_any_pressed(const inputstate* is) {
+static inline bool inputstate_any_pressed(const std::shared_ptr<inputstate> is) {
     if (!is) return false; // Invalid inputstate
     for (int idx = 0; idx < NUM_LONGS; idx++) {
         if (is->pressed[idx] != 0) return true; // At least one key pressed
@@ -117,26 +118,14 @@ static inline bool inputstate_is_right_shift_held(std::shared_ptr<inputstate> is
 static inline bool inputstate_is_shift_held(std::shared_ptr<inputstate> is) { return inputstate_is_left_shift_held(is) || inputstate_is_right_shift_held(is); }
 
 // Mouse button checks
-static inline bool inputstate_is_mouse_pressed(std::shared_ptr<inputstate> is, int button) {
-    return button >= 0 && button < 3 && is->mouse_pressed[button];
-}
+static inline bool inputstate_is_mouse_pressed(std::shared_ptr<inputstate> is, int button) { return button >= 0 && button < 3 && is->mouse_pressed[button]; }
 
-static inline bool inputstate_is_mouse_held(std::shared_ptr<inputstate> is, int button) {
-    return button >= 0 && button < 3 && is->mouse_held[button];
-}
+static inline bool inputstate_is_mouse_held(std::shared_ptr<inputstate> is, int button) { return button >= 0 && button < 3 && is->mouse_held[button]; }
 
-static inline bool inputstate_is_mouse_released(std::shared_ptr<inputstate> is, int button) {
-    return button >= 0 && button < 3 && is->mouse_released[button];
-}
+static inline bool inputstate_is_mouse_released(std::shared_ptr<inputstate> is, int button) { return button >= 0 && button < 3 && is->mouse_released[button]; }
 
-static inline Vector2 inputstate_get_mouse_position(std::shared_ptr<inputstate> is) {
-    return is->mouse_position;
-}
+static inline Vector2 inputstate_get_mouse_position(std::shared_ptr<inputstate> is) { return is->mouse_position; }
 
-static inline bool inputstate_is_left_mouse_pressed(std::shared_ptr<inputstate> is) {
-    return inputstate_is_mouse_pressed(is, MOUSE_BUTTON_LEFT);
-}
+static inline bool inputstate_is_left_mouse_pressed(std::shared_ptr<inputstate> is) { return inputstate_is_mouse_pressed(is, MOUSE_BUTTON_LEFT); }
 
-static inline bool inputstate_is_right_mouse_pressed(std::shared_ptr<inputstate> is) {
-    return inputstate_is_mouse_pressed(is, MOUSE_BUTTON_RIGHT);
-}
+static inline bool inputstate_is_right_mouse_pressed(std::shared_ptr<inputstate> is) { return inputstate_is_mouse_pressed(is, MOUSE_BUTTON_RIGHT); }
