@@ -20,7 +20,6 @@
 //#include "item.h"
 //#include "ringtype.h"
 //#include "shield.h"
-//#include <vector>
 
 using std::make_shared;
 using std::shared_ptr;
@@ -173,6 +172,8 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->weapon_type_list = make_shared<unordered_map<entityid, weapontype>>();
     g->stats_list = make_shared<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>>();
     g->equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
+
+    g->inventory_list = make_shared<unordered_map<entityid, shared_ptr<item_container>>>();
 
     g->last_click_screen_pos = (Vector2){-1, -1};
 
@@ -1581,3 +1582,51 @@ entityid g_get_equipped_weapon(shared_ptr<gamestate> g, entityid id) {
 //    }
 //    return false;
 //}
+
+bool g_add_inventory(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    // Automatically register component if not already registered
+    if (!g_add_comp(g, id, C_INVENTORY)) {
+        merror("g_add_inventory: Failed to add component C_INVENTORY for id %d", id);
+        return false;
+    }
+    if (!g->inventory_list) {
+        merror("g->inventory_list is NULL");
+        return false;
+    }
+    // Check if the inventory already exists for the entity
+    //if (g->inventory_list->find(id) != g->inventory_list->end()) {
+    if (g_has_inventory(g, id)) {
+        merror("g_add_inventory:fid %d already has an inventory component", id);
+        return false;
+    }
+    (*g->inventory_list)[id] = make_shared<item_container>();
+    return true;
+}
+
+bool g_has_inventory(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->inventory_list) {
+        merror("g->inventory_list is NULL");
+        return false;
+    }
+    // Check if the entity has an inventory component
+    return g->inventory_list->find(id) != g->inventory_list->end();
+}
+
+shared_ptr<item_container> g_get_inventory(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (g->inventory_list) {
+        if (!g_has_inventory(g, id)) {
+            merror("g_get_inventory: id %d does not have an inventory component", id);
+            return nullptr;
+        }
+        massert(g->inventory_list->find(id) != g->inventory_list->end(), "g_get_inventory: id %d not found in inventory list", id);
+        return g->inventory_list->at(id);
+    }
+    merror("g_get_inventory: g->inventory_list is NULL");
+    return nullptr; // Return nullptr if the id is not found
+}

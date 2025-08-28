@@ -8,15 +8,16 @@ LINK_MATH = -lm
 RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 CFLAGS ?= # Allow override
 
-GAMESTATE_OBJECTS = gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o dungeon.o keybinding.o path_node.o component.o
+GAMESTATE_OBJECTS = gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o dungeon.o keybinding.o path_node.o component.o item_container.o
 
-LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o component.o libdraw_sort_inventory_menu.o
+#LIBDRAW_OBJECTS = libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o gamestate.o dungeon_floor.o dungeon_tile.o component.o libdraw_sort_inventory_menu.o item_container.o
+LIBDRAW_OBJECTS = libdraw.o $(GAMESTATE_OBJECTS)
 LIBLOGIC_OBJECTS = liblogic.o $(GAMESTATE_OBJECTS)
 
 # Web build setup
 WEB_CC = emcc
 #WEB_SOURCES = $(MAIN_C) gameloader_web.cpp libdraw.cpp liblogic.cpp gamestate.cpp hashtable_entityid_spritegroup.cpp  specifier.cpp dungeon_floor.cpp dungeon_tile.cpp sprite.cpp spritegroup.cpp race.cpp dungeon.cpp keybinding.cpp path_node.cpp  
-WEB_SOURCES = $(MAIN_C) gameloader_web.cpp libdraw.cpp liblogic.cpp gamestate.cpp hashtable_entityid_spritegroup.cpp  dungeon_floor.cpp dungeon_tile.cpp sprite.cpp spritegroup.cpp race.cpp dungeon.cpp keybinding.cpp path_node.cpp  
+WEB_SOURCES = $(MAIN_C) gameloader_web.cpp libdraw.cpp liblogic.cpp gamestate.cpp hashtable_entityid_spritegroup.cpp  dungeon_floor.cpp dungeon_tile.cpp sprite.cpp spritegroup.cpp race.cpp dungeon.cpp keybinding.cpp path_node.cpp item_container.cpp
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
 
@@ -36,7 +37,7 @@ all: game
 # Desktop build
 
 #game: main.o gameloader.o gamestate.o keybinding.o libdraw.o liblogic.o component.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o path_node.o libdraw_sort_inventory_menu.o
-game: main.o gameloader.o gamestate.o keybinding.o libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o dungeon_tile.o path_node.o liblogic.o
+game: main.o gameloader.o gamestate.o keybinding.o libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o dungeon_tile.o path_node.o liblogic.o item_container.o
 	$(CXX) -o $@ $^ -L. $(RAYLIB_LIBS) $(WFLAGS) $(CFLAGS)
 	./log_build_stats.sh
 
@@ -79,7 +80,8 @@ path_node.o: path_node.cpp
 liblogic.o: liblogic.cpp
 	$(CXX) $(CXXFLAGS) $^ -c
 
-
+item_container.o: item_container.h item_container.cpp
+	$(CXX) $(CXXFLAGS) item_container.cpp -c
 
 
 

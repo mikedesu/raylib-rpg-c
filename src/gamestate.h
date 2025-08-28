@@ -13,6 +13,7 @@
 #include "fadestate.h"
 #include "gamestate_flag.h"
 #include "inventory_sort.h"
+#include "item_container.h"
 #include "keybinding.h"
 #include "monster_def.h"
 #include "ringtype.h"
@@ -113,7 +114,11 @@ typedef struct gamestate {
     shared_ptr<unordered_map<entityid, potiontype>> potion_type_list;
     shared_ptr<unordered_map<entityid, weapontype>> weapon_type_list;
     shared_ptr<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>> stats_list;
+
     shared_ptr<unordered_map<entityid, entityid>> equipped_weapon_list;
+
+    shared_ptr<unordered_map<entityid, shared_ptr<item_container>>> inventory_list;
+
 
     debugpanel_t debugpanel;
 
@@ -173,150 +178,154 @@ typedef struct gamestate {
 } gamestate;
 
 
-std::shared_ptr<gamestate> gamestateinitptr();
+shared_ptr<gamestate> gamestateinitptr();
 
 
-std::shared_ptr<dungeon_t> g_get_dungeon(std::shared_ptr<gamestate> g);
+shared_ptr<dungeon_t> g_get_dungeon(std::shared_ptr<gamestate> g);
 
 
-entityid gamestate_get_hero_id(std::shared_ptr<gamestate> g);
+entityid gamestate_get_hero_id(shared_ptr<gamestate> g);
 
 
-monster_def* g_get_monster_def(std::shared_ptr<gamestate> g, race_t r);
+monster_def* g_get_monster_def(shared_ptr<gamestate> g, race_t r);
 
 
-bool gs_add_entityid(std::shared_ptr<gamestate> g, entityid id);
+bool gs_add_entityid(shared_ptr<gamestate> g, entityid id);
 
 
-entityid g_add_entity(std::shared_ptr<gamestate> g);
+entityid g_add_entity(shared_ptr<gamestate> g);
 
 
-bool gamestate_add_msg_history(std::shared_ptr<gamestate> g, string msg);
-bool gamestate_init_msg_history(std::shared_ptr<gamestate> g);
+bool gamestate_add_msg_history(shared_ptr<gamestate> g, string msg);
+bool gamestate_init_msg_history(shared_ptr<gamestate> g);
 
 
-bool g_set_hero_id(std::shared_ptr<gamestate> g, entityid id);
+bool g_set_hero_id(shared_ptr<gamestate> g, entityid id);
 
 
-void gamestate_free(std::shared_ptr<gamestate> g);
-void gamestate_set_debug_panel_pos_bottom_left(std::shared_ptr<gamestate> g);
-void gamestate_set_debug_panel_pos_top_right(std::shared_ptr<gamestate> g);
-void gamestate_load_keybindings(std::shared_ptr<gamestate> g);
+void gamestate_free(shared_ptr<gamestate> g);
+void gamestate_set_debug_panel_pos_bottom_left(shared_ptr<gamestate> g);
+void gamestate_set_debug_panel_pos_top_right(shared_ptr<gamestate> g);
+void gamestate_load_keybindings(shared_ptr<gamestate> g);
 
 
-bool g_has_comp(std::shared_ptr<gamestate> g, entityid id, component comp);
-bool g_register_comp(std::shared_ptr<gamestate> g, entityid id, component comp);
-bool g_add_comp(std::shared_ptr<gamestate> g, entityid id, component comp);
+bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp);
+bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp);
+bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp);
 
 
-bool g_add_name(std::shared_ptr<gamestate> g, entityid id, string name);
-bool g_has_name(std::shared_ptr<gamestate> g, entityid id);
-string g_get_name(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_name(shared_ptr<gamestate> g, entityid id, string name);
+bool g_has_name(shared_ptr<gamestate> g, entityid id);
+string g_get_name(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_add_type(std::shared_ptr<gamestate> g, entityid id, entitytype_t type);
-entitytype_t g_get_type(std::shared_ptr<gamestate> g, entityid id);
-bool g_has_type(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type);
+entitytype_t g_get_type(shared_ptr<gamestate> g, entityid id);
+bool g_has_type(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_has_race(std::shared_ptr<gamestate> g, entityid id);
-race_t g_get_race(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_race(std::shared_ptr<gamestate> g, entityid id, race_t race);
-bool g_update_race(std::shared_ptr<gamestate> g, entityid id, race_t race);
+bool g_has_race(shared_ptr<gamestate> g, entityid id);
+race_t g_get_race(shared_ptr<gamestate> g, entityid id);
+bool g_add_race(shared_ptr<gamestate> g, entityid id, race_t race);
+bool g_update_race(shared_ptr<gamestate> g, entityid id, race_t race);
 
 
-bool g_has_loc(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_loc(std::shared_ptr<gamestate> g, entityid id, vec3 loc);
-bool g_update_loc(std::shared_ptr<gamestate> g, entityid id, vec3 loc);
-vec3 g_get_loc(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_loc(shared_ptr<gamestate> g, entityid id);
+bool g_add_loc(shared_ptr<gamestate> g, entityid id, vec3 loc);
+bool g_update_loc(shared_ptr<gamestate> g, entityid id, vec3 loc);
+vec3 g_get_loc(shared_ptr<gamestate> g, entityid id);
 
 
-direction_t g_get_dir(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_dir(std::shared_ptr<gamestate> g, entityid id, direction_t dir);
-bool g_update_dir(std::shared_ptr<gamestate> g, entityid id, direction_t dir);
-bool g_has_dir(std::shared_ptr<gamestate> g, entityid id);
+direction_t g_get_dir(shared_ptr<gamestate> g, entityid id);
+bool g_add_dir(shared_ptr<gamestate> g, entityid id, direction_t dir);
+bool g_update_dir(shared_ptr<gamestate> g, entityid id, direction_t dir);
+bool g_has_dir(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_has_sprite_move(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_sprite_move(std::shared_ptr<gamestate> g, entityid id, Rectangle loc);
-bool g_update_sprite_move(std::shared_ptr<gamestate> g, entityid id, Rectangle loc);
-Rectangle g_get_sprite_move(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_sprite_move(shared_ptr<gamestate> g, entityid id);
+bool g_add_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc);
+bool g_update_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc);
+Rectangle g_get_sprite_move(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_has_dead(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_dead(std::shared_ptr<gamestate> g, entityid id, bool dead);
-bool g_update_dead(std::shared_ptr<gamestate> g, entityid id, bool dead);
-bool g_is_dead(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_dead(shared_ptr<gamestate> g, entityid id);
+bool g_add_dead(shared_ptr<gamestate> g, entityid id, bool dead);
+bool g_update_dead(shared_ptr<gamestate> g, entityid id, bool dead);
+bool g_is_dead(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_has_update(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_update(std::shared_ptr<gamestate> g, entityid id, bool update);
-bool g_get_update(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_update(std::shared_ptr<gamestate> g, entityid id, bool update);
+bool g_has_update(shared_ptr<gamestate> g, entityid id);
+bool g_add_update(shared_ptr<gamestate> g, entityid id, bool update);
+bool g_get_update(shared_ptr<gamestate> g, entityid id);
+bool g_set_update(shared_ptr<gamestate> g, entityid id, bool update);
 
 
-bool g_has_attacking(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_attacking(std::shared_ptr<gamestate> g, entityid id, int attacking);
-bool g_set_attacking(std::shared_ptr<gamestate> g, entityid id, int attacking);
-bool g_get_attacking(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_attacking(shared_ptr<gamestate> g, entityid id);
+bool g_add_attacking(shared_ptr<gamestate> g, entityid id, int attacking);
+bool g_set_attacking(shared_ptr<gamestate> g, entityid id, int attacking);
+bool g_get_attacking(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_has_blocking(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_blocking(std::shared_ptr<gamestate> g, entityid id, int blocking);
-bool g_set_blocking(std::shared_ptr<gamestate> g, entityid id, int blocking);
-bool g_get_blocking(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_blocking(shared_ptr<gamestate> g, entityid id);
+bool g_add_blocking(shared_ptr<gamestate> g, entityid id, int blocking);
+bool g_set_blocking(shared_ptr<gamestate> g, entityid id, int blocking);
+bool g_get_blocking(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_has_block_success(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_block_success(std::shared_ptr<gamestate> g, entityid id, int block_success);
-bool g_set_block_success(std::shared_ptr<gamestate> g, entityid id, int block_success);
-bool g_get_block_success(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_block_success(shared_ptr<gamestate> g, entityid id);
+bool g_add_block_success(shared_ptr<gamestate> g, entityid id, int block_success);
+bool g_set_block_success(shared_ptr<gamestate> g, entityid id, int block_success);
+bool g_get_block_success(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_has_damaged(std::shared_ptr<gamestate> g, entityid id);
-bool g_add_damaged(std::shared_ptr<gamestate> g, entityid id, int damaged);
-bool g_set_damaged(std::shared_ptr<gamestate> g, entityid id, int damaged);
-bool g_get_damaged(std::shared_ptr<gamestate> g, entityid id);
+bool g_has_damaged(shared_ptr<gamestate> g, entityid id);
+bool g_add_damaged(shared_ptr<gamestate> g, entityid id, int damaged);
+bool g_set_damaged(shared_ptr<gamestate> g, entityid id, int damaged);
+bool g_get_damaged(shared_ptr<gamestate> g, entityid id);
 
 
-int g_get_tx_alpha(std::shared_ptr<gamestate> g, entityid id);
-bool g_has_tx_alpha(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
-bool g_add_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
-bool g_incr_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
-bool g_decr_tx_alpha(std::shared_ptr<gamestate> g, entityid id, int alpha);
+int g_get_tx_alpha(shared_ptr<gamestate> g, entityid id);
+bool g_has_tx_alpha(shared_ptr<gamestate> g, entityid id);
+bool g_set_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
+bool g_add_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
+bool g_incr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
+bool g_decr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
 
 
-bool g_add_pushable(std::shared_ptr<gamestate> g, entityid id);
-bool g_is_pushable(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_pushable(shared_ptr<gamestate> g, entityid id);
+bool g_is_pushable(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_add_item_type(std::shared_ptr<gamestate> g, entityid id, itemtype type);
-bool g_has_item_type(std::shared_ptr<gamestate> g, entityid id);
-itemtype g_get_item_type(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_item_type(std::shared_ptr<gamestate> g, entityid id, itemtype type);
+bool g_add_item_type(shared_ptr<gamestate> g, entityid id, itemtype type);
+bool g_has_item_type(shared_ptr<gamestate> g, entityid id);
+itemtype g_get_item_type(shared_ptr<gamestate> g, entityid id);
+bool g_set_item_type(shared_ptr<gamestate> g, entityid id, itemtype type);
 
 
 // set up declarations for potion type just like item type
-bool g_add_potion_type(std::shared_ptr<gamestate> g, entityid id, potiontype type);
-bool g_has_potion_type(std::shared_ptr<gamestate> g, entityid id);
-potiontype g_get_potion_type(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_potion_type(std::shared_ptr<gamestate> g, entityid id, potiontype type);
+bool g_add_potion_type(shared_ptr<gamestate> g, entityid id, potiontype type);
+bool g_has_potion_type(shared_ptr<gamestate> g, entityid id);
+potiontype g_get_potion_type(shared_ptr<gamestate> g, entityid id);
+bool g_set_potion_type(shared_ptr<gamestate> g, entityid id, potiontype type);
 
 
-bool g_add_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype type);
-bool g_has_weapon_type(std::shared_ptr<gamestate> g, entityid id);
-weapontype g_get_weapon_type(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype type);
+bool g_add_weapon_type(shared_ptr<gamestate> g, entityid id, weapontype type);
+bool g_has_weapon_type(shared_ptr<gamestate> g, entityid id);
+weapontype g_get_weapon_type(shared_ptr<gamestate> g, entityid id);
+bool g_set_weapon_type(shared_ptr<gamestate> g, entityid id, weapontype type);
 
 
-bool g_add_stats(std::shared_ptr<gamestate> g, entityid id);
-bool g_has_stats(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_stat(std::shared_ptr<gamestate> g, entityid id, stats_slot slot, int value);
-int g_get_stat(std::shared_ptr<gamestate> g, entityid id, stats_slot slot);
+bool g_add_stats(shared_ptr<gamestate> g, entityid id);
+bool g_has_stats(shared_ptr<gamestate> g, entityid id);
+bool g_set_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot, int value);
+int g_get_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot);
 
 
-bool g_add_equipped_weapon(std::shared_ptr<gamestate> g, entityid id, entityid wpn_id);
-bool g_has_equipped_weapon(std::shared_ptr<gamestate> g, entityid id);
-bool g_set_equipped_weapon(std::shared_ptr<gamestate> g, entityid id, entityid wpn_id);
-entityid g_get_equipped_weapon(std::shared_ptr<gamestate> g, entityid id);
+bool g_add_equipped_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id);
+bool g_has_equipped_weapon(shared_ptr<gamestate> g, entityid id);
+bool g_set_equipped_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id);
+entityid g_get_equipped_weapon(shared_ptr<gamestate> g, entityid id);
+
+bool g_add_inventory(shared_ptr<gamestate> g, entityid id);
+bool g_has_inventory(shared_ptr<gamestate> g, entityid id);
+shared_ptr<item_container> g_get_inventory(shared_ptr<gamestate> g, entityid id);
