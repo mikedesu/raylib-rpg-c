@@ -2039,3 +2039,8 @@ static void draw_character_creation_screen(shared_ptr<gamestate> g) {
         y += font_size + 4;
     }
 }
+
+
+static void draw_help_menu(shared_ptr<gamestate> g) {
+    // TODO
+}
