@@ -1,10 +1,13 @@
 #include "gamestate.h"
 #include "libgame_defines.h"
 #include "massert.h"
+#include "textureinfo.h"
 
 #include <memory>
 
 using std::shared_ptr;
+
+extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 void draw_character_creation_screen(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -39,7 +42,16 @@ void draw_character_creation_screen(shared_ptr<gamestate> g) {
     DrawText(TextFormat("Constitution: %d", g->chara_creation->constitution), x, y, font_size, WHITE);
     y += font_size + 10;
     // Draw sprite placeholder
-    DrawRectangleLinesEx((Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200}, 4, RED);
+    Rectangle dst = (Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200};
+    float pad = 40;
+    Rectangle dst2 = (Rectangle){(float)cx - 210 + pad, (float)sy + pad, (float)200 - pad * 2, (float)200 - pad * 2};
+    DrawRectangleLinesEx(dst, 4, RED);
+    DrawRectangleLinesEx(dst2, 4, BLUE);
+    // Draw a frame of the human idle texture
+    Rectangle src = {12, 12, 8, 8};
+    //DrawTexturePro(txinfo[TX_HUMAN_IDLE].texture, src, dst, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(txinfo[TX_HUMAN_IDLE].texture, src, dst2, (Vector2){0, 0}, 0.0f, WHITE);
+
     // Draw instructions
     y += font_size + 8;
     for (size_t i = 0; i < sizeof(remaining_text) / sizeof(remaining_text[0]); i++) {
