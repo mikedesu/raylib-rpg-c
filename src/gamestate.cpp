@@ -319,9 +319,9 @@ bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(comp != C_COUNT, "comp is invalid");
-
     minfo("g_register_comp: Registering component %s for entity %d", component2str(comp), id);
     if (!g_has_comp(g, id, comp)) {
+        minfo("g_register_comp: component unregistered. Registering...");
         // If the component is not already registered, add it
         if (g->component_table->find(id) == g->component_table->end()) {
             (*g->component_table)[id] = 0; // Initialize with 0 components
@@ -1603,12 +1603,20 @@ bool g_add_inventory(shared_ptr<gamestate> g, entityid id) {
     // Check if the inventory already exists for the entity
     //if (g->inventory_list->find(id) != g->inventory_list->end()) {
     if (g_has_inventory(g, id)) {
-        merror("g_add_inventory:fid %d already has an inventory component", id);
+        merror("g_add_inventory: id %d already has an inventory component", id);
         return false;
     }
-    (*g->inventory_list)[id] = make_shared<item_container>(2, 5);
-    msuccess("Entity id %d now has an inventory");
-    return true;
+    //(*g->inventory_list)[id] = make_shared<item_container>(2, 5);
+    // this line sometimes crashes...but why?
+    //g->inventory_list->insert({id, make_shared<item_container>(2, 5)});
+    if (g->inventory_list) {
+        minfo("Shit is gonna crash and idk why, wtf");
+        g->inventory_list->insert({id, make_shared<item_container>(2, 5)});
+        msuccess("Entity id %d now has an inventory");
+        return true;
+    }
+    merror("Something fucked up");
+    return false;
 }
 
 bool g_has_inventory(shared_ptr<gamestate> g, entityid id) {

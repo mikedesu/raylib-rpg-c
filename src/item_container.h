@@ -17,7 +17,7 @@ public:
     entityid remove(int x, int y);
 
 private:
-    vector<shared_ptr<vector<entityid>>> grid;
+    shared_ptr<vector<shared_ptr<vector<entityid>>>> grid;
     int rows;
     int cols;
 };

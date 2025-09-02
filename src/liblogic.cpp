@@ -140,26 +140,21 @@ static void init_dungeon(shared_ptr<gamestate> g) {
 
 static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
     massert(g, "gamestate is NULL");
-
     minfo("calling d_get_floor...");
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-
     minfo("calling df_tile_at...");
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
-
     massert(tile, "failed to get tile");
     minfo("checking if tile is walkable...");
     if (!tile_is_walkable(tile->type)) {
         merror("cannot create entity on non-walkable tile");
         return ENTITYID_INVALID;
     }
-
     minfo("checking if tile has live NPCs...");
     if (tile_has_live_npcs(g, tile)) {
         merror("cannot create entity on tile with live NPCs");
         return ENTITYID_INVALID;
     }
-
     entityid id = g_add_entity(g);
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_NPC);
@@ -175,14 +170,12 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
     g_add_damaged(g, id, false);
     g_add_tx_alpha(g, id, 0);
     g_add_stats(g, id);
-
     minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
     if (!df_add_at(df, id, loc.x, loc.y)) {
         return ENTITYID_INVALID;
     }
     msuccess("returning NPC entity ID: %d", id);
     return id;
-
     //g_add_zapping(g, id, false);
     //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
     //g_add_inventory(g, id);
@@ -280,23 +273,20 @@ static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
     massert(g, "gamestate is NULL");
     massert(name != "", "name is empty string");
     // use the previously-written liblogic_npc_create function
-
     minfo("Creating player...");
-
     race_t rt = g->chara_creation->race;
     minfo("Race: %s", race2str(rt).c_str());
-
     entityid id = create_npc(g, rt, loc, name);
-
-    msuccess("npc_create successful, id: %d", id);
+    msuccess("create_npc successful, id: %d", id);
     massert(id != ENTITYID_INVALID, "failed to create player");
     g_set_hero_id(g, id);
-
     g_add_type(g, id, ENTITY_PLAYER);
     g_set_tx_alpha(g, id, 0);
     g_set_stat(g, id, STATS_LEVEL, 666);
     g_add_equipped_weapon(g, id, ENTITYID_INVALID);
+    minfo("Adding inventory to entity id %d", id);
     g_add_inventory(g, id);
+    msuccess("create_player successful, id: %d", id);
     return id;
 }
 
@@ -728,9 +718,9 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
 
 void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
-    //minfo("liblogic_tick: is=%p, g=%p", is, g);
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
+    minfo("Begin tick");
     // Spawn NPCs periodically
     //try_spawn_npc(g);
     // update ALL entities
@@ -775,6 +765,7 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+    msuccess("End tick");
 }
 
 

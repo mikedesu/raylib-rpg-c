@@ -1075,6 +1075,8 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     double start_time = GetTime();
     BeginDrawing();
     ClearBackground(RED);
+
+    minfo("Begin draw frame");
     //BeginShaderMode(shader_psychedelic_0);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
@@ -1116,6 +1118,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     EndDrawing();
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
+    msuccess("End draw frame");
 }
 
 
