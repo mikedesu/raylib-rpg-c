@@ -1099,14 +1099,20 @@ static void add_message_and_history(gamestate* g, const char* fmt, ...) {
 //}
 
 
+// vec3 is a unit vector
 static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     g_set_update(g, id, true);
     g_update_dir(g, id, get_dir_from_xy(v.x, v.y));
+
+    // entity location
     vec3 loc = g_get_loc(g, id);
+
+    // entity's new location
     // we will have a special case for traversing floors so ignore v.z
     vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
+
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     if (!df) {
         merror("Dungeon floor is NULL for z=%d", loc.z);
@@ -1123,8 +1129,29 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
         return false;
     }
     entityid box_id = tile_has_box(g, aloc.x, aloc.y, aloc.z);
+    // we need to
+    // 1. check to see if box_id is pushable
+    // 2. check to see if the tile in front of box, if pushed, is free/open
     if (box_id != ENTITYID_INVALID) {
-        try_entity_move(g, box_id, v);
+        // 1. check to see if box_id is pushable
+        if (g_is_pushable(g, box_id)) {
+            // 2. check to see if the tile in front of box, if pushed, is free/open
+
+            // get the box's location
+            vec3 box_loc = g_get_loc(g, box_id);
+
+            // compute the location in front of the box
+            vec3 box_new_loc = {box_loc.x + v.x, box_loc.y + v.y, box_loc.z};
+
+            // get the tile at the new location
+            shared_ptr<tile_t> box_new_loc_tile = df_tile_at(d_get_floor(g->dungeon, g->dungeon->current_floor), box_new_loc);
+
+            // check to see tile has no entities
+
+
+            try_entity_move(g, box_id, v);
+        }
+
         merror("Cannot move, tile has box at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
         return false;
     }

@@ -30,9 +30,7 @@ typedef struct {
 
 std::shared_ptr<tile_t> tile_create(tiletype_t type);
 
-//entityid tile_add(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> tile, entityid id);
 entityid tile_add(std::shared_ptr<tile_t> tile, entityid id);
-//entityid tile_remove(std::shared_ptr<gamestate> g, std::shared_ptr<tile_t> tile, entityid id);
 entityid tile_remove(std::shared_ptr<tile_t> tile, entityid id);
 
 size_t tile_live_npc_count_at(std::shared_ptr<gamestate> g, int x, int y, int z);
