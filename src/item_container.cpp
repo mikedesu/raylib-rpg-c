@@ -19,6 +19,7 @@ item_container::item_container(int m, int n) {
     }
     rows = m;
     cols = n;
+    next_index = 0;
     msuccess("End create new item container");
 }
 
@@ -32,25 +33,17 @@ bool item_container::set(entityid id, int x, int y) {
 }
 
 
+bool item_container::set(entityid id, int i) {
+    massert(i >= 0 && i < cols * rows, "i out-of-bounds");
+    (*grid)[i] = id;
+    return true;
+}
+
+
 entityid item_container::get(int x, int y) {
     massert(x >= 0 && x < cols && y >= 0 && y < rows, "x or y out-of-bounds");
     return (*grid)[y * cols + x];
 }
-
-
-//entityid item_container::remove(entityid id) {
-//    // find the first i,j with id and replace with ENTITYID_INVALID, return true
-//    // otherwise, return false
-//    for (int i = 0; i < rows; i++) {
-//        for (int j = 0; j < cols; j++) {
-//            if ((*((*grid)[i]))[j] == id) {
-//                (*((*grid)[i]))[j] = ENTITYID_INVALID;
-//                return id;
-//            }
-//        }
-//    }
-//    return ENTITYID_INVALID;
-//}
 
 
 entityid item_container::remove(int x, int y) {
@@ -61,4 +54,19 @@ entityid item_container::remove(int x, int y) {
     entityid item_id = get(x, y);
     set(ENTITYID_INVALID, x, y);
     return item_id;
+}
+
+
+bool item_container::add(entityid id) {
+    massert(next_index >= 0, "next index is less-than-zero");
+    if (next_index >= grid->size()) {
+        merror("next index is greater than the vector size");
+        return false;
+    }
+    if (id == ENTITYID_INVALID) {
+        merror("entityid is invalid");
+        return false;
+    }
+    set(id, next_index++);
+    return true;
 }
