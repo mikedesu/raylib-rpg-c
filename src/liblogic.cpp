@@ -373,6 +373,40 @@ static void handle_input_character_creation_scene(shared_ptr<gamestate> g, share
     } else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         minfo("Exiting character creation");
         g->current_scene = SCENE_TITLE;
+    } else if (inputstate_is_pressed(is, KEY_LEFT)) {
+        int race = g->chara_creation->race;
+        if (race > 1) {
+            race--;
+        } else {
+            race = RACE_WARG;
+        }
+        g->chara_creation->race = (race_t)race;
+
+        //g->chara_creation->race = (race_t)(((int)g->chara_creation->race)-1);
+        //if (race == RACE_HUMAN) {
+        //    g->chara_creation->race = RACE_ORC;
+        //} else if (race == RACE_ORC) {
+        //    g->chara_creation->race = RACE_HUMAN;
+        //}
+
+
+    } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
+        int race = g->chara_creation->race;
+        if (race < RACE_COUNT - 1) {
+            race++;
+        } else {
+            race = RACE_HALFLING;
+        }
+
+        g->chara_creation->race = (race_t)race;
+
+
+        //race_t race = g->chara_creation->race;
+        //if (race == RACE_HUMAN) {
+        //    g->chara_creation->race = RACE_ORC;
+        //} else if (race == RACE_ORC) {
+        //    g->chara_creation->race = RACE_HUMAN;
+        //}
     }
 
     g->frame_dirty = true;

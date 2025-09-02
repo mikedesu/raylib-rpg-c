@@ -1,6 +1,7 @@
 #include "gamestate.h"
 #include "libgame_defines.h"
 #include "massert.h"
+#include "race.h"
 #include "textureinfo.h"
 
 #include <memory>
@@ -43,14 +44,39 @@ void draw_character_creation_screen(shared_ptr<gamestate> g) {
     y += font_size + 10;
     // Draw sprite placeholder
     Rectangle dst = (Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200};
-    float pad = 40;
+    float pad = -40;
     Rectangle dst2 = (Rectangle){(float)cx - 210 + pad, (float)sy + pad, (float)200 - pad * 2, (float)200 - pad * 2};
-    DrawRectangleLinesEx(dst, 4, RED);
-    DrawRectangleLinesEx(dst2, 4, BLUE);
+    //DrawRectangleLinesEx(dst, 4, RED);
+    //DrawRectangleLinesEx(dst2, 4, BLUE);
     // Draw a frame of the human idle texture
-    Rectangle src = {12, 12, 8, 8};
+    Rectangle src = {0, 0, 32, 32};
     //DrawTexturePro(txinfo[TX_HUMAN_IDLE].texture, src, dst, (Vector2){0, 0}, 0.0f, WHITE);
-    DrawTexturePro(txinfo[TX_HUMAN_IDLE].texture, src, dst2, (Vector2){0, 0}, 0.0f, WHITE);
+
+    int tx_key = TX_HUMAN_IDLE;
+    if (g->chara_creation->race == RACE_HUMAN) {
+        tx_key = TX_HUMAN_IDLE;
+    } else if (g->chara_creation->race == RACE_ORC) {
+        tx_key = TX_ORC_IDLE;
+    } else if (g->chara_creation->race == RACE_ELF) {
+        tx_key = TX_ELF_IDLE;
+    } else if (g->chara_creation->race == RACE_DWARF) {
+        tx_key = TX_DWARF_IDLE;
+    } else if (g->chara_creation->race == RACE_HALFLING) {
+        tx_key = TX_HALFLING_IDLE;
+    } else if (g->chara_creation->race == RACE_GOBLIN) {
+        tx_key = TX_GOBLIN_IDLE;
+    } else if (g->chara_creation->race == RACE_GREEN_SLIME) {
+        tx_key = TX_GREEN_SLIME_IDLE;
+    } else if (g->chara_creation->race == RACE_BAT) {
+        tx_key = TX_BAT_IDLE;
+    } else if (g->chara_creation->race == RACE_WOLF) {
+        tx_key = TX_WOLF_IDLE;
+    } else if (g->chara_creation->race == RACE_WARG) {
+        tx_key = TX_WARG_IDLE;
+    }
+
+
+    DrawTexturePro(txinfo[tx_key].texture, src, dst2, (Vector2){0, 0}, 0.0f, WHITE);
 
     // Draw instructions
     y += font_size + 8;
