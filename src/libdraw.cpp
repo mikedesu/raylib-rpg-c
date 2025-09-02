@@ -16,9 +16,6 @@
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
-//#include "tx_keys.h"
-//#include "tx_keys_npcs.h"
-//#include "tx_keys_weapons.h"
 #include "tx_keys_boxes.h"
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
@@ -30,7 +27,6 @@
 
 #include <cstdlib>
 #include <memory>
-
 #include <raylib.h>
 #include <sys/param.h>
 #include <vector>
@@ -97,7 +93,10 @@ static void draw_hud(shared_ptr<gamestate> g);
 static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu);
 static void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
 static void draw_title_screen_from_texture(shared_ptr<gamestate> g);
-static void draw_character_creation_screen(shared_ptr<gamestate> g);
+
+// externally defined
+void draw_character_creation_screen(shared_ptr<gamestate> g);
+
 static void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g);
 static void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
 static void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
@@ -1766,73 +1765,6 @@ static void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g)
 }
 
 
-static void draw_character_creation_screen(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    const char* title_text = "Character Creation";
-    const char* remaining_text[] = {"Press SPACE to re-roll stats",
-                                    "Press LEFT/RIGHT to change race (unavailable for now)",
-                                    "Press UP/DOWN to change class (unavailable for now)",
-                                    "Press ENTER to confirm"};
-    int font_size = 20;
-    int w = DEFAULT_TARGET_WIDTH;
-    int h = DEFAULT_TARGET_HEIGHT;
-    int cx = w / 2;
-    int sy = h / 4;
-    int x = cx;
-    int y = sy;
-    //char buffer[2048] = {0};
-    ClearBackground(BLACK);
-    DrawText(title_text, x, y, font_size, WHITE);
-    y += font_size + 10;
-
-    font_size = 10;
-    // Draw character stats
-
-    DrawText(TextFormat("Name: %s", g->chara_creation->name.c_str()), x, y, font_size, WHITE);
-    y += font_size + 10;
-    DrawText(TextFormat("Race: %s", race2str(g->chara_creation->race).c_str()), x, y, font_size, WHITE);
-    y += font_size + 10;
-    DrawText(TextFormat("Hitdie: %d", g->chara_creation->hitdie), x, y, font_size, WHITE);
-    y += font_size + 10;
-    DrawText(TextFormat("Strength: %d", g->chara_creation->strength), x, y, font_size, WHITE);
-    y += font_size + 10;
-    DrawText(TextFormat("Dexterity: %d", g->chara_creation->dexterity), x, y, font_size, WHITE);
-    y += font_size + 10;
-    DrawText(TextFormat("Constitution: %d", g->chara_creation->constitution), x, y, font_size, WHITE);
-    y += font_size + 10;
-
-    //for (int i = 0; i < sizeof(stats_fmt) / sizeof(stats_fmt[0]); i++) {
-    //if (i == 0) {
-    //    snprintf(buffer, sizeof(buffer), stats_fmt[i], g->chara_creation.name.c_str());
-    //} else if (i == 1) {
-    //    snprintf(buffer, sizeof(buffer), stats_fmt[i], get_race_str(g->chara_creation.race).c_str());
-    //} else if (i == 2) {
-    //    snprintf(buffer, sizeof(buffer), stats_fmt[i], g->chara_creation.hitdie);
-    //} else if (i == 3) {
-    //    snprintf(buffer, sizeof(buffer), stats_fmt[i], g->chara_creation.strength);
-    //} else if (i == 4) {
-    //    snprintf(buffer, sizeof(buffer), stats_fmt[i], g->chara_creation.dexterity);
-    //} else if (i == 5) {
-    //    snprintf(buffer, sizeof(buffer), stats_fmt[i], g->chara_creation.constitution);
-    //} else {
-    //    merror("Unknown index %d in stats_fmt", i);
-    //    continue;
-    //}
-
-    //    DrawText(buffer, x, y, font_size, WHITE);
-    //    y += font_size + 4;
-    //}
-    // Draw sprite placeholder
-    DrawRectangleLinesEx((Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200}, 4, RED);
-    // Draw instructions
-    y += font_size + 8;
-    for (size_t i = 0; i < sizeof(remaining_text) / sizeof(remaining_text[0]); i++) {
-        DrawText(remaining_text[i], x, y, font_size, WHITE);
-        y += font_size + 4;
-    }
-}
-
-
 static void draw_help_menu(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
 
@@ -2099,5 +2031,3 @@ static void draw_inventory_menu(shared_ptr<gamestate> g) {
     //    }
     //}
 }
-/*
-*/
