@@ -94,8 +94,11 @@ static bool try_entity_pickup(shared_ptr<gamestate> g, entityid id);
 
 static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc);
 static entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
-static entityid create_player(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+
+static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name);
+
 static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+
 static entityid create_potion(shared_ptr<gamestate> g, vec3 loc, potiontype type);
 static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type);
 
@@ -134,21 +137,26 @@ static void init_dungeon(shared_ptr<gamestate> g) {
 
 static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
     massert(g, "gamestate is NULL");
+
     minfo("calling d_get_floor...");
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+
     minfo("calling df_tile_at...");
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
+
     massert(tile, "failed to get tile");
     minfo("checking if tile is walkable...");
     if (!tile_is_walkable(tile->type)) {
         merror("cannot create entity on non-walkable tile");
         return ENTITYID_INVALID;
     }
+
     minfo("checking if tile has live NPCs...");
     if (tile_has_live_npcs(g, tile)) {
         merror("cannot create entity on tile with live NPCs");
         return ENTITYID_INVALID;
     }
+
     entityid id = g_add_entity(g);
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_NPC);
@@ -265,14 +273,22 @@ static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type
 }
 
 
-static entityid create_player(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
+static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
     massert(g, "gamestate is NULL");
     massert(name != "", "name is empty string");
     // use the previously-written liblogic_npc_create function
+
+    minfo("Creating player...");
+
+    race_t rt = g->chara_creation->race;
+    minfo("Race: %s", race2str(rt).c_str());
+
     entityid id = create_npc(g, rt, loc, name);
+
     msuccess("npc_create successful, id: %d", id);
     massert(id != ENTITYID_INVALID, "failed to create player");
     g_set_hero_id(g, id);
+
     g_add_type(g, id, ENTITY_PLAYER);
     g_set_tx_alpha(g, id, 0);
     g_set_stat(g, id, STATS_LEVEL, 666);
@@ -361,6 +377,9 @@ static void handle_input_character_creation_scene(shared_ptr<gamestate> g, share
             maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
             //bonus_calc(g->chara_creation.constitution);
         }
+
+        g->entity_turn = create_player(g, (vec3){0, 0, 0}, "darkmage");
+
         //g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
         //g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
         g->current_scene = SCENE_GAMEPLAY;
@@ -471,53 +490,55 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
             return;
         }
 
-        vec3 loc = g_get_loc(g, g->hero_id);
 
-        if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
-            try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
-            try_entity_move(g, g->hero_id, (vec3){0, 1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
-            try_entity_move(g, g->hero_id, (vec3){-1, 0, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
-            try_entity_move(g, g->hero_id, (vec3){1, 0, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (inputstate_is_pressed(is, KEY_Q)) {
-            try_entity_move(g, g->hero_id, (vec3){-1, -1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (inputstate_is_pressed(is, KEY_E)) {
-            try_entity_move(g, g->hero_id, (vec3){1, -1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (inputstate_is_pressed(is, KEY_Z)) {
-            try_entity_move(g, g->hero_id, (vec3){-1, 1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (inputstate_is_pressed(is, KEY_C)) {
-            try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-            g_set_attacking(g, g->hero_id, true);
-            g_set_update(g, g->hero_id, true);
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (inputstate_is_pressed(is, KEY_SEMICOLON)) {
-            //add_message(g, "pickup item (unimplemented)");
+        if (g->hero_id != ENTITYID_INVALID) {
+            vec3 loc = g_get_loc(g, g->hero_id);
+            if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
+                try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
+                try_entity_move(g, g->hero_id, (vec3){0, 1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+                try_entity_move(g, g->hero_id, (vec3){-1, 0, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
+                try_entity_move(g, g->hero_id, (vec3){1, 0, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_Q)) {
+                try_entity_move(g, g->hero_id, (vec3){-1, -1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_E)) {
+                try_entity_move(g, g->hero_id, (vec3){1, -1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_Z)) {
+                try_entity_move(g, g->hero_id, (vec3){-1, 1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_C)) {
+                try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+                g_set_attacking(g, g->hero_id, true);
+                g_set_update(g, g->hero_id, true);
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_SEMICOLON)) {
+                //add_message(g, "pickup item (unimplemented)");
 
-            try_entity_pickup(g, g->hero_id);
-            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (inputstate_is_pressed(is, KEY_SLASH) && inputstate_is_shift_held(is)) {
-            // open inventory
-            //g->inventory_is_open = !g->inventory_is_open;
+                try_entity_pickup(g, g->hero_id);
+                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            } else if (inputstate_is_pressed(is, KEY_SLASH) && inputstate_is_shift_held(is)) {
+                // open inventory
+                //g->inventory_is_open = !g->inventory_is_open;
 
-            g->display_help_menu = !g->display_help_menu;
-            g->frame_dirty = true;
-        } else if (inputstate_is_pressed(is, KEY_I)) {
-            g->display_inventory_menu = true;
-            g->controlmode = CONTROLMODE_INVENTORY;
-            g->frame_dirty = true;
+                g->display_help_menu = !g->display_help_menu;
+                g->frame_dirty = true;
+            } else if (inputstate_is_pressed(is, KEY_I)) {
+                g->display_inventory_menu = true;
+                g->controlmode = CONTROLMODE_INVENTORY;
+                g->frame_dirty = true;
+            }
+            return;
         }
-        return;
     }
 }
 
@@ -589,7 +610,10 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
     shield_dir = DIR_NONE;
     is_b = false;
     test_guard = g->test_guard;
-    loc = g_get_loc(g, g->hero_id);
+
+    if (g->hero_id != ENTITYID_INVALID) {
+        loc = g_get_loc(g, g->hero_id);
+    }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
     // zero out the buffer
@@ -658,8 +682,13 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
 void liblogic_init(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     srand(time(NULL));
+
+    minfo("liblogic_init");
+
     init_dungeon(g);
-    g->entity_turn = create_player(g, RACE_HUMAN, (vec3){0, 0, 0}, "darkmage");
+
+    //g->entity_turn = create_player(g, (vec3){0, 0, 0}, "darkmage");
+
     create_wooden_box(g, (vec3){2, 2, 0});
     create_wooden_box(g, (vec3){3, 2, 0});
     create_wooden_box(g, (vec3){4, 2, 0});
@@ -717,16 +746,19 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     //update_player_state(g);
     //update_npcs_state(g);
     // this was update player state
-    if (!g->gameover) {
-        g_incr_tx_alpha(g, g->hero_id, 2);
-        if (g_is_dead(g, g->hero_id)) {
-            //add_message_history(g, "You died!");
-            g->gameover = true;
+    if (g->hero_id != ENTITYID_INVALID) {
+        if (!g->gameover) {
+            g_incr_tx_alpha(g, g->hero_id, 2);
+            if (g_is_dead(g, g->hero_id)) {
+                //add_message_history(g, "You died!");
+                g->gameover = true;
+            }
+            //check_and_handle_level_up(g, g->hero_id);
         }
-        //check_and_handle_level_up(g, g->hero_id);
-    }
-    if (g_is_dead(g, g->hero_id)) {
-        return;
+
+        if (g_is_dead(g, g->hero_id)) {
+            return;
+        }
     }
     // this was update_npcs_state
     for (entityid id = 0; id < g->next_entityid; id++) {
@@ -736,8 +768,10 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
         g_incr_tx_alpha(g, id, 4);
     }
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-        g_set_blocking(g, g->hero_id, false);
-        g_set_block_success(g, g->hero_id, false);
+        if (g->hero_id != ENTITYID_INVALID) {
+            g_set_blocking(g, g->hero_id, false);
+            g_set_block_success(g, g->hero_id, false);
+        }
     }
     handle_input(g, is);
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {

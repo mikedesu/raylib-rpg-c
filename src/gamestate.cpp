@@ -144,6 +144,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->chara_creation->constitution = 10;
     g->chara_creation->hitdie = 6; // 1d6 hit die
     g->chara_creation->race = RACE_HUMAN;
+
     // why is the above line crashing?
     // the above line is also crashing
     msuccess("Gamestate character creation name set to empty string");
@@ -413,6 +414,7 @@ bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type) {
     }
     // Check if the type already exists for the entity
     (*g->type_list)[id] = type; // Insert or update the type
+    msuccess("Entity ID %d type set to %d", id, type);
     return true;
 }
 
@@ -1037,6 +1039,7 @@ bool g_set_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha) {
     if (g_has_tx_alpha(g, id)) {
         // Update the tx alpha for the entity
         (*g->tx_alpha_list)[id] = alpha; // Update the tx alpha
+        msuccess("Entity id %d alpha set to %d", id, alpha);
         return true;
     }
     merror("g_set_tx_alpha: id %d does not have a tx alpha component", id);
@@ -1362,6 +1365,7 @@ bool g_set_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot, int value
     }
     if (g_has_stats(g, id)) {
         (*(*g->stats_list)[id])[slot] = value;
+        msuccess("Entity id %d stat slot %d set to %d", id, slot, value);
         return true;
     }
     merror("g_set_stat: id %d does not have a stats component", id);
@@ -1400,6 +1404,7 @@ bool g_add_equipped_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id
     }
     // Check if the equipped weapon already exists for the entity
     (*g->equipped_weapon_list)[id] = wpn_id; // Insert or update the equipped weapon
+    msuccess("Entity id %d weapon set to %d", id, wpn_id);
     return true;
 }
 
@@ -1602,6 +1607,7 @@ bool g_add_inventory(shared_ptr<gamestate> g, entityid id) {
         return false;
     }
     (*g->inventory_list)[id] = make_shared<item_container>(2, 5);
+    msuccess("Entity id %d now has an inventory");
     return true;
 }
 
