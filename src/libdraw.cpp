@@ -1072,6 +1072,9 @@ static inline void handle_debug_panel(shared_ptr<gamestate> g) {
 
 
 void libdraw_drawframe(shared_ptr<gamestate> g) {
+    libdraw_update_sprites_pre(g);
+
+
     double start_time = GetTime();
     BeginDrawing();
     ClearBackground(RED);
@@ -1119,6 +1122,9 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
     //msuccess("End draw frame");
+
+
+    libdraw_update_sprites_post(g);
 }
 
 

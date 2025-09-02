@@ -15,12 +15,9 @@ void gamerun() {
     liblogic_init(g);
     libdraw_init(g);
     while (!libdraw_windowshouldclose(g)) {
-        //libdraw_update_input(is);
         inputstate_update(is);
         liblogic_tick(is, g);
-        libdraw_update_sprites_pre(g);
         libdraw_drawframe(g);
-        libdraw_update_sprites_post(g);
         //if (g->do_restart) {
         //    minfo("Restarting game...");
         //    libdraw_close_partial();
