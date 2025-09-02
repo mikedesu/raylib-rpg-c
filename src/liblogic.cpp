@@ -694,28 +694,26 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_wooden_box(g, (vec3){7, 6, 0});
     create_wooden_box(g, (vec3){7, 7, 0});
 
-    /*
-    create_npc_set_stats(g, (vec3){5, 3, 0}, RACE_HUMAN);
-    create_npc_set_stats(g, (vec3){5, 4, 0}, RACE_ELF);
-    create_npc_set_stats(g, (vec3){5, 5, 0}, RACE_DWARF);
-    create_npc_set_stats(g, (vec3){5, 6, 0}, RACE_GOBLIN);
-    create_npc_set_stats(g, (vec3){5, 7, 0}, RACE_HALFLING);
-    create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
-    create_npc_set_stats(g, (vec3){6, 4, 0}, RACE_ORC);
-    create_npc_set_stats(g, (vec3){6, 5, 0}, RACE_WOLF);
-    create_npc_set_stats(g, (vec3){6, 6, 0}, RACE_WARG);
-    create_npc_set_stats(g, (vec3){6, 7, 0}, RACE_BAT);
+    //create_npc_set_stats(g, (vec3){5, 3, 0}, RACE_HUMAN);
+    //create_npc_set_stats(g, (vec3){5, 4, 0}, RACE_ELF);
+    //create_npc_set_stats(g, (vec3){5, 5, 0}, RACE_DWARF);
+    //create_npc_set_stats(g, (vec3){5, 6, 0}, RACE_GOBLIN);
+    //create_npc_set_stats(g, (vec3){5, 7, 0}, RACE_HALFLING);
+    //create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
+    //create_npc_set_stats(g, (vec3){6, 4, 0}, RACE_ORC);
+    //create_npc_set_stats(g, (vec3){6, 5, 0}, RACE_WOLF);
+    //create_npc_set_stats(g, (vec3){6, 6, 0}, RACE_WARG);
+    //create_npc_set_stats(g, (vec3){6, 7, 0}, RACE_BAT);
 
-    create_potion(g, (vec3){1, 1, 0}, POTION_HP_SMALL);
-    create_potion(g, (vec3){2, 1, 0}, POTION_MP_SMALL);
-    create_potion(g, (vec3){3, 1, 0}, POTION_HP_MEDIUM);
-    create_potion(g, (vec3){4, 1, 0}, POTION_MP_MEDIUM);
-    create_potion(g, (vec3){5, 1, 0}, POTION_HP_LARGE);
-    create_potion(g, (vec3){6, 1, 0}, POTION_MP_LARGE);
+    //create_potion(g, (vec3){1, 1, 0}, POTION_HP_SMALL);
+    //create_potion(g, (vec3){2, 1, 0}, POTION_MP_SMALL);
+    //create_potion(g, (vec3){3, 1, 0}, POTION_HP_MEDIUM);
+    //create_potion(g, (vec3){4, 1, 0}, POTION_MP_MEDIUM);
+    //create_potion(g, (vec3){5, 1, 0}, POTION_HP_LARGE);
+    //create_potion(g, (vec3){6, 1, 0}, POTION_MP_LARGE);
 
-    create_weapon(g, (vec3){1, 5, 0}, WEAPON_TWO_HANDED_SWORD);
-    create_weapon(g, (vec3){1, 6, 0}, WEAPON_BOW);
-    */
+    //create_weapon(g, (vec3){1, 5, 0}, WEAPON_TWO_HANDED_SWORD);
+    //create_weapon(g, (vec3){1, 6, 0}, WEAPON_BOW);
     create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
     create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
     create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
@@ -810,69 +808,63 @@ static void add_message(shared_ptr<gamestate> g, const char* fmt, ...) {
 //}
 
 
-/*
-static inline bool
-is_traversable(shared_ptr<gamestate> g, int x, int y, int z) {
-    massert(g, "gamestate is NULL");
-    massert(z >= 0, "floor is out of bounds");
-    massert(z < g->d->num_floors, "floor is out of bounds");
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
-    massert(df, "failed to get dungeon floor");
-    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
-    massert(t, "failed to get tile");
-    return tile_is_walkable(t->type);
-}
-*/
+//static inline bool
+//is_traversable(shared_ptr<gamestate> g, int x, int y, int z) {
+//    massert(g, "gamestate is NULL");
+//    massert(z >= 0, "floor is out of bounds");
+//    massert(z < g->d->num_floors, "floor is out of bounds");
+//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
+//    massert(df, "failed to get dungeon floor");
+//    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
+//    massert(t, "failed to get tile");
+//    return tile_is_walkable(t->type);
+//}
 
 
-/*
-static inline shared_ptr<tile_t>
-get_first_empty_tile_around_entity(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entity id is invalid");
-    vec3 loc = g_get_location(g, id);
-    massert(loc.z >= 0 && loc.z < g->d->num_floors, "floor is out of bounds");
-    //dungeon_floor_t* const df = d_get_floor(g->dungeon, loc.z);
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-    massert(df, "failed to get dungeon floor");
-    // check the 8 surrounding tiles
-    for (int dx = -1; dx <= 1; dx++) {
-        for (int dy = -1; dy <= 1; dy++) {
-            if (dx == 0 && dy == 0) continue; // skip the entity's own tile
-            int x = loc.x + dx;
-            int y = loc.y + dy;
-            if (is_traversable(g, x, y, loc.z)) {
-                shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, loc.z});
-                if (t && t->entities->empty()) {
-                    return t; // found an empty tile
-                }
-            }
-        }
-    }
-    return nullptr; // no empty tile found
-}
-*/
+//static inline shared_ptr<tile_t>
+//get_first_empty_tile_around_entity(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entity id is invalid");
+//    vec3 loc = g_get_location(g, id);
+//    massert(loc.z >= 0 && loc.z < g->d->num_floors, "floor is out of bounds");
+//    //dungeon_floor_t* const df = d_get_floor(g->dungeon, loc.z);
+//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+//    massert(df, "failed to get dungeon floor");
+//    // check the 8 surrounding tiles
+//    for (int dx = -1; dx <= 1; dx++) {
+//        for (int dy = -1; dy <= 1; dy++) {
+//            if (dx == 0 && dy == 0) continue; // skip the entity's own tile
+//            int x = loc.x + dx;
+//            int y = loc.y + dy;
+//            if (is_traversable(g, x, y, loc.z)) {
+//                shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, loc.z});
+//                if (t && t->entities->empty()) {
+//                    return t; // found an empty tile
+//                }
+//            }
+//        }
+//    }
+//    return nullptr; // no empty tile found
+//}
 
 
-/*
-static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entity id is invalid");
-    // check if the NPC is dead
-    if (g_is_dead(g, id)) return;
-    // check if the NPC is blocking
-    if (g_get_blocking(g, id)) {
-        // reset the blocking state
-        g_set_blocking(g, id, false);
-        g_set_update(g, id, true);
-    }
-    // check if the NPC is blocked
-    if (g_get_block_success(g, id)) {
-        g_set_block_success(g, id, false);
-        g_set_update(g, id, true);
-    }
-}
-*/
+//static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entity id is invalid");
+//    // check if the NPC is dead
+//    if (g_is_dead(g, id)) return;
+//    // check if the NPC is blocking
+//    if (g_get_blocking(g, id)) {
+//        // reset the blocking state
+//        g_set_blocking(g, id, false);
+//        g_set_update(g, id, true);
+//    }
+//    // check if the NPC is blocked
+//    if (g_get_block_success(g, id)) {
+//        g_set_block_success(g, id, false);
+//        g_set_update(g, id, true);
+//    }
+//}
 
 //static void update_player_tiles_explored(shared_ptr<gamestate> g);
 //static vec3 get_random_available_loc_in_area(shared_ptr<gamestate> g,
@@ -950,100 +942,94 @@ static inline void update_npc_state(shared_ptr<gamestate> g, entityid id) {
 //                          entityid target_id);
 
 
-/*
-static int calc_reward_xp(shared_ptr<gamestate> g,
-                          entityid attacker_id,
-                          entityid target_id) {
-    massert(g, "gamestate is NULL");
-    massert(attacker_id != ENTITYID_INVALID, "attacker id is invalid");
-    massert(target_id != ENTITYID_INVALID, "target id is invalid");
-    // get the entity type
-    entitytype_t attacker_type = g_get_type(g, attacker_id);
-    massert(attacker_type == ENTITY_NPC || attacker_type == ENTITY_PLAYER,
-            "attacker type is not NPC or Player");
-    entitytype_t target_type = g_get_type(g, target_id);
-    massert(target_type == ENTITY_NPC || target_type == ENTITY_PLAYER,
-            "target type is not NPC or Player");
-    if (target_type != ENTITY_NPC && target_type != ENTITY_PLAYER) {
-        merror("Target type is not NPC or Player");
-        return 0; // no reward for non-NPC/Player targets
-    }
-    if (attacker_type == ENTITY_PLAYER && target_type == ENTITY_PLAYER) {
-        merror("Cannot calculate reward xp for player vs player combat");
-        return 0; // no reward for player vs player combat
-    }
-
-    // get the challenge rating
-    int challenge_rating = calc_challenge_rating(g, target_id);
-    massert(challenge_rating >= 0, "challenge rating is negative");
-    minfo("Challenge rating for target %d is %d", target_id, challenge_rating);
-    // get the attacker's level
-    int attacker_level = g_get_stat(g, attacker_id, STATS_LEVEL);
-    massert(attacker_level >= 0, "attacker level is negative");
-    // calculate the reward xp
-    int base_xp = challenge_rating * 2;
-    //int xp_modifier = pow(1.5, challenge_rating - attacker_level);
-    int base = 2;
-    int exponent = challenge_rating - attacker_level;
-    float xp_modifier = pow(base, exponent);
-    int reward_xp = (int)round(base_xp * xp_modifier);
-    massert(reward_xp >= 0, "reward xp is negative");
-    return reward_xp;
-}
-*/
+//static int calc_reward_xp(shared_ptr<gamestate> g,
+//                          entityid attacker_id,
+//                          entityid target_id) {
+//    massert(g, "gamestate is NULL");
+//    massert(attacker_id != ENTITYID_INVALID, "attacker id is invalid");
+//    massert(target_id != ENTITYID_INVALID, "target id is invalid");
+//    // get the entity type
+//    entitytype_t attacker_type = g_get_type(g, attacker_id);
+//    massert(attacker_type == ENTITY_NPC || attacker_type == ENTITY_PLAYER,
+//            "attacker type is not NPC or Player");
+//    entitytype_t target_type = g_get_type(g, target_id);
+//    massert(target_type == ENTITY_NPC || target_type == ENTITY_PLAYER,
+//            "target type is not NPC or Player");
+//    if (target_type != ENTITY_NPC && target_type != ENTITY_PLAYER) {
+//        merror("Target type is not NPC or Player");
+//        return 0; // no reward for non-NPC/Player targets
+//    }
+//    if (attacker_type == ENTITY_PLAYER && target_type == ENTITY_PLAYER) {
+//        merror("Cannot calculate reward xp for player vs player combat");
+//        return 0; // no reward for player vs player combat
+//    }
+//
+//    // get the challenge rating
+//    int challenge_rating = calc_challenge_rating(g, target_id);
+//    massert(challenge_rating >= 0, "challenge rating is negative");
+//    minfo("Challenge rating for target %d is %d", target_id, challenge_rating);
+//    // get the attacker's level
+//    int attacker_level = g_get_stat(g, attacker_id, STATS_LEVEL);
+//    massert(attacker_level >= 0, "attacker level is negative");
+//    // calculate the reward xp
+//    int base_xp = challenge_rating * 2;
+//    //int xp_modifier = pow(1.5, challenge_rating - attacker_level);
+//    int base = 2;
+//    int exponent = challenge_rating - attacker_level;
+//    float xp_modifier = pow(base, exponent);
+//    int reward_xp = (int)round(base_xp * xp_modifier);
+//    massert(reward_xp >= 0, "reward xp is negative");
+//    return reward_xp;
+//}
 
 //static int calc_challenge_rating(gamestate* const g, entityid id) {
-/*
-static int calc_challenge_rating(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entity id is invalid");
-    // get the entity type
-    entitytype_t type = g_get_type(g, id);
-    massert(type == ENTITY_NPC || type == ENTITY_PLAYER,
-            "entity type is not NPC or Player");
-    if (type != ENTITY_NPC || type != ENTITY_PLAYER) {
-        merror("Entity type is not NPC or Player");
-        return 0; // no challenge rating for non-NPC entities
-    }
-    // get the current level
-    int lvl = g_get_stat(g, id, STATS_LEVEL);
-    massert(lvl >= 0, "level is negative");
-    int wpn_bonus = 0;
-    // check to see if the NPC has an equipped weapon
-    entityid weapon_id = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
-    if (weapon_id != ENTITYID_INVALID) {
-        wpn_bonus = 1;
-    }
-    // check to see if the NPC has an equipped shield
-    int shield_bonus = 0;
-    entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
-    if (shield_id != ENTITYID_INVALID) {
-        shield_bonus = 1;
-    }
-    // calculate the challenge rating
-    int challenge_rating = lvl + wpn_bonus + shield_bonus;
-    massert(challenge_rating >= 0, "challenge rating is negative");
-    // set the challenge rating
-    return challenge_rating;
-}
-*/
+//static int calc_challenge_rating(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entity id is invalid");
+//    // get the entity type
+//    entitytype_t type = g_get_type(g, id);
+//    massert(type == ENTITY_NPC || type == ENTITY_PLAYER,
+//            "entity type is not NPC or Player");
+//    if (type != ENTITY_NPC || type != ENTITY_PLAYER) {
+//        merror("Entity type is not NPC or Player");
+//        return 0; // no challenge rating for non-NPC entities
+//    }
+//    // get the current level
+//    int lvl = g_get_stat(g, id, STATS_LEVEL);
+//    massert(lvl >= 0, "level is negative");
+//    int wpn_bonus = 0;
+//    // check to see if the NPC has an equipped weapon
+//    entityid weapon_id = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
+//    if (weapon_id != ENTITYID_INVALID) {
+//        wpn_bonus = 1;
+//    }
+//    // check to see if the NPC has an equipped shield
+//    int shield_bonus = 0;
+//    entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
+//    if (shield_id != ENTITYID_INVALID) {
+//        shield_bonus = 1;
+//    }
+//    // calculate the challenge rating
+//    int challenge_rating = lvl + wpn_bonus + shield_bonus;
+//    massert(challenge_rating >= 0, "challenge rating is negative");
+//    // set the challenge rating
+//    return challenge_rating;
+//}
 
 //static int calc_next_lvl_xp(gamestate* const g, entityid id) {
-/*
-static int calc_next_lvl_xp(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entity id is invalid");
-    // get the current level
-    int lvl = g_get_stat(g, id, STATS_LEVEL);
-    massert(lvl >= 0, "level is negative");
-    // calculate the next level's xp
-    int base_xp = 10;
-    int next_lvl_xp = base_xp * (powl(2, lvl) - 1);
-    massert(next_lvl_xp >= 0, "next level xp is negative");
-    // set the next level's xp
-    return next_lvl_xp;
-}
-*/
+//static int calc_next_lvl_xp(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entity id is invalid");
+//    // get the current level
+//    int lvl = g_get_stat(g, id, STATS_LEVEL);
+//    massert(lvl >= 0, "level is negative");
+//    // calculate the next level's xp
+//    int base_xp = 10;
+//    int next_lvl_xp = base_xp * (powl(2, lvl) - 1);
+//    massert(next_lvl_xp >= 0, "next level xp is negative");
+//    // set the next level's xp
+//    return next_lvl_xp;
+//}
 
 static void cycle_messages(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -1068,26 +1054,24 @@ static void cycle_messages(shared_ptr<gamestate> g) {
     }
 }
 
-/*
-static void add_message_and_history(gamestate* g, const char* fmt, ...) {
-    massert(g, "gamestate is NULL");
-    massert(fmt, "format string is NULL");
-    if (g->msg_system.count >= MAX_MESSAGES) {
-        mwarning("Message queue full!");
-        return;
-    }
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(g->msg_system.messages[g->msg_system.count],
-              MAX_MSG_LENGTH - 1,
-              fmt,
-              args);
-    va_end(args);
-    add_message_history(g, g->msg_system.messages[g->msg_system.count]);
-    g->msg_system.count++;
-    g->msg_system.is_active = true;
-}
-*/
+//static void add_message_and_history(gamestate* g, const char* fmt, ...) {
+//    massert(g, "gamestate is NULL");
+//    massert(fmt, "format string is NULL");
+//    if (g->msg_system.count >= MAX_MESSAGES) {
+//        mwarning("Message queue full!");
+//        return;
+//    }
+//    va_list args;
+//    va_start(args, fmt);
+//    vsnprintf(g->msg_system.messages[g->msg_system.count],
+//              MAX_MSG_LENGTH - 1,
+//              fmt,
+//              args);
+//    va_end(args);
+//    add_message_history(g, g->msg_system.messages[g->msg_system.count]);
+//    g->msg_system.count++;
+//    g->msg_system.is_active = true;
+//}
 
 
 //static void update_equipped_shield_dir(gamestate* g, entity* e) {
@@ -1229,410 +1213,384 @@ static void add_message_and_history(gamestate* g, const char* fmt, ...) {
 
 
 //static void try_entity_move_a_star(gamestate* const g, entityid id) {
-/*
-static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entity id is invalid");
-    // for testing, we will hardcode an update to the entity's target
-    // realistically, we should actually use a target ID and do location lookups on every update
-    // however, for this test, we will instead hardcode the target to point to the hero's location
-    // first, grab the hero id and then the hero entity pointer
-    vec3 hloc = g_get_location(g, g->hero_id);
-    vec3 eloc = g_get_location(g, id);
-    vec3 hloc_cast = {hloc.x, hloc.y, hloc.z};
-    vec3 eloc_cast = {eloc.x, eloc.y, eloc.z};
-    //dungeon_floor_t* df = d_get_floor(g->dungeon, eloc.z);
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, eloc.z);
-    //massert(df, "dungeon floor is NULL");
-    int target_path_length = 0;
-    vec3* target_path =
-        find_path(eloc_cast, hloc_cast, df, &target_path_length);
-    if (target_path) {
-        if (target_path_length >= 2) {
-            vec3 loc = target_path[target_path_length - 2];
-            if (entities_adjacent(g, id, g->hero_id)) {
-                try_entity_attack(g, id, loc.x, loc.y);
-            } else {
-                int dx = loc.x - eloc.x;
-                int dy = loc.y - eloc.y;
-                try_entity_move(g, id, dx, dy);
-            }
-        }
-    }
-}
-*/
+//static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entity id is invalid");
+//    // for testing, we will hardcode an update to the entity's target
+//    // realistically, we should actually use a target ID and do location lookups on every update
+//    // however, for this test, we will instead hardcode the target to point to the hero's location
+//    // first, grab the hero id and then the hero entity pointer
+//    vec3 hloc = g_get_location(g, g->hero_id);
+//    vec3 eloc = g_get_location(g, id);
+//    vec3 hloc_cast = {hloc.x, hloc.y, hloc.z};
+//    vec3 eloc_cast = {eloc.x, eloc.y, eloc.z};
+//    //dungeon_floor_t* df = d_get_floor(g->dungeon, eloc.z);
+//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, eloc.z);
+//    //massert(df, "dungeon floor is NULL");
+//    int target_path_length = 0;
+//    vec3* target_path =
+//        find_path(eloc_cast, hloc_cast, df, &target_path_length);
+//    if (target_path) {
+//        if (target_path_length >= 2) {
+//            vec3 loc = target_path[target_path_length - 2];
+//            if (entities_adjacent(g, id, g->hero_id)) {
+//                try_entity_attack(g, id, loc.x, loc.y);
+//            } else {
+//                int dx = loc.x - eloc.x;
+//                int dy = loc.y - eloc.y;
+//                try_entity_move(g, id, dx, dy);
+//            }
+//        }
+//    }
+//}
 
-/*
-static void try_entity_move_random(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entity id is invalid");
-    int x = (rand() % 3) - 1;
-    int y = 0;
-    //x = x == 0 ? -1 : x == 1 ? 0 : 1;
-    // if x is 0, y cannot also be 0
-    if (x == 0) {
-        y = rand() % 2 == 0 ? -1 : 1;
-    } else {
-        y = rand() % 3;
-        y = y == 0 ? -1 : y == 1 ? 0 : 1;
-    }
-    try_entity_move(g, id, x, y);
-}
-*/
+//static void try_entity_move_random(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entity id is invalid");
+//    int x = (rand() % 3) - 1;
+//    int y = 0;
+//    //x = x == 0 ? -1 : x == 1 ? 0 : 1;
+//    // if x is 0, y cannot also be 0
+//    if (x == 0) {
+//        y = rand() % 2 == 0 ? -1 : 1;
+//    } else {
+//        y = rand() % 3;
+//        y = y == 0 ? -1 : y == 1 ? 0 : 1;
+//    }
+//    try_entity_move(g, id, x, y);
+//}
 
-/*
-static inline void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g,
-                                                        entitytype_t type,
-                                                        bool success) {
-    //if (!success) {
-    //    if (type == ENTITY_PLAYER)
-    //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    //    else if (type == ENTITY_NPC)
-    //        g->flag = GAMESTATE_FLAG_NPC_ANIM;
-    //    else
-    //        g->flag = GAMESTATE_FLAG_NONE;
-    //} else {
-    //    if (type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    //}
-    g->flag = success && type == ENTITY_PLAYER    ? GAMESTATE_FLAG_PLAYER_ANIM
-              : !success && type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM
-              : !success && type == ENTITY_NPC    ? GAMESTATE_FLAG_NPC_ANIM
-              : !success                          ? GAMESTATE_FLAG_NONE
-                                                  : g->flag;
-}
-*/
+//static inline void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g,
+//                                                        entitytype_t type,
+//                                                        bool success) {
+//    //if (!success) {
+//    //    if (type == ENTITY_PLAYER)
+//    //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+//    //    else if (type == ENTITY_NPC)
+//    //        g->flag = GAMESTATE_FLAG_NPC_ANIM;
+//    //    else
+//    //        g->flag = GAMESTATE_FLAG_NONE;
+//    //} else {
+//    //    if (type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+//    //}
+//    g->flag = success && type == ENTITY_PLAYER    ? GAMESTATE_FLAG_PLAYER_ANIM
+//              : !success && type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM
+//              : !success && type == ENTITY_NPC    ? GAMESTATE_FLAG_NPC_ANIM
+//              : !success                          ? GAMESTATE_FLAG_NONE
+//                                                  : g->flag;
+//}
 
 //static void handle_attack_success(gamestate* const g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
-/*
-static void handle_attack_success(shared_ptr<gamestate> g,
-                                  entityid atk_id,
-                                  entityid tgt_id,
-                                  bool* atk_successful) {
-    massert(g, "gamestate is NULL");
-    massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
-    massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
-    massert(atk_successful, "attack_successful is NULL");
-    entitytype_t tgttype = g_get_type(g, tgt_id);
-    if (*atk_successful) {
-        entityid attacker_weapon_id =
-            g_get_equipment(g, atk_id, EQUIP_SLOT_WEAPON);
-        int dmg = 1;
-        if (attacker_weapon_id == ENTITYID_INVALID) {
-            // no weapon
-            // get the entity's base attack damage
-            vec3 dmg_roll = g_get_base_attack_damage(g, atk_id);
-            dmg = do_roll(dmg_roll);
-            int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
-            dmg += atk_bonus;
-        } else {
-            // weapon
-            // we will calculate damage based on weapon attributes
-            massert(g_has_damage(g, attacker_weapon_id),
-                    "attacker weapon does not have damage attached");
-            vec3 dmg_roll = g_get_damage(g, attacker_weapon_id);
-            dmg = do_roll(dmg_roll);
-            int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
-            dmg += atk_bonus;
-        }
-        g_set_damaged(g, tgt_id, true);
-        g_set_update(g, tgt_id, true);
-        int hp = g_get_stat(g, tgt_id, STATS_HP);
-        if (hp <= 0) {
-            merror("Target is already dead, hp was: %d", hp);
-            g_update_dead(g, tgt_id, true);
-            return;
-        }
-        hp -= dmg;
-        g_set_stat(g, tgt_id, STATS_HP, hp);
-        if (tgttype == ENTITY_PLAYER) {
-            add_message_history(g,
-                                "%s attacked you for %d damage!",
-                                g_get_name(g, atk_id).c_str(),
-                                dmg);
-        } else if (tgttype == ENTITY_NPC) {
-            add_message_history(g,
-                                "%s attacked %s for %d damage!",
-                                g_get_name(g, atk_id).c_str(),
-                                g_get_name(g, tgt_id).c_str(),
-                                dmg);
-        }
-        if (hp <= 0) {
-            g_update_dead(g, tgt_id, true);
-            if (tgttype == ENTITY_NPC) {
-                add_message_history(g,
-                                    "%s killed %s!",
-                                    g_get_name(g, atk_id).c_str(),
-                                    g_get_name(g, tgt_id).c_str());
-                // increment attacker's xp
-                int old_xp = g_get_stat(g, atk_id, STATS_XP);
-                massert(old_xp >= 0, "attacker's xp is negative");
-                int reward_xp = calc_reward_xp(g, atk_id, tgt_id);
-                massert(reward_xp >= 0, "reward xp is negative");
-                int new_xp = old_xp + reward_xp;
-                massert(new_xp >= 0, "new xp is negative");
-                g_set_stat(g, atk_id, STATS_XP, new_xp);
-                vec3 loc = g_get_location(g, tgt_id);
-                vec3 loc_cast = {loc.x, loc.y, loc.z};
-                entityid id = ENTITYID_INVALID;
-                while (id == ENTITYID_INVALID)
-                    id = potion_create(g,
-                                       loc_cast,
-                                       POTION_HEALTH_SMALL,
-                                       "small health potion");
-            }
-        } else {
-            g_update_dead(g, tgt_id, false);
-        }
-    } else {
-        // handle attack miss
-        if (tgttype == ENTITY_PLAYER)
-            add_message_history(
-                g, "%s's attack missed!", g_get_name(g, atk_id).c_str());
-        else if (tgttype == ENTITY_NPC)
-            add_message_history(g,
-                                "%s missed %s!",
-                                g_get_name(g, atk_id).c_str(),
-                                g_get_name(g, tgt_id).c_str());
-    }
-    //e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
-    //if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
-    //if (attacker->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
-    //if (e_get_hp(target) <= 0) {
-    //target->dead = true;
-    //g_update_dead(g, tgt_id, true);
-    //}
-}
-*/
+//static void handle_attack_success(shared_ptr<gamestate> g,
+//                                  entityid atk_id,
+//                                  entityid tgt_id,
+//                                  bool* atk_successful) {
+//    massert(g, "gamestate is NULL");
+//    massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
+//    massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
+//    massert(atk_successful, "attack_successful is NULL");
+//    entitytype_t tgttype = g_get_type(g, tgt_id);
+//    if (*atk_successful) {
+//        entityid attacker_weapon_id =
+//            g_get_equipment(g, atk_id, EQUIP_SLOT_WEAPON);
+//        int dmg = 1;
+//        if (attacker_weapon_id == ENTITYID_INVALID) {
+//            // no weapon
+//            // get the entity's base attack damage
+//            vec3 dmg_roll = g_get_base_attack_damage(g, atk_id);
+//            dmg = do_roll(dmg_roll);
+//            int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
+//            dmg += atk_bonus;
+//        } else {
+//            // weapon
+//            // we will calculate damage based on weapon attributes
+//            massert(g_has_damage(g, attacker_weapon_id),
+//                    "attacker weapon does not have damage attached");
+//            vec3 dmg_roll = g_get_damage(g, attacker_weapon_id);
+//            dmg = do_roll(dmg_roll);
+//            int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
+//            dmg += atk_bonus;
+//        }
+//        g_set_damaged(g, tgt_id, true);
+//        g_set_update(g, tgt_id, true);
+//        int hp = g_get_stat(g, tgt_id, STATS_HP);
+//        if (hp <= 0) {
+//            merror("Target is already dead, hp was: %d", hp);
+//            g_update_dead(g, tgt_id, true);
+//            return;
+//        }
+//        hp -= dmg;
+//        g_set_stat(g, tgt_id, STATS_HP, hp);
+//        if (tgttype == ENTITY_PLAYER) {
+//            add_message_history(g,
+//                                "%s attacked you for %d damage!",
+//                                g_get_name(g, atk_id).c_str(),
+//                                dmg);
+//        } else if (tgttype == ENTITY_NPC) {
+//            add_message_history(g,
+//                                "%s attacked %s for %d damage!",
+//                                g_get_name(g, atk_id).c_str(),
+//                                g_get_name(g, tgt_id).c_str(),
+//                                dmg);
+//        }
+//        if (hp <= 0) {
+//            g_update_dead(g, tgt_id, true);
+//            if (tgttype == ENTITY_NPC) {
+//                add_message_history(g,
+//                                    "%s killed %s!",
+//                                    g_get_name(g, atk_id).c_str(),
+//                                    g_get_name(g, tgt_id).c_str());
+//                // increment attacker's xp
+//                int old_xp = g_get_stat(g, atk_id, STATS_XP);
+//                massert(old_xp >= 0, "attacker's xp is negative");
+//                int reward_xp = calc_reward_xp(g, atk_id, tgt_id);
+//                massert(reward_xp >= 0, "reward xp is negative");
+//                int new_xp = old_xp + reward_xp;
+//                massert(new_xp >= 0, "new xp is negative");
+//                g_set_stat(g, atk_id, STATS_XP, new_xp);
+//                vec3 loc = g_get_location(g, tgt_id);
+//                vec3 loc_cast = {loc.x, loc.y, loc.z};
+//                entityid id = ENTITYID_INVALID;
+//                while (id == ENTITYID_INVALID)
+//                    id = potion_create(g,
+//                                       loc_cast,
+//                                       POTION_HEALTH_SMALL,
+//                                       "small health potion");
+//            }
+//        } else {
+//            g_update_dead(g, tgt_id, false);
+//        }
+//    } else {
+//        // handle attack miss
+//        if (tgttype == ENTITY_PLAYER)
+//            add_message_history(
+//                g, "%s's attack missed!", g_get_name(g, atk_id).c_str());
+//        else if (tgttype == ENTITY_NPC)
+//            add_message_history(g,
+//                                "%s missed %s!",
+//                                g_get_name(g, atk_id).c_str(),
+//                                g_get_name(g, tgt_id).c_str());
+//    }
+//    //e_set_hp(target, e_get_hp(target) - dmg); // Reduce HP by 1
+//    //if (target->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked you for %d damage!", attacker->name, dmg);
+//    //if (attacker->type == ENTITY_PLAYER) add_message_and_history(g, "%s attacked %s for %d damage!", attacker->name, target->name, dmg);
+//    //if (e_get_hp(target) <= 0) {
+//    //target->dead = true;
+//    //g_update_dead(g, tgt_id, true);
+//    //}
+//}
 
 //static void handle_attack_blocked(gamestate* const g, entityid attacker_id, entityid target_id, bool* atk_successful) {
-/*
-static void handle_attack_blocked(shared_ptr<gamestate> g,
-                                  entityid attacker_id,
-                                  entityid target_id,
-                                  bool* atk_successful) {
-    massert(g, "gamestate is NULL");
-    massert(attacker_id != ENTITYID_INVALID, "attacker entity id is invalid");
-    massert(target_id != ENTITYID_INVALID, "target entity id is invalid");
-    massert(atk_successful, "attack_successful is NULL");
-    *atk_successful = false;
-    g_set_damaged(g, target_id, false);
-    g_set_block_success(g, target_id, true);
-    g_set_update(g, target_id, true);
-    //entitytype_t tgttype = g_get_type(g, target_id);
-    //if (tgttype == ENTITY_PLAYER) {
-    //} else if (tgttype == ENTITY_NPC) {
-    add_message_history(g,
-                        "%s blocked %s's attack!",
-                        g_get_name(g, target_id).c_str(),
-                        g_get_name(g, attacker_id).c_str());
-    //}
-    //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
-}
-*/
+//static void handle_attack_blocked(shared_ptr<gamestate> g,
+//                                  entityid attacker_id,
+//                                  entityid target_id,
+//                                  bool* atk_successful) {
+//    massert(g, "gamestate is NULL");
+//    massert(attacker_id != ENTITYID_INVALID, "attacker entity id is invalid");
+//    massert(target_id != ENTITYID_INVALID, "target entity id is invalid");
+//    massert(atk_successful, "attack_successful is NULL");
+//    *atk_successful = false;
+//    g_set_damaged(g, target_id, false);
+//    g_set_block_success(g, target_id, true);
+//    g_set_update(g, target_id, true);
+//    //entitytype_t tgttype = g_get_type(g, target_id);
+//    //if (tgttype == ENTITY_PLAYER) {
+//    //} else if (tgttype == ENTITY_NPC) {
+//    add_message_history(g,
+//                        "%s blocked %s's attack!",
+//                        g_get_name(g, target_id).c_str(),
+//                        g_get_name(g, attacker_id).c_str());
+//    //}
+//    //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
+//}
 
-/*
-static bool handle_shield_check(shared_ptr<gamestate> g,
-                                entityid attacker_id,
-                                entityid target_id,
-                                int attack_roll,
-                                int base_ac,
-                                bool* attack_successful) {
-    // if you have a shield at all, the attack will get auto-blocked
-    entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
-    if (shield_id != ENTITYID_INVALID) {
-        int shield_ac = g_get_ac(g, shield_id);
-        int total_ac = base_ac + shield_ac;
-        if (attack_roll < total_ac) {
-            *attack_successful = false;
-            handle_attack_blocked(g, attacker_id, target_id, attack_successful);
-            return false;
-        }
-    }
-    msuccess("Attack successful");
-    *attack_successful = true;
-    handle_attack_success(g, attacker_id, target_id, attack_successful);
-    return true;
-}
-*/
+//static bool handle_shield_check(shared_ptr<gamestate> g,
+//                                entityid attacker_id,
+//                                entityid target_id,
+//                                int attack_roll,
+//                                int base_ac,
+//                                bool* attack_successful) {
+//    // if you have a shield at all, the attack will get auto-blocked
+//    entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
+//    if (shield_id != ENTITYID_INVALID) {
+//        int shield_ac = g_get_ac(g, shield_id);
+//        int total_ac = base_ac + shield_ac;
+//        if (attack_roll < total_ac) {
+//            *attack_successful = false;
+//            handle_attack_blocked(g, attacker_id, target_id, attack_successful);
+//            return false;
+//        }
+//    }
+//    msuccess("Attack successful");
+//    *attack_successful = true;
+//    handle_attack_success(g, attacker_id, target_id, attack_successful);
+//    return true;
+//}
 
-/*
-static inline bool handle_attack_helper_innerloop(shared_ptr<gamestate> g,
-                                                  shared_ptr<tile_t> tile,
-                                                  int i,
-                                                  entityid attacker_id,
-                                                  bool* attack_successful) {
-    massert(g, "gamestate is NULL");
-    massert(tile, "tile is NULL");
-    massert(i >= 0, "i is out of bounds");
-    //massert((size_t)i < tile->entity_max, "i is out of bounds");
-    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-    massert(attack_successful, "attack_successful is NULL");
-
-    entityid target_id = tile->entities->at(i);
-
-    if (target_id == ENTITYID_INVALID) return false;
-    entitytype_t type = g_get_type(g, target_id);
-    if (type != ENTITY_PLAYER && type != ENTITY_NPC) return false;
-    if (g_is_dead(g, target_id)) return false;
-    // lets try an experiment...
-    // get the armor class of the target
-    int base_ac = g_get_stat(g, target_id, STATS_AC);
-    int base_str = g_get_stat(g, attacker_id, STATS_STR);
-    int str_bonus = bonus_calc(base_str);
-    int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
-    int attack_roll = rand() % 20 + 1 + str_bonus +
-                      atk_bonus; // 1d20 + str bonus + attack bonus
-    *attack_successful = false;
-    if (attack_roll >= base_ac)
-        return handle_shield_check(
-            g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
-    // attack misses
-    handle_attack_success(g, attacker_id, target_id, attack_successful);
-    return false;
-}
-*/
+//static inline bool handle_attack_helper_innerloop(shared_ptr<gamestate> g,
+//                                                  shared_ptr<tile_t> tile,
+//                                                  int i,
+//                                                  entityid attacker_id,
+//                                                  bool* attack_successful) {
+//    massert(g, "gamestate is NULL");
+//    massert(tile, "tile is NULL");
+//    massert(i >= 0, "i is out of bounds");
+//    //massert((size_t)i < tile->entity_max, "i is out of bounds");
+//    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
+//    massert(attack_successful, "attack_successful is NULL");
+//
+//    entityid target_id = tile->entities->at(i);
+//
+//    if (target_id == ENTITYID_INVALID) return false;
+//    entitytype_t type = g_get_type(g, target_id);
+//    if (type != ENTITY_PLAYER && type != ENTITY_NPC) return false;
+//    if (g_is_dead(g, target_id)) return false;
+//    // lets try an experiment...
+//    // get the armor class of the target
+//    int base_ac = g_get_stat(g, target_id, STATS_AC);
+//    int base_str = g_get_stat(g, attacker_id, STATS_STR);
+//    int str_bonus = bonus_calc(base_str);
+//    int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
+//    int attack_roll = rand() % 20 + 1 + str_bonus +
+//                      atk_bonus; // 1d20 + str bonus + attack bonus
+//    *attack_successful = false;
+//    if (attack_roll >= base_ac)
+//        return handle_shield_check(
+//            g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
+//    // attack misses
+//    handle_attack_success(g, attacker_id, target_id, attack_successful);
+//    return false;
+//}
 
 //static void handle_attack_helper(gamestate* const g, tile_t* tile, entityid attacker_id, bool* successful) {
-/*
-static void handle_attack_helper(shared_ptr<gamestate> g,
-                                 shared_ptr<tile_t> tile,
-                                 entityid attacker_id,
-                                 bool* successful) {
-    massert(g, "gamestate is NULL");
-    massert(tile, "tile is NULL");
-    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-    massert(successful, "attack_successful is NULL");
-    //for (size_t i = 0; i < tile->entity_max; i++) {
-    for (int i = 0; (size_t)i < tile->entities->size(); i++) {
-        handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
-    }
-}
-*/
+//static void handle_attack_helper(shared_ptr<gamestate> g,
+//                                 shared_ptr<tile_t> tile,
+//                                 entityid attacker_id,
+//                                 bool* successful) {
+//    massert(g, "gamestate is NULL");
+//    massert(tile, "tile is NULL");
+//    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
+//    massert(successful, "attack_successful is NULL");
+//    //for (size_t i = 0; i < tile->entity_max; i++) {
+//    for (int i = 0; (size_t)i < tile->entities->size(); i++) {
+//        handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
+//    }
+//}
 
-/*
-static void try_entity_attack(shared_ptr<gamestate> g,
-                              entityid atk_id,
-                              int tgt_x,
-                              int tgt_y) {
-    massert(g, "gamestate is NULL");
-    massert(!g_is_dead(g, atk_id), "attacker entity is dead");
-    vec3 loc = g_get_location(g, atk_id);
-    //dungeon_floor_t* const floor = d_get_floor(g->dungeon, loc.z);
-    shared_ptr<dungeon_floor_t> floor = d_get_floor(g->dungeon, loc.z);
-    massert(floor, "failed to get dungeon floor");
-    //tile_t* const tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
-    shared_ptr<tile_t> tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
-    if (!tile) return;
-    // Calculate direction based on target position
-    bool ok = false;
-    vec3 eloc = g_get_location(g, atk_id);
-    int dx = tgt_x - eloc.x;
-    int dy = tgt_y - eloc.y;
-    g_update_direction(g, atk_id, get_dir_from_xy(dx, dy));
-    g_set_attacking(g, atk_id, true);
-    g_set_update(g, atk_id, true);
-    handle_attack_helper(g, tile, atk_id, &ok);
-    handle_attack_success_gamestate_flag(g, g_get_type(g, atk_id), ok);
-}
-*/
+//static void try_entity_attack(shared_ptr<gamestate> g,
+//                              entityid atk_id,
+//                              int tgt_x,
+//                              int tgt_y) {
+//    massert(g, "gamestate is NULL");
+//    massert(!g_is_dead(g, atk_id), "attacker entity is dead");
+//    vec3 loc = g_get_location(g, atk_id);
+//    //dungeon_floor_t* const floor = d_get_floor(g->dungeon, loc.z);
+//    shared_ptr<dungeon_floor_t> floor = d_get_floor(g->dungeon, loc.z);
+//    massert(floor, "failed to get dungeon floor");
+//    //tile_t* const tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
+//    shared_ptr<tile_t> tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
+//    if (!tile) return;
+//    // Calculate direction based on target position
+//    bool ok = false;
+//    vec3 eloc = g_get_location(g, atk_id);
+//    int dx = tgt_x - eloc.x;
+//    int dy = tgt_y - eloc.y;
+//    g_update_direction(g, atk_id, get_dir_from_xy(dx, dy));
+//    g_set_attacking(g, atk_id, true);
+//    g_set_update(g, atk_id, true);
+//    handle_attack_helper(g, tile, atk_id, &ok);
+//    handle_attack_success_gamestate_flag(g, g_get_type(g, atk_id), ok);
+//}
 
-/*
-static bool
-entities_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1) {
-    massert(g, "gamestate is NULL");
-    massert(id0 != ENTITYID_INVALID, "id0 is invalid");
-    massert(id1 != ENTITYID_INVALID, "id1 is invalid");
-    massert(id0 != id1, "id0 and id1 are the same");
-    // use e0 and check the surrounding 8 tiles
-    for (int y = -1; y <= 1; y++) {
-        for (int x = -1; x <= 1; x++) {
-            if (x == 0 && y == 0) continue;
-            vec3 loc0 = g_get_location(g, id0);
-            vec3 loc1 = g_get_location(g, id1);
-            if (loc0.x + x == loc1.x && loc0.y + y == loc1.y) return true;
-        }
-    }
-    return false;
-}
-*/
+//static bool
+//entities_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1) {
+//    massert(g, "gamestate is NULL");
+//    massert(id0 != ENTITYID_INVALID, "id0 is invalid");
+//    massert(id1 != ENTITYID_INVALID, "id1 is invalid");
+//    massert(id0 != id1, "id0 and id1 are the same");
+//    // use e0 and check the surrounding 8 tiles
+//    for (int y = -1; y <= 1; y++) {
+//        for (int x = -1; x <= 1; x++) {
+//            if (x == 0 && y == 0) continue;
+//            vec3 loc0 = g_get_location(g, id0);
+//            vec3 loc1 = g_get_location(g, id1);
+//            if (loc0.x + x == loc1.x && loc0.y + y == loc1.y) return true;
+//        }
+//    }
+//    return false;
+//}
 
-/*
-static void try_entity_wait(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "Game state is NULL!");
-    massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-    if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    g_set_update(g, id, true);
-}
-*/
+//static void try_entity_wait(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "Game state is NULL!");
+//    massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
+//    if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+//    g_set_update(g, id, true);
+//}
 
-/*
-static void
-execute_action(shared_ptr<gamestate> g, entityid id, entity_action_t action) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entity id is invalid");
-    switch (action) {
-    case ENTITY_ACTION_MOVE_LEFT: try_entity_move(g, id, -1, 0); break;
-    case ENTITY_ACTION_MOVE_RIGHT: try_entity_move(g, id, 1, 0); break;
-    case ENTITY_ACTION_MOVE_UP: try_entity_move(g, id, 0, -1); break;
-    case ENTITY_ACTION_MOVE_DOWN: try_entity_move(g, id, 0, 1); break;
-    case ENTITY_ACTION_MOVE_UP_LEFT: try_entity_move(g, id, -1, -1); break;
-    case ENTITY_ACTION_MOVE_UP_RIGHT: try_entity_move(g, id, 1, -1); break;
-    case ENTITY_ACTION_MOVE_DOWN_LEFT: try_entity_move(g, id, -1, 1); break;
-    case ENTITY_ACTION_MOVE_DOWN_RIGHT: try_entity_move(g, id, 1, 1); break;
-    //case ENTITY_ACTION_ATTACK_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y); break;
-    //case ENTITY_ACTION_ATTACK_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y); break;
-    //case ENTITY_ACTION_ATTACK_UP: try_entity_attack(g, e->id, loc.x, loc.y - 1); break;
-    //case ENTITY_ACTION_ATTACK_DOWN: try_entity_attack(g, e->id, loc.x, loc.y + 1); break;
-    //case ENTITY_ACTION_ATTACK_UP_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y - 1); break;
-    //case ENTITY_ACTION_ATTACK_UP_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y - 1); break;
-    //case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
-    //case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
-    case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, id); break;
-    case ENTITY_ACTION_WAIT: try_entity_wait(g, id); break;
-    //case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
-    //case ENTITY_ACTION_MOVE_PLAYER:
-    //    try_entity_move_player(g, e);
-    //    break;
-    //case ENTITY_ACTION_ATTACK_PLAYER: try_entity_attack_player(g, e); break;
-    //case ENTITY_ACTION_MOVE_ATTACK_PLAYER: try_entity_move_attack_player(g, e); break;
-    case ENTITY_ACTION_MOVE_A_STAR:
-        try_entity_move_a_star(g, id);
-        break;
-        //case ENTITY_ACTION_INTERACT_DOWN_LEFT:
-        //case ENTITY_ACTION_INTERACT_DOWN_RIGHT:
-        //case ENTITY_ACTION_INTERACT_UP_LEFT:
-        //case ENTITY_ACTION_INTERACT_UP_RIGHT:
-        //case ENTITY_ACTION_INTERACT_LEFT:
-        //case ENTITY_ACTION_INTERACT_RIGHT:
-        //case ENTITY_ACTION_INTERACT_UP:
-        //case ENTITY_ACTION_INTERACT_DOWN:
-    case ENTITY_ACTION_NONE:
-        // do nothing
-        break;
-    default: merror("Unknown entity action: %d", action); break;
-    }
-}
-*/
+//static void
+//execute_action(shared_ptr<gamestate> g, entityid id, entity_action_t action) {
+//    massert(g, "gamestate is NULL");
+//    massert(id != ENTITYID_INVALID, "entity id is invalid");
+//    switch (action) {
+//    case ENTITY_ACTION_MOVE_LEFT: try_entity_move(g, id, -1, 0); break;
+//    case ENTITY_ACTION_MOVE_RIGHT: try_entity_move(g, id, 1, 0); break;
+//    case ENTITY_ACTION_MOVE_UP: try_entity_move(g, id, 0, -1); break;
+//    case ENTITY_ACTION_MOVE_DOWN: try_entity_move(g, id, 0, 1); break;
+//    case ENTITY_ACTION_MOVE_UP_LEFT: try_entity_move(g, id, -1, -1); break;
+//    case ENTITY_ACTION_MOVE_UP_RIGHT: try_entity_move(g, id, 1, -1); break;
+//    case ENTITY_ACTION_MOVE_DOWN_LEFT: try_entity_move(g, id, -1, 1); break;
+//    case ENTITY_ACTION_MOVE_DOWN_RIGHT: try_entity_move(g, id, 1, 1); break;
+//    //case ENTITY_ACTION_ATTACK_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y); break;
+//    //case ENTITY_ACTION_ATTACK_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y); break;
+//    //case ENTITY_ACTION_ATTACK_UP: try_entity_attack(g, e->id, loc.x, loc.y - 1); break;
+//    //case ENTITY_ACTION_ATTACK_DOWN: try_entity_attack(g, e->id, loc.x, loc.y + 1); break;
+//    //case ENTITY_ACTION_ATTACK_UP_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y - 1); break;
+//    //case ENTITY_ACTION_ATTACK_UP_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y - 1); break;
+//    //case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
+//    //case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
+//    case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, id); break;
+//    case ENTITY_ACTION_WAIT: try_entity_wait(g, id); break;
+//    //case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
+//    //case ENTITY_ACTION_MOVE_PLAYER:
+//    //    try_entity_move_player(g, e);
+//    //    break;
+//    //case ENTITY_ACTION_ATTACK_PLAYER: try_entity_attack_player(g, e); break;
+//    //case ENTITY_ACTION_MOVE_ATTACK_PLAYER: try_entity_move_attack_player(g, e); break;
+//    case ENTITY_ACTION_MOVE_A_STAR:
+//        try_entity_move_a_star(g, id);
+//        break;
+//        //case ENTITY_ACTION_INTERACT_DOWN_LEFT:
+//        //case ENTITY_ACTION_INTERACT_DOWN_RIGHT:
+//        //case ENTITY_ACTION_INTERACT_UP_LEFT:
+//        //case ENTITY_ACTION_INTERACT_UP_RIGHT:
+//        //case ENTITY_ACTION_INTERACT_LEFT:
+//        //case ENTITY_ACTION_INTERACT_RIGHT:
+//        //case ENTITY_ACTION_INTERACT_UP:
+//        //case ENTITY_ACTION_INTERACT_DOWN:
+//    case ENTITY_ACTION_NONE:
+//        // do nothing
+//        break;
+//    default: merror("Unknown entity action: %d", action); break;
+//    }
+//}
 
 //static vec3* get_locs_around_entity(gamestate* const g, entityid id) {
-/*
-static vec3* get_locs_around_entity(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    //vec3* locs = malloc(sizeof(vec3) * 8);
-    vec3* locs = (vec3*)malloc(sizeof(vec3) * 8);
-    massert(locs, "failed to allocate memory for locs");
-    int index = 0;
-    vec3 oldloc = g_get_location(g, id);
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
-            if (i == 0 && j == 0) continue;
-            locs[index] = (vec3){oldloc.x + i, oldloc.y + j, oldloc.z};
-            index++;
-        }
-    }
-    return locs;
-}
-*/
+//static vec3* get_locs_around_entity(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "gamestate is NULL");
+//    //vec3* locs = malloc(sizeof(vec3) * 8);
+//    vec3* locs = (vec3*)malloc(sizeof(vec3) * 8);
+//    massert(locs, "failed to allocate memory for locs");
+//    int index = 0;
+//    vec3 oldloc = g_get_location(g, id);
+//    for (int i = -1; i <= 1; i++) {
+//        for (int j = -1; j <= 1; j++) {
+//            if (i == 0 && j == 0) continue;
+//            locs[index] = (vec3){oldloc.x + i, oldloc.y + j, oldloc.z};
+//            index++;
+//        }
+//    }
+//    return locs;
+//}
 
 //static inline tile_t* get_first_empty_tile_around_entity(gamestate* const g, entityid id) {
 //static inline shared_ptr<tile_t> get_first_empty_tile_around_entity(shared_ptr<gamestate> g, entityid id) {
@@ -1698,64 +1656,59 @@ static vec3* get_locs_around_entity(shared_ptr<gamestate> g, entityid id) {
 //}
 
 //static vec3 get_random_available_loc(gamestate* const g, int floor) {
-/*
-static vec3 get_random_available_loc(shared_ptr<gamestate> g, int floor) {
-    massert(g, "gamestate is NULL");
-    massert(floor >= 0, "floor is out of bounds");
-    massert(floor < g->d->num_floors, "floor is out of bounds");
+//static vec3 get_random_available_loc(shared_ptr<gamestate> g, int floor) {
+//    massert(g, "gamestate is NULL");
+//    massert(floor >= 0, "floor is out of bounds");
+//    massert(floor < g->d->num_floors, "floor is out of bounds");
+//
+//    int w = g->dungeon->floors->at(floor)->width;
+//    int h = g->dungeon->floors->at(floor)->height;
+//
+//    return get_random_available_loc_in_area(g, floor, 0, 0, w, h);
+//}
 
-    int w = g->dungeon->floors->at(floor)->width;
-    int h = g->dungeon->floors->at(floor)->height;
-
-    return get_random_available_loc_in_area(g, floor, 0, 0, w, h);
-}
-*/
-
-
-/*
-static entityid
-item_create(gamestate* const g, itemtype type, vec3 loc, const char* name) {
-    massert(g, "gamestate is NULL");
-    massert(name && name[0], "name is NULL or empty");
-    massert(type >= 0, "item_type is out of bounds: %s: %d", name, type);
-    massert(type < ITEM_TYPE_COUNT,
-            "item_type is out of bounds: %s: %d",
-            name,
-            type);
-    massert(loc.z >= 0, "z is out of bounds: %s: %d", name, loc.z);
-    massert(
-        loc.z < g->d->num_floors, "z is out of bounds: %s: %d", name, loc.z);
-    dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
-    massert(df, "failed to get current dungeon floor");
-    massert(loc.x >= 0, "x is out of bounds: %s: %d", name, loc.x);
-    massert(loc.x < df->width, "x is out of bounds: %s: %d", name, loc.x);
-    massert(loc.y >= 0, "y is out of bounds: %s: %d", name, loc.y);
-    massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
-    //tile_t* const tile = df_tile_at(df, loc);
-    shared_ptr<tile_t> tile = df_tile_at(df, loc);
-    massert(tile, "failed to get tile");
-    //if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
-    if (!tile_is_walkable(tile->type)) {
-        merror("cannot create entity on wall");
-        return ENTITYID_INVALID;
-    }
-    //if (tile_has_live_npcs(g, tile)) {
-    //    merror("cannot create entity on tile with NPC");
-    //    return ENTITYID_INVALID;
-    //}
-    entityid id = g_add_entity(g);
-    g_add_name(g, id, name);
-    g_add_type(g, id, ENTITY_ITEM);
-    g_add_direction(g, id, DIR_RIGHT);
-    vec3 loc_vec = {loc.x, loc.y, loc.z};
-    g_add_location(g, id, loc_vec);
-    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
-    g_add_update(g, id, false);
-    g_add_itemtype(g, id, type);
-    if (!df_add_at(df, id, loc.x, loc.y)) return ENTITYID_INVALID;
-    return id;
-}
-*/
+//static entityid
+//item_create(gamestate* const g, itemtype type, vec3 loc, const char* name) {
+//    massert(g, "gamestate is NULL");
+//    massert(name && name[0], "name is NULL or empty");
+//    massert(type >= 0, "item_type is out of bounds: %s: %d", name, type);
+//    massert(type < ITEM_TYPE_COUNT,
+//            "item_type is out of bounds: %s: %d",
+//            name,
+//            type);
+//    massert(loc.z >= 0, "z is out of bounds: %s: %d", name, loc.z);
+//    massert(
+//        loc.z < g->d->num_floors, "z is out of bounds: %s: %d", name, loc.z);
+//    dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
+//    massert(df, "failed to get current dungeon floor");
+//    massert(loc.x >= 0, "x is out of bounds: %s: %d", name, loc.x);
+//    massert(loc.x < df->width, "x is out of bounds: %s: %d", name, loc.x);
+//    massert(loc.y >= 0, "y is out of bounds: %s: %d", name, loc.y);
+//    massert(loc.y < df->height, "y is out of bounds: %s: %d", name, loc.y);
+//    //tile_t* const tile = df_tile_at(df, loc);
+//    shared_ptr<tile_t> tile = df_tile_at(df, loc);
+//    massert(tile, "failed to get tile");
+//    //if (!tile_is_walkable(tile->type) || tile_has_live_npcs(g, tile)) {
+//    if (!tile_is_walkable(tile->type)) {
+//        merror("cannot create entity on wall");
+//        return ENTITYID_INVALID;
+//    }
+//    //if (tile_has_live_npcs(g, tile)) {
+//    //    merror("cannot create entity on tile with NPC");
+//    //    return ENTITYID_INVALID;
+//    //}
+//    entityid id = g_add_entity(g);
+//    g_add_name(g, id, name);
+//    g_add_type(g, id, ENTITY_ITEM);
+//    g_add_direction(g, id, DIR_RIGHT);
+//    vec3 loc_vec = {loc.x, loc.y, loc.z};
+//    g_add_location(g, id, loc_vec);
+//    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
+//    g_add_update(g, id, false);
+//    g_add_itemtype(g, id, type);
+//    if (!df_add_at(df, id, loc.x, loc.y)) return ENTITYID_INVALID;
+//    return id;
+//}
 
 //static entityid weapon_create(gamestate* const g, weapontype type, vec3 loc, const char* name) {
 //    massert(g, "gamestate is NULL");
@@ -1813,42 +1766,40 @@ item_create(gamestate* const g, itemtype type, vec3 loc, const char* name) {
 //}
 
 //static void update_player_tiles_explored(gamestate* const g) {
-/*
-static void update_player_tiles_explored(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    entityid hero_id = g->hero_id;
-    massert(hero_id != ENTITYID_INVALID, "hero id is invalid");
-    dungeon_floor_t* df = d_get_floor(g->d, g->d->current_floor);
-    massert(df, "failed to get current dungeon floor");
-    vec3 loc = g_get_location(g, hero_id);
-    // Get the player's light radius
-    int light_radius = g_get_light_radius(g, hero_id);
-    int light_radius_bonus = g_get_entity_total_light_radius_bonus(g, hero_id);
-    light_radius += light_radius_bonus;
-    minfo("hero light radius: %d", light_radius);
-    massert(light_radius > 0, "light radius is negative");
-    // Reveal tiles in a diamond pattern
-    for (int i = -light_radius; i <= light_radius; i++) {
-        for (int j = -light_radius; j <= light_radius; j++) {
-            // Calculate Manhattan distance for diamond shape
-            int dist = abs(i) + abs(j);
-            // Only reveal tiles within the light radius
-            if (dist <= light_radius) {
-                vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
-                // Skip if out of bounds
-                if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 ||
-                    loc2.y >= df->height)
-                    continue;
-                //tile_t* tile = df_tile_at(df, loc2);
-                shared_ptr<tile_t> tile = df_tile_at(df, loc2);
-                massert(tile, "failed to get tile at hero location");
-                tile->explored = true;
-                tile->visible = true;
-            }
-        }
-    }
-}
-*/
+//static void update_player_tiles_explored(shared_ptr<gamestate> g) {
+//    massert(g, "gamestate is NULL");
+//    entityid hero_id = g->hero_id;
+//    massert(hero_id != ENTITYID_INVALID, "hero id is invalid");
+//    dungeon_floor_t* df = d_get_floor(g->d, g->d->current_floor);
+//    massert(df, "failed to get current dungeon floor");
+//    vec3 loc = g_get_location(g, hero_id);
+//    // Get the player's light radius
+//    int light_radius = g_get_light_radius(g, hero_id);
+//    int light_radius_bonus = g_get_entity_total_light_radius_bonus(g, hero_id);
+//    light_radius += light_radius_bonus;
+//    minfo("hero light radius: %d", light_radius);
+//    massert(light_radius > 0, "light radius is negative");
+//    // Reveal tiles in a diamond pattern
+//    for (int i = -light_radius; i <= light_radius; i++) {
+//        for (int j = -light_radius; j <= light_radius; j++) {
+//            // Calculate Manhattan distance for diamond shape
+//            int dist = abs(i) + abs(j);
+//            // Only reveal tiles within the light radius
+//            if (dist <= light_radius) {
+//                vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
+//                // Skip if out of bounds
+//                if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 ||
+//                    loc2.y >= df->height)
+//                    continue;
+//                //tile_t* tile = df_tile_at(df, loc2);
+//                shared_ptr<tile_t> tile = df_tile_at(df, loc2);
+//                massert(tile, "failed to get tile at hero location");
+//                tile->explored = true;
+//                tile->visible = true;
+//            }
+//        }
+//    }
+//}
 
 
 //static vec3* get_empty_non_wall_locs_in_area(dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
@@ -1874,84 +1825,80 @@ static void update_player_tiles_explored(shared_ptr<gamestate> g) {
 //}
 
 //static vec3* get_available_locs_in_area(gamestate* const g, dungeon_floor_t* const df, int* count, int x0, int y0, int w, int h) {
-/*
-static vec3* get_available_locs_in_area(shared_ptr<gamestate> g,
-                                        dungeon_floor_t* const df,
-                                        int* count,
-                                        int x0,
-                                        int y0,
-                                        int w,
-                                        int h) {
-    massert(df, "dungeon floor is NULL");
-    massert(count, "count is NULL");
-    int c = df_count_non_walls_in_area(df, x0, y0, w, h);
-    vec3* locs = (vec3*)malloc(sizeof(vec3) * c);
-    massert(locs, "malloc failed");
-    int i = 0;
-    // given the list of non-walls...
-    // c: count of non-wall tiles in area
-    // i: index and count of locs that dont have living NPCs found
-    // i should never exceed c, but might be less than or equal to c
-    for (int y = 0; y < h && y + y0 < df->height; y++) {
-        for (int x = 0; x < w && x + x0 < df->width; x++) {
-            int newx = x + x0;
-            int newy = y + y0;
-            //tile_t* t = df_tile_at(df, (vec3){newx, newy, df->floor});
-            shared_ptr<tile_t> t =
-                df_tile_at(df, (vec3){newx, newy, df->floor});
-            tiletype_t type = t->type;
-            if (tile_live_npc_count(g, t) == 0 && !tile_has_player(g, t) &&
-                tile_is_walkable(type)) {
-                locs[i++] = (vec3){newx, newy, df->floor};
-            }
-            if (i >= c) {
-                break;
-            }
-        }
-    }
-    // its possible there are no available locations
-    massert(i <= c, "count mismatch: expected %d, got %d", c, i);
-    *count = i;
-    return locs;
-}
-*/
+//static vec3* get_available_locs_in_area(shared_ptr<gamestate> g,
+//                                        dungeon_floor_t* const df,
+//                                        int* count,
+//                                        int x0,
+//                                        int y0,
+//                                        int w,
+//                                        int h) {
+//    massert(df, "dungeon floor is NULL");
+//    massert(count, "count is NULL");
+//    int c = df_count_non_walls_in_area(df, x0, y0, w, h);
+//    vec3* locs = (vec3*)malloc(sizeof(vec3) * c);
+//    massert(locs, "malloc failed");
+//    int i = 0;
+//    // given the list of non-walls...
+//    // c: count of non-wall tiles in area
+//    // i: index and count of locs that dont have living NPCs found
+//    // i should never exceed c, but might be less than or equal to c
+//    for (int y = 0; y < h && y + y0 < df->height; y++) {
+//        for (int x = 0; x < w && x + x0 < df->width; x++) {
+//            int newx = x + x0;
+//            int newy = y + y0;
+//            //tile_t* t = df_tile_at(df, (vec3){newx, newy, df->floor});
+//            shared_ptr<tile_t> t =
+//                df_tile_at(df, (vec3){newx, newy, df->floor});
+//            tiletype_t type = t->type;
+//            if (tile_live_npc_count(g, t) == 0 && !tile_has_player(g, t) &&
+//                tile_is_walkable(type)) {
+//                locs[i++] = (vec3){newx, newy, df->floor};
+//            }
+//            if (i >= c) {
+//                break;
+//            }
+//        }
+//    }
+//    // its possible there are no available locations
+//    massert(i <= c, "count mismatch: expected %d, got %d", c, i);
+//    *count = i;
+//    return locs;
+//}
 
-/*
-static vec3 get_random_available_loc_in_area(gamestate* const g,
-                                             int floor,
-                                             int x0,
-                                             int y0,
-                                             int w,
-                                             int h) {
-    massert(g, "gamestate is NULL");
-    massert(floor >= 0, "floor is out of bounds");
-    massert(floor < g->d->num_floors, "floor is out of bounds");
-    dungeon_floor_t* df = d_get_floor(g->d, floor);
-    massert(df, "failed to get current dungeon floor");
-    massert(x0 >= 0 && x0 < df->width, "x0 is out of bounds");
-    massert(y0 >= 0 && y0 < df->height, "y0 is out of bounds");
-    massert(w > 0 && w <= df->width - x0, "w is out of bounds");
-    massert(h > 0 && h <= df->height - y0, "h is out of bounds");
-    int c = 0;
-    vec3* locs = get_available_locs_in_area(g, df, &c, x0, y0, w, h);
-    massert(locs, "locs is NULL");
-    massert(c >= 0, "locs count is less than 0");
-    if (c == 0) {
-        merror("no available locations found in area (%d, %d, %d, %d)",
-               x0,
-               y0,
-               w,
-               h);
-        free(locs);
-        return (vec3){-1, -1, -1}; // return an invalid location
-    }
-    // pick a random location
-    int index = rand() % c;
-    vec3 loc = locs[index];
-    free(locs);
-    return loc;
-}
-*/
+//static vec3 get_random_available_loc_in_area(gamestate* const g,
+//                                             int floor,
+//                                             int x0,
+//                                             int y0,
+//                                             int w,
+//                                             int h) {
+//    massert(g, "gamestate is NULL");
+//    massert(floor >= 0, "floor is out of bounds");
+//    massert(floor < g->d->num_floors, "floor is out of bounds");
+//    dungeon_floor_t* df = d_get_floor(g->d, floor);
+//    massert(df, "failed to get current dungeon floor");
+//    massert(x0 >= 0 && x0 < df->width, "x0 is out of bounds");
+//    massert(y0 >= 0 && y0 < df->height, "y0 is out of bounds");
+//    massert(w > 0 && w <= df->width - x0, "w is out of bounds");
+//    massert(h > 0 && h <= df->height - y0, "h is out of bounds");
+//    int c = 0;
+//    vec3* locs = get_available_locs_in_area(g, df, &c, x0, y0, w, h);
+//    massert(locs, "locs is NULL");
+//    massert(c >= 0, "locs count is less than 0");
+//    if (c == 0) {
+//        merror("no available locations found in area (%d, %d, %d, %d)",
+//               x0,
+//               y0,
+//               w,
+//               h);
+//        free(locs);
+//        return (vec3){-1, -1, -1}; // return an invalid location
+//    }
+//    // pick a random location
+//    int index = rand() % c;
+//    vec3 loc = locs[index];
+//    free(locs);
+//    return loc;
+//}
 
 //static void init_npcs_test_by_room(gamestate* const g) {
 //    massert(g, "gamestate is NULL");
@@ -2003,115 +1950,105 @@ static vec3 get_random_available_loc_in_area(gamestate* const g,
 //}
 
 
-/*
-*/
+//static void handle_input_gameplay_settings(const inputstate* const is,
+//                                           gamestate* const g) {
+//    massert(is, "Input state is NULL!");
+//    massert(g, "Game state is NULL!");
+//
+//    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+//        g->controlmode = CONTROLMODE_PLAYER;
+//        g->display_gameplay_settings_menu = false;
+//        g->display_inventory_menu = false;
+//        return;
+//    }
+//
+//    // Cycle between settings and inventory menus
+//    if (inputstate_is_pressed(is, KEY_LEFT) ||
+//        inputstate_is_pressed(is, KEY_RIGHT)) {
+//        g->controlmode = CONTROLMODE_INVENTORY;
+//        g->display_gameplay_settings_menu = false;
+//        g->display_inventory_menu = true;
+//        return;
+//    }
+//
+//    // Handle menu navigation
+//    int max_selections = 2; // 0: Music Volume, 1: Back
+//    if (inputstate_is_pressed(is, KEY_UP)) {
+//        //g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection - 1 + 3) % 3;
+//        g->gameplay_settings_menu_selection =
+//            (g->gameplay_settings_menu_selection - 1 + max_selections) %
+//            max_selections;
+//        g->frame_dirty = true;
+//    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+//        g->gameplay_settings_menu_selection =
+//            (g->gameplay_settings_menu_selection + 1) % max_selections;
+//        g->frame_dirty = true;
+//    }
+//
+//    // Handle menu item selection
+//    if (g->gameplay_settings_menu_selection == 0) {
+//        // Music Volume
+//        if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
+//            g->music_volume =
+//                g->music_volume > 0 ? g->music_volume - 0.1f : 0.0f;
+//            g->music_volume_changed = true;
+//        } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
+//            g->music_volume =
+//                g->music_volume < 1 ? g->music_volume + 0.1f : 1.0f;
+//            g->music_volume_changed = true;
+//        }
+//
+//    } else if (g->gameplay_settings_menu_selection == 0) {
+//        // Back
+//        if (inputstate_is_pressed(is, KEY_ENTER) ||
+//            inputstate_is_pressed(is, KEY_SPACE)) {
+//            g->controlmode = CONTROLMODE_PLAYER;
+//            g->display_gameplay_settings_menu = false;
+//        }
+//    }
+//}
 
+//static void handle_sort_inventory(gamestate* const g) {
+//    g->display_sort_inventory_menu = false;
+//    // we need to sort the inventory based on the selected type
+//    inventory_sort sort_type = (inventory_sort)g->sort_inventory_menu_selection;
+//    size_t count = 0;
+//    entityid* inventory = g_get_inventory(g, g->hero_id, &count);
+//    massert(inventory, "inventory is NULL");
+//    massert(count >= 0, "inventory count is less than 0");
+//    // sort the inventory
+//    entityid* sorted_inventory =
+//        g_sort_inventory(g, inventory, count, sort_type);
+//    massert(sorted_inventory, "sorted inventory is NULL");
+//
+//    // now we have our original inventory and our sorted inventory...
+//    g_update_inventory(g, g->hero_id, sorted_inventory, count);
+//}
 
-/*
-static void handle_input_gameplay_settings(const inputstate* const is,
-                                           gamestate* const g) {
-    massert(is, "Input state is NULL!");
-    massert(g, "Game state is NULL!");
-
-    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-        g->controlmode = CONTROLMODE_PLAYER;
-        g->display_gameplay_settings_menu = false;
-        g->display_inventory_menu = false;
-        return;
-    }
-
-    // Cycle between settings and inventory menus
-    if (inputstate_is_pressed(is, KEY_LEFT) ||
-        inputstate_is_pressed(is, KEY_RIGHT)) {
-        g->controlmode = CONTROLMODE_INVENTORY;
-        g->display_gameplay_settings_menu = false;
-        g->display_inventory_menu = true;
-        return;
-    }
-
-    // Handle menu navigation
-    int max_selections = 2; // 0: Music Volume, 1: Back
-    if (inputstate_is_pressed(is, KEY_UP)) {
-        //g->gameplay_settings_menu_selection = (g->gameplay_settings_menu_selection - 1 + 3) % 3;
-        g->gameplay_settings_menu_selection =
-            (g->gameplay_settings_menu_selection - 1 + max_selections) %
-            max_selections;
-        g->frame_dirty = true;
-    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
-        g->gameplay_settings_menu_selection =
-            (g->gameplay_settings_menu_selection + 1) % max_selections;
-        g->frame_dirty = true;
-    }
-
-    // Handle menu item selection
-    if (g->gameplay_settings_menu_selection == 0) {
-        // Music Volume
-        if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
-            g->music_volume =
-                g->music_volume > 0 ? g->music_volume - 0.1f : 0.0f;
-            g->music_volume_changed = true;
-        } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
-            g->music_volume =
-                g->music_volume < 1 ? g->music_volume + 0.1f : 1.0f;
-            g->music_volume_changed = true;
-        }
-
-    } else if (g->gameplay_settings_menu_selection == 0) {
-        // Back
-        if (inputstate_is_pressed(is, KEY_ENTER) ||
-            inputstate_is_pressed(is, KEY_SPACE)) {
-            g->controlmode = CONTROLMODE_PLAYER;
-            g->display_gameplay_settings_menu = false;
-        }
-    }
-}
-*/
-
-/*
-static void handle_sort_inventory(gamestate* const g) {
-    g->display_sort_inventory_menu = false;
-    // we need to sort the inventory based on the selected type
-    inventory_sort sort_type = (inventory_sort)g->sort_inventory_menu_selection;
-    size_t count = 0;
-    entityid* inventory = g_get_inventory(g, g->hero_id, &count);
-    massert(inventory, "inventory is NULL");
-    massert(count >= 0, "inventory count is less than 0");
-    // sort the inventory
-    entityid* sorted_inventory =
-        g_sort_inventory(g, inventory, count, sort_type);
-    massert(sorted_inventory, "sorted inventory is NULL");
-
-    // now we have our original inventory and our sorted inventory...
-    g_update_inventory(g, g->hero_id, sorted_inventory, count);
-}
-*/
-
-/*
-static void handle_input_sort_inventory(const inputstate* const is,
-                                        gamestate* const g) {
-    massert(is, "Input state is NULL!");
-    massert(g, "Game state is NULL!");
-    if (inputstate_is_pressed(is, KEY_UP)) {
-        minfo("sort inv menu--");
-        g->sort_inventory_menu_selection--;
-        if (g->sort_inventory_menu_selection < 0) {
-            g->sort_inventory_menu_selection =
-                g->sort_inventory_menu_selection_max - 1;
-        }
-    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
-        minfo("sort inv menu++");
-        g->sort_inventory_menu_selection++;
-        if (g->sort_inventory_menu_selection >=
-            g->sort_inventory_menu_selection_max) {
-            g->sort_inventory_menu_selection = 0;
-        }
-    } else if (inputstate_is_pressed(is, KEY_S) ||
-               inputstate_is_pressed(is, KEY_ENTER) ||
-               inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-        handle_sort_inventory(g);
-    }
-}
-*/
+//static void handle_input_sort_inventory(const inputstate* const is,
+//                                        gamestate* const g) {
+//    massert(is, "Input state is NULL!");
+//    massert(g, "Game state is NULL!");
+//    if (inputstate_is_pressed(is, KEY_UP)) {
+//        minfo("sort inv menu--");
+//        g->sort_inventory_menu_selection--;
+//        if (g->sort_inventory_menu_selection < 0) {
+//            g->sort_inventory_menu_selection =
+//                g->sort_inventory_menu_selection_max - 1;
+//        }
+//    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+//        minfo("sort inv menu++");
+//        g->sort_inventory_menu_selection++;
+//        if (g->sort_inventory_menu_selection >=
+//            g->sort_inventory_menu_selection_max) {
+//            g->sort_inventory_menu_selection = 0;
+//        }
+//    } else if (inputstate_is_pressed(is, KEY_S) ||
+//               inputstate_is_pressed(is, KEY_ENTER) ||
+//               inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+//        handle_sort_inventory(g);
+//    }
+//}
 
 static void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
@@ -2276,8 +2213,6 @@ static void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamesta
     //        }
     //    }
 }
-/*
-*/
 
 
 static bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
@@ -2564,103 +2499,99 @@ static bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
 //} else {
 //    merror("No action found for key");
 //}
-/*
-*/
 
 
-/*
-static void try_entity_traverse_floors(gamestate* const g, entityid id) {
-    vec3 loc = g_get_location(g, id);
-    vec3 loc_cast = {loc.x, loc.y, loc.z};
-    dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
-    massert(df, "Dungeon floor is NULL!");
-    //tile_t* const tile = df_tile_at(df, loc_cast);
-    shared_ptr<tile_t> tile = df_tile_at(df, loc_cast);
-    massert(tile, "Tile is NULL!");
-    entitytype_t type = g_get_type(g, id);
-    if (tile->type == TILE_UPSTAIRS) {
-        // we need to check if the player is on the stairs
-        // and if so, we need to move them up a floor
-        //g_traverse_up(g, g->hero_id);
-        // we need to check to see which floor we are currently on
-        if (g->d->current_floor > 0) {
-            if (id == g->hero_id) {
-                add_message(g, "You ascend the stairs");
-                if (!df_remove_at(df, id, loc.x, loc.y)) return;
-                vec3 next_downstairs_loc =
-                    df_get_downstairs(g->d->floors[g->d->current_floor - 1]);
-                massert(next_downstairs_loc.x != -1 &&
-                            next_downstairs_loc.y != -1,
-                        "Failed to get next downstairs location");
-                // we need to set the player's location to the corresponding TILE_downstairs
-                next_downstairs_loc.z = g->d->current_floor - 1;
-                vec3 next_downstairs_loc_vec3 = {next_downstairs_loc.x,
-                                                 next_downstairs_loc.y,
-                                                 next_downstairs_loc.z};
-                g_update_location(g, id, next_downstairs_loc_vec3);
-                // we need to set the player's floor to the next floor
-                g->d->current_floor--;
-                // get the next dungeon floor
-                dungeon_floor_t* const next_floor =
-                    d_get_floor(g->d, g->d->current_floor);
-                int ex = next_downstairs_loc.x;
-                int ey = next_downstairs_loc.y;
-                if (!df_add_at(next_floor, id, ex, ey)) return;
-                if (id == g->hero_id) {
-                    update_player_tiles_explored(g);
-                }
-                if (type == ENTITY_PLAYER) {
-                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-                }
-            }
-        } else {
-            if (id == g->hero_id) {
-                add_message(g, "You are already at the top floor");
-            }
-        }
-    } else if (tile->type == TILE_DOWNSTAIRS) {
-        // we need to check if the player is on the stairs
-        // and if so, we need to move them down a floor
-        //g_traverse_down(g, g->hero_id);
-        if (g->d->current_floor < g->d->num_floors - 1) {
-            if (id == g->hero_id) {
-                add_message(g, "You descend the stairs");
-                if (!df_remove_at(df, id, loc.x, loc.y)) {
-                    merror("Failed to remove entity from old tile");
-                    return;
-                }
-                vec3 next_upstairs_loc =
-                    df_get_upstairs(g->d->floors[g->d->current_floor + 1]);
-                massert(next_upstairs_loc.x != -1 && next_upstairs_loc.y != -1,
-                        "Failed to get next upstairs location");
-                // we need to set the player's location to the corresponding TILE_UPSTAIRS
-                next_upstairs_loc.z = g->d->current_floor + 1;
-                vec3 next_upstairs_loc_vec3 = {next_upstairs_loc.x,
-                                               next_upstairs_loc.y,
-                                               next_upstairs_loc.z};
-                g_update_location(g, id, next_upstairs_loc_vec3);
-                // we need to set the player's floor to the next floor
-                g->d->current_floor++;
-                // get the next dungeon floor
-                dungeon_floor_t* const next_floor =
-                    d_get_floor(g->d, g->d->current_floor);
-                int ex = next_upstairs_loc.x;
-                int ey = next_upstairs_loc.y;
-                if (!df_add_at(next_floor, id, ex, ey)) {
-                    merror("Failed to add entity to new tile");
-                    return;
-                }
-                if (id == g->hero_id) update_player_tiles_explored(g);
-                if (type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            }
-        } else {
-            if (id == g->hero_id) {
-                add_message(g, "You are already at the bottom floor");
-            }
-        }
-    }
-}
-*/
+//static void try_entity_traverse_floors(gamestate* const g, entityid id) {
+//    vec3 loc = g_get_location(g, id);
+//    vec3 loc_cast = {loc.x, loc.y, loc.z};
+//    dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
+//    massert(df, "Dungeon floor is NULL!");
+//    //tile_t* const tile = df_tile_at(df, loc_cast);
+//    shared_ptr<tile_t> tile = df_tile_at(df, loc_cast);
+//    massert(tile, "Tile is NULL!");
+//    entitytype_t type = g_get_type(g, id);
+//    if (tile->type == TILE_UPSTAIRS) {
+//        // we need to check if the player is on the stairs
+//        // and if so, we need to move them up a floor
+//        //g_traverse_up(g, g->hero_id);
+//        // we need to check to see which floor we are currently on
+//        if (g->d->current_floor > 0) {
+//            if (id == g->hero_id) {
+//                add_message(g, "You ascend the stairs");
+//                if (!df_remove_at(df, id, loc.x, loc.y)) return;
+//                vec3 next_downstairs_loc =
+//                    df_get_downstairs(g->d->floors[g->d->current_floor - 1]);
+//                massert(next_downstairs_loc.x != -1 &&
+//                            next_downstairs_loc.y != -1,
+//                        "Failed to get next downstairs location");
+//                // we need to set the player's location to the corresponding TILE_downstairs
+//                next_downstairs_loc.z = g->d->current_floor - 1;
+//                vec3 next_downstairs_loc_vec3 = {next_downstairs_loc.x,
+//                                                 next_downstairs_loc.y,
+//                                                 next_downstairs_loc.z};
+//                g_update_location(g, id, next_downstairs_loc_vec3);
+//                // we need to set the player's floor to the next floor
+//                g->d->current_floor--;
+//                // get the next dungeon floor
+//                dungeon_floor_t* const next_floor =
+//                    d_get_floor(g->d, g->d->current_floor);
+//                int ex = next_downstairs_loc.x;
+//                int ey = next_downstairs_loc.y;
+//                if (!df_add_at(next_floor, id, ex, ey)) return;
+//                if (id == g->hero_id) {
+//                    update_player_tiles_explored(g);
+//                }
+//                if (type == ENTITY_PLAYER) {
+//                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+//                }
+//            }
+//        } else {
+//            if (id == g->hero_id) {
+//                add_message(g, "You are already at the top floor");
+//            }
+//        }
+//    } else if (tile->type == TILE_DOWNSTAIRS) {
+//        // we need to check if the player is on the stairs
+//        // and if so, we need to move them down a floor
+//        //g_traverse_down(g, g->hero_id);
+//        if (g->d->current_floor < g->d->num_floors - 1) {
+//            if (id == g->hero_id) {
+//                add_message(g, "You descend the stairs");
+//                if (!df_remove_at(df, id, loc.x, loc.y)) {
+//                    merror("Failed to remove entity from old tile");
+//                    return;
+//                }
+//                vec3 next_upstairs_loc =
+//                    df_get_upstairs(g->d->floors[g->d->current_floor + 1]);
+//                massert(next_upstairs_loc.x != -1 && next_upstairs_loc.y != -1,
+//                        "Failed to get next upstairs location");
+//                // we need to set the player's location to the corresponding TILE_UPSTAIRS
+//                next_upstairs_loc.z = g->d->current_floor + 1;
+//                vec3 next_upstairs_loc_vec3 = {next_upstairs_loc.x,
+//                                               next_upstairs_loc.y,
+//                                               next_upstairs_loc.z};
+//                g_update_location(g, id, next_upstairs_loc_vec3);
+//                // we need to set the player's floor to the next floor
+//                g->d->current_floor++;
+//                // get the next dungeon floor
+//                dungeon_floor_t* const next_floor =
+//                    d_get_floor(g->d, g->d->current_floor);
+//                int ex = next_upstairs_loc.x;
+//                int ey = next_upstairs_loc.y;
+//                if (!df_add_at(next_floor, id, ex, ey)) {
+//                    merror("Failed to add entity to new tile");
+//                    return;
+//                }
+//                if (id == g->hero_id) update_player_tiles_explored(g);
+//                if (type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+//            }
+//        } else {
+//            if (id == g->hero_id) {
+//                add_message(g, "You are already at the bottom floor");
+//            }
+//        }
+//    }
+//}
 
 
 //if (g->display_quit_menu) {
@@ -2681,102 +2612,100 @@ static void try_entity_traverse_floors(gamestate* const g, entityid id) {
 //    return;
 //}
 
-/*
-    if (g->current_scene == SCENE_GAMEPLAY) {
-        if (g->gameover) {
-            //if (inputstate_any_pressed(is)) liblogic_restart(g);
-            //if (inputstate_any_pressed(is)) {
-            if (inputstate_is_pressed(is, KEY_ENTER) ||
-                inputstate_is_pressed(is, KEY_SPACE)) {
-                liblogic_restart(g);
-            }
-            return;
-        }
-        //printf("Current control mode: %d\n", g->controlmode);
+//    if (g->current_scene == SCENE_GAMEPLAY) {
+//        if (g->gameover) {
+//            //if (inputstate_any_pressed(is)) liblogic_restart(g);
+//            //if (inputstate_any_pressed(is)) {
+//            if (inputstate_is_pressed(is, KEY_ENTER) ||
+//                inputstate_is_pressed(is, KEY_SPACE)) {
+//                liblogic_restart(g);
+//            }
+//            return;
+//        }
+//printf("Current control mode: %d\n", g->controlmode);
 
-        switch (g->controlmode) {
-        case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
-        case CONTROLMODE_INVENTORY: handle_input_inventory(is, g); break;
-        case CONTROLMODE_GAMEPLAY_SETTINGS:
-            handle_input_gameplay_settings(is, g);
-            break;
-        case CONTROLMODE_HELP: handle_input_help_menu(is, g); break;
-        default: merror("Unknown control mode: %d", g->controlmode); break;
-        }
-
-    } else if (g->current_scene == SCENE_TITLE) {
-        //if (inputstate_any_pressed(is)) {
-        if (inputstate_is_pressed(is, KEY_ENTER) ||
-            inputstate_is_pressed(is, KEY_SPACE)) {
-            //minfo("Title screen input detected, switching to main menu");
-            g->current_scene = SCENE_MAIN_MENU;
-            g->frame_dirty = true;
-        }
-    } else if (g->current_scene == SCENE_MAIN_MENU) {
-        if (inputstate_is_pressed(is, KEY_DOWN)) {
-            g->frame_dirty = true;
-            //if (g->title_screen_selection == g->max_title_screen_selections - 1) {
-            //    g->title_screen_selection = 0;
-            //} else {
-            //    g->title_screen_selection++;
-            //}
-            //minfo("Title screen selection: %d", g->title_screen_selection);
-        } else if (inputstate_is_pressed(is, KEY_UP)) {
-            g->frame_dirty = true;
-            //if (g->title_screen_selection == 0) {
-            //    g->title_screen_selection = g->max_title_screen_selections - 1;
-            //} else {
-            //    g->title_screen_selection--;
-            //}
-            //minfo("Title screen selection: %d", g->title_screen_selection);
-
-        } else if (inputstate_is_pressed(is, KEY_ENTER)) {
-            if (g->title_screen_selection == 0) {
-                g->current_scene = SCENE_CHARACTER_CREATION;
-                g->frame_dirty = true;
-            }
-        }
-        //else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-        //    g->do_quit = true;
-        //}
-
-    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
-        //if (inputstate_any_pressed(is)) {
-        if (inputstate_is_pressed(is, KEY_ENTER)) {
-            minfo("Character creation");
-            // we need to copy the character creation stats to the hero entity
-            // hero has already been created, so its id is available
-            g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
-            g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
-            g_set_stat(
-                g, g->hero_id, STATS_CON, g->chara_creation.constitution);
-            int hitdie = 8;
-            int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) +
-                             bonus_calc(g->chara_creation.constitution);
-            while (maxhp_roll < 1) {
-                maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) +
-                             bonus_calc(g->chara_creation.constitution);
-            }
-            g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
-            g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
-            g->current_scene = SCENE_GAMEPLAY;
-            g->frame_dirty = true;
-        } else if (inputstate_is_pressed(is, KEY_SPACE)) {
-            // re-roll character creation stats
-            g->frame_dirty = true;
-            g->chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
-            g->chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
-            g->chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
-        } else if (inputstate_is_pressed(is, KEY_LEFT)) {
-            // change race/class
-            g->frame_dirty = true;
-        } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
-            // change race/class
-            g->frame_dirty = true;
-        }
-    } else {
-    }
-*/
+//        switch (g->controlmode) {
+//        case CONTROLMODE_PLAYER: handle_input_player(is, g); break;
+//        case CONTROLMODE_INVENTORY: handle_input_inventory(is, g); break;
+//        case CONTROLMODE_GAMEPLAY_SETTINGS:
+//            handle_input_gameplay_settings(is, g);
+//            break;
+//        case CONTROLMODE_HELP: handle_input_help_menu(is, g); break;
+//        default: merror("Unknown control mode: %d", g->controlmode); break;
+//        }
+//
+//    } else if (g->current_scene == SCENE_TITLE) {
+//        //if (inputstate_any_pressed(is)) {
+//        if (inputstate_is_pressed(is, KEY_ENTER) ||
+//            inputstate_is_pressed(is, KEY_SPACE)) {
+//            //minfo("Title screen input detected, switching to main menu");
+//            g->current_scene = SCENE_MAIN_MENU;
+//            g->frame_dirty = true;
+//        }
+//    } else if (g->current_scene == SCENE_MAIN_MENU) {
+//        if (inputstate_is_pressed(is, KEY_DOWN)) {
+//            g->frame_dirty = true;
+//            //if (g->title_screen_selection == g->max_title_screen_selections - 1) {
+//            //    g->title_screen_selection = 0;
+//            //} else {
+//            //    g->title_screen_selection++;
+//            //}
+//            //minfo("Title screen selection: %d", g->title_screen_selection);
+//        } else if (inputstate_is_pressed(is, KEY_UP)) {
+//            g->frame_dirty = true;
+//            //if (g->title_screen_selection == 0) {
+//            //    g->title_screen_selection = g->max_title_screen_selections - 1;
+//            //} else {
+//            //    g->title_screen_selection--;
+//            //}
+//            //minfo("Title screen selection: %d", g->title_screen_selection);
+//
+//        } else if (inputstate_is_pressed(is, KEY_ENTER)) {
+//            if (g->title_screen_selection == 0) {
+//                g->current_scene = SCENE_CHARACTER_CREATION;
+//                g->frame_dirty = true;
+//            }
+//        }
+//        //else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+//        //    g->do_quit = true;
+//        //}
+//
+//    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+//        //if (inputstate_any_pressed(is)) {
+//        if (inputstate_is_pressed(is, KEY_ENTER)) {
+//            minfo("Character creation");
+//            // we need to copy the character creation stats to the hero entity
+//            // hero has already been created, so its id is available
+//            g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
+//            g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
+//            g_set_stat(
+//                g, g->hero_id, STATS_CON, g->chara_creation.constitution);
+//            int hitdie = 8;
+//            int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) +
+//                             bonus_calc(g->chara_creation.constitution);
+//            while (maxhp_roll < 1) {
+//                maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0}) +
+//                             bonus_calc(g->chara_creation.constitution);
+//            }
+//            g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
+//            g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
+//            g->current_scene = SCENE_GAMEPLAY;
+//            g->frame_dirty = true;
+//        } else if (inputstate_is_pressed(is, KEY_SPACE)) {
+//            // re-roll character creation stats
+//            g->frame_dirty = true;
+//            g->chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
+//            g->chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
+//            g->chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
+//        } else if (inputstate_is_pressed(is, KEY_LEFT)) {
+//            // change race/class
+//            g->frame_dirty = true;
+//        } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
+//            // change race/class
+//            g->frame_dirty = true;
+//        }
+//    } else {
+//    }
 
 
 //static void handle_input_help_menu(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
@@ -2791,69 +2720,60 @@ static void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstat
 }
 
 
-/*
-static int get_hitdie_for_race(race_t race) {
-    int hit_die = 4;
-    switch (race) {
-    case RACE_GREEN_SLIME: hit_die = 4; break;
-    case RACE_BAT: hit_die = 4; break;
-    case RACE_HALFLING: hit_die = 6; break;
-    case RACE_GOBLIN: hit_die = 6; break;
-    case RACE_WOLF: hit_die = 6; break;
-    case RACE_HUMAN: hit_die = 8; break;
-    case RACE_ELF: hit_die = 8; break;
-    case RACE_DWARF: hit_die = 8; break;
-    case RACE_ORC: hit_die = 10; break;
-    case RACE_WARG: hit_die = 12; break;
-    default: break;
-    }
-    return hit_die;
-}
-*/
+//static int get_hitdie_for_race(race_t race) {
+//    int hit_die = 4;
+//    switch (race) {
+//    case RACE_GREEN_SLIME: hit_die = 4; break;
+//    case RACE_BAT: hit_die = 4; break;
+//    case RACE_HALFLING: hit_die = 6; break;
+//    case RACE_GOBLIN: hit_die = 6; break;
+//    case RACE_WOLF: hit_die = 6; break;
+//    case RACE_HUMAN: hit_die = 8; break;
+//    case RACE_ELF: hit_die = 8; break;
+//    case RACE_DWARF: hit_die = 8; break;
+//    case RACE_ORC: hit_die = 10; break;
+//    case RACE_WARG: hit_die = 12; break;
+//    default: break;
+//    }
+//    return hit_die;
+//}
 
-/*
-static vec3 get_base_attack_damage_for_race(race_t race) {
-    vec3 r = {1, 4, 0}; // Default base attack damage
-    switch (race) {
-    case RACE_GREEN_SLIME: r = (vec3){1, 1, 0}; break;
-    case RACE_BAT: r = (vec3){1, 2, 0}; break;
-    case RACE_HALFLING: r = (vec3){1, 4, 0}; break;
-    case RACE_GOBLIN: r = (vec3){1, 4, 0}; break;
-    case RACE_WOLF: r = (vec3){1, 6, 0}; break;
-    case RACE_HUMAN: r = (vec3){1, 4, 0}; break;
-    case RACE_ELF: r = (vec3){1, 4, 0}; break;
-    case RACE_DWARF: r = (vec3){1, 4, 0}; break;
-    case RACE_ORC: r = (vec3){1, 6, 0}; break;
-    case RACE_WARG: r = (vec3){1, 12, 0}; break;
-    default: break;
-    }
-    return r;
-}
-*/
+//static vec3 get_base_attack_damage_for_race(race_t race) {
+//    vec3 r = {1, 4, 0}; // Default base attack damage
+//    switch (race) {
+//    case RACE_GREEN_SLIME: r = (vec3){1, 1, 0}; break;
+//    case RACE_BAT: r = (vec3){1, 2, 0}; break;
+//    case RACE_HALFLING: r = (vec3){1, 4, 0}; break;
+//    case RACE_GOBLIN: r = (vec3){1, 4, 0}; break;
+//    case RACE_WOLF: r = (vec3){1, 6, 0}; break;
+//    case RACE_HUMAN: r = (vec3){1, 4, 0}; break;
+//    case RACE_ELF: r = (vec3){1, 4, 0}; break;
+//    case RACE_DWARF: r = (vec3){1, 4, 0}; break;
+//    case RACE_ORC: r = (vec3){1, 6, 0}; break;
+//    case RACE_WARG: r = (vec3){1, 12, 0}; break;
+//    default: break;
+//    }
+//    return r;
+//}
 
 
-/*
-*/
-
-/*
-static race_t get_random_race_for_floor(int floor) {
-    race_t race = RACE_NONE;
-    if (floor == 0) {
-        return RACE_GREEN_SLIME;
-    } else if (floor >= 1 && floor <= 4) {
-        int num_choices = 3;
-        int choice = rand() % num_choices;
-        switch (choice) {
-        case 0: race = RACE_GREEN_SLIME; break;
-        case 1: race = RACE_BAT; break;
-        case 2: race = RACE_WOLF; break;
-        default: break;
-        }
-        return race;
-    }
-    return get_random_race();
-}
-*/
+//static race_t get_random_race_for_floor(int floor) {
+//    race_t race = RACE_NONE;
+//    if (floor == 0) {
+//        return RACE_GREEN_SLIME;
+//    } else if (floor >= 1 && floor <= 4) {
+//        int num_choices = 3;
+//        int choice = rand() % num_choices;
+//        switch (choice) {
+//        case 0: race = RACE_GREEN_SLIME; break;
+//        case 1: race = RACE_BAT; break;
+//        case 2: race = RACE_WOLF; break;
+//        default: break;
+//        }
+//        return race;
+//    }
+//    return get_random_race();
+//}
 
 
 static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc) {
@@ -2957,32 +2877,25 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
                 int current_floor = g->dungeon->current_floor;
                 //vec3 loc = get_random_available_loc(g, current_floor);
                 // generate a random location for NPC spawn
-
                 int x = rand() % g->dungeon->floors->at(current_floor)->width + 1;
                 int y = rand() % g->dungeon->floors->at(current_floor)->height + 1;
                 // Get the tile at that location and check the type of the tile
                 // If the tile is not walkable, success is still invalid and we should continue
-
                 vec3 loc = {x, y, current_floor};
                 //if (loc.x == -1 && loc.y == -1 && loc.z == -1) {
                 //    merror("No available location found for NPC spawn");
                 //    return; // No valid location found, exit early
                 //}
-
-
                 shared_ptr<tile_t> tile = df_tile_at(g->dungeon->floors->at(current_floor), loc);
                 if (!tile || tile_is_walkable(tile->type) == false) {
                     merror("Tile at %d, %d, %d is not walkable", x, y, current_floor);
                     continue; // Tile is not walkable, try again
                 }
-
-
                 // if the tile contains entities, try again
                 if (tile_has_live_npcs(g, tile)) {
                     merror("Tile is not empty");
                     continue;
                 }
-
                 //if (x > g->dungeon->floors->at(current_floor)->width) {
                 //    x = 1; // Reset x to 1 if it exceeds width
                 //}
@@ -2991,7 +2904,6 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
                 //}
                 race_t race = get_random_race();
                 //race_t race = RACE_ORC;
-
                 success = create_npc_set_stats(g, loc, race);
             }
             do_this_once = false;
@@ -3018,60 +2930,54 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
 //    }
 //}
 
-/*
-static void handle_level_up(gamestate* const g, entityid id) {
-    int level = g_get_stat(g, id, STATS_LEVEL);
-    // Level up the entity
-    level++;
-    g_set_stat(g, id, STATS_LEVEL, level);
-    //int test_level = g_get_stat(g, id, STATS_LEVEL);
-    massert(g_get_stat(g, id, STATS_LEVEL) == level, "Failed to set level");
-    // Increase attack bonus
-    int old_attack_bonus = g_get_stat(g, id, STATS_ATTACK_BONUS);
-    int new_attack_bonus = old_attack_bonus + 1; // Example: increase by 1
-    g_set_stat(g, id, STATS_ATTACK_BONUS, new_attack_bonus);
-    // Increase max HP based on Constitution bonus
-    int con_bonus = bonus_calc(g_get_stat(g, id, STATS_CON));
-    if (con_bonus < 0)
-        con_bonus = 0; // Ensure Constitution bonus is not negative
-    int hitdie = g_get_stat(g, id, STATS_HITDIE);
-    // roll the hitdie
-    vec3 r = {1, hitdie, 0}; // 1d(hitdie)
-    int hp_gain = do_roll(r) + con_bonus; // Add Constitution bonus to HP gain
-    int old_max_hp = g_get_stat(g, id, STATS_MAXHP);
-    int new_max_hp =
-        old_max_hp + hp_gain; // Increase max HP by the rolled amount
-    if (new_max_hp <= old_max_hp)
-        new_max_hp = old_max_hp + 1; // Ensure max HP increases
-    int new_next_level_xp = calc_next_lvl_xp(g, id);
-    g_set_stat(g, id, STATS_MAXHP, new_max_hp);
-    g_set_stat(g, id, STATS_HP, new_max_hp); // Restore HP to max
-    // Set next level XP requirement (example: 1000 XP for next level)
-    g_set_stat(g, id, STATS_NEXT_LEVEL_XP, new_next_level_xp);
-    if (id == g->hero_id) {
-        add_message_and_history(g, "You leveled up!");
-        add_message_and_history(g, "Level %d", level);
-        add_message_and_history(g, "Max HP increased to %d", new_max_hp);
-    } else {
-        msuccess(
-            "NPC %d leveled up to Level %d with %d HP", id, level, new_max_hp);
-    }
-}
-*/
+//static void handle_level_up(gamestate* const g, entityid id) {
+//    int level = g_get_stat(g, id, STATS_LEVEL);
+//    // Level up the entity
+//    level++;
+//    g_set_stat(g, id, STATS_LEVEL, level);
+//    //int test_level = g_get_stat(g, id, STATS_LEVEL);
+//    massert(g_get_stat(g, id, STATS_LEVEL) == level, "Failed to set level");
+//    // Increase attack bonus
+//    int old_attack_bonus = g_get_stat(g, id, STATS_ATTACK_BONUS);
+//    int new_attack_bonus = old_attack_bonus + 1; // Example: increase by 1
+//    g_set_stat(g, id, STATS_ATTACK_BONUS, new_attack_bonus);
+//    // Increase max HP based on Constitution bonus
+//    int con_bonus = bonus_calc(g_get_stat(g, id, STATS_CON));
+//    if (con_bonus < 0)
+//        con_bonus = 0; // Ensure Constitution bonus is not negative
+//    int hitdie = g_get_stat(g, id, STATS_HITDIE);
+//    // roll the hitdie
+//    vec3 r = {1, hitdie, 0}; // 1d(hitdie)
+//    int hp_gain = do_roll(r) + con_bonus; // Add Constitution bonus to HP gain
+//    int old_max_hp = g_get_stat(g, id, STATS_MAXHP);
+//    int new_max_hp =
+//        old_max_hp + hp_gain; // Increase max HP by the rolled amount
+//    if (new_max_hp <= old_max_hp)
+//        new_max_hp = old_max_hp + 1; // Ensure max HP increases
+//    int new_next_level_xp = calc_next_lvl_xp(g, id);
+//    g_set_stat(g, id, STATS_MAXHP, new_max_hp);
+//    g_set_stat(g, id, STATS_HP, new_max_hp); // Restore HP to max
+//    // Set next level XP requirement (example: 1000 XP for next level)
+//    g_set_stat(g, id, STATS_NEXT_LEVEL_XP, new_next_level_xp);
+//    if (id == g->hero_id) {
+//        add_message_and_history(g, "You leveled up!");
+//        add_message_and_history(g, "Level %d", level);
+//        add_message_and_history(g, "Max HP increased to %d", new_max_hp);
+//    } else {
+//        msuccess(
+//            "NPC %d leveled up to Level %d with %d HP", id, level, new_max_hp);
+//    }
+//}
 
-/*
-static void check_and_handle_level_up(gamestate* const g, entityid id) {
-    if (g_get_stat(g, id, STATS_XP) >= g_get_stat(g, id, STATS_NEXT_LEVEL_XP)) {
-        handle_level_up(g, id);
-    }
-}
-*/
+//static void check_and_handle_level_up(gamestate* const g, entityid id) {
+//    if (g_get_stat(g, id, STATS_XP) >= g_get_stat(g, id, STATS_NEXT_LEVEL_XP)) {
+//        handle_level_up(g, id);
+//    }
+//}
 
-/*
-static inline void update_npc_state(gamestate* const g, entityid id) {
-    if (g_is_dead(g, id)) return;
-}
-*/
+//static inline void update_npc_state(gamestate* const g, entityid id) {
+//    if (g_is_dead(g, id)) return;
+//}
 
 //static void update_npcs_state(shared_ptr<gamestate> g) {
 //    massert(g, "Game state is NULL!");
