@@ -1147,9 +1147,9 @@ static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
             shared_ptr<tile_t> box_new_loc_tile = df_tile_at(d_get_floor(g->dungeon, g->dungeon->current_floor), box_new_loc);
 
             // check to see tile has no entities
-
-
-            try_entity_move(g, box_id, v);
+            if (tile_entity_count(box_new_loc_tile) == 0) {
+                try_entity_move(g, box_id, v);
+            }
         }
 
         merror("Cannot move, tile has box at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
