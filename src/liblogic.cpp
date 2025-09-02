@@ -32,6 +32,7 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v);
 int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
 void update_player_state(shared_ptr<gamestate> g);
 //void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
+void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 
 
 static inline void reset_player_block_success(shared_ptr<gamestate> g) {
@@ -507,13 +508,11 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             } else if (inputstate_is_pressed(is, KEY_SEMICOLON)) {
                 //add_message(g, "pickup item (unimplemented)");
-
                 try_entity_pickup(g, g->hero_id);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             } else if (inputstate_is_pressed(is, KEY_SLASH) && inputstate_is_shift_held(is)) {
                 // open inventory
                 //g->inventory_is_open = !g->inventory_is_open;
-
                 g->display_help_menu = !g->display_help_menu;
                 g->frame_dirty = true;
             } else if (inputstate_is_pressed(is, KEY_I)) {
@@ -550,6 +549,10 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
     if (g->controlmode == CONTROLMODE_PLAYER) {
         handle_input_gameplay_controlmode_player(g, is);
         //return;
+    }
+
+    if (g->controlmode == CONTROLMODE_INVENTORY) {
+        handle_input_inventory(is, g);
     }
 }
 
@@ -2026,7 +2029,7 @@ static void cycle_messages(shared_ptr<gamestate> g) {
 //    }
 //}
 
-static void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
