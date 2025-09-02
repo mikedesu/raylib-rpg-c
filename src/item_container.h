@@ -12,12 +12,13 @@ class item_container {
 public:
     item_container(int m, int n);
 
-    bool add(entityid id);
-    entityid remove(entityid id);
+    bool set(entityid id, int x, int y);
+    entityid get(int x, int y);
+    //entityid remove(entityid id);
     entityid remove(int x, int y);
 
 private:
-    shared_ptr<vector<shared_ptr<vector<entityid>>>> grid;
+    shared_ptr<vector<entityid>> grid;
     int rows;
     int cols;
 };

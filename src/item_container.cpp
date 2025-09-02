@@ -1,6 +1,6 @@
 #include "entityid.h"
 #include "item_container.h"
-//#include "massert.h"
+#include "massert.h"
 #include "mprint.h"
 #include <cstdlib>
 
@@ -13,13 +13,9 @@ item_container::item_container(int m, int n) {
         merror("Both m and n must be > 0!");
         exit(-1);
     }
-    grid = make_shared<vector<shared_ptr<vector<entityid>>>>();
-    for (int i = 0; i < m; i++) {
-        shared_ptr<vector<entityid>> row = make_shared<vector<entityid>>();
-        for (int j = 0; j < n; j++) {
-            row->push_back(ENTITYID_INVALID);
-        }
-        grid->push_back(row);
+    grid = make_shared<vector<entityid>>();
+    for (int i = 0; i < m * n; i++) {
+        grid->push_back(ENTITYID_INVALID);
     }
     rows = m;
     cols = n;
@@ -27,34 +23,34 @@ item_container::item_container(int m, int n) {
 }
 
 
-bool item_container::add(entityid id) {
+bool item_container::set(entityid id, int x, int y) {
     // find the first i,j with ENTITYID_INVALID and replace with id, return true
     // otherwise, return false
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if ((*((*grid)[i]))[j] == ENTITYID_INVALID) {
-                (*((*grid)[i]))[j] = id;
-                return true;
-            }
-        }
-    }
-    return false;
+    massert(x >= 0 && x < cols && y >= 0 && y < rows, "x or y out-of-bounds");
+    (*grid)[y * cols + x] = id;
+    return true;
 }
 
 
-entityid item_container::remove(entityid id) {
-    // find the first i,j with id and replace with ENTITYID_INVALID, return true
-    // otherwise, return false
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if ((*((*grid)[i]))[j] == id) {
-                (*((*grid)[i]))[j] = ENTITYID_INVALID;
-                return id;
-            }
-        }
-    }
-    return ENTITYID_INVALID;
+entityid item_container::get(int x, int y) {
+    massert(x >= 0 && x < cols && y >= 0 && y < rows, "x or y out-of-bounds");
+    return (*grid)[y * cols + x];
 }
+
+
+//entityid item_container::remove(entityid id) {
+//    // find the first i,j with id and replace with ENTITYID_INVALID, return true
+//    // otherwise, return false
+//    for (int i = 0; i < rows; i++) {
+//        for (int j = 0; j < cols; j++) {
+//            if ((*((*grid)[i]))[j] == id) {
+//                (*((*grid)[i]))[j] = ENTITYID_INVALID;
+//                return id;
+//            }
+//        }
+//    }
+//    return ENTITYID_INVALID;
+//}
 
 
 entityid item_container::remove(int x, int y) {
@@ -62,7 +58,7 @@ entityid item_container::remove(int x, int y) {
     if (x < 0 || x >= cols || y < 0 || y >= rows) {
         return ENTITYID_INVALID;
     }
-    entityid id = (*((*grid)[y]))[x];
-    (*((*grid)[y]))[x] = ENTITYID_INVALID;
-    return id;
+    entityid item_id = get(x, y);
+    set(ENTITYID_INVALID, x, y);
+    return item_id;
 }
