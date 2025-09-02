@@ -6,8 +6,9 @@
 #include "tx_keys_potions.h"
 #include "tx_keys_rings.h"
 #include "tx_keys_shields.h"
-//#include "tx_keys_wands.h"
 #include "tx_keys_weapons.h"
+
+//#include "tx_keys_wands.h"
 
 //#define TX_ARROW_COUNT 1
 //static int TX_ARROW_KEYS[TX_ARROW_COUNT] = {TX_ARROW};

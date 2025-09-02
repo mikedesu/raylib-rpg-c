@@ -16,9 +16,18 @@
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 #include "textureinfo.h"
-#include "tx_keys.h"
+//#include "tx_keys.h"
+//#include "tx_keys_npcs.h"
+//#include "tx_keys_weapons.h"
+#include "tx_keys_boxes.h"
+#include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
+#include "tx_keys_potions.h"
+//#include "tx_keys_rings.h"
+//#include "tx_keys_shields.h"
 #include "tx_keys_weapons.h"
+
+
 #include <cstdlib>
 #include <memory>
 
