@@ -30,6 +30,7 @@ entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z);
 bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v);
 int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
 void update_player_state(shared_ptr<gamestate> g);
+void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
 
 
 static inline void reset_player_block_success(shared_ptr<gamestate> g) {
@@ -76,7 +77,6 @@ static inline void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
 //static void update_npcs_state(shared_ptr<gamestate> g);
 //static void handle_npc(shared_ptr<gamestate> g, entityid id);
 
-static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
 //static void add_message_history(shared_ptr<gamestate> g, const char* fmt, ...);
 static void cycle_messages(shared_ptr<gamestate> g);
 static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -772,22 +772,6 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
 void liblogic_close(shared_ptr<gamestate> g) {
     massert(g, "liblogic_close: gamestate is NULL");
     d_free(g->dungeon);
-}
-
-
-static void add_message(shared_ptr<gamestate> g, const char* fmt, ...) {
-    massert(g, "gamestate is NULL");
-    massert(fmt, "format string is NULL");
-    minfo("attempting to add message...");
-    char buffer[MAX_MSG_LENGTH];
-    va_list args;
-    va_start(args, fmt);
-    minfo("calling vsnprintf...");
-    vsnprintf(buffer, MAX_MSG_LENGTH - 1, fmt, args);
-    va_end(args);
-    string s(buffer);
-    g->msg_system->push_back(s);
-    g->msg_system_is_active = true;
 }
 
 
