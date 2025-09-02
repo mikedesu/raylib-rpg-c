@@ -25,9 +25,11 @@ using std::string;
 
 int liblogic_restart_count = 0;
 
+// these have been moved to external source files
 entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z);
 bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v);
 int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
+void update_player_state(shared_ptr<gamestate> g);
 
 
 static inline void reset_player_block_success(shared_ptr<gamestate> g) {
@@ -80,7 +82,8 @@ static void cycle_messages(shared_ptr<gamestate> g);
 static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static void update_player_state(shared_ptr<gamestate> g);
+
+
 static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void try_spawn_npc(shared_ptr<gamestate> const g);
@@ -362,7 +365,6 @@ static void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inp
 static void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-
     if (inputstate_is_pressed(is, KEY_ENTER)) {
         minfo("Character creation confirmed");
         // we need to copy the character creation stats to the hero entity
@@ -377,9 +379,7 @@ static void handle_input_character_creation_scene(shared_ptr<gamestate> g, share
             maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
             //bonus_calc(g->chara_creation.constitution);
         }
-
         g->entity_turn = create_player(g, (vec3){0, 0, 0}, "darkmage");
-
         //g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
         //g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
         g->current_scene = SCENE_GAMEPLAY;
@@ -400,15 +400,12 @@ static void handle_input_character_creation_scene(shared_ptr<gamestate> g, share
             race = RACE_WARG;
         }
         g->chara_creation->race = (race_t)race;
-
         //g->chara_creation->race = (race_t)(((int)g->chara_creation->race)-1);
         //if (race == RACE_HUMAN) {
         //    g->chara_creation->race = RACE_ORC;
         //} else if (race == RACE_ORC) {
         //    g->chara_creation->race = RACE_HUMAN;
         //}
-
-
     } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
         int race = g->chara_creation->race;
         if (race < RACE_COUNT - 1) {
@@ -416,10 +413,7 @@ static void handle_input_character_creation_scene(shared_ptr<gamestate> g, share
         } else {
             race = RACE_HALFLING;
         }
-
         g->chara_creation->race = (race_t)race;
-
-
         //race_t race = g->chara_creation->race;
         //if (race == RACE_HUMAN) {
         //    g->chara_creation->race = RACE_ORC;
@@ -427,7 +421,6 @@ static void handle_input_character_creation_scene(shared_ptr<gamestate> g, share
         //    g->chara_creation->race = RACE_HUMAN;
         //}
     }
-
     g->frame_dirty = true;
 }
 
@@ -755,7 +748,6 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
             }
             //check_and_handle_level_up(g, g->hero_id);
         }
-
         if (g_is_dead(g, g->hero_id)) {
             return;
         }
@@ -3010,21 +3002,21 @@ static void try_spawn_npc(shared_ptr<gamestate> const g) {
 }
 
 
-static void update_player_state(shared_ptr<gamestate> g) {
-    massert(g, "Game state is NULL!");
-    if (!g->gameover) {
-        g_incr_tx_alpha(g, g->hero_id, 2);
-
-        if (g_is_dead(g, g->hero_id)) {
-            //add_message_history(g, "You died!");
-            g->gameover = true;
-        }
-        //check_and_handle_level_up(g, g->hero_id);
-    }
-    if (g_is_dead(g, g->hero_id)) {
-        return;
-    }
-}
+//static void update_player_state(shared_ptr<gamestate> g) {
+//    massert(g, "Game state is NULL!");
+//    if (!g->gameover) {
+//        g_incr_tx_alpha(g, g->hero_id, 2);
+//
+//        if (g_is_dead(g, g->hero_id)) {
+//            //add_message_history(g, "You died!");
+//            g->gameover = true;
+//        }
+//        //check_and_handle_level_up(g, g->hero_id);
+//    }
+//    if (g_is_dead(g, g->hero_id)) {
+//        return;
+//    }
+//}
 
 /*
 static void handle_level_up(gamestate* const g, entityid id) {
