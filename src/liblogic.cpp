@@ -29,48 +29,12 @@ entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z);
 bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v);
 int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
 
-//static inline entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z) {
-//    massert(g, "gamestate is NULL");
-//    massert(z >= 0, "floor is out of bounds");
-//    massert(z < g->dungeon->floors->size(), "floor is out of bounds");
-//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
-//    //massert(df, "failed to get dungeon floor");
-//    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
-//    //massert(t, "failed to get tile");
-//    for (int i = 0; (size_t)i < t->entities->size(); i++) {
-//        entityid id = tile_get_entity(t, i);
-//        entitytype_t type = g_get_type(g, id);
-//        if (id != ENTITYID_INVALID && type == ENTITY_WOODEN_BOX) return id;
-//    }
-//    return ENTITYID_INVALID;
-//}
-
 
 static inline void reset_player_block_success(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     g_set_block_success(g, g->hero_id, false);
     //g_set_update(g, g->hero_id, true);
 }
-
-
-//static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
-//    massert(g, "gamestate is NULL");
-//    massert(z >= 0, "floor is out of bounds");
-//    massert(z < g->dungeon->floors->size(), "floor is out of bounds");
-//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, z);
-//    massert(df, "failed to get dungeon floor");
-//    shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});
-//    massert(t, "failed to get tile");
-//    int count = 0;
-//    for (int i = 0; (size_t)i < t->entities->size(); i++) {
-//        entityid id = tile_get_entity(t, i);
-//        entitytype_t type = g_get_type(g, id);
-//        if (id != ENTITYID_INVALID && (type == ENTITY_NPC || type == ENTITY_PLAYER) && !g_is_dead(g, id)) {
-//            count++;
-//        }
-//    }
-//    return count;
-//}
 
 
 static inline race_t get_random_race() {
@@ -308,18 +272,12 @@ static entityid create_player(shared_ptr<gamestate> g, race_t rt, vec3 loc, stri
     entityid id = create_npc(g, rt, loc, name);
     msuccess("npc_create successful, id: %d", id);
     massert(id != ENTITYID_INVALID, "failed to create player");
-
     g_set_hero_id(g, id);
     g_add_type(g, id, ENTITY_PLAYER);
     g_set_tx_alpha(g, id, 0);
-
     g_set_stat(g, id, STATS_LEVEL, 666);
-
     g_add_equipped_weapon(g, id, ENTITYID_INVALID);
-
     g_add_inventory(g, id);
-
-
     return id;
 }
 
@@ -337,7 +295,6 @@ static const char* get_action_key(shared_ptr<inputstate> is, shared_ptr<gamestat
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     const float move = g->cam2d.zoom;
     const char* action = get_action_key(is, g);
-
     if (inputstate_is_held(is, KEY_RIGHT)) {
         g->cam2d.offset.x += move;
     } else if (inputstate_is_held(is, KEY_LEFT)) {
@@ -348,19 +305,6 @@ static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> i
         g->cam2d.offset.y += move;
     }
 }
-
-
-//static inline void handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-//    massert(g, "Game state is NULL!");
-//    massert(is, "Input state is NULL!");
-//if (inputstate_is_held(is, KEY_Z)) {
-//    if (inputstate_is_shift_held(is)) {
-//        g->cam2d.zoom -= (g->cam2d.zoom > 1.0) ? DEFAULT_ZOOM_INCR : 0.0;
-//    } else {
-//        g->cam2d.zoom += DEFAULT_ZOOM_INCR;
-//    }
-//}
-//}
 
 
 static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
