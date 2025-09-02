@@ -1610,9 +1610,9 @@ bool g_add_inventory(shared_ptr<gamestate> g, entityid id) {
     // this line sometimes crashes...but why?
     //g->inventory_list->insert({id, make_shared<item_container>(2, 5)});
     if (g->inventory_list) {
-        minfo("Shit is gonna crash and idk why, wtf");
+        //minfo("Shit is gonna crash and idk why, wtf");
         g->inventory_list->insert({id, make_shared<item_container>(2, 5)});
-        msuccess("Entity id %d now has an inventory");
+        //msuccess("Entity id %d now has an inventory");
         return true;
     }
     merror("Something fucked up");
