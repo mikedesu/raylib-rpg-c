@@ -33,11 +33,7 @@ spritegroup_t* spritegroup_create(int capacity) {
     //    return NULL;
     //}
 
-    minfo("Initializing spritegroup sprites unordered_map...");
-    sg->sprites2 = unordered_map<entityid, shared_ptr<sprite>>();
-    msuccess("Initialized spritegroup sprites unordered_map");
-    //shared_ptr<unordered_map<int, shared_ptr<sprite>>> sprites2;
-    //massert(sg->sprites2, "spritegroup sprites2 is NULL");
+    minfo("Spritegroup sprites unordered_map will be automatically initialized");
 
     sg->dest = sg->move = (Rectangle){0, 0, 0, 0};
     //sg->specifier = SPECIFIER_NONE;
