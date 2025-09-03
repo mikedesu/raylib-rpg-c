@@ -6,6 +6,8 @@
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "libdraw.h"
+#include "libdraw_help_menu.h"
+#include "libdraw_title_screen.h"
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
@@ -30,11 +32,11 @@
 #include <memory>
 #include <raylib.h>
 #include <sys/param.h>
-#include <vector>
+//#include <vector>
 
 
 using std::shared_ptr;
-using std::vector;
+//using std::vector;
 
 
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
@@ -81,7 +83,6 @@ static inline void handle_debug_panel(shared_ptr<gamestate> g);
 static void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
-static void draw_help_menu(shared_ptr<gamestate> g);
 static void draw_gameover_menu(shared_ptr<gamestate> g);
 static void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id);
 static void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g);
@@ -91,7 +92,7 @@ static void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, sprit
 static void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 //static void draw_inventory_menu(shared_ptr<gamestate> g);
 static void draw_hud(shared_ptr<gamestate> g);
-static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu);
+//static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu);
 static void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
 static void draw_title_screen_from_texture(shared_ptr<gamestate> g);
 
@@ -1679,75 +1680,6 @@ static void draw_version(const shared_ptr<gamestate> g) {
 }
 
 
-static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
-    massert(g, "gamestate is NULL");
-    // Space between title texts
-    Color active_color = WHITE;
-    Color disabled_color = {0x99, 0x99, 0x99, 0xFF};
-    Color selection_color;
-
-    // this will go above the title text
-    const char* evidojo_presents_text = "@evildojo666 presents";
-
-    const char* menu_text[2] = {"New Game", "Continue (coming soon)"};
-    const char* title_text_0 = "project.";
-    const char* title_text_1 = "rpg";
-    const char* version_text = g->version.c_str();
-    const char* start_text = "Press enter or space to begin";
-    char buffer[1024] = {0};
-    Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
-    int sm_font_size = 10;
-    int font_size = 40;
-    int font_size2 = 20;
-
-    int evidojo_presents_measure = MeasureText(evidojo_presents_text, sm_font_size);
-    int measure = MeasureText(title_text_0, font_size);
-    int start_measure = MeasureText(start_text, sm_font_size);
-    int version_measure = MeasureText(version_text, sm_font_size);
-    int padding = 10;
-    int w = DEFAULT_TARGET_WIDTH;
-    int h = DEFAULT_TARGET_HEIGHT;
-    float x = (w - measure) / 2.0f;
-    float y = (h - font_size * 2) / 2.0f;
-    float start_x = (w - start_measure) / 2.0f;
-    float title_text_1_x = x + measure + padding;
-    float version_x = (w - version_measure) / 2.0f;
-    float version_y = y + font_size + 10;
-    float start_y = y + font_size * 1 + 20 + sm_font_size;
-    ClearBackground(BLACK);
-
-    // Draw the "evidojo666 presents" text at the top
-    int evidojo_x = (w - evidojo_presents_measure) / 2.0f;
-    int evidojo_y = y - sm_font_size - 10; // Position it above the title text
-
-    DrawText(evidojo_presents_text, evidojo_x, evidojo_y, sm_font_size, WHITE);
-
-    DrawText(title_text_0, x, y, font_size, title_text_0_color);
-    DrawText(title_text_1, title_text_1_x, y, font_size, title_text_1_color);
-    DrawText(version_text, version_x, version_y, sm_font_size, WHITE);
-    if (!show_menu) {
-        DrawText(start_text, start_x, start_y, sm_font_size, WHITE);
-        return;
-    }
-    // If show_menu is true, draw the new game, continue, options selection text
-    int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
-    int menu_spacing = 10;
-    int current_selection_index = g->title_screen_selection;
-    for (int i = 0; i < menu_count; i++) {
-        bzero(buffer, sizeof(buffer));
-        float menu_x = (w - MeasureText(menu_text[i], sm_font_size)) / 2.0f;
-        float menu_y = start_y + (i * (sm_font_size + menu_spacing));
-        if (i == current_selection_index) {
-            snprintf(buffer, sizeof(buffer), "> %s", menu_text[i]);
-        } else {
-            snprintf(buffer, sizeof(buffer), "  %s", menu_text[i]);
-        }
-        selection_color = i == 0 ? active_color : disabled_color; // First item is always active
-        DrawText(buffer, menu_x, menu_y, sm_font_size, selection_color);
-    }
-}
-
-
 static void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(title_target_texture);
@@ -1775,64 +1707,4 @@ static void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g) {
 static void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     DrawTexturePro(char_creation_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
-}
-
-
-static void draw_help_menu(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-
-    // Menu parameters
-    const char* menu_title = "Help Menu";
-
-    vector<string> help_menu;
-    help_menu.push_back("Movement: qweadzxc");
-    help_menu.push_back("Attack: Spacebar");
-    help_menu.push_back("Interact: Enter");
-    help_menu.push_back("Inventory: I");
-    help_menu.push_back("Settings: Esc");
-    help_menu.push_back("Quit: Q");
-    help_menu.push_back("");
-    help_menu.push_back("Press Esc to close this menu");
-
-    int font_size = 20;
-    int sm_font_size = 10;
-    int padding = 20;
-    int line_spacing = 4;
-
-    // Calculate sizes
-    int w = DEFAULT_TARGET_WIDTH;
-    int h = DEFAULT_TARGET_HEIGHT;
-    int title_width = MeasureText(menu_title, font_size);
-
-    // Calculate max text width
-    int max_text_width = title_width;
-    for (size_t i = 0; i < help_menu.size(); i++) {
-        int width = MeasureText(help_menu[i].c_str(), sm_font_size);
-        if (width > max_text_width) {
-            max_text_width = width;
-        }
-    }
-
-    // Menu box dimensions
-    int box_width = max_text_width + padding * 2;
-    int box_height = help_menu.size() * (sm_font_size + line_spacing) + padding * 2;
-    int box_x = (w - box_width) / 2;
-    int box_y = (h - box_height) / 2;
-
-    // Draw background
-    DrawRectangle(box_x, box_y, box_width, box_height, (Color){0x33, 0x33, 0x33, 0xcc});
-    DrawRectangleLinesEx((Rectangle){(float)box_x, (float)box_y, (float)box_width, (float)box_height}, 2, WHITE);
-
-    // Draw title
-    int title_x = box_x + (box_width - title_width) / 2;
-    int title_y = box_y + padding;
-    DrawText(menu_title, title_x, title_y, font_size, WHITE);
-
-    // Draw help text
-    int text_x = box_x + padding;
-    int text_y = title_y + font_size + padding;
-    for (size_t i = 0; i < help_menu.size(); i++) {
-        DrawText(help_menu[i].c_str(), text_x, text_y, sm_font_size, WHITE);
-        text_y += sm_font_size + line_spacing;
-    }
 }
