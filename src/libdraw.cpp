@@ -6,6 +6,7 @@
 #include "get_txkey_for_tiletype.h"
 #include "hashtable_entityid_spritegroup.h"
 #include "libdraw.h"
+#include "libdraw_draw_inventory_menu.h"
 #include "libdraw_help_menu.h"
 #include "libdraw_title_screen.h"
 #include "libgame_defines.h"
@@ -22,10 +23,9 @@
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"
+#include "tx_keys_weapons.h"
 //#include "tx_keys_rings.h"
 //#include "tx_keys_shields.h"
-#include "libdraw_draw_inventory_menu.h"
-#include "tx_keys_weapons.h"
 
 
 #include <cstdlib>
@@ -38,7 +38,7 @@
 using std::shared_ptr;
 //using std::vector;
 
-
+// this will be replaced with a new unordered_map
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
