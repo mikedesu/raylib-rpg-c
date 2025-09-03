@@ -138,8 +138,8 @@ bool spritegroup_set_current(spritegroup_t* const sg, int index) {
 int spritegroup_get_first_context(spritegroup_t* const sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->size > 0, "spritegroup is empty");
-    massert(sg->sprites2->at(0), "sprite is NULL");
-    return sprite_get_context2(sg->sprites2->at(0));
+    massert(sg->sprites2.at(0), "sprite is NULL");
+    return sprite_get_context2(sg->sprites2.at(0));
 }
 
 void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop) {
