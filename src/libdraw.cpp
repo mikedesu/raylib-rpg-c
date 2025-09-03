@@ -43,7 +43,8 @@ using std::unordered_map;
 // this will be replaced with a new unordered_map
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
 //shared_ptr<unordered_map<entityid, spritegroup_t *>> spritegroups2 = nullptr;
-shared_ptr<unordered_map<entityid, shared_ptr<spritegroup_t>>> spritegroups2 = nullptr;
+//shared_ptr<unordered_map<entityid, shared_ptr<spritegroup_t>>> spritegroups2 = nullptr;
+unordered_map<entityid, spritegroup_t*> spritegroups2;
 
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
@@ -1289,6 +1290,10 @@ static bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
     group->off_x = offset_x;
     group->off_y = offset_y;
     hashtable_entityid_spritegroup_insert(spritegroups, id, group);
+
+    // how its done in the future...
+    //spritegroups2[id] = group;
+
     return true;
 }
 
