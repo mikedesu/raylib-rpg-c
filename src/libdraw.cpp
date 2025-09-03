@@ -32,14 +32,19 @@
 #include <memory>
 #include <raylib.h>
 #include <sys/param.h>
+#include <unordered_map>
 //#include <vector>
 
 
 using std::shared_ptr;
+using std::unordered_map;
 //using std::vector;
 
 // this will be replaced with a new unordered_map
 hashtable_entityid_spritegroup_t* spritegroups = NULL;
+//shared_ptr<unordered_map<entityid, spritegroup_t *>> spritegroups2 = nullptr;
+shared_ptr<unordered_map<entityid, shared_ptr<spritegroup_t>>> spritegroups2 = nullptr;
+
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 
