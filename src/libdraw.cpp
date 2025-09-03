@@ -134,8 +134,10 @@ static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, sprit
 //                                   spritegroup_t* sg,
 //                                   entityid id);
 
-static sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-static sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+//static sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+//static sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+static shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static sprite* get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
@@ -237,7 +239,7 @@ static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_p
     return true;
 }
 
-static sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
+static shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
@@ -247,7 +249,8 @@ static sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spr
     if (!w_sg) {
         return NULL;
     }
-    sprite* retval = NULL;
+    //sprite* retval = NULL;
+    shared_ptr<sprite> retval = NULL;
     if (sg->current == SG_ANIM_NPC_ATTACK) {
         retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
     }
@@ -258,7 +261,8 @@ static sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spr
 }
 
 
-static sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
+//static sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
+static shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
@@ -270,8 +274,10 @@ static sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spri
     if (!w_sg) {
         return NULL;
     }
-    sprite* retval = NULL;
+    //sprite* retval = NULL;
+    shared_ptr<sprite> retval = NULL;
     if (sg->current == SG_ANIM_NPC_ATTACK) {
+        //retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
         retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
     }
     //else if (sg->current == SG_ANIM_NPC_SHOT) {
@@ -346,7 +352,8 @@ static sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
 static void draw_entity_sprite(const shared_ptr<gamestate> g, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
-    sprite* s = sg_get_current(sg);
+    //sprite* s = sg_get_current(sg);
+    shared_ptr<sprite> s = sg_get_current(sg);
     massert(s, "sprite is NULL");
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
 
@@ -398,7 +405,8 @@ static void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, sprite
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
-    sprite* weapon_back_s = get_weapon_back_sprite(g, id, sg);
+    //sprite* weapon_back_s = get_weapon_back_sprite(g, id, sg);
+    shared_ptr<sprite> weapon_back_s = get_weapon_back_sprite(g, id, sg);
     if (weapon_back_s) {
         DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
@@ -408,7 +416,8 @@ static void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, sprit
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
-    sprite* weapon_front_s = get_weapon_front_sprite(g, id, sg);
+    //sprite* weapon_front_s = get_weapon_front_sprite(g, id, sg);
+    shared_ptr<sprite> weapon_front_s = get_weapon_front_sprite(g, id, sg);
     if (weapon_front_s) {
         DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
     }
@@ -584,7 +593,7 @@ static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, sprit
     if (weaponid == ENTITYID_INVALID) return;
     spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weaponid);
     if (!w_sg) return;
-    int ctx = sg->sprites[sg->current]->currentcontext;
+    int ctx = sg->sprites2->at(sg->current)->currentcontext;
     spritegroup_setcontexts(w_sg, ctx);
     spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
 }
@@ -676,7 +685,7 @@ static void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id,
 static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir) {
     massert(g, "gamestate is NULL");
     massert(group != NULL, "group is NULL");
-    int old_ctx = group->sprites[group->current]->currentcontext;
+    int old_ctx = group->sprites2->at(group->current)->currentcontext;
     int ctx = old_ctx;
     ctx = dir == DIR_NONE                                      ? old_ctx
           : dir == DIR_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
@@ -820,13 +829,14 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
             for (int i = 0; i < num_spritegroups; i++) {
                 spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
                 if (sg) {
-                    sprite* const s = sg_get_current(sg);
+                    //sprite* const s = sg_get_current(sg);
+                    shared_ptr<sprite> s = sg_get_current(sg);
                     massert(s, "sprite is NULL");
                     //sprite* const s_shadow = sg_get_current_plus_one(sg);
                     g->frame_dirty = true;
                     if (s) {
                         //minfo("advancing sprite frame");
-                        sprite_incrframe(s);
+                        sprite_incrframe2(s);
                         if (s->num_loops >= 1) {
                             sg->current = sg->default_anim;
                             s->num_loops = 0;
@@ -1250,11 +1260,22 @@ static bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
     for (int i = 0; i < num_keys; i++) {
         int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
-        sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
+        //sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
+        minfo("creating sprite...");
+        shared_ptr<sprite> s = sprite_create2(tex, txinfo[k].contexts, txinfo[k].num_frames);
+        msuccess("created sprite!");
+        // as expected lol
+        // easy fix
+        // boom, fixed
+        minfo("adding sprite to group...");
         spritegroup_add(group, s);
+        msuccess("added sprite to group!");
     }
     group->id = id;
-    sprite* s = spritegroup_get(group, 0);
+
+    //sprite* s = spritegroup_get(group, 0);
+    shared_ptr<sprite> s = spritegroup_get(group, 0);
+
     massert(s, "sprite is NULL");
     if (!s) {
         spritegroup_destroy(group);
