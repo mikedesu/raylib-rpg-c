@@ -4,7 +4,7 @@
 #include "entityid.h"
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
-#include "hashtable_entityid_spritegroup.h"
+//#include "hashtable_entityid_spritegroup.h"
 #include "libdraw.h"
 #include "libdraw_draw_inventory_menu.h"
 #include "libdraw_help_menu.h"
@@ -41,9 +41,7 @@ using std::unordered_map;
 //using std::vector;
 
 // this will be replaced with a new unordered_map
-hashtable_entityid_spritegroup_t* spritegroups = NULL;
-//shared_ptr<unordered_map<entityid, spritegroup_t *>> spritegroups2 = nullptr;
-//shared_ptr<unordered_map<entityid, shared_ptr<spritegroup_t>>> spritegroups2 = nullptr;
+//hashtable_entityid_spritegroup_t* spritegroups = NULL;
 unordered_map<entityid, spritegroup_t*> spritegroups2;
 
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -246,12 +244,19 @@ static shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entit
     massert(sg, "spritegroup is NULL");
     entityid weapon = g_get_equipped_weapon(g, id);
     if (weapon == ENTITYID_INVALID) return NULL;
-    spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    if (!w_sg) {
-        return NULL;
+
+    if (spritegroups2.find(weapon) == spritegroups2.end()) {
+        return nullptr;
     }
-    //sprite* retval = NULL;
-    shared_ptr<sprite> retval = NULL;
+
+    //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
+    spritegroup_t* w_sg = spritegroups2[weapon];
+
+    if (!w_sg) {
+        return nullptr;
+    }
+
+    shared_ptr<sprite> retval = nullptr;
     if (sg->current == SG_ANIM_NPC_ATTACK) {
         retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
     }
@@ -269,14 +274,20 @@ static shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entity
     massert(sg, "spritegroup is NULL");
     entityid weapon = g_get_equipped_weapon(g, id);
     if (weapon == ENTITYID_INVALID) {
-        return NULL;
+        return nullptr;
     }
-    spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
+
+    if (spritegroups2.find(weapon) == spritegroups2.end()) {
+        return nullptr;
+    }
+
+    //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
+    spritegroup_t* w_sg = spritegroups2[weapon];
     if (!w_sg) {
-        return NULL;
+        return nullptr;
     }
-    //sprite* retval = NULL;
-    shared_ptr<sprite> retval = NULL;
+
+    shared_ptr<sprite> retval = nullptr;
     if (sg->current == SG_ANIM_NPC_ATTACK) {
         //retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
         retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
@@ -428,7 +439,11 @@ static void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, sprit
 static void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+    //spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
+    if (spritegroups2.find(id) == spritegroups2.end()) {
+        return;
+    }
+    spritegroup_t* sg = spritegroups2[id];
     entitytype_t type = g_get_type(g, id);
     massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));
     // Draw components in correct order
@@ -509,7 +524,13 @@ static inline bool camera_lock_on(shared_ptr<gamestate> g) {
     if (!g->cam_lockon) {
         return false;
     }
-    spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
+
+    if (spritegroups2.find(g->hero_id) == spritegroups2.end()) {
+        return false;
+    }
+
+    //spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
+    spritegroup_t* grp = spritegroups2[g->hero_id];
     if (!grp) {
         merror("camera_lock_on: spritegroup is NULL for hero_id %d", g->hero_id);
         minfo("hero may not have been created yet");
@@ -592,8 +613,12 @@ static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, sprit
     massert(sg, "spritegroup is NULL");
     entityid weaponid = g_get_equipped_weapon(g, id);
     if (weaponid == ENTITYID_INVALID) return;
-    spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weaponid);
-    if (!w_sg) return;
+
+    //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weaponid);
+    spritegroup_t* w_sg = spritegroups2[weaponid];
+    if (!w_sg) {
+        return;
+    }
     int ctx = sg->sprites2->at(sg->current)->currentcontext;
     spritegroup_setcontexts(w_sg, ctx);
     spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
@@ -756,13 +781,23 @@ static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spri
 static void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
-    for (int i = 0; i < num_spritegroups; i++) {
-        spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
-        if (sg) {
-            libdraw_update_sprite_ptr(g, id, sg);
-        }
+
+    if (spritegroups2.find(id) == spritegroups2.end()) {
+        return;
     }
+
+    spritegroup_t* sg = spritegroups2[id];
+    if (sg) {
+        libdraw_update_sprite_ptr(g, id, sg);
+    }
+
+    //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+    //for (int i = 0; i < num_spritegroups; i++) {
+    //    spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+    //    if (sg) {
+    //        libdraw_update_sprite_ptr(g, id, sg);
+    //    }
+    //}
 }
 
 
@@ -826,32 +861,32 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
         libdraw_handle_dirty_entities(g);
         g->frame_dirty = true;
         for (entityid id = 0; id < g->next_entityid; id++) {
-            int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
-            for (int i = 0; i < num_spritegroups; i++) {
-                spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
-                if (sg) {
-                    //sprite* const s = sg_get_current(sg);
-                    shared_ptr<sprite> s = sg_get_current(sg);
-                    massert(s, "sprite is NULL");
-                    //sprite* const s_shadow = sg_get_current_plus_one(sg);
-                    g->frame_dirty = true;
-                    if (s) {
-                        //minfo("advancing sprite frame");
-                        sprite_incrframe2(s);
-                        if (s->num_loops >= 1) {
-                            sg->current = sg->default_anim;
-                            s->num_loops = 0;
-                        }
+            //spritegroup_t* sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+            spritegroup_t* sg = spritegroups2[id];
+            //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+
+            //for (int i = 0; i < num_spritegroups; i++) {
+            //spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+            if (sg) {
+                shared_ptr<sprite> s = sg_get_current(sg);
+                massert(s, "sprite is NULL");
+                g->frame_dirty = true;
+                if (s) {
+                    sprite_incrframe2(s);
+                    if (s->num_loops >= 1) {
+                        sg->current = sg->default_anim;
+                        s->num_loops = 0;
                     }
-                    //if (s_shadow) {
-                    //    sprite_incrframe(s_shadow);
-                    //    if (s_shadow->num_loops >= 1) {
-                    //        sg->current = sg->default_anim;
-                    //        s_shadow->num_loops = 0;
-                    //    }
-                    //}
                 }
+                //if (s_shadow) {
+                //    sprite_incrframe(s_shadow);
+                //    if (s_shadow->num_loops >= 1) {
+                //        sg->current = sg->default_anim;
+                //        s_shadow->num_loops = 0;
+                //    }
+                //}
             }
+            //}
         }
         libdraw_handle_gamestate_flag(g);
     }
@@ -1289,10 +1324,11 @@ static bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
     group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
     group->off_x = offset_x;
     group->off_y = offset_y;
-    hashtable_entityid_spritegroup_insert(spritegroups, id, group);
+
+    //hashtable_entityid_spritegroup_insert(spritegroups, id, group);
 
     // how its done in the future...
-    //spritegroups2[id] = group;
+    spritegroups2[id] = group;
 
     return true;
 }
@@ -1545,7 +1581,7 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     target_dest = (Rectangle){0, 0, target_w * 1.0f, target_h * 1.0f};
 
     //target_dest = (Rectangle){0, 0, w, h};
-    spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
+    //spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
 
     load_textures();
 
