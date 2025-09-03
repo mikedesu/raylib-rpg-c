@@ -29,8 +29,7 @@ typedef struct spritegroup_t {
     //sprite** sprites; // this is nasty wtf lol
     // new idea here: shared_ptr to unordered_map of int->sprite or int->shared_ptr<sprite>
 
-    //shared_ptr<unordered_map<int, shared_ptr<sprite>>> sprites2;
-    shared_ptr<unordered_map<int, shared_ptr<sprite>>> sprites2;
+    unordered_map<int, shared_ptr<sprite>> sprites2;
 
     float move_rate;
 } spritegroup_t;

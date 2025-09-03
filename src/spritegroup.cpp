@@ -33,9 +33,9 @@ spritegroup_t* spritegroup_create(int capacity) {
     //    return NULL;
     //}
 
-    minfo("Allocating memory for spritegroup sprites unordered_map...");
-    sg->sprites2 = make_shared<unordered_map<entityid, shared_ptr<sprite>>>();
-    msuccess("Allocated memory for spritegroup sprites unordered_map");
+    minfo("Initializing spritegroup sprites unordered_map...");
+    sg->sprites2 = unordered_map<entityid, shared_ptr<sprite>>();
+    msuccess("Initialized spritegroup sprites unordered_map");
     //shared_ptr<unordered_map<int, shared_ptr<sprite>>> sprites2;
     //massert(sg->sprites2, "spritegroup sprites2 is NULL");
 
@@ -63,7 +63,7 @@ void spritegroup_add(spritegroup_t* const sg, shared_ptr<sprite> s) {
     }
     if (sg->size < sg->capacity) {
         //sg->sprites2[sg->size] = s;
-        sg->sprites2->insert({sg->size, s});
+        sg->sprites2.insert({sg->size, s});
         sg->size++;
     }
 }
@@ -75,8 +75,8 @@ void spritegroup_set(spritegroup_t* const sg, int index, shared_ptr<sprite> s) {
     massert(index >= 0, "index is negative");
     massert(index < sg->capacity, "index is out of bounds");
 
-    if (sg->sprites2->find(index) != sg->sprites2->end()) {
-        sg->sprites2->insert({index, s});
+    if (sg->sprites2.find(index) != sg->sprites2.end()) {
+        sg->sprites2.insert({index, s});
     }
 }
 
@@ -84,15 +84,15 @@ void spritegroup_set(spritegroup_t* const sg, int index, shared_ptr<sprite> s) {
 void spritegroup_setcontexts(spritegroup_t* const sg, int context) {
     massert(sg, "spritegroup is NULL");
     for (int i = 0; i < sg->size; i++) {
-        if (sg->sprites2->find(i) == sg->sprites2->end()) {
+        if (sg->sprites2.find(i) == sg->sprites2.end()) {
             continue;
         }
 
         //if (!sg->sprites[i]) continue;
-        if (sg->sprites2->at(i)->numcontexts <= 0) continue;
+        if (sg->sprites2.at(i)->numcontexts <= 0) continue;
         if (context < 0) continue;
-        if (context >= sg->sprites2->at(i)->numcontexts) continue;
-        sprite_setcontext2(sg->sprites2->at(i), context);
+        if (context >= sg->sprites2.at(i)->numcontexts) continue;
+        sprite_setcontext2(sg->sprites2.at(i), context);
     }
 }
 
@@ -102,7 +102,7 @@ shared_ptr<sprite> spritegroup_get(spritegroup_t* const sg, int index) {
     massert(index < sg->size, "index is out of bounds");
 
     //return sg->sprites2[index];
-    return sg->sprites2->at(index);
+    return sg->sprites2.at(index);
 }
 
 shared_ptr<sprite> sg_get_current(spritegroup_t* const sg) {
@@ -110,7 +110,7 @@ shared_ptr<sprite> sg_get_current(spritegroup_t* const sg) {
     massert(sg->current >= 0, "current is negative");
     massert(sg->current < sg->size, "current is out of bounds");
     //return sg->sprites2[sg->current];
-    return sg->sprites2->at(sg->current);
+    return sg->sprites2.at(sg->current);
 }
 
 shared_ptr<sprite> sg_get_current_plus_one(spritegroup_t* const sg) {
@@ -118,7 +118,7 @@ shared_ptr<sprite> sg_get_current_plus_one(spritegroup_t* const sg) {
     massert(sg->current >= 0, "current is negative");
     if (sg->current + 1 >= sg->size) return NULL;
     //return sg->sprites2[sg->current + 1];
-    return sg->sprites2->at(sg->current + 1);
+    return sg->sprites2.at(sg->current + 1);
 }
 
 bool spritegroup_set_current(spritegroup_t* const sg, int index) {
@@ -169,7 +169,7 @@ bool spritegroup_is_animating(spritegroup_t* const sg) {
     }
     //shared_ptr<sprite> s = sg->sprites[sg->current];
     //shared_ptr<sprite> s = sg->sprites2[sg->current];
-    shared_ptr<sprite> s = sg->sprites2->at(sg->current);
+    shared_ptr<sprite> s = sg->sprites2.at(sg->current);
     if (!s) {
         merror("sprite is NULL");
         return false;
