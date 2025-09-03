@@ -4,7 +4,6 @@
 #include "entityid.h"
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
-//#include "hashtable_entityid_spritegroup.h"
 #include "libdraw.h"
 #include "libdraw_draw_inventory_menu.h"
 #include "libdraw_help_menu.h"
@@ -33,17 +32,13 @@
 #include <raylib.h>
 #include <sys/param.h>
 #include <unordered_map>
-//#include <vector>
 
 
 using std::shared_ptr;
 using std::unordered_map;
-//using std::vector;
 
 // this will be replaced with a new unordered_map
-//hashtable_entityid_spritegroup_t* spritegroups = NULL;
 unordered_map<entityid, spritegroup_t*> spritegroups2;
-
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 
@@ -94,9 +89,7 @@ static void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, sprit
 static void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 static void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-//static void draw_inventory_menu(shared_ptr<gamestate> g);
 static void draw_hud(shared_ptr<gamestate> g);
-//static void draw_title_screen(shared_ptr<gamestate> g, bool show_menu);
 static void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
 static void draw_title_screen_from_texture(shared_ptr<gamestate> g);
 
@@ -244,18 +237,14 @@ static shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entit
     massert(sg, "spritegroup is NULL");
     entityid weapon = g_get_equipped_weapon(g, id);
     if (weapon == ENTITYID_INVALID) return NULL;
-
     if (spritegroups2.find(weapon) == spritegroups2.end()) {
         return nullptr;
     }
-
     //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
     spritegroup_t* w_sg = spritegroups2[weapon];
-
     if (!w_sg) {
         return nullptr;
     }
-
     shared_ptr<sprite> retval = nullptr;
     if (sg->current == SG_ANIM_NPC_ATTACK) {
         retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
@@ -276,17 +265,14 @@ static shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entity
     if (weapon == ENTITYID_INVALID) {
         return nullptr;
     }
-
     if (spritegroups2.find(weapon) == spritegroups2.end()) {
         return nullptr;
     }
-
     //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
     spritegroup_t* w_sg = spritegroups2[weapon];
     if (!w_sg) {
         return nullptr;
     }
-
     shared_ptr<sprite> retval = nullptr;
     if (sg->current == SG_ANIM_NPC_ATTACK) {
         //retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
@@ -368,7 +354,6 @@ static void draw_entity_sprite(const shared_ptr<gamestate> g, spritegroup_t* sg)
     shared_ptr<sprite> s = sg_get_current(sg);
     massert(s, "sprite is NULL");
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
-
     //unsigned char a = 255;
     unsigned char a = (unsigned char)g_get_tx_alpha(g, sg->id);
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, (Color){255, 255, 255, a});
@@ -424,6 +409,7 @@ static void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, sprite
     }
 }
 
+
 static void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
@@ -467,7 +453,6 @@ static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeo
     massert(loc.x < df->width, "draw_entities_2d: x is out of bounds");
     massert(loc.y >= 0, "draw_entities_2d: y is out of bounds");
     massert(loc.y < df->height, "draw_entities_2d: y is out of bounds");
-
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
     if (!tile) {
         merror("draw_entities_2d: tile is NULL at (%d, %d)", (int)loc.x, (int)loc.y);
@@ -511,6 +496,7 @@ static void load_shaders() {
     //shader_tile_glow = LoadShader(0, "psychedelic_ripple.frag");
 }
 
+
 static void libdraw_unload_shaders() {
     UnloadShader(shader_grayscale);
     UnloadShader(shader_glow);
@@ -519,16 +505,15 @@ static void libdraw_unload_shaders() {
     UnloadShader(shader_psychedelic_0);
 }
 
+
 static inline bool camera_lock_on(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (!g->cam_lockon) {
         return false;
     }
-
     if (spritegroups2.find(g->hero_id) == spritegroups2.end()) {
         return false;
     }
-
     //spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     spritegroup_t* grp = spritegroups2[g->hero_id];
     if (!grp) {
@@ -536,7 +521,6 @@ static inline bool camera_lock_on(shared_ptr<gamestate> g) {
         minfo("hero may not have been created yet");
         return false;
     }
-
     //massert(grp, "spritegroup is NULL");
     // get the old camera position
     Vector2 old_target = g->cam2d.target;
@@ -613,7 +597,6 @@ static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, sprit
     massert(sg, "spritegroup is NULL");
     entityid weaponid = g_get_equipped_weapon(g, id);
     if (weaponid == ENTITYID_INVALID) return;
-
     //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weaponid);
     spritegroup_t* w_sg = spritegroups2[weaponid];
     if (!w_sg) {
@@ -645,8 +628,7 @@ static void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, sp
     update_weapon_for_entity(g, id, sg);
     g_set_attacking(g, id, false);
 }
-/*
-*/
+
 
 /*
 static void libdraw_set_sg_block_success(shared_ptr<gamestate> g,
@@ -705,8 +687,7 @@ static void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id,
         g->frame_dirty = true;
     }
 }
-/*
-*/
+
 
 static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir) {
     massert(g, "gamestate is NULL");
@@ -740,8 +721,7 @@ static void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegro
     }
     spritegroup_setcontexts(group, ctx);
 }
-/*
-*/
+
 
 static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
@@ -767,7 +747,6 @@ static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spri
     //} else if (g_is_dead(g, id)) {
     //    libdraw_set_sg_is_dead(g, id, sg);
     //}
-
     // Update movement as long as sg->move.x/y is non-zero
     if (spritegroup_update_dest(sg)) {
         g->frame_dirty = true;
@@ -781,16 +760,13 @@ static void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spri
 static void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-
     if (spritegroups2.find(id) == spritegroups2.end()) {
         return;
     }
-
     spritegroup_t* sg = spritegroups2[id];
     if (sg) {
         libdraw_update_sprite_ptr(g, id, sg);
     }
-
     //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
     //for (int i = 0; i < num_spritegroups; i++) {
     //    spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
@@ -855,7 +831,6 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
         g->frame_dirty = false;
         return;
     }
-
     // for the gameplay scene...
     if (g->framecount % ANIM_SPEED == 0) {
         libdraw_handle_dirty_entities(g);
@@ -864,7 +839,6 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
             //spritegroup_t* sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
             spritegroup_t* sg = spritegroups2[id];
             //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
-
             //for (int i = 0; i < num_spritegroups; i++) {
             //spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
             if (sg) {
@@ -957,7 +931,6 @@ static bool libdraw_draw_mouse_box(shared_ptr<gamestate> g) {
     if (l.x == -1 && l.y == -1) {
         return false;
     }
-
     // translate loc into the world position
     Vector2 p = GetScreenToWorld2D(l, g->cam2d);
     //minfo("Drawing mouse box at %.01f, %.01f", p.x, p.y);
@@ -982,9 +955,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
     //camera_lock_on(g);
-
     //minfo("Drawing frame");
-
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
     //EndShaderMode();
@@ -1067,7 +1038,6 @@ static void draw_message_history(shared_ptr<gamestate> g) {
         // if there are no messages, we don't need to draw anything
         return;
     }
-
     //max_measure = -1;
     //for (int i = 0; i < msg_count; i++) {
     //    msg = g->msg_history->at(i);
@@ -1076,9 +1046,7 @@ static void draw_message_history(shared_ptr<gamestate> g) {
     //        max_measure = measure;
     //    }
     //}
-
     max_measure = g->msg_history_max_len_msg_measure;
-
     w = max_measure + g->pad;
     //h = font_size * 5 + g->pad * 2;
     pad = 10;
@@ -1086,7 +1054,6 @@ static void draw_message_history(shared_ptr<gamestate> g) {
     //x = DEFAULT_TARGET_WIDTH - w;
     x = 0;
     y = font_size + g->pad + 5;
-
     box = {x, y, w, h};
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);
@@ -1126,12 +1093,9 @@ static inline void handle_debug_panel(shared_ptr<gamestate> g) {
 
 void libdraw_drawframe(shared_ptr<gamestate> g) {
     libdraw_update_sprites_pre(g);
-
-
     double start_time = GetTime();
     BeginDrawing();
     ClearBackground(RED);
-
     //minfo("Begin draw frame");
     //BeginShaderMode(shader_psychedelic_0);
     //float time = (float)GetTime(); // Current time in seconds
@@ -1150,7 +1114,6 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
         g->frame_dirty = false;
         g->frame_updates++;
     }
-
     // draw to the target texture
     BeginTextureMode(target);
     ClearBackground(BLUE);
@@ -1164,7 +1127,6 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
         libdraw_drawframe_2d_from_texture(g);
     }
     DrawFPS(0, DEFAULT_TARGET_HEIGHT - 20);
-
     //handle_debug_panel(g);
     EndTextureMode();
     // draw the target texture to the window
@@ -1175,8 +1137,6 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
     //msuccess("End draw frame");
-
-
     libdraw_update_sprites_post(g);
 }
 
@@ -1223,14 +1183,11 @@ static bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* 
     massert(txinfo[txkey].texture.id == 0, "txinfo[%d].texture.id is not 0", txkey);
     massert(strlen(path) > 0, "load_texture: path is empty");
     massert(strcmp(path, "\n") != 0, "load_texture: path is newline");
-
     Image image = LoadImage(path);
     // crash if there is a problem loading the image
     massert(image.data != NULL, "load_texture: image data is NULL for path: %s", path);
-
     if (do_dither) ImageDither(&image, 4, 4, 4, 4);
     Texture2D texture = LoadTextureFromImage(image);
-
     UnloadImage(image);
     txinfo[txkey].texture = texture;
     txinfo[txkey].contexts = ctxs;
@@ -1311,10 +1268,8 @@ static bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
     }
     msuccess("Created spritegroup with sprites");
     group->id = id;
-
     //sprite* s = spritegroup_get(group, 0);
     shared_ptr<sprite> s = spritegroup_get(group, 0);
-
     massert(s, "sprite is NULL");
     if (!s) {
         spritegroup_destroy(group);
@@ -1324,12 +1279,9 @@ static bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
     group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
     group->off_x = offset_x;
     group->off_y = offset_y;
-
     //hashtable_entityid_spritegroup_insert(spritegroups, id, group);
-
     // how its done in the future...
     spritegroups2[id] = group;
-
     return true;
 }
 
@@ -1508,37 +1460,27 @@ static void draw_hud(shared_ptr<gamestate> g) {
     int ac = 0;
     int floor = g->dungeon->current_floor;
     int font_size = 10;
-
     char buffer0[1024] = {0};
     char buffer1[1024] = {0};
-
     const char* format_str_0 = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d";
     const char* format_str_1 = "Floor %d Turn %d";
-
     snprintf(buffer0, sizeof(buffer0), format_str_0, g_get_name(g, g->hero_id).c_str(), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp);
     snprintf(buffer1, sizeof(buffer1), format_str_1, floor, turn);
-
     //Vector2 text_size0 = MeasureTextEx(GetFontDefault(), buffer0, font_size, g->line_spacing);
     int text_size0 = MeasureText(buffer0, font_size);
-
     float box_w = text_size0 + g->pad * 2;
     float box_h = font_size + g->pad;
-
     // instead, lets position the HUD at the top right corner of the screen
     float box_x = 0;
     float box_y = 0;
     Color bg = (Color){0x33, 0x33, 0x33, 0xFF}, fg = WHITE;
-
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
     int line_thickness = 1;
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, line_thickness, fg);
-
     // Calculate text position to center it within the box
     int text_x = box_x + 10;
     int text_y = box_y + (box_h - font_size) / 2;
-
     DrawText(buffer0, text_x, text_y, font_size, fg);
-
     //text_y += font_size;
     //DrawText(buffer1, text_x, text_y, font_size, fg);
 }
@@ -1548,13 +1490,10 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     minfo("libdraw_init_rest: initializing rest of the libdraw");
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);
-
     int w = DEFAULT_WIN_WIDTH;
     int h = DEFAULT_WIN_HEIGHT;
-
     int target_w = DEFAULT_TARGET_WIDTH;
     int target_h = DEFAULT_TARGET_HEIGHT;
-
     minfo("libdraw_init_rest: window size: %dx%d", w, h);
     massert(w > 0 && h > 0, "window width or height is not set properly");
     g->windowwidth = w;
@@ -1570,25 +1509,17 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     //target = LoadRenderTexture(w, h);
     title_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(title_target_texture.texture, filter);
-
     char_creation_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(char_creation_target_texture.texture, filter);
-
     main_game_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(main_game_target_texture.texture, filter);
-
     target_src = (Rectangle){0, 0, target_w * 1.0f, -target_h * 1.0f};
     target_dest = (Rectangle){0, 0, target_w * 1.0f, target_h * 1.0f};
-
     //target_dest = (Rectangle){0, 0, w, h};
     //spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
-
     load_textures();
-
     //calc_debugpanel_size(g);
-
     load_shaders();
-
     float x = target_w / 2.0f - DEFAULT_TILE_SIZE * 4;
     //float y = target_h / 16.0f;
     float y = DEFAULT_TILE_SIZE * 2;
@@ -1596,24 +1527,18 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     //float y = DEFAULT_TILE_SIZE * 8;
     //float x = 0;
     //float y = 0;
-
     g->cam2d.offset = (Vector2){x, y};
     //g->cam2d.zoom = 1.0f;
-
     //gamestate_set_debug_panel_pos_top_right(g);
-
     // set the camera target to the center of the dungeon
     //dungeon_floor_t* const df = d_get_current_floor(g->d);
     //massert(df, "dungeon_floor is NULL");
-
     //int df_w = df->width;
     //int df_h = df->height;
     //g->cam2d.target = (Vector2){df_w * DEFAULT_TILE_SIZE / 2.0f,
     //                            df_h * DEFAULT_TILE_SIZE / 2.0f};
-
     draw_title_screen_to_texture(g, false);
     draw_character_creation_screen_to_texture(g);
-
     //InitAudioDevice();
     // select a random indices for current music
     //g->current_music_index = rand() % g->total_music_paths;
@@ -1633,9 +1558,7 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     //SetMusicVolume(music, g->music_volume); // Set initial music volume
     //SetMusicLooping(music, true); // Loop the music
     //PlayMusicStream(music);
-
     //if (!camera_lock_on(g)) merror("failed to lock camera on hero");
-
     msuccess("libdraw_init_rest: done");
 }
 
@@ -1646,12 +1569,9 @@ void libdraw_init(shared_ptr<gamestate> g) {
     const char* title = WINDOW_TITLE;
     char full_title[1024] = {0};
     snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version.c_str());
-
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
-
     InitWindow(w, h, full_title);
     SetWindowMinSize(320, 240);
-
     libdraw_init_rest(g);
 }
 
