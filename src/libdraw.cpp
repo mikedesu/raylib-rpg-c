@@ -1257,7 +1257,9 @@ static bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
         spritegroup_destroy(group);
         return false;
     }
+    minfo("Creating spritegroup for entity %d at loc %d,%d", id, (int)loc.x, (int)loc.y);
     for (int i = 0; i < num_keys; i++) {
+        minfo("loading sprite for key %d", keys[i]);
         int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
         //sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
@@ -1271,6 +1273,7 @@ static bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, 
         spritegroup_add(group, s);
         msuccess("added sprite to group!");
     }
+    msuccess("Created spritegroup with sprites");
     group->id = id;
 
     //sprite* s = spritegroup_get(group, 0);

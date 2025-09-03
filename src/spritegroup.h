@@ -6,11 +6,13 @@
 #include "vec3.h"
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 #define SPRITEGROUP_ANIM_QUEUE_MAX 32
 
 using std::shared_ptr;
 using std::unordered_map;
+using std::vector;
 
 typedef struct spritegroup_t {
     int size;
@@ -29,7 +31,8 @@ typedef struct spritegroup_t {
     //sprite** sprites; // this is nasty wtf lol
     // new idea here: shared_ptr to unordered_map of int->sprite or int->shared_ptr<sprite>
 
-    unordered_map<int, shared_ptr<sprite>> sprites2;
+    //unordered_map<int, shared_ptr<sprite>> sprites2;
+    vector<shared_ptr<sprite>>* sprites2;
 
     float move_rate;
 } spritegroup_t;
@@ -42,8 +45,8 @@ shared_ptr<sprite> sg_get_current_plus_one(spritegroup_t* const sg);
 
 int spritegroup_get_first_context(spritegroup_t* const sg);
 
-void spritegroup_add(spritegroup_t* const sg, shared_ptr<sprite> s);
-void spritegroup_set(spritegroup_t* const sg, int index, shared_ptr<sprite> s);
+void spritegroup_add(spritegroup_t* sg, shared_ptr<sprite> s);
+//void spritegroup_set(spritegroup_t* const sg, int index, shared_ptr<sprite> s);
 void spritegroup_setcontexts(spritegroup_t* const sg, int context);
 void spritegroup_destroy(spritegroup_t* sg);
 void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop);
