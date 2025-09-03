@@ -8,14 +8,14 @@ LINK_MATH = -lm
 RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 CFLAGS ?= # Allow override
 
-GAMESTATE_OBJECTS = gamestate.o hashtable_entityid_spritegroup.o dungeon_floor.o dungeon_tile.o dungeon.o keybinding.o path_node.o component.o item_container.o
+GAMESTATE_OBJECTS = gamestate.o dungeon_floor.o dungeon_tile.o dungeon.o keybinding.o path_node.o component.o item_container.o
 
 LIBDRAW_OBJECTS = libdraw.o $(GAMESTATE_OBJECTS)
 LIBLOGIC_OBJECTS = liblogic.o $(GAMESTATE_OBJECTS)
 
 # Web build setup
 WEB_CC = emcc
-WEB_SOURCES = $(MAIN_C) gameloader_web.cpp libdraw_draw_inventory_menu.cpp libdraw_title_screen.cpp libdraw_help_menu.cpp libdraw_draw_character_creation_screen.cpp libdraw.cpp liblogic_try_entity_pickup.cpp liblogic_add_message.cpp liblogic_update_player_state.o liblogic_tile_npc_living_count.cpp liblogic_tile_has_box.cpp liblogic_try_entity_move.cpp liblogic.cpp gamestate.cpp hashtable_entityid_spritegroup.cpp  dungeon_floor.cpp dungeon_tile.cpp sprite.cpp spritegroup.cpp race.cpp dungeon.cpp keybinding.cpp path_node.cpp item_container.cpp
+WEB_SOURCES = $(MAIN_C) gameloader_web.cpp libdraw_draw_inventory_menu.cpp libdraw_title_screen.cpp libdraw_help_menu.cpp libdraw_draw_character_creation_screen.cpp libdraw.cpp liblogic_try_entity_pickup.cpp liblogic_add_message.cpp liblogic_update_player_state.o liblogic_tile_npc_living_count.cpp liblogic_tile_has_box.cpp liblogic_try_entity_move.cpp liblogic.cpp gamestate.cpp dungeon_floor.cpp dungeon_tile.cpp sprite.cpp spritegroup.cpp race.cpp dungeon.cpp keybinding.cpp path_node.cpp item_container.cpp
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
 
@@ -31,7 +31,7 @@ all: game
 
 # Desktop build
 
-game: main.o gameloader.o gamestate.o keybinding.o libdraw_draw_inventory_menu.o libdraw_title_screen.o libdraw_help_menu.o  libdraw_draw_character_creation_screen.o  libdraw.o hashtable_entityid_spritegroup.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o dungeon_tile.o path_node.o liblogic_add_message.o liblogic_try_entity_pickup.o liblogic_update_player_state.o liblogic_tile_npc_living_count.o liblogic_tile_has_box.o liblogic_try_entity_move.o liblogic.o item_container.o
+game: main.o gameloader.o gamestate.o keybinding.o libdraw_draw_inventory_menu.o libdraw_title_screen.o libdraw_help_menu.o  libdraw_draw_character_creation_screen.o  libdraw.o spritegroup.o sprite.o dungeon.o dungeon_floor.o dungeon_tile.o dungeon_tile.o path_node.o liblogic_add_message.o liblogic_try_entity_pickup.o liblogic_update_player_state.o liblogic_tile_npc_living_count.o liblogic_tile_has_box.o liblogic_try_entity_move.o liblogic.o item_container.o
 	$(CXX) -o $@ $^ -L. $(RAYLIB_LIBS) $(WFLAGS) $(CFLAGS)
 	./log_build_stats.sh
 
@@ -51,9 +51,6 @@ sprite.o: sprite.cpp
 	$(CXX) $(CXXFLAGS) $^ -c 
 
 spritegroup.o: spritegroup.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
-
-hashtable_entityid_spritegroup.o: hashtable_entityid_spritegroup.cpp
 	$(CXX) $(CXXFLAGS) $^ -c 
 
 dungeon_tile.o: dungeon_tile.cpp
