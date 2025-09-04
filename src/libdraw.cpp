@@ -73,9 +73,6 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
 
-static int get_total_ac(shared_ptr<gamestate> g, entityid id);
-
-
 static inline bool camera_lock_on(shared_ptr<gamestate> g);
 static inline void update_debug_panel(shared_ptr<gamestate> g);
 static inline void handle_debug_panel(shared_ptr<gamestate> g);
@@ -1333,28 +1330,6 @@ static void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     }
 */
 
-/*
-static int get_total_ac(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    // get the ac stat
-    int stat_count = 0;
-    int* stats = g_get_stats(g, id, &stat_count);
-    massert(stats, "stats is NULL");
-    int ac = stats[STATS_AC], dex = g_get_stat(g, id, STATS_DEX),
-        dex_bonus = bonus_calc(dex);
-    // get the equipped shield
-    entityid shield_id = g_get_equipment(g, id, EQUIP_SLOT_SHIELD);
-    if (shield_id != ENTITYID_INVALID) {
-        // get the shield's ac
-        int shield_ac = g_get_ac(g, shield_id);
-        massert(shield_ac >= 0, "shield_ac is negative");
-        ac += shield_ac;
-    }
-    ac += dex_bonus;
-    return ac;
-}
-*/
 
 static void draw_hud(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
