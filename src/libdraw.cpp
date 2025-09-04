@@ -141,7 +141,6 @@ static bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_p
 static bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
 static bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
 static bool libdraw_draw_player_target_box(shared_ptr<gamestate> g);
-static bool libdraw_draw_mouse_box(shared_ptr<gamestate> g);
 
 //static bool libdraw_check_default_animations(const shared_ptr<gamestate> g);
 
@@ -922,34 +921,6 @@ static bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
 }
 
 
-static bool libdraw_draw_mouse_box(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    //entityid id = g->hero_id;
-    //if (id == -1) return false;
-    //direction_t dir = g_get_dir(g, id);
-    Vector2 l = g->last_click_screen_pos;
-    if (l.x == -1 && l.y == -1) {
-        return false;
-    }
-    // translate loc into the world position
-    Vector2 p = GetScreenToWorld2D(l, g->cam2d);
-    //minfo("Drawing mouse box at %.01f, %.01f", p.x, p.y);
-    float w = DEFAULT_TILE_SIZE; //* g->cam2d.zoom;
-    float h = DEFAULT_TILE_SIZE; //* g->cam2d.zoom;
-    float x = p.x - w / 2.0f;
-    float y = p.y - h / 2.0f;
-    //float y = loc.y + get_y_from_dir(dir);
-    //Color base_c = GREEN;
-    float a = 0.8f;
-    //if (g->player_changing_dir) {
-    //    a = 1.0f;
-    //}
-    //DrawRectangleLinesEx((Rectangle){p.x * w, p.y * h, w, h}, 1, Fade(ORANGE, a));
-    DrawRectangleLinesEx((Rectangle){x, y, w, h}, 1, Fade(BLUE, a));
-    return true;
-}
-
-
 static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
@@ -961,7 +932,6 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //EndShaderMode();
     libdraw_draw_dungeon_floor(g);
     libdraw_draw_player_target_box(g);
-    libdraw_draw_mouse_box(g);
     EndMode2D();
     draw_hud(g);
     draw_message_history(g);
