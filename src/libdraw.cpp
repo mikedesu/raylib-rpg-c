@@ -8,6 +8,7 @@
 #include "libdraw_draw_inventory_menu.h"
 #include "libdraw_help_menu.h"
 #include "libdraw_title_screen.h"
+#include "libdraw_version.h"
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
@@ -37,8 +38,8 @@
 using std::shared_ptr;
 using std::unordered_map;
 
-// this will be replaced with a new unordered_map
 unordered_map<entityid, spritegroup_t*> spritegroups2;
+
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 
@@ -116,7 +117,6 @@ static void draw_debug_panel(shared_ptr<gamestate> g);
 static void libdraw_drawframe_2d(shared_ptr<gamestate> g);
 static void create_sg_byid(shared_ptr<gamestate> g, entityid id);
 static bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
-static void draw_version(const shared_ptr<gamestate> g);
 
 static void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
@@ -973,7 +973,7 @@ static void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //    draw_gameplay_settings_menu(g);
     //}
     handle_debug_panel(g);
-    //draw_version(g);
+    draw_version(g);
     if (g->display_help_menu) {
         draw_help_menu(g);
     }
@@ -1655,19 +1655,19 @@ bool libdraw_windowshouldclose(const shared_ptr<gamestate> g) {
 }
 
 
-static void draw_version(const shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    const char* version = g->version.c_str();
-    int font_size = 10;
-    char buffer[1024] = {0};
-    // also grab the current music track path
-    snprintf(buffer, sizeof(buffer), "%s", version);
-    Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
-    int w = DEFAULT_TARGET_WIDTH;
-    int x = 20;
-    int y = 20;
-    DrawText(buffer, x, y, font_size, WHITE);
-}
+//void draw_version(const shared_ptr<gamestate> g) {
+//    massert(g, "gamestate is NULL");
+//    const char* version = g->version.c_str();
+//    int font_size = 10;
+//    char buffer[1024] = {0};
+//    // also grab the current music track path
+//    snprintf(buffer, sizeof(buffer), "%s", version);
+//    Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
+//    int w = DEFAULT_TARGET_WIDTH;
+//    int x = 20;
+//    int y = 20;
+//    DrawText(buffer, x, y, font_size, WHITE);
+//}
 
 
 static void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu) {
