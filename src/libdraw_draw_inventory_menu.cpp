@@ -1,10 +1,13 @@
+#include "gamestate_inventory.h"
 #include "libdraw_draw_inventory_menu.h"
 #include "libgame_defines.h"
 #include "spritegroup.h"
 
 void draw_inventory_menu(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    if (!g->display_inventory_menu) return;
+    if (!g->display_inventory_menu) {
+        return;
+    }
     const char* menu_title = "Inventory Menu";
     // Parameters
     int box_pad = g->pad;
@@ -37,7 +40,6 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
     // Partition into left/right halves (with gap)
     // Left box: inventory list
     // Right box: item info
-
     Rectangle left_box = {menu_box.x + box_pad, title_y + title_size.y + box_pad, half_width - box_pad, half_height};
     Rectangle right_box = {left_box.x + half_width + section_gap, left_box.y, half_width - box_pad * 2, half_height};
     // Draw left and right boxes
@@ -48,6 +50,29 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
     DrawRectangleLinesEx(left_box, 2, WHITE);
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
+
+    auto inventory = g_get_inventory(g, g->hero_id);
+    if (inventory) {
+        // lets start with just one block
+        float x = left_box.x + 2;
+        float y = left_box.y + 2;
+        int cols = 7;
+        const float w = (left_box.width - 4) / cols;
+        int rows = 7;
+        const float h = (left_box.height - 4) / rows;
+
+        for (int j = 0; j < rows; j++) {
+            for (int i = 0; i < cols; i++) {
+                Rectangle grid_box = {x, y, w, h};
+                DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
+                x += w;
+            }
+            x = left_box.x + 2;
+            y += h;
+        }
+    }
+
+
     //size_t inventory_count = 0;
     //entityid* inventory = g_get_inventory(g, g->hero_id, &inventory_count);
     //massert(inventory, "inventory is NULL");
