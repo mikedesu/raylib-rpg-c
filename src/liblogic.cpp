@@ -678,17 +678,17 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     //g->entity_turn = create_player(g, (vec3){0, 0, 0}, "darkmage");
 
-    create_wooden_box(g, (vec3){2, 2, 0});
-    create_wooden_box(g, (vec3){3, 2, 0});
-    create_wooden_box(g, (vec3){4, 2, 0});
-    create_wooden_box(g, (vec3){5, 2, 0});
-    create_wooden_box(g, (vec3){6, 2, 0});
-    create_wooden_box(g, (vec3){7, 2, 0});
-    create_wooden_box(g, (vec3){7, 3, 0});
-    create_wooden_box(g, (vec3){7, 4, 0});
-    create_wooden_box(g, (vec3){7, 5, 0});
-    create_wooden_box(g, (vec3){7, 6, 0});
-    create_wooden_box(g, (vec3){7, 7, 0});
+    //create_wooden_box(g, (vec3){2, 2, 0});
+    //create_wooden_box(g, (vec3){3, 2, 0});
+    //create_wooden_box(g, (vec3){4, 2, 0});
+    //create_wooden_box(g, (vec3){5, 2, 0});
+    //create_wooden_box(g, (vec3){6, 2, 0});
+    //create_wooden_box(g, (vec3){7, 2, 0});
+    //create_wooden_box(g, (vec3){7, 3, 0});
+    //create_wooden_box(g, (vec3){7, 4, 0});
+    //create_wooden_box(g, (vec3){7, 5, 0});
+    //create_wooden_box(g, (vec3){7, 6, 0});
+    //create_wooden_box(g, (vec3){7, 7, 0});
 
     //create_npc_set_stats(g, (vec3){5, 3, 0}, RACE_HUMAN);
     //create_npc_set_stats(g, (vec3){5, 4, 0}, RACE_ELF);
@@ -710,11 +710,18 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     //create_weapon(g, (vec3){1, 5, 0}, WEAPON_TWO_HANDED_SWORD);
     //create_weapon(g, (vec3){1, 6, 0}, WEAPON_BOW);
+    //create_weapon(g, (vec3){1, 6, 0}, WEAPON_WARHAMMER);
+
     create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
     create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
     create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
-    //create_weapon(g, (vec3){1, 6, 0}, WEAPON_WARHAMMER);
-    create_weapon(g, (vec3){1, 6, 0}, WEAPON_FLAIL);
+    create_weapon(g, (vec3){1, 5, 0}, WEAPON_FLAIL);
+
+    create_weapon(g, (vec3){2, 3, 0}, WEAPON_DAGGER);
+    create_weapon(g, (vec3){2, 2, 0}, WEAPON_SWORD);
+    create_weapon(g, (vec3){2, 4, 0}, WEAPON_AXE);
+    create_weapon(g, (vec3){2, 5, 0}, WEAPON_FLAIL);
+
 
     add_message(g, "Welcome to the game! Press enter to cycle messages.");
     add_message(g, "To move around, press q w e a d z x c");
@@ -2042,6 +2049,22 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
         return;
     }
 
+    if (inputstate_is_pressed(is, KEY_LEFT)) {
+        if (g->inventory_cursor.x > 0) {
+            g->inventory_cursor.x--;
+        }
+    }
+    if (inputstate_is_pressed(is, KEY_RIGHT)) {
+        g->inventory_cursor.x++;
+    }
+    if (inputstate_is_pressed(is, KEY_UP)) {
+        if (g->inventory_cursor.y > 0) {
+            g->inventory_cursor.y--;
+        }
+    }
+    if (inputstate_is_pressed(is, KEY_DOWN)) {
+        g->inventory_cursor.y++;
+    }
     // cycle menus
     //if (inputstate_is_pressed(is, KEY_LEFT) ||
     //    inputstate_is_pressed(is, KEY_RIGHT)) {

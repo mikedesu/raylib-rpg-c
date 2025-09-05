@@ -66,18 +66,26 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
 
         auto it = inventory->begin();
 
+        //Vector2 inventory_cursor = {0, 0};
+
         for (int j = 0; j < rows; j++) {
             for (int i = 0; i < cols; i++) {
                 Rectangle grid_box = {x, y, w, h};
+                Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
                 DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
 
                 if (it != inventory->end()) {
                     spritegroup_t* sg = spritegroups2[*it];
                     if (sg) {
                         auto sprite = sg_get_current(sg);
-                        DrawTexturePro(*(sprite->texture), (Rectangle){12, 12, 8, 8}, grid_box, (Vector2){0, 0}, 0.0f, WHITE);
+                        //DrawTexturePro(*(sprite->texture), (Rectangle){12, 12, 8, 8}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
+                        DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
                     }
                     it++;
+                }
+
+                if ((float)i == g->inventory_cursor.x && (float)j == g->inventory_cursor.y) {
+                    DrawRectangleLinesEx(grid_box, 2, GREEN);
                 }
 
                 x += w;

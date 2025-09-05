@@ -174,6 +174,10 @@ typedef struct gamestate {
     Vector2 last_click_screen_pos;
     Color message_history_bgcolor;
 
+
+    Vector2 inventory_cursor = {0, 0};
+
+
 } gamestate;
 
 
