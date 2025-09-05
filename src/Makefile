@@ -36,7 +36,6 @@ WEB_SOURCES=main.cpp \
 			race.cpp \
 			dungeon.cpp \
 			path_node.cpp \
-			item_container.cpp
 
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
@@ -79,7 +78,6 @@ OBJ_FILES=main.o \
 		  liblogic_tile_has_box.o \
 		  liblogic_try_entity_move.o \
 		  liblogic.o \
-		  item_container.o
 
 
 
@@ -173,8 +171,6 @@ liblogic_tile_has_box.o: liblogic_tile_has_box.cpp
 liblogic.o: liblogic.cpp
 	$(CXX) $(CXXFLAGS) $^ -c
 
-item_container.o: item_container.h item_container.cpp
-	$(CXX) $(CXXFLAGS) item_container.cpp -c
 
 
 #test: $(UNIT_TEST_OBJS)

@@ -13,13 +13,14 @@
 #include "fadestate.h"
 #include "gamestate_flag.h"
 #include "inventory_sort.h"
-#include "item_container.h"
+//#include "item_container.h"
 #include "monster_def.h"
 #include "ringtype.h"
 #include "scene.h"
 #include <ctime>
 #include <memory>
 #include <raylib.h>
+#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -37,6 +38,7 @@
 #define MAX_MUSIC_PATH_LENGTH 256
 
 
+using std::set;
 using std::shared_ptr;
 using std::unordered_map;
 using std::vector;
@@ -116,7 +118,7 @@ typedef struct gamestate {
 
     shared_ptr<unordered_map<entityid, entityid>> equipped_weapon_list;
 
-    shared_ptr<unordered_map<entityid, shared_ptr<item_container>>> inventory_list;
+    shared_ptr<unordered_map<entityid, shared_ptr<set<entityid>>>> inventory_list;
 
 
     debugpanel_t debugpanel;

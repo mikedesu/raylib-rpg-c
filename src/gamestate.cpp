@@ -172,8 +172,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->weapon_type_list = make_shared<unordered_map<entityid, weapontype>>();
     g->stats_list = make_shared<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>>();
     g->equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
-
-    g->inventory_list = make_shared<unordered_map<entityid, shared_ptr<item_container>>>();
+    g->inventory_list = make_shared<unordered_map<entityid, shared_ptr<set<entityid>>>>();
 
     g->last_click_screen_pos = (Vector2){-1, -1};
 

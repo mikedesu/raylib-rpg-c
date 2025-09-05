@@ -24,9 +24,7 @@ bool g_add_inventory(shared_ptr<gamestate> g, entityid id) {
     // this line sometimes crashes...but why?
     //g->inventory_list->insert({id, make_shared<item_container>(2, 5)});
     if (g->inventory_list) {
-        //minfo("Shit is gonna crash and idk why, wtf");
-        g->inventory_list->insert({id, make_shared<item_container>(2, 5)});
-        //msuccess("Entity id %d now has an inventory");
+        g->inventory_list->insert({id, make_shared<set<entityid>>()});
         return true;
     }
     merror("Something fucked up");
@@ -46,7 +44,7 @@ bool g_has_inventory(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-shared_ptr<item_container> g_get_inventory(shared_ptr<gamestate> g, entityid id) {
+shared_ptr<set<entityid>> g_get_inventory(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g->inventory_list) {
