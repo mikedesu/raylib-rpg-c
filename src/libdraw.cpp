@@ -3,6 +3,7 @@
 #include "dungeon_tile_type.h"
 #include "entityid.h"
 #include "gamestate.h"
+#include "gamestate_equipped_weapon.h"
 #include "get_txkey_for_tiletype.h"
 #include "libdraw.h"
 #include "libdraw_draw_character_creation_screen.h"

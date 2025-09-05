@@ -1,4 +1,5 @@
 #include "gamestate.h"
+#include "gamestate_equipped_weapon.h"
 #include "liblogic_add_message.h"
 #include "massert.h"
 

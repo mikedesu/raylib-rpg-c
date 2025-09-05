@@ -318,13 +318,3 @@ bool g_add_stats(shared_ptr<gamestate> g, entityid id);
 bool g_has_stats(shared_ptr<gamestate> g, entityid id);
 bool g_set_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot, int value);
 int g_get_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot);
-
-
-bool g_add_equipped_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id);
-bool g_has_equipped_weapon(shared_ptr<gamestate> g, entityid id);
-bool g_set_equipped_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id);
-entityid g_get_equipped_weapon(shared_ptr<gamestate> g, entityid id);
-
-bool g_add_inventory(shared_ptr<gamestate> g, entityid id);
-bool g_has_inventory(shared_ptr<gamestate> g, entityid id);
-shared_ptr<item_container> g_get_inventory(shared_ptr<gamestate> g, entityid id);
