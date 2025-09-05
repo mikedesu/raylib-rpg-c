@@ -33,7 +33,6 @@ WEB_SOURCES=main.cpp \
 			spritegroup.cpp \
 			race.cpp \
 			dungeon.cpp \
-			keybinding.cpp \
 			path_node.cpp \
 			item_container.cpp
 
@@ -43,7 +42,7 @@ WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-s
 EMCC_OPTIONS = -s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall -s ALLOW_MEMORY_GROWTH
 
 SHELL_FILE = --shell-file minshell.html
-PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img --preload-file keybindings.ini --preload-file ./audio/music --preload-file ./music.txt --preload-file ./monsters.csv
+PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img  --preload-file ./audio/music --preload-file ./music.txt --preload-file ./monsters.csv
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 
 # Targets
@@ -55,7 +54,6 @@ all: game
 OBJ_FILES=main.o \
 		  gameloader.o \
 		  gamestate.o \
-		  keybinding.o \
 		  libdraw_draw_inventory_menu.o \
 		  libdraw_message_history.o \
 		  libdraw_version.o \
@@ -94,8 +92,6 @@ gameloader.o: gameloader.cpp
 gamestate.o: gamestate.cpp
 	$(CXX) $(CXXFLAGS) $^ -c 
 
-keybinding.o: keybinding.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
 
 sprite.o: sprite.cpp
 	$(CXX) $(CXXFLAGS) $^ -c 

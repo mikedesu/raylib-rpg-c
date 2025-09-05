@@ -148,7 +148,6 @@ typedef struct gamestate {
 
     shared_ptr<vector<string>> msg_system;
     shared_ptr<vector<string>> msg_history;
-    shared_ptr<keybinding_list_t> keybinding_list;
     shared_ptr<character_creation> chara_creation;
 
     int msg_history_max_len_msg;

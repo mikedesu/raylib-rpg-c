@@ -90,7 +90,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void try_spawn_npc(shared_ptr<gamestate> const g);
 
-static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+//static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 
 //static void handle_input_help_menu(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 static void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -293,19 +293,19 @@ static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
 }
 
 
-static const char* get_action_key(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
-    int key = inputstate_get_pressed_key(is);
-    // can return early if key == -1
-    if (key == -1) {
-        return "none";
-    }
-    return get_action_for_key(g->keybinding_list, key);
-}
+//static const char* get_action_key(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+//    int key = inputstate_get_pressed_key(is);
+//    // can return early if key == -1
+//    if (key == -1) {
+//        return "none";
+//    }
+//    return get_action_for_key(g->keybinding_list, key);
+//}
 
 
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     const float move = g->cam2d.zoom;
-    const char* action = get_action_key(is, g);
+    //const char* action = get_action_key(is, g);
     if (inputstate_is_held(is, KEY_RIGHT)) {
         g->cam2d.offset.x += move;
     } else if (inputstate_is_held(is, KEY_LEFT)) {

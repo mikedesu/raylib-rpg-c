@@ -178,7 +178,6 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->last_click_screen_pos = (Vector2){-1, -1};
 
-    gamestate_load_keybindings(g);
     msuccess("Gamestate initialized successfully");
     return g;
 }
@@ -269,20 +268,6 @@ bool g_set_hero_id(shared_ptr<gamestate> g, entityid id) {
 entityid gamestate_get_hero_id(const gamestate* const g) {
     massert(g, "g is NULL");
     return g->hero_id;
-}
-
-
-void gamestate_load_keybindings(shared_ptr<gamestate> g) {
-    massert(g, "g is NULL");
-    minfo("Loading keybindings from file");
-    string filename = "keybindings.ini";
-    // keybinding_list needs to be initialized
-    if (!g->keybinding_list) {
-        g->keybinding_list = make_shared<keybinding_list_t>();
-        massert(g->keybinding_list, "g->keybinding_list is NULL");
-    }
-    load_keybindings(filename, g->keybinding_list);
-    print_keybindings(g->keybinding_list);
 }
 
 
