@@ -14,7 +14,6 @@
 #include "gamestate_flag.h"
 #include "inventory_sort.h"
 #include "item_container.h"
-#include "keybinding.h"
 #include "monster_def.h"
 #include "ringtype.h"
 #include "scene.h"
@@ -168,7 +167,6 @@ typedef struct gamestate {
     bool do_restart;
 
     // Array of monster definitions
-    //monster_def* monster_defs;
     float music_volume;
     // last click position
     Vector2 last_click_screen_pos;
@@ -179,8 +177,10 @@ typedef struct gamestate {
 
 shared_ptr<gamestate> gamestateinitptr();
 
+void gamestate_init_music_paths(shared_ptr<gamestate> g);
 
-shared_ptr<dungeon_t> g_get_dungeon(std::shared_ptr<gamestate> g);
+
+shared_ptr<dungeon_t> g_get_dungeon(shared_ptr<gamestate> g);
 
 
 entityid gamestate_get_hero_id(shared_ptr<gamestate> g);

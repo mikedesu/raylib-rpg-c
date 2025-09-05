@@ -32,7 +32,6 @@ using std::vector;
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
 #define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
 
-static void gamestate_init_music_paths(shared_ptr<gamestate> g);
 
 // have to update this function when we introduce new fields to Gamestate
 shared_ptr<gamestate> gamestateinitptr() {
@@ -183,7 +182,7 @@ shared_ptr<gamestate> gamestateinitptr() {
 }
 
 
-static void gamestate_init_music_paths(shared_ptr<gamestate> g) {
+void gamestate_init_music_paths(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
     const char* music_path_file = "music.txt";
     FILE* file = fopen(music_path_file, "r");
@@ -1573,6 +1572,7 @@ entityid g_get_equipped_weapon(shared_ptr<gamestate> g, entityid id) {
 //    return false;
 //}
 
+
 bool g_add_inventory(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
@@ -1604,6 +1604,7 @@ bool g_add_inventory(shared_ptr<gamestate> g, entityid id) {
     return false;
 }
 
+
 bool g_has_inventory(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
@@ -1614,6 +1615,7 @@ bool g_has_inventory(shared_ptr<gamestate> g, entityid id) {
     // Check if the entity has an inventory component
     return g->inventory_list->find(id) != g->inventory_list->end();
 }
+
 
 shared_ptr<item_container> g_get_inventory(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
