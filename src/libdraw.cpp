@@ -74,16 +74,27 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
 
-inline bool camera_lock_on(shared_ptr<gamestate> g);
-inline void update_debug_panel(shared_ptr<gamestate> g);
-inline void handle_debug_panel(shared_ptr<gamestate> g);
+bool camera_lock_on(shared_ptr<gamestate> g);
+void update_debug_panel(shared_ptr<gamestate> g);
+void handle_debug_panel(shared_ptr<gamestate> g);
 
-void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
-void draw_gameover_menu(shared_ptr<gamestate> g);
 void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id);
 void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g);
+void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+void libdraw_unload_shaders();
+void libdraw_unload_textures();
+void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
+void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+void libdraw_drawframe_2d(shared_ptr<gamestate> g);
+
+void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
+void draw_gameover_menu(shared_ptr<gamestate> g);
 void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
@@ -93,29 +104,20 @@ void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
 void draw_title_screen_from_texture(shared_ptr<gamestate> g);
 void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g);
 void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
-void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
-void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
-void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
-void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
-void load_shaders();
-void libdraw_unload_shaders();
-void libdraw_unload_textures();
-void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
-void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 void draw_message_box(shared_ptr<gamestate> g);
 void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id);
 void draw_debug_panel(shared_ptr<gamestate> g);
-void libdraw_drawframe_2d(shared_ptr<gamestate> g);
-void create_sg_byid(shared_ptr<gamestate> g, entityid id);
 
-bool load_textures();
+void create_sg_byid(shared_ptr<gamestate> g, entityid id);
+void load_shaders();
+
 bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
+bool load_textures();
 bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
-bool libdraw_unload_texture(int txkey);
 bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z);
 bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df);
 bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
+bool libdraw_unload_texture(int txkey);
 bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
 bool libdraw_draw_player_target_box(shared_ptr<gamestate> g);
 
@@ -125,10 +127,10 @@ shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id,
 sprite* get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
-//static sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-//static sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-//static bool libdraw_check_default_animations(const shared_ptr<gamestate> g);
-//static void draw_shadow_for_entity(const shared_ptr<gamestate> g,
+// sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+// sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+// bool libdraw_check_default_animations(const shared_ptr<gamestate> g);
+// void draw_shadow_for_entity(const shared_ptr<gamestate> g,
 //                                   spritegroup_t* sg,
 //                                   entityid id);
 
@@ -243,7 +245,6 @@ shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id,
 }
 
 
-//static sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
 shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
@@ -272,7 +273,7 @@ shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, 
 }
 
 /*
-static sprite* get_shield_front_sprite(const shared_ptr<gamestate> g,
+sprite* get_shield_front_sprite(const shared_ptr<gamestate> g,
                                        entityid id,
                                        spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
@@ -294,7 +295,7 @@ static sprite* get_shield_front_sprite(const shared_ptr<gamestate> g,
 */
 
 /*
-static sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
+sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
                                       entityid id,
                                       spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
@@ -313,7 +314,7 @@ static sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
 }
 */
 
-//static void draw_shadow_for_entity(const shared_ptr<gamestate> g,
+// void draw_shadow_for_entity(const shared_ptr<gamestate> g,
 //                                   spritegroup_t* sg,
 //                                   entityid id) {
 //    massert(g, "gamestate is NULL");
@@ -334,7 +335,7 @@ static sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
 //    }
 //}
 
-static void draw_entity_sprite(const shared_ptr<gamestate> g, spritegroup_t* sg) {
+void draw_entity_sprite(const shared_ptr<gamestate> g, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     //sprite* s = sg_get_current(sg);
@@ -349,7 +350,7 @@ static void draw_entity_sprite(const shared_ptr<gamestate> g, spritegroup_t* sg)
 }
 
 /*
-static void draw_shield_sprite_back(const shared_ptr<gamestate> g,
+ void draw_shield_sprite_back(const shared_ptr<gamestate> g,
                                     entityid id,
                                     spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
@@ -368,7 +369,7 @@ static void draw_shield_sprite_back(const shared_ptr<gamestate> g,
 */
 
 /*
-static void draw_shield_sprite_front(const shared_ptr<gamestate> g,
+ void draw_shield_sprite_front(const shared_ptr<gamestate> g,
                                      entityid id,
                                      spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
@@ -493,7 +494,7 @@ void libdraw_unload_shaders() {
 }
 
 
-inline bool camera_lock_on(shared_ptr<gamestate> g) {
+bool camera_lock_on(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (!g->cam_lockon) {
         return false;
@@ -522,7 +523,7 @@ inline bool camera_lock_on(shared_ptr<gamestate> g) {
     return true;
 }
 
-//static bool libdraw_check_default_animations(const gamestate* const g) {
+// bool libdraw_check_default_animations(const gamestate* const g) {
 //    massert(g, "gamestate is NULL");
 //    for (entityid id = 0; id < g->next_entityid; id++) {
 //        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
@@ -535,7 +536,7 @@ inline bool camera_lock_on(shared_ptr<gamestate> g) {
 //}
 
 /*
-static void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g,
+ void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g,
                                       entityid id,
                                       spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
@@ -555,7 +556,7 @@ static void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g,
 */
 
 /*
-static void libdraw_set_sg_is_dead(shared_ptr<gamestate> g,
+ void libdraw_set_sg_is_dead(shared_ptr<gamestate> g,
                                    entityid id,
                                    spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
@@ -618,7 +619,7 @@ void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegro
 
 
 /*
-static void libdraw_set_sg_block_success(shared_ptr<gamestate> g,
+ void libdraw_set_sg_block_success(shared_ptr<gamestate> g,
                                          entityid id,
                                          spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
@@ -777,7 +778,7 @@ void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
 }
 
 
-static void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
+void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (g->dirty_entities) {
         for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++) {
@@ -978,14 +979,14 @@ void draw_message_box(shared_ptr<gamestate> g) {
 }
 
 
-inline void update_debug_panel(shared_ptr<gamestate> g) {
+void update_debug_panel(shared_ptr<gamestate> g) {
     // concat a string onto the end of the debug panel message
     char tmp[1024] = {0};
     strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
 }
 
 
-inline void handle_debug_panel(shared_ptr<gamestate> g) {
+void handle_debug_panel(shared_ptr<gamestate> g) {
     if (g->debugpanelon) {
         update_debug_panel(g);
         draw_debug_panel(g);
@@ -1254,74 +1255,6 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-/*
-    else if (type == ENTITY_ITEM) {
-        // check the item type
-        itemtype item_type = g_get_itemtype(g, id);
-        if (item_type == ITEM_WEAPON) {
-            // check the weapon type
-            weapontype weapon_type = g_get_weapontype(g, id);
-            if (weapon_type == WEAPON_SWORD) {
-                keys = TX_LONG_SWORD_KEYS;
-                num_keys = TX_LONG_SWORD_COUNT;
-            } else if (weapon_type == WEAPON_DAGGER) {
-                keys = TX_DAGGER_KEYS;
-                num_keys = TX_DAGGER_COUNT;
-            } else if (weapon_type == WEAPON_AXE) {
-                keys = TX_AXE_KEYS;
-                num_keys = TX_AXE_COUNT;
-            } else if (weapon_type == WEAPON_BOW) {
-                keys = TX_BOW_KEYS;
-                num_keys = TX_BOW_COUNT;
-            }
-            create_spritegroup(
-                g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        } else 
-        if (item_type == ITEM_SHIELD) {
-            keys = TX_BUCKLER_KEYS;
-            num_keys = TX_BUCKLER_COUNT;
-            create_spritegroup(
-                g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        }
-        else 
-        if (item_type == ITEM_POTION) {
-            potiontype potion_type = g_get_potiontype(g, id);
-            if (potion_type == POTION_HEALTH_SMALL) {
-                keys = TX_POTION_HP_SMALL_KEYS;
-                num_keys = TX_POTION_HP_SMALL_COUNT;
-            }
-            else if (potion_type == POTION_HEALTH_MEDIUM) {
-                keys = TX_POTION_HP_MEDIUM_KEYS;
-                num_keys = TX_POTION_HP_MEDIUM_COUNT;
-            } else if (potion_type == POTION_HEALTH_LARGE) {
-                keys = TX_POTION_HP_LARGE_KEYS;
-                num_keys = TX_POTION_HP_LARGE_COUNT;
-            }
-            create_spritegroup(
-                g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        } else if (item_type == ITEM_WAND) {
-            keys = TX_WAND_BASIC_KEYS;
-            num_keys = TX_WAND_BASIC_COUNT;
-            create_spritegroup(
-                g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        } else if (item_type == ITEM_RING) {
-            ringtype ring_type = g_get_ringtype(g, id);
-            if (ring_type == RING_GOLD) {
-                keys = TX_GOLD_RING_KEYS;
-                num_keys = TX_GOLD_RING_COUNT;
-            } else if (ring_type == RING_SILVER) {
-                keys = TX_SILVER_RING_KEYS;
-                num_keys = TX_SILVER_RING_COUNT;
-            }
-            //keys = TX_RING_KEYS;
-            //num_keys = TX_RING_COUNT;
-            create_spritegroup(
-                g, id, keys, num_keys, offset_x, offset_y, SPECIFIER_NONE);
-        }
-    }
-*/
-
-
 void draw_hud(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     //int stat_count = 0;
@@ -1456,98 +1389,10 @@ void libdraw_init(shared_ptr<gamestate> g) {
 }
 
 
-/*
-static void draw_gameplay_settings_menu(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    if (!g->display_gameplay_settings_menu) return;
-    // Parameters
-    const char* menu_title = "Settings Menu";
-    int font_size = 20;
-    int menu_spacing = 15;
-    //const char* menu_text[] = {"Music Volume", "Message History BG", "Back"};
-    const char* menu_text[] = {"Music Volume", "Back"};
-    int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
-    int current_selection = g->gameplay_settings_menu_selection;
-    // Calculate max width needed for menu items and their values
-    int max_text_width = MeasureText(menu_title, font_size);
-    for (int i = 0; i < menu_count; i++) {
-        int width = MeasureText(menu_text[i], font_size);
-        if (width > max_text_width) max_text_width = width;
-    }
-    // Add space for values and padding
-    int w = DEFAULT_TARGET_WIDTH;
-    int h = DEFAULT_TARGET_HEIGHT;
-    int box_width = max_text_width + 150;
-    int box_height = (font_size + menu_spacing) * menu_count + 40;
-    int box_x = (w - box_width) / 2;
-    int box_y = (h - box_height) / 2;
-    // Draw background box
-    DrawRectangle(
-        box_x, box_y, box_width, box_height, (Color){0x33, 0x33, 0x33, 0xcc});
-    DrawRectangleLinesEx(
-        (Rectangle){
-            (float)box_x, (float)box_y, (float)box_width, (float)box_height},
-        2,
-        WHITE);
-    // Draw menu title
-    int title_x = box_x + (box_width - MeasureText(menu_title, font_size)) / 2;
-    DrawText(menu_title, title_x, box_y + 10, font_size, WHITE);
-    // Draw menu items
-    int y = box_y + 40;
-    int left_pad = box_x + 20;
-    for (int i = 0; i < menu_count; i++) {
-        Color color = (i == current_selection) ? YELLOW : WHITE;
-        // Draw selection indicator
-        if (i == current_selection) {
-            DrawText(">", left_pad - 20, y, font_size, color);
-        }
-        // Draw menu text
-        DrawText(menu_text[i], left_pad, y, font_size, color);
-        // Draw current values right-aligned
-        int value_x = box_x + box_width - 30;
-        char value_text[32];
-        if (i == 0) { // Music Volume
-            snprintf(value_text, sizeof(value_text), "%.1f", g->music_volume);
-            value_x -= MeasureText(value_text, font_size);
-            DrawText(value_text, value_x, y, font_size, color);
-            // Draw volume indicator
-            int bar_width = 50;
-            int bar_x = value_x - bar_width - 10;
-            int bar_y = y + font_size / 2;
-            DrawRectangle(bar_x, bar_y, bar_width, 2, Fade(WHITE, 0.3f));
-            DrawRectangle(
-                bar_x, bar_y, (int)(bar_width * g->music_volume), 2, color);
-        }
-        //else if (i == 1) { // BG Color
-        //    snprintf(value_text, sizeof(value_text), "# %02x%02x%02x", g->message_history_bgcolor.r, g->message_history_bgcolor.g, g->message_history_bgcolor.b);
-        //    value_x -= MeasureText(value_text, font_size);
-        //    DrawText(value_text, value_x, y, font_size, color);
-        //}
-        y += font_size + menu_spacing;
-    }
-}
-*/
-
-
 bool libdraw_windowshouldclose(const shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     return g->do_quit;
 }
-
-
-//void draw_version(const shared_ptr<gamestate> g) {
-//    massert(g, "gamestate is NULL");
-//    const char* version = g->version.c_str();
-//    int font_size = 10;
-//    char buffer[1024] = {0};
-//    // also grab the current music track path
-//    snprintf(buffer, sizeof(buffer), "%s", version);
-//    Vector2 text_size = MeasureTextEx(GetFontDefault(), buffer, font_size, 1.0f);
-//    int w = DEFAULT_TARGET_WIDTH;
-//    int x = 20;
-//    int y = 20;
-//    DrawText(buffer, x, y, font_size, WHITE);
-//}
 
 
 void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu) {
