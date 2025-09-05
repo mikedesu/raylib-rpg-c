@@ -2,6 +2,9 @@
 #include "libdraw_draw_inventory_menu.h"
 #include "libgame_defines.h"
 #include "spritegroup.h"
+#include <raylib.h>
+
+extern unordered_map<entityid, spritegroup_t*> spritegroups2;
 
 void draw_inventory_menu(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -61,10 +64,22 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
         int rows = 7;
         const float h = (left_box.height - 4) / rows;
 
+        auto it = inventory->begin();
+
         for (int j = 0; j < rows; j++) {
             for (int i = 0; i < cols; i++) {
                 Rectangle grid_box = {x, y, w, h};
                 DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
+
+                if (it != inventory->end()) {
+                    spritegroup_t* sg = spritegroups2[*it];
+                    if (sg) {
+                        auto sprite = sg_get_current(sg);
+                        DrawTexturePro(*(sprite->texture), (Rectangle){12, 12, 8, 8}, grid_box, (Vector2){0, 0}, 0.0f, WHITE);
+                    }
+                    it++;
+                }
+
                 x += w;
             }
             x = left_box.x + 2;
