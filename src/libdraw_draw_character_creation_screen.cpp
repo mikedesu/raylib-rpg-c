@@ -1,9 +1,9 @@
 #include "gamestate.h"
+#include "libdraw_draw_character_creation_screen.h"
 #include "libgame_defines.h"
 #include "massert.h"
 #include "race.h"
 #include "textureinfo.h"
-
 #include <memory>
 
 using std::shared_ptr;
