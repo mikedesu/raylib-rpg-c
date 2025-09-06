@@ -54,7 +54,9 @@ static inline entityid tile_get_entity(const shared_ptr<tile_t> t, size_t i) {
 
 
 static inline bool tile_has_live_npcs(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
-    if (!t) return false;
+    if (!t) {
+        return false;
+    }
     recompute_entity_cache(g, t);
     return t->cached_live_npcs > 0;
 }
@@ -67,7 +69,9 @@ static inline size_t tile_live_npc_count(shared_ptr<gamestate> g, shared_ptr<til
 
 
 static inline bool tile_has_player(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
-    if (!t) return false;
+    if (!t) {
+        return false;
+    }
     recompute_entity_cache(g, t);
     return t->cached_player_present;
 }
