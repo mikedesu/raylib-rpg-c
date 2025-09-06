@@ -95,7 +95,8 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
     g->cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
     g->cam3d.fovy = 45.0f;
-    g->cam3d.projection = CAMERA_PERSPECTIVE, g->camera_mode = CAMERA_FREE;
+    g->cam3d.projection = CAMERA_PERSPECTIVE;
+    g->camera_mode = CAMERA_FREE;
     g->controlmode = CONTROLMODE_PLAYER;
     g->fadestate = FADESTATENONE;
     // current displayed dungeon floor

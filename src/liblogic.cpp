@@ -2041,10 +2041,10 @@ static void cycle_messages(shared_ptr<gamestate> g) {
 void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+    if (inputstate_is_pressed(is, KEY_ESCAPE) || inputstate_is_pressed(is, KEY_I)) {
         g->controlmode = CONTROLMODE_PLAYER;
-        //g->display_gameplay_settings_menu = false;
         g->display_inventory_menu = false;
+        //g->display_gameplay_settings_menu = false;
         //g->display_sort_inventory_menu = false;
         return;
     }

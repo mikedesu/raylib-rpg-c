@@ -915,7 +915,7 @@ void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
-    //camera_lock_on(g);
+    camera_lock_on(g);
     //minfo("Drawing frame");
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
@@ -1334,14 +1334,17 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     load_textures();
     //calc_debugpanel_size(g);
     load_shaders();
-    float x = target_w / 2.0f - DEFAULT_TILE_SIZE * 4;
+    //float x = target_w / 2.0f - DEFAULT_TILE_SIZE * 4;
+    const float x = target_w / 4.0f;
     //float y = target_h / 16.0f;
-    float y = DEFAULT_TILE_SIZE * 2;
+    //float y = DEFAULT_TILE_SIZE * 2;
+    const float y = target_h / 4.0f;
     //float x = DEFAULT_TILE_SIZE * 4;
     //float y = DEFAULT_TILE_SIZE * 8;
     //float x = 0;
     //float y = 0;
     g->cam2d.offset = (Vector2){x, y};
+
     //g->cam2d.zoom = 1.0f;
     //gamestate_set_debug_panel_pos_top_right(g);
     // set the camera target to the center of the dungeon
