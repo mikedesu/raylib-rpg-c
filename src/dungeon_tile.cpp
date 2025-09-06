@@ -22,7 +22,7 @@ void tile_init(shared_ptr<tile_t> t, tiletype_t type) {
 }
 
 
-entityid tile_add(std::shared_ptr<tile_t> t, entityid id) {
+entityid tile_add(shared_ptr<tile_t> t, entityid id) {
     massert(t && t->entities, "tile or tile entities is NULL");
     // Check if the entity already exists
     if (find(t->entities->begin(), t->entities->end(), id) != t->entities->end()) {
@@ -35,7 +35,7 @@ entityid tile_add(std::shared_ptr<tile_t> t, entityid id) {
 }
 
 
-entityid tile_remove(std::shared_ptr<tile_t> tile, entityid id) {
+entityid tile_remove(shared_ptr<tile_t> tile, entityid id) {
     massert(tile && tile->entities, "tile or tile entities is NULL");
     massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
     auto it = find(tile->entities->begin(), tile->entities->end(), id);
