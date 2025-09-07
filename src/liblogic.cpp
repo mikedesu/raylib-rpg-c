@@ -90,7 +90,7 @@ static void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inp
 
 static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-static void try_spawn_npc(shared_ptr<gamestate> const g);
+//static void try_spawn_npc(shared_ptr<gamestate> const g);
 
 //static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 
@@ -99,14 +99,14 @@ static void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstat
 //static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 loc);
 //static bool try_entity_pickup(shared_ptr<gamestate> g, entityid id);
 
-static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc);
-static entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
+//static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc);
+//static entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
 
 static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name);
 
 static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
 
-static entityid create_potion(shared_ptr<gamestate> g, vec3 loc, potiontype type);
+//static entityid create_potion(shared_ptr<gamestate> g, vec3 loc, potiontype type);
 static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type);
 
 
@@ -204,38 +204,38 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
 }
 
 
-static entityid create_potion(shared_ptr<gamestate> g, vec3 loc, potiontype type) {
-    minfo("potion create...");
-    massert(g, "gamestate is NULL");
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-    minfo("calling df_tile_at...");
-    shared_ptr<tile_t> tile = df_tile_at(df, loc);
-    massert(tile, "failed to get tile");
-    minfo("checking if tile is walkable...");
-    if (!tile_is_walkable(tile->type)) {
-        merror("cannot create entity on non-walkable tile");
-        return ENTITYID_INVALID;
-    }
-    minfo("checking if tile has live NPCs...");
-    if (tile_has_live_npcs(g, tile)) {
-        merror("cannot create entity on tile with live NPCs");
-        return ENTITYID_INVALID;
-    }
-    entityid id = g_add_entity(g);
-    g_add_type(g, id, ENTITY_ITEM);
-    g_add_item_type(g, id, ITEM_POTION);
-    g_add_potion_type(g, id, type);
-    g_add_name(g, id, potiontype2str(type));
-    g_add_loc(g, id, loc);
-    g_add_tx_alpha(g, id, 255);
-    g_add_update(g, id, true);
-    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
-    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-    if (!df_add_at(df, id, loc.x, loc.y)) {
-        return ENTITYID_INVALID;
-    }
-    return ENTITYID_INVALID;
-}
+//static entityid create_potion(shared_ptr<gamestate> g, vec3 loc, potiontype type) {
+//    minfo("potion create...");
+//    massert(g, "gamestate is NULL");
+//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+//    minfo("calling df_tile_at...");
+//    shared_ptr<tile_t> tile = df_tile_at(df, loc);
+//    massert(tile, "failed to get tile");
+//    minfo("checking if tile is walkable...");
+//    if (!tile_is_walkable(tile->type)) {
+//        merror("cannot create entity on non-walkable tile");
+//        return ENTITYID_INVALID;
+//    }
+//    minfo("checking if tile has live NPCs...");
+//    if (tile_has_live_npcs(g, tile)) {
+//        merror("cannot create entity on tile with live NPCs");
+//        return ENTITYID_INVALID;
+//    }
+//    entityid id = g_add_entity(g);
+//    g_add_type(g, id, ENTITY_ITEM);
+//    g_add_item_type(g, id, ITEM_POTION);
+//    g_add_potion_type(g, id, type);
+//    g_add_name(g, id, potiontype2str(type));
+//    g_add_loc(g, id, loc);
+//    g_add_tx_alpha(g, id, 255);
+//    g_add_update(g, id, true);
+//    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
+//    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+//    if (!df_add_at(df, id, loc.x, loc.y)) {
+//        return ENTITYID_INVALID;
+//    }
+//    return ENTITYID_INVALID;
+//}
 
 
 static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type) {
@@ -479,7 +479,7 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
 
 
         if (g->hero_id != ENTITYID_INVALID) {
-            vec3 loc = g_get_loc(g, g->hero_id);
+            //vec3 loc = g_get_loc(g, g->hero_id);
             if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
                 try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -587,13 +587,16 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
     // Static buffers to avoid reallocating every frame
     static const char* control_modes[] = {"Camera", "Player", "Unknown"};
     // Get hero position once
-    int x, y, z, inventory_count;
+    //int x;
+    //int y;
+    //int z;
+    int inventory_count;
     direction_t player_dir, shield_dir;
     bool is_b, test_guard;
     vec3 loc;
-    x = -1;
-    y = -1;
-    z = -1;
+    //x = -1;
+    //y = -1;
+    //z = -1;
     inventory_count = -1;
     //entityid shield_id = -1;
     player_dir = DIR_NONE;
@@ -2792,142 +2795,126 @@ static void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstat
 //}
 
 
-static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc) {
-    massert(g, "gamestate is NULL");
-    minfo("calling d_get_floor...");
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-    minfo("calling df_tile_at...");
-    shared_ptr<tile_t> tile = df_tile_at(df, loc);
-    massert(tile, "failed to get tile");
-    minfo("checking if tile is walkable...");
-    if (!tile_is_walkable(tile->type)) {
-        merror("cannot create entity on non-walkable tile");
-        return ENTITYID_INVALID;
-    }
-    minfo("checking if tile has live NPCs...");
-    if (tile_has_live_npcs(g, tile)) {
-        merror("cannot create entity on tile with live NPCs");
-        return ENTITYID_INVALID;
-    }
-    entityid id = g_add_entity(g);
-    g_add_name(g, id, "wooden box");
-    g_add_type(g, id, ENTITY_WOODEN_BOX);
-    g_add_loc(g, id, loc);
-    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
-    g_add_update(g, id, true);
-    g_add_tx_alpha(g, id, 255);
-    g_add_pushable(g, id);
-    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-    if (!df_add_at(df, id, loc.x, loc.y)) {
-        return ENTITYID_INVALID;
-    }
-    msuccess("returning box entity ID: %d", id);
-    return id;
-}
+//static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc) {
+//    massert(g, "gamestate is NULL");
+//    minfo("calling d_get_floor...");
+//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+//    minfo("calling df_tile_at...");
+//    shared_ptr<tile_t> tile = df_tile_at(df, loc);
+//    massert(tile, "failed to get tile");
+//    minfo("checking if tile is walkable...");
+//    if (!tile_is_walkable(tile->type)) {
+//        merror("cannot create entity on non-walkable tile");
+//        return ENTITYID_INVALID;
+//    }
+//    minfo("checking if tile has live NPCs...");
+//    if (tile_has_live_npcs(g, tile)) {
+//        merror("cannot create entity on tile with live NPCs");
+//        return ENTITYID_INVALID;
+//    }
+//    entityid id = g_add_entity(g);
+//    g_add_name(g, id, "wooden box");
+//    g_add_type(g, id, ENTITY_WOODEN_BOX);
+//    g_add_loc(g, id, loc);
+//    g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
+//    g_add_update(g, id, true);
+//    g_add_tx_alpha(g, id, 255);
+//    g_add_pushable(g, id);
+//    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+//    if (!df_add_at(df, id, loc.x, loc.y)) {
+//        return ENTITYID_INVALID;
+//    }
+//    msuccess("returning box entity ID: %d", id);
+//    return id;
+//}
 
 
-static entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
-    minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
-    entityid id = ENTITYID_INVALID;
-    string race_name = race2str(race);
-    id = create_npc(g, race, loc, race_name);
-    if (id != ENTITYID_INVALID) {
-        int floor = loc.z + 1;
-        int hit_die = 8;
-        vec3 r = {1, hit_die, 0};
-        int max_hp = do_roll(r);
-        //g_set_stat(g, id, STATS_HITDIE, hit_die);
-        //g_set_stat(g, id, STATS_AC, 10);
-        //g_set_stat(g, id, STATS_XP, 0);
-        //g_set_stat(g, id, STATS_LEVEL, 1);
-        //vec3 base_attack_dmg = get_base_attack_damage_for_race(race);
-        //g_set_base_attack_damage(g, id, base_attack_dmg);
-        //g_set_stat(g, id, STATS_STR, do_roll_best_of_3((vec3){3, 6, 0}));
-        //g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
-        //g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
-        //max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
-        //if (max_hp <= 0) max_hp = 1; // Ensure max HP is at least 1
-        //g_set_stat(g, id, STATS_MAXHP, max_hp);
-        //g_set_stat(g, id, STATS_HP, max_hp);
-        //g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-        // we will update this to do an appropriate difficulty-scaling
-        // level-up is too powerful and results in imbalance
-        // the goal is to make the spawns challenge rating approximate
-        // and close either above or below the player's level and cr
-        //for (int i = 1; i < floor; i++) {
-        //    handle_level_up(g, id);
-        //}
-        //int new_level = g_get_stat(g, id, STATS_LEVEL);
-        //massert(g_get_stat(g, id, STATS_LEVEL) == floor, "New level %d does not match floor %d", new_level, floor);
-        msuccess("Spawned entity at %d, %d, %d", loc.x, loc.y, loc.z);
-        // update vision distance
-        // this will be appropriately set on a per-npc basis but for now...
-        // hard code 5
-        //int vision_distance0 = g_get_vision_distance(g, id);
-        //g_set_vision_distance(g, id, 5);
-        // verify vision distance
-        //int vision_distance = g_get_vision_distance(g, id);
-        //massert(g_get_vision_distance(g, id) == 5, "Vision distance %d does not match expected value 5", vision_distance);
-        //int default_light_radius = 3;
-        //g_set_light_radius(g, id, 3);
-        // verify light radius
-        //massert(g_get_light_radius(g, id) == 3,
-        //        "Light radius %d does not match expected value 3",
-        //        g_get_light_radius(g, id));
-        //success = true;
-    }
-    return id;
-}
+//static entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
+//    minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
+//    entityid id = ENTITYID_INVALID;
+//    string race_name = race2str(race);
+//    id = create_npc(g, race, loc, race_name);
+//    if (id != ENTITYID_INVALID) {
+//        int floor = loc.z + 1;
+//        int hit_die = 8;
+//        vec3 r = {1, hit_die, 0};
+//        int max_hp = do_roll(r);
+
+//g_set_stat(g, id, STATS_HITDIE, hit_die);
+//g_set_stat(g, id, STATS_AC, 10);
+//g_set_stat(g, id, STATS_XP, 0);
+//g_set_stat(g, id, STATS_LEVEL, 1);
+//vec3 base_attack_dmg = get_base_attack_damage_for_race(race);
+//g_set_base_attack_damage(g, id, base_attack_dmg);
+//g_set_stat(g, id, STATS_STR, do_roll_best_of_3((vec3){3, 6, 0}));
+//g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
+//g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
+//max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
+//if (max_hp <= 0) max_hp = 1; // Ensure max HP is at least 1
+//g_set_stat(g, id, STATS_MAXHP, max_hp);
+//g_set_stat(g, id, STATS_HP, max_hp);
+//g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+// we will update this to do an appropriate difficulty-scaling
+// level-up is too powerful and results in imbalance
+// the goal is to make the spawns challenge rating approximate
+// and close either above or below the player's level and cr
+//for (int i = 1; i < floor; i++) {
+//    handle_level_up(g, id);
+//}
+//int new_level = g_get_stat(g, id, STATS_LEVEL);
+//massert(g_get_stat(g, id, STATS_LEVEL) == floor, "New level %d does not match floor %d", new_level, floor);
+//        msuccess("Spawned entity at %d, %d, %d", loc.x, loc.y, loc.z);
+// update vision distance
+// this will be appropriately set on a per-npc basis but for now...
+// hard code 5
+//int vision_distance0 = g_get_vision_distance(g, id);
+//g_set_vision_distance(g, id, 5);
+// verify vision distance
+//int vision_distance = g_get_vision_distance(g, id);
+//massert(g_get_vision_distance(g, id) == 5, "Vision distance %d does not match expected value 5", vision_distance);
+//int default_light_radius = 3;
+//g_set_light_radius(g, id, 3);
+// verify light radius
+//massert(g_get_light_radius(g, id) == 3,
+//        "Light radius %d does not match expected value 3",
+//        g_get_light_radius(g, id));
+//success = true;
+//    }
+//    return id;
+//}
 
 
-static void try_spawn_npc(shared_ptr<gamestate> const g) {
-    massert(g, "gamestate is NULL");
-    static bool do_this_once = true;
-    //static int x = 1;
-    //static int y = 1;
-    int every_nth_turn = 2;
-    if (g->turn_count % every_nth_turn == 0) {
-        entityid success = ENTITYID_INVALID;
-        if (do_this_once) {
-            while (success == ENTITYID_INVALID) {
-                int current_floor = g->dungeon->current_floor;
-                //vec3 loc = get_random_available_loc(g, current_floor);
-                // generate a random location for NPC spawn
-                int x = rand() % g->dungeon->floors->at(current_floor)->width + 1;
-                int y = rand() % g->dungeon->floors->at(current_floor)->height + 1;
-                // Get the tile at that location and check the type of the tile
-                // If the tile is not walkable, success is still invalid and we should continue
-                vec3 loc = {x, y, current_floor};
-                //if (loc.x == -1 && loc.y == -1 && loc.z == -1) {
-                //    merror("No available location found for NPC spawn");
-                //    return; // No valid location found, exit early
-                //}
-                shared_ptr<tile_t> tile = df_tile_at(g->dungeon->floors->at(current_floor), loc);
-                if (!tile || tile_is_walkable(tile->type) == false) {
-                    merror("Tile at %d, %d, %d is not walkable", x, y, current_floor);
-                    continue; // Tile is not walkable, try again
-                }
-                // if the tile contains entities, try again
-                if (tile_has_live_npcs(g, tile)) {
-                    merror("Tile is not empty");
-                    continue;
-                }
-                //if (x > g->dungeon->floors->at(current_floor)->width) {
-                //    x = 1; // Reset x to 1 if it exceeds width
-                //}
-                //if (y > g->dungeon->floors->at(current_floor)->height) {
-                //    y = 1; // Reset y to 1 if it exceeds height
-                //}
-                race_t race = get_random_race();
-                //race_t race = RACE_ORC;
-                success = create_npc_set_stats(g, loc, race);
-            }
-            do_this_once = false;
-        }
-    } else {
-        do_this_once = true;
-    }
-}
+//static void try_spawn_npc(shared_ptr<gamestate> const g) {
+//    massert(g, "gamestate is NULL");
+//    static bool do_this_once = true;
+//    int every_nth_turn = 2;
+//    if (g->turn_count % every_nth_turn == 0) {
+//        entityid success = ENTITYID_INVALID;
+//        if (do_this_once) {
+//            while (success == ENTITYID_INVALID) {
+//                int current_floor = g->dungeon->current_floor;
+//                int x = rand() % g->dungeon->floors->at(current_floor)->width + 1;
+//                int y = rand() % g->dungeon->floors->at(current_floor)->height + 1;
+//                vec3 loc = {x, y, current_floor};
+//                shared_ptr<tile_t> tile = df_tile_at(g->dungeon->floors->at(current_floor), loc);
+//                if (!tile || tile_is_walkable(tile->type) == false) {
+//                    merror("Tile at %d, %d, %d is not walkable", x, y, current_floor);
+//                    continue; // Tile is not walkable, try again
+//                }
+//                // if the tile contains entities, try again
+//                if (tile_has_live_npcs(g, tile)) {
+//                    merror("Tile is not empty");
+//                    continue;
+//                }
+//                race_t race = get_random_race();
+//                success = create_npc_set_stats(g, loc, race);
+//            }
+//            do_this_once = false;
+//        }
+//    } else {
+//        do_this_once = true;
+//    }
+//}
 
 
 //static void update_player_state(shared_ptr<gamestate> g) {

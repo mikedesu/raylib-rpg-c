@@ -933,7 +933,8 @@ void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //    draw_gameplay_settings_menu(g);
     //}
     handle_debug_panel(g);
-    draw_version(g);
+    //draw_version(g);
+    int x = 0;
     if (g->display_help_menu) {
         draw_help_menu(g);
     }

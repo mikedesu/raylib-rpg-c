@@ -82,94 +82,94 @@ OBJ_FILES=main.o \
 
 
 game: $(OBJ_FILES)
-	$(CXX) -o $@ $^ -L. $(RAYLIB_LIBS) $(WFLAGS) $(CFLAGS)
+	$(CXX) $(WFLAGS) $(CFLAGS) $^ -L. $(RAYLIB_LIBS)   -o $@ 
 	./log_build_stats.sh
 
 main.o: main.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 gameloader.o: gameloader.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 ###################
 
 gamestate_equipped_weapon.o: gamestate_equipped_weapon.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 gamestate_inventory.o: gamestate_inventory.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 gamestate.o: gamestate.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 ###################
 
 sprite.o: sprite.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 spritegroup.o: spritegroup.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 dungeon_tile.o: dungeon_tile.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 dungeon_floor.o: dungeon_floor.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 dungeon.o: dungeon.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
 ###################
 libdraw_message_history.o: libdraw_message_history.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_version.o: libdraw_version.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_title_screen.o: libdraw_title_screen.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_help_menu.o: libdraw_help_menu.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_draw_inventory_menu.o: libdraw_draw_inventory_menu.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_draw_character_creation_screen.o: libdraw_draw_character_creation_screen.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw.o: libdraw.cpp 
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 ###################
 
 
 path_node.o: path_node.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 ###################
 
 liblogic_try_entity_pickup.o: liblogic_try_entity_pickup.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_add_message.o: liblogic_add_message.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_update_player_state.o: liblogic_update_player_state.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_tile_npc_living_count.o: liblogic_tile_npc_living_count.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_try_entity_move.o: liblogic_try_entity_move.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_tile_has_box.o: liblogic_tile_has_box.cpp
-	$(CXX) $(CXXFLAGS) $^ -c 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic.o: liblogic.cpp
-	$(CXX) $(CXXFLAGS) $^ -c
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c
 
 
 
