@@ -997,8 +997,8 @@ void handle_debug_panel(shared_ptr<gamestate> g) {
 
 
 void libdraw_drawframe(shared_ptr<gamestate> g) {
-    libdraw_update_sprites_pre(g);
     double start_time = GetTime();
+    libdraw_update_sprites_pre(g);
     BeginDrawing();
     ClearBackground(RED);
     //minfo("Begin draw frame");

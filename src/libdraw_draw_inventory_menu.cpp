@@ -98,6 +98,9 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                 if (sg) {
                     auto sprite = sg_get_current(sg);
                     DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
+
+                    string name = g_get_name(g, selection_id);
+                    DrawText(name.c_str(), right_box.x + 10, right_box.y + 10, 20, WHITE);
                 }
             }
         }

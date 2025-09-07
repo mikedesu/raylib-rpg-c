@@ -36,7 +36,7 @@ using std::vector;
 // have to update this function when we introduce new fields to Gamestate
 shared_ptr<gamestate> gamestateinitptr() {
     minfo("Initializing gamestate");
-    const size_t n = LIST_INIT_CAPACITY;
+    //const size_t n = LIST_INIT_CAPACITY;
 
     shared_ptr<gamestate> g = make_shared<gamestate>();
     massert(g, "g is NULL");
