@@ -118,7 +118,7 @@ typedef struct gamestate {
 
     shared_ptr<unordered_map<entityid, entityid>> equipped_weapon_list;
 
-    shared_ptr<unordered_map<entityid, shared_ptr<set<entityid>>>> inventory_list;
+    shared_ptr<unordered_map<entityid, shared_ptr<vector<entityid>>>> inventory_list;
 
 
     debugpanel_t debugpanel;

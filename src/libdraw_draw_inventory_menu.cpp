@@ -59,9 +59,9 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
         // lets start with just one block
         float x = left_box.x + 2;
         float y = left_box.y + 2;
-        int cols = 7;
+        const int cols = 7;
         const float w = (left_box.width - 4) / cols;
-        int rows = 7;
+        const int rows = 7;
         const float h = (left_box.height - 4) / rows;
 
         auto it = inventory->begin();
@@ -73,7 +73,6 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                 Rectangle grid_box = {x, y, w, h};
                 Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
                 DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
-
                 if (it != inventory->end()) {
                     spritegroup_t* sg = spritegroups2[*it];
                     if (sg) {
@@ -83,16 +82,16 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                     }
                     it++;
                 }
-
                 if ((float)i == g->inventory_cursor.x && (float)j == g->inventory_cursor.y) {
                     DrawRectangleLinesEx(grid_box, 2, GREEN);
                 }
-
                 x += w;
             }
             x = left_box.x + 2;
             y += h;
         }
+
+        // in the right box, item detail
     }
 
 

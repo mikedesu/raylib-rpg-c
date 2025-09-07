@@ -550,11 +550,12 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
 
     if (g->controlmode == CONTROLMODE_PLAYER) {
         handle_input_gameplay_controlmode_player(g, is);
-        //return;
+        return;
     }
 
     if (g->controlmode == CONTROLMODE_INVENTORY) {
         handle_input_inventory(is, g);
+        return;
     }
 }
 
@@ -2041,6 +2042,17 @@ static void cycle_messages(shared_ptr<gamestate> g) {
 void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
+
+    if (g->controlmode != CONTROLMODE_INVENTORY) {
+        //merror("wrong mode");
+        return;
+    }
+
+    if (!g->display_inventory_menu) {
+        return;
+    }
+
+
     if (inputstate_is_pressed(is, KEY_ESCAPE) || inputstate_is_pressed(is, KEY_I)) {
         g->controlmode = CONTROLMODE_PLAYER;
         g->display_inventory_menu = false;
