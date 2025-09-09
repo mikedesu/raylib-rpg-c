@@ -10,7 +10,9 @@ bool drop_item_from_hero_inventory(shared_ptr<gamestate> g) {
         // remove it from the player's inventory
         if (g_remove_from_inventory(g, g->hero_id, item_id)) {
             // if it was an equipped weapon, unequip it
-            g_unequip_weapon(g, g->hero_id, item_id);
+            if (g_get_equipped_weapon(g, g->hero_id) == item_id) {
+                g_unequip_weapon(g, g->hero_id, item_id);
+            }
 
 
             // add it to the tile at the player's current location
