@@ -2101,6 +2101,22 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
             }
         }
     }
+
+    if (inputstate_is_pressed(is, KEY_U)) {
+        // unequip weapon/item
+        // we will assume it is a weapon for now
+
+        entityid weapon_id = g_get_equipped_weapon(g, g->hero_id);
+        if (weapon_id != ENTITYID_INVALID) {
+            if (g_unequip_weapon(g, g->hero_id, weapon_id)) {
+                minfo("unequipped weapon %d", weapon_id);
+            } else {
+                minfo("failed to unequip weapon %d", weapon_id);
+            }
+        }
+    }
+
+
     if (inputstate_is_pressed(is, KEY_D)) {
         // drop item
         // get the item id of the current selection
