@@ -101,7 +101,7 @@ static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type
 //static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 loc);
 //static bool try_entity_pickup(shared_ptr<gamestate> g, entityid id);
 //static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc);
-//static entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
+entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
 
 //static entityid create_potion(shared_ptr<gamestate> g, vec3 loc, potiontype type);
 
@@ -697,7 +697,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_npc_set_stats(g, (vec3){5, 6, 0}, RACE_GOBLIN);
     //create_npc_set_stats(g, (vec3){5, 7, 0}, RACE_HALFLING);
     //create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
-    //create_npc_set_stats(g, (vec3){6, 4, 0}, RACE_ORC);
+    create_npc_set_stats(g, (vec3){6, 4, 0}, RACE_ORC);
     //create_npc_set_stats(g, (vec3){6, 5, 0}, RACE_WOLF);
     //create_npc_set_stats(g, (vec3){6, 6, 0}, RACE_WARG);
     //create_npc_set_stats(g, (vec3){6, 7, 0}, RACE_BAT);
@@ -2872,59 +2872,59 @@ static void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstat
 //}
 
 
-//static entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
-//    minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
-//    entityid id = ENTITYID_INVALID;
-//    string race_name = race2str(race);
-//    id = create_npc(g, race, loc, race_name);
-//    if (id != ENTITYID_INVALID) {
-//        int floor = loc.z + 1;
-//        int hit_die = 8;
-//        vec3 r = {1, hit_die, 0};
-//        int max_hp = do_roll(r);
+entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
+    minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
+    entityid id = ENTITYID_INVALID;
+    string race_name = race2str(race);
+    id = create_npc(g, race, loc, race_name);
+    if (id != ENTITYID_INVALID) {
+        //int floor = loc.z + 1;
+        int hit_die = 8;
+        vec3 r = {1, hit_die, 0};
+        int max_hp = do_roll(r);
 
-//g_set_stat(g, id, STATS_HITDIE, hit_die);
-//g_set_stat(g, id, STATS_AC, 10);
-//g_set_stat(g, id, STATS_XP, 0);
-//g_set_stat(g, id, STATS_LEVEL, 1);
-//vec3 base_attack_dmg = get_base_attack_damage_for_race(race);
-//g_set_base_attack_damage(g, id, base_attack_dmg);
-//g_set_stat(g, id, STATS_STR, do_roll_best_of_3((vec3){3, 6, 0}));
-//g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
-//g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
-//max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
-//if (max_hp <= 0) max_hp = 1; // Ensure max HP is at least 1
-//g_set_stat(g, id, STATS_MAXHP, max_hp);
-//g_set_stat(g, id, STATS_HP, max_hp);
-//g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
-// we will update this to do an appropriate difficulty-scaling
-// level-up is too powerful and results in imbalance
-// the goal is to make the spawns challenge rating approximate
-// and close either above or below the player's level and cr
-//for (int i = 1; i < floor; i++) {
-//    handle_level_up(g, id);
-//}
-//int new_level = g_get_stat(g, id, STATS_LEVEL);
-//massert(g_get_stat(g, id, STATS_LEVEL) == floor, "New level %d does not match floor %d", new_level, floor);
-//        msuccess("Spawned entity at %d, %d, %d", loc.x, loc.y, loc.z);
-// update vision distance
-// this will be appropriately set on a per-npc basis but for now...
-// hard code 5
-//int vision_distance0 = g_get_vision_distance(g, id);
-//g_set_vision_distance(g, id, 5);
-// verify vision distance
-//int vision_distance = g_get_vision_distance(g, id);
-//massert(g_get_vision_distance(g, id) == 5, "Vision distance %d does not match expected value 5", vision_distance);
-//int default_light_radius = 3;
-//g_set_light_radius(g, id, 3);
-// verify light radius
-//massert(g_get_light_radius(g, id) == 3,
-//        "Light radius %d does not match expected value 3",
-//        g_get_light_radius(g, id));
-//success = true;
-//    }
-//    return id;
-//}
+        g_set_stat(g, id, STATS_HITDIE, hit_die);
+        g_set_stat(g, id, STATS_AC, 10);
+        g_set_stat(g, id, STATS_XP, 0);
+        g_set_stat(g, id, STATS_LEVEL, 1);
+        //vec3 base_attack_dmg = get_base_attack_damage_for_race(race);
+        //g_set_base_attack_damage(g, id, base_attack_dmg);
+        g_set_stat(g, id, STATS_STR, do_roll_best_of_3((vec3){3, 6, 0}));
+        g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
+        g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
+        //max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
+        if (max_hp <= 0) max_hp = 1; // Ensure max HP is at least 1
+        g_set_stat(g, id, STATS_MAXHP, max_hp);
+        g_set_stat(g, id, STATS_HP, max_hp);
+        //g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
+        // we will update this to do an appropriate difficulty-scaling
+        // level-up is too powerful and results in imbalance
+        // the goal is to make the spawns challenge rating approximate
+        // and close either above or below the player's level and cr
+        //for (int i = 1; i < floor; i++) {
+        //    handle_level_up(g, id);
+        //}
+        //int new_level = g_get_stat(g, id, STATS_LEVEL);
+        //massert(g_get_stat(g, id, STATS_LEVEL) == floor, "New level %d does not match floor %d", new_level, floor);
+        //        msuccess("Spawned entity at %d, %d, %d", loc.x, loc.y, loc.z);
+        // update vision distance
+        // this will be appropriately set on a per-npc basis but for now...
+        // hard code 5
+        //int vision_distance0 = g_get_vision_distance(g, id);
+        //g_set_vision_distance(g, id, 5);
+        // verify vision distance
+        //int vision_distance = g_get_vision_distance(g, id);
+        //massert(g_get_vision_distance(g, id) == 5, "Vision distance %d does not match expected value 5", vision_distance);
+        //int default_light_radius = 3;
+        //g_set_light_radius(g, id, 3);
+        // verify light radius
+        //massert(g_get_light_radius(g, id) == 3,
+        //        "Light radius %d does not match expected value 3",
+        //        g_get_light_radius(g, id));
+        //success = true;
+    }
+    return id;
+}
 
 
 //static void try_spawn_npc(shared_ptr<gamestate> const g) {
