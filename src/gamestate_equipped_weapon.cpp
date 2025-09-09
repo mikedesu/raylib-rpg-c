@@ -31,7 +31,8 @@ bool g_has_equipped_weapon(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-bool g_set_equipped_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id) {
+//bool g_set_equipped_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id) {
+bool g_equip_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (!g->equipped_weapon_list) {
@@ -45,6 +46,24 @@ bool g_set_equipped_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id
         return true;
     }
     merror("g_set_equipped_weapon: id %d does not have an equipped weapon component", id);
+    return false;
+}
+
+
+bool g_unequip_weapon(shared_ptr<gamestate> g, entityid id, entityid wpn_id) {
+    massert(g, "g is NULL");
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    if (!g->equipped_weapon_list) {
+        merror("g->equipped_weapon_list is NULL");
+        return false;
+    }
+    // Check if the entity has an equipped weapon component
+    if (g_has_equipped_weapon(g, id)) {
+        // Update the equipped weapon for the entity to ENTITYID_INVALID
+        (*g->equipped_weapon_list)[id] = ENTITYID_INVALID; // Unequip the weapon
+        return true;
+    }
+    merror("g_unequip_weapon: id %d does not have an equipped weapon component", id);
     return false;
 }
 
