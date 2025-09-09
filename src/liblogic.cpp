@@ -2093,9 +2093,9 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
                 if (item_type == ITEM_WEAPON) {
                     // try to equip it
                     if (g_equip_weapon(g, g->hero_id, item_id)) {
-                        minfo("equipped item %zu", item_id);
+                        minfo("equipped item %d", item_id);
                     } else {
-                        minfo("failed to equip item %zu", item_id);
+                        minfo("failed to equip item %d", item_id);
                     }
                 }
             }
