@@ -35,8 +35,8 @@ entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z);
 bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v);
 int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
 void update_player_state(shared_ptr<gamestate> g);
-//void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
 void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
+//void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
 
 
 static inline void reset_player_block_success(shared_ptr<gamestate> g) {
@@ -88,28 +88,21 @@ static void cycle_messages(shared_ptr<gamestate> g);
 static void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-
-
 static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-//static void try_spawn_npc(shared_ptr<gamestate> const g);
-
-//static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-
-//static void handle_input_help_menu(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 static void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name);
+static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type);
+//static void try_spawn_npc(shared_ptr<gamestate> const g);
+//static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+//static void handle_input_help_menu(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 //static bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 loc);
 //static bool try_entity_pickup(shared_ptr<gamestate> g, entityid id);
-
 //static entityid create_wooden_box(shared_ptr<gamestate> g, vec3 loc);
 //static entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
 
-static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name);
-
-static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
-
 //static entityid create_potion(shared_ptr<gamestate> g, vec3 loc, potiontype type);
-static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type);
 
 
 static void handle_npc(shared_ptr<gamestate> g, entityid id) {
@@ -2087,6 +2080,33 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
     if (inputstate_is_pressed(is, KEY_DOWN)) {
         g->inventory_cursor.y++;
     }
+    if (inputstate_is_pressed(is, KEY_D)) {
+        // drop item
+        // get the item id of the current selection
+        size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+        auto inventory = g_get_inventory(g, g->hero_id);
+        if (index >= 0 && index < inventory->size()) {
+            entityid item_id = inventory->at(index);
+            // remove it from the player's inventory
+            if (g_remove_from_inventory(g, g->hero_id, item_id)) {
+                // add it to the tile at the player's current location
+
+                // get the player's location
+                vec3 loc = g_get_loc(g, g->hero_id);
+
+                // get the tile at the player's location
+                auto tile = df_tile_at(g->dungeon->floors->at(loc.z), loc);
+                if (tile) {
+                    // update the entity's location
+                    g_update_loc(g, item_id, loc);
+                    // add to tile
+                    tile_add(tile, item_id);
+                }
+            }
+        }
+    }
+
+
     // cycle menus
     //if (inputstate_is_pressed(is, KEY_LEFT) ||
     //    inputstate_is_pressed(is, KEY_RIGHT)) {
