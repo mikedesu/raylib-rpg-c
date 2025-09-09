@@ -19,6 +19,7 @@ WEB_SOURCES=main.cpp \
 			libdraw_help_menu.cpp \
 			libdraw_draw_character_creation_screen.cpp \
 			libdraw.cpp \
+		    liblogic_drop_item.cpp \
 		    liblogic_get_random_loc.cpp \
 			liblogic_try_entity_pickup.cpp \
 			liblogic_add_message.cpp \
@@ -72,6 +73,7 @@ OBJ_FILES=main.o \
 		  dungeon_tile.o \
 		  dungeon_tile.o \
 		  path_node.o \
+		  liblogic_drop_item.o \
 		  liblogic_get_random_loc.o \
 		  liblogic_add_message.o \
 		  liblogic_try_entity_pickup.o \
@@ -151,6 +153,9 @@ path_node.o: path_node.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 ###################
+liblogic_drop_item.o: liblogic_drop_item.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
 liblogic_get_random_loc.o: liblogic_get_random_loc.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
