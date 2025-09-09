@@ -11,9 +11,11 @@
 #include "libgame_defines.h"
 #include "liblogic.h"
 #include "liblogic_add_message.h"
+#include "liblogic_get_random_loc.h"
 #include "liblogic_try_entity_pickup.h"
 #include "massert.h"
-#include "potion.h"
+//#include "potion.h"
+#include "rect.h"
 #include "roll.h"
 #include <cassert>
 #include <cmath>
@@ -675,6 +677,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
 void liblogic_init(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     srand(time(NULL));
+    SetRandomSeed(time(NULL));
 
     minfo("liblogic_init");
 
@@ -716,15 +719,19 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon(g, (vec3){1, 6, 0}, WEAPON_BOW);
     //create_weapon(g, (vec3){1, 6, 0}, WEAPON_WARHAMMER);
 
-    create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
-    create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
-    create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
-    create_weapon(g, (vec3){1, 5, 0}, WEAPON_FLAIL);
+    //create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
 
-    create_weapon(g, (vec3){2, 3, 0}, WEAPON_DAGGER);
-    create_weapon(g, (vec3){2, 2, 0}, WEAPON_SWORD);
-    create_weapon(g, (vec3){2, 4, 0}, WEAPON_AXE);
-    create_weapon(g, (vec3){2, 5, 0}, WEAPON_FLAIL);
+    //create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
+
+    //create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
+    create_weapon(g, get_random_loc((rect){0, 0, 8, 8}, 0), WEAPON_AXE);
+
+    //create_weapon(g, (vec3){1, 5, 0}, WEAPON_FLAIL);
+
+    //create_weapon(g, (vec3){2, 3, 0}, WEAPON_DAGGER);
+    //create_weapon(g, (vec3){2, 2, 0}, WEAPON_SWORD);
+    //create_weapon(g, (vec3){2, 4, 0}, WEAPON_AXE);
+    //create_weapon(g, (vec3){2, 5, 0}, WEAPON_FLAIL);
 
 
     add_message(g, "Welcome to the game! Press enter to cycle messages.");
