@@ -1,3 +1,4 @@
+#include "gamestate_equipped_weapon.h"
 #include "gamestate_inventory.h"
 #include "libdraw_draw_inventory_menu.h"
 #include "libgame_defines.h"
@@ -55,6 +56,9 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
     DrawRectangleLinesEx(right_box, 2, WHITE);
 
     auto inventory = g_get_inventory(g, g->hero_id);
+    entityid current_weapon_id = g_get_equipped_weapon(g, g->hero_id);
+
+
     if (inventory) {
         // lets start with just one block
         float x = left_box.x + 2;
@@ -77,6 +81,14 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                         auto sprite = sg_get_current(sg);
                         //DrawTexturePro(*(sprite->texture), (Rectangle){12, 12, 8, 8}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
                         DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
+
+                        size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+                        if (index >= 0 && index < inventory->size()) {
+                            entityid selection_id = inventory->at(index);
+                            if (selection_id == current_weapon_id) {
+                                DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
+                            }
+                        }
                     }
                     it++;
                 }
