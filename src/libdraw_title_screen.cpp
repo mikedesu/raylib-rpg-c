@@ -18,7 +18,7 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
     int sm_font_size = 10;
     int font_size = 40;
-    int font_size2 = 20;
+    //int font_size2 = 20;
     int evidojo_presents_measure = MeasureText(evidojo_presents_text, sm_font_size);
     int measure = MeasureText(title_text_0, font_size);
     int start_measure = MeasureText(start_text, sm_font_size);

@@ -601,7 +601,7 @@ void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegro
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
-    race_t race = g_get_race(g, id);
+    //race_t race = g_get_race(g, id);
     //entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
     //weapontype wtype = g_get_weapontype(g, weapon);
     int cur = SG_ANIM_NPC_ATTACK;
@@ -662,7 +662,7 @@ void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, sprite
         g_update_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
         entitytype_t type = g_get_type(g, id);
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-            race_t race = g_get_race(g, id);
+            //race_t race = g_get_race(g, id);
             //sg->current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
             //if (loc == RACE_BAT)
             //    sg->current = SG_ANIM_BAT_IDLE;
@@ -901,7 +901,7 @@ bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     float y = loc.y + get_y_from_dir(dir);
     float w = DEFAULT_TILE_SIZE;
     float h = DEFAULT_TILE_SIZE;
-    Color base_c = GREEN;
+    //Color base_c = GREEN;
     float a = 0.75f;
     if (g->player_changing_dir) {
         a = 1.0f;
@@ -934,7 +934,7 @@ void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //}
     handle_debug_panel(g);
     //draw_version(g);
-    int x = 0;
+    //int x = 0;
     if (g->display_help_menu) {
         draw_help_menu(g);
     }
@@ -1269,9 +1269,9 @@ void draw_hud(shared_ptr<gamestate> g) {
     int xp = 0;
     int next_level_xp = 0;
     int attack_bonus = 0;
-    int str = 0;
-    int con = 0;
-    int dex = 0;
+    //int str = 0;
+    //int con = 0;
+    //int dex = 0;
     int ac = 0;
     int floor = g->dungeon->current_floor;
     int font_size = 10;

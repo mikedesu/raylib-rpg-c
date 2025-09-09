@@ -70,7 +70,7 @@ void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
     t->cached_live_npcs = 0;
     t->cached_player_present = false;
     // Iterate through all entities on the tile
-    for (int i = 0; i < t->entities->size(); i++) {
+    for (size_t i = 0; i < t->entities->size(); i++) {
         entityid id = t->entities->at(i);
         // Skip dead entities
         if (g_is_dead(g, id)) continue;
@@ -89,7 +89,7 @@ void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
 void recompute_entity_cache_at(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     massert(x >= 0 && y >= 0 && z >= 0, "x, y, or z is out of bounds: %d, %d, %d", x, y, z);
-    massert(z < g->dungeon->floors->size(), "z is out of bounds");
+    massert((size_t)z < g->dungeon->floors->size(), "z is out of bounds");
     shared_ptr<dungeon_floor_t> df = g->dungeon->floors->at(z);
     massert(df, "failed to get dungeon floor");
     shared_ptr<tile_t> t = df_tile_at(df, (vec3){x, y, z});

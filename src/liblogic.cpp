@@ -2374,8 +2374,7 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
 //    }
 //}
 //    }
-//}\
-
+//}
 
 
 //if (g->msg_system.is_active) {

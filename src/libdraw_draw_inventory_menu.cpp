@@ -15,9 +15,9 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
     // Parameters
     int box_pad = g->pad;
     int section_gap = 8;
-    int item_list_pad = g->pad;
+    //int item_list_pad = g->pad;
     int font_size = 10;
-    int scale = 4;
+    //int scale = 4;
     // Measure title
     Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g->line_spacing);
     // Menu box size
@@ -32,9 +32,9 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
     float title_y = menu_box.y + box_pad;
     float half_width = (menu_box.width - section_gap) / 2.0f;
     float half_height = menu_box.height - title_size.y - box_pad * 2.0f - box_pad;
-    const char* info_title = "Item Info:";
-    char info_text[256] = {0};
-    spritegroup_t* sg = NULL;
+    //const char* info_title = "Item Info:";
+    //char info_text[256] = {0};
+    //spritegroup_t* sg = NULL;
     // Draw menu background and border
     DrawRectangleRec(menu_box, (Color){0x33, 0x33, 0x33, 0x99});
     DrawRectangleLinesEx(menu_box, 2, WHITE);
@@ -46,9 +46,9 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
     Rectangle left_box = {menu_box.x + box_pad, title_y + title_size.y + box_pad, half_width - box_pad, half_height};
     Rectangle right_box = {left_box.x + half_width + section_gap, left_box.y, half_width - box_pad * 2, half_height};
     // Draw left and right boxes
-    float item_y = left_box.y + item_list_pad;
-    float info_title_y = right_box.y + item_list_pad;
-    float info_text_y = info_title_y + font_size + 8;
+    //float item_y = left_box.y + item_list_pad;
+    //float info_title_y = right_box.y + item_list_pad;
+    //float info_text_y = info_title_y + font_size + 8;
     DrawRectangleRec(left_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(left_box, 2, WHITE);
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
@@ -91,7 +91,7 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
 
         // in the right box, item detail
         if (inventory->size() > 0) {
-            int index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+            size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
             if (index >= 0 && index < inventory->size()) {
                 entityid selection_id = inventory->at(index);
                 spritegroup_t* sg = spritegroups2[selection_id];

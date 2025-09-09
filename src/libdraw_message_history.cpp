@@ -1,10 +1,10 @@
 #include "libdraw_message_history.h"
 
 void draw_message_history(shared_ptr<gamestate> g) {
-    int font_size, msg_count, measure, max_measure, pad;
+    int font_size, msg_count, max_measure, pad;
     Color message_bg;
     //float x, y, w, h, text_width, text_height, msg_x, msg_y;
-    float x, y, w, h, text_width, msg_x, msg_y;
+    float x, y, w, h, msg_x, msg_y;
     Rectangle box;
     char tmp[1024] = {0};
     string msg;

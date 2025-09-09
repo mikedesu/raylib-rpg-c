@@ -43,7 +43,7 @@ void draw_character_creation_screen(shared_ptr<gamestate> g) {
     DrawText(TextFormat("Constitution: %d", g->chara_creation->constitution), x, y, font_size, WHITE);
     y += font_size + 10;
     // Draw sprite placeholder
-    Rectangle dst = (Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200};
+    //Rectangle dst = (Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200};
     float pad = -40;
     Rectangle dst2 = (Rectangle){(float)cx - 210 + pad, (float)sy + pad, (float)200 - pad * 2, (float)200 - pad * 2};
     //DrawRectangleLinesEx(dst, 4, RED);
