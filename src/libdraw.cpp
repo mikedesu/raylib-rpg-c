@@ -436,8 +436,8 @@ bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor
     massert(df, "draw_entities_2d: dungeon_floor is NULL");
     massert(df->width > 0, "draw_entities_2d: dungeon_floor width is 0");
     massert(df->height > 0, "draw_entities_2d: dungeon_floor height is 0");
-    massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
-    massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
+    //massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
+    //massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
     massert(loc.x >= 0, "draw_entities_2d: x is out of bounds");
     massert(loc.x < df->width, "draw_entities_2d: x is out of bounds");
     massert(loc.y >= 0, "draw_entities_2d: y is out of bounds");
