@@ -56,6 +56,7 @@ Shader shader_psychedelic_0 = {0};
 RenderTexture2D title_target_texture = {0};
 RenderTexture2D char_creation_target_texture = {0};
 RenderTexture2D main_game_target_texture = {0};
+RenderTexture2D hud_target_texture = {0};
 
 
 RenderTexture2D target = {0};
@@ -78,6 +79,10 @@ int libdraw_restart_count = 0;
 bool camera_lock_on(shared_ptr<gamestate> g);
 void update_debug_panel(shared_ptr<gamestate> g);
 void handle_debug_panel(shared_ptr<gamestate> g);
+
+
+void draw_hud_from_texture(shared_ptr<gamestate> g);
+void draw_hud_to_texture(shared_ptr<gamestate> g);
 
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
@@ -923,7 +928,14 @@ void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     libdraw_draw_dungeon_floor(g);
     libdraw_draw_player_target_box(g);
     EndMode2D();
+
+    //if (g->frame_dirty) {
+    //draw_hud_to_texture(g);
+    //} else {
+    //draw_hud_from_texture(g);
+    //}
     draw_hud(g);
+
     draw_message_history(g);
     draw_message_box(g);
     if (g->display_inventory_menu) {
@@ -1061,6 +1073,7 @@ void libdraw_unload_textures() {
     UnloadRenderTexture(title_target_texture);
     UnloadRenderTexture(char_creation_target_texture);
     UnloadRenderTexture(main_game_target_texture);
+    UnloadRenderTexture(hud_target_texture);
     UnloadRenderTexture(target);
 }
 
@@ -1262,6 +1275,11 @@ void draw_hud(shared_ptr<gamestate> g) {
     //int stat_count = 0;
     //int* stats = g_get_stats(g, g->hero_id, &stat_count);
     //massert(stats, "stats is NULL");
+
+    //merror("DRAWING HUD");
+    // testing
+    //ClearBackground(RED);
+
     int turn = g->turn_count;
     int hp = 0;
     int maxhp = 0;
@@ -1301,6 +1319,15 @@ void draw_hud(shared_ptr<gamestate> g) {
 }
 
 
+void draw_hud_to_texture(shared_ptr<gamestate> g) {
+    BeginTextureMode(hud_target_texture);
+    draw_hud(g);
+    EndTextureMode();
+}
+
+void draw_hud_from_texture(shared_ptr<gamestate> g) { DrawTexturePro(hud_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE); }
+
+
 void libdraw_init_rest(shared_ptr<gamestate> g) {
     minfo("libdraw_init_rest: initializing rest of the libdraw");
     SetExitKey(KEY_NULL);
@@ -1322,12 +1349,19 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     SetTextureFilter(target.texture, filter);
     // Use anisotropic filtering for better quality
     //target = LoadRenderTexture(w, h);
+
     title_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(title_target_texture.texture, filter);
+
     char_creation_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(char_creation_target_texture.texture, filter);
+
     main_game_target_texture = LoadRenderTexture(target_w, target_h);
     SetTextureFilter(main_game_target_texture.texture, filter);
+
+    hud_target_texture = LoadRenderTexture(target_w, target_h);
+    SetTextureFilter(hud_target_texture.texture, filter);
+
     target_src = (Rectangle){0, 0, target_w * 1.0f, -target_h * 1.0f};
     target_dest = (Rectangle){0, 0, target_w * 1.0f, target_h * 1.0f};
     //target_dest = (Rectangle){0, 0, w, h};
@@ -1345,7 +1379,6 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     //float x = 0;
     //float y = 0;
     g->cam2d.offset = (Vector2){x, y};
-
     //g->cam2d.zoom = 1.0f;
     //gamestate_set_debug_panel_pos_top_right(g);
     // set the camera target to the center of the dungeon

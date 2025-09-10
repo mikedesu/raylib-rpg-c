@@ -587,18 +587,19 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
     //int y;
     //int z;
     int inventory_count;
-    direction_t player_dir, shield_dir;
-    bool is_b, test_guard;
+    //direction_t player_dir;
+    //shield_dir;
+    //bool is_b, test_guard;
     vec3 loc;
     //x = -1;
     //y = -1;
     //z = -1;
     inventory_count = -1;
     //entityid shield_id = -1;
-    player_dir = DIR_NONE;
-    shield_dir = DIR_NONE;
-    is_b = false;
-    test_guard = g->test_guard;
+    //player_dir = DIR_NONE;
+    //shield_dir = DIR_NONE;
+    //is_b = false;
+    //test_guard = g->test_guard;
 
     if (g->hero_id != ENTITYID_INVALID) {
         loc = g_get_loc(g, g->hero_id);
@@ -628,12 +629,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
              "Flag: %d\n"
              "Turn: %d\n"
              "Hero: (%d,%d,%d)\n"
-             "Inventory: %d\n"
-             "msg_history.count: %d\n"
-             "shield_dir_str: %s\n"
-             "player_dir_str: %s\n"
-             "is_blocking: %d\n"
-             "test_guard: %d\n",
+             "Inventory: %d\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -657,12 +653,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
              loc.x,
              loc.y,
              loc.z,
-             inventory_count,
-             0,
-             get_dir_as_string(shield_dir),
-             get_dir_as_string(player_dir),
-             is_b,
-             test_guard);
+             inventory_count);
 }
 
 
@@ -701,7 +692,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     const int max_x = 250;
     int y = 2;
     const int max_y = 31;
-    const int num = 4000;
+    const int num = 2000;
     for (int i = 0; i < num; i++) {
         create_npc_set_stats(g, (vec3){x, y, 0}, RACE_ORC);
         x++;
