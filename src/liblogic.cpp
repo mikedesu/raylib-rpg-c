@@ -633,8 +633,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
              "shield_dir_str: %s\n"
              "player_dir_str: %s\n"
              "is_blocking: %d\n"
-             "test_guard: %d\n"
-             "inventory_sort_menu_selection: %d\n",
+             "test_guard: %d\n",
              g->timebeganbuf,
              g->currenttimebuf,
              g->framecount,
@@ -663,8 +662,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
              get_dir_as_string(shield_dir),
              get_dir_as_string(player_dir),
              is_b,
-             test_guard,
-             0);
+             test_guard);
 }
 
 
