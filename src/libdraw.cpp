@@ -215,6 +215,7 @@ bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z)
     return true;
 }
 
+
 bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df) {
     massert(g, "gamestate is NULL");
     massert(df, "dungeon_floor is NULL");
@@ -225,6 +226,7 @@ bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dung
     }
     return true;
 }
+
 
 shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
@@ -278,6 +280,7 @@ shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, 
     return retval;
 }
 
+
 /*
 sprite* get_shield_front_sprite(const shared_ptr<gamestate> g,
                                        entityid id,
@@ -300,6 +303,7 @@ sprite* get_shield_front_sprite(const shared_ptr<gamestate> g,
 }
 */
 
+
 /*
 sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
                                       entityid id,
@@ -319,6 +323,7 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
     return retval;
 }
 */
+
 
 // void draw_shadow_for_entity(const shared_ptr<gamestate> g,
 //                                   spritegroup_t* sg,
@@ -340,6 +345,7 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
 //            WHITE);
 //    }
 //}
+
 
 void draw_entity_sprite(const shared_ptr<gamestate> g, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
@@ -396,7 +402,6 @@ void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
-    //sprite* weapon_back_s = get_weapon_back_sprite(g, id, sg);
     shared_ptr<sprite> weapon_back_s = get_weapon_back_sprite(g, id, sg);
     if (weapon_back_s) {
         DrawTexturePro(*weapon_back_s->texture, weapon_back_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
@@ -408,7 +413,6 @@ void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
-    //sprite* weapon_front_s = get_weapon_front_sprite(g, id, sg);
     shared_ptr<sprite> weapon_front_s = get_weapon_front_sprite(g, id, sg);
     if (weapon_front_s) {
         DrawTexturePro(*weapon_front_s->texture, weapon_front_s->src, sg->dest, (Vector2){0, 0}, 0, WHITE);
@@ -419,7 +423,6 @@ void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_
 void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    //spritegroup_t* sg = hashtable_entityid_spritegroup_get(spritegroups, id);
     if (spritegroups2.find(id) == spritegroups2.end()) {
         return;
     }
@@ -474,7 +477,6 @@ bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor
     //for (size_t i = 0; i < tile_entity_count(tile); i++) {
     for (size_t i = 0; i < tile->entities->size(); i++) {
         entityid id = tile_get_entity(tile, i);
-        //if (g_is_dead(g, id) == dead) {
         draw_sprite_and_shadow(g, id);
     }
     return true;
@@ -508,14 +510,10 @@ bool camera_lock_on(shared_ptr<gamestate> g) {
     if (spritegroups2.find(g->hero_id) == spritegroups2.end()) {
         return false;
     }
-    //spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     spritegroup_t* grp = spritegroups2[g->hero_id];
     if (!grp) {
-        //merror("camera_lock_on: spritegroup is NULL for hero_id %d", g->hero_id);
-        //minfo("hero may not have been created yet");
         return false;
     }
-    //massert(grp, "spritegroup is NULL");
     // get the old camera position
     Vector2 old_target = g->cam2d.target;
     g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
