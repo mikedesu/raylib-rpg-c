@@ -449,15 +449,15 @@ bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor
     massert(loc.y < df->height, "draw_entities_2d: y is out of bounds");
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
     if (!tile) {
-        merror("draw_entities_2d: tile is NULL at (%d, %d)", (int)loc.x, (int)loc.y);
+        //merror("draw_entities_2d: tile is NULL at (%d, %d)", (int)loc.x, (int)loc.y);
         return false;
     }
     if (tile_is_wall(tile->type)) {
-        merror("draw_entities_2d: tile is a wall at (%d, %d)", (int)loc.x, (int)loc.y);
+        //merror("draw_entities_2d: tile is a wall at (%d, %d)", (int)loc.x, (int)loc.y);
         return false;
     }
     if (!tile->visible) {
-        merror("draw_entities_2d: tile is not visible at (%d, %d)", (int)loc.x, (int)loc.y);
+        //merror("draw_entities_2d: tile is not visible at (%d, %d)", (int)loc.x, (int)loc.y);
         return true; // Do not draw entities on invisible tiles
     }
     // Get hero's vision distance and location
@@ -511,8 +511,8 @@ bool camera_lock_on(shared_ptr<gamestate> g) {
     //spritegroup_t* grp = hashtable_entityid_spritegroup_get(spritegroups, g->hero_id);
     spritegroup_t* grp = spritegroups2[g->hero_id];
     if (!grp) {
-        merror("camera_lock_on: spritegroup is NULL for hero_id %d", g->hero_id);
-        minfo("hero may not have been created yet");
+        //merror("camera_lock_on: spritegroup is NULL for hero_id %d", g->hero_id);
+        //minfo("hero may not have been created yet");
         return false;
     }
     //massert(grp, "spritegroup is NULL");
@@ -1131,14 +1131,14 @@ bool load_textures() {
         // check if the line begins with a #
         if (line[0] == '#') continue;
         sscanf(line, "%d %d %d %d %s", &txkey, &contexts, &frames, &do_dither, path);
-        minfo("Path: %s", path);
+        //minfo("Path: %s", path);
         massert(txkey >= 0, "txkey is invalid");
         massert(contexts >= 0, "contexts is invalid");
         massert(frames >= 0, "frames is invalid");
         if (txkey < 0 || contexts < 0 || frames < 0) continue;
         bool tx_loaded = load_texture(txkey, contexts, frames, do_dither, path);
         if (!tx_loaded) {
-            merror("Failed to load %s, hard-crashing!", path);
+            //merror("Failed to load %s, hard-crashing!", path);
             exit(-1);
         }
     }
@@ -1168,23 +1168,23 @@ bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num
         spritegroup_destroy(group);
         return false;
     }
-    minfo("Creating spritegroup for entity %d at loc %d,%d", id, (int)loc.x, (int)loc.y);
+    //minfo("Creating spritegroup for entity %d at loc %d,%d", id, (int)loc.x, (int)loc.y);
     for (int i = 0; i < num_keys; i++) {
-        minfo("loading sprite for key %d", keys[i]);
+        //minfo("loading sprite for key %d", keys[i]);
         int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
         //sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
-        minfo("creating sprite...");
+        //minfo("creating sprite...");
         shared_ptr<sprite> s = sprite_create2(tex, txinfo[k].contexts, txinfo[k].num_frames);
-        msuccess("created sprite!");
+        //msuccess("created sprite!");
         // as expected lol
         // easy fix
         // boom, fixed
-        minfo("adding sprite to group...");
+        //minfo("adding sprite to group...");
         spritegroup_add(group, s);
-        msuccess("added sprite to group!");
+        //msuccess("added sprite to group!");
     }
-    msuccess("Created spritegroup with sprites");
+    //msuccess("Created spritegroup with sprites");
     group->id = id;
     //sprite* s = spritegroup_get(group, 0);
     shared_ptr<sprite> s = spritegroup_get(group, 0);
@@ -1329,14 +1329,14 @@ void draw_hud_from_texture(shared_ptr<gamestate> g) { DrawTexturePro(hud_target_
 
 
 void libdraw_init_rest(shared_ptr<gamestate> g) {
-    minfo("libdraw_init_rest: initializing rest of the libdraw");
+    //minfo("libdraw_init_rest: initializing rest of the libdraw");
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);
     int w = DEFAULT_WIN_WIDTH;
     int h = DEFAULT_WIN_HEIGHT;
     int target_w = DEFAULT_TARGET_WIDTH;
     int target_h = DEFAULT_TARGET_HEIGHT;
-    minfo("libdraw_init_rest: window size: %dx%d", w, h);
+    //minfo("libdraw_init_rest: window size: %dx%d", w, h);
     massert(w > 0 && h > 0, "window width or height is not set properly");
     g->windowwidth = w;
     g->windowheight = h;
@@ -1410,7 +1410,7 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     //SetMusicLooping(music, true); // Loop the music
     //PlayMusicStream(music);
     //if (!camera_lock_on(g)) merror("failed to lock camera on hero");
-    msuccess("libdraw_init_rest: done");
+    //msuccess("libdraw_init_rest: done");
 }
 
 void libdraw_init(shared_ptr<gamestate> g) {

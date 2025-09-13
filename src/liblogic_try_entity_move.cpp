@@ -22,17 +22,14 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     if (!df) {
-        merror("Dungeon floor is NULL for z=%d", loc.z);
         return false; // Floor does not exist
     }
     // i feel like this might be something we can set elsewhere...like after the player input phase?
     shared_ptr<tile_t> tile = df_tile_at(df, aloc);
     if (!tile) {
-        merror("Tile at (%d, %d, %d) is NULL", aloc.x, aloc.y, aloc.z);
         return false; // Tile does not exist
     }
     if (!tile_is_walkable(tile->type)) {
-        merror("Cannot move, tile is not walkable at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
         return false;
     }
     entityid box_id = tile_has_box(g, aloc.x, aloc.y, aloc.z);
@@ -54,15 +51,12 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
                 try_entity_move(g, box_id, v);
             }
         }
-        merror("Cannot move, tile has box at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
         return false;
     }
     //if (tile_has_closed_door(g, ex, ey, floor)) {
-    //    merror("Cannot move, tile has a closed door");
     //    return;
     //}
     if (tile_npc_living_count(g, aloc.x, aloc.y, aloc.z) > 0) {
-        merror("Cannot move, tile has living NPCs");
         return false;
     }
     float mx = v.x * DEFAULT_TILE_SIZE;
@@ -71,20 +65,16 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     massert(current_tile, "Current tile is NULL at (%d, %d, %d)", loc.x, loc.y, loc.z);
     // remove the entity from the current tile
     if (!df_remove_at(df, id, loc.x, loc.y)) {
-        merror("Failed to remove entity %d from tile (%d, %d, %d)", id, loc.x, loc.y, loc.z);
         return false;
     }
     // add the entity to the new tile
     if (!df_add_at(df, id, aloc.x, aloc.y)) {
-        merror("Failed to add entity %d to tile (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
         return false;
     }
     g_update_loc(g, id, aloc);
     g_update_sprite_move(g, id, (Rectangle){mx, my, 0, 0});
-    //msuccess("Entity %d moved to (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
     return true;
     //if (player_on_tile(g, ex, ey, z)) {
-    //    merror("Cannot move, player on tile");
     //    return;
     //}
     //if (!df_remove_at(df, id, loc.x, loc.y)) return;
@@ -106,20 +96,16 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     // get the entity's new tile
     //tile_t* const new_tile = df_tile_at(df, (vec3){ex, ey, z});
     //if (!new_tile) {
-    //    merror("Failed to get new tile");
     //    return;
     //}
     // do not remove!!!
     // check if the tile has a pressure plate
     //if (new_tile->has_pressure_plate) {
-    //    msuccess("Pressure plate activated!");
     // do something
     // print the pressure plate event
-    //msuccessint("Pressure plate event", new_tile->pressure_plate_event);
     //}
     // check if the tile is an ON TRAP
     //if (new_tile->type == TILE_FLOOR_STONE_TRAP_ON_00) {
-    //    msuccess("On trap activated!");
     // do something
     //e->stats.hp--;
     //e->is_damaged = true;

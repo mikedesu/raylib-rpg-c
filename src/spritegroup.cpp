@@ -6,10 +6,10 @@
 
 
 spritegroup_t* spritegroup_create(int capacity) {
-    minfo("Creating spritegroup with capacity %d", capacity);
+    //minfo("Creating spritegroup with capacity %d", capacity);
     massert(capacity > 0, "capacity must be greater than 0, got %d", capacity);
     if (capacity <= 0) return NULL;
-    minfo("Allocating memory for spritegroup...");
+    //minfo("Allocating memory for spritegroup...");
     spritegroup_t* sg = (spritegroup_t*)malloc(sizeof(spritegroup_t));
     massert(sg, "spritegroup is NULL");
     if (!sg) {
@@ -22,7 +22,7 @@ spritegroup_t* spritegroup_create(int capacity) {
     sg->sprites2 = new vector<shared_ptr<sprite>>();
     sg->dest = sg->move = (Rectangle){0, 0, 0, 0};
     sg->move_rate = 1.0;
-    msuccess("spritegroup_create success");
+    //msuccess("spritegroup_create success");
     return sg;
 }
 
@@ -39,7 +39,7 @@ void spritegroup_destroy(spritegroup_t* sg) {
 }
 
 void spritegroup_add(spritegroup_t* sg, shared_ptr<sprite> s) {
-    minfo("Adding sprite to spritegroup...");
+    //minfo("Adding sprite to spritegroup...");
     if (!sg) {
         return;
     }
@@ -47,12 +47,12 @@ void spritegroup_add(spritegroup_t* sg, shared_ptr<sprite> s) {
         return;
     }
     if (sg->size < sg->capacity) {
-        minfo("Adding sprite at index %d", sg->size);
+        //minfo("Adding sprite at index %d", sg->size);
         sg->sprites2->push_back(s);
-        msuccess("Added sprite at index %d", sg->size);
+        //msuccess("Added sprite at index %d", sg->size);
         sg->size++;
     }
-    msuccess("spritegroup_add success");
+    //msuccess("spritegroup_add success");
 }
 
 

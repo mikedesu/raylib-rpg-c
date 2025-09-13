@@ -114,9 +114,9 @@ static void handle_npc(shared_ptr<gamestate> g, entityid id) {
         return;
     }
     if (g_get_type(g, id) == ENTITY_NPC) {
-        minfo("Handling NPC %d", id);
-        race_t race = g_get_race(g, id);
-        minfo("NPC %d race: %s", id, race2str(race).c_str());
+        //minfo("Handling NPC %d", id);
+        //race_t race = g_get_race(g, id);
+        //minfo("NPC %d race: %s", id, race2str(race).c_str());
         try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
         //execute_action(g, id, g_get_default_action(g, id));
     }
@@ -140,17 +140,13 @@ static void init_dungeon(shared_ptr<gamestate> g) {
 
 static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
     massert(g, "gamestate is NULL");
-    minfo("calling d_get_floor...");
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-    minfo("calling df_tile_at...");
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
-    minfo("checking if tile is walkable...");
     if (!tile_is_walkable(tile->type)) {
         merror("cannot create entity on non-walkable tile");
         return ENTITYID_INVALID;
     }
-    minfo("checking if tile has live NPCs...");
     if (tile_has_live_npcs(g, tile)) {
         merror("cannot create entity on tile with live NPCs");
         return ENTITYID_INVALID;
@@ -170,12 +166,7 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
     g_add_damaged(g, id, false);
     g_add_tx_alpha(g, id, 0);
     g_add_stats(g, id);
-    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-    if (!df_add_at(df, id, loc.x, loc.y)) {
-        return ENTITYID_INVALID;
-    }
-    msuccess("returning NPC entity ID: %d", id);
-    return id;
+    return df_add_at(df, id, loc.x, loc.y);
     //g_add_zapping(g, id, false);
     //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
     //g_add_inventory(g, id);
@@ -277,13 +268,15 @@ static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
     race_t rt = g->chara_creation->race;
     minfo("Race: %s", race2str(rt).c_str());
     entityid id = create_npc(g, rt, loc, name);
-    msuccess("create_npc successful, id: %d", id);
     massert(id != ENTITYID_INVALID, "failed to create player");
+    msuccess("create_npc successful, id: %d", id);
+
     g_set_hero_id(g, id);
     g_add_type(g, id, ENTITY_PLAYER);
     g_set_tx_alpha(g, id, 0);
     g_set_stat(g, id, STATS_LEVEL, 666);
     g_add_equipped_weapon(g, id, ENTITYID_INVALID);
+
     minfo("Adding inventory to entity id %d", id);
     g_add_inventory(g, id);
     msuccess("create_player successful, id: %d", id);
@@ -2880,7 +2873,7 @@ static void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstat
 
 
 entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
-    minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
+    //minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
     entityid id = ENTITYID_INVALID;
     string race_name = race2str(race);
     id = create_npc(g, race, loc, race_name);

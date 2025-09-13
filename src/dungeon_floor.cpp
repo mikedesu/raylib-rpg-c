@@ -397,21 +397,18 @@ void df_free(shared_ptr<dungeon_floor_t> df) {
     //free(df);
 }
 
-bool df_add_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y) {
+//bool df_add_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y) {
+entityid df_add_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y) {
     massert(df, "df is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(x >= 0, "x is less than zero");
     massert(x < df->width, "x is out of bounds");
     massert(y >= 0, "y is less than zero");
     massert(y < df->height, "y is out of bounds");
-    //entityid result = tile_add(&df->tiles[y][x], id) != -1;
     shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, -1});
     massert(tile, "tile is NULL at (%d, %d)", x, y);
-
-    minfo("df_add_at: calling tile_add with id %d at (%d, %d)", id, x, y);
     entityid result = tile_add(tile, id);
-    massert(result != ENTITYID_INVALID, "tile_add failed");
-    return result != ENTITYID_INVALID;
+    return result;
 }
 
 bool df_remove_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y) {

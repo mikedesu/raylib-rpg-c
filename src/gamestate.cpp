@@ -303,9 +303,9 @@ bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(comp != C_COUNT, "comp is invalid");
-    minfo("g_register_comp: Registering component %s for entity %d", component2str(comp), id);
+    //minfo("g_register_comp: Registering component %s for entity %d", component2str(comp), id);
     if (!g_has_comp(g, id, comp)) {
-        minfo("g_register_comp: component unregistered. Registering...");
+        //minfo("g_register_comp: component unregistered. Registering...");
         // If the component is not already registered, add it
         if (g->component_table->find(id) == g->component_table->end()) {
             (*g->component_table)[id] = 0; // Initialize with 0 components
@@ -321,7 +321,7 @@ bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp) {
     }
     // Check if the component was successfully registered
     if (g_has_comp(g, id, comp)) {
-        minfo("Component %s registered for entity %d", component2str(comp), id);
+        //minfo("Component %s already registered for entity %d", component2str(comp), id);
         return true;
     }
     merror("Failed to register component %s for entity %d", component2str(comp), id);
@@ -398,7 +398,7 @@ bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type) {
     }
     // Check if the type already exists for the entity
     (*g->type_list)[id] = type; // Insert or update the type
-    msuccess("Entity ID %d type set to %d", id, type);
+    //msuccess("Entity ID %d type set to %d", id, type);
     return true;
 }
 
@@ -1349,7 +1349,7 @@ bool g_set_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot, int value
     }
     if (g_has_stats(g, id)) {
         (*(*g->stats_list)[id])[slot] = value;
-        msuccess("Entity id %d stat slot %d set to %d", id, slot, value);
+        //msuccess("Entity id %d stat slot %d set to %d", id, slot, value);
         return true;
     }
     merror("g_set_stat: id %d does not have a stats component", id);
