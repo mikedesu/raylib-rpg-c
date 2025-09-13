@@ -39,6 +39,7 @@ void update_player_state(shared_ptr<gamestate> g);
 void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
+void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
 
 
 //void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
@@ -1255,25 +1256,23 @@ static void cycle_messages(shared_ptr<gamestate> g) {
 //    try_entity_move(g, id, x, y);
 //}
 
-//static inline void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g,
-//                                                        entitytype_t type,
-//                                                        bool success) {
-//    //if (!success) {
-//    //    if (type == ENTITY_PLAYER)
-//    //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-//    //    else if (type == ENTITY_NPC)
-//    //        g->flag = GAMESTATE_FLAG_NPC_ANIM;
-//    //    else
-//    //        g->flag = GAMESTATE_FLAG_NONE;
-//    //} else {
-//    //    if (type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-//    //}
-//    g->flag = success && type == ENTITY_PLAYER    ? GAMESTATE_FLAG_PLAYER_ANIM
-//              : !success && type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM
-//              : !success && type == ENTITY_NPC    ? GAMESTATE_FLAG_NPC_ANIM
-//              : !success                          ? GAMESTATE_FLAG_NONE
-//                                                  : g->flag;
-//}
+void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success) {
+    //if (!success) {
+    //    if (type == ENTITY_PLAYER)
+    //        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //    else if (type == ENTITY_NPC)
+    //        g->flag = GAMESTATE_FLAG_NPC_ANIM;
+    //    else
+    //        g->flag = GAMESTATE_FLAG_NONE;
+    //} else {
+    //    if (type == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //}
+    g->flag = success && type == ENTITY_PLAYER    ? GAMESTATE_FLAG_PLAYER_ANIM
+              : !success && type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM
+              : !success && type == ENTITY_NPC    ? GAMESTATE_FLAG_NPC_ANIM
+              : !success                          ? GAMESTATE_FLAG_NONE
+                                                  : g->flag;
+}
 
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
     massert(g, "gamestate is NULL");
@@ -1484,7 +1483,7 @@ static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_
     g_set_attacking(g, atk_id, true);
     g_set_update(g, atk_id, true);
     handle_attack_helper(g, tile, atk_id, &ok);
-    //handle_attack_success_gamestate_flag(g, g_get_type(g, atk_id), ok);
+    handle_attack_success_gamestate_flag(g, g_get_type(g, atk_id), ok);
 }
 
 //static bool
