@@ -165,9 +165,8 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
     g_add_type(g, id, ENTITY_NPC);
 
     g->ct.set<Name>(id, name);
+    g->ct.set<EntityType>(id, ENTITY_NPC);
     //g->ct<Name>[id]=name;
-
-
     //g->ct.set<EntityType>(id, ENTITY_NPC);
 
     g_add_race(g, id, rt);
