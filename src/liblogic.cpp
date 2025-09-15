@@ -1,6 +1,7 @@
 #include "ComponentTable.h"
 #include "ComponentTraits.h"
 #include "controlmode.h"
+#include "direction.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
@@ -166,8 +167,17 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
 
     g->ct.set<Name>(id, name);
     g->ct.set<EntityType>(id, ENTITY_NPC);
-    //g->ct<Name>[id]=name;
-    //g->ct.set<EntityType>(id, ENTITY_NPC);
+    g->ct.set<Race>(id, rt);
+    g->ct.set<Location>(id, loc);
+    g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
+    g->ct.set<Dead>(id, false);
+    g->ct.set<Update>(id, true);
+    g->ct.set<Direction>(id, DIR_DOWN_RIGHT);
+    g->ct.set<Attacking>(id, false);
+    g->ct.set<Blocking>(id, false);
+    g->ct.set<BlockSuccess>(id, false);
+    g->ct.set<Damaged>(id, false);
+    g->ct.set<TxAlpha>(id, 0);
 
     g_add_race(g, id, rt);
     g_add_loc(g, id, loc);
@@ -178,6 +188,7 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
     g_add_attacking(g, id, false);
     g_add_blocking(g, id, false);
     g_add_block_success(g, id, false);
+
     g_add_damaged(g, id, false);
     g_add_tx_alpha(g, id, 0);
     g_add_stats(g, id);

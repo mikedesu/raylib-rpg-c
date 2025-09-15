@@ -1270,24 +1270,13 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
 
 void draw_hud(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    //int stat_count = 0;
-    //int* stats = g_get_stats(g, g->hero_id, &stat_count);
-    //massert(stats, "stats is NULL");
-
-    //merror("DRAWING HUD");
-    // testing
-    //ClearBackground(RED);
-
     int turn = g->turn_count;
     int hp = 0;
     int maxhp = 0;
-    int level = g_get_stat(g, g->hero_id, STATS_LEVEL);
+    int level = 0;
     int xp = 0;
     int next_level_xp = 0;
     int attack_bonus = 0;
-    //int str = 0;
-    //int con = 0;
-    //int dex = 0;
     int ac = 0;
     int floor = g->dungeon->current_floor;
     int font_size = 10;
@@ -1295,9 +1284,10 @@ void draw_hud(shared_ptr<gamestate> g) {
     char buffer1[1024] = {0};
     const char* format_str_0 = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d";
     const char* format_str_1 = "Floor %d Turn %d";
-    snprintf(buffer0, sizeof(buffer0), format_str_0, g_get_name(g, g->hero_id).c_str(), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp);
+
+    string name = g->ct.get<Name>(g->hero_id).value_or("no-name");
+    snprintf(buffer0, sizeof(buffer0), format_str_0, name.c_str(), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp);
     snprintf(buffer1, sizeof(buffer1), format_str_1, floor, turn);
-    //Vector2 text_size0 = MeasureTextEx(GetFontDefault(), buffer0, font_size, g->line_spacing);
     int text_size0 = MeasureText(buffer0, font_size);
     float box_w = text_size0 + g->pad * 2;
     float box_h = font_size + g->pad;
@@ -1312,8 +1302,6 @@ void draw_hud(shared_ptr<gamestate> g) {
     int text_x = box_x + 10;
     int text_y = box_y + (box_h - font_size) / 2;
     DrawText(buffer0, text_x, text_y, font_size, fg);
-    //text_y += font_size;
-    //DrawText(buffer1, text_x, text_y, font_size, fg);
 }
 
 

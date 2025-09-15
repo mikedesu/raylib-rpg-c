@@ -5,6 +5,7 @@
 //#include "entityid.h"
 #include "entitytype.h"
 #include "race.h"
+#include "vec3.h"
 #include <raylib.h>
 #include <string>
 
@@ -17,7 +18,7 @@ using TileID = int;
 struct Name { }; // string
 struct EntityType { }; // entitytype_t
 struct Race { }; // race_t
-struct Location { }; // Vector3
+struct Location { }; //vec3
 struct SpriteMove { }; // Rectangle
 struct Dead { }; // bool
 struct Update { }; // bool
@@ -50,7 +51,7 @@ struct ComponentTraits<Race> {
 
 template <>
 struct ComponentTraits<Location> {
-    using Type = Vector3;
+    using Type = vec3;
 };
 
 template <>
