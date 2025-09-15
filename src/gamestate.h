@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ComponentTable.h"
 #include "character_creation.h"
 #include "component.h"
 #include "controlmode.h"
@@ -97,7 +98,9 @@ typedef struct gamestate {
     int gameplay_settings_menu_selection;
 
     shared_ptr<unordered_map<entityid, long>> component_table;
+
     shared_ptr<unordered_map<entityid, string>> name_list;
+
     shared_ptr<unordered_map<entityid, entitytype_t>> type_list;
     shared_ptr<unordered_map<entityid, race_t>> race_list;
     shared_ptr<unordered_map<entityid, vec3>> loc_list;
@@ -119,6 +122,8 @@ typedef struct gamestate {
     shared_ptr<unordered_map<entityid, entityid>> equipped_weapon_list;
 
     shared_ptr<unordered_map<entityid, shared_ptr<vector<entityid>>>> inventory_list;
+
+    ComponentTable ct;
 
 
     debugpanel_t debugpanel;

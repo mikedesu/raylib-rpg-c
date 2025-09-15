@@ -1,8 +1,11 @@
+#include "ComponentTable.h"
+#include "ComponentTraits.h"
 #include "controlmode.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
 #include "entityid.h"
+#include "entitytype.h"
 #include "gamestate.h"
 #include "gamestate_equipped_weapon.h"
 #include "gamestate_flag.h"
@@ -143,7 +146,7 @@ static void init_dungeon(shared_ptr<gamestate> g) {
 }
 
 
-static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name) {
+static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string name) {
     massert(g, "gamestate is NULL");
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
@@ -157,8 +160,16 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string 
         return ENTITYID_INVALID;
     }
     entityid id = g_add_entity(g);
+
     g_add_name(g, id, name);
     g_add_type(g, id, ENTITY_NPC);
+
+    g->ct.set<Name>(id, name);
+    //g->ct<Name>[id]=name;
+
+
+    //g->ct.set<EntityType>(id, ENTITY_NPC);
+
     g_add_race(g, id, rt);
     g_add_loc(g, id, loc);
     g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default

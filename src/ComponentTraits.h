@@ -2,19 +2,22 @@
 
 //#include "SpriteGroup.h"
 //#include "Direction.h"
+//#include "entityid.h"
+#include "entitytype.h"
 #include <raylib.h>
 #include <string>
 
 using std::string;
 
-using EntityID = int;
+//using entityid = int;
 using TileID = int;
 
 // Component kinds
 struct Name { };
-struct HitPoints { };
-struct MagicPoints { };
-struct Position { };
+struct EntityType { };
+//struct HitPoints { };
+//struct MagicPoints { };
+//struct Position { };
 //struct Sprites { };
 //struct Direction { };
 
@@ -27,19 +30,24 @@ struct ComponentTraits<Name> {
     using Type = string;
 };
 
-template <>
-struct ComponentTraits<HitPoints> {
-    using Type = Vector2;
-};
+//template <>
+//struct ComponentTraits<HitPoints> {
+//    using Type = Vector2;
+//};
+
+//template <>
+//struct ComponentTraits<MagicPoints> {
+//    using Type = Vector2;
+//};
+
+//template <>
+//struct ComponentTraits<Position> {
+//    using Type = Vector3;
+//};
 
 template <>
-struct ComponentTraits<MagicPoints> {
-    using Type = Vector2;
-};
-
-template <>
-struct ComponentTraits<Position> {
-    using Type = Vector3;
+struct ComponentTraits<EntityType> {
+    using Type = entitytype_t;
 };
 
 //template <>

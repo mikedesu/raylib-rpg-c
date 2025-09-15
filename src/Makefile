@@ -11,7 +11,6 @@ CFLAGS ?= # Allow override
 # Web build setup
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
-		    ComponentTable.cpp \
 			gameloader_web.cpp \
 			libdraw_draw_inventory_menu.cpp \
 			libdraw_message_history.cpp \
@@ -56,7 +55,6 @@ all: game
 # Desktop build
 
 OBJ_FILES=main.o \
-		  ComponentTable.o \
 		  gameloader.o \
 		  gamestate_inventory.o \
 		  gamestate_equipped_weapon.o \
@@ -182,8 +180,8 @@ liblogic_tile_has_box.o: liblogic_tile_has_box.cpp
 liblogic.o: liblogic.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c
 
-ComponentTable.o: ComponentTable.h ComponentTable.cpp ComponentTraits.h
-	$(CXX) $(WFLAGS) $(CXXFLAGS) ComponentTable.cpp -c
+#ComponentTable.o: ComponentTable.h ComponentTable.cpp ComponentTraits.h
+#	$(CXX) $(WFLAGS) $(CXXFLAGS) ComponentTable.cpp -c
 
 
 #test: $(UNIT_TEST_OBJS)
