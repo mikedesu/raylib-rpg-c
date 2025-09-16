@@ -99,7 +99,7 @@ typedef struct gamestate {
 
     shared_ptr<unordered_map<entityid, long>> component_table;
 
-    shared_ptr<unordered_map<entityid, string>> name_list;
+    //shared_ptr<unordered_map<entityid, string>> name_list;
 
     shared_ptr<unordered_map<entityid, entitytype_t>> type_list;
     shared_ptr<unordered_map<entityid, race_t>> race_list;
@@ -224,9 +224,9 @@ bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp);
 bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp);
 
 
-bool g_add_name(shared_ptr<gamestate> g, entityid id, string name);
-bool g_has_name(shared_ptr<gamestate> g, entityid id);
-string g_get_name(shared_ptr<gamestate> g, entityid id);
+//bool g_add_name(shared_ptr<gamestate> g, entityid id, string name);
+//bool g_has_name(shared_ptr<gamestate> g, entityid id);
+//string g_get_name(shared_ptr<gamestate> g, entityid id);
 
 
 bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type);

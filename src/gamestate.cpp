@@ -154,7 +154,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->music_volume = DEFAULT_MUSIC_VOLUME;
 
     g->component_table = make_shared<unordered_map<entityid, long>>();
-    g->name_list = make_shared<unordered_map<entityid, string>>();
+    //g->name_list = make_shared<unordered_map<entityid, string>>();
     g->type_list = make_shared<unordered_map<entityid, entitytype_t>>();
     g->race_list = make_shared<unordered_map<entityid, race_t>>();
     g->loc_list = make_shared<unordered_map<entityid, vec3>>();
@@ -354,37 +354,37 @@ bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp) {
 }
 
 
-bool g_has_name(shared_ptr<gamestate> g, entityid id) { return g_has_comp(g, id, C_NAME); }
+//bool g_has_name(shared_ptr<gamestate> g, entityid id) { return g_has_comp(g, id, C_NAME); }
 
 
-bool g_add_name(shared_ptr<gamestate> g, entityid id, string name) {
-    // Ensure entity exists in component table
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_NAME)) {
-        merror("g_add_component failed for id %d", id);
-        return false;
-    }
-    if (!g->name_list) {
-        merror("g->name_list is NULL");
-        return false;
-    }
-    (*g->name_list)[id] = name; // Insert or update the name
-    return true;
-}
+//bool g_add_name(shared_ptr<gamestate> g, entityid id, string name) {
+// Ensure entity exists in component table
+// Automatically register component if not already registered
+//if (!g_add_comp(g, id, C_NAME)) {
+//    merror("g_add_component failed for id %d", id);
+//    return false;
+//}
+//if (!g->name_list) {
+//    merror("g->name_list is NULL");
+//    return false;
+//}
+//(*g->name_list)[id] = name; // Insert or update the name
+//return true;
+//}
 
 
-string g_get_name(shared_ptr<gamestate> g, entityid id) {
-    if (!g_has_name(g, id)) {
-        merror("g_get_name: id %d does not have a name component", id);
-        return "no-name-comp";
-    }
-    if (g->name_list) {
-        // we can assume that the id is in the name_list
-        massert(g->name_list->find(id) != g->name_list->end(), "g_get_name: id %d not found in name_list", id);
-        return g->name_list->at(id);
-    }
-    return "no-name"; // Return an empty string if the id is not found
-}
+//string g_get_name(shared_ptr<gamestate> g, entityid id) {
+//    if (!g_has_name(g, id)) {
+//        merror("g_get_name: id %d does not have a name component", id);
+//        return "no-name-comp";
+//    }
+//    if (g->name_list) {
+//        // we can assume that the id is in the name_list
+//        massert(g->name_list->find(id) != g->name_list->end(), "g_get_name: id %d not found in name_list", id);
+//        return g->name_list->at(id);
+//    }
+//    return "no-name"; // Return an empty string if the id is not found
+//}
 
 
 bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type) {
