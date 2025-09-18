@@ -154,7 +154,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->music_volume = DEFAULT_MUSIC_VOLUME;
 
     g->component_table = make_shared<unordered_map<entityid, long>>();
-    g->dead_list = make_shared<unordered_map<entityid, bool>>();
+    //g->dead_list = make_shared<unordered_map<entityid, bool>>();
     g->update_list = make_shared<unordered_map<entityid, bool>>();
     g->attacking_list = make_shared<unordered_map<entityid, bool>>();
     g->blocking_list = make_shared<unordered_map<entityid, bool>>();
@@ -380,62 +380,6 @@ bool g_has_dir(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_has_comp(g, id, C_DIRECTION);
-}
-
-
-bool g_has_dead(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_DEAD);
-}
-
-
-bool g_add_dead(shared_ptr<gamestate> g, entityid id, bool dead) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_DEAD)) {
-        merror("g_add_dead: Failed to add component C_DEAD for id %d", id);
-        return false;
-    }
-    if (!g->dead_list) {
-        merror("g->dead_list is NULL");
-        return false;
-    }
-    // Check if the dead status already exists for the entity
-    (*g->dead_list)[id] = dead; // Insert or update the dead status
-    return true;
-}
-
-
-bool g_update_dead(shared_ptr<gamestate> g, entityid id, bool dead) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->dead_list) {
-        merror("g->dead_list is NULL");
-        return false;
-    }
-    // Check if the entity has a dead component
-    if (g_has_dead(g, id)) {
-        // Update the dead status for the entity
-        (*g->dead_list)[id] = dead; // Update the dead status
-        return true;
-    }
-    merror("g_update_dead: id %d does not have a dead component", id);
-    return false;
-}
-
-
-bool g_is_dead(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    if (id != ENTITYID_INVALID) {
-        if (g->dead_list) {
-            massert(g->dead_list->find(id) != g->dead_list->end(), "g_is_dead: id %d not found in dead list", id);
-            return g->dead_list->at(id);
-        }
-    }
-    merror("g_is_dead: id %d does not have a dead component", id);
-    return false;
 }
 
 
