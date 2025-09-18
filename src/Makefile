@@ -1,4 +1,4 @@
-CXX = clang
+CXX = g++
 OBJ = -c
 WFLAGS = -Wall -std=c++17
 SHARED = -shared
