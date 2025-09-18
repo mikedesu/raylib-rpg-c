@@ -1,3 +1,4 @@
+#include "ComponentTraits.h"
 #include "dungeon_tile.h"
 #include "gamestate.h"
 #include "libgame_defines.h"
@@ -16,7 +17,10 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     g_set_update(g, id, true);
     g_update_dir(g, id, get_dir_from_xy(v.x, v.y));
     // entity location
-    vec3 loc = g_get_loc(g, id);
+    //vec3 loc = g_get_loc(g, id);
+    vec3 loc = g->ct.get<Location>(id).value();
+
+
     // entity's new location
     // we will have a special case for traversing floors so ignore v.z
     vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
@@ -41,7 +45,8 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
         if (g_is_pushable(g, box_id)) {
             // 2. check to see if the tile in front of box, if pushed, is free/open
             // get the box's location
-            vec3 box_loc = g_get_loc(g, box_id);
+            //vec3 box_loc = g_get_loc(g, box_id);
+            vec3 box_loc = g->ct.get<Location>(box_id).value();
             // compute the location in front of the box
             vec3 box_new_loc = {box_loc.x + v.x, box_loc.y + v.y, box_loc.z};
             // get the tile at the new location
@@ -71,7 +76,8 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     if (!df_add_at(df, id, aloc.x, aloc.y)) {
         return false;
     }
-    g_update_loc(g, id, aloc);
+    //g_update_loc(g, id, aloc);
+    g->ct.set<Location>(id, aloc);
     g_update_sprite_move(g, id, (Rectangle){mx, my, 0, 0});
     return true;
     //if (player_on_tile(g, ex, ey, z)) {

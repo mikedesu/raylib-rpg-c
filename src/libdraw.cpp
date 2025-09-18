@@ -753,7 +753,12 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
         g->frame_dirty = true;
     }
     // Snap to the tile position only when movement is fully complete
-    vec3 loc = g_get_loc(g, id);
+    //vec3 loc = g_get_loc(g, id);
+
+    massert(g->ct.has<Location>(id), "id %d lacks location component", id);
+
+    vec3 loc = g->ct.get<Location>(id).value();
+
     spritegroup_snap_dest(sg, loc.x, loc.y);
 }
 
@@ -908,7 +913,10 @@ bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     entityid id = g->hero_id;
     if (id == -1) return false;
     direction_t dir = g_get_dir(g, id);
-    vec3 loc = g_get_loc(g, id);
+
+    //vec3 loc = g_get_loc(g, id);
+    vec3 loc = g->ct.get<Location>(id).value();
+
     float x = loc.x + get_x_from_dir(dir);
     float y = loc.y + get_y_from_dir(dir);
     float w = DEFAULT_TILE_SIZE;
@@ -1168,7 +1176,8 @@ bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num
     }
     int df_w = df->width;
     int df_h = df->height;
-    vec3 loc = g_get_loc(g, id);
+    //vec3 loc = g_get_loc(g, id);
+    vec3 loc = g->ct.get<Location>(id).value();
     massert(loc.x >= 0 && loc.x < df_w, "location x out of bounds: %d", loc.x);
     massert(loc.y >= 0 && loc.y < df_h, "location y out of bounds: %d", loc.y);
     if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {

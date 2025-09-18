@@ -181,9 +181,7 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
     g->ct.set<Damaged>(id, false);
     g->ct.set<TxAlpha>(id, 0);
 
-    //g_add_race(g, id, rt);
 
-    g_add_loc(g, id, loc);
     g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
     g_add_dead(g, id, false);
     g_add_update(g, id, true);
@@ -281,7 +279,9 @@ static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type
     //g_add_name(g, id, weapontype2str(type));
     g->ct.set<Name>(id, weapontype2str(type));
 
-    g_add_loc(g, id, loc);
+    //g_add_loc(g, id, loc);
+    g->ct.set<Location>(id, loc);
+
     g_add_tx_alpha(g, id, 255);
     g_add_update(g, id, true);
     g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
@@ -631,7 +631,7 @@ static void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputs
     //test_guard = g->test_guard;
 
     if (g->hero_id != ENTITYID_INVALID) {
-        loc = g_get_loc(g, g->hero_id);
+        loc = g->ct.get<Location>(g->hero_id).value();
     }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
@@ -1504,7 +1504,8 @@ void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, enti
 static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
     massert(!g_is_dead(g, atk_id), "attacker entity is dead");
-    vec3 loc = g_get_loc(g, atk_id);
+    //vec3 loc = g_get_loc(g, atk_id);
+    vec3 loc = g->ct.get<Location>(atk_id).value();
     shared_ptr<dungeon_floor_t> floor = d_get_floor(g->dungeon, loc.z);
     massert(floor, "failed to get dungeon floor");
     shared_ptr<tile_t> tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
@@ -1513,7 +1514,8 @@ static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_
     }
     // Calculate direction based on target position
     bool ok = false;
-    vec3 eloc = g_get_loc(g, atk_id);
+    //vec3 eloc = g_get_loc(g, atk_id);
+    vec3 eloc = g->ct.get<Location>(atk_id).value();
     int dx = tgt_x - eloc.x;
     int dy = tgt_y - eloc.y;
     g_update_dir(g, atk_id, get_dir_from_xy(dx, dy));

@@ -12,7 +12,10 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
     g_set_update(g, id, true);
     // check if the player is on a tile with an item
-    vec3 loc = g_get_loc(g, id);
+
+    //vec3 loc = g_get_loc(g, id);
+    vec3 loc = g->ct.get<Location>(id).value();
+
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     if (!df) {
         merror("Failed to get dungeon floor");

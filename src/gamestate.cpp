@@ -157,7 +157,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     //g->name_list = make_shared<unordered_map<entityid, string>>();
     //g->type_list = make_shared<unordered_map<entityid, entitytype_t>>();
     //g->race_list = make_shared<unordered_map<entityid, race_t>>();
-    g->loc_list = make_shared<unordered_map<entityid, vec3>>();
+    //g->loc_list = make_shared<unordered_map<entityid, vec3>>();
     g->sprite_move_list = make_shared<unordered_map<entityid, Rectangle>>();
     g->dir_list = make_shared<unordered_map<entityid, direction_t>>();
     g->dead_list = make_shared<unordered_map<entityid, bool>>();
@@ -491,50 +491,50 @@ vec3 g_get_loc(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (g_has_loc(g, id)) {
-        if (g->loc_list) {
-            massert(g->loc_list->find(id) != g->loc_list->end(), "g_get_loc: id %d not found in loc list", id);
-            return g->loc_list->at(id);
-        }
+        //if (g->loc_list) {
+        //    massert(g->loc_list->find(id) != g->loc_list->end(), "g_get_loc: id %d not found in loc list", id);
+        //    return g->loc_list->at(id);
+        //}
     }
     merror("Location component not found for id %d", id);
     return (vec3){-1, -1, -1}; // Return an invalid location if not found
 }
 
 
-bool g_add_loc(shared_ptr<gamestate> g, entityid id, vec3 loc) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_LOCATION)) {
-        merror("g_add_comp failed for id %d", id);
-        return false;
-    }
-    if (!g->loc_list) {
-        merror("g->loc_list is NULL");
-        return false;
-    }
-    // Check if the location already exists for the entity
-    (*g->loc_list)[id] = loc; // Insert or update the location
-    return true;
-}
+//bool g_add_loc(shared_ptr<gamestate> g, entityid id, vec3 loc) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+// Automatically register component if not already registered
+//if (!g_add_comp(g, id, C_LOCATION)) {
+//    merror("g_add_comp failed for id %d", id);
+//    return false;
+//}
+//if (!g->loc_list) {
+//    merror("g->loc_list is NULL");
+//    return false;
+//}
+// Check if the location already exists for the entity
+//(*g->loc_list)[id] = loc; // Insert or update the location
+//return true;
+//}
 
 
-bool g_update_loc(shared_ptr<gamestate> g, entityid id, vec3 loc) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->loc_list) {
-        merror("g->loc_list is NULL");
-        return false;
-    }
-    // Check if the entity has a location component
-    if (g_has_loc(g, id)) {
-        // Update the location for the entity
-        (*g->loc_list)[id] = loc; // Update the location
-        return true;
-    }
-    merror("g_update_loc: id %d does not have a location component", id);
-    return false;
-}
+//bool g_update_loc(shared_ptr<gamestate> g, entityid id, vec3 loc) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//if (!g->loc_list) {
+//    merror("g->loc_list is NULL");
+//    return false;
+//}
+// Check if the entity has a location component
+//if (g_has_loc(g, id)) {
+//    // Update the location for the entity
+//    (*g->loc_list)[id] = loc; // Update the location
+//    return true;
+//}
+//    merror("g_update_loc: id %d does not have a location component", id);
+//    return false;
+//}
 
 
 bool g_has_sprite_move(shared_ptr<gamestate> g, entityid id) {
