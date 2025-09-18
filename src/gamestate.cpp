@@ -154,12 +154,6 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->music_volume = DEFAULT_MUSIC_VOLUME;
 
     g->component_table = make_shared<unordered_map<entityid, long>>();
-    //g->name_list = make_shared<unordered_map<entityid, string>>();
-    //g->type_list = make_shared<unordered_map<entityid, entitytype_t>>();
-    //g->race_list = make_shared<unordered_map<entityid, race_t>>();
-    //g->loc_list = make_shared<unordered_map<entityid, vec3>>();
-    //g->sprite_move_list = make_shared<unordered_map<entityid, Rectangle>>();
-    //g->dir_list = make_shared<unordered_map<entityid, direction_t>>();
     g->dead_list = make_shared<unordered_map<entityid, bool>>();
     g->update_list = make_shared<unordered_map<entityid, bool>>();
     g->attacking_list = make_shared<unordered_map<entityid, bool>>();
@@ -354,132 +348,6 @@ bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp) {
 }
 
 
-//bool g_has_name(shared_ptr<gamestate> g, entityid id) { return g_has_comp(g, id, C_NAME); }
-
-
-//bool g_add_name(shared_ptr<gamestate> g, entityid id, string name) {
-// Ensure entity exists in component table
-// Automatically register component if not already registered
-//if (!g_add_comp(g, id, C_NAME)) {
-//    merror("g_add_component failed for id %d", id);
-//    return false;
-//}
-//if (!g->name_list) {
-//    merror("g->name_list is NULL");
-//    return false;
-//}
-//(*g->name_list)[id] = name; // Insert or update the name
-//return true;
-//}
-
-
-//string g_get_name(shared_ptr<gamestate> g, entityid id) {
-//    if (!g_has_name(g, id)) {
-//        merror("g_get_name: id %d does not have a name component", id);
-//        return "no-name-comp";
-//    }
-//    if (g->name_list) {
-//        // we can assume that the id is in the name_list
-//        massert(g->name_list->find(id) != g->name_list->end(), "g_get_name: id %d not found in name_list", id);
-//        return g->name_list->at(id);
-//    }
-//    return "no-name"; // Return an empty string if the id is not found
-//}
-
-
-//bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type) {
-//    if (!g_add_comp(g, id, C_TYPE)) {
-//        merror("g_add_type: Failed to add component C_TYPE for id %d", id);
-//        return false;
-//    }
-//    if (!g->type_list) {
-//        merror("g->type_list is NULL");
-//        return false;
-//    }
-//    // Check if the type already exists for the entity
-//    (*g->type_list)[id] = type; // Insert or update the type
-//    //msuccess("Entity ID %d type set to %d", id, type);
-//    return true;
-//}
-
-
-//entitytype_t g_get_type(shared_ptr<gamestate> g, entityid id) {
-//    //if (!g_has_comp(g, id, C_TYPE)) {
-//    if (!g_has_type(g, id)) {
-//        merror("g_get_type: id %d does not have a type component", id);
-//        return ENTITY_NONE; // Return ENTITY_NONE if the type component is not present
-//    }
-//    if (g->type_list) {
-//        massert(g->type_list->find(id) != g->type_list->end(), "g_get_type: id %d not found in type_list", id);
-//        return g->type_list->at(id);
-//    }
-//    return ENTITY_NONE; // Return ENTITY_NONE if the id is not found
-//}
-
-
-//bool g_has_type(shared_ptr<gamestate> g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_comp(g, id, C_TYPE);
-//}
-
-
-//bool g_has_race(shared_ptr<gamestate> g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    return g_has_comp(g, id, C_RACE);
-//}
-
-
-//race_t g_get_race(shared_ptr<gamestate> g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g_has_race(g, id)) {
-//        if (g->race_list) {
-//            massert(g->race_list->find(id) != g->race_list->end(), "g_get_race: id %d not found in race list", id);
-//            return g->race_list->at(id);
-//        }
-//    }
-//    merror("race component not found for id %d", id);
-//    return RACE_NONE;
-//}
-//
-//
-//bool g_add_race(shared_ptr<gamestate> g, entityid id, race_t race) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    // Automatically register component if not already registered
-//    if (!g_add_comp(g, id, C_RACE)) {
-//        merror("g_add_comp failed for id %d", id);
-//        return false;
-//    }
-//    if (!g->race_list) {
-//        merror("g->race_list is NULL");
-//        return false;
-//    }
-//    // Check if the type already exists for the entity
-//    (*g->race_list)[id] = race; // Insert or update the type
-//    return true;
-//}
-
-
-//bool g_update_race(shared_ptr<gamestate> g, entityid id, race_t race) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (!g_has_race(g, id)) {
-//        merror("g_update_race: id %d does not have a race component", id);
-//        return false;
-//    }
-//    if (!g->race_list) {
-//        merror("g->race_list is NULL");
-//        return false;
-//    }
-//    // Update
-//    (*g->race_list)[id] = race; // Insert or update the type
-//    return true;
-//}
-
-
 bool g_has_loc(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
@@ -501,96 +369,11 @@ vec3 g_get_loc(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-//bool g_add_loc(shared_ptr<gamestate> g, entityid id, vec3 loc) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-// Automatically register component if not already registered
-//if (!g_add_comp(g, id, C_LOCATION)) {
-//    merror("g_add_comp failed for id %d", id);
-//    return false;
-//}
-//if (!g->loc_list) {
-//    merror("g->loc_list is NULL");
-//    return false;
-//}
-// Check if the location already exists for the entity
-//(*g->loc_list)[id] = loc; // Insert or update the location
-//return true;
-//}
-
-
-//bool g_update_loc(shared_ptr<gamestate> g, entityid id, vec3 loc) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//if (!g->loc_list) {
-//    merror("g->loc_list is NULL");
-//    return false;
-//}
-// Check if the entity has a location component
-//if (g_has_loc(g, id)) {
-//    // Update the location for the entity
-//    (*g->loc_list)[id] = loc; // Update the location
-//    return true;
-//}
-//    merror("g_update_loc: id %d does not have a location component", id);
-//    return false;
-//}
-
-
 bool g_has_sprite_move(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_has_comp(g, id, C_SPRITE_MOVE);
 }
-
-//Rectangle g_get_sprite_move(shared_ptr<gamestate> g, entityid id) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (g_has_sprite_move(g, id)) {
-//        if (g->sprite_move_list) {
-//            massert(g->sprite_move_list->find(id) != g->sprite_move_list->end(), "g_get_sprite_move: id %d not found in sprite move list", id);
-//            return g->sprite_move_list->at(id);
-//        }
-//    }
-//    merror("Sprite move component not found for id %d", id);
-//    return (Rectangle){0, 0, 0, 0}; // Return an empty rectangle if not found
-//}
-
-
-//bool g_add_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-// Automatically register component if not already registered
-//if (!g_add_comp(g, id, C_SPRITE_MOVE)) {
-//    merror("g_add_comp failed for id %d", id);
-//    return false;
-//}
-//if (!g->sprite_move_list) {
-//    merror("g->sprite_move_list is NULL");
-//    return false;
-//}
-// Check if the sprite move already exists for the entity
-//    (*g->sprite_move_list)[id] = loc; // Insert or update the sprite move
-//    return true;
-//}
-
-
-//bool g_update_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc) {
-//    massert(g, "g is NULL");
-//    massert(id != ENTITYID_INVALID, "id is invalid");
-//    if (!g->sprite_move_list) {
-//        merror("g->sprite_move_list is NULL");
-//        return false;
-//    }
-//    // Check if the entity has a sprite move component
-//    if (g_has_sprite_move(g, id)) {
-//        // Update the sprite move for the entity
-//        (*g->sprite_move_list)[id] = loc; // Update the sprite move
-//        return true;
-//    }
-//    merror("g_update_sprite_move: id %d does not have a sprite move component", id);
-//    return false;
-//}
 
 
 bool g_has_dir(shared_ptr<gamestate> g, entityid id) {
