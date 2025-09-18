@@ -284,6 +284,8 @@ static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type
 
     g_add_tx_alpha(g, id, 255);
     g_add_update(g, id, true);
+
+    //g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
     g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
 
     minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
