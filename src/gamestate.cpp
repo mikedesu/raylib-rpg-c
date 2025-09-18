@@ -156,7 +156,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->component_table = make_shared<unordered_map<entityid, long>>();
     //g->name_list = make_shared<unordered_map<entityid, string>>();
     //g->type_list = make_shared<unordered_map<entityid, entitytype_t>>();
-    g->race_list = make_shared<unordered_map<entityid, race_t>>();
+    //g->race_list = make_shared<unordered_map<entityid, race_t>>();
     g->loc_list = make_shared<unordered_map<entityid, vec3>>();
     g->sprite_move_list = make_shared<unordered_map<entityid, Rectangle>>();
     g->dir_list = make_shared<unordered_map<entityid, direction_t>>();
@@ -424,60 +424,60 @@ bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp) {
 //}
 
 
-bool g_has_race(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_RACE);
-}
+//bool g_has_race(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    return g_has_comp(g, id, C_RACE);
+//}
 
 
-race_t g_get_race(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g_has_race(g, id)) {
-        if (g->race_list) {
-            massert(g->race_list->find(id) != g->race_list->end(), "g_get_race: id %d not found in race list", id);
-            return g->race_list->at(id);
-        }
-    }
-    merror("race component not found for id %d", id);
-    return RACE_NONE;
-}
+//race_t g_get_race(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (g_has_race(g, id)) {
+//        if (g->race_list) {
+//            massert(g->race_list->find(id) != g->race_list->end(), "g_get_race: id %d not found in race list", id);
+//            return g->race_list->at(id);
+//        }
+//    }
+//    merror("race component not found for id %d", id);
+//    return RACE_NONE;
+//}
+//
+//
+//bool g_add_race(shared_ptr<gamestate> g, entityid id, race_t race) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    // Automatically register component if not already registered
+//    if (!g_add_comp(g, id, C_RACE)) {
+//        merror("g_add_comp failed for id %d", id);
+//        return false;
+//    }
+//    if (!g->race_list) {
+//        merror("g->race_list is NULL");
+//        return false;
+//    }
+//    // Check if the type already exists for the entity
+//    (*g->race_list)[id] = race; // Insert or update the type
+//    return true;
+//}
 
 
-bool g_add_race(shared_ptr<gamestate> g, entityid id, race_t race) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_RACE)) {
-        merror("g_add_comp failed for id %d", id);
-        return false;
-    }
-    if (!g->race_list) {
-        merror("g->race_list is NULL");
-        return false;
-    }
-    // Check if the type already exists for the entity
-    (*g->race_list)[id] = race; // Insert or update the type
-    return true;
-}
-
-
-bool g_update_race(shared_ptr<gamestate> g, entityid id, race_t race) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g_has_race(g, id)) {
-        merror("g_update_race: id %d does not have a race component", id);
-        return false;
-    }
-    if (!g->race_list) {
-        merror("g->race_list is NULL");
-        return false;
-    }
-    // Update
-    (*g->race_list)[id] = race; // Insert or update the type
-    return true;
-}
+//bool g_update_race(shared_ptr<gamestate> g, entityid id, race_t race) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    if (!g_has_race(g, id)) {
+//        merror("g_update_race: id %d does not have a race component", id);
+//        return false;
+//    }
+//    if (!g->race_list) {
+//        merror("g->race_list is NULL");
+//        return false;
+//    }
+//    // Update
+//    (*g->race_list)[id] = race; // Insert or update the type
+//    return true;
+//}
 
 
 bool g_has_loc(shared_ptr<gamestate> g, entityid id) {

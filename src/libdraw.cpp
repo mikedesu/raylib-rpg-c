@@ -1220,7 +1220,9 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     massert(type != ENTITY_NONE, "entity type is none");
 
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-        race_t race = g_get_race(g, id);
+        //race_t race = g_get_race(g, id);
+        race_t race = g->ct.get<Race>(id).value_or(RACE_NONE);
+
         switch (race) {
         case RACE_HUMAN: create_spritegroup(g, id, TX_HUMAN_KEYS, TX_HUMAN_COUNT, -12, -12); break;
         case RACE_ORC: create_spritegroup(g, id, TX_ORC_KEYS, TX_ORC_COUNT, -12, -12); break;

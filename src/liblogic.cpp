@@ -181,7 +181,8 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
     g->ct.set<Damaged>(id, false);
     g->ct.set<TxAlpha>(id, 0);
 
-    g_add_race(g, id, rt);
+    //g_add_race(g, id, rt);
+
     g_add_loc(g, id, loc);
     g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
     g_add_dead(g, id, false);
