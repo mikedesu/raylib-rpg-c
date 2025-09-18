@@ -284,8 +284,6 @@ static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type
 
     g_add_tx_alpha(g, id, 255);
     g_add_update(g, id, true);
-
-    //g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
     g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
 
     minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
@@ -1506,8 +1504,7 @@ void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, enti
 
 static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
-    //massert(!g_is_dead(g, atk_id), "attacker entity is dead");
-    massert(!g->ct.get<Dead>(atk_id).value_or(false), "attacker entity is dead");
+    massert(!g_is_dead(g, atk_id), "attacker entity is dead");
     //vec3 loc = g_get_loc(g, atk_id);
     vec3 loc = g->ct.get<Location>(atk_id).value();
     shared_ptr<dungeon_floor_t> floor = d_get_floor(g->dungeon, loc.z);

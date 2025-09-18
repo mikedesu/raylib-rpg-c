@@ -81,7 +81,9 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     //g_update_loc(g, id, aloc);
     g->ct.set<Location>(id, aloc);
     //g_update_sprite_move(g, id, (Rectangle){mx, my, 0, 0});
+
     g->ct.set<SpriteMove>(id, (Rectangle){mx, my, 0, 0});
+    //g->ct<SpriteMove>[id]=(Rectangle){mx, my, 0, 0};
 
     return true;
     //if (player_on_tile(g, ex, ey, z)) {
