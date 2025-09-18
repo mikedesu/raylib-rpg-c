@@ -15,7 +15,9 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     g_set_update(g, id, true);
-    g_update_dir(g, id, get_dir_from_xy(v.x, v.y));
+    //g_update_dir(g, id, get_dir_from_xy(v.x, v.y));
+    g->ct.set<Direction>(id, get_dir_from_xy(v.x, v.y));
+
     // entity location
     //vec3 loc = g_get_loc(g, id);
     vec3 loc = g->ct.get<Location>(id).value();

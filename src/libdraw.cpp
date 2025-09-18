@@ -735,7 +735,12 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     if (g_get_update(g, id)) {
         //libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, id));
         //libdraw_update_sprite_context_ptr(g, sg, DIR_DOWN_LEFT);
-        libdraw_update_sprite_context_ptr(g, sg, g_get_dir(g, id));
+
+        //libdraw_update_sprite_context_ptr(g, sg, g_get_dir(g, id));
+
+        auto d = g->ct.get<Direction>(id).value();
+        libdraw_update_sprite_context_ptr(g, sg, d);
+
         g_set_update(g, id, false);
     }
     // Copy movement intent from sprite_move_x/y if present
@@ -915,7 +920,7 @@ bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     entityid id = g->hero_id;
     if (id == -1) return false;
-    direction_t dir = g_get_dir(g, id);
+    direction_t dir = g->ct.get<Direction>(id).value();
 
     //vec3 loc = g_get_loc(g, id);
     vec3 loc = g->ct.get<Location>(id).value();

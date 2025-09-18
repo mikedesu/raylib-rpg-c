@@ -1,6 +1,6 @@
 #include "component.h"
 #include "controlmode.h"
-#include "direction.h"
+//#include "direction.h"
 #include "entityid.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
@@ -159,7 +159,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     //g->race_list = make_shared<unordered_map<entityid, race_t>>();
     //g->loc_list = make_shared<unordered_map<entityid, vec3>>();
     //g->sprite_move_list = make_shared<unordered_map<entityid, Rectangle>>();
-    g->dir_list = make_shared<unordered_map<entityid, direction_t>>();
+    //g->dir_list = make_shared<unordered_map<entityid, direction_t>>();
     g->dead_list = make_shared<unordered_map<entityid, bool>>();
     g->update_list = make_shared<unordered_map<entityid, bool>>();
     g->attacking_list = make_shared<unordered_map<entityid, bool>>();
@@ -597,56 +597,6 @@ bool g_has_dir(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_has_comp(g, id, C_DIRECTION);
-}
-
-
-direction_t g_get_dir(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g_has_dir(g, id)) {
-        if (g->dir_list) {
-            massert(g->dir_list->find(id) != g->dir_list->end(), "g_get_dir: id %d not found in direction list", id);
-            return g->dir_list->at(id);
-        }
-    }
-    //merror("Direction component not found for id %d", id);
-    return DIR_NONE; // Return DIR_NONE if not found
-}
-
-
-bool g_add_dir(shared_ptr<gamestate> g, entityid id, direction_t dir) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_DIRECTION)) {
-        merror("g_add_comp failed for id %d", id);
-        return false;
-    }
-    if (!g->dir_list) {
-        merror("g->dir_list is NULL");
-        return false;
-    }
-    // Check if the direction already exists for the entity
-    (*g->dir_list)[id] = dir; // Insert or update the direction
-    return true;
-}
-
-
-bool g_update_dir(shared_ptr<gamestate> g, entityid id, direction_t dir) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->dir_list) {
-        merror("g->dir_list is NULL");
-        return false;
-    }
-    // Check if the entity has a direction component
-    if (g_has_dir(g, id)) {
-        // Update the direction for the entity
-        (*g->dir_list)[id] = dir; // Update the direction
-        return true;
-    }
-    merror("g_update_dir: id %d does not have a direction component", id);
-    return false;
 }
 
 

@@ -3,6 +3,7 @@
 //#include "SpriteGroup.h"
 //#include "Direction.h"
 //#include "entityid.h"
+#include "direction.h"
 #include "entitytype.h"
 #include "race.h"
 #include "vec3.h"
@@ -71,7 +72,7 @@ struct ComponentTraits<Update> {
 
 template <>
 struct ComponentTraits<Direction> {
-    using Type = int; // direction_t;
+    using Type = direction_t;
 };
 
 template <>

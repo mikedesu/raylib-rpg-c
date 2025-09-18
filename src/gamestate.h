@@ -109,7 +109,7 @@ typedef struct gamestate {
 
     //shared_ptr<unordered_map<entityid, Rectangle>> sprite_move_list;
 
-    shared_ptr<unordered_map<entityid, direction_t>> dir_list;
+    //shared_ptr<unordered_map<entityid, direction_t>> dir_list;
     shared_ptr<unordered_map<entityid, bool>> dead_list;
     shared_ptr<unordered_map<entityid, bool>> update_list;
     shared_ptr<unordered_map<entityid, bool>> attacking_list;
@@ -250,10 +250,10 @@ bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp);
 //vec3 g_get_loc(shared_ptr<gamestate> g, entityid id);
 
 
-direction_t g_get_dir(shared_ptr<gamestate> g, entityid id);
-bool g_add_dir(shared_ptr<gamestate> g, entityid id, direction_t dir);
-bool g_update_dir(shared_ptr<gamestate> g, entityid id, direction_t dir);
-bool g_has_dir(shared_ptr<gamestate> g, entityid id);
+//direction_t g_get_dir(shared_ptr<gamestate> g, entityid id);
+//bool g_add_dir(shared_ptr<gamestate> g, entityid id, direction_t dir);
+//bool g_update_dir(shared_ptr<gamestate> g, entityid id, direction_t dir);
+//bool g_has_dir(shared_ptr<gamestate> g, entityid id);
 
 
 //bool g_has_sprite_move(shared_ptr<gamestate> g, entityid id);

@@ -83,7 +83,9 @@ static inline void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
     if (g_is_dead(g, g->hero_id)) {
         return;
     }
-    g_update_dir(g, g->hero_id, dir);
+    //g_update_dir(g, g->hero_id, dir);
+    g->ct.set<Direction>(g->hero_id, dir);
+
     g_set_update(g, g->hero_id, true);
     g->player_changing_dir = false;
     g->frame_dirty = true;
@@ -182,10 +184,8 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
     g->ct.set<TxAlpha>(id, 0);
 
 
-    //g_add_sprite_move(g, id, (Rectangle){0, 0, 0, 0}); // default
     g_add_dead(g, id, false);
     g_add_update(g, id, true);
-    g_add_dir(g, id, DIR_DOWN_RIGHT);
     g_add_attacking(g, id, false);
     g_add_blocking(g, id, false);
     g_add_block_success(g, id, false);
@@ -1519,7 +1519,10 @@ static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_
     vec3 eloc = g->ct.get<Location>(atk_id).value();
     int dx = tgt_x - eloc.x;
     int dy = tgt_y - eloc.y;
-    g_update_dir(g, atk_id, get_dir_from_xy(dx, dy));
+
+    g->ct.set<Direction>(atk_id, get_dir_from_xy(dx, dy));
+
+
     g_set_attacking(g, atk_id, true);
     g_set_update(g, atk_id, true);
     handle_attack_helper(g, tile, atk_id, &ok);
