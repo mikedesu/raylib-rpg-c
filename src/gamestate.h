@@ -107,7 +107,7 @@ typedef struct gamestate {
 
     //shared_ptr<unordered_map<entityid, vec3>> loc_list;
 
-    shared_ptr<unordered_map<entityid, Rectangle>> sprite_move_list;
+    //shared_ptr<unordered_map<entityid, Rectangle>> sprite_move_list;
 
     shared_ptr<unordered_map<entityid, direction_t>> dir_list;
     shared_ptr<unordered_map<entityid, bool>> dead_list;
@@ -256,10 +256,10 @@ bool g_update_dir(shared_ptr<gamestate> g, entityid id, direction_t dir);
 bool g_has_dir(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_has_sprite_move(shared_ptr<gamestate> g, entityid id);
-bool g_add_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc);
-bool g_update_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc);
-Rectangle g_get_sprite_move(shared_ptr<gamestate> g, entityid id);
+//bool g_has_sprite_move(shared_ptr<gamestate> g, entityid id);
+//bool g_add_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc);
+//bool g_update_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc);
+//Rectangle g_get_sprite_move(shared_ptr<gamestate> g, entityid id);
 
 
 bool g_has_dead(shared_ptr<gamestate> g, entityid id);

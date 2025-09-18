@@ -663,12 +663,15 @@ void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, sprite
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    Rectangle sprite_move = g_get_sprite_move(g, id);
+
+    //Rectangle sprite_move = g_get_sprite_move(g, id);
+    Rectangle sprite_move = g->ct.get<SpriteMove>(id).value();
     if (sprite_move.x != 0 || sprite_move.y != 0) {
         sg->move.x = sprite_move.x;
         sg->move.y = sprite_move.y;
-        g_update_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
+        //g_update_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
 
+        g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
         //entitytype_t type = g_get_type(g, id);
         entitytype_t type = g->ct.get<EntityType>(id).value_or(ENTITY_NONE);
         massert(type != ENTITY_NONE, "entity type is none");
