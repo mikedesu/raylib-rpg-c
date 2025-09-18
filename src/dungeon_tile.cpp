@@ -1,5 +1,7 @@
+#include "ComponentTraits.h"
 #include "dungeon_tile.h"
 #include "entityid.h"
+#include "entitytype.h"
 #include "gamestate.h"
 #include "mprint.h"
 #include <algorithm>
@@ -75,11 +77,14 @@ void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
         // Skip dead entities
         if (g_is_dead(g, id)) continue;
         // Check entity type
-        entitytype_t type = g_get_type(g, id);
-        if (type == ENTITY_NPC)
+        //entitytype_t type = g_get_type(g, id);
+        entitytype_t type = g->ct.get<EntityType>(id).value_or(ENTITY_NONE);
+
+        if (type == ENTITY_NPC) {
             t->cached_live_npcs++;
-        else if (type == ENTITY_PLAYER)
+        } else if (type == ENTITY_PLAYER) {
             t->cached_player_present = true;
+        }
     }
     // Cache is now clean
     t->dirty_entities = false;

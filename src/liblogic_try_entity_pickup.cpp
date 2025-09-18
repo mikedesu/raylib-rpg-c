@@ -1,3 +1,5 @@
+#include "ComponentTraits.h"
+#include "entitytype.h"
 #include "gamestate.h"
 //#include "gamestate_equipped_weapon.h"
 #include "gamestate_inventory.h"
@@ -27,7 +29,8 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
     }
     for (size_t i = 0; i < tile->entities->size(); i++) {
         entityid itemid = tile->entities->at(i);
-        entitytype_t type = g_get_type(g, itemid);
+        //entitytype_t type = g_get_type(g, itemid);
+        entitytype_t type = g->ct.get<EntityType>(itemid).value_or(ENTITY_NONE);
         //    //minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
             if (g_add_to_inventory(g, id, itemid)) {
@@ -53,7 +56,7 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
             //                    tile_add(tile, equipped_wpn_id);
             //                    add_message(g, "Added equipped_wpn_id %d", equipped_wpn_id);
             //                }
-            if (g_get_type(g, id) == ENTITY_PLAYER) {
+            if (g->ct.get<EntityType>(id).value_or(ENTITY_NONE) == ENTITY_PLAYER) {
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             }
             break;

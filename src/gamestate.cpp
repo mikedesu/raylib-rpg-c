@@ -155,7 +155,7 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->component_table = make_shared<unordered_map<entityid, long>>();
     //g->name_list = make_shared<unordered_map<entityid, string>>();
-    g->type_list = make_shared<unordered_map<entityid, entitytype_t>>();
+    //g->type_list = make_shared<unordered_map<entityid, entitytype_t>>();
     g->race_list = make_shared<unordered_map<entityid, race_t>>();
     g->loc_list = make_shared<unordered_map<entityid, vec3>>();
     g->sprite_move_list = make_shared<unordered_map<entityid, Rectangle>>();
@@ -387,41 +387,41 @@ bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp) {
 //}
 
 
-bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type) {
-    if (!g_add_comp(g, id, C_TYPE)) {
-        merror("g_add_type: Failed to add component C_TYPE for id %d", id);
-        return false;
-    }
-    if (!g->type_list) {
-        merror("g->type_list is NULL");
-        return false;
-    }
-    // Check if the type already exists for the entity
-    (*g->type_list)[id] = type; // Insert or update the type
-    //msuccess("Entity ID %d type set to %d", id, type);
-    return true;
-}
+//bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type) {
+//    if (!g_add_comp(g, id, C_TYPE)) {
+//        merror("g_add_type: Failed to add component C_TYPE for id %d", id);
+//        return false;
+//    }
+//    if (!g->type_list) {
+//        merror("g->type_list is NULL");
+//        return false;
+//    }
+//    // Check if the type already exists for the entity
+//    (*g->type_list)[id] = type; // Insert or update the type
+//    //msuccess("Entity ID %d type set to %d", id, type);
+//    return true;
+//}
 
 
-entitytype_t g_get_type(shared_ptr<gamestate> g, entityid id) {
-    //if (!g_has_comp(g, id, C_TYPE)) {
-    if (!g_has_type(g, id)) {
-        merror("g_get_type: id %d does not have a type component", id);
-        return ENTITY_NONE; // Return ENTITY_NONE if the type component is not present
-    }
-    if (g->type_list) {
-        massert(g->type_list->find(id) != g->type_list->end(), "g_get_type: id %d not found in type_list", id);
-        return g->type_list->at(id);
-    }
-    return ENTITY_NONE; // Return ENTITY_NONE if the id is not found
-}
+//entitytype_t g_get_type(shared_ptr<gamestate> g, entityid id) {
+//    //if (!g_has_comp(g, id, C_TYPE)) {
+//    if (!g_has_type(g, id)) {
+//        merror("g_get_type: id %d does not have a type component", id);
+//        return ENTITY_NONE; // Return ENTITY_NONE if the type component is not present
+//    }
+//    if (g->type_list) {
+//        massert(g->type_list->find(id) != g->type_list->end(), "g_get_type: id %d not found in type_list", id);
+//        return g->type_list->at(id);
+//    }
+//    return ENTITY_NONE; // Return ENTITY_NONE if the id is not found
+//}
 
 
-bool g_has_type(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_TYPE);
-}
+//bool g_has_type(shared_ptr<gamestate> g, entityid id) {
+//    massert(g, "g is NULL");
+//    massert(id != ENTITYID_INVALID, "id is invalid");
+//    return g_has_comp(g, id, C_TYPE);
+//}
 
 
 bool g_has_race(shared_ptr<gamestate> g, entityid id) {

@@ -1,7 +1,9 @@
+#include "ComponentTraits.h"
 #include "direction.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
+#include "entitytype.h"
 #include "gamestate.h"
 #include "gamestate_equipped_weapon.h"
 #include "get_txkey_for_tiletype.h"
@@ -11,7 +13,7 @@
 #include "libdraw_help_menu.h"
 #include "libdraw_message_history.h"
 #include "libdraw_title_screen.h"
-#include "libdraw_version.h"
+//#include "libdraw_version.h"
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
@@ -427,8 +429,11 @@ void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
         return;
     }
     spritegroup_t* sg = spritegroups2[id];
-    entitytype_t type = g_get_type(g, id);
-    massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));
+
+
+    // old
+    //entitytype_t type = g_get_type(g, id);
+    //massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));
     // Draw components in correct order
     //draw_shadow_for_entity(g, sg, id);
     //draw_shield_sprite_back(g, id, sg);
@@ -663,7 +668,11 @@ void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, sprite
         sg->move.x = sprite_move.x;
         sg->move.y = sprite_move.y;
         g_update_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
-        entitytype_t type = g_get_type(g, id);
+
+        //entitytype_t type = g_get_type(g, id);
+        entitytype_t type = g->ct.get<EntityType>(id).value_or(ENTITY_NONE);
+        massert(type != ENTITY_NONE, "entity type is none");
+
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
             //race_t race = g_get_race(g, id);
             //sg->current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
@@ -1205,7 +1214,11 @@ bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num
 void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    entitytype_t type = g_get_type(g, id);
+
+    //entitytype_t type = g_get_type(g, id);
+    entitytype_t type = g->ct.get<EntityType>(id).value_or(ENTITY_NONE);
+    massert(type != ENTITY_NONE, "entity type is none");
+
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
         race_t race = g_get_race(g, id);
         switch (race) {
