@@ -80,7 +80,8 @@ static inline race_t get_random_race() {
 
 static inline void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
     massert(g, "Game state is NULL!");
-    if (g_is_dead(g, g->hero_id)) {
+    //if (g_is_dead(g, g->hero_id)) {
+    if (g->ct.get<Dead>(g->hero_id).value_or(true)) {
         return;
     }
     //g_update_dir(g, g->hero_id, dir);
@@ -185,7 +186,6 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
     g->ct.set<TxAlpha>(id, 0);
 
 
-    g_add_dead(g, id, false);
     g_add_update(g, id, true);
     g_add_attacking(g, id, false);
     g_add_blocking(g, id, false);
@@ -789,13 +789,15 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     if (g->hero_id != ENTITYID_INVALID) {
         if (!g->gameover) {
             g_incr_tx_alpha(g, g->hero_id, 2);
-            if (g_is_dead(g, g->hero_id)) {
+            //if (g_is_dead(g, g->hero_id)) {
+            if (g->ct.get<Dead>(g->hero_id).value_or(true)) {
                 //add_message_history(g, "You died!");
                 g->gameover = true;
             }
             //check_and_handle_level_up(g, g->hero_id);
         }
-        if (g_is_dead(g, g->hero_id)) {
+        //if (g_is_dead(g, g->hero_id)) {
+        if (g->ct.get<Dead>(g->hero_id).value_or(true)) {
             return;
         }
     }
@@ -1345,7 +1347,8 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
         int hp = g_get_stat(g, tgt_id, STATS_HP);
         if (hp <= 0) {
             merror("Target is already dead, hp was: %d", hp);
-            g_update_dead(g, tgt_id, true);
+            //g_update_dead(g, tgt_id, true);
+            g->ct.set<Dead>(tgt_id, true);
             return;
         }
         hp -= dmg;
@@ -1363,7 +1366,8 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             //                    dmg);
         }
         if (hp <= 0) {
-            g_update_dead(g, tgt_id, true);
+            //g_update_dead(g, tgt_id, true);
+            g->ct.set<Dead>(tgt_id, true);
             if (tgttype == ENTITY_NPC) {
                 //add_message_history(g,
                 //                    "%s killed %s!",
@@ -1388,7 +1392,8 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
                 //                       "small health potion");
             }
         } else {
-            g_update_dead(g, tgt_id, false);
+            //g_update_dead(g, tgt_id, false);
+            g->ct.set<Dead>(tgt_id, false);
         }
     }
     //else {
@@ -1476,7 +1481,10 @@ bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
     entitytype_t type = g->ct.get<EntityType>(target_id).value_or(ENTITY_NONE);
 
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) return false;
-    if (g_is_dead(g, target_id)) return false;
+    //if (g_is_dead(g, target_id)) return false;
+    if (g->ct.get<Dead>(target_id).value_or(true)) {
+        return false;
+    }
     //    // lets try an experiment...
     //    // get the armor class of the target
     int base_ac = g_get_stat(g, target_id, STATS_AC);
@@ -1508,7 +1516,9 @@ void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, enti
 
 static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
-    massert(!g_is_dead(g, atk_id), "attacker entity is dead");
+    //massert(!g_is_dead(g, atk_id), "attacker entity is dead");
+    massert(!g->ct.get<Dead>(atk_id).value_or(false), "attacker entity is dead");
+
     //vec3 loc = g_get_loc(g, atk_id);
     vec3 loc = g->ct.get<Location>(atk_id).value();
     shared_ptr<dungeon_floor_t> floor = d_get_floor(g->dungeon, loc.z);

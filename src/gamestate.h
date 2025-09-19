@@ -99,7 +99,8 @@ typedef struct gamestate {
 
     shared_ptr<unordered_map<entityid, long>> component_table;
 
-    shared_ptr<unordered_map<entityid, bool>> dead_list;
+    //shared_ptr<unordered_map<entityid, bool>> dead_list;
+
     shared_ptr<unordered_map<entityid, bool>> update_list;
     shared_ptr<unordered_map<entityid, bool>> attacking_list;
     shared_ptr<unordered_map<entityid, bool>> blocking_list;
@@ -251,10 +252,10 @@ bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp);
 //Rectangle g_get_sprite_move(shared_ptr<gamestate> g, entityid id);
 
 
-bool g_has_dead(shared_ptr<gamestate> g, entityid id);
-bool g_add_dead(shared_ptr<gamestate> g, entityid id, bool dead);
-bool g_update_dead(shared_ptr<gamestate> g, entityid id, bool dead);
-bool g_is_dead(shared_ptr<gamestate> g, entityid id);
+//bool g_has_dead(shared_ptr<gamestate> g, entityid id);
+//bool g_add_dead(shared_ptr<gamestate> g, entityid id, bool dead);
+//bool g_update_dead(shared_ptr<gamestate> g, entityid id, bool dead);
+//bool g_is_dead(shared_ptr<gamestate> g, entityid id);
 
 
 bool g_has_update(shared_ptr<gamestate> g, entityid id);
