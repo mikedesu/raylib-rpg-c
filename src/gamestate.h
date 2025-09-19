@@ -99,9 +99,6 @@ typedef struct gamestate {
 
     shared_ptr<unordered_map<entityid, long>> component_table;
 
-    //shared_ptr<unordered_map<entityid, bool>> dead_list;
-
-    //shared_ptr<unordered_map<entityid, bool>> update_list;
 
     shared_ptr<unordered_map<entityid, bool>> attacking_list;
     shared_ptr<unordered_map<entityid, bool>> blocking_list;
@@ -217,52 +214,6 @@ void gamestate_load_keybindings(shared_ptr<gamestate> g);
 bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp);
 bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp);
 bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp);
-
-
-//bool g_add_name(shared_ptr<gamestate> g, entityid id, string name);
-//bool g_has_name(shared_ptr<gamestate> g, entityid id);
-//string g_get_name(shared_ptr<gamestate> g, entityid id);
-
-
-//bool g_add_type(shared_ptr<gamestate> g, entityid id, entitytype_t type);
-//entitytype_t g_get_type(shared_ptr<gamestate> g, entityid id);
-//bool g_has_type(shared_ptr<gamestate> g, entityid id);
-
-
-//bool g_has_race(shared_ptr<gamestate> g, entityid id);
-//race_t g_get_race(shared_ptr<gamestate> g, entityid id);
-//bool g_add_race(shared_ptr<gamestate> g, entityid id, race_t race);
-//bool g_update_race(shared_ptr<gamestate> g, entityid id, race_t race);
-
-
-//bool g_has_loc(shared_ptr<gamestate> g, entityid id);
-//bool g_add_loc(shared_ptr<gamestate> g, entityid id, vec3 loc);
-//bool g_update_loc(shared_ptr<gamestate> g, entityid id, vec3 loc);
-//vec3 g_get_loc(shared_ptr<gamestate> g, entityid id);
-
-
-//direction_t g_get_dir(shared_ptr<gamestate> g, entityid id);
-//bool g_add_dir(shared_ptr<gamestate> g, entityid id, direction_t dir);
-//bool g_update_dir(shared_ptr<gamestate> g, entityid id, direction_t dir);
-//bool g_has_dir(shared_ptr<gamestate> g, entityid id);
-
-
-//bool g_has_sprite_move(shared_ptr<gamestate> g, entityid id);
-//bool g_add_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc);
-//bool g_update_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle loc);
-//Rectangle g_get_sprite_move(shared_ptr<gamestate> g, entityid id);
-
-
-//bool g_has_dead(shared_ptr<gamestate> g, entityid id);
-//bool g_add_dead(shared_ptr<gamestate> g, entityid id, bool dead);
-//bool g_update_dead(shared_ptr<gamestate> g, entityid id, bool dead);
-//bool g_is_dead(shared_ptr<gamestate> g, entityid id);
-
-
-//bool g_has_update(shared_ptr<gamestate> g, entityid id);
-//bool g_add_update(shared_ptr<gamestate> g, entityid id, bool update);
-//bool g_get_update(shared_ptr<gamestate> g, entityid id);
-//bool g_set_update(shared_ptr<gamestate> g, entityid id, bool update);
 
 
 bool g_has_attacking(shared_ptr<gamestate> g, entityid id);
