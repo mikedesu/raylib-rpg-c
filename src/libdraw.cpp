@@ -623,7 +623,7 @@ void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegro
     //}
     spritegroup_set_current(sg, cur);
     update_weapon_for_entity(g, id, sg);
-    g_set_attacking(g, id, false);
+    g->ct.set<Attacking>(id, false);
 }
 
 
@@ -750,7 +750,8 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     // Copy movement intent from sprite_move_x/y if present
     libdraw_update_sprite_position(g, id, sg);
 
-    if (g_get_attacking(g, id)) {
+    //if (g_get_attacking(g, id)) {
+    if (g->ct.get<Attacking>(id).value_or(false)) {
         libdraw_set_sg_is_attacking(g, id, sg);
     }
     //else if (g_get_block_success(g, id)) {

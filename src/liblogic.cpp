@@ -190,7 +190,10 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
 
     //g_add_update(g, id, true);
     g->ct.set<Update>(id, true);
-    g_add_attacking(g, id, false);
+
+    //g_add_attacking(g, id, false);
+    g->ct.set<Attacking>(id, false);
+
     g_add_blocking(g, id, false);
     g_add_block_success(g, id, false);
 
@@ -498,7 +501,8 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
             } else if (inputstate_is_pressed(is, KEY_C)) {
                 change_player_dir(g, DIR_DOWN_RIGHT);
             } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-                g_set_attacking(g, g->hero_id, true);
+                //            g_set_attacking(g, g->hero_id, true);
+                g->ct.set<Attacking>(g->hero_id, true);
                 //            g_set_update(g, g->hero_id, true);
                 g->ct.set<Update>(g->hero_id, true);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -540,7 +544,8 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
                 try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-                g_set_attacking(g, g->hero_id, true);
+                //            g_set_attacking(g, g->hero_id, true);
+                g->ct.set<Attacking>(g->hero_id, true);
                 //            g_set_update(g, g->hero_id, true);
                 g->ct.set<Update>(g->hero_id, true);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1544,7 +1549,8 @@ static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_
     g->ct.set<Direction>(atk_id, get_dir_from_xy(dx, dy));
 
 
-    g_set_attacking(g, atk_id, true);
+    //g_set_attacking(g, atk_id, true);
+    g->ct.set<Attacking>(atk_id, true);
     //g_set_update(g, atk_id, true);
     g->ct.set<Update>(atk_id, true);
     handle_attack_helper(g, tile, atk_id, &ok);

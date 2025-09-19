@@ -160,7 +160,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     //g->dir_list = make_shared<unordered_map<entityid, direction_t>>();
     //g->dead_list = make_shared<unordered_map<entityid, bool>>();
     //g->update_list = make_shared<unordered_map<entityid, bool>>();
-    g->attacking_list = make_shared<unordered_map<entityid, bool>>();
+    //g->attacking_list = make_shared<unordered_map<entityid, bool>>();
     g->blocking_list = make_shared<unordered_map<entityid, bool>>();
     g->block_success_list = make_shared<unordered_map<entityid, bool>>();
     g->damaged_list = make_shared<unordered_map<entityid, bool>>();
@@ -372,65 +372,6 @@ bool g_has_dir(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_has_comp(g, id, C_DIRECTION);
-}
-
-
-bool g_has_attacking(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_ATTACKING);
-}
-
-
-bool g_add_attacking(shared_ptr<gamestate> g, entityid id, int attacking) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_ATTACKING)) {
-        merror("g_add_attacking: Failed to add component C_ATTACKING for id %d", id);
-        return false;
-    }
-    if (!g->attacking_list) {
-        merror("g->attacking_list is NULL");
-        return false;
-    }
-    // Check if the attacking status already exists for the entity
-    (*g->attacking_list)[id] = attacking; // Insert or update the attacking status
-    return true;
-}
-
-
-bool g_set_attacking(shared_ptr<gamestate> g, entityid id, int attacking) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->attacking_list) {
-        merror("g->attacking_list is NULL");
-        return false;
-    }
-    // Check if the entity has an attacking component
-    if (g_has_attacking(g, id)) {
-        // Update the attacking status for the entity
-        (*g->attacking_list)[id] = attacking; // Update the attacking status
-        return true;
-    }
-    merror("g_set_attacking: id %d does not have an attacking component", id);
-    return false;
-}
-
-
-bool g_get_attacking(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->attacking_list) {
-        //massert(g->attacking_list->find(id) != g->attacking_list->end(), "g_get_attacking: id %d not found in attacking list", id);
-        if (g->attacking_list->find(id) == g->attacking_list->end()) {
-            //merror("g_get_attacking: id %d not found in attacking list", id);
-            return false; // Return false if the id is not found
-        }
-        return g->attacking_list->at(id);
-    }
-    merror("g_get_attacking: id %d does not have an attacking component", id);
-    return false; // Return false if the id is not found
 }
 
 
