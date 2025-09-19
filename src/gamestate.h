@@ -99,17 +99,6 @@ typedef struct gamestate {
 
     shared_ptr<unordered_map<entityid, long>> component_table;
 
-    //shared_ptr<unordered_map<entityid, string>> name_list;
-
-    //shared_ptr<unordered_map<entityid, entitytype_t>> type_list;
-
-    //shared_ptr<unordered_map<entityid, race_t>> race_list;
-
-    //shared_ptr<unordered_map<entityid, vec3>> loc_list;
-
-    //shared_ptr<unordered_map<entityid, Rectangle>> sprite_move_list;
-
-    //shared_ptr<unordered_map<entityid, direction_t>> dir_list;
     shared_ptr<unordered_map<entityid, bool>> dead_list;
     shared_ptr<unordered_map<entityid, bool>> update_list;
     shared_ptr<unordered_map<entityid, bool>> attacking_list;
