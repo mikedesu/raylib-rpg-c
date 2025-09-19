@@ -728,7 +728,7 @@ void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* g
 
 
 void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    minfo("Begin update sprite ptr: %d", id);
+    minfo2("Begin update sprite ptr: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
@@ -770,12 +770,12 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     vec3 loc = g->ct.get<Location>(id).value();
 
     spritegroup_snap_dest(sg, loc.x, loc.y);
-    minfo("End update sprite ptr: %d", id);
+    minfo2("End update sprite ptr: %d", id);
 }
 
 
 void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
-    minfo("Begin update sprite pre: %d", id);
+    minfo2("Begin update sprite pre: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     if (spritegroups2.find(id) == spritegroups2.end()) {
@@ -792,7 +792,7 @@ void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     //        libdraw_update_sprite_ptr(g, id, sg);
     //    }
     //}
-    minfo("End update sprite pre: %d", id);
+    minfo2("End update sprite pre: %d", id);
 }
 
 
@@ -811,7 +811,7 @@ void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
 
 void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    minfo("Begin handle dirty entities");
+    minfo2("Begin handle dirty entities");
     if (g->dirty_entities) {
         for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++) {
             create_sg_byid(g, i);
@@ -821,12 +821,12 @@ void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
         g->new_entityid_end = ENTITYID_INVALID;
         g->frame_dirty = true;
     }
-    minfo("End handle dirty entities");
+    minfo2("End handle dirty entities");
 }
 
 
 void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
-    minfo("Begin update sprites pre");
+    minfo2("Begin update sprites pre");
     massert(g, "gamestate is NULL");
     //UpdateMusicStream(music);
     //if (g->music_volume_changed) {
@@ -835,13 +835,13 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     //}
     if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_handle_dirty_entities(g);
-        minfo("Begin update sprites pre loop");
+        minfo2("Begin update sprites pre loop");
         for (entityid id = 0; id < g->next_entityid; id++) {
             libdraw_update_sprite_pre(g, id);
         }
-        minfo("End update sprites pre loop");
+        minfo2("End update sprites pre loop");
     }
-    minfo("End update sprites pre");
+    minfo2("End update sprites pre");
 }
 
 
@@ -1043,7 +1043,7 @@ void handle_debug_panel(shared_ptr<gamestate> g) {
 
 
 void libdraw_drawframe(shared_ptr<gamestate> g) {
-    minfo("Begin draw frame");
+    minfo2("Begin draw frame");
     double start_time = GetTime();
     libdraw_update_sprites_pre(g);
     BeginDrawing();
@@ -1053,7 +1053,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
     if (g->frame_dirty) {
-        minfo("handling dirty frame");
+        minfo2("handling dirty frame");
         if (g->current_scene == SCENE_TITLE) {
             draw_title_screen_to_texture(g, false);
         } else if (g->current_scene == SCENE_MAIN_MENU) {
@@ -1067,7 +1067,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
         g->frame_updates++;
     }
     // draw to the target texture
-    minfo("drawing frame to target texture");
+    minfo2("drawing frame to target texture");
     BeginTextureMode(target);
     ClearBackground(BLUE);
     if (g->current_scene == SCENE_TITLE) {
@@ -1090,7 +1090,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
     libdraw_update_sprites_post(g);
-    msuccess("End draw frame");
+    msuccess2("End draw frame");
 }
 
 

@@ -779,7 +779,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
 void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-    minfo("Begin tick");
+    minfo2("Begin tick");
     // Spawn NPCs periodically
     //try_spawn_npc(g);
     // update ALL entities
@@ -824,7 +824,7 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
-    msuccess("End tick");
+    msuccess2("End tick");
 }
 
 
