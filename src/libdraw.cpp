@@ -733,7 +733,8 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
     //if (g_is_dead(g, id) && !spritegroup_is_animating(sg)) return;
-    if (g_get_update(g, id)) {
+    //if (g_get_update(g, id)) {
+    if (g->ct.get<Update>(id).value_or(false)) {
         //libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, id));
         //libdraw_update_sprite_context_ptr(g, sg, DIR_DOWN_LEFT);
 
@@ -743,7 +744,8 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
             direction_t d = g->ct.get<Direction>(id).value();
             libdraw_update_sprite_context_ptr(g, sg, d);
         }
-        g_set_update(g, id, false);
+        //g_set_update(g, id, false);
+        g->ct.set<Update>(id, false);
     }
     // Copy movement intent from sprite_move_x/y if present
     libdraw_update_sprite_position(g, id, sg);

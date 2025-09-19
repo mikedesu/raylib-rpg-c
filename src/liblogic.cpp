@@ -87,7 +87,9 @@ static inline void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
     //g_update_dir(g, g->hero_id, dir);
     g->ct.set<Direction>(g->hero_id, dir);
 
-    g_set_update(g, g->hero_id, true);
+    //g_set_update(g, g->hero_id, true);
+    g->ct.set<Update>(g->hero_id, true);
+
     g->player_changing_dir = false;
     g->frame_dirty = true;
     //update_equipped_shield_dir(g, g->hero_id);
@@ -186,7 +188,8 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
     g->ct.set<TxAlpha>(id, 0);
 
 
-    g_add_update(g, id, true);
+    //g_add_update(g, id, true);
+    g->ct.set<Update>(id, true);
     g_add_attacking(g, id, false);
     g_add_blocking(g, id, false);
     g_add_block_success(g, id, false);
@@ -286,7 +289,8 @@ static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type
     g->ct.set<Location>(id, loc);
 
     g_add_tx_alpha(g, id, 255);
-    g_add_update(g, id, true);
+    //g_add_update(g, id, true);
+    g->ct.set<Update>(id, true);
     g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
 
     minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
@@ -495,7 +499,8 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
                 change_player_dir(g, DIR_DOWN_RIGHT);
             } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
                 g_set_attacking(g, g->hero_id, true);
-                g_set_update(g, g->hero_id, true);
+                //            g_set_update(g, g->hero_id, true);
+                g->ct.set<Update>(g->hero_id, true);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 g->player_changing_dir = false;
             }
@@ -536,7 +541,8 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
                 g_set_attacking(g, g->hero_id, true);
-                g_set_update(g, g->hero_id, true);
+                //            g_set_update(g, g->hero_id, true);
+                g->ct.set<Update>(g->hero_id, true);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             } else if (inputstate_is_pressed(is, KEY_SEMICOLON)) {
                 //add_message(g, "pickup item (unimplemented)");
@@ -1343,7 +1349,8 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
         //dmg += atk_bonus;
         //}
         g_set_damaged(g, tgt_id, true);
-        g_set_update(g, tgt_id, true);
+        //    g_set_update(g, tgt_id, true);
+        g->ct.set<Update>(tgt_id, true);
         int hp = g_get_stat(g, tgt_id, STATS_HP);
         if (hp <= 0) {
             merror("Target is already dead, hp was: %d", hp);
@@ -1538,7 +1545,8 @@ static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_
 
 
     g_set_attacking(g, atk_id, true);
-    g_set_update(g, atk_id, true);
+    //g_set_update(g, atk_id, true);
+    g->ct.set<Update>(atk_id, true);
     handle_attack_helper(g, tile, atk_id, &ok);
     //handle_attack_success_gamestate_flag(g, g_get_type(g, atk_id), ok);
     entitytype_t type0 = g->ct.get<EntityType>(atk_id).value_or(ENTITY_NONE);

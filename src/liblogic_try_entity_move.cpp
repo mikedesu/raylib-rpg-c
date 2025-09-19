@@ -14,7 +14,8 @@ int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
 bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-    g_set_update(g, id, true);
+    //g_set_update(g, id, true);
+    g->ct.set<Update>(id, true);
     //g_update_dir(g, id, get_dir_from_xy(v.x, v.y));
     g->ct.set<Direction>(id, get_dir_from_xy(v.x, v.y));
 

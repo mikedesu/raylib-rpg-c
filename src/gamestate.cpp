@@ -161,7 +161,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     //g->sprite_move_list = make_shared<unordered_map<entityid, Rectangle>>();
     //g->dir_list = make_shared<unordered_map<entityid, direction_t>>();
     //g->dead_list = make_shared<unordered_map<entityid, bool>>();
-    g->update_list = make_shared<unordered_map<entityid, bool>>();
+    //g->update_list = make_shared<unordered_map<entityid, bool>>();
     g->attacking_list = make_shared<unordered_map<entityid, bool>>();
     g->blocking_list = make_shared<unordered_map<entityid, bool>>();
     g->block_success_list = make_shared<unordered_map<entityid, bool>>();
@@ -597,61 +597,6 @@ bool g_has_dir(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_has_comp(g, id, C_DIRECTION);
-}
-
-
-bool g_has_update(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_UPDATE);
-}
-
-
-bool g_add_update(shared_ptr<gamestate> g, entityid id, bool update) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_UPDATE)) {
-        merror("g_add_update: Failed to add component C_UPDATE for id %d", id);
-        return false;
-    }
-    if (!g->update_list) {
-        merror("g->update_list is NULL");
-        return false;
-    }
-    // Check if the update status already exists for the entity
-    (*g->update_list)[id] = update; // Insert or update the update status
-    return true;
-}
-
-
-bool g_get_update(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->update_list) {
-        massert(g->update_list->find(id) != g->update_list->end(), "g_get_update: id %d not found in update list", id);
-        return g->update_list->at(id);
-    }
-    merror("g_get_update: id %d does not have an update component", id);
-    return false; // Return false if the id is not found
-}
-
-
-bool g_set_update(shared_ptr<gamestate> g, entityid id, bool update) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->update_list) {
-        merror("g->update_list is NULL");
-        return false;
-    }
-    // Check if the entity has an update component
-    if (g_has_update(g, id)) {
-        // Update the update status for the entity
-        (*g->update_list)[id] = update; // Update the update status
-        return true;
-    }
-    merror("g_set_update: id %d does not have an update component", id);
-    return false;
 }
 
 
