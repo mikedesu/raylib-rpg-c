@@ -361,20 +361,6 @@ vec3 g_get_loc(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-bool g_has_sprite_move(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_SPRITE_MOVE);
-}
-
-
-bool g_has_dir(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_DIRECTION);
-}
-
-
 int g_get_tx_alpha(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
