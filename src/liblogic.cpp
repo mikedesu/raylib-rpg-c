@@ -52,7 +52,8 @@ void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t 
 
 static inline void reset_player_block_success(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    g_set_block_success(g, g->hero_id, false);
+    //g_set_block_success(g, g->hero_id, false);
+    g->ct.set<BlockSuccess>(g->hero_id, false);
     //g_set_update(g, g->hero_id, true);
 }
 
@@ -188,7 +189,7 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
     g->ct.set<TxAlpha>(id, 0);
 
 
-    g_add_block_success(g, id, false);
+    //g_add_block_success(g, id, false);
     g_add_damaged(g, id, false);
     g_add_tx_alpha(g, id, 0);
     g_add_stats(g, id);
@@ -814,7 +815,8 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
         if (g->hero_id != ENTITYID_INVALID) {
             g->ct.set<Blocking>(g->hero_id, false);
-            g_set_block_success(g, g->hero_id, false);
+            //        g_set_block_success(g, g->hero_id, false);
+            g->ct.set<BlockSuccess>(g->hero_id, false);
         }
     }
     handle_input(g, is);

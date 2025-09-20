@@ -162,7 +162,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     //g->update_list = make_shared<unordered_map<entityid, bool>>();
     //g->attacking_list = make_shared<unordered_map<entityid, bool>>();
     //g->blocking_list = make_shared<unordered_map<entityid, bool>>();
-    g->block_success_list = make_shared<unordered_map<entityid, bool>>();
+    //g->block_success_list = make_shared<unordered_map<entityid, bool>>();
     g->damaged_list = make_shared<unordered_map<entityid, bool>>();
     g->pushable_list = make_shared<unordered_map<entityid, bool>>();
     g->tx_alpha_list = make_shared<unordered_map<entityid, int>>();
@@ -372,61 +372,6 @@ bool g_has_dir(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_has_comp(g, id, C_DIRECTION);
-}
-
-
-bool g_has_block_success(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_BLOCK_SUCCESS);
-}
-
-
-bool g_add_block_success(shared_ptr<gamestate> g, entityid id, int block_success) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_BLOCK_SUCCESS)) {
-        merror("g_add_block_success: Failed to add component C_BLOCK_SUCCESS for id %d", id);
-        return false;
-    }
-    if (!g->block_success_list) {
-        merror("g->block_success_list is NULL");
-        return false;
-    }
-    // Check if the block success status already exists for the entity
-    (*g->block_success_list)[id] = block_success; // Insert or update the block success status
-    return true;
-}
-
-
-bool g_set_block_success(shared_ptr<gamestate> g, entityid id, int block_success) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->block_success_list) {
-        merror("g->block_success_list is NULL");
-        return false;
-    }
-    // Check if the entity has a block success component
-    if (g_has_block_success(g, id)) {
-        // Update the block success status for the entity
-        (*g->block_success_list)[id] = block_success; // Update the block success status
-        return true;
-    }
-    merror("g_set_block_success: id %d does not have a block success component", id);
-    return false;
-}
-
-
-bool g_get_block_success(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->block_success_list) {
-        massert(g->block_success_list->find(id) != g->block_success_list->end(), "g_get_block_success: id %d not found in block success list", id);
-        return g->block_success_list->at(id);
-    }
-    merror("g_get_block_success: id %d does not have a block success component", id);
-    return false; // Return false if the id is not found
 }
 
 
