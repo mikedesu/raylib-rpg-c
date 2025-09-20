@@ -22,8 +22,6 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
-//#include "inventory_sort.h"
-//#include "item_container.h"
 
 
 #define DEFAULT_MUSIC_VOLUME 0.0f
@@ -100,9 +98,6 @@ typedef struct gamestate {
     shared_ptr<unordered_map<entityid, long>> component_table;
 
 
-    //shared_ptr<unordered_map<entityid, bool>> attacking_list;
-    //shared_ptr<unordered_map<entityid, bool>> blocking_list;
-    //shared_ptr<unordered_map<entityid, bool>> block_success_list;
     shared_ptr<unordered_map<entityid, bool>> damaged_list;
     shared_ptr<unordered_map<entityid, bool>> pushable_list;
     shared_ptr<unordered_map<entityid, int>> tx_alpha_list;
