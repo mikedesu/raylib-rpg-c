@@ -161,7 +161,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     //g->dead_list = make_shared<unordered_map<entityid, bool>>();
     //g->update_list = make_shared<unordered_map<entityid, bool>>();
     //g->attacking_list = make_shared<unordered_map<entityid, bool>>();
-    g->blocking_list = make_shared<unordered_map<entityid, bool>>();
+    //g->blocking_list = make_shared<unordered_map<entityid, bool>>();
     g->block_success_list = make_shared<unordered_map<entityid, bool>>();
     g->damaged_list = make_shared<unordered_map<entityid, bool>>();
     g->pushable_list = make_shared<unordered_map<entityid, bool>>();
@@ -372,61 +372,6 @@ bool g_has_dir(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_has_comp(g, id, C_DIRECTION);
-}
-
-
-bool g_has_blocking(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_BLOCKING);
-}
-
-
-bool g_add_blocking(shared_ptr<gamestate> g, entityid id, int blocking) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_BLOCKING)) {
-        merror("g_add_blocking: Failed to add component C_BLOCKING for id %d", id);
-        return false;
-    }
-    if (!g->blocking_list) {
-        merror("g->blocking_list is NULL");
-        return false;
-    }
-    // Check if the blocking status already exists for the entity
-    (*g->blocking_list)[id] = blocking; // Insert or update the blocking status
-    return true;
-}
-
-
-bool g_set_blocking(shared_ptr<gamestate> g, entityid id, int blocking) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->blocking_list) {
-        merror("g->blocking_list is NULL");
-        return false;
-    }
-    // Check if the entity has a blocking component
-    if (g_has_blocking(g, id)) {
-        // Update the blocking status for the entity
-        (*g->blocking_list)[id] = blocking; // Update the blocking status
-        return true;
-    }
-    merror("g_set_blocking: id %d does not have a blocking component", id);
-    return false;
-}
-
-
-bool g_get_blocking(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->blocking_list) {
-        massert(g->blocking_list->find(id) != g->blocking_list->end(), "g_get_blocking: id %d not found in blocking list", id);
-        return g->blocking_list->at(id);
-    }
-    merror("g_get_blocking: id %d does not have a blocking component", id);
-    return false; // Return false if the id is not found
 }
 
 

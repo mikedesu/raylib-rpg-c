@@ -101,7 +101,7 @@ typedef struct gamestate {
 
 
     //shared_ptr<unordered_map<entityid, bool>> attacking_list;
-    shared_ptr<unordered_map<entityid, bool>> blocking_list;
+    //shared_ptr<unordered_map<entityid, bool>> blocking_list;
     shared_ptr<unordered_map<entityid, bool>> block_success_list;
     shared_ptr<unordered_map<entityid, bool>> damaged_list;
     shared_ptr<unordered_map<entityid, bool>> pushable_list;
@@ -214,12 +214,6 @@ void gamestate_load_keybindings(shared_ptr<gamestate> g);
 bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp);
 bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp);
 bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp);
-
-
-bool g_has_blocking(shared_ptr<gamestate> g, entityid id);
-bool g_add_blocking(shared_ptr<gamestate> g, entityid id, int blocking);
-bool g_set_blocking(shared_ptr<gamestate> g, entityid id, int blocking);
-bool g_get_blocking(shared_ptr<gamestate> g, entityid id);
 
 
 bool g_has_block_success(shared_ptr<gamestate> g, entityid id);

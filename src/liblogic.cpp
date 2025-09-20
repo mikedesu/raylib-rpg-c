@@ -188,15 +188,7 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
     g->ct.set<TxAlpha>(id, 0);
 
 
-    //g_add_update(g, id, true);
-    g->ct.set<Update>(id, true);
-
-    //g_add_attacking(g, id, false);
-    g->ct.set<Attacking>(id, false);
-
-    g_add_blocking(g, id, false);
     g_add_block_success(g, id, false);
-
     g_add_damaged(g, id, false);
     g_add_tx_alpha(g, id, 0);
     g_add_stats(g, id);
@@ -821,7 +813,7 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     }
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
         if (g->hero_id != ENTITYID_INVALID) {
-            g_set_blocking(g, g->hero_id, false);
+            g->ct.set<Blocking>(g->hero_id, false);
             g_set_block_success(g, g->hero_id, false);
         }
     }
