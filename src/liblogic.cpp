@@ -190,7 +190,7 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
 
 
     //g_add_block_success(g, id, false);
-    g_add_damaged(g, id, false);
+    //g_add_damaged(g, id, false);
     g_add_tx_alpha(g, id, 0);
     g_add_stats(g, id);
 
@@ -1347,7 +1347,8 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
         //int atk_bonus = g_get_stat(g, atk_id, STATS_ATTACK_BONUS);
         //dmg += atk_bonus;
         //}
-        g_set_damaged(g, tgt_id, true);
+        //    g_set_damaged(g, tgt_id, true);
+        g->ct.set<Damaged>(tgt_id, true);
         //    g_set_update(g, tgt_id, true);
         g->ct.set<Update>(tgt_id, true);
         int hp = g_get_stat(g, tgt_id, STATS_HP);

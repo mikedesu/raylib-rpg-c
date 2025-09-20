@@ -163,7 +163,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     //g->attacking_list = make_shared<unordered_map<entityid, bool>>();
     //g->blocking_list = make_shared<unordered_map<entityid, bool>>();
     //g->block_success_list = make_shared<unordered_map<entityid, bool>>();
-    g->damaged_list = make_shared<unordered_map<entityid, bool>>();
+    //g->damaged_list = make_shared<unordered_map<entityid, bool>>();
     g->pushable_list = make_shared<unordered_map<entityid, bool>>();
     g->tx_alpha_list = make_shared<unordered_map<entityid, int>>();
     g->item_type_list = make_shared<unordered_map<entityid, itemtype>>();
@@ -372,61 +372,6 @@ bool g_has_dir(shared_ptr<gamestate> g, entityid id) {
     massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     return g_has_comp(g, id, C_DIRECTION);
-}
-
-
-bool g_has_damaged(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_DAMAGED);
-}
-
-
-bool g_add_damaged(shared_ptr<gamestate> g, entityid id, int damaged) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_DAMAGED)) {
-        merror("g_add_damaged: Failed to add component C_DAMAGED for id %d", id);
-        return false;
-    }
-    if (!g->damaged_list) {
-        merror("g->damaged_list is NULL");
-        return false;
-    }
-    // Check if the damaged status already exists for the entity
-    (*g->damaged_list)[id] = damaged; // Insert or update the damaged status
-    return true;
-}
-
-
-bool g_set_damaged(shared_ptr<gamestate> g, entityid id, int damaged) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->damaged_list) {
-        merror("g->damaged_list is NULL");
-        return false;
-    }
-    // Check if the entity has a damaged component
-    if (g_has_damaged(g, id)) {
-        // Update the damaged status for the entity
-        (*g->damaged_list)[id] = damaged; // Update the damaged status
-        return true;
-    }
-    merror("g_set_damaged: id %d does not have a damaged component", id);
-    return false;
-}
-
-
-bool g_get_damaged(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->damaged_list) {
-        massert(g->damaged_list->find(id) != g->damaged_list->end(), "g_get_damaged: id %d not found in damaged list", id);
-        return g->damaged_list->at(id);
-    }
-    merror("g_get_damaged: id %d does not have a damaged component", id);
-    return false; // Return false if the id is not found
 }
 
 
