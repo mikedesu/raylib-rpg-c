@@ -98,8 +98,7 @@ typedef struct gamestate {
     shared_ptr<unordered_map<entityid, long>> component_table;
 
 
-    //shared_ptr<unordered_map<entityid, bool>> damaged_list;
-    shared_ptr<unordered_map<entityid, bool>> pushable_list;
+    //shared_ptr<unordered_map<entityid, bool>> pushable_list;
     shared_ptr<unordered_map<entityid, int>> tx_alpha_list;
     shared_ptr<unordered_map<entityid, itemtype>> item_type_list;
     shared_ptr<unordered_map<entityid, potiontype>> potion_type_list;
@@ -217,10 +216,6 @@ bool g_set_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
 bool g_add_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
 bool g_incr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
 bool g_decr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
-
-
-bool g_add_pushable(shared_ptr<gamestate> g, entityid id);
-bool g_is_pushable(shared_ptr<gamestate> g, entityid id);
 
 
 bool g_add_item_type(shared_ptr<gamestate> g, entityid id, itemtype type);

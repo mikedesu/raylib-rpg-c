@@ -29,6 +29,7 @@ struct Blocking { }; // bool
 struct BlockSuccess { }; // bool
 struct Damaged { }; // bool
 struct TxAlpha { }; // int
+struct Pushable { }; // bool
 //struct Stats { }; // ??
 
 // Traits to associate each Kind with its data type
@@ -98,4 +99,9 @@ struct ComponentTraits<Damaged> {
 template <>
 struct ComponentTraits<TxAlpha> {
     using Type = int;
+};
+
+template <>
+struct ComponentTraits<Pushable> {
+    using Type = bool;
 };

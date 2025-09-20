@@ -164,7 +164,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     //g->blocking_list = make_shared<unordered_map<entityid, bool>>();
     //g->block_success_list = make_shared<unordered_map<entityid, bool>>();
     //g->damaged_list = make_shared<unordered_map<entityid, bool>>();
-    g->pushable_list = make_shared<unordered_map<entityid, bool>>();
+    //g->pushable_list = make_shared<unordered_map<entityid, bool>>();
     g->tx_alpha_list = make_shared<unordered_map<entityid, int>>();
     g->item_type_list = make_shared<unordered_map<entityid, itemtype>>();
     g->potion_type_list = make_shared<unordered_map<entityid, potiontype>>();
@@ -469,26 +469,6 @@ bool g_decr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha) {
     }
     merror("g_decr_tx_alpha: id %d does not have a tx alpha component", id);
     return false;
-}
-
-
-bool g_add_pushable(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_PUSHABLE)) {
-        merror("g_add_pushable: Failed to add component C_PUSHABLE for id %d", id);
-        return false;
-    }
-    // verify that the entity has a pushable component
-    return g_has_comp(g, id, C_PUSHABLE);
-}
-
-
-bool g_is_pushable(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_PUSHABLE);
 }
 
 

@@ -45,7 +45,8 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     // 2. check to see if the tile in front of box, if pushed, is free/open
     if (box_id != ENTITYID_INVALID) {
         // 1. check to see if box_id is pushable
-        if (g_is_pushable(g, box_id)) {
+        //if (g_is_pushable(g, box_id)) {
+        if (g->ct.get<Pushable>(box_id).value_or(false)) {
             // 2. check to see if the tile in front of box, if pushed, is free/open
             // get the box's location
             //vec3 box_loc = g_get_loc(g, box_id);
