@@ -191,7 +191,9 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
 
     //g_add_block_success(g, id, false);
     //g_add_damaged(g, id, false);
-    g_add_tx_alpha(g, id, 0);
+    //g_add_tx_alpha(g, id, 0);
+
+
     g_add_stats(g, id);
 
     minfo("end create npc");
@@ -284,7 +286,8 @@ static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type
     //g_add_loc(g, id, loc);
     g->ct.set<Location>(id, loc);
 
-    g_add_tx_alpha(g, id, 255);
+    //g_add_tx_alpha(g, id, 255);
+    g->ct.set<TxAlpha>(id, 255);
     //g_add_update(g, id, true);
     g->ct.set<Update>(id, true);
     g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
@@ -314,7 +317,8 @@ static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
     //g_add_type(g, id, ENTITY_PLAYER);
     g->ct.set<EntityType>(id, ENTITY_PLAYER);
 
-    g_set_tx_alpha(g, id, 0);
+    //g_set_tx_alpha(g, id, 0);
+    g->ct.set<TxAlpha>(id, 0);
     g_set_stat(g, id, STATS_LEVEL, 666);
     g_add_equipped_weapon(g, id, ENTITYID_INVALID);
 
@@ -792,7 +796,13 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     // this was update player state
     if (g->hero_id != ENTITYID_INVALID) {
         if (!g->gameover) {
-            g_incr_tx_alpha(g, g->hero_id, 2);
+            unsigned char a = g->ct.get<TxAlpha>(g->hero_id).value_or(255);
+            if (a < 255) {
+                a++;
+            }
+            g->ct.set<TxAlpha>(g->hero_id, a);
+
+
             //if (g_is_dead(g, g->hero_id)) {
             if (g->ct.get<Dead>(g->hero_id).value_or(true)) {
                 //add_message_history(g, "You died!");
@@ -810,7 +820,12 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
         if (id == g->hero_id) {
             continue;
         }
-        g_incr_tx_alpha(g, id, 4);
+        //g_incr_tx_alpha(g, id, 4);
+        unsigned char a = g->ct.get<TxAlpha>(id).value_or(255);
+        if (a < 255) {
+            a++;
+        }
+        g->ct.set<TxAlpha>(id, a);
     }
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
         if (g->hero_id != ENTITYID_INVALID) {

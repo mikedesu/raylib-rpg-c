@@ -1,9 +1,17 @@
+#include "ComponentTraits.h"
 #include "gamestate.h"
 
 void update_player_state(shared_ptr<gamestate> g) {
     massert(g, "Game state is NULL!");
     if (!g->gameover) {
-        g_incr_tx_alpha(g, g->hero_id, 2);
+        //g_incr_tx_alpha(g, g->hero_id, 2);
+
+        unsigned char a = g->ct.get<TxAlpha>(g->hero_id).value_or(255);
+        if (a < 255) {
+            a++;
+            g->ct.set<TxAlpha>(g->hero_id, a);
+        }
+
 
         //if (g_is_dead(g, g->hero_id)) {
         if (g->ct.get<Dead>(g->hero_id).value_or(true)) {
