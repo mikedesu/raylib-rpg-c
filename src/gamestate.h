@@ -13,8 +13,6 @@
 #include "entitytype.h"
 #include "fadestate.h"
 #include "gamestate_flag.h"
-#include "inventory_sort.h"
-//#include "item_container.h"
 #include "monster_def.h"
 #include "ringtype.h"
 #include "scene.h"
@@ -24,6 +22,8 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
+//#include "inventory_sort.h"
+//#include "item_container.h"
 
 
 #define DEFAULT_MUSIC_VOLUME 0.0f
