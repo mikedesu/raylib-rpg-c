@@ -1279,7 +1279,9 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
         itemtype_t item_type = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
 
         if (item_type == ITEM_POTION) {
-            potiontype potion_type = g_get_potion_type(g, id);
+            //potiontype_t potion_type = g_get_potion_type(g, id);
+            potiontype_t potion_type = g->ct.get<potiontype>(id).value_or(POTION_NONE);
+
             switch (potion_type) {
             case POTION_HP_SMALL: create_spritegroup(g, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, -12, -12); break;
             case POTION_HP_MEDIUM: create_spritegroup(g, id, TX_POTION_HP_MEDIUM_KEYS, TX_POTION_HP_MEDIUM_COUNT, -12, -12); break;

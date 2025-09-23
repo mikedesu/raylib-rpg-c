@@ -167,7 +167,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     //g->pushable_list = make_shared<unordered_map<entityid, bool>>();
     //g->tx_alpha_list = make_shared<unordered_map<entityid, int>>();
     //g->item_type_list = make_shared<unordered_map<entityid, itemtype>>();
-    g->potion_type_list = make_shared<unordered_map<entityid, potiontype>>();
+    //g->potion_type_list = make_shared<unordered_map<entityid, potiontype>>();
     g->weapon_type_list = make_shared<unordered_map<entityid, weapontype>>();
     g->stats_list = make_shared<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>>();
     g->equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
@@ -358,72 +358,6 @@ vec3 g_get_loc(shared_ptr<gamestate> g, entityid id) {
     }
     merror("Location component not found for id %d", id);
     return (vec3){-1, -1, -1}; // Return an invalid location if not found
-}
-
-
-bool g_add_potion_type(shared_ptr<gamestate> g, entityid id, potiontype type) {
-    //TODO
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_POTIONTYPE)) {
-        merror("g_add_potion_type: Failed to add component C_POTION_TYPE for id %d", id);
-        return false;
-    }
-    if (!g->potion_type_list) {
-        merror("g->potion_type_list is NULL");
-        return false;
-    }
-    // Check if the potion type already exists for the entity
-    (*g->potion_type_list)[id] = type; // Insert or update the potion type
-    return true;
-}
-
-
-bool g_has_potion_type(shared_ptr<gamestate> g, entityid id) {
-    //TODO
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->potion_type_list) {
-        merror("g->potion_type_list is NULL");
-        return false;
-    }
-    // Check if the entity has a potion type component
-    return g->potion_type_list->find(id) != g->potion_type_list->end();
-}
-
-
-potiontype g_get_potion_type(shared_ptr<gamestate> g, entityid id) {
-    //TODO
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->potion_type_list) {
-        if (g_has_potion_type(g, id)) {
-            massert(g->potion_type_list->find(id) != g->potion_type_list->end(), "g_get_potion_type: id %d not found in potion type list", id);
-            return g->potion_type_list->at(id);
-        }
-    }
-    merror("g_get_potion_type: id %d does not have a potion type component", id);
-    return POTION_NONE; // Return POTION_NONE if not found
-}
-
-
-bool g_set_potion_type(shared_ptr<gamestate> g, entityid id, potiontype type) {
-    //TODO
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->potion_type_list) {
-        merror("g->potion_type_list is NULL");
-        return false;
-    }
-    // Check if the entity has a potion type component
-    if (g_has_potion_type(g, id)) {
-        // Update the potion type for the entity
-        (*g->potion_type_list)[id] = type; // Update the potion type
-        return true;
-    }
-    merror("g_set_potion_type: id %d does not have a potion type component", id);
-    return false;
 }
 
 

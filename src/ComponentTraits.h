@@ -6,6 +6,7 @@
 #include "direction.h"
 #include "entitytype.h"
 #include "item.h"
+#include "potion.h"
 #include "race.h"
 #include "vec3.h"
 #include <raylib.h>
@@ -33,6 +34,7 @@ struct TxAlpha { }; // int
 struct Pushable { }; // bool
 
 struct itemtype { }; // itemtype_t
+struct potiontype { }; // potiontype_t
 
 //struct Stats { }; // ??
 
@@ -113,4 +115,9 @@ struct ComponentTraits<Pushable> {
 template <>
 struct ComponentTraits<itemtype> {
     using Type = itemtype_t;
+};
+
+template <>
+struct ComponentTraits<potiontype> {
+    using Type = potiontype_t;
 };
