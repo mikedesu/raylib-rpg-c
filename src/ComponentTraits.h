@@ -9,6 +9,7 @@
 #include "potion.h"
 #include "race.h"
 #include "vec3.h"
+#include "weapon.h"
 #include <raylib.h>
 #include <string>
 
@@ -35,6 +36,7 @@ struct Pushable { }; // bool
 
 struct itemtype { }; // itemtype_t
 struct potiontype { }; // potiontype_t
+struct weapontype { }; // weapontype_t
 
 //struct Stats { }; // ??
 
@@ -120,4 +122,9 @@ struct ComponentTraits<itemtype> {
 template <>
 struct ComponentTraits<potiontype> {
     using Type = potiontype_t;
+};
+
+template <>
+struct ComponentTraits<weapontype> {
+    using Type = weapontype_t;
 };

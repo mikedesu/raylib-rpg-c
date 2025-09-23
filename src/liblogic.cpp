@@ -257,7 +257,7 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
 //}
 
 
-static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type) {
+static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) {
     minfo("potion create...");
     massert(g, "gamestate is NULL");
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
@@ -281,10 +281,11 @@ static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type
     //g_add_item_type(g, id, ITEM_WEAPON);
     g->ct.set<itemtype>(id, ITEM_WEAPON);
 
-    g_add_weapon_type(g, id, type);
+    //g_add_weapon_type(g, id, type);
+    g->ct.set<weapontype>(id, type);
 
     //g_add_name(g, id, weapontype2str(type));
-    g->ct.set<Name>(id, weapontype2str(type));
+    g->ct.set<Name>(id, "weapon-name");
 
     //g_add_loc(g, id, loc);
     g->ct.set<Location>(id, loc);

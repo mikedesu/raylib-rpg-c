@@ -168,7 +168,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     //g->tx_alpha_list = make_shared<unordered_map<entityid, int>>();
     //g->item_type_list = make_shared<unordered_map<entityid, itemtype>>();
     //g->potion_type_list = make_shared<unordered_map<entityid, potiontype>>();
-    g->weapon_type_list = make_shared<unordered_map<entityid, weapontype>>();
+    //g->weapon_type_list = make_shared<unordered_map<entityid, weapontype>>();
     g->stats_list = make_shared<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>>();
     g->equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
     g->inventory_list = make_shared<unordered_map<entityid, shared_ptr<vector<entityid>>>>();
@@ -358,63 +358,6 @@ vec3 g_get_loc(shared_ptr<gamestate> g, entityid id) {
     }
     merror("Location component not found for id %d", id);
     return (vec3){-1, -1, -1}; // Return an invalid location if not found
-}
-
-
-bool g_add_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype type) {
-    //TODO
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    // Automatically register component if not already registered
-    if (!g_add_comp(g, id, C_WEAPONTYPE)) {
-        merror("g_add_weapon_type: Failed to add component C_WEAPON_TYPE for id %d", id);
-        return false;
-    }
-    if (!g->weapon_type_list) {
-        merror("g->weapon_type_list is NULL");
-        return false;
-    }
-    (*g->weapon_type_list)[id] = type; // Insert or update the weapon type
-    return true;
-}
-
-
-bool g_has_weapon_type(std::shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->weapon_type_list) {
-        merror("g->weapon_type_list is NULL");
-        return false;
-    }
-    return g->weapon_type_list->find(id) != g->weapon_type_list->end();
-}
-
-
-weapontype g_get_weapon_type(std::shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g->weapon_type_list) {
-        if (g_has_weapon_type(g, id)) {
-            massert(g->weapon_type_list->find(id) != g->weapon_type_list->end(), "g_get_weapon_type: id %d not found in weapon type list", id);
-            return g->weapon_type_list->at(id);
-        }
-    }
-    return WEAPON_NONE; // Return WEAPON_NONE if not found
-}
-
-
-bool g_set_weapon_type(std::shared_ptr<gamestate> g, entityid id, weapontype type) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!g->weapon_type_list) {
-        merror("g->weapon_type_list is NULL");
-        return false;
-    }
-    if (g_has_weapon_type(g, id)) {
-        (*g->weapon_type_list)[id] = type; // Update the weapon type
-        return true;
-    }
-    return false;
 }
 
 

@@ -29,6 +29,7 @@
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"
 #include "tx_keys_weapons.h"
+#include "weapon.h"
 //#include "tx_keys_rings.h"
 //#include "tx_keys_shields.h"
 
@@ -1293,7 +1294,9 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             }
             return;
         } else if (item_type == ITEM_WEAPON) {
-            weapontype weapon_type = g_get_weapon_type(g, id);
+            //weapontype weapon_type = g_get_weapon_type(g, id);
+            weapontype_t weapon_type = g->ct.get<weapontype>(id).value_or(WEAPON_NONE);
+
             switch (weapon_type) {
             case WEAPON_DAGGER: create_spritegroup(g, id, TX_DAGGER_KEYS, TX_DAGGER_COUNT, -12, -12); break;
             case WEAPON_SWORD: create_spritegroup(g, id, TX_SWORD_KEYS, TX_SWORD_COUNT, -12, -12); break;
