@@ -100,7 +100,7 @@ typedef struct gamestate {
 
     //shared_ptr<unordered_map<entityid, bool>> pushable_list;
     //shared_ptr<unordered_map<entityid, int>> tx_alpha_list;
-    shared_ptr<unordered_map<entityid, itemtype>> item_type_list;
+    //shared_ptr<unordered_map<entityid, itemtype>> item_type_list;
     shared_ptr<unordered_map<entityid, potiontype>> potion_type_list;
     shared_ptr<unordered_map<entityid, weapontype>> weapon_type_list;
     shared_ptr<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>> stats_list;
@@ -216,12 +216,6 @@ bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp);
 //bool g_add_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
 //bool g_incr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
 //bool g_decr_tx_alpha(shared_ptr<gamestate> g, entityid id, int alpha);
-
-
-bool g_add_item_type(shared_ptr<gamestate> g, entityid id, itemtype type);
-bool g_has_item_type(shared_ptr<gamestate> g, entityid id);
-itemtype g_get_item_type(shared_ptr<gamestate> g, entityid id);
-bool g_set_item_type(shared_ptr<gamestate> g, entityid id, itemtype type);
 
 
 // set up declarations for potion type just like item type

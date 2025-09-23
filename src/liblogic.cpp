@@ -12,6 +12,7 @@
 #include "gamestate_flag.h"
 #include "gamestate_inventory.h"
 #include "inputstate.h"
+#include "item.h"
 #include "libgame_defines.h"
 #include "liblogic.h"
 #include "liblogic_add_message.h"
@@ -277,7 +278,9 @@ static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type
     //g_add_type(g, id, ENTITY_ITEM);
     g->ct.set<EntityType>(id, ENTITY_ITEM);
 
-    g_add_item_type(g, id, ITEM_WEAPON);
+    //g_add_item_type(g, id, ITEM_WEAPON);
+    g->ct.set<itemtype>(id, ITEM_WEAPON);
+
     g_add_weapon_type(g, id, type);
 
     //g_add_name(g, id, weapontype2str(type));
@@ -2164,7 +2167,9 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
             entityid item_id = inventory->at(index);
             entitytype_t type = g->ct.get<EntityType>(item_id).value_or(ENTITY_NONE);
             if (type == ENTITY_ITEM) {
-                itemtype item_type = g_get_item_type(g, item_id);
+                //itemtype item_type = g_get_item_type(g, item_id);
+                itemtype_t item_type = g->ct.get<itemtype>(item_id).value_or(ITEM_NONE);
+
                 if (item_type == ITEM_WEAPON) {
                     // try to equip it
                     if (g_equip_weapon(g, g->hero_id, item_id)) {

@@ -5,6 +5,7 @@
 //#include "entityid.h"
 #include "direction.h"
 #include "entitytype.h"
+#include "item.h"
 #include "race.h"
 #include "vec3.h"
 #include <raylib.h>
@@ -30,6 +31,9 @@ struct BlockSuccess { }; // bool
 struct Damaged { }; // bool
 struct TxAlpha { }; // int
 struct Pushable { }; // bool
+
+struct itemtype { }; // itemtype_t
+
 //struct Stats { }; // ??
 
 // Traits to associate each Kind with its data type
@@ -104,4 +108,9 @@ struct ComponentTraits<TxAlpha> {
 template <>
 struct ComponentTraits<Pushable> {
     using Type = bool;
+};
+
+template <>
+struct ComponentTraits<itemtype> {
+    using Type = itemtype_t;
 };

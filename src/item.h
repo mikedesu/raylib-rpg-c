@@ -1,7 +1,7 @@
 #pragma once
 
 
-typedef enum itemtype_t
+typedef enum
 {
     ITEM_NONE,
     ITEM_WEAPON,
@@ -12,7 +12,7 @@ typedef enum itemtype_t
     ITEM_WAND,
     ITEM_RING,
     ITEM_TYPE_COUNT
-} itemtype;
+} itemtype_t;
 
 
 //static inline const char* itemtype_to_string(itemtype type) {

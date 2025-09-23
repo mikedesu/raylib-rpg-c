@@ -1275,7 +1275,9 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     } else if (type == ENTITY_WOODEN_BOX) {
         create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
     } else if (type == ENTITY_ITEM) {
-        itemtype item_type = g_get_item_type(g, id);
+        //itemtype item_type = g_get_item_type(g, id);
+        itemtype_t item_type = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
+
         if (item_type == ITEM_POTION) {
             potiontype potion_type = g_get_potion_type(g, id);
             switch (potion_type) {
