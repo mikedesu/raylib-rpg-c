@@ -10,7 +10,7 @@
 #include "gamestate.h"
 #include "gamestate_equipped_weapon.h"
 #include "gamestate_flag.h"
-#include "gamestate_inventory.h"
+//#include "gamestate_inventory.h"
 #include "inputstate.h"
 #include "item.h"
 #include "libgame_defines.h"
@@ -327,7 +327,7 @@ static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
     g_add_equipped_weapon(g, id, ENTITYID_INVALID);
 
     minfo("Adding inventory to entity id %d", id);
-    g_add_inventory(g, id);
+    //g_add_inventory(g, id);
     msuccess("create_player successful, id: %d", id);
     return id;
 }
@@ -2160,29 +2160,29 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
     if (inputstate_is_pressed(is, KEY_DOWN)) {
         g->inventory_cursor.y++;
     }
-    if (inputstate_is_pressed(is, KEY_E)) {
-        // equip item
-        // get the item id of the current selection
-        size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
-        auto inventory = g_get_inventory(g, g->hero_id);
-        if (index >= 0 && index < inventory->size()) {
-            entityid item_id = inventory->at(index);
-            entitytype_t type = g->ct.get<EntityType>(item_id).value_or(ENTITY_NONE);
-            if (type == ENTITY_ITEM) {
-                //itemtype item_type = g_get_item_type(g, item_id);
-                itemtype_t item_type = g->ct.get<itemtype>(item_id).value_or(ITEM_NONE);
+    //if (inputstate_is_pressed(is, KEY_E)) {
+    // equip item
+    // get the item id of the current selection
+    //size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+    //auto inventory = g_get_inventory(g, g->hero_id);
+    //if (index >= 0 && index < inventory->size()) {
+    //    entityid item_id = inventory->at(index);
+    //    entitytype_t type = g->ct.get<EntityType>(item_id).value_or(ENTITY_NONE);
+    //    if (type == ENTITY_ITEM) {
+    //        //itemtype item_type = g_get_item_type(g, item_id);
+    //        itemtype_t item_type = g->ct.get<itemtype>(item_id).value_or(ITEM_NONE);
 
-                if (item_type == ITEM_WEAPON) {
-                    // try to equip it
-                    if (g_equip_weapon(g, g->hero_id, item_id)) {
-                        minfo("equipped item %d", item_id);
-                    } else {
-                        minfo("failed to equip item %d", item_id);
-                    }
-                }
-            }
-        }
-    }
+    //        if (item_type == ITEM_WEAPON) {
+    // try to equip it
+    //            if (g_equip_weapon(g, g->hero_id, item_id)) {
+    //                minfo("equipped item %d", item_id);
+    //            } else {
+    //                minfo("failed to equip item %d", item_id);
+    //            }
+    //        }
+    //    }
+    //}
+    //}
 
     if (inputstate_is_pressed(is, KEY_U)) {
         // unequip weapon/item

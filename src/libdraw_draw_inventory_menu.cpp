@@ -1,5 +1,5 @@
-#include "gamestate_equipped_weapon.h"
-#include "gamestate_inventory.h"
+//#include "gamestate_equipped_weapon.h"
+//#include "gamestate_inventory.h"
 #include "libdraw_draw_inventory_menu.h"
 #include "libgame_defines.h"
 #include "spritegroup.h"
@@ -55,11 +55,12 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
 
-    auto inventory = g_get_inventory(g, g->hero_id);
-    entityid current_weapon_id = g_get_equipped_weapon(g, g->hero_id);
+    //auto inventory = g_get_inventory(g, g->hero_id);
+    //entityid current_weapon_id = g_get_equipped_weapon(g, g->hero_id);
 
 
-    if (inventory) {
+    //if (inventory) {
+    {
         // lets start with just one block
         float x = left_box.x + 2;
         float y = left_box.y + 2;
@@ -68,30 +69,30 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
         const int rows = 7;
         const float h = (left_box.height - 4) / rows;
 
-        auto it = inventory->begin();
+        //auto it = inventory->begin();
 
         for (int j = 0; j < rows; j++) {
             for (int i = 0; i < cols; i++) {
                 Rectangle grid_box = {x, y, w, h};
                 Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
                 DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
-                if (it != inventory->end()) {
-                    spritegroup_t* sg = spritegroups2[*it];
-                    if (sg) {
-                        auto sprite = sg_get_current(sg);
-                        //DrawTexturePro(*(sprite->texture), (Rectangle){12, 12, 8, 8}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
-                        DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
+                //if (it != inventory->end()) {
+                //spritegroup_t* sg = spritegroups2[*it];
+                //if (sg) {
+                //auto sprite = sg_get_current(sg);
+                //DrawTexturePro(*(sprite->texture), (Rectangle){12, 12, 8, 8}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
+                //DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
 
-                        size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
-                        if (index >= 0 && index < inventory->size()) {
-                            entityid selection_id = inventory->at(index);
-                            if (selection_id == current_weapon_id) {
-                                DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
-                            }
-                        }
-                    }
-                    it++;
-                }
+                //size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+                //if (index >= 0 && index < inventory->size()) {
+                //    entityid selection_id = inventory->at(index);
+                //    if (selection_id == current_weapon_id) {
+                //        DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
+                //    }
+                //}
+                //}
+                //it++;
+                //}
                 if ((float)i == g->inventory_cursor.x && (float)j == g->inventory_cursor.y) {
                     DrawRectangleLinesEx(grid_box, 2, GREEN);
                 }
@@ -102,25 +103,25 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
         }
 
         // in the right box, item detail
-        if (inventory->size() > 0) {
-            size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
-            if (index >= 0 && index < inventory->size()) {
-                entityid selection_id = inventory->at(index);
-                spritegroup_t* sg = spritegroups2[selection_id];
-                if (sg) {
-                    auto sprite = sg_get_current(sg);
-                    DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
+        //if (inventory->size() > 0) {
+        size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+        //if (index >= 0 && index < inventory->size()) {
+        //entityid selection_id = inventory->at(index);
+        //spritegroup_t* sg = spritegroups2[selection_id];
+        //if (sg) {
+        //auto sprite = sg_get_current(sg);
+        //DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
 
-                    // old
-                    //string name = g_get_name(g, selection_id);
+        // old
+        //string name = g_get_name(g, selection_id);
 
-                    // new-style component table access
-                    string name = g->ct.get<Name>(selection_id).value_or("no-name");
+        // new-style component table access
+        //string name = g->ct.get<Name>(selection_id).value_or("no-name");
 
 
-                    DrawText(name.c_str(), right_box.x + 10, right_box.y + 10, 20, WHITE);
-                }
-            }
-        }
+        //DrawText(name.c_str(), right_box.x + 10, right_box.y + 10, 20, WHITE);
+        //}
+        //}
+        //}
     }
 }

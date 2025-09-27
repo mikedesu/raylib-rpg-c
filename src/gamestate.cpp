@@ -152,26 +152,8 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->music_volume = DEFAULT_MUSIC_VOLUME;
 
     g->component_table = make_shared<unordered_map<entityid, long>>();
-    //g->name_list = make_shared<unordered_map<entityid, string>>();
-    //g->type_list = make_shared<unordered_map<entityid, entitytype_t>>();
-    //g->race_list = make_shared<unordered_map<entityid, race_t>>();
-    //g->loc_list = make_shared<unordered_map<entityid, vec3>>();
-    //g->sprite_move_list = make_shared<unordered_map<entityid, Rectangle>>();
-    //g->dir_list = make_shared<unordered_map<entityid, direction_t>>();
-    //g->dead_list = make_shared<unordered_map<entityid, bool>>();
-    //g->update_list = make_shared<unordered_map<entityid, bool>>();
-    //g->attacking_list = make_shared<unordered_map<entityid, bool>>();
-    //g->blocking_list = make_shared<unordered_map<entityid, bool>>();
-    //g->block_success_list = make_shared<unordered_map<entityid, bool>>();
-    //g->damaged_list = make_shared<unordered_map<entityid, bool>>();
-    //g->pushable_list = make_shared<unordered_map<entityid, bool>>();
-    //g->tx_alpha_list = make_shared<unordered_map<entityid, int>>();
-    //g->item_type_list = make_shared<unordered_map<entityid, itemtype>>();
-    //g->potion_type_list = make_shared<unordered_map<entityid, potiontype>>();
-    //g->weapon_type_list = make_shared<unordered_map<entityid, weapontype>>();
-    //g->stats_list = make_shared<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>>();
+
     g->equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
-    g->inventory_list = make_shared<unordered_map<entityid, shared_ptr<vector<entityid>>>>();
 
     g->last_click_screen_pos = (Vector2){-1, -1};
 

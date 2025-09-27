@@ -2,7 +2,7 @@
 #include "entitytype.h"
 #include "gamestate.h"
 //#include "gamestate_equipped_weapon.h"
-#include "gamestate_inventory.h"
+//#include "gamestate_inventory.h"
 #include "liblogic_add_message.h"
 #include "massert.h"
 
@@ -37,12 +37,12 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
         entitytype_t type = g->ct.get<EntityType>(itemid).value_or(ENTITY_NONE);
         //    //minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
-            if (g_add_to_inventory(g, id, itemid)) {
-                tile_remove(tile, itemid);
-                msuccess("item added to inventory");
-            } else {
-                merror("failed to add item to inventory");
-            }
+            //if (g_add_to_inventory(g, id, itemid)) {
+            //    tile_remove(tile, itemid);
+            //    msuccess("item added to inventory");
+            //} else {
+            merror("failed to add item to inventory");
+            //}
 
             //    entityid equipped_wpn_id = g_get_equipped_weapon(g, id);
             //    if (equipped_wpn_id == ENTITYID_INVALID) {
