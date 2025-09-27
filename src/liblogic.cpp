@@ -195,7 +195,7 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
     //g_add_tx_alpha(g, id, 0);
 
 
-    g_add_stats(g, id);
+    //g_add_stats(g, id);
 
     minfo("end create npc");
     return df_add_at(df, id, loc.x, loc.y);
@@ -323,7 +323,7 @@ static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
 
     //g_set_tx_alpha(g, id, 0);
     g->ct.set<TxAlpha>(id, 0);
-    g_set_stat(g, id, STATS_LEVEL, 666);
+    //g_set_stat(g, id, STATS_LEVEL, 666);
     g_add_equipped_weapon(g, id, ENTITYID_INVALID);
 
     minfo("Adding inventory to entity id %d", id);
@@ -1370,7 +1370,8 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
         g->ct.set<Damaged>(tgt_id, true);
         //    g_set_update(g, tgt_id, true);
         g->ct.set<Update>(tgt_id, true);
-        int hp = g_get_stat(g, tgt_id, STATS_HP);
+        //int hp = g_get_stat(g, tgt_id, STATS_HP);
+        int hp = 1;
         if (hp <= 0) {
             merror("Target is already dead, hp was: %d", hp);
             //g_update_dead(g, tgt_id, true);
@@ -1378,7 +1379,7 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             return;
         }
         hp -= dmg;
-        g_set_stat(g, tgt_id, STATS_HP, hp);
+        //g_set_stat(g, tgt_id, STATS_HP, hp);
         if (tgttype == ENTITY_PLAYER) {
             //add_message_history(g,
             //                    "%s attacked you for %d damage!",
@@ -1400,14 +1401,14 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
                 //                    g_get_name(g, atk_id).c_str(),
                 //                    g_get_name(g, tgt_id).c_str());
                 // increment attacker's xp
-                int old_xp = g_get_stat(g, atk_id, STATS_XP);
-                massert(old_xp >= 0, "attacker's xp is negative");
+                //int old_xp = g_get_stat(g, atk_id, STATS_XP);
+                //massert(old_xp >= 0, "attacker's xp is negative");
                 //int reward_xp = calc_reward_xp(g, atk_id, tgt_id);
-                int reward_xp = 1;
-                massert(reward_xp >= 0, "reward xp is negative");
-                int new_xp = old_xp + reward_xp;
-                massert(new_xp >= 0, "new xp is negative");
-                g_set_stat(g, atk_id, STATS_XP, new_xp);
+                //int reward_xp = 1;
+                //massert(reward_xp >= 0, "reward xp is negative");
+                //int new_xp = old_xp + reward_xp;
+                //massert(new_xp >= 0, "new xp is negative");
+                //g_set_stat(g, atk_id, STATS_XP, new_xp);
                 //vec3 loc = g_get_loc(g, tgt_id);
                 //vec3 loc_cast = {loc.x, loc.y, loc.z};
                 //entityid id = ENTITYID_INVALID;
@@ -1513,11 +1514,11 @@ bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
     }
     //    // lets try an experiment...
     //    // get the armor class of the target
-    int base_ac = g_get_stat(g, target_id, STATS_AC);
-    int base_str = g_get_stat(g, attacker_id, STATS_STR);
+    //int base_ac = g_get_stat(g, target_id, STATS_AC);
+    //int base_str = g_get_stat(g, attacker_id, STATS_STR);
     //int str_bonus = bonus_calc(base_str);
-    int str_bonus = 0;
-    int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
+    //int str_bonus = 0;
+    //int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
     //int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
     *attack_successful = false;
     //if (attack_roll >= base_ac) {
@@ -2959,23 +2960,23 @@ entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
     id = create_npc(g, race, loc, race_name);
     if (id != ENTITYID_INVALID) {
         //int floor = loc.z + 1;
-        int hit_die = 8;
-        vec3 r = {1, hit_die, 0};
-        int max_hp = do_roll(r);
+        //int hit_die = 8;
+        //vec3 r = {1, hit_die, 0};
+        //int max_hp = do_roll(r);
 
-        g_set_stat(g, id, STATS_HITDIE, hit_die);
-        g_set_stat(g, id, STATS_AC, 10);
-        g_set_stat(g, id, STATS_XP, 0);
-        g_set_stat(g, id, STATS_LEVEL, 1);
+        //g_set_stat(g, id, STATS_HITDIE, hit_die);
+        //g_set_stat(g, id, STATS_AC, 10);
+        //g_set_stat(g, id, STATS_XP, 0);
+        //g_set_stat(g, id, STATS_LEVEL, 1);
         //vec3 base_attack_dmg = get_base_attack_damage_for_race(race);
         //g_set_base_attack_damage(g, id, base_attack_dmg);
-        g_set_stat(g, id, STATS_STR, do_roll_best_of_3((vec3){3, 6, 0}));
-        g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
-        g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
+        //g_set_stat(g, id, STATS_STR, do_roll_best_of_3((vec3){3, 6, 0}));
+        //g_set_stat(g, id, STATS_DEX, do_roll_best_of_3((vec3){3, 6, 0}));
+        //g_set_stat(g, id, STATS_CON, do_roll_best_of_3((vec3){3, 6, 0}));
         //max_hp += bonus_calc(g_get_stat(g, id, STATS_CON));
-        if (max_hp <= 0) max_hp = 1; // Ensure max HP is at least 1
-        g_set_stat(g, id, STATS_MAXHP, max_hp);
-        g_set_stat(g, id, STATS_HP, max_hp);
+        //if (max_hp <= 0) max_hp = 1; // Ensure max HP is at least 1
+        //g_set_stat(g, id, STATS_MAXHP, max_hp);
+        //g_set_stat(g, id, STATS_HP, max_hp);
         //g_set_default_action(g, id, ENTITY_ACTION_MOVE_A_STAR);
         // we will update this to do an appropriate difficulty-scaling
         // level-up is too powerful and results in imbalance

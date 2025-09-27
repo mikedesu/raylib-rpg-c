@@ -99,7 +99,7 @@ typedef struct gamestate {
 
     //shared_ptr<unordered_map<entityid, potiontype>> potion_type_list;
     //shared_ptr<unordered_map<entityid, weapontype>> weapon_type_list;
-    shared_ptr<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>> stats_list;
+    //shared_ptr<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>> stats_list;
     shared_ptr<unordered_map<entityid, entityid>> equipped_weapon_list;
     shared_ptr<unordered_map<entityid, shared_ptr<vector<entityid>>>> inventory_list;
 
@@ -204,7 +204,7 @@ bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp);
 bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp);
 
 
-bool g_add_stats(shared_ptr<gamestate> g, entityid id);
-bool g_has_stats(shared_ptr<gamestate> g, entityid id);
-bool g_set_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot, int value);
-int g_get_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot);
+//bool g_add_stats(shared_ptr<gamestate> g, entityid id);
+//bool g_has_stats(shared_ptr<gamestate> g, entityid id);
+//bool g_set_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot, int value);
+//int g_get_stat(shared_ptr<gamestate> g, entityid id, stats_slot slot);
