@@ -2,7 +2,7 @@
 
 //#define GAME_VERSION "v0.0.3.19-20250704"
 #define WINDOW_TITLE "@evildojo666 presents: project.rpg"
-#define GAME_VERSION "v0.0.3.22-20250714"
+#define GAME_VERSION "v0.0.3.30-2025-09-27"
 
 //#define DEFAULT_MUSIC_VOLUME 0.5f
 //#define DEFAULT_WIN_WIDTH 800
