@@ -153,7 +153,7 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->component_table = make_shared<unordered_map<entityid, long>>();
 
-    g->equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
+    //g->equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
 
     g->last_click_screen_pos = (Vector2){-1, -1};
 
@@ -264,80 +264,4 @@ void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
     if (g->windowwidth == -1 || g->windowheight == -1) return;
     g->debugpanel.x = g->windowwidth - g->debugpanel.w;
     g->debugpanel.y = g->debugpanel.pad_right;
-}
-
-
-bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    massert(comp != C_COUNT, "comp is invalid");
-    //minfo("g_register_comp: Registering component %s for entity %d", component2str(comp), id);
-    if (!g_has_comp(g, id, comp)) {
-        //minfo("g_register_comp: component unregistered. Registering...");
-        // If the component is not already registered, add it
-        if (g->component_table->find(id) == g->component_table->end()) {
-            (*g->component_table)[id] = 0; // Initialize with 0 components
-        }
-        (*g->component_table)[id] |= (1L << comp); // Set the bit for the component
-        // assert that the bit has been set correctly
-        long components = g->component_table->at(id);
-        long comp_bit = 1L << comp; // Shift 1 to the left by 'comp' positions
-        massert((components & comp_bit) != 0, "g_register_comp: Component %s not set for entity %d", component2str(comp), id);
-        //merror("g_register_comp: Failed to set component %s for entity %d", component2str(comp), id);
-        //return false; // Failed to set the component
-        //}
-    }
-    // Check if the component was successfully registered
-    if (g_has_comp(g, id, comp)) {
-        //minfo("Component %s already registered for entity %d", component2str(comp), id);
-        return true;
-    }
-    merror("Failed to register component %s for entity %d", component2str(comp), id);
-    return false;
-}
-
-
-bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp) { return g_register_comp(g, id, comp); }
-
-
-bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    massert(comp != C_COUNT, "comp is invalid");
-    massert(g->component_table, "g->component_table is NULL");
-    // Check if the entity exists in the component table
-    // component table is now an unordered_map
-    //minfo("g_has_comp: Checking if entity %d has component %s", id, component2str(comp));
-    if (g->component_table->find(id) == g->component_table->end()) {
-        return false; // Entity does not exist
-    }
-    // Check if the component is registered for the entity
-    long components = g->component_table->at(id);
-    // Check if the component bit is set
-    long comp_bit = 1L << comp; // Shift 1 to the left by 'comp' positions
-    if ((components & comp_bit) != 0) {
-        return true; // Component is registered
-    }
-    return false; // Component is not registered
-}
-
-
-bool g_has_loc(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    return g_has_comp(g, id, C_LOCATION);
-}
-
-
-vec3 g_get_loc(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "g is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (g_has_loc(g, id)) {
-        //if (g->loc_list) {
-        //    massert(g->loc_list->find(id) != g->loc_list->end(), "g_get_loc: id %d not found in loc list", id);
-        //    return g->loc_list->at(id);
-        //}
-    }
-    merror("Location component not found for id %d", id);
-    return (vec3){-1, -1, -1}; // Return an invalid location if not found
 }

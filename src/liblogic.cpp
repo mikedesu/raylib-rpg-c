@@ -8,7 +8,7 @@
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate.h"
-#include "gamestate_equipped_weapon.h"
+//#include "gamestate_equipped_weapon.h"
 #include "gamestate_flag.h"
 //#include "gamestate_inventory.h"
 #include "inputstate.h"
@@ -326,7 +326,7 @@ static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
     //g_set_tx_alpha(g, id, 0);
     g->ct.set<TxAlpha>(id, 0);
     //g_set_stat(g, id, STATS_LEVEL, 666);
-    g_add_equipped_weapon(g, id, ENTITYID_INVALID);
+    //g_add_equipped_weapon(g, id, ENTITYID_INVALID);
 
     minfo("Adding inventory to entity id %d", id);
     //g_add_inventory(g, id);
@@ -2186,19 +2186,19 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
     //}
     //}
 
-    if (inputstate_is_pressed(is, KEY_U)) {
-        // unequip weapon/item
-        // we will assume it is a weapon for now
+    //if (inputstate_is_pressed(is, KEY_U)) {
+    // unequip weapon/item
+    // we will assume it is a weapon for now
 
-        entityid weapon_id = g_get_equipped_weapon(g, g->hero_id);
-        if (weapon_id != ENTITYID_INVALID) {
-            if (g_unequip_weapon(g, g->hero_id, weapon_id)) {
-                minfo("unequipped weapon %d", weapon_id);
-            } else {
-                minfo("failed to unequip weapon %d", weapon_id);
-            }
-        }
-    }
+    //entityid weapon_id = g_get_equipped_weapon(g, g->hero_id);
+    //if (weapon_id != ENTITYID_INVALID) {
+    //    if (g_unequip_weapon(g, g->hero_id, weapon_id)) {
+    //        minfo("unequipped weapon %d", weapon_id);
+    //    } else {
+    //        minfo("failed to unequip weapon %d", weapon_id);
+    //    }
+    //}
+    //}
 
 
     if (inputstate_is_pressed(is, KEY_D)) {

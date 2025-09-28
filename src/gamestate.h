@@ -114,8 +114,6 @@ typedef struct gamestate {
 
     shared_ptr<unordered_map<entityid, long>> component_table;
 
-    shared_ptr<unordered_map<entityid, entityid>> equipped_weapon_list;
-
     shared_ptr<dungeon_t> dungeon;
 
     char frame_time_str[32];
@@ -175,8 +173,3 @@ void gamestate_free(shared_ptr<gamestate> g);
 void gamestate_set_debug_panel_pos_bottom_left(shared_ptr<gamestate> g);
 void gamestate_set_debug_panel_pos_top_right(shared_ptr<gamestate> g);
 void gamestate_load_keybindings(shared_ptr<gamestate> g);
-
-
-bool g_has_comp(shared_ptr<gamestate> g, entityid id, component comp);
-bool g_register_comp(shared_ptr<gamestate> g, entityid id, component comp);
-bool g_add_comp(shared_ptr<gamestate> g, entityid id, component comp);

@@ -5,7 +5,6 @@
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate.h"
-#include "gamestate_equipped_weapon.h"
 #include "get_txkey_for_tiletype.h"
 #include "libdraw.h"
 #include "libdraw_draw_character_creation_screen.h"
@@ -13,7 +12,6 @@
 #include "libdraw_help_menu.h"
 #include "libdraw_message_history.h"
 #include "libdraw_title_screen.h"
-//#include "libdraw_version.h"
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
@@ -30,6 +28,8 @@
 #include "tx_keys_potions.h"
 #include "tx_keys_weapons.h"
 #include "weapon.h"
+//#include "gamestate_equipped_weapon.h"
+//#include "libdraw_version.h"
 //#include "tx_keys_rings.h"
 //#include "tx_keys_shields.h"
 
@@ -235,20 +235,21 @@ shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id,
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-    entityid weapon = g_get_equipped_weapon(g, id);
-    if (weapon == ENTITYID_INVALID) return NULL;
-    if (spritegroups2.find(weapon) == spritegroups2.end()) {
-        return nullptr;
-    }
+
+    //entityid weapon = g_get_equipped_weapon(g, id);
+    //if (weapon == ENTITYID_INVALID) return NULL;
+    //if (spritegroups2.find(weapon) == spritegroups2.end()) {
+    //    return nullptr;
+    //}
     //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    spritegroup_t* w_sg = spritegroups2[weapon];
-    if (!w_sg) {
-        return nullptr;
-    }
+    //spritegroup_t* w_sg = spritegroups2[weapon];
+    //if (!w_sg) {
+    //    return nullptr;
+    //}
     shared_ptr<sprite> retval = nullptr;
-    if (sg->current == SG_ANIM_NPC_ATTACK) {
-        retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
-    }
+    //if (sg->current == SG_ANIM_NPC_ATTACK) {
+    //    retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
+    //}
     //else if (sg->current == SG_ANIM_NPC_SHOT) {
     //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_F);
     //}
@@ -260,23 +261,23 @@ shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, 
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-    entityid weapon = g_get_equipped_weapon(g, id);
-    if (weapon == ENTITYID_INVALID) {
-        return nullptr;
-    }
-    if (spritegroups2.find(weapon) == spritegroups2.end()) {
-        return nullptr;
-    }
+    //entityid weapon = g_get_equipped_weapon(g, id);
+    //if (weapon == ENTITYID_INVALID) {
+    //    return nullptr;
+    //}
+    //if (spritegroups2.find(weapon) == spritegroups2.end()) {
+    //    return nullptr;
+    //}
     //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    spritegroup_t* w_sg = spritegroups2[weapon];
-    if (!w_sg) {
-        return nullptr;
-    }
+    //spritegroup_t* w_sg = spritegroups2[weapon];
+    //if (!w_sg) {
+    //    return nullptr;
+    //}
     shared_ptr<sprite> retval = nullptr;
-    if (sg->current == SG_ANIM_NPC_ATTACK) {
-        //retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-        retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    }
+    //if (sg->current == SG_ANIM_NPC_ATTACK) {
+    //retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
+    //    retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
+    //}
     //else if (sg->current == SG_ANIM_NPC_SHOT) {
     //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_B);
     //}
@@ -596,16 +597,16 @@ void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
-    entityid weaponid = g_get_equipped_weapon(g, id);
-    if (weaponid == ENTITYID_INVALID) return;
+    //entityid weaponid = g_get_equipped_weapon(g, id);
+    //if (weaponid == ENTITYID_INVALID) return;
     //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weaponid);
-    spritegroup_t* w_sg = spritegroups2[weaponid];
-    if (!w_sg) {
-        return;
-    }
-    int ctx = sg->sprites2->at(sg->current)->currentcontext;
-    spritegroup_setcontexts(w_sg, ctx);
-    spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
+    //spritegroup_t* w_sg = spritegroups2[weaponid];
+    //if (!w_sg) {
+    //    return;
+    //}
+    //int ctx = sg->sprites2->at(sg->current)->currentcontext;
+    //spritegroup_setcontexts(w_sg, ctx);
+    //spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
 }
 
 

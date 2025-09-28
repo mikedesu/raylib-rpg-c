@@ -28,7 +28,6 @@ WEB_SOURCES=main.cpp \
 			liblogic_tile_has_box.cpp \
 			liblogic_try_entity_move.cpp \
 			liblogic.cpp \
-			gamestate_equipped_weapon.cpp \
 			gamestate_inventory.cpp \
 			gamestate.cpp \
 			dungeon_floor.cpp \
@@ -57,7 +56,6 @@ all: game
 OBJ_FILES=main.o \
 		  gameloader.o \
 		  gamestate_inventory.o \
-		  gamestate_equipped_weapon.o \
 		  gamestate.o \
 		  libdraw_draw_inventory_menu.o \
 		  libdraw_message_history.o \
@@ -96,9 +94,6 @@ gameloader.o: gameloader.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 ###################
-
-gamestate_equipped_weapon.o: gamestate_equipped_weapon.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 gamestate_inventory.o: gamestate_inventory.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
