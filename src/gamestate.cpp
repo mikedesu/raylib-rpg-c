@@ -1,13 +1,10 @@
-#include "component.h"
 #include "controlmode.h"
-//#include "direction.h"
 #include "entityid.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
-//#include "stats_slot.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -15,16 +12,10 @@
 #include <memory>
 #include <raylib.h>
 #include <string>
-#include <unordered_map>
-
-//#include "item.h"
-//#include "ringtype.h"
-//#include "shield.h"
 
 using std::make_shared;
 using std::shared_ptr;
 using std::string;
-using std::unordered_map;
 using std::vector;
 
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
@@ -151,7 +142,7 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->music_volume = DEFAULT_MUSIC_VOLUME;
 
-    g->component_table = make_shared<unordered_map<entityid, long>>();
+    //g->component_table = make_shared<unordered_map<entityid, long>>();
 
     //g->equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
 

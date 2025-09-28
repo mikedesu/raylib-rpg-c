@@ -2,7 +2,6 @@
 
 #include "ComponentTable.h"
 #include "character_creation.h"
-#include "component.h"
 #include "controlmode.h"
 #include "debugpanel.h"
 #include "direction.h"
@@ -112,7 +111,6 @@ typedef struct gamestate {
 
     double last_frame_time;
 
-    shared_ptr<unordered_map<entityid, long>> component_table;
 
     shared_ptr<dungeon_t> dungeon;
 
@@ -143,32 +141,19 @@ typedef struct gamestate {
 
 
 shared_ptr<gamestate> gamestateinitptr();
-
-void gamestate_init_music_paths(shared_ptr<gamestate> g);
-
-
 shared_ptr<dungeon_t> g_get_dungeon(shared_ptr<gamestate> g);
-
-
-entityid gamestate_get_hero_id(shared_ptr<gamestate> g);
-
 
 monster_def* g_get_monster_def(shared_ptr<gamestate> g, race_t r);
 
-
-bool gs_add_entityid(shared_ptr<gamestate> g, entityid id);
-
-
+entityid gamestate_get_hero_id(shared_ptr<gamestate> g);
 entityid g_add_entity(shared_ptr<gamestate> g);
 
-
+bool gs_add_entityid(shared_ptr<gamestate> g, entityid id);
 bool gamestate_add_msg_history(shared_ptr<gamestate> g, string msg);
 bool gamestate_init_msg_history(shared_ptr<gamestate> g);
-
-
 bool g_set_hero_id(shared_ptr<gamestate> g, entityid id);
 
-
+void gamestate_init_music_paths(shared_ptr<gamestate> g);
 void gamestate_free(shared_ptr<gamestate> g);
 void gamestate_set_debug_panel_pos_bottom_left(shared_ptr<gamestate> g);
 void gamestate_set_debug_panel_pos_top_right(shared_ptr<gamestate> g);
