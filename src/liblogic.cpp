@@ -149,8 +149,11 @@ static void init_dungeon(shared_ptr<gamestate> g) {
     msuccess("Dungeon initialized successfully");
     minfo("adding floors...");
     int df_count = 1;
+    int w = 256;
+    int h = 256;
+
     for (int i = 0; i < df_count; i++) {
-        d_add_floor(g->dungeon, 256, 24);
+        d_add_floor(g->dungeon, w, h);
         //d_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
     }
     msuccess("Added %d floors to dungeon", df_count);
@@ -736,22 +739,22 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
 
 
-    int x = 2;
-    const int max_x = 250;
-    int y = 2;
-    const int max_y = 31;
-    const int num = 2000;
-    for (int i = 0; i < num; i++) {
-        create_npc_set_stats(g, (vec3){x, y, 0}, RACE_ORC);
-        x++;
-        if (x >= max_x) {
-            x = 2;
-            y++;
-        }
-        if (y >= max_y) {
-            break;
-        }
-    }
+    //int x = 2;
+    //const int max_x = 250;
+    //int y = 2;
+    //const int max_y = 31;
+    //const int num = 2000;
+    //for (int i = 0; i < num; i++) {
+    //    create_npc_set_stats(g, (vec3){x, y, 0}, RACE_ORC);
+    //    x++;
+    //    if (x >= max_x) {
+    //        x = 2;
+    //        y++;
+    //    }
+    //    if (y >= max_y) {
+    //        break;
+    //    }
+    //}
 
     //create_npc_set_stats(g, (vec3){6, 5, 0}, RACE_WOLF);
     //create_npc_set_stats(g, (vec3){6, 6, 0}, RACE_WARG);
