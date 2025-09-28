@@ -44,11 +44,14 @@ using std::vector;
 
 typedef struct gamestate {
     controlmode_t controlmode;
+    debugpanel_t debugpanel;
+    fadestate_t fadestate;
 
     entityid hero_id;
     entityid new_entityid_begin;
     entityid new_entityid_end;
     entityid next_entityid;
+    entityid entity_turn;
 
     time_t timebegan;
     time_t currenttime;
@@ -79,6 +82,8 @@ typedef struct gamestate {
     bool display_gameplay_settings_menu;
     bool display_sort_inventory_menu;
     bool music_volume_changed;
+    bool do_restart;
+    bool msg_system_is_active;
 
     int framecount;
     int fadealpha;
@@ -94,32 +99,24 @@ typedef struct gamestate {
     int pad;
     int inventory_menu_selection;
     int gameplay_settings_menu_selection;
+    int title_screen_selection;
+    int max_title_screen_selections;
+    int msg_history_max_len_msg;
+    int msg_history_max_len_msg_measure;
+    int current_music_index;
+    int total_music_paths;
+    int restart_count;
+
+    float line_spacing;
+    float music_volume;
+
+    double last_frame_time;
 
     shared_ptr<unordered_map<entityid, long>> component_table;
 
-    //shared_ptr<unordered_map<entityid, potiontype>> potion_type_list;
-    //shared_ptr<unordered_map<entityid, weapontype>> weapon_type_list;
-    //shared_ptr<unordered_map<entityid, shared_ptr<unordered_map<int, int>>>> stats_list;
     shared_ptr<unordered_map<entityid, entityid>> equipped_weapon_list;
-    //shared_ptr<unordered_map<entityid, shared_ptr<vector<entityid>>>> inventory_list;
-
-    ComponentTable ct;
-
-
-    debugpanel_t debugpanel;
-
-    Camera2D cam2d;
-    Camera3D cam3d;
-
-    fadestate_t fadestate;
-
-    Font font;
-
-    float line_spacing;
 
     shared_ptr<dungeon_t> dungeon;
-
-    double last_frame_time;
 
     char frame_time_str[32];
 
@@ -127,41 +124,22 @@ typedef struct gamestate {
 
     scene_t current_scene;
 
-    int title_screen_selection;
-    int max_title_screen_selections;
-
-    entityid entity_turn;
-
     shared_ptr<vector<string>> msg_system;
     shared_ptr<vector<string>> msg_history;
     shared_ptr<character_creation> chara_creation;
-
-    int msg_history_max_len_msg;
-    int msg_history_max_len_msg_measure;
-
-    bool msg_system_is_active;
-
-
-    int current_music_index;
-    int total_music_paths;
 
     char music_file_paths[MAX_MUSIC_PATHS][MAX_MUSIC_PATH_LENGTH];
 
     string version;
 
-    int restart_count;
-
-    bool do_restart;
-
-    // Array of monster definitions
-    float music_volume;
-    // last click position
-    Vector2 last_click_screen_pos;
     Color message_history_bgcolor;
-
-
+    Vector2 last_click_screen_pos;
     Vector2 inventory_cursor = {0, 0};
+    Camera2D cam2d;
+    Camera3D cam3d;
+    Font font;
 
+    ComponentTable ct;
 
 } gamestate;
 
