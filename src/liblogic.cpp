@@ -149,8 +149,10 @@ static void init_dungeon(shared_ptr<gamestate> g) {
     msuccess("Dungeon initialized successfully");
     minfo("adding floors...");
     int df_count = 1;
-    int w = 256;
-    int h = 256;
+    // max size of 128x128 for now to maintain 60fps
+    // dungeon floors, tiles etc will require re-write/re-design for optimization
+    int w = 128;
+    int h = 128;
 
     for (int i = 0; i < df_count; i++) {
         d_add_floor(g->dungeon, w, h);
