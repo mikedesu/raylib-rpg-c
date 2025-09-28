@@ -741,22 +741,22 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
 
 
-    //int x = 2;
-    //const int max_x = 250;
-    //int y = 2;
-    //const int max_y = 31;
-    //const int num = 2000;
-    //for (int i = 0; i < num; i++) {
-    //    create_npc_set_stats(g, (vec3){x, y, 0}, RACE_ORC);
-    //    x++;
-    //    if (x >= max_x) {
-    //        x = 2;
-    //        y++;
-    //    }
-    //    if (y >= max_y) {
-    //        break;
-    //    }
-    //}
+    int x = 2;
+    const int max_x = 110;
+    int y = 2;
+    const int max_y = 110;
+    const int num = 4000;
+    for (int i = 0; i < num; i++) {
+        create_npc_set_stats(g, (vec3){x, y, 0}, RACE_ORC);
+        x++;
+        if (x >= max_x) {
+            x = 2;
+            y++;
+        }
+        if (y >= max_y) {
+            break;
+        }
+    }
 
     //create_npc_set_stats(g, (vec3){6, 5, 0}, RACE_WOLF);
     //create_npc_set_stats(g, (vec3){6, 6, 0}, RACE_WARG);
