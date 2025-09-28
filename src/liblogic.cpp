@@ -111,7 +111,9 @@ static void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> i
 static void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 static entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name);
 static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
-static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type);
+
+entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type);
+
 //static void try_spawn_npc(shared_ptr<gamestate> const g);
 //static const char* get_action_key(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 //static void handle_input_help_menu(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
@@ -257,7 +259,7 @@ static entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const s
 //}
 
 
-static entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) {
+entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) {
     minfo("potion create...");
     massert(g, "gamestate is NULL");
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
@@ -974,7 +976,7 @@ void liblogic_close(shared_ptr<gamestate> g) {
 //static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id);
 
 //static void try_entity_attack(gamestate* const g, entityid attacker_id, int target_x, int target_y);
-static void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
+void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
 //static void try_entity_traverse_floors(gamestate* const g, entityid id);
 //static void try_entity_traverse_floors(shared_ptr<gamestate> g, entityid id);
 //static void check_and_handle_level_up(gamestate* const g, entityid id);
@@ -1347,7 +1349,7 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
 
     if (*atk_successful) {
         //entityid attacker_weapon_id = g_get_equipment(g, atk_id, EQUIP_SLOT_WEAPON);
-        entityid attacker_weapon_id = g_get_equipped_weapon(g, atk_id);
+        //entityid attacker_weapon_id = g_get_equipped_weapon(g, atk_id);
         int dmg = 1;
         //if (attacker_weapon_id == ENTITYID_INVALID) {
         // no weapon
@@ -1541,7 +1543,7 @@ void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, enti
     }
 }
 
-static void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
+void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
     //massert(!g_is_dead(g, atk_id), "attacker entity is dead");
     massert(!g->ct.get<Dead>(atk_id).value_or(false), "attacker entity is dead");

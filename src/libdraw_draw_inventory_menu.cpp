@@ -74,7 +74,7 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
         for (int j = 0; j < rows; j++) {
             for (int i = 0; i < cols; i++) {
                 Rectangle grid_box = {x, y, w, h};
-                Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
+                //Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
                 DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
                 //if (it != inventory->end()) {
                 //spritegroup_t* sg = spritegroups2[*it];
@@ -104,7 +104,7 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
 
         // in the right box, item detail
         //if (inventory->size() > 0) {
-        size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+        //size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
         //if (index >= 0 && index < inventory->size()) {
         //entityid selection_id = inventory->at(index);
         //spritegroup_t* sg = spritegroups2[selection_id];
