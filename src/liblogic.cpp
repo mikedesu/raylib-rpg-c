@@ -17,11 +17,11 @@
 #include "liblogic.h"
 #include "liblogic_add_message.h"
 #include "liblogic_drop_item.h"
-#include "liblogic_get_random_loc.h"
+//#include "liblogic_get_random_loc.h"
 #include "liblogic_try_entity_pickup.h"
 #include "massert.h"
 //#include "potion.h"
-#include "rect.h"
+//#include "rect.h"
 #include "roll.h"
 #include "weapon.h"
 #include <cassert>
@@ -778,7 +778,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
 
     //create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
-    create_weapon(g, get_random_loc((rect){0, 0, 8, 8}, 0), WEAPON_AXE);
+    //create_weapon(g, get_random_loc((rect){0, 0, 8, 8}, 0), WEAPON_AXE);
 
     //create_weapon(g, (vec3){1, 5, 0}, WEAPON_FLAIL);
 
