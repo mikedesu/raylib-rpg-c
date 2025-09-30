@@ -5,37 +5,6 @@
 
 using std::make_shared;
 
-sprite* sprite_create(Texture2D* t, int numcontexts, int numframes) {
-    if (!t) {
-        merror("sprite_create failed: texture is null");
-        return NULL;
-    }
-    sprite* s = (sprite*)malloc(sizeof(sprite));
-    if (!s) {
-        merror("sprite_create failed: could not allocate memory for sprite");
-        return NULL;
-    }
-    s->numframes = numframes;
-    s->numcontexts = numcontexts;
-    s->currentframe = 0;
-    s->currentcontext = 0;
-    s->num_loops = 0;
-    s->texture = t;
-    s->width = t->width / numframes;
-    s->height = t->height / numcontexts;
-    s->stop_on_last_frame = false;
-    s->is_animating = true;
-    // setting the source of the texture is about which frame and context we are on
-    // context is the y access aka which row of sprites
-    // frame is the x access aka which column of sprites
-    // to calculate the source rectangle we need to know the width and height of the sprite
-    // given the current frame and current context,
-    // the width is the current frame times the width of the sprite
-    s->src = (Rectangle){(float)(s->currentframe * s->width), (float)(s->currentcontext * s->height), (float)s->width, (float)s->height};
-    s->dest = (Rectangle){0, 0, 0, 0};
-    return s;
-}
-
 
 shared_ptr<sprite> sprite_create2(Texture2D* t, int numcontexts, int numframes) {
     if (!t) {
@@ -100,6 +69,7 @@ void sprite_incrframe(sprite* const s) {
     }
 }
 
+
 void sprite_setcontext(sprite* const s, int context) {
     massert(s, "sprite_setcontext: sprite is NULL");
     massert(context >= 0, "sprite_setcontext: context is less than 0: %d", context);
@@ -121,24 +91,6 @@ void sprite_setcontext(sprite* const s, int context) {
     s->src.x = 0;
 }
 
-//void sprite_incrcontext(sprite* const s) {
-//    massert(s, "sprite_incrcontext: sprite is NULL");
-//    s->currentcontext = (s->currentcontext + 1) % s->numcontexts;
-//    s->src.y = s->height * s->currentcontext;
-//}
-
-//void sprite_updatesrc(sprite* const s) {
-//    massert(s, "sprite_updatesrc: sprite is NULL");
-//    s->src.x = s->width * s->currentframe;
-//}
-
-void sprite_destroy(sprite* s) {
-    massert(s, "sprite_destroy: sprite is NULL");
-    s->texture = NULL;
-    free(s);
-    s = NULL;
-    msuccess("sprite_destroy success");
-}
 
 int sprite_get_context(const sprite* const s) {
     massert(s, "sprite_get_context: sprite is NULL");
