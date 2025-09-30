@@ -11,17 +11,10 @@ shared_ptr<sprite> sprite_create2(Texture2D* t, int numcontexts, int numframes) 
         merror("sprite_create failed: texture is null");
         return NULL;
     }
-    //sprite* s = (sprite*)malloc(sizeof(sprite));
     shared_ptr<sprite> s = make_shared<sprite>();
-    //if (!s) {
-    //    merror("sprite_create failed: could not allocate memory for sprite");
-    //    return NULL;
-    //}
     s->numframes = numframes;
     s->numcontexts = numcontexts;
-    s->currentframe = 0;
-    s->currentcontext = 0;
-    s->num_loops = 0;
+    s->currentframe = s->currentcontext = s->num_loops = 0;
     s->texture = t;
     s->width = t->width / numframes;
     s->height = t->height / numcontexts;
@@ -79,8 +72,7 @@ void sprite_setcontext2(shared_ptr<sprite> s, int context) {
 
     s->currentcontext = context % s->numcontexts;
     s->src.y = s->height * s->currentcontext;
-    s->currentframe = 0;
-    s->src.x = 0;
+    s->currentframe = s->src.x = 0;
 }
 
 
