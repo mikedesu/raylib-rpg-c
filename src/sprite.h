@@ -22,7 +22,6 @@ typedef struct sprite {
 } sprite;
 
 shared_ptr<sprite> sprite_create2(Texture2D* t, int numcontexts, int numframes);
-
 void sprite_incrframe2(shared_ptr<sprite> s);
 void sprite_setcontext2(shared_ptr<sprite> s, int context);
 void sprite_set_is_animating2(shared_ptr<sprite> s, bool is_animating);
