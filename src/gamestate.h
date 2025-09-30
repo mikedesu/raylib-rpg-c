@@ -12,7 +12,6 @@
 #include "entitytype.h"
 #include "fadestate.h"
 #include "gamestate_flag.h"
-#include "ringtype.h"
 #include "scene.h"
 #include <ctime>
 #include <memory>
