@@ -35,7 +35,6 @@ WEB_SOURCES=main.cpp \
 			spritegroup.cpp \
 			race.cpp \
 			dungeon.cpp \
-			path_node.cpp \
 
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
@@ -69,7 +68,6 @@ OBJ_FILES=main.o \
 		  dungeon_floor.o \
 		  dungeon_tile.o \
 		  dungeon_tile.o \
-		  path_node.o \
 		  liblogic_drop_item.o \
 		  liblogic_add_message.o \
 		  liblogic_try_entity_pickup.o \
@@ -142,8 +140,6 @@ libdraw.o: libdraw.cpp
 ###################
 
 
-path_node.o: path_node.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 ###################
 liblogic_drop_item.o: liblogic_drop_item.cpp

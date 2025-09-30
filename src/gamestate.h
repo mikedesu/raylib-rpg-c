@@ -12,7 +12,6 @@
 #include "entitytype.h"
 #include "fadestate.h"
 #include "gamestate_flag.h"
-#include "monster_def.h"
 #include "ringtype.h"
 #include "scene.h"
 #include <ctime>
@@ -142,8 +141,6 @@ typedef struct gamestate {
 
 shared_ptr<gamestate> gamestateinitptr();
 shared_ptr<dungeon_t> g_get_dungeon(shared_ptr<gamestate> g);
-
-monster_def* g_get_monster_def(shared_ptr<gamestate> g, race_t r);
 
 entityid gamestate_get_hero_id(shared_ptr<gamestate> g);
 entityid g_add_entity(shared_ptr<gamestate> g);
