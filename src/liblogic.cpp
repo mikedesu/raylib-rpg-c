@@ -741,9 +741,9 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
 
 
-    int x = 2;
+    int x = 5;
     const int max_x = 110;
-    int y = 2;
+    int y = 10;
     const int max_y = 110;
     const int num = 4000;
     for (int i = 0; i < num; i++) {
