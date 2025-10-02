@@ -60,6 +60,7 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     //}
     //return false;
     //}
+
     if (tile_npc_living_count(g, aloc.x, aloc.y, aloc.z) > 0) {
         merror("Tile at (%d, %d, %d) has living NPCs", aloc.x, aloc.y, aloc.z);
         return false;
@@ -72,6 +73,7 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     massert(current_tile, "Current tile is NULL at (%d, %d, %d)", loc.x, loc.y, loc.z);
 
     // remove the entity from the current tile
+
     if (!df_remove_at(df, id, loc.x, loc.y)) {
         merror("Failed to remove entity %d from tile at (%d, %d, %d)", id, loc.x, loc.y, loc.z);
         return false;

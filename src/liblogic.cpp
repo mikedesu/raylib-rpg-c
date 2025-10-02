@@ -96,8 +96,8 @@ void init_dungeon(shared_ptr<gamestate> g) {
     int df_count = 1;
     // max size of 128x128 for now to maintain 60fps
     // dungeon floors, tiles etc will require re-write/re-design for optimization
-    int w = 256;
-    int h = 256;
+    int w = 128;
+    int h = 128;
 
     for (int i = 0; i < df_count; i++) {
         d_add_floor(g->dungeon, w, h);
@@ -312,10 +312,12 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
         g->chara_creation->strength = do_roll_best_of_3((vec3){3, 6, 0});
         g->chara_creation->dexterity = do_roll_best_of_3((vec3){3, 6, 0});
         g->chara_creation->constitution = do_roll_best_of_3((vec3){3, 6, 0});
-    } else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-        minfo("Exiting character creation");
-        g->current_scene = SCENE_TITLE;
-    } else if (inputstate_is_pressed(is, KEY_LEFT)) {
+    }
+    //else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+    //    minfo("Exiting character creation");
+    //    g->current_scene = SCENE_TITLE;
+    //}
+    else if (inputstate_is_pressed(is, KEY_LEFT)) {
         int race = g->chara_creation->race;
         if (race > 1) {
             race--;
@@ -349,6 +351,12 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
 
 
 static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+        g->do_quit = true;
+        return;
+    }
+
+
     if (g->display_help_menu) {
         handle_input_help_menu(g, is);
     }
@@ -624,17 +632,18 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_npc_set_stats(g, (vec3){5, 7, 0}, RACE_HALFLING);
     //create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
 
+    int start_x = 5;
 
-    int x = 5;
-    const int max_x = 110;
-    int y = 10;
-    const int max_y = 110;
-    const int num = 0;
+    int x = start_x;
+    const int max_x = 120;
+    int y = 5;
+    const int max_y = 120;
+    const int num = 4000;
     for (int i = 0; i < num; i++) {
         create_npc_set_stats(g, (vec3){x, y, 0}, RACE_ORC);
         x++;
         if (x >= max_x) {
-            x = 2;
+            x = start_x;
             y++;
         }
         if (y >= max_y) {
@@ -1250,7 +1259,8 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
     if (!g->display_inventory_menu) {
         return;
     }
-    if (inputstate_is_pressed(is, KEY_ESCAPE) || inputstate_is_pressed(is, KEY_I)) {
+    //if (inputstate_is_pressed(is, KEY_ESCAPE) || inputstate_is_pressed(is, KEY_I)) {
+    if (inputstate_is_pressed(is, KEY_I)) {
         g->controlmode = CONTROLMODE_PLAYER;
         g->display_inventory_menu = false;
         //g->display_gameplay_settings_menu = false;

@@ -49,6 +49,7 @@ entityid tile_remove(shared_ptr<tile_t> tile, entityid id) {
         tile->is_empty = tile->entities->size() == 0;
         return id;
     }
+    merror("tile_remove: entity not found on tile");
     return ENTITYID_INVALID;
 }
 
