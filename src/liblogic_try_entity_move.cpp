@@ -1,12 +1,6 @@
-#include "ComponentTraits.h"
-#include "dungeon_tile.h"
-#include "gamestate.h"
 #include "libgame_defines.h"
+#include "liblogic_try_entity_move.h"
 #include "massert.h"
-
-#include <memory>
-
-using std::shared_ptr;
 
 entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z);
 int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
@@ -14,15 +8,11 @@ int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
 bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-    //g_set_update(g, id, true);
     g->ct.set<Update>(id, true);
-    //g_update_dir(g, id, get_dir_from_xy(v.x, v.y));
     g->ct.set<Direction>(id, get_dir_from_xy(v.x, v.y));
 
     // entity location
-    //vec3 loc = g_get_loc(g, id);
     vec3 loc = g->ct.get<Location>(id).value();
-
 
     // entity's new location
     // we will have a special case for traversing floors so ignore v.z
@@ -62,9 +52,6 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
         }
         return false;
     }
-    //if (tile_has_closed_door(g, ex, ey, floor)) {
-    //    return;
-    //}
     if (tile_npc_living_count(g, aloc.x, aloc.y, aloc.z) > 0) {
         return false;
     }
@@ -80,52 +67,7 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     if (!df_add_at(df, id, aloc.x, aloc.y)) {
         return false;
     }
-    //g_update_loc(g, id, aloc);
     g->ct.set<Location>(id, aloc);
-    //g_update_sprite_move(g, id, (Rectangle){mx, my, 0, 0});
-
     g->ct.set<SpriteMove>(id, (Rectangle){mx, my, 0, 0});
-    //g->ct<SpriteMove>[id]=(Rectangle){mx, my, 0, 0};
-
     return true;
-    //if (player_on_tile(g, ex, ey, z)) {
-    //    return;
-    //}
-    //if (!df_remove_at(df, id, loc.x, loc.y)) return;
-    //if (!df_remove_at(df, id, loc.x, loc.y)) return;
-    //if (!df_add_at(df, id, ex, ey)) return;
-    //g_update_location(g, id, (vec3){ex, ey, z});
-    //g_update_sprite_move(g, id, (vec3){x * DEFAULT_TILE_SIZE, y * DEFAULT_TILE_SIZE, 0});
-    //g_update_sprite_move(g,
-    //                     id,
-    //                     (Rectangle){(float)(x * DEFAULT_TILE_SIZE),
-    //                                 (float)(y * DEFAULT_TILE_SIZE),
-    //                                 0,
-    //                                 0});
-    //if (id == g->hero_id) {
-    //    update_player_tiles_explored(g);
-    //}
-    // at this point the move is 'successful'
-    //update_equipped_shield_dir(g, id);
-    // get the entity's new tile
-    //tile_t* const new_tile = df_tile_at(df, (vec3){ex, ey, z});
-    //if (!new_tile) {
-    //    return;
-    //}
-    // do not remove!!!
-    // check if the tile has a pressure plate
-    //if (new_tile->has_pressure_plate) {
-    // do something
-    // print the pressure plate event
-    //}
-    // check if the tile is an ON TRAP
-    //if (new_tile->type == TILE_FLOOR_STONE_TRAP_ON_00) {
-    // do something
-    //e->stats.hp--;
-    //e->is_damaged = true;
-    //    g_set_damaged(g, id, true);
-    //e->do_update = true;
-    //    g_set_update(g, id, true);
-    //}
-    //if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
