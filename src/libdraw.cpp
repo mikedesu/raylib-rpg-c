@@ -965,7 +965,9 @@ void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
+
     camera_lock_on(g);
+
     //minfo("Drawing frame");
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
