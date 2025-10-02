@@ -910,16 +910,20 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     massert(df, "dungeon_floor is NULL");
     int z = g->dungeon->current_floor;
     draw_dungeon_tiles_2d(g, z, df);
+    // dead
     //for (int y = 0; y < df->height; y++) {
     //    for (int x = 0; x < df->width; x++) {
     //        draw_entities_2d_at(g, df, true, (vec3){x, y, z});
     //    }
     //}
+
+    // living
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             draw_entities_2d_at(g, df, false, (vec3){x, y, z});
         }
     }
+
     return true;
 }
 
