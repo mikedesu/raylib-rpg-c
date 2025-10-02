@@ -96,7 +96,9 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->player_changing_dir = false;
 
-    g->next_entityid = 0;
+    // weird bug maybe when set to 0?
+    g->next_entityid = 1;
+
     g->current_music_index = 0;
     g->total_music_paths = 0;
     g->restart_count = 0;

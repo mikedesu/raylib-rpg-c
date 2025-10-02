@@ -421,8 +421,20 @@ bool df_remove_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int 
     //const entityid r = tile_remove(&df->tiles[y][x], id);
     shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, -1});
     massert(tile, "tile is NULL at (%d, %d)", x, y);
+
     entityid r = tile_remove(tile, id);
-    return r != -1 && r == id;
+
+    if (r == ENTITYID_INVALID) {
+        merror("df_remove_at: Failed to remove entity %d at (%d, %d)", id, x, y);
+        return false;
+    }
+
+    if (r != id) {
+        merror("df_remove_at: Removed entity %d but expected to remove %d at (%d, %d)", r, id, x, y);
+        return false;
+    }
+
+    return true;
 }
 
 void df_set_all_tiles(shared_ptr<dungeon_floor_t> const df, tiletype_t type) {

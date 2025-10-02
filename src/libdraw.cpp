@@ -473,6 +473,9 @@ bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor
         //merror("draw_entities_2d: tile is not visible at (%d, %d)", (int)loc.x, (int)loc.y);
         return true; // Do not draw entities on invisible tiles
     }
+    if (tile->is_empty) {
+        return true;
+    }
     // Get hero's vision distance and location
     //int vision_distance = g_get_vision_distance(g, g->hero_id);
     //int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);

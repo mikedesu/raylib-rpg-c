@@ -21,6 +21,7 @@ void tile_init(shared_ptr<tile_t> t, tiletype_t type) {
     t->dirty_entities = t->dirty_visibility = true;
     t->cached_live_npcs = 0;
     t->entities = make_shared<vector<entityid>>();
+    t->is_empty = true;
 }
 
 
@@ -33,6 +34,7 @@ entityid tile_add(shared_ptr<tile_t> t, entityid id) {
     }
     t->entities->push_back(id);
     t->dirty_entities = true;
+    t->is_empty = false;
     return id;
 }
 
@@ -44,6 +46,7 @@ entityid tile_remove(shared_ptr<tile_t> tile, entityid id) {
     if (it != tile->entities->end()) {
         tile->entities->erase(it);
         tile->dirty_entities = true;
+        tile->is_empty = tile->entities->size() == 0;
         return id;
     }
     return ENTITYID_INVALID;

@@ -26,6 +26,7 @@ typedef struct {
     bool cached_player_present;
     bool dirty_entities;
     bool dirty_visibility;
+    bool is_empty;
     int cached_live_npcs;
 
     shared_ptr<vector<entityid>> entities;
