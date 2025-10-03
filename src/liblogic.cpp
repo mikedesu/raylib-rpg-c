@@ -96,8 +96,8 @@ void init_dungeon(shared_ptr<gamestate> g) {
     int df_count = 1;
     // max size of 128x128 for now to maintain 60fps
     // dungeon floors, tiles etc will require re-write/re-design for optimization
-    int w = 128;
-    int h = 128;
+    int w = 16;
+    int h = 16;
 
     for (int i = 0; i < df_count; i++) {
         d_add_floor(g->dungeon, w, h);
@@ -635,10 +635,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
     int start_x = 5;
 
     int x = start_x;
-    const int max_x = 120;
+    const int max_x = 16;
     int y = 5;
-    const int max_y = 120;
-    const int num = 2000;
+    const int max_y = 16;
+    const int num = 4;
     for (int i = 0; i < num; i++) {
         create_npc_set_stats(g, (vec3){x, y, 0}, RACE_ORC);
         x++;
