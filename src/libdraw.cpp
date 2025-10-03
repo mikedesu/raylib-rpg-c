@@ -1386,8 +1386,8 @@ void draw_hud(shared_ptr<gamestate> g) {
     const char* format_str_0 = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d";
     const char* format_str_1 = "Floor %d Turn %d";
 
-    string name = g->ct.get<Name>(g->hero_id).value_or("no-name");
-    snprintf(buffer0, sizeof(buffer0), format_str_0, name.c_str(), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp);
+    string n = g->ct.get<name>(g->hero_id).value_or("no-name");
+    snprintf(buffer0, sizeof(buffer0), format_str_0, n.c_str(), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp);
     snprintf(buffer1, sizeof(buffer1), format_str_1, floor, turn);
     int text_size0 = MeasureText(buffer0, font_size);
     float box_w = text_size0 + g->pad * 2;

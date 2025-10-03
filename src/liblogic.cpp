@@ -107,7 +107,7 @@ void init_dungeon(shared_ptr<gamestate> g) {
 }
 
 
-entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string name) {
+entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n) {
     minfo("begin create npc");
     massert(g, "gamestate is NULL");
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
@@ -126,7 +126,7 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
     //g_add_name(g, id, name);
     //g_add_type(g, id, ENTITY_NPC);
 
-    g->ct.set<Name>(id, name);
+    g->ct.set<name>(id, n);
     g->ct.set<EntityType>(id, ENTITY_NPC);
     g->ct.set<Race>(id, rt);
     g->ct.set<Location>(id, loc);
@@ -191,7 +191,7 @@ entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) {
     g->ct.set<itemtype>(id, ITEM_WEAPON);
     g->ct.set<weapontype>(id, type);
 
-    g->ct.set<Name>(id, "weapon-name");
+    g->ct.set<name>(id, "weapon-name");
     g->ct.set<Location>(id, loc);
     g->ct.set<TxAlpha>(id, 255);
     g->ct.set<Update>(id, true);

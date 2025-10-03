@@ -19,7 +19,8 @@ using std::string;
 using TileID = int;
 
 // Component kinds
-struct Name { }; // string
+struct name { }; // string
+
 struct EntityType { }; // entitytype_t
 struct Race { }; // race_t
 struct Location { }; //vec3
@@ -45,7 +46,7 @@ template <typename Kind>
 struct ComponentTraits;
 
 template <>
-struct ComponentTraits<Name> {
+struct ComponentTraits<name> {
     using Type = string;
 };
 
