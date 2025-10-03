@@ -5,16 +5,17 @@
 //#include "gamestate_inventory.h"
 #include "liblogic_add_message.h"
 #include "massert.h"
+#include <unordered_set>
+
+using std::unordered_set;
 
 
 bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
-    //g_set_update(g, id, true);
     g->ct.set<update>(id, true);
     // check if the player is on a tile with an item
 
-    //vec3 loc = g_get_loc(g, id);
     vec3 loc = g->ct.get<location>(id).value();
 
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
@@ -22,15 +23,18 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
         merror("Failed to get dungeon floor");
         return false;
     }
+
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
     if (!tile) {
         merror("Failed to get tile");
         return false;
     }
+
     if (tile->entities->size() == 0) {
         add_message(g, "No items on tile");
         return false;
     }
+
     for (size_t i = 0; i < tile->entities->size(); i++) {
         entityid itemid = tile->entities->at(i);
         //entitytype_t type = g_get_type(g, itemid);
@@ -38,10 +42,24 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
         //    //minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
             //if (g_add_to_inventory(g, id, itemid)) {
-            //    tile_remove(tile, itemid);
+
+            //optional<shared_ptr<unordered_set<entityid>>> maybe_inventory = g->ct.get<inventory>(id);
+            optional<shared_ptr<vector<entityid>>> maybe_inventory = g->ct.get<inventory>(id);
+            if (maybe_inventory.has_value()) {
+                msuccess("id %d has an inventory", id);
+                tile_remove(tile, itemid);
+                //shared_ptr<unordered_set<entityid>> my_inventory = maybe_inventory.value();
+                shared_ptr<vector<entityid>> my_inventory = maybe_inventory.value();
+                // add the item_id to my_inventory
+                //my_inventory->insert(itemid);
+                my_inventory->push_back(itemid);
+
+            } else {
+                merror("id %d does not have an inventory", id);
+            }
+
             //    msuccess("item added to inventory");
             //} else {
-            merror("failed to add item to inventory");
             //}
 
             //    entityid equipped_wpn_id = g_get_equipped_weapon(g, id);
@@ -60,7 +78,8 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
             //                    tile_add(tile, equipped_wpn_id);
             //                    add_message(g, "Added equipped_wpn_id %d", equipped_wpn_id);
             //                }
-            if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_PLAYER) {
+            entitytype_t t = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            if (t == ENTITY_PLAYER) {
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             }
             break;

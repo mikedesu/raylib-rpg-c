@@ -140,6 +140,10 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
     g->ct.set<damaged>(id, false);
     g->ct.set<txalpha>(id, 0);
 
+    //shared_ptr<vector<entityid>> my_inventory = make_shared<vector<entityid>>();
+    //g->ct.set<inventory>(id, make_shared<unordered_set<entityid>>());
+    g->ct.set<inventory>(id, make_shared<vector<entityid>>());
+
     minfo("end create npc");
     return df_add_at(df, id, loc.x, loc.y);
 
@@ -449,16 +453,19 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
                 //            g_set_update(g, g->hero_id, true);
                 g->ct.set<update>(g->hero_id, true);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_SEMICOLON)) {
+                //} else if (inputstate_is_pressed(is, KEY_SEMICOLON)) {
+            } else if (inputstate_is_pressed(is, KEY_SLASH)) {
                 //add_message(g, "pickup item (unimplemented)");
                 try_entity_pickup(g, g->hero_id);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_SLASH) && inputstate_is_shift_held(is)) {
-                // open inventory
-                //g->inventory_is_open = !g->inventory_is_open;
-                g->display_help_menu = !g->display_help_menu;
-                g->frame_dirty = true;
-            } else if (inputstate_is_pressed(is, KEY_I)) {
+            }
+            //else if (inputstate_is_pressed(is, KEY_SLASH) && inputstate_is_shift_held(is)) {
+            //    // open inventory
+            //    //g->inventory_is_open = !g->inventory_is_open;
+            //    g->display_help_menu = !g->display_help_menu;
+            //    g->frame_dirty = true;
+            //}
+            else if (inputstate_is_pressed(is, KEY_I)) {
                 g->display_inventory_menu = true;
                 g->controlmode = CONTROLMODE_INVENTORY;
                 g->frame_dirty = true;
@@ -666,11 +673,11 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon(g, (vec3){1, 6, 0}, WEAPON_BOW);
     //create_weapon(g, (vec3){1, 6, 0}, WEAPON_WARHAMMER);
 
-    //create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
+    create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
 
     create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
 
-    //create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
+    create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
     //create_weapon(g, get_random_loc((rect){0, 0, 8, 8}, 0), WEAPON_AXE);
 
     //create_weapon(g, (vec3){1, 5, 0}, WEAPON_FLAIL);

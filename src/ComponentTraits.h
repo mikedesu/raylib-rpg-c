@@ -4,16 +4,23 @@
 //#include "Direction.h"
 //#include "entityid.h"
 #include "direction.h"
+#include "entityid.h"
 #include "entitytype.h"
 #include "item.h"
 #include "potion.h"
 #include "race.h"
 #include "vec3.h"
 #include "weapon.h"
+#include <memory>
 #include <raylib.h>
 #include <string>
+#include <unordered_set>
+#include <vector>
 
+using std::shared_ptr;
 using std::string;
+using std::unordered_set;
+using std::vector;
 
 //using entityid = int;
 using TileID = int;
@@ -38,6 +45,8 @@ struct pushable { }; // bool
 struct itemtype { }; // itemtype_t
 struct potiontype { }; // potiontype_t
 struct weapontype { }; // weapontype_t
+
+struct inventory { };
 
 //struct Stats { }; // ??
 
@@ -128,4 +137,10 @@ struct ComponentTraits<potiontype> {
 template <>
 struct ComponentTraits<weapontype> {
     using Type = weapontype_t;
+};
+
+template <>
+struct ComponentTraits<inventory> {
+    //using Type = shared_ptr<unordered_set<entityid>>;
+    using Type = shared_ptr<vector<entityid>>;
 };
