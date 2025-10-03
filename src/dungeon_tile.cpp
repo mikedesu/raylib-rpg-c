@@ -88,7 +88,7 @@ void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
 
         // Check entity type
         //entitytype_t type = g_get_type(g, id);
-        entitytype_t type = g->ct.get<EntityType>(id).value_or(ENTITY_NONE);
+        entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
 
         if (type == ENTITY_NPC) {
             t->cached_live_npcs++;

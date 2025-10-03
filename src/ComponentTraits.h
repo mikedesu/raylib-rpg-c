@@ -21,7 +21,7 @@ using TileID = int;
 // Component kinds
 struct name { }; // string
 
-struct EntityType { }; // entitytype_t
+struct entitytype { }; // entitytype_t
 struct Race { }; // race_t
 struct Location { }; //vec3
 struct SpriteMove { }; // Rectangle
@@ -51,7 +51,7 @@ struct ComponentTraits<name> {
 };
 
 template <>
-struct ComponentTraits<EntityType> {
+struct ComponentTraits<entitytype> {
     using Type = entitytype_t;
 };
 

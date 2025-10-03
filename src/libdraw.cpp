@@ -681,7 +681,7 @@ void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, sprite
 
         g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
         //entitytype_t type = g_get_type(g, id);
-        entitytype_t type = g->ct.get<EntityType>(id).value_or(ENTITY_NONE);
+        entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
         massert(type != ENTITY_NONE, "entity type is none");
 
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
@@ -1296,7 +1296,7 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
 
     //entitytype_t type = g_get_type(g, id);
-    entitytype_t type = g->ct.get<EntityType>(id).value_or(ENTITY_NONE);
+    entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
     massert(type != ENTITY_NONE, "entity type is none");
 
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {

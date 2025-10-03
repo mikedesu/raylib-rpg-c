@@ -77,7 +77,7 @@ void handle_npc(shared_ptr<gamestate> g, entityid id) {
         //merror("Tried to handle hero id %d as NPC! This should not happen.", id);
         return;
     }
-    if (g->ct.get<EntityType>(id).value_or(ENTITY_NONE) == ENTITY_NPC) {
+    if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC) {
         //minfo("Handling NPC %d", id);
         //race_t race = g_get_race(g, id);
         //minfo("NPC %d race: %s", id, race2str(race).c_str());
@@ -127,7 +127,7 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
     //g_add_type(g, id, ENTITY_NPC);
 
     g->ct.set<name>(id, n);
-    g->ct.set<EntityType>(id, ENTITY_NPC);
+    g->ct.set<entitytype>(id, ENTITY_NPC);
     g->ct.set<Race>(id, rt);
     g->ct.set<Location>(id, loc);
     g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
@@ -186,7 +186,7 @@ entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) {
     }
     entityid id = g_add_entity(g);
 
-    g->ct.set<EntityType>(id, ENTITY_ITEM);
+    g->ct.set<entitytype>(id, ENTITY_ITEM);
 
     g->ct.set<itemtype>(id, ITEM_WEAPON);
     g->ct.set<weapontype>(id, type);
@@ -220,7 +220,7 @@ entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
     g_set_hero_id(g, id);
 
     //g_add_type(g, id, ENTITY_PLAYER);
-    g->ct.set<EntityType>(id, ENTITY_PLAYER);
+    g->ct.set<entitytype>(id, ENTITY_PLAYER);
 
     //g_set_tx_alpha(g, id, 0);
     g->ct.set<TxAlpha>(id, 0);
@@ -824,7 +824,7 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
     massert(atk_successful, "attack_successful is NULL");
-    entitytype_t tgttype = g->ct.get<EntityType>(tgt_id).value_or(ENTITY_NONE);
+    entitytype_t tgttype = g->ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
     if (*atk_successful) {
         //entityid attacker_weapon_id = g_get_equipment(g, atk_id, EQUIP_SLOT_WEAPON);
         //entityid attacker_weapon_id = g_get_equipped_weapon(g, atk_id);
@@ -981,7 +981,7 @@ bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
         return false;
     }
 
-    entitytype_t type = g->ct.get<EntityType>(target_id).value_or(ENTITY_NONE);
+    entitytype_t type = g->ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
 
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) return false;
     if (g->ct.get<Dead>(target_id).value_or(true)) {
@@ -1036,7 +1036,7 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
     g->ct.set<Attacking>(atk_id, true);
     g->ct.set<Update>(atk_id, true);
     handle_attack_helper(g, tile, atk_id, &ok);
-    entitytype_t type0 = g->ct.get<EntityType>(atk_id).value_or(ENTITY_NONE);
+    entitytype_t type0 = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
     handle_attack_success_gamestate_flag(g, type0, ok);
 }
 
