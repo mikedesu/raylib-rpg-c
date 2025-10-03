@@ -20,20 +20,20 @@ using TileID = int;
 
 // Component kinds
 struct name { }; // string
-
 struct entitytype { }; // entitytype_t
-struct Race { }; // race_t
-struct Location { }; //vec3
-struct SpriteMove { }; // Rectangle
-struct Dead { }; // bool
-struct Update { }; // bool
-struct Direction { }; // dir_t
-struct Attacking { }; // bool
-struct Blocking { }; // bool
-struct BlockSuccess { }; // bool
-struct Damaged { }; // bool
-struct TxAlpha { }; // int
-struct Pushable { }; // bool
+//
+struct race { }; // race_t
+struct location { }; //vec3
+struct spritemove { }; // rectangle
+struct dead { }; // bool
+struct update { }; // bool
+struct direction { }; // dir_t
+struct attacking { }; // bool
+struct blocking { }; // bool
+struct blocksuccess { }; // bool
+struct damaged { }; // bool
+struct txalpha { }; // int
+struct pushable { }; // bool
 
 struct itemtype { }; // itemtype_t
 struct potiontype { }; // potiontype_t
@@ -56,62 +56,62 @@ struct ComponentTraits<entitytype> {
 };
 
 template <>
-struct ComponentTraits<Race> {
+struct ComponentTraits<race> {
     using Type = race_t;
 };
 
 template <>
-struct ComponentTraits<Location> {
+struct ComponentTraits<location> {
     using Type = vec3;
 };
 
 template <>
-struct ComponentTraits<SpriteMove> {
+struct ComponentTraits<spritemove> {
     using Type = Rectangle;
 };
 
 template <>
-struct ComponentTraits<Dead> {
+struct ComponentTraits<dead> {
     using Type = bool;
 };
 
 template <>
-struct ComponentTraits<Update> {
+struct ComponentTraits<update> {
     using Type = bool;
 };
 
 template <>
-struct ComponentTraits<Direction> {
+struct ComponentTraits<direction> {
     using Type = direction_t;
 };
 
 template <>
-struct ComponentTraits<Attacking> {
+struct ComponentTraits<attacking> {
     using Type = bool;
 };
 
 template <>
-struct ComponentTraits<Blocking> {
+struct ComponentTraits<blocking> {
     using Type = bool;
 };
 
 template <>
-struct ComponentTraits<BlockSuccess> {
+struct ComponentTraits<blocksuccess> {
     using Type = bool;
 };
 
 template <>
-struct ComponentTraits<Damaged> {
+struct ComponentTraits<damaged> {
     using Type = bool;
 };
 
 template <>
-struct ComponentTraits<TxAlpha> {
+struct ComponentTraits<txalpha> {
     using Type = int;
 };
 
 template <>
-struct ComponentTraits<Pushable> {
+struct ComponentTraits<pushable> {
     using Type = bool;
 };
 

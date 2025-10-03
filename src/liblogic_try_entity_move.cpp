@@ -9,11 +9,11 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     minfo("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
-    g->ct.set<Update>(id, true);
-    g->ct.set<Direction>(id, get_dir_from_xy(v.x, v.y));
+    g->ct.set<update>(id, true);
+    g->ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
 
     // entity location
-    vec3 loc = g->ct.get<Location>(id).value();
+    vec3 loc = g->ct.get<location>(id).value();
 
     // entity's new location
     // we will have a special case for traversing floors so ignore v.z
@@ -85,9 +85,9 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
         return false;
     }
 
-    g->ct.set<Location>(id, aloc);
+    g->ct.set<location>(id, aloc);
 
-    g->ct.set<SpriteMove>(id, (Rectangle){mx, my, 0, 0});
+    g->ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
 
     return true;
 }

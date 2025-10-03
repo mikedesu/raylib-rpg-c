@@ -60,11 +60,11 @@ void handle_npc(shared_ptr<gamestate> g, entityid id);
 
 void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
     massert(g, "Game state is NULL!");
-    if (g->ct.get<Dead>(g->hero_id).value_or(true)) {
+    if (g->ct.get<dead>(g->hero_id).value_or(true)) {
         return;
     }
-    g->ct.set<Direction>(g->hero_id, dir);
-    g->ct.set<Update>(g->hero_id, true);
+    g->ct.set<direction>(g->hero_id, dir);
+    g->ct.set<update>(g->hero_id, true);
     g->player_changing_dir = false;
     g->frame_dirty = true;
 }
@@ -128,17 +128,17 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
 
     g->ct.set<name>(id, n);
     g->ct.set<entitytype>(id, ENTITY_NPC);
-    g->ct.set<Race>(id, rt);
-    g->ct.set<Location>(id, loc);
-    g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
-    g->ct.set<Dead>(id, false);
-    g->ct.set<Update>(id, true);
-    g->ct.set<Direction>(id, DIR_DOWN_RIGHT);
-    g->ct.set<Attacking>(id, false);
-    g->ct.set<Blocking>(id, false);
-    g->ct.set<BlockSuccess>(id, false);
-    g->ct.set<Damaged>(id, false);
-    g->ct.set<TxAlpha>(id, 0);
+    g->ct.set<race>(id, rt);
+    g->ct.set<location>(id, loc);
+    g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+    g->ct.set<dead>(id, false);
+    g->ct.set<update>(id, true);
+    g->ct.set<direction>(id, DIR_DOWN_RIGHT);
+    g->ct.set<attacking>(id, false);
+    g->ct.set<blocking>(id, false);
+    g->ct.set<blocksuccess>(id, false);
+    g->ct.set<damaged>(id, false);
+    g->ct.set<txalpha>(id, 0);
 
     minfo("end create npc");
     return df_add_at(df, id, loc.x, loc.y);
@@ -192,10 +192,10 @@ entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) {
     g->ct.set<weapontype>(id, type);
 
     g->ct.set<name>(id, "weapon-name");
-    g->ct.set<Location>(id, loc);
-    g->ct.set<TxAlpha>(id, 255);
-    g->ct.set<Update>(id, true);
-    g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
+    g->ct.set<location>(id, loc);
+    g->ct.set<txalpha>(id, 255);
+    g->ct.set<update>(id, true);
+    g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
 
     minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
     if (!df_add_at(df, id, loc.x, loc.y)) {
@@ -223,7 +223,7 @@ entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
     g->ct.set<entitytype>(id, ENTITY_PLAYER);
 
     //g_set_tx_alpha(g, id, 0);
-    g->ct.set<TxAlpha>(id, 0);
+    g->ct.set<txalpha>(id, 0);
     //g_set_stat(g, id, STATS_LEVEL, 666);
     //g_add_equipped_weapon(g, id, ENTITYID_INVALID);
 
@@ -402,9 +402,9 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
                 change_player_dir(g, DIR_DOWN_RIGHT);
             } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
                 //            g_set_attacking(g, g->hero_id, true);
-                g->ct.set<Attacking>(g->hero_id, true);
+                g->ct.set<attacking>(g->hero_id, true);
                 //            g_set_update(g, g->hero_id, true);
-                g->ct.set<Update>(g->hero_id, true);
+                g->ct.set<update>(g->hero_id, true);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 g->player_changing_dir = false;
             }
@@ -445,9 +445,9 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
                 //            g_set_attacking(g, g->hero_id, true);
-                g->ct.set<Attacking>(g->hero_id, true);
+                g->ct.set<attacking>(g->hero_id, true);
                 //            g_set_update(g, g->hero_id, true);
-                g->ct.set<Update>(g->hero_id, true);
+                g->ct.set<update>(g->hero_id, true);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             } else if (inputstate_is_pressed(is, KEY_SEMICOLON)) {
                 //add_message(g, "pickup item (unimplemented)");
@@ -547,7 +547,7 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
     //test_guard = g->test_guard;
 
     if (g->hero_id != ENTITYID_INVALID) {
-        loc = g->ct.get<Location>(g->hero_id).value();
+        loc = g->ct.get<location>(g->hero_id).value();
     }
     // Determine control mode and flag strings
     const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
@@ -698,22 +698,22 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     // this was update player state
     if (g->hero_id != ENTITYID_INVALID) {
         if (!g->gameover) {
-            unsigned char a = g->ct.get<TxAlpha>(g->hero_id).value_or(255);
+            unsigned char a = g->ct.get<txalpha>(g->hero_id).value_or(255);
             if (a < 255) {
                 a++;
             }
-            g->ct.set<TxAlpha>(g->hero_id, a);
+            g->ct.set<txalpha>(g->hero_id, a);
 
 
             //if (g_is_dead(g, g->hero_id)) {
-            if (g->ct.get<Dead>(g->hero_id).value_or(true)) {
+            if (g->ct.get<dead>(g->hero_id).value_or(true)) {
                 //add_message_history(g, "You died!");
                 g->gameover = true;
             }
             //check_and_handle_level_up(g, g->hero_id);
         }
         //if (g_is_dead(g, g->hero_id)) {
-        if (g->ct.get<Dead>(g->hero_id).value_or(true)) {
+        if (g->ct.get<dead>(g->hero_id).value_or(true)) {
             return;
         }
     }
@@ -723,17 +723,17 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
             continue;
         }
         //g_incr_tx_alpha(g, id, 4);
-        unsigned char a = g->ct.get<TxAlpha>(id).value_or(255);
+        unsigned char a = g->ct.get<txalpha>(id).value_or(255);
         if (a < 255) {
             a++;
         }
-        g->ct.set<TxAlpha>(id, a);
+        g->ct.set<txalpha>(id, a);
     }
     if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
         if (g->hero_id != ENTITYID_INVALID) {
-            g->ct.set<Blocking>(g->hero_id, false);
+            g->ct.set<blocking>(g->hero_id, false);
             //        g_set_block_success(g, g->hero_id, false);
-            g->ct.set<BlockSuccess>(g->hero_id, false);
+            g->ct.set<blocksuccess>(g->hero_id, false);
         }
     }
     handle_input(g, is);
@@ -847,15 +847,15 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
         //dmg += atk_bonus;
         //}
         //    g_set_damaged(g, tgt_id, true);
-        g->ct.set<Damaged>(tgt_id, true);
+        g->ct.set<damaged>(tgt_id, true);
         //    g_set_update(g, tgt_id, true);
-        g->ct.set<Update>(tgt_id, true);
+        g->ct.set<update>(tgt_id, true);
         //int hp = g_get_stat(g, tgt_id, STATS_HP);
         int hp = 1;
         if (hp <= 0) {
             merror("Target is already dead, hp was: %d", hp);
             //g_update_dead(g, tgt_id, true);
-            g->ct.set<Dead>(tgt_id, true);
+            g->ct.set<dead>(tgt_id, true);
             return;
         }
         hp -= dmg;
@@ -874,7 +874,7 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
         }
         if (hp <= 0) {
             //g_update_dead(g, tgt_id, true);
-            g->ct.set<Dead>(tgt_id, true);
+            g->ct.set<dead>(tgt_id, true);
             if (tgttype == ENTITY_NPC) {
                 //add_message_history(g,
                 //                    "%s killed %s!",
@@ -900,7 +900,7 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             }
         } else {
             //g_update_dead(g, tgt_id, false);
-            g->ct.set<Dead>(tgt_id, false);
+            g->ct.set<dead>(tgt_id, false);
         }
     }
     //else {
@@ -984,7 +984,7 @@ bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
     entitytype_t type = g->ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
 
     if (type != ENTITY_PLAYER && type != ENTITY_NPC) return false;
-    if (g->ct.get<Dead>(target_id).value_or(true)) {
+    if (g->ct.get<dead>(target_id).value_or(true)) {
         return false;
     }
     //    // lets try an experiment...
@@ -1018,8 +1018,8 @@ void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, enti
 
 void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
-    massert(!g->ct.get<Dead>(atk_id).value_or(false), "attacker entity is dead");
-    vec3 loc = g->ct.get<Location>(atk_id).value();
+    massert(!g->ct.get<dead>(atk_id).value_or(false), "attacker entity is dead");
+    vec3 loc = g->ct.get<location>(atk_id).value();
     shared_ptr<dungeon_floor_t> floor = d_get_floor(g->dungeon, loc.z);
     massert(floor, "failed to get dungeon floor");
     shared_ptr<tile_t> tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
@@ -1029,12 +1029,12 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
     // Calculate direction based on target position
     bool ok = false;
     //vec3 eloc = g_get_loc(g, atk_id);
-    vec3 eloc = g->ct.get<Location>(atk_id).value();
+    vec3 eloc = g->ct.get<location>(atk_id).value();
     int dx = tgt_x - eloc.x;
     int dy = tgt_y - eloc.y;
-    g->ct.set<Direction>(atk_id, get_dir_from_xy(dx, dy));
-    g->ct.set<Attacking>(atk_id, true);
-    g->ct.set<Update>(atk_id, true);
+    g->ct.set<direction>(atk_id, get_dir_from_xy(dx, dy));
+    g->ct.set<attacking>(atk_id, true);
+    g->ct.set<update>(atk_id, true);
     handle_attack_helper(g, tile, atk_id, &ok);
     entitytype_t type0 = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
     handle_attack_success_gamestate_flag(g, type0, ok);

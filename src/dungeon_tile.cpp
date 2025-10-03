@@ -82,7 +82,7 @@ void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
 
         // if (g_is_dead(g, id)) continue;
 
-        if (g->ct.get<Dead>(id).value_or(true)) {
+        if (g->ct.get<dead>(id).value_or(true)) {
             continue;
         }
 

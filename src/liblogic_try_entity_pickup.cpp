@@ -11,11 +11,11 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
     //g_set_update(g, id, true);
-    g->ct.set<Update>(id, true);
+    g->ct.set<update>(id, true);
     // check if the player is on a tile with an item
 
     //vec3 loc = g_get_loc(g, id);
-    vec3 loc = g->ct.get<Location>(id).value();
+    vec3 loc = g->ct.get<location>(id).value();
 
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     if (!df) {

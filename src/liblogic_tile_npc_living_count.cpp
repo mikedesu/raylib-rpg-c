@@ -19,7 +19,7 @@ int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
         entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
 
         //if (id != ENTITYID_INVALID && (type == ENTITY_NPC || type == ENTITY_PLAYER) && !g_is_dead(g, id)) {
-        if (id != ENTITYID_INVALID && (type == ENTITY_NPC || type == ENTITY_PLAYER) && !g->ct.get<Dead>(id).value_or(true)) {
+        if (id != ENTITYID_INVALID && (type == ENTITY_NPC || type == ENTITY_PLAYER) && !g->ct.get<dead>(id).value_or(true)) {
             count++;
         }
     }

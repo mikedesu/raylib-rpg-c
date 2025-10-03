@@ -361,7 +361,7 @@ void draw_entity_sprite(const shared_ptr<gamestate> g, spritegroup_t* sg) {
     //unsigned char a = 255;
 
     //unsigned char a = (unsigned char)g_get_tx_alpha(g, sg->id);
-    unsigned char a = g->ct.get<TxAlpha>(sg->id).value_or(255);
+    unsigned char a = g->ct.get<txalpha>(sg->id).value_or(255);
 
     DrawTexturePro(*s->texture, s->src, dest, zero_vec, 0, (Color){255, 255, 255, a});
     // draw a box around the sprite
@@ -631,7 +631,7 @@ void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegro
     //}
     spritegroup_set_current(sg, cur);
     update_weapon_for_entity(g, id, sg);
-    g->ct.set<Attacking>(id, false);
+    g->ct.set<attacking>(id, false);
 }
 
 
@@ -673,13 +673,13 @@ void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, sprite
     massert(id != ENTITYID_INVALID, "entityid is invalid");
 
     //Rectangle sprite_move = g_get_sprite_move(g, id);
-    Rectangle sprite_move = g->ct.get<SpriteMove>(id).value();
+    Rectangle sprite_move = g->ct.get<spritemove>(id).value();
     if (sprite_move.x != 0 || sprite_move.y != 0) {
         sg->move.x = sprite_move.x;
         sg->move.y = sprite_move.y;
         //g_update_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
 
-        g->ct.set<SpriteMove>(id, (Rectangle){0, 0, 0, 0});
+        g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
         //entitytype_t type = g_get_type(g, id);
         entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
         massert(type != ENTITY_NONE, "entity type is none");
@@ -742,24 +742,24 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     massert(sg, "spritegroup is NULL");
     //if (g_is_dead(g, id) && !spritegroup_is_animating(sg)) return;
     //if (g_get_update(g, id)) {
-    if (g->ct.get<Update>(id).value_or(false)) {
+    if (g->ct.get<update>(id).value_or(false)) {
         //libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, id));
         //libdraw_update_sprite_context_ptr(g, sg, DIR_DOWN_LEFT);
 
         //libdraw_update_sprite_context_ptr(g, sg, g_get_dir(g, id));
 
-        if (g->ct.has<Direction>(id)) {
-            direction_t d = g->ct.get<Direction>(id).value();
+        if (g->ct.has<direction>(id)) {
+            direction_t d = g->ct.get<direction>(id).value();
             libdraw_update_sprite_context_ptr(g, sg, d);
         }
         //g_set_update(g, id, false);
-        g->ct.set<Update>(id, false);
+        g->ct.set<update>(id, false);
     }
     // Copy movement intent from sprite_move_x/y if present
     libdraw_update_sprite_position(g, id, sg);
 
     //if (g_get_attacking(g, id)) {
-    if (g->ct.get<Attacking>(id).value_or(false)) {
+    if (g->ct.get<attacking>(id).value_or(false)) {
         libdraw_set_sg_is_attacking(g, id, sg);
     }
     //else if (g_get_block_success(g, id)) {
@@ -776,9 +776,9 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     // Snap to the tile position only when movement is fully complete
     //vec3 loc = g_get_loc(g, id);
 
-    massert(g->ct.has<Location>(id), "id %d lacks location component", id);
+    //massert(g->ct.has<Location>(id), "id %d lacks location component", id);
 
-    vec3 loc = g->ct.get<Location>(id).value();
+    vec3 loc = g->ct.get<location>(id).value();
 
     spritegroup_snap_dest(sg, loc.x, loc.y);
     minfo2("End update sprite ptr: %d", id);
@@ -979,10 +979,10 @@ bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     entityid id = g->hero_id;
     if (id == -1) return false;
-    direction_t dir = g->ct.get<Direction>(id).value();
+    direction_t dir = g->ct.get<direction>(id).value();
 
     //vec3 loc = g_get_loc(g, id);
-    vec3 loc = g->ct.get<Location>(id).value();
+    vec3 loc = g->ct.get<location>(id).value();
 
     float x = loc.x + get_x_from_dir(dir);
     float y = loc.y + get_y_from_dir(dir);
@@ -1248,7 +1248,7 @@ bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num
     int df_w = df->width;
     int df_h = df->height;
     //vec3 loc = g_get_loc(g, id);
-    vec3 loc = g->ct.get<Location>(id).value();
+    vec3 loc = g->ct.get<location>(id).value();
     massert(loc.x >= 0 && loc.x < df_w, "location x out of bounds: %d", loc.x);
     massert(loc.y >= 0 && loc.y < df_h, "location y out of bounds: %d", loc.y);
     if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
@@ -1301,9 +1301,9 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
 
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
         //race_t race = g_get_race(g, id);
-        race_t race = g->ct.get<Race>(id).value_or(RACE_NONE);
+        race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
 
-        switch (race) {
+        switch (r) {
         case RACE_HUMAN: create_spritegroup(g, id, TX_HUMAN_KEYS, TX_HUMAN_COUNT, -12, -12); break;
         case RACE_ORC: create_spritegroup(g, id, TX_ORC_KEYS, TX_ORC_COUNT, -12, -12); break;
         case RACE_ELF: create_spritegroup(g, id, TX_ELF_KEYS, TX_ELF_COUNT, -12, -12); break;
@@ -1314,7 +1314,7 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
         case RACE_BAT: create_spritegroup(g, id, TX_BAT_KEYS, TX_BAT_COUNT, -12, -12); break;
         case RACE_WARG: create_spritegroup(g, id, TX_WARG_KEYS, TX_WARG_COUNT, -12, -12); break;
         case RACE_GREEN_SLIME: create_spritegroup(g, id, TX_GREEN_SLIME_KEYS, TX_GREEN_SLIME_COUNT, -12, -12); break;
-        default: merror("unknown race %d", race); return;
+        default: merror("unknown race %d", r); return;
         }
     } else if (type == ENTITY_WOODEN_BOX) {
         create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
