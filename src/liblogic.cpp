@@ -668,7 +668,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     //create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
 
-    //create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
+    create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
 
     //create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
     //create_weapon(g, get_random_loc((rect){0, 0, 8, 8}, 0), WEAPON_AXE);
