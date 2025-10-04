@@ -100,10 +100,6 @@ void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegr
 void libdraw_unload_shaders();
 
 
-//void libdraw_unload_textures();
-//void libdraw_unload_textures(textureinfo* txinfo);
-//bool libdraw_unload_texture(textureinfo* txinfo, int txkey);
-
 void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
 void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
@@ -129,8 +125,6 @@ void load_shaders();
 
 
 bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
-//bool load_textures();
-//bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z);
 bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df);
 bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
