@@ -12,6 +12,7 @@
 #include "libdraw_help_menu.h"
 #include "libdraw_message_history.h"
 #include "libdraw_title_screen.h"
+#include "libdraw_unload_textures.h"
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
@@ -96,7 +97,11 @@ void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, spritegroup_t*
 void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
 void libdraw_unload_shaders();
-void libdraw_unload_textures();
+
+//void libdraw_unload_textures();
+//void libdraw_unload_textures(textureinfo* txinfo);
+//bool libdraw_unload_texture(textureinfo* txinfo, int txkey);
+
 void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
 void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
@@ -126,7 +131,6 @@ bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z);
 bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df);
 bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
-bool libdraw_unload_texture(int txkey);
 bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
 bool libdraw_draw_player_target_box(shared_ptr<gamestate> g);
 
@@ -1144,31 +1148,17 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
 }
 
 
-bool libdraw_unload_texture(int txkey) {
-    massert(txkey >= 0, "txkey is invalid");
-    if (txkey < 0 || txkey >= GAMESTATE_SIZEOFTEXINFOARRAY) return false;
-    UnloadTexture(txinfo[txkey].texture);
-    txinfo[txkey].texture = (Texture2D){0};
-    txinfo[txkey].contexts = 0;
-    return true;
-}
+void libdraw_close_partial() {
+    UnloadMusicStream(music);
+    CloseAudioDevice();
+    libdraw_unload_textures(txinfo);
+    libdraw_unload_shaders();
 
-
-void libdraw_unload_textures() {
-    for (int i = 0; i < GAMESTATE_SIZEOFTEXINFOARRAY; i++) libdraw_unload_texture(i);
     UnloadRenderTexture(title_target_texture);
     UnloadRenderTexture(char_creation_target_texture);
     UnloadRenderTexture(main_game_target_texture);
     UnloadRenderTexture(hud_target_texture);
     UnloadRenderTexture(target);
-}
-
-
-void libdraw_close_partial() {
-    UnloadMusicStream(music);
-    CloseAudioDevice();
-    libdraw_unload_textures();
-    libdraw_unload_shaders();
 }
 
 
