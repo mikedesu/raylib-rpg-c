@@ -10,6 +10,7 @@
 #include "libdraw_draw_character_creation_screen.h"
 #include "libdraw_draw_inventory_menu.h"
 #include "libdraw_help_menu.h"
+#include "libdraw_load_textures.h"
 #include "libdraw_message_history.h"
 #include "libdraw_title_screen.h"
 #include "libdraw_unload_textures.h"
@@ -98,6 +99,7 @@ void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegro
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
 void libdraw_unload_shaders();
 
+
 //void libdraw_unload_textures();
 //void libdraw_unload_textures(textureinfo* txinfo);
 //bool libdraw_unload_texture(textureinfo* txinfo, int txkey);
@@ -125,9 +127,10 @@ void draw_debug_panel(shared_ptr<gamestate> g);
 void create_sg_byid(shared_ptr<gamestate> g, entityid id);
 void load_shaders();
 
+
 bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
-bool load_textures();
-bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
+//bool load_textures();
+//bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path);
 bool draw_dungeon_floor_tile(const shared_ptr<gamestate> g, int x, int y, int z);
 bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df);
 bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
@@ -1168,61 +1171,6 @@ void libdraw_close() {
 }
 
 
-bool load_texture(int txkey, int ctxs, int frames, bool do_dither, char* path) {
-    massert(path, "path is NULL");
-    massert(txkey >= 0, "txkey is invalid");
-    massert(ctxs >= 0, "contexts is invalid");
-    massert(frames >= 0, "frames is invalid");
-    massert(txkey < GAMESTATE_SIZEOFTEXINFOARRAY, "txkey is out of bounds: %d", txkey);
-    massert(txinfo[txkey].texture.id == 0, "txinfo[%d].texture.id is not 0", txkey);
-    massert(strlen(path) > 0, "load_texture: path is empty");
-    massert(strcmp(path, "\n") != 0, "load_texture: path is newline");
-    Image image = LoadImage(path);
-    // crash if there is a problem loading the image
-    massert(image.data != NULL, "load_texture: image data is NULL for path: %s", path);
-    if (do_dither) ImageDither(&image, 4, 4, 4, 4);
-    Texture2D texture = LoadTextureFromImage(image);
-    UnloadImage(image);
-    txinfo[txkey].texture = texture;
-    txinfo[txkey].contexts = ctxs;
-    txinfo[txkey].num_frames = frames;
-    return true;
-}
-
-
-bool load_textures() {
-    const char* textures_file = "textures.txt";
-    FILE* file = fopen(textures_file, "r");
-    massert(file, "textures.txt file is NULL");
-    if (!file) {
-        return false;
-    }
-    char line[1024] = {0};
-    while (fgets(line, sizeof(line), file)) {
-        int txkey = -1;
-        int contexts = -1;
-        int frames = -1;
-        int do_dither = 0;
-        char path[512] = {0};
-        // check if the line begins with a #
-        if (line[0] == '#') continue;
-        sscanf(line, "%d %d %d %d %s", &txkey, &contexts, &frames, &do_dither, path);
-        //minfo("Path: %s", path);
-        massert(txkey >= 0, "txkey is invalid");
-        massert(contexts >= 0, "contexts is invalid");
-        massert(frames >= 0, "frames is invalid");
-        if (txkey < 0 || contexts < 0 || frames < 0) continue;
-        bool tx_loaded = load_texture(txkey, contexts, frames, do_dither, path);
-        if (!tx_loaded) {
-            //merror("Failed to load %s, hard-crashing!", path);
-            exit(-1);
-        }
-    }
-    fclose(file);
-    return true;
-}
-
-
 bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
     massert(g, "gamestate is NULL");
     // can hold up to 32 sprites
@@ -1443,7 +1391,7 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     target_dest = (Rectangle){0, 0, target_w * 1.0f, target_h * 1.0f};
     //target_dest = (Rectangle){0, 0, w, h};
     //spritegroups = hashtable_entityid_spritegroup_create(DEFAULT_SPRITEGROUPS_SIZE);
-    load_textures();
+    load_textures(txinfo);
     //calc_debugpanel_size(g);
     load_shaders();
     //float x = target_w / 2.0f - DEFAULT_TILE_SIZE * 4;

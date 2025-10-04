@@ -18,6 +18,7 @@ WEB_SOURCES=main.cpp \
 			libdraw_title_screen.cpp \
 			libdraw_help_menu.cpp \
 			libdraw_draw_character_creation_screen.cpp \
+			libdraw_load_textures.cpp \
 			libdraw_unload_textures.cpp \
 			libdraw.cpp \
 		    liblogic_drop_item.cpp \
@@ -62,6 +63,7 @@ OBJ_FILES=main.o \
 		  libdraw_title_screen.o \
 		  libdraw_help_menu.o \
 		  libdraw_draw_character_creation_screen.o \
+		  libdraw_load_textures.o \
 		  libdraw_unload_textures.o \
 		  libdraw.o \
 		  spritegroup.o \
@@ -134,6 +136,9 @@ libdraw_draw_inventory_menu.o: libdraw_draw_inventory_menu.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_draw_character_creation_screen.o: libdraw_draw_character_creation_screen.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_load_textures.o: libdraw_load_textures.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_unload_textures.o: libdraw_unload_textures.cpp
