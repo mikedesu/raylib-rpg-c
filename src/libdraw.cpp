@@ -1,53 +1,19 @@
-#include "ComponentTraits.h"
-#include "direction.h"
-#include "dungeon_floor.h"
-#include "dungeon_tile_type.h"
-#include "entityid.h"
-#include "entitytype.h"
-#include "gamestate.h"
 #include "libdraw.h"
-#include "libdraw_create_spritegroup.h"
-#include "libdraw_draw_character_creation_screen.h"
-#include "libdraw_draw_inventory_menu.h"
-#include "libdraw_dungeon_floor_tile.h"
-#include "libdraw_help_menu.h"
-#include "libdraw_hud.h"
-#include "libdraw_load_textures.h"
-#include "libdraw_message_history.h"
-#include "libdraw_title_screen.h"
-#include "libdraw_unload_textures.h"
-#include "libgame_defines.h"
-#include "massert.h"
-#include "mprint.h"
-#include "race.h"
-#include "rlgl.h"
-#include "scene.h"
-#include "sprite.h"
+
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
-#include "textureinfo.h"
+
 #include "tx_keys_boxes.h"
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"
 #include "tx_keys_weapons.h"
-#include "weapon.h"
+
 //#include "get_txkey_for_tiletype.h"
 //#include "gamestate_equipped_weapon.h"
 //#include "libdraw_version.h"
 //#include "tx_keys_rings.h"
 //#include "tx_keys_shields.h"
-
-
-#include <cstdlib>
-#include <memory>
-#include <raylib.h>
-#include <sys/param.h>
-#include <unordered_map>
-
-
-using std::shared_ptr;
-using std::unordered_map;
 
 unordered_map<entityid, spritegroup_t*> spritegroups2;
 
