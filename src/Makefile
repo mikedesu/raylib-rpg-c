@@ -20,6 +20,7 @@ WEB_SOURCES=main.cpp \
 			libdraw_draw_character_creation_screen.cpp \
 			libdraw_load_textures.cpp \
 			libdraw_unload_textures.cpp \
+		  libdraw_dungeon_floor_tile.cpp \
 			libdraw_hud.cpp \
 			libdraw.cpp \
 		    liblogic_drop_item.cpp \
@@ -67,6 +68,7 @@ OBJ_FILES=main.o \
 		  libdraw_load_textures.o \
 		  libdraw_unload_textures.o \
 		  libdraw_hud.o \
+		  libdraw_dungeon_floor_tile.o \
 		  libdraw.o \
 		  spritegroup.o \
 		  sprite.o \
@@ -147,6 +149,9 @@ libdraw_unload_textures.o: libdraw_unload_textures.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_hud.o: libdraw_hud.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_dungeon_floor_tile.o: libdraw_dungeon_floor_tile.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw.o: libdraw.cpp 
