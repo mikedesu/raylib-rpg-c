@@ -125,7 +125,8 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id);
 void load_shaders();
 
 
-bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
+bool create_spritegroup(shared_ptr<gamestate> g, textureinfo* txinfo, entityid id, int* keys, int num_keys, int offset_x, int offset_y);
+
 bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df);
 bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
 bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
@@ -1090,8 +1091,9 @@ void libdraw_close() {
 }
 
 
-bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
+bool create_spritegroup(shared_ptr<gamestate> g, textureinfo* txinfo, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
     massert(g, "gamestate is NULL");
+    massert(txinfo, "txinfo is null");
     // can hold up to 32 sprites
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
     massert(group, "spritegroup is NULL");
@@ -1161,20 +1163,20 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
         race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
 
         switch (r) {
-        case RACE_HUMAN: create_spritegroup(g, id, TX_HUMAN_KEYS, TX_HUMAN_COUNT, -12, -12); break;
-        case RACE_ORC: create_spritegroup(g, id, TX_ORC_KEYS, TX_ORC_COUNT, -12, -12); break;
-        case RACE_ELF: create_spritegroup(g, id, TX_ELF_KEYS, TX_ELF_COUNT, -12, -12); break;
-        case RACE_DWARF: create_spritegroup(g, id, TX_DWARF_KEYS, TX_DWARF_COUNT, -12, -12); break;
-        case RACE_HALFLING: create_spritegroup(g, id, TX_HALFLING_KEYS, TX_HALFLING_COUNT, -12, -12); break;
-        case RACE_GOBLIN: create_spritegroup(g, id, TX_GOBLIN_KEYS, TX_GOBLIN_COUNT, -12, -12); break;
-        case RACE_WOLF: create_spritegroup(g, id, TX_WOLF_KEYS, TX_WOLF_COUNT, -12, -12); break;
-        case RACE_BAT: create_spritegroup(g, id, TX_BAT_KEYS, TX_BAT_COUNT, -12, -12); break;
-        case RACE_WARG: create_spritegroup(g, id, TX_WARG_KEYS, TX_WARG_COUNT, -12, -12); break;
-        case RACE_GREEN_SLIME: create_spritegroup(g, id, TX_GREEN_SLIME_KEYS, TX_GREEN_SLIME_COUNT, -12, -12); break;
+        case RACE_HUMAN: create_spritegroup(g, txinfo, id, TX_HUMAN_KEYS, TX_HUMAN_COUNT, -12, -12); break;
+        case RACE_ORC: create_spritegroup(g, txinfo, id, TX_ORC_KEYS, TX_ORC_COUNT, -12, -12); break;
+        case RACE_ELF: create_spritegroup(g, txinfo, id, TX_ELF_KEYS, TX_ELF_COUNT, -12, -12); break;
+        case RACE_DWARF: create_spritegroup(g, txinfo, id, TX_DWARF_KEYS, TX_DWARF_COUNT, -12, -12); break;
+        case RACE_HALFLING: create_spritegroup(g, txinfo, id, TX_HALFLING_KEYS, TX_HALFLING_COUNT, -12, -12); break;
+        case RACE_GOBLIN: create_spritegroup(g, txinfo, id, TX_GOBLIN_KEYS, TX_GOBLIN_COUNT, -12, -12); break;
+        case RACE_WOLF: create_spritegroup(g, txinfo, id, TX_WOLF_KEYS, TX_WOLF_COUNT, -12, -12); break;
+        case RACE_BAT: create_spritegroup(g, txinfo, id, TX_BAT_KEYS, TX_BAT_COUNT, -12, -12); break;
+        case RACE_WARG: create_spritegroup(g, txinfo, id, TX_WARG_KEYS, TX_WARG_COUNT, -12, -12); break;
+        case RACE_GREEN_SLIME: create_spritegroup(g, txinfo, id, TX_GREEN_SLIME_KEYS, TX_GREEN_SLIME_COUNT, -12, -12); break;
         default: merror("unknown race %d", r); return;
         }
     } else if (type == ENTITY_WOODEN_BOX) {
-        create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
+        create_spritegroup(g, txinfo, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
     } else if (type == ENTITY_ITEM) {
         //itemtype item_type = g_get_item_type(g, id);
         itemtype_t item_type = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
@@ -1184,12 +1186,12 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             potiontype_t potion_type = g->ct.get<potiontype>(id).value_or(POTION_NONE);
 
             switch (potion_type) {
-            case POTION_HP_SMALL: create_spritegroup(g, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, -12, -12); break;
-            case POTION_HP_MEDIUM: create_spritegroup(g, id, TX_POTION_HP_MEDIUM_KEYS, TX_POTION_HP_MEDIUM_COUNT, -12, -12); break;
-            case POTION_HP_LARGE: create_spritegroup(g, id, TX_POTION_HP_LARGE_KEYS, TX_POTION_HP_LARGE_COUNT, -12, -12); break;
-            case POTION_MP_SMALL: create_spritegroup(g, id, TX_POTION_MP_SMALL_KEYS, TX_POTION_MP_SMALL_COUNT, -12, -12); break;
-            case POTION_MP_MEDIUM: create_spritegroup(g, id, TX_POTION_MP_MEDIUM_KEYS, TX_POTION_MP_MEDIUM_COUNT, -12, -12); break;
-            case POTION_MP_LARGE: create_spritegroup(g, id, TX_POTION_MP_LARGE_KEYS, TX_POTION_MP_LARGE_COUNT, -12, -12); break;
+            case POTION_HP_SMALL: create_spritegroup(g, txinfo, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, -12, -12); break;
+            case POTION_HP_MEDIUM: create_spritegroup(g, txinfo, id, TX_POTION_HP_MEDIUM_KEYS, TX_POTION_HP_MEDIUM_COUNT, -12, -12); break;
+            case POTION_HP_LARGE: create_spritegroup(g, txinfo, id, TX_POTION_HP_LARGE_KEYS, TX_POTION_HP_LARGE_COUNT, -12, -12); break;
+            case POTION_MP_SMALL: create_spritegroup(g, txinfo, id, TX_POTION_MP_SMALL_KEYS, TX_POTION_MP_SMALL_COUNT, -12, -12); break;
+            case POTION_MP_MEDIUM: create_spritegroup(g, txinfo, id, TX_POTION_MP_MEDIUM_KEYS, TX_POTION_MP_MEDIUM_COUNT, -12, -12); break;
+            case POTION_MP_LARGE: create_spritegroup(g, txinfo, id, TX_POTION_MP_LARGE_KEYS, TX_POTION_MP_LARGE_COUNT, -12, -12); break;
             default: merror("unknown potion type %d", potion_type); return;
             }
             return;
@@ -1198,13 +1200,13 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             weapontype_t weapon_type = g->ct.get<weapontype>(id).value_or(WEAPON_NONE);
 
             switch (weapon_type) {
-            case WEAPON_DAGGER: create_spritegroup(g, id, TX_DAGGER_KEYS, TX_DAGGER_COUNT, -12, -12); break;
-            case WEAPON_SWORD: create_spritegroup(g, id, TX_SWORD_KEYS, TX_SWORD_COUNT, -12, -12); break;
-            case WEAPON_AXE: create_spritegroup(g, id, TX_AXE_KEYS, TX_AXE_COUNT, -12, -12); break;
-            case WEAPON_BOW: create_spritegroup(g, id, TX_BOW_KEYS, TX_BOW_COUNT, -12, -12); break;
-            case WEAPON_TWO_HANDED_SWORD: create_spritegroup(g, id, TX_TWO_HANDED_SWORD_KEYS, TX_TWO_HANDED_SWORD_COUNT, -12, -12); break;
-            case WEAPON_WARHAMMER: create_spritegroup(g, id, TX_WARHAMMER_KEYS, TX_WARHAMMER_COUNT, -12, -12); break;
-            case WEAPON_FLAIL: create_spritegroup(g, id, TX_WHIP_KEYS, TX_WHIP_COUNT, -12, -12); break;
+            case WEAPON_DAGGER: create_spritegroup(g, txinfo, id, TX_DAGGER_KEYS, TX_DAGGER_COUNT, -12, -12); break;
+            case WEAPON_SWORD: create_spritegroup(g, txinfo, id, TX_SWORD_KEYS, TX_SWORD_COUNT, -12, -12); break;
+            case WEAPON_AXE: create_spritegroup(g, txinfo, id, TX_AXE_KEYS, TX_AXE_COUNT, -12, -12); break;
+            case WEAPON_BOW: create_spritegroup(g, txinfo, id, TX_BOW_KEYS, TX_BOW_COUNT, -12, -12); break;
+            case WEAPON_TWO_HANDED_SWORD: create_spritegroup(g, txinfo, id, TX_TWO_HANDED_SWORD_KEYS, TX_TWO_HANDED_SWORD_COUNT, -12, -12); break;
+            case WEAPON_WARHAMMER: create_spritegroup(g, txinfo, id, TX_WARHAMMER_KEYS, TX_WARHAMMER_COUNT, -12, -12); break;
+            case WEAPON_FLAIL: create_spritegroup(g, txinfo, id, TX_WHIP_KEYS, TX_WHIP_COUNT, -12, -12); break;
             default: merror("unknown weapon type %d", weapon_type); return;
             }
             return;
