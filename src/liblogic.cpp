@@ -178,11 +178,13 @@ entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) {
     minfo("calling df_tile_at...");
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
+
     minfo("checking if tile is walkable...");
     if (!tile_is_walkable(tile->type)) {
         merror("cannot create entity on non-walkable tile");
         return ENTITYID_INVALID;
     }
+
     minfo("checking if tile has live NPCs...");
     if (tile_has_live_npcs(g, tile)) {
         merror("cannot create entity on tile with live NPCs");
@@ -674,10 +676,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon(g, (vec3){1, 6, 0}, WEAPON_WARHAMMER);
 
     create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
-
     create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
-
     create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
+
+
     //create_weapon(g, get_random_loc((rect){0, 0, 8, 8}, 0), WEAPON_AXE);
 
     //create_weapon(g, (vec3){1, 5, 0}, WEAPON_FLAIL);

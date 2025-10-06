@@ -47,9 +47,8 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
 
-    //auto inventory = g_get_inventory(g, g->hero_id);
-    optional<shared_ptr<vector<entityid>>> my_inventory = g->ct.get<inventory>(g->hero_id);
-    //entityid current_weapon_id = g_get_equipped_weapon(g, g->hero_id);
+    //optional<shared_ptr<vector<entityid>>> my_inventory = g->ct.get<inventory>(g->hero_id);
+    auto my_inventory = g->ct.get<inventory>(g->hero_id);
 
     if (my_inventory) {
         // lets start with just one block
@@ -63,7 +62,8 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
 
         if (my_inventory.has_value()) {
             // unpack the inventory optional
-            shared_ptr<vector<entityid>> unpacked_inventory = my_inventory.value();
+            //shared_ptr<vector<entityid>> unpacked_inventory = my_inventory.value();
+            auto unpacked_inventory = my_inventory.value();
 
             auto it = unpacked_inventory->begin();
 
