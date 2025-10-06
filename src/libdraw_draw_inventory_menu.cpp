@@ -100,22 +100,19 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
 
             // in the right box, item detail
             if (unpacked_inventory->size() > 0) {
-                //size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
-                //if (index >= 0 && index < inventory->size()) {
-                //entityid selection_id = inventory->at(index);
-                //spritegroup_t* sg = spritegroups2[selection_id];
-                //if (sg) {
-                //auto sprite = sg_get_current(sg);
-                //DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
+                size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+                if (index >= 0 && index < unpacked_inventory->size()) {
+                    entityid selection_id = unpacked_inventory->at(index);
+                    spritegroup_t* sg = spritegroups2[selection_id];
+                    if (sg) {
+                        auto sprite = sg_get_current(sg);
+                        DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
 
-                // old
-                //string name = g_get_name(g, selection_id);
-
-                // new-style component table access
-                //string name = g->ct.get<Name>(selection_id).value_or("no-name");
-                string name = "item-name";
-
-                DrawText(name.c_str(), right_box.x + 10, right_box.y + 10, 20, WHITE);
+                        // new-style component table access
+                        string my_name = g->ct.get<name>(selection_id).value_or("no-name");
+                        DrawText(my_name.c_str(), right_box.x + 10, right_box.y + 10, 20, WHITE);
+                    }
+                }
             }
         }
     }
