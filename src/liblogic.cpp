@@ -197,7 +197,17 @@ entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) {
     g->ct.set<itemtype>(id, ITEM_WEAPON);
     g->ct.set<weapontype>(id, type);
 
-    g->ct.set<name>(id, "weapon-name");
+    string item_name = "unnamed-weapon";
+    if (type == WEAPON_AXE) {
+        item_name = "axe";
+    } else if (type == WEAPON_DAGGER) {
+        item_name = "dagger";
+    } else if (type == WEAPON_SWORD) {
+        item_name = "sword";
+    }
+
+    g->ct.set<name>(id, item_name);
+
     g->ct.set<location>(id, loc);
     g->ct.set<txalpha>(id, 255);
     g->ct.set<update>(id, true);
