@@ -143,6 +143,7 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
     //shared_ptr<vector<entityid>> my_inventory = make_shared<vector<entityid>>();
     //g->ct.set<inventory>(id, make_shared<unordered_set<entityid>>());
     g->ct.set<inventory>(id, make_shared<vector<entityid>>());
+    g->ct.set<equipped_weapon>(id, ENTITYID_INVALID);
 
     minfo("end create npc");
     return df_add_at(df, id, loc.x, loc.y);

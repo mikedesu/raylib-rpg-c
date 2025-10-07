@@ -14,12 +14,12 @@
 #include <memory>
 #include <raylib.h>
 #include <string>
-#include <unordered_set>
+#include <unordered_map>
 #include <vector>
 
 using std::shared_ptr;
 using std::string;
-using std::unordered_set;
+using std::unordered_map;
 using std::vector;
 
 //using entityid = int;
@@ -28,7 +28,6 @@ using TileID = int;
 // Component kinds
 struct name { }; // string
 struct entitytype { }; // entitytype_t
-//
 struct race { }; // race_t
 struct location { }; //vec3
 struct spritemove { }; // rectangle
@@ -46,7 +45,9 @@ struct itemtype { }; // itemtype_t
 struct potiontype { }; // potiontype_t
 struct weapontype { }; // weapontype_t
 
-struct inventory { };
+struct inventory { }; // shared_ptr<vector<entityid>>
+
+struct equipped_weapon { }; // entityid
 
 //struct Stats { }; // ??
 
@@ -141,6 +142,10 @@ struct ComponentTraits<weapontype> {
 
 template <>
 struct ComponentTraits<inventory> {
-    //using Type = shared_ptr<unordered_set<entityid>>;
     using Type = shared_ptr<vector<entityid>>;
+};
+
+template <>
+struct ComponentTraits<equipped_weapon> {
+    using Type = entityid;
 };

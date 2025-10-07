@@ -1,5 +1,7 @@
 //#include "gamestate_equipped_weapon.h"
 //#include "gamestate_inventory.h"
+#include "ComponentTraits.h"
+#include "entityid.h"
 #include "libdraw_draw_inventory_menu.h"
 #include "libgame_defines.h"
 #include "spritegroup.h"
@@ -79,13 +81,14 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                             //DrawTexturePro(*(sprite->texture), (Rectangle){12, 12, 8, 8}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
                             DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
 
-                            //size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
-                            //if (index >= 0 && index < unpacked_inventory->size()) {
-                            //entityid selection_id = unpacked_inventory->at(index);
-                            //if (selection_id == current_weapon_id) {
-                            //    DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
-                            //}
-                            //}
+                            size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+                            if (index >= 0 && index < unpacked_inventory->size()) {
+                                entityid selection_id = unpacked_inventory->at(index);
+                                entityid cur_wpn_id = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
+                                if (selection_id == cur_wpn_id && cur_wpn_id != ENTITYID_INVALID) {
+                                    DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
+                                }
+                            }
                         }
                         it++;
                     }
