@@ -69,6 +69,7 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
 
             auto it = unpacked_inventory->begin();
 
+            // for each location in the grid...
             for (int j = 0; j < rows; j++) {
                 for (int i = 0; i < cols; i++) {
                     Rectangle grid_box = {x, y, w, h};
@@ -78,10 +79,11 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                         spritegroup_t* sg = spritegroups2[*it];
                         if (sg) {
                             auto sprite = sg_get_current(sg);
-                            //DrawTexturePro(*(sprite->texture), (Rectangle){12, 12, 8, 8}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
                             DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
 
-                            size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+                            //size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+                            size_t index = j * cols + i;
+
                             if (index >= 0 && index < unpacked_inventory->size()) {
                                 entityid selection_id = unpacked_inventory->at(index);
                                 entityid cur_wpn_id = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
@@ -120,6 +122,3 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
         }
     }
 }
-//}
-//}
-//}
