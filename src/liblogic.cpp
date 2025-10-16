@@ -578,8 +578,8 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
              sizeof(g->debugpanel.buffer),
              "@evildojo666\n"
              "project.rpg\n"
-             "%s\n" // timebeganbuf
-             "%s\n" // currenttimebuf
+             //"%s\n" // timebeganbuf
+             //"%s\n" // currenttimebuf
              "Frame : %d\n"
              "Update: %d\n"
              "Mouse: %.01f, %.01f\n"
@@ -594,9 +594,10 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
              "Flag: %d\n"
              "Turn: %d\n"
              "Hero: (%d,%d,%d)\n"
+             "Weapon: %d\n"
              "Inventory: %d\n",
-             g->timebeganbuf,
-             g->currenttimebuf,
+             //g->timebeganbuf,
+             //g->currenttimebuf,
              g->framecount,
              g->frame_updates,
              is->mouse_position.x,
@@ -618,6 +619,7 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
              loc.x,
              loc.y,
              loc.z,
+             g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID),
              inventory_count);
 }
 

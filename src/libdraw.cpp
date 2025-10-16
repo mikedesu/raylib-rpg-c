@@ -862,7 +862,7 @@ void draw_debug_panel(shared_ptr<gamestate> g) {
     int h = fontsize * 30; // Assuming single line text for now
     int x = DEFAULT_TARGET_WIDTH - w;
     int y = fontsize * 2;
-    DrawRectangle(x - 10 - 20, y - 10, w + 20, h + 20, bg);
+    //DrawRectangle(x - 10 - 20, y - 10, w + 20, h + 20, bg);
     DrawText(g->debugpanel.buffer, x - 20, y, fontsize, fg);
 }
 
