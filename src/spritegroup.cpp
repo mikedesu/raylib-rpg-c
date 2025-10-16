@@ -1,6 +1,7 @@
 #include "libgame_defines.h"
 #include "massert.h"
 #include "mprint.h"
+#include "sprite.h"
 #include "spritegroup.h"
 #include <cstdlib>
 
@@ -57,7 +58,7 @@ void spritegroup_add(spritegroup_t* sg, shared_ptr<sprite> s) {
 
 
 // each sprite has a 'context' that corresponds to different directions
-void spritegroup_setcontexts(spritegroup_t* const sg, int context) {
+void spritegroup_setcontexts(spritegroup_t* sg, int context) {
     massert(sg, "spritegroup is NULL");
     for (int i = 0; i < sg->size; i++) {
         if (!sg->sprites2->at(i)) continue;
@@ -68,7 +69,7 @@ void spritegroup_setcontexts(spritegroup_t* const sg, int context) {
     }
 }
 
-shared_ptr<sprite> spritegroup_get(spritegroup_t* const sg, int index) {
+shared_ptr<sprite> spritegroup_get(spritegroup_t* sg, int index) {
     massert(sg, "spritegroup is NULL");
     massert(index >= 0, "index is negative");
     massert(index < sg->size, "index is out of bounds");
@@ -76,7 +77,7 @@ shared_ptr<sprite> spritegroup_get(spritegroup_t* const sg, int index) {
 }
 
 
-shared_ptr<sprite> sg_get_current(spritegroup_t* const sg) {
+shared_ptr<sprite> sg_get_current(spritegroup_t* sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->current >= 0, "current is negative");
     massert(sg->current < sg->size, "current is out of bounds");
@@ -84,7 +85,7 @@ shared_ptr<sprite> sg_get_current(spritegroup_t* const sg) {
 }
 
 
-shared_ptr<sprite> sg_get_current_plus_one(spritegroup_t* const sg) {
+shared_ptr<sprite> sg_get_current_plus_one(spritegroup_t* sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->current >= 0, "current is negative");
     if (sg->current + 1 >= sg->size) return NULL;
@@ -92,7 +93,7 @@ shared_ptr<sprite> sg_get_current_plus_one(spritegroup_t* const sg) {
 }
 
 
-bool spritegroup_set_current(spritegroup_t* const sg, int index) {
+bool spritegroup_set_current(spritegroup_t* sg, int index) {
     massert(sg, "spritegroup is NULL");
     massert(index >= 0, "index is negative: %d, %d", index, sg->size);
     massert(index < sg->size, "index is out of bounds for id %d: %d, %d", sg->id, index, sg->size);
@@ -101,7 +102,7 @@ bool spritegroup_set_current(spritegroup_t* const sg, int index) {
 }
 
 
-int spritegroup_get_first_context(spritegroup_t* const sg) {
+int spritegroup_get_first_context(spritegroup_t* sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->size > 0, "spritegroup is empty");
     massert(sg->sprites2->at(0), "sprite is NULL");
@@ -109,7 +110,7 @@ int spritegroup_get_first_context(spritegroup_t* const sg) {
 }
 
 
-void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop) {
+void spritegroup_set_stop_on_last_frame(spritegroup_t* sg, bool do_stop) {
     massert(sg, "spritegroup is NULL");
     // get the current sprite
     shared_ptr<sprite> s = spritegroup_get(sg, sg->current);
@@ -129,7 +130,7 @@ void spritegroup_set_stop_on_last_frame(spritegroup_t* const sg, bool do_stop) {
 }
 
 
-bool spritegroup_is_animating(spritegroup_t* const sg) {
+bool spritegroup_is_animating(spritegroup_t* sg) {
     if (!sg) {
         merror("spritegroup is NULL");
         return false;
@@ -143,7 +144,7 @@ bool spritegroup_is_animating(spritegroup_t* const sg) {
 }
 
 
-bool spritegroup_snap_dest(spritegroup_t* const sg, int x, int y) {
+bool spritegroup_snap_dest(spritegroup_t* sg, int x, int y) {
     massert(sg, "spritegroup is NULL");
     bool retval = false;
     if (sg->move.x == 0 && sg->move.y == 0) {
@@ -155,7 +156,7 @@ bool spritegroup_snap_dest(spritegroup_t* const sg, int x, int y) {
 }
 
 
-bool spritegroup_update_dest(spritegroup_t* const sg) {
+bool spritegroup_update_dest(spritegroup_t* sg) {
     massert(sg, "spritegroup is NULL");
     bool retval = false;
     if (sg->move.x > 0) {
@@ -180,7 +181,14 @@ bool spritegroup_update_dest(spritegroup_t* const sg) {
 }
 
 
-void sg_set_default_anim(spritegroup_t* const sg, int anim) {
+void sg_set_default_anim(spritegroup_t* sg, int anim) {
     massert(sg, "spritegroup is NULL");
     sg->default_anim = anim;
 }
+
+
+//void sg_incr_frame(spritegroup_t* sg, int index) {
+//    if (index >= 0 && index < sg->sprites2->size()) {
+//        sprite_incrframe2(sg->sprites2->at(index));
+//    }
+//}

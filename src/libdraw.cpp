@@ -1,5 +1,7 @@
 #include "libdraw.h"
 
+#include "ComponentTraits.h"
+#include "entityid.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 
@@ -128,20 +130,26 @@ shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id,
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
 
-    //entityid weapon = g_get_equipped_weapon(g, id);
-    //if (weapon == ENTITYID_INVALID) return NULL;
-    //if (spritegroups2.find(weapon) == spritegroups2.end()) {
-    //    return nullptr;
-    //}
-    //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    //spritegroup_t* w_sg = spritegroups2[weapon];
-    //if (!w_sg) {
-    //    return nullptr;
-    //}
     shared_ptr<sprite> retval = nullptr;
-    //if (sg->current == SG_ANIM_NPC_ATTACK) {
-    //    retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
-    //}
+    entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
+    if (weapon == ENTITYID_INVALID) {
+        return retval;
+    }
+
+    auto it = spritegroups2.find(weapon);
+
+    if (it == spritegroups2.end()) {
+        return retval;
+    }
+
+    spritegroup_t* w_sg = it->second;
+    if (!w_sg) {
+        return retval;
+    }
+
+    if (sg->current == SG_ANIM_NPC_ATTACK) {
+        retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
+    }
     //else if (sg->current == SG_ANIM_NPC_SHOT) {
     //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_F);
     //}
@@ -334,7 +342,7 @@ void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
     // Draw components in correct order
     //draw_shadow_for_entity(g, sg, id);
     //draw_shield_sprite_back(g, id, sg);
-    draw_weapon_sprite_back(g, id, sg);
+    //draw_weapon_sprite_back(g, id, sg);
     draw_entity_sprite(g, sg);
     //draw_shield_sprite_front(g, id, sg);
     draw_weapon_sprite_front(g, id, sg);
@@ -492,16 +500,19 @@ void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
-    //entityid weaponid = g_get_equipped_weapon(g, id);
-    //if (weaponid == ENTITYID_INVALID) return;
-    //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weaponid);
-    //spritegroup_t* w_sg = spritegroups2[weaponid];
-    //if (!w_sg) {
-    //    return;
-    //}
-    //int ctx = sg->sprites2->at(sg->current)->currentcontext;
-    //spritegroup_setcontexts(w_sg, ctx);
-    //spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
+
+    spritegroup_t* w_sg = nullptr;
+    entityid weaponid = ENTITYID_INVALID;
+    int ctx = -1;
+
+    weaponid = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
+    if (weaponid == ENTITYID_INVALID) return;
+    w_sg = spritegroups2[weaponid];
+    if (!w_sg) return;
+
+    ctx = sg->sprites2->at(sg->current)->currentcontext;
+    spritegroup_setcontexts(w_sg, ctx);
+    spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
 }
 
 
@@ -770,16 +781,21 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
             //for (int i = 0; i < num_spritegroups; i++) {
             //spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
             if (sg) {
-                shared_ptr<sprite> s = sg_get_current(sg);
-                massert(s, "sprite is NULL");
-                g->frame_dirty = true;
+                //for (int i = 0; i < sg->sprites2->size(); i++) {
+                //shared_ptr<sprite> s = sg_get_current(sg);
+                shared_ptr<sprite> s = sg->sprites2->at(sg->current);
+
                 if (s) {
                     sprite_incrframe2(s);
+                    g->frame_dirty = true;
                     if (s->num_loops >= 1) {
                         sg->current = sg->default_anim;
                         s->num_loops = 0;
                     }
                 }
+                //}
+
+
                 //if (s_shadow) {
                 //    sprite_incrframe(s_shadow);
                 //    if (s_shadow->num_loops >= 1) {

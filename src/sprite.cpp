@@ -52,6 +52,11 @@ void sprite_incrframe2(shared_ptr<sprite> s) {
     if (s->currentframe == 0) {
         s->num_loops++;
     }
+
+    //if (s->num_loops >= 1) {
+    //    sg->current = sg->default_anim;
+    //    s->num_loops = 0;
+    //}
 }
 
 

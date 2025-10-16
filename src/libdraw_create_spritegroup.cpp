@@ -55,9 +55,12 @@ bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num
         return false;
     }
     group->current = 0;
+
     group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
+
     group->off_x = offset_x;
     group->off_y = offset_y;
+
     //hashtable_entityid_spritegroup_insert(spritegroups, id, group);
     // how its done in the future...
     spritegroups2[id] = group;
