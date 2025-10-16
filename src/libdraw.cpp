@@ -2,6 +2,7 @@
 
 #include "ComponentTraits.h"
 #include "entityid.h"
+#include "entitytype.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 
@@ -129,23 +130,13 @@ shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id,
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-
     shared_ptr<sprite> retval = nullptr;
     entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
-    if (weapon == ENTITYID_INVALID) {
-        return retval;
-    }
-
+    if (weapon == ENTITYID_INVALID) return retval;
     auto it = spritegroups2.find(weapon);
-
-    if (it == spritegroups2.end()) {
-        return retval;
-    }
-
+    if (it == spritegroups2.end()) return retval;
     spritegroup_t* w_sg = it->second;
-    if (!w_sg) {
-        return retval;
-    }
+    if (!w_sg) return retval;
 
     if (sg->current == SG_ANIM_NPC_ATTACK) {
         retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
@@ -161,26 +152,23 @@ shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, 
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-    //entityid weapon = g_get_equipped_weapon(g, id);
-    //if (weapon == ENTITYID_INVALID) {
-    //    return nullptr;
-    //}
-    //if (spritegroups2.find(weapon) == spritegroups2.end()) {
-    //    return nullptr;
-    //}
-    //spritegroup_t* w_sg = hashtable_entityid_spritegroup_get(spritegroups, weapon);
-    //spritegroup_t* w_sg = spritegroups2[weapon];
-    //if (!w_sg) {
-    //    return nullptr;
-    //}
+
     shared_ptr<sprite> retval = nullptr;
-    //if (sg->current == SG_ANIM_NPC_ATTACK) {
-    //retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    //    retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    //}
+    entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
+    if (weapon == ENTITYID_INVALID) return retval;
+    auto it = spritegroups2.find(weapon);
+    if (it == spritegroups2.end()) return retval;
+    spritegroup_t* w_sg = it->second;
+    if (!w_sg) return retval;
+
+    if (sg->current == SG_ANIM_NPC_ATTACK) {
+        retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
+    }
     //else if (sg->current == SG_ANIM_NPC_SHOT) {
     //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_B);
     //}
+
+
     return retval;
 }
 
@@ -342,7 +330,7 @@ void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
     // Draw components in correct order
     //draw_shadow_for_entity(g, sg, id);
     //draw_shield_sprite_back(g, id, sg);
-    //draw_weapon_sprite_back(g, id, sg);
+    draw_weapon_sprite_back(g, id, sg);
     draw_entity_sprite(g, sg);
     //draw_shield_sprite_front(g, id, sg);
     draw_weapon_sprite_front(g, id, sg);
@@ -775,39 +763,37 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
         libdraw_handle_dirty_entities(g);
         g->frame_dirty = true;
         for (entityid id = 0; id < g->next_entityid; id++) {
-            //spritegroup_t* sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
-            spritegroup_t* sg = spritegroups2[id];
-            //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
-            //for (int i = 0; i < num_spritegroups; i++) {
+            entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
             //spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+            spritegroup_t* sg = spritegroups2[id];
             if (sg) {
-                //for (int i = 0; i < sg->sprites2->size(); i++) {
-                //shared_ptr<sprite> s = sg_get_current(sg);
-                shared_ptr<sprite> s = sg->sprites2->at(sg->current);
+                int num_spritegroups = sg->sprites2->size();
+                for (int i = 0; i < num_spritegroups; i++) {
+                    shared_ptr<sprite> s = sg->sprites2->at(i);
 
-                if (s) {
-                    sprite_incrframe2(s);
-                    g->frame_dirty = true;
-                    if (s->num_loops >= 1) {
-                        sg->current = sg->default_anim;
-                        s->num_loops = 0;
+                    if (s) {
+                        sprite_incrframe2(s);
+                        g->frame_dirty = true;
+                        // this condition for the animation reset seems incorrect
+                        // certain cases are causing animations to drop-off mid-sequence
+                        if (s->num_loops >= 1) {
+                            sg->current = sg->default_anim;
+                            s->num_loops = 0;
+                        }
                     }
                 }
-                //}
-
-
-                //if (s_shadow) {
-                //    sprite_incrframe(s_shadow);
-                //    if (s_shadow->num_loops >= 1) {
-                //        sg->current = sg->default_anim;
-                //        s_shadow->num_loops = 0;
-                //    }
-                //}
             }
             //}
+            //if (s_shadow) {
+            //    sprite_incrframe(s_shadow);
+            //    if (s_shadow->num_loops >= 1) {
+            //        sg->current = sg->default_anim;
+            //        s_shadow->num_loops = 0;
+            //    }
+            //}
         }
-        libdraw_handle_gamestate_flag(g);
     }
+    libdraw_handle_gamestate_flag(g);
 }
 
 
