@@ -81,9 +81,12 @@ void handle_npc(shared_ptr<gamestate> g, entityid id) {
     }
     if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC) {
         //minfo("Handling NPC %d", id);
-        //race_t race = g_get_race(g, id);
-        //minfo("NPC %d race: %s", id, race2str(race).c_str());
-        try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+        if (g->ct.get<dead>(id).has_value()) {
+            bool is_dead = g->ct.get<dead>(id).value();
+            if (!is_dead) {
+                try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+            }
+        }
         //execute_action(g, id, g_get_default_action(g, id));
     }
 }
@@ -691,7 +694,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     const int max_x = 16;
     int y = 5;
     const int max_y = 16;
-    const int num = 4;
+    const int num = 25;
     for (int i = 0; i < num; i++) {
         create_npc_set_stats(g, (vec3){x, y, 0}, RACE_ORC);
         x++;
