@@ -3,6 +3,7 @@
 #include "ComponentTraits.h"
 #include "entityid.h"
 #include "entitytype.h"
+#include "race.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 
@@ -440,49 +441,53 @@ bool camera_lock_on(shared_ptr<gamestate> g) {
 //    return true;
 //}
 
-/*
- void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g,
-                                      entityid id,
-                                      spritegroup_t* const sg) {
+void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
-    race_t race = g_get_race(g, id);
-    int anim_index = race == RACE_BAT           ? SG_ANIM_BAT_DMG
-                     : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_DMG
-                                                : SG_ANIM_NPC_DMG;
-    //if (race == RACE_BAT)
-    //    anim_index = SG_ANIM_BAT_DMG;
-    //else if (race == RACE_GREEN_SLIME)
-    //    anim_index = SG_ANIM_SLIME_DMG;
+    race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
+    int anim_index = SG_ANIM_NPC_DMG;
+    if (r == RACE_GREEN_SLIME) {
+        anim_index = SG_ANIM_SLIME_DMG;
+    }
     spritegroup_set_current(sg, anim_index);
-    g_set_damaged(g, id, false);
+    g->ct.set<damaged>(id, true);
 }
-*/
 
-/*
- void libdraw_set_sg_is_dead(shared_ptr<gamestate> g,
-                                   entityid id,
-                                   spritegroup_t* const sg) {
+
+void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
-    if (!g_is_dead(g, id)) return;
-    race_t race = g_get_race(g, id);
+    if (!g->ct.get<dead>(id).has_value()) {
+        return;
+    }
+    if (!g->ct.get<dead>(id).value()) {
+        return;
+    }
+
+    race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
+    if (r == RACE_NONE) {
+        return;
+    }
+
     int anim_index = SG_ANIM_NPC_SPINDIE;
-    if (race == RACE_BAT) {
+
+    if (r == RACE_BAT) {
         anim_index = SG_ANIM_BAT_DIE;
-    } else if (race == RACE_GREEN_SLIME) {
+    } else if (r == RACE_GREEN_SLIME) {
         anim_index = SG_ANIM_SLIME_DIE;
     }
+
     if (sg->current == anim_index) {
         return;
     }
+
     sg_set_default_anim(sg, anim_index);
     spritegroup_set_current(sg, sg->default_anim);
     spritegroup_set_stop_on_last_frame(sg, true);
 }
-*/
+
 
 void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
@@ -662,22 +667,29 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     }
     //else if (g_get_block_success(g, id)) {
     //    libdraw_set_sg_block_success(g, id, sg);
-    //} else if (g_get_damaged(g, id)) {
-    //    libdraw_set_sg_is_damaged(g, id, sg);
-    //} else if (g_is_dead(g, id)) {
-    //    libdraw_set_sg_is_dead(g, id, sg);
-    //}
+    //} else
+
+    if (g->ct.get<dead>(id).has_value()) {
+        bool is_dead = g->ct.get<dead>(id).value();
+        if (is_dead) {
+            libdraw_set_sg_is_dead(g, id, sg);
+        }
+    } else if (g->ct.get<damaged>(id).has_value()) {
+        bool is_damaged = g->ct.get<damaged>(id).value();
+        if (is_damaged) {
+            libdraw_set_sg_is_damaged(g, id, sg);
+        }
+    }
+
+
     // Update movement as long as sg->move.x/y is non-zero
     if (spritegroup_update_dest(sg)) {
         g->frame_dirty = true;
     }
     // Snap to the tile position only when movement is fully complete
     //vec3 loc = g_get_loc(g, id);
-
     //massert(g->ct.has<Location>(id), "id %d lacks location component", id);
-
     vec3 loc = g->ct.get<location>(id).value();
-
     spritegroup_snap_dest(sg, loc.x, loc.y);
     minfo2("End update sprite ptr: %d", id);
 }
