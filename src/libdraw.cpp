@@ -500,6 +500,13 @@ void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_
 
     ctx = sg->sprites2->at(sg->current)->currentcontext;
     spritegroup_setcontexts(w_sg, ctx);
+
+    // this really should be either SLASH_F or SLASH_B
+    // eventually we will select this based on other factors as well
+    // or rather we'll have a better way to select which animation joins the entity's attack
+    // lets test this theory by changing it to the B anim
+
+    //spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
     spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
 }
 
@@ -774,11 +781,10 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
             spritegroup_t* sg = spritegroups2[id];
             if (sg) {
                 // for every sprite in the spritegroup (INCORRECT!!!! NOT WHAT WE WANT, CAUSE-OF-BUG!!!)
-                int num_sprites = sg->sprites2->size();
+                //int num_sprites = sg->sprites2->size();
                 //for (int i = 0; i < num_sprites; i++) {
                 //shared_ptr<sprite> s = sg->sprites2->at(i);
                 shared_ptr<sprite> s = sg->sprites2->at(sg->current);
-
                 if (s) {
                     sprite_incrframe2(s);
                     g->frame_dirty = true;
@@ -788,7 +794,29 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
                         sg->current = sg->default_anim;
                         s->num_loops = 0;
                     }
+
+                    // lets try something
+                    if (type == ENTITY_ITEM) {
+                        itemtype_t itype = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
+                        if (itype == ITEM_WEAPON) {
+                            if (sg->current > 0) {
+                                shared_ptr<sprite> s2 = sg->sprites2->at(sg->current + 1);
+                                if (s2) {
+                                    sprite_incrframe2(s2);
+                                    g->frame_dirty = true;
+                                    // this condition for the animation reset seems incorrect
+                                    // certain cases are causing animations to drop-off mid-sequence
+                                    if (s2->num_loops >= 1) {
+                                        sg->current = sg->default_anim;
+                                        s2->num_loops = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
+
+
                 //}
             }
             //}
@@ -872,7 +900,7 @@ void draw_debug_panel(shared_ptr<gamestate> g) {
     int h = fontsize * 30; // Assuming single line text for now
     int x = DEFAULT_TARGET_WIDTH - w;
     int y = fontsize * 2;
-    //DrawRectangle(x - 10 - 20, y - 10, w + 20, h + 20, bg);
+    DrawRectangle(x - 10 - 20, y - 10, w + 20, h + 20, bg);
     DrawText(g->debugpanel.buffer, x - 20, y, fontsize, fg);
 }
 

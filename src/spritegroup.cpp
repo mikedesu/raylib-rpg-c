@@ -98,6 +98,12 @@ bool spritegroup_set_current(spritegroup_t* sg, int index) {
     massert(index >= 0, "index is negative: %d, %d", index, sg->size);
     massert(index < sg->size, "index is out of bounds for id %d: %d, %d", sg->id, index, sg->size);
     sg->current = index;
+
+    // lets update the sprite's current frame to 0
+    // since we prob want to start an animation at the beginning
+    // if we are changing current
+    sg->sprites2->at(sg->current)->currentframe = 0;
+
     return true;
 }
 
