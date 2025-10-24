@@ -762,26 +762,34 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
     if (g->framecount % ANIM_SPEED == 0) {
         libdraw_handle_dirty_entities(g);
         g->frame_dirty = true;
+
+
+        // For every entity...
         for (entityid id = 0; id < g->next_entityid; id++) {
+            // verify it has an entity type
             entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
             //spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+
+            // grab the sprite group for that entity
             spritegroup_t* sg = spritegroups2[id];
             if (sg) {
-                int num_spritegroups = sg->sprites2->size();
-                for (int i = 0; i < num_spritegroups; i++) {
-                    shared_ptr<sprite> s = sg->sprites2->at(i);
+                // for every sprite in the spritegroup (INCORRECT!!!! NOT WHAT WE WANT, CAUSE-OF-BUG!!!)
+                int num_sprites = sg->sprites2->size();
+                //for (int i = 0; i < num_sprites; i++) {
+                //shared_ptr<sprite> s = sg->sprites2->at(i);
+                shared_ptr<sprite> s = sg->sprites2->at(sg->current);
 
-                    if (s) {
-                        sprite_incrframe2(s);
-                        g->frame_dirty = true;
-                        // this condition for the animation reset seems incorrect
-                        // certain cases are causing animations to drop-off mid-sequence
-                        if (s->num_loops >= 1) {
-                            sg->current = sg->default_anim;
-                            s->num_loops = 0;
-                        }
+                if (s) {
+                    sprite_incrframe2(s);
+                    g->frame_dirty = true;
+                    // this condition for the animation reset seems incorrect
+                    // certain cases are causing animations to drop-off mid-sequence
+                    if (s->num_loops >= 1) {
+                        sg->current = sg->default_anim;
+                        s->num_loops = 0;
                     }
                 }
+                //}
             }
             //}
             //if (s_shadow) {
