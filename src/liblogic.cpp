@@ -57,6 +57,8 @@ entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type);
 entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
 void handle_npc(shared_ptr<gamestate> g, entityid id);
 
+void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
+
 
 void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
     massert(g, "Game state is NULL!");
@@ -806,8 +808,6 @@ void liblogic_close(shared_ptr<gamestate> g) {
 //static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
 //static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id);
 
-void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
-
 
 void cycle_messages(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -1017,7 +1017,8 @@ bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
     //int str_bonus = 0;
     //int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
     //int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
-    *attack_successful = false;
+    //*attack_successful = false;
+    *attack_successful = true;
     //if (attack_roll >= base_ac) {
     //    return handle_shield_check(g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
     //}
@@ -1037,6 +1038,7 @@ void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, enti
         handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
     }
 }
+
 
 void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
