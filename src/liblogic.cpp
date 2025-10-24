@@ -463,11 +463,40 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
                 try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-                //            g_set_attacking(g, g->hero_id, true);
-                g->ct.set<attacking>(g->hero_id, true);
-                //            g_set_update(g, g->hero_id, true);
-                g->ct.set<update>(g->hero_id, true);
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                //g->ct.set<attacking>(g->hero_id, true);
+                //g->ct.set<update>(g->hero_id, true);
+
+
+                if (g->ct.get<location>(g->hero_id).has_value() && g->ct.get<direction>(g->hero_id).has_value()) {
+                    vec3 loc = g->ct.get<location>(g->hero_id).value();
+                    direction_t dir = g->ct.get<direction>(g->hero_id).value();
+                    if (dir == DIR_UP) {
+                        loc.y -= 1;
+                    } else if (dir == DIR_DOWN) {
+                        loc.y += 1;
+                    } else if (dir == DIR_LEFT) {
+                        loc.x -= 1;
+                    } else if (dir == DIR_RIGHT) {
+                        loc.x += 1;
+                    } else if (dir == DIR_UP_LEFT) {
+                        loc.x -= 1;
+                        loc.y -= 1;
+                    } else if (dir == DIR_UP_RIGHT) {
+                        loc.x += 1;
+                        loc.y -= 1;
+                    } else if (dir == DIR_DOWN_LEFT) {
+                        loc.x -= 1;
+                        loc.y += 1;
+                    } else if (dir == DIR_DOWN_RIGHT) {
+                        loc.x += 1;
+                        loc.y += 1;
+                    }
+
+                    try_entity_attack(g, g->hero_id, loc.x, loc.y);
+
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                }
+
                 //} else if (inputstate_is_pressed(is, KEY_SEMICOLON)) {
             } else if (inputstate_is_pressed(is, KEY_SLASH)) {
                 //add_message(g, "pickup item (unimplemented)");
@@ -834,11 +863,25 @@ void cycle_messages(shared_ptr<gamestate> g) {
 
 
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success) {
-    g->flag = success && type == ENTITY_PLAYER    ? GAMESTATE_FLAG_PLAYER_ANIM
-              : !success && type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM
-              : !success && type == ENTITY_NPC    ? GAMESTATE_FLAG_NPC_ANIM
-              : !success                          ? GAMESTATE_FLAG_NONE
-                                                  : g->flag;
+    //g->flag = success && type == ENTITY_PLAYER    ? GAMESTATE_FLAG_PLAYER_ANIM
+    //          : !success && type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM
+    //          : !success && type == ENTITY_NPC    ? GAMESTATE_FLAG_NPC_ANIM
+    //          : !success                          ? GAMESTATE_FLAG_NONE
+    //                                              : g->flag;
+    if (success) {
+        if (type == ENTITY_PLAYER) {
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        }
+    } else {
+        if (type == ENTITY_PLAYER) {
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        } else if (type == ENTITY_NPC) {
+            g->flag = GAMESTATE_FLAG_NPC_ANIM;
+        } else {
+            // this should NEVER happen!
+            g->flag = GAMESTATE_FLAG_NONE;
+        }
+    }
 }
 
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
@@ -848,6 +891,7 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
     massert(atk_successful, "attack_successful is NULL");
     entitytype_t tgttype = g->ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
     if (*atk_successful) {
+        msuccess("Attack was SUCCESSFUL!");
         //entityid attacker_weapon_id = g_get_equipment(g, atk_id, EQUIP_SLOT_WEAPON);
         //entityid attacker_weapon_id = g_get_equipped_weapon(g, atk_id);
         int dmg = 1;
@@ -924,8 +968,9 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             //g_update_dead(g, tgt_id, false);
             g->ct.set<dead>(tgt_id, false);
         }
+    } else {
+        merror("Attack MISSED");
     }
-    //else {
     // handle attack miss
     //if (tgttype == ENTITY_PLAYER)
     //add_message_history(
@@ -1043,6 +1088,9 @@ void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, enti
 void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
     massert(!g->ct.get<dead>(atk_id).value_or(false), "attacker entity is dead");
+
+    minfo("Trying to attack...");
+
     vec3 loc = g->ct.get<location>(atk_id).value();
     shared_ptr<dungeon_floor_t> floor = d_get_floor(g->dungeon, loc.z);
     massert(floor, "failed to get dungeon floor");
