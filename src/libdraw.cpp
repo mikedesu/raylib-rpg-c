@@ -960,6 +960,7 @@ void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //} else {
     //draw_hud_from_texture(g);
     //}
+
     draw_hud(g);
 
     draw_message_history(g);
@@ -1071,7 +1072,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     } else if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_drawframe_2d_from_texture(g);
     }
-    DrawFPS(0, DEFAULT_TARGET_HEIGHT - 20);
+    //DrawFPS(0, DEFAULT_TARGET_HEIGHT - 20);
     //handle_debug_panel(g);
     EndTextureMode();
     // draw the target texture to the window
@@ -1264,6 +1265,8 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     massert(w > 0 && h > 0, "window width or height is not set properly");
     g->windowwidth = w;
     g->windowheight = h;
+    g->targetwidth = target_w;
+    g->targetheight = target_h;
     TextureFilter filter = TEXTURE_FILTER_POINT; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_BILINEAR; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_TRILINEAR; // Use trilinear filtering for better quality
@@ -1345,7 +1348,11 @@ void libdraw_init(shared_ptr<gamestate> g) {
     char full_title[1024] = {0};
     snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version.c_str());
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
+
     InitWindow(w, h, full_title);
+    g->windowwidth = w;
+    g->windowheight = h;
+
     SetWindowMinSize(320, 240);
     libdraw_init_rest(g);
 }
