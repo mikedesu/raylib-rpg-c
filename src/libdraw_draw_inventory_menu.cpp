@@ -88,7 +88,8 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                                 entityid selection_id = unpacked_inventory->at(index);
                                 entityid cur_wpn_id = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
                                 if (selection_id == cur_wpn_id && cur_wpn_id != ENTITYID_INVALID) {
-                                    DrawText("weapon", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
+                                    //DrawText("weapon", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
+                                    DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
                                 }
                             }
                         }
