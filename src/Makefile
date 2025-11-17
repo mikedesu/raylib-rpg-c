@@ -32,6 +32,8 @@ WEB_SOURCES=main.cpp \
 			liblogic_tile_has_box.cpp \
 			liblogic_try_entity_move.cpp \
 			liblogic_create_weapon.cpp \
+			liblogic_create_player.cpp \
+			liblogic_create_npc.cpp \
 			liblogic.cpp \
 			gamestate_inventory.cpp \
 			gamestate.cpp \
@@ -87,6 +89,8 @@ OBJ_FILES=main.o \
 		  liblogic_tile_has_box.o \
 		  liblogic_try_entity_move.o \
 		  liblogic_create_weapon.o \
+		  liblogic_create_player.o \
+		  liblogic_create_npc.o \
 		  liblogic.o \
 
 
@@ -192,6 +196,10 @@ liblogic_tile_has_box.o: liblogic_tile_has_box.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_create_weapon.o: liblogic_create_weapon.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+liblogic_create_player.o: liblogic_create_player.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+liblogic_create_npc.o: liblogic_create_npc.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic.o: liblogic.cpp

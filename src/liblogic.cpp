@@ -14,6 +14,8 @@
 #include "libgame_defines.h"
 #include "liblogic.h"
 #include "liblogic_add_message.h"
+#include "liblogic_create_npc.h"
+#include "liblogic_create_player.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_drop_item.h"
 #include "liblogic_try_entity_move.h"
@@ -52,8 +54,7 @@ void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_npc(shared_ptr<gamestate> g, entityid id);
 void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
 
-entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name);
-entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
+//entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
 entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
 
 
@@ -109,98 +110,69 @@ void init_dungeon(shared_ptr<gamestate> g) {
 }
 
 
-entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n) {
-    minfo("begin create npc");
-    massert(g, "gamestate is NULL");
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-    shared_ptr<tile_t> tile = df_tile_at(df, loc);
-    massert(tile, "failed to get tile");
-    if (!tile_is_walkable(tile->type)) {
-        merror("cannot create entity on non-walkable tile");
-        return ENTITYID_INVALID;
-    }
-    if (tile_has_live_npcs(g, tile)) {
-        merror("cannot create entity on tile with live NPCs");
-        return ENTITYID_INVALID;
-    }
-    entityid id = g_add_entity(g);
-
-    //g_add_name(g, id, name);
-    //g_add_type(g, id, ENTITY_NPC);
-
-    g->ct.set<name>(id, n);
-    g->ct.set<entitytype>(id, ENTITY_NPC);
-    g->ct.set<race>(id, rt);
-    g->ct.set<location>(id, loc);
-    g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
-    g->ct.set<dead>(id, false);
-    g->ct.set<update>(id, true);
-    g->ct.set<direction>(id, DIR_DOWN_RIGHT);
-    g->ct.set<attacking>(id, false);
-    g->ct.set<blocking>(id, false);
-    g->ct.set<blocksuccess>(id, false);
-    g->ct.set<damaged>(id, false);
-    g->ct.set<txalpha>(id, 0);
-
-    //shared_ptr<vector<entityid>> my_inventory = make_shared<vector<entityid>>();
-    //g->ct.set<inventory>(id, make_shared<unordered_set<entityid>>());
-    g->ct.set<inventory>(id, make_shared<vector<entityid>>());
-    g->ct.set<equipped_weapon>(id, ENTITYID_INVALID);
-
-    minfo("end create npc");
-    return df_add_at(df, id, loc.x, loc.y);
-
-    //g_add_zapping(g, id, false);
-    //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
-    //g_add_inventory(g, id);
-    //g_add_target(g, id, (vec3){-1, -1, -1});
-    //g_add_target_path(g, id);
-    //g_add_equipment(g, id);
-    //g_add_base_attack_damage(g, id, (vec3){1, 4, 0});
-    //g_add_vision_distance(g, id, 0);
-    //g_add_light_radius(g, id, 0);
-    //g_add_stats(g, id);
-    //g_set_stat(g, id, STATS_LEVEL, 1);
-    //g_set_stat(g, id, STATS_XP, 0);
-    //g_set_stat(g, id, STATS_NEXT_LEVEL_XP, calc_next_lvl_xp(g, id));
-    //g_set_stat(g, id, STATS_MAXHP, 1);
-    //g_set_stat(g, id, STATS_HP, 1);
-    //g_set_stat(g, id, STATS_HITDIE, 1);
-    //g_set_stat(g, id, STATS_STR, 10);
-    //g_set_stat(g, id, STATS_DEX, 10);
-    //g_set_stat(g, id, STATS_CON, 10);
-    //g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
-    //g_set_stat(g, id, STATS_AC, 10);
-}
-
-
-entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
-    massert(g, "gamestate is NULL");
-    massert(name != "", "name is empty string");
-    // use the previously-written liblogic_npc_create function
-    minfo("Creating player...");
-    race_t rt = g->chara_creation->race;
-    minfo("Race: %s", race2str(rt).c_str());
-
-    entityid id = create_npc(g, rt, loc, name);
-    massert(id != ENTITYID_INVALID, "failed to create player");
-    msuccess("create_npc successful, id: %d", id);
-
-    g_set_hero_id(g, id);
-
-    //g_add_type(g, id, ENTITY_PLAYER);
-    g->ct.set<entitytype>(id, ENTITY_PLAYER);
-
-    //g_set_tx_alpha(g, id, 0);
-    g->ct.set<txalpha>(id, 0);
-    //g_set_stat(g, id, STATS_LEVEL, 666);
-    //g_add_equipped_weapon(g, id, ENTITYID_INVALID);
-
-    minfo("Adding inventory to entity id %d", id);
-    //g_add_inventory(g, id);
-    msuccess("create_player successful, id: %d", id);
-    return id;
-}
+//entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n) {
+//    minfo("begin create npc");
+//    massert(g, "gamestate is NULL");
+//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+//    shared_ptr<tile_t> tile = df_tile_at(df, loc);
+//    massert(tile, "failed to get tile");
+//    if (!tile_is_walkable(tile->type)) {
+//        merror("cannot create entity on non-walkable tile");
+//        return ENTITYID_INVALID;
+//    }
+//    if (tile_has_live_npcs(g, tile)) {
+//        merror("cannot create entity on tile with live NPCs");
+//        return ENTITYID_INVALID;
+//    }
+//    entityid id = g_add_entity(g);
+//
+//    //g_add_name(g, id, name);
+//    //g_add_type(g, id, ENTITY_NPC);
+//
+//    g->ct.set<name>(id, n);
+//    g->ct.set<entitytype>(id, ENTITY_NPC);
+//    g->ct.set<race>(id, rt);
+//    g->ct.set<location>(id, loc);
+//    g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+//    g->ct.set<dead>(id, false);
+//    g->ct.set<update>(id, true);
+//    g->ct.set<direction>(id, DIR_DOWN_RIGHT);
+//    g->ct.set<attacking>(id, false);
+//    g->ct.set<blocking>(id, false);
+//    g->ct.set<blocksuccess>(id, false);
+//    g->ct.set<damaged>(id, false);
+//    g->ct.set<txalpha>(id, 0);
+//
+//    //shared_ptr<vector<entityid>> my_inventory = make_shared<vector<entityid>>();
+//    //g->ct.set<inventory>(id, make_shared<unordered_set<entityid>>());
+//    g->ct.set<inventory>(id, make_shared<vector<entityid>>());
+//    g->ct.set<equipped_weapon>(id, ENTITYID_INVALID);
+//
+//    minfo("end create npc");
+//    return df_add_at(df, id, loc.x, loc.y);
+//
+//    //g_add_zapping(g, id, false);
+//    //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
+//    //g_add_inventory(g, id);
+//    //g_add_target(g, id, (vec3){-1, -1, -1});
+//    //g_add_target_path(g, id);
+//    //g_add_equipment(g, id);
+//    //g_add_base_attack_damage(g, id, (vec3){1, 4, 0});
+//    //g_add_vision_distance(g, id, 0);
+//    //g_add_light_radius(g, id, 0);
+//    //g_add_stats(g, id);
+//    //g_set_stat(g, id, STATS_LEVEL, 1);
+//    //g_set_stat(g, id, STATS_XP, 0);
+//    //g_set_stat(g, id, STATS_NEXT_LEVEL_XP, calc_next_lvl_xp(g, id));
+//    //g_set_stat(g, id, STATS_MAXHP, 1);
+//    //g_set_stat(g, id, STATS_HP, 1);
+//    //g_set_stat(g, id, STATS_HITDIE, 1);
+//    //g_set_stat(g, id, STATS_STR, 10);
+//    //g_set_stat(g, id, STATS_DEX, 10);
+//    //g_set_stat(g, id, STATS_CON, 10);
+//    //g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
+//    //g_set_stat(g, id, STATS_AC, 10);
+//}
 
 
 void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
@@ -1496,86 +1468,6 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
     //    }
 }
 
-
-//static bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
-//    massert(g, "Game state is NULL!");
-//    massert(id != ENTITYID_INVALID, "Entity is NULL!");
-//    g_set_update(g, id, true);
-//    // check if the player is on a tile with an item
-//    vec3 loc = g_get_loc(g, id);
-//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-//    if (!df) {
-//        merror("Failed to get dungeon floor");
-//        return false;
-//    }
-//    shared_ptr<tile_t> tile = df_tile_at(df, loc);
-//    if (!tile) {
-//        merror("Failed to get tile");
-//        return false;
-//    }
-//    if (tile->entities->size() == 0) {
-//        add_message(g, "No items on tile");
-//        return false;
-//    }
-//    for (size_t i = 0; i < tile->entities->size(); i++) {
-//        entityid itemid = tile->entities->at(i);
-//        entitytype_t type = g_get_type(g, itemid);
-//        //    //minfo("Item %s type: %d", g_get_name(g, itemid), type);
-//        if (type == ENTITY_ITEM) {
-//            // now, we need to check what type of item it is
-//            itemtype itype = g_get_item_type(g, itemid);
-//            if (itype == ITEM_WEAPON) {
-//                // if it is a weapon, we will "pick it up" and equip it
-//                // if we have no weapon equipped, the weapon will
-//                // simply come off the tile and be attached to the
-//                // equipped weapon slot
-//                //
-//                // if we have a weapon equipped, for right now, we will
-//                // swap the equipped weapon with the weapon on the tile,
-//                // that is, the weapon on the tile will be removed,
-//                // the equipped weapon will be detached and added to the tile,
-//                // and we will equip the new weapon
-//
-//                entityid equipped_wpn_id = g_get_equipped_weapon(g, id);
-//                if (equipped_wpn_id == ENTITYID_INVALID) {
-//                    tile_remove(tile, itemid);
-//                    g_set_equipped_weapon(g, id, itemid);
-//                    add_message(g, "Equipped itemid %d", itemid);
-//                } else {
-//                    tile_remove(tile, itemid);
-//                    g_update_loc(g, equipped_wpn_id, (vec3){-1, -1, -1});
-//                    g_set_equipped_weapon(g, id, itemid);
-//                    add_message(g, "Equipped itemid %d", itemid);
-//
-//                    // update the loc of the equipped_wpn_id
-//                    g_update_loc(g, equipped_wpn_id, loc);
-//                    tile_add(tile, equipped_wpn_id);
-//                    add_message(g, "Added equipped_wpn_id %d", equipped_wpn_id);
-//                }
-//                if (g_get_type(g, id) == ENTITY_PLAYER) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-//                break;
-//            }
-//        }
-//        add_message_history(g,
-//                            "%s picked up a %s",
-//                            g_get_name(g, id).c_str(),
-//                            g_get_name(g, itemid).c_str());
-//        bool result = g_add_to_inventory(g, id, itemid);
-//        if (!result) {
-//            merror("Failed to add item to inventory");
-//            return false;
-//        } else {
-//            //minfo("Item %s added to inventory", g_get_name(g, itemid));
-//            tile_remove(tile, itemid);
-//        }
-//        if (g_is_type(g, id, ENTITY_PLAYER)) {
-//            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-//        }
-//        return true;
-//    }
-//    //add_message(g, "No items to pick up");
-//    return false;
-//}
 
 void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
