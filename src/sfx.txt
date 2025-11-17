@@ -1,0 +1,6 @@
+confirm_10.wav
+equip_01.wav
+get_hit.wav
+hit_wet.wav
+coins.wav
+bag_open.wav

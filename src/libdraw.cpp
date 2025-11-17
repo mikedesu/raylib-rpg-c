@@ -65,6 +65,7 @@ void draw_hud_from_texture(shared_ptr<gamestate> g);
 void draw_hud_to_texture(shared_ptr<gamestate> g);
 
 void libdraw_load_music(shared_ptr<gamestate> g);
+void libdraw_load_sfx(shared_ptr<gamestate> g);
 
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
@@ -1328,7 +1329,9 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     draw_title_screen_to_texture(g, false);
     draw_character_creation_screen_to_texture(g);
 
+    InitAudioDevice();
     libdraw_load_music(g);
+    libdraw_load_sfx(g);
 
     //if (!camera_lock_on(g)) merror("failed to lock camera on hero");
     //msuccess("libdraw_init_rest: done");
@@ -1336,18 +1339,33 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
 
 
 void libdraw_load_music(shared_ptr<gamestate> g) {
-    InitAudioDevice();
     // load the music stream from the selected path
-
     // randomly select a music path
     size_t index = GetRandomValue(0, g->music_file_paths->size());
     const char* music_path = g->music_file_paths->at(index).c_str();
-
     minfo("Music path: %s", music_path);
     music = LoadMusicStream(music_path);
     SetMasterVolume(1.0f);
     SetMusicVolume(music, 0.75f); // Set initial music volume
     PlayMusicStream(music);
+}
+
+
+void libdraw_load_sfx(shared_ptr<gamestate> g) {
+    FILE* infile = fopen("sfx.txt", "r");
+    char buffer[128];
+
+    while (fgets(buffer, sizeof(buffer), infile) != NULL) {
+        size_t len = strlen(buffer);
+        if (len > 0 && buffer[len - 1] == '\n') {
+            buffer[len - 1] = '\0';
+        }
+        string fullpath = "audio/sfx/" + string(buffer);
+        Sound sound = LoadSound(fullpath.c_str());
+        g->sfx->push_back(sound);
+    }
+
+    fclose(infile);
 }
 
 

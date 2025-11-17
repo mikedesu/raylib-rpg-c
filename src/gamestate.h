@@ -121,8 +121,10 @@ typedef struct gamestate {
     shared_ptr<vector<string>> msg_history;
     shared_ptr<character_creation> chara_creation;
 
-    //char music_file_paths[MAX_MUSIC_PATHS][MAX_MUSIC_PATH_LENGTH];
     shared_ptr<vector<string>> music_file_paths;
+
+    shared_ptr<vector<Sound>> sfx;
+
 
     string version;
 

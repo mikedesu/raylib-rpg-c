@@ -150,6 +150,8 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     gamestate_init_music_paths(g);
 
+    g->sfx = make_shared<vector<Sound>>();
+
     msuccess("Gamestate initialized successfully");
     return g;
 }
@@ -184,7 +186,6 @@ void gamestate_init_music_paths(shared_ptr<gamestate> g) {
 
         // need to pre-pend the folder path
         string fullpath = "audio/music/" + string(buffer);
-
         g->music_file_paths->push_back(fullpath);
     }
     fclose(file);
