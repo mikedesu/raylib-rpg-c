@@ -20,6 +20,7 @@
 #include "liblogic_handle_input_title_scene.h"
 #include "liblogic_handle_npc.h"
 #include "liblogic_init_dungeon.h"
+#include "liblogic_update_debug_panel_buffer.h"
 #include "massert.h"
 #include "weapon.h"
 #include <cassert>
@@ -44,16 +45,10 @@ using std::string;
 
 int liblogic_restart_count = 0;
 
-// these have been moved to external source files
-//void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-//void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
-//bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
-//void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
-void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
+void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 
-
-static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(g, "Game state is NULL!");
     massert(is, "Input state is NULL!");
     if (inputstate_is_pressed(is, KEY_B)) {
@@ -81,7 +76,7 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
 }
 
 
-static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "inputstate is NULL");
     massert(g, "gamestate is NULL");
     // no matter which mode we are in, we can toggle the debug panel
@@ -100,87 +95,6 @@ static void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     } else if (g->current_scene == SCENE_GAMEPLAY) {
         handle_input_gameplay_scene(g, is);
     }
-}
-
-
-void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    massert(g, "gamestate is NULL");
-    // Static buffers to avoid reallocating every frame
-    static const char* control_modes[] = {"Camera", "Player", "Unknown"};
-    // Get hero position once
-    //int x;
-    //int y;
-    //int z;
-    int inventory_count;
-    //direction_t player_dir;
-    //shield_dir;
-    //bool is_b, test_guard;
-    vec3 loc;
-    //x = -1;
-    //y = -1;
-    //z = -1;
-    inventory_count = -1;
-    //entityid shield_id = -1;
-    //player_dir = DIR_NONE;
-    //shield_dir = DIR_NONE;
-    //is_b = false;
-    //test_guard = g->test_guard;
-
-    if (g->hero_id != ENTITYID_INVALID) {
-        loc = g->ct.get<location>(g->hero_id).value();
-    }
-    // Determine control mode and flag strings
-    const char* control_mode = control_modes[(g->controlmode >= 0 && g->controlmode < 2) ? g->controlmode : 2];
-    // zero out the buffer
-    memset(g->debugpanel.buffer, 0, sizeof(g->debugpanel.buffer));
-    // Format the string in one pass
-    snprintf(g->debugpanel.buffer,
-             sizeof(g->debugpanel.buffer),
-             "@evildojo666\n"
-             "project.rpg\n"
-             //"%s\n" // timebeganbuf
-             //"%s\n" // currenttimebuf
-             "Frame : %d\n"
-             "Update: %d\n"
-             "Mouse: %.01f, %.01f\n"
-             "Last Clicked: %.01f, %.01f\n"
-             "Frame Dirty: %d\n"
-             "Draw Time: %.1fms\n"
-             "Is3D: %d\n"
-             "Cam: (%.0f,%.0f) Zoom: %.1f\n"
-             "Mode: %s \n"
-             "Floor: %d/%d \n"
-             "Entities: %d\n"
-             "Flag: %d\n"
-             "Turn: %d\n"
-             "Hero: (%d,%d,%d)\n"
-             "Weapon: %d\n"
-             "Inventory: %d\n",
-             //g->timebeganbuf,
-             //g->currenttimebuf,
-             g->framecount,
-             g->frame_updates,
-             is->mouse_position.x,
-             is->mouse_position.y,
-             g->last_click_screen_pos.x,
-             g->last_click_screen_pos.y,
-             g->frame_dirty,
-             g->last_frame_time * 1000,
-             g->is3d,
-             g->cam2d.offset.x,
-             g->cam2d.offset.y,
-             g->cam2d.zoom,
-             control_mode,
-             0,
-             0,
-             g->next_entityid,
-             g->flag,
-             g->entity_turn,
-             loc.x,
-             loc.y,
-             loc.z,
-             g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID),
-             inventory_count);
 }
 
 
