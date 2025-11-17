@@ -14,7 +14,8 @@
 #include "libgame_defines.h"
 #include "liblogic.h"
 #include "liblogic_add_message.h"
-#include "liblogic_create_npc.h"
+//#include "liblogic_create_npc.h"
+#include "liblogic_create_npc_set_stats.h"
 #include "liblogic_create_player.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_drop_item.h"
@@ -55,7 +56,7 @@ void handle_npc(shared_ptr<gamestate> g, entityid id);
 void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
 
 //entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
-entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
+//entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
 
 
 void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
@@ -101,7 +102,6 @@ void init_dungeon(shared_ptr<gamestate> g) {
     // dungeon floors, tiles etc will require re-write/re-design for optimization
     int w = 16;
     int h = 16;
-
     for (int i = 0; i < df_count; i++) {
         d_add_floor(g->dungeon, w, h);
         //d_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
@@ -1477,18 +1477,6 @@ void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is) 
         g->controlmode = CONTROLMODE_PLAYER;
         return;
     }
-}
-
-
-entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
-    //minfo("npc_create_set_stats: %d,%d,%d %d", loc.x, loc.y, loc.z, race);
-    entityid id = ENTITYID_INVALID;
-    string race_name = race2str(race);
-    id = create_npc(g, race, loc, race_name);
-    if (id != ENTITYID_INVALID) {
-        // Set stats
-    }
-    return id;
 }
 
 
