@@ -1,12 +1,15 @@
 #include "liblogic_create_player.h"
 #include "liblogic_handle_input_character_creation_scene.h"
 #include "roll.h"
+#include "sfx.h"
+#include <raylib.h>
 
 void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (inputstate_is_pressed(is, KEY_ENTER)) {
         minfo("Character creation confirmed");
+        PlaySound(g->sfx->at(SFX_CONFIRM_01));
         // we need to copy the character creation stats to the hero entity
         // hero has already been created, so its id is available
         //g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
@@ -26,6 +29,7 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {
         // re-roll character creation stats
         minfo("Re-rolling character creation stats");
+        PlaySound(g->sfx->at(SFX_CONFIRM_01));
         g->chara_creation->strength = do_roll_best_of_3((vec3){3, 6, 0});
         g->chara_creation->dexterity = do_roll_best_of_3((vec3){3, 6, 0});
         g->chara_creation->constitution = do_roll_best_of_3((vec3){3, 6, 0});

@@ -6,6 +6,8 @@
 #include "liblogic_try_entity_attack.h"
 #include "liblogic_try_entity_move.h"
 #include "liblogic_try_entity_pickup.h"
+#include "sfx.h"
+#include <raylib.h>
 
 void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
@@ -63,6 +65,8 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
                 g->ct.set<update>(g->hero_id, true);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 g->player_changing_dir = false;
+
+                PlaySound(g->sfx->at(SFX_CONFIRM_01));
             }
             return;
         }
@@ -101,6 +105,7 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
             } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
                 //g->ct.set<attacking>(g->hero_id, true);
                 //g->ct.set<update>(g->hero_id, true);
+                PlaySound(g->sfx->at(SFX_CONFIRM_01));
 
                 if (g->ct.get<location>(g->hero_id).has_value() && g->ct.get<direction>(g->hero_id).has_value()) {
                     vec3 loc = g->ct.get<location>(g->hero_id).value();

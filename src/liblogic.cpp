@@ -147,7 +147,9 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
             g->ct.set<blocksuccess>(g->hero_id, false);
         }
     }
+
     handle_input(g, is);
+
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
         for (entityid id = 0; id < g->next_entityid; id++) {
             handle_npc(g, id);
