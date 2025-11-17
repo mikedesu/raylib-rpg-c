@@ -25,6 +25,7 @@ WEB_SOURCES=main.cpp \
 			libdraw_hud.cpp \
 			libdraw.cpp \
 		    liblogic_drop_item.cpp \
+			liblogic_try_entity_attack.cpp \
 			liblogic_try_entity_pickup.cpp \
 			liblogic_add_message.cpp \
 			liblogic_update_player_state.o \
@@ -42,6 +43,7 @@ WEB_SOURCES=main.cpp \
 			liblogic_handle_input_main_menu_scene.cpp \
 			liblogic_handle_input_help_menu.cpp \
 			liblogic_handle_input_character_creation_scene.cpp \
+			liblogic_handle_input_gameplay_controlmode_player.cpp \
 			liblogic_init_dungeon.cpp \
 			liblogic_cycle_messages.cpp \
 			liblogic.cpp \
@@ -93,6 +95,7 @@ OBJ_FILES=main.o \
 		  dungeon_tile.o \
 		  liblogic_drop_item.o \
 		  liblogic_add_message.o \
+		  liblogic_try_entity_attack.o \
 		  liblogic_try_entity_pickup.o \
 		  liblogic_update_player_state.o \
 		  liblogic_tile_npc_living_count.o \
@@ -109,6 +112,7 @@ OBJ_FILES=main.o \
 		  liblogic_handle_input_main_menu_scene.o \
 		  liblogic_handle_input_help_menu.o \
 		  liblogic_handle_input_character_creation_scene.o \
+		  liblogic_handle_input_gameplay_controlmode_player.o \
 		  liblogic_init_dungeon.o \
 		  liblogic_cycle_messages.o \
 		  liblogic.o \
@@ -195,6 +199,9 @@ libdraw.o: libdraw.cpp
 liblogic_drop_item.o: liblogic_drop_item.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
+liblogic_try_entity_attack.o: liblogic_try_entity_attack.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
 liblogic_try_entity_pickup.o: liblogic_try_entity_pickup.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
@@ -244,6 +251,9 @@ liblogic_handle_input_help_menu.o: liblogic_handle_input_help_menu.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_handle_input_character_creation_scene.o: liblogic_handle_input_character_creation_scene.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic_handle_input_gameplay_controlmode_player.o: liblogic_handle_input_gameplay_controlmode_player.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_init_dungeon.o: liblogic_init_dungeon.cpp
