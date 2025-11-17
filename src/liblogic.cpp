@@ -15,10 +15,11 @@
 #include "liblogic_add_message.h"
 #include "liblogic_change_player_dir.h"
 #include "liblogic_create_npc_set_stats.h"
-#include "liblogic_create_player.h"
+//#include "liblogic_create_player.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_cycle_messages.h"
 #include "liblogic_handle_camera_move.h"
+#include "liblogic_handle_input_character_creation_scene.h"
 #include "liblogic_handle_input_inventory.h"
 #include "liblogic_handle_input_main_menu_scene.h"
 #include "liblogic_handle_input_title_scene.h"
@@ -27,7 +28,7 @@
 #include "liblogic_try_entity_move.h"
 #include "liblogic_try_entity_pickup.h"
 #include "massert.h"
-#include "roll.h"
+//#include "roll.h"
 #include "weapon.h"
 #include <cassert>
 #include <cmath>
@@ -43,81 +44,16 @@ using std::string;
 int liblogic_restart_count = 0;
 
 // these have been moved to external source files
+void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
-void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
 
 
-void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    massert(is, "Input state is NULL!");
-    massert(g, "Game state is NULL!");
-    if (inputstate_is_pressed(is, KEY_ENTER)) {
-        minfo("Character creation confirmed");
-        // we need to copy the character creation stats to the hero entity
-        // hero has already been created, so its id is available
-        //g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
-        //g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
-        //g_set_stat(g, g->hero_id, STATS_CON, g->chara_creation.constitution);
-        int hitdie = 8;
-        int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
-        //bonus_calc(g->chara_creation.constitution);
-        while (maxhp_roll < 1) {
-            maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
-            //bonus_calc(g->chara_creation.constitution);
-        }
-        g->entity_turn = create_player(g, (vec3){0, 0, 0}, "darkmage");
-        //g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
-        //g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
-        g->current_scene = SCENE_GAMEPLAY;
-    } else if (inputstate_is_pressed(is, KEY_SPACE)) {
-        // re-roll character creation stats
-        minfo("Re-rolling character creation stats");
-        g->chara_creation->strength = do_roll_best_of_3((vec3){3, 6, 0});
-        g->chara_creation->dexterity = do_roll_best_of_3((vec3){3, 6, 0});
-        g->chara_creation->constitution = do_roll_best_of_3((vec3){3, 6, 0});
-    }
-    //else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-    //    minfo("Exiting character creation");
-    //    g->current_scene = SCENE_TITLE;
-    //}
-    else if (inputstate_is_pressed(is, KEY_LEFT)) {
-        int race = g->chara_creation->race;
-        if (race > 1) {
-            race--;
-        } else {
-            race = RACE_WARG;
-        }
-        g->chara_creation->race = (race_t)race;
-        //g->chara_creation->race = (race_t)(((int)g->chara_creation->race)-1);
-        //if (race == RACE_HUMAN) {
-        //    g->chara_creation->race = RACE_ORC;
-        //} else if (race == RACE_ORC) {
-        //    g->chara_creation->race = RACE_HUMAN;
-        //}
-    } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
-        int race = g->chara_creation->race;
-        if (race < RACE_COUNT - 1) {
-            race++;
-        } else {
-            race = RACE_HALFLING;
-        }
-        g->chara_creation->race = (race_t)race;
-        //race_t race = g->chara_creation->race;
-        //if (race == RACE_HUMAN) {
-        //    g->chara_creation->race = RACE_ORC;
-        //} else if (race == RACE_ORC) {
-        //    g->chara_creation->race = RACE_HUMAN;
-        //}
-    }
-    g->frame_dirty = true;
-}
-
-
-static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->do_quit = true;
         return;
