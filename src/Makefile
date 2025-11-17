@@ -34,7 +34,7 @@ WEB_SOURCES=main.cpp \
 			liblogic_create_weapon.cpp \
 			liblogic_create_player.cpp \
 			liblogic_create_npc.cpp \
-		  liblogic_create_npc_set_stats.cpp \
+			liblogic_create_npc_set_stats.cpp \
 			liblogic.cpp \
 			gamestate_inventory.cpp \
 			gamestate.cpp \
