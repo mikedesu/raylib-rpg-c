@@ -20,6 +20,7 @@
 #include "liblogic_cycle_messages.h"
 #include "liblogic_handle_camera_move.h"
 #include "liblogic_handle_input_inventory.h"
+#include "liblogic_handle_input_main_menu_scene.h"
 #include "liblogic_handle_input_title_scene.h"
 #include "liblogic_handle_npc.h"
 #include "liblogic_init_dungeon.h"
@@ -46,37 +47,9 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
 void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
-
-
-void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
-        if (g->title_screen_selection == 0) {
-            minfo("Switching to character creation scene");
-            g->current_scene = SCENE_CHARACTER_CREATION;
-            g->frame_dirty = true;
-        }
-    } else if (inputstate_is_pressed(is, KEY_DOWN)) {
-        minfo("Title screen selection++");
-        g->title_screen_selection++;
-        if (g->title_screen_selection >= g->max_title_screen_selections) {
-            g->title_screen_selection = 0;
-        }
-    } else if (inputstate_is_pressed(is, KEY_UP)) {
-        minfo("Title screen selection--");
-        g->title_screen_selection--;
-        if (g->title_screen_selection < 0) {
-            g->title_screen_selection = g->max_title_screen_selections - 1;
-        }
-    } else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-        g->do_quit = true;
-    }
-
-    g->frame_dirty = true;
-}
 
 
 void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {

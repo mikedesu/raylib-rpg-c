@@ -39,6 +39,7 @@ WEB_SOURCES=main.cpp \
 			liblogic_handle_camera_move.cpp \
 			liblogic_handle_input_inventory.cpp \
 			liblogic_handle_input_title_scene.cpp \
+			liblogic_handle_input_main_menu_scene.cpp \
 			liblogic_init_dungeon.cpp \
 			liblogic_cycle_messages.cpp \
 			liblogic.cpp \
@@ -103,6 +104,7 @@ OBJ_FILES=main.o \
 		  liblogic_handle_camera_move.o \
 		  liblogic_handle_input_inventory.o \
 		  liblogic_handle_input_title_scene.o \
+		  liblogic_handle_input_main_menu_scene.o \
 		  liblogic_init_dungeon.o \
 		  liblogic_cycle_messages.o \
 		  liblogic.o \
@@ -229,6 +231,9 @@ liblogic_handle_input_inventory.o: liblogic_handle_input_inventory.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_handle_input_title_scene.o: liblogic_handle_input_title_scene.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic_handle_input_main_menu_scene.o: liblogic_handle_input_main_menu_scene.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_init_dungeon.o: liblogic_init_dungeon.cpp
