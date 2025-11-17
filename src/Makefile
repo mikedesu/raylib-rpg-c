@@ -35,6 +35,7 @@ WEB_SOURCES=main.cpp \
 			liblogic_create_player.cpp \
 			liblogic_create_npc.cpp \
 			liblogic_create_npc_set_stats.cpp \
+			liblogic_change_player_dir.cpp \
 			liblogic.cpp \
 			gamestate_inventory.cpp \
 			gamestate.cpp \
@@ -93,6 +94,7 @@ OBJ_FILES=main.o \
 		  liblogic_create_player.o \
 		  liblogic_create_npc.o \
 		  liblogic_create_npc_set_stats.o \
+		  liblogic_change_player_dir.o \
 		  liblogic.o \
 
 
@@ -204,6 +206,8 @@ liblogic_create_player.o: liblogic_create_player.cpp
 liblogic_create_npc.o: liblogic_create_npc.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 liblogic_create_npc_set_stats.o: liblogic_create_npc_set_stats.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+liblogic_change_player_dir.o: liblogic_change_player_dir.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic.o: liblogic.cpp

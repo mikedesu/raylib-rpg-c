@@ -15,6 +15,7 @@
 #include "liblogic.h"
 #include "liblogic_add_message.h"
 //#include "liblogic_create_npc.h"
+#include "liblogic_change_player_dir.h"
 #include "liblogic_create_npc_set_stats.h"
 #include "liblogic_create_player.h"
 #include "liblogic_create_weapon.h"
@@ -43,7 +44,7 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
-void change_player_dir(shared_ptr<gamestate> g, direction_t dir);
+//void change_player_dir(shared_ptr<gamestate> g, direction_t dir);
 void init_dungeon(shared_ptr<gamestate> g);
 void cycle_messages(shared_ptr<gamestate> g);
 void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -54,21 +55,6 @@ void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_npc(shared_ptr<gamestate> g, entityid id);
 void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
-
-//entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
-//entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
-
-
-void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
-    massert(g, "Game state is NULL!");
-    if (g->ct.get<dead>(g->hero_id).value_or(true)) {
-        return;
-    }
-    g->ct.set<direction>(g->hero_id, dir);
-    g->ct.set<update>(g->hero_id, true);
-    g->player_changing_dir = false;
-    g->frame_dirty = true;
-}
 
 
 void handle_npc(shared_ptr<gamestate> g, entityid id) {
