@@ -10,7 +10,6 @@
 #include "gamestate.h"
 #include "gamestate_flag.h"
 #include "inputstate.h"
-#include "item.h"
 #include "libgame_defines.h"
 #include "liblogic.h"
 #include "liblogic_add_message.h"
@@ -19,8 +18,9 @@
 #include "liblogic_create_player.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_cycle_messages.h"
-#include "liblogic_drop_item.h"
 #include "liblogic_handle_camera_move.h"
+#include "liblogic_handle_input_inventory.h"
+#include "liblogic_handle_input_title_scene.h"
 #include "liblogic_handle_npc.h"
 #include "liblogic_init_dungeon.h"
 #include "liblogic_try_entity_move.h"
@@ -42,25 +42,14 @@ using std::string;
 int liblogic_restart_count = 0;
 
 // these have been moved to external source files
-void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
-void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
-
-
-void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
-        minfo("Title screen input detected, switching to main menu");
-        g->current_scene = SCENE_MAIN_MENU;
-        g->frame_dirty = true;
-    }
-}
 
 
 void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
@@ -161,7 +150,6 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
         return;
     }
 
-
     if (g->display_help_menu) {
         handle_input_help_menu(g, is);
     }
@@ -221,7 +209,6 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
             return;
         }
 
-
         if (g->hero_id != ENTITYID_INVALID) {
             //vec3 loc = g_get_loc(g, g->hero_id);
             if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
@@ -251,7 +238,6 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
             } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
                 //g->ct.set<attacking>(g->hero_id, true);
                 //g->ct.set<update>(g->hero_id, true);
-
 
                 if (g->ct.get<location>(g->hero_id).has_value() && g->ct.get<direction>(g->hero_id).has_value()) {
                     vec3 loc = g->ct.get<location>(g->hero_id).value();
@@ -309,7 +295,6 @@ static void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, sh
 static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(g, "Game state is NULL!");
     massert(is, "Input state is NULL!");
-
     if (inputstate_is_pressed(is, KEY_B)) {
         if (g->controlmode == CONTROLMODE_PLAYER) {
             g->controlmode = CONTROLMODE_CAMERA;
@@ -319,18 +304,15 @@ static void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inpu
         g->frame_dirty = true;
         //    //return;
     }
-
     if (g->controlmode == CONTROLMODE_CAMERA) {
         handle_camera_move(g, is);
         g->frame_dirty = true;
         //return;
     }
-
     if (g->controlmode == CONTROLMODE_PLAYER) {
         handle_input_gameplay_controlmode_player(g, is);
         return;
     }
-
     if (g->controlmode == CONTROLMODE_INVENTORY) {
         handle_input_inventory(is, g);
         return;
@@ -1075,238 +1057,6 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
 //        }
 //    }
 //}
-
-
-void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
-    massert(is, "Input state is NULL!");
-    massert(g, "Game state is NULL!");
-    if (g->controlmode != CONTROLMODE_INVENTORY) {
-        //merror("wrong mode");
-        return;
-    }
-    if (!g->display_inventory_menu) {
-        return;
-    }
-    //if (inputstate_is_pressed(is, KEY_ESCAPE) || inputstate_is_pressed(is, KEY_I)) {
-    if (inputstate_is_pressed(is, KEY_I)) {
-        g->controlmode = CONTROLMODE_PLAYER;
-        g->display_inventory_menu = false;
-        //g->display_gameplay_settings_menu = false;
-        //g->display_sort_inventory_menu = false;
-        return;
-    }
-    if (inputstate_is_pressed(is, KEY_LEFT)) {
-        if (g->inventory_cursor.x > 0) {
-            g->inventory_cursor.x--;
-        }
-    }
-    if (inputstate_is_pressed(is, KEY_RIGHT)) {
-        g->inventory_cursor.x++;
-    }
-    if (inputstate_is_pressed(is, KEY_UP)) {
-        if (g->inventory_cursor.y > 0) {
-            g->inventory_cursor.y--;
-        }
-    }
-    if (inputstate_is_pressed(is, KEY_DOWN)) {
-        g->inventory_cursor.y++;
-    }
-    if (inputstate_is_pressed(is, KEY_E)) {
-        // equip item
-        // get the item id of the current selection
-        size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
-
-        optional<shared_ptr<vector<entityid>>> my_inventory = g->ct.get<inventory>(g->hero_id);
-        if (my_inventory) {
-            if (my_inventory.has_value()) {
-                shared_ptr<vector<entityid>> unpacked_inventory = my_inventory.value();
-                if (index >= 0 && index < unpacked_inventory->size()) {
-                    entityid item_id = unpacked_inventory->at(index);
-                    entitytype_t type = g->ct.get<entitytype>(item_id).value_or(ENTITY_NONE);
-                    if (type == ENTITY_ITEM) {
-                        itemtype_t item_type = g->ct.get<itemtype>(item_id).value_or(ITEM_NONE);
-                        if (item_type != ITEM_NONE) {
-                            if (item_type == ITEM_WEAPON) {
-                                // try to equip it
-
-                                g->ct.set<equipped_weapon>(g->hero_id, item_id);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        //                minfo("equipped item %d", item_id);
-        //            } else {
-        //                minfo("failed to equip item %d", item_id);
-        //            }
-        //        }
-        //    }
-    }
-    //}
-    //if (inputstate_is_pressed(is, KEY_U)) {
-    // unequip weapon/item
-    // we will assume it is a weapon for now
-    //entityid weapon_id = g_get_equipped_weapon(g, g->hero_id);
-    //if (weapon_id != ENTITYID_INVALID) {
-    //    if (g_unequip_weapon(g, g->hero_id, weapon_id)) {
-    //        minfo("unequipped weapon %d", weapon_id);
-    //    } else {
-    //        minfo("failed to unequip weapon %d", weapon_id);
-    //    }
-    //}
-    //}
-    if (inputstate_is_pressed(is, KEY_D)) {
-        // drop item
-        drop_item_from_hero_inventory(g);
-    }
-    // cycle menus
-    //if (inputstate_is_pressed(is, KEY_LEFT) ||
-    //    inputstate_is_pressed(is, KEY_RIGHT)) {
-    //    g->controlmode = CONTROLMODE_GAMEPLAY_SETTINGS;
-    //    g->display_gameplay_settings_menu = true;
-    //    g->display_inventory_menu = false;
-    //    return;
-    //}
-    //if (inputstate_is_pressed(is, KEY_S)) {
-    //    minfo("toggling sort inventory menu");
-    //    g->display_sort_inventory_menu = !g->display_sort_inventory_menu;
-    //    return;
-    //}
-    //size_t count = 0;
-    //entityid* inventory = g_get_inventory(g, g->hero_id, &count);
-    //if (g->display_inventory_menu && g->display_sort_inventory_menu) {
-    //    handle_input_sort_inventory(is, g);
-    //    return;
-    //}
-    //
-    //    if (count == 0) return;
-    // make sure we separate control of inv menu from its sort inv menu
-    //    if (g->display_inventory_menu && !g->display_sort_inventory_menu) {
-    //        if (inputstate_is_pressed(is, KEY_DOWN) ||
-    //            inputstate_is_pressed(is, KEY_X)) {
-    //            g->inventory_menu_selection =
-    //                (size_t)g->inventory_menu_selection + 1 >= count
-    //                    ? 0
-    //                    : g->inventory_menu_selection + 1;
-    //        } else if (inputstate_is_pressed(is, KEY_UP) ||
-    //                   inputstate_is_pressed(is, KEY_W)) {
-    //            g->inventory_menu_selection = g->inventory_menu_selection - 1 < 0
-    //                                              ? count - 1
-    //                                              : g->inventory_menu_selection - 1;
-    //            // drop item
-    //        } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
-    //            // we need to grab the entityid of the selected item
-    //            entityid item_id = inventory[g->inventory_menu_selection];
-    //            g_remove_from_inventory(g, g->hero_id, item_id);
-    //            //handle_sort_inventory(g);
-    //            // add the item to the tile where the player is located at
-    //            vec3 loc = g_get_location(g, g->hero_id);
-    //            dungeon_floor_t* const df = d_get_floor(g->d, loc.z);
-    //            massert(df, "Dungeon floor is NULL!");
-    //            vec3 loc_cast = {loc.x, loc.y, loc.z};
-    //            //tile_t* const tile = df_tile_at(df, loc_cast);
-    //            shared_ptr<tile_t> tile = df_tile_at(df, loc_cast);
-    //            massert(tile, "Tile is NULL!");
-    //            if (!tile_add(tile, item_id)) return;
-    //            // we also have to update the location of the item
-    //            g_update_location(g, item_id, loc);
-    //            g->controlmode = CONTROLMODE_PLAYER;
-    //            g->display_inventory_menu = false;
-    //        } else if (inputstate_is_pressed(is, KEY_ENTER) ||
-    //                   inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-    //            entityid item_id = inventory[g->inventory_menu_selection];
-    //            // we will eventually adjust this to check which slot it needs to go into based on its various types
-    //            entitytype_t type = g_get_type(g, item_id);
-    //            if (type == ENTITY_ITEM) {
-    //                itemtype item_type = g_get_itemtype(g, item_id);
-    //                if (item_type == ITEM_POTION) {
-    //                    potiontype potion_type = g_get_potiontype(g, item_id);
-    //                    if (potion_type == POTION_HEALTH_SMALL) {
-    //                        int hp = g_get_stat(g, g->hero_id, STATS_HP);
-    //                        int maxhp = g_get_stat(g, g->hero_id, STATS_MAXHP);
-    //                        if (hp < maxhp) {
-    //                            int small_hp_health_roll = rand() % 4 + 1;
-    //                            hp += small_hp_health_roll;
-    //                            if (hp > maxhp) hp = maxhp;
-    //                            g_set_stat(g, g->hero_id, STATS_HP, hp);
-    //                            add_message_history(
-    //                                g,
-    //                                "%s drank a %s and recovered %d HP",
-    //                                g_get_name(g, g->hero_id).c_str(),
-    //                                g_get_name(g, item_id).c_str(),
-    //                                small_hp_health_roll);
-    //                            // remove the potion from the inventory
-    //                            g_remove_from_inventory(g, g->hero_id, item_id);
-    //                            g->controlmode = CONTROLMODE_PLAYER;
-    //                            g->display_inventory_menu = false;
-    //                            g->controlmode = CONTROLMODE_PLAYER;
-    //                            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    //                        }
-    //                    }
-    //                } else if (item_type == ITEM_WEAPON) {
-    //                    // check if the item is already equipped
-    //                    //entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON);
-    //                    //if (equipped_item != ENTITYID_INVALID) {
-    //                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WEAPON, item_id);
-    //                    add_message_history(g,
-    //                                        "%s equipped %s",
-    //                                        g_get_name(g, g->hero_id).c_str(),
-    //                                        g_get_name(g, item_id).c_str());
-    //                    //}
-    //                    g->controlmode = CONTROLMODE_PLAYER;
-    //                    g->display_inventory_menu = false;
-    //                    g->controlmode = CONTROLMODE_PLAYER;
-    //                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    //                } else if (item_type == ITEM_SHIELD) {
-    //                    //entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD);
-    //                    //if (equipped_item != ENTITYID_INVALID) {
-    //                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_SHIELD, item_id);
-    //                    add_message_history(g,
-    //                                        "%s equipped %s",
-    //                                        g_get_name(g, g->hero_id).c_str(),
-    //                                        g_get_name(g, item_id).c_str());
-    //                    //}
-    //                    g->controlmode = CONTROLMODE_PLAYER;
-    //                    g->display_inventory_menu = false;
-    //                    g->controlmode = CONTROLMODE_PLAYER;
-    //                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    //                } else if (item_type == ITEM_WAND) {
-    //                    //entityid equipped_item = g_get_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
-    //                    //if (equipped_item != ENTITYID_INVALID) {
-    //                    // unequip the currently equipped item
-    //                    //    g_unset_equipment(g, g->hero_id, EQUIP_SLOT_WAND);
-    //                    //    add_message_history(g, "%s unequipped %s", g_get_name(g, g->hero_id), g_get_name(g, item_id));
-    //                    //} else {
-    //                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_WAND, item_id);
-    //                    add_message_history(g,
-    //                                        "%s equipped %s",
-    //                                        g_get_name(g, g->hero_id).c_str(),
-    //                                        g_get_name(g, item_id).c_str());
-    //                    //}
-    //                    g->controlmode = CONTROLMODE_PLAYER;
-    //                    g->display_inventory_menu = false;
-    //                    g->controlmode = CONTROLMODE_PLAYER;
-    //                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    //                } else if (item_type == ITEM_RING) {
-    //                    g_set_equipment(g, g->hero_id, EQUIP_SLOT_RING, item_id);
-    //                    add_message_history(g,
-    //                                        "%s equipped %s",
-    //                                        g_get_name(g, g->hero_id).c_str(),
-    //                                        g_get_name(g, item_id).c_str());
-    //
-    //                    // update player tiles
-    //                    update_player_tiles_explored(g);
-    //
-    //                    g->controlmode = CONTROLMODE_PLAYER;
-    //                    g->display_inventory_menu = false;
-    //                    g->controlmode = CONTROLMODE_PLAYER;
-    //                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    //                }
-    //            }
-    //        }
-    //    }
-}
 
 
 void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {

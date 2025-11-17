@@ -37,6 +37,8 @@ WEB_SOURCES=main.cpp \
 			liblogic_create_npc_set_stats.cpp \
 			liblogic_handle_npc.cpp \
 			liblogic_handle_camera_move.cpp \
+			liblogic_handle_input_inventory.cpp \
+			liblogic_handle_input_title_scene.cpp \
 			liblogic_init_dungeon.cpp \
 			liblogic_cycle_messages.cpp \
 			liblogic.cpp \
@@ -99,6 +101,8 @@ OBJ_FILES=main.o \
 		  liblogic_create_npc_set_stats.o \
 		  liblogic_handle_npc.o \
 		  liblogic_handle_camera_move.o \
+		  liblogic_handle_input_inventory.o \
+		  liblogic_handle_input_title_scene.o \
 		  liblogic_init_dungeon.o \
 		  liblogic_cycle_messages.o \
 		  liblogic.o \
@@ -219,6 +223,12 @@ liblogic_handle_npc.o: liblogic_handle_npc.cpp liblogic_handle_npc.h liblogic_tr
 	$(CXX) $(WFLAGS) $(CXXFLAGS) liblogic_handle_npc.cpp -c 
 
 liblogic_handle_camera_move.o: liblogic_handle_camera_move.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic_handle_input_inventory.o: liblogic_handle_input_inventory.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic_handle_input_title_scene.o: liblogic_handle_input_title_scene.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_init_dungeon.o: liblogic_init_dungeon.cpp
