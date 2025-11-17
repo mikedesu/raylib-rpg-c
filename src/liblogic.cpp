@@ -1,6 +1,5 @@
 #include "ComponentTable.h"
 #include "ComponentTraits.h"
-#include "controlmode.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
@@ -12,10 +11,8 @@
 #include "liblogic_add_message.h"
 #include "liblogic_create_npc_set_stats.h"
 #include "liblogic_create_weapon.h"
-#include "liblogic_handle_camera_move.h"
 #include "liblogic_handle_input_character_creation_scene.h"
-#include "liblogic_handle_input_gameplay_controlmode_player.h"
-#include "liblogic_handle_input_inventory.h"
+#include "liblogic_handle_input_gameplay_scene.h"
 #include "liblogic_handle_input_main_menu_scene.h"
 #include "liblogic_handle_input_title_scene.h"
 #include "liblogic_handle_npc.h"
@@ -30,7 +27,11 @@
 #include <memory>
 #include <raylib.h>
 
+//#include "liblogic_handle_input_gameplay_controlmode_player.h"
+//#include "liblogic_handle_input_inventory.h"
 //#include "entitytype.h"
+//#include "controlmode.h"
+//#include "liblogic_handle_camera_move.h"
 //#include "liblogic_try_entity_move.h"
 //#include "liblogic_try_entity_pickup.h"
 //#include "liblogic_handle_input_help_menu.h"
@@ -45,35 +46,7 @@ using std::string;
 
 int liblogic_restart_count = 0;
 
-void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-
-void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    massert(g, "Game state is NULL!");
-    massert(is, "Input state is NULL!");
-    if (inputstate_is_pressed(is, KEY_B)) {
-        if (g->controlmode == CONTROLMODE_PLAYER) {
-            g->controlmode = CONTROLMODE_CAMERA;
-        } else if (g->controlmode == CONTROLMODE_CAMERA) {
-            g->controlmode = CONTROLMODE_PLAYER;
-        }
-        g->frame_dirty = true;
-        //    //return;
-    }
-    if (g->controlmode == CONTROLMODE_CAMERA) {
-        handle_camera_move(g, is);
-        g->frame_dirty = true;
-        //return;
-    }
-    if (g->controlmode == CONTROLMODE_PLAYER) {
-        handle_input_gameplay_controlmode_player(g, is);
-        return;
-    }
-    if (g->controlmode == CONTROLMODE_INVENTORY) {
-        handle_input_inventory(is, g);
-        return;
-    }
-}
 
 
 void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {

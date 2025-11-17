@@ -44,6 +44,7 @@ WEB_SOURCES=main.cpp \
 			liblogic_handle_input_help_menu.cpp \
 			liblogic_handle_input_character_creation_scene.cpp \
 			liblogic_handle_input_gameplay_controlmode_player.cpp \
+			liblogic_handle_input_gameplay_scene.cpp \
 			liblogic_init_dungeon.cpp \
 			liblogic_cycle_messages.cpp \
 			liblogic_update_debug_panel_buffer.cpp \
@@ -110,6 +111,7 @@ OBJ_FILES=main.o \
 		  liblogic_handle_camera_move.o \
 		  liblogic_handle_input_inventory.o \
 		  liblogic_handle_input_title_scene.o \
+			liblogic_handle_input_gameplay_scene.o \
 		  liblogic_handle_input_main_menu_scene.o \
 		  liblogic_handle_input_help_menu.o \
 		  liblogic_handle_input_character_creation_scene.o \
@@ -256,6 +258,9 @@ liblogic_handle_input_character_creation_scene.o: liblogic_handle_input_characte
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_handle_input_gameplay_controlmode_player.o: liblogic_handle_input_gameplay_controlmode_player.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic_handle_input_gameplay_scene.o: liblogic_handle_input_gameplay_scene.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_init_dungeon.o: liblogic_init_dungeon.cpp
