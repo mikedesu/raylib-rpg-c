@@ -38,6 +38,7 @@ WEB_SOURCES=main.cpp \
 			liblogic_handle_npc.cpp \
 			liblogic_handle_camera_move.cpp \
 			liblogic_init_dungeon.cpp \
+			liblogic_cycle_messages.cpp \
 			liblogic.cpp \
 			gamestate_inventory.cpp \
 			gamestate.cpp \
@@ -99,6 +100,7 @@ OBJ_FILES=main.o \
 		  liblogic_handle_npc.o \
 		  liblogic_handle_camera_move.o \
 		  liblogic_init_dungeon.o \
+		  liblogic_cycle_messages.o \
 		  liblogic.o \
 
 
@@ -220,6 +222,9 @@ liblogic_handle_camera_move.o: liblogic_handle_camera_move.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_init_dungeon.o: liblogic_init_dungeon.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic_cycle_messages.o: liblogic_cycle_messages.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic.o: liblogic.cpp 

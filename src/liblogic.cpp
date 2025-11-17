@@ -18,6 +18,7 @@
 #include "liblogic_create_npc_set_stats.h"
 #include "liblogic_create_player.h"
 #include "liblogic_create_weapon.h"
+#include "liblogic_cycle_messages.h"
 #include "liblogic_drop_item.h"
 #include "liblogic_handle_camera_move.h"
 #include "liblogic_handle_npc.h"
@@ -45,7 +46,6 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
-void cycle_messages(shared_ptr<gamestate> g);
 void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -616,30 +616,6 @@ void liblogic_close(shared_ptr<gamestate> g) {
 //static void add_message(gamestate* g, const char* fmt, ...);
 //static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
 //static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id);
-
-
-void cycle_messages(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    if (g->msg_system->size() > 0) {
-        string msg = g->msg_system->front();
-        int len = msg.length();
-        // measure the length of the message as calculated by MeasureText
-
-        if (len > g->msg_history_max_len_msg) {
-            g->msg_history_max_len_msg = len;
-            int font_size = 10;
-            int measure = MeasureText(msg.c_str(), font_size);
-            //if (measure > g->msg_history_max_len_msg_measure) {
-            g->msg_history_max_len_msg_measure = measure;
-        }
-
-        g->msg_history->push_back(g->msg_system->front());
-        g->msg_system->erase(g->msg_system->begin());
-    }
-    if (g->msg_system->size() == 0) {
-        g->msg_system_is_active = false;
-    }
-}
 
 
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success) {
