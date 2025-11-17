@@ -11,10 +11,7 @@
 #include "liblogic_add_message.h"
 #include "liblogic_create_npc_set_stats.h"
 #include "liblogic_create_weapon.h"
-#include "liblogic_handle_input_character_creation_scene.h"
-#include "liblogic_handle_input_gameplay_scene.h"
-#include "liblogic_handle_input_main_menu_scene.h"
-#include "liblogic_handle_input_title_scene.h"
+#include "liblogic_handle_input.h"
 #include "liblogic_handle_npc.h"
 #include "liblogic_init_dungeon.h"
 #include "liblogic_update_debug_panel_buffer.h"
@@ -27,48 +24,12 @@
 #include <memory>
 #include <raylib.h>
 
-//#include "liblogic_handle_input_gameplay_controlmode_player.h"
-//#include "liblogic_handle_input_inventory.h"
-//#include "entitytype.h"
-//#include "controlmode.h"
-//#include "liblogic_handle_camera_move.h"
-//#include "liblogic_try_entity_move.h"
-//#include "liblogic_try_entity_pickup.h"
-//#include "liblogic_handle_input_help_menu.h"
-//#include "liblogic_change_player_dir.h"
-//#include "liblogic_cycle_messages.h"
-//#include "direction.h"
-//#include "libgame_defines.h"
 
 using std::shared_ptr;
 using std::string;
 
 
 int liblogic_restart_count = 0;
-
-void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-
-
-void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    massert(is, "inputstate is NULL");
-    massert(g, "gamestate is NULL");
-    // no matter which mode we are in, we can toggle the debug panel
-    if (inputstate_is_pressed(is, KEY_P)) {
-        g->debugpanelon = !g->debugpanelon;
-        minfo("Toggling debug panel: %s", g->debugpanelon ? "ON" : "OFF");
-        return;
-    }
-
-    if (g->current_scene == SCENE_TITLE) {
-        handle_input_title_scene(g, is);
-    } else if (g->current_scene == SCENE_MAIN_MENU) {
-        handle_input_main_menu_scene(g, is);
-    } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
-        handle_input_character_creation_scene(g, is);
-    } else if (g->current_scene == SCENE_GAMEPLAY) {
-        handle_input_gameplay_scene(g, is);
-    }
-}
 
 
 void liblogic_init(shared_ptr<gamestate> g) {
@@ -81,7 +42,6 @@ void liblogic_init(shared_ptr<gamestate> g) {
     init_dungeon(g);
 
     //g->entity_turn = create_player(g, (vec3){0, 0, 0}, "darkmage");
-
     //create_wooden_box(g, (vec3){2, 2, 0});
     //create_wooden_box(g, (vec3){3, 2, 0});
     //create_wooden_box(g, (vec3){4, 2, 0});
@@ -93,7 +53,6 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 5, 0});
     //create_wooden_box(g, (vec3){7, 6, 0});
     //create_wooden_box(g, (vec3){7, 7, 0});
-
     //create_npc_set_stats(g, (vec3){5, 3, 0}, RACE_HUMAN);
     //create_npc_set_stats(g, (vec3){5, 4, 0}, RACE_ELF);
     //create_npc_set_stats(g, (vec3){5, 5, 0}, RACE_DWARF);

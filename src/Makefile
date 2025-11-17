@@ -37,6 +37,7 @@ WEB_SOURCES=main.cpp \
 			liblogic_create_npc.cpp \
 			liblogic_create_npc_set_stats.cpp \
 			liblogic_handle_npc.cpp \
+		  liblogic_handle_input.cpp \
 			liblogic_handle_camera_move.cpp \
 			liblogic_handle_input_inventory.cpp \
 			liblogic_handle_input_title_scene.cpp \
@@ -108,6 +109,7 @@ OBJ_FILES=main.o \
 		  liblogic_create_npc.o \
 		  liblogic_create_npc_set_stats.o \
 		  liblogic_handle_npc.o \
+		  liblogic_handle_input.o \
 		  liblogic_handle_camera_move.o \
 		  liblogic_handle_input_inventory.o \
 		  liblogic_handle_input_title_scene.o \
@@ -270,6 +272,9 @@ liblogic_cycle_messages.o: liblogic_cycle_messages.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_update_debug_panel_buffer.o: liblogic_update_debug_panel_buffer.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic_handle_input.o: liblogic_handle_input.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic.o: liblogic.cpp 
