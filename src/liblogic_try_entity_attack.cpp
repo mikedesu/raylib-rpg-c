@@ -1,4 +1,5 @@
 #include "liblogic_try_entity_attack.h"
+#include "sfx.h"
 
 void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful);
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
@@ -27,7 +28,19 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
     g->ct.set<direction>(atk_id, get_dir_from_xy(dx, dy));
     g->ct.set<attacking>(atk_id, true);
     g->ct.set<update>(atk_id, true);
+
+
     handle_attack_helper(g, tile, atk_id, &ok);
+
+    if (atk_id == g->hero_id) {
+        if (ok) {
+            PlaySound(g->sfx->at(SFX_HIT_METAL_ON_FLESH));
+        } else {
+            PlaySound(g->sfx->at(SFX_SLASH_ATTACK_SWORD_1));
+        }
+    }
+
+
     entitytype_t type0 = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
     handle_attack_success_gamestate_flag(g, type0, ok);
 }
