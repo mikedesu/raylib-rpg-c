@@ -15,11 +15,11 @@
 #include "liblogic_add_message.h"
 #include "liblogic_change_player_dir.h"
 #include "liblogic_create_npc_set_stats.h"
-//#include "liblogic_create_player.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_cycle_messages.h"
 #include "liblogic_handle_camera_move.h"
 #include "liblogic_handle_input_character_creation_scene.h"
+#include "liblogic_handle_input_help_menu.h"
 #include "liblogic_handle_input_inventory.h"
 #include "liblogic_handle_input_main_menu_scene.h"
 #include "liblogic_handle_input_title_scene.h"
@@ -28,7 +28,6 @@
 #include "liblogic_try_entity_move.h"
 #include "liblogic_try_entity_pickup.h"
 #include "massert.h"
-//#include "roll.h"
 #include "weapon.h"
 #include <cassert>
 #include <cmath>
@@ -49,7 +48,6 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
 void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
 
 
@@ -966,17 +964,6 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
 //        }
 //    }
 //}
-
-
-void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    massert(is, "Input state is NULL!");
-    massert(g, "Game state is NULL!");
-    if (inputstate_any_pressed(is)) {
-        g->display_help_menu = false;
-        g->controlmode = CONTROLMODE_PLAYER;
-        return;
-    }
-}
 
 
 //static void try_spawn_npc(shared_ptr<gamestate> const g) {
