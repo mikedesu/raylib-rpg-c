@@ -20,8 +20,8 @@ WEB_SOURCES=main.cpp \
 			libdraw_draw_character_creation_screen.cpp \
 			libdraw_load_textures.cpp \
 			libdraw_unload_textures.cpp \
-		  libdraw_dungeon_floor_tile.cpp \
-		  libdraw_create_spritegroup.cpp \
+		    libdraw_dungeon_floor_tile.cpp \
+		    libdraw_create_spritegroup.cpp \
 			libdraw_hud.cpp \
 			libdraw.cpp \
 		    liblogic_drop_item.cpp \
@@ -31,6 +31,7 @@ WEB_SOURCES=main.cpp \
 			liblogic_tile_npc_living_count.cpp \
 			liblogic_tile_has_box.cpp \
 			liblogic_try_entity_move.cpp \
+			liblogic_create_weapon.cpp \
 			liblogic.cpp \
 			gamestate_inventory.cpp \
 			gamestate.cpp \
@@ -85,6 +86,7 @@ OBJ_FILES=main.o \
 		  liblogic_tile_npc_living_count.o \
 		  liblogic_tile_has_box.o \
 		  liblogic_try_entity_move.o \
+		  liblogic_create_weapon.o \
 		  liblogic.o \
 
 
@@ -187,6 +189,9 @@ liblogic_try_entity_move.o: liblogic_try_entity_move.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_tile_has_box.o: liblogic_tile_has_box.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic_create_weapon.o: liblogic_create_weapon.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic.o: liblogic.cpp

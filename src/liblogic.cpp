@@ -14,6 +14,7 @@
 #include "libgame_defines.h"
 #include "liblogic.h"
 #include "liblogic_add_message.h"
+#include "liblogic_create_weapon.h"
 #include "liblogic_drop_item.h"
 #include "liblogic_try_entity_move.h"
 #include "liblogic_try_entity_pickup.h"
@@ -34,15 +35,12 @@ using std::string;
 int liblogic_restart_count = 0;
 
 // these have been moved to external source files
-entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z);
-int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
+
 void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
 void change_player_dir(shared_ptr<gamestate> g, direction_t dir);
-
-
 void init_dungeon(shared_ptr<gamestate> g);
 void cycle_messages(shared_ptr<gamestate> g);
 void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
@@ -51,13 +49,12 @@ void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate
 void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
+void handle_npc(shared_ptr<gamestate> g, entityid id);
+void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
+
 entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name);
 entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, string name);
-entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype type);
 entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race);
-void handle_npc(shared_ptr<gamestate> g, entityid id);
-
-void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
 
 
 void change_player_dir(shared_ptr<gamestate> g, direction_t dir) {
@@ -174,56 +171,6 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
     //g_set_stat(g, id, STATS_CON, 10);
     //g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
     //g_set_stat(g, id, STATS_AC, 10);
-}
-
-
-entityid create_weapon(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) {
-    minfo("potion create...");
-    massert(g, "gamestate is NULL");
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-    minfo("calling df_tile_at...");
-    shared_ptr<tile_t> tile = df_tile_at(df, loc);
-    massert(tile, "failed to get tile");
-
-    minfo("checking if tile is walkable...");
-    if (!tile_is_walkable(tile->type)) {
-        merror("cannot create entity on non-walkable tile");
-        return ENTITYID_INVALID;
-    }
-
-    minfo("checking if tile has live NPCs...");
-    if (tile_has_live_npcs(g, tile)) {
-        merror("cannot create entity on tile with live NPCs");
-        return ENTITYID_INVALID;
-    }
-    entityid id = g_add_entity(g);
-
-    g->ct.set<entitytype>(id, ENTITY_ITEM);
-
-    g->ct.set<itemtype>(id, ITEM_WEAPON);
-    g->ct.set<weapontype>(id, type);
-
-    string item_name = "unnamed-weapon";
-    if (type == WEAPON_AXE) {
-        item_name = "axe";
-    } else if (type == WEAPON_DAGGER) {
-        item_name = "dagger";
-    } else if (type == WEAPON_SWORD) {
-        item_name = "sword";
-    }
-
-    g->ct.set<name>(id, item_name);
-
-    g->ct.set<location>(id, loc);
-    g->ct.set<txalpha>(id, 255);
-    g->ct.set<update>(id, true);
-    g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
-
-    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-    if (!df_add_at(df, id, loc.x, loc.y)) {
-        return ENTITYID_INVALID;
-    }
-    return ENTITYID_INVALID;
 }
 
 
