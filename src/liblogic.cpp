@@ -726,16 +726,12 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
     create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
 
-
     //create_weapon(g, get_random_loc((rect){0, 0, 8, 8}, 0), WEAPON_AXE);
-
     //create_weapon(g, (vec3){1, 5, 0}, WEAPON_FLAIL);
-
     //create_weapon(g, (vec3){2, 3, 0}, WEAPON_DAGGER);
     //create_weapon(g, (vec3){2, 2, 0}, WEAPON_SWORD);
     //create_weapon(g, (vec3){2, 4, 0}, WEAPON_AXE);
     //create_weapon(g, (vec3){2, 5, 0}, WEAPON_FLAIL);
-
 
     add_message(g, "Welcome to the game! Press enter to cycle messages.");
     add_message(g, "To move around, press q w e a d z x c");
@@ -759,8 +755,6 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
                 a++;
             }
             g->ct.set<txalpha>(g->hero_id, a);
-
-
             //if (g_is_dead(g, g->hero_id)) {
             if (g->ct.get<dead>(g->hero_id).value_or(true)) {
                 //add_message_history(g, "You died!");
