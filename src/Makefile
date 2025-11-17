@@ -35,6 +35,9 @@ WEB_SOURCES=main.cpp \
 			liblogic_create_player.cpp \
 			liblogic_create_npc.cpp \
 			liblogic_create_npc_set_stats.cpp \
+			liblogic_handle_npc.cpp \
+			liblogic_handle_camera_move.cpp \
+			liblogic_init_dungeon.cpp \
 			liblogic.cpp \
 			gamestate_inventory.cpp \
 			gamestate.cpp \
@@ -93,6 +96,9 @@ OBJ_FILES=main.o \
 		  liblogic_create_player.o \
 		  liblogic_create_npc.o \
 		  liblogic_create_npc_set_stats.o \
+		  liblogic_handle_npc.o \
+		  liblogic_handle_camera_move.o \
+		  liblogic_init_dungeon.o \
 		  liblogic.o \
 
 
@@ -172,12 +178,10 @@ libdraw.o: libdraw.cpp
 
 ###################
 
-
-
 ###################
+
 liblogic_drop_item.o: liblogic_drop_item.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
 
 liblogic_try_entity_pickup.o: liblogic_try_entity_pickup.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
@@ -194,19 +198,31 @@ liblogic_tile_npc_living_count.o: liblogic_tile_npc_living_count.cpp
 liblogic_try_entity_move.o: liblogic_try_entity_move.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic_tile_has_box.o: liblogic_tile_has_box.cpp
+liblogic_tile_has_box.o: liblogic_tile_has_box.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_create_weapon.o: liblogic_create_weapon.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-liblogic_create_player.o: liblogic_create_player.cpp
+
+liblogic_create_player.o: liblogic_create_player.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-liblogic_create_npc.o: liblogic_create_npc.cpp
+
+liblogic_create_npc.o: liblogic_create_npc.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+	
 liblogic_create_npc_set_stats.o: liblogic_create_npc_set_stats.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic.o: liblogic.cpp
+liblogic_handle_npc.o: liblogic_handle_npc.cpp liblogic_handle_npc.h liblogic_try_entity_move.h gamestate.h
+	$(CXX) $(WFLAGS) $(CXXFLAGS) liblogic_handle_npc.cpp -c 
+
+liblogic_handle_camera_move.o: liblogic_handle_camera_move.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic_init_dungeon.o: liblogic_init_dungeon.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic.o: liblogic.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c
 
 #ComponentTable.o: ComponentTable.h ComponentTable.cpp ComponentTraits.h
@@ -224,6 +240,6 @@ index.html: $(WEB_SOURCES)
 	$(WEB_CC) -o $@ $(WEB_SOURCES) $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS) $(CFLAGS)
 
 clean:
-	rm -rfv game *.o time.txt index.html index.js index.wasm index.data test
+	rm -rfv game *.o *.gch time.txt index.html index.js index.wasm index.data test
 
 

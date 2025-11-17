@@ -14,12 +14,14 @@
 #include "libgame_defines.h"
 #include "liblogic.h"
 #include "liblogic_add_message.h"
-//#include "liblogic_create_npc.h"
 #include "liblogic_change_player_dir.h"
 #include "liblogic_create_npc_set_stats.h"
 #include "liblogic_create_player.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_drop_item.h"
+#include "liblogic_handle_camera_move.h"
+#include "liblogic_handle_npc.h"
+#include "liblogic_init_dungeon.h"
 #include "liblogic_try_entity_move.h"
 #include "liblogic_try_entity_pickup.h"
 #include "massert.h"
@@ -39,141 +41,17 @@ using std::string;
 int liblogic_restart_count = 0;
 
 // these have been moved to external source files
-
 void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
-//void change_player_dir(shared_ptr<gamestate> g, direction_t dir);
-void init_dungeon(shared_ptr<gamestate> g);
 void cycle_messages(shared_ptr<gamestate> g);
 void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_main_menu_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
 void handle_input_help_menu(shared_ptr<gamestate> g, shared_ptr<inputstate> is);
-void handle_npc(shared_ptr<gamestate> g, entityid id);
 void try_entity_attack(shared_ptr<gamestate> g, entityid attacker_id, int target_x, int target_y);
-
-
-void handle_npc(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "Game state is NULL!");
-    massert(id != ENTITYID_INVALID, "Entity is NULL!");
-    if (id == g->hero_id) {
-        //merror("Tried to handle hero id %d as NPC! This should not happen.", id);
-        return;
-    }
-    if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC) {
-        //minfo("Handling NPC %d", id);
-        if (g->ct.get<dead>(id).has_value()) {
-            bool is_dead = g->ct.get<dead>(id).value();
-            if (!is_dead) {
-                try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
-            }
-        }
-        //execute_action(g, id, g_get_default_action(g, id));
-    }
-}
-
-
-void init_dungeon(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    g->dungeon = d_create();
-    massert(g->dungeon, "failed to init dungeon");
-    msuccess("Dungeon initialized successfully");
-    minfo("adding floors...");
-    int df_count = 1;
-    // max size of 128x128 for now to maintain 60fps
-    // dungeon floors, tiles etc will require re-write/re-design for optimization
-    int w = 16;
-    int h = 16;
-    for (int i = 0; i < df_count; i++) {
-        d_add_floor(g->dungeon, w, h);
-        //d_add_floor(g->dungeon, DEFAULT_DUNGEON_FLOOR_WIDTH, DEFAULT_DUNGEON_FLOOR_HEIGHT);
-    }
-    msuccess("Added %d floors to dungeon", df_count);
-}
-
-
-//entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n) {
-//    minfo("begin create npc");
-//    massert(g, "gamestate is NULL");
-//    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-//    shared_ptr<tile_t> tile = df_tile_at(df, loc);
-//    massert(tile, "failed to get tile");
-//    if (!tile_is_walkable(tile->type)) {
-//        merror("cannot create entity on non-walkable tile");
-//        return ENTITYID_INVALID;
-//    }
-//    if (tile_has_live_npcs(g, tile)) {
-//        merror("cannot create entity on tile with live NPCs");
-//        return ENTITYID_INVALID;
-//    }
-//    entityid id = g_add_entity(g);
-//
-//    //g_add_name(g, id, name);
-//    //g_add_type(g, id, ENTITY_NPC);
-//
-//    g->ct.set<name>(id, n);
-//    g->ct.set<entitytype>(id, ENTITY_NPC);
-//    g->ct.set<race>(id, rt);
-//    g->ct.set<location>(id, loc);
-//    g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
-//    g->ct.set<dead>(id, false);
-//    g->ct.set<update>(id, true);
-//    g->ct.set<direction>(id, DIR_DOWN_RIGHT);
-//    g->ct.set<attacking>(id, false);
-//    g->ct.set<blocking>(id, false);
-//    g->ct.set<blocksuccess>(id, false);
-//    g->ct.set<damaged>(id, false);
-//    g->ct.set<txalpha>(id, 0);
-//
-//    //shared_ptr<vector<entityid>> my_inventory = make_shared<vector<entityid>>();
-//    //g->ct.set<inventory>(id, make_shared<unordered_set<entityid>>());
-//    g->ct.set<inventory>(id, make_shared<vector<entityid>>());
-//    g->ct.set<equipped_weapon>(id, ENTITYID_INVALID);
-//
-//    minfo("end create npc");
-//    return df_add_at(df, id, loc.x, loc.y);
-//
-//    //g_add_zapping(g, id, false);
-//    //g_add_default_action(g, id, ENTITY_ACTION_WAIT);
-//    //g_add_inventory(g, id);
-//    //g_add_target(g, id, (vec3){-1, -1, -1});
-//    //g_add_target_path(g, id);
-//    //g_add_equipment(g, id);
-//    //g_add_base_attack_damage(g, id, (vec3){1, 4, 0});
-//    //g_add_vision_distance(g, id, 0);
-//    //g_add_light_radius(g, id, 0);
-//    //g_add_stats(g, id);
-//    //g_set_stat(g, id, STATS_LEVEL, 1);
-//    //g_set_stat(g, id, STATS_XP, 0);
-//    //g_set_stat(g, id, STATS_NEXT_LEVEL_XP, calc_next_lvl_xp(g, id));
-//    //g_set_stat(g, id, STATS_MAXHP, 1);
-//    //g_set_stat(g, id, STATS_HP, 1);
-//    //g_set_stat(g, id, STATS_HITDIE, 1);
-//    //g_set_stat(g, id, STATS_STR, 10);
-//    //g_set_stat(g, id, STATS_DEX, 10);
-//    //g_set_stat(g, id, STATS_CON, 10);
-//    //g_set_stat(g, id, STATS_ATTACK_BONUS, 0);
-//    //g_set_stat(g, id, STATS_AC, 10);
-//}
-
-
-void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    const float move = g->cam2d.zoom;
-    //const char* action = get_action_key(is, g);
-    if (inputstate_is_held(is, KEY_RIGHT)) {
-        g->cam2d.offset.x += move;
-    } else if (inputstate_is_held(is, KEY_LEFT)) {
-        g->cam2d.offset.x -= move;
-    } else if (inputstate_is_held(is, KEY_UP)) {
-        g->cam2d.offset.y -= move;
-    } else if (inputstate_is_held(is, KEY_DOWN)) {
-        g->cam2d.offset.y += move;
-    }
-}
 
 
 void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
