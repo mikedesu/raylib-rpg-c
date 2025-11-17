@@ -749,7 +749,8 @@ void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
 void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     minfo2("Begin update sprites pre");
     massert(g, "gamestate is NULL");
-    //UpdateMusicStream(music);
+
+    UpdateMusicStream(music);
     //if (g->music_volume_changed) {
     //    SetMusicVolume(music, g->music_volume);
     //    g->music_volume_changed = false;
@@ -1322,25 +1323,18 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     //                            df_h * DEFAULT_TILE_SIZE / 2.0f};
     draw_title_screen_to_texture(g, false);
     draw_character_creation_screen_to_texture(g);
-    //InitAudioDevice();
-    // select a random indices for current music
-    //g->current_music_index = rand() % g->total_music_paths;
+
+    InitAudioDevice();
     // load the music stream from the selected path
-    //const char* music_path = g->music_file_paths[g->current_music_index];
-    //massert(music_path, "music_path is NULL");
-    //minfo("Loading music from path: %s", music_path);
-    //char real_music_path[1024] = {0};
-    //snprintf(real_music_path,
-    //         sizeof(real_music_path),
-    //         "%s%s",
-    //         "audio/music/",
-    //         music_path);
-    //music = LoadMusicStream(real_music_path);
-    //SetMusicVolume(music, 0.50f); // Set initial music volume
-    //SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
+    const char* music_path = "audio/music/dungeon-magic.mp3";
+    music = LoadMusicStream(music_path);
+
+    SetMasterVolume(1.0f);
+    SetMusicVolume(music, 0.75f); // Set initial music volume
+
     //SetMusicVolume(music, g->music_volume); // Set initial music volume
-    //SetMusicLooping(music, true); // Loop the music
-    //PlayMusicStream(music);
+
+    PlayMusicStream(music);
     //if (!camera_lock_on(g)) merror("failed to lock camera on hero");
     //msuccess("libdraw_init_rest: done");
 }
