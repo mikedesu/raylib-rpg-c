@@ -3,6 +3,7 @@
 #include "ComponentTraits.h"
 #include "entityid.h"
 #include "entitytype.h"
+#include "gamestate.h"
 #include "race.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -12,6 +13,7 @@
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"
 #include "tx_keys_weapons.h"
+#include <memory>
 
 //#include "get_txkey_for_tiletype.h"
 //#include "gamestate_equipped_weapon.h"
@@ -61,6 +63,8 @@ void handle_debug_panel(shared_ptr<gamestate> g);
 
 void draw_hud_from_texture(shared_ptr<gamestate> g);
 void draw_hud_to_texture(shared_ptr<gamestate> g);
+
+void libdraw_load_music(shared_ptr<gamestate> g);
 
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
@@ -1324,20 +1328,28 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     draw_title_screen_to_texture(g, false);
     draw_character_creation_screen_to_texture(g);
 
-    InitAudioDevice();
-    // load the music stream from the selected path
-    const char* music_path = "audio/music/dungeon-magic.mp3";
-    music = LoadMusicStream(music_path);
+    libdraw_load_music(g);
 
-    SetMasterVolume(1.0f);
-    SetMusicVolume(music, 0.75f); // Set initial music volume
-
-    //SetMusicVolume(music, g->music_volume); // Set initial music volume
-
-    PlayMusicStream(music);
     //if (!camera_lock_on(g)) merror("failed to lock camera on hero");
     //msuccess("libdraw_init_rest: done");
 }
+
+
+void libdraw_load_music(shared_ptr<gamestate> g) {
+    InitAudioDevice();
+    // load the music stream from the selected path
+
+    // randomly select a music path
+    size_t index = GetRandomValue(0, g->music_file_paths->size());
+    const char* music_path = g->music_file_paths->at(index).c_str();
+
+    minfo("Music path: %s", music_path);
+    music = LoadMusicStream(music_path);
+    SetMasterVolume(1.0f);
+    SetMusicVolume(music, 0.75f); // Set initial music volume
+    PlayMusicStream(music);
+}
+
 
 void libdraw_init(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");

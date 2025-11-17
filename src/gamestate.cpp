@@ -100,7 +100,6 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->next_entityid = 1;
 
     g->current_music_index = 0;
-    g->total_music_paths = 0;
     g->restart_count = 0;
     g->do_restart = 0;
 
@@ -119,7 +118,6 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->dungeon = nullptr;
 
-    gamestate_init_music_paths(g);
 
     g->msg_history = make_shared<vector<string>>();
     g->msg_system = make_shared<vector<string>>();
@@ -150,6 +148,8 @@ shared_ptr<gamestate> gamestateinitptr() {
 
     g->last_click_screen_pos = (Vector2){-1, -1};
 
+    gamestate_init_music_paths(g);
+
     msuccess("Gamestate initialized successfully");
     return g;
 }
@@ -157,30 +157,38 @@ shared_ptr<gamestate> gamestateinitptr() {
 
 void gamestate_init_music_paths(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
+    minfo("Initializing music paths...");
+    if (!g->music_file_paths) {
+        g->music_file_paths = make_shared<vector<string>>();
+    }
     const char* music_path_file = "music.txt";
     FILE* file = fopen(music_path_file, "r");
     massert(file, "Could not open music path file: %s", music_path_file);
-    int i = 0;
     char buffer[128];
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
         // Remove newline character if present
+        minfo("Removing newline character...");
         size_t len = strlen(buffer);
-        if (len > 0 && buffer[len - 1] == '\n') buffer[len - 1] = '\0';
-        // if it begins with a #, skip for now
-        if (buffer[0] == '#') continue;
-        // copy into g->music_file_paths[i]
-        // we have to add "audio/music/" to the beginning of the path
-        if (i < 1024) {
-            snprintf(g->music_file_paths[i], sizeof(g->music_file_paths[i]), "%s", buffer);
-            g->music_file_paths[i][sizeof(g->music_file_paths[i]) - 1] = '\0'; // Ensure null termination
-            i++;
-        } else {
-            merror("Too many music paths in %s", music_path_file);
-            break;
+        if (len > 0 && buffer[len - 1] == '\n') {
+            buffer[len - 1] = '\0';
         }
+        // if it begins with a #, skip for now
+        minfo("Checking for comment...");
+        if (buffer[0] == '#') {
+            mwarning("Comment received, skipping...");
+            continue;
+        }
+        // copy into g->music_file_paths
+        minfo("Pushing back %s", buffer);
+        //g->music_file_paths->push_back(string(buffer));
+
+        // need to pre-pend the folder path
+        string fullpath = "audio/music/" + string(buffer);
+
+        g->music_file_paths->push_back(fullpath);
     }
     fclose(file);
-    g->total_music_paths = i;
+    msuccess("Music paths initialized!");
 }
 
 

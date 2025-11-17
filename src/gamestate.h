@@ -101,7 +101,6 @@ typedef struct gamestate {
     int msg_history_max_len_msg;
     int msg_history_max_len_msg_measure;
     int current_music_index;
-    int total_music_paths;
     int restart_count;
 
     float line_spacing;
@@ -122,7 +121,8 @@ typedef struct gamestate {
     shared_ptr<vector<string>> msg_history;
     shared_ptr<character_creation> chara_creation;
 
-    char music_file_paths[MAX_MUSIC_PATHS][MAX_MUSIC_PATH_LENGTH];
+    //char music_file_paths[MAX_MUSIC_PATHS][MAX_MUSIC_PATH_LENGTH];
+    shared_ptr<vector<string>> music_file_paths;
 
     string version;
 
