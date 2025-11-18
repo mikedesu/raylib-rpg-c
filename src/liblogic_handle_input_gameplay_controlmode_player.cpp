@@ -151,6 +151,7 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
                 g->display_inventory_menu = true;
                 g->controlmode = CONTROLMODE_INVENTORY;
                 g->frame_dirty = true;
+                PlaySound(g->sfx->at(SFX_CONFIRM_01));
             }
             return;
         }
