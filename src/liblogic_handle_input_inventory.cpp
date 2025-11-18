@@ -18,31 +18,31 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
         g->display_inventory_menu = false;
         //g->display_gameplay_settings_menu = false;
         //g->display_sort_inventory_menu = false;
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        PlaySound(g->sfx->at(SFX_BAG_CLOSE));
         return;
     }
     if (inputstate_is_pressed(is, KEY_LEFT)) {
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
         if (g->inventory_cursor.x > 0) {
             g->inventory_cursor.x--;
         }
     }
     if (inputstate_is_pressed(is, KEY_RIGHT)) {
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
         g->inventory_cursor.x++;
     }
     if (inputstate_is_pressed(is, KEY_UP)) {
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
         if (g->inventory_cursor.y > 0) {
             g->inventory_cursor.y--;
         }
     }
     if (inputstate_is_pressed(is, KEY_DOWN)) {
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
         g->inventory_cursor.y++;
     }
     if (inputstate_is_pressed(is, KEY_E)) {
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        PlaySound(g->sfx->at(SFX_EQUIP_01));
         // equip item
         // get the item id of the current selection
         size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
