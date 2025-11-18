@@ -24,7 +24,10 @@ WEB_SOURCES=main.cpp \
 			libdraw_create_spritegroup.cpp \
 			libdraw_update_debug_panel.cpp \
 			libdraw_hud.cpp \
-		  libdraw_camera_lock_on.cpp \
+libdraw_load_music.cpp \
+libdraw_load_sfx.cpp \
+			libdraw_player_target_box.cpp \
+			libdraw_camera_lock_on.cpp \
 			libdraw_dungeon_tiles_2d.cpp \
 			libdraw.cpp \
 			liblogic_drop_item.cpp \
@@ -90,6 +93,9 @@ OBJ_FILES=main.o \
 		  libdraw_load_textures.o \
 		  libdraw_unload_textures.o \
 		  libdraw_hud.o \
+libdraw_load_music.o \
+libdraw_load_sfx.o \
+		  libdraw_player_target_box.o \
 		  libdraw_camera_lock_on.o \
 		  libdraw_dungeon_tiles_2d.o \
 		  libdraw_dungeon_floor_tile.o \
@@ -193,6 +199,15 @@ libdraw_unload_textures.o: libdraw_unload_textures.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_hud.o: libdraw_hud.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_load_music.o: libdraw_load_music.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_load_sfx.o: libdraw_load_sfx.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_player_target_box.o: libdraw_player_target_box.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_camera_lock_on.o: libdraw_camera_lock_on.cpp

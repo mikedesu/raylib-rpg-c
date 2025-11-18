@@ -5,6 +5,9 @@
 #include "libdraw.h"
 #include "libdraw_camera_lock_on.h"
 #include "libdraw_dungeon_tiles_2d.h"
+#include "libdraw_load_music.h"
+#include "libdraw_load_sfx.h"
+#include "libdraw_player_target_box.h"
 #include "libdraw_update_debug_panel.h"
 #include "race.h"
 #include "spritegroup.h"
@@ -61,10 +64,6 @@ void handle_debug_panel(shared_ptr<gamestate> g);
 void draw_hud_from_texture(shared_ptr<gamestate> g);
 
 void draw_hud_to_texture(shared_ptr<gamestate> g);
-
-void libdraw_load_music(shared_ptr<gamestate> g);
-
-void libdraw_load_sfx(shared_ptr<gamestate> g);
 
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
 
@@ -125,8 +124,6 @@ void load_shaders();
 bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
 
 bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
-
-bool libdraw_draw_player_target_box(shared_ptr<gamestate> g);
 
 void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
@@ -863,15 +860,12 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
             if (!tile) {
                 continue;
             }
-
             if (tile_is_wall(tile->type)) {
                 continue;
             }
-
             if (!tile->visible) {
                 continue; // Do not draw entities on invisible tiles
             }
-
             if (tile->is_empty) {
                 continue;
             }
@@ -912,36 +906,11 @@ void draw_debug_panel(shared_ptr<gamestate> g) {
 }
 
 
-bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    entityid id = g->hero_id;
-    if (id == -1) return false;
-    direction_t dir = g->ct.get<direction>(id).value();
-
-    //vec3 loc = g_get_loc(g, id);
-    vec3 loc = g->ct.get<location>(id).value();
-
-    float x = loc.x + get_x_from_dir(dir);
-    float y = loc.y + get_y_from_dir(dir);
-    float w = DEFAULT_TILE_SIZE;
-    float h = DEFAULT_TILE_SIZE;
-    //Color base_c = GREEN;
-    float a = 0.5f;
-    if (g->player_changing_dir) {
-        a = 0.75f;
-    }
-    DrawRectangleLinesEx((Rectangle){x * w, y * h, w, h}, 1, Fade(GREEN, a));
-    return true;
-}
-
-
 void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
-
     camera_lock_on(g);
-
     //minfo("Drawing frame");
     BeginMode2D(g->cam2d);
     ClearBackground(BLACK);
@@ -949,15 +918,12 @@ void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     libdraw_draw_dungeon_floor(g);
     libdraw_draw_player_target_box(g);
     EndMode2D();
-
     //if (g->frame_dirty) {
     //draw_hud_to_texture(g);
     //} else {
     //draw_hud_from_texture(g);
     //}
-
     draw_hud(g);
-
     draw_message_history(g);
     draw_message_box(g);
     if (g->display_inventory_menu) {
@@ -996,13 +962,9 @@ void draw_message_box(shared_ptr<gamestate> g) {
     if (!g->msg_system_is_active || g->msg_system->size() == 0) {
         return;
     }
-
     const string msg = g->msg_system->at(0);
-
     const Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     const int font_size = 10;
-
-
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
     const int measure = MeasureText(tmp, font_size);
@@ -1011,7 +973,6 @@ void draw_message_box(shared_ptr<gamestate> g) {
     const int w = DEFAULT_TARGET_WIDTH;
     const float x = (w - text_width) / 2.0 - g->pad;
     const float y = (DEFAULT_TARGET_HEIGHT - text_height) / 2.0 - g->pad;
-
     const Rectangle box = {x, y, text_width + g->pad * 2, text_height + g->pad * 2};
 
     DrawRectangleRec(box, message_bg);
@@ -1317,37 +1278,6 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
 
     //if (!camera_lock_on(g)) merror("failed to lock camera on hero");
     //msuccess("libdraw_init_rest: done");
-}
-
-
-void libdraw_load_music(shared_ptr<gamestate> g) {
-    // load the music stream from the selected path
-    // randomly select a music path
-    size_t index = GetRandomValue(0, g->music_file_paths->size());
-    const char* music_path = g->music_file_paths->at(index).c_str();
-    minfo("Music path: %s", music_path);
-    music = LoadMusicStream(music_path);
-    SetMasterVolume(1.0f);
-    SetMusicVolume(music, 0.5f); // Set initial music volume
-    PlayMusicStream(music);
-}
-
-
-void libdraw_load_sfx(shared_ptr<gamestate> g) {
-    FILE* infile = fopen("sfx.txt", "r");
-    char buffer[128];
-
-    while (fgets(buffer, sizeof(buffer), infile) != NULL) {
-        size_t len = strlen(buffer);
-        if (len > 0 && buffer[len - 1] == '\n') {
-            buffer[len - 1] = '\0';
-        }
-        string fullpath = "audio/sfx/" + string(buffer);
-        Sound sound = LoadSound(fullpath.c_str());
-        g->sfx->push_back(sound);
-    }
-
-    fclose(infile);
 }
 
 
