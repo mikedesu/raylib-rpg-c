@@ -3,7 +3,7 @@
 
 
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
-extern unordered_map<entityid, spritegroup_t*> spritegroups2;
+extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
 //bool create_spritegroup(shared_ptr<gamestate> g, textureinfo* txinfo, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
 bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
@@ -63,6 +63,6 @@ bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num
 
     //hashtable_entityid_spritegroup_insert(spritegroups, id, group);
     // how its done in the future...
-    spritegroups2[id] = group;
+    spritegroups[id] = group;
     return true;
 }

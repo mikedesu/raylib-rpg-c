@@ -1,19 +1,18 @@
-#include "libdraw.h"
-
 #include "ComponentTraits.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate.h"
+#include "libdraw.h"
+#include "libdraw_dungeon_tiles_2d.h"
+#include "libdraw_update_debug_panel.h"
 #include "race.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
-
 #include "tx_keys_boxes.h"
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"
 #include "tx_keys_weapons.h"
-#include <memory>
 
 //#include "get_txkey_for_tiletype.h"
 //#include "gamestate_equipped_weapon.h"
@@ -21,7 +20,7 @@
 //#include "tx_keys_rings.h"
 //#include "tx_keys_shields.h"
 
-unordered_map<entityid, spritegroup_t*> spritegroups2;
+unordered_map<entityid, spritegroup_t*> spritegroups;
 
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
@@ -57,59 +56,87 @@ int libdraw_restart_count = 0;
 
 
 bool camera_lock_on(shared_ptr<gamestate> g);
-void update_debug_panel(shared_ptr<gamestate> g);
+
 void handle_debug_panel(shared_ptr<gamestate> g);
 
-
 void draw_hud_from_texture(shared_ptr<gamestate> g);
+
 void draw_hud_to_texture(shared_ptr<gamestate> g);
 
 void libdraw_load_music(shared_ptr<gamestate> g);
+
 void libdraw_load_sfx(shared_ptr<gamestate> g);
 
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
+
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
+
 void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id);
+
 void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g);
+
 void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+
 void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+
 void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+
 void libdraw_unload_shaders();
 
-
 void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
 void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
+
 void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
 void libdraw_drawframe_2d(shared_ptr<gamestate> g);
 
 void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
+
 void draw_gameover_menu(shared_ptr<gamestate> g);
+
 void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
 void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
 void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
 void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
 void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
+
 void draw_title_screen_from_texture(shared_ptr<gamestate> g);
+
 void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g);
+
 void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
+
 void draw_message_box(shared_ptr<gamestate> g);
+
 void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id);
+
 void draw_debug_panel(shared_ptr<gamestate> g);
 
 void create_sg_byid(shared_ptr<gamestate> g, entityid id);
+
 void load_shaders();
 
-
-bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df);
 bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
+
 bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
+
 bool libdraw_draw_player_target_box(shared_ptr<gamestate> g);
 
 void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
 shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
 shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
 sprite* get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
 sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
 // sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
@@ -120,18 +147,6 @@ sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup
 //                                   entityid id);
 
 
-bool draw_dungeon_tiles_2d(const shared_ptr<gamestate> g, int z, shared_ptr<dungeon_floor_t> df) {
-    massert(g, "gamestate is NULL");
-    massert(df, "dungeon_floor is NULL");
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            draw_dungeon_floor_tile(g, txinfo, x, y, z);
-        }
-    }
-    return true;
-}
-
-
 shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
@@ -139,8 +154,8 @@ shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id,
     shared_ptr<sprite> retval = nullptr;
     entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
     if (weapon == ENTITYID_INVALID) return retval;
-    auto it = spritegroups2.find(weapon);
-    if (it == spritegroups2.end()) return retval;
+    auto it = spritegroups.find(weapon);
+    if (it == spritegroups.end()) return retval;
     spritegroup_t* w_sg = it->second;
     if (!w_sg) return retval;
 
@@ -162,8 +177,8 @@ shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, 
     shared_ptr<sprite> retval = nullptr;
     entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
     if (weapon == ENTITYID_INVALID) return retval;
-    auto it = spritegroups2.find(weapon);
-    if (it == spritegroups2.end()) return retval;
+    auto it = spritegroups.find(weapon);
+    if (it == spritegroups.end()) return retval;
     spritegroup_t* w_sg = it->second;
     if (!w_sg) return retval;
 
@@ -324,10 +339,10 @@ void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_
 void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (spritegroups2.find(id) == spritegroups2.end()) {
+    if (spritegroups.find(id) == spritegroups.end()) {
         return;
     }
-    spritegroup_t* sg = spritegroups2[id];
+    spritegroup_t* sg = spritegroups[id];
 
 
     // old
@@ -414,10 +429,10 @@ bool camera_lock_on(shared_ptr<gamestate> g) {
     if (!g->cam_lockon) {
         return false;
     }
-    if (spritegroups2.find(g->hero_id) == spritegroups2.end()) {
+    if (spritegroups.find(g->hero_id) == spritegroups.end()) {
         return false;
     }
-    spritegroup_t* grp = spritegroups2[g->hero_id];
+    spritegroup_t* grp = spritegroups[g->hero_id];
     if (!grp) {
         return false;
     }
@@ -505,7 +520,7 @@ void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_
 
     weaponid = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
     if (weaponid == ENTITYID_INVALID) return;
-    w_sg = spritegroups2[weaponid];
+    w_sg = spritegroups[weaponid];
     if (!w_sg) return;
 
     ctx = sg->sprites2->at(sg->current)->currentcontext;
@@ -704,10 +719,10 @@ void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     minfo2("Begin update sprite pre: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    if (spritegroups2.find(id) == spritegroups2.end()) {
+    if (spritegroups.find(id) == spritegroups.end()) {
         return;
     }
-    spritegroup_t* sg = spritegroups2[id];
+    spritegroup_t* sg = spritegroups[id];
     if (sg) {
         libdraw_update_sprite_ptr(g, id, sg);
     }
@@ -796,7 +811,7 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
             //spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
 
             // grab the sprite group for that entity
-            spritegroup_t* sg = spritegroups2[id];
+            spritegroup_t* sg = spritegroups[id];
             if (sg) {
                 // for every sprite in the spritegroup (INCORRECT!!!! NOT WHAT WE WANT, CAUSE-OF-BUG!!!)
                 //int num_sprites = sg->sprites2->size();
@@ -1031,13 +1046,6 @@ void draw_message_box(shared_ptr<gamestate> g) {
 }
 
 
-void update_debug_panel(shared_ptr<gamestate> g) {
-    // concat a string onto the end of the debug panel message
-    char tmp[1024] = {0};
-    strncat(g->debugpanel.buffer, tmp, sizeof(g->debugpanel.buffer) - strlen(g->debugpanel.buffer) - 1);
-}
-
-
 void handle_debug_panel(shared_ptr<gamestate> g) {
     if (g->debugpanelon) {
         update_debug_panel(g);
@@ -1172,7 +1180,7 @@ bool create_spritegroup(shared_ptr<gamestate> g, textureinfo* txinfo, entityid i
     group->off_y = offset_y;
     //hashtable_entityid_spritegroup_insert(spritegroups, id, group);
     // how its done in the future...
-    spritegroups2[id] = group;
+    spritegroups[id] = group;
     return true;
 }
 

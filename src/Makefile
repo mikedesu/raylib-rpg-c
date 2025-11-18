@@ -20,11 +20,13 @@ WEB_SOURCES=main.cpp \
 			libdraw_draw_character_creation_screen.cpp \
 			libdraw_load_textures.cpp \
 			libdraw_unload_textures.cpp \
-		    libdraw_dungeon_floor_tile.cpp \
-		    libdraw_create_spritegroup.cpp \
+			libdraw_dungeon_floor_tile.cpp \
+			libdraw_create_spritegroup.cpp \
+			libdraw_update_debug_panel.cpp \
 			libdraw_hud.cpp \
+			libdraw_dungeon_tiles_2d.cpp \
 			libdraw.cpp \
-		    liblogic_drop_item.cpp \
+			liblogic_drop_item.cpp \
 			liblogic_try_entity_attack.cpp \
 			liblogic_try_entity_pickup.cpp \
 			liblogic_add_message.cpp \
@@ -37,7 +39,7 @@ WEB_SOURCES=main.cpp \
 			liblogic_create_npc.cpp \
 			liblogic_create_npc_set_stats.cpp \
 			liblogic_handle_npc.cpp \
-		  liblogic_handle_input.cpp \
+			liblogic_handle_input.cpp \
 			liblogic_handle_camera_move.cpp \
 			liblogic_handle_input_inventory.cpp \
 			liblogic_handle_input_title_scene.cpp \
@@ -87,8 +89,10 @@ OBJ_FILES=main.o \
 		  libdraw_load_textures.o \
 		  libdraw_unload_textures.o \
 		  libdraw_hud.o \
+		  libdraw_dungeon_tiles_2d.o \
 		  libdraw_dungeon_floor_tile.o \
 		  libdraw_create_spritegroup.o \
+		  libdraw_update_debug_panel.o \
 		  libdraw.o \
 		  spritegroup.o \
 		  sprite.o \
@@ -113,7 +117,7 @@ OBJ_FILES=main.o \
 		  liblogic_handle_camera_move.o \
 		  liblogic_handle_input_inventory.o \
 		  liblogic_handle_input_title_scene.o \
-			liblogic_handle_input_gameplay_scene.o \
+		  liblogic_handle_input_gameplay_scene.o \
 		  liblogic_handle_input_main_menu_scene.o \
 		  liblogic_handle_input_help_menu.o \
 		  liblogic_handle_input_character_creation_scene.o \
@@ -189,10 +193,16 @@ libdraw_unload_textures.o: libdraw_unload_textures.cpp
 libdraw_hud.o: libdraw_hud.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
+libdraw_dungeon_tiles_2d.o: libdraw_dungeon_tiles_2d.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
 libdraw_dungeon_floor_tile.o: libdraw_dungeon_floor_tile.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_create_spritegroup.o: libdraw_create_spritegroup.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_update_debug_panel.o: libdraw_update_debug_panel.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw.o: libdraw.cpp 

@@ -7,7 +7,7 @@
 #include "spritegroup.h"
 #include <raylib.h>
 
-extern unordered_map<entityid, spritegroup_t*> spritegroups2;
+extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
 void draw_inventory_menu(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -76,7 +76,7 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                     Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
                     DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
                     if (it != unpacked_inventory->end()) {
-                        spritegroup_t* sg = spritegroups2[*it];
+                        spritegroup_t* sg = spritegroups[*it];
                         if (sg) {
                             auto sprite = sg_get_current(sg);
                             DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
@@ -109,7 +109,7 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                 size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
                 if (index >= 0 && index < unpacked_inventory->size()) {
                     entityid selection_id = unpacked_inventory->at(index);
-                    spritegroup_t* sg = spritegroups2[selection_id];
+                    spritegroup_t* sg = spritegroups[selection_id];
                     if (sg) {
                         auto sprite = sg_get_current(sg);
                         DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
