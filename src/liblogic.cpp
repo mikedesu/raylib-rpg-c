@@ -56,23 +56,11 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_npc_set_stats(g, (vec3){5, 6, 0}, RACE_GOBLIN);
     //create_npc_set_stats(g, (vec3){5, 7, 0}, RACE_HALFLING);
     //create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
-    int start_x = 5;
-    int x = start_x;
-    const int max_x = 16;
-    int y = 5;
-    const int max_y = 16;
-    const int num = 25;
-    for (int i = 0; i < num; i++) {
-        create_npc_set_stats(g, (vec3){x, y, 0}, RACE_ORC);
-        x++;
-        if (x >= max_x) {
-            x = start_x;
-            y++;
-        }
-        if (y >= max_y) {
-            break;
-        }
-    }
+
+    create_weapon(g, (vec3){1, 0, 0}, WEAPON_DAGGER);
+
+    create_npc_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
+
     //create_npc_set_stats(g, (vec3){6, 5, 0}, RACE_WOLF);
     //create_npc_set_stats(g, (vec3){6, 6, 0}, RACE_WARG);
     //create_npc_set_stats(g, (vec3){6, 7, 0}, RACE_BAT);
@@ -85,9 +73,9 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon(g, (vec3){1, 5, 0}, WEAPON_TWO_HANDED_SWORD);
     //create_weapon(g, (vec3){1, 6, 0}, WEAPON_BOW);
     //create_weapon(g, (vec3){1, 6, 0}, WEAPON_WARHAMMER);
-    create_weapon(g, (vec3){1, 3, 0}, WEAPON_DAGGER);
-    create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
-    create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
+    //create_weapon(g, (vec3){1, 2, 0}, WEAPON_SWORD);
+    //create_weapon(g, (vec3){1, 4, 0}, WEAPON_AXE);
+
     //create_weapon(g, get_random_loc((rect){0, 0, 8, 8}, 0), WEAPON_AXE);
     //create_weapon(g, (vec3){1, 5, 0}, WEAPON_FLAIL);
     //create_weapon(g, (vec3){2, 3, 0}, WEAPON_DAGGER);

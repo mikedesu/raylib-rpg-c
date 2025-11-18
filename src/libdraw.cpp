@@ -926,9 +926,9 @@ bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     float w = DEFAULT_TILE_SIZE;
     float h = DEFAULT_TILE_SIZE;
     //Color base_c = GREEN;
-    float a = 0.75f;
+    float a = 0.5f;
     if (g->player_changing_dir) {
-        a = 1.0f;
+        a = 0.75f;
     }
     DrawRectangleLinesEx((Rectangle){x * w, y * h, w, h}, 1, Fade(GREEN, a));
     return true;
