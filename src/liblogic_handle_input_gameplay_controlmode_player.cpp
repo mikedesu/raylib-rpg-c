@@ -22,6 +22,7 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
     if (g->msg_system_is_active) {
         // press enter to cycle thru message
         if (inputstate_is_pressed(is, KEY_ENTER)) {
+            PlaySound(g->sfx->at(SFX_CONFIRM_01));
             cycle_messages(g);
         }
         return;
@@ -151,7 +152,8 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
                 g->display_inventory_menu = true;
                 g->controlmode = CONTROLMODE_INVENTORY;
                 g->frame_dirty = true;
-                PlaySound(g->sfx->at(SFX_CONFIRM_01));
+                //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+                PlaySound(g->sfx->at(SFX_BAG_OPEN));
             }
             return;
         }

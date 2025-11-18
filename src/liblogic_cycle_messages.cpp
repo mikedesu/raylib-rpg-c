@@ -1,4 +1,5 @@
 #include "liblogic_cycle_messages.h"
+#include "sfx.h"
 
 void cycle_messages(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -6,7 +7,6 @@ void cycle_messages(shared_ptr<gamestate> g) {
         string msg = g->msg_system->front();
         int len = msg.length();
         // measure the length of the message as calculated by MeasureText
-
         if (len > g->msg_history_max_len_msg) {
             g->msg_history_max_len_msg = len;
             int font_size = 10;
@@ -14,7 +14,6 @@ void cycle_messages(shared_ptr<gamestate> g) {
             //if (measure > g->msg_history_max_len_msg_measure) {
             g->msg_history_max_len_msg_measure = measure;
         }
-
         g->msg_history->push_back(g->msg_system->front());
         g->msg_system->erase(g->msg_system->begin());
     }

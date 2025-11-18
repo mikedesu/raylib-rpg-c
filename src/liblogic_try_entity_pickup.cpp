@@ -5,7 +5,9 @@
 //#include "gamestate_inventory.h"
 #include "liblogic_add_message.h"
 #include "massert.h"
+#include "sfx.h"
 #include <unordered_set>
+
 
 using std::unordered_set;
 
@@ -53,6 +55,7 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
                 // add the item_id to my_inventory
                 //my_inventory->insert(itemid);
                 my_inventory->push_back(itemid);
+                PlaySound(g->sfx->at(SFX_CONFIRM_01));
 
             } else {
                 merror("id %d does not have an inventory", id);
