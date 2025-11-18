@@ -1,5 +1,8 @@
+#include "ComponentTraits.h"
+#include "entityid.h"
 #include "liblogic_try_entity_attack.h"
 #include "sfx.h"
+#include "weapon.h"
 
 void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful);
 bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
@@ -34,9 +37,28 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
 
     if (atk_id == g->hero_id) {
         if (ok) {
+            // default metal on flesh
             PlaySound(g->sfx->at(SFX_HIT_METAL_ON_FLESH));
         } else {
-            PlaySound(g->sfx->at(SFX_SLASH_ATTACK_SWORD_1));
+            // need to select appropriate sound effect based on equipment
+            // get hero's equipped weapon if any
+            entityid weapon_id = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
+            int index = 0;
+            if (weapon_id != ENTITYID_INVALID) {
+                // hero has equipped weapon
+                // get its type
+                weapontype_t wpn_type = g->ct.get<weapontype>(weapon_id).value_or(WEAPON_NONE);
+                if (wpn_type == WEAPON_SWORD) {
+                    index = SFX_SLASH_ATTACK_SWORD_1;
+                } else if (wpn_type == WEAPON_AXE) {
+                    index = SFX_SLASH_ATTACK_HEAVY_1;
+                } else if (wpn_type == WEAPON_DAGGER) {
+                    index = SFX_SLASH_ATTACK_LIGHT_1;
+                }
+            } else {
+                index = SFX_SLASH_ATTACK_SWORD_1;
+            }
+            PlaySound(g->sfx->at(index));
         }
     }
 
