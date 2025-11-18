@@ -3,6 +3,7 @@
 #include "entitytype.h"
 #include "gamestate.h"
 #include "libdraw.h"
+#include "libdraw_camera_lock_on.h"
 #include "libdraw_dungeon_tiles_2d.h"
 #include "libdraw_update_debug_panel.h"
 #include "race.h"
@@ -54,8 +55,6 @@ Music music;
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
-
-bool camera_lock_on(shared_ptr<gamestate> g);
 
 void handle_debug_panel(shared_ptr<gamestate> g);
 
@@ -423,31 +422,6 @@ void libdraw_unload_shaders() {
     UnloadShader(shader_psychedelic_0);
 }
 
-
-bool camera_lock_on(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    if (!g->cam_lockon) {
-        return false;
-    }
-    if (spritegroups.find(g->hero_id) == spritegroups.end()) {
-        return false;
-    }
-    spritegroup_t* grp = spritegroups[g->hero_id];
-    if (!grp) {
-        return false;
-    }
-    // get the old camera position
-    Vector2 old_target = g->cam2d.target;
-    g->cam2d.target = (Vector2){grp->dest.x, grp->dest.y};
-    // if the target changes, we need to set a flag indicating as such
-    if (old_target.x != g->cam2d.target.x || old_target.y != g->cam2d.target.y) {
-        g->cam_changed = true;
-        g->frame_dirty = true;
-    } else {
-        g->cam_changed = false;
-    }
-    return true;
-}
 
 // bool libdraw_check_default_animations(const gamestate* const g) {
 //    massert(g, "gamestate is NULL");
