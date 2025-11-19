@@ -5,10 +5,11 @@
 #include "libdraw.h"
 #include "libdraw_camera_lock_on.h"
 #include "libdraw_dungeon_tiles_2d.h"
+#include "libdraw_handle_debug_panel.h"
 #include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
 #include "libdraw_player_target_box.h"
-#include "libdraw_update_debug_panel.h"
+//#include "libdraw_update_debug_panel.h"
 #include "race.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -58,8 +59,6 @@ Music music;
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
-
-void handle_debug_panel(shared_ptr<gamestate> g);
 
 void draw_hud_from_texture(shared_ptr<gamestate> g);
 
@@ -892,20 +891,6 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
 }
 
 
-void draw_debug_panel(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f);
-    Color fg = WHITE;
-    int fontsize = 10;
-    int w = MeasureText(g->debugpanel.buffer, fontsize);
-    int h = fontsize * 30; // Assuming single line text for now
-    int x = DEFAULT_TARGET_WIDTH - w;
-    int y = fontsize * 2;
-    DrawRectangle(x - 10 - 20, y - 10, w + 20, h + 20, bg);
-    DrawText(g->debugpanel.buffer, x - 20, y, fontsize, fg);
-}
-
-
 void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
@@ -978,14 +963,6 @@ void draw_message_box(shared_ptr<gamestate> g) {
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);
     DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
-}
-
-
-void handle_debug_panel(shared_ptr<gamestate> g) {
-    if (g->debugpanelon) {
-        update_debug_panel(g);
-        draw_debug_panel(g);
-    }
 }
 
 
