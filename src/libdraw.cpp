@@ -11,6 +11,7 @@
 #include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
 #include "libdraw_player_target_box.h"
+#include "libdraw_set_sg_is_attacking.h"
 #include "race.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -76,11 +77,7 @@ void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup
 
 void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
 
-void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
-
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
-
-void libdraw_unload_shaders();
 
 void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
@@ -114,21 +111,20 @@ void draw_message_box(shared_ptr<gamestate> g);
 
 void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id);
 
-void draw_debug_panel(shared_ptr<gamestate> g);
-
 void create_sg_byid(shared_ptr<gamestate> g, entityid id);
 
 void load_shaders();
+
+void libdraw_unload_shaders();
 
 bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
 
 bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
 
-void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
+//sprite* get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
-sprite* get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+//sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
 // sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 // sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
@@ -408,55 +404,6 @@ void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, spritegroup_t*
     sg_set_default_anim(sg, anim_index);
     spritegroup_set_current(sg, sg->default_anim);
     spritegroup_set_stop_on_last_frame(sg, true);
-}
-
-
-void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entity id is -1");
-    massert(sg, "spritegroup is NULL");
-
-    spritegroup_t* w_sg = nullptr;
-    entityid weaponid = ENTITYID_INVALID;
-    int ctx = -1;
-
-    weaponid = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
-    if (weaponid == ENTITYID_INVALID) return;
-    w_sg = spritegroups[weaponid];
-    if (!w_sg) return;
-
-    ctx = sg->sprites2->at(sg->current)->currentcontext;
-    spritegroup_setcontexts(w_sg, ctx);
-
-    // this really should be either SLASH_F or SLASH_B
-    // eventually we will select this based on other factors as well
-    // or rather we'll have a better way to select which animation joins the entity's attack
-    // lets test this theory by changing it to the B anim
-
-    //spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
-}
-
-
-void libdraw_set_sg_is_attacking(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    massert(sg, "spritegroup is NULL");
-    //race_t race = g_get_race(g, id);
-    //entityid weapon = g_get_equipment(g, id, EQUIP_SLOT_WEAPON);
-    //weapontype wtype = g_get_weapontype(g, weapon);
-    int cur = SG_ANIM_NPC_ATTACK;
-    //if (wtype == WEAPON_BOW) {
-    //    cur = SG_ANIM_NPC_SHOT;
-    //}
-    //if (race == RACE_BAT) {
-    //    cur = SG_ANIM_BAT_ATTACK;
-    //} else if (race == RACE_GREEN_SLIME) {
-    //    cur = SG_ANIM_SLIME_ATTACK;
-    //}
-    spritegroup_set_current(sg, cur);
-    update_weapon_for_entity(g, id, sg);
-    g->ct.set<attacking>(id, false);
 }
 
 
