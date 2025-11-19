@@ -24,6 +24,7 @@ libdraw_dungeon_floor_tile.cpp \
 libdraw_create_spritegroup.cpp \
 libdraw_update_debug_panel.cpp \
 libdraw_hud.cpp \
+libdraw_weapon_sprite.cpp \
 libdraw_update_weapon_for_entity.cpp \
 libdraw_set_sg_is_attacking.cpp \
 libdraw_load_music.cpp \
@@ -100,6 +101,7 @@ libdraw_draw_character_creation_screen.o \
 libdraw_load_textures.o \
 libdraw_unload_textures.o \
 libdraw_hud.o \
+libdraw_weapon_sprite.o \
 libdraw_update_weapon_for_entity.o \
 libdraw_set_sg_is_attacking.o \
 libdraw_load_music.o \
@@ -215,6 +217,8 @@ libdraw_unload_textures.o: libdraw_unload_textures.cpp
 libdraw_hud.o: libdraw_hud.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
+libdraw_weapon_sprite.o: libdraw_weapon_sprite.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_update_weapon_for_entity.o: libdraw_update_weapon_for_entity.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
