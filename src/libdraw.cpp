@@ -5,11 +5,11 @@
 #include "libdraw.h"
 #include "libdraw_camera_lock_on.h"
 #include "libdraw_dungeon_tiles_2d.h"
+#include "libdraw_get_weapon_sprite.h"
 #include "libdraw_handle_debug_panel.h"
 #include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
 #include "libdraw_player_target_box.h"
-//#include "libdraw_update_debug_panel.h"
 #include "race.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -21,7 +21,6 @@
 
 //#include "get_txkey_for_tiletype.h"
 //#include "gamestate_equipped_weapon.h"
-//#include "libdraw_version.h"
 //#include "tx_keys_rings.h"
 //#include "tx_keys_shields.h"
 
@@ -126,12 +125,8 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
 
 void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
-shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-
-shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
 sprite* get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-
 sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
 // sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
@@ -140,53 +135,6 @@ sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup
 // void draw_shadow_for_entity(const shared_ptr<gamestate> g,
 //                                   spritegroup_t* sg,
 //                                   entityid id);
-
-
-shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "id is -1");
-    massert(sg, "spritegroup is NULL");
-    shared_ptr<sprite> retval = nullptr;
-    entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
-    if (weapon == ENTITYID_INVALID) return retval;
-    auto it = spritegroups.find(weapon);
-    if (it == spritegroups.end()) return retval;
-    spritegroup_t* w_sg = it->second;
-    if (!w_sg) return retval;
-
-    if (sg->current == SG_ANIM_NPC_ATTACK) {
-        retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
-    }
-    //else if (sg->current == SG_ANIM_NPC_SHOT) {
-    //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_F);
-    //}
-    return retval;
-}
-
-
-shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "id is -1");
-    massert(sg, "spritegroup is NULL");
-
-    shared_ptr<sprite> retval = nullptr;
-    entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
-    if (weapon == ENTITYID_INVALID) return retval;
-    auto it = spritegroups.find(weapon);
-    if (it == spritegroups.end()) return retval;
-    spritegroup_t* w_sg = it->second;
-    if (!w_sg) return retval;
-
-    if (sg->current == SG_ANIM_NPC_ATTACK) {
-        retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    }
-    //else if (sg->current == SG_ANIM_NPC_SHOT) {
-    //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_B);
-    //}
-
-
-    return retval;
-}
 
 
 /*

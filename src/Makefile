@@ -29,6 +29,7 @@ libdraw_load_sfx.cpp \
 libdraw_debug_panel.cpp \
 libdraw_update_debug_panel.cpp \
 libdraw_handle_debug_panel.cpp \
+libdraw_get_weapon_sprite.cpp \
 			libdraw_player_target_box.cpp \
 			libdraw_camera_lock_on.cpp \
 			libdraw_dungeon_tiles_2d.cpp \
@@ -101,6 +102,7 @@ libdraw_load_sfx.o \
 libdraw_debug_panel.o \
 libdraw_update_debug_panel.o \
 libdraw_handle_debug_panel.o \
+libdraw_get_weapon_sprite.o \
 		  libdraw_player_target_box.o \
 		  libdraw_camera_lock_on.o \
 		  libdraw_dungeon_tiles_2d.o \
@@ -207,6 +209,10 @@ libdraw_unload_textures.o: libdraw_unload_textures.cpp
 libdraw_hud.o: libdraw_hud.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
+libdraw_get_weapon_sprite.o: libdraw_get_weapon_sprite.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+
 libdraw_handle_debug_panel.o: libdraw_handle_debug_panel.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
@@ -238,8 +244,6 @@ libdraw_dungeon_floor_tile.o: libdraw_dungeon_floor_tile.cpp
 libdraw_create_spritegroup.o: libdraw_create_spritegroup.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-libdraw_update_debug_panel.o: libdraw_update_debug_panel.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw.o: libdraw.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
