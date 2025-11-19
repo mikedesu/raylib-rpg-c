@@ -11,63 +11,64 @@ CFLAGS ?= # Allow override
 # Web build setup
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
-			gameloader_web.cpp \
-			libdraw_draw_inventory_menu.cpp \
-			libdraw_message_history.cpp \
-			libdraw_version.cpp \
-			libdraw_title_screen.cpp \
-			libdraw_help_menu.cpp \
-			libdraw_draw_character_creation_screen.cpp \
-			libdraw_load_textures.cpp \
-			libdraw_unload_textures.cpp \
-			libdraw_dungeon_floor_tile.cpp \
-			libdraw_create_spritegroup.cpp \
-			libdraw_update_debug_panel.cpp \
-			libdraw_hud.cpp \
+gameloader_web.cpp \
+libdraw_draw_inventory_menu.cpp \
+libdraw_message_history.cpp \
+libdraw_version.cpp \
+libdraw_title_screen.cpp \
+libdraw_help_menu.cpp \
+libdraw_draw_character_creation_screen.cpp \
+libdraw_load_textures.cpp \
+libdraw_unload_textures.cpp \
+libdraw_dungeon_floor_tile.cpp \
+libdraw_create_spritegroup.cpp \
+libdraw_update_debug_panel.cpp \
+libdraw_hud.cpp \
 libdraw_load_music.cpp \
 libdraw_load_sfx.cpp \
 libdraw_debug_panel.cpp \
 libdraw_update_debug_panel.cpp \
 libdraw_handle_debug_panel.cpp \
 libdraw_get_weapon_sprite.cpp \
-			libdraw_player_target_box.cpp \
-			libdraw_camera_lock_on.cpp \
-			libdraw_dungeon_tiles_2d.cpp \
-			libdraw.cpp \
-			liblogic_drop_item.cpp \
-			liblogic_try_entity_attack.cpp \
-			liblogic_try_entity_pickup.cpp \
-			liblogic_add_message.cpp \
-			liblogic_update_player_state.o \
-			liblogic_tile_npc_living_count.cpp \
-			liblogic_tile_has_box.cpp \
-			liblogic_try_entity_move.cpp \
-			liblogic_create_weapon.cpp \
-			liblogic_create_player.cpp \
-			liblogic_create_npc.cpp \
-			liblogic_create_npc_set_stats.cpp \
-			liblogic_handle_npc.cpp \
-			liblogic_handle_input.cpp \
-			liblogic_handle_camera_move.cpp \
-			liblogic_handle_input_inventory.cpp \
-			liblogic_handle_input_title_scene.cpp \
-			liblogic_handle_input_main_menu_scene.cpp \
-			liblogic_handle_input_help_menu.cpp \
-			liblogic_handle_input_character_creation_scene.cpp \
-			liblogic_handle_input_gameplay_controlmode_player.cpp \
-			liblogic_handle_input_gameplay_scene.cpp \
-			liblogic_init_dungeon.cpp \
-			liblogic_cycle_messages.cpp \
-			liblogic_update_debug_panel_buffer.cpp \
-			liblogic.cpp \
-			gamestate_inventory.cpp \
-			gamestate.cpp \
-			dungeon_floor.cpp \
-			dungeon_tile.cpp \
-			sprite.cpp \
-			spritegroup.cpp \
-			race.cpp \
-			dungeon.cpp \
+libdraw_entity_sprite.cpp \
+libdraw_player_target_box.cpp \
+libdraw_camera_lock_on.cpp \
+libdraw_dungeon_tiles_2d.cpp \
+libdraw.cpp \
+liblogic_drop_item.cpp \
+liblogic_try_entity_attack.cpp \
+liblogic_try_entity_pickup.cpp \
+liblogic_add_message.cpp \
+liblogic_update_player_state.o \
+liblogic_tile_npc_living_count.cpp \
+liblogic_tile_has_box.cpp \
+liblogic_try_entity_move.cpp \
+liblogic_create_weapon.cpp \
+liblogic_create_player.cpp \
+liblogic_create_npc.cpp \
+liblogic_create_npc_set_stats.cpp \
+liblogic_handle_npc.cpp \
+liblogic_handle_input.cpp \
+liblogic_handle_camera_move.cpp \
+liblogic_handle_input_inventory.cpp \
+liblogic_handle_input_title_scene.cpp \
+liblogic_handle_input_main_menu_scene.cpp \
+liblogic_handle_input_help_menu.cpp \
+liblogic_handle_input_character_creation_scene.cpp \
+liblogic_handle_input_gameplay_controlmode_player.cpp \
+liblogic_handle_input_gameplay_scene.cpp \
+liblogic_init_dungeon.cpp \
+liblogic_cycle_messages.cpp \
+liblogic_update_debug_panel_buffer.cpp \
+liblogic.cpp \
+gamestate_inventory.cpp \
+gamestate.cpp \
+dungeon_floor.cpp \
+dungeon_tile.cpp \
+sprite.cpp \
+spritegroup.cpp \
+race.cpp \
+dungeon.cpp \
 
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
@@ -85,63 +86,64 @@ all: game
 # Desktop build
 
 OBJ_FILES=main.o \
-		  gameloader.o \
-		  gamestate_inventory.o \
-		  gamestate.o \
-		  libdraw_draw_inventory_menu.o \
-		  libdraw_message_history.o \
-		  libdraw_version.o \
-		  libdraw_title_screen.o \
-		  libdraw_help_menu.o \
-		  libdraw_draw_character_creation_screen.o \
-		  libdraw_load_textures.o \
-		  libdraw_unload_textures.o \
-		  libdraw_hud.o \
+gameloader.o \
+gamestate_inventory.o \
+gamestate.o \
+libdraw_draw_inventory_menu.o \
+libdraw_message_history.o \
+libdraw_version.o \
+libdraw_title_screen.o \
+libdraw_help_menu.o \
+libdraw_draw_character_creation_screen.o \
+libdraw_load_textures.o \
+libdraw_unload_textures.o \
+libdraw_hud.o \
 libdraw_load_music.o \
 libdraw_load_sfx.o \
 libdraw_debug_panel.o \
 libdraw_update_debug_panel.o \
 libdraw_handle_debug_panel.o \
 libdraw_get_weapon_sprite.o \
-		  libdraw_player_target_box.o \
-		  libdraw_camera_lock_on.o \
-		  libdraw_dungeon_tiles_2d.o \
-		  libdraw_dungeon_floor_tile.o \
-		  libdraw_create_spritegroup.o \
-		  libdraw_update_debug_panel.o \
-		  libdraw.o \
-		  spritegroup.o \
-		  sprite.o \
-		  dungeon.o \
-		  dungeon_floor.o \
-		  dungeon_tile.o \
-		  dungeon_tile.o \
-		  liblogic_drop_item.o \
-		  liblogic_add_message.o \
-		  liblogic_try_entity_attack.o \
-		  liblogic_try_entity_pickup.o \
-		  liblogic_update_player_state.o \
-		  liblogic_tile_npc_living_count.o \
-		  liblogic_tile_has_box.o \
-		  liblogic_try_entity_move.o \
-		  liblogic_create_weapon.o \
-		  liblogic_create_player.o \
-		  liblogic_create_npc.o \
-		  liblogic_create_npc_set_stats.o \
-		  liblogic_handle_npc.o \
-		  liblogic_handle_input.o \
-		  liblogic_handle_camera_move.o \
-		  liblogic_handle_input_inventory.o \
-		  liblogic_handle_input_title_scene.o \
-		  liblogic_handle_input_gameplay_scene.o \
-		  liblogic_handle_input_main_menu_scene.o \
-		  liblogic_handle_input_help_menu.o \
-		  liblogic_handle_input_character_creation_scene.o \
-		  liblogic_handle_input_gameplay_controlmode_player.o \
-		  liblogic_update_debug_panel_buffer.o \
-		  liblogic_init_dungeon.o \
-		  liblogic_cycle_messages.o \
-		  liblogic.o \
+libdraw_entity_sprite.o \
+libdraw_player_target_box.o \
+libdraw_camera_lock_on.o \
+libdraw_dungeon_tiles_2d.o \
+libdraw_dungeon_floor_tile.o \
+libdraw_create_spritegroup.o \
+libdraw_update_debug_panel.o \
+libdraw.o \
+spritegroup.o \
+sprite.o \
+dungeon.o \
+dungeon_floor.o \
+dungeon_tile.o \
+dungeon_tile.o \
+liblogic_drop_item.o \
+liblogic_add_message.o \
+liblogic_try_entity_attack.o \
+liblogic_try_entity_pickup.o \
+liblogic_update_player_state.o \
+liblogic_tile_npc_living_count.o \
+liblogic_tile_has_box.o \
+liblogic_try_entity_move.o \
+liblogic_create_weapon.o \
+liblogic_create_player.o \
+liblogic_create_npc.o \
+liblogic_create_npc_set_stats.o \
+liblogic_handle_npc.o \
+liblogic_handle_input.o \
+liblogic_handle_camera_move.o \
+liblogic_handle_input_inventory.o \
+liblogic_handle_input_title_scene.o \
+liblogic_handle_input_gameplay_scene.o \
+liblogic_handle_input_main_menu_scene.o \
+liblogic_handle_input_help_menu.o \
+liblogic_handle_input_character_creation_scene.o \
+liblogic_handle_input_gameplay_controlmode_player.o \
+liblogic_update_debug_panel_buffer.o \
+liblogic_init_dungeon.o \
+liblogic_cycle_messages.o \
+liblogic.o \
 
 
 
@@ -208,6 +210,10 @@ libdraw_unload_textures.o: libdraw_unload_textures.cpp
 
 libdraw_hud.o: libdraw_hud.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_entity_sprite.o: libdraw_entity_sprite.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
 
 libdraw_get_weapon_sprite.o: libdraw_get_weapon_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
@@ -329,10 +335,6 @@ liblogic_handle_input.o: liblogic_handle_input.cpp
 
 liblogic.o: liblogic.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c
-
-#ComponentTable.o: ComponentTable.h ComponentTable.cpp ComponentTraits.h
-#	$(CXX) $(WFLAGS) $(CXXFLAGS) ComponentTable.cpp -c
-
 
 #test: $(UNIT_TEST_OBJS)
 #$(CC) -o $@ $(UNIT_TEST_OBJS) $(WFLAGS) $(CFLAGS)
