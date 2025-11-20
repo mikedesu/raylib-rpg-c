@@ -1,6 +1,6 @@
 #include "ComponentTraits.h"
 #include "entityid.h"
-#include "entitytype.h"
+//#include "entitytype.h"
 #include "gamestate.h"
 #include "libdraw.h"
 #include "libdraw_camera_lock_on.h"
@@ -11,15 +11,14 @@
 #include "libdraw_message_box.h"
 #include "libdraw_player_target_box.h"
 #include "libdraw_shaders.h"
-#include "libdraw_update_sprite.h"
 #include "race.h"
 #include "spritegroup.h"
-#include "tx_keys_boxes.h"
-#include "tx_keys_monsters.h"
-#include "tx_keys_npcs.h"
-#include "tx_keys_potions.h"
-#include "tx_keys_weapons.h"
-
+//#include "libdraw_update_sprite.h"
+//#include "tx_keys_boxes.h"
+//#include "tx_keys_monsters.h"
+//#include "tx_keys_npcs.h"
+//#include "tx_keys_potions.h"
+//#include "tx_keys_weapons.h"
 //#include "libdraw_set_sg.h"
 //#include "libdraw_set_sg_is_attacking.h"
 //#include "spritegroup_anim.h"
@@ -68,7 +67,6 @@ void draw_hud_from_texture(shared_ptr<gamestate> g);
 void draw_hud_to_texture(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
-void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g);
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
 void libdraw_drawframe_2d(shared_ptr<gamestate> g);
 void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
@@ -79,7 +77,8 @@ void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
 void draw_title_screen_from_texture(shared_ptr<gamestate> g);
 void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g);
 void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
-void create_sg_byid(shared_ptr<gamestate> g, entityid id);
+
+//void create_sg_byid(shared_ptr<gamestate> g, entityid id);
 
 //sprite* get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
@@ -242,135 +241,6 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
 */
 
 
-void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-        g->flag = GAMESTATE_FLAG_NPC_TURN;
-        //g->test_guard = false;
-    } else if (g->flag == GAMESTATE_FLAG_NPC_ANIM) {
-        g->entity_turn = g->hero_id; // Reset directly to hero
-        g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
-        g->turn_count++;
-    }
-}
-
-
-void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    minfo2("Begin handle dirty entities");
-    if (g->dirty_entities) {
-        for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++) {
-            create_sg_byid(g, i);
-        }
-        g->dirty_entities = false;
-        g->new_entityid_begin = ENTITYID_INVALID;
-        g->new_entityid_end = ENTITYID_INVALID;
-        g->frame_dirty = true;
-    }
-    minfo2("End handle dirty entities");
-}
-
-
-void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
-    minfo2("Begin update sprites pre");
-    massert(g, "gamestate is NULL");
-
-    UpdateMusicStream(music);
-    //if (g->music_volume_changed) {
-    //    SetMusicVolume(music, g->music_volume);
-    //    g->music_volume_changed = false;
-    //}
-    if (g->current_scene == SCENE_GAMEPLAY) {
-        libdraw_handle_dirty_entities(g);
-        minfo2("Begin update sprites pre loop");
-        for (entityid id = 0; id < g->next_entityid; id++) {
-            libdraw_update_sprite_pre(g, id);
-        }
-        minfo2("End update sprites pre loop");
-    }
-    minfo2("End update sprites pre");
-}
-
-
-void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    //if (g->music_volume_changed) {
-    //    SetMusicVolume(music, g->music_volume);
-    //    g->music_volume_changed = false;
-    //}
-    //UpdateMusicStream(music);
-    if (g->current_scene != SCENE_GAMEPLAY) {
-        g->frame_dirty = false;
-        return;
-    }
-    // for the gameplay scene...
-    if (g->framecount % ANIM_SPEED == 0) {
-        libdraw_handle_dirty_entities(g);
-        g->frame_dirty = true;
-
-
-        // For every entity...
-        for (entityid id = 0; id < g->next_entityid; id++) {
-            // verify it has an entity type
-            entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            //spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
-
-            // grab the sprite group for that entity
-            spritegroup_t* sg = spritegroups[id];
-            if (sg) {
-                // for every sprite in the spritegroup (INCORRECT!!!! NOT WHAT WE WANT, CAUSE-OF-BUG!!!)
-                //int num_sprites = sg->sprites2->size();
-                //for (int i = 0; i < num_sprites; i++) {
-                //shared_ptr<sprite> s = sg->sprites2->at(i);
-                shared_ptr<sprite> s = sg->sprites2->at(sg->current);
-                if (s) {
-                    sprite_incrframe2(s);
-                    g->frame_dirty = true;
-                    // this condition for the animation reset seems incorrect
-                    // certain cases are causing animations to drop-off mid-sequence
-                    if (s->num_loops >= 1) {
-                        sg->current = sg->default_anim;
-                        s->num_loops = 0;
-                    }
-
-                    // lets try something
-                    if (type == ENTITY_ITEM) {
-                        itemtype_t itype = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
-                        if (itype == ITEM_WEAPON) {
-                            if (sg->current > 0) {
-                                shared_ptr<sprite> s2 = sg->sprites2->at(sg->current + 1);
-                                if (s2) {
-                                    sprite_incrframe2(s2);
-                                    g->frame_dirty = true;
-                                    // this condition for the animation reset seems incorrect
-                                    // certain cases are causing animations to drop-off mid-sequence
-                                    if (s2->num_loops >= 1) {
-                                        sg->current = sg->default_anim;
-                                        s2->num_loops = 0;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-                //}
-            }
-            //}
-            //if (s_shadow) {
-            //    sprite_incrframe(s_shadow);
-            //    if (s_shadow->num_loops >= 1) {
-            //        sg->current = sg->default_anim;
-            //        s_shadow->num_loops = 0;
-            //    }
-            //}
-        }
-    }
-    libdraw_handle_gamestate_flag(g);
-}
-
-
 void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
@@ -492,143 +362,6 @@ void libdraw_close_partial() {
 void libdraw_close() {
     libdraw_close_partial();
     CloseWindow();
-}
-
-
-bool create_spritegroup(shared_ptr<gamestate> g, textureinfo* txinfo, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
-    massert(g, "gamestate is NULL");
-    massert(txinfo, "txinfo is null");
-    // can hold up to 32 sprites
-    spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
-    massert(group, "spritegroup is NULL");
-    //disabling this check until dungeon_floor created
-    shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
-    massert(df, "dungeon_floor is NULL");
-    if (!df) {
-        spritegroup_destroy(group);
-        return false;
-    }
-    int df_w = df->width;
-    int df_h = df->height;
-    //vec3 loc = g_get_loc(g, id);
-    vec3 loc = g->ct.get<location>(id).value();
-    massert(loc.x >= 0 && loc.x < df_w, "location x out of bounds: %d", loc.x);
-    massert(loc.y >= 0 && loc.y < df_h, "location y out of bounds: %d", loc.y);
-    if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
-        spritegroup_destroy(group);
-        return false;
-    }
-    //minfo("Creating spritegroup for entity %d at loc %d,%d", id, (int)loc.x, (int)loc.y);
-    for (int i = 0; i < num_keys; i++) {
-        //minfo("loading sprite for key %d", keys[i]);
-        int k = keys[i];
-        Texture2D* tex = &txinfo[k].texture;
-        //sprite* s = sprite_create(tex, txinfo[k].contexts, txinfo[k].num_frames);
-        //minfo("creating sprite...");
-        shared_ptr<sprite> s = sprite_create2(tex, txinfo[k].contexts, txinfo[k].num_frames);
-        //msuccess("created sprite!");
-        // as expected lol
-        // easy fix
-        // boom, fixed
-        //minfo("adding sprite to group...");
-        spritegroup_add(group, s);
-        //msuccess("added sprite to group!");
-    }
-    //msuccess("Created spritegroup with sprites");
-    group->id = id;
-    //sprite* s = spritegroup_get(group, 0);
-    shared_ptr<sprite> s = spritegroup_get(group, 0);
-    massert(s, "sprite is NULL");
-    if (!s) {
-        spritegroup_destroy(group);
-        return false;
-    }
-    group->current = 0;
-    group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
-    group->off_x = offset_x;
-    group->off_y = offset_y;
-    //hashtable_entityid_spritegroup_insert(spritegroups, id, group);
-    // how its done in the future...
-    spritegroups[id] = group;
-    return true;
-}
-
-
-void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-
-    //entitytype_t type = g_get_type(g, id);
-    entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
-    massert(type != ENTITY_NONE, "entity type is none");
-
-    if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-        //race_t race = g_get_race(g, id);
-        race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
-
-        switch (r) {
-        case RACE_HUMAN: create_spritegroup(g, id, TX_HUMAN_KEYS, TX_HUMAN_COUNT, -12, -12); break;
-        case RACE_ORC: create_spritegroup(g, id, TX_ORC_KEYS, TX_ORC_COUNT, -12, -12); break;
-        case RACE_ELF: create_spritegroup(g, id, TX_ELF_KEYS, TX_ELF_COUNT, -12, -12); break;
-        case RACE_DWARF: create_spritegroup(g, id, TX_DWARF_KEYS, TX_DWARF_COUNT, -12, -12); break;
-        case RACE_HALFLING: create_spritegroup(g, id, TX_HALFLING_KEYS, TX_HALFLING_COUNT, -12, -12); break;
-        case RACE_GOBLIN: create_spritegroup(g, id, TX_GOBLIN_KEYS, TX_GOBLIN_COUNT, -12, -12); break;
-        case RACE_WOLF: create_spritegroup(g, id, TX_WOLF_KEYS, TX_WOLF_COUNT, -12, -12); break;
-        case RACE_BAT: create_spritegroup(g, id, TX_BAT_KEYS, TX_BAT_COUNT, -12, -12); break;
-        case RACE_WARG: create_spritegroup(g, id, TX_WARG_KEYS, TX_WARG_COUNT, -12, -12); break;
-        case RACE_GREEN_SLIME: create_spritegroup(g, id, TX_GREEN_SLIME_KEYS, TX_GREEN_SLIME_COUNT, -12, -12); break;
-        default: merror("unknown race %d", r); return;
-        }
-    } else if (type == ENTITY_WOODEN_BOX) {
-        create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
-    } else if (type == ENTITY_ITEM) {
-        //itemtype item_type = g_get_item_type(g, id);
-        itemtype_t item_type = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
-
-        if (item_type == ITEM_POTION) {
-            //potiontype_t potion_type = g_get_potion_type(g, id);
-            potiontype_t potion_type = g->ct.get<potiontype>(id).value_or(POTION_NONE);
-
-            switch (potion_type) {
-            case POTION_HP_SMALL: create_spritegroup(g, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, -12, -12); break;
-            case POTION_HP_MEDIUM: create_spritegroup(g, id, TX_POTION_HP_MEDIUM_KEYS, TX_POTION_HP_MEDIUM_COUNT, -12, -12); break;
-            case POTION_HP_LARGE: create_spritegroup(g, id, TX_POTION_HP_LARGE_KEYS, TX_POTION_HP_LARGE_COUNT, -12, -12); break;
-            case POTION_MP_SMALL: create_spritegroup(g, id, TX_POTION_MP_SMALL_KEYS, TX_POTION_MP_SMALL_COUNT, -12, -12); break;
-            case POTION_MP_MEDIUM: create_spritegroup(g, id, TX_POTION_MP_MEDIUM_KEYS, TX_POTION_MP_MEDIUM_COUNT, -12, -12); break;
-            case POTION_MP_LARGE: create_spritegroup(g, id, TX_POTION_MP_LARGE_KEYS, TX_POTION_MP_LARGE_COUNT, -12, -12); break;
-            default: merror("unknown potion type %d", potion_type); return;
-            }
-            return;
-        } else if (item_type == ITEM_WEAPON) {
-            //weapontype weapon_type = g_get_weapon_type(g, id);
-            weapontype_t weapon_type = g->ct.get<weapontype>(id).value_or(WEAPON_NONE);
-
-            switch (weapon_type) {
-            case WEAPON_DAGGER: create_spritegroup(g, id, TX_DAGGER_KEYS, TX_DAGGER_COUNT, -12, -12); break;
-            case WEAPON_SWORD: create_spritegroup(g, id, TX_SWORD_KEYS, TX_SWORD_COUNT, -12, -12); break;
-            case WEAPON_AXE: create_spritegroup(g, id, TX_AXE_KEYS, TX_AXE_COUNT, -12, -12); break;
-            case WEAPON_BOW: create_spritegroup(g, id, TX_BOW_KEYS, TX_BOW_COUNT, -12, -12); break;
-            case WEAPON_TWO_HANDED_SWORD: create_spritegroup(g, id, TX_TWO_HANDED_SWORD_KEYS, TX_TWO_HANDED_SWORD_COUNT, -12, -12); break;
-            case WEAPON_WARHAMMER: create_spritegroup(g, id, TX_WARHAMMER_KEYS, TX_WARHAMMER_COUNT, -12, -12); break;
-            case WEAPON_FLAIL: create_spritegroup(g, id, TX_WHIP_KEYS, TX_WHIP_COUNT, -12, -12); break;
-            default: merror("unknown weapon type %d", weapon_type); return;
-            }
-            return;
-        }
-        //else if (item_type == ITEM_SHIELD) {
-        //    create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12);
-        //} else if (item_type == ITEM_WAND) {
-        //    create_spritegroup(g, id, TX_WAND_BASIC_KEYS, TX_WAND_BASIC_COUNT, -12, -12);
-        //} else if (item_type == ITEM_RING) {
-        //    ringtype ring_type = g_get_ring_type(g, id);
-        //    switch (ring_type) {
-        //    case RING_GOLD: create_spritegroup(g, id, TX_GOLD_RING_KEYS, TX_GOLD_RING_COUNT, -12, -12); break;
-        //    case RING_SILVER: create_spritegroup(g, id, TX_SILVER_RING_KEYS, TX_SILVER_RING_COUNT, -12, -12); break;
-        //    default: merror("unknown ring type %d", ring_type); return;
-        //    }
-        //} else {
-        //    merror("unknown item type %d", item_type);
-    }
 }
 
 

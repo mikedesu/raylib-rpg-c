@@ -22,9 +22,13 @@ libdraw_load_textures.cpp \
 libdraw_unload_textures.cpp \
 libdraw_dungeon_floor_tile.cpp \
 libdraw_create_spritegroup.cpp \
+libdraw_create_sg_byid.cpp \
 libdraw_update_debug_panel.cpp \
 libdraw_hud.cpp \
+libdraw_handle_gamestate_flag.cpp \
+libdraw_handle_dirty_entities.cpp \
 libdraw_update_sprite.cpp \
+libdraw_update_sprites.cpp \
 libdraw_dungeon_floor.cpp \
 libdraw_message_box.cpp \
 libdraw_sprite.cpp \
@@ -107,7 +111,11 @@ libdraw_draw_character_creation_screen.o \
 libdraw_load_textures.o \
 libdraw_unload_textures.o \
 libdraw_hud.o \
+libdraw_create_sg_byid.o \
+libdraw_handle_gamestate_flag.o \
+libdraw_handle_dirty_entities.o \
 libdraw_update_sprite.o \
+libdraw_update_sprites.o \
 libdraw_dungeon_floor.o \
 libdraw_message_box.o \
 libdraw_shaders.o \
@@ -207,7 +215,19 @@ dungeon.o: dungeon.cpp
 libdraw_hud.o: libdraw_hud.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
+libdraw_create_sg_byid.o: libdraw_create_sg_byid.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_handle_dirty_entities.o: libdraw_handle_dirty_entities.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_handle_gamestate_flag.o: libdraw_handle_gamestate_flag.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
 libdraw_update_sprite.o: libdraw_update_sprite.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_update_sprites.o: libdraw_update_sprites.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_dungeon_floor.o: libdraw_dungeon_floor.cpp
