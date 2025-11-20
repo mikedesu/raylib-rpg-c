@@ -64,16 +64,18 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
 
-void draw_hud_to_texture(shared_ptr<gamestate> g);
-void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
-void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
 void libdraw_drawframe_2d(shared_ptr<gamestate> g);
+
 void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
 void draw_gameover_menu(shared_ptr<gamestate> g);
+
 void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+
+void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
 void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
+void draw_hud_to_texture(shared_ptr<gamestate> g);
 void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
 
 //void create_sg_byid(shared_ptr<gamestate> g, entityid id);
@@ -282,12 +284,6 @@ void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g) {
     BeginTextureMode(main_game_target_texture);
     libdraw_drawframe_2d(g);
     EndTextureMode();
-}
-
-
-void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    DrawTexturePro(main_game_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 
