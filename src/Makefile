@@ -65,6 +65,7 @@ liblogic_create_player.cpp \
 liblogic_create_npc.cpp \
 liblogic_create_npc_set_stats.cpp \
 liblogic_handle_npc.cpp \
+liblogic_handle_npcs.cpp \
 liblogic_handle_input.cpp \
 liblogic_handle_camera_move.cpp \
 liblogic_handle_input_inventory.cpp \
@@ -165,6 +166,7 @@ liblogic_create_player.o \
 liblogic_create_npc.o \
 liblogic_create_npc_set_stats.o \
 liblogic_handle_npc.o \
+liblogic_handle_npcs.o \
 liblogic_handle_input.o \
 liblogic_handle_camera_move.o \
 liblogic_handle_input_inventory.o \
@@ -383,8 +385,11 @@ liblogic_create_npc.o: liblogic_create_npc.cpp
 liblogic_create_npc_set_stats.o: liblogic_create_npc_set_stats.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic_handle_npc.o: liblogic_handle_npc.cpp liblogic_handle_npc.h liblogic_try_entity_move.h gamestate.h
-	$(CXX) $(WFLAGS) $(CXXFLAGS) liblogic_handle_npc.cpp -c 
+liblogic_handle_npc.o: liblogic_handle_npc.cpp 	
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+liblogic_handle_npcs.o: liblogic_handle_npcs.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_handle_camera_move.o: liblogic_handle_camera_move.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 

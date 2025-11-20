@@ -5,14 +5,13 @@
 #include "dungeon_tile.h"
 #include "entityid.h"
 #include "gamestate.h"
-#include "gamestate_flag.h"
 #include "inputstate.h"
 #include "liblogic.h"
 #include "liblogic_add_message.h"
 #include "liblogic_create_npc_set_stats.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_handle_input.h"
-#include "liblogic_handle_npc.h"
+#include "liblogic_handle_npcs.h"
 #include "liblogic_init_dungeon.h"
 #include "liblogic_update_debug_panel_buffer.h"
 #include "liblogic_update_player_state.h"
@@ -32,9 +31,7 @@ using std::string;
 
 int liblogic_restart_count = 0;
 
-//void update_player_state(shared_ptr<gamestate> g);
 void update_npcs_state(shared_ptr<gamestate> g);
-void handle_npcs(shared_ptr<gamestate> g);
 
 
 void liblogic_init(shared_ptr<gamestate> g) {
@@ -138,17 +135,6 @@ void update_npcs_state(shared_ptr<gamestate> g) {
         }
         g->ct.set<txalpha>(id, a);
         g->ct.set<damaged>(id, false);
-    }
-}
-
-
-void handle_npcs(shared_ptr<gamestate> g) {
-    if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
-        for (entityid id = 0; id < g->next_entityid; id++) {
-            handle_npc(g, id);
-        }
-        // After processing all NPCs, set the flag to animate all movements together
-        g->flag = GAMESTATE_FLAG_NPC_ANIM;
     }
 }
 
