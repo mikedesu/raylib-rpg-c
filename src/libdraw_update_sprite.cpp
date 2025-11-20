@@ -3,6 +3,8 @@
 #include "libdraw_update_sprite.h"
 #include "spritegroup_anim.h"
 
+extern unordered_map<entityid, spritegroup_t*> spritegroups;
+
 void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
@@ -125,4 +127,26 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     vec3 loc = g->ct.get<location>(id).value();
     spritegroup_snap_dest(sg, loc.x, loc.y);
     minfo2("End update sprite ptr: %d", id);
+}
+
+
+void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
+    minfo2("Begin update sprite pre: %d", id);
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entityid is invalid");
+    if (spritegroups.find(id) == spritegroups.end()) {
+        return;
+    }
+    spritegroup_t* sg = spritegroups[id];
+    if (sg) {
+        libdraw_update_sprite_ptr(g, id, sg);
+    }
+    //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
+    //for (int i = 0; i < num_spritegroups; i++) {
+    //    spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
+    //    if (sg) {
+    //        libdraw_update_sprite_ptr(g, id, sg);
+    //    }
+    //}
+    minfo2("End update sprite pre: %d", id);
 }

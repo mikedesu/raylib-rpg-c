@@ -68,7 +68,6 @@ void draw_hud_from_texture(shared_ptr<gamestate> g);
 void draw_hud_to_texture(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
-void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id);
 void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g);
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
 void libdraw_drawframe_2d(shared_ptr<gamestate> g);
@@ -241,28 +240,6 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
     g_set_block_success(g, id, false);
 }
 */
-
-
-void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
-    minfo2("Begin update sprite pre: %d", id);
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    if (spritegroups.find(id) == spritegroups.end()) {
-        return;
-    }
-    spritegroup_t* sg = spritegroups[id];
-    if (sg) {
-        libdraw_update_sprite_ptr(g, id, sg);
-    }
-    //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
-    //for (int i = 0; i < num_spritegroups; i++) {
-    //    spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
-    //    if (sg) {
-    //        libdraw_update_sprite_ptr(g, id, sg);
-    //    }
-    //}
-    minfo2("End update sprite pre: %d", id);
-}
 
 
 void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
