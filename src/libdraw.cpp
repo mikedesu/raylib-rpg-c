@@ -16,13 +16,13 @@
 #include "libdraw_update_sprite.h"
 #include "race.h"
 #include "spritegroup.h"
-#include "spritegroup_anim.h"
 #include "tx_keys_boxes.h"
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"
 #include "tx_keys_weapons.h"
 
+//#include "spritegroup_anim.h"
 //#include "libdraw_dungeon_tiles_2d.h"
 //#include "libdraw_sprite.h"
 //#include "libdraw_entity_sprite.h"
@@ -71,7 +71,6 @@ void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
 void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id);
 void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g);
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
-void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
 void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 void libdraw_drawframe_2d(shared_ptr<gamestate> g);
 void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
@@ -243,40 +242,6 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
     g_set_block_success(g, id, false);
 }
 */
-
-
-void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir) {
-    massert(g, "gamestate is NULL");
-    massert(group != NULL, "group is NULL");
-    int old_ctx = group->sprites2->at(group->current)->currentcontext;
-    int ctx = old_ctx;
-    ctx = dir == DIR_NONE                                      ? old_ctx
-          : dir == DIR_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIR_DOWN_LEFT                               ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIR_UP_RIGHT                                ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIR_UP_LEFT                                 ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIR_DOWN && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_D    ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_D    ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_R_U    ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIR_UP && ctx == SPRITEGROUP_CONTEXT_L_U    ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_D ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_D ? SPRITEGROUP_CONTEXT_R_D
-          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_R_U ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIR_RIGHT && ctx == SPRITEGROUP_CONTEXT_L_U ? SPRITEGROUP_CONTEXT_R_U
-          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_D  ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_D  ? SPRITEGROUP_CONTEXT_L_D
-          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
-          : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
-                                                               : old_ctx;
-    if (ctx != old_ctx) {
-        g->frame_dirty = true;
-    }
-    spritegroup_setcontexts(group, ctx);
-}
 
 
 void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
