@@ -262,23 +262,21 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
 }
 
 
-void libdraw_close_partial() {
-    UnloadMusicStream(music);
-    CloseAudioDevice();
-    libdraw_unload_textures(txinfo);
-    unload_shaders();
+void libdraw_init(shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    int w = DEFAULT_WIN_WIDTH;
+    int h = DEFAULT_WIN_HEIGHT;
+    const char* title = WINDOW_TITLE;
+    char full_title[1024] = {0};
+    snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version.c_str());
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
 
-    UnloadRenderTexture(title_target_texture);
-    UnloadRenderTexture(char_creation_target_texture);
-    UnloadRenderTexture(main_game_target_texture);
-    UnloadRenderTexture(hud_target_texture);
-    UnloadRenderTexture(target);
-}
+    InitWindow(w, h, full_title);
+    g->windowwidth = w;
+    g->windowheight = h;
 
-
-void libdraw_close() {
-    libdraw_close_partial();
-    CloseWindow();
+    SetWindowMinSize(320, 240);
+    libdraw_init_rest(g);
 }
 
 
@@ -356,25 +354,27 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
 }
 
 
-void libdraw_init(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    int w = DEFAULT_WIN_WIDTH;
-    int h = DEFAULT_WIN_HEIGHT;
-    const char* title = WINDOW_TITLE;
-    char full_title[1024] = {0};
-    snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version.c_str());
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
-
-    InitWindow(w, h, full_title);
-    g->windowwidth = w;
-    g->windowheight = h;
-
-    SetWindowMinSize(320, 240);
-    libdraw_init_rest(g);
-}
-
-
 bool libdraw_windowshouldclose(const shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     return g->do_quit;
+}
+
+
+void libdraw_close() {
+    libdraw_close_partial();
+    CloseWindow();
+}
+
+
+void libdraw_close_partial() {
+    UnloadMusicStream(music);
+    CloseAudioDevice();
+    libdraw_unload_textures(txinfo);
+    unload_shaders();
+
+    UnloadRenderTexture(title_target_texture);
+    UnloadRenderTexture(char_creation_target_texture);
+    UnloadRenderTexture(main_game_target_texture);
+    UnloadRenderTexture(hud_target_texture);
+    UnloadRenderTexture(target);
 }
