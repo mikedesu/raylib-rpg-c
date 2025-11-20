@@ -10,8 +10,6 @@
 #include "libdraw_load_sfx.h"
 #include "libdraw_message_box.h"
 #include "libdraw_player_target_box.h"
-#include "libdraw_set_sg.h"
-#include "libdraw_set_sg_is_attacking.h"
 #include "libdraw_shaders.h"
 #include "libdraw_update_sprite.h"
 #include "race.h"
@@ -22,6 +20,8 @@
 #include "tx_keys_potions.h"
 #include "tx_keys_weapons.h"
 
+//#include "libdraw_set_sg.h"
+//#include "libdraw_set_sg_is_attacking.h"
 //#include "spritegroup_anim.h"
 //#include "libdraw_dungeon_tiles_2d.h"
 //#include "libdraw_sprite.h"
@@ -71,7 +71,6 @@ void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
 void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id);
 void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g);
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
-void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 void libdraw_drawframe_2d(shared_ptr<gamestate> g);
 void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
 void draw_gameover_menu(shared_ptr<gamestate> g);
@@ -242,63 +241,6 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
     g_set_block_success(g, id, false);
 }
 */
-
-
-void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    minfo2("Begin update sprite ptr: %d", id);
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    massert(sg, "spritegroup is NULL");
-    //if (g_is_dead(g, id) && !spritegroup_is_animating(sg)) return;
-    //if (g_get_update(g, id)) {
-    if (g->ct.get<update>(id).value_or(false)) {
-        //libdraw_update_sprite_context_ptr(g, sg, g_get_direction(g, id));
-        //libdraw_update_sprite_context_ptr(g, sg, DIR_DOWN_LEFT);
-
-        //libdraw_update_sprite_context_ptr(g, sg, g_get_dir(g, id));
-
-        if (g->ct.has<direction>(id)) {
-            direction_t d = g->ct.get<direction>(id).value();
-            libdraw_update_sprite_context_ptr(g, sg, d);
-        }
-        //g_set_update(g, id, false);
-        g->ct.set<update>(id, false);
-    }
-    // Copy movement intent from sprite_move_x/y if present
-    libdraw_update_sprite_position(g, id, sg);
-
-    //if (g_get_attacking(g, id)) {
-    if (g->ct.get<attacking>(id).value_or(false)) {
-        libdraw_set_sg_is_attacking(g, id, sg);
-    }
-    //else if (g_get_block_success(g, id)) {
-    //    libdraw_set_sg_block_success(g, id, sg);
-    //} else
-
-    if (g->ct.get<dead>(id).has_value()) {
-        bool is_dead = g->ct.get<dead>(id).value();
-        if (is_dead) {
-            libdraw_set_sg_is_dead(g, id, sg);
-        }
-    } else if (g->ct.get<damaged>(id).has_value()) {
-        bool is_damaged = g->ct.get<damaged>(id).value();
-        if (is_damaged) {
-            libdraw_set_sg_is_damaged(g, id, sg);
-        }
-    }
-
-
-    // Update movement as long as sg->move.x/y is non-zero
-    if (spritegroup_update_dest(sg)) {
-        g->frame_dirty = true;
-    }
-    // Snap to the tile position only when movement is fully complete
-    //vec3 loc = g_get_loc(g, id);
-    //massert(g->ct.has<Location>(id), "id %d lacks location component", id);
-    vec3 loc = g->ct.get<location>(id).value();
-    spritegroup_snap_dest(sg, loc.x, loc.y);
-    minfo2("End update sprite ptr: %d", id);
-}
 
 
 void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
