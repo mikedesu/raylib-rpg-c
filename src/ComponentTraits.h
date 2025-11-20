@@ -40,14 +40,13 @@ struct blocksuccess { }; // bool
 struct damaged { }; // bool
 struct txalpha { }; // int
 struct pushable { }; // bool
-
 struct itemtype { }; // itemtype_t
 struct potiontype { }; // potiontype_t
 struct weapontype { }; // weapontype_t
-
 struct inventory { }; // shared_ptr<vector<entityid>>
-
 struct equipped_weapon { }; // entityid
+struct hp { }; // int
+struct maxhp { }; // int
 
 //struct Stats { }; // ??
 
@@ -148,4 +147,14 @@ struct ComponentTraits<inventory> {
 template <>
 struct ComponentTraits<equipped_weapon> {
     using Type = entityid;
+};
+
+template <>
+struct ComponentTraits<hp> {
+    using Type = int;
+};
+
+template <>
+struct ComponentTraits<maxhp> {
+    using Type = int;
 };

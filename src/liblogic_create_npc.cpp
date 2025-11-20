@@ -3,17 +3,22 @@
 entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n) {
     minfo("begin create npc");
     massert(g, "gamestate is NULL");
+
     shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     shared_ptr<tile_t> tile = df_tile_at(df, loc);
+
     massert(tile, "failed to get tile");
+
     if (!tile_is_walkable(tile->type)) {
         merror("cannot create entity on non-walkable tile");
         return ENTITYID_INVALID;
     }
+
     if (tile_has_live_npcs(g, tile)) {
         merror("cannot create entity on tile with live NPCs");
         return ENTITYID_INVALID;
     }
+
     entityid id = g_add_entity(g);
 
     //g_add_name(g, id, name);
@@ -35,10 +40,12 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
 
     //shared_ptr<vector<entityid>> my_inventory = make_shared<vector<entityid>>();
     //g->ct.set<inventory>(id, make_shared<unordered_set<entityid>>());
+
     g->ct.set<inventory>(id, make_shared<vector<entityid>>());
     g->ct.set<equipped_weapon>(id, ENTITYID_INVALID);
 
     minfo("end create npc");
+
     return df_add_at(df, id, loc.x, loc.y);
 
     //g_add_zapping(g, id, false);

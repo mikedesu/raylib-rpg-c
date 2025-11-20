@@ -116,6 +116,7 @@ bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
     return false;
 }
 
+
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
     massert(g, "gamestate is NULL");
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
@@ -149,56 +150,66 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
         //    g_set_update(g, tgt_id, true);
         g->ct.set<update>(tgt_id, true);
         //int hp = g_get_stat(g, tgt_id, STATS_HP);
-        int hp = 1;
-        if (hp <= 0) {
-            merror("Target is already dead, hp was: %d", hp);
-            //g_update_dead(g, tgt_id, true);
-            g->ct.set<dead>(tgt_id, true);
-            return;
-        }
-        hp -= dmg;
-        //g_set_stat(g, tgt_id, STATS_HP, hp);
-        if (tgttype == ENTITY_PLAYER) {
-            //add_message_history(g,
-            //                    "%s attacked you for %d damage!",
-            //                    g_get_name(g, atk_id).c_str(),
-            //                    dmg);
-        } else if (tgttype == ENTITY_NPC) {
-            //add_message_history(g,
-            //                    "%s attacked %s for %d damage!",
-            //                    g_get_name(g, atk_id).c_str(),
-            //                    g_get_name(g, tgt_id).c_str(),
-            //                    dmg);
-        }
-        if (hp <= 0) {
-            //g_update_dead(g, tgt_id, true);
-            g->ct.set<dead>(tgt_id, true);
-            if (tgttype == ENTITY_NPC) {
+
+        //int hp = 1;
+
+        optional<int> maybe_tgt_hp = g->ct.get<hp>(tgt_id);
+        if (maybe_tgt_hp.has_value()) {
+            int tgt_hp = maybe_tgt_hp.value();
+
+            if (tgt_hp <= 0) {
+                merror("Target is already dead, hp was: %d", tgt_hp);
+                //g_update_dead(g, tgt_id, true);
+                g->ct.set<dead>(tgt_id, true);
+                return;
+            }
+            tgt_hp -= dmg;
+            g->ct.set<hp>(tgt_id, tgt_hp);
+            //g_set_stat(g, tgt_id, STATS_HP, hp);
+            if (tgttype == ENTITY_PLAYER) {
                 //add_message_history(g,
-                //                    "%s killed %s!",
+                //                    "%s attacked you for %d damage!",
                 //                    g_get_name(g, atk_id).c_str(),
-                //                    g_get_name(g, tgt_id).c_str());
-                // increment attacker's xp
-                //int old_xp = g_get_stat(g, atk_id, STATS_XP);
-                //massert(old_xp >= 0, "attacker's xp is negative");
-                //int reward_xp = calc_reward_xp(g, atk_id, tgt_id);
-                //int reward_xp = 1;
-                //massert(reward_xp >= 0, "reward xp is negative");
-                //int new_xp = old_xp + reward_xp;
-                //massert(new_xp >= 0, "new xp is negative");
-                //g_set_stat(g, atk_id, STATS_XP, new_xp);
-                //vec3 loc = g_get_loc(g, tgt_id);
-                //vec3 loc_cast = {loc.x, loc.y, loc.z};
-                //entityid id = ENTITYID_INVALID;
-                //while (id == ENTITYID_INVALID)
-                //    id = potion_create(g,
-                //                       loc,
-                //                       POTION_HEALTH_SMALL,
-                //                       "small health potion");
+                //                    dmg);
+            } else if (tgttype == ENTITY_NPC) {
+                //add_message_history(g,
+                //                    "%s attacked %s for %d damage!",
+                //                    g_get_name(g, atk_id).c_str(),
+                //                    g_get_name(g, tgt_id).c_str(),
+                //                    dmg);
+            }
+            if (tgt_hp <= 0) {
+                //g_update_dead(g, tgt_id, true);
+                g->ct.set<dead>(tgt_id, true);
+                if (tgttype == ENTITY_NPC) {
+                    //add_message_history(g,
+                    //                    "%s killed %s!",
+                    //                    g_get_name(g, atk_id).c_str(),
+                    //                    g_get_name(g, tgt_id).c_str());
+                    // increment attacker's xp
+                    //int old_xp = g_get_stat(g, atk_id, STATS_XP);
+                    //massert(old_xp >= 0, "attacker's xp is negative");
+                    //int reward_xp = calc_reward_xp(g, atk_id, tgt_id);
+                    //int reward_xp = 1;
+                    //massert(reward_xp >= 0, "reward xp is negative");
+                    //int new_xp = old_xp + reward_xp;
+                    //massert(new_xp >= 0, "new xp is negative");
+                    //g_set_stat(g, atk_id, STATS_XP, new_xp);
+                    //vec3 loc = g_get_loc(g, tgt_id);
+                    //vec3 loc_cast = {loc.x, loc.y, loc.z};
+                    //entityid id = ENTITYID_INVALID;
+                    //while (id == ENTITYID_INVALID)
+                    //    id = potion_create(g,
+                    //                       loc,
+                    //                       POTION_HEALTH_SMALL,
+                    //                       "small health potion");
+                }
+            } else {
+                //g_update_dead(g, tgt_id, false);
+                g->ct.set<dead>(tgt_id, false);
             }
         } else {
-            //g_update_dead(g, tgt_id, false);
-            g->ct.set<dead>(tgt_id, false);
+            merror("Target does not have an HP component");
         }
     } else {
         merror("Attack MISSED");
