@@ -5,15 +5,14 @@
 #include "libdraw.h"
 #include "libdraw_camera_lock_on.h"
 #include "libdraw_dungeon_tiles_2d.h"
-#include "libdraw_entity_sprite.h"
-//#include "libdraw_get_weapon_sprite.h"
 #include "libdraw_handle_debug_panel.h"
 #include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
 #include "libdraw_player_target_box.h"
 #include "libdraw_set_sg.h"
 #include "libdraw_set_sg_is_attacking.h"
-#include "libdraw_weapon_sprite.h"
+#include "libdraw_shaders.h"
+#include "libdraw_sprite.h"
 #include "race.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -23,6 +22,9 @@
 #include "tx_keys_potions.h"
 #include "tx_keys_weapons.h"
 
+//#include "libdraw_entity_sprite.h"
+//#include "libdraw_get_weapon_sprite.h"
+//#include "libdraw_weapon_sprite.h"
 //#include "get_txkey_for_tiletype.h"
 //#include "gamestate_equipped_weapon.h"
 //#include "tx_keys_rings.h"
@@ -89,9 +91,6 @@ void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
 
 void draw_gameover_menu(shared_ptr<gamestate> g);
 
-//void draw_weapon_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-//void draw_weapon_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-
 void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
 void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
@@ -106,13 +105,8 @@ void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
 
 void draw_message_box(shared_ptr<gamestate> g);
 
-void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id);
-
 void create_sg_byid(shared_ptr<gamestate> g, entityid id);
 
-void load_shaders();
-
-void libdraw_unload_shaders();
 
 bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
 
@@ -235,28 +229,6 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
 */
 
 
-void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (spritegroups.find(id) == spritegroups.end()) {
-        return;
-    }
-    spritegroup_t* sg = spritegroups[id];
-
-
-    // old
-    //entitytype_t type = g_get_type(g, id);
-    //massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));
-    // Draw components in correct order
-    //draw_shadow_for_entity(g, sg, id);
-    //draw_shield_sprite_back(g, id, sg);
-    draw_weapon_sprite_back(g, id, sg);
-    draw_entity_sprite(g, sg);
-    //draw_shield_sprite_front(g, id, sg);
-    draw_weapon_sprite_front(g, id, sg);
-}
-
-
 bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc) {
     massert(g, "draw_entities_2d: gamestate is NULL");
     massert(df, "draw_entities_2d: dungeon_floor is NULL");
@@ -301,25 +273,6 @@ bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor
         draw_sprite_and_shadow(g, id);
     }
     return true;
-}
-
-
-void load_shaders() {
-    shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
-    shader_glow = LoadShader(0, "glow.frag");
-    shader_red_glow = LoadShader(0, "red-glow.frag");
-    shader_color_noise = LoadShader(0, "colornoise.frag");
-    shader_psychedelic_0 = LoadShader(0, "psychedelic-0.frag");
-    //shader_tile_glow = LoadShader(0, "psychedelic_ripple.frag");
-}
-
-
-void libdraw_unload_shaders() {
-    UnloadShader(shader_grayscale);
-    UnloadShader(shader_glow);
-    UnloadShader(shader_red_glow);
-    UnloadShader(shader_color_noise);
-    UnloadShader(shader_psychedelic_0);
 }
 
 
@@ -830,7 +783,7 @@ void libdraw_close_partial() {
     UnloadMusicStream(music);
     CloseAudioDevice();
     libdraw_unload_textures(txinfo);
-    libdraw_unload_shaders();
+    unload_shaders();
 
     UnloadRenderTexture(title_target_texture);
     UnloadRenderTexture(char_creation_target_texture);

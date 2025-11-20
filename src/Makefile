@@ -24,6 +24,8 @@ libdraw_dungeon_floor_tile.cpp \
 libdraw_create_spritegroup.cpp \
 libdraw_update_debug_panel.cpp \
 libdraw_hud.cpp \
+libdraw_sprite.cpp \
+libdraw_shaders.cpp \
 libdraw_weapon_sprite.cpp \
 libdraw_update_weapon_for_entity.cpp \
 libdraw_set_sg_is_attacking.cpp \
@@ -102,6 +104,8 @@ libdraw_draw_character_creation_screen.o \
 libdraw_load_textures.o \
 libdraw_unload_textures.o \
 libdraw_hud.o \
+libdraw_shaders.o \
+libdraw_sprite.o \
 libdraw_weapon_sprite.o \
 libdraw_update_weapon_for_entity.o \
 libdraw_set_sg_is_attacking.o \
@@ -192,6 +196,9 @@ dungeon.o: dungeon.cpp
 
 
 ###################
+libdraw_hud.o: libdraw_hud.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
 libdraw_message_history.o: libdraw_message_history.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
@@ -216,12 +223,15 @@ libdraw_load_textures.o: libdraw_load_textures.cpp
 libdraw_unload_textures.o: libdraw_unload_textures.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-libdraw_hud.o: libdraw_hud.cpp
+
+libdraw_shaders.o: libdraw_shaders.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_set_sg.o: libdraw_set_sg.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
+libdraw_sprite.o: libdraw_sprite.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_weapon_sprite.o: libdraw_weapon_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
