@@ -4,7 +4,7 @@
 #include "gamestate.h"
 #include "libdraw.h"
 #include "libdraw_camera_lock_on.h"
-#include "libdraw_dungeon_tiles_2d.h"
+#include "libdraw_dungeon_floor.h"
 #include "libdraw_handle_debug_panel.h"
 #include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
@@ -13,7 +13,6 @@
 #include "libdraw_set_sg.h"
 #include "libdraw_set_sg_is_attacking.h"
 #include "libdraw_shaders.h"
-#include "libdraw_sprite.h"
 #include "race.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
@@ -23,6 +22,8 @@
 #include "tx_keys_potions.h"
 #include "tx_keys_weapons.h"
 
+//#include "libdraw_dungeon_tiles_2d.h"
+//#include "libdraw_sprite.h"
 //#include "libdraw_entity_sprite.h"
 //#include "libdraw_get_weapon_sprite.h"
 //#include "libdraw_weapon_sprite.h"
@@ -55,10 +56,6 @@ Rectangle target_dest = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
 Rectangle win_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 
 
-Vector2 target_origin = {0, 0};
-Vector2 zero_vec = {0, 0};
-
-
 Music music;
 
 
@@ -67,51 +64,25 @@ int libdraw_restart_count = 0;
 
 
 void draw_hud_from_texture(shared_ptr<gamestate> g);
-
 void draw_hud_to_texture(shared_ptr<gamestate> g);
-
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
-
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
-
 void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id);
-
 void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g);
-
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
-
 void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-
 void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir);
-
 void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-
 void libdraw_drawframe_2d(shared_ptr<gamestate> g);
-
 void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
-
 void draw_gameover_menu(shared_ptr<gamestate> g);
-
 void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-
 void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-
 void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
-
 void draw_title_screen_from_texture(shared_ptr<gamestate> g);
-
 void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g);
-
 void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
-
-
 void create_sg_byid(shared_ptr<gamestate> g, entityid id);
-
-
-bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc);
-
-bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g);
-
 
 //sprite* get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 
@@ -227,53 +198,6 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
                        WHITE);
 }
 */
-
-
-bool draw_entities_2d_at(const shared_ptr<gamestate> g, shared_ptr<dungeon_floor_t> df, bool dead, vec3 loc) {
-    massert(g, "draw_entities_2d: gamestate is NULL");
-    massert(df, "draw_entities_2d: dungeon_floor is NULL");
-    massert(df->width > 0, "draw_entities_2d: dungeon_floor width is 0");
-    massert(df->height > 0, "draw_entities_2d: dungeon_floor height is 0");
-    //massert(df->width <= DEFAULT_DUNGEON_FLOOR_WIDTH, "draw_entities_2d: dungeon_floor width is too large");
-    //massert(df->height <= DEFAULT_DUNGEON_FLOOR_HEIGHT, "draw_entities_2d: dungeon_floor height is too large");
-    massert(loc.x >= 0, "draw_entities_2d: x is out of bounds");
-    massert(loc.x < df->width, "draw_entities_2d: x is out of bounds");
-    massert(loc.y >= 0, "draw_entities_2d: y is out of bounds");
-    massert(loc.y < df->height, "draw_entities_2d: y is out of bounds");
-    shared_ptr<tile_t> tile = df_tile_at(df, loc);
-    if (!tile) {
-        //merror("draw_entities_2d: tile is NULL at (%d, %d)", (int)loc.x, (int)loc.y);
-        return false;
-    }
-    if (tile_is_wall(tile->type)) {
-        //merror("draw_entities_2d: tile is a wall at (%d, %d)", (int)loc.x, (int)loc.y);
-        return false;
-    }
-    if (!tile->visible) {
-        //merror("draw_entities_2d: tile is not visible at (%d, %d)", (int)loc.x, (int)loc.y);
-        return true; // Do not draw entities on invisible tiles
-    }
-    if (tile->is_empty) {
-        return true;
-    }
-    // Get hero's vision distance and location
-    //int vision_distance = g_get_vision_distance(g, g->hero_id);
-    //int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
-    //int light_dist = 3;
-    //vec3 hero_loc = g_get_location(g, g->hero_id);
-    //int dist_to_check = MAX(vision_distance, light_dist);
-    // Calculate Manhattan distance from hero to this tile (diamond pattern)
-    //int distance = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
-    // Only draw entities within vision distance
-    //if (distance <= vision_distance) {
-    //if (distance <= dist_to_check) {
-    //for (size_t i = 0; i < tile_entity_count(tile); i++) {
-    for (size_t i = 0; i < tile->entities->size(); i++) {
-        entityid id = tile_get_entity(tile, i);
-        draw_sprite_and_shadow(g, id);
-    }
-    return true;
-}
 
 
 // bool libdraw_check_default_animations(const gamestate* const g) {
@@ -597,57 +521,6 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
 }
 
 
-bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    //dungeon_floor_t* const df = d_get_current_floor(g->d);
-    shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
-    massert(df, "dungeon_floor is NULL");
-    int z = g->dungeon->current_floor;
-    draw_dungeon_tiles_2d(g, z, df);
-    // dead
-    //for (int y = 0; y < df->height; y++) {
-    //    for (int x = 0; x < df->width; x++) {
-    //        draw_entities_2d_at(g, df, true, (vec3){x, y, z});
-    //    }
-    //}
-    // living
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            //draw_entities_2d_at(g, df, false, (vec3){x, y, z});
-            shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, z});
-            if (!tile) {
-                continue;
-            }
-            if (tile_is_wall(tile->type)) {
-                continue;
-            }
-            if (!tile->visible) {
-                continue; // Do not draw entities on invisible tiles
-            }
-            if (tile->is_empty) {
-                continue;
-            }
-            // Get hero's vision distance and location
-            //int vision_distance = g_get_vision_distance(g, g->hero_id);
-            //int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
-            //int light_dist = 3;
-            //vec3 hero_loc = g_get_location(g, g->hero_id);
-            //int dist_to_check = MAX(vision_distance, light_dist);
-            // Calculate Manhattan distance from hero to this tile (diamond pattern)
-            //int distance = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
-            // Only draw entities within vision distance
-            //if (distance <= vision_distance) {
-            //if (distance <= dist_to_check) {
-            for (size_t i = 0; i < tile->entities->size(); i++) {
-                entityid id = tile_get_entity(tile, i);
-                draw_sprite_and_shadow(g, id);
-            }
-        }
-    }
-    return true;
-}
-
-
 void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
@@ -696,7 +569,7 @@ void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g) {
 
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    DrawTexturePro(main_game_target_texture.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
+    DrawTexturePro(main_game_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 
@@ -743,7 +616,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     // draw the target texture to the window
     win_dest.width = GetScreenWidth();
     win_dest.height = GetScreenHeight();
-    DrawTexturePro(target.texture, target_src, win_dest, target_origin, 0.0f, WHITE);
+    DrawTexturePro(target.texture, target_src, win_dest, (Vector2){0, 0}, 0.0f, WHITE);
     EndDrawing();
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;

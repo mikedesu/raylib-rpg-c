@@ -24,6 +24,7 @@ libdraw_dungeon_floor_tile.cpp \
 libdraw_create_spritegroup.cpp \
 libdraw_update_debug_panel.cpp \
 libdraw_hud.cpp \
+libdraw_dungeon_floor.cpp \
 libdraw_message_box.cpp \
 libdraw_sprite.cpp \
 libdraw_shaders.cpp \
@@ -105,6 +106,7 @@ libdraw_draw_character_creation_screen.o \
 libdraw_load_textures.o \
 libdraw_unload_textures.o \
 libdraw_hud.o \
+libdraw_dungeon_floor.o \
 libdraw_message_box.o \
 libdraw_shaders.o \
 libdraw_sprite.o \
@@ -199,6 +201,9 @@ dungeon.o: dungeon.cpp
 
 ###################
 libdraw_hud.o: libdraw_hud.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_dungeon_floor.o: libdraw_dungeon_floor.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_message_box.o: libdraw_message_box.cpp
