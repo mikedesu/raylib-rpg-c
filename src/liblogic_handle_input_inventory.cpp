@@ -12,6 +12,13 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
     if (!g->display_inventory_menu) {
         return;
     }
+
+    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+        g->do_quit = true;
+        return;
+    }
+
+
     //if (inputstate_is_pressed(is, KEY_ESCAPE) || inputstate_is_pressed(is, KEY_I)) {
     if (inputstate_is_pressed(is, KEY_I)) {
         g->controlmode = CONTROLMODE_PLAYER;
