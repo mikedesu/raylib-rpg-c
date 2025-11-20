@@ -27,6 +27,7 @@ libdraw_hud.cpp \
 libdraw_weapon_sprite.cpp \
 libdraw_update_weapon_for_entity.cpp \
 libdraw_set_sg_is_attacking.cpp \
+libdraw_set_sg.cpp \
 libdraw_load_music.cpp \
 libdraw_load_sfx.cpp \
 libdraw_debug_panel.cpp \
@@ -104,6 +105,7 @@ libdraw_hud.o \
 libdraw_weapon_sprite.o \
 libdraw_update_weapon_for_entity.o \
 libdraw_set_sg_is_attacking.o \
+libdraw_set_sg.o \
 libdraw_load_music.o \
 libdraw_load_sfx.o \
 libdraw_debug_panel.o \
@@ -216,6 +218,10 @@ libdraw_unload_textures.o: libdraw_unload_textures.cpp
 
 libdraw_hud.o: libdraw_hud.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_set_sg.o: libdraw_set_sg.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
 
 libdraw_weapon_sprite.o: libdraw_weapon_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
