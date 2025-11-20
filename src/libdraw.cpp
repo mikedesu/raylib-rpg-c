@@ -5,6 +5,7 @@
 #include "libdraw.h"
 #include "libdraw_camera_lock_on.h"
 #include "libdraw_dungeon_floor.h"
+#include "libdraw_from_texture.h"
 #include "libdraw_handle_debug_panel.h"
 #include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
@@ -37,11 +38,11 @@ unordered_map<entityid, spritegroup_t*> spritegroups;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 
-Shader shader_grayscale = {0};
-Shader shader_glow = {0};
-Shader shader_red_glow = {0};
-Shader shader_color_noise = {0};
-Shader shader_psychedelic_0 = {0};
+//Shader shader_grayscale = {0};
+//Shader shader_glow = {0};
+//Shader shader_red_glow = {0};
+//Shader shader_color_noise = {0};
+//Shader shader_psychedelic_0 = {0};
 
 
 RenderTexture2D title_target_texture = {0};
@@ -63,7 +64,6 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
 
-void draw_hud_from_texture(shared_ptr<gamestate> g);
 void draw_hud_to_texture(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g);
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
@@ -74,8 +74,6 @@ void draw_gameover_menu(shared_ptr<gamestate> g);
 void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
-void draw_title_screen_from_texture(shared_ptr<gamestate> g);
-void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g);
 void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
 
 //void create_sg_byid(shared_ptr<gamestate> g, entityid id);
@@ -371,8 +369,6 @@ void draw_hud_to_texture(shared_ptr<gamestate> g) {
     EndTextureMode();
 }
 
-void draw_hud_from_texture(shared_ptr<gamestate> g) { DrawTexturePro(hud_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE); }
-
 
 void libdraw_init_rest(shared_ptr<gamestate> g) {
     //minfo("libdraw_init_rest: initializing rest of the libdraw");
@@ -481,22 +477,10 @@ void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu) {
 }
 
 
-void draw_title_screen_from_texture(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    DrawTexturePro(title_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
-}
-
-
 void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(char_creation_target_texture);
     draw_character_creation_screen(g);
     handle_debug_panel(g);
     EndTextureMode();
-}
-
-
-void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    DrawTexturePro(char_creation_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
