@@ -1,33 +1,15 @@
 #include "ComponentTraits.h"
 #include "entityid.h"
-//#include "entitytype.h"
 #include "gamestate.h"
 #include "libdraw.h"
-#include "libdraw_camera_lock_on.h"
-#include "libdraw_dungeon_floor.h"
 #include "libdraw_from_texture.h"
-#include "libdraw_handle_debug_panel.h"
 #include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
-#include "libdraw_message_box.h"
-#include "libdraw_player_target_box.h"
 #include "libdraw_shaders.h"
+#include "libdraw_to_texture.h"
 #include "race.h"
 #include "spritegroup.h"
-//#include "libdraw_update_sprite.h"
-//#include "tx_keys_boxes.h"
-//#include "tx_keys_monsters.h"
-//#include "tx_keys_npcs.h"
-//#include "tx_keys_potions.h"
-//#include "tx_keys_weapons.h"
-//#include "libdraw_set_sg.h"
-//#include "libdraw_set_sg_is_attacking.h"
-//#include "spritegroup_anim.h"
-//#include "libdraw_dungeon_tiles_2d.h"
-//#include "libdraw_sprite.h"
-//#include "libdraw_entity_sprite.h"
-//#include "libdraw_get_weapon_sprite.h"
-//#include "libdraw_weapon_sprite.h"
+
 //#include "get_txkey_for_tiletype.h"
 //#include "gamestate_equipped_weapon.h"
 //#include "tx_keys_rings.h"
@@ -64,33 +46,20 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
 
-void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
-void libdraw_drawframe_2d(shared_ptr<gamestate> g);
-
-void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
-void draw_gameover_menu(shared_ptr<gamestate> g);
-
-void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-
-void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g);
-void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu);
-void draw_hud_to_texture(shared_ptr<gamestate> g);
-void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
-
+//void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg);
+//void draw_gameplay_settings_menu(shared_ptr<gamestate> g);
+//void draw_gameover_menu(shared_ptr<gamestate> g);
+//void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
+//void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 //void create_sg_byid(shared_ptr<gamestate> g, entityid id);
-
 //sprite* get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-
 //sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-
 // sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 // sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 // bool libdraw_check_default_animations(const shared_ptr<gamestate> g);
 // void draw_shadow_for_entity(const shared_ptr<gamestate> g,
 //                                   spritegroup_t* sg,
 //                                   entityid id);
-
 
 /*
 sprite* get_shield_front_sprite(const shared_ptr<gamestate> g,
@@ -241,52 +210,6 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
 */
 
 
-void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
-    //BeginShaderMode(shader_color_noise);
-    //float time = (float)GetTime(); // Current time in seconds
-    //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
-    camera_lock_on(g);
-    //minfo("Drawing frame");
-    BeginMode2D(g->cam2d);
-    ClearBackground(BLACK);
-    //EndShaderMode();
-    libdraw_draw_dungeon_floor(g);
-    libdraw_draw_player_target_box(g);
-    EndMode2D();
-    //if (g->frame_dirty) {
-    //draw_hud_to_texture(g);
-    //} else {
-    //draw_hud_from_texture(g);
-    //}
-    draw_hud(g);
-    draw_message_history(g);
-    draw_message_box(g);
-    if (g->display_inventory_menu) {
-        draw_inventory_menu(g);
-    }
-    //else if (g->display_gameplay_settings_menu) {
-    //    draw_gameplay_settings_menu(g);
-    //}
-    handle_debug_panel(g);
-    //draw_version(g);
-    //int x = 0;
-    if (g->display_help_menu) {
-        draw_help_menu(g);
-    }
-    //if (g->gameover) {
-    //    draw_gameover_menu(g);
-    //}
-}
-
-
-void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    BeginTextureMode(main_game_target_texture);
-    libdraw_drawframe_2d(g);
-    EndTextureMode();
-}
-
-
 void libdraw_drawframe(shared_ptr<gamestate> g) {
     minfo2("Begin draw frame");
     double start_time = GetTime();
@@ -356,13 +279,6 @@ void libdraw_close_partial() {
 void libdraw_close() {
     libdraw_close_partial();
     CloseWindow();
-}
-
-
-void draw_hud_to_texture(shared_ptr<gamestate> g) {
-    BeginTextureMode(hud_target_texture);
-    draw_hud(g);
-    EndTextureMode();
 }
 
 
@@ -461,22 +377,4 @@ void libdraw_init(shared_ptr<gamestate> g) {
 bool libdraw_windowshouldclose(const shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     return g->do_quit;
-}
-
-
-void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu) {
-    massert(g, "gamestate is NULL");
-    BeginTextureMode(title_target_texture);
-    draw_title_screen(g, show_menu);
-    handle_debug_panel(g);
-    EndTextureMode();
-}
-
-
-void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    BeginTextureMode(char_creation_target_texture);
-    draw_character_creation_screen(g);
-    handle_debug_panel(g);
-    EndTextureMode();
 }

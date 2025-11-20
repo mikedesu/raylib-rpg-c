@@ -25,7 +25,9 @@ libdraw_create_spritegroup.cpp \
 libdraw_create_sg_byid.cpp \
 libdraw_update_debug_panel.cpp \
 libdraw_hud.cpp \
+libdraw_frame_2d.cpp \
 libdraw_from_texture.cpp \
+libdraw_to_texture.cpp \
 libdraw_handle_gamestate_flag.cpp \
 libdraw_handle_dirty_entities.cpp \
 libdraw_update_sprite.cpp \
@@ -112,7 +114,9 @@ libdraw_draw_character_creation_screen.o \
 libdraw_load_textures.o \
 libdraw_unload_textures.o \
 libdraw_hud.o \
+libdraw_frame_2d.o \
 libdraw_from_texture.o \
+libdraw_to_texture.o \
 libdraw_create_sg_byid.o \
 libdraw_handle_gamestate_flag.o \
 libdraw_handle_dirty_entities.o \
@@ -215,6 +219,12 @@ dungeon.o: dungeon.cpp
 
 
 libdraw_hud.o: libdraw_hud.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_to_texture.o: libdraw_to_texture.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_frame_2d.o: libdraw_frame_2d.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_from_texture.o: libdraw_from_texture.cpp
