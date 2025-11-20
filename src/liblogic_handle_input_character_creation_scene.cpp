@@ -7,6 +7,13 @@
 void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
+
+
+    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+        g->do_quit = true;
+        return;
+    }
+
     if (inputstate_is_pressed(is, KEY_ENTER)) {
         minfo("Character creation confirmed");
         PlaySound(g->sfx->at(SFX_CONFIRM_01));
