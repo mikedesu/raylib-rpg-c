@@ -58,9 +58,15 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
                         itemtype_t item_type = g->ct.get<itemtype>(item_id).value_or(ITEM_NONE);
                         if (item_type != ITEM_NONE) {
                             if (item_type == ITEM_WEAPON) {
-                                // try to equip it
-
-                                g->ct.set<equipped_weapon>(g->hero_id, item_id);
+                                // Check if this is the currently equipped weapon
+                                entityid current_weapon = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
+                                if (current_weapon == item_id) {
+                                    // Unequip if it's already equipped
+                                    g->ct.set<equipped_weapon>(g->hero_id, ENTITYID_INVALID);
+                                } else {
+                                    // Equip the new weapon
+                                    g->ct.set<equipped_weapon>(g->hero_id, item_id);
+                                }
                             }
                         }
                     }
