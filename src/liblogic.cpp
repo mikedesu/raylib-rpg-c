@@ -15,6 +15,7 @@
 #include "liblogic_handle_npc.h"
 #include "liblogic_init_dungeon.h"
 #include "liblogic_update_debug_panel_buffer.h"
+#include "liblogic_update_player_state.h"
 #include "massert.h"
 #include "weapon.h"
 #include <cassert>
@@ -30,6 +31,10 @@ using std::string;
 
 
 int liblogic_restart_count = 0;
+
+//void update_player_state(shared_ptr<gamestate> g);
+void update_npcs_state(shared_ptr<gamestate> g);
+void handle_npcs(shared_ptr<gamestate> g);
 
 
 void liblogic_init(shared_ptr<gamestate> g) {
@@ -61,7 +66,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_weapon(g, (vec3){2, 0, 0}, WEAPON_AXE);
     create_weapon(g, (vec3){3, 0, 0}, WEAPON_SWORD);
 
+    create_npc_set_stats(g, (vec3){1, 3, 0}, RACE_ORC);
+    create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);
     create_npc_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
+
 
     //create_npc_set_stats(g, (vec3){6, 5, 0}, RACE_WOLF);
     //create_npc_set_stats(g, (vec3){6, 6, 0}, RACE_WARG);
@@ -91,34 +99,34 @@ void liblogic_init(shared_ptr<gamestate> g) {
 }
 
 
-void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
-    massert(is, "Input state is NULL!");
-    massert(g, "Game state is NULL!");
-    minfo2("Begin tick");
-    // Spawn NPCs periodically
-    //try_spawn_npc(g);
-    // update ALL entities
-    // this was update player state
-    if (g->hero_id != ENTITYID_INVALID) {
-        if (!g->gameover) {
-            unsigned char a = g->ct.get<txalpha>(g->hero_id).value_or(255);
-            if (a < 255) {
-                a++;
-            }
-            g->ct.set<txalpha>(g->hero_id, a);
-            //if (g_is_dead(g, g->hero_id)) {
-            if (g->ct.get<dead>(g->hero_id).value_or(true)) {
-                //add_message_history(g, "You died!");
-                g->gameover = true;
-            }
-            //check_and_handle_level_up(g, g->hero_id);
-        }
-        //if (g_is_dead(g, g->hero_id)) {
-        if (g->ct.get<dead>(g->hero_id).value_or(true)) {
-            return;
-        }
-    }
-    // this was update_npcs_state
+//void update_player_state(shared_ptr<gamestate> g) {
+//    if (g->hero_id != ENTITYID_INVALID) {
+//        if (!g->gameover) {
+//            unsigned char a = g->ct.get<txalpha>(g->hero_id).value_or(255);
+//            if (a < 255) {
+//                a++;
+//            }
+//            g->ct.set<txalpha>(g->hero_id, a);
+//            if (g->ct.get<dead>(g->hero_id).value_or(true)) {
+//                //add_message_history(g, "You died!");
+//                g->gameover = true;
+//            }
+//            //check_and_handle_level_up(g, g->hero_id);
+//        }
+//        if (g->ct.get<dead>(g->hero_id).value_or(true)) {
+//            return;
+//        }
+//
+//        if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
+//            g->ct.set<blocking>(g->hero_id, false);
+//            g->ct.set<blocksuccess>(g->hero_id, false);
+//            g->ct.set<damaged>(g->hero_id, false);
+//        }
+//    }
+//}
+
+
+void update_npcs_state(shared_ptr<gamestate> g) {
     for (entityid id = 0; id < g->next_entityid; id++) {
         if (id == g->hero_id) {
             continue;
@@ -129,17 +137,12 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
             a++;
         }
         g->ct.set<txalpha>(id, a);
+        g->ct.set<damaged>(id, false);
     }
-    if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-        if (g->hero_id != ENTITYID_INVALID) {
-            g->ct.set<blocking>(g->hero_id, false);
-            //        g_set_block_success(g, g->hero_id, false);
-            g->ct.set<blocksuccess>(g->hero_id, false);
-        }
-    }
+}
 
-    handle_input(g, is);
 
+void handle_npcs(shared_ptr<gamestate> g) {
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
         for (entityid id = 0; id < g->next_entityid; id++) {
             handle_npc(g, id);
@@ -147,6 +150,20 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
         // After processing all NPCs, set the flag to animate all movements together
         g->flag = GAMESTATE_FLAG_NPC_ANIM;
     }
+}
+
+
+void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+    massert(is, "Input state is NULL!");
+    massert(g, "Game state is NULL!");
+    minfo2("Begin tick");
+    // Spawn NPCs periodically
+    //try_spawn_npc(g);
+    // update ALL entities
+    update_player_state(g);
+    update_npcs_state(g);
+    handle_input(g, is);
+    handle_npcs(g);
     update_debug_panel_buffer(g, is);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);

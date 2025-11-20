@@ -11,7 +11,7 @@ void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup
         anim_index = SG_ANIM_SLIME_DMG;
     }
     spritegroup_set_current(sg, anim_index);
-    g->ct.set<damaged>(id, true);
+    //g->ct.set<damaged>(id, true);
 }
 
 

@@ -55,7 +55,6 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
             // grab the sprite group for that entity
             spritegroup_t* sg = spritegroups[id];
             if (sg) {
-                // for every sprite in the spritegroup (INCORRECT!!!! NOT WHAT WE WANT, CAUSE-OF-BUG!!!)
                 //int num_sprites = sg->sprites2->size();
                 //for (int i = 0; i < num_sprites; i++) {
                 //shared_ptr<sprite> s = sg->sprites2->at(i);

@@ -2,6 +2,7 @@
 #include "entityid.h"
 #include "gamestate.h"
 #include "libdraw.h"
+#include "libdraw_check_default_animations.h"
 #include "libdraw_from_texture.h"
 #include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
@@ -56,7 +57,8 @@ int libdraw_restart_count = 0;
 //sprite* get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 // sprite* get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
 // sprite* get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg);
-// bool libdraw_check_default_animations(const shared_ptr<gamestate> g);
+
+
 // void draw_shadow_for_entity(const shared_ptr<gamestate> g,
 //                                   spritegroup_t* sg,
 //                                   entityid id);
@@ -163,19 +165,6 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
                        WHITE);
 }
 */
-
-
-// bool libdraw_check_default_animations(const gamestate* const g) {
-//    massert(g, "gamestate is NULL");
-//    for (entityid id = 0; id < g->next_entityid; id++) {
-//        spritegroup_t* const sg = hashtable_entityid_spritegroup_get(spritegroups, id);
-//        if (sg && sg->current != sg->default_anim) {
-//            // which sg isnt done?
-//            return false;
-//        }
-//    }
-//    return true;
-//}
 
 
 /*

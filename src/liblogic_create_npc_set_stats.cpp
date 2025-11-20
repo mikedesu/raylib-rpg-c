@@ -8,7 +8,7 @@ entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
     id = create_npc(g, race, loc, race_name);
     if (id != ENTITYID_INVALID) {
         // Set stats
-        const int tmphp = 100;
+        const int tmphp = 5;
         g->ct.set<hp>(id, tmphp);
         g->ct.set<maxhp>(id, tmphp);
     }

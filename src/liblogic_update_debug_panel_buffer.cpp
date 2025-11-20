@@ -1,3 +1,4 @@
+#include "gamestate_flag.h"
 #include "liblogic_update_debug_panel_buffer.h"
 
 void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
@@ -48,7 +49,7 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
              "Mode: %s \n"
              "Floor: %d/%d \n"
              "Entities: %d\n"
-             "Flag: %d\n"
+             "Flag: %s\n"
              "Turn: %d\n"
              "Hero: (%d,%d,%d)\n"
              "Weapon: %d\n"
@@ -71,7 +72,13 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
              0,
              0,
              g->next_entityid,
-             g->flag,
+             g->flag == GAMESTATE_FLAG_NONE           ? "None"
+             : g->flag == GAMESTATE_FLAG_PLAYER_INPUT ? "Player Input"
+             : g->flag == GAMESTATE_FLAG_PLAYER_ANIM  ? "Player anim"
+             : g->flag == GAMESTATE_FLAG_NPC_TURN     ? "NPC Turn"
+             : g->flag == GAMESTATE_FLAG_NPC_ANIM     ? "NPC anim"
+                                                      : "Unknown",
+
              g->entity_turn,
              loc.x,
              loc.y,
