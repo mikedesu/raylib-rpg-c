@@ -8,6 +8,7 @@
 #include "libdraw_handle_debug_panel.h"
 #include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
+#include "libdraw_message_box.h"
 #include "libdraw_player_target_box.h"
 #include "libdraw_set_sg.h"
 #include "libdraw_set_sg_is_attacking.h"
@@ -103,7 +104,6 @@ void draw_character_creation_screen_from_texture(shared_ptr<gamestate> g);
 
 void draw_character_creation_screen_to_texture(shared_ptr<gamestate> g);
 
-void draw_message_box(shared_ptr<gamestate> g);
 
 void create_sg_byid(shared_ptr<gamestate> g, entityid id);
 
@@ -610,12 +610,10 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     //        draw_entities_2d_at(g, df, true, (vec3){x, y, z});
     //    }
     //}
-
     // living
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             //draw_entities_2d_at(g, df, false, (vec3){x, y, z});
-
             shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, z});
             if (!tile) {
                 continue;
@@ -629,7 +627,6 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
             if (tile->is_empty) {
                 continue;
             }
-
             // Get hero's vision distance and location
             //int vision_distance = g_get_vision_distance(g, g->hero_id);
             //int light_dist = g_get_light_radius(g, g->hero_id) + g_get_entity_total_light_radius_bonus(g, g->hero_id);
@@ -647,7 +644,6 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
             }
         }
     }
-
     return true;
 }
 
@@ -701,29 +697,6 @@ void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g) {
 void libdraw_drawframe_2d_from_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     DrawTexturePro(main_game_target_texture.texture, target_src, target_dest, target_origin, 0.0f, WHITE);
-}
-
-
-void draw_message_box(shared_ptr<gamestate> g) {
-    if (!g->msg_system_is_active || g->msg_system->size() == 0) {
-        return;
-    }
-    const string msg = g->msg_system->at(0);
-    const Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    const int font_size = 10;
-    char tmp[1024] = {0};
-    snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
-    const int measure = MeasureText(tmp, font_size);
-    const float text_width = measure;
-    const float text_height = font_size;
-    const int w = DEFAULT_TARGET_WIDTH;
-    const float x = (w - text_width) / 2.0 - g->pad;
-    const float y = (DEFAULT_TARGET_HEIGHT - text_height) / 2.0 - g->pad;
-    const Rectangle box = {x, y, text_width + g->pad * 2, text_height + g->pad * 2};
-
-    DrawRectangleRec(box, message_bg);
-    DrawRectangleLinesEx(box, 1, WHITE);
-    DrawText(tmp, box.x + g->pad, box.y + g->pad, font_size, WHITE);
 }
 
 
