@@ -9,6 +9,9 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
     //int x;
     //int y;
     //int z;
+    int message_count = g->msg_history->size();
+
+
     int inventory_count;
     //direction_t player_dir;
     //shield_dir;
@@ -53,7 +56,8 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
              "Turn: %d\n"
              "Hero: (%d,%d,%d)\n"
              "Weapon: %d\n"
-             "Inventory: %d\n",
+             "Inventory: %d\n"
+             "Message count: %d\n",
              //g->timebeganbuf,
              //g->currenttimebuf,
              g->framecount,
@@ -84,5 +88,6 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
              loc.y,
              loc.z,
              g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID),
-             inventory_count);
+             inventory_count,
+             message_count);
 }

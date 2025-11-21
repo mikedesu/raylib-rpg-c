@@ -25,9 +25,9 @@ void draw_message_history(shared_ptr<gamestate> g) {
         snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
         const float msg_x = box.x + g->pad / 2.0;
         const float msg_y = box.y + g->pad / 2.0 + (i * (font_size + 2));
-        if (msg_y + font_size > box.y + box.height) {
-            break; // stop drawing if we exceed the box height
-        }
+        //if (msg_y + font_size > box.y + box.height) {
+        //    break; // stop drawing if we exceed the box height
+        //}
         DrawText(tmp, msg_x, msg_y, font_size, WHITE);
     }
 }
