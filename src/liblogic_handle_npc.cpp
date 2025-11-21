@@ -1,4 +1,5 @@
 #include "liblogic_handle_npc.h"
+#include "liblogic_try_entity_attack.h"
 #include "liblogic_try_entity_move.h"
 
 void handle_npc(shared_ptr<gamestate> g, entityid id) {
@@ -13,6 +14,11 @@ void handle_npc(shared_ptr<gamestate> g, entityid id) {
         if (g->ct.get<dead>(id).has_value()) {
             bool is_dead = g->ct.get<dead>(id).value();
             if (!is_dead) {
+                // test first by attacking to the left
+                //vec3 loc = g->ct.get<location>(id).value();
+                //try_entity_attack(g, id, loc.x - 1, loc.y);
+
+                // else, randomly move
                 try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
             }
         }

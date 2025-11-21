@@ -11,6 +11,11 @@ entityid create_npc_set_stats(shared_ptr<gamestate> g, vec3 loc, race_t race) {
         const int tmphp = 5;
         g->ct.set<hp>(id, tmphp);
         g->ct.set<maxhp>(id, tmphp);
+
+        // for now, if it is for sure not the hero, then we target the hero
+        if (id != g->hero_id) {
+            g->ct.set<target>(id, g->hero_id);
+        }
     }
     return id;
 }

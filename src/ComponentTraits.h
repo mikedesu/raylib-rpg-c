@@ -47,6 +47,7 @@ struct inventory { }; // shared_ptr<vector<entityid>>
 struct equipped_weapon { }; // entityid
 struct hp { }; // int
 struct maxhp { }; // int
+struct target { }; // int
 
 //struct Stats { }; // ??
 
@@ -156,5 +157,10 @@ struct ComponentTraits<hp> {
 
 template <>
 struct ComponentTraits<maxhp> {
+    using Type = int;
+};
+
+template <>
+struct ComponentTraits<target> {
     using Type = int;
 };
