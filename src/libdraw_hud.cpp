@@ -1,4 +1,7 @@
 #include "libdraw_hud.h"
+#include <algorithm>
+
+using std::max;
 
 void draw_hud(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -18,9 +21,9 @@ void draw_hud(shared_ptr<gamestate> g) {
     char floor_buffer[1024] = {0};
     const Color bg = (Color){0x33, 0x33, 0x33, 0xFF};
     const Color fg = WHITE;
-    
+
     const string n = g->ct.get<name>(g->hero_id).value_or("no-name");
-    
+
     // Format each line separately
     snprintf(name_buffer, sizeof(name_buffer), "%s", n.c_str());
     snprintf(stats_buffer, sizeof(stats_buffer), "Lvl %d HP %d/%d  Atk: %d  AC: %d", level, hp, maxhp, attack_bonus, ac);
@@ -30,7 +33,7 @@ void draw_hud(shared_ptr<gamestate> g) {
     const int name_width = MeasureText(name_buffer, font_size);
     const int stats_width = MeasureText(stats_buffer, font_size);
     const int floor_width = MeasureText(floor_buffer, font_size);
-    const int max_width = std::max({name_width, stats_width, floor_width});
+    const int max_width = max({name_width, stats_width, floor_width});
 
     // Calculate box dimensions based on widest line
     const float box_w = max_width + g->pad * 2;
@@ -47,12 +50,12 @@ void draw_hud(shared_ptr<gamestate> g) {
     // Draw each line with vertical spacing
     const int text_x = box_x + g->pad;
     int text_y = box_y + g->pad;
-    
+
     DrawText(name_buffer, text_x, text_y, font_size, fg);
     text_y += font_size + g->pad;
-    
+
     DrawText(stats_buffer, text_x, text_y, font_size, fg);
     text_y += font_size + g->pad;
-    
+
     DrawText(floor_buffer, text_x, text_y, font_size, fg);
 }
