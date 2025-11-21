@@ -36,26 +36,26 @@ void draw_hud(shared_ptr<gamestate> g) {
     const int max_width = max({name_width, stats_width, floor_width});
 
     // Calculate box dimensions based on widest line
-    const float box_w = max_width + g->pad * 2;
-    const float box_h = (font_size + g->pad) * 3; // 3 lines
+    const float box_w = max_width + g->pad;
+    const float box_h = (font_size + g->pad * 2); // 3 lines
 
     // Position box at bottom center
     const float box_x = g->targetwidth / 2.0f - (box_w / 2.0f);
-    const float box_y = g->targetheight - box_h;
+    const float box_y = g->targetheight - box_h - g->pad * 1.0f;
 
     // Draw background box
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, line_thickness, fg);
 
     // Draw each line with vertical spacing
-    const int text_x = box_x + g->pad;
-    int text_y = box_y + g->pad;
+    const int text_x = box_x + g->pad / 2.0f;
+    int text_y = box_y + g->pad / 2.0f;
 
     DrawText(name_buffer, text_x, text_y, font_size, fg);
-    text_y += font_size + g->pad;
+    text_y += font_size + 2;
 
     DrawText(stats_buffer, text_x, text_y, font_size, fg);
-    text_y += font_size + g->pad;
+    text_y += font_size + 2;
 
     DrawText(floor_buffer, text_x, text_y, font_size, fg);
 }
