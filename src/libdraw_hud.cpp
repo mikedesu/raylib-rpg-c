@@ -13,29 +13,46 @@ void draw_hud(shared_ptr<gamestate> g) {
     const int floor = g->dungeon->current_floor;
     const int font_size = 10;
     const int line_thickness = 1;
-    char buffer0[1024] = {0};
-    char buffer1[1024] = {0};
+    char name_buffer[1024] = {0};
+    char stats_buffer[1024] = {0};
+    char floor_buffer[1024] = {0};
     const Color bg = (Color){0x33, 0x33, 0x33, 0xFF};
     const Color fg = WHITE;
-    const char* format_str_0 = "%s Lvl %d HP %d/%d Atk: %d AC: %d XP %d/%d";
-    const char* format_str_1 = "Floor %d Turn %d";
+    
     const string n = g->ct.get<name>(g->hero_id).value_or("no-name");
+    
+    // Format each line separately
+    snprintf(name_buffer, sizeof(name_buffer), "%s", n.c_str());
+    snprintf(stats_buffer, sizeof(stats_buffer), "Lvl %d HP %d/%d  Atk: %d  AC: %d", level, hp, maxhp, attack_bonus, ac);
+    snprintf(floor_buffer, sizeof(floor_buffer), "Floor %d  Turn %d  XP %d/%d", floor, turn, xp, next_level_xp);
 
+    // Calculate max width of all lines
+    const int name_width = MeasureText(name_buffer, font_size);
+    const int stats_width = MeasureText(stats_buffer, font_size);
+    const int floor_width = MeasureText(floor_buffer, font_size);
+    const int max_width = std::max({name_width, stats_width, floor_width});
 
-    snprintf(buffer0, sizeof(buffer0), format_str_0, n.c_str(), level, hp, maxhp, attack_bonus, ac, xp, next_level_xp);
-    snprintf(buffer1, sizeof(buffer1), format_str_1, floor, turn);
+    // Calculate box dimensions based on widest line
+    const float box_w = max_width + g->pad * 2;
+    const float box_h = (font_size + g->pad) * 3; // 3 lines
 
-    const int text_size0 = MeasureText(buffer0, font_size);
-    const float box_w = text_size0 + g->pad * 2;
-    const float box_h = font_size + g->pad;
-
+    // Position box at bottom center
     const float box_x = g->targetwidth / 2.0f - (box_w / 2.0f);
-    const float box_y = g->targetheight - (box_h);
+    const float box_y = g->targetheight - box_h;
 
-    const int text_x = box_x + 10;
-    const int text_y = box_y + (box_h - font_size) / 2;
-
+    // Draw background box
     DrawRectangleRec((Rectangle){box_x, box_y, box_w, box_h}, bg);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_w, box_h}, line_thickness, fg);
-    DrawText(buffer0, text_x, text_y, font_size, fg);
+
+    // Draw each line with vertical spacing
+    const int text_x = box_x + g->pad;
+    int text_y = box_y + g->pad;
+    
+    DrawText(name_buffer, text_x, text_y, font_size, fg);
+    text_y += font_size + g->pad;
+    
+    DrawText(stats_buffer, text_x, text_y, font_size, fg);
+    text_y += font_size + g->pad;
+    
+    DrawText(floor_buffer, text_x, text_y, font_size, fg);
 }
