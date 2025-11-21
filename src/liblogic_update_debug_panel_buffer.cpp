@@ -47,11 +47,11 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
              "Last Clicked: %.01f, %.01f\n"
              "Frame Dirty: %d\n"
              "Draw Time: %.1fms\n"
-             "Is3D: %d\n"
              "Cam: (%.0f,%.0f) Zoom: %.1f\n"
              "Mode: %s \n"
              "Floor: %d/%d \n"
              "Entities: %d\n"
+             "Hero ID: %d\n"
              "Flag: %s\n"
              "Turn: %d\n"
              "Hero: (%d,%d,%d)\n"
@@ -68,7 +68,6 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
              g->last_click_screen_pos.y,
              g->frame_dirty,
              g->last_frame_time * 1000,
-             g->is3d,
              g->cam2d.offset.x,
              g->cam2d.offset.y,
              g->cam2d.zoom,
@@ -76,6 +75,7 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
              0,
              0,
              g->next_entityid,
+             g->hero_id,
              g->flag == GAMESTATE_FLAG_NONE           ? "None"
              : g->flag == GAMESTATE_FLAG_PLAYER_INPUT ? "Player Input"
              : g->flag == GAMESTATE_FLAG_PLAYER_ANIM  ? "Player anim"
