@@ -1,4 +1,5 @@
 #include "libgame_defines.h"
+#include "liblogic_add_message.h"
 #include "liblogic_change_player_dir.h"
 #include "liblogic_cycle_messages.h"
 #include "liblogic_handle_input_gameplay_controlmode_player.h"
@@ -77,84 +78,137 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
             return;
         }
 
+        if (inputstate_is_pressed(is, KEY_I)) {
+            g->display_inventory_menu = true;
+            g->controlmode = CONTROLMODE_INVENTORY;
+            g->frame_dirty = true;
+            //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+            PlaySound(g->sfx->at(SFX_BAG_OPEN));
+            return;
+        }
+
         if (g->hero_id != ENTITYID_INVALID) {
-            //vec3 loc = g_get_loc(g, g->hero_id);
-            if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
-                try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
-                try_entity_move(g, g->hero_id, (vec3){0, 1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
-                try_entity_move(g, g->hero_id, (vec3){-1, 0, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
-                try_entity_move(g, g->hero_id, (vec3){1, 0, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_Q)) {
-                try_entity_move(g, g->hero_id, (vec3){-1, -1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_E)) {
-                try_entity_move(g, g->hero_id, (vec3){1, -1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_Z)) {
-                try_entity_move(g, g->hero_id, (vec3){-1, 1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_C)) {
-                try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-                //PlaySound(g->sfx->at(SFX_SLASH_ATTACK_SWORD_1));
+            // make sure player isnt dead
+            optional<bool> maybe_player_is_dead = g->ct.get<dead>(g->hero_id);
+            if (maybe_player_is_dead.has_value()) {
+                bool player_is_dead = maybe_player_is_dead.value();
 
-                if (g->ct.get<location>(g->hero_id).has_value() && g->ct.get<direction>(g->hero_id).has_value()) {
-                    vec3 loc = g->ct.get<location>(g->hero_id).value();
-                    direction_t dir = g->ct.get<direction>(g->hero_id).value();
-                    if (dir == DIR_UP) {
-                        loc.y -= 1;
-                    } else if (dir == DIR_DOWN) {
-                        loc.y += 1;
-                    } else if (dir == DIR_LEFT) {
-                        loc.x -= 1;
-                    } else if (dir == DIR_RIGHT) {
-                        loc.x += 1;
-                    } else if (dir == DIR_UP_LEFT) {
-                        loc.x -= 1;
-                        loc.y -= 1;
-                    } else if (dir == DIR_UP_RIGHT) {
-                        loc.x += 1;
-                        loc.y -= 1;
-                    } else if (dir == DIR_DOWN_LEFT) {
-                        loc.x -= 1;
-                        loc.y += 1;
-                    } else if (dir == DIR_DOWN_RIGHT) {
-                        loc.x += 1;
-                        loc.y += 1;
+                // Handling movement
+                if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
+                    if (!player_is_dead) {
+                        try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
+                    } else {
+                        add_message(g, "You cant move while dead!");
                     }
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                } else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
+                    if (!player_is_dead) {
+                        try_entity_move(g, g->hero_id, (vec3){0, 1, 0});
+                    } else {
+                        add_message(g, "You cant move while dead!");
+                    }
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                } else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+                    if (!player_is_dead) {
+                        try_entity_move(g, g->hero_id, (vec3){-1, 0, 0});
+                    } else {
+                        add_message(g, "You cant move while dead!");
+                    }
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                } else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
+                    if (!player_is_dead) {
+                        try_entity_move(g, g->hero_id, (vec3){1, 0, 0});
+                    } else {
+                        add_message(g, "You cant move while dead!");
+                    }
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                } else if (inputstate_is_pressed(is, KEY_Q)) {
+                    if (!player_is_dead) {
+                        try_entity_move(g, g->hero_id, (vec3){-1, -1, 0});
+                    } else {
+                        add_message(g, "You cant move while dead!");
+                    }
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                } else if (inputstate_is_pressed(is, KEY_E)) {
+                    if (!player_is_dead) {
+                        try_entity_move(g, g->hero_id, (vec3){1, -1, 0});
+                    } else {
+                        add_message(g, "You cant move while dead!");
+                    }
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                } else if (inputstate_is_pressed(is, KEY_Z)) {
+                    if (!player_is_dead) {
+                        try_entity_move(g, g->hero_id, (vec3){-1, 1, 0});
+                    } else {
+                        add_message(g, "You cant move while dead!");
+                    }
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                } else if (inputstate_is_pressed(is, KEY_C)) {
+                    if (!player_is_dead) {
+                        try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
+                    } else {
+                        add_message(g, "You cant move while dead!");
+                    }
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                    // Handling attack
+                } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+                    if (!player_is_dead) {
+                        if (g->ct.get<location>(g->hero_id).has_value() && g->ct.get<direction>(g->hero_id).has_value()) {
+                            vec3 loc = g->ct.get<location>(g->hero_id).value();
+                            direction_t dir = g->ct.get<direction>(g->hero_id).value();
+                            if (dir == DIR_UP) {
+                                loc.y -= 1;
+                            } else if (dir == DIR_DOWN) {
+                                loc.y += 1;
+                            } else if (dir == DIR_LEFT) {
+                                loc.x -= 1;
+                            } else if (dir == DIR_RIGHT) {
+                                loc.x += 1;
+                            } else if (dir == DIR_UP_LEFT) {
+                                loc.x -= 1;
+                                loc.y -= 1;
+                            } else if (dir == DIR_UP_RIGHT) {
+                                loc.x += 1;
+                                loc.y -= 1;
+                            } else if (dir == DIR_DOWN_LEFT) {
+                                loc.x -= 1;
+                                loc.y += 1;
+                            } else if (dir == DIR_DOWN_RIGHT) {
+                                loc.x += 1;
+                                loc.y += 1;
+                            }
 
-                    try_entity_attack(g, g->hero_id, loc.x, loc.y);
+                            try_entity_attack(g, g->hero_id, loc.x, loc.y);
 
+                            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                        }
+                    } else {
+                        add_message(g, "You cant attack while dead!");
+                    }
+                    // handling pickup item
+                } else if (inputstate_is_pressed(is, KEY_SLASH)) {
+                    //add_message(g, "pickup item (unimplemented)");
+                    if (!player_is_dead) {
+                        try_entity_pickup(g, g->hero_id);
+                    } else {
+                        add_message(g, "You cant pickup items while dead!");
+                    }
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 }
-
-                //} else if (inputstate_is_pressed(is, KEY_SEMICOLON)) {
-            } else if (inputstate_is_pressed(is, KEY_SLASH)) {
-                //add_message(g, "pickup item (unimplemented)");
-                try_entity_pickup(g, g->hero_id);
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                //else {
+                // Player is dead
+                //add_message(g, "You cannot move while dead");
+                //}
             }
+
+
             //else if (inputstate_is_pressed(is, KEY_SLASH) && inputstate_is_shift_held(is)) {
             //    // open inventory
             //    //g->inventory_is_open = !g->inventory_is_open;
             //    g->display_help_menu = !g->display_help_menu;
             //    g->frame_dirty = true;
             //}
-            else if (inputstate_is_pressed(is, KEY_I)) {
-                g->display_inventory_menu = true;
-                g->controlmode = CONTROLMODE_INVENTORY;
-                g->frame_dirty = true;
-                //PlaySound(g->sfx->at(SFX_CONFIRM_01));
-                PlaySound(g->sfx->at(SFX_BAG_OPEN));
-            }
+
             return;
         }
     }
