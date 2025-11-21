@@ -29,7 +29,7 @@ void draw_hud(shared_ptr<gamestate> g) {
     const float box_w = text_size0 + g->pad * 2;
     const float box_h = font_size + g->pad;
 
-    const float box_x = 0;
+    const float box_x = g->targetwidth / 2.0f - (box_w / 2.0f);
     const float box_y = g->targetheight - (box_h);
 
     const int text_x = box_x + 10;
