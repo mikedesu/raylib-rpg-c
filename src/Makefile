@@ -53,6 +53,7 @@ libdraw_camera_lock_on.cpp \
 libdraw_dungeon_tiles_2d.cpp \
 libdraw.cpp \
 liblogic_drop_item.cpp \
+liblogic_is_entity_adjacent.cpp \
 liblogic_try_entity_attack.cpp \
 liblogic_try_entity_pickup.cpp \
 liblogic_add_message.cpp \
@@ -153,6 +154,7 @@ dungeon.o \
 dungeon_floor.o \
 dungeon_tile.o \
 dungeon_tile.o \
+liblogic_is_entity_adjacent.o \
 liblogic_drop_item.o \
 liblogic_add_message.o \
 liblogic_try_entity_attack.o \
@@ -348,6 +350,10 @@ libdraw.o: libdraw.cpp
 ###################
 
 ###################
+
+
+liblogic_is_entity_adjacent.o: liblogic_is_entity_adjacent.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_drop_item.o: liblogic_drop_item.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
