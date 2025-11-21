@@ -11,7 +11,7 @@ void draw_message_history(shared_ptr<gamestate> g) {
     }
     const int max_measure = g->msg_history_max_len_msg_measure;
     const float w = max_measure + g->pad;
-    const float h = font_size * msg_count + g->pad;
+    const float h = (font_size + 2) * msg_count + g->pad;
     //x = DEFAULT_TARGET_WIDTH - w;
     const float x = 0;
     const float y = 0;

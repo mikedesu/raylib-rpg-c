@@ -91,7 +91,8 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon(g, (vec3){2, 5, 0}, WEAPON_FLAIL);
     add_message(g, "Welcome to the game! Press enter to cycle messages.");
     add_message(g, "To move around, press q w e a d z x c");
-    add_message(g, "This is a test message to demonstrate the resizing of the message history box");
+    add_message(g, "This is a test message to demonstrate the resizing of");
+    add_message(g, "the message history box");
     msuccess("liblogic_init: Game state initialized");
 }
 
