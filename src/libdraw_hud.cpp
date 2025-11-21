@@ -6,8 +6,10 @@ using std::max;
 void draw_hud(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     const int turn = g->turn_count;
-    const int hp = 0;
-    const int maxhp = 0;
+
+    const int myhp = g->ct.get<hp>(g->hero_id).value_or(-1);
+    const int mymaxhp = g->ct.get<maxhp>(g->hero_id).value_or(-1);
+
     const int level = 0;
     const int xp = 0;
     const int next_level_xp = 0;
@@ -26,7 +28,7 @@ void draw_hud(shared_ptr<gamestate> g) {
 
     // Format each line separately
     snprintf(name_buffer, sizeof(name_buffer), "%s", n.c_str());
-    snprintf(stats_buffer, sizeof(stats_buffer), "Lvl %d HP %d/%d  Atk: %d  AC: %d", level, hp, maxhp, attack_bonus, ac);
+    snprintf(stats_buffer, sizeof(stats_buffer), "Lvl %d HP %d/%d  Atk: %d  AC: %d", level, myhp, mymaxhp, attack_bonus, ac);
     snprintf(floor_buffer, sizeof(floor_buffer), "Floor %d  Turn %d  XP %d/%d", floor, turn, xp, next_level_xp);
 
     // Calculate max width of all lines
