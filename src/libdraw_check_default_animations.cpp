@@ -11,7 +11,7 @@ bool check_default_animations(const shared_ptr<gamestate> g) {
 
         if (sg && sg->current != sg->default_anim) {
             // which sg isnt done?
-            merror("SPRITE HASNT RESET: %d\n", id);
+            //merror("SPRITE HASNT RESET: %d\n", id);
             return false;
         }
     }

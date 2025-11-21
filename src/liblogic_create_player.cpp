@@ -20,6 +20,8 @@ entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
 
     //g_set_tx_alpha(g, id, 0);
     g->ct.set<txalpha>(id, 0);
+    g->ct.set<hp>(id, 1);
+    g->ct.set<maxhp>(id, 1);
     //g_set_stat(g, id, STATS_LEVEL, 666);
     //g_add_equipped_weapon(g, id, ENTITYID_INVALID);
 

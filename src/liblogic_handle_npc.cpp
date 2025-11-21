@@ -15,11 +15,11 @@ void handle_npc(shared_ptr<gamestate> g, entityid id) {
             bool is_dead = g->ct.get<dead>(id).value();
             if (!is_dead) {
                 // test first by attacking to the left
-                //vec3 loc = g->ct.get<location>(id).value();
-                //try_entity_attack(g, id, loc.x - 1, loc.y);
+                vec3 loc = g->ct.get<location>(id).value();
+                try_entity_attack(g, id, loc.x - 1, loc.y);
 
                 // else, randomly move
-                try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+                //try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
             }
         }
         //execute_action(g, id, g_get_default_action(g, id));

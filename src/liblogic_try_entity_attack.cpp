@@ -1,5 +1,6 @@
 #include "ComponentTraits.h"
 #include "entityid.h"
+#include "liblogic_add_message.h"
 #include "liblogic_try_entity_attack.h"
 #include "sfx.h"
 #include "weapon.h"
@@ -156,7 +157,6 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
         optional<int> maybe_tgt_hp = g->ct.get<hp>(tgt_id);
         if (maybe_tgt_hp.has_value()) {
             int tgt_hp = maybe_tgt_hp.value();
-
             if (tgt_hp <= 0) {
                 merror("Target is already dead, hp was: %d", tgt_hp);
                 //g_update_dead(g, tgt_id, true);
@@ -203,6 +203,8 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
                     //                       loc,
                     //                       POTION_HEALTH_SMALL,
                     //                       "small health potion");
+                } else {
+                    add_message(g, "You died");
                 }
             } else {
                 //g_update_dead(g, tgt_id, false);
