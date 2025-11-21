@@ -1,3 +1,5 @@
+#include "ComponentTraits.h"
+#include "entitytype.h"
 #include "liblogic_create_player.h"
 #include "liblogic_handle_input_character_creation_scene.h"
 #include "roll.h"
@@ -30,9 +32,23 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
             //bonus_calc(g->chara_creation.constitution);
         }
         g->entity_turn = create_player(g, (vec3){0, 0, 0}, "darkmage");
+
+
+        // temporary wedge-in code
+        // set all the NPCs to target the hero
+        for (entityid id = 0; id < g->next_entityid; id++) {
+            entitytype_t t = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            if (t == ENTITY_NPC) {
+                g->ct.set<target>(id, g->hero_id);
+            }
+        }
+
+
         //g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
         //g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
+
         g->current_scene = SCENE_GAMEPLAY;
+
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {
         // re-roll character creation stats
         minfo("Re-rolling character creation stats");
