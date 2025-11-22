@@ -1,15 +1,9 @@
 #include "ComponentTraits.h"
 #include "entitytype.h"
 #include "gamestate.h"
-//#include "gamestate_equipped_weapon.h"
-//#include "gamestate_inventory.h"
 #include "liblogic_add_message.h"
 #include "massert.h"
 #include "sfx.h"
-#include <unordered_set>
-
-
-using std::unordered_set;
 
 
 bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
@@ -43,17 +37,12 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
         entitytype_t type = g->ct.get<entitytype>(itemid).value_or(ENTITY_NONE);
         //    //minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
-            //if (g_add_to_inventory(g, id, itemid)) {
-
-            //optional<shared_ptr<unordered_set<entityid>>> maybe_inventory = g->ct.get<inventory>(id);
             optional<shared_ptr<vector<entityid>>> maybe_inventory = g->ct.get<inventory>(id);
             if (maybe_inventory.has_value()) {
                 msuccess("id %d has an inventory", id);
                 tile_remove(tile, itemid);
-                //shared_ptr<unordered_set<entityid>> my_inventory = maybe_inventory.value();
                 shared_ptr<vector<entityid>> my_inventory = maybe_inventory.value();
                 // add the item_id to my_inventory
-                //my_inventory->insert(itemid);
                 my_inventory->push_back(itemid);
                 PlaySound(g->sfx->at(SFX_CONFIRM_01));
 
