@@ -21,7 +21,8 @@ void draw_hud(shared_ptr<gamestate> g) {
     char name_buffer[1024] = {0};
     char stats_buffer[1024] = {0};
     char floor_buffer[1024] = {0};
-    const Color bg = (Color){0x33, 0x33, 0x33, 0xFF};
+    //const Color bg = (Color){0x33, 0x33, 0x33, 0xFF};
+    const Color bg = (Color){0, 0, 0xff, 0xFF};
     const Color fg = WHITE;
 
     const string n = g->ct.get<name>(g->hero_id).value_or("no-name");
