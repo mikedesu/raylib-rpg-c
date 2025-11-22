@@ -10,6 +10,7 @@
 #include "libdraw_to_texture.h"
 #include "race.h"
 #include "spritegroup.h"
+#include <raylib.h>
 
 //#include "get_txkey_for_tiletype.h"
 //#include "gamestate_equipped_weapon.h"
@@ -335,6 +336,11 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     draw_character_creation_screen_to_texture(g);
 
     InitAudioDevice();
+
+    while (!IsAudioDeviceReady())
+        ;
+
+
     libdraw_load_music(g);
     libdraw_load_sfx(g);
 
