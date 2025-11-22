@@ -57,3 +57,30 @@ entityid create_weapon_at(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) 
 
     return ENTITYID_INVALID;
 }
+
+entityid create_weapon(shared_ptr<gamestate> g, weapontype_t type) {
+    massert(g, "gamestate is NULL");
+
+    entityid id = g_add_entity(g);
+
+    g->ct.set<entitytype>(id, ENTITY_ITEM);
+    g->ct.set<itemtype>(id, ITEM_WEAPON);
+    g->ct.set<weapontype>(id, type);
+
+    string item_name = "unnamed-weapon";
+
+    if (type == WEAPON_AXE) {
+        item_name = "axe";
+    } else if (type == WEAPON_DAGGER) {
+        item_name = "dagger";
+    } else if (type == WEAPON_SWORD) {
+        item_name = "sword";
+    }
+
+    g->ct.set<name>(id, item_name);
+    g->ct.set<txalpha>(id, 255);
+    g->ct.set<update>(id, true);
+    g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+
+    return id;
+}
