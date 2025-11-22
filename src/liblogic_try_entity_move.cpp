@@ -1,6 +1,7 @@
 #include "libgame_defines.h"
 #include "liblogic_try_entity_move.h"
 #include "massert.h"
+#include "sfx.h"
 
 entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z);
 int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
@@ -88,6 +89,10 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     g->ct.set<location>(id, aloc);
 
     g->ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
+
+
+    PlaySound(g->sfx->at(SFX_STEP_STONE_1));
+
 
     return true;
 }

@@ -27,6 +27,13 @@ item_pick.wav
 item_place.wav
 item_unlock.wav
 jewel.wav
+jump_1.wav
+jump_2.wav
+jump_3.wav
+land_1.wav
+land_2.wav
+land_on_grass_1.wav
+land_on_grass_2.wav
 leather.wav
 legendary_drop.wav
 metal_heavy.wav
