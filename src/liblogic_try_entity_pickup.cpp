@@ -2,6 +2,7 @@
 #include "entitytype.h"
 #include "gamestate.h"
 #include "liblogic_add_message.h"
+#include "manage_inventory.h"
 #include "massert.h"
 #include "sfx.h"
 
@@ -37,18 +38,22 @@ bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
         entitytype_t type = g->ct.get<entitytype>(itemid).value_or(ENTITY_NONE);
         //    //minfo("Item %s type: %d", g_get_name(g, itemid), type);
         if (type == ENTITY_ITEM) {
-            optional<shared_ptr<vector<entityid>>> maybe_inventory = g->ct.get<inventory>(id);
-            if (maybe_inventory.has_value()) {
-                msuccess("id %d has an inventory", id);
+            if (add_to_inventory(g, id, itemid)) {
                 tile_remove(tile, itemid);
-                shared_ptr<vector<entityid>> my_inventory = maybe_inventory.value();
-                // add the item_id to my_inventory
-                my_inventory->push_back(itemid);
                 PlaySound(g->sfx->at(SFX_CONFIRM_01));
-
-            } else {
-                merror("id %d does not have an inventory", id);
             }
+
+            //optional<shared_ptr<vector<entityid>>> maybe_inventory = g->ct.get<inventory>(id);
+            //if (maybe_inventory.has_value()) {
+            //    msuccess("id %d has an inventory", id);
+            //    tile_remove(tile, itemid);
+            //    shared_ptr<vector<entityid>> my_inventory = maybe_inventory.value();
+            //    // add the item_id to my_inventory
+            //    my_inventory->push_back(itemid);
+            //    PlaySound(g->sfx->at(SFX_CONFIRM_01));
+            //} else {
+            //    merror("id %d does not have an inventory", id);
+            //}
 
             //    msuccess("item added to inventory");
             //} else {

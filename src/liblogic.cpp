@@ -15,6 +15,7 @@
 #include "liblogic_init_dungeon.h"
 #include "liblogic_update_debug_panel_buffer.h"
 #include "liblogic_update_player_state.h"
+#include "manage_inventory.h"
 #include "massert.h"
 #include "weapon.h"
 #include <cassert>
@@ -64,8 +65,8 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_weapon_at(g, (vec3){3, 0, 0}, WEAPON_SWORD);
 
     entityid orc1 = create_npc_set_stats(g, (vec3){1, 3, 0}, RACE_ORC);
-    entityid orc1_weapon = create_weapon(g, WEAPON_DAGGER);
-    // not fully correct, technically we want it in the orc's inventory
+    entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
+    add_to_inventory(g, orc1, orc1_weapon);
     g->ct.set<equipped_weapon>(orc1, orc1_weapon);
 
     //entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);

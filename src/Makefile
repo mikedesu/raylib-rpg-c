@@ -12,6 +12,7 @@ CFLAGS ?= # Allow override
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
 gameloader_web.cpp \
+manage_inventory.cpp \
 libdraw_draw_inventory_menu.cpp \
 libdraw_message_history.cpp \
 libdraw_version.cpp \
@@ -108,6 +109,7 @@ OBJ_FILES=main.o \
 gameloader.o \
 gamestate_inventory.o \
 gamestate.o \
+manage_inventory.o \
 libdraw_draw_inventory_menu.o \
 libdraw_message_history.o \
 libdraw_version.o \
@@ -350,6 +352,8 @@ libdraw.o: libdraw.cpp
 ###################
 
 ###################
+manage_inventory.o: manage_inventory.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
 liblogic_is_entity_adjacent.o: liblogic_is_entity_adjacent.cpp
