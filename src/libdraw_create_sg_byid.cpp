@@ -7,12 +7,17 @@
 #include "tx_keys_weapons.h"
 
 void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
+    minfo("BEGIN create_sg_byid");
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     //entitytype_t type = g_get_type(g, id);
+
+    minfo("checking type for id %d", id);
     entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+    minfo("type for id %d is %d", id, type);
     massert(type != ENTITY_NONE, "entity type is none");
     if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
+        minfo("type is player");
         //race_t race = g_get_race(g, id);
         race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
         switch (r) {
@@ -26,15 +31,18 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
         case RACE_BAT: create_spritegroup(g, id, TX_BAT_KEYS, TX_BAT_COUNT, -12, -12); break;
         case RACE_WARG: create_spritegroup(g, id, TX_WARG_KEYS, TX_WARG_COUNT, -12, -12); break;
         case RACE_GREEN_SLIME: create_spritegroup(g, id, TX_GREEN_SLIME_KEYS, TX_GREEN_SLIME_COUNT, -12, -12); break;
-        default: merror("unknown race %d", r); return;
+        default: merror("unknown race %d", r);
         }
     } else if (type == ENTITY_WOODEN_BOX) {
+        minfo("type is wooden box");
         create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
     } else if (type == ENTITY_ITEM) {
+        minfo("type is item");
         //itemtype item_type = g_get_item_type(g, id);
         itemtype_t item_type = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
 
         if (item_type == ITEM_POTION) {
+            minfo("itemtype is potion");
             //potiontype_t potion_type = g_get_potion_type(g, id);
             potiontype_t potion_type = g->ct.get<potiontype>(id).value_or(POTION_NONE);
 
@@ -47,10 +55,11 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             case POTION_MP_LARGE: create_spritegroup(g, id, TX_POTION_MP_LARGE_KEYS, TX_POTION_MP_LARGE_COUNT, -12, -12); break;
             default: merror("unknown potion type %d", potion_type); return;
             }
-            return;
         } else if (item_type == ITEM_WEAPON) {
+            minfo("itemtype is weapon");
             //weapontype weapon_type = g_get_weapon_type(g, id);
             weapontype_t weapon_type = g->ct.get<weapontype>(id).value_or(WEAPON_NONE);
+            minfo("weapontype is %d", weapon_type);
 
             switch (weapon_type) {
             case WEAPON_DAGGER: create_spritegroup(g, id, TX_DAGGER_KEYS, TX_DAGGER_COUNT, -12, -12); break;
@@ -62,7 +71,6 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             case WEAPON_FLAIL: create_spritegroup(g, id, TX_WHIP_KEYS, TX_WHIP_COUNT, -12, -12); break;
             default: merror("unknown weapon type %d", weapon_type); return;
             }
-            return;
         }
         //else if (item_type == ITEM_SHIELD) {
         //    create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12);
@@ -78,4 +86,5 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
         //} else {
         //    merror("unknown item type %d", item_type);
     }
+    minfo("END create_sg_byid");
 }

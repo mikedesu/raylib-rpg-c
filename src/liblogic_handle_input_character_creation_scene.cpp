@@ -36,13 +36,18 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
 
         // temporary wedge-in code
         // set all the NPCs to target the hero
+        minfo("Hero ID: %d", g->hero_id);
+        minfo("BEGIN Temporary wedge-in code");
+        minfo("Probably crashes here");
         for (entityid id = 0; id < g->next_entityid; id++) {
+            minfo("Getting type for id %d", id);
             entitytype_t t = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (t == ENTITY_NPC) {
+                minfo("Setting target for id %d", id);
                 g->ct.set<target>(id, g->hero_id);
             }
         }
-
+        minfo("END Temporary wedge-in code");
 
         //g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
         //g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);

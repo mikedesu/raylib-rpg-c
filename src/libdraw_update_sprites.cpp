@@ -9,7 +9,7 @@ extern unordered_map<entityid, spritegroup_t*> spritegroups;
 extern int ANIM_SPEED;
 
 void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
-    minfo2("Begin update sprites pre");
+    minfo("Begin update sprites pre");
     massert(g, "gamestate is NULL");
 
     UpdateMusicStream(music);
@@ -19,13 +19,13 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     //}
     if (g->current_scene == SCENE_GAMEPLAY) {
         libdraw_handle_dirty_entities(g);
-        minfo2("Begin update sprites pre loop");
+        minfo("Begin update sprites pre loop");
         for (entityid id = 0; id < g->next_entityid; id++) {
             libdraw_update_sprite_pre(g, id);
         }
-        minfo2("End update sprites pre loop");
+        minfo("End update sprites pre loop");
     }
-    minfo2("End update sprites pre");
+    minfo("End update sprites pre");
 }
 
 

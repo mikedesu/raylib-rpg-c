@@ -38,6 +38,7 @@ entityid create_weapon_at(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) 
 
 entityid create_weapon(shared_ptr<gamestate> g, weapontype_t type) {
     massert(g, "gamestate is NULL");
+    minfo("BEGIN create_weapon");
 
     entityid id = g_add_entity(g);
 
@@ -60,5 +61,6 @@ entityid create_weapon(shared_ptr<gamestate> g, weapontype_t type) {
     g->ct.set<update>(id, true);
     g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
 
+    minfo("END create_weapon");
     return id;
 }
