@@ -24,15 +24,17 @@ entityid create_weapon_at(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) 
         return ENTITYID_INVALID;
     }
 
-    g->ct.set<location>(id, loc);
-    
+
     minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
     if (!df_add_at(df, id, loc.x, loc.y)) {
         return ENTITYID_INVALID;
     }
 
+    g->ct.set<location>(id, loc);
+
     return id;
 }
+
 
 entityid create_weapon(shared_ptr<gamestate> g, weapontype_t type) {
     massert(g, "gamestate is NULL");
