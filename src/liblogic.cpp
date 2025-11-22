@@ -66,7 +66,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     entityid orc1 = create_npc_set_stats(g, (vec3){1, 3, 0}, RACE_ORC);
     entityid orc1_weapon = create_weapon(g, WEAPON_DAGGER);
     // not fully correct, technically we want it in the orc's inventory
-    //g->ct.set<equipped_weapon>(orc1, orc1_weapon);
+    g->ct.set<equipped_weapon>(orc1, orc1_weapon);
 
     //entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);
     //entityid orc3 = create_npc_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
