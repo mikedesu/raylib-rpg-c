@@ -49,6 +49,7 @@ struct hp { }; // int
 struct maxhp { }; // int
 struct target { }; // int
 struct light_radius { }; // int
+struct vision_distance { }; // int
 
 //struct Stats { }; // ??
 
@@ -168,5 +169,10 @@ struct ComponentTraits<target> {
 
 template <>
 struct ComponentTraits<light_radius> {
+    using Type = int;
+};
+
+template <>
+struct ComponentTraits<vision_distance> {
     using Type = int;
 };

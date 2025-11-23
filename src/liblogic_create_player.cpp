@@ -1,3 +1,4 @@
+#include "ComponentTraits.h"
 #include "liblogic_create_npc.h"
 #include "liblogic_create_player.h"
 
@@ -20,8 +21,11 @@ entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
 
     //g_set_tx_alpha(g, id, 0);
     g->ct.set<txalpha>(id, 0);
-    g->ct.set<hp>(id, 5);
-    g->ct.set<maxhp>(id, 5);
+    g->ct.set<hp>(id, 100);
+    g->ct.set<maxhp>(id, 100);
+
+    g->ct.set<vision_distance>(id, 10);
+
     //g_set_stat(g, id, STATS_LEVEL, 666);
     //g_add_equipped_weapon(g, id, ENTITYID_INVALID);
 
