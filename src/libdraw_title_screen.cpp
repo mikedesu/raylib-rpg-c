@@ -32,9 +32,16 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     float title_text_1_x = x + measure + padding;
     float version_x = (w - version_measure) / 2.0f;
     float version_y = y + font_size + 10;
-    float start_y = y + font_size * 1 + 20 + sm_font_size;
+    // Add placeholder text between version and start text
+    const char* placeholder_text = "Placeholder Text";
+    int placeholder_measure = MeasureText(placeholder_text, sm_font_size);
+    float placeholder_x = (w - placeholder_measure) / 2.0f;
+    float placeholder_y = version_y + sm_font_size + 10;
+    float start_y = placeholder_y + sm_font_size + 10;
     ClearBackground(BLACK);
     // Draw the "evidojo666 presents" text at the top
+    // Draw the placeholder text
+    DrawText(placeholder_text, placeholder_x, placeholder_y, sm_font_size, WHITE);
     int evidojo_x = (w - evidojo_presents_measure) / 2.0f;
     int evidojo_y = y - sm_font_size - 10; // Position it above the title text
     DrawText(evidojo_presents_text, evidojo_x, evidojo_y, sm_font_size, WHITE);
