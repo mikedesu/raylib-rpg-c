@@ -43,6 +43,7 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
 
     g->ct.set<inventory>(id, make_shared<vector<entityid>>());
     g->ct.set<equipped_weapon>(id, ENTITYID_INVALID);
+    g->ct.set<aggro>(id, false);
 
     minfo("end create npc");
 
