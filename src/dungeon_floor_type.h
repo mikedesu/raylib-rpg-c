@@ -1,0 +1,10 @@
+#pragma once
+
+typedef enum
+{
+    DUNGEON_FLOOR_TYPE_NONE = 0,
+    DUNGEON_FLOOR_TYPE_STONE,
+    DUNGEON_FLOOR_TYPE_GRASS,
+    DUNGEON_FLOOR_TYPE_SAND,
+    DUNGEON_FLOOR_TYPE_WATER,
+} dungeon_floor_type_t;

@@ -1,5 +1,7 @@
 #include "dungeon.h"
 #include "dungeon_floor.h"
+//#include "dungeon_type.h"
+#include "dungeon_floor_type.h"
 #include "massert.h"
 #include <cstdlib>
 #include <cstring>
@@ -37,10 +39,10 @@ void d_free(shared_ptr<dungeon_t> dungeon) {
 }
 
 
-bool d_add_floor(shared_ptr<dungeon_t> dungeon, int width, int height) {
+bool d_add_floor(shared_ptr<dungeon_t> dungeon, dungeon_floor_type_t type, int width, int height) {
     if (!dungeon || width <= 0 || height <= 0 || dungeon->is_locked) return false;
     int current_floor = dungeon->floors->size();
-    shared_ptr<dungeon_floor_t> new_floor = df_create(current_floor, width, height);
+    shared_ptr<dungeon_floor_t> new_floor = df_create(current_floor, type, width, height);
     if (!new_floor) return false;
     df_assign_upstairs_in_area(new_floor, 0, 0, width, height);
     df_assign_downstairs_in_area(new_floor, 0, 0, width, height);

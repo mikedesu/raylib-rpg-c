@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dungeon_floor_type.h"
 #include "dungeon_tile.h"
 #include "entityid.h"
 #include "mprint.h"
@@ -26,11 +27,14 @@ typedef struct {
     vec3 downstairs_loc;
     vec3 upstairs_loc;
 
+    dungeon_floor_type_t type;
+
     shared_ptr<vector<tile_id>> tiles; // 2D vector of shared pointers to tile_t
     shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
 } dungeon_floor_t;
 
-shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height);
+//shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height);
+shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int width, int height);
 
 void df_set_tile_area_range(shared_ptr<dungeon_floor_t> const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end);
 void df_free(shared_ptr<dungeon_floor_t> df);

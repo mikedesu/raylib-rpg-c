@@ -1,4 +1,5 @@
 #include "dungeon_floor.h"
+#include "dungeon_floor_type.h"
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
@@ -39,6 +40,61 @@ vec3* df_get_possible_downstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, in
 int df_get_possible_upstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 int df_get_possible_downstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 void df_make_room(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+
+
+//shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height) {
+shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int width, int height) {
+    massert(width > 0, "width must be greater than zero");
+    massert(height > 0, "height must be greater than zero");
+    massert(floor >= 0, "floor must be greater than or equal to zero");
+
+    shared_ptr<dungeon_floor_t> df = make_shared<dungeon_floor_t>();
+    massert(df, "failed to malloc dungeon floor");
+
+    df->floor = floor;
+    df->width = width;
+    df->height = height;
+
+    df->tiles = make_shared<vector<tile_id>>();
+    massert(df->tiles, "failed to create tiles vector");
+
+    df->tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
+    massert(df->tile_map, "failed to create tile map");
+
+    df->type = t;
+
+    for (tile_id i = 0; i < width * height; i++) {
+        df->tiles->push_back(i);
+
+        shared_ptr<tile_t> tile = make_shared<tile_t>();
+        massert(tile, "failed to create tile");
+        tile->id = i;
+        tile->visible = true;
+
+        if (df->type == DUNGEON_FLOOR_TYPE_STONE) {
+            tile_init(tile, TILE_FLOOR_STONE_00);
+            tile->type = (tiletype_t)(TILE_FLOOR_STONE_00 + (rand() % (TILE_FLOOR_STONE_11 - TILE_FLOOR_STONE_00 + 1)));
+        } else if (df->type == DUNGEON_FLOOR_TYPE_GRASS) {
+            tile_init(tile, TILE_FLOOR_GRASS_00);
+            tile->type = (tiletype_t)(TILE_FLOOR_GRASS_00 + (rand() % (TILE_FLOOR_GRASS_10 - TILE_FLOOR_GRASS_00 + 1)));
+        } else {
+            tile_init(tile, TILE_FLOOR_STONE_00);
+            tile->type = (tiletype_t)(TILE_FLOOR_STONE_00 + (rand() % (TILE_FLOOR_STONE_11 - TILE_FLOOR_STONE_00 + 1)));
+        }
+
+        // for each tile in the dungeon floor, select a random tile between TILE_FLOOR_STONE_00 and 11
+        //tile->type = (tiletype_t)(TILE_FLOOR_STONE_00 + (rand() % (TILE_FLOOR_STONE_11 - TILE_FLOOR_STONE_00 + 1)));
+
+        df->tile_map->insert({i, tile});
+    }
+
+    df->upstairs_loc = (vec3){-1, -1, -1};
+    df->downstairs_loc = (vec3){-1, -1, -1};
+
+    //df_init(df);
+    msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
+    return df;
+}
 
 
 int df_get_possible_downstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) {
@@ -250,52 +306,6 @@ int df_center_y(const shared_ptr<dungeon_floor_t> df) {
     return df->height / 2;
 }
 
-shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height) {
-    massert(width > 0, "width must be greater than zero");
-    massert(height > 0, "height must be greater than zero");
-    massert(floor >= 0, "floor must be greater than or equal to zero");
-
-    //dungeon_floor_t* df = (dungeon_floor_t*)malloc(sizeof(dungeon_floor_t));
-    shared_ptr<dungeon_floor_t> df = make_shared<dungeon_floor_t>();
-    massert(df, "failed to malloc dungeon floor");
-
-    df->floor = floor;
-    df->width = width;
-    df->height = height;
-
-    //df->tiles = make_shared<vector<tile_id>>(width * height, TILE_NONE);
-    df->tiles = make_shared<vector<tile_id>>();
-    massert(df->tiles, "failed to create tiles vector");
-
-    df->tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
-    massert(df->tile_map, "failed to create tile map");
-
-    for (tile_id i = 0; i < width * height; i++) {
-        df->tiles->push_back(i);
-
-        shared_ptr<tile_t> tile = make_shared<tile_t>();
-
-        massert(tile, "failed to create tile");
-
-        tile_init(tile, TILE_FLOOR_STONE_00);
-
-        tile->id = i;
-        ////tile->type = TILE_NONE;
-        // for each tile in the dungeon floor, select a random tile between TILE_FLOOR_STONE_00 and 11
-        tile->type = (tiletype_t)(TILE_FLOOR_STONE_00 + (rand() % (TILE_FLOOR_STONE_11 - TILE_FLOOR_STONE_00 + 1)));
-        //tile->type = TILE_FLOOR_STONE_00;
-        tile->visible = true;
-
-        df->tile_map->insert({i, tile});
-    }
-
-    df->upstairs_loc = (vec3){-1, -1, -1};
-    df->downstairs_loc = (vec3){-1, -1, -1};
-
-    //df_init(df);
-    msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
-    return df;
-}
 
 void df_set_tile_area(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y, int w, int h) {
     minfo("df_set_tile_area: Setting tile area at (%d, %d) with size %dx%d to type %d", x, y, w, h, type);
