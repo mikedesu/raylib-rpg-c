@@ -1,5 +1,6 @@
 #include "libdraw_title_screen.h"
 #include "libgame_defines.h"
+#include "libgame_version.h"
 
 void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     massert(g, "gamestate is NULL");
@@ -19,6 +20,7 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     int sm_font_size = 10;
     int font_size = 40;
     //int font_size2 = 20;
+    // Draw the "evidojo666 presents" text at the top
     int evidojo_presents_measure = MeasureText(evidojo_presents_text, sm_font_size);
     int measure = MeasureText(title_text_0, font_size);
     int start_measure = MeasureText(start_text, sm_font_size);
@@ -33,15 +35,16 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     float version_x = (w - version_measure) / 2.0f;
     float version_y = y + font_size + 10;
     // Add placeholder text between version and start text
-    const char* placeholder_text = "Placeholder Text";
+
+    const char* placeholder_text = GAME_VERSION_DATE;
     int placeholder_measure = MeasureText(placeholder_text, sm_font_size);
     float placeholder_x = (w - placeholder_measure) / 2.0f;
     float placeholder_y = version_y + sm_font_size + 10;
     float start_y = placeholder_y + sm_font_size + 10;
     ClearBackground(BLACK);
-    // Draw the "evidojo666 presents" text at the top
     // Draw the placeholder text
     DrawText(placeholder_text, placeholder_x, placeholder_y, sm_font_size, WHITE);
+
     int evidojo_x = (w - evidojo_presents_measure) / 2.0f;
     int evidojo_y = y - sm_font_size - 10; // Position it above the title text
     DrawText(evidojo_presents_text, evidojo_x, evidojo_y, sm_font_size, WHITE);
