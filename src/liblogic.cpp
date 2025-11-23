@@ -160,33 +160,6 @@ void liblogic_close(shared_ptr<gamestate> g) {
 }
 
 
-//static inline void reset_player_blocking(shared_ptr<gamestate> g) {
-//    massert(g, "gamestate is NULL");
-//    g_set_blocking(g, g->hero_id, false);
-//g_set_block_success(g, g->hero_id, false);
-//g_set_update(g, g->hero_id, true);
-//}
-
-
-//static void handle_attack_blocked(shared_ptr<gamestate> g,
-//                                  entityid attacker_id,
-//                                  entityid target_id,
-//                                  bool* atk_successful);
-//static void handle_input_help_menu(const inputstate* const is, gamestate* const g);
-//static void handle_level_up(shared_ptr<gamestate> g, entityid id);
-//static void handle_input_sort_inventory(const inputstate* const is, gamestate* const g);
-//static void handle_input_sort_inventory(shared_ptr<inputstate> is,
-//                                        shared_ptr<gamestate> g);
-//static void init_dungeon(shared_ptr<gamestate> g);
-
-
-//static void
-//add_message_and_history(shared_ptr<gamestate> g, const char* fmt, ...);
-//static void add_message(gamestate* g, const char* fmt, ...);
-//static void add_message(shared_ptr<gamestate> g, const char* fmt, ...);
-//static void try_entity_move_a_star(shared_ptr<gamestate> g, entityid id);
-
-
 //static void handle_attack_blocked(shared_ptr<gamestate> g,
 //                                  entityid attacker_id,
 //                                  entityid target_id,
@@ -387,41 +360,6 @@ void liblogic_close(shared_ptr<gamestate> g) {
 //    // only return the total light radius bonus
 //    // it is fine if it is negative that might be fun for cursed items
 //    return total_light_radius_bonus;
-//}
-
-//static void update_player_tiles_explored(shared_ptr<gamestate> g) {
-//    massert(g, "gamestate is NULL");
-//    entityid hero_id = g->hero_id;
-//    massert(hero_id != ENTITYID_INVALID, "hero id is invalid");
-//    dungeon_floor_t* df = d_get_floor(g->d, g->d->current_floor);
-//    massert(df, "failed to get current dungeon floor");
-//    vec3 loc = g_get_location(g, hero_id);
-//    // Get the player's light radius
-//    int light_radius = g_get_light_radius(g, hero_id);
-//    int light_radius_bonus = g_get_entity_total_light_radius_bonus(g, hero_id);
-//    light_radius += light_radius_bonus;
-//    minfo("hero light radius: %d", light_radius);
-//    massert(light_radius > 0, "light radius is negative");
-//    // Reveal tiles in a diamond pattern
-//    for (int i = -light_radius; i <= light_radius; i++) {
-//        for (int j = -light_radius; j <= light_radius; j++) {
-//            // Calculate Manhattan distance for diamond shape
-//            int dist = abs(i) + abs(j);
-//            // Only reveal tiles within the light radius
-//            if (dist <= light_radius) {
-//                vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
-//                // Skip if out of bounds
-//                if (loc2.x < 0 || loc2.x >= df->width || loc2.y < 0 ||
-//                    loc2.y >= df->height)
-//                    continue;
-//                //tile_t* tile = df_tile_at(df, loc2);
-//                shared_ptr<tile_t> tile = df_tile_at(df, loc2);
-//                massert(tile, "failed to get tile at hero location");
-//                tile->explored = true;
-//                tile->visible = true;
-//            }
-//        }
-//    }
 //}
 
 
