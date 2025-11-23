@@ -17,6 +17,7 @@
 #include "liblogic_update_player_state.h"
 #include "manage_inventory.h"
 #include "massert.h"
+#include "update_player_tiles_explored.h"
 #include "weapon.h"
 #include <cassert>
 #include <cmath>
@@ -142,6 +143,8 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     // Spawn NPCs periodically
     //try_spawn_npc(g);
     // update ALL entities
+    update_player_tiles_explored(g);
+
     update_player_state(g);
     update_npcs_state(g);
     handle_input(g, is);

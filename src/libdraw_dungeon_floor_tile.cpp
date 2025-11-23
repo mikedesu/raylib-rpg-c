@@ -22,6 +22,9 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
         //merror("Tile at (%d, %d) is not visible", x, y);
         return true;
     }
+    if (!tile->explored) {
+        return true;
+    }
 
     //minfo("Drawing tile at (%d, %d) with type %d", x, y, tile->type);
     // Get hero's vision distance and location
