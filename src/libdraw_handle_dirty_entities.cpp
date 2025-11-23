@@ -3,7 +3,7 @@
 
 void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    minfo("Begin handle dirty entities");
+    //minfo("Begin handle dirty entities");
     if (g->dirty_entities) {
         for (entityid i = g->new_entityid_begin; i < g->new_entityid_end; i++) {
             create_sg_byid(g, i);
@@ -13,5 +13,5 @@ void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
         g->new_entityid_end = ENTITYID_INVALID;
         g->frame_dirty = true;
     }
-    minfo("End handle dirty entities");
+    //minfo("End handle dirty entities");
 }

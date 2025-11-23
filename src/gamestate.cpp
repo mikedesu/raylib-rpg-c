@@ -2,7 +2,8 @@
 #include "entityid.h"
 #include "gamestate.h"
 #include "gamestate_flag.h"
-#include "libgame_defines.h"
+//#include "libgame_defines.h"
+#include "libgame_version.h"
 #include "massert.h"
 #include "mprint.h"
 #include <cstdio>

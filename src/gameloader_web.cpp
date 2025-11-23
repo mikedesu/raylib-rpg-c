@@ -19,9 +19,9 @@ shared_ptr<gamestate> g = gamestateinitptr();
 void gameloop() {
     inputstate_update(is);
     liblogic_tick(is, g);
-    libdraw_update_sprites_pre(g);
     libdraw_drawframe(g);
-    libdraw_update_sprites_post(g);
+    //libdraw_update_sprites_pre(g);
+    //libdraw_update_sprites_post(g);
     //if (g->do_restart) {
     //    msuccess("Restarting game...");
     //    libdraw_close();

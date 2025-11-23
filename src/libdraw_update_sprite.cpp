@@ -6,7 +6,7 @@
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
 void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
-    minfo("Begin update sprite pre: %d", id);
+    //minfo("Begin update sprite pre: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
 
@@ -15,10 +15,10 @@ void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
         return;
     }
 
-    minfo("Grabbing spritegroup...");
+    //minfo("Grabbing spritegroup...");
     spritegroup_t* sg = spritegroups[id];
     if (sg) {
-        minfo("Updating spritegroup...");
+        //minfo("Updating spritegroup...");
         libdraw_update_sprite_ptr(g, id, sg);
     }
     //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
@@ -28,7 +28,7 @@ void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     //        libdraw_update_sprite_ptr(g, id, sg);
     //    }
     //}
-    minfo("End update sprite pre: %d", id);
+    //minfo("End update sprite pre: %d", id);
 }
 
 
@@ -101,7 +101,7 @@ void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* g
 
 
 void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    minfo("Begin update sprite ptr: %d", id);
+    //minfo("Begin update sprite ptr: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
@@ -144,5 +144,5 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
         spritegroup_snap_dest(sg, loc.x, loc.y);
     }
 
-    minfo("End update sprite ptr: %d", id);
+    //minfo("End update sprite ptr: %d", id);
 }

@@ -25,7 +25,6 @@ libdraw_unload_textures.cpp \
 libdraw_dungeon_floor_tile.cpp \
 libdraw_create_spritegroup.cpp \
 libdraw_create_sg_byid.cpp \
-libdraw_update_debug_panel.cpp \
 libdraw_hud.cpp \
 libdraw_check_default_animations.cpp \
 libdraw_frame_2d.cpp \
@@ -59,7 +58,7 @@ liblogic_is_entity_adjacent.cpp \
 liblogic_try_entity_attack.cpp \
 liblogic_try_entity_pickup.cpp \
 liblogic_add_message.cpp \
-liblogic_update_player_state.o \
+liblogic_update_player_state.cpp \
 liblogic_tile_npc_living_count.cpp \
 liblogic_tile_has_box.cpp \
 liblogic_try_entity_move.cpp \
@@ -88,7 +87,6 @@ dungeon_floor.cpp \
 dungeon_tile.cpp \
 sprite.cpp \
 spritegroup.cpp \
-race.cpp \
 dungeon.cpp \
 
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
@@ -97,7 +95,7 @@ WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-s
 EMCC_OPTIONS = -s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall -s ALLOW_MEMORY_GROWTH
 
 SHELL_FILE = --shell-file minshell.html
-PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img  --preload-file ./audio/music --preload-file ./music.txt --preload-file ./monsters.csv
+PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img  --preload-file ./audio/music --preload-file ./music.txt --preload-file ./audio/sfx --preload-file ./sfx.txt
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB
 
 # Targets
