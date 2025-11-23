@@ -48,6 +48,7 @@ struct equipped_weapon { }; // entityid
 struct hp { }; // int
 struct maxhp { }; // int
 struct target { }; // int
+struct light_radius { }; // int
 
 //struct Stats { }; // ??
 
@@ -162,5 +163,10 @@ struct ComponentTraits<maxhp> {
 
 template <>
 struct ComponentTraits<target> {
+    using Type = int;
+};
+
+template <>
+struct ComponentTraits<light_radius> {
     using Type = int;
 };
