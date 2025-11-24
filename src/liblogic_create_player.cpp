@@ -25,7 +25,7 @@ entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
     g->ct.set<maxhp>(id, 100);
 
     g->ct.set<vision_distance>(id, 3);
-    g->ct.set<light_radius>(id, 1);
+    g->ct.set<light_radius>(id, 3);
 
     //g_set_stat(g, id, STATS_LEVEL, 666);
     //g_add_equipped_weapon(g, id, ENTITYID_INVALID);
