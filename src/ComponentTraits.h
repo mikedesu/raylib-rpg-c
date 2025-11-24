@@ -165,7 +165,7 @@ struct ComponentTraits<maxhp> {
 
 template <>
 struct ComponentTraits<target> {
-    using Type = int;
+    using Type = entityid;
 };
 
 template <>
