@@ -26,14 +26,8 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
         return true;
     }
 
-    //minfo("Drawing tile at (%d, %d) with type %d", x, y, tile->type);
-    // Get hero's vision distance and location
-    //int vision_distance = g_get_vision_distance(g, g->hero_id);
-    //int vision_dist = g->ct.get<vision_distance>(g->hero_id).value_or(0);
-    // its not actually the vision distance we need,
-    // its the total light radius
+    // Get hero's total light radius
     int light_dist = g->ct.get<light_radius>(g->hero_id).value_or(1);
-    //                 g_get_entity_total_light_radius_bonus(g, g->hero_id);
 
     optional<vec3> maybe_loc = g->ct.get<location>(g->hero_id);
     if (maybe_loc.has_value()) {
@@ -56,8 +50,6 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
         int py = y * DEFAULT_TILE_SIZE + offset_y;
         Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
         Rectangle dest = {(float)px, (float)py, (float)DEFAULT_TILE_SIZE_SCALED, (float)DEFAULT_TILE_SIZE_SCALED};
-        // Draw tile with fade if beyond vision distance
-        //Color draw_color = distance > vision_dist ? Fade(WHITE, 0.4f) : WHITE; // Faded for out-of-range tiles
         // Draw tile with fade if beyond light dist
         Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : WHITE; // Faded for out-of-range tiles
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
