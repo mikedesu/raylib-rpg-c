@@ -9,6 +9,7 @@
 #include "item.h"
 #include "potion.h"
 #include "race.h"
+#include "shield.h"
 #include "vec3.h"
 #include "weapon.h"
 #include <memory>
@@ -43,8 +44,10 @@ struct pushable { }; // bool
 struct itemtype { }; // itemtype_t
 struct potiontype { }; // potiontype_t
 struct weapontype { }; // weapontype_t
+struct shieldtype { }; // shieldtype_t
 struct inventory { }; // shared_ptr<vector<entityid>>
 struct equipped_weapon { }; // entityid
+struct equipped_shield { }; // entityid
 struct hp { }; // int
 struct maxhp { }; // int
 struct target { }; // int
@@ -144,6 +147,11 @@ struct ComponentTraits<weapontype> {
 };
 
 template <>
+struct ComponentTraits<shieldtype> {
+    using Type = shieldtype_t;
+};
+
+template <>
 struct ComponentTraits<inventory> {
     using Type = shared_ptr<vector<entityid>>;
 };
@@ -152,6 +160,12 @@ template <>
 struct ComponentTraits<equipped_weapon> {
     using Type = entityid;
 };
+
+template <>
+struct ComponentTraits<equipped_shield> {
+    using Type = entityid;
+};
+
 
 template <>
 struct ComponentTraits<hp> {

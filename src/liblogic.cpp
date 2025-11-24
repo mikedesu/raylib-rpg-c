@@ -9,6 +9,7 @@
 #include "liblogic.h"
 #include "liblogic_add_message.h"
 #include "liblogic_create_npc_set_stats.h"
+#include "liblogic_create_shield.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_handle_input.h"
 #include "liblogic_handle_npcs.h"
@@ -17,6 +18,7 @@
 #include "liblogic_update_player_state.h"
 #include "manage_inventory.h"
 #include "massert.h"
+#include "shield.h"
 #include "update_player_tiles_explored.h"
 #include "weapon.h"
 #include <cassert>
@@ -65,20 +67,23 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_weapon_at(g, (vec3){2, 0, 0}, WEAPON_AXE);
     create_weapon_at(g, (vec3){3, 0, 0}, WEAPON_SWORD);
 
-    entityid orc1 = create_npc_set_stats(g, (vec3){1, 3, 0}, RACE_ORC);
-    entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
-    add_to_inventory(g, orc1, orc1_weapon);
-    g->ct.set<equipped_weapon>(orc1, orc1_weapon);
+    create_shield_at(g, (vec3){1, 1, 0}, SHIELD_BUCKLER);
 
-    entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);
-    entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
-    add_to_inventory(g, orc2, orc2_weapon);
-    g->ct.set<equipped_weapon>(orc2, orc2_weapon);
 
-    entityid orc3 = create_npc_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
-    entityid orc3_weapon = create_weapon(g, WEAPON_AXE);
-    add_to_inventory(g, orc3, orc3_weapon);
-    g->ct.set<equipped_weapon>(orc3, orc3_weapon);
+    //entityid orc1 = create_npc_set_stats(g, (vec3){1, 3, 0}, RACE_ORC);
+    //entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
+    //add_to_inventory(g, orc1, orc1_weapon);
+    //g->ct.set<equipped_weapon>(orc1, orc1_weapon);
+
+    //entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);
+    //entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
+    //add_to_inventory(g, orc2, orc2_weapon);
+    //g->ct.set<equipped_weapon>(orc2, orc2_weapon);
+
+    //entityid orc3 = create_npc_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
+    //entityid orc3_weapon = create_weapon(g, WEAPON_AXE);
+    //add_to_inventory(g, orc3, orc3_weapon);
+    //g->ct.set<equipped_weapon>(orc3, orc3_weapon);
 
 
     //entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);

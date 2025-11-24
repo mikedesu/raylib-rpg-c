@@ -4,6 +4,7 @@
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"
+#include "tx_keys_shields.h"
 #include "tx_keys_weapons.h"
 
 void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
@@ -71,9 +72,9 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             case WEAPON_FLAIL: create_spritegroup(g, id, TX_WHIP_KEYS, TX_WHIP_COUNT, -12, -12); break;
             default: merror("unknown weapon type %d", weapon_type); return;
             }
+        } else if (item_type == ITEM_SHIELD) {
+            create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12);
         }
-        //else if (item_type == ITEM_SHIELD) {
-        //    create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12);
         //} else if (item_type == ITEM_WAND) {
         //    create_spritegroup(g, id, TX_WAND_BASIC_KEYS, TX_WAND_BASIC_COUNT, -12, -12);
         //} else if (item_type == ITEM_RING) {
