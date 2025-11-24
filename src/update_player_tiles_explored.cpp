@@ -3,17 +3,12 @@
 
 void update_player_tiles_explored(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-
     if (g->hero_id != ENTITYID_INVALID) {
         shared_ptr<dungeon_floor_t> df = g->dungeon->floors->at(g->dungeon->current_floor);
         optional<vec3> maybe_loc = g->ct.get<location>(g->hero_id);
         if (maybe_loc.has_value()) {
             vec3 loc = maybe_loc.value();
-
             int my_light_radius = g->ct.get<light_radius>(g->hero_id).value_or(1);
-            //int light_radius_bonus = 0;
-            //my_light_radius += light_radius_bonus;
-
             for (int i = -my_light_radius; i <= my_light_radius; i++) {
                 for (int j = -my_light_radius; j <= my_light_radius; j++) {
                     // Calculate Manhattan distance for diamond shape
