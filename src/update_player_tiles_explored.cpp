@@ -3,8 +3,6 @@
 
 void update_player_tiles_explored(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    //massert(hero_id != ENTITYID_INVALID, "hero id is invalid");
-    //dungeon_floor_t* df = d_get_floor(g->d, g->d->current_floor);
 
     if (g->hero_id != ENTITYID_INVALID) {
         shared_ptr<dungeon_floor_t> df = g->dungeon->floors->at(g->dungeon->current_floor);
@@ -13,14 +11,14 @@ void update_player_tiles_explored(shared_ptr<gamestate> g) {
             vec3 loc = maybe_loc.value();
 
             int my_light_radius = g->ct.get<light_radius>(g->hero_id).value_or(1);
-            int light_radius_bonus = 0;
-            my_light_radius += light_radius_bonus;
+            //int light_radius_bonus = 0;
+            //my_light_radius += light_radius_bonus;
 
             for (int i = -my_light_radius; i <= my_light_radius; i++) {
                 for (int j = -my_light_radius; j <= my_light_radius; j++) {
                     // Calculate Manhattan distance for diamond shape
                     int dist = abs(i) + abs(j);
-                    //            // Only reveal tiles within the light radius
+                    // Only reveal tiles within the light radius
                     if (dist <= my_light_radius) {
                         vec3 loc2 = {loc.x + i, loc.y + j, loc.z};
                         // Skip if out of bounds
