@@ -11,8 +11,7 @@ void draw_hud(shared_ptr<gamestate> g) {
     const int mymaxhp = g->ct.get<maxhp>(g->hero_id).value_or(-1);
 
     const int level = 0;
-    const int xp = 0;
-    const int next_level_xp = 0;
+    const int myxp = g->ct.get<xp>(g->hero_id).value_or(0);
     const int attack_bonus = 0;
     const int ac = 0;
     const int floor = g->dungeon->current_floor;
@@ -21,8 +20,7 @@ void draw_hud(shared_ptr<gamestate> g) {
     char name_buffer[1024] = {0};
     char stats_buffer[1024] = {0};
     char floor_buffer[1024] = {0};
-    //const Color bg = (Color){0x33, 0x33, 0x33, 0xFF};
-    const Color bg = (Color){0, 0, 0xff, 0xFF};
+    const Color bg = Fade((Color){0, 0, 0xff, 0xFF}, 0.5f);
     const Color fg = WHITE;
 
     const string n = g->ct.get<name>(g->hero_id).value_or("no-name");
@@ -30,7 +28,7 @@ void draw_hud(shared_ptr<gamestate> g) {
     // Format each line separately
     snprintf(name_buffer, sizeof(name_buffer), "%s", n.c_str());
     snprintf(stats_buffer, sizeof(stats_buffer), "Lvl %d HP %d/%d  Atk: %d  AC: %d", level, myhp, mymaxhp, attack_bonus, ac);
-    snprintf(floor_buffer, sizeof(floor_buffer), "Floor %d  Turn %d  XP %d/%d", floor, turn, xp, next_level_xp);
+    snprintf(floor_buffer, sizeof(floor_buffer), "Floor %d  Turn %d  XP %d", floor, turn, myxp);
 
     // Calculate max width of all lines
     const int name_width = MeasureText(name_buffer, font_size);

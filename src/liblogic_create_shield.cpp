@@ -1,3 +1,4 @@
+#include "ComponentTraits.h"
 #include "liblogic_create_shield.h"
 #include "shield.h"
 
@@ -46,16 +47,21 @@ entityid create_shield(shared_ptr<gamestate> g, shieldtype_t type) {
     g->ct.set<shieldtype>(id, type);
 
     string item_name = "unnamed-shield";
+    string desc = "no-description";
 
     if (type == SHIELD_BUCKLER) {
         item_name = "buckler";
+        desc = "Your basic buckler.";
     } else if (type == SHIELD_KITE) {
         item_name = "kite shield";
+        desc = "Standard issue.";
     } else if (type == SHIELD_TOWER) {
         item_name = "tower shield";
+        desc = "It towers over you.";
     }
 
     g->ct.set<name>(id, item_name);
+    g->ct.set<description>(id, desc);
     g->ct.set<txalpha>(id, 255);
     g->ct.set<update>(id, true);
     g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});

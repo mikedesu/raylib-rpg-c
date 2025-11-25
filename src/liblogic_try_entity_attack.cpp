@@ -119,7 +119,12 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
         msuccess("Attack was SUCCESSFUL!");
         //entityid attacker_weapon_id = g_get_equipment(g, atk_id, EQUIP_SLOT_WEAPON);
         //entityid attacker_weapon_id = g_get_equipped_weapon(g, atk_id);
-        int dmg = 1;
+
+        //int dmg = 1;
+        entityid equipped_wpn = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
+        vec3 dmg_range = g->ct.get<damage>(equipped_wpn).value_or((vec3){0, 0, 0});
+        int dmg = GetRandomValue(dmg_range.x, dmg_range.y);
+
         //if (attacker_weapon_id == ENTITYID_INVALID) {
         // no weapon
         // get the entity's base attack damage
@@ -178,14 +183,16 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
                     //                    g_get_name(g, atk_id).c_str(),
                     //                    g_get_name(g, tgt_id).c_str());
                     // increment attacker's xp
-                    //int old_xp = g_get_stat(g, atk_id, STATS_XP);
+                    int old_xp = g->ct.get<xp>(atk_id).value_or(0);
                     //massert(old_xp >= 0, "attacker's xp is negative");
                     //int reward_xp = calc_reward_xp(g, atk_id, tgt_id);
-                    //int reward_xp = 1;
+                    int reward_xp = 1;
                     //massert(reward_xp >= 0, "reward xp is negative");
-                    //int new_xp = old_xp + reward_xp;
+                    int new_xp = old_xp + reward_xp;
                     //massert(new_xp >= 0, "new xp is negative");
-                    //g_set_stat(g, atk_id, STATS_XP, new_xp);
+                    g->ct.set<xp>(atk_id, new_xp);
+                    // handle item drops?
+                    // ...
                     //vec3 loc = g_get_loc(g, tgt_id);
                     //vec3 loc_cast = {loc.x, loc.y, loc.z};
                     //entityid id = ENTITYID_INVALID;

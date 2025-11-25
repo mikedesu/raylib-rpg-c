@@ -2,6 +2,7 @@
 //#include "gamestate_inventory.h"
 #include "ComponentTraits.h"
 #include "entityid.h"
+#include "item.h"
 #include "libdraw_draw_inventory_menu.h"
 #include "libgame_defines.h"
 #include "spritegroup.h"
@@ -110,13 +111,29 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                 if (index >= 0 && index < unpacked_inventory->size()) {
                     entityid selection_id = unpacked_inventory->at(index);
                     spritegroup_t* sg = spritegroups[selection_id];
+                    itemtype_t item_type = g->ct.get<itemtype>(selection_id).value_or(ITEM_NONE);
+
                     if (sg) {
                         auto sprite = sg_get_current(sg);
                         DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
 
                         // new-style component table access
                         string my_name = g->ct.get<name>(selection_id).value_or("no-name");
-                        DrawText(my_name.c_str(), right_box.x + 10, right_box.y + 10, 20, WHITE);
+                        const int fontsize = 10;
+                        const int cur_x = right_box.x + 10;
+                        int cur_y = right_box.y + 10;
+                        DrawText(my_name.c_str(), cur_x, cur_y, fontsize, WHITE);
+                        cur_y += 20;
+
+                        if (item_type == ITEM_WEAPON) {
+                            vec3 dmg = g->ct.get<damage>(selection_id).value_or((vec3){-1, -1, -1});
+                            DrawText(TextFormat("Damage: %d-%d", dmg.x, dmg.y), cur_x, cur_y, fontsize, WHITE);
+                            cur_y += 20;
+                        }
+
+                        string my_desc = g->ct.get<description>(selection_id).value_or("no-description");
+                        DrawText(my_desc.c_str(), cur_x, cur_y, fontsize, WHITE);
+                        cur_y += 20;
                     }
                 }
             }

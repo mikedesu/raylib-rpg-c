@@ -237,3 +237,17 @@ template <>
 struct ComponentTraits<aggro> {
     using Type = bool;
 };
+
+
+struct damage { }; // vec3
+template <>
+struct ComponentTraits<damage> {
+    using Type = vec3;
+};
+
+
+struct description { }; //string
+template <>
+struct ComponentTraits<description> {
+    using Type = string;
+};
