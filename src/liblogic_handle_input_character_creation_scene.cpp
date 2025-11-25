@@ -21,9 +21,6 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
         PlaySound(g->sfx->at(SFX_CONFIRM_01));
         // we need to copy the character creation stats to the hero entity
         // hero has already been created, so its id is available
-        //g_set_stat(g, g->hero_id, STATS_STR, g->chara_creation.strength);
-        //g_set_stat(g, g->hero_id, STATS_DEX, g->chara_creation.dexterity);
-        //g_set_stat(g, g->hero_id, STATS_CON, g->chara_creation.constitution);
         int hitdie = 8;
         int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
         //bonus_calc(g->chara_creation.constitution);
@@ -36,9 +33,6 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
 
         // temporary wedge-in code
         // set all the NPCs to target the hero
-        minfo("Hero ID: %d", g->hero_id);
-        minfo("BEGIN Temporary wedge-in code");
-        minfo("Probably crashes here");
         for (entityid id = 0; id < g->next_entityid; id++) {
             minfo("Getting type for id %d", id);
             entitytype_t t = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
@@ -47,11 +41,7 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
                 g->ct.set<target>(id, g->hero_id);
             }
         }
-        minfo("END Temporary wedge-in code");
-
-        //g_set_stat(g, g->hero_id, STATS_MAXHP, maxhp_roll);
-        //g_set_stat(g, g->hero_id, STATS_HP, maxhp_roll);
-
+        //minfo("END Temporary wedge-in code");
         g->current_scene = SCENE_GAMEPLAY;
 
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {
@@ -67,33 +57,25 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
     //    g->current_scene = SCENE_TITLE;
     //}
     else if (inputstate_is_pressed(is, KEY_LEFT)) {
+        PlaySound(g->sfx->at(SFX_CONFIRM_01));
         int race = g->chara_creation->race;
         if (race > 1) {
             race--;
         } else {
-            race = RACE_WARG;
+            //race = RACE_WARG;
+            race = RACE_COUNT - 1;
         }
         g->chara_creation->race = (race_t)race;
-        //g->chara_creation->race = (race_t)(((int)g->chara_creation->race)-1);
-        //if (race == RACE_HUMAN) {
-        //    g->chara_creation->race = RACE_ORC;
-        //} else if (race == RACE_ORC) {
-        //    g->chara_creation->race = RACE_HUMAN;
-        //}
     } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
+        PlaySound(g->sfx->at(SFX_CONFIRM_01));
         int race = g->chara_creation->race;
         if (race < RACE_COUNT - 1) {
             race++;
         } else {
-            race = RACE_HALFLING;
+            //race = RACE_HALFLING;
+            race = RACE_NONE + 1;
         }
         g->chara_creation->race = (race_t)race;
-        //race_t race = g->chara_creation->race;
-        //if (race == RACE_HUMAN) {
-        //    g->chara_creation->race = RACE_ORC;
-        //} else if (race == RACE_ORC) {
-        //    g->chara_creation->race = RACE_HUMAN;
-        //}
     }
     g->frame_dirty = true;
 }
