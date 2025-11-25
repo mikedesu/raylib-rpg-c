@@ -122,7 +122,7 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
 
         //int dmg = 1;
         entityid equipped_wpn = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
-        vec3 dmg_range = g->ct.get<damage>(equipped_wpn).value_or((vec3){0, 0, 0});
+        vec3 dmg_range = g->ct.get<damage>(equipped_wpn).value_or((vec3){1, 2, 0});
         int dmg = GetRandomValue(dmg_range.x, dmg_range.y);
 
         //if (attacker_weapon_id == ENTITYID_INVALID) {
