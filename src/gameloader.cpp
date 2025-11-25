@@ -1,7 +1,5 @@
 #include "gameloader.h"
 #include "inputstate.h"
-#include "massert.h"
-#include "mprint.h"
 #include <cstdio>
 #include <memory>
 #include <raylib.h>
