@@ -9,7 +9,6 @@
 #include "liblogic.h"
 #include "liblogic_add_message.h"
 #include "liblogic_create_npc.h"
-#include "liblogic_create_npc_set_stats.h"
 #include "liblogic_create_shield.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_handle_input.h"

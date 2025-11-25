@@ -1,3 +1,4 @@
+#include "ComponentTraits.h"
 #include "liblogic_create_npc.h"
 
 entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n) {
@@ -21,9 +22,6 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
 
     entityid id = g_add_entity(g);
 
-    //g_add_name(g, id, name);
-    //g_add_type(g, id, ENTITY_NPC);
-
     g->ct.set<name>(id, n);
     g->ct.set<entitytype>(id, ENTITY_NPC);
     g->ct.set<race>(id, rt);
@@ -37,13 +35,32 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
     g->ct.set<blocksuccess>(id, false);
     g->ct.set<damaged>(id, false);
     g->ct.set<txalpha>(id, 0);
-
-    //shared_ptr<vector<entityid>> my_inventory = make_shared<vector<entityid>>();
-    //g->ct.set<inventory>(id, make_shared<unordered_set<entityid>>());
-
     g->ct.set<inventory>(id, make_shared<vector<entityid>>());
     g->ct.set<equipped_weapon>(id, ENTITYID_INVALID);
     g->ct.set<aggro>(id, false);
+
+    // here we have some hard decisions to make about how to template-out NPC creation
+    // all NPCs begin at level 1. level-up mechanisms will be determined elsewhere
+    g->ct.set<level>(id, 1);
+    g->ct.set<xp>(id, 0);
+
+    // default to 10 for stats
+    // later, we will decide this by race templating
+    g->ct.set<strength>(id, 10);
+    g->ct.set<dexterity>(id, 10);
+    g->ct.set<intelligence>(id, 10);
+    g->ct.set<wisdom>(id, 10);
+    g->ct.set<constitution>(id, 10);
+    g->ct.set<charisma>(id, 10);
+
+    // set default hp/maxhp for now
+    // later, we will decide this by race templating
+    const int my_maxhp = 3;
+    const int my_hp = my_maxhp;
+
+    g->ct.set<maxhp>(id, my_maxhp);
+    g->ct.set<hp>(id, my_hp);
+
 
     minfo("end create npc");
 

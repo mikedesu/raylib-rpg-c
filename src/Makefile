@@ -65,7 +65,6 @@ liblogic_try_entity_move.cpp \
 liblogic_create_weapon.cpp \
 liblogic_create_player.cpp \
 liblogic_create_npc.cpp \
-liblogic_create_npc_set_stats.cpp \
 liblogic_handle_npc.cpp \
 liblogic_handle_npcs.cpp \
 liblogic_handle_input.cpp \
@@ -169,7 +168,6 @@ liblogic_try_entity_move.o \
 liblogic_create_weapon.o \
 liblogic_create_player.o \
 liblogic_create_npc.o \
-liblogic_create_npc_set_stats.o \
 liblogic_handle_npc.o \
 liblogic_handle_npcs.o \
 liblogic_handle_input.o \
@@ -401,9 +399,6 @@ liblogic_create_player.o: liblogic_create_player.cpp
 liblogic_create_npc.o: liblogic_create_npc.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 	
-liblogic_create_npc_set_stats.o: liblogic_create_npc_set_stats.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
 liblogic_handle_npc.o: liblogic_handle_npc.cpp 	
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
