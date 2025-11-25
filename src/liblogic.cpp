@@ -8,6 +8,7 @@
 #include "inputstate.h"
 #include "liblogic.h"
 #include "liblogic_add_message.h"
+#include "liblogic_create_npc.h"
 #include "liblogic_create_npc_set_stats.h"
 #include "liblogic_create_shield.h"
 #include "liblogic_create_weapon.h"
@@ -69,17 +70,20 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     create_shield_at(g, (vec3){1, 1, 0}, SHIELD_BUCKLER);
 
-    entityid orc1 = create_npc_set_stats(g, (vec3){1, 3, 0}, RACE_ORC);
+    //entityid orc1 = create_npc_set_stats(g, (vec3){1, 3, 0}, RACE_ORC);
+    entityid orc1 = create_npc(g, RACE_ORC, (vec3){1, 3, 0}, "orc");
     entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
     add_to_inventory(g, orc1, orc1_weapon);
     g->ct.set<equipped_weapon>(orc1, orc1_weapon);
 
-    entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);
+    //entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);
+    entityid orc2 = create_npc(g, RACE_ORC, (vec3){2, 3, 0}, "orc");
     entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
     add_to_inventory(g, orc2, orc2_weapon);
     g->ct.set<equipped_weapon>(orc2, orc2_weapon);
 
-    entityid orc3 = create_npc_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
+    //entityid orc3 = create_npc_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
+    entityid orc3 = create_npc(g, RACE_ORC, (vec3){3, 3, 0}, "orc");
     entityid orc3_weapon = create_weapon(g, WEAPON_AXE);
     add_to_inventory(g, orc3, orc3_weapon);
     g->ct.set<equipped_weapon>(orc3, orc3_weapon);

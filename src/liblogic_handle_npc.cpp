@@ -22,8 +22,6 @@ void handle_npc(shared_ptr<gamestate> g, entityid id) {
 
             if (!is_dead) {
                 entityid target_id = g->ct.get<target>(id).value_or(g->hero_id);
-                //entityid target_id = g->hero_id;
-
                 if (is_entity_adjacent(g, id, target_id)) {
                     // if id is adjacent to its target or the hero
                     vec3 loc = g->ct.get<location>(target_id).value();
