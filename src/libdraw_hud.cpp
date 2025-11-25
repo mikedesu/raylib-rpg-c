@@ -10,7 +10,8 @@ void draw_hud(shared_ptr<gamestate> g) {
     const int myhp = g->ct.get<hp>(g->hero_id).value_or(-1);
     const int mymaxhp = g->ct.get<maxhp>(g->hero_id).value_or(-1);
 
-    const int level = 0;
+    const int mylevel = g->ct.get<level>(g->hero_id).value_or(0);
+
     const int myxp = g->ct.get<xp>(g->hero_id).value_or(0);
     const int attack_bonus = 0;
     const int ac = 0;
@@ -27,7 +28,7 @@ void draw_hud(shared_ptr<gamestate> g) {
 
     // Format each line separately
     snprintf(name_buffer, sizeof(name_buffer), "%s", n.c_str());
-    snprintf(stats_buffer, sizeof(stats_buffer), "Lvl %d HP %d/%d  Atk: %d  AC: %d", level, myhp, mymaxhp, attack_bonus, ac);
+    snprintf(stats_buffer, sizeof(stats_buffer), "Lvl %d HP %d/%d  Atk: %d  AC: %d", mylevel, myhp, mymaxhp, attack_bonus, ac);
     snprintf(floor_buffer, sizeof(floor_buffer), "Floor %d  Turn %d  XP %d", floor, turn, myxp);
 
     // Calculate max width of all lines
