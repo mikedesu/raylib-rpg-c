@@ -1,5 +1,9 @@
 #include "ComponentTraits.h"
+#include "get_racial_modifiers.h"
 #include "liblogic_create_npc.h"
+#include "liblogic_stat_bonus.h"
+#include "race.h"
+#include <raylib.h>
 
 entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n) {
     minfo("begin create npc");
@@ -44,18 +48,48 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
     g->ct.set<level>(id, 1);
     g->ct.set<xp>(id, 0);
 
-    // default to 10 for stats
-    // later, we will decide this by race templating
-    g->ct.set<strength>(id, 10);
-    g->ct.set<dexterity>(id, 10);
-    g->ct.set<intelligence>(id, 10);
-    g->ct.set<wisdom>(id, 10);
-    g->ct.set<constitution>(id, 10);
-    g->ct.set<charisma>(id, 10);
+
+    // stats racial modifiers for stats
+    int str_m = get_racial_modifiers(rt, 0);
+    int dex_m = get_racial_modifiers(rt, 1);
+    int int_m = get_racial_modifiers(rt, 2);
+    int wis_m = get_racial_modifiers(rt, 3);
+    int con_m = get_racial_modifiers(rt, 4);
+    int cha_m = get_racial_modifiers(rt, 5);
+
+    // default to 3-18 for stats
+    const int strength_ = GetRandomValue(3, 18) + str_m;
+    const int dexterity_ = GetRandomValue(3, 18) + dex_m;
+    const int intelligence_ = GetRandomValue(3, 18) + int_m;
+    const int wisdom_ = GetRandomValue(3, 18) + wis_m;
+    const int constitution_ = GetRandomValue(3, 18) + con_m;
+    const int charisma_ = GetRandomValue(3, 18) + cha_m;
+
+    g->ct.set<strength>(id, strength_);
+    g->ct.set<dexterity>(id, dexterity_);
+    g->ct.set<intelligence>(id, intelligence_);
+    g->ct.set<wisdom>(id, wisdom_);
+    g->ct.set<constitution>(id, constitution_);
+    g->ct.set<charisma>(id, charisma_);
 
     // set default hp/maxhp for now
     // later, we will decide this by race templating
-    const int my_maxhp = 3;
+    vec3 hitdie = {1, 8, 0};
+    switch (rt) {
+    case RACE_HUMAN: hitdie.y = 8; break;
+    case RACE_ELF: hitdie.y = 6; break;
+    case RACE_DWARF: hitdie.y = 10; break;
+    case RACE_HALFLING: hitdie.y = 6; break;
+    case RACE_GOBLIN: hitdie.y = 6; break;
+    case RACE_ORC: hitdie.y = 8; break;
+    case RACE_BAT: hitdie.y = 3; break;
+    case RACE_GREEN_SLIME: hitdie.y = 4; break;
+    case RACE_WOLF: hitdie.y = 6; break;
+    case RACE_WARG: hitdie.y = 12; break;
+    default: break;
+    }
+
+    const int my_maxhp = GetRandomValue(1, hitdie.y) + get_stat_bonus(constitution_);
     const int my_hp = my_maxhp;
 
     g->ct.set<maxhp>(id, my_maxhp);
