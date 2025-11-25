@@ -1,12 +1,12 @@
 
 #include "liblogic_handle_npc.h"
 #include "liblogic_handle_npcs.h"
+
 void handle_npcs(shared_ptr<gamestate> g) {
     if (g->flag == GAMESTATE_FLAG_NPC_TURN) {
-        for (entityid id = 0; id < g->next_entityid; id++) {
-            handle_npc(g, id);
+        if (g->entity_turn >= 0 && g->entity_turn < g->next_entityid) {
+            handle_npc(g, g->entity_turn);
+            g->flag = GAMESTATE_FLAG_NPC_ANIM;
         }
-        // After processing all NPCs, set the flag to animate all movements together
-        g->flag = GAMESTATE_FLAG_NPC_ANIM;
     }
 }

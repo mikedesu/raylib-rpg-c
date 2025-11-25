@@ -7,7 +7,10 @@ void handle_npc(shared_ptr<gamestate> g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
 
+    minfo("handle_npc: %d", id);
+
     if (id == g->hero_id) {
+        merror("handle_npc: id is equal to hero_id");
         return;
     }
 
