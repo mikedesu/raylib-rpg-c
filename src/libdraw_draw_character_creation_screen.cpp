@@ -36,11 +36,25 @@ void draw_character_creation_screen(shared_ptr<gamestate> g) {
     y += font_size + 10;
     DrawText(TextFormat("Hitdie: %d", g->chara_creation->hitdie), x, y, font_size, WHITE);
     y += font_size + 10;
+
     DrawText(TextFormat("Strength: %d", g->chara_creation->strength), x, y, font_size, WHITE);
     y += font_size + 10;
+
     DrawText(TextFormat("Dexterity: %d", g->chara_creation->dexterity), x, y, font_size, WHITE);
     y += font_size + 10;
+
+    DrawText(TextFormat("Intelligence: %d", g->chara_creation->intelligence), x, y, font_size, WHITE);
+    y += font_size + 10;
+
+    DrawText(TextFormat("Wisdom: %d", g->chara_creation->wisdom), x, y, font_size, WHITE);
+    y += font_size + 10;
+
+
     DrawText(TextFormat("Constitution: %d", g->chara_creation->constitution), x, y, font_size, WHITE);
+    y += font_size + 10;
+
+
+    DrawText(TextFormat("Charisma: %d", g->chara_creation->charisma), x, y, font_size, WHITE);
     y += font_size + 10;
     // Draw sprite placeholder
     //Rectangle dst = (Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200};

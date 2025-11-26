@@ -1,5 +1,6 @@
 #include "ComponentTraits.h"
 #include "entitytype.h"
+#include "get_racial_hd.h"
 #include "liblogic_create_player.h"
 #include "liblogic_handle_input_character_creation_scene.h"
 #include "roll.h"
@@ -9,7 +10,6 @@
 void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-
 
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->do_quit = true;
@@ -21,7 +21,7 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
         PlaySound(g->sfx->at(SFX_CONFIRM_01));
         // we need to copy the character creation stats to the hero entity
         // hero has already been created, so its id is available
-        int hitdie = 8;
+        int hitdie = g->chara_creation->hitdie;
         int maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
         //bonus_calc(g->chara_creation.constitution);
         while (maxhp_roll < 1) {
@@ -50,19 +50,16 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
         PlaySound(g->sfx->at(SFX_CONFIRM_01));
         g->chara_creation->strength = do_roll_best_of_3((vec3){3, 6, 0});
         g->chara_creation->dexterity = do_roll_best_of_3((vec3){3, 6, 0});
+        g->chara_creation->intelligence = do_roll_best_of_3((vec3){3, 6, 0});
+        g->chara_creation->wisdom = do_roll_best_of_3((vec3){3, 6, 0});
         g->chara_creation->constitution = do_roll_best_of_3((vec3){3, 6, 0});
-    }
-    //else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-    //    minfo("Exiting character creation");
-    //    g->current_scene = SCENE_TITLE;
-    //}
-    else if (inputstate_is_pressed(is, KEY_LEFT)) {
+        g->chara_creation->charisma = do_roll_best_of_3((vec3){3, 6, 0});
+    } else if (inputstate_is_pressed(is, KEY_LEFT)) {
         PlaySound(g->sfx->at(SFX_CONFIRM_01));
         int race = g->chara_creation->race;
         if (race > 1) {
             race--;
         } else {
-            //race = RACE_WARG;
             race = RACE_COUNT - 1;
         }
         g->chara_creation->race = (race_t)race;
@@ -72,10 +69,10 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
         if (race < RACE_COUNT - 1) {
             race++;
         } else {
-            //race = RACE_HALFLING;
             race = RACE_NONE + 1;
         }
         g->chara_creation->race = (race_t)race;
+        g->chara_creation->hitdie = get_racial_hd(g->chara_creation->race);
     }
     g->frame_dirty = true;
 }

@@ -6,14 +6,16 @@
 using std::string;
 
 typedef struct character_creation_t {
-    //char name[1024];
     string name;
 
     race_t race;
 
     int hitdie;
     int strength;
-    int constitution;
     int dexterity;
+    int intelligence;
+    int wisdom;
+    int constitution;
+    int charisma;
 
 } character_creation;
