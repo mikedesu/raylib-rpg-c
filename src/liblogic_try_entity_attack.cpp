@@ -13,6 +13,14 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
 
 
+void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success) {
+    if (!success)
+        g->flag = type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM : type == ENTITY_NPC ? GAMESTATE_FLAG_NPC_ANIM : GAMESTATE_FLAG_NONE;
+    else if (type == ENTITY_PLAYER)
+        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+}
+
+
 void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
     massert(!g->ct.get<dead>(atk_id).value_or(false), "attacker entity is dead");
@@ -152,6 +160,13 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             //                    g_get_name(g, tgt_id).c_str(),
             //                    dmg);
             //}
+
+            // get the equipped weapon of the attacker
+            entityid wpn_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
+
+            int dura = g->ct.get<durability>(wpn_id).value_or(0);
+            g->ct.set<durability>(wpn_id, dura - 1 < 0 ? 0 : dura - 1);
+
             if (tgt_hp <= 0) {
                 //g_update_dead(g, tgt_id, true);
                 g->ct.set<dead>(tgt_id, true);
@@ -183,12 +198,4 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
     } else {
         merror("Attack MISSED");
     }
-}
-
-
-void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success) {
-    if (!success)
-        g->flag = type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM : type == ENTITY_NPC ? GAMESTATE_FLAG_NPC_ANIM : GAMESTATE_FLAG_NONE;
-    else if (type == ENTITY_PLAYER)
-        g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }

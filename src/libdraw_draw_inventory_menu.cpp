@@ -133,7 +133,7 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                             cur_y += y_incr;
 
                             int dura = g->ct.get<durability>(selection_id).value_or(-1);
-                            int max_dura = g->ct.get<durability>(selection_id).value_or(-1);
+                            int max_dura = g->ct.get<max_durability>(selection_id).value_or(-1);
                             DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, WHITE);
                             cur_y += y_incr;
                         }

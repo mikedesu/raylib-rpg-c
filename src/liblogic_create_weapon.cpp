@@ -49,8 +49,8 @@ entityid create_weapon(shared_ptr<gamestate> g, weapontype_t type) {
     string item_name = "unnamed-weapon";
     vec3 dmg = {1, 4, 0};
     string desc = "no description";
-    int dura = 100;
-    int max_dura = 100;
+    int dura = 5;
+    int max_dura = 5;
 
     if (type == WEAPON_AXE) {
         item_name = "axe";
