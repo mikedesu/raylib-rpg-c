@@ -163,9 +163,22 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
 
             // get the equipped weapon of the attacker
             entityid wpn_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
-
+            int max_dura = g->ct.get<max_durability>(wpn_id).value_or(0);
+            // decrement its durability
             int dura = g->ct.get<durability>(wpn_id).value_or(0);
             g->ct.set<durability>(wpn_id, dura - 1 < 0 ? 0 : dura - 1);
+            if (dura == 0) {
+                // permanently decrement from the max_durability
+                if (max_dura == 0) {
+                    // item destroyed
+                    g->ct.set<destroyed>(wpn_id, true);
+
+                } else {
+                    g->ct.set<max_durability>(wpn_id, max_dura - 1 < 0 ? 0 : max_dura - 1);
+                    // other bad things including -1 bonuses that we aren't handling yet
+                }
+            }
+
 
             if (tgt_hp <= 0) {
                 //g_update_dead(g, tgt_id, true);

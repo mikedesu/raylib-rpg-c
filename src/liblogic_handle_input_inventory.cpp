@@ -107,8 +107,9 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
     //    }
     //}
     //}
-    if (inputstate_is_pressed(is, KEY_D)) {
+    if (inputstate_is_pressed(is, KEY_Q)) {
         // drop item
+        PlaySound(g->sfx->at(SFX_DISCARD_ITEM));
         drop_item_from_hero_inventory(g);
     }
     // cycle menus

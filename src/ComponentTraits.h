@@ -265,3 +265,9 @@ template <>
 struct ComponentTraits<max_durability> {
     using Type = int;
 };
+
+struct destroyed { }; //string
+template <>
+struct ComponentTraits<destroyed> {
+    using Type = bool;
+};
