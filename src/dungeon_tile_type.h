@@ -8,9 +8,9 @@ typedef enum
     TILE_UPSTAIRS,
     TILE_DOWNSTAIRS,
     TILE_STONE_WALL_00,
-    TILE_STONE_WALL_01,
-    TILE_STONE_WALL_02,
-    TILE_STONE_WALL_03,
+    //TILE_STONE_WALL_01,
+    //TILE_STONE_WALL_02,
+    //TILE_STONE_WALL_03,
     //TILE_STONE_WALL_04,
     //TILE_STONE_WALL_05,
     //TILE_STONE_WALL_06,
@@ -164,7 +164,13 @@ static inline bool tile_is_none(const tiletype_t type) { return type == TILE_NON
 
 static inline bool tile_is_not_none(const tiletype_t type) { return type != TILE_NONE; }
 
-static inline bool tile_is_wall(const tiletype_t type) { return type >= TILE_STONE_WALL_00 && type <= TILE_STONE_WALL_03; }
+static inline bool tile_is_wall(const tiletype_t type) {
+    switch (type) {
+    case TILE_STONE_WALL_00: return true;
+    default: break;
+    }
+    return false;
+}
 
 static inline bool tile_is_not_wall(const tiletype_t type) { return tile_is_not_none(type) && !tile_is_wall(type); }
 
@@ -186,9 +192,9 @@ static inline const char* tiletype_to_str(const tiletype_t type) {
     case TILE_UPSTAIRS: return "TILE_UPSTAIRS";
     case TILE_DOWNSTAIRS: return "TILE_DOWNSTAIRS";
     case TILE_STONE_WALL_00: return "TILE_STONE_WALL_00";
-    case TILE_STONE_WALL_01: return "TILE_STONE_WALL_01";
-    case TILE_STONE_WALL_02: return "TILE_STONE_WALL_02";
-    case TILE_STONE_WALL_03: return "TILE_STONE_WALL_03";
+    //case TILE_STONE_WALL_01: return "TILE_STONE_WALL_01";
+    //case TILE_STONE_WALL_02: return "TILE_STONE_WALL_02";
+    //case TILE_STONE_WALL_03: return "TILE_STONE_WALL_03";
     case TILE_FLOOR_STONE_00: return "TILE_FLOOR_STONE_00";
     case TILE_FLOOR_STONE_01: return "TILE_FLOOR_STONE_01";
     case TILE_FLOOR_STONE_02: return "TILE_FLOOR_STONE_02";

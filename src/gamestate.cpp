@@ -79,7 +79,7 @@ shared_ptr<gamestate> gamestateinitptr() {
     g->gameplay_settings_menu_selection = 0;
     g->cam2d.target = (Vector2){0, 0};
     g->cam2d.offset = (Vector2){0, 0};
-    g->cam2d.zoom = 7.0f;
+    g->cam2d.zoom = 4.0f;
     g->cam2d.rotation = 0.0;
     g->fadealpha = 0.0;
     g->cam3d = (Camera3D){0};

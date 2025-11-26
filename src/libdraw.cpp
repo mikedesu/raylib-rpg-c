@@ -314,7 +314,7 @@ void libdraw_init_rest(shared_ptr<gamestate> g) {
     //calc_debugpanel_size(g);
     load_shaders();
     //float x = target_w / 2.0f - DEFAULT_TILE_SIZE * 4;
-    const float x = target_w / 4.0f;
+    const float x = target_w / 2.0f;
     //float y = target_h / 16.0f;
     //float y = DEFAULT_TILE_SIZE * 2;
     const float y = target_h / 4.0f;

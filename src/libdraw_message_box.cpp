@@ -7,7 +7,7 @@ void draw_message_box(shared_ptr<gamestate> g) {
     }
     const string msg = g->msg_system->at(0);
     //const Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
-    const Color message_bg = (Color){0, 0, 0xff, 0xff};
+    const Color message_bg = Fade((Color){0, 0, 0xff, 0xff}, 0.5f);
     const int font_size = 10;
     char tmp[1024] = {0};
     snprintf(tmp, sizeof(tmp), "%s", msg.c_str());

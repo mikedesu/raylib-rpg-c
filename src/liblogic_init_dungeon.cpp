@@ -12,8 +12,8 @@ void init_dungeon(shared_ptr<gamestate> g) {
     // dungeon floors, tiles etc will require re-write/re-design for optimization
     int w = 8;
     int h = 8;
-    //dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_STONE;
-    dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_GRASS;
+    const dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_STONE;
+    //dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_GRASS;
     for (int i = 0; i < df_count; i++) {
         d_add_floor(g->dungeon, type, w, h);
         //d_add_floor(g->dungeon, default_dungeon_floor_width, default_dungeon_floor_height);
