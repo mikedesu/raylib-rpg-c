@@ -251,3 +251,17 @@ template <>
 struct ComponentTraits<description> {
     using Type = string;
 };
+
+
+struct durability { }; //string
+template <>
+struct ComponentTraits<durability> {
+    using Type = int;
+};
+
+
+struct max_durability { }; //string
+template <>
+struct ComponentTraits<max_durability> {
+    using Type = int;
+};

@@ -122,18 +122,25 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                         const int fontsize = 10;
                         const int cur_x = right_box.x + 10;
                         int cur_y = right_box.y + 10;
+                        const int y_incr = 10;
+
                         DrawText(my_name.c_str(), cur_x, cur_y, fontsize, WHITE);
-                        cur_y += 20;
+                        cur_y += y_incr;
 
                         if (item_type == ITEM_WEAPON) {
                             vec3 dmg = g->ct.get<damage>(selection_id).value_or((vec3){-1, -1, -1});
                             DrawText(TextFormat("Damage: %d-%d", dmg.x, dmg.y), cur_x, cur_y, fontsize, WHITE);
-                            cur_y += 20;
+                            cur_y += y_incr;
+
+                            int dura = g->ct.get<durability>(selection_id).value_or(-1);
+                            int max_dura = g->ct.get<durability>(selection_id).value_or(-1);
+                            DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, WHITE);
+                            cur_y += y_incr;
                         }
 
                         string my_desc = g->ct.get<description>(selection_id).value_or("no-description");
                         DrawText(my_desc.c_str(), cur_x, cur_y, fontsize, WHITE);
-                        cur_y += 20;
+                        cur_y += y_incr;
                     }
                 }
             }

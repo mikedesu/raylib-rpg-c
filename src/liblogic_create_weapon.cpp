@@ -1,4 +1,3 @@
-
 #include "ComponentTraits.h"
 #include "liblogic_create_weapon.h"
 
@@ -50,6 +49,8 @@ entityid create_weapon(shared_ptr<gamestate> g, weapontype_t type) {
     string item_name = "unnamed-weapon";
     vec3 dmg = {1, 4, 0};
     string desc = "no description";
+    int dura = 100;
+    int max_dura = 100;
 
     if (type == WEAPON_AXE) {
         item_name = "axe";
@@ -68,9 +69,14 @@ entityid create_weapon(shared_ptr<gamestate> g, weapontype_t type) {
     g->ct.set<name>(id, item_name);
     g->ct.set<description>(id, desc);
     g->ct.set<damage>(id, dmg);
+
+    g->ct.set<durability>(id, dura);
+    g->ct.set<max_durability>(id, max_dura);
+
     g->ct.set<txalpha>(id, 255);
     g->ct.set<update>(id, true);
     g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+
 
     minfo("END create_weapon");
     return id;

@@ -28,24 +28,31 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
         PlaySound(g->sfx->at(SFX_BAG_CLOSE));
         return;
     }
-    if (inputstate_is_pressed(is, KEY_LEFT)) {
-        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+    if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+        PlaySound(g->sfx->at(SFX_CONFIRM_01));
         if (g->inventory_cursor.x > 0) {
             g->inventory_cursor.x--;
         }
     }
-    if (inputstate_is_pressed(is, KEY_RIGHT)) {
-        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+    if (inputstate_is_pressed(is, KEY_RIGHT)
+
+        || inputstate_is_pressed(is, KEY_D)) {
+        PlaySound(g->sfx->at(SFX_CONFIRM_01));
         g->inventory_cursor.x++;
     }
-    if (inputstate_is_pressed(is, KEY_UP)) {
-        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+    if (inputstate_is_pressed(is, KEY_UP)
+
+        || inputstate_is_pressed(is, KEY_W)) {
+        PlaySound(g->sfx->at(SFX_CONFIRM_01));
         if (g->inventory_cursor.y > 0) {
             g->inventory_cursor.y--;
         }
     }
-    if (inputstate_is_pressed(is, KEY_DOWN)) {
-        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+    if (inputstate_is_pressed(is, KEY_DOWN)
+
+
+        || inputstate_is_pressed(is, KEY_X)) {
+        PlaySound(g->sfx->at(SFX_CONFIRM_01));
         g->inventory_cursor.y++;
     }
     if (inputstate_is_pressed(is, KEY_E)) {
