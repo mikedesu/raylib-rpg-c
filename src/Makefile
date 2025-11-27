@@ -51,7 +51,6 @@ libdraw_get_weapon_sprite.cpp \
 libdraw_entity_sprite.cpp \
 libdraw_player_target_box.cpp \
 libdraw_camera_lock_on.cpp \
-libdraw_dungeon_tiles_2d.cpp \
 libdraw.cpp \
 liblogic_drop_item.cpp \
 liblogic_is_entity_adjacent.cpp \
@@ -145,7 +144,6 @@ libdraw_get_weapon_sprite.o \
 libdraw_entity_sprite.o \
 libdraw_player_target_box.o \
 libdraw_camera_lock_on.o \
-libdraw_dungeon_tiles_2d.o \
 libdraw_dungeon_floor_tile.o \
 libdraw_create_spritegroup.o \
 libdraw_update_debug_panel.o \
@@ -334,9 +332,6 @@ libdraw_player_target_box.o: libdraw_player_target_box.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_camera_lock_on.o: libdraw_camera_lock_on.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-libdraw_dungeon_tiles_2d.o: libdraw_dungeon_tiles_2d.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_dungeon_floor_tile.o: libdraw_dungeon_floor_tile.cpp

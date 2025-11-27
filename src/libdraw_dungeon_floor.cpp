@@ -1,7 +1,12 @@
 #include "ComponentTraits.h"
 #include "libdraw_dungeon_floor.h"
-#include "libdraw_dungeon_tiles_2d.h"
+#include "libdraw_dungeon_floor_tile.h"
 #include "libdraw_sprite.h"
+#include "textureinfo.h"
+
+
+extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
+
 
 bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -10,7 +15,12 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     massert(df, "dungeon_floor is NULL");
     const int z = g->dungeon->current_floor;
 
-    draw_dungeon_tiles_2d(g, z, df);
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            draw_dungeon_floor_tile(g, txinfo, x, y, z);
+        }
+    }
+
 
     // dead
     //for (int y = 0; y < df->height; y++) {
@@ -52,9 +62,11 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
         }
     }
 
-
-    draw_dungeon_walls_2d(g, z, df);
-
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            draw_dungeon_floor_wall(g, txinfo, x, y, z);
+        }
+    }
 
     return true;
 }
