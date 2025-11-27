@@ -8,7 +8,7 @@
 #include "inputstate.h"
 #include "liblogic.h"
 #include "liblogic_add_message.h"
-//#include "liblogic_create_npc.h"
+#include "liblogic_create_npc.h"
 #include "liblogic_create_shield.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_handle_input.h"
@@ -16,7 +16,7 @@
 #include "liblogic_init_dungeon.h"
 #include "liblogic_update_debug_panel_buffer.h"
 #include "liblogic_update_player_state.h"
-//#include "manage_inventory.h"
+#include "manage_inventory.h"
 #include "massert.h"
 #include "shield.h"
 #include "update_player_tiles_explored.h"
@@ -56,32 +56,22 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 5, 0});
     //create_wooden_box(g, (vec3){7, 6, 0});
     //create_wooden_box(g, (vec3){7, 7, 0});
-    //create_npc_set_stats(g, (vec3){5, 3, 0}, RACE_HUMAN);
-    //create_npc_set_stats(g, (vec3){5, 4, 0}, RACE_ELF);
-    //create_npc_set_stats(g, (vec3){5, 5, 0}, RACE_DWARF);
-    //create_npc_set_stats(g, (vec3){5, 6, 0}, RACE_GOBLIN);
-    //create_npc_set_stats(g, (vec3){5, 7, 0}, RACE_HALFLING);
-    //create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
 
     create_weapon_at(g, (vec3){2, 1, 0}, WEAPON_DAGGER);
     create_weapon_at(g, (vec3){3, 1, 0}, WEAPON_AXE);
     create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
-
     create_shield_at(g, (vec3){2, 2, 0}, SHIELD_BUCKLER);
 
-    //entityid orc1 = create_npc_set_stats(g, (vec3){1, 3, 0}, RACE_ORC);
-    //entityid orc1 = create_npc(g, RACE_ORC, (vec3){1, 3, 0}, "orc");
-    //entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
-    //add_to_inventory(g, orc1, orc1_weapon);
-    //g->ct.set<equipped_weapon>(orc1, orc1_weapon);
+    entityid orc1 = create_npc(g, RACE_ORC, (vec3){1, 3, 0}, "orc");
+    entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
+    add_to_inventory(g, orc1, orc1_weapon);
+    g->ct.set<equipped_weapon>(orc1, orc1_weapon);
 
-    //entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);
-    //entityid orc2 = create_npc(g, RACE_ORC, (vec3){2, 3, 0}, "orc");
-    //entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
-    //add_to_inventory(g, orc2, orc2_weapon);
-    //g->ct.set<equipped_weapon>(orc2, orc2_weapon);
+    entityid orc2 = create_npc(g, RACE_ORC, (vec3){2, 3, 0}, "orc");
+    entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
+    add_to_inventory(g, orc2, orc2_weapon);
+    g->ct.set<equipped_weapon>(orc2, orc2_weapon);
 
-    //entityid orc3 = create_npc(g, RACE_ORC, (vec3){3, 3, 0}, "orc");
     //entityid orc3_weapon = create_weapon(g, WEAPON_AXE);
     //add_to_inventory(g, orc3, orc3_weapon);
     //g->ct.set<equipped_weapon>(orc3, orc3_weapon);
@@ -102,13 +92,6 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //g->ct.set<equipped_weapon>(orc6, orc6_weapon);
 
 
-    //entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);
-    //entityid orc3 = create_npc_set_stats(g, (vec3){3, 3, 0}, RACE_ORC);
-
-
-    //create_npc_set_stats(g, (vec3){6, 5, 0}, RACE_WOLF);
-    //create_npc_set_stats(g, (vec3){6, 6, 0}, RACE_WARG);
-    //create_npc_set_stats(g, (vec3){6, 7, 0}, RACE_BAT);
     //create_potion(g, (vec3){1, 1, 0}, POTION_HP_SMALL);
     //create_potion(g, (vec3){3, 1, 0}, POTION_HP_MEDIUM);
     //create_potion(g, (vec3){5, 1, 0}, POTION_HP_LARGE);
