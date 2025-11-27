@@ -22,7 +22,6 @@ libdraw_help_menu.cpp \
 libdraw_draw_character_creation_screen.cpp \
 libdraw_load_textures.cpp \
 libdraw_unload_textures.cpp \
-libdraw_dungeon_floor_tile.cpp \
 libdraw_create_spritegroup.cpp \
 libdraw_create_sg_byid.cpp \
 libdraw_hud.cpp \
@@ -144,7 +143,6 @@ libdraw_get_weapon_sprite.o \
 libdraw_entity_sprite.o \
 libdraw_player_target_box.o \
 libdraw_camera_lock_on.o \
-libdraw_dungeon_floor_tile.o \
 libdraw_create_spritegroup.o \
 libdraw_update_debug_panel.o \
 libdraw.o \
@@ -332,9 +330,6 @@ libdraw_player_target_box.o: libdraw_player_target_box.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_camera_lock_on.o: libdraw_camera_lock_on.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-libdraw_dungeon_floor_tile.o: libdraw_dungeon_floor_tile.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_create_spritegroup.o: libdraw_create_spritegroup.cpp
