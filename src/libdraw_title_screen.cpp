@@ -23,7 +23,7 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     const char* start_text = "Press enter or space to begin";
     char buffer[1024] = {0};
     Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
-    int sm_font_size = 10;
+    const int sm_font_size = 20;
     int font_size = 40;
     //int font_size2 = 20;
     // Draw the "evidojo666 presents" text at the top
