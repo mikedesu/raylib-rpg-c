@@ -1,7 +1,9 @@
+#include "gamestate_flag.h"
 #include "libdraw_handle_dirty_entities.h"
 #include "libdraw_handle_gamestate_flag.h"
 #include "libdraw_update_sprite.h"
 #include "libdraw_update_sprites.h"
+#include "libgame_defines.h"
 
 extern Music music;
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
@@ -17,7 +19,15 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     //    SetMusicVolume(music, g->music_volume);
     //    g->music_volume_changed = false;
     //}
+
     if (g->current_scene == SCENE_GAMEPLAY) {
+        if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT || g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+            ANIM_SPEED = DEFAULT_ANIM_SPEED / 2;
+        } else if (g->flag == GAMESTATE_FLAG_NPC_TURN || g->flag == GAMESTATE_FLAG_NPC_ANIM) {
+            ANIM_SPEED = DEFAULT_ANIM_SPEED / 4;
+        }
+
+
         libdraw_handle_dirty_entities(g);
         //minfo("Begin update sprites pre loop");
         for (entityid id = 0; id < g->next_entityid; id++) {
