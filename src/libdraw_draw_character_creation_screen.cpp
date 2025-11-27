@@ -13,10 +13,7 @@ extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 void draw_character_creation_screen(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     const char* title_text = "Character Creation";
-    const char* remaining_text[] = {"Press SPACE to re-roll stats",
-                                    "Press LEFT/RIGHT to change race (unavailable for now)",
-                                    "Press UP/DOWN to change class (unavailable for now)",
-                                    "Press ENTER to confirm"};
+    const char* remaining_text[] = {"Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race", "Press ENTER to confirm"};
     int font_size = 20;
     int w = DEFAULT_TARGET_WIDTH;
     int h = DEFAULT_TARGET_HEIGHT;
@@ -30,32 +27,28 @@ void draw_character_creation_screen(shared_ptr<gamestate> g) {
     y += font_size + 10;
     font_size = 10;
     // Draw character stats
+
+    const int offset = 10;
+
     DrawText(TextFormat("Name: %s", g->chara_creation->name.c_str()), x, y, font_size, WHITE);
-    y += font_size + 10;
-    DrawText(TextFormat("Race: %s", race2str(g->chara_creation->race).c_str()), x, y, font_size, WHITE);
-    y += font_size + 10;
+    y += font_size + offset;
+    DrawText(TextFormat("< Race: %s >", race2str(g->chara_creation->race).c_str()), x, y, font_size, WHITE);
+    y += font_size + offset;
     DrawText(TextFormat("Hitdie: %d", g->chara_creation->hitdie), x, y, font_size, WHITE);
-    y += font_size + 10;
-
+    y += font_size + offset;
     DrawText(TextFormat("Strength: %d", g->chara_creation->strength), x, y, font_size, WHITE);
-    y += font_size + 10;
-
+    y += font_size + offset;
     DrawText(TextFormat("Dexterity: %d", g->chara_creation->dexterity), x, y, font_size, WHITE);
-    y += font_size + 10;
-
+    y += font_size + offset;
     DrawText(TextFormat("Intelligence: %d", g->chara_creation->intelligence), x, y, font_size, WHITE);
-    y += font_size + 10;
-
+    y += font_size + offset;
     DrawText(TextFormat("Wisdom: %d", g->chara_creation->wisdom), x, y, font_size, WHITE);
-    y += font_size + 10;
-
-
+    y += font_size + offset;
     DrawText(TextFormat("Constitution: %d", g->chara_creation->constitution), x, y, font_size, WHITE);
-    y += font_size + 10;
-
-
+    y += font_size + offset;
     DrawText(TextFormat("Charisma: %d", g->chara_creation->charisma), x, y, font_size, WHITE);
-    y += font_size + 10;
+    y += font_size + offset;
+
     // Draw sprite placeholder
     //Rectangle dst = (Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200};
     float pad = -40;

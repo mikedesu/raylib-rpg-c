@@ -1,6 +1,12 @@
 #include "libdraw_title_screen.h"
 #include "libgame_defines.h"
 #include "libgame_version.h"
+#include "textureinfo.h"
+#include <raylib.h>
+
+
+extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
+
 
 void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     massert(g, "gamestate is NULL");
@@ -51,10 +57,40 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     DrawText(title_text_0, x, y, font_size, title_text_0_color);
     DrawText(title_text_1, title_text_1_x, y, font_size, title_text_1_color);
     DrawText(version_text, version_x, version_y, sm_font_size, WHITE);
+
+
+    // experiment
+    // draw the first frame of one of our hero textures
+    const float mx = 128 + 64;
+    const float my = g->targetheight / 2.0f - 128;
+    const float rx = 0;
+    const float ry = 0;
+
+    const Texture t1 = txinfo[TX_ACTION_SLASH_SWORD_B].texture;
+    DrawTexturePro(t1, (Rectangle){rx, ry, 32, 32}, (Rectangle){mx, my, 256, 256}, (Vector2){0, 0}, 0.0f, WHITE);
+    const Texture t2 = txinfo[TX_HUMAN_ATTACK].texture;
+    DrawTexturePro(t2, (Rectangle){rx, ry, 32, 32}, (Rectangle){mx, my, 256, 256}, (Vector2){0, 0}, 0.0f, WHITE);
+    const Texture t3 = txinfo[TX_ACTION_SLASH_SWORD_F].texture;
+    DrawTexturePro(t3, (Rectangle){rx, ry, 32, 32}, (Rectangle){mx, my, 256, 256}, (Vector2){0, 0}, 0.0f, WHITE);
+
+    const float mx2 = g->targetwidth - 256 - 128;
+    const float my2 = g->targetheight / 2.0f - 128;
+    const float rx2 = 0;
+    const float ry2 = 0;
+
+    const Texture t4 = txinfo[TX_ACTION_SLASH_AXE_B].texture;
+    DrawTexturePro(t4, (Rectangle){rx2, ry2, -32, 32}, (Rectangle){mx2, my2, 256, 256}, (Vector2){0, 0}, 0.0f, WHITE);
+    const Texture t5 = txinfo[TX_ORC_ATTACK].texture;
+    DrawTexturePro(t5, (Rectangle){rx2, ry2, -32, 32}, (Rectangle){mx2, my2, 256, 256}, (Vector2){0, 0}, 0.0f, WHITE);
+    const Texture t6 = txinfo[TX_ACTION_SLASH_AXE_F].texture;
+    DrawTexturePro(t6, (Rectangle){rx2, ry2, -32, 32}, (Rectangle){mx2, my2, 256, 256}, (Vector2){0, 0}, 0.0f, WHITE);
+
+
     if (!show_menu) {
         DrawText(start_text, start_x, start_y, sm_font_size, WHITE);
         return;
     }
+
     // If show_menu is true, draw the new game, continue, options selection text
     int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
     int menu_spacing = 10;
