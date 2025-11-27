@@ -63,43 +63,43 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_npc_set_stats(g, (vec3){5, 7, 0}, RACE_HALFLING);
     //create_npc_set_stats(g, (vec3){6, 3, 0}, RACE_GREEN_SLIME);
 
-    create_weapon_at(g, (vec3){1, 0, 0}, WEAPON_DAGGER);
-    create_weapon_at(g, (vec3){2, 0, 0}, WEAPON_AXE);
-    create_weapon_at(g, (vec3){3, 0, 0}, WEAPON_SWORD);
+    create_weapon_at(g, (vec3){2, 1, 0}, WEAPON_DAGGER);
+    create_weapon_at(g, (vec3){3, 1, 0}, WEAPON_AXE);
+    create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
 
-    create_shield_at(g, (vec3){1, 1, 0}, SHIELD_BUCKLER);
+    create_shield_at(g, (vec3){2, 2, 0}, SHIELD_BUCKLER);
 
     //entityid orc1 = create_npc_set_stats(g, (vec3){1, 3, 0}, RACE_ORC);
-    entityid orc1 = create_npc(g, RACE_ORC, (vec3){1, 3, 0}, "orc");
-    entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
-    add_to_inventory(g, orc1, orc1_weapon);
-    g->ct.set<equipped_weapon>(orc1, orc1_weapon);
+    //entityid orc1 = create_npc(g, RACE_ORC, (vec3){1, 3, 0}, "orc");
+    //entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
+    //add_to_inventory(g, orc1, orc1_weapon);
+    //g->ct.set<equipped_weapon>(orc1, orc1_weapon);
 
     //entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);
-    entityid orc2 = create_npc(g, RACE_ORC, (vec3){2, 3, 0}, "orc");
-    entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
-    add_to_inventory(g, orc2, orc2_weapon);
-    g->ct.set<equipped_weapon>(orc2, orc2_weapon);
+    //entityid orc2 = create_npc(g, RACE_ORC, (vec3){2, 3, 0}, "orc");
+    //entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
+    //add_to_inventory(g, orc2, orc2_weapon);
+    //g->ct.set<equipped_weapon>(orc2, orc2_weapon);
 
-    entityid orc3 = create_npc(g, RACE_ORC, (vec3){3, 3, 0}, "orc");
-    entityid orc3_weapon = create_weapon(g, WEAPON_AXE);
-    add_to_inventory(g, orc3, orc3_weapon);
-    g->ct.set<equipped_weapon>(orc3, orc3_weapon);
+    //entityid orc3 = create_npc(g, RACE_ORC, (vec3){3, 3, 0}, "orc");
+    //entityid orc3_weapon = create_weapon(g, WEAPON_AXE);
+    //add_to_inventory(g, orc3, orc3_weapon);
+    //g->ct.set<equipped_weapon>(orc3, orc3_weapon);
 
-    entityid orc4 = create_npc(g, RACE_ORC, (vec3){1, 4, 0}, "orc");
-    entityid orc4_weapon = create_weapon(g, WEAPON_AXE);
-    add_to_inventory(g, orc4, orc4_weapon);
-    g->ct.set<equipped_weapon>(orc4, orc4_weapon);
+    //entityid orc4 = create_npc(g, RACE_ORC, (vec3){1, 4, 0}, "orc");
+    //entityid orc4_weapon = create_weapon(g, WEAPON_AXE);
+    //add_to_inventory(g, orc4, orc4_weapon);
+    //g->ct.set<equipped_weapon>(orc4, orc4_weapon);
 
-    entityid orc5 = create_npc(g, RACE_ORC, (vec3){2, 4, 0}, "orc");
-    entityid orc5_weapon = create_weapon(g, WEAPON_AXE);
-    add_to_inventory(g, orc5, orc5_weapon);
-    g->ct.set<equipped_weapon>(orc5, orc5_weapon);
+    //entityid orc5 = create_npc(g, RACE_ORC, (vec3){2, 4, 0}, "orc");
+    //entityid orc5_weapon = create_weapon(g, WEAPON_AXE);
+    //add_to_inventory(g, orc5, orc5_weapon);
+    //g->ct.set<equipped_weapon>(orc5, orc5_weapon);
 
-    entityid orc6 = create_npc(g, RACE_ORC, (vec3){3, 4, 0}, "orc");
-    entityid orc6_weapon = create_weapon(g, WEAPON_AXE);
-    add_to_inventory(g, orc6, orc6_weapon);
-    g->ct.set<equipped_weapon>(orc6, orc6_weapon);
+    //entityid orc6 = create_npc(g, RACE_ORC, (vec3){3, 4, 0}, "orc");
+    //entityid orc6_weapon = create_weapon(g, WEAPON_AXE);
+    //add_to_inventory(g, orc6, orc6_weapon);
+    //g->ct.set<equipped_weapon>(orc6, orc6_weapon);
 
 
     //entityid orc2 = create_npc_set_stats(g, (vec3){2, 3, 0}, RACE_ORC);

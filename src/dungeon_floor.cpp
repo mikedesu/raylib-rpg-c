@@ -42,7 +42,6 @@ int df_get_possible_downstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int
 void df_make_room(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 
 
-//shared_ptr<dungeon_floor_t> df_create(int floor, int width, int height) {
 shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int width, int height) {
     massert(width > 0, "width must be greater than zero");
     massert(height > 0, "height must be greater than zero");
@@ -71,6 +70,7 @@ shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int wid
         tile->id = i;
         tile->visible = true;
 
+        // for each tile in the dungeon floor, select a random tile between TILE_FLOOR_STONE_00 and 11
         if (df->type == DUNGEON_FLOOR_TYPE_STONE) {
             tile_init(tile, TILE_FLOOR_STONE_00);
             tile->type = (tiletype_t)(TILE_FLOOR_STONE_00 + (rand() % (TILE_FLOOR_STONE_11 - TILE_FLOOR_STONE_00 + 1)));
@@ -82,16 +82,26 @@ shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int wid
             tile->type = (tiletype_t)(TILE_FLOOR_STONE_00 + (rand() % (TILE_FLOOR_STONE_11 - TILE_FLOOR_STONE_00 + 1)));
         }
 
-        // for each tile in the dungeon floor, select a random tile between TILE_FLOOR_STONE_00 and 11
-        //tile->type = (tiletype_t)(TILE_FLOOR_STONE_00 + (rand() % (TILE_FLOOR_STONE_11 - TILE_FLOOR_STONE_00 + 1)));
-
         df->tile_map->insert({i, tile});
     }
 
     df->upstairs_loc = (vec3){-1, -1, -1};
     df->downstairs_loc = (vec3){-1, -1, -1};
 
-    //df_init(df);
+
+    // walls on first row and last row
+    for (int i = 0; i < width; i++) {
+        df_set_tile(df, TILE_STONE_WALL_00, i, 0);
+        df_set_tile(df, TILE_STONE_WALL_00, i, height - 1);
+    }
+
+    // walls on sides
+    for (int i = 0; i < width; i++) {
+        df_set_tile(df, TILE_STONE_WALL_00, 0, i);
+        df_set_tile(df, TILE_STONE_WALL_00, width - 1, i);
+    }
+
+
     msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
     return df;
 }

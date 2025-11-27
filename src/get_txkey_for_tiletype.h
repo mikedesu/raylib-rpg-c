@@ -161,8 +161,8 @@ static inline int get_txkey_for_tiletype(tiletype_t type) {
     //case TILE_FLOOR_DIRT_06: key = TX_DIRT_06; break;
     //case TILE_FLOOR_DIRT_07: key = TX_DIRT_07; break;
     //case TILE_FLOOR_DIRT_08: key = TX_DIRT_08; break;
-    case TILE_FLOOR_STONE_TRAP_OFF_00: key = TX_STONE_TRAP_OFF_00; break;
-    case TILE_FLOOR_STONE_TRAP_ON_00: key = TX_STONE_TRAP_ON_00; break;
+    //case TILE_FLOOR_STONE_TRAP_OFF_00: key = TX_STONE_TRAP_OFF_00; break;
+    //case TILE_FLOOR_STONE_TRAP_ON_00: key = TX_STONE_TRAP_ON_00; break;
     default: break;
     }
     return key;
