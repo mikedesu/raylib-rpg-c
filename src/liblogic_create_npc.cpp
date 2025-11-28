@@ -36,7 +36,7 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
     g->ct.set<direction>(id, DIR_DOWN_RIGHT);
     g->ct.set<attacking>(id, false);
     g->ct.set<blocking>(id, false);
-    g->ct.set<blocksuccess>(id, false);
+    g->ct.set<block_success>(id, false);
     g->ct.set<damaged>(id, false);
     g->ct.set<txalpha>(id, 0);
     g->ct.set<inventory>(id, make_shared<vector<entityid>>());

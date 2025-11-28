@@ -7,6 +7,7 @@
 #include "libdraw_load_sfx.h"
 #include "libdraw_shaders.h"
 #include "libdraw_to_texture.h"
+#include "libdraw_update_sprites.h"
 #include "race.h"
 #include "spritegroup.h"
 #include <raylib.h>

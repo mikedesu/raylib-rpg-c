@@ -45,7 +45,7 @@ void update_player_state(shared_ptr<gamestate> g) {
 
         //if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
         g->ct.set<blocking>(g->hero_id, false);
-        g->ct.set<blocksuccess>(g->hero_id, false);
+        g->ct.set<block_success>(g->hero_id, false);
         g->ct.set<damaged>(g->hero_id, false);
         //}
     }

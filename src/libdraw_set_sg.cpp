@@ -1,6 +1,21 @@
 #include "libdraw_set_sg.h"
 #include "spritegroup_anim.h"
 
+
+void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entity id is -1");
+    massert(sg, "spritegroup is NULL");
+
+    const race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
+    int anim_index = SG_ANIM_NPC_GUARD_SUCCESS;
+    if (r == RACE_GREEN_SLIME) {
+        anim_index = SG_ANIM_SLIME_IDLE;
+    }
+    spritegroup_set_current(sg, anim_index);
+}
+
+
 void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
@@ -11,7 +26,6 @@ void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup
         anim_index = SG_ANIM_SLIME_DMG;
     }
     spritegroup_set_current(sg, anim_index);
-    //g->ct.set<damaged>(id, true);
 }
 
 

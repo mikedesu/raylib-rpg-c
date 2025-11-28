@@ -119,13 +119,19 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     // Copy movement intent from sprite_move_x/y if present
     libdraw_update_sprite_position(g, id, sg);
 
+    if (g->ct.get<block_success>(id).value_or(false)) {
+        libdraw_set_sg_block_success(g, id, sg);
+    }
+
     if (g->ct.get<attacking>(id).value_or(false)) {
         libdraw_set_sg_is_attacking(g, id, sg);
     }
 
     if (g->ct.get<dead>(id).value_or(false)) {
         libdraw_set_sg_is_dead(g, id, sg);
-    } else if (g->ct.get<damaged>(id).value_or(false)) {
+    }
+
+    if (g->ct.get<damaged>(id).value_or(false)) {
         libdraw_set_sg_is_damaged(g, id, sg);
     }
 
