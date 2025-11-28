@@ -95,45 +95,45 @@ shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int wid
     const int h = 4;
 
     // init the inner 8x8 area
-    df_set_area(df, x, y, w, h, TILE_FLOOR_STONE_00);
     // outer walls
-    df_set_perimeter(df, x, y, w + 1, h + 1);
+    df_set_area(df, x, y, w, h, TILE_FLOOR_STONE_00);
+    //df_set_perimeter(df, x, y, w + 1, h + 1);
 
     // create a new room with walls
     const int x0 = x + w + 1 + 1;
     const int y0 = y;
     df_set_area(df, x0, y0, w, h, TILE_FLOOR_STONE_00);
-    df_set_perimeter(df, x0, y0, w + 1, h + 1);
+    //df_set_perimeter(df, x0, y0, w + 1, h + 1);
 
     // create an opening into the new room
-    const int x1 = x + w + 1;
-    const int y1 = y + h;
-    df_set_tile(df, TILE_FLOOR_STONE_00, x1, y1);
-    df_set_tile(df, TILE_FLOOR_STONE_00, x1 + 1, y1);
+    //const int x1 = x + w + 1;
+    //const int y1 = y + h;
+    //df_set_tile(df, TILE_FLOOR_STONE_00, x1, y1);
+    //df_set_tile(df, TILE_FLOOR_STONE_00, x1 + 1, y1);
 
     // create a new room with walls
-    const int x2 = x;
-    const int y2 = y + h + 1 + 1;
-    df_set_area(df, x2, y2, w, h, TILE_FLOOR_STONE_00);
-    df_set_perimeter(df, x2, y2, w + 1, h + 1);
+    //const int x2 = x;
+    //const int y2 = y + h + 1 + 1;
+    //df_set_area(df, x2, y2, w, h, TILE_FLOOR_STONE_00);
+    //df_set_perimeter(df, x2, y2, w + 1, h + 1);
 
     // create an opening into the new room
-    const int x3 = x;
-    const int y3 = y + h + 1;
-    df_set_tile(df, TILE_FLOOR_STONE_00, x3, y3);
-    df_set_tile(df, TILE_FLOOR_STONE_00, x3, y3 + 1);
+    //const int x3 = x;
+    //const int y3 = y + h + 1;
+    //df_set_tile(df, TILE_FLOOR_STONE_00, x3, y3);
+    //df_set_tile(df, TILE_FLOOR_STONE_00, x3, y3 + 1);
 
     // create a new room with walls
-    const int x4 = x + w + 1 + 1;
-    const int y4 = y + h + 1 + 1;
-    df_set_area(df, x4, y4, w, h, TILE_FLOOR_STONE_00);
-    df_set_perimeter(df, x4, y4, w + 1, h + 1);
+    //const int x4 = x + w + 1 + 1;
+    //const int y4 = y + h + 1 + 1;
+    //df_set_area(df, x4, y4, w, h, TILE_FLOOR_STONE_00);
+    //df_set_perimeter(df, x4, y4, w + 1, h + 1);
 
     // create an opening into the new room
-    const int x5 = x + w + 1;
-    const int y5 = y + h + 1 + h + 1;
-    df_set_tile(df, TILE_FLOOR_STONE_00, x5, y5);
-    df_set_tile(df, TILE_FLOOR_STONE_00, x5 + 1, y5);
+    //const int x5 = x + w + 1;
+    //const int y5 = y + h + 1 + h + 1;
+    //df_set_tile(df, TILE_FLOOR_STONE_00, x5, y5);
+    //df_set_tile(df, TILE_FLOOR_STONE_00, x5 + 1, y5);
 
     msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
     return df;
