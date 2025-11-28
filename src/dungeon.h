@@ -16,7 +16,8 @@ typedef struct {
 } dungeon_t;
 
 
-bool d_add_floor(shared_ptr<dungeon_t> dungeon, dungeon_floor_type_t type, int width, int height);
+//bool d_add_floor(shared_ptr<dungeon_t> dungeon, dungeon_floor_type_t type, int width, int height);
+shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dungeon, dungeon_floor_type_t type, int width, int height);
 shared_ptr<dungeon_t> d_create();
 void d_destroy(shared_ptr<dungeon_t> dungeon);
 void d_free(shared_ptr<dungeon_t> dungeon);
