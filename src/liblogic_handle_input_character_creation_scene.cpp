@@ -28,7 +28,10 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
             maxhp_roll = do_roll_best_of_3((vec3){1, hitdie, 0});
             //bonus_calc(g->chara_creation.constitution);
         }
-        g->entity_turn = create_player(g, (vec3){1, 1, 0}, "darkmage");
+
+
+        const vec3 start_loc = (vec3){9, 9, 0};
+        g->entity_turn = create_player(g, start_loc, "darkmage");
 
 
         // temporary wedge-in code

@@ -3,15 +3,18 @@
 
 void init_dungeon(shared_ptr<gamestate> g) {
     massert(g, "gamestate is null");
+
     g->dungeon = d_create();
+
     massert(g->dungeon, "failed to init dungeon");
     msuccess("dungeon initialized successfully");
     minfo("adding floors...");
-    int df_count = 1;
+
+    const int df_count = 1;
     // max size of 128x128 for now to maintain 60fps
     // dungeon floors, tiles etc will require re-write/re-design for optimization
-    int w = 8;
-    int h = 8;
+    const int w = 24;
+    const int h = 24;
     const dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_STONE;
     //dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_GRASS;
     for (int i = 0; i < df_count; i++) {
