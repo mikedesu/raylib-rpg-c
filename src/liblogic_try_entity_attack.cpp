@@ -143,6 +143,8 @@ void handle_block_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt
     const entityid equipped_shld = g->ct.get<equipped_shield>(tgt_id).value_or(ENTITYID_INVALID);
 
     if (equipped_shld != ENTITYID_INVALID) {
+        PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
+
         g->ct.set<block_success>(tgt_id, true);
         g->ct.set<update>(tgt_id, true);
     }
