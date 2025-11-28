@@ -2,7 +2,6 @@
 #include "entityid.h"
 #include "gamestate.h"
 #include "libdraw.h"
-#include "libdraw_check_default_animations.h"
 #include "libdraw_from_texture.h"
 #include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
@@ -12,6 +11,7 @@
 #include "spritegroup.h"
 #include <raylib.h>
 
+//#include "libdraw_check_default_animations.h"
 //#include "get_txkey_for_tiletype.h"
 //#include "gamestate_equipped_weapon.h"
 //#include "tx_keys_rings.h"
