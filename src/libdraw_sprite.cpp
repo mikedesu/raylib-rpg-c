@@ -1,4 +1,5 @@
 #include "libdraw_entity_sprite.h"
+#include "libdraw_shield_sprite.h"
 #include "libdraw_sprite.h"
 #include "libdraw_weapon_sprite.h"
 #include "spritegroup.h"
@@ -17,9 +18,9 @@ void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
     //massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));
     // Draw components in correct order
     //draw_shadow_for_entity(g, sg, id);
-    //draw_shield_sprite_back(g, id, sg);
+    draw_shield_sprite_back(g, id, sg);
     draw_weapon_sprite_back(g, id, sg);
     draw_entity_sprite(g, sg);
-    //draw_shield_sprite_front(g, id, sg);
+    draw_shield_sprite_front(g, id, sg);
     draw_weapon_sprite_front(g, id, sg);
 }

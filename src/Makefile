@@ -38,6 +38,7 @@ libdraw_message_box.cpp \
 libdraw_sprite.cpp \
 libdraw_shaders.cpp \
 libdraw_weapon_sprite.cpp \
+libdraw_shield_sprite.cpp \
 libdraw_update_weapon_for_entity.cpp \
 libdraw_set_sg_is_attacking.cpp \
 libdraw_set_sg.cpp \
@@ -47,6 +48,7 @@ libdraw_debug_panel.cpp \
 libdraw_update_debug_panel.cpp \
 libdraw_handle_debug_panel.cpp \
 libdraw_get_weapon_sprite.cpp \
+libdraw_get_shield_sprite.cpp \
 libdraw_entity_sprite.cpp \
 libdraw_player_target_box.cpp \
 libdraw_camera_lock_on.cpp \
@@ -131,6 +133,7 @@ libdraw_message_box.o \
 libdraw_shaders.o \
 libdraw_sprite.o \
 libdraw_weapon_sprite.o \
+libdraw_shield_sprite.o \
 libdraw_update_weapon_for_entity.o \
 libdraw_set_sg_is_attacking.o \
 libdraw_set_sg.o \
@@ -140,6 +143,7 @@ libdraw_debug_panel.o \
 libdraw_update_debug_panel.o \
 libdraw_handle_debug_panel.o \
 libdraw_get_weapon_sprite.o \
+libdraw_get_shield_sprite.o \
 libdraw_entity_sprite.o \
 libdraw_player_target_box.o \
 libdraw_camera_lock_on.o \
@@ -294,6 +298,8 @@ libdraw_sprite.o: libdraw_sprite.cpp
 
 libdraw_weapon_sprite.o: libdraw_weapon_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+libdraw_shield_sprite.o: libdraw_shield_sprite.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_update_weapon_for_entity.o: libdraw_update_weapon_for_entity.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
@@ -301,14 +307,14 @@ libdraw_update_weapon_for_entity.o: libdraw_update_weapon_for_entity.cpp
 libdraw_set_sg_is_attacking.o: libdraw_set_sg_is_attacking.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-
 libdraw_entity_sprite.o: libdraw_entity_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
 
 libdraw_get_weapon_sprite.o: libdraw_get_weapon_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
+libdraw_get_shield_sprite.o: libdraw_get_shield_sprite.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_handle_debug_panel.o: libdraw_handle_debug_panel.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
