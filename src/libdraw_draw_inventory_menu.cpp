@@ -82,14 +82,21 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
                             auto sprite = sg_get_current(sg);
                             DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
 
-                            //size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
                             size_t index = j * cols + i;
 
                             if (index >= 0 && index < unpacked_inventory->size()) {
                                 entityid selection_id = unpacked_inventory->at(index);
+
                                 entityid cur_wpn_id = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
-                                if (selection_id == cur_wpn_id && cur_wpn_id != ENTITYID_INVALID) {
-                                    //DrawText("weapon", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
+
+                                entityid cur_shield_id = g->ct.get<equipped_shield>(g->hero_id).value_or(ENTITYID_INVALID);
+
+
+                                if ((selection_id == cur_wpn_id && cur_wpn_id != ENTITYID_INVALID) ||
+                                    (selection_id == cur_shield_id && cur_shield_id != ENTITYID_INVALID)
+
+
+                                ) {
                                     DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
                                 }
                             }

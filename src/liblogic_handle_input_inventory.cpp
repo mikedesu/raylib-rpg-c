@@ -1,6 +1,78 @@
+#include "gamestate.h"
 #include "liblogic_drop_item.h"
 #include "liblogic_handle_input_inventory.h"
 #include "sfx.h"
+
+
+void handle_equip_shield(shared_ptr<gamestate> g, entityid item_id) {
+    // Check if this is the currently equipped weapon
+    minfo("handle equip shield");
+    entityid current_shield = g->ct.get<equipped_shield>(g->hero_id).value_or(ENTITYID_INVALID);
+    if (current_shield == item_id) {
+        // Unequip if it's already equipped
+        minfo("unequipping shield");
+        g->ct.set<equipped_shield>(g->hero_id, ENTITYID_INVALID);
+    } else {
+        // Equip the new shield
+        minfo("equipping shield");
+        g->ct.set<equipped_shield>(g->hero_id, item_id);
+    }
+}
+
+
+void handle_equip_weapon(shared_ptr<gamestate> g, entityid item_id) {
+    // Check if this is the currently equipped weapon
+    entityid current_weapon = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
+    if (current_weapon == item_id) {
+        // Unequip if it's already equipped
+        g->ct.set<equipped_weapon>(g->hero_id, ENTITYID_INVALID);
+    } else {
+        // Equip the new weapon
+        g->ct.set<equipped_weapon>(g->hero_id, item_id);
+    }
+}
+
+
+void handle_equip_item(shared_ptr<gamestate> g, entityid item_id) {
+    itemtype_t item_type = g->ct.get<itemtype>(item_id).value_or(ITEM_NONE);
+    //if (item_type != ITEM_NONE) {
+    //    if (item_type == ITEM_WEAPON) {
+    //        handle_equip_weapon(g, item_id);
+    //    } else if (item_type == ITEM_SHIELD) {
+    //        handle_equip_shield(g, item_id);
+    //    }
+
+    switch (item_type) {
+    case ITEM_NONE: break;
+    case ITEM_WEAPON: handle_equip_weapon(g, item_id); break;
+    case ITEM_SHIELD: handle_equip_shield(g, item_id); break;
+    default: break;
+    }
+    //}
+}
+
+
+void handle_equip(shared_ptr<gamestate> g) {
+    PlaySound(g->sfx->at(SFX_EQUIP_01));
+    // equip item
+    // get the item id of the current selection
+    size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+
+    optional<shared_ptr<vector<entityid>>> my_inventory = g->ct.get<inventory>(g->hero_id);
+    if (my_inventory) {
+        if (my_inventory.has_value()) {
+            shared_ptr<vector<entityid>> unpacked_inventory = my_inventory.value();
+            if (index >= 0 && index < unpacked_inventory->size()) {
+                entityid item_id = unpacked_inventory->at(index);
+                entitytype_t type = g->ct.get<entitytype>(item_id).value_or(ENTITY_NONE);
+                if (type == ENTITY_ITEM) {
+                    handle_equip_item(g, item_id);
+                }
+            }
+        }
+    }
+}
+
 
 void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
@@ -55,45 +127,12 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
         PlaySound(g->sfx->at(SFX_CONFIRM_01));
         g->inventory_cursor.y++;
     }
-    if (inputstate_is_pressed(is, KEY_E)) {
-        PlaySound(g->sfx->at(SFX_EQUIP_01));
-        // equip item
-        // get the item id of the current selection
-        size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
 
-        optional<shared_ptr<vector<entityid>>> my_inventory = g->ct.get<inventory>(g->hero_id);
-        if (my_inventory) {
-            if (my_inventory.has_value()) {
-                shared_ptr<vector<entityid>> unpacked_inventory = my_inventory.value();
-                if (index >= 0 && index < unpacked_inventory->size()) {
-                    entityid item_id = unpacked_inventory->at(index);
-                    entitytype_t type = g->ct.get<entitytype>(item_id).value_or(ENTITY_NONE);
-                    if (type == ENTITY_ITEM) {
-                        itemtype_t item_type = g->ct.get<itemtype>(item_id).value_or(ITEM_NONE);
-                        if (item_type != ITEM_NONE) {
-                            if (item_type == ITEM_WEAPON) {
-                                // Check if this is the currently equipped weapon
-                                entityid current_weapon = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
-                                if (current_weapon == item_id) {
-                                    // Unequip if it's already equipped
-                                    g->ct.set<equipped_weapon>(g->hero_id, ENTITYID_INVALID);
-                                } else {
-                                    // Equip the new weapon
-                                    g->ct.set<equipped_weapon>(g->hero_id, item_id);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        //                minfo("equipped item %d", item_id);
-        //            } else {
-        //                minfo("failed to equip item %d", item_id);
-        //            }
-        //        }
-        //    }
+
+    if (inputstate_is_pressed(is, KEY_E)) {
+        handle_equip(g);
     }
+
     //}
     //if (inputstate_is_pressed(is, KEY_U)) {
     // unequip weapon/item
