@@ -1,4 +1,5 @@
 #include "libdraw_load_music.h"
+#include <raylib.h>
 
 void libdraw_load_music(shared_ptr<gamestate> g) {
     minfo("BEGIN load_music");
@@ -9,7 +10,8 @@ void libdraw_load_music(shared_ptr<gamestate> g) {
     minfo("Music path: %s", music_path);
     music = LoadMusicStream(music_path);
     SetMasterVolume(1.0f);
-    SetMusicVolume(music, 0.25f); // Set initial music volume
+    SetMusicVolume(music, 0.0f); // Set initial music volume
+
     PlayMusicStream(music);
     minfo("END load_music");
 }
