@@ -40,6 +40,7 @@ libdraw_shaders.cpp \
 libdraw_weapon_sprite.cpp \
 libdraw_shield_sprite.cpp \
 libdraw_update_weapon_for_entity.cpp \
+libdraw_update_shield_for_entity.cpp \
 libdraw_set_sg_is_attacking.cpp \
 libdraw_set_sg.cpp \
 libdraw_load_music.cpp \
@@ -135,6 +136,7 @@ libdraw_sprite.o \
 libdraw_weapon_sprite.o \
 libdraw_shield_sprite.o \
 libdraw_update_weapon_for_entity.o \
+libdraw_update_shield_for_entity.o \
 libdraw_set_sg_is_attacking.o \
 libdraw_set_sg.o \
 libdraw_load_music.o \
@@ -302,6 +304,9 @@ libdraw_shield_sprite.o: libdraw_shield_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_update_weapon_for_entity.o: libdraw_update_weapon_for_entity.cpp 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
+
+libdraw_update_shield_for_entity.o: libdraw_update_shield_for_entity.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_set_sg_is_attacking.o: libdraw_set_sg_is_attacking.cpp 

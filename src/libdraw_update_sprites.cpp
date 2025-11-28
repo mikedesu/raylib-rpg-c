@@ -22,12 +22,12 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
 
     if (g->current_scene == SCENE_GAMEPLAY) {
         if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT || g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+            //ANIM_SPEED = DEFAULT_ANIM_SPEED;
             ANIM_SPEED = DEFAULT_ANIM_SPEED;
-            //ANIM_SPEED = DEFAULT_ANIM_SPEED * 4;
 
         } else if (g->flag == GAMESTATE_FLAG_NPC_TURN || g->flag == GAMESTATE_FLAG_NPC_ANIM) {
-            //ANIM_SPEED = DEFAULT_ANIM_SPEED / 4;
             ANIM_SPEED = DEFAULT_ANIM_SPEED / 2;
+            //ANIM_SPEED = DEFAULT_ANIM_SPEED / 2;
         }
 
 
@@ -86,13 +86,30 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
                     if (type == ENTITY_ITEM) {
                         itemtype_t itype = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
                         if (itype == ITEM_WEAPON) {
+                            // if the current is > 0, this implies it is equipped
+                            // or being displayed in a non-tile context
                             if (sg->current > 0) {
                                 shared_ptr<sprite> s2 = sg->sprites2->at(sg->current + 1);
                                 if (s2) {
                                     sprite_incrframe2(s2);
                                     g->frame_dirty = true;
-                                    // this condition for the animation reset seems incorrect
-                                    // certain cases are causing animations to drop-off mid-sequence
+                                    if (s2->num_loops >= 1) {
+                                        sg->current = sg->default_anim;
+                                        s2->num_loops = 0;
+                                    }
+                                }
+                            }
+                        } else if (itype == ITEM_SHIELD) {
+                            // if the current is > 0, this implies it is equipped
+                            // or being displayed in a non-tile context
+                            //minfo("handling shield update");
+
+                            if (sg->current > 0) {
+                                minfo("shield appears to be equipped...");
+                                shared_ptr<sprite> s2 = sg->sprites2->at(sg->current + 1);
+                                if (s2) {
+                                    sprite_incrframe2(s2);
+                                    g->frame_dirty = true;
                                     if (s2->num_loops >= 1) {
                                         sg->current = sg->default_anim;
                                         s2->num_loops = 0;
