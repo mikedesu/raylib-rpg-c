@@ -92,9 +92,9 @@ struct ComponentTraits<blocking> {
     using Type = bool;
 };
 
-struct blocksuccess { }; // bool
+struct block_success { }; // bool
 template <>
-struct ComponentTraits<blocksuccess> {
+struct ComponentTraits<block_success> {
     using Type = bool;
 };
 

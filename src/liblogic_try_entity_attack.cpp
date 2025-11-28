@@ -8,9 +8,11 @@
 #include "weapon.h"
 
 void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful);
-bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
+void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
+
+void handle_block_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id);
 
 
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success) {
@@ -83,7 +85,7 @@ void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, enti
 }
 
 
-bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful) {
+void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful) {
     massert(g, "gamestate is NULL");
     massert(tile, "tile is NULL");
     massert(i >= 0, "i is out of bounds");
@@ -92,14 +94,14 @@ bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
 
     const entityid target_id = tile->entities->at(i);
     if (target_id == ENTITYID_INVALID) {
-        return false;
+        return;
     }
 
     const entitytype_t type = g->ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
 
-    if (type != ENTITY_PLAYER && type != ENTITY_NPC) return false;
+    if (type != ENTITY_PLAYER && type != ENTITY_NPC) return;
     if (g->ct.get<dead>(target_id).value_or(true)) {
-        return false;
+        return;
     }
 
     // lets try an experiment...
@@ -110,14 +112,40 @@ bool handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
     //int str_bonus = 0;
     //int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
     //int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
-    //*attack_successful = false;
-    *attack_successful = true;
     //if (attack_roll >= base_ac) {
-    //    return handle_shield_check(g, attacker_id, target_id, attack_roll, base_ac, attack_successful);
-    //}
-    // attack misses
-    handle_attack_success(g, attacker_id, target_id, attack_successful);
-    return false;
+
+    optional<entityid> maybe_shield = g->ct.get<equipped_shield>(target_id);
+    if (maybe_shield.has_value()) {
+        entityid shield_id = maybe_shield.value();
+
+        if (shield_id == ENTITYID_INVALID) {
+            // no shield
+            *attack_successful = true;
+            handle_attack_success(g, attacker_id, target_id, attack_successful);
+        } else {
+            //*attack_successful = false;
+            handle_block_success(g, attacker_id, target_id);
+        }
+    } else {
+        // no shield
+        *attack_successful = true;
+        handle_attack_success(g, attacker_id, target_id, attack_successful);
+    }
+}
+
+
+void handle_block_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id) {
+    massert(g, "gamestate is NULL");
+    massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
+    massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
+
+    //const entitytype_t tgttype = g->ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
+    const entityid equipped_shld = g->ct.get<equipped_shield>(tgt_id).value_or(ENTITYID_INVALID);
+
+    if (equipped_shld != ENTITYID_INVALID) {
+        g->ct.set<block_success>(tgt_id, true);
+        g->ct.set<update>(tgt_id, true);
+    }
 }
 
 
