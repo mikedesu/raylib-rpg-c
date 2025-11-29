@@ -24,7 +24,8 @@ void df_assign_downstairs(shared_ptr<dungeon_floor_t> df);
 void df_assign_upstairs(shared_ptr<dungeon_floor_t> df);
 
 bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
-bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
+
 
 int df_get_possible_upstairs_count(shared_ptr<dungeon_floor_t> df);
 int df_get_possible_downstairs_count(shared_ptr<dungeon_floor_t> df);
@@ -177,7 +178,7 @@ int df_get_possible_upstairs_count_in_area(shared_ptr<dungeon_floor_t> df, Recta
 void df_assign_stairs(shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
     df_assign_upstairs_in_area(df, (Rectangle){0, 0, (float)df->width, (float)df->height});
-    df_assign_downstairs_in_area(df, 0, 0, df->width, df->height);
+    df_assign_downstairs_in_area(df, (Rectangle){0, 0, (float)df->width, (float)df->height});
 }
 
 
@@ -303,22 +304,22 @@ void df_assign_upstairs(shared_ptr<dungeon_floor_t> df) {
 
 
 void df_assign_downstairs(shared_ptr<dungeon_floor_t> df) {
-    df_assign_downstairs_in_area(df, 0, 0, df->width, df->height);
+    df_assign_downstairs_in_area(df, (Rectangle){0, 0, (float)df->width, (float)df->height});
 }
 
 
-bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) {
+bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r) {
     massert(df, "dungeon floor is NULL");
-    massert(x >= 0, "x is less than zero");
-    massert(x < df->width, "x is out of bounds");
-    massert(y >= 0, "y is less than zero");
-    massert(y < df->height, "y is out of bounds");
-    massert(w > 0, "w is less than zero");
-    massert(h > 0, "h is less than zero");
-    massert(x + w <= df->width, "x + w is out of bounds");
-    massert(y + h <= df->height, "y + h is out of bounds");
+    massert(r.x >= 0, "x is less than zero");
+    massert(r.x < df->width, "x is out of bounds");
+    massert(r.y >= 0, "y is less than zero");
+    massert(r.y < df->height, "y is out of bounds");
+    massert(r.width > 0, "w is less than zero");
+    massert(r.height > 0, "h is less than zero");
+    massert(r.x + r.width <= df->width, "x + w is out of bounds");
+    massert(r.y + r.height <= df->height, "y + h is out of bounds");
     int count = -1;
-    auto locations = df_get_possible_downstairs_locs_in_area(df, (Rectangle){(float)x, (float)y, (float)w, (float)h});
+    auto locations = df_get_possible_downstairs_locs_in_area(df, (Rectangle){(float)r.x, (float)r.y, (float)r.width, (float)r.height});
     // now that we have a list of possible locations for the upstairs to appear
     // we can randomly select one of them
     int downstairs_index = rand() % count;

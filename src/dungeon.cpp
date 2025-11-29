@@ -60,7 +60,7 @@ shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dungeon, dungeon_f
 
     // i forget why we are doing this external from dungeon_floor.cpp...
     df_assign_upstairs_in_area(new_floor, (Rectangle){0, 0, (float)width, (float)height});
-    df_assign_downstairs_in_area(new_floor, 0, 0, width, height);
+    df_assign_downstairs_in_area(new_floor, (Rectangle){0, 0, (float)width, (float)height});
 
     dungeon->floors->push_back(new_floor);
 

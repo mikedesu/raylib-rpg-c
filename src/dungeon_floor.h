@@ -46,7 +46,8 @@ bool df_remove_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int 
 
 //bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
-bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+//bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
 
 vec3 df_get_upstairs(shared_ptr<dungeon_floor_t> const df);
 vec3 df_get_downstairs(shared_ptr<dungeon_floor_t> const df);
