@@ -1,7 +1,7 @@
 #include "ComponentTraits.h"
-#include "libdraw_dungeon_floor.h"
-//#include "libdraw_dungeon_floor_tile.h"
+#include "dungeon_tile_type.h"
 #include "get_txkey_for_tiletype.h"
+#include "libdraw_dungeon_floor.h"
 #include "libdraw_sprite.h"
 #include "textureinfo.h"
 
@@ -82,21 +82,29 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     const int z = g->dungeon->current_floor;
 
 
-    for (int y = 0; y < df->height; y++)
-        for (int x = 0; x < df->width; x++) draw_dungeon_floor_tile(g, txinfo, x, y, z);
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            draw_dungeon_floor_tile(g, txinfo, x, y, z);
+        }
+    }
 
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             //draw_entities_2d_at(g, df, false, (vec3){x, y, z});
             const vec3 loc = {x, y, z};
             shared_ptr<tile_t> tile = df_tile_at(df, loc);
-            if (!tile || !tile->visible || tile_is_wall(tile->type) || tile->is_empty) continue;
+            if (!tile || !tile->visible || tile_is_wall(tile->type) || tile->is_empty) {
+                continue;
+            }
 
-            // bugfix for walls so entities do not draw on top:
+            // bugfix for tall walls so entities do not draw on top:
             // check to see if the tile directly beneath this tile is a wall
             const vec3 loc2 = {x, y + 1, z};
             shared_ptr<tile_t> tile2 = df_tile_at(df, loc2);
-            if (tile2 && tile_is_wall(tile2->type)) continue;
+            //if (tile2 && tile_is_wall(tile2->type)) {
+            if (tile2 && tile2->type == TILE_STONE_WALL_00) {
+                continue;
+            }
 
             // Get hero's vision distance and location
             const int vision_dist = g->ct.get<vision_distance>(g->hero_id).value_or(0);

@@ -23,10 +23,10 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     if (g->current_scene == SCENE_GAMEPLAY) {
         if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT || g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
             //ANIM_SPEED = DEFAULT_ANIM_SPEED;
-            ANIM_SPEED = DEFAULT_ANIM_SPEED;
+            ANIM_SPEED = DEFAULT_ANIM_SPEED / 2;
 
         } else if (g->flag == GAMESTATE_FLAG_NPC_TURN || g->flag == GAMESTATE_FLAG_NPC_ANIM) {
-            ANIM_SPEED = DEFAULT_ANIM_SPEED / 2;
+            ANIM_SPEED = DEFAULT_ANIM_SPEED / 4;
             //ANIM_SPEED = DEFAULT_ANIM_SPEED / 2;
         }
 

@@ -68,7 +68,7 @@
 #
 #
 41 1 1  0  img/tiles/wall_stone_00.png
-#42 1 1  0  img/tiles/stonewall_01.png
+42 1 1  0  img/tiles/wall_stone_01.png
 #43 1 1  0  img/tiles/stonewall_02.png
 #44 1 1  0  img/tiles/stonewall_03.png
 #

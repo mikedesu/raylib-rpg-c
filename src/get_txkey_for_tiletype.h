@@ -10,13 +10,13 @@ static inline int get_txkey_for_tiletype(tiletype_t type) {
     case TILE_UPSTAIRS: key = TX_UPSTAIRS_00; break;
     case TILE_DOWNSTAIRS: key = TX_DOWNSTAIRS_00; break;
     //case TILE_FLOOR_DIRT: key = TX_DIRT_00; break;
-    case TILE_STONE_WALL_00:
-        key = TX_STONEWALL_00;
+    case TILE_STONE_WALL_00: key = TX_STONEWALL_00; break;
+    case TILE_STONE_WALL_01:
+        key = TX_STONEWALL_01;
         break;
         //case TILE_STONE_WALL_01: key = TX_STONEWALL_01; break;
         //case TILE_STONE_WALL_02: key = TX_STONEWALL_02; break;
         //case TILE_STONE_WALL_03: key = TX_STONEWALL_03; break;
-
     case TILE_FLOOR_STONE_DIRT_UL_00: key = TX_STONE_DIRT_UL_00; break;
     case TILE_FLOOR_STONE_DIRT_U_00: key = TX_STONE_DIRT_U_00; break;
     case TILE_FLOOR_STONE_DIRT_UR_00: key = TX_STONE_DIRT_UR_00; break;
