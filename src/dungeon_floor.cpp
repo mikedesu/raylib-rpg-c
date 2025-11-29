@@ -26,9 +26,15 @@ bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, in
 bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 int df_get_possible_upstairs_count(shared_ptr<dungeon_floor_t> df);
 int df_get_possible_downstairs_count(shared_ptr<dungeon_floor_t> df);
-vec3* df_get_possible_upstairs_locs(shared_ptr<dungeon_floor_t> df, int* external_count);
+//vec3* df_get_possible_upstairs_locs(shared_ptr<dungeon_floor_t> df, int* external_count);
+
+shared_ptr<vector<vec3>> df_get_possible_upstairs_locs(shared_ptr<dungeon_floor_t> df);
 vec3* df_get_possible_downstairs_locs(shared_ptr<dungeon_floor_t> df, int* external_count);
-vec3* df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int* external_count, int x, int y, int w, int h);
+
+//vec3* df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int* external_count, int x, int y, int w, int h);
+shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+
+
 vec3* df_get_possible_downstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int* external_count, int x, int y, int w, int h);
 int df_get_possible_upstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 int df_get_possible_downstairs_count_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
@@ -184,14 +190,15 @@ int df_get_possible_downstairs_count(shared_ptr<dungeon_floor_t> df) {
 }
 
 
-vec3* df_get_possible_upstairs_locs(shared_ptr<dungeon_floor_t> df, int* external_count) {
+shared_ptr<vector<vec3>> df_get_possible_upstairs_locs(shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
-    massert(external_count, "external_count is NULL");
-    int count = -1;
-    vec3* locs = df_get_possible_upstairs_locs_in_area(df, &count, 0, 0, df->width, df->height);
+    //massert(external_count, "external_count is NULL");
+
+    //int count = -1;
+
+    auto locs = df_get_possible_upstairs_locs_in_area(df, 0, 0, df->width, df->height);
     massert(locs, "failed to get possible upstairs locations");
-    massert(count > 0, "no possible upstairs locations");
-    *external_count = count;
+
     return locs;
 }
 
@@ -208,12 +215,17 @@ vec3* df_get_possible_downstairs_locs(shared_ptr<dungeon_floor_t> df, int* exter
 }
 
 
-vec3* df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int* external_count, int x, int y, int w, int h) {
+//vec3* df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int* external_count, int x, int y, int w, int h) {
+shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h) {
     massert(df, "dungeon floor is NULL");
     int count = df_get_possible_upstairs_count_in_area(df, x, y, w, h);
-    vec3* locations = (vec3*)malloc(sizeof(vec3) * count);
-    massert(locations, "failed to malloc locations");
-    int count2 = 0;
+
+    //vec3* locations = (vec3*)malloc(sizeof(vec3) * count);
+
+    shared_ptr<vector<vec3>> locations = make_shared<vector<vec3>>();
+    massert(locations, "failed to make_shared locations");
+
+    //int count2 = 0;
     // now we can loop thru the dungeon floor again and fill the array with the locations
     for (int y0 = y; y0 < df->height; y0++) {
         for (int x0 = x; x0 < df->width; x0++) {
@@ -222,15 +234,18 @@ vec3* df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, int*
             if (tile_is_possible_upstairs(tile->type)) {
                 // there wont be any entities yet so do not check for them
                 // do not write an if statement
-                locations[count2].x = x0;
-                locations[count2].y = y0;
-                count2++;
-                massert(count2 <= count, "count2 is greater than count");
+
+                //locations[count2].x = x0;
+                //locations[count2].y = y0;
+                locations->push_back((vec3){x0, y0, 0});
+
+                //count2++;
+                massert(locations->size() <= (size_t)count, "count2 is greater than count");
             }
         }
     }
-    massert(count2 == count, "count2 is greater than count");
-    *external_count = count;
+    massert(locations->size() == (size_t)count, "count2 is greater than count");
+    //*external_count = count;
     return locations;
 }
 
@@ -277,20 +292,27 @@ bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, in
     massert(h > 0, "h is less than zero");
     massert(x + w <= df->width, "x + w is out of bounds");
     massert(y + h <= df->height, "y + h is out of bounds");
-    int count = -1;
-    vec3* locations = df_get_possible_upstairs_locs_in_area(df, &count, x, y, w, h);
-    massert(count > 0, "no possible upstairs locations");
+    //int count = -1;
+
+    //vec3* locations = df_get_possible_upstairs_locs_in_area(df, &count, x, y, w, h);
+    shared_ptr<vector<vec3>> locations = df_get_possible_upstairs_locs_in_area(df, x, y, w, h);
+    massert(locations->size() > 0, "no possible upstairs locations");
+
     // now that we have a list of possible locations for the upstairs to appear
     // we can randomly select one of them
-    int upstairs_index = rand() % count;
-    vec3 up_loc = locations[upstairs_index];
+    const int upstairs_index = rand() % locations->size();
+
+    const vec3 up_loc = locations->at(upstairs_index);
+
     // now we can set the upstairs tile
-    //tile_t* const tile = df_tile_at(df, up_loc);
     shared_ptr<tile_t> tile = df_tile_at(df, up_loc);
     massert(tile, "failed to get tile");
+
     tile_init(tile, TILE_UPSTAIRS);
-    tile->visible = true; // make sure the upstairs tile is visible
-    free(locations);
+
+    // make sure the upstairs tile is visible
+    tile->visible = true;
+
     df->upstairs_loc = up_loc;
     return true;
 }
