@@ -43,7 +43,9 @@ void df_set_tile(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, i
 entityid df_add_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y);
 
 bool df_remove_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y);
-bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+
+//bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
+bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
 bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 
 vec3 df_get_upstairs(shared_ptr<dungeon_floor_t> const df);
@@ -76,7 +78,8 @@ static inline shared_ptr<tile_t> df_tile_at(shared_ptr<dungeon_floor_t> df, vec3
     tile_id id = df->tiles->at(index);
     // Check if the tile_id exists in the map
     auto it = df->tile_map->find(id);
-    if (it != df->tile_map->end()) return it->second;
+    if (it != df->tile_map->end())
+        return it->second;
 
     //merror("Tile not found at location (%d, %d)", loc.x, loc.y);
     return NULL; // Tile not found
