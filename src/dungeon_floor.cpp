@@ -85,16 +85,50 @@ shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int wid
     const float y = height / 3.0;
 
     // off by 1...want 8 width? set it to 9
-    const int w = 4;
-    const int h = 4;
-
+    //const int w = 7;
+    //const int h = 3;
     // init the inner MxN area
     // create a new room with walls
-    df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x, y, w, h});
+    //Rectangle r = {x, y, w, h};
+    df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x, y, 7, 3});
+
+    df_set_area(df, TILE_STONE_WALL_00, (Rectangle){x, y - 1, 7, 1});
+    df_set_area(df, TILE_STONE_WALL_00, (Rectangle){x - 1, y - 1, 1, 5});
+    df_set_area(df, TILE_STONE_WALL_00, (Rectangle){x, y + 3, 7, 1});
+    df_set_area(df, TILE_STONE_WALL_00, (Rectangle){x + 7, y - 1, 1, 5});
+
+    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 7, y, 1, 1});
+    df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 7, y + 1, 1, 1});
+    df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 7, y + 2, 1, 1});
+
+    df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 8, y, 7, 3});
+
+    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 7, y + 1, 3, 1});
+    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 10, y + 2, 1, 1});
+    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 11, y + 1, 1, 1});
+    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 12, y + 2, 1, 1});
+    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 13, y + 1, 1, 1});
+    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 14, y + 0, 1, 1});
+    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 15, y + 1, 1, 1});
+
     // create a new room with walls
-    df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + w + 1, y, w, h});
+    //r.x = x + w + 1;
+    //df_set_area(df, TILE_FLOOR_STONE_00, r);
+
+    //r.x = x + 2 * w + 2;
+    //df_set_area(df, TILE_FLOOR_STONE_00, r);
+
+
     // create an opening into the new room
-    df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + w, y + h - 1, 1, 1});
+    //r.x = x + w;
+    //r.y = y + 1;
+    //r.width = 1;
+    //r.height = 1;
+    //df_set_area(df, TILE_FLOOR_STONE_00, r);
+    //r.x = x + 2 * w + 1;
+    //df_set_area(df, TILE_FLOOR_STONE_00, r);
+
+
     //df_set_perimeter(df, x0, y0, w + 1, h + 1);
 
     msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);

@@ -46,7 +46,9 @@ void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t);
 void recompute_entity_cache_at(shared_ptr<gamestate> g, int x, int y, int z);
 
 
-static inline size_t tile_entity_count(const shared_ptr<tile_t> t) { return t->entities->size(); }
+static inline size_t tile_entity_count(const shared_ptr<tile_t> t) {
+    return t->entities->size();
+}
 
 
 static inline entityid tile_get_entity(const shared_ptr<tile_t> t, size_t i) {
@@ -76,9 +78,3 @@ static inline bool tile_has_player(shared_ptr<gamestate> g, shared_ptr<tile_t> t
     recompute_entity_cache(g, t);
     return t->cached_player_present;
 }
-
-
-//static inline bool tile_is_visible(const shared_ptr<tile_t> t) { return t->visible; }
-//static inline void tile_set_explored(shared_ptr<tile_t> t, bool explored) { t->explored = explored; }
-//static inline void tile_set_visible(shared_ptr<tile_t> t, bool visible) { t->visible = visible; }
-//static inline bool tile_is_explored(const shared_ptr<tile_t> t) { return t->explored; }
