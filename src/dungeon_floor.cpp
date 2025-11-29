@@ -16,10 +16,9 @@ using std::unordered_map;
 using std::vector;
 
 
-void df_set_tile(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y);
-void df_set_tile_area(shared_ptr<dungeon_floor_t> df, tiletype_t type, int x, int y, int w, int h);
+void df_set_tile(shared_ptr<dungeon_floor_t> df, tiletype_t type, int x, int y);
 
-void df_set_all_tiles(shared_ptr<dungeon_floor_t> const df, tiletype_t type);
+void df_set_all_tiles(shared_ptr<dungeon_floor_t> df, tiletype_t type);
 void df_assign_stairs(shared_ptr<dungeon_floor_t> df);
 void df_assign_downstairs(shared_ptr<dungeon_floor_t> df);
 void df_assign_upstairs(shared_ptr<dungeon_floor_t> df);
@@ -343,28 +342,28 @@ int df_center_y(const shared_ptr<dungeon_floor_t> df) {
 }
 
 
-void df_set_tile_area(shared_ptr<dungeon_floor_t> const df, tiletype_t type, Rectangle r) {
-    massert(df, "dungeon floor is NULL");
-    massert(r.x >= 0, "x is less than zero");
-    massert(r.x < df->width, "x is out of bounds");
-    massert(r.y >= 0, "y is less than zero");
-    massert(r.y < df->height, "y is out of bounds");
-    massert(r.width > 0, "w is less than zero");
-    massert(r.height > 0, "h is less than zero");
-    massert(r.x + r.width <= df->width, "x + w is out of bounds");
-    massert(r.y + r.height <= df->height, "y + h is out of bounds");
+//void df_set_tile_area(shared_ptr<dungeon_floor_t> const df, tiletype_t type, Rectangle r) {
+//    massert(df, "dungeon floor is NULL");
+//    massert(r.x >= 0, "x is less than zero");
+//    massert(r.x < df->width, "x is out of bounds");
+//    massert(r.y >= 0, "y is less than zero");
+//    massert(r.y < df->height, "y is out of bounds");
+//    massert(r.width > 0, "w is less than zero");
+//    massert(r.height > 0, "h is less than zero");
+//    massert(r.x + r.width <= df->width, "x + w is out of bounds");
+//    massert(r.y + r.height <= df->height, "y + h is out of bounds");
+//
+//    minfo("entering loop...");
+//
+//    for (int i = r.y; i < r.y + r.height; i++) {
+//        for (int j = r.x; j < r.x + r.width; j++) {
+//            tile_init(df_tile_at(df, (vec3){j, i, -1}), type);
+//        }
+//    }
+//}
 
-    minfo("entering loop...");
 
-    for (int i = r.y; i < r.y + r.height; i++) {
-        for (int j = r.x; j < r.x + r.width; j++) {
-            tile_init(df_tile_at(df, (vec3){j, i, -1}), type);
-        }
-    }
-}
-
-
-void df_set_tile(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y) {
+void df_set_tile(shared_ptr<dungeon_floor_t> df, tiletype_t type, int x, int y) {
     massert(df, "dungeon floor is NULL");
     shared_ptr<tile_t> current = df_tile_at(df, (vec3){x, y, -1});
     tile_init(current, type);
@@ -425,10 +424,10 @@ bool df_remove_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int 
 }
 
 
-void df_set_all_tiles(shared_ptr<dungeon_floor_t> const df, tiletype_t type) {
+void df_set_all_tiles(shared_ptr<dungeon_floor_t> df, tiletype_t type) {
     minfo("df_set_all_tiles: Setting all tiles to type %d", type);
     massert(df, "dungeon floor is NULL");
-    df_set_tile_area(df, type, (Rectangle){0, 0, (float)df->width, (float)df->height});
+    df_set_area(df, type, (Rectangle){0, 0, (float)df->width, (float)df->height});
 }
 
 
