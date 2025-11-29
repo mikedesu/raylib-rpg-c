@@ -19,9 +19,13 @@ using std::vector;
 
 shared_ptr<dungeon_t> d_create() {
     shared_ptr<dungeon_t> dungeon = make_shared<dungeon_t>();
-    if (!dungeon) return nullptr;
+    if (!dungeon) {
+        return nullptr;
+    }
     dungeon->floors = make_shared<vector<shared_ptr<dungeon_floor_t>>>();
-    if (!dungeon->floors) return nullptr;
+    if (!dungeon->floors) {
+        return nullptr;
+    }
     dungeon->current_floor = 0;
     dungeon->is_locked = false;
     return dungeon;
@@ -29,12 +33,14 @@ shared_ptr<dungeon_t> d_create() {
 
 
 void d_destroy(shared_ptr<dungeon_t> d) {
-    if (d && d->floors) d->floors->clear();
+    if (d && d->floors) {
+        d->floors->clear();
+    }
 }
 
 
 void d_free(shared_ptr<dungeon_t> dungeon) {
-    //massert(dungeon, "dungeon is NULL");
+    massert(dungeon, "dungeon is NULL");
     d_destroy(dungeon);
 }
 
@@ -52,10 +58,10 @@ shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dungeon, dungeon_f
         return nullptr;
     }
 
+    // i forget why we are doing this external from dungeon_floor.cpp...
     df_assign_upstairs_in_area(new_floor, 0, 0, width, height);
     df_assign_downstairs_in_area(new_floor, 0, 0, width, height);
 
-    //dungeon->floors->push_back(shared_ptr<dungeon_floor_t>(new_floor));
     dungeon->floors->push_back(new_floor);
 
     return new_floor;
