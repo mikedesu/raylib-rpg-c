@@ -104,11 +104,13 @@ shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int wid
     df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y, w, h});
     df_set_perimeter(df, TILE_STONE_WALL_00, TILE_STONE_WALL_00, (Rectangle){x - 1, y - 1, w + 2, h + 2});
 
-    minfo("x: %f y: %f w: %d h: %d", x + w / 2, y, 1, h);
+    //minfo("x: %f y: %f w: %d h: %d", x + w / 2, y, 1, h);
     df_set_area(df, TILE_STONE_WALL_00, TILE_STONE_WALL_00, (Rectangle){x + w / 2.0f, y, 1, h});
+    df_set_area(df, TILE_STONE_WALL_00, TILE_STONE_WALL_00, (Rectangle){x, y + h / 2.0f, w, 1});
 
-
-    //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x + w, y, w2, h});
+    df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 1, 1, 2});
+    df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f + 2, y + 4, 1, 2});
+    df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 6, 1, 2});
     //df_set_perimeter(df, TILE_STONE_WALL_00, TILE_STONE_WALL_00, (Rectangle){x + w - 1, y - 1, w2 + 2, h + 2});
 
     //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x + w, y + h + 1, w2, h2});
