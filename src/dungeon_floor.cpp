@@ -17,8 +17,9 @@ using std::vector;
 
 
 void df_set_tile(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y);
-void df_set_all_tiles(shared_ptr<dungeon_floor_t> const df, tiletype_t type);
 void df_set_tile_area(shared_ptr<dungeon_floor_t> df, tiletype_t type, int x, int y, int w, int h);
+
+void df_set_all_tiles(shared_ptr<dungeon_floor_t> const df, tiletype_t type);
 void df_assign_stairs(shared_ptr<dungeon_floor_t> df);
 void df_assign_downstairs(shared_ptr<dungeon_floor_t> df);
 void df_assign_upstairs(shared_ptr<dungeon_floor_t> df);
@@ -194,11 +195,7 @@ int df_get_possible_downstairs_count(shared_ptr<dungeon_floor_t> df) {
 
 shared_ptr<vector<vec3>> df_get_possible_upstairs_locs(shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
-    //massert(external_count, "external_count is NULL");
 
-    //int count = -1;
-
-    //auto locs = df_get_possible_upstairs_locs_in_area(df, 0, 0, df->width, df->height);
     auto locs = df_get_possible_upstairs_locs_in_area(df, (Rectangle){0, 0, (float)df->width, (float)df->height});
     massert(locs, "failed to get possible upstairs locations");
 
