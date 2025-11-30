@@ -29,10 +29,9 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
             //bonus_calc(g->chara_creation.constitution);
         }
 
-
-        const vec3 start_loc = (vec3){9, 9, 0};
+        //const vec3 start_loc = (vec3){9, 9, 0};
+        const vec3 start_loc = g->dungeon->floors->at(g->dungeon->current_floor)->upstairs_loc;
         g->entity_turn = create_player(g, start_loc, "darkmage");
-
 
         // temporary wedge-in code
         // set all the NPCs to target the hero
@@ -44,6 +43,7 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
                 g->ct.set<target>(id, g->hero_id);
             }
         }
+
         //minfo("END Temporary wedge-in code");
         g->current_scene = SCENE_GAMEPLAY;
 
