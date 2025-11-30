@@ -4,25 +4,28 @@
 #include "sfx.h"
 
 
-void handle_equip_shield(shared_ptr<gamestate> g, entityid item_id) {
+void handle_inventory_equip_shield(shared_ptr<gamestate> g, entityid item_id) {
     // Check if this is the currently equipped weapon
-    minfo("handle equip shield");
-    entityid current_shield = g->ct.get<equipped_shield>(g->hero_id).value_or(ENTITYID_INVALID);
+    //minfo("handle equip shield");
+    const entityid current_shield = g->ct.get<equipped_shield>(g->hero_id).value_or(ENTITYID_INVALID);
     if (current_shield == item_id) {
         // Unequip if it's already equipped
-        minfo("unequipping shield");
+        //minfo("unequipping shield");
         g->ct.set<equipped_shield>(g->hero_id, ENTITYID_INVALID);
     } else {
         // Equip the new shield
-        minfo("equipping shield");
+        //minfo("equipping shield");
         g->ct.set<equipped_shield>(g->hero_id, item_id);
     }
+    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    g->controlmode = CONTROLMODE_PLAYER;
+    g->display_inventory_menu = false;
 }
 
 
-void handle_equip_weapon(shared_ptr<gamestate> g, entityid item_id) {
+void handle_inventory_equip_weapon(shared_ptr<gamestate> g, entityid item_id) {
     // Check if this is the currently equipped weapon
-    entityid current_weapon = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
+    const entityid current_weapon = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
     if (current_weapon == item_id) {
         // Unequip if it's already equipped
         g->ct.set<equipped_weapon>(g->hero_id, ENTITYID_INVALID);
@@ -30,34 +33,28 @@ void handle_equip_weapon(shared_ptr<gamestate> g, entityid item_id) {
         // Equip the new weapon
         g->ct.set<equipped_weapon>(g->hero_id, item_id);
     }
+    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    g->controlmode = CONTROLMODE_PLAYER;
+    g->display_inventory_menu = false;
 }
 
 
-void handle_equip_item(shared_ptr<gamestate> g, entityid item_id) {
+void handle_inventory_equip_item(shared_ptr<gamestate> g, entityid item_id) {
     itemtype_t item_type = g->ct.get<itemtype>(item_id).value_or(ITEM_NONE);
-    //if (item_type != ITEM_NONE) {
-    //    if (item_type == ITEM_WEAPON) {
-    //        handle_equip_weapon(g, item_id);
-    //    } else if (item_type == ITEM_SHIELD) {
-    //        handle_equip_shield(g, item_id);
-    //    }
-
     switch (item_type) {
     case ITEM_NONE: break;
-    case ITEM_WEAPON: handle_equip_weapon(g, item_id); break;
-    case ITEM_SHIELD: handle_equip_shield(g, item_id); break;
+    case ITEM_WEAPON: handle_inventory_equip_weapon(g, item_id); break;
+    case ITEM_SHIELD: handle_inventory_equip_shield(g, item_id); break;
     default: break;
     }
-    //}
 }
 
 
-void handle_equip(shared_ptr<gamestate> g) {
+void handle_inventory_equip(shared_ptr<gamestate> g) {
     PlaySound(g->sfx->at(SFX_EQUIP_01));
     // equip item
     // get the item id of the current selection
-    size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
-
+    const size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
     optional<shared_ptr<vector<entityid>>> my_inventory = g->ct.get<inventory>(g->hero_id);
     if (my_inventory) {
         if (my_inventory.has_value()) {
@@ -66,7 +63,7 @@ void handle_equip(shared_ptr<gamestate> g) {
                 entityid item_id = unpacked_inventory->at(index);
                 entitytype_t type = g->ct.get<entitytype>(item_id).value_or(ENTITY_NONE);
                 if (type == ENTITY_ITEM) {
-                    handle_equip_item(g, item_id);
+                    handle_inventory_equip_item(g, item_id);
                 }
             }
         }
@@ -120,64 +117,22 @@ void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) 
             g->inventory_cursor.y--;
         }
     }
-    if (inputstate_is_pressed(is, KEY_DOWN)
-
-
-        || inputstate_is_pressed(is, KEY_X)) {
+    if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
         PlaySound(g->sfx->at(SFX_CONFIRM_01));
         g->inventory_cursor.y++;
     }
 
 
     if (inputstate_is_pressed(is, KEY_E)) {
-        handle_equip(g);
+        handle_inventory_equip(g);
     }
 
-    //}
-    //if (inputstate_is_pressed(is, KEY_U)) {
-    // unequip weapon/item
-    // we will assume it is a weapon for now
-    //entityid weapon_id = g_get_equipped_weapon(g, g->hero_id);
-    //if (weapon_id != ENTITYID_INVALID) {
-    //    if (g_unequip_weapon(g, g->hero_id, weapon_id)) {
-    //        minfo("unequipped weapon %d", weapon_id);
-    //    } else {
-    //        minfo("failed to unequip weapon %d", weapon_id);
-    //    }
-    //}
-    //}
     if (inputstate_is_pressed(is, KEY_Q)) {
         // drop item
         PlaySound(g->sfx->at(SFX_DISCARD_ITEM));
         drop_item_from_hero_inventory(g);
     }
-    // cycle menus
-    //if (inputstate_is_pressed(is, KEY_LEFT) ||
-    //    inputstate_is_pressed(is, KEY_RIGHT)) {
-    //    g->controlmode = CONTROLMODE_GAMEPLAY_SETTINGS;
-    //    g->display_gameplay_settings_menu = true;
-    //    g->display_inventory_menu = false;
-    //    return;
-    //}
-    //if (inputstate_is_pressed(is, KEY_S)) {
-    //    minfo("toggling sort inventory menu");
-    //    g->display_sort_inventory_menu = !g->display_sort_inventory_menu;
-    //    return;
-    //}
-    //size_t count = 0;
-    //entityid* inventory = g_get_inventory(g, g->hero_id, &count);
-    //if (g->display_inventory_menu && g->display_sort_inventory_menu) {
-    //    handle_input_sort_inventory(is, g);
-    //    return;
-    //}
-    //
-    //    if (count == 0) return;
-    // make sure we separate control of inv menu from its sort inv menu
-    //    if (g->display_inventory_menu && !g->display_sort_inventory_menu) {
-    //        if (inputstate_is_pressed(is, KEY_DOWN) ||
-    //            inputstate_is_pressed(is, KEY_X)) {
-    //            g->inventory_menu_selection =
-    //                (size_t)g->inventory_menu_selection + 1 >= count
+
     //                    ? 0
     //                    : g->inventory_menu_selection + 1;
     //        } else if (inputstate_is_pressed(is, KEY_UP) ||
