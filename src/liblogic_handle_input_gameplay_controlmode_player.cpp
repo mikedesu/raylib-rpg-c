@@ -1,3 +1,4 @@
+#include "inputstate.h"
 #include "libgame_defines.h"
 #include "liblogic_add_message.h"
 #include "liblogic_change_player_dir.h"
@@ -8,6 +9,7 @@
 #include "liblogic_try_entity_move.h"
 #include "liblogic_try_entity_pickup.h"
 #include "sfx.h"
+#include "try_entity_stairs.h"
 #include <raylib.h>
 
 void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
@@ -185,8 +187,10 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
                     } else {
                         add_message(g, "You cant attack while dead!");
                     }
-                    // handling pickup item
-                } else if (inputstate_is_pressed(is, KEY_SLASH)) {
+                }
+
+                // handling pickup item
+                else if (inputstate_is_pressed(is, KEY_SLASH)) {
                     //add_message(g, "pickup item (unimplemented)");
                     if (!player_is_dead) {
                         try_entity_pickup(g, g->hero_id);
@@ -195,6 +199,17 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
                     }
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 }
+
+                // handling go up/down stairs
+                else if (inputstate_is_pressed(is, KEY_PERIOD)) {
+                    //minfo("UNIMPLEMENTED");
+
+                    // what happens when we go up or down stairs?
+
+                    try_entity_stairs(g, g->hero_id);
+                }
+
+
                 //else {
                 // Player is dead
                 //add_message(g, "You cannot move while dead");

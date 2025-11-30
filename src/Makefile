@@ -12,6 +12,7 @@ CFLAGS ?= # Allow override
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
 gameloader_web.cpp \
+try_entity_stairs.cpp \
 manage_inventory.cpp \
 update_player_tiles_explored.cpp \
 libdraw_draw_inventory_menu.cpp \
@@ -109,6 +110,7 @@ OBJ_FILES=main.o \
 gameloader.o \
 gamestate_inventory.o \
 gamestate.o \
+try_entity_stairs.o \
 manage_inventory.o \
 update_player_tiles_explored.o \
 libdraw_draw_inventory_menu.o \
@@ -352,8 +354,12 @@ libdraw.o: libdraw.cpp
 
 ###################
 
+
+
 ###################
 
+try_entity_stairs.o: try_entity_stairs.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_create_shield.o: liblogic_create_shield.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
