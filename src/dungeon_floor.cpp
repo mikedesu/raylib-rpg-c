@@ -113,11 +113,13 @@ shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int wid
     df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 6, 1, 2});
     //df_set_perimeter(df, TILE_STONE_WALL_00, TILE_STONE_WALL_00, (Rectangle){x + w - 1, y - 1, w2 + 2, h + 2});
 
-    df_set_tile(df, TILE_UPSTAIRS, 10, 10);
-    df->upstairs_loc = (vec3){10, 10, floor};
+    const vec3 loc_u = {9, 9, floor};
+    df_set_tile(df, TILE_UPSTAIRS, loc_u.x, loc_u.y);
+    df->upstairs_loc = loc_u;
 
-    df_set_tile(df, TILE_DOWNSTAIRS, 9, 14);
-    df->downstairs_loc = (vec3){9, 14, floor};
+    const vec3 loc_d = {9, 14, floor};
+    df_set_tile(df, TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
+    df->downstairs_loc = loc_d;
 
     //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x + w, y + h + 1, w2, h2});
     //df_set_perimeter(df, TILE_STONE_WALL_00, TILE_STONE_WALL_00, (Rectangle){x + w - 1, y + h, w2 + 2, h2 + 2});

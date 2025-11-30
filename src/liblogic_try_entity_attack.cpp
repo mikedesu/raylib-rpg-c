@@ -99,7 +99,8 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
 
     const entitytype_t type = g->ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
 
-    if (type != ENTITY_PLAYER && type != ENTITY_NPC) return;
+    if (type != ENTITY_PLAYER && type != ENTITY_NPC)
+        return;
     if (g->ct.get<dead>(target_id).value_or(true)) {
         return;
     }
@@ -157,6 +158,7 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
     massert(atk_successful, "attack_successful is NULL");
 
+    const entitytype_t atktype = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
     const entitytype_t tgttype = g->ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
 
     if (*atk_successful) {
@@ -178,24 +180,21 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             }
             tgt_hp -= dmg;
             g->ct.set<hp>(tgt_id, tgt_hp);
-            //if (tgttype == ENTITY_PLAYER) {
-            //add_message_history(g,
-            //                    "%s attacked you for %d damage!",
-            //                    g_get_name(g, atk_id).c_str(),
-            //                    dmg);
-            //} else if (tgttype == ENTITY_NPC) {
-            //add_message_history(g,
-            //                    "%s attacked %s for %d damage!",
-            //                    g_get_name(g, atk_id).c_str(),
-            //                    g_get_name(g, tgt_id).c_str(),
-            //                    dmg);
-            //}
+            if (tgttype == ENTITY_PLAYER) {
+                add_message(g, "%s attacked you for %d damage!", g->ct.get<name>(atk_id).value_or("no-name").c_str(), dmg);
+            } else if (atktype == ENTITY_PLAYER && tgttype == ENTITY_NPC) {
+                add_message(g,
+                            "%s attacked %s for %d damage!",
+                            g->ct.get<name>(atk_id).value_or("no-name").c_str(),
+                            g->ct.get<name>(tgt_id).value_or("no-name").c_str(),
+                            dmg);
+            }
 
             // get the equipped weapon of the attacker
             entityid wpn_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
-            int max_dura = g->ct.get<max_durability>(wpn_id).value_or(0);
+            const int max_dura = g->ct.get<max_durability>(wpn_id).value_or(0);
             // decrement its durability
-            int dura = g->ct.get<durability>(wpn_id).value_or(0);
+            const int dura = g->ct.get<durability>(wpn_id).value_or(0);
             g->ct.set<durability>(wpn_id, dura - 1 < 0 ? 0 : dura - 1);
             if (dura == 0) {
                 // permanently decrement from the max_durability

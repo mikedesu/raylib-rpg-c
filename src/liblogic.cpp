@@ -57,15 +57,15 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 6, 0});
     //create_wooden_box(g, (vec3){7, 7, 0});
 
-    //create_weapon_at(g, (vec3){2, 1, 0}, WEAPON_DAGGER);
+    create_weapon_at(g, (vec3){10, 9, 0}, WEAPON_DAGGER);
+    create_shield_at(g, (vec3){11, 9, 0}, SHIELD_BUCKLER);
     //create_weapon_at(g, (vec3){3, 1, 0}, WEAPON_AXE);
     //create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
-    //create_shield_at(g, (vec3){2, 2, 0}, SHIELD_BUCKLER);
 
-    //entityid orc1 = create_npc(g, RACE_ORC, (vec3){1, 3, 0}, "orc");
-    //entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
-    //add_to_inventory(g, orc1, orc1_weapon);
-    //g->ct.set<equipped_weapon>(orc1, orc1_weapon);
+    entityid orc1 = create_npc(g, RACE_ORC, (vec3){13, 9, 0}, "orc");
+    entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
+    add_to_inventory(g, orc1, orc1_weapon);
+    g->ct.set<equipped_weapon>(orc1, orc1_weapon);
 
     //entityid orc2 = create_npc(g, RACE_ORC, (vec3){2, 3, 0}, "orc");
     //entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
