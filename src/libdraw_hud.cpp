@@ -25,11 +25,12 @@ void draw_hud(shared_ptr<gamestate> g) {
     const Color fg = WHITE;
 
     const string n = g->ct.get<name>(g->hero_id).value_or("no-name");
+    const vec3 loc = g->ct.get<location>(g->hero_id).value_or((vec3){-1, -1, -1});
 
     // Format each line separately
     snprintf(name_buffer, sizeof(name_buffer), "%s", n.c_str());
     snprintf(stats_buffer, sizeof(stats_buffer), "Lvl %d HP %d/%d  Atk: %d  AC: %d", mylevel, myhp, mymaxhp, attack_bonus, ac);
-    snprintf(floor_buffer, sizeof(floor_buffer), "Floor %d  Turn %d  XP %d", floor, turn, myxp);
+    snprintf(floor_buffer, sizeof(floor_buffer), "Location: (%d, %d, %d) Turn %d  XP %d", loc.x, loc.y, floor, turn, myxp);
 
     // Calculate max width of all lines
     const int name_width = MeasureText(name_buffer, font_size);
