@@ -62,10 +62,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon_at(g, (vec3){3, 1, 0}, WEAPON_AXE);
     //create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
 
-    entityid orc1 = create_npc(g, RACE_ORC, (vec3){13, 9, 0}, "orc");
-    entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
-    add_to_inventory(g, orc1, orc1_weapon);
-    g->ct.set<equipped_weapon>(orc1, orc1_weapon);
+    //entityid orc1 = create_npc(g, RACE_ORC, (vec3){13, 9, 0}, "orc");
+    //entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
+    //add_to_inventory(g, orc1, orc1_weapon);
+    //g->ct.set<equipped_weapon>(orc1, orc1_weapon);
 
     //entityid orc2 = create_npc(g, RACE_ORC, (vec3){2, 3, 0}, "orc");
     //entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
