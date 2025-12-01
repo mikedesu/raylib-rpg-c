@@ -8,4 +8,9 @@
 - [ ] bat shield animation bugfix (CRASHING)
 - [ ] warg shield animation bugfix (CRASHING)
 
-- [ ] drawing order needs changing so that NPCs (warg etc) do not render behind door sprites when adjacent
+- [x] drawing order needs changing so that NPCs (warg etc) do not render behind door sprites when adjacent
+- [x] drawing order needs changing so that player target box renders beneath if player is a warg etc
+
+
+
+- [ ] Shader so that the target box glows

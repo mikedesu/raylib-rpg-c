@@ -1,7 +1,9 @@
 #include "ComponentTraits.h"
 #include "dungeon_tile_type.h"
+#include "entitytype.h"
 #include "get_txkey_for_tiletype.h"
 #include "libdraw_dungeon_floor.h"
+#include "libdraw_player_target_box.h"
 #include "libdraw_sprite.h"
 #include "textureinfo.h"
 
@@ -88,6 +90,8 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
         }
     }
 
+
+    // render doors
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             //draw_entities_2d_at(g, df, false, (vec3){x, y, z});
@@ -110,22 +114,87 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
             const int vision_dist = g->ct.get<vision_distance>(g->hero_id).value_or(0);
             const int light_rad = g->ct.get<light_radius>(g->hero_id).value_or(0);
             //const int light_dist = light_rad;
-            optional<vec3> maybe_hero_loc = g->ct.get<location>(g->hero_id);
+            auto maybe_hero_loc = g->ct.get<location>(g->hero_id);
             if (maybe_hero_loc.has_value()) {
                 vec3 hero_loc = maybe_hero_loc.value();
                 const int dist_to_check = std::max(vision_dist, light_rad);
                 // Calculate Manhattan distance from hero to this tile (diamond pattern)
                 const int dist = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
                 // Only draw entities within vision distance
-                //if (distance <= vision_dist && distance <= dist_to_check) {
-
                 // we might want to enforce a drawing order with the introduction of doors...
                 if (dist <= dist_to_check) {
                     for (size_t i = 0; i < tile->entities->size(); i++) {
                         const entityid id = tile_get_entity(tile, i);
+
+                        auto maybe_type = g->ct.get<entitytype>(id);
+                        if (!maybe_type.has_value()) {
+                            continue;
+                        }
+
+                        const auto type = maybe_type.value();
+
+                        if (type == ENTITY_DOOR) {
+                            draw_sprite_and_shadow(g, id);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    libdraw_draw_player_target_box(g);
+
+    // render NPCs
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            //draw_entities_2d_at(g, df, false, (vec3){x, y, z});
+            const vec3 loc = {x, y, z};
+            shared_ptr<tile_t> tile = df_tile_at(df, loc);
+            if (!tile || !tile->visible || tile_is_wall(tile->type) || tile->is_empty) {
+                continue;
+            }
+
+            // bugfix for tall walls so entities do not draw on top:
+            // check to see if the tile directly beneath this tile is a wall
+            const vec3 loc2 = {x, y + 1, z};
+            shared_ptr<tile_t> tile2 = df_tile_at(df, loc2);
+            //if (tile2 && tile_is_wall(tile2->type)) {
+            if (tile2 && tile2->type == TILE_STONE_WALL_00) {
+                continue;
+            }
+
+            // Get hero's vision distance and location
+            const int vision_dist = g->ct.get<vision_distance>(g->hero_id).value_or(0);
+            const int light_rad = g->ct.get<light_radius>(g->hero_id).value_or(0);
+            //const int light_dist = light_rad;
+            auto maybe_hero_loc = g->ct.get<location>(g->hero_id);
+            if (maybe_hero_loc.has_value()) {
+                vec3 hero_loc = maybe_hero_loc.value();
+                const int dist_to_check = std::max(vision_dist, light_rad);
+                // Calculate Manhattan distance from hero to this tile (diamond pattern)
+                const int dist = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
+                // Only draw entities within vision distance
+                // we might want to enforce a drawing order with the introduction of doors...
+                if (dist > dist_to_check) {
+                    continue;
+                }
+
+                //if (dist <= dist_to_check) {
+                for (size_t i = 0; i < tile->entities->size(); i++) {
+                    const entityid id = tile_get_entity(tile, i);
+
+                    auto maybe_type = g->ct.get<entitytype>(id);
+                    if (!maybe_type.has_value()) {
+                        continue;
+                    }
+
+                    const auto type = maybe_type.value();
+
+                    if (type != ENTITY_DOOR) {
                         draw_sprite_and_shadow(g, id);
                     }
                 }
+                //}
             }
         }
     }

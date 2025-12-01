@@ -23,6 +23,9 @@ unordered_map<entityid, spritegroup_t*> spritegroups;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 
+unordered_map<int, Shader> shaders;
+
+
 //Shader shader_grayscale = {0};
 //Shader shader_glow = {0};
 //Shader shader_red_glow = {0};

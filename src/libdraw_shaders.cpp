@@ -1,6 +1,17 @@
 #include "libdraw_shaders.h"
+#include <raylib.h>
+
+#include <unordered_map>
+
+using std::unordered_map;
+
+extern unordered_map<int, Shader> shaders;
+
 
 void load_shaders() {
+    shaders[1] = LoadShader(0, "shaders/desktop/green-glow.frag");
+
+
     //shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
     //shader_glow = LoadShader(0, "glow.frag");
     //shader_red_glow = LoadShader(0, "red-glow.frag");
@@ -11,6 +22,9 @@ void load_shaders() {
 
 
 void unload_shaders() {
+    UnloadShader(shaders[1]);
+
+
     //UnloadShader(shader_grayscale);
     //UnloadShader(shader_glow);
     //UnloadShader(shader_red_glow);

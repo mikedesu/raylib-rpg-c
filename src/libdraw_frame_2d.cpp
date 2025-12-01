@@ -7,7 +7,7 @@
 #include "libdraw_hud.h"
 #include "libdraw_message_box.h"
 #include "libdraw_message_history.h"
-#include "libdraw_player_target_box.h"
+//#include "libdraw_player_target_box.h"
 
 void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //BeginShaderMode(shader_color_noise);
@@ -19,7 +19,9 @@ void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     ClearBackground(BLACK);
     //EndShaderMode();
     libdraw_draw_dungeon_floor(g);
-    libdraw_draw_player_target_box(g);
+
+    //libdraw_draw_player_target_box(g);
+
     EndMode2D();
     //if (g->frame_dirty) {
     //draw_hud_to_texture(g);

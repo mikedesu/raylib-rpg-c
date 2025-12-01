@@ -1,13 +1,18 @@
 #include "libdraw_player_target_box.h"
 #include "libgame_defines.h"
+#include <raylib.h>
+
+
+extern unordered_map<int, Shader> shaders;
+
 
 bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     entityid id = g->hero_id;
-    if (id == -1) return false;
+    if (id == -1)
+        return false;
     direction_t dir = g->ct.get<direction>(id).value();
 
-    //vec3 loc = g_get_loc(g, id);
     vec3 loc = g->ct.get<location>(id).value();
 
     float x = loc.x + get_x_from_dir(dir);
@@ -19,6 +24,16 @@ bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     if (g->player_changing_dir) {
         a = 0.75f;
     }
+
+
+    float time = (float)GetTime();
+    SetShaderValue(shaders[1], GetShaderLocation(shaders[1], "time"), &time, SHADER_UNIFORM_FLOAT);
+
+    BeginShaderMode(shaders[1]);
+
     DrawRectangleLinesEx((Rectangle){x * w, y * h, w, h}, 1, Fade(GREEN, a));
+
+    EndShaderMode();
+
     return true;
 }
