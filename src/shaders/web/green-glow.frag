@@ -3,6 +3,7 @@ precision mediump float;
 varying mediump vec2 fragTexCoord;
 uniform sampler2D texture0;
 uniform mediump float time; // For pulsing effect
+uniform mediump float alpha; // 
 
 void main() {
     mediump vec4 color = texture2D(texture0, fragTexCoord);
@@ -11,5 +12,5 @@ void main() {
     // Pulse between 0.1 and 0.5
     float glowIntensity = 0.3 + 0.2 * sin(time * 2.0); 
     vec3 glowed = mix(color.rgb, glowColor, glowIntensity);
-    gl_FragColor = vec4(glowed, color.a);
+    gl_FragColor = vec4(glowed, alpha);
 }

@@ -9,8 +9,11 @@ extern unordered_map<int, Shader> shaders;
 
 
 void load_shaders() {
+#ifdef WEB
+    shaders[1] = LoadShader(0, "shaders/web/green-glow.frag");
+#else
     shaders[1] = LoadShader(0, "shaders/desktop/green-glow.frag");
-
+#endif
 
     //shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
     //shader_glow = LoadShader(0, "glow.frag");
@@ -23,7 +26,6 @@ void load_shaders() {
 
 void unload_shaders() {
     UnloadShader(shaders[1]);
-
 
     //UnloadShader(shader_grayscale);
     //UnloadShader(shader_glow);
