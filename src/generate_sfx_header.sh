@@ -1,8 +1,8 @@
 #!/usr/bin/zsh
 
 
-# lowercase all files in audio/sfx/*.mp3
-for file in audio/sfx/*.mp3; do
+# lowercase all files in audio/sfx/*.wav
+for file in audio/sfx/*.wav; do
     if [ -f "$file" ]; then
         lowercase_file=$(echo "$file" | tr '[:upper:]' '[:lower:]')
         if [ "$file" != "$lowercase_file" ]; then
@@ -11,7 +11,8 @@ for file in audio/sfx/*.mp3; do
     fi
 done
 
-
+# add all the filenames in audio/sfx/*.wav to sfx.txt
+# YOUR CODE HERE
 
 # generate the sfx.h
 FILENAME="sfx.h";
