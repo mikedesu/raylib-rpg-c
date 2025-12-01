@@ -2,7 +2,14 @@
 
 
 # lowercase all files in audio/sfx/*.mp3
-# YOUR CODE HERE
+for file in audio/sfx/*.mp3; do
+    if [ -f "$file" ]; then
+        lowercase_file=$(echo "$file" | tr '[:upper:]' '[:lower:]')
+        if [ "$file" != "$lowercase_file" ]; then
+            mv "$file" "$lowercase_file"
+        fi
+    fi
+done
 
 
 
