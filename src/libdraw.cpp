@@ -202,9 +202,10 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
 
 
 void libdraw_drawframe(shared_ptr<gamestate> g) {
-    //minfo("Begin draw frame");
+    minfo("Begin draw frame");
     double start_time = GetTime();
     libdraw_update_sprites_pre(g);
+
     BeginDrawing();
     ClearBackground(RED);
     //BeginShaderMode(shader_psychedelic_0);
@@ -212,7 +213,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
     if (g->frame_dirty) {
-        //minfo("handling dirty frame");
+        minfo("handling dirty frame");
         if (g->current_scene == SCENE_TITLE) {
             draw_title_screen_to_texture(g, false);
         } else if (g->current_scene == SCENE_MAIN_MENU) {
@@ -226,7 +227,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
         g->frame_updates++;
     }
     // draw to the target texture
-    //minfo("drawing frame to target texture");
+    minfo("drawing frame to target texture");
     BeginTextureMode(target);
     ClearBackground(BLUE);
     if (g->current_scene == SCENE_TITLE) {
@@ -249,7 +250,7 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
     libdraw_update_sprites_post(g);
-    //msuccess("End draw frame");
+    msuccess("End draw frame");
 }
 
 

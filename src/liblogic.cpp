@@ -1,5 +1,6 @@
 #include "ComponentTable.h"
 #include "ComponentTraits.h"
+#include "create_door.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
@@ -59,6 +60,8 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     create_weapon_at(g, (vec3){10, 9, 0}, WEAPON_DAGGER);
     create_shield_at(g, (vec3){11, 9, 0}, SHIELD_BUCKLER);
+
+    create_door_at(g, (vec3){12, 9, 0});
     //create_weapon_at(g, (vec3){3, 1, 0}, WEAPON_AXE);
     //create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
 

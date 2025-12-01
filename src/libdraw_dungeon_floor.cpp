@@ -118,6 +118,8 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
                 const int dist = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
                 // Only draw entities within vision distance
                 //if (distance <= vision_dist && distance <= dist_to_check) {
+
+                // we might want to enforce a drawing order with the introduction of doors...
                 if (dist <= dist_to_check) {
                     for (size_t i = 0; i < tile->entities->size(); i++) {
                         const entityid id = tile_get_entity(tile, i);

@@ -271,3 +271,10 @@ template <>
 struct ComponentTraits<destroyed> {
     using Type = bool;
 };
+
+
+struct door_open { }; //string
+template <>
+struct ComponentTraits<door_open> {
+    using Type = bool;
+};

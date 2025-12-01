@@ -12,6 +12,7 @@ CFLAGS ?= # Allow override
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
 gameloader_web.cpp \
+create_door.cpp \
 try_entity_stairs.cpp \
 manage_inventory.cpp \
 update_player_tiles_explored.cpp \
@@ -110,6 +111,7 @@ OBJ_FILES=main.o \
 gameloader.o \
 gamestate_inventory.o \
 gamestate.o \
+create_door.o \
 try_entity_stairs.o \
 manage_inventory.o \
 update_player_tiles_explored.o \
@@ -348,15 +350,11 @@ libdraw_camera_lock_on.o: libdraw_camera_lock_on.cpp
 libdraw_create_spritegroup.o: libdraw_create_spritegroup.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-
 libdraw.o: libdraw.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-###################
-
-
-
-###################
+create_door.o: create_door.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 try_entity_stairs.o: try_entity_stairs.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 

@@ -1,6 +1,7 @@
 #include "libdraw_create_sg_byid.h"
 #include "libdraw_create_spritegroup.h"
 #include "tx_keys_boxes.h"
+#include "tx_keys_doors.h"
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"
@@ -34,10 +35,20 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
         case RACE_GREEN_SLIME: create_spritegroup(g, id, TX_GREEN_SLIME_KEYS, TX_GREEN_SLIME_COUNT, -12, -12); break;
         default: merror("unknown race %d", r);
         }
-    } else if (type == ENTITY_WOODEN_BOX) {
+    }
+    // doors
+    else if (type == ENTITY_DOOR) {
+        minfo("type is door");
+        create_spritegroup(g, id, TX_WOODEN_DOOR_KEYS, TX_WOODEN_DOOR_COUNT, -12, -12);
+    }
+    // wooden box
+    else if (type == ENTITY_WOODEN_BOX) {
         minfo("type is wooden box");
         create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
-    } else if (type == ENTITY_ITEM) {
+    }
+
+    // items
+    else if (type == ENTITY_ITEM) {
         minfo("type is item");
         //itemtype item_type = g_get_item_type(g, id);
         itemtype_t item_type = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
