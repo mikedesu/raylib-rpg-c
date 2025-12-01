@@ -9,7 +9,8 @@
 spritegroup_t* spritegroup_create(int capacity) {
     //minfo("Creating spritegroup with capacity %d", capacity);
     massert(capacity > 0, "capacity must be greater than 0, got %d", capacity);
-    if (capacity <= 0) return NULL;
+    if (capacity <= 0)
+        return NULL;
     //minfo("Allocating memory for spritegroup...");
     spritegroup_t* sg = (spritegroup_t*)malloc(sizeof(spritegroup_t));
     massert(sg, "spritegroup is NULL");
@@ -61,10 +62,14 @@ void spritegroup_add(spritegroup_t* sg, shared_ptr<sprite> s) {
 void spritegroup_setcontexts(spritegroup_t* sg, int context) {
     massert(sg, "spritegroup is NULL");
     for (int i = 0; i < sg->size; i++) {
-        if (!sg->sprites2->at(i)) continue;
-        if (sg->sprites2->at(i)->numcontexts <= 0) continue;
-        if (context < 0) continue;
-        if (context >= sg->sprites2->at(i)->numcontexts) continue;
+        if (!sg->sprites2->at(i))
+            continue;
+        if (sg->sprites2->at(i)->numcontexts <= 0)
+            continue;
+        if (context < 0)
+            continue;
+        if (context >= sg->sprites2->at(i)->numcontexts)
+            continue;
         sprite_setcontext2(sg->sprites2->at(i), context);
     }
 }
@@ -88,15 +93,19 @@ shared_ptr<sprite> sg_get_current(spritegroup_t* sg) {
 shared_ptr<sprite> sg_get_current_plus_one(spritegroup_t* sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->current >= 0, "current is negative");
-    if (sg->current + 1 >= sg->size) return NULL;
+    if (sg->current + 1 >= sg->size)
+        return NULL;
     return sg->sprites2->at(sg->current + 1);
 }
 
 
 bool spritegroup_set_current(spritegroup_t* sg, int index) {
+    minfo("spritegroup set current");
+
     massert(sg, "spritegroup is NULL");
     massert(index >= 0, "index is negative: %d, %d", index, sg->size);
     massert(index < sg->size, "index is out of bounds for id %d: %d, %d", sg->id, index, sg->size);
+
     sg->current = index;
 
     // lets update the sprite's current frame to 0

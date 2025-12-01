@@ -460,6 +460,9 @@ void df_set_tile(shared_ptr<dungeon_floor_t> df, tiletype_t type, int x, int y) 
 }
 
 
+//void df_set_can_have_door(
+
+
 void df_free(shared_ptr<dungeon_floor_t> df) {
     massert(df, "dungeon floor is NULL");
 

@@ -59,7 +59,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 7, 0});
 
     create_weapon_at(g, (vec3){10, 9, 0}, WEAPON_DAGGER);
+    create_weapon_at(g, (vec3){10, 10, 0}, WEAPON_AXE);
+
     create_shield_at(g, (vec3){11, 9, 0}, SHIELD_BUCKLER);
+    create_weapon_at(g, (vec3){11, 10, 0}, WEAPON_SWORD);
 
     create_door_at(g, (vec3){12, 9, 0});
     create_door_at(g, (vec3){14, 12, 0});

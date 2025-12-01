@@ -4,13 +4,21 @@
 
 
 void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
+    minfo("set sg block success");
+
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
 
     const race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
     int anim_index = SG_ANIM_NPC_GUARD_SUCCESS;
-    if (r == RACE_GREEN_SLIME) anim_index = SG_ANIM_SLIME_IDLE;
+
+    if (r == RACE_GREEN_SLIME) {
+        anim_index = SG_ANIM_SLIME_IDLE;
+    } else if (r == RACE_WOLF) {
+        anim_index = SG_ANIM_WOLF_IDLE;
+    }
+
 
     spritegroup_set_current(sg, anim_index);
     update_shield_for_entity(g, id, sg);
@@ -24,7 +32,8 @@ void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid id, spritegroup
     massert(sg, "spritegroup is NULL");
     race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
     int anim_index = SG_ANIM_NPC_DMG;
-    if (r == RACE_GREEN_SLIME) anim_index = SG_ANIM_SLIME_DMG;
+    if (r == RACE_GREEN_SLIME)
+        anim_index = SG_ANIM_SLIME_DMG;
 
     spritegroup_set_current(sg, anim_index);
 }
@@ -35,8 +44,10 @@ void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, spritegroup_t*
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
 
-    if (!g->ct.get<dead>(id).has_value()) return;
-    if (!g->ct.get<dead>(id).value()) return;
+    if (!g->ct.get<dead>(id).has_value())
+        return;
+    if (!g->ct.get<dead>(id).value())
+        return;
 
     race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
     if (r == RACE_NONE) {

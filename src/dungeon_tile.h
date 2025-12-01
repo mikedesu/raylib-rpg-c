@@ -15,8 +15,10 @@
 using std::shared_ptr;
 using std::vector;
 
+
 // forward declaration for gamestate
 typedef struct gamestate gamestate;
+
 
 typedef struct {
     tile_id id;
@@ -29,16 +31,22 @@ typedef struct {
     bool is_empty;
     int cached_live_npcs;
 
+    bool can_have_door;
+
     shared_ptr<vector<entityid>> entities;
 
 } tile_t;
 
+
 shared_ptr<tile_t> tile_create(tiletype_t type);
+
 
 entityid tile_add(shared_ptr<tile_t> tile, entityid id);
 entityid tile_remove(shared_ptr<tile_t> tile, entityid id);
 
+
 size_t tile_live_npc_count_at(shared_ptr<gamestate> g, int x, int y, int z);
+
 
 void tile_init(shared_ptr<tile_t> t, tiletype_t type);
 void tile_free(shared_ptr<tile_t> t);
