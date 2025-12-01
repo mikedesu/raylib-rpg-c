@@ -1,3 +1,5 @@
+#include "ComponentTraits.h"
+#include "entitytype.h"
 #include "libdraw_set_sg.h"
 #include "libdraw_set_sg_is_attacking.h"
 #include "libdraw_update_sprite.h"
@@ -141,6 +143,23 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     if (g->ct.get<damaged>(id).value_or(false)) {
         libdraw_set_sg_is_damaged(g, id, sg);
     }
+
+
+    minfo("checking doors...");
+    const entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+    if (type == ENTITY_DOOR) {
+        auto maybe_door_open = g->ct.get<door_open>(id);
+        if (maybe_door_open.has_value()) {
+            bool is_open = maybe_door_open.value();
+            if (is_open) {
+                spritegroup_set_current(sg, 1);
+
+            } else {
+                spritegroup_set_current(sg, 0);
+            }
+        }
+    }
+
 
     // Update movement as long as sg->move.x/y is non-zero
     minfo("checking update dest...");
