@@ -9,6 +9,7 @@
 #include "liblogic_try_entity_move.h"
 #include "liblogic_try_entity_pickup.h"
 #include "sfx.h"
+#include "try_entity_open_door.h"
 #include "try_entity_stairs.h"
 #include <raylib.h>
 
@@ -202,11 +203,36 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
 
                 // handling go up/down stairs
                 else if (inputstate_is_pressed(is, KEY_PERIOD)) {
-                    //minfo("UNIMPLEMENTED");
-
                     // what happens when we go up or down stairs?
-
                     try_entity_stairs(g, g->hero_id);
+                }
+
+                else if (inputstate_is_pressed(is, KEY_O)) {
+                    vec3 loc = g->ct.get<location>(g->hero_id).value();
+                    direction_t dir = g->ct.get<direction>(g->hero_id).value();
+                    if (dir == DIR_UP) {
+                        loc.y -= 1;
+                    } else if (dir == DIR_DOWN) {
+                        loc.y += 1;
+                    } else if (dir == DIR_LEFT) {
+                        loc.x -= 1;
+                    } else if (dir == DIR_RIGHT) {
+                        loc.x += 1;
+                    } else if (dir == DIR_UP_LEFT) {
+                        loc.x -= 1;
+                        loc.y -= 1;
+                    } else if (dir == DIR_UP_RIGHT) {
+                        loc.x += 1;
+                        loc.y -= 1;
+                    } else if (dir == DIR_DOWN_LEFT) {
+                        loc.x -= 1;
+                        loc.y += 1;
+                    } else if (dir == DIR_DOWN_RIGHT) {
+                        loc.x += 1;
+                        loc.y += 1;
+                    }
+                    try_entity_open_door(g, g->hero_id, loc);
+                    g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 }
 
 

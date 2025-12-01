@@ -1,34 +1,15 @@
 #include "ComponentTraits.h"
 #include "entityid.h"
-#include "entitytype.h"
+//#include "entitytype.h"
 #include "libgame_defines.h"
 #include "liblogic_try_entity_move.h"
 #include "massert.h"
 #include "sfx.h"
+#include "tile_has_door.h"
 
 entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z);
 
 int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
-
-
-entityid tile_has_door(shared_ptr<gamestate> g, vec3 v) {
-    massert(g, "Game state is NULL!");
-
-    minfo("tile_has_door: %d %d %d", v.x, v.y, v.z);
-
-    auto df = d_get_current_floor(g->dungeon);
-    auto t = df_tile_at(df, v);
-
-    for (size_t i = 0; i < t->entities->size(); i++) {
-        const entityid id = t->entities->at(i);
-        const entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        if (type == ENTITY_DOOR) {
-            return id;
-        }
-    }
-
-    return ENTITYID_INVALID;
-}
 
 
 bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
@@ -94,9 +75,17 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
             return false;
         }
 
-        if (tile_has_door(g, aloc) != ENTITYID_INVALID) {
-            merror("Tile has door");
-            return false;
+        const entityid maybe_door = tile_has_door(g, aloc);
+        if (maybe_door != ENTITYID_INVALID) {
+            minfo("Tile has door");
+            optional<bool> maybe_is_open = g->ct.get<door_open>(maybe_door);
+            if (maybe_is_open.has_value()) {
+                bool is_open = maybe_is_open.value();
+                if (!is_open) {
+                    merror("door closed");
+                    return false;
+                }
+            }
         }
 
 
