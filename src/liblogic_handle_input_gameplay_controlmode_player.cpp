@@ -1,3 +1,4 @@
+#include "get_loc_facing_player.h"
 #include "inputstate.h"
 #include "libgame_defines.h"
 #include "liblogic_add_message.h"
@@ -157,29 +158,8 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
                 } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
                     if (!player_is_dead) {
                         if (g->ct.get<location>(g->hero_id).has_value() && g->ct.get<direction>(g->hero_id).has_value()) {
-                            vec3 loc = g->ct.get<location>(g->hero_id).value();
-                            direction_t dir = g->ct.get<direction>(g->hero_id).value();
-                            if (dir == DIR_UP) {
-                                loc.y -= 1;
-                            } else if (dir == DIR_DOWN) {
-                                loc.y += 1;
-                            } else if (dir == DIR_LEFT) {
-                                loc.x -= 1;
-                            } else if (dir == DIR_RIGHT) {
-                                loc.x += 1;
-                            } else if (dir == DIR_UP_LEFT) {
-                                loc.x -= 1;
-                                loc.y -= 1;
-                            } else if (dir == DIR_UP_RIGHT) {
-                                loc.x += 1;
-                                loc.y -= 1;
-                            } else if (dir == DIR_DOWN_LEFT) {
-                                loc.x -= 1;
-                                loc.y += 1;
-                            } else if (dir == DIR_DOWN_RIGHT) {
-                                loc.x += 1;
-                                loc.y += 1;
-                            }
+                            //vec3 loc = g->ct.get<location>(g->hero_id).value();
+                            vec3 loc = get_loc_facing_player(g);
 
                             try_entity_attack(g, g->hero_id, loc.x, loc.y);
 
@@ -208,29 +188,8 @@ void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_pt
                 }
 
                 else if (inputstate_is_pressed(is, KEY_O)) {
-                    vec3 loc = g->ct.get<location>(g->hero_id).value();
-                    direction_t dir = g->ct.get<direction>(g->hero_id).value();
-                    if (dir == DIR_UP) {
-                        loc.y -= 1;
-                    } else if (dir == DIR_DOWN) {
-                        loc.y += 1;
-                    } else if (dir == DIR_LEFT) {
-                        loc.x -= 1;
-                    } else if (dir == DIR_RIGHT) {
-                        loc.x += 1;
-                    } else if (dir == DIR_UP_LEFT) {
-                        loc.x -= 1;
-                        loc.y -= 1;
-                    } else if (dir == DIR_UP_RIGHT) {
-                        loc.x += 1;
-                        loc.y -= 1;
-                    } else if (dir == DIR_DOWN_LEFT) {
-                        loc.x -= 1;
-                        loc.y += 1;
-                    } else if (dir == DIR_DOWN_RIGHT) {
-                        loc.x += 1;
-                        loc.y += 1;
-                    }
+                    vec3 loc = get_loc_facing_player(g);
+
                     try_entity_open_door(g, g->hero_id, loc);
                     g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 }

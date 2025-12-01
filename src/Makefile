@@ -198,6 +198,7 @@ liblogic.o \
 
 
 game: $(OBJ_FILES)
+	./generate_sfx_header.sh
 	$(CXX) $(WFLAGS) $(CFLAGS) $^ -L. $(RAYLIB_LIBS)   -o $@ 
 	./log_build_stats.sh
 

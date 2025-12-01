@@ -1,6 +1,7 @@
 bag_close.wav
 bag_full.wav
 bag_open.wav
+chest_open.wav
 coins.wav
 confirm_01.wav
 discard_item.wav

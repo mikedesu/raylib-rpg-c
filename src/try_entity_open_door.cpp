@@ -2,6 +2,7 @@
 #include "dungeon.h"
 #include "entitytype.h"
 #include "liblogic_add_message.h"
+#include "sfx.h"
 #include "tile_has_door.h"
 #include "try_entity_open_door.h"
 
@@ -18,9 +19,10 @@ bool try_entity_open_door(shared_ptr<gamestate> g, entityid id, vec3 loc) {
             const entityid myid = t->entities->at(i);
             const entitytype_t type = g->ct.get<entitytype>(myid).value_or(ENTITY_NONE);
             if (type == ENTITY_DOOR) {
-                optional<bool> maybe_is_open = g->ct.get<door_open>(myid);
+                auto maybe_is_open = g->ct.get<door_open>(myid);
+
                 if (maybe_is_open.has_value()) {
-                    bool is_open = maybe_is_open.value();
+                    const bool is_open = maybe_is_open.value();
                     if (is_open) {
                         g->ct.set<door_open>(myid, false);
 
@@ -35,6 +37,9 @@ bool try_entity_open_door(shared_ptr<gamestate> g, entityid id, vec3 loc) {
                             add_message(g, "You opened a door");
                         }
                     }
+
+                    PlaySound(g->sfx->at(SFX_CHEST_OPEN));
+                    return true;
                 }
             }
         }
