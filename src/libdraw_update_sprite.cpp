@@ -6,7 +6,7 @@
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
 void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
-    //minfo("Begin update sprite pre: %d", id);
+    minfo("Begin update sprite pre: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
 
@@ -15,10 +15,10 @@ void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
         return;
     }
 
-    //minfo("Grabbing spritegroup...");
+    minfo("Grabbing spritegroup...");
     spritegroup_t* sg = spritegroups[id];
     if (sg) {
-        //minfo("Updating spritegroup...");
+        minfo("Updating spritegroup...");
         libdraw_update_sprite_ptr(g, id, sg);
     }
     //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
@@ -28,40 +28,44 @@ void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     //        libdraw_update_sprite_ptr(g, id, sg);
     //    }
     //}
-    //minfo("End update sprite pre: %d", id);
+    msuccess("End update sprite pre: %d", id);
 }
 
 
 void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
+    minfo("update sprite position");
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
 
-    //Rectangle sprite_move = g_get_sprite_move(g, id);
-    Rectangle sprite_move = g->ct.get<spritemove>(id).value();
-    if (sprite_move.x != 0 || sprite_move.y != 0) {
-        sg->move.x = sprite_move.x;
-        sg->move.y = sprite_move.y;
-        //g_update_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
+    optional<Rectangle> maybe_sprite_move = g->ct.get<spritemove>(id);
+    if (maybe_sprite_move.has_value()) {
+        Rectangle sprite_move = g->ct.get<spritemove>(id).value();
 
-        g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
-        //entitytype_t type = g_get_type(g, id);
-        entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        massert(type != ENTITY_NONE, "entity type is none");
+        if (sprite_move.x != 0 || sprite_move.y != 0) {
+            sg->move.x = sprite_move.x;
+            sg->move.y = sprite_move.y;
+            //g_update_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
 
-        if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-            //race_t race = g_get_race(g, id);
-            //sg->current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
-            //if (loc == RACE_BAT)
-            //    sg->current = SG_ANIM_BAT_IDLE;
-            //else if (race == RACE_GREEN_SLIME)
-            //    sg->current = SG_ANIM_SLIME_IDLE;
-            //else if (race > RACE_NONE && race < RACE_COUNT)
-            //    sg->current = SG_ANIM_NPC_WALK;
-            //else
-            sg->current = SG_ANIM_NPC_WALK;
+            g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+            //entitytype_t type = g_get_type(g, id);
+            entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            massert(type != ENTITY_NONE, "entity type is none");
+
+            if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
+                //race_t race = g_get_race(g, id);
+                //sg->current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
+                //if (loc == RACE_BAT)
+                //    sg->current = SG_ANIM_BAT_IDLE;
+                //else if (race == RACE_GREEN_SLIME)
+                //    sg->current = SG_ANIM_SLIME_IDLE;
+                //else if (race > RACE_NONE && race < RACE_COUNT)
+                //    sg->current = SG_ANIM_NPC_WALK;
+                //else
+                sg->current = SG_ANIM_NPC_WALK;
+            }
+            g->frame_dirty = true;
         }
-        g->frame_dirty = true;
     }
 }
 
@@ -101,13 +105,10 @@ void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* g
 
 
 void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    //minfo("Begin update sprite ptr: %d", id);
+    minfo("Begin update sprite ptr: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
-    //if (g_is_dead(g, id) && !spritegroup_is_animating(sg)) return;
-    //if (g_get_update(g, id)) {
-
 
     if (g->ct.get<update>(id).value_or(false)) {
         if (g->ct.has<direction>(id)) {
@@ -116,26 +117,33 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
         }
         g->ct.set<update>(id, false);
     }
+
     // Copy movement intent from sprite_move_x/y if present
+    minfo("updating sprite position");
     libdraw_update_sprite_position(g, id, sg);
 
+    minfo("checking sprite block success...");
     if (g->ct.get<block_success>(id).value_or(false)) {
         libdraw_set_sg_block_success(g, id, sg);
     }
 
+    minfo("checking sprite attacking...");
     if (g->ct.get<attacking>(id).value_or(false)) {
         libdraw_set_sg_is_attacking(g, id, sg);
     }
 
+    minfo("checking sprite dead...");
     if (g->ct.get<dead>(id).value_or(false)) {
         libdraw_set_sg_is_dead(g, id, sg);
     }
 
+    minfo("checking sprite damaged...");
     if (g->ct.get<damaged>(id).value_or(false)) {
         libdraw_set_sg_is_damaged(g, id, sg);
     }
 
     // Update movement as long as sg->move.x/y is non-zero
+    minfo("checking update dest...");
     if (spritegroup_update_dest(sg)) {
         g->frame_dirty = true;
     }
@@ -144,11 +152,12 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     //massert(g->ct.has<Location>(id), "id %d lacks location component", id);
 
 
+    minfo("checking sprite loc...");
     optional<vec3> maybe_loc = g->ct.get<location>(id);
     if (maybe_loc.has_value()) {
         vec3 loc = maybe_loc.value();
         spritegroup_snap_dest(sg, loc.x, loc.y);
     }
 
-    //minfo("End update sprite ptr: %d", id);
+    msuccess("End update sprite ptr: %d", id);
 }

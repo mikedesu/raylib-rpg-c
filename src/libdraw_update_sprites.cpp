@@ -31,12 +31,14 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
         }
 
 
+        minfo("Begin handling dirty entities");
         libdraw_handle_dirty_entities(g);
+        minfo("End handling dirty entities");
         minfo("Begin update sprites pre loop");
         for (entityid id = 0; id < g->next_entityid; id++) {
             libdraw_update_sprite_pre(g, id);
         }
-        minfo("End update sprites pre loop");
+        msuccess("End update sprites pre loop");
     }
     msuccess("END update sprites pre");
 }
