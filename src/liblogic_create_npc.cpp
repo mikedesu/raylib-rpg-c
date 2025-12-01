@@ -43,6 +43,9 @@ entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n
     g->ct.set<equipped_weapon>(id, ENTITYID_INVALID);
     g->ct.set<aggro>(id, false);
 
+    g->ct.set<vision_distance>(id, 3);
+    g->ct.set<hearing_distance>(id, 3);
+
     // here we have some hard decisions to make about how to template-out NPC creation
     // all NPCs begin at level 1. level-up mechanisms will be determined elsewhere
     g->ct.set<level>(id, 1);

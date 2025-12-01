@@ -26,16 +26,16 @@ bool try_entity_open_door(shared_ptr<gamestate> g, entityid id, vec3 loc) {
                     if (is_open) {
                         g->ct.set<door_open>(myid, false);
 
-                        if (id == g->hero_id) {
-                            add_message(g, "You closed a door");
-                        }
+                        //if (id == g->hero_id) {
+                        //    add_message(g, "You closed a door");
+                        //}
 
                     } else {
                         g->ct.set<door_open>(myid, true);
 
-                        if (id == g->hero_id) {
-                            add_message(g, "You opened a door");
-                        }
+                        //if (id == g->hero_id) {
+                        //    add_message(g, "You opened a door");
+                        //}
                     }
 
                     PlaySound(g->sfx->at(SFX_CHEST_OPEN));

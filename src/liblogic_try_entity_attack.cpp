@@ -158,7 +158,7 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
     massert(atk_successful, "attack_successful is NULL");
 
-    const entitytype_t atktype = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
+    //const entitytype_t atktype = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
     const entitytype_t tgttype = g->ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
 
     if (*atk_successful) {
@@ -180,15 +180,15 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             }
             tgt_hp -= dmg;
             g->ct.set<hp>(tgt_id, tgt_hp);
-            if (tgttype == ENTITY_PLAYER) {
-                add_message(g, "%s attacked you for %d damage!", g->ct.get<name>(atk_id).value_or("no-name").c_str(), dmg);
-            } else if (atktype == ENTITY_PLAYER && tgttype == ENTITY_NPC) {
-                add_message(g,
-                            "%s attacked %s for %d damage!",
-                            g->ct.get<name>(atk_id).value_or("no-name").c_str(),
-                            g->ct.get<name>(tgt_id).value_or("no-name").c_str(),
-                            dmg);
-            }
+            //if (tgttype == ENTITY_PLAYER) {
+            //add_message(g, "%s attacked you for %d damage!", g->ct.get<name>(atk_id).value_or("no-name").c_str(), dmg);
+            //} else if (atktype == ENTITY_PLAYER && tgttype == ENTITY_NPC) {
+            //add_message(g,
+            //            "%s attacked %s for %d damage!",
+            //            g->ct.get<name>(atk_id).value_or("no-name").c_str(),
+            //            g->ct.get<name>(tgt_id).value_or("no-name").c_str(),
+            //            dmg);
+            //}
 
             // get the equipped weapon of the attacker
             entityid wpn_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);

@@ -278,3 +278,10 @@ template <>
 struct ComponentTraits<door_open> {
     using Type = bool;
 };
+
+
+struct hearing_distance { }; //string
+template <>
+struct ComponentTraits<hearing_distance> {
+    using Type = int;
+};

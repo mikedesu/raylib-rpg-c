@@ -8,7 +8,7 @@
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
 void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
-    minfo("Begin update sprite pre: %d", id);
+    minfo2("Begin update sprite pre: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
 
@@ -17,10 +17,10 @@ void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
         return;
     }
 
-    minfo("Grabbing spritegroup...");
+    minfo2("Grabbing spritegroup...");
     spritegroup_t* sg = spritegroups[id];
     if (sg) {
-        minfo("Updating spritegroup...");
+        minfo2("Updating spritegroup...");
         libdraw_update_sprite_ptr(g, id, sg);
     }
     //int num_spritegroups = ht_entityid_sg_get_num_entries_for_key(spritegroups, id);
@@ -30,12 +30,12 @@ void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     //        libdraw_update_sprite_ptr(g, id, sg);
     //    }
     //}
-    msuccess("End update sprite pre: %d", id);
+    msuccess2("End update sprite pre: %d", id);
 }
 
 
 void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    minfo("update sprite position");
+    minfo2("update sprite position");
     massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -107,7 +107,7 @@ void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* g
 
 
 void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    minfo("Begin update sprite ptr: %d", id);
+    minfo2("Begin update sprite ptr: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
@@ -121,31 +121,31 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     }
 
     // Copy movement intent from sprite_move_x/y if present
-    minfo("updating sprite position");
+    minfo2("updating sprite position");
     libdraw_update_sprite_position(g, id, sg);
 
-    minfo("checking sprite block success...");
+    minfo2("checking sprite block success...");
     if (g->ct.get<block_success>(id).value_or(false)) {
         libdraw_set_sg_block_success(g, id, sg);
     }
 
-    minfo("checking sprite attacking...");
+    minfo2("checking sprite attacking...");
     if (g->ct.get<attacking>(id).value_or(false)) {
         libdraw_set_sg_is_attacking(g, id, sg);
     }
 
-    minfo("checking sprite dead...");
+    minfo2("checking sprite dead...");
     if (g->ct.get<dead>(id).value_or(false)) {
         libdraw_set_sg_is_dead(g, id, sg);
     }
 
-    minfo("checking sprite damaged...");
+    minfo2("checking sprite damaged...");
     if (g->ct.get<damaged>(id).value_or(false)) {
         libdraw_set_sg_is_damaged(g, id, sg);
     }
 
 
-    minfo("checking doors...");
+    minfo2("checking doors...");
     const entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
     if (type == ENTITY_DOOR) {
         auto maybe_door_open = g->ct.get<door_open>(id);
@@ -162,7 +162,7 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
 
 
     // Update movement as long as sg->move.x/y is non-zero
-    minfo("checking update dest...");
+    minfo2("checking update dest...");
     if (spritegroup_update_dest(sg)) {
         g->frame_dirty = true;
     }
@@ -171,12 +171,12 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     //massert(g->ct.has<Location>(id), "id %d lacks location component", id);
 
 
-    minfo("checking sprite loc...");
+    minfo2("checking sprite loc...");
     optional<vec3> maybe_loc = g->ct.get<location>(id);
     if (maybe_loc.has_value()) {
         vec3 loc = maybe_loc.value();
         spritegroup_snap_dest(sg, loc.x, loc.y);
     }
 
-    msuccess("End update sprite ptr: %d", id);
+    msuccess2("End update sprite ptr: %d", id);
 }
