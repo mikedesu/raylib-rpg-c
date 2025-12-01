@@ -12,7 +12,8 @@ for file in audio/sfx/*.wav; do
 done
 
 # add all the filenames in audio/sfx/*.wav to sfx.txt
-# YOUR CODE HERE
+basename -a audio/sfx/*.wav > sfx.txt
+sort -u sfx.txt -o sfx.txt
 
 # generate the sfx.h
 FILENAME="sfx.h";
