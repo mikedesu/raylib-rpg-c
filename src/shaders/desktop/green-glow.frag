@@ -4,6 +4,7 @@ in vec2 fragTexCoord;
 out vec4 finalColor;
 uniform sampler2D texture0;
 uniform float time; // For pulsing effect
+uniform float alpha; // 
 
 void main() {
     vec4 color = texture2D(texture0, fragTexCoord);
@@ -12,5 +13,6 @@ void main() {
     // Pulse between 0.1 and 0.5
     float glowIntensity = 0.3 + 0.2 * sin(time * 2.0); 
     vec3 glowed = mix(color.rgb, glowColor, glowIntensity);
-    finalColor = vec4(glowed, color.a);
+    //finalColor = vec4(glowed, color.a);
+    finalColor = vec4(glowed, alpha);
 }

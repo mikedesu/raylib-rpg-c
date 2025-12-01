@@ -11,6 +11,7 @@
 - [x] drawing order needs changing so that NPCs (warg etc) do not render behind door sprites when adjacent
 - [x] drawing order needs changing so that player target box renders beneath if player is a warg etc
 
-
+- [ ] when handling light radius and visibility distance, we need to check line-of-sight so we don't render
+things that might be behind doors, walls, etc.
 
 - [ ] Shader so that the target box glows

@@ -20,14 +20,15 @@ bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     float w = DEFAULT_TILE_SIZE;
     float h = DEFAULT_TILE_SIZE;
     //Color base_c = GREEN;
-    float a = 0.5f;
+    float a = 0.75f;
     if (g->player_changing_dir) {
-        a = 0.75f;
+        a = 0.9f;
     }
 
 
     float time = (float)GetTime();
     SetShaderValue(shaders[1], GetShaderLocation(shaders[1], "time"), &time, SHADER_UNIFORM_FLOAT);
+    SetShaderValue(shaders[1], GetShaderLocation(shaders[1], "alpha"), &a, SHADER_UNIFORM_FLOAT);
 
     BeginShaderMode(shaders[1]);
 
