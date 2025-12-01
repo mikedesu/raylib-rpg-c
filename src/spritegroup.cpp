@@ -100,7 +100,7 @@ shared_ptr<sprite> sg_get_current_plus_one(spritegroup_t* sg) {
 
 
 bool spritegroup_set_current(spritegroup_t* sg, int index) {
-    minfo("spritegroup set current");
+    minfo2("spritegroup set current");
 
     massert(sg, "spritegroup is NULL");
     massert(index >= 0, "index is negative: %d, %d", index, sg->size);
