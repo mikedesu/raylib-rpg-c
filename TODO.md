@@ -14,4 +14,6 @@
 - [ ] when handling light radius and visibility distance, we need to check line-of-sight so we don't render
 things that might be behind doors, walls, etc.
 
-- [ ] Shader so that the target box glows
+- [x] Shader so that the target box glows
+
+- [ ] fix web shaders
