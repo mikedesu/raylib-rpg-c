@@ -66,11 +66,11 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     create_door_at(g, (vec3){12, 9, 0});
     create_door_at(g, (vec3){14, 12, 0});
-
     create_door_at(g, (vec3){12, 9, 1});
     //create_weapon_at(g, (vec3){3, 1, 0}, WEAPON_AXE);
     //create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
 
+#ifdef SPAWN_MONSTERS
     entityid orc1 = create_npc(g, RACE_ORC, (vec3){13, 9, 0}, "orc");
     entityid orc1_weapon = create_weapon(g, WEAPON_AXE);
     add_to_inventory(g, orc1, orc1_weapon);
@@ -85,11 +85,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     entityid orc3_weapon = create_weapon(g, WEAPON_AXE);
     add_to_inventory(g, orc3, orc3_weapon);
     g->ct.set<equipped_weapon>(orc3, orc3_weapon);
-
-    //entityid orc4 = create_npc(g, RACE_ORC, (vec3){1, 4, 0}, "orc");
-    //entityid orc4_weapon = create_weapon(g, WEAPON_AXE);
-    //add_to_inventory(g, orc4, orc4_weapon);
-    //g->ct.set<equipped_weapon>(orc4, orc4_weapon);
+#endif
 
     //entityid orc5 = create_npc(g, RACE_ORC, (vec3){2, 4, 0}, "orc");
     //entityid orc5_weapon = create_weapon(g, WEAPON_AXE);

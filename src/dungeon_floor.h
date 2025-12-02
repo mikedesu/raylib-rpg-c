@@ -35,18 +35,12 @@ typedef struct {
 
 shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int width, int height);
 
-//void df_set_tile_area_range(shared_ptr<dungeon_floor_t> const df, int x, int y, int w, int h, tiletype_t begin, tiletype_t end);
 void df_free(shared_ptr<dungeon_floor_t> df);
 void df_set_tile(shared_ptr<dungeon_floor_t> const df, tiletype_t type, int x, int y);
-
-//bool df_add_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y);
 entityid df_add_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y);
-
 bool df_remove_at(shared_ptr<dungeon_floor_t> const df, entityid id, int x, int y);
 
-//bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
-//bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, int x, int y, int w, int h);
 bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
 
 vec3 df_get_upstairs(shared_ptr<dungeon_floor_t> const df);
@@ -71,12 +65,12 @@ static inline shared_ptr<tile_t> df_tile_at(shared_ptr<dungeon_floor_t> df, vec3
     // given that tiles is a 2D vector of shared pointers to tile_t
     // we can access the tile using the x and y coordinates
     // and calculate the index
-    size_t index = loc.y * df->width + loc.x;
+    const size_t index = loc.y * df->width + loc.x;
     if (index < 0 || index >= df->tiles->size()) {
         //merror("Index out of bounds: %ld", index);
         return NULL;
     }
-    tile_id id = df->tiles->at(index);
+    const tile_id id = df->tiles->at(index);
     // Check if the tile_id exists in the map
     auto it = df->tile_map->find(id);
     if (it != df->tile_map->end())
@@ -93,7 +87,7 @@ static inline tiletype_t df_type_at(shared_ptr<dungeon_floor_t> df, int x, int y
         //merror("x or y out of bounds");
         return TILE_NONE;
     }
-    tile_id id = df->tiles->at(y * df->width + x);
+    const tile_id id = df->tiles->at(y * df->width + x);
     auto it = df->tile_map->find(id);
     if (it != df->tile_map->end()) {
         return it->second->type; // Return the tile type
@@ -106,7 +100,7 @@ static inline tiletype_t df_type_at(shared_ptr<dungeon_floor_t> df, int x, int y
 
 static inline bool df_tile_is_wall(shared_ptr<dungeon_floor_t> df, int x, int y) {
     //massert(df, "dungeon floor is NULL");
-    tiletype_t type = df_type_at(df, x, y);
+    const tiletype_t type = df_type_at(df, x, y);
     if (type == TILE_NONE || type == TILE_COUNT) {
         //merror("Tile type is invalid at (%d, %d)", x, y);
         return false;

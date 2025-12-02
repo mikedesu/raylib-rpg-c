@@ -1,4 +1,6 @@
+#include "entitytype.h"
 #include "gamestate_flag.h"
+#include "item.h"
 #include "libdraw_handle_dirty_entities.h"
 #include "libdraw_handle_gamestate_flag.h"
 #include "libdraw_update_sprite.h"
@@ -15,10 +17,6 @@ void libdraw_update_sprites_pre(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
 
     UpdateMusicStream(music);
-    //if (g->music_volume_changed) {
-    //    SetMusicVolume(music, g->music_volume);
-    //    g->music_volume_changed = false;
-    //}
 
     if (g->current_scene == SCENE_GAMEPLAY) {
         if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT || g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
@@ -65,67 +63,78 @@ void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
         // For every entity...
         for (entityid id = 0; id < g->next_entityid; id++) {
             // verify it has an entity type
-            entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            const entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
             //spritegroup_t* const sg = hashtable_entityid_spritegroup_get_by_index(spritegroups, id, i);
 
             // grab the sprite group for that entity
             spritegroup_t* sg = spritegroups[id];
-            if (sg) {
-                //int num_sprites = sg->sprites2->size();
-                //for (int i = 0; i < num_sprites; i++) {
-                //shared_ptr<sprite> s = sg->sprites2->at(i);
-                shared_ptr<sprite> s = sg->sprites2->at(sg->current);
-                if (s) {
-                    sprite_incrframe2(s);
-                    g->frame_dirty = true;
-                    // this condition for the animation reset seems incorrect
-                    // certain cases are causing animations to drop-off mid-sequence
-                    if (s->num_loops >= 1) {
-                        sg->current = sg->default_anim;
-                        s->num_loops = 0;
-                    }
-
-                    // lets try something
-                    if (type == ENTITY_ITEM) {
-                        itemtype_t itype = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
-                        if (itype == ITEM_WEAPON) {
-                            // if the current is > 0, this implies it is equipped
-                            // or being displayed in a non-tile context
-                            if (sg->current > 0) {
-                                shared_ptr<sprite> s2 = sg->sprites2->at(sg->current + 1);
-                                if (s2) {
-                                    sprite_incrframe2(s2);
-                                    g->frame_dirty = true;
-                                    if (s2->num_loops >= 1) {
-                                        sg->current = sg->default_anim;
-                                        s2->num_loops = 0;
-                                    }
-                                }
-                            }
-                        } else if (itype == ITEM_SHIELD) {
-                            // if the current is > 0, this implies it is equipped
-                            // or being displayed in a non-tile context
-                            //minfo("handling shield update");
-
-                            if (sg->current > 0) {
-                                minfo("shield appears to be equipped...");
-                                shared_ptr<sprite> s2 = sg->sprites2->at(sg->current + 1);
-                                if (s2) {
-                                    sprite_incrframe2(s2);
-                                    g->frame_dirty = true;
-                                    if (s2->num_loops >= 1) {
-                                        sg->current = sg->default_anim;
-                                        s2->num_loops = 0;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-                //}
+            if (!sg) {
+                continue;
             }
+
+            //int num_sprites = sg->sprites2->size();
+            //for (int i = 0; i < num_sprites; i++) {
+            //shared_ptr<sprite> s = sg->sprites2->at(i);
+            shared_ptr<sprite> s = sg->sprites2->at(sg->current);
+            if (!s) {
+                continue;
+            }
+
+            sprite_incrframe2(s);
+            //g->frame_dirty = true;
+            // this condition for the animation reset seems incorrect
+            // certain cases are causing animations to drop-off mid-sequence
+            if (s->num_loops >= 1) {
+                sg->current = sg->default_anim;
+                s->num_loops = 0;
+            }
+
+            // lets try something
+            if (type == ENTITY_ITEM) {
+                const itemtype_t itype = g->ct.get<itemtype>(id).value_or(ITEM_NONE);
+                switch (itype) {
+                case ITEM_WEAPON: {
+                    // if the current is > 0, this implies it is equipped
+                    // or being displayed in a non-tile context
+                    if (sg->current == 0) {
+                        break;
+                    }
+                    shared_ptr<sprite> s2 = sg->sprites2->at(sg->current + 1);
+                    if (!s2) {
+                        break;
+                    }
+                    sprite_incrframe2(s2);
+                    g->frame_dirty = true;
+                    if (s2->num_loops >= 1) {
+                        sg->current = sg->default_anim;
+                        s2->num_loops = 0;
+                    }
+                } break;
+                case ITEM_SHIELD: {
+                    if (sg->current == 0) {
+                        break;
+                    }
+                    //                  if (sg->current > 0) {
+                    minfo("shield appears to be equipped...");
+                    shared_ptr<sprite> s2 = sg->sprites2->at(sg->current + 1);
+                    if (!s2) {
+                        break;
+                    }
+                    //if (s2) {
+                    sprite_incrframe2(s2);
+                    g->frame_dirty = true;
+                    if (s2->num_loops >= 1) {
+                        sg->current = sg->default_anim;
+                        s2->num_loops = 0;
+                    }
+                    //}
+                    //}
+                } break;
+                default: break;
+                }
+            }
+
+
             //}
             //if (s_shadow) {
             //    sprite_incrframe(s_shadow);
