@@ -140,14 +140,17 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
                         // Add primary point
                         path.push_back({x1, y1, z});
 
-                        // Add adjacent points for thickness
-                        // Horizontal/vertical lines get perpendicular adjacents
-                        if (dx > dy) {
-                            path.push_back({x1, y1 + 1, z});
-                            path.push_back({x1, y1 - 1, z});
-                        } else {
-                            path.push_back({x1 + 1, y1, z});
-                            path.push_back({x1 - 1, y1, z});
+                        // Add adjacent points for thickness only when we're not at start/end
+                        // and only when we're moving diagonally
+                        if (x1 != x2 && y1 != y2 && x1 != loc.x && y1 != loc.y) {
+                            // Add perpendicular points for diagonal movement
+                            if (dx > dy) {
+                                path.push_back({x1, y1 + sy, z});
+                                path.push_back({x1, y1 - sy, z});
+                            } else {
+                                path.push_back({x1 + sx, y1, z});
+                                path.push_back({x1 - sx, y1, z});
+                            }
                         }
                     }
 
