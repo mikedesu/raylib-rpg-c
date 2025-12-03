@@ -13,6 +13,64 @@
 using std::sort;
 
 
+static vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
+    vector<vec3> path;
+    int x1 = start.x, y1 = start.y;
+    int x2 = end.x, y2 = end.y;
+    int z = start.z;
+    
+    int dx = abs(x2 - x1);
+    int dy = abs(y2 - y1);
+    int sx = (x1 < x2) ? 1 : -1;
+    int sy = (y1 < y2) ? 1 : -1;
+    int err = dx - dy;
+    
+    while (true) {
+        // Skip the start point (we don't need to check visibility with self)
+        if (x1 != start.x || y1 != start.y) {
+            // Add primary point
+            path.push_back({x1, y1, z});
+
+            // Add adjacent points for thickness only when we're not at start/end
+            // and only when we're moving diagonally
+            if (x1 != x2 && y1 != y2 && x1 != start.x && y1 != start.y) {
+                // Add perpendicular points for diagonal movement
+                if (dx > dy) {
+                    path.push_back({x1, y1 + sy, z});
+                    path.push_back({x1, y1 - sy, z});
+                } else {
+                    path.push_back({x1 + sx, y1, z});
+                    path.push_back({x1 - sx, y1, z});
+                }
+            }
+        }
+
+        // Break if we've reached the end location
+        if (x1 == x2 && y1 == y2) break;
+        
+        int e2 = 2 * err;
+        if (e2 > -dy) {
+            err -= dy;
+            x1 += sx;
+        }
+        if (e2 < dx) {
+            err += dx;
+            y1 += sy;
+        }
+    }
+
+    // Remove duplicate points
+    sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
+        return a.x < b.x || (a.x == b.x && a.y < b.y);
+    });
+    path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
+        return a.x == b.x && a.y == b.y;
+    }), path.end());
+
+    return path;
+}
+
+
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 
@@ -72,57 +130,7 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
         const Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : WHITE; // Faded for out-of-range tiles
 
         // Draw tile with fade ALSO if path between tile and hero is blocked
-        vector<vec3> path;
-        int x1 = x, y1 = y;
-        int x2 = hero_loc.x, y2 = hero_loc.y;
-        
-        int dx = abs(x2 - x1);
-        int dy = abs(y2 - y1);
-        int sx = (x1 < x2) ? 1 : -1;
-        int sy = (y1 < y2) ? 1 : -1;
-        int err = dx - dy;
-        
-        while (true) {
-            // Skip the start point (we don't need to check visibility with self)
-            if (x1 != x || y1 != y) {
-                // Add primary point
-                path.push_back({x1, y1, z});
-
-                // Add adjacent points for thickness only when we're not at start/end
-                // and only when we're moving diagonally
-                if (x1 != x2 && y1 != y2 && x1 != x && y1 != y) {
-                    // Add perpendicular points for diagonal movement
-                    if (dx > dy) {
-                        path.push_back({x1, y1 + sy, z});
-                        path.push_back({x1, y1 - sy, z});
-                    } else {
-                        path.push_back({x1 + sx, y1, z});
-                        path.push_back({x1 - sx, y1, z});
-                    }
-                }
-            }
-
-            // Break if we've reached the hero's location
-            if (x1 == x2 && y1 == y2) break;
-            
-            int e2 = 2 * err;
-            if (e2 > -dy) {
-                err -= dy;
-                x1 += sx;
-            }
-            if (e2 < dx) {
-                err += dx;
-                y1 += sy;
-            }
-        }
-
-        // Remove duplicate points
-        sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
-            return a.x < b.x || (a.x == b.x && a.y < b.y);
-        });
-        path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
-            return a.x == b.x && a.y == b.y;
-        }), path.end());
+        vector<vec3> path = calculate_path_with_thickness({x, y, z}, hero_loc);
 
         // Check for blocking walls/doors in path
         bool blocking = false;
@@ -196,55 +204,8 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
                 // if either is true, then there is an object blocking our visibility of any entities
                 // it will be eventually possible to "see-thru-walls" in the future to overcome this...
 
-                // 1. build a thick path from loc to hero_loc using modified Bresenham's algorithm
-                vector<vec3> path;
-                int x1 = loc.x, y1 = loc.y;
-                int x2 = hero_loc.x, y2 = hero_loc.y;
-
-                int dx = abs(x2 - x1);
-                int dy = abs(y2 - y1);
-                int sx = (x1 < x2) ? 1 : -1;
-                int sy = (y1 < y2) ? 1 : -1;
-                int err = dx - dy;
-
-                while (true) {
-                    // Skip the start point (we don't need to check visibility with self)
-                    if (x1 != loc.x || y1 != loc.y) {
-                        // Add primary point
-                        path.push_back({x1, y1, z});
-
-                        // Add adjacent points for thickness only when we're not at start/end
-                        // and only when we're moving diagonally
-                        if (x1 != x2 && y1 != y2 && x1 != loc.x && y1 != loc.y) {
-                            // Add perpendicular points for diagonal movement
-                            if (dx > dy) {
-                                path.push_back({x1, y1 + sy, z});
-                                path.push_back({x1, y1 - sy, z});
-                            } else {
-                                path.push_back({x1 + sx, y1, z});
-                                path.push_back({x1 - sx, y1, z});
-                            }
-                        }
-                    }
-
-                    // Break if we've reached the hero's location
-                    if (x1 == x2 && y1 == y2)
-                        break;
-
-                    int e2 = 2 * err;
-                    if (e2 > -dy) {
-                        err -= dy;
-                        x1 += sx;
-                    }
-                    if (e2 < dx) {
-                        err += dx;
-                        y1 += sy;
-                    }
-                }
-
-                // Remove duplicate points that might have been added
-                sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); });
-                path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) { return a.x == b.x && a.y == b.y; }), path.end());
+                // Calculate path from entity to hero
+                vector<vec3> path = calculate_path_with_thickness(loc, hero_loc);
 
                 // 2. for each item in path
                 bool object_blocking = false;
