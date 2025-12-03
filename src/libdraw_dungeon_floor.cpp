@@ -27,12 +27,10 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
     massert(tile, "tile is NULL");
 
     if (tile->type == TILE_NONE) {
-        //merror("Tile at (%d, %d) is TILE_NONE", x, y);
         return true;
     }
 
     if (!tile->visible) {
-        //merror("Tile at (%d, %d) is not visible", x, y);
         return true;
     }
 
@@ -49,11 +47,11 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
 
     optional<vec3> maybe_loc = g->ct.get<location>(g->hero_id);
     if (maybe_loc.has_value()) {
-        vec3 hero_loc = maybe_loc.value();
+        const vec3 hero_loc = maybe_loc.value();
         // Calculate Manhattan distance from hero to this tile (diamond pattern)
-        int distance = abs(x - hero_loc.x) + abs(y - hero_loc.y);
+        const int distance = abs(x - hero_loc.x) + abs(y - hero_loc.y);
         // Get tile texture
-        int txkey = get_txkey_for_tiletype(tile->type);
+        const int txkey = get_txkey_for_tiletype(tile->type);
         if (txkey < 0) {
             return false;
         }
@@ -62,36 +60,25 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
             return false;
         }
         // Calculate drawing position
-        int offset_x = -12;
-        int offset_y = -12;
-        int px = x * DEFAULT_TILE_SIZE + offset_x;
-        int py = y * DEFAULT_TILE_SIZE + offset_y;
-        Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
-        Rectangle dest = {(float)px, (float)py, (float)DEFAULT_TILE_SIZE_SCALED, (float)DEFAULT_TILE_SIZE_SCALED};
+        const int offset_x = -12;
+        const int offset_y = -12;
+        const int px = x * DEFAULT_TILE_SIZE + offset_x;
+        const int py = y * DEFAULT_TILE_SIZE + offset_y;
+        const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+        const Rectangle dest = {(float)px, (float)py, (float)DEFAULT_TILE_SIZE_SCALED, (float)DEFAULT_TILE_SIZE_SCALED};
         // Draw tile with fade if beyond light dist
-        Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : WHITE; // Faded for out-of-range tiles
+        const Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : WHITE; // Faded for out-of-range tiles
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
     }
     return true;
 }
 
 
-bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    //dungeon_floor_t* const df = d_get_current_floor(g->d);
+void libdraw_draw_dungeon_floor_doors(const shared_ptr<gamestate> g) {
     shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
     massert(df, "dungeon_floor is NULL");
     const int z = g->dungeon->current_floor;
 
-
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
-            draw_dungeon_floor_tile(g, txinfo, x, y, z);
-        }
-    }
-
-
-    // render doors
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
             //draw_entities_2d_at(g, df, false, (vec3){x, y, z});
@@ -113,8 +100,9 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
             // Get hero's vision distance and location
             const int vision_dist = g->ct.get<vision_distance>(g->hero_id).value_or(0);
             const int light_rad = g->ct.get<light_radius>(g->hero_id).value_or(0);
-            //const int light_dist = light_rad;
+
             auto maybe_hero_loc = g->ct.get<location>(g->hero_id);
+
             if (maybe_hero_loc.has_value()) {
                 vec3 hero_loc = maybe_hero_loc.value();
                 const int dist_to_check = std::max(vision_dist, light_rad);
@@ -141,13 +129,33 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
             }
         }
     }
+}
+
+
+bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    //dungeon_floor_t* const df = d_get_current_floor(g->d);
+    shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
+    massert(df, "dungeon_floor is NULL");
+    const int z = g->dungeon->current_floor;
+
+
+    // render tiles
+    for (int y = 0; y < df->height; y++) {
+        for (int x = 0; x < df->width; x++) {
+            draw_dungeon_floor_tile(g, txinfo, x, y, z);
+        }
+    }
+
+
+    // render doors
+    libdraw_draw_dungeon_floor_doors(g);
 
     libdraw_draw_player_target_box(g);
 
     // render NPCs
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
-            //draw_entities_2d_at(g, df, false, (vec3){x, y, z});
             const vec3 loc = {x, y, z};
             shared_ptr<tile_t> tile = df_tile_at(df, loc);
             if (!tile || !tile->visible || tile_is_wall(tile->type) || tile->is_empty) {
@@ -158,7 +166,6 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
             // check to see if the tile directly beneath this tile is a wall
             const vec3 loc2 = {x, y + 1, z};
             shared_ptr<tile_t> tile2 = df_tile_at(df, loc2);
-            //if (tile2 && tile_is_wall(tile2->type)) {
             if (tile2 && tile2->type == TILE_STONE_WALL_00) {
                 continue;
             }
@@ -179,7 +186,6 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
                     continue;
                 }
 
-                //if (dist <= dist_to_check) {
                 for (size_t i = 0; i < tile->entities->size(); i++) {
                     const entityid id = tile_get_entity(tile, i);
 
@@ -194,7 +200,6 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
                         draw_sprite_and_shadow(g, id);
                     }
                 }
-                //}
             }
         }
     }
