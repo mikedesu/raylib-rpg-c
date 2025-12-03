@@ -12,6 +12,7 @@ CFLAGS ?= # Allow override
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
 gameloader_web.cpp \
+try_entity_attack.cpp \
 try_entity_open_door.cpp \
 tile_has_door.cpp \
 create_door.cpp \
@@ -60,7 +61,6 @@ libdraw_camera_lock_on.cpp \
 libdraw.cpp \
 liblogic_drop_item.cpp \
 liblogic_is_entity_adjacent.cpp \
-liblogic_try_entity_attack.cpp \
 liblogic_try_entity_pickup.cpp \
 liblogic_add_message.cpp \
 liblogic_update_player_state.cpp \
@@ -117,6 +117,7 @@ try_entity_open_door.o \
 tile_has_door.o \
 create_door.o \
 try_entity_stairs.o \
+try_entity_attack.o \
 manage_inventory.o \
 update_player_tiles_explored.o \
 libdraw_draw_inventory_menu.o \
@@ -169,7 +170,6 @@ dungeon_tile.o \
 liblogic_is_entity_adjacent.o \
 liblogic_drop_item.o \
 liblogic_add_message.o \
-liblogic_try_entity_attack.o \
 liblogic_try_entity_pickup.o \
 liblogic_update_player_state.o \
 liblogic_tile_npc_living_count.o \
@@ -385,7 +385,7 @@ liblogic_is_entity_adjacent.o: liblogic_is_entity_adjacent.cpp
 liblogic_drop_item.o: liblogic_drop_item.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic_try_entity_attack.o: liblogic_try_entity_attack.cpp
+try_entity_attack.o: try_entity_attack.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_try_entity_pickup.o: liblogic_try_entity_pickup.cpp

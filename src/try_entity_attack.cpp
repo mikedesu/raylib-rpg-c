@@ -3,8 +3,8 @@
 #include "entitytype.h"
 #include "gamestate_flag.h"
 #include "liblogic_add_message.h"
-#include "liblogic_try_entity_attack.h"
 #include "sfx.h"
+#include "try_entity_attack.h"
 #include "weapon.h"
 
 void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful);
