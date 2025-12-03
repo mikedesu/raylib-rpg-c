@@ -7,6 +7,11 @@
 #include "libdraw_sprite.h"
 #include "textureinfo.h"
 
+#include <algorithm>
+
+
+using std::sort;
+
 
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
@@ -122,33 +127,34 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
                 vector<vec3> path;
                 int x1 = loc.x, y1 = loc.y;
                 int x2 = hero_loc.x, y2 = hero_loc.y;
-                
+
                 int dx = abs(x2 - x1);
                 int dy = abs(y2 - y1);
                 int sx = (x1 < x2) ? 1 : -1;
                 int sy = (y1 < y2) ? 1 : -1;
                 int err = dx - dy;
-                
+
                 while (true) {
                     // Skip the start point (we don't need to check visibility with self)
                     if (x1 != loc.x || y1 != loc.y) {
                         // Add primary point
                         path.push_back({x1, y1, z});
-                        
+
                         // Add adjacent points for thickness
                         // Horizontal/vertical lines get perpendicular adjacents
                         if (dx > dy) {
-                            path.push_back({x1, y1+1, z});
-                            path.push_back({x1, y1-1, z});
+                            path.push_back({x1, y1 + 1, z});
+                            path.push_back({x1, y1 - 1, z});
                         } else {
-                            path.push_back({x1+1, y1, z});
-                            path.push_back({x1-1, y1, z});
+                            path.push_back({x1 + 1, y1, z});
+                            path.push_back({x1 - 1, y1, z});
                         }
                     }
-                    
+
                     // Break if we've reached the hero's location
-                    if (x1 == x2 && y1 == y2) break;
-                    
+                    if (x1 == x2 && y1 == y2)
+                        break;
+
                     int e2 = 2 * err;
                     if (e2 > -dy) {
                         err -= dy;
@@ -159,14 +165,10 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
                         y1 += sy;
                     }
                 }
-                
+
                 // Remove duplicate points that might have been added
-                sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
-                    return a.x < b.x || (a.x == b.x && a.y < b.y);
-                });
-                path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
-                    return a.x == b.x && a.y == b.y;
-                }), path.end());
+                sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); });
+                path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) { return a.x == b.x && a.y == b.y; }), path.end());
 
                 // 2. for each item in path
                 bool object_blocking = false;
