@@ -43,14 +43,10 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
         return true;
     }
 
-    //if (tile->type == TILE_STONE_WALL_00) {
-    //    return true;
-    //}
-
     // Get hero's total light radius
-    int light_dist = g->ct.get<light_radius>(g->hero_id).value_or(1);
+    const int light_dist = g->ct.get<light_radius>(g->hero_id).value_or(1);
 
-    optional<vec3> maybe_loc = g->ct.get<location>(g->hero_id);
+    auto maybe_loc = g->ct.get<location>(g->hero_id);
     if (maybe_loc.has_value()) {
         const vec3 hero_loc = maybe_loc.value();
         // Calculate Manhattan distance from hero to this tile (diamond pattern)
@@ -71,8 +67,15 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
         const int py = y * DEFAULT_TILE_SIZE + offset_y;
         const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
         const Rectangle dest = {(float)px, (float)py, (float)DEFAULT_TILE_SIZE_SCALED, (float)DEFAULT_TILE_SIZE_SCALED};
+
         // Draw tile with fade if beyond light dist
         const Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : WHITE; // Faded for out-of-range tiles
+
+        // Draw tile with fade ALSO if path between tile and hero is blocked
+        // BEGIN CODE HERE
+        // ...
+        // END CODE HERE
+
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
     }
     return true;
