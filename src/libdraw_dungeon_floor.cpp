@@ -188,9 +188,8 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
 
                 // check if tile has a DOOR
                 for_each(v0_tile->entities->cbegin(), v0_tile->entities->cend(), [g, &object_blocking](const entityid& id) {
-                    if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR)
-                        if (!g->ct.get<door_open>(id).value_or(false))
-                            object_blocking = true;
+                    if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g->ct.get<door_open>(id).value_or(false))
+                        object_blocking = true;
                 });
 
                 if (object_blocking)
