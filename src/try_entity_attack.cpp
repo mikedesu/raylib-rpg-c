@@ -12,7 +12,7 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
 
-void handle_block_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id);
+//void handle_block_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id);
 
 
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success) {
@@ -29,10 +29,10 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
     minfo("Trying to attack...");
 
     const vec3 loc = g->ct.get<location>(atk_id).value();
-    shared_ptr<dungeon_floor_t> floor = d_get_floor(g->dungeon, loc.z);
+    auto floor = d_get_floor(g->dungeon, loc.z);
     massert(floor, "failed to get dungeon floor");
 
-    shared_ptr<tile_t> tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
+    auto tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
     if (!tile) {
         merror("No tile at location, cannot attack");
         return;
@@ -40,7 +40,6 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
 
     // Calculate direction based on target position
     bool ok = false;
-
     const vec3 eloc = g->ct.get<location>(atk_id).value();
     const int dx = tgt_x - eloc.x;
     const int dy = tgt_y - eloc.y;
@@ -68,8 +67,8 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
         }
     }
 
-    const entitytype_t type0 = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
-    handle_attack_success_gamestate_flag(g, type0, ok);
+    const auto type = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
+    handle_attack_success_gamestate_flag(g, type, ok);
 }
 
 
@@ -97,13 +96,11 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
         return;
     }
 
-    const entitytype_t type = g->ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
-
+    const auto type = g->ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC)
         return;
-    if (g->ct.get<dead>(target_id).value_or(true)) {
+    if (g->ct.get<dead>(target_id).value_or(true))
         return;
-    }
 
     // lets try an experiment...
     // get the armor class of the target
@@ -115,18 +112,40 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
     //int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
     //if (attack_roll >= base_ac) {
 
-    optional<entityid> maybe_shield = g->ct.get<equipped_shield>(target_id);
-    if (maybe_shield.has_value()) {
-        entityid shield_id = maybe_shield.value();
-
+    auto maybe_shield = g->ct.get<equipped_shield>(target_id);
+    if (!maybe_shield.has_value()) {
+        // no shield
+        *attack_successful = true;
+        handle_attack_success(g, attacker_id, target_id, attack_successful);
+    } else {
+        const auto shield_id = maybe_shield.value();
         if (shield_id == ENTITYID_INVALID) {
             // no shield
+            // compute attack roll
             *attack_successful = true;
             handle_attack_success(g, attacker_id, target_id, attack_successful);
         } else {
-            //*attack_successful = false;
-            handle_block_success(g, attacker_id, target_id);
+            // they have a shield
+            // compute chance to block
+
+            // if roll successful
+            // block successful
+            // else
+            // block unsuccessful
+            // compute attack roll
+            //handle_block_success(g, attacker_id, target_id);
+
+            // block successful
+            if (shield_id != ENTITYID_INVALID) {
+                PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
+                g->ct.set<block_success>(target_id, true);
+                g->ct.set<update>(target_id, true);
+            }
         }
+    }
+
+
+    if (maybe_shield.has_value()) {
     } else {
         // no shield
         *attack_successful = true;
@@ -135,21 +154,18 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
 }
 
 
-void handle_block_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id) {
-    massert(g, "gamestate is NULL");
-    massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
-    massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
-
-    //const entitytype_t tgttype = g->ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
-    const entityid equipped_shld = g->ct.get<equipped_shield>(tgt_id).value_or(ENTITYID_INVALID);
-
-    if (equipped_shld != ENTITYID_INVALID) {
-        PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
-
-        g->ct.set<block_success>(tgt_id, true);
-        g->ct.set<update>(tgt_id, true);
-    }
-}
+//void handle_block_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id) {
+//    massert(g, "gamestate is NULL");
+//    massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
+//    massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
+//const entitytype_t tgttype = g->ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
+//    const entityid equipped_shld = g->ct.get<equipped_shield>(tgt_id).value_or(ENTITYID_INVALID);
+//    if (equipped_shld != ENTITYID_INVALID) {
+//        PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
+//        g->ct.set<block_success>(tgt_id, true);
+//        g->ct.set<update>(tgt_id, true);
+//    }
+//}
 
 
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
