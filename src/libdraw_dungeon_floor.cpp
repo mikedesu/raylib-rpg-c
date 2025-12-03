@@ -118,12 +118,36 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
                 // if either is true, then there is an object blocking our visibility of any entities
                 // it will be eventually possible to "see-thru-walls" in the future to overcome this...
 
-                // 1. build a path from loc to hero_loc
+                // 1. build a path from loc to hero_loc using Bresenham's line algorithm
                 vector<vec3> path;
-                // the path should be a straight line
-                // BEGIN FILL IN CODE HERE
-                // ...
-                // END FILL IN CODE HERE
+                int x1 = loc.x, y1 = loc.y;
+                int x2 = hero_loc.x, y2 = hero_loc.y;
+                
+                int dx = abs(x2 - x1);
+                int dy = abs(y2 - y1);
+                int sx = (x1 < x2) ? 1 : -1;
+                int sy = (y1 < y2) ? 1 : -1;
+                int err = dx - dy;
+                
+                while (true) {
+                    // Skip the start point (we don't need to check visibility with self)
+                    if (x1 != loc.x || y1 != loc.y) {
+                        path.push_back({x1, y1, z});
+                    }
+                    
+                    // Break if we've reached the hero's location
+                    if (x1 == x2 && y1 == y2) break;
+                    
+                    int e2 = 2 * err;
+                    if (e2 > -dy) {
+                        err -= dy;
+                        x1 += sx;
+                    }
+                    if (e2 < dx) {
+                        err += dx;
+                        y1 += sy;
+                    }
+                }
 
                 // 2. for each item in path
                 bool object_blocking = false;
