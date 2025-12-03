@@ -118,7 +118,7 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
                 // if either is true, then there is an object blocking our visibility of any entities
                 // it will be eventually possible to "see-thru-walls" in the future to overcome this...
 
-                // 1. build a path from loc to hero_loc using Bresenham's line algorithm
+                // 1. build a thick path from loc to hero_loc using modified Bresenham's algorithm
                 vector<vec3> path;
                 int x1 = loc.x, y1 = loc.y;
                 int x2 = hero_loc.x, y2 = hero_loc.y;
@@ -132,7 +132,18 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
                 while (true) {
                     // Skip the start point (we don't need to check visibility with self)
                     if (x1 != loc.x || y1 != loc.y) {
+                        // Add primary point
                         path.push_back({x1, y1, z});
+                        
+                        // Add adjacent points for thickness
+                        // Horizontal/vertical lines get perpendicular adjacents
+                        if (dx > dy) {
+                            path.push_back({x1, y1+1, z});
+                            path.push_back({x1, y1-1, z});
+                        } else {
+                            path.push_back({x1+1, y1, z});
+                            path.push_back({x1-1, y1, z});
+                        }
                     }
                     
                     // Break if we've reached the hero's location
@@ -148,6 +159,14 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
                         y1 += sy;
                     }
                 }
+                
+                // Remove duplicate points that might have been added
+                sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
+                    return a.x < b.x || (a.x == b.x && a.y < b.y);
+                });
+                path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
+                    return a.x == b.x && a.y == b.y;
+                }), path.end());
 
                 // 2. for each item in path
                 bool object_blocking = false;
