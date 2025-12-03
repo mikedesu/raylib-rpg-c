@@ -18,13 +18,13 @@ static vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
     int x1 = start.x, y1 = start.y;
     int x2 = end.x, y2 = end.y;
     int z = start.z;
-    
+
     int dx = abs(x2 - x1);
     int dy = abs(y2 - y1);
     int sx = (x1 < x2) ? 1 : -1;
     int sy = (y1 < y2) ? 1 : -1;
     int err = dx - dy;
-    
+
     while (true) {
         // Skip the start point (we don't need to check visibility with self)
         if (x1 != start.x || y1 != start.y) {
@@ -46,8 +46,9 @@ static vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
         }
 
         // Break if we've reached the end location
-        if (x1 == x2 && y1 == y2) break;
-        
+        if (x1 == x2 && y1 == y2)
+            break;
+
         int e2 = 2 * err;
         if (e2 > -dy) {
             err -= dy;
@@ -60,12 +61,8 @@ static vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
     }
 
     // Remove duplicate points
-    sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
-        return a.x < b.x || (a.x == b.x && a.y < b.y);
-    });
-    path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
-        return a.x == b.x && a.y == b.y;
-    }), path.end());
+    sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); });
+    path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) { return a.x == b.x && a.y == b.y; }), path.end());
 
     return path;
 }
@@ -142,13 +139,13 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
             }
             // Check for closed doors
             for (auto eid : *(tile->entities)) {
-                if (g->ct.get<entitytype>(eid).value_or(ENTITY_NONE) == ENTITY_DOOR && 
-                    !g->ct.get<door_open>(eid).value_or(false)) {
+                if (g->ct.get<entitytype>(eid).value_or(ENTITY_NONE) == ENTITY_DOOR && !g->ct.get<door_open>(eid).value_or(false)) {
                     blocking = true;
                     break;
                 }
             }
-            if (blocking) break;
+            if (blocking)
+                break;
         }
 
         // Apply fade if blocked
