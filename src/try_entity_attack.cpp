@@ -127,6 +127,30 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
         } else {
             // they have a shield
             // compute chance to block
+            int roll = GetRandomValue(1, 100);
+            auto chance = g->ct.get<block_chance>(shield_id).value_or(100);
+            int low_roll = 100 - chance;
+            if (low_roll == 0) {
+                // 100% block chance
+                if (shield_id != ENTITYID_INVALID) {
+                    PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
+                    g->ct.set<block_success>(target_id, true);
+                    g->ct.set<update>(target_id, true);
+                }
+            } else if (roll <= low_roll) {
+                // failed to block
+                // compute attack roll
+                *attack_successful = true;
+                handle_attack_success(g, attacker_id, target_id, attack_successful);
+
+            } else {
+                // block successful
+                if (shield_id != ENTITYID_INVALID) {
+                    PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
+                    g->ct.set<block_success>(target_id, true);
+                    g->ct.set<update>(target_id, true);
+                }
+            }
 
             // if roll successful
             // block successful
@@ -136,21 +160,21 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
             //handle_block_success(g, attacker_id, target_id);
 
             // block successful
-            if (shield_id != ENTITYID_INVALID) {
-                PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
-                g->ct.set<block_success>(target_id, true);
-                g->ct.set<update>(target_id, true);
-            }
+            //if (shield_id != ENTITYID_INVALID) {
+            //    PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
+            //    g->ct.set<block_success>(target_id, true);
+            //    g->ct.set<update>(target_id, true);
+            //}
         }
     }
 
 
-    if (maybe_shield.has_value()) {
-    } else {
-        // no shield
-        *attack_successful = true;
-        handle_attack_success(g, attacker_id, target_id, attack_successful);
-    }
+    //if (maybe_shield.has_value()) {
+    //} else {
+    // no shield
+    //    *attack_successful = true;
+    //    handle_attack_success(g, attacker_id, target_id, attack_successful);
+    //}
 }
 
 

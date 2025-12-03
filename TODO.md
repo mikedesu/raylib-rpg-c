@@ -1,5 +1,9 @@
 # TODO
 
+
+- [ ] bug involving player death animation
+  - animation stuck on first frame
+
 - [ ] wolf shield animation bugfix
 - [ ] elf shield animation bugfix
 - [ ] dwarf shield animation bugfix
@@ -11,7 +15,7 @@
 - [x] drawing order needs changing so that NPCs (warg etc) do not render behind door sprites when adjacent
 - [x] drawing order needs changing so that player target box renders beneath if player is a warg etc
 
-- [ ] when handling light radius and visibility distance, we need to check line-of-sight so we don't render
+- [x] when handling light radius and visibility distance, we need to check line-of-sight so we don't render
 things that might be behind doors, walls, etc.
 
 - [x] Shader so that the target box glows

@@ -285,3 +285,10 @@ template <>
 struct ComponentTraits<hearing_distance> {
     using Type = int;
 };
+
+
+struct block_chance { }; //int
+template <>
+struct ComponentTraits<block_chance> {
+    using Type = int;
+};

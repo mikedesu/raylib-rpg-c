@@ -6,8 +6,8 @@ entityid create_shield_at(shared_ptr<gamestate> g, vec3 loc, shieldtype_t type) 
     minfo("shield create at location...");
     massert(g, "gamestate is NULL");
 
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-    shared_ptr<tile_t> tile = df_tile_at(df, loc);
+    auto df = d_get_floor(g->dungeon, loc.z);
+    auto tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
 
     if (!tile_is_walkable(tile->type)) {
@@ -20,7 +20,7 @@ entityid create_shield_at(shared_ptr<gamestate> g, vec3 loc, shieldtype_t type) 
         return ENTITYID_INVALID;
     }
 
-    entityid id = create_shield(g, type);
+    const auto id = create_shield(g, type);
     if (id == ENTITYID_INVALID) {
         return ENTITYID_INVALID;
     }
@@ -40,7 +40,7 @@ entityid create_shield(shared_ptr<gamestate> g, shieldtype_t type) {
     massert(g, "gamestate is NULL");
     minfo("BEGIN create_shield");
 
-    entityid id = g_add_entity(g);
+    const auto id = g_add_entity(g);
 
     g->ct.set<entitytype>(id, ENTITY_ITEM);
     g->ct.set<itemtype>(id, ITEM_SHIELD);
@@ -65,6 +65,8 @@ entityid create_shield(shared_ptr<gamestate> g, shieldtype_t type) {
     g->ct.set<txalpha>(id, 255);
     g->ct.set<update>(id, true);
     g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+
+    g->ct.set<block_chance>(id, 50);
 
     minfo("END create_shield");
     return id;
