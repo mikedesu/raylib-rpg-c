@@ -46,7 +46,9 @@ void liblogic_init(shared_ptr<gamestate> g) {
     srand(time(NULL));
     SetRandomSeed(time(NULL));
     minfo("liblogic_init");
+
     init_dungeon(g);
+
     //g->entity_turn = create_player(g, (vec3){0, 0, 0}, "darkmage");
     //create_wooden_box(g, (vec3){2, 2, 0});
     //create_wooden_box(g, (vec3){3, 2, 0});

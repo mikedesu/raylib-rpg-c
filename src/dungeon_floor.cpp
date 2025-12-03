@@ -17,26 +17,18 @@ using std::vector;
 
 
 void df_set_tile(shared_ptr<dungeon_floor_t> df, tiletype_t type, int x, int y);
-
 void df_set_all_tiles(shared_ptr<dungeon_floor_t> df, tiletype_t type);
 void df_assign_stairs(shared_ptr<dungeon_floor_t> df);
 void df_assign_downstairs(shared_ptr<dungeon_floor_t> df);
 void df_assign_upstairs(shared_ptr<dungeon_floor_t> df);
-
 bool df_assign_upstairs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
 bool df_assign_downstairs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
-
-
 int df_get_possible_upstairs_count(shared_ptr<dungeon_floor_t> df);
 int df_get_possible_downstairs_count(shared_ptr<dungeon_floor_t> df);
-
-
 shared_ptr<vector<vec3>> df_get_possible_downstairs_locs(shared_ptr<dungeon_floor_t> df);
 shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
-
 shared_ptr<vector<vec3>> df_get_possible_upstairs_locs(shared_ptr<dungeon_floor_t> df);
 shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
-
 int df_get_possible_upstairs_count_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
 int df_get_possible_downstairs_count_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r);
 void df_set_area(shared_ptr<dungeon_floor_t> df, tiletype_t a, tiletype_t b, Rectangle r);
@@ -49,7 +41,7 @@ tiletype_t random_tiletype(tiletype_t a, tiletype_t b) {
 }
 
 
-shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int width, int height) {
+shared_ptr<dungeon_floor_t> df_init(int floor, dungeon_floor_type_t t, int width, int height) {
     massert(width > 0, "width must be greater than zero");
     massert(height > 0, "height must be greater than zero");
     massert(floor >= 0, "floor must be greater than or equal to zero");
@@ -59,21 +51,24 @@ shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int wid
     shared_ptr<dungeon_floor_t> df = make_shared<dungeon_floor_t>();
     massert(df, "failed to malloc dungeon floor");
 
+    // init floor vars
     df->floor = floor;
     df->width = width;
     df->height = height;
+    df->type = t;
 
+    // alloc the tile vector
     df->tiles = make_shared<vector<tile_id>>();
     massert(df->tiles, "failed to create tiles vector");
 
+    // alloc the tile map
     df->tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
     massert(df->tile_map, "failed to create tile map");
 
-    df->type = t;
-
+    // create all the tiles and add to the tile vector and tile map
     for (tile_id i = 0; i < width * height; i++) {
         df->tiles->push_back(i);
-        shared_ptr<tile_t> tile = make_shared<tile_t>();
+        auto tile = make_shared<tile_t>();
         massert(tile, "failed to create tile");
         tile->id = i;
         tile_init(tile, TILE_NONE);
@@ -82,36 +77,20 @@ shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int wid
 
     // locate "center"
     // in the 24x24 case,
-    // this would be x,y = 8,8
-
-    //df->upstairs_loc = (vec3){-1, -1, -1};
-    //df->downstairs_loc = (vec3){-1, -1, -1};
-
     // this is hard-coded atm but we will move it into a function
     const float x = width / 3.0;
     const float y = height / 3.0;
-
-    // off by 1...want 8 width? set it to 9
     const int w = 8;
     const int h = 8;
-
-    // init the inner MxN area
+    // init the inner w x h area
     // create a new room with walls
-    //Rectangle r = {x, y, w, h};
-
-    minfo("x: %f y: %f w: %d h: %d", x, y, w, h);
-
     df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y, w, h});
     df_set_perimeter(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x - 1, y - 1, w + 2, h + 2});
-
-    //minfo("x: %f y: %f w: %d h: %d", x + w / 2, y, 1, h);
     df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x + w / 2.0f, y, 1, h});
     df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x, y + h / 2.0f, w, 1});
-
     df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 1, 1, 1});
     df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f + 2, y + 4, 1, 2});
     df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 6, 1, 2});
-    //df_set_perimeter(df, TILE_STONE_WALL_00, TILE_STONE_WALL_00, (Rectangle){x + w - 1, y - 1, w2 + 2, h + 2});
 
     const vec3 loc_u = {9, 9, floor};
     df_set_tile(df, TILE_UPSTAIRS, loc_u.x, loc_u.y);
@@ -121,57 +100,48 @@ shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int wid
     df_set_tile(df, TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
     df->downstairs_loc = loc_d;
 
-    //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x + w, y + h + 1, w2, h2});
-    //df_set_perimeter(df, TILE_STONE_WALL_00, TILE_STONE_WALL_00, (Rectangle){x + w - 1, y + h, w2 + 2, h2 + 2});
-
-    //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y + h2 + 1, w, h});
-    //df_set_perimeter(df, TILE_STONE_WALL_00, TILE_STONE_WALL_00, (Rectangle){x - 1, y + h2, w + 1, h + 2});
-
-    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + w + 1, y, w2, h2});
-    //df_set_perimeter(df, TILE_STONE_WALL_00, (Rectangle){x + w - 1, y - 1, w2 + 2, h2 + 2});
-
-
-    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 7, y, 1, 1});
-    //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x + w - 1, y + 1, 1, 1});
-    //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x + w - 1, y + 2, 1, 1});
-
-    //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x + w + 1, y + 3, 1, 1});
-
-    //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x + w - 1, y + h2 + 1, 1, 1});
-
-
-    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 8, y, 7, 3});
-
-    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 7, y + 1, 3, 1});
-    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 10, y + 2, 1, 1});
-    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 11, y + 1, 1, 1});
-    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 12, y + 2, 1, 1});
-    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 13, y + 1, 1, 1});
-    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 14, y + 0, 1, 1});
-    //df_set_area(df, TILE_FLOOR_STONE_00, (Rectangle){x + 15, y + 1, 1, 1});
-
-    // create a new room with walls
-    //r.x = x + w + 1;
-    //df_set_area(df, TILE_FLOOR_STONE_00, r);
-
-    //r.x = x + 2 * w + 2;
-    //df_set_area(df, TILE_FLOOR_STONE_00, r);
-
-
-    // create an opening into the new room
-    //r.x = x + w;
-    //r.y = y + 1;
-    //r.width = 1;
-    //r.height = 1;
-    //df_set_area(df, TILE_FLOOR_STONE_00, r);
-    //r.x = x + 2 * w + 1;
-    //df_set_area(df, TILE_FLOOR_STONE_00, r);
-
-
-    //df_set_perimeter(df, x0, y0, w + 1, h + 1);
-
     msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
     return df;
+}
+
+
+void df_xform(function<void()> mLambda) {
+    //massert(width > 0, "width must be greater than zero");
+    //massert(height > 0, "height must be greater than zero");
+    //massert(floor >= 0, "floor must be greater than or equal to zero");
+
+    // creating a new dungeon floor
+    // this was likely called by d_add_floor
+    //auto df = df_init(floor, t, width, height);
+    //massert(df, "failed to malloc dungeon floor");
+
+    // init floor vars
+    //df->floor = floor;
+    //df->width = width;
+    //df->height = height;
+    //df->type = t;
+
+    // alloc the tile vector
+    //df->tiles = make_shared<vector<tile_id>>();
+    //massert(df->tiles, "failed to create tiles vector");
+
+    // alloc the tile map
+    //df->tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
+    //massert(df->tile_map, "failed to create tile map");
+
+    // create all the tiles and add to the tile vector and tile map
+    //for (tile_id i = 0; i < width * height; i++) {
+    //    df->tiles->push_back(i);
+    //    auto tile = make_shared<tile_t>();
+    //    massert(tile, "failed to create tile");
+    //    tile->id = i;
+    //    tile_init(tile, TILE_NONE);
+    //    df->tile_map->insert({i, tile});
+    //}
+
+    mLambda();
+
+    //return df;
 }
 
 

@@ -17,6 +17,8 @@ void init_dungeon(shared_ptr<gamestate> g) {
     const int h = 24;
     const dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_STONE;
     //dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_GRASS;
+
+
     for (int i = 0; i < df_count; i++) {
         d_add_floor(g->dungeon, type, w, h);
         // when ready to add doors, we can do so here

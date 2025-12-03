@@ -1,6 +1,5 @@
 #include "dungeon.h"
 #include "dungeon_floor.h"
-//#include "dungeon_type.h"
 #include "dungeon_floor_type.h"
 #include "massert.h"
 #include <cstdlib>
@@ -18,14 +17,12 @@ using std::vector;
 
 
 shared_ptr<dungeon_t> d_create() {
-    shared_ptr<dungeon_t> dungeon = make_shared<dungeon_t>();
-    if (!dungeon) {
+    auto dungeon = make_shared<dungeon_t>();
+    if (!dungeon)
         return nullptr;
-    }
     dungeon->floors = make_shared<vector<shared_ptr<dungeon_floor_t>>>();
-    if (!dungeon->floors) {
+    if (!dungeon->floors)
         return nullptr;
-    }
     dungeon->current_floor = 0;
     dungeon->is_locked = false;
     return dungeon;
@@ -33,9 +30,8 @@ shared_ptr<dungeon_t> d_create() {
 
 
 void d_destroy(shared_ptr<dungeon_t> d) {
-    if (d && d->floors) {
+    if (d && d->floors)
         d->floors->clear();
-    }
 }
 
 
@@ -45,24 +41,67 @@ void d_free(shared_ptr<dungeon_t> dungeon) {
 }
 
 
-shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dungeon, dungeon_floor_type_t type, int width, int height) {
-    if (!dungeon || width <= 0 || height <= 0 || dungeon->is_locked) {
-        return nullptr;
-    }
+//function<void(shared_ptr<dungeon_floor_t>)> df_create_test()//
 
+
+function<void(shared_ptr<dungeon_floor_t>)> creation_rules = [](shared_ptr<dungeon_floor_t> df) {
+    const float x = df->width / 3.0;
+    const float y = df->height / 3.0;
+    const int w = 8;
+    const int h = 8;
+
+    df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y, w, h});
+    df_set_perimeter(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x - 1, y - 1, w + 2, h + 2});
+    df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x + w / 2.0f, y, 1, h});
+    df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x, y + h / 2.0f, w, 1});
+    df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 1, 1, 1});
+    df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f + 2, y + 4, 1, 2});
+    df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 6, 1, 2});
+
+    const vec3 loc_u = {9, 9, df->floor};
+    df_set_tile(df, TILE_UPSTAIRS, loc_u.x, loc_u.y);
+    df->upstairs_loc = loc_u;
+
+    const vec3 loc_d = {9, 14, df->floor};
+    df_set_tile(df, TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
+    df->downstairs_loc = loc_d;
+};
+
+
+shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dungeon, dungeon_floor_type_t type, int width, int height) {
+    if (!dungeon || width <= 0 || height <= 0 || dungeon->is_locked)
+        return nullptr;
     const int current_floor = dungeon->floors->size();
 
-    shared_ptr<dungeon_floor_t> new_floor = df_create(current_floor, type, width, height);
-
-    if (!new_floor) {
+    auto df = df_init(current_floor, type, width, height);
+    if (!df)
         return nullptr;
-    }
 
-    // i forget why we are doing this external from dungeon_floor.cpp...
-    //df_assign_upstairs_in_area(new_floor, (Rectangle){0, 0, (float)width, (float)height});
-    //df_assign_downstairs_in_area(new_floor, (Rectangle){0, 0, (float)width, (float)height});
 
-    dungeon->floors->push_back(new_floor);
+    auto creation_rules = [df]() {
+        const float x = df->width / 3.0;
+        const float y = df->height / 3.0;
+        const int w = 8;
+        const int h = 8;
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y, w, h});
+        df_set_perimeter(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x - 1, y - 1, w + 2, h + 2});
+        df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x + w / 2.0f, y, 1, h});
+        df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x, y + h / 2.0f, w, 1});
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 1, 1, 1});
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f + 2, y + 4, 1, 2});
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 6, 1, 2});
+        const vec3 loc_u = {9, 9, df->floor};
+        df_set_tile(df, TILE_UPSTAIRS, loc_u.x, loc_u.y);
+        df->upstairs_loc = loc_u;
+        const vec3 loc_d = {9, 14, df->floor};
+        df_set_tile(df, TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
+        df->downstairs_loc = loc_d;
+    };
 
-    return new_floor;
+
+    df_xform(creation_rules);
+
+
+    dungeon->floors->push_back(df);
+    return df;
 }
