@@ -190,9 +190,13 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
                     for (auto eid : *(v0_tile->entities)) {
                         auto eid_type = g->ct.get<entitytype>(eid);
                         if (eid_type == ENTITY_DOOR) {
-                            // reject
-                            object_blocking = true;
-                            break;
+                            // check if door open
+                            auto is_door_open = g->ct.get<door_open>(eid).value_or(false);
+                            if (!is_door_open) {
+                                // reject
+                                object_blocking = true;
+                                break;
+                            }
                         }
                     }
 
