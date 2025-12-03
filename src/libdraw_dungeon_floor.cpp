@@ -72,11 +72,81 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
         const Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : WHITE; // Faded for out-of-range tiles
 
         // Draw tile with fade ALSO if path between tile and hero is blocked
-        // BEGIN CODE HERE
-        // ...
-        // END CODE HERE
+        vector<vec3> path;
+        int x1 = x, y1 = y;
+        int x2 = hero_loc.x, y2 = hero_loc.y;
+        
+        int dx = abs(x2 - x1);
+        int dy = abs(y2 - y1);
+        int sx = (x1 < x2) ? 1 : -1;
+        int sy = (y1 < y2) ? 1 : -1;
+        int err = dx - dy;
+        
+        while (true) {
+            // Skip the start point (we don't need to check visibility with self)
+            if (x1 != x || y1 != y) {
+                // Add primary point
+                path.push_back({x1, y1, z});
 
-        DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
+                // Add adjacent points for thickness only when we're not at start/end
+                // and only when we're moving diagonally
+                if (x1 != x2 && y1 != y2 && x1 != x && y1 != y) {
+                    // Add perpendicular points for diagonal movement
+                    if (dx > dy) {
+                        path.push_back({x1, y1 + sy, z});
+                        path.push_back({x1, y1 - sy, z});
+                    } else {
+                        path.push_back({x1 + sx, y1, z});
+                        path.push_back({x1 - sx, y1, z});
+                    }
+                }
+            }
+
+            // Break if we've reached the hero's location
+            if (x1 == x2 && y1 == y2) break;
+            
+            int e2 = 2 * err;
+            if (e2 > -dy) {
+                err -= dy;
+                x1 += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                y1 += sy;
+            }
+        }
+
+        // Remove duplicate points
+        sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
+            return a.x < b.x || (a.x == b.x && a.y < b.y);
+        });
+        path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) {
+            return a.x == b.x && a.y == b.y;
+        }), path.end());
+
+        // Check for blocking walls/doors in path
+        bool blocking = false;
+        for (const auto& v : path) {
+            shared_ptr<tile_t> tile = df_tile_at(df, v);
+            if (tile && (tile_is_wall(tile->type))) {
+                blocking = true;
+                break;
+            }
+            // Check for closed doors
+            for (auto eid : *(tile->entities)) {
+                if (g->ct.get<entitytype>(eid).value_or(ENTITY_NONE) == ENTITY_DOOR && 
+                    !g->ct.get<door_open>(eid).value_or(false)) {
+                    blocking = true;
+                    break;
+                }
+            }
+            if (blocking) break;
+        }
+
+        // Apply fade if blocked
+        Color final_color = blocking ? Fade(draw_color, 0.3f) : draw_color;
+
+        DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, final_color);
     }
     return true;
 }
