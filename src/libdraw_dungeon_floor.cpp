@@ -111,6 +111,53 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
                     continue;
                 }
 
+                // further, we need to step from the hero's location+1 to the tile location-1
+                // for each tile in this path, we need to check to see if
+                // 1. the tiletype is a WALL
+                // 2. the tile contains a DOOR entity
+                // if either is true, then there is an object blocking our visibility of any entities
+                // it will be eventually possible to "see-thru-walls" in the future to overcome this...
+
+                // 1. build a path from loc to hero_loc
+                vector<vec3> path;
+                // the path should be a straight line
+                // BEGIN FILL IN CODE HERE
+                // ...
+                // END FILL IN CODE HERE
+
+                // 2. for each item in path
+                bool object_blocking = false;
+
+                for (auto v0 : path) {
+                    // get tile
+                    auto v0_tile = df_tile_at(df, v0);
+                    // check type
+                    if (v0_tile->type == TILE_STONE_WALL_00 || v0_tile->type == TILE_STONE_WALL_01) {
+                        // reject
+                        object_blocking = true;
+                        break;
+                    }
+
+                    // check if tile has a DOOR
+                    for (auto eid : *(v0_tile->entities)) {
+                        auto eid_type = g->ct.get<entitytype>(eid);
+                        if (eid_type == ENTITY_DOOR) {
+                            // reject
+                            object_blocking = true;
+                            break;
+                        }
+                    }
+
+                    if (object_blocking) {
+                        break;
+                    }
+                }
+
+                if (object_blocking) {
+                    continue;
+                }
+
+
                 for (size_t i = 0; i < tile->entities->size(); i++) {
                     const entityid id = tile_get_entity(tile, i);
 
