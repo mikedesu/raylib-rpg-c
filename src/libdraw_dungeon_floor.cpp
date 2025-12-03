@@ -183,77 +183,82 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
             const int light_rad = g->ct.get<light_radius>(g->hero_id).value_or(0);
             //const int light_dist = light_rad;
             auto maybe_hero_loc = g->ct.get<location>(g->hero_id);
-            if (maybe_hero_loc.has_value()) {
-                vec3 hero_loc = maybe_hero_loc.value();
-                const int dist_to_check = std::max(vision_dist, light_rad);
-                // Calculate Manhattan distance from hero to this tile (diamond pattern)
-                const int dist = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
-                // Only draw entities within vision distance
-                // we might want to enforce a drawing order with the introduction of doors...
-                if (dist > dist_to_check) {
-                    continue;
+            if (!maybe_hero_loc.has_value()) {
+                // this shouldn't happen but...
+                continue;
+            }
+
+
+            //if (maybe_hero_loc.has_value()) {
+            vec3 hero_loc = maybe_hero_loc.value();
+            const int dist_to_check = std::max(vision_dist, light_rad);
+            // Calculate Manhattan distance from hero to this tile (diamond pattern)
+            const int dist = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
+            // Only draw entities within vision distance
+            // we might want to enforce a drawing order with the introduction of doors...
+            if (dist > dist_to_check) {
+                continue;
+            }
+
+            // further, we need to step from the hero's location+1 to the tile location-1
+            // for each tile in this path, we need to check to see if
+            // 1. the tiletype is a WALL
+            // 2. the tile contains a DOOR entity
+            // if either is true, then there is an object blocking our visibility of any entities
+            // it will be eventually possible to "see-thru-walls" in the future to overcome this...
+
+            // Calculate path from entity to hero
+            vector<vec3> path = calculate_path_with_thickness(loc, hero_loc);
+
+            // 2. for each item in path
+            bool object_blocking = false;
+
+            for (auto v0 : path) {
+                // get tile
+                auto v0_tile = df_tile_at(df, v0);
+                // check type
+                if (tile_is_wall(v0_tile->type)) {
+                    // reject
+                    object_blocking = true;
+                    break;
                 }
 
-                // further, we need to step from the hero's location+1 to the tile location-1
-                // for each tile in this path, we need to check to see if
-                // 1. the tiletype is a WALL
-                // 2. the tile contains a DOOR entity
-                // if either is true, then there is an object blocking our visibility of any entities
-                // it will be eventually possible to "see-thru-walls" in the future to overcome this...
-
-                // Calculate path from entity to hero
-                vector<vec3> path = calculate_path_with_thickness(loc, hero_loc);
-
-                // 2. for each item in path
-                bool object_blocking = false;
-
-                for (auto v0 : path) {
-                    // get tile
-                    auto v0_tile = df_tile_at(df, v0);
-                    // check type
-                    if (v0_tile->type == TILE_STONE_WALL_00 || v0_tile->type == TILE_STONE_WALL_01) {
-                        // reject
-                        object_blocking = true;
-                        break;
-                    }
-
-                    // check if tile has a DOOR
-                    for (auto eid : *(v0_tile->entities)) {
-                        auto eid_type = g->ct.get<entitytype>(eid);
-                        if (eid_type == ENTITY_DOOR) {
-                            // check if door open
-                            auto is_door_open = g->ct.get<door_open>(eid).value_or(false);
-                            if (!is_door_open) {
-                                // reject
-                                object_blocking = true;
-                                break;
-                            }
+                // check if tile has a DOOR
+                for (auto eid : *(v0_tile->entities)) {
+                    auto eid_type = g->ct.get<entitytype>(eid).value_or(ENTITY_NONE);
+                    if (eid_type == ENTITY_DOOR) {
+                        // check if door open
+                        auto is_door_open = g->ct.get<door_open>(eid).value_or(false);
+                        if (!is_door_open) {
+                            // reject
+                            object_blocking = true;
+                            break;
                         }
-                    }
-
-                    if (object_blocking) {
-                        break;
                     }
                 }
 
                 if (object_blocking) {
-                    continue;
+                    break;
                 }
+            }
+
+            if (object_blocking) {
+                continue;
+            }
 
 
-                for (size_t i = 0; i < tile->entities->size(); i++) {
-                    const entityid id = tile_get_entity(tile, i);
+            //for (size_t i = 0; i < tile->entities->size(); i++) {
+            //    const entityid id = tile_get_entity(tile, i);
+            //    const auto type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            //    if (type == entitytype_0) {
+            //        draw_sprite_and_shadow(g, id);
+            //    }
+            //}
 
-                    auto maybe_type = g->ct.get<entitytype>(id);
-                    if (!maybe_type.has_value()) {
-                        continue;
-                    }
-
-                    const auto type = maybe_type.value();
-
-                    if (type == entitytype_0) {
-                        draw_sprite_and_shadow(g, id);
-                    }
+            for (auto id : *(tile->entities)) {
+                const auto type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+                if (type == entitytype_0) {
+                    draw_sprite_and_shadow(g, id);
                 }
             }
         }
