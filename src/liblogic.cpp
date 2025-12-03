@@ -22,6 +22,7 @@
 #include "shield.h"
 #include "update_player_tiles_explored.h"
 #include "weapon.h"
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
@@ -30,6 +31,7 @@
 #include <raylib.h>
 
 
+using std::for_each;
 using std::shared_ptr;
 using std::string;
 
@@ -114,33 +116,6 @@ void liblogic_init(shared_ptr<gamestate> g) {
 }
 
 
-//void update_player_state(shared_ptr<gamestate> g) {
-//    if (g->hero_id != ENTITYID_INVALID) {
-//        if (!g->gameover) {
-//            unsigned char a = g->ct.get<txalpha>(g->hero_id).value_or(255);
-//            if (a < 255) {
-//                a++;
-//            }
-//            g->ct.set<txalpha>(g->hero_id, a);
-//            if (g->ct.get<dead>(g->hero_id).value_or(true)) {
-//                //add_message_history(g, "You died!");
-//                g->gameover = true;
-//            }
-//            //check_and_handle_level_up(g, g->hero_id);
-//        }
-//        if (g->ct.get<dead>(g->hero_id).value_or(true)) {
-//            return;
-//        }
-//
-//        if (g->flag == GAMESTATE_FLAG_PLAYER_INPUT) {
-//            g->ct.set<blocking>(g->hero_id, false);
-//            g->ct.set<blocksuccess>(g->hero_id, false);
-//            g->ct.set<damaged>(g->hero_id, false);
-//        }
-//    }
-//}
-
-
 void update_npcs_state(shared_ptr<gamestate> g) {
     for (entityid id = 0; id < g->next_entityid; id++) {
         if (id == g->hero_id) {
@@ -183,107 +158,6 @@ void liblogic_close(shared_ptr<gamestate> g) {
     d_free(g->dungeon);
 }
 
-
-//static void handle_attack_blocked(shared_ptr<gamestate> g,
-//                                  entityid attacker_id,
-//                                  entityid target_id,
-//                                  bool* atk_successful) {
-//    massert(g, "gamestate is NULL");
-//    massert(attacker_id != ENTITYID_INVALID, "attacker entity id is invalid");
-//    massert(target_id != ENTITYID_INVALID, "target entity id is invalid");
-//    massert(atk_successful, "attack_successful is NULL");
-//    *atk_successful = false;
-//    g_set_damaged(g, target_id, false);
-//    g_set_block_success(g, target_id, true);
-//    g_set_update(g, target_id, true);
-//    //entitytype_t tgttype = g_get_type(g, target_id);
-//    //if (tgttype == ENTITY_PLAYER) {
-//    //} else if (tgttype == ENTITY_NPC) {
-//    add_message_history(g,
-//                        "%s blocked %s's attack!",
-//                        g_get_name(g, target_id).c_str(),
-//                        g_get_name(g, attacker_id).c_str());
-//    //}
-//    //if (target->type == ENTITY_PLAYER) { add_message_and_history(g, "%s blocked %s's attack!", target->name, attacker->name); }
-//}
-
-//static bool handle_shield_check(shared_ptr<gamestate> g,
-//                                entityid attacker_id,
-//                                entityid target_id,
-//                                int attack_roll,
-//                                int base_ac,
-//                                bool* attack_successful) {
-//    // if you have a shield at all, the attack will get auto-blocked
-//    entityid shield_id = g_get_equipment(g, target_id, EQUIP_SLOT_SHIELD);
-//    if (shield_id != ENTITYID_INVALID) {
-//        int shield_ac = g_get_ac(g, shield_id);
-//        int total_ac = base_ac + shield_ac;
-//        if (attack_roll < total_ac) {
-//            *attack_successful = false;
-//            handle_attack_blocked(g, attacker_id, target_id, attack_successful);
-//            return false;
-//        }
-//    }
-//    msuccess("Attack successful");
-//    *attack_successful = true;
-//    handle_attack_success(g, attacker_id, target_id, attack_successful);
-//    return true;
-//}
-
-
-//static void try_entity_wait(shared_ptr<gamestate> g, entityid id) {
-//    massert(g, "Game state is NULL!");
-//    massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-//    if (g_is_type(g, id, ENTITY_PLAYER)) g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-//    g_set_update(g, id, true);
-//}
-
-//static void
-//execute_action(shared_ptr<gamestate> g, entityid id, entity_action_t action) {
-//    massert(g, "gamestate is NULL");
-//    massert(id != ENTITYID_INVALID, "entity id is invalid");
-//    switch (action) {
-//    case ENTITY_ACTION_MOVE_LEFT: try_entity_move(g, id, -1, 0); break;
-//    case ENTITY_ACTION_MOVE_RIGHT: try_entity_move(g, id, 1, 0); break;
-//    case ENTITY_ACTION_MOVE_UP: try_entity_move(g, id, 0, -1); break;
-//    case ENTITY_ACTION_MOVE_DOWN: try_entity_move(g, id, 0, 1); break;
-//    case ENTITY_ACTION_MOVE_UP_LEFT: try_entity_move(g, id, -1, -1); break;
-//    case ENTITY_ACTION_MOVE_UP_RIGHT: try_entity_move(g, id, 1, -1); break;
-//    case ENTITY_ACTION_MOVE_DOWN_LEFT: try_entity_move(g, id, -1, 1); break;
-//    case ENTITY_ACTION_MOVE_DOWN_RIGHT: try_entity_move(g, id, 1, 1); break;
-//    //case ENTITY_ACTION_ATTACK_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y); break;
-//    //case ENTITY_ACTION_ATTACK_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y); break;
-//    //case ENTITY_ACTION_ATTACK_UP: try_entity_attack(g, e->id, loc.x, loc.y - 1); break;
-//    //case ENTITY_ACTION_ATTACK_DOWN: try_entity_attack(g, e->id, loc.x, loc.y + 1); break;
-//    //case ENTITY_ACTION_ATTACK_UP_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y - 1); break;
-//    //case ENTITY_ACTION_ATTACK_UP_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y - 1); break;
-//    //case ENTITY_ACTION_ATTACK_DOWN_LEFT: try_entity_attack(g, e->id, loc.x - 1, loc.y + 1); break;
-//    //case ENTITY_ACTION_ATTACK_DOWN_RIGHT: try_entity_attack(g, e->id, loc.x + 1, loc.y + 1); break;
-//    case ENTITY_ACTION_MOVE_RANDOM: try_entity_move_random(g, id); break;
-//    case ENTITY_ACTION_WAIT: try_entity_wait(g, id); break;
-//    //case ENTITY_ACTION_ATTACK_RANDOM: try_entity_attack_random(g, e); break;
-//    //case ENTITY_ACTION_MOVE_PLAYER:
-//    //    try_entity_move_player(g, e);
-//    //    break;
-//    //case ENTITY_ACTION_ATTACK_PLAYER: try_entity_attack_player(g, e); break;
-//    //case ENTITY_ACTION_MOVE_ATTACK_PLAYER: try_entity_move_attack_player(g, e); break;
-//    case ENTITY_ACTION_MOVE_A_STAR:
-//        try_entity_move_a_star(g, id);
-//        break;
-//        //case ENTITY_ACTION_INTERACT_DOWN_LEFT:
-//        //case ENTITY_ACTION_INTERACT_DOWN_RIGHT:
-//        //case ENTITY_ACTION_INTERACT_UP_LEFT:
-//        //case ENTITY_ACTION_INTERACT_UP_RIGHT:
-//        //case ENTITY_ACTION_INTERACT_LEFT:
-//        //case ENTITY_ACTION_INTERACT_RIGHT:
-//        //case ENTITY_ACTION_INTERACT_UP:
-//        //case ENTITY_ACTION_INTERACT_DOWN:
-//    case ENTITY_ACTION_NONE:
-//        // do nothing
-//        break;
-//    default: merror("Unknown entity action: %d", action); break;
-//    }
-//}
 
 //static vec3* get_locs_around_entity(shared_ptr<gamestate> g, entityid id) {
 //    massert(g, "gamestate is NULL");
@@ -365,25 +239,6 @@ void liblogic_close(shared_ptr<gamestate> g) {
 //    int h = g->dungeon->floors->at(floor)->height;
 //
 //    return get_random_available_loc_in_area(g, floor, 0, 0, w, h);
-//}
-
-// this should only take into account any equipment that has light radius bonus equipment
-//static int get_entity_total_light_radius_bonus(gamestate* const g, entityid id) {
-//    int total_light_radius_bonus = 0;
-//    // get the light radius bonus from the equipment
-//    massert(g, "gamestate is NULL");
-//    massert(id != ENTITYID_INVALID, "entity id is invalid");
-//    // check each equipment slot
-//    for (int i = 0; i < EQUIPMENT_SLOT_COUNT; i++) {
-//        entityid equip_id = g_get_equipment(g, id, i);
-//        if (equip_id == ENTITYID_INVALID) continue;
-//        if (!g_has_light_radius_bonus(g, equip_id)) continue;
-//        int light_radius_bonus = g_get_light_radius_bonus(g, equip_id);
-//        total_light_radius_bonus += light_radius_bonus;
-//    }
-//    // only return the total light radius bonus
-//    // it is fine if it is negative that might be fun for cursed items
-//    return total_light_radius_bonus;
 //}
 
 
