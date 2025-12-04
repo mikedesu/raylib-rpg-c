@@ -61,7 +61,7 @@ libdraw_camera_lock_on.cpp \
 libdraw.cpp \
 liblogic_drop_item.cpp \
 liblogic_is_entity_adjacent.cpp \
-liblogic_try_entity_pickup.cpp \
+try_entity_pickup.cpp \
 liblogic_add_message.cpp \
 liblogic_update_player_state.cpp \
 liblogic_tile_npc_living_count.cpp \
@@ -170,7 +170,7 @@ dungeon_tile.o \
 liblogic_is_entity_adjacent.o \
 liblogic_drop_item.o \
 liblogic_add_message.o \
-liblogic_try_entity_pickup.o \
+try_entity_pickup.o \
 liblogic_update_player_state.o \
 liblogic_tile_npc_living_count.o \
 liblogic_tile_has_box.o \
@@ -388,7 +388,7 @@ liblogic_drop_item.o: liblogic_drop_item.cpp
 try_entity_attack.o: try_entity_attack.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic_try_entity_pickup.o: liblogic_try_entity_pickup.cpp
+try_entity_pickup.o: try_entity_pickup.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_add_message.o: liblogic_add_message.cpp

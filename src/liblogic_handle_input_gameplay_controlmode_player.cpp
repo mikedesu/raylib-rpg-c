@@ -7,10 +7,10 @@
 #include "liblogic_handle_input_gameplay_controlmode_player.h"
 #include "liblogic_handle_input_help_menu.h"
 #include "liblogic_try_entity_move.h"
-#include "liblogic_try_entity_pickup.h"
 #include "sfx.h"
 #include "try_entity_attack.h"
 #include "try_entity_open_door.h"
+#include "try_entity_pickup.h"
 #include "try_entity_stairs.h"
 #include <raylib.h>
 
