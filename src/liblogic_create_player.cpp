@@ -1,5 +1,5 @@
 #include "ComponentTraits.h"
-#include "liblogic_create_npc.h"
+#include "create_npc.h"
 #include "liblogic_create_player.h"
 
 entityid create_player(shared_ptr<gamestate> g, vec3 loc, string name) {
