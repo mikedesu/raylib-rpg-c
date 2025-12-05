@@ -35,6 +35,7 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
 
         // temporary wedge-in code
         // set all the NPCs to target the hero
+        minfo("BEGIN Temporary wedge-in code");
         for (entityid id = 0; id < g->next_entityid; id++) {
             minfo("Getting type for id %d", id);
             entitytype_t t = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
@@ -44,7 +45,7 @@ void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<i
             }
         }
 
-        //minfo("END Temporary wedge-in code");
+        minfo("END Temporary wedge-in code");
         g->current_scene = SCENE_GAMEPLAY;
 
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {

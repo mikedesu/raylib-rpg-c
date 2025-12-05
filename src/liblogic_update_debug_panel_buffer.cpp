@@ -6,12 +6,13 @@ void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> i
     massert(g, "gamestate is NULL");
     // Static buffers to avoid reallocating every frame
     //static const char* control_modes[] = {"Camera", "Player", "Unknown"};
+
     int message_count = g->msg_history->size();
     int inventory_count;
     vec3 loc = {0, 0, 0};
     inventory_count = -1;
     if (g->hero_id != ENTITYID_INVALID) {
-        loc = g->ct.get<location>(g->hero_id).value();
+        loc = g->ct.get<location>(g->hero_id).value_or((vec3){-1, -1, -1});
     }
     // Determine control mode and flag strings
     const char* control_mode = g->controlmode == CONTROLMODE_CAMERA ? "Camera" : g->controlmode == CONTROLMODE_PLAYER ? "Player" : "Unknown";

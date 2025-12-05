@@ -38,6 +38,8 @@ void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu) {
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(main_game_target_texture);
+    minfo("entering drawframe_2d");
     libdraw_drawframe_2d(g);
+    minfo("exitting drawframe_2d");
     EndTextureMode();
 }

@@ -205,8 +205,9 @@ sprite* get_shield_back_sprite(const shared_ptr<gamestate> g,
 
 
 void libdraw_drawframe(shared_ptr<gamestate> g) {
-    minfo2("Begin draw frame");
+    minfo("Begin draw frame");
     double start_time = GetTime();
+    minfo("Update sprites pre");
     libdraw_update_sprites_pre(g);
 
     BeginDrawing();
@@ -216,21 +217,25 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     //SetShaderValue(shader_psychedelic_0, GetShaderLocation(shader_psychedelic_0, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
     if (g->frame_dirty) {
-        minfo2("handling dirty frame");
+        minfo("handling dirty frame");
         if (g->current_scene == SCENE_TITLE) {
+            minfo("handling title");
             draw_title_screen_to_texture(g, false);
         } else if (g->current_scene == SCENE_MAIN_MENU) {
+            minfo("handling main menu");
             draw_title_screen_to_texture(g, true);
         } else if (g->current_scene == SCENE_CHARACTER_CREATION) {
+            minfo("handling character creation");
             draw_character_creation_screen_to_texture(g);
         } else if (g->current_scene == SCENE_GAMEPLAY) {
+            minfo("handling gameplay");
             libdraw_drawframe_2d_to_texture(g);
         }
         g->frame_dirty = false;
         g->frame_updates++;
     }
     // draw to the target texture
-    minfo2("drawing frame to target texture");
+    minfo("drawing frame to target texture");
     BeginTextureMode(target);
     ClearBackground(BLUE);
     if (g->current_scene == SCENE_TITLE) {
@@ -244,16 +249,19 @@ void libdraw_drawframe(shared_ptr<gamestate> g) {
     }
     //DrawFPS(0, DEFAULT_TARGET_HEIGHT - 20);
     //handle_debug_panel(g);
+    minfo("End texture mode");
     EndTextureMode();
     // draw the target texture to the window
     win_dest.width = GetScreenWidth();
     win_dest.height = GetScreenHeight();
     DrawTexturePro(target.texture, target_src, win_dest, (Vector2){0, 0}, 0.0f, WHITE);
+    minfo("End drawing");
     EndDrawing();
     g->last_frame_time = GetTime() - start_time;
     g->framecount++;
+    minfo("Update sprites post");
     libdraw_update_sprites_post(g);
-    msuccess2("End draw frame");
+    msuccess("End draw frame");
 }
 
 

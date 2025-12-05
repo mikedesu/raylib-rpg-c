@@ -105,19 +105,21 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
 
     //#ifdef SPAWN_MONSTERS
-    entityid orc1 = create_npc(g, RACE_ORC, (vec3){13, 9, 0}, "orc");
+    //entityid orc1 = create_npc(g, RACE_ORC, (vec3){13, 9, 0}, "orc");
 
-    entityid orc1_weapon = create_weapon_with(g, [g](entityid id) {
-        g->ct.set<name>(id, "Dagger");
-        g->ct.set<description>(id, "Stabby stabby.");
-        g->ct.set<weapontype>(id, WEAPON_DAGGER);
-        g->ct.set<damage>(id, (vec3){1, 4, 0});
-        g->ct.set<durability>(id, 100);
-        g->ct.set<max_durability>(id, 100);
-    });
+    //entityid orc1 = create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [g](entityid id) {
+    //    entityid orc1_weapon = create_weapon_with(g, [g](entityid id2) {
+    //        g->ct.set<name>(id2, "Axe");
+    //        g->ct.set<description>(id2, "We choppin' trees.");
+    //        g->ct.set<weapontype>(id2, WEAPON_AXE);
+    //        g->ct.set<damage>(id2, (vec3){1, 4, 0});
+    //        g->ct.set<durability>(id2, 100);
+    //        g->ct.set<max_durability>(id2, 100);
+    //    });
+    //    add_to_inventory(g, id, orc1_weapon);
+    //    g->ct.set<equipped_weapon>(id, orc1_weapon);
+    //});
 
-    add_to_inventory(g, orc1, orc1_weapon);
-    g->ct.set<equipped_weapon>(orc1, orc1_weapon);
 
     //entityid orc2 = create_npc(g, RACE_ORC, (vec3){14, 9, 0}, "orc");
     //entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
@@ -176,21 +178,27 @@ void update_npcs_state(shared_ptr<gamestate> g) {
 void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
-    //minfo("Begin tick");
+    minfo("Begin tick");
     // Spawn NPCs periodically
     //try_spawn_npc(g);
     // update ALL entities
+    minfo("Update player tiles explored");
     update_player_tiles_explored(g);
 
+    minfo("Update player state");
     update_player_state(g);
+    minfo("Update NPCs state");
     update_npcs_state(g);
+    minfo("Handle input");
     handle_input(g, is);
+    minfo("Handle NPCs");
     handle_npcs(g);
+    minfo("Update debug panel buffer");
     update_debug_panel_buffer(g, is);
     g->currenttime = time(NULL);
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
-    //msuccess("End tick");
+    msuccess("End tick");
 }
 
 
