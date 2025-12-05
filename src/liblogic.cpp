@@ -1,6 +1,7 @@
 #include "ComponentTable.h"
 #include "ComponentTraits.h"
 #include "create_door.h"
+#include "create_shield.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
@@ -10,7 +11,6 @@
 #include "liblogic.h"
 #include "liblogic_add_message.h"
 #include "liblogic_create_npc.h"
-#include "liblogic_create_shield.h"
 #include "liblogic_create_weapon.h"
 #include "liblogic_handle_input.h"
 #include "liblogic_handle_npcs.h"
@@ -22,7 +22,7 @@
 #include "shield.h"
 #include "update_player_tiles_explored.h"
 #include "weapon.h"
-#include <algorithm>
+//#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
@@ -31,7 +31,7 @@
 #include <raylib.h>
 
 
-using std::for_each;
+//using std::for_each;
 using std::shared_ptr;
 using std::string;
 

@@ -1,5 +1,5 @@
 #include "ComponentTraits.h"
-#include "liblogic_create_shield.h"
+#include "create_shield.h"
 #include "shield.h"
 
 entityid create_shield_at(shared_ptr<gamestate> g, vec3 loc, shieldtype_t type) {

@@ -84,7 +84,7 @@ liblogic_handle_input_gameplay_scene.cpp \
 liblogic_init_dungeon.cpp \
 liblogic_cycle_messages.cpp \
 liblogic_update_debug_panel_buffer.cpp \
-liblogic_create_shield.cpp \
+create_shield.cpp \
 liblogic.cpp \
 gamestate_inventory.cpp \
 gamestate.cpp \
@@ -191,7 +191,7 @@ liblogic_handle_input_character_creation_scene.o \
 liblogic_handle_input_gameplay_controlmode_player.o \
 liblogic_update_debug_panel_buffer.o \
 liblogic_init_dungeon.o \
-liblogic_create_shield.o \
+create_shield.o \
 liblogic_cycle_messages.o \
 liblogic.o \
 
@@ -370,7 +370,7 @@ create_door.o: create_door.cpp
 try_entity_stairs.o: try_entity_stairs.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic_create_shield.o: liblogic_create_shield.cpp
+create_shield.o: create_shield.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 manage_inventory.o: manage_inventory.cpp
