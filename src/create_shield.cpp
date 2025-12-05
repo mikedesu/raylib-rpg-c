@@ -40,34 +40,59 @@ entityid create_shield(shared_ptr<gamestate> g, shieldtype_t type) {
     massert(g, "gamestate is NULL");
     minfo("BEGIN create_shield");
 
-    const auto id = g_add_entity(g);
+    //const auto id = g_add_entity(g);
+    //g->ct.set<entitytype>(id, ENTITY_ITEM);
+    //g->ct.set<itemtype>(id, ITEM_SHIELD);
+    //g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+    //g->ct.set<txalpha>(id, 255);
+    //g->ct.set<update>(id, true);
 
-    g->ct.set<entitytype>(id, ENTITY_ITEM);
-    g->ct.set<itemtype>(id, ITEM_SHIELD);
-    g->ct.set<shieldtype>(id, type);
+    //g->ct.set<shieldtype>(id, type);
+    //string item_name = "unnamed-shield";
+    //string desc = "no-description";
+    //if (type == SHIELD_BUCKLER) {
+    //    item_name = "buckler";
+    //    desc = "Your basic buckler.";
+    //} else if (type == SHIELD_KITE) {
+    //    item_name = "kite shield";
+    //    desc = "Standard issue.";
+    //} else if (type == SHIELD_TOWER) {
+    //    item_name = "tower shield";
+    //    desc = "It towers over you.";
+    //}
+    //g->ct.set<name>(id, item_name);
+    //g->ct.set<description>(id, desc);
+    //g->ct.set<block_chance>(id, 50);
 
-    string item_name = "unnamed-shield";
-    string desc = "no-description";
+    const auto id = create_shield_with(g, [g, type](entityid id) {
+        g->ct.set<shieldtype>(id, type);
+        string item_name = "unnamed-shield";
+        string desc = "no-description";
+        if (type == SHIELD_BUCKLER) {
+            item_name = "buckler";
+            desc = "Your basic buckler.";
+        } else if (type == SHIELD_KITE) {
+            item_name = "kite shield";
+            desc = "Standard issue.";
+        } else if (type == SHIELD_TOWER) {
+            item_name = "tower shield";
+            desc = "It towers over you.";
+        }
+        g->ct.set<name>(id, item_name);
+        g->ct.set<description>(id, desc);
+        g->ct.set<block_chance>(id, 50);
+    });
 
-    if (type == SHIELD_BUCKLER) {
-        item_name = "buckler";
-        desc = "Your basic buckler.";
-    } else if (type == SHIELD_KITE) {
-        item_name = "kite shield";
-        desc = "Standard issue.";
-    } else if (type == SHIELD_TOWER) {
-        item_name = "tower shield";
-        desc = "It towers over you.";
-    }
-
-    g->ct.set<name>(id, item_name);
-    g->ct.set<description>(id, desc);
-    g->ct.set<txalpha>(id, 255);
-    g->ct.set<update>(id, true);
-    g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
-
-    g->ct.set<block_chance>(id, 50);
 
     minfo("END create_shield");
+    return id;
+}
+
+
+entityid create_shield_with(shared_ptr<gamestate> g, function<void(entityid)> shieldInitFunction) {
+    const auto id = g_add_entity(g);
+    g->ct.set<entitytype>(id, ENTITY_ITEM);
+    g->ct.set<itemtype>(id, ITEM_SHIELD);
+    shieldInitFunction(id);
     return id;
 }
