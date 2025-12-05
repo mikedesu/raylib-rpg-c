@@ -1,9 +1,9 @@
 //#include "gamestate_equipped_weapon.h"
 //#include "gamestate_inventory.h"
 #include "ComponentTraits.h"
+#include "draw_inventory_menu.h"
 #include "entityid.h"
 #include "item.h"
-#include "libdraw_draw_inventory_menu.h"
 #include "libgame_defines.h"
 #include "spritegroup.h"
 #include <raylib.h>

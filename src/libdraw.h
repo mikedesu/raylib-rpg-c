@@ -4,7 +4,7 @@
 
 #include "libdraw_create_spritegroup.h"
 #include "libdraw_draw_character_creation_screen.h"
-#include "libdraw_draw_inventory_menu.h"
+//#include "libdraw_draw_inventory_menu.h"
 #include "libdraw_help_menu.h"
 #include "libdraw_hud.h"
 #include "libdraw_load_textures.h"

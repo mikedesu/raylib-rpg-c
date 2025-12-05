@@ -19,7 +19,7 @@ create_door.cpp \
 try_entity_stairs.cpp \
 manage_inventory.cpp \
 update_player_tiles_explored.cpp \
-libdraw_draw_inventory_menu.cpp \
+draw_inventory_menu.cpp \
 libdraw_message_history.cpp \
 libdraw_version.cpp \
 libdraw_title_screen.cpp \
@@ -120,7 +120,7 @@ try_entity_stairs.o \
 try_entity_attack.o \
 manage_inventory.o \
 update_player_tiles_explored.o \
-libdraw_draw_inventory_menu.o \
+draw_inventory_menu.o \
 libdraw_message_history.o \
 libdraw_version.o \
 libdraw_title_screen.o \
@@ -291,7 +291,7 @@ libdraw_title_screen.o: libdraw_title_screen.cpp
 libdraw_help_menu.o: libdraw_help_menu.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-libdraw_draw_inventory_menu.o: libdraw_draw_inventory_menu.cpp
+draw_inventory_menu.o: draw_inventory_menu.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_draw_character_creation_screen.o: libdraw_draw_character_creation_screen.cpp
