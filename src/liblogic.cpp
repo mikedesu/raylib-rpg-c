@@ -81,12 +81,12 @@ void liblogic_init(shared_ptr<gamestate> g) {
         g->ct.set<block_chance>(id, 90);
     });
 
-    create_shield_at_with(g, (vec3){10, 10, 0}, [g](entityid id) {
-        g->ct.set<name>(id, "Tower");
-        g->ct.set<description>(id, "Lambda Tower");
-        g->ct.set<shieldtype>(id, SHIELD_TOWER);
-        g->ct.set<block_chance>(id, 100);
-    });
+    //create_shield_at_with(g, (vec3){10, 10, 0}, [g](entityid id) {
+    //    g->ct.set<name>(id, "Tower");
+    //    g->ct.set<description>(id, "Lambda Tower");
+    //    g->ct.set<shieldtype>(id, SHIELD_TOWER);
+    //    g->ct.set<block_chance>(id, 100);
+    //});
 
 
     //create_weapon_at(g, (vec3){11, 10, 0}, WEAPON_SWORD);

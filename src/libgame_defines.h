@@ -348,7 +348,7 @@
 #define TX_DAGGER 197
 #define TX_TWO_HANDED_SWORD 198
 
-#define TX_IRON_SHIELD 199
+#define TX_KITE_SHIELD 199
 #define TX_WOODEN_TOWER_SHIELD 200
 
 #define TX_POTION_HP_SMALL 201
@@ -393,10 +393,10 @@
 //296 4 3 0 img/actions/guard_buckler_success_back.png
 //297 4 3 0 img/actions/guard_iron_shield_success_front.png
 //298 4 3 0 img/actions/guard_iron_shield_success_back.png
-#define TX_GUARD_WOODEN_SHIELD_SUCCESS_FRONT 295
-#define TX_GUARD_WOODEN_SHIELD_SUCCESS_BACK 296
-#define TX_GUARD_IRON_SHIELD_SUCCESS_FRONT 297
-#define TX_GUARD_IRON_SHIELD_SUCCESS_BACK 298
+//#define TX_GUARD_WOODEN_SHIELD_SUCCESS_FRONT 295
+//#define TX_GUARD_WOODEN_SHIELD_SUCCESS_BACK 296
+#define TX_GUARD_KITE_SHIELD_SUCCESS_FRONT 297
+#define TX_GUARD_KITE_SHIELD_SUCCESS_BACK 298
 
 //299 1 4 0 img/weapons/bow.png
 //#

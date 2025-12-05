@@ -84,7 +84,17 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             default: merror("unknown weapon type %d", weapon_type); return;
             }
         } else if (item_type == ITEM_SHIELD) {
-            create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12);
+            auto shield_type = g->ct.get<shieldtype>(id).value_or(SHIELD_NONE);
+
+            switch (shield_type) {
+            case SHIELD_BUCKLER: create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12); break;
+            case SHIELD_KITE: create_spritegroup(g, id, TX_KITE_SHIELD_KEYS, TX_BUCKLER_COUNT, -12, -12); break;
+            //case SHIELD_TOWER:
+            //create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12);
+            //break;
+            default: merror("unknown shield type %d", shield_type); return;
+            }
+            //create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12);
         }
         //} else if (item_type == ITEM_WAND) {
         //    create_spritegroup(g, id, TX_WAND_BASIC_KEYS, TX_WAND_BASIC_COUNT, -12, -12);
