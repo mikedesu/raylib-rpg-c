@@ -136,6 +136,10 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
                     PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
                     g->ct.set<block_success>(target_id, true);
                     g->ct.set<update>(target_id, true);
+                    add_message_history(g,
+                                        "%s blocked an attack from %s",
+                                        g->ct.get<name>(target_id).value_or("no-name").c_str(),
+                                        g->ct.get<name>(attacker_id).value_or("no-name").c_str());
                 }
             } else if (roll <= low_roll) {
                 // failed to block
@@ -149,6 +153,10 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
                     PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
                     g->ct.set<block_success>(target_id, true);
                     g->ct.set<update>(target_id, true);
+                    add_message_history(g,
+                                        "%s blocked an attack from %s",
+                                        g->ct.get<name>(target_id).value_or("no-name").c_str(),
+                                        g->ct.get<name>(attacker_id).value_or("no-name").c_str());
                 }
             }
 
@@ -198,86 +206,99 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
     massert(atk_successful, "attack_successful is NULL");
 
-    //const entitytype_t atktype = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
     const entitytype_t tgttype = g->ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
 
-    if (*atk_successful) {
-        //msuccess("Attack was SUCCESSFUL!");
-        const entityid equipped_wpn = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
-        const vec3 dmg_range = g->ct.get<damage>(equipped_wpn).value_or((vec3){1, 2, 0});
-        const int dmg = GetRandomValue(dmg_range.x, dmg_range.y);
+    if (!*atk_successful) {
+        merror("Missed attack");
+        return;
+    }
 
-        g->ct.set<damaged>(tgt_id, true);
-        g->ct.set<update>(tgt_id, true);
+    const entityid equipped_wpn = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
+    const vec3 dmg_range = g->ct.get<damage>(equipped_wpn).value_or((vec3){1, 2, 0});
+    const int dmg = GetRandomValue(dmg_range.x, dmg_range.y);
 
-        optional<int> maybe_tgt_hp = g->ct.get<hp>(tgt_id);
-        if (maybe_tgt_hp.has_value()) {
-            int tgt_hp = maybe_tgt_hp.value();
-            if (tgt_hp <= 0) {
-                merror("Target is already dead, hp was: %d", tgt_hp);
-                g->ct.set<dead>(tgt_id, true);
-                return;
-            }
-            tgt_hp -= dmg;
-            g->ct.set<hp>(tgt_id, tgt_hp);
-            //if (tgttype == ENTITY_PLAYER) {
-            //add_message(g, "%s attacked you for %d damage!", g->ct.get<name>(atk_id).value_or("no-name").c_str(), dmg);
-            //} else if (atktype == ENTITY_PLAYER && tgttype == ENTITY_NPC) {
-            //add_message(g,
-            //            "%s attacked %s for %d damage!",
-            //            g->ct.get<name>(atk_id).value_or("no-name").c_str(),
-            //            g->ct.get<name>(tgt_id).value_or("no-name").c_str(),
-            //            dmg);
-            //}
-
-            // get the equipped weapon of the attacker
-            entityid wpn_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
-            const int max_dura = g->ct.get<max_durability>(wpn_id).value_or(0);
-            // decrement its durability
-            const int dura = g->ct.get<durability>(wpn_id).value_or(0);
-            g->ct.set<durability>(wpn_id, dura - 1 < 0 ? 0 : dura - 1);
-            if (dura == 0) {
-                // permanently decrement from the max_durability
-                if (max_dura == 0) {
-                    // item destroyed
-                    g->ct.set<destroyed>(wpn_id, true);
-
-                } else {
-                    g->ct.set<max_durability>(wpn_id, max_dura - 1 < 0 ? 0 : max_dura - 1);
-                    // other bad things including -1 bonuses that we aren't handling yet
-                }
-            }
+    g->ct.set<damaged>(tgt_id, true);
+    g->ct.set<update>(tgt_id, true);
 
 
-            if (tgt_hp <= 0) {
-                //g_update_dead(g, tgt_id, true);
-                g->ct.set<dead>(tgt_id, true);
-                if (tgttype == ENTITY_NPC) {
-                    // increment attacker's xp
-                    const int old_xp = g->ct.get<xp>(atk_id).value_or(0);
-                    const int reward_xp = 1;
-                    const int new_xp = old_xp + reward_xp;
-                    g->ct.set<xp>(atk_id, new_xp);
-                    // handle item drops?
-                    // ...
-                    //vec3 loc = g_get_loc(g, tgt_id);
-                    //vec3 loc_cast = {loc.x, loc.y, loc.z};
-                    //entityid id = ENTITYID_INVALID;
-                    //while (id == ENTITYID_INVALID)
-                    //    id = potion_create(g,
-                    //                       loc,
-                    //                       POTION_HEALTH_SMALL,
-                    //                       "small health potion");
-                } else {
-                    add_message(g, "You died");
-                }
-            } else {
-                g->ct.set<dead>(tgt_id, false);
-            }
+    add_message_history(
+        g, "%s deals %d damage to %s", g->ct.get<name>(atk_id).value_or("no-name").c_str(), dmg, g->ct.get<name>(tgt_id).value_or("no-name").c_str());
+
+
+    auto maybe_tgt_hp = g->ct.get<hp>(tgt_id);
+    if (!maybe_tgt_hp.has_value()) {
+        merror("target has no HP component");
+        return;
+    }
+
+
+    //if (maybe_tgt_hp.has_value()) {
+    int tgt_hp = maybe_tgt_hp.value();
+    if (tgt_hp <= 0) {
+        merror("Target is already dead, hp was: %d", tgt_hp);
+        g->ct.set<dead>(tgt_id, true);
+        return;
+    }
+    tgt_hp -= dmg;
+    g->ct.set<hp>(tgt_id, tgt_hp);
+    //if (tgttype == ENTITY_PLAYER) {
+    //add_message(g, "%s attacked you for %d damage!", g->ct.get<name>(atk_id).value_or("no-name").c_str(), dmg);
+    //} else if (atktype == ENTITY_PLAYER && tgttype == ENTITY_NPC) {
+    //add_message(g,
+    //            "%s attacked %s for %d damage!",
+    //            g->ct.get<name>(atk_id).value_or("no-name").c_str(),
+    //            g->ct.get<name>(tgt_id).value_or("no-name").c_str(),
+    //            dmg);
+    //}
+
+    // get the equipped weapon of the attacker
+    entityid wpn_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
+    const int max_dura = g->ct.get<max_durability>(wpn_id).value_or(0);
+    // decrement its durability
+    const int dura = g->ct.get<durability>(wpn_id).value_or(0);
+    g->ct.set<durability>(wpn_id, dura - 1 < 0 ? 0 : dura - 1);
+    if (dura == 0) {
+        // permanently decrement from the max_durability
+        if (max_dura == 0) {
+            // item destroyed
+            g->ct.set<destroyed>(wpn_id, true);
+
         } else {
-            merror("Target does not have an HP component");
+            g->ct.set<max_durability>(wpn_id, max_dura - 1 < 0 ? 0 : max_dura - 1);
+            // other bad things including -1 bonuses that we aren't handling yet
+        }
+    }
+
+
+    if (tgt_hp <= 0) {
+        g->ct.set<dead>(tgt_id, true);
+        if (tgttype == ENTITY_NPC) {
+            // increment attacker's xp
+            const int old_xp = g->ct.get<xp>(atk_id).value_or(0);
+            const int reward_xp = 1;
+            const int new_xp = old_xp + reward_xp;
+            g->ct.set<xp>(atk_id, new_xp);
+            // handle item drops?
+            // ...
+            //vec3 loc = g_get_loc(g, tgt_id);
+            //vec3 loc_cast = {loc.x, loc.y, loc.z};
+            //entityid id = ENTITYID_INVALID;
+            //while (id == ENTITYID_INVALID)
+            //    id = potion_create(g,
+            //                       loc,
+            //                       POTION_HEALTH_SMALL,
+            //                       "small health potion");
+        } else {
+            add_message(g, "You died");
         }
     } else {
-        merror("Attack MISSED");
+        g->ct.set<dead>(tgt_id, false);
     }
+    //} else {
+    //    merror("Target does not have an HP component");
+    //}
+    //}
+    //else {
+    //    merror("Attack MISSED");
+    //}
 }
