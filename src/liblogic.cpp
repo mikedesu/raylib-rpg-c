@@ -62,11 +62,34 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 6, 0});
     //create_wooden_box(g, (vec3){7, 7, 0});
 
-    create_weapon_at(g, (vec3){10, 9, 0}, WEAPON_DAGGER);
-    create_weapon_at(g, (vec3){10, 10, 0}, WEAPON_AXE);
+    //create_weapon_at(g, (vec3){10, 9, 0}, WEAPON_DAGGER);
+    //create_weapon_at(g, (vec3){10, 10, 0}, WEAPON_AXE);
 
-    create_shield_at(g, (vec3){11, 9, 0}, SHIELD_BUCKLER);
-    create_weapon_at(g, (vec3){11, 10, 0}, WEAPON_SWORD);
+    //create_shield_at(g, (vec3){11, 9, 0}, SHIELD_BUCKLER);
+
+    create_shield_at_with(g, (vec3){11, 9, 0}, [g](entityid id) {
+        g->ct.set<name>(id, "Buckler");
+        g->ct.set<description>(id, "Lambda Buckler");
+        g->ct.set<shieldtype>(id, SHIELD_BUCKLER);
+        g->ct.set<block_chance>(id, 50);
+    });
+
+    create_shield_at_with(g, (vec3){10, 9, 0}, [g](entityid id) {
+        g->ct.set<name>(id, "Kite");
+        g->ct.set<description>(id, "Lambda Kite");
+        g->ct.set<shieldtype>(id, SHIELD_KITE);
+        g->ct.set<block_chance>(id, 90);
+    });
+
+    create_shield_at_with(g, (vec3){10, 10, 0}, [g](entityid id) {
+        g->ct.set<name>(id, "Tower");
+        g->ct.set<description>(id, "Lambda Tower");
+        g->ct.set<shieldtype>(id, SHIELD_TOWER);
+        g->ct.set<block_chance>(id, 100);
+    });
+
+
+    //create_weapon_at(g, (vec3){11, 10, 0}, WEAPON_SWORD);
 
     create_door_at(g, (vec3){12, 9, 0});
     create_door_at(g, (vec3){14, 12, 0});
