@@ -1,5 +1,5 @@
 #include "ComponentTraits.h"
-#include "liblogic_create_weapon.h"
+#include "create_weapon.h"
 
 entityid create_weapon_at(shared_ptr<gamestate> g, vec3 loc, weapontype_t type) {
     minfo("weapon create at location...");
