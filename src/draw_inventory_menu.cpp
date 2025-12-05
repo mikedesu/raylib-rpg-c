@@ -53,6 +53,9 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
     //optional<shared_ptr<vector<entityid>>> my_inventory = g->ct.get<inventory>(g->hero_id);
     auto my_inventory = g->ct.get<inventory>(g->hero_id);
 
+    //if (my_inventory == nullopt)
+    //    return;
+
     if (my_inventory) {
         // lets start with just one block
         float x = left_box.x + 2;
@@ -62,95 +65,108 @@ void draw_inventory_menu(shared_ptr<gamestate> g) {
         const int rows = 7;
         const float h = (left_box.height - 4) / rows;
 
-
-        if (my_inventory.has_value()) {
-            // unpack the inventory optional
-            //shared_ptr<vector<entityid>> unpacked_inventory = my_inventory.value();
-            auto unpacked_inventory = my_inventory.value();
-
-            auto it = unpacked_inventory->begin();
-
-            // for each location in the grid...
-            for (int j = 0; j < rows; j++) {
-                for (int i = 0; i < cols; i++) {
-                    Rectangle grid_box = {x, y, w, h};
-                    Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
-                    DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
-                    if (it != unpacked_inventory->end()) {
-                        spritegroup_t* sg = spritegroups[*it];
-                        if (sg) {
-                            auto sprite = sg_get_current(sg);
-                            DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
-
-                            size_t index = j * cols + i;
-
-                            if (index >= 0 && index < unpacked_inventory->size()) {
-                                entityid selection_id = unpacked_inventory->at(index);
-
-                                entityid cur_wpn_id = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
-
-                                entityid cur_shield_id = g->ct.get<equipped_shield>(g->hero_id).value_or(ENTITYID_INVALID);
+        if (!my_inventory.has_value())
+            return;
 
 
-                                if ((selection_id == cur_wpn_id && cur_wpn_id != ENTITYID_INVALID) ||
-                                    (selection_id == cur_shield_id && cur_shield_id != ENTITYID_INVALID)
+        //if (my_inventory.has_value()) {
+        // unpack the inventory optional
+        //shared_ptr<vector<entityid>> unpacked_inventory = my_inventory.value();
+        auto unpacked_inventory = my_inventory.value();
 
+        auto it = unpacked_inventory->begin();
 
-                                ) {
-                                    DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
-                                }
-                            }
-                        }
-                        it++;
-                    }
-                    if ((float)i == g->inventory_cursor.x && (float)j == g->inventory_cursor.y) {
-                        DrawRectangleLinesEx(grid_box, 2, GREEN);
-                    }
-                    x += w;
-                }
-                x = left_box.x + 2;
-                y += h;
-            }
-
-            // in the right box, item detail
-            if (unpacked_inventory->size() > 0) {
-                size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
-                if (index >= 0 && index < unpacked_inventory->size()) {
-                    entityid selection_id = unpacked_inventory->at(index);
-                    spritegroup_t* sg = spritegroups[selection_id];
-                    itemtype_t item_type = g->ct.get<itemtype>(selection_id).value_or(ITEM_NONE);
+        // for each location in the grid...
+        for (int j = 0; j < rows; j++) {
+            for (int i = 0; i < cols; i++) {
+                Rectangle grid_box = {x, y, w, h};
+                Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
+                DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
+                if (it != unpacked_inventory->end()) {
+                    spritegroup_t* sg = spritegroups[*it];
+                    if (!sg)
+                        continue;
 
                     if (sg) {
                         auto sprite = sg_get_current(sg);
-                        DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
+                        DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
 
-                        // new-style component table access
-                        string my_name = g->ct.get<name>(selection_id).value_or("no-name");
-                        const int fontsize = 10;
-                        const int cur_x = right_box.x + 10;
-                        int cur_y = right_box.y + 10;
-                        const int y_incr = 10;
+                        size_t index = j * cols + i;
 
-                        DrawText(my_name.c_str(), cur_x, cur_y, fontsize, WHITE);
+                        if (index >= 0 && index < unpacked_inventory->size()) {
+                            entityid selection_id = unpacked_inventory->at(index);
+
+                            entityid cur_wpn_id = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
+
+                            entityid cur_shield_id = g->ct.get<equipped_shield>(g->hero_id).value_or(ENTITYID_INVALID);
+
+
+                            if ((selection_id == cur_wpn_id && cur_wpn_id != ENTITYID_INVALID) ||
+                                (selection_id == cur_shield_id && cur_shield_id != ENTITYID_INVALID)
+
+
+                            ) {
+                                DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
+                            }
+                        }
+                    }
+                    it++;
+                }
+                if ((float)i == g->inventory_cursor.x && (float)j == g->inventory_cursor.y) {
+                    DrawRectangleLinesEx(grid_box, 2, GREEN);
+                }
+                x += w;
+            }
+            x = left_box.x + 2;
+            y += h;
+        }
+
+        // in the right box, item detail
+        if (unpacked_inventory->size() > 0) {
+            size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+            if (index >= 0 && index < unpacked_inventory->size()) {
+                entityid selection_id = unpacked_inventory->at(index);
+                spritegroup_t* sg = spritegroups[selection_id];
+                itemtype_t item_type = g->ct.get<itemtype>(selection_id).value_or(ITEM_NONE);
+
+
+                if (sg) {
+                    auto sprite = sg_get_current(sg);
+                    DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
+
+                    // new-style component table access
+                    const string my_name = g->ct.get<name>(selection_id).value_or("no-name");
+                    const int fontsize = 10;
+                    const int cur_x = right_box.x + 10;
+                    int cur_y = right_box.y + 10;
+                    const int y_incr = 10;
+
+                    DrawText(my_name.c_str(), cur_x, cur_y, fontsize, WHITE);
+                    cur_y += y_incr;
+
+                    if (item_type == ITEM_WEAPON) {
+                        const vec3 dmg = g->ct.get<damage>(selection_id).value_or((vec3){-1, -1, -1});
+                        DrawText(TextFormat("Damage: %d-%d", dmg.x, dmg.y), cur_x, cur_y, fontsize, WHITE);
                         cur_y += y_incr;
 
-                        if (item_type == ITEM_WEAPON) {
-                            vec3 dmg = g->ct.get<damage>(selection_id).value_or((vec3){-1, -1, -1});
-                            DrawText(TextFormat("Damage: %d-%d", dmg.x, dmg.y), cur_x, cur_y, fontsize, WHITE);
-                            cur_y += y_incr;
+                        const int dura = g->ct.get<durability>(selection_id).value_or(-1);
+                        const int max_dura = g->ct.get<max_durability>(selection_id).value_or(-1);
+                        DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, WHITE);
+                        cur_y += y_incr;
+                    } else if (item_type == ITEM_SHIELD) {
+                        const int block = g->ct.get<block_chance>(selection_id).value_or(-1);
 
-                            int dura = g->ct.get<durability>(selection_id).value_or(-1);
-                            int max_dura = g->ct.get<max_durability>(selection_id).value_or(-1);
-                            DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, WHITE);
-                            cur_y += y_incr;
-                        }
-
-                        string my_desc = g->ct.get<description>(selection_id).value_or("no-description");
-                        DrawText(my_desc.c_str(), cur_x, cur_y, fontsize, WHITE);
+                        DrawText(TextFormat("Block chance: %d", block), cur_x, cur_y, fontsize, WHITE);
                         cur_y += y_incr;
                     }
+
+
+                    string my_desc = g->ct.get<description>(selection_id).value_or("no-description");
+                    DrawText(my_desc.c_str(), cur_x, cur_y, fontsize, WHITE);
+                    cur_y += y_incr;
                 }
             }
         }
+        //}
     }
 }

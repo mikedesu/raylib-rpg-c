@@ -292,3 +292,10 @@ template <>
 struct ComponentTraits<block_chance> {
     using Type = int;
 };
+
+
+struct damage_reduction { }; //int
+template <>
+struct ComponentTraits<damage_reduction> {
+    using Type = int;
+};
