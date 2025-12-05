@@ -1,6 +1,6 @@
 #include "ComponentTraits.h"
+#include "create_npc.h"
 #include "get_racial_modifiers.h"
-#include "liblogic_create_npc.h"
 #include "liblogic_stat_bonus.h"
 #include "race.h"
 #include <raylib.h>
