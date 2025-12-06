@@ -96,7 +96,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
 
     //#ifdef SPAWN_MONSTERS
-    create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [g](entityid id) {
+    const entityid npc_0 = create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [g](entityid id) {
         entityid weaponid = create_weapon_with(g, [g](entityid id2) {
             g->ct.set<name>(id2, "Axe");
             g->ct.set<description>(id2, "We choppin' trees.");
@@ -108,6 +108,14 @@ void liblogic_init(shared_ptr<gamestate> g) {
         add_to_inventory(g, id, weaponid);
         g->ct.set<equipped_weapon>(id, weaponid);
     });
+
+    minfo("confirming inventory size");
+    auto maybe_npc_0_inventory = g->ct.get<inventory>(npc_0);
+    if (maybe_npc_0_inventory.has_value()) {
+        auto npc_0_inventory = maybe_npc_0_inventory.value();
+
+        msuccess("inventory size: %ld", npc_0_inventory->size());
+    }
 
 
     //entityid orc2 = create_npc(g, RACE_ORC, (vec3){14, 9, 0}, "orc");

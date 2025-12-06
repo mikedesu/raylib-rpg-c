@@ -15,10 +15,10 @@ bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
         return false;
     }
 
-    minfo("getting direction");
+    //minfo("getting direction");
     direction_t dir = g->ct.get<direction>(id).value();
 
-    minfo("getting location");
+    //minfo("getting location");
     vec3 loc = g->ct.get<location>(id).value();
 
     float x = loc.x + get_x_from_dir(dir);
@@ -32,7 +32,7 @@ bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     }
 
 
-    minfo("begin shaders");
+    //minfo("begin shaders");
     float time = (float)GetTime();
     SetShaderValue(shaders[1], GetShaderLocation(shaders[1], "time"), &time, SHADER_UNIFORM_FLOAT);
     SetShaderValue(shaders[1], GetShaderLocation(shaders[1], "alpha"), &a, SHADER_UNIFORM_FLOAT);
@@ -41,7 +41,7 @@ bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
 
     DrawRectangleLinesEx((Rectangle){x * w, y * h, w, h}, 1, Fade(GREEN, a));
 
-    minfo("end shaders");
+    //minfo("end shaders");
     EndShaderMode();
 
     return true;

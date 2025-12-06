@@ -215,20 +215,20 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     const int z = g->dungeon->current_floor;
 
     // render tiles
-    minfo("render tiles");
+    //minfo("render tiles");
     for (int y = 0; y < df->height; y++)
         for (int x = 0; x < df->width; x++)
             draw_dungeon_floor_tile(g, txinfo, x, y, z);
 
-    minfo("render doors");
+    //minfo("render doors");
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_DOOR);
-    minfo("render target box");
+    //minfo("render target box");
     libdraw_draw_player_target_box(g);
-    minfo("render items");
+    //minfo("render items");
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM);
-    minfo("render npcs");
+    //minfo("render npcs");
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC);
-    minfo("render player");
+    //minfo("render player");
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PLAYER);
 
     return true;

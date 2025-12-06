@@ -5,3 +5,4 @@
 bool add_to_inventory(shared_ptr<gamestate> g, entityid actor_id, entityid item_id);
 bool remove_from_inventory(shared_ptr<gamestate> g, entityid actor_id, entityid item_id);
 bool drop_from_inventory(shared_ptr<gamestate> g, entityid actor_id, entityid item_id);
+bool drop_all_from_inventory(shared_ptr<gamestate> g, entityid actor_id);

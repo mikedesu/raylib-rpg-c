@@ -3,6 +3,7 @@
 #include "entitytype.h"
 #include "gamestate_flag.h"
 #include "liblogic_add_message.h"
+#include "manage_inventory.h"
 #include "sfx.h"
 #include "try_entity_attack.h"
 #include "weapon.h"
@@ -280,6 +281,13 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             g->ct.set<xp>(atk_id, new_xp);
             // handle item drops?
             // ...
+
+            // get the target's inventory
+            //auto maybe_inventory = g->ct.get<inventory>(tgt_id);
+            //if (maybe_inventory.has_value()) {
+            drop_all_from_inventory(g, tgt_id);
+            //}
+
             //vec3 loc = g_get_loc(g, tgt_id);
             //vec3 loc_cast = {loc.x, loc.y, loc.z};
             //entityid id = ENTITYID_INVALID;
