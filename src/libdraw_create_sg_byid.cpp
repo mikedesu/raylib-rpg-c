@@ -89,9 +89,7 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
             switch (shield_type) {
             case SHIELD_BUCKLER: create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12); break;
             case SHIELD_KITE: create_spritegroup(g, id, TX_KITE_SHIELD_KEYS, TX_BUCKLER_COUNT, -12, -12); break;
-            //case SHIELD_TOWER:
-            //create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12);
-            //break;
+            case SHIELD_TOWER: create_spritegroup(g, id, TX_TOWER_SHIELD_KEYS, TX_TOWER_SHIELD_COUNT, -12, -12); break;
             default: merror("unknown shield type %d", shield_type); return;
             }
             //create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12);
@@ -108,5 +106,5 @@ void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
         //} else {
         //    merror("unknown item type %d", item_type);
     }
-    minfo("END create_sg_byid");
+    //minfo("END create_sg_byid");
 }

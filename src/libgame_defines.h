@@ -497,7 +497,6 @@
 #define TX_SPELL_FIRE_CAST 340
 #define TX_SPELL_FIRE_PERSIST 341
 #define TX_SPELL_FIRE_END 342
-
 //--------------------------------
 //--------------------------------
 //--------------------------------
@@ -513,6 +512,11 @@
 //--------------------------------
 #define TX_WARHAMMER 347
 #define TX_WHIP 348
+//--------------------------------
+#define TX_GUARD_TOWER_SHIELD_SUCCESS_FRONT 361
+#define TX_GUARD_TOWER_SHIELD_SUCCESS_BACK 362
+//--------------------------------
+
 
 //--------------------------------
 #define COMPANYSCENE 0

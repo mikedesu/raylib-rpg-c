@@ -67,8 +67,8 @@ void liblogic_init(shared_ptr<gamestate> g) {
         g->ct.set<description>(id, "Stabby stabby.");
         g->ct.set<weapontype>(id, WEAPON_DAGGER);
         g->ct.set<damage>(id, (vec3){1, 4, 0});
-        g->ct.set<durability>(id, 100);
-        g->ct.set<max_durability>(id, 100);
+        g->ct.set<durability>(id, 2);
+        g->ct.set<max_durability>(id, 2);
     });
 
 
@@ -78,6 +78,14 @@ void liblogic_init(shared_ptr<gamestate> g) {
         g->ct.set<shieldtype>(id, SHIELD_BUCKLER);
         g->ct.set<block_chance>(id, 50);
     });
+
+    create_shield_at_with(g, (vec3){11, 10, 0}, [g](entityid id) {
+        g->ct.set<name>(id, "Tower Shield");
+        g->ct.set<description>(id, "Towering over you...");
+        g->ct.set<shieldtype>(id, SHIELD_TOWER);
+        g->ct.set<block_chance>(id, 100);
+    });
+
 
     create_shield_at_with(g, (vec3){10, 9, 0}, [g](entityid id) {
         g->ct.set<name>(id, "Kite");
@@ -96,11 +104,25 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
 
     //#ifdef SPAWN_MONSTERS
-    const entityid npc_0 = create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [g](entityid id) {
+    //const entityid npc_0 = create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [g](entityid id) {
+    create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [g](entityid id) {
         entityid weaponid = create_weapon_with(g, [g](entityid id2) {
             g->ct.set<name>(id2, "Axe");
             g->ct.set<description>(id2, "We choppin' trees.");
             g->ct.set<weapontype>(id2, WEAPON_AXE);
+            g->ct.set<damage>(id2, (vec3){1, 8, 0});
+            g->ct.set<durability>(id2, 100);
+            g->ct.set<max_durability>(id2, 100);
+        });
+        add_to_inventory(g, id, weaponid);
+        g->ct.set<equipped_weapon>(id, weaponid);
+    });
+
+    create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, [g](entityid id) {
+        entityid weaponid = create_weapon_with(g, [g](entityid id2) {
+            g->ct.set<name>(id2, "Dagger");
+            g->ct.set<description>(id2, "A lil blade");
+            g->ct.set<weapontype>(id2, WEAPON_DAGGER);
             g->ct.set<damage>(id2, (vec3){1, 4, 0});
             g->ct.set<durability>(id2, 100);
             g->ct.set<max_durability>(id2, 100);
@@ -109,13 +131,26 @@ void liblogic_init(shared_ptr<gamestate> g) {
         g->ct.set<equipped_weapon>(id, weaponid);
     });
 
-    minfo("confirming inventory size");
-    auto maybe_npc_0_inventory = g->ct.get<inventory>(npc_0);
-    if (maybe_npc_0_inventory.has_value()) {
-        auto npc_0_inventory = maybe_npc_0_inventory.value();
+    create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, [g](entityid id) {
+        entityid weaponid = create_weapon_with(g, [g](entityid id2) {
+            g->ct.set<name>(id2, "Sword");
+            g->ct.set<description>(id2, "Standard sword");
+            g->ct.set<weapontype>(id2, WEAPON_SWORD);
+            g->ct.set<damage>(id2, (vec3){1, 6, 0});
+            g->ct.set<durability>(id2, 100);
+            g->ct.set<max_durability>(id2, 100);
+        });
+        add_to_inventory(g, id, weaponid);
+        g->ct.set<equipped_weapon>(id, weaponid);
+    });
 
-        msuccess("inventory size: %ld", npc_0_inventory->size());
-    }
+
+    //minfo("confirming inventory size");
+    //auto maybe_npc_0_inventory = g->ct.get<inventory>(npc_0);
+    //if (maybe_npc_0_inventory.has_value()) {
+    //    auto npc_0_inventory = maybe_npc_0_inventory.value();
+    //    msuccess("inventory size: %ld", npc_0_inventory->size());
+    //}
 
 
     //entityid orc2 = create_npc(g, RACE_ORC, (vec3){14, 9, 0}, "orc");

@@ -473,3 +473,8 @@
 359  4 4  0  img/characters/shadows/orc_attack_thrust_shadow.png
 360  4 4  0  img/characters/shadows/goblin_attack_thrust_shadow.png
 #
+361  4 3  0  img/actions/guard_tower_shield_success_front.png
+362  4 3  0  img/actions/guard_tower_shield_success_back.png
+#
+#
+#
