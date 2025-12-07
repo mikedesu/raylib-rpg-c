@@ -13,8 +13,6 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful);
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success);
 
-//void handle_block_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id);
-
 
 void handle_attack_success_gamestate_flag(shared_ptr<gamestate> g, entitytype_t type, bool success) {
     if (!success)
@@ -254,20 +252,22 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
 
     // get the equipped weapon of the attacker
     entityid wpn_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
-    const int max_dura = g->ct.get<max_durability>(wpn_id).value_or(0);
+    //const int max_dura = g->ct.get<max_durability>(wpn_id).value_or(0);
     // decrement its durability
     const int dura = g->ct.get<durability>(wpn_id).value_or(0);
     g->ct.set<durability>(wpn_id, dura - 1 < 0 ? 0 : dura - 1);
     if (dura == 0) {
         // permanently decrement from the max_durability
-        if (max_dura == 0) {
-            // item destroyed
-            g->ct.set<destroyed>(wpn_id, true);
+        //if (max_dura == 0) {
+        // item destroyed
+        g->ct.set<destroyed>(wpn_id, true);
+        // remove item from attacker's inventory
+        remove_from_inventory(g, atk_id, wpn_id);
 
-        } else {
-            g->ct.set<max_durability>(wpn_id, max_dura - 1 < 0 ? 0 : max_dura - 1);
-            // other bad things including -1 bonuses that we aren't handling yet
-        }
+        //} else {
+        //g->ct.set<max_durability>(wpn_id, max_dura - 1 < 0 ? 0 : max_dura - 1);
+        // other bad things including -1 bonuses that we aren't handling yet
+        //}
     }
 
 
