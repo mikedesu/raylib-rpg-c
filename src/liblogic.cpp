@@ -116,6 +116,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
         });
         add_to_inventory(g, id, weaponid);
         g->ct.set<equipped_weapon>(id, weaponid);
+        g->ct.set<name>(id, "Zook");
     });
 
     create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, [g](entityid id) {
@@ -129,9 +130,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
         });
         add_to_inventory(g, id, weaponid);
         g->ct.set<equipped_weapon>(id, weaponid);
+        g->ct.set<name>(id, "Zugzug");
     });
 
-    create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, [g](entityid id) {
+    create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, [g](entityid id) {
         entityid weaponid = create_weapon_with(g, [g](entityid id2) {
             g->ct.set<name>(id2, "Sword");
             g->ct.set<description>(id2, "Standard sword");
@@ -142,6 +144,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
         });
         add_to_inventory(g, id, weaponid);
         g->ct.set<equipped_weapon>(id, weaponid);
+        g->ct.set<name>(id, "Gorp");
     });
 
 

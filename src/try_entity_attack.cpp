@@ -254,21 +254,25 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
     entityid wpn_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
     //const int max_dura = g->ct.get<max_durability>(wpn_id).value_or(0);
     // decrement its durability
-    const int dura = g->ct.get<durability>(wpn_id).value_or(0);
-    g->ct.set<durability>(wpn_id, dura - 1 < 0 ? 0 : dura - 1);
-    if (dura == 0) {
-        // permanently decrement from the max_durability
-        //if (max_dura == 0) {
-        // item destroyed
-        g->ct.set<destroyed>(wpn_id, true);
-        // remove item from attacker's inventory
-        remove_from_inventory(g, atk_id, wpn_id);
+    //const int dura = g->ct.get<durability>(wpn_id).value_or(0);
+    auto maybe_dura = g->ct.get<durability>(wpn_id);
 
-        //} else {
-        //g->ct.set<max_durability>(wpn_id, max_dura - 1 < 0 ? 0 : max_dura - 1);
-        // other bad things including -1 bonuses that we aren't handling yet
-        //}
+    if (maybe_dura.has_value()) {
+        const int dura = maybe_dura.value();
+        g->ct.set<durability>(wpn_id, dura - 1 < 0 ? 0 : dura - 1);
+        if (dura == 0) {
+            // item destroyed
+            g->ct.set<destroyed>(wpn_id, true);
+            // remove item from attacker's inventory
+            remove_from_inventory(g, atk_id, wpn_id);
+            // unequip item
+            g->ct.set<equipped_weapon>(atk_id, ENTITYID_INVALID);
+            PlaySound(g->sfx->at(SFX_05_ALCHEMY_GLASS_BREAK));
+            add_message_history(g, "%s broke!", g->ct.get<name>(wpn_id).value_or("no-name").c_str());
+        }
     }
+    //else {
+    //}
 
 
     if (tgt_hp <= 0) {
