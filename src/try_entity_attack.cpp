@@ -54,16 +54,14 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
         PlaySound(g->sfx->at(SFX_HIT_METAL_ON_FLESH));
     } else {
         // need to select appropriate sound effect based on equipment- get attacker's equipped weapon if any
-        const entityid weapon_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
-        if (weapon_id != ENTITYID_INVALID) {
-            // attacker has equipped weapon - get its type
-            const weapontype_t wpn_type = g->ct.get<weapontype>(weapon_id).value_or(WEAPON_NONE);
-            const int index = wpn_type == WEAPON_SWORD    ? SFX_SLASH_ATTACK_SWORD_1
-                              : wpn_type == WEAPON_AXE    ? SFX_SLASH_ATTACK_HEAVY_1
-                              : wpn_type == WEAPON_DAGGER ? SFX_SLASH_ATTACK_LIGHT_1
-                                                          : SFX_SLASH_ATTACK_SWORD_1;
-            PlaySound(g->sfx->at(index));
-        }
+        //const entityid weapon_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
+        // attacker has equipped weapon - get its type
+        const weapontype_t wpn_type = g->ct.get<weapontype>(g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID)).value_or(WEAPON_NONE);
+        const int index = wpn_type == WEAPON_SWORD    ? SFX_SLASH_ATTACK_SWORD_1
+                          : wpn_type == WEAPON_AXE    ? SFX_SLASH_ATTACK_HEAVY_1
+                          : wpn_type == WEAPON_DAGGER ? SFX_SLASH_ATTACK_LIGHT_1
+                                                      : SFX_SLASH_ATTACK_SWORD_1;
+        PlaySound(g->sfx->at(index));
     }
 
     const auto type = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
@@ -77,9 +75,8 @@ void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, enti
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(successful, "attack_successful is NULL");
 
-    for (int i = 0; (size_t)i < tile->entities->size(); i++) {
+    for (int i = 0; (size_t)i < tile->entities->size(); i++)
         handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
-    }
 }
 
 
@@ -91,13 +88,13 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
     massert(attack_successful, "attack_successful is NULL");
 
     const entityid target_id = tile->entities->at(i);
-    if (target_id == ENTITYID_INVALID) {
+    if (target_id == ENTITYID_INVALID)
         return;
-    }
 
     const auto type = g->ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC)
         return;
+
     if (g->ct.get<dead>(target_id).value_or(true))
         return;
 
@@ -116,87 +113,52 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
         // no shield
         *attack_successful = true;
         handle_attack_success(g, attacker_id, target_id, attack_successful);
-    } else {
-        const auto shield_id = maybe_shield.value();
-        if (shield_id == ENTITYID_INVALID) {
-            // no shield
-            // compute attack roll
-            *attack_successful = true;
-            handle_attack_success(g, attacker_id, target_id, attack_successful);
-        } else {
-            // they have a shield
-            // compute chance to block
-            int roll = GetRandomValue(1, 100);
-            auto chance = g->ct.get<block_chance>(shield_id).value_or(100);
-            int low_roll = 100 - chance;
-            if (low_roll == 0) {
-                // 100% block chance
-                if (shield_id != ENTITYID_INVALID) {
-                    PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
-                    g->ct.set<block_success>(target_id, true);
-                    g->ct.set<update>(target_id, true);
-                    add_message_history(g,
-                                        "%s blocked an attack from %s",
-                                        g->ct.get<name>(target_id).value_or("no-name").c_str(),
-                                        g->ct.get<name>(attacker_id).value_or("no-name").c_str());
-                }
-            } else if (roll <= low_roll) {
-                // failed to block
-                // compute attack roll
-                *attack_successful = true;
-                handle_attack_success(g, attacker_id, target_id, attack_successful);
-
-            } else {
-                // block successful
-                if (shield_id != ENTITYID_INVALID) {
-                    PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
-                    g->ct.set<block_success>(target_id, true);
-                    g->ct.set<update>(target_id, true);
-                    add_message_history(g,
-                                        "%s blocked an attack from %s",
-                                        g->ct.get<name>(target_id).value_or("no-name").c_str(),
-                                        g->ct.get<name>(attacker_id).value_or("no-name").c_str());
-                }
-            }
-
-            // if roll successful
-            // block successful
-            // else
-            // block unsuccessful
-            // compute attack roll
-            //handle_block_success(g, attacker_id, target_id);
-
-            // block successful
-            //if (shield_id != ENTITYID_INVALID) {
-            //    PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
-            //    g->ct.set<block_success>(target_id, true);
-            //    g->ct.set<update>(target_id, true);
-            //}
-        }
+        return;
     }
 
+    //else {
+    const auto shield_id = maybe_shield.value();
+    if (shield_id == ENTITYID_INVALID) {
+        // no shield
+        // compute attack roll
+        *attack_successful = true;
+        handle_attack_success(g, attacker_id, target_id, attack_successful);
+        return;
+    }
+    //else {
+    // they have a shield
+    // compute chance to block
+    const int roll = GetRandomValue(1, 100);
+    const int chance = g->ct.get<block_chance>(shield_id).value_or(100);
+    const int low_roll = 100 - chance;
+    if (low_roll == 0 && shield_id != ENTITYID_INVALID) {
+        // 100% block chance
+        PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
+        g->ct.set<block_success>(target_id, true);
+        g->ct.set<update>(target_id, true);
+        add_message_history(g,
+                            "%s blocked an attack from %s",
+                            g->ct.get<name>(target_id).value_or("no-name").c_str(),
+                            g->ct.get<name>(attacker_id).value_or("no-name").c_str());
+    } else if (roll <= low_roll) {
+        // failed to block
+        // compute attack roll
+        *attack_successful = true;
+        handle_attack_success(g, attacker_id, target_id, attack_successful);
 
-    //if (maybe_shield.has_value()) {
-    //} else {
-    // no shield
-    //    *attack_successful = true;
-    //    handle_attack_success(g, attacker_id, target_id, attack_successful);
-    //}
+    } else {
+        // block successful
+        if (shield_id != ENTITYID_INVALID) {
+            PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
+            g->ct.set<block_success>(target_id, true);
+            g->ct.set<update>(target_id, true);
+            add_message_history(g,
+                                "%s blocked an attack from %s",
+                                g->ct.get<name>(target_id).value_or("no-name").c_str(),
+                                g->ct.get<name>(attacker_id).value_or("no-name").c_str());
+        }
+    }
 }
-
-
-//void handle_block_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id) {
-//    massert(g, "gamestate is NULL");
-//    massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
-//    massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
-//const entitytype_t tgttype = g->ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
-//    const entityid equipped_shld = g->ct.get<equipped_shield>(tgt_id).value_or(ENTITYID_INVALID);
-//    if (equipped_shld != ENTITYID_INVALID) {
-//        PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
-//        g->ct.set<block_success>(tgt_id, true);
-//        g->ct.set<update>(tgt_id, true);
-//    }
-//}
 
 
 void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
@@ -219,10 +181,8 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
     g->ct.set<damaged>(tgt_id, true);
     g->ct.set<update>(tgt_id, true);
 
-
     add_message_history(
         g, "%s deals %d damage to %s", g->ct.get<name>(atk_id).value_or("no-name").c_str(), dmg, g->ct.get<name>(tgt_id).value_or("no-name").c_str());
-
 
     auto maybe_tgt_hp = g->ct.get<hp>(tgt_id);
     if (!maybe_tgt_hp.has_value()) {
@@ -230,16 +190,16 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
         return;
     }
 
-
-    //if (maybe_tgt_hp.has_value()) {
     int tgt_hp = maybe_tgt_hp.value();
     if (tgt_hp <= 0) {
         merror("Target is already dead, hp was: %d", tgt_hp);
         g->ct.set<dead>(tgt_id, true);
         return;
     }
+
     tgt_hp -= dmg;
     g->ct.set<hp>(tgt_id, tgt_hp);
+
     //if (tgttype == ENTITY_PLAYER) {
     //add_message(g, "%s attacked you for %d damage!", g->ct.get<name>(atk_id).value_or("no-name").c_str(), dmg);
     //} else if (atktype == ENTITY_PLAYER && tgttype == ENTITY_NPC) {
@@ -252,9 +212,8 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
 
     // get the equipped weapon of the attacker
     entityid wpn_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
-    //const int max_dura = g->ct.get<max_durability>(wpn_id).value_or(0);
+
     // decrement its durability
-    //const int dura = g->ct.get<durability>(wpn_id).value_or(0);
     auto maybe_dura = g->ct.get<durability>(wpn_id);
 
     if (maybe_dura.has_value()) {
@@ -271,9 +230,6 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             add_message_history(g, "%s broke!", g->ct.get<name>(wpn_id).value_or("no-name").c_str());
         }
     }
-    //else {
-    //}
-
 
     if (tgt_hp <= 0) {
         g->ct.set<dead>(tgt_id, true);
@@ -283,34 +239,14 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             const int reward_xp = 1;
             const int new_xp = old_xp + reward_xp;
             g->ct.set<xp>(atk_id, new_xp);
-            // handle item drops?
-            // ...
 
-            // get the target's inventory
-            //auto maybe_inventory = g->ct.get<inventory>(tgt_id);
-            //if (maybe_inventory.has_value()) {
+            // handle item drops
             drop_all_from_inventory(g, tgt_id);
-            //}
 
-            //vec3 loc = g_get_loc(g, tgt_id);
-            //vec3 loc_cast = {loc.x, loc.y, loc.z};
-            //entityid id = ENTITYID_INVALID;
-            //while (id == ENTITYID_INVALID)
-            //    id = potion_create(g,
-            //                       loc,
-            //                       POTION_HEALTH_SMALL,
-            //                       "small health potion");
         } else {
             add_message(g, "You died");
         }
     } else {
         g->ct.set<dead>(tgt_id, false);
     }
-    //} else {
-    //    merror("Target does not have an HP component");
-    //}
-    //}
-    //else {
-    //    merror("Attack MISSED");
-    //}
 }

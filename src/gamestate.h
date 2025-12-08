@@ -156,3 +156,6 @@ void gamestate_free(shared_ptr<gamestate> g);
 void gamestate_set_debug_panel_pos_bottom_left(shared_ptr<gamestate> g);
 void gamestate_set_debug_panel_pos_top_right(shared_ptr<gamestate> g);
 void gamestate_load_keybindings(shared_ptr<gamestate> g);
+
+
+//void set_comp(shared_ptr<gamestate> g

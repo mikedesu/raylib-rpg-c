@@ -62,7 +62,8 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 6, 0});
     //create_wooden_box(g, (vec3){7, 7, 0});
 
-    create_weapon_at_with(g, (vec3){10, 10, 0}, [g](entityid id) {
+    //create_weapon_at_with(g, (vec3){10, 10, 0}, [g](entityid id) {
+    create_weapon_at_with(g, (vec3){10, 10, 0}, [](shared_ptr<gamestate> g, entityid id) {
         g->ct.set<name>(id, "Dagger");
         g->ct.set<description>(id, "Stabby stabby.");
         g->ct.set<weapontype>(id, WEAPON_DAGGER);
@@ -104,15 +105,14 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
 
     //#ifdef SPAWN_MONSTERS
-    //const entityid npc_0 = create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [g](entityid id) {
     create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [g](entityid id) {
-        entityid weaponid = create_weapon_with(g, [g](entityid id2) {
-            g->ct.set<name>(id2, "Axe");
-            g->ct.set<description>(id2, "We choppin' trees.");
-            g->ct.set<weapontype>(id2, WEAPON_AXE);
-            g->ct.set<damage>(id2, (vec3){1, 8, 0});
-            g->ct.set<durability>(id2, 100);
-            g->ct.set<max_durability>(id2, 100);
+        entityid weaponid = create_weapon_with(g, [](shared_ptr<gamestate> g, entityid id) {
+            g->ct.set<name>(id, "Axe");
+            g->ct.set<description>(id, "We choppin' trees.");
+            g->ct.set<weapontype>(id, WEAPON_AXE);
+            g->ct.set<damage>(id, (vec3){1, 8, 0});
+            g->ct.set<durability>(id, 100);
+            g->ct.set<max_durability>(id, 100);
         });
         add_to_inventory(g, id, weaponid);
         g->ct.set<equipped_weapon>(id, weaponid);
@@ -120,13 +120,13 @@ void liblogic_init(shared_ptr<gamestate> g) {
     });
 
     create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, [g](entityid id) {
-        entityid weaponid = create_weapon_with(g, [g](entityid id2) {
-            g->ct.set<name>(id2, "Dagger");
-            g->ct.set<description>(id2, "A lil blade");
-            g->ct.set<weapontype>(id2, WEAPON_DAGGER);
-            g->ct.set<damage>(id2, (vec3){1, 4, 0});
-            g->ct.set<durability>(id2, 100);
-            g->ct.set<max_durability>(id2, 100);
+        entityid weaponid = create_weapon_with(g, [](shared_ptr<gamestate> g, entityid id) {
+            g->ct.set<name>(id, "Dagger");
+            g->ct.set<description>(id, "A lil blade");
+            g->ct.set<weapontype>(id, WEAPON_DAGGER);
+            g->ct.set<damage>(id, (vec3){1, 4, 0});
+            g->ct.set<durability>(id, 100);
+            g->ct.set<max_durability>(id, 100);
         });
         add_to_inventory(g, id, weaponid);
         g->ct.set<equipped_weapon>(id, weaponid);
@@ -134,13 +134,13 @@ void liblogic_init(shared_ptr<gamestate> g) {
     });
 
     create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, [g](entityid id) {
-        entityid weaponid = create_weapon_with(g, [g](entityid id2) {
-            g->ct.set<name>(id2, "Sword");
-            g->ct.set<description>(id2, "Standard sword");
-            g->ct.set<weapontype>(id2, WEAPON_SWORD);
-            g->ct.set<damage>(id2, (vec3){1, 6, 0});
-            g->ct.set<durability>(id2, 100);
-            g->ct.set<max_durability>(id2, 100);
+        entityid weaponid = create_weapon_with(g, [](shared_ptr<gamestate> g, entityid id) {
+            g->ct.set<name>(id, "Sword");
+            g->ct.set<description>(id, "Standard sword");
+            g->ct.set<weapontype>(id, WEAPON_SWORD);
+            g->ct.set<damage>(id, (vec3){1, 6, 0});
+            g->ct.set<durability>(id, 100);
+            g->ct.set<max_durability>(id, 100);
         });
         add_to_inventory(g, id, weaponid);
         g->ct.set<equipped_weapon>(id, weaponid);
