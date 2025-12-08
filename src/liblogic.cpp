@@ -116,25 +116,25 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_door_at(g, (vec3){12, 9, 1});
 
 
-    //create_weapon_at(g, (vec3){3, 1, 0}, WEAPON_AXE);
-    //create_weapon_at(g, (vec3){4, 1, 0}, WEAPON_SWORD);
+    auto axe_init = [](shared_ptr<gamestate> g, entityid id) {
+        g->ct.set<name>(id, "Axe");
+        g->ct.set<description>(id, "We choppin' trees.");
+        g->ct.set<weapontype>(id, WEAPON_AXE);
+        g->ct.set<damage>(id, (vec3){1, 8, 0});
+        g->ct.set<durability>(id, 100);
+        g->ct.set<max_durability>(id, 100);
+    };
+
 
     //#ifdef SPAWN_MONSTERS
-    create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [g](entityid id) {
-        entityid weaponid = create_weapon_with(g, [](shared_ptr<gamestate> g, entityid id) {
-            g->ct.set<name>(id, "Axe");
-            g->ct.set<description>(id, "We choppin' trees.");
-            g->ct.set<weapontype>(id, WEAPON_AXE);
-            g->ct.set<damage>(id, (vec3){1, 8, 0});
-            g->ct.set<durability>(id, 100);
-            g->ct.set<max_durability>(id, 100);
-        });
+    create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [axe_init](shared_ptr<gamestate> g, entityid id) {
+        entityid weaponid = create_weapon_with(g, axe_init);
         add_to_inventory(g, id, weaponid);
         g->ct.set<equipped_weapon>(id, weaponid);
         g->ct.set<name>(id, "Zook");
     });
 
-    create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, [g](entityid id) {
+    create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, [](shared_ptr<gamestate> g, entityid id) {
         entityid weaponid = create_weapon_with(g, [](shared_ptr<gamestate> g, entityid id) {
             g->ct.set<name>(id, "Dagger");
             g->ct.set<description>(id, "A lil blade");
@@ -148,7 +148,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
         g->ct.set<name>(id, "Zugzug");
     });
 
-    create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, [g](entityid id) {
+    create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, [](shared_ptr<gamestate> g, entityid id) {
         entityid weaponid = create_weapon_with(g, [](shared_ptr<gamestate> g, entityid id) {
             g->ct.set<name>(id, "Sword");
             g->ct.set<description>(id, "Standard sword");

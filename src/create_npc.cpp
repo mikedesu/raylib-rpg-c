@@ -82,7 +82,8 @@ void set_npc_defaults(shared_ptr<gamestate> g, entityid id) {
 }
 
 
-entityid create_npc_with(shared_ptr<gamestate> g, race_t rt, function<void(entityid)> npcInitFunction) {
+//entityid create_npc_with(shared_ptr<gamestate> g, race_t rt, function<void(entityid)> npcInitFunction) {
+entityid create_npc_with(shared_ptr<gamestate> g, race_t rt, function<void(shared_ptr<gamestate>, entityid)> npcInitFunction) {
     minfo("begin create npc");
     massert(g, "gamestate is NULL");
 
@@ -93,13 +94,13 @@ entityid create_npc_with(shared_ptr<gamestate> g, race_t rt, function<void(entit
 
     set_npc_starting_stats(g, id);
 
-    npcInitFunction(id);
+    npcInitFunction(g, id);
 
     minfo("end create npc");
     return id;
 }
 
-entityid create_npc_at_with(shared_ptr<gamestate> g, race_t rt, vec3 loc, function<void(entityid)> npcInitFunction) {
+entityid create_npc_at_with(shared_ptr<gamestate> g, race_t rt, vec3 loc, function<void(shared_ptr<gamestate>, entityid)> npcInitFunction) {
     auto df = d_get_floor(g->dungeon, loc.z);
     auto tile = df_tile_at(df, loc);
 
@@ -127,5 +128,5 @@ entityid create_npc_at_with(shared_ptr<gamestate> g, race_t rt, vec3 loc, functi
 }
 
 entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n) {
-    return create_npc_at_with(g, rt, loc, [](entityid) {});
+    return create_npc_at_with(g, rt, loc, [](shared_ptr<gamestate>, entityid) {});
 }
