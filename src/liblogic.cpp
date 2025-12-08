@@ -63,39 +63,54 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 7, 0});
 
     //create_weapon_at_with(g, (vec3){10, 10, 0}, [g](entityid id) {
-    create_weapon_at_with(g, (vec3){10, 10, 0}, [](shared_ptr<gamestate> g, entityid id) {
+
+
+    auto dagger_init = [](shared_ptr<gamestate> g, entityid id) {
         g->ct.set<name>(id, "Dagger");
         g->ct.set<description>(id, "Stabby stabby.");
         g->ct.set<weapontype>(id, WEAPON_DAGGER);
         g->ct.set<damage>(id, (vec3){1, 4, 0});
         g->ct.set<durability>(id, 2);
         g->ct.set<max_durability>(id, 2);
-    });
+    };
 
 
-    create_shield_at_with(g, (vec3){11, 9, 0}, [g](entityid id) {
+    create_weapon_at_with(g, (vec3){10, 10, 0}, dagger_init);
+
+    //[](shared_ptr<gamestate> g, entityid id) {
+    //g->ct.set<name>(id, "Dagger");
+    //g->ct.set<description>(id, "Stabby stabby.");
+    //g->ct.set<weapontype>(id, WEAPON_DAGGER);
+    //g->ct.set<damage>(id, (vec3){1, 4, 0});
+    //g->ct.set<durability>(id, 2);
+    //g->ct.set<max_durability>(id, 2);
+    //});
+
+
+    auto buckler_init = [](shared_ptr<gamestate> g, entityid id) {
         g->ct.set<name>(id, "Buckler");
         g->ct.set<description>(id, "Lambda Buckler");
         g->ct.set<shieldtype>(id, SHIELD_BUCKLER);
         g->ct.set<block_chance>(id, 50);
-    });
+    };
 
-    create_shield_at_with(g, (vec3){11, 10, 0}, [g](entityid id) {
+    auto tower_shield_init = [](shared_ptr<gamestate> g, entityid id) {
         g->ct.set<name>(id, "Tower Shield");
         g->ct.set<description>(id, "Towering over you...");
         g->ct.set<shieldtype>(id, SHIELD_TOWER);
         g->ct.set<block_chance>(id, 100);
-    });
+    };
 
-
-    create_shield_at_with(g, (vec3){10, 9, 0}, [g](entityid id) {
+    auto kite_shield_init = [](shared_ptr<gamestate> g, entityid id) {
         g->ct.set<name>(id, "Kite");
         g->ct.set<description>(id, "Lambda Kite");
         g->ct.set<shieldtype>(id, SHIELD_KITE);
         g->ct.set<block_chance>(id, 90);
-    });
+    };
 
-
+    create_shield_at_with(g, (vec3){11, 9, 0}, buckler_init);
+    create_shield_at_with(g, (vec3){11, 10, 0}, tower_shield_init);
+    create_shield_at_with(g, (vec3){10, 9, 0}, kite_shield_init);
     create_door_at(g, (vec3){12, 9, 0});
     create_door_at(g, (vec3){14, 12, 0});
     create_door_at(g, (vec3){12, 9, 1});
