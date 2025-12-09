@@ -7,6 +7,7 @@
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile.h"
+#include "entity_templates.h"
 #include "entityid.h"
 #include "gamestate.h"
 #include "inputstate.h"
@@ -88,22 +89,28 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
 
     auto buckler_init = [](shared_ptr<gamestate> g, entityid id) {
-        g->ct.set<name>(id, "Buckler");
-        g->ct.set<description>(id, "Lambda Buckler");
+        //g->ct.set<name>(id, "Buckler");
+        set_name(g, id, "Buckler");
+        set_description(g, id, "The basic buckler");
+        //g->ct.set<description>(id, "Lambda Buckler");
         g->ct.set<shieldtype>(id, SHIELD_BUCKLER);
         g->ct.set<block_chance>(id, 50);
     };
 
     auto tower_shield_init = [](shared_ptr<gamestate> g, entityid id) {
-        g->ct.set<name>(id, "Tower Shield");
-        g->ct.set<description>(id, "Towering over you...");
+        //g->ct.set<name>(id, "Tower Shield");
+        set_name(g, id, "Tower Shield");
+        set_description(g, id, "The tower towers");
+        //g->ct.set<description>(id, "Towering over you...");
         g->ct.set<shieldtype>(id, SHIELD_TOWER);
         g->ct.set<block_chance>(id, 100);
     };
 
     auto kite_shield_init = [](shared_ptr<gamestate> g, entityid id) {
-        g->ct.set<name>(id, "Kite");
-        g->ct.set<description>(id, "Lambda Kite");
+        //g->ct.set<name>(id, "Kite");
+        set_name(g, id, "Kite");
+        set_description(g, id, "Standard knight's shield");
+        //g->ct.set<description>(id, "Lambda Kite");
         g->ct.set<shieldtype>(id, SHIELD_KITE);
         g->ct.set<block_chance>(id, 90);
     };
@@ -116,41 +123,45 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_door_at(g, (vec3){12, 9, 1});
 
 
-    auto axe_init = [](shared_ptr<gamestate> g, entityid id) {
-        g->ct.set<name>(id, "Axe");
-        g->ct.set<description>(id, "We choppin' trees.");
-        g->ct.set<weapontype>(id, WEAPON_AXE);
-        g->ct.set<damage>(id, (vec3){1, 8, 0});
-        g->ct.set<durability>(id, 100);
-        g->ct.set<max_durability>(id, 100);
-    };
+    //auto axe_init = [](shared_ptr<gamestate> g, entityid id) {
+    //    g->ct.set<name>(id, "Axe");
+    //    g->ct.set<description>(id, "We choppin' trees.");
+    //    g->ct.set<weapontype>(id, WEAPON_AXE);
+    //    g->ct.set<damage>(id, (vec3){1, 8, 0});
+    //    g->ct.set<durability>(id, 100);
+    //    g->ct.set<max_durability>(id, 100);
+    //};
 
 
     //#ifdef SPAWN_MONSTERS
-    create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [axe_init](shared_ptr<gamestate> g, entityid id) {
-        entityid weaponid = create_weapon_with(g, axe_init);
-        add_to_inventory(g, id, weaponid);
-        g->ct.set<equipped_weapon>(id, weaponid);
-        g->ct.set<name>(id, "Zook");
+    create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [](shared_ptr<gamestate> g, entityid id) {
+        const entityid wpn_id = create_weapon_with(g, axe_init_test);
+        add_to_inventory(g, id, wpn_id);
+        set_equipped_weapon(g, id, wpn_id);
+        set_name(g, id, "Zook");
     });
 
     create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, [](shared_ptr<gamestate> g, entityid id) {
         entityid weaponid = create_weapon_with(g, [](shared_ptr<gamestate> g, entityid id) {
-            g->ct.set<name>(id, "Dagger");
-            g->ct.set<description>(id, "A lil blade");
+            set_name(g, id, "Dagger");
+            set_description(g, id, "a lil dagger");
+            //g->ct.set<description>(id, "A lil blade");
             g->ct.set<weapontype>(id, WEAPON_DAGGER);
             g->ct.set<damage>(id, (vec3){1, 4, 0});
             g->ct.set<durability>(id, 100);
             g->ct.set<max_durability>(id, 100);
         });
         add_to_inventory(g, id, weaponid);
-        g->ct.set<equipped_weapon>(id, weaponid);
-        g->ct.set<name>(id, "Zugzug");
+        //g->ct.set<equipped_weapon>(id, weaponid);
+        set_equipped_weapon(g, id, weaponid);
+        //g->ct.set<name>(id, "Zugzug");
+        set_name(g, id, "Zugzug");
     });
 
     create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, [](shared_ptr<gamestate> g, entityid id) {
         entityid weaponid = create_weapon_with(g, [](shared_ptr<gamestate> g, entityid id) {
-            g->ct.set<name>(id, "Sword");
+            //g->ct.set<name>(id, "Sword");
+            set_name(g, id, "Sword");
             g->ct.set<description>(id, "Standard sword");
             g->ct.set<weapontype>(id, WEAPON_SWORD);
             g->ct.set<damage>(id, (vec3){1, 6, 0});
@@ -158,8 +169,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
             g->ct.set<max_durability>(id, 100);
         });
         add_to_inventory(g, id, weaponid);
-        g->ct.set<equipped_weapon>(id, weaponid);
-        g->ct.set<name>(id, "Gorp");
+        //g->ct.set<equipped_weapon>(id, weaponid);
+        set_equipped_weapon(g, id, weaponid);
+        //g->ct.set<name>(id, "Gorp");
+        set_name(g, id, "Gorp");
     });
 
 
