@@ -1,9 +1,9 @@
-#include "ComponentTraits.h"
-#include "entitytype.h"
+#pragma once
+
 #include "gamestate.h"
 #include "massert.h"
 
-int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
+static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     massert(z >= 0, "floor is out of bounds");
     massert((size_t)z < g->dungeon->floors->size(), "floor is out of bounds");
