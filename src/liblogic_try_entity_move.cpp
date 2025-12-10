@@ -17,22 +17,21 @@ bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
     g->ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
 
     // entity location
-    optional<vec3> maybe_loc = g->ct.get<location>(id);
+    auto maybe_loc = g->ct.get<location>(id);
     if (maybe_loc.has_value()) {
         vec3 loc = g->ct.get<location>(id).value();
 
         // entity's new location
         // we will have a special case for traversing floors so ignore v.z
         vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
-        shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+        auto df = d_get_floor(g->dungeon, loc.z);
         if (!df) {
             merror("Dungeon floor %d does not exist", loc.z);
             return false; // Floor does not exist
         }
 
         // i feel like this might be something we can set elsewhere...like after the player input phase?
-        shared_ptr<tile_t> tile = df_tile_at(df, aloc);
-
+        auto tile = df_tile_at(df, aloc);
         if (!tile) {
             merror("Tile does not exist at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
             return false; // Tile does not exist

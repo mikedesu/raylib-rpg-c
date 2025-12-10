@@ -14,7 +14,6 @@ WEB_SOURCES=main.cpp \
 gameloader_web.cpp \
 try_entity_attack.cpp \
 try_entity_open_door.cpp \
-tile_has_door.cpp \
 try_entity_stairs.cpp \
 manage_inventory.cpp \
 update_player_tiles_explored.cpp \
@@ -107,7 +106,6 @@ gameloader.o \
 gamestate_inventory.o \
 gamestate.o \
 try_entity_open_door.o \
-tile_has_door.o \
 try_entity_stairs.o \
 try_entity_attack.o \
 manage_inventory.o \
@@ -205,9 +203,6 @@ gamestate.o: gamestate.cpp
 ###################
 
 try_entity_open_door.o: try_entity_open_door.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-tile_has_door.o: tile_has_door.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 sprite.o: sprite.cpp
