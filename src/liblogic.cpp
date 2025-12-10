@@ -18,12 +18,8 @@
 #include "liblogic_init_dungeon.h"
 #include "liblogic_update_debug_panel_buffer.h"
 #include "liblogic_update_player_state.h"
-//#include "manage_inventory.h"
 #include "massert.h"
-//#include "shield.h"
 #include "update_player_tiles_explored.h"
-//#include "weapon.h"
-//#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
@@ -32,7 +28,6 @@
 #include <raylib.h>
 
 
-//using std::for_each;
 using std::shared_ptr;
 using std::string;
 

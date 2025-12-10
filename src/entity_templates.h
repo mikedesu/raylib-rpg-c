@@ -122,6 +122,7 @@ static inline void kite_shield_init_test(shared_ptr<gamestate> g, entityid id) {
 static inline void random_weapon_init_test(shared_ptr<gamestate> g, entityid id) {
     weapontype_t t = (weapontype_t)GetRandomValue(WEAPON_NONE + 1, WEAPON_TYPE_COUNT - 1);
     set_weapontype(g, id, t);
+
     switch (t) {
     case WEAPON_SWORD: sword_init_test(g, id); break;
     case WEAPON_DAGGER: dagger_init_test(g, id); break;
