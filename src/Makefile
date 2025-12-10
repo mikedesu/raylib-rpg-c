@@ -63,7 +63,6 @@ liblogic_update_player_state.cpp \
 liblogic_handle_npc.cpp \
 liblogic_handle_npcs.cpp \
 liblogic_handle_input.cpp \
-liblogic_handle_camera_move.cpp \
 liblogic_handle_input_inventory.cpp \
 liblogic_handle_input_title_scene.cpp \
 liblogic_handle_input_main_menu_scene.cpp \
@@ -159,7 +158,6 @@ liblogic_update_player_state.o \
 liblogic_handle_npc.o \
 liblogic_handle_npcs.o \
 liblogic_handle_input.o \
-liblogic_handle_camera_move.o \
 liblogic_handle_input_inventory.o \
 liblogic_handle_input_title_scene.o \
 liblogic_handle_input_gameplay_scene.o \
@@ -368,8 +366,6 @@ liblogic_handle_npc.o: liblogic_handle_npc.cpp
 liblogic_handle_npcs.o: liblogic_handle_npcs.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic_handle_camera_move.o: liblogic_handle_camera_move.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_handle_input_inventory.o: liblogic_handle_input_inventory.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
