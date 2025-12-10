@@ -67,7 +67,6 @@ liblogic_update_player_state.cpp \
 liblogic_tile_npc_living_count.cpp \
 liblogic_tile_has_box.cpp \
 liblogic_try_entity_move.cpp \
-create_weapon.cpp \
 liblogic_create_player.cpp \
 create_npc.cpp \
 liblogic_handle_npc.cpp \
@@ -175,7 +174,6 @@ liblogic_update_player_state.o \
 liblogic_tile_npc_living_count.o \
 liblogic_tile_has_box.o \
 liblogic_try_entity_move.o \
-create_weapon.o \
 liblogic_create_player.o \
 create_npc.o \
 liblogic_handle_npc.o \
@@ -403,9 +401,6 @@ liblogic_try_entity_move.o: liblogic_try_entity_move.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_tile_has_box.o: liblogic_tile_has_box.cpp 
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-create_weapon.o: create_weapon.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_create_player.o: liblogic_create_player.cpp 
