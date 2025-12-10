@@ -91,9 +91,13 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon(g, (vec3){1, 5, 0}, WEAPON_FLAIL);
 
     add_message(g, "Welcome to the game! Press enter to cycle messages.");
-    add_message(g, "To move around, press [q w e a d z x c]");
-    add_message(g, "To pick up items, press / ");
-    add_message(g, "To attack, press ' ");
+    //add_message_history(g, "To move around, press [q w e a d z x c]");
+    //add_message_history(g, "To pick up items, press / ");
+    //add_message_history(g, "To manage inventory, press i ");
+    //add_message_history(g, "To equip/unequip an item, highlight and press e ");
+    //add_message_history(g, "To drop an item, highlight and press q ");
+    //add_message_history(g, "To attack, press ' ");
+
     msuccess("liblogic_init: Game state initialized");
 }
 
