@@ -74,7 +74,6 @@ liblogic_handle_input_character_creation_scene.cpp \
 liblogic_handle_input_gameplay_controlmode_player.cpp \
 liblogic_handle_input_gameplay_scene.cpp \
 liblogic_init_dungeon.cpp \
-liblogic_cycle_messages.cpp \
 liblogic_update_debug_panel_buffer.cpp \
 liblogic.cpp \
 gamestate_inventory.cpp \
@@ -174,7 +173,6 @@ liblogic_handle_input_character_creation_scene.o \
 liblogic_handle_input_gameplay_controlmode_player.o \
 liblogic_update_debug_panel_buffer.o \
 liblogic_init_dungeon.o \
-liblogic_cycle_messages.o \
 liblogic.o \
 
 
@@ -405,8 +403,6 @@ liblogic_handle_input_gameplay_scene.o: liblogic_handle_input_gameplay_scene.cpp
 liblogic_init_dungeon.o: liblogic_init_dungeon.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic_cycle_messages.o: liblogic_cycle_messages.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_update_debug_panel_buffer.o: liblogic_update_debug_panel_buffer.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
