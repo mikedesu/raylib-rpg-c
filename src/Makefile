@@ -15,7 +15,6 @@ gameloader_web.cpp \
 try_entity_attack.cpp \
 try_entity_open_door.cpp \
 tile_has_door.cpp \
-create_door.cpp \
 try_entity_stairs.cpp \
 manage_inventory.cpp \
 update_player_tiles_explored.cpp \
@@ -68,7 +67,6 @@ liblogic_tile_npc_living_count.cpp \
 liblogic_tile_has_box.cpp \
 liblogic_try_entity_move.cpp \
 liblogic_create_player.cpp \
-create_npc.cpp \
 liblogic_handle_npc.cpp \
 liblogic_handle_npcs.cpp \
 liblogic_handle_input.cpp \
@@ -113,7 +111,6 @@ gamestate_inventory.o \
 gamestate.o \
 try_entity_open_door.o \
 tile_has_door.o \
-create_door.o \
 try_entity_stairs.o \
 try_entity_attack.o \
 manage_inventory.o \
@@ -174,7 +171,6 @@ liblogic_tile_npc_living_count.o \
 liblogic_tile_has_box.o \
 liblogic_try_entity_move.o \
 liblogic_create_player.o \
-create_npc.o \
 liblogic_handle_npc.o \
 liblogic_handle_npcs.o \
 liblogic_handle_input.o \
@@ -359,8 +355,6 @@ libdraw_create_spritegroup.o: libdraw_create_spritegroup.cpp
 libdraw.o: libdraw.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-create_door.o: create_door.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 try_entity_stairs.o: try_entity_stairs.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
@@ -402,9 +396,6 @@ liblogic_tile_has_box.o: liblogic_tile_has_box.cpp
 liblogic_create_player.o: liblogic_create_player.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-create_npc.o: create_npc.cpp 
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-	
 liblogic_handle_npc.o: liblogic_handle_npc.cpp 	
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
