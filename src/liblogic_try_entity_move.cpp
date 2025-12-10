@@ -6,7 +6,7 @@
 #include "sfx.h"
 #include "tile_has_door.h"
 
-int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
+#include "tile_npc_living_count.h"
 
 
 bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
