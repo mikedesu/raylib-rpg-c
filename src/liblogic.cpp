@@ -17,8 +17,8 @@
 #include "liblogic.h"
 #include "liblogic_handle_input.h"
 #include "liblogic_update_debug_panel_buffer.h"
-#include "liblogic_update_player_state.h"
 #include "massert.h"
+#include "update_player_state.h"
 #include "update_player_tiles_explored.h"
 #include <cassert>
 #include <cmath>

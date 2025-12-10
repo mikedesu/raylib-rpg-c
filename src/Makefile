@@ -59,7 +59,6 @@ libdraw_camera_lock_on.cpp \
 libdraw.cpp \
 liblogic_is_entity_adjacent.cpp \
 try_entity_pickup.cpp \
-liblogic_update_player_state.cpp \
 liblogic_handle_input.cpp \
 liblogic_handle_input_inventory.cpp \
 liblogic_handle_input_title_scene.cpp \
@@ -144,7 +143,6 @@ dungeon_tile.o \
 dungeon_tile.o \
 liblogic_is_entity_adjacent.o \
 try_entity_pickup.o \
-liblogic_update_player_state.o \
 liblogic_handle_input.o \
 liblogic_handle_input_inventory.o \
 liblogic_handle_input_title_scene.o \
@@ -336,8 +334,6 @@ try_entity_pickup.o: try_entity_pickup.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
-liblogic_update_player_state.o: liblogic_update_player_state.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
 

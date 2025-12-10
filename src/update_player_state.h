@@ -1,7 +1,9 @@
-#include "ComponentTraits.h"
+#pragma once
+
+
 #include "gamestate.h"
 
-void update_player_state(shared_ptr<gamestate> g) {
+static inline void update_player_state(shared_ptr<gamestate> g) {
     //massert(g, "Game state is NULL!");
     //if (!g->gameover) {
     //    //g_incr_tx_alpha(g, g->hero_id, 2);
