@@ -69,9 +69,11 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_shield_at_with(g, (vec3){11, 10, 0}, tower_shield_init_test);
     create_shield_at_with(g, (vec3){10, 9, 0}, kite_shield_init_test);
 
-    create_door_at(g, (vec3){12, 9, 0});
-    create_door_at(g, (vec3){14, 12, 0});
-    create_door_at(g, (vec3){12, 9, 1});
+    create_door_at_with(g, (vec3){12, 9, 0}, [](shared_ptr<gamestate> g, entityid id) {});
+    create_door_at_with(g, (vec3){14, 12, 0}, [](shared_ptr<gamestate> g, entityid id) {});
+    create_door_at_with(g, (vec3){12, 9, 1}, [](shared_ptr<gamestate> g, entityid id) {});
+    //create_door_at(g, (vec3){14, 12, 0});
+    //create_door_at(g, (vec3){12, 9, 1});
 
     //#ifdef SPAWN_MONSTERS
 
