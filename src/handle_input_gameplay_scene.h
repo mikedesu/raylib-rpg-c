@@ -1,9 +1,12 @@
+#pragma once
+
+#include "gamestate.h"
 #include "handle_input_gameplay_controlmode_player.h"
 #include "handle_input_inventory.h"
+#include "inputstate.h"
 #include "liblogic_handle_camera_move.h"
-#include "liblogic_handle_input_gameplay_scene.h"
 
-void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(g, "Game state is NULL!");
     massert(is, "Input state is NULL!");
     if (inputstate_is_pressed(is, KEY_B)) {
