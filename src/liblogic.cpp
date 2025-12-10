@@ -63,57 +63,22 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 6, 0});
     //create_wooden_box(g, (vec3){7, 7, 0});
 
-    //create_weapon_at_with(g, (vec3){10, 10, 0}, [g](entityid id) {
-
-
     create_weapon_at_with(g, (vec3){10, 10, 0}, dagger_init_test);
-
 
     create_shield_at_with(g, (vec3){11, 9, 0}, buckler_init_test);
     create_shield_at_with(g, (vec3){11, 10, 0}, tower_shield_init_test);
     create_shield_at_with(g, (vec3){10, 9, 0}, kite_shield_init_test);
+
     create_door_at(g, (vec3){12, 9, 0});
     create_door_at(g, (vec3){14, 12, 0});
     create_door_at(g, (vec3){12, 9, 1});
 
     //#ifdef SPAWN_MONSTERS
 
-    //create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, [](shared_ptr<gamestate> g, entityid id) {
-    //    const entityid wpn_id = create_weapon_with(g, axe_init_test);
-    //    add_to_inventory(g, id, wpn_id);
-    //    set_equipped_weapon(g, id, wpn_id);
-    //    set_name(g, id, "Zook");
-    //});
-
-
     create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, orc_init_test);
     create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, orc_init_test2);
     create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, orc_init_test3);
 
-    //create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, [](shared_ptr<gamestate> g, entityid id) {
-    //    const entityid weaponid = create_weapon_with(g, dagger_init_test);
-    //    add_to_inventory(g, id, weaponid);
-    //    set_equipped_weapon(g, id, weaponid);
-    //    set_name(g, id, "Zugzug");
-    //});
-
-    //create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, [](shared_ptr<gamestate> g, entityid id) {
-    //    const entityid weaponid = create_weapon_with(g, sword_init_test);
-    //    add_to_inventory(g, id, weaponid);
-    //    set_equipped_weapon(g, id, weaponid);
-    //    set_name(g, id, "Gorp");
-    //});
-
-
-    //entityid orc2 = create_npc(g, RACE_ORC, (vec3){14, 9, 0}, "orc");
-    //entityid orc2_weapon = create_weapon(g, WEAPON_AXE);
-    //add_to_inventory(g, orc2, orc2_weapon);
-    //g->ct.set<equipped_weapon>(orc2, orc2_weapon);
-
-    //entityid orc3 = create_npc(g, RACE_ORC, (vec3){15, 9, 0}, "orc");
-    //entityid orc3_weapon = create_weapon(g, WEAPON_AXE);
-    //add_to_inventory(g, orc3, orc3_weapon);
-    //g->ct.set<equipped_weapon>(orc3, orc3_weapon);
     //#endif
 
 
