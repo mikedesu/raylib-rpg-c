@@ -1,9 +1,12 @@
-#include "liblogic_handle_npc.h"
+#pragma once
+
+#include "gamestate.h"
 #include "liblogic_is_entity_adjacent.h"
 #include "try_entity_attack.h"
 #include "try_entity_move.h"
 
-void handle_npc(shared_ptr<gamestate> g, entityid id) {
+
+static inline void handle_npc(shared_ptr<gamestate> g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
 

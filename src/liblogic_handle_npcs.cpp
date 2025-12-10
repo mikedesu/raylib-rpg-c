@@ -1,5 +1,4 @@
-
-#include "liblogic_handle_npc.h"
+#include "handle_npc.h"
 #include "liblogic_handle_npcs.h"
 
 void handle_npcs(shared_ptr<gamestate> g) {
