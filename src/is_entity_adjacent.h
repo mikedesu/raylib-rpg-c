@@ -1,6 +1,8 @@
-#include "liblogic_is_entity_adjacent.h"
+#pragma once
 
-bool is_entity_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1) {
+#include "gamestate.h"
+
+static inline bool is_entity_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1) {
     massert(g, "gamestate is NULL");
     massert(id0 != ENTITYID_INVALID, "id0 is invalid");
     massert(id1 != ENTITYID_INVALID, "id1 is invalid");
@@ -8,7 +10,8 @@ bool is_entity_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1) {
     // use e0 and check the surrounding 8 tiles
     for (int y = -1; y <= 1; y++) {
         for (int x = -1; x <= 1; x++) {
-            if (x == 0 && y == 0) continue;
+            if (x == 0 && y == 0)
+                continue;
             optional<vec3> maybe_loc0 = g->ct.get<location>(id0);
             optional<vec3> maybe_loc1 = g->ct.get<location>(id1);
             if (maybe_loc0.has_value() && maybe_loc1.has_value()) {

@@ -57,7 +57,6 @@ libdraw_entity_sprite.cpp \
 libdraw_player_target_box.cpp \
 libdraw_camera_lock_on.cpp \
 libdraw.cpp \
-liblogic_is_entity_adjacent.cpp \
 try_entity_pickup.cpp \
 liblogic_handle_input.cpp \
 liblogic_handle_input_inventory.cpp \
@@ -140,7 +139,6 @@ libdraw.o \
 dungeon_floor.o \
 dungeon_tile.o \
 dungeon_tile.o \
-liblogic_is_entity_adjacent.o \
 try_entity_pickup.o \
 liblogic_handle_input.o \
 liblogic_handle_input_inventory.o \
@@ -321,8 +319,6 @@ manage_inventory.o: manage_inventory.cpp
 update_player_tiles_explored.o: update_player_tiles_explored.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic_is_entity_adjacent.o: liblogic_is_entity_adjacent.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
 try_entity_attack.o: try_entity_attack.cpp
