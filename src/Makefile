@@ -12,7 +12,6 @@ CFLAGS ?= # Allow override
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
 gameloader_web.cpp \
-entity_templates.cpp \
 try_entity_attack.cpp \
 try_entity_open_door.cpp \
 tile_has_door.cpp \
@@ -114,7 +113,6 @@ OBJ_FILES=main.o \
 gameloader.o \
 gamestate_inventory.o \
 gamestate.o \
-entity_templates.o \
 try_entity_open_door.o \
 tile_has_door.o \
 create_door.o \
@@ -243,9 +241,6 @@ dungeon.o: dungeon.cpp
 
 
 ###################
-entity_templates.o: entity_templates.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
 
 libdraw_hud.o: libdraw_hud.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
