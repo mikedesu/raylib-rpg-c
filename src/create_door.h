@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entity_templates.h"
 #include "gamestate.h"
 
 static inline entityid create_door_with(shared_ptr<gamestate> g, function<void(shared_ptr<gamestate>, entityid)> doorInitFunction) {
@@ -31,9 +32,9 @@ static inline entityid create_door_at_with(shared_ptr<gamestate> g, vec3 loc, fu
         return ENTITYID_INVALID;
     }
 
-    g->ct.set<location>(id, loc);
-    g->ct.set<door_open>(id, false);
-    g->ct.set<update>(id, true);
+    set_location(g, id, loc);
+    set_door_open(g, id, false);
+    set_update(g, id, true);
 
     minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
     if (!df_add_at(df, id, loc.x, loc.y)) {
