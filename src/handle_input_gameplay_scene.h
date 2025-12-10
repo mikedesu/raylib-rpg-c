@@ -1,10 +1,10 @@
 #pragma once
 
 #include "gamestate.h"
+#include "handle_camera_move.h"
 #include "handle_input_gameplay_controlmode_player.h"
 #include "handle_input_inventory.h"
 #include "inputstate.h"
-#include "liblogic_handle_camera_move.h"
 
 static inline void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(g, "Game state is NULL!");
