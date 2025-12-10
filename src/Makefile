@@ -64,7 +64,6 @@ try_entity_pickup.cpp \
 liblogic_add_message.cpp \
 liblogic_update_player_state.cpp \
 liblogic_tile_npc_living_count.cpp \
-liblogic_tile_has_box.cpp \
 liblogic_try_entity_move.cpp \
 liblogic_handle_npc.cpp \
 liblogic_handle_npcs.cpp \
@@ -167,7 +166,6 @@ liblogic_add_message.o \
 try_entity_pickup.o \
 liblogic_update_player_state.o \
 liblogic_tile_npc_living_count.o \
-liblogic_tile_has_box.o \
 liblogic_try_entity_move.o \
 liblogic_handle_npc.o \
 liblogic_handle_npcs.o \
@@ -386,9 +384,6 @@ liblogic_tile_npc_living_count.o: liblogic_tile_npc_living_count.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_try_entity_move.o: liblogic_try_entity_move.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-liblogic_tile_has_box.o: liblogic_tile_has_box.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_handle_npc.o: liblogic_handle_npc.cpp 	

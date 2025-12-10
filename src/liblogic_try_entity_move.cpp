@@ -1,13 +1,12 @@
 #include "ComponentTraits.h"
 #include "entityid.h"
-//#include "entitytype.h"
 #include "libgame_defines.h"
 #include "liblogic_try_entity_move.h"
 #include "massert.h"
 #include "sfx.h"
 #include "tile_has_door.h"
 
-entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z);
+//entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z);
 
 int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, int z);
 

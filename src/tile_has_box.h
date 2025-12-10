@@ -1,10 +1,8 @@
-//#include "ComponentTraits.h"
-//#include "entitytype.h"
-//#include "gamestate.h"
+#pragma once
 
-#include "liblogic_tile_has_box.h"
+#include "gamestate.h"
 
-entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z) {
+static inline entityid tile_has_box(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     massert(z >= 0, "floor is out of bounds");
     massert((size_t)z < g->dungeon->floors->size(), "floor is out of bounds");
