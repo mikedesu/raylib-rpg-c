@@ -76,7 +76,6 @@ gamestate_inventory.cpp \
 gamestate.cpp \
 dungeon_floor.cpp \
 dungeon_tile.cpp \
-sprite.cpp \
 spritegroup.cpp \
 
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
@@ -145,7 +144,6 @@ libdraw_create_spritegroup.o \
 libdraw_update_debug_panel.o \
 libdraw.o \
 spritegroup.o \
-sprite.o \
 dungeon_floor.o \
 dungeon_tile.o \
 dungeon_tile.o \
@@ -191,8 +189,6 @@ gamestate.o: gamestate.cpp
 try_entity_open_door.o: try_entity_open_door.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-sprite.o: sprite.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 spritegroup.o: spritegroup.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
