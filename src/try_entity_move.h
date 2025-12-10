@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entity_accessors.h"
 #include "entity_templates.h"
 #include "gamestate.h"
 #include "libgame_defines.h"
@@ -12,15 +13,15 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     minfo("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
-    g->ct.set<update>(id, true);
+    set_update(g, id, true);
+
     g->ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
 
     // entity location
-    auto maybe_loc = g->ct.get<location>(id);
-    if (!maybe_loc.has_value()) {
+    auto maybe_loc = maybe_location(id);
+    if (!maybe_loc.has_value())
         return false;
-    }
-    vec3 loc = g->ct.get<location>(id).value();
+    vec3 loc = maybe_loc.value();
 
     // entity's new location
     // we will have a special case for traversing floors so ignore v.z
@@ -28,7 +29,7 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
     auto df = d_get_floor(g->dungeon, loc.z);
     if (!df) {
         merror("Dungeon floor %d does not exist", loc.z);
-        return false; // Floor does not exist
+        return false;
     }
 
     // i feel like this might be something we can set elsewhere...like after the player input phase?
@@ -86,6 +87,8 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
             merror("Door should have an open value");
             return false;
         }
+    } else {
+        minfo("No door...");
     }
 
     const float mx = v.x * DEFAULT_TILE_SIZE;
