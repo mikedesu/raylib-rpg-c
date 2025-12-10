@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dungeon_floor.h"
+#include "dungeon_tile_type.h"
 #include "dungeonfloorid.h"
 
 #include <functional>
@@ -45,24 +46,48 @@ static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dung
         return nullptr;
 
     auto creation_rules = [df]() {
-        const float x = df->width / 3.0;
-        const float y = df->height / 3.0;
-        const int w = 8;
-        const int h = 8;
-        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y, w, h});
-        df_set_perimeter(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x - 1, y - 1, w + 2, h + 2});
-        df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x + w / 2.0f, y, 1, h});
-        df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x, y + h / 2.0f, w, 1});
-        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 1, 1, 1});
-        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f + 2, y + 4, 1, 2});
-        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 6, 1, 2});
-        const vec3 loc_u = {9, 9, df->floor};
+        const float x = df->width / 4.0;
+        const float y = df->height / 4.0;
+
+        const int w = 4;
+        const int h = 3;
+
+        // create an wxh area
+        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y, w, h});
+        Rectangle base = {x - 1, y - 1, static_cast<float>(df->width), static_cast<float>(df->height)};
+        df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, base);
+        // draw room 1
+        Rectangle room1 = {base.x + 1, base.y + 1, w, h};
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room1);
+        // draw room 2
+        Rectangle room2 = {room1.x + room1.width + 1, room1.y, w, h};
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room2);
+        // poke a hole
+        Rectangle entryway1 = {room2.x - 1, room2.y + 1, 1, 1};
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway1);
+        //df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x + w / 2.0f, y, 1, h});
+        Rectangle room3 = {room2.x, room2.y + room2.height + 1, w, h};
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room3);
+        // poke a hole in the wall
+        Rectangle entryway2 = {room3.x + 1, room3.y - 1, 1, 1};
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway2);
+        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 1, 1, 1});
+        // poke a hole in the wall
+        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f + 2, y + 4, 1, 2});
+        // poke a hole in the wall
+        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 6, 1, 1});
+
+        // set upstairs
+        const vec3 loc_u = {static_cast<int>(room1.x), static_cast<int>(room1.y), df->floor};
         df_set_tile(df, TILE_UPSTAIRS, loc_u.x, loc_u.y);
         df->upstairs_loc = loc_u;
+
+        // set downstairs
         const vec3 loc_d = {9, 14, df->floor};
         df_set_tile(df, TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
         df->downstairs_loc = loc_d;
 
+        // automatic door placement
         for (int x = 0; x < df->width; x++) {
             for (int y = 0; y < df->height; y++) {
                 if (df_is_good_door_loc(df, (vec3){x, y, df->floor})) {
@@ -70,13 +95,6 @@ static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dung
                 }
             }
         }
-
-        //df_set_can_have_door(df, (vec3){12, 9, 2});
-        //df_set_can_have_door(df, (vec3){12, 9, 3});
-        //df_set_can_have_door(df, (vec3){14, 12, 0});
-        //df_set_can_have_door(df, (vec3){14, 12, 1});
-        //df_set_can_have_door(df, (vec3){14, 12, 2});
-        //df_set_can_have_door(df, (vec3){14, 12, 3});
     };
 
     df_xform(creation_rules);

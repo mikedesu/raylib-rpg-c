@@ -15,7 +15,10 @@ using std::vector;
 
 
 void tile_init(shared_ptr<tile_t> t, tiletype_t type) {
-    massert(t, "tile is NULL");
+    //massert(t, "tile is NULL");
+    if (!t)
+        return;
+
     t->type = type;
     t->visible = t->explored = t->cached_player_present = false;
     t->dirty_entities = t->dirty_visibility = true;
