@@ -3,6 +3,7 @@
 #include "create_weapon.h"
 #include "gamestate.h"
 #include "manage_inventory.h"
+#include "weapon.h"
 
 // Component Setters
 static inline void set_name(shared_ptr<gamestate> g, entityid id, string n) {
@@ -101,25 +102,41 @@ static inline void kite_shield_init_test(shared_ptr<gamestate> g, entityid id) {
 }
 
 
+static inline void random_weapon_init_test(shared_ptr<gamestate> g, entityid id) {
+    weapontype_t t = (weapontype_t)GetRandomValue(WEAPON_NONE + 1, WEAPON_TYPE_COUNT - 1);
+    set_weapontype(g, id, t);
+
+    switch (t) {
+    case WEAPON_SWORD: sword_init_test(g, id); break;
+    case WEAPON_DAGGER: dagger_init_test(g, id); break;
+    case WEAPON_AXE: axe_init_test(g, id); break;
+    default: break;
+    }
+
+    //set_durability(g, id, 100);
+    //set_max_durability(g, id, 100);
+}
+
+
 static inline void orc_init_test(shared_ptr<gamestate> g, entityid id) {
-    const entityid wpn_id = create_weapon_with(g, axe_init_test);
+    const entityid wpn_id = create_weapon_with(g, random_weapon_init_test);
     add_to_inventory(g, id, wpn_id);
     set_equipped_weapon(g, id, wpn_id);
     set_name(g, id, "Zook");
 }
 
 
-static inline void orc_init_test2(shared_ptr<gamestate> g, entityid id) {
-    const entityid wpn_id = create_weapon_with(g, dagger_init_test);
-    add_to_inventory(g, id, wpn_id);
-    set_equipped_weapon(g, id, wpn_id);
-    set_name(g, id, "Zook");
-}
+//static inline void orc_init_test2(shared_ptr<gamestate> g, entityid id) {
+//    const entityid wpn_id = create_weapon_with(g, dagger_init_test);
+//    add_to_inventory(g, id, wpn_id);
+//    set_equipped_weapon(g, id, wpn_id);
+//    set_name(g, id, "Zook");
+//}
 
 
-static inline void orc_init_test3(shared_ptr<gamestate> g, entityid id) {
-    const entityid weaponid = create_weapon_with(g, sword_init_test);
-    add_to_inventory(g, id, weaponid);
-    set_equipped_weapon(g, id, weaponid);
-    set_name(g, id, "Gorp");
-}
+//static inline void orc_init_test3(shared_ptr<gamestate> g, entityid id) {
+//    const entityid weaponid = create_weapon_with(g, sword_init_test);
+//    add_to_inventory(g, id, weaponid);
+//    set_equipped_weapon(g, id, weaponid);
+//    set_name(g, id, "Gorp");
+//}

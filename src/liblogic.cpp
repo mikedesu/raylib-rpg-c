@@ -18,11 +18,11 @@
 #include "liblogic_init_dungeon.h"
 #include "liblogic_update_debug_panel_buffer.h"
 #include "liblogic_update_player_state.h"
-#include "manage_inventory.h"
+//#include "manage_inventory.h"
 #include "massert.h"
-#include "shield.h"
+//#include "shield.h"
 #include "update_player_tiles_explored.h"
-#include "weapon.h"
+//#include "weapon.h"
 //#include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -76,8 +76,8 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //#ifdef SPAWN_MONSTERS
 
     create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, orc_init_test);
-    create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, orc_init_test2);
-    create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, orc_init_test3);
+    create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, orc_init_test);
+    create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, orc_init_test);
 
     //#endif
 
