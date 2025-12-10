@@ -17,29 +17,23 @@ static inline entityid create_door_at_with(shared_ptr<gamestate> g, vec3 loc, fu
 
     massert(tile, "failed to get tile");
 
-    if (!tile_is_walkable(tile->type)) {
-        merror("cannot create entity on non-walkable tile");
+    if (!tile_is_walkable(tile->type))
         return ENTITYID_INVALID;
-    }
 
-    if (tile_has_live_npcs(g, tile)) {
-        merror("cannot create entity on tile with live NPCs");
+    if (tile_has_live_npcs(g, tile))
         return ENTITYID_INVALID;
-    }
 
     const auto id = create_door_with(g, doorInitFunction);
-    if (id == ENTITYID_INVALID) {
+    if (id == ENTITYID_INVALID)
         return ENTITYID_INVALID;
-    }
+
+    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+    if (!df_add_at(df, id, loc.x, loc.y))
+        return ENTITYID_INVALID;
 
     set_location(g, id, loc);
     set_door_open(g, id, false);
     set_update(g, id, true);
-
-    minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-    if (!df_add_at(df, id, loc.x, loc.y)) {
-        return ENTITYID_INVALID;
-    }
 
     return id;
 }

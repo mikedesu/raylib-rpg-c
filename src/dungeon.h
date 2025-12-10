@@ -40,8 +40,10 @@ static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dung
     const int current_floor = dungeon->floors->size();
 
     auto df = df_init(current_floor, type, width, height);
+
     if (!df)
         return nullptr;
+
     auto creation_rules = [df]() {
         const float x = df->width / 3.0;
         const float y = df->height / 3.0;
@@ -60,7 +62,16 @@ static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dung
         const vec3 loc_d = {9, 14, df->floor};
         df_set_tile(df, TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
         df->downstairs_loc = loc_d;
+
+        df_set_can_have_door(df, (vec3){12, 9, 1});
+        df_set_can_have_door(df, (vec3){12, 9, 2});
+        df_set_can_have_door(df, (vec3){12, 9, 3});
+        df_set_can_have_door(df, (vec3){14, 12, 0});
+        df_set_can_have_door(df, (vec3){14, 12, 1});
+        df_set_can_have_door(df, (vec3){14, 12, 2});
+        df_set_can_have_door(df, (vec3){14, 12, 3});
     };
+
     df_xform(creation_rules);
     dungeon->floors->push_back(df);
     return df;

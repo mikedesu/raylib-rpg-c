@@ -110,16 +110,6 @@ shared_ptr<dungeon_floor_t> df_init(int floor, biome_t t, int width, int height)
         DEBUG_BREAK();
     }
 
-    df_set_can_have_door(df, (vec3){12, 9, 1});
-    df_set_can_have_door(df, (vec3){12, 9, 2});
-    df_set_can_have_door(df, (vec3){12, 9, 3});
-
-    df_set_can_have_door(df, (vec3){14, 12, 0});
-    df_set_can_have_door(df, (vec3){14, 12, 1});
-    df_set_can_have_door(df, (vec3){14, 12, 2});
-    df_set_can_have_door(df, (vec3){14, 12, 3});
-
-
     msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
     return df;
 }
