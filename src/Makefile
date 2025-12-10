@@ -59,7 +59,6 @@ libdraw_camera_lock_on.cpp \
 libdraw.cpp \
 try_entity_pickup.cpp \
 liblogic_handle_input.cpp \
-liblogic_handle_input_inventory.cpp \
 liblogic_handle_input_character_creation_scene.cpp \
 liblogic_handle_input_gameplay_controlmode_player.cpp \
 liblogic_handle_input_gameplay_scene.cpp \
@@ -139,7 +138,6 @@ dungeon_tile.o \
 dungeon_tile.o \
 try_entity_pickup.o \
 liblogic_handle_input.o \
-liblogic_handle_input_inventory.o \
 liblogic_handle_input_gameplay_scene.o \
 liblogic_handle_input_character_creation_scene.o \
 liblogic_handle_input_gameplay_controlmode_player.o \
@@ -329,8 +327,6 @@ try_entity_pickup.o: try_entity_pickup.cpp
 
 
 
-liblogic_handle_input_inventory.o: liblogic_handle_input_inventory.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
 

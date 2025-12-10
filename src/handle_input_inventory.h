@@ -1,10 +1,11 @@
+#pragma once
+
 #include "drop_item.h"
 #include "gamestate.h"
-#include "liblogic_handle_input_inventory.h"
+#include "inputstate.h"
 #include "sfx.h"
 
-
-void handle_inventory_equip_shield(shared_ptr<gamestate> g, entityid item_id) {
+static inline void handle_inventory_equip_shield(shared_ptr<gamestate> g, entityid item_id) {
     // Check if this is the currently equipped weapon
     //minfo("handle equip shield");
     const entityid current_shield = g->ct.get<equipped_shield>(g->hero_id).value_or(ENTITYID_INVALID);
@@ -23,7 +24,7 @@ void handle_inventory_equip_shield(shared_ptr<gamestate> g, entityid item_id) {
 }
 
 
-void handle_inventory_equip_weapon(shared_ptr<gamestate> g, entityid item_id) {
+static inline void handle_inventory_equip_weapon(shared_ptr<gamestate> g, entityid item_id) {
     // Check if this is the currently equipped weapon
     const entityid current_weapon = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
     if (current_weapon == item_id) {
@@ -39,7 +40,7 @@ void handle_inventory_equip_weapon(shared_ptr<gamestate> g, entityid item_id) {
 }
 
 
-void handle_inventory_equip_item(shared_ptr<gamestate> g, entityid item_id) {
+static inline void handle_inventory_equip_item(shared_ptr<gamestate> g, entityid item_id) {
     itemtype_t item_type = g->ct.get<itemtype>(item_id).value_or(ITEM_NONE);
     switch (item_type) {
     case ITEM_NONE: break;
@@ -50,7 +51,7 @@ void handle_inventory_equip_item(shared_ptr<gamestate> g, entityid item_id) {
 }
 
 
-void handle_inventory_equip(shared_ptr<gamestate> g) {
+static inline void handle_inventory_equip(shared_ptr<gamestate> g) {
     PlaySound(g->sfx->at(SFX_EQUIP_01));
     // equip item
     // get the item id of the current selection
@@ -71,7 +72,7 @@ void handle_inventory_equip(shared_ptr<gamestate> g) {
 }
 
 
-void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+static inline void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (g->controlmode != CONTROLMODE_INVENTORY) {
