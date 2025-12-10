@@ -76,7 +76,6 @@ gamestate_inventory.cpp \
 gamestate.cpp \
 dungeon_floor.cpp \
 dungeon_tile.cpp \
-spritegroup.cpp \
 
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
@@ -143,7 +142,6 @@ libdraw_camera_lock_on.o \
 libdraw_create_spritegroup.o \
 libdraw_update_debug_panel.o \
 libdraw.o \
-spritegroup.o \
 dungeon_floor.o \
 dungeon_tile.o \
 dungeon_tile.o \
@@ -190,8 +188,6 @@ try_entity_open_door.o: try_entity_open_door.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
-spritegroup.o: spritegroup.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 dungeon_tile.o: dungeon_tile.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
