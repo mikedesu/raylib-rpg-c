@@ -1,7 +1,8 @@
-#include "dungeon_floor_type.h"
-#include "liblogic_init_dungeon.h"
+#pragma once
 
-void init_dungeon(shared_ptr<gamestate> g) {
+#include "gamestate.h"
+
+static inline void init_dungeon(shared_ptr<gamestate> g) {
     massert(g, "gamestate is null");
 
     g->dungeon = d_create();
