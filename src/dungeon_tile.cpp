@@ -22,6 +22,7 @@ void tile_init(shared_ptr<tile_t> t, tiletype_t type) {
     t->cached_live_npcs = 0;
     t->entities = make_shared<vector<entityid>>();
     t->is_empty = true;
+    t->can_have_door = false;
 }
 
 
@@ -57,21 +58,24 @@ entityid tile_remove(shared_ptr<tile_t> tile, entityid id) {
 shared_ptr<tile_t> tile_create(tiletype_t type) {
     massert(type >= TILE_NONE && type < TILE_COUNT, "tile_create: type is out-of-bounds");
     shared_ptr<tile_t> t = make_shared<tile_t>();
-    if (!t) return nullptr;
+    if (!t)
+        return nullptr;
     tile_init(t, type);
     return t;
 }
 
 
 void tile_free(shared_ptr<tile_t> t) {
-    if (t) t->entities->clear();
+    if (t)
+        t->entities->clear();
 }
 
 
 void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
     massert(g && t, "gamestate or tile is NULL");
     // Only recompute if cache is dirty
-    if (!t->dirty_entities) return;
+    if (!t->dirty_entities)
+        return;
     // Reset counters
     t->cached_live_npcs = 0;
     t->cached_player_present = false;

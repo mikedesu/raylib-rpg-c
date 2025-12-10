@@ -25,6 +25,7 @@
             exit(EXIT_FAILURE); \
         } \
     } while (0)
+//#define mbreak() DEBUG_BREAK()
 #else
 #define massert(cond, ...) ((void)0)
 #endif

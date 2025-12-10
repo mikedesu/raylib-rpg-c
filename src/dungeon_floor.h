@@ -116,3 +116,15 @@ static inline bool df_tile_is_wall(shared_ptr<dungeon_floor_t> df, int x, int y)
         return false;
     return tile_is_wall(type);
 }
+
+
+static inline void df_set_can_have_door(shared_ptr<dungeon_floor_t> df, vec3 loc) {
+    minfo("set can have door: %d, %d, %d", loc.x, loc.y, loc.z);
+    auto tile = df_tile_at(df, loc);
+    if (tile) {
+        msuccess("Setting can have door to true");
+        tile->can_have_door = true;
+    } else {
+        merror("Cannot set door, tile is NULL");
+    }
+}

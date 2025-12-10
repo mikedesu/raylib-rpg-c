@@ -65,16 +65,42 @@ void liblogic_init(shared_ptr<gamestate> g) {
     create_shield_at_with(g, (vec3){10, 9, 0}, kite_shield_init_test);
 
     create_door_at_with(g, (vec3){12, 9, 0}, [](shared_ptr<gamestate> g, entityid id) {});
-    create_door_at_with(g, (vec3){14, 12, 0}, [](shared_ptr<gamestate> g, entityid id) {});
-    create_door_at_with(g, (vec3){12, 9, 1}, [](shared_ptr<gamestate> g, entityid id) {});
+    //create_door_at_with(g, (vec3){14, 12, 0}, [](shared_ptr<gamestate> g, entityid id) {});
+    //create_door_at_with(g, (vec3){12, 9, 1}, [](shared_ptr<gamestate> g, entityid id) {});
+
+
+    //minfo("BEGIN CREATING DOORS");
+    //for (int z = 0; z < (int)g->dungeon->floors->size(); z++) {
+    //    auto df = d_get_floor(g->dungeon, z);
+    //    for (int x = 0; x < df->width; x++) {
+    //        for (int y = 0; y < df->height; y++) {
+    //            const vec3 loc = {x, y, z};
+    //            //auto tile = df_tile_at(d_get_current_floor(g->dungeon), loc);
+    //            auto tile = df_tile_at(df, loc);
+    //            if (tile) {
+    //                if (tile->can_have_door) {
+    //                    msuccess("creating door at (%d, %d, %d)", loc.x, loc.y, loc.z);
+    //                    create_door_at_with(g, loc, [](shared_ptr<gamestate> g, entityid id) {});
+    //                } else {
+    //                    merror("tile CANNOT have door at (%d, %d, %d)", loc.x, loc.y, loc.z);
+    //                }
+    //            } else {
+    //                merror("tile was NULL at (%d, %d, %d)", loc.x, loc.y, loc.z);
+    //            }
+    //        }
+    //    }
+    //}
+    //minfo("END CREATING DOORS");
+
+
     //create_door_at(g, (vec3){14, 12, 0});
     //create_door_at(g, (vec3){12, 9, 1});
 
     //#ifdef SPAWN_MONSTERS
 
-    create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, orc_init_test);
-    create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, orc_init_test);
-    create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, orc_init_test);
 
     //#endif
 

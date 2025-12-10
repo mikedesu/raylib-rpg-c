@@ -100,6 +100,26 @@ shared_ptr<dungeon_floor_t> df_init(int floor, biome_t t, int width, int height)
     df_set_tile(df, TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
     df->downstairs_loc = loc_d;
 
+
+    df_set_can_have_door(df, (vec3){12, 9, 0});
+    if (df_tile_at(df, (vec3){12, 9, 0})->can_have_door) {
+        msuccess("door has can have door set");
+        //DEBUG_BREAK();
+    } else {
+        merror("door does not have can have door set");
+        DEBUG_BREAK();
+    }
+
+    df_set_can_have_door(df, (vec3){12, 9, 1});
+    df_set_can_have_door(df, (vec3){12, 9, 2});
+    df_set_can_have_door(df, (vec3){12, 9, 3});
+
+    df_set_can_have_door(df, (vec3){14, 12, 0});
+    df_set_can_have_door(df, (vec3){14, 12, 1});
+    df_set_can_have_door(df, (vec3){14, 12, 2});
+    df_set_can_have_door(df, (vec3){14, 12, 3});
+
+
     msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
     return df;
 }
@@ -428,9 +448,6 @@ void df_set_tile(shared_ptr<dungeon_floor_t> df, tiletype_t type, int x, int y) 
     shared_ptr<tile_t> current = df_tile_at(df, (vec3){x, y, -1});
     tile_init(current, type);
 }
-
-
-//void df_set_can_have_door(
 
 
 void df_free(shared_ptr<dungeon_floor_t> df) {
