@@ -1,6 +1,6 @@
+#include "handle_input_gameplay_controlmode_player.h"
 #include "handle_input_inventory.h"
 #include "liblogic_handle_camera_move.h"
-#include "liblogic_handle_input_gameplay_controlmode_player.h"
 #include "liblogic_handle_input_gameplay_scene.h"
 
 void handle_input_gameplay_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {

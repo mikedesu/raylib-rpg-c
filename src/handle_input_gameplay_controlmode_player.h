@@ -1,20 +1,20 @@
+#pragma once
+
 #include "add_message.h"
 #include "cycle_messages.h"
+#include "gamestate.h"
 #include "get_loc_facing_player.h"
 #include "handle_input_help_menu.h"
-#include "inputstate.h"
-#include "libgame_defines.h"
 #include "liblogic_change_player_dir.h"
-#include "liblogic_handle_input_gameplay_controlmode_player.h"
 #include "sfx.h"
 #include "try_entity_attack.h"
 #include "try_entity_move.h"
 #include "try_entity_open_door.h"
 #include "try_entity_pickup.h"
 #include "try_entity_stairs.h"
-#include <raylib.h>
 
-void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+
+static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->do_quit = true;
         return;
