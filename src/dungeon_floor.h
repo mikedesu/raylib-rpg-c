@@ -114,7 +114,7 @@ static inline bool df_tile_is_wall(shared_ptr<dungeon_floor_t> df, int x, int y)
     if (type == TILE_NONE || type == TILE_COUNT)
         //merror("Tile type is invalid at (%d, %d)", x, y);
         return false;
-    return tile_is_wall(type);
+    return tiletype_is_wall(type);
 }
 
 
@@ -134,24 +134,31 @@ static inline bool df_is_good_door_loc(shared_ptr<dungeon_floor_t> df, vec3 loc)
     auto tile = df_tile_at(df, loc);
     if (tile) {
         // case 1:
-        auto tile0 = df_tile_at(df, (vec3){loc.x - 1, loc.y - 1, loc.z});
-        auto tile1 = df_tile_at(df, (vec3){loc.x - 1, loc.y, loc.z});
-        auto tile2 = df_tile_at(df, (vec3){loc.x - 1, loc.y + 1, loc.z});
+        auto t0 = df_tile_at(df, (vec3){loc.x - 1, loc.y - 1, loc.z});
+        auto t1 = df_tile_at(df, (vec3){loc.x - 1, loc.y, loc.z});
+        auto t2 = df_tile_at(df, (vec3){loc.x - 1, loc.y + 1, loc.z});
 
-        auto tile3 = df_tile_at(df, (vec3){loc.x, loc.y - 1, loc.z});
-        auto tile4 = df_tile_at(df, (vec3){loc.x, loc.y + 1, loc.z});
+        auto t3 = df_tile_at(df, (vec3){loc.x, loc.y - 1, loc.z});
+        auto t4 = df_tile_at(df, (vec3){loc.x, loc.y + 1, loc.z});
 
-        auto tile5 = df_tile_at(df, (vec3){loc.x + 1, loc.y - 1, loc.z});
-        auto tile6 = df_tile_at(df, (vec3){loc.x + 1, loc.y, loc.z});
-        auto tile7 = df_tile_at(df, (vec3){loc.x + 1, loc.y + 1, loc.z});
+        auto t5 = df_tile_at(df, (vec3){loc.x + 1, loc.y - 1, loc.z});
+        auto t6 = df_tile_at(df, (vec3){loc.x + 1, loc.y, loc.z});
+        auto t7 = df_tile_at(df, (vec3){loc.x + 1, loc.y + 1, loc.z});
 
-        if (!tile0 || !tile1 || !tile2 || !tile3 || !tile4 || !tile5 || !tile6 || !tile7) {
-            return false;
+        auto tw0 = tile_is_wall(t0);
+        auto tw1 = tile_is_wall(t1);
+        auto tw2 = tile_is_wall(t2);
+        auto tw3 = tile_is_wall(t3);
+        auto tw4 = tile_is_wall(t4);
+        auto tw5 = tile_is_wall(t5);
+        auto tw6 = tile_is_wall(t6);
+        auto tw7 = tile_is_wall(t7);
+
+        if (tw3 && tw4 && !(tw0 || tw1 || tw2 || tw5 || tw6 || tw7)) {
+            return true;
         }
 
-        if (tile_is_wall(tile3->type) && tile_is_wall(tile4->type) &&
-            !(tile_is_wall(tile0->type) || tile_is_wall(tile1->type) || tile_is_wall(tile2->type) || tile_is_wall(tile5->type) || tile_is_wall(tile6->type) ||
-              tile_is_wall(tile7->type))) {
+        if (tw1 && tw6 && !(tw0 || tw2 || tw3 || tw4 || tw5 || tw7)) {
             return true;
         }
 

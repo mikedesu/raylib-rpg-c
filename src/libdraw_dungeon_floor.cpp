@@ -112,7 +112,8 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
     bool blocking = false;
     for (const auto& v : path) {
         auto tile = df_tile_at(df, v);
-        if (tile && (tile_is_wall(tile->type))) {
+        //if (tile && (tile_is_wall(tile->type))) {
+        if (tile && (tiletype_is_wall(tile->type))) {
             blocking = true;
             break;
         }
@@ -140,7 +141,8 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
         for (int x = 0; x < df->width; x++) {
             const vec3 loc = {x, y, z};
             const auto tile = df_tile_at(df, loc);
-            if (!tile || !tile->visible || tile_is_wall(tile->type) || tile->is_empty)
+            //if (!tile || !tile->visible || tile_is_wall(tile->type) || tile->is_empty)
+            if (!tile || !tile->visible || tiletype_is_wall(tile->type) || tile->is_empty)
                 continue;
 
             // bugfix for tall walls so entities do not draw on top:
@@ -181,7 +183,8 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
 
             for (auto v0 : path) {
                 auto v0_tile = df_tile_at(df, v0);
-                if (tile_is_wall(v0_tile->type)) {
+                //if (tile_is_wall(v0_tile->type)) {
+                if (tiletype_is_wall(v0_tile->type)) {
                     object_blocking = true;
                     break;
                 }

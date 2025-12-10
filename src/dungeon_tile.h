@@ -86,3 +86,13 @@ static inline bool tile_has_player(shared_ptr<gamestate> g, shared_ptr<tile_t> t
     recompute_entity_cache(g, t);
     return t->cached_player_present;
 }
+
+
+static inline bool tile_is_wall(shared_ptr<tile_t> t) {
+    //massert(g, "gamestate is none");
+
+    if (!t)
+        return false;
+
+    return tiletype_is_wall(t->type);
+}
