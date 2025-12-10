@@ -78,7 +78,6 @@ dungeon_floor.cpp \
 dungeon_tile.cpp \
 sprite.cpp \
 spritegroup.cpp \
-dungeon.cpp \
 
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
@@ -147,7 +146,6 @@ libdraw_update_debug_panel.o \
 libdraw.o \
 spritegroup.o \
 sprite.o \
-dungeon.o \
 dungeon_floor.o \
 dungeon_tile.o \
 dungeon_tile.o \
@@ -205,8 +203,6 @@ dungeon_tile.o: dungeon_tile.cpp
 dungeon_floor.o: dungeon_floor.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-dungeon.o: dungeon.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
 ###################
