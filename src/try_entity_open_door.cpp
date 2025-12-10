@@ -1,7 +1,7 @@
 #include "ComponentTraits.h"
 #include "dungeon.h"
 #include "entitytype.h"
-#include "liblogic_add_message.h"
+//#include "add_message.h"
 #include "sfx.h"
 #include "tile_has_door.h"
 #include "try_entity_open_door.h"

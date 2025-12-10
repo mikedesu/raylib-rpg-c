@@ -1,11 +1,11 @@
 #include "ComponentTraits.h"
 #include "dungeon.h"
-#include "liblogic_add_message.h"
+//#include "add_message.h"
 #include "manage_inventory.h"
-#include <algorithm>
+//#include <algorithm>
 
 
-using std::find;
+//using std::find;
 
 
 bool add_to_inventory(shared_ptr<gamestate> g, entityid actor_id, entityid item_id) {

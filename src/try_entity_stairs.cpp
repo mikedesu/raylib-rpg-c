@@ -1,6 +1,6 @@
 
+#include "add_message.h"
 #include "dungeon_tile_type.h"
-#include "liblogic_add_message.h"
 #include "sfx.h"
 #include "try_entity_stairs.h"
 
