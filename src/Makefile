@@ -62,7 +62,6 @@ liblogic_is_entity_adjacent.cpp \
 try_entity_pickup.cpp \
 liblogic_add_message.cpp \
 liblogic_update_player_state.cpp \
-liblogic_try_entity_move.cpp \
 liblogic_handle_npc.cpp \
 liblogic_handle_npcs.cpp \
 liblogic_handle_input.cpp \
@@ -162,7 +161,6 @@ liblogic_drop_item.o \
 liblogic_add_message.o \
 try_entity_pickup.o \
 liblogic_update_player_state.o \
-liblogic_try_entity_move.o \
 liblogic_handle_npc.o \
 liblogic_handle_npcs.o \
 liblogic_handle_input.o \
@@ -373,8 +371,6 @@ liblogic_add_message.o: liblogic_add_message.cpp
 liblogic_update_player_state.o: liblogic_update_player_state.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic_try_entity_move.o: liblogic_try_entity_move.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_handle_npc.o: liblogic_handle_npc.cpp 	
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
