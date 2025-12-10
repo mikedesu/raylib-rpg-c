@@ -1,7 +1,7 @@
 #include "ComponentTraits.h"
+#include "create_player.h"
 #include "entitytype.h"
 #include "get_racial_hd.h"
-#include "liblogic_create_player.h"
 #include "liblogic_handle_input_character_creation_scene.h"
 #include "roll.h"
 #include "sfx.h"

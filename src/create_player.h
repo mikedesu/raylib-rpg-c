@@ -1,10 +1,9 @@
-#include "ComponentTraits.h"
+#pragma once
+
 #include "create_npc.h"
 #include "gamestate.h"
-#include "liblogic_create_player.h"
-#include <memory>
 
-entityid create_player(shared_ptr<gamestate> g, vec3 loc, string n) {
+static inline entityid create_player(shared_ptr<gamestate> g, vec3 loc, string n) {
     massert(g, "gamestate is NULL");
     massert(n != "", "name is empty string");
 
