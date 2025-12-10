@@ -59,7 +59,6 @@ libdraw_camera_lock_on.cpp \
 libdraw.cpp \
 liblogic_is_entity_adjacent.cpp \
 try_entity_pickup.cpp \
-liblogic_add_message.cpp \
 liblogic_update_player_state.cpp \
 liblogic_handle_npc.cpp \
 liblogic_handle_npcs.cpp \
@@ -155,7 +154,6 @@ dungeon_floor.o \
 dungeon_tile.o \
 dungeon_tile.o \
 liblogic_is_entity_adjacent.o \
-liblogic_add_message.o \
 try_entity_pickup.o \
 liblogic_update_player_state.o \
 liblogic_handle_npc.o \
@@ -359,8 +357,6 @@ try_entity_attack.o: try_entity_attack.cpp
 try_entity_pickup.o: try_entity_pickup.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-liblogic_add_message.o: liblogic_add_message.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic_update_player_state.o: liblogic_update_player_state.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
