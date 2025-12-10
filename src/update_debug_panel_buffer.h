@@ -1,8 +1,10 @@
-#include "controlmode.h"
-#include "gamestate_flag.h"
-#include "liblogic_update_debug_panel_buffer.h"
+#pragma once
 
-void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+#include "gamestate.h"
+#include "inputstate.h"
+
+
+static inline void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(g, "gamestate is NULL");
     // Static buffers to avoid reallocating every frame
     //static const char* control_modes[] = {"Camera", "Player", "Unknown"};
