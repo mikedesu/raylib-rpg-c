@@ -1,7 +1,7 @@
+#include "handle_input_char_creation_scene.h"
 #include "handle_input_main_menu_scene.h"
 #include "handle_input_title_scene.h"
 #include "liblogic_handle_input.h"
-#include "liblogic_handle_input_character_creation_scene.h"
 #include "liblogic_handle_input_gameplay_scene.h"
 
 void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {

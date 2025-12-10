@@ -1,13 +1,14 @@
-#include "ComponentTraits.h"
+#pragma once
+
 #include "create_player.h"
-#include "entitytype.h"
+#include "gamestate.h"
 #include "get_racial_hd.h"
-#include "liblogic_handle_input_character_creation_scene.h"
+#include "inputstate.h"
 #include "roll.h"
 #include "sfx.h"
-#include <raylib.h>
 
-void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+
+static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
 
