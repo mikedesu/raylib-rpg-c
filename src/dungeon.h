@@ -34,7 +34,7 @@ static inline shared_ptr<dungeon_t> d_create() {
 }
 
 
-static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dungeon, dungeon_floor_type_t type, int width, int height) {
+static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dungeon, biome_t type, int width, int height) {
     if (!dungeon || width <= 0 || height <= 0 || dungeon->is_locked)
         return nullptr;
     const int current_floor = dungeon->floors->size();

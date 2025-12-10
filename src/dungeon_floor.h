@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dungeon_floor_type.h"
+#include "biome.h"
 #include "dungeon_tile.h"
 #include "entityid.h"
 #include "mprint.h"
@@ -30,7 +30,7 @@ typedef struct {
     vec3 downstairs_loc;
     vec3 upstairs_loc;
 
-    dungeon_floor_type_t type;
+    biome_t biome;
 
     shared_ptr<vector<tile_id>> tiles; // 2D vector of shared pointers to tile_t
     shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
@@ -38,7 +38,7 @@ typedef struct {
 
 
 //shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int width, int height);
-shared_ptr<dungeon_floor_t> df_init(int floor, dungeon_floor_type_t t, int width, int height);
+shared_ptr<dungeon_floor_t> df_init(int floor, biome_t t, int width, int height);
 //shared_ptr<dungeon_floor_t> df_create_with(int floor, dungeon_floor_type_t t, int width, int height, function<void()> mLambda);
 void df_xform(function<void()> mLambda);
 

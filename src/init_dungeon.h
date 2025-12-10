@@ -16,7 +16,7 @@ static inline void init_dungeon(shared_ptr<gamestate> g) {
     // dungeon floors, tiles etc will require re-write/re-design for optimization
     const int w = 24;
     const int h = 24;
-    const dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_STONE;
+    const biome_t type = BIOME_STONE;
     //dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_GRASS;
 
 

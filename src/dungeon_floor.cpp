@@ -1,5 +1,5 @@
+#include "biome.h"
 #include "dungeon_floor.h"
-#include "dungeon_floor_type.h"
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
@@ -41,7 +41,7 @@ tiletype_t random_tiletype(tiletype_t a, tiletype_t b) {
 }
 
 
-shared_ptr<dungeon_floor_t> df_init(int floor, dungeon_floor_type_t t, int width, int height) {
+shared_ptr<dungeon_floor_t> df_init(int floor, biome_t t, int width, int height) {
     massert(width > 0, "width must be greater than zero");
     massert(height > 0, "height must be greater than zero");
     massert(floor >= 0, "floor must be greater than or equal to zero");
@@ -55,7 +55,7 @@ shared_ptr<dungeon_floor_t> df_init(int floor, dungeon_floor_type_t t, int width
     df->floor = floor;
     df->width = width;
     df->height = height;
-    df->type = t;
+    df->biome = t;
 
     // alloc the tile vector
     df->tiles = make_shared<vector<tile_id>>();
