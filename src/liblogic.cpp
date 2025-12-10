@@ -2,7 +2,6 @@
 #include "ComponentTraits.h"
 #include "add_message.h"
 #include "create_door.h"
-//#include "create_npc.h"
 #include "create_shield.h"
 #include "create_weapon.h"
 #include "dungeon.h"
@@ -11,11 +10,11 @@
 #include "entity_templates.h"
 #include "entityid.h"
 #include "gamestate.h"
+#include "handle_input.h"
 #include "handle_npcs.h"
 #include "init_dungeon.h"
 #include "inputstate.h"
 #include "liblogic.h"
-#include "liblogic_handle_input.h"
 #include "massert.h"
 #include "update_debug_panel_buffer.h"
 #include "update_player_state.h"
@@ -26,6 +25,7 @@
 #include <cstring>
 #include <memory>
 #include <raylib.h>
+//#include "create_npc.h"
 
 
 using std::shared_ptr;
