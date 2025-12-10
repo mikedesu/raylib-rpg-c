@@ -1,8 +1,10 @@
-#include "liblogic_handle_input_title_scene.h"
-#include "sfx.h"
-#include <raylib.h>
+#pragma once
 
-void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+#include "gamestate.h"
+#include "inputstate.h"
+#include "sfx.h"
+
+static inline void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->do_quit = true;
         return;
