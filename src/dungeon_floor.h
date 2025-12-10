@@ -128,3 +128,35 @@ static inline void df_set_can_have_door(shared_ptr<dungeon_floor_t> df, vec3 loc
         merror("Cannot set door, tile is NULL");
     }
 }
+
+
+static inline bool df_is_good_door_loc(shared_ptr<dungeon_floor_t> df, vec3 loc) {
+    auto tile = df_tile_at(df, loc);
+    if (tile) {
+        // case 1:
+        auto tile0 = df_tile_at(df, (vec3){loc.x - 1, loc.y - 1, loc.z});
+        auto tile1 = df_tile_at(df, (vec3){loc.x - 1, loc.y, loc.z});
+        auto tile2 = df_tile_at(df, (vec3){loc.x - 1, loc.y + 1, loc.z});
+
+        auto tile3 = df_tile_at(df, (vec3){loc.x, loc.y - 1, loc.z});
+        auto tile4 = df_tile_at(df, (vec3){loc.x, loc.y + 1, loc.z});
+
+        auto tile5 = df_tile_at(df, (vec3){loc.x + 1, loc.y - 1, loc.z});
+        auto tile6 = df_tile_at(df, (vec3){loc.x + 1, loc.y, loc.z});
+        auto tile7 = df_tile_at(df, (vec3){loc.x + 1, loc.y + 1, loc.z});
+
+        if (!tile0 || !tile1 || !tile2 || !tile3 || !tile4 || !tile5 || !tile6 || !tile7) {
+            return false;
+        }
+
+        if (tile_is_wall(tile3->type) && tile_is_wall(tile4->type) &&
+            !(tile_is_wall(tile0->type) || tile_is_wall(tile1->type) || tile_is_wall(tile2->type) || tile_is_wall(tile5->type) || tile_is_wall(tile6->type) ||
+              tile_is_wall(tile7->type))) {
+            return true;
+        }
+
+    } else {
+        merror("No tile at loc %d,%d,%d", loc.x, loc.y, loc.z);
+    }
+    return false;
+}

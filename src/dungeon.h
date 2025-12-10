@@ -63,13 +63,20 @@ static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dung
         df_set_tile(df, TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
         df->downstairs_loc = loc_d;
 
-        df_set_can_have_door(df, (vec3){12, 9, 1});
-        df_set_can_have_door(df, (vec3){12, 9, 2});
-        df_set_can_have_door(df, (vec3){12, 9, 3});
-        df_set_can_have_door(df, (vec3){14, 12, 0});
-        df_set_can_have_door(df, (vec3){14, 12, 1});
-        df_set_can_have_door(df, (vec3){14, 12, 2});
-        df_set_can_have_door(df, (vec3){14, 12, 3});
+        for (int x = 0; x < df->width; x++) {
+            for (int y = 0; y < df->height; y++) {
+                if (df_is_good_door_loc(df, (vec3){x, y, df->floor})) {
+                    df_set_can_have_door(df, (vec3){x, y, df->floor});
+                }
+            }
+        }
+
+        //df_set_can_have_door(df, (vec3){12, 9, 2});
+        //df_set_can_have_door(df, (vec3){12, 9, 3});
+        //df_set_can_have_door(df, (vec3){14, 12, 0});
+        //df_set_can_have_door(df, (vec3){14, 12, 1});
+        //df_set_can_have_door(df, (vec3){14, 12, 2});
+        //df_set_can_have_door(df, (vec3){14, 12, 3});
     };
 
     df_xform(creation_rules);
