@@ -125,14 +125,12 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
 void update_npcs_state(shared_ptr<gamestate> g) {
     for (entityid id = 0; id < g->next_entityid; id++) {
-        if (id == g->hero_id) {
+        if (id == g->hero_id)
             continue;
-        }
         //g_incr_tx_alpha(g, id, 4);
         unsigned char a = g->ct.get<txalpha>(id).value_or(255);
-        if (a < 255) {
+        if (a < 255)
             a++;
-        }
         g->ct.set<txalpha>(id, a);
         g->ct.set<damaged>(id, false);
     }
