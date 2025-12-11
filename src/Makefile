@@ -32,7 +32,6 @@ libdraw_handle_gamestate_flag.cpp \
 libdraw_update_sprite.cpp \
 libdraw_update_sprites.cpp \
 libdraw_dungeon_floor.cpp \
-libdraw_message_box.cpp \
 libdraw_sprite.cpp \
 libdraw_shaders.cpp \
 libdraw_weapon_sprite.cpp \
@@ -97,7 +96,6 @@ libdraw_handle_gamestate_flag.o \
 libdraw_update_sprite.o \
 libdraw_update_sprites.o \
 libdraw_dungeon_floor.o \
-libdraw_message_box.o \
 libdraw_shaders.o \
 libdraw_sprite.o \
 libdraw_weapon_sprite.o \
@@ -188,8 +186,6 @@ libdraw_update_sprites.o: libdraw_update_sprites.cpp
 libdraw_dungeon_floor.o: libdraw_dungeon_floor.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-libdraw_message_box.o: libdraw_message_box.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_message_history.o: libdraw_message_history.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 

@@ -1,7 +1,9 @@
-#include "libdraw_message_box.h"
+#pragma once
+
+#include "gamestate.h"
 #include "libgame_defines.h"
 
-void draw_message_box(shared_ptr<gamestate> g) {
+static inline void draw_message_box(shared_ptr<gamestate> g) {
     if (!g->msg_system_is_active || g->msg_system->size() == 0) {
         return;
     }
