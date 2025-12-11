@@ -39,7 +39,6 @@ libdraw_update_weapon_for_entity.cpp \
 libdraw_update_shield_for_entity.cpp \
 libdraw_set_sg_is_attacking.cpp \
 libdraw_set_sg.cpp \
-libdraw_load_music.cpp \
 libdraw_load_sfx.cpp \
 libdraw_debug_panel.cpp \
 libdraw_update_debug_panel.cpp \
@@ -102,7 +101,6 @@ libdraw_update_weapon_for_entity.o \
 libdraw_update_shield_for_entity.o \
 libdraw_set_sg_is_attacking.o \
 libdraw_set_sg.o \
-libdraw_load_music.o \
 libdraw_load_sfx.o \
 libdraw_debug_panel.o \
 libdraw_update_debug_panel.o \
@@ -248,8 +246,6 @@ libdraw_debug_panel.o: libdraw_debug_panel.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
-libdraw_load_music.o: libdraw_load_music.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_load_sfx.o: libdraw_load_sfx.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 

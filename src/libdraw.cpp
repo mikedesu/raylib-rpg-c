@@ -3,11 +3,11 @@
 #include "gamestate.h"
 #include "libdraw.h"
 #include "libdraw_from_texture.h"
-#include "libdraw_load_music.h"
 #include "libdraw_load_sfx.h"
 #include "libdraw_shaders.h"
 #include "libdraw_to_texture.h"
 #include "libdraw_update_sprites.h"
+#include "load_music.h"
 #include "race.h"
 #include "spritegroup.h"
 #include <raylib.h>
