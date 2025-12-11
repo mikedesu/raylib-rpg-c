@@ -96,9 +96,9 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     //#ifdef SPAWN_MONSTERS
 
-    //create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, orc_init_test);
-    //create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, orc_init_test);
-    //create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, orc_init_test);
+    create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, orc_init_test);
+    create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, orc_init_test);
+    create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, orc_init_test);
 
     //#endif
 
