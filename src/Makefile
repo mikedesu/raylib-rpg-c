@@ -26,7 +26,6 @@ libdraw_draw_character_creation_screen.cpp \
 libdraw_load_textures.cpp \
 libdraw_unload_textures.cpp \
 libdraw_create_spritegroup.cpp \
-libdraw_hud.cpp \
 libdraw_check_default_animations.cpp \
 libdraw_frame_2d.cpp \
 libdraw_from_texture.cpp \
@@ -94,7 +93,6 @@ libdraw_help_menu.o \
 libdraw_draw_character_creation_screen.o \
 libdraw_load_textures.o \
 libdraw_unload_textures.o \
-libdraw_hud.o \
 libdraw_check_default_animations.o \
 libdraw_frame_2d.o \
 libdraw_from_texture.o \
@@ -169,8 +167,6 @@ dungeon_floor.o: dungeon_floor.cpp
 
 ###################
 
-libdraw_hud.o: libdraw_hud.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_check_default_animations.o: libdraw_check_default_animations.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 

@@ -1,9 +1,9 @@
-#include "libdraw_hud.h"
-#include <algorithm>
+#pragma once
 
+#include "gamestate.h"
 using std::max;
 
-void draw_hud(shared_ptr<gamestate> g) {
+static inline void draw_hud(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     const int turn = g->turn_count;
 

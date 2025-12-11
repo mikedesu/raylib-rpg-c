@@ -1,13 +1,13 @@
+#include "draw_hud.h"
 #include "libdraw_draw_character_creation_screen.h"
 #include "libdraw_frame_2d.h"
 #include "libdraw_handle_debug_panel.h"
-#include "libdraw_hud.h"
 #include "libdraw_title_screen.h"
 #include "libdraw_to_texture.h"
 
 extern RenderTexture2D title_target_texture;
-extern Rectangle target_src;
-extern Rectangle target_dest;
+//extern Rectangle target_src;
+//extern Rectangle target_dest;
 extern RenderTexture2D char_creation_target_texture;
 extern RenderTexture2D hud_target_texture;
 extern RenderTexture2D main_game_target_texture;
@@ -38,8 +38,6 @@ void draw_title_screen_to_texture(shared_ptr<gamestate> g, bool show_menu) {
 void libdraw_drawframe_2d_to_texture(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     BeginTextureMode(main_game_target_texture);
-    //minfo("entering drawframe_2d");
     libdraw_drawframe_2d(g);
-    //minfo("exitting drawframe_2d");
     EndTextureMode();
 }
