@@ -1,15 +1,16 @@
+#pragma once
+
 #include "draw_hud.h"
 #include "draw_inventory_menu.h"
+#include "gamestate.h"
 #include "libdraw_camera_lock_on.h"
 #include "libdraw_dungeon_floor.h"
-#include "libdraw_frame_2d.h"
 #include "libdraw_handle_debug_panel.h"
 #include "libdraw_help_menu.h"
 #include "libdraw_message_box.h"
 #include "libdraw_message_history.h"
-//#include "libdraw_player_target_box.h"
 
-void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
+static inline void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //minfo("BEGIN drawframe 2d");
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
