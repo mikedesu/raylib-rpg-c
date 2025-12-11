@@ -26,7 +26,6 @@ libdraw_draw_character_creation_screen.cpp \
 libdraw_load_textures.cpp \
 libdraw_unload_textures.cpp \
 libdraw_create_spritegroup.cpp \
-libdraw_create_sg_byid.cpp \
 libdraw_hud.cpp \
 libdraw_check_default_animations.cpp \
 libdraw_frame_2d.cpp \
@@ -101,7 +100,6 @@ libdraw_check_default_animations.o \
 libdraw_frame_2d.o \
 libdraw_from_texture.o \
 libdraw_to_texture.o \
-libdraw_create_sg_byid.o \
 libdraw_handle_gamestate_flag.o \
 libdraw_handle_dirty_entities.o \
 libdraw_update_sprite.o \
@@ -188,8 +186,6 @@ libdraw_frame_2d.o: libdraw_frame_2d.cpp
 libdraw_from_texture.o: libdraw_from_texture.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-libdraw_create_sg_byid.o: libdraw_create_sg_byid.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_handle_dirty_entities.o: libdraw_handle_dirty_entities.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 

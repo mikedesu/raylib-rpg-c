@@ -1,4 +1,6 @@
-#include "libdraw_create_sg_byid.h"
+#pragma once
+
+#include "gamestate.h"
 #include "libdraw_create_spritegroup.h"
 #include "tx_keys_boxes.h"
 #include "tx_keys_doors.h"
@@ -8,7 +10,8 @@
 #include "tx_keys_shields.h"
 #include "tx_keys_weapons.h"
 
-void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
+
+static inline void create_sg_byid(shared_ptr<gamestate> g, entityid id) {
     minfo("BEGIN create_sg_byid");
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");

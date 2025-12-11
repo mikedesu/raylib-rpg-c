@@ -1,4 +1,4 @@
-#include "libdraw_create_sg_byid.h"
+#include "create_sg_byid.h"
 #include "libdraw_handle_dirty_entities.h"
 
 void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
