@@ -6,7 +6,7 @@
 #include "draw_message_history.h"
 #include "libdraw_create_spritegroup.h"
 #include "libdraw_draw_character_creation_screen.h"
-#include "libdraw_help_menu.h"
+//#include "draw_help_menu.h"
 #include "libdraw_load_textures.h"
 #include "libdraw_title_screen.h"
 #include "unload_textures.h"
