@@ -1,7 +1,9 @@
-#include "libdraw_debug_panel.h"
+#pragma once
+
+#include "gamestate.h"
 #include "libgame_defines.h"
 
-void draw_debug_panel(shared_ptr<gamestate> g) {
+static inline void draw_debug_panel(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     Color bg = Fade((Color){0x66, 0x66, 0x66}, 0.8f);
     Color fg = WHITE;
