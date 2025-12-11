@@ -1,6 +1,8 @@
-#include "libdraw_version.h"
+#pragma once
 
-void draw_version(const shared_ptr<gamestate> g) {
+#include "gamestate.h"
+
+static inline void draw_version(const shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     const char* version = g->version.c_str();
     char buffer[1024] = {0};
