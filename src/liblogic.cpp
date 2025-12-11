@@ -81,18 +81,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
         for (int x = 0; x < df->width; x++) {
             for (int y = 0; y < df->height; y++) {
                 const vec3 loc = {x, y, z};
-                //auto tile = df_tile_at(d_get_current_floor(g->dungeon), loc);
                 auto tile = df_tile_at(df, loc);
-                if (tile) {
-                    if (tile->can_have_door) {
-                        msuccess("creating door at (%d, %d, %d)", loc.x, loc.y, loc.z);
-                        create_door_at_with(g, loc, [](shared_ptr<gamestate> g, entityid id) {});
-                    } else {
-                        merror("tile CANNOT have door at (%d, %d, %d)", loc.x, loc.y, loc.z);
-                    }
-                } else {
-                    merror("tile was NULL at (%d, %d, %d)", loc.x, loc.y, loc.z);
-                }
+                if (!tile || !tile->can_have_door)
+                    continue;
+                create_door_at_with(g, loc, [](shared_ptr<gamestate> g, entityid id) {});
             }
         }
     }
