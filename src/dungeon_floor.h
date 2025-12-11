@@ -37,9 +37,7 @@ typedef struct {
 } dungeon_floor_t;
 
 
-//shared_ptr<dungeon_floor_t> df_create(int floor, dungeon_floor_type_t t, int width, int height);
 shared_ptr<dungeon_floor_t> df_init(int floor, biome_t t, int width, int height);
-//shared_ptr<dungeon_floor_t> df_create_with(int floor, dungeon_floor_type_t t, int width, int height, function<void()> mLambda);
 void df_xform(function<void()> mLambda);
 
 void df_set_area(shared_ptr<dungeon_floor_t> df, tiletype_t a, tiletype_t b, Rectangle r);
@@ -72,98 +70,63 @@ int df_center_y(shared_ptr<dungeon_floor_t> const df);
 
 static inline shared_ptr<tile_t> df_tile_at(shared_ptr<dungeon_floor_t> df, vec3 loc) {
     massert(df, "df is NULL");
-    if (loc.x < 0 || loc.x >= df->width || loc.y < 0 || loc.y >= df->height) {
-        //merror("x or y out of bounds: x: %d, y: %d", loc.x, loc.y);
+    if (loc.x < 0 || loc.x >= df->width || loc.y < 0 || loc.y >= df->height)
         return NULL;
-    }
     // given that tiles is a 2D vector of shared pointers to tile_t
     // we can access the tile using the x and y coordinates
     // and calculate the index
     const size_t index = loc.y * df->width + loc.x;
-    if (index < 0 || index >= df->tiles->size()) {
+    if (index < 0 || index >= df->tiles->size())
         return NULL;
-    }
     const tile_id id = df->tiles->at(index);
     // Check if the tile_id exists in the map
     auto it = df->tile_map->find(id);
     if (it != df->tile_map->end())
         return it->second;
-    //merror("Tile not found at location (%d, %d)", loc.x, loc.y);
-    return NULL; // Tile not found
+    return NULL;
 }
 
 
 static inline tiletype_t df_type_at(shared_ptr<dungeon_floor_t> df, int x, int y) {
     massert(df, "df is NULL");
-    if (x < 0 || x >= df->width || y < 0 || y >= df->height) {
+    if (x < 0 || x >= df->width || y < 0 || y >= df->height)
         return TILE_NONE;
-    }
     const tile_id id = df->tiles->at(y * df->width + x);
     auto it = df->tile_map->find(id);
     if (it != df->tile_map->end())
-        // Return the tile type
         return it->second->type;
-    // Tile not found
     return TILE_NONE;
 }
 
 
 static inline bool df_tile_is_wall(shared_ptr<dungeon_floor_t> df, int x, int y) {
-    //massert(df, "dungeon floor is NULL");
-    const tiletype_t type = df_type_at(df, x, y);
-    if (type == TILE_NONE || type == TILE_COUNT)
-        //merror("Tile type is invalid at (%d, %d)", x, y);
-        return false;
-    return tiletype_is_wall(type);
+    const tiletype_t t = df_type_at(df, x, y);
+    return (t == TILE_NONE || t == TILE_COUNT) ? false : tiletype_is_wall(t);
 }
 
 
 static inline void df_set_can_have_door(shared_ptr<dungeon_floor_t> df, vec3 loc) {
     minfo("set can have door: %d, %d, %d", loc.x, loc.y, loc.z);
     auto tile = df_tile_at(df, loc);
-    if (tile) {
-        msuccess("Setting can have door to true");
-        tile->can_have_door = true;
-    } else {
-        merror("Cannot set door, tile is NULL");
-    }
+    if (!tile)
+        return;
+    tile->can_have_door = true;
 }
 
 
 static inline bool df_is_good_door_loc(shared_ptr<dungeon_floor_t> df, vec3 loc) {
     auto tile = df_tile_at(df, loc);
-    if (tile) {
-        // case 1:
-        auto t0 = df_tile_at(df, (vec3){loc.x - 1, loc.y - 1, loc.z});
-        auto t1 = df_tile_at(df, (vec3){loc.x - 1, loc.y, loc.z});
-        auto t2 = df_tile_at(df, (vec3){loc.x - 1, loc.y + 1, loc.z});
-
-        auto t3 = df_tile_at(df, (vec3){loc.x, loc.y - 1, loc.z});
-        auto t4 = df_tile_at(df, (vec3){loc.x, loc.y + 1, loc.z});
-
-        auto t5 = df_tile_at(df, (vec3){loc.x + 1, loc.y - 1, loc.z});
-        auto t6 = df_tile_at(df, (vec3){loc.x + 1, loc.y, loc.z});
-        auto t7 = df_tile_at(df, (vec3){loc.x + 1, loc.y + 1, loc.z});
-
-        auto tw0 = tile_is_wall(t0);
-        auto tw1 = tile_is_wall(t1);
-        auto tw2 = tile_is_wall(t2);
-        auto tw3 = tile_is_wall(t3);
-        auto tw4 = tile_is_wall(t4);
-        auto tw5 = tile_is_wall(t5);
-        auto tw6 = tile_is_wall(t6);
-        auto tw7 = tile_is_wall(t7);
-
-        if (tw3 && tw4 && !(tw0 || tw1 || tw2 || tw5 || tw6 || tw7)) {
-            return true;
-        }
-
-        if (tw1 && tw6 && !(tw0 || tw2 || tw3 || tw4 || tw5 || tw7)) {
-            return true;
-        }
-
-    } else {
-        merror("No tile at loc %d,%d,%d", loc.x, loc.y, loc.z);
-    }
+    if (!tile)
+        return false;
+    auto t0 = df_tile_at(df, (vec3){loc.x - 1, loc.y - 1, loc.z}), t1 = df_tile_at(df, (vec3){loc.x - 1, loc.y, loc.z});
+    auto t2 = df_tile_at(df, (vec3){loc.x - 1, loc.y + 1, loc.z}), t3 = df_tile_at(df, (vec3){loc.x, loc.y - 1, loc.z});
+    auto t4 = df_tile_at(df, (vec3){loc.x, loc.y + 1, loc.z}), t5 = df_tile_at(df, (vec3){loc.x + 1, loc.y - 1, loc.z});
+    auto t6 = df_tile_at(df, (vec3){loc.x + 1, loc.y, loc.z}), t7 = df_tile_at(df, (vec3){loc.x + 1, loc.y + 1, loc.z});
+    auto tw0 = tile_is_wall(t0), tw1 = tile_is_wall(t1), tw2 = tile_is_wall(t2), tw3 = tile_is_wall(t3);
+    auto tw4 = tile_is_wall(t4), tw5 = tile_is_wall(t5), tw6 = tile_is_wall(t6), tw7 = tile_is_wall(t7);
+    if (tw3 && tw4 && !(tw0 || tw1 || tw2 || tw5 || tw6 || tw7))
+        return true;
+    if (tw1 && tw6 && !(tw0 || tw2 || tw3 || tw4 || tw5 || tw7))
+        return true;
     return false;
 }

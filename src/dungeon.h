@@ -65,12 +65,20 @@ static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dung
         // poke a hole
         Rectangle entryway1 = {room2.x - 1, room2.y + 1, 1, 1};
         df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway1);
-        //df_set_area(df, TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x + w / 2.0f, y, 1, h});
+        // draw room 3
         Rectangle room3 = {room2.x, room2.y + room2.height + 1, w, h};
         df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room3);
         // poke a hole in the wall
         Rectangle entryway2 = {room3.x + 1, room3.y - 1, 1, 1};
         df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway2);
+        // draw room 4
+        Rectangle room4 = {room1.x, room1.y + room1.height + 1, w, h};
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room4);
+        // poke a hole in the wall
+        Rectangle entryway3 = {room3.x - 1, room3.y + 1, 1, 1};
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway3);
+
+
         //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f, y + 1, 1, 1});
         // poke a hole in the wall
         //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w / 2.0f + 2, y + 4, 1, 2});
@@ -88,13 +96,10 @@ static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dung
         df->downstairs_loc = loc_d;
 
         // automatic door placement
-        for (int x = 0; x < df->width; x++) {
-            for (int y = 0; y < df->height; y++) {
-                if (df_is_good_door_loc(df, (vec3){x, y, df->floor})) {
+        for (int x = 0; x < df->width; x++)
+            for (int y = 0; y < df->height; y++)
+                if (df_is_good_door_loc(df, (vec3){x, y, df->floor}))
                     df_set_can_have_door(df, (vec3){x, y, df->floor});
-                }
-            }
-        }
     };
 
     df_xform(creation_rules);
