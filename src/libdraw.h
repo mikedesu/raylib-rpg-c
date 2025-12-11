@@ -9,7 +9,7 @@
 #include "libdraw_load_textures.h"
 #include "libdraw_message_history.h"
 #include "libdraw_title_screen.h"
-#include "libdraw_unload_textures.h"
+#include "unload_textures.h"
 
 bool libdraw_windowshouldclose(shared_ptr<gamestate> g);
 
