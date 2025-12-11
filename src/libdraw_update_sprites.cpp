@@ -1,7 +1,7 @@
 #include "entitytype.h"
 #include "gamestate_flag.h"
+#include "handle_dirty_entities.h"
 #include "item.h"
-#include "libdraw_handle_dirty_entities.h"
 #include "libdraw_handle_gamestate_flag.h"
 #include "libdraw_update_sprite.h"
 #include "libdraw_update_sprites.h"

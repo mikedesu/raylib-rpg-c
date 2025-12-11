@@ -1,7 +1,9 @@
-#include "create_sg_byid.h"
-#include "libdraw_handle_dirty_entities.h"
+#pragma once
 
-void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
+#include "create_sg_byid.h"
+#include "gamestate.h"
+
+static inline void libdraw_handle_dirty_entities(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     //minfo("Begin handle dirty entities");
     if (g->dirty_entities) {

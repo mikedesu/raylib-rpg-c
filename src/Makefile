@@ -32,7 +32,6 @@ libdraw_frame_2d.cpp \
 libdraw_from_texture.cpp \
 libdraw_to_texture.cpp \
 libdraw_handle_gamestate_flag.cpp \
-libdraw_handle_dirty_entities.cpp \
 libdraw_update_sprite.cpp \
 libdraw_update_sprites.cpp \
 libdraw_dungeon_floor.cpp \
@@ -101,7 +100,6 @@ libdraw_frame_2d.o \
 libdraw_from_texture.o \
 libdraw_to_texture.o \
 libdraw_handle_gamestate_flag.o \
-libdraw_handle_dirty_entities.o \
 libdraw_update_sprite.o \
 libdraw_update_sprites.o \
 libdraw_dungeon_floor.o \
@@ -187,8 +185,6 @@ libdraw_from_texture.o: libdraw_from_texture.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
-libdraw_handle_dirty_entities.o: libdraw_handle_dirty_entities.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_handle_gamestate_flag.o: libdraw_handle_gamestate_flag.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
