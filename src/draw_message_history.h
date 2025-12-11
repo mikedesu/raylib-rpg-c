@@ -1,8 +1,10 @@
-#include "libdraw_message_history.h"
+#pragma once
+
+#include "gamestate.h"
 
 using std::min;
 
-void draw_message_history(shared_ptr<gamestate> g) {
+static inline void draw_message_history(shared_ptr<gamestate> g) {
     char tmp[1024] = {0};
     const int font_size = 10;
     const int max_messages = 20;
