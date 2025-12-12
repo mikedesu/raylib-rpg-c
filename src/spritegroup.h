@@ -46,7 +46,8 @@ static inline spritegroup_t* spritegroup_create(int capacity) {
     sg->alpha = 255;
     sg->capacity = capacity;
     sg->sprites2 = new vector<shared_ptr<sprite>>();
-    sg->dest = sg->move = (Rectangle){0, 0, 0, 0};
+    sg->dest = (Rectangle){0, 0, 0, 0};
+    sg->move = (Rectangle){0, 0, 0, 0};
     sg->move_rate = 1.0;
     return sg;
 }

@@ -7,6 +7,9 @@ static inline entityid create_weapon_with(shared_ptr<gamestate> g, function<void
     const auto id = g_add_entity(g);
     g->ct.set<entitytype>(id, ENTITY_ITEM);
     g->ct.set<itemtype>(id, ITEM_WEAPON);
+    g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+    g->ct.set<update>(id, true);
+
     weaponInitFunction(g, id);
     return id;
 }

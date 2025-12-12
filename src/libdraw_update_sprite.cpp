@@ -40,35 +40,35 @@ void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, sprite
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
 
-    optional<Rectangle> maybe_sprite_move = g->ct.get<spritemove>(id);
-    if (maybe_sprite_move.has_value()) {
-        Rectangle sprite_move = g->ct.get<spritemove>(id).value();
-
-        if (sprite_move.x != 0 || sprite_move.y != 0) {
-            sg->move.x = sprite_move.x;
-            sg->move.y = sprite_move.y;
-            //g_update_sprite_move(g, id, (Rectangle){0, 0, 0, 0});
-
-            g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
-            //entitytype_t type = g_get_type(g, id);
-            entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            massert(type != ENTITY_NONE, "entity type is none");
-
-            if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-                //race_t race = g_get_race(g, id);
-                //sg->current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
-                //if (loc == RACE_BAT)
-                //    sg->current = SG_ANIM_BAT_IDLE;
-                //else if (race == RACE_GREEN_SLIME)
-                //    sg->current = SG_ANIM_SLIME_IDLE;
-                //else if (race > RACE_NONE && race < RACE_COUNT)
-                //    sg->current = SG_ANIM_NPC_WALK;
-                //else
-                sg->current = SG_ANIM_NPC_WALK;
-            }
-            g->frame_dirty = true;
-        }
+    auto maybe_sprite_move = g->ct.get<spritemove>(id);
+    if (!maybe_sprite_move.has_value()) {
+        return;
     }
+
+    Rectangle sprite_move = g->ct.get<spritemove>(id).value();
+    if (sprite_move.x != 0 || sprite_move.y != 0) {
+        sg->move.x = sprite_move.x;
+        sg->move.y = sprite_move.y;
+
+
+        g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+        entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+        massert(type != ENTITY_NONE, "entity type is none");
+        if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
+            //race_t race = g_get_race(g, id);
+            //sg->current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
+            //if (loc == RACE_BAT)
+            //    sg->current = SG_ANIM_BAT_IDLE;
+            //else if (race == RACE_GREEN_SLIME)
+            //    sg->current = SG_ANIM_SLIME_IDLE;
+            //else if (race > RACE_NONE && race < RACE_COUNT)
+            //    sg->current = SG_ANIM_NPC_WALK;
+            //else
+            sg->current = SG_ANIM_NPC_WALK;
+        }
+        g->frame_dirty = true;
+    }
+    //}
 }
 
 
@@ -121,51 +121,47 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     }
 
     // Copy movement intent from sprite_move_x/y if present
-    minfo2("updating sprite position");
+    //minfo2("updating sprite position");
     libdraw_update_sprite_position(g, id, sg);
 
-    minfo2("checking sprite block success...");
-    if (g->ct.get<block_success>(id).value_or(false)) {
+    //minfo2("checking sprite block success...");
+    if (g->ct.get<block_success>(id).value_or(false))
         libdraw_set_sg_block_success(g, id, sg);
-    }
 
-    minfo2("checking sprite attacking...");
-    if (g->ct.get<attacking>(id).value_or(false)) {
+    //minfo2("checking sprite attacking...");
+    if (g->ct.get<attacking>(id).value_or(false))
         libdraw_set_sg_is_attacking(g, id, sg);
-    }
 
-    minfo2("checking sprite dead...");
-    if (g->ct.get<dead>(id).value_or(false)) {
+
+    //minfo2("checking sprite dead...");
+    if (g->ct.get<dead>(id).value_or(false))
         libdraw_set_sg_is_dead(g, id, sg);
-    }
 
-    minfo2("checking sprite damaged...");
-    if (g->ct.get<damaged>(id).value_or(false)) {
+
+    //minfo2("checking sprite damaged...");
+    if (g->ct.get<damaged>(id).value_or(false))
         libdraw_set_sg_is_damaged(g, id, sg);
-    }
 
 
-    minfo2("checking doors...");
+    //minfo2("checking doors...");
     const entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
     if (type == ENTITY_DOOR) {
         auto maybe_door_open = g->ct.get<door_open>(id);
         if (maybe_door_open.has_value()) {
             bool is_open = maybe_door_open.value();
-            if (is_open) {
+            if (is_open)
                 spritegroup_set_current(sg, 1);
-
-            } else {
+            else
                 spritegroup_set_current(sg, 0);
-            }
         }
     }
 
 
     // Update movement as long as sg->move.x/y is non-zero
-    minfo2("checking update dest...");
-    if (spritegroup_update_dest(sg)) {
+    //minfo2("checking update dest...");
+    if (spritegroup_update_dest(sg))
         g->frame_dirty = true;
-    }
+
     // Snap to the tile position only when movement is fully complete
     //vec3 loc = g_get_loc(g, id);
     //massert(g->ct.has<Location>(id), "id %d lacks location component", id);
@@ -176,6 +172,13 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     if (maybe_loc.has_value()) {
         vec3 loc = maybe_loc.value();
         spritegroup_snap_dest(sg, loc.x, loc.y);
+        //bool did_snap = spritegroup_snap_dest(sg, loc.x, loc.y);
+        //if (!did_snap) {
+        //    merror("Failed to snap spritegroup to destination at %d, %d, %d!", loc.x, loc.y, loc.z);
+        //    merror("sg->move.x: %f", sg->move.x);
+        //    merror("sg->move.y: %f", sg->move.y);
+        //    merror("id: %d", id);
+        //}
     }
 
     msuccess2("End update sprite ptr: %d", id);

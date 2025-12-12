@@ -27,8 +27,10 @@ bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num
 
     if (maybe_loc.has_value()) {
         vec3 loc = maybe_loc.value();
+
         massert(loc.x >= 0 && loc.x < df_w, "location x out of bounds: %d", loc.x);
         massert(loc.y >= 0 && loc.y < df_h, "location y out of bounds: %d", loc.y);
+
         if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
             spritegroup_destroy(group);
             return false;
@@ -50,7 +52,9 @@ bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num
             return false;
         }
         group->current = 0;
+
         group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
+
         group->off_x = offset_x;
         group->off_y = offset_y;
 
@@ -73,7 +77,10 @@ bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int* keys, int num
             return false;
         }
         group->current = 0;
+
         //group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
+        group->dest = (Rectangle){-1.0f * DEFAULT_TILE_SIZE + offset_x, -1.0f * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
+
         group->off_x = offset_x;
         group->off_y = offset_y;
 

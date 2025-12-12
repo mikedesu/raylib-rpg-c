@@ -268,7 +268,7 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_DOOR, mydefault);
     libdraw_draw_player_target_box(g);
 
-    //libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
+    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
 
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
 
