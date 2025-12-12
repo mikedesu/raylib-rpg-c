@@ -25,7 +25,6 @@ libdraw_create_spritegroup.cpp \
 libdraw_check_default_animations.cpp \
 libdraw_from_texture.cpp \
 libdraw_to_texture.cpp \
-libdraw_handle_gamestate_flag.cpp \
 libdraw_update_sprite.cpp \
 libdraw_update_sprites.cpp \
 libdraw_dungeon_floor.cpp \
@@ -83,7 +82,6 @@ libdraw_load_textures.o \
 libdraw_check_default_animations.o \
 libdraw_from_texture.o \
 libdraw_to_texture.o \
-libdraw_handle_gamestate_flag.o \
 libdraw_update_sprite.o \
 libdraw_update_sprites.o \
 libdraw_dungeon_floor.o \
@@ -162,8 +160,6 @@ libdraw_from_texture.o: libdraw_from_texture.cpp
 
 
 
-libdraw_handle_gamestate_flag.o: libdraw_handle_gamestate_flag.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_update_sprite.o: libdraw_update_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 

@@ -1,8 +1,9 @@
+#pragma once
 
+#include "gamestate.h"
 #include "libdraw_check_default_animations.h"
-#include "libdraw_handle_gamestate_flag.h"
 
-void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
+static inline void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
 
     if (check_default_animations(g)) {
