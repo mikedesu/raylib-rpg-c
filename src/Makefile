@@ -22,7 +22,7 @@ libdraw_title_screen.cpp \
 libdraw_draw_character_creation_screen.cpp \
 libdraw_load_textures.cpp \
 libdraw_create_spritegroup.cpp \
-libdraw_check_default_animations.cpp \
+check_default_animations.cpp \
 libdraw_from_texture.cpp \
 libdraw_to_texture.cpp \
 libdraw_update_sprite.cpp \
@@ -77,7 +77,7 @@ draw_inventory_menu.o \
 libdraw_title_screen.o \
 libdraw_draw_character_creation_screen.o \
 libdraw_load_textures.o \
-libdraw_check_default_animations.o \
+check_default_animations.o \
 libdraw_from_texture.o \
 libdraw_to_texture.o \
 libdraw_update_sprite.o \
@@ -143,7 +143,7 @@ dungeon_floor.o: dungeon_floor.cpp
 ###################
 
 
-libdraw_check_default_animations.o: libdraw_check_default_animations.cpp
+check_default_animations.o: check_default_animations.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_to_texture.o: libdraw_to_texture.cpp

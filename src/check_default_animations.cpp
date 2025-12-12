@@ -1,4 +1,4 @@
-#include "libdraw_check_default_animations.h"
+#include "check_default_animations.h"
 #include "spritegroup.h"
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
