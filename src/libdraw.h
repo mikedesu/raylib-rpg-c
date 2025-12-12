@@ -6,9 +6,8 @@
 #include "draw_message_history.h"
 #include "libdraw_create_spritegroup.h"
 #include "libdraw_draw_character_creation_screen.h"
-//#include "draw_help_menu.h"
-#include "libdraw_load_textures.h"
 #include "libdraw_title_screen.h"
+#include "load_textures.h"
 #include "unload_textures.h"
 
 bool libdraw_windowshouldclose(shared_ptr<gamestate> g);
