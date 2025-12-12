@@ -40,7 +40,7 @@ libdraw_get_weapon_sprite.cpp \
 libdraw_get_shield_sprite.cpp \
 libdraw_entity_sprite.cpp \
 libdraw_player_target_box.cpp \
-libdraw_camera_lock_on.cpp \
+camera_lock_on.cpp \
 libdraw.cpp \
 try_entity_pickup.cpp \
 liblogic.cpp \
@@ -95,7 +95,7 @@ libdraw_get_weapon_sprite.o \
 libdraw_get_shield_sprite.o \
 libdraw_entity_sprite.o \
 libdraw_player_target_box.o \
-libdraw_camera_lock_on.o \
+camera_lock_on.o \
 libdraw_create_spritegroup.o \
 libdraw.o \
 dungeon_floor.o \
@@ -224,7 +224,7 @@ libdraw_get_shield_sprite.o: libdraw_get_shield_sprite.cpp
 libdraw_player_target_box.o: libdraw_player_target_box.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-libdraw_camera_lock_on.o: libdraw_camera_lock_on.cpp
+camera_lock_on.o: camera_lock_on.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_create_spritegroup.o: libdraw_create_spritegroup.cpp
