@@ -95,13 +95,13 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     //#ifdef SPAWN_MONSTERS
 
-    for (int i = 0; i < 4; i++) {
-        create_npc_at_with(g, RACE_ORC, (vec3){10, 10, i}, orc_init_test);
-        create_npc_at_with(g, RACE_ORC, (vec3){14, 9, i}, orc_init_test);
-        create_npc_at_with(g, RACE_ORC, (vec3){14, 10, i}, orc_init_test);
-        create_npc_at_with(g, RACE_ORC, (vec3){13, 11, i}, orc_init_test);
-        create_npc_at_with(g, RACE_ORC, (vec3){14, 11, i}, orc_init_test);
-    }
+    //for (int i = 0; i < 4; i++) {
+    create_npc_at_with(g, RACE_ORC, (vec3){10, 10, 0}, orc_init_test);
+    create_npc_at_with(g, RACE_ORC, (vec3){10, 9, 0}, orc_init_test);
+    create_npc_at_with(g, RACE_ORC, (vec3){11, 9, 0}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){13, 11, 0}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){14, 11, 0}, orc_init_test);
+    //}
     //#endif
 
 
@@ -129,7 +129,6 @@ void update_npcs_state(shared_ptr<gamestate> g) {
     for (entityid id = 0; id < g->next_entityid; id++) {
         if (id == g->hero_id)
             continue;
-        //g_incr_tx_alpha(g, id, 4);
         unsigned char a = g->ct.get<txalpha>(id).value_or(255);
         if (a < 255)
             a++;
