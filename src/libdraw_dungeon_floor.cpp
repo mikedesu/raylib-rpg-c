@@ -132,7 +132,9 @@ bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x
 }
 
 
-void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entitytype_t entitytype_0) {
+void libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g,
+                                           entitytype_t entitytype_0,
+                                           function<bool(shared_ptr<gamestate>, entityid)> additional_check) {
     shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
     massert(df, "dungeon_floor is NULL");
     const int z = g->dungeon->current_floor;
@@ -202,8 +204,9 @@ void libdraw_draw_dungeon_floor_entitytype(const shared_ptr<gamestate> g, entity
             if (object_blocking)
                 continue;
 
-            for_each(tile->entities->cbegin(), tile->entities->cend(), [&g, entitytype_0](const entityid& id) {
-                if (entitytype_0 == g->ct.get<entitytype>(id).value_or(ENTITY_NONE))
+            for_each(tile->entities->cbegin(), tile->entities->cend(), [&g, entitytype_0, &additional_check](const entityid& id) {
+                auto type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+                if (entitytype_0 == type && additional_check(g, id))
                     draw_sprite_and_shadow(g, id);
             });
         }
@@ -223,16 +226,36 @@ bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
         for (int x = 0; x < df->width; x++)
             draw_dungeon_floor_tile(g, txinfo, x, y, z);
 
-    //minfo("render doors");
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_DOOR);
-    //minfo("render target box");
+    auto mydefault = [](shared_ptr<gamestate> g, entityid id) { return true; };
+
+    //auto dead_check = [](shared_ptr<gamestate> g, entityid id) { return g->ct.get<dead>(id).value_or(false); };
+
+    auto alive_check = [](shared_ptr<gamestate> g, entityid id) {
+        auto maybe_dead = g->ct.get<dead>(id);
+        if (maybe_dead.has_value())
+            return !maybe_dead.value();
+        return false;
+    };
+
+    auto dead_check = [](shared_ptr<gamestate> g, entityid id) {
+        auto maybe_dead = g->ct.get<dead>(id);
+        if (maybe_dead.has_value())
+            return maybe_dead.value();
+        return false;
+    };
+
+
+    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_DOOR, mydefault);
     libdraw_draw_player_target_box(g);
-    //minfo("render items");
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM);
-    //minfo("render npcs");
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC);
-    //minfo("render player");
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PLAYER);
+
+    //libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
+
+    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
+
+    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, alive_check);
+
+
+    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, mydefault);
 
     return true;
 }

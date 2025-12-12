@@ -1,11 +1,7 @@
 #include "ComponentTraits.h"
 #include "dungeon.h"
-//#include "add_message.h"
+#include "entityid.h"
 #include "manage_inventory.h"
-//#include <algorithm>
-
-
-//using std::find;
 
 
 bool add_to_inventory(shared_ptr<gamestate> g, entityid actor_id, entityid item_id) {
@@ -81,7 +77,19 @@ bool drop_from_inventory(shared_ptr<gamestate> g, entityid actor_id, entityid it
             return false;
         }
 
-        df_add_at(df, item_id, loc.x, loc.y);
+
+        //const entityid retval = df_add_at(df, item_id, loc.x, loc.y);
+
+        const entityid retval = tile_add(tile, item_id);
+        if (retval == ENTITYID_INVALID) {
+            merror("Failed to add to tile");
+            return false;
+        }
+        // update the item_id's location
+        g->ct.set<location>(item_id, loc);
+
+        msuccess("Drop item successful");
+
         return true;
     }
     merror("Remove from inventory failed for some reason");
