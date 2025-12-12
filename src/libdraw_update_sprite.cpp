@@ -1,8 +1,8 @@
 #include "ComponentTraits.h"
 #include "entitytype.h"
-#include "libdraw_set_sg.h"
 #include "libdraw_set_sg_is_attacking.h"
 #include "libdraw_update_sprite.h"
+#include "set_sg.h"
 #include "spritegroup_anim.h"
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
