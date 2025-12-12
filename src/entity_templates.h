@@ -133,8 +133,8 @@ static inline void random_weapon_init_test(shared_ptr<gamestate> g, entityid id)
 
 
 static inline void orc_init_test(shared_ptr<gamestate> g, entityid id) {
-    //const entityid wpn_id = create_weapon_with(g, random_weapon_init_test);
-    const entityid wpn_id = create_weapon_with(g, axe_init_test);
+    const entityid wpn_id = create_weapon_with(g, random_weapon_init_test);
+    //const entityid wpn_id = create_weapon_with(g, axe_init_test);
 
     add_to_inventory(g, id, wpn_id);
     set_equipped_weapon(g, id, wpn_id);

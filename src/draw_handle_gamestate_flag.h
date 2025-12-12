@@ -5,8 +5,9 @@
 
 static inline void libdraw_handle_gamestate_flag(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    if (!check_default_animations(g))
-        return;
+
+    //if (!check_default_animations(g))
+    //    return;
 
     if (g->flag == GAMESTATE_FLAG_PLAYER_ANIM) {
 #ifndef NPCS_ALL_AT_ONCE
