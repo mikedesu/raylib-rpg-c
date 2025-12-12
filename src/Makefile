@@ -18,7 +18,7 @@ try_entity_stairs.cpp \
 manage_inventory.cpp \
 update_player_tiles_explored.cpp \
 draw_inventory_menu.cpp \
-libdraw_title_screen.cpp \
+draw_title_screen.cpp \
 libdraw_draw_character_creation_screen.cpp \
 libdraw_create_spritegroup.cpp \
 check_default_animations.cpp \
@@ -71,7 +71,7 @@ try_entity_attack.o \
 manage_inventory.o \
 update_player_tiles_explored.o \
 draw_inventory_menu.o \
-libdraw_title_screen.o \
+draw_title_screen.o \
 libdraw_draw_character_creation_screen.o \
 check_default_animations.o \
 libdraw_from_texture.o \
@@ -162,7 +162,7 @@ libdraw_dungeon_floor.o: libdraw_dungeon_floor.cpp
 
 
 
-libdraw_title_screen.o: libdraw_title_screen.cpp
+draw_title_screen.o: draw_title_screen.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 

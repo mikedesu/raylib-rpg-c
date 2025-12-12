@@ -1,4 +1,4 @@
-#include "libdraw_title_screen.h"
+#include "draw_title_screen.h"
 #include "libgame_defines.h"
 #include "libgame_version.h"
 #include "textureinfo.h"
@@ -21,6 +21,13 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     const char* title_text_1 = "rpg";
     const char* version_text = g->version.c_str();
     const char* start_text = "Press enter or space to begin";
+
+    // new text
+    const char* programming_by = "darkmage";
+    const char* art_by = "Krishna Palacio";
+    const char* sound_effects_by = "Leoh Paz";
+    const char* music_by = "darkmage + suno.ai";
+
     char buffer[1024] = {0};
     Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF}, title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
     const int sm_font_size = 10;
