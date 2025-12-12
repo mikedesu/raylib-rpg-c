@@ -1,4 +1,4 @@
-#include "libdraw_camera_lock_on.h"
+#include "camera_lock_on.h"
 #include "spritegroup.h"
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
