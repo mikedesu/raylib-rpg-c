@@ -78,9 +78,9 @@ bool drop_from_inventory(shared_ptr<gamestate> g, entityid actor_id, entityid it
         }
 
 
-        //const entityid retval = df_add_at(df, item_id, loc.x, loc.y);
+        const entityid retval = df_add_at(df, item_id, loc.x, loc.y);
 
-        const entityid retval = tile_add(tile, item_id);
+        //const entityid retval = tile_add(tile, item_id);
         if (retval == ENTITYID_INVALID) {
             merror("Failed to add to tile");
             return false;

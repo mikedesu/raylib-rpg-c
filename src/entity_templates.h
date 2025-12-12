@@ -121,7 +121,7 @@ static inline void kite_shield_init_test(shared_ptr<gamestate> g, entityid id) {
 
 static inline void random_weapon_init_test(shared_ptr<gamestate> g, entityid id) {
     weapontype_t t = (weapontype_t)GetRandomValue(WEAPON_NONE + 1, WEAPON_TYPE_COUNT - 1);
-    set_weapontype(g, id, t);
+    //set_weapontype(g, id, t);
 
     switch (t) {
     case WEAPON_SWORD: sword_init_test(g, id); break;
@@ -133,7 +133,9 @@ static inline void random_weapon_init_test(shared_ptr<gamestate> g, entityid id)
 
 
 static inline void orc_init_test(shared_ptr<gamestate> g, entityid id) {
-    const entityid wpn_id = create_weapon_with(g, random_weapon_init_test);
+    //const entityid wpn_id = create_weapon_with(g, random_weapon_init_test);
+    const entityid wpn_id = create_weapon_with(g, axe_init_test);
+
     add_to_inventory(g, id, wpn_id);
     set_equipped_weapon(g, id, wpn_id);
     set_name(g, id, "Zook");

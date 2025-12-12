@@ -58,11 +58,10 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 6, 0});
     //create_wooden_box(g, (vec3){7, 7, 0});
 
-    create_weapon_at_with(g, (vec3){10, 10, 0}, dagger_init_test);
-
-    create_shield_at_with(g, (vec3){11, 9, 0}, buckler_init_test);
+    create_weapon_at_with(g, (vec3){11, 9, 0}, dagger_init_test);
+    //create_shield_at_with(g, (vec3){11, 9, 0}, buckler_init_test);
     create_shield_at_with(g, (vec3){11, 10, 0}, tower_shield_init_test);
-    create_shield_at_with(g, (vec3){10, 9, 0}, kite_shield_init_test);
+    //create_shield_at_with(g, (vec3){10, 9, 0}, kite_shield_init_test);
 
 
     //auto loc = (vec3){12, 9, 0};
@@ -96,9 +95,9 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     //#ifdef SPAWN_MONSTERS
 
-    create_npc_at_with(g, RACE_ORC, (vec3){13, 9, 0}, orc_init_test);
-    create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, orc_init_test);
-    create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, orc_init_test);
+    create_npc_at_with(g, RACE_ORC, (vec3){10, 10, 0}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){14, 9, 0}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){14, 10, 0}, orc_init_test);
 
     //#endif
 

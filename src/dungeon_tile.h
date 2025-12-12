@@ -55,7 +55,7 @@ void recompute_entity_cache_at(shared_ptr<gamestate> g, int x, int y, int z);
 
 
 static inline size_t tile_entity_count(const shared_ptr<tile_t> t) {
-    return t->entities->size();
+    return !t ? 0 : t->entities->size();
 }
 
 

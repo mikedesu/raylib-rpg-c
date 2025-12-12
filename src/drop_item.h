@@ -26,13 +26,19 @@ static inline bool drop_item_from_hero_inventory(shared_ptr<gamestate> g) {
     // get the player's location
     vec3 loc = g->ct.get<location>(g->hero_id).value();
     // get the tile at the player's location
-    auto tile = df_tile_at(g->dungeon->floors->at(loc.z), loc);
-    if (!tile)
+    //auto tile = df_tile_at(g->dungeon->floors->at(loc.z), loc);
+    //if (!tile)
+    //    return false;
+    auto df = d_get_current_floor(g->dungeon);
+
+    if (!df_add_at(df, item_id, loc.x, loc.y)) {
+        merror("Failed to add to %d, %d, %d", loc.x, loc.y, loc.z);
         return false;
+    }
 
     // update the entity's location
     g->ct.set<location>(item_id, loc);
     // add to tile
-    tile_add(tile, item_id);
+
     return true;
 }

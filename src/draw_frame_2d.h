@@ -5,6 +5,7 @@
 #include "draw_help_menu.h"
 #include "draw_hud.h"
 #include "draw_inventory_menu.h"
+#include "draw_look_panel.h"
 #include "draw_message_box.h"
 #include "draw_message_history.h"
 #include "gamestate.h"
@@ -34,6 +35,7 @@ static inline void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //}
     //minfo("draw hud");
     draw_hud(g);
+    draw_look_panel(g);
     //minfo("draw msg history");
     draw_message_history(g);
     //minfo("draw msg box");
