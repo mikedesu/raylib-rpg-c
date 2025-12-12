@@ -1,8 +1,6 @@
 # TODO
 
-
-- [ ] bug involving player death animation
-  - animation stuck on first frame
+- [ ] enemies are currently attacking each other randomly (shouldn't happen)
 
 - [ ] wolf shield animation bugfix
 - [ ] elf shield animation bugfix
