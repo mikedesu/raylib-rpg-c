@@ -2,7 +2,7 @@
 
 #include "gamestate.h"
 #include "get_racial_modifiers.h"
-#include "liblogic_stat_bonus.h"
+#include "stat_bonus.h"
 
 static inline void set_npc_starting_stats(shared_ptr<gamestate> g, entityid id) {
     auto rt = g->ct.get<race>(id).value_or(RACE_NONE);
