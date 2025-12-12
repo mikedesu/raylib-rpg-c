@@ -1,5 +1,9 @@
 # TODO
 
+- [ ] create infrastructure for A/B testing of a specific game logic
+    - [ ] individual NPC turn rendering (individual NPC turns render one-at-a-time)
+    - [ ] mass NPC turn rendering (all NPCs' turns render simultaneously)
+
 - [ ] enemies are currently attacking each other randomly (shouldn't happen)
 
 - [ ] wolf shield animation bugfix
