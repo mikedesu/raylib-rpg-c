@@ -36,7 +36,6 @@ libdraw_update_weapon_for_entity.cpp \
 libdraw_update_shield_for_entity.cpp \
 libdraw_set_sg_is_attacking.cpp \
 libdraw_set_sg.cpp \
-libdraw_update_debug_panel.cpp \
 libdraw_handle_debug_panel.cpp \
 libdraw_get_weapon_sprite.cpp \
 libdraw_get_shield_sprite.cpp \
@@ -93,7 +92,6 @@ libdraw_update_weapon_for_entity.o \
 libdraw_update_shield_for_entity.o \
 libdraw_set_sg_is_attacking.o \
 libdraw_set_sg.o \
-libdraw_update_debug_panel.o \
 libdraw_handle_debug_panel.o \
 libdraw_get_weapon_sprite.o \
 libdraw_get_shield_sprite.o \
@@ -101,7 +99,6 @@ libdraw_entity_sprite.o \
 libdraw_player_target_box.o \
 libdraw_camera_lock_on.o \
 libdraw_create_spritegroup.o \
-libdraw_update_debug_panel.o \
 libdraw.o \
 dungeon_floor.o \
 dungeon_tile.o \
@@ -223,8 +220,6 @@ libdraw_get_shield_sprite.o: libdraw_get_shield_sprite.cpp
 libdraw_handle_debug_panel.o: libdraw_handle_debug_panel.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-libdraw_update_debug_panel.o: libdraw_update_debug_panel.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
 
