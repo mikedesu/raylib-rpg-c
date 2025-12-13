@@ -40,6 +40,8 @@ static inline void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, 
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
+
+
     if (!g->ct.get<dead>(id).has_value())
         return;
     if (!g->ct.get<dead>(id).value())
@@ -52,9 +54,16 @@ static inline void libdraw_set_sg_is_dead(shared_ptr<gamestate> g, entityid id, 
         anim_index = SG_ANIM_BAT_DIE;
     else if (r == RACE_GREEN_SLIME)
         anim_index = SG_ANIM_SLIME_DIE;
-    if (sg->current == anim_index)
+
+    if (sg->current == anim_index) {
+        //minfo("set sg is dead -- current, and stop on last frame: sg->current = %d, anim_index = %d", sg->current, anim_index);
         return;
+    }
+
+    //minfo("set sg is dead -- current, and stop on last frame: sg->current = %d, anim_index = %d", sg->current, anim_index);
+
     sg_set_default_anim(sg, anim_index);
     spritegroup_set_current(sg, sg->default_anim);
+    //sg_reset_anim(sg);
     spritegroup_set_stop_on_last_frame(sg, true);
 }

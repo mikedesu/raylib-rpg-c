@@ -146,6 +146,8 @@ static inline bool spritegroup_set_current(spritegroup_t* sg, int index) {
     // since we prob want to start an animation at the beginning
     // if we are changing current
     sg->sprites2->at(sg->current)->currentframe = 0;
+    // we might prob wanna reset numloops as well
+    sg->sprites2->at(sg->current)->num_loops = 0;
     return true;
 }
 
@@ -201,3 +203,12 @@ static inline void sg_set_default_anim(spritegroup_t* sg, int anim) {
     massert(sg, "spritegroup is NULL");
     sg->default_anim = anim;
 }
+
+
+//static inline void sg_reset_anim(spritegroup_t* sg) {
+//    massert(sg, "sg is null");
+//    massert(sg->current >= 0, "sg->current < 0");
+//    massert(sg->current < sg->sprites2->size(), "sg->current > size");
+//
+//    sg->sprites2->at(sg->current)->currentframe = 0;
+//}

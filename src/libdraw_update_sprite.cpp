@@ -13,7 +13,7 @@ void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
 
     if (spritegroups.find(id) == spritegroups.end()) {
-        merror("Could not find spritegroup for id %d", id);
+        //merror("Could not find spritegroup for id %d", id);
         return;
     }
 
@@ -132,14 +132,10 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
     if (g->ct.get<attacking>(id).value_or(false))
         libdraw_set_sg_is_attacking(g, id, sg);
 
-
-    //minfo2("checking sprite dead...");
+    //minfo2("checking sprite damaged...");
     if (g->ct.get<dead>(id).value_or(false))
         libdraw_set_sg_is_dead(g, id, sg);
-
-
-    //minfo2("checking sprite damaged...");
-    if (g->ct.get<damaged>(id).value_or(false))
+    else if (g->ct.get<damaged>(id).value_or(false))
         libdraw_set_sg_is_damaged(g, id, sg);
 
 
@@ -168,18 +164,11 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
 
 
     minfo2("checking sprite loc...");
-    optional<vec3> maybe_loc = g->ct.get<location>(id);
+    auto maybe_loc = g->ct.get<location>(id);
     if (maybe_loc.has_value()) {
-        vec3 loc = maybe_loc.value();
+        const vec3 loc = maybe_loc.value();
         spritegroup_snap_dest(sg, loc.x, loc.y);
-        //bool did_snap = spritegroup_snap_dest(sg, loc.x, loc.y);
-        //if (!did_snap) {
-        //    merror("Failed to snap spritegroup to destination at %d, %d, %d!", loc.x, loc.y, loc.z);
-        //    merror("sg->move.x: %f", sg->move.x);
-        //    merror("sg->move.y: %f", sg->move.y);
-        //    merror("id: %d", id);
-        //}
     }
 
-    msuccess2("End update sprite ptr: %d", id);
+    //msuccess2("End update sprite ptr: %d", id);
 }

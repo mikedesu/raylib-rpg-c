@@ -53,28 +53,21 @@ static inline shared_ptr<sprite> sprite_create2(Texture2D* t, int numcontexts, i
 static inline void sprite_incrframe2(shared_ptr<sprite> s) {
     massert(s, "sprite_incrframe: sprite is NULL");
     if (!s->is_animating) {
+        //merror("sprite is not animating");
         return;
     }
-
-    if (s->stop_on_last_frame && s->currentframe == s->numframes - 1) {
-        s->is_animating = false;
-        return;
-    }
-
     s->currentframe++;
+    if (s->stop_on_last_frame && s->currentframe == s->numframes - 1) {
+        merror("stop on last frame");
+        s->is_animating = false;
+        s->src.x = s->width * s->currentframe;
+        return;
+    }
     if (s->currentframe >= s->numframes) {
         s->currentframe = 0;
-    }
-
-    s->src.x = s->width * s->currentframe;
-    if (s->currentframe == 0) {
         s->num_loops++;
     }
-
-    //if (s->num_loops >= 1) {
-    //    sg->current = sg->default_anim;
-    //    s->num_loops = 0;
-    //}
+    s->src.x = s->width * s->currentframe;
 }
 
 
