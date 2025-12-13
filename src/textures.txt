@@ -375,14 +375,14 @@
 #
 286 1 4  0  img/weapons/axe.png
 #
-287 4 4  0  img/characters/dwarf_guard_success.png
+287 4 3  0  img/characters/dwarf_guard_success.png
 288 4 4  0  img/characters/shadows/dwarf_guard_success_shadow.png
-289 4 4  0  img/characters/elf_guard_success.png
+289 4 3  0  img/characters/elf_guard_success.png
 290 4 4  0  img/characters/shadows/elf_guard_success_shadow.png
 #
-291 4 4  0  img/characters/halfling_guard_success.png
+291 4 3  0  img/characters/halfling_guard_success.png
 292 4 4  0  img/characters/shadows/halfling_guard_success_shadow.png
-293 4 4  0  img/characters/goblin_guard_success.png
+293 4 3  0  img/characters/goblin_guard_success.png
 294 4 4  0  img/characters/shadows/goblin_guard_success_shadow.png
 #
 #295 4 3 0 img/actions/guard_wooden_shield_success_front.png
