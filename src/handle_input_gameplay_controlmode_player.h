@@ -73,6 +73,12 @@ static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate
             } else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
                 // this is incorrect
                 // this should be a regular attack
+                if (is_dead) {
+                    add_message(g, "You cannot attack while dead");
+                    return;
+                }
+
+
                 g->ct.set<attacking>(g->hero_id, true);
                 g->ct.set<update>(g->hero_id, true);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -82,11 +88,6 @@ static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate
         }
 
         if (inputstate_is_pressed(is, KEY_S)) {
-            if (is_dead) {
-                add_message(g, "You cannot change directions while dead");
-                return;
-            }
-
             g->player_changing_dir = true;
             return;
         }
