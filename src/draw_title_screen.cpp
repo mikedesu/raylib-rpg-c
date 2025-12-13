@@ -74,9 +74,9 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
 
     const char* date_text = GAME_VERSION_DATE;
     const Vector2 date_measure = MeasureTextEx(GetFontDefault(), date_text, sm_font_size, spacing);
-    const float placeholder_x = g->targetwidth / 2.0f - date_measure.x / 2.0f;
+    //const float placeholder_x = g->targetwidth / 2.0f - date_measure.x / 2.0f;
     const float placeholder_y = y + font_size + sm_font_size + 10;
-    const float start_x = g->targetwidth / 2.0f - start_measure.x / 4.0f;
+    //const float start_x = g->targetwidth / 2.0f - start_measure.x / 4.0f;
 
     ClearBackground(BLACK);
     //int evidojo_x = (w - evidojo_presents_measure) / 2.0f;
@@ -143,7 +143,8 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     DrawTexturePro(t3, src, dst, origin, 0.0f, WHITE);
 
     const float mx2 = frame.x + frame.width - sw, my2 = frame.y + sw / 2;
-    const float rx2 = 0, ry2 = 0;
+    //const float rx2 = 0;
+    //ry2 = 0;
     const Rectangle src2 = {rx, ry, -32, 32}, dst2 = {mx2, my2, sw, sw};
 
     const Texture t4 = txinfo[TX_ACTION_SLASH_AXE_B].texture;

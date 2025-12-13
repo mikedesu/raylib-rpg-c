@@ -4,9 +4,11 @@
 #include "entitytype.h"
 #include "gamestate_flag.h"
 #include "manage_inventory.h"
+#include "play_sound.h"
 #include "sfx.h"
 #include "try_entity_attack.h"
 #include "weapon.h"
+#include <raymath.h>
 
 void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful);
 void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful);
@@ -39,9 +41,9 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
 
     // Calculate direction based on target position
     bool ok = false;
-    const vec3 eloc = g->ct.get<location>(atk_id).value();
-    const int dx = tgt_x - eloc.x;
-    const int dy = tgt_y - eloc.y;
+    //const vec3 eloc = g->ct.get<location>(atk_id).value();
+    const int dx = tgt_x - loc.x;
+    const int dy = tgt_y - loc.y;
 
     g->ct.set<direction>(atk_id, get_dir_from_xy(dx, dy));
     g->ct.set<attacking>(atk_id, true);
@@ -49,9 +51,21 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
 
     handle_attack_helper(g, tile, atk_id, &ok);
 
+    // did the hero hear this event?
+    const vec3 hero_loc = g->ct.get<location>(g->hero_id).value_or((vec3){-1, -1, -1});
+    const float hx = static_cast<float>(hero_loc.x);
+    const float hy = static_cast<float>(hero_loc.y);
+    const float tx = static_cast<float>(tgt_x);
+    const float ty = static_cast<float>(tgt_y);
+    const Vector2 p0 = {hx, hy};
+    const Vector2 p1 = {tx, ty};
+    float dist = Vector2Distance(p0, p1);
+    float hearing = g->ct.get<hearing_distance>(g->hero_id).value_or(3);
+    bool event_heard = dist <= hearing;
+
     if (ok) {
         // default metal on flesh
-        PlaySound(g->sfx->at(SFX_HIT_METAL_ON_FLESH));
+        play_sound_if_heard(SFX_HIT_METAL_ON_FLESH, event_heard);
     } else {
         // need to select appropriate sound effect based on equipment- get attacker's equipped weapon if any
         //const entityid weapon_id = g->ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
@@ -61,7 +75,7 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
                           : wpn_type == WEAPON_AXE    ? SFX_SLASH_ATTACK_HEAVY_1
                           : wpn_type == WEAPON_DAGGER ? SFX_SLASH_ATTACK_LIGHT_1
                                                       : SFX_SLASH_ATTACK_SWORD_1;
-        PlaySound(g->sfx->at(index));
+        play_sound_if_heard(index, event_heard);
     }
 
     const auto type = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);

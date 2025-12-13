@@ -21,7 +21,7 @@ static inline void draw_look_panel(shared_ptr<gamestate> g) {
 
 
     float some_offset_y = 100;
-    float some_offset_x = 10;
+    //float some_offset_x = 10;
     const int font_size = 10;
     const Color bgcolor = {0, 0, 255, 128};
     const int pad_w = 10;
