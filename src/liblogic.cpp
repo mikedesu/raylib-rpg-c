@@ -114,17 +114,18 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_weapon(g, (vec3){1, 5, 0}, WEAPON_FLAIL);
 
     add_message(g, "Welcome to the game! Press enter to cycle messages.");
-    //add_message(g, "To move around, press [q w e a d z x c]");
-    //add_message(g, "To pick up items, press / ");
-    //add_message(g, "To manage inventory, press i ");
-    //add_message(g, "To equip/unequip an item, highlight and press e ");
-    //add_message(g, "To drop an item, highlight and press q ");
-    //add_message(g, "To attack, press ' ");
-    //add_message(g, "To go up/down a floor, press . ");
-    //add_message(g, "To wait a turn, press s s ");
-    //add_message(g, "To change direction, press s and then [q w e a d z x c] ");
-    //add_message(g, "To open a door, face it and press o ");
-
+#ifdef START_MESSAGES
+    add_message(g, "To move around, press [q w e a d z x c]");
+    add_message(g, "To pick up items, press / ");
+    add_message(g, "To manage inventory, press i ");
+    add_message(g, "To equip/unequip an item, highlight and press e ");
+    add_message(g, "To drop an item, highlight and press q ");
+    add_message(g, "To attack, press ' ");
+    add_message(g, "To go up/down a floor, press . ");
+    add_message(g, "To wait a turn, press s s ");
+    add_message(g, "To change direction, press s and then [q w e a d z x c] ");
+    add_message(g, "To open a door, face it and press o ");
+#endif
     msuccess("liblogic_init: Game state initialized");
 }
 
