@@ -48,15 +48,15 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
 
     const Rectangle frame = {g->targetwidth / 4.0f, g->targetheight / 4.0f, g->targetwidth / 2.0f, g->targetheight / 2.0f};
 
-    DrawRectangleLinesEx(frame, 2, RED);
+    //DrawRectangleLinesEx(frame, 2, RED);
 
-    const Vector2 dividing_line_0 = {g->targetwidth / 2.0f, 0};
-    const Vector2 dividing_line_1 = {g->targetwidth / 2.0f, g->targetheight * 1.0f};
-    DrawLineEx(dividing_line_0, dividing_line_1, 2.0f, RED);
+    //const Vector2 dividing_line_0 = {g->targetwidth / 2.0f, 0};
+    //const Vector2 dividing_line_1 = {g->targetwidth / 2.0f, g->targetheight * 1.0f};
+    //DrawLineEx(dividing_line_0, dividing_line_1, 2.0f, RED);
 
-    const Vector2 dividing_line_2 = {0, g->targetheight / 2.0f};
-    const Vector2 dividing_line_3 = {g->targetwidth * 1.0f, g->targetheight / 2.0f};
-    DrawLineEx(dividing_line_2, dividing_line_3, 2.0f, RED);
+    //const Vector2 dividing_line_2 = {0, g->targetheight / 2.0f};
+    //const Vector2 dividing_line_3 = {g->targetwidth * 1.0f, g->targetheight / 2.0f};
+    //DrawLineEx(dividing_line_2, dividing_line_3, 2.0f, RED);
 
 
     const float pad = 10;
@@ -77,7 +77,6 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     const float placeholder_x = g->targetwidth / 2.0f - date_measure.x / 2.0f;
     const float placeholder_y = y + font_size + sm_font_size + 10;
     const float start_x = g->targetwidth / 2.0f - start_measure.x / 4.0f;
-    const float start_y = frame.y + frame.height - sm_font_size - 10;
 
     ClearBackground(BLACK);
     //int evidojo_x = (w - evidojo_presents_measure) / 2.0f;
@@ -106,9 +105,26 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
 
     // Draw the version text
     pos = {g->targetwidth / 2.0f - version_measure.x / 2.0f, pos.y + sm_font_size + pad};
-    //DrawText(version_text, pos.x, pos.y, sm_font_size, WHITE);
     DrawTextPro(GetFontDefault(), version_text, pos, origin, 0, sm_font_size, spacing, WHITE);
 
+    // Draw the programming by text
+    const Vector2 prog_m = MeasureTextEx(GetFontDefault(), programming_by, sm_font_size, spacing);
+    const Vector2 art_m = MeasureTextEx(GetFontDefault(), art_by, sm_font_size, spacing);
+    const Vector2 music_m = MeasureTextEx(GetFontDefault(), music_by, sm_font_size, spacing);
+    const Vector2 sfx_m = MeasureTextEx(GetFontDefault(), sound_effects_by, sm_font_size, spacing);
+
+    pos = {g->targetwidth / 2.0f - prog_m.x / 2.0f, pos.y + sm_font_size + pad};
+    DrawText(programming_by, pos.x, pos.y, sm_font_size, WHITE);
+
+    // Draw the art text
+    pos = {g->targetwidth / 2.0f - art_m.x / 2.0f, pos.y + sm_font_size + pad};
+    DrawText(art_by, pos.x, pos.y, sm_font_size, WHITE);
+    // Draw the sfx text
+    pos = {g->targetwidth / 2.0f - sfx_m.x / 2.0f, pos.y + sm_font_size + pad};
+    DrawText(sound_effects_by, pos.x, pos.y, sm_font_size, WHITE);
+    // Draw the music text
+    pos = {g->targetwidth / 2.0f - music_m.x / 2.0f, pos.y + sm_font_size + pad};
+    DrawText(music_by, pos.x, pos.y, sm_font_size, WHITE);
 
     // experiment
     // draw the first frame of one of our hero textures
@@ -139,14 +155,18 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
 
 
     if (!show_menu) {
-        //DrawText(start_text, start_x, start_y, sm_font_size, WHITE);
+        //pos = {g->targetwidth / 2.0f - start_measure.x / 2.0f, g->targetheight / 2.0f - sm_font_size / 2.0f};
+        //DrawTextPro(GetFontDefault(), start_text, pos, origin, 0, sm_font_size, spacing, WHITE);
 
-        pos = {g->targetwidth / 2.0f - start_measure.x / 2.0f, g->targetheight / 2.0f - sm_font_size / 2.0f};
-        DrawTextPro(GetFontDefault(), start_text, pos, origin, 0, sm_font_size, spacing, WHITE);
+        // Draw the music text
+        pos = {g->targetwidth / 2.0f - start_measure.x / 2.0f, pos.y + sm_font_size + pad * 2};
+        DrawText(start_text, pos.x, pos.y, sm_font_size, WHITE);
+
 
         return;
     }
-
+    //const float start_y = frame.y + frame.height - sm_font_size - 10;
+    const float start_y = pos.y + sm_font_size + pad * 4;
     // If show_menu is true, draw the new game, continue, options selection text
     const int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
     const int menu_spacing = 10;
