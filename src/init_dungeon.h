@@ -11,7 +11,7 @@ static inline void init_dungeon(shared_ptr<gamestate> g) {
     msuccess("dungeon initialized successfully");
     minfo("adding floors...");
 
-    const int df_count = 4;
+    const int df_count = 20;
     // max size of 128x128 for now to maintain 60fps
     // dungeon floors, tiles etc will require re-write/re-design for optimization
     const int w = 32;

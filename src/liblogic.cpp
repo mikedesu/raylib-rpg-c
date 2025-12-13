@@ -60,7 +60,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     create_weapon_at_with(g, (vec3){11, 9, 0}, dagger_init_test);
     //create_shield_at_with(g, (vec3){11, 9, 0}, buckler_init_test);
-    create_shield_at_with(g, (vec3){11, 10, 0}, tower_shield_init_test);
+    create_shield_at_with(g, (vec3){11, 10, 0}, kite_shield_init_test);
     //create_shield_at_with(g, (vec3){10, 9, 0}, kite_shield_init_test);
 
 
@@ -95,7 +95,7 @@ void liblogic_init(shared_ptr<gamestate> g) {
 
     //#ifdef SPAWN_MONSTERS
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < g->dungeon->floors->size(); i++) {
         create_npc_at_with(g, RACE_ORC, (vec3){10, 10, i}, orc_init_test);
         create_npc_at_with(g, RACE_ORC, (vec3){10, 9, i}, orc_init_test);
         create_npc_at_with(g, RACE_ORC, (vec3){11, 9, i}, orc_init_test);
