@@ -1,5 +1,6 @@
 #pragma once
 
+#include "check_hearing.h"
 #include "entity_accessors.h"
 #include "entity_templates.h"
 #include "gamestate.h"
@@ -14,36 +15,30 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     minfo("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
     set_update(g, id, true);
-
     g->ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
-
     // entity location
     auto maybe_loc = maybe_location(id);
     if (!maybe_loc.has_value())
         return false;
-    vec3 loc = maybe_loc.value();
-
+    const vec3 loc = maybe_loc.value();
     // entity's new location
     // we will have a special case for traversing floors so ignore v.z
-    vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
+    const vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
     auto df = d_get_floor(g->dungeon, loc.z);
     if (!df) {
         merror("Dungeon floor %d does not exist", loc.z);
         return false;
     }
-
     // i feel like this might be something we can set elsewhere...like after the player input phase?
     auto tile = df_tile_at(df, aloc);
     if (!tile) {
         merror("Tile does not exist at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
         return false; // Tile does not exist
     }
-
     if (!tile_is_walkable(tile->type)) {
         merror("Tile at (%d, %d, %d) is not walkable", aloc.x, aloc.y, aloc.z);
         return false;
     }
-
     //entityid box_id = tile_has_box(g, aloc.x, aloc.y, aloc.z);
     // we need to
     // 1. check to see if box_id is pushable
@@ -67,14 +62,16 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
     //}
     //return false;
     //}
-
     if (tile_npc_living_count(g, aloc.x, aloc.y, aloc.z) > 0) {
         merror("Tile at (%d, %d, %d) has living NPCs", aloc.x, aloc.y, aloc.z);
         return false;
     }
 
+
     const entityid maybe_door = tile_has_door(g, aloc);
-    if (maybe_door != ENTITYID_INVALID) {
+    if (maybe_door == ENTITYID_INVALID) {
+        minfo("No door...");
+    } else {
         minfo("Tile has door");
         auto maybe_is_open = g->ct.get<door_open>(maybe_door);
         if (maybe_is_open.has_value()) {
@@ -87,8 +84,6 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
             merror("Door should have an open value");
             return false;
         }
-    } else {
-        minfo("No door...");
     }
 
     const float mx = v.x * DEFAULT_TILE_SIZE;
@@ -110,10 +105,9 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
     }
 
     set_location(g, id, aloc);
+    set_sprite_move(g, id, (Rectangle){mx, my, 0, 0});
 
-    g->ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
-
-    play_sound(SFX_STEP_STONE_1);
+    play_sound_if_heard(SFX_STEP_STONE_1, check_hearing(g, g->hero_id, aloc));
 
     return true;
 }

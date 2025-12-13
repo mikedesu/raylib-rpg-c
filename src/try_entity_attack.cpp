@@ -1,5 +1,6 @@
 #include "ComponentTraits.h"
 #include "add_message.h"
+#include "check_hearing.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate_flag.h"
@@ -52,16 +53,16 @@ void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, int tgt_x, int 
     handle_attack_helper(g, tile, atk_id, &ok);
 
     // did the hero hear this event?
-    const vec3 hero_loc = g->ct.get<location>(g->hero_id).value_or((vec3){-1, -1, -1});
-    const float hx = static_cast<float>(hero_loc.x);
-    const float hy = static_cast<float>(hero_loc.y);
-    const float tx = static_cast<float>(tgt_x);
-    const float ty = static_cast<float>(tgt_y);
-    const Vector2 p0 = {hx, hy};
-    const Vector2 p1 = {tx, ty};
-    float dist = Vector2Distance(p0, p1);
-    float hearing = g->ct.get<hearing_distance>(g->hero_id).value_or(3);
-    bool event_heard = dist <= hearing;
+    //const vec3 hero_loc = g->ct.get<location>(g->hero_id).value_or((vec3){-1, -1, -1});
+    //const float hx = static_cast<float>(hero_loc.x);
+    //const float hy = static_cast<float>(hero_loc.y);
+    //const float tx = static_cast<float>(tgt_x);
+    //const float ty = static_cast<float>(tgt_y);
+    //const Vector2 p0 = {hx, hy};
+    //const Vector2 p1 = {tx, ty};
+    //float dist = Vector2Distance(p0, p1);
+    //float hearing = g->ct.get<hearing_distance>(g->hero_id).value_or(3);
+    const bool event_heard = check_hearing(g, g->hero_id, (vec3){tgt_x, tgt_y, loc.z});
 
     if (ok) {
         // default metal on flesh
@@ -147,7 +148,10 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
     const int low_roll = 100 - chance;
     if (low_roll == 0 && shield_id != ENTITYID_INVALID) {
         // 100% block chance
-        PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
+
+        const bool event_heard = check_hearing(g, g->hero_id, g->ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
+        play_sound_if_heard(SFX_HIT_METAL_ON_METAL, event_heard);
+
         g->ct.set<block_success>(target_id, true);
         g->ct.set<update>(target_id, true);
         add_message_history(g,
@@ -163,7 +167,9 @@ void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> 
     } else {
         // block successful
         if (shield_id != ENTITYID_INVALID) {
-            PlaySound(g->sfx->at(SFX_HIT_METAL_ON_METAL));
+            const bool event_heard = check_hearing(g, g->hero_id, g->ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
+            play_sound_if_heard(SFX_HIT_METAL_ON_METAL, event_heard);
+
             g->ct.set<block_success>(target_id, true);
             g->ct.set<update>(target_id, true);
             add_message_history(g,
@@ -240,7 +246,10 @@ void handle_attack_success(shared_ptr<gamestate> g, entityid atk_id, entityid tg
             remove_from_inventory(g, atk_id, wpn_id);
             // unequip item
             g->ct.set<equipped_weapon>(atk_id, ENTITYID_INVALID);
-            PlaySound(g->sfx->at(SFX_05_ALCHEMY_GLASS_BREAK));
+
+            const bool event_heard = check_hearing(g, g->hero_id, g->ct.get<location>(tgt_id).value_or((vec3){-1, -1, -1}));
+            play_sound_if_heard(SFX_05_ALCHEMY_GLASS_BREAK, event_heard);
+
             add_message_history(g, "%s broke!", g->ct.get<name>(wpn_id).value_or("no-name").c_str());
         }
     }

@@ -55,6 +55,11 @@ static inline void set_location(shared_ptr<gamestate> g, entityid id, vec3 loc) 
 }
 
 
+static inline void set_sprite_move(shared_ptr<gamestate> g, entityid id, Rectangle r) {
+    g->ct.set<spritemove>(id, r);
+}
+
+
 static inline void set_door_open(shared_ptr<gamestate> g, entityid id, bool o) {
     g->ct.set<door_open>(id, o);
 }
