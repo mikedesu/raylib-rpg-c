@@ -25,12 +25,10 @@ static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate
         return;
     }
 
-    if (g->msg_system_is_active) {
-        // press enter to cycle thru message
-        if (inputstate_is_pressed(is, KEY_ENTER)) {
-            PlaySound(g->sfx->at(SFX_CONFIRM_01));
-            cycle_messages(g);
-        }
+    // press enter to cycle thru message
+    if (g->msg_system_is_active && inputstate_is_pressed(is, KEY_ENTER)) {
+        play_sound(SFX_CONFIRM_01);
+        cycle_messages(g);
         return;
     }
 
@@ -38,10 +36,18 @@ static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate
         if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
             g->cam2d.zoom += DEFAULT_ZOOM_INCR;
             g->frame_dirty = true;
+            return;
         } else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
             g->cam2d.zoom -= (g->cam2d.zoom > 1.0) ? DEFAULT_ZOOM_INCR : 0.0;
             g->frame_dirty = true;
+            return;
         }
+
+        // make sure player isnt dead
+        auto maybe_player_is_dead = g->ct.get<dead>(g->hero_id);
+        if (!maybe_player_is_dead.has_value())
+            return;
+        const bool is_dead = maybe_player_is_dead.value();
 
         if (g->player_changing_dir) {
             // double 's' is wait one turn
@@ -76,6 +82,11 @@ static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate
         }
 
         if (inputstate_is_pressed(is, KEY_S)) {
+            if (is_dead) {
+                add_message(g, "You cannot change directions while dead");
+                return;
+            }
+
             g->player_changing_dir = true;
             return;
         }
@@ -84,74 +95,145 @@ static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate
             g->display_inventory_menu = true;
             g->controlmode = CONTROLMODE_INVENTORY;
             g->frame_dirty = true;
-            //PlaySound(g->sfx->at(SFX_CONFIRM_01));
-            PlaySound(g->sfx->at(SFX_BAG_OPEN));
+            play_sound(SFX_BAG_OPEN);
             return;
         }
 
         if (g->hero_id == ENTITYID_INVALID)
             return;
 
-        // make sure player isnt dead
-        auto maybe_player_is_dead = g->ct.get<dead>(g->hero_id);
-        if (!maybe_player_is_dead.has_value())
-            return;
-
-        const bool player_is_dead = maybe_player_is_dead.value();
-        if (player_is_dead) {
-            add_message(g, "You cant act while dead!");
-            return;
-        }
-
 
         // Handling movement
         if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
+            if (is_dead) {
+                add_message(g, "You cannot move while dead");
+                return;
+            }
+
             try_entity_move(g, g->hero_id, (vec3){0, -1, 0});
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
         } else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
+            if (is_dead) {
+                add_message(g, "You cannot move while dead");
+                return;
+            }
+
+
             try_entity_move(g, g->hero_id, (vec3){0, 1, 0});
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
         } else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+            if (is_dead) {
+                add_message(g, "You cannot move while dead");
+                return;
+            }
+
+
             try_entity_move(g, g->hero_id, (vec3){-1, 0, 0});
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
         } else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
+            if (is_dead) {
+                add_message(g, "You cannot move while dead");
+                return;
+            }
+
+
             try_entity_move(g, g->hero_id, (vec3){1, 0, 0});
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
         } else if (inputstate_is_pressed(is, KEY_Q)) {
+            if (is_dead) {
+                add_message(g, "You cannot move while dead");
+                return;
+            }
+
+
             try_entity_move(g, g->hero_id, (vec3){-1, -1, 0});
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
         } else if (inputstate_is_pressed(is, KEY_E)) {
+            if (is_dead) {
+                add_message(g, "You cannot move while dead");
+                return;
+            }
+
+
             try_entity_move(g, g->hero_id, (vec3){1, -1, 0});
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
         } else if (inputstate_is_pressed(is, KEY_Z)) {
+            if (is_dead) {
+                add_message(g, "You cannot move while dead");
+                return;
+            }
+
+
             try_entity_move(g, g->hero_id, (vec3){-1, 1, 0});
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
         } else if (inputstate_is_pressed(is, KEY_C)) {
+            if (is_dead) {
+                add_message(g, "You cannot move while dead");
+                return;
+            }
+
+
             try_entity_move(g, g->hero_id, (vec3){1, 1, 0});
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
         }
         // Handling attack
         else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+            if (is_dead) {
+                add_message(g, "You cannot attack while dead");
+                return;
+            }
+
+
             if (g->ct.get<location>(g->hero_id).has_value() && g->ct.get<direction>(g->hero_id).has_value()) {
                 const vec3 loc = get_loc_facing_player(g);
                 try_entity_attack(g, g->hero_id, loc.x, loc.y);
                 g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                return;
             }
         }
         // handling pickup item
         else if (inputstate_is_pressed(is, KEY_SLASH)) {
+            if (is_dead) {
+                add_message(g, "You cannot pick up items while dead");
+                return;
+            }
+
+
             try_entity_pickup(g, g->hero_id);
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
         }
         // handling go up/down stairs
         // what happens when we go up or down stairs?
-        else if (inputstate_is_pressed(is, KEY_PERIOD))
+        else if (inputstate_is_pressed(is, KEY_PERIOD)) {
+            if (is_dead) {
+                add_message(g, "You cannot pick up items while dead");
+                return;
+            }
+
             try_entity_stairs(g, g->hero_id);
+            return;
+        }
         // handling open door
         else if (inputstate_is_pressed(is, KEY_O)) {
+            if (is_dead) {
+                add_message(g, "You cannot pick up items while dead");
+                return;
+            }
+
+
             const vec3 loc = get_loc_facing_player(g);
             try_entity_open_door(g, g->hero_id, loc);
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
         }
     }
 }
