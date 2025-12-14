@@ -1,7 +1,7 @@
+#include "draw_entity_sprite.h"
 #include "draw_shield_sprite.h"
 #include "draw_sprite.h"
 #include "draw_weapon_sprite.h"
-#include "libdraw_entity_sprite.h"
 #include "spritegroup.h"
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
