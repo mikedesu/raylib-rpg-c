@@ -64,10 +64,10 @@ void draw_character_creation_screen(shared_ptr<gamestate> g) {
     switch (g->chara_creation->race) {
     case RACE_HUMAN: tx_key = TX_CHAR_HUMAN_IDLE; break;
     case RACE_ORC: tx_key = TX_CHAR_ORC_IDLE; break;
-    case RACE_ELF: tx_key = TX_ELF_IDLE; break;
-    case RACE_DWARF: tx_key = TX_DWARF_IDLE; break;
-    case RACE_HALFLING: tx_key = TX_HALFLING_IDLE; break;
-    case RACE_GOBLIN: tx_key = TX_GOBLIN_IDLE; break;
+    case RACE_ELF: tx_key = TX_CHAR_ELF_IDLE; break;
+    case RACE_DWARF: tx_key = TX_CHAR_DWARF_IDLE; break;
+    case RACE_HALFLING: tx_key = TX_CHAR_HALFLING_IDLE; break;
+    case RACE_GOBLIN: tx_key = TX_CHAR_GOBLIN_IDLE; break;
     case RACE_GREEN_SLIME: tx_key = TX_GREEN_SLIME_IDLE; break;
     case RACE_BAT: tx_key = TX_BAT_IDLE; break;
     case RACE_WOLF: tx_key = TX_WOLF_IDLE; break;
