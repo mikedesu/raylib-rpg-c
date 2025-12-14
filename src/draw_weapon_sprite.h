@@ -1,6 +1,6 @@
 #pragma once
 #include "gamestate.h"
-#include "libdraw_get_weapon_sprite.h"
+#include "get_weapon_sprite.h"
 #include "spritegroup.h"
 
 

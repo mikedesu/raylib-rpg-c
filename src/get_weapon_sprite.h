@@ -1,33 +1,29 @@
-#include "libdraw_get_weapon_sprite.h"
+#pragma once
+
+#include "gamestate.h"
+#include "sprite.h"
+#include "spritegroup.h"
+#include "spritegroup_anim.h"
+
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
-shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
+static inline shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-
     shared_ptr<sprite> retval = nullptr;
-
     entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
-
-    if (weapon == ENTITYID_INVALID) {
+    if (weapon == ENTITYID_INVALID)
         return retval;
-    }
-
     auto it = spritegroups.find(weapon);
-    if (it == spritegroups.end()) {
+    if (it == spritegroups.end())
         return retval;
-    }
-
     spritegroup_t* w_sg = it->second;
-    if (!w_sg) {
+    if (!w_sg)
         return retval;
-    }
-
-    if (sg->current == SG_ANIM_NPC_ATTACK) {
+    if (sg->current == SG_ANIM_NPC_ATTACK)
         retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
-    }
     //else if (sg->current == SG_ANIM_NPC_SHOT) {
     //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_F);
     //}
@@ -35,34 +31,22 @@ shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id,
 }
 
 
-shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
+static inline shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
-
     shared_ptr<sprite> retval = nullptr;
-
     entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
-
-    if (weapon == ENTITYID_INVALID) {
+    if (weapon == ENTITYID_INVALID)
         return retval;
-    }
-
     auto it = spritegroups.find(weapon);
-
-    if (it == spritegroups.end()) {
+    if (it == spritegroups.end())
         return retval;
-    }
-
     spritegroup_t* w_sg = it->second;
-
-    if (!w_sg) {
+    if (!w_sg)
         return retval;
-    }
-
-    if (sg->current == SG_ANIM_NPC_ATTACK) {
+    if (sg->current == SG_ANIM_NPC_ATTACK)
         retval = spritegroup_get(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    }
     //else if (sg->current == SG_ANIM_NPC_SHOT) {
     //    retval = spritegroup_get(w_sg, SG_ANIM_BOW_SHOT_B);
     //}
