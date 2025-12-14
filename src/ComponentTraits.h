@@ -299,3 +299,10 @@ template <>
 struct ComponentTraits<damage_reduction> {
     using Type = int;
 };
+
+
+struct hitdie { }; //int
+template <>
+struct ComponentTraits<hitdie> {
+    using Type = int;
+};
