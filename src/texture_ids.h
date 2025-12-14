@@ -1,42 +1,8 @@
 #pragma once
 
-#define TX_CHAR_HUMAN_IDLE 1
-#define TX_CHAR_HUMAN_IDLE_SHADOW 2
-#define TX_CHAR_HUMAN_WALK 3
-#define TX_CHAR_HUMAN_WALK_SHADOW 4
-#define TX_CHAR_HUMAN_ATTACK 5
-#define TX_CHAR_HUMAN_ATTACK_SHADOW 6
-#define TX_CHAR_HUMAN_JUMP 7
-#define TX_CHAR_HUMAN_JUMP_SHADOW 8
-#define TX_CHAR_HUMAN_SPIN_DIE 9
-#define TX_CHAR_HUMAN_SPIN_DIE_SHADOW 10
-#define TX_CHAR_HUMAN_SOUL_DIE 11
-#define TX_CHAR_HUMAN_SOUL_DIE_SHADOW 12
-#define TX_CHAR_HUMAN_DMG 75
-#define TX_CHAR_HUMAN_DMG_SHADOW 76
-#define TX_CHAR_HUMAN_GUARD 66
-#define TX_CHAR_HUMAN_GUARD_SHADOW 67
-#define TX_CHAR_HUMAN_GUARD_SUCCESS 68
-#define TX_CHAR_HUMAN_GUARD_SUCCESS_SHADOW 69
-
-#define TX_CHAR_ORC_IDLE 13
-#define TX_CHAR_ORC_IDLE_SHADOW 14
-#define TX_CHAR_ORC_WALK 15
-#define TX_CHAR_ORC_WALK_SHADOW 16
-#define TX_CHAR_ORC_ATTACK 17
-#define TX_CHAR_ORC_ATTACK_SHADOW 18
-#define TX_CHAR_ORC_CHARGED_ATTACK 19
-#define TX_CHAR_ORC_CHARGED_ATTACK_SHADOW 20
-#define TX_CHAR_ORC_JUMP 21
-#define TX_CHAR_ORC_JUMP_SHADOW 22
-#define TX_CHAR_ORC_DIE 23
-#define TX_CHAR_ORC_DIE_SHADOW 24
-#define TX_CHAR_ORC_DMG 25
-#define TX_CHAR_ORC_DMG_SHADOW 26
-#define TX_CHAR_ORC_GUARD 213
-#define TX_CHAR_ORC_GUARD_SHADOW 214
-#define TX_CHAR_ORC_GUARD_SUCCESS 215
-#define TX_CHAR_ORC_GUARD_SUCCESS_SHADOW 216
+// --------------------------------------------------------------------------------
+// Tiles
+// --------------------------------------------------------------------------------
 
 #define TX_TILES_DIRT_00 0
 #define TX_TILES_STONE_00 27
@@ -114,11 +80,6 @@
 #define TX_TILES_GRASS_03 59
 #define TX_TILES_GRASS_04 60
 
-#define TX_ACTIONS_GUARD_BUCKLER_SUCCESS_FRONT 72
-#define TX_ACTIONS_GUARD_BUCKLER_SUCCESS_BACK 73
-
-#define TX_BUCKLER 74
-
 #define TX_TILES_GRASS_05 77
 #define TX_TILES_GRASS_06 78
 #define TX_TILES_GRASS_07 79
@@ -155,17 +116,53 @@
 #define TX_TILES_DIRT_07 110
 #define TX_TILES_DIRT_08 111
 
-//#define TX_PRESSURE_PLATE_UP_00 112
-//#define TX_PRESSURE_PLATE_DOWN_00 113
-//#define TX_STONE_TRAP_OFF_00 114
-//#define TX_STONE_TRAP_ON_00 115
-//#define TX_WALL_SWITCH_UP_00 116
-//#define TX_WALL_SWITCH_DOWN_00 117
+#define TX_TILES_UPSTAIRS_00 118
+#define TX_TILES_DOWNSTAIRS_00 119
 
-#define TX_UPSTAIRS_00 118
-#define TX_DOWNSTAIRS_00 119
+// --------------------------------------------------------------------------------
+// Characters
+// --------------------------------------------------------------------------------
 
-#define TX_SWORD_00 120
+
+#define TX_CHAR_HUMAN_IDLE 1
+#define TX_CHAR_HUMAN_IDLE_SHADOW 2
+#define TX_CHAR_HUMAN_WALK 3
+#define TX_CHAR_HUMAN_WALK_SHADOW 4
+#define TX_CHAR_HUMAN_ATTACK 5
+#define TX_CHAR_HUMAN_ATTACK_SHADOW 6
+#define TX_CHAR_HUMAN_JUMP 7
+#define TX_CHAR_HUMAN_JUMP_SHADOW 8
+#define TX_CHAR_HUMAN_SPIN_DIE 9
+#define TX_CHAR_HUMAN_SPIN_DIE_SHADOW 10
+#define TX_CHAR_HUMAN_SOUL_DIE 11
+#define TX_CHAR_HUMAN_SOUL_DIE_SHADOW 12
+#define TX_CHAR_HUMAN_DMG 75
+#define TX_CHAR_HUMAN_DMG_SHADOW 76
+#define TX_CHAR_HUMAN_GUARD 66
+#define TX_CHAR_HUMAN_GUARD_SHADOW 67
+#define TX_CHAR_HUMAN_GUARD_SUCCESS 68
+#define TX_CHAR_HUMAN_GUARD_SUCCESS_SHADOW 69
+#define TX_CHAR_HUMAN_SHOT 300
+#define TX_CHAR_HUMAN_SHOT_SHADOW 301
+
+#define TX_CHAR_ORC_IDLE 13
+#define TX_CHAR_ORC_IDLE_SHADOW 14
+#define TX_CHAR_ORC_WALK 15
+#define TX_CHAR_ORC_WALK_SHADOW 16
+#define TX_CHAR_ORC_ATTACK 17
+#define TX_CHAR_ORC_ATTACK_SHADOW 18
+#define TX_CHAR_ORC_CHARGED_ATTACK 19
+#define TX_CHAR_ORC_CHARGED_ATTACK_SHADOW 20
+#define TX_CHAR_ORC_JUMP 21
+#define TX_CHAR_ORC_JUMP_SHADOW 22
+#define TX_CHAR_ORC_DIE 23
+#define TX_CHAR_ORC_DIE_SHADOW 24
+#define TX_CHAR_ORC_DMG 25
+#define TX_CHAR_ORC_DMG_SHADOW 26
+#define TX_CHAR_ORC_GUARD 213
+#define TX_CHAR_ORC_GUARD_SHADOW 214
+#define TX_CHAR_ORC_GUARD_SUCCESS 215
+#define TX_CHAR_ORC_GUARD_SUCCESS_SHADOW 216
 
 #define TX_CHAR_DWARF_IDLE 121
 #define TX_CHAR_DWARF_IDLE_SHADOW 122
@@ -181,6 +178,8 @@
 #define TX_CHAR_DWARF_DMG_SHADOW 134
 #define TX_DWARF_GUARD_SUCCESS 287
 #define TX_DWARF_GUARD_SUCCESS_SHADOW 288
+#define TX_CHAR_DWARF_SHOT 304
+#define TX_CHAR_DWARF_SHOT_SHADOW 305
 
 #define TX_CHAR_ELF_IDLE 135
 #define TX_CHAR_ELF_IDLE_SHADOW 136
@@ -196,6 +195,8 @@
 #define TX_CHAR_ELF_DMG_SHADOW 148
 #define TX_CHAR_ELF_GUARD_SUCCESS 289
 #define TX_CHAR_ELF_GUARD_SUCCESS_SHADOW 290
+#define TX_CHAR_ELF_SHOT 306
+#define TX_CHAR_ELF_SHOT_SHADOW 307
 
 #define TX_CHAR_HALFLING_IDLE 149
 #define TX_CHAR_HALFLING_IDLE_SHADOW 150
@@ -211,6 +212,8 @@
 #define TX_CHAR_HALFLING_SPIN_DIE_SHADOW 160
 #define TX_CHAR_HALFLING_GUARD_SUCCESS 291
 #define TX_CHAR_HALFLING_GUARD_SUCCESS_SHADOW 292
+#define TX_CHAR_HALFLING_SHOT 308
+#define TX_CHAR_HALFLING_SHOT_SHADOW 309
 
 #define TX_CHAR_GOBLIN_IDLE 163
 #define TX_CHAR_GOBLIN_IDLE_SHADOW 164
@@ -226,6 +229,36 @@
 #define TX_CHAR_GOBLIN_SPIN_DIE_SHADOW 174
 #define TX_CHAR_GOBLIN_GUARD_SUCCESS 293
 #define TX_CHAR_GOBLIN_GUARD_SUCCESS_SHADOW 294
+#define TX_CHAR_GOBLIN_SHOT 310
+#define TX_CHAR_GOBLIN_SHOT_SHADOW 311
+
+//#define TX_ORC_SHOT 302
+//#define TX_ORC_SHOT_SHADOW 303
+
+
+// --------------------------------------------------------------------------------
+// Actions
+// --------------------------------------------------------------------------------
+#define TX_ACTIONS_GUARD_BUCKLER_SUCCESS_FRONT 72
+#define TX_ACTIONS_GUARD_BUCKLER_SUCCESS_BACK 73
+#define TX_ACTION_SLASH_AXE_B 207
+#define TX_ACTION_SLASH_AXE_F 208
+#define TX_ACTION_SLASH_DAGGER_B 209
+#define TX_ACTION_SLASH_DAGGER_F 210
+#define TX_ACTION_SLASH_SWORD_B 211
+#define TX_ACTION_SLASH_SWORD_F 212
+#define TX_ACTION_SHOT_BOW_F 312
+#define TX_ACTION_SHOT_BOW_B 313
+#define TX_ACTION_SHOT_BOW_B_HALFLING_GOBLIN_DWARF 314
+
+#define TX_GUARD_KITE_SHIELD_SUCCESS_FRONT 297
+#define TX_GUARD_KITE_SHIELD_SUCCESS_BACK 298
+#define TX_GUARD_TOWER_SHIELD_SUCCESS_FRONT 361
+#define TX_GUARD_TOWER_SHIELD_SUCCESS_BACK 362
+
+// --------------------------------------------------------------------------------
+// Monsters
+// --------------------------------------------------------------------------------
 
 #define TX_BAT_IDLE 177
 #define TX_BAT_IDLE_SHADOW 178
@@ -251,60 +284,6 @@
 #define TX_WOLF_DIE 195
 #define TX_WOLF_DIE_SHADOW 196
 
-#define TX_DAGGER 197
-#define TX_TWO_HANDED_SWORD 198
-
-#define TX_KITE_SHIELD 199
-#define TX_WOODEN_TOWER_SHIELD 200
-
-#define TX_POTION_HP_SMALL 201
-#define TX_POTION_HP_MEDIUM 202
-#define TX_POTION_HP_LARGE 203
-
-#define TX_POTION_MP_SMALL 204
-#define TX_POTION_MP_MEDIUM 205
-#define TX_POTION_MP_LARGE 206
-
-#define TX_ACTION_SLASH_AXE_B 207
-#define TX_ACTION_SLASH_AXE_F 208
-
-#define TX_ACTION_SLASH_DAGGER_B 209
-#define TX_ACTION_SLASH_DAGGER_F 210
-
-#define TX_ACTION_SLASH_SWORD_B 211
-#define TX_ACTION_SLASH_SWORD_F 212
-
-#define TX_WOODEN_DOOR_CLOSED 283
-#define TX_WOODEN_DOOR_OPEN 284
-
-#define TX_KEY_BASIC 285
-
-#define TX_AXE 286
-
-#define TX_GUARD_KITE_SHIELD_SUCCESS_FRONT 297
-#define TX_GUARD_KITE_SHIELD_SUCCESS_BACK 298
-
-#define TX_BOW 299
-
-#define TX_CHAR_HUMAN_SHOT 300
-#define TX_CHAR_HUMAN_SHOT_SHADOW 301
-//#define TX_ORC_SHOT 302
-//#define TX_ORC_SHOT_SHADOW 303
-#define TX_CHAR_DWARF_SHOT 304
-#define TX_CHAR_DWARF_SHOT_SHADOW 305
-#define TX_CHAR_ELF_SHOT 306
-#define TX_CHAR_ELF_SHOT_SHADOW 307
-#define TX_CHAR_HALFLING_SHOT 308
-#define TX_CHAR_HALFLING_SHOT_SHADOW 309
-#define TX_CHAR_GOBLIN_SHOT 310
-#define TX_CHAR_GOBLIN_SHOT_SHADOW 311
-
-#define TX_ACTION_SHOT_BOW_F 312
-#define TX_ACTION_SHOT_BOW_B 313
-#define TX_ACTION_SHOT_BOW_B_HALFLING_GOBLIN_DWARF 314
-
-#define TX_ARROW 315
-
 #define TX_WARG_IDLE 318
 #define TX_WARG_IDLE_SHADOW 319
 #define TX_WARG_WALK 320
@@ -327,19 +306,64 @@
 #define TX_GREEN_SLIME_DMG_SHADOW 335
 #define TX_GREEN_SLIME_DIE_SHADOW 337
 
+
+// --------------------------------------------------------------------------------
+// Potions
+// --------------------------------------------------------------------------------
+#define TX_POTION_HP_SMALL 201
+#define TX_POTION_HP_MEDIUM 202
+#define TX_POTION_HP_LARGE 203
+
+#define TX_POTION_MP_SMALL 204
+#define TX_POTION_MP_MEDIUM 205
+#define TX_POTION_MP_LARGE 206
+
+// --------------------------------------------------------------------------------
+// Doors
+// --------------------------------------------------------------------------------
+#define TX_WOODEN_DOOR_CLOSED 283
+#define TX_WOODEN_DOOR_OPEN 284
+
+// --------------------------------------------------------------------------------
+// Doors
+// --------------------------------------------------------------------------------
+#define TX_KEY_BASIC 285
+
+// --------------------------------------------------------------------------------
+// Weapons
+// --------------------------------------------------------------------------------
+#define TX_SWORD_00 120
+#define TX_AXE 286
+#define TX_BOW 299
+#define TX_DAGGER 197
+#define TX_TWO_HANDED_SWORD 198
+#define TX_ARROW 315
+#define TX_WARHAMMER 347
+#define TX_WHIP 348
+
+// --------------------------------------------------------------------------------
+// Shields
+// --------------------------------------------------------------------------------
+#define TX_KITE_SHIELD 199
+#define TX_WOODEN_TOWER_SHIELD 200
+#define TX_BUCKLER 74
+
+// --------------------------------------------------------------------------------
+// Spells
+// --------------------------------------------------------------------------------
 #define TX_SPELL_FIRE_FULL 339
 #define TX_SPELL_FIRE_CAST 340
 #define TX_SPELL_FIRE_PERSIST 341
 #define TX_SPELL_FIRE_END 342
 
+// --------------------------------------------------------------------------------
+// Rings
+// --------------------------------------------------------------------------------
 #define TX_RING_GOLD 343
 #define TX_RING_SILVER 344
 #define TX_RING_IRON 345
 
+// --------------------------------------------------------------------------------
+// Boxes
+// --------------------------------------------------------------------------------
 #define TX_WOODEN_BOX 346
-
-#define TX_WARHAMMER 347
-#define TX_WHIP 348
-
-#define TX_GUARD_TOWER_SHIELD_SUCCESS_FRONT 361
-#define TX_GUARD_TOWER_SHIELD_SUCCESS_BACK 362

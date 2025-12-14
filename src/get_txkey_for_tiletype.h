@@ -8,8 +8,8 @@
 static inline int get_txkey_for_tiletype(tiletype_t type) {
     int key = -1;
     switch (type) {
-    case TILE_UPSTAIRS: key = TX_UPSTAIRS_00; break;
-    case TILE_DOWNSTAIRS: key = TX_DOWNSTAIRS_00; break;
+    case TILE_UPSTAIRS: key = TX_TILES_UPSTAIRS_00; break;
+    case TILE_DOWNSTAIRS: key = TX_TILES_DOWNSTAIRS_00; break;
     //case TILE_FLOOR_DIRT: key = TX_DIRT_00; break;
     case TILE_STONE_WALL_00: key = TX_TILES_STONEWALL_00; break;
     case TILE_STONE_WALL_01:
