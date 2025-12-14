@@ -66,10 +66,6 @@
 #define TX_CHAR_ORC_DIE_SHADOW 24
 #define TX_CHAR_ORC_DMG 25
 #define TX_CHAR_ORC_DMG_SHADOW 26
-//213 4 4  0  img/characters/orc_guard.png
-//214 4 4  0  img/characters/shadows/orc_guard_shadow.png
-//215 4 3  0  img/characters/orc_guard_success.png
-//216 4 3  0  img/characters/shadows/orc_guard_success_shadow.png
 #define TX_CHAR_ORC_GUARD 213
 #define TX_CHAR_ORC_GUARD_SHADOW 214
 #define TX_CHAR_ORC_GUARD_SUCCESS 215
@@ -89,44 +85,10 @@
 #define TX_TILES_STONE_10 37
 #define TX_TILES_STONE_11 38
 #define TX_TILES_STONE_12 39
-//#define TX_STONE_13 40
 #define TX_TILES_STONEWALL_00 41
 #define TX_TILES_STONEWALL_01 42
 #define TX_TILES_STONEWALL_02 43
 #define TX_TILES_STONEWALL_03 44
-//#define TX_STONEWALL_04 45
-//#define TX_STONEWALL_05 46
-//#define TX_STONEWALL_06 47
-//#define TX_STONEWALL_07 48
-//#define TX_STONEWALL_08 49
-//#define TX_STONEWALL_09 50
-//#define TX_STONEWALL_10 51
-//#define TX_STONEWALL_11 52
-//#define TX_STONEWALL_12 53
-//#define TX_STONEWALL_13 54
-//#define TX_STONEWALL_14 55
-
-//#define TX_STONEWALL_15 217
-//#define TX_STONEWALL_16 218
-//#define TX_STONEWALL_17 219
-//#define TX_STONEWALL_18 220
-//#define TX_STONEWALL_19 221
-//#define TX_STONEWALL_20 222
-//#define TX_STONEWALL_21 223
-//#define TX_STONEWALL_22 224
-//#define TX_STONEWALL_23 225
-//#define TX_STONEWALL_24 226
-//#define TX_STONEWALL_25 227
-//#define TX_STONEWALL_26 228
-//#define TX_STONEWALL_27 229
-//#define TX_STONEWALL_28 230
-//#define TX_STONEWALL_29 231
-//#define TX_STONEWALL_30 232
-//#define TX_STONEWALL_31 233
-//#define TX_STONEWALL_32 234
-//#define TX_STONEWALL_33 235
-//#define TX_STONEWALL_34 236
-//#define TX_STONEWALL_35 237
 
 #define TX_TILES_STONE_DIRT_UL_00 238
 #define TX_TILES_STONE_DIRT_U_00 239
@@ -184,14 +146,7 @@
 #define TX_TILES_GRASS_02 58
 #define TX_TILES_GRASS_03 59
 #define TX_TILES_GRASS_04 60
-//#define TX_TILES_DIRT_01 61
-//#define TX_TILES_DIRT_02 62
-//#define TX_TILES_DIRT_03 63
-//#define TX_TILES_DIRT_04 64
-//#define TX_TILES_DIRT_05 65
 
-//#define TX_GUARD_BUCKLER_FRONT 70
-//#define TX_GUARD_BUCKLER_BACK 71
 #define TX_ACTIONS_GUARD_BUCKLER_SUCCESS_FRONT 72
 #define TX_ACTIONS_GUARD_BUCKLER_SUCCESS_BACK 73
 
@@ -233,12 +188,12 @@
 #define TX_TILES_DIRT_07 110
 #define TX_TILES_DIRT_08 111
 
-#define TX_PRESSURE_PLATE_UP_00 112
-#define TX_PRESSURE_PLATE_DOWN_00 113
-#define TX_STONE_TRAP_OFF_00 114
-#define TX_STONE_TRAP_ON_00 115
-#define TX_WALL_SWITCH_UP_00 116
-#define TX_WALL_SWITCH_DOWN_00 117
+//#define TX_PRESSURE_PLATE_UP_00 112
+//#define TX_PRESSURE_PLATE_DOWN_00 113
+//#define TX_STONE_TRAP_OFF_00 114
+//#define TX_STONE_TRAP_ON_00 115
+//#define TX_WALL_SWITCH_UP_00 116
+//#define TX_WALL_SWITCH_DOWN_00 117
 
 #define TX_UPSTAIRS_00 118
 #define TX_DOWNSTAIRS_00 119
@@ -255,14 +210,10 @@
 #define TX_CHAR_DWARF_JUMP_SHADOW 128
 #define TX_CHAR_DWARF_SPIN_DIE 129
 #define TX_CHAR_DWARF_SPIN_DIE_SHADOW 130
-//#define TX_DWARF_SOUL_DIE 131
-//#define TX_DWARF_SOUL_DIE_SHADOW 132
-#define TX_DWARF_DMG 133
-#define TX_DWARF_DMG_SHADOW 134
-//#define TX_DWARF_GUARD 66
-//#define TX_DWARF_GUARD_SHADOW 67
-//#define TX_DWARF_GUARD_SUCCESS 68
-//#define TX_DWARF_GUARD_SUCCESS_SHADOW 69
+#define TX_CHAR_DWARF_DMG 133
+#define TX_CHAR_DWARF_DMG_SHADOW 134
+#define TX_DWARF_GUARD_SUCCESS 287
+#define TX_DWARF_GUARD_SUCCESS_SHADOW 288
 
 #define TX_CHAR_ELF_IDLE 135
 #define TX_CHAR_ELF_IDLE_SHADOW 136
@@ -274,14 +225,10 @@
 #define TX_CHAR_ELF_JUMP_SHADOW 142
 #define TX_CHAR_ELF_SPIN_DIE 143
 #define TX_CHAR_ELF_SPIN_DIE_SHADOW 144
-//#define TX_ELF_SOUL_DIE 145
-//#define TX_ELF_SOUL_DIE_SHADOW 146
 #define TX_CHAR_ELF_DMG 147
 #define TX_CHAR_ELF_DMG_SHADOW 148
-//#define TX_ELF_GUARD 66
-//#define TX_ELF_GUARD_SHADOW 67
-//#define TX_ELF_GUARD_SUCCESS 68
-//#define TX_ELF_GUARD_SUCCESS_SHADOW 69
+#define TX_CHAR_ELF_GUARD_SUCCESS 289
+#define TX_CHAR_ELF_GUARD_SUCCESS_SHADOW 290
 
 #define TX_CHAR_HALFLING_IDLE 149
 #define TX_CHAR_HALFLING_IDLE_SHADOW 150
@@ -295,12 +242,8 @@
 #define TX_CHAR_HALFLING_DMG_SHADOW 158
 #define TX_CHAR_HALFLING_SPIN_DIE 159
 #define TX_CHAR_HALFLING_SPIN_DIE_SHADOW 160
-//#define TX_HALFLING_SOUL_DIE 159
-//#define TX_HALFLING_SOUL_DIE_SHADOW 160
-//#define TX_HALFLING_GUARD 66
-//#define TX_HALFLING_GUARD_SHADOW 67
-//#define TX_HALFLING_GUARD_SUCCESS 68
-//#define TX_HALFLING_GUARD_SUCCESS_SHADOW 69
+#define TX_CHAR_HALFLING_GUARD_SUCCESS 291
+#define TX_CHAR_HALFLING_GUARD_SUCCESS_SHADOW 292
 
 #define TX_CHAR_GOBLIN_IDLE 163
 #define TX_CHAR_GOBLIN_IDLE_SHADOW 164
@@ -314,12 +257,8 @@
 #define TX_CHAR_GOBLIN_DMG_SHADOW 172
 #define TX_CHAR_GOBLIN_SPIN_DIE 173
 #define TX_CHAR_GOBLIN_SPIN_DIE_SHADOW 174
-//#define TX_GOBLIN_SOUL_DIE 173
-//#define TX_GOBLIN_SOUL_DIE_SHADOW 174
-//#define TX_GOBLIN_GUARD 66
-//#define TX_GOBLIN_GUARD_SHADOW 67
-//#define TX_GOBLIN_GUARD_SUCCESS 68
-//#define TX_GOBLIN_GUARD_SUCCESS_SHADOW 69
+#define TX_CHAR_GOBLIN_GUARD_SUCCESS 293
+#define TX_CHAR_GOBLIN_GUARD_SUCCESS_SHADOW 294
 
 #define TX_BAT_IDLE 177
 #define TX_BAT_IDLE_SHADOW 178
@@ -373,45 +312,11 @@
 
 #define TX_KEY_BASIC 285
 
-//286 1 4  0  img/weapons/axe.png
 #define TX_AXE 286
 
-//287 4 4  0  img/characters/dwarf_guard_success.png
-//288 4 4  0  img/characters/shadows/dwarf_guard_success_shadow.png
-//289 4 4  0  img/characters/elf_guard_success.png
-//290 4 4  0  img/characters/shadows/elf_guard_success_shadow.png
-#define TX_DWARF_GUARD_SUCCESS 287
-#define TX_DWARF_GUARD_SUCCESS_SHADOW 288
-#define TX_ELF_GUARD_SUCCESS 289
-#define TX_ELF_GUARD_SUCCESS_SHADOW 290
-#define TX_HALFLING_GUARD_SUCCESS 291
-#define TX_HALFLING_GUARD_SUCCESS_SHADOW 292
-#define TX_GOBLIN_GUARD_SUCCESS 293
-#define TX_GOBLIN_GUARD_SUCCESS_SHADOW 294
-
-//295 4 3 0 img/actions/guard_buckler_success_front.png
-//296 4 3 0 img/actions/guard_buckler_success_back.png
-//297 4 3 0 img/actions/guard_iron_shield_success_front.png
-//298 4 3 0 img/actions/guard_iron_shield_success_back.png
-//#define TX_GUARD_WOODEN_SHIELD_SUCCESS_FRONT 295
-//#define TX_GUARD_WOODEN_SHIELD_SUCCESS_BACK 296
 #define TX_GUARD_KITE_SHIELD_SUCCESS_FRONT 297
 #define TX_GUARD_KITE_SHIELD_SUCCESS_BACK 298
 
-//299 1 4 0 img/weapons/bow.png
-//#
-//300 4 8 0 img/characters/human_shot.png
-//301 4 8 0 img/characters/shadows/human_shot_shadow.png
-//302 4 8 0 img/characters/orc_shot.png
-//303 4 8 0 img/characters/shadows/orc_shot_shadow.png
-//304 4 8 0 img/characters/dwarf_shot.png
-//305 4 8 0 img/characters/shadows/dwarf_shot_shadow.png
-//306 4 8 0 img/characters/elf_shot.png
-//307 4 8 0 img/characters/shadows/elf_shot_shadow.png
-//308 4 8 0 img/characters/halfling_shot.png
-//309 4 8 0 img/characters/shadows/halfling_shot_shadow.png
-//310 4 8 0 img/characters/goblin_shot.png
-//311 4 8 0 img/characters/shadows/goblin_shot_shadow.png
 #define TX_BOW 299
 
 #define TX_CHAR_HUMAN_SHOT 300
@@ -427,28 +332,12 @@
 #define TX_CHAR_GOBLIN_SHOT 310
 #define TX_CHAR_GOBLIN_SHOT_SHADOW 311
 
-//312 4 8 0 img/actions/shot_bow_f.png
-//313 4 8 0 img/actions/shot_bow_b.png
-//314 4 8 0 img/actions/shot_bow_b_halfling_goblin_dwarf.png
 #define TX_ACTION_SHOT_BOW_F 312
 #define TX_ACTION_SHOT_BOW_B 313
 #define TX_ACTION_SHOT_BOW_B_HALFLING_GOBLIN_DWARF 314
 
-//315 1 4 0 img/items/arrow.png
 #define TX_ARROW 315
 
-//318 4 12 0  img/monsters/warg/warg_idle.png
-//319 4 12 0  img/monsters/warg/shadows/warg_idle_shadow.png
-//320 4  4 0  img/monsters/warg/warg_walk.png
-//321 4  4 0  img/monsters/warg/shadows/warg_walk_shadow.png
-//322 4  4 0  img/monsters/warg/warg_attack.png
-//323 4  4 0  img/monsters/warg/shadows/warg_attack_shadow.png
-//324 4  4 0  img/monsters/warg/warg_dmg.png
-//325 4  4 0  img/monsters/warg/shadows/warg_dmg_shadow.png
-//326 4  4 0  img/monsters/warg/warg_jump.png
-//327 4  4 0  img/monsters/warg/shadows/warg_jump_shadow.png
-//328 1  5 0  img/monsters/warg/warg_die.png
-//329 1  5 0  img/monsters/warg/shadows/warg_die_shadow.png
 #define TX_WARG_IDLE 318
 #define TX_WARG_IDLE_SHADOW 319
 #define TX_WARG_WALK 320
@@ -462,14 +351,6 @@
 #define TX_WARG_DIE 328
 #define TX_WARG_DIE_SHADOW 329
 
-//330 4  8 0  img/monsters/green_slime/SlimeGreenIdle.png
-//331 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenIdle.png
-//332 4  8 0  img/monsters/green_slime/SlimeGreenJumpAttack.png
-//333 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenJumpAttack.png
-//334 4  8 0  img/monsters/green_slime/SlimeGreenDmg.png
-//335 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDmg.png
-//336 4  8 0  img/monsters/green_slime/SlimeGreenDie.png
-//337 4  8 0  img/monsters/green_slime/shadows/ShadowSlimeGreenDie.png
 #define TX_GREEN_SLIME_IDLE 330
 #define TX_GREEN_SLIME_JUMP_ATTACK 332
 #define TX_GREEN_SLIME_DMG 334
@@ -478,47 +359,26 @@
 #define TX_GREEN_SLIME_JUMP_ATTACK_SHADOW 333
 #define TX_GREEN_SLIME_DMG_SHADOW 335
 #define TX_GREEN_SLIME_DIE_SHADOW 337
-//--------------------------------
-//#define TX_WAND_BASIC 338
-//--------------------------------
-//
-//
-//
-// spells (unimplemented)
-//
-//339 1 24 0  img/spells/full_fire.png
-//340 1  8 0  img/spells/cast_fire.png
-//341 1  8 0  img/spells/persist_fire.png
-//342 1  8 0  img/spells/end_fire.png
-//
-//--------------------------------
 
 #define TX_SPELL_FIRE_FULL 339
 #define TX_SPELL_FIRE_CAST 340
 #define TX_SPELL_FIRE_PERSIST 341
 #define TX_SPELL_FIRE_END 342
-//--------------------------------
-//--------------------------------
-//--------------------------------
-// rings
-//--------------------------------
-//--------------------------------
-//--------------------------------
+
 #define TX_RING_GOLD 343
 #define TX_RING_SILVER 344
 #define TX_RING_IRON 345
-//--------------------------------
+
 #define TX_WOODEN_BOX 346
-//--------------------------------
+
 #define TX_WARHAMMER 347
 #define TX_WHIP 348
-//--------------------------------
+
 #define TX_GUARD_TOWER_SHIELD_SUCCESS_FRONT 361
 #define TX_GUARD_TOWER_SHIELD_SUCCESS_BACK 362
-//--------------------------------
 
+//-------------------------------------------------------------------------------
 
-//--------------------------------
 #define COMPANYSCENE 0
 #define TITLESCENE 1
 #define GAMEPLAYSCENE 2
@@ -526,9 +386,7 @@
 #define COMPANYNAME "@evildojo666"
 #define COMPANYFILL "   x  x x   "
 
-//#define DEFAULT_FONT_PATH "fonts/hack.ttf"
-
-#define DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE 16
+//#define DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE 16
 
 #define DEFAULT_DUNGEONFLOOR_WIDTH 8
 #define DEFAULT_DUNGEONFLOOR_HEIGHT 8
