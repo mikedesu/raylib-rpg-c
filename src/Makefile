@@ -14,7 +14,6 @@ WEB_SOURCES=main.cpp \
 gameloader_web.cpp \
 try_entity_attack.cpp \
 try_entity_open_door.cpp \
-try_entity_stairs.cpp \
 manage_inventory.cpp \
 draw_inventory_menu.cpp \
 draw_title_screen.cpp \
@@ -57,7 +56,6 @@ gameloader.o \
 gamestate_inventory.o \
 gamestate.o \
 try_entity_open_door.o \
-try_entity_stairs.o \
 try_entity_attack.o \
 manage_inventory.o \
 draw_inventory_menu.o \
@@ -188,8 +186,6 @@ libdraw.o: libdraw.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
-try_entity_stairs.o: try_entity_stairs.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
 manage_inventory.o: manage_inventory.cpp
