@@ -1,6 +1,6 @@
+#include "draw_sprite.h"
 #include "libdraw_entity_sprite.h"
 #include "libdraw_shield_sprite.h"
-#include "libdraw_sprite.h"
 #include "libdraw_weapon_sprite.h"
 #include "spritegroup.h"
 

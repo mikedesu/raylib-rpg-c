@@ -27,7 +27,7 @@ libdraw_to_texture.cpp \
 libdraw_update_sprite.cpp \
 libdraw_update_sprites.cpp \
 libdraw_dungeon_floor.cpp \
-libdraw_sprite.cpp \
+draw_sprite.cpp \
 shaders.cpp \
 libdraw_weapon_sprite.cpp \
 libdraw_shield_sprite.cpp \
@@ -80,7 +80,7 @@ libdraw_update_sprite.o \
 libdraw_update_sprites.o \
 libdraw_dungeon_floor.o \
 shaders.o \
-libdraw_sprite.o \
+draw_sprite.o \
 libdraw_weapon_sprite.o \
 libdraw_shield_sprite.o \
 libdraw_update_weapon_for_entity.o \
@@ -179,7 +179,7 @@ shaders.o: shaders.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
-libdraw_sprite.o: libdraw_sprite.cpp
+draw_sprite.o: draw_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_weapon_sprite.o: libdraw_weapon_sprite.cpp

@@ -1,10 +1,10 @@
 #include "ComponentTraits.h"
+#include "draw_sprite.h"
 #include "dungeon_tile_type.h"
 #include "entitytype.h"
 #include "get_txkey_for_tiletype.h"
 #include "libdraw_dungeon_floor.h"
 #include "libdraw_player_target_box.h"
-#include "libdraw_sprite.h"
 #include "textureinfo.h"
 #include <algorithm>
 
