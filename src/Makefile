@@ -31,7 +31,6 @@ draw_sprite.cpp \
 shaders.cpp \
 libdraw_update_weapon_for_entity.cpp \
 libdraw_update_shield_for_entity.cpp \
-libdraw_get_shield_sprite.cpp \
 libdraw_player_target_box.cpp \
 camera_lock_on.cpp \
 libdraw.cpp \
@@ -79,7 +78,6 @@ shaders.o \
 draw_sprite.o \
 libdraw_update_weapon_for_entity.o \
 libdraw_update_shield_for_entity.o \
-libdraw_get_shield_sprite.o \
 libdraw_player_target_box.o \
 camera_lock_on.o \
 libdraw_create_spritegroup.o \
@@ -184,8 +182,6 @@ libdraw_update_shield_for_entity.o: libdraw_update_shield_for_entity.cpp
 
 
 
-libdraw_get_shield_sprite.o: libdraw_get_shield_sprite.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
 

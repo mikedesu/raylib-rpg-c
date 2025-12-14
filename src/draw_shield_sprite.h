@@ -1,6 +1,6 @@
 
 #include "gamestate.h"
-#include "libdraw_get_shield_sprite.h"
+#include "get_shield_sprite.h"
 #include "spritegroup.h"
 
 
