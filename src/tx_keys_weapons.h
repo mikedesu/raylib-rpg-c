@@ -1,5 +1,4 @@
 #pragma once
-#include "libgame_defines.h"
 #include "texture_ids.h"
 
 // Weapons
