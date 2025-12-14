@@ -1,56 +1,18 @@
+#pragma once
+
 #include "ComponentTraits.h"
 #include "entitytype.h"
+#include "gamestate.h"
 #include "libdraw_set_sg_is_attacking.h"
-#include "libdraw_update_sprite.h"
 #include "set_sg.h"
+#include "spritegroup.h"
 #include "spritegroup_anim.h"
+#include "update_sprite.h"
+
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
-void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    if (spritegroups.find(id) == spritegroups.end())
-        return;
-    spritegroup_t* sg = spritegroups[id];
-    if (!sg)
-        return;
-    libdraw_update_sprite_ptr(g, id, sg);
-}
-
-
-void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
-    massert(sg, "spritegroup is NULL");
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    auto maybe_sprite_move = g->ct.get<spritemove>(id);
-    if (!maybe_sprite_move.has_value())
-        return;
-    Rectangle sprite_move = g->ct.get<spritemove>(id).value();
-    if (sprite_move.x != 0 || sprite_move.y != 0) {
-        sg->move.x = sprite_move.x;
-        sg->move.y = sprite_move.y;
-        g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
-        entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        massert(type != ENTITY_NONE, "entity type is none");
-        if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-            //race_t race = g_get_race(g, id);
-            //sg->current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
-            //if (loc == RACE_BAT)
-            //    sg->current = SG_ANIM_BAT_IDLE;
-            //else if (race == RACE_GREEN_SLIME)
-            //    sg->current = SG_ANIM_SLIME_IDLE;
-            //else if (race > RACE_NONE && race < RACE_COUNT)
-            //    sg->current = SG_ANIM_NPC_WALK;
-            //else
-            sg->current = SG_ANIM_NPC_WALK;
-        }
-        g->frame_dirty = true;
-    }
-}
-
-
-void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir) {
+static inline void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* group, direction_t dir) {
     massert(g, "gamestate is NULL");
     massert(group != NULL, "group is NULL");
     int old_ctx = group->sprites2->at(group->current)->currentcontext;
@@ -83,7 +45,38 @@ void libdraw_update_sprite_context_ptr(shared_ptr<gamestate> g, spritegroup_t* g
 }
 
 
-void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
+static inline void libdraw_update_sprite_position(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
+    massert(g, "gamestate is NULL");
+    massert(sg, "spritegroup is NULL");
+    massert(id != ENTITYID_INVALID, "entityid is invalid");
+    auto maybe_sprite_move = g->ct.get<spritemove>(id);
+    if (!maybe_sprite_move.has_value())
+        return;
+    Rectangle sprite_move = g->ct.get<spritemove>(id).value();
+    if (sprite_move.x != 0 || sprite_move.y != 0) {
+        sg->move.x = sprite_move.x;
+        sg->move.y = sprite_move.y;
+        g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+        entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+        massert(type != ENTITY_NONE, "entity type is none");
+        if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
+            //race_t race = g_get_race(g, id);
+            //sg->current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
+            //if (loc == RACE_BAT)
+            //    sg->current = SG_ANIM_BAT_IDLE;
+            //else if (race == RACE_GREEN_SLIME)
+            //    sg->current = SG_ANIM_SLIME_IDLE;
+            //else if (race > RACE_NONE && race < RACE_COUNT)
+            //    sg->current = SG_ANIM_NPC_WALK;
+            //else
+            sg->current = SG_ANIM_NPC_WALK;
+        }
+        g->frame_dirty = true;
+    }
+}
+
+
+static inline void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
     minfo2("Begin update sprite ptr: %d", id);
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -131,4 +124,16 @@ void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid id, spritegroup
         const vec3 loc = maybe_loc.value();
         spritegroup_snap_dest(sg, loc.x, loc.y);
     }
+}
+
+
+static inline void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
+    massert(g, "gamestate is NULL");
+    massert(id != ENTITYID_INVALID, "entityid is invalid");
+    if (spritegroups.find(id) == spritegroups.end())
+        return;
+    spritegroup_t* sg = spritegroups[id];
+    if (!sg)
+        return;
+    libdraw_update_sprite_ptr(g, id, sg);
 }

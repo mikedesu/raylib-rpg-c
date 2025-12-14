@@ -1,5 +1,16 @@
 #pragma once
 
 #include "gamestate.h"
+#include "spritegroup.h"
 
-bool check_default_animations(shared_ptr<gamestate> g);
+extern unordered_map<entityid, spritegroup_t*> spritegroups;
+
+static inline bool check_default_animations(shared_ptr<gamestate> g) {
+    massert(g, "gamestate is NULL");
+    for (entityid id = 0; id < g->next_entityid; id++) {
+        spritegroup_t* sg = spritegroups[id];
+        if (sg && sg->current != sg->default_anim)
+            return false;
+    }
+    return true;
+}

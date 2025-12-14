@@ -3,9 +3,9 @@
 #include "gamestate_flag.h"
 #include "handle_dirty_entities.h"
 #include "item.h"
-#include "libdraw_update_sprite.h"
 #include "libdraw_update_sprites.h"
 #include "libgame_defines.h"
+#include "update_sprite.h"
 
 extern Music music;
 extern unordered_map<entityid, spritegroup_t*> spritegroups;

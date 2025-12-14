@@ -12,26 +12,15 @@ CFLAGS ?= # Allow override
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
 gameloader_web.cpp \
-try_entity_attack.cpp \
-try_entity_open_door.cpp \
-manage_inventory.cpp \
 draw_inventory_menu.cpp \
 draw_title_screen.cpp \
 draw_character_creation_screen.cpp \
 libdraw_create_spritegroup.cpp \
-check_default_animations.cpp \
-libdraw_from_texture.cpp \
-libdraw_to_texture.cpp \
-libdraw_update_sprite.cpp \
 libdraw_update_sprites.cpp \
 libdraw_dungeon_floor.cpp \
 draw_sprite.cpp \
-shaders.cpp \
-camera_lock_on.cpp \
 libdraw.cpp \
-try_entity_pickup.cpp \
 liblogic.cpp \
-gamestate_inventory.cpp \
 gamestate.cpp \
 dungeon_floor.cpp \
 dungeon_tile.cpp \
@@ -53,31 +42,19 @@ all: game
 
 OBJ_FILES=main.o \
 gameloader.o \
-gamestate_inventory.o \
 gamestate.o \
-try_entity_open_door.o \
-try_entity_attack.o \
-manage_inventory.o \
 draw_inventory_menu.o \
 draw_title_screen.o \
 draw_character_creation_screen.o \
-check_default_animations.o \
-libdraw_from_texture.o \
-libdraw_to_texture.o \
-libdraw_update_sprite.o \
 libdraw_update_sprites.o \
 libdraw_dungeon_floor.o \
-shaders.o \
 draw_sprite.o \
-camera_lock_on.o \
 libdraw_create_spritegroup.o \
 libdraw.o \
 dungeon_floor.o \
 dungeon_tile.o \
 dungeon_tile.o \
-try_entity_pickup.o \
 liblogic.o \
-
 
 
 game: $(OBJ_FILES)
@@ -93,44 +70,16 @@ gameloader.o: gameloader.cpp
 
 ###################
 
-gamestate_inventory.o: gamestate_inventory.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 gamestate.o: gamestate.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 ###################
 
-try_entity_open_door.o: try_entity_open_door.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-
-
 dungeon_tile.o: dungeon_tile.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 dungeon_floor.o: dungeon_floor.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-
-
-###################
-
-
-check_default_animations.o: check_default_animations.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-libdraw_to_texture.o: libdraw_to_texture.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-
-libdraw_from_texture.o: libdraw_from_texture.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-
-
-
-libdraw_update_sprite.o: libdraw_update_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_update_sprites.o: libdraw_update_sprites.cpp
@@ -139,12 +88,8 @@ libdraw_update_sprites.o: libdraw_update_sprites.cpp
 libdraw_dungeon_floor.o: libdraw_dungeon_floor.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-
-
-
 draw_title_screen.o: draw_title_screen.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
 
 draw_inventory_menu.o: draw_inventory_menu.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
@@ -152,31 +97,7 @@ draw_inventory_menu.o: draw_inventory_menu.cpp
 draw_character_creation_screen.o: draw_character_creation_screen.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-
-
-
-shaders.o: shaders.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-
 draw_sprite.o: draw_sprite.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-camera_lock_on.o: camera_lock_on.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_create_spritegroup.o: libdraw_create_spritegroup.cpp
@@ -184,38 +105,6 @@ libdraw_create_spritegroup.o: libdraw_create_spritegroup.cpp
 
 libdraw.o: libdraw.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-
-
-
-manage_inventory.o: manage_inventory.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-
-
-
-try_entity_attack.o: try_entity_attack.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-try_entity_pickup.o: try_entity_pickup.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 liblogic.o: liblogic.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c
