@@ -5,7 +5,6 @@
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 
-
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
 static inline shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
