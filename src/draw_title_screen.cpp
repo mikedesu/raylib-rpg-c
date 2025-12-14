@@ -1,5 +1,5 @@
 #include "draw_title_screen.h"
-#include "libgame_defines.h"
+//#include "libgame_defines.h"
 #include "libgame_version.h"
 #include "texture_ids.h"
 #include "textureinfo.h"
@@ -148,23 +148,19 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     //ry2 = 0;
     const Rectangle src2 = {rx, ry, -32, 32}, dst2 = {mx2, my2, sw, sw};
 
-    const Texture t4 = txinfo[TX_ACTION_SLASH_AXE_B].texture;
+    const Texture t4 = txinfo[TX_ACTIONS_SLASH_AXE_B].texture;
     DrawTexturePro(t4, src2, dst2, origin, 0.0f, WHITE);
     const Texture t5 = txinfo[TX_CHAR_ORC_ATTACK].texture;
     DrawTexturePro(t5, src2, dst2, origin, 0.0f, WHITE);
-    const Texture t6 = txinfo[TX_ACTION_SLASH_AXE_F].texture;
+    const Texture t6 = txinfo[TX_ACTIONS_SLASH_AXE_F].texture;
     DrawTexturePro(t6, src2, dst2, origin, 0.0f, WHITE);
-
 
     if (!show_menu) {
         //pos = {g->targetwidth / 2.0f - start_measure.x / 2.0f, g->targetheight / 2.0f - sm_font_size / 2.0f};
         //DrawTextPro(GetFontDefault(), start_text, pos, origin, 0, sm_font_size, spacing, WHITE);
-
         // Draw the music text
         pos = {g->targetwidth / 2.0f - start_measure.x / 2.0f, pos.y + sm_font_size + pad * 2};
         DrawText(start_text, pos.x, pos.y, sm_font_size, WHITE);
-
-
         return;
     }
     //const float start_y = frame.y + frame.height - sm_font_size - 10;

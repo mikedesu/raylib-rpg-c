@@ -241,8 +241,8 @@
 // --------------------------------------------------------------------------------
 #define TX_ACTIONS_GUARD_BUCKLER_SUCCESS_FRONT 72
 #define TX_ACTIONS_GUARD_BUCKLER_SUCCESS_BACK 73
-#define TX_ACTION_SLASH_AXE_B 207
-#define TX_ACTION_SLASH_AXE_F 208
+#define TX_ACTIONS_SLASH_AXE_B 207
+#define TX_ACTIONS_SLASH_AXE_F 208
 #define TX_ACTION_SLASH_DAGGER_B 209
 #define TX_ACTION_SLASH_DAGGER_F 210
 #define TX_ACTION_SLASH_SWORD_B 211
