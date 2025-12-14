@@ -29,7 +29,6 @@ libdraw_update_sprites.cpp \
 libdraw_dungeon_floor.cpp \
 draw_sprite.cpp \
 shaders.cpp \
-libdraw_update_weapon_for_entity.cpp \
 libdraw_update_shield_for_entity.cpp \
 libdraw_player_target_box.cpp \
 camera_lock_on.cpp \
@@ -76,7 +75,6 @@ libdraw_update_sprites.o \
 libdraw_dungeon_floor.o \
 shaders.o \
 draw_sprite.o \
-libdraw_update_weapon_for_entity.o \
 libdraw_update_shield_for_entity.o \
 libdraw_player_target_box.o \
 camera_lock_on.o \
@@ -173,8 +171,6 @@ draw_sprite.o: draw_sprite.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
-libdraw_update_weapon_for_entity.o: libdraw_update_weapon_for_entity.cpp 
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 libdraw_update_shield_for_entity.o: libdraw_update_shield_for_entity.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
