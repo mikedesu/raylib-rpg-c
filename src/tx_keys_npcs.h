@@ -1,5 +1,6 @@
 #pragma once
 #include "libgame_defines.h"
+#include "texture_ids.h"
 
 #define TX_HUMAN_COUNT 16
 static int TX_HUMAN_KEYS[TX_HUMAN_COUNT] = {TX_CHAR_HUMAN_IDLE,

@@ -1,5 +1,6 @@
 #pragma once
 #include "libgame_defines.h"
+#include "texture_ids.h"
 
 // Weapons
 #define TX_SWORD_COUNT 3

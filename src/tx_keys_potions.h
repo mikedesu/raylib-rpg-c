@@ -1,5 +1,6 @@
 #pragma once
 #include "libgame_defines.h"
+#include "texture_ids.h"
 
 // Potions
 #define TX_POTION_HP_SMALL_COUNT 1

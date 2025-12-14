@@ -1,8 +1,9 @@
 #pragma once
 
 #include "dungeon_tile_type.h"
-#include "get_txkey_for_tiletype.h"
+//#include "get_txkey_for_tiletype.h"
 #include "libgame_defines.h"
+#include "texture_ids.h"
 
 static inline int get_txkey_for_tiletype(tiletype_t type) {
     int key = -1;

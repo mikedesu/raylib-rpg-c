@@ -1,5 +1,6 @@
 #pragma once
 #include "libgame_defines.h"
+#include "texture_ids.h"
 
 // Shields
 #define TX_BUCKLER_COUNT 3

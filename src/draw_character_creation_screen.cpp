@@ -3,6 +3,7 @@
 #include "libgame_defines.h"
 #include "massert.h"
 #include "race.h"
+#include "texture_ids.h"
 #include "textureinfo.h"
 #include <memory>
 

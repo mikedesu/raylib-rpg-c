@@ -1,6 +1,7 @@
 #include "draw_title_screen.h"
 #include "libgame_defines.h"
 #include "libgame_version.h"
+#include "texture_ids.h"
 #include "textureinfo.h"
 #include <raylib.h>
 

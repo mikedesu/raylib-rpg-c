@@ -1,6 +1,7 @@
 #pragma once
-#include "libgame_defines.h"
 
+#include "libgame_defines.h"
+#include "texture_ids.h"
 
 #define TX_WOLF_COUNT 12
 static int TX_WOLF_KEYS[TX_WOLF_COUNT] = {
