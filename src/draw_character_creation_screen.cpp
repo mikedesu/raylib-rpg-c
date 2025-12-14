@@ -1,5 +1,5 @@
+#include "draw_character_creation_screen.h"
 #include "gamestate.h"
-#include "libdraw_draw_character_creation_screen.h"
 #include "libgame_defines.h"
 #include "massert.h"
 #include "race.h"
@@ -59,28 +59,43 @@ void draw_character_creation_screen(shared_ptr<gamestate> g) {
     Rectangle src = {0, 0, 32, 32};
     //DrawTexturePro(txinfo[TX_HUMAN_IDLE].texture, src, dst, (Vector2){0, 0}, 0.0f, WHITE);
 
-    int tx_key = TX_HUMAN_IDLE;
-    if (g->chara_creation->race == RACE_HUMAN) {
-        tx_key = TX_HUMAN_IDLE;
-    } else if (g->chara_creation->race == RACE_ORC) {
-        tx_key = TX_ORC_IDLE;
-    } else if (g->chara_creation->race == RACE_ELF) {
-        tx_key = TX_ELF_IDLE;
-    } else if (g->chara_creation->race == RACE_DWARF) {
-        tx_key = TX_DWARF_IDLE;
-    } else if (g->chara_creation->race == RACE_HALFLING) {
-        tx_key = TX_HALFLING_IDLE;
-    } else if (g->chara_creation->race == RACE_GOBLIN) {
-        tx_key = TX_GOBLIN_IDLE;
-    } else if (g->chara_creation->race == RACE_GREEN_SLIME) {
-        tx_key = TX_GREEN_SLIME_IDLE;
-    } else if (g->chara_creation->race == RACE_BAT) {
-        tx_key = TX_BAT_IDLE;
-    } else if (g->chara_creation->race == RACE_WOLF) {
-        tx_key = TX_WOLF_IDLE;
-    } else if (g->chara_creation->race == RACE_WARG) {
-        tx_key = TX_WARG_IDLE;
+    int tx_key = TX_CHAR_HUMAN_IDLE;
+
+    switch (g->chara_creation->race) {
+    case RACE_HUMAN: tx_key = TX_CHAR_HUMAN_IDLE; break;
+    case RACE_ORC: tx_key = TX_CHAR_ORC_IDLE; break;
+    case RACE_ELF: tx_key = TX_ELF_IDLE; break;
+    case RACE_DWARF: tx_key = TX_DWARF_IDLE; break;
+    case RACE_HALFLING: tx_key = TX_HALFLING_IDLE; break;
+    case RACE_GOBLIN: tx_key = TX_GOBLIN_IDLE; break;
+    case RACE_GREEN_SLIME: tx_key = TX_GREEN_SLIME_IDLE; break;
+    case RACE_BAT: tx_key = TX_BAT_IDLE; break;
+    case RACE_WOLF: tx_key = TX_WOLF_IDLE; break;
+    case RACE_WARG: tx_key = TX_WARG_IDLE; break;
+    default: break;
     }
+
+    //if (g->chara_creation->race == RACE_HUMAN) {
+    //    tx_key = TX_CHAR_HUMAN_IDLE;
+    //} else if (g->chara_creation->race == RACE_ORC) {
+    //    tx_key = TX_CHAR_ORC_IDLE;
+    //} else if (g->chara_creation->race == RACE_ELF) {
+    //    tx_key = TX_ELF_IDLE;
+    //} else if (g->chara_creation->race == RACE_DWARF) {
+    //    tx_key = TX_DWARF_IDLE;
+    //} else if (g->chara_creation->race == RACE_HALFLING) {
+    //    tx_key = TX_HALFLING_IDLE;
+    //} else if (g->chara_creation->race == RACE_GOBLIN) {
+    //    tx_key = TX_GOBLIN_IDLE;
+    //} else if (g->chara_creation->race == RACE_GREEN_SLIME) {
+    //    tx_key = TX_GREEN_SLIME_IDLE;
+    //} else if (g->chara_creation->race == RACE_BAT) {
+    //    tx_key = TX_BAT_IDLE;
+    //} else if (g->chara_creation->race == RACE_WOLF) {
+    //    tx_key = TX_WOLF_IDLE;
+    //} else if (g->chara_creation->race == RACE_WARG) {
+    //    tx_key = TX_WARG_IDLE;
+    //}
 
 
     DrawTexturePro(txinfo[tx_key].texture, src, dst2, (Vector2){0, 0}, 0.0f, WHITE);

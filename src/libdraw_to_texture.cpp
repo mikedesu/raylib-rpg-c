@@ -1,13 +1,11 @@
+#include "draw_character_creation_screen.h"
 #include "draw_frame_2d.h"
 #include "draw_handle_debug_panel.h"
 #include "draw_hud.h"
 #include "draw_title_screen.h"
-#include "libdraw_draw_character_creation_screen.h"
 #include "libdraw_to_texture.h"
 
 extern RenderTexture2D title_target_texture;
-//extern Rectangle target_src;
-//extern Rectangle target_dest;
 extern RenderTexture2D char_creation_target_texture;
 extern RenderTexture2D hud_target_texture;
 extern RenderTexture2D main_game_target_texture;

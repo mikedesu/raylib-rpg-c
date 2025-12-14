@@ -137,7 +137,7 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     const Rectangle src = {rx, ry, 32, 32};
     const Rectangle dst = {mx, my, sw, sw};
     DrawTexturePro(t1, src, dst, origin, 0.0f, WHITE);
-    const Texture t2 = txinfo[TX_HUMAN_ATTACK].texture;
+    const Texture t2 = txinfo[TX_CHAR_HUMAN_ATTACK].texture;
     DrawTexturePro(t2, src, dst, origin, 0.0f, WHITE);
     const Texture t3 = txinfo[TX_ACTION_SLASH_SWORD_F].texture;
     DrawTexturePro(t3, src, dst, origin, 0.0f, WHITE);
@@ -149,7 +149,7 @@ void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
 
     const Texture t4 = txinfo[TX_ACTION_SLASH_AXE_B].texture;
     DrawTexturePro(t4, src2, dst2, origin, 0.0f, WHITE);
-    const Texture t5 = txinfo[TX_ORC_ATTACK].texture;
+    const Texture t5 = txinfo[TX_CHAR_ORC_ATTACK].texture;
     DrawTexturePro(t5, src2, dst2, origin, 0.0f, WHITE);
     const Texture t6 = txinfo[TX_ACTION_SLASH_AXE_F].texture;
     DrawTexturePro(t6, src2, dst2, origin, 0.0f, WHITE);

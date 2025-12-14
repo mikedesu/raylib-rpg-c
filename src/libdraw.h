@@ -2,11 +2,11 @@
 
 #include "gamestate.h"
 
+#include "draw_character_creation_screen.h"
 #include "draw_hud.h"
 #include "draw_message_history.h"
 #include "draw_title_screen.h"
 #include "libdraw_create_spritegroup.h"
-#include "libdraw_draw_character_creation_screen.h"
 #include "load_textures.h"
 #include "unload_textures.h"
 

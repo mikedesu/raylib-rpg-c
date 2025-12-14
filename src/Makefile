@@ -19,7 +19,7 @@ manage_inventory.cpp \
 update_player_tiles_explored.cpp \
 draw_inventory_menu.cpp \
 draw_title_screen.cpp \
-libdraw_draw_character_creation_screen.cpp \
+draw_character_creation_screen.cpp \
 libdraw_create_spritegroup.cpp \
 check_default_animations.cpp \
 libdraw_from_texture.cpp \
@@ -69,7 +69,7 @@ manage_inventory.o \
 update_player_tiles_explored.o \
 draw_inventory_menu.o \
 draw_title_screen.o \
-libdraw_draw_character_creation_screen.o \
+draw_character_creation_screen.o \
 check_default_animations.o \
 libdraw_from_texture.o \
 libdraw_to_texture.o \
@@ -163,7 +163,7 @@ draw_title_screen.o: draw_title_screen.cpp
 draw_inventory_menu.o: draw_inventory_menu.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-libdraw_draw_character_creation_screen.o: libdraw_draw_character_creation_screen.cpp
+draw_character_creation_screen.o: draw_character_creation_screen.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
