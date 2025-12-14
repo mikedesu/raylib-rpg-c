@@ -16,7 +16,6 @@ try_entity_attack.cpp \
 try_entity_open_door.cpp \
 try_entity_stairs.cpp \
 manage_inventory.cpp \
-update_player_tiles_explored.cpp \
 draw_inventory_menu.cpp \
 draw_title_screen.cpp \
 draw_character_creation_screen.cpp \
@@ -61,7 +60,6 @@ try_entity_open_door.o \
 try_entity_stairs.o \
 try_entity_attack.o \
 manage_inventory.o \
-update_player_tiles_explored.o \
 draw_inventory_menu.o \
 draw_title_screen.o \
 draw_character_creation_screen.o \
@@ -197,8 +195,6 @@ try_entity_stairs.o: try_entity_stairs.cpp
 manage_inventory.o: manage_inventory.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
-update_player_tiles_explored.o: update_player_tiles_explored.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 
 
