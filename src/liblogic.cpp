@@ -16,6 +16,7 @@
 #include "inputstate.h"
 #include "liblogic.h"
 #include "massert.h"
+#include "place_doors.h"
 #include "update_debug_panel_buffer.h"
 #include "update_player_state.h"
 #include "update_player_tiles_explored.h"
@@ -75,20 +76,20 @@ void liblogic_init(shared_ptr<gamestate> g) {
     //create_door_at_with(g, (vec3){12, 9, 1}, [](shared_ptr<gamestate> g, entityid id) {});
 
     //minfo("BEGIN CREATING DOORS");
-    for (int z = 0; z < (int)g->dungeon->floors->size(); z++) {
-        auto df = d_get_floor(g->dungeon, z);
-        for (int x = 0; x < df->width; x++) {
-            for (int y = 0; y < df->height; y++) {
-                const vec3 loc = {x, y, z};
-                auto tile = df_tile_at(df, loc);
-                if (!tile || !tile->can_have_door)
-                    continue;
-                create_door_at_with(g, loc, [](shared_ptr<gamestate> g, entityid id) {});
-            }
-        }
-    }
+    //for (int z = 0; z < (int)g->dungeon->floors->size(); z++) {
+    //    auto df = d_get_floor(g->dungeon, z);
+    //    for (int x = 0; x < df->width; x++) {
+    //        for (int y = 0; y < df->height; y++) {
+    //            const vec3 loc = {x, y, z};
+    //            auto tile = df_tile_at(df, loc);
+    //            if (!tile || !tile->can_have_door)
+    //                continue;
+    //            create_door_at_with(g, loc, [](shared_ptr<gamestate> g, entityid id) {});
+    //        }
+    //    }
+    //}
     //minfo("END CREATING DOORS");
-
+    place_doors(g);
 
     //create_door_at(g, (vec3){14, 12, 0});
     //create_door_at(g, (vec3){12, 9, 1});
