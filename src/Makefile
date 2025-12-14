@@ -29,7 +29,6 @@ libdraw_update_sprites.cpp \
 libdraw_dungeon_floor.cpp \
 draw_sprite.cpp \
 shaders.cpp \
-libdraw_player_target_box.cpp \
 camera_lock_on.cpp \
 libdraw.cpp \
 try_entity_pickup.cpp \
@@ -74,7 +73,6 @@ libdraw_update_sprites.o \
 libdraw_dungeon_floor.o \
 shaders.o \
 draw_sprite.o \
-libdraw_player_target_box.o \
 camera_lock_on.o \
 libdraw_create_spritegroup.o \
 libdraw.o \
@@ -181,8 +179,6 @@ draw_sprite.o: draw_sprite.cpp
 
 
 
-libdraw_player_target_box.o: libdraw_player_target_box.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 camera_lock_on.o: camera_lock_on.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
