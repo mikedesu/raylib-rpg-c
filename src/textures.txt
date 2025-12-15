@@ -130,7 +130,7 @@
 #
 #
 #
-74 1 4 0 img/shields/buckler.png
+74 1 4 0 img/shield/buckler.png
 #
 #
 #
@@ -183,7 +183,7 @@
 #117 1 1  0  img/switches/wall-switch-down-00.png
 118 1 1  0  img/tiles/upstairs_00.png
 119 1 1  0  img/tiles/downstairs_00.png
-120 1 4  0  img/weapons/sword.png
+120 1 4  0  img/weapon/sword.png
 #
 #
 #
@@ -290,13 +290,13 @@
 #
 #
 #
-197 1 4  0  img/weapons/dagger.png
-198 1 4  0  img/weapons/two_handed_sword.png
+197 1 4  0  img/weapon/dagger.png
+198 1 4  0  img/weapon/two_handed_sword.png
 #
 #
 #
-199 1 4  0  img/shields/kite_shield.png
-200 1 4  0  img/shields/wooden_tower_shield.png
+199 1 4  0  img/shield/kite_shield.png
+200 1 4  0  img/shield/wooden_tower_shield.png
 #
 #
 #
@@ -373,7 +373,7 @@
 284 1 1  0  img/door/wooden_open_00.png
 285 1 4  0  img/items/key_basic.png
 #
-286 1 4  0  img/weapons/axe.png
+286 1 4  0  img/weapon/axe.png
 #
 287 4 3  0  img/char/dwarf_guard_success.png
 288 4 4  0  img/char/dwarf_guard_success_shadow.png
@@ -390,7 +390,7 @@
 297 4 3 0 img/actions/guard_kite_shield_success_front.png
 298 4 3 0 img/actions/guard_kite_shield_success_back.png
 #
-299 1 4 0 img/weapons/bow.png
+299 1 4 0 img/weapon/bow.png
 #
 300 4 8 0 img/char/human_shot.png
 301 4 8 0 img/char/human_shot_shadow.png
@@ -456,8 +456,8 @@
 346 1  1 0  img/prop/wooden-box.png
 #
 #
-347 1  4 0  img/weapons/warhammer.png
-348 1  4 0  img/weapons/flail.png
+347 1  4 0  img/weapon/warhammer.png
+348 1  4 0  img/weapon/flail.png
 #
 349  4 4  0  img/char/human_attack_thrust.png
 350  4 4  0  img/char/elf_attack_thrust.png
