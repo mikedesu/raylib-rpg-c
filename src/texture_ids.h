@@ -260,16 +260,16 @@
 // Monsters
 // --------------------------------------------------------------------------------
 
-#define TX_BAT_IDLE 177
-#define TX_BAT_IDLE_SHADOW 178
-#define TX_BAT_ATTACK 179
-#define TX_BAT_ATTACK_SHADOW 180
-#define TX_BAT_DMG 181
-#define TX_BAT_DMG_SHADOW 182
-#define TX_BAT_SLEEP 183
-#define TX_BAT_SLEEP_SHADOW 184
-#define TX_BAT_DIE 316
-#define TX_BAT_DIE_SHADOW 317
+#define TX_MONSTER_BAT_IDLE 177
+#define TX_MONSTER_BAT_IDLE_SHADOW 178
+#define TX_MONSTER_BAT_ATTACK 179
+#define TX_MONSTER_BAT_ATTACK_SHADOW 180
+#define TX_MONSTER_BAT_DMG 181
+#define TX_MONSTER_BAT_DMG_SHADOW 182
+#define TX_MONSTER_BAT_SLEEP 183
+#define TX_MONSTER_BAT_SLEEP_SHADOW 184
+#define TX_MONSTER_BAT_DIE 316
+#define TX_MONSTER_BAT_DIE_SHADOW 317
 
 #define TX_WOLF_IDLE 185
 #define TX_WOLF_IDLE_SHADOW 186

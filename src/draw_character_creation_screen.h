@@ -67,7 +67,7 @@ static inline void draw_character_creation_screen(shared_ptr<gamestate> g) {
     case RACE_HALFLING: tx_key = TX_CHAR_HALFLING_IDLE; break;
     case RACE_GOBLIN: tx_key = TX_CHAR_GOBLIN_IDLE; break;
     case RACE_GREEN_SLIME: tx_key = TX_GREEN_SLIME_IDLE; break;
-    case RACE_BAT: tx_key = TX_BAT_IDLE; break;
+    case RACE_BAT: tx_key = TX_MONSTER_BAT_IDLE; break;
     case RACE_WOLF: tx_key = TX_WOLF_IDLE; break;
     case RACE_WARG: tx_key = TX_WARG_IDLE; break;
     default: break;
