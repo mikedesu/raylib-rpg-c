@@ -13,7 +13,6 @@ WEB_CC = emcc
 WEB_SOURCES=main.cpp \
 libdraw.cpp \
 liblogic.cpp \
-gamestate.cpp \
 
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
@@ -31,7 +30,6 @@ all: game
 # Desktop build
 
 OBJ_FILES=main.o \
-gamestate.o \
 libdraw.o \
 liblogic.o \
 
@@ -42,13 +40,6 @@ game: $(OBJ_FILES)
 	./log_build_stats.sh
 
 main.o: main.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-
-###################
-
-
-gamestate.o: gamestate.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 ###################
