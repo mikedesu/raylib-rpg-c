@@ -275,18 +275,18 @@
 #
 #
 #
-185 4 12 0  img/monster/wolf/wolf_idle.png
-186 4 12 0  img/monster/wolf/wolf_idle_shadow.png
-187 4  4 0  img/monster/wolf/wolf_walk.png
-188 4  4 0  img/monster/wolf/wolf_walk_shadow.png
-189 4  4 0  img/monster/wolf/wolf_attack.png
-190 4  4 0  img/monster/wolf/wolf_attack_shadow.png
-191 4  4 0  img/monster/wolf/wolf_dmg.png
-192 4  4 0  img/monster/wolf/wolf_dmg_shadow.png
-193 4  4 0  img/monster/wolf/wolf_jump.png
-194 4  4 0  img/monster/wolf/wolf_jump_shadow.png
-195 1  5 0  img/monster/wolf/wolf_die.png
-196 1  5 0  img/monster/wolf/wolf_die_shadow.png
+185 4 12 0  img/monster/wolf_idle.png
+186 4 12 0  img/monster/wolf_idle_shadow.png
+187 4  4 0  img/monster/wolf_walk.png
+188 4  4 0  img/monster/wolf_walk_shadow.png
+189 4  4 0  img/monster/wolf_attack.png
+190 4  4 0  img/monster/wolf_attack_shadow.png
+191 4  4 0  img/monster/wolf_dmg.png
+192 4  4 0  img/monster/wolf_dmg_shadow.png
+193 4  4 0  img/monster/wolf_jump.png
+194 4  4 0  img/monster/wolf_jump_shadow.png
+195 1  5 0  img/monster/wolf_die.png
+196 1  5 0  img/monster/wolf_die_shadow.png
 #
 #
 #
@@ -411,27 +411,27 @@
 #
 315 1 4 0 img/item/arrow.png
 #
-318 4 12 0  img/monster/warg/warg_idle.png
-319 4 12 0  img/monster/warg/shadows/warg_idle_shadow.png
-320 4  4 0  img/monster/warg/warg_walk.png
-321 4  4 0  img/monster/warg/shadows/warg_walk_shadow.png
-322 4  4 0  img/monster/warg/warg_attack.png
-323 4  4 0  img/monster/warg/shadows/warg_attack_shadow.png
-324 4  4 0  img/monster/warg/warg_dmg.png
-325 4  4 0  img/monster/warg/shadows/warg_dmg_shadow.png
-326 4  4 0  img/monster/warg/warg_jump.png
-327 4  4 0  img/monster/warg/shadows/warg_jump_shadow.png
-328 1  5 0  img/monster/warg/warg_die.png
-329 1  5 0  img/monster/warg/shadows/warg_die_shadow.png
+318 4 12 0  img/monster/warg_idle.png
+319 4 12 0  img/monster/warg_idle_shadow.png
+320 4  4 0  img/monster/warg_walk.png
+321 4  4 0  img/monster/warg_walk_shadow.png
+322 4  4 0  img/monster/warg_attack.png
+323 4  4 0  img/monster/warg_attack_shadow.png
+324 4  4 0  img/monster/warg_dmg.png
+325 4  4 0  img/monster/warg_dmg_shadow.png
+326 4  4 0  img/monster/warg_jump.png
+327 4  4 0  img/monster/warg_jump_shadow.png
+328 1  5 0  img/monster/warg_die.png
+329 1  5 0  img/monster/warg_die_shadow.png
 #
-330 4  8 0  img/monster/green_slime/SlimeGreenIdle.png
-332 4  4 0  img/monster/green_slime/SlimeGreenJumpAttack.png
-334 4  4 0  img/monster/green_slime/SlimeGreenDmg.png
-336 1  8 0  img/monster/green_slime/SlimeGreenDie.png
-331 4  8 0  img/monster/green_slime/shadows/ShadowSlimeIdle.png
-333 4  4 0  img/monster/green_slime/shadows/ShadowSlimeJump.png
-335 4  4 0  img/monster/green_slime/shadows/ShadowSlimeDmg.png
-337 1  8 0  img/monster/green_slime/shadows/ShadowSlimeDie.png
+330 4  8 0  img/monster/SlimeGreenIdle.png
+332 4  4 0  img/monster/SlimeGreenJumpAttack.png
+334 4  4 0  img/monster/SlimeGreenDmg.png
+336 1  8 0  img/monster/SlimeGreenDie.png
+331 4  8 0  img/monster/ShadowSlimeIdle.png
+333 4  4 0  img/monster/ShadowSlimeJump.png
+335 4  4 0  img/monster/ShadowSlimeDmg.png
+337 1  8 0  img/monster/ShadowSlimeDie.png
 #
 #338 1  4 0  img/wands/basic-wand.png
 #
