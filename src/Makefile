@@ -11,7 +11,6 @@ CFLAGS ?= # Allow override
 # Web build setup
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
-gameloader_web.cpp \
 libdraw.cpp \
 liblogic.cpp \
 gamestate.cpp \
