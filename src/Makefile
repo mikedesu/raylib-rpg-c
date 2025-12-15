@@ -11,7 +11,6 @@ CFLAGS ?= # Allow override
 # Web build setup
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
-libdraw.cpp \
 liblogic.cpp \
 
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
@@ -30,7 +29,6 @@ all: game
 # Desktop build
 
 OBJ_FILES=main.o \
-libdraw.o \
 liblogic.o \
 
 
@@ -44,8 +42,6 @@ main.o: main.cpp
 
 ###################
 
-libdraw.o: libdraw.cpp 
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 liblogic.o: liblogic.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c
