@@ -4,8 +4,8 @@ from PIL import Image
 
 def main():
 
-    outfile_images_path = "textures2.txt"
-    outfile_header_path = "textures2.h"
+    outfile_images_path = "textures.txt"
+    outfile_header_path = "texture_ids.h"
 
     outfile_images = open(outfile_images_path, "w")
     outfile_header = open(outfile_header_path, "w")

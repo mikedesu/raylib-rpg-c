@@ -1,480 +1,477 @@
-# txkey contexts frames dodither path
-#0  1 1  1  img/tiles/dirt_00.png
-#
-#
-# atm there are 12 total human sprite animations
-#
-#
-1  4 16 0  img/char/human_idle.png
-2  4 16 0  img/char/human_idle_shadow.png
-3  4 4  0  img/char/human_walk.png
-4  4 4  0  img/char/human_walk_shadow.png
-5  4 4  0  img/char/human_attack_slash.png
-6  4 4  0  img/char/human_attack_slash_shadow.png
-7  4 4  0  img/char/human_jump.png
-8  4 4  0  img/char/human_jump_shadow.png
-9  1 7  0  img/char/human_spindie.png
-#
-#
-#
-10 1 7  0  img/char/human_spindie_shadow.png
-11 1 12 0  img/char/human_souldie.png
-12 1 12 0  img/char/human_souldie_shadow.png
-66 4 4  0  img/char/human_guard.png
-67 4 4  0  img/char/human_guard_shadow.png
-68 4 3  0  img/char/human_guard_success.png
-69 4 3  0  img/char/human_guard_success_shadow.png
-75 4 4  0  img/char/human_dmg.png
-76 4 4  0  img/char/human_dmg_shadow.png
-#
-#
-# atm there are 14 total orc sprite animations
-#
-#
-13  4 16 0  img/char/orc/orc_idle.png
-14  4 16 0  img/char/orc/orc_idle_shadow.png
-15  4 4  0  img/char/orc/orc_walk.png
-16  4 4  0  img/char/orc/orc_walk_shadow.png
-17  4 4  0  img/char/orc/orc_attack_slash.png
-18  4 4  0  img/char/orc/orc_attack_slash_shadow.png
-19  4 6  0  img/char/orc/orc_chargedattack.png
-20  4 6  0  img/char/orc/orc_chargedattack_shadow.png
-21  4 4  0  img/char/orc/orc_jump.png
-22  4 4  0  img/char/orc/orc_jump_shadow.png
-23  1 7  0  img/char/orc/orc_die2.png
-24  1 7  0  img/char/orc/orc_die2_shadow.png
-25  4 4  0  img/char/orc/orc_dmg.png
-26  4 4  0  img/char/orc/orc_dmg_shadow.png
-213 4 4  0  img/char/orc/orc_guard.png
-214 4 4  0  img/char/orc/orc_guard_shadow.png
-215 4 3  0  img/char/orc/orc_guard_success.png
-216 4 3  0  img/char/orc/orc_guard_success_shadow.png
-#
-#
-#
-27 1 1  0  img/tiles/stone_00.png
-28 1 1  0  img/tiles/stone_01.png
-29 1 1  0  img/tiles/stone_02.png
-30 1 1  0  img/tiles/stone_03.png
-31 1 1  0  img/tiles/stone_04.png
-32 1 1  0  img/tiles/stone_05.png
-33 1 1  0  img/tiles/stone_06.png
-34 1 1  0  img/tiles/stone_07.png
-35 1 1  0  img/tiles/stone_08.png
-36 1 1  0  img/tiles/stone_09.png
-37 1 1  0  img/tiles/stone_10.png
-38 1 1  0  img/tiles/stone_11.png
-#
-#
-#
-41 1 1  0  img/tiles/wall_stone_00.png
-42 1 1  0  img/tiles/wall_stone_01.png
-#43 1 1  0  img/tiles/stonewall_02.png
-#44 1 1  0  img/tiles/stonewall_03.png
-#
-#
-#
-#
-#45 1 1  0  img/tiles/stonewall_04.png
-#46 1 1  0  img/tiles/stonewall_05.png
-#47 1 1  0  img/tiles/stonewall_06.png
-#48 1 1  0  img/tiles/stonewall_07.png
-#49 1 1  0  img/tiles/stonewall_08.png
-#50 1 1  0  img/tiles/stonewall_09.png
-#51 1 1  0  img/tiles/stonewall_10.png
-#52 1 1  0  img/tiles/stonewall_11.png
-#53 1 1  0  img/tiles/stonewall_12.png
-#54 1 1  0  img/tiles/stonewall_13.png
-#55 1 1  0  img/tiles/stonewall_14.png
-#217 1 1  0  img/tiles/stonewall_15.png
-#218 1 1  0  img/tiles/stonewall_16.png
-#219 1 1  0  img/tiles/stonewall_17.png
-#220 1 1  0  img/tiles/stonewall_18.png
-#221 1 1  0  img/tiles/stonewall_19.png
-#222 1 1  0  img/tiles/stonewall_20.png
-#223 1 1  0  img/tiles/stonewall_21.png
-#224 1 1  0  img/tiles/stonewall_22.png
-#225 1 1  0  img/tiles/stonewall_23.png
-#226 1 1  0  img/tiles/stonewall_24.png
-#227 1 1  0  img/tiles/stonewall_25.png
-#228 1 1  0  img/tiles/stonewall_26.png
-#229 1 1  0  img/tiles/stonewall_27.png
-#230 1 1  0  img/tiles/stonewall_28.png
-#231 1 1  0  img/tiles/stonewall_29.png
-#232 1 1  0  img/tiles/stonewall_30.png
-#233 1 1  0  img/tiles/stonewall_31.png
-#234 1 1  0  img/tiles/stonewall_32.png
-#235 1 1  0  img/tiles/stonewall_33.png
-#236 1 1  0  img/tiles/stonewall_34.png
-#237 1 1  0  img/tiles/stonewall_35.png
-#
-#
-#
-56 1 1  0  img/tiles/grass_00.png
-57 1 1  0  img/tiles/grass_01.png
-58 1 1  0  img/tiles/grass_02.png
-59 1 1  0  img/tiles/grass_03.png
-60 1 1  0  img/tiles/grass_04.png
-#61  1 1  0 img/tiles/dirt_01.png
-#62  1 1  0 img/tiles/dirt_02.png
-#63  1 1  0 img/tiles/dirt_03.png
-#64  1 1  0 img/tiles/dirt_04.png
-#65  1 1  0 img/tiles/dirt_05.png
-#
-#
-#
-#70 4 4 0 img/actions/guard__front.png
-#71 4 4 0 img/actions/guard_wooden_shield_back.png
-72 4 3 0 img/actions/guard_buckler_success_front.png
-73 4 3 0 img/actions/guard_buckler_success_back.png
-#
-#
-#
-74 1 4 0 img/shield/buckler.png
-#
-#
-#
-77 1 1  0  img/tiles/grass_05.png
-78 1 1  0  img/tiles/grass_06.png
-79 1 1  0  img/tiles/grass_07.png
-80 1 1  0  img/tiles/grass_08.png
-81 1 1  0  img/tiles/grass_09.png
-82 1 1  0  img/tiles/grass_10.png
-83 1 1  0  img/tiles/grass_11.png
-84 1 1  0  img/tiles/grass_12.png
-85 1 1  0  img/tiles/grass_13.png
-86 1 1  0  img/tiles/grass_14.png
-87 1 1  0  img/tiles/grass_15.png
-88 1 1  0  img/tiles/grass_16.png
-89 1 1  0  img/tiles/grass_17.png
-90 1 1  0  img/tiles/grass_18.png
-91 1 1  0  img/tiles/grass_19.png
-#92 1 1  0  img/tiles/dirt_grass_00.png
-#93 1 1  0  img/tiles/dirt_grass_01.png
-#94 1 1  0  img/tiles/dirt_grass_02.png
-#95 1 1  0  img/tiles/dirt_grass_03.png
-#96 1 1  0  img/tiles/dirt_grass_04.png
-#97 1 1  0  img/tiles/dirt_grass_05.png
-#98 1 1  0  img/tiles/dirt_grass_06.png
-#99 1 1  0  img/tiles/dirt_grass_07.png
-#100 1 1  0  img/tiles/dirt_grass_08.png
-#101 1 1  0  img/tiles/dirt_grass_09.png
-#102 1 1  0  img/tiles/dirt_grass_10.png
-#103 1 1  0  img/tiles/dirt_grass_11.png
-#104 1 1  0  img/tiles/dirt_grass_12.png
-#105 1 1  0  img/tiles/dirt_grass_13.png
-#106 1 1  0  img/tiles/dirt_grass_14.png
-#107 1 1  0  img/tiles/water_00.png
-#108 1 1  0  img/tiles/water_01.png
-#109 1 1  0  img/tiles/dirt_06.png
-#110 1 1  0  img/tiles/dirt_07.png
-#111 1 1  0  img/tiles/dirt_08.png
-#
-#
-#
-#112 1 1  0  img/switches/pressure-plate-up-00.png
-#113 1 1  0  img/switches/pressure-plate-down-00.png
-#
-#
-#
-#114 1 1  0  img/tiles/stone_trap_off_00.png
-#115 1 1  0  img/tiles/stone_trap_on_00.png
-#116 1 1  0  img/switches/wall-switch-up-00.png
-#117 1 1  0  img/switches/wall-switch-down-00.png
-118 1 1  0  img/tiles/upstairs_00.png
-119 1 1  0  img/tiles/downstairs_00.png
-120 1 4  0  img/weapon/sword.png
-#
-#
-#
-121 4 16 0  img/char/dwarf_idle.png
-122 4 16 0  img/char/dwarf_idle_shadow.png
-123 4 4  0  img/char/dwarf_walk.png
-124 4 4  0  img/char/dwarf_walk_shadow.png
-125 4 4  0  img/char/dwarf_attack_slash.png
-126 4 4  0  img/char/dwarf_attack_slash_shadow.png
-127 4 4  0  img/char/dwarf_jump.png
-128 4 4  0  img/char/dwarf_jump_shadow.png
-129 1 7  0  img/char/dwarf_spindie2.png
-130 1 7  0  img/char/dwarf_spindie2_shadow.png
-#131 1 12 0  img/char/dwarf_souldie.png
-#132 1 12 0  img/char/dwarf_souldie_shadow.png
-133 4 4  0  img/char/dwarf_dmg.png
-134 4 4  0  img/char/dwarf_dmg_shadow.png
-#
-#
-#
-135 4 16 0  img/char/elf_idle.png
-136 4 16 0  img/char/elf_idle_shadow.png
-137 4 4  0  img/char/elf_walk.png
-138 4 4  0  img/char/elf_walk_shadow.png
-139 4 4  0  img/char/elf_attack_slash.png
-140 4 4  0  img/char/elf_attack_slash_shadow.png
-141 4 4  0  img/char/elf_jump.png
-142 4 4  0  img/char/elf_jump_shadow.png
-143 1 7  0  img/char/elf_spindie2.png
-144 1 7  0  img/char/elf_spindie2_shadow.png
-#145 1 12 0  img/char/elf_souldie.png
-#146 1 12 0  img/char/elf_souldie_shadow.png
-147 4 4  0  img/char/elf_dmg.png
-148 4 4  0  img/char/elf_dmg_shadow.png
-#
-#
-#
-149 4 16 0  img/char/halfling_idle.png
-150 4 16 0  img/char/halfling_idle_shadow.png
-151 4 4  0  img/char/halfling_walk.png
-152 4 4  0  img/char/halfling_walk_shadow.png
-153 4 4  0  img/char/halfling_attack_slash.png
-154 4 4  0  img/char/halfling_attack_slash_shadow.png
-155 4 4  0  img/char/halfling_jump.png
-156 4 4  0  img/char/halfling_jump_shadow.png
-157 4 4  0  img/char/halfling_dmg.png
-158 4 4  0  img/char/halfling_dmg_shadow.png
-159 1 7  0  img/char/halfling_spindie2.png
-160 1 7  0  img/char/halfling_spindie2_shadow.png
-#
-#
-#
-#161 1 12 0  img/char/halfling_souldie.png
-#162 1 12 0  img/char/halfling_souldie_shadow.png
-#
-#
-#
-163 4 16 0  img/char/goblin_idle.png
-164 4 16 0  img/char/goblin_idle_shadow.png
-165 4 4  0  img/char/goblin_walk.png
-166 4 4  0  img/char/goblin_walk_shadow.png
-167 4 4  0  img/char/goblin_attack_slash.png
-168 4 4  0  img/char/goblin_attack_slash_shadow.png
-169 4 4  0  img/char/goblin_jump.png
-170 4 4  0  img/char/goblin_jump_shadow.png
-171 4 4  0  img/char/goblin_dmg.png
-172 4 4  0  img/char/goblin_dmg_shadow.png
-173 1 7  0  img/char/goblin_spindie2.png
-174 1 7  0  img/char/goblin_spindie2_shadow.png
-#
-#
-#
-#173 1 12 0  img/char/goblin_souldie.png
-#174 1 12 0  img/char/goblin_souldie_shadow.png
-#
-#
-#
-#
-177 4 2  0  img/monster/bat_idle.png
-178 4 2  0  img/monster/bat_idle_shadow.png
-179 4 4  0  img/monster/bat_attack.png
-180 4 4  0  img/monster/bat_attack_shadow.png
-181 4 4  0  img/monster/bat_dmg.png
-182 4 4  0  img/monster/bat_dmg_shadow.png
-183 3 8  0  img/monster/bat_sleep.png
-184 3 8  0  img/monster/bat_sleep_shadow.png
-316 1 7  0  img/monster/bat_die.png
-317 1 7  0  img/monster/bat_die_shadow.png
-#
-#
-#
-185 4 12 0  img/monster/wolf_idle.png
-186 4 12 0  img/monster/wolf_idle_shadow.png
-187 4  4 0  img/monster/wolf_walk.png
-188 4  4 0  img/monster/wolf_walk_shadow.png
-189 4  4 0  img/monster/wolf_attack.png
-190 4  4 0  img/monster/wolf_attack_shadow.png
-191 4  4 0  img/monster/wolf_dmg.png
-192 4  4 0  img/monster/wolf_dmg_shadow.png
-193 4  4 0  img/monster/wolf_jump.png
-194 4  4 0  img/monster/wolf_jump_shadow.png
-195 1  5 0  img/monster/wolf_die.png
-196 1  5 0  img/monster/wolf_die_shadow.png
-#
-#
-#
-197 1 4  0  img/weapon/dagger.png
-198 1 4  0  img/weapon/two_handed_sword.png
-#
-#
-#
-199 1 4  0  img/shield/kite_shield.png
-200 1 4  0  img/shield/wooden_tower_shield.png
-#
-#
-#
-201 1 4  0  img/item/potion_hp_small.png
-202 1 4  0  img/item/potion_hp_medium.png
-203 1 4  0  img/item/potion_hp_large.png
-204 1 4  0  img/item/potion_mp_small.png
-205 1 4  0  img/item/potion_mp_medium.png
-206 1 4  0  img/item/potion_mp_large.png
-#
-#
-#
-207 4 4  0  img/actions/slash_axe_b.png
-208 4 4  0  img/actions/slash_axe_f.png
-209 4 4  0  img/actions/slash_dagger_b.png
-210 4 4  0  img/actions/slash_dagger_f.png
-211 4 4  0  img/actions/slash_sword_b.png
-212 4 4  0  img/actions/slash_sword_f.png
-#
-#
-#
-238 1 1  0  img/tiles/stone_dirt_ul_00.png
-239 1 1  0  img/tiles/stone_dirt_u_00.png
-240 1 1  0  img/tiles/stone_dirt_ur_00.png
-241 1 1  0  img/tiles/stone_dirt_l_00.png
-242 1 1  0  img/tiles/stone_dirt_c_00.png
-243 1 1  0  img/tiles/stone_dirt_r_00.png
-244 1 1  0  img/tiles/stone_dirt_dl_00.png
-245 1 1  0  img/tiles/stone_dirt_d_00.png
-246 1 1  0  img/tiles/stone_dirt_dr_00.png
-#
-247 1 1  0  img/tiles/stone_dirt_ul_01.png
-248 1 1  0  img/tiles/stone_dirt_u_01.png
-249 1 1  0  img/tiles/stone_dirt_ur_01.png
-250 1 1  0  img/tiles/stone_dirt_l_01.png
-251 1 1  0  img/tiles/stone_dirt_c_01.png
-252 1 1  0  img/tiles/stone_dirt_r_01.png
-253 1 1  0  img/tiles/stone_dirt_dl_01.png
-254 1 1  0  img/tiles/stone_dirt_d_01.png
-255 1 1  0  img/tiles/stone_dirt_dr_01.png
-#
-256 1 1  0  img/tiles/stone_dirt_ul_02.png
-257 1 1  0  img/tiles/stone_dirt_u_02.png
-258 1 1  0  img/tiles/stone_dirt_ur_02.png
-259 1 1  0  img/tiles/stone_dirt_l_02.png
-260 1 1  0  img/tiles/stone_dirt_c_02.png
-261 1 1  0  img/tiles/stone_dirt_r_02.png
-262 1 1  0  img/tiles/stone_dirt_dl_02.png
-263 1 1  0  img/tiles/stone_dirt_d_02.png
-264 1 1  0  img/tiles/stone_dirt_dr_02.png
-#
-265 1 1  0  img/tiles/stone_dirt_ul_03.png
-266 1 1  0  img/tiles/stone_dirt_u_03.png
-267 1 1  0  img/tiles/stone_dirt_ur_03.png
-268 1 1  0  img/tiles/stone_dirt_dl_03.png
-269 1 1  0  img/tiles/stone_dirt_d_03.png
-270 1 1  0  img/tiles/stone_dirt_dr_03.png
-#
-271 1 1  0  img/tiles/stone_dirt_ul_04.png
-272 1 1  0  img/tiles/stone_dirt_u_04.png
-273 1 1  0  img/tiles/stone_dirt_ur_04.png
-274 1 1  0  img/tiles/stone_dirt_dl_04.png
-275 1 1  0  img/tiles/stone_dirt_d_04.png
-276 1 1  0  img/tiles/stone_dirt_dr_04.png
-#
-277 1 1  0  img/tiles/stone_dirt_ul_05.png
-278 1 1  0  img/tiles/stone_dirt_u_05.png
-279 1 1  0  img/tiles/stone_dirt_ur_05.png
-280 1 1  0  img/tiles/stone_dirt_dl_05.png
-281 1 1  0  img/tiles/stone_dirt_d_05.png
-282 1 1  0  img/tiles/stone_dirt_dr_05.png
-#
-283 1 1  0  img/door/wooden_closed_00.png
-284 1 1  0  img/door/wooden_open_00.png
-285 1 4  0  img/item/key_basic.png
-#
-286 1 4  0  img/weapon/axe.png
-#
-287 4 3  0  img/char/dwarf_guard_success.png
-288 4 4  0  img/char/dwarf_guard_success_shadow.png
-289 4 3  0  img/char/elf_guard_success.png
-290 4 4  0  img/char/elf_guard_success_shadow.png
-#
-291 4 3  0  img/char/halfling_guard_success.png
-292 4 4  0  img/char/halfling_guard_success_shadow.png
-293 4 3  0  img/char/goblin_guard_success.png
-294 4 4  0  img/char/goblin_guard_success_shadow.png
-#
-#295 4 3 0 img/actions/guard_wooden_shield_success_front.png
-#296 4 3 0 img/actions/guard_wooden_shield_success_back.png
-297 4 3 0 img/actions/guard_kite_shield_success_front.png
-298 4 3 0 img/actions/guard_kite_shield_success_back.png
-#
-299 1 4 0 img/weapon/bow.png
-#
-300 4 8 0 img/char/human_shot.png
-301 4 8 0 img/char/human_shot_shadow.png
-#302 4 8 0 img/char/orc_shot.png
-#303 4 8 0 img/char/orc_shot_shadow.png
-304 4 8 0 img/char/dwarf_shot.png
-305 4 8 0 img/char/dwarf_shot_shadow.png
-306 4 8 0 img/char/elf_shot.png
-307 4 8 0 img/char/elf_shot_shadow.png
-308 4 8 0 img/char/halfling_shot.png
-309 4 8 0 img/char/halfling_shot_shadow.png
-310 4 8 0 img/char/goblin_shot.png
-311 4 8 0 img/char/goblin_shot_shadow.png
-#
-312 4 8 0 img/actions/shot_bow_f.png
-313 4 8 0 img/actions/shot_bow_b.png
-314 4 8 0 img/actions/shot_bow_b_halfling_goblin_dwarf.png
-#
-315 1 4 0 img/item/arrow.png
-#
-318 4 12 0  img/monster/warg_idle.png
-319 4 12 0  img/monster/warg_idle_shadow.png
-320 4  4 0  img/monster/warg_walk.png
-321 4  4 0  img/monster/warg_walk_shadow.png
-322 4  4 0  img/monster/warg_attack.png
-323 4  4 0  img/monster/warg_attack_shadow.png
-324 4  4 0  img/monster/warg_dmg.png
-325 4  4 0  img/monster/warg_dmg_shadow.png
-326 4  4 0  img/monster/warg_jump.png
-327 4  4 0  img/monster/warg_jump_shadow.png
-328 1  5 0  img/monster/warg_die.png
-329 1  5 0  img/monster/warg_die_shadow.png
-#
-330 4  8 0  img/monster/SlimeGreenIdle.png
-332 4  4 0  img/monster/SlimeGreenJumpAttack.png
-334 4  4 0  img/monster/SlimeGreenDmg.png
-336 1  8 0  img/monster/SlimeGreenDie.png
-331 4  8 0  img/monster/ShadowSlimeIdle.png
-333 4  4 0  img/monster/ShadowSlimeJump.png
-335 4  4 0  img/monster/ShadowSlimeDmg.png
-337 1  8 0  img/monster/ShadowSlimeDie.png
-#
-#338 1  4 0  img/wands/basic-wand.png
-#
-339 1 24 0  img/spell/fire_full.png
-340 1  8 0  img/spell/fire_cast.png
-341 1  8 0  img/spell/fire_persist.png
-342 1  8 0  img/spell/fire_end.png
-#
-#
-# ####  #  #  #####  #   #  #   #  #####    #    #   #
-# #     #  #  #      #  #    # #   #       # #   #   #
-# ####  #  #  #      ###      #    #####  #   #  #####
-# #     #  #  #      #  #     #    #      #####  #   #
-# #     ####  #####  #   #    #    #####  #   #  #   #
-#
-343 1  4 0  img/ring/gold.png
-344 1  4 0  img/ring/silver.png
-345 1  4 0  img/ring/iron.png
-#
-#
-#
-346 1  1 0  img/box/wooden.png
-#
-#
-347 1  4 0  img/weapon/warhammer.png
-348 1  4 0  img/weapon/flail.png
-#
-349  4 4  0  img/char/human_attack_thrust.png
-350  4 4  0  img/char/elf_attack_thrust.png
-351  4 4  0  img/char/dwarf_attack_thrust.png
-352  4 4  0  img/char/halfling_attack_thrust.png
-353  4 4  0  img/char/orc_attack_thrust.png
-354  4 4  0  img/char/goblin_attack_thrust.png
-#
-355  4 4  0  img/char/human_attack_thrust_shadow.png
-356  4 4  0  img/char/elf_attack_thrust_shadow.png
-357  4 4  0  img/char/dwarf_attack_thrust_shadow.png
-358  4 4  0  img/char/halfling_attack_thrust_shadow.png
-359  4 4  0  img/char/orc_attack_thrust_shadow.png
-360  4 4  0  img/char/goblin_attack_thrust_shadow.png
-#
-361  4 3  0  img/actions/guard_tower_shield_success_front.png
-362  4 3  0  img/actions/guard_tower_shield_success_back.png
-#
-#
-#
+0 1 24 0 img/spell/fire_full.png
+1 1 8 0 img/spell/fire_cast.png
+2 1 8 0 img/spell/fire_persist.png
+3 1 8 0 img/spell/fire_end.png
+4 1 1 0 img/door/wooden_open_01.png
+5 1 1 0 img/door/wooden_open_00.png
+6 1 1 0 img/door/wooden_closed_01.png
+7 1 1 0 img/door/wooden_closed_00.png
+8 1 1 0 img/tiles/grass_15.png
+9 1 1 0 img/tiles/stone_grass_08.png
+10 1 1 0 img/tiles/grass_12.png
+11 1 1 0 img/tiles/town_dirt_00.png
+12 1 1 0 img/tiles/upstairs_00.png
+13 1 1 0 img/tiles/stone_10.png
+14 1 1 0 img/tiles/stone_grass_06.png
+15 1 1 0 img/tiles/dirt_grass_11.png
+16 1 1 0 img/tiles/stone_grass_01.png
+17 1 1 0 img/tiles/stone_dirt_dl_05.png
+18 1 1 0 img/tiles/town_dirt_stone_11.png
+19 1 1 0 img/tiles/stone_trap_on_00.png
+20 1 1 0 img/tiles/stone_dirt_dr_03.png
+21 1 1 0 img/tiles/town_dirt_grass_13.png
+22 1 1 0 img/tiles/stone_dirt_l_02.png
+23 1 1 0 img/tiles/stone_dirt_dr_04.png
+24 1 1 0 img/tiles/town_dirt_grass_14.png
+25 1 1 0 img/tiles/stone_dirt_dl_02.png
+26 1 1 0 img/tiles/town_dirt_stone_16.png
+27 1 1 0 img/tiles/stone_dirt_u_01.png
+28 1 1 0 img/tiles/dirt_05.png
+29 1 1 0 img/tiles/dirt_02.png
+30 1 1 0 img/tiles/town_wall_stone_00.png
+31 1 1 0 img/tiles/stone_dirt_ur_05.png
+32 1 4 0 img/tiles/water_01.png
+33 1 1 0 img/tiles/stone_dirt_ul_03.png
+34 1 1 0 img/tiles/stone_dirt_ul_04.png
+35 1 1 0 img/tiles/town_dirt_stone_09.png
+36 1 1 0 img/tiles/stone_dirt_ur_02.png
+37 1 1 0 img/tiles/town_dirt_grass_05.png
+38 1 1 0 img/tiles/town_dirt_stone_07.png
+39 1 1 0 img/tiles/downstairs_00.png
+40 1 1 0 img/tiles/town_dirt_stone_00.png
+41 1 1 0 img/tiles/town_dirt_grass_02.png
+42 1 1 0 img/tiles/stone_08.png
+43 1 1 0 img/tiles/stone_trap_off_00.png
+44 1 1 0 img/tiles/dirt_grass_07.png
+45 1 1 0 img/tiles/town_interior_floor_01.png
+46 1 1 0 img/tiles/stone_dirt_d_00.png
+47 1 1 0 img/tiles/stone_grass_10.png
+48 1 1 0 img/tiles/dirt_grass_00.png
+49 1 1 0 img/tiles/stone_dirt_c_02.png
+50 1 1 0 img/tiles/grass_03.png
+51 1 1 0 img/tiles/stone_01.png
+52 1 1 0 img/tiles/stone_06.png
+53 1 1 0 img/tiles/dirt_grass_09.png
+54 1 1 0 img/tiles/grass_04.png
+55 1 1 0 img/tiles/dirt_03.png
+56 1 1 0 img/tiles/dirt_04.png
+57 1 1 0 img/tiles/stone_dirt_u_00.png
+58 1 1 0 img/tiles/stone_dirt_dr_05.png
+59 1 1 0 img/tiles/town_dirt_stone_17.png
+60 1 1 0 img/tiles/stone_dirt_dl_03.png
+61 1 1 0 img/tiles/town_dirt_stone_10.png
+62 1 1 0 img/tiles/stone_dirt_dl_04.png
+63 1 1 0 img/tiles/stone_dirt_r_02.png
+64 1 1 0 img/tiles/stone_dirt_dr_02.png
+65 1 1 0 img/tiles/town_dirt_grass_12.png
+66 1 1 0 img/tiles/stone_grass_00.png
+67 1 1 0 img/tiles/stone_grass_07.png
+68 1 1 0 img/tiles/dirt_grass_10.png
+69 1 1 0 img/tiles/stone_grass_09.png
+70 1 1 0 img/tiles/grass_13.png
+71 1 1 0 img/tiles/stone_11.png
+72 1 1 0 img/tiles/grass_14.png
+73 1 1 0 img/tiles/stone_07.png
+74 1 1 0 img/tiles/dirt_grass_08.png
+75 1 1 0 img/tiles/grass_05.png
+76 1 1 0 img/tiles/grass_02.png
+77 1 1 0 img/tiles/stone_00.png
+78 1 1 0 img/tiles/dirt_grass_01.png
+79 1 1 0 img/tiles/stone_09.png
+80 1 1 0 img/tiles/town_interior_floor_00.png
+81 1 1 0 img/tiles/dirt_grass_06.png
+82 1 1 0 img/tiles/stone_dirt_d_01.png
+83 1 1 0 img/tiles/stone_grass_11.png
+84 1 1 0 img/tiles/town_dirt_stone_01.png
+85 1 1 0 img/tiles/town_dirt_grass_03.png
+86 1 1 0 img/tiles/town_dirt_grass_04.png
+87 1 1 0 img/tiles/town_dirt_stone_06.png
+88 1 1 0 img/tiles/stone_dirt_ul_05.png
+89 1 1 0 img/tiles/town_dirt_stone_08.png
+90 1 1 0 img/tiles/stone_dirt_ur_03.png
+91 1 1 0 img/tiles/stone_dirt_ur_04.png
+92 1 4 0 img/tiles/water_00.png
+93 1 1 0 img/tiles/stone_dirt_ul_02.png
+94 1 1 0 img/tiles/stone_dirt_c_00.png
+95 1 1 0 img/tiles/grass_01.png
+96 1 1 0 img/tiles/stone_03.png
+97 1 1 0 img/tiles/wall_stone_00.png
+98 1 1 0 img/tiles/stone_04.png
+99 1 1 0 img/tiles/grass_06.png
+100 1 1 0 img/tiles/stone_dirt_d_02.png
+101 1 1 0 img/tiles/dirt_grass_05.png
+102 1 1 0 img/tiles/grass_08.png
+103 1 1 0 img/tiles/stone_grass_12.png
+104 1 1 0 img/tiles/stone_dirt_d_05.png
+105 1 1 0 img/tiles/dirt_grass_02.png
+106 1 1 0 img/tiles/town_dirt_grass_07.png
+107 1 1 0 img/tiles/town_dirt_stone_05.png
+108 1 1 0 img/tiles/town_dirt_stone_02.png
+109 1 1 0 img/tiles/town_dirt_grass_00.png
+110 1 1 0 img/tiles/stone_dirt_ul_01.png
+111 1 1 0 img/tiles/town_dirt_grass_09.png
+112 1 1 0 img/tiles/stone_dirt_ur_00.png
+113 1 1 0 img/tiles/stone_dirt_u_03.png
+114 1 1 0 img/tiles/dirt_07.png
+115 1 1 0 img/tiles/stone_dirt_u_04.png
+116 1 1 0 img/tiles/dirt_00.png
+117 1 1 0 img/tiles/town_dirt_stone_13.png
+118 1 1 0 img/tiles/stone_dirt_r_01.png
+119 1 1 0 img/tiles/town_dirt_grass_11.png
+120 1 1 0 img/tiles/stone_dirt_dr_01.png
+121 1 1 0 img/tiles/stone_dirt_l_00.png
+122 1 1 0 img/tiles/stone_dirt_dl_00.png
+123 1 1 0 img/tiles/town_dirt_stone_14.png
+124 1 1 0 img/tiles/town_stone_00.png
+125 1 1 0 img/tiles/stone_grass_04.png
+126 1 1 0 img/tiles/dirt_grass_13.png
+127 1 1 0 img/tiles/grass_19.png
+128 1 1 0 img/tiles/stone_grass_03.png
+129 1 1 0 img/tiles/dirt_grass_14.png
+130 1 1 0 img/tiles/grass_17.png
+131 1 1 0 img/tiles/grass_10.png
+132 1 1 0 img/tiles/stone_12.png
+133 1 1 0 img/tiles/town_dirt_grass_08.png
+134 1 1 0 img/tiles/stone_dirt_ur_01.png
+135 1 1 0 img/tiles/stone_dirt_ul_00.png
+136 1 1 0 img/tiles/town_dirt_stone_03.png
+137 1 1 0 img/tiles/town_dirt_grass_01.png
+138 1 1 0 img/tiles/town_dirt_grass_06.png
+139 1 1 0 img/tiles/town_dirt_stone_04.png
+140 1 1 0 img/tiles/stone_dirt_d_04.png
+141 1 1 0 img/tiles/dirt_grass_03.png
+142 1 1 0 img/tiles/stone_dirt_d_03.png
+143 1 1 0 img/tiles/dirt_grass_04.png
+144 1 1 0 img/tiles/grass_09.png
+145 1 1 0 img/tiles/stone_grass_13.png
+146 1 1 0 img/tiles/stone_05.png
+147 1 1 0 img/tiles/grass_07.png
+148 1 1 0 img/tiles/stone_dirt_c_01.png
+149 1 1 0 img/tiles/grass_00.png
+150 1 1 0 img/tiles/stone_02.png
+151 1 1 0 img/tiles/wall_stone_01.png
+152 1 1 0 img/tiles/grass_11.png
+153 1 1 0 img/tiles/grass_16.png
+154 1 1 0 img/tiles/grass_18.png
+155 1 1 0 img/tiles/stone_grass_02.png
+156 1 1 0 img/tiles/stone_grass_05.png
+157 1 1 0 img/tiles/dirt_grass_12.png
+158 1 1 0 img/tiles/stone_dirt_l_01.png
+159 1 1 0 img/tiles/town_dirt_stone_15.png
+160 1 1 0 img/tiles/stone_dirt_dl_01.png
+161 1 1 0 img/tiles/town_stone_01.png
+162 1 1 0 img/tiles/dirt_08.png
+163 1 1 0 img/tiles/town_dirt_stone_12.png
+164 1 1 0 img/tiles/stone_dirt_r_00.png
+165 1 1 0 img/tiles/town_dirt_grass_10.png
+166 1 1 0 img/tiles/stone_dirt_dr_00.png
+167 1 1 0 img/tiles/dirt_01.png
+168 1 1 0 img/tiles/stone_dirt_u_05.png
+169 1 1 0 img/tiles/dirt_06.png
+170 1 1 0 img/tiles/stone_dirt_u_02.png
+171 1 1 0 img/switches/wall_switch_up_00.png
+172 1 1 0 img/switches/pressure_plate_down_00.png
+173 1 1 0 img/switches/wall_switch_down_00.png
+174 1 1 0 img/switches/pressure_plate_00.png
+175 1 1 0 img/switches/pressure_plate_down_01.png
+176 1 1 0 img/switches/lever_right_00.png
+177 1 1 0 img/switches/wall_switch_center_00.png
+178 1 1 0 img/switches/lever_left_00.png
+179 1 1 0 img/switches/lever_center_00.png
+180 1 1 0 img/switches/pressure_plate_up_01.png
+181 1 1 0 img/switches/pressure_plate_up_00.png
+182 1 4 0 img/gems/emerald.png
+183 1 4 0 img/gems/ruby.png
+184 1 4 0 img/gems/diamond.png
+185 1 4 0 img/gems/sapphire.png
+186 0 0 0 img/tile_etchings/summoning_circle_sheet.png
+187 1 4 0 img/shield/buckler.png
+188 1 4 0 img/shield/kite_shield.png
+189 1 4 0 img/shield/wooden_tower_shield.png
+190 1 4 0 img/item/arrow.png
+191 1 8 0 img/item/torch.png
+192 1 1 0 img/item/sack_00.png
+193 1 4 0 img/item/potion_hp_medium.png
+194 1 4 0 img/item/key_basic.png
+195 1 4 0 img/item/potion_mp_small.png
+196 1 4 0 img/item/potion_mp_large.png
+197 1 4 0 img/item/potion_hp_large.png
+198 1 4 0 img/item/potion_hp_small.png
+199 1 4 0 img/item/potion_mp_medium.png
+200 1 4 0 img/ring/silver.png
+201 1 4 0 img/ring/iron.png
+202 1 4 0 img/ring/gold.png
+203 1 1 0 img/gui/icons/heart_00.png
+204 1 1 0 img/gui/selectors/green_00.png
+205 1 1 0 img/gui/selectors/green_01.png
+206 1 1 0 img/gui/selectors/green_02.png
+207 1 1 0 img/gui/selectors/green_03.png
+208 1 1 0 img/gui/inventory/item_slot_00.png
+209 4 8 0 img/char/elf_shot_shadow.png
+210 1 12 0 img/char/goblin_souldie_shadow.png
+211 4 3 0 img/char/halfling_guard_success_shadow.png
+212 4 4 0 img/char/dwarf_jump_shadow.png
+213 4 8 0 img/char/halfling_shot_shadow.png
+214 4 4 0 img/char/human_attack_shadow.png
+215 1 7 0 img/char/elf_spindie.png
+216 4 4 0 img/char/dwarf_dmg_shadow.png
+217 4 4 0 img/char/goblin_guard_shadow.png
+218 4 3 0 img/char/orc_attack_thrust_shadow.png
+219 4 3 0 img/char/goblin_attack_thrust.png
+220 4 4 0 img/char/human_guard.png
+221 1 12 0 img/char/orc_die_shadow.png
+222 4 4 0 img/char/goblin_walk.png
+223 4 4 0 img/char/dwarf_walk.png
+224 4 4 0 img/char/halfling_walk_shadow.png
+225 4 16 0 img/char/dwarf_idle_shadow.png
+226 3 6 0 img/char/elf_chargedattack_shadow.png
+227 3 6 0 img/char/dwarf2_chargedattack.png
+228 4 4 0 img/char/orc_dmg_shadow.png
+229 4 16 0 img/char/human_idle.png
+230 4 6 0 img/char/dwarf_mining.png
+231 4 4 0 img/char/elf_walk_shadow.png
+232 4 16 0 img/char/elf_idle.png
+233 4 4 0 img/char/orc_attack_slash.png
+234 1 7 0 img/char/halfling_spindie.png
+235 3 6 0 img/char/goblin_chargedattack_shadow.png
+236 4 6 0 img/char/goblin_mining.png
+237 4 4 0 img/char/halfling_jump_shadow.png
+238 4 4 0 img/char/halfling_attack_slash_shadow.png
+239 1 7 0 img/char/halfling_spindie_shadow.png
+240 4 4 0 img/char/elf_jump.png
+241 4 4 0 img/char/elf_jump_shadow.png
+242 4 4 0 img/char/goblin_attack_slash.png
+243 4 4 0 img/char/human_jump.png
+244 4 8 0 img/char/dwarf_shot_shadow.png
+245 4 3 0 img/char/dwarf_attack_thrust_shadow.png
+246 4 4 0 img/char/goblin_attack_slash_shadow.png
+247 4 3 0 img/char/goblin_guard_success.png
+248 4 4 0 img/char/dwarf2_attack.png
+249 4 4 0 img/char/dwarf_walk_shadow.png
+250 4 16 0 img/char/halfling_idle_shadow.png
+251 3 6 0 img/char/goblin_chargedattack.png
+252 1 7 0 img/char/human_spindie.png
+253 4 16 0 img/char/elf_idle_shadow.png
+254 4 4 0 img/char/orc_guard_shadow.png
+255 4 4 0 img/char/human_attack.png
+256 4 4 0 img/char/elf_dmg.png
+257 1 7 0 img/char/orc_die2.png
+258 4 3 0 img/char/human_attack_thrust.png
+259 1 12 0 img/char/human_souldie.png
+260 4 4 0 img/char/goblin_attack_shadow.png
+261 4 4 0 img/char/elf_attack_slash.png
+262 4 4 0 img/char/halfling_walk.png
+263 4 4 0 img/char/dwarf2_walk.png
+264 4 4 0 img/char/human_attack_slash.png
+265 4 4 0 img/char/goblin_dmg_shadow.png
+266 4 16 0 img/char/goblin_idle_shadow.png
+267 3 6 0 img/char/human_chargedattack_shadow.png
+268 4 8 0 img/char/human_shot.png
+269 4 4 0 img/char/orc_guard.png
+270 4 8 0 img/char/elf_shot.png
+271 4 4 0 img/char/dwarf_guard.png
+272 4 3 0 img/char/dwarf_guard_success_shadow.png
+273 4 4 0 img/char/goblin_jump_shadow.png
+274 1 12 0 img/char/halfling_souldie_shadow.png
+275 4 4 0 img/char/goblin_dmg.png
+276 4 4 0 img/char/goblin_walk_shadow.png
+277 4 4 0 img/char/elf_guard_shadow.png
+278 4 4 0 img/char/halfling_dmg.png
+279 4 4 0 img/char/dwarf_attack_slash_shadow.png
+280 4 4 0 img/char/human_guard_shadow.png
+281 4 3 0 img/char/halfling_attack_thrust_shadow.png
+282 4 4 0 img/char/elf_guard.png
+283 4 6 0 img/char/orc_mining.png
+284 4 8 0 img/char/goblin_shot_shadow.png
+285 4 4 0 img/char/halfling_dmg_shadow.png
+286 4 4 0 img/char/dwarf2_dmg.png
+287 4 3 0 img/char/orc_guard_success_shadow.png
+288 4 4 0 img/char/orc_dmg.png
+289 1 7 0 img/char/goblin_spindie_shadow.png
+290 4 3 0 img/char/human_guard_success.png
+291 4 4 0 img/char/halfling_attack.png
+292 4 6 0 img/char/elf_mining.png
+293 4 4 0 img/char/orc_walk.png
+294 4 3 0 img/char/halfling_attack_thrust.png
+295 4 3 0 img/char/human_attack_thrust_shadow.png
+296 4 4 0 img/char/halfling_jump.png
+297 4 16 0 img/char/orc_idle.png
+298 4 4 0 img/char/dwarf2_jump.png
+299 4 3 0 img/char/goblin_guard_success_shadow.png
+300 1 7 0 img/char/goblin_spindie.png
+301 4 4 0 img/char/human_dmg.png
+302 4 4 0 img/char/halfling_attack_slash.png
+303 4 4 0 img/char/orc_attack.png
+304 3 6 0 img/char/elf_chargedattack.png
+305 1 12 0 img/char/elf_souldie_shadow.png
+306 4 4 0 img/char/dwarf_attack_slash.png
+307 4 4 0 img/char/elf_attack.png
+308 4 3 0 img/char/elf_guard_success.png
+309 4 6 0 img/char/halfling_mining.png
+310 4 4 0 img/char/halfling_guard.png
+311 3 6 0 img/char/halfling_chargedattack_shadow.png
+312 4 4 0 img/char/dwarf_attack_shadow.png
+313 4 3 0 img/char/elf_attack_thrust.png
+314 1 7 0 img/char/human_spindie_shadow.png
+315 4 8 0 img/char/dwarf_shot.png
+316 4 4 0 img/char/halfling_guard_shadow.png
+317 4 6 0 img/char/mining_shadow.png
+318 4 4 0 img/char/elf_dmg_shadow.png
+319 4 4 0 img/char/human_attack_slash_shadow.png
+320 4 4 0 img/char/orc_attack_slash_shadow.png
+321 4 3 0 img/char/elf_guard_success_shadow.png
+322 1 7 0 img/char/dwarf2_spindie2.png
+323 4 4 0 img/char/orc_attack_shadow.png
+324 4 16 0 img/char/halfling_idle.png
+325 4 4 0 img/char/goblin_guard.png
+326 4 4 0 img/char/human_dmg_shadow.png
+327 4 16 0 img/char/dwarf2_idle.png
+328 3 6 0 img/char/halfling_chargedattack.png
+329 4 4 0 img/char/orc_jump.png
+330 4 8 0 img/char/goblin_shot.png
+331 4 4 0 img/char/dwarf_guard_shadow.png
+332 4 3 0 img/char/halfling_guard_success.png
+333 4 3 0 img/char/orc_guard_success.png
+334 4 4 0 img/char/goblin_attack.png
+335 4 4 0 img/char/human_jump_shadow.png
+336 4 8 0 img/char/orc_shot_shadow.png
+337 4 3 0 img/char/elf_attack_thrust_shadow.png
+338 4 4 0 img/char/goblin_jump.png
+339 3 6 0 img/char/orc_chargedattack.png
+340 4 8 0 img/char/orc_shot.png
+341 4 4 0 img/char/halfling_attack_shadow.png
+342 4 16 0 img/char/human_idle_shadow.png
+343 4 3 0 img/char/dwarf_guard_success.png
+344 1 12 0 img/char/orc_die.png
+345 4 4 0 img/char/dwarf_jump.png
+346 1 12 0 img/char/dwarf2_spindie.png
+347 1 12 0 img/char/human_souldie_shadow.png
+348 4 4 0 img/char/orc_walk_shadow.png
+349 4 6 0 img/char/human_mining.png
+350 3 6 0 img/char/orc_chargedattack_shadow.png
+351 3 6 0 img/char/dwarf_chargedattack.png
+352 4 4 0 img/char/elf_walk.png
+353 1 7 0 img/char/elf_spindie_shadow.png
+354 4 4 0 img/char/human_walk.png
+355 1 7 0 img/char/orc_die2_shadow.png
+356 4 4 0 img/char/elf_attack_shadow.png
+357 4 3 0 img/char/dwarf_attack_thrust.png
+358 4 8 0 img/char/human_shot_shadow.png
+359 4 4 0 img/char/orc_jump_shadow.png
+360 4 16 0 img/char/dwarf_idle.png
+361 1 7 0 img/char/dwarf_spindie_shadow.png
+362 4 16 0 img/char/goblin_idle.png
+363 4 3 0 img/char/goblin_attack_thrust_shadow.png
+364 4 4 0 img/char/human_walk_shadow.png
+365 4 4 0 img/char/elf_attack_slash_shadow.png
+366 1 7 0 img/char/dwarf_spindie.png
+367 4 3 0 img/char/human_guard_success_shadow.png
+368 4 16 0 img/char/orc_idle_shadow.png
+369 4 4 0 img/char/dwarf_attack.png
+370 4 4 0 img/char/dwarf_dmg.png
+371 4 8 0 img/char/halfling_shot.png
+372 4 3 0 img/char/orc_attack_thrust.png
+373 3 6 0 img/char/dwarf_chargedattack_shadow.png
+374 1 1 0 img/chest/open_00.png
+375 1 1 0 img/chest/closed_00.png
+376 1 4 0 img/weapon/bow.png
+377 1 4 0 img/weapon/long_sword.png
+378 1 4 0 img/weapon/warhammer.png
+379 1 4 0 img/weapon/arrow.png
+380 1 4 0 img/weapon/two_handed_sword.png
+381 1 4 0 img/weapon/axe.png
+382 1 4 0 img/weapon/flail.png
+383 1 4 0 img/weapon/dagger.png
+384 1 4 0 img/weapon/pick_axe.png
+385 1 4 0 img/weapon/sword.png
+386 1 1 0 img/prop/wooden_table_00.png
+387 4 1 0 img/prop/wooden_chair_00.png
+388 1 1 0 img/prop/banner_01.png
+389 1 1 0 img/prop/wooden_barrel_open_top_water.png
+390 1 1 0 img/prop/torch_00.png
+391 1 1 0 img/prop/wooden_table_01.png
+392 1 1 0 img/prop/wooden_barrel_open_top_empty.png
+393 1 1 0 img/prop/candle_00.png
+394 1 1 0 img/prop/banner_00.png
+395 4 1 0 img/prop/white_statue_down_00.png
+396 1 1 0 img/prop/jar_00.png
+397 1 1 0 img/prop/wooden_box_open_top_empty.png
+398 1 1 0 img/prop/wooden_box_open_top_watery.png
+399 4 1 0 img/prop/white_statue_00.png
+400 1 1 0 img/prop/banner_02.png
+401 1 1 0 img/prop/plate_00.png
+402 1 1 0 img/prop/wooden_chair_down_00.png
+403 4 2 0 img/monster/bat_idle.png
+404 4 8 0 img/monster/green_slime_idle.png
+405 4 4 0 img/monster/warg_attack.png
+406 4 4 0 img/monster/green_slime_dmg.png
+407 1 7 0 img/monster/bat_die.png
+408 4 12 0 img/monster/wolf_idle.png
+409 4 4 0 img/monster/warg_dmg.png
+410 4 4 0 img/monster/wolf_jump.png
+411 1 7 0 img/monster/bat_die_shadow.png
+412 4 4 0 img/monster/green_slime_jump_attack.png
+413 4 4 0 img/monster/bat_dmg_shadow.png
+414 4 4 0 img/monster/warg_walk.png
+415 4 4 0 img/monster/wolf_dmg.png
+416 4 2 0 img/monster/bat_idle_shadow.png
+417 4 4 0 img/monster/wolf_walk_shadow.png
+418 4 4 0 img/monster/green_slime_dmg_shadow.png
+419 4 4 0 img/monster/green_slime_jump_attack_shadow.png
+420 1 8 0 img/monster/green_slime_die_shadow.png
+421 4 12 0 img/monster/wolf_idle_shadow.png
+422 4 8 0 img/monster/green_slime_idle_shadow.png
+423 4 4 0 img/monster/bat_attack.png
+424 4 4 0 img/monster/wolf_attack_shadow.png
+425 4 4 0 img/monster/wolf_jump_shadow.png
+426 3 5 0 img/monster/bat_sleep_shadow.png
+427 1 5 0 img/monster/warg_die_shadow.png
+428 1 5 0 img/monster/warg_die.png
+429 3 5 0 img/monster/bat_sleep.png
+430 4 4 0 img/monster/warg_dmg_shadow.png
+431 1 5 0 img/monster/wolf_die.png
+432 4 4 0 img/monster/warg_walk_shadow.png
+433 1 8 0 img/monster/green_slime_die.png
+434 4 4 0 img/monster/wolf_attack.png
+435 4 4 0 img/monster/warg_jump_shadow.png
+436 4 4 0 img/monster/bat_dmg.png
+437 4 12 0 img/monster/warg_idle_shadow.png
+438 4 12 0 img/monster/warg_idle.png
+439 1 5 0 img/monster/wolf_die_shadow.png
+440 4 4 0 img/monster/bat_attack_shadow.png
+441 4 4 0 img/monster/warg_attack_shadow.png
+442 4 4 0 img/monster/wolf_dmg_shadow.png
+443 4 4 0 img/monster/wolf_walk.png
+444 4 4 0 img/monster/warg_jump.png
+445 1 4 0 img/amulets/amulet_iron.png
+446 1 4 0 img/armor_feet/shoes_leather.png
+447 1 4 0 img/armor_body/shirt_cloth.png
+448 1 4 0 img/armor_body/plate_iron.png
+449 1 4 0 img/food/burger.png
+450 1 4 0 img/food/coffee.png
+451 1 1 0 img/box/wooden.png
+452 0 0 0 img/runes/wunjo.png
+453 0 0 0 img/runes/kenaz.png
+454 0 0 0 img/runes/ansuz.png
+455 0 0 0 img/runes/thurisaz.png
+456 0 0 0 img/runes/fehu.png
+457 0 0 0 img/runes/raidho.png
+458 0 0 0 img/runes/gebo.png
+459 0 0 0 img/runes/uruz.png
+460 4 4 0 img/actions/slash_sword_f.png
+461 4 4 0 img/actions/slash_axe_b.png
+462 4 8 0 img/actions/shot_bow_f.png
+463 4 4 0 img/actions/guard_wooden_shield_back.png
+464 4 3 0 img/actions/guard_buckler_success_back.png
+465 4 4 0 img/actions/slash_dagger_f.png
+466 4 3 0 img/actions/guard_tower_shield_success_back.png
+467 4 3 0 img/actions/guard_buckler_success_front.png
+468 4 3 0 img/actions/guard_tower_shield_success_front.png
+469 4 8 0 img/actions/shot_bow_b_halfling_goblin_dwarf.png
+470 4 4 0 img/actions/slash_dagger_b.png
+471 4 4 0 img/actions/guard_wooden_shield_front.png
+472 4 3 0 img/actions/guard_kite_shield_success_front.png
+473 4 8 0 img/actions/shot_bow_b.png
+474 4 4 0 img/actions/slash_sword_b.png
+475 4 4 0 img/actions/slash_axe_f.png
+476 4 3 0 img/actions/guard_kite_shield_success_back.png

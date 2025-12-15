@@ -68,12 +68,12 @@ static inline void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     // experiment
     // draw the first frame of one of our hero textures
     const float sw = 128, rx = 0, ry = 0, mx = frame.x, my = frame.y + sw / 2;
-    const Texture t1 = txinfo[TX_ACTION_SLASH_SWORD_B].texture;
+    const Texture t1 = txinfo[TX_ACTIONS_SLASH_SWORD_B].texture;
     const Rectangle src = {rx, ry, 32, 32}, dst = {mx, my, sw, sw};
     DrawTexturePro(t1, src, dst, origin, 0.0f, WHITE);
     const Texture t2 = txinfo[TX_CHAR_HUMAN_ATTACK].texture;
     DrawTexturePro(t2, src, dst, origin, 0.0f, WHITE);
-    const Texture t3 = txinfo[TX_ACTION_SLASH_SWORD_F].texture;
+    const Texture t3 = txinfo[TX_ACTIONS_SLASH_SWORD_F].texture;
     DrawTexturePro(t3, src, dst, origin, 0.0f, WHITE);
     const float mx2 = frame.x + frame.width - sw, my2 = frame.y + sw / 2;
     const Rectangle src2 = {rx, ry, -32, 32}, dst2 = {mx2, my2, sw, sw};
