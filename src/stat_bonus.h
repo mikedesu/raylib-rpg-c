@@ -1,7 +1,7 @@
 #pragma once
 
 
-static inline const int get_stat_bonus(int v) {
+constexpr static inline const int get_stat_bonus(int v) {
     if (v == 0 || v == 1)
         return -5;
     if (v == 2 || v == 3)
