@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gamestate.h"
+#include "tile_has_live_npcs.h"
 
 static inline entityid create_weapon_with(shared_ptr<gamestate> g, function<void(shared_ptr<gamestate>, entityid)> weaponInitFunction) {
     massert(g, "gamestate is NULL");
@@ -9,7 +10,6 @@ static inline entityid create_weapon_with(shared_ptr<gamestate> g, function<void
     g->ct.set<itemtype>(id, ITEM_WEAPON);
     g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
     g->ct.set<update>(id, true);
-
     weaponInitFunction(g, id);
     return id;
 }
@@ -17,31 +17,21 @@ static inline entityid create_weapon_with(shared_ptr<gamestate> g, function<void
 
 static inline entityid create_weapon_at_with(shared_ptr<gamestate> g, vec3 loc, function<void(shared_ptr<gamestate>, entityid)> weaponInitFunction) {
     massert(g, "gamestate is NULL");
-
-    shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
-    shared_ptr<tile_t> tile = df_tile_at(df, loc);
+    auto df = d_get_floor(g->dungeon, loc.z);
+    auto tile = df_tile_at(df, loc);
     massert(tile, "failed to get tile");
-
-    if (!tile_is_walkable(tile->type)) {
+    if (!tile_is_walkable(tile->type))
         merror("cannot create entity on non-walkable tile");
-        return ENTITYID_INVALID;
-    }
-
-    if (tile_has_live_npcs(g, tile)) {
+    return ENTITYID_INVALID;
+    if (tile_has_live_npcs(g, tile))
         merror("cannot create entity on tile with live NPCs");
-        return ENTITYID_INVALID;
-    }
-
+    return ENTITYID_INVALID;
     const auto id = create_weapon_with(g, weaponInitFunction);
-    if (id == ENTITYID_INVALID) {
+    if (id == ENTITYID_INVALID)
         return ENTITYID_INVALID;
-    }
-
     minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-    if (!df_add_at(df, id, loc.x, loc.y)) {
+    if (!df_add_at(df, id, loc.x, loc.y))
         return ENTITYID_INVALID;
-    }
-
     g->ct.set<location>(id, loc);
     return id;
 }
