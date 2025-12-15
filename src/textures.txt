@@ -369,8 +369,8 @@
 281 1 1  0  img/tiles/stone_dirt_d_05.png
 282 1 1  0  img/tiles/stone_dirt_dr_05.png
 #
-283 1 1  0  img/doors/wooden-door-closed-00.png
-284 1 1  0  img/doors/wooden-door-open-00.png
+283 1 1  0  img/door/wooden_closed_00.png
+284 1 1  0  img/door/wooden_open_00.png
 285 1 4  0  img/items/key_basic.png
 #
 286 1 4  0  img/weapons/axe.png
