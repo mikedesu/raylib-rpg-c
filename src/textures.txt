@@ -405,8 +405,8 @@
 310 4 8 0 img/char/goblin_shot.png
 311 4 8 0 img/char/goblin_shot_shadow.png
 #
-312 4 8 0 img/actions/shot_bow_f_2.png
-313 4 8 0 img/actions/shot_bow_b_2.png
+312 4 8 0 img/actions/shot_bow_f.png
+313 4 8 0 img/actions/shot_bow_b.png
 314 4 8 0 img/actions/shot_bow_b_halfling_goblin_dwarf.png
 #
 315 1 4 0 img/item/arrow.png
