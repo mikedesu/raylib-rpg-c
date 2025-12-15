@@ -13,11 +13,11 @@
 6  4 4  0  img/char/human_attack_slash_shadow.png
 7  4 4  0  img/char/human_jump.png
 8  4 4  0  img/char/human_jump_shadow.png
-9  1 7  0  img/char/human_spindie2.png
+9  1 7  0  img/char/human_spindie.png
 #
 #
 #
-10 1 7  0  img/char/human_spindie2_shadow.png
+10 1 7  0  img/char/human_spindie_shadow.png
 11 1 12 0  img/char/human_souldie.png
 12 1 12 0  img/char/human_souldie_shadow.png
 66 4 4  0  img/char/human_guard.png
