@@ -453,7 +453,7 @@
 #
 #
 #
-346 1  1 0  img/prop/wooden-box.png
+346 1  1 0  img/box/wooden.png
 #
 #
 347 1  4 0  img/weapon/warhammer.png
