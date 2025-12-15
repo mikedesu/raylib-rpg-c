@@ -1,8 +1,6 @@
 #include "handle_input.h"
 #include "handle_npcs.h"
-//#include "inputstate.h"
 #include "liblogic.h"
-//#include "massert.h"
 #include "update_debug_panel_buffer.h"
 #include "update_player_state.h"
 #include "update_player_tiles_explored.h"
