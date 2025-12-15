@@ -300,12 +300,12 @@
 #
 #
 #
-201 1 4  0  img/items/potion_hp_small.png
-202 1 4  0  img/items/potion_hp_medium.png
-203 1 4  0  img/items/potion_hp_large.png
-204 1 4  0  img/items/potion_mp_small.png
-205 1 4  0  img/items/potion_mp_medium.png
-206 1 4  0  img/items/potion_mp_large.png
+201 1 4  0  img/item/potion_hp_small.png
+202 1 4  0  img/item/potion_hp_medium.png
+203 1 4  0  img/item/potion_hp_large.png
+204 1 4  0  img/item/potion_mp_small.png
+205 1 4  0  img/item/potion_mp_medium.png
+206 1 4  0  img/item/potion_mp_large.png
 #
 #
 #
@@ -371,7 +371,7 @@
 #
 283 1 1  0  img/door/wooden_closed_00.png
 284 1 1  0  img/door/wooden_open_00.png
-285 1 4  0  img/items/key_basic.png
+285 1 4  0  img/item/key_basic.png
 #
 286 1 4  0  img/weapon/axe.png
 #
@@ -409,7 +409,7 @@
 313 4 8 0 img/actions/shot_bow_b_2.png
 314 4 8 0 img/actions/shot_bow_b_halfling_goblin_dwarf.png
 #
-315 1 4 0 img/items/arrow.png
+315 1 4 0 img/item/arrow.png
 #
 318 4 12 0  img/monster/warg/warg_idle.png
 319 4 12 0  img/monster/warg/shadows/warg_idle_shadow.png
