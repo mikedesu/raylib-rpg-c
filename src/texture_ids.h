@@ -332,21 +332,21 @@
 // --------------------------------------------------------------------------------
 // Weapons
 // --------------------------------------------------------------------------------
-#define TX_SWORD_00 120
-#define TX_AXE 286
-#define TX_BOW 299
-#define TX_DAGGER 197
-#define TX_TWO_HANDED_SWORD 198
-#define TX_ARROW 315
-#define TX_WARHAMMER 347
-#define TX_WHIP 348
+#define TX_WEAPON_SWORD_00 120
+#define TX_WEAPON_AXE 286
+#define TX_WEAPON_BOW 299
+#define TX_WEAPON_DAGGER 197
+#define TX_WEAPON_TWO_HANDED_SWORD 198
+#define TX_WEAPON_ARROW 315
+#define TX_WEAPON_WARHAMMER 347
+#define TX_WEAPON_WHIP 348
 
 // --------------------------------------------------------------------------------
 // Shields
 // --------------------------------------------------------------------------------
-#define TX_KITE_SHIELD 199
-#define TX_WOODEN_TOWER_SHIELD 200
-#define TX_BUCKLER 74
+#define TX_SHIELD_KITE_SHIELD 199
+#define TX_SHIELD_WOODEN_TOWER_SHIELD 200
+#define TX_SHIELD_BUCKLER 74
 
 // --------------------------------------------------------------------------------
 // Spells
