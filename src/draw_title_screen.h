@@ -71,7 +71,7 @@ static inline void draw_title_screen(shared_ptr<gamestate> g, bool show_menu) {
     const Texture t1 = txinfo[TX_ACTIONS_SLASH_SWORD_B].texture;
     const Rectangle src = {rx, ry, 32, 32}, dst = {mx, my, sw, sw};
     DrawTexturePro(t1, src, dst, origin, 0.0f, WHITE);
-    const Texture t2 = txinfo[TX_CHAR_HUMAN_ATTACK].texture;
+    const Texture t2 = txinfo[TX_CHAR_HUMAN_ATTACK_SLASH].texture;
     DrawTexturePro(t2, src, dst, origin, 0.0f, WHITE);
     const Texture t3 = txinfo[TX_ACTIONS_SLASH_SWORD_F].texture;
     DrawTexturePro(t3, src, dst, origin, 0.0f, WHITE);
