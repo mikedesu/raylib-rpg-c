@@ -1,4 +1,3 @@
-//#include "gameloader.h"
 #include "gamestate.h"
 #include "inputstate.h"
 #include "libdraw.h"
@@ -9,9 +8,7 @@
 #endif
 
 shared_ptr<inputstate> is = make_shared<inputstate>();
-
 shared_ptr<gamestate> g = gamestateinitptr();
-
 
 void gameloop() {
     inputstate_update(is);
@@ -37,17 +34,14 @@ void gameloop() {
 int main() {
     liblogic_init(g);
     libdraw_init(g);
-
 #ifndef WEB
-    while (!libdraw_windowshouldclose(g)) {
+    while (!libdraw_windowshouldclose(g))
         gameloop();
-    }
 #else
     emscripten_set_main_loop(gameloop, 0, 1);
 #endif
     libdraw_close();
     liblogic_close(g);
     gamestate_free(g);
-
     return 0;
 }
