@@ -447,9 +447,9 @@
 # #     #  #  #      #  #     #    #      #####  #   #
 # #     ####  #####  #   #    #    #####  #   #  #   #
 #
-343 1  4 0  img/rings/gold_ring.png
-344 1  4 0  img/rings/silver_ring.png
-345 1  4 0  img/rings/iron_ring.png
+343 1  4 0  img/ring/gold.png
+344 1  4 0  img/ring/silver.png
+345 1  4 0  img/ring/iron.png
 #
 #
 #
