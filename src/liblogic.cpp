@@ -104,9 +104,3 @@ void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     g->currenttimetm = localtime(&g->currenttime);
     strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 }
-
-
-void liblogic_close(shared_ptr<gamestate> g) {
-    massert(g, "liblogic_close: gamestate is NULL");
-    d_free(g->dungeon);
-}
