@@ -32,7 +32,6 @@ using std::string;
 
 int liblogic_restart_count = 0;
 
-void update_npcs_state(shared_ptr<gamestate> g);
 
 void liblogic_init(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
