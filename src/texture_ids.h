@@ -310,13 +310,13 @@
 // --------------------------------------------------------------------------------
 // Potions
 // --------------------------------------------------------------------------------
-#define TX_POTION_HP_SMALL 201
-#define TX_POTION_HP_MEDIUM 202
-#define TX_POTION_HP_LARGE 203
+#define TX_ITEM_POTION_HP_SMALL 201
+#define TX_ITEM_POTION_HP_MEDIUM 202
+#define TX_ITEM_POTION_HP_LARGE 203
 
-#define TX_POTION_MP_SMALL 204
-#define TX_POTION_MP_MEDIUM 205
-#define TX_POTION_MP_LARGE 206
+#define TX_ITEM_POTION_MP_SMALL 204
+#define TX_ITEM_POTION_MP_MEDIUM 205
+#define TX_ITEM_POTION_MP_LARGE 206
 
 // --------------------------------------------------------------------------------
 // Doors
@@ -327,7 +327,7 @@
 // --------------------------------------------------------------------------------
 // Doors
 // --------------------------------------------------------------------------------
-#define TX_KEY_BASIC 285
+#define TX_ITEM_KEY_BASIC 285
 
 // --------------------------------------------------------------------------------
 // Weapons
