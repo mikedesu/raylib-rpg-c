@@ -1,6 +1,6 @@
 CXX = g++
 OBJ = -c
-WFLAGS = -Wall -std=c++17
+WFLAGS = -Wall -std=c++23
 SHARED = -shared
 STATIC_LINK_RAYLIB = -l:libraylib.a  # Desktop Raylib
 MAIN_C = main.cpp
@@ -27,24 +27,20 @@ WEB_OPTIONS = -DPLATFORM_WEB -DWEB -DSPAWN_MONSTERS -DNPCS_ALL_AT_ONCE -DSTART_M
 all: game 
 
 # Desktop build
-
-OBJ_FILES=main.o \
-liblogic.o \
+OBJ_FILES=main.o liblogic.o 
 
 
 game: $(OBJ_FILES)
-	./generate_sfx_header.sh
 	$(CXX) $(WFLAGS) $(CFLAGS) $^ -L. $(RAYLIB_LIBS)   -o $@ 
 	./log_build_stats.sh
 
-main.o: main.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-###################
-
+main.o: main.cpp 
+	$(CXX) $(WFLAGS) $(CXXFLAGS) main.cpp -c 
 
 liblogic.o: liblogic.cpp 
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c
+	./generate_sfx_header.sh
+	$(CXX) $(WFLAGS) $(CXXFLAGS) liblogic.cpp -c
+
 
 #test: $(UNIT_TEST_OBJS)
 #$(CC) -o $@ $(UNIT_TEST_OBJS) $(WFLAGS) $(CFLAGS)

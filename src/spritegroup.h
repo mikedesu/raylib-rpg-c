@@ -34,7 +34,7 @@ typedef struct spritegroup_t {
 } spritegroup_t;
 
 
-static inline spritegroup_t* spritegroup_create(int capacity) {
+constexpr static inline spritegroup_t* spritegroup_create(int capacity) {
     massert(capacity > 0, "capacity must be greater than 0, got %d", capacity);
     if (capacity <= 0)
         return NULL;

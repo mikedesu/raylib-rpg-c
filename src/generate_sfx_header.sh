@@ -1,6 +1,9 @@
 #!/usr/bin/zsh
 
 
+echo "Generating sfx.h...";
+
+
 # lowercase all files in audio/sfx/*.wav
 for file in audio/sfx/*.wav; do
     if [ -f "$file" ]; then
@@ -26,3 +29,4 @@ for i in `cat sfx.txt`; do
 done >> $FILENAME;
 
 
+echo "sfx.h generated successfully!";
