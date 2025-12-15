@@ -6,49 +6,49 @@
 #
 #
 1  4 16 0  img/char/human_idle.png
-2  4 16 0  img/char/shadows/human_idle_shadow.png
+2  4 16 0  img/char/human_idle_shadow.png
 3  4 4  0  img/char/human_walk.png
-4  4 4  0  img/char/shadows/human_walk_shadow.png
+4  4 4  0  img/char/human_walk_shadow.png
 5  4 4  0  img/char/human_attack_slash.png
-6  4 4  0  img/char/shadows/human_attack_slash_shadow.png
+6  4 4  0  img/char/human_attack_slash_shadow.png
 7  4 4  0  img/char/human_jump.png
-8  4 4  0  img/char/shadows/human_jump_shadow.png
+8  4 4  0  img/char/human_jump_shadow.png
 9  1 7  0  img/char/human_spindie2.png
 #
 #
 #
-10 1 7  0  img/char/shadows/human_spindie2_shadow.png
+10 1 7  0  img/char/human_spindie2_shadow.png
 11 1 12 0  img/char/human_souldie.png
-12 1 12 0  img/char/shadows/human_souldie_shadow.png
+12 1 12 0  img/char/human_souldie_shadow.png
 66 4 4  0  img/char/human_guard.png
-67 4 4  0  img/char/shadows/human_guard_shadow.png
+67 4 4  0  img/char/human_guard_shadow.png
 68 4 3  0  img/char/human_guard_success.png
-69 4 3  0  img/char/shadows/human_guard_success_shadow.png
+69 4 3  0  img/char/human_guard_success_shadow.png
 75 4 4  0  img/char/human_dmg.png
-76 4 4  0  img/char/shadows/human_dmg_shadow.png
+76 4 4  0  img/char/human_dmg_shadow.png
 #
 #
 # atm there are 14 total orc sprite animations
 #
 #
 13  4 16 0  img/char/orc/orc_idle.png
-14  4 16 0  img/char/orc/shadows/orc_idle_shadow.png
+14  4 16 0  img/char/orc/orc_idle_shadow.png
 15  4 4  0  img/char/orc/orc_walk.png
-16  4 4  0  img/char/orc/shadows/orc_walk_shadow.png
+16  4 4  0  img/char/orc/orc_walk_shadow.png
 17  4 4  0  img/char/orc/orc_attack_slash.png
-18  4 4  0  img/char/orc/shadows/orc_attack_slash_shadow.png
+18  4 4  0  img/char/orc/orc_attack_slash_shadow.png
 19  4 6  0  img/char/orc/orc_chargedattack.png
-20  4 6  0  img/char/orc/shadows/orc_chargedattack_shadow.png
+20  4 6  0  img/char/orc/orc_chargedattack_shadow.png
 21  4 4  0  img/char/orc/orc_jump.png
-22  4 4  0  img/char/orc/shadows/orc_jump_shadow.png
+22  4 4  0  img/char/orc/orc_jump_shadow.png
 23  1 7  0  img/char/orc/orc_die2.png
-24  1 7  0  img/char/orc/shadows/orc_die2_shadow.png
+24  1 7  0  img/char/orc/orc_die2_shadow.png
 25  4 4  0  img/char/orc/orc_dmg.png
-26  4 4  0  img/char/orc/shadows/orc_dmg_shadow.png
+26  4 4  0  img/char/orc/orc_dmg_shadow.png
 213 4 4  0  img/char/orc/orc_guard.png
-214 4 4  0  img/char/orc/shadows/orc_guard_shadow.png
+214 4 4  0  img/char/orc/orc_guard_shadow.png
 215 4 3  0  img/char/orc/orc_guard_success.png
-216 4 3  0  img/char/orc/shadows/orc_guard_success_shadow.png
+216 4 3  0  img/char/orc/orc_guard_success_shadow.png
 #
 #
 #
@@ -188,105 +188,105 @@
 #
 #
 121 4 16 0  img/char/dwarf_idle.png
-122 4 16 0  img/char/shadows/dwarf_idle_shadow.png
+122 4 16 0  img/char/dwarf_idle_shadow.png
 123 4 4  0  img/char/dwarf_walk.png
-124 4 4  0  img/char/shadows/dwarf_walk_shadow.png
+124 4 4  0  img/char/dwarf_walk_shadow.png
 125 4 4  0  img/char/dwarf_attack_slash.png
-126 4 4  0  img/char/shadows/dwarf_attack_slash_shadow.png
+126 4 4  0  img/char/dwarf_attack_slash_shadow.png
 127 4 4  0  img/char/dwarf_jump.png
-128 4 4  0  img/char/shadows/dwarf_jump_shadow.png
+128 4 4  0  img/char/dwarf_jump_shadow.png
 129 1 7  0  img/char/dwarf_spindie2.png
-130 1 7  0  img/char/shadows/dwarf_spindie2_shadow.png
+130 1 7  0  img/char/dwarf_spindie2_shadow.png
 #131 1 12 0  img/char/dwarf_souldie.png
-#132 1 12 0  img/char/shadows/dwarf_souldie_shadow.png
+#132 1 12 0  img/char/dwarf_souldie_shadow.png
 133 4 4  0  img/char/dwarf_dmg.png
-134 4 4  0  img/char/shadows/dwarf_dmg_shadow.png
+134 4 4  0  img/char/dwarf_dmg_shadow.png
 #
 #
 #
 135 4 16 0  img/char/elf_idle.png
-136 4 16 0  img/char/shadows/elf_idle_shadow.png
+136 4 16 0  img/char/elf_idle_shadow.png
 137 4 4  0  img/char/elf_walk.png
-138 4 4  0  img/char/shadows/elf_walk_shadow.png
+138 4 4  0  img/char/elf_walk_shadow.png
 139 4 4  0  img/char/elf_attack_slash.png
-140 4 4  0  img/char/shadows/elf_attack_slash_shadow.png
+140 4 4  0  img/char/elf_attack_slash_shadow.png
 141 4 4  0  img/char/elf_jump.png
-142 4 4  0  img/char/shadows/elf_jump_shadow.png
+142 4 4  0  img/char/elf_jump_shadow.png
 143 1 7  0  img/char/elf_spindie2.png
-144 1 7  0  img/char/shadows/elf_spindie2_shadow.png
+144 1 7  0  img/char/elf_spindie2_shadow.png
 #145 1 12 0  img/char/elf_souldie.png
-#146 1 12 0  img/char/shadows/elf_souldie_shadow.png
+#146 1 12 0  img/char/elf_souldie_shadow.png
 147 4 4  0  img/char/elf_dmg.png
-148 4 4  0  img/char/shadows/elf_dmg_shadow.png
+148 4 4  0  img/char/elf_dmg_shadow.png
 #
 #
 #
 149 4 16 0  img/char/halfling_idle.png
-150 4 16 0  img/char/shadows/halfling_idle_shadow.png
+150 4 16 0  img/char/halfling_idle_shadow.png
 151 4 4  0  img/char/halfling_walk.png
-152 4 4  0  img/char/shadows/halfling_walk_shadow.png
+152 4 4  0  img/char/halfling_walk_shadow.png
 153 4 4  0  img/char/halfling_attack_slash.png
-154 4 4  0  img/char/shadows/halfling_attack_slash_shadow.png
+154 4 4  0  img/char/halfling_attack_slash_shadow.png
 155 4 4  0  img/char/halfling_jump.png
-156 4 4  0  img/char/shadows/halfling_jump_shadow.png
+156 4 4  0  img/char/halfling_jump_shadow.png
 157 4 4  0  img/char/halfling_dmg.png
-158 4 4  0  img/char/shadows/halfling_dmg_shadow.png
+158 4 4  0  img/char/halfling_dmg_shadow.png
 159 1 7  0  img/char/halfling_spindie2.png
-160 1 7  0  img/char/shadows/halfling_spindie2_shadow.png
+160 1 7  0  img/char/halfling_spindie2_shadow.png
 #
 #
 #
 #161 1 12 0  img/char/halfling_souldie.png
-#162 1 12 0  img/char/shadows/halfling_souldie_shadow.png
+#162 1 12 0  img/char/halfling_souldie_shadow.png
 #
 #
 #
 163 4 16 0  img/char/goblin_idle.png
-164 4 16 0  img/char/shadows/goblin_idle_shadow.png
+164 4 16 0  img/char/goblin_idle_shadow.png
 165 4 4  0  img/char/goblin_walk.png
-166 4 4  0  img/char/shadows/goblin_walk_shadow.png
+166 4 4  0  img/char/goblin_walk_shadow.png
 167 4 4  0  img/char/goblin_attack_slash.png
-168 4 4  0  img/char/shadows/goblin_attack_slash_shadow.png
+168 4 4  0  img/char/goblin_attack_slash_shadow.png
 169 4 4  0  img/char/goblin_jump.png
-170 4 4  0  img/char/shadows/goblin_jump_shadow.png
+170 4 4  0  img/char/goblin_jump_shadow.png
 171 4 4  0  img/char/goblin_dmg.png
-172 4 4  0  img/char/shadows/goblin_dmg_shadow.png
+172 4 4  0  img/char/goblin_dmg_shadow.png
 173 1 7  0  img/char/goblin_spindie2.png
-174 1 7  0  img/char/shadows/goblin_spindie2_shadow.png
+174 1 7  0  img/char/goblin_spindie2_shadow.png
 #
 #
 #
 #173 1 12 0  img/char/goblin_souldie.png
-#174 1 12 0  img/char/shadows/goblin_souldie_shadow.png
+#174 1 12 0  img/char/goblin_souldie_shadow.png
 #
 #
 #
 #
 177 4 2  0  img/monsters/bat/bat_idle.png
-178 4 2  0  img/monsters/bat/shadows/bat_idle_shadow.png
+178 4 2  0  img/monsters/bat/bat_idle_shadow.png
 179 4 4  0  img/monsters/bat/bat_attack.png
-180 4 4  0  img/monsters/bat/shadows/bat_attack_shadow.png
+180 4 4  0  img/monsters/bat/bat_attack_shadow.png
 181 4 4  0  img/monsters/bat/bat_dmg.png
-182 4 4  0  img/monsters/bat/shadows/bat_dmg_shadow.png
+182 4 4  0  img/monsters/bat/bat_dmg_shadow.png
 183 3 8  0  img/monsters/bat/bat_sleep.png
-184 3 8  0  img/monsters/bat/shadows/bat_sleep_shadow.png
+184 3 8  0  img/monsters/bat/bat_sleep_shadow.png
 316 1 7  0  img/monsters/bat/bat_die.png
-317 1 7  0  img/monsters/bat/shadows/bat_die_shadow.png
+317 1 7  0  img/monsters/bat/bat_die_shadow.png
 #
 #
 #
 185 4 12 0  img/monsters/wolf/wolf_idle.png
-186 4 12 0  img/monsters/wolf/shadows/wolf_idle_shadow.png
+186 4 12 0  img/monsters/wolf/wolf_idle_shadow.png
 187 4  4 0  img/monsters/wolf/wolf_walk.png
-188 4  4 0  img/monsters/wolf/shadows/wolf_walk_shadow.png
+188 4  4 0  img/monsters/wolf/wolf_walk_shadow.png
 189 4  4 0  img/monsters/wolf/wolf_attack.png
-190 4  4 0  img/monsters/wolf/shadows/wolf_attack_shadow.png
+190 4  4 0  img/monsters/wolf/wolf_attack_shadow.png
 191 4  4 0  img/monsters/wolf/wolf_dmg.png
-192 4  4 0  img/monsters/wolf/shadows/wolf_dmg_shadow.png
+192 4  4 0  img/monsters/wolf/wolf_dmg_shadow.png
 193 4  4 0  img/monsters/wolf/wolf_jump.png
-194 4  4 0  img/monsters/wolf/shadows/wolf_jump_shadow.png
+194 4  4 0  img/monsters/wolf/wolf_jump_shadow.png
 195 1  5 0  img/monsters/wolf/wolf_die.png
-196 1  5 0  img/monsters/wolf/shadows/wolf_die_shadow.png
+196 1  5 0  img/monsters/wolf/wolf_die_shadow.png
 #
 #
 #
@@ -376,14 +376,14 @@
 286 1 4  0  img/weapons/axe.png
 #
 287 4 3  0  img/char/dwarf_guard_success.png
-288 4 4  0  img/char/shadows/dwarf_guard_success_shadow.png
+288 4 4  0  img/char/dwarf_guard_success_shadow.png
 289 4 3  0  img/char/elf_guard_success.png
-290 4 4  0  img/char/shadows/elf_guard_success_shadow.png
+290 4 4  0  img/char/elf_guard_success_shadow.png
 #
 291 4 3  0  img/char/halfling_guard_success.png
-292 4 4  0  img/char/shadows/halfling_guard_success_shadow.png
+292 4 4  0  img/char/halfling_guard_success_shadow.png
 293 4 3  0  img/char/goblin_guard_success.png
-294 4 4  0  img/char/shadows/goblin_guard_success_shadow.png
+294 4 4  0  img/char/goblin_guard_success_shadow.png
 #
 #295 4 3 0 img/actions/guard_wooden_shield_success_front.png
 #296 4 3 0 img/actions/guard_wooden_shield_success_back.png
@@ -393,17 +393,17 @@
 299 1 4 0 img/weapons/bow.png
 #
 300 4 8 0 img/char/human_shot.png
-301 4 8 0 img/char/shadows/human_shot_shadow.png
+301 4 8 0 img/char/human_shot_shadow.png
 #302 4 8 0 img/char/orc_shot.png
-#303 4 8 0 img/char/shadows/orc_shot_shadow.png
+#303 4 8 0 img/char/orc_shot_shadow.png
 304 4 8 0 img/char/dwarf_shot.png
-305 4 8 0 img/char/shadows/dwarf_shot_shadow.png
+305 4 8 0 img/char/dwarf_shot_shadow.png
 306 4 8 0 img/char/elf_shot.png
-307 4 8 0 img/char/shadows/elf_shot_shadow.png
+307 4 8 0 img/char/elf_shot_shadow.png
 308 4 8 0 img/char/halfling_shot.png
-309 4 8 0 img/char/shadows/halfling_shot_shadow.png
+309 4 8 0 img/char/halfling_shot_shadow.png
 310 4 8 0 img/char/goblin_shot.png
-311 4 8 0 img/char/shadows/goblin_shot_shadow.png
+311 4 8 0 img/char/goblin_shot_shadow.png
 #
 312 4 8 0 img/actions/shot_bow_f_2.png
 313 4 8 0 img/actions/shot_bow_b_2.png
@@ -466,12 +466,12 @@
 353  4 4  0  img/char/orc_attack_thrust.png
 354  4 4  0  img/char/goblin_attack_thrust.png
 #
-355  4 4  0  img/char/shadows/human_attack_thrust_shadow.png
-356  4 4  0  img/char/shadows/elf_attack_thrust_shadow.png
-357  4 4  0  img/char/shadows/dwarf_attack_thrust_shadow.png
-358  4 4  0  img/char/shadows/halfling_attack_thrust_shadow.png
-359  4 4  0  img/char/shadows/orc_attack_thrust_shadow.png
-360  4 4  0  img/char/shadows/goblin_attack_thrust_shadow.png
+355  4 4  0  img/char/human_attack_thrust_shadow.png
+356  4 4  0  img/char/elf_attack_thrust_shadow.png
+357  4 4  0  img/char/dwarf_attack_thrust_shadow.png
+358  4 4  0  img/char/halfling_attack_thrust_shadow.png
+359  4 4  0  img/char/orc_attack_thrust_shadow.png
+360  4 4  0  img/char/goblin_attack_thrust_shadow.png
 #
 361  4 3  0  img/actions/guard_tower_shield_success_front.png
 362  4 3  0  img/actions/guard_tower_shield_success_back.png
