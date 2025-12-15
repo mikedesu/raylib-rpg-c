@@ -12,9 +12,7 @@ CFLAGS ?= # Allow override
 WEB_CC = emcc
 WEB_SOURCES=main.cpp \
 gameloader_web.cpp \
-draw_inventory_menu.cpp \
 draw_title_screen.cpp \
-draw_character_creation_screen.cpp \
 libdraw_create_spritegroup.cpp \
 libdraw_update_sprites.cpp \
 libdraw_dungeon_floor.cpp \
@@ -43,9 +41,7 @@ all: game
 OBJ_FILES=main.o \
 gameloader.o \
 gamestate.o \
-draw_inventory_menu.o \
 draw_title_screen.o \
-draw_character_creation_screen.o \
 libdraw_update_sprites.o \
 libdraw_dungeon_floor.o \
 draw_sprite.o \
@@ -89,12 +85,6 @@ libdraw_dungeon_floor.o: libdraw_dungeon_floor.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 draw_title_screen.o: draw_title_screen.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-draw_inventory_menu.o: draw_inventory_menu.cpp
-	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
-
-draw_character_creation_screen.o: draw_character_creation_screen.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $^ -c 
 
 draw_sprite.o: draw_sprite.cpp
