@@ -51,8 +51,8 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
     //#ifdef SPAWN_MONSTERS
     for (int i = 0; i < (int)g->dungeon->floors->size(); i++) {
         create_npc_at_with(g, RACE_ORC, (vec3){10, 10, i}, orc_init_test);
-        create_npc_at_with(g, RACE_ORC, (vec3){10, 9, i}, orc_init_test);
-        create_npc_at_with(g, RACE_ORC, (vec3){11, 9, i}, orc_init_test);
+        //create_npc_at_with(g, RACE_ORC, (vec3){10, 9, i}, orc_init_test);
+        //create_npc_at_with(g, RACE_ORC, (vec3){11, 9, i}, orc_init_test);
         create_npc_at_with(g, RACE_ORC, (vec3){13, 11, i}, orc_init_test);
         create_npc_at_with(g, RACE_ORC, (vec3){14, 11, i}, orc_init_test);
     }
