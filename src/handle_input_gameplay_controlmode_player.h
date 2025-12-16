@@ -236,5 +236,14 @@ static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return;
         }
+
+        // handle restart
+        else if (inputstate_is_pressed(is, KEY_R)) {
+            if (is_dead) {
+                g->do_restart = true;
+                minfo("setting do_restart to true...");
+                return;
+            }
+        }
     }
 }

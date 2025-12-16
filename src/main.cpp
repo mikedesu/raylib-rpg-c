@@ -14,20 +14,18 @@ void gameloop() {
     inputstate_update(is);
     liblogic_tick(is, g);
     libdraw_drawframe(g);
-    //if (g->do_restart) {
-    //    msuccess("Restarting game...");
-    //    libdraw_close();
-    //dlclose(draw_handle);
-    //    liblogic_close(g);
-    //dlclose(logic_handle);
-    //    gamestatefree(g);
-    //    g = gamestateinitptr();
-    //load_draw_symbols();
-    //load_logic_symbols();
-    //    liblogic_init(g);
-    //    libdraw_init(g);
-    //    g->do_restart = false; // Reset restart flag
-    //}
+
+    if (g->do_restart) {
+        msuccess("Restarting game...");
+        libdraw_close();
+        liblogic_close(g);
+        //gamestate_free(g);
+        g = nullptr;
+        g = gamestateinitptr();
+        liblogic_init(g);
+        libdraw_init(g);
+        g->do_restart = false; // Reset restart flag
+    }
 }
 
 
