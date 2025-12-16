@@ -341,9 +341,10 @@ static inline int df_get_possible_upstairs_count_in_area(shared_ptr<dungeon_floo
 
 static inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(shared_ptr<dungeon_floor_t> df, Rectangle r) {
     massert(df, "dungeon floor is NULL");
-    int count = df_get_possible_upstairs_count_in_area(df, r);
+    //int count = df_get_possible_upstairs_count_in_area(df, r);
 
-    shared_ptr<vector<vec3>> locations = make_shared<vector<vec3>>();
+    //shared_ptr<vector<vec3>> locations = make_shared<vector<vec3>>();
+    auto locations = make_shared<vector<vec3>>();
     massert(locations, "failed to make_shared locations");
 
     // now we can loop thru the dungeon floor again and fill the array with the locations
@@ -357,7 +358,7 @@ static inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(sha
             }
         }
     }
-    massert(locations->size() == (size_t)count, "count2 is greater than count");
+    //massert(locations->size() == (size_t)count, "count2 is greater than count");
     return locations;
 }
 
