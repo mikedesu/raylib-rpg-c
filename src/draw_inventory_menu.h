@@ -154,6 +154,10 @@ static inline void draw_inventory_menu(shared_ptr<gamestate> g) {
 
                         DrawText(TextFormat("Block chance: %d", block), cur_x, cur_y, fontsize, WHITE);
                         cur_y += y_incr;
+                    } else if (item_type == ITEM_POTION) {
+                        const vec3 heal = g->ct.get<healing>(selection_id).value_or((vec3){-1, -1, -1});
+                        DrawText(TextFormat("Heal amount: %d-%d", heal.x, heal.y), cur_x, cur_y, fontsize, WHITE);
+                        cur_y += y_incr;
                     }
 
 

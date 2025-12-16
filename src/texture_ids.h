@@ -1,3 +1,4 @@
+#pragma once
 #define TX_SPELL_FIRE_FULL 0
 #define TX_SPELL_FIRE_CAST 1
 #define TX_SPELL_FIRE_PERSIST 2

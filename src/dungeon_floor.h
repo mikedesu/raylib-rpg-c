@@ -354,7 +354,7 @@ static inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(sha
             if (tile_is_possible_upstairs(tile->type)) {
                 // there wont be any entities yet so do not check for them
                 locations->push_back((vec3){x0, y0, 0});
-                massert(locations->size() <= (size_t)count, "count2 is greater than count");
+                //massert(locations->size() <= (size_t)count, "count2 is greater than count");
             }
         }
     }

@@ -246,6 +246,13 @@ struct ComponentTraits<damage> {
 };
 
 
+struct healing { }; // vec3
+template <>
+struct ComponentTraits<healing> {
+    using Type = vec3;
+};
+
+
 struct description { }; //string
 template <>
 struct ComponentTraits<description> {

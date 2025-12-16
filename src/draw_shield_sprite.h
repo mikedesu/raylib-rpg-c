@@ -1,3 +1,4 @@
+#pragma once
 
 #include "gamestate.h"
 #include "get_shield_sprite.h"

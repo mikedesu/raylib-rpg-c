@@ -2,12 +2,14 @@
 
 #include "add_message.h"
 #include "create_npc.h"
+#include "create_potion.h"
 #include "create_shield.h"
 #include "entity_templates.h"
 #include "gamestate.h"
 #include "init_dungeon.h"
 #include "inputstate.h"
 #include "place_doors.h"
+#include "potion.h"
 #include <memory>
 
 #define TILE_COUNT_ERROR -999
@@ -46,6 +48,13 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 7, 0});
     create_weapon_at_with(g, (vec3){11, 9, 0}, dagger_init_test);
     create_shield_at_with(g, (vec3){11, 10, 0}, kite_shield_init_test);
+    create_potion_at_with(g, (vec3){9, 10, 0}, [](shared_ptr<gamestate> g, entityid id) {
+        // set healing
+        g->ct.set<name>(id, "small healing potion");
+        g->ct.set<description>(id, "a small healing potion");
+        g->ct.set<potiontype>(id, POTION_HP_SMALL);
+        g->ct.set<healing>(id, (vec3){1, 6, 0});
+    });
     place_doors(g);
 
     //#ifdef SPAWN_MONSTERS

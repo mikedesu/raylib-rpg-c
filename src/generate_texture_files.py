@@ -10,6 +10,8 @@ def main():
     outfile_images = open(outfile_images_path, "w")
     outfile_header = open(outfile_header_path, "w")
 
+    outfile_header.write("#pragma once\n")
+
     filecount = 0
     for i, _, k in os.walk("img"):
         subpath = i[4:]

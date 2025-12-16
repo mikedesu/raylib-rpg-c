@@ -20,6 +20,7 @@ static inline bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int*
     massert(df, "dungeon_floor is NULL");
     if (!df) {
         spritegroup_destroy(group);
+        merror("END create spritegroup");
         return false;
     }
     int df_w = df->width;
@@ -36,6 +37,7 @@ static inline bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int*
 
         if (loc.x < 0 || loc.x >= df_w || loc.y < 0 || loc.y >= df_h) {
             spritegroup_destroy(group);
+            merror("END create spritegroup");
             return false;
         }
 
@@ -52,6 +54,7 @@ static inline bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int*
         massert(s, "sprite is NULL");
         if (!s) {
             spritegroup_destroy(group);
+            merror("END create spritegroup");
             return false;
         }
         group->current = 0;
@@ -62,6 +65,7 @@ static inline bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int*
         group->off_y = offset_y;
 
         spritegroups[id] = group;
+        msuccess("END create spritegroup");
         return true;
     } else {
         for (int i = 0; i < num_keys; i++) {
@@ -77,6 +81,7 @@ static inline bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int*
         massert(s, "sprite is NULL");
         if (!s) {
             spritegroup_destroy(group);
+            merror("END create spritegroup");
             return false;
         }
         group->current = 0;
@@ -88,6 +93,8 @@ static inline bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int*
         group->off_y = offset_y;
 
         spritegroups[id] = group;
+
+        msuccess("END create spritegroup");
         return true;
     }
 }
