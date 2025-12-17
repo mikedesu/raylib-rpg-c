@@ -3,7 +3,10 @@
 #include "gamestate.h"
 
 static inline void update_player_state(shared_ptr<gamestate> g) {
-    massert(g->hero_id != ENTITYID_INVALID, "heroid is invalid");
+    //massert(g->hero_id != ENTITYID_INVALID, "heroid is invalid");
+    if (g->hero_id == ENTITYID_INVALID)
+        return;
+
     unsigned char a = g->ct.get<txalpha>(g->hero_id).value_or(255);
     if (a < 255)
         a++;

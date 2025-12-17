@@ -29,6 +29,8 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
         const vec3 start_loc = g->dungeon->floors->at(g->dungeon->current_floor)->upstairs_loc;
         g->entity_turn = create_player(g, start_loc, "darkmage");
 
+        massert(g->hero_id != ENTITYID_INVALID, "heroid is invalid");
+
         // set stats from char_creation
         g->ct.set<strength>(g->hero_id, g->chara_creation->strength);
         g->ct.set<dexterity>(g->hero_id, g->chara_creation->dexterity);
