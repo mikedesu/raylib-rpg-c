@@ -25,6 +25,7 @@ void gameloop() {
         liblogic_init(g);
         libdraw_init(g);
         g->do_restart = false; // Reset restart flag
+        g->restart_count++;
     }
 }
 

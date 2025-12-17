@@ -1,10 +1,12 @@
 #pragma once
 
 #include "ComponentTraits.h"
+#include "create_potion.h"
 #include "create_weapon.h"
 #include "entityid.h"
 #include "gamestate.h"
 #include "manage_inventory.h"
+#include "orc_names.h"
 #include "weapon.h"
 
 // Component Setters
@@ -140,8 +142,15 @@ static inline void random_weapon_init_test(shared_ptr<gamestate> g, entityid id)
 static inline void orc_init_test(shared_ptr<gamestate> g, entityid id) {
     const entityid wpn_id = create_weapon_with(g, random_weapon_init_test);
     //const entityid wpn_id = create_weapon_with(g, axe_init_test);
+    const entityid potion_id = create_potion_with(g, [](shared_ptr<gamestate> g, entityid myid) {
+        g->ct.set<name>(myid, "small healing potion");
+        g->ct.set<description>(myid, "a small healing potion");
+        g->ct.set<potiontype>(myid, POTION_HP_SMALL);
+        g->ct.set<healing>(myid, (vec3){1, 6, 0});
+    });
 
     add_to_inventory(g, id, wpn_id);
+    add_to_inventory(g, id, potion_id);
     set_equipped_weapon(g, id, wpn_id);
-    set_name(g, id, "Zook");
+    set_name(g, id, get_random_orc_name());
 }
