@@ -301,6 +301,13 @@ struct ComponentTraits<block_chance> {
 };
 
 
+struct base_ac { }; //int
+template <>
+struct ComponentTraits<base_ac> {
+    using Type = int;
+};
+
+
 struct damage_reduction { }; //int
 template <>
 struct ComponentTraits<damage_reduction> {

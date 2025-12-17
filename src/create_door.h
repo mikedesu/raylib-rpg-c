@@ -30,9 +30,9 @@ static inline entityid create_door_at_with(shared_ptr<gamestate> g, vec3 loc, fu
     if (!df_add_at(df, id, loc.x, loc.y))
         return ENTITYID_INVALID;
 
-    set_location(g, id, loc);
-    set_door_open(g, id, false);
-    set_update(g, id, true);
+    g->ct.set<location>(id, loc);
+    g->ct.set<door_open>(id, false);
+    g->ct.set<update>(id, true);
 
     return id;
 }

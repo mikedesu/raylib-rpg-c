@@ -7,7 +7,7 @@ using std::min;
 static inline void draw_message_history(shared_ptr<gamestate> g) {
     char tmp[1024] = {0};
     const int font_size = 10;
-    const int max_messages = 20;
+    const int max_messages = 30;
 
     //const Color message_bg = {0x33, 0x33, 0x33, 0xff};
     const Color message_bg = Fade((Color){0, 0, 0xff, 0xff}, 0.5f);

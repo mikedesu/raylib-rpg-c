@@ -1,7 +1,9 @@
 #pragma once
 
 #include "ComponentTraits.h"
+#include "compute_armor_class.h"
 #include "gamestate.h"
+#include "stat_bonus.h"
 using std::max;
 
 static inline void draw_hud(shared_ptr<gamestate> g) {
@@ -14,8 +16,8 @@ static inline void draw_hud(shared_ptr<gamestate> g) {
     const int mylevel = g->ct.get<level>(g->hero_id).value_or(0);
 
     const int myxp = g->ct.get<xp>(g->hero_id).value_or(0);
-    const int attack_bonus = 0;
-    const int ac = 0;
+    const int attack_bonus = get_stat_bonus(g->ct.get<strength>(g->hero_id).value_or(10));
+    const int ac = compute_armor_class(g, g->hero_id);
     const int floor = g->dungeon->current_floor;
     const int font_size = 10;
     const int line_thickness = 1;

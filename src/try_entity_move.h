@@ -14,7 +14,7 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     minfo("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
-    set_update(g, id, true);
+    g->ct.set<update>(id, true);
     g->ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
     // entity location
     auto maybe_loc = maybe_location(id);
@@ -104,8 +104,8 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
         return false;
     }
 
-    set_location(g, id, aloc);
-    set_sprite_move(g, id, (Rectangle){mx, my, 0, 0});
+    g->ct.set<location>(id, aloc);
+    g->ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
 
     play_sound_if_heard(SFX_STEP_STONE_1, check_hearing(g, g->hero_id, aloc));
 
