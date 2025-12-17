@@ -4,7 +4,6 @@
 #include "entitytype.h"
 #include "gamestate.h"
 #include "set_sg.h"
-//#include "set_sg_is_attacking.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 #include "update_sprite.h"
@@ -105,13 +104,8 @@ static inline void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid i
     const entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
     if (type == ENTITY_DOOR) {
         auto maybe_door_open = g->ct.get<door_open>(id);
-        if (maybe_door_open.has_value()) {
-            bool is_open = maybe_door_open.value();
-            if (is_open)
-                spritegroup_set_current(sg, 1);
-            else
-                spritegroup_set_current(sg, 0);
-        }
+        if (maybe_door_open.has_value())
+            spritegroup_set_current(sg, maybe_door_open.value() ? 1 : 0);
     }
     // Update movement as long as sg->move.x/y is non-zero
     //minfo2("checking update dest...");
