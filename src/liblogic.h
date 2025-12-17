@@ -6,17 +6,22 @@
 #include "create_shield.h"
 #include "entity_templates.h"
 #include "gamestate.h"
+#include "handle_input.h"
+#include "handle_npcs.h"
 #include "init_dungeon.h"
 #include "inputstate.h"
 #include "place_doors.h"
 #include "potion.h"
+#include "update_debug_panel_buffer.h"
+#include "update_player_state.h"
+#include "update_player_tiles_explored.h"
 #include <memory>
 
 #define TILE_COUNT_ERROR -999
 
 using std::shared_ptr;
 
-void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
+//void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
 //void liblogic_restart(shared_ptr<gamestate> g);
 
 
@@ -93,4 +98,21 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
     add_message(g, "To open a door, face it and press o ");
 #endif
     msuccess("liblogic_init: Game state initialized");
+}
+
+
+static inline void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+    massert(is, "Input state is NULL!");
+    massert(g, "Game state is NULL!");
+    // Spawn NPCs periodically
+    //try_spawn_npc(g);
+    update_player_tiles_explored(g);
+    update_player_state(g);
+    update_npcs_state(g);
+    handle_input(g, is);
+    handle_npcs(g);
+    update_debug_panel_buffer(g, is);
+    g->currenttime = time(NULL);
+    g->currenttimetm = localtime(&g->currenttime);
+    strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
 }

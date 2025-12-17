@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gamestate.h"
+//#include "gamestate.h"
 #include "is_entity_adjacent.h"
 #include "try_entity_attack.h"
 #include "try_entity_move.h"
@@ -36,10 +36,13 @@ static inline void handle_npc(shared_ptr<gamestate> g, entityid id) {
     // originally, we were just moving randomly
     // this example shows how, if the player is not adjacent to an NPC,
     // they will just move randomly. otherwise, they attack the player
-    const entityid target_id = g->ct.get<target>(id).value_or(g->hero_id);
-    if (is_entity_adjacent(g, id, target_id)) {
+
+    //const entityid target_id = g->ct.get<target>(id).value_or(g->hero_id);
+    auto tgt_id = g->ct.get<target_id>(id).value_or(g->hero_id);
+
+    if (is_entity_adjacent(g, id, tgt_id)) {
         // if id is adjacent to its target or the hero
-        vec3 loc = g->ct.get<location>(target_id).value();
+        vec3 loc = g->ct.get<location>(tgt_id).value();
         try_entity_attack(g, id, loc.x, loc.y);
         return;
     }

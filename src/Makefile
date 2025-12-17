@@ -10,8 +10,7 @@ CFLAGS ?= # Allow override
 
 # Web build setup
 WEB_CC = emcc
-WEB_SOURCES=main.cpp \
-liblogic.cpp \
+WEB_SOURCES=main.cpp 
 
 WEB_INCLUDES = -I. -I /usr/local/include -I /home/darkmage/src/emsdk/upstream/emscripten/cache/sysroot/include
 WEB_LINKS = -L. -L /home/darkmage/src/raylib/src -l:libraylib.web.a  # Use web-specific Raylib
@@ -27,7 +26,7 @@ WEB_OPTIONS = -DPLATFORM_WEB -DWEB -DSPAWN_MONSTERS -DNPCS_ALL_AT_ONCE -DSTART_M
 all: game 
 
 # Desktop build
-OBJ_FILES=main.o liblogic.o 
+OBJ_FILES=main.o  
 
 
 game: $(OBJ_FILES)
@@ -37,9 +36,9 @@ game: $(OBJ_FILES)
 main.o: main.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) main.cpp -c 
 
-liblogic.o: liblogic.cpp 
+#liblogic.o: liblogic.cpp 
 	#./generate_sfx_header.sh
-	$(CXX) $(WFLAGS) $(CXXFLAGS) liblogic.cpp -c
+#	$(CXX) $(WFLAGS) $(CXXFLAGS) liblogic.cpp -c
 
 
 #test: $(UNIT_TEST_OBJS)

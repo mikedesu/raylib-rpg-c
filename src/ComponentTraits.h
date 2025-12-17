@@ -214,9 +214,9 @@ struct ComponentTraits<charisma> {
     using Type = int;
 };
 
-struct target { }; // int
+struct target_id { }; // int
 template <>
-struct ComponentTraits<target> {
+struct ComponentTraits<target_id> {
     using Type = entityid;
 };
 

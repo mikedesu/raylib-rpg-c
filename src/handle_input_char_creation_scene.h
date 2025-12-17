@@ -62,7 +62,7 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
             entitytype_t t = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (t == ENTITY_NPC) {
                 minfo("Setting target for id %d", id);
-                g->ct.set<target>(id, g->hero_id);
+                g->ct.set<target_id>(id, g->hero_id);
             }
         }
 
