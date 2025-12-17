@@ -585,3 +585,35 @@ static inline void df_set_all_tiles(shared_ptr<dungeon_floor_t> df, tiletype_t t
     massert(df, "dungeon floor is NULL");
     df_set_area(df, type, type, (Rectangle){0, 0, (float)df->width, (float)df->height});
 }
+
+
+static inline vec3 df_get_random_loc(shared_ptr<dungeon_floor_t> df) {
+    massert(df, "df is null");
+
+    vector<vec3> tmp;
+
+    for (int x = 0; x < df->width; x++) {
+        for (int y = 0; y < df->height; y++) {
+            vec3 loc = {x, y, df->floor};
+            auto tile = df_tile_at(df, loc);
+            if (!tile)
+                continue;
+            if (tile->type == TILE_NONE)
+                continue;
+            if (tile->type == TILE_STONE_WALL_00)
+                continue;
+            if (tile->type == TILE_STONE_WALL_01)
+                continue;
+            if (tile->entities->size() > 0)
+                continue;
+            tmp.push_back(loc);
+        }
+    }
+
+    if (tmp.size() > 0) {
+        vec3 loc = tmp[GetRandomValue(0, tmp.size() - 1)];
+        return loc;
+    }
+
+    return (vec3){-1, -1, -1};
+}

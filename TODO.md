@@ -1,6 +1,8 @@
 # TODO
 
-- [ ] BUG death animation for player stuck on first frame
+
+- [ ] BUG sometimes it appears like the orcs are spawning without gear
+- [ ] BUG game crashes on reload 
 - [ ] BUG when going downstairs/upstairs, it is possible to be "on top" of another entity
     - [ ] when you walk off of the tile, the entity acts
     - [ ] unobserved what happens if you do not walk off
@@ -66,4 +68,5 @@
 things that might be behind doors, walls, etc.
 
 - [x] Shader so that the target box glows
+- [x] BUG death animation for player stuck on first frame
 
