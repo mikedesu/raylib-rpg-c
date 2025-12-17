@@ -130,10 +130,6 @@ static inline void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid i
 static inline void libdraw_update_sprite_pre(shared_ptr<gamestate> g, entityid id) {
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    if (spritegroups.find(id) == spritegroups.end())
-        return;
-    spritegroup_t* sg = spritegroups[id];
-    if (!sg)
-        return;
-    libdraw_update_sprite_ptr(g, id, sg);
+    if (spritegroups.find(id) != spritegroups.end())
+        libdraw_update_sprite_ptr(g, id, spritegroups[id]);
 }
