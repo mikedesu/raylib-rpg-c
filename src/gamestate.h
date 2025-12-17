@@ -10,7 +10,6 @@
 #include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
-#include "fadestate.h"
 #include "gamestate_flag.h"
 #include "get_racial_hd.h"
 #include "libgame_version.h"
@@ -47,7 +46,6 @@ using std::vector;
 typedef struct gamestate {
     controlmode_t controlmode;
     debugpanel_t debugpanel;
-    fadestate_t fadestate;
 
     entityid hero_id;
     entityid new_entityid_begin;
@@ -265,7 +263,6 @@ static inline shared_ptr<gamestate> gamestateinitptr() {
     g->cam3d.projection = CAMERA_PERSPECTIVE;
     g->camera_mode = CAMERA_FREE;
     g->controlmode = CONTROLMODE_PLAYER;
-    g->fadestate = FADESTATENONE;
     // current displayed dungeon floor
     g->flag = GAMESTATE_FLAG_PLAYER_INPUT;
     g->font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;

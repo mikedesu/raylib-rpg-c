@@ -25,7 +25,6 @@ static inline bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int*
     }
     int df_w = df->width;
     int df_h = df->height;
-    //vec3 loc = g_get_loc(g, id);
 
     optional<vec3> maybe_loc = g->ct.get<location>(id);
 
