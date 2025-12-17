@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "add_message.h"
 #include "entitytype.h"
 #include "gamestate.h"
 #include "manage_inventory.h"
@@ -23,6 +24,12 @@ static inline bool use_potion(shared_ptr<gamestate> g, entityid actor_id, entity
             const int myhp = g->ct.get<hp>(actor_id).value_or(-1);
             const int mymaxhp = g->ct.get<maxhp>(actor_id).value_or(-1);
             g->ct.set<hp>(actor_id, mymaxhp ? mymaxhp : myhp + amount);
+
+            if (actor_id == g->hero_id) {
+                string n = g->ct.get<name>(actor_id).value_or("no-name");
+                add_message_history(g, "%s used a healing potion", n.c_str());
+                add_message_history(g, "%s restored %d hp", n.c_str(), amount);
+            }
         }
         //====
         else {
@@ -32,6 +39,8 @@ static inline bool use_potion(shared_ptr<gamestate> g, entityid actor_id, entity
 
         // consume the potion by removing it
         remove_from_inventory(g, actor_id, item_id);
+
+
         return true;
     }
     merror("id %d is not an item, potion, or isnt in the inventory", item_id);
