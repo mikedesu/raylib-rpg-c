@@ -6,6 +6,7 @@
 #include "item.h"
 #include "potion.h"
 #include "race.h"
+#include "rarity.h"
 #include "shield.h"
 #include "vec3.h"
 #include "weapon.h"
@@ -319,4 +320,11 @@ struct hd { }; //int
 template <>
 struct ComponentTraits<hd> {
     using Type = vec3;
+};
+
+
+struct rarity { }; //int
+template <>
+struct ComponentTraits<rarity> {
+    using Type = rarity_t;
 };

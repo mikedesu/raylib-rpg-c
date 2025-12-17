@@ -17,6 +17,7 @@ static inline void axe_init_test(shared_ptr<gamestate> g, entityid id) {
     g->ct.set<damage>(id, (vec3){1, 8, 0});
     g->ct.set<durability>(id, 100);
     g->ct.set<max_durability>(id, 100);
+    g->ct.set<rarity>(id, RARITY_COMMON);
 }
 
 
@@ -27,6 +28,7 @@ static inline void dagger_init_test(shared_ptr<gamestate> g, entityid id) {
     g->ct.set<damage>(id, (vec3){1, 4, 0});
     g->ct.set<durability>(id, 100);
     g->ct.set<max_durability>(id, 100);
+    g->ct.set<rarity>(id, RARITY_COMMON);
 }
 
 
@@ -37,6 +39,7 @@ static inline void sword_init_test(shared_ptr<gamestate> g, entityid id) {
     g->ct.set<damage>(id, (vec3){1, 6, 0});
     g->ct.set<durability>(id, 100);
     g->ct.set<max_durability>(id, 100);
+    g->ct.set<rarity>(id, RARITY_COMMON);
 }
 
 
@@ -45,6 +48,7 @@ static inline void buckler_init_test(shared_ptr<gamestate> g, entityid id) {
     g->ct.set<description>(id, "The basic buckler");
     g->ct.set<shieldtype>(id, SHIELD_BUCKLER);
     g->ct.set<block_chance>(id, 50);
+    g->ct.set<rarity>(id, RARITY_COMMON);
 }
 
 
@@ -53,6 +57,7 @@ static inline void tower_shield_init_test(shared_ptr<gamestate> g, entityid id) 
     g->ct.set<description>(id, "The tower towers");
     g->ct.set<shieldtype>(id, SHIELD_TOWER);
     g->ct.set<block_chance>(id, 100);
+    g->ct.set<rarity>(id, RARITY_COMMON);
 }
 
 
@@ -61,6 +66,7 @@ static inline void kite_shield_init_test(shared_ptr<gamestate> g, entityid id) {
     g->ct.set<description>(id, "Standard knight's shield");
     g->ct.set<shieldtype>(id, SHIELD_KITE);
     g->ct.set<block_chance>(id, 90);
+    g->ct.set<rarity>(id, RARITY_COMMON);
 }
 
 
