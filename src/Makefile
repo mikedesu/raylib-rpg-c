@@ -38,7 +38,7 @@ main.o: main.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) main.cpp -c 
 
 liblogic.o: liblogic.cpp 
-	./generate_sfx_header.sh
+	#./generate_sfx_header.sh
 	$(CXX) $(WFLAGS) $(CXXFLAGS) liblogic.cpp -c
 
 
