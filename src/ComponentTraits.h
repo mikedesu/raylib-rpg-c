@@ -315,8 +315,8 @@ struct ComponentTraits<damage_reduction> {
 };
 
 
-struct hitdie { }; //int
+struct hd { }; //int
 template <>
-struct ComponentTraits<hitdie> {
-    using Type = int;
+struct ComponentTraits<hd> {
+    using Type = vec3;
 };

@@ -33,6 +33,7 @@ static inline void set_npc_starting_stats(shared_ptr<gamestate> g, entityid id) 
     g->ct.set<constitution>(id, constitution_);
     g->ct.set<charisma>(id, charisma_);
 
+
     // set default hp/maxhp for now
     // later, we will decide this by race templating
     vec3 hitdie = {1, 8, 0};
@@ -55,6 +56,8 @@ static inline void set_npc_starting_stats(shared_ptr<gamestate> g, entityid id) 
 
     g->ct.set<maxhp>(id, my_maxhp);
     g->ct.set<hp>(id, my_hp);
+    g->ct.set<base_ac>(id, 10);
+    g->ct.set<hd>(id, hitdie);
 }
 
 

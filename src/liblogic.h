@@ -21,15 +21,10 @@
 
 using std::shared_ptr;
 
-//void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g);
-//void liblogic_restart(shared_ptr<gamestate> g);
-
-
 static inline void liblogic_close(shared_ptr<gamestate> g) {
     massert(g, "liblogic_close: gamestate is NULL");
     d_free(g->dungeon);
 }
-
 
 static inline void update_npcs_state(shared_ptr<gamestate> g) {
     for (entityid id = 0; id < g->next_entityid; id++) {
@@ -42,7 +37,6 @@ static inline void update_npcs_state(shared_ptr<gamestate> g) {
         g->ct.set<damaged>(id, false);
     }
 }
-
 
 static inline void liblogic_init(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -65,13 +59,9 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
     //#ifdef SPAWN_MONSTERS
     for (int i = 0; i < (int)g->dungeon->floors->size(); i++) {
         //create_npc_at_with(g, RACE_ORC, df_get_random_loc(g->dungeon->floors->at(i)), orc_init_test);
-
-
         for (int j = 1; j <= i + 1; j++) {
             create_npc_at_with(g, RACE_ORC, df_get_random_loc(d_get_floor(g->dungeon, i)), orc_init_test);
         }
-
-
         //create_npc_at_with(g, RACE_ORC, (vec3){10, 10, i}, orc_init_test);
         //create_npc_at_with(g, RACE_ORC, (vec3){10, 9, i}, orc_init_test);
         //create_npc_at_with(g, RACE_ORC, (vec3){11, 9, i}, orc_init_test);
@@ -79,11 +69,9 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
         //create_npc_at_with(g, RACE_ORC, (vec3){14, 11, i}, orc_init_test);
     }
     //#endif
-
     //create_potion(g, (vec3){1, 1, 0}, POTION_HP_SMALL);
     //create_potion(g, (vec3){3, 1, 0}, POTION_HP_MEDIUM);
     //create_potion(g, (vec3){5, 1, 0}, POTION_HP_LARGE);
-
     add_message(g, "Welcome to the game! Press enter to cycle messages.");
 #ifdef START_MESSAGES
     add_message(g, "To move around, press [q w e a d z x c]");
@@ -99,7 +87,6 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
 #endif
     msuccess("liblogic_init: Game state initialized");
 }
-
 
 static inline void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
     massert(is, "Input state is NULL!");

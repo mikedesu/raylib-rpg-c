@@ -22,22 +22,10 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
         PlaySound(g->sfx->at(SFX_CONFIRM_01));
         // we need to copy the character creation stats to the hero entity
         // hero has already been created, so its id is available
-        int hd = g->chara_creation->hitdie;
-        int maxhp_roll = do_roll_best_of_3((vec3){1, hd, 0});
-        maxhp_roll += get_stat_bonus(g->chara_creation->constitution);
-
-        //int best_hp = maxhp_roll;
-
-        while (maxhp_roll < 1) {
-            maxhp_roll = do_roll_best_of_3((vec3){1, hd, 0});
-            maxhp_roll += get_stat_bonus(g->chara_creation->constitution);
-
-            //if (maxhp_roll > best_hp)
-            //    best_hp = maxhp_roll;
-        }
-
-
-        //const vec3 start_loc = (vec3){9, 9, 0};
+        const int myhd = g->chara_creation->hitdie;
+        int maxhp_roll = -1;
+        while (maxhp_roll < 1)
+            maxhp_roll = do_roll_best_of_3((vec3){1, myhd, 0}) + get_stat_bonus(g->chara_creation->constitution);
         const vec3 start_loc = g->dungeon->floors->at(g->dungeon->current_floor)->upstairs_loc;
         g->entity_turn = create_player(g, start_loc, "darkmage");
 
@@ -49,10 +37,9 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
         g->ct.set<wisdom>(g->hero_id, g->chara_creation->wisdom);
         g->ct.set<charisma>(g->hero_id, g->chara_creation->charisma);
 
-        g->ct.set<hitdie>(g->hero_id, hd);
+        g->ct.set<hd>(g->hero_id, (vec3){1, g->chara_creation->hitdie, 0});
         g->ct.set<hp>(g->hero_id, maxhp_roll);
         g->ct.set<maxhp>(g->hero_id, maxhp_roll);
-
 
         // temporary wedge-in code
         // set all the NPCs to target the hero
@@ -65,7 +52,6 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
                 g->ct.set<target_id>(id, g->hero_id);
             }
         }
-
         minfo("END Temporary wedge-in code");
         g->current_scene = SCENE_GAMEPLAY;
 
@@ -82,20 +68,19 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
         PlaySound(g->sfx->at(SFX_CONFIRM_01));
         int race = g->chara_creation->race;
-        if (race > 1) {
+        if (g->chara_creation->race > 1)
             race--;
-        } else {
+        else
             race = RACE_COUNT - 1;
-        }
         g->chara_creation->race = (race_t)race;
+        g->chara_creation->hitdie = get_racial_hd(g->chara_creation->race);
     } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
         PlaySound(g->sfx->at(SFX_CONFIRM_01));
         int race = g->chara_creation->race;
-        if (race < RACE_COUNT - 1) {
+        if (race < RACE_COUNT - 1)
             race++;
-        } else {
+        else
             race = RACE_NONE + 1;
-        }
         g->chara_creation->race = (race_t)race;
         g->chara_creation->hitdie = get_racial_hd(g->chara_creation->race);
     }

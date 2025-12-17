@@ -10,10 +10,7 @@ static inline void handle_npc(shared_ptr<gamestate> g, entityid id) {
     massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
 
-    if (id == 0)
-        return;
-
-    if (id == g->hero_id)
+    if (id == 0 || id == g->hero_id)
         return;
 
     auto maybe_type = g->ct.get<entitytype>(id);
