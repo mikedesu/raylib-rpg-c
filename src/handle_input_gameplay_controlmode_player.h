@@ -297,7 +297,6 @@ static inline bool handle_open_door(shared_ptr<gamestate> g, shared_ptr<inputsta
 
 
 static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    //if (inputstate_is_pressed(is, KEY_ESCAPE)) {
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT)
         return;
     if (handle_quit_pressed(g, is))
@@ -341,12 +340,6 @@ static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate
         return;
     if (handle_open_door(g, is, is_dead))
         return;
-    // handle restart
-    if (inputstate_is_pressed(is, KEY_R)) {
-        if (is_dead) {
-            g->do_restart = true;
-            minfo("setting do_restart to true...");
-            return;
-        }
-    }
+    if (handle_restart(g, is, is_dead))
+        return;
 }
