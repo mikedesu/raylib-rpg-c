@@ -14,13 +14,11 @@ void gameloop() {
     inputstate_update(is);
     liblogic_tick(is, g);
     libdraw_drawframe(g);
-
     if (g->do_restart) {
         msuccess("Restarting game...");
         libdraw_close();
         liblogic_close(g);
-        //gamestate_free(g);
-        g = nullptr;
+        g.reset();
         g = gamestateinitptr();
         liblogic_init(g);
         libdraw_init(g);
@@ -33,12 +31,14 @@ void gameloop() {
 int main() {
     liblogic_init(g);
     libdraw_init(g);
+
 #ifndef WEB
     while (!libdraw_windowshouldclose(g))
         gameloop();
 #else
     emscripten_set_main_loop(gameloop, 0, 1);
 #endif
+
     libdraw_close();
     liblogic_close(g);
     gamestate_free(g);
