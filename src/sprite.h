@@ -19,16 +19,12 @@ typedef struct sprite {
     int currentframe;
     int currentcontext;
     int num_loops;
-
     bool stop_on_last_frame;
     bool is_animating;
 } sprite;
 
 static inline shared_ptr<sprite> sprite_create2(Texture2D* t, int numcontexts, int numframes) {
-    if (!t) {
-        merror("sprite_create failed: texture is null");
-        return NULL;
-    }
+    massert(t, "texture t was null");
     shared_ptr<sprite> s = make_shared<sprite>();
     s->numframes = numframes;
     s->numcontexts = numcontexts;
@@ -75,17 +71,14 @@ static inline void sprite_setcontext2(shared_ptr<sprite> s, int context) {
     massert(s, "sprite_setcontext: sprite is NULL");
     massert(context >= 0, "sprite_setcontext: context is less than 0: %d", context);
     massert(context < s->numcontexts, "sprite_setcontext: context is greater than numcontexts: %d < %d", context, s->numcontexts);
-
     if (context < 0) {
         merror("sprite_setcontext: context is less than 0");
         return;
     }
-
     if (context >= s->numcontexts) {
         merror("sprite_setcontext: context is greater than numcontexts: %d < %d", context, s->numcontexts);
         return;
     }
-
     s->currentcontext = context % s->numcontexts;
     s->src.y = s->height * s->currentcontext;
     s->currentframe = s->src.x = 0;

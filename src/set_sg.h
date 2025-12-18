@@ -14,11 +14,7 @@ static inline void libdraw_set_sg_block_success(shared_ptr<gamestate> g, entityi
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
     const race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
-    int anim_index = SG_ANIM_NPC_GUARD_SUCCESS;
-    if (r == RACE_GREEN_SLIME)
-        anim_index = SG_ANIM_SLIME_IDLE;
-    else if (r == RACE_WOLF)
-        anim_index = SG_ANIM_WOLF_IDLE;
+    const int anim_index = r == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : r == RACE_WOLF ? SG_ANIM_WOLF_IDLE : SG_ANIM_NPC_GUARD_SUCCESS;
     spritegroup_set_current(sg, anim_index);
     update_shield_for_entity(g, id, sg);
     g->ct.set<block_success>(id, false);
@@ -29,10 +25,8 @@ static inline void libdraw_set_sg_is_damaged(shared_ptr<gamestate> g, entityid i
     massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
-    race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
-    int anim_index = SG_ANIM_NPC_DMG;
-    if (r == RACE_GREEN_SLIME)
-        anim_index = SG_ANIM_SLIME_DMG;
+    const race_t r = g->ct.get<race>(id).value_or(RACE_NONE);
+    const int anim_index = r == RACE_GREEN_SLIME ? SG_ANIM_SLIME_DMG : SG_ANIM_NPC_DMG;
     spritegroup_set_current(sg, anim_index);
 }
 
