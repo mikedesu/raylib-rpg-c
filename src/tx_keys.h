@@ -6,6 +6,7 @@
 #include "tx_keys_potions.h"
 #include "tx_keys_rings.h"
 #include "tx_keys_shields.h"
+#include "tx_keys_spells.h"
 #include "tx_keys_weapons.h"
 
 //#include "tx_keys_wands.h"

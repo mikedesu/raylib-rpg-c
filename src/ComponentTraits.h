@@ -8,6 +8,7 @@
 #include "race.h"
 #include "rarity.h"
 #include "shield.h"
+#include "spell.h"
 #include "vec3.h"
 #include "weapon.h"
 #include <memory>
@@ -327,4 +328,11 @@ struct rarity { }; //int
 template <>
 struct ComponentTraits<rarity> {
     using Type = rarity_t;
+};
+
+
+struct spelltype { }; //int
+template <>
+struct ComponentTraits<spelltype> {
+    using Type = spelltype_t;
 };
