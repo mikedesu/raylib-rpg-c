@@ -8,7 +8,7 @@ typedef enum
     ENTITY_ITEM,
     ENTITY_WOODEN_BOX,
     ENTITY_DOOR,
-    //ENTITY_SPELL_EFFECT,
+    ENTITY_SPELL,
     ENTITY_TYPE_COUNT
 } entitytype_t;
 
