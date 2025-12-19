@@ -2,29 +2,30 @@
 
 #include "gamestate.h"
 
-static inline void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
-    massert(g && t, "gamestate or tile is NULL");
+//static inline void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<tile_t> t) {
+static inline void recompute_entity_cache(shared_ptr<gamestate> g, tile_t& t) {
+    massert(g, "gamestate is NULL");
     // Only recompute if cache is dirty
-    if (!t->dirty_entities)
+    if (!t.dirty_entities)
         return;
     // Reset counters
-    t->cached_live_npcs = 0;
-    t->cached_player_present = false;
+    t.cached_live_npcs = 0;
+    t.cached_player_present = false;
     // Iterate through all entities on the tile
-    for (size_t i = 0; i < t->entities->size(); i++) {
-        const entityid id = t->entities->at(i);
+    for (size_t i = 0; i < t.entities->size(); i++) {
+        const entityid id = t.entities->at(i);
         // Skip dead entities
         if (g->ct.get<dead>(id).value_or(true))
             continue;
         // Check entity type
         const entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
         if (type == ENTITY_NPC)
-            t->cached_live_npcs++;
+            t.cached_live_npcs++;
         else if (type == ENTITY_PLAYER)
-            t->cached_player_present = true;
+            t.cached_player_present = true;
     }
     // Cache is now clean
-    t->dirty_entities = false;
+    t.dirty_entities = false;
 }
 
 
@@ -35,6 +36,6 @@ static inline void recompute_entity_cache_at(shared_ptr<gamestate> g, int x, int
     auto df = g->dungeon.floors[z];
     //massert(df, "failed to get dungeon floor");
     auto t = df_tile_at(df, (vec3){x, y, z});
-    massert(t, "tile not found");
+    //massert(t, "tile not found");
     recompute_entity_cache(g, t);
 }

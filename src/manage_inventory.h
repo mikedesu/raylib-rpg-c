@@ -80,10 +80,10 @@ static inline bool drop_from_inventory(shared_ptr<gamestate> g, entityid actor_i
 
         auto df = d_get_current_floor(g->dungeon);
         auto tile = df_tile_at(df, loc);
-        if (!tile) {
-            merror("No tile at that location: %d %d %d", loc.x, loc.y, loc.z);
-            return false;
-        }
+        //if (!tile) {
+        //    merror("No tile at that location: %d %d %d", loc.x, loc.y, loc.z);
+        //    return false;
+        //}
 
 
         const entityid retval = df_add_at(df, item_id, loc.x, loc.y);

@@ -12,9 +12,9 @@ static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, i
     auto df = d_get_floor(g->dungeon, z);
     //massert(df, "failed to get dungeon floor");
     auto t = df_tile_at(df, (vec3){x, y, z});
-    massert(t, "failed to get tile");
+    //massert(t, "failed to get tile");
     int count = 0;
-    for (int i = 0; (size_t)i < t->entities->size(); i++) {
+    for (int i = 0; (size_t)i < t.entities->size(); i++) {
         const entityid id = tile_get_entity(t, i);
         const entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
         if (id == ENTITYID_INVALID)

@@ -16,8 +16,8 @@ static inline entityid create_potion_at_with(shared_ptr<gamestate> g, vec3 loc, 
     auto df = d_get_floor(g->dungeon, loc.z);
     auto tile = df_tile_at(df, loc);
     //massert(df, "failed to get df");
-    massert(tile, "failed to get tile");
-    if (!tile_is_walkable(tile->type))
+    //massert(tile, "failed to get tile");
+    if (!tile_is_walkable(tile.type))
         return ENTITYID_INVALID;
     if (tile_has_live_npcs(g, tile))
         return ENTITYID_INVALID;

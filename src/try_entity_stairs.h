@@ -18,10 +18,10 @@ static inline bool try_entity_stairs(shared_ptr<gamestate> g, entityid id) {
     //auto df = g->dungeon.floors->at(current_floor);
     auto df = g->dungeon.floors[current_floor];
     auto t = df_tile_at(df, loc);
-    massert(t, "tile was NULL");
+    //massert(t, "tile was NULL");
 
     // check the tile type
-    if (t->type == TILE_UPSTAIRS) {
+    if (t.type == TILE_UPSTAIRS) {
         // can't go up on the top floor
         // otherwise...
         if (current_floor == 0) {
@@ -46,7 +46,7 @@ static inline bool try_entity_stairs(shared_ptr<gamestate> g, entityid id) {
             return true;
         }
 
-    } else if (t->type == TILE_DOWNSTAIRS) {
+    } else if (t.type == TILE_DOWNSTAIRS) {
         // can't go down on the bottom floor
         // otherwise...
 

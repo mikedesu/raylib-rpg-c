@@ -11,7 +11,8 @@ static inline void place_doors(shared_ptr<gamestate> g) {
             for (int y = 0; y < df.height; y++) {
                 const vec3 loc = {x, y, z};
                 auto tile = df_tile_at(df, loc);
-                if (!tile || !tile->can_have_door)
+                //if (!tile || !tile->can_have_door)
+                if (!tile.can_have_door)
                     continue;
                 create_door_at_with(g, loc, [](shared_ptr<gamestate> g, entityid id) {});
             }

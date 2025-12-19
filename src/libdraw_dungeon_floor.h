@@ -79,8 +79,8 @@ static inline bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo*
     massert(y < df.height, "y is out of bounds");
     //massert(df, "dungeon_floor is NULL");
     auto tile = df_tile_at(df, (vec3){x, y, z});
-    massert(tile, "tile is NULL");
-    if (tile->type == TILE_NONE || !tile->visible || !tile->explored)
+    //massert(tile, "tile is NULL");
+    if (tile.type == TILE_NONE || !tile.visible || !tile.explored)
         return true;
     // Get hero's total light radius
     const int light_dist = g->ct.get<light_radius>(g->hero_id).value_or(1);
@@ -91,7 +91,7 @@ static inline bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo*
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
     const int distance = abs(x - hero_loc.x) + abs(y - hero_loc.y);
     // Get tile texture
-    const int txkey = get_txkey_for_tiletype(tile->type);
+    const int txkey = get_txkey_for_tiletype(tile.type);
     if (txkey < 0)
         return false;
     Texture2D* texture = &txinfo[txkey].texture;
@@ -117,12 +117,12 @@ static inline bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo*
     for (const auto& v : path) {
         auto tile = df_tile_at(df, v);
         //if (tile && (tile_is_wall(tile->type))) {
-        if (tile && (tiletype_is_wall(tile->type))) {
+        if (tiletype_is_wall(tile.type)) {
             blocking = true;
             break;
         }
         // Check for closed doors
-        for_each(tile->entities->cbegin(), tile->entities->cend(), [g, &blocking](const entityid& id) {
+        for_each(tile.entities->cbegin(), tile.entities->cend(), [g, &blocking](const entityid& id) {
             if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g->ct.get<door_open>(id).value_or(false))
                 blocking = true;
         });
@@ -146,22 +146,22 @@ libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t enti
         for (int x = 0; x < df.width; x++) {
             const vec3 loc = {x, y, z};
             const auto tile = df_tile_at(df, loc);
-            if (!tile) {
-                //merror("No tile at location %d, %d, %d", loc.x, loc.y, loc.z);
-                continue;
-            }
+            //if (!tile) {
+            //merror("No tile at location %d, %d, %d", loc.x, loc.y, loc.z);
+            //    continue;
+            //}
 
-            if (!tile->visible) {
+            if (!tile.visible) {
                 //merror("Tile invisible");
                 continue;
             }
 
-            if (tiletype_is_wall(tile->type)) {
+            if (tiletype_is_wall(tile.type)) {
                 //merror("Tile is wall");
                 continue;
             }
 
-            if (tile->is_empty) {
+            if (tile.is_empty) {
                 //merror("Tile is empty at %d, %d, %d", loc.x, loc.y, loc.z);
                 continue;
             }
@@ -170,7 +170,7 @@ libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t enti
             // check to see if the tile directly beneath this tile is a wall
             const vec3 loc2 = {x, y + 1, z};
             const auto tile2 = df_tile_at(df, loc2);
-            if (tile2 && tile2->type == TILE_STONE_WALL_00) {
+            if (tile2.type == TILE_STONE_WALL_00) {
                 continue;
             }
 
@@ -209,13 +209,13 @@ libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t enti
             for (auto v0 : path) {
                 auto v0_tile = df_tile_at(df, v0);
                 //if (tile_is_wall(v0_tile->type)) {
-                if (tiletype_is_wall(v0_tile->type)) {
+                if (tiletype_is_wall(v0_tile.type)) {
                     object_blocking = true;
                     break;
                 }
 
                 // check if tile has a DOOR
-                for_each(v0_tile->entities->cbegin(), v0_tile->entities->cend(), [g, &object_blocking](const entityid& id) {
+                for_each(v0_tile.entities->cbegin(), v0_tile.entities->cend(), [g, &object_blocking](const entityid& id) {
                     if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g->ct.get<door_open>(id).value_or(false))
                         object_blocking = true;
                 });
@@ -227,7 +227,7 @@ libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t enti
             if (object_blocking)
                 continue;
 
-            for_each(tile->entities->cbegin(), tile->entities->cend(), [&g, entitytype_0, &additional_check](const entityid& id) {
+            for_each(tile.entities->cbegin(), tile.entities->cend(), [&g, entitytype_0, &additional_check](const entityid& id) {
                 auto type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
                 if (entitytype_0 == type && additional_check(g, id))
                     draw_sprite_and_shadow(g, id);

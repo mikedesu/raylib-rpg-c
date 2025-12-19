@@ -105,14 +105,15 @@ static inline void handle_attack_success(shared_ptr<gamestate> g, entityid atk_i
     }
 }
 
-static inline void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful) {
+//static inline void handle_attack_helper_innerloop(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, int i, entityid attacker_id, bool* attack_successful) {
+static inline void handle_attack_helper_innerloop(shared_ptr<gamestate> g, tile_t& tile, int i, entityid attacker_id, bool* attack_successful) {
     massert(g, "gamestate is NULL");
-    massert(tile, "tile is NULL");
+    //massert(tile, "tile is NULL");
     massert(i >= 0, "i is out of bounds");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(attack_successful, "attack_successful is NULL");
 
-    const entityid target_id = tile->entities->at(i);
+    const entityid target_id = tile.entities->at(i);
     if (target_id == ENTITYID_INVALID)
         return;
 
@@ -199,13 +200,14 @@ static inline void handle_attack_helper_innerloop(shared_ptr<gamestate> g, share
     }
 }
 
-static inline void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful) {
+//static inline void handle_attack_helper(shared_ptr<gamestate> g, shared_ptr<tile_t> tile, entityid attacker_id, bool* successful) {
+static inline void handle_attack_helper(shared_ptr<gamestate> g, tile_t& tile, entityid attacker_id, bool* successful) {
     massert(g, "gamestate is NULL");
-    massert(tile, "tile is NULL");
+    //massert(tile, "tile is NULL");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(successful, "attack_successful is NULL");
 
-    for (int i = 0; (size_t)i < tile->entities->size(); i++)
+    for (int i = 0; (size_t)i < tile.entities->size(); i++)
         handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
 }
 
@@ -219,10 +221,10 @@ static inline void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, i
     //massert(floor, "failed to get dungeon floor");
 
     auto tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
-    if (!tile) {
-        merror("No tile at location, cannot attack");
-        return;
-    }
+    //if (!tile) {
+    //    merror("No tile at location, cannot attack");
+    //    return;
+    //}
 
     // Calculate direction based on target position
     bool ok = false;

@@ -26,10 +26,10 @@ static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, i
     //massert(floor, "failed to get dungeon floor");
     const vec3 spell_loc = {tgt_x, tgt_y, loc.z};
     auto tile = df_tile_at(floor, spell_loc);
-    if (!tile) {
-        merror("No tile at location, cannot attack");
-        return;
-    }
+    //if (!tile) {
+    //    merror("No tile at location, cannot attack");
+    //    return;
+    //}
 
     // Calculate direction based on target position
     bool ok = false;
@@ -60,7 +60,7 @@ static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, i
 
         if (tile_has_live_npcs(g, tile)) {
             entityid npcid = ENTITYID_INVALID;
-            for (auto id : *tile->entities) {
+            for (auto id : *tile.entities) {
                 if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC) {
                     npcid = id;
                     break;
@@ -113,7 +113,7 @@ static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, i
         if (tile_has_door(g, spell_loc)) {
             // find the door id
             entityid doorid = ENTITYID_INVALID;
-            for (auto id : *tile->entities) {
+            for (auto id : *tile.entities) {
                 if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR) {
                     doorid = id;
                     break;

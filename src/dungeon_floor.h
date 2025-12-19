@@ -28,57 +28,60 @@ typedef struct {
     vec3 upstairs_loc;
     biome_t biome;
     vector<tile_id> tiles; // 2D vector of shared pointers to tile_t
-    shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
+    shared_ptr<unordered_map<tile_id, tile_t>> tile_map; // Maps tile_id to tile_t pointer
 } dungeon_floor_t;
 
 
-static inline shared_ptr<tile_t> df_tile_at(dungeon_floor_t& df, vec3 loc) {
-    if (loc.x < 0 || loc.x >= df.width || loc.y < 0 || loc.y >= df.height)
-        return NULL;
+static inline tile_t& df_tile_at(dungeon_floor_t& df, vec3 loc) {
     // given that tiles is a 2D vector of shared pointers to tile_t
     // we can access the tile using the x and y coordinates
     // and calculate the index
     const size_t index = loc.y * df.width + loc.x;
-    if (index < 0 || index >= df.tiles.size())
-        return NULL;
+    massert(index < df.tiles.size(), "index is out-of-bounds: %d, %d", loc.x, loc.y);
     const tile_id id = df.tiles[index];
     // Check if the tile_id exists in the map
     auto it = df.tile_map->find(id);
-    if (it != df.tile_map->end())
-        return it->second;
-    return NULL;
+    return it->second;
 }
 
 
 static inline void df_set_can_have_door(dungeon_floor_t& df, vec3 loc) {
     minfo("set can have door: %d, %d, %d", loc.x, loc.y, loc.z);
-    auto tile = df_tile_at(df, loc);
-    if (!tile)
-        return;
-    tile->can_have_door = true;
+    tile_t& tile = df_tile_at(df, loc);
+    tile.can_have_door = true;
 }
 
 
 static inline bool df_is_good_door_loc(dungeon_floor_t& df, vec3 loc) {
     auto tile = df_tile_at(df, loc);
-    if (!tile)
-        return false;
-    auto t0 = df_tile_at(df, (vec3){loc.x - 1, loc.y - 1, loc.z}), t1 = df_tile_at(df, (vec3){loc.x - 1, loc.y, loc.z});
-    auto t2 = df_tile_at(df, (vec3){loc.x - 1, loc.y + 1, loc.z}), t3 = df_tile_at(df, (vec3){loc.x, loc.y - 1, loc.z});
-    auto t4 = df_tile_at(df, (vec3){loc.x, loc.y + 1, loc.z}), t5 = df_tile_at(df, (vec3){loc.x + 1, loc.y - 1, loc.z});
-    auto t6 = df_tile_at(df, (vec3){loc.x + 1, loc.y, loc.z}), t7 = df_tile_at(df, (vec3){loc.x + 1, loc.y + 1, loc.z});
-    auto tw0 = tile_is_wall(t0), tw1 = tile_is_wall(t1), tw2 = tile_is_wall(t2), tw3 = tile_is_wall(t3);
-    auto tw4 = tile_is_wall(t4), tw5 = tile_is_wall(t5), tw6 = tile_is_wall(t6), tw7 = tile_is_wall(t7);
-    if (tw3 && tw4 && !(tw0 || tw1 || tw2 || tw5 || tw6 || tw7))
-        return true;
-    if (tw1 && tw6 && !(tw0 || tw2 || tw3 || tw4 || tw5 || tw7))
-        return true;
+    if (loc.x >= 1 && loc.y >= 1 && loc.x < df.width - 1 && loc.y < df.height - 1) {
+        auto t0 = df_tile_at(df, (vec3){loc.x - 1, loc.y - 1, loc.z});
+        auto t1 = df_tile_at(df, (vec3){loc.x - 1, loc.y, loc.z});
+        auto t2 = df_tile_at(df, (vec3){loc.x - 1, loc.y + 1, loc.z});
+        auto t3 = df_tile_at(df, (vec3){loc.x, loc.y - 1, loc.z});
+        auto t4 = df_tile_at(df, (vec3){loc.x, loc.y + 1, loc.z});
+        auto t5 = df_tile_at(df, (vec3){loc.x + 1, loc.y - 1, loc.z});
+        auto t6 = df_tile_at(df, (vec3){loc.x + 1, loc.y, loc.z});
+        auto t7 = df_tile_at(df, (vec3){loc.x + 1, loc.y + 1, loc.z});
+        auto tw0 = tile_is_wall(t0);
+        auto tw1 = tile_is_wall(t1);
+        auto tw2 = tile_is_wall(t2);
+        auto tw3 = tile_is_wall(t3);
+        auto tw4 = tile_is_wall(t4);
+        auto tw5 = tile_is_wall(t5);
+        auto tw6 = tile_is_wall(t6);
+        auto tw7 = tile_is_wall(t7);
+        if (tw3 && tw4 && !(tw0 || tw1 || tw2 || tw5 || tw6 || tw7))
+            return true;
+        if (tw1 && tw6 && !(tw0 || tw2 || tw3 || tw4 || tw5 || tw7))
+            return true;
+    }
     return false;
 }
 
 
 static inline void df_set_tile(dungeon_floor_t& df, tiletype_t type, int x, int y) {
-    shared_ptr<tile_t> current = df_tile_at(df, (vec3){x, y, -1});
+    tile_t& current = df_tile_at(df, (vec3){x, y, -1});
     tile_init(current, type);
 }
 
@@ -88,10 +91,10 @@ static inline tiletype_t random_tiletype(tiletype_t a, tiletype_t b) {
 }
 
 
-//static inline void df_set_area(shared_ptr<dungeon_floor_t> df, tiletype_t a, tiletype_t b, Rectangle r) {
 static inline void df_set_area(dungeon_floor_t& df, tiletype_t a, tiletype_t b, Rectangle r) {
-    for (int x = r.x; x < r.x + r.width; x++) {
-        for (int y = r.y; y < r.y + r.height; y++) {
+    minfo("df set area");
+    for (int x = r.x; x < r.x + r.width && x < df.width; x++) {
+        for (int y = r.y; y < r.y + r.height && y < df.height; y++) {
             const tiletype_t t = random_tiletype(a, b);
             df_set_tile(df, t, x, y);
         }
@@ -127,15 +130,16 @@ static inline void df_init(dungeon_floor_t& df, int floor, biome_t t, int width,
     df.biome = t;
 
     // alloc the tile map
-    df.tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
+    df.tile_map = make_shared<unordered_map<tile_id, tile_t>>();
     massert(df.tile_map, "failed to create tile map");
 
     // create all the tiles and add to the tile vector and tile map
     for (tile_id i = 0; i < width * height; i++) {
         df.tiles.push_back(i);
-        auto tile = make_shared<tile_t>();
-        massert(tile, "failed to create tile");
-        tile->id = i;
+        //auto tile = make_shared<tile_t>();
+        tile_t tile;
+        //massert(tile, "failed to create tile");
+        tile.id = i;
         tile_init(tile, TILE_NONE);
         df.tile_map->insert({i, tile});
     }
@@ -165,9 +169,8 @@ static inline void df_init(dungeon_floor_t& df, int floor, biome_t t, int width,
     df_set_tile(df, TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
     df.downstairs_loc = loc_d;
 
-
     df_set_can_have_door(df, (vec3){12, 9, 0});
-    if (df_tile_at(df, (vec3){12, 9, 0})->can_have_door) {
+    if (df_tile_at(df, (vec3){12, 9, 0}).can_have_door) {
         msuccess("door has can have door set");
         //DEBUG_BREAK();
     } else {
@@ -193,18 +196,15 @@ static inline int df_get_possible_downstairs_count_in_area(dungeon_floor_t& df, 
     massert(r.height > 0, "h is less than zero");
     massert(r.x + r.width <= df.width, "x + w is out of bounds");
     massert(r.y + r.height <= df.height, "y + h is out of bounds");
-
     int count = 0;
     for (int y0 = r.y; y0 < df.height; y0++) {
         for (int x0 = r.x; x0 < df.width; x0++) {
-            shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x0, y0, -1});
-            massert(tile, "tile is NULL at (%d, %d)", x0, y0);
+            tile_t& tile = df_tile_at(df, (vec3){x0, y0, -1});
             // check if the tile is possible downstairs
-            if (tile_is_possible_downstairs(tile->type))
+            if (tile_is_possible_downstairs(tile.type))
                 count++;
         }
     }
-
     return count;
 }
 
@@ -222,8 +222,8 @@ static inline int df_get_possible_upstairs_count_in_area(dungeon_floor_t& df, Re
     int count = 0;
     for (int y0 = r.y; y0 < df.height; y0++) {
         for (int x0 = r.x; x0 < df.width; x0++) {
-            shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x0, y0, -1});
-            if (tile_is_possible_upstairs(tile->type))
+            tile_t& tile = df_tile_at(df, (vec3){x0, y0, -1});
+            if (tile_is_possible_upstairs(tile.type))
                 count++;
         }
     }
@@ -234,13 +234,12 @@ static inline int df_get_possible_upstairs_count_in_area(dungeon_floor_t& df, Re
 static inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(dungeon_floor_t& df, Rectangle r) {
     auto locations = make_shared<vector<vec3>>();
     massert(locations, "failed to make_shared locations");
-
     // now we can loop thru the dungeon floor again and fill the array with the locations
     for (int y0 = r.y; y0 < df.height; y0++) {
         for (int x0 = r.x; x0 < df.width; x0++) {
-            shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x0, y0, -1});
+            tile_t& tile = df_tile_at(df, (vec3){x0, y0, -1});
             // there wont be any entities yet so do not check for them
-            if (tile_is_possible_upstairs(tile->type))
+            if (tile_is_possible_upstairs(tile.type))
                 locations->push_back((vec3){x0, y0, 0});
         }
     }
@@ -267,13 +266,10 @@ static inline bool df_assign_upstairs_in_area(dungeon_floor_t& df, Rectangle r) 
     const vec3 up_loc = locations->at(upstairs_index);
 
     // now we can set the upstairs tile
-    shared_ptr<tile_t> tile = df_tile_at(df, up_loc);
-    massert(tile, "failed to get tile");
-
+    //shared_ptr<tile_t> tile = df_tile_at(df, up_loc);
+    tile_t& tile = df_tile_at(df, up_loc);
     tile_init(tile, TILE_UPSTAIRS);
-
-    // make sure the upstairs tile is visible
-    tile->visible = true;
+    tile.visible = true;
 
     df.upstairs_loc = up_loc;
     return true;
@@ -290,9 +286,9 @@ static inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(d
     // now we can loop thru the dungeon floor again and fill the array with the locations
     for (int y0 = r.y; y0 < df.height; y0++) {
         for (int x0 = r.x; x0 < df.width; x0++) {
-            shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x0, y0, -1});
+            tile_t& tile = df_tile_at(df, (vec3){x0, y0, -1});
             // there wont be any entities yet so do not check for them
-            if (tile_is_possible_downstairs(tile->type))
+            if (tile_is_possible_downstairs(tile.type))
                 locations->push_back((vec3){x0, y0, 0});
         }
     }
@@ -316,10 +312,9 @@ static inline bool df_assign_downstairs_in_area(dungeon_floor_t& df, Rectangle r
     int downstairs_index = rand() % count;
     vec3 down_loc = locations->at(downstairs_index);
     // now we can set the upstairs tile
-    shared_ptr<tile_t> tile = df_tile_at(df, down_loc);
-    massert(tile, "failed to get tile");
+    tile_t& tile = df_tile_at(df, down_loc);
     tile_init(tile, TILE_DOWNSTAIRS);
-    tile->visible = true; // make sure the upstairs tile is visible
+    tile.visible = true; // make sure the upstairs tile is visible
     df.downstairs_loc = down_loc;
     return true;
 }
@@ -377,8 +372,7 @@ static inline entityid df_add_at(dungeon_floor_t& df, entityid id, int x, int y)
     massert(x < df.width, "x is out of bounds");
     massert(y >= 0, "y is less than zero");
     massert(y < df.height, "y is out of bounds");
-    shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, -1});
-    massert(tile, "tile is NULL at (%d, %d)", x, y);
+    tile_t& tile = df_tile_at(df, (vec3){x, y, -1});
     return tile_add(tile, id);
 }
 
@@ -388,8 +382,7 @@ static inline bool df_remove_at(dungeon_floor_t& df, entityid id, int x, int y) 
     massert(x < df.width, "x is out of bounds");
     massert(y >= 0, "y is less than zero");
     massert(y < df.height, "y is out of bounds");
-    shared_ptr<tile_t> tile = df_tile_at(df, (vec3){x, y, -1});
-    massert(tile, "tile is NULL at (%d, %d)", x, y);
+    tile_t& tile = df_tile_at(df, (vec3){x, y, -1});
     const entityid r = tile_remove(tile, id);
     if (r == ENTITYID_INVALID) {
         merror("df_remove_at: Failed to remove entity %d at (%d, %d)", id, x, y);
@@ -415,15 +408,13 @@ static inline vec3 df_get_random_loc(dungeon_floor_t& df) {
         for (int y = 0; y < df.height; y++) {
             vec3 loc = {x, y, df.floor};
             auto tile = df_tile_at(df, loc);
-            if (!tile)
+            if (tile.type == TILE_NONE)
                 continue;
-            if (tile->type == TILE_NONE)
+            if (tile.type == TILE_STONE_WALL_00)
                 continue;
-            if (tile->type == TILE_STONE_WALL_00)
+            if (tile.type == TILE_STONE_WALL_01)
                 continue;
-            if (tile->type == TILE_STONE_WALL_01)
-                continue;
-            if (tile->entities->size() > 0)
+            if (tile.entities->size() > 0)
                 continue;
             tmp.push_back(loc);
         }

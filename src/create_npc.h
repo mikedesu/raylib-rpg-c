@@ -101,9 +101,9 @@ static inline entityid create_npc_at_with(shared_ptr<gamestate> g, race_t rt, ve
     auto df = d_get_floor(g->dungeon, loc.z);
     auto tile = df_tile_at(df, loc);
 
-    massert(tile, "failed to get tile");
+    //massert(tile, "failed to get tile");
 
-    if (!tile_is_walkable(tile->type)) {
+    if (!tile_is_walkable(tile.type)) {
         merror("cannot create entity on non-walkable tile");
         return ENTITYID_INVALID;
     }

@@ -15,8 +15,8 @@ static inline bool try_entity_open_door(shared_ptr<gamestate> g, entityid id, ve
         auto df = d_get_current_floor(g->dungeon);
         auto t = df_tile_at(df, loc);
 
-        for (size_t i = 0; i < t->entities->size(); i++) {
-            const entityid myid = t->entities->at(i);
+        for (size_t i = 0; i < t.entities->size(); i++) {
+            const entityid myid = t.entities->at(i);
             const entitytype_t type = g->ct.get<entitytype>(myid).value_or(ENTITY_NONE);
             if (type == ENTITY_DOOR) {
                 auto maybe_is_open = g->ct.get<door_open>(myid);

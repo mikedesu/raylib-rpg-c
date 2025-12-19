@@ -5,17 +5,14 @@
 using std::max;
 using std::min;
 
-static inline void update_tile(shared_ptr<tile_t> tile) {
-    if (!tile)
-        return;
-    tile->explored = tile->visible = true;
+static inline void update_tile(tile_t& tile) {
+    tile.explored = tile.visible = true;
 }
 
 static inline void update_player_tiles_explored(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     if (g->hero_id == ENTITYID_INVALID)
         return;
-    //auto df = g->dungeon->floors->at(g->dungeon->current_floor);
     auto df = d_get_current_floor(g->dungeon);
     auto maybe_loc = g->ct.get<location>(g->hero_id);
     if (!maybe_loc.has_value())

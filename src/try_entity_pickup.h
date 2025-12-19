@@ -26,10 +26,10 @@ static inline bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
     //}
 
     auto tile = df_tile_at(df, loc);
-    if (!tile) {
-        merror("Failed to get tile");
-        return false;
-    }
+    //if (!tile) {
+    //    merror("Failed to get tile");
+    //    return false;
+    //}
 
     //if (tile->entities->size() == 0) {
     //    add_message(g, "No items on tile");
@@ -40,8 +40,8 @@ static inline bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
     bool item_picked_up = false;
     auto item_id = ENTITYID_INVALID;
 
-    for (size_t i = 0; i < tile->entities->size(); i++) {
-        entityid itemid = tile->entities->at(i);
+    for (size_t i = 0; i < tile.entities->size(); i++) {
+        entityid itemid = tile.entities->at(i);
         auto type = g->ct.get<entitytype>(itemid).value_or(ENTITY_NONE);
         if (type == ENTITY_ITEM) {
             if (add_to_inventory(g, id, itemid)) {

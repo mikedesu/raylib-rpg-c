@@ -31,11 +31,11 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
     //}
     // i feel like this might be something we can set elsewhere...like after the player input phase?
     auto tile = df_tile_at(df, aloc);
-    if (!tile) {
-        merror("Tile does not exist at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
-        return false; // Tile does not exist
-    }
-    if (!tile_is_walkable(tile->type)) {
+    //if (!tile) {
+    //    merror("Tile does not exist at (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
+    //    return false; // Tile does not exist
+    //}
+    if (!tile_is_walkable(tile.type)) {
         merror("Tile at (%d, %d, %d) is not walkable", aloc.x, aloc.y, aloc.z);
         return false;
     }
@@ -90,7 +90,7 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
     const float my = v.y * DEFAULT_TILE_SIZE;
 
     auto current_tile = df_tile_at(df, loc);
-    massert(current_tile, "Current tile is NULL at (%d, %d, %d)", loc.x, loc.y, loc.z);
+    //massert(current_tile, "Current tile is NULL at (%d, %d, %d)", loc.x, loc.y, loc.z);
 
     // remove the entity from the current tile
     if (!df_remove_at(df, id, loc.x, loc.y)) {

@@ -14,11 +14,12 @@ static inline entityid create_door_with(shared_ptr<gamestate> g, function<void(s
 static inline entityid create_door_at_with(shared_ptr<gamestate> g, vec3 loc, function<void(shared_ptr<gamestate>, entityid)> doorInitFunction) {
     //shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
     dungeon_floor_t& df = d_get_floor(g->dungeon, loc.z);
-    shared_ptr<tile_t> tile = df_tile_at(df, loc);
+    //shared_ptr<tile_t> tile = df_tile_at(df, loc);
+    tile_t& tile = df_tile_at(df, loc);
 
-    massert(tile, "failed to get tile");
+    //massert(tile, "failed to get tile");
 
-    if (!tile_is_walkable(tile->type))
+    if (!tile_is_walkable(tile.type))
         return ENTITYID_INVALID;
     if (tile_has_live_npcs(g, tile))
         return ENTITYID_INVALID;
