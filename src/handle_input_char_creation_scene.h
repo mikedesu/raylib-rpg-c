@@ -30,7 +30,7 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
         while (maxhp_roll < 1)
             maxhp_roll = do_roll_best_of_3((vec3){1, myhd, 0}) + get_stat_bonus(g->chara_creation.constitution);
         //const vec3 start_loc = g->dungeon.floors->at(g->dungeon.current_floor)->upstairs_loc;
-        const vec3 start_loc = g->dungeon.floors[g->dungeon.current_floor]->upstairs_loc;
+        const vec3 start_loc = g->dungeon.floors[g->dungeon.current_floor].upstairs_loc;
         g->entity_turn = create_player(g, start_loc, "darkmage");
 
         massert(g->hero_id != ENTITYID_INVALID, "heroid is invalid");

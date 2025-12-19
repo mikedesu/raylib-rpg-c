@@ -23,7 +23,7 @@ static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, i
     const vec3 loc = maybe_loc.value();
 
     auto floor = d_get_floor(g->dungeon, loc.z);
-    massert(floor, "failed to get dungeon floor");
+    //massert(floor, "failed to get dungeon floor");
     const vec3 spell_loc = {tgt_x, tgt_y, loc.z};
     auto tile = df_tile_at(floor, spell_loc);
     if (!tile) {

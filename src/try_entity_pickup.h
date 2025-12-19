@@ -20,10 +20,10 @@ static inline bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
 
     auto loc = maybe_loc.value();
     auto df = d_get_floor(g->dungeon, loc.z);
-    if (!df) {
-        merror("Failed to get dungeon floor");
-        return false;
-    }
+    //if (!df) {
+    //    merror("Failed to get dungeon floor");
+    //    return false;
+    //}
 
     auto tile = df_tile_at(df, loc);
     if (!tile) {

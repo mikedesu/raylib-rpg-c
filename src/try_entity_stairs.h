@@ -35,7 +35,7 @@ static inline bool try_entity_stairs(shared_ptr<gamestate> g, entityid id) {
 
             const int new_floor = g->dungeon.current_floor;
             auto df2 = g->dungeon.floors[new_floor];
-            const vec3 uloc = df2->downstairs_loc;
+            const vec3 uloc = df2.downstairs_loc;
             auto t2 = df_tile_at(df2, uloc);
 
             df_add_at(df2, g->hero_id, uloc.x, uloc.y);
@@ -59,7 +59,7 @@ static inline bool try_entity_stairs(shared_ptr<gamestate> g, entityid id) {
 
             const int new_floor = g->dungeon.current_floor;
             auto df2 = g->dungeon.floors[new_floor];
-            const vec3 uloc = df2->upstairs_loc;
+            const vec3 uloc = df2.upstairs_loc;
             auto t2 = df_tile_at(df2, uloc);
 
             df_add_at(df2, g->hero_id, uloc.x, uloc.y);

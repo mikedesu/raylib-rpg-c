@@ -16,19 +16,19 @@ static inline bool create_spritegroup(shared_ptr<gamestate> g, entityid id, int*
     massert(group, "spritegroup is NULL");
     //disabling this check until dungeon_floor created
     auto df = d_get_current_floor(g->dungeon);
-    massert(df, "dungeon_floor is NULL");
-    if (!df) {
-        spritegroup_destroy(group);
-        merror("END create spritegroup");
-        return false;
-    }
+    //massert(df, "dungeon_floor is NULL");
+    //if (!df) {
+    //    spritegroup_destroy(group);
+    //    merror("END create spritegroup");
+    //    return false;
+    //}
     auto maybe_loc = g->ct.get<location>(id);
     // if it has a location...
     if (maybe_loc.has_value()) {
         const vec3 loc = maybe_loc.value();
-        massert(loc.x >= 0 && loc.x < df->width, "location x out of bounds: %d", loc.x);
-        massert(loc.y >= 0 && loc.y < df->height, "location y out of bounds: %d", loc.y);
-        if (loc.x < 0 || loc.x >= df->width || loc.y < 0 || loc.y >= df->height) {
+        massert(loc.x >= 0 && loc.x < df.width, "location x out of bounds: %d", loc.x);
+        massert(loc.y >= 0 && loc.y < df.height, "location y out of bounds: %d", loc.y);
+        if (loc.x < 0 || loc.x >= df.width || loc.y < 0 || loc.y >= df.height) {
             spritegroup_destroy(group);
             merror("END create spritegroup");
             return false;

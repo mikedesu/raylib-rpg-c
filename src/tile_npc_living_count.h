@@ -10,7 +10,7 @@ static inline int tile_npc_living_count(shared_ptr<gamestate> g, int x, int y, i
     massert(z >= 0, "floor is out of bounds");
     massert((size_t)z < g->dungeon.floors.size(), "floor is out of bounds");
     auto df = d_get_floor(g->dungeon, z);
-    massert(df, "failed to get dungeon floor");
+    //massert(df, "failed to get dungeon floor");
     auto t = df_tile_at(df, (vec3){x, y, z});
     massert(t, "failed to get tile");
     int count = 0;

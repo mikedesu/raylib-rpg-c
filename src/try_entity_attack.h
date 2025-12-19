@@ -216,7 +216,7 @@ static inline void try_entity_attack(shared_ptr<gamestate> g, entityid atk_id, i
 
     const vec3 loc = g->ct.get<location>(atk_id).value();
     auto floor = d_get_floor(g->dungeon, loc.z);
-    massert(floor, "failed to get dungeon floor");
+    //massert(floor, "failed to get dungeon floor");
 
     auto tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
     if (!tile) {

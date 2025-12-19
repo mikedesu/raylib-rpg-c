@@ -74,10 +74,10 @@ static inline bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo*
     massert(x >= 0, "x is less than 0");
     massert(y >= 0, "y is less than 0");
     auto df = d_get_floor(g->dungeon, z);
-    massert(df, "dungeon_floor is NULL");
-    massert(x < df->width, "x is out of bounds");
-    massert(y < df->height, "y is out of bounds");
-    massert(df, "dungeon_floor is NULL");
+    //massert(df, "dungeon_floor is NULL");
+    massert(x < df.width, "x is out of bounds");
+    massert(y < df.height, "y is out of bounds");
+    //massert(df, "dungeon_floor is NULL");
     auto tile = df_tile_at(df, (vec3){x, y, z});
     massert(tile, "tile is NULL");
     if (tile->type == TILE_NONE || !tile->visible || !tile->explored)
@@ -138,12 +138,12 @@ static inline bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo*
 
 static inline void
 libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t entitytype_0, function<bool(shared_ptr<gamestate>, entityid)> additional_check) {
-    shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
-    massert(df, "dungeon_floor is NULL");
+    auto df = d_get_current_floor(g->dungeon);
+    //massert(df, "dungeon_floor is NULL");
     const int z = g->dungeon.current_floor;
 
-    for (int y = 0; y < df->height; y++) {
-        for (int x = 0; x < df->width; x++) {
+    for (int y = 0; y < df.height; y++) {
+        for (int x = 0; x < df.width; x++) {
             const vec3 loc = {x, y, z};
             const auto tile = df_tile_at(df, loc);
             if (!tile) {
@@ -239,14 +239,14 @@ libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t enti
 
 static inline bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
-    shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
-    massert(df, "dungeon_floor is NULL");
+    auto df = d_get_current_floor(g->dungeon);
+    //massert(df, "dungeon_floor is NULL");
     const int z = g->dungeon.current_floor;
 
     // render tiles
     //minfo("render tiles");
-    for (int y = 0; y < df->height; y++)
-        for (int x = 0; x < df->width; x++)
+    for (int y = 0; y < df.height; y++)
+        for (int x = 0; x < df.width; x++)
             draw_dungeon_floor_tile(g, txinfo, x, y, z);
 
     auto mydefault = [](shared_ptr<gamestate> g, entityid id) { return true; };

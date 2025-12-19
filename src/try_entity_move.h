@@ -25,10 +25,10 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
     // we will have a special case for traversing floors so ignore v.z
     const vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
     auto df = d_get_floor(g->dungeon, loc.z);
-    if (!df) {
-        merror("Dungeon floor %d does not exist", loc.z);
-        return false;
-    }
+    //if (!df) {
+    //    merror("Dungeon floor %d does not exist", loc.z);
+    //    return false;
+    //}
     // i feel like this might be something we can set elsewhere...like after the player input phase?
     auto tile = df_tile_at(df, aloc);
     if (!tile) {
