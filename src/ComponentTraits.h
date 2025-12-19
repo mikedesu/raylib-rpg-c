@@ -88,6 +88,13 @@ struct ComponentTraits<attacking> {
     using Type = bool;
 };
 
+struct casting { }; // bool
+template <>
+struct ComponentTraits<casting> {
+    using Type = bool;
+};
+
+
 struct blocking { }; // bool
 template <>
 struct ComponentTraits<blocking> {
@@ -335,4 +342,11 @@ struct spelltype { }; //int
 template <>
 struct ComponentTraits<spelltype> {
     using Type = spelltype_t;
+};
+
+
+struct spellstate { }; //int
+template <>
+struct ComponentTraits<spellstate> {
+    using Type = spellstate_t;
 };

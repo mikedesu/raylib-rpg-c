@@ -8,6 +8,7 @@
 #include "handle_input_help_menu.h"
 #include "sfx.h"
 #include "try_entity_attack.h"
+#include "try_entity_cast_spell.h"
 #include "try_entity_move.h"
 #include "try_entity_open_door.h"
 #include "try_entity_pickup.h"
@@ -242,6 +243,26 @@ static inline bool handle_attack(shared_ptr<gamestate> g, shared_ptr<inputstate>
     return false;
 }
 
+
+static inline bool handle_test_cast_spell(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+    if (inputstate_is_pressed(is, KEY_M)) {
+        if (is_dead) {
+            add_message(g, "You cannot cast spells while dead (yet)");
+            return true;
+        }
+        if (g->ct.get<location>(g->hero_id).has_value() && g->ct.get<direction>(g->hero_id).has_value()) {
+            const vec3 loc = get_loc_facing_player(g);
+            //try_entity_attack(g, g->hero_id, loc.x, loc.y);
+            try_entity_cast_spell(g, g->hero_id, loc.x, loc.y);
+
+            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return true;
+        }
+    }
+    return false;
+}
+
+
 static inline bool handle_pickup_item(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_SLASH)) {
         if (is_dead) {
@@ -340,6 +361,9 @@ static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate
         return;
     if (handle_open_door(g, is, is_dead))
         return;
+    if (handle_test_cast_spell(g, is, is_dead))
+        return;
+
     if (handle_restart(g, is, is_dead))
         return;
 }
