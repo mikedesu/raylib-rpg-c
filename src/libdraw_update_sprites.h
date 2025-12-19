@@ -83,24 +83,19 @@ static inline void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
             }
         }
 
-        //if (type == ENTITY_SPELL) {
-        //    if (sg->current == 0) {
-        //        if (s->num_loops >= 1) {
-        //            sg->current = 1;
-        //            s->num_loops = 0;
-        //        }
-        //    } else if (sg->current == 1) {
-        //        if (s->num_loops >= 1) {
-        //            sg->current = 2;
-        //            s->num_loops = 0;
-        //        }
-        //    } else if (sg->current == 2) {
-        //        if (s->num_loops >= 1) {
-        //            sg->current = 0;
-        //            s->num_loops = 0;
-        //        }
-        //    }
-        //}
+        // this will fire off an infinite loop of spell transitions
+        // from cast, to persist, to end
+        // then repeat
+        // it works, but isnt quite what i want
+        if (type == ENTITY_SPELL && s->num_loops >= 1) {
+            if (sg->current == 0) {
+                spritegroup_set_current(sg, 1);
+            } else if (sg->current == 1) {
+                spritegroup_set_current(sg, 2);
+            } else if (sg->current == 2) {
+                spritegroup_set_current(sg, 0);
+            }
+        }
 
         // lets try something
         if (type == ENTITY_ITEM) {
