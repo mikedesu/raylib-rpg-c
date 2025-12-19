@@ -7,12 +7,12 @@
 #include <emscripten/emscripten.h>
 #endif
 
-shared_ptr<inputstate> is = make_shared<inputstate>();
+inputstate is;
 shared_ptr<gamestate> g = gamestateinitptr();
 
 void gameloop() {
     inputstate_update(is);
-    liblogic_tick(is, g);
+    liblogic_tick(g, is);
     libdraw_drawframe(g);
     if (g->do_restart) {
         msuccess("Restarting game...");

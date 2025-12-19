@@ -4,7 +4,7 @@
 #include "inputstate.h"
 
 
-static inline void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline void update_debug_panel_buffer(shared_ptr<gamestate> g, inputstate& is) {
     massert(g, "gamestate is NULL");
     // Static buffers to avoid reallocating every frame
     //static const char* control_modes[] = {"Camera", "Player", "Unknown"};
@@ -29,8 +29,6 @@ static inline void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr
              //"%s\n" // currenttimebuf
              "frame : %d\n"
              "update: %d\n"
-             "mouse: %.01f, %.01f\n"
-             "last clicked: %.01f, %.01f\n"
              "frame dirty: %d\n"
              "draw time: %.1fms\n"
              "cam: (%.0f,%.0f) Zoom: %.1f\n"
@@ -46,10 +44,6 @@ static inline void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr
              "message count: %d\n",
              g->framecount,
              g->frame_updates,
-             is->mouse_position.x,
-             is->mouse_position.y,
-             g->last_click_screen_pos.x,
-             g->last_click_screen_pos.y,
              g->frame_dirty,
              g->last_frame_time * 1000,
              g->cam2d.offset.x,

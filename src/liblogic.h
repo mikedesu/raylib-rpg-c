@@ -129,8 +129,9 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
     msuccess("liblogic_init: Game state initialized");
 }
 
-static inline void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
-    massert(is, "Input state is NULL!");
+//static inline void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+static inline void liblogic_tick(shared_ptr<gamestate> g, inputstate& is) {
+    //massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     // Spawn NPCs periodically
     //try_spawn_npc(g);

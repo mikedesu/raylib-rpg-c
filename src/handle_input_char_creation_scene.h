@@ -9,8 +9,8 @@
 #include "sfx.h"
 
 
-static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    massert(is, "Input state is NULL!");
+static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g, inputstate& is) {
+    //massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
 
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {

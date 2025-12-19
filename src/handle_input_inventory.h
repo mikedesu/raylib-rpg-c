@@ -112,8 +112,9 @@ static inline void handle_inventory_equip(shared_ptr<gamestate> g) {
 }
 
 
-static inline void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
-    massert(is, "Input state is NULL!");
+//static inline void handle_input_inventory(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
+static inline void handle_input_inventory(shared_ptr<gamestate> g, inputstate& is) {
+    //massert(is, "Input state is NULL!");
     massert(g, "Game state is NULL!");
     if (g->controlmode != CONTROLMODE_INVENTORY)
         return;

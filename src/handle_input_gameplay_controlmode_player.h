@@ -15,7 +15,7 @@
 #include "try_entity_stairs.h"
 
 
-static inline bool handle_quit_pressed(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline bool handle_quit_pressed(shared_ptr<gamestate> g, inputstate& is) {
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->do_quit = true;
         return true;
@@ -23,7 +23,7 @@ static inline bool handle_quit_pressed(shared_ptr<gamestate> g, shared_ptr<input
     return false;
 }
 
-static inline bool handle_cycle_messages(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline bool handle_cycle_messages(shared_ptr<gamestate> g, inputstate& is) {
     if (g->msg_system_is_active && inputstate_is_pressed(is, KEY_ENTER)) {
         play_sound(SFX_CONFIRM_01);
         cycle_messages(g);
@@ -33,7 +33,7 @@ static inline bool handle_cycle_messages(shared_ptr<gamestate> g, shared_ptr<inp
 }
 
 
-static inline bool handle_change_dir_intent(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline bool handle_change_dir_intent(shared_ptr<gamestate> g, inputstate& is) {
     if (inputstate_is_pressed(is, KEY_S)) {
         g->player_changing_dir = true;
         return true;
@@ -42,7 +42,7 @@ static inline bool handle_change_dir_intent(shared_ptr<gamestate> g, shared_ptr<
 }
 
 
-static inline bool handle_display_inventory(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline bool handle_display_inventory(shared_ptr<gamestate> g, inputstate& is) {
     if (inputstate_is_pressed(is, KEY_I)) {
         g->display_inventory_menu = true;
         g->controlmode = CONTROLMODE_INVENTORY;
@@ -54,7 +54,7 @@ static inline bool handle_display_inventory(shared_ptr<gamestate> g, shared_ptr<
 }
 
 
-static inline bool handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline bool handle_camera_zoom(shared_ptr<gamestate> g, inputstate& is) {
     if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
         g->cam2d.zoom += DEFAULT_ZOOM_INCR;
         g->frame_dirty = true;
@@ -68,7 +68,7 @@ static inline bool handle_camera_zoom(shared_ptr<gamestate> g, shared_ptr<inputs
 }
 
 
-static inline bool handle_change_dir(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline bool handle_change_dir(shared_ptr<gamestate> g, inputstate& is) {
     if (g->player_changing_dir) {
         auto maybe_player_is_dead = g->ct.get<dead>(g->hero_id);
         if (!maybe_player_is_dead.has_value())
@@ -115,7 +115,7 @@ static inline bool handle_change_dir(shared_ptr<gamestate> g, shared_ptr<inputst
 }
 
 
-static inline bool handle_move_up(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_move_up(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
         if (is_dead) {
             add_message(g, "You cannot move while dead");
@@ -130,7 +130,7 @@ static inline bool handle_move_up(shared_ptr<gamestate> g, shared_ptr<inputstate
 }
 
 
-static inline bool handle_move_down(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_move_down(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
         if (is_dead) {
             add_message(g, "You cannot move while dead");
@@ -143,7 +143,7 @@ static inline bool handle_move_down(shared_ptr<gamestate> g, shared_ptr<inputsta
     return false;
 }
 
-static inline bool handle_move_left(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_move_left(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
         if (is_dead) {
             add_message(g, "You cannot move while dead");
@@ -157,7 +157,7 @@ static inline bool handle_move_left(shared_ptr<gamestate> g, shared_ptr<inputsta
 }
 
 
-static inline bool handle_move_right(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_move_right(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
         if (is_dead) {
             add_message(g, "You cannot move while dead");
@@ -171,7 +171,7 @@ static inline bool handle_move_right(shared_ptr<gamestate> g, shared_ptr<inputst
 }
 
 
-static inline bool handle_move_up_left(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_move_up_left(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_Q)) {
         if (is_dead) {
             add_message(g, "You cannot move while dead");
@@ -185,7 +185,7 @@ static inline bool handle_move_up_left(shared_ptr<gamestate> g, shared_ptr<input
 }
 
 
-static inline bool handle_move_up_right(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_move_up_right(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_E)) {
         if (is_dead) {
             add_message(g, "You cannot move while dead");
@@ -199,7 +199,7 @@ static inline bool handle_move_up_right(shared_ptr<gamestate> g, shared_ptr<inpu
 }
 
 
-static inline bool handle_move_down_left(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_move_down_left(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_Z)) {
         if (is_dead) {
             add_message(g, "You cannot move while dead");
@@ -213,7 +213,7 @@ static inline bool handle_move_down_left(shared_ptr<gamestate> g, shared_ptr<inp
 }
 
 
-static inline bool handle_move_down_right(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_move_down_right(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_C)) {
         if (is_dead) {
             add_message(g, "You cannot move while dead");
@@ -227,7 +227,7 @@ static inline bool handle_move_down_right(shared_ptr<gamestate> g, shared_ptr<in
 }
 
 
-static inline bool handle_attack(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_attack(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
         if (is_dead) {
             add_message(g, "You cannot attack while dead");
@@ -244,7 +244,7 @@ static inline bool handle_attack(shared_ptr<gamestate> g, shared_ptr<inputstate>
 }
 
 
-static inline bool handle_test_cast_spell(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_test_cast_spell(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_M)) {
         if (is_dead) {
             add_message(g, "You cannot cast spells while dead (yet)");
@@ -263,7 +263,7 @@ static inline bool handle_test_cast_spell(shared_ptr<gamestate> g, shared_ptr<in
 }
 
 
-static inline bool handle_pickup_item(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_pickup_item(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_SLASH)) {
         if (is_dead) {
             add_message(g, "You cannot pick up items while dead");
@@ -279,7 +279,7 @@ static inline bool handle_pickup_item(shared_ptr<gamestate> g, shared_ptr<inputs
 //static inline bool handle_attack(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
 //}
 
-static inline bool handle_traverse_stairs(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_traverse_stairs(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_PERIOD)) {
         if (is_dead) {
             add_message(g, "You cannot traverse stairs while dead");
@@ -292,7 +292,7 @@ static inline bool handle_traverse_stairs(shared_ptr<gamestate> g, shared_ptr<in
 }
 
 
-static inline bool handle_restart(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_restart(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_R) && is_dead) {
         g->do_restart = true;
         minfo("setting do_restart to true...");
@@ -302,7 +302,7 @@ static inline bool handle_restart(shared_ptr<gamestate> g, shared_ptr<inputstate
 }
 
 
-static inline bool handle_open_door(shared_ptr<gamestate> g, shared_ptr<inputstate> is, bool is_dead) {
+static inline bool handle_open_door(shared_ptr<gamestate> g, inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_O)) {
         if (is_dead) {
             add_message(g, "You cannot open doors while dead");
@@ -317,7 +317,7 @@ static inline bool handle_open_door(shared_ptr<gamestate> g, shared_ptr<inputsta
 }
 
 
-static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline void handle_input_gameplay_controlmode_player(shared_ptr<gamestate> g, inputstate& is) {
     if (g->flag != GAMESTATE_FLAG_PLAYER_INPUT)
         return;
     if (handle_quit_pressed(g, is))

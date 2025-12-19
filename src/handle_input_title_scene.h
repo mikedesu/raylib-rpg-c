@@ -5,7 +5,8 @@
 #include "play_sound.h"
 #include "sfx.h"
 
-static inline void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+//static inline void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline void handle_input_title_scene(shared_ptr<gamestate> g, inputstate& is) {
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         g->do_quit = true;
         return;

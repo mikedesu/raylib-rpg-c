@@ -4,7 +4,7 @@
 #include "inputstate.h"
 
 
-static inline void handle_camera_move(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline void handle_camera_move(shared_ptr<gamestate> g, inputstate& is) {
     const float move = g->cam2d.zoom;
     //const char* action = get_action_key(is, g);
     if (inputstate_is_held(is, KEY_RIGHT)) {

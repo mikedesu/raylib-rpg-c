@@ -8,8 +8,9 @@
 #include "inputstate.h"
 #include "scene.h"
 
-static inline void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
-    massert(is, "inputstate is NULL");
+//static inline void handle_input(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
+static inline void handle_input(shared_ptr<gamestate> g, inputstate& is) {
+    //massert(is, "inputstate is NULL");
     massert(g, "gamestate is NULL");
 
     // no matter which mode we are in, we can toggle the debug panel
