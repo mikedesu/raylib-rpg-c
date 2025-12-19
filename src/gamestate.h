@@ -122,9 +122,9 @@ typedef struct gamestate {
 
     shared_ptr<vector<string>> msg_system;
     shared_ptr<vector<string>> msg_history;
-    shared_ptr<vector<string>> music_file_paths;
     shared_ptr<vector<Sound>> sfx;
 
+    vector<string> music_file_paths;
     //shared_ptr<character_creation> chara_creation;
 
     character_creation chara_creation;
@@ -168,9 +168,9 @@ typedef struct gamestate {
 static inline void gamestate_init_music_paths(shared_ptr<gamestate> g) {
     massert(g, "g is NULL");
     minfo("Initializing music paths...");
-    if (!g->music_file_paths) {
-        g->music_file_paths = make_shared<vector<string>>();
-    }
+    //if (!g->music_file_paths) {
+    //    g->music_file_paths = make_shared<vector<string>>();
+    //}
     const char* music_path_file = "music.txt";
     FILE* file = fopen(music_path_file, "r");
     massert(file, "Could not open music path file: %s", music_path_file);
@@ -194,7 +194,7 @@ static inline void gamestate_init_music_paths(shared_ptr<gamestate> g) {
 
         // need to pre-pend the folder path
         string fullpath = "audio/music/" + string(buffer);
-        g->music_file_paths->push_back(fullpath);
+        g->music_file_paths.push_back(fullpath);
     }
     fclose(file);
     msuccess("Music paths initialized!");
