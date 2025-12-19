@@ -8,6 +8,7 @@
 #include "manage_inventory.h"
 #include "play_sound.h"
 #include "sfx.h"
+#include "tile_has_door.h"
 
 static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, int tgt_x, int tgt_y) {
     massert(g, "gamestate is NULL");
@@ -107,6 +108,22 @@ static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, i
             } else if (tgttype == ENTITY_PLAYER) {
                 add_message(g, "You died");
             }
+        }
+
+        if (tile_has_door(g, spell_loc)) {
+            // find the door id
+            entityid doorid = ENTITYID_INVALID;
+            for (auto id : *tile->entities) {
+                if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR) {
+                    doorid = id;
+                    break;
+                }
+            }
+
+            // mark it 'destroyed'
+            g->ct.set<destroyed>(doorid, true);
+            // remove it from the tile
+            df_remove_at(floor, doorid, spell_loc.x, spell_loc.y);
         }
 
         g->ct.set<destroyed>(spell_id, true);
