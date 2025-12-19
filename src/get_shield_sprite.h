@@ -7,12 +7,12 @@
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
-static inline shared_ptr<sprite> get_shield_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
+static inline shared_ptr<sprite> get_shield_front_sprite(gamestate& g, entityid id, spritegroup_t* sg) {
+    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
     shared_ptr<sprite> retval = nullptr;
-    const entityid shield = g->ct.get<equipped_shield>(id).value_or(ENTITYID_INVALID);
+    const entityid shield = g.ct.get<equipped_shield>(id).value_or(ENTITYID_INVALID);
     if (shield == ENTITYID_INVALID)
         return retval;
     auto it = spritegroups.find(shield);
@@ -27,12 +27,12 @@ static inline shared_ptr<sprite> get_shield_front_sprite(shared_ptr<gamestate> g
 }
 
 
-static inline shared_ptr<sprite> get_shield_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
+static inline shared_ptr<sprite> get_shield_back_sprite(gamestate& g, entityid id, spritegroup_t* sg) {
+    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
     shared_ptr<sprite> retval = nullptr;
-    const entityid shield = g->ct.get<equipped_shield>(id).value_or(ENTITYID_INVALID);
+    const entityid shield = g.ct.get<equipped_shield>(id).value_or(ENTITYID_INVALID);
     if (shield == ENTITYID_INVALID)
         return retval;
     auto it = spritegroups.find(shield);

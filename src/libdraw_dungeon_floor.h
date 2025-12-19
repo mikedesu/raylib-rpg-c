@@ -68,12 +68,12 @@ static inline vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
 }
 
 
-static inline bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo* txinfo, int x, int y, int z) {
-    massert(g, "gamestate is NULL");
+static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, int x, int y, int z) {
+    //massert(g, "gamestate is NULL");
     massert(txinfo, "txinfo is null");
     massert(x >= 0, "x is less than 0");
     massert(y >= 0, "y is less than 0");
-    auto df = d_get_floor(g->dungeon, z);
+    auto df = d_get_floor(g.dungeon, z);
     //massert(df, "dungeon_floor is NULL");
     massert(x < df.width, "x is out of bounds");
     massert(y < df.height, "y is out of bounds");
@@ -83,8 +83,8 @@ static inline bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo*
     if (tile.type == TILE_NONE || !tile.visible || !tile.explored)
         return true;
     // Get hero's total light radius
-    const int light_dist = g->ct.get<light_radius>(g->hero_id).value_or(1);
-    auto maybe_loc = g->ct.get<location>(g->hero_id);
+    const int light_dist = g.ct.get<light_radius>(g.hero_id).value_or(1);
+    auto maybe_loc = g.ct.get<location>(g.hero_id);
     if (!maybe_loc.has_value())
         return false;
     const vec3 hero_loc = maybe_loc.value();
@@ -122,8 +122,8 @@ static inline bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo*
             break;
         }
         // Check for closed doors
-        for_each(tile.entities->cbegin(), tile.entities->cend(), [g, &blocking](const entityid& id) {
-            if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g->ct.get<door_open>(id).value_or(false))
+        for_each(tile.entities->cbegin(), tile.entities->cend(), [&g, &blocking](const entityid& id) {
+            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false))
                 blocking = true;
         });
         if (blocking)
@@ -136,11 +136,10 @@ static inline bool draw_dungeon_floor_tile(shared_ptr<gamestate> g, textureinfo*
 }
 
 
-static inline void
-libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t entitytype_0, function<bool(shared_ptr<gamestate>, entityid)> additional_check) {
-    auto df = d_get_current_floor(g->dungeon);
+static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytype_t entitytype_0, function<bool(gamestate&, entityid)> additional_check) {
+    auto df = d_get_current_floor(g.dungeon);
     //massert(df, "dungeon_floor is NULL");
-    const int z = g->dungeon.current_floor;
+    const int z = g.dungeon.current_floor;
 
     for (int y = 0; y < df.height; y++) {
         for (int x = 0; x < df.width; x++) {
@@ -175,9 +174,9 @@ libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t enti
             }
 
             // Get hero's vision distance and location
-            const int vision_dist = g->ct.get<vision_distance>(g->hero_id).value_or(0);
-            const int light_rad = g->ct.get<light_radius>(g->hero_id).value_or(0);
-            auto maybe_hero_loc = g->ct.get<location>(g->hero_id);
+            const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
+            const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
+            auto maybe_hero_loc = g.ct.get<location>(g.hero_id);
             if (!maybe_hero_loc.has_value()) {
                 merror("Hero's location not set");
                 continue;
@@ -215,8 +214,8 @@ libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t enti
                 }
 
                 // check if tile has a DOOR
-                for_each(v0_tile.entities->cbegin(), v0_tile.entities->cend(), [g, &object_blocking](const entityid& id) {
-                    if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g->ct.get<door_open>(id).value_or(false))
+                for_each(v0_tile.entities->cbegin(), v0_tile.entities->cend(), [&g, &object_blocking](const entityid& id) {
+                    if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false))
                         object_blocking = true;
                 });
 
@@ -228,7 +227,7 @@ libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t enti
                 continue;
 
             for_each(tile.entities->cbegin(), tile.entities->cend(), [&g, entitytype_0, &additional_check](const entityid& id) {
-                auto type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+                auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
                 if (entitytype_0 == type && additional_check(g, id))
                     draw_sprite_and_shadow(g, id);
             });
@@ -237,11 +236,11 @@ libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t enti
 }
 
 
-static inline bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    auto df = d_get_current_floor(g->dungeon);
+static inline bool libdraw_draw_dungeon_floor(gamestate& g) {
+    //massert(g, "gamestate is NULL");
+    auto df = d_get_current_floor(g.dungeon);
     //massert(df, "dungeon_floor is NULL");
-    const int z = g->dungeon.current_floor;
+    const int z = g.dungeon.current_floor;
 
     // render tiles
     //minfo("render tiles");
@@ -249,19 +248,19 @@ static inline bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
         for (int x = 0; x < df.width; x++)
             draw_dungeon_floor_tile(g, txinfo, x, y, z);
 
-    auto mydefault = [](shared_ptr<gamestate> g, entityid id) { return true; };
+    auto mydefault = [](gamestate& g, entityid id) { return true; };
 
     //auto dead_check = [](shared_ptr<gamestate> g, entityid id) { return g->ct.get<dead>(id).value_or(false); };
 
-    auto alive_check = [](shared_ptr<gamestate> g, entityid id) {
-        auto maybe_dead = g->ct.get<dead>(id);
+    auto alive_check = [](gamestate& g, entityid id) {
+        auto maybe_dead = g.ct.get<dead>(id);
         if (maybe_dead.has_value())
             return !maybe_dead.value();
         return false;
     };
 
-    auto dead_check = [](shared_ptr<gamestate> g, entityid id) {
-        auto maybe_dead = g->ct.get<dead>(id);
+    auto dead_check = [](gamestate& g, entityid id) {
+        auto maybe_dead = g.ct.get<dead>(id);
         if (maybe_dead.has_value())
             return maybe_dead.value();
         return false;

@@ -7,8 +7,8 @@
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
-static inline void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
+static inline void update_weapon_for_entity(gamestate& g, entityid id, spritegroup_t* sg) {
+    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
 
@@ -16,7 +16,7 @@ static inline void update_weapon_for_entity(shared_ptr<gamestate> g, entityid id
     entityid weaponid = ENTITYID_INVALID;
     int ctx = -1;
 
-    weaponid = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
+    weaponid = g.ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
     if (weaponid == ENTITYID_INVALID)
         return;
     w_sg = spritegroups[weaponid];

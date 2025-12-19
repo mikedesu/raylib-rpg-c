@@ -5,8 +5,8 @@
 #include "spritegroup.h"
 
 
-static inline void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
+static inline void draw_shield_sprite_back(gamestate& g, entityid id, spritegroup_t* sg) {
+    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
     auto shield_back_s = get_shield_back_sprite(g, id, sg);
@@ -15,8 +15,8 @@ static inline void draw_shield_sprite_back(shared_ptr<gamestate> g, entityid id,
 }
 
 
-static inline void draw_shield_sprite_front(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
+static inline void draw_shield_sprite_front(gamestate& g, entityid id, spritegroup_t* sg) {
+    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
     auto shield_front_s = get_shield_front_sprite(g, id, sg);

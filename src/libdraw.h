@@ -34,13 +34,13 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
 
-static inline void libdraw_drawframe(shared_ptr<gamestate> g) {
+static inline void libdraw_drawframe(gamestate& g) {
     double start_time = GetTime();
     libdraw_update_sprites_pre(g);
     BeginDrawing();
     ClearBackground(RED);
-    if (g->frame_dirty) {
-        switch (g->current_scene) {
+    if (g.frame_dirty) {
+        switch (g.current_scene) {
         case SCENE_TITLE: draw_title_screen_to_texture(g, false); break;
         case SCENE_MAIN_MENU: draw_title_screen_to_texture(g, true); break;
         case SCENE_CHARACTER_CREATION: draw_character_creation_screen_to_texture(g); break;
@@ -48,13 +48,13 @@ static inline void libdraw_drawframe(shared_ptr<gamestate> g) {
         default: break;
         }
 
-        g->frame_dirty = false;
-        g->frame_updates++;
+        g.frame_dirty = false;
+        g.frame_updates++;
     }
     // draw to the target texture
     BeginTextureMode(target);
     ClearBackground(BLUE);
-    switch (g->current_scene) {
+    switch (g.current_scene) {
     case SCENE_TITLE: draw_title_screen_from_texture(g); break;
     case SCENE_MAIN_MENU: draw_title_screen_from_texture(g); break;
     case SCENE_CHARACTER_CREATION: draw_character_creation_screen_from_texture(g); break;
@@ -67,17 +67,17 @@ static inline void libdraw_drawframe(shared_ptr<gamestate> g) {
     win_dest.height = GetScreenHeight();
     DrawTexturePro(target.texture, target_src, win_dest, (Vector2){0, 0}, 0.0f, WHITE);
     EndDrawing();
-    g->last_frame_time = GetTime() - start_time;
-    g->framecount++;
+    g.last_frame_time = GetTime() - start_time;
+    g.framecount++;
     libdraw_update_sprites_post(g);
 }
 
 
-static inline void libdraw_init_rest(shared_ptr<gamestate> g) {
+static inline void libdraw_init_rest(gamestate& g) {
     SetExitKey(KEY_ESCAPE);
     SetTargetFPS(60);
-    g->windowwidth = DEFAULT_WIN_WIDTH, g->windowheight = DEFAULT_WIN_HEIGHT;
-    g->targetwidth = DEFAULT_TARGET_WIDTH, g->targetheight = DEFAULT_TARGET_HEIGHT;
+    g.windowwidth = DEFAULT_WIN_WIDTH, g.windowheight = DEFAULT_WIN_HEIGHT;
+    g.targetwidth = DEFAULT_TARGET_WIDTH, g.targetheight = DEFAULT_TARGET_HEIGHT;
     TextureFilter filter = TEXTURE_FILTER_POINT; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_BILINEAR; // Use trilinear filtering for better quality
     //TextureFilter filter = TEXTURE_FILTER_TRILINEAR; // Use trilinear filtering for better quality
@@ -99,7 +99,7 @@ static inline void libdraw_init_rest(shared_ptr<gamestate> g) {
     load_textures(txinfo);
     load_shaders();
     const float x = DEFAULT_TARGET_WIDTH / 2.0f, y = DEFAULT_TARGET_HEIGHT / 4.0f;
-    g->cam2d.offset = (Vector2){x, y};
+    g.cam2d.offset = (Vector2){x, y};
     draw_title_screen_to_texture(g, false);
     draw_character_creation_screen_to_texture(g);
     InitAudioDevice();
@@ -110,25 +110,25 @@ static inline void libdraw_init_rest(shared_ptr<gamestate> g) {
 }
 
 
-static inline void libdraw_init(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
+static inline void libdraw_init(gamestate& g) {
+    //massert(g, "gamestate is NULL");
     int w = DEFAULT_WIN_WIDTH;
     int h = DEFAULT_WIN_HEIGHT;
     const char* title = WINDOW_TITLE;
     char full_title[1024] = {0};
-    snprintf(full_title, sizeof(full_title), "%s - %s", title, g->version.c_str());
+    snprintf(full_title, sizeof(full_title), "%s - %s", title, g.version.c_str());
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
     InitWindow(w, h, full_title);
-    g->windowwidth = w;
-    g->windowheight = h;
+    g.windowwidth = w;
+    g.windowheight = h;
     SetWindowMinSize(320, 240);
     libdraw_init_rest(g);
 }
 
 
-static inline bool libdraw_windowshouldclose(const shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    return g->do_quit;
+static inline bool libdraw_windowshouldclose(const gamestate& g) {
+    //massert(g, "gamestate is NULL");
+    return g.do_quit;
 }
 
 

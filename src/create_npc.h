@@ -5,8 +5,8 @@
 #include "stat_bonus.h"
 #include "tile_has_live_npcs.h"
 
-static inline void set_npc_starting_stats(shared_ptr<gamestate> g, entityid id) {
-    auto rt = g->ct.get<race>(id).value_or(RACE_NONE);
+static inline void set_npc_starting_stats(gamestate& g, entityid id) {
+    auto rt = g.ct.get<race>(id).value_or(RACE_NONE);
     if (rt == RACE_NONE)
         return;
 
@@ -26,12 +26,12 @@ static inline void set_npc_starting_stats(shared_ptr<gamestate> g, entityid id) 
     const int constitution_ = GetRandomValue(3, 18) + con_m;
     const int charisma_ = GetRandomValue(3, 18) + cha_m;
 
-    g->ct.set<strength>(id, strength_);
-    g->ct.set<dexterity>(id, dexterity_);
-    g->ct.set<intelligence>(id, intelligence_);
-    g->ct.set<wisdom>(id, wisdom_);
-    g->ct.set<constitution>(id, constitution_);
-    g->ct.set<charisma>(id, charisma_);
+    g.ct.set<strength>(id, strength_);
+    g.ct.set<dexterity>(id, dexterity_);
+    g.ct.set<intelligence>(id, intelligence_);
+    g.ct.set<wisdom>(id, wisdom_);
+    g.ct.set<constitution>(id, constitution_);
+    g.ct.set<charisma>(id, charisma_);
 
 
     // set default hp/maxhp for now
@@ -54,42 +54,42 @@ static inline void set_npc_starting_stats(shared_ptr<gamestate> g, entityid id) 
     const int my_maxhp = GetRandomValue(1, hitdie.y) + get_stat_bonus(constitution_);
     const int my_hp = my_maxhp;
 
-    g->ct.set<maxhp>(id, my_maxhp);
-    g->ct.set<hp>(id, my_hp);
-    g->ct.set<base_ac>(id, 10);
-    g->ct.set<hd>(id, hitdie);
+    g.ct.set<maxhp>(id, my_maxhp);
+    g.ct.set<hp>(id, my_hp);
+    g.ct.set<base_ac>(id, 10);
+    g.ct.set<hd>(id, hitdie);
 }
 
 
-static inline void set_npc_defaults(shared_ptr<gamestate> g, entityid id) {
-    g->ct.set<entitytype>(id, ENTITY_NPC);
-    g->ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
-    g->ct.set<dead>(id, false);
-    g->ct.set<update>(id, true);
-    g->ct.set<direction>(id, DIR_DOWN_RIGHT);
-    g->ct.set<attacking>(id, false);
-    g->ct.set<blocking>(id, false);
-    g->ct.set<block_success>(id, false);
-    g->ct.set<damaged>(id, false);
-    g->ct.set<txalpha>(id, 0);
-    g->ct.set<inventory>(id, make_shared<vector<entityid>>());
-    g->ct.set<equipped_weapon>(id, ENTITYID_INVALID);
-    g->ct.set<aggro>(id, false);
-    g->ct.set<vision_distance>(id, 3);
-    g->ct.set<hearing_distance>(id, 3);
+static inline void set_npc_defaults(gamestate& g, entityid id) {
+    g.ct.set<entitytype>(id, ENTITY_NPC);
+    g.ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+    g.ct.set<dead>(id, false);
+    g.ct.set<update>(id, true);
+    g.ct.set<direction>(id, DIR_DOWN_RIGHT);
+    g.ct.set<attacking>(id, false);
+    g.ct.set<blocking>(id, false);
+    g.ct.set<block_success>(id, false);
+    g.ct.set<damaged>(id, false);
+    g.ct.set<txalpha>(id, 0);
+    g.ct.set<inventory>(id, make_shared<vector<entityid>>());
+    g.ct.set<equipped_weapon>(id, ENTITYID_INVALID);
+    g.ct.set<aggro>(id, false);
+    g.ct.set<vision_distance>(id, 3);
+    g.ct.set<hearing_distance>(id, 3);
     // here we have some hard decisions to make about how to template-out NPC creation
     // all NPCs begin at level 1. level-up mechanisms will be determined elsewhere
-    g->ct.set<level>(id, 1);
-    g->ct.set<xp>(id, 0);
+    g.ct.set<level>(id, 1);
+    g.ct.set<xp>(id, 0);
 }
 
 
-static inline entityid create_npc_with(shared_ptr<gamestate> g, race_t rt, function<void(shared_ptr<gamestate>, entityid)> npcInitFunction) {
+static inline entityid create_npc_with(gamestate& g, race_t rt, function<void(gamestate&, entityid)> npcInitFunction) {
     minfo("begin create npc");
-    massert(g, "gamestate is NULL");
+    //massert(g, "gamestate is NULL");
     entityid id = g_add_entity(g);
     set_npc_defaults(g, id);
-    g->ct.set<race>(id, rt);
+    g.ct.set<race>(id, rt);
     set_npc_starting_stats(g, id);
     npcInitFunction(g, id);
     minfo("end create npc");
@@ -97,8 +97,8 @@ static inline entityid create_npc_with(shared_ptr<gamestate> g, race_t rt, funct
 }
 
 
-static inline entityid create_npc_at_with(shared_ptr<gamestate> g, race_t rt, vec3 loc, function<void(shared_ptr<gamestate>, entityid)> npcInitFunction) {
-    auto df = d_get_floor(g->dungeon, loc.z);
+static inline entityid create_npc_at_with(gamestate& g, race_t rt, vec3 loc, function<void(gamestate&, entityid)> npcInitFunction) {
+    auto df = d_get_floor(g.dungeon, loc.z);
     auto tile = df_tile_at(df, loc);
 
     //massert(tile, "failed to get tile");
@@ -119,13 +119,13 @@ static inline entityid create_npc_at_with(shared_ptr<gamestate> g, race_t rt, ve
     if (!df_add_at(df, id, loc.x, loc.y)) {
         return ENTITYID_INVALID;
     }
-    g->ct.set<location>(id, loc);
+    g.ct.set<location>(id, loc);
 
     return id;
 }
 
 
 // Original function still available but implemented using the new lambda-based version
-static inline entityid create_npc(shared_ptr<gamestate> g, race_t rt, vec3 loc, const string n) {
-    return create_npc_at_with(g, rt, loc, [](shared_ptr<gamestate>, entityid) {});
+static inline entityid create_npc(gamestate& g, race_t rt, vec3 loc, const string n) {
+    return create_npc_at_with(g, rt, loc, [](gamestate&, entityid) {});
 }

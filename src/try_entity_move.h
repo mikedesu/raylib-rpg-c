@@ -10,21 +10,21 @@
 #include "tile_has_door.h"
 #include "tile_npc_living_count.h"
 
-static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v) {
-    massert(g, "Game state is NULL!");
+static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
+    //massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     minfo("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
-    g->ct.set<update>(id, true);
-    g->ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
+    g.ct.set<update>(id, true);
+    g.ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
     // entity location
-    auto maybe_loc = maybe_location(id);
+    auto maybe_loc = g.ct.get<location>(id);
     if (!maybe_loc.has_value())
         return false;
     const vec3 loc = maybe_loc.value();
     // entity's new location
     // we will have a special case for traversing floors so ignore v.z
     const vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
-    auto df = d_get_floor(g->dungeon, loc.z);
+    auto df = d_get_floor(g.dungeon, loc.z);
     //if (!df) {
     //    merror("Dungeon floor %d does not exist", loc.z);
     //    return false;
@@ -73,7 +73,7 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
         minfo("No door...");
     } else {
         minfo("Tile has door");
-        auto maybe_is_open = g->ct.get<door_open>(maybe_door);
+        auto maybe_is_open = g.ct.get<door_open>(maybe_door);
         if (maybe_is_open.has_value()) {
             bool is_open = maybe_is_open.value();
             if (!is_open) {
@@ -104,10 +104,13 @@ static inline bool try_entity_move(shared_ptr<gamestate> g, entityid id, vec3 v)
         return false;
     }
 
-    g->ct.set<location>(id, aloc);
-    g->ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
+    g.ct.set<location>(id, aloc);
+    g.ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
 
-    play_sound_if_heard(SFX_STEP_STONE_1, check_hearing(g, g->hero_id, aloc));
+    //play_sound_if_heard(SFX_STEP_STONE_1, check_hearing(g, g->hero_id, aloc));
+    if (check_hearing(g, g.hero_id, aloc)) {
+        PlaySound(g.sfx[SFX_STEP_STONE_1]);
+    }
 
     return true;
 }

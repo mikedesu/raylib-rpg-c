@@ -2,13 +2,13 @@
 
 #include "gamestate.h"
 
-static inline void draw_look_panel(shared_ptr<gamestate> g) {
+static inline void draw_look_panel(gamestate& g) {
     // To make this useful,
     // we need to construct strings
     // telling us info about the tile
 
-    auto loc = g->ct.get<location>(g->hero_id).value_or((vec3){-1, -1, -1});
-    auto df = d_get_floor(g->dungeon, loc.z);
+    auto loc = g.ct.get<location>(g.hero_id).value_or((vec3){-1, -1, -1});
+    auto df = d_get_floor(g.dungeon, loc.z);
     auto tile = df_tile_at(df, loc);
 
     // subtract 1 for the PLAYER
@@ -33,7 +33,7 @@ static inline void draw_look_panel(shared_ptr<gamestate> g) {
     float h = font_size * texts_size + pad_h * 2;
 
     const float base_x = 10;
-    const float base_y = g->targetheight - some_offset_y;
+    const float base_y = g.targetheight - some_offset_y;
 
     Rectangle r = {base_x, base_y, w, h};
 

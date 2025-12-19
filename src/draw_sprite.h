@@ -10,8 +10,8 @@
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
-static inline void draw_sprite_and_shadow(const shared_ptr<gamestate> g, entityid id) {
-    massert(g, "gamestate is NULL");
+static inline void draw_sprite_and_shadow(gamestate& g, entityid id) {
+    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (spritegroups.find(id) == spritegroups.end()) {
         merror("NO SPRITE GROUP FOR ID %d", id);

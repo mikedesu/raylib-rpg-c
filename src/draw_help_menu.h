@@ -3,8 +3,8 @@
 #include "gamestate.h"
 #include "libgame_defines.h"
 
-static inline void draw_help_menu(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
+static inline void draw_help_menu(gamestate& g) {
+    //massert(g, "gamestate is NULL");
     // Menu parameters
     const char* menu_title = "Help Menu";
     vector<string> help_menu;

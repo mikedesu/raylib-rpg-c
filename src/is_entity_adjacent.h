@@ -2,15 +2,15 @@
 
 #include "gamestate.h"
 
-static inline bool is_entity_adjacent(shared_ptr<gamestate> g, entityid id0, entityid id1) {
-    massert(g, "gamestate is NULL");
+static inline bool is_entity_adjacent(gamestate& g, entityid id0, entityid id1) {
+    //massert(g, "gamestate is NULL");
     massert(id0 != ENTITYID_INVALID, "id0 is invalid");
     massert(id1 != ENTITYID_INVALID, "id1 is invalid");
     massert(id0 != id1, "id0 and id1 are the same");
 
     // check if on same floor
-    auto loc0 = g->ct.get<location>(id0).value_or((vec3){-1, -1, -1});
-    auto loc1 = g->ct.get<location>(id1).value_or((vec3){-1, -1, -1});
+    auto loc0 = g.ct.get<location>(id0).value_or((vec3){-1, -1, -1});
+    auto loc1 = g.ct.get<location>(id1).value_or((vec3){-1, -1, -1});
     if (loc0.z == -1 || loc1.z == -1 || loc0.z != loc1.z)
         return false;
 

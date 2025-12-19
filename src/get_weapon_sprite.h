@@ -7,12 +7,12 @@
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
-static inline shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
+static inline shared_ptr<sprite> get_weapon_front_sprite(gamestate& g, entityid id, spritegroup_t* sg) {
+    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
     shared_ptr<sprite> retval = nullptr;
-    entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
+    entityid weapon = g.ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
     if (weapon == ENTITYID_INVALID)
         return retval;
     auto it = spritegroups.find(weapon);
@@ -30,12 +30,12 @@ static inline shared_ptr<sprite> get_weapon_front_sprite(shared_ptr<gamestate> g
 }
 
 
-static inline shared_ptr<sprite> get_weapon_back_sprite(shared_ptr<gamestate> g, entityid id, spritegroup_t* sg) {
-    massert(g, "gamestate is NULL");
+static inline shared_ptr<sprite> get_weapon_back_sprite(gamestate& g, entityid id, spritegroup_t* sg) {
+    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
     shared_ptr<sprite> retval = nullptr;
-    entityid weapon = g->ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
+    entityid weapon = g.ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
     if (weapon == ENTITYID_INVALID)
         return retval;
     auto it = spritegroups.find(weapon);

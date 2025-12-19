@@ -8,27 +8,29 @@
 #endif
 
 inputstate is;
-shared_ptr<gamestate> g = gamestateinitptr();
+gamestate g;
 
 void gameloop() {
     inputstate_update(is);
     liblogic_tick(g, is);
     libdraw_drawframe(g);
-    if (g->do_restart) {
+    if (g.do_restart) {
         msuccess("Restarting game...");
         libdraw_close();
         liblogic_close(g);
-        g.reset();
-        g = gamestateinitptr();
+        //g.reset();
+        gamestateinitptr(g);
         liblogic_init(g);
         libdraw_init(g);
-        g->do_restart = false; // Reset restart flag
-        g->restart_count++;
+        g.do_restart = false; // Reset restart flag
+        g.restart_count++;
     }
 }
 
 
 int main() {
+    gamestateinitptr(g);
+
     liblogic_init(g);
     libdraw_init(g);
 

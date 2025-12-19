@@ -11,7 +11,7 @@
 #include "gamestate.h"
 #include "libdraw_dungeon_floor.h"
 
-static inline void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
+static inline void libdraw_drawframe_2d(gamestate& g) {
     //minfo("BEGIN drawframe 2d");
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
@@ -19,7 +19,7 @@ static inline void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //minfo("camera lock-on");
     camera_lock_on(g);
     ////minfo("Drawing frame");
-    BeginMode2D(g->cam2d);
+    BeginMode2D(g.cam2d);
     ClearBackground(BLACK);
     //EndShaderMode();
     //minfo("draw dungeon floor");
@@ -28,7 +28,7 @@ static inline void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     //libdraw_draw_player_target_box(g);
 
     EndMode2D();
-    //if (g->frame_dirty) {
+    //if (g.frame_dirty) {
     //draw_hud_to_texture(g);
     //} else {
     //draw_hud_from_texture(g);
@@ -40,22 +40,22 @@ static inline void libdraw_drawframe_2d(shared_ptr<gamestate> g) {
     draw_message_history(g);
     //minfo("draw msg box");
     draw_message_box(g);
-    if (g->display_inventory_menu) {
+    if (g.display_inventory_menu) {
         //minfo("draw inventory menu");
         draw_inventory_menu(g);
     }
-    //else if (g->display_gameplay_settings_menu) {
+    //else if (g.display_gameplay_settings_menu) {
     //    draw_gameplay_settings_menu(g);
     //}
     //minfo("handle debug panel");
     handle_debug_panel(g);
     //draw_version(g);
     //int x = 0;
-    if (g->display_help_menu) {
+    if (g.display_help_menu) {
         //minfo("draw help menu");
         draw_help_menu(g);
     }
-    //if (g->gameover) {
+    //if (g.gameover) {
     //    draw_gameover_menu(g);
     //}
     //minfo("END drawframe 2d");

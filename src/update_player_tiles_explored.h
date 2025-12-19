@@ -9,16 +9,16 @@ static inline void update_tile(tile_t& tile) {
     tile.explored = tile.visible = true;
 }
 
-static inline void update_player_tiles_explored(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    if (g->hero_id == ENTITYID_INVALID)
+static inline void update_player_tiles_explored(gamestate& g) {
+    //massert(g, "gamestate is NULL");
+    if (g.hero_id == ENTITYID_INVALID)
         return;
-    auto df = d_get_current_floor(g->dungeon);
-    auto maybe_loc = g->ct.get<location>(g->hero_id);
+    auto df = d_get_current_floor(g.dungeon);
+    auto maybe_loc = g.ct.get<location>(g.hero_id);
     if (!maybe_loc.has_value())
         return;
     const vec3 loc = maybe_loc.value();
-    const int light_radius0 = g->ct.get<light_radius>(g->hero_id).value_or(1);
+    const int light_radius0 = g.ct.get<light_radius>(g.hero_id).value_or(1);
     // Precompute bounds for the loops
     const int min_x = max(0, loc.x - light_radius0), max_x = min(df.width - 1, loc.x + light_radius0);
     const int min_y = max(0, loc.y - light_radius0), max_y = min(df.height - 1, loc.y + light_radius0);

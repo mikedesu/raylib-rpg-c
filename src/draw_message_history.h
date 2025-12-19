@@ -4,22 +4,22 @@
 
 using std::min;
 
-static inline void draw_message_history(shared_ptr<gamestate> g) {
+static inline void draw_message_history(gamestate& g) {
     char tmp[1024] = {0};
     const int font_size = 10;
     const int max_messages = 30;
 
     //const Color message_bg = {0x33, 0x33, 0x33, 0xff};
     const Color message_bg = Fade((Color){0, 0, 0xff, 0xff}, 0.5f);
-    const int msg_count = g->msg_history.size();
+    const int msg_count = g.msg_history.size();
     if (msg_count == 0) {
         // if there are no messages, we don't need to draw anything
         return;
     }
-    const int max_measure = g->msg_history_max_len_msg_measure;
-    const float w = max_measure + g->pad;
-    //const float h = (font_size + 2) * msg_count + g->pad;
-    const float h = (font_size + 2) * min(msg_count, max_messages) + g->pad;
+    const int max_measure = g.msg_history_max_len_msg_measure;
+    const float w = max_measure + g.pad;
+    //const float h = (font_size + 2) * msg_count + g.pad;
+    const float h = (font_size + 2) * min(msg_count, max_messages) + g.pad;
     //x = DEFAULT_TARGET_WIDTH - w;
     const float x = 0;
     const float y = 0;
@@ -32,12 +32,12 @@ static inline void draw_message_history(shared_ptr<gamestate> g) {
     if (msg_count > max_messages) {
         int outer_count = 0;
         for (int i = msg_count - max_messages; i < msg_count; i++) {
-            const string msg = g->msg_history.at(i);
+            const string msg = g.msg_history.at(i);
             bzero(tmp, 1024);
             snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
-            const float msg_x = box.x + g->pad / 2.0;
-            //const float msg_y = box.y + g->pad / 2.0 + (i * (font_size + 2));
-            const float msg_y = box.y + g->pad / 2.0 + (outer_count * (font_size + 2));
+            const float msg_x = box.x + g.pad / 2.0;
+            //const float msg_y = box.y + g.pad / 2.0 + (i * (font_size + 2));
+            const float msg_y = box.y + g.pad / 2.0 + (outer_count * (font_size + 2));
             //if (msg_y + font_size > box.y + box.height) {
             //    break; // stop drawing if we exceed the box height
             //}
@@ -46,11 +46,11 @@ static inline void draw_message_history(shared_ptr<gamestate> g) {
         }
     } else {
         for (int i = 0; i < msg_count; i++) {
-            const string msg = g->msg_history.at(i);
+            const string msg = g.msg_history.at(i);
             bzero(tmp, 1024);
             snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
-            const float msg_x = box.x + g->pad / 2.0;
-            const float msg_y = box.y + g->pad / 2.0 + (i * (font_size + 2));
+            const float msg_x = box.x + g.pad / 2.0;
+            const float msg_y = box.y + g.pad / 2.0 + (i * (font_size + 2));
             //if (msg_y + font_size > box.y + box.height) {
             //    break; // stop drawing if we exceed the box height
             //}

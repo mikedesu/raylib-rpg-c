@@ -2,11 +2,11 @@
 
 #include "gamestate.h"
 
-static inline void init_dungeon(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is null");
+static inline void init_dungeon(gamestate& g) {
+    //massert(g, "gamestate is null");
 
     //g->dungeon = d_create();
-    d_create(g->dungeon);
+    d_create(g.dungeon);
 
     //massert(g->dungeon, "failed to init dungeon");
     msuccess("dungeon initialized successfully");
@@ -21,7 +21,7 @@ static inline void init_dungeon(shared_ptr<gamestate> g) {
     //dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_GRASS;
 
     for (int i = 0; i < df_count; i++)
-        d_add_floor(g->dungeon, type, w, h);
+        d_add_floor(g.dungeon, type, w, h);
 
     msuccess("added %d floors to dungeon", df_count);
 }

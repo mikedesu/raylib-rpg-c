@@ -6,18 +6,18 @@
 
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
-static inline void draw_inventory_menu(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
-    if (!g->display_inventory_menu) {
+static inline void draw_inventory_menu(gamestate& g) {
+    //massert(g, "gamestate is NULL");
+    if (!g.display_inventory_menu) {
         return;
     }
     const char* menu_title = "Inventory Menu";
     // Parameters
-    int box_pad = g->pad;
+    int box_pad = g.pad;
     int section_gap = 8;
     int font_size = 10;
     // Measure title
-    Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g->line_spacing);
+    Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g.line_spacing);
     // Menu box size
     float menu_width_percent = 0.75f;
     float menu_height_percent = 0.75f;
@@ -46,8 +46,8 @@ static inline void draw_inventory_menu(shared_ptr<gamestate> g) {
     DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
     DrawRectangleLinesEx(right_box, 2, WHITE);
 
-    //optional<shared_ptr<vector<entityid>>> my_inventory = g->ct.get<inventory>(g->hero_id);
-    auto my_inventory = g->ct.get<inventory>(g->hero_id);
+    //optional<shared_ptr<vector<entityid>>> my_inventory = g.ct.get<inventory>(g.hero_id);
+    auto my_inventory = g.ct.get<inventory>(g.hero_id);
 
     //if (my_inventory == nullopt)
     //    return;
@@ -92,9 +92,9 @@ static inline void draw_inventory_menu(shared_ptr<gamestate> g) {
                         if (index >= 0 && index < unpacked_inventory->size()) {
                             entityid selection_id = unpacked_inventory->at(index);
 
-                            entityid cur_wpn_id = g->ct.get<equipped_weapon>(g->hero_id).value_or(ENTITYID_INVALID);
+                            entityid cur_wpn_id = g.ct.get<equipped_weapon>(g.hero_id).value_or(ENTITYID_INVALID);
 
-                            entityid cur_shield_id = g->ct.get<equipped_shield>(g->hero_id).value_or(ENTITYID_INVALID);
+                            entityid cur_shield_id = g.ct.get<equipped_shield>(g.hero_id).value_or(ENTITYID_INVALID);
 
 
                             if ((selection_id == cur_wpn_id && cur_wpn_id != ENTITYID_INVALID) ||
@@ -108,7 +108,7 @@ static inline void draw_inventory_menu(shared_ptr<gamestate> g) {
                     }
                     it++;
                 }
-                if ((float)i == g->inventory_cursor.x && (float)j == g->inventory_cursor.y) {
+                if ((float)i == g.inventory_cursor.x && (float)j == g.inventory_cursor.y) {
                     DrawRectangleLinesEx(grid_box, 2, GREEN);
                 }
                 x += w;
@@ -119,11 +119,11 @@ static inline void draw_inventory_menu(shared_ptr<gamestate> g) {
 
         // in the right box, item detail
         if (unpacked_inventory->size() > 0) {
-            size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;
+            size_t index = g.inventory_cursor.y * 7 + g.inventory_cursor.x;
             if (index >= 0 && index < unpacked_inventory->size()) {
                 entityid selection_id = unpacked_inventory->at(index);
                 spritegroup_t* sg = spritegroups[selection_id];
-                itemtype_t item_type = g->ct.get<itemtype>(selection_id).value_or(ITEM_NONE);
+                itemtype_t item_type = g.ct.get<itemtype>(selection_id).value_or(ITEM_NONE);
 
 
                 if (sg) {
@@ -131,7 +131,7 @@ static inline void draw_inventory_menu(shared_ptr<gamestate> g) {
                     DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
 
                     // new-style component table access
-                    const string my_name = g->ct.get<name>(selection_id).value_or("no-name");
+                    const string my_name = g.ct.get<name>(selection_id).value_or("no-name");
                     const int fontsize = 10;
                     const int cur_x = right_box.x + 10;
                     int cur_y = right_box.y + 10;
@@ -141,27 +141,27 @@ static inline void draw_inventory_menu(shared_ptr<gamestate> g) {
                     cur_y += y_incr;
 
                     if (item_type == ITEM_WEAPON) {
-                        const vec3 dmg = g->ct.get<damage>(selection_id).value_or((vec3){-1, -1, -1});
+                        const vec3 dmg = g.ct.get<damage>(selection_id).value_or((vec3){-1, -1, -1});
                         DrawText(TextFormat("Damage: %d-%d", dmg.x, dmg.y), cur_x, cur_y, fontsize, WHITE);
                         cur_y += y_incr;
 
-                        const int dura = g->ct.get<durability>(selection_id).value_or(-1);
-                        const int max_dura = g->ct.get<max_durability>(selection_id).value_or(-1);
+                        const int dura = g.ct.get<durability>(selection_id).value_or(-1);
+                        const int max_dura = g.ct.get<max_durability>(selection_id).value_or(-1);
                         DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, WHITE);
                         cur_y += y_incr;
                     } else if (item_type == ITEM_SHIELD) {
-                        const int block = g->ct.get<block_chance>(selection_id).value_or(-1);
+                        const int block = g.ct.get<block_chance>(selection_id).value_or(-1);
 
                         DrawText(TextFormat("Block chance: %d", block), cur_x, cur_y, fontsize, WHITE);
                         cur_y += y_incr;
                     } else if (item_type == ITEM_POTION) {
-                        const vec3 heal = g->ct.get<healing>(selection_id).value_or((vec3){-1, -1, -1});
+                        const vec3 heal = g.ct.get<healing>(selection_id).value_or((vec3){-1, -1, -1});
                         DrawText(TextFormat("Heal amount: %d-%d", heal.x, heal.y), cur_x, cur_y, fontsize, WHITE);
                         cur_y += y_incr;
                     }
 
 
-                    string my_desc = g->ct.get<description>(selection_id).value_or("no-description");
+                    string my_desc = g.ct.get<description>(selection_id).value_or("no-description");
                     DrawText(my_desc.c_str(), cur_x, cur_y, fontsize, WHITE);
                     cur_y += y_incr;
                 }

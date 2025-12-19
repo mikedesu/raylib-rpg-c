@@ -6,14 +6,14 @@
 #include "try_entity_move.h"
 
 
-static inline void handle_npc(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "Game state is NULL!");
+static inline void handle_npc(gamestate& g, entityid id) {
+    //massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
 
-    if (id == 0 || id == g->hero_id)
+    if (id == 0 || id == g.hero_id)
         return;
 
-    auto maybe_type = g->ct.get<entitytype>(id);
+    auto maybe_type = g.ct.get<entitytype>(id);
     if (!maybe_type.has_value())
         return;
 
@@ -21,7 +21,7 @@ static inline void handle_npc(shared_ptr<gamestate> g, entityid id) {
     if (type != ENTITY_NPC)
         return;
 
-    auto maybe_dead = g->ct.get<dead>(id);
+    auto maybe_dead = g.ct.get<dead>(id);
     if (!maybe_dead.has_value())
         return;
 
@@ -34,12 +34,12 @@ static inline void handle_npc(shared_ptr<gamestate> g, entityid id) {
     // this example shows how, if the player is not adjacent to an NPC,
     // they will just move randomly. otherwise, they attack the player
 
-    //const entityid target_id = g->ct.get<target>(id).value_or(g->hero_id);
-    auto tgt_id = g->ct.get<target_id>(id).value_or(g->hero_id);
+    //const entityid target_id = g.ct.get<target>(id).value_or(g.hero_id);
+    auto tgt_id = g.ct.get<target_id>(id).value_or(g.hero_id);
 
     if (is_entity_adjacent(g, id, tgt_id)) {
         // if id is adjacent to its target or the hero
-        vec3 loc = g->ct.get<location>(tgt_id).value();
+        vec3 loc = g.ct.get<location>(tgt_id).value();
         try_entity_attack(g, id, loc.x, loc.y);
         return;
     }

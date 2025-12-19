@@ -7,19 +7,19 @@
 #include "sfx.h"
 
 
-static inline bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
-    massert(g, "Game state is NULL!");
+static inline bool try_entity_pickup(gamestate& g, entityid id) {
+    //massert(g, "Game state is NULL!");
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
-    g->ct.set<update>(id, true);
+    g.ct.set<update>(id, true);
     // check if the player is on a tile with an item
 
-    auto maybe_loc = g->ct.get<location>(id);
+    auto maybe_loc = g.ct.get<location>(id);
     if (!maybe_loc.has_value()) {
         return false;
     }
 
     auto loc = maybe_loc.value();
-    auto df = d_get_floor(g->dungeon, loc.z);
+    auto df = d_get_floor(g.dungeon, loc.z);
     //if (!df) {
     //    merror("Failed to get dungeon floor");
     //    return false;
@@ -42,23 +42,23 @@ static inline bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
 
     for (size_t i = 0; i < tile.entities->size(); i++) {
         entityid itemid = tile.entities->at(i);
-        auto type = g->ct.get<entitytype>(itemid).value_or(ENTITY_NONE);
+        auto type = g.ct.get<entitytype>(itemid).value_or(ENTITY_NONE);
         if (type == ENTITY_ITEM) {
             if (add_to_inventory(g, id, itemid)) {
                 tile_remove(tile, itemid);
-                //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+                //PlaySound(g.sfx->at(SFX_CONFIRM_01));
                 play_sound(SFX_CONFIRM_01);
                 item_picked_up = true;
                 item_id = itemid;
             }
-            //optional<shared_ptr<vector<entityid>>> maybe_inventory = g->ct.get<inventory>(id);
+            //optional<shared_ptr<vector<entityid>>> maybe_inventory = g.ct.get<inventory>(id);
             //if (maybe_inventory.has_value()) {
             //    msuccess("id %d has an inventory", id);
             //    tile_remove(tile, itemid);
             //    shared_ptr<vector<entityid>> my_inventory = maybe_inventory.value();
             //    // add the item_id to my_inventory
             //    my_inventory->push_back(itemid);
-            //    PlaySound(g->sfx->at(SFX_CONFIRM_01));
+            //    PlaySound(g.sfx->at(SFX_CONFIRM_01));
             //} else {
             //    merror("id %d does not have an inventory", id);
             //}
@@ -81,16 +81,16 @@ static inline bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
             //                    tile_add(tile, equipped_wpn_id);
             //                    add_message(g, "Added equipped_wpn_id %d", equipped_wpn_id);
             //                }
-            auto t = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            auto t = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (t == ENTITY_PLAYER) {
-                g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
             }
             break;
         }
     }
 
     if (item_picked_up) {
-        auto item_name = g->ct.get<name>(item_id).value_or("no-name-item");
+        auto item_name = g.ct.get<name>(item_id).value_or("no-name-item");
         add_message_history(g, "You picked up %s", item_name.c_str());
     }
 
@@ -108,7 +108,7 @@ static inline bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
     //            tile_remove(tile, itemid);
     //        }
     //        if (g_is_type(g, id, ENTITY_PLAYER)) {
-    //            g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //            g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
     //        }
     //        return true;
     //add_message(g, "No items to pick up");

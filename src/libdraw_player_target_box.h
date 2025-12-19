@@ -7,20 +7,20 @@
 extern unordered_map<int, Shader> shaders;
 
 
-static inline bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
+static inline bool libdraw_draw_player_target_box(gamestate& g) {
+    //massert(g, "gamestate is NULL");
 
-    entityid id = g->hero_id;
+    entityid id = g.hero_id;
 
     if (id == -1) {
         return false;
     }
 
     //minfo("getting direction");
-    direction_t dir = g->ct.get<direction>(id).value();
+    direction_t dir = g.ct.get<direction>(id).value();
 
     //minfo("getting location");
-    vec3 loc = g->ct.get<location>(id).value();
+    vec3 loc = g.ct.get<location>(id).value();
 
     float x = loc.x + get_x_from_dir(dir);
     float y = loc.y + get_y_from_dir(dir);
@@ -28,7 +28,7 @@ static inline bool libdraw_draw_player_target_box(shared_ptr<gamestate> g) {
     float h = DEFAULT_TILE_SIZE;
     //Color base_c = GREEN;
     float a = 0.75f;
-    if (g->player_changing_dir) {
+    if (g.player_changing_dir) {
         a = 0.9f;
     }
 

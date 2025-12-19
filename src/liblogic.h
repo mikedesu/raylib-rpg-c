@@ -21,66 +21,67 @@
 
 using std::shared_ptr;
 
-static inline void liblogic_close(shared_ptr<gamestate> g) {
-    massert(g, "liblogic_close: gamestate is NULL");
+static inline void liblogic_close(gamestate& g) {
+    //massert(g, "liblogic_close: gamestate is NULL");
     //d_free(g->dungeon);
-    d_destroy(g->dungeon);
+    d_destroy(g.dungeon);
 }
 
-static inline void update_npcs_state(shared_ptr<gamestate> g) {
-    for (entityid id = 0; id < g->next_entityid; id++) {
-        if (id == g->hero_id || g->ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC)
+static inline void update_npcs_state(gamestate& g) {
+    for (entityid id = 0; id < g.next_entityid; id++) {
+        if (id == g.hero_id || g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC)
             continue;
 
-        unsigned char a = g->ct.get<txalpha>(id).value_or(255);
+        unsigned char a = g.ct.get<txalpha>(id).value_or(255);
         if (a < 255)
             a++;
-        g->ct.set<txalpha>(id, a);
-        g->ct.set<damaged>(id, false);
+        g.ct.set<txalpha>(id, a);
+        g.ct.set<damaged>(id, false);
     }
 }
 
 
-static inline void update_spells_state(shared_ptr<gamestate> g) {
-    for (entityid id = 0; id < g->next_entityid; id++) {
-        if (id == g->hero_id || g->ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL)
+static inline void update_spells_state(gamestate& g) {
+    for (entityid id = 0; id < g.next_entityid; id++) {
+        if (id == g.hero_id || g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL)
             continue;
 
-        unsigned char a = g->ct.get<txalpha>(id).value_or(255);
+        unsigned char a = g.ct.get<txalpha>(id).value_or(255);
         if (a < 255)
             a++;
-        g->ct.set<txalpha>(id, a);
+        g.ct.set<txalpha>(id, a);
 
-        //const bool is_casting = g->ct.get<spell_casting>(id).value_or(false);
-        //const bool is_persisting = g->ct.get<spell_persisting>(id).value_or(false);
-        const bool is_complete = g->ct.get<spell_complete>(id).value_or(false);
-        const bool is_destroyed = g->ct.get<destroyed>(id).value_or(false);
+        //const bool is_casting = g.ct.get<spell_casting>(id).value_or(false);
+        //const bool is_persisting = g.ct.get<spell_persisting>(id).value_or(false);
+        const bool is_complete = g.ct.get<spell_complete>(id).value_or(false);
+        const bool is_destroyed = g.ct.get<destroyed>(id).value_or(false);
         //if (is_casting) {
-        //    g->ct.set<spell_casting>(id, false);
-        //    g->ct.set<spell_persisting>(id, true);
-        //    g->ct.set<spell_ending>(id, false);
+        //    g.ct.set<spell_casting>(id, false);
+        //    g.ct.set<spell_persisting>(id, true);
+        //    g.ct.set<spell_ending>(id, false);
         //} else if (is_persisting) {
-        //    g->ct.set<spell_casting>(id, false);
-        //    g->ct.set<spell_persisting>(id, false);
-        //    g->ct.set<spell_ending>(id, true);
+        //    g.ct.set<spell_casting>(id, false);
+        //    g.ct.set<spell_persisting>(id, false);
+        //    g.ct.set<spell_ending>(id, true);
         if (is_complete && is_destroyed) {
             // remove it from the tile
-            auto df = d_get_current_floor(g->dungeon);
-            auto loc = g->ct.get<location>(id).value_or((vec3){-1, -1, -1});
+            auto df = d_get_current_floor(g.dungeon);
+            auto loc = g.ct.get<location>(id).value_or((vec3){-1, -1, -1});
             df_remove_at(df, id, loc.x, loc.y);
             //auto tile = df_tile_at(df, );
             //tile_remove(tile, id);
 
-            //    g->ct.set<spell_casting>(id, false);
-            //    g->ct.set<spell_persisting>(id, false);
-            //    g->ct.set<spell_ending>(id, false);
+            //    g.ct.set<spell_casting>(id, false);
+            //    g.ct.set<spell_persisting>(id, false);
+            //    g.ct.set<spell_ending>(id, false);
         }
     }
 }
 
 
-static inline void liblogic_init(shared_ptr<gamestate> g) {
-    massert(g, "gamestate is NULL");
+//static inline void liblogic_init(shared_ptr<gamestate> g) {
+static inline void liblogic_init(gamestate& g) {
+    //massert(g, "gamestate is NULL");
     srand(time(NULL));
     SetRandomSeed(time(NULL));
     minfo("liblogic_init");
@@ -88,20 +89,20 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
     //create_wooden_box(g, (vec3){7, 7, 0});
     create_weapon_at_with(g, (vec3){11, 9, 0}, dagger_init_test);
     create_shield_at_with(g, (vec3){11, 10, 0}, kite_shield_init_test);
-    create_potion_at_with(g, (vec3){9, 10, 0}, [](shared_ptr<gamestate> g, entityid id) {
+    create_potion_at_with(g, (vec3){9, 10, 0}, [](gamestate& g, entityid id) {
         // set healing
-        g->ct.set<name>(id, "small healing potion");
-        g->ct.set<description>(id, "a small healing potion");
-        g->ct.set<potiontype>(id, POTION_HP_SMALL);
-        g->ct.set<healing>(id, (vec3){1, 6, 0});
+        g.ct.set<name>(id, "small healing potion");
+        g.ct.set<description>(id, "a small healing potion");
+        g.ct.set<potiontype>(id, POTION_HP_SMALL);
+        g.ct.set<healing>(id, (vec3){1, 6, 0});
     });
     place_doors(g);
 
     //#ifdef SPAWN_MONSTERS
-    for (int i = 0; i < (int)g->dungeon.floors.size(); i++) {
+    for (int i = 0; i < (int)g.dungeon.floors.size(); i++) {
         //create_npc_at_with(g, RACE_ORC, df_get_random_loc(g->dungeon->floors->at(i)), orc_init_test);
         for (int j = 1; j <= i + 1; j++) {
-            create_npc_at_with(g, RACE_ORC, df_get_random_loc(d_get_floor(g->dungeon, i)), orc_init_test);
+            create_npc_at_with(g, RACE_ORC, df_get_random_loc(d_get_floor(g.dungeon, i)), orc_init_test);
         }
         //create_npc_at_with(g, RACE_ORC, (vec3){10, 10, i}, orc_init_test);
         //create_npc_at_with(g, RACE_ORC, (vec3){10, 9, i}, orc_init_test);
@@ -130,9 +131,9 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
 }
 
 //static inline void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
-static inline void liblogic_tick(shared_ptr<gamestate> g, inputstate& is) {
+static inline void liblogic_tick(gamestate& g, inputstate& is) {
     //massert(is, "Input state is NULL!");
-    massert(g, "Game state is NULL!");
+    //massert(g, "Game state is NULL!");
     // Spawn NPCs periodically
     //try_spawn_npc(g);
     update_player_tiles_explored(g);
@@ -144,7 +145,7 @@ static inline void liblogic_tick(shared_ptr<gamestate> g, inputstate& is) {
     handle_input(g, is);
     handle_npcs(g);
     update_debug_panel_buffer(g, is);
-    g->currenttime = time(NULL);
-    g->currenttimetm = localtime(&g->currenttime);
-    strftime(g->currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g->currenttimetm);
+    g.currenttime = time(NULL);
+    g.currenttimetm = localtime(&g.currenttime);
+    strftime(g.currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g.currenttimetm);
 }
