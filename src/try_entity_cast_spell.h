@@ -121,9 +121,11 @@ static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, i
             }
 
             // mark it 'destroyed'
-            g->ct.set<destroyed>(doorid, true);
             // remove it from the tile
-            df_remove_at(floor, doorid, spell_loc.x, spell_loc.y);
+            if (doorid != ENTITYID_INVALID) {
+                g->ct.set<destroyed>(doorid, true);
+                df_remove_at(floor, doorid, spell_loc.x, spell_loc.y);
+            }
         }
 
         g->ct.set<destroyed>(spell_id, true);
