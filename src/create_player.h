@@ -10,7 +10,7 @@ static inline entityid create_player(shared_ptr<gamestate> g, vec3 loc, string n
     massert(n != "", "name is empty string");
 
     minfo("Creating player...");
-    race_t rt = g->chara_creation->race;
+    race_t rt = g->chara_creation.race;
     minfo("Race: %s", race2str(rt).c_str());
 
     const auto id = create_npc_at_with(g, rt, loc, [n](shared_ptr<gamestate> g, entityid id) {

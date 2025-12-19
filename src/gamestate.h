@@ -125,7 +125,9 @@ typedef struct gamestate {
     shared_ptr<vector<string>> music_file_paths;
     shared_ptr<vector<Sound>> sfx;
 
-    shared_ptr<character_creation> chara_creation;
+    //shared_ptr<character_creation> chara_creation;
+
+    character_creation chara_creation;
 
 
     string version;
@@ -299,19 +301,19 @@ static inline shared_ptr<gamestate> gamestateinitptr() {
     g->msg_history_max_len_msg_measure = 0;
 
     // initialize character creation
-    g->chara_creation = make_shared<character_creation>();
+    //g->chara_creation = make_shared<character_creation>();
 
-    g->chara_creation->name = "hero";
+    g->chara_creation.name = "hero";
 
-    g->chara_creation->strength = 10;
-    g->chara_creation->dexterity = 10;
-    g->chara_creation->intelligence = 10;
-    g->chara_creation->wisdom = 10;
-    g->chara_creation->constitution = 10;
-    g->chara_creation->charisma = 10;
+    g->chara_creation.strength = 10;
+    g->chara_creation.dexterity = 10;
+    g->chara_creation.intelligence = 10;
+    g->chara_creation.wisdom = 10;
+    g->chara_creation.constitution = 10;
+    g->chara_creation.charisma = 10;
 
-    g->chara_creation->race = RACE_HUMAN;
-    g->chara_creation->hitdie = get_racial_hd(RACE_HUMAN);
+    g->chara_creation.race = RACE_HUMAN;
+    g->chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
 
     // why is the above line crashing?
     // the above line is also crashing
