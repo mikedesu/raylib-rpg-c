@@ -4,10 +4,10 @@
 #include "libgame_defines.h"
 
 static inline void draw_message_box(shared_ptr<gamestate> g) {
-    if (!g->msg_system_is_active || g->msg_system->size() == 0) {
+    if (!g->msg_system_is_active || g->msg_system.size() == 0) {
         return;
     }
-    const string msg = g->msg_system->at(0);
+    const string msg = g->msg_system.at(0);
     //const Color message_bg = (Color){0x33, 0x33, 0x33, 0xff};
     const Color message_bg = Fade((Color){0, 0, 0xff, 0xff}, 0.5f);
     const int font_size = 10;

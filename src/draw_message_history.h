@@ -11,7 +11,7 @@ static inline void draw_message_history(shared_ptr<gamestate> g) {
 
     //const Color message_bg = {0x33, 0x33, 0x33, 0xff};
     const Color message_bg = Fade((Color){0, 0, 0xff, 0xff}, 0.5f);
-    const int msg_count = g->msg_history->size();
+    const int msg_count = g->msg_history.size();
     if (msg_count == 0) {
         // if there are no messages, we don't need to draw anything
         return;
@@ -32,7 +32,7 @@ static inline void draw_message_history(shared_ptr<gamestate> g) {
     if (msg_count > max_messages) {
         int outer_count = 0;
         for (int i = msg_count - max_messages; i < msg_count; i++) {
-            const string msg = g->msg_history->at(i);
+            const string msg = g->msg_history.at(i);
             bzero(tmp, 1024);
             snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
             const float msg_x = box.x + g->pad / 2.0;
@@ -46,7 +46,7 @@ static inline void draw_message_history(shared_ptr<gamestate> g) {
         }
     } else {
         for (int i = 0; i < msg_count; i++) {
-            const string msg = g->msg_history->at(i);
+            const string msg = g->msg_history.at(i);
             bzero(tmp, 1024);
             snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
             const float msg_x = box.x + g->pad / 2.0;

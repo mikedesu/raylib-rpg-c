@@ -9,7 +9,7 @@ static inline void update_debug_panel_buffer(shared_ptr<gamestate> g, shared_ptr
     // Static buffers to avoid reallocating every frame
     //static const char* control_modes[] = {"Camera", "Player", "Unknown"};
 
-    int message_count = g->msg_history->size();
+    int message_count = g->msg_history.size();
     int inventory_count;
     vec3 loc = {0, 0, 0};
     inventory_count = -1;

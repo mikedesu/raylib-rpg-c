@@ -120,8 +120,10 @@ typedef struct gamestate {
 
     scene_t current_scene;
 
-    shared_ptr<vector<string>> msg_system;
-    shared_ptr<vector<string>> msg_history;
+    //shared_ptr<vector<string>> msg_system;
+    //shared_ptr<vector<string>> msg_history;
+    vector<string> msg_system;
+    vector<string> msg_history;
 
     //shared_ptr<vector<Sound>> sfx;
     //shared_ptr<character_creation> chara_creation;
@@ -296,8 +298,8 @@ static inline shared_ptr<gamestate> gamestateinitptr() {
     g->dungeon = nullptr;
 
 
-    g->msg_history = make_shared<vector<string>>();
-    g->msg_system = make_shared<vector<string>>();
+    //g->msg_history = make_shared<vector<string>>();
+    //g->msg_system = make_shared<vector<string>>();
     g->msg_history_max_len_msg = 0;
     g->msg_history_max_len_msg_measure = 0;
 
@@ -386,17 +388,17 @@ static inline entityid gamestate_get_hero_id(const gamestate* const g) {
 }
 
 
-static inline bool gamestate_add_msg_history(shared_ptr<gamestate> g, string msg) {
-    massert(g, "g is NULL");
-    massert(msg != "", "msg is empty string");
-    if (!g->msg_history) {
-        merror("Message history is not initialized");
-        return false;
-    }
-    // Add the message to the history
-    g->msg_history->push_back(msg);
-    return true;
-}
+//static inline bool gamestate_add_msg_history(shared_ptr<gamestate> g, string msg) {
+//    massert(g, "g is NULL");
+//    massert(msg != "", "msg is empty string");
+//    if (!g->msg_history) {
+//        merror("Message history is not initialized");
+//        return false;
+//    }
+// Add the message to the history
+//    g->msg_history->push_back(msg);
+//    return true;
+//}
 
 
 static inline void gamestate_set_debug_panel_pos_bottom_left(gamestate* const g) {
