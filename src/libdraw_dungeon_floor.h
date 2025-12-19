@@ -145,23 +145,16 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
         for (int x = 0; x < df.width; x++) {
             const vec3 loc = {x, y, z};
             const auto tile = df_tile_at(df, loc);
-            //if (!tile) {
-            //merror("No tile at location %d, %d, %d", loc.x, loc.y, loc.z);
-            //    continue;
-            //}
 
             if (!tile.visible) {
-                //merror("Tile invisible");
                 continue;
             }
 
             if (tiletype_is_wall(tile.type)) {
-                //merror("Tile is wall");
                 continue;
             }
 
             if (tile.is_empty) {
-                //merror("Tile is empty at %d, %d, %d", loc.x, loc.y, loc.z);
                 continue;
             }
 
@@ -207,7 +200,6 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 
             for (auto v0 : path) {
                 auto v0_tile = df_tile_at(df, v0);
-                //if (tile_is_wall(v0_tile->type)) {
                 if (tiletype_is_wall(v0_tile.type)) {
                     object_blocking = true;
                     break;
@@ -237,20 +229,15 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 
 
 static inline bool libdraw_draw_dungeon_floor(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     auto df = d_get_current_floor(g.dungeon);
-    //massert(df, "dungeon_floor is NULL");
     const int z = g.dungeon.current_floor;
 
     // render tiles
-    //minfo("render tiles");
     for (int y = 0; y < df.height; y++)
         for (int x = 0; x < df.width; x++)
             draw_dungeon_floor_tile(g, txinfo, x, y, z);
 
     auto mydefault = [](gamestate& g, entityid id) { return true; };
-
-    //auto dead_check = [](shared_ptr<gamestate> g, entityid id) { return g->ct.get<dead>(id).value_or(false); };
 
     auto alive_check = [](gamestate& g, entityid id) {
         auto maybe_dead = g.ct.get<dead>(id);
@@ -269,9 +256,12 @@ static inline bool libdraw_draw_dungeon_floor(gamestate& g) {
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_DOOR, mydefault);
     libdraw_draw_player_target_box(g);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_SPELL, mydefault);
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
+    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_BOX, mydefault);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
+
+    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, alive_check);
+
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, mydefault);
 
     return true;

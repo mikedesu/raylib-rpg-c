@@ -6,7 +6,8 @@ typedef enum
     ENTITY_PLAYER,
     ENTITY_NPC,
     ENTITY_ITEM,
-    ENTITY_WOODEN_BOX,
+    //ENTITY_WOODEN_BOX,
+    ENTITY_BOX,
     ENTITY_DOOR,
 
     ENTITY_SPELL,

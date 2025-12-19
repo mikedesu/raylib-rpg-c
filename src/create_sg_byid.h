@@ -122,7 +122,7 @@ static inline void create_sg_byid(gamestate& g, entityid id) {
     case ENTITY_PLAYER:
     case ENTITY_NPC: create_npc_sg_byid(g, id); break;
     case ENTITY_DOOR: create_door_sg_byid(g, id); break;
-    case ENTITY_WOODEN_BOX: create_box_sg_byid(g, id); break;
+    case ENTITY_BOX: create_box_sg_byid(g, id); break;
     case ENTITY_ITEM: create_item_sg_byid(g, id); break;
     case ENTITY_SPELL: create_spell_sg_byid(g, id); break;
 

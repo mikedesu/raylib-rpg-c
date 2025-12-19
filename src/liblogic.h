@@ -1,6 +1,7 @@
 #pragma once
 
 #include "add_message.h"
+#include "create_box.h"
 #include "create_npc.h"
 #include "create_potion.h"
 #include "create_shield.h"
@@ -63,29 +64,30 @@ static inline void liblogic_init(gamestate& g) {
     SetRandomSeed(time(NULL));
     minfo("liblogic_init");
     init_dungeon(g);
-    //create_wooden_box(g, (vec3){7, 7, 0});
-    create_weapon_at_with(g, (vec3){11, 9, 0}, dagger_init_test);
-    create_shield_at_with(g, (vec3){11, 10, 0}, kite_shield_init_test);
-    create_potion_at_with(g, (vec3){9, 10, 0}, [](gamestate& g, entityid id) {
-        // set healing
-        g.ct.set<name>(id, "small healing potion");
-        g.ct.set<description>(id, "a small healing potion");
-        g.ct.set<potiontype>(id, POTION_HP_SMALL);
-        g.ct.set<healing>(id, (vec3){1, 6, 0});
-    });
-    place_doors(g);
+    create_box_at_with(g, (vec3){11, 9, 0}, [](gamestate& g, entityid id) {});
+    //create_weapon_at_with(g, (vec3){11, 9, 0}, dagger_init_test);
+    //create_shield_at_with(g, (vec3){11, 10, 0}, kite_shield_init_test);
+    //create_potion_at_with(g, (vec3){9, 10, 0}, [](gamestate& g, entityid id) {
+    //    // set healing
+    //    g.ct.set<name>(id, "small healing potion");
+    //    g.ct.set<description>(id, "a small healing potion");
+    //    g.ct.set<potiontype>(id, POTION_HP_SMALL);
+    //    g.ct.set<healing>(id, (vec3){1, 6, 0});
+    //});
+    //place_doors(g);
     //#ifdef SPAWN_MONSTERS
-    for (int i = 0; i < (int)g.dungeon.floors.size(); i++) {
-        //create_npc_at_with(g, RACE_ORC, df_get_random_loc(g->dungeon->floors->at(i)), orc_init_test);
-        for (int j = 1; j <= i + 1; j++) {
-            create_npc_at_with(g, RACE_ORC, df_get_random_loc(d_get_floor(g.dungeon, i)), orc_init_test);
-        }
-        //create_npc_at_with(g, RACE_ORC, (vec3){10, 10, i}, orc_init_test);
-        //create_npc_at_with(g, RACE_ORC, (vec3){10, 9, i}, orc_init_test);
-        //create_npc_at_with(g, RACE_ORC, (vec3){11, 9, i}, orc_init_test);
-        //create_npc_at_with(g, RACE_ORC, (vec3){13, 11, i}, orc_init_test);
-        //create_npc_at_with(g, RACE_ORC, (vec3){14, 11, i}, orc_init_test);
-    }
+    //for (int i = 0; i < (int)g.dungeon.floors.size(); i++) {
+    //for (int j = 1; j <= i + 1; j++) {
+    //    create_npc_at_with(g, RACE_ORC, df_get_random_loc(d_get_floor(g.dungeon, i)), orc_init_test);
+    //}
+
+    //create_npc_at_with(g, RACE_ORC, df_get_random_loc(g->dungeon->floors->at(i)), orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){10, 10, i}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){10, 9, i}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){11, 9, i}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){13, 11, i}, orc_init_test);
+    //create_npc_at_with(g, RACE_ORC, (vec3){14, 11, i}, orc_init_test);
+    //}
     //#endif
     //create_potion(g, (vec3){3, 1, 0}, POTION_HP_MEDIUM);
     //create_potion(g, (vec3){5, 1, 0}, POTION_HP_LARGE);
