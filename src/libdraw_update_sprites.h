@@ -76,10 +76,32 @@ static inline void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
         sprite_incrframe2(s);
         // this condition for the animation reset seems incorrect
         // certain cases are causing animations to drop-off mid-sequence
-        if (s->num_loops >= 1) {
-            sg->current = sg->default_anim;
-            s->num_loops = 0;
+        if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
+            if (s->num_loops >= 1) {
+                sg->current = sg->default_anim;
+                s->num_loops = 0;
+            }
         }
+
+        //if (type == ENTITY_SPELL) {
+        //    if (sg->current == 0) {
+        //        if (s->num_loops >= 1) {
+        //            sg->current = 1;
+        //            s->num_loops = 0;
+        //        }
+        //    } else if (sg->current == 1) {
+        //        if (s->num_loops >= 1) {
+        //            sg->current = 2;
+        //            s->num_loops = 0;
+        //        }
+        //    } else if (sg->current == 2) {
+        //        if (s->num_loops >= 1) {
+        //            sg->current = 0;
+        //            s->num_loops = 0;
+        //        }
+        //    }
+        //}
+
         // lets try something
         if (type == ENTITY_ITEM) {
             const itemtype_t itype = g->ct.get<itemtype>(id).value_or(ITEM_NONE);

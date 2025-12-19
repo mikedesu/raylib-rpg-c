@@ -82,7 +82,7 @@ static inline void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid i
     massert(sg, "spritegroup is NULL");
     if (g->ct.get<update>(id).value_or(false)) {
         if (g->ct.has<direction>(id)) {
-            direction_t d = g->ct.get<direction>(id).value();
+            const direction_t d = g->ct.get<direction>(id).value();
             libdraw_update_sprite_context_ptr(g, sg, d);
         }
         g->ct.set<update>(id, false);
@@ -96,10 +96,23 @@ static inline void libdraw_update_sprite_ptr(shared_ptr<gamestate> g, entityid i
     if (g->ct.get<attacking>(id).value_or(false))
         libdraw_set_sg_is_attacking(g, id, sg);
 
+    //if (g->ct.get<casting>(id).value_or(false))
+    //    libdraw_set_sg_is_casting(g, id, sg);
+
+
+    //if (g->ct.get<spell_casting>(id).value_or(false))
+    //    libdraw_set_sg_spell_casting(g, id, sg);
+    //else if (g->ct.get<spell_persisting>(id).value_or(false))
+    //    libdraw_set_sg_spell_persisting(g, id, sg);
+    //else if (g->ct.get<spell_ending>(id).value_or(false))
+    //    libdraw_set_sg_spell_ending(g, id, sg);
+
+
     if (g->ct.get<dead>(id).value_or(false))
         libdraw_set_sg_is_dead(g, id, sg);
     else if (g->ct.get<damaged>(id).value_or(false))
         libdraw_set_sg_is_damaged(g, id, sg);
+
 
     const entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
     if (type == ENTITY_DOOR) {

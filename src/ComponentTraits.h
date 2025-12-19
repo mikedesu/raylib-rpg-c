@@ -88,9 +88,30 @@ struct ComponentTraits<attacking> {
     using Type = bool;
 };
 
+// this casting is for NPCs
 struct casting { }; // bool
 template <>
 struct ComponentTraits<casting> {
+    using Type = bool;
+};
+
+
+// this casting is for spells
+struct spell_casting { }; // bool
+template <>
+struct ComponentTraits<spell_casting> {
+    using Type = bool;
+};
+
+struct spell_persisting { }; // bool
+template <>
+struct ComponentTraits<spell_persisting> {
+    using Type = bool;
+};
+
+struct spell_ending { }; // bool
+template <>
+struct ComponentTraits<spell_ending> {
     using Type = bool;
 };
 

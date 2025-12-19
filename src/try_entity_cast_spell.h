@@ -44,6 +44,7 @@ static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, i
         //...
         g->ct.set<spellstate>(id, SPELLSTATE_CAST);
         g->ct.set<spelltype>(id, SPELLTYPE_FIRE);
+        g->ct.set<spell_casting>(id, true);
     });
 
     if (spell_id != ENTITYID_INVALID) {

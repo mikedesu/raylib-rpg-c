@@ -28,8 +28,9 @@ static inline void liblogic_close(shared_ptr<gamestate> g) {
 
 static inline void update_npcs_state(shared_ptr<gamestate> g) {
     for (entityid id = 0; id < g->next_entityid; id++) {
-        if (id == g->hero_id)
+        if (id == g->hero_id || g->ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC)
             continue;
+
         unsigned char a = g->ct.get<txalpha>(id).value_or(255);
         if (a < 255)
             a++;
@@ -37,6 +38,38 @@ static inline void update_npcs_state(shared_ptr<gamestate> g) {
         g->ct.set<damaged>(id, false);
     }
 }
+
+
+static inline void update_spells_state(shared_ptr<gamestate> g) {
+    for (entityid id = 0; id < g->next_entityid; id++) {
+        if (id == g->hero_id || g->ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL)
+            continue;
+
+        unsigned char a = g->ct.get<txalpha>(id).value_or(255);
+        if (a < 255)
+            a++;
+        g->ct.set<txalpha>(id, a);
+
+        const bool is_casting = g->ct.get<spell_casting>(id).value_or(false);
+        const bool is_persisting = g->ct.get<spell_persisting>(id).value_or(false);
+        const bool is_ending = g->ct.get<spell_ending>(id).value_or(false);
+
+        if (is_casting) {
+            g->ct.set<spell_casting>(id, false);
+            g->ct.set<spell_persisting>(id, true);
+            g->ct.set<spell_ending>(id, false);
+        } else if (is_persisting) {
+            g->ct.set<spell_casting>(id, false);
+            g->ct.set<spell_persisting>(id, false);
+            g->ct.set<spell_ending>(id, true);
+        } else if (is_ending) {
+            g->ct.set<spell_casting>(id, false);
+            g->ct.set<spell_persisting>(id, false);
+            g->ct.set<spell_ending>(id, false);
+        }
+    }
+}
+
 
 static inline void liblogic_init(shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
@@ -94,8 +127,11 @@ static inline void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate
     // Spawn NPCs periodically
     //try_spawn_npc(g);
     update_player_tiles_explored(g);
+
     update_player_state(g);
     update_npcs_state(g);
+    //update_spells_state(g);
+
     handle_input(g, is);
     handle_npcs(g);
     update_debug_panel_buffer(g, is);
