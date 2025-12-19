@@ -22,8 +22,8 @@ static inline entityid create_spell_at_with(shared_ptr<gamestate> g, vec3 loc, f
     massert(tile, "failed to get tile");
     if (!tile_is_walkable(tile->type))
         return ENTITYID_INVALID;
-    if (tile_has_live_npcs(g, tile))
-        return ENTITYID_INVALID;
+    //if (tile_has_live_npcs(g, tile))
+    //    return ENTITYID_INVALID;
     const auto id = create_spell_with(g, spellInitFunction);
     if (id == ENTITYID_INVALID)
         return ENTITYID_INVALID;

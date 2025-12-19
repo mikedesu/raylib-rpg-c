@@ -50,22 +50,29 @@ static inline void update_spells_state(shared_ptr<gamestate> g) {
             a++;
         g->ct.set<txalpha>(id, a);
 
-        const bool is_casting = g->ct.get<spell_casting>(id).value_or(false);
-        const bool is_persisting = g->ct.get<spell_persisting>(id).value_or(false);
-        const bool is_ending = g->ct.get<spell_ending>(id).value_or(false);
+        //const bool is_casting = g->ct.get<spell_casting>(id).value_or(false);
+        //const bool is_persisting = g->ct.get<spell_persisting>(id).value_or(false);
+        const bool is_complete = g->ct.get<spell_complete>(id).value_or(false);
+        const bool is_destroyed = g->ct.get<destroyed>(id).value_or(false);
+        //if (is_casting) {
+        //    g->ct.set<spell_casting>(id, false);
+        //    g->ct.set<spell_persisting>(id, true);
+        //    g->ct.set<spell_ending>(id, false);
+        //} else if (is_persisting) {
+        //    g->ct.set<spell_casting>(id, false);
+        //    g->ct.set<spell_persisting>(id, false);
+        //    g->ct.set<spell_ending>(id, true);
+        if (is_complete && is_destroyed) {
+            // remove it from the tile
+            auto df = d_get_current_floor(g->dungeon);
+            auto loc = g->ct.get<location>(id).value_or((vec3){-1, -1, -1});
+            df_remove_at(df, id, loc.x, loc.y);
+            //auto tile = df_tile_at(df, );
+            //tile_remove(tile, id);
 
-        if (is_casting) {
-            g->ct.set<spell_casting>(id, false);
-            g->ct.set<spell_persisting>(id, true);
-            g->ct.set<spell_ending>(id, false);
-        } else if (is_persisting) {
-            g->ct.set<spell_casting>(id, false);
-            g->ct.set<spell_persisting>(id, false);
-            g->ct.set<spell_ending>(id, true);
-        } else if (is_ending) {
-            g->ct.set<spell_casting>(id, false);
-            g->ct.set<spell_persisting>(id, false);
-            g->ct.set<spell_ending>(id, false);
+            //    g->ct.set<spell_casting>(id, false);
+            //    g->ct.set<spell_persisting>(id, false);
+            //    g->ct.set<spell_ending>(id, false);
         }
     }
 }
@@ -130,7 +137,7 @@ static inline void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate
 
     update_player_state(g);
     update_npcs_state(g);
-    //update_spells_state(g);
+    update_spells_state(g);
 
     handle_input(g, is);
     handle_npcs(g);

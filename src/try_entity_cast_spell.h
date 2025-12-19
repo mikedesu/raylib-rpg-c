@@ -1,9 +1,11 @@
 #pragma once
 
+#include "add_message.h"
 #include "check_hearing.h"
 #include "create_spell.h"
 #include "entityid.h"
 #include "gamestate.h"
+#include "manage_inventory.h"
 #include "play_sound.h"
 #include "sfx.h"
 
@@ -21,7 +23,8 @@ static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, i
 
     auto floor = d_get_floor(g->dungeon, loc.z);
     massert(floor, "failed to get dungeon floor");
-    auto tile = df_tile_at(floor, (vec3){tgt_x, tgt_y, loc.z});
+    const vec3 spell_loc = {tgt_x, tgt_y, loc.z};
+    auto tile = df_tile_at(floor, spell_loc);
     if (!tile) {
         merror("No tile at location, cannot attack");
         return;
@@ -39,16 +42,74 @@ static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, i
     // ok...
     // we are hard-coding a spell cast
     // in this example, we will 'create' a 'spell entity' of type 'fire' and place it on a tile
-
-    const entityid spell_id = create_spell_at_with(g, (vec3){tgt_x, tgt_y, loc.z}, [](shared_ptr<gamestate> g, entityid id) {
+    const entityid spell_id = create_spell_at_with(g, spell_loc, [](shared_ptr<gamestate> g, entityid id) {
         //...
         g->ct.set<spellstate>(id, SPELLSTATE_CAST);
         g->ct.set<spelltype>(id, SPELLTYPE_FIRE);
         g->ct.set<spell_casting>(id, true);
     });
 
+
     if (spell_id != ENTITYID_INVALID) {
         ok = true;
+
+        // lets do an example of processing a spell effect immediately
+        // first we need to iterate the entities on the tile
+        // if there's an NPC we damage it
+
+        if (tile_has_live_npcs(g, tile)) {
+            entityid npcid = ENTITYID_INVALID;
+            for (auto id : *tile->entities) {
+                if (g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC) {
+                    npcid = id;
+                    break;
+                }
+            }
+
+            const int dmg = GetRandomValue(1, 6);
+
+            g->ct.set<damaged>(npcid, true);
+            g->ct.set<update>(npcid, true);
+
+            auto maybe_tgt_hp = g->ct.get<hp>(npcid);
+            if (!maybe_tgt_hp.has_value()) {
+                merror("target has no HP component");
+                return;
+            }
+
+            int tgt_hp = maybe_tgt_hp.value();
+            if (tgt_hp <= 0) {
+                merror("Target is already dead, hp was: %d", tgt_hp);
+                g->ct.set<dead>(npcid, true);
+                return;
+            }
+
+            tgt_hp -= dmg;
+            g->ct.set<hp>(npcid, tgt_hp);
+
+            if (tgt_hp > 0) {
+                g->ct.set<dead>(npcid, false);
+                return;
+            }
+
+            auto tgttype = g->ct.get<entitytype>(npcid).value_or(ENTITY_NONE);
+
+            g->ct.set<dead>(npcid, true);
+            if (tgttype == ENTITY_NPC) {
+                // increment attacker's xp
+                const int old_xp = g->ct.get<xp>(id).value_or(0);
+                const int reward_xp = 1;
+                const int new_xp = old_xp + reward_xp;
+                g->ct.set<xp>(id, new_xp);
+
+                // handle item drops
+                drop_all_from_inventory(g, npcid);
+            } else if (tgttype == ENTITY_PLAYER) {
+                add_message(g, "You died");
+            }
+        }
+
+        g->ct.set<destroyed>(spell_id, true);
     }
 
 
@@ -78,11 +139,4 @@ static inline void try_entity_cast_spell(shared_ptr<gamestate> g, entityid id, i
         //                                              : SFX_SLASH_ATTACK_SWORD_1;
         //play_sound_if_heard(index, event_heard);
     }
-
-    //const entitytype_t type = g->ct.get<entitytype>(id).value_or(ENTITY_NONE);
-    //g->flag = type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM : type == ENTITY_NPC ? GAMESTATE_FLAG_NPC_ANIM : GAMESTATE_FLAG_NONE;
-
-
-    //const auto type = g->ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
-    //handle_attack_success_gamestate_flag(g, type, ok);
 }

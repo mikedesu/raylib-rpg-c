@@ -115,6 +115,12 @@ struct ComponentTraits<spell_ending> {
     using Type = bool;
 };
 
+struct spell_complete { }; // bool
+template <>
+struct ComponentTraits<spell_complete> {
+    using Type = bool;
+};
+
 
 struct blocking { }; // bool
 template <>

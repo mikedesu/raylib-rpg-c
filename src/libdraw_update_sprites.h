@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ComponentTraits.h"
 #include "draw_handle_gamestate_flag.h"
 #include "gamestate.h"
 #include "handle_dirty_entities.h"
@@ -90,10 +91,24 @@ static inline void libdraw_update_sprites_post(shared_ptr<gamestate> g) {
         if (type == ENTITY_SPELL && s->num_loops >= 1) {
             if (sg->current == 0) {
                 spritegroup_set_current(sg, 1);
+                g->ct.set<spell_casting>(id, false);
+                g->ct.set<spell_persisting>(id, true);
+                g->ct.set<spell_ending>(id, false);
+                g->ct.set<spell_complete>(id, false);
+
             } else if (sg->current == 1) {
                 spritegroup_set_current(sg, 2);
+                g->ct.set<spell_casting>(id, false);
+                g->ct.set<spell_persisting>(id, false);
+                g->ct.set<spell_ending>(id, true);
+                g->ct.set<spell_complete>(id, false);
             } else if (sg->current == 2) {
-                spritegroup_set_current(sg, 0);
+                //spritegroup_set_current(sg, 0);
+                g->ct.set<spell_casting>(id, false);
+                g->ct.set<spell_persisting>(id, false);
+                g->ct.set<spell_ending>(id, false);
+                g->ct.set<spell_complete>(id, true);
+                sg->visible = false;
             }
         }
 

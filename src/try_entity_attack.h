@@ -44,8 +44,6 @@ static inline void handle_attack_success(shared_ptr<gamestate> g, entityid atk_i
     g->ct.set<damaged>(tgt_id, true);
     g->ct.set<update>(tgt_id, true);
 
-    add_message_history(
-        g, "%s deals %d damage to %s", g->ct.get<name>(atk_id).value_or("no-name").c_str(), dmg, g->ct.get<name>(tgt_id).value_or("no-name").c_str());
 
     auto maybe_tgt_hp = g->ct.get<hp>(tgt_id);
     if (!maybe_tgt_hp.has_value()) {
@@ -60,6 +58,8 @@ static inline void handle_attack_success(shared_ptr<gamestate> g, entityid atk_i
         return;
     }
 
+    add_message_history(
+        g, "%s deals %d damage to %s", g->ct.get<name>(atk_id).value_or("no-name").c_str(), dmg, g->ct.get<name>(tgt_id).value_or("no-name").c_str());
     tgt_hp -= dmg;
     g->ct.set<hp>(tgt_id, tgt_hp);
 

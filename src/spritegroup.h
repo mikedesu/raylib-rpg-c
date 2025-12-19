@@ -31,6 +31,7 @@ typedef struct spritegroup_t {
     Rectangle move;
     vector<shared_ptr<sprite>>* sprites2;
     float move_rate;
+    bool visible;
 } spritegroup_t;
 
 
@@ -49,6 +50,7 @@ constexpr static inline spritegroup_t* spritegroup_create(int capacity) {
     sg->dest = (Rectangle){0, 0, 0, 0};
     sg->move = (Rectangle){0, 0, 0, 0};
     sg->move_rate = 1.0;
+    sg->visible = true;
     return sg;
 }
 

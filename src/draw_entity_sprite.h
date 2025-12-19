@@ -15,7 +15,8 @@ static inline void draw_entity_sprite(const shared_ptr<gamestate> g, spritegroup
     const Color c = {255, 255, 255, a};
     auto s = sg_get_current(sg);
     massert(s, "sprite is NULL");
-    DrawTexturePro(*s->texture, s->src, dest, (Vector2){0, 0}, 0, c);
+    if (sg->visible)
+        DrawTexturePro(*s->texture, s->src, dest, (Vector2){0, 0}, 0, c);
     // draw a box around the sprite
     //DrawRectangleLinesEx(dest, 1, (Color){255, 0, 0, 255});
 }
