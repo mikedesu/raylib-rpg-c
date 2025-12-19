@@ -113,6 +113,7 @@ typedef struct gamestate {
 
 
     shared_ptr<dungeon_t> dungeon;
+    //dungeon_t dungeon;
 
     char frame_time_str[32];
 
