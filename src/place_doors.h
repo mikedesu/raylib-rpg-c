@@ -5,7 +5,7 @@
 
 static inline void place_doors(shared_ptr<gamestate> g) {
     massert(g, "g is null");
-    for (int z = 0; z < (int)g->dungeon.floors->size(); z++) {
+    for (int z = 0; z < (int)g->dungeon.floors.size(); z++) {
         auto df = d_get_floor(g->dungeon, z);
         for (int x = 0; x < df->width; x++) {
             for (int y = 0; y < df->height; y++) {

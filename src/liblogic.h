@@ -98,7 +98,7 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
     place_doors(g);
 
     //#ifdef SPAWN_MONSTERS
-    for (int i = 0; i < (int)g->dungeon.floors->size(); i++) {
+    for (int i = 0; i < (int)g->dungeon.floors.size(); i++) {
         //create_npc_at_with(g, RACE_ORC, df_get_random_loc(g->dungeon->floors->at(i)), orc_init_test);
         for (int j = 1; j <= i + 1; j++) {
             create_npc_at_with(g, RACE_ORC, df_get_random_loc(d_get_floor(g->dungeon, i)), orc_init_test);

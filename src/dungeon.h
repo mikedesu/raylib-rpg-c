@@ -16,7 +16,8 @@ using std::vector;
 #define INITIAL_DUNGEON_CAPACITY 4
 
 typedef struct {
-    shared_ptr<vector<shared_ptr<dungeon_floor_t>>> floors; // vector of shared pointers to dungeon_floor_t
+    //shared_ptr<vector<shared_ptr<dungeon_floor_t>>> floors; // vector of shared pointers to dungeon_floor_t
+    vector<shared_ptr<dungeon_floor_t>> floors; // vector of shared pointers to dungeon_floor_t
     int current_floor;
     bool is_locked;
 } dungeon_t;
@@ -27,9 +28,9 @@ static inline void d_create(dungeon_t& dungeon) {
     //auto dungeon = make_shared<dungeon_t>();
     //if (!dungeon)
     //    return nullptr;
-    dungeon.floors = make_shared<vector<shared_ptr<dungeon_floor_t>>>();
-    if (!dungeon.floors)
-        return;
+    //dungeon.floors = make_shared<vector<shared_ptr<dungeon_floor_t>>>();
+    //if (!dungeon.floors)
+    //    return;
     dungeon.current_floor = 0;
     dungeon.is_locked = false;
     //return dungeon;
@@ -41,7 +42,7 @@ static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int 
     if (width <= 0 || height <= 0 || dungeon.is_locked)
         return;
 
-    const int current_floor = dungeon.floors->size();
+    const int current_floor = dungeon.floors.size();
     auto df = df_init(current_floor, type, width, height);
     if (!df)
         return;
@@ -103,15 +104,15 @@ static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int 
     };
 
     df_xform(creation_rules);
-    dungeon.floors->push_back(df);
+    dungeon.floors.push_back(df);
     //return df;
 }
 
 
 //static inline void d_destroy(shared_ptr<dungeon_t> d) {
 static inline void d_destroy(dungeon_t& d) {
-    if (d.floors)
-        d.floors->clear();
+    //if (d.floors)
+    d.floors.clear();
 }
 
 
@@ -123,7 +124,8 @@ static inline void d_destroy(dungeon_t& d) {
 
 //static inline shared_ptr<dungeon_floor_t> d_get_floor(shared_ptr<dungeon_t> dungeon, size_t index) {
 static inline shared_ptr<dungeon_floor_t> d_get_floor(dungeon_t& dungeon, size_t index) {
-    return index < 0 || index >= dungeon.floors->size() ? nullptr : dungeon.floors->at(index);
+    //return index < 0 || index >= dungeon.floors.size() ? nullptr : dungeon.floors.at(index);
+    return index < 0 || index >= dungeon.floors.size() ? nullptr : dungeon.floors[index];
 }
 
 //static inline shared_ptr<dungeon_floor_t> d_get_current_floor(shared_ptr<dungeon_t> dungeon) {
