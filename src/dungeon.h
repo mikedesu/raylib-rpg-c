@@ -16,28 +16,18 @@ using std::vector;
 #define INITIAL_DUNGEON_CAPACITY 4
 
 typedef struct {
-    //shared_ptr<vector<shared_ptr<dungeon_floor_t>>> floors; // vector of shared pointers to dungeon_floor_t
     vector<shared_ptr<dungeon_floor_t>> floors; // vector of shared pointers to dungeon_floor_t
     int current_floor;
     bool is_locked;
 } dungeon_t;
 
 
-//static inline shared_ptr<dungeon_t> d_create() {
 static inline void d_create(dungeon_t& dungeon) {
-    //auto dungeon = make_shared<dungeon_t>();
-    //if (!dungeon)
-    //    return nullptr;
-    //dungeon.floors = make_shared<vector<shared_ptr<dungeon_floor_t>>>();
-    //if (!dungeon.floors)
-    //    return;
     dungeon.current_floor = 0;
     dungeon.is_locked = false;
-    //return dungeon;
 }
 
 
-//static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dungeon, biome_t type, int width, int height) {
 static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int height) {
     if (width <= 0 || height <= 0 || dungeon.is_locked)
         return;
@@ -109,26 +99,14 @@ static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int 
 }
 
 
-//static inline void d_destroy(shared_ptr<dungeon_t> d) {
 static inline void d_destroy(dungeon_t& d) {
-    //if (d.floors)
     d.floors.clear();
 }
 
-
-//static inline void d_free(shared_ptr<dungeon_t> dungeon) {
-//    massert(dungeon, "dungeon is NULL");
-//    d_destroy(dungeon);
-//}
-
-
-//static inline shared_ptr<dungeon_floor_t> d_get_floor(shared_ptr<dungeon_t> dungeon, size_t index) {
 static inline shared_ptr<dungeon_floor_t> d_get_floor(dungeon_t& dungeon, size_t index) {
-    //return index < 0 || index >= dungeon.floors.size() ? nullptr : dungeon.floors.at(index);
     return index < 0 || index >= dungeon.floors.size() ? nullptr : dungeon.floors[index];
 }
 
-//static inline shared_ptr<dungeon_floor_t> d_get_current_floor(shared_ptr<dungeon_t> dungeon) {
 static inline shared_ptr<dungeon_floor_t> d_get_current_floor(dungeon_t& dungeon) {
     return d_get_floor(dungeon, dungeon.current_floor);
 }
