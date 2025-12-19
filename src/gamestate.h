@@ -124,11 +124,10 @@ typedef struct gamestate {
     shared_ptr<vector<string>> msg_history;
 
     //shared_ptr<vector<Sound>> sfx;
-    vector<Sound> sfx;
-
-    vector<string> music_file_paths;
     //shared_ptr<character_creation> chara_creation;
 
+    vector<Sound> sfx;
+    vector<string> music_file_paths;
     character_creation chara_creation;
 
 
