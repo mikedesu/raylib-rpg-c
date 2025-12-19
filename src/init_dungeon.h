@@ -5,9 +5,10 @@
 static inline void init_dungeon(shared_ptr<gamestate> g) {
     massert(g, "gamestate is null");
 
-    g->dungeon = d_create();
+    //g->dungeon = d_create();
+    d_create(g->dungeon);
 
-    massert(g->dungeon, "failed to init dungeon");
+    //massert(g->dungeon, "failed to init dungeon");
     msuccess("dungeon initialized successfully");
     minfo("adding floors...");
 

@@ -31,8 +31,8 @@ static inline void recompute_entity_cache(shared_ptr<gamestate> g, shared_ptr<ti
 static inline void recompute_entity_cache_at(shared_ptr<gamestate> g, int x, int y, int z) {
     massert(g, "gamestate is NULL");
     massert(x >= 0 && y >= 0 && z >= 0, "x, y, or z is out of bounds: %d, %d, %d", x, y, z);
-    massert((size_t)z < g->dungeon->floors->size(), "z is out of bounds");
-    auto df = g->dungeon->floors->at(z);
+    massert((size_t)z < g->dungeon.floors->size(), "z is out of bounds");
+    auto df = g->dungeon.floors->at(z);
     massert(df, "failed to get dungeon floor");
     auto t = df_tile_at(df, (vec3){x, y, z});
     massert(t, "tile not found");

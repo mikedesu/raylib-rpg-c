@@ -14,8 +14,8 @@ static inline bool try_entity_stairs(shared_ptr<gamestate> g, entityid id) {
     const vec3 loc = g->ct.get<location>(id).value();
 
     // first, we prob want to get the tile at this location
-    const int current_floor = g->dungeon->current_floor;
-    auto df = g->dungeon->floors->at(current_floor);
+    const int current_floor = g->dungeon.current_floor;
+    auto df = g->dungeon.floors->at(current_floor);
     auto t = df_tile_at(df, loc);
     massert(t, "tile was NULL");
 
@@ -30,10 +30,10 @@ static inline bool try_entity_stairs(shared_ptr<gamestate> g, entityid id) {
             // we have to remove the player from the old tile
             df_remove_at(df, g->hero_id, loc.x, loc.y);
 
-            g->dungeon->current_floor--;
+            g->dungeon.current_floor--;
 
-            const int new_floor = g->dungeon->current_floor;
-            auto df2 = g->dungeon->floors->at(new_floor);
+            const int new_floor = g->dungeon.current_floor;
+            auto df2 = g->dungeon.floors->at(new_floor);
             const vec3 uloc = df2->downstairs_loc;
             auto t2 = df_tile_at(df2, uloc);
 
@@ -49,15 +49,15 @@ static inline bool try_entity_stairs(shared_ptr<gamestate> g, entityid id) {
         // can't go down on the bottom floor
         // otherwise...
 
-        if ((size_t)current_floor < g->dungeon->floors->size() - 1) {
+        if ((size_t)current_floor < g->dungeon.floors->size() - 1) {
             // go downstairs
             // we have to remove the player from the old tile
             df_remove_at(df, g->hero_id, loc.x, loc.y);
 
-            g->dungeon->current_floor++;
+            g->dungeon.current_floor++;
 
-            const int new_floor = g->dungeon->current_floor;
-            auto df2 = g->dungeon->floors->at(new_floor);
+            const int new_floor = g->dungeon.current_floor;
+            auto df2 = g->dungeon.floors->at(new_floor);
             const vec3 uloc = df2->upstairs_loc;
             auto t2 = df_tile_at(df2, uloc);
 

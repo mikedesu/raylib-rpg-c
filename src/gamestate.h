@@ -112,8 +112,8 @@ typedef struct gamestate {
     double last_frame_time;
 
 
-    shared_ptr<dungeon_t> dungeon;
-    //dungeon_t dungeon;
+    //shared_ptr<dungeon_t> dungeon;
+    dungeon_t dungeon;
 
     char frame_time_str[32];
 
@@ -296,7 +296,7 @@ static inline shared_ptr<gamestate> gamestateinitptr() {
     g->debugpanel.pad_bottom = 0;
     g->inventory_menu_selection = 0;
 
-    g->dungeon = nullptr;
+    //g->dungeon = nullptr;
 
 
     //g->msg_history = make_shared<vector<string>>();

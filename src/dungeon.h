@@ -22,33 +22,33 @@ typedef struct {
 } dungeon_t;
 
 
-static inline shared_ptr<dungeon_t> d_create() {
-    auto dungeon = make_shared<dungeon_t>();
-    if (!dungeon)
-        return nullptr;
-    dungeon->floors = make_shared<vector<shared_ptr<dungeon_floor_t>>>();
-    if (!dungeon->floors)
-        return nullptr;
-    dungeon->current_floor = 0;
-    dungeon->is_locked = false;
-    return dungeon;
+//static inline shared_ptr<dungeon_t> d_create() {
+static inline void d_create(dungeon_t& dungeon) {
+    //auto dungeon = make_shared<dungeon_t>();
+    //if (!dungeon)
+    //    return nullptr;
+    dungeon.floors = make_shared<vector<shared_ptr<dungeon_floor_t>>>();
+    if (!dungeon.floors)
+        return;
+    dungeon.current_floor = 0;
+    dungeon.is_locked = false;
+    //return dungeon;
 }
 
 
-static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dungeon, biome_t type, int width, int height) {
-    if (!dungeon || width <= 0 || height <= 0 || dungeon->is_locked)
-        return nullptr;
-    const int current_floor = dungeon->floors->size();
+//static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dungeon, biome_t type, int width, int height) {
+static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int height) {
+    if (width <= 0 || height <= 0 || dungeon.is_locked)
+        return;
 
+    const int current_floor = dungeon.floors->size();
     auto df = df_init(current_floor, type, width, height);
-
     if (!df)
-        return nullptr;
+        return;
 
     auto creation_rules = [df]() {
         const float x = df->width / 4.0;
         const float y = df->height / 4.0;
-
         const int w = 4;
         const int h = 3;
 
@@ -103,27 +103,30 @@ static inline shared_ptr<dungeon_floor_t> d_add_floor(shared_ptr<dungeon_t> dung
     };
 
     df_xform(creation_rules);
-    dungeon->floors->push_back(df);
-    return df;
+    dungeon.floors->push_back(df);
+    //return df;
 }
 
 
-static inline void d_destroy(shared_ptr<dungeon_t> d) {
-    if (d && d->floors)
-        d->floors->clear();
+//static inline void d_destroy(shared_ptr<dungeon_t> d) {
+static inline void d_destroy(dungeon_t& d) {
+    if (d.floors)
+        d.floors->clear();
 }
 
 
-static inline void d_free(shared_ptr<dungeon_t> dungeon) {
-    massert(dungeon, "dungeon is NULL");
-    d_destroy(dungeon);
+//static inline void d_free(shared_ptr<dungeon_t> dungeon) {
+//    massert(dungeon, "dungeon is NULL");
+//    d_destroy(dungeon);
+//}
+
+
+//static inline shared_ptr<dungeon_floor_t> d_get_floor(shared_ptr<dungeon_t> dungeon, size_t index) {
+static inline shared_ptr<dungeon_floor_t> d_get_floor(dungeon_t& dungeon, size_t index) {
+    return index < 0 || index >= dungeon.floors->size() ? nullptr : dungeon.floors->at(index);
 }
 
-
-static inline shared_ptr<dungeon_floor_t> d_get_floor(shared_ptr<dungeon_t> dungeon, size_t index) {
-    return !dungeon || index < 0 || index >= dungeon->floors->size() ? nullptr : dungeon->floors->at(index);
-}
-
-static inline shared_ptr<dungeon_floor_t> d_get_current_floor(shared_ptr<dungeon_t> dungeon) {
-    return !dungeon ? nullptr : d_get_floor(dungeon, dungeon->current_floor);
+//static inline shared_ptr<dungeon_floor_t> d_get_current_floor(shared_ptr<dungeon_t> dungeon) {
+static inline shared_ptr<dungeon_floor_t> d_get_current_floor(dungeon_t& dungeon) {
+    return d_get_floor(dungeon, dungeon.current_floor);
 }

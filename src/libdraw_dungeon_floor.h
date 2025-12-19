@@ -140,7 +140,7 @@ static inline void
 libdraw_draw_dungeon_floor_entitytype(shared_ptr<gamestate> g, entitytype_t entitytype_0, function<bool(shared_ptr<gamestate>, entityid)> additional_check) {
     shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
     massert(df, "dungeon_floor is NULL");
-    const int z = g->dungeon->current_floor;
+    const int z = g->dungeon.current_floor;
 
     for (int y = 0; y < df->height; y++) {
         for (int x = 0; x < df->width; x++) {
@@ -241,7 +241,7 @@ static inline bool libdraw_draw_dungeon_floor(const shared_ptr<gamestate> g) {
     massert(g, "gamestate is NULL");
     shared_ptr<dungeon_floor_t> df = d_get_current_floor(g->dungeon);
     massert(df, "dungeon_floor is NULL");
-    const int z = g->dungeon->current_floor;
+    const int z = g->dungeon.current_floor;
 
     // render tiles
     //minfo("render tiles");

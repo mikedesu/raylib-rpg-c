@@ -23,7 +23,8 @@ using std::shared_ptr;
 
 static inline void liblogic_close(shared_ptr<gamestate> g) {
     massert(g, "liblogic_close: gamestate is NULL");
-    d_free(g->dungeon);
+    //d_free(g->dungeon);
+    d_destroy(g->dungeon);
 }
 
 static inline void update_npcs_state(shared_ptr<gamestate> g) {
@@ -97,7 +98,7 @@ static inline void liblogic_init(shared_ptr<gamestate> g) {
     place_doors(g);
 
     //#ifdef SPAWN_MONSTERS
-    for (int i = 0; i < (int)g->dungeon->floors->size(); i++) {
+    for (int i = 0; i < (int)g->dungeon.floors->size(); i++) {
         //create_npc_at_with(g, RACE_ORC, df_get_random_loc(g->dungeon->floors->at(i)), orc_init_test);
         for (int j = 1; j <= i + 1; j++) {
             create_npc_at_with(g, RACE_ORC, df_get_random_loc(d_get_floor(g->dungeon, i)), orc_init_test);
