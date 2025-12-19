@@ -2,7 +2,6 @@
 
 #include "gamestate.h"
 
-
 extern RenderTexture2D title_target_texture;
 extern Rectangle target_src;
 extern Rectangle target_dest;
@@ -11,7 +10,6 @@ extern RenderTexture2D hud_target_texture;
 extern RenderTexture2D main_game_target_texture;
 
 static inline void draw_title_screen_from_texture(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     DrawTexturePro(title_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
@@ -20,13 +18,10 @@ static inline void draw_hud_from_texture(gamestate& g) {
     DrawTexturePro(hud_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
-
 static inline void draw_character_creation_screen_from_texture(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     DrawTexturePro(char_creation_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 static inline void libdraw_drawframe_2d_from_texture(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     DrawTexturePro(main_game_target_texture.texture, target_src, target_dest, (Vector2){0, 0}, 0.0f, WHITE);
 }

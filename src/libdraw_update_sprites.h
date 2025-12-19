@@ -14,10 +14,7 @@ extern int ANIM_SPEED;
 
 static inline void libdraw_update_sprites_pre(gamestate& g) {
     minfo2("BEGIN update sprites pre");
-    //massert(g, "gamestate is NULL");
-
     UpdateMusicStream(music);
-
     if (g.current_scene == SCENE_GAMEPLAY) {
         if (g.flag == GAMESTATE_FLAG_PLAYER_INPUT || g.flag == GAMESTATE_FLAG_PLAYER_ANIM) {
             //ANIM_SPEED = DEFAULT_ANIM_SPEED * 2;
@@ -28,7 +25,6 @@ static inline void libdraw_update_sprites_pre(gamestate& g) {
             ANIM_SPEED = DEFAULT_ANIM_SPEED;
             //ANIM_SPEED = DEFAULT_ANIM_SPEED;
         }
-
         minfo2("Begin handling dirty entities");
         libdraw_handle_dirty_entities(g);
         minfo2("End handling dirty entities");
@@ -43,7 +39,6 @@ static inline void libdraw_update_sprites_pre(gamestate& g) {
 
 
 static inline void libdraw_update_sprites_post(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     //if (g->music_volume_changed) {
     //    SetMusicVolume(music, g->music_volume);
     //    g->music_volume_changed = false;
@@ -83,7 +78,6 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 s->num_loops = 0;
             }
         }
-
         // this will fire off an infinite loop of spell transitions
         // from cast, to persist, to end
         // then repeat
@@ -95,7 +89,6 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 g.ct.set<spell_persisting>(id, true);
                 g.ct.set<spell_ending>(id, false);
                 g.ct.set<spell_complete>(id, false);
-
             } else if (sg->current == 1) {
                 spritegroup_set_current(sg, 2);
                 g.ct.set<spell_casting>(id, false);
@@ -156,6 +149,5 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
         //    }
         //}
     }
-    //}
     libdraw_handle_gamestate_flag(g);
 }

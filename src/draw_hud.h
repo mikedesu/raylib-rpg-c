@@ -7,7 +7,6 @@
 using std::max;
 
 static inline void draw_hud(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     const int turn = g.turn_count;
     const int myhp = g.ct.get<hp>(g.hero_id).value_or(-1);
     const int mymaxhp = g.ct.get<maxhp>(g.hero_id).value_or(-1);

@@ -9,7 +9,6 @@ using std::shared_ptr;
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 static inline void draw_character_creation_screen(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     const char* title_text = "Character Creation";
     const char* remaining_text[] = {"Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race", "Press ENTER to confirm"};
     int font_size = 20;
@@ -19,15 +18,12 @@ static inline void draw_character_creation_screen(gamestate& g) {
     int sy = h / 4;
     int x = cx;
     int y = sy;
-    //char buffer[2048] = {0};
     ClearBackground(BLACK);
     DrawText(title_text, x, y, font_size, WHITE);
     y += font_size + 10;
     font_size = 10;
     // Draw character stats
-
     const int offset = 10;
-
     DrawText(TextFormat("Name: %s", g.chara_creation.name.c_str()), x, y, font_size, WHITE);
     y += font_size + offset;
     DrawText(TextFormat("< Race: %s >", race2str(g.chara_creation.race).c_str()), x, y, font_size, WHITE);
@@ -46,7 +42,6 @@ static inline void draw_character_creation_screen(gamestate& g) {
     y += font_size + offset;
     DrawText(TextFormat("Charisma: %d", g.chara_creation.charisma), x, y, font_size, WHITE);
     y += font_size + offset;
-
     // Draw sprite placeholder
     //Rectangle dst = (Rectangle){(float)cx - 210, (float)sy, (float)200, (float)200};
     float pad = -40;
@@ -56,9 +51,7 @@ static inline void draw_character_creation_screen(gamestate& g) {
     // Draw a frame of the human idle texture
     Rectangle src = {0, 0, 32, 32};
     //DrawTexturePro(txinfo[TX_HUMAN_IDLE].texture, src, dst, (Vector2){0, 0}, 0.0f, WHITE);
-
     int tx_key = TX_CHAR_HUMAN_IDLE;
-
     switch (g.chara_creation.race) {
     case RACE_HUMAN: tx_key = TX_CHAR_HUMAN_IDLE; break;
     case RACE_ORC: tx_key = TX_CHAR_ORC_IDLE; break;
@@ -72,7 +65,6 @@ static inline void draw_character_creation_screen(gamestate& g) {
     case RACE_WARG: tx_key = TX_MONSTER_WARG_IDLE; break;
     default: break;
     }
-
     //if (g.chara_creation->race == RACE_HUMAN) {
     //    tx_key = TX_CHAR_HUMAN_IDLE;
     //} else if (g.chara_creation->race == RACE_ORC) {
@@ -94,10 +86,7 @@ static inline void draw_character_creation_screen(gamestate& g) {
     //} else if (g.chara_creation->race == RACE_WARG) {
     //    tx_key = TX_WARG_IDLE;
     //}
-
-
     DrawTexturePro(txinfo[tx_key].texture, src, dst2, (Vector2){0, 0}, 0.0f, WHITE);
-
     // Draw instructions
     y += font_size + 8;
     for (size_t i = 0; i < sizeof(remaining_text) / sizeof(remaining_text[0]); i++) {

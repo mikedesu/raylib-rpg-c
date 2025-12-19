@@ -5,24 +5,19 @@
 #include "texture_ids.h"
 #include "textureinfo.h"
 
-
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
-
 static inline void draw_title_screen(gamestate& g, bool show_menu) {
-    //massert(g, "gamestate is NULL");
     char buffer[1024] = {0};
     // Space between title texts
     const Color active_color = WHITE, disabled_color = {0x99, 0x99, 0x99, 0xFF}, title_text_0_color = {0x66, 0x66, 0x66, 0xFF},
                 title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
-    //Color selection_color;
     // this will go above the title text
     const char* menu_text[2] = {"New Game", "Continue (coming soon)"};
     const char *evildojo_presents_text = "@evildojo666 presents", *title_text_0 = "project.", *title_text_1 = "rpg",
                *start_text = "Press enter or space to begin", *programming_by = "programming by darkmage", *art_by = "art by Krishna Palacio",
                *sound_effects_by = "sound effects by Leoh Paz", *music_by = "music by darkmage + suno.ai", *version_text = g.version.c_str(),
                *date_text = GAME_VERSION_DATE;
-    //const int spacing2 = 4;
     const int spacing = 2, sm_font_size = 10, font_size = 40;
     const Rectangle frame = {g.targetwidth / 4.0f, g.targetheight / 4.0f, g.targetwidth / 2.0f, g.targetheight / 2.0f};
     // Add placeholder text between version and start text

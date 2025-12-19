@@ -19,7 +19,6 @@ static inline void draw_hud_to_texture(gamestate& g) {
 }
 
 static inline void draw_character_creation_screen_to_texture(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     BeginTextureMode(char_creation_target_texture);
     draw_character_creation_screen(g);
     handle_debug_panel(g);
@@ -27,7 +26,6 @@ static inline void draw_character_creation_screen_to_texture(gamestate& g) {
 }
 
 static inline void draw_title_screen_to_texture(gamestate& g, bool show_menu) {
-    //massert(g, "gamestate is NULL");
     BeginTextureMode(title_target_texture);
     draw_title_screen(g, show_menu);
     handle_debug_panel(g);
@@ -35,7 +33,6 @@ static inline void draw_title_screen_to_texture(gamestate& g, bool show_menu) {
 }
 
 static inline void libdraw_drawframe_2d_to_texture(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     BeginTextureMode(main_game_target_texture);
     libdraw_drawframe_2d(g);
     EndTextureMode();
