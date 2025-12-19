@@ -92,7 +92,8 @@ static inline void handle_inventory_equip_item(shared_ptr<gamestate> g, entityid
 
 
 static inline void handle_inventory_equip(shared_ptr<gamestate> g) {
-    PlaySound(g->sfx->at(SFX_EQUIP_01));
+    //PlaySound(g->sfx->at(SFX_EQUIP_01));
+    play_sound(SFX_EQUIP_01);
     // equip item
     // get the item id of the current selection
     const size_t index = g->inventory_cursor.y * 7 + g->inventory_cursor.x;

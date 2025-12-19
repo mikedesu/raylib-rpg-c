@@ -3,6 +3,7 @@
 #include "add_message.h"
 #include "gamestate.h"
 #include "manage_inventory.h"
+#include "play_sound.h"
 #include "sfx.h"
 
 
@@ -45,7 +46,8 @@ static inline bool try_entity_pickup(shared_ptr<gamestate> g, entityid id) {
         if (type == ENTITY_ITEM) {
             if (add_to_inventory(g, id, itemid)) {
                 tile_remove(tile, itemid);
-                PlaySound(g->sfx->at(SFX_CONFIRM_01));
+                //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+                play_sound(SFX_CONFIRM_01);
                 item_picked_up = true;
                 item_id = itemid;
             }

@@ -2,6 +2,7 @@
 
 #include "add_message.h"
 #include "gamestate.h"
+#include "play_sound.h"
 #include "sfx.h"
 
 
@@ -39,7 +40,8 @@ static inline bool try_entity_stairs(shared_ptr<gamestate> g, entityid id) {
             df_add_at(df2, g->hero_id, uloc.x, uloc.y);
             g->ct.set<location>(g->hero_id, uloc);
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            PlaySound(g->sfx->at(SFX_STEP_STONE_1));
+            //PlaySound(g->sfx->at(SFX_STEP_STONE_1));
+            play_sound(SFX_STEP_STONE_1);
             return true;
         }
 
@@ -62,7 +64,8 @@ static inline bool try_entity_stairs(shared_ptr<gamestate> g, entityid id) {
             df_add_at(df2, g->hero_id, uloc.x, uloc.y);
             g->ct.set<location>(g->hero_id, uloc);
             g->flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            PlaySound(g->sfx->at(SFX_STEP_STONE_1));
+            //PlaySound(g->sfx->at(SFX_STEP_STONE_1));
+            play_sound(SFX_STEP_STONE_1);
             return true;
 
         } else {

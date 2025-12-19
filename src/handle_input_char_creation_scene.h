@@ -4,6 +4,7 @@
 #include "gamestate.h"
 #include "get_racial_hd.h"
 #include "inputstate.h"
+#include "play_sound.h"
 #include "roll.h"
 #include "sfx.h"
 
@@ -19,7 +20,9 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
 
     if (inputstate_is_pressed(is, KEY_ENTER)) {
         minfo("Character creation confirmed");
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        play_sound(SFX_CONFIRM_01);
+
         // we need to copy the character creation stats to the hero entity
         // hero has already been created, so its id is available
         const int myhd = g->chara_creation.hitdie;
@@ -60,7 +63,7 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
     } else if (inputstate_is_pressed(is, KEY_SPACE)) {
         // re-roll character creation stats
         minfo("Re-rolling character creation stats");
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        play_sound(SFX_CONFIRM_01);
         g->chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
         g->chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
         g->chara_creation.intelligence = do_roll_best_of_3((vec3){3, 6, 0});
@@ -68,7 +71,8 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
         g->chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
         g->chara_creation.charisma = do_roll_best_of_3((vec3){3, 6, 0});
     } else if (inputstate_is_pressed(is, KEY_LEFT)) {
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        play_sound(SFX_CONFIRM_01);
         int race = g->chara_creation.race;
         if (g->chara_creation.race > 1)
             race--;
@@ -77,7 +81,8 @@ static inline void handle_input_character_creation_scene(shared_ptr<gamestate> g
         g->chara_creation.race = (race_t)race;
         g->chara_creation.hitdie = get_racial_hd(g->chara_creation.race);
     } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        //PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        play_sound(SFX_CONFIRM_01);
         int race = g->chara_creation.race;
         if (race < RACE_COUNT - 1)
             race++;

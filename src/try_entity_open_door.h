@@ -2,6 +2,8 @@
 
 
 #include "gamestate.h"
+#include "play_sound.h"
+#include "sfx.h"
 #include "tile_has_door.h"
 
 static inline bool try_entity_open_door(shared_ptr<gamestate> g, entityid id, vec3 loc) {
@@ -36,7 +38,8 @@ static inline bool try_entity_open_door(shared_ptr<gamestate> g, entityid id, ve
                         //}
                     }
 
-                    PlaySound(g->sfx->at(SFX_CHEST_OPEN));
+                    //PlaySound(g->sfx->at(SFX_CHEST_OPEN));
+                    play_sound(SFX_CHEST_OPEN);
                     return true;
                 }
             }

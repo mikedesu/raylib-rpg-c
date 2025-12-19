@@ -2,6 +2,7 @@
 
 #include "gamestate.h"
 #include "inputstate.h"
+#include "play_sound.h"
 #include "sfx.h"
 
 static inline void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<inputstate> is) {
@@ -15,6 +16,6 @@ static inline void handle_input_title_scene(shared_ptr<gamestate> g, shared_ptr<
         g->current_scene = SCENE_MAIN_MENU;
         g->frame_dirty = true;
 
-        PlaySound(g->sfx->at(SFX_CONFIRM_01));
+        play_sound(SFX_CONFIRM_01);
     }
 }
