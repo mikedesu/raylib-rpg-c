@@ -4,7 +4,6 @@
 #include "tile_has_live_npcs.h"
 
 static inline entityid create_potion_with(gamestate& g, function<void(gamestate&, entityid)> potionInitFunction) {
-    //massert(g, "gamestate is NULL");
     const auto id = g_add_entity(g);
     g.ct.set<entitytype>(id, ENTITY_ITEM);
     g.ct.set<itemtype>(id, ITEM_POTION);
@@ -15,8 +14,6 @@ static inline entityid create_potion_with(gamestate& g, function<void(gamestate&
 static inline entityid create_potion_at_with(gamestate& g, vec3 loc, function<void(gamestate&, entityid)> potionInitFunction) {
     auto df = d_get_floor(g.dungeon, loc.z);
     auto tile = df_tile_at(df, loc);
-    //massert(df, "failed to get df");
-    //massert(tile, "failed to get tile");
     if (!tile_is_walkable(tile.type))
         return ENTITYID_INVALID;
     if (tile_has_live_npcs(g, tile))

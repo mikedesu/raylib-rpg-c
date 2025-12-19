@@ -10,7 +10,6 @@ static inline void update_tile(tile_t& tile) {
 }
 
 static inline void update_player_tiles_explored(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     if (g.hero_id == ENTITYID_INVALID)
         return;
     auto df = d_get_current_floor(g.dungeon);

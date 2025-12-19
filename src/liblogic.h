@@ -22,8 +22,6 @@
 using std::shared_ptr;
 
 static inline void liblogic_close(gamestate& g) {
-    //massert(g, "liblogic_close: gamestate is NULL");
-    //d_free(g->dungeon);
     d_destroy(g.dungeon);
 }
 
@@ -31,7 +29,6 @@ static inline void update_npcs_state(gamestate& g) {
     for (entityid id = 0; id < g.next_entityid; id++) {
         if (id == g.hero_id || g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC)
             continue;
-
         unsigned char a = g.ct.get<txalpha>(id).value_or(255);
         if (a < 255)
             a++;
@@ -45,43 +42,23 @@ static inline void update_spells_state(gamestate& g) {
     for (entityid id = 0; id < g.next_entityid; id++) {
         if (id == g.hero_id || g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL)
             continue;
-
         unsigned char a = g.ct.get<txalpha>(id).value_or(255);
         if (a < 255)
             a++;
         g.ct.set<txalpha>(id, a);
-
-        //const bool is_casting = g.ct.get<spell_casting>(id).value_or(false);
-        //const bool is_persisting = g.ct.get<spell_persisting>(id).value_or(false);
         const bool is_complete = g.ct.get<spell_complete>(id).value_or(false);
         const bool is_destroyed = g.ct.get<destroyed>(id).value_or(false);
-        //if (is_casting) {
-        //    g.ct.set<spell_casting>(id, false);
-        //    g.ct.set<spell_persisting>(id, true);
-        //    g.ct.set<spell_ending>(id, false);
-        //} else if (is_persisting) {
-        //    g.ct.set<spell_casting>(id, false);
-        //    g.ct.set<spell_persisting>(id, false);
-        //    g.ct.set<spell_ending>(id, true);
         if (is_complete && is_destroyed) {
             // remove it from the tile
             auto df = d_get_current_floor(g.dungeon);
             auto loc = g.ct.get<location>(id).value_or((vec3){-1, -1, -1});
             df_remove_at(df, id, loc.x, loc.y);
-            //auto tile = df_tile_at(df, );
-            //tile_remove(tile, id);
-
-            //    g.ct.set<spell_casting>(id, false);
-            //    g.ct.set<spell_persisting>(id, false);
-            //    g.ct.set<spell_ending>(id, false);
         }
     }
 }
 
 
-//static inline void liblogic_init(shared_ptr<gamestate> g) {
 static inline void liblogic_init(gamestate& g) {
-    //massert(g, "gamestate is NULL");
     srand(time(NULL));
     SetRandomSeed(time(NULL));
     minfo("liblogic_init");
@@ -97,7 +74,6 @@ static inline void liblogic_init(gamestate& g) {
         g.ct.set<healing>(id, (vec3){1, 6, 0});
     });
     place_doors(g);
-
     //#ifdef SPAWN_MONSTERS
     for (int i = 0; i < (int)g.dungeon.floors.size(); i++) {
         //create_npc_at_with(g, RACE_ORC, df_get_random_loc(g->dungeon->floors->at(i)), orc_init_test);
@@ -111,7 +87,6 @@ static inline void liblogic_init(gamestate& g) {
         //create_npc_at_with(g, RACE_ORC, (vec3){14, 11, i}, orc_init_test);
     }
     //#endif
-    //create_potion(g, (vec3){1, 1, 0}, POTION_HP_SMALL);
     //create_potion(g, (vec3){3, 1, 0}, POTION_HP_MEDIUM);
     //create_potion(g, (vec3){5, 1, 0}, POTION_HP_LARGE);
     add_message(g, "Welcome to the game! Press enter to cycle messages.");
@@ -130,18 +105,13 @@ static inline void liblogic_init(gamestate& g) {
     msuccess("liblogic_init: Game state initialized");
 }
 
-//static inline void liblogic_tick(shared_ptr<inputstate> is, shared_ptr<gamestate> g) {
 static inline void liblogic_tick(gamestate& g, inputstate& is) {
-    //massert(is, "Input state is NULL!");
-    //massert(g, "Game state is NULL!");
     // Spawn NPCs periodically
     //try_spawn_npc(g);
     update_player_tiles_explored(g);
-
     update_player_state(g);
     update_npcs_state(g);
     update_spells_state(g);
-
     handle_input(g, is);
     handle_npcs(g);
     update_debug_panel_buffer(g, is);

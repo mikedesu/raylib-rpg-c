@@ -33,7 +33,6 @@ static inline void set_npc_starting_stats(gamestate& g, entityid id) {
     g.ct.set<constitution>(id, constitution_);
     g.ct.set<charisma>(id, charisma_);
 
-
     // set default hp/maxhp for now
     // later, we will decide this by race templating
     vec3 hitdie = {1, 8, 0};
@@ -86,7 +85,6 @@ static inline void set_npc_defaults(gamestate& g, entityid id) {
 
 static inline entityid create_npc_with(gamestate& g, race_t rt, function<void(gamestate&, entityid)> npcInitFunction) {
     minfo("begin create npc");
-    //massert(g, "gamestate is NULL");
     entityid id = g_add_entity(g);
     set_npc_defaults(g, id);
     g.ct.set<race>(id, rt);
@@ -100,27 +98,19 @@ static inline entityid create_npc_with(gamestate& g, race_t rt, function<void(ga
 static inline entityid create_npc_at_with(gamestate& g, race_t rt, vec3 loc, function<void(gamestate&, entityid)> npcInitFunction) {
     auto df = d_get_floor(g.dungeon, loc.z);
     auto tile = df_tile_at(df, loc);
-
-    //massert(tile, "failed to get tile");
-
     if (!tile_is_walkable(tile.type)) {
         merror("cannot create entity on non-walkable tile");
         return ENTITYID_INVALID;
     }
-
     if (tile_has_live_npcs(g, tile)) {
         merror("cannot create entity on tile with live NPCs");
         return ENTITYID_INVALID;
     }
-
     const auto id = create_npc_with(g, rt, npcInitFunction);
-
-
     if (!df_add_at(df, id, loc.x, loc.y)) {
         return ENTITYID_INVALID;
     }
     g.ct.set<location>(id, loc);
-
     return id;
 }
 

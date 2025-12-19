@@ -3,7 +3,6 @@
 #include "gamestate.h"
 
 static inline void add_message(gamestate& g, const char* fmt, ...) {
-    //massert(g, "gamestate is NULL");
     massert(fmt, "format string is NULL");
     minfo("attempting to add message...");
     char buffer[MAX_MSG_LENGTH];
@@ -18,7 +17,6 @@ static inline void add_message(gamestate& g, const char* fmt, ...) {
 }
 
 static inline void add_message_history(gamestate& g, const char* fmt, ...) {
-    //massert(g, "gamestate is NULL");
     massert(fmt, "format string is NULL");
     minfo("attempting to add message to history...");
     char buffer[MAX_MSG_LENGTH];

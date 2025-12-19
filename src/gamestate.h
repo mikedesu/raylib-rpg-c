@@ -111,8 +111,6 @@ typedef struct gamestate {
 
     double last_frame_time;
 
-
-    //shared_ptr<dungeon_t> dungeon;
     dungeon_t dungeon;
 
     char frame_time_str[32];
@@ -121,18 +119,12 @@ typedef struct gamestate {
 
     scene_t current_scene;
 
-    //shared_ptr<vector<string>> msg_system;
-    //shared_ptr<vector<string>> msg_history;
     vector<string> msg_system;
     vector<string> msg_history;
-
-    //shared_ptr<vector<Sound>> sfx;
-    //shared_ptr<character_creation> chara_creation;
-
     vector<Sound> sfx;
     vector<string> music_file_paths;
-    character_creation chara_creation;
 
+    character_creation chara_creation;
 
     string version;
 
@@ -148,21 +140,6 @@ typedef struct gamestate {
 } gamestate;
 
 
-//shared_ptr<gamestate> gamestateinitptr();
-//shared_ptr<dungeon_t> g_get_dungeon(shared_ptr<gamestate> g);
-//entityid gamestate_get_hero_id(shared_ptr<gamestate> g);
-//entityid g_add_entity(shared_ptr<gamestate> g);
-//bool gs_add_entityid(shared_ptr<gamestate> g, entityid id);
-//bool gamestate_add_msg_history(shared_ptr<gamestate> g, string msg);
-//bool gamestate_init_msg_history(shared_ptr<gamestate> g);
-//bool g_set_hero_id(shared_ptr<gamestate> g, entityid id);
-//void gamestate_init_music_paths(shared_ptr<gamestate> g);
-//void gamestate_free(shared_ptr<gamestate> g);
-//void gamestate_set_debug_panel_pos_bottom_left(shared_ptr<gamestate> g);
-//void gamestate_set_debug_panel_pos_top_right(shared_ptr<gamestate> g);
-//void gamestate_load_keybindings(shared_ptr<gamestate> g);
-
-
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
@@ -170,11 +147,7 @@ typedef struct gamestate {
 
 
 static inline void gamestate_init_music_paths(gamestate& g) {
-    //massert(g, "g is NULL");
     minfo("Initializing music paths...");
-    //if (!g->music_file_paths) {
-    //    g->music_file_paths = make_shared<vector<string>>();
-    //}
     const char* music_path_file = "music.txt";
     FILE* file = fopen(music_path_file, "r");
     massert(file, "Could not open music path file: %s", music_path_file);
@@ -194,8 +167,6 @@ static inline void gamestate_init_music_paths(gamestate& g) {
         }
         // copy into g->music_file_paths
         minfo("Pushing back %s", buffer);
-        //g->music_file_paths->push_back(string(buffer));
-
         // need to pre-pend the folder path
         string fullpath = "audio/music/" + string(buffer);
         g.music_file_paths.push_back(fullpath);
@@ -206,12 +177,8 @@ static inline void gamestate_init_music_paths(gamestate& g) {
 
 
 // have to update this function when we introduce new fields to Gamestate
-//static inline shared_ptr<gamestate> gamestateinitptr() {
 static inline void gamestateinitptr(gamestate& g) {
     minfo("Initializing gamestate");
-    //const size_t n = LIST_INIT_CAPACITY;
-    //shared_ptr<gamestate> g = make_shared<gamestate>();
-    //massert(g, "g is NULL");
     g.msg_system_is_active = false;
     g.version = GAME_VERSION;
     g.cam_lockon = true;
@@ -274,19 +241,14 @@ static inline void gamestateinitptr(gamestate& g) {
     g.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
     g.pad = 20;
     g.line_spacing = 1.0f;
-
     g.player_changing_dir = false;
-
     // weird bug maybe when set to 0?
     g.next_entityid = 1;
-
     g.current_music_index = 0;
     g.restart_count = 0;
     g.do_restart = 0;
-
     g.title_screen_selection = 0;
     g.max_title_screen_selections = 2;
-
     g.lock = 0;
     g.frame_updates = 0;
     g.framecount = 0;
@@ -296,55 +258,30 @@ static inline void gamestateinitptr(gamestate& g) {
     g.debugpanel.pad_right = 0;
     g.debugpanel.pad_bottom = 0;
     g.inventory_menu_selection = 0;
-
-    //g.dungeon = nullptr;
-
-
-    //g.msg_history = make_shared<vector<string>>();
-    //g.msg_system = make_shared<vector<string>>();
     g.msg_history_max_len_msg = 0;
     g.msg_history_max_len_msg_measure = 0;
-
     // initialize character creation
-    //g.chara_creation = make_shared<character_creation>();
-
     g.chara_creation.name = "hero";
-
     g.chara_creation.strength = 10;
     g.chara_creation.dexterity = 10;
     g.chara_creation.intelligence = 10;
     g.chara_creation.wisdom = 10;
     g.chara_creation.constitution = 10;
     g.chara_creation.charisma = 10;
-
     g.chara_creation.race = RACE_HUMAN;
     g.chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
-
     // why is the above line crashing?
     // the above line is also crashing
     msuccess("Gamestate character creation name set to empty string");
-
     g.current_scene = SCENE_TITLE;
-
     g.music_volume = DEFAULT_MUSIC_VOLUME;
-
-    //g.component_table = make_shared<unordered_map<entityid, long>>();
-
-    //g.equipped_weapon_list = make_shared<unordered_map<entityid, entityid>>();
-
     g.last_click_screen_pos = (Vector2){-1, -1};
-
     gamestate_init_music_paths(g);
-
-    //g.sfx = make_shared<vector<Sound>>();
-
     msuccess("Gamestate initialized successfully");
-    //return g;
 }
 
 
 static inline void gamestate_free(gamestate& g) {
-    //massert(g, "g is NULL");
     minfo("Freeing gamestate");
     //if (g->chara_creation) {
     //    g->chara_creation->name.clear(); // Clear the name string
@@ -363,7 +300,6 @@ static inline entityid g_add_entity(gamestate& g) {
         g.new_entityid_begin = id;
         g.new_entityid_end = id + 1;
     } else {
-        //g->dirty_entities = true;
         g.new_entityid_end = id + 1;
     }
     g.next_entityid++;
@@ -372,7 +308,6 @@ static inline entityid g_add_entity(gamestate& g) {
 
 
 static inline bool g_set_hero_id(gamestate& g, entityid id) {
-    //massert(g, "g is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
     if (id == ENTITYID_INVALID) {
         merror("g_set_hero_id: id is invalid");
@@ -382,43 +317,3 @@ static inline bool g_set_hero_id(gamestate& g, entityid id) {
     msuccess("Hero ID set to %d", id);
     return true;
 }
-
-
-//static inline entityid gamestate_get_hero_id(const gamestate* const g) {
-//    massert(g, "g is NULL");
-//    return g->hero_id;
-//}
-
-
-//static inline bool gamestate_add_msg_history(shared_ptr<gamestate> g, string msg) {
-//    massert(g, "g is NULL");
-//    massert(msg != "", "msg is empty string");
-//    if (!g->msg_history) {
-//        merror("Message history is not initialized");
-//        return false;
-//    }
-// Add the message to the history
-//    g->msg_history->push_back(msg);
-//    return true;
-//}
-
-
-//static inline void gamestate_set_debug_panel_pos_bottom_left(gamestate* const g) {
-//    massert(g, "g is NULL");
-//    if (g->windowwidth == -1 || g->windowheight == -1)
-//        return;
-//    g->debugpanel.x = 0;
-//    g->debugpanel.y = g->windowheight - g->debugpanel.h;
-//}
-
-
-//static inline void gamestate_set_debug_panel_pos_top_right(gamestate* const g) {
-//    massert(g, "g is NULL");
-//    if (g->windowwidth == -1 || g->windowheight == -1)
-//        return;
-//    g->debugpanel.x = g->windowwidth - g->debugpanel.w;
-//    g->debugpanel.y = g->debugpanel.pad_right;
-//}
-
-
-//void set_comp(shared_ptr<gamestate> g
