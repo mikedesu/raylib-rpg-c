@@ -11,8 +11,6 @@
 #include "tile_has_door.h"
 
 static inline void try_entity_cast_spell(gamestate& g, entityid id, int tgt_x, int tgt_y) {
-    //massert(g, "gamestate is NULL");
-    //massert(!g.ct.get<dead>(atk_id).value_or(false), "attacker entity is dead");
     minfo("Trying to cast spell...");
 
     const auto maybe_loc = g.ct.get<location>(id);
@@ -23,13 +21,8 @@ static inline void try_entity_cast_spell(gamestate& g, entityid id, int tgt_x, i
     const vec3 loc = maybe_loc.value();
 
     auto floor = d_get_floor(g.dungeon, loc.z);
-    //massert(floor, "failed to get dungeon floor");
     const vec3 spell_loc = {tgt_x, tgt_y, loc.z};
     auto tile = df_tile_at(floor, spell_loc);
-    //if (!tile) {
-    //    merror("No tile at location, cannot attack");
-    //    return;
-    //}
 
     // Calculate direction based on target position
     bool ok = false;
@@ -38,7 +31,6 @@ static inline void try_entity_cast_spell(gamestate& g, entityid id, int tgt_x, i
     g.ct.set<direction>(id, get_dir_from_xy(dx, dy));
     g.ct.set<casting>(id, true);
     g.ct.set<update>(id, true);
-    //handle_attack_helper(g, tile, atk_id, &ok);
 
     // ok...
     // we are hard-coding a spell cast
