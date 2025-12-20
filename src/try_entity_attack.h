@@ -12,14 +12,14 @@
 #include "stat_bonus.h"
 
 
-static inline void handle_attack_success_gamestate_flag(gamestate& g, entitytype_t type, bool success) {
+static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entitytype_t type, bool success) {
     if (!success)
         g.flag = type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM : type == ENTITY_NPC ? GAMESTATE_FLAG_NPC_ANIM : GAMESTATE_FLAG_NONE;
     else if (type == ENTITY_PLAYER)
         g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
 }
 
-static inline void handle_attack_success(gamestate& g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
+static inline void process_attack_results(gamestate& g, entityid atk_id, entityid tgt_id, bool* atk_successful) {
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
     massert(atk_successful, "attack_successful is NULL");
@@ -118,7 +118,7 @@ static inline void handle_attack_success(gamestate& g, entityid atk_id, entityid
 }
 
 
-static inline void handle_attack_helper_innerloop(gamestate& g, tile_t& tile, int i, entityid attacker_id, bool* attack_successful) {
+static inline void process_attack_entity(gamestate& g, tile_t& tile, int i, entityid attacker_id, bool* attack_successful) {
     massert(i >= 0, "i is out of bounds");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     massert(attack_successful, "attack_successful is NULL");
@@ -153,7 +153,7 @@ static inline void handle_attack_helper_innerloop(gamestate& g, tile_t& tile, in
         const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
         const int target_ac = compute_armor_class(g, target_id);
         *attack_successful = roll >= target_ac;
-        handle_attack_success(g, attacker_id, target_id, attack_successful);
+        process_attack_results(g, attacker_id, target_id, attack_successful);
         return;
     }
 
@@ -164,7 +164,7 @@ static inline void handle_attack_helper_innerloop(gamestate& g, tile_t& tile, in
         const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
         const int target_ac = compute_armor_class(g, target_id);
         *attack_successful = roll >= target_ac;
-        handle_attack_success(g, attacker_id, target_id, attack_successful);
+        process_attack_results(g, attacker_id, target_id, attack_successful);
         return;
     }
 
@@ -189,7 +189,7 @@ static inline void handle_attack_helper_innerloop(gamestate& g, tile_t& tile, in
         const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
         const int target_ac = compute_armor_class(g, target_id);
         *attack_successful = roll >= target_ac;
-        handle_attack_success(g, attacker_id, target_id, attack_successful);
+        process_attack_results(g, attacker_id, target_id, attack_successful);
     } else {
         // block successful
         if (shield_id != ENTITYID_INVALID) {
@@ -207,11 +207,12 @@ static inline void handle_attack_helper_innerloop(gamestate& g, tile_t& tile, in
     }
 }
 
-static inline void handle_attack_helper(gamestate& g, tile_t& tile, entityid attacker_id, bool* successful) {
+static inline bool process_attack_entities(gamestate& g, tile_t& tile, entityid attacker_id) {
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-    massert(successful, "attack_successful is NULL");
+    bool ok = false;
     for (int i = 0; (size_t)i < tile.entities->size(); i++)
-        handle_attack_helper_innerloop(g, tile, i, attacker_id, successful);
+        process_attack_entity(g, tile, i, attacker_id, &ok);
+    return ok;
 }
 
 static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, int tgt_y) {
@@ -222,7 +223,6 @@ static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, i
     auto tile = df_tile_at(df, (vec3){tgt_x, tgt_y, loc.z});
 
     // Calculate direction based on target position
-    bool ok = false;
     const int dx = tgt_x - loc.x;
     const int dy = tgt_y - loc.y;
 
@@ -230,14 +230,13 @@ static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, i
     g.ct.set<attacking>(atk_id, true);
     g.ct.set<update>(atk_id, true);
 
-    handle_attack_helper(g, tile, atk_id, &ok);
+    bool ok = process_attack_entities(g, tile, atk_id);
 
     // did the hero hear this event?
     const bool event_heard = check_hearing(g, g.hero_id, (vec3){tgt_x, tgt_y, loc.z});
 
     if (ok) {
         // default metal on flesh
-        //play_sound_if_heard(SFX_HIT_METAL_ON_FLESH, event_heard);
         if (event_heard)
             PlaySound(g.sfx[SFX_HIT_METAL_ON_FLESH]);
 
@@ -250,11 +249,9 @@ static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, i
                           : wpn_type == WEAPON_AXE    ? SFX_SLASH_ATTACK_HEAVY_1
                           : wpn_type == WEAPON_DAGGER ? SFX_SLASH_ATTACK_LIGHT_1
                                                       : SFX_SLASH_ATTACK_SWORD_1;
-        //play_sound_if_heard(index, event_heard);
         if (event_heard)
             PlaySound(g.sfx[index]);
     }
 
-    const auto type = g.ct.get<entitytype>(atk_id).value_or(ENTITY_NONE);
-    handle_attack_success_gamestate_flag(g, type, ok);
+    set_gamestate_flag_for_attack_animation(g, g.ct.get<entitytype>(atk_id).value_or(ENTITY_NONE), ok);
 }
