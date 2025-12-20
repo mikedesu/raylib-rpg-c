@@ -1,22 +1,24 @@
 #pragma once
 
+#include "entityid.h"
 #include "gamestate.h"
 #include "get_racial_modifiers.h"
 #include "stat_bonus.h"
+#include "tile_has_box.h"
 #include "tile_has_live_npcs.h"
 
 static inline void set_npc_starting_stats(gamestate& g, entityid id) {
-    auto rt = g.ct.get<race>(id).value_or(RACE_NONE);
+    const race_t rt = g.ct.get<race>(id).value_or(RACE_NONE);
     if (rt == RACE_NONE)
         return;
 
     // stats racial modifiers for stats
-    int str_m = get_racial_modifiers(rt, 0);
-    int dex_m = get_racial_modifiers(rt, 1);
-    int int_m = get_racial_modifiers(rt, 2);
-    int wis_m = get_racial_modifiers(rt, 3);
-    int con_m = get_racial_modifiers(rt, 4);
-    int cha_m = get_racial_modifiers(rt, 5);
+    const int str_m = get_racial_modifiers(rt, 0);
+    const int dex_m = get_racial_modifiers(rt, 1);
+    const int int_m = get_racial_modifiers(rt, 2);
+    const int wis_m = get_racial_modifiers(rt, 3);
+    const int con_m = get_racial_modifiers(rt, 4);
+    const int cha_m = get_racial_modifiers(rt, 5);
 
     // default to 3-18 for stats
     const int strength_ = GetRandomValue(3, 18) + str_m;
@@ -85,7 +87,7 @@ static inline void set_npc_defaults(gamestate& g, entityid id) {
 
 static inline entityid create_npc_with(gamestate& g, race_t rt, function<void(gamestate&, entityid)> npcInitFunction) {
     minfo("begin create npc");
-    entityid id = g_add_entity(g);
+    const entityid id = g_add_entity(g);
     set_npc_defaults(g, id);
     g.ct.set<race>(id, rt);
     set_npc_starting_stats(g, id);
@@ -96,20 +98,29 @@ static inline entityid create_npc_with(gamestate& g, race_t rt, function<void(ga
 
 
 static inline entityid create_npc_at_with(gamestate& g, race_t rt, vec3 loc, function<void(gamestate&, entityid)> npcInitFunction) {
-    auto df = d_get_floor(g.dungeon, loc.z);
-    auto tile = df_tile_at(df, loc);
+    dungeon_floor_t& df = d_get_floor(g.dungeon, loc.z);
+    tile_t& tile = df_tile_at(df, loc);
+
     if (!tile_is_walkable(tile.type)) {
         merror("cannot create entity on non-walkable tile");
         return ENTITYID_INVALID;
     }
+
     if (tile_has_live_npcs(g, tile)) {
         merror("cannot create entity on tile with live NPCs");
         return ENTITYID_INVALID;
     }
-    const auto id = create_npc_with(g, rt, npcInitFunction);
+
+    if (tile_has_box(g, loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
+        merror("cannot create entity on tile with box");
+        return ENTITYID_INVALID;
+    }
+
+    const entityid id = create_npc_with(g, rt, npcInitFunction);
     if (!df_add_at(df, id, loc.x, loc.y)) {
         return ENTITYID_INVALID;
     }
+
     g.ct.set<location>(id, loc);
     return id;
 }
