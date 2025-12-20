@@ -85,6 +85,7 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
             return false;
         }
     }
+    // if door, door is open
 
     const float mx = v.x * DEFAULT_TILE_SIZE;
     const float my = v.y * DEFAULT_TILE_SIZE;
