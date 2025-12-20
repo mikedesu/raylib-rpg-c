@@ -2,6 +2,7 @@
 
 #include "biome.h"
 #include "dungeon_tile.h"
+#include "dungeon_tile_type.h"
 #include "entityid.h"
 #include "mprint.h"
 #include "raylib.h"
@@ -247,35 +248,6 @@ static inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(dun
 }
 
 
-static inline bool df_assign_upstairs_in_area(dungeon_floor_t& df, Rectangle r) {
-    massert(r.x >= 0, "x is less than zero");
-    massert(r.x < df.width, "x is out of bounds");
-    massert(r.y >= 0, "y is less than zero");
-    massert(r.y < df.height, "y is out of bounds");
-    massert(r.width > 0, "w is less than zero");
-    massert(r.height > 0, "h is less than zero");
-    massert(r.x + r.width <= df.width, "x + w is out of bounds");
-    massert(r.y + r.height <= df.height, "y + h is out of bounds");
-
-    auto locations = df_get_possible_upstairs_locs_in_area(df, (Rectangle){r.x, r.y, r.width, r.height});
-    massert(locations->size() > 0, "no possible upstairs locations");
-
-    // now that we have a list of possible locations for the upstairs to appear
-    // we can randomly select one of them
-    const int upstairs_index = rand() % locations->size();
-    const vec3 up_loc = locations->at(upstairs_index);
-
-    // now we can set the upstairs tile
-    //shared_ptr<tile_t> tile = df_tile_at(df, up_loc);
-    tile_t& tile = df_tile_at(df, up_loc);
-    tile_init(tile, TILE_UPSTAIRS);
-    tile.visible = true;
-
-    df.upstairs_loc = up_loc;
-    return true;
-}
-
-
 static inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(dungeon_floor_t& df, Rectangle r) {
     massert(r.x >= 0, "x is less than zero");
     massert(r.x < df.width, "x is out of bounds");
@@ -293,36 +265,6 @@ static inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(d
         }
     }
     return locations;
-}
-
-
-static inline bool df_assign_downstairs_in_area(dungeon_floor_t& df, Rectangle r) {
-    massert(r.x >= 0, "x is less than zero");
-    massert(r.x < df.width, "x is out of bounds");
-    massert(r.y >= 0, "y is less than zero");
-    massert(r.y < df.height, "y is out of bounds");
-    massert(r.width > 0, "w is less than zero");
-    massert(r.height > 0, "h is less than zero");
-    massert(r.x + r.width <= df.width, "x + w is out of bounds");
-    massert(r.y + r.height <= df.height, "y + h is out of bounds");
-    int count = -1;
-    auto locations = df_get_possible_downstairs_locs_in_area(df, (Rectangle){(float)r.x, (float)r.y, (float)r.width, (float)r.height});
-    // now that we have a list of possible locations for the upstairs to appear
-    // we can randomly select one of them
-    int downstairs_index = rand() % count;
-    vec3 down_loc = locations->at(downstairs_index);
-    // now we can set the upstairs tile
-    tile_t& tile = df_tile_at(df, down_loc);
-    tile_init(tile, TILE_DOWNSTAIRS);
-    tile.visible = true; // make sure the upstairs tile is visible
-    df.downstairs_loc = down_loc;
-    return true;
-}
-
-
-static inline void df_assign_stairs(dungeon_floor_t& df) {
-    df_assign_upstairs_in_area(df, (Rectangle){0, 0, (float)df.width, (float)df.height});
-    df_assign_downstairs_in_area(df, (Rectangle){0, 0, (float)df.width, (float)df.height});
 }
 
 
@@ -347,16 +289,6 @@ static inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs(dungeon_f
     auto locs = df_get_possible_downstairs_locs_in_area(df, (Rectangle){0, 0, (float)df.width, (float)df.height});
     massert(locs, "failed to get possible downstairs locations");
     return locs;
-}
-
-
-static inline void df_assign_upstairs(dungeon_floor_t& df) {
-    df_assign_upstairs_in_area(df, (Rectangle){0, 0, (float)df.width, (float)df.height});
-}
-
-
-static inline void df_assign_downstairs(dungeon_floor_t& df) {
-    df_assign_downstairs_in_area(df, (Rectangle){0, 0, (float)df.width, (float)df.height});
 }
 
 
@@ -408,11 +340,8 @@ static inline vec3 df_get_random_loc(dungeon_floor_t& df) {
         for (int y = 0; y < df.height; y++) {
             vec3 loc = {x, y, df.floor};
             auto tile = df_tile_at(df, loc);
-            if (tile.type == TILE_NONE)
-                continue;
-            if (tile.type == TILE_STONE_WALL_00)
-                continue;
-            if (tile.type == TILE_STONE_WALL_01)
+            if (tile.type == TILE_NONE || tile.type == TILE_STONE_WALL_00 || tile.type == TILE_STONE_WALL_01 || tile.type == TILE_UPSTAIRS ||
+                tile.type == TILE_DOWNSTAIRS)
                 continue;
             if (tile.entities->size() > 0)
                 continue;
