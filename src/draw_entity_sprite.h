@@ -4,7 +4,6 @@
 #include "spritegroup.h"
 
 static inline void draw_entity_sprite(gamestate& g, spritegroup_t* sg) {
-    //massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     if (dest.width == 0 || dest.height == 0) {
