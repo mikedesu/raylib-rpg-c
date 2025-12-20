@@ -36,42 +36,30 @@ typedef struct {
 } tile_t;
 
 
-//static inline size_t tile_entity_count(const shared_ptr<tile_t> t) {
 static inline size_t tile_entity_count(tile_t& t) {
     return t.entities->size();
 }
 
 
-//static inline entityid tile_get_entity(const shared_ptr<tile_t> t, size_t i) {
 static inline entityid tile_get_entity(tile_t& t, size_t i) {
     return i >= 0 && i < t.entities->size() ? t.entities->at(i) : ENTITYID_INVALID;
 }
 
 
-//static inline bool tile_is_wall(shared_ptr<tile_t> t) {
 static inline bool tile_is_wall(tile_t& t) {
     return tiletype_is_wall(t.type);
 }
 
 
-//static inline void tile_init(shared_ptr<tile_t> t, tiletype_t type) {
 static inline void tile_init(tile_t& t, tiletype_t type) {
-    //if (!t)
-    //    return;
     t.type = type;
-    t.visible = false;
-    t.explored = false;
-    t.cached_player_present = false;
-    t.can_have_door = false;
-    t.dirty_entities = true;
-    t.dirty_visibility = true;
-    t.is_empty = true;
+    t.visible = t.explored = t.cached_player_present = t.can_have_door = false;
+    t.dirty_entities = t.dirty_visibility = t.is_empty = true;
     t.cached_live_npcs = 0;
     t.entities = make_shared<vector<entityid>>();
 }
 
 
-//static inline entityid tile_add(shared_ptr<tile_t> t, entityid id) {
 static inline entityid tile_add(tile_t& t, entityid id) {
     massert(t.entities, "tile or tile entities is NULL");
     // Check if the entity already exists
@@ -86,7 +74,6 @@ static inline entityid tile_add(tile_t& t, entityid id) {
 }
 
 
-//static inline entityid tile_remove(shared_ptr<tile_t> tile, entityid id) {
 static inline entityid tile_remove(tile_t& tile, entityid id) {
     massert(tile.entities, "tile or tile entities is NULL");
     massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
@@ -102,19 +89,12 @@ static inline entityid tile_remove(tile_t& tile, entityid id) {
 }
 
 
-//static inline shared_ptr<tile_t> tile_create(tiletype_t type) {
 static inline void tile_create(tile_t& t, tiletype_t type) {
     massert(type >= TILE_NONE && type < TILE_COUNT, "tile_create: type is out-of-bounds");
-    //auto t = make_shared<tile_t>();
-    //if (!t)
-    //    return nullptr;
     tile_init(t, type);
-    //return t;
 }
 
 
-//static inline void tile_free(shared_ptr<tile_t> t) {
 static inline void tile_free(tile_t& t) {
-    //if (t)
     t.entities->clear();
 }
