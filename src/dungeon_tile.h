@@ -41,12 +41,12 @@ static inline size_t tile_entity_count(tile_t& t) {
 }
 
 
-static inline entityid tile_get_entity(tile_t& t, size_t i) {
+constexpr static inline entityid tile_get_entity(tile_t& t, size_t i) {
     return i >= 0 && i < t.entities->size() ? t.entities->at(i) : ENTITYID_INVALID;
 }
 
 
-static inline bool tile_is_wall(tile_t& t) {
+constexpr static inline bool tile_is_wall(tile_t& t) {
     return tiletype_is_wall(t.type);
 }
 
@@ -61,7 +61,6 @@ static inline void tile_init(tile_t& t, tiletype_t type) {
 
 
 static inline entityid tile_add(tile_t& t, entityid id) {
-    massert(t.entities, "tile or tile entities is NULL");
     // Check if the entity already exists
     if (find(t.entities->begin(), t.entities->end(), id) != t.entities->end()) {
         merror("tile_add: entity already exists on tile");

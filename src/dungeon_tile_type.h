@@ -178,10 +178,6 @@ constexpr static inline bool tiletype_is_wall(const tiletype_t type) {
     return false;
 }
 
-//constexpr static inline bool tile_is_not_wall(const tiletype_t type) {
-//    return tile_is_not_none(type) && !tiletype_is_wall(type);
-//}
-
 constexpr static inline bool tile_is_walkable(const tiletype_t type) {
     return !tiletype_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE && type != TILE_COUNT;
 }

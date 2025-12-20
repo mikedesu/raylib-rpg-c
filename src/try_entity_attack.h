@@ -22,7 +22,6 @@ static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entityt
 static inline void process_attack_results(gamestate& g, entityid atk_id, entityid tgt_id, bool atk_successful) {
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
-    massert(atk_successful, "attack_successful is NULL");
 
     const entitytype_t tgttype = g.ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
 
@@ -116,6 +115,58 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     }
 }
 
+static inline bool process_attack_shield(gamestate& g, entityid attacker_id, entityid target_id, entityid shield_id) {
+    const int roll = GetRandomValue(1, 100);
+    const int chance = g.ct.get<block_chance>(shield_id).value_or(100);
+    const int low_roll = 100 - chance;
+    if (low_roll == 0 && shield_id != ENTITYID_INVALID) {
+        // 100% block chance
+        const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
+        if (event_heard)
+            PlaySound(g.sfx[SFX_HIT_METAL_ON_METAL]);
+        g.ct.set<block_success>(target_id, true);
+        g.ct.set<update>(target_id, true);
+        add_message_history(
+            g, "%s blocked an attack from %s", g.ct.get<name>(target_id).value_or("no-name").c_str(), g.ct.get<name>(attacker_id).value_or("no-name").c_str());
+        return false;
+    } else if (roll <= low_roll) {
+        // failed to block
+        // compute attack roll
+        const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
+        const int target_ac = compute_armor_class(g, target_id);
+        const bool attack_successful = roll >= target_ac;
+        process_attack_results(g, attacker_id, target_id, attack_successful);
+        return attack_successful;
+    }
+
+    // block successful
+    if (shield_id != ENTITYID_INVALID) {
+        // shield block
+        const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
+        if (event_heard)
+            PlaySound(g.sfx[SFX_HIT_METAL_ON_METAL]);
+        g.ct.set<block_success>(target_id, true);
+        g.ct.set<update>(target_id, true);
+        add_message_history(
+            g, "%s blocked an attack from %s", g.ct.get<name>(target_id).value_or("no-name").c_str(), g.ct.get<name>(attacker_id).value_or("no-name").c_str());
+        return false;
+    }
+    //else {
+    // non-shield block?
+    // how did we get here?
+    //}
+    return false;
+}
+
+
+static inline bool process_attack_no_shield(gamestate& g, entityid atk_id, entityid tgt_id) {
+    const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(atk_id).value_or(10));
+    const int target_ac = compute_armor_class(g, tgt_id);
+    const bool attack_successful = roll >= target_ac;
+    process_attack_results(g, atk_id, tgt_id, attack_successful);
+    return attack_successful;
+}
+
 
 static inline bool process_attack_entity(gamestate& g, tile_t& tile, int i, entityid attacker_id) {
     massert(i >= 0, "i is out of bounds");
@@ -138,62 +189,18 @@ static inline bool process_attack_entity(gamestate& g, tile_t& tile, int i, enti
         // compute attack roll
         // eventually we will need to select str or dex bonus
         // depending on weapon type, class, etc
-        const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
-        const int target_ac = compute_armor_class(g, target_id);
-        const bool attack_successful = roll >= target_ac;
-        process_attack_results(g, attacker_id, target_id, attack_successful);
-        return attack_successful;
+        return process_attack_no_shield(g, attacker_id, target_id);
     }
 
-    const auto shield_id = maybe_shield.value();
+    const entityid shield_id = maybe_shield.value();
     if (shield_id == ENTITYID_INVALID) {
         // no shield
         // compute attack roll
-        const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
-        const int target_ac = compute_armor_class(g, target_id);
-        const bool attack_successful = roll >= target_ac;
-        process_attack_results(g, attacker_id, target_id, attack_successful);
-        return attack_successful;
+        return process_attack_no_shield(g, attacker_id, target_id);
     }
 
     // they have a shield
-    // compute chance to block
-    const int roll = GetRandomValue(1, 100);
-    const int chance = g.ct.get<block_chance>(shield_id).value_or(100);
-    const int low_roll = 100 - chance;
-    if (low_roll == 0 && shield_id != ENTITYID_INVALID) {
-        // 100% block chance
-        const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
-        if (event_heard)
-            PlaySound(g.sfx[SFX_HIT_METAL_ON_METAL]);
-        g.ct.set<block_success>(target_id, true);
-        g.ct.set<update>(target_id, true);
-        add_message_history(
-            g, "%s blocked an attack from %s", g.ct.get<name>(target_id).value_or("no-name").c_str(), g.ct.get<name>(attacker_id).value_or("no-name").c_str());
-        return false;
-    } else if (roll <= low_roll) {
-        // failed to block
-        // compute attack roll
-        const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
-        const int target_ac = compute_armor_class(g, target_id);
-        const bool attack_successful = roll >= target_ac;
-        process_attack_results(g, attacker_id, target_id, attack_successful);
-        return attack_successful;
-    } else {
-        // block successful
-        if (shield_id != ENTITYID_INVALID) {
-            const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
-            if (event_heard)
-                PlaySound(g.sfx[SFX_HIT_METAL_ON_METAL]);
-            g.ct.set<block_success>(target_id, true);
-            g.ct.set<update>(target_id, true);
-            add_message_history(g,
-                                "%s blocked an attack from %s",
-                                g.ct.get<name>(target_id).value_or("no-name").c_str(),
-                                g.ct.get<name>(attacker_id).value_or("no-name").c_str());
-        }
-    }
-    return false;
+    return process_attack_shield(g, attacker_id, target_id, shield_id);
 }
 
 static inline bool process_attack_entities(gamestate& g, tile_t& tile, entityid attacker_id) {

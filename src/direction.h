@@ -1,7 +1,7 @@
 #pragma once
 
-//#include "location.h"
 #include "vec3.h"
+
 typedef enum direction_t
 {
     DIR_NONE,
@@ -17,7 +17,7 @@ typedef enum direction_t
     DIR_COUNT
 } direction_t;
 
-static inline int get_x_from_dir(direction_t dir) {
+constexpr static inline int get_x_from_dir(direction_t dir) {
     switch (dir) {
     case DIR_UP_LEFT:
     case DIR_DOWN_LEFT:
@@ -33,7 +33,7 @@ static inline int get_x_from_dir(direction_t dir) {
     }
 }
 
-static inline int get_y_from_dir(direction_t dir) {
+constexpr static inline int get_y_from_dir(direction_t dir) {
     switch (dir) {
     case DIR_UP:
     case DIR_UP_LEFT:
@@ -49,7 +49,7 @@ static inline int get_y_from_dir(direction_t dir) {
     }
 }
 
-static inline vec3 get_loc_from_dir(direction_t dir) {
+constexpr static inline vec3 get_loc_from_dir(direction_t dir) {
     vec3 loc = {0, 0, 0};
     switch (dir) {
     case DIR_UP: loc = (vec3){0, -1}; break;
@@ -67,23 +67,34 @@ static inline vec3 get_loc_from_dir(direction_t dir) {
     return loc;
 }
 
-static inline const direction_t get_dir_from_xy(int x, int y) {
-    if (x == 0 && y == 0) return DIR_NONE;
-    if (x == 0 && y == -1) return DIR_UP;
-    if (x == 0 && y == 1) return DIR_DOWN;
-    if (x == -1 && y == 0) return DIR_LEFT;
-    if (x == 1 && y == 0) return DIR_RIGHT;
+constexpr static inline const direction_t get_dir_from_xy(int x, int y) {
+    if (x == 0 && y == 0)
+        return DIR_NONE;
+    if (x == 0 && y == -1)
+        return DIR_UP;
+    if (x == 0 && y == 1)
+        return DIR_DOWN;
+    if (x == -1 && y == 0)
+        return DIR_LEFT;
+    if (x == 1 && y == 0)
+        return DIR_RIGHT;
     // also handle diagonals
-    if (x == -1 && y == -1) return DIR_UP_LEFT;
-    if (x == 1 && y == -1) return DIR_UP_RIGHT;
-    if (x == -1 && y == 1) return DIR_DOWN_LEFT;
-    if (x == 1 && y == 1) return DIR_DOWN_RIGHT;
+    if (x == -1 && y == -1)
+        return DIR_UP_LEFT;
+    if (x == 1 && y == -1)
+        return DIR_UP_RIGHT;
+    if (x == -1 && y == 1)
+        return DIR_DOWN_LEFT;
+    if (x == 1 && y == 1)
+        return DIR_DOWN_RIGHT;
     return DIR_UNKNOWN;
 }
 
-static inline direction_t get_dir_from_loc(vec3 loc) { return get_dir_from_xy(loc.x, loc.y); }
+constexpr static inline direction_t get_dir_from_loc(vec3 loc) {
+    return get_dir_from_xy(loc.x, loc.y);
+}
 
-static inline const char* get_dir_as_string(direction_t dir) {
+constexpr static inline const char* get_dir_as_string(direction_t dir) {
     switch (dir) {
     case DIR_UP: return "up";
     case DIR_DOWN: return "down";
