@@ -111,9 +111,8 @@ static inline void libdraw_init_rest(gamestate& g) {
 
 
 static inline void libdraw_init(gamestate& g) {
-    //massert(g, "gamestate is NULL");
-    int w = DEFAULT_WIN_WIDTH;
-    int h = DEFAULT_WIN_HEIGHT;
+    const int w = DEFAULT_WIN_WIDTH;
+    const int h = DEFAULT_WIN_HEIGHT;
     const char* title = WINDOW_TITLE;
     char full_title[1024] = {0};
     snprintf(full_title, sizeof(full_title), "%s - %s", title, g.version.c_str());
@@ -126,8 +125,7 @@ static inline void libdraw_init(gamestate& g) {
 }
 
 
-static inline bool libdraw_windowshouldclose(const gamestate& g) {
-    //massert(g, "gamestate is NULL");
+static inline bool libdraw_windowshouldclose(gamestate& g) {
     return g.do_quit;
 }
 
