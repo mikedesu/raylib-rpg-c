@@ -7,6 +7,7 @@
 #include "libgame_defines.h"
 #include "play_sound.h"
 #include "sfx.h"
+#include "tile_has_box.h"
 #include "tile_has_door.h"
 #include "tile_npc_living_count.h"
 
@@ -39,13 +40,38 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
         merror("Tile at (%d, %d, %d) is not walkable", aloc.x, aloc.y, aloc.z);
         return false;
     }
-    //entityid box_id = tile_has_box(g, aloc.x, aloc.y, aloc.z);
+
+    const entityid maybe_box_id = tile_has_box(g, aloc.x, aloc.y, aloc.z);
     // we need to
     // 1. check to see if box_id is pushable
     // 2. check to see if the tile in front of box, if pushed, is free/open
-    //if (box_id != ENTITYID_INVALID) {
+    if (maybe_box_id != ENTITYID_INVALID) {
+        minfo("Box present");
+        const bool maybe_pushable = g.ct.get<pushable>(maybe_box_id).value_or(false);
+        if (maybe_pushable) {
+            const vec3 box_loc = g.ct.get<location>(maybe_box_id).value_or((vec3){-1, -1, -1});
+            const vec3 box_new_loc = {box_loc.x + v.x, box_loc.y + v.y, box_loc.z};
+
+            tile_t& box_new_loc_tile = df_tile_at(d_get_floor(g.dungeon, g.dungeon.current_floor), box_new_loc);
+            if (tile_entity_count(box_new_loc_tile) == 0) {
+                try_entity_move(g, maybe_box_id, v);
+                return true;
+            } else {
+                // not an empty tile
+                minfo("tile not empty");
+                return false;
+            }
+
+        } else {
+            // box is not pushable
+            minfo("Box NOT pushable");
+            return false;
+        }
+    } else {
+        // no boxes
+        minfo("Box NOT present");
+    }
     // 1. check to see if box_id is pushable
-    //if (g_is_pushable(g, box_id)) {
     //if (g->ct.get<Pushable>(box_id).value_or(false)) {
     // 2. check to see if the tile in front of box, if pushed, is free/open
     // get the box's location

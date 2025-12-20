@@ -1,8 +1,9 @@
 #pragma once
 
+#include "entityid.h"
 #include "gamestate.h"
 
-static inline bool tile_has_box(gamestate& g, int x, int y, int z) {
+static inline entityid tile_has_box(gamestate& g, int x, int y, int z) {
     //massert(g, "gamestate is NULL");
     massert(z >= 0, "floor is out of bounds");
     massert((size_t)z < g.dungeon.floors.size(), "floor is out of bounds");
@@ -12,7 +13,7 @@ static inline bool tile_has_box(gamestate& g, int x, int y, int z) {
         const entityid id = tile_get_entity(t, i);
         const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
         if (id != ENTITYID_INVALID && type == ENTITY_BOX)
-            return true;
+            return id;
     }
-    return false;
+    return ENTITYID_INVALID;
 }

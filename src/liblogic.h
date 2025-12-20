@@ -65,6 +65,7 @@ static inline void liblogic_init(gamestate& g) {
     minfo("liblogic_init");
     init_dungeon(g);
     create_box_at_with(g, (vec3){11, 9, 0}, [](gamestate& g, entityid id) {});
+    create_box_at_with(g, (vec3){10, 9, 0}, [](gamestate& g, entityid id) {});
     //create_weapon_at_with(g, (vec3){11, 9, 0}, dagger_init_test);
     //create_shield_at_with(g, (vec3){11, 10, 0}, kite_shield_init_test);
     //create_potion_at_with(g, (vec3){9, 10, 0}, [](gamestate& g, entityid id) {

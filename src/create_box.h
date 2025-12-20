@@ -10,6 +10,7 @@ static inline entityid create_box_with(gamestate& g, function<void(gamestate&, e
     g.ct.set<entitytype>(id, ENTITY_BOX);
     g.ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
     g.ct.set<update>(id, true);
+    g.ct.set<pushable>(id, true);
     boxInitFunction(g, id);
     return id;
 }
@@ -28,7 +29,7 @@ static inline entityid create_box_at_with(gamestate& g, vec3 loc, function<void(
         return ENTITYID_INVALID;
     }
 
-    if (tile_has_box(g, loc.x, loc.y, loc.z)) {
+    if (tile_has_box(g, loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
         merror("cannot create entity on tile with box");
         return ENTITYID_INVALID;
     }
