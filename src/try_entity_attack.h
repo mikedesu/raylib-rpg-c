@@ -22,7 +22,7 @@ static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entityt
 static inline void process_attack_results(gamestate& g, entityid atk_id, entityid tgt_id, bool atk_successful) {
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
-    massert(atk_successful, "attack_successful is NULL");
+    //massert(atk_successful, "attack_successful is NULL");
 
     const entitytype_t tgttype = g.ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
 
