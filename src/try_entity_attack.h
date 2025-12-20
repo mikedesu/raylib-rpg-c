@@ -132,16 +132,6 @@ static inline bool process_attack_entity(gamestate& g, tile_t& tile, int i, enti
     if (g.ct.get<dead>(target_id).value_or(true))
         return false;
 
-    // lets try an experiment...
-    // get the armor class of the target
-    //int base_ac = g_get_stat(g, target_id, STATS_AC);
-    //int base_str = g_get_stat(g, attacker_id, STATS_STR);
-    //int str_bonus = bonus_calc(base_str);
-    //int str_bonus = 0;
-    //int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
-    //int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
-    //if (attack_roll >= base_ac) {
-
     auto maybe_shield = g.ct.get<equipped_shield>(target_id);
     if (!maybe_shield.has_value()) {
         // no shield
