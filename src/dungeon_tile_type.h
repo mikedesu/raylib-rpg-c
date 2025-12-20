@@ -161,15 +161,15 @@ typedef enum
     TILE_COUNT
 } tiletype_t;
 
-static inline bool tile_is_none(const tiletype_t type) {
+constexpr static inline bool tile_is_none(const tiletype_t type) {
     return type == TILE_NONE;
 }
 
-static inline bool tile_is_not_none(const tiletype_t type) {
+constexpr static inline bool tile_is_not_none(const tiletype_t type) {
     return type != TILE_NONE;
 }
 
-static inline bool tiletype_is_wall(const tiletype_t type) {
+constexpr static inline bool tiletype_is_wall(const tiletype_t type) {
     switch (type) {
     case TILE_STONE_WALL_00: return true;
     case TILE_STONE_WALL_01: return true;
@@ -178,18 +178,18 @@ static inline bool tiletype_is_wall(const tiletype_t type) {
     return false;
 }
 
-static inline bool tile_is_not_wall(const tiletype_t type) {
-    return tile_is_not_none(type) && !tiletype_is_wall(type);
-}
+//constexpr static inline bool tile_is_not_wall(const tiletype_t type) {
+//    return tile_is_not_none(type) && !tiletype_is_wall(type);
+//}
 
-static inline bool tile_is_walkable(const tiletype_t type) {
+constexpr static inline bool tile_is_walkable(const tiletype_t type) {
     return !tiletype_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE && type != TILE_COUNT;
 }
 
-static inline bool tile_is_possible_upstairs(const tiletype_t type) {
+constexpr static inline bool tile_is_possible_upstairs(const tiletype_t type) {
     return tile_is_walkable(type) && type != TILE_DOWNSTAIRS && type != TILE_COUNT;
 }
 
-static inline bool tile_is_possible_downstairs(const tiletype_t type) {
+constexpr static inline bool tile_is_possible_downstairs(const tiletype_t type) {
     return tile_is_walkable(type) && type != TILE_UPSTAIRS && type != TILE_COUNT;
 }

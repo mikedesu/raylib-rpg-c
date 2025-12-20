@@ -42,7 +42,6 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
         if (maybe_pushable) {
             //const vec3 box_loc = g.ct.get<location>(maybe_box_id).value_or((vec3){-1, -1, -1});
             //const vec3 box_new_loc = {box_loc.x + v.x, box_loc.y + v.y, box_loc.z};
-            //tile_t& box_new_loc_tile = df_tile_at(d_get_floor(g.dungeon, g.dungeon.current_floor), box_new_loc);
             //if (tile_entity_count(box_new_loc_tile) == 0) {
             if (try_entity_move(g, maybe_box_id, v)) {
                 return true;
@@ -60,28 +59,11 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
         // no boxes
         minfo("Box NOT present");
     }
-    // 1. check to see if box_id is pushable
-    //if (g->ct.get<Pushable>(box_id).value_or(false)) {
-    // 2. check to see if the tile in front of box, if pushed, is free/open
-    // get the box's location
-    //vec3 box_loc = g_get_loc(g, box_id);
-    //    vec3 box_loc = g->ct.get<Location>(box_id).value();
-    // compute the location in front of the box
-    //    vec3 box_new_loc = {box_loc.x + v.x, box_loc.y + v.y, box_loc.z};
-    // get the tile at the new location
-    //    shared_ptr<tile_t> box_new_loc_tile = df_tile_at(d_get_floor(g->dungeon, g->dungeon->current_floor), box_new_loc);
-    // check to see tile has no entities
-    //    if (tile_entity_count(box_new_loc_tile) == 0) {
-    //        try_entity_move(g, box_id, v);
-    //    }
-    //}
-    //return false;
-    //}
+
     if (tile_npc_living_count(g, aloc.x, aloc.y, aloc.z) > 0) {
         merror("Tile at (%d, %d, %d) has living NPCs", aloc.x, aloc.y, aloc.z);
         return false;
     }
-
 
     const entityid maybe_door = tile_has_door(g, aloc);
     if (maybe_door != ENTITYID_INVALID) {
@@ -98,13 +80,8 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
             return false;
         }
     }
+
     // if door, door is open
-
-    const float mx = v.x * DEFAULT_TILE_SIZE;
-    const float my = v.y * DEFAULT_TILE_SIZE;
-
-    auto current_tile = df_tile_at(df, loc);
-    //massert(current_tile, "Current tile is NULL at (%d, %d, %d)", loc.x, loc.y, loc.z);
 
     // remove the entity from the current tile
     if (!df_remove_at(df, id, loc.x, loc.y)) {
@@ -119,6 +96,8 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
     }
 
     g.ct.set<location>(id, aloc);
+
+    const float mx = v.x * DEFAULT_TILE_SIZE, my = v.y * DEFAULT_TILE_SIZE;
     g.ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
 
     if (check_hearing(g, g.hero_id, aloc))
