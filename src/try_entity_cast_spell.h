@@ -123,17 +123,7 @@ static inline void try_entity_cast_spell(gamestate& g, entityid id, int tgt_x, i
         g.ct.set<destroyed>(spell_id, true);
     }
 
-
     // did the hero hear this event?
-    //const vec3 hero_loc = g.ct.get<location>(g.hero_id).value_or((vec3){-1, -1, -1});
-    //const float hx = static_cast<float>(hero_loc.x);
-    //const float hy = static_cast<float>(hero_loc.y);
-    //const float tx = static_cast<float>(tgt_x);
-    //const float ty = static_cast<float>(tgt_y);
-    //const Vector2 p0 = {hx, hy};
-    //const Vector2 p1 = {tx, ty};
-    //float dist = Vector2Distance(p0, p1);
-    //float hearing = g.ct.get<hearing_distance>(g.hero_id).value_or(3);
     const bool event_heard = check_hearing(g, g.hero_id, (vec3){tgt_x, tgt_y, loc.z});
 
     if (ok) {
