@@ -13,13 +13,13 @@
 
 
 static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entitytype_t type, bool success) {
+    massert(type == ENTITY_PLAYER || type == ENTITY_NPC, "type is not player or npc!");
+
     if (!success) {
         if (type == ENTITY_PLAYER)
             g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
         else if (type == ENTITY_NPC)
             g.flag = GAMESTATE_FLAG_NPC_ANIM;
-        else
-            g.flag = GAMESTATE_FLAG_NONE;
 
     } else if (type == ENTITY_PLAYER)
         g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
