@@ -225,7 +225,6 @@ static inline bool process_attack_entities(gamestate& g, tile_t& tile, entityid 
         const entityid target_id = tile.entities->at(i);
         if (target_id == ENTITYID_INVALID)
             continue;
-
         ok |= process_attack_entity(g, tile, attacker_id, target_id);
     }
     return ok;
