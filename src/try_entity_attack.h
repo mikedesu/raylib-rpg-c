@@ -4,19 +4,33 @@
 #include "add_message.h"
 #include "check_hearing.h"
 #include "compute_armor_class.h"
+#include "entityid.h"
 #include "entitytype.h"
 #include "gamestate.h"
+#include "get_cached_npc.h"
 #include "manage_inventory.h"
 #include "play_sound.h"
+#include "recompute_entity_cache.h"
+#include "set_npc_dead.h"
 #include "sfx.h"
 #include "stat_bonus.h"
 
 
 static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entitytype_t type, bool success) {
-    if (!success)
-        g.flag = type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM : type == ENTITY_NPC ? GAMESTATE_FLAG_NPC_ANIM : GAMESTATE_FLAG_NONE;
-    else if (type == ENTITY_PLAYER)
+    massert(type == ENTITY_PLAYER || type == ENTITY_NPC, "type is not player or npc!");
+
+    //if (!success) {
+    //    if (type == ENTITY_PLAYER)
+    //        g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //    else if (type == ENTITY_NPC)
+    //        g.flag = GAMESTATE_FLAG_NPC_ANIM;
+    //} else if (type == ENTITY_PLAYER)
+    //    g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
+
+    if (type == ENTITY_PLAYER)
         g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    else if (type == ENTITY_NPC)
+        g.flag = GAMESTATE_FLAG_NPC_ANIM;
 }
 
 static inline void process_attack_results(gamestate& g, entityid atk_id, entityid tgt_id, bool atk_successful) {
@@ -86,7 +100,12 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
         return;
     }
 
-    g.ct.set<dead>(tgt_id, true);
+    set_npc_dead(g, tgt_id);
+    //g.ct.set<dead>(tgt_id, true);
+    //const vec3 tgt_loc = g.ct.get<location>(tgt_id).value_or((vec3){-1, -1, -1});
+    //massert(!vec3_equal(tgt_loc, (vec3){-1, -1, -1}), "tgt_id %d has no location", tgt_id);
+    //tile_t& target_tile = df_tile_at(d_get_current_floor(g.dungeon), tgt_loc);
+    //target_tile.dirty_entities = true;
 
     switch (tgttype) {
     case ENTITY_NPC: {
@@ -115,7 +134,56 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     }
 }
 
-static inline bool process_attack_shield(gamestate& g, entityid attacker_id, entityid target_id, entityid shield_id) {
+
+static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid attacker_id, entityid target_id) {
+    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
+
+    if (target_id == ENTITYID_INVALID)
+        return false;
+
+    const entitytype_t type = g.ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
+    if (type != ENTITY_PLAYER && type != ENTITY_NPC)
+        return false;
+
+    if (g.ct.get<dead>(target_id).value_or(true))
+        return false;
+
+    // lets try an experiment...
+    // get the armor class of the target
+    //int base_ac = g_get_stat(g, target_id, STATS_AC);
+    //int base_str = g_get_stat(g, attacker_id, STATS_STR);
+    //int str_bonus = bonus_calc(base_str);
+    //int str_bonus = 0;
+    //int atk_bonus = g_get_stat(g, attacker_id, STATS_ATTACK_BONUS);
+    //int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
+    //if (attack_roll >= base_ac) {
+
+    auto maybe_shield = g.ct.get<equipped_shield>(target_id);
+    if (!maybe_shield.has_value()) {
+        // no shield
+        // compute attack roll
+        // eventually we will need to select str or dex bonus
+        // depending on weapon type, class, etc
+        const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
+        const int target_ac = compute_armor_class(g, target_id);
+        const bool attack_successful = roll >= target_ac;
+        process_attack_results(g, attacker_id, target_id, attack_successful);
+        return attack_successful;
+    }
+
+    const auto shield_id = maybe_shield.value();
+    if (shield_id == ENTITYID_INVALID) {
+        // no shield
+        // compute attack roll
+        const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
+        const int target_ac = compute_armor_class(g, target_id);
+        const bool attack_successful = roll >= target_ac;
+        process_attack_results(g, attacker_id, target_id, attack_successful);
+        return attack_successful;
+    }
+
+    // they have a shield
+    // compute chance to block
     const int roll = GetRandomValue(1, 100);
     const int chance = g.ct.get<block_chance>(shield_id).value_or(100);
     const int low_roll = 100 - chance;
@@ -159,58 +227,6 @@ static inline bool process_attack_shield(gamestate& g, entityid attacker_id, ent
 }
 
 
-static inline bool process_attack_no_shield(gamestate& g, entityid atk_id, entityid tgt_id) {
-    const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(atk_id).value_or(10));
-    const int target_ac = compute_armor_class(g, tgt_id);
-    const bool attack_successful = roll >= target_ac;
-    process_attack_results(g, atk_id, tgt_id, attack_successful);
-    return attack_successful;
-}
-
-
-static inline bool process_attack_entity(gamestate& g, tile_t& tile, int i, entityid attacker_id) {
-    massert(i >= 0, "i is out of bounds");
-    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-
-    const entityid target_id = tile.entities->at(i);
-    if (target_id == ENTITYID_INVALID)
-        return false;
-
-    const entitytype_t type = g.ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
-    if (type != ENTITY_PLAYER && type != ENTITY_NPC)
-        return false;
-
-    if (g.ct.get<dead>(target_id).value_or(true))
-        return false;
-
-    auto maybe_shield = g.ct.get<equipped_shield>(target_id);
-    if (!maybe_shield.has_value()) {
-        // no shield
-        // compute attack roll
-        // eventually we will need to select str or dex bonus
-        // depending on weapon type, class, etc
-        return process_attack_no_shield(g, attacker_id, target_id);
-    }
-
-    const entityid shield_id = maybe_shield.value();
-    if (shield_id == ENTITYID_INVALID) {
-        // no shield
-        // compute attack roll
-        return process_attack_no_shield(g, attacker_id, target_id);
-    }
-
-    // they have a shield
-    return process_attack_shield(g, attacker_id, target_id, shield_id);
-}
-
-static inline bool process_attack_entities(gamestate& g, tile_t& tile, entityid attacker_id) {
-    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-    bool ok = false;
-    for (int i = 0; (size_t)i < tile.entities->size(); i++)
-        ok |= process_attack_entity(g, tile, i, attacker_id);
-    return ok;
-}
-
 static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(!g.ct.get<dead>(atk_id).value_or(false), "attacker entity is dead");
     minfo("Trying to attack...");
@@ -226,7 +242,8 @@ static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, i
     g.ct.set<attacking>(atk_id, true);
     g.ct.set<update>(atk_id, true);
 
-    bool ok = process_attack_entities(g, tile, atk_id);
+    const entityid npc_id = get_cached_npc(g, tile);
+    const bool ok = process_attack_entity(g, tile, atk_id, npc_id);
 
     // did the hero hear this event?
     const bool event_heard = check_hearing(g, g.hero_id, (vec3){tgt_x, tgt_y, loc.z});

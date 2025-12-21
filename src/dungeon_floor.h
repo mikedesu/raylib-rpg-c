@@ -308,11 +308,7 @@ static inline entityid df_add_at(dungeon_floor_t& df, entityid id, int x, int y)
 
 static inline bool df_remove_at(dungeon_floor_t& df, entityid id, int x, int y) {
     massert(id != ENTITYID_INVALID, "id is -1");
-    //massert(x >= 0, "x is less than zero");
-    //massert(x < df.width, "x is out of bounds");
     massert(x >= 0 && x < df.width, "x is out of bounds");
-    //massert(y >= 0, "y is less than zero");
-    //massert(y < df.height, "y is out of bounds");
     massert(y >= 0 && y < df.height, "y is out of bounds");
     tile_t& tile = df_tile_at(df, (vec3){x, y, -1});
     const entityid r = tile_remove(tile, id);
