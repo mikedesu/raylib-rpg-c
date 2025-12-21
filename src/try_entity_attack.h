@@ -216,17 +216,17 @@ static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid at
 
 static inline bool process_attack_entities(gamestate& g, tile_t& tile, entityid attacker_id) {
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-    bool ok = false;
 
-    //const entityid npc_id = get_cached_npc(g, tile);
-    //const bool ok = process_attack_entity(g, tile, attacker_id, npc_id);
+    const entityid npc_id = get_cached_npc(g, tile);
+    const bool ok = process_attack_entity(g, tile, attacker_id, npc_id);
 
-    for (int i = 0; (size_t)i < tile.entities->size(); i++) {
-        const entityid target_id = tile.entities->at(i);
-        if (target_id == ENTITYID_INVALID)
-            continue;
-        ok |= process_attack_entity(g, tile, attacker_id, target_id);
-    }
+    //bool ok = false;
+    //for (int i = 0; (size_t)i < tile.entities->size(); i++) {
+    //    const entityid target_id = tile.entities->at(i);
+    //    if (target_id == ENTITYID_INVALID)
+    //        continue;
+    //    ok |= process_attack_entity(g, tile, attacker_id, target_id);
+    //}
     return ok;
 }
 
