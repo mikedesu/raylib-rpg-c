@@ -8,6 +8,7 @@
 #include "gamestate.h"
 #include "manage_inventory.h"
 #include "play_sound.h"
+#include "recompute_entity_cache.h"
 #include "sfx.h"
 #include "stat_bonus.h"
 
@@ -94,6 +95,14 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     }
 
     g.ct.set<dead>(tgt_id, true);
+
+    const vec3 tgt_loc = g.ct.get<location>(tgt_id).value_or((vec3){-1, -1, -1});
+    massert(!vec3_equal(tgt_loc, (vec3){-1, -1, -1}), "tgt_id %d has no location", tgt_id);
+
+    tile_t& target_tile = df_tile_at(d_get_current_floor(g.dungeon), tgt_loc);
+    target_tile.dirty_entities = true;
+    //recompute_entity_cache(g, df_tile_at(d_get_current_floor(g.dungeon), tgt_loc));
+
 
     switch (tgttype) {
     case ENTITY_NPC: {

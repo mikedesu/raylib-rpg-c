@@ -88,6 +88,11 @@ static inline void try_entity_cast_spell(gamestate& g, entityid id, int tgt_x, i
             auto tgttype = g.ct.get<entitytype>(npcid).value_or(ENTITY_NONE);
 
             g.ct.set<dead>(npcid, true);
+
+            tile_t& target_tile = df_tile_at(d_get_current_floor(g.dungeon), spell_loc);
+            target_tile.dirty_entities = true;
+
+
             if (tgttype == ENTITY_NPC) {
                 // increment attacker's xp
                 const int old_xp = g.ct.get<xp>(id).value_or(0);
