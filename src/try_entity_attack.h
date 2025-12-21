@@ -4,6 +4,7 @@
 #include "add_message.h"
 #include "check_hearing.h"
 #include "compute_armor_class.h"
+#include "entityid.h"
 #include "entitytype.h"
 #include "gamestate.h"
 #include "get_cached_npc.h"
@@ -133,6 +134,9 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
 static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid attacker_id, entityid target_id) {
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
 
+    if (target_id == ENTITYID_INVALID)
+        return false;
+
     const entitytype_t type = g.ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC)
         return false;
@@ -218,16 +222,7 @@ static inline bool process_attack_entities(gamestate& g, tile_t& tile, entityid 
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
 
     const entityid npc_id = get_cached_npc(g, tile);
-    const bool ok = process_attack_entity(g, tile, attacker_id, npc_id);
-
-    //bool ok = false;
-    //for (int i = 0; (size_t)i < tile.entities->size(); i++) {
-    //    const entityid target_id = tile.entities->at(i);
-    //    if (target_id == ENTITYID_INVALID)
-    //        continue;
-    //    ok |= process_attack_entity(g, tile, attacker_id, target_id);
-    //}
-    return ok;
+    return process_attack_entity(g, tile, attacker_id, npc_id);
 }
 
 static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, int tgt_y) {
