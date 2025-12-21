@@ -62,9 +62,10 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
     //minfo("Box NOT present");
     //}
 
-    //if (tile_npc_living_count(g, aloc.x, aloc.y, aloc.z) > 0) {
     if (tile_has_live_npcs(g, df_tile_at(d_get_current_floor(g.dungeon), aloc))) {
-        //merror("Tile at (%d, %d, %d) has living NPCs", aloc.x, aloc.y, aloc.z);
+        if (id == g.hero_id) {
+            merror("Tile at (%d, %d, %d) has living NPCs", aloc.x, aloc.y, aloc.z);
+        }
         return false;
     }
 

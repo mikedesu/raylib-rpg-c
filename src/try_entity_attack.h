@@ -11,6 +11,7 @@
 #include "manage_inventory.h"
 #include "play_sound.h"
 #include "recompute_entity_cache.h"
+#include "set_npc_dead.h"
 #include "sfx.h"
 #include "stat_bonus.h"
 
@@ -18,14 +19,18 @@
 static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entitytype_t type, bool success) {
     massert(type == ENTITY_PLAYER || type == ENTITY_NPC, "type is not player or npc!");
 
-    if (!success) {
-        if (type == ENTITY_PLAYER)
-            g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        else if (type == ENTITY_NPC)
-            g.flag = GAMESTATE_FLAG_NPC_ANIM;
+    //if (!success) {
+    //    if (type == ENTITY_PLAYER)
+    //        g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    //    else if (type == ENTITY_NPC)
+    //        g.flag = GAMESTATE_FLAG_NPC_ANIM;
+    //} else if (type == ENTITY_PLAYER)
+    //    g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
 
-    } else if (type == ENTITY_PLAYER)
+    if (type == ENTITY_PLAYER)
         g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    else if (type == ENTITY_NPC)
+        g.flag = GAMESTATE_FLAG_NPC_ANIM;
 }
 
 static inline void process_attack_results(gamestate& g, entityid atk_id, entityid tgt_id, bool atk_successful) {
@@ -95,13 +100,12 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
         return;
     }
 
-    g.ct.set<dead>(tgt_id, true);
-
-    const vec3 tgt_loc = g.ct.get<location>(tgt_id).value_or((vec3){-1, -1, -1});
-    massert(!vec3_equal(tgt_loc, (vec3){-1, -1, -1}), "tgt_id %d has no location", tgt_id);
-
-    tile_t& target_tile = df_tile_at(d_get_current_floor(g.dungeon), tgt_loc);
-    target_tile.dirty_entities = true;
+    set_npc_dead(g, tgt_id);
+    //g.ct.set<dead>(tgt_id, true);
+    //const vec3 tgt_loc = g.ct.get<location>(tgt_id).value_or((vec3){-1, -1, -1});
+    //massert(!vec3_equal(tgt_loc, (vec3){-1, -1, -1}), "tgt_id %d has no location", tgt_id);
+    //tile_t& target_tile = df_tile_at(d_get_current_floor(g.dungeon), tgt_loc);
+    //target_tile.dirty_entities = true;
 
     switch (tgttype) {
     case ENTITY_NPC: {
