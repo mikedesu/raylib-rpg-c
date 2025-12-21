@@ -101,7 +101,6 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
 
     tile_t& target_tile = df_tile_at(d_get_current_floor(g.dungeon), tgt_loc);
     target_tile.dirty_entities = true;
-    //recompute_entity_cache(g, df_tile_at(d_get_current_floor(g.dungeon), tgt_loc));
 
 
     switch (tgttype) {
@@ -132,13 +131,15 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
 }
 
 
-static inline bool process_attack_entity(gamestate& g, tile_t& tile, int i, entityid attacker_id) {
-    massert(i >= 0, "i is out of bounds");
+//static inline bool process_attack_entity(gamestate& g, tile_t& tile, int i, entityid attacker_id) {
+static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid attacker_id, entityid target_id) {
+    //massert(i >= 0, "i is out of bounds");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
+    //massert(target_id != ENTITYID_INVALID, "attacker is NULL");
 
-    const entityid target_id = tile.entities->at(i);
-    if (target_id == ENTITYID_INVALID)
-        return false;
+    //const entityid target_id = tile.entities->at(i);
+    //if (target_id == ENTITYID_INVALID)
+    //    return false;
 
     const entitytype_t type = g.ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC)
@@ -224,8 +225,13 @@ static inline bool process_attack_entity(gamestate& g, tile_t& tile, int i, enti
 static inline bool process_attack_entities(gamestate& g, tile_t& tile, entityid attacker_id) {
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     bool ok = false;
-    for (int i = 0; (size_t)i < tile.entities->size(); i++)
-        ok |= process_attack_entity(g, tile, i, attacker_id);
+    for (int i = 0; (size_t)i < tile.entities->size(); i++) {
+        const entityid target_id = tile.entities->at(i);
+        if (target_id == ENTITYID_INVALID)
+            continue;
+
+        ok |= process_attack_entity(g, tile, attacker_id, target_id);
+    }
     return ok;
 }
 
