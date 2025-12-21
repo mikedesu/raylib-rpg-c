@@ -31,7 +31,9 @@ typedef struct {
     bool dirty_visibility;
     bool is_empty;
     int cached_live_npcs;
+    int cached_item_count;
     entityid cached_npc;
+    entityid cached_item;
     bool can_have_door;
     shared_ptr<vector<entityid>> entities;
 } tile_t;
@@ -57,7 +59,9 @@ static inline void tile_init(tile_t& t, tiletype_t type) {
     t.visible = t.explored = t.cached_player_present = t.can_have_door = false;
     t.dirty_entities = t.dirty_visibility = t.is_empty = true;
     t.cached_live_npcs = 0;
+    t.cached_item_count = 0;
     t.cached_npc = ENTITYID_INVALID;
+    t.cached_item = ENTITYID_INVALID;
     t.entities = make_shared<vector<entityid>>();
 }
 

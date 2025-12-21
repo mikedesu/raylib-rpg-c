@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entityid.h"
 #include "gamestate.h"
 
 static inline void recompute_entity_cache(gamestate& g, tile_t& t) {
@@ -8,13 +9,15 @@ static inline void recompute_entity_cache(gamestate& g, tile_t& t) {
         return;
     // Reset counters
     t.cached_live_npcs = 0;
+    t.cached_item_count = 0;
     t.cached_player_present = false;
     t.cached_npc = ENTITYID_INVALID;
+    t.cached_item = ENTITYID_INVALID;
     // Iterate through all entities on the tile
     for (size_t i = 0; i < t.entities->size(); i++) {
         const entityid id = t.entities->at(i);
         // Skip dead entities
-        if (g.ct.get<dead>(id).value_or(true)) {
+        if (g.ct.get<dead>(id).value_or(false)) {
             continue;
         }
         // Check entity type
@@ -25,6 +28,9 @@ static inline void recompute_entity_cache(gamestate& g, tile_t& t) {
         } else if (type == ENTITY_PLAYER) {
             t.cached_player_present = true;
             t.cached_npc = id;
+        } else if (type == ENTITY_ITEM) {
+            t.cached_item_count++;
+            t.cached_item = id;
         }
     }
     // Cache is now clean

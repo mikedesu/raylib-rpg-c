@@ -4,7 +4,7 @@
 
 static inline entityid tile_has_door(gamestate& g, vec3 v) {
     //massert(g, "Game state is NULL!");
-    minfo("tile_has_door: %d %d %d", v.x, v.y, v.z);
+    //minfo("tile_has_door: %d %d %d", v.x, v.y, v.z);
     auto df = d_get_current_floor(g.dungeon);
     auto t = df_tile_at(df, v);
     for (size_t i = 0; i < t.entities->size(); i++) {
