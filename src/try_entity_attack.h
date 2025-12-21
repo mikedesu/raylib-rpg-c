@@ -14,19 +14,15 @@
 
 static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entitytype_t type, bool success) {
     if (!success) {
-        //g.flag = type == ENTITY_PLAYER ? GAMESTATE_FLAG_PLAYER_ANIM : type == ENTITY_NPC ? GAMESTATE_FLAG_NPC_ANIM : GAMESTATE_FLAG_NONE;
-
-        if (type == ENTITY_PLAYER) {
+        if (type == ENTITY_PLAYER)
             g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        } else if (type == ENTITY_NPC) {
+        else if (type == ENTITY_NPC)
             g.flag = GAMESTATE_FLAG_NPC_ANIM;
-        } else {
+        else
             g.flag = GAMESTATE_FLAG_NONE;
-        }
 
-    } else if (type == ENTITY_PLAYER) {
+    } else if (type == ENTITY_PLAYER)
         g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    }
 }
 
 static inline void process_attack_results(gamestate& g, entityid atk_id, entityid tgt_id, bool atk_successful) {
