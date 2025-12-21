@@ -218,12 +218,6 @@ static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid at
     return false;
 }
 
-static inline bool process_attack_entities(gamestate& g, tile_t& tile, entityid attacker_id) {
-    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-
-    const entityid npc_id = get_cached_npc(g, tile);
-    return process_attack_entity(g, tile, attacker_id, npc_id);
-}
 
 static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, int tgt_y) {
     massert(!g.ct.get<dead>(atk_id).value_or(false), "attacker entity is dead");
@@ -240,7 +234,8 @@ static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, i
     g.ct.set<attacking>(atk_id, true);
     g.ct.set<update>(atk_id, true);
 
-    bool ok = process_attack_entities(g, tile, atk_id);
+    const entityid npc_id = get_cached_npc(g, tile);
+    const bool ok = process_attack_entity(g, tile, atk_id, npc_id);
 
     // did the hero hear this event?
     const bool event_heard = check_hearing(g, g.hero_id, (vec3){tgt_x, tgt_y, loc.z});
