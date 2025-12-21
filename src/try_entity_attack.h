@@ -29,7 +29,6 @@ static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entityt
 static inline void process_attack_results(gamestate& g, entityid atk_id, entityid tgt_id, bool atk_successful) {
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
-    //massert(atk_successful, "attack_successful is NULL");
 
     const entitytype_t tgttype = g.ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
 
@@ -102,7 +101,6 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     tile_t& target_tile = df_tile_at(d_get_current_floor(g.dungeon), tgt_loc);
     target_tile.dirty_entities = true;
 
-
     switch (tgttype) {
     case ENTITY_NPC: {
         //const int old_xp = g.ct.get<xp>(atk_id).value_or(0);
@@ -131,15 +129,8 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
 }
 
 
-//static inline bool process_attack_entity(gamestate& g, tile_t& tile, int i, entityid attacker_id) {
 static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid attacker_id, entityid target_id) {
-    //massert(i >= 0, "i is out of bounds");
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-    //massert(target_id != ENTITYID_INVALID, "attacker is NULL");
-
-    //const entityid target_id = tile.entities->at(i);
-    //if (target_id == ENTITYID_INVALID)
-    //    return false;
 
     const entitytype_t type = g.ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC)
