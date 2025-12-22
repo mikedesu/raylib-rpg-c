@@ -53,3 +53,5 @@ src/graphs/*
 src/minifantasy
 .aider*
 test
+old_stats
+stats
