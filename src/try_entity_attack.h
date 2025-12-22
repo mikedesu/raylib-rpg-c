@@ -67,7 +67,6 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     g.ct.set<hp>(tgt_id, tgt_hp);
 
     // get the equipped weapon of the attacker
-    //const entityid wpn_id = g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
 
     // decrement its durability
     handle_durability_loss(g, atk_id, tgt_id);
@@ -81,10 +80,10 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
 
     switch (tgttype) {
     case ENTITY_NPC: {
-        //const int old_xp = g.ct.get<xp>(atk_id).value_or(0);
-        //const int reward_xp = 1;
-        //const int new_xp = old_xp + reward_xp;
-        g.ct.set<xp>(atk_id, g.ct.get<xp>(atk_id).value_or(0) + 1);
+        const int old_xp = g.ct.get<xp>(atk_id).value_or(0);
+        const int reward_xp = 1;
+        const int new_xp = old_xp + reward_xp;
+        g.ct.set<xp>(atk_id, new_xp);
         // handle item drops
         drop_all_from_inventory(g, tgt_id);
     } break;
