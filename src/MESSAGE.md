@@ -1,1 +1,17 @@
 Great job with the recent analysis on my game's attack logic. What's the biggest one thing you can see that I need to work on fixing or cleaning up next?
+
+I have already done the following:
+
+- [x] re-ordered the attack roll and shield block checks and verified that they work as intended
+
+Previous analysis suggestions you've brought up that I will eventually implement.
+
+- [ ] Currently in process_attack_results(), the damage calculation doesn't account for
+  - [ ] Target's equipped armor **WONT FIX: armor is currently un-implemented**
+  - [ ] Damage reduction from armor (you have a damage_reduction component defined but it's not used) **WONT FIX: damage reduction currently un-implemented**
+  - [ ] Armor durability loss (similar to weapon durability logic) **WONT FIX: armor is currently un-implemented**
+
+My own thoughts derived from your analysis:
+
+- [ ] Shields will need durability soon as well as durability reduction and breaking handled
+
