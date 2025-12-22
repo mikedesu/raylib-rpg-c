@@ -8,6 +8,7 @@
 #include "entitytype.h"
 #include "gamestate.h"
 #include "get_cached_npc.h"
+#include "handle_durability_loss.h"
 #include "manage_inventory.h"
 #include "play_sound.h"
 #include "recompute_entity_cache.h"
@@ -24,6 +25,7 @@ static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entityt
     else if (type == ENTITY_NPC)
         g.flag = GAMESTATE_FLAG_NPC_ANIM;
 }
+
 
 static inline void process_attack_results(gamestate& g, entityid atk_id, entityid tgt_id, bool atk_successful) {
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
@@ -67,25 +69,7 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     const entityid wpn_id = g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
 
     // decrement its durability
-    auto maybe_dura = g.ct.get<durability>(wpn_id);
-
-    if (maybe_dura.has_value()) {
-        const int dura = maybe_dura.value();
-        g.ct.set<durability>(wpn_id, dura - 1 < 0 ? 0 : dura - 1);
-        if (dura == 0) {
-            // item destroyed
-            g.ct.set<destroyed>(wpn_id, true);
-            // remove item from attacker's inventory
-            remove_from_inventory(g, atk_id, wpn_id);
-            // unequip item
-            g.ct.set<equipped_weapon>(atk_id, ENTITYID_INVALID);
-            const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(tgt_id).value_or((vec3){-1, -1, -1}));
-            if (event_heard)
-                PlaySound(g.sfx[SFX_05_ALCHEMY_GLASS_BREAK]);
-
-            add_message_history(g, "%s broke!", g.ct.get<name>(wpn_id).value_or("no-name").c_str());
-        }
-    }
+    handle_durability_loss(g, atk_id, tgt_id);
 
     if (tgt_hp > 0) {
         g.ct.set<dead>(tgt_id, false);
