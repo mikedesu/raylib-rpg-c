@@ -5,6 +5,9 @@ bugs, and prepare for the future. We will clean up other files like this as well
 I have already done the following:
 
 - [x] re-ordered the attack roll and shield block checks and verified that they work as intended
+- [x] unify attack sound handling in `try_entity_attack.h`
+  - [x] created an `attack_result_t` to separate attack result types: HIT, MISS, BLOCK (to start with...DODGE, DEFLECT, etc may come later...)
+  - [x] sound effect selected based on `attack_result_t`
 
 Previous analysis suggestions you've brought up that I will eventually implement.
 

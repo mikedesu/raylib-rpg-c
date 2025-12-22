@@ -2,6 +2,7 @@
 #pragma once
 
 #include "add_message.h"
+#include "attack_result.h"
 #include "check_hearing.h"
 #include "compute_armor_class.h"
 #include "compute_attack_roll.h"
@@ -17,7 +18,7 @@
 #include "sfx.h"
 #include "stat_bonus.h"
 
-static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entitytype_t type, bool success) {
+static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entitytype_t type) {
     massert(type == ENTITY_PLAYER || type == ENTITY_NPC, "type is not player or npc!");
     if (type == ENTITY_PLAYER)
         g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -25,6 +26,25 @@ static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entityt
         g.flag = GAMESTATE_FLAG_NPC_ANIM;
     else
         merror("Unknown flag state, invalid type: %d", type);
+}
+
+
+static inline void handle_attack_sounds(gamestate& g, entityid attacker, attack_result_t result) {
+    if (!check_hearing(g, g.hero_id, g.ct.get<location>(attacker).value_or((vec3){-1, -1, -1})))
+        return;
+    int index = SFX_SLASH_ATTACK_SWORD_1;
+    if (result == ATTACK_RESULT_BLOCK) {
+        index = SFX_HIT_METAL_ON_METAL;
+    } else if (result == ATTACK_RESULT_HIT) {
+        index = SFX_HIT_METAL_ON_FLESH;
+    } else if (result == ATTACK_RESULT_MISS) {
+        const weapontype_t wpn_type = g.ct.get<weapontype>(g.ct.get<equipped_weapon>(attacker).value_or(ENTITYID_INVALID)).value_or(WEAPON_NONE);
+        index = wpn_type == WEAPON_SWORD    ? SFX_SLASH_ATTACK_SWORD_1
+                : wpn_type == WEAPON_AXE    ? SFX_SLASH_ATTACK_HEAVY_1
+                : wpn_type == WEAPON_DAGGER ? SFX_SLASH_ATTACK_LIGHT_1
+                                            : SFX_SLASH_ATTACK_SWORD_1;
+    }
+    PlaySound(g.sfx[index]);
 }
 
 
@@ -80,15 +100,15 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
 }
 
 
-static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid attacker_id, entityid target_id) {
+static inline attack_result_t process_attack_entity(gamestate& g, tile_t& tile, entityid attacker_id, entityid target_id) {
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     if (target_id == ENTITYID_INVALID)
-        return false;
+        return ATTACK_RESULT_MISS;
     const entitytype_t type = g.ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC)
-        return false;
+        return ATTACK_RESULT_MISS;
     if (g.ct.get<dead>(target_id).value_or(true))
-        return false;
+        return ATTACK_RESULT_MISS;
     // they have a shield
     // still need to do attack successful check
     const bool attack_successful = compute_attack_roll(g, attacker_id, target_id);
@@ -104,7 +124,7 @@ static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid at
             if (roll <= low_roll) {
                 // failed to block
                 process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
-                return true;
+                return ATTACK_RESULT_HIT;
             }
             // block successful
             const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
@@ -117,15 +137,15 @@ static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid at
                                 "%s blocked an attack from %s",
                                 g.ct.get<name>(target_id).value_or("no-name").c_str(),
                                 g.ct.get<name>(attacker_id).value_or("no-name").c_str());
-            return false;
+            return ATTACK_RESULT_BLOCK;
         }
         // if no shield
         process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
-        return true;
+        return ATTACK_RESULT_HIT;
     }
     // attack unsuccessful
     process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
-    return false;
+    return ATTACK_RESULT_MISS;
 }
 
 
@@ -142,22 +162,8 @@ static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, i
     g.ct.set<attacking>(atk_id, true);
     g.ct.set<update>(atk_id, true);
     const entityid npc_id = get_cached_npc(g, tile);
-    const bool ok = process_attack_entity(g, tile, atk_id, npc_id);
+    const attack_result_t result = process_attack_entity(g, tile, atk_id, npc_id);
     // did the hero hear this event?
-    const bool event_heard = check_hearing(g, g.hero_id, (vec3){tgt_x, tgt_y, loc.z});
-    if (ok && event_heard) {
-        // default metal on flesh
-        PlaySound(g.sfx[SFX_HIT_METAL_ON_FLESH]);
-    } else if (event_heard) {
-        // need to select appropriate sound effect based on equipment- get attacker's equipped weapon if any
-        // attacker has equipped weapon - get its type
-        const weapontype_t wpn_type = g.ct.get<weapontype>(g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID)).value_or(WEAPON_NONE);
-        const int index = wpn_type == WEAPON_SWORD    ? SFX_SLASH_ATTACK_SWORD_1
-                          : wpn_type == WEAPON_AXE    ? SFX_SLASH_ATTACK_HEAVY_1
-                          : wpn_type == WEAPON_DAGGER ? SFX_SLASH_ATTACK_LIGHT_1
-                                                      : SFX_SLASH_ATTACK_SWORD_1;
-        PlaySound(g.sfx[index]);
-    }
-
-    set_gamestate_flag_for_attack_animation(g, g.ct.get<entitytype>(atk_id).value_or(ENTITY_NONE), ok);
+    handle_attack_sounds(g, atk_id, result);
+    set_gamestate_flag_for_attack_animation(g, g.ct.get<entitytype>(atk_id).value_or(ENTITY_NONE));
 }
