@@ -6,7 +6,7 @@
 #include "manage_inventory.h"
 #include "sfx.h"
 
-static inline void handle_durability_loss(gamestate& g, entityid atk_id, entityid tgt_id) {
+static inline void handle_weapon_durability_loss(gamestate& g, entityid atk_id, entityid tgt_id) {
     const entityid equipped_wpn = g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
     auto maybe_dura = g.ct.get<durability>(equipped_wpn);
     if (maybe_dura.has_value()) {

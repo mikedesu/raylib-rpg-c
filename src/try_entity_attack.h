@@ -17,67 +17,54 @@
 #include "sfx.h"
 #include "stat_bonus.h"
 
-
 static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entitytype_t type, bool success) {
     massert(type == ENTITY_PLAYER || type == ENTITY_NPC, "type is not player or npc!");
-
     if (type == ENTITY_PLAYER)
         g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
     else if (type == ENTITY_NPC)
         g.flag = GAMESTATE_FLAG_NPC_ANIM;
+    else
+        merror("Unknown flag state, invalid type: %d", type);
 }
 
 
 static inline void process_attack_results(gamestate& g, entityid atk_id, entityid tgt_id, bool atk_successful) {
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
-
-    const entitytype_t tgttype = g.ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
-
     if (!atk_successful) {
         minfo("Missed attack");
         add_message_history(
             g, "%s swings at %s and misses!", g.ct.get<name>(atk_id).value_or("no-name").c_str(), g.ct.get<name>(tgt_id).value_or("no-name").c_str());
         return;
     }
-
     const entityid equipped_wpn = g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
     const vec3 dmg_range = g.ct.get<damage>(equipped_wpn).value_or((vec3){1, 2, 0});
     const int dmg = GetRandomValue(dmg_range.x, dmg_range.y);
-
     g.ct.set<damaged>(tgt_id, true);
     g.ct.set<update>(tgt_id, true);
-
     auto maybe_tgt_hp = g.ct.get<hp>(tgt_id);
     if (!maybe_tgt_hp.has_value()) {
         merror("target has no HP component");
         return;
     }
-
     int tgt_hp = maybe_tgt_hp.value();
     if (tgt_hp <= 0) {
         merror("Target is already dead, hp was: %d", tgt_hp);
         g.ct.set<dead>(tgt_id, true);
         return;
     }
-
     add_message_history(
         g, "%s deals %d damage to %s", g.ct.get<name>(atk_id).value_or("no-name").c_str(), dmg, g.ct.get<name>(tgt_id).value_or("no-name").c_str());
     tgt_hp -= dmg;
     g.ct.set<hp>(tgt_id, tgt_hp);
-
-    // get the equipped weapon of the attacker
-
-    // decrement its durability
-    handle_durability_loss(g, atk_id, tgt_id);
-
+    // decrement weapon durability
+    handle_weapon_durability_loss(g, atk_id, tgt_id);
     if (tgt_hp > 0) {
         g.ct.set<dead>(tgt_id, false);
         return;
     }
-
     set_npc_dead(g, tgt_id);
-
+    const entitytype_t tgttype = g.ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
     switch (tgttype) {
     case ENTITY_NPC: {
         const int old_xp = g.ct.get<xp>(atk_id).value_or(0);
@@ -95,67 +82,49 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
 
 static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid attacker_id, entityid target_id) {
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-
     if (target_id == ENTITYID_INVALID)
         return false;
-
     const entitytype_t type = g.ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
     if (type != ENTITY_PLAYER && type != ENTITY_NPC)
         return false;
-
     if (g.ct.get<dead>(target_id).value_or(true))
         return false;
-
     // they have a shield
     // still need to do attack successful check
     const bool attack_successful = compute_attack_roll(g, attacker_id, target_id);
     if (attack_successful) {
         // check for shield
         const entityid shield_id = g.ct.get<equipped_shield>(target_id).value_or(ENTITYID_INVALID);
-        // if no shield
-        if (shield_id == ENTITYID_INVALID) {
-            process_attack_results(g, attacker_id, target_id, attack_successful);
-            return true;
-        }
         // if has shield
-        else {
+        if (shield_id != ENTITYID_INVALID) {
             // compute chance to block
             const int roll = GetRandomValue(1, 100);
             const int chance = g.ct.get<block_chance>(shield_id).value_or(100);
             const int low_roll = 100 - chance;
-            if (low_roll == 0) {
-                const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
-                if (event_heard)
-                    PlaySound(g.sfx[SFX_HIT_METAL_ON_METAL]);
-                g.ct.set<block_success>(target_id, true);
-                g.ct.set<update>(target_id, true);
-                add_message_history(g,
-                                    "%s blocked an attack from %s",
-                                    g.ct.get<name>(target_id).value_or("no-name").c_str(),
-                                    g.ct.get<name>(attacker_id).value_or("no-name").c_str());
-            } else if (roll <= low_roll) {
+            if (roll <= low_roll) {
                 // failed to block
-                process_attack_results(g, attacker_id, target_id, attack_successful);
+                process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
                 return true;
-            } else {
-                // block successful
-                const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
-                if (event_heard) {
-                    PlaySound(g.sfx[SFX_HIT_METAL_ON_METAL]);
-                }
-                g.ct.set<block_success>(target_id, true);
-                g.ct.set<update>(target_id, true);
-                add_message_history(g,
-                                    "%s blocked an attack from %s",
-                                    g.ct.get<name>(target_id).value_or("no-name").c_str(),
-                                    g.ct.get<name>(attacker_id).value_or("no-name").c_str());
             }
+            // block successful
+            const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
+            if (event_heard) {
+                PlaySound(g.sfx[SFX_HIT_METAL_ON_METAL]);
+            }
+            g.ct.set<block_success>(target_id, true);
+            g.ct.set<update>(target_id, true);
+            add_message_history(g,
+                                "%s blocked an attack from %s",
+                                g.ct.get<name>(target_id).value_or("no-name").c_str(),
+                                g.ct.get<name>(attacker_id).value_or("no-name").c_str());
+            return false;
         }
+        // if no shield
+        process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
+        return true;
     }
     // attack unsuccessful
-    else {
-        process_attack_results(g, attacker_id, target_id, attack_successful);
-    }
+    process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
     return false;
 }
 
@@ -166,28 +135,21 @@ static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, i
     const vec3 loc = g.ct.get<location>(atk_id).value();
     auto df = d_get_floor(g.dungeon, loc.z);
     auto tile = df_tile_at(df, (vec3){tgt_x, tgt_y, loc.z});
-
     // Calculate direction based on target position
     const int dx = tgt_x - loc.x;
     const int dy = tgt_y - loc.y;
-
     g.ct.set<direction>(atk_id, get_dir_from_xy(dx, dy));
     g.ct.set<attacking>(atk_id, true);
     g.ct.set<update>(atk_id, true);
-
     const entityid npc_id = get_cached_npc(g, tile);
     const bool ok = process_attack_entity(g, tile, atk_id, npc_id);
-
     // did the hero hear this event?
     const bool event_heard = check_hearing(g, g.hero_id, (vec3){tgt_x, tgt_y, loc.z});
-
     if (ok && event_heard) {
         // default metal on flesh
         PlaySound(g.sfx[SFX_HIT_METAL_ON_FLESH]);
-
     } else if (event_heard) {
         // need to select appropriate sound effect based on equipment- get attacker's equipped weapon if any
-        //const entityid weapon_id = g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
         // attacker has equipped weapon - get its type
         const weapontype_t wpn_type = g.ct.get<weapontype>(g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID)).value_or(WEAPON_NONE);
         const int index = wpn_type == WEAPON_SWORD    ? SFX_SLASH_ATTACK_SWORD_1

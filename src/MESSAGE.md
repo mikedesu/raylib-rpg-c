@@ -1,4 +1,6 @@
 Great job with the recent analysis on my game's attack logic. What's the biggest one thing you can see that I need to work on fixing or cleaning up next?
+Focus your criticism on the file itself, and do not base your own criticism based on the notes below. We are looking to clean up the file, fix potential 
+bugs, and prepare for the future. We will clean up other files like this as well.
 
 I have already done the following:
 
