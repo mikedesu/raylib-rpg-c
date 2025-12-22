@@ -23,7 +23,6 @@ all: game
 # Desktop build
 game: main.cpp 
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $(CFLAGS) $^ -L. $(RAYLIB_LIBS)   -o $@ 
-#./log_build_stats.sh
 
 # Web build
 index.html: main.cpp
