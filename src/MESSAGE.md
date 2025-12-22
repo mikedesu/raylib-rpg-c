@@ -11,6 +11,7 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement.
 
+- [ ] There are three identical calls to process_attack_results() in process_attack_entity(), each marked with // <===== ############. 
 - [ ] Currently in process_attack_results(), the damage calculation doesn't account for
   - [ ] Target's equipped armor **WONT FIX: armor is currently un-implemented**
   - [ ] Damage reduction from armor (you have a damage_reduction component defined but it's not used) **WONT FIX: damage reduction currently un-implemented**
