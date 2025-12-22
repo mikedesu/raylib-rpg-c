@@ -19,14 +19,6 @@
 static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entitytype_t type, bool success) {
     massert(type == ENTITY_PLAYER || type == ENTITY_NPC, "type is not player or npc!");
 
-    //if (!success) {
-    //    if (type == ENTITY_PLAYER)
-    //        g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
-    //    else if (type == ENTITY_NPC)
-    //        g.flag = GAMESTATE_FLAG_NPC_ANIM;
-    //} else if (type == ENTITY_PLAYER)
-    //    g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
-
     if (type == ENTITY_PLAYER)
         g.flag = GAMESTATE_FLAG_PLAYER_ANIM;
     else if (type == ENTITY_NPC)
@@ -101,11 +93,6 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     }
 
     set_npc_dead(g, tgt_id);
-    //g.ct.set<dead>(tgt_id, true);
-    //const vec3 tgt_loc = g.ct.get<location>(tgt_id).value_or((vec3){-1, -1, -1});
-    //massert(!vec3_equal(tgt_loc, (vec3){-1, -1, -1}), "tgt_id %d has no location", tgt_id);
-    //tile_t& target_tile = df_tile_at(d_get_current_floor(g.dungeon), tgt_loc);
-    //target_tile.dirty_entities = true;
 
     switch (tgttype) {
     case ENTITY_NPC: {
@@ -118,19 +105,6 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     } break;
     case ENTITY_PLAYER: add_message(g, "You died"); break;
     default: break;
-    }
-
-    if (tgttype == ENTITY_NPC) {
-        // increment attacker's xp
-        const int old_xp = g.ct.get<xp>(atk_id).value_or(0);
-        const int reward_xp = 1;
-        const int new_xp = old_xp + reward_xp;
-        g.ct.set<xp>(atk_id, new_xp);
-
-        // handle item drops
-        drop_all_from_inventory(g, tgt_id);
-    } else if (tgttype == ENTITY_PLAYER) {
-        add_message(g, "You died");
     }
 }
 
@@ -217,12 +191,7 @@ static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid at
         g.ct.set<update>(target_id, true);
         add_message_history(
             g, "%s blocked an attack from %s", g.ct.get<name>(target_id).value_or("no-name").c_str(), g.ct.get<name>(attacker_id).value_or("no-name").c_str());
-        return false;
     }
-    //else {
-    // non-shield block?
-    // how did we get here?
-    //}
     return false;
 }
 
