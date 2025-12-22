@@ -4,6 +4,7 @@
 #include "add_message.h"
 #include "check_hearing.h"
 #include "compute_armor_class.h"
+#include "compute_attack_roll.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate.h"
@@ -66,7 +67,7 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     g.ct.set<hp>(tgt_id, tgt_hp);
 
     // get the equipped weapon of the attacker
-    const entityid wpn_id = g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
+    //const entityid wpn_id = g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
 
     // decrement its durability
     handle_durability_loss(g, atk_id, tgt_id);
@@ -116,26 +117,29 @@ static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid at
     //int attack_roll = rand() % 20 + 1 + str_bonus + atk_bonus; // 1d20 + str bonus + attack bonus
     //if (attack_roll >= base_ac) {
 
-    auto maybe_shield = g.ct.get<equipped_shield>(target_id);
-    if (!maybe_shield.has_value()) {
-        // no shield
-        // compute attack roll
-        // eventually we will need to select str or dex bonus
-        // depending on weapon type, class, etc
-        const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
-        const int target_ac = compute_armor_class(g, target_id);
-        const bool attack_successful = roll >= target_ac;
-        process_attack_results(g, attacker_id, target_id, attack_successful);
-        return attack_successful;
-    }
+    //auto maybe_shield = g.ct.get<equipped_shield>(target_id);
+    //if (!maybe_shield.has_value()) {
+    // no shield
+    // compute attack roll
+    // eventually we will need to select str or dex bonus
+    // depending on weapon type, class, etc
+    //const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
+    //const int target_ac = compute_armor_class(g, target_id);
+    //const bool attack_successful = compute_attack_roll(g, attacker_id, target_id);
+    //process_attack_results(g, attacker_id, target_id, attack_successful);
+    //return attack_successful;
+    //}
 
-    const auto shield_id = maybe_shield.value();
+    const entityid shield_id = g.ct.get<equipped_shield>(target_id).value_or(ENTITYID_INVALID);
+
+    //maybe_shield.value();
     if (shield_id == ENTITYID_INVALID) {
         // no shield
         // compute attack roll
-        const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
-        const int target_ac = compute_armor_class(g, target_id);
-        const bool attack_successful = roll >= target_ac;
+        //const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
+        //const int target_ac = compute_armor_class(g, target_id);
+        //const bool attack_successful = roll >= target_ac;
+        const bool attack_successful = compute_attack_roll(g, attacker_id, target_id);
         process_attack_results(g, attacker_id, target_id, attack_successful);
         return attack_successful;
     }
@@ -158,9 +162,10 @@ static inline bool process_attack_entity(gamestate& g, tile_t& tile, entityid at
     } else if (roll <= low_roll) {
         // failed to block
         // compute attack roll
-        const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
-        const int target_ac = compute_armor_class(g, target_id);
-        const bool attack_successful = roll >= target_ac;
+        //const int roll = GetRandomValue(1, 20) + get_stat_bonus(g.ct.get<strength>(attacker_id).value_or(10));
+        //const int target_ac = compute_armor_class(g, target_id);
+        //const bool attack_successful = roll >= target_ac;
+        const bool attack_successful = compute_attack_roll(g, attacker_id, target_id);
         process_attack_results(g, attacker_id, target_id, attack_successful);
         return attack_successful;
     }
