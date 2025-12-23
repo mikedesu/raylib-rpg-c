@@ -150,6 +150,10 @@ static inline attack_result_t process_attack_entity(gamestate& g, tile_t& tile, 
         return ATTACK_RESULT_HIT;
     }
 
+
+    // decrement shield durability
+    handle_shield_durability_loss(g, target_id, attacker_id);
+
     handle_shield_block_sfx(g, target_id);
     g.ct.set<block_success>(target_id, true);
     g.ct.set<update>(target_id, true);
