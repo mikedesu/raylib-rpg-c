@@ -19,7 +19,6 @@
 #include <unordered_map>
 #include <vector>
 
-
 #define DEFAULT_MUSIC_VOLUME 0.0f
 #define DEFAULT_MSG_HIST_BGCOLOR ((Color){0x33, 0x33, 0x33, 255})
 #define GAMESTATE_SIZEOFTIMEBUF 64
@@ -33,18 +32,16 @@
 #define MAX_MUSIC_PATH_LENGTH 256
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
+#define GAMESTATE_DEBUGPANEL_DEFAULT_WIDTH 200
+#define GAMESTATE_DEBUGPANEL_DEFAULT_HEIGHT 200
+
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
 #define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
-
 
 using std::make_shared;
 using std::string;
 using std::unordered_map;
 using std::vector;
-
-
-//typedef struct gamestate {
-
 
 class gamestate {
 public:
@@ -180,23 +177,18 @@ public:
     void reset() {
         minfo("gamestate reset");
 
-        msg_system_is_active = false;
         version = GAME_VERSION;
-        cam_lockon = true;
-        frame_dirty = true;
         debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
         debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
-        debugpanel.w = 200;
-        debugpanel.h = 200;
+        debugpanel.w = GAMESTATE_DEBUGPANEL_DEFAULT_WIDTH;
+        debugpanel.h = GAMESTATE_DEBUGPANEL_DEFAULT_HEIGHT;
         debugpanel.fg_color = RAYWHITE;
         debugpanel.bg_color = RED;
         debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
 
-        targetwidth = targetheight = -1;
-        windowwidth = windowheight = -1;
+        targetwidth = targetheight = windowwidth = windowheight = -1;
         hero_id = entity_turn = new_entityid_begin = new_entityid_end = -1;
-        timebegan = time(NULL);
-        currenttime = time(NULL);
+        timebegan = currenttime = time(NULL);
         timebegantm = localtime(&timebegan);
         currenttimetm = localtime(&currenttime);
         bzero(timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
@@ -204,8 +196,25 @@ public:
         strftime(timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", timebegantm);
         strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
 
-        debugpanelon = player_input_received = is_locked = gridon = display_inventory_menu = display_quit_menu = display_help_menu = do_quit =
-            processing_actions = cam_changed = gameover = test_guard = dirty_entities = display_sort_inventory_menu = music_volume_changed = false;
+        cam_lockon = true;
+        frame_dirty = true;
+        debugpanelon = false;
+        player_input_received = false;
+        is_locked = false;
+        gridon = false;
+        display_inventory_menu = false;
+        display_quit_menu = false;
+        display_help_menu = false;
+        do_quit = false;
+        processing_actions = false;
+        cam_changed = false;
+        gameover = false;
+        test_guard = false;
+        dirty_entities = false;
+        display_sort_inventory_menu = false;
+        music_volume_changed = false;
+        player_changing_dir = false;
+        msg_system_is_active = false;
 
         gameplay_settings_menu_selection = 0;
         cam2d.target = cam2d.offset = (Vector2){0, 0};
@@ -218,30 +227,33 @@ public:
         font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
         pad = 20;
         line_spacing = 1.0f;
-        player_changing_dir = false;
         // weird bug maybe when set to 0?
         next_entityid = 1;
+
         current_music_index = 0;
         restart_count = 0;
         do_restart = 0;
         title_screen_selection = 0;
-        max_title_screen_selections = 2;
         lock = 0;
         frame_updates = 0;
         framecount = 0;
         turn_count = 0;
         inventory_menu_selection = 0;
+        msg_history_max_len_msg_measure = 0;
+        debugpanel.pad_top = 0;
+        debugpanel.pad_left = 0;
+        debugpanel.pad_right = 0;
+        debugpanel.pad_bottom = 0;
+        msg_history_max_len_msg = 0;
 
-        debugpanel.pad_top = debugpanel.pad_left = debugpanel.pad_right = debugpanel.pad_bottom = 0;
-        msg_history_max_len_msg = msg_history_max_len_msg_measure = 0;
+        max_title_screen_selections = 2;
+
         // initialize character creation
         chara_creation.name = "hero";
-        chara_creation.strength = 10;
-        chara_creation.dexterity = 10;
-        chara_creation.intelligence = 10;
-        chara_creation.wisdom = 10;
-        chara_creation.constitution = 10;
-        chara_creation.charisma = 10;
+
+        chara_creation.strength = chara_creation.dexterity = chara_creation.intelligence = chara_creation.wisdom = chara_creation.constitution =
+            chara_creation.charisma = 10;
+
         chara_creation.race = RACE_HUMAN;
         chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
         // why is the above line crashing?
@@ -251,7 +263,6 @@ public:
         music_volume = DEFAULT_MUSIC_VOLUME;
         last_click_screen_pos = (Vector2){-1, -1};
 
-        msg_system_is_active = false;
 
         msg_system.clear();
         msg_history.clear();
