@@ -4,6 +4,7 @@ We are looking to clean up the file, fix potential bugs, and prepare for the fut
 
 I have already done the following:
 
+- [x] **FIXED** There is now a bug where taking lethal damage with a shield does not kill the player
 - [x] magic values were created for MAX BLOCK CHANCE and MINIMUM DAMAGE so they arent hardcoded into try attack entity
 - [x] There are three identical calls to process_attack_results() in process_attack_entity(), each marked with // <===== ############. 
   - [x] fixed and cleaned up
@@ -38,6 +39,5 @@ Previous analysis suggestions you've brought up that I will eventually implement
 
 My own thoughts derived from your analysis:
 
-- [ ] There is now a bug where taking lethal damage with a shield does not kill the player
 - [ ] Shields will need durability soon as well as durability reduction and breaking handled
 

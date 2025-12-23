@@ -47,11 +47,6 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     const char* atk_name = attacker_name.c_str();
     const char* tgt_name = target_name.c_str();
 
-    if (!atk_successful) {
-        minfo("Missed attack");
-        add_message_history(g, "%s swings at %s and misses!", atk_name, tgt_name);
-        return;
-    }
 
     if (get_npc_dead(g, tgt_id)) {
         minfo("Target is dead");
@@ -59,29 +54,34 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
         return;
     }
 
+    if (!atk_successful) {
+        minfo("Missed attack");
+        add_message_history(g, "%s swings at %s and misses!", atk_name, tgt_name);
+        return;
+    }
+
+
     const int dmg = compute_attack_damage(g, atk_id, tgt_id);
     g.ct.set<damaged>(tgt_id, true);
     g.ct.set<update>(tgt_id, true);
 
     auto maybe_tgt_hp = g.ct.get<hp>(tgt_id);
-
     if (!maybe_tgt_hp.has_value()) {
         merror("target has no HP component");
         return;
     }
 
-    const int tgt_hp = maybe_tgt_hp.value();
-
-    if (tgt_hp <= 0) {
-        merror("Target is already dead, hp was: %d", tgt_hp);
-        set_npc_dead(g, tgt_id);
-        return;
-    }
+    const int tgt_hp = maybe_tgt_hp.value() - dmg;
+    //if (tgt_hp <= 0) {
+    //    merror("Target is already dead, hp was: %d", tgt_hp);
+    //    set_npc_dead(g, tgt_id);
+    //    return;
+    //}
 
     minfo("damage dealt");
     add_message_history(g, "%s deals %d damage to %s", atk_name, dmg, tgt_name);
 
-    g.ct.set<hp>(tgt_id, tgt_hp - dmg);
+    g.ct.set<hp>(tgt_id, tgt_hp);
 
     // decrement weapon durability
     handle_weapon_durability_loss(g, atk_id, tgt_id);
@@ -112,6 +112,13 @@ static inline attack_result_t process_attack_entity(gamestate& g, tile_t& tile, 
         return ATTACK_RESULT_MISS;
     if (g.ct.get<dead>(target_id).value_or(true))
         return ATTACK_RESULT_MISS;
+
+    const string attacker_name = get_entity_name(g, attacker_id);
+    const string target_name = get_entity_name(g, target_id);
+    const char* atk_name = attacker_name.c_str();
+    const char* tgt_name = target_name.c_str();
+
+
     // they have a shield
     // still need to do attack successful check
     const bool attack_successful = compute_attack_roll(g, attacker_id, target_id);
@@ -138,6 +145,7 @@ static inline attack_result_t process_attack_entity(gamestate& g, tile_t& tile, 
     const int low_roll = MAX_BLOCK_CHANCE - chance;
     if (roll <= low_roll) {
         // failed to block
+        minfo("%s failed to block", tgt_name);
         process_attack_results(g, attacker_id, target_id, true);
         return ATTACK_RESULT_HIT;
     }
@@ -145,11 +153,6 @@ static inline attack_result_t process_attack_entity(gamestate& g, tile_t& tile, 
     handle_shield_block_sfx(g, target_id);
     g.ct.set<block_success>(target_id, true);
     g.ct.set<update>(target_id, true);
-
-    const string attacker_name = get_entity_name(g, attacker_id);
-    const string target_name = get_entity_name(g, target_id);
-    const char* atk_name = attacker_name.c_str();
-    const char* tgt_name = target_name.c_str();
 
     minfo("attack blocked");
     add_message_history(g, "%s blocked an attack from %s", tgt_name, atk_name);

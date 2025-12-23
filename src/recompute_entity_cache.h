@@ -5,7 +5,7 @@
 
 static inline void recompute_entity_cache(gamestate& g, tile_t& t) {
     // Only recompute if cache is dirty
-    minfo("recompute entity cache...");
+    //minfo("recompute entity cache...");
     if (!t.dirty_entities)
         return;
     // Reset counters
