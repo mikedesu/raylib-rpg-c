@@ -4,6 +4,7 @@ We are looking to clean up the file, fix potential bugs, and prepare for the fut
 
 I have already done the following:
 
+- [x] Shields now have durability and have durability reduced when successfully blocking
 - [x] **FIXED** There is now a bug where taking lethal damage with a shield does not kill the player
 - [x] magic values were created for MAX BLOCK CHANCE and MINIMUM DAMAGE so they arent hardcoded into try attack entity
 - [x] There are three identical calls to process_attack_results() in process_attack_entity(), each marked with // <===== ############. 
@@ -15,7 +16,6 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle:
 
-- [ ] Shields will need durability soon as well as durability reduction and breaking handled
 - [ ] on game restart after dying, we need to clear the message history, as well as reset the gamestate in general
 - [ ] to prepare for unit testing and automation, we need to re-factor gamestate into a proper object
   - [ ] code from `liblogic` will be used to manage initializing the dungeon, etc
