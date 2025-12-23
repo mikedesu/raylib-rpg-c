@@ -251,6 +251,11 @@ public:
         music_volume = DEFAULT_MUSIC_VOLUME;
         last_click_screen_pos = (Vector2){-1, -1};
 
+        msg_system_is_active = false;
+
+        msg_system.clear();
+        msg_history.clear();
+
         init_music_paths();
     }
 
