@@ -29,7 +29,7 @@ static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entityt
 }
 
 
-static inline void handle_attack_sounds(gamestate& g, entityid attacker, attack_result_t result) {
+static inline void handle_attack_sfx(gamestate& g, entityid attacker, attack_result_t result) {
     if (!check_hearing(g, g.hero_id, g.ct.get<location>(attacker).value_or((vec3){-1, -1, -1})))
         return;
     int index = SFX_SLASH_ATTACK_SWORD_1;
@@ -38,13 +38,22 @@ static inline void handle_attack_sounds(gamestate& g, entityid attacker, attack_
     } else if (result == ATTACK_RESULT_HIT) {
         index = SFX_HIT_METAL_ON_FLESH;
     } else if (result == ATTACK_RESULT_MISS) {
-        const weapontype_t wpn_type = g.ct.get<weapontype>(g.ct.get<equipped_weapon>(attacker).value_or(ENTITYID_INVALID)).value_or(WEAPON_NONE);
+        const entityid weapon_id = g.ct.get<equipped_weapon>(attacker).value_or(ENTITYID_INVALID);
+        const weapontype_t wpn_type = g.ct.get<weapontype>(weapon_id).value_or(WEAPON_NONE);
         index = wpn_type == WEAPON_SWORD    ? SFX_SLASH_ATTACK_SWORD_1
                 : wpn_type == WEAPON_AXE    ? SFX_SLASH_ATTACK_HEAVY_1
                 : wpn_type == WEAPON_DAGGER ? SFX_SLASH_ATTACK_LIGHT_1
                                             : SFX_SLASH_ATTACK_SWORD_1;
     }
     PlaySound(g.sfx[index]);
+}
+
+
+static inline void handle_shield_block_sfx(gamestate& g, entityid target_id) {
+    const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
+    if (event_heard) {
+        PlaySound(g.sfx[SFX_HIT_METAL_ON_METAL]);
+    }
 }
 
 
@@ -127,10 +136,7 @@ static inline attack_result_t process_attack_entity(gamestate& g, tile_t& tile, 
                 return ATTACK_RESULT_HIT;
             }
             // block successful
-            const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
-            if (event_heard) {
-                PlaySound(g.sfx[SFX_HIT_METAL_ON_METAL]);
-            }
+            handle_shield_block_sfx(g, target_id);
             g.ct.set<block_success>(target_id, true);
             g.ct.set<update>(target_id, true);
             add_message_history(g,
@@ -164,6 +170,6 @@ static inline void try_entity_attack(gamestate& g, entityid atk_id, int tgt_x, i
     const entityid npc_id = get_cached_npc(g, tile);
     const attack_result_t result = process_attack_entity(g, tile, atk_id, npc_id);
     // did the hero hear this event?
-    handle_attack_sounds(g, atk_id, result);
+    handle_attack_sfx(g, atk_id, result);
     set_gamestate_flag_for_attack_animation(g, g.ct.get<entitytype>(atk_id).value_or(ENTITY_NONE));
 }
