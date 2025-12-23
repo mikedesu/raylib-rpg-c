@@ -3,7 +3,8 @@
 #include "gamestate.h"
 
 static inline entityid create_shield_with(gamestate& g, function<void(gamestate&, entityid)> shieldInitFunction) {
-    const auto id = g_add_entity(g);
+    //const auto id = g_add_entity(g);
+    const auto id = g.add_entity();
     g.ct.set<entitytype>(id, ENTITY_ITEM);
     g.ct.set<itemtype>(id, ITEM_SHIELD);
     g.ct.set<durability>(id, 100);

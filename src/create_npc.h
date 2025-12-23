@@ -87,7 +87,8 @@ static inline void set_npc_defaults(gamestate& g, entityid id) {
 
 static inline entityid create_npc_with(gamestate& g, race_t rt, function<void(gamestate&, entityid)> npcInitFunction) {
     minfo("begin create npc");
-    const entityid id = g_add_entity(g);
+    //const entityid id = g_add_entity(g);
+    const auto id = g.add_entity();
     set_npc_defaults(g, id);
     g.ct.set<race>(id, rt);
     set_npc_starting_stats(g, id);

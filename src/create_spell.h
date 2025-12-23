@@ -5,7 +5,8 @@
 #include "tile_has_live_npcs.h"
 
 static inline entityid create_spell_with(gamestate& g, function<void(gamestate&, entityid)> spellInitFunction) {
-    const auto id = g_add_entity(g);
+    //const auto id = g_add_entity(g);
+    const auto id = g.add_entity();
     g.ct.set<entitytype>(id, ENTITY_SPELL);
     g.ct.set<spelltype>(id, SPELLTYPE_FIRE);
     g.ct.set<spellstate>(id, SPELLSTATE_NONE);

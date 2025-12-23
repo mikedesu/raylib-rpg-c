@@ -15,9 +15,7 @@
 #include "libgame_version.h"
 #include "scene.h"
 #include <ctime>
-#include <memory>
 #include <raylib.h>
-#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -40,8 +38,6 @@
 
 
 using std::make_shared;
-using std::set;
-using std::shared_ptr;
 using std::string;
 using std::unordered_map;
 using std::vector;
@@ -76,7 +72,6 @@ public:
     bool player_input_received;
     bool is_locked;
     bool processing_actions;
-    bool is3d;
     bool gameover;
     bool player_changing_dir;
     bool test_guard;
@@ -95,7 +90,6 @@ public:
 
     int framecount;
     int fadealpha;
-    int camera_mode;
     int targetwidth;
     int targetheight;
     int windowwidth;
@@ -140,7 +134,6 @@ public:
     Vector2 last_click_screen_pos;
     Vector2 inventory_cursor = {0, 0};
     Camera2D cam2d;
-    Camera3D cam3d;
     Font font;
 
     ComponentTable ct;
@@ -148,106 +141,7 @@ public:
 
     gamestate() {
         minfo("Initializing gamestate");
-        msg_system_is_active = false;
-        version = GAME_VERSION;
-        cam_lockon = true;
-        frame_dirty = true;
-        debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
-        debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
-        debugpanel.w = 200;
-        debugpanel.h = 200;
-        debugpanel.fg_color = RAYWHITE;
-        debugpanel.bg_color = RED;
-        debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
-        targetwidth = -1;
-        targetheight = -1;
-        windowwidth = -1;
-        windowheight = -1;
-        hero_id = -1;
-        entity_turn = -1;
-        new_entityid_begin = -1;
-        new_entityid_end = -1;
-        timebegan = time(NULL);
-        currenttime = time(NULL);
-        timebegantm = localtime(&timebegan);
-        currenttimetm = localtime(&currenttime);
-        bzero(timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
-        bzero(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
-        strftime(timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", timebegantm);
-        strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
-        debugpanelon = false;
-        player_input_received = false;
-        is_locked = false;
-        gridon = false;
-        display_inventory_menu = false;
-        display_quit_menu = false;
-        display_help_menu = false;
-        do_quit = false;
-        processing_actions = false;
-        cam_changed = false;
-        is3d = false;
-        gameover = false;
-        test_guard = false;
-        dirty_entities = false;
-        display_sort_inventory_menu = false;
-        music_volume_changed = false;
-        gameplay_settings_menu_selection = 0;
-        cam2d.target = (Vector2){0, 0};
-        cam2d.offset = (Vector2){0, 0};
-        cam2d.zoom = 4.0f;
-        cam2d.rotation = 0.0;
-        fadealpha = 0.0;
-        cam3d = (Camera3D){0};
-        cam3d.position = (Vector3){0.0f, 20.0f, 20.0f};
-        cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
-        cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
-        cam3d.fovy = 45.0f;
-        cam3d.projection = CAMERA_PERSPECTIVE;
-        camera_mode = CAMERA_FREE;
-        controlmode = CONTROLMODE_PLAYER;
-        // current displayed dungeon floor
-        flag = GAMESTATE_FLAG_PLAYER_INPUT;
-        font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
-        pad = 20;
-        line_spacing = 1.0f;
-        player_changing_dir = false;
-        // weird bug maybe when set to 0?
-        next_entityid = 1;
-        current_music_index = 0;
-        restart_count = 0;
-        do_restart = 0;
-        title_screen_selection = 0;
-        max_title_screen_selections = 2;
-        lock = 0;
-        frame_updates = 0;
-        framecount = 0;
-        turn_count = 0;
-        debugpanel.pad_top = 0;
-        debugpanel.pad_left = 0;
-        debugpanel.pad_right = 0;
-        debugpanel.pad_bottom = 0;
-        inventory_menu_selection = 0;
-        msg_history_max_len_msg = 0;
-        msg_history_max_len_msg_measure = 0;
-        // initialize character creation
-        chara_creation.name = "hero";
-        chara_creation.strength = 10;
-        chara_creation.dexterity = 10;
-        chara_creation.intelligence = 10;
-        chara_creation.wisdom = 10;
-        chara_creation.constitution = 10;
-        chara_creation.charisma = 10;
-        chara_creation.race = RACE_HUMAN;
-        chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
-        // why is the above line crashing?
-        // the above line is also crashing
-        msuccess("Gamestate character creation name set to empty string");
-        current_scene = SCENE_TITLE;
-        music_volume = DEFAULT_MUSIC_VOLUME;
-        last_click_screen_pos = (Vector2){-1, -1};
-
-        init_music_paths();
-
+        reset();
         msuccess("Gamestate initialized successfully");
     }
 
@@ -258,6 +152,7 @@ public:
         FILE* file = fopen(music_path_file, "r");
         massert(file, "Could not open music path file: %s", music_path_file);
         char buffer[128];
+        music_file_paths.clear();
         while (fgets(buffer, sizeof(buffer), file) != NULL) {
             // Remove newline character if present
             minfo("Removing newline character...");
@@ -284,6 +179,79 @@ public:
 
     void reset() {
         minfo("gamestate reset");
+
+        msg_system_is_active = false;
+        version = GAME_VERSION;
+        cam_lockon = true;
+        frame_dirty = true;
+        debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
+        debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
+        debugpanel.w = 200;
+        debugpanel.h = 200;
+        debugpanel.fg_color = RAYWHITE;
+        debugpanel.bg_color = RED;
+        debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
+
+        targetwidth = targetheight = -1;
+        windowwidth = windowheight = -1;
+        hero_id = entity_turn = new_entityid_begin = new_entityid_end = -1;
+        timebegan = time(NULL);
+        currenttime = time(NULL);
+        timebegantm = localtime(&timebegan);
+        currenttimetm = localtime(&currenttime);
+        bzero(timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
+        bzero(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
+        strftime(timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", timebegantm);
+        strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
+
+        debugpanelon = player_input_received = is_locked = gridon = display_inventory_menu = display_quit_menu = display_help_menu = do_quit =
+            processing_actions = cam_changed = gameover = test_guard = dirty_entities = display_sort_inventory_menu = music_volume_changed = false;
+
+        gameplay_settings_menu_selection = 0;
+        cam2d.target = cam2d.offset = (Vector2){0, 0};
+        cam2d.zoom = 4.0f;
+        cam2d.rotation = 0.0;
+        fadealpha = 0.0;
+        controlmode = CONTROLMODE_PLAYER;
+        // current displayed dungeon floor
+        flag = GAMESTATE_FLAG_PLAYER_INPUT;
+        font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
+        pad = 20;
+        line_spacing = 1.0f;
+        player_changing_dir = false;
+        // weird bug maybe when set to 0?
+        next_entityid = 1;
+        current_music_index = 0;
+        restart_count = 0;
+        do_restart = 0;
+        title_screen_selection = 0;
+        max_title_screen_selections = 2;
+        lock = 0;
+        frame_updates = 0;
+        framecount = 0;
+        turn_count = 0;
+        inventory_menu_selection = 0;
+
+        debugpanel.pad_top = debugpanel.pad_left = debugpanel.pad_right = debugpanel.pad_bottom = 0;
+        msg_history_max_len_msg = msg_history_max_len_msg_measure = 0;
+        // initialize character creation
+        chara_creation.name = "hero";
+        chara_creation.strength = 10;
+        chara_creation.dexterity = 10;
+        chara_creation.intelligence = 10;
+        chara_creation.wisdom = 10;
+        chara_creation.constitution = 10;
+        chara_creation.charisma = 10;
+        chara_creation.race = RACE_HUMAN;
+        chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
+        // why is the above line crashing?
+        // the above line is also crashing
+        msuccess("Gamestate character creation name set to empty string");
+        current_scene = SCENE_TITLE;
+        music_volume = DEFAULT_MUSIC_VOLUME;
+        last_click_screen_pos = (Vector2){-1, -1};
+
+        init_music_paths();
     }
 
 
@@ -297,18 +265,18 @@ public:
         msuccess("Hero ID set to %d", id);
         return true;
     }
-};
 
 
-static inline entityid g_add_entity(gamestate& g) {
-    entityid id = g.next_entityid;
-    if (!g.dirty_entities) {
-        g.dirty_entities = true;
-        g.new_entityid_begin = id;
-        g.new_entityid_end = id + 1;
-    } else {
-        g.new_entityid_end = id + 1;
+    entityid add_entity() {
+        const entityid id = next_entityid;
+        if (!dirty_entities) {
+            dirty_entities = true;
+            new_entityid_begin = id;
+            new_entityid_end = id + 1;
+        } else {
+            new_entityid_end = id + 1;
+        }
+        next_entityid++;
+        return id;
     }
-    g.next_entityid++;
-    return id;
-}
+};

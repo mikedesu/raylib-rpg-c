@@ -5,7 +5,8 @@
 
 static inline entityid create_weapon_with(gamestate& g, function<void(gamestate&, entityid)> weaponInitFunction) {
     //massert(g, "gamestate is NULL");
-    const auto id = g_add_entity(g);
+    //const auto id = g_add_entity(g);
+    const auto id = g.add_entity();
     g.ct.set<entitytype>(id, ENTITY_ITEM);
     g.ct.set<itemtype>(id, ITEM_WEAPON);
     g.ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});

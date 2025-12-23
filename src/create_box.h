@@ -6,7 +6,7 @@
 #include "tile_has_live_npcs.h"
 
 static inline entityid create_box_with(gamestate& g, function<void(gamestate&, entityid)> boxInitFunction) {
-    const auto id = g_add_entity(g);
+    const auto id = g.add_entity();
     g.ct.set<entitytype>(id, ENTITY_BOX);
     g.ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
     g.ct.set<update>(id, true);

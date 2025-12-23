@@ -5,7 +5,8 @@
 
 static inline entityid create_door_with(gamestate& g, function<void(gamestate&, entityid)> doorInitFunction) {
     //massert(g, "gamestate is NULL");
-    const auto id = g_add_entity(g);
+    //const auto id = g_add_entity(g);
+    const auto id = g.add_entity();
     g.ct.set<entitytype>(id, ENTITY_DOOR);
     doorInitFunction(g, id);
     return id;
