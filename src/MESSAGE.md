@@ -13,10 +13,14 @@ I have already done the following:
   - [x] created an `attack_result_t` to separate attack result types: HIT, MISS, BLOCK (to start with...DODGE, DEFLECT, etc may come later...)
   - [x] sound effect selected based on `attack_result_t`
 
-Previous analysis suggestions you've brought up that I will eventually implement.
+Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle:
 
+- [ ] Shields will need durability soon as well as durability reduction and breaking handled
+- [ ] on game restart after dying, we need to clear the message history, as well as reset the gamestate in general
+- [ ] to prepare for unit testing and automation, we need to re-factor gamestate into a proper object
+  - [ ] code from `liblogic` will be used to manage initializing the dungeon, etc
+  - [ ] we will be able to set a flag indicating the gamestate is in a unit-test environment (so we can skip rendering and simply simulate the dungeon)
 - [ ] break `process_attack_entity` and `process_attack_results` up into further functions
-- [ ] negative damage isnt taken into consideration in an attack
 - [ ] Currently in `process_attack_results`, the damage calculation doesn't account for
   - [ ] Target's equipped armor **WONT FIX: armor is currently un-implemented**
   - [ ] Armor durability loss (similar to weapon durability logic) **WONT FIX: armor is currently un-implemented**
@@ -36,8 +40,4 @@ Previous analysis suggestions you've brought up that I will eventually implement
     - [ ] piercing
     - [ ] poison
   - [ ] damage to attributes and stats
-
-My own thoughts derived from your analysis:
-
-- [ ] Shields will need durability soon as well as durability reduction and breaking handled
 

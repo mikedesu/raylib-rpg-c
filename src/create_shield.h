@@ -6,6 +6,10 @@ static inline entityid create_shield_with(gamestate& g, function<void(gamestate&
     const auto id = g_add_entity(g);
     g.ct.set<entitytype>(id, ENTITY_ITEM);
     g.ct.set<itemtype>(id, ITEM_SHIELD);
+    g.ct.set<durability>(id, 100);
+    g.ct.set<max_durability>(id, 100);
+    g.ct.set<rarity>(id, RARITY_COMMON);
+
     shieldInitFunction(g, id);
     return id;
 }

@@ -31,7 +31,7 @@ static inline void draw_inventory_menu(gamestate& g) {
     float half_width = (menu_box.width - section_gap) / 2.0f;
     float half_height = menu_box.height - title_size.y - box_pad * 2.0f - box_pad;
     // Draw menu background and border
-    DrawRectangleRec(menu_box, (Color){0x33, 0x33, 0x33, 0x99});
+    DrawRectangleRec(menu_box, Fade((Color){0, 0, 255, 255}, 0.8));
     DrawRectangleLinesEx(menu_box, 2, WHITE);
     // Draw menu title centered at top
     DrawText(menu_title, title_x, title_y, font_size, WHITE);
@@ -154,6 +154,12 @@ static inline void draw_inventory_menu(gamestate& g) {
 
                         DrawText(TextFormat("Block chance: %d", block), cur_x, cur_y, fontsize, WHITE);
                         cur_y += y_incr;
+
+                        const int dura = g.ct.get<durability>(selection_id).value_or(-1);
+                        const int max_dura = g.ct.get<max_durability>(selection_id).value_or(-1);
+                        DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, WHITE);
+                        cur_y += y_incr;
+
                     } else if (item_type == ITEM_POTION) {
                         const vec3 heal = g.ct.get<healing>(selection_id).value_or((vec3){-1, -1, -1});
                         DrawText(TextFormat("Heal amount: %d-%d", heal.x, heal.y), cur_x, cur_y, fontsize, WHITE);
@@ -167,6 +173,5 @@ static inline void draw_inventory_menu(gamestate& g) {
                 }
             }
         }
-        //}
     }
 }
