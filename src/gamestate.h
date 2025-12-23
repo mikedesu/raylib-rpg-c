@@ -20,10 +20,9 @@
 #include <vector>
 
 #define DEFAULT_MUSIC_VOLUME 0.0f
-#define DEFAULT_MSG_HIST_BGCOLOR ((Color){0x33, 0x33, 0x33, 255})
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
-#define GAMESTATE_SIZEOFTEXINFOARRAY 1024
+#define GAMESTATE_SIZEOFTEXINFOARRAY 2048
 #define MAX_MESSAGES 64
 #define MAX_MSG_LENGTH 256
 #define LIST_INIT_CAPACITY 16
@@ -36,7 +35,7 @@
 #define GAMESTATE_DEBUGPANEL_DEFAULT_HEIGHT 200
 
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
-#define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
+#define GAMESTATE_INIT_ENTITYIDS_MAX 3000000
 
 using std::make_shared;
 using std::string;
@@ -266,6 +265,8 @@ public:
 
         msg_system.clear();
         msg_history.clear();
+
+        ct.clear();
 
         init_music_paths();
     }

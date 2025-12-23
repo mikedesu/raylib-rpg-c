@@ -67,5 +67,8 @@ public:
     bool remove(entityid entity) {
         return getStore<Kind>()->erase(entity) > 0;
     }
-    void clear() { stores.clear(); }
+    // Empty the table
+    void clear() {
+        stores.clear();
+    }
 };
