@@ -5,13 +5,19 @@
 #include "attack_result.h"
 #include "check_hearing.h"
 #include "compute_armor_class.h"
+#include "compute_attack_damage.h"
 #include "compute_attack_roll.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate.h"
 #include "get_cached_npc.h"
 #include "get_entity_name.h"
+#include "get_entity_type.h"
+#include "get_npc_dead.h"
+#include "get_npc_xp.h"
+#include "handle_attack_sfx.h"
 #include "handle_durability_loss.h"
+#include "handle_shield_block_sfx.h"
 #include "magic_values.h"
 #include "manage_inventory.h"
 #include "play_sound.h"
@@ -19,6 +25,7 @@
 #include "set_npc_dead.h"
 #include "sfx.h"
 #include "stat_bonus.h"
+#include "update_npc_xp.h"
 
 static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entitytype_t type) {
     massert(type == ENTITY_PLAYER || type == ENTITY_NPC, "type is not player or npc!");
@@ -28,34 +35,6 @@ static inline void set_gamestate_flag_for_attack_animation(gamestate& g, entityt
         g.flag = GAMESTATE_FLAG_NPC_ANIM;
     else
         merror("Unknown flag state, invalid type: %d", type);
-}
-
-
-static inline void handle_attack_sfx(gamestate& g, entityid attacker, attack_result_t result) {
-    if (!check_hearing(g, g.hero_id, g.ct.get<location>(attacker).value_or((vec3){-1, -1, -1})))
-        return;
-    int index = SFX_SLASH_ATTACK_SWORD_1;
-    if (result == ATTACK_RESULT_BLOCK) {
-        index = SFX_HIT_METAL_ON_METAL;
-    } else if (result == ATTACK_RESULT_HIT) {
-        index = SFX_HIT_METAL_ON_FLESH;
-    } else if (result == ATTACK_RESULT_MISS) {
-        const entityid weapon_id = g.ct.get<equipped_weapon>(attacker).value_or(ENTITYID_INVALID);
-        const weapontype_t wpn_type = g.ct.get<weapontype>(weapon_id).value_or(WEAPON_NONE);
-        index = wpn_type == WEAPON_SWORD    ? SFX_SLASH_ATTACK_SWORD_1
-                : wpn_type == WEAPON_AXE    ? SFX_SLASH_ATTACK_HEAVY_1
-                : wpn_type == WEAPON_DAGGER ? SFX_SLASH_ATTACK_LIGHT_1
-                                            : SFX_SLASH_ATTACK_SWORD_1;
-    }
-    PlaySound(g.sfx[index]);
-}
-
-
-static inline void handle_shield_block_sfx(gamestate& g, entityid target_id) {
-    const bool event_heard = check_hearing(g, g.hero_id, g.ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
-    if (event_heard) {
-        PlaySound(g.sfx[SFX_HIT_METAL_ON_METAL]);
-    }
 }
 
 
@@ -73,43 +52,48 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
         add_message_history(g, "%s swings at %s and misses!", atk_name, tgt_name);
         return;
     }
-    const entityid equipped_wpn = g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
 
-    const vec3 dmg_range = g.ct.get<damage>(equipped_wpn).value_or(MINIMUM_DAMAGE);
+    if (get_npc_dead(g, tgt_id)) {
+        minfo("Target is dead");
+        add_message_history(g, "%s swings at a dead target", atk_name);
+        return;
+    }
 
-    const int dmg = GetRandomValue(dmg_range.x, dmg_range.y);
+    const int dmg = compute_attack_damage(g, atk_id, tgt_id);
     g.ct.set<damaged>(tgt_id, true);
     g.ct.set<update>(tgt_id, true);
+
     auto maybe_tgt_hp = g.ct.get<hp>(tgt_id);
+
     if (!maybe_tgt_hp.has_value()) {
         merror("target has no HP component");
         return;
     }
-    int tgt_hp = maybe_tgt_hp.value();
+
+    const int tgt_hp = maybe_tgt_hp.value();
+
     if (tgt_hp <= 0) {
         merror("Target is already dead, hp was: %d", tgt_hp);
-        g.ct.set<dead>(tgt_id, true);
+        set_npc_dead(g, tgt_id);
         return;
     }
-    //add_message_history(g, "%s deals %d damage to %s", get_entity_name(g, atk_id).c_str(), dmg, get_entity_name(g, tgt_id).c_str());
+
     minfo("damage dealt");
     add_message_history(g, "%s deals %d damage to %s", atk_name, dmg, tgt_name);
-    tgt_hp -= dmg;
-    g.ct.set<hp>(tgt_id, tgt_hp);
+
+    g.ct.set<hp>(tgt_id, tgt_hp - dmg);
+
     // decrement weapon durability
     handle_weapon_durability_loss(g, atk_id, tgt_id);
-    if (tgt_hp > 0) {
-        g.ct.set<dead>(tgt_id, false);
+
+    if (tgt_hp > 0)
         return;
-    }
+
     set_npc_dead(g, tgt_id);
-    const entitytype_t tgttype = g.ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE);
-    switch (tgttype) {
+
+    switch (get_entity_type(g, tgt_id)) {
     case ENTITY_NPC: {
-        const int old_xp = g.ct.get<xp>(atk_id).value_or(0);
-        const int reward_xp = 1;
-        const int new_xp = old_xp + reward_xp;
-        g.ct.set<xp>(atk_id, new_xp);
+        update_npc_xp(g, atk_id, tgt_id);
         // handle item drops
         drop_all_from_inventory(g, tgt_id);
     } break;
