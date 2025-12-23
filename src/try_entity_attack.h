@@ -10,6 +10,7 @@
 #include "entitytype.h"
 #include "gamestate.h"
 #include "get_cached_npc.h"
+#include "get_entity_name.h"
 #include "handle_durability_loss.h"
 #include "manage_inventory.h"
 #include "play_sound.h"
@@ -60,10 +61,15 @@ static inline void handle_shield_block_sfx(gamestate& g, entityid target_id) {
 static inline void process_attack_results(gamestate& g, entityid atk_id, entityid tgt_id, bool atk_successful) {
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
+
+    const string attacker_name = get_entity_name(g, atk_id);
+    const string target_name = get_entity_name(g, tgt_id);
+    const char* atk_name = attacker_name.c_str();
+    const char* tgt_name = target_name.c_str();
+
     if (!atk_successful) {
         minfo("Missed attack");
-        add_message_history(
-            g, "%s swings at %s and misses!", g.ct.get<name>(atk_id).value_or("no-name").c_str(), g.ct.get<name>(tgt_id).value_or("no-name").c_str());
+        add_message_history(g, "%s swings at %s and misses!", atk_name, tgt_name);
         return;
     }
     const entityid equipped_wpn = g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
@@ -82,8 +88,9 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
         g.ct.set<dead>(tgt_id, true);
         return;
     }
-    add_message_history(
-        g, "%s deals %d damage to %s", g.ct.get<name>(atk_id).value_or("no-name").c_str(), dmg, g.ct.get<name>(tgt_id).value_or("no-name").c_str());
+    //add_message_history(g, "%s deals %d damage to %s", get_entity_name(g, atk_id).c_str(), dmg, get_entity_name(g, tgt_id).c_str());
+    minfo("damage dealt");
+    add_message_history(g, "%s deals %d damage to %s", atk_name, dmg, tgt_name);
     tgt_hp -= dmg;
     g.ct.set<hp>(tgt_id, tgt_hp);
     // decrement weapon durability
@@ -121,37 +128,54 @@ static inline attack_result_t process_attack_entity(gamestate& g, tile_t& tile, 
     // they have a shield
     // still need to do attack successful check
     const bool attack_successful = compute_attack_roll(g, attacker_id, target_id);
-    if (attack_successful) {
+    attack_result_t result = ATTACK_RESULT_NONE;
+
+
+    // attack unsuccessful
+    if (!attack_successful) {
+        result = ATTACK_RESULT_MISS;
+    } else {
         // check for shield
         const entityid shield_id = g.ct.get<equipped_shield>(target_id).value_or(ENTITYID_INVALID);
         // if has shield
-        if (shield_id != ENTITYID_INVALID) {
+
+        // if no shield
+        if (shield_id == ENTITYID_INVALID) {
+            result = ATTACK_RESULT_HIT;
+        } else {
             // compute chance to block
             const int roll = GetRandomValue(1, 100);
             const int chance = g.ct.get<block_chance>(shield_id).value_or(100);
             const int low_roll = 100 - chance;
             if (roll <= low_roll) {
                 // failed to block
-                process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
-                return ATTACK_RESULT_HIT;
+                result = ATTACK_RESULT_HIT;
             }
             // block successful
-            handle_shield_block_sfx(g, target_id);
-            g.ct.set<block_success>(target_id, true);
-            g.ct.set<update>(target_id, true);
-            add_message_history(g,
-                                "%s blocked an attack from %s",
-                                g.ct.get<name>(target_id).value_or("no-name").c_str(),
-                                g.ct.get<name>(attacker_id).value_or("no-name").c_str());
-            return ATTACK_RESULT_BLOCK;
+            else {
+                handle_shield_block_sfx(g, target_id);
+                g.ct.set<block_success>(target_id, true);
+                g.ct.set<update>(target_id, true);
+
+                const string attacker_name = get_entity_name(g, attacker_id);
+                const string target_name = get_entity_name(g, target_id);
+                const char* atk_name = attacker_name.c_str();
+                const char* tgt_name = target_name.c_str();
+
+
+                minfo("attack blocked");
+                add_message_history(g, "%s blocked an attack from %s", tgt_name, atk_name);
+                result = ATTACK_RESULT_BLOCK;
+            }
         }
-        // if no shield
-        process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
-        return ATTACK_RESULT_HIT;
     }
-    // attack unsuccessful
-    process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
-    return ATTACK_RESULT_MISS;
+
+
+    if (result != ATTACK_RESULT_BLOCK) {
+        process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
+    }
+
+    return result;
 }
 
 
