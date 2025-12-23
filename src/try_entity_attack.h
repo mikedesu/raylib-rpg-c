@@ -12,6 +12,7 @@
 #include "get_cached_npc.h"
 #include "get_entity_name.h"
 #include "handle_durability_loss.h"
+#include "magic_values.h"
 #include "manage_inventory.h"
 #include "play_sound.h"
 #include "recompute_entity_cache.h"
@@ -73,7 +74,9 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
         return;
     }
     const entityid equipped_wpn = g.ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
-    const vec3 dmg_range = g.ct.get<damage>(equipped_wpn).value_or((vec3){1, 2, 0});
+
+    const vec3 dmg_range = g.ct.get<damage>(equipped_wpn).value_or(MINIMUM_DAMAGE);
+
     const int dmg = GetRandomValue(dmg_range.x, dmg_range.y);
     g.ct.set<damaged>(tgt_id, true);
     g.ct.set<update>(tgt_id, true);
@@ -146,9 +149,9 @@ static inline attack_result_t process_attack_entity(gamestate& g, tile_t& tile, 
 
     // if has shield
     // compute chance to block
-    const int roll = GetRandomValue(1, 100);
-    const int chance = g.ct.get<block_chance>(shield_id).value_or(100);
-    const int low_roll = 100 - chance;
+    const int roll = GetRandomValue(1, MAX_BLOCK_CHANCE);
+    const int chance = g.ct.get<block_chance>(shield_id).value_or(MAX_BLOCK_CHANCE);
+    const int low_roll = MAX_BLOCK_CHANCE - chance;
     if (roll <= low_roll) {
         // failed to block
         process_attack_results(g, attacker_id, target_id, true);
