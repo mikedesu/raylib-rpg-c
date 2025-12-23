@@ -38,5 +38,6 @@ Previous analysis suggestions you've brought up that I will eventually implement
 
 My own thoughts derived from your analysis:
 
+- [ ] There is now a bug where taking lethal damage with a shield does not kill the player
 - [ ] Shields will need durability soon as well as durability reduction and breaking handled
 
