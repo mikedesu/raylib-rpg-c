@@ -285,6 +285,18 @@ public:
     void reset() {
         minfo("gamestate reset");
     }
+
+
+    bool set_hero_id(entityid id) {
+        massert(id != ENTITYID_INVALID, "id is invalid");
+        if (id == ENTITYID_INVALID) {
+            merror("g_set_hero_id: id is invalid");
+            return false;
+        }
+        hero_id = id;
+        msuccess("Hero ID set to %d", id);
+        return true;
+    }
 };
 
 
@@ -299,16 +311,4 @@ static inline entityid g_add_entity(gamestate& g) {
     }
     g.next_entityid++;
     return id;
-}
-
-
-static inline bool g_set_hero_id(gamestate& g, entityid id) {
-    massert(id != ENTITYID_INVALID, "id is invalid");
-    if (id == ENTITYID_INVALID) {
-        merror("g_set_hero_id: id is invalid");
-        return false;
-    }
-    g.hero_id = id;
-    msuccess("Hero ID set to %d", id);
-    return true;
 }

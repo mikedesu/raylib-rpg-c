@@ -21,7 +21,7 @@ static inline entityid create_player(gamestate& g, vec3 loc, string n) {
         const int hear_dist = 3;
         const entitytype_t type = ENTITY_PLAYER;
 
-        g_set_hero_id(g, id);
+        g.set_hero_id(id);
         g.ct.set<entitytype>(id, type);
         g.ct.set<txalpha>(id, 0);
         g.ct.set<hp>(id, hp_);
