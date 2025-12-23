@@ -3,6 +3,7 @@
 #include "entityid.h"
 #include "gamestate.h"
 #include "get_racial_modifiers.h"
+#include "race.h"
 #include "stat_bonus.h"
 #include "tile_has_box.h"
 #include "tile_has_live_npcs.h"
@@ -49,6 +50,9 @@ static inline void set_npc_starting_stats(gamestate& g, entityid id) {
     case RACE_GREEN_SLIME: hitdie.y = 4; break;
     case RACE_WOLF: hitdie.y = 6; break;
     case RACE_WARG: hitdie.y = 12; break;
+    case RACE_RAT: hitdie.y = 4; break;
+    case RACE_SKELETON: hitdie.y = 8; break;
+    case RACE_ZOMBIE: hitdie.y = 8; break;
     default: break;
     }
 
