@@ -431,7 +431,7 @@
 430 4 4 0 img/monster/bat_attack.png
 431 4 13 0 img/monster/rat_idle_shadow.png
 432 4 4 0 img/monster/wolf_attack_shadow.png
-433 1 9 0 img/monster/skeleton_die.png
+433 1 6 0 img/monster/skeleton_die.png
 434 4 4 0 img/monster/wolf_jump_shadow.png
 435 3 5 0 img/monster/bat_sleep_shadow.png
 436 1 5 0 img/monster/warg_die_shadow.png
