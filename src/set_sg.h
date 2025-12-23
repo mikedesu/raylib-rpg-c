@@ -114,10 +114,14 @@ static inline void libdraw_set_sg_is_attacking(gamestate& g, entityid id, sprite
     //}
     //if (race == RACE_BAT) {
     //    cur = SG_ANIM_BAT_ATTACK;
-    //} else if (race == RACE_GREEN_SLIME) {
-    //    cur = SG_ANIM_SLIME_ATTACK;
-    //}
-    spritegroup_set_current(sg, cur);
-    update_weapon_for_entity(g, id, sg);
-    g.ct.set<attacking>(id, false);
+    const race_t r = g.ct.get<race>(id).value_or(RACE_NONE);
+    if (r == RACE_GREEN_SLIME) {
+        cur = SG_ANIM_SLIME_JUMP_ATTACK;
+    }
+
+    if (r != RACE_NONE) {
+        spritegroup_set_current(sg, cur);
+        update_weapon_for_entity(g, id, sg);
+        g.ct.set<attacking>(id, false);
+    }
 }
