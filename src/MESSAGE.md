@@ -13,6 +13,7 @@ I have already done the following:
 - [x] unify attack sound handling in `try_entity_attack.h`
   - [x] created an `attack_result_t` to separate attack result types: HIT, MISS, BLOCK (to start with...DODGE, DEFLECT, etc may come later...)
   - [x] sound effect selected based on `attack_result_t`
+- [x] textures for zombie, rat, and skeleton
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle:
 
