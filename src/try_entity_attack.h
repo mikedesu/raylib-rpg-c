@@ -128,54 +128,45 @@ static inline attack_result_t process_attack_entity(gamestate& g, tile_t& tile, 
     // they have a shield
     // still need to do attack successful check
     const bool attack_successful = compute_attack_roll(g, attacker_id, target_id);
-    attack_result_t result = ATTACK_RESULT_NONE;
-
 
     // attack unsuccessful
     if (!attack_successful) {
-        result = ATTACK_RESULT_MISS;
-    } else {
-        // check for shield
-        const entityid shield_id = g.ct.get<equipped_shield>(target_id).value_or(ENTITYID_INVALID);
-        // if has shield
-
-        // if no shield
-        if (shield_id == ENTITYID_INVALID) {
-            result = ATTACK_RESULT_HIT;
-        } else {
-            // compute chance to block
-            const int roll = GetRandomValue(1, 100);
-            const int chance = g.ct.get<block_chance>(shield_id).value_or(100);
-            const int low_roll = 100 - chance;
-            if (roll <= low_roll) {
-                // failed to block
-                result = ATTACK_RESULT_HIT;
-            }
-            // block successful
-            else {
-                handle_shield_block_sfx(g, target_id);
-                g.ct.set<block_success>(target_id, true);
-                g.ct.set<update>(target_id, true);
-
-                const string attacker_name = get_entity_name(g, attacker_id);
-                const string target_name = get_entity_name(g, target_id);
-                const char* atk_name = attacker_name.c_str();
-                const char* tgt_name = target_name.c_str();
-
-
-                minfo("attack blocked");
-                add_message_history(g, "%s blocked an attack from %s", tgt_name, atk_name);
-                result = ATTACK_RESULT_BLOCK;
-            }
-        }
+        process_attack_results(g, attacker_id, target_id, false);
+        return ATTACK_RESULT_MISS;
     }
 
+    // check for shield
+    const entityid shield_id = g.ct.get<equipped_shield>(target_id).value_or(ENTITYID_INVALID);
 
-    if (result != ATTACK_RESULT_BLOCK) {
-        process_attack_results(g, attacker_id, target_id, attack_successful); // <===== ############
+    // if no shield
+    if (shield_id == ENTITYID_INVALID) {
+        process_attack_results(g, attacker_id, target_id, true);
+        return ATTACK_RESULT_HIT;
     }
 
-    return result;
+    // if has shield
+    // compute chance to block
+    const int roll = GetRandomValue(1, 100);
+    const int chance = g.ct.get<block_chance>(shield_id).value_or(100);
+    const int low_roll = 100 - chance;
+    if (roll <= low_roll) {
+        // failed to block
+        process_attack_results(g, attacker_id, target_id, true);
+        return ATTACK_RESULT_HIT;
+    }
+
+    handle_shield_block_sfx(g, target_id);
+    g.ct.set<block_success>(target_id, true);
+    g.ct.set<update>(target_id, true);
+
+    const string attacker_name = get_entity_name(g, attacker_id);
+    const string target_name = get_entity_name(g, target_id);
+    const char* atk_name = attacker_name.c_str();
+    const char* tgt_name = target_name.c_str();
+
+    minfo("attack blocked");
+    add_message_history(g, "%s blocked an attack from %s", tgt_name, atk_name);
+    return ATTACK_RESULT_BLOCK;
 }
 
 
