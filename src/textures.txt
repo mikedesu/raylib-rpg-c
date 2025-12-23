@@ -418,7 +418,7 @@
 417 4 4 0 img/monster/warg_walk.png
 418 4 4 0 img/monster/wolf_dmg.png
 419 4 2 0 img/monster/bat_idle_shadow.png
-420 1 11 0 img/monster/zombie_die.png
+420 1 8 0 img/monster/zombie_die.png
 421 4 4 0 img/monster/rat_walk_shadow.png
 422 4 4 0 img/monster/wolf_walk_shadow.png
 423 4 4 0 img/monster/green_slime_dmg_shadow.png
@@ -438,7 +438,7 @@
 437 1 19 0 img/monster/zombie_idle_shadow.png
 438 1 5 0 img/monster/warg_die.png
 439 3 5 0 img/monster/bat_sleep.png
-440 1 11 0 img/monster/rat_die.png
+440 1 7 0 img/monster/rat_die.png
 441 4 4 0 img/monster/warg_dmg_shadow.png
 442 1 5 0 img/monster/wolf_die.png
 443 4 4 0 img/monster/warg_walk_shadow.png
