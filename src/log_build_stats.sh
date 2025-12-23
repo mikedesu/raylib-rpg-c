@@ -1,5 +1,16 @@
-#!/usr/bin/env zsh
+#!/usr/bin/bash
 
-echo -e "$(scc -i cpp,h,py,sh,frag,html)\n" | zstd -19 >> stats/stats.txt.zstd
+TIMESTAMP=$(date +%s)
 
 
+COST=$(scc -i cpp,h,py,sh,frag,html | grep -i cost | awk '{print $6}');
+LINES=$(scc -i cpp,h,py,sh,frag,html | grep -i total | awk '{print $6}')
+MONTHS=$(scc -i cpp,h,py,sh,frag,html | grep -i effort | awk '{print $5}');
+
+#echo timestamp,lines,months,cost
+
+#echo $LINES
+#echo $TIMESTAMP 
+#echo $MONTHS
+#echo $COST 
+echo $TIMESTAMP $LINES $MONTHS $COST >> build-stats.csv
