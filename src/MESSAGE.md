@@ -16,6 +16,7 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle:
 
+- [ ] **BUG** i just saw an NPC orc push a box under the player
 - [ ] on game restart after dying, we need to clear the message history, as well as reset the gamestate in general
 - [ ] to prepare for unit testing and automation, we need to re-factor gamestate into a proper object
   - [ ] code from `liblogic` will be used to manage initializing the dungeon, etc

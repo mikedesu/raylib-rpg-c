@@ -16,38 +16,87 @@
 
 
 static inline void create_npc_sg_byid(gamestate& g, entityid id) {
-    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    switch (g.ct.get<race>(id).value_or(RACE_NONE)) {
-    case RACE_HUMAN: create_spritegroup(g, id, TX_HUMAN_KEYS, TX_HUMAN_COUNT, -12, -12); break;
-    case RACE_ORC: create_spritegroup(g, id, TX_ORC_KEYS, TX_ORC_COUNT, -12, -12); break;
-    case RACE_ELF: create_spritegroup(g, id, TX_ELF_KEYS, TX_ELF_COUNT, -12, -12); break;
-    case RACE_DWARF: create_spritegroup(g, id, TX_DWARF_KEYS, TX_DWARF_COUNT, -12, -12); break;
-    case RACE_HALFLING: create_spritegroup(g, id, TX_HALFLING_KEYS, TX_HALFLING_COUNT, -12, -12); break;
-    case RACE_GOBLIN: create_spritegroup(g, id, TX_GOBLIN_KEYS, TX_GOBLIN_COUNT, -12, -12); break;
-    case RACE_WOLF: create_spritegroup(g, id, TX_WOLF_KEYS, TX_WOLF_COUNT, -12, -12); break;
-    case RACE_BAT: create_spritegroup(g, id, TX_BAT_KEYS, TX_BAT_COUNT, -12, -12); break;
-    case RACE_WARG: create_spritegroup(g, id, TX_WARG_KEYS, TX_WARG_COUNT, -12, -12); break;
-    case RACE_GREEN_SLIME: create_spritegroup(g, id, TX_GREEN_SLIME_KEYS, TX_GREEN_SLIME_COUNT, -12, -12); break;
+
+    const race_t r = g.ct.get<race>(id).value_or(RACE_NONE);
+    massert(r != RACE_NONE, "race is none for id %d", id);
+
+    int* keys = NULL;
+    int key_count = 0;
+
+    switch (r) {
+    case RACE_HUMAN: {
+        keys = TX_HUMAN_KEYS;
+        key_count = TX_HUMAN_COUNT;
+    } break;
+    case RACE_ORC: {
+        keys = TX_ORC_KEYS;
+        key_count = TX_ORC_COUNT;
+    } break;
+    case RACE_ELF: {
+        keys = TX_ELF_KEYS;
+        key_count = TX_ELF_COUNT;
+    } break;
+    case RACE_DWARF: {
+        keys = TX_DWARF_KEYS;
+        key_count = TX_DWARF_COUNT;
+    } break;
+    case RACE_HALFLING: {
+        keys = TX_HALFLING_KEYS;
+        key_count = TX_HALFLING_COUNT;
+    } break;
+    case RACE_GOBLIN: {
+        keys = TX_GOBLIN_KEYS;
+        key_count = TX_GOBLIN_COUNT;
+    } break;
+    case RACE_WOLF: {
+        keys = TX_WOLF_KEYS;
+        key_count = TX_WOLF_COUNT;
+    } break;
+    case RACE_BAT: {
+        keys = TX_BAT_KEYS;
+        key_count = TX_BAT_COUNT;
+    } break;
+    case RACE_WARG: {
+        keys = TX_WARG_KEYS;
+        key_count = TX_WARG_COUNT;
+    } break;
+    case RACE_GREEN_SLIME: {
+        keys = TX_GREEN_SLIME_KEYS;
+        key_count = TX_GREEN_SLIME_COUNT;
+    } break;
+    case RACE_SKELETON: {
+        keys = TX_SKELETON_KEYS;
+        key_count = TX_SKELETON_COUNT;
+    } break;
+    case RACE_RAT: {
+        keys = TX_RAT_KEYS;
+        key_count = TX_RAT_COUNT;
+    } break;
+    case RACE_ZOMBIE: {
+        keys = TX_ZOMBIE_KEYS;
+        key_count = TX_ZOMBIE_COUNT;
+    } break;
     default: break;
     }
+
+    massert(keys != NULL, "keys is null");
+    massert(key_count > 0, "key_count is not > 0");
+    create_spritegroup(g, id, keys, key_count, -12, -12);
 }
 
 static inline void create_door_sg_byid(gamestate& g, entityid id) {
-    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     create_spritegroup(g, id, TX_WOODEN_DOOR_KEYS, TX_WOODEN_DOOR_COUNT, -12, -12);
 }
 
 static inline void create_box_sg_byid(gamestate& g, entityid id) {
-    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
 }
 
 
 static inline void create_potion_sg_byid(gamestate& g, entityid id) {
-    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<potiontype>(id).value_or(POTION_NONE)) {
     case POTION_HP_SMALL: create_spritegroup(g, id, TX_POTION_HP_SMALL_KEYS, TX_POTION_HP_SMALL_COUNT, -12, -12); break;
@@ -62,7 +111,6 @@ static inline void create_potion_sg_byid(gamestate& g, entityid id) {
 
 
 static inline void create_weapon_sg_byid(gamestate& g, entityid id) {
-    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<weapontype>(id).value_or(WEAPON_NONE)) {
     case WEAPON_DAGGER: create_spritegroup(g, id, TX_DAGGER_KEYS, TX_DAGGER_COUNT, -12, -12); break;
@@ -78,9 +126,7 @@ static inline void create_weapon_sg_byid(gamestate& g, entityid id) {
 
 
 static inline void create_shield_sg_byid(gamestate& g, entityid id) {
-    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-
     switch (g.ct.get<shieldtype>(id).value_or(SHIELD_NONE)) {
     case SHIELD_BUCKLER: create_spritegroup(g, id, TX_BUCKLER_KEYS, TX_BUCKLER_COUNT, -12, -12); break;
     case SHIELD_KITE: create_spritegroup(g, id, TX_KITE_SHIELD_KEYS, TX_BUCKLER_COUNT, -12, -12); break;
@@ -91,9 +137,7 @@ static inline void create_shield_sg_byid(gamestate& g, entityid id) {
 
 
 static inline void create_spell_sg_byid(gamestate& g, entityid id) {
-    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-
     switch (g.ct.get<spelltype>(id).value_or(SPELLTYPE_NONE)) {
     case SPELLTYPE_FIRE: create_spritegroup(g, id, TX_SPELL_FIRE_KEYS, TX_SPELL_FIRE_COUNT, -12, -12); break;
     default: break;
@@ -102,9 +146,7 @@ static inline void create_spell_sg_byid(gamestate& g, entityid id) {
 
 
 static inline void create_item_sg_byid(gamestate& g, entityid id) {
-    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-
     switch (g.ct.get<itemtype>(id).value_or(ITEM_NONE)) {
     case ITEM_POTION: create_potion_sg_byid(g, id); break;
     case ITEM_WEAPON: create_weapon_sg_byid(g, id); break;
@@ -115,9 +157,7 @@ static inline void create_item_sg_byid(gamestate& g, entityid id) {
 
 
 static inline void create_sg_byid(gamestate& g, entityid id) {
-    //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-
     switch (g.ct.get<entitytype>(id).value_or(ENTITY_NONE)) {
     case ENTITY_PLAYER:
     case ENTITY_NPC: create_npc_sg_byid(g, id); break;
@@ -125,7 +165,6 @@ static inline void create_sg_byid(gamestate& g, entityid id) {
     case ENTITY_BOX: create_box_sg_byid(g, id); break;
     case ENTITY_ITEM: create_item_sg_byid(g, id); break;
     case ENTITY_SPELL: create_spell_sg_byid(g, id); break;
-
     default: break;
     }
 }
