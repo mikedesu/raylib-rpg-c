@@ -33,6 +33,10 @@
 #define DEFAULT_MAX_HISTORY_SIZE 1024
 #define MAX_MUSIC_PATHS 1024
 #define MAX_MUSIC_PATH_LENGTH 256
+#define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
+#define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
+#define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
+#define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
 
 
 using std::make_shared;
@@ -43,7 +47,11 @@ using std::unordered_map;
 using std::vector;
 
 
-typedef struct gamestate {
+//typedef struct gamestate {
+
+
+class gamestate {
+public:
     controlmode_t controlmode;
     debugpanel_t debugpanel;
 
@@ -137,160 +145,147 @@ typedef struct gamestate {
 
     ComponentTable ct;
 
-} gamestate;
 
+    gamestate() {
+        minfo("Initializing gamestate");
+        msg_system_is_active = false;
+        version = GAME_VERSION;
+        cam_lockon = true;
+        frame_dirty = true;
+        debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
+        debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
+        debugpanel.w = 200;
+        debugpanel.h = 200;
+        debugpanel.fg_color = RAYWHITE;
+        debugpanel.bg_color = RED;
+        debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
+        targetwidth = -1;
+        targetheight = -1;
+        windowwidth = -1;
+        windowheight = -1;
+        hero_id = -1;
+        entity_turn = -1;
+        new_entityid_begin = -1;
+        new_entityid_end = -1;
+        timebegan = time(NULL);
+        currenttime = time(NULL);
+        timebegantm = localtime(&timebegan);
+        currenttimetm = localtime(&currenttime);
+        bzero(timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
+        bzero(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
+        strftime(timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", timebegantm);
+        strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
+        debugpanelon = false;
+        player_input_received = false;
+        is_locked = false;
+        gridon = false;
+        display_inventory_menu = false;
+        display_quit_menu = false;
+        display_help_menu = false;
+        do_quit = false;
+        processing_actions = false;
+        cam_changed = false;
+        is3d = false;
+        gameover = false;
+        test_guard = false;
+        dirty_entities = false;
+        display_sort_inventory_menu = false;
+        music_volume_changed = false;
+        gameplay_settings_menu_selection = 0;
+        cam2d.target = (Vector2){0, 0};
+        cam2d.offset = (Vector2){0, 0};
+        cam2d.zoom = 4.0f;
+        cam2d.rotation = 0.0;
+        fadealpha = 0.0;
+        cam3d = (Camera3D){0};
+        cam3d.position = (Vector3){0.0f, 20.0f, 20.0f};
+        cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
+        cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
+        cam3d.fovy = 45.0f;
+        cam3d.projection = CAMERA_PERSPECTIVE;
+        camera_mode = CAMERA_FREE;
+        controlmode = CONTROLMODE_PLAYER;
+        // current displayed dungeon floor
+        flag = GAMESTATE_FLAG_PLAYER_INPUT;
+        font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
+        pad = 20;
+        line_spacing = 1.0f;
+        player_changing_dir = false;
+        // weird bug maybe when set to 0?
+        next_entityid = 1;
+        current_music_index = 0;
+        restart_count = 0;
+        do_restart = 0;
+        title_screen_selection = 0;
+        max_title_screen_selections = 2;
+        lock = 0;
+        frame_updates = 0;
+        framecount = 0;
+        turn_count = 0;
+        debugpanel.pad_top = 0;
+        debugpanel.pad_left = 0;
+        debugpanel.pad_right = 0;
+        debugpanel.pad_bottom = 0;
+        inventory_menu_selection = 0;
+        msg_history_max_len_msg = 0;
+        msg_history_max_len_msg_measure = 0;
+        // initialize character creation
+        chara_creation.name = "hero";
+        chara_creation.strength = 10;
+        chara_creation.dexterity = 10;
+        chara_creation.intelligence = 10;
+        chara_creation.wisdom = 10;
+        chara_creation.constitution = 10;
+        chara_creation.charisma = 10;
+        chara_creation.race = RACE_HUMAN;
+        chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
+        // why is the above line crashing?
+        // the above line is also crashing
+        msuccess("Gamestate character creation name set to empty string");
+        current_scene = SCENE_TITLE;
+        music_volume = DEFAULT_MUSIC_VOLUME;
+        last_click_screen_pos = (Vector2){-1, -1};
 
-#define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
-#define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
-#define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
-#define GAMESTATE_INIT_ENTITYIDS_MAX 1000000
+        init_music_paths();
 
-
-static inline void gamestate_init_music_paths(gamestate& g) {
-    minfo("Initializing music paths...");
-    const char* music_path_file = "music.txt";
-    FILE* file = fopen(music_path_file, "r");
-    massert(file, "Could not open music path file: %s", music_path_file);
-    char buffer[128];
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        // Remove newline character if present
-        minfo("Removing newline character...");
-        size_t len = strlen(buffer);
-        if (len > 0 && buffer[len - 1] == '\n') {
-            buffer[len - 1] = '\0';
-        }
-        // if it begins with a #, skip for now
-        minfo("Checking for comment...");
-        if (buffer[0] == '#') {
-            mwarning("Comment received, skipping...");
-            continue;
-        }
-        // copy into g->music_file_paths
-        minfo("Pushing back %s", buffer);
-        // need to pre-pend the folder path
-        string fullpath = "audio/music/" + string(buffer);
-        g.music_file_paths.push_back(fullpath);
+        msuccess("Gamestate initialized successfully");
     }
-    fclose(file);
-    msuccess("Music paths initialized!");
-}
 
 
-// have to update this function when we introduce new fields to Gamestate
-static inline void gamestateinitptr(gamestate& g) {
-    minfo("Initializing gamestate");
-    g.msg_system_is_active = false;
-    g.version = GAME_VERSION;
-    g.cam_lockon = true;
-    g.frame_dirty = true;
-    g.debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
-    g.debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
-    g.debugpanel.w = 200;
-    g.debugpanel.h = 200;
-    g.debugpanel.fg_color = RAYWHITE;
-    g.debugpanel.bg_color = RED;
-    g.debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
-    g.targetwidth = -1;
-    g.targetheight = -1;
-    g.windowwidth = -1;
-    g.windowheight = -1;
-    g.hero_id = -1;
-    g.entity_turn = -1;
-    g.new_entityid_begin = -1;
-    g.new_entityid_end = -1;
-    g.timebegan = time(NULL);
-    g.currenttime = time(NULL);
-    g.timebegantm = localtime(&(g.timebegan));
-    g.currenttimetm = localtime(&(g.currenttime));
-    bzero(g.timebeganbuf, GAMESTATE_SIZEOFTIMEBUF);
-    bzero(g.currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
-    strftime(g.timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", g.timebegantm);
-    strftime(g.currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", g.currenttimetm);
-    g.debugpanelon = false;
-    g.player_input_received = false;
-    g.is_locked = false;
-    g.gridon = false;
-    g.display_inventory_menu = false;
-    g.display_quit_menu = false;
-    g.display_help_menu = false;
-    g.do_quit = false;
-    g.processing_actions = false;
-    g.cam_changed = false;
-    g.is3d = false;
-    g.gameover = false;
-    g.test_guard = false;
-    g.dirty_entities = false;
-    g.display_sort_inventory_menu = false;
-    g.music_volume_changed = false;
-    g.gameplay_settings_menu_selection = 0;
-    g.cam2d.target = (Vector2){0, 0};
-    g.cam2d.offset = (Vector2){0, 0};
-    g.cam2d.zoom = 4.0f;
-    g.cam2d.rotation = 0.0;
-    g.fadealpha = 0.0;
-    g.cam3d = (Camera3D){0};
-    g.cam3d.position = (Vector3){0.0f, 20.0f, 20.0f};
-    g.cam3d.target = (Vector3){0.0f, 0.0f, 0.0f};
-    g.cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};
-    g.cam3d.fovy = 45.0f;
-    g.cam3d.projection = CAMERA_PERSPECTIVE;
-    g.camera_mode = CAMERA_FREE;
-    g.controlmode = CONTROLMODE_PLAYER;
-    // current displayed dungeon floor
-    g.flag = GAMESTATE_FLAG_PLAYER_INPUT;
-    g.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
-    g.pad = 20;
-    g.line_spacing = 1.0f;
-    g.player_changing_dir = false;
-    // weird bug maybe when set to 0?
-    g.next_entityid = 1;
-    g.current_music_index = 0;
-    g.restart_count = 0;
-    g.do_restart = 0;
-    g.title_screen_selection = 0;
-    g.max_title_screen_selections = 2;
-    g.lock = 0;
-    g.frame_updates = 0;
-    g.framecount = 0;
-    g.turn_count = 0;
-    g.debugpanel.pad_top = 0;
-    g.debugpanel.pad_left = 0;
-    g.debugpanel.pad_right = 0;
-    g.debugpanel.pad_bottom = 0;
-    g.inventory_menu_selection = 0;
-    g.msg_history_max_len_msg = 0;
-    g.msg_history_max_len_msg_measure = 0;
-    // initialize character creation
-    g.chara_creation.name = "hero";
-    g.chara_creation.strength = 10;
-    g.chara_creation.dexterity = 10;
-    g.chara_creation.intelligence = 10;
-    g.chara_creation.wisdom = 10;
-    g.chara_creation.constitution = 10;
-    g.chara_creation.charisma = 10;
-    g.chara_creation.race = RACE_HUMAN;
-    g.chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
-    // why is the above line crashing?
-    // the above line is also crashing
-    msuccess("Gamestate character creation name set to empty string");
-    g.current_scene = SCENE_TITLE;
-    g.music_volume = DEFAULT_MUSIC_VOLUME;
-    g.last_click_screen_pos = (Vector2){-1, -1};
-    gamestate_init_music_paths(g);
-    msuccess("Gamestate initialized successfully");
-}
+    void init_music_paths() {
+        minfo("Initializing music paths...");
+        const char* music_path_file = "music.txt";
+        FILE* file = fopen(music_path_file, "r");
+        massert(file, "Could not open music path file: %s", music_path_file);
+        char buffer[128];
+        while (fgets(buffer, sizeof(buffer), file) != NULL) {
+            // Remove newline character if present
+            minfo("Removing newline character...");
+            size_t len = strlen(buffer);
+            if (len > 0 && buffer[len - 1] == '\n') {
+                buffer[len - 1] = '\0';
+            }
+            // if it begins with a #, skip for now
+            minfo("Checking for comment...");
+            if (buffer[0] == '#') {
+                mwarning("Comment received, skipping...");
+                continue;
+            }
+            // copy into g->music_file_paths
+            minfo("Pushing back %s", buffer);
+            // need to pre-pend the folder path
+            string fullpath = "audio/music/" + string(buffer);
+            music_file_paths.push_back(fullpath);
+        }
+        fclose(file);
+        msuccess("Music paths initialized!");
+    }
 
 
-static inline void gamestate_free(gamestate& g) {
-    minfo("Freeing gamestate");
-    //if (g->chara_creation) {
-    //    g->chara_creation->name.clear(); // Clear the name string
-    //    g->chara_creation.reset(); // Reset the shared pointer
-    //    g->chara_creation = nullptr; // Set to nullptr
-    //}
-    //if (g->msg_system) delete g->msg_system;
-    //if (g->msg_history) delete g->msg_history;
-}
+    void reset() {
+        minfo("gamestate reset");
+    }
+};
 
 
 static inline entityid g_add_entity(gamestate& g) {

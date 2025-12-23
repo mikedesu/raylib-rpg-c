@@ -18,7 +18,7 @@ void gameloop() {
         msuccess("Restarting game...");
         libdraw_close();
         liblogic_close(g);
-        gamestateinitptr(g);
+        g.reset();
         liblogic_init(g);
         libdraw_init(g);
         g.do_restart = false; // Reset restart flag
@@ -27,7 +27,6 @@ void gameloop() {
 }
 
 int main() {
-    gamestateinitptr(g);
     liblogic_init(g);
     libdraw_init(g);
 #ifndef WEB
@@ -38,6 +37,5 @@ int main() {
 #endif
     libdraw_close();
     liblogic_close(g);
-    gamestate_free(g);
     return 0;
 }
