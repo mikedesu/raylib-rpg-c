@@ -460,7 +460,7 @@
 459 4 4 0 img/monster/warg_attack_shadow.png
 460 4 4 0 img/monster/wolf_dmg_shadow.png
 461 4 13 0 img/monster/rat_idle.png
-462 3 5 0 img/monster/skeleton_idle.png
+462 4 10 0 img/monster/skeleton_idle.png
 463 4 4 0 img/monster/zombie_dmg.png
 464 4 4 0 img/monster/skeleton_dmg_shadow.png
 465 4 4 0 img/monster/wolf_walk.png

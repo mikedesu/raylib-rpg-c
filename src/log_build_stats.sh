@@ -3,9 +3,9 @@
 TIMESTAMP=$(date +%s)
 
 
-COST=$(scc -i cpp,h,py,sh,frag,html | grep -i cost | awk '{print $6}');
-LINES=$(scc -i cpp,h,py,sh,frag,html | grep -i total | awk '{print $6}')
-MONTHS=$(scc -i cpp,h,py,sh,frag,html | grep -i effort | awk '{print $5}');
+COST=$(scc -i cpp,h,py,sh,frag,html,txt,md | grep -i cost | awk '{print $6}');
+LINES=$(scc -i cpp,h,py,sh,frag,html,txt,md | grep -i total | awk '{print $6}')
+MONTHS=$(scc -i cpp,h,py,sh,frag,html,txt,md | grep -i effort | awk '{print $5}');
 
 #echo timestamp,lines,months,cost
 

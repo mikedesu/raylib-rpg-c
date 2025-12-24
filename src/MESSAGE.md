@@ -4,6 +4,7 @@ We are looking to clean up the file, fix potential bugs, and prepare for the fut
 
 I have already done the following:
 
+- [x] **FIXED** skeleton idle animation appears odd, flashes in-and-out
 - [x] Shields now have durability and have durability reduced when successfully blocking
 - [x] **FIXED** There is now a bug where taking lethal damage with a shield does not kill the player
 - [x] magic values were created for MAX BLOCK CHANCE and MINIMUM DAMAGE so they arent hardcoded into try attack entity
@@ -19,7 +20,8 @@ Previous analysis suggestions you've brought up that I will eventually implement
 
 - [ ] **BUG** i just saw an NPC orc push a box under the player
 - [ ] on game restart after dying, we need to clear the message history, as well as reset the gamestate in general
-- [ ] to prepare for unit testing and automation, we need to re-factor gamestate into a proper object
+- [x] to prepare for unit testing and automation, we need to re-factor gamestate into a proper object
+  - [x] initial gamestate class created
   - [ ] code from `liblogic` will be used to manage initializing the dungeon, etc
   - [ ] we will be able to set a flag indicating the gamestate is in a unit-test environment (so we can skip rendering and simply simulate the dungeon)
 - [ ] break `process_attack_entity` and `process_attack_results` up into further functions
