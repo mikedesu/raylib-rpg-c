@@ -5,6 +5,7 @@
 #include "create_monster.h"
 #include "create_npc.h"
 #include "create_potion.h"
+#include "create_prop.h"
 #include "create_shield.h"
 #include "entity_templates.h"
 #include "gamestate.h"
@@ -14,6 +15,7 @@
 #include "inputstate.h"
 #include "place_doors.h"
 #include "potion.h"
+#include "proptype.h"
 #include "update_debug_panel_buffer.h"
 #include "update_player_state.h"
 #include "update_player_tiles_explored.h"
@@ -66,7 +68,14 @@ static inline void liblogic_init(gamestate& g) {
     minfo("liblogic_init");
     init_dungeon(g);
 
+    // create doors
     place_doors(g);
+
+    // create props
+    create_prop_at_with(g, PROP_DUNGEON_BANNER, (vec3){9, 7, 0}, [](gamestate& g, entityid id) {});
+    create_prop_at_with(g, PROP_DUNGEON_BANNER, (vec3){10, 7, 0}, [](gamestate& g, entityid id) {});
+    create_prop_at_with(g, PROP_DUNGEON_BANNER, (vec3){11, 7, 0}, [](gamestate& g, entityid id) {});
+
 
     create_box_at_with(g, (vec3){11, 9, 0}, [](gamestate& g, entityid id) {});
     create_box_at_with(g, (vec3){10, 9, 0}, [](gamestate& g, entityid id) {});

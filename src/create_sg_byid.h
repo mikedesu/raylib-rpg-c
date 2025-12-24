@@ -4,12 +4,14 @@
 #include "gamestate.h"
 #include "item.h"
 #include "libdraw_create_spritegroup.h"
+#include "proptype.h"
 #include "spell.h"
 #include "tx_keys_boxes.h"
 #include "tx_keys_doors.h"
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"
+#include "tx_keys_props.h"
 #include "tx_keys_shields.h"
 #include "tx_keys_spells.h"
 #include "tx_keys_weapons.h"
@@ -156,6 +158,18 @@ static inline void create_item_sg_byid(gamestate& g, entityid id) {
 }
 
 
+static inline void create_prop_sg_byid(gamestate& g, entityid id) {
+    massert(id != ENTITYID_INVALID, "entityid is invalid");
+    switch (g.ct.get<proptype>(id).value_or(PROP_NONE)) {
+    case PROP_DUNGEON_BANNER: create_spritegroup(g, id, TX_PROP_DUNGEON_BANNER_KEYS, TX_PROP_DUNGEON_BANNER_COUNT, -12, -12); break;
+    //case PROP_DUNGEON_TABLE: create_potion_sg_byid(g, id); break;
+    //case PROP_DUNGEON_CHAIR: create_potion_sg_byid(g, id); break;
+    //case PROP_DUNGEON_STATUE: create_potion_sg_byid(g, id); break;
+    default: break;
+    }
+}
+
+
 static inline void create_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<entitytype>(id).value_or(ENTITY_NONE)) {
@@ -165,6 +179,7 @@ static inline void create_sg_byid(gamestate& g, entityid id) {
     case ENTITY_BOX: create_box_sg_byid(g, id); break;
     case ENTITY_ITEM: create_item_sg_byid(g, id); break;
     case ENTITY_SPELL: create_spell_sg_byid(g, id); break;
+    case ENTITY_PROP: create_prop_sg_byid(g, id); break;
     default: break;
     }
 }

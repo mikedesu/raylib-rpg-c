@@ -51,7 +51,7 @@ static inline void handle_input_character_creation_scene(gamestate& g, inputstat
         // set all the NPCs to target the hero
         minfo("BEGIN Temporary wedge-in code");
         for (entityid id = 0; id < g.next_entityid; id++) {
-            minfo("Getting type for id %d", id);
+            //minfo("Getting type for id %d", id);
             entitytype_t t = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (t == ENTITY_NPC) {
                 minfo("Setting target for id %d", id);

@@ -5,6 +5,7 @@
 #include "entitytype.h"
 #include "item.h"
 #include "potion.h"
+#include "proptype.h"
 #include "race.h"
 #include "rarity.h"
 #include "shield.h"
@@ -376,4 +377,11 @@ struct spellstate { }; //int
 template <>
 struct ComponentTraits<spellstate> {
     using Type = spellstate_t;
+};
+
+
+struct proptype { }; //int
+template <>
+struct ComponentTraits<proptype> {
+    using Type = proptype_t;
 };

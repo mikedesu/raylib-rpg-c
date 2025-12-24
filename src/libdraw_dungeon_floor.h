@@ -1,6 +1,7 @@
 #pragma once
 
 #include "draw_sprite.h"
+#include "entitytype.h"
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
 #include "libdraw_player_target_box.h"
@@ -146,25 +147,25 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
             const vec3 loc = {x, y, z};
             const auto tile = df_tile_at(df, loc);
 
-            if (!tile.visible) {
-                continue;
-            }
+            //if (!tile.visible) {
+            //    continue;
+            //}
 
-            if (tiletype_is_wall(tile.type)) {
-                continue;
-            }
+            //if (tiletype_is_wall(tile.type)) {
+            //    continue;
+            //}
 
-            if (tile.is_empty) {
-                continue;
-            }
+            //if (tile.is_empty) {
+            //    continue;
+            //}
 
             // bugfix for tall walls so entities do not draw on top:
             // check to see if the tile directly beneath this tile is a wall
-            const vec3 loc2 = {x, y + 1, z};
-            const auto tile2 = df_tile_at(df, loc2);
-            if (tile2.type == TILE_STONE_WALL_00) {
-                continue;
-            }
+            //const vec3 loc2 = {x, y + 1, z};
+            //const auto tile2 = df_tile_at(df, loc2);
+            //if (tile2.type == TILE_STONE_WALL_00) {
+            //    continue;
+            //}
 
             // Get hero's vision distance and location
             const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
@@ -215,13 +216,27 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
                     break;
             }
 
-            if (object_blocking)
-                continue;
+            // render all props
+            //for_each(tile.entities->cbegin(), tile.entities->cend(), [&g, entitytype_0](const entityid& id) {
+            //    auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            //    if (entitytype_0 == ENTITY_PROP && type == ENTITY_PROP)
+            //        draw_sprite_and_shadow(g, id);
+            //});
 
-            for_each(tile.entities->cbegin(), tile.entities->cend(), [&g, entitytype_0, &additional_check](const entityid& id) {
+            //if (object_blocking) {
+            //    continue;
+            //}
+
+            for_each(tile.entities->cbegin(), tile.entities->cend(), [&g, entitytype_0, object_blocking, &additional_check](const entityid& id) {
                 auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-                if (entitytype_0 == type && additional_check(g, id))
+                if (!object_blocking && entitytype_0 == type && additional_check(g, id)) {
                     draw_sprite_and_shadow(g, id);
+                }
+                //else if (object_blocking && entitytype_0 == ENTITY_PROP && type == ENTITY_PROP) {
+                //    merror("A prop is being blocked by an object");
+                //} else if (type == ENTITY_PROP) {
+                //    merror("A prop is here");
+                //}
             });
         }
     }
@@ -254,6 +269,7 @@ static inline bool libdraw_draw_dungeon_floor(gamestate& g) {
     };
 
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_DOOR, mydefault);
+    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PROP, mydefault);
     libdraw_draw_player_target_box(g);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_SPELL, mydefault);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_BOX, mydefault);

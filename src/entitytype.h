@@ -9,5 +9,6 @@ typedef enum
     ENTITY_BOX,
     ENTITY_DOOR,
     ENTITY_SPELL,
+    ENTITY_PROP,
     ENTITY_TYPE_COUNT
 } entitytype_t;

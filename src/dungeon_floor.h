@@ -349,3 +349,26 @@ static inline vec3 df_get_random_loc(dungeon_floor_t& df) {
     vec3 loc = tmp[GetRandomValue(0, tmp.size() - 1)];
     return loc;
 }
+
+
+static inline vec3 df_get_random_loc_of_type(dungeon_floor_t& df, tiletype_t type) {
+    vector<vec3> tmp;
+    for (int x = 0; x < df.width; x++) {
+        for (int y = 0; y < df.height; y++) {
+            vec3 loc = {x, y, df.floor};
+            auto tile = df_tile_at(df, loc);
+            if (tile.type != type)
+                continue;
+            //if (tile.type == TILE_NONE || tile.type == TILE_STONE_WALL_00 || tile.type == TILE_STONE_WALL_01 || tile.type == TILE_UPSTAIRS ||
+            //    tile.type == TILE_DOWNSTAIRS)
+            //    continue;
+            //if (tile.entities->size() > 0)
+            //    continue;
+            tmp.push_back(loc);
+        }
+    }
+    if (tmp.size() == 0)
+        return (vec3){-1, -1, -1};
+    vec3 loc = tmp[GetRandomValue(0, tmp.size() - 1)];
+    return loc;
+}
