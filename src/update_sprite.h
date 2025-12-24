@@ -59,16 +59,13 @@ static inline void libdraw_update_sprite_position(gamestate& g, entityid id, spr
         entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
         massert(type != ENTITY_NONE, "entity type is none");
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-            //race_t race = g_get_race(g, id);
-            //sg.current = race == RACE_BAT ? SG_ANIM_BAT_IDLE : race == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : SG_ANIM_NPC_WALK;
-            //if (loc == RACE_BAT)
-            //    sg.current = SG_ANIM_BAT_IDLE;
-            //else if (race == RACE_GREEN_SLIME)
-            //    sg.current = SG_ANIM_SLIME_IDLE;
-            //else if (race > RACE_NONE && race < RACE_COUNT)
-            //    sg.current = SG_ANIM_NPC_WALK;
-            //else
-            sg->current = SG_ANIM_NPC_WALK;
+            race_t r = g.ct.get<race>(id).value_or(RACE_NONE);
+            if (r == RACE_BAT)
+                sg->current = SG_ANIM_BAT_IDLE;
+            else if (r == RACE_GREEN_SLIME)
+                sg->current = SG_ANIM_SLIME_IDLE;
+            else
+                sg->current = SG_ANIM_NPC_WALK;
         }
         g.frame_dirty = true;
     }

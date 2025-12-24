@@ -15,9 +15,14 @@ I have already done the following:
   - [x] created an `attack_result_t` to separate attack result types: HIT, MISS, BLOCK (to start with...DODGE, DEFLECT, etc may come later...)
   - [x] sound effect selected based on `attack_result_t`
 - [x] textures for zombie, rat, and skeleton
+- [x] **FIXED** some NPC races' unarmed attack animations are incorrect
+- [x] **FIXED** The bat's walk animation shouldn't be the attack animation
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle:
 
+- [ ] NPCs moving into tiles too far away to see kind of "disappear" instead of moving into the tile
+- [ ] The way we handle race2str and str2race can be updated
+  - [ ] we should be using a `map` instead of hard-coding strings into vectors
 - [ ] **BUG** i just saw an NPC orc push a box under the player
 - [ ] on game restart after dying, we need to clear the message history, as well as reset the gamestate in general
 - [x] to prepare for unit testing and automation, we need to re-factor gamestate into a proper object

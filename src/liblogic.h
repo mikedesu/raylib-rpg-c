@@ -2,6 +2,7 @@
 
 #include "add_message.h"
 #include "create_box.h"
+#include "create_monster.h"
 #include "create_npc.h"
 #include "create_potion.h"
 #include "create_shield.h"
@@ -64,6 +65,9 @@ static inline void liblogic_init(gamestate& g) {
     SetRandomSeed(time(NULL));
     minfo("liblogic_init");
     init_dungeon(g);
+
+    place_doors(g);
+
     create_box_at_with(g, (vec3){11, 9, 0}, [](gamestate& g, entityid id) {});
     create_box_at_with(g, (vec3){10, 9, 0}, [](gamestate& g, entityid id) {});
     create_box_at_with(g, (vec3){9, 9, 0}, [](gamestate& g, entityid id) {});
@@ -77,17 +81,21 @@ static inline void liblogic_init(gamestate& g) {
         g.ct.set<potiontype>(id, POTION_HP_SMALL);
         g.ct.set<healing>(id, (vec3){1, 6, 0});
     });
-    place_doors(g);
     //#ifdef SPAWN_MONSTERS
     for (int i = 0; i < (int)g.dungeon.floors.size(); i++) {
         for (int j = 1; j <= i + 1; j++) {
             //create_npc_at_with(g, RACE_ORC, df_get_random_loc(d_get_floor(g.dungeon, i)), orc_init_test);
-            create_npc_at_with(
-                //g, RACE_GREEN_SLIME, df_get_random_loc(d_get_floor(g.dungeon, i)), [](gamestate& g, entityid id) { g.ct.set<name>(id, "slime"); });
-                g,
-                RACE_SKELETON,
-                df_get_random_loc(d_get_floor(g.dungeon, i)),
-                [](gamestate& g, entityid id) { g.ct.set<name>(id, "skeleton"); });
+
+            //const race_t r = RACE_SKELETON;
+            //create_npc_at_with(
+            //    g,
+            //    r,
+            //    df_get_random_loc(d_get_floor(g.dungeon, i)),
+            //    [](gamestate& g, entityid id) { g.ct.set<name>(id, race2str(r)); });
+
+            const vec3 random_loc = df_get_random_loc(d_get_floor(g.dungeon, i));
+            auto init_function = [](gamestate& g, entityid id) {};
+            create_random_monster_at_with(g, random_loc, init_function);
         }
     }
 

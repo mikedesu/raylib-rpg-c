@@ -257,9 +257,9 @@ static inline bool libdraw_draw_dungeon_floor(gamestate& g) {
     libdraw_draw_player_target_box(g);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_SPELL, mydefault);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_BOX, mydefault);
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
 
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
+    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, alive_check);
 
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, mydefault);
