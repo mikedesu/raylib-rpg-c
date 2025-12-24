@@ -31,27 +31,33 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
     g.ct.set<update>(id, true);
     g.ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
     // entity location
-    auto maybe_loc = g.ct.get<location>(id);
-    if (!maybe_loc.has_value())
-        return false;
-    const vec3 loc = maybe_loc.value();
+    massert(g.ct.has<location>(id), "id %d has no location", id);
+    //auto maybe_loc = g.ct.get<location>(id);
+    //if (!maybe_loc.has_value()) {
+    //    return false;
+    //}
+    const vec3 loc = g.ct.get<location>(id).value_or((vec3){-1, -1, -1});
+    massert(!vec3_equal(loc, (vec3){-1, -1, -1}), "id %d has no location", id);
     // entity's new location
     // we will have a special case for traversing floors so ignore v.z
     const vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
     auto df = d_get_floor(g.dungeon, loc.z);
     auto tile = df_tile_at(df, aloc);
-    if (!tile_is_walkable(tile.type))
+    if (!tile_is_walkable(tile.type)) {
         return false;
+    }
 
     const entityid box_id = tile_has_box(g, aloc.x, aloc.y, aloc.z);
     // we need to
     // 1. check to see if box_id is pushable
     // 2. check to see if the tile in front of box, if pushed, is free/open
-    if (box_id != ENTITYID_INVALID)
+    if (box_id != ENTITYID_INVALID) {
         return handle_box_push(g, box_id, v);
+    }
 
-    if (tile_has_live_npcs(g, g.tile_at_cur_floor(aloc)))
+    if (tile_has_live_npcs(g, g.tile_at_cur_floor(aloc))) {
         return false;
+    }
 
     const entityid door_id = tile_has_door(g, aloc);
     if (door_id != ENTITYID_INVALID) {

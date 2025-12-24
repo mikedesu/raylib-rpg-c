@@ -1,5 +1,10 @@
-Great job with the recent analysis on my game's attack logic. What's the biggest one thing you can see that I need to work on fixing or cleaning up next?
-Focus your criticism on the attack logic file itself, and do not base your own criticism based on the notes below, except to sift out what NOT to report on. 
+Great job with the recent analysis on my game's attack logic!
+
+We are moving on to cleaning up `try_entity_move.h` next.
+
+What's the biggest one thing you can see that I need to work on fixing or cleaning up next?
+
+Focus your criticism on the file itself, and do not base your own criticism based on the notes below, except to sift out what NOT to report on. 
 We are looking to clean up the file, fix potential bugs, and prepare for the future. We will clean up other files like this as well.
 
 I have already done the following:
@@ -18,7 +23,7 @@ I have already done the following:
 - [x] **FIXED** some NPC races' unarmed attack animations are incorrect
 - [x] **FIXED** The bat's walk animation shouldn't be the attack animation
 
-Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle:
+Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
 - [ ] NPCs moving into tiles too far away to see kind of "disappear" instead of moving into the tile
 - [ ] The way we handle race2str and str2race can be updated
