@@ -85,9 +85,9 @@ static inline void liblogic_init(gamestate& g) {
             create_npc_at_with(
                 //g, RACE_GREEN_SLIME, df_get_random_loc(d_get_floor(g.dungeon, i)), [](gamestate& g, entityid id) { g.ct.set<name>(id, "slime"); });
                 g,
-                RACE_SKELETON,
+                RACE_ZOMBIE,
                 df_get_random_loc(d_get_floor(g.dungeon, i)),
-                [](gamestate& g, entityid id) { g.ct.set<name>(id, "skeleton"); });
+                [](gamestate& g, entityid id) { g.ct.set<name>(id, "zombie"); });
         }
     }
 
