@@ -296,4 +296,9 @@ public:
         next_entityid++;
         return id;
     }
+
+
+    tile_t& tile_at_cur_floor(vec3 loc) {
+        return df_tile_at(d_get_current_floor(dungeon), loc);
+    }
 };
