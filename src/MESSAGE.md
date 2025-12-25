@@ -22,26 +22,26 @@ I have already done the following:
 - [x] textures for zombie, rat, and skeleton
 - [x] **FIXED** some NPC races' unarmed attack animations are incorrect
 - [x] **FIXED** The bat's walk animation shouldn't be the attack animation
+- [x] **FIXED** on game restart after dying, we need to clear the message history, as well as reset the gamestate in general
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
-- [ ] there is a small jitter when moving diagonally likely due to `cam_lockon`
 - [ ] **CRASH** **BUG** unknown crash occuring, potentially on NPC death
   - [ ] witnessed crash occuring on `drop inventory` after killing a skeleton
-- [ ] need to introduce `burnable` component such that
+- [ ] **BUG** i just saw an NPC orc push a box under the player
   - [ ] if a `fire` effect hits a tile w/ a `burnable` entity, that entity is destroyed
   - [ ] if a `fire` effect hits a tile w/ a `burnable` item on an entity, that item is destroyed
-- [ ] NPCs moving into tiles too far away to see kind of "disappear" instead of moving into the tile
-- [ ] The way we handle race2str and str2race can be updated
-  - [ ] we should be using a `map` instead of hard-coding strings into vectors
-- [ ] **BUG** i just saw an NPC orc push a box under the player
-- [ ] on game restart after dying, we need to clear the message history, as well as reset the gamestate in general
-- [x] to prepare for unit testing and automation, we need to re-factor gamestate into a proper object
+- [ ] **QA** there is a small jitter when moving diagonally likely due to `cam_lockon`
+- [ ] **QA** NPCs moving into tiles too far away to see kind of "disappear" instead of moving into the tile
+- [x] **CORE** to prepare for unit testing and automation, we need to re-factor gamestate into a proper object
   - [x] initial gamestate class created
   - [ ] code from `liblogic` will be used to manage initializing the dungeon, etc
   - [ ] we will be able to set a flag indicating the gamestate is in a unit-test environment (so we can skip rendering and simply simulate the dungeon)
-- [ ] break `process_attack_entity` and `process_attack_results` up into further functions
-- [ ] Currently in `process_attack_results`, the damage calculation doesn't account for
+- [ ] **CODE QUALITY** The way we handle race2str and str2race can be updated
+  - [ ] we should be using a `map` instead of hard-coding strings into vectors
+- [ ] **CODE QUALITY** break `process_attack_entity` and `process_attack_results` up into further functions
+- [ ] **UPGRADE** need to introduce `burnable` component such that
+- [ ] **UPGRADE** Currently in `process_attack_results`, the damage calculation doesn't account for
   - [ ] Target's equipped armor **WONT FIX: armor is currently un-implemented**
   - [ ] Armor durability loss (similar to weapon durability logic) **WONT FIX: armor is currently un-implemented**
   - [ ] Damage reduction from armor (you have a damage_reduction component defined but it's not used) **WONT FIX: damage reduction currently un-implemented**
