@@ -28,6 +28,9 @@ void gameloop() {
 
 int main() {
     liblogic_init(g);
+
+    // g.liblogic_init();
+
     libdraw_init(g);
 #ifndef WEB
     while (!libdraw_windowshouldclose(g))

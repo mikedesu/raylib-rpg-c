@@ -68,30 +68,9 @@ static inline void liblogic_init(gamestate& g) {
     SetRandomSeed(time(NULL));
     minfo("liblogic_init");
     init_dungeon(g, 10);
-
     // create doors
     place_doors(g);
-
     place_props(g);
-    // create props
-    //auto mydefault = [](gamestate& g, entityid id) {};
-    //auto set_solid = [](gamestate& g, entityid id) { g.ct.set<solid>(id, true); };
-    //auto set_solid_and_pushable = [](gamestate& g, entityid id) {
-    //    g.ct.set<solid>(id, true);
-    //    g.ct.set<pushable>(id, true);
-    //};
-
-    //create_prop_at_with(g, PROP_DUNGEON_BANNER_00, (vec3){9, 7, 0}, mydefault);
-    //create_prop_at_with(g, PROP_DUNGEON_BANNER_01, (vec3){10, 7, 0}, mydefault);
-    //create_prop_at_with(g, PROP_DUNGEON_BANNER_02, (vec3){11, 7, 0}, mydefault);
-
-    //create_prop_at_with(g, PROP_DUNGEON_WOODEN_TABLE_00, (vec3){9, 8, 0}, set_solid);
-    //create_prop_at_with(g, PROP_DUNGEON_WOODEN_TABLE_01, (vec3){10, 8, 0}, set_solid);
-    //create_prop_at_with(g, PROP_DUNGEON_WOODEN_CHAIR_00, (vec3){11, 8, 0}, set_solid);
-
-    //create_prop_at_with(g, PROP_DUNGEON_STATUE_00, (vec3){9, 9, 0}, set_solid_and_pushable);
-
-
     //    create_box_at_with(g, (vec3){11, 9, 0}, [](gamestate& g, entityid id) {});
     //    create_box_at_with(g, (vec3){10, 9, 0}, [](gamestate& g, entityid id) {});
     //create_box_at_with(g, (vec3){9, 9, 0}, [](gamestate& g, entityid id) {});
@@ -108,28 +87,11 @@ static inline void liblogic_init(gamestate& g) {
     //#ifdef SPAWN_MONSTERS
     for (int i = 0; i < (int)g.dungeon.floors.size(); i++) {
         for (int j = 1; j <= i + 1; j++) {
-            //create_npc_at_with(g, RACE_ORC, df_get_random_loc(d_get_floor(g.dungeon, i)), orc_init_test);
-
-            //const race_t r = RACE_SKELETON;
-            //create_npc_at_with(
-            //    g,
-            //    r,
-            //    df_get_random_loc(d_get_floor(g.dungeon, i)),
-            //    [](gamestate& g, entityid id) { g.ct.set<name>(id, race2str(r)); });
-
             const vec3 random_loc = df_get_random_loc(d_get_floor(g.dungeon, i));
             auto init_function = [](gamestate& g, entityid id) {};
             create_random_monster_at_with(g, random_loc, init_function);
         }
     }
-
-    //create_npc_at_with(g, RACE_ORC, df_get_random_loc(g->dungeon->floors->at(i)), orc_init_test);
-    //create_npc_at_with(g, RACE_ORC, (vec3){10, 10, i}, orc_init_test);
-    //create_npc_at_with(g, RACE_ORC, (vec3){10, 9, i}, orc_init_test);
-    //create_npc_at_with(g, RACE_ORC, (vec3){11, 9, i}, orc_init_test);
-    //create_npc_at_with(g, RACE_ORC, (vec3){13, 11, i}, orc_init_test);
-    //create_npc_at_with(g, RACE_ORC, (vec3){14, 11, i}, orc_init_test);
-    //}
     //#endif
     //create_potion(g, (vec3){3, 1, 0}, POTION_HP_MEDIUM);
     //create_potion(g, (vec3){5, 1, 0}, POTION_HP_LARGE);

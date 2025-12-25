@@ -12,6 +12,7 @@
 #include "entitytype.h"
 #include "gamestate_flag.h"
 #include "get_racial_hd.h"
+//#include "init_dungeon.h"
 #include "libgame_version.h"
 #include "scene.h"
 #include <ctime>
@@ -301,5 +302,14 @@ public:
 
     tile_t& tile_at_cur_floor(vec3 loc) {
         return df_tile_at(d_get_current_floor(dungeon), loc);
+    }
+
+
+    void logic_init() {
+        srand(time(NULL));
+        SetRandomSeed(time(NULL));
+        minfo("gamestate.logic_init");
+
+        //init_dungeon(this, 10);
     }
 };
