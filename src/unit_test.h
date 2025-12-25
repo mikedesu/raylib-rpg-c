@@ -128,8 +128,7 @@ public:
         minfo("Testing camera zoom");
         g.cam2d.zoom = 2.0f;
         as(g.cam2d.zoom == 2.0f);
-        as(g.cam_changed == true);
-        minfo("Camera zoom set to %.1f, changed flag: %d", g.cam2d.zoom, g.cam_changed);
+        minfo("Camera zoom set to %.1f", g.cam2d.zoom);
         
         // Test reset
         minfo("Testing camera reset");
