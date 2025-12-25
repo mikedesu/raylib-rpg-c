@@ -139,4 +139,34 @@ public:
         as(g.cam_changed == false);
         minfo("Reset complete - zoom: %.1f, changed: %d", g.cam2d.zoom, g.cam_changed);
     }
+
+    void testMusicSystem() {
+        minfo("Starting testMusicSystem");
+        gamestate g;
+        
+        // Verify initial state
+        minfo("Checking initial music state");
+        as(g.music_volume == DEFAULT_MUSIC_VOLUME);
+        as(!g.music_volume_changed);
+        as(g.current_music_index == 0);
+        
+        // Verify music paths initialized
+        minfo("Checking music paths");
+        as(!g.music_file_paths.empty());
+        minfo("Found %zu music paths", g.music_file_paths.size());
+        
+        // Test volume change
+        minfo("Testing volume change");
+        g.music_volume = 0.5f;
+        as(g.music_volume == 0.5f);
+        as(g.music_volume_changed == true);
+        
+        // Test reset
+        minfo("Testing reset");
+        g.reset();
+        as(g.music_volume == DEFAULT_MUSIC_VOLUME);
+        as(!g.music_volume_changed);
+        as(g.current_music_index == 0);
+        minfo("Reset complete - volume: %.1f, changed: %d", g.music_volume, g.music_volume_changed);
+    }
 };
