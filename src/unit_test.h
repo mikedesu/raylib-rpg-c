@@ -141,32 +141,48 @@ public:
     }
 
     void testMusicSystem() {
-        minfo("Starting testMusicSystem");
+        minfo("=== Starting testMusicSystem ===");
         gamestate g;
         
         // Verify initial state
-        minfo("Checking initial music state");
+        minfo("Checking initial music state...");
+        minfo("Expected music_volume: %.1f, Actual: %.1f", DEFAULT_MUSIC_VOLUME, g.music_volume);
         as(g.music_volume == DEFAULT_MUSIC_VOLUME);
+        minfo("Expected music_volume_changed: 0, Actual: %d", g.music_volume_changed);
         as(!g.music_volume_changed);
+        minfo("Expected current_music_index: 0, Actual: %d", g.current_music_index);
         as(g.current_music_index == 0);
         
         // Verify music paths initialized
-        minfo("Checking music paths");
+        minfo("Checking music paths...");
+        minfo("Music paths count: %zu", g.music_file_paths.size());
+        if (!g.music_file_paths.empty()) {
+            minfo("First music path: %s", g.music_file_paths[0].c_str());
+        }
         as(!g.music_file_paths.empty());
-        minfo("Found %zu music paths", g.music_file_paths.size());
         
         // Test volume change
-        minfo("Testing volume change");
-        g.music_volume = 0.5f;
-        as(g.music_volume == 0.5f);
+        minfo("Testing volume change...");
+        const float test_volume = 0.5f;
+        g.music_volume = test_volume;
+        minfo("Set volume to %.1f, checking...", test_volume);
+        minfo("Expected music_volume: %.1f, Actual: %.1f", test_volume, g.music_volume);
+        as(g.music_volume == test_volume);
+        minfo("Expected music_volume_changed: 1, Actual: %d", g.music_volume_changed);
         as(g.music_volume_changed == true);
         
         // Test reset
-        minfo("Testing reset");
+        minfo("Testing reset...");
         g.reset();
+        minfo("After reset - Expected music_volume: %.1f, Actual: %.1f", 
+              DEFAULT_MUSIC_VOLUME, g.music_volume);
         as(g.music_volume == DEFAULT_MUSIC_VOLUME);
+        minfo("After reset - Expected music_volume_changed: 0, Actual: %d", 
+              g.music_volume_changed);
         as(!g.music_volume_changed);
+        minfo("After reset - Expected current_music_index: 0, Actual: %d", 
+              g.current_music_index);
         as(g.current_music_index == 0);
-        minfo("Reset complete - volume: %.1f, changed: %d", g.music_volume, g.music_volume_changed);
+        minfo("=== Reset complete ===");
     }
 };
