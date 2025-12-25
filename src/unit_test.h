@@ -35,4 +35,38 @@ public:
             gamestate g;
         }
     }
+
+    void testEntityManagement() {
+        minfo("test entity management");
+        gamestate g;
+        
+        // Verify initial state
+        as(g.next_entityid == 1);
+        as(g.new_entityid_begin == ENTITYID_INVALID);
+        as(g.new_entityid_end == ENTITYID_INVALID);
+        as(!g.dirty_entities);
+        
+        // Add first entity
+        entityid first = g.add_entity();
+        as(first == 1);
+        as(g.next_entityid == 2);
+        as(g.new_entityid_begin == 1);
+        as(g.new_entityid_end == 2);
+        as(g.dirty_entities);
+        
+        // Add second entity
+        entityid second = g.add_entity();
+        as(second == 2);
+        as(g.next_entityid == 3);
+        as(g.new_entityid_begin == 1);  // Should stay at first ID
+        as(g.new_entityid_end == 3);    // Should update to new end
+        as(g.dirty_entities);
+        
+        // Reset and verify clean state
+        g.reset();
+        as(g.next_entityid == 1);
+        as(g.new_entityid_begin == ENTITYID_INVALID);
+        as(g.new_entityid_end == ENTITYID_INVALID);
+        as(!g.dirty_entities);
+    }
 };
