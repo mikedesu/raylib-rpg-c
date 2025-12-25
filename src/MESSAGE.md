@@ -26,11 +26,13 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
+- [ ] **CRASH** **BUG** unknown crash occuring, was entering "room 3" with a table, statue, table in vertical pattern
 - [ ] **CRASH** **BUG** unknown crash occuring, potentially on NPC death
   - [ ] witnessed crash occuring on `drop inventory` after killing a skeleton
 - [ ] **BUG** i just saw an NPC orc push a box under the player
-  - [ ] if a `fire` effect hits a tile w/ a `burnable` entity, that entity is destroyed
-  - [ ] if a `fire` effect hits a tile w/ a `burnable` item on an entity, that item is destroyed
+- [ ] **BUG** it is possible that `solid` props are placed in a way that blocks access into another area. one of two possible fixes:
+  - [ ] 1. more intelligent prop placement (currently totally random)
+  - [ ] 2. some props have `burnable` and can be cleared from the `df`
 - [ ] **QA** there is a small jitter when moving diagonally likely due to `cam_lockon`
 - [ ] **QA** NPCs moving into tiles too far away to see kind of "disappear" instead of moving into the tile
 - [x] **CORE** to prepare for unit testing and automation, we need to re-factor gamestate into a proper object
@@ -41,6 +43,8 @@ Previous analysis suggestions you've brought up that I will eventually implement
   - [ ] we should be using a `map` instead of hard-coding strings into vectors
 - [ ] **CODE QUALITY** break `process_attack_entity` and `process_attack_results` up into further functions
 - [ ] **UPGRADE** need to introduce `burnable` component such that
+  - [ ] if a `fire` effect hits a tile w/ a `burnable` entity, that entity is destroyed
+  - [ ] if a `fire` effect hits a tile w/ a `burnable` item on an entity, that item is destroyed
 - [ ] **UPGRADE** Currently in `process_attack_results`, the damage calculation doesn't account for
   - [ ] Target's equipped armor **WONT FIX: armor is currently un-implemented**
   - [ ] Armor durability loss (similar to weapon durability logic) **WONT FIX: armor is currently un-implemented**
