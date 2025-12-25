@@ -30,7 +30,10 @@ static inline bool handle_box_push(gamestate& g, entityid id, vec3 v) {
 
 static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-    //minfo("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
+
+    if (id == g.hero_id)
+        minfo("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
+
     g.ct.set<update>(id, true);
     g.ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
     // entity location
@@ -100,5 +103,7 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
     if (check_hearing(g, g.hero_id, aloc))
         PlaySound(g.sfx[SFX_STEP_STONE_1]);
 
+    if (id == g.hero_id)
+        msuccess("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
     return true;
 }
