@@ -18,7 +18,7 @@ PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-f
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB -DSPAWN_MONSTERS -DNPCS_ALL_AT_ONCE -DSTART_MESSAGES
 
 # Targets
-all: game 
+all: game index.html tests
 
 # Desktop build
 game: main.cpp 
@@ -29,7 +29,14 @@ game: main.cpp
 index.html: main.cpp
 	$(WEB_CC) -o $@ main.cpp $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS) $(CFLAGS)
 
+# Unit tests
+tests: tests.cpp
+	g++ -o tests tests.cpp -DDEBUG=1
+
+tests.cpp: unit_test.h
+	cxxtestgen --error-printer -o tests.cpp unit_test.h
+
 clean:
-	rm -rfv game *.gch time.txt index.html index.js index.wasm index.data test
+	rm -rfv game *.gch time.txt index.html index.js index.wasm index.data test tests.cpp tests
 
 

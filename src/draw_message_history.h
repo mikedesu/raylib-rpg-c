@@ -18,8 +18,10 @@ static inline void draw_message_history(gamestate& g) {
     const int max_measure = g.msg_history_max_len_msg_measure;
     const float w = max_measure + g.pad;
     const float h = (font_size + 2) * min(msg_count, max_messages) + g.pad;
-    const float x = 0;
+
+    const float x = g.targetwidth - w;
     const float y = 0;
+
     const Rectangle box = {x, y, w, h};
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);

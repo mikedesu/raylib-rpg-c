@@ -98,7 +98,9 @@ static inline void libdraw_init_rest(gamestate& g) {
     target_dest = (Rectangle){0, 0, DEFAULT_TARGET_WIDTH * 1.0f, DEFAULT_TARGET_HEIGHT * 1.0f};
     load_textures(txinfo);
     load_shaders();
-    const float x = DEFAULT_TARGET_WIDTH / 2.0f, y = DEFAULT_TARGET_HEIGHT / 4.0f;
+    //const float x = DEFAULT_TARGET_WIDTH / 2.0f, y = DEFAULT_TARGET_HEIGHT / 4.0f;
+    const float x = DEFAULT_TARGET_WIDTH / 4.0f;
+    const float y = DEFAULT_TARGET_HEIGHT / 4.0f;
     g.cam2d.offset = (Vector2){x, y};
     draw_title_screen_to_texture(g, false);
     draw_character_creation_screen_to_texture(g);

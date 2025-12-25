@@ -143,7 +143,7 @@ public:
 
 
     void init_music_paths() {
-        minfo("Initializing music paths...");
+        //minfo("Initializing music paths...");
         const char* music_path_file = "music.txt";
         FILE* file = fopen(music_path_file, "r");
         massert(file, "Could not open music path file: %s", music_path_file);
@@ -151,30 +151,30 @@ public:
         music_file_paths.clear();
         while (fgets(buffer, sizeof(buffer), file) != NULL) {
             // Remove newline character if present
-            minfo("Removing newline character...");
+            //minfo("Removing newline character...");
             size_t len = strlen(buffer);
             if (len > 0 && buffer[len - 1] == '\n') {
                 buffer[len - 1] = '\0';
             }
             // if it begins with a #, skip for now
-            minfo("Checking for comment...");
+            //minfo("Checking for comment...");
             if (buffer[0] == '#') {
                 mwarning("Comment received, skipping...");
                 continue;
             }
             // copy into g->music_file_paths
-            minfo("Pushing back %s", buffer);
+            //minfo("Pushing back %s", buffer);
             // need to pre-pend the folder path
             string fullpath = "audio/music/" + string(buffer);
             music_file_paths.push_back(fullpath);
         }
         fclose(file);
-        msuccess("Music paths initialized!");
+        //msuccess("Music paths initialized!");
     }
 
 
     void reset() {
-        minfo("gamestate reset");
+        //minfo("gamestate reset");
 
         version = GAME_VERSION;
         debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
@@ -186,7 +186,7 @@ public:
         debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
 
         targetwidth = targetheight = windowwidth = windowheight = -1;
-        hero_id = entity_turn = new_entityid_begin = new_entityid_end = -1;
+        hero_id = entity_turn = new_entityid_begin = new_entityid_end = ENTITYID_INVALID;
         timebegan = currenttime = time(NULL);
         timebegantm = localtime(&timebegan);
         currenttimetm = localtime(&currenttime);
@@ -197,6 +197,7 @@ public:
 
         cam_lockon = true;
         frame_dirty = true;
+
         debugpanelon = false;
         player_input_received = false;
         is_locked = false;
@@ -257,7 +258,7 @@ public:
         chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
         // why is the above line crashing?
         // the above line is also crashing
-        msuccess("Gamestate character creation name set to empty string");
+        //msuccess("Gamestate character creation name set to empty string");
         current_scene = SCENE_TITLE;
         music_volume = DEFAULT_MUSIC_VOLUME;
         last_click_screen_pos = (Vector2){-1, -1};

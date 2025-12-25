@@ -25,7 +25,12 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
+- [ ] there is a small jitter when moving diagonally likely due to `cam_lockon`
 - [ ] **CRASH** **BUG** unknown crash occuring, potentially on NPC death
+  - [ ] witnessed crash occuring on `drop inventory` after killing a skeleton
+- [ ] need to introduce `burnable` component such that
+  - [ ] if a `fire` effect hits a tile w/ a `burnable` entity, that entity is destroyed
+  - [ ] if a `fire` effect hits a tile w/ a `burnable` item on an entity, that item is destroyed
 - [ ] NPCs moving into tiles too far away to see kind of "disappear" instead of moving into the tile
 - [ ] The way we handle race2str and str2race can be updated
   - [ ] we should be using a `map` instead of hard-coding strings into vectors
