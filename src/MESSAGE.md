@@ -25,6 +25,7 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
+- [ ] **CRASH** **BUG** unknown crash occuring, potentially on NPC death
 - [ ] NPCs moving into tiles too far away to see kind of "disappear" instead of moving into the tile
 - [ ] The way we handle race2str and str2race can be updated
   - [ ] we should be using a `map` instead of hard-coding strings into vectors
