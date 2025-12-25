@@ -71,59 +71,73 @@ public:
     }
 
     void testMessageSystem() {
-        minfo("test message system");
+        minfo("Starting testMessageSystem");
         gamestate g;
         
         // Verify initial state
+        minfo("Checking initial state");
         as(g.msg_system.size() == 0);
         as(g.msg_history.size() == 0);
         as(!g.msg_system_is_active);
         
         // Add messages
+        minfo("Adding test messages");
         g.msg_system.push_back("Test message 1");
         g.msg_system.push_back("Test message 2");
         as(g.msg_system.size() == 2);
+        minfo("Message system size: %zu", g.msg_system.size());
         as(g.msg_system[0] == "Test message 1");
         as(g.msg_system[1] == "Test message 2");
         
         // Verify history
+        minfo("Checking message history");
         g.msg_history = g.msg_system;
         as(g.msg_history.size() == 2);
+        minfo("History size: %zu", g.msg_history.size());
         as(g.msg_history[0] == "Test message 1");
         as(g.msg_history[1] == "Test message 2");
         
         // Test reset
+        minfo("Testing reset behavior");
         g.reset();
         as(g.msg_system.size() == 0);
         as(g.msg_history.size() == 0);
         as(!g.msg_system_is_active);
+        minfo("Reset complete");
     }
 
     void testCameraSystem() {
-        minfo("test camera system");
+        minfo("Starting testCameraSystem");
         gamestate g;
         
         // Verify initial state
+        minfo("Checking initial camera state");
         as(g.cam2d.zoom == 4.0f);
         as(g.cam2d.rotation == 0.0);
         as(g.cam_lockon == true);
         as(g.cam_changed == false);
         
         // Test camera movement
+        minfo("Testing camera movement");
         g.cam2d.target = (Vector2){100, 100};
         as(g.cam2d.target.x == 100);
         as(g.cam2d.target.y == 100);
+        minfo("Camera target set to (%.1f, %.1f)", g.cam2d.target.x, g.cam2d.target.y);
         
         // Test zoom
+        minfo("Testing camera zoom");
         g.cam2d.zoom = 2.0f;
         as(g.cam2d.zoom == 2.0f);
         as(g.cam_changed == true);
+        minfo("Camera zoom set to %.1f, changed flag: %d", g.cam2d.zoom, g.cam_changed);
         
         // Test reset
+        minfo("Testing camera reset");
         g.reset();
         as(g.cam2d.zoom == 4.0f);
         as(g.cam2d.rotation == 0.0);
         as(g.cam_lockon == true);
         as(g.cam_changed == false);
+        minfo("Reset complete - zoom: %.1f, changed: %d", g.cam2d.zoom, g.cam_changed);
     }
 };
