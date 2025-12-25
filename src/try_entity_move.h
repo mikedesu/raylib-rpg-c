@@ -4,6 +4,7 @@
 #include "dungeon.h"
 #include "entity_accessors.h"
 #include "entity_templates.h"
+#include "entityid.h"
 #include "gamestate.h"
 //#include "handle_box_push.h"
 #include "libgame_defines.h"
@@ -11,6 +12,8 @@
 #include "sfx.h"
 #include "tile_has_box.h"
 #include "tile_has_door.h"
+#include "tile_has_pushable.h"
+#include "tile_has_solid.h"
 #include "tile_npc_living_count.h"
 
 static inline bool try_entity_move(gamestate& g, entityid id, vec3 v);
@@ -47,12 +50,20 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
         return false;
     }
 
+
     const entityid box_id = tile_has_box(g, aloc.x, aloc.y, aloc.z);
-    // we need to
-    // 1. check to see if box_id is pushable
-    // 2. check to see if the tile in front of box, if pushed, is free/open
     if (box_id != ENTITYID_INVALID) {
         return handle_box_push(g, box_id, v);
+    }
+
+    const entityid pushable_id = tile_has_pushable(g, aloc.x, aloc.y, aloc.z);
+    if (pushable_id != ENTITYID_INVALID) {
+        return handle_box_push(g, pushable_id, v);
+    }
+
+    const bool has_solid = tile_has_solid(g, aloc.x, aloc.y, aloc.z);
+    if (has_solid) {
+        return false;
     }
 
     if (tile_has_live_npcs(g, g.tile_at_cur_floor(aloc))) {

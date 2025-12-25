@@ -54,7 +54,7 @@ static inline void sprite_incrframe2(shared_ptr<sprite> s) {
     }
     s->currentframe++;
     if (s->stop_on_last_frame && s->currentframe == s->numframes - 1) {
-        merror("stop on last frame");
+        //merror("stop on last frame");
         s->is_animating = false;
         s->src.x = s->width * s->currentframe;
         return;

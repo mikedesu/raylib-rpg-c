@@ -14,6 +14,7 @@
 #include "init_dungeon.h"
 #include "inputstate.h"
 #include "place_doors.h"
+#include "place_props.h"
 #include "potion.h"
 #include "proptype.h"
 #include "update_debug_panel_buffer.h"
@@ -66,20 +67,34 @@ static inline void liblogic_init(gamestate& g) {
     srand(time(NULL));
     SetRandomSeed(time(NULL));
     minfo("liblogic_init");
-    init_dungeon(g);
+    init_dungeon(g, 10);
 
     // create doors
     place_doors(g);
 
+    place_props(g);
     // create props
-    create_prop_at_with(g, PROP_DUNGEON_BANNER, (vec3){9, 7, 0}, [](gamestate& g, entityid id) {});
-    create_prop_at_with(g, PROP_DUNGEON_BANNER, (vec3){10, 7, 0}, [](gamestate& g, entityid id) {});
-    create_prop_at_with(g, PROP_DUNGEON_BANNER, (vec3){11, 7, 0}, [](gamestate& g, entityid id) {});
+    //auto mydefault = [](gamestate& g, entityid id) {};
+    //auto set_solid = [](gamestate& g, entityid id) { g.ct.set<solid>(id, true); };
+    //auto set_solid_and_pushable = [](gamestate& g, entityid id) {
+    //    g.ct.set<solid>(id, true);
+    //    g.ct.set<pushable>(id, true);
+    //};
+
+    //create_prop_at_with(g, PROP_DUNGEON_BANNER_00, (vec3){9, 7, 0}, mydefault);
+    //create_prop_at_with(g, PROP_DUNGEON_BANNER_01, (vec3){10, 7, 0}, mydefault);
+    //create_prop_at_with(g, PROP_DUNGEON_BANNER_02, (vec3){11, 7, 0}, mydefault);
+
+    //create_prop_at_with(g, PROP_DUNGEON_WOODEN_TABLE_00, (vec3){9, 8, 0}, set_solid);
+    //create_prop_at_with(g, PROP_DUNGEON_WOODEN_TABLE_01, (vec3){10, 8, 0}, set_solid);
+    //create_prop_at_with(g, PROP_DUNGEON_WOODEN_CHAIR_00, (vec3){11, 8, 0}, set_solid);
+
+    //create_prop_at_with(g, PROP_DUNGEON_STATUE_00, (vec3){9, 9, 0}, set_solid_and_pushable);
 
 
-    create_box_at_with(g, (vec3){11, 9, 0}, [](gamestate& g, entityid id) {});
-    create_box_at_with(g, (vec3){10, 9, 0}, [](gamestate& g, entityid id) {});
-    create_box_at_with(g, (vec3){9, 9, 0}, [](gamestate& g, entityid id) {});
+    //    create_box_at_with(g, (vec3){11, 9, 0}, [](gamestate& g, entityid id) {});
+    //    create_box_at_with(g, (vec3){10, 9, 0}, [](gamestate& g, entityid id) {});
+    //create_box_at_with(g, (vec3){9, 9, 0}, [](gamestate& g, entityid id) {});
     //create_weapon_at_with(g, df_get_random_loc(d_get_floor(g.dungeon, 0)), dagger_init_test);
     create_weapon_at_with(g, df_get_random_loc(g.dungeon.floors[0]), dagger_init_test);
     create_shield_at_with(g, df_get_random_loc(g.dungeon.floors[0]), kite_shield_init_test);

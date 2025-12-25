@@ -385,3 +385,10 @@ template <>
 struct ComponentTraits<proptype> {
     using Type = proptype_t;
 };
+
+
+struct solid { }; // bool
+template <>
+struct ComponentTraits<solid> {
+    using Type = bool;
+};

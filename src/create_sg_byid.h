@@ -161,10 +161,13 @@ static inline void create_item_sg_byid(gamestate& g, entityid id) {
 static inline void create_prop_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<proptype>(id).value_or(PROP_NONE)) {
-    case PROP_DUNGEON_BANNER: create_spritegroup(g, id, TX_PROP_DUNGEON_BANNER_KEYS, TX_PROP_DUNGEON_BANNER_COUNT, -12, -12); break;
-    //case PROP_DUNGEON_TABLE: create_potion_sg_byid(g, id); break;
-    //case PROP_DUNGEON_CHAIR: create_potion_sg_byid(g, id); break;
-    //case PROP_DUNGEON_STATUE: create_potion_sg_byid(g, id); break;
+    case PROP_DUNGEON_BANNER_00: create_spritegroup(g, id, TX_PROP_DUNGEON_BANNER_00_KEYS, TX_PROP_DUNGEON_BANNER_00_COUNT, -12, -12); break;
+    case PROP_DUNGEON_BANNER_01: create_spritegroup(g, id, TX_PROP_DUNGEON_BANNER_01_KEYS, TX_PROP_DUNGEON_BANNER_01_COUNT, -12, -12); break;
+    case PROP_DUNGEON_BANNER_02: create_spritegroup(g, id, TX_PROP_DUNGEON_BANNER_02_KEYS, TX_PROP_DUNGEON_BANNER_02_COUNT, -12, -12); break;
+    case PROP_DUNGEON_WOODEN_TABLE_00: create_spritegroup(g, id, TX_PROP_DUNGEON_WOODEN_TABLE_00_KEYS, TX_PROP_DUNGEON_WOODEN_TABLE_00_COUNT, -12, -12); break;
+    case PROP_DUNGEON_WOODEN_TABLE_01: create_spritegroup(g, id, TX_PROP_DUNGEON_WOODEN_TABLE_01_KEYS, TX_PROP_DUNGEON_WOODEN_TABLE_01_COUNT, -12, -12); break;
+    case PROP_DUNGEON_WOODEN_CHAIR_00: create_spritegroup(g, id, TX_PROP_DUNGEON_WOODEN_CHAIR_00_KEYS, TX_PROP_DUNGEON_WOODEN_CHAIR_00_COUNT, -12, -12); break;
+    case PROP_DUNGEON_STATUE_00: create_spritegroup(g, id, TX_PROP_DUNGEON_STATUE_00_KEYS, TX_PROP_DUNGEON_STATUE_00_COUNT, -12, -12); break;
     default: break;
     }
 }
