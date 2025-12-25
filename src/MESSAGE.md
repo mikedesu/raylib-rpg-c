@@ -26,6 +26,7 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
+- [ ] **CRASH** **BUG** unknown crash occuring, was moving onto a tile with an npc i just killed
 - [ ] **CRASH** **BUG** unknown crash occuring, was entering "room 3" with a table, statue, table in vertical pattern
 - [ ] **CRASH** **BUG** unknown crash occuring, potentially on NPC death
   - [ ] witnessed crash occuring on `drop inventory` after killing a skeleton
