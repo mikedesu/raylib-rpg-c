@@ -2,8 +2,8 @@
 
 //#include "gamestate.h"
 #include "is_entity_adjacent.h"
-#include "try_entity_attack.h"
-#include "try_entity_move.h"
+//#include "try_entity_attack.h"
+//#include "try_entity_move.h"
 
 
 static inline void handle_npc(gamestate& g, entityid id) {
@@ -40,9 +40,9 @@ static inline void handle_npc(gamestate& g, entityid id) {
     if (is_entity_adjacent(g, id, tgt_id)) {
         // if id is adjacent to its target or the hero
         vec3 loc = g.ct.get<location>(tgt_id).value();
-        try_entity_attack(g, id, loc.x, loc.y);
+        g.try_entity_attack(id, loc.x, loc.y);
         return;
     }
     // else, randomly move
-    try_entity_move(g, id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+    g.try_entity_move(id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
 }

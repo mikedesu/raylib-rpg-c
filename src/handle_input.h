@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gamestate.h"
-#include "handle_input_gameplay_scene.h"
+//#include "handle_input_gameplay_scene.h"
 #include "inputstate.h"
 
 static inline void handle_input(gamestate& g, inputstate& is) {
@@ -19,5 +19,5 @@ static inline void handle_input(gamestate& g, inputstate& is) {
     else if (g.current_scene == SCENE_CHARACTER_CREATION)
         g.handle_input_character_creation_scene(is);
     else if (g.current_scene == SCENE_GAMEPLAY)
-        handle_input_gameplay_scene(g, is);
+        g.handle_input_gameplay_scene(is);
 }
