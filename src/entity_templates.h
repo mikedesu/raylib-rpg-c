@@ -77,20 +77,3 @@ static inline void random_weapon_init_test(gamestate& g, entityid id) {
     default: break;
     }
 }
-
-
-static inline void orc_init_test(gamestate& g, entityid id) {
-    const entityid wpn_id = create_weapon_with(g, random_weapon_init_test);
-    //const entityid wpn_id = create_weapon_with(g, axe_init_test);
-    const entityid potion_id = create_potion_with(g, [](gamestate& g, entityid myid) {
-        g.ct.set<name>(myid, "small healing potion");
-        g.ct.set<description>(myid, "a small healing potion");
-        g.ct.set<potiontype>(myid, POTION_HP_SMALL);
-        g.ct.set<healing>(myid, (vec3){1, 6, 0});
-    });
-
-    add_to_inventory(g, id, wpn_id);
-    add_to_inventory(g, id, potion_id);
-    g.ct.set<equipped_weapon>(id, wpn_id);
-    g.ct.set<name>(id, get_random_orc_name());
-}
