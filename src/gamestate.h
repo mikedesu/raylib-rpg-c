@@ -3,18 +3,15 @@
 #include "ComponentTable.h"
 #include "character_creation.h"
 #include "controlmode.h"
-//#include "create_prop.h"
 #include "debugpanel.h"
 #include "direction.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "entity_actions.h"
-//#include "entity_templates.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate_flag.h"
 #include "get_racial_hd.h"
-//#include "init_dungeon.h"
 #include "get_racial_modifiers.h"
 #include "libgame_version.h"
 #include "orc_names.h"
@@ -514,7 +511,8 @@ public:
                             const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_TABLE_01, loc);
                             ct.set<solid>(id, true);
                         } else if (flip == 2) {
-                            const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_CHAIR_00, loc);
+                            //const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_CHAIR_00, loc);
+                            create_prop_at_with(PROP_DUNGEON_WOODEN_CHAIR_00, loc);
                         } else if (flip == 3) {
                             const entityid id = create_prop_at_with(PROP_DUNGEON_STATUE_00, loc);
                             ct.set<solid>(id, true);
@@ -760,12 +758,6 @@ public:
     }
 
 
-    // Original function still available but implemented using the new lambda-based version
-    //inline entityid create_npc(race_t rt, vec3 locn) {
-    //    return create_npc_at_with(g, rt, loc, [](gamestate&, entityid) {});
-    //}
-
-
     inline bool add_to_inventory(entityid actor_id, entityid item_id) {
         minfo("add to inventory: %d %d", actor_id, item_id);
         auto maybe_inventory = ct.get<inventory>(actor_id);
@@ -828,18 +820,7 @@ public:
         minfo("getting tile has live npcs...");
         if (tile_has_live_npcs(tile))
             return ENTITYID_INVALID;
-        //function<void(gamestate&, entityid)> hook;
-        //if (r == RACE_ORC) {
-        //    hook = [&monsterInitFunction](gamestate& g, entityid id) {
-        //        orc_init_test(g, id);
-        //        monsterInitFunction(g, id);
-        //    };
-        //} else {
-        //    hook = [&monsterInitFunction, r](gamestate& g, entityid id) {
-        //        g.ct.set<name>(id, race2str(r));
-        //        monsterInitFunction(g, id);
-        //    };
-        //}
+
 
         //const auto id = create_random_monster_with(g, monsterInitFunction);
         minfo("create random monster with...");
@@ -890,8 +871,6 @@ public:
         place_props();
 
         const entityid dagger_id = create_weapon_at_with(df_get_random_loc(dungeon.floors[0]));
-        //dagger_init_test(this, dagger_id);
-
         ct.set<name>(dagger_id, "Dagger");
         ct.set<description>(dagger_id, "Stabby stabby.");
         ct.set<weapontype>(dagger_id, WEAPON_DAGGER);

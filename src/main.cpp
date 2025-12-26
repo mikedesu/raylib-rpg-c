@@ -19,7 +19,6 @@ void gameloop() {
         libdraw_close();
         liblogic_close(g);
         g.reset();
-        //liblogic_init(g);
         g.logic_init();
         libdraw_init(g);
         g.do_restart = false; // Reset restart flag
@@ -28,8 +27,6 @@ void gameloop() {
 }
 
 int main() {
-    //liblogic_init(g);
-
     g.logic_init();
 
     libdraw_init(g);
