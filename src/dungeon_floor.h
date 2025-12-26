@@ -299,7 +299,7 @@ static inline void df_free(dungeon_floor_t& df) {
 }
 
 
-static inline entityid df_add_at(dungeon_floor_t& df, entityid id, int x, int y) {
+const static inline entityid df_add_at(dungeon_floor_t& df, entityid id, int x, int y) {
     //minfo("df_add_at: %d, %d, %d", id, x, y);
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(x >= 0 && x < df.width, "x is out of bounds");
@@ -332,7 +332,7 @@ static inline void df_set_all_tiles(dungeon_floor_t& df, tiletype_t type) {
 }
 
 
-static inline vec3 df_get_random_loc(dungeon_floor_t& df) {
+const static inline vec3 df_get_random_loc(dungeon_floor_t& df) {
     vector<vec3> tmp;
     for (int x = 0; x < df.width; x++) {
         for (int y = 0; y < df.height; y++) {
@@ -353,7 +353,7 @@ static inline vec3 df_get_random_loc(dungeon_floor_t& df) {
 }
 
 
-static inline vec3 df_get_random_loc_of_type(dungeon_floor_t& df, tiletype_t type) {
+const static inline vec3 df_get_random_loc_of_type(dungeon_floor_t& df, tiletype_t type) {
     vector<vec3> tmp;
     for (int x = 0; x < df.width; x++) {
         for (int y = 0; y < df.height; y++) {

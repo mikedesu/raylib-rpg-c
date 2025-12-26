@@ -66,7 +66,7 @@ static inline void tile_init(tile_t& t, tiletype_t type) {
 }
 
 
-static inline entityid tile_add(tile_t& t, entityid id) {
+const static inline entityid tile_add(tile_t& t, const entityid id) {
     // Check if the entity already exists
     if (find(t.entities->begin(), t.entities->end(), id) != t.entities->end()) {
         merror("tile_add: entity already exists on tile");

@@ -45,6 +45,10 @@
 #define GAMESTATE_INIT_ENTITYIDS_MAX 3000000
 
 
+typedef function<void(ComponentTable&, const entityid)> with_function;
+typedef ComponentTable CT;
+
+
 class gamestate {
 public:
     controlmode_t controlmode;
@@ -481,12 +485,13 @@ public:
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
-        minfo("attempting prop df_add_at: %d, %d, %d", id, loc.x, loc.y);
-        if (!df_add_at(df, id, loc.x, loc.y)) {
-            merror("failed df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        //minfo("attempting prop df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        const entityid result = df_add_at(df, id, loc.x, loc.y);
+        if (result == ENTITYID_INVALID) {
+            //merror("failed df_add_at: %d, %d, %d", id, loc.x, loc.y);
             return ENTITYID_INVALID;
         }
-        msuccess("prop add success");
+        //msuccess("prop add success");
         ct.set<location>(id, loc);
         return id;
     }
@@ -494,13 +499,16 @@ public:
 
 
 
-    inline void place_props() {
+    const inline int place_props() {
         //auto mydefault = [](gamestate& g, entityid id) {};
         //auto set_solid = [](gamestate& g, entityid id) { g.ct.set<solid>(id, true); };
         //auto set_solid_and_pushable = [](gamestate& g, entityid id) {
         //    g.ct.set<solid>(id, true);
         //    g.ct.set<pushable>(id, true);
         //};
+
+        int placed_props = 0;
+
         for (int z = 0; z < (int)dungeon.floors.size(); z++) {
             auto df = d_get_floor(dungeon, z);
             for (int x = 0; x < df.width; x++) {
@@ -519,9 +527,21 @@ public:
                         if (flip == 0) {
                             const int r = GetRandomValue(1, 3);
                             switch (r) {
-                            case 1: create_prop_at_with(PROP_DUNGEON_BANNER_00, loc);
-                            case 2: create_prop_at_with(PROP_DUNGEON_BANNER_01, loc);
-                            case 3: create_prop_at_with(PROP_DUNGEON_BANNER_02, loc);
+                            case 1: {
+                                const entityid id = create_prop_at_with(PROP_DUNGEON_BANNER_00, loc);
+                                if (id != ENTITYID_INVALID)
+                                    placed_props++;
+                            } break;
+                            case 2: {
+                                const entityid id = create_prop_at_with(PROP_DUNGEON_BANNER_01, loc);
+                                if (id != ENTITYID_INVALID)
+                                    placed_props++;
+                            } break;
+                            case 3: {
+                                const entityid id = create_prop_at_with(PROP_DUNGEON_BANNER_02, loc);
+                                if (id != ENTITYID_INVALID)
+                                    placed_props++;
+                            } break;
                             default: break;
                             }
                         }
@@ -530,41 +550,54 @@ public:
                         if (flip == 0) {
                             const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_TABLE_00, loc);
                             ct.set<solid>(id, true);
+                            if (id != ENTITYID_INVALID)
+                                placed_props++;
 
                         } else if (flip == 1) {
                             const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_TABLE_01, loc);
-                            ct.set<solid>(id, true);
+                            if (id != ENTITYID_INVALID) {
+                                placed_props++;
+                                ct.set<solid>(id, true);
+                            }
                         } else if (flip == 2) {
-                            //const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_CHAIR_00, loc);
-                            create_prop_at_with(PROP_DUNGEON_WOODEN_CHAIR_00, loc);
+                            const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_CHAIR_00, loc);
+                            if (id != ENTITYID_INVALID)
+                                placed_props++;
+
                         } else if (flip == 3) {
                             const entityid id = create_prop_at_with(PROP_DUNGEON_STATUE_00, loc);
-                            ct.set<solid>(id, true);
-                            ct.set<pushable>(id, true);
+                            if (id != ENTITYID_INVALID) {
+                                placed_props++;
+                                ct.set<solid>(id, true);
+                                ct.set<pushable>(id, true);
+                            }
                         }
                     }
                 }
             }
         }
+
+        return placed_props;
     }
 
 
 
 
-    const inline entityid create_weapon_with() {
+    //const inline entityid create_weapon_with(ComponentTable& ct, function<void(ComponentTable&, entityid)> weaponInitFunction) {
+    const inline entityid create_weapon_with(ComponentTable& ct, with_function weaponInitFunction) {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
         ct.set<itemtype>(id, ITEM_WEAPON);
         ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
         ct.set<update>(id, true);
-        //weaponInitFunction(g, id);
+        weaponInitFunction(ct, id);
         return id;
     }
 
 
 
 
-    const inline entityid create_weapon_at_with(const vec3 loc) {
+    const inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_function weaponInitFunction) {
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type)) {
@@ -575,7 +608,7 @@ public:
             merror("cannot create entity on tile with live NPCs");
             return ENTITYID_INVALID;
         }
-        const auto id = create_weapon_with();
+        const auto id = create_weapon_with(ct, weaponInitFunction);
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
@@ -818,14 +851,17 @@ public:
         const race_t r = RACE_ORC;
         const entityid id = create_npc_with(r);
         minfo("create weapon");
-        const entityid wpn_id = create_weapon_with();
-        ct.set<name>(wpn_id, "Dagger");
-        ct.set<description>(wpn_id, "Stabby stabby.");
-        ct.set<weapontype>(wpn_id, WEAPON_DAGGER);
-        ct.set<damage>(wpn_id, (vec3){1, 4, 0});
-        ct.set<durability>(wpn_id, 100);
-        ct.set<max_durability>(wpn_id, 100);
-        ct.set<rarity>(wpn_id, RARITY_COMMON);
+
+        const entityid wpn_id = create_weapon_with(ct, [](CT& ct, const entityid id) {
+            ct.set<name>(id, "Dagger");
+            ct.set<description>(id, "Stabby stabby.");
+            ct.set<weapontype>(id, WEAPON_DAGGER);
+            ct.set<damage>(id, (vec3){1, 4, 0});
+            ct.set<durability>(id, 100);
+            ct.set<max_durability>(id, 100);
+            ct.set<rarity>(id, RARITY_COMMON);
+        });
+
         minfo("create potion");
         //const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]));
         const entityid potion_id = create_potion_with();
@@ -1002,14 +1038,15 @@ public:
         place_doors();
         place_props();
 
-        const entityid dagger_id = create_weapon_at_with(df_get_random_loc(dungeon.floors[0]));
-        ct.set<name>(dagger_id, "Dagger");
-        ct.set<description>(dagger_id, "Stabby stabby.");
-        ct.set<weapontype>(dagger_id, WEAPON_DAGGER);
-        ct.set<damage>(dagger_id, (vec3){1, 4, 0});
-        ct.set<durability>(dagger_id, 100);
-        ct.set<max_durability>(dagger_id, 100);
-        ct.set<rarity>(dagger_id, RARITY_COMMON);
+        const entityid dagger_id = create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
+            ct.set<name>(id, "Dagger");
+            ct.set<description>(id, "Stabby stabby.");
+            ct.set<weapontype>(id, WEAPON_DAGGER);
+            ct.set<damage>(id, (vec3){1, 4, 0});
+            ct.set<durability>(id, 100);
+            ct.set<max_durability>(id, 100);
+            ct.set<rarity>(id, RARITY_COMMON);
+        });
 
         const entityid shield_id = create_shield_at_with(df_get_random_loc(dungeon.floors[0]));
         ct.set<name>(shield_id, "Kite Shield");

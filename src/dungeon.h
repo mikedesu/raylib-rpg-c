@@ -73,8 +73,8 @@ static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int 
     auto creation_rules = [&df]() {
         const float x = df.width / 4.0;
         const float y = df.height / 4.0;
-        const int w = 3;
-        const int h = 3;
+        const int w = 4;
+        const int h = 4;
         //minfo("setting rooms...");
         // create an wxh area
         Rectangle base = {x - 1, y - 1, static_cast<float>(df.width), static_cast<float>(df.height)};
@@ -83,11 +83,11 @@ static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int 
         Rectangle room1 = {base.x + 1, base.y + 1, w, h};
         df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room1);
         // draw room 2
-        //Rectangle room2 = {room1.x + room1.width + 1, room1.y, w, h};
-        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room2);
+        Rectangle room2 = {room1.x + room1.width + 1, room1.y, w, h};
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room2);
         // poke a hole
-        //Rectangle entryway1 = {room2.x - 1, room2.y + 1, 1, 1};
-        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway1);
+        Rectangle entryway1 = {room2.x - 1, room2.y + 1, 1, 1};
+        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway1);
         // draw room 3
         //Rectangle room3 = {room2.x, room2.y + room2.height + 1, w, h};
         //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room3);
@@ -112,14 +112,14 @@ static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int 
         df.downstairs_loc = loc_d;
         //minfo("setting doors...");
         // automatic door placement
-        //for (int x = 0; x < df.width; x++) {
-        //    for (int y = 0; y < df.height; y++) {
-        //        //minfo("x: %d, y: %d, df.width: %d, df.height: %d", x, y, df.width, df.height);
-        //        if (df_is_good_door_loc(df, (vec3){x, y, df.floor})) {
-        //            df_set_can_have_door(df, (vec3){x, y, df.floor});
-        //        }
-        //    }
-        //}
+        for (int x = 0; x < df.width; x++) {
+            for (int y = 0; y < df.height; y++) {
+                //minfo("x: %d, y: %d, df.width: %d, df.height: %d", x, y, df.width, df.height);
+                if (df_is_good_door_loc(df, (vec3){x, y, df.floor})) {
+                    df_set_can_have_door(df, (vec3){x, y, df.floor});
+                }
+            }
+        }
     };
 
     //minfo("df xform...");
