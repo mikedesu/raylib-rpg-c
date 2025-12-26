@@ -3,7 +3,6 @@
 #include "dungeon_floor.h"
 #include "dungeon_tile_type.h"
 #include "dungeonfloorid.h"
-
 #include <functional>
 #include <memory>
 #include <optional>
@@ -14,7 +13,9 @@ using std::make_shared;
 using std::shared_ptr;
 using std::vector;
 
+
 #define INITIAL_DUNGEON_CAPACITY 4
+
 
 typedef struct {
     vector<dungeon_floor_t> floors; // vector of shared pointers to dungeon_floor_t
@@ -22,6 +23,9 @@ typedef struct {
     bool is_locked;
     bool is_initialized;
 } dungeon_t;
+
+
+
 
 static inline void d_create(dungeon_t& dungeon) {
     //minfo("d_create");
@@ -35,17 +39,29 @@ static inline void d_create(dungeon_t& dungeon) {
     //msuccess("dungeon created");
 }
 
+
+
+
 static inline void d_destroy(dungeon_t& d) {
     d.floors.clear();
 }
+
+
+
 
 static inline dungeon_floor_t& d_get_floor(dungeon_t& dungeon, size_t index) {
     return dungeon.floors[index];
 }
 
+
+
+
 static inline dungeon_floor_t& d_get_current_floor(dungeon_t& dungeon) {
     return d_get_floor(dungeon, dungeon.current_floor);
 }
+
+
+
 
 static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int height) {
     if (width <= 0 || height <= 0 || dungeon.is_locked)
@@ -57,7 +73,7 @@ static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int 
     auto creation_rules = [&df]() {
         const float x = df.width / 4.0;
         const float y = df.height / 4.0;
-        const int w = 4;
+        const int w = 3;
         const int h = 3;
         //minfo("setting rooms...");
         // create an wxh area
@@ -67,23 +83,23 @@ static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int 
         Rectangle room1 = {base.x + 1, base.y + 1, w, h};
         df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room1);
         // draw room 2
-        Rectangle room2 = {room1.x + room1.width + 1, room1.y, w, h};
-        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room2);
+        //Rectangle room2 = {room1.x + room1.width + 1, room1.y, w, h};
+        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room2);
         // poke a hole
-        Rectangle entryway1 = {room2.x - 1, room2.y + 1, 1, 1};
-        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway1);
+        //Rectangle entryway1 = {room2.x - 1, room2.y + 1, 1, 1};
+        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway1);
         // draw room 3
-        Rectangle room3 = {room2.x, room2.y + room2.height + 1, w, h};
-        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room3);
+        //Rectangle room3 = {room2.x, room2.y + room2.height + 1, w, h};
+        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room3);
         // poke a hole in the wall
-        Rectangle entryway2 = {room3.x + 1, room3.y - 1, 1, 1};
-        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway2);
+        //Rectangle entryway2 = {room3.x + 1, room3.y - 1, 1, 1};
+        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway2);
         // draw room 4
-        Rectangle room4 = {room1.x, room1.y + room1.height + 1, w, h};
-        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room4);
+        //Rectangle room4 = {room1.x, room1.y + room1.height + 1, w, h};
+        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, room4);
         // poke a hole in the wall
-        Rectangle entryway3 = {room3.x - 1, room3.y + 1, 1, 1};
-        df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway3);
+        //Rectangle entryway3 = {room3.x - 1, room3.y + 1, 1, 1};
+        //df_set_area(df, TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, entryway3);
 
         //minfo("setting stairs...");
         // set upstairs
@@ -91,19 +107,19 @@ static inline void d_add_floor(dungeon_t& dungeon, biome_t type, int width, int 
         df_set_tile(df, TILE_UPSTAIRS, loc_u.x, loc_u.y);
         df.upstairs_loc = loc_u;
         // set downstairs
-        const vec3 loc_d = {9, 14, df.floor};
+        const vec3 loc_d = {static_cast<int>(room1.x + 1), static_cast<int>(room1.y + 1), df.floor};
         df_set_tile(df, TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
         df.downstairs_loc = loc_d;
         //minfo("setting doors...");
         // automatic door placement
-        for (int x = 0; x < df.width; x++) {
-            for (int y = 0; y < df.height; y++) {
-                //minfo("x: %d, y: %d, df.width: %d, df.height: %d", x, y, df.width, df.height);
-                if (df_is_good_door_loc(df, (vec3){x, y, df.floor})) {
-                    df_set_can_have_door(df, (vec3){x, y, df.floor});
-                }
-            }
-        }
+        //for (int x = 0; x < df.width; x++) {
+        //    for (int y = 0; y < df.height; y++) {
+        //        //minfo("x: %d, y: %d, df.width: %d, df.height: %d", x, y, df.width, df.height);
+        //        if (df_is_good_door_loc(df, (vec3){x, y, df.floor})) {
+        //            df_set_can_have_door(df, (vec3){x, y, df.floor});
+        //        }
+        //    }
+        //}
     };
 
     //minfo("df xform...");
