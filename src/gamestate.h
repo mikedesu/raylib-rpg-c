@@ -2150,7 +2150,9 @@ public:
                     : wpn_type == WEAPON_DAGGER ? SFX_SLASH_ATTACK_LIGHT_1
                                                 : SFX_SLASH_ATTACK_SWORD_1;
         }
+        minfo("playing attack sfx...");
         PlaySound(sfx[index]);
+        msuccess("attack sfx played");
     }
 
 
@@ -2249,6 +2251,7 @@ public:
         //    add_message_history(g, "You picked up %s", item_name.c_str());
         //}
 
+        minfo("returning item_picked_up: %d", item_picked_up);
         return item_picked_up;
     }
 
