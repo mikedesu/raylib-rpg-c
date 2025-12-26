@@ -2647,4 +2647,159 @@ public:
             return;
         }
     }
+
+
+    void handle_input(inputstate& is) {
+        // no matter which mode we are in, we can toggle the debug panel
+        if (inputstate_is_pressed(is, KEY_P)) {
+            debugpanelon = !debugpanelon;
+            minfo("Toggling debug panel: %s", debugpanelon ? "ON" : "OFF");
+            return;
+        }
+
+        if (current_scene == SCENE_TITLE)
+            handle_input_title_scene(is);
+        else if (current_scene == SCENE_MAIN_MENU)
+            handle_input_main_menu_scene(is);
+        else if (current_scene == SCENE_CHARACTER_CREATION)
+            handle_input_character_creation_scene(is);
+        else if (current_scene == SCENE_GAMEPLAY)
+            handle_input_gameplay_scene(is);
+    }
+
+
+    void update_debug_panel_buffer(inputstate& is) {
+        // Static buffers to avoid reallocating every frame
+        //static const char* control_modes[] = {"Camera", "Player", "Unknown"};
+        int message_count = msg_history.size();
+        int inventory_count;
+        vec3 loc = {0, 0, 0};
+        inventory_count = -1;
+        if (hero_id != ENTITYID_INVALID)
+            loc = ct.get<location>(hero_id).value_or((vec3){-1, -1, -1});
+        // Determine control mode and flag strings
+        const char* control_mode = controlmode == CONTROLMODE_CAMERA ? "Camera" : controlmode == CONTROLMODE_PLAYER ? "Player" : "Unknown";
+        // zero out the buffer
+        memset(debugpanel.buffer, 0, sizeof(debugpanel.buffer));
+        // Format the string in one pass
+        snprintf(debugpanel.buffer,
+                 sizeof(debugpanel.buffer),
+                 "@evildojo666\n"
+                 "project.rpg\n"
+                 //"%s\n" // timebeganbuf
+                 //"%s\n" // currenttimebuf
+                 "frame : %d\n"
+                 "update: %d\n"
+                 "frame dirty: %d\n"
+                 "draw time: %.1fms\n"
+                 "cam: (%.0f,%.0f) Zoom: %.1f\n"
+                 "controlmode: %s \n"
+                 "floor: %d/%d \n"
+                 "next_entity_id: %d\n"
+                 "hero_id: %d\n"
+                 "flag: %s\n"
+                 "entity_turn: %d\n"
+                 "hero: (%d,%d,%d)\n"
+                 "weapon: %d\n"
+                 "inventory: %d\n"
+                 "message count: %d\n",
+                 framecount,
+                 frame_updates,
+                 frame_dirty,
+                 last_frame_time * 1000,
+                 cam2d.offset.x,
+                 cam2d.offset.y,
+                 cam2d.zoom,
+                 control_mode,
+                 0,
+                 0,
+                 next_entityid,
+                 hero_id,
+                 flag == GAMESTATE_FLAG_NONE           ? "None"
+                 : flag == GAMESTATE_FLAG_PLAYER_INPUT ? "Player Input"
+                 : flag == GAMESTATE_FLAG_PLAYER_ANIM  ? "Player anim"
+                 : flag == GAMESTATE_FLAG_NPC_TURN     ? "NPC Turn"
+                 : flag == GAMESTATE_FLAG_NPC_ANIM     ? "NPC anim"
+                                                       : "Unknown",
+
+                 entity_turn,
+                 loc.x,
+                 loc.y,
+                 loc.z,
+                 ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID),
+                 inventory_count,
+                 message_count);
+    }
+
+
+    bool is_entity_adjacent(entityid id0, entityid id1) {
+        massert(id0 != ENTITYID_INVALID, "id0 is invalid");
+        massert(id1 != ENTITYID_INVALID, "id1 is invalid");
+        massert(id0 != id1, "id0 and id1 are the same");
+        // check if on same floor
+        auto loc0 = ct.get<location>(id0).value_or((vec3){-1, -1, -1});
+        auto loc1 = ct.get<location>(id1).value_or((vec3){-1, -1, -1});
+        if (loc0.z == -1 || loc1.z == -1 || loc0.z != loc1.z)
+            return false;
+        // use e0 and check the surrounding 8 tiles
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                if (x == 0 && y == 0)
+                    continue;
+                if (loc0.x + x == loc1.x && loc0.y + y == loc1.y)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+
+    void handle_npc(entityid id) {
+        massert(id != ENTITYID_INVALID, "Entity is NULL!");
+        if (id == 0 || id == hero_id)
+            return;
+        auto maybe_type = ct.get<entitytype>(id);
+        if (!maybe_type.has_value())
+            return;
+        entitytype_t type = maybe_type.value();
+        if (type != ENTITY_NPC)
+            return;
+        auto maybe_dead = ct.get<dead>(id);
+        if (!maybe_dead.has_value())
+            return;
+        const bool is_dead = maybe_dead.value();
+        if (is_dead)
+            return;
+        // this is a heuristic for handling entity actions
+        // originally, we were just moving randomly
+        // this example shows how, if the player is not adjacent to an NPC,
+        // they will just move randomly. otherwise, they attack the player
+        //const entityid target_id = g.ct.get<target>(id).value_or(g.hero_id);
+        auto tgt_id = ct.get<target_id>(id).value_or(hero_id);
+        if (is_entity_adjacent(id, tgt_id)) {
+            // if id is adjacent to its target or the hero
+            vec3 loc = ct.get<location>(tgt_id).value();
+            try_entity_attack(id, loc.x, loc.y);
+            return;
+        }
+        // else, randomly move
+        try_entity_move(id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+    }
+
+
+    void handle_npcs() {
+        if (flag == GAMESTATE_FLAG_NPC_TURN) {
+#ifndef NPCS_ALL_AT_ONCE
+            if (entity_turn >= 0 && entity_turn < next_entityid) {
+                handle_npc(entity_turn);
+                flag = GAMESTATE_FLAG_NPC_ANIM;
+            }
+#else
+            for (entityid id = 0; id < next_entityid; id++) {
+                handle_npc(id);
+            }
+            flag = GAMESTATE_FLAG_NPC_ANIM;
+#endif
+        }
+    }
 };
