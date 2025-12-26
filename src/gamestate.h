@@ -1237,4 +1237,18 @@ public:
     void logic_close() {
         d_destroy(dungeon);
     }
+
+
+    void handle_camera_move(inputstate& is) {
+        const float move = cam2d.zoom;
+        if (inputstate_is_held(is, KEY_RIGHT)) {
+            cam2d.offset.x += move;
+        } else if (inputstate_is_held(is, KEY_LEFT)) {
+            cam2d.offset.x -= move;
+        } else if (inputstate_is_held(is, KEY_UP)) {
+            cam2d.offset.y -= move;
+        } else if (inputstate_is_held(is, KEY_DOWN)) {
+            cam2d.offset.y += move;
+        }
+    }
 };
