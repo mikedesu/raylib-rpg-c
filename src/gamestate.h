@@ -45,8 +45,8 @@
 #define GAMESTATE_INIT_ENTITYIDS_MAX 3000000
 
 
-typedef function<void(ComponentTable&, const entityid)> with_function;
 typedef ComponentTable CT;
+typedef function<void(CT& ct, const entityid)> with_function;
 
 
 class gamestate {
@@ -584,7 +584,7 @@ public:
 
 
     //const inline entityid create_weapon_with(ComponentTable& ct, function<void(ComponentTable&, entityid)> weaponInitFunction) {
-    const inline entityid create_weapon_with(ComponentTable& ct, with_function weaponInitFunction) {
+    const inline entityid create_weapon_with(with_function weaponInitFunction) {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
         ct.set<itemtype>(id, ITEM_WEAPON);
@@ -608,7 +608,7 @@ public:
             merror("cannot create entity on tile with live NPCs");
             return ENTITYID_INVALID;
         }
-        const auto id = create_weapon_with(ct, weaponInitFunction);
+        const auto id = create_weapon_with(weaponInitFunction);
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
@@ -623,22 +623,22 @@ public:
 
 
 
-    const inline entityid create_shield_with() {
+    const inline entityid create_shield_with(with_function shieldInitFunction) {
         const auto id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
         ct.set<itemtype>(id, ITEM_SHIELD);
         ct.set<durability>(id, 100);
         ct.set<max_durability>(id, 100);
         ct.set<rarity>(id, RARITY_COMMON);
-        //shieldInitFunction(g, id);
+        shieldInitFunction(ct, id);
         return id;
     }
 
 
 
 
-    const inline entityid create_shield_at_with(const vec3 loc) {
-        const auto id = create_shield_with();
+    const inline entityid create_shield_at_with(const vec3 loc, with_function shieldInitFunction) {
+        const auto id = create_shield_with(shieldInitFunction);
         minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         auto df = d_get_floor(dungeon, loc.z);
         if (!df_add_at(df, id, loc.x, loc.y))
@@ -852,7 +852,7 @@ public:
         const entityid id = create_npc_with(r);
         minfo("create weapon");
 
-        const entityid wpn_id = create_weapon_with(ct, [](CT& ct, const entityid id) {
+        const entityid wpn_id = create_weapon_with([](CT& ct, const entityid id) {
             ct.set<name>(id, "Dagger");
             ct.set<description>(id, "Stabby stabby.");
             ct.set<weapontype>(id, WEAPON_DAGGER);
@@ -1038,7 +1038,8 @@ public:
         place_doors();
         place_props();
 
-        const entityid dagger_id = create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
+        //const entityid dagger_id = create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
+        create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
             ct.set<name>(id, "Dagger");
             ct.set<description>(id, "Stabby stabby.");
             ct.set<weapontype>(id, WEAPON_DAGGER);
@@ -1048,11 +1049,13 @@ public:
             ct.set<rarity>(id, RARITY_COMMON);
         });
 
-        const entityid shield_id = create_shield_at_with(df_get_random_loc(dungeon.floors[0]));
-        ct.set<name>(shield_id, "Kite Shield");
-        ct.set<description>(shield_id, "Standard knight's shield");
-        ct.set<shieldtype>(shield_id, SHIELD_KITE);
-        ct.set<block_chance>(shield_id, 90);
+        //const entityid shield_id = create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
+        create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
+            ct.set<name>(id, "Kite Shield");
+            ct.set<description>(id, "Standard knight's shield");
+            ct.set<shieldtype>(id, SHIELD_KITE);
+            ct.set<block_chance>(id, 90);
+        });
 
         const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]));
         ct.set<name>(potion_id, "small healing potion");
