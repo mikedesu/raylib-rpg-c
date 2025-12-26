@@ -4,7 +4,7 @@
 //#include "create_potion.h"
 #include "entityid.h"
 #include "gamestate.h"
-#include "manage_inventory.h"
+//#include "manage_inventory.h"
 #include "orc_names.h"
 #include "weapon.h"
 

@@ -4,7 +4,6 @@
 #include "character_creation.h"
 #include "controlmode.h"
 #include "debugpanel.h"
-#include "direction.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "entity_actions.h"
@@ -22,8 +21,6 @@
 #include "stat_bonus.h"
 #include <ctime>
 #include <raylib.h>
-#include <unordered_map>
-#include <vector>
 
 #define DEFAULT_MUSIC_VOLUME 0.0f
 #define GAMESTATE_SIZEOFTIMEBUF 64
@@ -43,10 +40,6 @@
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
 #define GAMESTATE_INIT_ENTITYIDS_MAX 3000000
 
-using std::make_shared;
-using std::string;
-using std::unordered_map;
-using std::vector;
 
 class gamestate {
 public:
@@ -181,7 +174,6 @@ public:
 
     void reset() {
         //minfo("gamestate reset");
-
         version = GAME_VERSION;
         debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
         debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
@@ -190,7 +182,6 @@ public:
         debugpanel.fg_color = RAYWHITE;
         debugpanel.bg_color = RED;
         debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
-
         targetwidth = targetheight = windowwidth = windowheight = -1;
         hero_id = entity_turn = new_entityid_begin = new_entityid_end = ENTITYID_INVALID;
         timebegan = currenttime = time(NULL);
@@ -200,10 +191,8 @@ public:
         bzero(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
         strftime(timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", timebegantm);
         strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
-
         cam_lockon = true;
         frame_dirty = true;
-
         debugpanelon = false;
         player_input_received = false;
         is_locked = false;
@@ -221,7 +210,6 @@ public:
         music_volume_changed = false;
         player_changing_dir = false;
         msg_system_is_active = false;
-
         gameplay_settings_menu_selection = 0;
         cam2d.target = cam2d.offset = (Vector2){0, 0};
         cam2d.zoom = 4.0f;
@@ -235,7 +223,6 @@ public:
         line_spacing = 1.0f;
         // weird bug maybe when set to 0?
         next_entityid = 1;
-
         current_music_index = 0;
         restart_count = 0;
         do_restart = 0;
@@ -251,15 +238,11 @@ public:
         debugpanel.pad_right = 0;
         debugpanel.pad_bottom = 0;
         msg_history_max_len_msg = 0;
-
         max_title_screen_selections = 2;
-
         // initialize character creation
         chara_creation.name = "hero";
-
         chara_creation.strength = chara_creation.dexterity = chara_creation.intelligence = chara_creation.wisdom = chara_creation.constitution =
             chara_creation.charisma = 10;
-
         chara_creation.race = RACE_HUMAN;
         chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
         // why is the above line crashing?
@@ -268,13 +251,9 @@ public:
         current_scene = SCENE_TITLE;
         music_volume = DEFAULT_MUSIC_VOLUME;
         last_click_screen_pos = (Vector2){-1, -1};
-
-
         msg_system.clear();
         msg_history.clear();
-
         ct.clear();
-
         init_music_paths();
     }
 
@@ -329,9 +308,8 @@ public:
 
 
     entityid create_door_with() {
-        //massert(g, "gamestate is NULL");
         //const auto id = g_add_entity(g);
-        const auto id = add_entity();
+        const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_DOOR);
         //doorInitFunction(g, id);
         return id;
@@ -388,31 +366,23 @@ public:
         return t.cached_live_npcs > 0;
     }
 
+
     entityid create_door_at_with(vec3 loc) {
-        //shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
         dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
-        //shared_ptr<tile_t> tile = df_tile_at(df, loc);
         tile_t& tile = df_tile_at(df, loc);
-
-        //massert(tile, "failed to get tile");
-
         if (!tile_is_walkable(tile.type))
             return ENTITYID_INVALID;
         if (tile_has_live_npcs(tile))
             return ENTITYID_INVALID;
-
         const auto id = create_door_with();
         if (id == ENTITYID_INVALID)
             return ENTITYID_INVALID;
-
         minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         if (!df_add_at(df, id, loc.x, loc.y))
             return ENTITYID_INVALID;
-
         ct.set<location>(id, loc);
         ct.set<door_open>(id, false);
         ct.set<update>(id, true);
-
         return id;
     }
 
@@ -433,7 +403,6 @@ public:
     }
 
 
-    //entityid create_prop_with(proptype_t type, function<void(gamestate&, entityid)> propInitFunction) {
     entityid create_prop_with(proptype_t type) {
         const auto id = add_entity();
         ct.set<entitytype>(id, ENTITY_PROP);
@@ -445,27 +414,20 @@ public:
     }
 
 
-    //entityid create_prop_at_with(gamestate& g, proptype_t type, vec3 loc, function<void(gamestate&, entityid)> propInitFunction) {
     entityid create_prop_at_with(proptype_t type, vec3 loc) {
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, loc);
-
-        const auto id = create_prop_with(type);
+        const entityid id = create_prop_with(type);
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
-
         minfo("attempting prop df_add_at: %d, %d, %d", id, loc.x, loc.y);
-
         if (!df_add_at(df, id, loc.x, loc.y)) {
             merror("failed df_add_at: %d, %d, %d", id, loc.x, loc.y);
             return ENTITYID_INVALID;
         }
-
         msuccess("prop add success");
-
         ct.set<location>(id, loc);
-
         return id;
     }
 
@@ -477,7 +439,6 @@ public:
         //    g.ct.set<solid>(id, true);
         //    g.ct.set<pushable>(id, true);
         //};
-
         for (int z = 0; z < (int)dungeon.floors.size(); z++) {
             auto df = d_get_floor(dungeon, z);
             for (int x = 0; x < df.width; x++) {
@@ -487,12 +448,10 @@ public:
                     //if (!tile.can_have_door)
                     //    continue;
                     //create_door_at_with(g, loc, [](gamestate& g, entityid id) {});
-
                     if (tile.type == TILE_UPSTAIRS || tile.type == TILE_DOWNSTAIRS)
                         continue;
                     if (tile.can_have_door)
                         continue;
-
                     if (tile_is_wall(tile)) {
                         const int flip = GetRandomValue(0, 20);
                         if (flip == 0) {
@@ -529,9 +488,7 @@ public:
 
 
     entityid create_weapon_with() {
-        //massert(g, "gamestate is NULL");
-        //const auto id = g_add_entity(g);
-        const auto id = add_entity();
+        const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
         ct.set<itemtype>(id, ITEM_WEAPON);
         ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
@@ -542,10 +499,8 @@ public:
 
 
     entityid create_weapon_at_with(vec3 loc) {
-        //massert(g, "gamestate is NULL");
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, loc);
-        //massert(tile, "failed to get tile");
         if (!tile_is_walkable(tile.type)) {
             merror("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
@@ -598,6 +553,7 @@ public:
         return id;
     }
 
+
     inline entityid create_potion_at_with(vec3 loc) {
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, loc);
@@ -623,11 +579,11 @@ public:
         return monster_races[random_index];
     }
 
+
     inline void set_npc_starting_stats(entityid id) {
         const race_t rt = ct.get<race>(id).value_or(RACE_NONE);
         if (rt == RACE_NONE)
             return;
-
         // stats racial modifiers for stats
         const int str_m = get_racial_modifiers(rt, 0);
         const int dex_m = get_racial_modifiers(rt, 1);
@@ -635,7 +591,6 @@ public:
         const int wis_m = get_racial_modifiers(rt, 3);
         const int con_m = get_racial_modifiers(rt, 4);
         const int cha_m = get_racial_modifiers(rt, 5);
-
         // default to 3-18 for stats
         const int strength_ = GetRandomValue(3, 18) + str_m;
         const int dexterity_ = GetRandomValue(3, 18) + dex_m;
@@ -643,14 +598,12 @@ public:
         const int wisdom_ = GetRandomValue(3, 18) + wis_m;
         const int constitution_ = GetRandomValue(3, 18) + con_m;
         const int charisma_ = GetRandomValue(3, 18) + cha_m;
-
         ct.set<strength>(id, strength_);
         ct.set<dexterity>(id, dexterity_);
         ct.set<intelligence>(id, intelligence_);
         ct.set<wisdom>(id, wisdom_);
         ct.set<constitution>(id, constitution_);
         ct.set<charisma>(id, charisma_);
-
         // set default hp/maxhp for now
         // later, we will decide this by race templating
         vec3 hitdie = {1, 8, 0};
@@ -670,10 +623,8 @@ public:
         case RACE_ZOMBIE: hitdie.y = 8; break;
         default: break;
         }
-
         const int my_maxhp = GetRandomValue(1, hitdie.y) + get_stat_bonus(constitution_);
         const int my_hp = my_maxhp;
-
         ct.set<maxhp>(id, my_maxhp);
         ct.set<hp>(id, my_hp);
         ct.set<base_ac>(id, 10);
@@ -735,33 +686,28 @@ public:
     inline entityid create_npc_at_with(race_t rt, vec3 loc) {
         dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
         tile_t& tile = df_tile_at(df, loc);
-
         if (!tile_is_walkable(tile.type)) {
             merror("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
         }
-
         if (tile_has_live_npcs(tile)) {
             merror("cannot create entity on tile with live NPCs");
             return ENTITYID_INVALID;
         }
-
         if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
             merror("cannot create entity on tile with box");
             return ENTITYID_INVALID;
         }
-
         const entityid id = create_npc_with(rt);
         if (!df_add_at(df, id, loc.x, loc.y)) {
             return ENTITYID_INVALID;
         }
-
         ct.set<location>(id, loc);
         return id;
     }
 
 
-    inline bool add_to_inventory(entityid actor_id, entityid item_id) {
+    bool add_to_inventory(entityid actor_id, entityid item_id) {
         minfo("add to inventory: %d %d", actor_id, item_id);
         auto maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value()) {
@@ -781,8 +727,6 @@ public:
         minfo("create random monster with");
         const race_t r = RACE_ORC;
         const entityid id = create_npc_with(r);
-
-
         minfo("create weapon");
         const entityid wpn_id = create_weapon_with();
         ct.set<name>(wpn_id, "Dagger");
@@ -792,7 +736,6 @@ public:
         ct.set<durability>(wpn_id, 100);
         ct.set<max_durability>(wpn_id, 100);
         ct.set<rarity>(wpn_id, RARITY_COMMON);
-
         minfo("create potion");
         //const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]));
         const entityid potion_id = create_potion_with();
@@ -823,8 +766,6 @@ public:
         minfo("getting tile has live npcs...");
         if (tile_has_live_npcs(tile))
             return ENTITYID_INVALID;
-
-
         //const auto id = create_random_monster_with(g, monsterInitFunction);
         minfo("create random monster with...");
         const auto id = create_random_monster_with();
@@ -850,6 +791,7 @@ public:
         msg_system.push_back(s);
         msg_system_is_active = true;
     }
+
 
     inline void add_message_history(const char* fmt, ...) {
         massert(fmt, "format string is NULL");
@@ -948,7 +890,6 @@ public:
         minfo("gamestate.logic_init");
 
         init_dungeon(10);
-
         place_doors();
         place_props();
 
@@ -961,20 +902,17 @@ public:
         ct.set<max_durability>(dagger_id, 100);
         ct.set<rarity>(dagger_id, RARITY_COMMON);
 
-
         const entityid shield_id = create_shield_at_with(df_get_random_loc(dungeon.floors[0]));
         ct.set<name>(shield_id, "Kite Shield");
         ct.set<description>(shield_id, "Standard knight's shield");
         ct.set<shieldtype>(shield_id, SHIELD_KITE);
         ct.set<block_chance>(shield_id, 90);
 
-
         const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]));
         ct.set<name>(potion_id, "small healing potion");
         ct.set<description>(potion_id, "a small healing potion");
         ct.set<potiontype>(potion_id, POTION_HP_SMALL);
         ct.set<healing>(potion_id, (vec3){1, 6, 0});
-
 
         minfo("creating monsters...");
         for (int i = 0; i < (int)dungeon.floors.size(); i++) {
@@ -984,7 +922,6 @@ public:
             }
         }
         msuccess("end creating monsters...");
-
         add_message("Welcome to the game! Press enter to cycle messages.");
 #ifdef START_MESSAGES
         add_message("To move around, press [q w e a d z x c]");
@@ -1022,10 +959,7 @@ public:
                 current_scene = SCENE_CHARACTER_CREATION;
                 frame_dirty = true;
             }
-
             PlaySound(sfx.at(SFX_CONFIRM_01));
-            //play_sound(SFX_CONFIRM_01);
-
         } else if (inputstate_is_pressed(is, KEY_DOWN)) {
             minfo("Title screen selection++");
             title_screen_selection++;
@@ -1033,7 +967,6 @@ public:
                 title_screen_selection = 0;
             }
             PlaySound(sfx.at(SFX_CONFIRM_01));
-            //play_sound(SFX_CONFIRM_01);
         } else if (inputstate_is_pressed(is, KEY_UP)) {
             minfo("Title screen selection--");
             title_screen_selection--;
@@ -1041,13 +974,10 @@ public:
                 title_screen_selection = max_title_screen_selections - 1;
             }
             PlaySound(sfx.at(SFX_CONFIRM_01));
-            //play_sound(SFX_CONFIRM_01);
         } else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
             do_quit = true;
             PlaySound(sfx.at(SFX_CONFIRM_01));
-            //play_sound(SFX_CONFIRM_01);
         }
-
         frame_dirty = true;
     }
 
@@ -1097,32 +1027,27 @@ public:
             merror("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
         }
-
         if (tile_has_live_npcs(tile)) {
             merror("cannot create entity on tile with live NPCs");
             return ENTITYID_INVALID;
         }
-
         if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
             merror("cannot create entity on tile with box");
             return ENTITYID_INVALID;
         }
-
         const auto id = create_box_with();
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
-
         minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-
         if (!df_add_at(df, id, loc.x, loc.y)) {
             merror("failed df_add_at: %d, %d, %d", id, loc.x, loc.y);
             return ENTITYID_INVALID;
         }
-
         ct.set<location>(id, loc);
         return id;
     }
+
 
     entityid create_spell_with() {
         const auto id = add_entity();
@@ -1168,9 +1093,7 @@ public:
             //const vec3 start_loc = g.dungeon.floors->at(g.dungeon.current_floor)->upstairs_loc;
             const vec3 start_loc = dungeon.floors[dungeon.current_floor].upstairs_loc;
             entity_turn = create_player(start_loc, "darkmage");
-
             massert(hero_id != ENTITYID_INVALID, "heroid is invalid");
-
             // set stats from char_creation
             ct.set<strength>(hero_id, chara_creation.strength);
             ct.set<dexterity>(hero_id, chara_creation.dexterity);
@@ -1182,7 +1105,6 @@ public:
             ct.set<hd>(hero_id, (vec3){1, chara_creation.hitdie, 0});
             ct.set<hp>(hero_id, maxhp_roll);
             ct.set<maxhp>(hero_id, maxhp_roll);
-
             // temporary wedge-in code
             // set all the NPCs to target the hero
             minfo("BEGIN Temporary wedge-in code");
@@ -1196,7 +1118,6 @@ public:
             }
             minfo("END Temporary wedge-in code");
             current_scene = SCENE_GAMEPLAY;
-
         } else if (inputstate_is_pressed(is, KEY_SPACE)) {
             // re-roll character creation stats
             minfo("Re-rolling character creation stats");
@@ -1231,6 +1152,226 @@ public:
             chara_creation.hitdie = get_racial_hd(chara_creation.race);
         }
         frame_dirty = true;
+    }
+
+
+    bool remove_from_inventory(entityid actor_id, entityid item_id) {
+        minfo("remove from inventory: %d %d", actor_id, item_id);
+        auto maybe_inventory = ct.get<inventory>(actor_id);
+        if (!maybe_inventory.has_value()) {
+            merror("maybe_inventory has no value for actor id %d", actor_id);
+            return false;
+        }
+        auto my_items = maybe_inventory.value();
+        bool success = false;
+        minfo("Inventory size: %ld", my_items->size());
+        for (auto it = my_items->begin(); it != my_items->end(); it++) {
+            minfo("item id %d", *it);
+            if (*it == item_id) {
+                my_items->erase(it);
+                success = true;
+                break;
+            }
+        }
+
+        if (!success) {
+            merror("Failed to find item id %d", item_id);
+        } else {
+            msuccess("Successfully removed item id %d", item_id);
+        }
+        return success;
+    }
+
+    bool drop_from_inventory(entityid actor_id, entityid item_id) {
+        minfo("drop from inventory: %d %d", actor_id, item_id);
+        if (remove_from_inventory(actor_id, item_id)) {
+            auto maybe_loc = ct.get<location>(actor_id);
+            if (!maybe_loc.has_value()) {
+                merror("actor id %d has no location -- cannot drop item", actor_id);
+                return false;
+            }
+            auto loc = maybe_loc.value();
+            auto df = d_get_current_floor(dungeon);
+            auto tile = df_tile_at(df, loc);
+            const entityid retval = df_add_at(df, item_id, loc.x, loc.y);
+            if (retval == ENTITYID_INVALID) {
+                merror("Failed to add to tile");
+                return false;
+            }
+            // update the item_id's location
+            ct.set<location>(item_id, loc);
+            msuccess("Drop item successful");
+            return true;
+        }
+        merror("Remove from inventory failed for some reason");
+        return false;
+    }
+
+    bool drop_all_from_inventory(entityid actor_id) {
+        minfo("drop all from inventory: %d", actor_id);
+        auto maybe_inventory = ct.get<inventory>(actor_id);
+        if (!maybe_inventory.has_value()) {
+            merror("no inventory");
+            return false;
+        }
+        auto inventory = maybe_inventory.value();
+        while (inventory->size() > 0) {
+            auto id = inventory->back();
+            drop_from_inventory(actor_id, id);
+        }
+        return true;
+    }
+
+
+    void handle_hero_inventory_equip_weapon(entityid item_id) {
+        // Check if this is the currently equipped weapon
+        const entityid current_weapon = ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID);
+        // Unequip if it's already equipped
+        if (current_weapon == item_id)
+            ct.set<equipped_weapon>(hero_id, ENTITYID_INVALID);
+        // Equip the new weapon
+        else
+            ct.set<equipped_weapon>(hero_id, item_id);
+        flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        controlmode = CONTROLMODE_PLAYER;
+        display_inventory_menu = false;
+    }
+
+
+    void handle_hero_inventory_equip_shield(entityid item_id) {
+        // Check if this is the currently equipped weapon
+        const entityid current_shield = ct.get<equipped_shield>(hero_id).value_or(ENTITYID_INVALID);
+        // Unequip if it's already equipped
+        if (current_shield == item_id)
+            ct.set<equipped_shield>(hero_id, ENTITYID_INVALID);
+        // Equip the new shield
+        else
+            ct.set<equipped_shield>(hero_id, item_id);
+        flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        controlmode = CONTROLMODE_PLAYER;
+        display_inventory_menu = false;
+    }
+
+
+    void handle_hero_inventory_equip_item(entityid item_id) {
+        itemtype_t item_type = ct.get<itemtype>(item_id).value_or(ITEM_NONE);
+        switch (item_type) {
+        case ITEM_NONE: break;
+        case ITEM_WEAPON: handle_hero_inventory_equip_weapon(item_id); break;
+        case ITEM_SHIELD: handle_hero_inventory_equip_shield(item_id); break;
+        default: break;
+        }
+    }
+
+
+    void handle_hero_inventory_equip() {
+        PlaySound(sfx.at(SFX_EQUIP_01));
+        // equip item
+        // get the item id of the current selection
+        const size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
+        auto my_inventory = ct.get<inventory>(hero_id);
+        if (!my_inventory)
+            return;
+        if (!my_inventory.has_value())
+            return;
+        auto unpacked_inventory = my_inventory.value();
+        if (index < 0 || index >= unpacked_inventory->size())
+            return;
+        entityid item_id = unpacked_inventory->at(index);
+        entitytype_t type = ct.get<entitytype>(item_id).value_or(ENTITY_NONE);
+        if (type == ENTITY_ITEM) {
+            handle_hero_inventory_equip_item(item_id);
+        }
+    }
+
+
+    bool drop_item_from_hero_inventory() {
+        if (!ct.has<inventory>(hero_id))
+            return false;
+        size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
+        auto maybe_inventory = ct.get<inventory>(hero_id);
+        if (!maybe_inventory.has_value())
+            return false;
+        auto inventory = maybe_inventory.value();
+        if (index < 0 || index >= inventory->size())
+            return false;
+        entityid item_id = inventory->at(index);
+        inventory->erase(inventory->begin() + index);
+        if (item_id == ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID))
+            ct.set<equipped_weapon>(hero_id, ENTITYID_INVALID);
+        // add it to the tile at the player's current location
+        // get the player's location
+        vec3 loc = ct.get<location>(hero_id).value();
+        // get the tile at the player's location
+        //auto tile = df_tile_at(g.dungeon->floors->at(loc.z), loc);
+        //if (!tile)
+        //    return false;
+        auto df = d_get_current_floor(dungeon);
+        if (!df_add_at(df, item_id, loc.x, loc.y)) {
+            merror("Failed to add to %d, %d, %d", loc.x, loc.y, loc.z);
+            return false;
+        }
+        // update the entity's location
+        ct.set<location>(item_id, loc);
+        // add to tile
+        return true;
+    }
+
+
+    bool is_in_inventory(entityid actor_id, entityid item_id) {
+        auto maybe_inventory = ct.get<inventory>(actor_id);
+        if (!maybe_inventory.has_value()) {
+            merror("maybe_inventory has no value for actor id %d", actor_id);
+            return false;
+        }
+        auto my_items = maybe_inventory.value();
+        for (auto it = my_items->begin(); it != my_items->end(); it++) {
+            minfo("item id %d", *it);
+            if (*it == item_id)
+                return true;
+        }
+        return false;
+    }
+
+
+    bool use_potion(entityid actor_id, entityid item_id) {
+        massert(actor_id != ENTITYID_INVALID, "actor_id is invalid");
+        massert(item_id != ENTITYID_INVALID, "actor_id is invalid");
+
+        const bool is_item = ct.get<entitytype>(item_id).value_or(ENTITY_NONE) == ENTITY_ITEM;
+        const bool is_potion = ct.get<itemtype>(item_id).value_or(ITEM_NONE) == ITEM_POTION;
+        const bool in_inventory = is_in_inventory(actor_id, item_id);
+
+        if (is_item && is_potion && in_inventory) {
+            // get the item's effects
+            auto maybe_heal = ct.get<healing>(item_id);
+            if (maybe_heal && maybe_heal.has_value()) {
+                const auto heal = maybe_heal.value();
+                const int amount = do_roll(heal);
+                const int myhp = ct.get<hp>(actor_id).value_or(-1);
+                const int mymaxhp = ct.get<maxhp>(actor_id).value_or(-1);
+                ct.set<hp>(actor_id, mymaxhp ? mymaxhp : myhp + amount);
+
+                if (actor_id == hero_id) {
+                    string n = ct.get<name>(actor_id).value_or("no-name");
+                    add_message_history("%s used a healing potion", n.c_str());
+                    add_message_history("%s restored %d hp", n.c_str(), amount);
+                }
+            }
+            //====
+            else {
+                merror("Potion has no healing component");
+                return false;
+            }
+
+            // consume the potion by removing it
+            remove_from_inventory(actor_id, item_id);
+
+
+            return true;
+        }
+        merror("id %d is not an item, potion, or isnt in the inventory", item_id);
+        return false;
     }
 
 

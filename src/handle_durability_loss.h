@@ -6,7 +6,6 @@
 #include "gamestate.h"
 #include "get_entity_location.h"
 #include "get_entity_name.h"
-#include "manage_inventory.h"
 #include "sfx.h"
 
 static inline void handle_weapon_durability_loss(gamestate& g, const entityid atk_id, const entityid tgt_id) {
@@ -22,7 +21,7 @@ static inline void handle_weapon_durability_loss(gamestate& g, const entityid at
     // unequip item
     g.ct.set<equipped_weapon>(atk_id, ENTITYID_INVALID);
     // remove item from attacker's inventory
-    remove_from_inventory(g, atk_id, equipped_wpn);
+    g.remove_from_inventory(atk_id, equipped_wpn);
     // item destroyed
     g.ct.set<destroyed>(equipped_wpn, true);
     const bool event_heard = check_hearing(g, g.hero_id, get_entity_location(g, tgt_id));
@@ -45,7 +44,7 @@ static inline void handle_shield_durability_loss(gamestate& g, const entityid de
     // unequip item
     g.ct.set<equipped_shield>(defender, ENTITYID_INVALID);
     // remove item from attacker's inventory
-    remove_from_inventory(g, defender, shield);
+    g.remove_from_inventory(defender, shield);
     // item destroyed
     g.ct.set<destroyed>(shield, true);
     const bool event_heard = check_hearing(g, g.hero_id, get_entity_location(g, defender));

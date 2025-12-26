@@ -19,7 +19,6 @@
 #include "handle_durability_loss.h"
 #include "handle_shield_block_sfx.h"
 #include "magic_values.h"
-#include "manage_inventory.h"
 #include "play_sound.h"
 #include "recompute_entity_cache.h"
 #include "set_npc_dead.h"
@@ -95,7 +94,7 @@ static inline void process_attack_results(gamestate& g, entityid atk_id, entityi
     case ENTITY_NPC: {
         update_npc_xp(g, atk_id, tgt_id);
         // handle item drops
-        drop_all_from_inventory(g, tgt_id);
+        g.drop_all_from_inventory(tgt_id);
     } break;
     case ENTITY_PLAYER: add_message(g, "You died"); break;
     default: break;

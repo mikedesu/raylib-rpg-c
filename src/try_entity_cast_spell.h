@@ -5,7 +5,6 @@
 //#include "create_spell.h"
 #include "entityid.h"
 #include "gamestate.h"
-#include "manage_inventory.h"
 #include "play_sound.h"
 #include "sfx.h"
 #include "tile_has_door.h"
@@ -99,7 +98,7 @@ static inline void try_entity_cast_spell(gamestate& g, entityid id, int tgt_x, i
                 g.ct.set<xp>(id, new_xp);
 
                 // handle item drops
-                drop_all_from_inventory(g, npcid);
+                g.drop_all_from_inventory(npcid);
             } else if (tgttype == ENTITY_PLAYER) {
                 add_message(g, "You died");
             }

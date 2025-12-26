@@ -3,7 +3,7 @@
 #include "add_message.h"
 #include "entityid.h"
 #include "gamestate.h"
-#include "manage_inventory.h"
+//#include "manage_inventory.h"
 #include "play_sound.h"
 #include "sfx.h"
 #include "tile_get_item.h"
@@ -47,7 +47,7 @@ static inline bool try_entity_pickup(gamestate& g, entityid id) {
     // lets try using our new cached_item via tile_get_item
     const entityid item_id = tile_get_item(g, tile);
 
-    if (item_id != ENTITYID_INVALID && add_to_inventory(g, id, item_id)) {
+    if (item_id != ENTITYID_INVALID && g.add_to_inventory(id, item_id)) {
         tile_remove(tile, item_id);
         play_sound(SFX_CONFIRM_01);
         item_picked_up = true;
