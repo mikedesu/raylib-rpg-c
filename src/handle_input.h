@@ -1,12 +1,8 @@
 #pragma once
 
 #include "gamestate.h"
-#include "handle_input_char_creation_scene.h"
 #include "handle_input_gameplay_scene.h"
-#include "handle_input_main_menu_scene.h"
-#include "handle_input_title_scene.h"
 #include "inputstate.h"
-#include "scene.h"
 
 static inline void handle_input(gamestate& g, inputstate& is) {
     // no matter which mode we are in, we can toggle the debug panel
@@ -17,11 +13,11 @@ static inline void handle_input(gamestate& g, inputstate& is) {
     }
 
     if (g.current_scene == SCENE_TITLE)
-        handle_input_title_scene(g, is);
+        g.handle_input_title_scene(is);
     else if (g.current_scene == SCENE_MAIN_MENU)
-        handle_input_main_menu_scene(g, is);
+        g.handle_input_main_menu_scene(is);
     else if (g.current_scene == SCENE_CHARACTER_CREATION)
-        handle_input_character_creation_scene(g, is);
+        g.handle_input_character_creation_scene(is);
     else if (g.current_scene == SCENE_GAMEPLAY)
         handle_input_gameplay_scene(g, is);
 }

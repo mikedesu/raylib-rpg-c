@@ -13,9 +13,12 @@
 #include "gamestate_flag.h"
 #include "get_racial_hd.h"
 #include "get_racial_modifiers.h"
+#include "inputstate.h"
 #include "libgame_version.h"
 #include "orc_names.h"
+#include "roll.h"
 #include "scene.h"
+#include "sfx.h"
 #include "stat_bonus.h"
 #include <ctime>
 #include <raylib.h>
@@ -997,6 +1000,168 @@ public:
 #endif
         msuccess("liblogic_init: Game state initialized");
     }
+
+    void handle_input_title_scene(inputstate& is) {
+        if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+            do_quit = true;
+            return;
+        }
+
+        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+            minfo("Title screen input detected, switching to main menu");
+            current_scene = SCENE_MAIN_MENU;
+            frame_dirty = true;
+            PlaySound(sfx[SFX_CONFIRM_01]);
+        }
+    }
+
+    void handle_input_main_menu_scene(inputstate& is) {
+        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
+            if (title_screen_selection == 0) {
+                minfo("Switching to character creation scene");
+                current_scene = SCENE_CHARACTER_CREATION;
+                frame_dirty = true;
+            }
+
+            PlaySound(sfx.at(SFX_CONFIRM_01));
+            //play_sound(SFX_CONFIRM_01);
+
+        } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+            minfo("Title screen selection++");
+            title_screen_selection++;
+            if (title_screen_selection >= max_title_screen_selections) {
+                title_screen_selection = 0;
+            }
+            PlaySound(sfx.at(SFX_CONFIRM_01));
+            //play_sound(SFX_CONFIRM_01);
+        } else if (inputstate_is_pressed(is, KEY_UP)) {
+            minfo("Title screen selection--");
+            title_screen_selection--;
+            if (title_screen_selection < 0) {
+                title_screen_selection = max_title_screen_selections - 1;
+            }
+            PlaySound(sfx.at(SFX_CONFIRM_01));
+            //play_sound(SFX_CONFIRM_01);
+        } else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+            do_quit = true;
+            PlaySound(sfx.at(SFX_CONFIRM_01));
+            //play_sound(SFX_CONFIRM_01);
+        }
+
+        frame_dirty = true;
+    }
+
+
+    entityid create_player(vec3 loc, string n) {
+        massert(n != "", "name is empty string");
+        minfo("Creating player...");
+        race_t rt = chara_creation.race;
+        minfo("Race: %s", race2str(rt).c_str());
+        const auto id = create_npc_at_with(rt, loc); // [n](gamestate& g, entityid id) {
+        const int hp_ = 10;
+        const int maxhp_ = 10;
+        const int vis_dist = 3;
+        const int light_rad = 3;
+        const int hear_dist = 3;
+        const entitytype_t type = ENTITY_PLAYER;
+        set_hero_id(id);
+        ct.set<entitytype>(id, type);
+        ct.set<txalpha>(id, 0);
+        ct.set<hp>(id, hp_);
+        ct.set<maxhp>(id, maxhp_);
+        ct.set<vision_distance>(id, vis_dist);
+        ct.set<light_radius>(id, light_rad);
+        ct.set<hearing_distance>(id, hear_dist);
+        ct.set<name>(id, n);
+        minfo("Adding inventory to entity id %d", id);
+        msuccess("create_player successful, id: %d", id);
+        return id;
+    }
+
+
+    void handle_input_character_creation_scene(inputstate& is) {
+        if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+            do_quit = true;
+            return;
+        }
+        if (inputstate_is_pressed(is, KEY_ENTER)) {
+            minfo("Character creation confirmed");
+            PlaySound(sfx.at(SFX_CONFIRM_01));
+            //play_sound(SFX_CONFIRM_01);
+            // we need to copy the character creation stats to the hero entity
+            // hero has already been created, so its id is available
+            const int myhd = chara_creation.hitdie;
+            int maxhp_roll = -1;
+            while (maxhp_roll < 1)
+                maxhp_roll = do_roll_best_of_3((vec3){1, myhd, 0}) + get_stat_bonus(chara_creation.constitution);
+            //const vec3 start_loc = g.dungeon.floors->at(g.dungeon.current_floor)->upstairs_loc;
+            const vec3 start_loc = dungeon.floors[dungeon.current_floor].upstairs_loc;
+            entity_turn = create_player(start_loc, "darkmage");
+
+            massert(hero_id != ENTITYID_INVALID, "heroid is invalid");
+
+            // set stats from char_creation
+            ct.set<strength>(hero_id, chara_creation.strength);
+            ct.set<dexterity>(hero_id, chara_creation.dexterity);
+            ct.set<constitution>(hero_id, chara_creation.constitution);
+            ct.set<intelligence>(hero_id, chara_creation.intelligence);
+            ct.set<wisdom>(hero_id, chara_creation.wisdom);
+            ct.set<charisma>(hero_id, chara_creation.charisma);
+
+            ct.set<hd>(hero_id, (vec3){1, chara_creation.hitdie, 0});
+            ct.set<hp>(hero_id, maxhp_roll);
+            ct.set<maxhp>(hero_id, maxhp_roll);
+
+            // temporary wedge-in code
+            // set all the NPCs to target the hero
+            minfo("BEGIN Temporary wedge-in code");
+            for (entityid id = 0; id < next_entityid; id++) {
+                //minfo("Getting type for id %d", id);
+                entitytype_t t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+                if (t == ENTITY_NPC) {
+                    minfo("Setting target for id %d", id);
+                    ct.set<target_id>(id, hero_id);
+                }
+            }
+            minfo("END Temporary wedge-in code");
+            current_scene = SCENE_GAMEPLAY;
+
+        } else if (inputstate_is_pressed(is, KEY_SPACE)) {
+            // re-roll character creation stats
+            minfo("Re-rolling character creation stats");
+            PlaySound(sfx.at(SFX_CONFIRM_01));
+            chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
+            chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
+            chara_creation.intelligence = do_roll_best_of_3((vec3){3, 6, 0});
+            chara_creation.wisdom = do_roll_best_of_3((vec3){3, 6, 0});
+            chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
+            chara_creation.charisma = do_roll_best_of_3((vec3){3, 6, 0});
+        } else if (inputstate_is_pressed(is, KEY_LEFT)) {
+            //PlaySound(g.sfx->at(SFX_CONFIRM_01));
+            //play_sound(SFX_CONFIRM_01);
+            PlaySound(sfx.at(SFX_CONFIRM_01));
+            int race = chara_creation.race;
+            if (chara_creation.race > 1)
+                race--;
+            else
+                race = RACE_COUNT - 1;
+            chara_creation.race = (race_t)race;
+            chara_creation.hitdie = get_racial_hd(chara_creation.race);
+        } else if (inputstate_is_pressed(is, KEY_RIGHT)) {
+            //PlaySound(g.sfx->at(SFX_CONFIRM_01));
+            //play_sound(SFX_CONFIRM_01);
+            PlaySound(sfx.at(SFX_CONFIRM_01));
+            int race = chara_creation.race;
+            if (race < RACE_COUNT - 1)
+                race++;
+            else
+                race = RACE_NONE + 1;
+            chara_creation.race = (race_t)race;
+            chara_creation.hitdie = get_racial_hd(chara_creation.race);
+        }
+        frame_dirty = true;
+    }
+
 
     void logic_close() {
         d_destroy(dungeon);
