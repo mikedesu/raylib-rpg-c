@@ -17,9 +17,11 @@ void gameloop() {
     if (g.do_restart) {
         msuccess("Restarting game...");
         libdraw_close();
-        liblogic_close(g);
+
+        g.logic_close();
         g.reset();
         g.logic_init();
+
         libdraw_init(g);
         g.do_restart = false; // Reset restart flag
         g.restart_count++;
@@ -28,7 +30,6 @@ void gameloop() {
 
 int main() {
     g.logic_init();
-
     libdraw_init(g);
 #ifndef WEB
     while (!libdraw_windowshouldclose(g))
@@ -37,6 +38,6 @@ int main() {
     emscripten_set_main_loop(gameloop, 0, 1);
 #endif
     libdraw_close();
-    liblogic_close(g);
+    g.logic_close();
     return 0;
 }

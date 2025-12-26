@@ -906,6 +906,39 @@ public:
     }
 
 
+    void update_spells_state() {
+        for (entityid id = 0; id < next_entityid; id++) {
+            if (id == hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL)
+                continue;
+            unsigned char a = ct.get<txalpha>(id).value_or(255);
+            if (a < 255)
+                a++;
+            ct.set<txalpha>(id, a);
+            const bool is_complete = ct.get<spell_complete>(id).value_or(false);
+            const bool is_destroyed = ct.get<destroyed>(id).value_or(false);
+            if (is_complete && is_destroyed) {
+                // remove it from the tile
+                auto df = d_get_current_floor(dungeon);
+                auto loc = ct.get<location>(id).value_or((vec3){-1, -1, -1});
+                df_remove_at(df, id, loc.x, loc.y);
+            }
+        }
+    }
+
+
+    void update_npcs_state() {
+        for (entityid id = 0; id < next_entityid; id++) {
+            if (id == hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC)
+                continue;
+            unsigned char a = ct.get<txalpha>(id).value_or(255);
+            if (a < 255)
+                a++;
+            ct.set<txalpha>(id, a);
+            ct.set<damaged>(id, false);
+        }
+    }
+
+
     void logic_init() {
         srand(time(NULL));
         SetRandomSeed(time(NULL));
@@ -963,5 +996,9 @@ public:
         add_message("To open a door, face it and press o ");
 #endif
         msuccess("liblogic_init: Game state initialized");
+    }
+
+    void logic_close() {
+        d_destroy(dungeon);
     }
 };
