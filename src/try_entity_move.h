@@ -69,7 +69,7 @@ static inline bool try_entity_move(gamestate& g, entityid id, vec3 v) {
         return false;
     }
 
-    if (tile_has_live_npcs(g, g.tile_at_cur_floor(aloc))) {
+    if (g.tile_has_live_npcs(g.tile_at_cur_floor(aloc))) {
         return false;
     }
 

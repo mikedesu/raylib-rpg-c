@@ -2,7 +2,7 @@
 
 #include "add_message.h"
 #include "check_hearing.h"
-#include "create_spell.h"
+//#include "create_spell.h"
 #include "entityid.h"
 #include "gamestate.h"
 #include "manage_inventory.h"
@@ -35,12 +35,10 @@ static inline void try_entity_cast_spell(gamestate& g, entityid id, int tgt_x, i
     // ok...
     // we are hard-coding a spell cast
     // in this example, we will 'create' a 'spell entity' of type 'fire' and place it on a tile
-    const entityid spell_id = create_spell_at_with(g, spell_loc, [](gamestate& g, entityid id) {
-        //...
-        g.ct.set<spellstate>(id, SPELLSTATE_CAST);
-        g.ct.set<spelltype>(id, SPELLTYPE_FIRE);
-        g.ct.set<spell_casting>(id, true);
-    });
+    const entityid spell_id = g.create_spell_at_with(spell_loc);
+    g.ct.set<spellstate>(id, SPELLSTATE_CAST);
+    g.ct.set<spelltype>(id, SPELLTYPE_FIRE);
+    g.ct.set<spell_casting>(id, true);
 
 
     if (spell_id != ENTITYID_INVALID) {
@@ -50,7 +48,7 @@ static inline void try_entity_cast_spell(gamestate& g, entityid id, int tgt_x, i
         // first we need to iterate the entities on the tile
         // if there's an NPC we damage it
 
-        if (tile_has_live_npcs(g, tile)) {
+        if (g.tile_has_live_npcs(tile)) {
             entityid npcid = ENTITYID_INVALID;
             for (auto id : *tile.entities) {
                 if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC) {

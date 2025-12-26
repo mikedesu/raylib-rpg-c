@@ -1079,6 +1079,77 @@ public:
     }
 
 
+    entityid create_box_with() {
+        const auto id = add_entity();
+        ct.set<entitytype>(id, ENTITY_BOX);
+        ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+        ct.set<update>(id, true);
+        ct.set<pushable>(id, true);
+        //boxInitFunction(g, id);
+        return id;
+    }
+
+
+    entityid create_box_at_with(vec3 loc) {
+        auto df = d_get_floor(dungeon, loc.z);
+        auto tile = df_tile_at(df, loc);
+        if (!tile_is_walkable(tile.type)) {
+            merror("cannot create entity on non-walkable tile");
+            return ENTITYID_INVALID;
+        }
+
+        if (tile_has_live_npcs(tile)) {
+            merror("cannot create entity on tile with live NPCs");
+            return ENTITYID_INVALID;
+        }
+
+        if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
+            merror("cannot create entity on tile with box");
+            return ENTITYID_INVALID;
+        }
+
+        const auto id = create_box_with();
+        if (id == ENTITYID_INVALID) {
+            return ENTITYID_INVALID;
+        }
+
+        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+
+        if (!df_add_at(df, id, loc.x, loc.y)) {
+            merror("failed df_add_at: %d, %d, %d", id, loc.x, loc.y);
+            return ENTITYID_INVALID;
+        }
+
+        ct.set<location>(id, loc);
+        return id;
+    }
+
+    entityid create_spell_with() {
+        const auto id = add_entity();
+        ct.set<entitytype>(id, ENTITY_SPELL);
+        ct.set<spelltype>(id, SPELLTYPE_FIRE);
+        ct.set<spellstate>(id, SPELLSTATE_NONE);
+        return id;
+    }
+
+
+    entityid create_spell_at_with(vec3 loc) {
+        auto df = d_get_floor(dungeon, loc.z);
+        auto tile = df_tile_at(df, loc);
+        if (!tile_is_walkable(tile.type))
+            return ENTITYID_INVALID;
+        const auto id = create_spell_with();
+        if (id == ENTITYID_INVALID)
+            return ENTITYID_INVALID;
+        //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        if (!df_add_at(df, id, loc.x, loc.y))
+            return ENTITYID_INVALID;
+        ct.set<location>(id, loc);
+        ct.set<update>(id, true);
+        return id;
+    }
+
+
     void handle_input_character_creation_scene(inputstate& is) {
         if (inputstate_is_pressed(is, KEY_ESCAPE)) {
             do_quit = true;
