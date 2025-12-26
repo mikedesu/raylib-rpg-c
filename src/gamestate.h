@@ -144,7 +144,7 @@ public:
     gamestate() {
         //minfo("Initializing gamestate");
         reset();
-        msuccess("Gamestate initialized successfully");
+        //msuccess("Gamestate initialized successfully");
     }
 
 
@@ -276,7 +276,7 @@ public:
         ct.clear();
 
 
-        for (int i = 0; i < dungeon.floors.size(); i++) {
+        for (size_t i = 0; i < dungeon.floors.size(); i++) {
             df_free(dungeon.floors[i]);
         }
 
@@ -293,7 +293,7 @@ public:
     const inline bool set_hero_id(const entityid id) {
         massert(id != ENTITYID_INVALID, "id is invalid");
         hero_id = id;
-        msuccess("Hero ID set to %d", id);
+        //msuccess("Hero ID set to %d", id);
         return true;
     }
 
@@ -327,10 +327,10 @@ public:
         massert(df_count > 0, "df_count is <= 0");
         d_create(dungeon);
         if (dungeon.is_initialized) {
-            merror("dungeon is already initialized");
+            //merror("dungeon is already initialized");
             return;
         }
-        minfo("adding floors...");
+        //minfo("adding floors...");
         // max size of 128x128 for now to maintain 60fps
         // dungeon floors, tiles etc will require re-write/re-design for optimization
         const int w = 32;
@@ -341,8 +341,8 @@ public:
             d_add_floor(dungeon, type, w, h);
         }
         dungeon.is_initialized = true;
-        msuccess("added %d floors to dungeon", df_count);
-        msuccess("dungeon initialized successfully");
+        //msuccess("added %d floors to dungeon", df_count);
+        //msuccess("dungeon initialized successfully");
     }
 
 

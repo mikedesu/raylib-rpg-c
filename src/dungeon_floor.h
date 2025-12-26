@@ -172,14 +172,14 @@ static inline void df_init(dungeon_floor_t& df, int floor, biome_t t, int width,
 
     df_set_can_have_door(df, (vec3){12, 9, 0});
     if (df_tile_at(df, (vec3){12, 9, 0}).can_have_door) {
-        msuccess("door has can have door set");
+        //msuccess("door has can have door set");
         //DEBUG_BREAK();
     } else {
-        merror("door does not have can have door set");
+        //merror("door does not have can have door set");
         DEBUG_BREAK();
     }
 
-    msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
+    //msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
 }
 
 
@@ -293,14 +293,14 @@ static inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs(dungeon_f
 
 
 static inline void df_free(dungeon_floor_t& df) {
-    minfo("df_free");
+    //minfo("df_free");
     df.tiles.clear();
     df.tile_map->clear();
 }
 
 
 static inline entityid df_add_at(dungeon_floor_t& df, entityid id, int x, int y) {
-    minfo("df_add_at: %d, %d, %d", id, loc.x, loc.y);
+    //minfo("df_add_at: %d, %d, %d", id, x, y);
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(x >= 0 && x < df.width, "x is out of bounds");
     massert(y >= 0 && y < df.height, "y is out of bounds");

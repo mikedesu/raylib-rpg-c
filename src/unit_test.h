@@ -7,7 +7,7 @@
 class MyTestSuite : public CxxTest::TestSuite {
 public:
     void testGamestateBasic() {
-        minfo("--- start test gamestate basic ---");
+        //minfo("--- start test gamestate basic ---");
         gamestate g;
 
         TS_ASSERT(g.cam_lockon == true);
@@ -28,14 +28,14 @@ public:
     }
 
     void testGamestateThrowaway() {
-        minfo("--- start test gamestate throwaway ---");
+        //minfo("--- start test gamestate throwaway ---");
         for (int i = 0; i < 10; i++) {
             gamestate g;
         }
     }
 
     void testEntityManagement() {
-        minfo("--- start test entity management ---");
+        //minfo("--- start test entity management ---");
         gamestate g;
 
         // Verify initial state
@@ -69,7 +69,7 @@ public:
     }
 
     void testMessageSystem() {
-        minfo("--- start test message system ---");
+        //minfo("--- start test message system ---");
         gamestate g;
 
         // Verify initial state
@@ -105,7 +105,7 @@ public:
     }
 
     void testCameraSystem() {
-        minfo("--- start test camera system ---");
+        //minfo("--- start test camera system ---");
         gamestate g;
 
         // Verify initial state
@@ -139,7 +139,7 @@ public:
     }
 
     void testMusicSystem() {
-        minfo("--- Starting test music system ---");
+        //minfo("--- Starting test music system ---");
         gamestate g;
 
         // Verify initial state
@@ -182,7 +182,7 @@ public:
 
 
     void testGamestateInitDungeon() {
-        minfo("--- start test init dungeon ---");
+        //minfo("--- start test init dungeon ---");
         gamestate g;
 
         g.init_dungeon(1);
@@ -202,7 +202,7 @@ public:
 
 
     void testPlaceDoors() {
-        minfo("--- start test place doors ---");
+        //minfo("--- start test place doors ---");
         gamestate g;
         const size_t placed_doors_0 = g.place_doors();
 
