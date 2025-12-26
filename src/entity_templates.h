@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ComponentTraits.h"
-#include "create_potion.h"
+//#include "create_potion.h"
 #include "entityid.h"
 #include "gamestate.h"
 #include "manage_inventory.h"
