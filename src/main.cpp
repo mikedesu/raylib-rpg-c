@@ -19,7 +19,8 @@ void gameloop() {
         libdraw_close();
         liblogic_close(g);
         g.reset();
-        liblogic_init(g);
+        //liblogic_init(g);
+        g.logic_init();
         libdraw_init(g);
         g.do_restart = false; // Reset restart flag
         g.restart_count++;
@@ -27,9 +28,9 @@ void gameloop() {
 }
 
 int main() {
-    liblogic_init(g);
+    //liblogic_init(g);
 
-    // g.liblogic_init();
+    g.logic_init();
 
     libdraw_init(g);
 #ifndef WEB

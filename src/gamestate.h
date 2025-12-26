@@ -3,18 +3,23 @@
 #include "ComponentTable.h"
 #include "character_creation.h"
 #include "controlmode.h"
+//#include "create_prop.h"
 #include "debugpanel.h"
 #include "direction.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "entity_actions.h"
+//#include "entity_templates.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate_flag.h"
 #include "get_racial_hd.h"
 //#include "init_dungeon.h"
+#include "get_racial_modifiers.h"
 #include "libgame_version.h"
+#include "orc_names.h"
 #include "scene.h"
+#include "stat_bonus.h"
 #include <ctime>
 #include <raylib.h>
 #include <unordered_map>
@@ -305,11 +310,633 @@ public:
     }
 
 
+    void init_dungeon(int df_count) {
+        massert(df_count > 0, "df_count is <= 0");
+        d_create(dungeon);
+        msuccess("dungeon initialized successfully");
+        minfo("adding floors...");
+        // max size of 128x128 for now to maintain 60fps
+        // dungeon floors, tiles etc will require re-write/re-design for optimization
+        const int w = 32;
+        const int h = 32;
+        const biome_t type = BIOME_STONE;
+        //dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_GRASS;
+        for (int i = 0; i < df_count; i++) {
+            d_add_floor(dungeon, type, w, h);
+        }
+        msuccess("added %d floors to dungeon", df_count);
+    }
+
+
+    entityid create_door_with() {
+        //massert(g, "gamestate is NULL");
+        //const auto id = g_add_entity(g);
+        const auto id = add_entity();
+        ct.set<entitytype>(id, ENTITY_DOOR);
+        //doorInitFunction(g, id);
+        return id;
+    }
+
+
+    void recompute_entity_cache(tile_t& t) {
+        // Only recompute if cache is dirty
+        //minfo("recompute entity cache...");
+        if (!t.dirty_entities)
+            return;
+        // Reset counters
+        t.cached_live_npcs = 0;
+        t.cached_item_count = 0;
+        t.cached_player_present = false;
+        t.cached_npc = ENTITYID_INVALID;
+        t.cached_item = ENTITYID_INVALID;
+        // Iterate through all entities on the tile
+        for (size_t i = 0; i < t.entities->size(); i++) {
+            const entityid id = t.entities->at(i);
+            // Skip dead entities
+            if (ct.get<dead>(id).value_or(false)) {
+                continue;
+            }
+            // Check entity type
+            const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            if (type == ENTITY_NPC) {
+                t.cached_live_npcs++;
+                t.cached_npc = id;
+            } else if (type == ENTITY_PLAYER) {
+                t.cached_player_present = true;
+                t.cached_npc = id;
+            } else if (type == ENTITY_ITEM) {
+                t.cached_item_count++;
+                t.cached_item = id;
+            }
+        }
+        // Cache is now clean
+        t.dirty_entities = false;
+    }
+
+
+    void recompute_entity_cache_at(int x, int y, int z) {
+        massert(x >= 0 && y >= 0 && z >= 0, "x, y, or z is out of bounds: %d, %d, %d", x, y, z);
+        massert((size_t)z < dungeon.floors.size(), "z is out of bounds");
+        auto df = dungeon.floors[z];
+        auto t = df_tile_at(df, (vec3){x, y, z});
+        recompute_entity_cache(t);
+    }
+
+
+    bool tile_has_live_npcs(tile_t& t) {
+        recompute_entity_cache(t);
+        return t.cached_live_npcs > 0;
+    }
+
+    entityid create_door_at_with(vec3 loc) {
+        //shared_ptr<dungeon_floor_t> df = d_get_floor(g->dungeon, loc.z);
+        dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
+        //shared_ptr<tile_t> tile = df_tile_at(df, loc);
+        tile_t& tile = df_tile_at(df, loc);
+
+        //massert(tile, "failed to get tile");
+
+        if (!tile_is_walkable(tile.type))
+            return ENTITYID_INVALID;
+        if (tile_has_live_npcs(tile))
+            return ENTITYID_INVALID;
+
+        const auto id = create_door_with();
+        if (id == ENTITYID_INVALID)
+            return ENTITYID_INVALID;
+
+        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        if (!df_add_at(df, id, loc.x, loc.y))
+            return ENTITYID_INVALID;
+
+        ct.set<location>(id, loc);
+        ct.set<door_open>(id, false);
+        ct.set<update>(id, true);
+
+        return id;
+    }
+
+
+    void place_doors() {
+        for (int z = 0; z < (int)dungeon.floors.size(); z++) {
+            auto df = d_get_floor(dungeon, z);
+            for (int x = 0; x < df.width; x++) {
+                for (int y = 0; y < df.height; y++) {
+                    const vec3 loc = {x, y, z};
+                    auto tile = df_tile_at(df, loc);
+                    if (!tile.can_have_door)
+                        continue;
+                    create_door_at_with(loc);
+                }
+            }
+        }
+    }
+
+
+    //entityid create_prop_with(proptype_t type, function<void(gamestate&, entityid)> propInitFunction) {
+    entityid create_prop_with(proptype_t type) {
+        const auto id = add_entity();
+        ct.set<entitytype>(id, ENTITY_PROP);
+        ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+        ct.set<update>(id, true);
+        ct.set<proptype>(id, type);
+        //propInitFunction(g, id);
+        return id;
+    }
+
+
+    //entityid create_prop_at_with(gamestate& g, proptype_t type, vec3 loc, function<void(gamestate&, entityid)> propInitFunction) {
+    entityid create_prop_at_with(proptype_t type, vec3 loc) {
+        auto df = d_get_floor(dungeon, loc.z);
+        auto tile = df_tile_at(df, loc);
+
+        const auto id = create_prop_with(type);
+        if (id == ENTITYID_INVALID) {
+            return ENTITYID_INVALID;
+        }
+
+        minfo("attempting prop df_add_at: %d, %d, %d", id, loc.x, loc.y);
+
+        if (!df_add_at(df, id, loc.x, loc.y)) {
+            merror("failed df_add_at: %d, %d, %d", id, loc.x, loc.y);
+            return ENTITYID_INVALID;
+        }
+
+        msuccess("prop add success");
+
+        ct.set<location>(id, loc);
+
+        return id;
+    }
+
+
+    inline void place_props() {
+        //auto mydefault = [](gamestate& g, entityid id) {};
+        //auto set_solid = [](gamestate& g, entityid id) { g.ct.set<solid>(id, true); };
+        //auto set_solid_and_pushable = [](gamestate& g, entityid id) {
+        //    g.ct.set<solid>(id, true);
+        //    g.ct.set<pushable>(id, true);
+        //};
+
+        for (int z = 0; z < (int)dungeon.floors.size(); z++) {
+            auto df = d_get_floor(dungeon, z);
+            for (int x = 0; x < df.width; x++) {
+                for (int y = 0; y < df.height; y++) {
+                    const vec3 loc = {x, y, z};
+                    auto tile = df_tile_at(df, loc);
+                    //if (!tile.can_have_door)
+                    //    continue;
+                    //create_door_at_with(g, loc, [](gamestate& g, entityid id) {});
+
+                    if (tile.type == TILE_UPSTAIRS || tile.type == TILE_DOWNSTAIRS)
+                        continue;
+                    if (tile.can_have_door)
+                        continue;
+
+                    if (tile_is_wall(tile)) {
+                        const int flip = GetRandomValue(0, 20);
+                        if (flip == 0) {
+                            const int r = GetRandomValue(1, 3);
+                            switch (r) {
+                            case 1: create_prop_at_with(PROP_DUNGEON_BANNER_00, loc);
+                            case 2: create_prop_at_with(PROP_DUNGEON_BANNER_01, loc);
+                            case 3: create_prop_at_with(PROP_DUNGEON_BANNER_02, loc);
+                            default: break;
+                            }
+                        }
+                    } else {
+                        const int flip = GetRandomValue(0, 20);
+                        if (flip == 0) {
+                            const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_TABLE_00, loc);
+                            ct.set<solid>(id, true);
+
+                        } else if (flip == 1) {
+                            const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_TABLE_01, loc);
+                            ct.set<solid>(id, true);
+                        } else if (flip == 2) {
+                            const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_CHAIR_00, loc);
+                        } else if (flip == 3) {
+                            const entityid id = create_prop_at_with(PROP_DUNGEON_STATUE_00, loc);
+                            ct.set<solid>(id, true);
+                            ct.set<pushable>(id, true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    entityid create_weapon_with() {
+        //massert(g, "gamestate is NULL");
+        //const auto id = g_add_entity(g);
+        const auto id = add_entity();
+        ct.set<entitytype>(id, ENTITY_ITEM);
+        ct.set<itemtype>(id, ITEM_WEAPON);
+        ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+        ct.set<update>(id, true);
+        //weaponInitFunction(g, id);
+        return id;
+    }
+
+
+    entityid create_weapon_at_with(vec3 loc) {
+        //massert(g, "gamestate is NULL");
+        auto df = d_get_floor(dungeon, loc.z);
+        auto tile = df_tile_at(df, loc);
+        //massert(tile, "failed to get tile");
+        if (!tile_is_walkable(tile.type)) {
+            merror("cannot create entity on non-walkable tile");
+            return ENTITYID_INVALID;
+        }
+        if (tile_has_live_npcs(tile)) {
+            merror("cannot create entity on tile with live NPCs");
+            return ENTITYID_INVALID;
+        }
+        const auto id = create_weapon_with();
+        if (id == ENTITYID_INVALID) {
+            return ENTITYID_INVALID;
+        }
+        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        if (!df_add_at(df, id, loc.x, loc.y)) {
+            return ENTITYID_INVALID;
+        }
+        ct.set<location>(id, loc);
+        return id;
+    }
+
+
+    inline entityid create_shield_with() {
+        const auto id = add_entity();
+        ct.set<entitytype>(id, ENTITY_ITEM);
+        ct.set<itemtype>(id, ITEM_SHIELD);
+        ct.set<durability>(id, 100);
+        ct.set<max_durability>(id, 100);
+        ct.set<rarity>(id, RARITY_COMMON);
+        //shieldInitFunction(g, id);
+        return id;
+    }
+
+
+    inline entityid create_shield_at_with(vec3 loc) {
+        const auto id = create_shield_with();
+        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        auto df = d_get_floor(dungeon, loc.z);
+        if (!df_add_at(df, id, loc.x, loc.y))
+            return ENTITYID_INVALID;
+        ct.set<location>(id, loc);
+        return id;
+    }
+
+
+    inline entityid create_potion_with() {
+        const auto id = add_entity();
+        ct.set<entitytype>(id, ENTITY_ITEM);
+        ct.set<itemtype>(id, ITEM_POTION);
+        //potionInitFunction(g, id);
+        return id;
+    }
+
+    inline entityid create_potion_at_with(vec3 loc) {
+        auto df = d_get_floor(dungeon, loc.z);
+        auto tile = df_tile_at(df, loc);
+        if (!tile_is_walkable(tile.type))
+            return ENTITYID_INVALID;
+        if (tile_has_live_npcs(tile))
+            return ENTITYID_INVALID;
+        const auto id = create_potion_with();
+        if (id == ENTITYID_INVALID)
+            return ENTITYID_INVALID;
+        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        if (!df_add_at(df, id, loc.x, loc.y))
+            return ENTITYID_INVALID;
+        ct.set<location>(id, loc);
+        ct.set<update>(id, true);
+        return id;
+    }
+
+
+    inline race_t random_monster_type() {
+        const vector<race_t> monster_races = {RACE_GOBLIN, RACE_ORC, RACE_BAT, RACE_WOLF, RACE_WARG, RACE_ZOMBIE, RACE_SKELETON, RACE_RAT, RACE_GREEN_SLIME};
+        const int random_index = GetRandomValue(0, monster_races.size() - 1);
+        return monster_races[random_index];
+    }
+
+    inline void set_npc_starting_stats(entityid id) {
+        const race_t rt = ct.get<race>(id).value_or(RACE_NONE);
+        if (rt == RACE_NONE)
+            return;
+
+        // stats racial modifiers for stats
+        const int str_m = get_racial_modifiers(rt, 0);
+        const int dex_m = get_racial_modifiers(rt, 1);
+        const int int_m = get_racial_modifiers(rt, 2);
+        const int wis_m = get_racial_modifiers(rt, 3);
+        const int con_m = get_racial_modifiers(rt, 4);
+        const int cha_m = get_racial_modifiers(rt, 5);
+
+        // default to 3-18 for stats
+        const int strength_ = GetRandomValue(3, 18) + str_m;
+        const int dexterity_ = GetRandomValue(3, 18) + dex_m;
+        const int intelligence_ = GetRandomValue(3, 18) + int_m;
+        const int wisdom_ = GetRandomValue(3, 18) + wis_m;
+        const int constitution_ = GetRandomValue(3, 18) + con_m;
+        const int charisma_ = GetRandomValue(3, 18) + cha_m;
+
+        ct.set<strength>(id, strength_);
+        ct.set<dexterity>(id, dexterity_);
+        ct.set<intelligence>(id, intelligence_);
+        ct.set<wisdom>(id, wisdom_);
+        ct.set<constitution>(id, constitution_);
+        ct.set<charisma>(id, charisma_);
+
+        // set default hp/maxhp for now
+        // later, we will decide this by race templating
+        vec3 hitdie = {1, 8, 0};
+        switch (rt) {
+        case RACE_HUMAN: hitdie.y = 8; break;
+        case RACE_ELF: hitdie.y = 6; break;
+        case RACE_DWARF: hitdie.y = 10; break;
+        case RACE_HALFLING: hitdie.y = 6; break;
+        case RACE_GOBLIN: hitdie.y = 6; break;
+        case RACE_ORC: hitdie.y = 8; break;
+        case RACE_BAT: hitdie.y = 3; break;
+        case RACE_GREEN_SLIME: hitdie.y = 4; break;
+        case RACE_WOLF: hitdie.y = 6; break;
+        case RACE_WARG: hitdie.y = 12; break;
+        case RACE_RAT: hitdie.y = 4; break;
+        case RACE_SKELETON: hitdie.y = 8; break;
+        case RACE_ZOMBIE: hitdie.y = 8; break;
+        default: break;
+        }
+
+        const int my_maxhp = GetRandomValue(1, hitdie.y) + get_stat_bonus(constitution_);
+        const int my_hp = my_maxhp;
+
+        ct.set<maxhp>(id, my_maxhp);
+        ct.set<hp>(id, my_hp);
+        ct.set<base_ac>(id, 10);
+        ct.set<hd>(id, hitdie);
+    }
+
+
+    inline void set_npc_defaults(entityid id) {
+        ct.set<entitytype>(id, ENTITY_NPC);
+        ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+        ct.set<dead>(id, false);
+        ct.set<update>(id, true);
+        ct.set<direction>(id, DIR_DOWN_RIGHT);
+        ct.set<attacking>(id, false);
+        ct.set<blocking>(id, false);
+        ct.set<block_success>(id, false);
+        ct.set<damaged>(id, false);
+        ct.set<txalpha>(id, 0);
+        ct.set<inventory>(id, make_shared<vector<entityid>>());
+        ct.set<equipped_weapon>(id, ENTITYID_INVALID);
+        ct.set<aggro>(id, false);
+        ct.set<vision_distance>(id, 3);
+        ct.set<hearing_distance>(id, 3);
+        // here we have some hard decisions to make about how to template-out NPC creation
+        // all NPCs ben at level 1. level-up mechanisms will be determined elsewhere
+        ct.set<level>(id, 1);
+        ct.set<xp>(id, 0);
+    }
+
+
+    inline entityid create_npc_with(race_t rt) {
+        minfo("begin create npc");
+        //const entityid id = g_add_entity(g);
+        const auto id = add_entity();
+        set_npc_defaults(id);
+        ct.set<race>(id, rt);
+        set_npc_starting_stats(id);
+        //npcInitFunction(g, id);
+        minfo("end create npc");
+        return id;
+    }
+
+
+    inline entityid tile_has_box(int x, int y, int z) {
+        massert(z >= 0, "floor is out of bounds");
+        massert((size_t)z < dungeon.floors.size(), "floor is out of bounds");
+        auto df = d_get_floor(dungeon, z);
+        auto t = df_tile_at(df, (vec3){x, y, z});
+        for (int i = 0; (size_t)i < t.entities->size(); i++) {
+            const entityid id = tile_get_entity(t, i);
+            const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            if (id != ENTITYID_INVALID && type == ENTITY_BOX)
+                return id;
+        }
+        return ENTITYID_INVALID;
+    }
+
+
+    inline entityid create_npc_at_with(race_t rt, vec3 loc) {
+        dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
+        tile_t& tile = df_tile_at(df, loc);
+
+        if (!tile_is_walkable(tile.type)) {
+            merror("cannot create entity on non-walkable tile");
+            return ENTITYID_INVALID;
+        }
+
+        if (tile_has_live_npcs(tile)) {
+            merror("cannot create entity on tile with live NPCs");
+            return ENTITYID_INVALID;
+        }
+
+        if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
+            merror("cannot create entity on tile with box");
+            return ENTITYID_INVALID;
+        }
+
+        const entityid id = create_npc_with(rt);
+        if (!df_add_at(df, id, loc.x, loc.y)) {
+            return ENTITYID_INVALID;
+        }
+
+        ct.set<location>(id, loc);
+        return id;
+    }
+
+
+    // Original function still available but implemented using the new lambda-based version
+    //inline entityid create_npc(race_t rt, vec3 locn) {
+    //    return create_npc_at_with(g, rt, loc, [](gamestate&, entityid) {});
+    //}
+
+
+    inline bool add_to_inventory(entityid actor_id, entityid item_id) {
+        minfo("add to inventory: %d %d", actor_id, item_id);
+        auto maybe_inventory = ct.get<inventory>(actor_id);
+        if (!maybe_inventory.has_value()) {
+            merror("no inventory: %d", actor_id);
+            return false;
+        }
+        auto my_inventory = maybe_inventory.value();
+        my_inventory->push_back(item_id);
+        msuccess("item id %d added successfully to actor %d's inventory", item_id, actor_id);
+        msuccess("inventory size: %ld", my_inventory->size());
+        return true;
+    }
+
+
+    inline entityid create_random_monster_with() {
+        //const race_t r = random_monster_type();
+        minfo("create random monster with");
+        const race_t r = RACE_ORC;
+        const entityid id = create_npc_with(r);
+
+
+        minfo("create weapon");
+        const entityid wpn_id = create_weapon_with();
+        ct.set<name>(wpn_id, "Dagger");
+        ct.set<description>(wpn_id, "Stabby stabby.");
+        ct.set<weapontype>(wpn_id, WEAPON_DAGGER);
+        ct.set<damage>(wpn_id, (vec3){1, 4, 0});
+        ct.set<durability>(wpn_id, 100);
+        ct.set<max_durability>(wpn_id, 100);
+        ct.set<rarity>(wpn_id, RARITY_COMMON);
+
+        minfo("create potion");
+        //const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]));
+        const entityid potion_id = create_potion_with();
+        msuccess("created potion");
+        ct.set<name>(potion_id, "small healing potion");
+        ct.set<description>(potion_id, "a small healing potion");
+        ct.set<potiontype>(potion_id, POTION_HP_SMALL);
+        ct.set<healing>(potion_id, (vec3){1, 6, 0});
+        minfo("add to inventory");
+        add_to_inventory(id, wpn_id);
+        minfo("add to inventory");
+        add_to_inventory(id, potion_id);
+        ct.set<equipped_weapon>(id, wpn_id);
+        ct.set<name>(id, get_random_orc_name());
+        return id;
+    }
+
+
+    inline entityid create_random_monster_at_with(vec3 loc) {
+        minfo("create random monster at with: %d, %d, %d", loc.x, loc.y, loc.z);
+        minfo("getting floor...");
+        auto df = d_get_floor(dungeon, loc.z);
+        minfo("getting tile...");
+        auto tile = df_tile_at(df, loc);
+        minfo("getting tile is walkable...");
+        if (!tile_is_walkable(tile.type))
+            return ENTITYID_INVALID;
+        minfo("getting tile has live npcs...");
+        if (tile_has_live_npcs(tile))
+            return ENTITYID_INVALID;
+        //function<void(gamestate&, entityid)> hook;
+        //if (r == RACE_ORC) {
+        //    hook = [&monsterInitFunction](gamestate& g, entityid id) {
+        //        orc_init_test(g, id);
+        //        monsterInitFunction(g, id);
+        //    };
+        //} else {
+        //    hook = [&monsterInitFunction, r](gamestate& g, entityid id) {
+        //        g.ct.set<name>(id, race2str(r));
+        //        monsterInitFunction(g, id);
+        //    };
+        //}
+
+        //const auto id = create_random_monster_with(g, monsterInitFunction);
+        minfo("create random monster with...");
+        const auto id = create_random_monster_with();
+        if (id == ENTITYID_INVALID)
+            return ENTITYID_INVALID;
+        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        if (!df_add_at(df, id, loc.x, loc.y))
+            return ENTITYID_INVALID;
+        ct.set<location>(id, loc);
+        ct.set<update>(id, true);
+        return id;
+    }
+
+
+    inline void add_message(const char* fmt, ...) {
+        massert(fmt, "format string is NULL");
+        char buffer[MAX_MSG_LENGTH];
+        va_list args;
+        va_start(args, fmt);
+        vsnprintf(buffer, MAX_MSG_LENGTH - 1, fmt, args);
+        va_end(args);
+        string s(buffer);
+        msg_system.push_back(s);
+        msg_system_is_active = true;
+    }
+
+    inline void add_message_history(const char* fmt, ...) {
+        massert(fmt, "format string is NULL");
+        char buffer[MAX_MSG_LENGTH];
+        va_list args;
+        va_start(args, fmt);
+        vsnprintf(buffer, MAX_MSG_LENGTH - 1, fmt, args);
+        va_end(args);
+        string s(buffer);
+        msg_history.push_back(s);
+    }
+
+
     void logic_init() {
         srand(time(NULL));
         SetRandomSeed(time(NULL));
         minfo("gamestate.logic_init");
 
-        //init_dungeon(this, 10);
+        init_dungeon(10);
+
+        place_doors();
+        place_props();
+
+        const entityid dagger_id = create_weapon_at_with(df_get_random_loc(dungeon.floors[0]));
+        //dagger_init_test(this, dagger_id);
+
+        ct.set<name>(dagger_id, "Dagger");
+        ct.set<description>(dagger_id, "Stabby stabby.");
+        ct.set<weapontype>(dagger_id, WEAPON_DAGGER);
+        ct.set<damage>(dagger_id, (vec3){1, 4, 0});
+        ct.set<durability>(dagger_id, 100);
+        ct.set<max_durability>(dagger_id, 100);
+        ct.set<rarity>(dagger_id, RARITY_COMMON);
+
+
+        const entityid shield_id = create_shield_at_with(df_get_random_loc(dungeon.floors[0]));
+        ct.set<name>(shield_id, "Kite Shield");
+        ct.set<description>(shield_id, "Standard knight's shield");
+        ct.set<shieldtype>(shield_id, SHIELD_KITE);
+        ct.set<block_chance>(shield_id, 90);
+
+
+        const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]));
+        ct.set<name>(potion_id, "small healing potion");
+        ct.set<description>(potion_id, "a small healing potion");
+        ct.set<potiontype>(potion_id, POTION_HP_SMALL);
+        ct.set<healing>(potion_id, (vec3){1, 6, 0});
+
+
+        minfo("creating monsters...");
+        for (int i = 0; i < (int)dungeon.floors.size(); i++) {
+            for (int j = 1; j <= i + 1; j++) {
+                const vec3 random_loc = df_get_random_loc(d_get_floor(dungeon, i));
+                create_random_monster_at_with(random_loc);
+            }
+        }
+        msuccess("end creating monsters...");
+
+        add_message("Welcome to the game! Press enter to cycle messages.");
+#ifdef START_MESSAGES
+        add_message("To move around, press [q w e a d z x c]");
+        add_message("To pick up items, press / ");
+        add_message("To manage inventory, press i ");
+        add_message("To equip/unequip an item, highlight and press e ");
+        add_message("To drop an item, highlight and press q ");
+        add_message("To attack, press ' ");
+        add_message("To go up/down a floor, press . ");
+        add_message("To wait a turn, press s s ");
+        add_message("To change direction, press s and then [q w e a d z x c] ");
+        add_message("To open a door, face it and press o ");
+#endif
+        msuccess("liblogic_init: Game state initialized");
     }
 };

@@ -28,23 +28,16 @@ static inline entityid create_random_monster_with(gamestate& g, function<void(ga
             monsterInitFunction(g, id);
         };
     }
-    //return create_npc_with(g, r, monsterInitFunction);
     return create_npc_with(g, r, hook);
 }
 
 static inline entityid create_random_monster_at_with(gamestate& g, vec3 loc, function<void(gamestate&, entityid)> monsterInitFunction) {
-    //const race_t r = random_monster_type();
-
-    //const race_t r = RACE_ORC;
-
     auto df = d_get_floor(g.dungeon, loc.z);
     auto tile = df_tile_at(df, loc);
     if (!tile_is_walkable(tile.type))
         return ENTITYID_INVALID;
     if (tile_has_live_npcs(g, tile))
         return ENTITYID_INVALID;
-
-
     //function<void(gamestate&, entityid)> hook;
     //if (r == RACE_ORC) {
     //    hook = [&monsterInitFunction](gamestate& g, entityid id) {
