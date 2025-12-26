@@ -650,25 +650,25 @@ public:
 
 
 
-    const inline entityid create_potion_with() {
+    const inline entityid create_potion_with(with_function potionInitFunction) {
         const auto id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
         ct.set<itemtype>(id, ITEM_POTION);
-        //potionInitFunction(g, id);
+        potionInitFunction(ct, id);
         return id;
     }
 
 
 
 
-    const inline entityid create_potion_at_with(const vec3 loc) {
+    const inline entityid create_potion_at_with(const vec3 loc, with_function potionInitFunction) {
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type))
             return ENTITYID_INVALID;
         if (tile_has_live_npcs(tile))
             return ENTITYID_INVALID;
-        const auto id = create_potion_with();
+        const auto id = create_potion_with(potionInitFunction);
         if (id == ENTITYID_INVALID)
             return ENTITYID_INVALID;
         minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
@@ -864,12 +864,14 @@ public:
 
         minfo("create potion");
         //const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]));
-        const entityid potion_id = create_potion_with();
+        const entityid potion_id = create_potion_with([](CT& ct, const entityid id) {
+            ct.set<name>(id, "small healing potion");
+            ct.set<description>(id, "a small healing potion");
+            ct.set<potiontype>(id, POTION_HP_SMALL);
+            ct.set<healing>(id, (vec3){1, 6, 0});
+        });
+
         msuccess("created potion");
-        ct.set<name>(potion_id, "small healing potion");
-        ct.set<description>(potion_id, "a small healing potion");
-        ct.set<potiontype>(potion_id, POTION_HP_SMALL);
-        ct.set<healing>(potion_id, (vec3){1, 6, 0});
         minfo("add to inventory");
         add_to_inventory(id, wpn_id);
         minfo("add to inventory");
@@ -1057,11 +1059,13 @@ public:
             ct.set<block_chance>(id, 90);
         });
 
-        const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]));
-        ct.set<name>(potion_id, "small healing potion");
-        ct.set<description>(potion_id, "a small healing potion");
-        ct.set<potiontype>(potion_id, POTION_HP_SMALL);
-        ct.set<healing>(potion_id, (vec3){1, 6, 0});
+        //const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
+        create_potion_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
+            ct.set<name>(id, "small healing potion");
+            ct.set<description>(id, "a small healing potion");
+            ct.set<potiontype>(id, POTION_HP_SMALL);
+            ct.set<healing>(id, (vec3){1, 6, 0});
+        });
 
         minfo("creating monsters...");
         for (int i = 0; i < (int)dungeon.floors.size(); i++) {
