@@ -890,6 +890,22 @@ public:
     }
 
 
+    void update_player_state() {
+        if (hero_id == ENTITYID_INVALID)
+            return;
+        const unsigned char a = ct.get<txalpha>(hero_id).value_or(255);
+        if (a < 255)
+            ct.set<txalpha>(hero_id, a + 1);
+        if (ct.get<dead>(hero_id).value_or(true)) {
+            gameover = true;
+            return;
+        }
+        ct.set<blocking>(hero_id, false);
+        ct.set<block_success>(hero_id, false);
+        ct.set<damaged>(hero_id, false);
+    }
+
+
     void logic_init() {
         srand(time(NULL));
         SetRandomSeed(time(NULL));
