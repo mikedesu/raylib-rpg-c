@@ -6,7 +6,7 @@
 #include "inputstate.h"
 #include "update_debug_panel_buffer.h"
 #include "update_player_state.h"
-#include "update_player_tiles_explored.h"
+//#include "update_player_tiles_explored.h"
 #include <memory>
 
 #define TILE_COUNT_ERROR -999
@@ -53,7 +53,8 @@ static inline void update_spells_state(gamestate& g) {
 static inline void liblogic_tick(gamestate& g, inputstate& is) {
     // Spawn NPCs periodically
     //try_spawn_npc(g);
-    update_player_tiles_explored(g);
+    g.update_player_tiles_explored();
+
     update_player_state(g);
     update_npcs_state(g);
     update_spells_state(g);

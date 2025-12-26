@@ -860,6 +860,36 @@ public:
     }
 
 
+    void update_tile(tile_t& tile) {
+        tile.explored = tile.visible = true;
+    }
+
+
+    void update_player_tiles_explored() {
+        if (hero_id == ENTITYID_INVALID)
+            return;
+        auto df = d_get_current_floor(dungeon);
+        auto maybe_loc = ct.get<location>(hero_id);
+        if (!maybe_loc.has_value())
+            return;
+        const vec3 loc = maybe_loc.value();
+        const int light_radius0 = ct.get<light_radius>(hero_id).value_or(1);
+        // Precompute bounds for the loops
+        const int min_x = std::max(0, loc.x - light_radius0);
+        const int max_x = std::min(df.width - 1, loc.x + light_radius0);
+        const int min_y = std::max(0, loc.y - light_radius0);
+        const int max_y = std::min(df.height - 1, loc.y + light_radius0);
+        for (int y = min_y; y <= max_y; y++) {
+            for (int x = min_x; x <= max_x; x++) {
+                // Calculate Manhattan distance for diamond shape
+                if (abs(x - loc.x) + abs(y - loc.y) > light_radius0)
+                    continue;
+                update_tile(df_tile_at(df, (vec3){x, y, loc.z}));
+            }
+        }
+    }
+
+
     void logic_init() {
         srand(time(NULL));
         SetRandomSeed(time(NULL));
