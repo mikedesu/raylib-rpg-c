@@ -1,8 +1,6 @@
 #include "gamestate.h"
 #include "inputstate.h"
 #include "libdraw.h"
-#include "liblogic.h"
-
 #ifdef WEB
 #include <emscripten/emscripten.h>
 #endif
@@ -10,18 +8,16 @@
 inputstate is;
 gamestate g;
 
-void gameloop() {
+static inline void gameloop() {
     inputstate_update(is);
-    liblogic_tick(g, is);
+    g.tick(is);
     libdraw_drawframe(g);
     if (g.do_restart) {
         msuccess("Restarting game...");
         libdraw_close();
-
         g.logic_close();
         g.reset();
         g.logic_init();
-
         libdraw_init(g);
         g.do_restart = false; // Reset restart flag
         g.restart_count++;

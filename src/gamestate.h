@@ -2802,4 +2802,20 @@ public:
 #endif
         }
     }
+
+
+    void tick(inputstate& is) {
+        // Spawn NPCs periodically
+        //try_spawn_npc(g);
+        update_player_tiles_explored();
+        update_player_state();
+        update_npcs_state();
+        update_spells_state();
+        handle_input(is);
+        handle_npcs();
+        update_debug_panel_buffer(is);
+        currenttime = time(NULL);
+        currenttimetm = localtime(&currenttime);
+        strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
+    }
 };
