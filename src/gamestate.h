@@ -2133,8 +2133,10 @@ public:
 
 
     inline void handle_attack_sfx(const entityid attacker, const attack_result_t result) {
-        if (!check_hearing(hero_id, ct.get<location>(attacker).value_or((vec3){-1, -1, -1})))
+        minfo("handle_attack_sfx: %d %d", attacker, result);
+        if (!check_hearing(hero_id, ct.get<location>(attacker).value_or((vec3){-1, -1, -1}))) {
             return;
+        }
         int index = SFX_SLASH_ATTACK_SWORD_1;
         if (result == ATTACK_RESULT_BLOCK) {
             index = SFX_HIT_METAL_ON_METAL;
@@ -2163,23 +2165,24 @@ public:
     }
 
 
-    inline void try_entity_attack(const entityid atk_id, const int tgt_x, const int tgt_y) {
-        massert(!ct.get<dead>(atk_id).value_or(false), "attacker entity is dead");
-        minfo("Trying to attack...");
-        const vec3 loc = ct.get<location>(atk_id).value();
+    inline void try_entity_attack(const entityid id, const int tgt_x, const int tgt_y) {
+        massert(!ct.get<dead>(id).value_or(false), "attacker entity is dead");
+        if (id == hero_id)
+            minfo("try_entity_attack: %d, (%d,%d)", id, tgt_x, tgt_y);
+        const vec3 loc = ct.get<location>(id).value();
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, (vec3){tgt_x, tgt_y, loc.z});
         // Calculate direction based on target position
         const int dx = tgt_x - loc.x;
         const int dy = tgt_y - loc.y;
-        ct.set<direction>(atk_id, get_dir_from_xy(dx, dy));
-        ct.set<attacking>(atk_id, true);
-        ct.set<update>(atk_id, true);
+        ct.set<direction>(id, get_dir_from_xy(dx, dy));
+        ct.set<attacking>(id, true);
+        ct.set<update>(id, true);
         const entityid npc_id = get_cached_npc(tile);
-        const attack_result_t result = process_attack_entity(tile, atk_id, npc_id);
+        const attack_result_t result = process_attack_entity(tile, id, npc_id);
         // did the hero hear this event?
-        handle_attack_sfx(atk_id, result);
-        set_gamestate_flag_for_attack_animation(ct.get<entitytype>(atk_id).value_or(ENTITY_NONE));
+        handle_attack_sfx(id, result);
+        set_gamestate_flag_for_attack_animation(ct.get<entitytype>(id).value_or(ENTITY_NONE));
     }
 
 
