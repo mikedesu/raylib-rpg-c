@@ -293,12 +293,14 @@ static inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs(dungeon_f
 
 
 static inline void df_free(dungeon_floor_t& df) {
+    minfo("df_free");
     df.tiles.clear();
     df.tile_map->clear();
 }
 
 
 static inline entityid df_add_at(dungeon_floor_t& df, entityid id, int x, int y) {
+    minfo("df_add_at: %d, %d, %d", id, loc.x, loc.y);
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(x >= 0 && x < df.width, "x is out of bounds");
     massert(y >= 0 && y < df.height, "y is out of bounds");

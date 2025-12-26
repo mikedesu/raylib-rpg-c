@@ -7,7 +7,7 @@
 class MyTestSuite : public CxxTest::TestSuite {
 public:
     void testGamestateBasic() {
-        minfo("test gamestate basic");
+        minfo("--- start test gamestate basic ---");
         gamestate g;
 
         TS_ASSERT(g.cam_lockon == true);
@@ -28,14 +28,14 @@ public:
     }
 
     void testGamestateThrowaway() {
-        minfo("test gamestate throwaway");
+        minfo("--- start test gamestate throwaway ---");
         for (int i = 0; i < 10; i++) {
             gamestate g;
         }
     }
 
     void testEntityManagement() {
-        minfo("test entity management");
+        minfo("--- start test entity management ---");
         gamestate g;
 
         // Verify initial state
@@ -69,7 +69,7 @@ public:
     }
 
     void testMessageSystem() {
-        minfo("Starting testMessageSystem");
+        minfo("--- start test message system ---");
         gamestate g;
 
         // Verify initial state
@@ -101,11 +101,11 @@ public:
         TS_ASSERT(g.msg_system.size() == 0);
         TS_ASSERT(g.msg_history.size() == 0);
         TS_ASSERT(!g.msg_system_is_active);
-        minfo("Reset complete");
+        //minfo("Reset complete");
     }
 
     void testCameraSystem() {
-        minfo("Starting testCameraSystem");
+        minfo("--- start test camera system ---");
         gamestate g;
 
         // Verify initial state
@@ -135,11 +135,11 @@ public:
         TS_ASSERT(g.cam2d.rotation == 0.0);
         TS_ASSERT(g.cam_lockon == true);
         TS_ASSERT(g.cam_changed == false);
-        minfo("Reset complete - zoom: %.1f, changed: %d", g.cam2d.zoom, g.cam_changed);
+        //minfo("Reset complete - zoom: %.1f, changed: %d", g.cam2d.zoom, g.cam_changed);
     }
 
     void testMusicSystem() {
-        minfo("--- Starting testMusicSystem ---");
+        minfo("--- Starting test music system ---");
         gamestate g;
 
         // Verify initial state
@@ -177,7 +177,7 @@ public:
         TS_ASSERT(!g.music_volume_changed);
         //minfo("After reset - Expected current_music_index: 0, Actual: %d", g.current_music_index);
         TS_ASSERT(g.current_music_index == 0);
-        minfo("--- Reset complete ---");
+        //minfo("--- Reset complete ---");
     }
 
 
@@ -197,6 +197,23 @@ public:
 
         g.reset();
 
-        minfo("--- end test init dungeon ---");
+        //minfo("--- end test init dungeon ---");
+    }
+
+
+    void testPlaceDoors() {
+        minfo("--- start test place doors ---");
+        gamestate g;
+        const size_t placed_doors_0 = g.place_doors();
+
+        TS_ASSERT(placed_doors_0 == 0);
+
+        g.init_dungeon(1);
+
+        TS_ASSERT(g.dungeon.floors.size() == 1);
+
+        const size_t placed_doors_1 = g.place_doors();
+
+        TS_ASSERT(placed_doors_1 > 0);
     }
 };

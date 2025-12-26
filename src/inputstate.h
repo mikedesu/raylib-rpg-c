@@ -52,7 +52,7 @@ static inline void inputstate_update(inputstate& is) {
 }
 
 // Check if a key was pressed this frame
-static inline bool inputstate_is_pressed(inputstate& is, int key) {
+static inline const bool inputstate_is_pressed(const inputstate& is, int key) {
     if (key < 0 || key >= MAX_KEYS)
         return false;
     const int idx = key / BITS_PER_LONG, bit = key % BITS_PER_LONG;
@@ -60,7 +60,7 @@ static inline bool inputstate_is_pressed(inputstate& is, int key) {
 }
 
 // Check if ANY key was pressed this frame
-static inline bool inputstate_any_pressed(inputstate& is) {
+static inline bool inputstate_any_pressed(const inputstate& is) {
     for (int idx = 0; idx < NUM_LONGS; idx++) {
         if (is.pressed[idx] != 0)
             return true; // At least one key pressed
@@ -69,7 +69,7 @@ static inline bool inputstate_any_pressed(inputstate& is) {
 }
 
 // Check if a key is held down
-static inline bool inputstate_is_held(inputstate& is, int key) {
+static inline const bool inputstate_is_held(const inputstate& is, int key) {
     if (key < 0 || key >= MAX_KEYS)
         return false;
     const int idx = key / BITS_PER_LONG, bit = key % BITS_PER_LONG;
@@ -77,7 +77,7 @@ static inline bool inputstate_is_held(inputstate& is, int key) {
 }
 
 // Get the first key pressed this frame
-static inline int inputstate_get_pressed_key(inputstate& is) {
+static inline int inputstate_get_pressed_key(const inputstate& is) {
     for (int idx = 0; idx < NUM_LONGS; idx++) {
         const uint64_t bits = is.pressed[idx];
         if (bits != 0) { // At least one key pressed in this block
@@ -96,14 +96,14 @@ static inline int inputstate_get_pressed_key(inputstate& is) {
     return -1; // No key pressed
 }
 
-static inline bool inputstate_is_left_shift_held(inputstate& is) {
+static inline bool inputstate_is_left_shift_held(const inputstate& is) {
     return inputstate_is_held(is, KEY_LEFT_SHIFT);
 }
 
-static inline bool inputstate_is_right_shift_held(inputstate& is) {
+static inline bool inputstate_is_right_shift_held(const inputstate& is) {
     return inputstate_is_held(is, KEY_RIGHT_SHIFT);
 }
 
-static inline bool inputstate_is_shift_held(inputstate& is) {
+static inline bool inputstate_is_shift_held(const inputstate& is) {
     return inputstate_is_left_shift_held(is) || inputstate_is_right_shift_held(is);
 }
