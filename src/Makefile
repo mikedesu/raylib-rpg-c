@@ -31,7 +31,7 @@ index.html: main.cpp
 
 # Unit tests
 tests: tests.cpp
-	g++ -o tests tests.cpp -DDEBUG=1
+	g++ -o tests tests.cpp -lraylib -DDEBUG=1
 
 tests.cpp: unit_test.h
 	cxxtestgen --error-printer -o tests.cpp unit_test.h

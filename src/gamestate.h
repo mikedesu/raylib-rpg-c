@@ -65,6 +65,7 @@ public:
     char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF];
     char currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
 
+    bool test;
     bool debugpanelon;
     bool gridon;
     bool cam_lockon;
@@ -139,7 +140,7 @@ public:
 
 
     gamestate() {
-        minfo("Initializing gamestate");
+        //minfo("Initializing gamestate");
         reset();
         msuccess("Gamestate initialized successfully");
     }
@@ -214,6 +215,7 @@ public:
         music_volume_changed = false;
         player_changing_dir = false;
         msg_system_is_active = false;
+        test = false;
         gameplay_settings_menu_selection = 0;
         cam2d.target = cam2d.offset = (Vector2){0, 0};
         cam2d.zoom = 4.0f;
@@ -258,6 +260,10 @@ public:
         msg_system.clear();
         msg_history.clear();
         ct.clear();
+
+        dungeon.floors.clear();
+        dungeon.is_initialized = false;
+
         init_music_paths();
     }
 
@@ -292,7 +298,10 @@ public:
     inline void init_dungeon(const int df_count) {
         massert(df_count > 0, "df_count is <= 0");
         d_create(dungeon);
-        msuccess("dungeon initialized successfully");
+        if (dungeon.is_initialized) {
+            merror("dungeon is already initialized");
+            return;
+        }
         minfo("adding floors...");
         // max size of 128x128 for now to maintain 60fps
         // dungeon floors, tiles etc will require re-write/re-design for optimization
@@ -303,7 +312,9 @@ public:
         for (int i = 0; i < df_count; i++) {
             d_add_floor(dungeon, type, w, h);
         }
+        dungeon.is_initialized = true;
         msuccess("added %d floors to dungeon", df_count);
+        msuccess("dungeon initialized successfully");
     }
 
 
@@ -887,7 +898,7 @@ public:
         SetRandomSeed(time(NULL));
         minfo("gamestate.logic_init");
 
-        init_dungeon(10);
+        init_dungeon(1);
         place_doors();
         place_props();
 

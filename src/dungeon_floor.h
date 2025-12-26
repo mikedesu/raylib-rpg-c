@@ -47,7 +47,7 @@ static inline tile_t& df_tile_at(dungeon_floor_t& df, vec3 loc) {
 
 
 static inline void df_set_can_have_door(dungeon_floor_t& df, vec3 loc) {
-    minfo("set can have door: %d, %d, %d", loc.x, loc.y, loc.z);
+    //minfo("set can have door: %d, %d, %d", loc.x, loc.y, loc.z);
     tile_t& tile = df_tile_at(df, loc);
     tile.can_have_door = true;
 }
@@ -93,7 +93,7 @@ static inline tiletype_t random_tiletype(tiletype_t a, tiletype_t b) {
 
 
 static inline void df_set_area(dungeon_floor_t& df, tiletype_t a, tiletype_t b, Rectangle r) {
-    minfo("df set area");
+    //minfo("df set area");
     for (int x = r.x; x < r.x + r.width && x < df.width; x++) {
         for (int y = r.y; y < r.y + r.height && y < df.height; y++) {
             const tiletype_t t = random_tiletype(a, b);
@@ -325,7 +325,7 @@ static inline bool df_remove_at(dungeon_floor_t& df, entityid id, int x, int y) 
 
 
 static inline void df_set_all_tiles(dungeon_floor_t& df, tiletype_t type) {
-    minfo("df_set_all_tiles: Setting all tiles to type %d", type);
+    //minfo("df_set_all_tiles: Setting all tiles to type %d", type);
     df_set_area(df, type, type, (Rectangle){0, 0, (float)df.width, (float)df.height});
 }
 

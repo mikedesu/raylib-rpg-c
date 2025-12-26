@@ -20,11 +20,19 @@ typedef struct {
     vector<dungeon_floor_t> floors; // vector of shared pointers to dungeon_floor_t
     int current_floor;
     bool is_locked;
+    bool is_initialized;
 } dungeon_t;
 
 static inline void d_create(dungeon_t& dungeon) {
+    minfo("d_create");
+    if (dungeon.is_initialized) {
+        merror("dungeon is already initialized");
+        return;
+    }
     dungeon.current_floor = 0;
     dungeon.is_locked = false;
+    dungeon.is_initialized = false;
+    msuccess("dungeon created");
 }
 
 static inline void d_destroy(dungeon_t& d) {
