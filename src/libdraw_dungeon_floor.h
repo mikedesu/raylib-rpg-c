@@ -74,7 +74,8 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
     massert(txinfo, "txinfo is null");
     massert(x >= 0, "x is less than 0");
     massert(y >= 0, "y is less than 0");
-    auto df = d_get_floor(g.dungeon, z);
+    //auto df = d_get_floor(g.dungeon, z);
+    auto df = g.d.get_floor(z);
     //massert(df, "dungeon_floor is NULL");
     massert(x < df.width, "x is out of bounds");
     massert(y < df.height, "y is out of bounds");
@@ -138,9 +139,9 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
 
 
 static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytype_t entitytype_0, function<bool(gamestate&, entityid)> additional_check) {
-    auto df = d_get_current_floor(g.dungeon);
+    auto df = g.d.get_current_floor();
     //massert(df, "dungeon_floor is NULL");
-    const int z = g.dungeon.current_floor;
+    const int z = g.d.current_floor;
 
     for (int y = 0; y < df.height; y++) {
         for (int x = 0; x < df.width; x++) {
@@ -244,8 +245,9 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 
 
 static inline bool libdraw_draw_dungeon_floor(gamestate& g) {
-    auto df = d_get_current_floor(g.dungeon);
-    const int z = g.dungeon.current_floor;
+    //auto df = d_get_current_floor(g.dungeon);
+    auto df = g.d.get_current_floor();
+    const int z = g.d.current_floor;
 
     // render tiles
     for (int y = 0; y < df.height; y++)

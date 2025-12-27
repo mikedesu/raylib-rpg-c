@@ -14,7 +14,7 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
     massert(group, "spritegroup is NULL");
     //disabling this check until dungeon_floor created
-    auto df = d_get_current_floor(g.dungeon);
+    auto df = g.d.get_current_floor();
     auto maybe_loc = g.ct.get<location>(id);
     // if it has a location...
     if (maybe_loc.has_value()) {

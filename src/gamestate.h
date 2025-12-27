@@ -117,7 +117,7 @@ public:
 
     double last_frame_time;
 
-    dungeon_t dungeon;
+    dungeon d;
 
     char frame_time_str[32];
 
@@ -270,11 +270,11 @@ public:
         msg_system.clear();
         msg_history.clear();
         ct.clear();
-        for (size_t i = 0; i < dungeon.floors.size(); i++) {
-            df_free(dungeon.floors[i]);
+        for (size_t i = 0; i < d.floors.size(); i++) {
+            df_free(d.floors[i]);
         }
-        dungeon.floors.clear();
-        dungeon.is_initialized = false;
+        d.floors.clear();
+        d.is_initialized = false;
         init_music_paths();
     }
 
@@ -307,7 +307,8 @@ public:
 
 
     inline tile_t& tile_at_cur_floor(const vec3 loc) {
-        return df_tile_at(d_get_current_floor(dungeon), loc);
+        //return df_tile_at(d_get_current_floor(dungeon), loc);
+        return df_tile_at(d.get_current_floor(), loc);
     }
 
 
@@ -315,10 +316,12 @@ public:
 
     inline void init_dungeon(const int df_count) {
         massert(df_count > 0, "df_count is <= 0");
-        d_create(dungeon);
-        if (dungeon.is_initialized) {
+
+        //d_create(dungeon);
+        if (d.is_initialized) {
             return;
         }
+
         // max size of 128x128 for now to maintain 60fps
         // dungeon floors, tiles etc will require re-write/re-design for optimization
         const int w = 32;
@@ -326,9 +329,10 @@ public:
         const biome_t type = BIOME_STONE;
         //dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_GRASS;
         for (int i = 0; i < df_count; i++) {
-            d_add_floor(dungeon, type, w, h);
+            //d_add_floor(dungeon, type, w, h);
+            d.add_floor(type, w, h);
         }
-        dungeon.is_initialized = true;
+        d.is_initialized = true;
     }
 
 
@@ -383,8 +387,8 @@ public:
 
     inline void recompute_entity_cache_at(const int x, const int y, const int z) {
         massert(x >= 0 && y >= 0 && z >= 0, "x, y, or z is out of bounds: %d, %d, %d", x, y, z);
-        massert((size_t)z < dungeon.floors.size(), "z is out of bounds");
-        auto df = dungeon.floors[z];
+        massert((size_t)z < d.floors.size(), "z is out of bounds");
+        auto df = d.floors[z];
         auto t = df_tile_at(df, (vec3){x, y, z});
         recompute_entity_cache(t);
     }
@@ -401,8 +405,8 @@ public:
 
 
     const inline entityid create_door_at_with(const vec3 loc) {
-        dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
-        tile_t& tile = df_tile_at(df, loc);
+        auto df = d.get_floor(loc.z);
+        auto tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type))
             return ENTITYID_INVALID;
         if (tile_has_live_npcs(tile))
@@ -423,8 +427,8 @@ public:
 
     const inline size_t place_doors() {
         size_t placed_doors = 0;
-        for (int z = 0; z < (int)dungeon.floors.size(); z++) {
-            dungeon_floor_t& df = d_get_floor(dungeon, z);
+        for (int z = 0; z < (int)d.floors.size(); z++) {
+            auto df = d.get_floor(z);
             for (int x = 0; x < df.width; x++) {
                 for (int y = 0; y < df.height; y++) {
                     const vec3 loc = {x, y, z};
@@ -460,7 +464,7 @@ public:
 
 
     const inline entityid create_prop_at_with(const proptype_t type, const vec3 loc) {
-        auto df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         auto tile = df_tile_at(df, loc);
         const entityid id = create_prop_with(type);
         if (id == ENTITYID_INVALID) {
@@ -485,8 +489,8 @@ public:
         //    g.ct.set<pushable>(id, true);
         //};
         int placed_props = 0;
-        for (int z = 0; z < (int)dungeon.floors.size(); z++) {
-            auto df = d_get_floor(dungeon, z);
+        for (int z = 0; z < (int)d.floors.size(); z++) {
+            auto df = d.get_floor(z);
             for (int x = 0; x < df.width; x++) {
                 for (int y = 0; y < df.height; y++) {
                     const vec3 loc = {x, y, z};
@@ -608,11 +612,11 @@ public:
 
     const inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_fun weaponInitFunction) {
         //minfo("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
-        if (dungeon.floors.size() == 0) {
+        if (d.floors.size() == 0) {
             merror("dungeon floors size is 0");
             return ENTITYID_INVALID;
         }
-        if (!dungeon.is_initialized) {
+        if (!d.is_initialized) {
             merror("dungeon is_initialized flag not set");
             return ENTITYID_INVALID;
         }
@@ -620,7 +624,7 @@ public:
             merror("loc is invalid");
             return ENTITYID_INVALID;
         }
-        auto df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         auto tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type)) {
             merror("cannot create entity on non-walkable tile");
@@ -646,7 +650,7 @@ public:
 
 
     const inline entityid create_weapon_at_random_loc_with(CT& ct, with_fun weaponInitFunction) {
-        const vec3 loc = df_get_random_loc(dungeon.floors[dungeon.current_floor]);
+        const vec3 loc = df_get_random_loc(d.floors[d.current_floor]);
         if (vec3_invalid(loc)) {
             merror("loc is invalid");
             return ENTITYID_INVALID;
@@ -672,11 +676,11 @@ public:
 
 
     const inline entityid create_shield_at_with(const vec3 loc, with_fun shieldInitFunction) {
-        if (dungeon.floors.size() == 0)
+        if (d.floors.size() == 0)
             return ENTITYID_INVALID;
         const auto id = create_shield_with(shieldInitFunction);
         //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-        auto df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         if (!df_add_at(df, id, loc.x, loc.y))
             return ENTITYID_INVALID;
         ct.set<location>(id, loc);
@@ -698,7 +702,8 @@ public:
 
 
     const inline entityid create_potion_at_with(const vec3 loc, with_fun potionInitFunction) {
-        auto df = d_get_floor(dungeon, loc.z);
+        //auto df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         auto tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type))
             return ENTITYID_INVALID;
@@ -820,8 +825,10 @@ public:
 
     const inline entityid tile_has_box(const int x, const int y, const int z) {
         massert(z >= 0, "floor is out of bounds");
-        massert((size_t)z < dungeon.floors.size(), "floor is out of bounds");
-        auto df = d_get_floor(dungeon, z);
+        massert((size_t)z < d.floors.size(), "floor is out of bounds");
+        //auto df = d_get_floor(dungeon, z);
+
+        auto df = d.get_floor(z);
         auto t = df_tile_at(df, (vec3){x, y, z});
         for (int i = 0; (size_t)i < t.entities->size(); i++) {
             const entityid id = tile_get_entity(t, i);
@@ -836,7 +843,8 @@ public:
 
 
     const inline entityid create_npc_at_with(const race_t rt, const vec3 loc, with_fun npcInitFunction) {
-        dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
+        //dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         tile_t& tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type)) {
             merror("cannot create entity on non-walkable tile");
@@ -920,7 +928,8 @@ public:
     const inline entityid create_random_monster_at_with(const vec3 loc, with_fun monsterInitFunction) {
         if (vec3_equal(loc, (vec3){-1, -1, -1}))
             return ENTITYID_INVALID;
-        auto df = d_get_floor(dungeon, loc.z);
+        //auto df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         auto tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type))
             return ENTITYID_INVALID;
@@ -979,7 +988,8 @@ public:
     inline void update_player_tiles_explored() {
         if (hero_id == ENTITYID_INVALID)
             return;
-        auto df = d_get_current_floor(dungeon);
+        //auto df = d_get_current_floor(dungeon);
+        auto df = d.get_current_floor();
         auto maybe_loc = ct.get<location>(hero_id);
         if (!maybe_loc.has_value())
             return;
@@ -1033,7 +1043,8 @@ public:
             const bool is_destroyed = ct.get<destroyed>(id).value_or(false);
             if (is_complete && is_destroyed) {
                 // remove it from the tile
-                auto df = d_get_current_floor(dungeon);
+                //        auto df = d_get_current_floor(dungeon);
+                auto df = d.get_current_floor();
                 auto loc = ct.get<location>(id).value_or((vec3){-1, -1, -1});
                 df_remove_at(df, id, loc.x, loc.y);
             }
@@ -1065,22 +1076,23 @@ public:
 
         init_dungeon(1);
 
-        massert(dungeon.floors.size() > 0, "dungeon.floors.size is 0");
+        massert(d.floors.size() > 0, "dungeon.floors.size is 0");
 
         place_doors();
         place_props();
 
-        const vec3 loc = df_get_random_loc(dungeon.floors[0]);
+        const vec3 loc = df_get_random_loc(d.floors[0]);
 
         create_weapon_at_with(ct, loc, dagger_init());
         //create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
-        create_shield_at_with(df_get_random_loc(dungeon.floors[0]), shield_init());
-        create_potion_at_with(df_get_random_loc(dungeon.floors[0]), potion_init(POTION_HP_SMALL));
+        create_shield_at_with(df_get_random_loc(d.floors[0]), shield_init());
+        create_potion_at_with(df_get_random_loc(d.floors[0]), potion_init(POTION_HP_SMALL));
 
         //minfo("creating monsters...");
-        for (int i = 0; i < (int)dungeon.floors.size(); i++) {
-            for (int j = 1; j <= i + 4; j++) {
-                const vec3 random_loc = df_get_random_loc(d_get_floor(dungeon, i));
+        constexpr int monster_count = 5;
+        for (int i = 0; i < (int)d.floors.size(); i++) {
+            for (int j = 0; j < monster_count; j++) {
+                const vec3 random_loc = df_get_random_loc(d.get_floor(i));
                 create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
             }
         }
@@ -1195,7 +1207,8 @@ public:
 
 
     const inline entityid create_box_at_with(const vec3 loc) {
-        auto df = d_get_floor(dungeon, loc.z);
+        //auto df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         auto tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type)) {
             merror("cannot create entity on non-walkable tile");
@@ -1237,7 +1250,8 @@ public:
 
 
     const inline entityid create_spell_at_with(const vec3 loc) {
-        auto df = d_get_floor(dungeon, loc.z);
+        //auto df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         auto tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type))
             return ENTITYID_INVALID;
@@ -1282,7 +1296,7 @@ public:
             while (maxhp_roll < 1)
                 maxhp_roll = do_roll_best_of_3((vec3){1, myhd, 0}) + get_stat_bonus(chara_creation.constitution);
             //const vec3 start_loc = g.dungeon.floors->at(g.dungeon.current_floor)->upstairs_loc;
-            const vec3 start_loc = dungeon.floors[dungeon.current_floor].upstairs_loc;
+            const vec3 start_loc = d.floors[d.current_floor].upstairs_loc;
 
             entity_turn = create_player_with(start_loc, "darkmage", [this, maxhp_roll](CT& ct, const entityid id) {
                 // set stats from char_creation
@@ -1381,7 +1395,8 @@ public:
                 return false;
             }
             auto loc = maybe_loc.value();
-            auto df = d_get_current_floor(dungeon);
+            //    auto df = d_get_current_floor(dungeon);
+            auto df = d.get_current_floor();
             auto tile = df_tile_at(df, loc);
             const entityid retval = df_add_at(df, item_id, loc.x, loc.y);
             if (retval == ENTITYID_INVALID) {
@@ -1506,7 +1521,8 @@ public:
         // get the player's location
         vec3 loc = ct.get<location>(hero_id).value();
         // get the tile at the player's location
-        auto df = d_get_current_floor(dungeon);
+        //auto df = d_get_current_floor(dungeon);
+        auto df = d.get_current_floor();
         if (!df_add_at(df, item_id, loc.x, loc.y)) {
             merror("Failed to add to %d, %d, %d", loc.x, loc.y, loc.z);
             return false;
@@ -1577,7 +1593,8 @@ public:
 
 
     inline void logic_close() {
-        d_destroy(dungeon);
+        //d_destroy(dungeon);
+        d.floors.clear();
     }
 
 
@@ -1836,8 +1853,9 @@ public:
 
     const inline bool tile_has_solid(const int x, const int y, const int z) {
         massert(z >= 0, "floor is out of bounds");
-        massert((size_t)z < dungeon.floors.size(), "floor is out of bounds");
-        auto df = d_get_floor(dungeon, z);
+        massert((size_t)z < d.floors.size(), "floor is out of bounds");
+        //auto df = d_get_floor(dungeon, z);
+        auto df = d.get_floor(z);
         auto t = df_tile_at(df, (vec3){x, y, z});
         for (int i = 0; (size_t)i < t.entities->size(); i++) {
             const entityid id = tile_get_entity(t, i);
@@ -1866,8 +1884,9 @@ public:
 
     const inline entityid tile_has_pushable(const int x, const int y, const int z) {
         massert(z >= 0, "floor is out of bounds");
-        massert((size_t)z < dungeon.floors.size(), "floor is out of bounds");
-        auto df = d_get_floor(dungeon, z);
+        massert((size_t)z < d.floors.size(), "floor is out of bounds");
+        //auto df = d_get_floor(dungeon, z);
+        auto df = d.get_floor(z);
         auto t = df_tile_at(df, (vec3){x, y, z});
         for (int i = 0; (size_t)i < t.entities->size(); i++) {
             const entityid id = tile_get_entity(t, i);
@@ -1882,7 +1901,8 @@ public:
 
 
     const inline entityid tile_has_door(const vec3 v) {
-        auto df = d_get_current_floor(dungeon);
+        //auto df = d_get_current_floor(dungeon);
+        auto df = d.get_current_floor();
         auto t = df_tile_at(df, v);
         for (size_t i = 0; i < t.entities->size(); i++) {
             const entityid id = t.entities->at(i);
@@ -1927,7 +1947,8 @@ public:
         // entity's new location
         // we will have a special case for traversing floors so ignore v.z
         const vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
-        auto df = d_get_floor(dungeon, loc.z);
+        //auto df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         auto tile = df_tile_at(df, aloc);
 
         minfo("is walkable");
@@ -2423,10 +2444,13 @@ public:
     }
 
 
-    inline attack_result_t try_entity_attack(const entityid id, const int tgt_x, const int tgt_y) {
+
+
+    const inline attack_result_t try_entity_attack(const entityid id, const int tgt_x, const int tgt_y) {
         massert(!ct.get<dead>(id).value_or(false), "attacker entity is dead");
         const vec3 loc = ct.get<location>(id).value();
-        auto df = d_get_floor(dungeon, loc.z);
+        //auto df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         auto tile = df_tile_at(df, (vec3){tgt_x, tgt_y, loc.z});
         // Calculate direction based on target position
         const int dx = tgt_x - loc.x;
@@ -2484,7 +2508,8 @@ public:
             return false;
         }
         const vec3 loc = maybe_loc.value();
-        dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
+        //dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         tile_t& tile = df_tile_at(df, loc);
         bool item_picked_up = false;
         // lets try using our new cached_item via tile_get_item
@@ -2530,9 +2555,9 @@ public:
         ct.set<update>(id, true);
         const vec3 loc = ct.get<location>(id).value();
         // first, we prob want to get the tile at this location
-        const int current_floor = dungeon.current_floor;
+        const int current_floor = d.current_floor;
         //auto df = g.dungeon.floors->at(current_floor);
-        auto df = dungeon.floors[current_floor];
+        auto df = d.floors[current_floor];
         auto t = df_tile_at(df, loc);
         // check the tile type
         if (t.type == TILE_UPSTAIRS) {
@@ -2544,9 +2569,9 @@ public:
                 // go upstairs
                 // we have to remove the player from the old tile
                 df_remove_at(df, hero_id, loc.x, loc.y);
-                dungeon.current_floor--;
-                const int new_floor = dungeon.current_floor;
-                auto df2 = dungeon.floors[new_floor];
+                d.current_floor--;
+                const int new_floor = d.current_floor;
+                auto df2 = d.floors[new_floor];
                 const vec3 uloc = df2.downstairs_loc;
                 auto t2 = df_tile_at(df2, uloc);
                 df_add_at(df2, hero_id, uloc.x, uloc.y);
@@ -2558,13 +2583,13 @@ public:
         } else if (t.type == TILE_DOWNSTAIRS) {
             // can't go down on the bottom floor
             // otherwise...
-            if ((size_t)current_floor < dungeon.floors.size() - 1) {
+            if ((size_t)current_floor < d.floors.size() - 1) {
                 // go downstairs
                 // we have to remove the player from the old tile
                 df_remove_at(df, hero_id, loc.x, loc.y);
-                dungeon.current_floor++;
-                const int new_floor = dungeon.current_floor;
-                auto df2 = dungeon.floors[new_floor];
+                d.current_floor++;
+                const int new_floor = d.current_floor;
+                auto df2 = d.floors[new_floor];
                 const vec3 uloc = df2.upstairs_loc;
                 auto t2 = df_tile_at(df2, uloc);
                 df_add_at(df2, hero_id, uloc.x, uloc.y);
@@ -2601,7 +2626,7 @@ public:
     const inline bool try_entity_open_door(const entityid id, const vec3 loc) {
         massert(id != ENTITYID_INVALID, "id is invalid");
         if (tile_has_door(loc)) {
-            auto df = d_get_current_floor(dungeon);
+            auto df = d.get_current_floor();
             auto t = df_tile_at(df, loc);
             for (size_t i = 0; i < t.entities->size(); i++) {
                 const entityid myid = t.entities->at(i);
@@ -2652,9 +2677,10 @@ public:
             return;
         }
         const vec3 loc = maybe_loc.value();
-        auto floor = d_get_floor(dungeon, loc.z);
+        //auto floor = d_get_floor(dungeon, loc.z);
+        auto df = d.get_floor(loc.z);
         const vec3 spell_loc = {tgt_x, tgt_y, loc.z};
-        auto tile = df_tile_at(floor, spell_loc);
+        auto tile = df_tile_at(df, spell_loc);
         // Calculate direction based on target position
         bool ok = false;
         const int dx = tgt_x - loc.x;
@@ -2704,7 +2730,7 @@ public:
                 }
                 auto tgttype = ct.get<entitytype>(npcid).value_or(ENTITY_NONE);
                 ct.set<dead>(npcid, true);
-                tile_t& target_tile = df_tile_at(d_get_current_floor(dungeon), spell_loc);
+                auto target_tile = df_tile_at(d.get_current_floor(), spell_loc);
                 target_tile.dirty_entities = true;
                 if (tgttype == ENTITY_NPC) {
                     // increment attacker's xp
@@ -2731,7 +2757,7 @@ public:
                 // remove it from the tile
                 if (doorid != ENTITYID_INVALID) {
                     ct.set<destroyed>(doorid, true);
-                    df_remove_at(floor, doorid, spell_loc.x, spell_loc.y);
+                    df_remove_at(df, doorid, spell_loc.x, spell_loc.y);
                 }
             }
             ct.set<destroyed>(spell_id, true);
@@ -3027,14 +3053,15 @@ public:
         // this example shows how, if the player is not adjacent to an NPC,
         // they will just move randomly. otherwise, they attack the player
         //const entityid target_id = g.ct.get<target>(id).value_or(g.hero_id);
-        auto tgt_id = ct.get<target_id>(id).value_or(hero_id);
-        if (is_entity_adjacent(id, tgt_id)) {
-            // if id is adjacent to its target or the hero
-            const vec3 loc = ct.get<location>(tgt_id).value();
-            minfo("%d is attempting to attack", id);
-            try_entity_attack(id, loc.x, loc.y);
-            return;
-        }
+
+        //auto tgt_id = ct.get<target_id>(id).value_or(hero_id);
+        //if (is_entity_adjacent(id, tgt_id)) {
+        // if id is adjacent to its target or the hero
+        //const vec3 loc = ct.get<location>(tgt_id).value();
+        //minfo("%d is attempting to attack", id);
+        //try_entity_attack(id, loc.x, loc.y);
+        //return;
+        //}
         // else, randomly move
         minfo("%d is attempting to move", id);
         const bool result = try_entity_move(id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
@@ -3053,17 +3080,17 @@ public:
     inline void handle_npcs() {
         minfo("handle npcs");
         if (flag == GAMESTATE_FLAG_NPC_TURN) {
-            //#ifndef NPCS_ALL_AT_ONCE
-            //            if (entity_turn >= 0 && entity_turn < next_entityid) {
-            //                handle_npc(entity_turn);
-            //                flag = GAMESTATE_FLAG_NPC_ANIM;
-            //            }
-            //#else
+#ifndef NPCS_ALL_AT_ONCE
+            if (entity_turn >= 0 && entity_turn < next_entityid) {
+                handle_npc(entity_turn);
+                flag = GAMESTATE_FLAG_NPC_ANIM;
+            }
+#else
             for (entityid id = 0; id < next_entityid; id++) {
                 handle_npc(id);
             }
             flag = GAMESTATE_FLAG_NPC_ANIM;
-            //#endif
+#endif
         }
     }
 
@@ -3071,32 +3098,33 @@ public:
 
 
     inline void handle_test_flag() {
+        minfo("handle test flag");
         if (flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-            //#ifndef NPCS_ALL_AT_ONCE
-            //            entity_turn++;
-            //            if (entity_turn >= next_entityid)
-            //                entity_turn = 0;
-            //#endif
+#ifndef NPCS_ALL_AT_ONCE
+            entity_turn++;
+            if (entity_turn >= next_entityid)
+                entity_turn = 0;
+#endif
             minfo("handle test flag -: %d", turn_count);
 
             flag = GAMESTATE_FLAG_NPC_TURN;
         } else if (flag == GAMESTATE_FLAG_NPC_ANIM) {
-            //#ifndef NPCS_ALL_AT_ONCE
-            //            entity_turn++;
-            //            if (entity_turn >= next_entityid) {
-            //                entity_turn = 0;
-            //            }
-            //            if (entity_turn == hero_id) {
-            //                flag = GAMESTATE_FLAG_PLAYER_INPUT;
-            //                turn_count++;
-            //            } else {
-            //                flag = GAMESTATE_FLAG_NPC_TURN;
-            //            }
-            //#else
+#ifndef NPCS_ALL_AT_ONCE
+            entity_turn++;
+            if (entity_turn >= next_entityid) {
+                entity_turn = 0;
+            }
+            if (entity_turn == hero_id) {
+                flag = GAMESTATE_FLAG_PLAYER_INPUT;
+                turn_count++;
+            } else {
+                flag = GAMESTATE_FLAG_NPC_TURN;
+            }
+#else
             flag = GAMESTATE_FLAG_PLAYER_INPUT;
             minfo("handle test flag: %d", turn_count);
             turn_count++;
-            //#endif
+#endif
         }
     }
 

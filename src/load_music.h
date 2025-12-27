@@ -17,7 +17,7 @@ static inline void libdraw_load_music(gamestate& g) {
 #ifdef MUSIC_OFF
     SetMusicVolume(music, 0.0f); // Set initial music volume
 #else
-    SetMusicVolume(music, 0.50f); // Set initial music volume
+    SetMusicVolume(music, 0.25f); // Set initial music volume
 #endif
     PlayMusicStream(music);
     minfo("END load_music");

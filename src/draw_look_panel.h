@@ -8,7 +8,7 @@ static inline void draw_look_panel(gamestate& g) {
     // telling us info about the tile
 
     auto loc = g.ct.get<location>(g.hero_id).value_or((vec3){-1, -1, -1});
-    auto df = d_get_floor(g.dungeon, loc.z);
+    auto df = g.d.get_floor(loc.z);
     auto tile = df_tile_at(df, loc);
 
     // subtract 1 for the PLAYER

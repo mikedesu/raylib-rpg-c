@@ -159,14 +159,14 @@ public:
         gamestate g;
 
         g.init_dungeon(1);
-        TS_ASSERT(g.dungeon.floors.size() == 1);
+        TS_ASSERT(g.d.floors.size() == 1);
         g.init_dungeon(2);
-        TS_ASSERT(g.dungeon.floors.size() == 1);
+        TS_ASSERT(g.d.floors.size() == 1);
         g.reset();
-        TS_ASSERT(g.dungeon.floors.size() == 0);
+        TS_ASSERT(g.d.floors.size() == 0);
 
         g.init_dungeon(2);
-        TS_ASSERT(g.dungeon.floors.size() == 2);
+        TS_ASSERT(g.d.floors.size() == 2);
 
         g.reset();
     }
@@ -177,7 +177,7 @@ public:
         const size_t placed_doors_0 = g.place_doors();
         TS_ASSERT(placed_doors_0 == 0);
         g.init_dungeon(1);
-        TS_ASSERT(g.dungeon.floors.size() == 1);
+        TS_ASSERT(g.d.floors.size() == 1);
         const size_t placed_doors_1 = g.place_doors();
         TS_ASSERT(placed_doors_1 > 0);
     }
@@ -196,13 +196,13 @@ public:
     void testPlaceDagger() {
         gamestate g;
 
-        TS_ASSERT(g.dungeon.floors.size() == 0);
+        TS_ASSERT(g.d.floors.size() == 0);
 
         g.init_dungeon(1);
 
-        TS_ASSERT(g.dungeon.floors.size() == 1);
+        TS_ASSERT(g.d.floors.size() == 1);
 
-        const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+        const vec3 loc = df_get_random_loc(g.d.floors[0]);
 
         TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
 
@@ -223,8 +223,8 @@ public:
     void testInitShield() {
         gamestate g;
         g.init_dungeon(1);
-        TS_ASSERT(g.dungeon.floors.size() > 0);
-        const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(g.d.floors.size() > 0);
+        const vec3 loc = df_get_random_loc(g.d.floors[0]);
         TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
         const entityid id = g.create_shield_at_with(loc, g.shield_init());
         TS_ASSERT(id != ENTITYID_INVALID);
@@ -243,8 +243,8 @@ public:
     void testInitPotion() {
         gamestate g;
         g.init_dungeon(1);
-        TS_ASSERT(g.dungeon.floors.size() > 0);
-        const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(g.d.floors.size() > 0);
+        const vec3 loc = df_get_random_loc(g.d.floors[0]);
         TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
         const entityid id = g.create_potion_at_with(loc, g.potion_init(POTION_HP_SMALL));
         TS_ASSERT(id != ENTITYID_INVALID);
@@ -264,8 +264,8 @@ public:
     void testMonsterInitSingle() {
         gamestate g;
         g.init_dungeon(1);
-        TS_ASSERT(g.dungeon.floors.size() > 0);
-        const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(g.d.floors.size() > 0);
+        const vec3 loc = df_get_random_loc(g.d.floors[0]);
         TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
 
         const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
@@ -282,7 +282,7 @@ public:
         TS_ASSERT(g.ct.get<inventory>(id).value()->size() > 0);
         TS_ASSERT(g.ct.get<inventory>(id).value()->size() == 2);
 
-        dungeon_floor_t& df = g.dungeon.floors[0];
+        dungeon_floor_t& df = g.d.floors[0];
         tile_t& t = df_tile_at(df, loc);
 
         TS_ASSERT(t.entities->size() > 0);
@@ -298,8 +298,8 @@ public:
         constexpr int monster_count = 4;
         std::set<entityid> monster_set;
         for (int i = 0; i < monster_count; i++) {
-            TS_ASSERT(g.dungeon.floors.size() > 0);
-            const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+            TS_ASSERT(g.d.floors.size() > 0);
+            const vec3 loc = df_get_random_loc(g.d.floors[0]);
             TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
             const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
             TS_ASSERT(id != ENTITYID_INVALID);
@@ -315,8 +315,8 @@ public:
         constexpr int monster_count = 31;
         std::set<entityid> monster_set;
         for (int i = 0; i < monster_count; i++) {
-            TS_ASSERT(g.dungeon.floors.size() > 0);
-            const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+            TS_ASSERT(g.d.floors.size() > 0);
+            const vec3 loc = df_get_random_loc(g.d.floors[0]);
             TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
             const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
             TS_ASSERT(id != ENTITYID_INVALID);
@@ -329,11 +329,11 @@ public:
     void testMonsterTooMany() {
         gamestate g;
         g.init_dungeon(1);
-        TS_ASSERT(g.dungeon.floors.size() > 0);
+        TS_ASSERT(g.d.floors.size() > 0);
         constexpr int monster_count = 32;
         std::set<entityid> monster_set;
         for (int i = 0; i < monster_count; i++) {
-            const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+            const vec3 loc = df_get_random_loc(g.d.floors[0]);
             const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
             if (id == ENTITYID_INVALID) {
                 continue;
@@ -352,7 +352,7 @@ public:
         srand(time(NULL));
         SetRandomSeed(time(NULL));
         g.init_dungeon(1);
-        TS_ASSERT(g.dungeon.floors.size() > 0);
+        TS_ASSERT(g.d.floors.size() > 0);
 
         // place doors
         const size_t placed_doors_0 = g.place_doors();
@@ -367,13 +367,13 @@ public:
         TS_ASSERT(id != ENTITYID_INVALID);
 
         // create shield
-        const vec3 loc2 = df_get_random_loc(g.dungeon.floors[0]);
+        const vec3 loc2 = df_get_random_loc(g.d.floors[0]);
         TS_ASSERT(!vec3_equal(loc2, (vec3){-1, -1, -1}));
         const entityid id2 = g.create_shield_at_with(loc2, g.shield_init());
         TS_ASSERT(id2 != ENTITYID_INVALID);
 
         // create potion
-        const vec3 loc3 = df_get_random_loc(g.dungeon.floors[0]);
+        const vec3 loc3 = df_get_random_loc(g.d.floors[0]);
         TS_ASSERT(!vec3_equal(loc3, (vec3){-1, -1, -1}));
         const entityid id3 = g.create_potion_at_with(loc3, g.potion_init(POTION_HP_SMALL));
         TS_ASSERT(id3 != ENTITYID_INVALID);
@@ -382,8 +382,8 @@ public:
         constexpr int monster_count = 4;
         std::set<entityid> monster_set;
         for (int i = 0; i < monster_count; i++) {
-            TS_ASSERT(g.dungeon.floors.size() > 0);
-            const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+            TS_ASSERT(g.d.floors.size() > 0);
+            const vec3 loc = df_get_random_loc(g.d.floors[0]);
             TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
             const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
             TS_ASSERT(id != ENTITYID_INVALID);
@@ -391,7 +391,7 @@ public:
         }
         TS_ASSERT_EQUALS(monster_set.size(), monster_count);
 
-        const vec3 loc4 = df_get_random_loc(g.dungeon.floors[0]);
+        const vec3 loc4 = df_get_random_loc(g.d.floors[0]);
         TS_ASSERT(!vec3_equal(loc4, (vec3){-1, -1, -1}));
 
         const int maxhp_roll = 10;
