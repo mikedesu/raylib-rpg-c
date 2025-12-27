@@ -147,7 +147,6 @@ public:
     gamestate() {
         minfo("Initializing gamestate");
         reset();
-        //msuccess("Gamestate initialized successfully");
     }
 
 
@@ -155,14 +154,12 @@ public:
 
     ~gamestate() {
         reset();
-        //msuccess("Gamestate destroyed");
     }
 
 
 
 
     inline void init_music_paths() {
-        //minfo("Initializing music paths...");
         const char* music_path_file = "music.txt";
         FILE* file = fopen(music_path_file, "r");
         massert(file, "Could not open music path file: %s", music_path_file);
@@ -170,32 +167,27 @@ public:
         music_file_paths.clear();
         while (fgets(buffer, sizeof(buffer), file) != NULL) {
             // Remove newline character if present
-            //minfo("Removing newline character...");
             size_t len = strlen(buffer);
             if (len > 0 && buffer[len - 1] == '\n') {
                 buffer[len - 1] = '\0';
             }
             // if it begins with a #, skip for now
-            //minfo("Checking for comment...");
             if (buffer[0] == '#') {
                 mwarning("Comment received, skipping...");
                 continue;
             }
             // copy into g->music_file_paths
-            //minfo("Pushing back %s", buffer);
             // need to pre-pend the folder path
             string fullpath = "audio/music/" + string(buffer);
             music_file_paths.push_back(fullpath);
         }
         fclose(file);
-        //msuccess("Music paths initialized!");
     }
 
 
 
 
     inline void reset() {
-        //minfo("gamestate reset");
         version = GAME_VERSION;
         debugpanel.x = GAMESTATE_DEBUGPANEL_DEFAULT_X;
         debugpanel.y = GAMESTATE_DEBUGPANEL_DEFAULT_Y;
@@ -277,16 +269,11 @@ public:
         msg_system.clear();
         msg_history.clear();
         ct.clear();
-
-
         for (size_t i = 0; i < dungeon.floors.size(); i++) {
             df_free(dungeon.floors[i]);
         }
-
         dungeon.floors.clear();
-
         dungeon.is_initialized = false;
-
         init_music_paths();
     }
 
@@ -296,7 +283,6 @@ public:
     const inline bool set_hero_id(const entityid id) {
         massert(id != ENTITYID_INVALID, "id is invalid");
         hero_id = id;
-        //msuccess("Hero ID set to %d", id);
         return true;
     }
 
@@ -330,10 +316,8 @@ public:
         massert(df_count > 0, "df_count is <= 0");
         d_create(dungeon);
         if (dungeon.is_initialized) {
-            //merror("dungeon is already initialized");
             return;
         }
-        //minfo("adding floors...");
         // max size of 128x128 for now to maintain 60fps
         // dungeon floors, tiles etc will require re-write/re-design for optimization
         const int w = 32;
@@ -344,8 +328,6 @@ public:
             d_add_floor(dungeon, type, w, h);
         }
         dungeon.is_initialized = true;
-        //msuccess("added %d floors to dungeon", df_count);
-        //msuccess("dungeon initialized successfully");
     }
 
 
@@ -427,7 +409,6 @@ public:
         const auto id = create_door_with();
         if (id == ENTITYID_INVALID)
             return ENTITYID_INVALID;
-        //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         if (!df_add_at(df, id, loc.x, loc.y))
             return ENTITYID_INVALID;
         ct.set<location>(id, loc);
@@ -484,13 +465,10 @@ public:
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
-        //minfo("attempting prop df_add_at: %d, %d, %d", id, loc.x, loc.y);
         const entityid result = df_add_at(df, id, loc.x, loc.y);
         if (result == ENTITYID_INVALID) {
-            //merror("failed df_add_at: %d, %d, %d", id, loc.x, loc.y);
             return ENTITYID_INVALID;
         }
-        //msuccess("prop add success");
         ct.set<location>(id, loc);
         return id;
     }
@@ -505,18 +483,13 @@ public:
         //    g.ct.set<solid>(id, true);
         //    g.ct.set<pushable>(id, true);
         //};
-
         int placed_props = 0;
-
         for (int z = 0; z < (int)dungeon.floors.size(); z++) {
             auto df = d_get_floor(dungeon, z);
             for (int x = 0; x < df.width; x++) {
                 for (int y = 0; y < df.height; y++) {
                     const vec3 loc = {x, y, z};
                     auto tile = df_tile_at(df, loc);
-                    //if (!tile.can_have_door)
-                    //    continue;
-                    //create_door_at_with(g, loc, [](gamestate& g, entityid id) {});
                     if (tile.type == TILE_UPSTAIRS || tile.type == TILE_DOWNSTAIRS)
                         continue;
                     if (tile.can_have_door)
@@ -575,16 +548,14 @@ public:
                 }
             }
         }
-
         return placed_props;
     }
 
 
 
 
-    //const inline entityid create_weapon_with(ComponentTable& ct, function<void(ComponentTable&, entityid)> weaponInitFunction) {
     const inline entityid create_weapon_with(with_fun weaponInitFunction) {
-        minfo("create weapon with");
+        //minfo("create weapon with");
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
         ct.set<itemtype>(id, ITEM_WEAPON);
@@ -613,7 +584,7 @@ public:
 
 
     const inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_fun weaponInitFunction) {
-        minfo("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
+        //minfo("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
         if (dungeon.floors.size() == 0) {
             merror("dungeon floors size is 0");
             return ENTITYID_INVALID;
@@ -624,23 +595,23 @@ public:
         }
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, loc);
-        minfo("checking if tile is walkable...");
+        //minfo("checking if tile is walkable...");
         if (!tile_is_walkable(tile.type)) {
             merror("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
         }
-        minfo("checking if tile has live NPCs");
+        //minfo("checking if tile has live NPCs");
         if (tile_has_live_npcs(tile)) {
             merror("cannot create entity on tile with live NPCs");
             return ENTITYID_INVALID;
         }
-        minfo("creating weapon...");
+        //minfo("creating weapon...");
         const auto id = create_weapon_with(weaponInitFunction);
         if (id == ENTITYID_INVALID) {
             minfo("failed to create weapon");
             return ENTITYID_INVALID;
         }
-        minfo("attempting df_add_at: %d, %d ", id, loc.x, loc.y);
+        //minfo("attempting df_add_at: %d, %d ", id, loc.x, loc.y);
         if (df_add_at(df, id, loc.x, loc.y) == ENTITYID_INVALID) {
             minfo("failed to add weapon to df");
             return ENTITYID_INVALID;
@@ -668,7 +639,7 @@ public:
 
     const inline entityid create_shield_at_with(const vec3 loc, with_fun shieldInitFunction) {
         const auto id = create_shield_with(shieldInitFunction);
-        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         auto df = d_get_floor(dungeon, loc.z);
         if (!df_add_at(df, id, loc.x, loc.y))
             return ENTITYID_INVALID;
@@ -700,7 +671,7 @@ public:
         const auto id = create_potion_with(potionInitFunction);
         if (id == ENTITYID_INVALID)
             return ENTITYID_INVALID;
-        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         if (!df_add_at(df, id, loc.x, loc.y))
             return ENTITYID_INVALID;
         ct.set<location>(id, loc);
@@ -800,14 +771,14 @@ public:
 
 
     const inline entityid create_npc_with(const race_t rt) {
-        minfo("begin create npc");
+        //minfo("begin create npc");
         //const entityid id = g_add_entity(g);
         const auto id = add_entity();
         set_npc_defaults(id);
         ct.set<race>(id, rt);
         set_npc_starting_stats(id);
         //npcInitFunction(g, id);
-        minfo("end create npc");
+        //minfo("end create npc");
         return id;
     }
 
@@ -858,7 +829,7 @@ public:
 
 
     const inline bool add_to_inventory(const entityid actor_id, const entityid item_id) {
-        minfo("add to inventory: %d %d", actor_id, item_id);
+        //minfo("add to inventory: %d %d", actor_id, item_id);
         auto maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value()) {
             merror("no inventory: %d", actor_id);
@@ -876,10 +847,10 @@ public:
 
     const inline entityid create_random_monster_with(with_fun monsterInitFunction) {
         //const race_t r = random_monster_type();
-        minfo("create random monster with");
+        //minfo("create random monster with");
         const race_t r = RACE_ORC;
         const entityid id = create_npc_with(r);
-        minfo("create weapon");
+        //minfo("create weapon");
 
         const entityid wpn_id = create_weapon_with([](CT& ct, const entityid id) {
             ct.set<name>(id, "Dagger");
@@ -891,7 +862,7 @@ public:
             ct.set<rarity>(id, RARITY_COMMON);
         });
 
-        minfo("create potion");
+        //minfo("create potion");
         //const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]));
         const entityid potion_id = create_potion_with([](CT& ct, const entityid id) {
             ct.set<name>(id, "small healing potion");
@@ -901,9 +872,9 @@ public:
         });
 
         msuccess("created potion");
-        minfo("add to inventory");
+        //minfo("add to inventory");
         add_to_inventory(id, wpn_id);
-        minfo("add to inventory");
+        //minfo("add to inventory");
         add_to_inventory(id, potion_id);
         ct.set<equipped_weapon>(id, wpn_id);
         ct.set<name>(id, get_random_orc_name());
@@ -914,23 +885,23 @@ public:
 
 
     const inline entityid create_random_monster_at_with(const vec3 loc, with_fun monsterInitFunction) {
-        minfo("create random monster at with: %d, %d, %d", loc.x, loc.y, loc.z);
-        minfo("getting floor...");
+        //minfo("create random monster at with: %d, %d, %d", loc.x, loc.y, loc.z);
+        //minfo("getting floor...");
         auto df = d_get_floor(dungeon, loc.z);
-        minfo("getting tile...");
+        //minfo("getting tile...");
         auto tile = df_tile_at(df, loc);
-        minfo("getting tile is walkable...");
+        //minfo("getting tile is walkable...");
         if (!tile_is_walkable(tile.type))
             return ENTITYID_INVALID;
-        minfo("getting tile has live npcs...");
+        //minfo("getting tile has live npcs...");
         if (tile_has_live_npcs(tile))
             return ENTITYID_INVALID;
         //const auto id = create_random_monster_with(g, monsterInitFunction);
-        minfo("create random monster with...");
+        //minfo("create random monster with...");
         const auto id = create_random_monster_with([](CT& ct, const entityid id) {});
         if (id == ENTITYID_INVALID)
             return ENTITYID_INVALID;
-        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         if (!df_add_at(df, id, loc.x, loc.y))
             return ENTITYID_INVALID;
         ct.set<location>(id, loc);
@@ -1063,7 +1034,7 @@ public:
     inline void logic_init() {
         srand(time(NULL));
         SetRandomSeed(time(NULL));
-        minfo("gamestate.logic_init");
+        //minfo("gamestate.logic_init");
 
         init_dungeon(1);
 
@@ -1090,7 +1061,7 @@ public:
             ct.set<healing>(id, (vec3){1, 6, 0});
         });
 
-        minfo("creating monsters...");
+        //minfo("creating monsters...");
         for (int i = 0; i < (int)dungeon.floors.size(); i++) {
             for (int j = 1; j <= i + 1; j++) {
                 const vec3 random_loc = df_get_random_loc(d_get_floor(dungeon, i));
@@ -1125,7 +1096,7 @@ public:
         }
 
         if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
-            minfo("Title screen input detected, switching to main menu");
+            //minfo("Title screen input detected, switching to main menu");
             current_scene = SCENE_MAIN_MENU;
             frame_dirty = true;
             PlaySound(sfx[SFX_CONFIRM_01]);
@@ -1138,20 +1109,20 @@ public:
     inline void handle_input_main_menu_scene(const inputstate& is) {
         if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
             if (title_screen_selection == 0) {
-                minfo("Switching to character creation scene");
+                //minfo("Switching to character creation scene");
                 current_scene = SCENE_CHARACTER_CREATION;
                 frame_dirty = true;
             }
             PlaySound(sfx.at(SFX_CONFIRM_01));
         } else if (inputstate_is_pressed(is, KEY_DOWN)) {
-            minfo("Title screen selection++");
+            //minfo("Title screen selection++");
             title_screen_selection++;
             if (title_screen_selection >= max_title_screen_selections) {
                 title_screen_selection = 0;
             }
             PlaySound(sfx.at(SFX_CONFIRM_01));
         } else if (inputstate_is_pressed(is, KEY_UP)) {
-            minfo("Title screen selection--");
+            //minfo("Title screen selection--");
             title_screen_selection--;
             if (title_screen_selection < 0) {
                 title_screen_selection = max_title_screen_selections - 1;
@@ -1169,9 +1140,9 @@ public:
 
     const inline entityid create_player(const vec3 loc, const string n) {
         massert(n != "", "name is empty string");
-        minfo("Creating player...");
+        //minfo("Creating player...");
         race_t rt = chara_creation.race;
-        minfo("Race: %s", race2str(rt).c_str());
+        //minfo("Race: %s", race2str(rt).c_str());
         const auto id = create_npc_at_with(rt, loc); // [n](gamestate& g, entityid id) {
         const int hp_ = 10;
         const int maxhp_ = 10;
@@ -1188,7 +1159,7 @@ public:
         ct.set<light_radius>(id, light_rad);
         ct.set<hearing_distance>(id, hear_dist);
         ct.set<name>(id, n);
-        minfo("Adding inventory to entity id %d", id);
+        //minfo("Adding inventory to entity id %d", id);
         msuccess("create_player successful, id: %d", id);
         return id;
     }
@@ -1228,7 +1199,7 @@ public:
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
-        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
+        //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         if (!df_add_at(df, id, loc.x, loc.y)) {
             merror("failed df_add_at: %d, %d, %d", id, loc.x, loc.y);
             return ENTITYID_INVALID;
@@ -1276,7 +1247,7 @@ public:
             return;
         }
         if (inputstate_is_pressed(is, KEY_ENTER)) {
-            minfo("Character creation confirmed");
+            //minfo("Character creation confirmed");
             PlaySound(sfx.at(SFX_CONFIRM_01));
             //play_sound(SFX_CONFIRM_01);
             // we need to copy the character creation stats to the hero entity
@@ -1302,20 +1273,20 @@ public:
             ct.set<maxhp>(hero_id, maxhp_roll);
             // temporary wedge-in code
             // set all the NPCs to target the hero
-            minfo("BEGIN Temporary wedge-in code");
+            //minfo("BEGIN Temporary wedge-in code");
             for (entityid id = 0; id < next_entityid; id++) {
                 //minfo("Getting type for id %d", id);
                 entitytype_t t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
                 if (t == ENTITY_NPC) {
-                    minfo("Setting target for id %d", id);
+                    //minfo("Setting target for id %d", id);
                     ct.set<target_id>(id, hero_id);
                 }
             }
-            minfo("END Temporary wedge-in code");
+            //minfo("END Temporary wedge-in code");
             current_scene = SCENE_GAMEPLAY;
         } else if (inputstate_is_pressed(is, KEY_SPACE)) {
             // re-roll character creation stats
-            minfo("Re-rolling character creation stats");
+            //minfo("Re-rolling character creation stats");
             PlaySound(sfx.at(SFX_CONFIRM_01));
             chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
             chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
@@ -1353,7 +1324,7 @@ public:
 
 
     const inline bool remove_from_inventory(const entityid actor_id, const entityid item_id) {
-        minfo("remove from inventory: %d %d", actor_id, item_id);
+        //minfo("remove from inventory: %d %d", actor_id, item_id);
         auto maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value()) {
             merror("maybe_inventory has no value for actor id %d", actor_id);
@@ -1361,9 +1332,9 @@ public:
         }
         auto my_items = maybe_inventory.value();
         bool success = false;
-        minfo("Inventory size: %ld", my_items->size());
+        //minfo("Inventory size: %ld", my_items->size());
         for (auto it = my_items->begin(); it != my_items->end(); it++) {
-            minfo("item id %d", *it);
+            //minfo("item id %d", *it);
             if (*it == item_id) {
                 my_items->erase(it);
                 success = true;
@@ -1383,7 +1354,7 @@ public:
 
 
     const inline bool drop_from_inventory(const entityid actor_id, const entityid item_id) {
-        minfo("drop from inventory: %d %d", actor_id, item_id);
+        //minfo("drop from inventory: %d %d", actor_id, item_id);
         if (remove_from_inventory(actor_id, item_id)) {
             auto maybe_loc = ct.get<location>(actor_id);
             if (!maybe_loc.has_value()) {
@@ -1411,7 +1382,7 @@ public:
 
 
     const inline bool drop_all_from_inventory(entityid actor_id) {
-        minfo("drop all from inventory: %d", actor_id);
+        //minfo("drop all from inventory: %d", actor_id);
         auto maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value()) {
             merror("no inventory");
@@ -1538,7 +1509,7 @@ public:
         }
         auto my_items = maybe_inventory.value();
         for (auto it = my_items->begin(); it != my_items->end(); it++) {
-            minfo("item id %d", *it);
+            //minfo("item id %d", *it);
             if (*it == item_id)
                 return true;
         }
@@ -1867,7 +1838,7 @@ public:
             return try_entity_move(id, v);
         }
         // box is not pushable
-        minfo("Box NOT pushable");
+        //minfo("Box NOT pushable");
         return false;
     }
 
@@ -2276,12 +2247,12 @@ public:
         const char* atk_name = attacker_name.c_str();
         const char* tgt_name = target_name.c_str();
         if (ct.get<dead>(tgt_id).value_or(false)) {
-            minfo("Target is dead");
+            //minfo("Target is dead");
             add_message_history("%s swings at a dead target", atk_name);
             return;
         }
         if (!atk_successful) {
-            minfo("Missed attack");
+            //minfo("Missed attack");
             add_message_history("%s swings at %s and misses!", atk_name, tgt_name);
             return;
         }
@@ -2294,7 +2265,7 @@ public:
             return;
         }
         const int tgt_hp = maybe_tgt_hp.value() - dmg;
-        minfo("damage dealt");
+        //minfo("damage dealt");
         add_message_history("%s deals %d damage to %s", atk_name, dmg, tgt_name);
         ct.set<hp>(tgt_id, tgt_hp);
         // decrement weapon durability
@@ -2360,7 +2331,7 @@ public:
         const int low_roll = MAX_BLOCK_CHANCE - chance;
         if (roll <= low_roll) {
             // failed to block
-            minfo("%s failed to block", tgt_name);
+            //minfo("%s failed to block", tgt_name);
             process_attack_results(attacker_id, target_id, true);
             return ATTACK_RESULT_HIT;
         }
@@ -2369,7 +2340,7 @@ public:
         handle_shield_block_sfx(target_id);
         ct.set<block_success>(target_id, true);
         ct.set<update>(target_id, true);
-        minfo("attack blocked");
+        //minfo("attack blocked");
         add_message_history("%s blocked an attack from %s", tgt_name, atk_name);
         return ATTACK_RESULT_BLOCK;
     }
@@ -2378,7 +2349,7 @@ public:
 
 
     inline void handle_attack_sfx(const entityid attacker, const attack_result_t result) {
-        minfo("handle_attack_sfx: %d %d", attacker, result);
+        //minfo("handle_attack_sfx: %d %d", attacker, result);
         if (!check_hearing(hero_id, ct.get<location>(attacker).value_or((vec3){-1, -1, -1}))) {
             return;
         }
@@ -2395,7 +2366,7 @@ public:
                     : wpn_type == WEAPON_DAGGER ? SFX_SLASH_ATTACK_LIGHT_1
                                                 : SFX_SLASH_ATTACK_SWORD_1;
         }
-        minfo("playing attack sfx...");
+        //minfo("playing attack sfx...");
         PlaySound(sfx[index]);
         msuccess("attack sfx played");
     }
@@ -2416,8 +2387,8 @@ public:
 
     inline void try_entity_attack(const entityid id, const int tgt_x, const int tgt_y) {
         massert(!ct.get<dead>(id).value_or(false), "attacker entity is dead");
-        if (id == hero_id)
-            minfo("try_entity_attack: %d, (%d,%d)", id, tgt_x, tgt_y);
+        //if (id == hero_id)
+        //minfo("try_entity_attack: %d, (%d,%d)", id, tgt_x, tgt_y);
         const vec3 loc = ct.get<location>(id).value();
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, (vec3){tgt_x, tgt_y, loc.z});
@@ -2771,7 +2742,7 @@ public:
     const inline bool handle_restart(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_R) && is_dead) {
             do_restart = true;
-            minfo("setting do_restart to true...");
+            //minfo("setting do_restart to true...");
             return true;
         }
         return false;
@@ -2863,7 +2834,7 @@ public:
         // no matter which mode we are in, we can toggle the debug panel
         if (inputstate_is_pressed(is, KEY_P)) {
             debugpanelon = !debugpanelon;
-            minfo("Toggling debug panel: %s", debugpanelon ? "ON" : "OFF");
+            //minfo("Toggling debug panel: %s", debugpanelon ? "ON" : "OFF");
             return;
         }
         if (current_scene == SCENE_TITLE)
