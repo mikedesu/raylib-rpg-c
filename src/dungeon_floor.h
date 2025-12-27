@@ -21,7 +21,8 @@ using std::shared_ptr;
 using std::unordered_map;
 using std::vector;
 
-typedef struct {
+class dungeon_floor_t {
+public:
     int floor; // the floor number, starting from 0
     int width;
     int height;
@@ -30,7 +31,7 @@ typedef struct {
     biome_t biome;
     vector<tile_id> tiles; // 2D vector of shared pointers to tile_t
     shared_ptr<unordered_map<tile_id, tile_t>> tile_map; // Maps tile_id to tile_t pointer
-} dungeon_floor_t;
+};
 
 
 static inline tile_t& df_tile_at(dungeon_floor_t& df, vec3 loc) {

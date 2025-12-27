@@ -2,6 +2,7 @@
 
 #include "ComponentTable.h"
 #include "attack_result.h"
+#include "biome.h"
 #include "character_creation.h"
 #include "controlmode.h"
 #include "debugpanel.h"
@@ -314,7 +315,7 @@ public:
 
 
 
-    inline void init_dungeon(const int df_count) {
+    inline void init_dungeon(const biome_t type, const int df_count, const int w, const int h) {
         massert(df_count > 0, "df_count is <= 0");
 
         //d_create(dungeon);
@@ -322,14 +323,15 @@ public:
             return;
         }
 
+        massert(w > 0, "w == 0");
+        massert(h > 0, "h == 0");
+        massert(df_count > 0, "df_count == 0");
+        massert(type > BIOME_NONE, "biome is invalid");
+        massert(type < BIOME_COUNT, "biome is invalid 2");
+
         // max size of 128x128 for now to maintain 60fps
         // dungeon floors, tiles etc will require re-write/re-design for optimization
-        const int w = 32;
-        const int h = 32;
-        const biome_t type = BIOME_STONE;
-        //dungeon_floor_type_t type = DUNGEON_FLOOR_TYPE_GRASS;
         for (int i = 0; i < df_count; i++) {
-            //d_add_floor(dungeon, type, w, h);
             d.add_floor(type, w, h);
         }
         d.is_initialized = true;
@@ -586,6 +588,8 @@ public:
     }
 
 
+
+
     inline with_fun shield_init() {
         return [](CT& ct, const entityid id) {
             ct.set<name>(id, "kite shield");
@@ -596,6 +600,8 @@ public:
     }
 
 
+
+
     inline with_fun potion_init(potiontype_t pt) {
         return [pt](CT& ct, const entityid id) {
             ct.set<potiontype>(id, pt);
@@ -604,6 +610,23 @@ public:
                 ct.set<description>(id, "a small healing potion");
                 ct.set<healing>(id, (vec3){1, 6, 0});
             }
+        };
+    }
+
+
+
+
+    inline with_fun player_init(const int maxhp_roll) {
+        return [this, maxhp_roll](CT& ct, const entityid id) {
+            ct.set<strength>(id, chara_creation.strength);
+            ct.set<dexterity>(id, chara_creation.dexterity);
+            ct.set<constitution>(id, chara_creation.constitution);
+            ct.set<intelligence>(id, chara_creation.intelligence);
+            ct.set<wisdom>(id, chara_creation.wisdom);
+            ct.set<charisma>(id, chara_creation.charisma);
+            ct.set<hd>(id, (vec3){1, chara_creation.hitdie, 0});
+            ct.set<hp>(id, maxhp_roll);
+            ct.set<maxhp>(id, maxhp_roll);
         };
     }
 
@@ -1094,7 +1117,7 @@ public:
         SetRandomSeed(time(NULL));
         //minfo("gamestate.logic_init");
 
-        init_dungeon(1);
+        init_dungeon(BIOME_STONE, 1, 32, 32);
 
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
 
