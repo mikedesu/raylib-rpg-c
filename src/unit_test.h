@@ -410,13 +410,9 @@ public:
 
         TS_ASSERT(g.hero_id != ENTITYID_INVALID);
 
-
         inputstate is;
-
         inputstate_update(is);
-
         g.current_scene = SCENE_GAMEPLAY;
-
 
         TS_ASSERT(g.test);
         constexpr int num_ticks = 1000;
@@ -425,5 +421,10 @@ public:
         }
         TS_ASSERT(g.turn_count > 0);
         TS_ASSERT(g.turn_count == num_ticks / 2);
+        TS_ASSERT(g.ct.has<dead>(g.hero_id));
+        TS_ASSERT(!g.ct.get<dead>(g.hero_id).value());
+        const int npc_count = g.count_live_npcs_on_floor(0);
+        TS_ASSERT(npc_count > 0);
+        TS_ASSERT(npc_count == monster_count);
     }
 };

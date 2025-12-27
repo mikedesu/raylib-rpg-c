@@ -1069,6 +1069,26 @@ public:
 
 
 
+    const inline size_t count_live_npcs_on_floor(size_t floor) {
+        auto df = d.get_floor(floor);
+
+        size_t count = 0;
+
+        for (int i = 0; i < df.width; i++) {
+            for (int j = 0; j < df.height; j++) {
+                auto t = df_tile_at(df, (vec3){i, j, -1});
+                if (tile_has_live_npcs(t)) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+
+
+
     inline void logic_init() {
         srand(time(NULL));
         SetRandomSeed(time(NULL));
