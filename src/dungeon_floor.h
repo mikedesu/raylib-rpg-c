@@ -299,13 +299,18 @@ static inline void df_free(dungeon_floor_t& df) {
 }
 
 
-const static inline entityid df_add_at(dungeon_floor_t& df, entityid id, int x, int y) {
-    //minfo("df_add_at: %d, %d, %d", id, x, y);
+const static inline entityid df_add_at(dungeon_floor_t& df, const entityid id, const int x, const int y) {
+    minfo("df_add_at: %d, %d, %d", id, x, y);
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(x >= 0 && x < df.width, "x is out of bounds");
     massert(y >= 0 && y < df.height, "y is out of bounds");
     tile_t& tile = df_tile_at(df, (vec3){x, y, -1});
-    return tile_add(tile, id);
+
+    const entityid result = tile_add(tile, id);
+
+    minfo("tile_add returned %d", result);
+
+    return result;
 }
 
 static inline bool df_remove_at(dungeon_floor_t& df, entityid id, int x, int y) {
@@ -332,7 +337,10 @@ static inline void df_set_all_tiles(dungeon_floor_t& df, tiletype_t type) {
 }
 
 
+// this function is DANGEROUS
+// it assumes df exists
 const static inline vec3 df_get_random_loc(dungeon_floor_t& df) {
+    minfo("df get random loc");
     vector<vec3> tmp;
     for (int x = 0; x < df.width; x++) {
         for (int y = 0; y < df.height; y++) {

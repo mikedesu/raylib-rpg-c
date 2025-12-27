@@ -173,16 +173,33 @@ public:
 
     void testPlaceProps() {
         gamestate g;
-        //const size_t placed_doors_0 = g.place_doors();
-        //TS_ASSERT(placed_doors_0 == 0);
-        //TS_ASSERT(g.dungeon.floors.size() == 1);
-        //const size_t placed_doors_1 = g.place_doors();
-        //TS_ASSERT(placed_doors_1 > 0);
-
         const size_t placed_props_0 = g.place_props();
         TS_ASSERT(placed_props_0 == 0);
         g.init_dungeon(1);
         const size_t placed_props_1 = g.place_props();
         TS_ASSERT(placed_props_1 > 0);
+    }
+
+
+    void testPlaceDagger() {
+        gamestate g;
+        TS_ASSERT(g.dungeon.floors.size() == 0);
+        g.init_dungeon(1);
+        TS_ASSERT(g.dungeon.floors.size() == 1);
+        const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
+        //const entityid id = g.create_weapon_at_with(g.ct, loc, [](CT& ct, const entityid id) {
+        //    ct.set<name>(id, "Dagger");
+        //    ct.set<description>(id, "Stabby stabby.");
+        //    ct.set<weapontype>(id, WEAPON_DAGGER);
+        //    ct.set<damage>(id, (vec3){1, 4, 0});
+        //    ct.set<durability>(id, 100);
+        //    ct.set<max_durability>(id, 100);
+        //    ct.set<rarity>(id, RARITY_COMMON);
+        //});
+
+        const entityid id = g.create_weapon_at_with(g.ct, loc, g.dagger_init());
+
+        TS_ASSERT(id != ENTITYID_INVALID);
     }
 };

@@ -46,7 +46,7 @@
 
 
 typedef ComponentTable CT;
-typedef function<void(CT& ct, const entityid)> with_function;
+typedef function<void(CT& ct, const entityid)> with_fun;
 
 
 class gamestate {
@@ -146,7 +146,7 @@ public:
 
 
     gamestate() {
-        //minfo("Initializing gamestate");
+        minfo("Initializing gamestate");
         reset();
         //msuccess("Gamestate initialized successfully");
     }
@@ -584,7 +584,8 @@ public:
 
 
     //const inline entityid create_weapon_with(ComponentTable& ct, function<void(ComponentTable&, entityid)> weaponInitFunction) {
-    const inline entityid create_weapon_with(with_function weaponInitFunction) {
+    const inline entityid create_weapon_with(with_fun weaponInitFunction) {
+        minfo("create weapon with");
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
         ct.set<itemtype>(id, ITEM_WEAPON);
@@ -597,23 +598,52 @@ public:
 
 
 
-    const inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_function weaponInitFunction) {
+    inline with_fun dagger_init() {
+        return [](CT& ct, const entityid id) {
+            ct.set<name>(id, "Dagger");
+            ct.set<description>(id, "Stabby stabby.");
+            ct.set<weapontype>(id, WEAPON_DAGGER);
+            ct.set<damage>(id, (vec3){1, 4, 0});
+            ct.set<durability>(id, 100);
+            ct.set<max_durability>(id, 100);
+            ct.set<rarity>(id, RARITY_COMMON);
+        };
+    }
+
+
+
+
+    const inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_fun weaponInitFunction) {
+        minfo("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
+        if (dungeon.floors.size() == 0) {
+            merror("dungeon floors size is 0");
+            return ENTITYID_INVALID;
+        }
+        if (!dungeon.is_initialized) {
+            merror("dungeon is_initialized flag not set");
+            return ENTITYID_INVALID;
+        }
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, loc);
+        minfo("checking if tile is walkable...");
         if (!tile_is_walkable(tile.type)) {
             merror("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
         }
+        minfo("checking if tile has live NPCs");
         if (tile_has_live_npcs(tile)) {
             merror("cannot create entity on tile with live NPCs");
             return ENTITYID_INVALID;
         }
+        minfo("creating weapon...");
         const auto id = create_weapon_with(weaponInitFunction);
         if (id == ENTITYID_INVALID) {
+            minfo("failed to create weapon");
             return ENTITYID_INVALID;
         }
-        minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
-        if (!df_add_at(df, id, loc.x, loc.y)) {
+        minfo("attempting df_add_at: %d, %d ", id, loc.x, loc.y);
+        if (df_add_at(df, id, loc.x, loc.y) == ENTITYID_INVALID) {
+            minfo("failed to add weapon to df");
             return ENTITYID_INVALID;
         }
         ct.set<location>(id, loc);
@@ -623,7 +653,7 @@ public:
 
 
 
-    const inline entityid create_shield_with(with_function shieldInitFunction) {
+    const inline entityid create_shield_with(with_fun shieldInitFunction) {
         const auto id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
         ct.set<itemtype>(id, ITEM_SHIELD);
@@ -637,7 +667,7 @@ public:
 
 
 
-    const inline entityid create_shield_at_with(const vec3 loc, with_function shieldInitFunction) {
+    const inline entityid create_shield_at_with(const vec3 loc, with_fun shieldInitFunction) {
         const auto id = create_shield_with(shieldInitFunction);
         minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         auto df = d_get_floor(dungeon, loc.z);
@@ -650,7 +680,7 @@ public:
 
 
 
-    const inline entityid create_potion_with(with_function potionInitFunction) {
+    const inline entityid create_potion_with(with_fun potionInitFunction) {
         const auto id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
         ct.set<itemtype>(id, ITEM_POTION);
@@ -661,7 +691,7 @@ public:
 
 
 
-    const inline entityid create_potion_at_with(const vec3 loc, with_function potionInitFunction) {
+    const inline entityid create_potion_at_with(const vec3 loc, with_fun potionInitFunction) {
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type))
@@ -845,7 +875,7 @@ public:
 
 
 
-    const inline entityid create_random_monster_with() {
+    const inline entityid create_random_monster_with(with_fun monsterInitFunction) {
         //const race_t r = random_monster_type();
         minfo("create random monster with");
         const race_t r = RACE_ORC;
@@ -884,7 +914,7 @@ public:
 
 
 
-    const inline entityid create_random_monster_at_with(const vec3 loc) {
+    const inline entityid create_random_monster_at_with(const vec3 loc, with_fun monsterInitFunction) {
         minfo("create random monster at with: %d, %d, %d", loc.x, loc.y, loc.z);
         minfo("getting floor...");
         auto df = d_get_floor(dungeon, loc.z);
@@ -898,7 +928,7 @@ public:
             return ENTITYID_INVALID;
         //const auto id = create_random_monster_with(g, monsterInitFunction);
         minfo("create random monster with...");
-        const auto id = create_random_monster_with();
+        const auto id = create_random_monster_with([](CT& ct, const entityid id) {});
         if (id == ENTITYID_INVALID)
             return ENTITYID_INVALID;
         minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
@@ -1041,15 +1071,16 @@ public:
         place_props();
 
         //const entityid dagger_id = create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
-        create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
-            ct.set<name>(id, "Dagger");
-            ct.set<description>(id, "Stabby stabby.");
-            ct.set<weapontype>(id, WEAPON_DAGGER);
-            ct.set<damage>(id, (vec3){1, 4, 0});
-            ct.set<durability>(id, 100);
-            ct.set<max_durability>(id, 100);
-            ct.set<rarity>(id, RARITY_COMMON);
-        });
+        //create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
+        create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), dagger_init());
+        //ct.set<name>(id, "Dagger");
+        //ct.set<description>(id, "Stabby stabby.");
+        //ct.set<weapontype>(id, WEAPON_DAGGER);
+        //ct.set<damage>(id, (vec3){1, 4, 0});
+        //ct.set<durability>(id, 100);
+        //ct.set<max_durability>(id, 100);
+        //ct.set<rarity>(id, RARITY_COMMON);
+        //});
 
         //const entityid shield_id = create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
         create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
@@ -1071,7 +1102,7 @@ public:
         for (int i = 0; i < (int)dungeon.floors.size(); i++) {
             for (int j = 1; j <= i + 1; j++) {
                 const vec3 random_loc = df_get_random_loc(d_get_floor(dungeon, i));
-                create_random_monster_at_with(random_loc);
+                create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
             }
         }
         msuccess("end creating monsters...");
