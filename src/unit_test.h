@@ -4,6 +4,7 @@
 #include "gamestate.h"
 #include "mprint.h"
 #include "potion.h"
+#include "scene.h"
 #include "weapon.h"
 #include <cxxtest/TestSuite.h>
 #include <raylib.h>
@@ -341,5 +342,114 @@ public:
             monster_set.emplace(id);
         }
         TS_ASSERT_EQUALS(monster_set.size(), monster_count - 1);
+    }
+
+
+
+    void testLogicInit() {
+        gamestate g;
+        g.test = true;
+        srand(time(NULL));
+        SetRandomSeed(time(NULL));
+        g.init_dungeon(1);
+        TS_ASSERT(g.dungeon.floors.size() > 0);
+
+        // place doors
+        const size_t placed_doors_0 = g.place_doors();
+        TS_ASSERT(placed_doors_0 > 0);
+
+        // place props
+        const size_t placed_props_0 = g.place_props();
+        TS_ASSERT(placed_props_0 > 0);
+
+        // create dagger
+        const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
+        const entityid id = g.create_weapon_at_with(g.ct, loc, g.dagger_init());
+        TS_ASSERT(id != ENTITYID_INVALID);
+
+        // create shield
+        const vec3 loc2 = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(!vec3_equal(loc2, (vec3){-1, -1, -1}));
+        const entityid id2 = g.create_shield_at_with(loc, g.shield_init());
+        TS_ASSERT(id2 != ENTITYID_INVALID);
+
+        // create potion
+        const vec3 loc3 = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(!vec3_equal(loc3, (vec3){-1, -1, -1}));
+        const entityid id3 = g.create_potion_at_with(loc, g.potion_init(POTION_HP_SMALL));
+        TS_ASSERT(id3 != ENTITYID_INVALID);
+
+        // create NPCs (orcs)
+        constexpr int monster_count = 4;
+        std::set<entityid> monster_set;
+        for (int i = 0; i < monster_count; i++) {
+            TS_ASSERT(g.dungeon.floors.size() > 0);
+            const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+            TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
+            const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
+            TS_ASSERT(id != ENTITYID_INVALID);
+            monster_set.emplace(id);
+        }
+        TS_ASSERT_EQUALS(monster_set.size(), monster_count);
+
+        const vec3 loc4 = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(!vec3_equal(loc4, (vec3){-1, -1, -1}));
+
+        const int maxhp_roll = 10;
+        g.entity_turn = g.create_player_with(loc4, "darkmage", [this, maxhp_roll, &g](CT& ct, const entityid id) {
+            // set stats from char_creation
+            ct.set<strength>(id, g.chara_creation.strength);
+            ct.set<dexterity>(id, g.chara_creation.dexterity);
+            ct.set<constitution>(id, g.chara_creation.constitution);
+            ct.set<intelligence>(id, g.chara_creation.intelligence);
+            ct.set<wisdom>(id, g.chara_creation.wisdom);
+            ct.set<charisma>(id, g.chara_creation.charisma);
+            ct.set<hd>(id, (vec3){1, g.chara_creation.hitdie, 0});
+            ct.set<hp>(id, maxhp_roll);
+            ct.set<maxhp>(id, maxhp_roll);
+        });
+
+        TS_ASSERT(g.hero_id != ENTITYID_INVALID);
+
+
+        inputstate is;
+
+        inputstate_update(is);
+
+        g.current_scene = SCENE_GAMEPLAY;
+
+
+        TS_ASSERT(g.test);
+        constexpr int num_ticks = 1000;
+        for (int i = 0; i < num_ticks; i++) {
+            g.tick(is);
+        }
+        TS_ASSERT(g.turn_count > 0);
+        //TS_ASSERT(g.turn_count == 5);
+
+        //msuccess("success!");
+        //g.update_player_tiles_explored();
+        //g.update_player_state();
+        //g.update_npcs_state();
+        //g.update_spells_state();
+        //g.handle_input(is);
+        //g.handle_npcs();
+
+        //minfo("g.flag: %d\n", g.flag);
+        //minfo("g.flag: %s\n",
+        //      g.flag == GAMESTATE_FLAG_PLAYER_INPUT  ? "Player input"
+        //      : g.flag == GAMESTATE_FLAG_PLAYER_ANIM ? "Player anim"
+        //      : g.flag == GAMESTATE_FLAG_NPC_TURN    ? "NPC turn"
+        //      : g.flag == GAMESTATE_FLAG_NPC_ANIM    ? "NPC anim"
+        //                                             : "Unknown flag");
+        //minfo("g.turn_count: %d\n", g.turn_count);
+        //minfo("g.test: %d\n", g.test);
+        //TS_ASSERT(g.turn_count > 9000);
+
+        //g.update_debug_panel_buffer(is);
+        //if (g.test) {
+        //    g.handle_test_flag();
+        //}
     }
 };
