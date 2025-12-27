@@ -7,7 +7,6 @@
 #include "debugpanel.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
-#include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate_flag.h"
@@ -1077,16 +1076,6 @@ public:
 
         create_weapon_at_with(ct, loc, dagger_init());
 
-        //ct.set<name>(id, "Dagger");
-        //ct.set<description>(id, "Stabby stabby.");
-        //ct.set<weapontype>(id, WEAPON_DAGGER);
-        //ct.set<damage>(id, (vec3){1, 4, 0});
-        //ct.set<durability>(id, 100);
-        //ct.set<max_durability>(id, 100);
-        //ct.set<rarity>(id, RARITY_COMMON);
-        //});
-
-        //const entityid shield_id = create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
         create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
             ct.set<name>(id, "Kite Shield");
             ct.set<description>(id, "Standard knight's shield");
@@ -1094,7 +1083,6 @@ public:
             ct.set<block_chance>(id, 90);
         });
 
-        //const entityid potion_id = create_potion_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
         create_potion_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
             ct.set<name>(id, "small healing potion");
             ct.set<description>(id, "a small healing potion");
@@ -1109,6 +1097,7 @@ public:
                 create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
             }
         }
+
         msuccess("end creating monsters...");
         add_message("Welcome to the game! Press enter to cycle messages.");
 #ifdef START_MESSAGES
@@ -1527,9 +1516,6 @@ public:
         // get the player's location
         vec3 loc = ct.get<location>(hero_id).value();
         // get the tile at the player's location
-        //auto tile = df_tile_at(g.dungeon->floors->at(loc.z), loc);
-        //if (!tile)
-        //    return false;
         auto df = d_get_current_floor(dungeon);
         if (!df_add_at(df, item_id, loc.x, loc.y)) {
             merror("Failed to add to %d, %d, %d", loc.x, loc.y, loc.z);
@@ -1585,17 +1571,12 @@ public:
                     add_message_history("%s used a healing potion", n.c_str());
                     add_message_history("%s restored %d hp", n.c_str(), amount);
                 }
-            }
-            //====
-            else {
+            } else {
                 merror("Potion has no healing component");
                 return false;
             }
-
             // consume the potion by removing it
             remove_from_inventory(actor_id, item_id);
-
-
             return true;
         }
         merror("id %d is not an item, potion, or isnt in the inventory", item_id);
@@ -1732,8 +1713,6 @@ public:
 
 
     inline void cycle_messages() {
-        //massert(g, "gamestate is NULL");
-
         if (msg_system.size() > 0) {
             string msg = msg_system.front();
             int len = msg.length();
@@ -1747,7 +1726,6 @@ public:
             msg_history.push_back(msg_system.front());
             msg_system.erase(msg_system.begin());
         }
-
         if (msg_system.size() == 0)
             msg_system_is_active = false;
     }
@@ -1784,7 +1762,6 @@ public:
 
 
     inline void change_player_dir(const direction_t dir) {
-        //massert(g, "Game state is NULL!");
         if (ct.get<dead>(hero_id).value_or(true))
             return;
         ct.set<direction>(hero_id, dir);
@@ -1829,7 +1806,6 @@ public:
                     add_message("You cannot attack while dead");
                     return true;
                 }
-
                 ct.set<attacking>(hero_id, true);
                 ct.set<update>(hero_id, true);
                 flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1950,18 +1926,12 @@ public:
 
     const inline bool try_entity_move(const entityid id, const vec3 v) {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-
-        if (id == hero_id)
-            minfo("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
-
+        //if (id == hero_id)
+        //    minfo("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
         ct.set<update>(id, true);
         ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
         // entity location
         massert(ct.has<location>(id), "id %d has no location", id);
-        //auto maybe_loc = g.ct.get<location>(id);
-        //if (!maybe_loc.has_value()) {
-        //    return false;
-        //}
         const vec3 loc = ct.get<location>(id).value_or((vec3){-1, -1, -1});
         massert(!vec3_equal(loc, (vec3){-1, -1, -1}), "id %d has no location", id);
         // entity's new location
@@ -1995,14 +1965,12 @@ public:
 
         const entityid door_id = tile_has_door(aloc);
         if (door_id != ENTITYID_INVALID) {
-            //minfo("Tile has door");
             massert(ct.has<door_open>(door_id), "door_id %d doesnt have a door_open component", door_id);
             if (!ct.get<door_open>(door_id).value_or(false))
                 return false;
         }
 
         // if door, door is open
-
         // remove the entity from the current tile
         if (!df_remove_at(df, id, loc.x, loc.y)) {
             merror("Failed to remove entity %d from tile at (%d, %d, %d)", id, loc.x, loc.y, loc.z);
@@ -2014,15 +1982,11 @@ public:
             merror("Failed to add entity %d to tile at (%d, %d, %d)", id, aloc.x, aloc.y, aloc.z);
             return false;
         }
-
         ct.set<location>(id, aloc);
-
         const float mx = v.x * DEFAULT_TILE_SIZE, my = v.y * DEFAULT_TILE_SIZE;
         ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
-
         if (check_hearing(hero_id, aloc))
             PlaySound(sfx[SFX_STEP_STONE_1]);
-
         if (id == hero_id)
             msuccess("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
         return true;
@@ -2268,7 +2232,6 @@ public:
         auto maybe_dura = ct.get<durability>(shield);
         if (!maybe_dura.has_value())
             return;
-
         const int dura = maybe_dura.value();
         ct.set<durability>(shield, dura - 1 < 0 ? 0 : dura - 1);
         if (dura > 0)
@@ -2279,12 +2242,9 @@ public:
         remove_from_inventory(defender, shield);
         // item destroyed
         ct.set<destroyed>(shield, true);
-        //const bool event_heard = g.check_hearing(g.hero_id, get_entity_location(g, defender));
         const bool event_heard = check_hearing(hero_id, ct.get<location>(defender).value_or((vec3){-1, -1, -1}));
         if (event_heard)
             PlaySound(sfx[SFX_05_ALCHEMY_GLASS_BREAK]);
-
-        //add_message_history("%s broke!", get_entity_name(g, shield).c_str());
         add_message_history("%s broke!", ct.get<name>(shield).value_or("no-name-shield").c_str());
     }
 
@@ -2311,58 +2271,37 @@ public:
     inline void process_attack_results(const entityid atk_id, const entityid tgt_id, const bool atk_successful) {
         massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
         massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
-
         const string attacker_name = ct.get<name>(atk_id).value_or("no-name");
         const string target_name = ct.get<name>(tgt_id).value_or("no-name");
         const char* atk_name = attacker_name.c_str();
         const char* tgt_name = target_name.c_str();
-
-
         if (ct.get<dead>(tgt_id).value_or(false)) {
             minfo("Target is dead");
             add_message_history("%s swings at a dead target", atk_name);
             return;
         }
-
         if (!atk_successful) {
             minfo("Missed attack");
             add_message_history("%s swings at %s and misses!", atk_name, tgt_name);
             return;
         }
-
-
         const int dmg = compute_attack_damage(atk_id, tgt_id);
         ct.set<damaged>(tgt_id, true);
         ct.set<update>(tgt_id, true);
-
         auto maybe_tgt_hp = ct.get<hp>(tgt_id);
         if (!maybe_tgt_hp.has_value()) {
             merror("target has no HP component");
             return;
         }
-
         const int tgt_hp = maybe_tgt_hp.value() - dmg;
-        //if (tgt_hp <= 0) {
-        //    merror("Target is already dead, hp was: %d", tgt_hp);
-        //    set_npc_dead(g, tgt_id);
-        //    return;
-        //}
-
         minfo("damage dealt");
         add_message_history("%s deals %d damage to %s", atk_name, dmg, tgt_name);
-
         ct.set<hp>(tgt_id, tgt_hp);
-
         // decrement weapon durability
         handle_weapon_durability_loss(atk_id, tgt_id);
-
         if (tgt_hp > 0)
             return;
-
-        //set_npc_dead(g, tgt_id);
         ct.set<dead>(tgt_id, true);
-
-        //switch (get_entity_type(g, tgt_id)) {
         switch (ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE)) {
         case ENTITY_NPC: {
             update_npc_xp(atk_id, tgt_id);
@@ -2395,32 +2334,25 @@ public:
             return ATTACK_RESULT_MISS;
         if (ct.get<dead>(target_id).value_or(true))
             return ATTACK_RESULT_MISS;
-
         const string attacker_name = ct.get<name>(attacker_id).value_or("no-name");
         const string target_name = ct.get<name>(target_id).value_or("no-name");
         const char* atk_name = attacker_name.c_str();
         const char* tgt_name = target_name.c_str();
-
-
         // they have a shield
         // still need to do attack successful check
         const bool attack_successful = compute_attack_roll(attacker_id, target_id);
-
         // attack unsuccessful
         if (!attack_successful) {
             process_attack_results(attacker_id, target_id, false);
             return ATTACK_RESULT_MISS;
         }
-
         // check for shield
         const entityid shield_id = ct.get<equipped_shield>(target_id).value_or(ENTITYID_INVALID);
-
         // if no shield
         if (shield_id == ENTITYID_INVALID) {
             process_attack_results(attacker_id, target_id, true);
             return ATTACK_RESULT_HIT;
         }
-
         // if has shield
         // compute chance to block
         const int roll = GetRandomValue(1, MAX_BLOCK_CHANCE);
@@ -2432,15 +2364,11 @@ public:
             process_attack_results(attacker_id, target_id, true);
             return ATTACK_RESULT_HIT;
         }
-
-
         // decrement shield durability
         handle_shield_durability_loss(target_id, attacker_id);
-
         handle_shield_block_sfx(target_id);
         ct.set<block_success>(target_id, true);
         ct.set<update>(target_id, true);
-
         minfo("attack blocked");
         add_message_history("%s blocked an attack from %s", tgt_name, atk_name);
         return ATTACK_RESULT_BLOCK;
@@ -2515,7 +2443,6 @@ public:
                 add_message("You cannot attack while dead");
                 return true;
             }
-            //if (ct.get<location>(hero_id).has_value() && ct.get<direction>(hero_id).has_value()) {
             if (ct.has<location>(hero_id) && ct.has<direction>(hero_id)) {
                 const vec3 loc = get_loc_facing_player();
                 try_entity_attack(hero_id, loc.x, loc.y);
@@ -2540,23 +2467,18 @@ public:
     const inline bool try_entity_pickup(const entityid id) {
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
         ct.set<update>(id, true);
-
         // check if the player is on a tile with an item
         auto maybe_loc = ct.get<location>(id);
         if (!maybe_loc.has_value()) {
             merror("id %d has no location", id);
             return false;
         }
-
         const vec3 loc = maybe_loc.value();
         dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
         tile_t& tile = df_tile_at(df, loc);
-
         bool item_picked_up = false;
-
         // lets try using our new cached_item via tile_get_item
         const entityid item_id = tile_get_item(tile);
-
         if (item_id != ENTITYID_INVALID && add_to_inventory(id, item_id)) {
             tile_remove(tile, item_id);
             PlaySound(sfx[SFX_CONFIRM_01]);
@@ -2566,18 +2488,11 @@ public:
         } else if (item_id == ENTITYID_INVALID) {
             merror("No item cached");
         }
-
         auto t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
         if (t == ENTITY_PLAYER) {
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
         }
-
-        //if (item_picked_up) {
-        //    auto item_name = g.ct.get<name>(item_id).value_or("no-name-item");
-        //    add_message_history(g, "You picked up %s", item_name.c_str());
-        //}
-
-        minfo("returning item_picked_up: %d", item_picked_up);
+        //minfo("returning item_picked_up: %d", item_picked_up);
         return item_picked_up;
     }
 
@@ -2601,19 +2516,14 @@ public:
 
 
     const inline bool try_entity_stairs(const entityid id) {
-        //massert(g, "Game state is NULL!");
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-
         ct.set<update>(id, true);
         const vec3 loc = ct.get<location>(id).value();
-
         // first, we prob want to get the tile at this location
         const int current_floor = dungeon.current_floor;
         //auto df = g.dungeon.floors->at(current_floor);
         auto df = dungeon.floors[current_floor];
         auto t = df_tile_at(df, loc);
-        //massert(t, "tile was NULL");
-
         // check the tile type
         if (t.type == TILE_UPSTAIRS) {
             // can't go up on the top floor
@@ -2624,50 +2534,39 @@ public:
                 // go upstairs
                 // we have to remove the player from the old tile
                 df_remove_at(df, hero_id, loc.x, loc.y);
-
                 dungeon.current_floor--;
-
                 const int new_floor = dungeon.current_floor;
                 auto df2 = dungeon.floors[new_floor];
                 const vec3 uloc = df2.downstairs_loc;
                 auto t2 = df_tile_at(df2, uloc);
-
                 df_add_at(df2, hero_id, uloc.x, uloc.y);
                 ct.set<location>(hero_id, uloc);
                 flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 PlaySound(sfx.at(SFX_STEP_STONE_1));
                 return true;
             }
-
         } else if (t.type == TILE_DOWNSTAIRS) {
             // can't go down on the bottom floor
             // otherwise...
-
             if ((size_t)current_floor < dungeon.floors.size() - 1) {
                 // go downstairs
                 // we have to remove the player from the old tile
                 df_remove_at(df, hero_id, loc.x, loc.y);
-
                 dungeon.current_floor++;
-
                 const int new_floor = dungeon.current_floor;
                 auto df2 = dungeon.floors[new_floor];
                 const vec3 uloc = df2.upstairs_loc;
                 auto t2 = df_tile_at(df2, uloc);
-
                 df_add_at(df2, hero_id, uloc.x, uloc.y);
                 ct.set<location>(hero_id, uloc);
                 flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 PlaySound(sfx.at(SFX_STEP_STONE_1));
-                //play_sound(SFX_STEP_STONE_1);
                 return true;
-
             } else {
                 // bottom floor
                 add_message("You can't go downstairs anymore!");
             }
         }
-
         return false;
     }
 
@@ -2694,37 +2593,24 @@ public:
         if (tile_has_door(loc)) {
             auto df = d_get_current_floor(dungeon);
             auto t = df_tile_at(df, loc);
-
             for (size_t i = 0; i < t.entities->size(); i++) {
                 const entityid myid = t.entities->at(i);
                 const entitytype_t type = ct.get<entitytype>(myid).value_or(ENTITY_NONE);
                 if (type == ENTITY_DOOR) {
                     auto maybe_is_open = ct.get<door_open>(myid);
-
                     if (maybe_is_open.has_value()) {
                         const bool is_open = maybe_is_open.value();
                         if (is_open) {
                             ct.set<door_open>(myid, false);
-
-                            //if (id == g.hero_id) {
-                            //    add_message(g, "You closed a door");
-                            //}
-
                         } else {
                             ct.set<door_open>(myid, true);
-
-                            //if (id == g.hero_id) {
-                            //    add_message(g, "You opened a door");
-                            //}
                         }
-
                         PlaySound(sfx.at(SFX_CHEST_OPEN));
                         return true;
                     }
                 }
             }
         }
-
         return false;
     }
 
@@ -2749,18 +2635,16 @@ public:
 
 
     inline void try_entity_cast_spell(const entityid id, const int tgt_x, const int tgt_y) {
-        minfo("Trying to cast spell...");
+        //minfo("Trying to cast spell...");
         const auto maybe_loc = ct.get<location>(id);
         if (!maybe_loc.has_value()) {
             merror("no location for entity id %d", id);
             return;
         }
         const vec3 loc = maybe_loc.value();
-
         auto floor = d_get_floor(dungeon, loc.z);
         const vec3 spell_loc = {tgt_x, tgt_y, loc.z};
         auto tile = df_tile_at(floor, spell_loc);
-
         // Calculate direction based on target position
         bool ok = false;
         const int dx = tgt_x - loc.x;
@@ -2768,7 +2652,6 @@ public:
         ct.set<direction>(id, get_dir_from_xy(dx, dy));
         ct.set<casting>(id, true);
         ct.set<update>(id, true);
-
         // ok...
         // we are hard-coding a spell cast
         // in this example, we will 'create' a 'spell entity' of type 'fire' and place it on a tile
@@ -2776,15 +2659,11 @@ public:
         ct.set<spellstate>(id, SPELLSTATE_CAST);
         ct.set<spelltype>(id, SPELLTYPE_FIRE);
         ct.set<spell_casting>(id, true);
-
-
         if (spell_id != ENTITYID_INVALID) {
             ok = true;
-
             // lets do an example of processing a spell effect immediately
             // first we need to iterate the entities on the tile
             // if there's an NPC we damage it
-
             if (tile_has_live_npcs(tile)) {
                 entityid npcid = ENTITYID_INVALID;
                 for (auto id : *tile.entities) {
@@ -2793,55 +2672,42 @@ public:
                         break;
                     }
                 }
-
                 const int dmg = GetRandomValue(1, 6);
-
                 ct.set<damaged>(npcid, true);
                 ct.set<update>(npcid, true);
-
                 auto maybe_tgt_hp = ct.get<hp>(npcid);
                 if (!maybe_tgt_hp.has_value()) {
                     merror("target has no HP component");
                     return;
                 }
-
                 int tgt_hp = maybe_tgt_hp.value();
                 if (tgt_hp <= 0) {
                     merror("Target is already dead, hp was: %d", tgt_hp);
                     ct.set<dead>(npcid, true);
                     return;
                 }
-
                 tgt_hp -= dmg;
                 ct.set<hp>(npcid, tgt_hp);
-
                 if (tgt_hp > 0) {
                     ct.set<dead>(npcid, false);
                     return;
                 }
-
                 auto tgttype = ct.get<entitytype>(npcid).value_or(ENTITY_NONE);
-
                 ct.set<dead>(npcid, true);
-
                 tile_t& target_tile = df_tile_at(d_get_current_floor(dungeon), spell_loc);
                 target_tile.dirty_entities = true;
-
-
                 if (tgttype == ENTITY_NPC) {
                     // increment attacker's xp
                     const int old_xp = ct.get<xp>(id).value_or(0);
                     const int reward_xp = 1;
                     const int new_xp = old_xp + reward_xp;
                     ct.set<xp>(id, new_xp);
-
                     // handle item drops
                     drop_all_from_inventory(npcid);
                 } else if (tgttype == ENTITY_PLAYER) {
                     add_message("You died");
                 }
             }
-
             if (tile_has_door(spell_loc)) {
                 // find the door id
                 entityid doorid = ENTITYID_INVALID;
@@ -2851,7 +2717,6 @@ public:
                         break;
                     }
                 }
-
                 // mark it 'destroyed'
                 // remove it from the tile
                 if (doorid != ENTITYID_INVALID) {
@@ -2859,13 +2724,10 @@ public:
                     df_remove_at(floor, doorid, spell_loc.x, spell_loc.y);
                 }
             }
-
             ct.set<destroyed>(spell_id, true);
         }
-
         // did the hero hear this event?
         const bool event_heard = check_hearing(hero_id, (vec3){tgt_x, tgt_y, loc.z});
-
         if (ok) {
             // default metal on flesh
             //play_sound_if_heard(SFX_ITEM_FUSION, event_heard);
@@ -2932,39 +2794,39 @@ public:
         const bool is_dead = maybe_player_is_dead.value();
         if (handle_camera_zoom(is))
             return;
-        if (handle_change_dir(is))
+        else if (handle_change_dir(is))
             return;
-        if (handle_change_dir_intent(is))
+        else if (handle_change_dir_intent(is))
             return;
-        if (handle_display_inventory(is))
+        else if (handle_display_inventory(is))
             return;
-        if (handle_move_up(is, is_dead))
+        else if (handle_move_up(is, is_dead))
             return;
-        if (handle_move_down(is, is_dead))
+        else if (handle_move_down(is, is_dead))
             return;
-        if (handle_move_left(is, is_dead))
+        else if (handle_move_left(is, is_dead))
             return;
-        if (handle_move_right(is, is_dead))
+        else if (handle_move_right(is, is_dead))
             return;
-        if (handle_move_up_left(is, is_dead))
+        else if (handle_move_up_left(is, is_dead))
             return;
-        if (handle_move_up_right(is, is_dead))
+        else if (handle_move_up_right(is, is_dead))
             return;
-        if (handle_move_down_left(is, is_dead))
+        else if (handle_move_down_left(is, is_dead))
             return;
-        if (handle_move_down_right(is, is_dead))
+        else if (handle_move_down_right(is, is_dead))
             return;
-        if (handle_attack(is, is_dead))
+        else if (handle_attack(is, is_dead))
             return;
-        if (handle_pickup_item(is, is_dead))
+        else if (handle_pickup_item(is, is_dead))
             return;
-        if (handle_traverse_stairs(is, is_dead))
+        else if (handle_traverse_stairs(is, is_dead))
             return;
-        if (handle_open_door(is, is_dead))
+        else if (handle_open_door(is, is_dead))
             return;
-        if (handle_test_cast_spell(is, is_dead))
+        else if (handle_test_cast_spell(is, is_dead))
             return;
-        if (handle_restart(is, is_dead))
+        else if (handle_restart(is, is_dead))
             return;
     }
 
@@ -3004,7 +2866,6 @@ public:
             minfo("Toggling debug panel: %s", debugpanelon ? "ON" : "OFF");
             return;
         }
-
         if (current_scene == SCENE_TITLE)
             handle_input_title_scene(is);
         else if (current_scene == SCENE_MAIN_MENU)
