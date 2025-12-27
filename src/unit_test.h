@@ -1,5 +1,8 @@
+#include "ComponentTraits.h"
+#include "entitytype.h"
 #include "gamestate.h"
 #include "mprint.h"
+#include "weapon.h"
 #include <cxxtest/TestSuite.h>
 #include <raylib.h>
 
@@ -183,23 +186,27 @@ public:
 
     void testPlaceDagger() {
         gamestate g;
+
         TS_ASSERT(g.dungeon.floors.size() == 0);
+
         g.init_dungeon(1);
+
         TS_ASSERT(g.dungeon.floors.size() == 1);
+
         const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+
         TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
-        //const entityid id = g.create_weapon_at_with(g.ct, loc, [](CT& ct, const entityid id) {
-        //    ct.set<name>(id, "Dagger");
-        //    ct.set<description>(id, "Stabby stabby.");
-        //    ct.set<weapontype>(id, WEAPON_DAGGER);
-        //    ct.set<damage>(id, (vec3){1, 4, 0});
-        //    ct.set<durability>(id, 100);
-        //    ct.set<max_durability>(id, 100);
-        //    ct.set<rarity>(id, RARITY_COMMON);
-        //});
 
         const entityid id = g.create_weapon_at_with(g.ct, loc, g.dagger_init());
 
         TS_ASSERT(id != ENTITYID_INVALID);
+        TS_ASSERT(g.ct.has<entitytype>(id));
+        TS_ASSERT(g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_ITEM);
+        TS_ASSERT(g.ct.has<itemtype>(id));
+        TS_ASSERT(g.ct.get<itemtype>(id).value_or(ITEM_NONE) == ITEM_WEAPON);
+        TS_ASSERT(g.ct.has<weapontype>(id));
+        TS_ASSERT(g.ct.get<weapontype>(id).value_or(WEAPON_NONE) == WEAPON_DAGGER);
+        TS_ASSERT(g.ct.has<name>(id));
+        TS_ASSERT(g.ct.get<name>(id).value_or("no-name") == "dagger");
     }
 };

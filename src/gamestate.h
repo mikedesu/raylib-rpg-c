@@ -600,7 +600,7 @@ public:
 
     inline with_fun dagger_init() {
         return [](CT& ct, const entityid id) {
-            ct.set<name>(id, "Dagger");
+            ct.set<name>(id, "dagger");
             ct.set<description>(id, "Stabby stabby.");
             ct.set<weapontype>(id, WEAPON_DAGGER);
             ct.set<damage>(id, (vec3){1, 4, 0});
@@ -1067,12 +1067,16 @@ public:
         minfo("gamestate.logic_init");
 
         init_dungeon(1);
+
+        massert(dungeon.floors.size() > 0, "dungeon.floors.size is 0");
+
         place_doors();
         place_props();
 
-        //const entityid dagger_id = create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
-        //create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
-        create_weapon_at_with(ct, df_get_random_loc(dungeon.floors[0]), dagger_init());
+        const vec3 loc = df_get_random_loc(dungeon.floors[0]);
+
+        create_weapon_at_with(ct, loc, dagger_init());
+
         //ct.set<name>(id, "Dagger");
         //ct.set<description>(id, "Stabby stabby.");
         //ct.set<weapontype>(id, WEAPON_DAGGER);
