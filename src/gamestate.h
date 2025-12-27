@@ -405,6 +405,13 @@ public:
 
 
 
+    const inline bool tile_has_player(tile_t& t) {
+        recompute_entity_cache(t);
+        return t.cached_player_present;
+    }
+
+
+
 
     const inline entityid create_door_at_with(const vec3 loc) {
         auto df = d.get_floor(loc.z);
@@ -2021,6 +2028,14 @@ public:
         if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
             return false;
         }
+
+
+
+        minfo("has player");
+        if (tile_has_player(tile_at_cur_floor(aloc))) {
+            return false;
+        }
+
 
         minfo("has door");
         const entityid door_id = tile_has_door(aloc);
