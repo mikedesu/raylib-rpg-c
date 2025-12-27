@@ -616,31 +616,42 @@ public:
             merror("dungeon is_initialized flag not set");
             return ENTITYID_INVALID;
         }
+        if (vec3_invalid(loc)) {
+            merror("loc is invalid");
+            return ENTITYID_INVALID;
+        }
         auto df = d_get_floor(dungeon, loc.z);
         auto tile = df_tile_at(df, loc);
-        //minfo("checking if tile is walkable...");
         if (!tile_is_walkable(tile.type)) {
             merror("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
         }
-        //minfo("checking if tile has live NPCs");
         if (tile_has_live_npcs(tile)) {
             merror("cannot create entity on tile with live NPCs");
             return ENTITYID_INVALID;
         }
-        //minfo("creating weapon...");
         const auto id = create_weapon_with(weaponInitFunction);
         if (id == ENTITYID_INVALID) {
             minfo("failed to create weapon");
             return ENTITYID_INVALID;
         }
-        //minfo("attempting df_add_at: %d, %d ", id, loc.x, loc.y);
         if (df_add_at(df, id, loc.x, loc.y) == ENTITYID_INVALID) {
             minfo("failed to add weapon to df");
             return ENTITYID_INVALID;
         }
         ct.set<location>(id, loc);
         return id;
+    }
+
+
+
+    const inline entityid create_weapon_at_random_loc_with(CT& ct, with_fun weaponInitFunction) {
+        const vec3 loc = df_get_random_loc(dungeon.floors[dungeon.current_floor]);
+        if (vec3_invalid(loc)) {
+            merror("loc is invalid");
+            return ENTITYID_INVALID;
+        }
+        return create_weapon_at_with(ct, loc, dagger_init());
     }
 
 

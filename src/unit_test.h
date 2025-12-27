@@ -363,21 +363,19 @@ public:
         TS_ASSERT(placed_props_0 > 0);
 
         // create dagger
-        const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
-        TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
-        const entityid id = g.create_weapon_at_with(g.ct, loc, g.dagger_init());
+        const entityid id = g.create_weapon_at_random_loc_with(g.ct, g.dagger_init());
         TS_ASSERT(id != ENTITYID_INVALID);
 
         // create shield
         const vec3 loc2 = df_get_random_loc(g.dungeon.floors[0]);
         TS_ASSERT(!vec3_equal(loc2, (vec3){-1, -1, -1}));
-        const entityid id2 = g.create_shield_at_with(loc, g.shield_init());
+        const entityid id2 = g.create_shield_at_with(loc2, g.shield_init());
         TS_ASSERT(id2 != ENTITYID_INVALID);
 
         // create potion
         const vec3 loc3 = df_get_random_loc(g.dungeon.floors[0]);
         TS_ASSERT(!vec3_equal(loc3, (vec3){-1, -1, -1}));
-        const entityid id3 = g.create_potion_at_with(loc, g.potion_init(POTION_HP_SMALL));
+        const entityid id3 = g.create_potion_at_with(loc3, g.potion_init(POTION_HP_SMALL));
         TS_ASSERT(id3 != ENTITYID_INVALID);
 
         // create NPCs (orcs)
@@ -426,30 +424,6 @@ public:
             g.tick(is);
         }
         TS_ASSERT(g.turn_count > 0);
-        //TS_ASSERT(g.turn_count == 5);
-
-        //msuccess("success!");
-        //g.update_player_tiles_explored();
-        //g.update_player_state();
-        //g.update_npcs_state();
-        //g.update_spells_state();
-        //g.handle_input(is);
-        //g.handle_npcs();
-
-        //minfo("g.flag: %d\n", g.flag);
-        //minfo("g.flag: %s\n",
-        //      g.flag == GAMESTATE_FLAG_PLAYER_INPUT  ? "Player input"
-        //      : g.flag == GAMESTATE_FLAG_PLAYER_ANIM ? "Player anim"
-        //      : g.flag == GAMESTATE_FLAG_NPC_TURN    ? "NPC turn"
-        //      : g.flag == GAMESTATE_FLAG_NPC_ANIM    ? "NPC anim"
-        //                                             : "Unknown flag");
-        //minfo("g.turn_count: %d\n", g.turn_count);
-        //minfo("g.test: %d\n", g.test);
-        //TS_ASSERT(g.turn_count > 9000);
-
-        //g.update_debug_panel_buffer(is);
-        //if (g.test) {
-        //    g.handle_test_flag();
-        //}
+        TS_ASSERT(g.turn_count == num_ticks / 2);
     }
 };
