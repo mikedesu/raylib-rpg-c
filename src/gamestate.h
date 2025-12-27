@@ -17,6 +17,7 @@
 #include "libgame_version.h"
 #include "magic_values.h"
 #include "orc_names.h"
+#include "potion.h"
 #include "roll.h"
 #include "scene.h"
 #include "sfx.h"
@@ -581,6 +582,28 @@ public:
     }
 
 
+    inline with_fun shield_init() {
+        return [](CT& ct, const entityid id) {
+            ct.set<name>(id, "kite shield");
+            ct.set<description>(id, "Standard knight's shield");
+            ct.set<shieldtype>(id, SHIELD_KITE);
+            ct.set<block_chance>(id, 90);
+        };
+    }
+
+
+    inline with_fun potion_init(potiontype_t pt) {
+        return [pt](CT& ct, const entityid id) {
+            ct.set<potiontype>(id, pt);
+            if (pt == POTION_HP_SMALL) {
+                ct.set<name>(id, "small healing potion");
+                ct.set<description>(id, "a small healing potion");
+                ct.set<healing>(id, (vec3){1, 6, 0});
+            }
+        };
+    }
+
+
 
 
     const inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_fun weaponInitFunction) {
@@ -638,6 +661,8 @@ public:
 
 
     const inline entityid create_shield_at_with(const vec3 loc, with_fun shieldInitFunction) {
+        if (dungeon.floors.size() == 0)
+            return ENTITYID_INVALID;
         const auto id = create_shield_with(shieldInitFunction);
         //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         auto df = d_get_floor(dungeon, loc.z);
@@ -770,15 +795,12 @@ public:
 
 
 
-    const inline entityid create_npc_with(const race_t rt) {
-        //minfo("begin create npc");
-        //const entityid id = g_add_entity(g);
+    const inline entityid create_npc_with(const race_t rt, with_fun npcInitFunction) {
         const auto id = add_entity();
         set_npc_defaults(id);
         ct.set<race>(id, rt);
         set_npc_starting_stats(id);
-        //npcInitFunction(g, id);
-        //minfo("end create npc");
+        npcInitFunction(ct, id);
         return id;
     }
 
@@ -802,7 +824,7 @@ public:
 
 
 
-    const inline entityid create_npc_at_with(const race_t rt, const vec3 loc) {
+    const inline entityid create_npc_at_with(const race_t rt, const vec3 loc, with_fun npcInitFunction) {
         dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
         tile_t& tile = df_tile_at(df, loc);
         if (!tile_is_walkable(tile.type)) {
@@ -817,7 +839,7 @@ public:
             merror("cannot create entity on tile with box");
             return ENTITYID_INVALID;
         }
-        const entityid id = create_npc_with(rt);
+        const entityid id = create_npc_with(rt, npcInitFunction);
         if (!df_add_at(df, id, loc.x, loc.y)) {
             return ENTITYID_INVALID;
         }
@@ -849,7 +871,7 @@ public:
         //const race_t r = random_monster_type();
         //minfo("create random monster with");
         const race_t r = RACE_ORC;
-        const entityid id = create_npc_with(r);
+        const entityid id = create_npc_with(r, monsterInitFunction);
         //minfo("create weapon");
 
         const entityid wpn_id = create_weapon_with([](CT& ct, const entityid id) {
@@ -885,23 +907,17 @@ public:
 
 
     const inline entityid create_random_monster_at_with(const vec3 loc, with_fun monsterInitFunction) {
-        //minfo("create random monster at with: %d, %d, %d", loc.x, loc.y, loc.z);
-        //minfo("getting floor...");
+        if (vec3_equal(loc, (vec3){-1, -1, -1}))
+            return ENTITYID_INVALID;
         auto df = d_get_floor(dungeon, loc.z);
-        //minfo("getting tile...");
         auto tile = df_tile_at(df, loc);
-        //minfo("getting tile is walkable...");
         if (!tile_is_walkable(tile.type))
             return ENTITYID_INVALID;
-        //minfo("getting tile has live npcs...");
         if (tile_has_live_npcs(tile))
             return ENTITYID_INVALID;
-        //const auto id = create_random_monster_with(g, monsterInitFunction);
-        //minfo("create random monster with...");
-        const auto id = create_random_monster_with([](CT& ct, const entityid id) {});
+        const auto id = create_random_monster_with(monsterInitFunction);
         if (id == ENTITYID_INVALID)
             return ENTITYID_INVALID;
-        //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         if (!df_add_at(df, id, loc.x, loc.y))
             return ENTITYID_INVALID;
         ct.set<location>(id, loc);
@@ -1046,24 +1062,13 @@ public:
         const vec3 loc = df_get_random_loc(dungeon.floors[0]);
 
         create_weapon_at_with(ct, loc, dagger_init());
-
-        create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
-            ct.set<name>(id, "Kite Shield");
-            ct.set<description>(id, "Standard knight's shield");
-            ct.set<shieldtype>(id, SHIELD_KITE);
-            ct.set<block_chance>(id, 90);
-        });
-
-        create_potion_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
-            ct.set<name>(id, "small healing potion");
-            ct.set<description>(id, "a small healing potion");
-            ct.set<potiontype>(id, POTION_HP_SMALL);
-            ct.set<healing>(id, (vec3){1, 6, 0});
-        });
+        //create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
+        create_shield_at_with(df_get_random_loc(dungeon.floors[0]), shield_init());
+        create_potion_at_with(df_get_random_loc(dungeon.floors[0]), potion_init(POTION_HP_SMALL));
 
         //minfo("creating monsters...");
         for (int i = 0; i < (int)dungeon.floors.size(); i++) {
-            for (int j = 1; j <= i + 1; j++) {
+            for (int j = 1; j <= i + 4; j++) {
                 const vec3 random_loc = df_get_random_loc(d_get_floor(dungeon, i));
                 create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
             }
@@ -1143,7 +1148,7 @@ public:
         //minfo("Creating player...");
         race_t rt = chara_creation.race;
         //minfo("Race: %s", race2str(rt).c_str());
-        const auto id = create_npc_at_with(rt, loc); // [n](gamestate& g, entityid id) {
+        const auto id = create_npc_at_with(rt, loc, [](CT& ct, const entityid id) {});
         const int hp_ = 10;
         const int maxhp_ = 10;
         const int vis_dist = 3;

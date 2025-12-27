@@ -1,10 +1,13 @@
 #include "ComponentTraits.h"
+#include "entityid.h"
 #include "entitytype.h"
 #include "gamestate.h"
 #include "mprint.h"
+#include "potion.h"
 #include "weapon.h"
 #include <cxxtest/TestSuite.h>
 #include <raylib.h>
+#include <set>
 
 
 class MyTestSuite : public CxxTest::TestSuite {
@@ -29,11 +32,16 @@ public:
         g.reset();
     }
 
+
+
     void testGamestateThrowaway() {
         for (int i = 0; i < 10; i++) {
             gamestate g;
         }
     }
+
+
+
 
     void testEntityManagement() {
         gamestate g;
@@ -208,5 +216,130 @@ public:
         TS_ASSERT(g.ct.get<weapontype>(id).value_or(WEAPON_NONE) == WEAPON_DAGGER);
         TS_ASSERT(g.ct.has<name>(id));
         TS_ASSERT(g.ct.get<name>(id).value_or("no-name") == "dagger");
+    }
+
+
+    void testInitShield() {
+        gamestate g;
+        g.init_dungeon(1);
+        TS_ASSERT(g.dungeon.floors.size() > 0);
+        const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
+        const entityid id = g.create_shield_at_with(loc, g.shield_init());
+        TS_ASSERT(id != ENTITYID_INVALID);
+
+        TS_ASSERT(g.ct.has<entitytype>(id));
+        TS_ASSERT(g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_ITEM);
+        TS_ASSERT(g.ct.has<itemtype>(id));
+        TS_ASSERT(g.ct.get<itemtype>(id).value_or(ITEM_NONE) == ITEM_SHIELD);
+        TS_ASSERT(g.ct.has<shieldtype>(id));
+        TS_ASSERT(g.ct.get<shieldtype>(id).value_or(SHIELD_NONE) == SHIELD_KITE);
+        TS_ASSERT(g.ct.has<name>(id));
+        TS_ASSERT(g.ct.get<name>(id).value_or("no-name") == "kite shield");
+    }
+
+
+    void testInitPotion() {
+        gamestate g;
+        g.init_dungeon(1);
+        TS_ASSERT(g.dungeon.floors.size() > 0);
+        const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
+        const entityid id = g.create_potion_at_with(loc, g.potion_init(POTION_HP_SMALL));
+        TS_ASSERT(id != ENTITYID_INVALID);
+
+        TS_ASSERT(g.ct.has<entitytype>(id));
+        TS_ASSERT(g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_ITEM);
+        TS_ASSERT(g.ct.has<itemtype>(id));
+        TS_ASSERT(g.ct.get<itemtype>(id).value_or(ITEM_NONE) == ITEM_POTION);
+        TS_ASSERT(g.ct.has<potiontype>(id));
+        TS_ASSERT(g.ct.get<potiontype>(id).value_or(POTION_NONE) == POTION_HP_SMALL);
+        TS_ASSERT(g.ct.has<name>(id));
+        TS_ASSERT(g.ct.get<name>(id).value_or("no-name") == "small healing potion");
+    }
+
+
+
+    void testMonsterInitSingle() {
+        gamestate g;
+        g.init_dungeon(1);
+        TS_ASSERT(g.dungeon.floors.size() > 0);
+        const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+        TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
+
+        const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
+        TS_ASSERT(id != ENTITYID_INVALID);
+
+        TS_ASSERT(g.ct.has<entitytype>(id));
+        TS_ASSERT(g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC);
+        //TS_ASSERT(g.ct.has<itemtype>(id));
+        //TS_ASSERT(g.ct.get<itemtype>(id).value_or(ITEM_NONE) == ITEM_POTION);
+        TS_ASSERT(g.ct.has<race>(id));
+        TS_ASSERT(g.ct.get<race>(id).value_or(RACE_NONE) == RACE_ORC);
+        TS_ASSERT(g.ct.has<name>(id));
+        TS_ASSERT(g.ct.has<inventory>(id));
+        TS_ASSERT(g.ct.get<inventory>(id).value()->size() > 0);
+        TS_ASSERT(g.ct.get<inventory>(id).value()->size() == 2);
+
+        dungeon_floor_t& df = g.dungeon.floors[0];
+        tile_t& t = df_tile_at(df, loc);
+
+        TS_ASSERT(t.entities->size() > 0);
+        const entityid id2 = t.entities->at(0);
+        TS_ASSERT_EQUALS(id, id2);
+    }
+
+
+
+    void testMonsterMulti() {
+        gamestate g;
+        g.init_dungeon(1);
+        constexpr int monster_count = 4;
+        std::set<entityid> monster_set;
+        for (int i = 0; i < monster_count; i++) {
+            TS_ASSERT(g.dungeon.floors.size() > 0);
+            const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+            TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
+            const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
+            TS_ASSERT(id != ENTITYID_INVALID);
+            monster_set.emplace(id);
+        }
+        TS_ASSERT_EQUALS(monster_set.size(), monster_count);
+    }
+
+
+    void testMonsterMax() {
+        gamestate g;
+        g.init_dungeon(1);
+        constexpr int monster_count = 31;
+        std::set<entityid> monster_set;
+        for (int i = 0; i < monster_count; i++) {
+            TS_ASSERT(g.dungeon.floors.size() > 0);
+            const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+            TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
+            const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
+            TS_ASSERT(id != ENTITYID_INVALID);
+            monster_set.emplace(id);
+        }
+        TS_ASSERT_EQUALS(monster_set.size(), monster_count);
+    }
+
+
+    void testMonsterTooMany() {
+        gamestate g;
+        g.init_dungeon(1);
+        TS_ASSERT(g.dungeon.floors.size() > 0);
+        constexpr int monster_count = 32;
+        std::set<entityid> monster_set;
+        for (int i = 0; i < monster_count; i++) {
+            const vec3 loc = df_get_random_loc(g.dungeon.floors[0]);
+            const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
+            if (id == ENTITYID_INVALID) {
+                continue;
+            }
+            TS_ASSERT(id != ENTITYID_INVALID);
+            monster_set.emplace(id);
+        }
+        TS_ASSERT_EQUALS(monster_set.size(), monster_count - 1);
     }
 };
