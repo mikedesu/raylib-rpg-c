@@ -21,7 +21,7 @@ using std::shared_ptr;
 using std::unordered_map;
 using std::vector;
 
-class dungeon_floor_t {
+class dungeon_floor {
 public:
     int floor; // the floor number, starting from 0
     int width;
@@ -402,9 +402,9 @@ public:
 
 
 
-    dungeon_floor_t() {
+    dungeon_floor() {
     }
 
-    ~dungeon_floor_t() {
+    ~dungeon_floor() {
     }
 };

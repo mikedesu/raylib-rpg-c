@@ -19,7 +19,7 @@ using std::vector;
 
 class dungeon {
 public:
-    vector<dungeon_floor_t> floors; // vector of shared pointers to dungeon_floor_t
+    vector<dungeon_floor> floors; // vector of shared pointers to dungeon_floor_t
     int current_floor;
     bool is_locked;
     bool is_initialized;
@@ -49,7 +49,7 @@ public:
 
 
 
-    inline dungeon_floor_t& get_floor(const size_t index) {
+    inline dungeon_floor& get_floor(const size_t index) {
         massert(index >= 0 && index < floors.size(), "index is OOB");
         return floors[index];
     }
@@ -57,7 +57,7 @@ public:
 
 
 
-    inline dungeon_floor_t& get_current_floor() {
+    inline dungeon_floor& get_current_floor() {
         return get_floor(current_floor);
     }
 
@@ -68,7 +68,7 @@ public:
         if (width <= 0 || height <= 0 || is_locked)
             return;
         const int current_floor = floors.size();
-        dungeon_floor_t df;
+        dungeon_floor df;
         df.init(current_floor, type, width, height);
         //minfo("creation rules...");
         auto creation_rules = [&df]() {

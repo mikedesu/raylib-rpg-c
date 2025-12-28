@@ -287,8 +287,8 @@ public:
         TS_ASSERT(g.ct.get<inventory>(id).value()->size() > 0);
         TS_ASSERT(g.ct.get<inventory>(id).value()->size() == 2);
 
-        dungeon_floor_t& df = g.d.floors[0];
-        tile_t& t = df.df_tile_at(loc);
+        auto df = g.d.floors[0];
+        auto t = df.df_tile_at(loc);
 
         TS_ASSERT(t.entities->size() > 0);
         const entityid id2 = t.entities->at(0);
