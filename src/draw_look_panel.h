@@ -9,7 +9,7 @@ static inline void draw_look_panel(gamestate& g) {
 
     auto loc = g.ct.get<location>(g.hero_id).value_or((vec3){-1, -1, -1});
     auto df = g.d.get_floor(loc.z);
-    auto tile = df_tile_at(df, loc);
+    auto tile = df.df_tile_at(loc);
 
     // subtract 1 for the PLAYER
     const int entity_count = tile_entity_count(tile) - 1;

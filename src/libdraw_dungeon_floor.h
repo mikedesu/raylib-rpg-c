@@ -80,7 +80,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
     massert(x < df.width, "x is out of bounds");
     massert(y < df.height, "y is out of bounds");
     //massert(df, "dungeon_floor is NULL");
-    auto tile = df_tile_at(df, (vec3){x, y, z});
+    auto tile = df.df_tile_at((vec3){x, y, z});
     //massert(tile, "tile is NULL");
     if (tile.type == TILE_NONE || !tile.visible || !tile.explored)
         return true;
@@ -117,7 +117,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
     // Check for blocking walls/doors in path
     bool blocking = false;
     for (const auto& v : path) {
-        auto tile = df_tile_at(df, v);
+        auto tile = df.df_tile_at(v);
         //if (tile && (tile_is_wall(tile->type))) {
         if (tiletype_is_wall(tile.type)) {
             blocking = true;
@@ -146,7 +146,7 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
     for (int y = 0; y < df.height; y++) {
         for (int x = 0; x < df.width; x++) {
             const vec3 loc = {x, y, z};
-            const auto tile = df_tile_at(df, loc);
+            const auto tile = df.df_tile_at(loc);
 
             //if (!tile.visible) {
             //    continue;
@@ -201,7 +201,7 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
             bool object_blocking = false;
 
             for (auto v0 : path) {
-                auto v0_tile = df_tile_at(df, v0);
+                auto v0_tile = df.df_tile_at(v0);
                 if (tiletype_is_wall(v0_tile.type)) {
                     object_blocking = true;
                     break;
