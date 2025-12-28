@@ -50,7 +50,7 @@ public:
 
 
     inline dungeon_floor& get_floor(const size_t index) {
-        massert(index >= 0 && index < floors.size(), "index is OOB");
+        massert(index >= 0 && index < floors.size(), "index is OOB: index is %ld", index);
         return floors[index];
     }
 

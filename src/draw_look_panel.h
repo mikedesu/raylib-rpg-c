@@ -12,7 +12,7 @@ static inline void draw_look_panel(gamestate& g) {
     auto tile = df.df_tile_at(loc);
 
     // subtract 1 for the PLAYER
-    const int entity_count = tile_entity_count(tile) - 1;
+    const int entity_count = tile.tile_entity_count() - 1;
 
     const char* texts[] = {"Look Panel", "There is some tile here", TextFormat("There are %d things here", entity_count)};
     const int texts_size = 3;

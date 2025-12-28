@@ -21,7 +21,8 @@ using std::shared_ptr;
 using std::vector;
 
 
-typedef struct {
+class tile_t {
+public:
     tile_id id;
     tiletype_t type;
     bool visible;
@@ -36,71 +37,77 @@ typedef struct {
     entityid cached_item;
     bool can_have_door;
     shared_ptr<vector<entityid>> entities;
-} tile_t;
 
-
-static inline size_t tile_entity_count(tile_t& t) {
-    return t.entities->size();
-}
-
-
-constexpr static inline entityid tile_get_entity(tile_t& t, size_t i) {
-    return i >= 0 && i < t.entities->size() ? t.entities->at(i) : ENTITYID_INVALID;
-}
-
-
-constexpr static inline bool tile_is_wall(tile_t& t) {
-    return tiletype_is_wall(t.type);
-}
-
-
-static inline void tile_init(tile_t& t, tiletype_t type) {
-    t.type = type;
-    t.visible = t.explored = t.cached_player_present = t.can_have_door = false;
-    t.dirty_entities = t.dirty_visibility = t.is_empty = true;
-    t.cached_live_npcs = 0;
-    t.cached_item_count = 0;
-    t.cached_npc = ENTITYID_INVALID;
-    t.cached_item = ENTITYID_INVALID;
-    t.entities = make_shared<vector<entityid>>();
-}
-
-
-const static inline entityid tile_add(tile_t& t, const entityid id) {
-    // Check if the entity already exists
-    //minfo("tile_add: %d", id);
-    if (find(t.entities->begin(), t.entities->end(), id) != t.entities->end()) {
-        merror("tile_add: entity already exists on tile");
-        return ENTITYID_INVALID;
+    inline size_t tile_entity_count() {
+        return entities->size();
     }
-    t.entities->push_back(id);
-    t.dirty_entities = true;
-    t.is_empty = false;
-    return id;
-}
 
 
-static inline entityid tile_remove(tile_t& tile, entityid id) {
-    massert(tile.entities, "tile or tile entities is NULL");
-    massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
-    auto it = find(tile.entities->begin(), tile.entities->end(), id);
-    if (it == tile.entities->end()) {
-        merror("tile_remove: entity not found on tile");
-        return ENTITYID_INVALID;
+    constexpr inline entityid tile_get_entity(size_t i) {
+        return i >= 0 && i < entities->size() ? entities->at(i) : ENTITYID_INVALID;
     }
-    tile.entities->erase(it);
-    tile.dirty_entities = true;
-    tile.is_empty = tile.entities->size() == 0;
-    return id;
-}
+
+    constexpr inline bool tile_is_wall() {
+        return tiletype_is_wall(type);
+    }
 
 
-static inline void tile_create(tile_t& t, tiletype_t type) {
-    massert(type >= TILE_NONE && type < TILE_COUNT, "tile_create: type is out-of-bounds");
-    tile_init(t, type);
-}
+    inline void tile_init(tiletype_t type) {
+        type = type;
+        visible = false;
+        explored = false;
+        cached_player_present = false;
+        can_have_door = false;
+        dirty_entities = true;
+        dirty_visibility = true;
+        is_empty = true;
+        cached_live_npcs = 0;
+        cached_item_count = 0;
+        cached_npc = ENTITYID_INVALID;
+        cached_item = ENTITYID_INVALID;
+        entities = make_shared<vector<entityid>>();
+    }
 
 
-static inline void tile_free(tile_t& t) {
-    t.entities->clear();
-}
+    inline entityid tile_add(const entityid id) {
+        // Check if the entity already exists
+        //minfo("tile_add: %d", id);
+        if (find(entities->begin(), entities->end(), id) != entities->end()) {
+            merror("tile_add: entity already exists on tile");
+            return ENTITYID_INVALID;
+        }
+        entities->push_back(id);
+        dirty_entities = true;
+        is_empty = false;
+        return id;
+    }
+
+
+    inline entityid tile_remove(const entityid id) {
+        massert(entities, "tile or tile entities is NULL");
+        massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
+        auto it = find(entities->begin(), entities->end(), id);
+        if (it == entities->end()) {
+            merror("tile_remove: entity not found on tile");
+            return ENTITYID_INVALID;
+        }
+        entities->erase(it);
+        dirty_entities = true;
+        is_empty = entities->size() == 0;
+        return id;
+    }
+
+
+
+
+    inline void tile_create(tiletype_t type) {
+        massert(type >= TILE_NONE && type < TILE_COUNT, "tile_create: type is out-of-bounds");
+        tile_init(type);
+    }
+
+
+
+    inline void tile_free() {
+        entities->clear();
+    }
+};

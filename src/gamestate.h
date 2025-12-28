@@ -508,7 +508,7 @@ public:
                         continue;
                     if (tile.can_have_door)
                         continue;
-                    if (tile_is_wall(tile)) {
+                    if (tile.tile_is_wall()) {
                         const int flip = GetRandomValue(0, 20);
                         if (flip == 0) {
                             const int r = GetRandomValue(1, 3);
@@ -641,7 +641,7 @@ public:
 
 
     const inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_fun weaponInitFunction) {
-        //minfo("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
+        minfo("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
         if (d.floors.size() == 0) {
             merror("dungeon floors size is 0");
             return ENTITYID_INVALID;
@@ -861,7 +861,7 @@ public:
         auto df = d.get_floor(z);
         auto t = df.df_tile_at((vec3){x, y, z});
         for (int i = 0; (size_t)i < t.entities->size(); i++) {
-            const entityid id = tile_get_entity(t, i);
+            const entityid id = t.tile_get_entity(i);
             const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (id != ENTITYID_INVALID && type == ENTITY_BOX)
                 return id;
@@ -874,10 +874,11 @@ public:
 
     const inline entityid create_npc_at_with(const race_t rt, const vec3 loc, with_fun npcInitFunction) {
         //dungeon_floor_t& df = d_get_floor(dungeon, loc.z);
+        minfo("create npc at with: (%d, %d, %d)", loc.x, loc.y, loc.z);
         auto df = d.get_floor(loc.z);
         tile_t& tile = df.df_tile_at(loc);
         if (!tile_is_walkable(tile.type)) {
-            merror("cannot create entity on non-walkable tile");
+            merror("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile.type).c_str());
             return ENTITYID_INVALID;
         }
         if (tile_has_live_npcs(tile)) {
@@ -1135,17 +1136,17 @@ public:
 
         create_weapon_at_with(ct, loc, dagger_init());
         //create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
-        create_shield_at_with(d.floors[0].df_get_random_loc(), shield_init());
-        create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
+        //create_shield_at_with(d.floors[0].df_get_random_loc(), shield_init());
+        //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
 
         //minfo("creating monsters...");
-        constexpr int monster_count = 5;
-        for (int i = 0; i < (int)d.floors.size(); i++) {
-            for (int j = 0; j < monster_count; j++) {
-                const vec3 random_loc = d.get_floor(i).df_get_random_loc();
-                create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
-            }
-        }
+        //constexpr int monster_count = 5;
+        //for (int i = 0; i < (int)d.floors.size(); i++) {
+        //    for (int j = 0; j < monster_count; j++) {
+        //        const vec3 random_loc = d.get_floor(i).df_get_random_loc();
+        //        create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
+        //    }
+        //}
 
         msuccess("end creating monsters...");
         add_message("Welcome to the game! Press enter to cycle messages.");
@@ -1220,6 +1221,8 @@ public:
         massert(n != "", "name is empty string");
         const race_t rt = chara_creation.race;
         const auto id = create_npc_at_with(rt, loc, [](CT& ct, const entityid id) {});
+        massert(id != ENTITYID_INVALID, "id is invalid");
+
         const int hp_ = 10;
         const int maxhp_ = 10;
         const int vis_dist = 3;
@@ -1347,6 +1350,7 @@ public:
                 maxhp_roll = do_roll_best_of_3((vec3){1, myhd, 0}) + get_stat_bonus(chara_creation.constitution);
             //const vec3 start_loc = g.dungeon.floors->at(g.dungeon.current_floor)->upstairs_loc;
             const vec3 start_loc = d.floors[d.current_floor].upstairs_loc;
+            massert(!vec3_invalid(start_loc), "start_loc is (-1,-1,-1)");
 
             entity_turn = create_player_with(start_loc, "darkmage", [this, maxhp_roll](CT& ct, const entityid id) {
                 // set stats from char_creation
@@ -1908,7 +1912,7 @@ public:
         auto df = d.get_floor(z);
         auto t = df.df_tile_at((vec3){x, y, z});
         for (int i = 0; (size_t)i < t.entities->size(); i++) {
-            const entityid id = tile_get_entity(t, i);
+            const entityid id = t.tile_get_entity(i);
             const bool is_solid = ct.get<solid>(id).value_or(false);
             if (id != ENTITYID_INVALID && is_solid)
                 return true;
@@ -1939,7 +1943,7 @@ public:
         auto df = d.get_floor(z);
         auto t = df.df_tile_at((vec3){x, y, z});
         for (int i = 0; (size_t)i < t.entities->size(); i++) {
-            const entityid id = tile_get_entity(t, i);
+            const entityid id = t.tile_get_entity(i);
             const bool is_pushable = ct.get<pushable>(id).value_or(false);
             if (id != ENTITYID_INVALID && is_pushable)
                 return id;
@@ -2573,7 +2577,7 @@ public:
         // lets try using our new cached_item via tile_get_item
         const entityid item_id = tile_get_item(tile);
         if (item_id != ENTITYID_INVALID && add_to_inventory(id, item_id)) {
-            tile_remove(tile, item_id);
+            tile.tile_remove(item_id);
             PlaySound(sfx[SFX_CONFIRM_01]);
             item_picked_up = true;
             auto item_name = ct.get<name>(item_id).value_or("no-name-item");

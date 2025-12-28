@@ -66,14 +66,14 @@ public:
             auto t5 = df_tile_at((vec3){loc.x + 1, loc.y - 1, loc.z});
             auto t6 = df_tile_at((vec3){loc.x + 1, loc.y, loc.z});
             auto t7 = df_tile_at((vec3){loc.x + 1, loc.y + 1, loc.z});
-            auto tw0 = tile_is_wall(t0);
-            auto tw1 = tile_is_wall(t1);
-            auto tw2 = tile_is_wall(t2);
-            auto tw3 = tile_is_wall(t3);
-            auto tw4 = tile_is_wall(t4);
-            auto tw5 = tile_is_wall(t5);
-            auto tw6 = tile_is_wall(t6);
-            auto tw7 = tile_is_wall(t7);
+            auto tw0 = t0.tile_is_wall();
+            auto tw1 = t1.tile_is_wall();
+            auto tw2 = t2.tile_is_wall();
+            auto tw3 = t3.tile_is_wall();
+            auto tw4 = t4.tile_is_wall();
+            auto tw5 = t5.tile_is_wall();
+            auto tw6 = t6.tile_is_wall();
+            auto tw7 = t7.tile_is_wall();
             if (tw3 && tw4 && !(tw0 || tw1 || tw2 || tw5 || tw6 || tw7))
                 return true;
             if (tw1 && tw6 && !(tw0 || tw2 || tw3 || tw4 || tw5 || tw7))
@@ -87,7 +87,7 @@ public:
 
     inline void df_set_tile(tiletype_t type, int x, int y) {
         tile_t& current = df_tile_at((vec3){x, y, -1});
-        tile_init(current, type);
+        current.tile_init(type);
     }
 
 
@@ -128,7 +128,7 @@ public:
     inline void init(const int f, const biome_t t, const int w, const int h) {
         massert(w > 0, "width must be greater than zero");
         massert(h > 0, "height must be greater than zero");
-        massert(floor >= 0, "floor must be greater than or equal to zero");
+        massert(f >= 0, "floor must be greater than or equal to zero");
 
         // creating a new dungeon floor
         // init floor vars
@@ -148,7 +148,7 @@ public:
             tile_t tile;
             //massert(tile, "failed to create tile");
             tile.id = i;
-            tile_init(tile, TILE_NONE);
+            tile.tile_init(TILE_NONE);
             tile_map->insert({i, tile});
         }
 
@@ -322,7 +322,7 @@ public:
         minfo("getting tile...");
         tile_t& tile = df_tile_at((vec3){x, y, -1});
         minfo("adding to tile...");
-        const entityid result = tile_add(tile, id);
+        const entityid result = tile.tile_add(id);
         minfo("tile_add returned %d", result);
         return result;
     }
@@ -335,7 +335,7 @@ public:
         massert(x >= 0 && x < width, "x is out of bounds");
         massert(y >= 0 && y < height, "y is out of bounds");
         tile_t& tile = df_tile_at((vec3){x, y, -1});
-        const entityid r = tile_remove(tile, id);
+        const entityid r = tile.tile_remove(id);
         if (r == ENTITYID_INVALID) {
             merror("df_remove_at: Failed to remove entity %d at (%d, %d)", id, x, y);
             return false;

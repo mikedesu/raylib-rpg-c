@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <string>
 
 typedef enum
 {
@@ -160,6 +161,27 @@ typedef enum
     TILE_UNKNOWN,
     TILE_COUNT
 } tiletype_t;
+
+
+
+static inline std::string tiletype2str(const tiletype_t type) {
+    if (type == TILE_NONE)
+        return "TileNone";
+
+    else if (type == TILE_UNKNOWN)
+        return "TileUnknown";
+    else if (type == TILE_UPSTAIRS)
+        return "TileUpstairs";
+    else if (type == TILE_DOWNSTAIRS)
+        return "TileDownstairs";
+    else if (type >= TILE_FLOOR_STONE_00 && type <= TILE_FLOOR_STONE_11)
+        return "TileStone";
+
+
+    return "TileError";
+}
+
+
 
 constexpr static inline bool tile_is_none(const tiletype_t type) {
     return type == TILE_NONE;
