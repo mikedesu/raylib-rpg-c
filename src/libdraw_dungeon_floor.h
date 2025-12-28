@@ -69,7 +69,9 @@ static inline vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
 }
 
 
-static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, int x, int y, int z) {
+
+
+const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, const int x, const int y, const int z) {
     //massert(g, "gamestate is NULL");
     massert(txinfo, "txinfo is null");
     massert(x >= 0, "x is less than 0");
@@ -230,6 +232,13 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 
             for_each(tile.entities->cbegin(), tile.entities->cend(), [&g, entitytype_0, object_blocking, &additional_check](const entityid& id) {
                 auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+                //auto sm = g.ct.get<spritemove>(id).value_or((Rectangle){0, 0, 0, 0});
+
+                //spritegroup_t* sg = spritegroups[id];
+                //if (sg->move.x != 0 || sg->move.y != 0) {
+                //    draw_sprite_and_shadow(g, id);
+                //}
+
                 if (!object_blocking && entitytype_0 == type && additional_check(g, id)) {
                     draw_sprite_and_shadow(g, id);
                 }
@@ -244,7 +253,7 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 }
 
 
-static inline bool libdraw_draw_dungeon_floor(gamestate& g) {
+const static inline bool libdraw_draw_dungeon_floor(gamestate& g) {
     //auto df = d_get_current_floor(g.dungeon);
     auto df = g.d.get_current_floor();
     const int z = g.d.current_floor;
