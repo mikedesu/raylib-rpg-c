@@ -26,6 +26,15 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
+- [ ] **FEATURE** volume control menu
+  - [ ] press V key, pop-up volume control menu
+    - [ ] select master
+    - [ ] select music 
+    - [ ] select sfx
+- [ ] **FEATURE** text display that sits on top of each NPC
+  - [ ] start with static text that simply gets rendered after NPC draw
+- [ ] **FEATURE** pop-up text display that sits on top of each NPC and rises up and fades away
+
 - [ ] **CRASH** **BUG** unknown crash occuring, was moving onto a tile with an npc i just killed
 - [ ] **CRASH** **BUG** unknown crash occuring, was entering "room 3" with a table, statue, table in vertical pattern
 - [ ] **CRASH** **BUG** unknown crash occuring, potentially on NPC death
