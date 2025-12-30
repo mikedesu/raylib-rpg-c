@@ -81,6 +81,7 @@ public:
     bool player_changing_dir;
     bool test_guard;
     bool display_inventory_menu;
+    bool display_action_menu;
     bool display_quit_menu;
     bool do_quit;
     bool dirty_entities;
@@ -112,6 +113,8 @@ public:
     int msg_history_max_len_msg_measure;
     int current_music_index;
     int restart_count;
+
+    size_t action_selection;
 
     float line_spacing;
     float music_volume;
@@ -213,6 +216,7 @@ public:
         player_input_received = false;
         is_locked = false;
         gridon = false;
+        display_action_menu = false;
         display_inventory_menu = false;
         display_quit_menu = false;
         display_help_menu = false;
@@ -255,6 +259,7 @@ public:
         debugpanel.pad_right = 0;
         debugpanel.pad_bottom = 0;
         msg_history_max_len_msg = 0;
+        action_selection = 0;
         max_title_screen_selections = 2;
         // initialize character creation
         chara_creation.name = "hero";
@@ -2800,7 +2805,10 @@ public:
             return;
         }
 
-
+        if (inputstate_is_pressed(is, KEY_SPACE)) {
+            display_action_menu = true;
+            return;
+        }
         if (handle_quit_pressed(is))
             return;
         if (handle_cycle_messages(is))
@@ -2851,6 +2859,12 @@ public:
 
 
 
+    inline void handle_input_action_menu(const inputstate& is) {
+    }
+
+
+
+
     inline void handle_input_gameplay_scene(const inputstate& is) {
         if (inputstate_is_pressed(is, KEY_B)) {
             if (controlmode == CONTROLMODE_PLAYER) {
@@ -2870,6 +2884,10 @@ public:
         }
         if (controlmode == CONTROLMODE_INVENTORY) {
             handle_input_inventory(is);
+            return;
+        }
+        if (controlmode == CONTROLMODE_ACTION_MENU) {
+            handle_input_action_menu(is);
             return;
         }
     }

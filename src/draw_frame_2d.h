@@ -1,6 +1,7 @@
 #pragma once
 
 #include "camera_lock_on.h"
+#include "draw_action_menu.h"
 #include "draw_handle_debug_panel.h"
 #include "draw_help_menu.h"
 #include "draw_hud.h"
@@ -44,6 +45,11 @@ static inline void libdraw_drawframe_2d(gamestate& g) {
         //minfo("draw inventory menu");
         draw_inventory_menu(g);
     }
+
+    if (g.display_action_menu) {
+        draw_action_menu(g);
+    }
+
     //else if (g.display_gameplay_settings_menu) {
     //    draw_gameplay_settings_menu(g);
     //}
