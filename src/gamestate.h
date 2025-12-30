@@ -1205,6 +1205,7 @@ public:
         ct.set<light_radius>(id, light_rad);
         ct.set<hearing_distance>(id, hear_dist);
         ct.set<name>(id, n);
+        ct.set<dead>(id, false); // Hero should never start dead
         playerInitFunction(ct, id);
         return id;
     }
