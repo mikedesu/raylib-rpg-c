@@ -33,7 +33,7 @@ public:
     shared_ptr<unordered_map<tile_id, tile_t>> tile_map; // Maps tile_id to tile_t pointer
 
 
-    inline tile_t& df_tile_at(vec3 loc) {
+    inline tile_t& df_tile_at(const vec3 loc) {
         // given that tiles is a 2D vector of shared pointers to tile_t
         // we can access the tile using the x and y coordinates
         // and calculate the index
@@ -46,7 +46,7 @@ public:
     }
 
 
-    inline void df_set_can_have_door(vec3 loc) {
+    inline void df_set_can_have_door(const vec3 loc) {
         //minfo("set can have door: %d, %d, %d", loc.x, loc.y, loc.z);
         tile_t& tile = df_tile_at(loc);
         tile.can_have_door = true;
@@ -55,7 +55,7 @@ public:
 
 
 
-    inline bool df_is_good_door_loc(vec3 loc) {
+    inline bool df_is_good_door_loc(const vec3 loc) {
         auto tile = df_tile_at(loc);
         if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1) {
             auto t0 = df_tile_at((vec3){loc.x - 1, loc.y - 1, loc.z});
@@ -85,17 +85,17 @@ public:
 
 
 
-    inline void df_set_tile(tiletype_t type, int x, int y) {
+    inline void df_set_tile(const tiletype_t type, const int x, const int y) {
         tile_t& current = df_tile_at((vec3){x, y, -1});
         current.tile_init(type);
     }
 
 
-    inline tiletype_t random_tiletype(tiletype_t a, tiletype_t b) {
+    inline tiletype_t random_tiletype(const tiletype_t a, const tiletype_t b) {
         return (tiletype_t)GetRandomValue(a, b);
     }
 
-    inline void df_set_area(tiletype_t a, tiletype_t b, Rectangle r) {
+    inline void df_set_area(const tiletype_t a, const tiletype_t b, const Rectangle r) {
         //minfo("df set area");
         for (int x = r.x; x < r.x + r.width && x < width; x++) {
             for (int y = r.y; y < r.y + r.height && y < height; y++) {
@@ -108,7 +108,7 @@ public:
 
 
 
-    inline void df_set_perimeter(tiletype_t a, tiletype_t b, Rectangle r) {
+    inline void df_set_perimeter(const tiletype_t a, const tiletype_t b, const Rectangle r) {
         for (int x = r.x; x < r.x + r.width; x++) {
             const tiletype_t t = random_tiletype(a, b);
             df_set_tile(t, x, r.y);
@@ -198,7 +198,7 @@ public:
 
 
 
-    inline int df_get_possible_downstairs_count_in_area(Rectangle r) {
+    inline int df_get_possible_downstairs_count_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
         massert(r.y >= 0, "y is less than zero");
@@ -221,7 +221,7 @@ public:
 
 
 
-    inline int df_get_possible_upstairs_count_in_area(Rectangle r) {
+    inline int df_get_possible_upstairs_count_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
         massert(r.y >= 0, "y is less than zero");
@@ -244,7 +244,7 @@ public:
 
 
 
-    inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(Rectangle r) {
+    inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(const Rectangle r) {
         auto locations = make_shared<vector<vec3>>();
         massert(locations, "failed to make_shared locations");
         // now we can loop thru the dungeon floor again and fill the array with the locations
@@ -260,7 +260,7 @@ public:
     }
 
 
-    inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(Rectangle r) {
+    inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
         massert(r.y >= 0, "y is less than zero");
@@ -330,7 +330,7 @@ public:
 
 
 
-    inline bool df_remove_at(entityid id, int x, int y) {
+    inline bool df_remove_at(const entityid id, const int x, const int y) {
         massert(id != ENTITYID_INVALID, "id is -1");
         massert(x >= 0 && x < width, "x is out of bounds");
         massert(y >= 0 && y < height, "y is out of bounds");
@@ -348,7 +348,7 @@ public:
     }
 
 
-    inline void df_set_all_tiles(tiletype_t type) {
+    inline void df_set_all_tiles(const tiletype_t type) {
         //minfo("df_set_all_tiles: Setting all tiles to type %d", type);
         df_set_area(type, type, (Rectangle){0, 0, (float)width, (float)height});
     }
@@ -363,21 +363,27 @@ public:
                 auto tile = df_tile_at(loc);
                 const bool type_invalid = tile.type == TILE_NONE || tile.type == TILE_STONE_WALL_00 || tile.type == TILE_STONE_WALL_01 ||
                                           tile.type == TILE_UPSTAIRS || tile.type == TILE_DOWNSTAIRS;
-                if (type_invalid)
+                if (type_invalid) {
+                    merror("loc at (%d, %d, %d) type invalid. type is: %d", x, y, floor, tile.type);
                     continue;
-                if (tile.entities->size() > 0)
+                }
+                if (tile.entities->size() > 0) {
+                    merror("loc at (%d, %d, %d) type invalid. tile has %ld entities", x, y, floor, tile.entities->size());
                     continue;
+                }
                 tmp.push_back(loc);
             }
         }
-        if (tmp.size() == 0)
+        if (tmp.size() == 0) {
+            merror("no locations are suitable. returning (-1, -1, -1)");
             return (vec3){-1, -1, -1};
+        }
         return tmp[GetRandomValue(0, tmp.size() - 1)];
     }
 
 
 
-    const inline vec3 df_get_random_loc_of_type(tiletype_t type) {
+    const inline vec3 df_get_random_loc_of_type(const tiletype_t type) {
         vector<vec3> tmp;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {

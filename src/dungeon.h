@@ -65,11 +65,12 @@ public:
 
 
     inline void add_floor(const biome_t type, const int width, const int height) {
-        if (width <= 0 || height <= 0 || is_locked)
-            return;
-        const int current_floor = floors.size();
+        massert(width > 0, "width is 0");
+        massert(height > 0, "height is 0");
+        massert(!is_locked, "dungeon is locked");
+
         dungeon_floor df;
-        df.init(current_floor, type, width, height);
+        df.init(floors.size(), type, width, height);
         //minfo("creation rules...");
         auto creation_rules = [&df]() {
             const float x = df.width / 4.0;

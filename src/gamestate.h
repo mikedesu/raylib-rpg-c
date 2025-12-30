@@ -317,23 +317,19 @@ public:
 
     inline void init_dungeon(const biome_t type, const int df_count, const int w, const int h) {
         massert(df_count > 0, "df_count is <= 0");
-
-        //d_create(dungeon);
-        if (d.is_initialized) {
-            return;
-        }
-
         massert(w > 0, "w == 0");
         massert(h > 0, "h == 0");
         massert(df_count > 0, "df_count == 0");
         massert(type > BIOME_NONE, "biome is invalid");
         massert(type < BIOME_COUNT, "biome is invalid 2");
 
+        if (d.is_initialized)
+            return;
+
         // max size of 128x128 for now to maintain 60fps
         // dungeon floors, tiles etc will require re-write/re-design for optimization
-        for (int i = 0; i < df_count; i++) {
+        for (int i = 0; i < df_count; i++)
             d.add_floor(type, w, h);
-        }
         d.is_initialized = true;
     }
 
@@ -435,6 +431,7 @@ public:
 
 
     const inline size_t place_doors() {
+        minfo("gamestate.place_doors");
         size_t placed_doors = 0;
         for (int z = 0; z < (int)d.floors.size(); z++) {
             auto df = d.get_floor(z);
@@ -1121,32 +1118,32 @@ public:
 
 
     inline void logic_init() {
+        minfo("gamestate.logic_init");
         srand(time(NULL));
         SetRandomSeed(time(NULL));
-        //minfo("gamestate.logic_init");
 
-        init_dungeon(BIOME_STONE, 1, 32, 32);
+        init_dungeon(BIOME_STONE, 4, 32, 32);
 
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
 
         place_doors();
         place_props();
 
-        const vec3 loc = d.floors[0].df_get_random_loc();
+        const vec3 loc0 = d.floors[0].df_get_random_loc();
+        //const vec3 loc1 = d.floors[0].df_get_random_loc();
 
-        create_weapon_at_with(ct, loc, dagger_init());
-        //create_shield_at_with(df_get_random_loc(dungeon.floors[0]), [](CT& ct, const entityid id) {
-        //create_shield_at_with(d.floors[0].df_get_random_loc(), shield_init());
-        //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
+        create_weapon_at_with(ct, loc0, dagger_init());
+        create_shield_at_with(d.floors[0].df_get_random_loc(), shield_init());
+        create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
 
-        //minfo("creating monsters...");
-        //constexpr int monster_count = 5;
-        //for (int i = 0; i < (int)d.floors.size(); i++) {
-        //    for (int j = 0; j < monster_count; j++) {
-        //        const vec3 random_loc = d.get_floor(i).df_get_random_loc();
-        //        create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
-        //    }
-        //}
+        minfo("creating monsters...");
+        for (int i = 0; i < (int)d.floors.size(); i++) {
+            const int monster_count = i + 1;
+            for (int j = 0; j < monster_count; j++) {
+                const vec3 random_loc = d.get_floor(i).df_get_random_loc();
+                create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
+            }
+        }
 
         msuccess("end creating monsters...");
         add_message("Welcome to the game! Press enter to cycle messages.");

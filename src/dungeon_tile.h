@@ -52,8 +52,8 @@ public:
     }
 
 
-    inline void tile_init(tiletype_t type) {
-        type = type;
+    inline void tile_init(const tiletype_t t) {
+        type = t;
         visible = false;
         explored = false;
         cached_player_present = false;
