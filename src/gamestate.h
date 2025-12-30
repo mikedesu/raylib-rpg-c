@@ -2807,6 +2807,7 @@ public:
 
         if (inputstate_is_pressed(is, KEY_SPACE)) {
             display_action_menu = true;
+            controlmode = CONTROLMODE_ACTION_MENU;
             return;
         }
         if (handle_quit_pressed(is))
@@ -2860,6 +2861,19 @@ public:
 
 
     inline void handle_input_action_menu(const inputstate& is) {
+        massert(controlmode == CONTROLMODE_ACTION_MENU, "controlmode isnt in action menu: %d", controlmode);
+
+        if (inputstate_is_pressed(is, KEY_SPACE)) {
+            display_action_menu = false;
+            controlmode = CONTROLMODE_PLAYER;
+            return;
+        } else if (inputstate_is_pressed(is, KEY_DOWN)) {
+            action_selection++;
+            // eventually need a check for how many actions defined / show-up on menu
+            // this may be dynamic and require monitoring/management
+        } else if (inputstate_is_pressed(is, KEY_UP)) {
+            action_selection--;
+        }
     }
 
 
