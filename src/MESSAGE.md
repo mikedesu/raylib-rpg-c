@@ -23,6 +23,13 @@ I have already done the following:
 - [x] **FIXED** some NPC races' unarmed attack animations are incorrect
 - [x] **FIXED** The bat's walk animation shouldn't be the attack animation
 - [x] **FIXED** on game restart after dying, we need to clear the message history, as well as reset the gamestate in general
+- [x] **CORE** to prepare for unit testing and automation, we need to re-factor gamestate into a proper object
+  - [x] initial gamestate class created
+  - [x] code from `liblogic` will be used to manage initializing the dungeon, etc
+  - [x] we will be able to set a flag indicating the gamestate is in a unit-test environment (so we can skip rendering and simply simulate the dungeon)
+- [x] **CODE QUALITY** The way we handle race2str and str2race can be updated
+  - [x] we should be using a `map` instead of hard-coding strings into vectors
+
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
@@ -35,22 +42,16 @@ Previous analysis suggestions you've brought up that I will eventually implement
   - [ ] start with static text that simply gets rendered after NPC draw
 - [ ] **FEATURE** pop-up text display that sits on top of each NPC and rises up and fades away
 
+- [ ] **BUG** i just saw an NPC orc push a box under the player
+- [ ] **ALGORITHM BUG** it is possible that `solid` props are placed in a way that blocks access into another area. one of two possible fixes:
 - [ ] **CRASH** **BUG** unknown crash occuring, was moving onto a tile with an npc i just killed
 - [ ] **CRASH** **BUG** unknown crash occuring, was entering "room 3" with a table, statue, table in vertical pattern
 - [ ] **CRASH** **BUG** unknown crash occuring, potentially on NPC death
   - [ ] witnessed crash occuring on `drop inventory` after killing a skeleton
-- [ ] **BUG** i just saw an NPC orc push a box under the player
-- [ ] **BUG** it is possible that `solid` props are placed in a way that blocks access into another area. one of two possible fixes:
   - [ ] 1. more intelligent prop placement (currently totally random)
   - [ ] 2. some props have `burnable` and can be cleared from the `df`
 - [ ] **QA** there is a small jitter when moving diagonally likely due to `cam_lockon`
 - [ ] **QA** NPCs moving into tiles too far away to see kind of "disappear" instead of moving into the tile
-- [x] **CORE** to prepare for unit testing and automation, we need to re-factor gamestate into a proper object
-  - [x] initial gamestate class created
-  - [ ] code from `liblogic` will be used to manage initializing the dungeon, etc
-  - [ ] we will be able to set a flag indicating the gamestate is in a unit-test environment (so we can skip rendering and simply simulate the dungeon)
-- [ ] **CODE QUALITY** The way we handle race2str and str2race can be updated
-  - [ ] we should be using a `map` instead of hard-coding strings into vectors
 - [ ] **CODE QUALITY** break `process_attack_entity` and `process_attack_results` up into further functions
 - [ ] **UPGRADE** need to introduce `burnable` component such that
   - [ ] if a `fire` effect hits a tile w/ a `burnable` entity, that entity is destroyed

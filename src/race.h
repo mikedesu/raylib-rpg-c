@@ -3,8 +3,10 @@
 #include "massert.h"
 #include <string.h>
 #include <string>
+#include <unordered_map>
 
 using std::string;
+using std::unordered_map;
 
 typedef enum
 {
@@ -25,24 +27,38 @@ typedef enum
     RACE_COUNT
 } race_t;
 
-static inline string race2str(race_t race) {
-    string race_strings[RACE_COUNT] = {
-        "none", "halfling", "goblin", "human", "elf", "dwarf", "orc", "green_slime", "bat", "wolf", "warg", "zombie", "skeleton", "rat"};
-    massert(race >= RACE_NONE && race < RACE_COUNT, "Invalid race name");
-    return race_strings[race];
+
+
+
+const unordered_map<race_t, string> rn = {{RACE_NONE, "race_none"},
+                                          {RACE_COUNT, "race_count"},
+                                          {RACE_HUMAN, "human"},
+                                          {RACE_HALFLING, "halfling"},
+                                          {RACE_GOBLIN, "goblin"},
+                                          {RACE_ELF, "elf"},
+                                          {RACE_DWARF, "dwarf"},
+                                          {RACE_ORC, "orc"},
+                                          {RACE_GREEN_SLIME, "green slime"},
+                                          {RACE_BAT, "bat"},
+                                          {RACE_WOLF, "wolf"},
+                                          {RACE_WARG, "warg"},
+                                          {RACE_ZOMBIE, "zombie"},
+                                          {RACE_SKELETON, "skeleton"},
+                                          {RACE_RAT, "rat"}};
+
+
+
+
+const static inline string race2str(const race_t r) {
+    massert(r >= RACE_NONE && r < RACE_COUNT, "Invalid race name");
+    massert(rn.find(r) != rn.end(), "race doesn't exist in map!: %d", r);
+    return rn.at(r);
 }
 
-// for lowercase names found in monsters.csv
-static inline race_t str2race(string str) {
-    //string names[11] = {"none", "halfling", "goblin", "human", "elf", "dwarf", "orc", "green_slime", "bat", "wolf", "warg"};
-    string names[RACE_COUNT] = {
-        "none", "halfling", "goblin", "human", "elf", "dwarf", "orc", "green_slime", "bat", "wolf", "warg", "zombie", "skeleton", "rat"};
-    const int num_races = sizeof(names) / sizeof(names[0]);
-    for (int i = 0; i < num_races; i++) {
-        string name = names[i];
-        if (str == name) {
-            return (race_t)i;
-        }
-    }
+
+const static inline race_t str2race(const string str) {
+    for (auto i : rn)
+        if (str == i.second)
+            return i.first;
     return RACE_NONE;
 }
