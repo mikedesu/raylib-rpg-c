@@ -359,8 +359,8 @@ public:
     void testLogicInitRunSim() {
         gamestate g;
         g.test = true;
-        srand(time(NULL));
-        SetRandomSeed(time(NULL));
+        //srand(time(NULL));
+        //SetRandomSeed(time(NULL));
         g.init_dungeon(BIOME_STONE, 1, 32, 32);
         TS_ASSERT(g.d.floors.size() > 0);
         // place doors
@@ -419,5 +419,12 @@ public:
         TS_ASSERT(npc_count > 0);
         //TS_ASSERT(npc_count == monster_count);
         // No more than 1 NPC per tile
+    }
+
+
+
+    void testCombat() {
+        gamestate g;
+        g.test = true;
     }
 };

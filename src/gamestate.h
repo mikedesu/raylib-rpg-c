@@ -151,6 +151,9 @@ public:
 
     gamestate() {
         //minfo("Initializing gamestate");
+        srand(time(NULL));
+        SetRandomSeed(time(NULL));
+
         reset();
     }
 
@@ -2994,18 +2997,18 @@ public:
     void handle_npc(const entityid id) {
         minfo("handle npc %d", id);
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
-        if (id == hero_id) {
-            merror("hero is not an npc");
-            return;
-        }
-        auto maybe_type = ct.get<entitytype>(id);
-        if (!maybe_type.has_value())
-            return;
-        const entitytype_t type = maybe_type.value();
-        if (type != ENTITY_NPC) {
-            merror("type is not npc");
-            return;
-        }
+        //if (id == hero_id) {
+        //    merror("hero is not an npc");
+        //    return;
+        //}
+        //auto maybe_type = ct.get<entitytype>(id);
+        //if (!maybe_type.has_value())
+        //    return;
+        //const entitytype_t type = maybe_type.value();
+        //if (type != ENTITY_NPC) {
+        //    merror("type is not npc");
+        //    return;
+        //}
         auto maybe_dead = ct.get<dead>(id);
         if (!maybe_dead.has_value()) {
             merror("npc has no dead component");
@@ -3052,6 +3055,9 @@ public:
             }
 #else
             for (entityid id = 0; id < next_entityid; id++) {
+                const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+                if (type != ENTITY_NPC)
+                    continue;
                 handle_npc(id);
             }
             flag = GAMESTATE_FLAG_NPC_ANIM;
