@@ -23,6 +23,7 @@
 #include "scene.h"
 #include "sfx.h"
 #include "stat_bonus.h"
+#include "tactics.h"
 #include <ctime>
 #include <raylib.h>
 #include <raymath.h>
@@ -831,9 +832,16 @@ public:
         ct.set<vision_distance>(id, 3);
         ct.set<hearing_distance>(id, 3);
         // here we have some hard decisions to make about how to template-out NPC creation
-        // all NPCs ben at level 1. level-up mechanisms will be determined elsewhere
+        // all NPCs begin at level 1. level-up mechanisms will be determined elsewhere
         ct.set<level>(id, 1);
         ct.set<xp>(id, 0);
+
+
+        //tactic t = {tactic_target::enemy, tactic_condition::adjacent, tactic_action::wait};
+
+        vector<tactic> my_tactics = {{tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
+                                     {tactic_target::nil, tactic_condition::any, tactic_action::move}};
+        ct.set<tactics>(id, my_tactics);
     }
 
 
@@ -2771,7 +2779,7 @@ public:
 
 
     inline void handle_input_gameplay_controlmode_player(const inputstate& is) {
-        minfo("handle input gameplay controlmode player");
+        //minfo("handle input gameplay controlmode player");
 
         if (flag != GAMESTATE_FLAG_PLAYER_INPUT)
             return;
@@ -2891,7 +2899,7 @@ public:
 
     inline void handle_input(const inputstate& is) {
         // no matter which mode we are in, we can toggle the debug panel
-        minfo("handle input");
+        //minfo("handle input");
         if (inputstate_is_pressed(is, KEY_P)) {
             debugpanelon = !debugpanelon;
             //minfo("Toggling debug panel: %s", debugpanelon ? "ON" : "OFF");
@@ -2994,63 +3002,83 @@ public:
 
 
 
-    void handle_npc(const entityid id) {
+    const inline bool handle_npc(const entityid id) {
         minfo("handle npc %d", id);
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
-        //if (id == hero_id) {
-        //    merror("hero is not an npc");
-        //    return;
-        //}
-        //auto maybe_type = ct.get<entitytype>(id);
-        //if (!maybe_type.has_value())
-        //    return;
-        //const entitytype_t type = maybe_type.value();
-        //if (type != ENTITY_NPC) {
-        //    merror("type is not npc");
-        //    return;
-        //}
         auto maybe_dead = ct.get<dead>(id);
         if (!maybe_dead.has_value()) {
             merror("npc has no dead component");
-            return;
+            return false;
         }
         const bool is_dead = maybe_dead.value();
         if (is_dead) {
             merror("npc is dead");
-            return;
+            return false;
         }
         // this is a heuristic for handling entity actions
         // originally, we were just moving randomly
         // this example shows how, if the player is not adjacent to an NPC,
         // they will just move randomly. otherwise, they attack the player
-        //const entityid target_id = ct.get<target>(id).value_or(g.hero_id);
         auto tgt_id = ct.get<target_id>(id).value_or(hero_id);
-        if (is_entity_adjacent(id, tgt_id)) {
-            // if id is adjacent to its target or the hero
-            const vec3 loc = ct.get<location>(tgt_id).value();
-            //minfo("%d is attempting to attack", id);
-            try_entity_attack(id, loc.x, loc.y);
-            return;
+
+        vector<tactic> default_tactics = {{tactic_target::nil, tactic_condition::any, tactic_action::move}};
+        auto npc_tactics = ct.get<tactics>(id).value_or(default_tactics);
+
+        //auto npc_tactics = ct.get<tactics>(id).value_or((vector<tactic>){tactic::wait});
+        //bool action_success = false;
+
+        minfo("checking tactics...");
+        for (tactic t : npc_tactics) {
+            //minfo("tactic: %d %d %d", t.target, t.condition, t.action);
+            if (t.target == tactic_target::nil && t.condition == tactic_condition::any && t.action == tactic_action::move) {
+                // handle random move
+                const bool result = try_entity_move(id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+                if (result) {
+                    msuccess("try entity move succeeded");
+                } else {
+                    merror("try entity move FAILED");
+                }
+                return true;
+            } else if (t.target == tactic_target::enemy && t.condition == tactic_condition::adjacent && t.action == tactic_action::attack) {
+                // handle attack adjacent enemy
+                if (is_entity_adjacent(id, tgt_id)) {
+                    const vec3 loc = ct.get<location>(tgt_id).value();
+                    const attack_result_t result = try_entity_attack(id, loc.x, loc.y);
+                    if (result == ATTACK_RESULT_BLOCK) {
+                        minfo("attack result: blocked");
+                    } else if (result == ATTACK_RESULT_HIT) {
+                        minfo("attack result: hit");
+                    } else if (result == ATTACK_RESULT_MISS) {
+                        minfo("attack result: miss");
+                    } else if (result == ATTACK_RESULT_NONE) {
+                        minfo("attack result: none");
+                    } else if (result == ATTACK_RESULT_COUNT) {
+                        minfo("attack result: count");
+                    } else {
+                        minfo("attack result: unknown");
+                    }
+                    return true;
+                }
+            }
         }
-        // else, randomly move
-        minfo("%d is attempting to move", id);
-        const bool result = try_entity_move(id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
-        if (result)
-            msuccess("try entity move succeeded");
-        else
-            merror("try entity move FAILED");
-        msuccess("handle npc %d", id);
+        merror("failed to handle npc %d", id);
+        return false;
     }
 
 
 
 
     inline void handle_npcs() {
-        minfo("handle npcs");
+        //minfo("handle npcs");
         if (flag == GAMESTATE_FLAG_NPC_TURN) {
 #ifndef NPCS_ALL_AT_ONCE
             if (entity_turn >= 0 && entity_turn < next_entityid) {
-                handle_npc(entity_turn);
+                const bool result = handle_npc(entity_turn);
+                if (result) {
+                    msuccess("npc %d handled successfully", entity_turn);
+                } else {
+                    merror("npc %d handle failed", entity_turn);
+                }
                 flag = GAMESTATE_FLAG_NPC_ANIM;
             }
 #else
@@ -3058,7 +3086,12 @@ public:
                 const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
                 if (type != ENTITY_NPC)
                     continue;
-                handle_npc(id);
+                const bool result = handle_npc(id);
+                if (result) {
+                    msuccess("npc %d handled successfully", entity_turn);
+                } else {
+                    merror("npc %d handle failed", entity_turn);
+                }
             }
             flag = GAMESTATE_FLAG_NPC_ANIM;
 #endif

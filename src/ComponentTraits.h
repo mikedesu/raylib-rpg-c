@@ -10,6 +10,7 @@
 #include "rarity.h"
 #include "shield.h"
 #include "spell.h"
+#include "tactics.h"
 #include "vec3.h"
 #include "weapon.h"
 #include <memory>
@@ -391,4 +392,13 @@ struct solid { }; // bool
 template <>
 struct ComponentTraits<solid> {
     using Type = bool;
+};
+
+
+
+
+struct tactics { }; // vector of tactic_t
+template <>
+struct ComponentTraits<tactics> {
+    using Type = vector<tactic>;
 };
