@@ -5,15 +5,18 @@
 #include "mprint.h"
 #include "potion.h"
 #include "scene.h"
+#include "tactics.h"
 #include "weapon.h"
 #include <cxxtest/TestSuite.h>
 #include <raylib.h>
 #include <set>
 
 
-class MyTestSuite : public CxxTest::TestSuite {
+class MyTestSuite : public CxxTest::TestSuite
+{
 public:
-    void testGamestateBasic() {
+    void testGamestateBasic()
+    {
         gamestate g;
 
         TS_ASSERT(g.cam_lockon == true);
@@ -35,7 +38,8 @@ public:
 
 
 
-    void testGamestateThrowaway() {
+    void testGamestateThrowaway()
+    {
         for (int i = 0; i < 10; i++) {
             gamestate g;
         }
@@ -44,7 +48,8 @@ public:
 
 
 
-    void testEntityManagement() {
+    void testEntityManagement()
+    {
         gamestate g;
 
         // Verify initial state
@@ -77,7 +82,8 @@ public:
         TS_ASSERT(!g.dirty_entities);
     }
 
-    void testMessageSystem() {
+    void testMessageSystem()
+    {
         gamestate g;
 
         // Verify initial state
@@ -105,7 +111,8 @@ public:
         TS_ASSERT(!g.msg_system_is_active);
     }
 
-    void testCameraSystem() {
+    void testCameraSystem()
+    {
         gamestate g;
 
         // Verify initial state
@@ -131,7 +138,8 @@ public:
         TS_ASSERT(g.cam_changed == false);
     }
 
-    void testMusicSystem() {
+    void testMusicSystem()
+    {
         gamestate g;
 
         // Verify initial state
@@ -155,7 +163,8 @@ public:
     }
 
 
-    void testGamestateInitDungeon() {
+    void testGamestateInitDungeon()
+    {
         gamestate g;
 
         g.init_dungeon(BIOME_STONE, 1, 32, 32);
@@ -172,7 +181,8 @@ public:
     }
 
 
-    void testPlaceDoors() {
+    void testPlaceDoors()
+    {
         gamestate g;
         const size_t placed_doors_0 = g.place_doors();
         TS_ASSERT(placed_doors_0 == 0);
@@ -183,7 +193,8 @@ public:
     }
 
 
-    void testPlaceProps() {
+    void testPlaceProps()
+    {
         gamestate g;
         const size_t placed_props_0 = g.place_props();
         TS_ASSERT(placed_props_0 == 0);
@@ -193,7 +204,8 @@ public:
     }
 
 
-    void testPlaceDagger() {
+    void testPlaceDagger()
+    {
         gamestate g;
 
         TS_ASSERT(g.d.floors.size() == 0);
@@ -221,7 +233,8 @@ public:
     }
 
 
-    void testInitShield() {
+    void testInitShield()
+    {
         gamestate g;
         //g.init_dungeon(1);
         g.init_dungeon(BIOME_STONE, 1, 32, 32);
@@ -242,7 +255,8 @@ public:
     }
 
 
-    void testInitPotion() {
+    void testInitPotion()
+    {
         gamestate g;
         //g.init_dungeon(1);
 
@@ -265,7 +279,8 @@ public:
 
 
 
-    void testMonsterInitSingle() {
+    void testMonsterInitSingle()
+    {
         gamestate g;
         //g.init_dungeon(1);
         g.init_dungeon(BIOME_STONE, 1, 32, 32);
@@ -297,7 +312,8 @@ public:
 
 
 
-    void testMonsterMulti() {
+    void testMonsterMulti()
+    {
         gamestate g;
         //g.init_dungeon(1);
         g.init_dungeon(BIOME_STONE, 1, 32, 32);
@@ -316,7 +332,8 @@ public:
     }
 
 
-    void testMonsterMax() {
+    void testMonsterMax()
+    {
         gamestate g;
         //g.init_dungeon(1);
         g.init_dungeon(BIOME_STONE, 1, 32, 32);
@@ -335,7 +352,8 @@ public:
     }
 
 
-    void testMonsterTooMany() {
+    void testMonsterTooMany()
+    {
         gamestate g;
         g.init_dungeon(BIOME_STONE, 1, 32, 32);
         TS_ASSERT(g.d.floors.size() > 0);
@@ -356,11 +374,10 @@ public:
 
 
 
-    void testLogicInitRunSim() {
+    void testLogicInit()
+    {
         gamestate g;
         g.test = true;
-        //srand(time(NULL));
-        //SetRandomSeed(time(NULL));
         g.init_dungeon(BIOME_STONE, 1, 32, 32);
         TS_ASSERT(g.d.floors.size() > 0);
         // place doors
@@ -373,13 +390,11 @@ public:
         const entityid id = g.create_weapon_at_random_loc_with(g.ct, g.dagger_init());
         TS_ASSERT(id != ENTITYID_INVALID);
         // create shield
-        //const vec3 loc2 = df_get_random_loc(g.d.floors[0]);
         const vec3 loc2 = g.d.floors[0].df_get_random_loc();
         TS_ASSERT(!vec3_equal(loc2, (vec3){-1, -1, -1}));
         const entityid id2 = g.create_shield_at_with(loc2, g.shield_init());
         TS_ASSERT(id2 != ENTITYID_INVALID);
         // create potion
-        //const vec3 loc3 = df_get_random_loc(g.d.floors[0]);
         const vec3 loc3 = g.d.floors[0].df_get_random_loc();
         TS_ASSERT(!vec3_equal(loc3, (vec3){-1, -1, -1}));
         const entityid id3 = g.create_potion_at_with(loc3, g.potion_init(POTION_HP_SMALL));
@@ -389,7 +404,6 @@ public:
         std::set<entityid> monster_set;
         for (int i = 0; i < monster_count; i++) {
             TS_ASSERT(g.d.floors.size() > 0);
-            //    const vec3 loc = df_get_random_loc(g.d.floors[0]);
             const vec3 loc = g.d.floors[0].df_get_random_loc();
             TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
             const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
@@ -397,7 +411,6 @@ public:
             monster_set.emplace(id);
         }
         TS_ASSERT_EQUALS(monster_set.size(), monster_count);
-        //const vec3 loc4 = df_get_random_loc(g.d.floors[0]);
         const vec3 loc4 = g.d.floors[0].df_get_random_loc();
         TS_ASSERT(!vec3_equal(loc4, (vec3){-1, -1, -1}));
         const int maxhp_roll = 10;
@@ -417,14 +430,58 @@ public:
         TS_ASSERT(!g.ct.get<dead>(g.hero_id).value());
         const int npc_count = g.count_live_npcs_on_floor(0);
         TS_ASSERT(npc_count > 0);
-        //TS_ASSERT(npc_count == monster_count);
         // No more than 1 NPC per tile
     }
 
 
 
-    void testCombat() {
+    void testCombat1v1() {
         gamestate g;
         g.test = true;
+        g.init_dungeon(BIOME_STONE, 1, 32, 32);
+        TS_ASSERT(g.d.floors.size() > 0);
+        
+        const vec3 player_loc = g.d.floors[0].df_get_random_loc();
+        TS_ASSERT(!vec3_equal(player_loc, (vec3){-1, -1, -1}));
+        const int maxhp_roll = 10;
+        g.entity_turn = g.create_player_with(player_loc, "darkmage", g.player_init(maxhp_roll));
+        TS_ASSERT(g.hero_id != ENTITYID_INVALID);
+
+        constexpr int monster_count = 1;
+        for (int i = 0; i < monster_count; i++) {
+            TS_ASSERT(g.d.floors.size() > 0);
+            const vec3 loc = g.d.floors[0].df_get_random_loc();
+            TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
+            const entityid id = g.create_random_monster_at_with(loc, [](CT& ct, const entityid id) {});
+
+            g.ct.set<tactics>(id, (vector<tactic>){
+                {tactic_target::nil, tactic_condition::any, tactic_action::move}
+            });
+
+            TS_ASSERT(id != ENTITYID_INVALID);
+        }
+
+        inputstate is;
+        //inputstate_update(is);
+        g.current_scene = SCENE_GAMEPLAY;
+        TS_ASSERT(g.test);
+        
+        constexpr int num_ticks = 1000;
+        minfo("simulating game for 1000 ticks...");
+        for (int i = 0; i < num_ticks; i++) {
+            g.tick(is);
+        }
+        minfo("simulation complete");
+
+        TS_ASSERT(g.turn_count > 0);
+        
+        minfo("turn count: %d", g.turn_count);
+
+        //TS_ASSERT(g.turn_count == num_ticks / 2);
+        //TS_ASSERT(g.ct.has<dead>(g.hero_id));
+        //TS_ASSERT(!g.ct.get<dead>(g.hero_id).value());
+        //const int npc_count = g.count_live_npcs_on_floor(0);
+        //TS_ASSERT(npc_count > 0);
+        // No more than 1 NPC per tile
     }
 };

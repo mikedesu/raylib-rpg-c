@@ -33,6 +33,7 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
+- [ ] **BUG** `handle_test_flag` not properly incrementing turns
 - [ ] **PLAYER REQUEST** numpad movement controls
 - [ ] **FEATURE** volume control menu
   - [ ] press V key, pop-up volume control menu
