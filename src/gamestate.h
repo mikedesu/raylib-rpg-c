@@ -209,9 +209,9 @@ public:
 
 
 
-        minfo("-------------------------");
-        minfo("The gamestate seed was set to: %s", seed.c_str());
-        minfo("-------------------------");
+        //minfo("-------------------------");
+        //minfo("The gamestate seed was set to: %s", seed.c_str());
+        //minfo("-------------------------");
 
         reset();
     }
@@ -495,7 +495,7 @@ public:
 
 
     const inline size_t place_doors() {
-        minfo("gamestate.place_doors");
+        minfo2("gamestate.place_doors");
         size_t placed_doors = 0;
         for (int z = 0; z < (int)d.floors.size(); z++) {
             auto df = d.get_floor(z);
@@ -512,7 +512,7 @@ public:
                 }
             }
         }
-        msuccess("placed %ld doors", placed_doors);
+        msuccess2("placed %ld doors", placed_doors);
         return placed_doors;
     }
 
@@ -706,36 +706,36 @@ public:
 
 
     const inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_fun weaponInitFunction) {
-        minfo("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
+        minfo2("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
         if (d.floors.size() == 0) {
-            merror("dungeon floors size is 0");
+            merror2("dungeon floors size is 0");
             return ENTITYID_INVALID;
         }
         if (!d.is_initialized) {
-            merror("dungeon is_initialized flag not set");
+            merror2("dungeon is_initialized flag not set");
             return ENTITYID_INVALID;
         }
         if (vec3_invalid(loc)) {
-            merror("loc is invalid");
+            merror2("loc is invalid");
             return ENTITYID_INVALID;
         }
         auto df = d.get_floor(loc.z);
         auto tile = df.df_tile_at(loc);
         if (!tile_is_walkable(tile.type)) {
-            merror("cannot create entity on non-walkable tile");
+            merror2("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
         }
         if (tile_has_live_npcs(tile)) {
-            merror("cannot create entity on tile with live NPCs");
+            merror2("cannot create entity on tile with live NPCs");
             return ENTITYID_INVALID;
         }
         const auto id = create_weapon_with(weaponInitFunction);
         if (id == ENTITYID_INVALID) {
-            minfo("failed to create weapon");
+            minfo2("failed to create weapon");
             return ENTITYID_INVALID;
         }
         if (df.df_add_at(id, loc.x, loc.y) == ENTITYID_INVALID) {
-            minfo("failed to add weapon to df");
+            minfo2("failed to add weapon to df");
             return ENTITYID_INVALID;
         }
         ct.set<location>(id, loc);
@@ -954,23 +954,23 @@ public:
 
 
     const inline entityid create_npc_at_with(const race_t rt, const vec3 loc, with_fun npcInitFunction) {
-        minfo("create npc at with: (%d, %d, %d)", loc.x, loc.y, loc.z);
+        minfo2("create npc at with: (%d, %d, %d)", loc.x, loc.y, loc.z);
         auto df = d.get_floor(loc.z);
         auto tile = df.df_tile_at(loc);
         if (!tile_is_walkable(tile.type)) {
-            merror("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile.type).c_str());
+            merror2("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile.type).c_str());
             return ENTITYID_INVALID;
         }
         if (tile_has_live_npcs(tile)) {
-            merror("cannot create entity on tile with live NPCs");
+            merror2("cannot create entity on tile with live NPCs");
             return ENTITYID_INVALID;
         }
         if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
-            merror("cannot create entity on tile with box");
+            merror2("cannot create entity on tile with box");
             return ENTITYID_INVALID;
         }
         if (tile_has_pushable(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
-            merror("cannot create entity on tile with pushable");
+            merror2("cannot create entity on tile with pushable");
             return ENTITYID_INVALID;
         }
         const entityid id = create_npc_with(rt, npcInitFunction);
@@ -982,9 +982,9 @@ public:
             merror("failed to add npc %d to %d, %d", id, loc.x, loc.y);
             return ENTITYID_INVALID;
         }
-        minfo("setting location for %d", id);
+        minfo2("setting location for %d", id);
         ct.set<location>(id, loc);
-        msuccess("created npc %d", id);
+        msuccess2("created npc %d", id);
         return id;
     }
 
@@ -992,15 +992,15 @@ public:
 
 
     const inline bool add_to_inventory(const entityid actor_id, const entityid item_id) {
-        minfo("adding %d to %d's inventory", actor_id, item_id);
+        minfo2("adding %d to %d's inventory", actor_id, item_id);
         auto maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value()) {
-            merror("%d has no inventory component", actor_id);
+            merror2("%d has no inventory component", actor_id);
             return false;
         }
         auto my_inventory = maybe_inventory.value();
         my_inventory->push_back(item_id);
-        msuccess("added %d to %d's inventory", actor_id, item_id);
+        msuccess2("added %d to %d's inventory", actor_id, item_id);
         return true;
     }
 
@@ -1818,7 +1818,7 @@ public:
     inline void cycle_messages() {
         if (msg_system.size() > 0) {
             const string msg = msg_system.front();
-            const int len = msg.length();
+            const unsigned int len = msg.length();
             // measure the length of the message as calculated by MeasureText
             if (len > msg_history_max_len_msg) {
                 msg_history_max_len_msg = len;
@@ -2026,7 +2026,7 @@ public:
 
     const inline bool try_entity_move(const entityid id, const vec3 v) {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-        minfo("entity %d is trying to move to (%d,%d,%d)", id, v.x, v.y, v.z);
+        minfo2("entity %d is trying to move to (%d,%d,%d)", id, v.x, v.y, v.z);
         ct.set<update>(id, true);
         ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
         // entity location
@@ -2040,35 +2040,35 @@ public:
         auto tile = df.df_tile_at(aloc);
         //minfo("is walkable");
         if (!tile_is_walkable(tile.type)) {
-            merror("tile is not walkable");
+            merror2("tile is not walkable");
             return false;
         }
         //minfo("has box");
         const entityid box_id = tile_has_box(aloc.x, aloc.y, aloc.z);
         if (box_id != ENTITYID_INVALID) {
-            merror("box present, trying to push");
+            merror2("box present, trying to push");
             return handle_box_push(box_id, v);
         }
         //minfo("has pushable");
         const entityid pushable_id = tile_has_pushable(aloc.x, aloc.y, aloc.z);
         if (pushable_id != ENTITYID_INVALID) {
-            merror("pushable present, trying to push");
+            merror2("pushable present, trying to push");
             return handle_box_push(pushable_id, v);
         }
         //minfo("has solid");
         const bool has_solid = tile_has_solid(aloc.x, aloc.y, aloc.z);
         if (has_solid) {
-            merror("solid present, cannot move");
+            merror2("solid present, cannot move");
             return false;
         }
         //minfo("has live npcs");
         if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
-            merror("live npcs present, cannot move");
+            merror2("live npcs present, cannot move");
             return false;
         }
         //minfo("has player");
         if (tile_has_player(tile_at_cur_floor(aloc))) {
-            merror("player present, cannot move");
+            merror2("player present, cannot move");
             return false;
         }
         //minfo("has door");
@@ -2076,7 +2076,7 @@ public:
         if (door_id != ENTITYID_INVALID) {
             massert(ct.has<door_open>(door_id), "door_id %d doesnt have a door_open component", door_id);
             if (!ct.get<door_open>(door_id).value_or(false)) {
-                merror("door is closed");
+                merror2("door is closed");
                 return false;
             }
         }
@@ -2084,13 +2084,13 @@ public:
         //minfo("df remove at");
         // remove the entity from the current tile
         if (!df.df_remove_at(id, loc.x, loc.y)) {
-            merror("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
+            merror2("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
             return false;
         }
         // add the entity to the new tile
         //minfo("df add at");
         if (df.df_add_at(id, aloc.x, aloc.y) == ENTITYID_INVALID) {
-            merror("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
+            merror2("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
             return false;
         }
         //minfo("setting location");
@@ -2104,7 +2104,7 @@ public:
             if (IsAudioDeviceReady())
                 PlaySound(sfx[SFX_STEP_STONE_1]);
         }
-        msuccess("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
+        msuccess2("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
         return true;
     }
 
@@ -2525,14 +2525,14 @@ public:
         else if (type == ENTITY_NPC)
             flag = GAMESTATE_FLAG_NPC_ANIM;
         else
-            merror("Unknown flag state, invalid type: %d", type);
+            merror2("Unknown flag state, invalid type: %d", type);
     }
 
 
 
 
     const inline attack_result_t try_entity_attack(const entityid id, const int x, const int y) {
-        minfo("entity %d is attacking location %d, %d", id, x, y);
+        minfo2("entity %d is attacking location %d, %d", id, x, y);
         massert(!ct.get<dead>(id).value_or(false), "attacker entity is dead");
         massert(ct.has<location>(id), "entity %d has no location", id);
         const vec3 loc = ct.get<location>(id).value();
@@ -2907,15 +2907,15 @@ public:
         if (test) {
             // special handler
             // move randomly for now
-            minfo("hero random move");
+            minfo2("hero random move");
             //const bool r0 = try_entity_move(hero_id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
             uniform_int_distribution<int> dist(-1, 1);
             const bool r0 = try_entity_move(hero_id, (vec3){dist(mt), dist(mt), 0});
 
             if (r0) {
-                msuccess("hero moved randomly successfully");
+                msuccess2("hero moved randomly successfully");
             } else {
-                minfo("hero failed to move randomly");
+                minfo2("hero failed to move randomly");
             }
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return;
@@ -3134,16 +3134,16 @@ public:
 
 
     const inline bool handle_npc(const entityid id) {
-        minfo("handle npc %d", id);
+        minfo2("handle npc %d", id);
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
         auto maybe_dead = ct.get<dead>(id);
         if (!maybe_dead.has_value()) {
-            merror("npc has no dead component");
+            merror2("npc has no dead component");
             return false;
         }
         const bool is_dead = maybe_dead.value();
         if (is_dead) {
-            merror("npc is dead");
+            merror2("npc is dead");
             return false;
         }
         // this is a heuristic for handling entity actions
@@ -3167,9 +3167,9 @@ public:
                 //const bool result = try_entity_move(id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
                 const bool result = try_entity_move(id, (vec3){dist(mt), dist(mt), 0});
                 if (result) {
-                    msuccess("try entity move succeeded");
+                    msuccess2("try entity move succeeded");
                 } else {
-                    merror("try entity move FAILED");
+                    merror2("try entity move FAILED");
                 }
                 return true;
             } else if (t.target == tactic_target::enemy && t.condition == tactic_condition::adjacent && t.action == tactic_action::attack) {
@@ -3178,23 +3178,23 @@ public:
                     const vec3 loc = ct.get<location>(tgt_id).value();
                     const attack_result_t result = try_entity_attack(id, loc.x, loc.y);
                     if (result == ATTACK_RESULT_BLOCK) {
-                        minfo("attack result: blocked");
+                        minfo2("attack result: blocked");
                     } else if (result == ATTACK_RESULT_HIT) {
-                        minfo("attack result: hit");
+                        minfo2("attack result: hit");
                     } else if (result == ATTACK_RESULT_MISS) {
-                        minfo("attack result: miss");
+                        minfo2("attack result: miss");
                     } else if (result == ATTACK_RESULT_NONE) {
-                        minfo("attack result: none");
+                        minfo2("attack result: none");
                     } else if (result == ATTACK_RESULT_COUNT) {
-                        minfo("attack result: count");
+                        minfo2("attack result: count");
                     } else {
-                        minfo("attack result: unknown");
+                        minfo2("attack result: unknown");
                     }
                     return true;
                 }
             }
         }
-        merror("failed to handle npc %d", id);
+        merror2("failed to handle npc %d", id);
         return false;
     }
 
@@ -3221,9 +3221,9 @@ public:
                     continue;
                 const bool result = handle_npc(id);
                 if (result) {
-                    msuccess("npc %d handled successfully", entity_turn);
+                    msuccess2("npc %d handled successfully", entity_turn);
                 } else {
-                    merror("npc %d handle failed", entity_turn);
+                    merror2("npc %d handle failed", entity_turn);
                 }
             }
             flag = GAMESTATE_FLAG_NPC_ANIM;

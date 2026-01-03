@@ -377,7 +377,7 @@ public:
             }
         }
         if (tmp.size() == 0) {
-            merror("no locations are suitable. returning (-1, -1, -1)");
+            merror2("no locations are suitable. returning (-1, -1, -1)");
             return (vec3){-1, -1, -1};
         }
         return tmp[GetRandomValue(0, tmp.size() - 1)];

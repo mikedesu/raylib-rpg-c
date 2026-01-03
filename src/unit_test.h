@@ -429,13 +429,13 @@ public:
 
 
     void testCombat1v1() {
-        minfo("----------------------------------------");
-        minfo("test combat 1v1");
-        minfo("----------------------------------------");
+        //minfo("----------------------------------------");
+        //minfo("test combat 1v1");
+        //minfo("----------------------------------------");
 
         unsigned int hero_death_count = 0;
 
-        constexpr unsigned int sim_count = 10000;
+        constexpr unsigned int sim_count = 20000;
 
         //vector<string> seeds;
 
@@ -484,29 +484,27 @@ public:
             TS_ASSERT(g.current_scene == SCENE_GAMEPLAY);
 
             constexpr int num_ticks = 100;
-            minfo("simulating game for %d ticks...", num_ticks);
+            //minfo("simulating game for %d ticks...", num_ticks);
             for (int i = 0; i < num_ticks; i++) {
                 g.tick(is);
             }
-            minfo("simulation complete");
-            minfo("turn count: %d", g.turn_count);
+            //minfo("simulation complete");
+            //minfo("turn count: %d", g.turn_count);
             TS_ASSERT(g.turn_count > 0);
             TS_ASSERT(g.turn_count == num_ticks / 2);
 
             //TS_ASSERT(g.ct.has<dead>(g.hero_id));
             //TS_ASSERT(!g.ct.get<dead>(g.hero_id).value());
             const unsigned int live_npc_count = g.count_live_npcs_on_floor(0);
-            minfo("live npc_count: %u", live_npc_count);
-
-            minfo("id %d race: %d", g.hero_id, g.ct.get<race>(g.hero_id).value_or(RACE_NONE));
-            minfo("id %d hp: %d", g.hero_id, g.ct.get<hp>(g.hero_id).value_or(-666));
-            minfo("id %d maxhp: %d", g.hero_id, g.ct.get<maxhp>(g.hero_id).value_or(-666));
-            minfo("id %d dead: %d", g.hero_id, g.ct.get<dead>(g.hero_id).value_or(true));
-
-            minfo("id %d race: %d", id, g.ct.get<race>(id).value_or(RACE_NONE));
-            minfo("id %d dead: %d", id, g.ct.get<dead>(id).value_or(true));
-            minfo("id %d hp: %d", id, g.ct.get<hp>(id).value_or(-666));
-            minfo("id %d maxhp: %d", id, g.ct.get<maxhp>(id).value_or(-666));
+            //minfo("live npc_count: %u", live_npc_count);
+            //minfo("id %d race: %d", g.hero_id, g.ct.get<race>(g.hero_id).value_or(RACE_NONE));
+            //minfo("id %d hp: %d", g.hero_id, g.ct.get<hp>(g.hero_id).value_or(-666));
+            //minfo("id %d maxhp: %d", g.hero_id, g.ct.get<maxhp>(g.hero_id).value_or(-666));
+            //minfo("id %d dead: %d", g.hero_id, g.ct.get<dead>(g.hero_id).value_or(true));
+            //minfo("id %d race: %d", id, g.ct.get<race>(id).value_or(RACE_NONE));
+            //minfo("id %d dead: %d", id, g.ct.get<dead>(id).value_or(true));
+            //minfo("id %d hp: %d", id, g.ct.get<hp>(id).value_or(-666));
+            //minfo("id %d maxhp: %d", id, g.ct.get<maxhp>(id).value_or(-666));
 
             if (g.ct.get<hp>(g.hero_id).value_or(-666) <= 0) {
                 TS_ASSERT(g.ct.get<dead>(g.hero_id).value_or(true));
