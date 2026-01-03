@@ -319,11 +319,13 @@ public:
         massert(id != ENTITYID_INVALID, "id is invalid");
         massert(x >= 0 && x < width, "x is out of bounds");
         massert(y >= 0 && y < height, "y is out of bounds");
-        minfo("getting tile...");
-        tile_t& tile = df_tile_at((vec3){x, y, -1});
-        minfo("adding to tile...");
+        //minfo("getting tile...");
+        auto tile = df_tile_at((vec3){x, y, -1});
+        //minfo("adding to tile...");
         const entityid result = tile.tile_add(id);
-        minfo("tile_add returned %d", result);
+        if (result == ENTITYID_INVALID) {
+            minfo("tile_add returned %d", result);
+        }
         return result;
     }
 
@@ -364,11 +366,11 @@ public:
                 const bool type_invalid = tile.type == TILE_NONE || tile.type == TILE_STONE_WALL_00 || tile.type == TILE_STONE_WALL_01 ||
                                           tile.type == TILE_UPSTAIRS || tile.type == TILE_DOWNSTAIRS;
                 if (type_invalid) {
-                    merror("loc at (%d, %d, %d) type invalid. type is: %d", x, y, floor, tile.type);
+                    //merror("loc at (%d, %d, %d) type invalid. type is: %d", x, y, floor, tile.type);
                     continue;
                 }
                 if (tile.entities->size() > 0) {
-                    merror("loc at (%d, %d, %d) type invalid. tile has %ld entities", x, y, floor, tile.entities->size());
+                    //merror("loc at (%d, %d, %d) type invalid. tile has %ld entities", x, y, floor, tile.entities->size());
                     continue;
                 }
                 tmp.push_back(loc);

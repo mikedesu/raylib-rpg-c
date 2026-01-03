@@ -24,7 +24,10 @@
 #include "sfx.h"
 #include "stat_bonus.h"
 #include "tactics.h"
+#include <algorithm>
+#include <chrono>
 #include <ctime>
+#include <random>
 #include <raylib.h>
 #include <raymath.h>
 
@@ -48,7 +51,31 @@
 
 
 typedef ComponentTable CT;
+
 typedef function<void(CT& ct, const entityid)> with_fun;
+
+using std::mt19937;
+using std::seed_seq;
+using std::uniform_int_distribution;
+using std::chrono::duration_cast;
+using std::chrono::nanoseconds;
+using std::chrono::system_clock;
+using std::chrono::time_point;
+//using std::chrono::system_clock;
+
+
+//static const string generate_mt_seed() {
+//    srand(time(NULL));
+//    constexpr size_t buf_size=65;
+//    char buf[buf_size];
+//    bzero(buf, buf_size);
+//    for (int i=0; i<buf_size; i++) {
+//        buf[i] = 48 + rand()%80;
+//    }
+//    return string(buf);
+//}
+
+
 
 
 class gamestate {
@@ -70,6 +97,9 @@ public:
 
     char timebeganbuf[GAMESTATE_SIZEOFTIMEBUF];
     char currenttimebuf[GAMESTATE_SIZEOFTIMEBUF];
+
+    mt19937 mt;
+    string seed;
 
     bool test;
     bool debugpanelon;
@@ -95,25 +125,27 @@ public:
     bool do_restart;
     bool msg_system_is_active;
 
-    int framecount;
-    int fadealpha;
-    int targetwidth;
-    int targetheight;
-    int windowwidth;
-    int windowheight;
+    unsigned int framecount;
+    unsigned int fadealpha;
+    unsigned int targetwidth;
+    unsigned int targetheight;
+    unsigned int windowwidth;
+    unsigned int windowheight;
     int lock;
-    int turn_count;
-    int frame_updates;
-    int font_size;
+    unsigned int frame_updates;
     int pad;
-    int inventory_menu_selection;
-    int gameplay_settings_menu_selection;
-    int title_screen_selection;
-    int max_title_screen_selections;
-    int msg_history_max_len_msg;
-    int msg_history_max_len_msg_measure;
-    int current_music_index;
-    int restart_count;
+    unsigned int inventory_menu_selection;
+    unsigned int gameplay_settings_menu_selection;
+    unsigned int title_screen_selection;
+    unsigned int max_title_screen_selections;
+    unsigned int msg_history_max_len_msg;
+
+    unsigned int msg_history_max_len_msg_measure;
+    unsigned int current_music_index;
+    unsigned int restart_count;
+    unsigned int font_size;
+    unsigned int turn_count;
+    unsigned long int ticks;
 
     size_t action_selection;
 
@@ -152,8 +184,34 @@ public:
 
     gamestate() {
         //minfo("Initializing gamestate");
+
         srand(time(NULL));
         SetRandomSeed(time(NULL));
+
+        //constexpr size_t buf_size = 65;
+        //char buf[buf_size];
+        //bzero(buf, buf_size);
+        //for (int i = 0; i < buf_size; i++) {
+        //    buf[i] = 48 + rand() % 80;
+        //}
+        //string buff(buf);
+        //seed = buff;
+
+        //seed_seq seedseq(buff.begin(), buff.end());
+        //mt.seed(seedseq);
+        time_point<system_clock> now = system_clock::now();
+        auto dur = duration_cast<nanoseconds>(now.time_since_epoch());
+        long long nanoseconds_since_epoch = dur.count();
+
+        seed = std::to_string(nanoseconds_since_epoch);
+        seed_seq seedseq(seed.begin(), seed.end());
+        mt.seed(seedseq);
+
+
+
+        minfo("-------------------------");
+        minfo("The gamestate seed was set to: %s", seed.c_str());
+        minfo("-------------------------");
 
         reset();
     }
@@ -511,9 +569,13 @@ public:
                     if (tile.can_have_door)
                         continue;
                     if (tile.tile_is_wall()) {
-                        const int flip = GetRandomValue(0, 20);
+                        //const int flip = GetRandomValue(0, 20);
+                        uniform_int_distribution<int> gen(0, 20);
+                        const int flip = gen(mt);
                         if (flip == 0) {
-                            const int r = GetRandomValue(1, 3);
+                            uniform_int_distribution<int> gen2(1, 3);
+                            //const int r = GetRandomValue(1, 3);
+                            const int r = gen2(mt);
                             switch (r) {
                             case 1: {
                                 const entityid id = create_prop_at_with(PROP_DUNGEON_BANNER_00, loc, defaultInit);
@@ -534,7 +596,9 @@ public:
                             }
                         }
                     } else {
-                        const int flip = GetRandomValue(0, 20);
+                        uniform_int_distribution<int> gen(0, 20);
+                        //const int flip = GetRandomValue(0, 20);
+                        const int flip = gen(mt);
                         if (flip == 0) {
                             const entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_TABLE_00, loc, defaultInit);
                             ct.set<solid>(id, true);
@@ -754,7 +818,9 @@ public:
 
     const inline race_t random_monster_type() {
         const vector<race_t> monster_races = {RACE_GOBLIN, RACE_ORC, RACE_BAT, RACE_WOLF, RACE_WARG, RACE_ZOMBIE, RACE_SKELETON, RACE_RAT, RACE_GREEN_SLIME};
-        const int random_index = GetRandomValue(0, monster_races.size() - 1);
+        uniform_int_distribution<int> gen(0, monster_races.size() - 1);
+        //const int random_index = GetRandomValue(0, monster_races.size() - 1);
+        const int random_index = gen(mt);
         return monster_races[random_index];
     }
 
@@ -773,12 +839,21 @@ public:
         const int con_m = get_racial_modifiers(rt, 4);
         const int cha_m = get_racial_modifiers(rt, 5);
         // default to 3-18 for stats
-        const int strength_ = GetRandomValue(3, 18) + str_m;
-        const int dexterity_ = GetRandomValue(3, 18) + dex_m;
-        const int intelligence_ = GetRandomValue(3, 18) + int_m;
-        const int wisdom_ = GetRandomValue(3, 18) + wis_m;
-        const int constitution_ = GetRandomValue(3, 18) + con_m;
-        const int charisma_ = GetRandomValue(3, 18) + cha_m;
+        uniform_int_distribution<int> gen(3, 18);
+
+        //const int strength_ = GetRandomValue(3, 18) + str_m;
+        //const int dexterity_ = GetRandomValue(3, 18) + dex_m;
+        //const int intelligence_ = GetRandomValue(3, 18) + int_m;
+        //const int wisdom_ = GetRandomValue(3, 18) + wis_m;
+        //const int constitution_ = GetRandomValue(3, 18) + con_m;
+        //const int charisma_ = GetRandomValue(3, 18) + cha_m;
+        const int strength_ = gen(mt) + str_m;
+        const int dexterity_ = gen(mt) + dex_m;
+        const int intelligence_ = gen(mt) + int_m;
+        const int wisdom_ = gen(mt) + wis_m;
+        const int constitution_ = gen(mt) + con_m;
+        const int charisma_ = gen(mt) + cha_m;
+
         ct.set<strength>(id, strength_);
         ct.set<dexterity>(id, dexterity_);
         ct.set<intelligence>(id, intelligence_);
@@ -804,7 +879,9 @@ public:
         case RACE_ZOMBIE: hitdie.y = 8; break;
         default: break;
         }
-        const int my_maxhp = GetRandomValue(1, hitdie.y) + get_stat_bonus(constitution_);
+        uniform_int_distribution<int> gen2(1, hitdie.y);
+        //const int my_maxhp = std::max(1, GetRandomValue(1, hitdie.y) + get_stat_bonus(constitution_));
+        const int my_maxhp = std::max(1, gen2(mt) + get_stat_bonus(constitution_));
         const int my_hp = my_maxhp;
         ct.set<maxhp>(id, my_maxhp);
         ct.set<hp>(id, my_hp);
@@ -839,8 +916,8 @@ public:
 
         //tactic t = {tactic_target::enemy, tactic_condition::adjacent, tactic_action::wait};
 
-        vector<tactic> my_tactics = {{tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
-                                     {tactic_target::nil, tactic_condition::any, tactic_action::move}};
+        vector<tactic> my_tactics = {
+            {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack}, {tactic_target::nil, tactic_condition::any, tactic_action::move}};
         ct.set<tactics>(id, my_tactics);
     }
 
@@ -1018,14 +1095,17 @@ public:
 
 
 
-    inline void update_player_tiles_explored() {
-        if (hero_id == ENTITYID_INVALID)
-            return;
-        //auto df = d_get_current_floor(dungeon);
+    const inline bool update_player_tiles_explored() {
+        if (hero_id == ENTITYID_INVALID) {
+            merror("hero_id is invalid");
+            return false;
+        }
         auto df = d.get_current_floor();
         auto maybe_loc = ct.get<location>(hero_id);
-        if (!maybe_loc.has_value())
-            return;
+        if (!maybe_loc.has_value()) {
+            merror("hero location lacks value");
+            return false;
+        }
         const vec3 loc = maybe_loc.value();
         const int light_radius0 = ct.get<light_radius>(hero_id).value_or(1);
         // Precompute bounds for the loops
@@ -1036,30 +1116,35 @@ public:
         for (int y = min_y; y <= max_y; y++) {
             for (int x = min_x; x <= max_x; x++) {
                 // Calculate Manhattan distance for diamond shape
-                if (abs(x - loc.x) + abs(y - loc.y) > light_radius0)
+                if (abs(x - loc.x) + abs(y - loc.y) > light_radius0) {
                     continue;
+                }
                 update_tile(df.df_tile_at((vec3){x, y, loc.z}));
             }
         }
+        return true;
     }
 
 
 
 
-    inline void update_player_state() {
-        if (hero_id == ENTITYID_INVALID)
-            return;
+    const inline bool update_player_state() {
+        if (hero_id == ENTITYID_INVALID) {
+            merror("hero_id is invalid");
+            return false;
+        }
         const unsigned char a = ct.get<txalpha>(hero_id).value_or(255);
         const bool is_dead = ct.get<dead>(hero_id).value_or(true);
         if (a < 255)
             ct.set<txalpha>(hero_id, a + 1);
         if (is_dead) {
             gameover = true;
-            return;
+            return true;
         }
         ct.set<blocking>(hero_id, false);
         ct.set<block_success>(hero_id, false);
         ct.set<damaged>(hero_id, false);
+        return true;
     }
 
 
@@ -1079,7 +1164,11 @@ public:
                 // remove it from the tile
                 auto df = d.get_current_floor();
                 auto loc = ct.get<location>(id).value_or((vec3){-1, -1, -1});
-                df.df_remove_at(id, loc.x, loc.y);
+
+                const bool r0 = df.df_remove_at(id, loc.x, loc.y);
+                if (!r0) {
+                    merror("failed to remove id %d at %d, %d", id, loc.x, loc.y);
+                }
             }
         }
     }
@@ -1937,7 +2026,7 @@ public:
 
     const inline bool try_entity_move(const entityid id, const vec3 v) {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-        minfo("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
+        minfo("entity %d is trying to move to (%d,%d,%d)", id, v.x, v.y, v.z);
         ct.set<update>(id, true);
         ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
         // entity location
@@ -1949,48 +2038,66 @@ public:
         const vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
         auto df = d.get_floor(loc.z);
         auto tile = df.df_tile_at(aloc);
-        minfo("is walkable");
-        if (!tile_is_walkable(tile.type))
+        //minfo("is walkable");
+        if (!tile_is_walkable(tile.type)) {
+            merror("tile is not walkable");
             return false;
-        minfo("has box");
+        }
+        //minfo("has box");
         const entityid box_id = tile_has_box(aloc.x, aloc.y, aloc.z);
-        if (box_id != ENTITYID_INVALID)
+        if (box_id != ENTITYID_INVALID) {
+            merror("box present, trying to push");
             return handle_box_push(box_id, v);
-        minfo("has pushable");
+        }
+        //minfo("has pushable");
         const entityid pushable_id = tile_has_pushable(aloc.x, aloc.y, aloc.z);
-        if (pushable_id != ENTITYID_INVALID)
+        if (pushable_id != ENTITYID_INVALID) {
+            merror("pushable present, trying to push");
             return handle_box_push(pushable_id, v);
-        minfo("has solid");
+        }
+        //minfo("has solid");
         const bool has_solid = tile_has_solid(aloc.x, aloc.y, aloc.z);
-        if (has_solid)
+        if (has_solid) {
+            merror("solid present, cannot move");
             return false;
-        minfo("has live npcs");
-        if (tile_has_live_npcs(tile_at_cur_floor(aloc)))
+        }
+        //minfo("has live npcs");
+        if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
+            merror("live npcs present, cannot move");
             return false;
-        minfo("has player");
-        if (tile_has_player(tile_at_cur_floor(aloc)))
+        }
+        //minfo("has player");
+        if (tile_has_player(tile_at_cur_floor(aloc))) {
+            merror("player present, cannot move");
             return false;
-        minfo("has door");
+        }
+        //minfo("has door");
         const entityid door_id = tile_has_door(aloc);
         if (door_id != ENTITYID_INVALID) {
             massert(ct.has<door_open>(door_id), "door_id %d doesnt have a door_open component", door_id);
-            if (!ct.get<door_open>(door_id).value_or(false))
+            if (!ct.get<door_open>(door_id).value_or(false)) {
+                merror("door is closed");
                 return false;
+            }
         }
         // if door, door is open
-        minfo("df remove at");
+        //minfo("df remove at");
         // remove the entity from the current tile
-        if (!df.df_remove_at(id, loc.x, loc.y))
+        if (!df.df_remove_at(id, loc.x, loc.y)) {
+            merror("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
             return false;
+        }
         // add the entity to the new tile
-        minfo("df add at");
-        if (df.df_add_at(id, aloc.x, aloc.y) == ENTITYID_INVALID)
+        //minfo("df add at");
+        if (df.df_add_at(id, aloc.x, aloc.y) == ENTITYID_INVALID) {
+            merror("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
             return false;
-        minfo("setting location");
+        }
+        //minfo("setting location");
         ct.set<location>(id, aloc);
         const float mx = v.x * DEFAULT_TILE_SIZE;
         const float my = v.y * DEFAULT_TILE_SIZE;
-        minfo("setting spritemove...");
+        //minfo("setting spritemove...");
         ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
         if (check_hearing(hero_id, aloc)) {
             // crashes in unittest if missing this check
@@ -2190,7 +2297,9 @@ public:
     const inline bool compute_attack_roll(const entityid attacker, const entityid target) {
         const int str = ct.get<strength>(attacker).value_or(10);
         const int bonus = get_stat_bonus(str);
-        const int roll = GetRandomValue(1, 20) + bonus;
+        //const int roll = GetRandomValue(1, 20) + bonus;
+        uniform_int_distribution<int> gen(1, 20);
+        const int roll = gen(mt) + bonus;
         const int ac = compute_armor_class(target);
         return roll >= ac;
     }
@@ -2203,7 +2312,9 @@ public:
         const int bonus = std::max(0, get_stat_bonus(str));
         const entityid equipped_wpn = ct.get<equipped_weapon>(attacker).value_or(ENTITYID_INVALID);
         const vec3 dmg_range = ct.get<damage>(equipped_wpn).value_or(MINIMUM_DAMAGE);
-        const int dmg = std::max(1, GetRandomValue(dmg_range.x, dmg_range.y));
+        uniform_int_distribution<int> gen(dmg_range.x, dmg_range.y);
+        //const int dmg = std::max(1, GetRandomValue(dmg_range.x, dmg_range.y));
+        const int dmg = std::max(1, gen(mt));
         return dmg + bonus;
     }
 
@@ -2360,7 +2471,9 @@ public:
         }
         // if has shield
         // compute chance to block
-        const int roll = GetRandomValue(1, MAX_BLOCK_CHANCE);
+        uniform_int_distribution<int> gen(1, MAX_BLOCK_CHANCE);
+        //const int roll = GetRandomValue(1, MAX_BLOCK_CHANCE);
+        const int roll = gen(mt);
         const int chance = ct.get<block_chance>(shield_id).value_or(MAX_BLOCK_CHANCE);
         const int low_roll = MAX_BLOCK_CHANCE - chance;
         if (roll <= low_roll) {
@@ -2418,15 +2531,16 @@ public:
 
 
 
-    const inline attack_result_t try_entity_attack(const entityid id, const int tgt_x, const int tgt_y) {
+    const inline attack_result_t try_entity_attack(const entityid id, const int x, const int y) {
+        minfo("entity %d is attacking location %d, %d", id, x, y);
         massert(!ct.get<dead>(id).value_or(false), "attacker entity is dead");
+        massert(ct.has<location>(id), "entity %d has no location", id);
         const vec3 loc = ct.get<location>(id).value();
-        //auto df = d_get_floor(dungeon, loc.z);
         auto df = d.get_floor(loc.z);
-        auto tile = df.df_tile_at((vec3){tgt_x, tgt_y, loc.z});
+        auto tile = df.df_tile_at((vec3){x, y, loc.z});
         // Calculate direction based on target position
-        const int dx = tgt_x - loc.x;
-        const int dy = tgt_y - loc.y;
+        const int dx = x - loc.x;
+        const int dy = y - loc.y;
         ct.set<direction>(id, get_dir_from_xy(dx, dy));
         ct.set<attacking>(id, true);
         ct.set<update>(id, true);
@@ -2434,8 +2548,9 @@ public:
         const attack_result_t result = process_attack_entity(tile, id, npc_id);
         // did the hero hear this event?
         handle_attack_sfx(id, result);
-        if (!test)
+        if (!test) {
             set_gamestate_flag_for_attack_animation(ct.get<entitytype>(id).value_or(ENTITY_NONE));
+        }
         return result;
     }
 
@@ -2670,7 +2785,10 @@ public:
                         break;
                     }
                 }
-                const int dmg = GetRandomValue(1, 6);
+
+                uniform_int_distribution<int> gen(1, 6);
+                //const int dmg = GetRandomValue(1, 6);
+                const int dmg = gen(mt);
                 ct.set<damaged>(npcid, true);
                 ct.set<update>(npcid, true);
                 auto maybe_tgt_hp = ct.get<hp>(npcid);
@@ -2781,14 +2899,24 @@ public:
     inline void handle_input_gameplay_controlmode_player(const inputstate& is) {
         //minfo("handle input gameplay controlmode player");
 
-        if (flag != GAMESTATE_FLAG_PLAYER_INPUT)
+        if (flag != GAMESTATE_FLAG_PLAYER_INPUT) {
+            //merror("flag is not player input");
             return;
+        }
 
         if (test) {
             // special handler
             // move randomly for now
             minfo("hero random move");
-            try_entity_move(hero_id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+            //const bool r0 = try_entity_move(hero_id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+            uniform_int_distribution<int> dist(-1, 1);
+            const bool r0 = try_entity_move(hero_id, (vec3){dist(mt), dist(mt), 0});
+
+            if (r0) {
+                msuccess("hero moved randomly successfully");
+            } else {
+                minfo("hero failed to move randomly");
+            }
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return;
         }
@@ -2868,6 +2996,7 @@ public:
 
 
     inline void handle_input_gameplay_scene(const inputstate& is) {
+        //minfo("handle input gameplay scene");
         if (inputstate_is_pressed(is, KEY_B)) {
             if (controlmode == CONTROLMODE_PLAYER) {
                 controlmode = CONTROLMODE_CAMERA;
@@ -2900,6 +3029,7 @@ public:
     inline void handle_input(const inputstate& is) {
         // no matter which mode we are in, we can toggle the debug panel
         //minfo("handle input");
+        //minfo("current_scene: %d", current_scene);
         if (inputstate_is_pressed(is, KEY_P)) {
             debugpanelon = !debugpanelon;
             //minfo("Toggling debug panel: %s", debugpanelon ? "ON" : "OFF");
@@ -2933,53 +3063,54 @@ public:
         //memset(debugpanel.buffer, 0, sizeof(debugpanel.buffer));
         bzero(debugpanel.buffer, sizeof(debugpanel.buffer));
         // Format the string in one pass
-        snprintf(debugpanel.buffer,
-                 sizeof(debugpanel.buffer),
-                 "@evildojo666\n"
-                 "project.rpg\n"
-                 //"%s\n" // timebeganbuf
-                 //"%s\n" // currenttimebuf
-                 "frame : %d\n"
-                 "update: %d\n"
-                 "frame dirty: %d\n"
-                 "draw time: %.1fms\n"
-                 "cam: (%.0f,%.0f) Zoom: %.1f\n"
-                 "controlmode: %s \n"
-                 "floor: %d/%d \n"
-                 "next_entity_id: %d\n"
-                 "hero_id: %d\n"
-                 "flag: %s\n"
-                 "entity_turn: %d\n"
-                 "hero: (%d,%d,%d)\n"
-                 "weapon: %d\n"
-                 "inventory: %d\n"
-                 "message count: %d\n",
-                 framecount,
-                 frame_updates,
-                 frame_dirty,
-                 last_frame_time * 1000,
-                 cam2d.offset.x,
-                 cam2d.offset.y,
-                 cam2d.zoom,
-                 control_mode,
-                 0,
-                 0,
-                 next_entityid,
-                 hero_id,
-                 flag == GAMESTATE_FLAG_NONE           ? "None"
-                 : flag == GAMESTATE_FLAG_PLAYER_INPUT ? "Player Input"
-                 : flag == GAMESTATE_FLAG_PLAYER_ANIM  ? "Player anim"
-                 : flag == GAMESTATE_FLAG_NPC_TURN     ? "NPC Turn"
-                 : flag == GAMESTATE_FLAG_NPC_ANIM     ? "NPC anim"
-                                                       : "Unknown",
+        snprintf(
+            debugpanel.buffer,
+            sizeof(debugpanel.buffer),
+            "@evildojo666\n"
+            "project.rpg\n"
+            //"%s\n" // timebeganbuf
+            //"%s\n" // currenttimebuf
+            "frame : %d\n"
+            "update: %d\n"
+            "frame dirty: %d\n"
+            "draw time: %.1fms\n"
+            "cam: (%.0f,%.0f) Zoom: %.1f\n"
+            "controlmode: %s \n"
+            "floor: %d/%d \n"
+            "next_entity_id: %d\n"
+            "hero_id: %d\n"
+            "flag: %s\n"
+            "entity_turn: %d\n"
+            "hero: (%d,%d,%d)\n"
+            "weapon: %d\n"
+            "inventory: %d\n"
+            "message count: %d\n",
+            framecount,
+            frame_updates,
+            frame_dirty,
+            last_frame_time * 1000,
+            cam2d.offset.x,
+            cam2d.offset.y,
+            cam2d.zoom,
+            control_mode,
+            0,
+            0,
+            next_entityid,
+            hero_id,
+            flag == GAMESTATE_FLAG_NONE           ? "None"
+            : flag == GAMESTATE_FLAG_PLAYER_INPUT ? "Player Input"
+            : flag == GAMESTATE_FLAG_PLAYER_ANIM  ? "Player anim"
+            : flag == GAMESTATE_FLAG_NPC_TURN     ? "NPC Turn"
+            : flag == GAMESTATE_FLAG_NPC_ANIM     ? "NPC anim"
+                                                  : "Unknown",
 
-                 entity_turn,
-                 loc.x,
-                 loc.y,
-                 loc.z,
-                 ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID),
-                 inventory_count,
-                 message_count);
+            entity_turn,
+            loc.x,
+            loc.y,
+            loc.z,
+            ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID),
+            inventory_count,
+            message_count);
     }
 
 
@@ -3027,12 +3158,14 @@ public:
         //auto npc_tactics = ct.get<tactics>(id).value_or((vector<tactic>){tactic::wait});
         //bool action_success = false;
 
-        minfo("checking tactics...");
+        //minfo("checking tactics...");
         for (tactic t : npc_tactics) {
             //minfo("tactic: %d %d %d", t.target, t.condition, t.action);
             if (t.target == tactic_target::nil && t.condition == tactic_condition::any && t.action == tactic_action::move) {
                 // handle random move
-                const bool result = try_entity_move(id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+                uniform_int_distribution<int> dist(-1, 1);
+                //const bool result = try_entity_move(id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+                const bool result = try_entity_move(id, (vec3){dist(mt), dist(mt), 0});
                 if (result) {
                     msuccess("try entity move succeeded");
                 } else {
@@ -3074,11 +3207,11 @@ public:
 #ifndef NPCS_ALL_AT_ONCE
             if (entity_turn >= 0 && entity_turn < next_entityid) {
                 const bool result = handle_npc(entity_turn);
-                if (result) {
-                    msuccess("npc %d handled successfully", entity_turn);
-                } else {
-                    merror("npc %d handle failed", entity_turn);
-                }
+                //if (result) {
+                //    msuccess("npc %d handled successfully", entity_turn);
+                //} else {
+                //    merror("npc %d handle failed", entity_turn);
+                //}
                 flag = GAMESTATE_FLAG_NPC_ANIM;
             }
 #else
@@ -3102,17 +3235,19 @@ public:
 
 
     inline void handle_test_flag() {
-        minfo("handle test flag");
+        //minfo("handle test flag: %d", flag);
         if (flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+            //minfo("player anim");
 #ifndef NPCS_ALL_AT_ONCE
             entity_turn++;
             if (entity_turn >= next_entityid)
                 entity_turn = 0;
 #endif
-            minfo("handle test flag -: %d", turn_count);
+            //minfo("handle test flag: %d", turn_count);
 
             flag = GAMESTATE_FLAG_NPC_TURN;
         } else if (flag == GAMESTATE_FLAG_NPC_ANIM) {
+            //minfo("npc anim");
 #ifndef NPCS_ALL_AT_ONCE
             entity_turn++;
             if (entity_turn >= next_entityid) {
@@ -3126,7 +3261,7 @@ public:
             }
 #else
             flag = GAMESTATE_FLAG_PLAYER_INPUT;
-            minfo("handle test flag: %d", turn_count);
+            //minfo("handle test flag: %d", turn_count);
             turn_count++;
 #endif
         }
@@ -3136,20 +3271,39 @@ public:
 
 
     inline void tick(const inputstate& is) {
+        //minfo("tick");
         // Spawn NPCs periodically
         //try_spawn_npc(g);
-        update_player_tiles_explored();
-        update_player_state();
+        const bool r0 = update_player_tiles_explored();
+        //massert(r0, "update player tiles explored failed");
+        if (!r0) {
+            merror("update player tiles explored failed");
+        }
+
+        const bool r1 = update_player_state();
+        if (!r1) {
+            merror("update player state failed");
+        }
+
         update_npcs_state();
+
         update_spells_state();
+
         handle_input(is);
+
         handle_npcs();
+
         update_debug_panel_buffer(is);
+
         currenttime = time(NULL);
         currenttimetm = localtime(&currenttime);
         strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
+
         if (test) {
             handle_test_flag();
         }
+
+        ticks++;
+        //minfo("end tick");
     }
 };

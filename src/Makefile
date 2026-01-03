@@ -34,7 +34,8 @@ tests: tests.cpp
 	g++ -o tests tests.cpp -lraylib $(CXXFLAGS) $(CFLAGS)
 
 tests.cpp: unit_test.h
-	cxxtestgen --error-printer -o tests.cpp unit_test.h
+	cxxtestgen --error-printer -o tests.cpp unit_test.h 
+
 
 clean:
 	rm -rfv game *.gch time.txt index.html index.js index.wasm index.data test tests.cpp tests
