@@ -1,10 +1,11 @@
 #pragma once
 #include <cstdio>
 // Single-line macros that clang-format won't break
-#ifdef DEBUG
+//#ifdef DEBUG
+#if DEBUG == 1
 #define minfo(...)                                                                                                                                             \
     do {                                                                                                                                                       \
-        printf("📔 \033[35;1mInfo  \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                      \
+        printf("📔 \033[35;1mInfo  \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                       \
         printf(__VA_ARGS__);                                                                                                                                   \
         printf("\n");                                                                                                                                          \
     } while (0)
@@ -16,13 +17,13 @@
     } while (0)
 #define merror(...)                                                                                                                                            \
     do {                                                                                                                                                       \
-        printf("☠️ \033[31;1mError \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                 \
+        printf("☠️ \033[31;1mError \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                  \
         printf(__VA_ARGS__);                                                                                                                                   \
         printf("\n");                                                                                                                                          \
     } while (0)
 #define msuccess(...)                                                                                                                                          \
     do {                                                                                                                                                       \
-        printf("✅ \033[32;1mOK   \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                      \
+        printf("✅ \033[32;1mOK   \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                        \
         printf(__VA_ARGS__);                                                                                                                                   \
         printf("\n");                                                                                                                                          \
     } while (0)
@@ -33,10 +34,11 @@
 #define msuccess(...) ((void)0)
 #endif
 
-#ifdef DEBUG2
+//#ifdef DEBUG2
+#if DEBUG == 2
 #define minfo2(...)                                                                                                                                            \
     do {                                                                                                                                                       \
-        printf("📔 \033[35;1mInfo \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                      \
+        printf("📔 \033[35;1mInfo \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                        \
         printf(__VA_ARGS__);                                                                                                                                   \
         printf("\n");                                                                                                                                          \
     } while (0)
@@ -48,13 +50,13 @@
     } while (0)
 #define merror2(...)                                                                                                                                           \
     do {                                                                                                                                                       \
-        printf("☠️ \033[31;1mError \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                 \
+        printf("☠️ \033[31;1mError \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                  \
         printf(__VA_ARGS__);                                                                                                                                   \
         printf("\n");                                                                                                                                          \
     } while (0)
 #define msuccess2(...)                                                                                                                                         \
     do {                                                                                                                                                       \
-        printf("✅ \033[32;1mOK   \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                      \
+        printf("✅ \033[32;1mOK   \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                        \
         printf(__VA_ARGS__);                                                                                                                                   \
         printf("\n");                                                                                                                                          \
     } while (0)

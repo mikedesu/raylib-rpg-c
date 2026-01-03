@@ -33,17 +33,23 @@ public:
     shared_ptr<unordered_map<tile_id, tile_t>> tile_map; // Maps tile_id to tile_t pointer
 
 
+
+
     inline tile_t& df_tile_at(const vec3 loc) {
         // given that tiles is a 2D vector of shared pointers to tile_t
         // we can access the tile using the x and y coordinates
         // and calculate the index
+        //minfo("df_tile_at: (%d, %d, %d)", loc.x, loc.y, loc.z);
         const size_t index = loc.y * width + loc.x;
+
         massert(index < tiles.size(), "index is out-of-bounds: %d, %d", loc.x, loc.y);
         const tile_id id = tiles[index];
         // Check if the tile_id exists in the map
         auto it = tile_map->find(id);
         return it->second;
     }
+
+
 
 
     inline void df_set_can_have_door(const vec3 loc) {
@@ -55,7 +61,7 @@ public:
 
 
 
-    inline bool df_is_good_door_loc(const vec3 loc) {
+    const inline bool df_is_good_door_loc(const vec3 loc) {
         auto tile = df_tile_at(loc);
         if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1) {
             auto t0 = df_tile_at((vec3){loc.x - 1, loc.y - 1, loc.z});
@@ -91,11 +97,16 @@ public:
     }
 
 
-    inline tiletype_t random_tiletype(const tiletype_t a, const tiletype_t b) {
+
+
+    const inline tiletype_t random_tiletype(const tiletype_t a, const tiletype_t b) {
         return (tiletype_t)GetRandomValue(a, b);
     }
 
-    inline void df_set_area(const tiletype_t a, const tiletype_t b, const Rectangle r) {
+
+
+
+    const inline void df_set_area(const tiletype_t a, const tiletype_t b, const Rectangle r) {
         //minfo("df set area");
         for (int x = r.x; x < r.x + r.width && x < width; x++) {
             for (int y = r.y; y < r.y + r.height && y < height; y++) {
@@ -126,6 +137,8 @@ public:
 
 
     inline void init(const int f, const biome_t t, const int w, const int h) {
+        minfo("df init: f=%d, t=%d, w=%d, h=%d", f, t, w, h);
+
         massert(w > 0, "width must be greater than zero");
         massert(h > 0, "height must be greater than zero");
         massert(f >= 0, "floor must be greater than or equal to zero");
@@ -142,6 +155,7 @@ public:
         massert(tile_map, "failed to create tile map");
 
         // create all the tiles and add to the tile vector and tile map
+        minfo("pushing tiles...");
         for (tile_id i = 0; i < width * height; i++) {
             tiles.push_back(i);
             //auto tile = make_shared<tile_t>();
@@ -151,6 +165,7 @@ public:
             tile.tile_init(TILE_NONE);
             tile_map->insert({i, tile});
         }
+        msuccess("tiles pushed.");
 
         // locate "center"
         // in the 24x24 case,
@@ -161,32 +176,32 @@ public:
         const int h2 = 8;
         // init the inner w x h area
         // create a new room with walls
-        df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y, w2, h2});
-        df_set_perimeter(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x - 1, y - 1, w2 + 2, h2 + 2});
-        df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x + w2 / 2.0f, y, 1, h2});
-        df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x, y + h2 / 2.0f, w2, 1});
-        df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w2 / 2.0f, y + 1, 1, 1});
-        df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w2 / 2.0f + 2, y + 4, 1, 2});
-        df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w2 / 2.0f, y + 6, 1, 2});
+        //df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y, w2, h2});
+        //df_set_perimeter(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x - 1, y - 1, w2 + 2, h2 + 2});
+        //df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x + w2 / 2.0f, y, 1, h2});
+        //df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x, y + h2 / 2.0f, w2, 1});
+        //df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w2 / 2.0f, y + 1, 1, 1});
+        //df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w2 / 2.0f + 2, y + 4, 1, 2});
+        //df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w2 / 2.0f, y + 6, 1, 2});
 
-        const vec3 loc_u = {9, 9, floor};
-        df_set_tile(TILE_UPSTAIRS, loc_u.x, loc_u.y);
-        upstairs_loc = loc_u;
+        //const vec3 loc_u = {9, 9, floor};
+        //df_set_tile(TILE_UPSTAIRS, loc_u.x, loc_u.y);
+        //upstairs_loc = loc_u;
 
-        const vec3 loc_d = {9, 14, floor};
-        df_set_tile(TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
-        downstairs_loc = loc_d;
+        //const vec3 loc_d = {9, 14, floor};
+        //df_set_tile(TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
+        //downstairs_loc = loc_d;
 
-        df_set_can_have_door((vec3){12, 9, 0});
-        if (df_tile_at((vec3){12, 9, 0}).can_have_door) {
-            //msuccess("door has can have door set");
-            //DEBUG_BREAK();
-        } else {
-            //merror("door does not have can have door set");
-            DEBUG_BREAK();
-        }
+        //df_set_can_have_door((vec3){12, 9, 0});
+        //if (df_tile_at((vec3){12, 9, 0}).can_have_door) {
+        //msuccess("door has can have door set");
+        //DEBUG_BREAK();
+        //} else {
+        //merror("door does not have can have door set");
+        //    DEBUG_BREAK();
+        //}
 
-        //msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
+        msuccess("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
     }
 
 
@@ -411,6 +426,8 @@ public:
 
 
     dungeon_floor() {
+        upstairs_loc = {-1, -1, -1};
+        downstairs_loc = {-1, -1, -1};
     }
 
     ~dungeon_floor() {

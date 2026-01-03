@@ -382,19 +382,32 @@ public:
 
 
     inline void init_dungeon(const biome_t type, const int df_count, const int w, const int h) {
+        minfo("init_dungeon");
         massert(df_count > 0, "df_count is <= 0");
         massert(w > 0, "w == 0");
         massert(h > 0, "h == 0");
         massert(df_count > 0, "df_count == 0");
         massert(type > BIOME_NONE, "biome is invalid");
         massert(type < BIOME_COUNT, "biome is invalid 2");
-        if (d.is_initialized)
+        if (d.is_initialized) {
+            merror("dungeon is already initialized");
             return;
+        }
         // max size of 128x128 for now to maintain 60fps
         // dungeon floors, tiles etc will require re-write/re-design for optimization
-        for (int i = 0; i < df_count; i++)
+        for (int i = 0; i < df_count; i++) {
             d.add_floor(type, w, h);
+        }
         d.is_initialized = true;
+    }
+
+
+
+
+    const inline vector<vec3> get_df_locs(const size_t floor_num) {
+        vector<vec3> locs;
+
+        return locs;
     }
 
 
@@ -1130,7 +1143,7 @@ public:
 
     const inline bool update_player_state() {
         if (hero_id == ENTITYID_INVALID) {
-            merror("hero_id is invalid");
+            merror2("hero_id is invalid");
             return false;
         }
         const unsigned char a = ct.get<txalpha>(hero_id).value_or(255);
@@ -1138,6 +1151,7 @@ public:
         if (a < 255)
             ct.set<txalpha>(hero_id, a + 1);
         if (is_dead) {
+            merror2("hero_id is dead");
             gameover = true;
             return true;
         }
@@ -1213,20 +1227,20 @@ public:
         SetRandomSeed(time(NULL));
         init_dungeon(BIOME_STONE, 4, 32, 32);
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
-        place_doors();
-        place_props();
-        const vec3 loc0 = d.floors[0].df_get_random_loc();
-        create_weapon_at_with(ct, loc0, dagger_init());
-        create_shield_at_with(d.floors[0].df_get_random_loc(), shield_init());
-        create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
-        minfo("creating monsters...");
-        for (int i = 0; i < (int)d.floors.size(); i++) {
-            const int monster_count = i + 1;
-            for (int j = 0; j < monster_count; j++) {
-                const vec3 random_loc = d.get_floor(i).df_get_random_loc();
-                create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
-            }
-        }
+        //place_doors();
+        //place_props();
+        //const vec3 loc0 = d.floors[0].df_get_random_loc();
+        //create_weapon_at_with(ct, loc0, dagger_init());
+        //create_shield_at_with(d.floors[0].df_get_random_loc(), shield_init());
+        //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
+        //minfo("creating monsters...");
+        //for (int i = 0; i < (int)d.floors.size(); i++) {
+        //    const int monster_count = i + 1;
+        //    for (int j = 0; j < monster_count; j++) {
+        //        const vec3 random_loc = d.get_floor(i).df_get_random_loc();
+        //        create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
+        //    }
+        //}
 
         msuccess("end creating monsters...");
         add_message("Welcome to the game! Press enter to cycle messages.");
@@ -1291,6 +1305,7 @@ public:
 
 
     const inline entityid create_player_with(const vec3 loc, const string n, with_fun playerInitFunction) {
+        minfo2("create player with: loc=(%d, %d, %d), n=%s", loc.x, loc.y, loc.z, n.c_str());
         massert(n != "", "name is empty string");
         const race_t rt = chara_creation.race;
         const auto id = create_npc_at_with(rt, loc, [](CT& ct, const entityid id) {});
@@ -1415,8 +1430,10 @@ public:
             int maxhp_roll = -1;
             while (maxhp_roll < 1)
                 maxhp_roll = do_roll_best_of_3((vec3){1, myhd, 0}) + get_stat_bonus(chara_creation.constitution);
-            const vec3 start_loc = d.floors[d.current_floor].upstairs_loc;
+            //const vec3 start_loc = d.floors[d.current_floor].upstairs_loc;
+            const vec3 start_loc = d.floors[0].df_get_random_loc();
             massert(!vec3_invalid(start_loc), "start_loc is (-1,-1,-1)");
+
             entity_turn = create_player_with(start_loc, "darkmage", [this, maxhp_roll](CT& ct, const entityid id) {
                 // set stats from char_creation
                 ct.set<strength>(id, chara_creation.strength);
@@ -2026,7 +2043,8 @@ public:
 
     const inline bool try_entity_move(const entityid id, const vec3 v) {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-        minfo2("entity %d is trying to move to (%d,%d,%d)", id, v.x, v.y, v.z);
+        minfo2("entity %d is trying to move: (%d,%d,%d)", id, v.x, v.y, v.z);
+
         ct.set<update>(id, true);
         ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
         // entity location
@@ -2036,7 +2054,22 @@ public:
         // entity's new location
         // we will have a special case for traversing floors so ignore v.z
         const vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
+        minfo2("entity %d is trying to move to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
+
+
         auto df = d.get_floor(loc.z);
+
+        //massert(aloc.x >= 0, "aloc.x <= 0");
+        //massert(aloc.x < df.width, "aloc.x >= df.width");
+        //massert(aloc.y >= 0, "aloc.y <= 0");
+        //massert(aloc.y < df.height, "aloc.y >= df.height");
+
+        if (aloc.x < 0 || aloc.x >= df.width || aloc.y < 0 || aloc.y >= df.height) {
+            merror("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
+            return false;
+        }
+
+
         auto tile = df.df_tile_at(aloc);
         //minfo("is walkable");
         if (!tile_is_walkable(tile.type)) {
@@ -3282,7 +3315,7 @@ public:
 
         const bool r1 = update_player_state();
         if (!r1) {
-            merror("update player state failed");
+            merror2("update player state failed");
         }
 
         update_npcs_state();
