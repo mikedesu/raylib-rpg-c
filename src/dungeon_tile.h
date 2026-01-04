@@ -29,11 +29,11 @@ private:
     tile_id id;
     //bool is_empty;
     bool visible;
+    bool explored;
 
 
 
 public:
-    bool explored;
     bool cached_player_present;
     bool dirty_entities;
     bool dirty_visibility;
@@ -42,6 +42,23 @@ public:
     entityid cached_npc;
     entityid cached_item;
     shared_ptr<vector<entityid>> entities;
+
+
+
+
+    void set_explored(const bool b)
+    {
+        explored = b;
+    }
+
+
+
+
+    const bool get_explored()
+    {
+        return explored;
+    }
+
 
 
 

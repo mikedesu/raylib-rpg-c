@@ -1243,8 +1243,7 @@ public:
 
     inline void update_tile(tile_t& tile)
     {
-        tile.explored = true;
-        //tile.visible = true;
+        tile.set_explored(true);
         tile.set_visible(true);
     }
 
@@ -1322,10 +1321,14 @@ public:
         for (entityid id = 0; id < next_entityid; id++)
         {
             if (id == hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL)
+            {
                 continue;
+            }
             unsigned char a = ct.get<txalpha>(id).value_or(255);
             if (a < 255)
+            {
                 a++;
+            }
             ct.set<txalpha>(id, a);
             const bool is_complete = ct.get<spell_complete>(id).value_or(false);
             const bool is_destroyed = ct.get<destroyed>(id).value_or(false);
@@ -1334,7 +1337,6 @@ public:
                 // remove it from the tile
                 auto df = d.get_current_floor();
                 auto loc = ct.get<location>(id).value_or((vec3){-1, -1, -1});
-
                 const bool r0 = df.df_remove_at(id, loc.x, loc.y);
                 if (!r0)
                 {
@@ -1353,10 +1355,14 @@ public:
         for (entityid id = 0; id < next_entityid; id++)
         {
             if (id == hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC)
+            {
                 continue;
+            }
             unsigned char a = ct.get<txalpha>(id).value_or(255);
             if (a < 255)
+            {
                 a++;
+            }
             ct.set<txalpha>(id, a);
             ct.set<damaged>(id, false);
         }
@@ -1375,7 +1381,9 @@ public:
             {
                 auto t = df.df_tile_at((vec3){i, j, -1});
                 if (tile_has_live_npcs(t))
+                {
                     count++;
+                }
             }
         }
         return count;
@@ -1405,7 +1413,6 @@ public:
         //        create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
         //    }
         //}
-
         msuccess("end creating monsters...");
         add_message("Welcome to the game! Press enter to cycle messages.");
 #ifdef START_MESSAGES
@@ -1603,7 +1610,9 @@ public:
         {
             const entitytype_t t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (t == ENTITY_NPC)
+            {
                 ct.set<target_id>(id, hero_id);
+            }
         }
     }
 
@@ -1626,7 +1635,9 @@ public:
             const int myhd = chara_creation.hitdie;
             int maxhp_roll = -1;
             while (maxhp_roll < 1)
+            {
                 maxhp_roll = do_roll_best_of_3((vec3){1, myhd, 0}) + get_stat_bonus(chara_creation.constitution);
+            }
             //const vec3 start_loc = d.floors[d.current_floor].upstairs_loc;
             const vec3 start_loc = d.floors[0].df_get_random_loc();
             massert(!vec3_invalid(start_loc), "start_loc is (-1,-1,-1)");
@@ -1669,9 +1680,13 @@ public:
             PlaySound(sfx.at(SFX_CONFIRM_01));
             int race = chara_creation.race;
             if (chara_creation.race > 1)
+            {
                 race--;
+            }
             else
+            {
                 race = RACE_COUNT - 1;
+            }
             chara_creation.race = (race_t)race;
             chara_creation.hitdie = get_racial_hd(chara_creation.race);
         }
@@ -1680,9 +1695,13 @@ public:
             PlaySound(sfx.at(SFX_CONFIRM_01));
             int race = chara_creation.race;
             if (race < RACE_COUNT - 1)
+            {
                 race++;
+            }
             else
+            {
                 race = RACE_NONE + 1;
+            }
             chara_creation.race = (race_t)race;
             chara_creation.hitdie = get_racial_hd(chara_creation.race);
         }
@@ -1712,9 +1731,13 @@ public:
             }
         }
         if (!success)
+        {
             merror("Failed to find item id %d", item_id);
+        }
         else
+        {
             msuccess("Successfully removed item id %d", item_id);
+        }
         return success;
     }
 
@@ -1778,10 +1801,14 @@ public:
         const entityid current_weapon = ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID);
         // Unequip if it's already equipped
         if (current_weapon == item_id)
+        {
             ct.set<equipped_weapon>(hero_id, ENTITYID_INVALID);
+        }
         // Equip the new weapon
         else
+        {
             ct.set<equipped_weapon>(hero_id, item_id);
+        }
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         controlmode = CONTROLMODE_PLAYER;
         display_inventory_menu = false;
@@ -1796,10 +1823,14 @@ public:
         const entityid current_shield = ct.get<equipped_shield>(hero_id).value_or(ENTITYID_INVALID);
         // Unequip if it's already equipped
         if (current_shield == item_id)
+        {
             ct.set<equipped_shield>(hero_id, ENTITYID_INVALID);
+        }
         // Equip the new shield
         else
+        {
             ct.set<equipped_shield>(hero_id, item_id);
+        }
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         controlmode = CONTROLMODE_PLAYER;
         display_inventory_menu = false;
@@ -1831,16 +1862,24 @@ public:
         const size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
         auto my_inventory = ct.get<inventory>(hero_id);
         if (!my_inventory)
+        {
             return;
+        }
         if (!my_inventory.has_value())
+        {
             return;
+        }
         auto unpacked_inventory = my_inventory.value();
         if (index < 0 || index >= unpacked_inventory->size())
+        {
             return;
+        }
         const entityid item_id = unpacked_inventory->at(index);
         const entitytype_t type = ct.get<entitytype>(item_id).value_or(ENTITY_NONE);
         if (type == ENTITY_ITEM)
+        {
             handle_hero_inventory_equip_item(item_id);
+        }
     }
 
 
@@ -1849,18 +1888,26 @@ public:
     const inline bool drop_item_from_hero_inventory()
     {
         if (!ct.has<inventory>(hero_id))
+        {
             return false;
+        }
         const size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
         auto maybe_inventory = ct.get<inventory>(hero_id);
         if (!maybe_inventory.has_value())
+        {
             return false;
+        }
         auto inventory = maybe_inventory.value();
         if (index < 0 || index >= inventory->size())
+        {
             return false;
+        }
         const entityid item_id = inventory->at(index);
         inventory->erase(inventory->begin() + index);
         if (item_id == ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID))
+        {
             ct.set<equipped_weapon>(hero_id, ENTITYID_INVALID);
+        }
         // add it to the tile at the player's current location
         // get the player's location
         const vec3 loc = ct.get<location>(hero_id).value();
@@ -1894,7 +1941,9 @@ public:
         {
             //minfo("item id %d", *it);
             if (*it == item_id)
+            {
                 return true;
+            }
         }
         return false;
     }
@@ -1955,13 +2004,21 @@ public:
     {
         const float move = cam2d.zoom;
         if (inputstate_is_held(is, KEY_RIGHT))
+        {
             cam2d.offset.x += move;
+        }
         else if (inputstate_is_held(is, KEY_LEFT))
+        {
             cam2d.offset.x -= move;
+        }
         else if (inputstate_is_held(is, KEY_UP))
+        {
             cam2d.offset.y -= move;
+        }
         else if (inputstate_is_held(is, KEY_DOWN))
+        {
             cam2d.offset.y += move;
+        }
     }
 
 
@@ -1971,10 +2028,14 @@ public:
     {
         const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
         if (type != ENTITY_ITEM)
+        {
             return;
+        }
         const itemtype_t i_type = ct.get<itemtype>(id).value_or(ITEM_NONE);
         if (i_type == ITEM_NONE || i_type != ITEM_POTION)
+        {
             return;
+        }
         if (use_potion(hero_id, id))
         {
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1990,22 +2051,34 @@ public:
     {
         const size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
         if (index < 0)
+        {
             return;
+        }
         auto maybe_inventory = ct.get<inventory>(hero_id);
         if (!maybe_inventory || !maybe_inventory.has_value())
+        {
             return;
+        }
         auto inventory = maybe_inventory.value();
         if (index >= inventory->size())
+        {
             return;
+        }
         const entityid item_id = inventory->at(index);
         const entitytype_t type = ct.get<entitytype>(item_id).value_or(ENTITY_NONE);
         if (type != ENTITY_ITEM)
+        {
             return;
+        }
         const itemtype_t i_type = ct.get<itemtype>(item_id).value_or(ITEM_NONE);
         if (i_type == ITEM_NONE)
+        {
             return;
+        }
         if (i_type == ITEM_POTION)
+        {
             handle_hero_potion_use(item_id);
+        }
     }
 
 
@@ -2014,9 +2087,13 @@ public:
     inline void handle_input_inventory(const inputstate& is)
     {
         if (controlmode != CONTROLMODE_INVENTORY)
+        {
             return;
+        }
         if (!display_inventory_menu)
+        {
             return;
+        }
         if (inputstate_is_pressed(is, KEY_ESCAPE))
         {
             do_quit = true;
@@ -2033,7 +2110,9 @@ public:
         {
             PlaySound(sfx[SFX_CONFIRM_01]);
             if (inventory_cursor.x > 0)
+            {
                 inventory_cursor.x--;
+            }
         }
         if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D))
         {
@@ -2044,7 +2123,9 @@ public:
         {
             PlaySound(sfx[SFX_CONFIRM_01]);
             if (inventory_cursor.y > 0)
+            {
                 inventory_cursor.y--;
+            }
         }
         if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X))
         {
