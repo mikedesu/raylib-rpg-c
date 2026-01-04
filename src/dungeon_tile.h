@@ -35,11 +35,40 @@ private:
     int cached_item_count;
     entityid cached_npc;
     entityid cached_item;
+    shared_ptr<vector<entityid>> entities;
 
 
 
 public:
-    shared_ptr<vector<entityid>> entities;
+    shared_ptr<vector<entityid>> get_entities()
+    {
+        return entities;
+    }
+
+
+
+
+    const size_t get_entity_count()
+    {
+        return entities->size();
+    }
+
+
+
+
+    const entityid get_entity_at(const size_t i)
+    {
+        if (entities->size() == 0)
+        {
+            return ENTITYID_INVALID;
+        }
+        else if (i >= entities->size())
+        {
+            return ENTITYID_INVALID;
+        }
+        return entities->at(i);
+    }
+
 
 
 

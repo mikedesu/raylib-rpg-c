@@ -147,8 +147,8 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
         }
         // Check for closed doors
         for_each(
-            tile.entities->cbegin(),
-            tile.entities->cend(),
+            tile.get_entities()->cbegin(),
+            tile.get_entities()->cend(),
             [&g, &blocking](const entityid& id)
             {
                 if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false))
@@ -175,7 +175,7 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
         for (int x = 0; x < df.width; x++)
         {
             const vec3 loc = {x, y, z};
-            const auto tile = df.df_tile_at(loc);
+            auto tile = df.df_tile_at(loc);
 
             //if (!tile.visible) {
             //    continue;
@@ -242,8 +242,8 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 
                 // check if tile has a DOOR
                 for_each(
-                    v0_tile.entities->cbegin(),
-                    v0_tile.entities->cend(),
+                    v0_tile.get_entities()->cbegin(),
+                    v0_tile.get_entities()->cend(),
                     [&g, &object_blocking](const entityid& id)
                     {
                         if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false))
@@ -266,8 +266,8 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
             //}
 
             for_each(
-                tile.entities->cbegin(),
-                tile.entities->cend(),
+                tile.get_entities()->cbegin(),
+                tile.get_entities()->cend(),
                 [&g, entitytype_0, object_blocking, &additional_check](const entityid& id)
                 {
                     auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);

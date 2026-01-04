@@ -421,7 +421,7 @@ public:
                     //merror("loc at (%d, %d, %d) type invalid. type is: %d", x, y, floor, tile.type);
                     continue;
                 }
-                if (tile.entities->size() > 0)
+                if (tile.get_entity_count() > 0)
                 {
                     //merror("loc at (%d, %d, %d) type invalid. tile has %ld entities", x, y, floor, tile.entities->size());
                     continue;

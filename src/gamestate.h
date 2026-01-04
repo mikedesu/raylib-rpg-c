@@ -455,9 +455,9 @@ public:
         t.set_cached_npc(ENTITYID_INVALID);
         t.set_cached_item(ENTITYID_INVALID);
         // Iterate through all entities on the tile
-        for (size_t i = 0; i < t.entities->size(); i++)
+        for (size_t i = 0; i < t.get_entity_count(); i++)
         {
-            const entityid id = t.entities->at(i);
+            const entityid id = t.get_entity_at(i);
             // Skip dead entities
             if (ct.get<dead>(id).value_or(false))
             {
@@ -1069,12 +1069,14 @@ public:
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         auto df = d.get_floor(z);
         auto t = df.df_tile_at((vec3){x, y, z});
-        for (int i = 0; (size_t)i < t.entities->size(); i++)
+        for (int i = 0; (size_t)i < t.get_entity_count(); i++)
         {
             const entityid id = t.tile_get_entity(i);
             const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (id != ENTITYID_INVALID && type == ENTITY_BOX)
+            {
                 return id;
+            }
         }
         return ENTITYID_INVALID;
     }
@@ -2320,12 +2322,14 @@ public:
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         auto df = d.get_floor(z);
         auto t = df.df_tile_at((vec3){x, y, z});
-        for (int i = 0; (size_t)i < t.entities->size(); i++)
+        for (int i = 0; (size_t)i < t.get_entity_count(); i++)
         {
             const entityid id = t.tile_get_entity(i);
             const bool is_solid = ct.get<solid>(id).value_or(false);
             if (id != ENTITYID_INVALID && is_solid)
+            {
                 return true;
+            }
         }
         return false;
     }
@@ -2350,12 +2354,14 @@ public:
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         auto df = d.get_floor(z);
         auto t = df.df_tile_at((vec3){x, y, z});
-        for (int i = 0; (size_t)i < t.entities->size(); i++)
+        for (int i = 0; (size_t)i < t.get_entity_count(); i++)
         {
             const entityid id = t.tile_get_entity(i);
             const bool is_pushable = ct.get<pushable>(id).value_or(false);
             if (id != ENTITYID_INVALID && is_pushable)
+            {
                 return id;
+            }
         }
         return ENTITYID_INVALID;
     }
@@ -2367,12 +2373,15 @@ public:
     {
         auto df = d.get_current_floor();
         auto t = df.df_tile_at(v);
-        for (size_t i = 0; i < t.entities->size(); i++)
+        for (size_t i = 0; i < t.get_entity_count(); i++)
         {
-            const entityid id = t.entities->at(i);
+            //const entityid id = t.entities->at(i);
+            const entityid id = t.get_entity_at(i);
             const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (type == ENTITY_DOOR)
+            {
                 return id;
+            }
         }
         return ENTITYID_INVALID;
     }
@@ -3213,9 +3222,9 @@ public:
             return false;
         auto df = d.get_current_floor();
         auto t = df.df_tile_at(loc);
-        for (size_t i = 0; i < t.entities->size(); i++)
+        for (size_t i = 0; i < t.get_entity_count(); i++)
         {
-            const entityid myid = t.entities->at(i);
+            const entityid myid = t.get_entity_at(i);
             const entitytype_t type = ct.get<entitytype>(myid).value_or(ENTITY_NONE);
             if (type != ENTITY_DOOR)
                 continue;
@@ -3288,7 +3297,8 @@ public:
             if (tile_has_live_npcs(tile))
             {
                 entityid npcid = ENTITYID_INVALID;
-                for (auto id : *tile.entities)
+                //for (auto id : *tile.entities)
+                for (auto id : *tile.get_entities())
                 {
                     if (ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC)
                     {
@@ -3345,7 +3355,8 @@ public:
             {
                 // find the door id
                 entityid doorid = ENTITYID_INVALID;
-                for (auto id : *tile.entities)
+                //for (auto id : *tile.entities)
+                for (auto id : *tile.get_entities())
                 {
                     if (ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR)
                     {
