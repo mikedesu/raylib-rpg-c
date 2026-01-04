@@ -35,12 +35,12 @@ private:
 
 
 public:
-    bool dirty_visibility;
     int cached_live_npcs;
     int cached_item_count;
     entityid cached_npc;
     entityid cached_item;
     shared_ptr<vector<entityid>> entities;
+
 
 
 
@@ -104,23 +104,6 @@ public:
     {
         return visible;
     }
-
-
-
-
-    //void set_is_empty()
-    //{
-    //is_empty = b;
-    //is_empty = entities->size() == 0;
-    //}
-
-
-
-
-    //const bool get_is_empty()
-    //{
-    //    return entities->size() == 0;
-    //}
 
 
 
@@ -205,8 +188,6 @@ public:
         cached_player_present = false;
         can_have_door = false;
         dirty_entities = true;
-        dirty_visibility = true;
-        //is_empty = true;
         cached_live_npcs = 0;
         cached_item_count = 0;
         cached_npc = ENTITYID_INVALID;
@@ -228,7 +209,6 @@ public:
         }
         entities->push_back(id);
         dirty_entities = true;
-        //is_empty = false;
         return id;
     }
 
@@ -247,7 +227,6 @@ public:
         }
         entities->erase(it);
         dirty_entities = true;
-        //is_empty = entities->size() == 0;
         return id;
     }
 
