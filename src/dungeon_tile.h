@@ -26,11 +26,11 @@ class tile_t
 private:
     bool can_have_door;
     tiletype_t type;
+    tile_id id;
 
 
 
 public:
-    tile_id id;
     bool visible;
     bool explored;
     bool cached_player_present;
@@ -45,6 +45,23 @@ public:
 
 
 
+
+    const tile_id get_id()
+    {
+        return id;
+    }
+
+
+
+
+    void set_id(const tile_id tid)
+    {
+        id = tid;
+    }
+
+
+
+
     const tiletype_t get_type()
     {
         return type;
@@ -53,7 +70,7 @@ public:
 
 
 
-    void set_type(tiletype_t t)
+    void set_type(const tiletype_t t)
     {
         type = t;
     }

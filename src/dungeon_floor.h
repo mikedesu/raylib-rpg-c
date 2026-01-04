@@ -175,7 +175,8 @@ public:
             //auto tile = make_shared<tile_t>();
             tile_t tile;
             //massert(tile, "failed to create tile");
-            tile.id = i;
+            //tile.id = i;
+            tile.set_id(i);
             tile.tile_init(TILE_NONE);
             tile_map->insert({i, tile});
         }
