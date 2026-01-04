@@ -351,5 +351,7 @@ public:
 
     ~tile_t()
     {
+        minfo2("destroying tile id %d", id);
+        //tile_free();
     }
 };

@@ -33,6 +33,7 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
+- [ ] **BUG** **PERFORMANCE** **CRITICAL** during dungeon floor draw, for some reason, our tile destructor is being called many times literally once-per-frame, for every tile! WTF?
 - [ ] **BUG** `handle_test_flag` not properly incrementing turns
 - [ ] **PLAYER REQUEST** numpad movement controls
 - [ ] **FEATURE** volume control menu
