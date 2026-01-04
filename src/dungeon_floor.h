@@ -23,8 +23,9 @@ using std::vector;
 
 class dungeon_floor
 {
-public:
+private:
     int floor; // the floor number, starting from 0
+public:
     int width;
     int height;
     vec3 downstairs_loc;
@@ -32,6 +33,13 @@ public:
     biome_t biome;
     vector<tile_id> tiles; // 2D vector of shared pointers to tile_t
     shared_ptr<unordered_map<tile_id, tile_t>> tile_map; // Maps tile_id to tile_t pointer
+
+
+
+    const int get_floor()
+    {
+        return floor;
+    }
 
 
 
