@@ -452,7 +452,7 @@ public:
         t.set_cached_live_npcs(0);
         t.set_cached_item_count(0);
         t.set_cached_player_present(false);
-        t.cached_npc = ENTITYID_INVALID;
+        t.set_cached_npc(ENTITYID_INVALID);
         t.cached_item = ENTITYID_INVALID;
         // Iterate through all entities on the tile
         for (size_t i = 0; i < t.entities->size(); i++)
@@ -468,12 +468,12 @@ public:
             if (type == ENTITY_NPC)
             {
                 t.set_cached_live_npcs(t.get_cached_live_npcs() + 1);
-                t.cached_npc = id;
+                t.set_cached_npc(id);
             }
             else if (type == ENTITY_PLAYER)
             {
                 t.set_cached_player_present(true);
-                t.cached_npc = id;
+                t.set_cached_npc(id);
             }
             else if (type == ENTITY_ITEM)
             {
@@ -2726,7 +2726,7 @@ public:
     const inline entityid get_cached_npc(tile_t& t)
     {
         recompute_entity_cache(t); // Force update
-        return t.cached_npc;
+        return t.get_cached_npc();
     }
 
 

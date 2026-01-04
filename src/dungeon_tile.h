@@ -33,13 +33,28 @@ private:
     bool dirty_entities;
     int cached_live_npcs;
     int cached_item_count;
+    entityid cached_npc;
 
 
 
 public:
-    entityid cached_npc;
     entityid cached_item;
     shared_ptr<vector<entityid>> entities;
+
+
+    void set_cached_npc(const entityid id)
+    {
+        cached_npc = id;
+    }
+
+
+
+
+    const entityid get_cached_npc()
+    {
+        return cached_npc;
+    }
+
 
 
 
