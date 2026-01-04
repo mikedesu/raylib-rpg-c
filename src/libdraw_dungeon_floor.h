@@ -21,7 +21,8 @@ using std::sort;
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 
-static inline vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
+static inline vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end)
+{
     vector<vec3> path;
     int x1 = start.x, y1 = start.y;
     int x2 = end.x, y2 = end.y;
@@ -31,19 +32,25 @@ static inline vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
     int sx = (x1 < x2) ? 1 : -1;
     int sy = (y1 < y2) ? 1 : -1;
     int err = dx - dy;
-    while (true) {
+    while (true)
+    {
         // Skip the start point (we don't need to check visibility with self)
-        if (x1 != start.x || y1 != start.y) {
+        if (x1 != start.x || y1 != start.y)
+        {
             // Add primary point
             path.push_back({x1, y1, z});
             // Add adjacent points for thickness only when we're not at start/end
             // and only when we're moving diagonally
-            if (x1 != x2 && y1 != y2 && x1 != start.x && y1 != start.y) {
+            if (x1 != x2 && y1 != y2 && x1 != start.x && y1 != start.y)
+            {
                 // Add perpendicular points for diagonal movement
-                if (dx > dy) {
+                if (dx > dy)
+                {
                     path.push_back({x1, y1 + sy, z});
                     path.push_back({x1, y1 - sy, z});
-                } else {
+                }
+                else
+                {
                     path.push_back({x1 + sx, y1, z});
                     path.push_back({x1 - sx, y1, z});
                 }
@@ -53,11 +60,13 @@ static inline vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
         if (x1 == x2 && y1 == y2)
             break;
         int e2 = 2 * err;
-        if (e2 > -dy) {
+        if (e2 > -dy)
+        {
             err -= dy;
             x1 += sx;
         }
-        if (e2 < dx) {
+        if (e2 < dx)
+        {
             err += dx;
             y1 += sy;
         }
@@ -71,7 +80,8 @@ static inline vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
 
 
 
-const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, const int x, const int y, const int z) {
+const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, const int x, const int y, const int z)
+{
     //massert(g, "gamestate is NULL");
     massert(txinfo, "txinfo is null");
     massert(x >= 0, "x is less than 0");
@@ -84,8 +94,11 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
     //massert(df, "dungeon_floor is NULL");
     auto tile = df.df_tile_at((vec3){x, y, z});
     //massert(tile, "tile is NULL");
-    if (tile.type == TILE_NONE || !tile.visible || !tile.explored)
+    //if (tile.type == TILE_NONE || !tile.visible || !tile.explored) {
+    if (tile.get_type() == TILE_NONE || !tile.visible || !tile.explored)
+    {
         return true;
+    }
     // Get hero's total light radius
     const int light_dist = g.ct.get<light_radius>(g.hero_id).value_or(1);
     auto maybe_loc = g.ct.get<location>(g.hero_id);
@@ -95,12 +108,16 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
     const int distance = abs(x - hero_loc.x) + abs(y - hero_loc.y);
     // Get tile texture
-    const int txkey = get_txkey_for_tiletype(tile.type);
+    const int txkey = get_txkey_for_tiletype(tile.get_type());
     if (txkey < 0)
+    {
         return false;
+    }
     Texture2D* texture = &txinfo[txkey].texture;
     if (texture->id <= 0)
+    {
         return false;
+    }
     // Calculate drawing position
     const int offset_x = -12;
     const int offset_y = -12;
@@ -110,7 +127,8 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
     const Rectangle dest = {(float)px, (float)py, (float)DEFAULT_TILE_SIZE_SCALED, (float)DEFAULT_TILE_SIZE_SCALED};
     // Draw tile with fade if beyond light dist
     Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : WHITE; // Faded for out-of-range tiles
-    if (distance > light_dist) {
+    if (distance > light_dist)
+    {
         DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
         return true;
     }
@@ -118,18 +136,24 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
     auto path = calculate_path_with_thickness({x, y, z}, hero_loc);
     // Check for blocking walls/doors in path
     bool blocking = false;
-    for (const auto& v : path) {
+    for (const auto& v : path)
+    {
         auto tile = df.df_tile_at(v);
         //if (tile && (tile_is_wall(tile->type))) {
-        if (tiletype_is_wall(tile.type)) {
+        if (tiletype_is_wall(tile.get_type()))
+        {
             blocking = true;
             break;
         }
         // Check for closed doors
-        for_each(tile.entities->cbegin(), tile.entities->cend(), [&g, &blocking](const entityid& id) {
-            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false))
-                blocking = true;
-        });
+        for_each(
+            tile.entities->cbegin(),
+            tile.entities->cend(),
+            [&g, &blocking](const entityid& id)
+            {
+                if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false))
+                    blocking = true;
+            });
         if (blocking)
             break;
     }
@@ -140,13 +164,16 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
 }
 
 
-static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytype_t entitytype_0, function<bool(gamestate&, entityid)> additional_check) {
+static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytype_t entitytype_0, function<bool(gamestate&, entityid)> additional_check)
+{
     auto df = g.d.get_current_floor();
     //massert(df, "dungeon_floor is NULL");
     const int z = g.d.current_floor;
 
-    for (int y = 0; y < df.height; y++) {
-        for (int x = 0; x < df.width; x++) {
+    for (int y = 0; y < df.height; y++)
+    {
+        for (int x = 0; x < df.width; x++)
+        {
             const vec3 loc = {x, y, z};
             const auto tile = df.df_tile_at(loc);
 
@@ -174,7 +201,8 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
             const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
             const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
             auto maybe_hero_loc = g.ct.get<location>(g.hero_id);
-            if (!maybe_hero_loc.has_value()) {
+            if (!maybe_hero_loc.has_value())
+            {
                 merror("Hero's location not set");
                 continue;
             }
@@ -185,7 +213,8 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
             const int dist = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
             // Only draw entities within vision distance
             // we might want to enforce a drawing order with the introduction of doors...
-            if (dist > dist_to_check) {
+            if (dist > dist_to_check)
+            {
                 continue;
             }
 
@@ -202,18 +231,24 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
             // 2. for each item in path
             bool object_blocking = false;
 
-            for (auto v0 : path) {
+            for (auto v0 : path)
+            {
                 auto v0_tile = df.df_tile_at(v0);
-                if (tiletype_is_wall(v0_tile.type)) {
+                if (tiletype_is_wall(v0_tile.get_type()))
+                {
                     object_blocking = true;
                     break;
                 }
 
                 // check if tile has a DOOR
-                for_each(v0_tile.entities->cbegin(), v0_tile.entities->cend(), [&g, &object_blocking](const entityid& id) {
-                    if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false))
-                        object_blocking = true;
-                });
+                for_each(
+                    v0_tile.entities->cbegin(),
+                    v0_tile.entities->cend(),
+                    [&g, &object_blocking](const entityid& id)
+                    {
+                        if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false))
+                            object_blocking = true;
+                    });
 
                 if (object_blocking)
                     break;
@@ -230,30 +265,36 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
             //    continue;
             //}
 
-            for_each(tile.entities->cbegin(), tile.entities->cend(), [&g, entitytype_0, object_blocking, &additional_check](const entityid& id) {
-                auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-                //auto sm = g.ct.get<spritemove>(id).value_or((Rectangle){0, 0, 0, 0});
+            for_each(
+                tile.entities->cbegin(),
+                tile.entities->cend(),
+                [&g, entitytype_0, object_blocking, &additional_check](const entityid& id)
+                {
+                    auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+                    //auto sm = g.ct.get<spritemove>(id).value_or((Rectangle){0, 0, 0, 0});
 
-                //spritegroup_t* sg = spritegroups[id];
-                //if (sg->move.x != 0 || sg->move.y != 0) {
-                //    draw_sprite_and_shadow(g, id);
-                //}
+                    //spritegroup_t* sg = spritegroups[id];
+                    //if (sg->move.x != 0 || sg->move.y != 0) {
+                    //    draw_sprite_and_shadow(g, id);
+                    //}
 
-                if (!object_blocking && entitytype_0 == type && additional_check(g, id)) {
-                    draw_sprite_and_shadow(g, id);
-                }
-                //else if (object_blocking && entitytype_0 == ENTITY_PROP && type == ENTITY_PROP) {
-                //    merror("A prop is being blocked by an object");
-                //} else if (type == ENTITY_PROP) {
-                //    merror("A prop is here");
-                //}
-            });
+                    if (!object_blocking && entitytype_0 == type && additional_check(g, id))
+                    {
+                        draw_sprite_and_shadow(g, id);
+                    }
+                    //else if (object_blocking && entitytype_0 == ENTITY_PROP && type == ENTITY_PROP) {
+                    //    merror("A prop is being blocked by an object");
+                    //} else if (type == ENTITY_PROP) {
+                    //    merror("A prop is here");
+                    //}
+                });
         }
     }
 }
 
 
-const static inline bool libdraw_draw_dungeon_floor(gamestate& g) {
+const static inline bool libdraw_draw_dungeon_floor(gamestate& g)
+{
     //auto df = d_get_current_floor(g.dungeon);
     auto df = g.d.get_current_floor();
     const int z = g.d.current_floor;
@@ -265,14 +306,16 @@ const static inline bool libdraw_draw_dungeon_floor(gamestate& g) {
 
     auto mydefault = [](gamestate& g, entityid id) { return true; };
 
-    auto alive_check = [](gamestate& g, entityid id) {
+    auto alive_check = [](gamestate& g, entityid id)
+    {
         auto maybe_dead = g.ct.get<dead>(id);
         if (maybe_dead.has_value())
             return !maybe_dead.value();
         return false;
     };
 
-    auto dead_check = [](gamestate& g, entityid id) {
+    auto dead_check = [](gamestate& g, entityid id)
+    {
         auto maybe_dead = g.ct.get<dead>(id);
         if (maybe_dead.has_value())
             return maybe_dead.value();

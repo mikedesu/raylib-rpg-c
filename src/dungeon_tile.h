@@ -23,9 +23,14 @@ using std::vector;
 
 class tile_t
 {
+private:
+    bool can_have_door;
+    tiletype_t type;
+
+
+
 public:
     tile_id id;
-    tiletype_t type;
     bool visible;
     bool explored;
     bool cached_player_present;
@@ -36,8 +41,38 @@ public:
     int cached_item_count;
     entityid cached_npc;
     entityid cached_item;
-    bool can_have_door;
     shared_ptr<vector<entityid>> entities;
+
+
+
+    const tiletype_t get_type()
+    {
+        return type;
+    }
+
+
+
+
+    void set_type(tiletype_t t)
+    {
+        type = t;
+    }
+
+
+
+
+    const bool get_can_have_door()
+    {
+        return can_have_door;
+    }
+
+
+
+
+    void set_can_have_door(const bool b)
+    {
+        can_have_door = b;
+    }
 
 
 

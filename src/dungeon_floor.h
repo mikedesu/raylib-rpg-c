@@ -57,7 +57,7 @@ public:
     {
         //minfo("set can have door: %d, %d, %d", loc.x, loc.y, loc.z);
         tile_t& tile = df_tile_at(loc);
-        tile.can_have_door = true;
+        tile.set_can_have_door(true);
     }
 
 
@@ -219,7 +219,7 @@ public:
             {
                 tile_t& tile = df_tile_at((vec3){x0, y0, -1});
                 // check if the tile is possible downstairs
-                if (tile_is_possible_downstairs(tile.type))
+                if (tile_is_possible_downstairs(tile.get_type()))
                 {
                     count++;
                 }
@@ -247,7 +247,7 @@ public:
             for (int x0 = r.x; x0 < width; x0++)
             {
                 tile_t& tile = df_tile_at((vec3){x0, y0, -1});
-                if (tile_is_possible_upstairs(tile.type))
+                if (tile_is_possible_upstairs(tile.get_type()))
                 {
                     count++;
                 }
@@ -269,7 +269,7 @@ public:
             {
                 tile_t& tile = df_tile_at((vec3){x0, y0, -1});
                 // there wont be any entities yet so do not check for them
-                if (tile_is_possible_upstairs(tile.type))
+                if (tile_is_possible_upstairs(tile.get_type()))
                 {
                     locations->push_back((vec3){x0, y0, 0});
                 }
@@ -294,7 +294,7 @@ public:
             {
                 tile_t& tile = df_tile_at((vec3){x0, y0, -1});
                 // there wont be any entities yet so do not check for them
-                if (tile_is_possible_downstairs(tile.type))
+                if (tile_is_possible_downstairs(tile.get_type()))
                 {
                     locations->push_back((vec3){x0, y0, 0});
                 }
@@ -413,8 +413,8 @@ public:
             {
                 const vec3 loc = {x, y, floor};
                 auto tile = df_tile_at(loc);
-                const bool type_invalid = tile.type == TILE_NONE || tile.type == TILE_STONE_WALL_00 || tile.type == TILE_STONE_WALL_01 ||
-                                          tile.type == TILE_UPSTAIRS || tile.type == TILE_DOWNSTAIRS;
+                const bool type_invalid = tile.get_type() == TILE_NONE || tile.get_type() == TILE_STONE_WALL_00 || tile.get_type() == TILE_STONE_WALL_01 ||
+                                          tile.get_type() == TILE_UPSTAIRS || tile.get_type() == TILE_DOWNSTAIRS;
                 if (type_invalid)
                 {
                     //merror("loc at (%d, %d, %d) type invalid. type is: %d", x, y, floor, tile.type);
@@ -448,8 +448,10 @@ public:
             {
                 vec3 loc = {x, y, floor};
                 auto tile = df_tile_at(loc);
-                if (tile.type != type)
+                if (tile.get_type() != type)
+                {
                     continue;
+                }
                 //if (tile.type == TILE_NONE || tile.type == TILE_STONE_WALL_00 || tile.type == TILE_STONE_WALL_01 || tile.type == TILE_UPSTAIRS ||
                 //    tile.type == TILE_DOWNSTAIRS)
                 //    continue;

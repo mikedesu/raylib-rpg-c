@@ -521,15 +521,23 @@ public:
     {
         auto df = d.get_floor(loc.z);
         auto tile = df.df_tile_at(loc);
-        if (!tile_is_walkable(tile.type))
+        if (!tile_is_walkable(tile.get_type()))
+        {
             return ENTITYID_INVALID;
+        }
         if (tile_has_live_npcs(tile))
+        {
             return ENTITYID_INVALID;
+        }
         const auto id = create_door_with(doorInitFunction);
         if (id == ENTITYID_INVALID)
+        {
             return ENTITYID_INVALID;
+        }
         if (!df.df_add_at(id, loc.x, loc.y))
+        {
             return ENTITYID_INVALID;
+        }
         ct.set<location>(id, loc);
         ct.set<door_open>(id, false);
         ct.set<update>(id, true);
@@ -552,8 +560,11 @@ public:
                 {
                     const vec3 loc = {x, y, z};
                     tile_t& tile = df.df_tile_at(loc);
-                    if (!tile.can_have_door)
+                    //if (!tile.can_have_door)
+                    if (!tile.get_can_have_door())
+                    {
                         continue;
+                    }
                     const entityid door_id = create_door_at_with(loc, [](CT& ct, const entityid id) {});
                     if (door_id == ENTITYID_INVALID)
                         continue;
@@ -618,12 +629,17 @@ public:
                 for (int y = 0; y < df.height; y++)
                 {
                     const vec3 loc = {x, y, z};
-                    auto tile = df.df_tile_at(loc);
-                    if (tile.type == TILE_UPSTAIRS || tile.type == TILE_DOWNSTAIRS)
+                    auto t = df.df_tile_at(loc);
+                    if (t.get_type() == TILE_UPSTAIRS || t.get_type() == TILE_DOWNSTAIRS)
+                    {
                         continue;
-                    if (tile.can_have_door)
+                    }
+                    //if (tile.can_have_door)
+                    if (t.get_can_have_door())
+                    {
                         continue;
-                    if (tile.tile_is_wall())
+                    }
+                    if (t.tile_is_wall())
                     {
                         //const int flip = GetRandomValue(0, 20);
                         uniform_int_distribution<int> gen(0, 20);
@@ -809,7 +825,7 @@ public:
         }
         auto df = d.get_floor(loc.z);
         auto tile = df.df_tile_at(loc);
-        if (!tile_is_walkable(tile.type))
+        if (!tile_is_walkable(tile.get_type()))
         {
             merror2("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
@@ -896,16 +912,24 @@ public:
     {
         auto df = d.get_floor(loc.z);
         auto tile = df.df_tile_at(loc);
-        if (!tile_is_walkable(tile.type))
+        if (!tile_is_walkable(tile.get_type()))
+        {
             return ENTITYID_INVALID;
+        }
         if (tile_has_live_npcs(tile))
+        {
             return ENTITYID_INVALID;
+        }
         const auto id = create_potion_with(potionInitFunction);
         if (id == ENTITYID_INVALID)
+        {
             return ENTITYID_INVALID;
+        }
         //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         if (!df.df_add_at(id, loc.x, loc.y))
+        {
             return ENTITYID_INVALID;
+        }
         ct.set<location>(id, loc);
         ct.set<update>(id, true);
         return id;
@@ -1063,9 +1087,9 @@ public:
         minfo2("create npc at with: (%d, %d, %d)", loc.x, loc.y, loc.z);
         auto df = d.get_floor(loc.z);
         auto tile = df.df_tile_at(loc);
-        if (!tile_is_walkable(tile.type))
+        if (!tile_is_walkable(tile.get_type()))
         {
-            merror2("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile.type).c_str());
+            merror2("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile.get_type()).c_str());
             return ENTITYID_INVALID;
         }
         if (tile_has_live_npcs(tile))
@@ -1161,15 +1185,23 @@ public:
         //auto df = d_get_floor(dungeon, loc.z);
         auto df = d.get_floor(loc.z);
         auto tile = df.df_tile_at(loc);
-        if (!tile_is_walkable(tile.type))
+        if (!tile_is_walkable(tile.get_type()))
+        {
             return ENTITYID_INVALID;
+        }
         if (tile_has_live_npcs(tile))
+        {
             return ENTITYID_INVALID;
+        }
         const auto id = create_random_monster_with(monsterInitFunction);
         if (id == ENTITYID_INVALID)
+        {
             return ENTITYID_INVALID;
+        }
         if (!df.df_add_at(id, loc.x, loc.y))
+        {
             return ENTITYID_INVALID;
+        }
         ct.set<location>(id, loc);
         ct.set<update>(id, true);
         return id;
@@ -1495,7 +1527,7 @@ public:
     {
         auto df = d.get_floor(loc.z);
         auto tile = df.df_tile_at(loc);
-        if (!tile_is_walkable(tile.type))
+        if (!tile_is_walkable(tile.get_type()))
         {
             merror("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
@@ -1543,13 +1575,19 @@ public:
     {
         auto df = d.get_floor(loc.z);
         auto tile = df.df_tile_at(loc);
-        if (!tile_is_walkable(tile.type))
+        if (!tile_is_walkable(tile.get_type()))
+        {
             return ENTITYID_INVALID;
+        }
         const auto id = create_spell_with();
         if (id == ENTITYID_INVALID)
+        {
             return ENTITYID_INVALID;
+        }
         if (!df.df_add_at(id, loc.x, loc.y))
+        {
             return ENTITYID_INVALID;
+        }
         ct.set<location>(id, loc);
         ct.set<update>(id, true);
         return id;
@@ -2312,7 +2350,7 @@ public:
 
         auto tile = df.df_tile_at(aloc);
         //minfo("is walkable");
-        if (!tile_is_walkable(tile.type))
+        if (!tile_is_walkable(tile.get_type()))
         {
             merror2("tile is not walkable");
             return false;
@@ -3015,7 +3053,7 @@ public:
         auto df = d.floors[current_floor];
         auto t = df.df_tile_at(loc);
         // check the tile type
-        if (t.type == TILE_UPSTAIRS)
+        if (t.get_type() == TILE_UPSTAIRS)
         {
             // can't go up on the top floor
             // otherwise...
@@ -3038,7 +3076,7 @@ public:
                 return true;
             }
         }
-        else if (t.type == TILE_DOWNSTAIRS)
+        else if (t.get_type() == TILE_DOWNSTAIRS)
         {
             // can't go down on the bottom floor
             // otherwise...
