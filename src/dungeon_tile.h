@@ -30,17 +30,32 @@ private:
     bool visible;
     bool explored;
     bool cached_player_present;
+    bool dirty_entities;
 
 
 
 public:
-    bool dirty_entities;
     bool dirty_visibility;
     int cached_live_npcs;
     int cached_item_count;
     entityid cached_npc;
     entityid cached_item;
     shared_ptr<vector<entityid>> entities;
+
+
+
+    void set_dirty_entities(const bool b)
+    {
+        dirty_entities = b;
+    }
+
+
+
+
+    const bool get_dirty_entities()
+    {
+        return dirty_entities;
+    }
 
 
 

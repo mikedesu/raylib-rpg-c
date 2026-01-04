@@ -446,7 +446,7 @@ public:
     inline void recompute_entity_cache(tile_t& t)
     {
         // Only recompute if cache is dirty
-        if (!t.dirty_entities)
+        if (!t.get_dirty_entities())
             return;
         // Reset counters
         t.cached_live_npcs = 0;
@@ -482,7 +482,7 @@ public:
             }
         }
         // Cache is now clean
-        t.dirty_entities = false;
+        t.set_dirty_entities(false);
     }
 
 
@@ -3325,7 +3325,7 @@ public:
                 auto tgttype = ct.get<entitytype>(npcid).value_or(ENTITY_NONE);
                 ct.set<dead>(npcid, true);
                 auto target_tile = d.get_current_floor().df_tile_at(spell_loc);
-                target_tile.dirty_entities = true;
+                target_tile.set_dirty_entities(true);
                 if (tgttype == ENTITY_NPC)
                 {
                     // increment attacker's xp
