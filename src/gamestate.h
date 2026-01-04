@@ -453,7 +453,7 @@ public:
         t.set_cached_item_count(0);
         t.set_cached_player_present(false);
         t.set_cached_npc(ENTITYID_INVALID);
-        t.cached_item = ENTITYID_INVALID;
+        t.set_cached_item(ENTITYID_INVALID);
         // Iterate through all entities on the tile
         for (size_t i = 0; i < t.entities->size(); i++)
         {
@@ -478,7 +478,7 @@ public:
             else if (type == ENTITY_ITEM)
             {
                 t.set_cached_item_count(t.get_cached_item_count() + 1);
-                t.cached_item = id;
+                t.set_cached_item(id);
             }
         }
         // Cache is now clean
@@ -3062,7 +3062,7 @@ public:
     const inline entityid tile_get_item(tile_t& t)
     {
         recompute_entity_cache(t);
-        return t.cached_item;
+        return t.get_cached_item();
     }
 
 

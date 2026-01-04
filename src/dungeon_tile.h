@@ -34,12 +34,29 @@ private:
     int cached_live_npcs;
     int cached_item_count;
     entityid cached_npc;
+    entityid cached_item;
 
 
 
 public:
-    entityid cached_item;
     shared_ptr<vector<entityid>> entities;
+
+
+
+    void set_cached_item(const entityid id)
+    {
+        cached_item = id;
+    }
+
+
+
+
+    const entityid get_cached_item()
+    {
+        return cached_item;
+    }
+
+
 
 
     void set_cached_npc(const entityid id)
