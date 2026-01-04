@@ -7,7 +7,8 @@
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
-static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
+static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int offset_x, int offset_y)
+{
     minfo("BEGIN create_spritegroup");
     massert(txinfo, "txinfo is null");
     // can hold up to 32 sprites
@@ -17,16 +18,19 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     auto df = g.d.get_current_floor();
     auto maybe_loc = g.ct.get<location>(id);
     // if it has a location...
-    if (maybe_loc.has_value()) {
+    if (maybe_loc.has_value())
+    {
         const vec3 loc = maybe_loc.value();
-        massert(loc.x >= 0 && loc.x < df.width, "location x out of bounds: %d", loc.x);
+        massert(loc.x >= 0 && loc.x < df.get_width(), "location x out of bounds: %d", loc.x);
         massert(loc.y >= 0 && loc.y < df.height, "location y out of bounds: %d", loc.y);
-        if (loc.x < 0 || loc.x >= df.width || loc.y < 0 || loc.y >= df.height) {
-            spritegroup_destroy(group);
-            merror("END create spritegroup");
-            return false;
-        }
-        for (int i = 0; i < num_keys; i++) {
+        //if (loc.x < 0 || loc.x >= df.get_width() || loc.y < 0 || loc.y >= df.height)
+        //{
+        //    spritegroup_destroy(group);
+        //    merror("END create spritegroup");
+        //    return false;
+        //}
+        for (int i = 0; i < num_keys; i++)
+        {
             const int k = keys[i];
             Texture2D* tex = &txinfo[k].texture;
             auto s = sprite_create2(tex, txinfo[k].contexts, txinfo[k].num_frames);
@@ -36,7 +40,8 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
         group->id = id;
         auto s = spritegroup_get(group, 0);
         massert(s, "sprite is NULL");
-        if (!s) {
+        if (!s)
+        {
             spritegroup_destroy(group);
             merror("END create spritegroup");
             return false;
@@ -51,7 +56,8 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     }
 
     // if it does not have a location...
-    for (int i = 0; i < num_keys; i++) {
+    for (int i = 0; i < num_keys; i++)
+    {
         int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
         auto s = sprite_create2(tex, txinfo[k].contexts, txinfo[k].num_frames);
@@ -62,7 +68,8 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     group->current = 0;
     auto s = spritegroup_get(group, 0);
     massert(s, "sprite is NULL");
-    if (!s) {
+    if (!s)
+    {
         spritegroup_destroy(group);
         merror("END create spritegroup");
         return false;

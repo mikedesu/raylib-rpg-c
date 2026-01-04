@@ -554,7 +554,7 @@ public:
         for (int z = 0; z < (int)d.floors.size(); z++)
         {
             auto df = d.get_floor(z);
-            for (int x = 0; x < df.width; x++)
+            for (int x = 0; x < df.get_width(); x++)
             {
                 for (int y = 0; y < df.height; y++)
                 {
@@ -624,7 +624,7 @@ public:
         for (int z = 0; z < (int)d.floors.size(); z++)
         {
             auto df = d.get_floor(z);
-            for (int x = 0; x < df.width; x++)
+            for (int x = 0; x < df.get_width(); x++)
             {
                 for (int y = 0; y < df.height; y++)
                 {
@@ -1270,7 +1270,7 @@ public:
         const int light_radius0 = ct.get<light_radius>(hero_id).value_or(1);
         // Precompute bounds for the loops
         const int min_x = std::max(0, loc.x - light_radius0);
-        const int max_x = std::min(df.width - 1, loc.x + light_radius0);
+        const int max_x = std::min(df.get_width() - 1, loc.x + light_radius0);
         const int min_y = std::max(0, loc.y - light_radius0);
         const int max_y = std::min(df.height - 1, loc.y + light_radius0);
         for (int y = min_y; y <= max_y; y++)
@@ -1377,7 +1377,7 @@ public:
     {
         auto df = d.get_floor(floor);
         size_t count = 0;
-        for (int i = 0; i < df.width; i++)
+        for (int i = 0; i < df.get_width(); i++)
         {
             for (int j = 0; j < df.height; j++)
             {
@@ -2432,7 +2432,7 @@ public:
         //massert(aloc.y >= 0, "aloc.y <= 0");
         //massert(aloc.y < df.height, "aloc.y >= df.height");
 
-        if (aloc.x < 0 || aloc.x >= df.width || aloc.y < 0 || aloc.y >= df.height)
+        if (aloc.x < 0 || aloc.x >= df.get_width() || aloc.y < 0 || aloc.y >= df.height)
         {
             merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
             return false;
