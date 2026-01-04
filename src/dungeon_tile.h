@@ -27,14 +27,13 @@ private:
     bool can_have_door;
     tiletype_t type;
     tile_id id;
-    //bool is_empty;
     bool visible;
     bool explored;
+    bool cached_player_present;
 
 
 
 public:
-    bool cached_player_present;
     bool dirty_entities;
     bool dirty_visibility;
     int cached_live_npcs;
@@ -42,6 +41,22 @@ public:
     entityid cached_npc;
     entityid cached_item;
     shared_ptr<vector<entityid>> entities;
+
+
+
+
+    void set_cached_player_present(const bool b)
+    {
+        cached_player_present = b;
+    }
+
+
+
+
+    const bool get_cached_player_present()
+    {
+        return cached_player_present;
+    }
 
 
 
