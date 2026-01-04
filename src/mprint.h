@@ -1,8 +1,8 @@
 #pragma once
 #include <cstdio>
 // Single-line macros that clang-format won't break
-//#ifdef DEBUG
-#if DEBUG == 1
+#ifdef DEBUG
+//#if DEBUG == 1
 #define minfo(...)                                                                                                                                             \
     do {                                                                                                                                                       \
         printf("📔 \033[35;1mInfo  \033[0m %s:%d: ", __FILE__, __LINE__);                                                                                       \

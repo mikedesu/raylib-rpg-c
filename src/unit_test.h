@@ -24,112 +24,119 @@ using std::chrono::time_point;
 
 
 
-class MyTestSuite : public CxxTest::TestSuite {
+class MyTestSuite : public CxxTest::TestSuite
+{
 public:
-    //void testGamestateBasic() {
-    //    gamestate g;
-    //    TS_ASSERT(g.cam_lockon == true);
-    //    TS_ASSERT(g.msg_system.size() == 0);
-    //    TS_ASSERT(g.msg_history.size() == 0);
-    //    g.set_hero_id(1);
-    //    TS_ASSERT(g.hero_id == 1);
-    //    g.reset();
-    //    TS_ASSERT(g.hero_id == ENTITYID_INVALID);
-    //    TS_ASSERT(g.cam_lockon == true);
-    //    TS_ASSERT(g.msg_system.size() == 0);
-    //    TS_ASSERT(g.msg_history.size() == 0);
-    //    g.reset();
-    //}
+    void testGamestateBasic()
+    {
+        gamestate g;
+        TS_ASSERT(g.cam_lockon == true);
+        TS_ASSERT(g.msg_system.size() == 0);
+        TS_ASSERT(g.msg_history.size() == 0);
+        g.set_hero_id(1);
+        TS_ASSERT(g.hero_id == 1);
+        g.reset();
+        TS_ASSERT(g.hero_id == ENTITYID_INVALID);
+        TS_ASSERT(g.cam_lockon == true);
+        TS_ASSERT(g.msg_system.size() == 0);
+        TS_ASSERT(g.msg_history.size() == 0);
+        g.reset();
+    }
 
 
 
-    //void testGamestateThrowaway() {
-    //    for (int i = 0; i < 10; i++) {
-    //        gamestate g;
-    //    }
-    //}
-
-
-
-
-    //void testEntityManagement() {
-    //    gamestate g;
-    //    // Verify initial state
-    //    TS_ASSERT(g.next_entityid == 1);
-    //    TS_ASSERT(g.new_entityid_begin == ENTITYID_INVALID);
-    //    TS_ASSERT(g.new_entityid_end == ENTITYID_INVALID);
-    //    TS_ASSERT(!g.dirty_entities);
-    //    // Add first entity
-    //    entityid first = g.add_entity();
-    //    TS_ASSERT(first == 1);
-    //    TS_ASSERT(g.next_entityid == 2);
-    //    TS_ASSERT(g.new_entityid_begin == 1);
-    //    TS_ASSERT(g.new_entityid_end == 2);
-    //    TS_ASSERT(g.dirty_entities);
-    //    // Add second entity
-    //    entityid second = g.add_entity();
-    //    TS_ASSERT(second == 2);
-    //    TS_ASSERT(g.next_entityid == 3);
-    //    TS_ASSERT(g.new_entityid_begin == 1); // Should stay at first ID
-    //    TS_ASSERT(g.new_entityid_end == 3); // Should update to new end
-    //    TS_ASSERT(g.dirty_entities);
-    //    // Reset and verify clean state
-    //    g.reset();
-    //    TS_ASSERT(g.next_entityid == 1);
-    //    TS_ASSERT(g.new_entityid_begin == ENTITYID_INVALID);
-    //    TS_ASSERT(g.new_entityid_end == ENTITYID_INVALID);
-    //    TS_ASSERT(!g.dirty_entities);
-    //}
-
-
-    //void testMessageSystem() {
-    //    gamestate g;
-    //    // Verify initial state
-    //    TS_ASSERT(g.msg_system.size() == 0);
-    //    TS_ASSERT(g.msg_history.size() == 0);
-    //    TS_ASSERT(!g.msg_system_is_active);
-    //    // Add messages
-    //    g.msg_system.push_back("Test message 1");
-    //    g.msg_system.push_back("Test message 2");
-    //    TS_ASSERT(g.msg_system.size() == 2);
-    //    TS_ASSERT(g.msg_system[0] == "Test message 1");
-    //    TS_ASSERT(g.msg_system[1] == "Test message 2");
-    //    // Verify history
-    //    g.msg_history = g.msg_system;
-    //    TS_ASSERT(g.msg_history.size() == 2);
-    //    TS_ASSERT(g.msg_history[0] == "Test message 1");
-    //    TS_ASSERT(g.msg_history[1] == "Test message 2");
-    //    // Test reset
-    //    g.reset();
-    //    TS_ASSERT(g.msg_system.size() == 0);
-    //    TS_ASSERT(g.msg_history.size() == 0);
-    //    TS_ASSERT(!g.msg_system_is_active);
-    //}
+    void testGamestateThrowaway()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            gamestate g;
+        }
+    }
 
 
 
 
-    //void testCameraSystem() {
-    //    gamestate g;
-    //    // Verify initial state
-    //    TS_ASSERT(g.cam2d.zoom == 4.0f);
-    //    TS_ASSERT(g.cam2d.rotation == 0.0);
-    //    TS_ASSERT(g.cam_lockon == true);
-    //    TS_ASSERT(g.cam_changed == false);
-    //    // Test camera movement
-    //    g.cam2d.target = (Vector2){100, 100};
-    //    TS_ASSERT(g.cam2d.target.x == 100);
-    //    TS_ASSERT(g.cam2d.target.y == 100);
-    //    // Test zoom
-    //    g.cam2d.zoom = 2.0f;
-    //    TS_ASSERT(g.cam2d.zoom == 2.0f);
-    //    // Test reset
-    //    g.reset();
-    //    TS_ASSERT(g.cam2d.zoom == 4.0f);
-    //    TS_ASSERT(g.cam2d.rotation == 0.0);
-    //    TS_ASSERT(g.cam_lockon == true);
-    //    TS_ASSERT(g.cam_changed == false);
-    //}
+    void testEntityManagement()
+    {
+        gamestate g;
+        // Verify initial state
+        TS_ASSERT(g.next_entityid == 1);
+        TS_ASSERT(g.new_entityid_begin == ENTITYID_INVALID);
+        TS_ASSERT(g.new_entityid_end == ENTITYID_INVALID);
+        TS_ASSERT(!g.dirty_entities);
+        // Add first entity
+        entityid first = g.add_entity();
+        TS_ASSERT(first == 1);
+        TS_ASSERT(g.next_entityid == 2);
+        TS_ASSERT(g.new_entityid_begin == 1);
+        TS_ASSERT(g.new_entityid_end == 2);
+        TS_ASSERT(g.dirty_entities);
+        // Add second entity
+        entityid second = g.add_entity();
+        TS_ASSERT(second == 2);
+        TS_ASSERT(g.next_entityid == 3);
+        TS_ASSERT(g.new_entityid_begin == 1); // Should stay at first ID
+        TS_ASSERT(g.new_entityid_end == 3); // Should update to new end
+        TS_ASSERT(g.dirty_entities);
+        // Reset and verify clean state
+        g.reset();
+        TS_ASSERT(g.next_entityid == 1);
+        TS_ASSERT(g.new_entityid_begin == ENTITYID_INVALID);
+        TS_ASSERT(g.new_entityid_end == ENTITYID_INVALID);
+        TS_ASSERT(!g.dirty_entities);
+    }
+
+
+    void testMessageSystem()
+    {
+        gamestate g;
+        // Verify initial state
+        TS_ASSERT(g.msg_system.size() == 0);
+        TS_ASSERT(g.msg_history.size() == 0);
+        TS_ASSERT(!g.msg_system_is_active);
+        // Add messages
+        g.msg_system.push_back("Test message 1");
+        g.msg_system.push_back("Test message 2");
+        TS_ASSERT(g.msg_system.size() == 2);
+        TS_ASSERT(g.msg_system[0] == "Test message 1");
+        TS_ASSERT(g.msg_system[1] == "Test message 2");
+        // Verify history
+        g.msg_history = g.msg_system;
+        TS_ASSERT(g.msg_history.size() == 2);
+        TS_ASSERT(g.msg_history[0] == "Test message 1");
+        TS_ASSERT(g.msg_history[1] == "Test message 2");
+        // Test reset
+        g.reset();
+        TS_ASSERT(g.msg_system.size() == 0);
+        TS_ASSERT(g.msg_history.size() == 0);
+        TS_ASSERT(!g.msg_system_is_active);
+    }
+
+
+
+
+    void testCameraSystem()
+    {
+        gamestate g;
+        // Verify initial state
+        TS_ASSERT(g.cam2d.zoom == 4.0f);
+        TS_ASSERT(g.cam2d.rotation == 0.0);
+        TS_ASSERT(g.cam_lockon == true);
+        TS_ASSERT(g.cam_changed == false);
+        // Test camera movement
+        g.cam2d.target = (Vector2){100, 100};
+        TS_ASSERT(g.cam2d.target.x == 100);
+        TS_ASSERT(g.cam2d.target.y == 100);
+        // Test zoom
+        g.cam2d.zoom = 2.0f;
+        TS_ASSERT(g.cam2d.zoom == 2.0f);
+        // Test reset
+        g.reset();
+        TS_ASSERT(g.cam2d.zoom == 4.0f);
+        TS_ASSERT(g.cam2d.rotation == 0.0);
+        TS_ASSERT(g.cam_lockon == true);
+        TS_ASSERT(g.cam_changed == false);
+    }
 
 
 
@@ -495,16 +502,32 @@ public:
 
 
 
-    void testCorridor() {
+    void testCorridor()
+    {
         auto begin_time = get_nanoseconds();
         gamestate g;
+        inputstate is;
         g.test = true;
         g.init_dungeon(BIOME_STONE, 1, 32, 1);
         TS_ASSERT(g.d.floors.size() > 0);
-        //const vec3 player_loc = g.d.floors[0].df_get_random_loc();
-        //const vec3 player_loc = g.d.floors[0];
-        //TS_ASSERT(!vec3_equal(player_loc, (vec3){-1, -1, -1}));
-        //const int maxhp_roll = 10;
-        //g.entity_turn = g.create_player_with(player_loc, "darkmage", g.player_init(maxhp_roll));
+        const vec3 loc = g.d.floors[0].df_get_random_loc();
+        TS_ASSERT(!vec3_equal(loc, (vec3){-1, -1, -1}));
+        const int maxhp_roll = 10;
+        g.entity_turn = g.create_player_with(loc, "darkmage", g.player_init(maxhp_roll));
+        TS_ASSERT(g.hero_id != INVALID);
+        TS_ASSERT(g.ct.has<location>(g.hero_id));
+        auto loc2 = g.ct.get<location>(g.hero_id).value();
+        TS_ASSERT(!vec3_invalid(loc2));
+        g.current_scene = SCENE_GAMEPLAY;
+        constexpr unsigned int turns = 100;
+        for (int i = 0; i < turns; i++)
+        {
+            g.tick(is);
+        }
+        auto diff_ms = get_diff_ms(begin_time, get_nanoseconds());
+        auto step_count = g.ct.get<steps_taken>(g.hero_id).value_or(0);
+        minfo("hero took %u steps", step_count);
+        TS_ASSERT(step_count > 0)
+        minfo("test ran in %0.4llf ms", diff_ms);
     }
 };

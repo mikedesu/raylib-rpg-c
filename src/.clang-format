@@ -52,24 +52,24 @@ BinPackArguments: false
 BinPackParameters: false
 
 # Configure each individual brace in BraceWrapping
-#BreakBeforeBraces: BS_Attach
-BreakBeforeBraces: Custom 
+BreakBeforeBraces: Allman 
+#BreakBeforeBraces: false
 # Control of individual brace wrapping cases
 BraceWrapping: {
-    AfterClass: 'false'
-    AfterControlStatement: 'false'
-    AfterEnum : 'true'
-    AfterFunction : 'false'
-    AfterNamespace : 'true'
-    AfterStruct : 'false'
-    AfterUnion : 'false'
-    BeforeCatch : 'false'
-    BeforeElse : 'false'
-    IndentBraces : 'false'
-    AfterExternBlock : 'false'
-    SplitEmptyFunction : 'false'
-    SplitEmptyRecord : 'false'
-    SplitEmptyNamespace : 'false'
+    AfterClass: 'true'
+    AfterControlStatement: 'true'
+    #AfterEnum: true
+    AfterFunction: 'false'
+    AfterNamespace: 'true'
+    AfterStruct: 'false'
+    AfterUnion: 'false'
+    BeforeCatch: 'false'
+    BeforeElse: 'true'
+    #IndentBraces: 'false'
+    AfterExternBlock: 'false'
+    SplitEmptyFunction: 'false'
+    SplitEmptyRecord: 'false'
+    SplitEmptyNamespace: 'false'
 }
 
 BreakAfterJavaFieldAnnotations: true

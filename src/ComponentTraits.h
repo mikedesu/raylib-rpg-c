@@ -402,3 +402,12 @@ template <>
 struct ComponentTraits<tactics> {
     using Type = vector<tactic>;
 };
+
+
+
+
+struct steps_taken { }; // vector of tactic_t
+template <>
+struct ComponentTraits<steps_taken> {
+    using Type = unsigned int;
+};

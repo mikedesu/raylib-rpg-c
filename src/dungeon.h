@@ -50,7 +50,7 @@ public:
 
 
     inline dungeon_floor& get_floor(const size_t index) {
-        minfo("get_floor: %ld", index);
+        //minfo2("get_floor: %ld", index);
         massert(index >= 0 && index < floors.size(), "index is OOB: index is %ld", index);
         return floors[index];
     }
@@ -66,7 +66,7 @@ public:
 
 
     inline void add_floor(const biome_t type, const int width, const int height) {
-        minfo("dungeon add floor");
+        //minfo2("dungeon add floor");
 
         massert(width > 0, "width is 0");
         massert(height > 0, "height is 0");

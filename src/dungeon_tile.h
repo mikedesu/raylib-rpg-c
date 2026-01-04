@@ -21,7 +21,8 @@ using std::shared_ptr;
 using std::vector;
 
 
-class tile_t {
+class tile_t
+{
 public:
     tile_id id;
     tiletype_t type;
@@ -38,21 +39,35 @@ public:
     bool can_have_door;
     shared_ptr<vector<entityid>> entities;
 
-    inline size_t tile_entity_count() {
+
+
+
+    inline size_t tile_entity_count()
+    {
         return entities->size();
     }
 
 
-    constexpr inline entityid tile_get_entity(size_t i) {
+
+
+    constexpr inline entityid tile_get_entity(size_t i)
+    {
         return i >= 0 && i < entities->size() ? entities->at(i) : ENTITYID_INVALID;
     }
 
-    constexpr inline bool tile_is_wall() {
+
+
+
+    constexpr inline bool tile_is_wall()
+    {
         return tiletype_is_wall(type);
     }
 
 
-    inline void tile_init(const tiletype_t t) {
+
+
+    inline void tile_init(const tiletype_t t)
+    {
         type = t;
         visible = false;
         explored = false;
@@ -69,10 +84,14 @@ public:
     }
 
 
-    const inline entityid tile_add(const entityid id) {
+
+
+    const inline entityid tile_add(const entityid id)
+    {
         // Check if the entity already exists
         //minfo("tile_add: %d", id);
-        if (find(entities->begin(), entities->end(), id) != entities->end()) {
+        if (find(entities->begin(), entities->end(), id) != entities->end())
+        {
             merror("tile_add: entity already exists on tile");
             return ENTITYID_INVALID;
         }
@@ -83,11 +102,15 @@ public:
     }
 
 
-    const inline entityid tile_remove(const entityid id) {
+
+
+    const inline entityid tile_remove(const entityid id)
+    {
         massert(entities, "tile or tile entities is NULL");
         massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
         auto it = find(entities->begin(), entities->end(), id);
-        if (it == entities->end()) {
+        if (it == entities->end())
+        {
             merror("tile_remove: entity not found on tile");
             return ENTITYID_INVALID;
         }
@@ -100,14 +123,31 @@ public:
 
 
 
-    inline void tile_create(tiletype_t type) {
+    inline void tile_create(tiletype_t type)
+    {
         massert(type >= TILE_NONE && type < TILE_COUNT, "tile_create: type is out-of-bounds");
         tile_init(type);
     }
 
 
 
-    inline void tile_free() {
+
+    inline void tile_free()
+    {
         entities->clear();
+    }
+
+
+
+
+    tile_t()
+    {
+    }
+
+
+
+
+    ~tile_t()
+    {
     }
 };
