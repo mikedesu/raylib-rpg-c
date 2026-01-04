@@ -30,9 +30,9 @@ private:
     biome_t biome;
     vec3 downstairs_loc;
     vec3 upstairs_loc;
+    vector<tile_id> tiles; // 2D vector of shared pointers to tile_t
 
 public:
-    vector<tile_id> tiles; // 2D vector of shared pointers to tile_t
     shared_ptr<unordered_map<tile_id, tile_t>> tile_map; // Maps tile_id to tile_t pointer
 
 
@@ -42,6 +42,10 @@ public:
     {
         return upstairs_loc;
     }
+
+
+
+
     const vec3 get_downstairs_loc()
     {
         return downstairs_loc;
