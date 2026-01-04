@@ -31,15 +31,46 @@ private:
     bool explored;
     bool cached_player_present;
     bool dirty_entities;
+    int cached_live_npcs;
+    int cached_item_count;
 
 
 
 public:
-    int cached_live_npcs;
-    int cached_item_count;
     entityid cached_npc;
     entityid cached_item;
     shared_ptr<vector<entityid>> entities;
+
+
+
+    void set_cached_item_count(const int n)
+    {
+        cached_item_count = n;
+    }
+
+
+
+
+    const int get_cached_item_count()
+    {
+        return cached_item_count;
+    }
+
+
+
+
+    void set_cached_live_npcs(const int n)
+    {
+        cached_live_npcs = n;
+    }
+
+
+
+
+    const int get_cached_live_npcs()
+    {
+        return cached_live_npcs;
+    }
 
 
 

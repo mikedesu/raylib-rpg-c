@@ -449,8 +449,8 @@ public:
         if (!t.get_dirty_entities())
             return;
         // Reset counters
-        t.cached_live_npcs = 0;
-        t.cached_item_count = 0;
+        t.set_cached_live_npcs(0);
+        t.set_cached_item_count(0);
         t.set_cached_player_present(false);
         t.cached_npc = ENTITYID_INVALID;
         t.cached_item = ENTITYID_INVALID;
@@ -467,7 +467,7 @@ public:
             const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (type == ENTITY_NPC)
             {
-                t.cached_live_npcs++;
+                t.set_cached_live_npcs(t.get_cached_live_npcs() + 1);
                 t.cached_npc = id;
             }
             else if (type == ENTITY_PLAYER)
@@ -477,7 +477,7 @@ public:
             }
             else if (type == ENTITY_ITEM)
             {
-                t.cached_item_count++;
+                t.set_cached_item_count(t.get_cached_item_count() + 1);
                 t.cached_item = id;
             }
         }
@@ -503,7 +503,7 @@ public:
     const inline bool tile_has_live_npcs(tile_t& t)
     {
         recompute_entity_cache(t);
-        return t.cached_live_npcs > 0;
+        return t.get_cached_live_npcs() > 0;
     }
 
 
