@@ -3158,7 +3158,7 @@ public:
                 d.current_floor--;
                 const int new_floor = d.current_floor;
                 auto df2 = d.floors[new_floor];
-                const vec3 uloc = df2.downstairs_loc;
+                const vec3 uloc = df2.get_downstairs_loc();
                 auto t2 = df2.df_tile_at(uloc);
                 df2.df_add_at(hero_id, uloc.x, uloc.y);
                 ct.set<location>(hero_id, uloc);
@@ -3179,7 +3179,7 @@ public:
                 d.current_floor++;
                 const int new_floor = d.current_floor;
                 auto df2 = d.floors[new_floor];
-                const vec3 uloc = df2.upstairs_loc;
+                const vec3 uloc = df2.get_upstairs_loc();
                 auto t2 = df2.df_tile_at(uloc);
                 df2.df_add_at(hero_id, uloc.x, uloc.y);
                 ct.set<location>(hero_id, uloc);
