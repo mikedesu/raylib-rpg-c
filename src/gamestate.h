@@ -182,25 +182,11 @@ public:
 
 
 
-
-    gamestate()
+    void set_seed()
     {
-        //minfo("Initializing gamestate");
-
         srand(time(NULL));
         SetRandomSeed(time(NULL));
 
-        //constexpr size_t buf_size = 65;
-        //char buf[buf_size];
-        //bzero(buf, buf_size);
-        //for (int i = 0; i < buf_size; i++) {
-        //    buf[i] = 48 + rand() % 80;
-        //}
-        //string buff(buf);
-        //seed = buff;
-
-        //seed_seq seedseq(buff.begin(), buff.end());
-        //mt.seed(seedseq);
         time_point<system_clock> now = system_clock::now();
         auto dur = duration_cast<nanoseconds>(now.time_since_epoch());
         long long nanoseconds_since_epoch = dur.count();
@@ -208,12 +194,18 @@ public:
         seed = std::to_string(nanoseconds_since_epoch);
         seed_seq seedseq(seed.begin(), seed.end());
         mt.seed(seedseq);
+    }
 
 
 
-        //minfo("-------------------------");
-        //minfo("The gamestate seed was set to: %s", seed.c_str());
-        //minfo("-------------------------");
+
+    gamestate()
+    {
+        minfo2("Initializing gamestate");
+
+        set_seed();
+
+        minfo2("The gamestate seed was set to: %s", seed.c_str());
 
         reset();
     }
