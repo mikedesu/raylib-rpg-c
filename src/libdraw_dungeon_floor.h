@@ -95,7 +95,7 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
     auto tile = df.df_tile_at((vec3){x, y, z});
     //massert(tile, "tile is NULL");
     //if (tile.type == TILE_NONE || !tile.visible || !tile.explored) {
-    if (tile.get_type() == TILE_NONE || !tile.visible || !tile.explored)
+    if (tile.get_type() == TILE_NONE || !tile.get_visible() || !tile.explored)
     {
         return true;
     }

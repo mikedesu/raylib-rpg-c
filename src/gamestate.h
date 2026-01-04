@@ -1244,7 +1244,8 @@ public:
     inline void update_tile(tile_t& tile)
     {
         tile.explored = true;
-        tile.visible = true;
+        //tile.visible = true;
+        tile.set_visible(true);
     }
 
 
