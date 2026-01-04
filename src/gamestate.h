@@ -556,7 +556,7 @@ public:
             auto df = d.get_floor(z);
             for (int x = 0; x < df.get_width(); x++)
             {
-                for (int y = 0; y < df.height; y++)
+                for (int y = 0; y < df.get_height(); y++)
                 {
                     const vec3 loc = {x, y, z};
                     tile_t& tile = df.df_tile_at(loc);
@@ -626,7 +626,7 @@ public:
             auto df = d.get_floor(z);
             for (int x = 0; x < df.get_width(); x++)
             {
-                for (int y = 0; y < df.height; y++)
+                for (int y = 0; y < df.get_height(); y++)
                 {
                     const vec3 loc = {x, y, z};
                     auto t = df.df_tile_at(loc);
@@ -1272,7 +1272,7 @@ public:
         const int min_x = std::max(0, loc.x - light_radius0);
         const int max_x = std::min(df.get_width() - 1, loc.x + light_radius0);
         const int min_y = std::max(0, loc.y - light_radius0);
-        const int max_y = std::min(df.height - 1, loc.y + light_radius0);
+        const int max_y = std::min(df.get_height() - 1, loc.y + light_radius0);
         for (int y = min_y; y <= max_y; y++)
         {
             for (int x = min_x; x <= max_x; x++)
@@ -1379,7 +1379,7 @@ public:
         size_t count = 0;
         for (int i = 0; i < df.get_width(); i++)
         {
-            for (int j = 0; j < df.height; j++)
+            for (int j = 0; j < df.get_height(); j++)
             {
                 auto t = df.df_tile_at((vec3){i, j, -1});
                 if (tile_has_live_npcs(t))
@@ -2432,7 +2432,7 @@ public:
         //massert(aloc.y >= 0, "aloc.y <= 0");
         //massert(aloc.y < df.height, "aloc.y >= df.height");
 
-        if (aloc.x < 0 || aloc.x >= df.get_width() || aloc.y < 0 || aloc.y >= df.height)
+        if (aloc.x < 0 || aloc.x >= df.get_width() || aloc.y < 0 || aloc.y >= df.get_height())
         {
             merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
             return false;

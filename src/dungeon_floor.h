@@ -26,14 +26,22 @@ class dungeon_floor
 private:
     int floor; // the floor number, starting from 0
     int width;
+    int height;
 
 public:
-    int height;
     vec3 downstairs_loc;
     vec3 upstairs_loc;
     biome_t biome;
     vector<tile_id> tiles; // 2D vector of shared pointers to tile_t
     shared_ptr<unordered_map<tile_id, tile_t>> tile_map; // Maps tile_id to tile_t pointer
+
+
+
+    const int get_height()
+    {
+        return height;
+    }
+
 
 
 

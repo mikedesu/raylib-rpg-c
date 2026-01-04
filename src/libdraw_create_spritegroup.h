@@ -22,7 +22,7 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     {
         const vec3 loc = maybe_loc.value();
         massert(loc.x >= 0 && loc.x < df.get_width(), "location x out of bounds: %d", loc.x);
-        massert(loc.y >= 0 && loc.y < df.height, "location y out of bounds: %d", loc.y);
+        massert(loc.y >= 0 && loc.y < df.get_height(), "location y out of bounds: %d", loc.y);
         //if (loc.x < 0 || loc.x >= df.get_width() || loc.y < 0 || loc.y >= df.height)
         //{
         //    spritegroup_destroy(group);
