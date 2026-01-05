@@ -156,6 +156,11 @@ public:
 
     double last_frame_time;
 
+#define LAST_FRAME_TIMES_MAX 1000
+    vector<double> last_frame_times;
+    size_t last_frame_times_current;
+
+
     dungeon d;
 
     char frame_time_str[32];
@@ -249,6 +254,19 @@ public:
 
 
 
+    inline double get_avg_last_frame_time()
+    {
+        double sum = 0;
+        for (int i = 0; i < LAST_FRAME_TIMES_MAX; i++)
+        {
+            sum += last_frame_times[i];
+        }
+        return sum / LAST_FRAME_TIMES_MAX;
+    }
+
+
+
+
     inline void reset()
     {
         version = GAME_VERSION;
@@ -309,6 +327,16 @@ public:
         lock = 0;
         frame_updates = 0;
         framecount = 0;
+
+        last_frame_time = 0;
+        last_frame_times_current = 0;
+        last_frame_times.reserve(LAST_FRAME_TIMES_MAX);
+        for (size_t i = 0; i < last_frame_times.size(); i++)
+        {
+            last_frame_times[i] = 0;
+        }
+
+
         turn_count = 0;
         inventory_menu_selection = 0;
         msg_history_max_len_msg_measure = 0;
@@ -3765,6 +3793,7 @@ public:
             "update: %d\n"
             "frame dirty: %d\n"
             "draw time: %.1fms\n"
+            "avg last %d draw time: %.1fms\n"
             "cam: (%.0f,%.0f) Zoom: %.1f\n"
             "controlmode: %s \n"
             "floor: %d/%d \n"
@@ -3781,6 +3810,8 @@ public:
             frame_updates,
             frame_dirty,
             last_frame_time * 1000,
+            LAST_FRAME_TIMES_MAX,
+            (get_avg_last_frame_time() * 1000),
             cam2d.offset.x,
             cam2d.offset.y,
             cam2d.zoom,

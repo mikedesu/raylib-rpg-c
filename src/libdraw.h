@@ -34,13 +34,16 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
 
-static inline void libdraw_drawframe(gamestate& g) {
+static inline void libdraw_drawframe(gamestate& g)
+{
     double start_time = GetTime();
     libdraw_update_sprites_pre(g);
     BeginDrawing();
     ClearBackground(RED);
-    if (g.frame_dirty) {
-        switch (g.current_scene) {
+    if (g.frame_dirty)
+    {
+        switch (g.current_scene)
+        {
         case SCENE_TITLE: draw_title_screen_to_texture(g, false); break;
         case SCENE_MAIN_MENU: draw_title_screen_to_texture(g, true); break;
         case SCENE_CHARACTER_CREATION: draw_character_creation_screen_to_texture(g); break;
@@ -54,7 +57,8 @@ static inline void libdraw_drawframe(gamestate& g) {
     // draw to the target texture
     BeginTextureMode(target);
     ClearBackground(BLUE);
-    switch (g.current_scene) {
+    switch (g.current_scene)
+    {
     case SCENE_TITLE: draw_title_screen_from_texture(g); break;
     case SCENE_MAIN_MENU: draw_title_screen_from_texture(g); break;
     case SCENE_CHARACTER_CREATION: draw_character_creation_screen_from_texture(g); break;
@@ -67,13 +71,24 @@ static inline void libdraw_drawframe(gamestate& g) {
     win_dest.height = GetScreenHeight();
     DrawTexturePro(target.texture, target_src, win_dest, (Vector2){0, 0}, 0.0f, WHITE);
     EndDrawing();
+
     g.last_frame_time = GetTime() - start_time;
+
+    g.last_frame_times[g.last_frame_times_current] = g.last_frame_time;
+    g.last_frame_times_current++;
+    if (g.last_frame_times_current >= LAST_FRAME_TIMES_MAX)
+    {
+        g.last_frame_times_current = 0;
+    }
+
+
     g.framecount++;
     libdraw_update_sprites_post(g);
 }
 
 
-static inline void libdraw_init_rest(gamestate& g) {
+static inline void libdraw_init_rest(gamestate& g)
+{
     SetExitKey(KEY_ESCAPE);
     SetTargetFPS(60);
     g.windowwidth = DEFAULT_WIN_WIDTH, g.windowheight = DEFAULT_WIN_HEIGHT;
@@ -112,7 +127,8 @@ static inline void libdraw_init_rest(gamestate& g) {
 }
 
 
-static inline void libdraw_init(gamestate& g) {
+static inline void libdraw_init(gamestate& g)
+{
     const int w = DEFAULT_WIN_WIDTH;
     const int h = DEFAULT_WIN_HEIGHT;
     const char* title = WINDOW_TITLE;
@@ -127,12 +143,14 @@ static inline void libdraw_init(gamestate& g) {
 }
 
 
-static inline bool libdraw_windowshouldclose(gamestate& g) {
+static inline bool libdraw_windowshouldclose(gamestate& g)
+{
     return g.do_quit;
 }
 
 
-static inline void libdraw_close_partial() {
+static inline void libdraw_close_partial()
+{
     UnloadMusicStream(music);
     CloseAudioDevice();
     libdraw_unload_textures(txinfo);
@@ -145,7 +163,8 @@ static inline void libdraw_close_partial() {
 }
 
 
-static inline void libdraw_close() {
+static inline void libdraw_close()
+{
     libdraw_close_partial();
     CloseWindow();
 }
