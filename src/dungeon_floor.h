@@ -90,7 +90,6 @@ public:
         // given that tiles is a 2D vector of shared pointers to tile_t
         // we can access the tile using the x and y coordinates
         // and calculate the index
-        //minfo("df_tile_at: (%d, %d, %d)", loc.x, loc.y, loc.z);
         const size_t index = loc.y * width + loc.x;
         massert(index < tiles.size(), "index is out-of-bounds: %d, %d", loc.x, loc.y);
         const tile_id id = tiles[index];
