@@ -1,6 +1,7 @@
 #pragma once
 
 #include "draw_sprite.h"
+#include "dungeon_floor.h"
 #include "entitytype.h"
 #include "gamestate.h"
 #include "get_txkey_for_tiletype.h"
@@ -88,7 +89,7 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
     massert(x >= 0, "x is less than 0");
     massert(y >= 0, "y is less than 0");
     //auto df = d_get_floor(g.dungeon, z);
-    auto df = g.d.get_floor(z);
+    dungeon_floor& df = g.d.get_floor(z);
     //massert(df, "dungeon_floor is NULL");
     massert(x < df.get_width(), "x is out of bounds");
     massert(y < df.get_height(), "y is out of bounds");
@@ -153,7 +154,7 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
     bool blocking = false;
     for (const auto& v : path)
     {
-        auto tile = df.df_tile_at(v);
+        tile_t& tile = df.df_tile_at(v);
         //if (tile && (tile_is_wall(tile->type))) {
         if (tiletype_is_wall(tile.get_type()))
         {
@@ -336,7 +337,7 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 const static inline bool libdraw_draw_dungeon_floor(gamestate& g)
 {
     minfo2("BEGIN draw dungeon floor");
-    auto df = g.d.get_current_floor();
+    dungeon_floor& df = g.d.get_current_floor();
     const int z = g.d.current_floor;
 
     // render tiles
