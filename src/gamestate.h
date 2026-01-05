@@ -1409,10 +1409,10 @@ public:
         srand(time(NULL));
         SetRandomSeed(time(NULL));
 
-        const int w = 128;
-        const int h = 128;
+        const int w = 64;
+        const int h = 64;
 
-        init_dungeon(BIOME_STONE, 4, w, h);
+        init_dungeon(BIOME_STONE, 1, w, h);
 
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
         //place_doors();
@@ -3736,7 +3736,6 @@ public:
     {
         minfo2("update debug panel buffer");
         // Static buffers to avoid reallocating every frame
-        //static const char* control_modes[] = {"Camera", "Player", "Unknown"};
         const int message_count = msg_history.size();
         int inventory_count;
         vec3 loc = {0, 0, 0};
@@ -3745,6 +3744,10 @@ public:
         {
             loc = ct.get<location>(hero_id).value_or((vec3){-1, -1, -1});
         }
+        // current df
+        dungeon_floor& df = d.get_current_floor();
+        const int df_w = df.get_width();
+        const int df_h = df.get_height();
         // Determine control mode and flag strings
         const char* control_mode = controlmode == CONTROLMODE_CAMERA ? "Camera" : controlmode == CONTROLMODE_PLAYER ? "Player" : "Unknown";
         // zero out the buffer
@@ -3772,7 +3775,8 @@ public:
             "hero: (%d,%d,%d)\n"
             "weapon: %d\n"
             "inventory: %d\n"
-            "message count: %d\n",
+            "message count: %d\n"
+            "df.width x height: %dx%d\n",
             framecount,
             frame_updates,
             frame_dirty,
@@ -3798,7 +3802,9 @@ public:
             loc.z,
             ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID),
             inventory_count,
-            message_count);
+            message_count,
+            df_w,
+            df_h);
     }
 
 
