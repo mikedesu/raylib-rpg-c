@@ -336,12 +336,12 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 
 const static inline bool libdraw_draw_dungeon_floor(gamestate& g)
 {
-    minfo2("BEGIN draw dungeon floor");
+    //minfo2("BEGIN draw dungeon floor");
     dungeon_floor& df = g.d.get_current_floor();
     const int z = g.d.current_floor;
 
     // render tiles
-    minfo2("BEGIN draw dungeon floor --- rendering tiles");
+    //minfo2("BEGIN draw dungeon floor --- rendering tiles");
     //for (int y = 0; y < df.get_height(); y++)
     //{
     //    for (int x = 0; x < df.get_width(); x++)
@@ -386,7 +386,7 @@ const static inline bool libdraw_draw_dungeon_floor(gamestate& g)
         return false;
     };
 
-    minfo2("BEGIN draw dungeon floor --- rendering entities");
+    //minfo2("BEGIN draw dungeon floor --- rendering entities");
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_DOOR, mydefault);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PROP, mydefault);
     libdraw_draw_player_target_box(g);
@@ -396,7 +396,7 @@ const static inline bool libdraw_draw_dungeon_floor(gamestate& g)
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, alive_check);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, mydefault);
-    minfo2("END draw dungeon floor --- rendering entities");
-    minfo2("END draw dungeon floor");
+    //minfo2("END draw dungeon floor --- rendering entities");
+    //minfo2("END draw dungeon floor");
     return true;
 }

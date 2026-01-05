@@ -532,5 +532,6 @@ public:
 
     ~dungeon_floor()
     {
+        minfo2("dungeon floor destroyed");
     }
 };

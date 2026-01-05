@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dungeon_floor.h"
 #include "gamestate.h"
 #include "spritegroup.h"
 #include "textureinfo.h"
@@ -15,7 +16,7 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
     massert(group, "spritegroup is NULL");
     //disabling this check until dungeon_floor created
-    auto df = g.d.get_current_floor();
+    dungeon_floor& df = g.d.get_current_floor();
     auto maybe_loc = g.ct.get<location>(id);
     // if it has a location...
     if (maybe_loc.has_value())
@@ -33,19 +34,19 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
         {
             const int k = keys[i];
             Texture2D* tex = &txinfo[k].texture;
-            auto s = sprite_create2(tex, txinfo[k].contexts, txinfo[k].num_frames);
+            shared_ptr<sprite> s = sprite_create2(tex, txinfo[k].contexts, txinfo[k].num_frames);
             spritegroup_add(group, s);
             //msuccess("added sprite to group!");
         }
         group->id = id;
-        auto s = spritegroup_get(group, 0);
+        shared_ptr<sprite> s = spritegroup_get(group, 0);
         massert(s, "sprite is NULL");
-        if (!s)
-        {
-            spritegroup_destroy(group);
-            merror("END create spritegroup");
-            return false;
-        }
+        //if (!s)
+        //{
+        //    spritegroup_destroy(group);
+        //    merror("END create spritegroup");
+        //    return false;
+        //}
         group->current = 0;
         group->dest = (Rectangle){(float)loc.x * DEFAULT_TILE_SIZE + offset_x, (float)loc.y * DEFAULT_TILE_SIZE + offset_y, (float)s->width, (float)s->height};
         group->off_x = offset_x;
@@ -68,12 +69,12 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     group->current = 0;
     auto s = spritegroup_get(group, 0);
     massert(s, "sprite is NULL");
-    if (!s)
-    {
-        spritegroup_destroy(group);
-        merror("END create spritegroup");
-        return false;
-    }
+    //if (!s)
+    //{
+    //    spritegroup_destroy(group);
+    //    merror("END create spritegroup");
+    //    return false;
+    //}
     const float x = -DEFAULT_TILE_SIZE + offset_x, y = -DEFAULT_TILE_SIZE + offset_y, w = s->width, h = s->height;
     group->dest = (Rectangle){x, y, w, h};
     group->off_x = offset_x;
