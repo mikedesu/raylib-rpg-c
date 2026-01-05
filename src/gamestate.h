@@ -1408,7 +1408,12 @@ public:
         minfo("gamestate.logic_init");
         srand(time(NULL));
         SetRandomSeed(time(NULL));
-        init_dungeon(BIOME_STONE, 4, 32, 16);
+
+        const int w = 128;
+        const int h = 128;
+
+        init_dungeon(BIOME_STONE, 4, w, h);
+
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
         //place_doors();
         //place_props();

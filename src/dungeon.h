@@ -17,7 +17,8 @@ using std::vector;
 #define INITIAL_DUNGEON_CAPACITY 4
 
 
-class dungeon {
+class dungeon
+{
 public:
     vector<dungeon_floor> floors; // vector of shared pointers to dungeon_floor_t
     int current_floor;
@@ -26,7 +27,8 @@ public:
 
 
 
-    dungeon() {
+    dungeon()
+    {
         current_floor = 0;
         is_locked = false;
         is_initialized = false;
@@ -35,21 +37,24 @@ public:
 
 
 
-    ~dungeon() {
+    ~dungeon()
+    {
         floors.clear();
     }
 
 
 
 
-    const inline size_t get_floor_count() {
+    const inline size_t get_floor_count()
+    {
         return floors.size();
     }
 
 
 
 
-    inline dungeon_floor& get_floor(const size_t index) {
+    inline dungeon_floor& get_floor(const size_t index)
+    {
         //minfo2("get_floor: %ld", index);
         massert(index >= 0 && index < floors.size(), "index is OOB: index is %ld", index);
         return floors[index];
@@ -58,14 +63,16 @@ public:
 
 
 
-    inline dungeon_floor& get_current_floor() {
+    inline dungeon_floor& get_current_floor()
+    {
         return get_floor(current_floor);
     }
 
 
 
 
-    inline void add_floor(const biome_t type, const int width, const int height) {
+    inline void add_floor(const biome_t type, const int width, const int height)
+    {
         //minfo2("dungeon add floor");
 
         massert(width > 0, "width is 0");
@@ -79,13 +86,16 @@ public:
         // at present, these creation rules do not account for the df's width and height
         // as passed in by the parameters to this function or the properties of the df
         // this is not ideal
-        auto creation_rules = [&df]() {
+        auto creation_rules = [&df, width, height]()
+        {
             //const float x = df.width / 4.0;
             //const float y = df.height / 4.0;
             //constexpr int w = 4;
             //constexpr int h = 4;
             // draw room 1
-            df.df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 0, 32, 1});
+
+            df.df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 0, static_cast<float>(width), static_cast<float>(height)});
+
             //const Rectangle base = {x - 1, y - 1, static_cast<float>(df.width), static_cast<float>(df.height)};
             //df.df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, base);
             // draw room 1
