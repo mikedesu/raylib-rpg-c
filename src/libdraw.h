@@ -36,7 +36,7 @@ int libdraw_restart_count = 0;
 
 static inline void libdraw_drawframe(gamestate& g)
 {
-    double start_time = GetTime();
+    const double start_time = GetTime();
     libdraw_update_sprites_pre(g);
     BeginDrawing();
     ClearBackground(RED);
@@ -72,17 +72,17 @@ static inline void libdraw_drawframe(gamestate& g)
     DrawTexturePro(target.texture, target_src, win_dest, (Vector2){0, 0}, 0.0f, WHITE);
     EndDrawing();
 
+#ifdef DEBUG
     g.last_frame_time = GetTime() - start_time;
-
     g.last_frame_times[g.last_frame_times_current] = g.last_frame_time;
     g.last_frame_times_current++;
     if (g.last_frame_times_current >= LAST_FRAME_TIMES_MAX)
     {
         g.last_frame_times_current = 0;
     }
-
-
     g.framecount++;
+#endif
+
     libdraw_update_sprites_post(g);
 }
 

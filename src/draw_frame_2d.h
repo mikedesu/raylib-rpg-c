@@ -12,7 +12,8 @@
 #include "gamestate.h"
 #include "libdraw_dungeon_floor.h"
 
-static inline void libdraw_drawframe_2d(gamestate& g) {
+static inline void libdraw_drawframe_2d(gamestate& g)
+{
     //minfo("BEGIN drawframe 2d");
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
@@ -41,12 +42,14 @@ static inline void libdraw_drawframe_2d(gamestate& g) {
     draw_message_history(g);
     //minfo("draw msg box");
     draw_message_box(g);
-    if (g.display_inventory_menu) {
+    if (g.display_inventory_menu)
+    {
         //minfo("draw inventory menu");
         draw_inventory_menu(g);
     }
 
-    if (g.display_action_menu) {
+    if (g.display_action_menu)
+    {
         draw_action_menu(g);
     }
 
@@ -54,10 +57,14 @@ static inline void libdraw_drawframe_2d(gamestate& g) {
     //    draw_gameplay_settings_menu(g);
     //}
     //minfo("handle debug panel");
+
+#ifdef DEBUG
     handle_debug_panel(g);
+#endif
     //draw_version(g);
     //int x = 0;
-    if (g.display_help_menu) {
+    if (g.display_help_menu)
+    {
         //minfo("draw help menu");
         draw_help_menu(g);
     }

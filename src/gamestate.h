@@ -4059,7 +4059,10 @@ public:
         update_spells_state();
         handle_input(is);
         handle_npcs();
+
+#ifdef DEBUG
         update_debug_panel_buffer(is);
+#endif
         currenttime = time(NULL);
         currenttimetm = localtime(&currenttime);
         strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
