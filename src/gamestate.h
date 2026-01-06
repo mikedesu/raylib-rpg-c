@@ -2258,6 +2258,21 @@ public:
 
 
 
+    const inline bool handle_cycle_messages_test()
+    {
+        bool retval = false;
+        if (msg_system_is_active)
+        {
+            PlaySound(sfx[SFX_CONFIRM_01]);
+            cycle_messages();
+            retval = true;
+        }
+        return retval;
+    }
+
+
+
+
     const inline bool handle_camera_zoom(const inputstate& is)
     {
         bool retval = false;
@@ -3555,6 +3570,11 @@ public:
 
         if (test && framecount % 60 == 0)
         {
+            if (handle_cycle_messages_test())
+            {
+                return;
+            }
+
             // special handler
             // move randomly for now
             minfo2("hero random move");
