@@ -37,6 +37,13 @@ I have already done the following:
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
 
+- [ ] **IMPROVEMENT** i want to get rid of the `entities` vector on `tile_t`. if we limit things such that
+  - [ ] only 1 NPC per tile
+  - [ ] only 1 item per tile
+  - [ ] only 1 door per tile
+  - [ ] then we can eliminate the `entities` entirely and the game should be more performant since our lookups dont involve memory
+- [ ] **BUG** i've seen the player and NPCs move into tiles that are occupied by other entities, which violates the system
+- [ ] **BUG** automated gameplay system found you can move while dead
 - [ ] **API** we need a way to simulate gameplay in a manner similar to how unit_test works while actually rendering the game
   - [ ] in the function where the player's `test` switch is controlled in `handle_input`, we can check current frame and act only on certain frames
 - [ ] **API** we need a proper create_monster-type function that allows for setting of the race 
@@ -50,7 +57,6 @@ Previous analysis suggestions you've brought up that I will eventually implement
 - [ ] **FEATURE** text display that sits on top of each NPC
   - [ ] start with static text that simply gets rendered after NPC draw
 - [ ] **FEATURE** pop-up text display that sits on top of each NPC and rises up and fades away
-
 - [ ] **BUG** i just saw an NPC orc push a box under the player
 - [ ] **ALGORITHM BUG** it is possible that `solid` props are placed in a way that blocks access into another area. one of two possible fixes:
 - [ ] **CRASH** **BUG** unknown crash occuring, was moving onto a tile with an npc i just killed

@@ -1460,6 +1460,13 @@ public:
         //    for (int j = 0; j < monster_count; j++) {
         const vec3 random_loc = d.get_floor(0).df_get_random_loc();
         create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
+        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
+        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
+        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
+        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
+        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
+        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
+        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
         //    }
         //}
         msuccess("end creating monsters...");
