@@ -5,7 +5,9 @@
 #include "gamestate.h"
 #include "handle_dirty_entities.h"
 #include "libgame_defines.h"
+#include "load_music.h"
 #include "update_sprite.h"
+#include <raylib.h>
 
 extern Music music;
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
@@ -15,7 +17,9 @@ extern int ANIM_SPEED;
 static inline void libdraw_update_sprites_pre(gamestate& g)
 {
     minfo2("BEGIN update sprites pre");
-    UpdateMusicStream(music);
+
+    handle_music_stream(g);
+
     if (g.current_scene == SCENE_GAMEPLAY)
     {
         if (g.flag == GAMESTATE_FLAG_PLAYER_INPUT || g.flag == GAMESTATE_FLAG_PLAYER_ANIM)

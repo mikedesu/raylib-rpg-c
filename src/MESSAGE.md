@@ -29,11 +29,13 @@ I have already done the following:
   - [x] we will be able to set a flag indicating the gamestate is in a unit-test environment (so we can skip rendering and simply simulate the dungeon)
 - [x] **CODE QUALITY** The way we handle race2str and str2race can be updated
   - [x] we should be using a `map` instead of hard-coding strings into vectors
+- [x] **BUG** **PERFORMANCE** **CRITICAL** during dungeon floor draw, for some reason, our tile destructor is being called many times literally once-per-frame, for every tile! WTF?
+  - [x] **FIXED** `auto` was copying objects
 
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
-- [ ] **BUG** **PERFORMANCE** **CRITICAL** during dungeon floor draw, for some reason, our tile destructor is being called many times literally once-per-frame, for every tile! WTF?
+- [ ] **FEATURE** we should be able to change track on track end
 - [ ] **BUG** `handle_test_flag` not properly incrementing turns
 - [ ] **PLAYER REQUEST** numpad movement controls
 - [ ] **FEATURE** volume control menu
