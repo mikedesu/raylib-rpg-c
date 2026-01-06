@@ -1181,7 +1181,7 @@ public:
 
 
 
-    const inline entityid create_random_monster_with(with_fun monsterInitFunction)
+    const inline entityid create_orc_with(with_fun monsterInitFunction)
     {
         const race_t r = RACE_ORC;
         const entityid id = create_npc_with(r, monsterInitFunction);
@@ -1214,7 +1214,7 @@ public:
 
 
 
-    const inline entityid create_random_monster_at_with(const vec3 loc, with_fun monsterInitFunction)
+    const inline entityid create_orc_at_with(const vec3 loc, with_fun monsterInitFunction)
     {
         if (vec3_invalid(loc))
         {
@@ -1230,7 +1230,7 @@ public:
         {
             return ENTITYID_INVALID;
         }
-        const entityid id = create_random_monster_with(monsterInitFunction);
+        const entityid id = create_orc_with(monsterInitFunction);
         if (id == ENTITYID_INVALID)
         {
             return ENTITYID_INVALID;
@@ -1438,8 +1438,8 @@ public:
         srand(time(NULL));
         SetRandomSeed(time(NULL));
 
-        const int w = 64;
-        const int h = 64;
+        const int w = 8;
+        const int h = 8;
 
         init_dungeon(BIOME_STONE, 1, w, h);
 
@@ -1454,8 +1454,8 @@ public:
         //for (int i = 0; i < (int)d.floors.size(); i++) {
         //    const int monster_count = i + 1;
         //    for (int j = 0; j < monster_count; j++) {
-        //        const vec3 random_loc = d.get_floor(i).df_get_random_loc();
-        //        create_random_monster_at_with(random_loc, [](CT& ct, const entityid id) {});
+        const vec3 random_loc = d.get_floor(0).df_get_random_loc();
+        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
         //    }
         //}
         msuccess("end creating monsters...");
