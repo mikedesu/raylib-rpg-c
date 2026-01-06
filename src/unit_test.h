@@ -505,6 +505,8 @@ public:
     void testCorridor()
     {
         auto begin_time = get_nanoseconds();
+        constexpr unsigned int turns = 100;
+        constexpr unsigned int simulations = 100;
         gamestate g;
         inputstate is;
         g.test = true;
@@ -519,15 +521,15 @@ public:
         auto loc2 = g.ct.get<location>(g.hero_id).value();
         TS_ASSERT(!vec3_invalid(loc2));
         g.current_scene = SCENE_GAMEPLAY;
-        constexpr unsigned int turns = 100;
         for (int i = 0; i < turns; i++)
         {
             g.tick(is);
+            g.tick(is);
         }
-        auto diff_ms = get_diff_ms(begin_time, get_nanoseconds());
-        auto step_count = g.ct.get<steps_taken>(g.hero_id).value_or(0);
-        minfo("hero took %u steps", step_count);
+        const unsigned int step_count = g.ct.get<steps_taken>(g.hero_id).value_or(0);
         TS_ASSERT(step_count > 0)
+        TS_ASSERT(g.ticks > 0)
+        auto diff_ms = get_diff_ms(begin_time, get_nanoseconds());
         minfo("test ran in %0.4llf ms", diff_ms);
     }
 };

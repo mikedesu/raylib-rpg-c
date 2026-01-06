@@ -414,7 +414,7 @@ public:
 
     inline void init_dungeon(const biome_t type, const int df_count, const int w, const int h)
     {
-        minfo("init_dungeon");
+        minfo2("init_dungeon");
         massert(df_count > 0, "df_count is <= 0");
         massert(w > 0, "w == 0");
         massert(h > 0, "h == 0");
