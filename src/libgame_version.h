@@ -1,4 +1,4 @@
 #pragma once
 
-#define GAME_VERSION "v0.0.5.24"
-#define GAME_VERSION_DATE "January 5, 2026"
+#define GAME_VERSION "v0.0.5.25"
+#define GAME_VERSION_DATE "January 6, 2026"
