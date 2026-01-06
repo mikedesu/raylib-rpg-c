@@ -307,7 +307,11 @@ public:
         music_volume_changed = false;
         player_changing_dir = false;
         msg_system_is_active = false;
+#ifndef TEST
         test = false;
+#else
+        test = true;
+#endif
         gameplay_settings_menu_selection = 0;
         cam2d.target = cam2d.offset = (Vector2){0, 0};
         cam2d.zoom = 4.0f;
@@ -3549,7 +3553,7 @@ public:
             return;
         }
 
-        if (test)
+        if (test && framecount % 60 == 0)
         {
             // special handler
             // move randomly for now
@@ -3567,6 +3571,10 @@ public:
                 minfo2("hero failed to move randomly");
             }
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
+            return;
+        }
+        else if (test)
+        {
             return;
         }
 

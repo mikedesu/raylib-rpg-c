@@ -31,11 +31,15 @@ I have already done the following:
   - [x] we should be using a `map` instead of hard-coding strings into vectors
 - [x] **BUG** **PERFORMANCE** **CRITICAL** during dungeon floor draw, for some reason, our tile destructor is being called many times literally once-per-frame, for every tile! WTF?
   - [x] **FIXED** `auto` was copying objects
+- [x] **FEATURE** we should be able to change track on track end
 
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
-- [ ] **FEATURE** we should be able to change track on track end
+
+- [ ] **API** we need a way to simulate gameplay in a manner similar to how unit_test works while actually rendering the game
+  - [ ] in the function where the player's `test` switch is controlled in `handle_input`, we can check current frame and act only on certain frames
+- [ ] **API** we need a proper create_monster-type function that allows for setting of the race 
 - [ ] **BUG** `handle_test_flag` not properly incrementing turns
 - [ ] **PLAYER REQUEST** numpad movement controls
 - [ ] **FEATURE** volume control menu
