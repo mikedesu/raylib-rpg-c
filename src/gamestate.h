@@ -2517,6 +2517,10 @@ public:
     {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
         minfo2("entity %d is trying to move: (%d,%d,%d)", id, v.x, v.y, v.z);
+
+
+
+
         ct.set<update>(id, true);
         ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
         // entity location
@@ -3584,7 +3588,15 @@ public:
 
             // special handler
             // move randomly for now
+
+            const bool is_dead = ct.get<dead>(hero_id).value_or(true);
+            if (is_dead)
+            {
+                return;
+            }
+
             minfo2("hero random move");
+
             //const bool r0 = try_entity_move(hero_id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
             uniform_int_distribution<int> dist(-1, 1);
             const bool r0 = try_entity_move(hero_id, (vec3){dist(mt), dist(mt), 0});
