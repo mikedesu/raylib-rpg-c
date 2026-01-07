@@ -11,8 +11,9 @@
 #include <memory>
 #include <vector>
 
-#define DUNGEON_TILE_MAX_ENTITIES_DEFAULT 8
-#define DUNGEON_TILE_MAX_ENTITIES_MAX 256
+//#define DUNGEON_TILE_MAX_ENTITIES_DEFAULT 8
+//#define DUNGEON_TILE_MAX_ENTITIES_MAX 256
+#define DUNGEON_TILE_ENTITIES_RESERVE 4
 
 
 using std::find;
@@ -284,7 +285,9 @@ public:
         cached_item_count = 0;
         cached_npc = ENTITYID_INVALID;
         cached_item = ENTITYID_INVALID;
+
         entities = make_shared<vector<entityid>>();
+        entities->reserve(DUNGEON_TILE_ENTITIES_RESERVE);
     }
 
 
