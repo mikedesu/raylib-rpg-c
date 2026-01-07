@@ -2,7 +2,8 @@
 
 #include "gamestate.h"
 
-static inline void draw_look_panel(gamestate& g) {
+static inline void draw_look_panel(gamestate& g)
+{
     // To make this useful,
     // we need to construct strings
     // telling us info about the tile
@@ -12,7 +13,7 @@ static inline void draw_look_panel(gamestate& g) {
     auto tile = df.df_tile_at(loc);
 
     // subtract 1 for the PLAYER
-    const int entity_count = tile.tile_entity_count() - 1;
+    const int entity_count = tile->tile_entity_count() - 1;
 
     const char* texts[] = {"Look Panel", "There is some tile here", TextFormat("There are %d things here", entity_count)};
     const int texts_size = 3;
@@ -41,7 +42,8 @@ static inline void draw_look_panel(gamestate& g) {
     DrawRectangleLinesEx(r, 1, WHITE);
 
     int off_y = 0;
-    for (int i = 0; i < texts_size; i++) {
+    for (int i = 0; i < texts_size; i++)
+    {
         DrawText(texts[i], r.x + pad_w, r.y + pad_h + off_y, font_size, WHITE);
         off_y += 10;
     }

@@ -505,13 +505,13 @@ public:
     void testCorridor()
     {
         auto begin_time = get_nanoseconds();
-        constexpr unsigned int turns = 1;
+        constexpr unsigned int turns = 100;
         //constexpr unsigned int simulations = 100;
         gamestate g;
         inputstate is;
         g.test = true;
 
-        g.init_dungeon(BIOME_STONE, 1, 32, 1);
+        g.init_dungeon(BIOME_STONE, 1, 32, 2);
         TS_ASSERT(g.d.floors.size() > 0);
 
         const vec3 loc = g.d.floors[0].df_get_random_loc();
