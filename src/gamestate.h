@@ -1372,7 +1372,7 @@ public:
                 // remove it from the tile
                 shared_ptr<dungeon_floor> df = d.get_current_floor();
                 const vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
-                const bool r0 = df->df_remove_at(id, loc.x, loc.y);
+                const bool r0 = df->df_remove_at(id, loc);
                 if (!r0)
                 {
                     merror("failed to remove id %d at %d, %d", id, loc.x, loc.y);
@@ -2585,7 +2585,7 @@ public:
         // if door, door is open
         //minfo("df remove at");
         // remove the entity from the current tile
-        if (!df->df_remove_at(id, loc.x, loc.y))
+        if (!df->df_remove_at(id, loc))
         {
             merror2("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
             return false;
@@ -3276,7 +3276,7 @@ public:
             {
                 // go upstairs
                 // we have to remove the player from the old tile
-                df->df_remove_at(hero_id, loc.x, loc.y);
+                df->df_remove_at(hero_id, loc);
                 d.current_floor--;
                 const int new_floor = d.current_floor;
                 shared_ptr<dungeon_floor> df2 = d.floors[new_floor];
@@ -3297,7 +3297,7 @@ public:
             {
                 // go downstairs
                 // we have to remove the player from the old tile
-                df->df_remove_at(hero_id, loc.x, loc.y);
+                df->df_remove_at(hero_id, loc);
                 d.current_floor++;
                 const int new_floor = d.current_floor;
                 shared_ptr<dungeon_floor> df2 = d.floors[new_floor];
@@ -3491,7 +3491,7 @@ public:
                 if (doorid != ENTITYID_INVALID)
                 {
                     ct.set<destroyed>(doorid, true);
-                    df->df_remove_at(doorid, spell_loc.x, spell_loc.y);
+                    df->df_remove_at(doorid, spell_loc);
                 }
             }
             ct.set<destroyed>(spell_id, true);
