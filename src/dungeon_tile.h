@@ -275,6 +275,7 @@ public:
 
     inline void tile_init(const tiletype_t t)
     {
+        minfo2("tile_init(%d)", t);
         type = t;
         visible = false;
         explored = false;
@@ -345,8 +346,23 @@ public:
 
 
 
+    tile_t(tiletype_t t, tile_id tid)
+        : type(t)
+        , id(tid)
+    {
+        minfo2("BEGIN tile_t(%d, %d)", tid, t);
+        tile_init(t);
+        minfo2("END tile_t(%d, %d)", tid, t);
+    }
+
+
+
+
     tile_t()
     {
+        minfo2("BEGIN tile_t()");
+        tile_init(TILE_NONE);
+        minfo2("END tile_t()");
     }
 
 

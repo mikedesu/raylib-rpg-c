@@ -150,7 +150,8 @@ public:
     inline void df_set_tile(const tiletype_t type, const int x, const int y)
     {
         tile_t& current = df_tile_at((vec3){x, y, -1});
-        current.tile_init(type);
+        current.set_type(type);
+        //current.tile_init(type);
     }
 
 
@@ -216,19 +217,14 @@ public:
         tile_map = make_shared<unordered_map<tile_id, tile_t>>();
         massert(tile_map, "failed to create tile map");
         // create all the tiles and add to the tile vector and tile map
-        minfo2("pushing tiles...");
+        //minfo2("pushing tiles...");
         for (tile_id i = 0; i < width * height; i++)
         {
+            minfo2("Begin loop %d", i);
             tiles.push_back(i);
-            //auto tile = make_shared<tile_t>();
-            tile_t tile;
-            //massert(tile, "failed to create tile");
-            //tile.id = i;
-            tile.set_id(i);
-            tile.tile_init(TILE_NONE);
-            tile_map->insert({i, tile});
+            tile_map->emplace(i, tile_t(TILE_NONE, i));
         }
-        msuccess2("tiles pushed.");
+        //msuccess2("tiles pushed.");
         //df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y, w2, h2});
         //df_set_perimeter(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x - 1, y - 1, w2 + 2, h2 + 2});
         //df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x + w2 / 2.0f, y, 1, h2});

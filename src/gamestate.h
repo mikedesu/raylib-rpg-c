@@ -3597,8 +3597,23 @@ public:
             minfo2("hero random move");
 
             //const bool r0 = try_entity_move(hero_id, (vec3){rand() % 3 - 1, rand() % 3 - 1, 0});
+
             uniform_int_distribution<int> dist(-1, 1);
-            const bool r0 = try_entity_move(hero_id, (vec3){dist(mt), dist(mt), 0});
+
+            int vx = 0;
+            while (vx == 0)
+            {
+                vx = dist(mt);
+            }
+
+            int vy = 0;
+            //while (vy == 0)
+            //{
+            //    vy = dist(mt);
+            //}
+
+
+            const bool r0 = try_entity_move(hero_id, vec3{vx, vy, 0});
 
             if (r0)
             {
