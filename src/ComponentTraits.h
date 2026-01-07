@@ -30,384 +30,573 @@ template <typename Kind>
 struct ComponentTraits;
 
 // Component kinds
-struct level { }; // int
+struct level
+{
+}; // int
 template <>
-struct ComponentTraits<level> {
+struct ComponentTraits<level>
+{
     using Type = int;
 };
 
-struct name { }; // string
+struct name
+{
+}; // string
 template <>
-struct ComponentTraits<name> {
+struct ComponentTraits<name>
+{
     using Type = string;
 };
 
-struct entitytype { }; // entitytype_t
+struct entitytype
+{
+}; // entitytype_t
 template <>
-struct ComponentTraits<entitytype> {
+struct ComponentTraits<entitytype>
+{
     using Type = entitytype_t;
 };
 
-struct race { }; // race_t
+struct race
+{
+}; // race_t
 template <>
-struct ComponentTraits<race> {
+struct ComponentTraits<race>
+{
     using Type = race_t;
 };
 
-struct location { }; //vec3
+struct location
+{
+}; //vec3
 template <>
-struct ComponentTraits<location> {
+struct ComponentTraits<location>
+{
     using Type = vec3;
 };
 
-struct spritemove { }; // rectangle
+struct spritemove
+{
+}; // rectangle
 template <>
-struct ComponentTraits<spritemove> {
+struct ComponentTraits<spritemove>
+{
     using Type = Rectangle;
 };
 
-struct dead { }; // bool
+struct dead
+{
+}; // bool
 template <>
-struct ComponentTraits<dead> {
+struct ComponentTraits<dead>
+{
     using Type = bool;
 };
 
-struct update { }; // bool
+struct update
+{
+}; // bool
 template <>
-struct ComponentTraits<update> {
+struct ComponentTraits<update>
+{
     using Type = bool;
 };
 
-struct direction { }; // dir_t
+struct direction
+{
+}; // dir_t
 template <>
-struct ComponentTraits<direction> {
+struct ComponentTraits<direction>
+{
     using Type = direction_t;
 };
 
-struct attacking { }; // bool
+struct attacking
+{
+}; // bool
 template <>
-struct ComponentTraits<attacking> {
+struct ComponentTraits<attacking>
+{
     using Type = bool;
 };
 
 // this casting is for NPCs
-struct casting { }; // bool
+struct casting
+{
+}; // bool
 template <>
-struct ComponentTraits<casting> {
+struct ComponentTraits<casting>
+{
     using Type = bool;
 };
 
 
 // this casting is for spells
-struct spell_casting { }; // bool
+struct spell_casting
+{
+}; // bool
 template <>
-struct ComponentTraits<spell_casting> {
+struct ComponentTraits<spell_casting>
+{
     using Type = bool;
 };
 
-struct spell_persisting { }; // bool
+struct spell_persisting
+{
+}; // bool
 template <>
-struct ComponentTraits<spell_persisting> {
+struct ComponentTraits<spell_persisting>
+{
     using Type = bool;
 };
 
-struct spell_ending { }; // bool
+struct spell_ending
+{
+}; // bool
 template <>
-struct ComponentTraits<spell_ending> {
+struct ComponentTraits<spell_ending>
+{
     using Type = bool;
 };
 
-struct spell_complete { }; // bool
+struct spell_complete
+{
+}; // bool
 template <>
-struct ComponentTraits<spell_complete> {
+struct ComponentTraits<spell_complete>
+{
     using Type = bool;
 };
 
 
-struct blocking { }; // bool
+struct blocking
+{
+}; // bool
 template <>
-struct ComponentTraits<blocking> {
+struct ComponentTraits<blocking>
+{
     using Type = bool;
 };
 
-struct block_success { }; // bool
+struct block_success
+{
+}; // bool
 template <>
-struct ComponentTraits<block_success> {
+struct ComponentTraits<block_success>
+{
     using Type = bool;
 };
 
-struct damaged { }; // bool
+struct damaged
+{
+}; // bool
 template <>
-struct ComponentTraits<damaged> {
+struct ComponentTraits<damaged>
+{
     using Type = bool;
 };
 
-struct txalpha { }; // int
+struct txalpha
+{
+}; // int
 template <>
-struct ComponentTraits<txalpha> {
+struct ComponentTraits<txalpha>
+{
     using Type = int;
 };
 
-struct pushable { }; // bool
+struct pushable
+{
+}; // bool
 template <>
-struct ComponentTraits<pushable> {
+struct ComponentTraits<pushable>
+{
     using Type = bool;
 };
 
-struct itemtype { }; // itemtype_t
+struct itemtype
+{
+}; // itemtype_t
 template <>
-struct ComponentTraits<itemtype> {
+struct ComponentTraits<itemtype>
+{
     using Type = itemtype_t;
 };
 
-struct potiontype { }; // potiontype_t
+struct potiontype
+{
+}; // potiontype_t
 template <>
-struct ComponentTraits<potiontype> {
+struct ComponentTraits<potiontype>
+{
     using Type = potiontype_t;
 };
 
-struct weapontype { }; // weapontype_t
+struct weapontype
+{
+}; // weapontype_t
 template <>
-struct ComponentTraits<weapontype> {
+struct ComponentTraits<weapontype>
+{
     using Type = weapontype_t;
 };
 
-struct shieldtype { }; // shieldtype_t
+struct shieldtype
+{
+}; // shieldtype_t
 template <>
-struct ComponentTraits<shieldtype> {
+struct ComponentTraits<shieldtype>
+{
     using Type = shieldtype_t;
 };
 
-struct inventory { }; // shared_ptr<vector<entityid>>
+struct inventory
+{
+}; // shared_ptr<vector<entityid>>
 template <>
-struct ComponentTraits<inventory> {
+struct ComponentTraits<inventory>
+{
     using Type = shared_ptr<vector<entityid>>;
 };
 
-struct equipped_weapon { }; // entityid
+struct equipped_weapon
+{
+}; // entityid
 template <>
-struct ComponentTraits<equipped_weapon> {
+struct ComponentTraits<equipped_weapon>
+{
     using Type = entityid;
 };
 
-struct equipped_shield { }; // entityid
+struct equipped_shield
+{
+}; // entityid
 template <>
-struct ComponentTraits<equipped_shield> {
+struct ComponentTraits<equipped_shield>
+{
     using Type = entityid;
 };
 
 
-struct xp { }; // int
+struct xp
+{
+}; // int
 template <>
-struct ComponentTraits<xp> {
+struct ComponentTraits<xp>
+{
     using Type = int;
 };
 
 
-struct hp { }; // int
+struct hp
+{
+}; // int
 template <>
-struct ComponentTraits<hp> {
+struct ComponentTraits<hp>
+{
     using Type = int;
 };
 
-struct maxhp { }; // int
+struct maxhp
+{
+}; // int
 template <>
-struct ComponentTraits<maxhp> {
+struct ComponentTraits<maxhp>
+{
     using Type = int;
 };
 
-struct strength { }; // int
+struct strength
+{
+}; // int
 template <>
-struct ComponentTraits<strength> {
+struct ComponentTraits<strength>
+{
     using Type = int;
 };
 
-struct dexterity { }; // int
+struct dexterity
+{
+}; // int
 template <>
-struct ComponentTraits<dexterity> {
+struct ComponentTraits<dexterity>
+{
     using Type = int;
 };
 
-struct intelligence { }; // int
+struct intelligence
+{
+}; // int
 template <>
-struct ComponentTraits<intelligence> {
+struct ComponentTraits<intelligence>
+{
     using Type = int;
 };
 
-struct wisdom { }; // int
+struct wisdom
+{
+}; // int
 template <>
-struct ComponentTraits<wisdom> {
+struct ComponentTraits<wisdom>
+{
     using Type = int;
 };
 
-struct constitution { }; // int
+struct constitution
+{
+}; // int
 template <>
-struct ComponentTraits<constitution> {
+struct ComponentTraits<constitution>
+{
     using Type = int;
 };
 
-struct charisma { }; // int
+struct charisma
+{
+}; // int
 template <>
-struct ComponentTraits<charisma> {
+struct ComponentTraits<charisma>
+{
     using Type = int;
 };
 
-struct target_id { }; // int
+struct target_id
+{
+}; // int
 template <>
-struct ComponentTraits<target_id> {
+struct ComponentTraits<target_id>
+{
     using Type = entityid;
 };
 
-struct light_radius { }; // int
+struct light_radius
+{
+}; // int
 template <>
-struct ComponentTraits<light_radius> {
+struct ComponentTraits<light_radius>
+{
     using Type = int;
 };
 
-struct vision_distance { }; // int
+struct vision_distance
+{
+}; // int
 template <>
-struct ComponentTraits<vision_distance> {
+struct ComponentTraits<vision_distance>
+{
     using Type = int;
 };
 
-struct aggro { }; // bool
+struct aggro
+{
+}; // bool
 template <>
-struct ComponentTraits<aggro> {
+struct ComponentTraits<aggro>
+{
     using Type = bool;
 };
 
 
-struct damage { }; // vec3
+struct damage
+{
+}; // vec3
 template <>
-struct ComponentTraits<damage> {
+struct ComponentTraits<damage>
+{
     using Type = vec3;
 };
 
 
-struct healing { }; // vec3
+struct healing
+{
+}; // vec3
 template <>
-struct ComponentTraits<healing> {
+struct ComponentTraits<healing>
+{
     using Type = vec3;
 };
 
 
-struct description { }; //string
+struct description
+{
+}; //string
 template <>
-struct ComponentTraits<description> {
+struct ComponentTraits<description>
+{
     using Type = string;
 };
 
 
-struct durability { }; //string
+struct durability
+{
+}; //string
 template <>
-struct ComponentTraits<durability> {
+struct ComponentTraits<durability>
+{
     using Type = int;
 };
 
 
-struct max_durability { }; //string
+struct max_durability
+{
+}; //string
 template <>
-struct ComponentTraits<max_durability> {
+struct ComponentTraits<max_durability>
+{
     using Type = int;
 };
 
-struct destroyed { }; //string
+struct destroyed
+{
+}; //string
 template <>
-struct ComponentTraits<destroyed> {
+struct ComponentTraits<destroyed>
+{
     using Type = bool;
 };
 
 
-struct door_open { }; //string
+struct door_open
+{
+}; //string
 template <>
-struct ComponentTraits<door_open> {
+struct ComponentTraits<door_open>
+{
     using Type = bool;
 };
 
 
-struct hearing_distance { }; //string
+struct hearing_distance
+{
+}; //string
 template <>
-struct ComponentTraits<hearing_distance> {
+struct ComponentTraits<hearing_distance>
+{
     using Type = int;
 };
 
 
-struct block_chance { }; //int
+struct block_chance
+{
+}; //int
 template <>
-struct ComponentTraits<block_chance> {
+struct ComponentTraits<block_chance>
+{
     using Type = int;
 };
 
 
-struct base_ac { }; //int
+struct base_ac
+{
+}; //int
 template <>
-struct ComponentTraits<base_ac> {
+struct ComponentTraits<base_ac>
+{
     using Type = int;
 };
 
 
-struct damage_reduction { }; //int
+struct damage_reduction
+{
+}; //int
 template <>
-struct ComponentTraits<damage_reduction> {
+struct ComponentTraits<damage_reduction>
+{
     using Type = int;
 };
 
 
-struct hd { }; //int
+struct hd
+{
+}; //int
 template <>
-struct ComponentTraits<hd> {
+struct ComponentTraits<hd>
+{
     using Type = vec3;
 };
 
 
-struct rarity { }; //int
+struct rarity
+{
+}; //int
 template <>
-struct ComponentTraits<rarity> {
+struct ComponentTraits<rarity>
+{
     using Type = rarity_t;
 };
 
 
-struct spelltype { }; //int
+struct spelltype
+{
+}; //int
 template <>
-struct ComponentTraits<spelltype> {
+struct ComponentTraits<spelltype>
+{
     using Type = spelltype_t;
 };
 
 
-struct spellstate { }; //int
+struct spellstate
+{
+}; //int
 template <>
-struct ComponentTraits<spellstate> {
+struct ComponentTraits<spellstate>
+{
     using Type = spellstate_t;
 };
 
 
-struct proptype { }; //int
+struct proptype
+{
+}; //int
 template <>
-struct ComponentTraits<proptype> {
+struct ComponentTraits<proptype>
+{
     using Type = proptype_t;
 };
 
 
-struct solid { }; // bool
+struct solid
+{
+}; // bool
 template <>
-struct ComponentTraits<solid> {
+struct ComponentTraits<solid>
+{
     using Type = bool;
 };
 
 
 
 
-struct tactics { }; // vector of tactic_t
+struct tactics
+{
+}; // vector of tactic
 template <>
-struct ComponentTraits<tactics> {
+struct ComponentTraits<tactics>
+{
     using Type = vector<tactic>;
 };
 
 
 
 
-struct steps_taken { }; // vector of tactic_t
+struct steps_taken
+{
+};
 template <>
-struct ComponentTraits<steps_taken> {
+struct ComponentTraits<steps_taken>
+{
     using Type = unsigned int;
+};
+
+
+
+
+struct zombie
+{
+}; // bool
+template <>
+struct ComponentTraits<zombie>
+{
+    using Type = bool;
 };

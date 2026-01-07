@@ -408,7 +408,11 @@ public:
         massert(x >= 0 && x < width, "x is out of bounds");
         massert(y >= 0 && y < height, "y is out of bounds");
         //minfo("getting tile...");
-        auto tile = df_tile_at((vec3){x, y, -1});
+
+        //auto tile = df_tile_at((vec3){x, y, -1});
+        //tile_t& tile = df_tile_at((vec3){x, y, -1});
+        tile_t& tile = df_tile_at(vec3{x, y, -1});
+
         //minfo("adding to tile...");
         const entityid result = tile.tile_add(id);
         if (result == ENTITYID_INVALID)
@@ -426,7 +430,7 @@ public:
         massert(id != ENTITYID_INVALID, "id is -1");
         massert(x >= 0 && x < width, "x is out of bounds");
         massert(y >= 0 && y < height, "y is out of bounds");
-        tile_t& tile = df_tile_at((vec3){x, y, -1});
+        tile_t& tile = df_tile_at(vec3{x, y, -1});
         const entityid r = tile.tile_remove(id);
         if (r == ENTITYID_INVALID)
         {

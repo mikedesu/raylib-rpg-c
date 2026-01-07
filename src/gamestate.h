@@ -33,7 +33,7 @@
 #include <raymath.h>
 
 #define DEFAULT_MASTER_VOLUME 1.0f
-#define DEFAULT_MUSIC_VOLUME 0.5f
+#define DEFAULT_MUSIC_VOLUME 0.35f
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
 #define GAMESTATE_SIZEOFTEXINFOARRAY 2048
@@ -255,7 +255,7 @@ public:
 
 
 
-    inline double get_avg_last_frame_time()
+    const inline double get_avg_last_frame_time()
     {
         double sum = 0;
         for (int i = 0; i < LAST_FRAME_TIMES_MAX; i++)
@@ -314,7 +314,7 @@ public:
 #endif
         gameplay_settings_menu_selection = 0;
         cam2d.target = cam2d.offset = (Vector2){0, 0};
-        cam2d.zoom = 4.0f;
+        cam2d.zoom = 2.0f;
         cam2d.rotation = 0.0;
         fadealpha = 0.0;
         controlmode = CONTROLMODE_PLAYER;
@@ -1442,8 +1442,8 @@ public:
         srand(time(NULL));
         SetRandomSeed(time(NULL));
 
-        const int w = 8;
-        const int h = 8;
+        const int w = 64;
+        const int h = 64;
 
         init_dungeon(BIOME_STONE, 1, w, h);
 
@@ -1456,17 +1456,12 @@ public:
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         //minfo("creating monsters...");
         //for (int i = 0; i < (int)d.floors.size(); i++) {
-        //    const int monster_count = i + 1;
-        //    for (int j = 0; j < monster_count; j++) {
-        const vec3 random_loc = d.get_floor(0).df_get_random_loc();
-        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
-        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
-        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
-        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
-        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
-        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
-        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
-        create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
+        constexpr int monster_count = 100;
+        for (int j = 0; j < monster_count; j++)
+        {
+            const vec3 random_loc = d.get_floor(0).df_get_random_loc();
+            create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
+        }
         //    }
         //}
         msuccess("end creating monsters...");
@@ -1669,10 +1664,14 @@ public:
         for (entityid id = 0; id < next_entityid; id++)
         {
             const entitytype_t t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            if (t == ENTITY_NPC)
+            if (t != ENTITY_NPC)
             {
-                ct.set<target_id>(id, hero_id);
+                continue;
             }
+            //if (t == ENTITY_NPC)
+            //{
+            ct.set<target_id>(id, hero_id);
+            //}
         }
     }
 
@@ -3579,7 +3578,7 @@ public:
             return;
         }
 
-        if (test && framecount % 60 == 0)
+        if (test && framecount % 15 == 0)
         {
             if (handle_cycle_messages_test())
             {

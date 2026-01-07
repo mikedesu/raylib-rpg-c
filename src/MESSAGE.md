@@ -32,22 +32,23 @@ I have already done the following:
 - [x] **BUG** **PERFORMANCE** **CRITICAL** during dungeon floor draw, for some reason, our tile destructor is being called many times literally once-per-frame, for every tile! WTF?
   - [x] **FIXED** `auto` was copying objects
 - [x] **FEATURE** we should be able to change track on track end
+- [x] **API** we need a way to simulate gameplay in a manner similar to how unit_test works while actually rendering the game
+  - [x] in the function where the player's `test` switch is controlled in `handle_input`, we can check current frame and act only on certain frames
+- [x] **FIXED** automated gameplay system found you can move while dead
+  - [x] halting movement while dead in `test` but future mechanics may allow for this:
+    - [ ] dragging bodies
+    - [ ] zombie mechanics ('alive-but-dead')
+- [x] **BUG** `handle_test_flag` not properly incrementing turns
+  - [ ] **i think its fixed**
+
 
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
 
-- [ ] **IMPROVEMENT** i want to get rid of the `entities` vector on `tile_t`. if we limit things such that
-  - [ ] only 1 NPC per tile
-  - [ ] only 1 item per tile
-  - [ ] only 1 door per tile
-  - [ ] then we can eliminate the `entities` entirely and the game should be more performant since our lookups dont involve memory
+
 - [ ] **BUG** i've seen the player and NPCs move into tiles that are occupied by other entities, which violates the system
-- [ ] **BUG** automated gameplay system found you can move while dead
-- [ ] **API** we need a way to simulate gameplay in a manner similar to how unit_test works while actually rendering the game
-  - [ ] in the function where the player's `test` switch is controlled in `handle_input`, we can check current frame and act only on certain frames
 - [ ] **API** we need a proper create_monster-type function that allows for setting of the race 
-- [ ] **BUG** `handle_test_flag` not properly incrementing turns
 - [ ] **PLAYER REQUEST** numpad movement controls
 - [ ] **FEATURE** volume control menu
   - [ ] press V key, pop-up volume control menu
