@@ -401,19 +401,16 @@ public:
 
 
 
-    const inline entityid df_add_at(const entityid id, const int x, const int y)
+    //inline entityid df_add_at(entityid id, int x, int y)
+    inline entityid df_add_at(entityid id, vec3 loc)
     {
-        //minfo("df_add_at: %d, %d, %d", id, x, y);
         massert(id != ENTITYID_INVALID, "id is invalid");
-        massert(x >= 0 && x < width, "x is out of bounds");
-        massert(y >= 0 && y < height, "y is out of bounds");
-        //minfo("getting tile...");
+        massert(!vec3_invalid(loc), "loc is invalid");
+        massert(loc.x >= 0 && loc.x < width, "x is out of bounds");
+        massert(loc.y >= 0 && loc.y < height, "y is out of bounds");
 
-        //auto tile = df_tile_at((vec3){x, y, -1});
-        //tile_t& tile = df_tile_at((vec3){x, y, -1});
-        shared_ptr<tile_t> tile = df_tile_at(vec3{x, y, -1});
-
-        //minfo("adding to tile...");
+        //shared_ptr<tile_t> tile = df_tile_at(vec3{x, y, -1});
+        shared_ptr<tile_t> tile = df_tile_at(loc);
         const entityid result = tile->tile_add(id);
         if (result == ENTITYID_INVALID)
         {
@@ -425,7 +422,7 @@ public:
 
 
 
-    inline bool df_remove_at(const entityid id, const int x, const int y)
+    inline bool df_remove_at(entityid id, int x, int y)
     {
         massert(id != ENTITYID_INVALID, "id is -1");
         massert(x >= 0 && x < width, "x is out of bounds");

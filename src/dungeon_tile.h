@@ -294,7 +294,7 @@ public:
 
 
 
-    const inline entityid tile_add(const entityid id)
+    inline entityid tile_add(const entityid id)
     {
         // Check if the entity already exists
         //minfo("tile_add: %d", id);
@@ -311,7 +311,7 @@ public:
 
 
 
-    const inline entityid tile_remove(const entityid id)
+    inline entityid tile_remove(const entityid id)
     {
         massert(entities, "tile or tile entities is NULL");
         massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
