@@ -314,7 +314,7 @@ public:
 #endif
         gameplay_settings_menu_selection = 0;
         cam2d.target = cam2d.offset = (Vector2){0, 0};
-        cam2d.zoom = 2.0f;
+        cam2d.zoom = 3.0f;
         cam2d.rotation = 0.0;
         fadealpha = 0.0;
         controlmode = CONTROLMODE_PLAYER;
@@ -1456,7 +1456,7 @@ public:
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         //minfo("creating monsters...");
         //for (int i = 0; i < (int)d.floors.size(); i++) {
-        constexpr int monster_count = 1;
+        constexpr int monster_count = 0;
         for (int j = 0; j < monster_count; j++)
         {
             const vec3 random_loc = d.get_floor(0).df_get_random_loc();

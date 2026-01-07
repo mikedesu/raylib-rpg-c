@@ -1,13 +1,3 @@
-chillout-chiptune-10.mp3
-chillout-chiptune-1.mp3
-chillout-chiptune-2.mp3
-chillout-chiptune-3.mp3
-chillout-chiptune-4.mp3
-chillout-chiptune-5.mp3
-chillout-chiptune-6.mp3
-chillout-chiptune-7.mp3
-chillout-chiptune-8.mp3
-chillout-chiptune-9.mp3
 chiptune-battle-10.mp3
 chiptune-battle-1.mp3
 chiptune-battle-2.mp3
