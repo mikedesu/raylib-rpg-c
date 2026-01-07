@@ -20,7 +20,7 @@ using std::vector;
 class dungeon
 {
 public:
-    vector<dungeon_floor> floors; // vector of shared pointers to dungeon_floor_t
+    vector<shared_ptr<dungeon_floor>> floors; // vector of shared pointers to dungeon_floor_t
     int current_floor;
     bool is_locked;
     bool is_initialized;
@@ -53,17 +53,17 @@ public:
 
 
 
-    inline dungeon_floor& get_floor(const size_t index)
+    inline shared_ptr<dungeon_floor> get_floor(const size_t index)
     {
         //minfo2("get_floor: %ld", index);
         massert(index >= 0 && index < floors.size(), "index is OOB: index is %ld", index);
-        return floors[index];
+        return floors.at(index);
     }
 
 
 
 
-    inline dungeon_floor& get_current_floor()
+    inline shared_ptr<dungeon_floor> get_current_floor()
     {
         return get_floor(current_floor);
     }
@@ -79,8 +79,8 @@ public:
         massert(height > 0, "height is 0");
         massert(!is_locked, "dungeon is locked");
 
-        dungeon_floor df;
-        df.init(floors.size(), type, width, height);
+        shared_ptr<dungeon_floor> df = make_shared<dungeon_floor>();
+        df->init(floors.size(), type, width, height);
         //minfo("creation rules...");
 
         // at present, these creation rules do not account for the df's width and height
@@ -94,7 +94,7 @@ public:
             //constexpr int h = 4;
             // draw room 1
 
-            df.df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 0, static_cast<float>(width), static_cast<float>(height)});
+            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 0, static_cast<float>(width), static_cast<float>(height)});
 
             //const Rectangle base = {x - 1, y - 1, static_cast<float>(df.width), static_cast<float>(df.height)};
             //df.df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, base);
@@ -137,7 +137,7 @@ public:
             //}
         };
 
-        df.df_xform(creation_rules);
+        df->df_xform(creation_rules);
         floors.push_back(df);
     }
 };
