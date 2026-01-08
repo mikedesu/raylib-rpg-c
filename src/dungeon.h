@@ -96,11 +96,13 @@ public:
             //df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 0, static_cast<float>(width), static_cast<float>(height)});
 
             // draw room 1
-            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 0, 3.0, 3.0});
-            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {3, 1, 1.0, 1.0});
-            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {4, 0, 3.0, 3.0});
+            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 0, 5.0, 5.0});
+            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {6, 0, 5.0, 5.0});
+            //df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 6, 5.0, 5.0});
+            //df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {6, 6, 5.0, 5.0});
 
-            df->df_set_can_have_door((vec3){3, 1, 0});
+            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {5, 2, 1.0, 1.0});
+            df->df_set_can_have_door((vec3){5, 2, 0});
 
             //const Rectangle base = {x - 1, y - 1, static_cast<float>(df.width), static_cast<float>(df.height)};
             //df.df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, base);

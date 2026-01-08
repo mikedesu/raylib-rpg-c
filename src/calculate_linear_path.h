@@ -66,7 +66,7 @@ static inline vector<vec3> calculate_path_with_thickness(const vec3 start, const
         }
     }
     // Remove duplicate points
-    sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); });
-    path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) { return a.x == b.x && a.y == b.y; }), path.end());
+    sort(path.begin(), path.end(), [](vec3& a, vec3& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); });
+    path.erase(unique(path.begin(), path.end(), [](vec3& a, vec3& b) { return a.x == b.x && a.y == b.y; }), path.end());
     return path;
 }

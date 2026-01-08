@@ -3,6 +3,7 @@
 #include "ComponentTable.h"
 #include "attack_result.h"
 #include "biome.h"
+#include "calculate_linear_path.h"
 #include "character_creation.h"
 #include "controlmode.h"
 #include "debugpanel.h"
@@ -1268,6 +1269,43 @@ public:
 
 
 
+    inline bool path_blocked(vec3 a, vec3 b)
+    {
+        vector<vec3> path = calculate_path_with_thickness(a, b);
+        shared_ptr<dungeon_floor> df = d.get_current_floor();
+
+        for (auto loc : path)
+        {
+            shared_ptr<tile_t> t = df->tile_at(loc);
+            if (tile_is_none(t->get_type()))
+            {
+                return true;
+            }
+            else if (tiletype_is_wall(t->get_type()))
+            {
+                return true;
+            }
+            // also need to check for a door or other blockades
+
+            for (auto id : *t->get_entities())
+            {
+                const bool door_present = ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR;
+                if (door_present)
+                {
+                    const bool door_is_open = ct.get<door_open>(id).value_or(false);
+                    if (!door_is_open)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+
+
     inline bool update_player_tiles_explored()
     {
         if (current_scene != SCENE_GAMEPLAY)
@@ -1287,23 +1325,31 @@ public:
             merror2("hero location lacks value");
             return false;
         }
-        const vec3 loc = maybe_loc.value();
+        const vec3 hero_loc = maybe_loc.value();
         const int light_radius0 = ct.get<light_radius>(hero_id).value_or(1);
         // Precompute bounds for the loops
-        const int min_x = std::max(0, loc.x - light_radius0);
-        const int max_x = std::min(df->get_width() - 1, loc.x + light_radius0);
-        const int min_y = std::max(0, loc.y - light_radius0);
-        const int max_y = std::min(df->get_height() - 1, loc.y + light_radius0);
+        const int min_x = std::max(0, hero_loc.x - light_radius0);
+        const int max_x = std::min(df->get_width() - 1, hero_loc.x + light_radius0);
+        const int min_y = std::max(0, hero_loc.y - light_radius0);
+        const int max_y = std::min(df->get_height() - 1, hero_loc.y + light_radius0);
         for (int y = min_y; y <= max_y; y++)
         {
             for (int x = min_x; x <= max_x; x++)
             {
                 // Calculate Manhattan distance for diamond shape
-                if (abs(x - loc.x) + abs(y - loc.y) > light_radius0)
+                if (abs(x - hero_loc.x) + abs(y - hero_loc.y) > light_radius0)
                 {
                     continue;
                 }
-                shared_ptr<tile_t> t = df->tile_at(vec3{x, y, loc.z});
+                // we need to see if there is anything blocking us between the player and this hero_location
+                const vec3 loc = {x, y, hero_loc.z};
+                const bool blocked = path_blocked(hero_loc, loc);
+                if (blocked)
+                {
+                    continue;
+                }
+
+                shared_ptr<tile_t> t = df->tile_at(loc);
                 update_tile(t);
             }
         }
@@ -1579,8 +1625,8 @@ public:
 
         const int hp_ = 10;
         const int maxhp_ = 10;
-        const int vis_dist = 7;
-        const int light_rad = 7;
+        const int vis_dist = 2;
+        const int light_rad = 2;
         const int hear_dist = 3;
         const entitytype_t type = ENTITY_PLAYER;
         set_hero_id(id);
