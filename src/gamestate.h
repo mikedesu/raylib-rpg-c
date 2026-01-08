@@ -554,14 +554,14 @@ public:
     {
         minfo2("gamestate.place_doors");
         size_t placed_doors = 0;
-        for (int z = 0; z < (int)d.floors.size(); z++)
+        for (size_t z = 0; z < d.floors.size(); z++)
         {
             shared_ptr<dungeon_floor> df = d.get_floor(z);
             for (int x = 0; x < df->get_width(); x++)
             {
                 for (int y = 0; y < df->get_height(); y++)
                 {
-                    const vec3 loc = {x, y, z};
+                    const vec3 loc = {x, y, static_cast<int>(z)};
                     shared_ptr<tile_t> tile = df->tile_at(loc);
                     if (!tile->get_can_have_door())
                     {
@@ -576,7 +576,7 @@ public:
                 }
             }
         }
-        msuccess2("placed %ld doors", placed_doors);
+        msuccess("placed %ld doors", placed_doors);
         return placed_doors;
     }
 
@@ -1184,28 +1184,6 @@ public:
     {
         const race_t r = RACE_ORC;
         const entityid id = create_npc_with(r, monsterInitFunction);
-        const entityid wpn_id = create_weapon_with(
-            [](CT& ct, const entityid id)
-            {
-                ct.set<name>(id, "Dagger");
-                ct.set<description>(id, "Stabby stabby.");
-                ct.set<weapontype>(id, WEAPON_DAGGER);
-                ct.set<damage>(id, (vec3){1, 4, 0});
-                ct.set<durability>(id, 100);
-                ct.set<max_durability>(id, 100);
-                ct.set<rarity>(id, RARITY_COMMON);
-            });
-        const entityid potion_id = create_potion_with(
-            [](CT& ct, const entityid id)
-            {
-                ct.set<name>(id, "small healing potion");
-                ct.set<description>(id, "a small healing potion");
-                ct.set<potiontype>(id, POTION_HP_SMALL);
-                ct.set<healing>(id, (vec3){1, 6, 0});
-            });
-        add_to_inventory(id, wpn_id);
-        add_to_inventory(id, potion_id);
-        ct.set<equipped_weapon>(id, wpn_id);
         ct.set<name>(id, get_random_orc_name());
         return id;
     }
@@ -1463,13 +1441,13 @@ public:
         srand(time(NULL));
         SetRandomSeed(time(NULL));
 
-        const int w = 16;
+        const int w = 16; // 4x4 4x4 areas
         const int h = 16;
 
         init_dungeon(BIOME_STONE, 1, w, h);
 
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
-        //place_doors();
+        place_doors();
         //place_props();
         //const vec3 loc0 = d.floors[0].df_get_random_loc();
         //create_weapon_at_with(ct, loc0, dagger_init());
@@ -1477,11 +1455,38 @@ public:
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         //minfo("creating monsters...");
         //for (int i = 0; i < (int)d.floors.size(); i++) {
-        constexpr int monster_count = 16;
+        constexpr int monster_count = 1;
         for (int j = 0; j < monster_count; j++)
         {
             const vec3 random_loc = d.get_floor(0)->df_get_random_loc();
-            create_orc_at_with(random_loc, [](CT& ct, const entityid id) {});
+            create_orc_at_with(
+                random_loc,
+                [this](CT& ct, const entityid id)
+                {
+                    const entityid wpn_id = create_weapon_with(
+                        [](CT& ct, const entityid id)
+                        {
+                            ct.set<name>(id, "Dagger");
+                            ct.set<description>(id, "Stabby stabby.");
+                            ct.set<weapontype>(id, WEAPON_DAGGER);
+                            ct.set<damage>(id, (vec3){1, 4, 0});
+                            ct.set<durability>(id, 100);
+                            ct.set<max_durability>(id, 100);
+                            ct.set<rarity>(id, RARITY_COMMON);
+                        });
+
+                    const entityid potion_id = create_potion_with(
+                        [](CT& ct, const entityid id)
+                        {
+                            ct.set<name>(id, "small healing potion");
+                            ct.set<description>(id, "a small healing potion");
+                            ct.set<potiontype>(id, POTION_HP_SMALL);
+                            ct.set<healing>(id, (vec3){1, 6, 0});
+                        });
+                    add_to_inventory(id, wpn_id);
+                    add_to_inventory(id, potion_id);
+                    ct.set<equipped_weapon>(id, wpn_id);
+                });
         }
         //    }
         //}

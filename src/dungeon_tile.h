@@ -57,13 +57,9 @@ public:
 
 
 
-    const entityid get_entity_at(const size_t i)
+    entityid get_entity_at(size_t i)
     {
-        if (entities->size() == 0)
-        {
-            return ENTITYID_INVALID;
-        }
-        else if (i >= entities->size())
+        if (entities->size() == 0 || i >= entities->size())
         {
             return ENTITYID_INVALID;
         }
@@ -73,7 +69,7 @@ public:
 
 
 
-    void set_cached_item(const entityid id)
+    void set_cached_item(entityid id)
     {
         cached_item = id;
     }
@@ -81,7 +77,7 @@ public:
 
 
 
-    const entityid get_cached_item()
+    entityid get_cached_item()
     {
         return cached_item;
     }
@@ -89,7 +85,7 @@ public:
 
 
 
-    void set_cached_npc(const entityid id)
+    void set_cached_npc(entityid id)
     {
         cached_npc = id;
     }
@@ -97,7 +93,7 @@ public:
 
 
 
-    const entityid get_cached_npc()
+    entityid get_cached_npc()
     {
         return cached_npc;
     }
@@ -105,7 +101,7 @@ public:
 
 
 
-    void set_cached_item_count(const int n)
+    void set_cached_item_count(int n)
     {
         cached_item_count = n;
     }
@@ -113,7 +109,7 @@ public:
 
 
 
-    const int get_cached_item_count()
+    int get_cached_item_count()
     {
         return cached_item_count;
     }
@@ -121,7 +117,7 @@ public:
 
 
 
-    void set_cached_live_npcs(const int n)
+    void set_cached_live_npcs(int n)
     {
         cached_live_npcs = n;
     }
@@ -129,7 +125,7 @@ public:
 
 
 
-    const int get_cached_live_npcs()
+    int get_cached_live_npcs()
     {
         return cached_live_npcs;
     }
@@ -137,7 +133,7 @@ public:
 
 
 
-    void set_dirty_entities(const bool b)
+    void set_dirty_entities(bool b)
     {
         dirty_entities = b;
     }
@@ -145,7 +141,7 @@ public:
 
 
 
-    const bool get_dirty_entities()
+    bool get_dirty_entities()
     {
         return dirty_entities;
     }
@@ -153,7 +149,7 @@ public:
 
 
 
-    void set_cached_player_present(const bool b)
+    void set_cached_player_present(bool b)
     {
         cached_player_present = b;
     }
@@ -161,7 +157,7 @@ public:
 
 
 
-    const bool get_cached_player_present()
+    bool get_cached_player_present()
     {
         return cached_player_present;
     }
@@ -169,7 +165,7 @@ public:
 
 
 
-    void set_explored(const bool b)
+    void set_explored(bool b)
     {
         explored = b;
     }
@@ -177,7 +173,7 @@ public:
 
 
 
-    const bool get_explored()
+    bool get_explored()
     {
         return explored;
     }
@@ -193,7 +189,7 @@ public:
 
 
 
-    const bool get_visible()
+    bool get_visible()
     {
         return visible;
     }
@@ -201,7 +197,7 @@ public:
 
 
 
-    const tile_id get_id()
+    tile_id get_id()
     {
         return id;
     }
@@ -217,7 +213,7 @@ public:
 
 
 
-    const tiletype_t get_type()
+    tiletype_t get_type()
     {
         return type;
     }
@@ -225,7 +221,7 @@ public:
 
 
 
-    void set_type(const tiletype_t t)
+    void set_type(tiletype_t t)
     {
         type = t;
     }
@@ -233,7 +229,7 @@ public:
 
 
 
-    const bool get_can_have_door()
+    bool get_can_have_door()
     {
         return can_have_door;
     }
@@ -241,7 +237,7 @@ public:
 
 
 
-    void set_can_have_door(const bool b)
+    void set_can_have_door(bool b)
     {
         can_have_door = b;
     }
@@ -273,7 +269,7 @@ public:
 
 
 
-    inline void tile_init(const tiletype_t t)
+    inline void tile_init(tiletype_t t)
     {
         minfo2("tile_init(%d)", t);
         type = t;
@@ -294,7 +290,7 @@ public:
 
 
 
-    inline entityid tile_add(const entityid id)
+    inline entityid tile_add(entityid id)
     {
         // Check if the entity already exists
         //minfo("tile_add: %d", id);
@@ -311,7 +307,7 @@ public:
 
 
 
-    inline entityid tile_remove(const entityid id)
+    inline entityid tile_remove(entityid id)
     {
         massert(entities, "tile or tile entities is NULL");
         massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");

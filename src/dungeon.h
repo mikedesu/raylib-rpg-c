@@ -93,8 +93,14 @@ public:
             //constexpr int w = 4;
             //constexpr int h = 4;
             // draw room 1
+            //df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 0, static_cast<float>(width), static_cast<float>(height)});
 
-            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 0, static_cast<float>(width), static_cast<float>(height)});
+            // draw room 1
+            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {0, 0, 3.0, 3.0});
+            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {3, 1, 1.0, 1.0});
+            df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, {4, 0, 3.0, 3.0});
+
+            df->df_set_can_have_door((vec3){3, 1, 0});
 
             //const Rectangle base = {x - 1, y - 1, static_cast<float>(df.width), static_cast<float>(df.height)};
             //df.df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, base);
@@ -128,13 +134,16 @@ public:
             //df.df_set_tile(TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
             //df.downstairs_loc = loc_d;
             // automatic door placement
-            //for (int x = 0; x < df.width; x++) {
-            //    for (int y = 0; y < df.height; y++) {
-            //        if (df.df_is_good_door_loc((vec3){x, y, df.floor})) {
-            //            df.df_set_can_have_door((vec3){x, y, df.floor});
-            //        }
-            //    }
-            //}
+            for (int x = 0; x < df->get_width(); x++)
+            {
+                for (int y = 0; y < df->get_height(); y++)
+                {
+                    if (df->df_is_good_door_loc((vec3){x, y, df->get_floor()}))
+                    {
+                        df->df_set_can_have_door((vec3){x, y, df->get_floor()});
+                    }
+                }
+            }
         };
 
         df->df_xform(creation_rules);
