@@ -171,7 +171,11 @@ public:
     Camera2D cam2d;
     Font font;
 
+
+
+
     ComponentTable ct;
+
 
 
 
@@ -1091,6 +1095,7 @@ public:
         for (int i = 0; (size_t)i < t->get_entity_count(); i++)
         {
             const entityid id = t->tile_get_entity(i);
+
             const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (id != ENTITYID_INVALID && type == ENTITY_BOX)
             {
@@ -3017,8 +3022,19 @@ public:
         // decrement weapon durability
         handle_weapon_durability_loss(atk_id, tgt_id);
         if (tgt_hp > 0)
+        {
             return;
+        }
+
         ct.set<dead>(tgt_id, true);
+        // we need to remove tgt_id from the floor's living npcs and add it to dead npcs
+        shared_ptr<dungeon_floor> df = d.get_current_floor();
+        df->remove_living_npc(tgt_id);
+        df->add_dead_npc(tgt_id);
+
+
+        // when an npc target is killed, the attacker gains xp
+        // when an npc target is killed, it drops its inventory
         switch (ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE))
         {
         case ENTITY_NPC:
@@ -3918,7 +3934,10 @@ public:
             "weapon: %d\n"
             "inventory: %d\n"
             "message count: %d\n"
-            "df.width x height: %dx%d\n",
+            "df.width x height: %dx%d\n"
+            "living npcs on floor: %lu\n"
+            "dead npcs on floor: %lu\n"
+            "\n",
             framecount,
             frame_updates,
             frame_dirty,
@@ -3948,7 +3967,9 @@ public:
             inventory_count,
             message_count,
             df_w,
-            df_h);
+            df_h,
+            d.get_current_floor()->get_living_npcs()->size(),
+            d.get_current_floor()->get_dead_npcs()->size());
     }
 
 

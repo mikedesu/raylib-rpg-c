@@ -33,15 +33,50 @@ private:
 
     vector<tile_id> tiles;
     shared_ptr<vector<entityid>> living_npcs;
+    shared_ptr<vector<entityid>> dead_npcs;
+
     shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
 
 
 
 
 public:
+    shared_ptr<vector<entityid>> get_dead_npcs()
+    {
+        return dead_npcs;
+    }
+
+
+
+
     shared_ptr<vector<entityid>> get_living_npcs()
     {
         return living_npcs;
+    }
+
+
+
+
+    void add_dead_npc(entityid id)
+    {
+        massert(id != ENTITYID_INVALID, "id is invalid");
+        dead_npcs->push_back(id);
+    }
+
+
+
+
+    bool remove_dead_npc(entityid id)
+    {
+        massert(id != ENTITYID_INVALID, "id is invalid");
+
+        auto it = find(dead_npcs->cbegin(), dead_npcs->cend(), id);
+        if (it == dead_npcs->cend())
+        {
+            return false;
+        }
+        dead_npcs->erase(it);
+        return true;
     }
 
 
@@ -250,6 +285,7 @@ public:
         biome = t;
 
         living_npcs = make_shared<vector<entityid>>();
+        dead_npcs = make_shared<vector<entityid>>();
 
         // alloc the tile map
         tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
