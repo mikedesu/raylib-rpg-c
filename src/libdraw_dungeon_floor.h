@@ -100,7 +100,7 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
     //auto tile = df.df_tile_at((vec3){x, y, z});
 
     // this forces it to be a reference
-    shared_ptr<tile_t> tile = df->df_tile_at((vec3){x, y, z});
+    shared_ptr<tile_t> tile = df->tile_at((vec3){x, y, z});
 
     //massert(tile, "tile is NULL");
     //if (tile.type == TILE_NONE || !tile.visible || !tile.explored) {
@@ -154,7 +154,7 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
     bool blocking = false;
     for (const auto& v : path)
     {
-        shared_ptr<tile_t> tile = df->df_tile_at(v);
+        shared_ptr<tile_t> tile = df->tile_at(v);
         //if (tile && (tile_is_wall(tile->type))) {
         if (tiletype_is_wall(tile->get_type()))
         {
@@ -203,7 +203,7 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
         for (int x = 0; x < df->get_width(); x++)
         {
             const vec3 loc = {x, y, z};
-            shared_ptr<tile_t> tile = df->df_tile_at(loc);
+            shared_ptr<tile_t> tile = df->tile_at(loc);
 
             //if (!tile.visible) {
             //    continue;
@@ -261,7 +261,7 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 
             for (auto v0 : path)
             {
-                shared_ptr<tile_t> v0_tile = df->df_tile_at(v0);
+                shared_ptr<tile_t> v0_tile = df->tile_at(v0);
                 if (tiletype_is_wall(v0_tile->get_type()))
                 {
                     object_blocking = true;
