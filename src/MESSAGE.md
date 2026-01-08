@@ -46,7 +46,8 @@ I have already done the following:
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
 
-
+- [ ] **OPTIMIZATION** we need to start storing lists of entityids by type in `gamestate`
+  - [ ] when looping thru handling entities, it would reduce comparisons and make the internal `tick` faster
 - [ ] **BUG** i've seen the player and NPCs move into tiles that are occupied by other entities, which violates the system
 - [ ] **API** we need a proper create_monster-type function that allows for setting of the race 
 - [ ] **PLAYER REQUEST** numpad movement controls

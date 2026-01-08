@@ -300,7 +300,7 @@ public:
 #endif
         gameplay_settings_menu_selection = 0;
         cam2d.target = cam2d.offset = (Vector2){0, 0};
-        cam2d.zoom = 3.0f;
+        cam2d.zoom = 6.0f;
         cam2d.rotation = 0.0;
         fadealpha = 0.0;
         controlmode = CONTROLMODE_PLAYER;
@@ -429,16 +429,7 @@ public:
 
 
 
-    //const inline vector<vec3> get_df_locs(const size_t floor_num)
-    //{
-    //    vector<vec3> locs;
-    //    return locs;
-    //}
-
-
-
-
-    const inline entityid create_door_with(with_fun doorInitFunction)
+    inline entityid create_door_with(with_fun doorInitFunction)
     {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_DOOR);
@@ -496,19 +487,19 @@ public:
 
 
 
-    inline void recompute_entity_cache_at(const int x, const int y, const int z)
+    inline void recompute_entity_cache_at(vec3 l)
     {
-        massert(x >= 0 && y >= 0 && z >= 0, "x, y, or z is out of bounds: %d, %d, %d", x, y, z);
-        massert((size_t)z < d.floors.size(), "z is out of bounds");
-        shared_ptr<dungeon_floor> df = d.floors[z];
-        shared_ptr<tile_t> t = df->df_tile_at((vec3){x, y, z});
+        massert(l.x >= 0 && l.y >= 0 && l.z >= 0, "x, y, or z is out of bounds: %d, %d, %d", l.x, l.y, l.z);
+        massert((size_t)l.z < d.floors.size(), "z is out of bounds");
+        shared_ptr<dungeon_floor> df = d.floors[l.z];
+        shared_ptr<tile_t> t = df->df_tile_at(l);
         recompute_entity_cache(t);
     }
 
 
 
 
-    const inline bool tile_has_live_npcs(shared_ptr<tile_t> t)
+    inline bool tile_has_live_npcs(shared_ptr<tile_t> t)
     {
         recompute_entity_cache(t);
         return t->get_cached_live_npcs() > 0;
@@ -516,7 +507,7 @@ public:
 
 
 
-    const inline bool tile_has_player(shared_ptr<tile_t> t)
+    inline bool tile_has_player(shared_ptr<tile_t> t)
     {
         recompute_entity_cache(t);
         return t->get_cached_player_present();
@@ -525,7 +516,7 @@ public:
 
 
 
-    const inline entityid create_door_at_with(const vec3 loc, with_fun doorInitFunction)
+    inline entityid create_door_at_with(const vec3 loc, with_fun doorInitFunction)
     {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         shared_ptr<tile_t> tile = df->df_tile_at(loc);
@@ -555,7 +546,7 @@ public:
 
 
 
-    const inline size_t place_doors()
+    inline size_t place_doors()
     {
         minfo2("gamestate.place_doors");
         size_t placed_doors = 0;
@@ -568,7 +559,6 @@ public:
                 {
                     const vec3 loc = {x, y, z};
                     shared_ptr<tile_t> tile = df->df_tile_at(loc);
-                    //if (!tile.can_have_door)
                     if (!tile->get_can_have_door())
                     {
                         continue;
@@ -589,7 +579,7 @@ public:
 
 
 
-    const inline entityid create_prop_with(const proptype_t type, with_fun initFun)
+    inline entityid create_prop_with(proptype_t type, with_fun initFun)
     {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_PROP);
@@ -603,7 +593,7 @@ public:
 
 
 
-    inline entityid create_prop_at_with(const proptype_t type, const vec3 loc, with_fun initFun)
+    inline entityid create_prop_at_with(proptype_t type, vec3 loc, with_fun initFun)
     {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         //tile_t& tile = df.df_tile_at(loc);
@@ -624,7 +614,7 @@ public:
 
 
 
-    const inline int place_props()
+    inline int place_props()
     {
         //auto mydefault = [](gamestate& g, entityid id) {};
         //auto set_solid = [](gamestate& g, entityid id) { g.ct.set<solid>(id, true); };
@@ -746,7 +736,7 @@ public:
 
 
 
-    const inline entityid create_weapon_with(with_fun weaponInitFunction)
+    inline entityid create_weapon_with(with_fun weaponInitFunction)
     {
         //minfo("create weapon with");
         const entityid id = add_entity();
@@ -828,7 +818,7 @@ public:
 
 
 
-    const inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_fun weaponInitFunction)
+    inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_fun weaponInitFunction)
     {
         minfo2("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
         if (d.floors.size() == 0)
@@ -875,7 +865,7 @@ public:
 
 
 
-    const inline entityid create_weapon_at_random_loc_with(CT& ct, with_fun weaponInitFunction)
+    inline entityid create_weapon_at_random_loc_with(CT& ct, with_fun weaponInitFunction)
     {
         const vec3 loc = d.floors[d.current_floor]->df_get_random_loc();
         if (vec3_invalid(loc))
@@ -889,7 +879,7 @@ public:
 
 
 
-    const inline entityid create_shield_with(with_fun shieldInitFunction)
+    inline entityid create_shield_with(with_fun shieldInitFunction)
     {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
@@ -904,7 +894,7 @@ public:
 
 
 
-    const inline entityid create_shield_at_with(const vec3 loc, with_fun shieldInitFunction)
+    inline entityid create_shield_at_with(const vec3 loc, with_fun shieldInitFunction)
     {
         if (d.floors.size() == 0)
         {
@@ -923,7 +913,7 @@ public:
 
 
 
-    const inline entityid create_potion_with(with_fun potionInitFunction)
+    inline entityid create_potion_with(with_fun potionInitFunction)
     {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
@@ -935,7 +925,7 @@ public:
 
 
 
-    const inline entityid create_potion_at_with(const vec3 loc, with_fun potionInitFunction)
+    inline entityid create_potion_at_with(const vec3 loc, with_fun potionInitFunction)
     {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         shared_ptr<tile_t> tile = df->df_tile_at(loc);
@@ -965,7 +955,7 @@ public:
 
 
 
-    const inline race_t random_monster_type()
+    inline race_t random_monster_type()
     {
         const vector<race_t> monster_races = {RACE_GOBLIN, RACE_ORC, RACE_BAT, RACE_WOLF, RACE_WARG, RACE_ZOMBIE, RACE_SKELETON, RACE_RAT, RACE_GREEN_SLIME};
         uniform_int_distribution<int> gen(0, monster_races.size() - 1);
@@ -1066,15 +1056,20 @@ public:
         ct.set<level>(id, 1);
         ct.set<xp>(id, 0);
         //tactic t = {tactic_target::enemy, tactic_condition::adjacent, tactic_action::wait};
-        vector<tactic> my_tactics = {
-            {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack}, {tactic_target::nil, tactic_condition::any, tactic_action::move}};
+        //vector<tactic> my_tactics = {
+        //    {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack}, {tactic_target::nil, tactic_condition::any, tactic_action::move}};
+        vector<tactic> my_tactics = {//{tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
+                                     {tactic_target::nil, tactic_condition::any, tactic_action::move}};
+
+
+
         ct.set<tactics>(id, my_tactics);
     }
 
 
 
 
-    const inline entityid create_npc_with(const race_t rt, with_fun npcInitFunction)
+    inline entityid create_npc_with(const race_t rt, with_fun npcInitFunction)
     {
         const entityid id = add_entity();
         set_npc_defaults(id);
@@ -1087,7 +1082,7 @@ public:
 
 
 
-    const inline entityid tile_has_box(const int x, const int y, const int z)
+    inline entityid tile_has_box(const int x, const int y, const int z)
     {
         massert(z >= 0, "floor is out of bounds");
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
@@ -1108,7 +1103,7 @@ public:
 
 
 
-    const inline entityid create_npc_at_with(const race_t rt, const vec3 loc, with_fun npcInitFunction)
+    inline entityid create_npc_at_with(const race_t rt, const vec3 loc, with_fun npcInitFunction)
     {
         minfo2("create npc at with: (%d, %d, %d)", loc.x, loc.y, loc.z);
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
@@ -1153,7 +1148,7 @@ public:
 
 
 
-    const inline bool add_to_inventory(const entityid actor_id, const entityid item_id)
+    inline bool add_to_inventory(const entityid actor_id, const entityid item_id)
     {
         minfo2("adding %d to %d's inventory", actor_id, item_id);
         optional<shared_ptr<vector<entityid>>> maybe_inventory = ct.get<inventory>(actor_id);
@@ -1171,7 +1166,7 @@ public:
 
 
 
-    const inline entityid create_orc_with(with_fun monsterInitFunction)
+    inline entityid create_orc_with(with_fun monsterInitFunction)
     {
         const race_t r = RACE_ORC;
         const entityid id = create_npc_with(r, monsterInitFunction);
@@ -1204,7 +1199,7 @@ public:
 
 
 
-    const inline entityid create_orc_at_with(const vec3 loc, with_fun monsterInitFunction)
+    inline entityid create_orc_at_with(const vec3 loc, with_fun monsterInitFunction)
     {
         if (vec3_invalid(loc))
         {
@@ -1277,7 +1272,7 @@ public:
 
 
 
-    const inline bool update_player_tiles_explored()
+    inline bool update_player_tiles_explored()
     {
         if (current_scene != SCENE_GAMEPLAY)
         {
@@ -1322,7 +1317,7 @@ public:
 
 
 
-    const inline bool update_player_state()
+    inline bool update_player_state()
     {
         if (hero_id == ENTITYID_INVALID)
         {
@@ -1389,15 +1384,22 @@ public:
         minfo2("update_npcs_state");
         for (entityid id = 0; id < next_entityid; id++)
         {
-            if (id == hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC)
+            if (id == hero_id)
             {
                 continue;
             }
+
+            if (ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC)
+            {
+                continue;
+            }
+
             unsigned char a = ct.get<txalpha>(id).value_or(255);
             if (a < 255)
             {
                 a++;
             }
+
             ct.set<txalpha>(id, a);
             ct.set<damaged>(id, false);
         }
@@ -1447,7 +1449,7 @@ public:
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         //minfo("creating monsters...");
         //for (int i = 0; i < (int)d.floors.size(); i++) {
-        constexpr int monster_count = 0;
+        constexpr int monster_count = 1000;
         for (int j = 0; j < monster_count; j++)
         {
             const vec3 random_loc = d.get_floor(0)->df_get_random_loc();
@@ -1533,7 +1535,7 @@ public:
 
 
 
-    const inline entityid create_player_with(const vec3 loc, const string n, with_fun playerInitFunction)
+    inline entityid create_player_with(const vec3 loc, const string n, with_fun playerInitFunction)
     {
         minfo2("create player with: loc=(%d, %d, %d), n=%s", loc.x, loc.y, loc.z, n.c_str());
         massert(n != "", "name is empty string");
@@ -1542,8 +1544,8 @@ public:
         massert(id != ENTITYID_INVALID, "id is invalid");
         const int hp_ = 10;
         const int maxhp_ = 10;
-        const int vis_dist = 3;
-        const int light_rad = 3;
+        const int vis_dist = 7;
+        const int light_rad = 7;
         const int hear_dist = 3;
         const entitytype_t type = ENTITY_PLAYER;
         set_hero_id(id);
@@ -1563,7 +1565,7 @@ public:
 
 
 
-    const inline entityid create_box_with()
+    inline entityid create_box_with()
     {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_BOX);
@@ -1577,7 +1579,7 @@ public:
 
 
 
-    const inline entityid create_box_at_with(const vec3 loc)
+    inline entityid create_box_at_with(const vec3 loc)
     {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         shared_ptr<tile_t> tile = df->df_tile_at(loc);
@@ -1613,7 +1615,7 @@ public:
 
 
 
-    const inline entityid create_spell_with()
+    inline entityid create_spell_with()
     {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_SPELL);
@@ -1625,7 +1627,7 @@ public:
 
 
 
-    const inline entityid create_spell_at_with(const vec3 loc)
+    inline entityid create_spell_at_with(const vec3 loc)
     {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         shared_ptr<tile_t> tile = df->df_tile_at(loc);
@@ -1760,7 +1762,7 @@ public:
 
 
 
-    const inline bool remove_from_inventory(const entityid actor_id, const entityid item_id)
+    inline bool remove_from_inventory(const entityid actor_id, const entityid item_id)
     {
         optional<shared_ptr<vector<entityid>>> maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value())
@@ -1793,7 +1795,7 @@ public:
 
 
 
-    const inline bool drop_from_inventory(const entityid actor_id, const entityid item_id)
+    inline bool drop_from_inventory(const entityid actor_id, const entityid item_id)
     {
         if (remove_from_inventory(actor_id, item_id))
         {
@@ -1824,7 +1826,7 @@ public:
 
 
 
-    const inline bool drop_all_from_inventory(entityid actor_id)
+    inline bool drop_all_from_inventory(entityid actor_id)
     {
         optional<shared_ptr<vector<entityid>>> maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value())
@@ -1934,7 +1936,7 @@ public:
 
 
 
-    const inline bool drop_item_from_hero_inventory()
+    inline bool drop_item_from_hero_inventory()
     {
         if (!ct.has<inventory>(hero_id))
         {
@@ -1977,7 +1979,7 @@ public:
 
 
 
-    const inline bool is_in_inventory(const entityid actor_id, const entityid item_id)
+    inline bool is_in_inventory(const entityid actor_id, const entityid item_id)
     {
         optional<shared_ptr<vector<entityid>>> maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value())
@@ -2000,7 +2002,7 @@ public:
 
 
 
-    const inline bool use_potion(const entityid actor_id, const entityid item_id)
+    inline bool use_potion(const entityid actor_id, const entityid item_id)
     {
         massert(actor_id != ENTITYID_INVALID, "actor_id is invalid");
         massert(item_id != ENTITYID_INVALID, "actor_id is invalid");
@@ -2201,7 +2203,7 @@ public:
 
 
 
-    const inline bool handle_quit_pressed(const inputstate& is)
+    inline bool handle_quit_pressed(const inputstate& is)
     {
         bool retval = false;
         if (inputstate_is_pressed(is, KEY_ESCAPE))
@@ -2240,7 +2242,7 @@ public:
 
 
 
-    const inline bool handle_cycle_messages(const inputstate& is)
+    inline bool handle_cycle_messages(const inputstate& is)
     {
         bool retval = false;
         if (msg_system_is_active && inputstate_is_pressed(is, KEY_ENTER))
@@ -2255,7 +2257,7 @@ public:
 
 
 
-    const inline bool handle_cycle_messages_test()
+    inline bool handle_cycle_messages_test()
     {
         bool retval = false;
         if (msg_system_is_active)
@@ -2270,7 +2272,7 @@ public:
 
 
 
-    const inline bool handle_camera_zoom(const inputstate& is)
+    inline bool handle_camera_zoom(const inputstate& is)
     {
         bool retval = false;
         if (inputstate_is_pressed(is, KEY_LEFT_BRACKET))
@@ -2304,7 +2306,7 @@ public:
 
 
 
-    const inline bool handle_change_dir(const inputstate& is)
+    inline bool handle_change_dir(const inputstate& is)
     {
         if (!player_changing_dir)
         {
@@ -2374,7 +2376,7 @@ public:
 
 
 
-    const inline bool handle_change_dir_intent(const inputstate& is)
+    inline bool handle_change_dir_intent(const inputstate& is)
     {
         if (inputstate_is_pressed(is, KEY_S))
         {
@@ -2387,7 +2389,7 @@ public:
 
 
 
-    const inline bool handle_display_inventory(const inputstate& is)
+    inline bool handle_display_inventory(const inputstate& is)
     {
         if (inputstate_is_pressed(is, KEY_I))
         {
@@ -2403,7 +2405,7 @@ public:
 
 
 
-    const inline bool tile_has_solid(const int x, const int y, const int z)
+    inline bool tile_has_solid(const int x, const int y, const int z)
     {
         massert(z >= 0, "floor is out of bounds");
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
@@ -2424,7 +2426,7 @@ public:
 
 
 
-    const inline bool handle_box_push(const entityid id, const vec3 v)
+    inline bool handle_box_push(const entityid id, const vec3 v)
     {
         const bool can_push = ct.get<pushable>(id).value_or(false);
         if (!can_push)
@@ -2437,7 +2439,7 @@ public:
 
 
 
-    const inline entityid tile_has_pushable(const int x, const int y, const int z)
+    inline entityid tile_has_pushable(const int x, const int y, const int z)
     {
         massert(z >= 0, "floor is out of bounds");
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
@@ -2458,7 +2460,7 @@ public:
 
 
 
-    const inline entityid tile_has_door(const vec3 v)
+    inline entityid tile_has_door(const vec3 v)
     {
         shared_ptr<dungeon_floor> df = d.get_current_floor();
         shared_ptr<tile_t> t = df->df_tile_at(v);
@@ -2478,7 +2480,7 @@ public:
 
 
 
-    const inline bool check_hearing(const entityid id, const vec3 loc)
+    inline bool check_hearing(const entityid id, const vec3 loc)
     {
         if (id == ENTITYID_INVALID || vec3_equal(loc, (vec3){-1, -1, -1}))
         {
@@ -2503,75 +2505,71 @@ public:
 
 
 
-    const inline bool try_entity_move(const entityid id, const vec3 v)
+    inline bool try_entity_move(entityid id, vec3 v)
     {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
         minfo2("entity %d is trying to move: (%d,%d,%d)", id, v.x, v.y, v.z);
 
-
-
-
-        ct.set<update>(id, true);
         ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
+        ct.set<update>(id, true);
+
         // entity location
         massert(ct.has<location>(id), "id %d has no location", id);
         const vec3 loc = ct.get<location>(id).value_or((vec3){-1, -1, -1});
-        massert(!vec3_equal(loc, (vec3){-1, -1, -1}), "id %d has no location", id);
+        massert(!vec3_invalid(loc), "id %d location invalid", id);
+
         // entity's new location
         // we will have a special case for traversing floors so ignore v.z
         const vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
         minfo2("entity %d is trying to move to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
+
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        //massert(aloc.x >= 0, "aloc.x <= 0");
-        //massert(aloc.x < df.width, "aloc.x >= df.width");
-        //massert(aloc.y >= 0, "aloc.y <= 0");
-        //massert(aloc.y < df.height, "aloc.y >= df.height");
         if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height())
         {
             merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
             return false;
         }
+
         shared_ptr<tile_t> tile = df->df_tile_at(aloc);
-        //minfo("is walkable");
         if (!tile_is_walkable(tile->get_type()))
         {
             merror2("tile is not walkable");
             return false;
         }
-        //minfo("has box");
+
         const entityid box_id = tile_has_box(aloc.x, aloc.y, aloc.z);
         if (box_id != ENTITYID_INVALID)
         {
             merror2("box present, trying to push");
             return handle_box_push(box_id, v);
         }
-        //minfo("has pushable");
+
         const entityid pushable_id = tile_has_pushable(aloc.x, aloc.y, aloc.z);
         if (pushable_id != ENTITYID_INVALID)
         {
             merror2("pushable present, trying to push");
             return handle_box_push(pushable_id, v);
         }
-        //minfo("has solid");
+
         const bool has_solid = tile_has_solid(aloc.x, aloc.y, aloc.z);
         if (has_solid)
         {
             merror2("solid present, cannot move");
             return false;
         }
-        //minfo("has live npcs");
+
         if (tile_has_live_npcs(tile_at_cur_floor(aloc)))
         {
             merror2("live npcs present, cannot move");
             return false;
         }
-        //minfo("has player");
+
         if (tile_has_player(tile_at_cur_floor(aloc)))
         {
             merror2("player present, cannot move");
             return false;
         }
-        //minfo("has door");
+
         const entityid door_id = tile_has_door(aloc);
         if (door_id != ENTITYID_INVALID)
         {
@@ -2590,6 +2588,9 @@ public:
             merror2("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
             return false;
         }
+        // force cache update
+        recompute_entity_cache_at(loc);
+
         // add the entity to the new tile
         //minfo("df add at");
         if (df->df_add_at(id, aloc) == ENTITYID_INVALID)
@@ -2597,6 +2598,8 @@ public:
             merror2("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
             return false;
         }
+        // force cache update
+        recompute_entity_cache_at(aloc);
         //minfo("setting location");
         ct.set<location>(id, aloc);
         const float mx = v.x * DEFAULT_TILE_SIZE;
@@ -2618,7 +2621,7 @@ public:
 
 
 
-    const inline bool handle_move_up(const inputstate& is, const bool is_dead)
+    inline bool handle_move_up(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W))
         {
@@ -2637,7 +2640,7 @@ public:
 
 
 
-    const inline bool handle_move_down(const inputstate& is, const bool is_dead)
+    inline bool handle_move_down(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X))
         {
@@ -2656,7 +2659,7 @@ public:
 
 
 
-    const inline bool handle_move_left(const inputstate& is, const bool is_dead)
+    inline bool handle_move_left(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A))
         {
@@ -2675,7 +2678,7 @@ public:
 
 
 
-    const inline bool handle_move_right(const inputstate& is, const bool is_dead)
+    inline bool handle_move_right(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D))
         {
@@ -2694,7 +2697,7 @@ public:
 
 
 
-    const inline bool handle_move_up_left(const inputstate& is, const bool is_dead)
+    inline bool handle_move_up_left(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_Q))
         {
@@ -2713,7 +2716,7 @@ public:
 
 
 
-    const inline bool handle_move_up_right(const inputstate& is, const bool is_dead)
+    inline bool handle_move_up_right(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_E))
         {
@@ -2732,7 +2735,7 @@ public:
 
 
 
-    const inline bool handle_move_down_left(const inputstate& is, const bool is_dead)
+    inline bool handle_move_down_left(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_Z))
         {
@@ -2751,7 +2754,7 @@ public:
 
 
 
-    const inline bool handle_move_down_right(const inputstate& is, const bool is_dead)
+    inline bool handle_move_down_right(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_C))
         {
@@ -2770,7 +2773,7 @@ public:
 
 
 
-    const inline vec3 get_loc_facing_player()
+    inline vec3 get_loc_facing_player()
     {
         optional<vec3> maybe_loc = ct.get<location>(hero_id);
         if (maybe_loc.has_value())
@@ -2821,7 +2824,7 @@ public:
 
 
 
-    const inline entityid get_cached_npc(shared_ptr<tile_t> t)
+    inline entityid get_cached_npc(shared_ptr<tile_t> t)
     {
         recompute_entity_cache(t); // Force update
         return t->get_cached_npc();
@@ -2830,7 +2833,7 @@ public:
 
 
 
-    const inline int compute_armor_class(const entityid id)
+    inline int compute_armor_class(const entityid id)
     {
         massert(ENTITYID_INVALID != id, "id is invalid");
         const int base_armor_class = ct.get<base_ac>(id).value_or(10);
@@ -2843,7 +2846,7 @@ public:
 
 
 
-    const inline bool compute_attack_roll(const entityid attacker, const entityid target)
+    inline bool compute_attack_roll(const entityid attacker, const entityid target)
     {
         const int str = ct.get<strength>(attacker).value_or(10);
         const int bonus = get_stat_bonus(str);
@@ -2856,7 +2859,7 @@ public:
 
 
 
-    const inline int compute_attack_damage(const entityid attacker, const entityid target)
+    inline int compute_attack_damage(const entityid attacker, const entityid target)
     {
         const int str = ct.get<strength>(attacker).value_or(10);
         const int bonus = std::max(0, get_stat_bonus(str));
@@ -2933,7 +2936,7 @@ public:
 
 
 
-    const inline int get_npc_xp(const entityid id)
+    inline int get_npc_xp(const entityid id)
     {
         return ct.get<xp>(id).value_or(0);
     }
@@ -3016,7 +3019,7 @@ public:
 
 
 
-    const inline attack_result_t process_attack_entity(shared_ptr<tile_t> tile, const entityid attacker_id, const entityid target_id)
+    inline attack_result_t process_attack_entity(shared_ptr<tile_t> tile, const entityid attacker_id, const entityid target_id)
     {
         massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
         if (target_id == ENTITYID_INVALID)
@@ -3133,7 +3136,7 @@ public:
 
 
 
-    const inline attack_result_t try_entity_attack(const entityid id, const int x, const int y)
+    inline attack_result_t try_entity_attack(const entityid id, const int x, const int y)
     {
         minfo2("entity %d is attacking location %d, %d", id, x, y);
         massert(!ct.get<dead>(id).value_or(false), "attacker entity is dead");
@@ -3161,7 +3164,7 @@ public:
 
 
 
-    const inline bool handle_attack(const inputstate& is, const bool is_dead)
+    inline bool handle_attack(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_APOSTROPHE))
         {
@@ -3184,7 +3187,7 @@ public:
 
 
 
-    const inline entityid tile_get_item(shared_ptr<tile_t> t)
+    inline entityid tile_get_item(shared_ptr<tile_t> t)
     {
         recompute_entity_cache(t);
         return t->get_cached_item();
@@ -3193,7 +3196,7 @@ public:
 
 
 
-    const inline bool try_entity_pickup(const entityid id)
+    inline bool try_entity_pickup(const entityid id)
     {
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
         ct.set<update>(id, true);
@@ -3234,7 +3237,7 @@ public:
 
 
 
-    const inline bool handle_pickup_item(const inputstate& is, const bool is_dead)
+    inline bool handle_pickup_item(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_SLASH))
         {
@@ -3253,7 +3256,7 @@ public:
 
 
 
-    const inline bool try_entity_stairs(const entityid id)
+    inline bool try_entity_stairs(const entityid id)
     {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
         ct.set<update>(id, true);
@@ -3321,7 +3324,7 @@ public:
 
 
 
-    const inline bool handle_traverse_stairs(const inputstate& is, const bool is_dead)
+    inline bool handle_traverse_stairs(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_PERIOD))
         {
@@ -3339,7 +3342,7 @@ public:
 
 
 
-    const inline bool try_entity_open_door(const entityid id, const vec3 loc)
+    inline bool try_entity_open_door(const entityid id, const vec3 loc)
     {
         massert(id != ENTITYID_INVALID, "id is invalid");
         if (!tile_has_door(loc))
@@ -3364,7 +3367,7 @@ public:
 
 
 
-    const inline bool handle_open_door(const inputstate& is, const bool is_dead)
+    inline bool handle_open_door(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_O))
         {
@@ -3522,7 +3525,7 @@ public:
 
 
 
-    const inline bool handle_test_cast_spell(const inputstate& is, const bool is_dead)
+    inline bool handle_test_cast_spell(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_M))
         {
@@ -3545,7 +3548,7 @@ public:
 
 
 
-    const inline bool handle_restart(const inputstate& is, const bool is_dead)
+    inline bool handle_restart(const inputstate& is, const bool is_dead)
     {
         if (inputstate_is_pressed(is, KEY_R) && is_dead)
         {
@@ -3569,7 +3572,7 @@ public:
             return;
         }
 
-        if (test && framecount % 15 == 0)
+        if (test && framecount % 60 == 0)
         {
             if (handle_cycle_messages_test())
             {
@@ -3911,7 +3914,7 @@ public:
 
 
 
-    const inline bool is_entity_adjacent(const entityid id0, const entityid id1)
+    inline bool is_entity_adjacent(const entityid id0, const entityid id1)
     {
         massert(id0 != ENTITYID_INVALID, "id0 is invalid");
         massert(id1 != ENTITYID_INVALID, "id1 is invalid");
@@ -3931,7 +3934,7 @@ public:
 
 
 
-    const inline bool handle_npc(const entityid id)
+    inline bool handle_npc(const entityid id)
     {
         minfo2("handle npc %d", id);
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
