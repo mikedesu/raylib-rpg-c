@@ -1,5 +1,6 @@
 #pragma once
 
+#include "calculate_linear_path.h"
 #include "draw_sprite.h"
 #include "dungeon_floor.h"
 #include "entitytype.h"
@@ -7,7 +8,6 @@
 #include "get_txkey_for_tiletype.h"
 #include "libdraw_player_target_box.h"
 #include "textureinfo.h"
-
 
 
 
@@ -22,66 +22,7 @@ extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 
 
-static inline vector<vec3> calculate_path_with_thickness(const vec3 start, const vec3 end)
-{
-    vector<vec3> path;
-    int x1 = start.x, y1 = start.y;
-    int x2 = end.x, y2 = end.y;
-    int z = start.z;
-    int dx = abs(x2 - x1);
-    int dy = abs(y2 - y1);
-    int sx = (x1 < x2) ? 1 : -1;
-    int sy = (y1 < y2) ? 1 : -1;
-    int err = dx - dy;
-    while (true)
-    {
-        // Skip the start point (we don't need to check visibility with self)
-        if (x1 != start.x || y1 != start.y)
-        {
-            // Add primary point
-            path.push_back({x1, y1, z});
-            // Add adjacent points for thickness only when we're not at start/end
-            // and only when we're moving diagonally
-            if (x1 != x2 && y1 != y2 && x1 != start.x && y1 != start.y)
-            {
-                // Add perpendicular points for diagonal movement
-                if (dx > dy)
-                {
-                    path.push_back({x1, y1 + sy, z});
-                    path.push_back({x1, y1 - sy, z});
-                }
-                else
-                {
-                    path.push_back({x1 + sx, y1, z});
-                    path.push_back({x1 - sx, y1, z});
-                }
-            }
-        }
-        // Break if we've reached the end location
-        if (x1 == x2 && y1 == y2)
-            break;
-        int e2 = 2 * err;
-        if (e2 > -dy)
-        {
-            err -= dy;
-            x1 += sx;
-        }
-        if (e2 < dx)
-        {
-            err += dx;
-            y1 += sy;
-        }
-    }
-    // Remove duplicate points
-    sort(path.begin(), path.end(), [](const vec3& a, const vec3& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); });
-    path.erase(unique(path.begin(), path.end(), [](const vec3& a, const vec3& b) { return a.x == b.x && a.y == b.y; }), path.end());
-    return path;
-}
-
-
-
-
-const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, const int x, const int y, const int z)
+static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, const int x, const int y, const int z)
 {
     minfo2("BEGIN draw dungeon floor tile");
     //massert(g, "gamestate is NULL");
@@ -156,15 +97,25 @@ const static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txin
     {
         shared_ptr<tile_t> tile = df->tile_at(v);
         //if (tile && (tile_is_wall(tile->type))) {
-        if (tiletype_is_wall(tile->get_type()))
+
+        if (tile_is_none(tile->get_type()))
         {
             blocking = true;
             break;
         }
-        if (blocking)
+        else if (tiletype_is_wall(tile->get_type()))
         {
+            blocking = true;
             break;
         }
+
+
+
+
+        //if (blocking)
+        //{
+        //    break;
+        //}
 
 
         // Check for closed doors
@@ -209,9 +160,14 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
             //    continue;
             //}
 
-            //if (tiletype_is_wall(tile.type)) {
-            //    continue;
-            //}
+            if (tile_is_none(tile->get_type()))
+            {
+                continue;
+            }
+            else if (tiletype_is_wall(tile->get_type()))
+            {
+                continue;
+            }
 
             //if (tile.is_empty) {
             //    continue;
@@ -262,6 +218,12 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
             for (auto v0 : path)
             {
                 shared_ptr<tile_t> v0_tile = df->tile_at(v0);
+                if (tile_is_none(v0_tile->get_type()))
+                {
+                    object_blocking = true;
+                    break;
+                }
+
                 if (tiletype_is_wall(v0_tile->get_type()))
                 {
                     object_blocking = true;
@@ -334,7 +296,7 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 
 
 
-const static inline bool libdraw_draw_dungeon_floor(gamestate& g)
+const static inline bool draw_dungeon_floor(gamestate& g)
 {
     //minfo2("BEGIN draw dungeon floor");
     shared_ptr<dungeon_floor> df = g.d.get_current_floor();

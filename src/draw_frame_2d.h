@@ -2,6 +2,7 @@
 
 #include "camera_lock_on.h"
 #include "draw_action_menu.h"
+#include "draw_dungeon_floor.h"
 #include "draw_handle_debug_panel.h"
 #include "draw_help_menu.h"
 #include "draw_hud.h"
@@ -10,7 +11,6 @@
 #include "draw_message_box.h"
 #include "draw_message_history.h"
 #include "gamestate.h"
-#include "libdraw_dungeon_floor.h"
 
 static inline void libdraw_drawframe_2d(gamestate& g)
 {
@@ -25,7 +25,7 @@ static inline void libdraw_drawframe_2d(gamestate& g)
     ClearBackground(BLACK);
     //EndShaderMode();
     //minfo("draw dungeon floor");
-    libdraw_draw_dungeon_floor(g);
+    draw_dungeon_floor(g);
 
     //libdraw_draw_player_target_box(g);
 
