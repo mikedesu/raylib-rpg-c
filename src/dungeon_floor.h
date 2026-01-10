@@ -1,11 +1,13 @@
 #pragma once
 
 #include "biome.h"
+#include "dungeon.h"
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
 #include "mprint.h"
 #include "raylib.h"
+#include "room_metadata.h"
 #include "tile_id.h"
 #include "vec3.h"
 #include <functional>
@@ -13,13 +15,22 @@
 #include <unordered_map>
 #include <vector>
 
+
+
+
 #define DEFAULT_DUNGEON_FLOOR_WIDTH (16)
 #define DEFAULT_DUNGEON_FLOOR_HEIGHT (12)
+
+
+
 
 using std::function;
 using std::shared_ptr;
 using std::unordered_map;
 using std::vector;
+
+
+
 
 class dungeon_floor
 {
@@ -34,13 +45,79 @@ private:
     vector<tile_id> tiles;
     shared_ptr<vector<entityid>> living_npcs;
     shared_ptr<vector<entityid>> dead_npcs;
-
+    shared_ptr<vector<room_metadata>> room_metadatas;
     shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
 
 
 
 
 public:
+    bool room_id_exists(room_id id)
+    {
+        for (auto room : *room_metadatas)
+        {
+            if (room.get_id() == id)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
+    bool room_area_collides(Rectangle a)
+    {
+        for (auto room : *room_metadatas)
+        {
+            const Rectangle r = room.get_area();
+            if (CheckCollisionRecs(a, r))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
+    bool add_room_metadata(room_metadata room)
+    {
+        // need to check for existing rooms
+        if (room_id_exists(room.get_id()))
+        {
+            return false;
+        }
+        else if (room_area_collides(room.get_area()))
+        {
+            return false;
+        }
+
+        room_metadatas->push_back(room);
+        return true;
+    }
+
+
+
+
+    room_metadata get_room_metadata(size_t i)
+    {
+        return room_metadatas->at(i);
+    }
+
+
+
+
+    shared_ptr<vector<room_metadata>> get_room_metadatas()
+    {
+        return room_metadatas;
+    }
+
+
+
+
     shared_ptr<vector<entityid>> get_dead_npcs()
     {
         return dead_npcs;
@@ -286,6 +363,7 @@ public:
 
         living_npcs = make_shared<vector<entityid>>();
         dead_npcs = make_shared<vector<entityid>>();
+        room_metadatas = make_shared<vector<room_metadata>>();
 
         // alloc the tile map
         tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();

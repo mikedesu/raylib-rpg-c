@@ -9,6 +9,7 @@
 #include "debugpanel.h"
 #include "dungeon.h"
 #include "dungeon_floor.h"
+#include "dungeon_tile_type.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate_flag.h"
@@ -27,6 +28,7 @@
 #include "tactics.h"
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <ctime>
 #include <memory>
 #include <random>
@@ -56,9 +58,13 @@ typedef ComponentTable CT;
 
 typedef function<void(CT& ct, const entityid)> with_fun;
 
+using std::make_pair;
 using std::mt19937;
+using std::pair;
+using std::round;
 using std::seed_seq;
 using std::uniform_int_distribution;
+using std::uniform_real_distribution;
 using std::chrono::duration_cast;
 using std::chrono::nanoseconds;
 using std::chrono::system_clock;
@@ -176,6 +182,34 @@ public:
 
 
     ComponentTable ct;
+
+
+
+
+    pair<int, int> get_random_point_in_circle(int radius)
+    {
+        uniform_real_distribution<double> d(0, 1);
+        const double t = 2 * PI * d(mt);
+        const double u = d(mt) + d(mt);
+        const double r = u > 1 ? 2 - u : u;
+        const int x = static_cast<int>(radius * r * cos(t));
+        const int y = static_cast<int>(radius * r * sin(t));
+        return make_pair(x, y);
+    }
+
+
+
+
+    pair<int, int> get_random_point_in_ellipse(int w, int h)
+    {
+        uniform_real_distribution<double> d(0, 1);
+        const double t = PI * d(mt);
+        const double u = d(mt) + d(mt);
+        const double r = u > 1 ? 2 - u : u;
+        const int x = static_cast<int>(w * r * cos(t) / 2);
+        const int y = static_cast<int>(h * r * sin(t) / 2);
+        return make_pair(x, y);
+    }
 
 
 
@@ -424,9 +458,154 @@ public:
         }
         // max size of 128x128 for now to maintain 60fps
         // dungeon floors, tiles etc will require re-write/re-design for optimization
+
+        //auto creation_rules = ;
+
         for (int i = 0; i < df_count; i++)
         {
-            d.add_floor(type, w, h);
+            auto df = d.create_floor(type, w, h);
+
+            //constexpr float base_w = 4.0;
+            //constexpr float base_h = 4.0;
+
+            // dungeon floor width
+            const float dw = df->get_width();
+            // dungeon floor height
+            const float dh = df->get_height();
+
+            // center of df
+            const float cx = dw / 2.0;
+            const float cy = dh / 2.0;
+
+            constexpr int num_rooms = 3;
+            vec3 p;
+            float px;
+            float py;
+            float rw;
+            float rh;
+            Rectangle a;
+            uniform_int_distribution<int> random_room_size(2, 6);
+
+            vector<room_metadata> rooms;
+
+            // generate rooms
+
+            for (int i = 0; i < num_rooms; i++)
+            {
+                // get a random point
+                pair<int, int> p = get_random_point_in_ellipse(dw / 2.0, dh / 4.0);
+                px = p.first + cx;
+                py = p.second + cy;
+                // generate a random width and height with a range
+                rw = random_room_size(mt);
+                rh = random_room_size(mt);
+                a = {px, py, rw, rh};
+                // if the rectangle falls outside the dungeon width or height
+                // re-roll the random point
+                while (a.x + a.width >= dw || a.y + a.height >= dh)
+                {
+                    p = get_random_point_in_ellipse(dw / 2.0, dh / 4.0);
+                    px = p.first + cx;
+                    py = p.second + cy;
+                    a = {px, py, rw, rh};
+
+                    massert(px + rw < dw, "room outside of dw");
+                    massert(py + rh < dw, "room outside of dh");
+                }
+                const string room_name(TextFormat("room %d", i));
+                const string room_desc(TextFormat("room %d desc", i));
+                const room_metadata room_a(i, room_name, room_desc, a);
+                rooms.push_back(room_a);
+            }
+
+            // make sure rooms dont overlap
+            for (size_t i = 0; i < rooms.size(); i++)
+            {
+                // get room
+                room_metadata room = rooms[i];
+                Rectangle ra = room.get_area();
+
+                for (size_t j = i + 1; j < rooms.size(); j++)
+                {
+                    // get room
+                    room_metadata room2 = rooms[j];
+                    Rectangle ra2 = room2.get_area();
+
+                    // check collision
+                    while (CheckCollisionRecs(ra, ra2))
+                    {
+                        ra2.x++;
+                    }
+                    ra2.x++;
+
+                    massert(ra2.x + ra2.width < dw, "room outside of dw");
+                    massert(ra2.y + ra2.height < dh, "room outside of dh");
+
+                    room2.set_area(ra2);
+                    rooms[j] = room2;
+                }
+            }
+
+            // mark main rooms
+            // delaunay triangulation + graph
+
+            vector<pair<int, int>> points;
+            for (size_t i = 0; i < rooms.size(); i++)
+            {
+                // find the midpoint of the room
+                Rectangle ra = rooms[i].get_area();
+                int mx = ra.x + ra.width / 2.0;
+                int my = ra.y + ra.height / 2.0;
+                pair<int, int> mp = make_pair(mx, my);
+                points.push_back(mp);
+            }
+
+
+            // now we have a list of midpoints
+            // we can use this to generate edges
+            // each edge will be represented as
+            // a pair of pairs
+            // i.e.  pair< pair<int,int>, pair<int, int>>
+            vector<pair<pair<int, int>, pair<int, int>>> edges;
+            for (size_t i = 0; i < points.size(); i++)
+            {
+                pair<int, int> p0 = points[i];
+
+                for (size_t j = i + 1; j < points.size(); j++)
+                {
+                    pair<int, int> p1 = points[j];
+                    edges.push_back(make_pair(p0, p1));
+                }
+            }
+
+            vector<pair<pair<int, int>, pair<int, int>>> mst;
+            // minimum spanning tree
+            // CODE GOES HERE
+
+            // hallways / connecting rooms
+            // CODE GOES HERE
+            // define hallways based on the minimum spanning tree
+            // and add them to rooms
+
+            for (int i = 0; i < rooms.size(); i++)
+            {
+                //    df->add_room_metadata(room_metadata(i, textformat("room %d", i), textformat("room %d description", i), rooms[i]));
+                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, rooms[i].get_area());
+            }
+
+            // automatic door placement
+            //for (int x = 0; x < df->get_width(); x++)
+            //{
+            //    for (int y = 0; y < df->get_height(); y++)
+            //    {
+            //        if (df->df_is_good_door_loc((vec3){x, y, df->get_floor()}))
+            //        {
+            //            df->df_set_can_have_door((vec3){x, y, df->get_floor()});
+            //        }
+            //    }
+            //}
+
+            d.add_floor(df);
         }
         d.is_initialized = true;
     }
