@@ -14,7 +14,7 @@ typedef int room_id;
 
 
 
-class room_metadata
+class room
 {
 private:
     room_id id;
@@ -39,7 +39,7 @@ public:
 
 
 
-    int get_h()
+    float get_h()
     {
         return area.height;
     }
@@ -47,7 +47,7 @@ public:
 
 
 
-    int get_w()
+    float get_w()
     {
         return area.width;
     }
@@ -55,7 +55,7 @@ public:
 
 
 
-    int get_y()
+    float get_y()
     {
         return area.y;
     }
@@ -63,7 +63,7 @@ public:
 
 
 
-    int get_x()
+    float get_x()
     {
         return area.x;
     }
@@ -119,7 +119,7 @@ public:
 
 
 
-    room_metadata(room_id i, string n, string d, Rectangle a)
+    room(room_id i, string n, string d, Rectangle a)
         : id(i)
         , name(n)
         , description(d)
@@ -130,7 +130,7 @@ public:
 
 
 
-    room_metadata(string n, string d, Rectangle a)
+    room(string n, string d, Rectangle a)
         : name(n)
         , description(d)
         , area(a)
@@ -141,7 +141,7 @@ public:
 
 
 
-    room_metadata(string n, Rectangle a)
+    room(string n, Rectangle a)
         : name(n)
         , area(a)
     {
@@ -152,7 +152,7 @@ public:
 
 
 
-    room_metadata(Rectangle a)
+    room(Rectangle a)
         : area(a)
     {
         id = -1;
@@ -163,7 +163,7 @@ public:
 
 
 
-    room_metadata()
+    room()
     {
         id = -1;
         name = "unnamed-room";

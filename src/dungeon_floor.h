@@ -1,13 +1,13 @@
 #pragma once
 
 #include "biome.h"
-#include "dungeon.h"
+//#include "dungeon.h"
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
 #include "mprint.h"
 #include "raylib.h"
-#include "room_metadata.h"
+#include "room.h"
 #include "tile_id.h"
 #include "vec3.h"
 #include <functional>
@@ -45,7 +45,7 @@ private:
     vector<tile_id> tiles;
     shared_ptr<vector<entityid>> living_npcs;
     shared_ptr<vector<entityid>> dead_npcs;
-    shared_ptr<vector<room_metadata>> room_metadatas;
+    shared_ptr<vector<room>> room_metadatas;
     shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
 
 
@@ -83,26 +83,26 @@ public:
 
 
 
-    bool add_room_metadata(room_metadata room)
+    bool add_room_metadata(room r)
     {
         // need to check for existing rooms
-        if (room_id_exists(room.get_id()))
+        if (room_id_exists(r.get_id()))
         {
             return false;
         }
-        else if (room_area_collides(room.get_area()))
+        else if (room_area_collides(r.get_area()))
         {
             return false;
         }
 
-        room_metadatas->push_back(room);
+        room_metadatas->push_back(r);
         return true;
     }
 
 
 
 
-    room_metadata get_room_metadata(size_t i)
+    room get_room_metadata(size_t i)
     {
         return room_metadatas->at(i);
     }
@@ -110,7 +110,7 @@ public:
 
 
 
-    shared_ptr<vector<room_metadata>> get_room_metadatas()
+    shared_ptr<vector<room>> get_room_metadatas()
     {
         return room_metadatas;
     }
@@ -363,7 +363,7 @@ public:
 
         living_npcs = make_shared<vector<entityid>>();
         dead_npcs = make_shared<vector<entityid>>();
-        room_metadatas = make_shared<vector<room_metadata>>();
+        room_metadatas = make_shared<vector<room>>();
 
         // alloc the tile map
         tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
