@@ -881,7 +881,7 @@ public:
             }
 
             // now the last column
-            for (size_t i = 3; i < 16; i += parts)
+            for (size_t i = 3; i < 15; i += parts)
             {
                 const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
                 const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
@@ -2086,7 +2086,7 @@ public:
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         //minfo("creating monsters...");
         //for (int i = 0; i < (int)d.floors.size(); i++) {
-        constexpr int monster_count = 1;
+        constexpr int monster_count = 10;
         for (int j = 0; j < monster_count; j++)
         {
             const vec3 random_loc = d.get_floor(0)->df_get_random_loc();
