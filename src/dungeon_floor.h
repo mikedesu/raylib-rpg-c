@@ -83,7 +83,7 @@ public:
 
 
 
-    bool add_room_metadata(room r)
+    bool add_room(room r)
     {
         // need to check for existing rooms
         if (room_id_exists(r.get_id()))

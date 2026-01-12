@@ -597,9 +597,6 @@ public:
         //auto creation_rules = ;
         //constexpr int num_rooms = 3;
 
-
-
-
         for (int i = 0; i < df_count; i++)
         {
             auto df = d.create_floor(type, w, h);
@@ -610,12 +607,10 @@ public:
             // dungeon floor height
             const float dh = df->get_height();
             // center of df
-            const float cx = dw / 2.0;
-            const float cy = dh / 2.0;
-
+            //const float cx = dw / 4.0;
+            //const float cy = dh / 2.0;
             vector<room> rooms;
             vector<room> doorways;
-
             // this was an attempt at a 'proper' algorithmic generation
             // but we will do this again from scratch
             //auto attempt_one = [num_rooms, dw, dh, cx, cy, &rooms, this]()
@@ -710,33 +705,115 @@ public:
             //                // hallways / connecting rooms
             //                // CODE GOES HERE
             //            };
-            uniform_int_distribution<int> o(0, 3);
-            uniform_int_distribution<int> o2(0, 7);
-
-            room r0(0, "room-0", "room-0 description", {cx - 4, cy - 4, 8, 8});
-
-            float r1o = o2(mt);
+            //uniform_int_distribution<int> o(0, 3);
+            //uniform_int_distribution<int> o2(0, 7);
+            //room r0(0, "room-0", "room-0 description", {cx - 4, cy - 4, 8, 8});
+            //float r1o = o2(mt);
             //float r2o = o(mt);
 
-            room r1(1, "room-1", "room-1 description", {r0.get_x() + r0.get_w() + 1.0f, r0.get_y() + r1o, 4, 4});
-            room r2(2, "doorway-1", "doorway-1 description", {r0.get_x() + r0.get_w(), r1.get_y(), 1, 1});
 
-            room r3(3, "room-2", "room-2 description", {r0.get_x() - 5, r0.get_y(), 4, 4});
+            // im gonna blog here a bit
+            // now that i have god_mode, i can explore dungeons
+            // where rooms are not connected
+            // in other words
+            // this is a debugging tool to help with the dungeon gen procedure
+            // i am still working out what is best for the kinds of dungeons i want to make
+            // for example, i dont necessarily want long hallways everywhere
+            // and a lot of the algorithms ive found online are predicated on long hallways
+            // meanwhile im working in a very constrained space
+            // and can be optimized for my situation
+            // for instance, rooms connected by doors can be 1x1 adjacent, or have a space of
+            // 1 tile between them, so as to have a location to connect a door, which is
+            // effectively a tiny hallway itself
+            // hallway sizes should be minimized
+            // so in a 16x16 area,
+            // we could have 4 or more rooms
+            // by dividing by quadrants
+            // so we have 4 areas of size 8x8
+            // which is plenty for creating a rich dungeon floor
+            // we can even go smaller
+            // and start with an 8x8
+            // divide by 4 areas
+            // and we have 4 4x4 regions
+            // so we can even operate on this basis and scale upwards
+            // which is ideal i feel
 
-            room r4(4, "doorway-2", "doorway-2 description", {r0.get_x() - 1, r0.get_y() + o(mt), 1, 1});
+            //Rectangle quad_1 = {0, 0, dw / 2.0f, dh / 2.0f};
+            //Rectangle quad_2 = {dw / 2.0f, 0, dw / 2.0f, dh / 2.0f};
+            //Rectangle quad_3 = {0, dh / 2.0f, dw / 2.0f, dh / 2.0f};
+            //Rectangle quad_4 = {dw / 2.0f, dh / 2.0f, dw / 2.0f, dh / 2.0f};
 
-            room r5(5, "room-3", "room-3 description", {r0.get_x(), r0.get_y() + r0.get_h() + 1, 2, 2});
-            room r6(6, "doorway-3", "doorway-3 description", {r0.get_x(), r0.get_y() + r0.get_h(), 1, 1});
+            // no matter the size of the quad, they will conform to the dungeon size
+            // but keep things divisible by 2 to make the algorithm happy :)
 
-            rooms.push_back(r0);
-            rooms.push_back(r1);
-            rooms.push_back(r3);
-            rooms.push_back(r5);
+            // rooms of size 1 should be non-existent
+            // so the minimum room size should be 2x2
+            constexpr float min_room_w = 2;
+            //constexpr float min_room_h = 2;
 
-            doorways.push_back(r2);
-            doorways.push_back(r4);
-            doorways.push_back(r6);
+            // we can calculate how many rooms we can accomodate
+            // it can be between 1 big room and quad.width / (min_room_w+1)
+            // but do we need to?
 
+            constexpr float parts = 4.0;
+            for (int i = 0; i < parts; i++)
+            {
+                for (int j = 0; j < parts; j++)
+                {
+                    Rectangle q = {(dw / parts) * j, (dh / parts) * i, dw / parts, dh / parts};
+                    const float max_room_w = q.width / 2.0;
+                    uniform_int_distribution<int> pgx(q.x, q.x + q.width / 2.0 - 1);
+                    uniform_int_distribution<int> pgy(q.y, q.y + q.height / 2.0 - 1);
+                    uniform_int_distribution<int> sg(min_room_w, max_room_w);
+                    Rectangle ra1 = {static_cast<float>(pgx(mt)), static_cast<float>(pgy(mt)), static_cast<float>(sg(mt)), static_cast<float>(sg(mt))};
+                    room_id rid = i * parts + j;
+                    room r(rid, TextFormat("room-%d", rid), TextFormat("room-%d description", rid), ra1);
+                    rooms.push_back(r);
+                }
+            }
+
+            // we can handle this on a per-quad basis
+            // to begin with, we can handle generating 1 room per quad
+            //const float max_room_h = quad_1.height / 2.0 - 1;
+            //uniform_int_distribution<int> q1pg(quad_1.x, quad_1.x + quad_1.width - max_room_w - 1);
+            //uniform_int_distribution<int> q1sg(min_room_w, max_room_w);
+            //uniform_int_distribution<int> q2pg(quad_2.x, quad_2.x + quad_2.width - max_room_w - 1);
+            //uniform_int_distribution<int> q2sg(min_room_w, max_room_w);
+
+            //uniform_int_distribution<int> q3pg(quad_3.x, quad_3.x + quad_3.width - max_room_w - 1);
+            //uniform_int_distribution<int> q3sg(min_room_w, max_room_w);
+
+            //uniform_int_distribution<int> q4pg(quad_4.x, quad_4.x + quad_4.width - max_room_w - 1);
+            //uniform_int_distribution<int> q4sg(min_room_w, max_room_w);
+
+            //Rectangle ra1 = {static_cast<float>(q1pg(mt)), static_cast<float>(q1pg(mt)), static_cast<float>(q1sg(mt)), static_cast<float>(q1sg(mt))};
+
+            //Rectangle ra2 = {static_cast<float>(q2pg(mt)), static_cast<float>(q1pg(mt)), static_cast<float>(q2sg(mt)), static_cast<float>(q2sg(mt))};
+
+            //Rectangle ra3 = {static_cast<float>(q3pg(mt)), static_cast<float>(q3pg(mt)), static_cast<float>(q3sg(mt)), static_cast<float>(q3sg(mt))};
+
+            //Rectangle ra4 = {static_cast<float>(q4pg(mt)), static_cast<float>(q4pg(mt)), static_cast<float>(q4sg(mt)), static_cast<float>(q4sg(mt))};
+
+            //room r1(1, "room-1", "room-1 description", ra1);
+            //room r2(2, "room-2", "room-2 description", ra2);
+            //room r3(3, "room-3", "room-3 description", ra3);
+            //room r4(4, "room-4", "room-4 description", ra4);
+
+            //room r2(2, "doorway-1", "doorway-1 description", {r0.get_x() + r0.get_w(), r1.get_y(), 1, 1});
+            //room r3(3, "room-2", "room-2 description", {r0.get_x() - 5, r0.get_y(), 4, 4});
+            //room r4(4, "doorway-2", "doorway-2 description", {r0.get_x() - 1, r0.get_y() + o(mt), 1, 1});
+            //room r5(5, "room-3", "room-3 description", {r0.get_x(), r0.get_y() + r0.get_h() + 1, 2, 2});
+            //room r6(6, "doorway-3", "doorway-3 description", {r0.get_x(), r0.get_y() + r0.get_h(), 1, 1});
+            //rooms.push_back(r0);
+            //rooms.push_back(r1);
+            //rooms.push_back(r2);
+            //rooms.push_back(r3);
+            //rooms.push_back(r4);
+            //rooms.push_back(r3);
+            //rooms.push_back(r5);
+            //doorways.push_back(r2);
+            //doorways.push_back(r4);
+            //doorways.push_back(r6);
             // the more complicated version:
             // 1. randomly select a series of points in an elliptic area
             //vector<pair<int, int>> points = get_random_points_in_ellipse(cx, cy, 8);
@@ -769,28 +846,22 @@ public:
             //    room myroom(1, "room-1", "room-1 description", r);
             //    rooms.push_back(myroom);
             //}
-
-
-
-
             for (size_t i = 0; i < rooms.size(); i++)
             {
-                //    df->add_room_metadata(room_metadata(i, textformat("room %d", i), textformat("room %d description", i), rooms[i]));
+                if (!df->add_room(rooms[i]))
+                {
+                    merror("Failed to add room");
+                    continue;
+                }
                 df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, rooms[i].get_area());
             }
-
-            for (size_t i = 0; i < doorways.size(); i++)
-            {
-                //    df->add_room_metadata(room_metadata(i, textformat("room %d", i), textformat("room %d description", i), rooms[i]));
-                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, doorways[i].get_area());
-
-                int x = doorways[i].get_x();
-                int y = doorways[i].get_y();
-                df->df_set_can_have_door(vec3{x, y, -1});
-            }
-
-
-
+            //for (size_t i = 0; i < doorways.size(); i++)
+            //{
+            //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, doorways[i].get_area());
+            //    int x = doorways[i].get_x();
+            //    int y = doorways[i].get_y();
+            //    df->df_set_can_have_door(vec3{x, y, -1});
+            //}
             // here, we can use the edges to create hallways
             //for (auto edge : edges)
             //{
@@ -803,10 +874,6 @@ public:
             //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, Rectangle{pax, pay, fabs(pax - pbx), 1});
             //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, Rectangle{pax, pay, 1, fabs(pax - pbx)});
             //}
-
-
-
-
             // automatic door placement
             //for (int x = 0; x < df->get_width(); x++)
             //{
@@ -818,7 +885,6 @@ public:
             //        }
             //    }
             //}
-
             d.add_floor(df);
         }
         d.is_initialized = true;
