@@ -52,6 +52,7 @@
 #define GAMESTATE_DEBUGPANEL_DEFAULT_HEIGHT 200
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
 #define GAMESTATE_INIT_ENTITYIDS_MAX 3000000
+#define LAST_FRAME_TIMES_MAX 1000
 
 
 typedef ComponentTable CT;
@@ -97,6 +98,7 @@ public:
     mt19937 mt;
     string seed;
 
+    bool god_mode;
     bool test;
     bool debugpanelon;
     bool gridon;
@@ -150,7 +152,6 @@ public:
 
     double last_frame_time;
 
-#define LAST_FRAME_TIMES_MAX 1000
     vector<double> last_frame_times;
     size_t last_frame_times_current;
 
@@ -177,9 +178,6 @@ public:
     Vector2 inventory_cursor = {0, 0};
     Camera2D cam2d;
     Font font;
-
-
-
 
     ComponentTable ct;
 
@@ -463,6 +461,17 @@ public:
 #else
         test = true;
 #endif
+#ifndef GODMODE
+        god_mode = false;
+#else
+        god_mode = true;
+#endif
+
+#ifndef GOD_MODE
+        god_mode = false;
+#else
+        god_mode = true;
+#endif
         gameplay_settings_menu_selection = 0;
         cam2d.target = cam2d.offset = (Vector2){0, 0};
         cam2d.zoom = 2.0f;
@@ -707,7 +716,7 @@ public:
             room r0(0, "room-0", "room-0 description", {cx - 4, cy - 4, 8, 8});
 
             float r1o = o2(mt);
-            float r2o = o(mt);
+            //float r2o = o(mt);
 
             room r1(1, "room-1", "room-1 description", {r0.get_x() + r0.get_w() + 1.0f, r0.get_y() + r1o, 4, 4});
             room r2(2, "doorway-1", "doorway-1 description", {r0.get_x() + r0.get_w(), r1.get_y(), 1, 1});
@@ -3000,11 +3009,18 @@ public:
         }
 
         shared_ptr<tile_t> tile = df->tile_at(aloc);
+
         if (!tile_is_walkable(tile->get_type()))
         {
-            merror2("tile is not walkable");
-            return false;
+            if (!(god_mode && id == hero_id))
+            {
+                merror2("tile is not walkable");
+                return false;
+            }
         }
+
+
+
 
         const entityid box_id = tile_has_box(aloc.x, aloc.y, aloc.z);
         if (box_id != ENTITYID_INVALID)
@@ -4372,6 +4388,7 @@ public:
             "df.width x height: %dx%d\n"
             "living npcs on floor: %lu\n"
             "dead npcs on floor: %lu\n"
+            "god_mode: %d\n"
             "\n",
             framecount,
             frame_updates,
@@ -4404,7 +4421,8 @@ public:
             df_w,
             df_h,
             d.get_current_floor()->get_living_npcs()->size(),
-            d.get_current_floor()->get_dead_npcs()->size());
+            d.get_current_floor()->get_dead_npcs()->size(),
+            god_mode);
     }
 
 
