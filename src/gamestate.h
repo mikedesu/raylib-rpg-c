@@ -835,12 +835,14 @@ public:
             //}
 
 
+            // hallways
             for (size_t y = 0; y < parts; y++)
             {
                 for (size_t x = 0; x < parts; x++)
                 {
                     const size_t index = y * parts + x;
                     room& r = rooms[index];
+                    // calc center of room
                     const int rx = r.get_x() + r.get_w() / 2;
                     const int ry = r.get_y() + r.get_h() / 2;
                     const float rix = rx;
@@ -849,20 +851,34 @@ public:
                     if (x < parts - 1)
                     {
                         room& r2 = rooms[index + 1];
+                        // calc edge of room 1
+                        const int rx_e = r.get_x() + r.get_w();
+                        const float rxf_e = r.get_x() + r.get_w();
+                        // calc center x of room 2
                         const int rjx = r2.get_x() + r2.get_w() / 2;
-                        const float rw = rjx - rix;
-                        Rectangle c0 = {rix, riy, rw, 1};
-                        minfo("setting hallway (%0.1f, %0.1f, %0.1f, %0.1f)", rix, riy, rw, 1.0);
+                        // calc edge of room 2
+                        const int rjx_e = r2.get_x();
+                        // calc width of hallway
+                        //const float rw = rjx - rix;
+                        const float rw = rjx_e - rx_e;
+                        Rectangle c0 = {rxf_e, riy, rw, 1};
+                        //minfo("setting hallway (%0.1f, %0.1f, %0.1f, %0.1f)", rix, riy, rw, 1.0);
                         df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
+
+                        shared_ptr<tile_t> first_tile = df->tile_at(vec3{rx_e, ry, -1});
+                        first_tile->set_can_have_door(true);
                     }
 
                     if (y < parts - 1)
                     {
                         const size_t index2 = (y + 1) * parts + x;
                         room& r2 = rooms[index2];
-                        const int rjy = r2.get_y() + r2.get_h() / 2.0f;
-                        const float rh = rjy - riy;
-                        Rectangle c0 = {rix, riy, 1, rh};
+                        const float ry_e = r.get_y() + r.get_h();
+                        const int rjy = r2.get_y() + r2.get_h() / 2;
+                        const int rjy_e = r2.get_y();
+                        //const float rh = rjy - riy;
+                        const float rh = rjy_e - ry_e;
+                        Rectangle c0 = {rix, ry_e, 1, rh};
                         df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
                     }
                 }
