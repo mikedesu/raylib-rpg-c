@@ -10,6 +10,7 @@
 #include "draw_look_panel.h"
 #include "draw_message_box.h"
 #include "draw_message_history.h"
+#include "draw_option_menu.h"
 #include "gamestate.h"
 
 static inline void libdraw_drawframe_2d(gamestate& g)
@@ -51,6 +52,11 @@ static inline void libdraw_drawframe_2d(gamestate& g)
     if (g.display_action_menu)
     {
         draw_action_menu(g);
+    }
+
+    if (g.display_option_menu)
+    {
+        draw_option_menu(g);
     }
 
     //else if (g.display_gameplay_settings_menu) {

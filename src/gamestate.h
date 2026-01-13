@@ -111,6 +111,7 @@ public:
     bool test_guard;
     bool display_inventory_menu;
     bool display_action_menu;
+    bool display_option_menu;
     bool display_quit_menu;
     bool do_quit;
     bool dirty_entities;
@@ -4450,6 +4451,17 @@ public:
             return;
         }
 
+
+        if (inputstate_is_pressed(is, KEY_GRAVE))
+        {
+            display_option_menu = true;
+            controlmode = CONTROLMODE_OPTION_MENU;
+            return;
+        }
+
+
+
+
         if (inputstate_is_pressed(is, KEY_SPACE))
         {
             display_action_menu = true;
@@ -4573,7 +4585,21 @@ public:
 
 
 
-    inline void handle_input_gameplay_scene(const inputstate& is)
+    inline void handle_input_option_menu(inputstate& is)
+    {
+        massert(controlmode == CONTROLMODE_OPTION_MENU, "controlmode isnt in option menu: %d", controlmode);
+        if (inputstate_is_pressed(is, KEY_GRAVE))
+        {
+            display_option_menu = false;
+            controlmode = CONTROLMODE_PLAYER;
+            return;
+        }
+    }
+
+
+
+
+    inline void handle_input_gameplay_scene(inputstate& is)
     {
         minfo2("handle input gameplay scene");
         if (inputstate_is_pressed(is, KEY_B))
@@ -4608,12 +4634,18 @@ public:
             handle_input_action_menu(is);
             return;
         }
+
+        if (controlmode == CONTROLMODE_OPTION_MENU)
+        {
+            handle_input_option_menu(is);
+            return;
+        }
     }
 
 
 
 
-    inline void handle_input(const inputstate& is)
+    inline void handle_input(inputstate& is)
     {
         // no matter which mode we are in, we can toggle the debug panel
         minfo2("handle input: current_scene: %d", current_scene);
@@ -4947,7 +4979,7 @@ public:
 
 
 
-    inline void tick(const inputstate& is)
+    inline void tick(inputstate& is)
     {
         minfo2("tick");
         // Spawn NPCs periodically
