@@ -2192,6 +2192,11 @@ public:
         create_weapon_at_with(ct, df->df_get_random_loc(), dagger_init());
         create_weapon_at_with(ct, df->df_get_random_loc(), axe_init());
         create_shield_at_with(ct, df->df_get_random_loc(), shield_init());
+
+        for (int i = 0; i < 10; i++)
+        {
+            create_box_at_with(df->df_get_random_loc());
+        }
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         //minfo("creating monsters...");
         //for (int i = 0; i < (int)d.floors.size(); i++) {
