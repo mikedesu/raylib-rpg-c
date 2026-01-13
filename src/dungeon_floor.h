@@ -238,6 +238,7 @@ public:
         // we can access the tile using the x and y coordinates
         // and calculate the index
         const size_t index = loc.y * width + loc.x;
+        minfo2("tile_at: (%d, %d, %d)", loc.x, loc.y, loc.z);
         massert(index < tiles.size(), "index is out-of-bounds: %d, %d", loc.x, loc.y);
         const tile_id id = tiles[index];
         // Check if the tile_id exists in the map

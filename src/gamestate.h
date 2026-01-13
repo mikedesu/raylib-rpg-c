@@ -596,7 +596,10 @@ public:
 
         //auto creation_rules = ;
         //constexpr int num_rooms = 3;
+        constexpr float min_room_w = 2;
+        constexpr float parts = 4.0;
 
+        minfo2("BEGIN floor creation loop");
         for (int i = 0; i < df_count; i++)
         {
             auto df = d.create_floor(type, w, h);
@@ -748,14 +751,14 @@ public:
 
             // rooms of size 1 should be non-existent
             // so the minimum room size should be 2x2
-            constexpr float min_room_w = 2;
             //constexpr float min_room_h = 2;
 
             // we can calculate how many rooms we can accomodate
             // it can be between 1 big room and quad.width / (min_room_w+1)
             // but do we need to?
 
-            constexpr float parts = 4.0;
+
+            minfo2("creating rooms");
             for (int i = 0; i < parts; i++)
             {
                 for (int j = 0; j < parts; j++)
@@ -779,6 +782,7 @@ public:
             // to our rooms vector, we can't yet test the tiles themselves...
             // we could create the rooms right away. this might make checking things easier because
             // we want to make sure we leave a gap between rooms
+            minfo2("setting rooms");
             for (size_t i = 0; i < rooms.size(); i++)
             {
                 if (!df->add_room(rooms[i]))
@@ -796,6 +800,7 @@ public:
             // in situations like that, we might just wire the rooms up directly
             // note that the rooms are not sorted
             // we might want to do that to make making the hallways easier
+            minfo2("sorting rooms");
             std::sort(rooms.begin(), rooms.end(), [](room& a, room& b) { return a.get_x() < b.get_x() && a.get_y() < b.get_y(); });
 
             // now the top-left most room should be the first
@@ -830,77 +835,110 @@ public:
             //}
 
 
-            for (size_t i = 0; i < 3; i++)
+            for (size_t y = 0; y < parts; y++)
             {
-                const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
-                const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
-                const float rjx = rooms[i + 1].get_x() + rooms[i + 1].get_w() / 2.0f;
-                //const float rjy = rooms[i + 1].get_y() + rooms[i + 1].get_h() / 2.0f;
-                //const float rkx = rooms[i + 4].get_x() + rooms[i + 4].get_w() / 2.0f;
-                const float rky = rooms[i + 4].get_y() + rooms[i + 4].get_h() / 2.0f;
-                const float rw = rjx - rix;
-                const float rh = rky - riy;
-                Rectangle c0 = {rix, riy, rw, 1};
-                Rectangle c1 = {rix, riy, 1, rh};
-                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c1);
+                for (size_t x = 0; x < parts; x++)
+                {
+                    const size_t index = y * parts + x;
+                    room& r = rooms[index];
+                    const int rx = r.get_x() + r.get_w() / 2;
+                    const int ry = r.get_y() + r.get_h() / 2;
+                    const float rix = rx;
+                    const float riy = ry;
+
+                    if (x < parts - 1)
+                    {
+                        room& r2 = rooms[index + 1];
+                        const int rjx = r2.get_x() + r2.get_w() / 2;
+                        const float rw = rjx - rix;
+                        Rectangle c0 = {rix, riy, rw, 1};
+                        minfo("setting hallway (%0.1f, %0.1f, %0.1f, %0.1f)", rix, riy, rw, 1.0);
+                        df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
+                    }
+
+                    if (y < parts - 1)
+                    {
+                        const size_t index2 = (y + 1) * parts + x;
+                        room& r2 = rooms[index2];
+                        const int rjy = r2.get_y() + r2.get_h() / 2.0f;
+                        const float rh = rjy - riy;
+                        Rectangle c0 = {rix, riy, 1, rh};
+                        df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
+                    }
+                }
             }
 
 
-            for (size_t i = 4; i < 7; i++)
-            {
-                const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
-                const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
-                const float rjx = rooms[i + 1].get_x() + rooms[i + 1].get_w() / 2.0f;
-                //const float rjy = rooms[i + 1].get_y() + rooms[i + 1].get_h() / 2.0f;
-                //const float rkx = rooms[i + 4].get_x() + rooms[i + 4].get_w() / 2.0f;
-                const float rky = rooms[i + 4].get_y() + rooms[i + 4].get_h() / 2.0f;
-                const float rw = rjx - rix;
-                const float rh = rky - riy;
-                Rectangle c0 = {rix, riy, rw, 1};
-                Rectangle c1 = {rix, riy, 1, rh};
-                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c1);
-            }
+            //minfo2("connecting hallways 1");
+            //for (size_t i = 0; i < 3; i++)
+            //{
+            //    const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
+            //    const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
+            //    const float rjx = rooms[i + 1].get_x() + rooms[i + 1].get_w() / 2.0f;
+            //    const float rky = rooms[i + 4].get_y() + rooms[i + 4].get_h() / 2.0f;
+            //    const float rw = rjx - rix;
+            //    const float rh = rky - riy;
+            //    Rectangle c0 = {rix, riy, rw, 1};
+            //    Rectangle c1 = {rix, riy, 1, rh};
+            //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
+            //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c1);
+            //}
 
 
-            for (size_t i = 8; i < 11; i++)
-            {
-                const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
-                const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
-                const float rjx = rooms[i + 1].get_x() + rooms[i + 1].get_w() / 2.0f;
-                //const float rjy = rooms[i + 1].get_y() + rooms[i + 1].get_h() / 2.0f;
-                //const float rkx = rooms[i + 4].get_x() + rooms[i + 4].get_w() / 2.0f;
-                const float rky = rooms[i + 4].get_y() + rooms[i + 4].get_h() / 2.0f;
-                const float rw = rjx - rix;
-                const float rh = rky - riy;
-                Rectangle c0 = {rix, riy, rw, 1};
-                Rectangle c1 = {rix, riy, 1, rh};
-                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c1);
-            }
+            //minfo2("connecting hallways 2");
+            //for (size_t i = 4; i < parts * parts; i++)
+            //{
+            //    const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
+            //    const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
+            //    const float rjx = rooms[i + 1].get_x() + rooms[i + 1].get_w() / 2.0f;
+            //    const float rky = rooms[i + 4].get_y() + rooms[i + 4].get_h() / 2.0f;
+            //    const float rw = rjx - rix;
+            //    const float rh = rky - riy;
+            //    Rectangle c0 = {rix, riy, rw, 1};
+            //    Rectangle c1 = {rix, riy, 1, rh};
+            //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
+            //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c1);
+            //}
+
+
+            //minfo2("connecting hallways 3");
+            //for (size_t i = 8; i < parts * parts; i++)
+            //{
+            //    const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
+            //    const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
+            //    const float rjx = rooms[i + 1].get_x() + rooms[i + 1].get_w() / 2.0f;
+            //    const float rky = rooms[i + 4].get_y() + rooms[i + 4].get_h() / 2.0f;
+            //    const float rw = rjx - rix;
+            //    const float rh = rky - riy;
+            //    Rectangle c0 = {rix, riy, rw, 1};
+            //    Rectangle c1 = {rix, riy, 1, rh};
+            //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
+            //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c1);
+            //}
 
             // now the last column
-            for (size_t i = 3; i < 15; i += parts)
-            {
-                const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
-                const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
-                const float rjy = rooms[i + parts].get_y() + rooms[i + parts].get_h() / 2.0f;
-                const float rh = rjy - riy;
-                Rectangle c1 = {rix, riy, 1, rh};
-                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c1);
-            }
+            //minfo2("connecting hallways 4");
+            //for (size_t i = 3; i < parts * parts; i += parts)
+            //{
+            //    const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
+            //    const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
+            //    const float rjy = rooms[i + parts].get_y() + rooms[i + parts].get_h() / 2.0f;
+            //    const float rh = rjy - riy;
+            //    Rectangle c1 = {rix, riy, 1, rh};
+            //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c1);
+            //}
 
             // now the last row
-            for (size_t i = 12; i < 15; i++)
-            {
-                const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
-                const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
-                const float rjx = rooms[i + 1].get_x() + rooms[i + 1].get_w() / 2.0f;
-                const float rw = rjx - rix;
-                Rectangle c0 = {rix, riy, rw, 1};
-                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-            }
+            //minfo2("connecting hallways 5");
+            //for (size_t i = 12; i < 15; i++)
+            //{
+            //    const float rix = rooms[i].get_x() + rooms[i].get_w() / 2.0f;
+            //    const float riy = rooms[i].get_y() + rooms[i].get_h() / 2.0f;
+            //    const float rjx = rooms[i + 1].get_x() + rooms[i + 1].get_w() / 2.0f;
+            //    const float rw = rjx - rix;
+            //    Rectangle c0 = {rix, riy, rw, 1};
+            //    df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
+            //}
 
 
             // we can handle this on a per-quad basis
@@ -1008,8 +1046,11 @@ public:
             //        }
             //    }
             //}
+            minfo2("adding floor to dungeon...");
             d.add_floor(df);
         }
+
+        minfo2("END floor creation loop");
         d.is_initialized = true;
     }
 
@@ -2072,8 +2113,8 @@ public:
         // 8x8   = 4 4x4 areas
         // 16x16 = 4 8x8 areas
         // 32x32 = 4 16x16 areas = 8 8x8 areas
-        const int w = 16; // 4x4 4x4 areas
-        const int h = 16;
+        const int w = 32; // 4x4 4x4 areas
+        const int h = 32;
 
         init_dungeon(BIOME_STONE, 1, w, h);
 
@@ -2086,7 +2127,7 @@ public:
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         //minfo("creating monsters...");
         //for (int i = 0; i < (int)d.floors.size(); i++) {
-        constexpr int monster_count = 10;
+        constexpr int monster_count = 0;
         for (int j = 0; j < monster_count; j++)
         {
             const vec3 random_loc = d.get_floor(0)->df_get_random_loc();
