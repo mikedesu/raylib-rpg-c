@@ -790,7 +790,7 @@ public:
                     merror("Failed to add room");
                     continue;
                 }
-                df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, rooms[i].get_area());
+                df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, rooms[i].get_area());
             }
 
             // now that the rooms have been laid down onto tiles, we can step through
@@ -863,26 +863,58 @@ public:
                         const float rw = rjx_e - rx_e;
                         Rectangle c0 = {rxf_e, riy, rw, 1};
                         //minfo("setting hallway (%0.1f, %0.1f, %0.1f, %0.1f)", rix, riy, rw, 1.0);
-                        df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
+                        df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
 
                         shared_ptr<tile_t> first_tile = df->tile_at(vec3{rx_e, ry, -1});
                         first_tile->set_can_have_door(true);
+
+                        const int rw_i = rw;
+                        shared_ptr<tile_t> last_tile = df->tile_at(vec3{rx_e + rw_i - 1, ry, -1});
+                        last_tile->set_can_have_door(true);
                     }
 
                     if (y < parts - 1)
                     {
                         const size_t index2 = (y + 1) * parts + x;
                         room& r2 = rooms[index2];
-                        const float ry_e = r.get_y() + r.get_h();
+                        const int ry_e = r.get_y() + r.get_h();
+                        const float ryf_e = r.get_y() + r.get_h();
                         const int rjy = r2.get_y() + r2.get_h() / 2;
                         const int rjy_e = r2.get_y();
                         //const float rh = rjy - riy;
                         const float rh = rjy_e - ry_e;
-                        Rectangle c0 = {rix, ry_e, 1, rh};
-                        df->df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
+                        Rectangle c0 = {rix, ryf_e, 1, rh};
+                        df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
+
+                        shared_ptr<tile_t> first_tile = df->tile_at(vec3{rx, ry_e, -1});
+                        first_tile->set_can_have_door(true);
                     }
                 }
             }
+
+
+            // Now we want to introduce a one-pass 'stitching' algorithm
+            // The hallways may be unconnected at their ends
+            // If we iterate each tile across the floor
+            // and check to see if it meets certain conditions
+            // we can place a new tile to help link rooms and halls together
+
+            for (int y = 1; y < dh - 1; y++)
+            {
+                for (int x = 1; x < dw - 1; x++)
+                {
+                    vec3 loc = {x, y, -1};
+                    if (df->tile_is_good_for_upgrade(loc))
+                    {
+                        df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_10, Rectangle{static_cast<float>(loc.x), static_cast<float>(loc.y), 1, 1});
+
+                        //shared_ptr<tile_t> t = df->tile_at(loc);
+                        //t->set_can_have_door(true);
+                    }
+                }
+            }
+
+
 
 
             //minfo2("connecting hallways 1");

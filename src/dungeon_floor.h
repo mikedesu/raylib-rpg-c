@@ -259,7 +259,7 @@ public:
 
 
 
-    const inline bool df_is_good_door_loc(const vec3 loc)
+    inline bool df_is_good_door_loc(vec3 loc)
     {
         auto tile = tile_at(loc);
         if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1)
@@ -295,6 +295,46 @@ public:
 
 
 
+    inline bool tile_is_good_for_upgrade(vec3 loc)
+    {
+        auto tile = tile_at(loc);
+        if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1)
+        {
+            auto t0 = tile_at((vec3){loc.x - 1, loc.y - 1, loc.z});
+            auto t1 = tile_at((vec3){loc.x - 1, loc.y, loc.z});
+            auto t2 = tile_at((vec3){loc.x - 1, loc.y + 1, loc.z});
+            auto t3 = tile_at((vec3){loc.x, loc.y - 1, loc.z});
+            auto t4 = tile_at((vec3){loc.x, loc.y + 1, loc.z});
+            auto t5 = tile_at((vec3){loc.x + 1, loc.y - 1, loc.z});
+            auto t6 = tile_at((vec3){loc.x + 1, loc.y, loc.z});
+            auto t7 = tile_at((vec3){loc.x + 1, loc.y + 1, loc.z});
+
+            /*
+             035
+             1.6
+             247
+             */
+
+            auto top_row_none = t0->get_type() == TILE_NONE && t3->get_type() == TILE_NONE && t5->get_type() == TILE_NONE;
+
+            auto bottom_row_none = t2->get_type() == TILE_NONE && t4->get_type() == TILE_NONE && t7->get_type() == TILE_NONE;
+
+            auto left_not_none = t1->get_type() != TILE_NONE;
+            auto right_not_none = t6->get_type() != TILE_NONE;
+
+            auto case1 = top_row_none && bottom_row_none && left_not_none && right_not_none;
+
+            if (case1)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
     inline void df_set_tile(const tiletype_t type, const int x, const int y)
     {
         shared_ptr<tile_t> current = tile_at((vec3){x, y, -1});
@@ -313,7 +353,7 @@ public:
 
 
 
-    const inline void df_set_area(const tiletype_t a, const tiletype_t b, const Rectangle r)
+    inline void set_area(const tiletype_t a, const tiletype_t b, const Rectangle r)
     {
         //minfo("df set area");
         for (int x = r.x; x < r.x + r.width && x < width; x++)
@@ -602,7 +642,7 @@ public:
     inline void df_set_all_tiles(const tiletype_t type)
     {
         //minfo("df_set_all_tiles: Setting all tiles to type %d", type);
-        df_set_area(type, type, (Rectangle){0, 0, (float)width, (float)height});
+        set_area(type, type, (Rectangle){0, 0, (float)width, (float)height});
     }
 
 
