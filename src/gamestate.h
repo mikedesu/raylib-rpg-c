@@ -1443,6 +1443,22 @@ public:
 
 
 
+    inline with_fun axe_init()
+    {
+        return [](CT& ct, const entityid id)
+        {
+            ct.set<name>(id, "axe");
+            ct.set<description>(id, "Choppy choppy");
+            ct.set<weapontype>(id, WEAPON_AXE);
+            ct.set<damage>(id, (vec3){1, 8, 0});
+            ct.set<durability>(id, 100);
+            ct.set<max_durability>(id, 100);
+            ct.set<rarity>(id, RARITY_COMMON);
+        };
+    }
+
+
+
 
     inline with_fun shield_init()
     {
@@ -1555,7 +1571,7 @@ public:
 
 
 
-    inline entityid create_shield_with(with_fun shieldInitFunction)
+    inline entityid create_shield_with(ComponentTable& ct, with_fun shieldInitFunction)
     {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
@@ -1570,13 +1586,13 @@ public:
 
 
 
-    inline entityid create_shield_at_with(const vec3 loc, with_fun shieldInitFunction)
+    inline entityid create_shield_at_with(ComponentTable& ct, const vec3 loc, with_fun shieldInitFunction)
     {
         if (d.floors.size() == 0)
         {
             return ENTITYID_INVALID;
         }
-        const entityid id = create_shield_with(shieldInitFunction);
+        const entityid id = create_shield_with(ct, shieldInitFunction);
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         if (!df->df_add_at(id, loc))
         {
@@ -2170,12 +2186,16 @@ public:
         place_doors();
         //place_props();
         //const vec3 loc0 = d.floors[0].df_get_random_loc();
-        //create_weapon_at_with(ct, loc0, dagger_init());
-        //create_shield_at_with(d.floors[0].df_get_random_loc(), shield_init());
+
+        auto df = d.get_current_floor();
+        //auto rl0 = df->df_get_random_loc();
+        create_weapon_at_with(ct, df->df_get_random_loc(), dagger_init());
+        create_weapon_at_with(ct, df->df_get_random_loc(), axe_init());
+        create_shield_at_with(ct, df->df_get_random_loc(), shield_init());
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         //minfo("creating monsters...");
         //for (int i = 0; i < (int)d.floors.size(); i++) {
-        constexpr int monster_count = 0;
+        constexpr int monster_count = 10;
         for (int j = 0; j < monster_count; j++)
         {
             const vec3 random_loc = d.get_floor(0)->df_get_random_loc();
