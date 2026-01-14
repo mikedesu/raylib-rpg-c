@@ -4595,25 +4595,18 @@ public:
         {
             display_option_menu = false;
             controlmode = CONTROLMODE_PLAYER;
-            return;
         }
-
-        if (inputstate_is_pressed(is, KEY_UP))
+        else if (inputstate_is_pressed(is, KEY_UP))
         {
             options_menu.decr_selection();
-            return;
         }
-
-        if (inputstate_is_pressed(is, KEY_DOWN))
+        else if (inputstate_is_pressed(is, KEY_DOWN))
         {
             options_menu.incr_selection();
-            return;
         }
-
-        if (inputstate_is_pressed(is, KEY_ENTER))
+        else if (inputstate_is_pressed(is, KEY_ENTER))
         {
             minfo("Enter pressed");
-            return;
         }
     }
 
