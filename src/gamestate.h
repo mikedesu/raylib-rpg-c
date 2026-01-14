@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "ComponentTable.h"
 #include "attack_result.h"
 #include "biome.h"
@@ -35,6 +36,7 @@
 #include <random>
 #include <raylib.h>
 #include <raymath.h>
+
 
 #define DEFAULT_MASTER_VOLUME 1.0f
 #define DEFAULT_MUSIC_VOLUME 0.35f

@@ -6,10 +6,7 @@
 extern Music music;
 
 
-
-
-static inline void load_random_music(gamestate& g)
-{
+static inline void load_random_music(gamestate& g) {
     minfo2("BEGIN load_random_music");
     // load the music stream from the selected path
     // randomly select a music path
@@ -24,15 +21,11 @@ static inline void load_random_music(gamestate& g)
 }
 
 
-
-
-static inline void handle_music_stream(gamestate& g)
-{
+static inline void handle_music_stream(gamestate& g) {
     UpdateMusicStream(music);
 
     // handle load next music track
-    if (!IsMusicStreamPlaying(music))
-    {
+    if (!IsMusicStreamPlaying(music)) {
         StopMusicStream(music);
         UnloadMusicStream(music);
         load_random_music(g);
@@ -41,10 +34,7 @@ static inline void handle_music_stream(gamestate& g)
 }
 
 
-
-
-static inline void libdraw_load_music(gamestate& g)
-{
+static inline void libdraw_load_music(gamestate& g) {
     minfo2("BEGIN load_music");
     load_random_music(g);
     SetMasterVolume(DEFAULT_MASTER_VOLUME);

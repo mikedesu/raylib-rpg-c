@@ -1,14 +1,16 @@
 #pragma once
 
+
 #include "gamestate.h"
 
+
 using std::min;
+
 
 static inline void draw_message_history(gamestate& g) {
     char tmp[1024] = {0};
     const int font_size = 10;
     const int max_messages = 30;
-
     const Color message_bg = Fade((Color){0, 0, 0xff, 0xff}, 0.5f);
     const int msg_count = g.msg_history.size();
     if (msg_count == 0) {
@@ -18,15 +20,12 @@ static inline void draw_message_history(gamestate& g) {
     const int max_measure = g.msg_history_max_len_msg_measure;
     const float w = max_measure + g.pad;
     const float h = (font_size + 2) * min(msg_count, max_messages) + g.pad;
-
     const float x = g.targetwidth - w;
     const float y = 0;
-
     const Rectangle box = {x, y, w, h};
     DrawRectangleRec(box, message_bg);
     DrawRectangleLinesEx(box, 1, WHITE);
     // now lets draw each message in the history
-
     if (msg_count > max_messages) {
         int outer_count = 0;
         for (int i = msg_count - max_messages; i < msg_count; i++) {

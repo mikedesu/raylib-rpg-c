@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "camera_lock_on.h"
 #include "draw_action_menu.h"
 #include "draw_dungeon_floor.h"
@@ -13,8 +14,8 @@
 #include "draw_option_menu.h"
 #include "gamestate.h"
 
-static inline void libdraw_drawframe_2d(gamestate& g)
-{
+
+static inline void libdraw_drawframe_2d(gamestate& g) {
     //minfo("BEGIN drawframe 2d");
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
@@ -27,9 +28,7 @@ static inline void libdraw_drawframe_2d(gamestate& g)
     //EndShaderMode();
     //minfo("draw dungeon floor");
     draw_dungeon_floor(g);
-
     //libdraw_draw_player_target_box(g);
-
     EndMode2D();
     //if (g.frame_dirty) {
     //draw_hud_to_texture(g);
@@ -43,34 +42,26 @@ static inline void libdraw_drawframe_2d(gamestate& g)
     draw_message_history(g);
     //minfo("draw msg box");
     draw_message_box(g);
-    if (g.display_inventory_menu)
-    {
+    if (g.display_inventory_menu) {
         //minfo("draw inventory menu");
         draw_inventory_menu(g);
     }
-
-    if (g.display_action_menu)
-    {
+    if (g.display_action_menu) {
         draw_action_menu(g);
     }
-
-    if (g.display_option_menu)
-    {
+    if (g.display_option_menu) {
         draw_option_menu(g);
     }
-
     //else if (g.display_gameplay_settings_menu) {
     //    draw_gameplay_settings_menu(g);
     //}
     //minfo("handle debug panel");
-
 #ifdef DEBUG
     handle_debug_panel(g);
 #endif
     //draw_version(g);
     //int x = 0;
-    if (g.display_help_menu)
-    {
+    if (g.display_help_menu) {
         //minfo("draw help menu");
         draw_help_menu(g);
     }

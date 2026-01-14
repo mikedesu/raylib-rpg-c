@@ -5,16 +5,16 @@
 #include <emscripten/emscripten.h>
 #endif
 
+
 inputstate is;
 gamestate g;
 
-static inline void gameloop()
-{
+
+static inline void gameloop() {
     inputstate_update(is);
     g.tick(is);
     libdraw_drawframe(g);
-    if (g.do_restart)
-    {
+    if (g.do_restart) {
         msuccess("Restarting game...");
         libdraw_close();
         g.logic_close();
@@ -26,13 +26,12 @@ static inline void gameloop()
     }
 }
 
-int main()
-{
+
+int main() {
     g.logic_init();
     libdraw_init(g);
 #ifndef WEB
-    while (!libdraw_windowshouldclose(g))
-    {
+    while (!libdraw_windowshouldclose(g)) {
         gameloop();
     }
 #else

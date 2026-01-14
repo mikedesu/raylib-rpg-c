@@ -3,8 +3,7 @@
 #include "gamestate.h"
 #include "libgame_defines.h"
 
-static inline void draw_debug_panel(const gamestate& g)
-{
+static inline void draw_debug_panel(const gamestate& g) {
     constexpr Color bg = {0, 0, 255, 255};
     constexpr Color fg = WHITE;
     constexpr int fontsize = 10;

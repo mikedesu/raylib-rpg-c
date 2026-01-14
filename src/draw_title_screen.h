@@ -1,11 +1,14 @@
 #pragma once
 
+
 #include "gamestate.h"
 #include "libgame_version.h"
 #include "texture_ids.h"
 #include "textureinfo.h"
 
+
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
+
 
 static inline void draw_title_screen(gamestate& g, bool show_menu) {
     char buffer[1024] = {0};

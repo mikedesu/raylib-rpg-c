@@ -1,11 +1,11 @@
 #pragma once
 
-#include "gamestate.h"
 
 #include "draw_character_creation_screen.h"
 #include "draw_hud.h"
 #include "draw_message_history.h"
 #include "draw_title_screen.h"
+#include "gamestate.h"
 #include "libdraw_create_spritegroup.h"
 #include "libdraw_from_texture.h"
 #include "libdraw_to_texture.h"
@@ -17,6 +17,7 @@
 #include "scene.h"
 #include "shaders.h"
 #include "unload_textures.h"
+
 
 unordered_map<entityid, spritegroup_t*> spritegroups;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -34,31 +35,26 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
 
-static inline void libdraw_drawframe(gamestate& g)
-{
+static inline void libdraw_drawframe(gamestate& g) {
     const double start_time = GetTime();
     libdraw_update_sprites_pre(g);
     BeginDrawing();
     ClearBackground(RED);
-    if (g.frame_dirty)
-    {
-        switch (g.current_scene)
-        {
+    if (g.frame_dirty) {
+        switch (g.current_scene) {
         case SCENE_TITLE: draw_title_screen_to_texture(g, false); break;
         case SCENE_MAIN_MENU: draw_title_screen_to_texture(g, true); break;
         case SCENE_CHARACTER_CREATION: draw_character_creation_screen_to_texture(g); break;
         case SCENE_GAMEPLAY: libdraw_drawframe_2d_to_texture(g); break;
         default: break;
         }
-
         g.frame_dirty = false;
         g.frame_updates++;
     }
     // draw to the target texture
     BeginTextureMode(target);
     ClearBackground(BLUE);
-    switch (g.current_scene)
-    {
+    switch (g.current_scene) {
     case SCENE_TITLE: draw_title_screen_from_texture(g); break;
     case SCENE_MAIN_MENU: draw_title_screen_from_texture(g); break;
     case SCENE_CHARACTER_CREATION: draw_character_creation_screen_from_texture(g); break;
@@ -71,13 +67,11 @@ static inline void libdraw_drawframe(gamestate& g)
     win_dest.height = GetScreenHeight();
     DrawTexturePro(target.texture, target_src, win_dest, (Vector2){0, 0}, 0.0f, WHITE);
     EndDrawing();
-
 #ifdef DEBUG
     g.last_frame_time = GetTime() - start_time;
     g.last_frame_times[g.last_frame_times_current] = g.last_frame_time;
     g.last_frame_times_current++;
-    if (g.last_frame_times_current >= LAST_FRAME_TIMES_MAX)
-    {
+    if (g.last_frame_times_current >= LAST_FRAME_TIMES_MAX) {
         g.last_frame_times_current = 0;
     }
     g.framecount++;
@@ -87,8 +81,7 @@ static inline void libdraw_drawframe(gamestate& g)
 }
 
 
-static inline void libdraw_init_rest(gamestate& g)
-{
+static inline void libdraw_init_rest(gamestate& g) {
     SetExitKey(KEY_ESCAPE);
     SetTargetFPS(60);
     g.windowwidth = DEFAULT_WIN_WIDTH, g.windowheight = DEFAULT_WIN_HEIGHT;
@@ -113,7 +106,6 @@ static inline void libdraw_init_rest(gamestate& g)
     target_dest = (Rectangle){0, 0, DEFAULT_TARGET_WIDTH * 1.0f, DEFAULT_TARGET_HEIGHT * 1.0f};
     load_textures(txinfo);
     load_shaders();
-    //const float x = DEFAULT_TARGET_WIDTH / 2.0f, y = DEFAULT_TARGET_HEIGHT / 4.0f;
     const float x = DEFAULT_TARGET_WIDTH / 4.0f;
     const float y = DEFAULT_TARGET_HEIGHT / 4.0f;
     g.cam2d.offset = (Vector2){x, y};
@@ -127,8 +119,7 @@ static inline void libdraw_init_rest(gamestate& g)
 }
 
 
-static inline void libdraw_init(gamestate& g)
-{
+static inline void libdraw_init(gamestate& g) {
     const int w = DEFAULT_WIN_WIDTH;
     const int h = DEFAULT_WIN_HEIGHT;
     const char* title = WINDOW_TITLE;
@@ -143,14 +134,12 @@ static inline void libdraw_init(gamestate& g)
 }
 
 
-static inline bool libdraw_windowshouldclose(gamestate& g)
-{
+static inline bool libdraw_windowshouldclose(gamestate& g) {
     return g.do_quit;
 }
 
 
-static inline void libdraw_close_partial()
-{
+static inline void libdraw_close_partial() {
     UnloadMusicStream(music);
     CloseAudioDevice();
     libdraw_unload_textures(txinfo);
@@ -163,8 +152,7 @@ static inline void libdraw_close_partial()
 }
 
 
-static inline void libdraw_close()
-{
+static inline void libdraw_close() {
     libdraw_close_partial();
     CloseWindow();
 }

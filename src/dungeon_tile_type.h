@@ -1,10 +1,11 @@
 #pragma once
 
+
 #include <stdbool.h>
 #include <string>
 
-typedef enum
-{
+
+typedef enum {
     TILE_NONE,
     TILE_UPSTAIRS,
     TILE_DOWNSTAIRS,
@@ -58,7 +59,6 @@ typedef enum
     TILE_FLOOR_STONE_09,
     TILE_FLOOR_STONE_10,
     TILE_FLOOR_STONE_11,
-
     TILE_FLOOR_STONE_DIRT_UL_00,
     TILE_FLOOR_STONE_DIRT_U_00,
     TILE_FLOOR_STONE_DIRT_UR_00,
@@ -68,7 +68,6 @@ typedef enum
     TILE_FLOOR_STONE_DIRT_DL_00,
     TILE_FLOOR_STONE_DIRT_D_00,
     TILE_FLOOR_STONE_DIRT_DR_00,
-
     TILE_FLOOR_STONE_DIRT_UL_01,
     TILE_FLOOR_STONE_DIRT_U_01,
     TILE_FLOOR_STONE_DIRT_UR_01,
@@ -78,7 +77,6 @@ typedef enum
     TILE_FLOOR_STONE_DIRT_DL_01,
     TILE_FLOOR_STONE_DIRT_D_01,
     TILE_FLOOR_STONE_DIRT_DR_01,
-
     TILE_FLOOR_STONE_DIRT_UL_02,
     TILE_FLOOR_STONE_DIRT_U_02,
     TILE_FLOOR_STONE_DIRT_UR_02,
@@ -88,28 +86,24 @@ typedef enum
     TILE_FLOOR_STONE_DIRT_DL_02,
     TILE_FLOOR_STONE_DIRT_D_02,
     TILE_FLOOR_STONE_DIRT_DR_02,
-
     TILE_FLOOR_STONE_DIRT_UL_03,
     TILE_FLOOR_STONE_DIRT_U_03,
     TILE_FLOOR_STONE_DIRT_UR_03,
     TILE_FLOOR_STONE_DIRT_DL_03,
     TILE_FLOOR_STONE_DIRT_D_03,
     TILE_FLOOR_STONE_DIRT_DR_03,
-
     TILE_FLOOR_STONE_DIRT_UL_04,
     TILE_FLOOR_STONE_DIRT_U_04,
     TILE_FLOOR_STONE_DIRT_UR_04,
     TILE_FLOOR_STONE_DIRT_DL_04,
     TILE_FLOOR_STONE_DIRT_D_04,
     TILE_FLOOR_STONE_DIRT_DR_04,
-
     TILE_FLOOR_STONE_DIRT_UL_05,
     TILE_FLOOR_STONE_DIRT_U_05,
     TILE_FLOOR_STONE_DIRT_UR_05,
     TILE_FLOOR_STONE_DIRT_DL_05,
     TILE_FLOOR_STONE_DIRT_D_05,
     TILE_FLOOR_STONE_DIRT_DR_05,
-
     TILE_FLOOR_GRASS_00,
     TILE_FLOOR_GRASS_01,
     TILE_FLOOR_GRASS_02,
@@ -163,11 +157,9 @@ typedef enum
 } tiletype_t;
 
 
-
 static inline std::string tiletype2str(const tiletype_t type) {
     if (type == TILE_NONE)
         return "TileNone";
-
     else if (type == TILE_UNKNOWN)
         return "TileUnknown";
     else if (type == TILE_UPSTAIRS)
@@ -176,20 +168,19 @@ static inline std::string tiletype2str(const tiletype_t type) {
         return "TileDownstairs";
     else if (type >= TILE_FLOOR_STONE_00 && type <= TILE_FLOOR_STONE_11)
         return "TileStone";
-
-
     return "TileError";
 }
-
 
 
 constexpr static inline bool tile_is_none(const tiletype_t type) {
     return type == TILE_NONE;
 }
 
+
 constexpr static inline bool tile_is_not_none(const tiletype_t type) {
     return type != TILE_NONE;
 }
+
 
 constexpr static inline bool tiletype_is_wall(const tiletype_t type) {
     switch (type) {
@@ -200,13 +191,16 @@ constexpr static inline bool tiletype_is_wall(const tiletype_t type) {
     return false;
 }
 
+
 constexpr static inline bool tile_is_walkable(const tiletype_t type) {
     return !tiletype_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE && type != TILE_COUNT;
 }
 
+
 constexpr static inline bool tile_is_possible_upstairs(const tiletype_t type) {
     return tile_is_walkable(type) && type != TILE_DOWNSTAIRS && type != TILE_COUNT;
 }
+
 
 constexpr static inline bool tile_is_possible_downstairs(const tiletype_t type) {
     return tile_is_walkable(type) && type != TILE_UPSTAIRS && type != TILE_COUNT;

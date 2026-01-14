@@ -1,12 +1,14 @@
 #pragma once
+
+
 #include "gamestate.h"
 #include "libgame_defines.h"
 #include "texture_ids.h"
 #include "textureinfo.h"
 
-using std::shared_ptr;
 
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
+
 
 static inline void draw_character_creation_screen(gamestate& g) {
     const char* title_text = "Character Creation";
