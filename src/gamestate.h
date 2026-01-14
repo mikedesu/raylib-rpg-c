@@ -2231,7 +2231,6 @@ public:
         // equip item
         // get the item id of the current selection
         const size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
-        //optional<shared_ptr<vector<entityid>>> my_inventory = ct.get<inventory>(hero_id);
         auto my_inventory = ct.get<inventory>(hero_id);
         if (!my_inventory) {
             return;
@@ -2239,7 +2238,6 @@ public:
         if (!my_inventory.has_value()) {
             return;
         }
-        //shared_ptr<vector<entityid>> unpacked_inventory = my_inventory.value();
         auto inventory = my_inventory.value();
         if (index < 0 || index >= inventory->size()) {
             return;
@@ -2257,12 +2255,10 @@ public:
             return false;
         }
         const size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
-        //optional<shared_ptr<vector<entityid>>> maybe_inventory = ct.get<inventory>(hero_id);
         auto maybe_inventory = ct.get<inventory>(hero_id);
         if (!maybe_inventory.has_value()) {
             return false;
         }
-        //shared_ptr<vector<entityid>> inventory = maybe_inventory.value();
         auto inventory = maybe_inventory.value();
         if (index < 0 || index >= inventory->size()) {
             return false;
@@ -3295,7 +3291,6 @@ public:
                 const int new_floor = d.current_floor;
                 shared_ptr<dungeon_floor> df2 = d.floors[new_floor];
                 const vec3 uloc = df2->get_downstairs_loc();
-                //tile_t& t2 = df2.df_tile_at(uloc);
                 df2->df_add_at(hero_id, uloc);
                 ct.set<location>(hero_id, uloc);
                 flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -3313,7 +3308,6 @@ public:
                 const int new_floor = d.current_floor;
                 shared_ptr<dungeon_floor> df2 = d.floors[new_floor];
                 const vec3 uloc = df2->get_upstairs_loc();
-                //tile_t& t2 = df2.df_tile_at(uloc);
                 df2->df_add_at(hero_id, uloc);
                 ct.set<location>(hero_id, uloc);
                 flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -3876,19 +3870,19 @@ public:
                 if (is_entity_adjacent(id, tgt_id)) {
                     const vec3 loc = ct.get<location>(tgt_id).value();
                     const attack_result_t result = try_entity_attack(id, loc.x, loc.y);
-                    if (result == ATTACK_RESULT_BLOCK) {
-                        minfo2("attack result: blocked");
-                    } else if (result == ATTACK_RESULT_HIT) {
-                        minfo2("attack result: hit");
-                    } else if (result == ATTACK_RESULT_MISS) {
-                        minfo2("attack result: miss");
-                    } else if (result == ATTACK_RESULT_NONE) {
-                        minfo2("attack result: none");
-                    } else if (result == ATTACK_RESULT_COUNT) {
-                        minfo2("attack result: count");
-                    } else {
-                        minfo2("attack result: unknown");
-                    }
+                    //if (result == ATTACK_RESULT_BLOCK) {
+                    //    minfo2("attack result: blocked");
+                    //} else if (result == ATTACK_RESULT_HIT) {
+                    //    minfo2("attack result: hit");
+                    //} else if (result == ATTACK_RESULT_MISS) {
+                    //    minfo2("attack result: miss");
+                    //} else if (result == ATTACK_RESULT_NONE) {
+                    //    minfo2("attack result: none");
+                    //} else if (result == ATTACK_RESULT_COUNT) {
+                    //    minfo2("attack result: count");
+                    //} else {
+                    //    minfo2("attack result: unknown");
+                    //}
                     return true;
                 }
             }
