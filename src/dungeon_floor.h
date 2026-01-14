@@ -16,12 +16,8 @@
 #include <vector>
 
 
-
-
 #define DEFAULT_DUNGEON_FLOOR_WIDTH (16)
 #define DEFAULT_DUNGEON_FLOOR_HEIGHT (12)
-
-
 
 
 using std::function;
@@ -30,10 +26,7 @@ using std::unordered_map;
 using std::vector;
 
 
-
-
-class dungeon_floor
-{
+class dungeon_floor {
 private:
     int floor; // the floor number, starting from 0
     int width;
@@ -49,15 +42,10 @@ private:
     shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
 
 
-
-
 public:
-    bool room_id_exists(room_id id)
-    {
-        for (auto room : *room_metadatas)
-        {
-            if (room.get_id() == id)
-            {
+    bool room_id_exists(room_id id) {
+        for (auto room : *room_metadatas) {
+            if (room.get_id() == id) {
                 return true;
             }
         }
@@ -65,15 +53,10 @@ public:
     }
 
 
-
-
-    bool room_area_collides(Rectangle a)
-    {
-        for (auto room : *room_metadatas)
-        {
+    bool room_area_collides(Rectangle a) {
+        for (auto room : *room_metadatas) {
             const Rectangle r = room.get_area();
-            if (CheckCollisionRecs(a, r))
-            {
+            if (CheckCollisionRecs(a, r)) {
                 return true;
             }
         }
@@ -81,17 +64,11 @@ public:
     }
 
 
-
-
-    bool add_room(room r)
-    {
+    bool add_room(room r) {
         // need to check for existing rooms
-        if (room_id_exists(r.get_id()))
-        {
+        if (room_id_exists(r.get_id())) {
             return false;
-        }
-        else if (room_area_collides(r.get_area()))
-        {
+        } else if (room_area_collides(r.get_area())) {
             return false;
         }
 
@@ -100,56 +77,37 @@ public:
     }
 
 
-
-
-    room get_room_metadata(size_t i)
-    {
+    room get_room_metadata(size_t i) {
         return room_metadatas->at(i);
     }
 
 
-
-
-    shared_ptr<vector<room>> get_room_metadatas()
-    {
+    shared_ptr<vector<room>> get_room_metadatas() {
         return room_metadatas;
     }
 
 
-
-
-    shared_ptr<vector<entityid>> get_dead_npcs()
-    {
+    shared_ptr<vector<entityid>> get_dead_npcs() {
         return dead_npcs;
     }
 
 
-
-
-    shared_ptr<vector<entityid>> get_living_npcs()
-    {
+    shared_ptr<vector<entityid>> get_living_npcs() {
         return living_npcs;
     }
 
 
-
-
-    void add_dead_npc(entityid id)
-    {
+    void add_dead_npc(entityid id) {
         massert(id != ENTITYID_INVALID, "id is invalid");
         dead_npcs->push_back(id);
     }
 
 
-
-
-    bool remove_dead_npc(entityid id)
-    {
+    bool remove_dead_npc(entityid id) {
         massert(id != ENTITYID_INVALID, "id is invalid");
 
         auto it = find(dead_npcs->cbegin(), dead_npcs->cend(), id);
-        if (it == dead_npcs->cend())
-        {
+        if (it == dead_npcs->cend()) {
             return false;
         }
         dead_npcs->erase(it);
@@ -157,24 +115,17 @@ public:
     }
 
 
-
-
-    void add_living_npc(entityid id)
-    {
+    void add_living_npc(entityid id) {
         massert(id != ENTITYID_INVALID, "id is invalid");
         living_npcs->push_back(id);
     }
 
 
-
-
-    bool remove_living_npc(entityid id)
-    {
+    bool remove_living_npc(entityid id) {
         massert(id != ENTITYID_INVALID, "id is invalid");
 
         auto it = find(living_npcs->cbegin(), living_npcs->cend(), id);
-        if (it == living_npcs->cend())
-        {
+        if (it == living_npcs->cend()) {
             return false;
         }
         living_npcs->erase(it);
@@ -182,58 +133,37 @@ public:
     }
 
 
-
-
-    const vec3 get_upstairs_loc()
-    {
+    const vec3 get_upstairs_loc() {
         return upstairs_loc;
     }
 
 
-
-
-    const vec3 get_downstairs_loc()
-    {
+    const vec3 get_downstairs_loc() {
         return downstairs_loc;
     }
 
 
-
-
-    const biome_t get_biome()
-    {
+    const biome_t get_biome() {
         return biome;
     }
 
 
-
-
-    const int get_height()
-    {
+    const int get_height() {
         return height;
     }
 
 
-
-
-    const int get_width()
-    {
+    const int get_width() {
         return width;
     }
 
 
-
-
-    const int get_floor()
-    {
+    const int get_floor() {
         return floor;
     }
 
 
-
-
-    inline shared_ptr<tile_t> tile_at(const vec3 loc)
-    {
+    inline shared_ptr<tile_t> tile_at(const vec3 loc) {
         // given that tiles is a 2D vector of shared pointers to tile_t
         // we can access the tile using the x and y coordinates
         // and calculate the index
@@ -247,23 +177,16 @@ public:
     }
 
 
-
-
-    inline void df_set_can_have_door(const vec3 loc)
-    {
+    inline void df_set_can_have_door(const vec3 loc) {
         //minfo("set can have door: %d, %d, %d", loc.x, loc.y, loc.z);
         shared_ptr<tile_t> tile = tile_at(loc);
         tile->set_can_have_door(true);
     }
 
 
-
-
-    inline bool df_is_good_door_loc(vec3 loc)
-    {
+    inline bool df_is_good_door_loc(vec3 loc) {
         auto tile = tile_at(loc);
-        if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1)
-        {
+        if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1) {
             auto t0 = tile_at((vec3){loc.x - 1, loc.y - 1, loc.z});
             auto t1 = tile_at((vec3){loc.x - 1, loc.y, loc.z});
             auto t2 = tile_at((vec3){loc.x - 1, loc.y + 1, loc.z});
@@ -280,12 +203,10 @@ public:
             auto tw5 = t5->tile_is_wall();
             auto tw6 = t6->tile_is_wall();
             auto tw7 = t7->tile_is_wall();
-            if (tw3 && tw4 && !(tw0 || tw1 || tw2 || tw5 || tw6 || tw7))
-            {
+            if (tw3 && tw4 && !(tw0 || tw1 || tw2 || tw5 || tw6 || tw7)) {
                 return true;
             }
-            if (tw1 && tw6 && !(tw0 || tw2 || tw3 || tw4 || tw5 || tw7))
-            {
+            if (tw1 && tw6 && !(tw0 || tw2 || tw3 || tw4 || tw5 || tw7)) {
                 return true;
             }
         }
@@ -293,13 +214,9 @@ public:
     }
 
 
-
-
-    inline bool tile_is_good_for_upgrade(vec3 loc)
-    {
+    inline bool tile_is_good_for_upgrade(vec3 loc) {
         auto tile = tile_at(loc);
-        if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1)
-        {
+        if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1) {
             auto t0 = tile_at((vec3){loc.x - 1, loc.y - 1, loc.z});
             auto t1 = tile_at((vec3){loc.x - 1, loc.y, loc.z});
             auto t2 = tile_at((vec3){loc.x - 1, loc.y + 1, loc.z});
@@ -324,8 +241,7 @@ public:
 
             auto case1 = top_row_none && bottom_row_none && left_not_none && right_not_none;
 
-            if (case1)
-            {
+            if (case1) {
                 return true;
             }
         }
@@ -333,33 +249,22 @@ public:
     }
 
 
-
-
-    inline void df_set_tile(const tiletype_t type, const int x, const int y)
-    {
+    inline void df_set_tile(const tiletype_t type, const int x, const int y) {
         shared_ptr<tile_t> current = tile_at((vec3){x, y, -1});
         current->set_type(type);
         //current.tile_init(type);
     }
 
 
-
-
-    const inline tiletype_t random_tiletype(const tiletype_t a, const tiletype_t b)
-    {
+    const inline tiletype_t random_tiletype(const tiletype_t a, const tiletype_t b) {
         return (tiletype_t)GetRandomValue(a, b);
     }
 
 
-
-
-    inline void set_area(const tiletype_t a, const tiletype_t b, const Rectangle r)
-    {
+    inline void set_area(const tiletype_t a, const tiletype_t b, const Rectangle r) {
         //minfo("df set area");
-        for (int x = r.x; x < r.x + r.width && x < width; x++)
-        {
-            for (int y = r.y; y < r.y + r.height && y < height; y++)
-            {
+        for (int x = r.x; x < r.x + r.width && x < width; x++) {
+            for (int y = r.y; y < r.y + r.height && y < height; y++) {
                 const tiletype_t t = random_tiletype(a, b);
                 df_set_tile(t, x, y);
             }
@@ -367,19 +272,14 @@ public:
     }
 
 
-
-
-    inline void df_set_perimeter(const tiletype_t a, const tiletype_t b, const Rectangle r)
-    {
-        for (int x = r.x; x < r.x + r.width; x++)
-        {
+    inline void df_set_perimeter(const tiletype_t a, const tiletype_t b, const Rectangle r) {
+        for (int x = r.x; x < r.x + r.width; x++) {
             const tiletype_t t = random_tiletype(a, b);
             df_set_tile(t, x, r.y);
             df_set_tile(t, x, r.y + r.height - 1);
         }
 
-        for (int y = r.y; y < r.y + r.height; y++)
-        {
+        for (int y = r.y; y < r.y + r.height; y++) {
             const tiletype_t t = random_tiletype(a, b);
             df_set_tile(t, r.x, y);
             df_set_tile(t, r.x + r.width - 1, y);
@@ -387,10 +287,7 @@ public:
     }
 
 
-
-
-    inline void init(const int f, const biome_t t, const int w, const int h)
-    {
+    inline void init(const int f, const biome_t t, const int w, const int h) {
         minfo2("df init: f=%d, t=%d, w=%d, h=%d", f, t, w, h);
         massert(w > 0, "width must be greater than zero");
         massert(h > 0, "height must be greater than zero");
@@ -411,8 +308,7 @@ public:
         massert(tile_map, "failed to create tile map");
         // create all the tiles and add to the tile vector and tile map
         //minfo2("pushing tiles...");
-        for (tile_id i = 0; i < width * height; i++)
-        {
+        for (tile_id i = 0; i < width * height; i++) {
             minfo2("Begin loop %d", i);
             tiles.push_back(i);
             //tile_map->emplace(i, tile_t(TILE_NONE, i));
@@ -435,17 +331,12 @@ public:
     }
 
 
-
-
-    inline void df_xform(function<void()> mLambda)
-    {
+    inline void df_xform(function<void()> mLambda) {
         mLambda();
     }
 
 
-
-    inline int df_get_possible_downstairs_count_in_area(const Rectangle r)
-    {
+    inline int df_get_possible_downstairs_count_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
         massert(r.y >= 0, "y is less than zero");
@@ -455,14 +346,11 @@ public:
         massert(r.x + r.width <= width, "x + w is out of bounds");
         massert(r.y + r.height <= height, "y + h is out of bounds");
         int count = 0;
-        for (int y0 = r.y; y0 < height; y0++)
-        {
-            for (int x0 = r.x; x0 < width; x0++)
-            {
+        for (int y0 = r.y; y0 < height; y0++) {
+            for (int x0 = r.x; x0 < width; x0++) {
                 shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
                 // check if the tile is possible downstairs
-                if (tile_is_possible_downstairs(tile->get_type()))
-                {
+                if (tile_is_possible_downstairs(tile->get_type())) {
                     count++;
                 }
             }
@@ -471,9 +359,7 @@ public:
     }
 
 
-
-    inline int df_get_possible_upstairs_count_in_area(const Rectangle r)
-    {
+    inline int df_get_possible_upstairs_count_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
         massert(r.y >= 0, "y is less than zero");
@@ -484,13 +370,10 @@ public:
         massert(r.y + r.height <= height, "y + h is out of bounds");
 
         int count = 0;
-        for (int y0 = r.y; y0 < height; y0++)
-        {
-            for (int x0 = r.x; x0 < width; x0++)
-            {
+        for (int y0 = r.y; y0 < height; y0++) {
+            for (int x0 = r.x; x0 < width; x0++) {
                 shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
-                if (tile_is_possible_upstairs(tile->get_type()))
-                {
+                if (tile_is_possible_upstairs(tile->get_type())) {
                     count++;
                 }
             }
@@ -499,20 +382,15 @@ public:
     }
 
 
-
-    inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(const Rectangle r)
-    {
+    inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(const Rectangle r) {
         auto locations = make_shared<vector<vec3>>();
         massert(locations, "failed to make_shared locations");
         // now we can loop thru the dungeon floor again and fill the array with the locations
-        for (int y0 = r.y; y0 < height; y0++)
-        {
-            for (int x0 = r.x; x0 < width; x0++)
-            {
+        for (int y0 = r.y; y0 < height; y0++) {
+            for (int x0 = r.x; x0 < width; x0++) {
                 shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
                 // there wont be any entities yet so do not check for them
-                if (tile_is_possible_upstairs(tile->get_type()))
-                {
+                if (tile_is_possible_upstairs(tile->get_type())) {
                     locations->push_back((vec3){x0, y0, 0});
                 }
             }
@@ -521,8 +399,7 @@ public:
     }
 
 
-    inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(const Rectangle r)
-    {
+    inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
         massert(r.y >= 0, "y is less than zero");
@@ -530,14 +407,11 @@ public:
         shared_ptr<vector<vec3>> locations = make_shared<vector<vec3>>();
         massert(locations, "failed to make_shared locations");
         // now we can loop thru the dungeon floor again and fill the array with the locations
-        for (int y0 = r.y; y0 < height; y0++)
-        {
-            for (int x0 = r.x; x0 < width; x0++)
-            {
+        for (int y0 = r.y; y0 < height; y0++) {
+            for (int x0 = r.x; x0 < width; x0++) {
                 shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
                 // there wont be any entities yet so do not check for them
-                if (tile_is_possible_downstairs(tile->get_type()))
-                {
+                if (tile_is_possible_downstairs(tile->get_type())) {
                     locations->push_back((vec3){x0, y0, 0});
                 }
             }
@@ -546,58 +420,45 @@ public:
     }
 
 
-
-
-    inline int df_get_possible_upstairs_count()
-    {
+    inline int df_get_possible_upstairs_count() {
         return df_get_possible_upstairs_count_in_area((Rectangle){0, 0, (float)width, (float)height});
     }
 
 
-
-
-    inline int df_get_possible_downstairs_count()
-    {
+    inline int df_get_possible_downstairs_count() {
         return df_get_possible_downstairs_count_in_area((Rectangle){0, 0, (float)width, (float)height});
     }
 
 
-
-
-    inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs()
-    {
+    inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs() {
         auto locs = df_get_possible_upstairs_locs_in_area((Rectangle){0, 0, (float)width, (float)height});
         massert(locs, "failed to get possible upstairs locations");
         return locs;
     }
 
 
-
-
-    inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs()
-    {
+    inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs() {
         auto locs = df_get_possible_downstairs_locs_in_area((Rectangle){0, 0, (float)width, (float)height});
         massert(locs, "failed to get possible downstairs locations");
         return locs;
     }
 
 
-
-
-    inline void df_free()
-    {
+    inline void df_free() {
         //minfo("df_free");
         tiles.clear();
         tile_map->clear();
     }
 
 
-
-
     //inline entityid df_add_at(entityid id, int x, int y)
-    inline entityid df_add_at(entityid id, vec3 loc)
-    {
-        massert(id != ENTITYID_INVALID, "id is invalid");
+    inline entityid df_add_at(entityid id, vec3 loc) {
+        if (id == ENTITYID_INVALID) {
+            minfo("id is invalid");
+            return ENTITYID_INVALID;
+        }
+
+        //massert(id != ENTITYID_INVALID, "id is invalid");
         massert(!vec3_invalid(loc), "loc is invalid");
         massert(loc.x >= 0 && loc.x < width, "x is out of bounds");
         massert(loc.y >= 0 && loc.y < height, "y is out of bounds");
@@ -605,31 +466,25 @@ public:
         //shared_ptr<tile_t> tile = df_tile_at(vec3{x, y, -1});
         shared_ptr<tile_t> tile = tile_at(loc);
         const entityid result = tile->tile_add(id);
-        if (result == ENTITYID_INVALID)
-        {
+        if (result == ENTITYID_INVALID) {
             minfo("tile_add returned %d", result);
         }
         return result;
     }
 
 
-
-
     //inline bool df_remove_at(entityid id, int x, int y)
-    inline bool df_remove_at(entityid id, vec3 l)
-    {
+    inline bool df_remove_at(entityid id, vec3 l) {
         massert(id != ENTITYID_INVALID, "id is -1");
         massert(l.x >= 0 && l.x < width, "x is out of bounds");
         massert(l.y >= 0 && l.y < height, "y is out of bounds");
         shared_ptr<tile_t> tile = tile_at(l);
         const entityid r = tile->tile_remove(id);
-        if (r == ENTITYID_INVALID)
-        {
+        if (r == ENTITYID_INVALID) {
             merror("df_remove_at: Failed to remove entity %d at (%d, %d)", id, l.x, l.y);
             return false;
         }
-        if (r != id)
-        {
+        if (r != id) {
             merror("df_remove_at: Removed entity %d but expected to remove %d at (%d, %d)", r, id, l.x, l.y);
             return false;
         }
@@ -637,43 +492,32 @@ public:
     }
 
 
-
-
-    inline void df_set_all_tiles(const tiletype_t type)
-    {
+    inline void df_set_all_tiles(const tiletype_t type) {
         //minfo("df_set_all_tiles: Setting all tiles to type %d", type);
         set_area(type, type, (Rectangle){0, 0, (float)width, (float)height});
     }
 
 
-
-
-    const inline vec3 df_get_random_loc()
-    {
+    const inline vec3 df_get_random_loc() {
         vector<vec3> tmp;
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 const vec3 loc = {x, y, floor};
                 auto tile = tile_at(loc);
                 const bool type_invalid = tile->get_type() == TILE_NONE || tile->get_type() == TILE_STONE_WALL_00 || tile->get_type() == TILE_STONE_WALL_01 ||
                                           tile->get_type() == TILE_UPSTAIRS || tile->get_type() == TILE_DOWNSTAIRS;
-                if (type_invalid)
-                {
+                if (type_invalid) {
                     //merror("loc at (%d, %d, %d) type invalid. type is: %d", x, y, floor, tile.type);
                     continue;
                 }
-                if (tile->get_entity_count() > 0)
-                {
+                if (tile->get_entity_count() > 0) {
                     //merror("loc at (%d, %d, %d) type invalid. tile has %ld entities", x, y, floor, tile.entities->size());
                     continue;
                 }
                 tmp.push_back(loc);
             }
         }
-        if (tmp.size() == 0)
-        {
+        if (tmp.size() == 0) {
             merror2("no locations are suitable. returning (-1, -1, -1)");
             return (vec3){-1, -1, -1};
         }
@@ -681,19 +525,13 @@ public:
     }
 
 
-
-
-    const inline vec3 df_get_random_loc_of_type(const tiletype_t type)
-    {
+    const inline vec3 df_get_random_loc_of_type(const tiletype_t type) {
         vector<vec3> tmp;
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 vec3 loc = {x, y, floor};
                 auto tile = tile_at(loc);
-                if (tile->get_type() != type)
-                {
+                if (tile->get_type() != type) {
                     continue;
                 }
                 //if (tile.type == TILE_NONE || tile.type == TILE_STONE_WALL_00 || tile.type == TILE_STONE_WALL_01 || tile.type == TILE_UPSTAIRS ||
@@ -704,8 +542,7 @@ public:
                 tmp.push_back(loc);
             }
         }
-        if (tmp.size() == 0)
-        {
+        if (tmp.size() == 0) {
             return (vec3){-1, -1, -1};
         }
         vec3 loc = tmp[GetRandomValue(0, tmp.size() - 1)];
@@ -713,19 +550,13 @@ public:
     }
 
 
-
-
-    dungeon_floor()
-    {
+    dungeon_floor() {
         upstairs_loc = {-1, -1, -1};
         downstairs_loc = {-1, -1, -1};
     }
 
 
-
-
-    ~dungeon_floor()
-    {
+    ~dungeon_floor() {
         minfo2("dungeon floor destroyed");
     }
 };

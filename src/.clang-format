@@ -52,7 +52,8 @@ BinPackArguments: false
 BinPackParameters: false
 
 # Configure each individual brace in BraceWrapping
-BreakBeforeBraces: Allman 
+#BreakBeforeBraces: Allman 
+BreakBeforeBraces: Attach
 #BreakBeforeBraces: false
 # Control of individual brace wrapping cases
 BraceWrapping: {
@@ -98,7 +99,7 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 MacroBlockBegin: ''
 MacroBlockEnd:   ''
 JavaScriptQuotes: Double
-MaxEmptyLinesToKeep: 4
+MaxEmptyLinesToKeep: 2
 NamespaceIndentation: None
 ObjCBlockIndentWidth: 4
 ObjCSpaceAfterProperty: true
