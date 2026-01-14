@@ -119,6 +119,16 @@ static inline void libdraw_init_rest(gamestate& g) {
 }
 
 
+//static inline void load_font(const char* path) {
+//gfont = LoadFont(path);
+//gfont = LoadFontEx(path, 10, 0, 0);
+//gfont_10 = LoadFontEx(path, 10, 0, 0);
+//gfont_20 = LoadFontEx(path, 20, 0, 0);
+//gfont_30 = LoadFontEx(path, 30, 0, 0);
+//gfont_40 = LoadFontEx(path, 40, 0, 0);
+//}
+
+
 static inline void libdraw_init(gamestate& g) {
     const int w = DEFAULT_WIN_WIDTH;
     const int h = DEFAULT_WIN_HEIGHT;
@@ -130,6 +140,9 @@ static inline void libdraw_init(gamestate& g) {
     g.windowwidth = w;
     g.windowheight = h;
     SetWindowMinSize(320, 240);
+
+    //load_font("fonts/departuremono.otf");
+
     libdraw_init_rest(g);
 }
 
