@@ -1683,7 +1683,7 @@ public:
         auto df = d.get_current_floor();
         for (auto loc : path) {
             auto t = df->tile_at(loc);
-            if (tile_is_none(t->get_type())) {
+            if (tiletype_is_none(t->get_type())) {
                 return true;
             } else if (tiletype_is_wall(t->get_type())) {
                 return true;

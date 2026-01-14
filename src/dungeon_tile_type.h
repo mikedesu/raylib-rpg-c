@@ -172,7 +172,7 @@ static inline std::string tiletype2str(const tiletype_t type) {
 }
 
 
-constexpr static inline bool tile_is_none(const tiletype_t type) {
+constexpr static inline bool tiletype_is_none(const tiletype_t type) {
     return type == TILE_NONE;
 }
 
