@@ -19,6 +19,7 @@
 #include "libgame_defines.h"
 #include "libgame_version.h"
 #include "magic_values.h"
+#include "option_menu.h"
 #include "orc_names.h"
 #include "potion.h"
 #include "roll.h"
@@ -181,6 +182,8 @@ public:
     Font font;
 
     ComponentTable ct;
+
+    option_menu options_menu;
 
 
 
@@ -856,7 +859,7 @@ public:
                         const int rx_e = r.get_x() + r.get_w();
                         const float rxf_e = r.get_x() + r.get_w();
                         // calc center x of room 2
-                        const int rjx = r2.get_x() + r2.get_w() / 2;
+                        //const int rjx = r2.get_x() + r2.get_w() / 2;
                         // calc edge of room 2
                         const int rjx_e = r2.get_x();
                         // calc width of hallway
@@ -880,7 +883,7 @@ public:
                         room& r2 = rooms[index2];
                         const int ry_e = r.get_y() + r.get_h();
                         const float ryf_e = r.get_y() + r.get_h();
-                        const int rjy = r2.get_y() + r2.get_h() / 2;
+                        //const int rjy = r2.get_y() + r2.get_h() / 2;
                         const int rjy_e = r2.get_y();
                         //const float rh = rjy - riy;
                         const float rh = rjy_e - ry_e;
@@ -4592,6 +4595,24 @@ public:
         {
             display_option_menu = false;
             controlmode = CONTROLMODE_PLAYER;
+            return;
+        }
+
+        if (inputstate_is_pressed(is, KEY_UP))
+        {
+            options_menu.decr_selection();
+            return;
+        }
+
+        if (inputstate_is_pressed(is, KEY_DOWN))
+        {
+            options_menu.incr_selection();
+            return;
+        }
+
+        if (inputstate_is_pressed(is, KEY_ENTER))
+        {
+            minfo("Enter pressed");
             return;
         }
     }
