@@ -13,7 +13,7 @@ gamestate g;
 static inline void gameloop() {
     inputstate_update(is);
     g.tick(is);
-    libdraw_drawframe(g);
+    drawframe(g);
     if (g.do_restart) {
         msuccess("Restarting game...");
         libdraw_close();

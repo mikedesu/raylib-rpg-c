@@ -35,7 +35,7 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
 
 
-static inline void libdraw_drawframe(gamestate& g) {
+static inline void drawframe(gamestate& g) {
     const double start_time = GetTime();
     libdraw_update_sprites_pre(g);
     BeginDrawing();

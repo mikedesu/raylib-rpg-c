@@ -3869,7 +3869,8 @@ public:
                 // handle attack adjacent enemy
                 if (is_entity_adjacent(id, tgt_id)) {
                     const vec3 loc = ct.get<location>(tgt_id).value();
-                    const attack_result_t result = try_entity_attack(id, loc.x, loc.y);
+                    try_entity_attack(id, loc.x, loc.y);
+                    //const attack_result_t result = try_entity_attack(id, loc.x, loc.y);
                     //if (result == ATTACK_RESULT_BLOCK) {
                     //    minfo2("attack result: blocked");
                     //} else if (result == ATTACK_RESULT_HIT) {
