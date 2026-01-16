@@ -34,6 +34,10 @@ I have already done the following:
 - [x] **FEATURE** we should be able to change track on track end
 - [x] **API** we need a way to simulate gameplay in a manner similar to how unit_test works while actually rendering the game
   - [x] in the function where the player's `test` switch is controlled in `handle_input`, we can check current frame and act only on certain frames
+- [x] **FIXED** **BUG** the `-DMUSIC_OFF` flag is not properly handled
+  - [x] it currently appears to be off for the first track it plays, but then comes back on for
+  track 2
+  - [x] the main hint i can give myself as to where this bug is occuring is that we need to grep for functions related to `Audio` and `Sound`, mainly related to `Music`...
 - [x] **FIXED** automated gameplay system found you can move while dead
   - [x] halting movement while dead in `test` but future mechanics may allow for this:
     - [ ] dragging bodies

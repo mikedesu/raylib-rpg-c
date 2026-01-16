@@ -16,19 +16,22 @@ static inline void load_random_music(gamestate& g) {
     minfo("Music path: %s", music_path);
     music = LoadMusicStream(music_path);
     music.looping = false;
-
     minfo2("END load_random_music");
 }
 
 
 static inline void handle_music_stream(gamestate& g) {
     UpdateMusicStream(music);
-
     // handle load next music track
     if (!IsMusicStreamPlaying(music)) {
         StopMusicStream(music);
         UnloadMusicStream(music);
         load_random_music(g);
+#ifdef MUSIC_OFF
+        SetMusicVolume(music, 0.0f); // Set initial music volume
+#else
+        SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
+#endif
         PlayMusicStream(music);
     }
 }

@@ -23,11 +23,9 @@ static inline void libdraw_update_sprites_pre(gamestate& g) {
         if (g.flag == GAMESTATE_FLAG_PLAYER_INPUT || g.flag == GAMESTATE_FLAG_PLAYER_ANIM) {
             //ANIM_SPEED = DEFAULT_ANIM_SPEED * 2;
             ANIM_SPEED = DEFAULT_ANIM_SPEED;
-            //ANIM_SPEED = DEFAULT_ANIM_SPEED;
         } else if (g.flag == GAMESTATE_FLAG_NPC_TURN || g.flag == GAMESTATE_FLAG_NPC_ANIM) {
             //ANIM_SPEED = DEFAULT_ANIM_SPEED * 4;
             ANIM_SPEED = DEFAULT_ANIM_SPEED;
-            //ANIM_SPEED = DEFAULT_ANIM_SPEED;
         }
         minfo2("Begin handling dirty entities");
         libdraw_handle_dirty_entities(g);
@@ -43,11 +41,6 @@ static inline void libdraw_update_sprites_pre(gamestate& g) {
 
 
 static inline void libdraw_update_sprites_post(gamestate& g) {
-    //if (g->music_volume_changed) {
-    //    SetMusicVolume(music, g->music_volume);
-    //    g->music_volume_changed = false;
-    //}
-    //UpdateMusicStream(music);
     minfo2("BEGIN update sprites post");
     if (g.current_scene != SCENE_GAMEPLAY) {
         g.frame_dirty = false;
