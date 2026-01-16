@@ -111,6 +111,49 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, co
 }
 
 
+static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc) {
+    // Get hero's vision distance and location
+    const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
+    const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
+    massert(!vec3_invalid(hero_loc), "hero_loc invalid");
+    const int dist_to_check = std::max(vision_dist, light_rad);
+    // Calculate Manhattan distance from hero to this tile (diamond pattern)
+    const int dist = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
+    // Only draw entities within vision distance
+    // we might want to enforce a drawing order with the introduction of doors...
+    if (dist > dist_to_check) {
+        return true;
+    }
+    return false;
+}
+
+
+static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> df, vec3 loc, vec3 hero_loc) {
+    vector<vec3> path = calculate_path_with_thickness(loc, hero_loc);
+    bool object_blocking = false;
+    for (auto v0 : path) {
+        auto v0_tile = df->tile_at(v0);
+        auto v0_tiletype = v0_tile->get_type();
+        if (tiletype_is_none(v0_tiletype) || tiletype_is_wall(v0_tiletype)) {
+            object_blocking = true;
+            break;
+        }
+        // check if tile has a DOOR
+        for (const entityid id : *v0_tile->get_entities()) {
+            auto type_is_door = g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR;
+            auto is_open = g.ct.get<door_open>(id).value_or(false);
+            if (type_is_door && !is_open) {
+                object_blocking = true;
+                break;
+            }
+        }
+        if (object_blocking)
+            break;
+    }
+    return object_blocking;
+}
+
+
 static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, function<bool(gamestate&, entityid)> extra_check) {
     auto df = g.d.get_current_floor();
     const int z = g.d.current_floor;
@@ -118,90 +161,24 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
         for (int x = 0; x < df->get_width(); x++) {
             const vec3 loc = {x, y, z};
             auto tile = df->tile_at(loc);
-            //if (!tile.visible) {
-            //    continue;
-            //}
-            if (tiletype_is_none(tile->get_type())) {
-                continue;
-            } else if (tiletype_is_wall(tile->get_type())) {
+            auto tiletype = tile->get_type();
+            auto tile_is_none = tiletype_is_none(tiletype);
+            auto tile_is_wall = tiletype_is_wall(tiletype);
+            auto hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
+            auto is_too_far = is_loc_too_far_to_draw(g, loc, hero_loc);
+            if (tile_is_none || tile_is_wall || is_too_far) {
                 continue;
             }
-            //if (tile.is_empty) {
-            //    continue;
-            //}
             // bugfix for tall walls so entities do not draw on top:
             // check to see if the tile directly beneath this tile is a wall
-            //const vec3 loc2 = {x, y + 1, z};
-            //const auto tile2 = df_tile_at(df, loc2);
-            //if (tile2.type == TILE_STONE_WALL_00) {
+            //const auto tile2 = df_tile_at(df, loc {x, y+1, z});
+            //if (tile2.type == TILE_STONE_WALL_00)
             //    continue;
-            //}
-            // Get hero's vision distance and location
-            const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
-            const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
-            auto maybe_hero_loc = g.ct.get<location>(g.hero_id);
-            if (!maybe_hero_loc.has_value()) {
-                merror("Hero's location not set");
-                continue;
-            }
-            const vec3 hero_loc = maybe_hero_loc.value();
-            const int dist_to_check = std::max(vision_dist, light_rad);
-            // Calculate Manhattan distance from hero to this tile (diamond pattern)
-            const int dist = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
-            // Only draw entities within vision distance
-            // we might want to enforce a drawing order with the introduction of doors...
-            if (dist > dist_to_check) {
-                continue;
-            }
-            // further, we need to step from the hero's location+1 to the tile location-1
-            // for each tile in this path, we need to check to see if
-            // 1. the tiletype is a WALL
-            // 2. the tile contains a DOOR entity
-            // if either is true, then there is an object blocking our visibility of any entities
-            // it will be eventually possible to "see-thru-walls" in the future to overcome this...
-            // Calculate path from entity to hero
-            vector<vec3> path = calculate_path_with_thickness(loc, hero_loc);
-            // 2. for each item in path
-            bool object_blocking = false;
-            for (auto v0 : path) {
-                shared_ptr<tile_t> v0_tile = df->tile_at(v0);
-                if (tiletype_is_none(v0_tile->get_type())) {
-                    object_blocking = true;
-                    break;
-                }
-                if (tiletype_is_wall(v0_tile->get_type())) {
-                    object_blocking = true;
-                    break;
-                }
-                // check if tile has a DOOR
-                //for_each(
-                //    v0_tile.get_entities()->cbegin(),
-                //    v0_tile.get_entities()->cend(),
-                //    [&g, &object_blocking](const entityid& id)
-                //    {
-                //        if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false))
-                //            object_blocking = true;
-                //    });
-                for (const entityid id : *v0_tile->get_entities()) {
-                    if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false)) {
-                        object_blocking = true;
-                        break;
-                    }
-                }
-                if (object_blocking) {
-                    break;
-                }
-            }
-            // render all props
-            //for_each(tile.entities->cbegin(), tile.entities->cend(), [&g, entitytype_0](const entityid& id) {
-            //    auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            //    if (entitytype_0 == ENTITY_PROP && type == ENTITY_PROP)
-            //        draw_sprite_and_shadow(g, id);
-            //});
-            //if (object_blocking) {
-            //    continue;
-            //}
-            for_each(tile->get_entities()->cbegin(), tile->get_entities()->cend(), [&g, type_0, object_blocking, &extra_check](const entityid& id) {
+            bool object_blocking = is_loc_path_blocked(g, df, loc, hero_loc);
+            // render all entities if not blocked
+            auto entities_begin = tile->get_entities()->cbegin();
+            auto entities_end = tile->get_entities()->cend();
+            for_each(entities_begin, entities_end, [&g, type_0, object_blocking, &extra_check](const entityid& id) {
                 const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
                 //auto sm = g.ct.get<spritemove>(id).value_or((Rectangle){0, 0, 0, 0});
                 //spritegroup_t* sg = spritegroups[id];
@@ -211,11 +188,6 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
                 if (!object_blocking && type_0 == type && extra_check(g, id)) {
                     draw_sprite_and_shadow(g, id);
                 }
-                //else if (object_blocking && entitytype_0 == ENTITY_PROP && type == ENTITY_PROP) {
-                //    merror("A prop is being blocked by an object");
-                //} else if (type == ENTITY_PROP) {
-                //    merror("A prop is here");
-                //}
             });
         }
     }
