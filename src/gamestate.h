@@ -109,17 +109,18 @@ public:
     bool gameover;
     bool player_changing_dir;
     bool test_guard;
+
     bool display_inventory_menu;
     bool display_action_menu;
     bool display_option_menu;
-    bool display_quit_menu;
+
     bool do_quit;
     bool dirty_entities;
     bool display_help_menu;
     bool cam_changed;
     bool frame_dirty;
-    bool display_gameplay_settings_menu;
-    bool display_sort_inventory_menu;
+
+
     bool music_volume_changed;
     bool do_restart;
     bool msg_system_is_active;
@@ -400,7 +401,6 @@ public:
         gridon = false;
         display_action_menu = false;
         display_inventory_menu = false;
-        display_quit_menu = false;
         display_help_menu = false;
         do_quit = false;
         processing_actions = false;
@@ -408,7 +408,6 @@ public:
         gameover = false;
         test_guard = false;
         dirty_entities = false;
-        display_sort_inventory_menu = false;
         music_volume_changed = false;
         player_changing_dir = false;
         msg_system_is_active = false;
