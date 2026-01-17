@@ -368,14 +368,13 @@ public:
     }
 
 
-    inline shared_ptr<tile_t> tile_at_cur_floor(const vec3 loc) {
+    inline shared_ptr<tile_t> tile_at_cur_floor(vec3 loc) {
         return d.get_current_floor()->tile_at(loc);
     }
 
 
-    inline void init_dungeon(const biome_t type, const int df_count, const int w, const int h) {
+    inline void init_dungeon(biome_t type, int df_count, int w, int h, float parts) {
         constexpr float min_room_w = 2;
-        constexpr float parts = 4.0;
         minfo2("init_dungeon");
         massert(df_count > 0, "df_count is <= 0");
         massert(w > 0, "w == 0");
@@ -1305,9 +1304,10 @@ public:
         // 8x8   = 4 4x4 areas
         // 16x16 = 4 8x8 areas
         // 32x32 = 4 16x16 areas = 8 8x8 areas
-        const int w = 16; // 4x4 4x4 areas
-        const int h = 16;
-        init_dungeon(BIOME_STONE, 1, w, h);
+        const int w = 32; // 4x4 4x4 areas
+        const int h = 32;
+        constexpr float parts = 4.0;
+        init_dungeon(BIOME_STONE, 1, w, h, parts);
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
         place_doors();
         //place_props();
