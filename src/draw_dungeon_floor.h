@@ -195,39 +195,25 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 
 
 const static inline bool draw_dungeon_floor(gamestate& g) {
-    //minfo2("BEGIN draw dungeon floor");
     shared_ptr<dungeon_floor> df = g.d.get_current_floor();
     const int z = g.d.current_floor;
     // render tiles
-    //minfo2("BEGIN draw dungeon floor --- rendering tiles");
-    //for (int y = 0; y < df.get_height(); y++)
-    //{
-    //    for (int x = 0; x < df.get_width(); x++)
-    //    {
-    //        draw_dungeon_floor_tile(g, txinfo, x, y, z);
-    //    }
-    //}
     for (int i = 0; i < df->get_height() * df->get_width(); i++) {
-        //minfo2("BEGIN draw tile %d", i);
         const int y = i / df->get_width();
         const int x = i - (y * df->get_width());
         draw_dungeon_floor_tile(g, txinfo, x, y, z);
-        //minfo2("END draw tile %d", i);
     }
-    //minfo2("END draw dungeon floor --- rendering tiles");
     auto mydefault = [](gamestate& g, entityid id) { return true; };
     auto alive_check = [](gamestate& g, entityid id) {
         auto maybe_dead = g.ct.get<dead>(id);
-        if (maybe_dead.has_value()) {
+        if (maybe_dead.has_value())
             return !maybe_dead.value();
-        }
         return false;
     };
     auto dead_check = [](gamestate& g, entityid id) {
         auto maybe_dead = g.ct.get<dead>(id);
-        if (maybe_dead.has_value()) {
+        if (maybe_dead.has_value())
             return maybe_dead.value();
-        }
         return false;
     };
     //minfo2("BEGIN draw dungeon floor --- rendering entities");
@@ -235,9 +221,11 @@ const static inline bool draw_dungeon_floor(gamestate& g) {
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PROP, mydefault);
     libdraw_draw_player_target_box(g);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_SPELL, mydefault);
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_BOX, mydefault);
+
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
+    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_BOX, mydefault);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
+
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, alive_check);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, mydefault);
     //minfo2("END draw dungeon floor --- rendering entities");
