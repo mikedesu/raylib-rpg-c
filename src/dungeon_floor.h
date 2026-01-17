@@ -498,7 +498,7 @@ public:
     }
 
 
-    const inline vec3 df_get_random_loc() {
+    const inline vec3 get_random_loc() {
         vector<vec3> tmp;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
