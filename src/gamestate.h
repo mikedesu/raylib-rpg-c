@@ -1436,6 +1436,7 @@ public:
         ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
         ct.set<update>(id, true);
         ct.set<pushable>(id, true);
+        ct.set<pullable>(id, true);
         //boxInitFunction(g, id);
         return id;
     }
@@ -2103,11 +2104,13 @@ public:
             merror2("box present, trying to push");
             return handle_box_push(box_id, v);
         }
+
         const entityid pushable_id = tile_has_pushable(aloc.x, aloc.y, aloc.z);
         if (pushable_id != ENTITYID_INVALID) {
             merror2("pushable present, trying to push");
             return handle_box_push(pushable_id, v);
         }
+
         const bool has_solid = tile_has_solid(aloc.x, aloc.y, aloc.z);
         if (has_solid) {
             merror2("solid present, cannot move");
@@ -2142,18 +2145,15 @@ public:
         }
         // force cache update
         recompute_entity_cache_at(aloc);
-        //minfo("setting location");
         ct.set<location>(id, aloc);
         const float mx = v.x * DEFAULT_TILE_SIZE;
         const float my = v.y * DEFAULT_TILE_SIZE;
-        //minfo("setting spritemove...");
         ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
         if (check_hearing(hero_id, aloc)) {
             // crashes in unittest if missing this check
             if (IsAudioDeviceReady())
                 PlaySound(sfx[SFX_STEP_STONE_1]);
         }
-        //msuccess2("try_entity_move: %d, (%d,%d,%d)", id, v.x, v.y, v.z);
         ct.set<steps_taken>(id, ct.get<steps_taken>(id).value_or(0) + 1);
         msuccess2("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
         return true;
@@ -2568,7 +2568,106 @@ public:
     }
 
 
-    inline bool try_entity_pickup(const entityid id) {
+    inline bool try_entity_pull(entityid id) {
+        massert(id != ENTITYID_INVALID, "Entity is NULL!");
+        ct.set<update>(id, true);
+        vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
+        massert(!vec3_invalid(loc), "loc is invalid");
+        auto df = d.get_floor(loc.z);
+        auto tile = df->tile_at(loc);
+
+        // get the id's direction
+        direction_t facing_d = ct.get<direction>(id).value_or(DIR_NONE);
+        massert(facing_d != DIR_NONE, "direction d is none");
+
+        // opposite dir
+        direction_t d = get_opposite_dir(facing_d);
+
+        vec3 v = get_loc_from_dir(d);
+        vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
+
+        vec3 fv = get_loc_from_dir(facing_d);
+        vec3 bloc = {loc.x + fv.x, loc.y + fv.y, loc.z};
+
+        if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height()) {
+            merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
+            return false;
+        }
+
+        if (!tile_is_walkable(tile->get_type())) {
+            //if (!(god_mode && id == hero_id)) {
+            merror2("tile is not walkable");
+            return false;
+            //}
+        }
+
+
+        const entityid box_id = tile_has_box(aloc.x, aloc.y, aloc.z);
+        if (box_id != ENTITYID_INVALID) {
+            merror2("box present, can't push and pull simultaneously");
+            return false;
+        }
+
+        const bool has_solid = tile_has_solid(aloc.x, aloc.y, aloc.z);
+        if (has_solid) {
+            merror2("solid present, cannot move");
+            return false;
+        } else if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
+            merror2("live npcs present, cannot move");
+            return false;
+        } else if (tile_has_player(tile_at_cur_floor(aloc))) {
+            merror2("player present, cannot move");
+            return false;
+        }
+        const entityid door_id = tile_has_door(aloc);
+        if (door_id != ENTITYID_INVALID) {
+            massert(ct.has<door_open>(door_id), "door_id %d doesnt have a door_open component", door_id);
+            if (!ct.get<door_open>(door_id).value_or(false)) {
+                merror2("door is closed");
+                return false;
+            }
+        }
+
+
+        const entityid box_id2 = tile_has_box(bloc.x, bloc.y, bloc.z);
+        if (box_id2 == ENTITYID_INVALID)
+            return false;
+
+        // remove the entity from the current tile
+        if (!df->df_remove_at(id, loc)) {
+            merror2("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
+            return false;
+        }
+        // force cache update
+        recompute_entity_cache_at(loc);
+        // add the entity to the new tile
+        if (df->df_add_at(id, aloc) == ENTITYID_INVALID) {
+            merror2("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
+            return false;
+        }
+        // force cache update
+        recompute_entity_cache_at(aloc);
+        ct.set<location>(id, aloc);
+        const float mx = v.x * DEFAULT_TILE_SIZE;
+        const float my = v.y * DEFAULT_TILE_SIZE;
+        ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
+        if (check_hearing(hero_id, aloc)) {
+            // crashes in unittest if missing this check
+            if (IsAudioDeviceReady())
+                PlaySound(sfx[SFX_STEP_STONE_1]);
+        }
+        ct.set<steps_taken>(id, ct.get<steps_taken>(id).value_or(0) + 1);
+        msuccess2("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
+
+        // check to see if pullable
+        // for now i will be lazy
+        // and skip this check
+        try_entity_move(box_id2, v);
+        return true;
+    }
+
+
+    inline bool try_entity_pickup(entityid id) {
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
         ct.set<update>(id, true);
         // check if the player is on a tile with an item
@@ -2882,8 +2981,11 @@ public:
             controlmode = CONTROLMODE_OPTION_MENU;
             return;
         } else if (inputstate_is_pressed(is, KEY_SPACE)) {
-            display_action_menu = true;
-            controlmode = CONTROLMODE_ACTION_MENU;
+            //display_action_menu = true;
+            //controlmode = CONTROLMODE_ACTION_MENU;
+            try_entity_pull(hero_id);
+            flag = GAMESTATE_FLAG_PLAYER_ANIM;
+
             return;
         } else if (handle_quit_pressed(is))
             return;
