@@ -111,20 +111,23 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, co
 }
 
 
+constexpr static inline int manhattan_distance(vec3 a, vec3 b) {
+    return abs(a.x - b.x) + abs(a.y - b.y);
+}
+
+
 static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc) {
     // Get hero's vision distance and location
     const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
     const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
     massert(!vec3_invalid(hero_loc), "hero_loc invalid");
+    massert(!vec3_invalid(loc), "loc invalid");
     const int dist_to_check = std::max(vision_dist, light_rad);
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
-    const int dist = abs(loc.x - hero_loc.x) + abs(loc.y - hero_loc.y);
+    const int dist = manhattan_distance(loc, hero_loc);
     // Only draw entities within vision distance
     // we might want to enforce a drawing order with the introduction of doors...
-    if (dist > dist_to_check) {
-        return true;
-    }
-    return false;
+    return dist > dist_to_check;
 }
 
 
@@ -156,41 +159,84 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
 
 static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, function<bool(gamestate&, entityid)> extra_check) {
     auto df = g.d.get_current_floor();
-    const int z = g.d.current_floor;
+    const int df_w = df->get_width();
+    const int df_h = df->get_height();
+    const int num_tiles = df_w * df_h;
+
+    for (int i = 0; i < num_tiles; i++) {
+        int y = i / df_w;
+        int x = i - (y * df_w);
+        const vec3 loc = {x, y, g.d.current_floor};
+        auto tile = df->tile_at(loc);
+        auto tiletype = tile->get_type();
+        if (tiletype_is_none(tiletype) || tiletype_is_wall(tiletype))
+            continue;
+        auto hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
+        massert(!vec3_invalid(hero_loc), "hero loc is invalid");
+        if (is_loc_too_far_to_draw(g, loc, hero_loc))
+            continue;
+        // bugfix for tall walls so entities do not draw on top:
+        // check to see if the tile directly beneath this tile is a wall
+        //if (tile2.type == TILE_STONE_WALL_00)
+        //    continue;
+        //bool object_blocking = is_loc_path_blocked(g, df, loc, hero_loc);
+        // render all entities if not blocked
+        if (is_loc_path_blocked(g, df, loc, hero_loc))
+            continue;
+        //if (!object_blocking) {
+        auto entities_begin = tile->get_entities()->cbegin();
+        auto entities_end = tile->get_entities()->cend();
+        for_each(entities_begin, entities_end, [&g, type_0, &extra_check](entityid id) {
+            const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            //auto sm = g.ct.get<spritemove>(id).value_or((Rectangle){0, 0, 0, 0});
+            //spritegroup_t* sg = spritegroups[id];
+            //if (sg->move.x != 0 || sg->move.y != 0) {
+            //    draw_sprite_and_shadow(g, id);
+            //}
+            if (type_0 == type && extra_check(g, id))
+                draw_sprite_and_shadow(g, id);
+        });
+    }
+
+
+    /*
     for (int y = 0; y < df->get_height(); y++) {
         for (int x = 0; x < df->get_width(); x++) {
-            const vec3 loc = {x, y, z};
+            //int tile_index = y * df_w + x;
+            //int y2 =
+            const vec3 loc = {x, y, g.d.current_floor};
             auto tile = df->tile_at(loc);
             auto tiletype = tile->get_type();
             auto tile_is_none = tiletype_is_none(tiletype);
             auto tile_is_wall = tiletype_is_wall(tiletype);
             auto hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
             auto is_too_far = is_loc_too_far_to_draw(g, loc, hero_loc);
-            if (tile_is_none || tile_is_wall || is_too_far) {
+            if (tile_is_none || tile_is_wall || is_too_far)
                 continue;
-            }
             // bugfix for tall walls so entities do not draw on top:
             // check to see if the tile directly beneath this tile is a wall
-            //const auto tile2 = df_tile_at(df, loc {x, y+1, z});
             //if (tile2.type == TILE_STONE_WALL_00)
             //    continue;
-            bool object_blocking = is_loc_path_blocked(g, df, loc, hero_loc);
+            //bool object_blocking = is_loc_path_blocked(g, df, loc, hero_loc);
             // render all entities if not blocked
+            if (is_loc_path_blocked(g, df, loc, hero_loc))
+                continue;
+            //if (!object_blocking) {
             auto entities_begin = tile->get_entities()->cbegin();
             auto entities_end = tile->get_entities()->cend();
-            for_each(entities_begin, entities_end, [&g, type_0, object_blocking, &extra_check](const entityid& id) {
+            for_each(entities_begin, entities_end, [&g, type_0, &extra_check](entityid id) {
                 const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
                 //auto sm = g.ct.get<spritemove>(id).value_or((Rectangle){0, 0, 0, 0});
                 //spritegroup_t* sg = spritegroups[id];
                 //if (sg->move.x != 0 || sg->move.y != 0) {
                 //    draw_sprite_and_shadow(g, id);
                 //}
-                if (!object_blocking && type_0 == type && extra_check(g, id)) {
+                if (type_0 == type && extra_check(g, id))
                     draw_sprite_and_shadow(g, id);
-                }
             });
         }
     }
+    */
 }
 
 
