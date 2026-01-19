@@ -1413,7 +1413,7 @@ public:
         const entityid id = create_npc_at_with(rt, loc, [](CT& ct, const entityid id) {});
         massert(id != ENTITYID_INVALID, "id is invalid");
         constexpr int hp_ = 10, maxhp_ = 10;
-        constexpr int vis_dist = 2, light_rad = 2, hear_dist = 3;
+        constexpr int vis_dist = 5, light_rad = 5, hear_dist = 3;
         constexpr entitytype_t type = ENTITY_PLAYER;
         set_hero_id(id);
         ct.set<entitytype>(id, type);
