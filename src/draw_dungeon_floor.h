@@ -71,22 +71,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
     const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
     const Rectangle dest = {(float)px, (float)py, (float)DEFAULT_TILE_SIZE_SCALED, (float)DEFAULT_TILE_SIZE_SCALED};
 
-    // Draw tile with fade if beyond light dist
 
-    //const Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : WHITE; // Faded for out-of-range tiles
-
-    //const Color draw_color = distance > light_dist ? Color{255, 255, 255, 102} : Color{255, 255, 255, 255}; // Faded for out-of-range tiles
-
-    unsigned char a = 102;
-
-    const Color draw_color = distance > light_dist ? Color{255, 255, 255, a} : Color{255, 255, 255, 255}; // Faded for out-of-range tiles
-
-
-    if (distance > light_dist) {
-        minfo2("END draw dungeon floor tile 4");
-        DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
-        return true;
-    }
     // Draw tile with fade ALSO if path between tile and hero is blocked
     auto path = calculate_path_with_thickness({x, y, z}, hero_loc);
     // Check for blocking walls/doors in path
@@ -97,9 +82,18 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
             blocking = true;
             break;
         }
-        // Check for closed doors
         for (const entityid id : *tile->get_entities()) {
-            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR && !g.ct.get<door_open>(id).value_or(false)) {
+            auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            auto is_open = g.ct.get<door_open>(id).value_or(false);
+
+            // Check for closed doors
+            if (type == ENTITY_DOOR && !is_open) {
+                blocking = true;
+                break;
+            }
+
+            // Check for boxes
+            if (type == ENTITY_BOX) {
                 blocking = true;
                 break;
             }
@@ -108,12 +102,20 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
             break;
     }
     // Apply fade if blocked
-    //constexpr float fade_percent = 0.3f;
+    const unsigned char a = blocking ? 31 : distance > light_dist ? 102 : 255;
+    const Color draw_color2 = Color{255, 255, 255, a};
 
-    //const Color draw_color2 = blocking ? Fade(draw_color, fade_percent) : draw_color;
-    const Color draw_color2 = blocking ? Color{255, 255, 255, 31} : draw_color;
+    // Draw tile with fade if beyond light dist
+    //if (distance > light_dist) {
+    //    minfo2("END draw dungeon floor tile 4");
+    //    constexpr unsigned char a = 102;
+    //    const Color draw_color = {255, 255, 255, a}; // Faded for out-of-range tiles
+    //    DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color);
+    //    return true;
+    //}
 
-    DrawTexturePro(*texture, src, dest, (Vector2){0, 0}, 0, draw_color2);
+
+    DrawTexturePro(*texture, src, dest, Vector2{0, 0}, 0, draw_color2);
     minfo2("END draw dungeon floor tile 5");
     return true;
 }
@@ -197,7 +199,7 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 }
 
 
-const static inline bool draw_dungeon_floor(gamestate& g) {
+static inline bool draw_dungeon_floor(gamestate& g) {
     shared_ptr<dungeon_floor> df = g.d.get_current_floor();
     const int z = g.d.current_floor;
     // render tiles

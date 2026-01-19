@@ -44,10 +44,9 @@ static inline void libdraw_drawframe_2d(gamestate& g) {
 #endif
     //draw_version(g);
     //int x = 0;
-    if (g.display_help_menu) {
-        //minfo("draw help menu");
+    if (g.display_help_menu)
         draw_help_menu(g);
-    }
+
     //if (g.gameover) {
     //    draw_gameover_menu(g);
     //}

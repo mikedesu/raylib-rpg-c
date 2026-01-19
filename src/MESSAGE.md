@@ -49,6 +49,7 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
+- [ ] **BUG** pulling a box can result in the player moving into an empty/unknown/none-tiletype
 - [ ] **BUG** hallways generated do not always connect on their adjacent rooms
 - [ ] **OPTIMIZATION** we need to start storing lists of entityids by type in `gamestate`
   - [ ] when looping thru handling entities, it would reduce comparisons and make the internal `tick` faster
