@@ -34,7 +34,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
     // this forces it to be a reference
     const vec3 loc = {x, y, z};
     massert(!vec3_invalid(loc), "loc is invalid");
-    auto tile = df->tile_at((vec3){x, y, z});
+    auto tile = df->tile_at(vec3{x, y, z});
     massert(tile, "tile is NULL");
     if (tile->get_type() == TILE_NONE || !tile->get_visible() || !tile->get_explored()) {
         minfo2("END draw dungeon floor tile 0");
@@ -74,7 +74,13 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
     // Draw tile with fade if beyond light dist
 
     //const Color draw_color = distance > light_dist ? Fade(WHITE, 0.4f) : WHITE; // Faded for out-of-range tiles
-    const Color draw_color = distance > light_dist ? Color{255, 255, 255, 102} : WHITE; // Faded for out-of-range tiles
+
+    //const Color draw_color = distance > light_dist ? Color{255, 255, 255, 102} : Color{255, 255, 255, 255}; // Faded for out-of-range tiles
+
+    unsigned char a = 102;
+
+    const Color draw_color = distance > light_dist ? Color{255, 255, 255, a} : Color{255, 255, 255, 255}; // Faded for out-of-range tiles
+
 
     if (distance > light_dist) {
         minfo2("END draw dungeon floor tile 4");
@@ -102,7 +108,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
             break;
     }
     // Apply fade if blocked
-    constexpr float fade_percent = 0.3f;
+    //constexpr float fade_percent = 0.3f;
 
     //const Color draw_color2 = blocking ? Fade(draw_color, fade_percent) : draw_color;
     const Color draw_color2 = blocking ? Color{255, 255, 255, 31} : draw_color;
