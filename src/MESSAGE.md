@@ -44,14 +44,16 @@ I have already done the following:
     - [ ] zombie mechanics ('alive-but-dead')
 - [x] **BUG** `handle_test_flag` not properly incrementing turns
   - [ ] **i think its fixed**
-
+- [x] **FIXED** **BUG** pulling a box can result in the player moving into an empty/unknown/none-tiletype
 
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
+
+- [ ] **POLISH** camera movement should be bounded by the size of the dungeon floor
+- [ ] **BUG** standing on top of dead bodies causes the lighting system to treat it as if you can't see in any direction
 - [ ] **POLISH** draw tile updates can be moved over into draw entity
   - [ ] there is a lot of code duplication, see if we cant use the manhattan dist function...
-- [ ] **BUG** pulling a box can result in the player moving into an empty/unknown/none-tiletype
 - [ ] **BUG** hallways generated do not always connect on their adjacent rooms
 - [ ] **OPTIMIZATION** we need to start storing lists of entityids by type in `gamestate`
   - [ ] when looping thru handling entities, it would reduce comparisons and make the internal `tick` faster

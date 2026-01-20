@@ -1230,7 +1230,8 @@ public:
         create_weapon_at_with(ct, df->get_random_loc(), axe_init());
         create_shield_at_with(ct, df->get_random_loc(), shield_init());
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
-        for (int i = 0; i < 10; i++)
+        constexpr int num_boxes = 100;
+        for (int i = 0; i < num_boxes; i++)
             create_box_at_with(df->get_random_loc());
         constexpr int monster_count = 10;
         for (int j = 0; j < monster_count; j++) {
@@ -2470,34 +2471,44 @@ public:
     inline bool try_entity_pull(entityid id) {
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
         ct.set<update>(id, true);
+
         vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
         massert(!vec3_invalid(loc), "loc is invalid");
+
         auto df = d.get_floor(loc.z);
         auto tile = df->tile_at(loc);
+
         // get the id's direction
         direction_t facing_d = ct.get<direction>(id).value_or(DIR_NONE);
         massert(facing_d != DIR_NONE, "direction d is none");
+
         // opposite dir
         direction_t d = get_opposite_dir(facing_d);
         vec3 v = get_loc_from_dir(d);
         vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
         vec3 fv = get_loc_from_dir(facing_d);
         vec3 bloc = {loc.x + fv.x, loc.y + fv.y, loc.z};
+
+        auto tile_dest = df->tile_at(aloc);
+
         if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height()) {
             merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
             return false;
         }
-        if (!tile_is_walkable(tile->get_type())) {
+
+        if (!tile_is_walkable(tile_dest->get_type())) {
             //if (!(god_mode && id == hero_id)) {
             merror2("tile is not walkable");
             return false;
             //}
         }
+
         const entityid box_id = tile_has_box(aloc.x, aloc.y, aloc.z);
         if (box_id != ENTITYID_INVALID) {
             merror2("box present, can't push and pull simultaneously");
             return false;
         }
+
         const bool has_solid = tile_has_solid(aloc.x, aloc.y, aloc.z);
         if (has_solid) {
             merror2("solid present, cannot move");
@@ -2509,6 +2520,7 @@ public:
             merror2("player present, cannot move");
             return false;
         }
+
         const entityid door_id = tile_has_door(aloc);
         if (door_id != ENTITYID_INVALID) {
             massert(ct.has<door_open>(door_id), "door_id %d doesnt have a door_open component", door_id);
@@ -2517,14 +2529,17 @@ public:
                 return false;
             }
         }
+
         const entityid box_id2 = tile_has_box(bloc.x, bloc.y, bloc.z);
         if (box_id2 == ENTITYID_INVALID)
             return false;
+
         // remove the entity from the current tile
         if (!df->df_remove_at(id, loc)) {
             merror2("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
             return false;
         }
+
         // force cache update
         recompute_entity_cache_at(loc);
         // add the entity to the new tile
@@ -2532,17 +2547,21 @@ public:
             merror2("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
             return false;
         }
+
         // force cache update
         recompute_entity_cache_at(aloc);
+
         ct.set<location>(id, aloc);
         const float mx = v.x * DEFAULT_TILE_SIZE;
         const float my = v.y * DEFAULT_TILE_SIZE;
+
         ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
         if (check_hearing(hero_id, aloc)) {
             // crashes in unittest if missing this check
             if (IsAudioDeviceReady())
                 PlaySound(sfx[SFX_STEP_STONE_1]);
         }
+
         ct.set<steps_taken>(id, ct.get<steps_taken>(id).value_or(0) + 1);
         msuccess2("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
         // check to see if pullable
