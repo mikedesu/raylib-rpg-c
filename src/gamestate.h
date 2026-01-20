@@ -232,10 +232,8 @@ public:
         bzero(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF);
         strftime(timebeganbuf, GAMESTATE_SIZEOFTIMEBUF, "Start Time: %Y-%m-%d %H:%M:%S", timebegantm);
         strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
-
         cam_lockon = true;
         frame_dirty = true;
-
         debugpanelon = false;
         player_input_received = false;
         is_locked = false;
@@ -245,14 +243,11 @@ public:
         display_help_menu = false;
         do_quit = false;
         cam_changed = false;
-
         gameover = dirty_entities = false;
         processing_actions = false;
-
         test_guard = false;
         player_changing_dir = false;
         msg_system_is_active = false;
-
         music_volume_changed = false;
 #ifndef TEST
         test = false;
@@ -282,25 +277,19 @@ public:
         line_spacing = 1.0f;
         // weird bug maybe when set to 0?
         next_entityid = 1;
-
         current_music_index = 0;
         do_restart = 0;
         title_screen_selection = 0;
         lock = 0;
         frame_updates = framecount = restart_count = 0;
         last_frame_time = last_frame_times_current = 0;
-
         last_frame_times.reserve(LAST_FRAME_TIMES_MAX);
         for (size_t i = 0; i < last_frame_times.size(); i++)
             last_frame_times[i] = 0;
-
         turn_count = 0;
         action_selection = inventory_menu_selection = 0;
         msg_history_max_len_msg_measure = msg_history_max_len_msg = 0;
-
         debugpanel.pad_top = debugpanel.pad_left = debugpanel.pad_right = debugpanel.pad_bottom = 0;
-
-
         max_title_screen_selections = 2;
         // initialize character creation
         chara_creation.name = "hero";
@@ -470,7 +459,6 @@ public:
             minfo2("adding floor to dungeon...");
             d.add_floor(df);
         }
-
         minfo2("END floor creation loop");
         d.is_initialized = true;
     }
@@ -594,7 +582,6 @@ public:
 
     inline entityid create_prop_at_with(proptype_t type, vec3 loc, with_fun initFun) {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        //tile_t& tile = df.df_tile_at(loc);
         const entityid id = create_prop_with(type, initFun);
         if (id == ENTITYID_INVALID)
             return ENTITYID_INVALID;
@@ -851,7 +838,6 @@ public:
         const entityid id = create_potion_with(potionInitFunction);
         if (id == ENTITYID_INVALID)
             return ENTITYID_INVALID;
-        //minfo("attempting df_add_at: %d, %d, %d", id, loc.x, loc.y);
         if (!df->df_add_at(id, loc))
             return ENTITYID_INVALID;
         ct.set<location>(id, loc);
@@ -863,7 +849,6 @@ public:
     inline race_t random_monster_type() {
         const vector<race_t> monster_races = {RACE_GOBLIN, RACE_ORC, RACE_BAT, RACE_WOLF, RACE_WARG, RACE_ZOMBIE, RACE_SKELETON, RACE_RAT, RACE_GREEN_SLIME};
         uniform_int_distribution<int> gen(0, monster_races.size() - 1);
-        //const int random_index = GetRandomValue(0, monster_races.size() - 1);
         const int random_index = gen(mt);
         return monster_races[random_index];
     }
@@ -1162,10 +1147,9 @@ public:
             return false;
         }
         const unsigned char a = ct.get<txalpha>(hero_id).value_or(255);
-        const bool is_dead = ct.get<dead>(hero_id).value_or(true);
         if (a < 255)
             ct.set<txalpha>(hero_id, a + 1);
-        if (is_dead) {
+        if (ct.get<dead>(hero_id).value_or(true)) {
             merror2("hero_id is dead");
             gameover = true;
             return true;
@@ -3084,8 +3068,7 @@ public:
         for (tactic t : npc_tactics) {
             if (t.target == tactic_target::nil && t.condition == tactic_condition::any && t.action == tactic_action::move) {
                 // handle random move
-                const bool result = try_entity_move(id, (vec3){dist(mt), dist(mt), 0});
-                if (result)
+                if (try_entity_move(id, vec3{dist(mt), dist(mt), 0}))
                     msuccess2("try entity move succeeded");
                 else
                     merror2("try entity move FAILED");
@@ -3167,15 +3150,13 @@ public:
             //minfo("npc anim");
 #ifndef NPCS_ALL_AT_ONCE
             entity_turn++;
-            if (entity_turn >= next_entityid) {
+            if (entity_turn >= next_entityid)
                 entity_turn = 0;
-            }
             if (entity_turn == hero_id) {
                 flag = GAMESTATE_FLAG_PLAYER_INPUT;
                 turn_count++;
-            } else {
+            } else
                 flag = GAMESTATE_FLAG_NPC_TURN;
-            }
 #else
             flag = GAMESTATE_FLAG_PLAYER_INPUT;
             //minfo("handle test flag: %d", turn_count);
@@ -3190,12 +3171,10 @@ public:
         // Spawn NPCs periodically
         //try_spawn_npc(g);
         //massert(r0, "update player tiles explored failed");
-        if (!update_player_tiles_explored()) {
+        if (!update_player_tiles_explored())
             merror2("update player tiles explored failed");
-        }
-        if (!update_player_state()) {
+        if (!update_player_state())
             merror2("update player state failed");
-        }
         update_npcs_state();
         update_spells_state();
         handle_input(is);
@@ -3206,9 +3185,8 @@ public:
         currenttime = time(NULL);
         currenttimetm = localtime(&currenttime);
         strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
-        if (test) {
+        if (test)
             handle_test_flag();
-        }
         ticks++;
         minfo2("end tick");
     }
