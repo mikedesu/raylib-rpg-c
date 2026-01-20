@@ -11,7 +11,6 @@
 
 
 using std::for_each;
-using std::sort;
 
 
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -19,93 +18,6 @@ extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 constexpr static inline int manhattan_distance(vec3 a, vec3 b) {
     return abs(a.x - b.x) + abs(a.y - b.y);
-}
-
-
-static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, int x, int y, int z) {
-    minfo2("BEGIN draw dungeon floor tile");
-    massert(txinfo, "txinfo is null");
-    massert(z >= 0 && static_cast<size_t>(z) < g.d.get_floor_count(), "z is oob");
-    auto df = g.d.get_floor(z);
-    massert(df, "dungeon_floor is NULL");
-    massert(x >= 0 && x < df->get_width(), "x is oob");
-    massert(y >= 0 && y < df->get_height(), "y is oob");
-    const vec3 loc = {x, y, z};
-    massert(!vec3_invalid(loc), "loc is invalid");
-    auto tile = df->tile_at(vec3{x, y, z});
-    massert(tile, "tile is NULL");
-    if (tile->get_type() == TILE_NONE || !tile->get_visible() || !tile->get_explored()) {
-        minfo2("END draw dungeon floor tile 0");
-        return true;
-    }
-
-    // Get tile texture
-    const int txkey = get_txkey_for_tiletype(tile->get_type());
-    if (txkey < 0) {
-        minfo2("END draw dungeon floor tile 2");
-        return false;
-    }
-    Texture2D* texture = &txinfo[txkey].texture;
-    if (texture->id <= 0) {
-        minfo2("END draw dungeon floor tile 3");
-        return false;
-    }
-
-
-    // Get hero's total light radius
-    const int light_dist = g.ct.get<light_radius>(g.hero_id).value_or(1);
-    auto maybe_hero_loc = g.ct.get<location>(g.hero_id);
-    if (!maybe_hero_loc.has_value()) {
-        minfo2("END draw dungeon floor tile 1");
-        return false;
-    }
-    const vec3 hero_loc = maybe_hero_loc.value();
-    // Calculate Manhattan distance from hero to this tile (diamond pattern)
-    const int distance = manhattan_distance(loc, hero_loc);
-
-    // Calculate drawing position
-    constexpr int offset_x = -12;
-    constexpr int offset_y = -12;
-    const int px = x * DEFAULT_TILE_SIZE + offset_x;
-    const int py = y * DEFAULT_TILE_SIZE + offset_y;
-    const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
-    //const Rectangle dest = {(float)px, (float)py, (float)DEFAULT_TILE_SIZE_SCALED, (float)DEFAULT_TILE_SIZE_SCALED};
-    const float f_px = px;
-    const float f_py = py;
-    const Rectangle dest = {f_px, f_py, DEFAULT_TILE_SIZE_FLOAT, DEFAULT_TILE_SIZE_FLOAT};
-    // Draw tile with fade ALSO if path between tile and hero is blocked
-    auto path = calculate_path_with_thickness({x, y, z}, hero_loc);
-    // Check for blocking walls/doors in path
-    bool blocking = false;
-    for (const auto& v : path) {
-        auto tile = df->tile_at(v);
-        if (tiletype_is_none(tile->get_type()) || tiletype_is_wall(tile->get_type())) {
-            blocking = true;
-            break;
-        }
-        for (const entityid id : *tile->get_entities()) {
-            auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            auto is_open = g.ct.get<door_open>(id).value_or(false);
-            // Check for closed doors
-            if (type == ENTITY_DOOR && !is_open) {
-                blocking = true;
-                break;
-            }
-            // Check for boxes
-            if (type == ENTITY_BOX) {
-                blocking = true;
-                break;
-            }
-        }
-        if (blocking)
-            break;
-    }
-    // Apply fade if blocked
-    const unsigned char a = blocking ? 31 : distance > light_dist ? 102 : 255;
-    const Color draw_color = Color{255, 255, 255, a};
-    DrawTexturePro(*texture, src, dest, Vector2{0, 0}, 0, draw_color);
-    minfo2("END draw dungeon floor tile 5");
-    return true;
 }
 
 
@@ -134,17 +46,19 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
             object_blocking = true;
             break;
         }
-        for (const entityid id : *v0_tile->get_entities()) {
-            auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            auto is_open = g.ct.get<door_open>(id).value_or(false);
-            // check if tile has a DOOR
-            if (type == ENTITY_DOOR && !is_open) {
-                object_blocking = true;
-                break;
-            }
 
-            // Check for boxes
-            if (type == ENTITY_BOX) {
+        for (entityid id : *v0_tile->get_entities()) {
+            auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            // check if tile has a DOOR
+            if (type == ENTITY_DOOR) {
+                auto is_open = g.ct.get<door_open>(id).value_or(false);
+                if (!is_open) {
+                    object_blocking = true;
+                    break;
+                }
+            }
+            // Check if tile has a box
+            else if (type == ENTITY_BOX) {
                 object_blocking = true;
                 break;
             }
@@ -153,6 +67,81 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
             break;
     }
     return object_blocking;
+}
+
+
+static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, int x, int y, int z) {
+    minfo2("BEGIN draw dungeon floor tile");
+    massert(txinfo, "txinfo is null");
+    massert(z >= 0 && static_cast<size_t>(z) < g.d.get_floor_count(), "z is oob");
+    auto df = g.d.get_floor(z);
+    massert(df, "dungeon_floor is NULL");
+    massert(x >= 0 && x < df->get_width(), "x is oob");
+    massert(y >= 0 && y < df->get_height(), "y is oob");
+    const vec3 loc = {x, y, z};
+    massert(!vec3_invalid(loc), "loc is invalid");
+    auto tile = df->tile_at(vec3{x, y, z});
+    massert(tile, "tile is NULL");
+    if (tile->get_type() == TILE_NONE || !tile->get_visible() || !tile->get_explored())
+        return true;
+    // Get tile texture
+    const int txkey = get_txkey_for_tiletype(tile->get_type());
+    massert(txkey >= 0, "txkey is invalid");
+    Texture2D* texture = &txinfo[txkey].texture;
+    massert(texture->id > 0, "texture->id is <= 0");
+    // Get hero's total light radius
+    const int light_dist = g.ct.get<light_radius>(g.hero_id).value_or(1);
+    auto maybe_hero_loc = g.ct.get<location>(g.hero_id);
+    if (!maybe_hero_loc.has_value()) {
+        minfo2("END draw dungeon floor tile 1");
+        return false;
+    }
+    const vec3 hero_loc = maybe_hero_loc.value();
+    // Calculate Manhattan distance from hero to this tile (diamond pattern)
+    const int distance = manhattan_distance(loc, hero_loc);
+    // Calculate drawing position
+    constexpr int offset_x = -12;
+    constexpr int offset_y = -12;
+    const int px = x * DEFAULT_TILE_SIZE + offset_x;
+    const int py = y * DEFAULT_TILE_SIZE + offset_y;
+    const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+    //const Rectangle dest = {(float)px, (float)py, (float)DEFAULT_TILE_SIZE_SCALED, (float)DEFAULT_TILE_SIZE_SCALED};
+    const float f_px = px;
+    const float f_py = py;
+    const Rectangle dest = {f_px, f_py, DEFAULT_TILE_SIZE_FLOAT, DEFAULT_TILE_SIZE_FLOAT};
+    // Draw tile with fade ALSO if path between tile and hero is blocked
+    auto path = calculate_path_with_thickness({x, y, z}, hero_loc);
+    // Check for blocking walls/doors in path
+    const bool blocking = is_loc_path_blocked(g, df, loc, hero_loc);
+    //for (const auto& v : path) {
+    //auto tile = df->tile_at(v);
+    //if (tiletype_is_none(tile->get_type()) || tiletype_is_wall(tile->get_type())) {
+    //blocking = true;
+    //break;
+    //}
+    //for (const entityid id : *tile->get_entities()) {
+    //auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+    //auto is_open = g.ct.get<door_open>(id).value_or(false);
+    // Check for closed doors
+    //if (type == ENTITY_DOOR && !is_open) {
+    //blocking = true;
+    //break;
+    //}
+    // Check for boxes
+    //if (type == ENTITY_BOX) {
+    //blocking = true;
+    //break;
+    //}
+    //}
+    //if (blocking)
+    //break;
+    //}
+    // Apply fade if blocked
+    const unsigned char a = blocking ? 31 : distance > light_dist ? 102 : 255;
+    const Color draw_color = Color{255, 255, 255, a};
+    DrawTexturePro(*texture, src, dest, Vector2{0, 0}, 0, draw_color);
+    minfo2("END draw dungeon floor tile 5");
+    return true;
 }
 
 
@@ -197,9 +186,11 @@ static inline bool draw_dungeon_floor(gamestate& g) {
     shared_ptr<dungeon_floor> df = g.d.get_current_floor();
     const int z = g.d.current_floor;
     // render tiles
-    for (int i = 0; i < df->get_height() * df->get_width(); i++) {
-        const int y = i / df->get_width();
-        const int x = i - (y * df->get_width());
+    const int dw = df->get_width();
+    const int dh = df->get_height();
+    for (int i = 0; i < dh * dw; i++) {
+        const int y = i / dw;
+        const int x = i - (y * dw);
         draw_dungeon_floor_tile(g, txinfo, x, y, z);
     }
     auto mydefault = [](gamestate& g, entityid id) { return true; };
@@ -215,19 +206,14 @@ static inline bool draw_dungeon_floor(gamestate& g) {
             return maybe_dead.value();
         return false;
     };
-    //minfo2("BEGIN draw dungeon floor --- rendering entities");
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_DOOR, mydefault);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PROP, mydefault);
     libdraw_draw_player_target_box(g);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_SPELL, mydefault);
-
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_BOX, mydefault);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
-
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, alive_check);
     libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, mydefault);
-    //minfo2("END draw dungeon floor --- rendering entities");
-    //minfo2("END draw dungeon floor");
     return true;
 }
