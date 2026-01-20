@@ -18,7 +18,6 @@
 #include "get_racial_modifiers.h"
 #include "inputstate.h"
 #include "libgame_defines.h"
-#include "libgame_version.h"
 #include "magic_values.h"
 #include "option_menu.h"
 #include "orc_names.h"

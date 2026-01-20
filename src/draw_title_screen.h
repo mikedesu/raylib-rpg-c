@@ -2,7 +2,6 @@
 
 
 #include "gamestate.h"
-#include "libgame_version.h"
 #include "texture_ids.h"
 #include "textureinfo.h"
 #include <raylib.h>
