@@ -5,9 +5,6 @@
 #include <memory>
 #include <raylib.h>
 
-using std::make_shared;
-using std::shared_ptr;
-
 class sprite {
 private:
     Texture2D* texture;
@@ -18,8 +15,17 @@ private:
     int currentframe;
     int currentcontext;
     int num_loops;
+    bool stop_on_last_frame;
 
 public:
+    bool get_stop_on_last_frame() {
+        return stop_on_last_frame;
+    }
+
+    void set_stop_on_last_frame(bool b) {
+        stop_on_last_frame = b;
+    }
+
     sprite() {
     }
 
@@ -28,9 +34,7 @@ public:
         , numcontexts(nc)
         , numframes(nf) {
         massert(t, "texture t was null");
-        currentframe = 0;
-        currentcontext = 0;
-        num_loops = 0;
+        currentframe = currentcontext = num_loops = 0;
         width = t->width / numframes;
         height = t->height / numcontexts;
         stop_on_last_frame = false;
@@ -41,12 +45,8 @@ public:
         // to calculate the source rectangle we need to know the width and height of the sprite
         // given the current frame and current context,
         // the width is the current frame times the width of the sprite
-        float x = currentframe * width;
-        float y = currentcontext * height;
-        float w = width;
-        float h = height;
-
-        src = Rectangle{x, y, w, h};
+        src = Rectangle{
+            static_cast<float>(currentframe * width), static_cast<float>(currentcontext * height), static_cast<float>(width), static_cast<float>(height)};
         dest = Rectangle{0, 0, 0, 0};
     }
 
@@ -117,22 +117,16 @@ public:
         num_loops = n;
     }
 
-    //void set_texture(Texture2D* t) {
-    //    texture = t;
-    //}
-
     Texture2D* get_texture() {
         return texture;
     }
 
     Rectangle src;
     Rectangle dest;
-
-    bool stop_on_last_frame;
     bool is_animating;
 };
 
-static inline void sprite_setcontext2(shared_ptr<sprite> s, int ctx) {
+static inline void sprite_setcontext2(std::shared_ptr<sprite> s, int ctx) {
     massert(s, "sprite_setcontext2: sprite is NULL");
     massert(ctx >= 0, "sprite_setcontext2: context is less than 0: %d", ctx);
     const int nc = s->get_numcontexts();
@@ -151,17 +145,17 @@ static inline void sprite_setcontext2(shared_ptr<sprite> s, int ctx) {
     s->src.x = 0;
 }
 
-static inline void sprite_set_is_animating2(shared_ptr<sprite> s, bool is_animating) {
+static inline void sprite_set_is_animating2(std::shared_ptr<sprite> s, bool is_animating) {
     massert(s, "sprite_set_is_animating: sprite is NULL");
     s->is_animating = is_animating;
 }
 
-static inline int sprite_get_context2(shared_ptr<sprite> s) {
+static inline int sprite_get_context2(std::shared_ptr<sprite> s) {
     massert(s, "sprite_get_context: sprite is NULL");
     return s->get_currentcontext();
 }
 
-static inline bool sprite_is_animating2(shared_ptr<sprite> s) {
+static inline bool sprite_is_animating2(std::shared_ptr<sprite> s) {
     massert(s, "sprite_is_animating: sprite is NULL");
     return s->is_animating;
 }
