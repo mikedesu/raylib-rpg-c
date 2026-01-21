@@ -3,7 +3,6 @@
 #include "gamestate.h"
 #include "spritegroup.h"
 
-
 extern unordered_map<entityid, spritegroup_t*> spritegroups;
 
 static inline void draw_inventory_menu(gamestate& g) {
@@ -64,7 +63,6 @@ static inline void draw_inventory_menu(gamestate& g) {
         if (!my_inventory.has_value())
             return;
 
-
         //if (my_inventory.has_value()) {
         // unpack the inventory optional
         //shared_ptr<vector<entityid>> unpacked_inventory = my_inventory.value();
@@ -85,7 +83,8 @@ static inline void draw_inventory_menu(gamestate& g) {
 
                     if (sg) {
                         auto sprite = sg_get_current(sg);
-                        DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
+                        //DrawTexturePro(*(sprite->texture), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
+                        DrawTexturePro(*(sprite->get_texture()), (Rectangle){10, 10, 12, 12}, grid_box2, (Vector2){0, 0}, 0.0f, WHITE);
 
                         size_t index = j * cols + i;
 
@@ -96,10 +95,8 @@ static inline void draw_inventory_menu(gamestate& g) {
 
                             entityid cur_shield_id = g.ct.get<equipped_shield>(g.hero_id).value_or(ENTITYID_INVALID);
 
-
                             if ((selection_id == cur_wpn_id && cur_wpn_id != ENTITYID_INVALID) ||
                                 (selection_id == cur_shield_id && cur_shield_id != ENTITYID_INVALID)
-
 
                             ) {
                                 DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
@@ -125,10 +122,9 @@ static inline void draw_inventory_menu(gamestate& g) {
                 spritegroup_t* sg = spritegroups[selection_id];
                 itemtype_t item_type = g.ct.get<itemtype>(selection_id).value_or(ITEM_NONE);
 
-
                 if (sg) {
                     auto sprite = sg_get_current(sg);
-                    DrawTexturePro(*(sprite->texture), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
+                    DrawTexturePro(*(sprite->get_texture()), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
 
                     // new-style component table access
                     const string my_name = g.ct.get<name>(selection_id).value_or("no-name");
@@ -165,7 +161,6 @@ static inline void draw_inventory_menu(gamestate& g) {
                         DrawText(TextFormat("Heal amount: %d-%d", heal.x, heal.y), cur_x, cur_y, fontsize, WHITE);
                         cur_y += y_incr;
                     }
-
 
                     string my_desc = g.ct.get<description>(selection_id).value_or("no-description");
                     DrawText(my_desc.c_str(), cur_x, cur_y, fontsize, WHITE);

@@ -5,13 +5,12 @@
 #include <memory>
 #include <raylib.h>
 
-
 using std::make_shared;
 using std::shared_ptr;
 
-
 class sprite {
 private:
+    Texture2D* texture;
     int width;
     int height;
     int numcontexts;
@@ -20,11 +19,9 @@ private:
     int currentcontext;
     int num_loops;
 
-
 public:
     sprite() {
     }
-
 
     sprite(Texture* t, int nc, int nf)
         : texture(t)
@@ -56,7 +53,6 @@ public:
     ~sprite() {
     }
 
-
     void incr_frame() {
         if (!is_animating)
             return;
@@ -73,33 +69,38 @@ public:
         src.x = width * currentframe;
     }
 
-
     int get_width() {
         return width;
     }
+
     int get_height() {
         return height;
     }
+
     void set_width(int w) {
         width = w;
     }
+
     void set_height(int h) {
         height = h;
     }
 
-
     int get_numcontexts() {
         return numcontexts;
     }
+
     int get_numframes() {
         return numframes;
     }
+
     int get_currentframe() {
         return currentcontext;
     }
+
     int get_currentcontext() {
         return currentframe;
     }
+
     int get_num_loops() {
         return num_loops;
     }
@@ -116,15 +117,20 @@ public:
         num_loops = n;
     }
 
+    //void set_texture(Texture2D* t) {
+    //    texture = t;
+    //}
 
-    Texture2D* texture;
+    Texture2D* get_texture() {
+        return texture;
+    }
+
     Rectangle src;
     Rectangle dest;
 
     bool stop_on_last_frame;
     bool is_animating;
 };
-
 
 static inline void sprite_setcontext2(shared_ptr<sprite> s, int ctx) {
     massert(s, "sprite_setcontext2: sprite is NULL");
@@ -145,18 +151,15 @@ static inline void sprite_setcontext2(shared_ptr<sprite> s, int ctx) {
     s->src.x = 0;
 }
 
-
 static inline void sprite_set_is_animating2(shared_ptr<sprite> s, bool is_animating) {
     massert(s, "sprite_set_is_animating: sprite is NULL");
     s->is_animating = is_animating;
 }
 
-
 static inline int sprite_get_context2(shared_ptr<sprite> s) {
     massert(s, "sprite_get_context: sprite is NULL");
     return s->get_currentcontext();
 }
-
 
 static inline bool sprite_is_animating2(shared_ptr<sprite> s) {
     massert(s, "sprite_is_animating: sprite is NULL");
