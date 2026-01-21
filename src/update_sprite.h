@@ -14,7 +14,7 @@ extern unordered_map<entityid, spritegroup_t*> spritegroups;
 static inline void libdraw_update_sprite_context_ptr(gamestate& g, spritegroup_t* group, direction_t dir) {
     //massert(g, "gamestate is NULL");
     massert(group != NULL, "group is NULL");
-    int old_ctx = group->sprites2->at(group->current)->currentcontext;
+    int old_ctx = group->sprites2->at(group->current)->get_currentcontext();
     int ctx = old_ctx;
     ctx = dir == DIR_NONE                                      ? old_ctx
           : dir == DIR_DOWN_RIGHT                              ? SPRITEGROUP_CONTEXT_R_D

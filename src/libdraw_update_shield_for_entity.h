@@ -31,7 +31,7 @@ static inline void update_shield_for_entity(gamestate& g, entityid id, spritegro
         return;
     }
 
-    ctx = sg->sprites2->at(sg->current)->currentcontext;
+    ctx = sg->sprites2->at(sg->current)->get_currentcontext();
     spritegroup_setcontexts(shield_sg, ctx);
 
     merror("I expect a crash here...");

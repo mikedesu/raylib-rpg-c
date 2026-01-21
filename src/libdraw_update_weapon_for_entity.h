@@ -23,7 +23,7 @@ static inline void update_weapon_for_entity(gamestate& g, entityid id, spritegro
     if (!w_sg)
         return;
 
-    ctx = sg->sprites2->at(sg->current)->currentcontext;
+    ctx = sg->sprites2->at(sg->current)->get_currentcontext();
     spritegroup_setcontexts(w_sg, ctx);
 
     // this really should be either SLASH_F or SLASH_B

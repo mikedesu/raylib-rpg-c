@@ -74,16 +74,16 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
         // this condition for the animation reset seems incorrect
         // certain cases are causing animations to drop-off mid-sequence
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
-            if (s->num_loops >= 1) {
+            if (s->get_num_loops() >= 1) {
                 sg->current = sg->default_anim;
-                s->num_loops = 0;
+                s->set_num_loops(0);
             }
         }
         // this will fire off an infinite loop of spell transitions
         // from cast, to persist, to end
         // then repeat
         // it works, but isnt quite what i want
-        if (type == ENTITY_SPELL && s->num_loops >= 1) {
+        if (type == ENTITY_SPELL && s->get_num_loops() >= 1) {
             if (sg->current == 0) {
                 spritegroup_set_current(sg, 1);
                 g.ct.set<spell_casting>(id, false);
@@ -123,9 +123,9 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 s2->incr_frame();
 
                 g.frame_dirty = true;
-                if (s2->num_loops >= 1) {
+                if (s2->get_num_loops() >= 1) {
                     sg->current = sg->default_anim;
-                    s2->num_loops = 0;
+                    s2->set_num_loops(0);
                 }
             } break;
             case ITEM_SHIELD: {
@@ -138,9 +138,9 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 //sprite_incrframe2(s2);
                 s2->incr_frame();
                 g.frame_dirty = true;
-                if (s2->num_loops >= 1) {
+                if (s2->get_num_loops() >= 1) {
                     sg->current = sg->default_anim;
-                    s2->num_loops = 0;
+                    s2->set_num_loops(0);
                 }
             } break;
             default: break;

@@ -101,7 +101,7 @@ static inline void spritegroup_setcontexts(spritegroup_t* sg, int context) {
     massert(sg, "spritegroup is NULL");
     for (int i = 0; i < sg->size; i++) {
         auto s = sg->sprites2->at(i);
-        if (!s || s->numcontexts <= 0 || context < 0 || context >= s->numcontexts)
+        if (!s || s->get_numcontexts() <= 0 || context < 0 || context >= s->get_numcontexts())
             continue;
         sprite_setcontext2(s, context);
     }
@@ -147,9 +147,9 @@ static inline bool spritegroup_set_current(spritegroup_t* sg, int index) {
     // lets update the sprite's current frame to 0
     // since we prob want to start an animation at the beginning
     // if we are changing current
-    sg->sprites2->at(sg->current)->currentframe = 0;
+    sg->sprites2->at(sg->current)->set_currentframe(0);
     // we might prob wanna reset numloops as well
-    sg->sprites2->at(sg->current)->num_loops = 0;
+    sg->sprites2->at(sg->current)->set_num_loops(0);
     return true;
 }
 

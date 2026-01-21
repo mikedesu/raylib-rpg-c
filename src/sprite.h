@@ -14,6 +14,12 @@ class sprite {
 private:
     int width;
     int height;
+    int numcontexts;
+    int numframes;
+    int currentframe;
+    int currentcontext;
+    int num_loops;
+
 
 public:
     sprite() {
@@ -82,34 +88,61 @@ public:
     }
 
 
+    int get_numcontexts() {
+        return numcontexts;
+    }
+    int get_numframes() {
+        return numframes;
+    }
+    int get_currentframe() {
+        return currentcontext;
+    }
+    int get_currentcontext() {
+        return currentframe;
+    }
+    int get_num_loops() {
+        return num_loops;
+    }
+
+    void set_currentcontext(int n) {
+        currentcontext = n;
+    }
+
+    void set_currentframe(int n) {
+        currentframe = n;
+    }
+
+    void set_num_loops(int n) {
+        num_loops = n;
+    }
+
+
     Texture2D* texture;
     Rectangle src;
     Rectangle dest;
-    int numcontexts;
-    int numframes;
-    int currentframe;
-    int currentcontext;
-    int num_loops;
+
     bool stop_on_last_frame;
     bool is_animating;
 };
 
 
-static inline void sprite_setcontext2(shared_ptr<sprite> s, int context) {
-    massert(s, "sprite_setcontext: sprite is NULL");
-    massert(context >= 0, "sprite_setcontext: context is less than 0: %d", context);
-    massert(context < s->numcontexts, "sprite_setcontext: context is greater than numcontexts: %d < %d", context, s->numcontexts);
-    if (context < 0) {
-        merror("sprite_setcontext: context is less than 0");
+static inline void sprite_setcontext2(shared_ptr<sprite> s, int ctx) {
+    massert(s, "sprite_setcontext2: sprite is NULL");
+    massert(ctx >= 0, "sprite_setcontext2: context is less than 0: %d", ctx);
+    const int nc = s->get_numcontexts();
+    massert(ctx < nc, "sprite_setcontext2: context is greater than numcontexts: %d < %d", ctx, nc);
+    if (ctx < 0) {
+        merror("sprite_setcontext2: context is less than 0");
         return;
     }
-    if (context >= s->numcontexts) {
-        merror("sprite_setcontext: context is greater than numcontexts: %d < %d", context, s->numcontexts);
+    if (ctx >= s->get_numcontexts()) {
+        merror("sprite_setcontext2: context is greater than numcontexts: %d < %d", ctx, s->get_numcontexts());
         return;
     }
-    s->currentcontext = context % s->numcontexts;
-    s->src.y = s->get_height() * s->currentcontext;
-    s->currentframe = s->src.x = 0;
+    s->set_currentcontext(ctx % s->get_numcontexts());
+    s->src.y = s->get_height() * s->get_currentcontext();
+    s->set_currentframe(0);
+    s->src.x = 0;
 }
 
 
@@ -121,7 +154,7 @@ static inline void sprite_set_is_animating2(shared_ptr<sprite> s, bool is_animat
 
 static inline int sprite_get_context2(shared_ptr<sprite> s) {
     massert(s, "sprite_get_context: sprite is NULL");
-    return s->currentcontext;
+    return s->get_currentcontext();
 }
 
 
