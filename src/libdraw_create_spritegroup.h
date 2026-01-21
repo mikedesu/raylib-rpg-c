@@ -38,8 +38,8 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
         group->current = 0;
         float x = loc.x * DEFAULT_TILE_SIZE + offset_x;
         float y = loc.y * DEFAULT_TILE_SIZE + offset_y;
-        float w = s->width;
-        float h = s->height;
+        float w = s->get_width();
+        float h = s->get_height();
         group->dest = Rectangle{x, y, w, h};
         group->off_x = offset_x;
         group->off_y = offset_y;
@@ -61,8 +61,8 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     massert(s, "sprite is NULL");
     float x = -DEFAULT_TILE_SIZE + offset_x;
     float y = -DEFAULT_TILE_SIZE + offset_y;
-    float w = s->width;
-    float h = s->height;
+    float w = s->get_width();
+    float h = s->get_height();
     group->dest = Rectangle{x, y, w, h};
     group->off_x = offset_x;
     group->off_y = offset_y;

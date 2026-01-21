@@ -66,7 +66,11 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
         auto s = sg->sprites2->at(sg->current);
         if (!s)
             continue;
-        sprite_incrframe2(s);
+
+        //sprite_incrframe2(s);
+
+        s->incr_frame();
+
         // this condition for the animation reset seems incorrect
         // certain cases are causing animations to drop-off mid-sequence
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
@@ -114,7 +118,10 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 auto s2 = sg->sprites2->at(sg->current + 1);
                 if (!s2)
                     break;
-                sprite_incrframe2(s2);
+
+                //sprite_incrframe2(s2);
+                s2->incr_frame();
+
                 g.frame_dirty = true;
                 if (s2->num_loops >= 1) {
                     sg->current = sg->default_anim;
@@ -128,7 +135,8 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 auto s2 = sg->sprites2->at(sg->current + 1);
                 if (!s2)
                     break;
-                sprite_incrframe2(s2);
+                //sprite_incrframe2(s2);
+                s2->incr_frame();
                 g.frame_dirty = true;
                 if (s2->num_loops >= 1) {
                     sg->current = sg->default_anim;

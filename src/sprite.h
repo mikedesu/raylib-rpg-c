@@ -12,6 +12,9 @@ using std::shared_ptr;
 
 class sprite {
 private:
+    int width;
+    int height;
+
 public:
     sprite() {
     }
@@ -47,11 +50,41 @@ public:
     ~sprite() {
     }
 
+
+    void incr_frame() {
+        if (!is_animating)
+            return;
+        currentframe++;
+        if (stop_on_last_frame && currentframe == numframes - 1) {
+            is_animating = false;
+            src.x = width * currentframe;
+            return;
+        }
+        if (currentframe >= numframes) {
+            currentframe = 0;
+            num_loops++;
+        }
+        src.x = width * currentframe;
+    }
+
+
+    int get_width() {
+        return width;
+    }
+    int get_height() {
+        return height;
+    }
+    void set_width(int w) {
+        width = w;
+    }
+    void set_height(int h) {
+        height = h;
+    }
+
+
     Texture2D* texture;
     Rectangle src;
     Rectangle dest;
-    int width;
-    int height;
     int numcontexts;
     int numframes;
     int currentframe;
@@ -60,27 +93,6 @@ public:
     bool stop_on_last_frame;
     bool is_animating;
 };
-
-
-static inline void sprite_incrframe2(shared_ptr<sprite> s) {
-    massert(s, "sprite_incrframe: sprite is NULL");
-    if (!s->is_animating) {
-        //merror("sprite is not animating");
-        return;
-    }
-    s->currentframe++;
-    if (s->stop_on_last_frame && s->currentframe == s->numframes - 1) {
-        //merror("stop on last frame");
-        s->is_animating = false;
-        s->src.x = s->width * s->currentframe;
-        return;
-    }
-    if (s->currentframe >= s->numframes) {
-        s->currentframe = 0;
-        s->num_loops++;
-    }
-    s->src.x = s->width * s->currentframe;
-}
 
 
 static inline void sprite_setcontext2(shared_ptr<sprite> s, int context) {
@@ -96,7 +108,7 @@ static inline void sprite_setcontext2(shared_ptr<sprite> s, int context) {
         return;
     }
     s->currentcontext = context % s->numcontexts;
-    s->src.y = s->height * s->currentcontext;
+    s->src.y = s->get_height() * s->currentcontext;
     s->currentframe = s->src.x = 0;
 }
 
