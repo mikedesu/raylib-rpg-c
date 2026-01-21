@@ -8,7 +8,9 @@
 using std::make_shared;
 using std::shared_ptr;
 
-typedef struct sprite {
+//typedef struct sprite {
+class sprite {
+public:
     Texture2D* texture;
     Rectangle src;
     Rectangle dest;
@@ -21,7 +23,7 @@ typedef struct sprite {
     int num_loops;
     bool stop_on_last_frame;
     bool is_animating;
-} sprite;
+};
 
 static inline shared_ptr<sprite> sprite_create2(Texture2D* t, int numcontexts, int numframes) {
     massert(t, "texture t was null");
