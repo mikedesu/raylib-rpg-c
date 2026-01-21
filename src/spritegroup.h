@@ -79,7 +79,7 @@ static inline int spritegroup_get_first_context(spritegroup_t* sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->size > 0, "spritegroup is empty");
     massert(sg->sprites2->at(0), "sprite is NULL");
-    return sprite_get_context2(sg->sprites2->at(0));
+    return sg->sprites2->at(0)->get_currentcontext();
 }
 
 static inline void spritegroup_add(spritegroup_t* sg, shared_ptr<sprite> s) {

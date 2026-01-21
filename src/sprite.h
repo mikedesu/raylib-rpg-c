@@ -131,12 +131,8 @@ static inline void sprite_setcontext2(std::shared_ptr<sprite> s, int ctx) {
     massert(ctx >= 0, "sprite_setcontext2: context is less than 0: %d", ctx);
     const int nc = s->get_numcontexts();
     massert(ctx < nc, "sprite_setcontext2: context is greater than numcontexts: %d < %d", ctx, nc);
-    if (ctx < 0) {
-        merror("sprite_setcontext2: context is less than 0");
-        return;
-    }
-    if (ctx >= s->get_numcontexts()) {
-        merror("sprite_setcontext2: context is greater than numcontexts: %d < %d", ctx, s->get_numcontexts());
+    if (ctx < 0 || ctx >= s->get_numcontexts()) {
+        merror("sprite_setcontext2: context is OOB: %d vs %d", ctx, s->get_numcontexts());
         return;
     }
     s->set_currentcontext(ctx % s->get_numcontexts());
@@ -145,17 +141,7 @@ static inline void sprite_setcontext2(std::shared_ptr<sprite> s, int ctx) {
     s->src.x = 0;
 }
 
-static inline void sprite_set_is_animating2(std::shared_ptr<sprite> s, bool is_animating) {
-    massert(s, "sprite_set_is_animating: sprite is NULL");
-    s->is_animating = is_animating;
-}
-
-static inline int sprite_get_context2(std::shared_ptr<sprite> s) {
-    massert(s, "sprite_get_context: sprite is NULL");
-    return s->get_currentcontext();
-}
-
-static inline bool sprite_is_animating2(std::shared_ptr<sprite> s) {
-    massert(s, "sprite_is_animating: sprite is NULL");
-    return s->is_animating;
-}
+//static inline void sprite_set_is_animating2(std::shared_ptr<sprite> s, bool is_animating) {
+//    massert(s, "sprite_set_is_animating: sprite is NULL");
+//    s->is_animating = is_animating;
+//}
