@@ -5,12 +5,48 @@
 #include <memory>
 #include <raylib.h>
 
+
 using std::make_shared;
 using std::shared_ptr;
 
-//typedef struct sprite {
+
 class sprite {
+private:
 public:
+    sprite() {
+    }
+
+
+    sprite(Texture* t, int nc, int nf)
+        : texture(t)
+        , numcontexts(nc)
+        , numframes(nf) {
+        massert(t, "texture t was null");
+        currentframe = 0;
+        currentcontext = 0;
+        num_loops = 0;
+        width = t->width / numframes;
+        height = t->height / numcontexts;
+        stop_on_last_frame = false;
+        is_animating = true;
+        // setting the source of the texture is about which frame and context we are on
+        // context is the y access aka which row of sprites
+        // frame is the x access aka which column of sprites
+        // to calculate the source rectangle we need to know the width and height of the sprite
+        // given the current frame and current context,
+        // the width is the current frame times the width of the sprite
+        float x = currentframe * width;
+        float y = currentcontext * height;
+        float w = width;
+        float h = height;
+
+        src = Rectangle{x, y, w, h};
+        dest = Rectangle{0, 0, 0, 0};
+    }
+
+    ~sprite() {
+    }
+
     Texture2D* texture;
     Rectangle src;
     Rectangle dest;
@@ -24,28 +60,6 @@ public:
     bool stop_on_last_frame;
     bool is_animating;
 };
-
-static inline shared_ptr<sprite> sprite_create2(Texture2D* t, int numcontexts, int numframes) {
-    massert(t, "texture t was null");
-    shared_ptr<sprite> s = make_shared<sprite>();
-    s->numframes = numframes;
-    s->numcontexts = numcontexts;
-    s->currentframe = s->currentcontext = s->num_loops = 0;
-    s->texture = t;
-    s->width = t->width / numframes;
-    s->height = t->height / numcontexts;
-    s->stop_on_last_frame = false;
-    s->is_animating = true;
-    // setting the source of the texture is about which frame and context we are on
-    // context is the y access aka which row of sprites
-    // frame is the x access aka which column of sprites
-    // to calculate the source rectangle we need to know the width and height of the sprite
-    // given the current frame and current context,
-    // the width is the current frame times the width of the sprite
-    s->src = (Rectangle){(float)(s->currentframe * s->width), (float)(s->currentcontext * s->height), (float)s->width, (float)s->height};
-    s->dest = (Rectangle){0, 0, 0, 0};
-    return s;
-}
 
 
 static inline void sprite_incrframe2(shared_ptr<sprite> s) {
