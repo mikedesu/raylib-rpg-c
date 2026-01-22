@@ -143,12 +143,9 @@ static inline bool spritegroup_set_current(spritegroup_t* sg, int index) {
 }
 
 static inline bool spritegroup_is_animating(spritegroup_t* sg) {
-    if (!sg)
+    if (!sg || !sg->sprites2->at(sg->current))
         return false;
-    auto s = sg->sprites2->at(sg->current);
-    if (!s)
-        return false;
-    return s->is_animating;
+    return sg->sprites2->at(sg->current)->get_is_animating();
 }
 
 static inline bool spritegroup_update_dest(spritegroup_t* sg) {

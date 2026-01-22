@@ -15,7 +15,7 @@ static inline void draw_entity_sprite(gamestate& g, spritegroup_t* sg) {
     auto s = sg_get_current(sg);
     massert(s, "sprite is NULL");
     if (sg->visible)
-        DrawTexturePro(*s->get_texture(), s->src, dest, (Vector2){0, 0}, 0, c);
+        DrawTexturePro(*s->get_texture(), s->get_src(), dest, (Vector2){0, 0}, 0, c);
 #ifdef ENTITY_BORDER
     // draw a box around the sprite
     DrawRectangleLinesEx(dest, 1, (Color){255, 0, 0, 255});

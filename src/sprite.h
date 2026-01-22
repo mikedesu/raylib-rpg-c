@@ -16,8 +16,34 @@ private:
     int currentcontext;
     int num_loops;
     bool stop_on_last_frame;
+    bool is_animating;
+    Rectangle src;
 
 public:
+    Rectangle get_src() {
+        return src;
+    }
+
+    void set_src(Rectangle r) {
+        src = r;
+    }
+
+    void set_src_x(float x) {
+        src.x = x;
+    }
+
+    void set_src_y(float y) {
+        src.y = y;
+    }
+
+    bool get_is_animating() {
+        return is_animating;
+    }
+
+    void set_is_animating(bool b) {
+        is_animating = b;
+    }
+
     bool get_stop_on_last_frame() {
         return stop_on_last_frame;
     }
@@ -121,9 +147,7 @@ public:
         return texture;
     }
 
-    Rectangle src;
     Rectangle dest;
-    bool is_animating;
 };
 
 static inline void sprite_setcontext2(std::shared_ptr<sprite> s, int ctx) {
@@ -135,13 +159,8 @@ static inline void sprite_setcontext2(std::shared_ptr<sprite> s, int ctx) {
         merror("sprite_setcontext2: context is OOB: %d vs %d", ctx, s->get_numcontexts());
         return;
     }
-    s->set_currentcontext(ctx % s->get_numcontexts());
-    s->src.y = s->get_height() * s->get_currentcontext();
+    s->set_currentcontext(ctx % nc);
+    s->set_src_y(s->get_height() * s->get_currentcontext());
     s->set_currentframe(0);
-    s->src.x = 0;
+    s->set_src_x(0);
 }
-
-//static inline void sprite_set_is_animating2(std::shared_ptr<sprite> s, bool is_animating) {
-//    massert(s, "sprite_set_is_animating: sprite is NULL");
-//    s->is_animating = is_animating;
-//}
